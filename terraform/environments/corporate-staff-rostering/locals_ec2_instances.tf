@@ -180,7 +180,7 @@ locals {
       }
       instance = {
         disable_api_termination      = false
-        instance_type                = "t3.nano"
+        instance_type                = "t3.medium"
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "required"
         tags = {
