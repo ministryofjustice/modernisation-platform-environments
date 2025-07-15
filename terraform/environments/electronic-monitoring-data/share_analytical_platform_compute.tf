@@ -23,6 +23,7 @@ locals {
     "datamart",
     "derived",
     "testing",
+    "servicenow"
   ]
   prod_dbs_to_grant = local.is-production ? ["am_stg",
     "cap_dw_stg",
