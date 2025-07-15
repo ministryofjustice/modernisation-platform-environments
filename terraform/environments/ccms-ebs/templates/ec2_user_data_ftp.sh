@@ -19,9 +19,6 @@ systemctl stop amazon-ssm-agent
 rm -rf /var/lib/amazon/ssm/ipc/
 systemctl start amazon-ssm-agent
 
-AWS_REGION=eu-west-2
-aws configure set region $AWS_REGION
-
 ENV="${environment}"
 inbound_bucket="${ftp_inbound_bucket}"
 outbound_bucket="${ftp_outbound_bucket}"
@@ -42,6 +39,8 @@ if ! grep -q '^Port 8022' "$SSHD_CONFIG"; then
 fi
 
 SECRET_NAME="ftp-s3-$ENV-aws-key"
+
+echo "the secret name is $SECRET_NAME"
 
 # --- Fetch secret securely ---
 SECRET_JSON=$(aws secretsmanager get-secret-value \
