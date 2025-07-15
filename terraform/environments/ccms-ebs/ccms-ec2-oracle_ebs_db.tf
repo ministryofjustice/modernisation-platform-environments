@@ -104,7 +104,7 @@ resource "aws_ebs_volume" "export_home" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "export-home")) },
+    # { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "export-home")) },
     { device-name = "/dev/sdh" }
   )
 }
@@ -126,7 +126,7 @@ resource "aws_ebs_volume" "u01" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "u01")) },
+    # { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "u01")) },
     { device-name = "/dev/sdi" }
   )
 }
