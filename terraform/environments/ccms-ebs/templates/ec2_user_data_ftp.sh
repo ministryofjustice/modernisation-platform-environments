@@ -19,7 +19,90 @@ systemctl stop amazon-ssm-agent
 rm -rf /var/lib/amazon/ssm/ipc/
 systemctl start amazon-ssm-agent
 
-useradd -m s3xfer
+SSHD_CONFIG="/etc/ssh/sshd_config"
+
+# Backup original config
+cp "$SSHD_CONFIG" "$SSHD_CONFIG.bak_$(date +%F_%T)"
+
+# Add port 22 if not already present
+if ! grep -q '^Port 22' "$SSHD_CONFIG"; then
+    echo "Port 22" | sudo tee -a "$SSHD_CONFIG" > /dev/null
+fi
+
+# Add port 8022 if not already present
+if ! grep -q '^Port 8022' "$SSHD_CONFIG"; then
+    echo "Port 8022" | sudo tee -a "$SSHD_CONFIG" > /dev/null
+fi
+
+SECRET_NAME="ftp-s3-${environment}-aws-key"
+
+# --- Fetch secret securely ---
+SECRET_JSON=$(aws secretsmanager get-secret-value \
+  --secret-id "$SECRET_NAME" \
+  --region "$REGION" \
+  --query SecretString \
+  --output text)
+
+# --- Extract credentials ---
+USERNAME=$(echo "$SECRET_JSON" | jq -r '.USER')
+PASSWORD=$(echo "$SECRET_JSON" | jq -r '.PASSWORD')
+
+# --- Validate inputs ---
+if [[ -z "$USERNAME" || -z "$PASSWORD" || "$USERNAME" == "null" || "$PASSWORD" == "null" ]]; then
+  echo "❌ USER or PASSWORD key is missing or null in the secret!"
+  exit 1
+fi
+
+# --- Create user if not exists ---
+if id "$USERNAME" &>/dev/null; then
+  echo "User $USERNAME already exists."
+else
+  useradd -m "$USERNAME"
+fi
+
+# --- Set password securely using heredoc ---
+chpasswd <<EOF
+$USERNAME:$PASSWORD
+EOF
+
+# Check if PasswordAuthentication is disabled
+if grep -qE "^#?PasswordAuthentication\s+no" "$SSHD_CONFIG"; then
+  echo "🔄 Enabling PasswordAuthentication..."
+  sed -i 's/^#\?PasswordAuthentication\s\+no/PasswordAuthentication yes/' "$SSHD_CONFIG"
+else
+  echo "✅ PasswordAuthentication is already enabled or not explicitly set."
+fi
+
+# Ensure ChallengeResponseAuthentication is disabled (for passwords to work reliably)
+if grep -qE "^#?ChallengeResponseAuthentication\s+yes" "$SSHD_CONFIG"; then
+  echo "🔄 Disabling ChallengeResponseAuthentication..."
+  sed -i 's/^#\?ChallengeResponseAuthentication\s\+yes/ChallengeResponseAuthentication no/' "$SSHD_CONFIG"
+fi
+
+# Restart sshd service
+echo "Restarting sshd..."
+systemctl restart sshd
+
+C=\$(aws secretsmanager get-secret-value --secret-id ftp-s3-${environment}-aws-key --region eu-west-2)
+K=\$(jq -r '.SecretString' <<< \${C} |cut -d'"' -f2)
+S=\$(jq -r '.SecretString' <<< \${C} |cut -d'"' -f4)
+U=\$(id -u ${USERNAME})
+G=\$(id -g ${USERNAME})
+F=/etc/passwd-s3fs
+echo "\${K}:\${S}" > "\${F}"
+chmod 600 \${F}
+
+for b in "\${B[@]}"; do
+  D=/${USERNAME}/S3/\${b}
+
+  if [[ -d \${D} ]]; then
+    echo "\${D} exists."
+  else
+    mkdir -p \${D}
+  fi
+
+  chown -R ${USERNAME}:users \${D}
+  chmod 755 \${D}
 
 echo "pasv_enable=YES" >> /etc/vsftpd/vsftpd.conf
 echo "pasv_min_port=3000" >> /etc/vsftpd/vsftpd.conf
@@ -28,13 +111,13 @@ echo "pasv_max_port=3010" >> /etc/vsftpd/vsftpd.conf
 systemctl restart vsftpd.service
 
 # create mount directories
-mkdir -p /s3xfer/S3/laa-ccms-inbound-${environment}-mp /s3xfer/S3/laa-ccms-outbound-${environment}-mp
+mkdir -p /${USERNAME}/S3/laa-ccms-inbound-${environment}-mp /${USERNAME}/S3/laa-ccms-outbound-${environment}-mp
 # Backup fstab first
 cp /etc/fstab /etc/fstab.bak.$(date +%F-%H%M%S)
 
 # Define mount entries
-LINE1="s3fs#laa-ccms-inbound-${environment}-mp /s3xfer/S3/laa-ccms-inbound-${environment}-mp fuse _netdev,iam_role=auto,allow_other,nonempty 0 0"
-LINE2="s3fs#laa-ccms-outbound-${environment}-mp /s3xfer/S3/laa-ccms-outbound-${environment}-mp fuse _netdev,iam_role=auto,allow_other,nonempty 0 0"
+LINE1="s3fs#laa-ccms-inbound-${environment}-mp /${USERNAME}/S3/laa-ccms-inbound-${environment}-mp fuse _netdev,iam_role=auto,uid=${U},gid=${G},mp_umask=0022,allow_other,nonempty 0 0"
+LINE2="s3fs#laa-ccms-outbound-${environment}-mp /${USERNAME}/S3/laa-ccms-outbound-${environment}-mp fuse _netdev,iam_role=auto,uid=${U},gid=${G},mp_umask=0022,allow_other,nonempty 0 0"
 
 # Append to fstab if not already present
 grep -qxF "$LINE1" /etc/fstab || echo "$LINE1" >> /etc/fstab
@@ -49,4 +132,11 @@ if ! sudo mount -a 2>&1 | tee /etc/mount_errors.log; then
   exit 1
 else
   echo "[SUCCESS] All mounts applied successfully."
+  if [[ "$environment" != "production" ]]; then
+    ln -s /${USERNAME}/S3/laa-ccms-inbound-${environment}-mp/inbound-lambda-runs /home/${USERNAME}/inbound-lambda-runs
+    ln -s /${USERNAME}/S3/laa-ccms-outbound-${environment}-mp/outbound-lambda-runs /home/${USERNAME}/outbound-lambda-runs
+    chown -h ${USERNAME}:${USERNAME} /home/${USERNAME}/inbound-lambda-runs
+    chown -h ${USERNAME}:${USERNAME} /home/${USERNAME}/outbound-lambda-runs
+  fi
+
 fi

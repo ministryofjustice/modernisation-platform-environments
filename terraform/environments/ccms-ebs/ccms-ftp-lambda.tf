@@ -246,8 +246,8 @@ module "LAA-ftp-eckoh-inbound-ccms" {
   ftp_remote_path          = "/outbound/"
   ftp_bucket               = aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket
   env                      = local.environment
-  secret_name              = "LAA-ftp-allpay-inbound-ccms-${local.environment}"
-  secret_arn               = aws_secretsmanager_secret.secrets["LAA-ftp-allpay-inbound-ccms"].arn
+  secret_name              = "LAA-ftp-eckoh-inbound-ccms-${local.environment}"
+  secret_arn               = aws_secretsmanager_secret.secrets["LAA-ftp-eckoh-inbound-ccms"].arn
   s3_bucket_ftp            = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
   s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
   s3_object_ftp_client     = aws_s3_object.ftp_client.key

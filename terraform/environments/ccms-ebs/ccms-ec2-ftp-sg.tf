@@ -65,6 +65,16 @@ resource "aws_security_group" "ec2_sg_ftp" {
 #   local.application_data.accounts[local.environment].lz_aws_subnet_env]
 # }
 
+resource "aws_security_group_rule" "ingress_traffic_ftp_22" {
+  security_group_id = aws_security_group.ec2_sg_ftp.id
+  type              = "ingress"
+  description       = "allow all tcp traffic from lambda"
+  protocol          = "TCP"
+  from_port         = 0
+  to_port           = 65535
+  cidr_blocks = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id]
+}
+
 
 
 # EGRESS Rules
