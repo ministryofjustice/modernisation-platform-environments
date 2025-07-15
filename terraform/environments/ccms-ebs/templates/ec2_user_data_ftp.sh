@@ -92,6 +92,8 @@ F=/etc/passwd-s3fs
 echo "\${K}:\${S}" > "\${F}"
 chmod 600 \${F}
 
+B=("laa-ccms-inbound-\${environment}-mp" "laa-ccms-outbound-\${environment}-mp")
+
 for b in "\${B[@]}"; do
   D="/${USERNAME}/S3/${b}"
 
