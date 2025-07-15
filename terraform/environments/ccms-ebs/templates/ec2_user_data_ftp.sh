@@ -92,7 +92,7 @@ F=/etc/passwd-s3fs
 echo "\${K}:\${S}" > "\${F}"
 chmod 600 \${F}
 
-for b in "${B[@]}"; do
+for b in "\${B[@]}"; do
   D="/${USERNAME}/S3/${b}"
 
   if [[ -d "${D}" ]]; then
