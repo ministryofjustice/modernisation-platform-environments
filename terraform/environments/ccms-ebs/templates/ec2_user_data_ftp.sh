@@ -100,7 +100,7 @@ B=(${inbound_bucket} ${outbound_bucket})
 
 
 
-for b in "\${B[@]}"; do
+for b in "${B[@]}"; do
   D="${USERNAME}/S3/${b}"
 
   if [[ -d "${D}" ]]; then
