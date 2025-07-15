@@ -30,8 +30,7 @@ data "aws_iam_policy_document" "glue_connection_snow" {
         effect = "Allow"
         actions = ["secretsmanager:*"]
         resources = [
-            aws_secretsmanager_secret_version.servicenow_credentials.arn,
-            aws_secretsmanager_secret.servicenow_credentials.arn
+            "arn:aws:secretsmanager:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:secret:credentials/servicenow*"
         ]
     }
 }
