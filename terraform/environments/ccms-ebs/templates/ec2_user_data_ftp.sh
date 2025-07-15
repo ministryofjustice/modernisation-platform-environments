@@ -22,3 +22,20 @@ systemctl start amazon-ssm-agent
 ENV="${environment}"
 inbound_bucket="${ftp_inbound_bucket}"
 outbound_bucket="${ftp_outbound_bucket}"
+
+SSHD_CONFIG="/etc/ssh/sshd_config"
+
+# Backup original config
+cp "$SSHD_CONFIG" "$SSHD_CONFIG.bak_$(date +%F_%T)"
+
+# Add port 22 if not already present
+if ! grep -q '^Port 22' "$SSHD_CONFIG"; then
+    echo "Port 22" | sudo tee -a "$SSHD_CONFIG" > /dev/null
+fi
+
+# Add port 8022 if not already present
+if ! grep -q '^Port 8022' "$SSHD_CONFIG"; then
+    echo "Port 8022" | sudo tee -a "$SSHD_CONFIG" > /dev/null
+fi
+
+SECRET_NAME="ftp-s3-$ENV-aws-key"
