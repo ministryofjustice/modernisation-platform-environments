@@ -41,7 +41,6 @@ locals {
 
 }
 
-
 # IAM  Resources
 
 resource "aws_iam_role" "ftp_lambda_role" {
@@ -73,9 +72,9 @@ resource "aws_iam_role_policy_attachment" "basic_execution" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
-resource "aws_iam_role_policy" "shared_bucket_access" {
+resource "aws_iam_role_policy" "general_lambda_access" {
   count = local.build_ftp ? 1 : 0
-  name  = "S3SharedBucketAccess"
+  name  = "GeneralLambdaAccess"
   role  = aws_iam_role.ftp_lambda_role[0].id
 
   policy = jsonencode({
@@ -99,11 +98,18 @@ resource "aws_iam_role_policy" "shared_bucket_access" {
         Action = [
           "logs:CreateLogGroup",
           "logs:CreateLogStream",
-          "logs:PutLogEvents",
+          "logs:PutLogEvents"
+        ],
+        Resource = [
+          "arn:aws:logs:*:${local.environment_management.account_ids[terraform.workspace]}:*"
+        ]
+      },
+      {
+        Effect = "Allow",
+        Action = [
           "cloudwatch:PutMetricData"
         ],
-        Resource = "arn:aws:logs:*:${local.environment_management.account_ids[terraform.workspace]}:*"
-
+        Resource = ["*"]
       }
     ]
   })
@@ -152,6 +158,8 @@ resource "aws_iam_role_policy" "secretsmanager_access" {
 }
 
 resource "aws_iam_role_policy" "vpc_eni_access" {
+  #checkov:skip=CKV_AWS_290:"Accepted"
+  #checkov:skip=CKV_AWS_355:"Accepted"
   count = local.build_ftp ? 1 : 0
   name  = "VPCEniPolicy"
   role  = aws_iam_role.ftp_lambda_role[0].id
