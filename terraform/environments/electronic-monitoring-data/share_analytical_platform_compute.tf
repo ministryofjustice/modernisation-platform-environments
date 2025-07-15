@@ -41,7 +41,8 @@ locals {
   dev_dbs_to_grant       = local.is-production ? [for db in local.prod_dbs_to_grant : "${db}_historic_dev_dbt"] : []
   dbt_dbs_to_grant       = [for db in local.dbt_dbs : "${db}${local.dbt_suffix}"]
   live_feed_dbs_to_grant = [for db in local.live_feeds_dbs : "${db}_${local.environment_shorthand}"]
-  dbs_to_grant           = toset(flatten([local.prod_dbs_to_grant, local.dev_dbs_to_grant, local.dbt_dbs_to_grant, local.live_feed_dbs_to_grant]))
+  dbs_to_grant           = toset(flatten([local.prod_dbs_to_grant, local.dev_dbs_to_grant, local.dbt_dbs_to_grant]))
+  existing_dbs_to_grant  = toset(local.live_feed_dbs_to_grant)
 }
 
 # Source Analytics DBT Secrets
@@ -596,6 +597,16 @@ module "share_dbs_with_roles" {
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
   role_arn                = aws_iam_role.dataapi_cross_role.arn
   de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
+}
+
+module "share_existing_dbs_with_roles" {
+  count                   = local.is-development ? 0 : 1
+  source                  = "./modules/lakeformation_database_share"
+  dbs_to_grant            = local.existing_dbs_to_grant
+  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+  role_arn                = aws_iam_role.dataapi_cross_role.arn
+  de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
+  db_exists               = true
 }
 
 resource "aws_lakeformation_resource" "rds_bucket" {
