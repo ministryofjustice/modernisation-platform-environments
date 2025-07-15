@@ -85,6 +85,8 @@ module "dms_failure_state_rule" {
   source        = "./modules/notifications/eventbridge"
   sns_topic_arn = module.notifications_sns.sns_topic_arn
 
+  state = local.enable_dms_failure_alerts ? "ENABLED" : "DISABLED"
+
   rule_name         = "${local.project}-dms-task-failure-state-rule-${local.environment}"
   event_target_name = "${local.project}-dms-task-rule-target-${local.environment}"
 
@@ -112,8 +114,9 @@ PATTERN
 
 # DMS failure state rule
 module "postgres_tickle_function_failure_rule" {
-  count         = local.enable_cw_alarm && local.enable_postgres_tickle_function_failure_alarm ? 1 : 0
+  count         = local.enable_cw_alarm && local.create_postgres_tickle_function_failure_alarm ? 1 : 0
   source        = "./modules/notifications/eventbridge"
+  state         = local.enable_postgres_tickle_function_failure_alarm ? "ENABLED" : "DISABLED"
   sns_topic_arn = module.notifications_sns.sns_topic_arn
 
   rule_name         = "${local.project}-postgres-tickle-function-failure-rule-${local.environment}"

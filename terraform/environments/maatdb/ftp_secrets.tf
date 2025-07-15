@@ -5,7 +5,7 @@
 # This secret manages the details of the endpoints such as server names and remote folders
 # It will have:
 
-# 1. The name of the job
+# 1. The name of the job. This will match the value of ftp_job.job_name in the ftp_lambda.tf file
 # 2. The value type (host_address or remote_folder)
 # 3. The secret value
 
@@ -13,27 +13,27 @@
 
 # [
 #   {
-#     "name": "xerox_outbound",
+#     "name": "xerox-outbound",
 #     "type": "remote-host",
 #     "value": "sftp.example.com" or IP address
 #   },
 #   {
-#     "name": "xerox_outbound",
+#     "name": "xerox-outbound",
 #     "type": "remote-port",
 #     "value": "22"
 #   },
 #   {
-#     "name": "xerox_outbound",
+#     "name": "xerox-outbound",
 #     "type": "remote-folder",
 #     "value": "/incoming/"
 #   },
 #   {
-#     "name": "xerox_outbound",
+#     "name": "xerox-outbound",
 #     "type": "username",
 #     "value": "username"
 #   },
 #   {
-#     "name": "xerox_outbound",
+#     "name": "xerox-outbound",
 #     "type": "password",
 #     "value": "password"
 #   }
