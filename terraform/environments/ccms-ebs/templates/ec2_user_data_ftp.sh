@@ -19,7 +19,9 @@ systemctl stop amazon-ssm-agent
 rm -rf /var/lib/amazon/ssm/ipc/
 systemctl start amazon-ssm-agent
 
-ENV="\${environment}"
+ENV="${environment}"
+inbound_bucket="${ftp_inbound_bucket}"
+outbound_bucket="${ftp_outbound_bucket}"
 
 SSHD_CONFIG="/etc/ssh/sshd_config"
 
@@ -94,7 +96,9 @@ F=/etc/passwd-s3fs
 echo "\${K}:\${S}" > "\${F}"
 chmod 600 \${F}
 
-B=("laa-ccms-inbound-$ENV-mp" "laa-ccms-outbound-$ENV-mp")
+B=(${inbound_bucket} ${outbound_bucket})
+
+
 
 for b in "\${B[@]}"; do
   D="${USERNAME}/S3/${b}"
@@ -121,8 +125,8 @@ mkdir -p /${USERNAME}/S3/laa-ccms-inbound-$ENV-mp /${USERNAME}/S3/laa-ccms-outbo
 cp /etc/fstab /etc/fstab.bak.$(date +%F-%H%M%S)
 
 # Define mount entries
-LINE1="s3fs#laa-ccms-inbound-$ENV-mp /${USERNAME}/S3/laa-ccms-inbound-$ENV-mp fuse _netdev,iam_role=auto,uid=${U},gid=${G},mp_umask=0022,allow_other,nonempty 0 0"
-LINE2="s3fs#laa-ccms-outbound-$ENV-mp /${USERNAME}/S3/laa-ccms-outbound-$ENV-mp fuse _netdev,iam_role=auto,uid=${U},gid=${G},mp_umask=0022,allow_other,nonempty 0 0"
+LINE1="s3fs#${inbound_bucket} /${USERNAME}/S3/${inbound_bucket} fuse _netdev,iam_role=auto,uid=${U},gid=${G},mp_umask=0022,allow_other,nonempty 0 0"
+LINE2="s3fs#${outbound_bucket} /${USERNAME}/S3/${outbound_bucket} fuse _netdev,iam_role=auto,uid=${U},gid=${G},mp_umask=0022,allow_other,nonempty 0 0"
 
 # Append to fstab if not already present
 grep -qxF "$LINE1" /etc/fstab || echo "$LINE1" >> /etc/fstab
@@ -138,8 +142,8 @@ if ! sudo mount -a 2>&1 | tee /etc/mount_errors.log; then
 else
   echo "[SUCCESS] All mounts applied successfully."
   if [[ "$ENV" != "production" ]]; then
-    ln -s /${USERNAME}/S3/laa-ccms-inbound-$ENV-mp/inbound-lambda-runs /home/${USERNAME}/inbound-lambda-runs
-    ln -s /${USERNAME}/S3/laa-ccms-outbound-$ENV-mp/outbound-lambda-runs /home/${USERNAME}/outbound-lambda-runs
+    ln -s /${USERNAME}/S3/${inbound_bucket}/inbound-lambda-runs /home/${USERNAME}/inbound-lambda-runs
+    ln -s /${USERNAME}/S3/${outbound_bucket}/outbound-lambda-runs /home/${USERNAME}/outbound-lambda-runs
     chown -h ${USERNAME}:${USERNAME} /home/${USERNAME}/inbound-lambda-runs
     chown -h ${USERNAME}:${USERNAME} /home/${USERNAME}/outbound-lambda-runs
   fi
