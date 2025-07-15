@@ -133,7 +133,7 @@ if ! sudo mount -a 2>&1 | tee /etc/mount_errors.log; then
   exit 1
 else
   echo "[SUCCESS] All mounts applied successfully."
-  if [[ "$environment" != "production" ]]; then
+  if [[ "\${environment}" != "production" ]]; then
     ln -s /${USERNAME}/S3/laa-ccms-inbound-\${environment}-mp/inbound-lambda-runs /home/${USERNAME}/inbound-lambda-runs
     ln -s /${USERNAME}/S3/laa-ccms-outbound-\${environment}-mp/outbound-lambda-runs /home/${USERNAME}/outbound-lambda-runs
     chown -h ${USERNAME}:${USERNAME} /home/${USERNAME}/inbound-lambda-runs
