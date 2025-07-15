@@ -55,7 +55,7 @@ data "aws_iam_policy_document" "sftp_user_policy" {
     condition {
       test     = "StringLike"
       variable = "s3:prefix"
-      values   = ["${var.user_name}", "${var.user_name}/*"]
+      values = [var.user_name, "${var.user_name}/*"]
     }
   }
 
