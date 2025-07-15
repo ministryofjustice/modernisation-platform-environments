@@ -56,9 +56,27 @@ chmod +x build-layer.sh entrypoint.sh
 
 ### Step 3: Upload the created ZIP file to layer S3 bucket
 
-The bucket and folder location are defined in the following parameters in application_variables.json:
+The zip file name, bucket and folder location are defined in the following parameters in application_variables.json:
 
+- ftp_layer_source_zip
 - ftp_layer_bucket
 - ftp_layer_folder_location
 
 Note - if amending for an existing deployment the, request for the layer resource to be “tainted” (ask the Modernisation Platform Team via the ask channel to do this) and then re-run the GitHub workflow for the environment in question. The layer will then be recreated using the updated python libs.
+
+## Python Lambda Source
+
+The directory also contains the following files:
+
+- ftpclient.py. FTP script to upload or download files to/from a remote sftp host.
+- zip_s3_objects.py. A script that will zip up files in a defined location.
+
+Both of those files should zipped and uploaded to the bucket & folder location as mentioned above. 
+
+The following parameters are relevant:
+
+ftp_layer_source_zip - ftp lambda file name
+zip_lambda_source_file - zip lambda file name
+
+ftp_lambda_source_file_version & zip_lambda_source_file_version - the version IDs from the s3 bucket objects.
+
