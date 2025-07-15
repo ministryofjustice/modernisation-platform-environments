@@ -145,7 +145,7 @@ resource "aws_wafv2_web_acl" "prtg_acl" {
   # checkov:skip=CKV_AWS_192: "Ensure WAF prevents message lookup in Log4j2. See CVE-2021-44228 aka log4jshell"
   count       = local.is-production ? 0 : 1
   name        = "WAFprtg-acl"
-  description = "WAF ACL rules for prtg Looad Balancer."
+  description = "WAF ACL rules for prtg Load Balancer."
   scope       = "REGIONAL"
 
   default_action {

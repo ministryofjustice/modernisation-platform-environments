@@ -18,25 +18,25 @@ locals {
   }
 
   ftp_job = {
-    job_name          = "xerox-outbound"
-    bucket_name       = try(module.s3_bucket.outbound.bucket.bucket, "")
-    bucket_folder     = "export/home/ccmtdb/central_print/rep_orders/"
-    ftp_protocol      = "SFTP"
-    ftp_type          = "SFTP_UPLOAD"
-    require_ssl       = "NO"
-    insecure          = "YES"
-    ftp_file_types    = "zip"
-    file_remove       = "YES"
-    cron_rule         = local.application_data.accounts[local.environment].ftp_lambda_eventbridge_cron
+    job_name       = "xerox-outbound"
+    bucket_name    = try(module.s3_bucket.outbound.bucket.bucket, "")
+    bucket_folder  = "export/home/ccmtdb/central_print/rep_orders/"
+    ftp_protocol   = "SFTP"
+    ftp_type       = "SFTP_UPLOAD"
+    require_ssl    = "NO"
+    insecure       = "YES"
+    ftp_file_types = "zip"
+    file_remove    = "YES"
+    cron_rule      = local.application_data.accounts[local.environment].ftp_lambda_eventbridge_cron
   }
 
   zip_job = {
-    job_name          = "xerox-outbound"
-    bucket_name       = try(module.s3_bucket.outbound.bucket.bucket, "")
-    bucket_folder     = "export/home/ccmtdb/central_print/rep_orders/"
-    file_remove       = "YES"
-    zip_file_types    = "pdf,PDF,xml"
-    cron_rule         = local.application_data.accounts[local.environment].zip_lambda_eventbridge_cron
+    job_name       = "xerox-outbound"
+    bucket_name    = try(module.s3_bucket.outbound.bucket.bucket, "")
+    bucket_folder  = "export/home/ccmtdb/central_print/rep_orders/"
+    file_remove    = "YES"
+    zip_file_types = "pdf,PDF,xml"
+    cron_rule      = local.application_data.accounts[local.environment].zip_lambda_eventbridge_cron
   }
 
 }
@@ -244,9 +244,9 @@ resource "aws_lambda_layer_version" "ftpclientlibs" {
 # Security Groups
 
 resource "aws_security_group" "ftp_lambda" {
-  count  = local.build_ftp ? 1 : 0
-  name   = "ftp-lambda-${local.ftp_job.job_name}-sg"
-  vpc_id = data.aws_vpc.shared.id
+  count       = local.build_ftp ? 1 : 0
+  name        = "ftp-lambda-${local.ftp_job.job_name}-sg"
+  vpc_id      = data.aws_vpc.shared.id
   description = "ftp lambda security group"
 
   egress {
@@ -267,9 +267,9 @@ resource "aws_security_group" "ftp_lambda" {
 }
 
 resource "aws_security_group" "zip_lambda" {
-  count  = local.build_ftp ? 1 : 0
-  name   = "zip-lambda-${local.ftp_job.job_name}-sg"
-  vpc_id = data.aws_vpc.shared.id
+  count       = local.build_ftp ? 1 : 0
+  name        = "zip-lambda-${local.ftp_job.job_name}-sg"
+  vpc_id      = data.aws_vpc.shared.id
   description = "zip lambda security group"
 
 
@@ -295,11 +295,11 @@ resource "aws_lambda_function" "ftp" {
   runtime       = local.python_runtime
   handler       = "ftpclient.lambda_handler"
 
-  memory_size        = 512
-  timeout            = 300
-  s3_bucket          = local.ftp_layer_bucket
-  s3_key             = "${local.ftp_layer_folder_location}/${local.ftp_lambda_source_file}"
-  s3_object_version  = local.ftp_lambda_source_file_version
+  memory_size       = 512
+  timeout           = 300
+  s3_bucket         = local.ftp_layer_bucket
+  s3_key            = "${local.ftp_layer_folder_location}/${local.ftp_lambda_source_file}"
+  s3_object_version = local.ftp_lambda_source_file_version
 
   reserved_concurrent_executions = 1
 
@@ -343,11 +343,11 @@ resource "aws_lambda_function" "zip" {
   runtime       = local.python_runtime
   handler       = "zip_s3_objects.lambda_handler"
 
-  memory_size        = 512
-  timeout            = 900
-  s3_bucket          = local.ftp_layer_bucket
-  s3_key             = "${local.ftp_layer_folder_location}/${local.zip_lambda_source_file}"
-  s3_object_version  = local.zip_lambda_source_file_version
+  memory_size       = 512
+  timeout           = 900
+  s3_bucket         = local.ftp_layer_bucket
+  s3_key            = "${local.ftp_layer_folder_location}/${local.zip_lambda_source_file}"
+  s3_object_version = local.zip_lambda_source_file_version
 
   reserved_concurrent_executions = 1
 
