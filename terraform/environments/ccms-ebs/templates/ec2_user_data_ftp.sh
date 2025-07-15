@@ -87,31 +87,41 @@ fi
 echo "Restarting sshd..."
 systemctl restart sshd
 
-C=\$(aws secretsmanager get-secret-value --secret-id ftp-s3-$ENV-aws-key --region eu-west-2)
-K=\$(jq -r '.SecretString' <<< \${C} |cut -d'"' -f2)
-S=\$(jq -r '.SecretString' <<< \${C} |cut -d'"' -f4)
+
 U=\$(id -u ${USERNAME})
 G=\$(id -g ${USERNAME})
-F=/etc/passwd-s3fs
-echo "\${K}:\${S}" > "\${F}"
-chmod 600 \${F}
 
-B=(${inbound_bucket} ${outbound_bucket})
+# B=(${inbound_bucket} ${outbound_bucket})
 
+if [[ -d "${USERNAME}/S3/${inbound_bucket}" ]]; then
+  echo " the path ${USERNAME}/S3/${inbound_bucket} exists"
+else
+  mkdir -p "${USERNAME}/S3/${inbound_bucket}"
+fi
 
+if [[ -d "${USERNAME}/S3/${outbound_bucket}" ]]; then
+  echo " the path ${USERNAME}/S3/${inbound_bucket} exists"
+else
+  mkdir -p "${USERNAME}/S3/${outbound_bucket}"
+fi
 
-for b in "${B[@]}"; do
-  D="${USERNAME}/S3/${b}"
+chown -R "${USERNAME}:users" "${USERNAME}/S3/${inbound_bucket}"
+chown -R "${USERNAME}:users" "${USERNAME}/S3/${outbound_bucket}"
+chmod 755 "${USERNAME}/S3/${inbound_bucket}"
+chmod 755 "${USERNAME}/S3/${outbound_bucket}"
 
-  if [[ -d "${D}" ]]; then
-    echo "${D} exists."
-  else
-    mkdir -p "${D}"
-  fi
+# for b in "${B[@]}"; do
+#   D="${USERNAME}/S3/${b}"
 
-  chown -R "${USERNAME}:users" "${D}"
-  chmod 755 "${D}"
-done
+#   if [[ -d "${D}" ]]; then
+#     echo "${D} exists."
+#   else
+#     mkdir -p "${D}"
+#   fi
+
+#   chown -R "${USERNAME}:users" "${D}"
+#   chmod 755 "${D}"
+# done
 
 echo "pasv_enable=YES" >> /etc/vsftpd/vsftpd.conf
 echo "pasv_min_port=3000" >> /etc/vsftpd/vsftpd.conf
