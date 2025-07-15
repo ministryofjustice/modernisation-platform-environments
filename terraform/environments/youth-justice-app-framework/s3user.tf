@@ -43,7 +43,7 @@ resource "aws_iam_policy" "s3" {
       "arn:aws:s3:::yjaf-${local.environment}-bedunlock",
       "arn:aws:s3:::yjaf-${local.environment}-bands",
       "arn:aws:s3:::yjaf-${local.environment}-incident",
-      "arn:aws:s3:::yjaf-${local.environment}-cmm"
+      "arn:aws:s3:::yjaf-${local.environment}-cmm",
       "arn:aws:s3:::yjaf-${local.environment}-cms/*",
       "arn:aws:s3:::yjaf-${local.environment}-yjsm/*",
       "arn:aws:s3:::yjaf-${local.environment}-mis/*",
