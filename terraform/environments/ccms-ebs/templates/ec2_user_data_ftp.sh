@@ -121,8 +121,8 @@ mkdir -p /$USERNAME/S3/laa-ccms-inbound-$ENV-mp /$USERNAME/S3/laa-ccms-outbound-
 cp /etc/fstab /etc/fstab.bak.$(date +%F-%H%M%S)
 
 # Define mount entries
-LINE1="s3fs#$inbound_bucket /$USERNAME/S3/$inbound_bucket fuse _netdev,iam_role=auto,uid=${U},gid=${G},mp_umask=0022,allow_other,nonempty 0 0"
-LINE2="s3fs#$outbound_bucket /$USERNAME/S3/$outbound_bucket fuse _netdev,iam_role=auto,uid=${U},gid=${G},mp_umask=0022,allow_other,nonempty 0 0"
+LINE1="s3fs#$inbound_bucket /$USERNAME/S3/$inbound_bucket fuse _netdev,iam_role=auto,uid=$U,gid=$G,mp_umask=0022,allow_other,nonempty 0 0"
+LINE2="s3fs#$outbound_bucket /$USERNAME/S3/$outbound_bucket fuse _netdev,iam_role=auto,uid=$U,gid=$G,mp_umask=0022,allow_other,nonempty 0 0"
 
 # Append to fstab if not already present
 grep -qxF "$LINE1" /etc/fstab || echo "$LINE1" >> /etc/fstab
