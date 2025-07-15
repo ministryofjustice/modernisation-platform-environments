@@ -1,5 +1,5 @@
 {
-  "Id": "S3ObjecctAccess",
+  "Id": "S3ObjectAccess",
   "Version": "2012-10-17",
   "Statement": [
     {
