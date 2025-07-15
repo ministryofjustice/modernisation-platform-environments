@@ -66,7 +66,7 @@ locals {
             },
             {
               "name" : "SPRING_PROFILES_ACTIVE",
-              "value" : "moj-${local.environment}"
+              "value" : "${local.environment}"
             },
             {
               "name" : "DD_SERVICE",
