@@ -170,6 +170,22 @@ locals {
           update-ssm-agent = "patchgroup1"
         }
       }
+
+      prisoner-retail-poc = merge(local.ec2_instances.prisoner-retail, {
+        autoscaling_group = {
+          desired_capacity    = 1
+          force_delete        = true
+          max_size            = 1
+          vpc_zone_identifier = module.environment.subnets["private"].ids
+        }
+        autoscaling_schedules = {
+          scale_down = { recurrence = "0 19 * * Mon-Fri", desired_capacity = 0 }
+          scale_up   = { recurrence = "0 7 * * Mon-Fri" }
+        }
+        instance = merge(local.ec2_instances.prisoner-retail.instance, {
+          disable_api_termination      = false
+        })
+      })
     }
   }
 }
