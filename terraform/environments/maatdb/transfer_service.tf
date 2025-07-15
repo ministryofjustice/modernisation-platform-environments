@@ -91,26 +91,22 @@ resource "aws_security_group" "transfer_server_sg" {
     protocol    = "tcp"
     cidr_blocks = local.ingress_cidrs
   }
-
-  egress {
-    description = "SSH egress"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = local.ingress_cidrs
-  }
 }
 
+resource "aws_eip" "transfer_eip_set" {
+  count = 3
+  domain = "vpc"
+}
 
 resource "aws_transfer_server" "transfer_service_server" {
   count = local.build_transfer ? 1 : 0
   endpoint_type               = "VPC"
   identity_provider_type      = "SERVICE_MANAGED"
-  sftp_authentication_methods = "PUBLIC_KEY"
-  security_policy_name        = "TransferSecurityPolicy-2024-01"
+  security_policy_name        = "TransferSecurityPolicy-SshAuditCompliant-2025-02"
   endpoint_details {
     vpc_id                 = data.aws_vpc.shared.id
     subnet_ids             = [data.aws_subnet.public_subnets_a.id, data.aws_subnet.public_subnets_b.id, data.aws_subnet.public_subnets_c.id]
+    address_allocation_ids = aws_eip.transfer_eip_set[*].id
     security_group_ids     = [aws_security_group.transfer_server_sg[0].id]
   }
   tags = merge(

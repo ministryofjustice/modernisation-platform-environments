@@ -25,7 +25,7 @@
 #   {
 #     "name": "xhibit-inbound",
 #     "type": "folder",
-#     "value": "temp/""
+#     "value": "/temp/""
 #   },
 #   {
 #     "name": "xhibit-inbound",
