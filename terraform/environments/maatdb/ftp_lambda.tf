@@ -329,6 +329,12 @@ resource "aws_lambda_function" "ftp" {
       FILEREMOVE   = local.ftp_job.file_remove
     }
   }
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.ftp_job.job_name}-ftp"
+    }
+  )
 }
 
 # Lambda that generates the zip bundles
@@ -369,6 +375,12 @@ resource "aws_lambda_function" "zip" {
       REMOVEFILESAFTER = local.zip_job.file_remove
     }
   }
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.ftp_job.job_name}-zip"
+    }
+  )
 }
 
 # EventBridge rules for lambda exec

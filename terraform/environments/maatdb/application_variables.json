@@ -29,7 +29,7 @@
       "mlra_ecs_cluster_sec_group_id": "sg-08c5bdc7e3c480907",
       "build_s3": true,
       "build_ftp": true,
-      "build_transfer": false,
+      "build_transfer": true,
       "build_ses": true,
       "build_ec2": true,
       "pagerduty_integration_key_name": "laa_maat_nonprod_alarms",

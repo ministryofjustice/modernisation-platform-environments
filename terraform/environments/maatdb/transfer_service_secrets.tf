@@ -4,7 +4,7 @@
 
 
 # 1. The name of the job. This is "xhibit-inbound"
-# 2. The value type (public_key or source_cidr)
+# 2. The value type  - one of each username, folder, public_key and source_cidr. Note there can be multiple source_cidrs.
 # 3. The secret value
 
 # Add all inbound CIDRs to filter for as required
@@ -15,7 +15,7 @@
 #   {
 #     "name": "xhibit-inbound",
 #     "type": "username",
-#     "value": "example_user_name""
+#     "value": "example_user_name"
 #   },
 #   {
 #     "name": "xhibit-inbound",
@@ -24,14 +24,19 @@
 #   },
 #   {
 #     "name": "xhibit-inbound",
-#     "type": "source_cidr_1",
+#     "type": "folder",
+#     "value": "temp/""
+#   },
+#   {
+#     "name": "xhibit-inbound",
+#     "type": "ingress_cidr",
 #     "value": "1.1.1.1/32"
 #   },
 #   {
 #     "name": "xhibit-inbound",
-#     "type": "source_cidr_2",
+#     "type": "ingress_cidr",
 #     "value": "2.2.2.2/32"
-#   },
+#   }
 # ]
 
 resource "aws_secretsmanager_secret" "transfer_service_secret" {
