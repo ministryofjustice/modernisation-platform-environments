@@ -53,7 +53,7 @@ PASSWORD=$(echo "$SECRET_JSON" | jq -r '.PASSWORD')
 
 # --- Validate inputs ---
 if [[ -z "$USERNAME" || -z "$PASSWORD" || "$USERNAME" == "null" || "$PASSWORD" == "null" ]]; then
-  echo "❌ USER or PASSWORD key is missing or null in the secret!"
+  echo "USER or PASSWORD key is missing or null in the secret!"
   exit 1
 fi
 
@@ -71,15 +71,15 @@ EOF
 
 # Check if PasswordAuthentication is disabled
 if grep -qE "^#?PasswordAuthentication\s+no" "$SSHD_CONFIG"; then
-  echo "🔄 Enabling PasswordAuthentication..."
+  echo "Enabling PasswordAuthentication..."
   sed -i 's/^#\?PasswordAuthentication\s\+no/PasswordAuthentication yes/' "$SSHD_CONFIG"
 else
-  echo "✅ PasswordAuthentication is already enabled or not explicitly set."
+  echo "PasswordAuthentication is already enabled or not explicitly set."
 fi
 
 # Ensure ChallengeResponseAuthentication is disabled (for passwords to work reliably)
 if grep -qE "^#?ChallengeResponseAuthentication\s+yes" "$SSHD_CONFIG"; then
-  echo "🔄 Disabling ChallengeResponseAuthentication..."
+  echo "Disabling ChallengeResponseAuthentication..."
   sed -i 's/^#\?ChallengeResponseAuthentication\s\+yes/ChallengeResponseAuthentication no/' "$SSHD_CONFIG"
 fi
 
