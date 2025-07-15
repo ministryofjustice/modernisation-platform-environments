@@ -18,3 +18,7 @@ rpm -U ./amazon-cloudwatch-agent.rpm
 systemctl stop amazon-ssm-agent
 rm -rf /var/lib/amazon/ssm/ipc/
 systemctl start amazon-ssm-agent
+
+ENV="${environment}"
+inbound_bucket="${ftp_inbound_bucket}"
+outbound_bucket="${ftp_outbound_bucket}"
