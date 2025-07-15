@@ -92,17 +92,18 @@ F=/etc/passwd-s3fs
 echo "\${K}:\${S}" > "\${F}"
 chmod 600 \${F}
 
-for b in "\${B[@]}"; do
-  D=/${USERNAME}/S3/\${b}
+for b in "${B[@]}"; do
+  D="/${USERNAME}/S3/${b}"
 
-  if [[ -d \${D} ]]; then
-    echo "\${D} exists."
+  if [[ -d "${D}" ]]; then
+    echo "${D} exists."
   else
-    mkdir -p \${D}
+    mkdir -p "${D}"
   fi
 
-  chown -R ${USERNAME}:users \${D}
-  chmod 755 \${D}
+  chown -R "${USERNAME}:users" "${D}"
+  chmod 755 "${D}"
+done
 
 echo "pasv_enable=YES" >> /etc/vsftpd/vsftpd.conf
 echo "pasv_min_port=3000" >> /etc/vsftpd/vsftpd.conf
