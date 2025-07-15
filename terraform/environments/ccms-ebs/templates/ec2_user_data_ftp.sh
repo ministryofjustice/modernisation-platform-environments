@@ -108,3 +108,40 @@ chown -R "$USERNAME:users" "$USERNAME/S3/$inbound_bucket"
 chown -R "$USERNAME:users" "$USERNAME/S3/$outbound_bucket"
 chmod 755 "$USERNAME/S3/$inbound_bucket"
 chmod 755 "$USERNAME/S3/$outbound_bucket"
+
+echo "pasv_enable=YES" >> /etc/vsftpd/vsftpd.conf
+echo "pasv_min_port=3000" >> /etc/vsftpd/vsftpd.conf
+echo "pasv_max_port=3010" >> /etc/vsftpd/vsftpd.conf
+
+systemctl restart vsftpd.service
+
+# create mount directories
+mkdir -p /$USERNAME/S3/laa-ccms-inbound-$ENV-mp /$USERNAME/S3/laa-ccms-outbound-$ENV-mp
+# Backup fstab first
+cp /etc/fstab /etc/fstab.bak.$(date +%F-%H%M%S)
+
+# Define mount entries
+LINE1="s3fs#$inbound_bucket /$USERNAME/S3/$inbound_bucket fuse _netdev,iam_role=auto,uid=${U},gid=${G},mp_umask=0022,allow_other,nonempty 0 0"
+LINE2="s3fs#$outbound_bucket /$USERNAME/S3/$outbound_bucket fuse _netdev,iam_role=auto,uid=${U},gid=${G},mp_umask=0022,allow_other,nonempty 0 0"
+
+# Append to fstab if not already present
+grep -qxF "$LINE1" /etc/fstab || echo "$LINE1" >> /etc/fstab
+grep -qxF "$LINE2" /etc/fstab || echo "$LINE2" >> /etc/fstab
+
+echo "fstab updated."
+# Test mounting all entries and capture errors
+echo "Testing mounts with: mount -a"
+if ! sudo mount -a 2>&1 | tee /etc/mount_errors.log; then
+  echo "[ERROR] One or more mounts failed. See /tmp/mount_errors.log:"
+  cat /etc/mount_errors.log
+  exit 1
+else
+  echo "[SUCCESS] All mounts applied successfully."
+  if [[ "$ENV" != "production" ]]; then
+    ln -s /$USERNAME/S3/$inbound_bucket/inbound-lambda-runs /home/$USERNAME/inbound-lambda-runs
+    ln -s /$USERNAME/S3/$outbound_bucket/outbound-lambda-runs /home/$USERNAME/outbound-lambda-runs
+    chown -h $USERNAME:$USERNAME /home/$USERNAME/inbound-lambda-runs
+    chown -h $USERNAME:$USERNAME /home/$USERNAME/outbound-lambda-runs
+  fi
+
+fi
