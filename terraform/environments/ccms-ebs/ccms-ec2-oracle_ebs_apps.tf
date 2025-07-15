@@ -145,7 +145,7 @@ resource "aws_ebs_volume" "stage" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-    { Name = "stage" }
+    # { Name = "stage" }
   )
 }
 
