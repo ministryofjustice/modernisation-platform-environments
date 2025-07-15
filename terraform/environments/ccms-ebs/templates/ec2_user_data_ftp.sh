@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euxo pipefail
 
 exec > /tmp/userdata.log 2>&1
 
@@ -90,8 +91,8 @@ echo "Restarting sshd..."
 systemctl restart sshd
 
 
-U=\$(id -u $USERNAME)
-G=\$(id -g $USERNAME)
+U=$(id -u $USERNAME)
+G=$(id -g $USERNAME)
 
 
 if [[ -d "$USERNAME/S3/$inbound_bucket" ]]; then
