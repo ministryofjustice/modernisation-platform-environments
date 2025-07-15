@@ -91,21 +91,20 @@ systemctl restart sshd
 U=\$(id -u $USERNAME)
 G=\$(id -g $USERNAME)
 
-# B=(${inbound_bucket} ${outbound_bucket})
 
-if [[ -d "${USERNAME}/S3/${inbound_bucket}" ]]; then
-  echo " the path ${USERNAME}/S3/${inbound_bucket} exists"
+if [[ -d "$USERNAME/S3/$inbound_bucket" ]]; then
+  echo " the path $USERNAME/S3/$inbound_bucket exists"
 else
-  mkdir -p "${USERNAME}/S3/${inbound_bucket}"
+  mkdir -p "$USERNAME/S3/$inbound_bucket"
 fi
 
-if [[ -d "${USERNAME}/S3/${outbound_bucket}" ]]; then
-  echo " the path ${USERNAME}/S3/${inbound_bucket} exists"
+if [[ -d "$USERNAME/S3/$outbound_bucket" ]]; then
+  echo " the path $USERNAME/S3/$inbound_bucket exists"
 else
-  mkdir -p "${USERNAME}/S3/${outbound_bucket}"
+  mkdir -p "$USERNAME/S3/$outbound_bucket"
 fi
 
-chown -R "${USERNAME}:users" "${USERNAME}/S3/${inbound_bucket}"
-chown -R "${USERNAME}:users" "${USERNAME}/S3/${outbound_bucket}"
-chmod 755 "${USERNAME}/S3/${inbound_bucket}"
-chmod 755 "${USERNAME}/S3/${outbound_bucket}"
+chown -R "$USERNAME:users" "$USERNAME/S3/$inbound_bucket"
+chown -R "$USERNAME:users" "$USERNAME/S3/$outbound_bucket"
+chmod 755 "$USERNAME/S3/$inbound_bucket"
+chmod 755 "$USERNAME/S3/$outbound_bucket"
