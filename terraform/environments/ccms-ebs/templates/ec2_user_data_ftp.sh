@@ -34,7 +34,7 @@ if ! grep -q '^Port 8022' "$SSHD_CONFIG"; then
     echo "Port 8022" | sudo tee -a "$SSHD_CONFIG" > /dev/null
 fi
 
-SECRET_NAME="ftp-s3-${environment}-aws-key"
+SECRET_NAME="ftp-s3-\${environment}-aws-key"
 
 # --- Fetch secret securely ---
 SECRET_JSON=$(aws secretsmanager get-secret-value \
@@ -83,7 +83,7 @@ fi
 echo "Restarting sshd..."
 systemctl restart sshd
 
-C=\$(aws secretsmanager get-secret-value --secret-id ftp-s3-${environment}-aws-key --region eu-west-2)
+C=\$(aws secretsmanager get-secret-value --secret-id ftp-s3-\${environment}-aws-key --region eu-west-2)
 K=\$(jq -r '.SecretString' <<< \${C} |cut -d'"' -f2)
 S=\$(jq -r '.SecretString' <<< \${C} |cut -d'"' -f4)
 U=\$(id -u ${USERNAME})
@@ -112,13 +112,13 @@ echo "pasv_max_port=3010" >> /etc/vsftpd/vsftpd.conf
 systemctl restart vsftpd.service
 
 # create mount directories
-mkdir -p /${USERNAME}/S3/laa-ccms-inbound-${environment}-mp /${USERNAME}/S3/laa-ccms-outbound-${environment}-mp
+mkdir -p /${USERNAME}/S3/laa-ccms-inbound-\${environment}-mp /${USERNAME}/S3/laa-ccms-outbound-\${environment}-mp
 # Backup fstab first
 cp /etc/fstab /etc/fstab.bak.$(date +%F-%H%M%S)
 
 # Define mount entries
-LINE1="s3fs#laa-ccms-inbound-${environment}-mp /${USERNAME}/S3/laa-ccms-inbound-${environment}-mp fuse _netdev,iam_role=auto,uid=${U},gid=${G},mp_umask=0022,allow_other,nonempty 0 0"
-LINE2="s3fs#laa-ccms-outbound-${environment}-mp /${USERNAME}/S3/laa-ccms-outbound-${environment}-mp fuse _netdev,iam_role=auto,uid=${U},gid=${G},mp_umask=0022,allow_other,nonempty 0 0"
+LINE1="s3fs#laa-ccms-inbound-\${environment}-mp /${USERNAME}/S3/laa-ccms-inbound-\${environment}-mp fuse _netdev,iam_role=auto,uid=${U},gid=${G},mp_umask=0022,allow_other,nonempty 0 0"
+LINE2="s3fs#laa-ccms-outbound-\${environment}-mp /${USERNAME}/S3/laa-ccms-outbound-\${environment}-mp fuse _netdev,iam_role=auto,uid=${U},gid=${G},mp_umask=0022,allow_other,nonempty 0 0"
 
 # Append to fstab if not already present
 grep -qxF "$LINE1" /etc/fstab || echo "$LINE1" >> /etc/fstab
@@ -134,8 +134,8 @@ if ! sudo mount -a 2>&1 | tee /etc/mount_errors.log; then
 else
   echo "[SUCCESS] All mounts applied successfully."
   if [[ "$environment" != "production" ]]; then
-    ln -s /${USERNAME}/S3/laa-ccms-inbound-${environment}-mp/inbound-lambda-runs /home/${USERNAME}/inbound-lambda-runs
-    ln -s /${USERNAME}/S3/laa-ccms-outbound-${environment}-mp/outbound-lambda-runs /home/${USERNAME}/outbound-lambda-runs
+    ln -s /${USERNAME}/S3/laa-ccms-inbound-\${environment}-mp/inbound-lambda-runs /home/${USERNAME}/inbound-lambda-runs
+    ln -s /${USERNAME}/S3/laa-ccms-outbound-\${environment}-mp/outbound-lambda-runs /home/${USERNAME}/outbound-lambda-runs
     chown -h ${USERNAME}:${USERNAME} /home/${USERNAME}/inbound-lambda-runs
     chown -h ${USERNAME}:${USERNAME} /home/${USERNAME}/outbound-lambda-runs
   fi
