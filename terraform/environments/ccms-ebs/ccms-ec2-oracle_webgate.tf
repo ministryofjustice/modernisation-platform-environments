@@ -45,7 +45,7 @@ resource "aws_instance" "ec2_webgate" {
     volume_size = 50
     encrypted   = true
     tags = merge(local.tags,
-      { Name = lower(format("%s-%s-%s", local.application_data.accounts[local.environment].instance_role_webgate, count.index + 1, "root")) },
+      # { Name = lower(format("%s-%s-%s", local.application_data.accounts[local.environment].instance_role_webgate, count.index + 1, "root")) },
       { device-name = "/dev/sda1" }
     )
   }
