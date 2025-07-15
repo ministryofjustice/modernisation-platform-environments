@@ -88,8 +88,8 @@ echo "Restarting sshd..."
 systemctl restart sshd
 
 
-U=\$(id -u ${USERNAME})
-G=\$(id -g ${USERNAME})
+U=\$(id -u $USERNAME)
+G=\$(id -g $USERNAME)
 
 # B=(${inbound_bucket} ${outbound_bucket})
 
