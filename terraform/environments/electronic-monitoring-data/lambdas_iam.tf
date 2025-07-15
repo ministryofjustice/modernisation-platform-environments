@@ -511,7 +511,8 @@ data "aws_iam_policy_document" "zero_etl" {
     actions = [
       "glue:*Integration*",
       "glue:*Integration",
-      "glue:Integration*"
+      "glue:CreateIntegration",
+      "glue:CreateIntegrationResourceProperty"
     ]
     resources = [
       "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:integration/*",
