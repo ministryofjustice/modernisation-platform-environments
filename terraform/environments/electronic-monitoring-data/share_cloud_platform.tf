@@ -191,6 +191,24 @@ module "share_specials_data_marts" {
   role_arn                = module.specials_cmt_front_end_assumable_role.iam_role_arn
 }
 
+resource "aws_lakeformation_permissions" "ac_allied_db" {
+  count       = local.is-development || local.is-test ? 1 : 0
+  principal   = module.acquisitive_crime_assumable_role[0].iam_role_name
+  permissions = ["DESCRIBE"]
+  database {
+    name = "allied_mdss_${local.environment_shorthand}"
+  }
+}
+
+resource "aws_lakeformation_permissions" "ac_allied_tables" {
+  count       = local.is-development || local.is-test ? 1 : 0
+  principal   = module.acquisitive_crime_assumable_role[0].iam_role_name
+  permissions = ["SELECT", "DESCRIBE"]
+  table {
+    database_name = "allied_mdss_${local.environment_shorthand}"
+    wildcard      = true
+  }
+}
 
 data "aws_iam_policy_document" "standard_athena_access" {
   statement {
