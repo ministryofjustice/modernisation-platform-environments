@@ -81,6 +81,11 @@ locals {
         })
         config = merge(local.ec2_autoscaling_groups.base_windows.config, {
           ami_name = "hmpps_windows_server_2022_release_2024-*"
+          user_data_raw = base64encode(templatefile(
+            "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
+              branch = "TM-1398/powershell/add-dryrun-option"
+            }
+          ))
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 100 }
@@ -88,11 +93,6 @@ locals {
         instance = merge(local.ec2_autoscaling_groups.base_windows.instance, {
           instance_type = "t3.medium"
         })
-        user_data_raw = base64encode(templatefile(
-          "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
-            branch = "TM-1398/powershell/add-dryrun-option"
-          }
-        ))
         tags = merge(local.ec2_autoscaling_groups.base_windows.tags, {
           description = "Windows Server 2022 instance for testing domain join and patching"
           domain-name = "azure.noms.root"
