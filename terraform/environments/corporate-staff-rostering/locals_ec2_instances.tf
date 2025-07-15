@@ -169,11 +169,11 @@ locals {
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"
         ]
         subnet_name = "private"
-        # user_data_raw = base64encode(templatefile(
-        #   "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
-        #     branch = "main"
-        #   }
-        # ))
+        user_data_raw = base64encode(templatefile(
+          "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
+            branch = "prisoner-retail-ec2-poc"
+          }
+        ))
       }
       ebs_volumes = {
         "/dev/sda1" = { type = "gp3", size = 100 }
