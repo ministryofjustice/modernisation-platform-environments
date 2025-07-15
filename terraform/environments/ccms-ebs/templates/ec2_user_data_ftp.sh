@@ -20,6 +20,14 @@ systemctl stop amazon-ssm-agent
 rm -rf /var/lib/amazon/ssm/ipc/
 systemctl start amazon-ssm-agent
 
+echo "pasv_enable=YES" >> /etc/vsftpd/vsftpd.conf
+echo "pasv_min_port=3000" >> /etc/vsftpd/vsftpd.conf
+echo "pasv_max_port=3010" >> /etc/vsftpd/vsftpd.conf
+systemctl enable vsftpd.service
+systemctl restart vsftpd.service
+
+cat > /etc/mount_s3.sh <<- EOM
+#!/bin/bash
 ENV="${environment}"
 inbound_bucket="${ftp_inbound_bucket}"
 outbound_bucket="${ftp_outbound_bucket}"
@@ -112,12 +120,6 @@ chown -R "$USERNAME:users" "$USERNAME/S3/$outbound_bucket"
 chmod 755 "$USERNAME/S3/$inbound_bucket"
 chmod 755 "$USERNAME/S3/$outbound_bucket"
 
-echo "pasv_enable=YES" >> /etc/vsftpd/vsftpd.conf
-echo "pasv_min_port=3000" >> /etc/vsftpd/vsftpd.conf
-echo "pasv_max_port=3010" >> /etc/vsftpd/vsftpd.conf
-
-systemctl restart vsftpd.service
-
 # create mount directories
 mkdir -p /$USERNAME/S3/laa-ccms-inbound-$ENV-mp /$USERNAME/S3/laa-ccms-outbound-$ENV-mp
 # Backup fstab first
@@ -148,3 +150,10 @@ else
   fi
 
 fi
+EOM
+
+chmod +x /etc/mount_s3.sh
+
+chmod +x /etc/rc.d/rc.local
+echo "/etc/mount_s3.sh" >> /etc/rc.local
+systemctl start rc-local.service
