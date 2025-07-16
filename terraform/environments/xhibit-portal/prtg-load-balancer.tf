@@ -141,74 +141,74 @@ resource "aws_acm_certificate_validation" "prtg_lb_cert_validation" {
   validation_record_fqdns = [for record in local.prtg_domain_types : record.name]
 }
 
-resource "aws_wafv2_web_acl" "prtg_acl" {
-  # checkov:skip=CKV_AWS_192: "Ensure WAF prevents message lookup in Log4j2. See CVE-2021-44228 aka log4jshell"
-  count       = local.is-production ? 0 : 1
-  name        = "WAFprtg-acl"
-  description = "WAF ACL rules for prtg Load Balancer."
-  scope       = "REGIONAL"
+#resource "aws_wafv2_web_acl" "prtg_acl" {
+#  # checkov:skip=CKV_AWS_192: "Ensure WAF prevents message lookup in Log4j2. See CVE-2021-44228 aka log4jshell"
+#  count       = local.is-production ? 0 : 1
+#  name        = "WAFprtg-acl"
+#  description = "WAF ACL rules for prtg Load Balancer."
+#  scope       = "REGIONAL"
+#
+#  default_action {
+#    block {}
+#  }
 
-  default_action {
-    block {}
-  }
+#  rule {
+#    name     = "block-non-gb"
+#    priority = 0
 
-  rule {
-    name     = "block-non-gb"
-    priority = 0
+#    action {
+#      allow {}
+#    }
 
-    action {
-      allow {}
-    }
+#    statement {
+#      geo_match_statement {
+#        country_codes = ["GB"]
+#      }
+#    }
 
-    statement {
-      geo_match_statement {
-        country_codes = ["GB"]
-      }
-    }
+#    visibility_config {
+#      cloudwatch_metrics_enabled = true
+#      metric_name                = "prtg-acl-block-non-gb-rule-metric"
+#      sampled_requests_enabled   = true
+#    }
+#  }
 
-    visibility_config {
-      cloudwatch_metrics_enabled = true
-      metric_name                = "prtg-acl-block-non-gb-rule-metric"
-      sampled_requests_enabled   = true
-    }
-  }
+#  rule {
+#    name     = "aws-prtg-common-rules"
+#    priority = 1
 
-  rule {
-    name     = "aws-prtg-common-rules"
-    priority = 1
+#    override_action {
+#      count {}
+#    }
 
-    override_action {
-      count {}
-    }
+#    statement {
+#      managed_rule_group_statement {
+#        name        = "AWSManagedRulesCommonRuleSet"
+#        vendor_name = "AWS"
+#      }
+#    }
 
-    statement {
-      managed_rule_group_statement {
-        name        = "AWSManagedRulesCommonRuleSet"
-        vendor_name = "AWS"
-      }
-    }
+#    visibility_config {
+#      cloudwatch_metrics_enabled = true
+#      metric_name                = "prtg-acl-common-rules-metric"
+#      sampled_requests_enabled   = true
+#    }
+#  }
 
-    visibility_config {
-      cloudwatch_metrics_enabled = true
-      metric_name                = "prtg-acl-common-rules-metric"
-      sampled_requests_enabled   = true
-    }
-  }
+#  tags = merge(
+#    local.tags,
+#    {
+#      Name = "prtg-acl-${var.networking[0].application}"
+#    },
+#  )
 
-  tags = merge(
-    local.tags,
-    {
-      Name = "prtg-acl-${var.networking[0].application}"
-    },
-  )
+#  visibility_config {
+#    cloudwatch_metrics_enabled = true
+#    metric_name                = "prtg-acl-metric"
+#    sampled_requests_enabled   = true
+#  }
 
-  visibility_config {
-    cloudwatch_metrics_enabled = true
-    metric_name                = "prtg-acl-metric"
-    sampled_requests_enabled   = true
-  }
-
-}
+#}
 
 resource "aws_wafv2_web_acl_association" "aws_prtg-lb_waf_association" {
   # count        = local.is-production ? 0 : 1
