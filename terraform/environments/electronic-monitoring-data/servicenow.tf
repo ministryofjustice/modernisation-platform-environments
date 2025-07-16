@@ -50,6 +50,25 @@ data "aws_iam_policy_document" "glue_connection_snow" {
         "arn:aws:s3:::emds-test-cadt/zero-etl/servicenow_test/*"
       ]
     }
+    statement {
+      effect = "Allow"
+      actions = ["cloudwatch:PutMetricData"]
+      resource = ["*"]
+      condition {
+        test     = "StringEquals"
+        values   = ["AWS/Glue/ZeroETL"]
+        variable = "cloudwatch:namespace"
+      }
+    }
+    statement {
+      effect = "Allow"
+      actions = [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+      ]
+      resource = ["*"]
+    }
 }
 
 resource "aws_iam_policy" "glue_connection_snow_access" {
