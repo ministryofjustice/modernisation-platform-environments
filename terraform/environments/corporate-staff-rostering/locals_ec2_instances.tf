@@ -167,7 +167,7 @@ locals {
           "EC2Default",
           "EC2S3BucketWriteAndDeleteAccessPolicy",
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
-          "Ec2PrisonerRetailPolicy"
+          #"Ec2PrisonerRetailPolicy"
         ]
         subnet_name = "private"
         user_data_raw = base64encode(templatefile(
