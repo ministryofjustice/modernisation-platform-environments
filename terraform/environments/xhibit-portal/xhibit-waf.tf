@@ -42,6 +42,7 @@ resource "aws_wafv2_ip_set" "prtg_waf_ip_set" {
   )
 }
 
+# WebACL for PRTG
 resource "aws_wafv2_web_acl" "prtg_web_acl" {
   # checkov:skip=CKV_AWS_192: "Ensure WAF prevents message lookup in Log4j2. See CVE-2021-44228 aka log4jshell"
   name        = "prtg_waf"
@@ -94,7 +95,7 @@ resource "aws_wafv2_web_acl" "prtg_web_acl" {
     }
   }
 
-  # AWS Managed Rule Groups (in COUNT mode)
+  # AWS Managed Rule Group (in COUNT mode)
   rule {
     name     = "AWS-AWSManagedRulesKnownBadInputsRuleSet"
     priority = 10
@@ -128,6 +129,7 @@ resource "aws_wafv2_web_acl" "prtg_web_acl" {
   }
 }
 
+# Create CloudWatch log group for PRTG
 resource "aws_cloudwatch_log_group" "prtg_waf_logs" {
   # checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS"
   name              = "aws-waf-logs-prtg-waf"
@@ -138,6 +140,7 @@ resource "aws_cloudwatch_log_group" "prtg_waf_logs" {
   )
 }
 
+# Send WebACL logs to CloudWatch
 resource "aws_wafv2_web_acl_logging_configuration" "prtg_waf_logging" {
   log_destination_configs = [aws_cloudwatch_log_group.prtg_waf_logs.arn]
   resource_arn            = aws_wafv2_web_acl.prtg_web_acl.arn
