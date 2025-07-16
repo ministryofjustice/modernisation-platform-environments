@@ -29,8 +29,6 @@ locals {
   ndmis_service_name      = local.is_non_prod ? jsondecode(data.aws_secretsmanager_secret_version.ndmis[0].secret_string)["db_name"] : ""
   connection_string_ndmis = local.is_non_prod ? "oracle://jdbc:oracle:thin:$${${aws_secretsmanager_secret.ndmis[0].name}}@//${local.ndmis_host}:${local.ndmis_port}/${local.ndmis_service_name}" : ""
 
-  excluded_catalogs = toset(["dps-testing", "dps-testing2"])
-
   # Some connections are only set up in specific environments
   dev_federated_query_connections_oracle = {
     nomis   = local.connection_string_nomis
@@ -45,23 +43,6 @@ locals {
     onr     = local.connection_string_onr
     ndelius = local.connection_string_ndelius
     ndmis   = local.connection_string_ndmis
-  }
-
-  dps_host = {
-    for item in local.dps_domains_list :
-    item => jsondecode(data.aws_secretsmanager_secret_version.dps[item].secret_string)["endpoint"]
-  }
-  dps_port_num = {
-    for item in local.dps_domains_list :
-    item => jsondecode(data.aws_secretsmanager_secret_version.dps[item].secret_string)["port"]
-  }
-  dps_database_name = {
-    for item in local.dps_domains_list :
-    item => jsondecode(data.aws_secretsmanager_secret_version.dps[item].secret_string)["db_name"]
-  }
-  dps_full_connection_string = {
-    for item in local.dps_domains_list :
-    replace(item, "-", "_") => "postgres://jdbc:postgresql://${local.dps_host[item]}:${local.dps_port_num[item]}/${local.dps_database_name[item]}?$${${aws_secretsmanager_secret.dps[item].name}}"
   }
 
   preproduction_federated_query_connections_oracle = {
@@ -90,11 +71,6 @@ locals {
     aws_secretsmanager_secret.ndmis[0].arn
   ] : []
 
-  federated_query_credentials_secret_arns_postgresql_list = [
-    for item in local.dps_domains_list : aws_secretsmanager_secret.dps[item].arn
-    if !contains(local.excluded_catalogs, item)
-  ]
-
   preproduction_federated_query_credentials_secret_arns_oracle = local.is-preproduction ? [
     aws_secretsmanager_secret.nomis.arn,
     aws_secretsmanager_secret.bodmis.arn,
@@ -118,7 +94,6 @@ locals {
       (local.is-preproduction ? local.preproduction_federated_query_credentials_secret_arns_oracle :
         local.production_federated_query_credentials_secret_arns_oracle)))
 
-  federated_query_connection_strings_map_postgresql = local.dps_full_connection_string
 }
 
 module "athena_federated_query_connector_oracle" {
