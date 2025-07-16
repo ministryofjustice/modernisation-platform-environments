@@ -24,7 +24,7 @@ module "waf" {
 # WAF IP allow list for PRTG
 
 resource "aws_wafv2_ip_set" "prtg_waf_ip_set" {
-  name               = "prtg_waf_ip_set"
+  name               = "prtg-waf-ip-set"
   scope              = "REGIONAL"
   ip_address_version = "IPV4"
   description        = "List of trusted IP Addresses allowing access via WAF"
@@ -45,7 +45,7 @@ resource "aws_wafv2_ip_set" "prtg_waf_ip_set" {
 # WebACL for PRTG
 resource "aws_wafv2_web_acl" "prtg_web_acl" {
   # checkov:skip=CKV_AWS_192: "Ensure WAF prevents message lookup in Log4j2. See CVE-2021-44228 aka log4jshell"
-  name        = "prtg_waf"
+  name        = "prtg-waf"
   scope       = "REGIONAL"
   description = "AWS WAF Web ACL for PRTG"
 
@@ -54,7 +54,7 @@ resource "aws_wafv2_web_acl" "prtg_web_acl" {
   }
 
   rule {
-    name = "prtg-trusted-rule"
+    name = "prtg-waf-ip-list"
 
     priority = 1
     action {
@@ -69,13 +69,13 @@ resource "aws_wafv2_web_acl" "prtg_web_acl" {
 
     visibility_config {
       cloudwatch_metrics_enabled = true
-      metric_name                = "prtg_waf_trusted_rule"
+      metric_name                = "prtg-waf-ip-list"
       sampled_requests_enabled   = true
     }
   }
 
   rule {
-    name     = "block-non-gb"
+    name     = "block-non-uk"
     priority = 2
 
     action {
@@ -90,14 +90,14 @@ resource "aws_wafv2_web_acl" "prtg_web_acl" {
 
     visibility_config {
       cloudwatch_metrics_enabled = true
-      metric_name                = "prtg_waf_block_non_gb_rule_metric"
+      metric_name                = "prtg-waf-block-non-uk"
       sampled_requests_enabled   = true
     }
   }
 
   # AWS Managed Rule Group (in COUNT mode)
   rule {
-    name     = "AWS-AWSManagedRulesKnownBadInputsRuleSet"
+    name     = "AWSManagedRulesKnownBadInputsRuleSet"
     priority = 10
 
     override_action {
@@ -113,7 +113,7 @@ resource "aws_wafv2_web_acl" "prtg_web_acl" {
 
     visibility_config {
       cloudwatch_metrics_enabled = true
-      metric_name                = "prtg_waf_KnownBadInputs"
+      metric_name                = "AWSManagedRulesKnownBadInputsRuleSet"
       sampled_requests_enabled   = true
     }
   }
@@ -124,7 +124,7 @@ resource "aws_wafv2_web_acl" "prtg_web_acl" {
 
   visibility_config {
       cloudwatch_metrics_enabled = true
-      metric_name                = "prtg_waf_metrics"
+      metric_name                = "prtg-waf"
       sampled_requests_enabled   = true
   }
 }
