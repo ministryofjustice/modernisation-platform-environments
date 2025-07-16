@@ -259,7 +259,7 @@ data "aws_iam_policy_document" "standard_athena_access" {
   }
 }
 
-data "iam_policy_document" "cmt_permissions" {
+data "aws_iam_policy_document" "cmt_permissions" {
   statement {
     effect = "Allow"
     actions = [
@@ -279,7 +279,7 @@ data "iam_policy_document" "cmt_permissions" {
 
 
 
-data "iam_policy_document" "ac_permissions" {
+data "aws_iam_policy_document" "ac_permissions" {
   statement {
     effect = "Allow"
     actions = [
