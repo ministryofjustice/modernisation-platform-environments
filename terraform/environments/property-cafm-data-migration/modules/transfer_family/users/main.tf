@@ -74,4 +74,20 @@ data "aws_iam_policy_document" "sftp_user_policy" {
     ]
     resources = ["arn:aws:s3:::${var.s3_bucket}/${var.user_name}/*"]
   }
+
+  statement {
+    sid    = "KMSAccessForEncryptedS3"
+    effect = "Allow"
+    actions = [
+        "kms:Encrypt",
+        "kms:Decrypt",
+        "kms:ReEncrypt*",
+        "kms:GenerateDataKey*",
+        "kms:DescribeKey"
+    ]
+    resources = [
+        var.kms_key_arn
+    ]
+    }
 }
+

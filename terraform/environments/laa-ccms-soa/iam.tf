@@ -188,7 +188,11 @@ resource "aws_iam_policy" "ec2_instance_policy" {
         {
           "Effect": "Allow",
           "Action": ["secretsmanager:GetSecretValue"],
-          "Resource": ["arn:aws:secretsmanager:eu-west-2:*:secret:ccms/soa/deploy-*"]
+          "Resource": [
+            "arn:aws:secretsmanager:eu-west-2:*:secret:ccms/soa/deploy-*",
+            "arn:aws:secretsmanager:eu-west-2:*:secret:ccms/soa/password",
+            "arn:aws:secretsmanager:eu-west-2:*:secret:ccms/soa/xxsoa/ds/password"
+          ]
         }
     ]
 }
