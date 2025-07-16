@@ -442,11 +442,11 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "default_encryptio
   }
 }
 
-resource "aws_wafv2_web_acl_logging_configuration" "waf_logs" {
-  count                   = local.is-production ? 0 : 1
-  log_destination_configs = [aws_s3_bucket.waf_logs[0].arn]
-  resource_arn            = aws_wafv2_web_acl.waf_acl[0].arn
-}
+#resource "aws_wafv2_web_acl_logging_configuration" "waf_logs" {
+#  count                   = local.is-production ? 0 : 1
+#  log_destination_configs = [aws_s3_bucket.waf_logs[0].arn]
+#  resource_arn            = aws_wafv2_web_acl.waf_acl[0].arn
+#}
 
 resource "aws_s3_bucket_policy" "waf_logs_policy" {
   count  = local.is-production ? 0 : 1
