@@ -1,32 +1,9 @@
 module "waf" {
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-waf?ref=v0.0.1"
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-waf?ref=ecc855f212ce6a2f36a7a77e78c42d968f15ee8d"
   enable_ddos_protection = true
   ddos_rate_limit        = 3000
   block_non_uk_traffic   = true
   associated_resource_arns = [aws_lb.waf_lb.arn]
-
-  managed_rule_actions = {
-    AWSManagedRulesKnownBadInputsRuleSet = true
-    AWSManagedRulesCommonRuleSet         = true
-    AWSManagedRulesSQLiRuleSet           = true
-    AWSManagedRulesLinuxRuleSet          = true
-    AWSManagedRulesAnonymousIpList       = true
-    AWSManagedRulesBotControlRuleSet     = true
-  }
-  
-  core_logging_account_id = local.environment_management.account_ids["core-logging-production"]
-
-  application_name = local.application_name
-  tags             = local.tags
-
-}
-
-module "waf_prtg" {
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-waf?ref=v0.0.1"
-  enable_ddos_protection = true
-  ddos_rate_limit        = 1000
-  block_non_uk_traffic   = true
-  associated_resource_arns = [aws_lb.prtg_lb.arn]
 
   managed_rule_actions = {
     AWSManagedRulesKnownBadInputsRuleSet = true
@@ -78,7 +55,7 @@ resource "aws_wafv2_web_acl" "prtg_web_acl" {
     name = "prtg-trusted-rule"
 
     priority = 1
-    action {
+    override_action {
       count {}
     }
 
@@ -95,15 +72,33 @@ resource "aws_wafv2_web_acl" "prtg_web_acl" {
     }
   }
 
+
+  # AWS Managed Rule Groups (in COUNT mode)
+  rule {
+    name     = "AWS-AWSManagedRulesKnownBadInputsRuleSet"
+    priority = 10
+
+    override_action {
+      count {}
+    }
+
+    statement {
+      managed_rule_group_statement {
+        name        = "AWSManagedRulesKnownBadInputsRuleSet"
+        vendor_name = "AWS"
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "KnownBadInputs"
+      sampled_requests_enabled   = true
+    }
+  }
+
   tags = merge(local.tags,
     { Name = lower(format("%s-prtg-waf-web-acl-%s", local.application_name, local.environment)) }
   )
-
-  visibility_config {
-    cloudwatch_metrics_enabled = true
-    metric_name                = "prtg_waf_metrics"
-    sampled_requests_enabled   = true
-  }
 }
 
 resource "aws_cloudwatch_log_group" "prtg_waf_logs" {
