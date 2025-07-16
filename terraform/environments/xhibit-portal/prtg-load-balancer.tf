@@ -211,9 +211,13 @@ resource "aws_wafv2_web_acl" "prtg_acl" {
 }
 
 resource "aws_wafv2_web_acl_association" "aws_prtg-lb_waf_association" {
-  count        = local.is-production ? 0 : 1
+  # count        = local.is-production ? 0 : 1
   resource_arn = aws_lb.prtg_lb.arn
-  web_acl_arn  = aws_wafv2_web_acl.prtg_acl[0].arn
+  web_acl_arn  = aws_wafv2_web_acl.prtg_web_acl.arn
+  depends_on   = [
+    aws_lb.prtg_lb,
+    aws_wafv2_web_acl.prtg_web_acl
+    ]
 }
 
 # trivy:ignore:AVD-AWS-0086 reason: (HIGH): No public access block so not blocking public acls
