@@ -10,16 +10,6 @@ data "aws_vpc" "apc" {
   }
 }
 
-# data "aws_subnets" "apc_private" {
-#   filter {
-#     name   = "vpc-id"
-#     values = [data.aws_vpc.apc.id]
-#   }
-#   tags = {
-#     Name = "${local.application_name}-${local.environment}-private*"
-#   }
-# }
-
 data "aws_subnets" "apc_private" {
   filter {
     name   = "vpc-id"
@@ -38,17 +28,6 @@ data "aws_subnet" "apc_private_subnet_details" {
   id = each.value
 }
 
-
-# data "aws_subnets" "apc_intra" {
-#   filter {
-#     name   = "vpc-id"
-#     values = [data.aws_vpc.apc.id]
-#   }
-#   tags = {
-#     Name = "${local.application_name}-${local.environment}-intra*"
-#   }
-# }
-
 data "aws_subnets" "apc_intra" {
   filter {
     name   = "vpc-id"
@@ -64,8 +43,6 @@ data "aws_db_subnet_group" "apc_database" {
   name = "${local.application_name}-${local.environment}"
 }
 
-
-
 data "aws_iam_roles" "platform_engineer_admin_sso_role" {
   name_regex  = "AWSReservedSSO_platform-engineer-admin_.*"
   path_prefix = "/aws-reserved/sso.amazonaws.com/"
@@ -79,20 +56,6 @@ data "aws_iam_roles" "eks_sso_access_role" {
 # EKS
 data "aws_eks_cluster" "eks" {
   name = local.eks_cluster_name
-}
-
-# Log Groups
-data "aws_cloudwatch_log_group" "eks_logs" {
-  name = local.eks_cloudwatch_log_group_name
-}
-
-data "aws_cloudwatch_log_group" "prometheus_logs" {
-  name = local.amp_cloudwatch_log_group_name
-}
-
-# KMS
-data "aws_kms_key" "common_secrets_manager_kms" {
-  key_id = "alias/secretsmanager/common"
 }
 
 data "http" "prometheus_operator_crds" {
@@ -116,9 +79,3 @@ data "http" "prometheus_operator_crds" {
 data "aws_route53_zone" "route53_zone_zone" {
   name = local.environment_configuration.route53_zone
 }
-
-# data "kubernetes_namespace" "aws_observability" {
-#   metadata {
-#     name = "aws-observability"
-#   }
-# }

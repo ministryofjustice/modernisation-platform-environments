@@ -47,7 +47,6 @@ resource "helm_release" "aws_for_fluent_bit" {
   chart      = "aws-for-fluent-bit"
   version    = "0.1.35"
   namespace  = kubernetes_namespace.aws_observability.metadata[0].name
-  # namespace = data.kubernetes_namespace.aws_observability.metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/values/aws-for-fluent-bit/values.yml.tftpl",
@@ -55,7 +54,6 @@ resource "helm_release" "aws_for_fluent_bit" {
         aws_region                = data.aws_region.current.name
         cluster_name              = module.eks.cluster_name
         cloudwatch_log_group_name = module.eks_log_group.cloudwatch_log_group_name
-        # cloudwatch_log_group_name = data.aws_cloudwatch_log_group.eks_logs.name
         eks_role_arn = module.aws_for_fluent_bit_iam_role.iam_role_arn
       }
     )
