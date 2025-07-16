@@ -1,6 +1,6 @@
 module "rds_export" {
-  source = "github.com/ministryofjustice/terraform-rds-export?ref=04916a52ce20590674198fc48456dad95d7dee75"
-
+  source = "github.com/ministryofjustice/terraform-rds-export?ref=33a12fbbc09d8ab19fa59825a829530653497205"
+  
   # Replace the kms_key_arn, name, vpc_id and (database_subnet_ids in a list)
   kms_key_arn = aws_kms_key.sns_kms.arn
   name = "cafm"
