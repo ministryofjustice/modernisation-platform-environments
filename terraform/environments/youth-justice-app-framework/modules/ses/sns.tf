@@ -30,13 +30,9 @@ resource "aws_sns_topic_policy" "allow_ses_publish" {
 data "aws_caller_identity" "current" {}
 
 
-variable "ses_identity" {
-  ses_identity = aws_ses_domain_identity.main[each.value.identity].domain
-}
-
 # Bounce Notifications
 resource "aws_ses_identity_notification_topic" "bounce_topic" {
-  identity       = var.ses_identity
+  identity       = aws_ses_domain_identity.main[each.value.identity].domain
   notification_type = "Bounce"
   topic_arn      = aws_sns_topic.ses_notifications.arn
   include_original_headers = true
@@ -44,7 +40,7 @@ resource "aws_ses_identity_notification_topic" "bounce_topic" {
 
 # Complaint Notifications
 resource "aws_ses_identity_notification_topic" "complaint_topic" {
-  identity       = var.ses_identity
+  identity       = aws_ses_domain_identity.main[each.value.identity].domain
   notification_type = "Complaint"
   topic_arn      = aws_sns_topic.ses_notifications.arn
   include_original_headers = true
