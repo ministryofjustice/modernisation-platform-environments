@@ -73,6 +73,26 @@ resource "aws_wafv2_web_acl" "prtg_web_acl" {
     }
   }
 
+  rule {
+    name     = "block-non-gb"
+    priority = 2
+
+    action {
+      allow {}
+    }
+
+    statement {
+      geo_match_statement {
+        country_codes = ["GB"]
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "prtg_waf_block_non_gb_rule_metric"
+      sampled_requests_enabled   = true
+    }
+  }
 
   # AWS Managed Rule Groups (in COUNT mode)
   rule {
