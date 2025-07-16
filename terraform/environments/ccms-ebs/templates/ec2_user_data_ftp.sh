@@ -6,7 +6,7 @@ exec > /tmp/userdata.log 2>&1
 # amazon-linux-extras install -y epel
 # yum install -y wget unzip vsftpd jq s3fs-fuse amazon-cloudwatch-agent telnet
 yum install -y wget unzip vsftpd jq amazon-cloudwatch-agent telnet
-dnf install -y git gcc libstdc++-devel automake libtool fuse fuse-devel curl-devel openssl-devel make
+dnf install -y git gcc libstdc++-devel automake libtool fuse fuse-devel curl-devel openssl-devel make libxml2-devel gcc-c++
 
 cd /usr/local/src
 git clone https://github.com/s3fs-fuse/s3fs-fuse.git
