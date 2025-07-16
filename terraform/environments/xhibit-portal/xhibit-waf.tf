@@ -33,7 +33,7 @@ resource "aws_wafv2_ip_set" "prtg_waf_ip_set" {
     "100.44.12.86/32",   // MoJ Digital Wifi
     "35.176.93.186/32",  // MoJ VPN Gateway Proxies
     "172.10.10.188/32",  // V1 Digital Wifi
-    "194.62.186.170/32",    // V1 VPN Gateway Proxies
+    "194.62.186.170/32", // V1 VPN Gateway Proxies
     "66.155.16.68/32",   // Southampton BEL Wifi
   ]
 
