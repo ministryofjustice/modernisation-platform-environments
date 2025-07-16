@@ -22,6 +22,8 @@ resource "aws_instance" "ec2_ebsapps" {
       ebs_block_device,
       user_data,
       user_data_replace_on_change,
+      ebs_block_device["tags"],
+      root_block_device["tags"],
       tags
     ]
   }
