@@ -31,7 +31,7 @@ data "aws_caller_identity" "current" {}
 
 
 variable "ses_identity" {
-  default = aws_ses_domain_identity.main[each.value.identity].domain
+  ses_identity = aws_ses_domain_identity.main[each.value.identity].domain
 }
 
 # Bounce Notifications
