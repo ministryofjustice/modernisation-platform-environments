@@ -19,6 +19,8 @@ yum install -y wget unzip vsftpd jq s3fs-fuse amazon-cloudwatch-agent telnet
 # systemctl stop amazon-ssm-agent
 # rm -rf /var/lib/amazon/ssm/ipc/
 # systemctl start amazon-ssm-agent
+systemctl enable amazon-cloudwatch-agent
+systemctl start amazon-cloudwatch-agent
 
 echo "pasv_enable=YES" >> /etc/vsftpd/vsftpd.conf
 echo "pasv_min_port=3000" >> /etc/vsftpd/vsftpd.conf
@@ -26,8 +28,8 @@ echo "pasv_max_port=3010" >> /etc/vsftpd/vsftpd.conf
 systemctl enable vsftpd.service
 systemctl restart vsftpd.service
 
-cat > /etc/mount_s3_new.sh <<- EOM
-#!/bin/bash
+# cat > /etc/mount_s3_new.sh <<- EOM
+# #!/bin/bash
 ENV="${environment}"
 inbound_bucket="${ftp_inbound_bucket}"
 outbound_bucket="${ftp_outbound_bucket}"
@@ -72,13 +74,18 @@ fi
 if id "$USERNAME" &>/dev/null; then
   echo "User $USERNAME already exists."
 else
+
   useradd -m "$USERNAME"
+  # --- Set password securely using heredoc ---
+  chpasswd <<EOF
+  $USERNAME:$PASSWORD
+EOF
 fi
 
-# --- Set password securely using heredoc ---
-chpasswd <<EOF
-$USERNAME:$PASSWORD
-EOF
+# # --- Set password securely using heredoc ---
+# chpasswd <<EOF
+# $USERNAME:$PASSWORD
+# EOF
 
 # Check if PasswordAuthentication is disabled
 if grep -qE "^#?PasswordAuthentication\s+no" "$SSHD_CONFIG"; then
@@ -150,10 +157,10 @@ else
   fi
 
 fi
-EOM
+# EOM
 
-chmod +x /etc/mount_s3_new.sh
+# chmod +x /etc/mount_s3_new.sh
 
-chmod +x /etc/rc.d/rc.local
-echo "/etc/mount_s3_new.sh" >> /etc/rc.local
-systemctl start rc-local.service
+# chmod +x /etc/rc.d/rc.local
+# echo "/etc/mount_s3_new.sh" >> /etc/rc.local
+# systemctl start rc-local.service
