@@ -2,23 +2,23 @@
 # Sizes and IOPS of these volumes have to match production values, hence hardcoded reference.
 # Device IDs start from /dev/sdaa, up to /dev/sdaj (normal volumes occupy ids up to /dev/sdz).
 # 
-#           snap-0f26fe4c50464458e - /
-# /dev/sdaa snap-04dc8385f2eea4c46 + /backup
-# /dev/sdab snap-Oc8fe8d91964afa0d + /CCMS/EBSPROD/arch
-# /dev/sdac snap-0443ae13d35ca9706 + /CCMS/EBSPROD/dbf01
-# /dev/sdad snap-02d677a1195040bd5 + /CCMS/EBSPROD/dbf02
-# /dev/sdae snap-0fb308e92c6ce4ecc + /CCMS/EBSPROD/dbf03
-# /dev/sdaf snap-0728d350b9079f044 + /CCMS/EBSPROD/dbf04
-# /dev/sdag snap-099dc03400be4bbf9 + /CCMS/EBSPROD/diag
-# /dev/sdah snap-Oa254db0b5290dba3 + /CCMS/EBSPROD/redoA
-# /dev/sdai snap-093f8f3c22aa5c13b + /CCMS/EBSPROD/redoB
-# /dev/sdaj snap-01bdd99b165c0d8f4 + /CCMS/EBSPROD/techst
-#           snap-02f666549819240a2 - /export/home
-#           snap-05eaf45bd409c4c9e - /home
-#           snap-06aa8b3fb0d3c45e7 - /temp
-#           snap-06d8adeb781e60d40 - /u01
+#          snap-0f26fe4c50464458e - /
+# /dev/sde snap-04dc8385f2eea4c46 + /backup
+# /dev/sdf snap-Oc8fe8d91964afa0d + /CCMS/EBSPROD/arch
+# /dev/sdg snap-0443ae13d35ca9706 + /CCMS/EBSPROD/dbf01
+# /dev/sdk snap-02d677a1195040bd5 + /CCMS/EBSPROD/dbf02
+# /dev/sdu snap-0fb308e92c6ce4ecc + /CCMS/EBSPROD/dbf03
+# /dev/sdv snap-0728d350b9079f044 + /CCMS/EBSPROD/dbf04
+# /dev/sdw snap-099dc03400be4bbf9 + /CCMS/EBSPROD/diag
+# /dev/sdx snap-Oa254db0b5290dba3 + /CCMS/EBSPROD/redoA
+# /dev/sdy snap-093f8f3c22aa5c13b + /CCMS/EBSPROD/redoB
+# /dev/sdz snap-01bdd99b165c0d8f4 + /CCMS/EBSPROD/techst
+#          snap-02f666549819240a2 - /export/home
+#          snap-05eaf45bd409c4c9e - /home
+#          snap-06aa8b3fb0d3c45e7 - /temp
+#          snap-06d8adeb781e60d40 - /u01
 
-# /dev/sdaa snap-04dc8385f2eea4c46 + /backup
+# /dev/sde snap-04dc8385f2eea4c46 + /backup
 resource "aws_ebs_volume" "prod_db_backup" {
   count       = local.is-test ? 1 : 0
   snapshot_id = "snap-04dc8385f2eea4c46"
@@ -36,19 +36,19 @@ resource "aws_ebs_volume" "prod_db_backup" {
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
     { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "prod_db_backup")) },
-    { device-name = "/dev/sdaa" }
+    { device-name = "/dev/sde" }
   )
 }
 
 resource "aws_volume_attachment" "att_prod_db_backup" {
   count       = local.is-test ? 1 : 0
-  device_name = "/dev/sdaa"
+  device_name = "/dev/sde"
   volume_id   = aws_ebs_volume.prod_db_backup[0].id
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
 
 
-# /dev/sdab snap-Oc8fe8d91964afa0d + /CCMS/EBSPROD/arch
+# /dev/sdf snap-Oc8fe8d91964afa0d + /CCMS/EBSPROD/arch
 resource "aws_ebs_volume" "prod_db_arch" {
   count       = local.is-test ? 1 : 0
   snapshot_id = "snap-Oc8fe8d91964afa0d"
@@ -66,19 +66,19 @@ resource "aws_ebs_volume" "prod_db_arch" {
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
     { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "prod_db_arch")) },
-    { device-name = "/dev/sdab" }
+    { device-name = "/dev/sdf" }
   )
 }
 
 resource "aws_volume_attachment" "att_prod_db_arch" {
   count       = local.is-test ? 1 : 0
-  device_name = "/dev/sdab"
+  device_name = "/dev/sdf"
   volume_id   = aws_ebs_volume.prod_db_arch[0].id
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
 
 
-# /dev/sdac snap-0443ae13d35ca9706 + /CCMS/EBSPROD/dbf01
+# /dev/sdg snap-0443ae13d35ca9706 + /CCMS/EBSPROD/dbf01
 resource "aws_ebs_volume" "prod_db_dbf01" {
   count       = local.is-test ? 1 : 0
   snapshot_id = "snap-0443ae13d35ca9706"
@@ -96,19 +96,19 @@ resource "aws_ebs_volume" "prod_db_dbf01" {
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
     { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "prod_db_dbf01")) },
-    { device-name = "/dev/sdac" }
+    { device-name = "/dev/sdg" }
   )
 }
 
 resource "aws_volume_attachment" "att_prod_db_dbf01" {
   count       = local.is-test ? 1 : 0
-  device_name = "/dev/sdac"
+  device_name = "/dev/sdg"
   volume_id   = aws_ebs_volume.prod_db_dbf01[0].id
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
 
 
-# /dev/sdad snap-02d677a1195040bd5 + /CCMS/EBSPROD/dbf02
+# /dev/sdk snap-02d677a1195040bd5 + /CCMS/EBSPROD/dbf02
 resource "aws_ebs_volume" "prod_db_dbf02" {
   count       = local.is-test ? 1 : 0
   snapshot_id = "snap-02d677a1195040bd5"
@@ -126,19 +126,19 @@ resource "aws_ebs_volume" "prod_db_dbf02" {
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
     { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "prod_db_dbf02")) },
-    { device-name = "/dev/sdad" }
+    { device-name = "/dev/sdk" }
   )
 }
 
 resource "aws_volume_attachment" "att_prod_db_dbf02" {
   count       = local.is-test ? 1 : 0
-  device_name = "/dev/sdad"
+  device_name = "/dev/sdk"
   volume_id   = aws_ebs_volume.prod_db_dbf02[0].id
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
 
 
-# /dev/sdae snap-0fb308e92c6ce4ecc + /CCMS/EBSPROD/dbf03
+# /dev/sdu snap-0fb308e92c6ce4ecc + /CCMS/EBSPROD/dbf03
 resource "aws_ebs_volume" "prod_db_dbf03" {
   count       = local.is-test ? 1 : 0
   snapshot_id = "snap-0fb308e92c6ce4ecc"
@@ -156,19 +156,19 @@ resource "aws_ebs_volume" "prod_db_dbf03" {
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
     { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "prod_db_dbf03")) },
-    { device-name = "/dev/sdae" }
+    { device-name = "/dev/sdu" }
   )
 }
 
 resource "aws_volume_attachment" "att_prod_db_dbf03" {
   count       = local.is-test ? 1 : 0
-  device_name = "/dev/sdae"
+  device_name = "/dev/sdu"
   volume_id   = aws_ebs_volume.prod_db_dbf03[0].id
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
 
 
-# /dev/sdaf snap-0728d350b9079f044 + /CCMS/EBSPROD/dbf04
+# /dev/sdv snap-0728d350b9079f044 + /CCMS/EBSPROD/dbf04
 resource "aws_ebs_volume" "prod_db_dbf04" {
   count       = local.is-test ? 1 : 0
   snapshot_id = "snap-0728d350b9079f044"
@@ -186,19 +186,19 @@ resource "aws_ebs_volume" "prod_db_dbf04" {
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
     { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "prod_db_dbf04")) },
-    { device-name = "/dev/sdaf" }
+    { device-name = "/dev/sdv" }
   )
 }
 
 resource "aws_volume_attachment" "att_prod_db_dbf04" {
   count       = local.is-test ? 1 : 0
-  device_name = "/dev/sdaf"
+  device_name = "/dev/sdv"
   volume_id   = aws_ebs_volume.prod_db_dbf04[0].id
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
 
 
-# /dev/sdag snap-099dc03400be4bbf9 + /CCMS/EBSPROD/diag
+# /dev/sdw snap-099dc03400be4bbf9 + /CCMS/EBSPROD/diag
 resource "aws_ebs_volume" "prod_db_diag" {
   count       = local.is-test ? 1 : 0
   snapshot_id = "snap-099dc03400be4bbf9"
@@ -216,19 +216,19 @@ resource "aws_ebs_volume" "prod_db_diag" {
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
     { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "prod_db_diag")) },
-    { device-name = "/dev/sdag" }
+    { device-name = "/dev/sdw" }
   )
 }
 
 resource "aws_volume_attachment" "att_prod_db_diag" {
   count       = local.is-test ? 1 : 0
-  device_name = "/dev/sdag"
+  device_name = "/dev/sdw"
   volume_id   = aws_ebs_volume.prod_db_diag[0].id
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
 
 
-# /dev/sdah snap-Oa254db0b5290dba3 + /CCMS/EBSPROD/redoA
+# /dev/sdx snap-Oa254db0b5290dba3 + /CCMS/EBSPROD/redoA
 resource "aws_ebs_volume" "prod_db_redoa" {
   count       = local.is-test ? 1 : 0
   snapshot_id = "snap-Oa254db0b5290dba3"
@@ -246,19 +246,19 @@ resource "aws_ebs_volume" "prod_db_redoa" {
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
     { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "prod_db_redoa")) },
-    { device-name = "/dev/sdah" }
+    { device-name = "/dev/sdx" }
   )
 }
 
 resource "aws_volume_attachment" "att_prod_db_redoa" {
   count       = local.is-test ? 1 : 0
-  device_name = "/dev/sdah"
+  device_name = "/dev/sdx"
   volume_id   = aws_ebs_volume.prod_db_redoa[0].id
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
 
 
-# /dev/sdai snap-093f8f3c22aa5c13b + /CCMS/EBSPROD/redoB
+# /dev/sdy snap-093f8f3c22aa5c13b + /CCMS/EBSPROD/redoB
 resource "aws_ebs_volume" "prod_db_redob" {
   count       = local.is-test ? 1 : 0
   snapshot_id = "snap-093f8f3c22aa5c13b"
@@ -276,19 +276,19 @@ resource "aws_ebs_volume" "prod_db_redob" {
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
     { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "prod_db_redob")) },
-    { device-name = "/dev/sdai" }
+    { device-name = "/dev/sdy" }
   )
 }
 
 resource "aws_volume_attachment" "att_prod_db_redob" {
   count       = local.is-test ? 1 : 0
-  device_name = "/dev/sdai"
+  device_name = "/dev/sdy"
   volume_id   = aws_ebs_volume.prod_db_redob[0].id
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
 
 
-# /dev/sdaj snap-01bdd99b165c0d8f4 + /CCMS/EBSPROD/techst
+# /dev/sdz snap-01bdd99b165c0d8f4 + /CCMS/EBSPROD/techst
 resource "aws_ebs_volume" "prod_db_techst" {
   count       = local.is-test ? 1 : 0
   snapshot_id = "snap-01bdd99b165c0d8f4"
@@ -306,13 +306,13 @@ resource "aws_ebs_volume" "prod_db_techst" {
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
     { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "prod_db_techst")) },
-    { device-name = "/dev/sdaj" }
+    { device-name = "/dev/sdz" }
   )
 }
 
 resource "aws_volume_attachment" "att_prod_db_techst" {
   count       = local.is-test ? 1 : 0
-  device_name = "/dev/sdaj"
+  device_name = "/dev/sdz"
   volume_id   = aws_ebs_volume.prod_db_techst[0].id
   instance_id = aws_instance.ec2_oracle_ebs.id
 }

@@ -244,33 +244,34 @@ resource "aws_volume_attachment" "backup_att" {
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
 
-resource "aws_ebs_volume" "backup_clone" {
-  lifecycle {
-    ignore_changes = [
-      kms_key_id,
-      tags
-    ]
-  }
-  availability_zone = "eu-west-2a"
-  count             = length(local.application_data.accounts[local.environment].ebs_backup_snapshot_id) > 0 ? 1 : 0
-  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_backup
-  type              = local.application_data.accounts[local.environment].ebs_type_ebsdb_backup
-  snapshot_id       = length(local.application_data.accounts[local.environment].ebs_backup_snapshot_id) > 0 ? local.application_data.accounts[local.environment].ebs_backup_snapshot_id : null
-  iops              = 3000
-  encrypted         = true
-  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  tags = merge(local.tags,
-    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "backup")) },
-    { device-name = "/dev/sdz" }
-  )
-}
-
-resource "aws_volume_attachment" "backup_clone_att" {
-  count       = length(local.application_data.accounts[local.environment].ebs_backup_snapshot_id) > 0 ? 1 : 0
-  device_name = "/dev/sdz"
-  volume_id   = aws_ebs_volume.backup_clone[0].id
-  instance_id = aws_instance.ec2_oracle_ebs.id
-}
+# Commented out because we ran out of device ids in Test.
+# resource "aws_ebs_volume" "backup_clone" {
+#   lifecycle {
+#     ignore_changes = [
+#       kms_key_id,
+#       tags
+#     ]
+#   }
+#   availability_zone = "eu-west-2a"
+#   count             = length(local.application_data.accounts[local.environment].ebs_backup_snapshot_id) > 0 ? 1 : 0
+#   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_backup
+#   type              = local.application_data.accounts[local.environment].ebs_type_ebsdb_backup
+#   snapshot_id       = length(local.application_data.accounts[local.environment].ebs_backup_snapshot_id) > 0 ? local.application_data.accounts[local.environment].ebs_backup_snapshot_id : null
+#   iops              = 3000
+#   encrypted         = true
+#   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+#   tags = merge(local.tags,
+#     { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "backup")) },
+#     { device-name = "/dev/sdz" }
+#   )
+# }
+# 
+# resource "aws_volume_attachment" "backup_clone_att" {
+#   count       = length(local.application_data.accounts[local.environment].ebs_backup_snapshot_id) > 0 ? 1 : 0
+#   device_name = "/dev/sdz"
+#   volume_id   = aws_ebs_volume.backup_clone[0].id
+#   instance_id = aws_instance.ec2_oracle_ebs.id
+# }
 
 resource "aws_ebs_volume" "backup_prod" {
   lifecycle {
