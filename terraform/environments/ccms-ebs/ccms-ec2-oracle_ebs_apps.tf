@@ -39,6 +39,9 @@ resource "aws_instance" "ec2_ebsapps" {
   # root
   # Increase the volume size of the root volume
   root_block_device {
+    lifecycle {
+      ignore_changes = [tags]
+    }
     volume_type = "gp3"
     volume_size = 50
     encrypted   = true
@@ -49,6 +52,9 @@ resource "aws_instance" "ec2_ebsapps" {
   }
   # swap
   ebs_block_device {
+    lifecycle {
+      ignore_changes = [tags]
+    }
     device_name = "/dev/sdb"
     volume_type = "gp3"
     volume_size = 20
@@ -61,6 +67,9 @@ resource "aws_instance" "ec2_ebsapps" {
   }
   # temp
   ebs_block_device {
+    lifecycle {
+      ignore_changes = [tags]
+    }
     device_name = "/dev/sdc"
     volume_type = "gp3"
     volume_size = 100
@@ -73,6 +82,9 @@ resource "aws_instance" "ec2_ebsapps" {
   }
   # home
   ebs_block_device {
+    lifecycle {
+      ignore_changes = [tags]
+    }
     device_name = "/dev/sdd"
     volume_type = "gp3"
     volume_size = 100
@@ -87,6 +99,9 @@ resource "aws_instance" "ec2_ebsapps" {
   # non-AMI mappings start at /dev/sdh
   # /export/home
   ebs_block_device {
+    lifecycle {
+      ignore_changes = [tags]
+    }
     device_name = "/dev/sdh"
     volume_type = "io2"
     volume_size = local.application_data.accounts[local.environment].ebsapps_exhome_size
@@ -100,6 +115,9 @@ resource "aws_instance" "ec2_ebsapps" {
   }
   # u01
   ebs_block_device {
+    lifecycle {
+      ignore_changes = [tags]
+    }
     device_name = "/dev/sdi"
     volume_type = "io2"
     volume_size = local.application_data.accounts[local.environment].ebsapps_u01_size
@@ -113,6 +131,9 @@ resource "aws_instance" "ec2_ebsapps" {
   }
   # u03
   ebs_block_device {
+    lifecycle {
+      ignore_changes = [tags]
+    }
     device_name = "/dev/sdj"
     volume_type = "io2"
     volume_size = local.application_data.accounts[local.environment].ebsapps_u03_size
@@ -137,7 +158,7 @@ resource "aws_instance" "ec2_ebsapps" {
 resource "aws_ebs_volume" "stage" {
   count = local.application_data.accounts[local.environment].ebsapps_no_instances
   lifecycle {
-        ignore_changes = [
+    ignore_changes = [
       kms_key_id,
       tags
     ]
