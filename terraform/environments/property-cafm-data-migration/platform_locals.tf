@@ -54,6 +54,12 @@ locals {
       s3_bucket    = aws_s3_bucket.CAFM.bucket
       ssm_key_name = "/sftp/keys/dev_user2"
     }
+    "priya_dev" = {
+      environment  = "development"
+      user_name    = "priya_dev"
+      s3_bucket    = aws_s3_bucket.CAFM.bucket
+      ssm_key_name = "/sftp/keys/priya_dev"
+    }
   }
 
   # Filter only users matching the current environment
