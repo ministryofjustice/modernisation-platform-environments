@@ -33,6 +33,23 @@ data "aws_iam_policy_document" "glue_connection_snow" {
             "arn:aws:secretsmanager:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:secret:credentials/servicenow*"
         ]
     }
+    statement {
+      effect = "Allow"
+      actions = ["glue:*"]
+      resources = [
+        "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:catalog",
+        "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:schema/*",
+        "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/*/*",
+        "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/*"
+      ]
+    }
+    statement {
+      effect = "Allow"
+      actions = ["s3:*"]
+      resources = [
+        "arn:aws:s3:::emds-test-cadt/zero-etl/servicenow_test/*"
+      ]
+    }
 }
 
 resource "aws_iam_policy" "glue_connection_snow_access" {
