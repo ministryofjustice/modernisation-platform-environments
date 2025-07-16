@@ -23,7 +23,10 @@ resource "aws_ebs_volume" "prod_db_backup" {
   count       = local.is-test ? 1 : 0
   snapshot_id = "snap-04dc8385f2eea4c46"
   lifecycle {
-    ignore_changes = [kms_key_id]
+    ignore_changes = [
+      kms_key_id,
+      tags
+    ]
   }
   availability_zone = "eu-west-2a"
   size              = local.application_data.accounts["production"].ebs_size_ebsdb_backup
@@ -50,7 +53,10 @@ resource "aws_ebs_volume" "prod_db_arch" {
   count       = local.is-test ? 1 : 0
   snapshot_id = "snap-Oc8fe8d91964afa0d"
   lifecycle {
-    ignore_changes = [kms_key_id]
+    ignore_changes = [
+      kms_key_id,
+      tags
+    ]
   }
   availability_zone = "eu-west-2a"
   size              = local.application_data.accounts["production"].ebs_size_ebsdb_arch
@@ -77,7 +83,10 @@ resource "aws_ebs_volume" "prod_db_dbf01" {
   count       = local.is-test ? 1 : 0
   snapshot_id = "snap-0443ae13d35ca9706"
   lifecycle {
-    ignore_changes = [kms_key_id]
+    ignore_changes = [
+      kms_key_id,
+      tags
+    ]
   }
   availability_zone = "eu-west-2a"
   size              = local.application_data.accounts["production"].ebs_size_ebsdb_dbf01
@@ -104,7 +113,10 @@ resource "aws_ebs_volume" "prod_db_dbf02" {
   count       = local.is-test ? 1 : 0
   snapshot_id = "snap-02d677a1195040bd5"
   lifecycle {
-    ignore_changes = [kms_key_id]
+    ignore_changes = [
+      kms_key_id,
+      tags
+    ]
   }
   availability_zone = "eu-west-2a"
   size              = local.application_data.accounts["production"].ebs_size_ebsdb_dbf02
@@ -131,7 +143,10 @@ resource "aws_ebs_volume" "prod_db_dbf03" {
   count       = local.is-test ? 1 : 0
   snapshot_id = "snap-0fb308e92c6ce4ecc"
   lifecycle {
-    ignore_changes = [kms_key_id]
+    ignore_changes = [
+      kms_key_id,
+      tags
+    ]
   }
   availability_zone = "eu-west-2a"
   size              = local.application_data.accounts["production"].ebs_size_ebsdb_dbf03
@@ -158,7 +173,10 @@ resource "aws_ebs_volume" "prod_db_dbf04" {
   count       = local.is-test ? 1 : 0
   snapshot_id = "snap-0728d350b9079f044"
   lifecycle {
-    ignore_changes = [kms_key_id]
+    ignore_changes = [
+      kms_key_id,
+      tags
+    ]
   }
   availability_zone = "eu-west-2a"
   size              = local.application_data.accounts["production"].ebs_size_ebsdb_dbf04
@@ -185,7 +203,10 @@ resource "aws_ebs_volume" "prod_db_diag" {
   count       = local.is-test ? 1 : 0
   snapshot_id = "snap-099dc03400be4bbf9"
   lifecycle {
-    ignore_changes = [kms_key_id]
+    ignore_changes = [
+      kms_key_id,
+      tags
+    ]
   }
   availability_zone = "eu-west-2a"
   size              = local.application_data.accounts["production"].ebs_size_ebsdb_diag
@@ -212,7 +233,10 @@ resource "aws_ebs_volume" "prod_db_redoa" {
   count       = local.is-test ? 1 : 0
   snapshot_id = "snap-Oa254db0b5290dba3"
   lifecycle {
-    ignore_changes = [kms_key_id]
+    ignore_changes = [
+      kms_key_id,
+      tags
+    ]
   }
   availability_zone = "eu-west-2a"
   size              = local.application_data.accounts["production"].ebs_size_ebsdb_redoA
@@ -239,7 +263,10 @@ resource "aws_ebs_volume" "prod_db_redob" {
   count       = local.is-test ? 1 : 0
   snapshot_id = "snap-093f8f3c22aa5c13b"
   lifecycle {
-    ignore_changes = [kms_key_id]
+    ignore_changes = [
+      kms_key_id,
+      tags
+    ]
   }
   availability_zone = "eu-west-2a"
   size              = local.application_data.accounts["production"].ebs_size_ebsdb_redoB
@@ -266,7 +293,10 @@ resource "aws_ebs_volume" "prod_db_techst" {
   count       = local.is-test ? 1 : 0
   snapshot_id = "snap-01bdd99b165c0d8f4"
   lifecycle {
-    ignore_changes = [kms_key_id]
+    ignore_changes = [
+      kms_key_id,
+      tags
+    ]
   }
   availability_zone = "eu-west-2a"
   size              = local.application_data.accounts["production"].ebs_size_ebsdb_techst
