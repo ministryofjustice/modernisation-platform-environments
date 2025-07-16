@@ -81,7 +81,7 @@ variable "ec2_sec_rules" {
       "from_port"  = 1521,
       "to_port"    = 1521,
       "protocol"   = "tcp"
-      "cidr_block" = "0.0.0.0/0"
+      # "cidr_block" = "0.0.0.0/0"
     }
   }
 }
