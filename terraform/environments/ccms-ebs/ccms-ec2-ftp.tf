@@ -13,7 +13,8 @@ resource "aws_instance" "ec2_ftp" {
   lifecycle {
     ignore_changes = [
       ebs_block_device,
-      root_block_device
+      root_block_device,
+      tags
       # user_data,
       # user_data_replace_on_change
     ]
