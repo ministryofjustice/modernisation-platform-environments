@@ -3,13 +3,23 @@ set -e
 
 exec > /tmp/userdata.log 2>&1
 
-amazon-linux-extras install -y epel
-yum install -y wget unzip vsftpd jq s3fs-fuse amazon-cloudwatch-agent telnet
+# amazon-linux-extras install -y epel
+# yum install -y wget unzip vsftpd jq s3fs-fuse amazon-cloudwatch-agent telnet
+yum install -y wget unzip vsftpd jq amazon-cloudwatch-agent telnet
+dnf install -y git gcc libstdc++-devel automake libtool fuse fuse-devel curl-devel openssl-devel make
+
+cd /usr/local/src
+git clone https://github.com/s3fs-fuse/s3fs-fuse.git
+cd s3fs-fuse
+./autogen.sh
+./configure
+make
+make install
 # yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
 
-curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-unzip awscliv2.zip
-./aws/install
+# curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+# unzip awscliv2.zip
+# ./aws/install
 
 # wget https://s3.amazonaws.com/amazoncloudwatch-agent/oracle_linux/amd64/latest/amazon-cloudwatch-agent.rpm
 # rpm -U ./amazon-cloudwatch-agent.rpm
@@ -56,7 +66,7 @@ echo "the secret name is $SECRET_NAME"
 # --- Fetch secret securely ---
 SECRET_JSON=$(aws secretsmanager get-secret-value \
   --secret-id "$SECRET_NAME" \
-  --region "eu-west-2" \
+  --region eu-west-2 \
   --query SecretString \
   --output text)
 
@@ -75,11 +85,12 @@ if id "$USERNAME" &>/dev/null; then
   echo "User $USERNAME already exists."
 else
 
-  useradd -m "$USERNAME"
-  # --- Set password securely using heredoc ---
-  chpasswd <<EOF
-  $USERNAME:$PASSWORD
+useradd -m "$USERNAME"
+# --- Set password securely using heredoc ---
+chpasswd <<EOF
+$USERNAME:$PASSWORD
 EOF
+echo "user created with password"
 fi
 
 # Check if PasswordAuthentication is disabled
