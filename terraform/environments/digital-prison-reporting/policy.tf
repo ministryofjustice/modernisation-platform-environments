@@ -907,16 +907,15 @@ data "aws_iam_policy_document" "ap_assume_role" {
     }
   }
   statement {
-    effect  = "Allow"
-    actions = ["sts:AssumeRoleWithWebIdentity"]
+    effect = "Allow"
+    actions = [
+      "sts:AssumeRole"
+    ]
     principals {
-      type        = "Federated"
-      identifiers = ["arn:aws:iam::${local.environment_management.account_ids["analytical-platform-common-production"]}:oidc-provider/token.actions.githubusercontent.com"]
-    }
-    condition {
-      test     = "StringLike"
-      variable = "token.actions.githubusercontent.com:sub"
-      values   = ["repo:ministryofjustice/data-engineering-datalake-access:ref:refs/heads/*"]
+      type = "AWS"
+      identifiers = [
+        "arn:aws:sts::${local.environment_management.account_ids["analytical-platform-management-production"]}:assumed-role/GlobalGitHubActionAccess/GitHubActions"
+      ]
     }
   }
 }

@@ -181,12 +181,12 @@ resource "aws_eip" "eips" {
   count = 6
   tags = {
     Name = [
-      "Temp vSRX1 Mgt Interface",
-      "Temp vSRX1 PSK Interface",
-      "Temp vSRX1 Cert Interface",
-      "Temp vSRX2 Mgt Interface",
-      "Temp vSRX2 PSK Interface",
-      "Temp vSRX2 Cert Interface"
+      "vSRX1 Mgt Interface",
+      "vSRX1 PSK Interface",
+      "vSRX1 Cert Interface",
+      "vSRX2 Mgt Interface",
+      "vSRX2 PSK Interface",
+      "vSRX2 Cert Interface"
     ][count.index]
   }
   lifecycle {
