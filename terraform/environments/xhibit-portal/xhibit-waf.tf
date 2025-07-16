@@ -67,7 +67,7 @@ resource "aws_wafv2_web_acl" "prtg_web_acl" {
 
     visibility_config {
       cloudwatch_metrics_enabled = true
-      metric_name                = "prtg_waf_metrics"
+      metric_name                = "prtg_waf_trusted_rule"
       sampled_requests_enabled   = true
     }
   }
@@ -91,7 +91,7 @@ resource "aws_wafv2_web_acl" "prtg_web_acl" {
 
     visibility_config {
       cloudwatch_metrics_enabled = true
-      metric_name                = "KnownBadInputs"
+      metric_name                = "prtg_waf_KnownBadInputs"
       sampled_requests_enabled   = true
     }
   }
@@ -99,6 +99,12 @@ resource "aws_wafv2_web_acl" "prtg_web_acl" {
   tags = merge(local.tags,
     { Name = lower(format("%s-prtg-waf-web-acl-%s", local.application_name, local.environment)) }
   )
+
+  visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "prtg_waf_metrics"
+      sampled_requests_enabled   = true
+  }
 }
 
 resource "aws_cloudwatch_log_group" "prtg_waf_logs" {
