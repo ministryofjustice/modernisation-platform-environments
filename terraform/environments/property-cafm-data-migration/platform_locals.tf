@@ -43,23 +43,29 @@ locals {
 locals {  
   sftp_users_all = {
     "dev_user1" = {
-      environment  = "development"
+      environment  = local.environment,
       user_name    = "dev_user1"
       s3_bucket    = aws_s3_bucket.CAFM.bucket
       ssm_key_name = "/sftp/keys/dev_user1"
     }
     "dev_user2" = {
-      environment  = "development"
+      environment  = local.environment,
       user_name    = "dev_user2"
       s3_bucket    = aws_s3_bucket.CAFM.bucket
       ssm_key_name = "/sftp/keys/dev_user2"
+    }
+    "planetfm_sftp_user" = {
+      environment  = local.environment,
+      user_name    = "prod_user1"
+      s3_bucket    = aws_s3_bucket.CAFM.bucket
+      ssm_key_name = "/sftp/keys/planetfm_sftp_user"
     }
   }
 
   # Filter only users matching the current environment
   sftp_users = {
-    for username, config in local.sftp_users_all :
-    username => config
+    for  user_config in local.sftp_users_all :
+    username => user_config
     if config.environment == local.environment
   }
 }
