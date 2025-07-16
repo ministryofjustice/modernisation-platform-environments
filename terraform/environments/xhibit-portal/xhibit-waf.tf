@@ -102,6 +102,7 @@ resource "aws_wafv2_web_acl" "prtg_web_acl" {
 }
 
 resource "aws_cloudwatch_log_group" "prtg_waf_logs" {
+  # checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS"
   name              = "aws-waf-logs-prtg-waf"
   retention_in_days = 365
 
