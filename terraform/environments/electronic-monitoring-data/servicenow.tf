@@ -53,7 +53,7 @@ data "aws_iam_policy_document" "glue_connection_snow" {
     statement {
       effect = "Allow"
       actions = ["cloudwatch:PutMetricData"]
-      resource = ["*"]
+      resources = ["*"]
       condition {
         test     = "StringEquals"
         values   = ["AWS/Glue/ZeroETL"]
@@ -67,7 +67,7 @@ data "aws_iam_policy_document" "glue_connection_snow" {
         "logs:CreateLogStream",
         "logs:PutLogEvents"
       ]
-      resource = ["*"]
+      resources = ["*"]
     }
 }
 
