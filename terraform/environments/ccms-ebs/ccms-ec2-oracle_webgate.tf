@@ -25,7 +25,7 @@ resource "aws_instance" "ec2_webgate" {
       cpu_options["core_count"],
       user_data,
       user_data_replace_on_change,
-      ebs_block_device["tags"],
+      [for ebs in ebs_block_device : ebs.tags],
       root_block_device["tags"],
       tags
     ]
