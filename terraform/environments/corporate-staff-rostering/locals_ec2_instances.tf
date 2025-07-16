@@ -166,7 +166,8 @@ locals {
           "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
           "EC2Default",
           "EC2S3BucketWriteAndDeleteAccessPolicy",
-          "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"
+          "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
+          "Ec2PrisonerRetailPolicy"
         ]
         subnet_name = "private"
         user_data_raw = base64encode(templatefile(
