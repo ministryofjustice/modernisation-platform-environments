@@ -58,14 +58,14 @@ locals {
       environment  = local.environment,
       user_name    = "prod_user1"
       s3_bucket    = aws_s3_bucket.CAFM.bucket
-      ssm_key_name = "/sftp/keys/planetfm_sftp_user"
+      ssm_key_name = "/sftp/keys/prod_user1"
     }
   }
 
   # Filter only users matching the current environment
   sftp_users = {
-    for  user_config in local.sftp_users_all :
-    username => user_config
+    for username, config in local.sftp_users_all :
+    username => config
     if config.environment == local.environment
   }
 }
