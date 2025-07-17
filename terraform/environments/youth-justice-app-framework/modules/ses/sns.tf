@@ -23,7 +23,7 @@ resource "aws_sns_topic_policy" "allow_ses_publish" {
             "AWS:SourceAccount" = data.aws_caller_identity.current.account_id
           },
           StringLike = {
-            "AWS:SourceArn" = "arn:aws:ses:${var.aws_region}:${data.aws_caller_identity.current.account_id}:identity/*"
+            "AWS:SourceArn" = "arn:aws:ses:${var.region}:${data.aws_caller_identity.current.account_id}:identity/*"
           }
         }
       }
