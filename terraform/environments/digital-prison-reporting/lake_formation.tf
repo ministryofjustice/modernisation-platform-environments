@@ -17,13 +17,13 @@ resource "aws_lakeformation_data_lake_settings" "lake_formation" {
   create_database_default_permissions {
     # These settings should replicate current behaviour: LakeFormation is Ignored
     permissions = ["ALL"]
-    principal   = "AWSServiceRoleForLakeFormationDataAccess"
+    principal   = "arn:aws:iam::771283872747:role/aws-service-role/lakeformation.amazonaws.com/AWSServiceRoleForLakeFormationDataAccess"
   }
 
   create_table_default_permissions {
     # These settings should replicate current behaviour: LakeFormation is Ignored
     permissions = ["ALL"]
-    principal   = "AWSServiceRoleForLakeFormationDataAccess"
+    principal   = "arn:aws:iam::771283872747:role/aws-service-role/lakeformation.amazonaws.com/AWSServiceRoleForLakeFormationDataAccess"
   }
 
   parameters = {
