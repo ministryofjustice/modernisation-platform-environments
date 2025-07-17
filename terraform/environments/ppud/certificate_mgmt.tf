@@ -178,12 +178,12 @@ resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_prod" {
   s3_bucket                      = "moj-infrastructure"
   s3_key                         = "lambda/functions/certificate_expiry_prod.zip"
   function_name                  = "certificate_expiry_prod"
-  role                           = aws_iam_role.lambda_role_certificate_expiry_prod[0].arn
+  role                           = aws_iam_role.lambda_role_get_certificate_prod[0].arn
   handler                        = "certificate_expiry_prod.lambda_handler"
   runtime                        = "python3.13"
   timeout                        = 30
   reserved_concurrent_executions = 5
-  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_certificate_expiry_to_lambda_role_certificate_expiry_prod]
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policies_get_certificate_prod]
   environment {
     variables = {
       EXPIRY_DAYS   = "30",
