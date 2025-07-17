@@ -25,7 +25,8 @@ resource "aws_instance" "ec2_oracle_ebs" {
       ebs_block_device,
       ebs_optimized,
       user_data,
-      user_data_replace_on_change
+      user_data_replace_on_change,
+      tags
     ]
   }
   user_data_replace_on_change = false

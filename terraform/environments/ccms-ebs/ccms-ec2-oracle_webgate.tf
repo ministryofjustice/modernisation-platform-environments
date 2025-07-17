@@ -24,7 +24,8 @@ resource "aws_instance" "ec2_webgate" {
       ebs_optimized,
       cpu_options["core_count"],
       user_data,
-      user_data_replace_on_change
+      user_data_replace_on_change,
+      tags
     ]
   }
   user_data_replace_on_change = false
