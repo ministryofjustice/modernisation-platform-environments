@@ -15,7 +15,8 @@ resource "aws_instance" "ec2_ftp" {
       ebs_block_device,
       root_block_device,
       user_data,
-      user_data_replace_on_change
+      user_data_replace_on_change,
+      tags
     ]
   }
   user_data_replace_on_change = false
