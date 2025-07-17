@@ -61,7 +61,7 @@ locals {
       ssm_key_name = "/sftp/keys/planetfm_sftp_user"
     }
   }
- 
+
   # Filter only users matching the current environment
   sftp_users = {
     for username, config in local.sftp_users_all :
