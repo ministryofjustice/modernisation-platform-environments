@@ -106,7 +106,8 @@
       "certificate_expiry_days": 45,
       "certificate_monitor_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com",
       "payment_load_monitor_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com",
-      "alerts_subscription_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com"
+      "alerts_subscription_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com",
+      "cash_office_entra_group_name": "azure-aws-sso-laa-ccms-ebs-s3-cashoffice"
     },
     "test": {
       "short_env": "tst",
