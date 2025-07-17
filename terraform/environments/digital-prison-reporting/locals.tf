@@ -69,9 +69,7 @@ locals {
   federated_query_lambda_timeout_seconds       = local.application_data.accounts[local.environment].athena_federated_query_lambda_timeout_seconds
   federated_query_lambda_concurrent_executions = local.application_data.accounts[local.environment].athena_federated_query_lambda_concurrent_executions
   lambda_oracle_handler                        = "com.amazonaws.athena.connectors.oracle.OracleMuxCompositeHandler"
-  lambda_postgresql_handler                    = "com.amazonaws.athena.connectors.postgresql.PostGreSqlMuxCompositeHandler"
   athena_oracle_connector_type                 = "oracle"
-  athena_postgresql_connector_type             = "postgresql"
 
   # Glue Job parameters
   glue_placeholder_script_location = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/scripts/digital-prison-reporting-jobs-vLatest.scala"
