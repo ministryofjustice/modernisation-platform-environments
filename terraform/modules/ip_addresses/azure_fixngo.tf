@@ -2,21 +2,29 @@ locals {
 
   azure_fixngo_ip = {
     # Prod Domain Controllers
-    PCMCW0011 = "10.40.128.196"
-    PCMCW0012 = "10.40.0.133"
+    AD-HMPP-DC-A = "10.27.136.5"
+    AD-HMPP-DC-B = "10.27.137.5"
+    PCMCW0011    = "10.40.128.196"
+    PCMCW0012    = "10.40.0.133"
 
     # DevTest Domain Controllers
-    MGMCW0002 = "10.102.0.196"
+    AD-AZURE-DC-A = "10.20.104.5"
+    AD-AZURE-DC-B = "10.20.106.5"
+    MGMCW0002     = "10.102.0.196"
   }
 
   azure_fixngo_ips = {
     devtest = {
       domain_controllers = [
+        local.azure_fixngo_ip.AD-AZURE-DC-A,
+        local.azure_fixngo_ip.AD-AZURE-DC-B,
         local.azure_fixngo_ip.MGMCW0002,
       ]
     }
     prod = {
       domain_controllers = [
+        local.azure_fixngo_ip.AD-HMPP-DC-A,
+        local.azure_fixngo_ip.AD-HMPP-DC-B,
         local.azure_fixngo_ip.PCMCW0011,
         local.azure_fixngo_ip.PCMCW0012,
       ]
