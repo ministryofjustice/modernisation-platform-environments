@@ -126,6 +126,30 @@ locals {
         })
       })
 
+      test-rds-1-a = merge(local.ec2_instances.rds, {
+        config = merge(local.ec2_instances.rds.config, {
+          ami_name          = "hmpps_windows_server_2022_release_2025-04-02T00-00-40.543Z"
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.rds.config.instance_profile_policies, [
+            "Ec2SecretPolicy"]
+          )
+          user_data_raw = base64encode(templatefile(
+            "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
+              branch = "TM-1398/powershell/more-whatif-fixes"
+            }
+          ))
+        })
+        instance = merge(local.ec2_instances.rds.instance, {
+          tags = {
+            patch-manager = "group2"
+          }
+        })
+        tags = merge(local.ec2_instances.rds.tags, {
+          domain-name = "azure.noms.root"
+        })
+        cloudwatch_metric_alarms = null
+      })
+
       test-rds-2-b = merge(local.ec2_instances.rds, {
         config = merge(local.ec2_instances.rds.config, {
           ami_name          = "hmpps_windows_server_2022_release_2025-04-02T00-00-40.543Z"
