@@ -17,8 +17,6 @@ data "aws_iam_policy_document" "glue-policy" {
       "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:catalog"
     ]
   }
-<<<<<<< Updated upstream
-=======
   statement {
     sid = "AllowGlueServiceInboundIntegration"
     effect = "Allow"
@@ -61,5 +59,4 @@ data "aws_iam_policy_document" "glue-policy" {
       "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:catalog"
     ]
   }
->>>>>>> Stashed changes
 }
