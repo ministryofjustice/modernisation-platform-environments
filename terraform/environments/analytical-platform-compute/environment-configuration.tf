@@ -38,7 +38,7 @@ locals {
       data_engineering_airflow_execution_role_arn = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/airflow-dev-execution-role"
 
       /* managed_prometheus_kms_access_iam_policy_arn */
-      managed_prometheus_kms_access_iam_policy_arn = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-compute-development"]}:policy/managed-prometheus-kms-access*"
+      managed_prometheus_kms_access_iam_policy_arn = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-compute-development"]}:policy/managed-prometheus-kms-access20240521093109516600000001"
 
       /* UI */
       ui_hostname = "development.analytical-platform.service.justice.gov.uk"
@@ -90,7 +90,7 @@ locals {
       data_engineering_airflow_execution_role_arn = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/airflow-dev-execution-role"
 
       /* managed_prometheus_kms_access_iam_policy_arn */
-      managed_prometheus_kms_access_iam_policy_arn = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-compute-development"]}:policy/managed-prometheus-kms-access*"
+      managed_prometheus_kms_access_iam_policy_arn = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-compute-test"]}:policy/managed-prometheus-kms-access20240521093123650600000001"
 
       /* UI */
       ui_hostname = "test.analytical-platform.service.justice.gov.uk"
@@ -142,7 +142,7 @@ locals {
       data_engineering_airflow_execution_role_arn = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/airflow-prod-execution-role"
 
       /* managed_prometheus_kms_access_iam_policy_arn */
-      managed_prometheus_kms_access_iam_policy_arn = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-compute-development"]}:policy/managed-prometheus-kms-access*"
+      managed_prometheus_kms_access_iam_policy_arn = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-compute-production"]}:policy/managed-prometheus-kms-access20240522102621280000000012"
 
       /* UI */
       ui_hostname = "analytical-platform.service.justice.gov.uk"
