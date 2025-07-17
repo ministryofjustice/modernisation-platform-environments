@@ -171,7 +171,7 @@ locals {
         }
       }
 
-      prisoner-retail-poc = merge(local.ec2_instances.prisoner-retail, {
+      prisoner-retail = merge(local.ec2_instances.prisoner-retail, {
         autoscaling_group = {
           desired_capacity    = 1
           force_delete        = true
