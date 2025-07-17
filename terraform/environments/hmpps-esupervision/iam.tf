@@ -42,7 +42,7 @@ data "aws_iam_policy" "rekognition_read" {
 
 resource "aws_iam_user_policy_attachment" "rekognition_rekognition" {
   user = aws_iam_user.rekognition_user.name
-  policy_arn = data.aws_iam_policy.rekognition_read
+  policy_arn = data.aws_iam_policy.rekognition_read.arn
 }
 
 resource "aws_iam_user_policy_attachment" "rekognition_s3" {
