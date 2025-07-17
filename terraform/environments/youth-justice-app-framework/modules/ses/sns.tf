@@ -1,5 +1,5 @@
 resource "aws_sns_topic" "ses_notifications" {
-  name                = "ses-bounce-complaint-topic"
+  name                = "ses-bounce-complaint"
   kms_master_key_id   = var.key_id
 }
 
