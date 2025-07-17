@@ -28,7 +28,7 @@ module "definition_upload_lambda_security_group" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/security-group/aws"
-  version = "5.2.0"
+  version = "5.3.0"
 
   name        = "${local.application_name}-${local.environment}-definition-upload-lambda"
   description = "Security Group for Definition Upload Lambda"
@@ -46,7 +46,7 @@ module "transfer_lambda_security_group" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/security-group/aws"
-  version = "5.2.0"
+  version = "5.3.0"
 
   name        = "${local.application_name}-${local.environment}-transfer-lambda"
   description = "Security Group for Transfer Lambda"
@@ -64,7 +64,7 @@ module "scan_lambda_security_group" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/security-group/aws"
-  version = "5.2.0"
+  version = "5.3.0"
 
   name        = "${local.application_name}-${local.environment}-scan-lambda"
   description = "Security Group for Scan Lambda"
@@ -82,7 +82,7 @@ module "datasync_activation_nlb_security_group" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/security-group/aws"
-  version = "5.2.0"
+  version = "5.3.0"
 
   name        = "${local.application_name}-${local.environment}-datasync-activation-nlb"
   description = "Security Group for DataSync Activation NLB"
@@ -102,7 +102,7 @@ module "datasync_vpc_endpoint_security_group" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/security-group/aws"
-  version = "5.2.0"
+  version = "5.3.0"
 
   name        = "${local.application_name}-${local.environment}-datasync-vpc-endpoint"
   description = "Security Group for DataSync VPC Endpoint"
@@ -129,7 +129,7 @@ module "datasync_task_eni_security_group" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/security-group/aws"
-  version = "5.2.0"
+  version = "5.3.0"
 
   name        = "${local.application_name}-${local.environment}-datasync-task-eni"
   description = "Security Group for DataSync Task ENIs"
@@ -153,7 +153,7 @@ module "datasync_instance_security_group" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/security-group/aws"
-  version = "5.2.0"
+  version = "5.3.0"
 
   name        = "${local.application_name}-${local.environment}-datasync-instance"
   description = "Security Group for DataSync Instance"

@@ -2,7 +2,7 @@ module "quarantined_topic" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/sns/aws"
-  version = "6.1.0"
+  version = "6.2.0"
 
   name              = "quarantined"
   display_name      = "quarantined"
@@ -43,7 +43,7 @@ module "quarantined_topic" {
 module "transferred_topic" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/sns/aws"
-  version = "6.1.0"
+  version = "6.2.0"
 
   name              = "transferred"
   display_name      = "transferred"

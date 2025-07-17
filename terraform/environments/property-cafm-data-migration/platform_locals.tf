@@ -36,4 +36,30 @@ locals {
   # example_data = local.application_data.accounts[local.environment].example_var
   application_data = fileexists("./application_variables.json") ? jsondecode(file("./application_variables.json")) : null
 
+  availability_zones = slice(data.aws_availability_zones.available.names, 0, 3)
+  private_subnets    = cidrsubnets(local.application_data.accounts[local.environment].vpc_cidr, 4, 4, 4)
+}
+
+locals {  
+  sftp_users_all = {
+    "dev_user1" = {
+      environment  = "development"
+      user_name    = "dev_user1"
+      s3_bucket    = aws_s3_bucket.CAFM.bucket
+      ssm_key_name = "/sftp/keys/dev_user1"
+    }
+    "dev_user2" = {
+      environment  = "development"
+      user_name    = "dev_user2"
+      s3_bucket    = aws_s3_bucket.CAFM.bucket
+      ssm_key_name = "/sftp/keys/dev_user2"
+    }
+  }
+
+  # Filter only users matching the current environment
+  sftp_users = {
+    for username, config in local.sftp_users_all :
+    username => config
+    if config.environment == local.environment
+  }
 }
