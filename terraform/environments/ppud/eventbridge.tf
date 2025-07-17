@@ -93,6 +93,7 @@ resource "aws_cloudwatch_event_target" "trigger_lambda_target_send_cpu_graph_pro
   arn       = aws_lambda_function.terraform_lambda_func_send_cpu_graph_prod[0].arn
 }
 
+/*
 # Eventbridge rule to invoke the PPUD ELB report lambda function every weekday at 20:15
 # Set time to 20:15 during UTC and 19:15 during BST
 
@@ -144,6 +145,7 @@ resource "aws_cloudwatch_event_target" "trigger_lambda_target_wam_elb_report_pro
   target_id = "wam_elb_report"
   arn       = aws_lambda_function.terraform_lambda_func_wam_elb_report_prod[0].arn
 }
+*/
 
 # Eventbridge rule to invoke the PPUD Email Report lambda function every Monday at 07:00
 # Set time to 07:15 during UTC and 06:15 during BST

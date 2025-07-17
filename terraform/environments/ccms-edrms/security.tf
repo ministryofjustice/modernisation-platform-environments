@@ -17,8 +17,9 @@ resource "aws_security_group_rule" "alb_ingress_443" {
   protocol          = "TCP"
   from_port         = 443
   to_port           = 443
-  cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
+  cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block, local.application_data.accounts[local.environment].northgate_proxy]
 }
+
 
 resource "aws_security_group_rule" "alb_egress_all" {
   security_group_id = aws_security_group.load_balancer.id
@@ -86,25 +87,25 @@ resource "aws_security_group_rule" "cluster_ec2_ingress_22" {
   cidr_blocks       = [local.application_data.accounts[local.environment].aws_workspace]
 }
 
-resource "aws_security_group_rule" "cluster_ec2_ingress_7001" {
-  security_group_id = aws_security_group.cluster_ec2.id
-  type              = "ingress"
-  description       = "Application Traffic"
-  protocol          = "TCP"
-  from_port         = 7001
-  to_port           = 7001
-  cidr_blocks       = ["0.0.0.0/0"] # Need to figure out what needs this port
-}
+# resource "aws_security_group_rule" "cluster_ec2_ingress_7001" {
+#   security_group_id = aws_security_group.cluster_ec2.id
+#   type              = "ingress"
+#   description       = "Application Traffic"
+#   protocol          = "TCP"
+#   from_port         = 7001
+#   to_port           = 7001
+#   cidr_blocks       = ["0.0.0.0/0"] # Need to figure out what needs this port
+# }
 
-resource "aws_security_group_rule" "cluster_ec2_ingress_8001" {
-  security_group_id = aws_security_group.cluster_ec2.id
-  type              = "ingress"
-  description       = "Application Traffic"
-  protocol          = "TCP"
-  from_port         = 8001
-  to_port           = 8001
-  cidr_blocks       = ["0.0.0.0/0"] # Need to figure out what needs this port
-}
+# resource "aws_security_group_rule" "cluster_ec2_ingress_8001" {
+#   security_group_id = aws_security_group.cluster_ec2.id
+#   type              = "ingress"
+#   description       = "Application Traffic"
+#   protocol          = "TCP"
+#   from_port         = 8001
+#   to_port           = 8001
+#   cidr_blocks       = ["0.0.0.0/0"] # Need to figure out what needs this port
+# }
 
 resource "aws_security_group_rule" "cluster_ec2_ingress_lb" {
   security_group_id        = aws_security_group.cluster_ec2.id

@@ -2,14 +2,12 @@ locals {
   env_ = "${local.environment_shorthand}_"
   iam-dev = local.environment_shorthand == "dev" ? [
     var.cloud-platform-iam-dev,
-    var.cloud-platform-crime-matching-iam-dev
   ] : null
 
   iam-test = local.environment_shorthand == "test" ? [
     var.cloud-platform-iam-dev,
     var.cloud-platform-iam-preprod,
     var.cloud-platform-iam-prod,
-    var.cloud-platform-crime-matching-iam-dev
   ] : null
 
   iam-preprod = local.environment_shorthand == "preprod" ? [
@@ -120,6 +118,26 @@ module "cmt_front_end_assumable_role" {
   role_requires_mfa = false
 
   role_name = "cmt_read_emds_data_${local.environment_shorthand}"
+
+  tags = local.tags
+}
+
+module "acquisitive_crime_assumable_role" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+  count   = local.is-development || local.is-test ? 1 : 0
+  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
+  version = "5.48.0"
+
+  trusted_role_arns = flatten([
+    data.aws_iam_roles.mod_plat_roles.arns,
+    [var.cloud-platform-crime-matching-iam-dev],
+  ])
+
+  create_role       = true
+  role_requires_mfa = false
+
+  role_name = "ac_read_emds_data_${local.environment_shorthand}"
 
   tags = local.tags
 }
@@ -264,4 +282,10 @@ resource "aws_iam_role_policy_attachment" "standard_athena_access" {
 resource "aws_iam_role_policy_attachment" "specials_role_standard_athena_access" {
   policy_arn = aws_iam_policy.standard_athena_access.arn
   role       = module.specials_cmt_front_end_assumable_role.iam_role_name
+}
+
+resource "aws_iam_role_policy_attachment" "standard_athena_access_ac" {
+  count      = local.is-development || local.is-test ? 1 : 0
+  policy_arn = aws_iam_policy.standard_athena_access.arn
+  role       = module.acquisitive_crime_assumable_role[0].iam_role_name
 }

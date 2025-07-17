@@ -230,6 +230,151 @@ resource "aws_lb_target_group_attachment" "external2" {
 
 
 ############################################
+# External CWA ELB Security Group MOJ Prefix List
+############################################
+
+resource "aws_ec2_managed_prefix_list" "moj_ip_allowlist" {
+  name           = "moj-aws-ip-allowlist"
+  address_family = "IPv4"
+  max_entries    = 13
+
+  entry {
+    cidr        = "18.130.39.94/32"
+    description = "Non-Prod Workspaces NAT IPs"
+  }
+
+  entry {
+    cidr        = "35.177.145.193/32"
+    description = "Non-Prod Workspaces NAT IPs"
+  }
+
+  entry {
+    cidr        = "35.176.127.232/32"
+    description = "Non-Prod Workspaces NAT IPs"
+  }
+
+  entry {
+    cidr        = "52.56.212.11/32"
+    description = "Prod WorkSpaces NAT IPs"
+  }
+
+  entry {
+    cidr        = "35.176.254.38/32"
+    description = "Prod WorkSpaces NAT IPs"
+  }
+
+  entry {
+    cidr        = "35.177.173.197/32"
+    description = "Prod WorkSpaces NAT IPs"
+  }
+
+  entry {
+    cidr        = "3.9.183.160/32"
+    description = "AppStream NAT IP"
+  }
+
+  entry {
+    cidr        = "35.178.209.113/32"
+    description = "Cloud Platform"
+  }
+
+  entry {
+    cidr        = "3.8.51.207/32"
+    description = "Cloud Platform"
+  }
+
+  entry {
+    cidr        = "35.177.252.54/32"
+    description = "Cloud Platform"
+  }
+
+  tags = {
+    Name        = "moj-aws-ip-allowlist"
+    Environment = "all"
+  }
+}
+
+############################################
+# External CWA ELB Security Group LAA Prefix List
+############################################
+
+resource "aws_ec2_managed_prefix_list" "laa_ip_allowlist" {
+  name           = "laa-ip-allowlist"
+  address_family = "IPv4"
+  max_entries    = 13
+
+  entry {
+    cidr        = "51.149.249.0/29"
+    description = "Allowlist entry"
+  }
+
+  entry {
+    cidr        = "194.33.249.0/29"
+    description = "Allowlist entry"
+  }
+
+  entry {
+    cidr        = "51.149.249.32/29"
+    description = "Allowlist entry"
+  }
+
+  entry {
+    cidr        = "194.33.248.0/29"
+    description = "Allowlist entry"
+  }
+
+  entry {
+    cidr        = "20.49.214.199/32"
+    description = "Allowlist entry"
+  }
+
+  entry {
+    cidr        = "20.49.214.228/32"
+    description = "Allowlist entry"
+  }
+
+  entry {
+    cidr        = "20.26.11.71/32"
+    description = "Allowlist entry"
+  }
+
+  entry {
+    cidr        = "20.26.11.108/32"
+    description = "Allowlist entry"
+  }
+
+  entry {
+    cidr        = "128.77.75.64/26"
+    description = "Allowlist entry"
+  }
+
+  entry {
+    cidr        = "18.169.147.172/32"
+    description = "Allowlist entry"
+  }
+
+  entry {
+    cidr        = "35.176.93.186/32"
+    description = "Allowlist entry"
+  }
+
+  entry {
+    cidr        = "18.130.148.126/32"
+    description = "Allowlist entry"
+  }
+
+  entry {
+    cidr        = "35.176.148.126/32"
+    description = "Allowlist entry"
+  }
+
+  tags = {
+    Name        = "laa-ip-allowlist"
+    Environment = "all"
+  }
+}
+
+############################################
 # External CWA ELB Security Group
 ############################################
 
@@ -239,9 +384,17 @@ resource "aws_security_group" "external_lb" {
   vpc_id      = data.aws_vpc.shared.id
 }
 
-resource "aws_vpc_security_group_ingress_rule" "external_lb_inbound" {
+resource "aws_vpc_security_group_ingress_rule" "external_lb_inbound_laa_allowlist" {
   security_group_id = aws_security_group.external_lb.id
-  cidr_ipv4         = "0.0.0.0/0"
+  prefix_list_id    = aws_ec2_managed_prefix_list.laa_ip_allowlist.id
+  from_port         = 443
+  ip_protocol       = "tcp"
+  to_port           = 443
+}
+
+resource "aws_vpc_security_group_ingress_rule" "external_lb_inbound_MOJ_allowlist" {
+  security_group_id = aws_security_group.external_lb.id
+  prefix_list_id    = aws_ec2_managed_prefix_list.moj_ip_allowlist.id
   from_port         = 443
   ip_protocol       = "tcp"
   to_port           = 443
