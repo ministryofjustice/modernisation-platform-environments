@@ -84,7 +84,7 @@ resource "aws_secretsmanager_secret_version" "bodmis" {
 resource "aws_secretsmanager_secret" "oasys" {
   #checkov:skip=CKV2_AWS_57: “Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
   #checkov:skip=CKV_AWS_149: "Ensure that Secrets Manager secret is encrypted using KMS CMK"
-  count = local.is_dev_or_test ? 1 : 0
+  count = local.is-test ? 1 : 0
 
   name = "external/${local.project}-oasys-source-secret"
 
@@ -100,7 +100,7 @@ resource "aws_secretsmanager_secret" "oasys" {
 
 # PlaceHolder Secrets
 resource "aws_secretsmanager_secret_version" "oasys" {
-  count = local.is_dev_or_test ? 1 : 0
+  count = local.is-test ? 1 : 0
 
   secret_id     = aws_secretsmanager_secret.oasys[0].id
   secret_string = jsonencode(local.oasys_secrets_placeholder)
@@ -114,7 +114,7 @@ resource "aws_secretsmanager_secret_version" "oasys" {
 resource "aws_secretsmanager_secret" "onr" {
   #checkov:skip=CKV2_AWS_57: “Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
   #checkov:skip=CKV_AWS_149: "Ensure that Secrets Manager secret is encrypted using KMS CMK"
-  count = local.is_dev_or_test ? 1 : 0
+  count = local.is-test ? 1 : 0
 
   name = "external/${local.project}-onr-source-secret"
 
@@ -130,7 +130,7 @@ resource "aws_secretsmanager_secret" "onr" {
 
 # PlaceHolder Secrets
 resource "aws_secretsmanager_secret_version" "onr" {
-  count = local.is_dev_or_test ? 1 : 0
+  count = local.is-test ? 1 : 0
 
   secret_id     = aws_secretsmanager_secret.onr[0].id
   secret_string = jsonencode(local.onr_secrets_placeholder)
@@ -144,7 +144,7 @@ resource "aws_secretsmanager_secret_version" "onr" {
 resource "aws_secretsmanager_secret" "ndelius" {
   #checkov:skip=CKV2_AWS_57: “Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
   #checkov:skip=CKV_AWS_149: "Ensure that Secrets Manager secret is encrypted using KMS CMK"
-  count = local.is_dev_or_test ? 1 : 0
+  count = local.is-test ? 1 : 0
 
   name = "external/${local.project}-ndelius-source-secret"
 
@@ -159,7 +159,7 @@ resource "aws_secretsmanager_secret" "ndelius" {
 
 # PlaceHolder Secrets
 resource "aws_secretsmanager_secret_version" "ndelius" {
-  count = local.is_dev_or_test ? 1 : 0
+  count = local.is-test ? 1 : 0
 
   secret_id     = aws_secretsmanager_secret.ndelius[0].id
   secret_string = jsonencode(local.ndelius_secrets_placeholder)

@@ -87,14 +87,27 @@ If a composite is taken offline, this will result in errors being fired, to remo
 
 ### **Impact of an outage:**
 
-**TBC**
+SOA is a critical component of CCMS and provides key integrations to several other external services.
+
+Without SOA:
+
+- Case data, client details and invoice details are not transferred from PUI/Apply to EBS. New cases will not flow into EBS for caseworkers to assess.
+- The notification service will not function, and providers will not be alerted to changes to cases or certificates being granted, or financial statements (PSOAs) being generated.
+
+In an extended outage:
+
+- FTP services which are managed by SOA will not run, the AppOps SRE team will be unable to load payment files into the BACS software processor or for printing to be carried out by third parties
+- Finance teams would be unable to reconcile receipts and payments made, meaning we cannot provide an accurate picture of the LAA’s material position to HMT, NAO or others
 
 ### **Consumers of this service:**
 
-- PUI
-- Benefit Checker
-- Apply Service
-- Payment FTP Lambdas
+- CCMS-EBS (MP)
+- CCMS-EDRMS (MP)
+- Benefit Checker (CP)
+- OIA Hub (CP)
+- Assess Service Adapter (CP)
+- Payment FTP Lambdas (MP)
+- CWA (ECP)
 
 ### **Services consumed by this:**
 

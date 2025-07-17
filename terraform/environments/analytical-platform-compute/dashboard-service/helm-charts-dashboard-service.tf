@@ -4,7 +4,7 @@ resource "helm_release" "dashboard_service" {
   /* https://github.com/ministryofjustice/analytical-platform-dashboard-service */
   name       = "dashboard-service"
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
-  version    = "0.1.12"
+  version    = terraform.workspace == "analytical-platform-compute-development" ? "0.2.0" : "0.1.12"
   chart      = "dashboard-service"
   namespace  = kubernetes_namespace.dashboard_service[0].metadata[0].name
   values = [
