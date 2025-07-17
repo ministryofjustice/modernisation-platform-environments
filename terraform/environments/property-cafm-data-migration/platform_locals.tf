@@ -50,11 +50,15 @@ locals {
 
       transfer_server_sftp_users = {
         "dev_user1" = {
+          environment = "development"
           user_name    = "dev_user1"
+          s3_bucket    = aws_s3_bucket.CAFM.bucket
           ssm_key_name = "/sftp/keys/dev_user1"
         }
         "dev_user2" = {
+          environment = "development"
           user_name    = "dev_user2"
+          s3_bucket    = aws_s3_bucket.CAFM.bucket
           ssm_key_name = "/sftp/keys/dev_user2"
         }
       }
@@ -66,7 +70,9 @@ locals {
 
       transfer_server_sftp_users = {
         "planetfm_sftp_user" = {
+          environment = "production"
           user_name    = "planetfm_sftp_user"
+          s3_bucket    = aws_s3_bucket.CAFM.bucket
           ssm_key_name = "/sftp/keys/planetfm_sftp_user"
         }
       }

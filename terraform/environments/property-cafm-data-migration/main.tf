@@ -56,7 +56,7 @@ module "server" {
 # ------------------------
 module "sftp_user" {
   source = "./modules/transfer_family/users"
-  for_each = local.sftp_users
+  for_each = local.environment_configuration.transfer_server_sftp_users
 
   user_name    = each.value.user_name
   server_id    = module.server.id
@@ -66,7 +66,7 @@ module "sftp_user" {
 
 
 data "aws_ssm_parameter" "ssh_keys" {
-  for_each = local.sftp_users
+  for_each = local.environment_configuration.transfer_server_sftp_users
   name     = each.value.ssm_key_name
 }
 
@@ -75,7 +75,7 @@ data "aws_ssm_parameter" "ssh_keys" {
 # ------------------------
 module "sftp_ssh_key" {
   source        = "./modules/transfer_family/ssh_key"
-  for_each      = local.sftp_users
+  for_each      = local.environment_configuration.transfer_server_sftp_users
 
   server_id     = module.server.id
   user_name     = each.key
