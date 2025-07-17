@@ -13,12 +13,12 @@ resource "aws_instance" "ec2_ftp" {
   lifecycle {
     ignore_changes = [
       ebs_block_device,
-      root_block_device
-      # user_data,
-      # user_data_replace_on_change
+      root_block_device,
+      user_data,
+      user_data_replace_on_change
     ]
   }
-  user_data_replace_on_change = true
+  user_data_replace_on_change = false
   user_data = base64encode(templatefile("./templates/ec2_user_data_ftp.sh", {
     environment               = "${local.environment}"
     lz_aws_account_id_env     = "${local.application_data.accounts[local.environment].lz_aws_account_id_env}"
@@ -39,11 +39,9 @@ resource "aws_instance" "ec2_ftp" {
     encrypted   = true
     kms_key_id  = data.aws_kms_key.ebs_shared.key_id
     tags = merge(local.tags,
-      { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ftp, "root")) },
-      { device-name = "/dev/sda1" }
+      { Name = "root-block" }
     )
   }
-
   ebs_block_device {
     device_name = "/dev/sdb"
     volume_type = "gp3"
@@ -52,14 +50,13 @@ resource "aws_instance" "ec2_ftp" {
     encrypted  = true
     kms_key_id = data.aws_kms_key.ebs_shared.key_id
     tags = merge(local.tags,
-      { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ftp, "ftp")) },
-      { device-name = "/dev/sda1" }
+      { Name = "swap" }
     )
   }
 
   tags = merge(local.tags,
     { Name = lower(format("ec2-%s-%s-FTP", local.application_name, local.environment)) },
-    { instance-role = local.application_data.accounts[local.environment].instance_role_ftp },
+    { instance-scheduling = "skip-scheduling" },
     { backup = "true" }
   )
 
