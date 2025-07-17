@@ -46,21 +46,24 @@ module "endpoints" {
 }
 
 module "server" {
-  source = "./modules/transfer_family/server"
+  source     = "./modules/transfer_family/server"
   name   = "CAFM SFTP Server"
+  environment = local.environment
 }
 
 # ------------------------
 # Transfer User
 # ------------------------
 module "sftp_user" {
-  source     = "./modules/transfer_family/users"
-  for_each   = local.sftp_users
+  source = "./modules/transfer_family/users"
+  for_each = local.sftp_users
 
-  user_name  = each.key
-  server_id  = module.server.id
-  s3_bucket  = each.value.s3_bucket
+  user_name    = each.value.user_name
+  server_id    = module.server.id
+  s3_bucket    = each.value.s3_bucket
+  kms_key_arn  = aws_kms_key.sns_kms.arn
 }
+
 
 data "aws_ssm_parameter" "ssh_keys" {
   for_each = local.sftp_users

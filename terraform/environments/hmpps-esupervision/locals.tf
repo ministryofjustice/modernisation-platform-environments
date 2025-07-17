@@ -1,1 +1,3 @@
-#### This file can be used to store locals specific to the member account ####
+locals {
+  rekog_s3_bucket_name = "${terraform.workspace}-rekognition-uploads"
+}

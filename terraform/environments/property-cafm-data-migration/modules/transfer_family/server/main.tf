@@ -7,6 +7,7 @@ resource "aws_transfer_server" "this" {
 
   tags = {
     Name = var.name
+    Environment = var.environment
   }
 }
 
