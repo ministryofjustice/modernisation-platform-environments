@@ -33,12 +33,12 @@ data "aws_iam_policy_document" "transfer_assume_role" {
 
 data "aws_iam_policy_document" "transfer" {
   statement {
-    sid     = "AllowS3Grants"
-    effect  = "Allow"
+    sid    = "AllowS3Grants"
+    effect = "Allow"
     actions = [
-        "s3:GetDataAccess",
-        "s3:ListCallerAccessGrants",
-        "s3:ListAccessGrantsInstances"]
+      "s3:GetDataAccess",
+      "s3:ListCallerAccessGrants",
+    "s3:ListAccessGrantsInstances"]
     resources = [
       "*"
     ]
@@ -48,14 +48,14 @@ data "aws_iam_policy_document" "transfer" {
 #--S3 Family IAM Docs
 data "aws_iam_policy_document" "s3" {
   statement {
-    sid     = "ObjectLevelReadPermissions"
-    effect  = "Allow"
+    sid    = "ObjectLevelReadPermissions"
+    effect = "Allow"
     actions = [
       "s3:GetObject",
       "s3:GetObjectVersion",
       "s3:GetObjectAcl",
       "s3:GetObjectVersionAcl",
-      "s3:ListMultipartUploadParts",]
+    "s3:ListMultipartUploadParts", ]
     resources = [
       "${var.bucket_name}"
     ]
@@ -75,13 +75,13 @@ data "aws_iam_policy_document" "s3" {
     }
   }
   statement {
-    sid     = "ObjectLevelWritePermissions"
-    effect  = "Allow"
+    sid    = "ObjectLevelWritePermissions"
+    effect = "Allow"
     actions = [
       "s3:PutObject",
       "s3:PutObjectAcl",
       "s3:PutObjectVersionAcl",
-      "s3:AbortMultipartUpload",]
+    "s3:AbortMultipartUpload", ]
     resources = [
       "${var.bucket_name}/*"
     ]
@@ -101,9 +101,9 @@ data "aws_iam_policy_document" "s3" {
     }
   }
   statement {
-    sid     = "BucketLevelReadPermissions"
-    effect  = "Allow"
-    actions = ["s3:ListBucket"]
+    sid       = "BucketLevelReadPermissions"
+    effect    = "Allow"
+    actions   = ["s3:ListBucket"]
     resources = [var.bucket_name]
     condition {
       test     = "StringEquals"
