@@ -21,12 +21,16 @@ resource "aws_sns_topic_policy" "allow_ses_publish" {
         Condition = {
           StringEquals = {
             "AWS:SourceAccount" = data.aws_caller_identity.current.account_id
+          },
+          StringLike = {
+            "AWS:SourceArn" = "arn:aws:ses:${var.aws_region}:${data.aws_caller_identity.current.account_id}:identity/*"
           }
         }
       }
     ]
   })
 }
+
 
 data "aws_caller_identity" "current" {}
 
@@ -38,6 +42,7 @@ resource "aws_ses_identity_notification_topic" "bounce_topic" {
   notification_type        = "Bounce"
   topic_arn                = aws_sns_topic.ses_notifications.arn
   include_original_headers = true
+  depends_on               = [aws_sns_topic_policy.allow_ses_publish]
 }
 
 # Complaint Notifications
@@ -47,4 +52,5 @@ resource "aws_ses_identity_notification_topic" "complaint_topic" {
   notification_type        = "Complaint"
   topic_arn                = aws_sns_topic.ses_notifications.arn
   include_original_headers = true
+  depends_on               = [aws_sns_topic_policy.allow_ses_publish]
 }
