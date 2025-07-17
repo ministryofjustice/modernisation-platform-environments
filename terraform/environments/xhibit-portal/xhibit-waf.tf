@@ -7,11 +7,11 @@ module "waf" {
 
   managed_rule_actions = {
     AWSManagedRulesKnownBadInputsRuleSet = true
-    AWSManagedRulesCommonRuleSet         = true
+    AWSManagedRulesCommonRuleSet         = false
     AWSManagedRulesSQLiRuleSet           = true
     AWSManagedRulesLinuxRuleSet          = true
-    AWSManagedRulesAnonymousIpList       = true
-    AWSManagedRulesBotControlRuleSet     = true
+    AWSManagedRulesAnonymousIpList       = false
+    AWSManagedRulesBotControlRuleSet     = false
   }
   
   core_logging_account_id = local.environment_management.account_ids["core-logging-production"]
