@@ -1,6 +1,6 @@
 #--S3 Grants
 resource "aws_s3control_access_grants_instance" "this" {
-  identity_center_arn = tolist(data.aws_ssoadmin_instances.entra.identity_store_ids)[0]
+  identity_center_arn = tolist(data.aws_ssoadmin_instances.entra.arns)[0]
 }
 
 resource "aws_s3control_access_grants_location" "this" {
