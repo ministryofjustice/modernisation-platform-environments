@@ -137,7 +137,10 @@ resource "aws_instance" "ec2_ebsapps" {
 resource "aws_ebs_volume" "stage" {
   count = local.application_data.accounts[local.environment].ebsapps_no_instances
   lifecycle {
-    ignore_changes = [kms_key_id]
+    ignore_changes = [
+      kms_key_id,
+      tags
+    ]
   }
   availability_zone = aws_instance.ec2_ebsapps[count.index].availability_zone
   size              = local.application_data.accounts[local.environment].ebsapps_stage_size
