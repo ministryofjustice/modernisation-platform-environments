@@ -40,32 +40,36 @@ locals {
   private_subnets    = cidrsubnets(local.application_data.accounts[local.environment].vpc_cidr, 4, 4, 4)
 }
 
-locals {  
-  sftp_users_all = {
-    "dev_user1" = {
-      environment  = "development"
-      user_name    = "dev_user1"
-      s3_bucket    = aws_s3_bucket.CAFM.bucket
-      ssm_key_name = "/sftp/keys/dev_user1"
-    }
-    "dev_user2" = {
-      environment  = "development"
-      user_name    = "dev_user2"
-      s3_bucket    = aws_s3_bucket.CAFM.bucket
-      ssm_key_name = "/sftp/keys/dev_user2"
-    }
-    "planetfm_sftp_user" = {
-      environment  = "production"
-      user_name    = "planetfm_sftp_user"
-      s3_bucket    = aws_s3_bucket.CAFM.bucket
-      ssm_key_name = "/sftp/keys/planetfm_sftp_user"
-    }
-  }
+locals {
+  # Active environment configuration shortcut
+  environment_configuration = local.environment_configurations[local.environment]
+  environment_configurations = {
+    development = {
+      /* Transfer Server */
+      transfer_server_hostname = "CAFM SFTP Server"
 
-  # Filter only users matching the current environment
-  sftp_users = {
-    for username, config in local.sftp_users_all :
-    username => config
-    if config.environment == local.environment
+      transfer_server_sftp_users = {
+        "dev_user1" = {
+          user_name    = "dev_user1"
+          ssm_key_name = "/sftp/keys/dev_user1"
+        }
+        "dev_user2" = {
+          user_name    = "dev_user2"
+          ssm_key_name = "/sftp/keys/dev_user2"
+        }
+      }
+    }
+
+    production = {
+      /* Transfer Server */
+      transfer_server_hostname = "CAFM SFTP Server"
+
+      transfer_server_sftp_users = {
+        "planetfm_sftp_user" = {
+          user_name    = "planetfm_sftp_user"
+          ssm_key_name = "/sftp/keys/planetfm_sftp_user"
+        }
+      }
+    }
   }
 }
