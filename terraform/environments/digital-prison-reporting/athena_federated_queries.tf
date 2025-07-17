@@ -29,8 +29,6 @@ locals {
   ndmis_service_name      = local.is_non_prod ? jsondecode(data.aws_secretsmanager_secret_version.ndmis[0].secret_string)["db_name"] : ""
   connection_string_ndmis = local.is_non_prod ? "oracle://jdbc:oracle:thin:$${${aws_secretsmanager_secret.ndmis[0].name}}@//${local.ndmis_host}:${local.ndmis_port}/${local.ndmis_service_name}" : ""
 
-  excluded_catalogs = toset(["dps-testing", "dps-testing2"])
-
   # Some connections are only set up in specific environments
   dev_federated_query_connections_oracle = {
     nomis   = local.connection_string_nomis
@@ -45,23 +43,6 @@ locals {
     onr     = local.connection_string_onr
     ndelius = local.connection_string_ndelius
     ndmis   = local.connection_string_ndmis
-  }
-
-  dps_host = {
-    for item in local.dps_domains_list :
-    item => jsondecode(data.aws_secretsmanager_secret_version.dps[item].secret_string)["endpoint"]
-  }
-  dps_port_num = {
-    for item in local.dps_domains_list :
-    item => jsondecode(data.aws_secretsmanager_secret_version.dps[item].secret_string)["port"]
-  }
-  dps_database_name = {
-    for item in local.dps_domains_list :
-    item => jsondecode(data.aws_secretsmanager_secret_version.dps[item].secret_string)["db_name"]
-  }
-  dps_full_connection_string = {
-    for item in local.dps_domains_list :
-    replace(item, "-", "_") => "postgres://jdbc:postgresql://${local.dps_host[item]}:${local.dps_port_num[item]}/${local.dps_database_name[item]}?$${${aws_secretsmanager_secret.dps[item].name}}"
   }
 
   preproduction_federated_query_connections_oracle = {
@@ -90,11 +71,6 @@ locals {
     aws_secretsmanager_secret.ndmis[0].arn
   ] : []
 
-  federated_query_credentials_secret_arns_postgresql_list = [
-    for item in local.dps_domains_list : aws_secretsmanager_secret.dps[item].arn
-    if !contains(local.excluded_catalogs, item)
-  ]
-
   preproduction_federated_query_credentials_secret_arns_oracle = local.is-preproduction ? [
     aws_secretsmanager_secret.nomis.arn,
     aws_secretsmanager_secret.bodmis.arn,
@@ -118,7 +94,6 @@ locals {
       (local.is-preproduction ? local.preproduction_federated_query_credentials_secret_arns_oracle :
         local.production_federated_query_credentials_secret_arns_oracle)))
 
-  federated_query_connection_strings_map_postgresql = local.dps_full_connection_string
 }
 
 module "athena_federated_query_connector_oracle" {
@@ -154,41 +129,6 @@ module "athena_federated_query_connector_oracle" {
 
   # A map that links catalog names to database connection strings
   connection_strings = local.federated_query_connection_strings_map_oracle
-}
-
-module "athena_federated_query_connector_postgresql" {
-  source = "./modules/athena_federated_query_connectors"
-
-  #checkov:skip=CKV_AWS_25
-  #checkov:skip=CKV_AWS_23
-  #checkov:skip=CKV_AWS_277
-  #checkov:skip=CKV_AWS_260
-  #checkov:skip=CKV_AWS_24
-  #checkov:skip=CKV_AWS_117
-  #checkov:skip=CKV_AWS_363
-  #checkov:skip=CKV_AWS_63:Ensure no IAM policies documents allow "*" as a statement's actions
-  #checkov:skip=CKV_AWS_62:Ensure IAM policies that allow full "*-*" administrative privileges are not created
-  #checkov:skip=CKV_AWS_61:Ensure AWS IAM policy does not allow assume role permission across all service
-  #checkov:skip=CKV_AWS_60:Ensure IAM role allows only specific services or principals to assume it
-  #checkov:skip=CKV_AWS_274:Disallow IAM roles, users, and groups from using the AWS AdministratorAccess policy
-
-  connector_jar_bucket_key              = "third-party/athena-postgresql/athena-postgresql-2025.23.1.jar"
-  connector_jar_bucket_name             = module.s3_artifacts_store.bucket_id
-  spill_bucket_name                     = module.s3_working_bucket.bucket_id
-  credentials_secret_arns               = local.federated_query_credentials_secret_arns_postgresql_list
-  project_prefix                        = local.project
-  account_id                            = local.account_id
-  region                                = local.account_region
-  vpc_id                                = data.aws_vpc.shared.id
-  subnet_id                             = data.aws_subnet.private_subnets_a.id
-  lambda_memory_allocation_mb           = local.federated_query_lambda_memory_mb
-  lambda_timeout_seconds                = local.federated_query_lambda_timeout_seconds
-  lambda_reserved_concurrent_executions = local.federated_query_lambda_concurrent_executions
-  lambda_handler                        = local.lambda_postgresql_handler
-  athena_connector_type                 = local.athena_postgresql_connector_type
-
-  # A map that links catalog names to database connection strings
-  connection_strings = local.federated_query_connection_strings_map_postgresql
 }
 
 # ORACLE ATHENA DATA CATALOGS
@@ -266,26 +206,5 @@ resource "aws_athena_data_catalog" "ndmis_catalog" {
 
   parameters = {
     "function" = module.athena_federated_query_connector_oracle.lambda_function_arn
-  }
-}
-
-
-# POSTGRESQL ATHENA DATA CATALOGS
-# --------------------------------
-
-# Adds an Athena data source / catalog for dps_locations
-resource "aws_athena_data_catalog" "dps_data_catalog" {
-  for_each = toset(
-    [
-      for item in local.dps_domains_list : item
-      if !contains(local.excluded_catalogs, item)
-    ]
-  )
-  name        = replace(each.value, "-", "_")
-  description = "${replace(each.value, "-", "_")} Athena data catalog"
-  type        = "LAMBDA"
-
-  parameters = {
-    "function" = module.athena_federated_query_connector_postgresql.lambda_function_arn
   }
 }
