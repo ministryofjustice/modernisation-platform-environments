@@ -13,11 +13,8 @@ resource "aws_s3control_access_grants_location" "this" {
 resource "aws_s3control_access_grant" "this" {
   permission                = "READWRITE"
   access_grants_location_id = aws_s3control_access_grants_instance.this.id
-  access_grants_location_configuration {
-    S3SubPrefix = "${var.bucket_name}/*"
-  }
   grantee {
-    type       = "DIRECTORY_GROUP"
-    identifier = data.aws_identitystore_group.this.group_id
+    grantee_type       = "DIRECTORY_GROUP"
+    grantee_identifier = data.aws_identitystore_group.this.group_id
   }
 }
