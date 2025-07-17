@@ -22,7 +22,6 @@
 /terraform/environments/coat @ministryofjustice/cloud-optimisation-and-accountability @ministryofjustice/modernisation-platform
 /terraform/environments/contract-work-administration @ministryofjustice/laa-aws-infrastructure @ministryofjustice/laa-cwa-developer @ministryofjustice/laa-pcuam @ministryofjustice/modernisation-platform
 /terraform/environments/cooker @ministryofjustice/modernisation-platform @ministryofjustice/tvm-purple-team @ministryofjustice/modernisation-platform
-/terraform/environments/corporate-information-system @ministryofjustice/laa-aws-infrastructure @ministryofjustice/laa-cis-dbas @ministryofjustice/laa-cis-team @ministryofjustice/modernisation-platform
 /terraform/environments/corporate-staff-rostering @ministryofjustice/azure-aws-sso-csr-migration @ministryofjustice/azure-aws-sso-digital-studio-operations @ministryofjustice/csr-application-support @ministryofjustice/hosting-migrations @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
 /terraform/environments/dacp @ministryofjustice/dts-legacy @ministryofjustice/modernisation-platform
 /terraform/environments/data-platform @ministryofjustice/data-platform-apps-and-tools @ministryofjustice/data-platform-labs @ministryofjustice/modernisation-platform
