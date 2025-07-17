@@ -52,14 +52,28 @@ locals {
         "dev_user1" = {
           environment = "development"
           user_name    = "dev_user1"
-          s3_bucket    = aws_s3_bucket.CAFM.bucket
+          s3_bucket    = "property-datahub-landing-${local.environment}"
           ssm_key_name = "/sftp/keys/dev_user1"
         }
         "dev_user2" = {
           environment = "development"
           user_name    = "dev_user2"
-          s3_bucket    = aws_s3_bucket.CAFM.bucket
+          s3_bucket    = "property-datahub-landing-${local.environment}"
           ssm_key_name = "/sftp/keys/dev_user2"
+        }
+      }
+    }
+
+    preproduction = {
+      /* Transfer Server */
+      transfer_server_hostname = "CAFM SFTP Server"
+
+      transfer_server_sftp_users = {
+        "preprod_sftp_user" = {
+          environment = "preproduction"
+          user_name    = "preprod_sftp_user"
+          s3_bucket    = "property-datahub-landing-${local.environment}"
+          ssm_key_name = "/sftp/keys/preprod_sftp_user"
         }
       }
     }
@@ -72,7 +86,7 @@ locals {
         "planetfm_sftp_user" = {
           environment = "production"
           user_name    = "planetfm_sftp_user"
-          s3_bucket    = aws_s3_bucket.CAFM.bucket
+          s3_bucket    = "property-datahub-landing-${local.environment}"
           ssm_key_name = "/sftp/keys/planetfm_sftp_user"
         }
       }
