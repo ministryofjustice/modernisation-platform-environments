@@ -7,6 +7,7 @@ locals {
 
   baseline_presets_preproduction = {
     options = {
+      enable_xsiam_s3_integration = true
       route53_resolver_rules = {
         outbound-data-and-private-subnets = ["azure-fixngo-domain", "infra-int-domain"]
       }
@@ -401,6 +402,13 @@ locals {
 
     lbs = {
       private = merge(local.lbs.private, {
+
+        s3_notification_queues = {
+          "cortex-xsiam-s3-alb-log-collection" = {
+            events    = ["s3:ObjectCreated:*"]
+            queue_arn = "cortex-xsiam-s3-alb-log-collection"
+          }
+        }
 
         listeners = merge(local.lbs.private.listeners, {
           https = merge(local.lbs.private.listeners.https, {
