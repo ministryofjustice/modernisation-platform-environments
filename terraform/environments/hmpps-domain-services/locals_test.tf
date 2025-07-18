@@ -198,7 +198,7 @@ locals {
           })
           test-rds-1-https = merge(local.lbs.public.instance_target_groups.https, {
             attachments = [
-              { ec2_instance_name = "test-rds-2-b" },
+              { ec2_instance_name = "test-rds-1-a" },
             ]
           })
         }
