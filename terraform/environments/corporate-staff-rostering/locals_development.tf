@@ -172,26 +172,9 @@ locals {
       }
     }
 
-    ec2_instances = {
-      prisoner-retail = local.ec2_instances.prisoner-retail
-    }
+    ec2_instances = {}
 
     iam_policies = {
-      Ec2PrisonerRetailPolicy = {
-        description = "Permissions required for prisoner retail"
-        statements = [
-          {
-            effect = "Allow"
-            actions = [
-              "secretsmanager:GetSecretValue",
-              "secretsmanager:PutSecretValue",
-            ]
-            resources = [
-              "arn:aws:secretsmanager:*:*:secret:/prisoner-retail/*",
-            ]
-          }
-        ]
-      }
     }
 
     
