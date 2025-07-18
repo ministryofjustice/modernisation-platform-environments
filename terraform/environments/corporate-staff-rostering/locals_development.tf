@@ -194,13 +194,6 @@ locals {
       }
     }
 
-    secretsmanager_secrets = {
-      "/prisoner-retail" = {
-        secrets = {
-          notify_emails = { description = "email list to notify about prisoner retail job outputs. Format: 'from':'some.name@domain','to':'\"<some.name@domain>\", \"<another.name@domain>\" " }
-        }
-      }
-    }
     
   }
 }
