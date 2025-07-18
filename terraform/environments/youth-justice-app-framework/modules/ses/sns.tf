@@ -37,7 +37,7 @@ data "aws_caller_identity" "current" {}
 
 # Bounce Notifications
 resource "aws_ses_identity_notification_topic" "bounce_topic" {
-  for_each                 = { for k, v in var.ses_domain_identities : k => v if v.create_records }
+  for_each                 = var.ses_domain_identities
   identity                 = aws_ses_domain_identity.main[each.key].domain
   notification_type        = "Bounce"
   topic_arn                = aws_sns_topic.ses_notifications.arn
@@ -47,7 +47,7 @@ resource "aws_ses_identity_notification_topic" "bounce_topic" {
 
 # Complaint Notifications
 resource "aws_ses_identity_notification_topic" "complaint_topic" {
-  for_each                 = { for k, v in var.ses_domain_identities : k => v if v.create_records }
+  for_each                 = var.ses_domain_identities
   identity                 = aws_ses_domain_identity.main[each.key].domain
   notification_type        = "Complaint"
   topic_arn                = aws_sns_topic.ses_notifications.arn
