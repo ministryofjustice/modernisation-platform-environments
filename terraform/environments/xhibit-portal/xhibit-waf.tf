@@ -79,12 +79,16 @@ resource "aws_wafv2_web_acl" "prtg_web_acl" {
     priority = 2
 
     action {
-      allow {}
+      block {}
     }
 
     statement {
-      geo_match_statement {
-        country_codes = ["GB"]
+      not_statement {
+        statement {
+          geo_match_statement {
+            country_codes = ["GB"]
+          }
+        }
       }
     }
 
