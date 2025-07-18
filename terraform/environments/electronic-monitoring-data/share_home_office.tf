@@ -1,10 +1,10 @@
 data "aws_secretsmanager_secret_version" "home_office_account_id" {
   count = local.is-production ? 1 : 0
-  secret_id = aws_secretsmanager_secret.home_office_account_id.id
+  secret_id = aws_secretsmanager_secret.home_office_account_id[0].id
 }
 
 locals {
-    ho_role_arn = "arn:aws:iam::${data.aws_secretsmanager_secret_version.home_office_account_id.secret_string}:role/DACC-DataScience-TL"
+    ho_role_arn = "arn:aws:iam::${data.aws_secretsmanager_secret_version.home_office_account_id[0].secret_string}:role/DACC-DataScience-TL"
 }
 
 resource "aws_lakeformation_permissions" "home_office_share_bucket" {

@@ -38,13 +38,13 @@ resource "aws_secretsmanager_secret" "home_office_account_id" {
 
 resource "aws_secretsmanager_secret_version" "home_office_account_id" {
   count = local.is-production ? 1 : 0
-  secret_id     = aws_secretsmanager_secret.home_office_account_id.id
+  secret_id     = aws_secretsmanager_secret.home_office_account_id[0].id
   secret_string = jsonencode(local.account_id_placeholder)
 
   lifecycle {
     ignore_changes = [secret_string, ]
   }
 
-  depends_on = [aws_secretsmanager_secret.home_office_account_id]
+  depends_on = [aws_secretsmanager_secret.home_office_account_id[0]]
 }
 
