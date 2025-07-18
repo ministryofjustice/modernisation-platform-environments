@@ -26,6 +26,7 @@ data "aws_iam_policy_document" "rekognition_s3_policy_document" {
     actions = [
       "s3:GetObject",
       "s3:PutObject",
+      "s3:DeleteObject"
     ]
     resources = ["${aws_s3_bucket.rekognition_bucket.arn}/*"]
   }

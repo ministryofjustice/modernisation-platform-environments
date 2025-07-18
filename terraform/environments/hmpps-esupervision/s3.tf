@@ -7,6 +7,43 @@ resource "aws_kms_key" "rekognition_encryption_key" {
   deletion_window_in_days = 30
 }
 
+data "aws_iam_policy_document" "rekognition_kms_key_policy" {
+  # NOTE: this is the default key policy granting root user access
+  statement {
+    sid = "DefaultKeyPolicy"
+    effect = "Allow"
+    principals {
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+      type = "AWS"
+    }
+    actions = ["kms:*"]
+    resources = ["*"]
+  }
+
+  # Allow access to rekognition user
+  statement {
+    sid = "RekognitionUserKeyUser"
+    effect = "Allow"
+    principals {
+      identifiers = [aws_iam_user.rekognition_user.arn]
+      type = "AWS"
+    }
+    actions = [
+      "kms:Decrypt",
+      "kms:DescribeKey",
+      "kms:Encrypt",
+      "kms:GenerateDataKey*",
+      "kms:ReEncrypt*"
+    ]
+    resources = ["*"]
+  }
+}
+
+resource "aws_kms_key_policy" "rekognition_encryption_key_policy" {
+  key_id = aws_kms_key.rekognition_encryption_key.id
+  policy = data.aws_iam_policy_document.rekognition_kms_key_policy.json
+}
+
 resource "aws_s3_bucket_server_side_encryption_configuration" "rekognition_bucket_encryption_configuration" {
   bucket = aws_s3_bucket.rekognition_bucket.id
 
