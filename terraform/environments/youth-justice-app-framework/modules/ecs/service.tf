@@ -6,11 +6,6 @@ data "aws_secretsmanager_secret_version" "postgres_secret" {
   secret_id = var.ecs_service_postgres_secret_arn
 }
 
-data "aws_lb_target_group" "target_group" {
-  for_each = var.ecs_services
-  name     = "${each.value.name}-target-group-1"
-}
-
 #For each ecs service create a service module
 module "ecs_service" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
