@@ -91,7 +91,7 @@ data "aws_iam_policy_document" "s3" {
       "s3:GetObjectAcl",
       "s3:GetObjectVersionAcl",
     "s3:ListMultipartUploadParts"]
-    resources = ["arn:aws:s3:::${var.bucket_name}"]
+    resources = ["arn:aws:s3:::${var.bucket_name}/*"]
     condition {
       test     = "StringEquals"
       variable = "aws:ResourceAccount"
