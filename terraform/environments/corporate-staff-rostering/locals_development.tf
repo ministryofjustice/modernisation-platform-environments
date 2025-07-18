@@ -173,7 +173,7 @@ locals {
     }
 
     ec2_instances = {
-      # prisoner-retail = local.ec2_instances.prisoner-retail
+      prisoner-retail = local.ec2_instances.prisoner-retail
     }
 
     iam_policies = {
