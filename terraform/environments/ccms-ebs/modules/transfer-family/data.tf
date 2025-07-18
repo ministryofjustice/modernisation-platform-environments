@@ -57,7 +57,7 @@ data "aws_iam_policy_document" "s3_assume_role" {
     effect = "Allow"
     actions = [
       "sts:AssumeRole",
-      "sts:SetSourceIdentity"
+      "sts:SetSourceIdentity",
     ]
     principals {
       type        = "Service"
