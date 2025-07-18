@@ -4,7 +4,7 @@ data "aws_secretsmanager_secret_version" "home_office_account_id" {
 }
 
 locals {
-    ho_role_arn = "arn:aws:iam::${data.aws_secretsmanager_secret_version.home_office_account_id[0].secret_string}:role/DACC-DataScience-TL"
+    ho_role_arn = local.is-production ? "arn:aws:iam::${data.aws_secretsmanager_secret_version.home_office_account_id[0].secret_string}:role/DACC-DataScience-TL" : ""
 }
 
 resource "aws_lakeformation_permissions" "home_office_share_bucket" {
