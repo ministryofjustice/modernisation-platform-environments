@@ -192,7 +192,7 @@
       "dbf_path": "/CCMS/EBS/dbf",
       "ebs_type_ebsdb_backup": "io2",
       "ebs_backup_snapshot_id": "snap-099109cbec77f0deb",
-      "ebs_backup_prod_snapshot_id": "",
+      "ebs_backup_prod_snapshot_id": "snap-04dc8385f2eea4c46",
       "instance_role_accessgate": "accessgate",
       "instance_role_clamav": "clamav",
       "instance_role_ebsapps": "apps",
