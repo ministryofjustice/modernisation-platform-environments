@@ -11,12 +11,12 @@ locals {
         content_type = "text/plain"
       }
       rules = {
-        gateway = {
+        gateway-external = {
           priority = 1
           actions = [
             {
               type             = "forward"
-              target_group_key = "gateway-target-group-2"
+              target_group_key = "gateway-external-target-group-2"
             }
           ]
           conditions = [{
