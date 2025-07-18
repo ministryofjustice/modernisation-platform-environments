@@ -2,6 +2,20 @@ resource "aws_s3_bucket" "rekognition_bucket" {
   bucket = local.rekog_s3_bucket_name
 }
 
+resource "aws_s3_bucket_cors_configuration" "rekognition_bucket_cors" {
+  bucket = aws_s3_bucket.rekognition_bucket.id
+
+  cors_rule {
+    allowed_headers = ["*"]
+    allowed_methods = ["GET", "PUT"]
+    // TODO: restrict to known environments
+    // need to allow for dev
+    allowed_origins = ["*"]
+    expose_headers = ["ETag"]
+    max_age_seconds = 3000
+  }
+}
+
 resource "aws_kms_key" "rekognition_encryption_key" {
   description = "Encryption key for rekognition image uploads bucket"
   deletion_window_in_days = 30
