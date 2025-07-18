@@ -1,4 +1,5 @@
 data "aws_secretsmanager_secret_version" "home_office_account_id" {
+  count = local.is-production ? 1 : 0
   secret_id = aws_secretsmanager_secret.home_office_account_id.id
 }
 
