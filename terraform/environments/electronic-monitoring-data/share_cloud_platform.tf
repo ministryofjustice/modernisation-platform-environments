@@ -293,17 +293,14 @@ data "aws_iam_policy_document" "ac_permissions" {
       "glue:GetDatabase",
       "glue:GetTables",
     ]
-    resources = local.is-test ? ["arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/*"] : [
-      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/allied_mdss_${local.environment_shorthand}",
-    ]
+    resources = local.is-development || local.is-test ? ["arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/*"] : []
   }
   statement {
     effect = "Allow"
     actions = [
       "glue:GetTable",
     ]
-    resources = local.is-test ? ["arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/*/*"] : ["arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/allied_mdss_${local.environment_shorthand}/*",
-    ]
+    resources = local.is-development || local.is-test ? ["arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/*/*"] : []
   }
 }
 
