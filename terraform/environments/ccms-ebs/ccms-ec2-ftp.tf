@@ -26,6 +26,8 @@ resource "aws_instance" "ec2_ftp" {
     lz_aws_account_id_env     = "${local.application_data.accounts[local.environment].lz_aws_account_id_env}"
     lz_ftp_bucket_environment = "${local.application_data.accounts[local.environment].lz_ftp_bucket_environment}"
     hostname                  = "ftp"
+    ftp_inbound_bucket        = "laa-ccms-inbound-${local.environment}-mp"
+    ftp_outbound_bucket       = "laa-ccms-outbound-${local.environment}-mp"
   }))
 
   metadata_options {

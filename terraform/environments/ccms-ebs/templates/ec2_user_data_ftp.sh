@@ -1,78 +1,163 @@
 #!/bin/bash
+set -e
 
 exec > /tmp/userdata.log 2>&1
 
-amazon-linux-extras install -y epel
-yum install -y wget unzip vsftpd jq s3fs-fuse
-yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
+# amazon-linux-extras install -y epel
+# yum install -y wget unzip vsftpd jq s3fs-fuse amazon-cloudwatch-agent telnet
+yum install -y wget unzip vsftpd jq amazon-cloudwatch-agent telnet
+dnf install -y git gcc libstdc++-devel automake libtool fuse fuse-devel curl-devel openssl-devel make libxml2-devel gcc-c++
 
-curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-unzip awscliv2.zip
-./aws/install
+cd /usr/local/src
+git clone https://github.com/s3fs-fuse/s3fs-fuse.git
+cd s3fs-fuse
+./autogen.sh
+./configure
+make
+make install
 
-wget https://s3.amazonaws.com/amazoncloudwatch-agent/oracle_linux/amd64/latest/amazon-cloudwatch-agent.rpm
-rpm -U ./amazon-cloudwatch-agent.rpm
-
-/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c ssm:cloud-watch-config
-
-systemctl stop amazon-ssm-agent
-rm -rf /var/lib/amazon/ssm/ipc/
-systemctl start amazon-ssm-agent
-
-useradd -m s3xfer
+systemctl enable amazon-cloudwatch-agent
+systemctl start amazon-cloudwatch-agent
 
 echo "pasv_enable=YES" >> /etc/vsftpd/vsftpd.conf
 echo "pasv_min_port=3000" >> /etc/vsftpd/vsftpd.conf
 echo "pasv_max_port=3010" >> /etc/vsftpd/vsftpd.conf
-
+systemctl enable vsftpd.service
 systemctl restart vsftpd.service
 
-cat > /etc/mount_s3.sh <<- EOM
-#!/bin/bash
+# cat > /etc/mount_s3_new.sh <<- EOM
+# #!/bin/bash
+ENV="${environment}"
+inbound_bucket="${ftp_inbound_bucket}"
+outbound_bucket="${ftp_outbound_bucket}"
 
-B=(laa-ccms-inbound-${lz_ftp_bucket_environment} laa-ccms-outbound-${lz_ftp_bucket_environment} laa-cis-outbound-${lz_ftp_bucket_environment} laa-cis-inbound-${lz_ftp_bucket_environment} bacway-${lz_ftp_bucket_environment}-eu-west-2-${lz_aws_account_id_env})
+SSHD_CONFIG="/etc/ssh/sshd_config"
 
-C=\$(aws secretsmanager get-secret-value --secret-id ftp-s3-${environment}-aws-key --region eu-west-2)
-K=\$(jq -r '.SecretString' <<< \$${C} |cut -d'"' -f2)
-S=\$(jq -r '.SecretString' <<< \$${C} |cut -d'"' -f4)
-U=\$(id -u s3xfer)
-G=\$(id -g s3xfer)
-F=/etc/passwd-s3fs
-echo "\$${K}:\$${S}" > "\$${F}"
-chmod 600 \$${F}
+# Backup original config
+cp "$SSHD_CONFIG" "$SSHD_CONFIG.bak_$(date +%F_%T)"
 
-for b in "\$${B[@]}"; do
-  D=/s3xfer/S3/\$${b}
+# Add port 22 if not already present
+if ! grep -q '^Port 22' "$SSHD_CONFIG"; then
+    echo "Port 22" | sudo tee -a "$SSHD_CONFIG" > /dev/null
+fi
 
-  if [[ -d \$${D} ]]; then
-    echo "\$${D} exists."
-  else
-    mkdir -p \$${D}
-  fi
+# Add port 8022 if not already present
+if ! grep -q '^Port 8022' "$SSHD_CONFIG"; then
+    echo "Port 8022" | sudo tee -a "$SSHD_CONFIG" > /dev/null
+fi
 
-  chown -R s3xfer:users \$${D}
-  chmod 755 \$${D}
+SECRET_NAME="ftp-s3-$ENV-aws-key"
 
-  s3fs \$${b} \$${D} -o passwd_file=\$${F} -o _netdev,allow_other,use_cache=/tmp,url=https://s3-eu-west-2.amazonaws.com,endpoint=eu-west-2,umask=022,uid=\$${U},gid=\$${G}
-  if [[ \$? -eq 0 ]]; then
-    s3fs \$${b} \$${D} -o passwd_file=\$${F}
-    echo "\$${b} has been mounted in \$${D}"
-  else
-    echo "\$${b} has not been mounted! Please investigate."
-  fi
-done
+echo "the secret name is $SECRET_NAME"
 
-ln -s /s3xfer/S3/laa-ccms-inbound-${lz_ftp_bucket_environment}/CCMS_PRD_TDX/Inbound /home/s3xfer/CCMS_PRD_TDX_Inbound
-ln -s /s3xfer/S3/laa-ccms-outbound-${lz_ftp_bucket_environment}/CCMS_PRD_TDX/Outbound /home/s3xfer/CCMS_PRD_TDX_Outbound
+# --- Fetch secret securely ---
+SECRET_JSON=$(aws secretsmanager get-secret-value \
+  --secret-id "$SECRET_NAME" \
+  --region eu-west-2 \
+  --query SecretString \
+  --output text)
 
-chown -h s3xfer:s3xfer /home/s3xfer/CCMS_PRD_TDX_Inbound
-chown -h s3xfer:s3xfer /home/s3xfer/CCMS_PRD_TDX_Outbound
+# --- Extract credentials ---
+USERNAME=$(echo "$SECRET_JSON" | jq -r '.USER')
+PASSWORD=$(echo "$SECRET_JSON" | jq -r '.PASSWORD')
 
-rm \$${F}
-EOM
+# --- Validate inputs ---
+if [[ -z "$USERNAME" || -z "$PASSWORD" || "$USERNAME" == "null" || "$PASSWORD" == "null" ]]; then
+  echo "USER or PASSWORD key is missing or null in the secret!"
+  exit 1
+fi
 
-chmod +x /etc/mount_s3.sh
+# --- Create user if not exists ---
+if id "$USERNAME" &>/dev/null; then
+  echo "User $USERNAME already exists."
+else
 
-chmod +x /etc/rc.d/rc.local
-echo "/etc/mount_s3.sh" >> /etc/rc.local
-systemctl start rc-local.service
+useradd -m "$USERNAME"
+# --- Set password securely using heredoc ---
+chpasswd <<EOF
+$USERNAME:$PASSWORD
+EOF
+echo "user created with password"
+fi
+
+# Check if PasswordAuthentication is disabled
+if grep -qE "^#?PasswordAuthentication\s+no" "$SSHD_CONFIG"; then
+  echo "Enabling PasswordAuthentication..."
+  sed -i 's/^#\?PasswordAuthentication\s\+no/PasswordAuthentication yes/' "$SSHD_CONFIG"
+else
+  echo "PasswordAuthentication is already enabled or not explicitly set."
+fi
+
+# Ensure ChallengeResponseAuthentication is disabled (for passwords to work reliably)
+if grep -qE "^#?ChallengeResponseAuthentication\s+yes" "$SSHD_CONFIG"; then
+  echo "Disabling ChallengeResponseAuthentication..."
+  sed -i 's/^#\?ChallengeResponseAuthentication\s\+yes/ChallengeResponseAuthentication no/' "$SSHD_CONFIG"
+fi
+
+# Restart sshd service
+echo "Restarting sshd..."
+systemctl restart sshd
+
+
+U=$(id -u $USERNAME)
+G=$(id -g $USERNAME)
+
+
+if [[ -d "$USERNAME/S3/$inbound_bucket" ]]; then
+  echo " the path $USERNAME/S3/$inbound_bucket exists"
+else
+  mkdir -p "$USERNAME/S3/$inbound_bucket"
+fi
+
+if [[ -d "$USERNAME/S3/$outbound_bucket" ]]; then
+  echo " the path $USERNAME/S3/$inbound_bucket exists"
+else
+  mkdir -p "$USERNAME/S3/$outbound_bucket"
+fi
+
+chown -R "$USERNAME:users" "$USERNAME/S3/$inbound_bucket"
+chown -R "$USERNAME:users" "$USERNAME/S3/$outbound_bucket"
+chmod 755 "$USERNAME/S3/$inbound_bucket"
+chmod 755 "$USERNAME/S3/$outbound_bucket"
+
+# create mount directories
+mkdir -p /$USERNAME/S3/laa-ccms-inbound-$ENV-mp /$USERNAME/S3/laa-ccms-outbound-$ENV-mp
+# Backup fstab first
+cp /etc/fstab /etc/fstab.bak.$(date +%F-%H%M%S)
+
+# Define mount entries
+LINE1="s3fs#$inbound_bucket /$USERNAME/S3/$inbound_bucket fuse _netdev,iam_role=auto,uid=$U,gid=$G,mp_umask=0022,allow_other,nonempty 0 0"
+LINE2="s3fs#$outbound_bucket /$USERNAME/S3/$outbound_bucket fuse _netdev,iam_role=auto,uid=$U,gid=$G,mp_umask=0022,allow_other,nonempty 0 0"
+
+# Append to fstab if not already present
+grep -qxF "$LINE1" /etc/fstab || echo "$LINE1" >> /etc/fstab
+grep -qxF "$LINE2" /etc/fstab || echo "$LINE2" >> /etc/fstab
+
+echo "fstab updated."
+# Test mounting all entries and capture errors
+echo "Testing mounts with: mount -a"
+if ! sudo mount -a 2>&1 | tee /etc/mount_errors.log; then
+  echo "[ERROR] One or more mounts failed. See /tmp/mount_errors.log:"
+  cat /etc/mount_errors.log
+  exit 1
+else
+  echo "[SUCCESS] All mounts applied successfully."
+  # if [[ "$ENV" != "production" ]]; then
+  #   ln -s /$USERNAME/S3/$inbound_bucket/inbound-lambda-runs /home/$USERNAME/inbound-lambda-runs
+  #   ln -s /$USERNAME/S3/$outbound_bucket/outbound-lambda-runs /home/$USERNAME/outbound-lambda-runs
+  #   chown -h $USERNAME:$USERNAME /home/$USERNAME/inbound-lambda-runs
+  #   chown -h $USERNAME:$USERNAME /home/$USERNAME/outbound-lambda-runs
+  # fi
+  ln -s /$USERNAME/S3/$inbound_bucket /home/$USERNAME/$inbound_bucket
+  ln -s /$USERNAME/S3/$outbound_bucket /home/$USERNAME/$outbound_bucket
+  chown -h $USERNAME:$USERNAME /home/$USERNAME/$inbound_bucket
+  chown -h $USERNAME:$USERNAME /home/$USERNAME/$outbound_bucket
+
+fi
+# EOM
+
+# chmod +x /etc/mount_s3_new.sh
+
+# chmod +x /etc/rc.d/rc.local
+# echo "/etc/mount_s3_new.sh" >> /etc/rc.local
+# systemctl start rc-local.service

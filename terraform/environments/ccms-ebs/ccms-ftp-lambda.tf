@@ -32,6 +32,21 @@ resource "aws_secretsmanager_secret" "secrets" {
   name = "${each.value}-${local.environment}"
 }
 
+
+# Reference the secret for ccms-ebs ftp server
+data "aws_secretsmanager_secret" "ftp_test_user_secret" {
+  name = "ftp-s3-${local.environment}-aws-key"
+}
+
+# Get the latest version of the secret value for ccms-ebs ftp server
+data "aws_secretsmanager_secret_version" "ftp_test_user_secret_value" {
+  secret_id = data.aws_secretsmanager_secret.ftp_test_user_secret.id
+}
+
+locals {
+  ftp_test_user_secret_value = jsondecode(data.aws_secretsmanager_secret_version.ftp_test_user_secret_value.secret_string)
+}
+
 resource "aws_s3_bucket" "buckets" {
   for_each = toset(local.bucket_names)
 
