@@ -15,16 +15,16 @@ resource "aws_mwaa_environment" "main" {
   plugins_s3_path                = "plugins.zip"
   plugins_s3_object_version      = module.airflow_plugins_object.s3_object_version_id
 
-  max_workers = 2
-  min_workers = 1
-  schedulers  = 2
+  max_workers = local.environment_configuration.airflow_max_workers
+  min_workers = local.environment_configuration.airflow_min_workers
+  schedulers  = local.environment_configuration.airflow_schedulers
 
   webserver_access_mode = "PRIVATE_ONLY"
 
   airflow_configuration_options = {
     "secrets.backend"                    = "airflow.providers.amazon.aws.secrets.secrets_manager.SecretsManagerBackend"
     "secrets.backend_kwargs"             = "{\"connections_prefix\": \"airflow/connections\", \"variables_prefix\": \"airflow/variables\"}"
-    "smtp.smtp_host"                     = "email-smtp.${data.aws_region.current.name}.amazonaws.com"
+    "smtp.smtp_host"                     = "email-smtp.${data.aws_region.current.region}.amazonaws.com"
     "smtp.smtp_port"                     = 587
     "smtp.smtp_starttls"                 = 1
     "smtp.smtp_user"                     = module.mwaa_ses_iam_user.iam_access_key_id
@@ -33,6 +33,7 @@ resource "aws_mwaa_environment" "main" {
     "webserver.warn_deployment_exposure" = 0
     "webserver.base_url"                 = "airflow.${local.environment_configuration.route53_zone}"
     "webserver.instance_name"            = local.environment_configuration.airflow_webserver_instance_name
+    "celery.worker_autoscale"            = local.environment_configuration.airflow_celery_worker_autoscale
   }
 
   network_configuration {

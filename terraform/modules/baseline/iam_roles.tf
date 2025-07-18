@@ -29,7 +29,7 @@ data "aws_iam_policy_document" "assume_role" {
         for_each = statement.value.principals != null ? [statement.value.principals] : []
         content {
           type        = principals.value.type
-          identifiers = [for identifier in principals.value.identifiers : try(var.environment.account_root_arns[identifier], identifier)]
+          identifiers = principals.value.identifiers
         }
       }
       dynamic "condition" {
@@ -37,7 +37,7 @@ data "aws_iam_policy_document" "assume_role" {
         content {
           test     = condition.value.test
           variable = condition.value.variable
-          values   = condition.value.values
+          values   = [for value in condition.value.values : try(aws_ssm_parameter.fixed[value].value, value)]
         }
       }
     }

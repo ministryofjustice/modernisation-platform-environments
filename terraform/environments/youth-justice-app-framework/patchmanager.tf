@@ -26,6 +26,27 @@ resource "aws_ssm_patch_baseline" "yjaf_amazon_linux_2" {
 
   approval_rule {
     approve_after_days  = 1
+    compliance_level    = "HIGH"
+    enable_non_security = false
+
+    patch_filter {
+      key    = "PRODUCT"
+      values = ["*"]
+    }
+
+    patch_filter {
+      key    = "CLASSIFICATION"
+      values = ["*"]
+    }
+
+    patch_filter {
+      key    = "SEVERITY"
+      values = ["Important"]
+    }
+  }
+
+  approval_rule {
+    approve_after_days  = 1
     compliance_level    = "INFORMATIONAL"
     enable_non_security = true
 
@@ -123,6 +144,32 @@ resource "aws_ssm_patch_baseline" "yjaf_windows_patch_baseline" {
   }
 
   approval_rule {
+    approve_after_days  = 1
+    compliance_level    = "HIGH"
+    enable_non_security = false
+
+    patch_filter {
+      key    = "PATCH_SET"
+      values = ["OS"]
+    }
+
+    patch_filter {
+      key    = "PRODUCT"
+      values = ["*"]
+    }
+
+    patch_filter {
+      key    = "CLASSIFICATION"
+      values = ["*"]
+    }
+
+    patch_filter {
+      key    = "MSRC_SEVERITY"
+      values = ["Important"]
+    }
+  }
+
+  approval_rule {
     approve_after_days  = 7
     compliance_level    = "INFORMATIONAL"
     enable_non_security = false
@@ -156,4 +203,27 @@ resource "aws_ssm_patch_baseline" "yjaf_windows_patch_baseline" {
 resource "aws_ssm_patch_group" "yjaf_windows_patch_group" {
   baseline_id = aws_ssm_patch_baseline.yjaf_windows_patch_baseline.id
   patch_group = "Windows"
+}
+
+
+
+resource "aws_ssm_association" "patch_schedule" {
+  name = "AWS-RunPatchBaseline"
+
+  # Target EC2 instances with the Patch Group tag
+  targets {
+    key    = "tag:Patch Group"
+    values = ["Linux2", "Ubuntu", "Windows"]
+  }
+
+  schedule_expression = "cron(0 3 ? * SUN *)" # Every Sunday at 3:00 AM UTC
+
+  compliance_severity = "HIGH"
+  max_concurrency     = "50%"
+  max_errors          = "1"
+
+  automation_target_parameter_name = "InstanceId"
+  parameters = {
+    Operation = "Install"
+  }
 }

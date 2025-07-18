@@ -230,6 +230,7 @@ resource "aws_security_group" "vpc_sec_group" {
   description = "RDS Access with the shared vpc"
   vpc_id      = var.vpc_shared_id
 
+  # Ingress and egress with the maat application
   ingress {
     description     = "Sql Net on 1521"
     from_port       = 1521
@@ -244,6 +245,16 @@ resource "aws_security_group" "vpc_sec_group" {
     to_port         = 1521
     protocol        = "tcp"
     security_groups = [var.ecs_cluster_sec_group_id]
+  }
+
+  # Required to support https calls from the RDS to the S3 endpoint. Note that vpc endpoint times out hence general outbound
+  egress {
+    description = "Access to S3 VPC endpoint"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+
   }
 
   tags = {
@@ -318,20 +329,21 @@ resource "aws_security_group" "ses_sec_group" {
   description = "SES Outbound Access"
   vpc_id      = var.vpc_shared_id
 
-
   egress {
-    description     = "SMTP Outbound to 587"
-    from_port       = 587
-    to_port         = 587
-    protocol        = "tcp"
+    description = "SMTP Outbound to 587"
+    from_port   = 587
+    to_port     = 587
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
-
   }
 
   tags = {
     Name = "${var.application_name}-${var.environment}-ses-sec-group"
   }
 }
+
+
+# Outputs
 
 output "db_instance_id" {
   value = aws_db_instance.appdb1.id
