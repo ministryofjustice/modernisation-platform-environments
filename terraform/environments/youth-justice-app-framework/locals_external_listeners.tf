@@ -12,7 +12,7 @@ locals {
       }
       rules = {
         gateway-external = {
-          priority = 1
+          priority = 2
           actions = [
             {
               type             = "forward"

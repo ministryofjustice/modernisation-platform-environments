@@ -149,7 +149,7 @@ locals {
           }]
         },
         gateway-internal = {
-          priority = 12
+          priority = 22
           actions = [
             {
               type             = "forward"
