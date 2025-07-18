@@ -133,11 +133,6 @@ locals {
           instance_profile_policies = concat(local.ec2_instances.rds.config.instance_profile_policies, [
             "Ec2SecretPolicy"]
           )
-          user_data_raw = base64encode(templatefile(
-            "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
-              branch = "TM-1398/powershell/more-whatif-fixes"
-            }
-          ))
         })
         instance = merge(local.ec2_instances.rds.instance, {
           tags = {
