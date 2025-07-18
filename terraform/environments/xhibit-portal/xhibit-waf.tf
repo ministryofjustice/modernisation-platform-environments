@@ -6,10 +6,10 @@ module "waf" {
   associated_resource_arns = [aws_lb.waf_lb.arn]
 
   managed_rule_actions = {
-    AWSManagedRulesKnownBadInputsRuleSet = true
+    AWSManagedRulesKnownBadInputsRuleSet = false
     AWSManagedRulesCommonRuleSet         = false
-    AWSManagedRulesSQLiRuleSet           = true
-    AWSManagedRulesLinuxRuleSet          = true
+    AWSManagedRulesSQLiRuleSet           = false
+    AWSManagedRulesLinuxRuleSet          = false
     AWSManagedRulesAnonymousIpList       = false
     AWSManagedRulesBotControlRuleSet     = false
   }
