@@ -173,7 +173,33 @@ locals {
     }
 
     ec2_instances = {
-      prisoner-retail = local.ec2_instances.prisoner-retail
+      # prisoner-retail = local.ec2_instances.prisoner-retail
+    }
+
+    iam_policies = {
+      Ec2PrisonerRetailPolicy = {
+        description = "Permissions required for prisoner retail"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/prisoner-retail/*",
+            ]
+          }
+        ]
+      }
+    }
+
+    secretsmanager_secrets = {
+      "/prisoner-retail" = {
+        secrets = {
+          notify_emails = { description = "email list to notify about prisoner retail job outputs. Format: 'from':'some.name@domain','to':'\"<some.name@domain>\", \"<another.name@domain>\" " }
+        }
+      }
     }
     
   }
