@@ -187,6 +187,18 @@ locals {
         }
       }
     }
+    prisoner-retail = {
+      description = "Security group for prisoner retail"
+      ingress = {
+        all-from-self = {
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
+        }
+      }
+    }
     database = {
       description = "New security group for database servers"
       ingress = {
