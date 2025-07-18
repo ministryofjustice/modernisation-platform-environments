@@ -1,6 +1,6 @@
 module "rds_export" {
-  source = "github.com/ministryofjustice/terraform-rds-export?ref=04916a52ce20590674198fc48456dad95d7dee75"
-
+  source = "github.com/ministryofjustice/terraform-rds-export?ref=230537b0367f7a55d27ee91c219f13a263ba615e"
+  
   # Replace the kms_key_arn, name, vpc_id and (database_subnet_ids in a list)
   kms_key_arn = aws_kms_key.sns_kms.arn
   name = "cafm"
@@ -46,24 +46,27 @@ module "endpoints" {
 }
 
 module "server" {
-  source = "./modules/transfer_family/server"
+  source     = "./modules/transfer_family/server"
   name   = "CAFM SFTP Server"
+  environment = local.environment
 }
 
 # ------------------------
 # Transfer User
 # ------------------------
 module "sftp_user" {
-  source     = "./modules/transfer_family/users"
-  for_each   = local.sftp_users
+  source = "./modules/transfer_family/users"
+  for_each = local.environment_configuration.transfer_server_sftp_users
 
-  user_name  = each.key
-  server_id  = module.server.id
-  s3_bucket  = each.value.s3_bucket
+  user_name    = each.value.user_name
+  server_id    = module.server.id
+  s3_bucket    = each.value.s3_bucket
+  kms_key_arn  = aws_kms_key.sns_kms.arn
 }
 
+
 data "aws_ssm_parameter" "ssh_keys" {
-  for_each = local.sftp_users
+  for_each = local.environment_configuration.transfer_server_sftp_users
   name     = each.value.ssm_key_name
 }
 
@@ -72,7 +75,7 @@ data "aws_ssm_parameter" "ssh_keys" {
 # ------------------------
 module "sftp_ssh_key" {
   source        = "./modules/transfer_family/ssh_key"
-  for_each      = local.sftp_users
+  for_each      = local.environment_configuration.transfer_server_sftp_users
 
   server_id     = module.server.id
   user_name     = each.key
