@@ -1,17 +1,3 @@
-#--SSO
-data "aws_ssoadmin_instances" "entra" {}
-
-data "aws_identitystore_group" "this" {
-  identity_store_id = tolist(data.aws_ssoadmin_instances.entra.identity_store_ids)[0]
-
-  alternate_identifier {
-    unique_attribute {
-      attribute_path  = "DisplayName"
-      attribute_value = var.entra_group_name
-    }
-  }
-}
-
 #--Transfer Family IAM Docs
 data "aws_iam_policy_document" "transfer_assume_role" {
   version = "2012-10-17"

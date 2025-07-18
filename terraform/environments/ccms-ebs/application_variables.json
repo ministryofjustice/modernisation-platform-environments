@@ -107,7 +107,8 @@
       "certificate_monitor_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com",
       "payment_load_monitor_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com",
       "alerts_subscription_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com",
-      "cash_office_entra_group_name": "azure-aws-sso-laa-ccms-ebs-s3-cashoffice"
+      "cash_office_idp_arn": "arn:aws:sso:::instance/ssoins-7535d9af4f41fb26",
+      "cash_office_sso_group_id": "c64272c4-30a1-7039-8ffd-af791143da2e"
     },
     "test": {
       "short_env": "tst",
@@ -181,7 +182,7 @@
       "ebs_iops_ebsdb_dbf03": 6000,
       "ebs_size_ebsdb_dbf03": 3000,
       "ebs_iops_ebsdb_dbf04": 3000,
-      "ebs_size_ebsdb_dbf04": 1250,
+      "ebs_size_ebsdb_dbf04": 500,
       "ebs_size_ebsdb_redoA": 100,
       "ebs_size_ebsdb_redoB": 50,
       "ebs_size_ebsdb_techst": 50,
@@ -193,7 +194,7 @@
       "dbf_path": "/CCMS/EBS/dbf",
       "ebs_type_ebsdb_backup": "io2",
       "ebs_backup_snapshot_id": "snap-099109cbec77f0deb",
-      "ebs_backup_prod_snapshot_id": "snap-04dc8385f2eea4c46",
+      "ebs_backup_prod_snapshot_id": "",
       "instance_role_accessgate": "accessgate",
       "instance_role_clamav": "clamav",
       "instance_role_ebsapps": "apps",
@@ -212,7 +213,8 @@
       "certificate_monitor_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com",
       "payment_load_monitor_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com",
       "alerts_subscription_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com",
-      "cash_office_entra_group_name": "azure-aws-sso-laa-ccms-ebs-s3-cashoffice"
+      "cash_office_idp_arn": "arn:aws:sso:::instance/ssoins-7535d9af4f41fb26",
+      "cash_office_sso_group_id": "c64272c4-30a1-7039-8ffd-af791143da2e"
     },
     "preproduction": {
       "short_env": "prep",
@@ -317,7 +319,8 @@
       "certificate_monitor_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com",
       "payment_load_monitor_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com",
       "alerts_subscription_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com",
-      "cash_office_entra_group_name": "azure-aws-sso-laa-ccms-ebs-s3-cashoffice"
+      "cash_office_idp_arn": "arn:aws:sso:::instance/ssoins-7535d9af4f41fb26",
+      "cash_office_sso_group_id": "c64272c4-30a1-7039-8ffd-af791143da2e"
     },
     "production": {
       "short_env": "prod",
@@ -424,7 +427,8 @@
       "certificate_monitor_email": "ccms-ebs-prod-monitor-aaaajvsud6ikkogrh4dyt53whq@moj.org.slack.com",
       "payment_load_monitor_email": "ccms-ebs-prod-monitor-aaaajvsud6ikkogrh4dyt53whq@moj.org.slack.com",
       "alerts_subscription_email": "ccms-ebs-prod-monitor-aaaajvsud6ikkogrh4dyt53whq@moj.org.slack.com",
-      "cash_office_entra_group_name": "azure-aws-sso-laa-ccms-ebs-s3-cashoffice"
+      "cash_office_idp_arn": "arn:aws:sso:::instance/ssoins-7535d9af4f41fb26",
+      "cash_office_sso_group_id": "c64272c4-30a1-7039-8ffd-af791143da2e"
     }
   },
   "webgate_ebs": {

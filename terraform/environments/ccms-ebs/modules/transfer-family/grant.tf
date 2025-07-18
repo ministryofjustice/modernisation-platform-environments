@@ -1,6 +1,6 @@
 #--S3 Grants
 resource "aws_s3control_access_grants_instance" "this" {
-  identity_center_arn = tolist(data.aws_ssoadmin_instances.entra.arns)[0]
+  identity_center_arn = var.aws_identity_centre_store_arn
 }
 
 resource "aws_s3control_access_grants_location" "this" {
@@ -15,6 +15,6 @@ resource "aws_s3control_access_grant" "this" {
   access_grants_location_id = aws_s3control_access_grants_instance.this.id
   grantee {
     grantee_type       = "DIRECTORY_GROUP"
-    grantee_identifier = data.aws_identitystore_group.this.group_id
+    grantee_identifier = var.aws_identity_centre_sso_group_id
   }
 }
