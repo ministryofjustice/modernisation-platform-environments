@@ -34,7 +34,9 @@ resource "aws_wafv2_ip_set" "prtg_waf_ip_set" {
     "35.176.93.186/32",  // MoJ VPN Gateway Proxies
     "172.10.10.188/32",  // V1 Digital Wifi
     "194.62.186.170/32", // V1 VPN Gateway Proxies
-    "66.155.16.68/32"   // Southampton BEL Wifi
+    "66.155.16.61/32",   // SBEL Wifi
+    "66.155.16.68/32",   // SBEL Wifi
+    "92.236.109.133/32"  // GD Wifi
   ]
 
   tags = merge(local.tags,
@@ -50,7 +52,7 @@ resource "aws_wafv2_web_acl" "prtg_web_acl" {
   description = "AWS WAF Web ACL for PRTG"
 
   default_action {
-    allow {}
+    block {}
   }
 
   rule {
@@ -58,7 +60,7 @@ resource "aws_wafv2_web_acl" "prtg_web_acl" {
 
     priority = 1
     action {
-      count {}
+      allow {}
     }
 
     statement {
