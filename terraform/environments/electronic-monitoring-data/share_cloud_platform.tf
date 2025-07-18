@@ -321,7 +321,7 @@ resource "aws_iam_policy" "cmt_specific_access" {
 
 resource "aws_iam_policy" "ac_specific_access" {
   name_prefix = "ac_specific_access"
-  description = "Access to the Glue tables required by AC."
+  description = "Access to the Glue tables required by Acquisitive Crime."
   policy      = data.aws_iam_policy_document.ac_permissions.json
 }
 
