@@ -20,7 +20,7 @@ module "ui_rds" {
   max_allocated_storage = 256
 
   multi_az               = true
-  db_subnet_group_name   = module.vpc.database_subnet_group
+  db_subnet_group_name   = data.aws_db_subnet_group.apc_database.name
   vpc_security_group_ids = [module.rds_security_group.security_group_id]
 
   username                    = "ui"
