@@ -48,17 +48,14 @@ data "aws_iam_policy_document" "s3_assume_role" {
     }
     condition {
       test     = "StringEquals"
-      variable = "AWS:SourceArn"
+      variable = "AWS:SourceAccount"
       values   = ["${var.aws_account_id}"]
     }
   }
   statement {
     sid    = "AccessGrantsTrustPolicyWithIDCContext"
     effect = "Allow"
-    actions = [
-      "sts:AssumeRole",
-      "sts:SetSourceIdentity",
-    ]
+    actions = ["sts:SetContext"]
     principals {
       type        = "Service"
       identifiers = ["access-grants.s3.amazonaws.com"]
@@ -70,7 +67,7 @@ data "aws_iam_policy_document" "s3_assume_role" {
     }
     condition {
       test     = "StringEquals"
-      variable = "AWS:SourceArn"
+      variable = "AWS:SourceAccount"
       values   = ["${var.aws_account_id}"]
     }
     condition {
