@@ -284,6 +284,11 @@ data "aws_iam_policy_document" "ac_permissions" {
     effect = "Allow"
     actions = [
       "glue:GetDatabases",
+      # Glue uses a heirarchical system of permissions. Permissions must be granted at
+      # every higher level to work in the lower levels!
+      "glue:GetDatabase",
+      "glue:GetTables",
+      "glue:GetTable",
     ]
     resources = ["arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:catalog"]
   }
@@ -292,6 +297,7 @@ data "aws_iam_policy_document" "ac_permissions" {
     actions = [
       "glue:GetDatabase",
       "glue:GetTables",
+      "glue:GetTable",
     ]
     resources = local.is-development || local.is-test ? ["arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/*"] : []
   }
