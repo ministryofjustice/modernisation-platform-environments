@@ -304,6 +304,7 @@ data "aws_iam_policy_document" "ac_permissions" {
   statement {
     effect = "Allow"
     actions = [
+      "glue:GetTables",
       "glue:GetTable",
     ]
     resources = local.is-development || local.is-test ? ["arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/*/*"] : []
