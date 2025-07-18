@@ -1,4 +1,5 @@
 module "transfer_family" {
+  count                            = local.is-development ? 1 : 0
   source                           = "./modules/transfer-family"
   aws_account_id                   = data.aws_caller_identity.current.account_id
   app_name                         = local.application_name
