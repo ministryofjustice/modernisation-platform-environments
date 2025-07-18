@@ -192,7 +192,7 @@ module "share_specials_data_marts" {
 }
 
 resource "aws_lakeformation_permissions" "ac_allied_db" {
-  count       = local.is-development || local.is-test ? 1 : 0
+  count       = local.is-test ? 1 : 0
   principal   = module.acquisitive_crime_assumable_role[0].iam_role_arn
   permissions = ["DESCRIBE"]
   database {
@@ -201,7 +201,7 @@ resource "aws_lakeformation_permissions" "ac_allied_db" {
 }
 
 resource "aws_lakeformation_permissions" "ac_allied_tables" {
-  count       = local.is-development || local.is-test ? 1 : 0
+  count       = local.is-test ? 1 : 0
   principal   = module.acquisitive_crime_assumable_role[0].iam_role_arn
   permissions = ["SELECT", "DESCRIBE"]
   table {
