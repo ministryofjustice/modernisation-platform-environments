@@ -19,19 +19,107 @@ make install
 systemctl enable amazon-cloudwatch-agent
 systemctl start amazon-cloudwatch-agent
 
-echo "pasv_enable=YES" >> /etc/vsftpd/vsftpd.conf
-echo "pasv_min_port=3000" >> /etc/vsftpd/vsftpd.conf
-echo "pasv_max_port=3010" >> /etc/vsftpd/vsftpd.conf
-systemctl enable vsftpd.service
-systemctl restart vsftpd.service
 
-# cat > /etc/mount_s3_new.sh <<- EOM
-# #!/bin/bash
 ENV="${environment}"
 inbound_bucket="${ftp_inbound_bucket}"
 outbound_bucket="${ftp_outbound_bucket}"
 
 SSHD_CONFIG="/etc/ssh/sshd_config"
+
+
+
+# === VSFTPD CONFIGURATION ===
+CERT_DIR="/etc/vsftpd/ssl"
+CA_NAME="MyPrivateCA"
+SERVER_CN="ftp.laa-$ENV.modernisation-platform.service.justice.gov.uk"
+VALID_DAYS=825
+
+mkdir -p "$CERT_DIR"
+cd "$CERT_DIR"
+
+echo "[1] Generating CA key and certificate..."
+openssl req -x509 -nodes -new -sha256 \
+  -days $VALID_DAYS \
+  -subj "/CN=ftp.local/OU=LAA/O=Moj/L=London/ST=England/C=GB" \
+  -keyout ca.key -out ca.crt
+
+echo "[2] Generating server key..."
+openssl genrsa -out vsftpd.key 2048
+
+echo "[3] Creating OpenSSL config for CSR..."
+cat > vsftpd_csr.cnf <<EOF
+[ req ]
+default_bits       = 2048
+distinguished_name = req_distinguished_name
+req_extensions     = req_ext
+prompt             = no
+
+[ req_distinguished_name ]
+C  = GB
+ST = England
+L  = London
+O  = Moj
+OU = LAA
+CN = ftp.local
+
+[ req_ext ]
+subjectAltName = @alt_names
+
+[ alt_names ]
+DNS.1 = $SERVER_CN
+EOF
+
+echo "[4] Creating CSR using config with SAN..."
+openssl req -new -key vsftpd.key -out vsftpd.csr -config vsftpd_csr.cnf
+
+echo "[5] Creating cert extension file..."
+cat > vsftpd_cert_ext.cnf <<EOF
+subjectAltName = DNS:$SERVER_CN
+extendedKeyUsage = serverAuth
+EOF
+
+echo "[6] Signing server CSR with CA..."
+openssl x509 -req -in vsftpd.csr \
+  -CA ca.crt -CAkey ca.key -CAcreateserial \
+  -days $VALID_DAYS -sha256 \
+  -extfile vsftpd_cert_ext.cnf \
+  -out vsftpd.crt
+
+chmod 600 vsftpd.key
+
+echo "Certificate generation complete:"
+echo "  - CA Cert:       $CERT_DIR/ca.crt"
+echo "  - Server Cert:   $CERT_DIR/vsftpd.crt"
+echo "  - Server Key:    $CERT_DIR/vsftpd.key"
+
+
+echo "pasv_enable=YES" >> /etc/vsftpd/vsftpd.conf
+echo "pasv_min_port=3000" >> /etc/vsftpd/vsftpd.conf
+echo "pasv_max_port=3010" >> /etc/vsftpd/vsftpd.conf
+echo "rsa_cert_file=/etc/vsftpd/ssl/vsftpd.crt" >> /etc/vsftpd/vsftpd.conf
+echo "rsa_private_key_file=/etc/vsftpd/ssl/vsftpd.key" >> /etc/vsftpd/vsftpd.conf
+echo "implicit_ssl=YES" >> /etc/vsftpd/vsftpd.conf
+echo "ssl_enable=YES" >> /etc/vsftpd/vsftpd.conf
+echo "ssl_tlsv1=YES" >> /etc/vsftpd/vsftpd.conf
+echo "ssl_sslv2=NO" >> /etc/vsftpd/vsftpd.conf
+echo "ssl_sslv3=NO" >> /etc/vsftpd/vsftpd.conf
+echo "force_local_data_ssl=YES" >> /etc/vsftpd/vsftpd.conf
+echo "force_local_logins_ssl=YES" >> /etc/vsftpd/vsftpd.conf
+echo "ssl_ciphers=HIGH" >> /etc/vsftpd/vsftpd.conf
+echo "log_ftp_protocol=YES" >> /etc/vsftpd/vsftpd.conf
+echo "require_ssl_reuse=NO" >> /etc/vsftpd/vsftpd.conf
+
+
+
+
+
+
+
+systemctl enable vsftpd.service
+systemctl restart vsftpd.service
+
+
+
 
 # Backup original config
 cp "$SSHD_CONFIG" "$SSHD_CONFIG.bak_$(date +%F_%T)"
@@ -142,22 +230,9 @@ if ! sudo mount -a 2>&1 | tee /etc/mount_errors.log; then
   exit 1
 else
   echo "[SUCCESS] All mounts applied successfully."
-  # if [[ "$ENV" != "production" ]]; then
-  #   ln -s /$USERNAME/S3/$inbound_bucket/inbound-lambda-runs /home/$USERNAME/inbound-lambda-runs
-  #   ln -s /$USERNAME/S3/$outbound_bucket/outbound-lambda-runs /home/$USERNAME/outbound-lambda-runs
-  #   chown -h $USERNAME:$USERNAME /home/$USERNAME/inbound-lambda-runs
-  #   chown -h $USERNAME:$USERNAME /home/$USERNAME/outbound-lambda-runs
-  # fi
   ln -s /$USERNAME/S3/$inbound_bucket /home/$USERNAME/$inbound_bucket
   ln -s /$USERNAME/S3/$outbound_bucket /home/$USERNAME/$outbound_bucket
   chown -h $USERNAME:$USERNAME /home/$USERNAME/$inbound_bucket
   chown -h $USERNAME:$USERNAME /home/$USERNAME/$outbound_bucket
-
 fi
-# EOM
 
-# chmod +x /etc/mount_s3_new.sh
-
-# chmod +x /etc/rc.d/rc.local
-# echo "/etc/mount_s3_new.sh" >> /etc/rc.local
-# systemctl start rc-local.service
