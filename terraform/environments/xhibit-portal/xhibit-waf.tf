@@ -50,7 +50,7 @@ resource "aws_wafv2_web_acl" "prtg_web_acl" {
   description = "AWS WAF Web ACL for PRTG"
 
   default_action {
-    block {}
+    allow {}
   }
 
   rule {
