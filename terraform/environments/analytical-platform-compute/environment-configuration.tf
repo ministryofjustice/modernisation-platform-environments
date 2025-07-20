@@ -37,6 +37,9 @@ locals {
       /* Data Engineering Airflow */
       data_engineering_airflow_execution_role_arn = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/airflow-dev-execution-role"
 
+      /* managed_prometheus_kms_access_iam_policy_arn */
+      managed_prometheus_kms_access_iam_policy_arn = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-compute-development"]}:policy/managed-prometheus-kms-access20240521093109516600000001"
+
       /* UI */
       ui_hostname = "development.analytical-platform.service.justice.gov.uk"
 
@@ -86,12 +89,62 @@ locals {
       /* Data Engineering Airflow */
       data_engineering_airflow_execution_role_arn = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/airflow-dev-execution-role"
 
+      /* managed_prometheus_kms_access_iam_policy_arn */
+      managed_prometheus_kms_access_iam_policy_arn = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-compute-test"]}:policy/managed-prometheus-kms-access20240521093123650600000001"
+
       /* UI */
       ui_hostname = "test.analytical-platform.service.justice.gov.uk"
 
       /* Network Monitoring */
-      hmcts_sdp_endpoints          = {}
-      hmcts_sdp_onecrown_endpoints = {}
+      hmcts_sdp_endpoints = {
+        mipersistentithc-blob = {
+          destination      = "10.168.4.13"
+          destination_port = 443
+        }
+        miexportithc-blob = {
+          destination      = "10.168.4.5"
+          destination_port = 443
+        }
+        mipersistentstg-blob = {
+          destination      = "10.168.3.8"
+          destination_port = 443
+        }
+        miexportstg-blob = {
+          destination      = "10.168.3.7"
+          destination_port = 443
+        }
+        mipersistentprod-blob = {
+          destination      = "10.168.5.13"
+          destination_port = 443
+        }
+        miexportprod-blob = {
+          destination      = "10.168.5.8"
+          destination_port = 443
+        }
+        baisbaumojapnle-blob = {
+          destination      = "10.225.251.100"
+          destination_port = 443
+        }
+        baisbaumojapprod-blob = {
+          destination      = "10.224.251.100"
+          destination_port = 443
+        }
+        miadhoclandingprod-blob = {
+          destination      = "10.168.5.4"
+          destination_port = 443
+        }
+      }
+
+      hmcts_sdp_onecrown_endpoints = {
+        mi-synapse-dev-sql = {
+          destination      = "10.168.1.14"
+          destination_port = 1433
+        }
+        mi-synapse-prod-sql = {
+          destination      = "10.168.5.16"
+          destination_port = 1433
+        }
+      }
     }
     production = {
       /* VPC */
@@ -134,6 +187,9 @@ locals {
 
       /* Data Engineering Airflow */
       data_engineering_airflow_execution_role_arn = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/airflow-prod-execution-role"
+
+      /* managed_prometheus_kms_access_iam_policy_arn */
+      managed_prometheus_kms_access_iam_policy_arn = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-compute-production"]}:policy/managed-prometheus-kms-access20240522102621280000000012"
 
       /* UI */
       ui_hostname = "analytical-platform.service.justice.gov.uk"

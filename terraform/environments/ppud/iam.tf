@@ -829,7 +829,164 @@ resource "aws_iam_policy" "iam_policy_lambda_get_securityhub_data_uat" {
 
 ####################### IAM Roles and Attachments #######################
 
-# TBA
+# Lambda role and attachment for invoking SSM & powershell on EC2 instances
+
+resource "aws_iam_role" "lambda_role_invoke_ssm_prod" {
+  count              = local.is-production == true ? 1 : 0
+  name               = "PPUD_Lambda_Function_Role_Invoke_SSM_Prod"
+  assume_role_policy = <<EOF
+{
+ "Version": "2012-10-17",
+ "Statement": [
+   {
+     "Action": "sts:AssumeRole",
+     "Principal": {
+       "Service": "lambda.amazonaws.com"
+     },
+     "Effect": "Allow",
+     "Sid": ""
+   }
+ ]
+}
+EOF
+}
+
+locals {
+  lambda_invoke_ssm_policies_prod = local.is-production ? {
+    "send_message_to_sqs"      = aws_iam_policy.iam_policy_lambda_send_message_to_sqs_prod[0].arn
+    "send_logs_to_cloudwatch"  = aws_iam_policy.iam_policy_lambda_send_logs_cloudwatch_prod[0].arn
+    "invoke_ssm_powershell"    = aws_iam_policy.iam_policy_lambda_invoke_ssm_powershell_prod[0].arn
+    "invoke_ssm_ec2_instances" = aws_iam_policy.iam_policy_lambda_invoke_ssm_ec2_instances_prod[0].arn
+    "lambda_invoke"            = aws_iam_policy.iam_policy_lambda_invoke_prod[0].arn
+  } : {}
+}
+
+resource "aws_iam_role_policy_attachment" "attach_lambda_policies_invoke_ssm_prod" {
+  for_each   = local.is-production ? local.lambda_invoke_ssm_policies_prod : {}
+  role       = aws_iam_role.lambda_role_invoke_ssm_prod[0].name
+  policy_arn = each.value
+}
+
+# Lambda role and attachment for retrieving data and metrics from cloudwatch
+
+resource "aws_iam_role" "lambda_role_get_cloudwatch_prod" {
+  count              = local.is-production == true ? 1 : 0
+  name               = "PPUD_Lambda_Function_Role_Get_Cloudwatch_Prod"
+  assume_role_policy = <<EOF
+{
+ "Version": "2012-10-17",
+ "Statement": [
+   {
+     "Action": "sts:AssumeRole",
+     "Principal": {
+       "Service": "lambda.amazonaws.com"
+     },
+     "Effect": "Allow",
+     "Sid": ""
+   }
+ ]
+}
+EOF
+}
+
+locals {
+  lambda_get_cloudwatch_policies_prod = local.is-production ? {
+    "send_message_to_sqs"     = aws_iam_policy.iam_policy_lambda_send_message_to_sqs_prod[0].arn
+    "send_logs_to_cloudwatch" = aws_iam_policy.iam_policy_lambda_send_logs_cloudwatch_prod[0].arn
+    "get_cloudwatch_metrics"  = aws_iam_policy.iam_policy_lambda_get_cloudwatch_metrics_prod[0].arn
+    "get_data_s3"             = aws_iam_policy.iam_policy_lambda_get_s3_data_prod[0].arn
+    "get_klayers"             = aws_iam_policy.iam_policy_lambda_get_ssm_parameter_klayers_prod[0].arn
+  } : {}
+}
+
+resource "aws_iam_role_policy_attachment" "attach_lambda_policies_get_cloudwatch_prod" {
+  for_each   = local.is-production ? local.lambda_get_cloudwatch_policies_prod : {}
+  role       = aws_iam_role.lambda_role_get_cloudwatch_prod[0].name
+  policy_arn = each.value
+}
+
+/*
+resource "aws_iam_policy_attachment" "attach_lambda_cloudwatch_full_access_prod_2" {
+  count      = local.is-production == true ? 1 : 0
+  name       = "lambda-cloudwatch-full-access-iam-attachment"
+  roles      = [aws_iam_role.lambda_role_get_cloudwatch_prod[0].id]
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchFullAccessV2"
+}
+*/
+
+# Lambda role and attachment for retrieving security hub data
+
+resource "aws_iam_role" "lambda_role_get_securityhub_data_prod" {
+  count              = local.is-production == true ? 1 : 0
+  name               = "PPUD_Lambda_Function_Role_Get_Securityhub_Data_Prod"
+  assume_role_policy = <<EOF
+{
+ "Version": "2012-10-17",
+ "Statement": [
+   {
+     "Action": "sts:AssumeRole",
+     "Principal": {
+       "Service": "lambda.amazonaws.com"
+     },
+     "Effect": "Allow",
+     "Sid": ""
+   }
+ ]
+}
+EOF
+}
+
+locals {
+  lambda_get_securityhub_policies_prod = local.is-production ? {
+    "send_message_to_sqs"     = aws_iam_policy.iam_policy_lambda_send_message_to_sqs_prod[0].arn
+    "send_logs_to_cloudwatch" = aws_iam_policy.iam_policy_lambda_send_logs_cloudwatch_prod[0].arn
+    "get_securityhub_data"    = aws_iam_policy.iam_policy_lambda_get_securityhub_data_prod[0].arn
+  } : {}
+}
+
+resource "aws_iam_role_policy_attachment" "attach_lambda_policies_get_securityhub_data_prod" {
+  for_each   = local.is-production ? local.lambda_get_securityhub_policies_prod : {}
+  role       = aws_iam_role.lambda_role_get_securityhub_data_prod[0].name
+  policy_arn = each.value
+}
+
+# Lambda role and attachment for retrieving ACM certificate expiry dates
+
+resource "aws_iam_role" "lambda_role_get_certificate_prod" {
+  count              = local.is-production == true ? 1 : 0
+  name               = "PPUD_Lambda_Function_Role_Get_Certificate_Prod"
+  assume_role_policy = <<EOF
+{
+ "Version": "2012-10-17",
+ "Statement": [
+   {
+     "Action": "sts:AssumeRole",
+     "Principal": {
+       "Service": "lambda.amazonaws.com"
+     },
+     "Effect": "Allow",
+     "Sid": ""
+   }
+ ]
+}
+EOF
+}
+
+locals {
+  lambda_get_certificate_policies_prod = local.is-production ? {
+    "send_message_to_sqs"     = aws_iam_policy.iam_policy_lambda_send_message_to_sqs_prod[0].arn
+    "send_logs_to_cloudwatch" = aws_iam_policy.iam_policy_lambda_send_logs_cloudwatch_prod[0].arn
+    "publish_to_sns"          = aws_iam_policy.iam_policy_lambda_publish_to_sns_prod[0].arn
+    "get_certificate"         = aws_iam_policy.iam_policy_lambda_get_certificate_prod[0].arn
+    "get_cloudwatch_metrics"  = aws_iam_policy.iam_policy_lambda_get_cloudwatch_metrics_prod[0].arn
+  } : {}
+}
+
+resource "aws_iam_role_policy_attachment" "attach_lambda_policies_get_certificate_prod" {
+  for_each   = local.is-production ? local.lambda_get_certificate_policies_prod : {}
+  role       = aws_iam_role.lambda_role_get_certificate_prod[0].name
+  policy_arn = each.value
+}
 
 ####################### IAM Policies #######################
 
@@ -1087,6 +1244,26 @@ resource "aws_iam_policy" "iam_policy_lambda_get_securityhub_data_prod" {
   })
 }
 
+resource "aws_iam_policy" "iam_policy_lambda_get_ssm_parameter_klayers_prod" {
+  count       = local.is-production == true ? 1 : 0
+  name        = "aws_iam_policy_for_lambda_get_ssm_parameters_klayers_${local.environment}"
+  path        = "/"
+  description = "Allows lambda functions to get ssm parameters (account ID) for the klayers account"
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "ssm:GetParameter"
+        ],
+        "Resource" : [
+          "arn:aws:ssm:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:parameter/klayers-account"
+        ]
+      }
+    ]
+  })
+}
 
 ##########################################################################################################
 
