@@ -1629,6 +1629,7 @@ resource "aws_iam_role_policy_attachment" "attach_lambda_policy_cloudwatch_invok
 # IAM Role & Policy for Lambda Certificate Expiration - PROD
 ############################################################
 
+/*
 resource "aws_iam_role" "lambda_role_certificate_expiry_prod" {
   count              = local.is-production == true ? 1 : 0
   name               = "PPUD_Lambda_Function_Role_Certificate_Expiry_PROD"
@@ -1729,6 +1730,7 @@ resource "aws_iam_role_policy_attachment" "attach_lambda_policy_certificate_expi
   role       = aws_iam_role.lambda_role_certificate_expiry_prod[0].name
   policy_arn = aws_iam_policy.iam_policy_for_lambda_certificate_expiry_prod[0].arn
 }
+*/
 
 ####################################################
 # IAM User, Policy for MGN
@@ -1919,6 +1921,7 @@ resource "aws_iam_policy_attachment" "attach_lambda_cloudwatch_full_access_prod"
 # IAM Role & Policy for Security Hub report- PROD
 #################################################
 
+/*
 resource "aws_iam_role" "lambda_role_securityhub_get_data_prod" {
   count              = local.is-production == true ? 1 : 0
   name               = "PPUD_Lambda_Function_Role_Securityhub_Get_Data_Prod"
@@ -2006,7 +2009,7 @@ resource "aws_iam_role_policy_attachment" "lambda_vpc_access_policy_to_lambda_ro
   role       = aws_iam_role.lambda_role_securityhub_get_data_prod[0].id
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
 }
-
+*/
 
 #########################################################
 # IAM Role & Policy for S3 Bucket Replication to CP - DEV
