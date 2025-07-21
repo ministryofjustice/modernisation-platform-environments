@@ -91,13 +91,12 @@ resource "aws_s3_bucket_policy" "inbound_bucket_policy" {
           aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].arn,
           "${aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].arn}/*"
         ]
-      }
-
-/*       {
+      },
+      {
           "Sid": "Access_for_s3_transfer_family_list",
           "Effect": "Allow",
           "Principal": {
-              "AWS": ["${module.transfer_family.grant_iam_role_arn}"]
+              "AWS": ["${module.transfer_family[0].grant_iam_role_arn}"]
           },
           "Action": ["s3:ListBucket"],
           "Resource": ["${aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].arn}"]
@@ -106,7 +105,7 @@ resource "aws_s3_bucket_policy" "inbound_bucket_policy" {
           "Sid": "Access_for_s3_transfer_family_contents",
           "Effect": "Allow",
           "Principal": {
-              "AWS": ["${module.transfer_family.grant_iam_role_arn}"]
+              "AWS": ["${module.transfer_family[0].grant_iam_role_arn}"]
           },
           "Action": [
               "s3:GetObject",
@@ -120,7 +119,7 @@ resource "aws_s3_bucket_policy" "inbound_bucket_policy" {
               "s3:AbortMultipartUpload"
           ],
           "Resource": ["${aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].arn}/*"]
-      } */
+      }
     ]
     }
   )
