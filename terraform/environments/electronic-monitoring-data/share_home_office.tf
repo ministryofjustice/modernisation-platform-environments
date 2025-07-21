@@ -1,5 +1,5 @@
 data "aws_secretsmanager_secret_version" "home_office_account_id" {
-  count = local.is-production ? 1 : 0
+  count     = local.is-production ? 1 : 0
   secret_id = aws_secretsmanager_secret.home_office_account_id[0].id
 }
 
@@ -9,7 +9,7 @@ locals {
 }
 
 resource "aws_lakeformation_permissions" "home_office_share_bucket" {
-  count = local.is-production ? 1 : 0
+  count       = local.is-production ? 1 : 0
   principal   = local.ho_role_arn
   permissions = ["DATA_LOCATION_ACCESS"]
   data_location {
@@ -18,7 +18,7 @@ resource "aws_lakeformation_permissions" "home_office_share_bucket" {
 }
 
 resource "aws_lakeformation_permissions" "home_office_share_database" {
-  count = local.is-production ? 1 : 0
+  count       = local.is-production ? 1 : 0
   principal   = local.ho_role_arn
   permissions = ["DESCRIBE"]
   database {
@@ -27,7 +27,7 @@ resource "aws_lakeformation_permissions" "home_office_share_database" {
 }
 
 resource "aws_lakeformation_permissions" "home_office_share_table" {
-  count = local.is-production ? 1 : 0
+  count       = local.is-production ? 1 : 0
   principal   = local.ho_role_arn
   permissions = ["SELECT"]
   table {

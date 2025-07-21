@@ -177,6 +177,6 @@ locals {
     iam_policies = {
     }
 
-    
+
   }
 }

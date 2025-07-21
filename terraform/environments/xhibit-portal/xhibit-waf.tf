@@ -1,8 +1,8 @@
 module "waf" {
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-waf?ref=ecc855f212ce6a2f36a7a77e78c42d968f15ee8d"
-  enable_ddos_protection = true
-  ddos_rate_limit        = 3000
-  block_non_uk_traffic   = true
+  source                   = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-waf?ref=ecc855f212ce6a2f36a7a77e78c42d968f15ee8d"
+  enable_ddos_protection   = true
+  ddos_rate_limit          = 3000
+  block_non_uk_traffic     = true
   associated_resource_arns = [aws_lb.waf_lb.arn]
 
   managed_rule_actions = {
@@ -13,7 +13,7 @@ module "waf" {
     AWSManagedRulesAnonymousIpList       = false
     AWSManagedRulesBotControlRuleSet     = false
   }
-  
+
   core_logging_account_id = local.environment_management.account_ids["core-logging-production"]
 
   application_name = local.application_name
@@ -129,9 +129,9 @@ resource "aws_wafv2_web_acl" "prtg_web_acl" {
   )
 
   visibility_config {
-      cloudwatch_metrics_enabled = true
-      metric_name                = "prtg-waf"
-      sampled_requests_enabled   = true
+    cloudwatch_metrics_enabled = true
+    metric_name                = "prtg-waf"
+    sampled_requests_enabled   = true
   }
 }
 

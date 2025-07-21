@@ -96,7 +96,7 @@ resource "aws_instance" "ec2_oracle_ebs" {
 
 resource "aws_ebs_volume" "export_home" {
   lifecycle {
-   ignore_changes = [
+    ignore_changes = [
       kms_key_id,
       tags
     ]
@@ -246,7 +246,7 @@ resource "aws_volume_attachment" "backup_att" {
 
 resource "aws_ebs_volume" "backup_clone" {
   lifecycle {
-   ignore_changes = [
+    ignore_changes = [
       kms_key_id,
       tags
     ]
@@ -274,7 +274,7 @@ resource "aws_volume_attachment" "backup_clone_att" {
 
 resource "aws_ebs_volume" "backup_prod" {
   lifecycle {
-   ignore_changes = [
+    ignore_changes = [
       kms_key_id,
       tags
     ]
@@ -302,7 +302,7 @@ resource "aws_volume_attachment" "backup_prod_att" {
 
 resource "aws_ebs_volume" "redoB" {
   lifecycle {
-   ignore_changes = [
+    ignore_changes = [
       kms_key_id,
       tags
     ]
@@ -529,10 +529,10 @@ resource "aws_volume_attachment" "dbf2_att" {
 module "cw-ebs-ec2" {
   source = "./modules/cw-ec2"
 
-  short_env    = local.application_data.accounts[local.environment].short_env
-  name         = "ec2-ebs"
-  topic        = aws_sns_topic.cw_alerts.arn
-  instanceId   = aws_instance.ec2_oracle_ebs.id
+  short_env  = local.application_data.accounts[local.environment].short_env
+  name       = "ec2-ebs"
+  topic      = aws_sns_topic.cw_alerts.arn
+  instanceId = aws_instance.ec2_oracle_ebs.id
   # imageId      = local.environment == "development" ? local.application_data.accounts[local.environment].restored_db_image : data.aws_ami.oracle_db.id
   imageId      = local.application_data.accounts[local.environment].ebsdb_ami_id
   instanceType = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ebsdb

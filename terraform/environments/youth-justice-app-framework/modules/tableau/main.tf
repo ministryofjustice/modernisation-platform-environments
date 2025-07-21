@@ -66,7 +66,7 @@ module "tableau-alb" {
 
   enable_deletion_protection = local.enable_deletion_protection
 
-# LB Attributes
+  # LB Attributes
   idle_timeout               = 360
   drop_invalid_header_fields = false
 
