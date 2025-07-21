@@ -7,4 +7,3 @@ module "transfer_family" {
   aws_identity_centre_store_arn    = local.application_data.accounts[local.environment].cash_office_idp_arn
   aws_identity_centre_sso_group_id = local.application_data.accounts[local.environment].cash_office_sso_group_id
 }
-

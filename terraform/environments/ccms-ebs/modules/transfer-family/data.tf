@@ -53,8 +53,8 @@ data "aws_iam_policy_document" "s3_assume_role" {
     }
   }
   statement {
-    sid    = "AccessGrantsTrustPolicyWithIDCContext"
-    effect = "Allow"
+    sid     = "AccessGrantsTrustPolicyWithIDCContext"
+    effect  = "Allow"
     actions = ["sts:SetContext"]
     principals {
       type        = "Service"
