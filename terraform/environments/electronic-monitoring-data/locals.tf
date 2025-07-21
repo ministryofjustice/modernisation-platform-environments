@@ -9,6 +9,7 @@ locals {
   ]
   capita_cidr_ipv4s = [
     "195.59.155.38/32",
+    "195.180.32.164/32"
   ]
   capita_cidr_ipv6s = []
 
