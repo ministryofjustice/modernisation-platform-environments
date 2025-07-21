@@ -566,6 +566,44 @@ resource "aws_iam_role_policy_attachment" "attach_lambda_policies_get_certificat
   policy_arn = each.value
 }
 
+
+# Lambda role and attachment for ses logging
+
+resource "aws_iam_role" "lambda_role_get_ses_logging_uat" {
+  count              = local.is-preproduction == true ? 1 : 0
+  name               = "PPUD_Lambda_Function_Role_Get_SES_Logging_UAT"
+  assume_role_policy = <<EOF
+{
+ "Version": "2012-10-17",
+ "Statement": [
+   {
+     "Action": "sts:AssumeRole",
+     "Principal": {
+       "Service": "lambda.amazonaws.com"
+     },
+     "Effect": "Allow",
+     "Sid": ""
+   }
+ ]
+}
+EOF
+}
+
+locals {
+  lambda_get_ses_logging_policies_uat = local.is-preproduction ? {
+    "send_message_to_sqs"     = aws_iam_policy.iam_policy_lambda_send_message_to_sqs_uat[0].arn
+    "send_logs_to_cloudwatch" = aws_iam_policy.iam_policy_lambda_send_logs_cloudwatch_uat[0].arn
+    "publish_to_sns"          = aws_iam_policy.iam_policy_lambda_publish_to_sns_uat[0].arn
+    "put_data_s3"             = aws_iam_policy.iam_policy_lambda_put_s3_data_uat[0]arn
+  } : {}
+}
+
+resource "aws_iam_role_policy_attachment" "attach_lambda_policies_get_ses_logging_uat" {
+  for_each   = local.is-preproduction ? local.lambda_get_ses_logging_policies_uat : {}
+  role       = aws_iam_role.lambda_role_get_ses_logging_uat[0].name
+  policy_arn = each.value
+}
+
 ####################### IAM Policies #######################
 
 resource "aws_iam_policy" "iam_policy_lambda_send_message_to_sqs_uat" {
@@ -774,6 +812,30 @@ resource "aws_iam_policy" "iam_policy_lambda_get_s3_data_uat" {
         "Resource" : [
           "arn:aws:s3:::moj-infrastructure-uat",
           "arn:aws:s3:::moj-infrastructure-uat/*"
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy" "iam_policy_lambda_put_s3_data_uat" {
+  count       = local.is-preproduction == true ? 1 : 0
+  name        = "aws_iam_policy_for_lambda_put_s3_data_${local.environment}"
+  path        = "/"
+  description = "Allows lambda functions to put data into S3"
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "s3:PutObject",
+          "s3:PutObjectAcl",
+          "s3:ListBucket"
+        ],
+        "Resource" : [
+          "arn:aws:s3:::moj-log-files-uat",
+          "arn:aws:s3:::moj-log-files--uat/*"
         ]
       }
     ]
