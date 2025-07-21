@@ -1,5 +1,6 @@
 locals {
   servicenow_credentials_placeholder = {"USERNAME":"placeholder", "PASSWORD": "placeholders"}
+  underscore_env                     = local.is-production ? "" : "_${local.environment_shorthand}"
 }
 
 resource "aws_secretsmanager_secret" "servicenow_credentials" {
@@ -87,13 +88,27 @@ resource "aws_iam_role_policy_attachment" "glue_connection_snow_access" {
     policy_arn = aws_iam_policy.glue_connection_snow_access.arn
 }
 
-# resource "aws_glue_connection" "servicenow" {
-#   name            = "servicenow-connector"
-#   connection_type = "SERVICENOW"
-#   connection_properties = {
-#     SECRET_ID = "net.snowflake.client.jdbc.SnowflakeDriver"
-#     CONNECTION_TYPE      = "Jdbc"
-#     CONNECTOR_URL        = "s3://example/snowflake-jdbc.jar" # S3 path to the snowflake jdbc jar
-#     JDBC_CONNECTION_URL  = "[[\"default=jdbc❄//example.com/?user=$${user}&password=$${password}\"],\",\"]"
-#   }
-# }
+resource "aws_lakeformation_permissions" "zero_etl_s3_access" {
+  principal   = aws_iam_role.glue_connection_snow_access.arn
+  permissions = ["DATA_LOCATION_ACCESS"]
+  data_location {
+    arn = aws_lakeformation_resource.data_bucket.arn
+  }
+}
+
+resource "aws_lakeformation_permissions" "zero_etl_db_access" {
+  principal   = aws_iam_role.glue_connection_snow_access.arn
+  permissions = ["ALL"]
+  database {
+    name = "servicenow${local.underscore_env}"
+  }
+}
+
+resource "aws_lakeformation_permissions" "zero_etl_table_access" {
+  principal   = aws_iam_role.glue_connection_snow_access.arn
+  permissions = ["ALL"]
+  table {
+    database_name = "servicenow${local.underscore_env}"
+    wildcard      = true
+  }
+}
