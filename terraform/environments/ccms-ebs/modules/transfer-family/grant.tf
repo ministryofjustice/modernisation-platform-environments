@@ -15,6 +15,9 @@ resource "aws_s3control_access_grant" "this" {
   permission                = "READWRITE"
   access_grants_location_id = aws_s3control_access_grants_location.this.id
   account_id                = var.aws_account_id
+  access_grants_location_configuration {
+    s3_sub_prefix = "${var.bucket_name}/"
+  }
   grantee {
     grantee_type       = "DIRECTORY_GROUP"
     grantee_identifier = var.aws_identity_centre_sso_group_id
