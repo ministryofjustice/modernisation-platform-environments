@@ -128,7 +128,7 @@ data "aws_iam_policy_document" "s3" {
     condition {
       test     = "StringEquals"
       variable = "aws:ResourceAccount"
-      values   = ["arn:aws:s3:::${var.aws_account_id}"]
+      values   = ["${var.aws_account_id}"]
     }
     condition {
       test     = "ArnEquals"

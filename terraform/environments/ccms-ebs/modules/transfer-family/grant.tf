@@ -14,6 +14,7 @@ resource "aws_s3control_access_grant" "this" {
   depends_on                = [aws_s3control_access_grants_instance.this]
   permission                = "READWRITE"
   access_grants_location_id = aws_s3control_access_grants_location.this.id
+  account_id                = var.aws_account_id
   grantee {
     grantee_type       = "DIRECTORY_GROUP"
     grantee_identifier = var.aws_identity_centre_sso_group_id
