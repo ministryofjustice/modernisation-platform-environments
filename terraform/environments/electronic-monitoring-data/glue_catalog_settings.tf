@@ -18,7 +18,7 @@ data "aws_iam_policy_document" "glue-policy" {
     ]
   }
   statement {
-    sid = "AllowGlueServiceInboundIntegration"
+    sid    = "AllowGlueServiceInboundIntegration"
     effect = "Allow"
     principals {
       type        = "Service"
@@ -47,10 +47,10 @@ data "aws_iam_policy_document" "glue-policy" {
     ]
   }
   statement {
-    effect = "Allow"
+    effect  = "Allow"
     actions = ["glue:ShareResource"]
     principals {
-      type = "Service"
+      type        = "Service"
       identifiers = ["ram.amazonaws.com"]
     }
     resources = [

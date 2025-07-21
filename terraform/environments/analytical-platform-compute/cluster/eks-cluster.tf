@@ -15,7 +15,7 @@ module "eks" {
   cluster_endpoint_public_access  = true
 
   vpc_id                   = data.aws_vpc.apc.id
-  control_plane_subnet_ids = data.aws_subnets.apc_intra.ids 
+  control_plane_subnet_ids = data.aws_subnets.apc_intra.ids
   subnet_ids               = data.aws_subnets.apc_private.ids
   cluster_security_group_additional_rules = {
     vpc = {

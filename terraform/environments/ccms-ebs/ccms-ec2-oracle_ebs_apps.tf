@@ -166,10 +166,10 @@ module "cw-ebsapps-ec2" {
   source = "./modules/cw-ec2"
   count  = local.application_data.accounts[local.environment].ebsapps_no_instances
 
-  short_env    = local.application_data.accounts[local.environment].short_env
-  name         = "ec2-ebsapps-${count.index + 1}"
-  topic        = aws_sns_topic.cw_alerts.arn
-  instanceId   = aws_instance.ec2_ebsapps[count.index].id
+  short_env  = local.application_data.accounts[local.environment].short_env
+  name       = "ec2-ebsapps-${count.index + 1}"
+  topic      = aws_sns_topic.cw_alerts.arn
+  instanceId = aws_instance.ec2_ebsapps[count.index].id
   # imageId      = data.aws_ami.oracle_base_prereqs.id
   imageId      = local.application_data.accounts[local.environment]["ebsapps_ami_id-${count.index + 1}"]
   instanceType = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ebsapps

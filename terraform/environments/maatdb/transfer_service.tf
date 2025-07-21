@@ -19,9 +19,9 @@ locals {
 
 
   transfer_service = {
-    job_name          = "xhibit-inbound"
-    bucket_name       = try(module.s3_bucket.inbound.bucket.bucket, "")
-    bucket_folder     = "temp/"
+    job_name      = "xhibit-inbound"
+    bucket_name   = try(module.s3_bucket.inbound.bucket.bucket, "")
+    bucket_folder = "temp/"
   }
 
 }
