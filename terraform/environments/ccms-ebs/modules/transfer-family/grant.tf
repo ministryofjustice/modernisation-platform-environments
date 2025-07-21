@@ -16,7 +16,7 @@ resource "aws_s3control_access_grant" "this" {
   access_grants_location_id = aws_s3control_access_grants_location.this.id
   account_id                = var.aws_account_id
   access_grants_location_configuration {
-    s3_sub_prefix = "${var.bucket_name}/"
+    s3_sub_prefix = "*"
   }
   grantee {
     grantee_type       = "DIRECTORY_GROUP"
