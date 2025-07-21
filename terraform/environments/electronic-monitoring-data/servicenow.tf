@@ -40,7 +40,8 @@ data "aws_iam_policy_document" "glue_connection_snow" {
         "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:catalog",
         "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:schema/*",
         "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/*/*",
-        "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/*"
+        "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/*",
+        "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:connection/*"
       ]
     }
     statement {
