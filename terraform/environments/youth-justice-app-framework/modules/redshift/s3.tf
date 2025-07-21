@@ -40,7 +40,6 @@ resource "aws_s3_bucket_policy" "default" {
       },
       "Action": [
         "s3:GetBucketLocation",
-        "s3:ListAllMyBuckets",
         "s3:ListBucket",
         "s3:GetObject"
       ],
