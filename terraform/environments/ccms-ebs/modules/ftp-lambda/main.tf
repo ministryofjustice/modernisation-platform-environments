@@ -1,11 +1,4 @@
 
-# locals {
-#   lambda_src_dir = "${path.module}/lambda/ftp-client"
-#   lambda_zip     = "${path.module}/lambda/ftp-client/ftp-client.zip"
-#   # layer_src_dir = "${path.module}/lambda/lambda-layer"
-#   # layer_output_dir = "${path.module}/lambda/output"
-# }
-
 ## sg for ftp
 resource "aws_security_group" "ftp_sg" {
   name        = "${var.lambda_name}-sg"
@@ -59,12 +52,12 @@ resource "aws_iam_policy" "ftp_policy" {
         ]
       },
       {
-        Action: [
-                "secretsmanager:GetSecretValue",
-                "secretsmanager:DescribeSecret",
-                "secretsmanager:ListSecretVersionIds"
+        Action : [
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:DescribeSecret",
+          "secretsmanager:ListSecretVersionIds"
         ],
-        Effect = "Allow",
+        Effect   = "Allow",
         Resource = var.secret_arn
       }
     ]
@@ -79,26 +72,10 @@ resource "aws_iam_role_policy_attachment" "ftp_lambda_policy_attach" {
   policy_arn = aws_iam_policy.ftp_policy.arn
 }
 
-# Create ZIP archive of lambda_code/
-# data "archive_file" "lambda_zip" {
-#   type        = "zip"
-#   source_dir  = local.lambda_src_dir
-#   output_path = local.lambda_zip
-# }
-
-
-# # Create ZIP archive of lambda layer/
-# data "archive_file" "lambda_layer" {
-#   type        = "zip"
-#   source_dir  = local.layer_src_dir   # folder containing 'python/' directory
-#   output_path = "${local.layer_output_dir}/lambda-layer.zip"
-# }
-
-
 ### lambda layer for python dependencies
 resource "aws_lambda_layer_version" "ftp_layer" {
-  layer_name               = "ftpclientlayer"
-  compatible_runtimes      = ["python3.13"]
+  layer_name          = "ftpclientlayer"
+  compatible_runtimes = ["python3.13"]
   # filename    = data.archive_file.lambda_layer.output_path
   # source_code_hash = data.archive_file.lambda_layer.output_base64sha256
   s3_bucket                = var.s3_bucket_ftp
@@ -114,7 +91,7 @@ resource "aws_lambda_function" "ftp_lambda" {
   runtime       = "python3.13"
   timeout       = 900
   memory_size   = 256
-  layers    = [aws_lambda_layer_version.ftp_layer.arn]
+  layers        = [aws_lambda_layer_version.ftp_layer.arn]
   # filename      = data.archive_file.lambda_zip.output_path
   # source_code_hash = data.archive_file.lambda_zip.output_base64sha256
   s3_bucket = var.s3_bucket_ftp
@@ -127,41 +104,44 @@ resource "aws_lambda_function" "ftp_lambda" {
 
   environment {
     variables = {
-      PORT         = var.ftp_port
-      PROTOCOL     = var.ftp_protocol
-      FILETYPES    = var.ftp_file_types
-      TRANSFERTYPE = var.ftp_transfer_type
-      LOCALPATH    = var.ftp_local_path
-      REMOTEPATH   = var.ftp_remote_path
-      REQUIRE_SSL  = var.ftp_require_ssl
-      CA_CERT      = var.ftp_ca_cert
-      CERT         = var.ftp_cert
-      KEY          = var.ftp_key
-      KEY_TYPE     = var.ftp_key_type
-      S3BUCKET     = var.ftp_bucket
-      FILEREMOVE   = var.ftp_file_remove
-      SKIP_KEY_VERIFICATION= var.skip_key_verification
-      SECRET_NAME = var.secret_name
+      PORT                  = var.ftp_port
+      PROTOCOL              = var.ftp_protocol
+      FILETYPES             = var.ftp_file_types
+      TRANSFERTYPE          = var.ftp_transfer_type
+      LOCALPATH             = var.ftp_local_path
+      REMOTEPATH            = var.ftp_remote_path
+      REQUIRE_SSL           = var.ftp_require_ssl
+      CA_CERT               = var.ftp_ca_cert
+      CERT                  = var.ftp_cert
+      KEY                   = var.ftp_key
+      KEY_TYPE              = var.ftp_key_type
+      S3BUCKET              = var.ftp_bucket
+      FILEREMOVE            = var.ftp_file_remove
+      SKIP_KEY_VERIFICATION = var.skip_key_verification
+      SECRET_NAME           = var.secret_name
     }
   }
 }
-### cw rule for schedule
-resource "aws_cloudwatch_event_rule" "ftp_schedule" {
-  name                = "${var.lambda_name}-schedule"
-  schedule_expression = var.ftp_cron
-}
-### cw event lambda target
-resource "aws_cloudwatch_event_target" "ftp_target" {
-  rule      = aws_cloudwatch_event_rule.ftp_schedule.name
-  target_id = "ftp-lambda"
-  arn       = aws_lambda_function.ftp_lambda.arn
-}
+# ### cw rule for schedule
+# resource "aws_cloudwatch_event_rule" "ftp_schedule" {
+#   count               = var.env == "production" ? 1 : 0
+#   name                = "${var.lambda_name}-schedule"
+#   schedule_expression = var.ftp_cron
+# }
+# ### cw event lambda target
+# resource "aws_cloudwatch_event_target" "ftp_target" {
+#   count     = var.env == "production" ? 1 : 0
+#   rule      = aws_cloudwatch_event_rule.ftp_schedule[count.index].name
+#   target_id = "ftp-lambda"
+#   arn       = aws_lambda_function.ftp_lambda.arn
+# }
 
-### attaching lambda iam role to inbound bucket
-resource "aws_lambda_permission" "ftp_permission" {
-  statement_id  = "AllowExecutionFromCloudWatch"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.ftp_lambda.function_name
-  principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.ftp_schedule.arn
-}
+# ### allow cw to event in lambda
+# resource "aws_lambda_permission" "ftp_permission" {
+#   count         = var.env == "production" ? 1 : 0
+#   statement_id  = "AllowExecutionFromCloudWatch"
+#   action        = "lambda:InvokeFunction"
+#   function_name = aws_lambda_function.ftp_lambda.function_name
+#   principal     = "events.amazonaws.com"
+#   source_arn    = aws_cloudwatch_event_rule.ftp_schedule[count.index].arn
+# }

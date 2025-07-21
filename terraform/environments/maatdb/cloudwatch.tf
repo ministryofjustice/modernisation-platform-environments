@@ -51,6 +51,51 @@ resource "aws_cloudwatch_metric_alarm" "rds_alarms" {
 
 }
 
+# Cloudwatch resources for the FTP and ZIP Lambdas
+
+# Note that we only build these if the rest of the lambda infrastructure is flagged for creation via local.build_ftp
+
+resource "aws_cloudwatch_metric_alarm" "ftp_lambda_error" {
+  count               = local.build_ftp ? 1 : 0
+  alarm_name          = "${aws_lambda_function.ftp[0].function_name}-errors"
+  alarm_description   = "Alarm for ${aws_lambda_function.ftp[0].function_name} function errors"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  metric_name         = "Errors"
+  namespace           = "AWS/Lambda"
+  period              = 300
+  statistic           = "Sum"
+  threshold           = 0
+  treat_missing_data  = "missing"
+
+  dimensions = {
+    FunctionName = aws_lambda_function.ftp[0].function_name
+  }
+
+  alarm_actions = [aws_sns_topic.maatdb_alerting_topic.arn] # optional
+}
+
+resource "aws_cloudwatch_metric_alarm" "zip_lambda_error" {
+  count               = local.build_ftp ? 1 : 0
+  alarm_name          = "${aws_lambda_function.zip[0].function_name}-errors"
+  alarm_description   = "Alarm for ${aws_lambda_function.zip[0].function_name} function errors"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  metric_name         = "Errors"
+  namespace           = "AWS/Lambda"
+  period              = 300
+  statistic           = "Sum"
+  threshold           = 0
+  treat_missing_data  = "missing"
+
+  dimensions = {
+    FunctionName = aws_lambda_function.zip[0].function_name
+  }
+
+  alarm_actions = [aws_sns_topic.maatdb_alerting_topic.arn]
+}
+
+
 
 ####### CLOUDWATCH PAGERDUTY ALERTING
 

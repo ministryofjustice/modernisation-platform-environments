@@ -126,10 +126,10 @@ locals {
         })
       })
 
-      test-rds-2-b = merge(local.ec2_instances.rds, {
+      test-rds-1-a = merge(local.ec2_instances.rds, {
         config = merge(local.ec2_instances.rds.config, {
           ami_name          = "hmpps_windows_server_2022_release_2025-04-02T00-00-40.543Z"
-          availability_zone = "eu-west-2b"
+          availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.ec2_instances.rds.config.instance_profile_policies, [
             "Ec2SecretPolicy"]
           )
@@ -142,7 +142,6 @@ locals {
         tags = merge(local.ec2_instances.rds.tags, {
           domain-name = "azure.noms.root"
         })
-        cloudwatch_metric_alarms = null
       })
     }
 
@@ -174,7 +173,7 @@ locals {
           })
           test-rds-1-https = merge(local.lbs.public.instance_target_groups.https, {
             attachments = [
-              { ec2_instance_name = "test-rds-2-b" },
+              { ec2_instance_name = "test-rds-1-a" },
             ]
           })
         }

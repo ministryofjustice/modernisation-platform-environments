@@ -62,6 +62,7 @@ resource "aws_security_group" "sftp_sg" {
   vpc_id      = data.aws_vpc.shared.id
 
   ingress {
+    description = "SSH outbound"
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
@@ -69,6 +70,7 @@ resource "aws_security_group" "sftp_sg" {
   }
 
   egress {
+    description = "SSH inbound"
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
@@ -76,6 +78,7 @@ resource "aws_security_group" "sftp_sg" {
   }
 
   egress {
+    description = "SSM endpoint access"
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
@@ -93,13 +96,21 @@ data "aws_ami" "amazon_linux_2023" {
   }
 }
 
+# trivy:ignore:AVD-AWS-0131
 resource "aws_instance" "sftp_server" {
+  #checkov:skip=CKV_AWS_8:"EBS encryption using shared KMS is enforced by account default."
+  #checkov:skip=CKV_AWS_135:"EC2 used for sftp testing only."
   count                  = local.build_ec2 ? 1 : 0
   ami                    = data.aws_ami.amazon_linux_2023.id
   instance_type          = "t3.micro"
   subnet_id              = data.aws_subnet.private_subnets_a.id
   vpc_security_group_ids = [aws_security_group.sftp_sg[0].id]
   iam_instance_profile   = aws_iam_instance_profile.ssm_profile[0].name
+
+  metadata_options {
+    http_tokens   = "required" # Force use of IMDSv2
+    http_endpoint = "enabled"  # Enable IMDS access
+  }
 
   tags = merge(
     local.tags,

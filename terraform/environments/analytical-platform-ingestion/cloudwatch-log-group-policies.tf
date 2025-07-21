@@ -17,7 +17,7 @@ data "aws_iam_policy_document" "datasync_cloudwatch_logs" {
     condition {
       test     = "ArnLike"
       variable = "aws:SourceArn"
-      values   = ["arn:aws:datasync:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:task/*"]
+      values   = ["arn:aws:datasync:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:task/*"]
     }
     condition {
       test     = "StringEquals"
