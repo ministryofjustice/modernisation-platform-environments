@@ -22,10 +22,13 @@ locals {
     "derived",
     "testing",
   ]
-  live_feeds_dbs = [
+  live_feeds_dbs = local.is-test ? [
     "servicenow",
     "serco_fms",
     "allied_mdss",
+  ] : [
+    "servicenow",
+    "serco_fms"
   ]
   prod_dbs_to_grant = local.is-production ? [
     "am_stg",
