@@ -108,8 +108,8 @@ resource "aws_instance" "sftp_server" {
   iam_instance_profile   = aws_iam_instance_profile.ssm_profile[0].name
 
   metadata_options {
-    http_tokens   = "required"       # Force use of IMDSv2
-    http_endpoint = "enabled"        # Enable IMDS access
+    http_tokens   = "required" # Force use of IMDSv2
+    http_endpoint = "enabled"  # Enable IMDS access
   }
 
   tags = merge(

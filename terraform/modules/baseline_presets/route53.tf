@@ -30,7 +30,7 @@ locals {
         var.ip_addresses.mp_ips.ad_fixngo_hmpp_domain_controllers,
         var.ip_addresses.azure_fixngo_ips.prod.domain_controllers,
       ])
-      rule_type   = "FORWARD"
+      rule_type = "FORWARD"
     }
     infra-int-domain-hmpp-forest-trust = {
       domain_name = "infra.int"
@@ -38,7 +38,7 @@ locals {
         var.ip_addresses.mp_ips.ad_fixngo_hmpp_domain_controllers,
         var.ip_addresses.azure_fixngo_ips.prod.domain_controllers,
       ])
-      rule_type   = "FORWARD"
+      rule_type = "FORWARD"
     }
   }
 

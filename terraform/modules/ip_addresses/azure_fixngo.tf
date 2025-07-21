@@ -2,11 +2,11 @@ locals {
 
   azure_fixngo_ip = {
     # Prod Domain Controllers
-    PCMCW0011    = "10.40.128.196"
-    PCMCW0012    = "10.40.0.133"
+    PCMCW0011 = "10.40.128.196"
+    PCMCW0012 = "10.40.0.133"
 
     # DevTest Domain Controllers
-    MGMCW0002     = "10.102.0.196"
+    MGMCW0002 = "10.102.0.196"
   }
 
   azure_fixngo_ips = {
