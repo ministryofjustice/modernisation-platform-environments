@@ -1,4 +1,5 @@
 locals {
+  #checkov:ignore=CKV_SECRET_6 placeholder
   servicenow_credentials_placeholder = {"USERNAME":"placeholder", "PASSWORD": "placeholders"}
   underscore_env                     = local.is-production ? "" : "_${local.environment_shorthand}"
 }

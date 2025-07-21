@@ -505,6 +505,7 @@ resource "aws_iam_role" "zero_etl_snow" {
 }
 
 data "aws_iam_policy_document" "zero_etl_snow" {
+  #checkov:ignore=CKV_AWS_111 - glue star
   statement {
     sid = "AllowIntegrationDeploymentDestruction"
     effect = "Allow"
