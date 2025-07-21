@@ -65,8 +65,8 @@
 #   number_of_workers = 8
 #   default_arguments = {
 #     "--script_bucket_name"                = module.s3-glue-job-script-bucket.bucket.id
-#     "--rds_db_host_ep"                    = split(":", aws_db_instance.database_2022.endpoint)[0]
-#     "--rds_db_pwd"                        = aws_db_instance.database_2022.password
+#     "--rds_db_host_ep"                    = split(":", aws_db_instance.database_2022[0].endpoint)[0]
+#     "--rds_db_pwd"                        = aws_db_instance.database_2022[0].password
 #     "--rds_sqlserver_db"                  = ""
 #     "--rds_sqlserver_db_schema"           = "dbo"
 #     "--rds_exclude_db_tbls"               = ""
@@ -126,8 +126,8 @@
 #   number_of_workers = 5
 #   default_arguments = {
 #     "--script_bucket_name"                = module.s3-glue-job-script-bucket.bucket.id
-#     "--rds_db_host_ep"                    = split(":", aws_db_instance.database_2022.endpoint)[0]
-#     "--rds_db_pwd"                        = aws_db_instance.database_2022.password
+#     "--rds_db_host_ep"                    = split(":", aws_db_instance.database_2022[0].endpoint)[0]
+#     "--rds_db_pwd"                        = aws_db_instance.database_2022[0].password
 #     "--prq_leftanti_join_rds"             = "false"
 #     "--parquet_df_repartition_num"        = 32
 #     "--parallel_jdbc_conn_num"            = 4
@@ -182,8 +182,8 @@
 #   number_of_workers = 5
 #   default_arguments = {
 #     "--script_bucket_name"                   = module.s3-glue-job-script-bucket.bucket.id
-#     "--rds_db_host_ep"                       = split(":", aws_db_instance.database_2022.endpoint)[0]
-#     "--rds_db_pwd"                           = aws_db_instance.database_2022.password
+#     "--rds_db_host_ep"                       = split(":", aws_db_instance.database_2022[0].endpoint)[0]
+#     "--rds_db_pwd"                           = aws_db_instance.database_2022[0].password
 #     "--rds_sqlserver_db"                     = ""
 #     "--rds_sqlserver_db_schema"              = "dbo"
 #     "--rds_sqlserver_db_table"               = ""
@@ -250,8 +250,8 @@
 #   number_of_workers = 5
 #   default_arguments = {
 #     "--script_bucket_name"               = module.s3-glue-job-script-bucket.bucket.id
-#     "--rds_db_host_ep"                   = split(":", aws_db_instance.database_2022.endpoint)[0]
-#     "--rds_db_pwd"                       = aws_db_instance.database_2022.password
+#     "--rds_db_host_ep"                   = split(":", aws_db_instance.database_2022[0].endpoint)[0]
+#     "--rds_db_pwd"                       = aws_db_instance.database_2022[0].password
 #     "--rds_sqlserver_db"                 = ""
 #     "--rds_sqlserver_db_schema"          = "dbo"
 #     "--rds_sqlserver_db_table"           = ""

@@ -4,7 +4,7 @@ resource "aws_dms_replication_subnet_group" "dms_replication_subnet_group" {
   replication_subnet_group_description = "RDS subnet group"
   replication_subnet_group_id          = "rds-replication-subnet-group-tf"
 
-  subnet_ids = tolist(aws_db_subnet_group.db.subnet_ids)
+  subnet_ids = tolist(aws_db_subnet_group.db[0].subnet_ids)
 
   tags = merge(
     local.tags,

@@ -54,8 +54,8 @@ resource "aws_glue_job" "dms_dv_rds_to_s3_parquet_v1" {
   number_of_workers = 4
   default_arguments = {
     "--script_bucket_name"               = module.s3-glue-job-script-bucket.bucket.id
-    "--rds_db_host_ep"                   = split(":", aws_db_instance.database_2022.endpoint)[0]
-    "--rds_db_pwd"                       = aws_db_instance.database_2022.password
+    "--rds_db_host_ep"                   = split(":", aws_db_instance.database_2022[0].endpoint)[0]
+    "--rds_db_pwd"                       = aws_db_instance.database_2022[0].password
     "--rds_sqlserver_db"                 = ""
     "--rds_sqlserver_db_schema"          = "dbo"
     "--rds_exclude_db_tbls"              = ""
@@ -134,8 +134,8 @@ resource "aws_glue_job" "dms_dv_rds_to_s3_parquet_v2" {
   number_of_workers = 4
   default_arguments = {
     "--script_bucket_name"                = module.s3-glue-job-script-bucket.bucket.id
-    "--rds_db_host_ep"                    = split(":", aws_db_instance.database_2022.endpoint)[0]
-    "--rds_db_pwd"                        = aws_db_instance.database_2022.password
+    "--rds_db_host_ep"                    = split(":", aws_db_instance.database_2022[0].endpoint)[0]
+    "--rds_db_pwd"                        = aws_db_instance.database_2022[0].password
     "--parquet_df_repartition_num"        = 24
     "--parallel_jdbc_conn_num"            = 4
     "--rds_df_repartition_num"            = 0
@@ -205,8 +205,8 @@ EOF
 #   number_of_workers = 4
 #   default_arguments = {
 #     "--script_bucket_name"               = module.s3-glue-job-script-bucket.bucket.id
-#     "--rds_db_host_ep"                   = split(":", aws_db_instance.database_2022.endpoint)[0]
-#     "--rds_db_pwd"                       = aws_db_instance.database_2022.password
+#     "--rds_db_host_ep"                   = split(":", aws_db_instance.database_2022[0].endpoint)[0]
+#     "--rds_db_pwd"                       = aws_db_instance.database_2022[0].password
 #     "--rds_sqlserver_db"                 = ""
 #     "--rds_sqlserver_db_schema"          = "dbo"
 #     "--rds_sqlserver_db_table"           = ""
@@ -277,8 +277,8 @@ EOF
 #   number_of_workers = 4
 #   default_arguments = {
 #     "--script_bucket_name"                   = module.s3-glue-job-script-bucket.bucket.id
-#     "--rds_db_host_ep"                       = split(":", aws_db_instance.database_2022.endpoint)[0]
-#     "--rds_db_pwd"                           = aws_db_instance.database_2022.password
+#     "--rds_db_host_ep"                       = split(":", aws_db_instance.database_2022[0].endpoint)[0]
+#     "--rds_db_pwd"                           = aws_db_instance.database_2022[0].password
 #     "--rds_sqlserver_db"                     = ""
 #     "--rds_sqlserver_db_schema"              = "dbo"
 #     "--rds_sqlserver_db_table"               = ""
@@ -435,8 +435,8 @@ resource "aws_glue_job" "etl_table_rows_hashvalue_to_parquet" {
   number_of_workers = 4
   default_arguments = {
     "--script_bucket_name"                  = module.s3-glue-job-script-bucket.bucket.id
-    "--rds_db_host_ep"                      = split(":", aws_db_instance.database_2022.endpoint)[0]
-    "--rds_db_pwd"                          = aws_db_instance.database_2022.password
+    "--rds_db_host_ep"                      = split(":", aws_db_instance.database_2022[0].endpoint)[0]
+    "--rds_db_pwd"                          = aws_db_instance.database_2022[0].password
     "--rds_sqlserver_db"                    = ""
     "--rds_sqlserver_db_schema"             = "dbo"
     "--rds_sqlserver_db_table"              = ""
@@ -505,8 +505,8 @@ resource "aws_glue_job" "dms_dv_on_rows_hashvalue" {
   number_of_workers = 4
   default_arguments = {
     "--script_bucket_name"               = module.s3-glue-job-script-bucket.bucket.id
-    "--rds_db_host_ep"                   = split(":", aws_db_instance.database_2022.endpoint)[0]
-    "--rds_db_pwd"                       = aws_db_instance.database_2022.password
+    "--rds_db_host_ep"                   = split(":", aws_db_instance.database_2022[0].endpoint)[0]
+    "--rds_db_pwd"                       = aws_db_instance.database_2022[0].password
     "--rds_database_folder"              = ""
     "--rds_db_schema_folder"             = "dbo"
     "--table_to_be_validated"            = ""
@@ -581,8 +581,8 @@ resource "aws_glue_job" "etl_rds_tbl_rows_hashvalue_to_s3_prq_yyyy_mm" {
 
   default_arguments = {
     "--script_bucket_name"                  = module.s3-glue-job-script-bucket.bucket.id
-    "--rds_db_host_ep"                      = split(":", aws_db_instance.database_2022.endpoint)[0]
-    "--rds_db_pwd"                          = aws_db_instance.database_2022.password
+    "--rds_db_host_ep"                      = split(":", aws_db_instance.database_2022[0].endpoint)[0]
+    "--rds_db_pwd"                          = aws_db_instance.database_2022[0].password
     "--rds_sqlserver_db"                    = ""
     "--rds_sqlserver_db_schema"             = "dbo"
     "--rds_sqlserver_db_table"              = ""
@@ -659,8 +659,8 @@ resource "aws_glue_job" "etl_rds_sqlserver_query_to_s3_parquet" {
   number_of_workers = 4
   default_arguments = {
     "--script_bucket_name"                   = module.s3-glue-job-script-bucket.bucket.id
-    "--rds_db_host_ep"                       = split(":", aws_db_instance.database_2022.endpoint)[0]
-    "--rds_db_pwd"                           = aws_db_instance.database_2022.password
+    "--rds_db_host_ep"                       = split(":", aws_db_instance.database_2022[0].endpoint)[0]
+    "--rds_db_pwd"                           = aws_db_instance.database_2022[0].password
     "--jdbc_read_partitions_num"             = 0
     "--rds_sqlserver_db"                     = ""
     "--rds_sqlserver_db_schema"              = "dbo"
@@ -838,8 +838,8 @@ resource "aws_glue_job" "dms_dv_on_rows_hashvalue_partitionby_yyyy_mm" {
   number_of_workers = 4
   default_arguments = {
     "--script_bucket_name"                  = module.s3-glue-job-script-bucket.bucket.id
-    "--rds_db_host_ep"                      = split(":", aws_db_instance.database_2022.endpoint)[0]
-    "--rds_db_pwd"                          = aws_db_instance.database_2022.password
+    "--rds_db_host_ep"                      = split(":", aws_db_instance.database_2022[0].endpoint)[0]
+    "--rds_db_pwd"                          = aws_db_instance.database_2022[0].password
     "--rds_database_folder"                 = ""
     "--rds_db_schema_folder"                = "dbo"
     "--rds_table_orignal_name"              = ""

@@ -64,7 +64,7 @@ resource "aws_vpc_security_group_egress_rule" "vpc_access" {
 resource "aws_vpc_security_group_ingress_rule" "rds_via_vpc_access" {
   count = local.is-production || local.is-development ? 1 : 0
 
-  security_group_id            = aws_security_group.db.id
+  security_group_id            = aws_security_group.db[0].id
   description                  = "EC2 instance connection to RDS"
   ip_protocol                  = "tcp"
   from_port                    = 1433
