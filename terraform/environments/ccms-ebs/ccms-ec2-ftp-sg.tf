@@ -151,7 +151,7 @@ resource "aws_security_group_rule" "egress_traffic_ftp_22_xerox" {
   protocol          = "TCP"
   from_port         = 22
   to_port           = 22
-  cidr_blocks       = [jsondecode(data.aws_secretsmanager_secret_version.secrets["LAA-ftp-xerox-outbound"].secretstring)["HOST_CIDR"]]
+  cidr_blocks       = [jsondecode(data.aws_secretsmanager_secret_version.secrets["LAA-ftp-xerox-outbound"].secret_string)["HOST_CIDR"]]
 }
 
 resource "aws_security_group_rule" "egress_traffic_ftp_22_eckoh" {
@@ -162,7 +162,7 @@ resource "aws_security_group_rule" "egress_traffic_ftp_22_eckoh" {
   protocol          = "TCP"
   from_port         = 22
   to_port           = 22
-  cidr_blocks       = [jsondecode(data.aws_secretsmanager_secret_version.secrets["LAA-ftp-eckoh-inbound-ccms"].secretstring)["HOST_CIDR"]]
+  cidr_blocks       = [jsondecode(data.aws_secretsmanager_secret_version.secrets["LAA-ftp-eckoh-inbound-ccms"].secret_string)["HOST_CIDR"]]
 }
 
 resource "aws_security_group_rule" "egress_traffic_ftp_22_allpay" {
@@ -173,7 +173,7 @@ resource "aws_security_group_rule" "egress_traffic_ftp_22_allpay" {
   protocol          = "TCP"
   from_port         = 22
   to_port           = 22
-  cidr_blocks       = [jsondecode(data.aws_secretsmanager_secret_version.secrets["LAA-ftp-allpay-inbound-ccms"].secretstring)["HOST_CIDR"]]
+  cidr_blocks       = [jsondecode(data.aws_secretsmanager_secret_version.secrets["LAA-ftp-allpay-inbound-ccms"].secret_string)["HOST_CIDR"]]
 }
 
 resource "aws_security_group_rule" "egress_traffic_ftp_22_rossendales" {
@@ -184,7 +184,7 @@ resource "aws_security_group_rule" "egress_traffic_ftp_22_rossendales" {
   protocol          = "TCP"
   from_port         = 22
   to_port           = 22
-  cidr_blocks       = [jsondecode(data.aws_secretsmanager_secret_version.secrets["LAA-ftp-rossendales-ccms-inbound"].secretstring)["HOST_CIDR"]]
+  cidr_blocks       = [jsondecode(data.aws_secretsmanager_secret_version.secrets["LAA-ftp-rossendales-ccms-inbound"].secret_string)["HOST_CIDR"]]
 }
 
 ### SFTP
@@ -196,7 +196,7 @@ resource "aws_security_group_rule" "egress_traffic_ftp_8022" {
   protocol          = "TCP"
   from_port         = 8022
   to_port           = 8022
-  cidr_blocks       = [jsondecode(data.aws_secretsmanager_secret_version.secrets["LAA-ftp-1stlocate-ccms-inbound"].secretstring)["HOST_CIDR"]]
+  cidr_blocks       = [jsondecode(data.aws_secretsmanager_secret_version.secrets["LAA-ftp-1stlocate-ccms-inbound"].secret_string)["HOST_CIDR"]]
 }
 ### HTTPS
 
