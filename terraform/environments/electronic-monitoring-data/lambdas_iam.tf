@@ -500,7 +500,7 @@ resource "aws_iam_role_policy" "calculate_checksum" {
 #-----------------------------------------------------------------------------------
 
 resource "aws_iam_role" "zero_etl_snow" {
-  name               = "zero-etl-lambda-iam-role"
+  name               = "zero-etl-snow-lambda-iam-role"
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
 }
 
@@ -577,7 +577,7 @@ data "aws_iam_policy_document" "zero_etl_snow" {
 }
 
 resource "aws_iam_policy" "zero_etl_snow" {
-  name   = "zero-etl-policy"
+  name   = "zero-etl-snow-policy"
   policy = data.aws_iam_policy_document.zero_etl_snow.json
 }
 

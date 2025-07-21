@@ -51,7 +51,7 @@ data "aws_iam_policy_document" "glue_connection_snow" {
     effect = "Allow"
     actions = ["s3:*"]
     resources = [
-      "arn:aws:s3:::emds-test-cadt/zero-etl/servicenow_test/*"
+      "${module.s3-create-a-derived-table-bucket.bucket.arn}/zero-etl/servicenow${local.underscore_env}/*"
     ]
   }
   statement {
