@@ -499,12 +499,12 @@ resource "aws_iam_role_policy" "calculate_checksum" {
 # Deploy/destroy zero etl
 #-----------------------------------------------------------------------------------
 
-resource "aws_iam_role" "zero_etl" {
+resource "aws_iam_role" "zero_etl_snow" {
   name               = "zero-etl-lambda-iam-role"
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
 }
 
-data "aws_iam_policy_document" "zero_etl" {
+data "aws_iam_policy_document" "zero_etl_snow" {
   statement {
     sid = "AllowIntegrationDeploymentDestruction"
     effect = "Allow"
@@ -576,24 +576,24 @@ data "aws_iam_policy_document" "zero_etl" {
   }
 }
 
-resource "aws_iam_policy" "zero_etl" {
+resource "aws_iam_policy" "zero_etl_snow" {
   name   = "zero-etl-policy"
-  policy = data.aws_iam_policy_document.zero_etl.json
+  policy = data.aws_iam_policy_document.zero_etl_snow.json
 }
 
-resource "aws_iam_role_policy_attachment" "zero_etl" {
-  role       = aws_iam_role.zero_etl.name
-  policy_arn = aws_iam_policy.zero_etl.arn
+resource "aws_iam_role_policy_attachment" "zero_etl_snow" {
+  role       = aws_iam_role.zero_etl_snow.name
+  policy_arn = aws_iam_policy.zero_etl_snow.arn
 }
 
 resource "aws_lakeformation_permissions" "servicenow" {
-  principal = aws_iam_role.zero_etl.arn
+  principal = aws_iam_role.zero_etl_snow.arn
   permissions = ["CREATE_DATABASE"]
   catalog_resource = true
 }
 
 resource "aws_lakeformation_permissions" "servicenow_bucket" {
-  principal = aws_iam_role.zero_etl.arn
+  principal = aws_iam_role.zero_etl_snow.arn
   permissions = ["DATA_LOCATION_ACCESS"]
   data_location {
     arn = aws_lakeformation_resource.data_bucket.arn

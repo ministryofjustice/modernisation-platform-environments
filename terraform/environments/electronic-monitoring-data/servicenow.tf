@@ -27,50 +27,52 @@ resource "aws_secretsmanager_secret_version" "servicenow_credentials" {
 
 
 data "aws_iam_policy_document" "glue_connection_snow" {
-    statement {
-        effect = "Allow"
-        actions = ["secretsmanager:*"]
-        resources = [
-            "arn:aws:secretsmanager:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:secret:credentials/servicenow*"
-        ]
+  #checkov:skip=CKV_AWS_111: Cloudwatch *
+  #checkov:skip=CKV_AWS_356: Cloudwatch *
+  statement {
+    effect = "Allow"
+    actions = ["secretsmanager:*"]
+    resources = [
+        "arn:aws:secretsmanager:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:secret:credentials/servicenow*"
+    ]
+  }
+  statement {
+    effect = "Allow"
+    actions = ["glue:*"]
+    resources = [
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:catalog",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:schema/*",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/*/*",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/*",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:connection/*"
+    ]
+  }
+  statement {
+    effect = "Allow"
+    actions = ["s3:*"]
+    resources = [
+      "arn:aws:s3:::emds-test-cadt/zero-etl/servicenow_test/*"
+    ]
+  }
+  statement {
+    effect = "Allow"
+    actions = ["cloudwatch:PutMetricData"]
+    resources = ["*"]
+    condition {
+      test     = "StringEquals"
+      values   = ["AWS/Glue/ZeroETL"]
+      variable = "cloudwatch:namespace"
     }
-    statement {
-      effect = "Allow"
-      actions = ["glue:*"]
-      resources = [
-        "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:catalog",
-        "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:schema/*",
-        "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/*/*",
-        "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/*",
-        "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:connection/*"
-      ]
-    }
-    statement {
-      effect = "Allow"
-      actions = ["s3:*"]
-      resources = [
-        "arn:aws:s3:::emds-test-cadt/zero-etl/servicenow_test/*"
-      ]
-    }
-    statement {
-      effect = "Allow"
-      actions = ["cloudwatch:PutMetricData"]
-      resources = ["*"]
-      condition {
-        test     = "StringEquals"
-        values   = ["AWS/Glue/ZeroETL"]
-        variable = "cloudwatch:namespace"
-      }
-    }
-    statement {
-      effect = "Allow"
-      actions = [
-        "logs:CreateLogGroup",
-        "logs:CreateLogStream",
-        "logs:PutLogEvents"
-      ]
-      resources = ["*"]
-    }
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents"
+    ]
+    resources = ["*"]
+  }
 }
 
 resource "aws_iam_policy" "glue_connection_snow_access" {
@@ -88,7 +90,7 @@ resource "aws_iam_role_policy_attachment" "glue_connection_snow_access" {
     policy_arn = aws_iam_policy.glue_connection_snow_access.arn
 }
 
-resource "aws_lakeformation_permissions" "zero_etl_s3_access" {
+resource "aws_lakeformation_permissions" "zero_etl_snow_s3_access" {
   principal   = aws_iam_role.glue_connection_snow_access.arn
   permissions = ["DATA_LOCATION_ACCESS"]
   data_location {
@@ -96,7 +98,7 @@ resource "aws_lakeformation_permissions" "zero_etl_s3_access" {
   }
 }
 
-resource "aws_lakeformation_permissions" "zero_etl_db_access" {
+resource "aws_lakeformation_permissions" "zero_etl_snow_db_access" {
   principal   = aws_iam_role.glue_connection_snow_access.arn
   permissions = ["ALL"]
   database {
@@ -104,7 +106,7 @@ resource "aws_lakeformation_permissions" "zero_etl_db_access" {
   }
 }
 
-resource "aws_lakeformation_permissions" "zero_etl_table_access" {
+resource "aws_lakeformation_permissions" "zero_etl_snow_table_access" {
   principal   = aws_iam_role.glue_connection_snow_access.arn
   permissions = ["ALL"]
   table {
