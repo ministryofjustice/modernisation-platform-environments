@@ -17,28 +17,28 @@ locals {
     "LAA-ftp-1stlocate-ccms-inbound",
     "LAA-ftp-xerox-outbound"
   ]
-  full_secret_ids = [
-    for id in local.secret_ids : "${id}-${local.environment}"
-  ]
+  # full_secret_ids = [
+  #   for id in local.secret_ids : "${id}-${local.environment}"
+  # ]
 
-  host_cidrs = {
-    for key, secret in data.aws_secretsmanager_secret_version.secrets :
-    key => jsondecode(secret.secret_string)["HOST_CIDR"]
-  }
+  # host_cidrs = {
+  #   for key, secret in data.aws_secretsmanager_secret_version.secrets :
+  #   key => jsondecode(secret.secret_string)["HOST_CIDR"]
+  # }
 
-  # Filtered CIDRs for SSH only
-  ssh_host_cidrs = {
-    for key, value in local.host_cidrs :
-    key => value
-    if !(key == ["LAA-ftp-1stlocate-ccms-inbound-${local.environment}"])
-  }
+  # # Filtered CIDRs for SSH only
+  # ssh_host_cidrs = {
+  #   for key, value in local.host_cidrs :
+  #   key => value
+  #   if !(key == ["LAA-ftp-1stlocate-ccms-inbound-${local.environment}"])
+  # }
 }
 
 # Fetch each secret's current version
 data "aws_secretsmanager_secret_version" "secrets" {
-  for_each = toset(local.full_secret_ids)
+  for_each = toset(local.secret_ids)
 
-  secret_id = each.value
+  secret_id = "${each.value}-${local.environment}"
 }
 
 # Security Group for FTP Server
@@ -131,27 +131,72 @@ resource "aws_security_group_rule" "ingress_data_traffic_ebsdb" {
 
 ### SSH
 
-resource "aws_security_group_rule" "egress_traffic_ftp_22" {
-  for_each = local.ssh_host_cidrs
+# resource "aws_security_group_rule" "egress_traffic_ftp_22" {
+#   count               = local.environment != "test" ? 1 : 0
+#   for_each = local.ssh_host_cidrs
+#   security_group_id = aws_security_group.ec2_sg_ftp.id
+#   type              = "egress"
+#   description       = "SSH for testing third party host ${each.key}"
+#   protocol          = "TCP"
+#   from_port         = 22
+#   to_port           = 22
+#   cidr_blocks       = [each.value]
+# }
+
+resource "aws_security_group_rule" "egress_traffic_ftp_22_xerox" {
+  count               = local.environment != "test" ? 1 : 0
   security_group_id = aws_security_group.ec2_sg_ftp.id
   type              = "egress"
-  description       = "SSH for testing third party host ${each.key}"
+  description       = "SSH for testing third party host xerox"
   protocol          = "TCP"
   from_port         = 22
   to_port           = 22
-  cidr_blocks       = [each.value]
+  cidr_blocks       = [jsondecode(data.aws_secretsmanager_secret_version.secrets["LAA-ftp-xerox-outbound-${local.environment}"].secretstring)["HOST_CIDR"]]
+}
+
+resource "aws_security_group_rule" "egress_traffic_ftp_22_eckoh" {
+  count               = local.environment != "test" ? 1 : 0
+  security_group_id = aws_security_group.ec2_sg_ftp.id
+  type              = "egress"
+  description       = "SSH for testing third party host eckoh"
+  protocol          = "TCP"
+  from_port         = 22
+  to_port           = 22
+  cidr_blocks       = [jsondecode(data.aws_secretsmanager_secret_version.secrets["LAA-ftp-eckoh-inbound-ccms-${local.environment}"].secretstring)["HOST_CIDR"]]
+}
+
+resource "aws_security_group_rule" "egress_traffic_ftp_22_allpay" {
+  count               = local.environment != "test" ? 1 : 0
+  security_group_id = aws_security_group.ec2_sg_ftp.id
+  type              = "egress"
+  description       = "SSH for testing third party host allpay"
+  protocol          = "TCP"
+  from_port         = 22
+  to_port           = 22
+  cidr_blocks       = [jsondecode(data.aws_secretsmanager_secret_version.secrets["LAA-ftp-allpay-inbound-ccms-${local.environment}"].secretstring)["HOST_CIDR"]]
+}
+
+resource "aws_security_group_rule" "egress_traffic_ftp_22_rossendales" {
+  count               = local.environment != "test" ? 1 : 0
+  security_group_id = aws_security_group.ec2_sg_ftp.id
+  type              = "egress"
+  description       = "SSH for testing third party host rossendales"
+  protocol          = "TCP"
+  from_port         = 22
+  to_port           = 22
+  cidr_blocks       = [jsondecode(data.aws_secretsmanager_secret_version.secrets["LAA-ftp-rossendales-ccms-inbound-${local.environment}"].secretstring)["HOST_CIDR"]]
 }
 
 ### SFTP
 resource "aws_security_group_rule" "egress_traffic_ftp_8022" {
-  count = contains(keys(local.host_cidrs), "LAA-ftp-1stlocate-ccms-inbound-${local.environment}") ? 1 : 0
+  count             = local.environment != "test" ? 1 : 0
   security_group_id = aws_security_group.ec2_sg_ftp.id
   type              = "egress"
   description       = "SFTP for 1stlocate thirdparty"
   protocol          = "TCP"
   from_port         = 8022
   to_port           = 8022
-  cidr_blocks       = [local.host_cidrs["LAA-ftp-1stlocate-ccms-inbound-${local.environment}"]]
+  cidr_blocks       = [jsondecode(data.aws_secretsmanager_secret_version.secrets["LAA-ftp-1stlocate-ccms-inbound-${local.environment}"].secretstring)["HOST_CIDR"]]
 }
 ### HTTPS
 
