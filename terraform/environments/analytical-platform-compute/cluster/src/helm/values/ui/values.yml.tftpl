@@ -1,0 +1,18 @@
+---
+ingress:
+  enabled: true
+  className: "default"
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-production-http01
+  hosts:
+    - host: ${ui_hostname}
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls:
+    - secretName: ui-tls
+      hosts:
+        - ${ui_hostname}
+serviceAccount:
+  annotations:
+    eks.amazonaws.com/role-arn: ${eks_role_arn}

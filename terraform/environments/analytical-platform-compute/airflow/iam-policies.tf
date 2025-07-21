@@ -31,7 +31,7 @@ data "aws_iam_policy_document" "mwaa_execution_policy" {
       "logs:GetLogGroupFields",
       "logs:GetQueryResults"
     ]
-    resources = ["arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:airflow-${local.environment}-*"]
+    resources = ["arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:airflow-${local.environment}-*"]
   }
   statement {
     effect    = "Allow"
@@ -58,7 +58,7 @@ data "aws_iam_policy_document" "mwaa_execution_policy" {
       "sqs:ReceiveMessage",
       "sqs:SendMessage"
     ]
-    resources = ["arn:aws:sqs:${data.aws_region.current.name}:*:airflow-celery-*"]
+    resources = ["arn:aws:sqs:${data.aws_region.current.region}:*:airflow-celery-*"]
   }
   statement {
     effect = "Allow"
@@ -73,8 +73,8 @@ data "aws_iam_policy_document" "mwaa_execution_policy" {
       test     = "StringLike"
       variable = "kms:ViaService"
       values = [
-        "s3.${data.aws_region.current.name}.amazonaws.com",
-        "sqs.${data.aws_region.current.name}.amazonaws.com"
+        "s3.${data.aws_region.current.region}.amazonaws.com",
+        "sqs.${data.aws_region.current.region}.amazonaws.com"
       ]
     }
   }
@@ -114,7 +114,7 @@ module "mwaa_execution_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.55.0"
+  version = "5.59.0"
 
   name   = "mwaa-execution"
   policy = data.aws_iam_policy_document.mwaa_execution_policy.json
@@ -144,7 +144,7 @@ module "mwaa_ses_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.55.0"
+  version = "5.59.0"
 
   name   = "mwaa-ses"
   policy = data.aws_iam_policy_document.mwaa_ses.json
@@ -197,7 +197,7 @@ module "gha_moj_ap_airflow_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.55.0"
+  version = "5.59.0"
 
   name = "github-actions-ministryofjustice-analytical-platform-airflow"
 
@@ -220,7 +220,7 @@ module "gha_mojas_airflow_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.55.0"
+  version = "5.59.0"
 
   name_prefix = "github-actions-mojas-airflow"
 

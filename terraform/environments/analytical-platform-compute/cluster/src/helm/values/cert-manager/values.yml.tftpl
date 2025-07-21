@@ -1,0 +1,14 @@
+---
+installCRDs: true
+
+config:
+  featureGates:
+    ACMEHTTP01IngressPathTypeExact: false
+
+serviceAccount:
+  annotations:
+    eks.amazonaws.com/role-arn: ${eks_role_arn}
+
+prometheus:
+  servicemonitor:
+    enabled: true

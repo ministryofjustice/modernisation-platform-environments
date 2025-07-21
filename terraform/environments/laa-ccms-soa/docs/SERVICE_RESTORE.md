@@ -144,15 +144,20 @@ sudo su ec2-user
 cd ~/efs/laa-ccms-app-soa/Scripts
 ```
 
-This directory contains a number of `build.properties.environment` files (one per environment). These files are encrypted with `git-crypt` and currently there is no automated process for decrypting them on the host. Because of this limitation, the best method currently available to get the file you need on to EFS is to have a user who currently has access to [https://github.com/ministryofjustice/laa-ccms-app-soa/tree/master/Scripts](https://github.com/ministryofjustice/laa-ccms-app-soa/tree/master/Scripts) copy a cleartext version of the `build.properties.environment` file for your environment EFS. The file ultimatley needs to replace the existing file in `~/efs/laa-ccms-app-soa/Scripts`. This process is not sustainable in the long term and and templated solution is WIP.
+Edit the script `build.properties.generator.sh` and update the inputs as indicated for all endpoints, ports and secret paths as relevant, these inputs are clearly named and are used to create connections to the backing databases, other SOA servers and external API services that SOA integrates with.
 
-For example if you are building a dev environment, you will need to delete `build.properties.dev` from EFS, then create a new file and populate it with the cleartext contents of `build.properties.dev`. As each of these files is environment specific, there is no need to copy every environment's build files, only the single file for the environment you are building.
+Executing this script will generate a configuration file used for deploying composites to SOA.
 
-With the configuration file in place, any reference to passwords and endpoints should be updated to reflect:
+Execute the script with the name of your environment as an input parameter. For example for dev:
 
-- External Service Endpoints (EDRMS, Benefit Checker, Assess Service etc.)
-- RDS Databases
-- Secrets (which can be obtained from Secrets Manager for your environment)
+`./build.properties.generator.sh --env dev`.
+
+Suitable inputs (for legacy reasons) to the `--env` argument are:
+
+- dev
+- tst
+- stg
+- prod
 
 ### Deploy Composites
 
