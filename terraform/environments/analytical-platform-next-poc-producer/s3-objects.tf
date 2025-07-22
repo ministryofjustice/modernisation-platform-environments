@@ -1,6 +1,7 @@
 locals {
-  # https://www.gov.uk/government/publications/workforce-management-information-moj
+  headcount_and_payroll_data_folder_prefix = "moj-headcount-and-payroll-data"
   headcount_and_payroll_data = {
+    # https://www.gov.uk/government/publications/workforce-management-information-moj
     january-2022 = {
       url = "https://assets.publishing.service.gov.uk/media/623d8fbae90e075f0993a127/MoJ_headcount_and_payroll_data_for_January_2022.csv"
     }
@@ -29,7 +30,7 @@ module "moj_headcount_and_payroll_data_s3_objects" {
   version = "5.2.0"
 
   bucket             = module.s3_bucket.s3_bucket_id
-  key                = "moj-headcount-and-payroll-data-${each.key}.csv"
+  key                = "${local.headcount_and_payroll_data_folder_prefix}/${each.key}.csv"
   content            = data.http.moj_headcount_and_payroll_data[each.key].response_body
   bucket_key_enabled = true
   force_destroy      = true
