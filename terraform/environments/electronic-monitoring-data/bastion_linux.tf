@@ -64,7 +64,7 @@ resource "aws_vpc_security_group_egress_rule" "vpc_access" {
 resource "aws_vpc_security_group_ingress_rule" "rds_via_vpc_access" {
   count = local.is-production || local.is-development ? 1 : 0
 
-  security_group_id            = aws_security_group.db.id
+  security_group_id            = aws_security_group.db[0].id
   description                  = "EC2 instance connection to RDS"
   ip_protocol                  = "tcp"
   from_port                    = 1433
@@ -101,12 +101,6 @@ resource "aws_iam_role_policy" "ec2_s3_policy" {
   name   = "ec2-s3-policy"
   role   = module.rds_bastion[0].bastion_iam_role.name
   policy = data.aws_iam_policy_document.ec2_s3_policy.json
-}
-
-resource "aws_iam_policy_attachment" "ssm-attachments-zip" {
-  name       = "ssm-attach-instance-role-zip"
-  roles      = [module.zip_bastion.bastion_iam_role.name]
-  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
 resource "aws_iam_role_policy" "zip_s3_policy" {
