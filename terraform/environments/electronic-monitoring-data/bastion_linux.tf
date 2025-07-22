@@ -103,12 +103,6 @@ resource "aws_iam_role_policy" "ec2_s3_policy" {
   policy = data.aws_iam_policy_document.ec2_s3_policy.json
 }
 
-resource "aws_iam_policy_attachment" "ssm-attachments-zip" {
-  name       = "ssm-attach-instance-role-zip"
-  roles      = [module.zip_bastion.bastion_iam_role.name]
-  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-}
-
 resource "aws_iam_role_policy" "zip_s3_policy" {
 
   name   = "zip_s3_policy"
