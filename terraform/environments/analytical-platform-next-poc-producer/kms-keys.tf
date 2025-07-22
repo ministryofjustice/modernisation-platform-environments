@@ -1,11 +1,37 @@
-module "glue_kms_key" {
+module "glue_catalog_kms_key" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/kms/aws"
   version = "4.0.0"
 
-  aliases               = ["glue/default"]
+  aliases               = ["glue/catalog"]
+  enable_default_policy = true
+
+  deletion_window_in_days = 7
+}
+
+module "glue_connections_kms_key" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/kms/aws"
+  version = "4.0.0"
+
+  aliases               = ["glue/connections"]
+  enable_default_policy = true
+
+  deletion_window_in_days = 7
+}
+
+module "glue_crawler_logs_kms_key" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/kms/aws"
+  version = "4.0.0"
+
+  aliases               = ["glue/crawler/logs"]
   enable_default_policy = true
   key_statements = [
     {
