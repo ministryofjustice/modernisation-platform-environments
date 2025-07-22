@@ -8,9 +8,10 @@ module "s3-log" {
 
   project_name = local.project_name
   environment  = local.environment
-  tags         = local.tags
-
+  tags         = local.tag
   bucket_name = [local.log_bucket]
+
+  add_log_policy = true
 
   # ownership_controls = "BucketOwnerEnforced"
 }
