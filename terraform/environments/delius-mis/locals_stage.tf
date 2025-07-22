@@ -372,13 +372,15 @@ locals {
         iops       = 5000
         throughput = 500
         type       = "gp3"
-        total_size = 6000
+        # total_size = 6000 <- revert back when deploying properly
+        total_size = 500
       }
       flash = {
         iops       = 3000
         throughput = 500
         type       = "gp3"
-        total_size = 4000
+        # total_size = 4000 <- revert back when deploying properly
+        total_size = 500
       }
     }
     ansible_user_data_config = {
