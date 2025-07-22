@@ -43,7 +43,7 @@ resource "aws_cloudfront_distribution" "transfer_family" {
   comment         = "CloudFront Distribution: cashoffice"
   is_ipv6_enabled = false
   http_version    = "http2" # Automatically supports http/2, http/1.1, and http/1.0
-  aliases         = [trim(aws_route53_record.transfer_family[0].name, ".")] #--Remove the trailing dot from the record name
+  aliases         = ["${aws_route53_record.transfer_family[0].name}.${trim(data.aws_route53_zone.external.name, ".")}"]
   origin {
     domain_name = local.application_data.accounts[local.environment].cash_web_app_url
     origin_id   = "transfer-family"
