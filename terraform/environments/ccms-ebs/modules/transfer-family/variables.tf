@@ -16,6 +16,7 @@ variable "aws_identity_centre_store_arn" {
 variable "aws_identity_centre_sso_group_id" {
   type        = string
   description = "Group ID that should be used to grant SSO access to Web App. Federated from a corresponding group in Entra/Github"
+  default     = "c64272c4-30a1-7039-8ffd-af791143da2e" #--azure-aws-sso-laa-ccms-ebs-s3-cashoffice
 }
 
 variable "bucket_name" {
