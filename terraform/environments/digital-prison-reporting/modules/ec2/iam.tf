@@ -98,8 +98,8 @@ data "aws_iam_policy_document" "dms" {
       "s3:GetBucketLocation",
     ]
     resources = [
-      "arn:aws:s3:::dpr-*/*",
-      "arn:aws:s3:::dpr-*"
+      "arn:aws:s3:::dpr-*",
+      "arn:aws:s3:::dpr-*/*"
     ]
   }
 

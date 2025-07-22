@@ -111,8 +111,8 @@ resource "aws_iam_role_policy" "dmsoperatorpolicy" {
                 "s3:GetBucketLocation"
             ],
             "Resource": [
-                "arn:aws:s3::*:dpr-*/*",
-                "arn:aws:s3::*:dpr-*"
+                "arn:aws:s3::*:dpr-*",
+                "arn:aws:s3::*:dpr-*/*"
             ]
         },
         {
