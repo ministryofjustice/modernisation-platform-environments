@@ -94,13 +94,13 @@ module "ecs_service" {
   ignore_task_definition_changes = true
   load_balancer = each.value.internal_only ? {
     service = {
-      target_group_arn = each.value.load_balancer_target_group_arn != null ? each.value.load_balancer_target_group_arn : lookup(var.list_of_target_group_arns, "${each.key}-target-group-2", null)
+      target_group_arn = each.value.load_balancer_target_group_arn != null ? each.value.load_balancer_target_group_arn : lookup(var.list_of_target_group_arns, "${each.key}-target-group-1", null)
       container_name   = each.value.name
       container_port   = each.value.container_port
     }
     } : {
     cloudfront = {
-      target_group_arn = each.value.load_balancer_target_group_arn != null ? each.value.load_balancer_target_group_arn : lookup(var.list_of_target_group_arns, "${each.key}-target-group-2", null)
+      target_group_arn = each.value.load_balancer_target_group_arn != null ? each.value.load_balancer_target_group_arn : lookup(var.list_of_target_group_arns, "${each.key}-target-group-1", null)
       container_name   = each.value.name
       container_port   = each.value.container_port
     }
