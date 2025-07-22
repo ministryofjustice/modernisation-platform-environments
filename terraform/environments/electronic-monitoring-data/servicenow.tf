@@ -217,3 +217,11 @@ resource "aws_glue_catalog_database" "servicenow" {
   name = "servicenow${local.underscore_env}"
   location_uri = "s3://${module.s3-create-a-derived-table-bucket.bucket.id}/zero-etl/servicenow${local.underscore_env}/"
 }
+
+resource "aws_lakeformation_permissions" "servicenow" {
+  principal = data.aws_iam_role.github_actions_role.arn
+  permissions = ["ALL"]
+  database {
+    name = aws_glue_catalog_database.servicenow.name
+  } 
+}
