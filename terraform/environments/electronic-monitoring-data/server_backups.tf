@@ -79,6 +79,8 @@ resource "aws_security_group" "db" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "db_ipv4_mp" {
+  count = local.is-production || local.is-development ? 1 : 0
+
   security_group_id = aws_security_group.db[0].id
   description       = "Default SQL Server port 1433 access for Matt Price"
   ip_protocol       = "tcp"
@@ -100,6 +102,8 @@ resource "aws_vpc_security_group_ingress_rule" "db_ipv4_mh" {
   cidr_ipv4 = "152.37.111.98/32"
 }
 resource "aws_vpc_security_group_ingress_rule" "db_ipv4_pf" {
+  count = local.is-production || local.is-development ? 1 : 0
+
   security_group_id = aws_security_group.db[0].id
   description       = "PF ip"
   ip_protocol       = "tcp"
@@ -110,6 +114,7 @@ resource "aws_vpc_security_group_ingress_rule" "db_ipv4_pf" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "db_ipv4_mk" {
+  count = local.is-production || local.is-development ? 1 : 0
 
   security_group_id = aws_security_group.db[0].id
   description       = "Default SQL Server port 1433 access for MK"
@@ -145,6 +150,7 @@ resource "aws_db_subnet_group" "db" {
 # -----------------------------------------------------------------------
 
 resource "aws_vpc_security_group_egress_rule" "rds_egress_all" {
+  count = local.is-production || local.is-development ? 1 : 0
 
   security_group_id            = aws_security_group.db[0].id
   referenced_security_group_id = aws_security_group.db[0].id
