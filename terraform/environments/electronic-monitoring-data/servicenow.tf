@@ -215,4 +215,5 @@ resource "aws_lakeformation_permissions" "zero_etl_snow_table_access" {
 
 resource "aws_glue_catalog_database" "servicenow" {
   name = "servicenow${local.underscore_env}"
+  location_uri = "${module.s3-create-a-derived-table-bucket.bucket.arn}/zero-etl/servicenow${local.underscore_env}/"
 }
