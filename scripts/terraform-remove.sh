@@ -25,7 +25,7 @@ while IFS= read -r ADDRESS; do
   fi
   
   echo "Removing from state: $ADDRESS"
-  terraform -chdir="$TERRAFORM_DIR" state rm "$ADDRESS" | ./scripts/redact-output.sh
+  terraform -chdir="$TERRAFORM_DIR" state rm '$ADDRESS' | ./scripts/redact-output.sh
 done < "$ADDRESSES_FILE"
 
 echo "State removal operation completed successfully"
