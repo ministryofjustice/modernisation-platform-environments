@@ -30,6 +30,7 @@ resource "aws_secretsmanager_secret_version" "servicenow_credentials" {
 data "aws_iam_policy_document" "zero_etl_source" {
   #checkov:skip=CKV_AWS_111: glue min permssions *
   #checkov:skip=CKV_AWS_356: glue min permssions *
+  #checkov:skip=CKV_AWS_109: secrets
   statement {
     effect = "Allow"
     actions = ["secretsmanager:*"]
