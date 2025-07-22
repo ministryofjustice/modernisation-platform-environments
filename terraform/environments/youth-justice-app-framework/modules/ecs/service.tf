@@ -91,7 +91,7 @@ module "ecs_service" {
       entry_point = each.value.entry_point
     }
   })
-  ignore_task_definition_changes = false
+  ignore_task_definition_changes = true
   load_balancer = each.value.internal_only ? {
     service = {
       target_group_arn = each.value.load_balancer_target_group_arn != null ? each.value.load_balancer_target_group_arn : lookup(var.list_of_target_group_arns, "${each.key}-target-group-2", null)
