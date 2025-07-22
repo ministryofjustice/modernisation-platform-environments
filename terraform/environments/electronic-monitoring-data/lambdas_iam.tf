@@ -590,13 +590,13 @@ resource "aws_iam_role_policy_attachment" "zero_etl_snow" {
   policy_arn = aws_iam_policy.zero_etl_snow.arn
 }
 
-resource "aws_lakeformation_permissions" "servicenow" {
+resource "aws_lakeformation_permissions" "lambda_servicenow_create_db" {
   principal = aws_iam_role.zero_etl_snow.arn
   permissions = ["CREATE_DATABASE"]
   catalog_resource = true
 }
 
-resource "aws_lakeformation_permissions" "servicenow_bucket" {
+resource "aws_lakeformation_permissions" "lambda_servicenow_bucket" {
   principal = aws_iam_role.zero_etl_snow.arn
   permissions = ["DATA_LOCATION_ACCESS"]
   data_location {
@@ -604,3 +604,10 @@ resource "aws_lakeformation_permissions" "servicenow_bucket" {
   }
 }
 
+resource "aws_lakeformation_permissions" "lambda_servicenow_read_db" {
+  principal   = aws_iam_role.zero_etl_snow.arn
+  permissions = ["DESCRIBE"]
+  database {
+    name = "servicenow${local.underscore_env}"
+  }
+}
