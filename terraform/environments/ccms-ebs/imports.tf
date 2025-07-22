@@ -5,5 +5,5 @@ import {
 
 import {
   to = module.transfer_family[0].aws_s3control_access_grant.this
-  id = "767123802783,c64272c4-30a1-7039-8ffd-af791143da2e"
+  id = "767123802783,bf39ec08-45cb-4003-b9ea-ed3f8c40175d"
 }
