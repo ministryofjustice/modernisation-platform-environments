@@ -19,13 +19,16 @@ data "http" "moj_headcount_and_payroll_data" {
   url = each.value.url
 }
 
-module "moj_headcount_and_payroll_data" {
+module "moj_headcount_and_payroll_data_s3_objects" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
   for_each = local.headcount_and_payroll_data
 
   source  = "terraform-aws-modules/s3-bucket/aws//modules/object"
   version = "5.2.0"
 
-  bucket             = module.bucket.s3_bucket_id
+  bucket             = module.s3_bucket.s3_bucket_id
   key                = "moj-headcount-and-payroll-data-${each.key}.csv"
   content            = data.http.moj_headcount_and_payroll_data[each.key].response_body
   bucket_key_enabled = true
