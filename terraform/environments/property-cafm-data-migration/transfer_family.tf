@@ -60,7 +60,7 @@
 
 #   protocols            = ["SFTP"]
 #   security_policy_name = "TransferSecurityPolicy-2024-01"
-  
+
 #   tags = {
 #     Name = "CAFM SFTP Server"
 #   }

@@ -19,20 +19,26 @@ locals {
     azure-fixngo-devtest-domain = {
       domain_name = "azure.noms.root"
       target_ips = flatten([
-        var.ip_addresses.azure_fixngo_ips.devtest.domain_controllers,
         var.ip_addresses.mp_ips.ad_fixngo_azure_domain_controllers,
+        var.ip_addresses.azure_fixngo_ips.devtest.domain_controllers,
       ])
       rule_type = "FORWARD"
     }
     azure-fixngo-production-domain = {
       domain_name = "azure.hmpp.root"
-      target_ips  = var.ip_addresses.azure_fixngo_ips.prod.domain_controllers
-      rule_type   = "FORWARD"
+      target_ips = flatten([
+        var.ip_addresses.mp_ips.ad_fixngo_hmpp_domain_controllers,
+        var.ip_addresses.azure_fixngo_ips.prod.domain_controllers,
+      ])
+      rule_type = "FORWARD"
     }
     infra-int-domain-hmpp-forest-trust = {
       domain_name = "infra.int"
-      target_ips  = var.ip_addresses.azure_fixngo_ips.prod.domain_controllers
-      rule_type   = "FORWARD"
+      target_ips = flatten([
+        var.ip_addresses.mp_ips.ad_fixngo_hmpp_domain_controllers,
+        var.ip_addresses.azure_fixngo_ips.prod.domain_controllers,
+      ])
+      rule_type = "FORWARD"
     }
   }
 
