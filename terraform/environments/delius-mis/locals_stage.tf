@@ -337,9 +337,12 @@ locals {
 
   # MIS DB config
   mis_db_config_stage = {
-    instance_type  = "r7i.4xlarge"
-    instance_count = 0
-    ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
+    instance_type = "m7i.large" # set to same size as dev for testing only
+    # instance_type  = "r7i.4xlarge"
+    instance_count = 1
+    # most recent 8_5 image, ami builder needs fixing after this
+    ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2025-03-02T00-00-34.442Z"
+    # ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
     instance_policies = {
       "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access
