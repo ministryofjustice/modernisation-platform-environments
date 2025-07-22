@@ -84,8 +84,8 @@ resource "aws_iam_policy" "s3_read_access_policy" {
           "s3:Get*",
         ],
         "Resource" : [
-          "arn:aws:s3:::${local.project}-*/*",
-          "arn:aws:s3:::${local.project}-*"
+          "arn:aws:s3:::${local.project}-*",
+          "arn:aws:s3:::${local.project}-*/*"
         ]
       }
     ]
@@ -119,8 +119,8 @@ resource "aws_iam_policy" "s3_read_write_policy" {
           "s3:*Object",
         ],
         "Resource" : [
-          "arn:aws:s3:::${local.project}-*/*",
-          "arn:aws:s3:::${local.project}-*"
+          "arn:aws:s3:::${local.project}-*",
+          "arn:aws:s3:::${local.project}-*/*"
         ]
       }
     ]
@@ -138,8 +138,8 @@ resource "aws_iam_policy" "s3_all_object_actions_policy" {
         "Action" : ["s3:*Object"],
         "Effect" : "Allow",
         "Resource" : [
-          "arn:aws:s3:::${local.project}-*/*",
-          "arn:aws:s3:::${local.project}-*"
+          "arn:aws:s3:::${local.project}-*",
+          "arn:aws:s3:::${local.project}-*/*"
         ]
       }
     ]
@@ -321,12 +321,12 @@ data "aws_iam_policy_document" "redshift-additional-policy" {
   }
   statement {
     actions = [
+      "logs:AssociateKmsKey",
       "logs:CreateLogGroup",
       "logs:CreateLogStream",
-      "logs:PutLogEvents",
-      "logs:AssociateKmsKey",
       "logs:DescribeLogStreams",
       "logs:GetLogEvents",
+      "logs:PutLogEvents",
       "logs:PutRetentionPolicy"
     ]
     resources = [
@@ -957,9 +957,9 @@ data "aws_iam_policy_document" "eventbridge_execution_assume_policy_document" {
       type = "Service"
 
       identifiers = [
+        "lambda.amazonaws.com",
         "scheduler.amazonaws.com",
-        "states.amazonaws.com",
-        "lambda.amazonaws.com"
+        "states.amazonaws.com"
       ]
     }
   }
