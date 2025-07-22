@@ -324,6 +324,7 @@ resource "aws_iam_policy" "cmt_specific_access" {
 }
 
 resource "aws_iam_policy" "ac_specific_access" {
+  count      = local.is-development || local.is-test ? 1 : 0
   name_prefix = "ac_specific_access"
   description = "Access to the Glue tables required by Acquisitive Crime."
   policy      = data.aws_iam_policy_document.ac_permissions.json
@@ -353,6 +354,6 @@ resource "aws_iam_role_policy_attachment" "standard_athena_access_ac" {
 
 resource "aws_iam_role_policy_attachment" "ac_specific_access" {
   count      = local.is-development || local.is-test ? 1 : 0
-  policy_arn = aws_iam_policy.ac_specific_access.arn
+  policy_arn = aws_iam_policy.ac_specific_access[0].arn
   role       = module.acquisitive_crime_assumable_role[0].iam_role_name
 }
