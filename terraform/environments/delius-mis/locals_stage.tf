@@ -343,6 +343,7 @@ locals {
     # most recent 8_5 image, ami builder needs fixing after this
     ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2025-03-02T00-00-34.442Z"
     # ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
+    cloudwatch_metric_alarms = {} # turn off while testing
 
     instance_policies = {
       "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access
@@ -372,13 +373,15 @@ locals {
         iops       = 5000
         throughput = 500
         type       = "gp3"
-        total_size = 6000
+        total_size = 500 # TODO: Revert this after testing
+        # total_size = 6000
       }
       flash = {
         iops       = 3000
         throughput = 500
         type       = "gp3"
-        total_size = 4000
+        total_size = 500 # TODO: Revert this after testing
+        # total_size = 4000
       }
     }
     ansible_user_data_config = {
