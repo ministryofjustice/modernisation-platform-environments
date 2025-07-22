@@ -86,6 +86,51 @@ module "s3_mojap_next_poc_data_kms_key" {
 
   aliases               = ["s3/${local.datastore_bucket_name}"]
   enable_default_policy = true
+  key_statements = [
+    {
+      sid    = "AllowAnalyticalPlatformNextPoCHub"
+      effect = "Allow"
+      actions = [
+        "kms:Decrypt",
+        "kms:DescribeKey",
+        "kms:GenerateDataKey"
+      ]
+      resources = ["*"]
+      principals = [
+        {
+          type = "AWS"
+          # identifiers = ["arn:aws:iam::${local.environment_management.account_ids["analytical-platform-next-poc-hub"]}:root"]
+          identifiers = ["arn:aws:iam::112639118718:root"]
+        }
+      ]
+      conditions = [
+        {
+          test     = "StringEquals"
+          variable = "kms:ViaService"
+          values = [
+            "s3.${data.aws_region.current.name}.amazonaws.com",
+            "lakeformation.${data.aws_region.current.name}.amazonaws.com"
+          ]
+        }
+      ]
+    },
+    {
+      sid    = "AllowLakeFormationService"
+      effect = "Allow"
+      actions = [
+        "kms:Decrypt",
+        "kms:DescribeKey",
+        "kms:GenerateDataKey"
+      ]
+      resources = ["*"]
+      principals = [
+        {
+          type        = "Service"
+          identifiers = ["lakeformation.amazonaws.com"]
+        }
+      ]
+    }
+  ]
 
   deletion_window_in_days = 7
 }
