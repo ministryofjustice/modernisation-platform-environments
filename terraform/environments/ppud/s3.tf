@@ -2246,7 +2246,9 @@ resource "aws_s3_bucket_policy" "moj-infrastructure-uat" {
         ],
         "Principal" : {
           "AWS" : [
-            "arn:aws:iam::${local.environment_management.account_ids["ppud-preproduction"]}:role/ec2-iam-role"
+            "arn:aws:iam::${local.environment_management.account_ids["ppud-preproduction"]}:role/ec2-iam-role",
+            "arn:aws:iam::${local.environment_management.account_ids["ppud-production"]}:role/ec2-iam-role",
+            "arn:aws:iam::${local.environment_management.account_ids["ppud-production"]}:role/developer",
           ]
         }
       },
