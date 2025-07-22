@@ -6,6 +6,7 @@ locals {
   }
   dbt_suffix = local.is-production ? "" : "_${local.environment_shorthand}_dbt"
   suffix     = local.is-production ? "" : local.is-preproduction ? "-pp" : local.is-test ? "-test" : "-dev"
+  db_suffix  = local.is-production ? "" : "_${local.environment_shorthand}"
   dbt_dbs = [
     "staged_fms",
     "staged_mdss",
@@ -43,7 +44,7 @@ locals {
   ] : []
   dev_dbs_to_grant       = local.is-production ? [for db in local.prod_dbs_to_grant : "${db}_historic_dev_dbt"] : []
   dbt_dbs_to_grant       = [for db in local.dbt_dbs : "${db}${local.dbt_suffix}"]
-  live_feed_dbs_to_grant = [for db in local.live_feeds_dbs : "${db}_${local.environment_shorthand}"]
+  live_feed_dbs_to_grant = [for db in local.live_feeds_dbs : "${db}${local.db_suffix}"]
   dbs_to_grant           = toset(flatten([local.prod_dbs_to_grant, local.dev_dbs_to_grant, local.dbt_dbs_to_grant]))
   existing_dbs_to_grant  = toset(local.live_feed_dbs_to_grant)
 }

@@ -2,7 +2,7 @@
 #   bucket = module.s3-glue-job-script-bucket.bucket.id
 #   key    = "dms_dv_rds_and_s3_parquet_write_v2.py"
 #   source = "glue-job/dms_dv_rds_and_s3_parquet_write_v2.py"
-#   etag   = filemd5("glue-job/dms_dv_rds_and_s3_parquet_write_v2.py")
+#   source_hash = filemd5("glue-job/dms_dv_rds_and_s3_parquet_write_v2.py")
 # }
 
 
@@ -10,7 +10,7 @@
 #   bucket = module.s3-glue-job-script-bucket.bucket.id
 #   key    = "dms_dv_rds_and_s3_parquet_write_v4d.py"
 #   source = "glue-job/dms_dv_rds_and_s3_parquet_write_v4d.py"
-#   etag   = filemd5("glue-job/dms_dv_rds_and_s3_parquet_write_v4d.py")
+#   source_hash = filemd5("glue-job/dms_dv_rds_and_s3_parquet_write_v4d.py")
 # }
 
 
@@ -18,7 +18,7 @@
 #   bucket = module.s3-glue-job-script-bucket.bucket.id
 #   key    = "rds_to_s3_parquet_migration_monthly.py"
 #   source = "glue-job/rds_to_s3_parquet_migration_monthly.py"
-#   etag   = filemd5("glue-job/rds_to_s3_parquet_migration_monthly.py")
+#   source_hash = filemd5("glue-job/rds_to_s3_parquet_migration_monthly.py")
 # }
 
 
@@ -26,7 +26,7 @@
 #   bucket = module.s3-glue-job-script-bucket.bucket.id
 #   key    = "rds_to_s3_parquet_migration.py"
 #   source = "glue-job/rds_to_s3_parquet_migration.py"
-#   etag   = filemd5("glue-job/rds_to_s3_parquet_migration.py")
+#   source_hash = filemd5("glue-job/rds_to_s3_parquet_migration.py")
 # }
 
 
@@ -34,7 +34,7 @@
 #   bucket = module.s3-glue-job-script-bucket.bucket.id
 #   key    = "resizing_parquet_files.py"
 #   source = "glue-job/resizing_parquet_files.py"
-#   etag   = filemd5("glue-job/resizing_parquet_files.py")
+#   source_hash = filemd5("glue-job/resizing_parquet_files.py")
 # }
 
 
