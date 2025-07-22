@@ -16,13 +16,12 @@ Until those bugs are addressed, the below resources are created manually in PROD
 */
 
 module "transfer_family" {
-  count                            = local.is-development ? 1 : 0
-  source                           = "./modules/transfer-family"
-  aws_account_id                   = data.aws_caller_identity.current.account_id
-  app_name                         = local.application_name
-  bucket_name                      = aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket
-  aws_identity_centre_store_arn    = local.application_data.accounts[local.environment].cash_office_idp_arn
-  aws_identity_centre_sso_group_id = local.application_data.accounts[local.environment].cash_office_sso_group_id
+  count                         = local.is-development ? 1 : 0
+  source                        = "./modules/transfer-family"
+  aws_account_id                = data.aws_caller_identity.current.account_id
+  app_name                      = local.application_name
+  bucket_name                   = aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket
+  aws_identity_centre_store_arn = local.application_data.accounts[local.environment].cash_office_idp_arn
 }
 
 /*
@@ -36,5 +35,41 @@ resource "aws_route53_record" "transfer_family" {
   name     = "ebs-upload"
   type     = "CNAME"
   ttl      = 300
-  records  = ["webapp-01efa045f0de46e9b.transfer-webapp.eu-west-2.on.aws"]
+  records  = [local.application_data.accounts[local.environment].cash_web_app_url]
+}
+
+resource "aws_cloudfront_distribution" "transfer_family" {
+  enabled         = true
+  comment         = "CloudFront Distribution: cashoffice"
+  is_ipv6_enabled = false
+  http_version    = "http2" # Automatically supports http/2, http/1.1, and http/1.0
+  aliases         = [aws_route53_record.transfer_family.name]
+  origin {
+    domain_name = [local.application_data.accounts[local.environment].cash_web_app_url]
+    origin_id   = "transfer-family"
+
+    custom_origin_config {
+      https_port             = 443
+      origin_protocol_policy = "https-only"
+      origin_ssl_protocols   = ["TLSv1.2"]
+    }
+  }
+  default_cache_behavior {
+    target_origin_id       = "transfer-family"
+    viewer_protocol_policy = "redirect-to-https"
+    allowed_methods        = ["GET", "HEAD"]
+    cached_methods         = ["GET", "HEAD"]
+    forwarded_values {
+      query_string = false
+      cookies {
+        forward = "none"
+      }
+    }
+    compress = true
+  }
+  viewer_certificate {
+    cloudfront_default_certificate = true
+    minimum_protocol_version       = "TLSv1.2_2021"
+  }
+  web_acl_id = module.transfer_family[0].cloudfront_waf_acl
 }

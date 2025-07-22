@@ -125,6 +125,29 @@ resource "aws_s3_bucket_policy" "inbound_bucket_policy" {
   )
 }
 
+#--Transfer family CORS
+resource "aws_s3_bucket_cors_configuration" "inbound_bucket_cors_policy" {
+  bucket = aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket
+  cors_rule {
+    allowed_headers = ["*"]
+    allowed_methods = ["GET", "PUT", "POST"]
+    allowed_origins = ["https://${[local.application_data.accounts[local.environment].cash_web_app_url]}"]
+    expose_headers = [
+      "last-modified",
+      "content-length",
+      "etag",
+      "x-amz-version-id",
+      "content-type",
+      "x-amz-request-id",
+      "x-amz-id-2",
+      "date",
+      "x-amz-cf-id",
+      "x-amz-storage-class",
+      "access-control-expose-headers"
+    ]
+    max_age_seconds = 3000
+  }
+}
 
 resource "aws_s3_bucket_policy" "outbound_bucket_policy" {
   bucket = aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].bucket
