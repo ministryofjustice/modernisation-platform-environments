@@ -9,6 +9,7 @@ resource "aws_s3control_access_grants_location" "this" {
   location_scope = "s3://${var.bucket_name}"
 }
 
+
 /* resource "aws_s3control_access_grant" "this" {
   depends_on                = [aws_s3control_access_grants_instance.this]
   permission                = "READWRITE"

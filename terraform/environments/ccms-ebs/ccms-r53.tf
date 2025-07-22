@@ -284,11 +284,11 @@ resource "aws_route53_record" "ftp" {
   records  = [aws_instance.ec2_ftp.private_ip]
 }
 
-## NLB DNS TESTING
-resource "aws_route53_record" "nlb_testing" {
+## CCMS EBS DB
+resource "aws_route53_record" "ccms_ebs_nlb" {
   provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.external.zone_id
-  name     = "ccms-nlb"
+  name     = "ebs-db"
   type     = "CNAME"
   ttl      = 300
   records  = ["ccms-ebs-db-nlb-4a3f6f3bd578eb48.elb.eu-west-2.amazonaws.com"]
