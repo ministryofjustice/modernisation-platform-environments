@@ -45,13 +45,18 @@ resource "aws_cloudfront_distribution" "transfer_family" {
   http_version    = "http2" # Automatically supports http/2, http/1.1, and http/1.0
   aliases         = [aws_route53_record.transfer_family[0].name]
   origin {
-    domain_name = [local.application_data.accounts[local.environment].cash_web_app_url]
+    domain_name = local.application_data.accounts[local.environment].cash_web_app_url
     origin_id   = "transfer-family"
 
     custom_origin_config {
       https_port             = 443
       origin_protocol_policy = "https-only"
       origin_ssl_protocols   = ["TLSv1.2"]
+    }
+  }
+  restrictions {
+    geo_restriction {
+      restriction_type = "none"
     }
   }
   default_cache_behavior {
