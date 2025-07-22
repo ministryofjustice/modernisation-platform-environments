@@ -252,11 +252,11 @@ data "aws_iam_policy_document" "ses_logging_uat_topic_policy_document" {
   policy_id = "ses_logging_uat_sns_topic_policy_document"
 
   statement {
-    sid    = "ses_logging_uat_statement_id"
+    sid    = "AllowSESPublish"
     effect = "Allow"
     principals {
       type        = "Service"
-      identifiers = ["cloudwatch.amazonaws.com"]
+      identifiers = ["ses.amazonaws.com"]
     }
     actions = [
       "SNS:Subscribe",
