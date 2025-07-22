@@ -223,7 +223,4 @@ module "zero_etl_snow" {
   timeout                 = 900
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev          = local.is-production ? "prod" : "dev"
-  environment_variables   = {
-    CONN_AWS_ROLE_ARN = aws_iam_role.glue_connection_snow_access.arn
-  }
 }

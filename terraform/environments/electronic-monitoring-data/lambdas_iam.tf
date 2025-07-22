@@ -564,7 +564,10 @@ data "aws_iam_policy_document" "zero_etl_snow" {
     sid = "PassRoleToConn"
     effect = "Allow"
     actions = ["iam:PassRole"]
-    resources = [aws_iam_role.glue_connection_snow_access.arn]
+    resources = [
+      aws_iam_role.zero_etl_snow_source.arn,
+      aws_iam_role.zero_etl_snow_target.arn,
+    ]
   }
   statement {
     sid    = "ListAllBuckets"
