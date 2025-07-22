@@ -49,7 +49,7 @@ resource "aws_cloudfront_distribution" "transfer_family" {
     origin_id   = "transfer-family"
 
     custom_origin_config {
-      https_port             = 80
+      http_port              = 80
       https_port             = 443
       origin_protocol_policy = "https-only"
       origin_ssl_protocols   = ["TLSv1.2"]
