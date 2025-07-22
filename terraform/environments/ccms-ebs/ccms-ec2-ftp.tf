@@ -41,8 +41,8 @@ resource "aws_instance" "ec2_ftp" {
     encrypted   = true
     kms_key_id  = data.aws_kms_key.ebs_shared.key_id
     tags = merge(local.tags,
-     { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ftp, "root")) },
-     { device-name = "/dev/sda1" }
+      { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ftp, "root")) },
+      { device-name = "/dev/sda1" }
     )
   }
   ebs_block_device {
@@ -53,8 +53,8 @@ resource "aws_instance" "ec2_ftp" {
     encrypted  = true
     kms_key_id = data.aws_kms_key.ebs_shared.key_id
     tags = merge(local.tags,
-     { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ftp, "ftp")) },
-     { device-name = "/dev/sda1" }
+      { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ftp, "ftp")) },
+      { device-name = "/dev/sda1" }
     )
   }
 
