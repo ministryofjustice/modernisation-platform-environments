@@ -23,7 +23,7 @@ module "gds_data_s3_objects" {
   source  = "terraform-aws-modules/s3-bucket/aws//modules/object"
   version = "5.2.0"
 
-  bucket             = module.s3_bucket.s3_bucket_id
+  bucket             = module.mojap_next_poc_data_s3_bucket.s3_bucket_id
   key                = "${local.gds_data_folder_prefix}/${each.key}.csv"
   content            = data.http.gds_data[each.key].response_body
   bucket_key_enabled = true

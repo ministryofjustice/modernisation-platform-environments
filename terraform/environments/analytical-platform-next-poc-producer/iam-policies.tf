@@ -1,15 +1,25 @@
 data "aws_iam_policy_document" "glue_crawler" {
   statement {
-    sid       = "AllowKMS"
-    effect    = "Allow"
-    actions   = ["kms:Decrypt"]
-    resources = [module.kms_key.key_arn]
+    sid    = "AllowGlueKMSActions"
+    effect = "Allow"
+    actions = [
+      "kms:Decrypt",
+      "kms:Encrypt",
+      "kms:GenerateDataKey"
+    ]
+    resources = [module.glue_kms_key.key_arn]
   }
   statement {
-    sid       = "AllowS3"
+    sid       = "AllowS3KMSActions"
+    effect    = "Allow"
+    actions   = ["kms:Decrypt"]
+    resources = [module.s3_mojap_next_poc_data_kms_key.key_arn]
+  }
+  statement {
+    sid       = "AllowS3Actions"
     effect    = "Allow"
     actions   = ["s3:GetObject"]
-    resources = ["${module.s3_bucket.s3_bucket_arn}/*"]
+    resources = ["${module.mojap_next_poc_data_s3_bucket.s3_bucket_arn}/*"]
   }
 }
 
