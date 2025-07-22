@@ -70,5 +70,10 @@ resource "aws_autoscaling_group" "cluster-scaling-group" {
     id      = aws_launch_template.ec2-launch-template.id
     version = "$Latest"
   }
+  tag {
+    key                 = "instance-scheduling"
+    value               = "skip-scheduling"
+    propagate_at_launch = true
+  }
 
 }
