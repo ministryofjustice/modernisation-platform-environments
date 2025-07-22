@@ -77,5 +77,4 @@ resource "aws_cloudfront_distribution" "transfer_family" {
     cloudfront_default_certificate = true
     minimum_protocol_version       = "TLSv1.2_2021"
   }
-  web_acl_id = module.transfer_family[0].cloudfront_waf_acl
 }
