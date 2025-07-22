@@ -98,9 +98,8 @@ module "s3_mojap_next_poc_data_kms_key" {
       resources = ["*"]
       principals = [
         {
-          type = "AWS"
-          # identifiers = ["arn:aws:iam::${local.environment_management.account_ids["analytical-platform-next-poc-hub"]}:root"]
-          identifiers = ["arn:aws:iam::112639118718:root"]
+          type        = "AWS"
+          identifiers = ["arn:aws:iam::${local.hub_account_id}:root"]
         }
       ]
       conditions = [
