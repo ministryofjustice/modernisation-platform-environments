@@ -7,21 +7,16 @@
 ###########################
 
 resource "aws_ses_configuration_set" "ses_events_configuration_set_uat" {
-  count  = local.is-preproduction == false ? 1 : 0
-  name   = "ses-events-configuration-set-uat"
+  count = local.is-preproduction == true ? 1 : 0
+  name  = "ses-events-configuration-set-uat"
 }
 
-resource "aws_ses_event_destination" "ses_delivery_events" {
-  count                  = local.is-preproduction == false ? 1 : 0
-  name                   = "delivery-events"
+resource "aws_ses_event_destination" "ses_delivery_events_uat" {
+  count                  = local.is-preproduction == true ? 1 : 0
+  name                   = "ses-delivery-events-uat"
   configuration_set_name = aws_ses_configuration_set.ses_events_configuration_set_uat[0].name
   enabled                = true
-
-  matching_types = [
-    "delivery",
-    "bounce",
-    "complaint"
-  ]
+  matching_types         = [ "delivery", "bounce", "complaint" ]
 
   sns_destination {
     topic_arn = aws_sns_topic.ses_logging_uat[0].arn
