@@ -28,6 +28,12 @@ resource "aws_ses_event_destination" "ses_delivery_events_uat" {
   }
 }
 
+resource "aws_ses_identity_configuration_set_attachment" "ses_config_attach_uat" {
+  count                 = local.is-preproduction == true ? 1 : 0
+  configuration_set_name = "ses-events-configuration-set-uat"
+  identity               = "uat.ppud.justice.gov.uk"
+}
+
 ########################
 # Production Environment
 ########################
