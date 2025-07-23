@@ -172,7 +172,7 @@ resource "aws_ecs_service" "dacp_ecs_service" {
     aws_lb_listener.dacp_lb
   ]
   count                             = local.is-development ? 0 : 1
-  name                              = "${var.networking[0].application}-win2022"
+  name                              = var.networking[0].application
   cluster                           = aws_ecs_cluster.dacp_cluster.id
   task_definition                   = aws_ecs_task_definition.dacp_task_definition[0].arn
   launch_type                       = "FARGATE"
