@@ -836,7 +836,7 @@ resource "aws_iam_policy" "iam_policy_lambda_put_s3_data_uat" {
         ],
         "Resource" : [
           "arn:aws:s3:::moj-log-files-uat",
-          "arn:aws:s3:::moj-log-files--uat/*"
+          "arn:aws:s3:::moj-log-files-uat/*"
         ]
       }
     ]
