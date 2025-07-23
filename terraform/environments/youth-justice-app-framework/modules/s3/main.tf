@@ -51,6 +51,29 @@ resource "aws_s3_bucket_logging" "default" {
 }
 
 
+resource "aws_s3_bucket_policy" "logging" {
+  for_each = var.add_log_policy == true ? toset(local.bucket_name_all) : []
+  bucket   = aws_s3_bucket.default[each.value].id
+
+
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Id": "PolicyForS3AccessLoggingBucket",
+  "Statement": [
+		{
+			"Sid": "Permissions to receive s3 access logs",
+			"Effect": "Allow",
+			"Principal": { "Service": "logging.s3.amazonaws.com"},
+			"Action": "s3:PutObject",
+			"Resource": "arn:aws:s3:::${each.value}/*"
+		}
+	]
+}
+  POLICY
+
+}
+
 resource "aws_s3_bucket_policy" "default" {
   for_each = var.allow_replication == true ? toset(local.bucket_name_allow_replication) : []
   bucket   = aws_s3_bucket.default[each.value].id
