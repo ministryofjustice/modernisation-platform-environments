@@ -62,7 +62,8 @@ resource "aws_secretsmanager_secret_version" "LDAP_administration_version" {
     "password" = "changeme" } #checkov:skip=CKV_SECRET_6: Ignore this
   )
   lifecycle {
-    ignore_changes = [secret_string]
+    prevent_destroy = true
+    ignore_changes  = [secret_string]
   }
 }
 
