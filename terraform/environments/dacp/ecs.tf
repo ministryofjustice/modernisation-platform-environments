@@ -195,6 +195,10 @@ resource "aws_ecs_service" "dacp_ecs_service" {
   deployment_controller {
     type = "ECS"
   }
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_ecs_service" "dacp_ecs_service_dev" {
@@ -224,6 +228,10 @@ resource "aws_ecs_service" "dacp_ecs_service_dev" {
 
   deployment_controller {
     type = "ECS"
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 }
 
