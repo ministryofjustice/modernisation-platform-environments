@@ -31,6 +31,12 @@ resource "aws_sns_topic_policy" "allow_ses_publish" {
   })
 }
 
+resource "aws_sns_topic_subscription" "email_subscription" {
+  topic_arn = aws_sns_topic.ses_notifications.arn
+  protocol  = "email"
+  endpoint  = "yjafsesndr@necsws.com"
+}
+
 
 data "aws_caller_identity" "current" {}
 

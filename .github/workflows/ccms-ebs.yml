@@ -48,6 +48,7 @@ jobs:
       application: "${{ github.workflow }}"
       environment: "${{ matrix.target }}"
       action: "${{ matrix.action }}"
+      component: "${{ matrix.component }}"
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
