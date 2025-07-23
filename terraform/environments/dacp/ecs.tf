@@ -186,6 +186,10 @@ resource "aws_ecs_service" "dacp_ecs_service" {
     assign_public_ip = false
   }
 
+  lifecycle {
+    create_before_destroy = true
+  }
+
   load_balancer {
     target_group_arn = aws_lb_target_group.dacp_target_group.arn
     container_name   = "dacp-container"
@@ -214,6 +218,10 @@ resource "aws_ecs_service" "dacp_ecs_service_dev" {
     subnets          = data.aws_subnets.shared-private.ids
     security_groups  = [aws_security_group.ecs_service.id]
     assign_public_ip = false
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 
   load_balancer {
