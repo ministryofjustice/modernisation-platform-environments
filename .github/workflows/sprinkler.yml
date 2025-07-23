@@ -55,6 +55,8 @@ jobs:
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
+      IDENTITY_PROVIDER_INSTANCE_ARN: ${{ secrets.IDENTITY_PROVIDER_INSTANCE_ARN }}
+      IDENTITY_PROVIDER_ROLE_ARN: ${{ secrets.IDENTITY_PROVIDER_ROLE_ARN }}
 
   destroy-development:
     if: inputs.action == 'destroy'

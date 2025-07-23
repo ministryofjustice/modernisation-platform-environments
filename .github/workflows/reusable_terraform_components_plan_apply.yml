@@ -51,6 +51,8 @@
     env:
       ACCOUNT_NAME: "${{ inputs.application }}-${{ inputs.environment }}"
       WORKSPACE_NAME: "${{ inputs.application }}-${{ inputs.environment }}"
+      TF_VAR_identity_provider_instance_arn: ${{ secrets.IDENTITY_PROVIDER_INSTANCE_ARN }}
+      TF_VAR_identity_provider_role_arn: ${{ secrets.IDENTITY_PROVIDER_ROLE_ARN }}
     concurrency:
       group: ${{ inputs.application }}-${{ inputs.environment }}-${{ inputs.component }}
     jobs:
