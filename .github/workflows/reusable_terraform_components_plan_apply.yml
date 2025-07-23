@@ -47,6 +47,10 @@
             required: true
           PASSPHRASE:
             required: true
+          IDENTITY_PROVIDER_INSTANCE_ARN:
+            required: false
+          IDENTITY_PROVIDER_ROLE_ARN:
+            required: false
 
     env:
       ACCOUNT_NAME: "${{ inputs.application }}-${{ inputs.environment }}"
