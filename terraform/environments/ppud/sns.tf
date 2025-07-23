@@ -260,14 +260,9 @@ data "aws_iam_policy_document" "ses_logging_uat_topic_policy_document" {
     }
     actions = [
       "SNS:Subscribe",
-      "SNS:SetTopicAttributes",
-      "SNS:RemovePermission",
-      "SNS:Receive",
       "SNS:Publish",
       "SNS:ListSubscriptionsByTopic",
       "SNS:GetTopicAttributes",
-      "SNS:DeleteTopic",
-      "SNS:AddPermission"
     ]
     condition {
       test     = "StringEquals"
@@ -279,6 +274,28 @@ data "aws_iam_policy_document" "ses_logging_uat_topic_policy_document" {
     resources = [
       aws_sns_topic.ses_logging_uat[0].arn
     ]
+  }
+
+   statement {
+    sid    = "AllowSNSInvokeLambda"
+    effect = "Allow"
+    principals {
+      type        = "Service"
+      identifiers = ["sns.amazonaws.com"]
+    }
+    actions = [
+      "lambda:InvokeFunction"
+    ]
+    resources = [
+      aws_lambda_function.terraform_lambda_func_ses_logging_uat[0].arn
+    ]
+    condition {
+      test     = "ArnEquals"
+      variable = "AWS:SourceArn"
+      values = [
+        aws_sns_topic.ses_logging_uat[0].arn
+      ]
+    }
   }
 }
 
