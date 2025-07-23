@@ -200,7 +200,7 @@ resource "aws_lakeformation_permissions" "zero_etl_snow_db_access" {
   principal   = aws_iam_role.zero_etl_snow_target.arn
   permissions = ["ALL"]
   database {
-    name = "servicenow${local.underscore_env}"
+    name = aws_glue_catalog_database.servicenow.name
   }
 }
 
@@ -208,7 +208,20 @@ resource "aws_lakeformation_permissions" "zero_etl_snow_table_access" {
   principal   = aws_iam_role.zero_etl_snow_target.arn
   permissions = ["ALL"]
   table {
-    database_name = "servicenow${local.underscore_env}"
+    database_name = aws_glue_catalog_database.servicenow.name
     wildcard      = true
   }
+}
+
+resource "aws_glue_catalog_database" "servicenow" {
+  name = "servicenow${local.underscore_env}"
+  location_uri = "s3://${module.s3-create-a-derived-table-bucket.bucket.id}/zero-etl/servicenow${local.underscore_env}/"
+}
+
+resource "aws_lakeformation_permissions" "servicenow" {
+  principal = data.aws_iam_role.github_actions_role.arn
+  permissions = ["ALL"]
+  database {
+    name = aws_glue_catalog_database.servicenow.name
+  } 
 }

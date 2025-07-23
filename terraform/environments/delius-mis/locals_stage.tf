@@ -339,7 +339,7 @@ locals {
   mis_db_config_stage = {
     instance_type = "m7i.large" # set to same size as dev for testing only
     # instance_type  = "r7i.4xlarge"
-    instance_count = 1
+    instance_count = 0
     # most recent 8_5 image, ami builder needs fixing after this
     ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2025-03-02T00-00-34.442Z"
     # ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
@@ -372,13 +372,15 @@ locals {
         iops       = 5000
         throughput = 500
         type       = "gp3"
-        total_size = 6000
+        # total_size = 6000 <- revert back when deploying properly
+        total_size = 500
       }
       flash = {
         iops       = 3000
         throughput = 500
         type       = "gp3"
-        total_size = 4000
+        # total_size = 4000 <- revert back when deploying properly
+        total_size = 500
       }
     }
     ansible_user_data_config = {
