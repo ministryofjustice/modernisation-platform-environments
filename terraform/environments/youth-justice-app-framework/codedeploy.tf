@@ -15,6 +15,7 @@ module "codedeploy" {
     { "conversions" = "internal" },
     { "dal" = "internal" },
     { "documents" = "internal" },
+    { "gateway-internal" = "internal" },
     { "placements" = "internal" },
     { "refdata" = "internal" },
     { "returns" = "internal" },
