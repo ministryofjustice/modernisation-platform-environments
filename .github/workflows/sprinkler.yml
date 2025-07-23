@@ -25,6 +25,9 @@ on:
         options:
           - deploy
           - destroy
+env:
+  TF_VAR_identity_provider_instance_arn: ${{ secrets.IDENTITY_PROVIDER_INSTANCE_ARN }}
+  TF_VAR_identity_provider_role_arn: ${{ secrets.IDENTITY_PROVIDER_ROLE_ARN }}
 
 permissions:
   id-token: write  # This is required for requesting the JWT
