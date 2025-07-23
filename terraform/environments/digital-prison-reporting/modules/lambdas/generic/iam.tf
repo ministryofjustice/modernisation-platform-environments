@@ -32,9 +32,9 @@ data "aws_iam_policy_document" "lambda_execution" {
     ]
 
     actions = [
-      "logs:CreateLogGroup",
+      "logs:PutLogEvents",
       "logs:CreateLogStream",
-      "logs:PutLogEvents"
+      "logs:CreateLogGroup",
     ]
   }
 
@@ -42,8 +42,8 @@ data "aws_iam_policy_document" "lambda_execution" {
     resources = ["*"]
 
     actions = [
+      "xray:PutTraceSegments",
       "xray:PutTelemetryRecords",
-      "xray:PutTraceSegments"
     ]
   }
 
@@ -59,11 +59,11 @@ data "aws_iam_policy_document" "lambda_execution" {
     resources = ["*"]
 
     actions = [
-      "ec2:AttachNetworkInterface",
-      "ec2:CreateNetworkInterface",
-      "ec2:DeleteNetworkInterface",
+      "ec2:DescribeNetworkInterfaces",
       "ec2:DescribeInstances",
-      "ec2:DescribeNetworkInterfaces"
+      "ec2:DeleteNetworkInterface",
+      "ec2:CreateNetworkInterface",
+      "ec2:AttachNetworkInterface",
     ]
   }
 
