@@ -886,6 +886,7 @@ resource "aws_iam_policy" "iam_policy_lambda_get_securityhub_data_uat" {
   })
 }
 
+/*
 resource "aws_iam_policy" "iam_policy_sns_invoke_lambda_ses_uat" {
   count       = local.is-preproduction == true ? 1 : 0
   name        = "aws_iam_policy_for_sns_to_invoke_lambda_ses_${local.environment}"
@@ -916,6 +917,7 @@ resource "aws_iam_policy" "iam_policy_sns_invoke_lambda_ses_uat" {
     ]
   })
 }
+*/
 
 ###########################
 # Production Environment

@@ -335,13 +335,13 @@ resource "aws_lambda_function" "terraform_lambda_func_ses_logging_uat" {
   }
 }
 
-resource "aws_lambda_permission" "allow_lambda_to_query_securityhub_ses_logging_uat" {
+resource "aws_lambda_permission" "allow_sns_to_invoke_lambda_ses_logging_uat" {
   count         = local.is-preproduction == true ? 1 : 0
-  statement_id  = "AllowAccesstoSecurityHub"
+  statement_id  = "AllowSNSInvokeLambda"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.terraform_lambda_func_ses_logging_uat[0].function_name
-  principal     = "securityhub.amazonaws.com"
-  source_arn    = "arn:aws:securityhub:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:*"
+  principal     = "sns.amazonaws.com"
+  source_arn    = aws_sns_topic.ses_logging_uat[0].arn
 }
 
 resource "aws_cloudwatch_log_group" "lambda_ses_logging_uat_log_group" {
