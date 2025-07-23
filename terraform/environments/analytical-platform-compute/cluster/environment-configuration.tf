@@ -30,8 +30,8 @@ locals {
         coredns                           = "v1.12.2-eksbuild.4"
         eks_pod_identity_agent            = "v1.3.8-eksbuild.2"
         aws_guardduty_agent               = "v1.10.0-eksbuild.2"
-        aws_ebs_csi_driver                = "v1.45.0-eksbuild.2"
-        vpc_cni                           = "v1.19.6-eksbuild.7"
+        aws_ebs_csi_driver                = "v1.46.0-eksbuild.1"
+        vpc_cni                           = "v1.20.0-eksbuild.1"
       }
 
       /* Data Engineering Airflow */
@@ -79,8 +79,8 @@ locals {
         coredns                           = "v1.12.2-eksbuild.4"
         eks_pod_identity_agent            = "v1.3.8-eksbuild.2"
         aws_guardduty_agent               = "v1.10.0-eksbuild.2"
-        aws_ebs_csi_driver                = "v1.45.0-eksbuild.2"
-        vpc_cni                           = "v1.19.6-eksbuild.7"
+        aws_ebs_csi_driver                = "v1.46.0-eksbuild.1"
+        vpc_cni                           = "v1.20.0-eksbuild.1"
       }
 
       /* Data Engineering Airflow */
