@@ -595,7 +595,7 @@ locals {
     "send_logs_to_cloudwatch" = aws_iam_policy.iam_policy_lambda_send_logs_cloudwatch_uat[0].arn
     "publish_to_sns"          = aws_iam_policy.iam_policy_lambda_publish_to_sns_uat[0].arn
     "put_data_s3"             = aws_iam_policy.iam_policy_lambda_put_s3_data_uat[0].arn
-    "sns_invoke_lambda"       = aws_iam_policy.iam_policy_sns_invoke_lambda_ses_uat[0].arn
+#    "sns_invoke_lambda"       = aws_iam_policy.iam_policy_sns_invoke_lambda_ses_uat[0].arn
   } : {}
 }
 
