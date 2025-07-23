@@ -1,13 +1,10 @@
-resource "aws_lakeformation_permissions" "share_lf_tags" {
+resource "aws_lakeformation_permissions" "allow_consumer_associate_tag" {
   principal   = local.hub_account_id
   permissions = ["ASSOCIATE"]
 
-  lf_tag_policy {
-    resource_type = "DATABASE"
-    expression {
-      key    = "business-unit"
-      values = ["Central Digital"]
-    }
+  lf_tag {
+    key    = "business-unit"
+    values = ["Central Digital"]
   }
 }
 
