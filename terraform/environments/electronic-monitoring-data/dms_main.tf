@@ -27,11 +27,11 @@ module "dms_task" {
   database_name = each.key
 
   # DMS Source Endpoint Inputs
-  rds_db_security_group_id = aws_security_group.db.id
-  rds_db_server_name       = split(":", aws_db_instance.database_2022.endpoint)[0]
-  rds_db_instance_port     = aws_db_instance.database_2022.port
-  rds_db_username          = aws_db_instance.database_2022.username
-  rds_db_instance_pasword  = aws_db_instance.database_2022.password
+  rds_db_security_group_id = aws_security_group.db[0].id
+  rds_db_server_name       = split(":", aws_db_instance.database_2022[0].endpoint)[0]
+  rds_db_instance_port     = aws_db_instance.database_2022[0].port
+  rds_db_username          = aws_db_instance.database_2022[0].username
+  rds_db_instance_pasword  = aws_db_instance.database_2022[0].password
 
   # DMS Target Endpoint Inputs
   target_s3_bucket_name      = module.s3-dms-target-store-bucket.bucket.id

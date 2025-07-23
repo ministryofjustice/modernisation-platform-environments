@@ -9,7 +9,7 @@ module "capita" {
     # Accounts for each system to be migrated.
     # local.sftp_account_capita_specials_mailbox,
     local.sftp_account_capita_alcohol_monitoring,
-    # local.sftp_account_capita_blob_storage,
+    local.sftp_account_capita_blob_storage,
     local.sftp_account_capita_forms_and_subject_id,
 
     # Test account for supplier.

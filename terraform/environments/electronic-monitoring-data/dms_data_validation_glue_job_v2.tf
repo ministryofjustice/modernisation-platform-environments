@@ -24,7 +24,7 @@ resource "aws_s3_object" "aws_s3_object_pyzipfile_to_s3folder" {
   key    = "${var.s3_pylib_dir_path}/glue_data_validation_lib.zip"
   source = data.archive_file.archive_file_zip_py_files.output_path
   acl    = "private"
-  etag   = filemd5(data.archive_file.archive_file_zip_py_files.output_path)
+  source_hash = filemd5(data.archive_file.archive_file_zip_py_files.output_path)
 }
 
 
@@ -40,7 +40,7 @@ resource "aws_s3_object" "dms_dv_rds_to_s3_parquet_v1" {
   bucket = module.s3-glue-job-script-bucket.bucket.id
   key    = "dms_dv_rds_to_s3_parquet_v1.py"
   source = "glue-job/dms_dv_rds_to_s3_parquet_v1.py"
-  etag   = filemd5("glue-job/dms_dv_rds_to_s3_parquet_v1.py")
+  source_hash = filemd5("glue-job/dms_dv_rds_to_s3_parquet_v1.py")
 }
 
 resource "aws_glue_job" "dms_dv_rds_to_s3_parquet_v1" {
@@ -54,8 +54,8 @@ resource "aws_glue_job" "dms_dv_rds_to_s3_parquet_v1" {
   number_of_workers = 4
   default_arguments = {
     "--script_bucket_name"               = module.s3-glue-job-script-bucket.bucket.id
-    "--rds_db_host_ep"                   = split(":", aws_db_instance.database_2022.endpoint)[0]
-    "--rds_db_pwd"                       = aws_db_instance.database_2022.password
+    "--rds_db_host_ep"                   = split(":", aws_db_instance.database_2022[0].endpoint)[0]
+    "--rds_db_pwd"                       = aws_db_instance.database_2022[0].password
     "--rds_sqlserver_db"                 = ""
     "--rds_sqlserver_db_schema"          = "dbo"
     "--rds_exclude_db_tbls"              = ""
@@ -120,7 +120,7 @@ resource "aws_s3_object" "dms_dv_rds_to_s3_parquet_v2" {
   bucket = module.s3-glue-job-script-bucket.bucket.id
   key    = "dms_dv_rds_to_s3_parquet_v2.py"
   source = "glue-job/dms_dv_rds_to_s3_parquet_v2.py"
-  etag   = filemd5("glue-job/dms_dv_rds_to_s3_parquet_v2.py")
+  source_hash = filemd5("glue-job/dms_dv_rds_to_s3_parquet_v2.py")
 }
 
 resource "aws_glue_job" "dms_dv_rds_to_s3_parquet_v2" {
@@ -134,8 +134,8 @@ resource "aws_glue_job" "dms_dv_rds_to_s3_parquet_v2" {
   number_of_workers = 4
   default_arguments = {
     "--script_bucket_name"                = module.s3-glue-job-script-bucket.bucket.id
-    "--rds_db_host_ep"                    = split(":", aws_db_instance.database_2022.endpoint)[0]
-    "--rds_db_pwd"                        = aws_db_instance.database_2022.password
+    "--rds_db_host_ep"                    = split(":", aws_db_instance.database_2022[0].endpoint)[0]
+    "--rds_db_pwd"                        = aws_db_instance.database_2022[0].password
     "--parquet_df_repartition_num"        = 24
     "--parallel_jdbc_conn_num"            = 4
     "--rds_df_repartition_num"            = 0
@@ -191,7 +191,7 @@ EOF
 #   bucket = module.s3-glue-job-script-bucket.bucket.id
 #   key    = "etl_rds_to_s3_parquet_partitionby_yyyy_mm.py"
 #   source = "glue-job/etl_rds_to_s3_parquet_partitionby_yyyy_mm.py"
-#   etag   = filemd5("glue-job/etl_rds_to_s3_parquet_partitionby_yyyy_mm.py")
+#   source_hash = filemd5("glue-job/etl_rds_to_s3_parquet_partitionby_yyyy_mm.py")
 # }
 
 # resource "aws_glue_job" "etl_rds_to_s3_parquet_partitionby_yyyy_mm" {
@@ -205,8 +205,8 @@ EOF
 #   number_of_workers = 4
 #   default_arguments = {
 #     "--script_bucket_name"               = module.s3-glue-job-script-bucket.bucket.id
-#     "--rds_db_host_ep"                   = split(":", aws_db_instance.database_2022.endpoint)[0]
-#     "--rds_db_pwd"                       = aws_db_instance.database_2022.password
+#     "--rds_db_host_ep"                   = split(":", aws_db_instance.database_2022[0].endpoint)[0]
+#     "--rds_db_pwd"                       = aws_db_instance.database_2022[0].password
 #     "--rds_sqlserver_db"                 = ""
 #     "--rds_sqlserver_db_schema"          = "dbo"
 #     "--rds_sqlserver_db_table"           = ""
@@ -263,7 +263,7 @@ EOF
 #   bucket = module.s3-glue-job-script-bucket.bucket.id
 #   key    = "etl_dv_rds_to_s3_parquet_partitionby_yyyy_mm.py"
 #   source = "glue-job/etl_dv_rds_to_s3_parquet_partitionby_yyyy_mm.py"
-#   etag   = filemd5("glue-job/etl_dv_rds_to_s3_parquet_partitionby_yyyy_mm.py")
+#   source_hash = filemd5("glue-job/etl_dv_rds_to_s3_parquet_partitionby_yyyy_mm.py")
 # }
 
 # resource "aws_glue_job" "etl_dv_rds_to_s3_parquet_partitionby_yyyy_mm" {
@@ -277,8 +277,8 @@ EOF
 #   number_of_workers = 4
 #   default_arguments = {
 #     "--script_bucket_name"                   = module.s3-glue-job-script-bucket.bucket.id
-#     "--rds_db_host_ep"                       = split(":", aws_db_instance.database_2022.endpoint)[0]
-#     "--rds_db_pwd"                           = aws_db_instance.database_2022.password
+#     "--rds_db_host_ep"                       = split(":", aws_db_instance.database_2022[0].endpoint)[0]
+#     "--rds_db_pwd"                           = aws_db_instance.database_2022[0].password
 #     "--rds_sqlserver_db"                     = ""
 #     "--rds_sqlserver_db_schema"              = "dbo"
 #     "--rds_sqlserver_db_table"               = ""
@@ -348,7 +348,7 @@ resource "aws_s3_object" "parquet_resize_or_partitionby_yyyy_mm_dd" {
   bucket = module.s3-glue-job-script-bucket.bucket.id
   key    = "parquet_resize_or_partitionby_yyyy_mm_dd.py"
   source = "glue-job/parquet_resize_or_partitionby_yyyy_mm_dd.py"
-  etag   = filemd5("glue-job/parquet_resize_or_partitionby_yyyy_mm_dd.py")
+  source_hash = filemd5("glue-job/parquet_resize_or_partitionby_yyyy_mm_dd.py")
 }
 
 resource "aws_glue_job" "parquet_resize_or_partitionby_yyyy_mm_dd" {
@@ -421,7 +421,7 @@ resource "aws_s3_object" "etl_table_rows_hashvalue_to_parquet" {
   bucket = module.s3-glue-job-script-bucket.bucket.id
   key    = "etl_table_rows_hashvalue_to_parquet.py"
   source = "glue-job/etl_table_rows_hashvalue_to_parquet.py"
-  etag   = filemd5("glue-job/etl_table_rows_hashvalue_to_parquet.py")
+  source_hash = filemd5("glue-job/etl_table_rows_hashvalue_to_parquet.py")
 }
 
 resource "aws_glue_job" "etl_table_rows_hashvalue_to_parquet" {
@@ -435,8 +435,8 @@ resource "aws_glue_job" "etl_table_rows_hashvalue_to_parquet" {
   number_of_workers = 4
   default_arguments = {
     "--script_bucket_name"                  = module.s3-glue-job-script-bucket.bucket.id
-    "--rds_db_host_ep"                      = split(":", aws_db_instance.database_2022.endpoint)[0]
-    "--rds_db_pwd"                          = aws_db_instance.database_2022.password
+    "--rds_db_host_ep"                      = split(":", aws_db_instance.database_2022[0].endpoint)[0]
+    "--rds_db_pwd"                          = aws_db_instance.database_2022[0].password
     "--rds_sqlserver_db"                    = ""
     "--rds_sqlserver_db_schema"             = "dbo"
     "--rds_sqlserver_db_table"              = ""
@@ -491,7 +491,7 @@ resource "aws_s3_object" "dms_dv_on_rows_hashvalue" {
   bucket = module.s3-glue-job-script-bucket.bucket.id
   key    = "dms_dv_on_rows_hashvalue.py"
   source = "glue-job/dms_dv_on_rows_hashvalue.py"
-  etag   = filemd5("glue-job/dms_dv_on_rows_hashvalue.py")
+  source_hash = filemd5("glue-job/dms_dv_on_rows_hashvalue.py")
 }
 
 resource "aws_glue_job" "dms_dv_on_rows_hashvalue" {
@@ -505,8 +505,8 @@ resource "aws_glue_job" "dms_dv_on_rows_hashvalue" {
   number_of_workers = 4
   default_arguments = {
     "--script_bucket_name"               = module.s3-glue-job-script-bucket.bucket.id
-    "--rds_db_host_ep"                   = split(":", aws_db_instance.database_2022.endpoint)[0]
-    "--rds_db_pwd"                       = aws_db_instance.database_2022.password
+    "--rds_db_host_ep"                   = split(":", aws_db_instance.database_2022[0].endpoint)[0]
+    "--rds_db_pwd"                       = aws_db_instance.database_2022[0].password
     "--rds_database_folder"              = ""
     "--rds_db_schema_folder"             = "dbo"
     "--table_to_be_validated"            = ""
@@ -562,7 +562,7 @@ resource "aws_s3_object" "etl_rds_tbl_rows_hashvalue_to_s3_prq_yyyy_mm" {
   bucket = module.s3-glue-job-script-bucket.bucket.id
   key    = "etl_rds_tbl_rows_hashvalue_to_s3_prq_yyyy_mm.py"
   source = "glue-job/etl_rds_tbl_rows_hashvalue_to_s3_prq_yyyy_mm.py"
-  etag   = filemd5("glue-job/etl_rds_tbl_rows_hashvalue_to_s3_prq_yyyy_mm.py")
+  source_hash = filemd5("glue-job/etl_rds_tbl_rows_hashvalue_to_s3_prq_yyyy_mm.py")
 }
 
 resource "aws_glue_job" "etl_rds_tbl_rows_hashvalue_to_s3_prq_yyyy_mm" {
@@ -581,8 +581,8 @@ resource "aws_glue_job" "etl_rds_tbl_rows_hashvalue_to_s3_prq_yyyy_mm" {
 
   default_arguments = {
     "--script_bucket_name"                  = module.s3-glue-job-script-bucket.bucket.id
-    "--rds_db_host_ep"                      = split(":", aws_db_instance.database_2022.endpoint)[0]
-    "--rds_db_pwd"                          = aws_db_instance.database_2022.password
+    "--rds_db_host_ep"                      = split(":", aws_db_instance.database_2022[0].endpoint)[0]
+    "--rds_db_pwd"                          = aws_db_instance.database_2022[0].password
     "--rds_sqlserver_db"                    = ""
     "--rds_sqlserver_db_schema"             = "dbo"
     "--rds_sqlserver_db_table"              = ""
@@ -645,7 +645,7 @@ resource "aws_s3_object" "etl_rds_sqlserver_query_to_s3_parquet" {
   bucket = module.s3-glue-job-script-bucket.bucket.id
   key    = "etl_rds_sqlserver_query_to_s3_parquet.py"
   source = "glue-job/etl_rds_sqlserver_query_to_s3_parquet.py"
-  etag   = filemd5("glue-job/etl_rds_sqlserver_query_to_s3_parquet.py")
+  source_hash = filemd5("glue-job/etl_rds_sqlserver_query_to_s3_parquet.py")
 }
 
 resource "aws_glue_job" "etl_rds_sqlserver_query_to_s3_parquet" {
@@ -659,8 +659,8 @@ resource "aws_glue_job" "etl_rds_sqlserver_query_to_s3_parquet" {
   number_of_workers = 4
   default_arguments = {
     "--script_bucket_name"                   = module.s3-glue-job-script-bucket.bucket.id
-    "--rds_db_host_ep"                       = split(":", aws_db_instance.database_2022.endpoint)[0]
-    "--rds_db_pwd"                           = aws_db_instance.database_2022.password
+    "--rds_db_host_ep"                       = split(":", aws_db_instance.database_2022[0].endpoint)[0]
+    "--rds_db_pwd"                           = aws_db_instance.database_2022[0].password
     "--jdbc_read_partitions_num"             = 0
     "--rds_sqlserver_db"                     = ""
     "--rds_sqlserver_db_schema"              = "dbo"
@@ -735,7 +735,7 @@ resource "aws_s3_object" "create_or_refresh_dv_table" {
   bucket = module.s3-glue-job-script-bucket.bucket.id
   key    = "create_or_refresh_dv_table.py"
   source = "glue-job/create_or_refresh_dv_table.py"
-  etag   = filemd5("glue-job/create_or_refresh_dv_table.py")
+  source_hash = filemd5("glue-job/create_or_refresh_dv_table.py")
 }
 
 resource "aws_glue_job" "create_or_refresh_dv_table" {
@@ -824,7 +824,7 @@ resource "aws_s3_object" "dms_dv_on_rows_hashvalue_partitionby_yyyy_mm" {
   bucket = module.s3-glue-job-script-bucket.bucket.id
   key    = "dms_dv_on_rows_hashvalue_partitionby_yyyy_mm.py"
   source = "glue-job/dms_dv_on_rows_hashvalue_partitionby_yyyy_mm.py"
-  etag   = filemd5("glue-job/dms_dv_on_rows_hashvalue_partitionby_yyyy_mm.py")
+  source_hash = filemd5("glue-job/dms_dv_on_rows_hashvalue_partitionby_yyyy_mm.py")
 }
 
 resource "aws_glue_job" "dms_dv_on_rows_hashvalue_partitionby_yyyy_mm" {
@@ -838,8 +838,8 @@ resource "aws_glue_job" "dms_dv_on_rows_hashvalue_partitionby_yyyy_mm" {
   number_of_workers = 4
   default_arguments = {
     "--script_bucket_name"                  = module.s3-glue-job-script-bucket.bucket.id
-    "--rds_db_host_ep"                      = split(":", aws_db_instance.database_2022.endpoint)[0]
-    "--rds_db_pwd"                          = aws_db_instance.database_2022.password
+    "--rds_db_host_ep"                      = split(":", aws_db_instance.database_2022[0].endpoint)[0]
+    "--rds_db_pwd"                          = aws_db_instance.database_2022[0].password
     "--rds_database_folder"                 = ""
     "--rds_db_schema_folder"                = "dbo"
     "--rds_table_orignal_name"              = ""

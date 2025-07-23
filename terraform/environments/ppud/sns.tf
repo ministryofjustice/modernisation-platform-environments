@@ -260,14 +260,9 @@ data "aws_iam_policy_document" "ses_logging_uat_topic_policy_document" {
     }
     actions = [
       "SNS:Subscribe",
-      "SNS:SetTopicAttributes",
-      "SNS:RemovePermission",
-      "SNS:Receive",
       "SNS:Publish",
       "SNS:ListSubscriptionsByTopic",
       "SNS:GetTopicAttributes",
-      "SNS:DeleteTopic",
-      "SNS:AddPermission"
     ]
     condition {
       test     = "StringEquals"
