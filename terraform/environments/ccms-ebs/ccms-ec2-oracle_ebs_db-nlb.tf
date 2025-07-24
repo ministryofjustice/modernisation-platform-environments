@@ -1,9 +1,9 @@
 # NLB for EBS DB
 resource "aws_lb" "ebsdb_nlb" {
   name                             = lower(format("nlb-%s-db", local.application_name))
-  internal                         = true
+  internal                         = false
   load_balancer_type               = "network"
-  enable_deletion_protection       = true
+  enable_deletion_protection       = false
   enable_cross_zone_load_balancing = true
   subnets                          = data.aws_subnets.shared-private.ids
   security_groups                  = [aws_security_group.sg_ebsdb_nlb.id]
