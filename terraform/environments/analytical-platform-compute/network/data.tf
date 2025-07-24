@@ -11,37 +11,6 @@ data "aws_vpc" "shared" {
   }
 }
 
-data "aws_subnets" "shared_private" {
-  filter {
-    name   = "vpc-id"
-    values = [data.aws_vpc.shared.id]
-  }
-  tags = {
-    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private*"
-  }
-}
-
-data "aws_subnet" "shared_private_subnets_a" {
-  vpc_id = data.aws_vpc.shared.id
-  tags = {
-    "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private-${data.aws_region.current.name}a"
-  }
-}
-
-data "aws_subnet" "shared_private_subnets_b" {
-  vpc_id = data.aws_vpc.shared.id
-  tags = {
-    "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private-${data.aws_region.current.name}b"
-  }
-}
-
-data "aws_subnet" "shared_private_subnets_c" {
-  vpc_id = data.aws_vpc.shared.id
-  tags = {
-    "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private-${data.aws_region.current.name}c"
-  }
-}
-
 data "aws_ssoadmin_instances" "main" {
   provider = aws.sso-readonly
 }
