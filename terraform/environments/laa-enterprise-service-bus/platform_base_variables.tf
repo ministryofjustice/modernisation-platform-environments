@@ -1,5 +1,7 @@
 variable "networking" {
+
   type = list(any)
+
 }
 
 variable "collaborator_access" {
