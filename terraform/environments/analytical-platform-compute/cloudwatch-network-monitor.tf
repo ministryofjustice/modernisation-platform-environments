@@ -6,9 +6,8 @@ module "hmcts_sdp_network_monitoring" {
   monitor_name     = "hmcts-sdp-${each.key}"
   destination      = each.value.destination
   destination_port = each.value.destination_port
-  # source_arns      = module.vpc.private_subnet_arns
-  source_arns = local.private_subnet_arns
-  tags        = local.tags
+  source_arns      = local.private_subnet_arns
+  tags             = local.tags
 }
 
 module "hmcts_sdp_onecrown_network_monitoring" {
@@ -19,8 +18,7 @@ module "hmcts_sdp_onecrown_network_monitoring" {
   monitor_name     = "hmcts-sdp-onecrown-${each.key}"
   destination      = each.value.destination
   destination_port = each.value.destination_port
-  # source_arns      = module.vpc.private_subnet_arns
-  source_arns = local.private_subnet_arns
+  source_arns      = local.private_subnet_arns
 
   tags = local.tags
 }
