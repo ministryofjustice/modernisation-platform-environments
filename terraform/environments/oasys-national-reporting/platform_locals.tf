@@ -12,6 +12,7 @@ locals {
   is-production    = substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-production"
   is-preproduction = substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-preproduction"
   is-test          = substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-test"
+  is-development   = substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-development"
 
   # Merge tags from the environment json file with additional ones
   tags = merge(
