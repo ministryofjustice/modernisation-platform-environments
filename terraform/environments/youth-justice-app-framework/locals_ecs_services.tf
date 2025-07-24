@@ -66,7 +66,7 @@ locals {
             },
             {
               "name" : "SPRING_PROFILES_ACTIVE",
-              "value" : "moj-${local.environment}"
+              "value" : local.environment
             },
             {
               "name" : "DD_SERVICE",
@@ -252,17 +252,69 @@ locals {
       ]
       enable_postgres_secret = false
     },
-    gateway = {
-      name                              = "gateway"
+    gateway-external = {
+      name                              = "gateway-external"
       internal_only                     = false
       image                             = "673920839910.dkr.ecr.eu-west-2.amazonaws.com/yjaf/gateway:preprod"
       task_cpu                          = 1024
       task_memory                       = 3072
-      desired_count                     = 1
+      desired_count                     = 2
       health_check_grace_period_seconds = 600
-      autoscaling_max_capacity          = 1
+      autoscaling_max_capacity          = 2
       ecs_task_iam_role_name            = "gateway-custom-role"
-      deployment_controller             = "ECS"
+      #todo add gateway sg
+      additional_environment_variables = [
+        {
+          "name" : "GATEWAY_SERVICE_URI"
+          "value" : "http://private-lb.${local.environment}.yjaf:8080"
+        },
+        {
+          "name" : "JAVA_OPTS",
+          "value" : "-Xmx5120m -Xms2048m --add-modules java.se --add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.management/sun.management=ALL-UNNAMED --add-opens jdk.management/com.sun.management.internal=ALL-UNNAMED -Ddd.jmxfetch.enabled=true -Ddd.profiling.enabled=true -XX:FlightRecorderOptions=stackdepth=256 -Ddd.logs.injection=true -Ddd.trace.sample.rate=1 -Ddd.service=gateway -XX:-HeapDumpOnOutOfMemoryError"
+        }
+      ]
+      enable_postgres_secret = false
+      additional_mount_points = [
+        {
+          "sourceVolume" : "logging",
+          "containerPath" : "/root/logging",
+          "readOnly" : false
+        },
+        {
+          "sourceVolume" : "gateway-logs",
+          "containerPath" : "/var/log/yjaf",
+          "readOnly" : false
+        }
+      ]
+      volumes = [
+        {
+          "name" : "logging",
+          "host" : {}
+        },
+        {
+          "name" : "gateway-logs",
+          "dockerVolumeConfiguration" : {
+            "scope" : "shared",
+            "autoprovision" : true,
+            "driver" : "local"
+          }
+        },
+        {
+          "name" : "tmpfs-1",
+          "host" : {}
+        }
+      ]
+    },
+    gateway-internal = {
+      name                              = "gateway-internal"
+      internal_only                     = true
+      image                             = "673920839910.dkr.ecr.eu-west-2.amazonaws.com/yjaf/gateway:preprod"
+      task_cpu                          = 1024
+      task_memory                       = 3072
+      desired_count                     = 2
+      health_check_grace_period_seconds = 600
+      autoscaling_max_capacity          = 2
+      ecs_task_iam_role_name            = "gateway-custom-role"
       #todo add gateway sg
       additional_environment_variables = [
         {

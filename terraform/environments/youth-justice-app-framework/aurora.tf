@@ -36,7 +36,7 @@ module "aurora" {
   aws_account_id = data.aws_caller_identity.current.account_id
 
   engine          = "aurora-postgresql"
-  engine_version  = "16.6"
+  engine_version  = local.application_data.accounts[local.environment].rds_engine_version
   master_username = "root"
 
   create_sheduler              = local.application_data.accounts[local.environment].create_rds_sheduler

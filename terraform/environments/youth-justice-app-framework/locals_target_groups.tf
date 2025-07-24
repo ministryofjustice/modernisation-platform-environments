@@ -60,11 +60,17 @@ locals {
     documents-target-group-2 = {
       name = "documents-target-group-2"
     },
-    gateway-target-group-1 = {
-      name = "gateway-target-group-1"
+    gateway-external-target-group-1 = {
+      name = "gateway-external-target-group-1"
     },
-    gateway-target-group-2 = {
-      name = "gateway-target-group-2"
+    gateway-external-target-group-2 = {
+      name = "gateway-external-target-group-2"
+    },
+    gateway-internal-target-group-1 = {
+      name = "gateway-internal-target-group-1"
+    },
+    gateway-internal-target-group-2 = {
+      name = "gateway-internal-target-group-2"
     },
     placements-target-group-1 = {
       name = "placements-target-group-1"

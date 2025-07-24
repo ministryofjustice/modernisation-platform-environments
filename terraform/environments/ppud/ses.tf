@@ -21,16 +21,16 @@ resource "aws_ses_event_destination" "ses_delivery_events_uat" {
   name                   = "ses-delivery-events-uat"
   configuration_set_name = aws_ses_configuration_set.ses_events_configuration_set_uat[0].name
   enabled                = true
-  matching_types         = [ "delivery", "bounce", "send" ]
+  matching_types         = [ "send" ]
 
   sns_destination {
     topic_arn = aws_sns_topic.ses_logging_uat[0].arn
   }
 }
 
-########################
-# Production Environment
-########################
+###########################################
+# Development and Preproduction Environment
+###########################################
 
 resource "aws_ses_domain_identity" "ppud" {
   count  = local.is-production == false ? 1 : 0

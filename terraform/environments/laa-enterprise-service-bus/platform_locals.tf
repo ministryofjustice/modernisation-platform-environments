@@ -1,7 +1,6 @@
 locals {
 
-  application_name = "ccms-ebs"
-  component_name   = "crowdstrike"
+  application_name = "laa-enterprise-service-bus"
 
   environment_management = jsondecode(data.aws_secretsmanager_secret_version.environment_management.secret_string)
 

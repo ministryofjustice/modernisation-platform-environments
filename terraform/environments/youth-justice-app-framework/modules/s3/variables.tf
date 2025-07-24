@@ -69,6 +69,12 @@ variable "log_bucket" {
   default     = null
 }
 
+variable "add_log_policy" {
+  type        = bool
+  description = "Se to tur to show that a bucket is being created to receive s3 access logs."
+  default     = false
+}
+
 variable "allow_replication" {
   type        = bool
   description = "Used to indicate that policy should be assigned to enable replication from the equivelent old account."
