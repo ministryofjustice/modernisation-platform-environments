@@ -71,6 +71,7 @@ data "aws_iam_policy_document" "load_data" {
     effect = "Allow"
     actions = [
       "glue:GetTable",
+      "glue:GetTables",
       "glue:GetDatabase",
       "glue:GetDatabases",
       "glue:CreateTable",
