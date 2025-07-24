@@ -3,17 +3,22 @@
 
 locals {
   baseline_presets_environments_specific = {
+    development = local.baseline_presets_development
     test          = local.baseline_presets_test
     preproduction = local.baseline_presets_preproduction
     production    = local.baseline_presets_production
   }
+
   baseline_presets_environment_specific = local.baseline_presets_environments_specific[local.environment]
 
   baseline_environments_specific = {
+    development = local.baseline_development
     test          = local.baseline_test
     preproduction = local.baseline_preproduction
     production    = local.baseline_production
   }
+
+
   baseline_environment_specific = local.baseline_environments_specific[local.environment]
 
   baseline_presets_all_environments = {
@@ -46,11 +51,10 @@ locals {
     }
   }
 
-  baseline_all_environments = {
+{  baseline_all_environments = {
     options = {
       enable_resource_explorer = true
     }
-
     cloudwatch_log_groups = local.ssm_doc_cloudwatch_log_groups
     security_groups       = local.security_groups
   }
