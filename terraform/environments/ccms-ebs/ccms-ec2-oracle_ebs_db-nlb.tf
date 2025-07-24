@@ -1,7 +1,7 @@
 # NLB for EBS DB
 resource "aws_lb" "ebsdb_nlb" {
   name                             = lower(format("nlb-%s-db", local.application_name))
-  internal                         = false
+  internal                         = true
   load_balancer_type               = "network"
   enable_deletion_protection       = false
   enable_cross_zone_load_balancing = true
