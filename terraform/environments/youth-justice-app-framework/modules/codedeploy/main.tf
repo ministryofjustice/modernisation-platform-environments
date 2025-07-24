@@ -125,7 +125,7 @@ resource "aws_codedeploy_deployment_group" "this" {
   load_balancer_info {
     target_group_pair_info {
       prod_traffic_route {
-        listener_arns = each.value[join("", keys(each.value))] == "external" ? [data.aws_lb_listener.external.arn, data.aws_lb_listener.internal.arn] : [data.aws_lb_listener.internal.arn]
+        listener_arns = each.value[join("", keys(each.value))] == "external" ? [data.aws_lb_listener.external.arn] : [data.aws_lb_listener.internal.arn]
       }
 
       target_group {
