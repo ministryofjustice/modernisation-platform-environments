@@ -3,7 +3,7 @@
 
 locals {
   baseline_presets_environments_specific = {
-    development = local.baseline_presets_development
+    development   = local.baseline_presets_development
     test          = local.baseline_presets_test
     preproduction = local.baseline_presets_preproduction
     production    = local.baseline_presets_production
@@ -12,7 +12,7 @@ locals {
   baseline_presets_environment_specific = local.baseline_presets_environments_specific[local.environment]
 
   baseline_environments_specific = {
-    development = local.baseline_development
+    development   = local.baseline_development
     test          = local.baseline_test
     preproduction = local.baseline_preproduction
     production    = local.baseline_production
@@ -51,7 +51,7 @@ locals {
     }
   }
 
-{  baseline_all_environments = {
+  baseline_all_environments = {
     options = {
       enable_resource_explorer = true
     }
