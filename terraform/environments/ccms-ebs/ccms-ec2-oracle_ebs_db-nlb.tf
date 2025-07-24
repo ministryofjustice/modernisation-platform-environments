@@ -17,7 +17,7 @@ resource "aws_lb_target_group" "ebsdb_nlb" {
   port                 = local.application_data.accounts[local.environment].tg_db_port
   protocol             = "TCP"
   vpc_id               = data.aws_vpc.shared.id
-  target_type          = "ip"
+  target_type          = "instance"
   deregistration_delay = 30
 
   health_check {
