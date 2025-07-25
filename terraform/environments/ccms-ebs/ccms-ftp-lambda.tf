@@ -151,7 +151,7 @@ resource "aws_s3_bucket_policy" "inbound_bucket_policy" {
   policy = data.aws_iam_policy_document.inbound_bucket_policy.json
 }
 
-#--Transfer family CORS. Production onl
+#--Transfer family CORS. Production only
 resource "aws_s3_bucket_cors_configuration" "inbound_bucket_cors_policy" {
   count  = local.is-development ? 1 : 0
   bucket = aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket

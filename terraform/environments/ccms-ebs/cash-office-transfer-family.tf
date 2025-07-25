@@ -32,7 +32,7 @@ resource "aws_route53_record" "transfer_family" {
   count    = local.is-development ? 1 : 0
   provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.external.zone_id
-  name     = "ebs-upload"
+  name     = "ccms-file-uplods"
   type     = "CNAME"
   ttl      = 300
   records  = [local.application_data.accounts[local.environment].cash_web_app_url]
