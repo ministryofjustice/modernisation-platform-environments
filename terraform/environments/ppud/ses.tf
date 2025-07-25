@@ -28,6 +28,8 @@ resource "aws_ses_event_destination" "ses_delivery_events_uat" {
   }
 }
 
+# Note the SES event destination attachment to the identity has been performed via the GUI as the identity was created there and doesn't exist in the TF code base.
+
 ###########################################
 # Development and Preproduction Environment
 ###########################################
