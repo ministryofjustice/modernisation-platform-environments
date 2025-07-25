@@ -967,14 +967,12 @@ resource "aws_iam_role_policy_attachment" "attach_lambda_policies_get_cloudwatch
   policy_arn = each.value
 }
 
-/*
-resource "aws_iam_policy_attachment" "attach_lambda_cloudwatch_full_access_prod_2" {
+resource "aws_iam_policy_attachment" "attach_lambda_cloudwatch_full_access_prod_new" {
   count      = local.is-production == true ? 1 : 0
-  name       = "lambda-cloudwatch-full-access-iam-attachment"
+  name       = "lambda-cloudwatch-full-access-iam-attachment-new"
   roles      = [aws_iam_role.lambda_role_get_cloudwatch_prod[0].id]
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchFullAccessV2"
 }
-*/
 
 # Lambda role and attachment for retrieving security hub data
 
@@ -1686,113 +1684,6 @@ resource "aws_iam_role_policy_attachment" "attach_lambda_policy_cloudwatch_invok
   role       = aws_iam_role.lambda_role_cloudwatch_invoke_lambda_prod[0].name
   policy_arn = aws_iam_policy.iam_policy_for_lambda_cloudwatch_invoke_lambda_prod[0].arn
 }
-
-############################################################
-# IAM Role & Policy for Lambda Certificate Expiration - PROD
-############################################################
-
-/*
-resource "aws_iam_role" "lambda_role_certificate_expiry_prod" {
-  count              = local.is-production == true ? 1 : 0
-  name               = "PPUD_Lambda_Function_Role_Certificate_Expiry_PROD"
-  assume_role_policy = <<EOF
-{
- "Version": "2012-10-17",
- "Statement": [
-   {
-     "Action": "sts:AssumeRole",
-     "Principal": {
-       "Service": "lambda.amazonaws.com"
-     },
-     "Effect": "Allow",
-     "Sid": ""
-   }
- ]
-}
-EOF
-}
-
-resource "aws_iam_policy" "iam_policy_for_lambda_certificate_expiry_prod" {
-  count       = local.is-production == true ? 1 : 0
-  name        = "aws_iam_policy_for_terraform_aws_lambda_role_certificate_expiry_prod"
-  path        = "/"
-  description = "AWS IAM Policy for managing aws lambda role certificate expiry prod"
-  policy = jsonencode(
-    {
-      "Version" : "2012-10-17",
-      "Statement" : [
-        {
-          "Sid" : "LambdaCertificateExpiryPolicy1",
-          "Effect" : "Allow",
-          "Action" : "logs:CreateLogGroup",
-          "Resource" : "arn:aws:logs:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:*"
-        },
-        {
-          "Sid" : "LambdaCertificateExpiryPolicy2",
-          "Effect" : "Allow",
-          "Action" : [
-            "logs:CreateLogStream",
-            "logs:PutLogEvents"
-          ],
-          "Resource" : [
-            "arn:aws:logs:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:log-group:/aws/lambda/handle-expiring-certificates:*"
-          ]
-        },
-        {
-          "Sid" : "LambdaCertificateExpiryPolicy3",
-          "Effect" : "Allow",
-          "Action" : [
-            "acm:DescribeCertificate",
-            "acm:GetCertificate",
-            "acm:ListCertificates",
-            "acm:ListTagsForCertificate"
-          ],
-          "Resource" : [
-            "arn:aws:acm:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:certificate/*"
-          ]
-        },
-        {
-          "Sid" : "LambdaCertificateExpiryPolicy4",
-          "Effect" : "Allow",
-          "Action" : "SNS:Publish",
-          "Resource" : [
-            "arn:aws:sns:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:*"
-          ]
-        },
-        {
-          "Sid" : "LambdaCertificateExpiryPolicy5",
-          "Effect" : "Allow",
-          "Action" : "cloudwatch:ListMetrics",
-          "Resource" : [
-            "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:*"
-          ]
-        },
-        {
-          "Sid" : "LambdaCertificateExpiryPolicy6",
-          "Effect" : "Allow",
-          "Action" : [
-            "sqs:ChangeMessageVisibility",
-            "sqs:DeleteMessage",
-            "sqs:GetQueueAttributes",
-            "sqs:GetQueueUrl",
-            "sqs:ListQueueTags",
-            "sqs:ReceiveMessage",
-            "sqs:SendMessage"
-          ],
-          "Resource" : [
-            "arn:aws:sqs:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:Lambda-Queue-Production"
-          ]
-        }
-      ]
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "attach_lambda_policy_certificate_expiry_to_lambda_role_certificate_expiry_prod" {
-  count      = local.is-production == true ? 1 : 0
-  role       = aws_iam_role.lambda_role_certificate_expiry_prod[0].name
-  policy_arn = aws_iam_policy.iam_policy_for_lambda_certificate_expiry_prod[0].arn
-}
-*/
 
 ####################################################
 # IAM User, Policy for MGN
