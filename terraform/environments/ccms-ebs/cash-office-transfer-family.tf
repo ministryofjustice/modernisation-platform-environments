@@ -76,5 +76,6 @@ resource "aws_cloudfront_distribution" "transfer_family" {
   viewer_certificate {
     cloudfront_default_certificate = false
     acm_certificate_arn            = "arn:aws:acm:eu-west-2:767123802783:certificate/e03b12dd-2875-407d-b5da-896e2d771c13"
+    ssl_support_method             = "sni-only"
   }
 }
