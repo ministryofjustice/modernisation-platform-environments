@@ -40,7 +40,7 @@ resource "aws_route53_record" "transfer_family" {
 
 resource "aws_acm_certificate" "transfer_family" {
   count                     = local.is-development ? 1 : 0
-  provider                  = "us-east-1"
+  provider                  = aws.us-east-1
   domain_name               = trim(data.aws_route53_zone.external.name, ".") #--Remove the trailing dot from the zone name
   subject_alternative_names = [aws_route53_record.transfer_family[0].fqdn]
   validation_method         = "DNS"
@@ -51,7 +51,7 @@ resource "aws_acm_certificate" "transfer_family" {
 
 resource "aws_acm_certificate_validation" "transfer_family" {
   count                   = local.is-development ? 1 : 0
-  provider                = us-east-1
+  provider                = aws.us-east-1
   certificate_arn         = aws_acm_certificate.transfer_family[0].arn
   validation_record_fqdns = [for record in aws_route53_record.validation : record.fqdn]
 }
