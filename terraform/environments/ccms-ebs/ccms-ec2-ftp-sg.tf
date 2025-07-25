@@ -10,7 +10,7 @@
 
 locals {
   # ftp_tp_secret_value = jsondecode(data.aws_secretsmanager_secret_version.ftp_tp_secret_value.secret_string)
-   secret_ids = [
+  secret_ids = [
     "LAA-ftp-allpay-inbound-ccms",
     "LAA-ftp-rossendales-ccms-inbound",
     "LAA-ftp-eckoh-inbound-ccms",
@@ -100,7 +100,7 @@ resource "aws_security_group_rule" "ingress_private_traffic_lambda" {
   protocol          = "TCP"
   from_port         = 0
   to_port           = 65535
-  cidr_blocks = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
+  cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
 }
 
 resource "aws_security_group_rule" "ingress_data_traffic_ebsdb" {
@@ -110,7 +110,7 @@ resource "aws_security_group_rule" "ingress_data_traffic_ebsdb" {
   protocol          = "TCP"
   from_port         = 0
   to_port           = 65535
-  cidr_blocks = [data.aws_subnet.data_subnets_a.cidr_block, data.aws_subnet.data_subnets_b.cidr_block, data.aws_subnet.data_subnets_c.cidr_block]
+  cidr_blocks       = [data.aws_subnet.data_subnets_a.cidr_block, data.aws_subnet.data_subnets_b.cidr_block, data.aws_subnet.data_subnets_c.cidr_block]
 }
 
 
@@ -144,7 +144,7 @@ resource "aws_security_group_rule" "ingress_data_traffic_ebsdb" {
 # }
 
 resource "aws_security_group_rule" "egress_traffic_ftp_22_xerox" {
-  count               = local.environment != "test" ? 1 : 0
+  count             = local.environment != "test" ? 1 : 0
   security_group_id = aws_security_group.ec2_sg_ftp.id
   type              = "egress"
   description       = "SSH for testing third party host xerox"
@@ -155,7 +155,7 @@ resource "aws_security_group_rule" "egress_traffic_ftp_22_xerox" {
 }
 
 resource "aws_security_group_rule" "egress_traffic_ftp_22_eckoh" {
-  count               = local.environment != "test" ? 1 : 0
+  count             = local.environment != "test" ? 1 : 0
   security_group_id = aws_security_group.ec2_sg_ftp.id
   type              = "egress"
   description       = "SSH for testing third party host eckoh"
@@ -166,7 +166,7 @@ resource "aws_security_group_rule" "egress_traffic_ftp_22_eckoh" {
 }
 
 resource "aws_security_group_rule" "egress_traffic_ftp_22_allpay" {
-  count               = local.environment != "test" ? 1 : 0
+  count             = local.environment != "test" ? 1 : 0
   security_group_id = aws_security_group.ec2_sg_ftp.id
   type              = "egress"
   description       = "SSH for testing third party host allpay"
@@ -177,7 +177,7 @@ resource "aws_security_group_rule" "egress_traffic_ftp_22_allpay" {
 }
 
 resource "aws_security_group_rule" "egress_traffic_ftp_22_rossendales" {
-  count               = local.environment != "test" ? 1 : 0
+  count             = local.environment != "test" ? 1 : 0
   security_group_id = aws_security_group.ec2_sg_ftp.id
   type              = "egress"
   description       = "SSH for testing third party host rossendales"
