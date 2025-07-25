@@ -225,7 +225,7 @@ locals {
 
         self_managed_active_directory = {
           dns_ips = flatten([
-            module.ad_fixngo_ip_addresses.mp_ips.ad_fixngo_hmpp_domain_controllers,
+            module.ip_addresses.mp_ips.ad_fixngo_hmpp_domain_controllers,
           ])
           domain_name                      = "azure.hmpp.root"
           username                         = "svc_fsx_windows"
