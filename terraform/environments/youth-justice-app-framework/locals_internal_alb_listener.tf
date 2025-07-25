@@ -453,7 +453,7 @@ locals {
             }
           }]
         }
-        refdata_health  = {
+        refdata_health = {
           priority = 34
           actions = [
             {
@@ -573,6 +573,7 @@ locals {
             }
           }]
         }
+      }
     }
   }
 }
