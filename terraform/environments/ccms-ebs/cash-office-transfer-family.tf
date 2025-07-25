@@ -62,7 +62,7 @@ resource "aws_acm_certificate_validation" "transfer_family" {
 resource "aws_route53_record" "validation" {
   provider = aws.core-vpc
   for_each = {
-    for dvo in aws_acm_certificate.transfer_family.domain_validation_options : dvo.domain_name => {
+    for dvo in aws_acm_certificate.transfer_family[0].domain_validation_options : dvo.domain_name => {
       name   = dvo.resource_record_name
       record = dvo.resource_record_value
       type   = dvo.resource_record_type
