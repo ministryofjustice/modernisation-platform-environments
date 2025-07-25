@@ -288,7 +288,291 @@ locals {
             }
           }]
         }
-      }
+        dal_health = {
+          priority = 23
+          actions = [
+            {
+              type             = "forward"
+              target_group_key = "dal-target-group-1"
+            }
+          ]
+          conditions = [{ #header condition for dal
+            http_header = {
+              name   = "service-health"
+              values = ["dal"]
+            }
+          }]
+        }
+        yp_health = {
+          priority = 24
+          actions = [
+            {
+              type             = "forward"
+              target_group_key = "yp-target-group-1"
+            }
+          ]
+          conditions = [{ #header condition for dal
+            http_header = {
+              name   = "service-health"
+              values = ["yp"]
+            }
+          }]
+        }
+        auth_health = {
+          priority = 25
+          actions = [
+            {
+              type             = "forward"
+              target_group_key = "auth-target-group-1"
+            }
+          ]
+          conditions = [{ #header condition for dal
+            http_header = {
+              name   = "service-health"
+              values = ["auth"]
+            }
+          }]
+        },
+        bands_health = {
+          priority = 26
+          actions = [
+            {
+              type             = "forward"
+              target_group_key = "bands-target-group-1"
+            }
+          ]
+          conditions = [{ #header condition for dal
+            http_header = {
+              name   = "service-health"
+              values = ["bands"]
+            }
+          }]
+        }
+        bu_health = {
+          priority = 27
+          actions = [
+            {
+              type             = "forward"
+              target_group_key = "bu-target-group-1"
+            }
+          ]
+          conditions = [{ #header condition for dal
+            http_header = {
+              name   = "service-health"
+              values = ["bu"]
+            }
+          }]
+        }
+        case_health = {
+          priority = 28
+          actions = [
+            {
+              type             = "forward"
+              target_group_key = "case-target-group-1"
+            }
+          ]
+          conditions = [{ #header condition for dal
+            http_header = {
+              name   = "service-health"
+              values = ["case"]
+            }
+          }]
+        },
+        cmm_health = {
+          priority = 29
+          actions = [
+            {
+              type             = "forward"
+              target_group_key = "cmm-target-group-1"
+            }
+          ]
+          conditions = [{ #header condition for dal
+            http_header = {
+              name   = "service-health"
+              values = ["cmm"]
+            }
+          }]
+        }
+        conversions_health = {
+          priority = 30
+          actions = [
+            {
+              type             = "forward"
+              target_group_key = "conversions-target-group-1"
+            }
+          ]
+          conditions = [{ #header condition for dal
+            http_header = {
+              name   = "service-health"
+              values = ["conversions"]
+            }
+          }]
+        }
+        documents_health = {
+          priority = 31
+          actions = [
+            {
+              type             = "forward"
+              target_group_key = "documents-target-group-1"
+            }
+          ]
+          conditions = [{ #header condition for dal
+            http_header = {
+              name   = "service-health"
+              values = ["documents"]
+            }
+          }]
+        },
+        gateway-internal_health = {
+          priority = 32
+          actions = [
+            {
+              type             = "forward"
+              target_group_key = "gateway-internal-target-group-1"
+            }
+          ]
+          conditions = [{ #header condition for dal
+            http_header = {
+              name   = "service-health"
+              values = ["gateway-internal"]
+            }
+          }]
+        }
+        placements_health = {
+          priority = 33
+          actions = [
+            {
+              type             = "forward"
+              target_group_key = "placements-target-group-1"
+            }
+          ]
+          conditions = [{ #header condition for dal
+            http_header = {
+              name   = "service-health"
+              values = ["placements"]
+            }
+          }]
+        }
+        refdata_health  = {
+          priority = 34
+          actions = [
+            {
+              type             = "forward"
+              target_group_key = "refdata-target-group-1"
+            }
+          ]
+          conditions = [{ #header condition for dal
+            http_header = {
+              name   = "service-health"
+              values = ["refdata"]
+            }
+          }]
+        },
+        returns_health = {
+          priority = 35
+          actions = [
+            {
+              type             = "forward"
+              target_group_key = "returns-target-group-1"
+            }
+          ]
+          conditions = [{ #header condition for dal
+            http_header = {
+              name   = "service-health"
+              values = ["returns"]
+            }
+          }]
+        }
+        serious-incidents_health = {
+          priority = 36
+          actions = [
+            {
+              type             = "forward"
+              target_group_key = "serious-incidents-target-group-1"
+            }
+          ]
+          conditions = [{ #header condition for dal
+            http_header = {
+              name   = "service-health"
+              values = ["serious-incidents"]
+            }
+          }]
+        }
+        transfers_health = {
+          priority = 37
+          actions = [
+            {
+              type             = "forward"
+              target_group_key = "transfers-target-group-1"
+            }
+          ]
+          conditions = [{ #header condition for dal
+            http_header = {
+              name   = "service-health"
+              values = ["transfers"]
+            }
+          }]
+        },
+        views_health = {
+          priority = 38
+          actions = [
+            {
+              type             = "forward"
+              target_group_key = "views-target-group-1"
+            }
+          ]
+          conditions = [{ #header condition for dal
+            http_header = {
+              name   = "service-health"
+              values = ["views"]
+            }
+          }]
+        }
+        workflow_health = {
+          priority = 39
+          actions = [
+            {
+              type             = "forward"
+              target_group_key = "workflow-target-group-1"
+            }
+          ]
+          conditions = [{ #header condition for dal
+            http_header = {
+              name   = "service-health"
+              values = ["workflow"]
+            }
+          }]
+        },
+        sentences_health = {
+          priority = 40
+          actions = [
+            {
+              type             = "forward"
+              target_group_key = "sentences-target-group-1"
+            }
+          ]
+          conditions = [{ #header condition for dal
+            http_header = {
+              name   = "service-health"
+              values = ["sentences"]
+            }
+          }]
+        }
+        transitions_health = {
+          priority = 41
+          actions = [
+            {
+              type             = "forward"
+              target_group_key = "transitions-target-group-1"
+            }
+          ]
+          conditions = [{ #header condition for dal
+            http_header = {
+              name   = "service-health"
+              values = ["transitions"]
+            }
+          }]
+        }
     }
   }
 }
