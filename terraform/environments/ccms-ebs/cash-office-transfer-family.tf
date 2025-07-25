@@ -51,7 +51,7 @@ resource "aws_acm_certificate" "transfer_family" {
 
 resource "aws_acm_certificate_validation" "transfer_family" {
   count                   = local.is-development ? 1 : 0
-  provider                = "us-east-1"
+  provider                = us-east-1
   certificate_arn         = aws_acm_certificate.transfer_family[0].arn
   validation_record_fqdns = [for record in aws_route53_record.validation : record.fqdn]
 }
