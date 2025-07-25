@@ -4,6 +4,13 @@ resource "aws_appautoscaling_target" "ecs_service" {
   scalable_dimension = "ecs:service:DesiredCount"
   min_capacity       = 2
   max_capacity       = 4
+
+  # Suspend scaling during deployment
+  suspended_state {
+      dynamic_scaling_in_suspended  = true
+      dynamic_scaling_out_suspended = true
+      scheduled_scaling_suspended   = true
+    }
 }
 
 resource "aws_appautoscaling_policy" "scale_up_amber" {

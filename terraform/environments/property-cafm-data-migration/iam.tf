@@ -15,8 +15,8 @@ data "aws_iam_policy_document" "assume_role" {
 # --- SFTP Server-Level Access Policy (if needed globally) ---
 data "aws_iam_policy_document" "sftp_access" {
   statement {
-    sid     = "AllowSftpFromWhitelistedIps"
-    effect  = "Allow"
+    sid    = "AllowSftpFromWhitelistedIps"
+    effect = "Allow"
     actions = [
       "s3:PutObject",
       "s3:GetObject",

@@ -15,7 +15,7 @@ module "eks" {
   cluster_endpoint_public_access  = true
 
   vpc_id                   = data.aws_vpc.apc.id
-  control_plane_subnet_ids = data.aws_subnets.apc_intra.ids 
+  control_plane_subnet_ids = data.aws_subnets.apc_intra.ids
   subnet_ids               = data.aws_subnets.apc_private.ids
   cluster_security_group_additional_rules = {
     vpc = {
@@ -115,9 +115,11 @@ module "eks" {
     }
 
     iam_role_additional_policies = {
-      AmazonSSMManagedInstanceCore  = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-      CloudWatchAgentServerPolicy   = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
-      EKSClusterLogsKMSAccessPolicy = module.eks_cluster_logs_kms_access_iam_policy.arn
+      AmazonEC2ContainerRegistryReadOnly = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+      AmazonSSMManagedInstanceCore       = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+      CloudWatchAgentServerPolicy        = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+      ECRPullThroughCachePolicy          = module.ecr_pull_through_cache_iam_policy.arn
+      EKSClusterLogsKMSAccessPolicy      = module.eks_cluster_logs_kms_access_iam_policy.arn
     }
 
     node_repair_config = {

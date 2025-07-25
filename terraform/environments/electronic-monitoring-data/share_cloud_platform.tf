@@ -61,7 +61,7 @@ locals {
   resolved-cloud-platform-iam-roles = coalesce(local.iam-dev, local.iam-test, local.iam-preprod, local.iam-prod)
 
   # Setting glue ARNs to limit access to production API mart
-  glue_arns = local.is-production ? [
+  cmt_glue_arns = local.is-production ? [
     "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:catalog",
     "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/staged_fms_${local.env_}dbt",
     "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/staged_fms_${local.env_}dbt/*"
@@ -191,6 +191,24 @@ module "share_specials_data_marts" {
   role_arn                = module.specials_cmt_front_end_assumable_role.iam_role_arn
 }
 
+resource "aws_lakeformation_permissions" "ac_allied_db" {
+  count       = local.is-test ? 1 : 0
+  principal   = module.acquisitive_crime_assumable_role[0].iam_role_arn
+  permissions = ["DESCRIBE"]
+  database {
+    name = "allied_mdss_${local.environment_shorthand}"
+  }
+}
+
+resource "aws_lakeformation_permissions" "ac_allied_tables" {
+  count       = local.is-test ? 1 : 0
+  principal   = module.acquisitive_crime_assumable_role[0].iam_role_arn
+  permissions = ["SELECT", "DESCRIBE"]
+  table {
+    database_name = "allied_mdss_${local.environment_shorthand}"
+    wildcard      = true
+  }
+}
 
 data "aws_iam_policy_document" "standard_athena_access" {
   statement {
@@ -200,31 +218,20 @@ data "aws_iam_policy_document" "standard_athena_access" {
       "athena:GetQueryResults",
       "athena:GetWorkGroup",
       "athena:StartQueryExecution",
-      "athena:StopQueryExecution"
-    ]
-    resources = [
-      "arn:aws:athena:${data.aws_region.current.name}:${local.env_account_id}:*/*"
-    ]
-  }
-  statement {
-    actions = [
+      "athena:StopQueryExecution",
       "athena:CreatePreparedStatement",
       "athena:UpdatePreparedStatement",
       "athena:GetPreparedStatement",
       "athena:ListPreparedStatements",
-      "athena:DeletePreparedStatement"
+      "athena:DeletePreparedStatement",
     ]
     resources = [
       "arn:aws:athena:${data.aws_region.current.name}:${local.env_account_id}:*/*"
     ]
   }
   statement {
-    actions = [
-      "athena:ListWorkGroups"
-    ]
-    resources = [
-      "*"
-    ]
+    actions   = ["athena:ListWorkGroups"]
+    resources = ["*"]
   }
   statement {
     actions   = ["lakeformation:GetDataAccess"]
@@ -250,6 +257,9 @@ data "aws_iam_policy_document" "standard_athena_access" {
     ]
     resources = ["${module.s3-athena-bucket.bucket.arn}/*"]
   }
+}
+
+data "aws_iam_policy_document" "cmt_permissions" {
   statement {
     effect = "Allow"
     actions = [
@@ -258,12 +268,46 @@ data "aws_iam_policy_document" "standard_athena_access" {
       "glue:GetTables",
       "glue:GetTable"
     ]
-    resources = local.glue_arns
+    resources = local.cmt_glue_arns
   }
   statement {
     effect    = "Allow"
     actions   = ["execute-api:Invoke"]
     resources = ["arn:aws:execute-api:${data.aws_region.current.name}:${local.env_account_id}:${module.get_zipped_file_api_api.api_gateway_id}/*"]
+  }
+}
+
+
+
+data "aws_iam_policy_document" "ac_permissions" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "glue:GetDatabases",
+      # Glue uses a heirarchical system of permissions. Permissions must be granted at
+      # every higher level to work in the lower levels!
+      "glue:GetDatabase",
+      "glue:GetTables",
+      "glue:GetTable",
+    ]
+    resources = ["arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:catalog"]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "glue:GetDatabase",
+      "glue:GetTables",
+      "glue:GetTable",
+    ]
+    resources = local.is-development || local.is-test ? ["arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/*"] : []
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "glue:GetTables",
+      "glue:GetTable",
+    ]
+    resources = local.is-development || local.is-test ? ["arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/*/*"] : []
   }
 }
 
@@ -273,8 +317,26 @@ resource "aws_iam_policy" "standard_athena_access" {
   policy      = data.aws_iam_policy_document.standard_athena_access.json
 }
 
+resource "aws_iam_policy" "cmt_specific_access" {
+  name_prefix = "cmt_specific_access"
+  description = "Access to the Glue tables and APIs required by CMT."
+  policy      = data.aws_iam_policy_document.cmt_permissions.json
+}
+
+resource "aws_iam_policy" "ac_specific_access" {
+  count      = local.is-development || local.is-test ? 1 : 0
+  name_prefix = "ac_specific_access"
+  description = "Access to the Glue tables required by Acquisitive Crime."
+  policy      = data.aws_iam_policy_document.ac_permissions.json
+}
+
 resource "aws_iam_role_policy_attachment" "standard_athena_access" {
   policy_arn = aws_iam_policy.standard_athena_access.arn
+  role       = module.cmt_front_end_assumable_role.iam_role_name
+}
+
+resource "aws_iam_role_policy_attachment" "cmt_specific_access" {
+  policy_arn = aws_iam_policy.cmt_specific_access.arn
   role       = module.cmt_front_end_assumable_role.iam_role_name
 }
 
@@ -287,5 +349,11 @@ resource "aws_iam_role_policy_attachment" "specials_role_standard_athena_access"
 resource "aws_iam_role_policy_attachment" "standard_athena_access_ac" {
   count      = local.is-development || local.is-test ? 1 : 0
   policy_arn = aws_iam_policy.standard_athena_access.arn
+  role       = module.acquisitive_crime_assumable_role[0].iam_role_name
+}
+
+resource "aws_iam_role_policy_attachment" "ac_specific_access" {
+  count      = local.is-development || local.is-test ? 1 : 0
+  policy_arn = aws_iam_policy.ac_specific_access[0].arn
   role       = module.acquisitive_crime_assumable_role[0].iam_role_name
 }

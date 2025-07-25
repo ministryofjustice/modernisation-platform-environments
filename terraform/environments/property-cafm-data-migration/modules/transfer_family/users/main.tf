@@ -48,19 +48,19 @@ resource "aws_transfer_user" "this" {
 # --- User-specific Resources ---
 data "aws_iam_policy_document" "sftp_user_policy" {
   statement {
-    sid = "ListBucket"
-    effect = "Allow"
-    actions = ["s3:ListBucket"]
+    sid       = "ListBucket"
+    effect    = "Allow"
+    actions   = ["s3:ListBucket"]
     resources = ["arn:aws:s3:::${var.s3_bucket}"]
     condition {
       test     = "StringLike"
       variable = "s3:prefix"
-      values = [var.user_name, "${var.user_name}/*"]
+      values   = [var.user_name, "${var.user_name}/*"]
     }
   }
 
   statement {
-    sid = "FullAccessToUserFolder"
+    sid    = "FullAccessToUserFolder"
     effect = "Allow"
     actions = [
       "s3:GetObject",
@@ -79,15 +79,15 @@ data "aws_iam_policy_document" "sftp_user_policy" {
     sid    = "KMSAccessForEncryptedS3"
     effect = "Allow"
     actions = [
-        "kms:Encrypt",
-        "kms:Decrypt",
-        "kms:ReEncrypt*",
-        "kms:GenerateDataKey*",
-        "kms:DescribeKey"
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:DescribeKey"
     ]
     resources = [
-        var.kms_key_arn
+      var.kms_key_arn
     ]
-    }
+  }
 }
 

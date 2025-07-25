@@ -171,6 +171,12 @@ locals {
         }
       }
     }
-    
+
+    ec2_instances = {}
+
+    iam_policies = {
+    }
+
+
   }
 }

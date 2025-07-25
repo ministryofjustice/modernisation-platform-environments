@@ -92,26 +92,25 @@ data "aws_iam_policy_document" "extra-policy-document" {
 
   statement {
     actions = [
-      "s3:GetObject",
-      "s3:DeleteObject",
-      "s3:GetObjectAcl",
-      "s3:ListBucket",
       "s3:PutObject",
+      "s3:ListBucket",
+      "s3:GetObjectAcl",
+      "s3:GetObject",
       "s3:GetBucketLocation",
-      "s3:GetBucketLocation"
+      "s3:DeleteObject",
     ]
     resources = [
       "arn:aws:s3:::${var.project_id}-*/*",
-      "arn:aws:s3:::${var.project_id}-*"
+      "arn:aws:s3:::${var.project_id}-*",
     ]
   }
   # https://docs.aws.amazon.com/glue/latest/dg/monitor-continuous-logging-enable.html#monitor-continuous-logging-encrypt-log-data
   statement {
     actions = [
-      "logs:CreateLogGroup",
-      "logs:CreateLogStream",
       "logs:PutLogEvents",
-      "logs:AssociateKmsKey"
+      "logs:CreateLogStream",
+      "logs:CreateLogGroup",
+      "logs:AssociateKmsKey",
     ]
     resources = [
       "arn:aws:logs:*:*:/aws-glue/*"
@@ -119,12 +118,12 @@ data "aws_iam_policy_document" "extra-policy-document" {
   }
   statement {
     actions = [
-      "glue:*",
+      "sqs:*", # Needs Fixing
       "iam:ListRolePolicies",
-      "iam:GetRole",
       "iam:GetRolePolicy",
+      "iam:GetRole",
+      "glue:*",
       "cloudwatch:PutMetricData",
-      "sqs:*" # Needs Fixing
     ]
     resources = [
       "*"
@@ -132,10 +131,10 @@ data "aws_iam_policy_document" "extra-policy-document" {
   }
   statement {
     actions = [
+      "dms:StopReplicationTask",
+      "dms:ModifyReplicationTask",
       "dms:DescribeTableStatistics",
       "dms:DescribeReplicationTasks",
-      "dms:StopReplicationTask",
-      "dms:ModifyReplicationTask"
     ]
     resources = [
       "arn:aws:dms:${var.region}:${var.account}:*:*"
@@ -143,12 +142,12 @@ data "aws_iam_policy_document" "extra-policy-document" {
   }
   statement {
     actions = [
-      "kinesis:DescribeLimits",
-      "kinesis:DescribeStream",
-      "kinesis:GetRecords",
-      "kinesis:GetShardIterator",
       "kinesis:SubscribeToShard",
-      "kinesis:ListShards"
+      "kinesis:ListShards",
+      "kinesis:GetShardIterator",
+      "kinesis:GetRecords",
+      "kinesis:DescribeStream",
+      "kinesis:DescribeLimits",
     ]
     resources = [
       "arn:aws:kinesis:${var.region}:${var.account}:stream/${var.project_id}-*"
@@ -157,20 +156,20 @@ data "aws_iam_policy_document" "extra-policy-document" {
   statement {
     actions = [
       "secretsmanager:GetSecretValue",
-      "secretsmanager:DescribeSecret"
+      "secretsmanager:DescribeSecret",
     ]
     resources = concat(var.additional_secret_arns, [
+      "arn:aws:secretsmanager:${var.region}:${var.account}:secret:external/${var.project_id}-dps-*",
       "arn:aws:secretsmanager:${var.region}:${var.account}:secret:${var.project_id}-redshift-secret-*",
-      "arn:aws:secretsmanager:${var.region}:${var.account}:secret:external/${var.project_id}-dps-*"
     ])
   }
   statement {
     actions = [
-      "kms:Encrypt*",
-      "kms:Decrypt*",
       "kms:ReEncrypt*",
       "kms:GenerateDataKey*",
-      "kms:DescribeKey"
+      "kms:Encrypt*",
+      "kms:DescribeKey",
+      "kms:Decrypt*",
     ]
     resources = [
       "arn:aws:kms:*:${var.account}:key/*"
@@ -178,17 +177,17 @@ data "aws_iam_policy_document" "extra-policy-document" {
   }
   statement {
     actions = [
-      "dynamodb:BatchGet*",
-      "dynamodb:DescribeStream",
-      "dynamodb:DescribeTable",
-      "dynamodb:Get*",
-      "dynamodb:Query",
-      "dynamodb:Scan",
-      "dynamodb:BatchWrite*",
-      "dynamodb:CreateTable",
-      "dynamodb:Delete*",
       "dynamodb:Update*",
-      "dynamodb:PutItem"
+      "dynamodb:Scan",
+      "dynamodb:Query",
+      "dynamodb:PutItem",
+      "dynamodb:Get*",
+      "dynamodb:DescribeTable",
+      "dynamodb:DescribeStream",
+      "dynamodb:Delete*",
+      "dynamodb:CreateTable",
+      "dynamodb:BatchWrite*",
+      "dynamodb:BatchGet*",
     ]
     resources = [
       "arn:aws:dynamodb:${var.region}:${var.account}:table/dpr-*"

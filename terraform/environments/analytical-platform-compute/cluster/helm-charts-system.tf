@@ -54,7 +54,7 @@ resource "helm_release" "aws_for_fluent_bit" {
         aws_region                = data.aws_region.current.name
         cluster_name              = module.eks.cluster_name
         cloudwatch_log_group_name = module.eks_log_group.cloudwatch_log_group_name
-        eks_role_arn = module.aws_for_fluent_bit_iam_role.iam_role_arn
+        eks_role_arn              = module.aws_for_fluent_bit_iam_role.iam_role_arn
       }
     )
   ]

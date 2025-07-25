@@ -31,9 +31,9 @@ locals {
 
   # Some connections are only set up in specific environments
   dev_federated_query_connections_oracle = {
-    nomis   = local.connection_string_nomis
-    bodmis  = local.connection_string_bodmis
-    ndmis   = local.connection_string_ndmis
+    nomis  = local.connection_string_nomis
+    bodmis = local.connection_string_bodmis
+    ndmis  = local.connection_string_ndmis
   }
 
   test_federated_query_connections_oracle = {
@@ -86,13 +86,13 @@ locals {
   federated_query_connection_strings_map_oracle = (local.is-development ? local.dev_federated_query_connections_oracle :
     (local.is-test ? local.test_federated_query_connections_oracle :
       (local.is-preproduction ? local.preproduction_federated_query_connections_oracle :
-        local.production_federated_query_connections_oracle)))
+  local.production_federated_query_connections_oracle)))
 
   federated_query_credentials_secret_arns_oracle = (local.is-development ?
     local.dev_federated_query_credentials_secret_arns_oracle :
     (local.is-test ? local.test_federated_query_credentials_secret_arns_oracle :
       (local.is-preproduction ? local.preproduction_federated_query_credentials_secret_arns_oracle :
-        local.production_federated_query_credentials_secret_arns_oracle)))
+  local.production_federated_query_credentials_secret_arns_oracle)))
 
 }
 

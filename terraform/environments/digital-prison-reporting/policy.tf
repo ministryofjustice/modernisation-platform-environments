@@ -30,11 +30,11 @@ data "aws_iam_policy_document" "glue-policy-data" {
   #checkov:skip=CKV_AWS_283: "Ensure no IAM policies documents allow ALL or any AWS principal permissions to the resource"
   statement {
     actions = [
-      "glue:CreateTable",
-      "glue:DeleteTable",
-      "glue:CreateSchema",
-      "glue:DeleteSchema",
       "glue:UpdateTable",
+      "glue:DeleteTable",
+      "glue:DeleteSchema",
+      "glue:CreateSchema",
+      "glue:CreateTable",
     ]
     resources = ["arn:aws:glue:${local.current_account_region}:${local.current_account_id}:*"]
     principals {
@@ -85,7 +85,7 @@ resource "aws_iam_policy" "s3_read_access_policy" {
         ],
         "Resource" : [
           "arn:aws:s3:::${local.project}-*/*",
-          "arn:aws:s3:::${local.project}-*"
+          "arn:aws:s3:::${local.project}-*",
         ]
       }
     ]
@@ -120,7 +120,7 @@ resource "aws_iam_policy" "s3_read_write_policy" {
         ],
         "Resource" : [
           "arn:aws:s3:::${local.project}-*/*",
-          "arn:aws:s3:::${local.project}-*"
+          "arn:aws:s3:::${local.project}-*",
         ]
       }
     ]
@@ -139,7 +139,7 @@ resource "aws_iam_policy" "s3_all_object_actions_policy" {
         "Effect" : "Allow",
         "Resource" : [
           "arn:aws:s3:::${local.project}-*/*",
-          "arn:aws:s3:::${local.project}-*"
+          "arn:aws:s3:::${local.project}-*",
         ]
       }
     ]
@@ -158,8 +158,8 @@ resource "aws_iam_policy" "invoke_lambda_policy" {
           "lambda:InvokeFunction"
         ],
         "Resource" : [
+          "arn:aws:lambda:*:${local.account_id}:function:*:*",
           "arn:aws:lambda:*:${local.account_id}:function:*",
-          "arn:aws:lambda:*:${local.account_id}:function:*:*"
         ]
       }
     ]
@@ -195,9 +195,9 @@ resource "aws_iam_policy" "trigger_glue_job_policy" {
         "Effect" : "Allow",
         "Action" : [
           "glue:StartJobRun",
-          "glue:GetJobRun",
           "glue:GetJobRuns",
-          "glue:BatchStopJobRun"
+          "glue:GetJobRun",
+          "glue:BatchStopJobRun",
         ],
         "Resource" : [
           "arn:aws:glue:${local.account_region}:${local.account_id}:*"
@@ -321,12 +321,12 @@ data "aws_iam_policy_document" "redshift-additional-policy" {
   }
   statement {
     actions = [
+      "logs:AssociateKmsKey",
       "logs:CreateLogGroup",
       "logs:CreateLogStream",
-      "logs:PutLogEvents",
-      "logs:AssociateKmsKey",
       "logs:DescribeLogStreams",
       "logs:GetLogEvents",
+      "logs:PutLogEvents",
       "logs:PutRetentionPolicy"
     ]
     resources = [
@@ -957,9 +957,9 @@ data "aws_iam_policy_document" "eventbridge_execution_assume_policy_document" {
       type = "Service"
 
       identifiers = [
+        "lambda.amazonaws.com",
         "scheduler.amazonaws.com",
-        "states.amazonaws.com",
-        "lambda.amazonaws.com"
+        "states.amazonaws.com"
       ]
     }
   }

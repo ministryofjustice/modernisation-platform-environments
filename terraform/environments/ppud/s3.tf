@@ -114,9 +114,7 @@ resource "aws_s3_bucket_policy" "PPUD" {
             "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/developer",
             "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/sandbox",
             "arn:aws:iam::${local.environment_management.account_ids["ppud-preproduction"]}:role/developer",
-            "arn:aws:iam::${local.environment_management.account_ids["ppud-preproduction"]}:role/migration",
-            "arn:aws:iam::${local.environment_management.account_ids["ppud-production"]}:role/developer",
-            "arn:aws:iam::${local.environment_management.account_ids["ppud-production"]}:role/migration"
+            "arn:aws:iam::${local.environment_management.account_ids["ppud-production"]}:role/developer"
           ]
         }
         Action = [
@@ -291,6 +289,8 @@ resource "aws_s3_bucket_policy" "moj-infrastructure" {
         ],
         "Principal" : {
           "AWS" : [
+            "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/ec2-iam-role",
+            "arn:aws:iam::${local.environment_management.account_ids["ppud-preproduction"]}:role/ec2-iam-role",
             "arn:aws:iam::${local.environment_management.account_ids["ppud-production"]}:role/ec2-iam-role"
           ]
         }
@@ -2106,7 +2106,9 @@ resource "aws_s3_bucket_policy" "moj-infrastructure-dev" {
         ],
         "Principal" : {
           "AWS" : [
-            "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/ec2-iam-role"
+            "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/ec2-iam-role",
+            "arn:aws:iam::${local.environment_management.account_ids["ppud-preproduction"]}:role/ec2-iam-role",
+            "arn:aws:iam::${local.environment_management.account_ids["ppud-production"]}:role/ec2-iam-role"
           ]
         }
       },
@@ -2246,7 +2248,9 @@ resource "aws_s3_bucket_policy" "moj-infrastructure-uat" {
         ],
         "Principal" : {
           "AWS" : [
-            "arn:aws:iam::${local.environment_management.account_ids["ppud-preproduction"]}:role/ec2-iam-role"
+            "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/ec2-iam-role",
+            "arn:aws:iam::${local.environment_management.account_ids["ppud-preproduction"]}:role/ec2-iam-role",
+            "arn:aws:iam::${local.environment_management.account_ids["ppud-production"]}:role/ec2-iam-role"
           ]
         }
       },

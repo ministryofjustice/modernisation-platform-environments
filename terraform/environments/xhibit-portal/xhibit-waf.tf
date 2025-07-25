@@ -1,19 +1,19 @@
 module "waf" {
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-waf?ref=ecc855f212ce6a2f36a7a77e78c42d968f15ee8d"
-  enable_ddos_protection = true
-  ddos_rate_limit        = 3000
-  block_non_uk_traffic   = true
+  source                   = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-waf?ref=ecc855f212ce6a2f36a7a77e78c42d968f15ee8d"
+  enable_ddos_protection   = true
+  ddos_rate_limit          = 3000
+  block_non_uk_traffic     = true
   associated_resource_arns = [aws_lb.waf_lb.arn]
 
   managed_rule_actions = {
-    AWSManagedRulesKnownBadInputsRuleSet = true
+    AWSManagedRulesKnownBadInputsRuleSet = false
     AWSManagedRulesCommonRuleSet         = false
-    AWSManagedRulesSQLiRuleSet           = true
-    AWSManagedRulesLinuxRuleSet          = true
+    AWSManagedRulesSQLiRuleSet           = false
+    AWSManagedRulesLinuxRuleSet          = false
     AWSManagedRulesAnonymousIpList       = false
     AWSManagedRulesBotControlRuleSet     = false
   }
-  
+
   core_logging_account_id = local.environment_management.account_ids["core-logging-production"]
 
   application_name = local.application_name
@@ -34,7 +34,9 @@ resource "aws_wafv2_ip_set" "prtg_waf_ip_set" {
     "35.176.93.186/32",  // MoJ VPN Gateway Proxies
     "172.10.10.188/32",  // V1 Digital Wifi
     "194.62.186.170/32", // V1 VPN Gateway Proxies
-    "66.155.16.68/32"   // Southampton BEL Wifi
+    "66.155.16.61/32",   // SBEL Wifi
+    "66.155.16.68/32",   // SBEL Wifi
+    "92.236.109.133/32"  // GD Wifi
   ]
 
   tags = merge(local.tags,
@@ -58,7 +60,7 @@ resource "aws_wafv2_web_acl" "prtg_web_acl" {
 
     priority = 1
     action {
-      count {}
+      allow {}
     }
 
     statement {
@@ -79,12 +81,16 @@ resource "aws_wafv2_web_acl" "prtg_web_acl" {
     priority = 2
 
     action {
-      allow {}
+      block {}
     }
 
     statement {
-      geo_match_statement {
-        country_codes = ["GB"]
+      not_statement {
+        statement {
+          geo_match_statement {
+            country_codes = ["GB"]
+          }
+        }
       }
     }
 
@@ -123,9 +129,9 @@ resource "aws_wafv2_web_acl" "prtg_web_acl" {
   )
 
   visibility_config {
-      cloudwatch_metrics_enabled = true
-      metric_name                = "prtg-waf"
-      sampled_requests_enabled   = true
+    cloudwatch_metrics_enabled = true
+    metric_name                = "prtg-waf"
+    sampled_requests_enabled   = true
   }
 }
 

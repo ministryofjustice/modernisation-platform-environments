@@ -14,6 +14,15 @@ parameters:
     type: String
     description: 'Any additional parameters to pass to powershell in hashtable format, e.g. @{"DomainNameFQDN" = "azure.noms.root"}'
     default: '@{}'
+  whatIfPreference:
+    type: String
+    description: 'Optionally set whatIfPreference, e.g. set to $true'
+    default: '$false'
+  verbosePreference:
+    type: String
+    description: 'Optionally set verbose, e.g. set to Continue for verbose output'
+    default: SilentlyContinue
+
 mainSteps:
   - name: WindowsPowershellConfigurationManagement
     action: aws:runPowerShellScript
@@ -33,5 +42,9 @@ mainSteps:
           $ScriptArgs = {{ powershellScriptArgs }}
           [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 # since powershell 4 uses Tls1 as default
           Invoke-WebRequest "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform-configuration-management/${GitBranch}/powershell/Scripts/Run-GitScript.ps1" -OutFile "Run-GitScript.ps1"
+          Write-Output "Set WhatIfPreference=$WhatIfPreference VerbosePreference=$VerbosePreference"
+          $WhatIfPreference = {{ whatIfPreference }}
+          $VerbosePreference = "{{ verbosePreference }}"
+          Write-Output ("Run-GitScript.ps1 $Script -GitBranch $GitBranch -ScriptArgs " + ($ScriptArgs | ConvertTo-Json -Compress))
           . ./Run-GitScript.ps1 $Script -GitBranch $GitBranch -ScriptArgs $ScriptArgs
           Exit $LASTEXITCODE

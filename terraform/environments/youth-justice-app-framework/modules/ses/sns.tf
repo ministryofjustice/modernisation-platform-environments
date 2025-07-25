@@ -1,6 +1,6 @@
 resource "aws_sns_topic" "ses_notifications" {
-  name                = "ses-bounce-complaint"
-  kms_master_key_id   = var.key_id
+  name              = "ses-bounce-complaint"
+  kms_master_key_id = var.key_id
 }
 
 
@@ -11,13 +11,13 @@ resource "aws_sns_topic_policy" "allow_ses_publish" {
     Version = "2012-10-17",
     Statement = [
       {
-        Sid       = "AllowSESPublish",
-        Effect    = "Allow",
+        Sid    = "AllowSESPublish",
+        Effect = "Allow",
         Principal = {
           Service = "ses.amazonaws.com"
         },
-        Action    = "SNS:Publish",
-        Resource  = aws_sns_topic.ses_notifications.arn,
+        Action   = "SNS:Publish",
+        Resource = aws_sns_topic.ses_notifications.arn,
         Condition = {
           StringEquals = {
             "AWS:SourceAccount" = data.aws_caller_identity.current.account_id
@@ -31,13 +31,19 @@ resource "aws_sns_topic_policy" "allow_ses_publish" {
   })
 }
 
+resource "aws_sns_topic_subscription" "email_subscription" {
+  topic_arn = aws_sns_topic.ses_notifications.arn
+  protocol  = "email"
+  endpoint  = "yjafsesndr@necsws.com"
+}
+
 
 data "aws_caller_identity" "current" {}
 
 
 # Bounce Notifications
 resource "aws_ses_identity_notification_topic" "bounce_topic" {
-  for_each                 = { for k, v in var.ses_domain_identities : k => v if v.create_records }
+  for_each                 = var.ses_domain_identities
   identity                 = aws_ses_domain_identity.main[each.key].domain
   notification_type        = "Bounce"
   topic_arn                = aws_sns_topic.ses_notifications.arn
@@ -47,7 +53,7 @@ resource "aws_ses_identity_notification_topic" "bounce_topic" {
 
 # Complaint Notifications
 resource "aws_ses_identity_notification_topic" "complaint_topic" {
-  for_each                 = { for k, v in var.ses_domain_identities : k => v if v.create_records }
+  for_each                 = var.ses_domain_identities
   identity                 = aws_ses_domain_identity.main[each.key].domain
   notification_type        = "Complaint"
   topic_arn                = aws_sns_topic.ses_notifications.arn

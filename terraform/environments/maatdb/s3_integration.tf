@@ -39,7 +39,7 @@ module "s3_bucket" {
       noncurrent_version_expiration = {
         days = 31
       }
-    
+
       transition = [
         {
           days          = 90

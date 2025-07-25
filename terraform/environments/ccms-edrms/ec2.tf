@@ -47,6 +47,13 @@ resource "aws_launch_template" "ec2-launch-template" {
   }
 
   tag_specifications {
+    resource_type = "instance"
+    tags = merge(local.tags,
+      { instance-scheduling = "skip-scheduling" }
+    )
+  }
+
+  tag_specifications {
     resource_type = "volume"
     tags = merge(local.tags,
       { Name = lower(format("%s-%s-ecs-cluster", local.application_name, local.environment)) }

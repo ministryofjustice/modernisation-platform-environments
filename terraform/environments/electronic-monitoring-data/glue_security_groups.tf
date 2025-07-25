@@ -19,9 +19,10 @@ resource "aws_security_group" "glue_rds_conn_security_group" {
 # -------------------------------------------------------
 
 resource "aws_vpc_security_group_egress_rule" "glue_rds_egress" {
+  count = local.is-production || local.is-development ? 1 : 0
 
   security_group_id            = aws_security_group.glue_rds_conn_security_group.id
-  referenced_security_group_id = aws_security_group.db.id
+  referenced_security_group_id = aws_security_group.db[0].id
   ip_protocol                  = "tcp"
   from_port                    = 1433
   to_port                      = 1433
@@ -29,7 +30,9 @@ resource "aws_vpc_security_group_egress_rule" "glue_rds_egress" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "rds_glue_ingress" {
-  security_group_id            = aws_security_group.db.id
+  count = local.is-production || local.is-development ? 1 : 0
+
+  security_group_id            = aws_security_group.db[0].id
   referenced_security_group_id = aws_security_group.glue_rds_conn_security_group.id
   ip_protocol                  = "tcp"
   from_port                    = 1433
