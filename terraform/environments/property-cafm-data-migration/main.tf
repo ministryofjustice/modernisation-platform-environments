@@ -1,20 +1,24 @@
-module "rds_export" {
-  source = "github.com/ministryofjustice/terraform-rds-export?ref=230537b0367f7a55d27ee91c219f13a263ba615e"
+# module "rds_export" {
+#   source = "github.com/ministryofjustice/terraform-rds-export?ref=230537b0367f7a55d27ee91c219f13a263ba615e"
 
-  # Replace the kms_key_arn, name, vpc_id and (database_subnet_ids in a list)
-  kms_key_arn         = aws_kms_key.sns_kms.arn
-  name                = "cafm"
-  vpc_id              = module.vpc.vpc_id
-  database_subnet_ids = module.vpc.private_subnets
+#   # Replace the kms_key_arn, name, vpc_id and (database_subnet_ids in a list)
+#   kms_key_arn         = aws_kms_key.sns_kms.arn
+#   name                = "cafm"
+#   vpc_id              = module.vpc.vpc_id
+#   database_subnet_ids = module.vpc.private_subnets
 
-  tags = {
-    business-unit = "Property"
-    application   = local.application_name
-    is-production = "false"
-    owner         = "shanmugapriya.basker@justice.gov.uk"
-  }
+#   tags = {
+#     business-unit = "Property"
+#     application   = local.application_name
+#     is-production = "false"
+#     owner         = "shanmugapriya.basker@justice.gov.uk"
+#   }
+# }
+
+resource "aws_secretsmanager_secret" "db_master_user_secret" {
+  # checkov:skip=CKV2_AWS_57: Skipping because automatic rotation not needed.
+  name       = "cafm-database-master-user-secret-test1"
 }
-
 
 module "endpoints" {
   # Commit has for v5.21.0
