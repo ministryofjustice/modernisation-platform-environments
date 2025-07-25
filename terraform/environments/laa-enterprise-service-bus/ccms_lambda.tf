@@ -1,18 +1,16 @@
 resource "aws_lambda_function" "ccms_lambda" {
-  # If the file is not in the current working directory you will need to include a
-  # path.module in the filename.
-  filename      = "lambda_function_payload.zip"
-  function_name = "lambda_function_name"
-  role          = aws_iam_role.iam_for_lambda.arn
-  handler       = "index.test"
+  filename         = "ccms_lambda.zip"
+  function_name    = "ccms_lambda_function"
+  role             = aws_iam_role.ccms_lambda_role.arn
+  handler          = "index.test"
+  runtime          = "python3.11"
+  source_code_hash = filebase64sha256("lambda.zip")
 
-  source_code_hash = data.archive_file.lambda.output_base64sha256
+#   vpc_config {
+#     subnet_ids         = # Replace with your private subnet(s)
+#     security_group_ids = # Replace with appropriate SG
+#   }
 
-  runtime = "nodejs16.x"
-
-  environment {
-    variables = {
-      foo = "bar"
-    }
-  }
+  timeout = 10
+  memory_size = 128
 }
