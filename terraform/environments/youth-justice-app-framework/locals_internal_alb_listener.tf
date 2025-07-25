@@ -49,7 +49,7 @@ locals {
               values = ["/api/v1/yps*", "/api/v1/yp*"]
             }
           }]
-        }
+        },
         auth = {
           priority = 5
           actions = [
@@ -77,7 +77,7 @@ locals {
               values = ["/api/v1/bands*"]
             }
           }]
-        }
+        },
         bu = {
           priority = 7
           actions = [
@@ -91,7 +91,7 @@ locals {
               values = ["/api/v1/bu*"]
             }
           }]
-        }
+        },
         case = {
           priority = 8
           actions = [
@@ -119,7 +119,7 @@ locals {
               values = ["/api/v1/cmm*"]
             }
           }]
-        }
+        },
         conversions = {
           priority = 10
           actions = [
@@ -133,7 +133,7 @@ locals {
               values = ["/api/v1/conversions*"]
             }
           }]
-        }
+        },
         documents = {
           priority = 11
           actions = [
@@ -161,7 +161,7 @@ locals {
               values = ["/secure/api*"]
             }
           }]
-        }
+        },
         placements = {
           priority = 13
           actions = [
@@ -175,7 +175,7 @@ locals {
               values = ["/api/v1/placements*"]
             }
           }]
-        }
+        },
         refdata = {
           priority = 14
           actions = [
@@ -203,7 +203,7 @@ locals {
               values = ["/api/v1/returns*"]
             }
           }]
-        }
+        },
         serious-incidents = {
           priority = 16
           actions = [
@@ -217,7 +217,7 @@ locals {
               values = ["/serious-incidents", "/api/v1/serious-incidents*"]
             }
           }]
-        }
+        },
         transfers = {
           priority = 17
           actions = [
@@ -245,7 +245,7 @@ locals {
               values = ["/api/v1/views*"]
             }
           }]
-        }
+        },
         workflow = {
           priority = 19
           actions = [
@@ -273,7 +273,7 @@ locals {
               values = ["/api/v1/sentence-calc*", "/api/v1/sentences*"]
             }
           }]
-        }
+        },
         transitions = {
           priority = 21
           actions = [
@@ -287,7 +287,7 @@ locals {
               values = ["/transition", "/api/v1/transition*"]
             }
           }]
-        }
+        },
         dal_health = {
           priority = 23
           actions = [
@@ -298,11 +298,11 @@ locals {
           ]
           conditions = [{ #header condition for dal
             http_header = {
-              name   = "service-health"
-              values = ["dal"]
+              http_header_name = "service-health"
+              values           = ["dal"]
             }
           }]
-        }
+        },
         yp_health = {
           priority = 24
           actions = [
@@ -313,11 +313,11 @@ locals {
           ]
           conditions = [{ #header condition for dal
             http_header = {
-              name   = "service-health"
-              values = ["yp"]
+              http_header_name = "service-health"
+              values           = ["yp"]
             }
           }]
-        }
+        },
         auth_health = {
           priority = 25
           actions = [
@@ -328,8 +328,8 @@ locals {
           ]
           conditions = [{ #header condition for dal
             http_header = {
-              name   = "service-health"
-              values = ["auth"]
+              http_header_name = "service-health"
+              values           = ["auth"]
             }
           }]
         },
@@ -343,11 +343,11 @@ locals {
           ]
           conditions = [{ #header condition for dal
             http_header = {
-              name   = "service-health"
-              values = ["bands"]
+              http_header_name = "service-health"
+              values           = ["bands"]
             }
           }]
-        }
+        },
         bu_health = {
           priority = 27
           actions = [
@@ -358,11 +358,11 @@ locals {
           ]
           conditions = [{ #header condition for dal
             http_header = {
-              name   = "service-health"
-              values = ["bu"]
+              http_header_name = "service-health"
+              values           = ["bu"]
             }
           }]
-        }
+        },
         case_health = {
           priority = 28
           actions = [
@@ -373,8 +373,8 @@ locals {
           ]
           conditions = [{ #header condition for dal
             http_header = {
-              name   = "service-health"
-              values = ["case"]
+              http_header_name = "service-health"
+              values           = ["case"]
             }
           }]
         },
@@ -388,11 +388,11 @@ locals {
           ]
           conditions = [{ #header condition for dal
             http_header = {
-              name   = "service-health"
-              values = ["cmm"]
+              http_header_name = "service-health"
+              values           = ["cmm"]
             }
           }]
-        }
+        },
         conversions_health = {
           priority = 30
           actions = [
@@ -403,11 +403,11 @@ locals {
           ]
           conditions = [{ #header condition for dal
             http_header = {
-              name   = "service-health"
-              values = ["conversions"]
+              http_header_name = "service-health"
+              values           = ["conversions"]
             }
           }]
-        }
+        },
         documents_health = {
           priority = 31
           actions = [
@@ -418,8 +418,8 @@ locals {
           ]
           conditions = [{ #header condition for dal
             http_header = {
-              name   = "service-health"
-              values = ["documents"]
+              http_header_name = "service-health"
+              values           = ["documents"]
             }
           }]
         },
@@ -433,11 +433,11 @@ locals {
           ]
           conditions = [{ #header condition for dal
             http_header = {
-              name   = "service-health"
-              values = ["gateway-internal"]
+              http_header_name = "service-health"
+              values           = ["gateway-internal"]
             }
           }]
-        }
+        },
         placements_health = {
           priority = 33
           actions = [
@@ -448,11 +448,11 @@ locals {
           ]
           conditions = [{ #header condition for dal
             http_header = {
-              name   = "service-health"
-              values = ["placements"]
+              http_header_name = "service-health"
+              values           = ["placements"]
             }
           }]
-        }
+        },
         refdata_health = {
           priority = 34
           actions = [
@@ -463,8 +463,8 @@ locals {
           ]
           conditions = [{ #header condition for dal
             http_header = {
-              name   = "service-health"
-              values = ["refdata"]
+              http_header_name = "service-health"
+              values           = ["refdata"]
             }
           }]
         },
@@ -478,11 +478,11 @@ locals {
           ]
           conditions = [{ #header condition for dal
             http_header = {
-              name   = "service-health"
-              values = ["returns"]
+              http_header_name = "service-health"
+              values           = ["returns"]
             }
           }]
-        }
+        },
         serious-incidents_health = {
           priority = 36
           actions = [
@@ -493,11 +493,11 @@ locals {
           ]
           conditions = [{ #header condition for dal
             http_header = {
-              name   = "service-health"
-              values = ["serious-incidents"]
+              http_header_name = "service-health"
+              values           = ["serious-incidents"]
             }
           }]
-        }
+        },
         transfers_health = {
           priority = 37
           actions = [
@@ -508,8 +508,8 @@ locals {
           ]
           conditions = [{ #header condition for dal
             http_header = {
-              name   = "service-health"
-              values = ["transfers"]
+              http_header_name = "service-health"
+              values           = ["transfers"]
             }
           }]
         },
@@ -523,11 +523,11 @@ locals {
           ]
           conditions = [{ #header condition for dal
             http_header = {
-              name   = "service-health"
-              values = ["views"]
+              http_header_name = "service-health"
+              values           = ["views"]
             }
           }]
-        }
+        },
         workflow_health = {
           priority = 39
           actions = [
@@ -538,8 +538,8 @@ locals {
           ]
           conditions = [{ #header condition for dal
             http_header = {
-              name   = "service-health"
-              values = ["workflow"]
+              http_header_name = "service-health"
+              values           = ["workflow"]
             }
           }]
         },
@@ -553,11 +553,11 @@ locals {
           ]
           conditions = [{ #header condition for dal
             http_header = {
-              name   = "service-health"
-              values = ["sentences"]
+              http_header_name = "service-health"
+              values           = ["sentences"]
             }
           }]
-        }
+        },
         transitions_health = {
           priority = 41
           actions = [
@@ -568,8 +568,8 @@ locals {
           ]
           conditions = [{ #header condition for dal
             http_header = {
-              name   = "service-health"
-              values = ["transitions"]
+              http_header_name = "service-health"
+              values           = ["transitions"]
             }
           }]
         }
