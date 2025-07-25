@@ -25,8 +25,8 @@ module "transfer_family" {
 }
 
 /*
-Because of the issues above, the below DNS record relies on a manual input, following the
-manual creation of a Web App
+The resourced below here are not a good candidate for inclusion in a module as they require creation
+AFTER the manual creation of a webapp and the input of the webapps URL
 */
 resource "aws_route53_record" "transfer_family" {
   count    = local.is-development ? 1 : 0
@@ -38,6 +38,9 @@ resource "aws_route53_record" "transfer_family" {
   records  = [local.application_data.accounts[local.environment].cash_web_app_url]
 }
 
+/*
+Certs need to be created in us-east-1 as they are associated with Cloudfront
+*/
 resource "aws_acm_certificate" "transfer_family" {
   count                     = local.is-development ? 1 : 0
   provider                  = aws.us-east-1
@@ -54,6 +57,23 @@ resource "aws_acm_certificate_validation" "transfer_family" {
   provider                = aws.us-east-1
   certificate_arn         = aws_acm_certificate.transfer_family[0].arn
   validation_record_fqdns = [for record in aws_route53_record.validation : record.fqdn]
+}
+
+resource "aws_route53_record" "validation" {
+  provider = aws.core-vpc
+  for_each = {
+    for dvo in aws_acm_certificate.transfer_family.domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+    }
+  }
+  allow_overwrite = true
+  name            = each.value.name
+  records         = [each.value.record]
+  ttl             = 60
+  type            = each.value.type
+  zone_id         = data.aws_route53_zone.external.zone_id
 }
 
 resource "aws_cloudfront_distribution" "transfer_family" {
