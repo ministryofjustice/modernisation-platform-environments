@@ -109,7 +109,6 @@
       "alerts_subscription_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com",
       "cash_office_idp_arn": "arn:aws:sso:::instance/ssoins-7535d9af4f41fb26",
       "cash_web_app_url": "webapp-01efa045f0de46e9b.transfer-webapp.eu-west-2.on.aws"
-
     },
     "test": {
       "short_env": "tst",
