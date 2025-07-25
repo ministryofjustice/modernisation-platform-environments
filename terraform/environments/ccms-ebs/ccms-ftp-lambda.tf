@@ -79,69 +79,81 @@ resource "aws_s3_bucket_versioning" "s3_versioning" {
   }
 }
 
+#--Dynamic blocks for transfer family policy in production only
+data "aws_iam_policy_document" "inbound_bucket_policy" {
+  statement {
+    sid     = "Access_for_ccms-ebs_and_soa"
+    effect  = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:GetObject",
+      "s3:ListBucket",
+      "s3:DeleteObject"
+    ]
+    principals {
+      type        = "AWS"
+      identifiers = [
+        "arn:aws:iam::${local.environment_management.account_ids["laa-ccms-soa-${local.environment}"]}:role/ccms-soa-ec2-instance-role",
+        "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/role_stsassume_oracle_base"
+      ]
+    }
+    resources = [
+      aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].arn,
+      "${aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].arn}/*"
+    ]
+  }
+
+  dynamic "statement" {
+    for_each = local.is-development ? [1] : []
+    content {
+      sid     = "Access_for_s3_transfer_family_list"
+      effect  = "Allow"
+      actions = ["s3:ListBucket"]
+      principals {
+        type        = "AWS"
+        identifiers = [module.transfer_family[0].grant_iam_role_arn]
+      }
+      resources = [
+        aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].arn
+      ]
+    }
+  }
+
+  dynamic "statement" {
+    for_each = local.is-development ? [1] : []
+    content {
+      sid     = "Access_for_s3_transfer_family_contents"
+      effect  = "Allow"
+      actions = [
+        "s3:GetObject",
+        "s3:GetObjectVersion",
+        "s3:GetObjectAcl",
+        "s3:GetObjectVersionAcl",
+        "s3:ListMultipartUploadParts",
+        "s3:PutObject",
+        "s3:PutObjectAcl",
+        "s3:PutObjectVersionAcl",
+        "s3:AbortMultipartUpload"
+      ]
+      principals {
+        type        = "AWS"
+        identifiers = [module.transfer_family[0].grant_iam_role_arn]
+      }
+      resources = [
+        "${aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].arn}/*"
+      ]
+    }
+  }
+}
 
 resource "aws_s3_bucket_policy" "inbound_bucket_policy" {
   bucket = aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket
-
-  policy = jsonencode({
-    "Version" : "2012-10-17",
-    "Id" : "AccessFromMP",
-    "Statement" : [
-      {
-        "Sid" : "Access_for_ccms-ebs_and_soa",
-        "Effect" : "Allow",
-        "Principal" : {
-          "AWS" : [
-            "arn:aws:iam::${local.environment_management.account_ids["laa-ccms-soa-${local.environment}"]}:role/ccms-soa-ec2-instance-role",
-            "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/role_stsassume_oracle_base"
-          ]
-        },
-        "Action" : [
-          "s3:PutObject",
-          "s3:GetObject",
-          "s3:ListBucket",
-          "s3:DeleteObject"
-        ],
-        "Resource" : [
-          aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].arn,
-          "${aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].arn}/*"
-        ]
-      },
-      {
-        "Sid" : "Access_for_s3_transfer_family_list",
-        "Effect" : "Allow",
-        "Principal" : {
-          "AWS" : ["${module.transfer_family[0].grant_iam_role_arn}"]
-        },
-        "Action" : ["s3:ListBucket"],
-        "Resource" : ["${aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].arn}"]
-      },
-      {
-        "Sid" : "Access_for_s3_transfer_family_contents",
-        "Effect" : "Allow",
-        "Principal" : {
-          "AWS" : ["${module.transfer_family[0].grant_iam_role_arn}"]
-        },
-        "Action" : [
-          "s3:GetObject",
-          "s3:GetObjectVersion",
-          "s3:GetObjectAcl",
-          "s3:GetObjectVersionAcl",
-          "s3:ListMultipartUploadParts",
-          "s3:PutObject",
-          "s3:PutObjectAcl",
-          "s3:PutObjectVersionAcl",
-          "s3:AbortMultipartUpload"
-        ],
-        "Resource" : ["${aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].arn}/*"]
-      }
-    ]
-    }
-  )
+  policy = data.aws_iam_policy_document.inbound_bucket_policy.json
 }
 
-#--Transfer family CORS
+#--Transfer family CORS. Production onl
 resource "aws_s3_bucket_cors_configuration" "inbound_bucket_cors_policy" {
+  count  = local.is-development ? 1 : 0
   bucket = aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket
   cors_rule {
     allowed_headers = ["*"]
