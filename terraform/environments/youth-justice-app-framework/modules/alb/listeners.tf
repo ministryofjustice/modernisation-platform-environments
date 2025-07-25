@@ -129,7 +129,7 @@ resource "aws_lb_listener_rule" "this" {
         for_each = try([condition.value.http_header], [])
 
         content {
-          http_header_name = http_header.value.http_header_name
+          http_header_name = http_header.value.name
           values           = http_header.value.values
         }
       }
