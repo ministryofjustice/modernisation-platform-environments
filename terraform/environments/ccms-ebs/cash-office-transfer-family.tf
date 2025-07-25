@@ -60,7 +60,6 @@ resource "aws_acm_certificate_validation" "transfer_family" {
 }
 
 resource "aws_route53_record" "validation" {
-  count    = local.is-development ? 1 : 0
   provider = aws.core-vpc
   for_each = {
     for dvo in aws_acm_certificate.transfer_family.domain_validation_options : dvo.domain_name => {
