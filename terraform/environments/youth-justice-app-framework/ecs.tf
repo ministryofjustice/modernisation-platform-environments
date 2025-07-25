@@ -21,9 +21,9 @@ module "ecs" {
   #ECS details
   cluster_name                = "yjaf-cluster"
   ec2_instance_type           = "c6a.4xlarge"
-  ec2_min_size                = 7
-  ec2_max_size                = 7
-  ec2_desired_capacity        = 7
+  ec2_min_size                = 8
+  ec2_max_size                = 8
+  ec2_desired_capacity        = 8
   disable_overnight_scheduler = local.application_data.accounts[local.environment].disable_overnight_ecs_scheduler                                  #todo shared from old yjaf, replace with output of ami builder
   nameserver                  = join(".", [split(".", data.aws_vpc.shared.cidr_block)[0], split(".", data.aws_vpc.shared.cidr_block)[1], "0", "2"]) #eg "10.23.0.2"
 
