@@ -128,7 +128,7 @@ resource "aws_lambda_function" "athena_federated_query_lambda" {
       aws_security_group.athena_federated_query_lambda_sg_oracle[0].id
       ] : local.is_postgresql ? [
       aws_security_group.athena_federated_query_lambda_sg_postgresql[0].id
-    ] : aws_security_group.athena_federated_query_lambda_sg_redshift[0].id
+    ] : [aws_security_group.athena_federated_query_lambda_sg_redshift[0].id]
 
     subnet_ids = [
       var.subnet_id
