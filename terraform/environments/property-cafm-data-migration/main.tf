@@ -18,6 +18,7 @@
 resource "aws_secretsmanager_secret" "db_master_user_secret" {
   # checkov:skip=CKV2_AWS_57: Skipping because automatic rotation not needed.
   name       = "cafm-database-master-user-secret-test1"
+  kms_key_id  = aws_kms_key.sns_kms.arn
 }
 
 module "endpoints" {
