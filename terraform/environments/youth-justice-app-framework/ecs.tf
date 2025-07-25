@@ -1,4 +1,6 @@
-
+locals {
+  list_of_target_group_arns = merge(module.external_alb.target_group_arns, module.internal_alb.target_group_arns)
+}
 
 #tfsec:ignore:AVD-AWS-0130
 module "ecs" {
@@ -67,6 +69,8 @@ module "ecs" {
   ecs_role_additional_policies_arns = [
     aws_iam_policy.s3-access.arn
   ]
+
+  list_of_target_group_arns = local.list_of_target_group_arns
 
   depends_on = [module.internal_alb, module.external_alb, module.aurora, module.redshift]
 }
