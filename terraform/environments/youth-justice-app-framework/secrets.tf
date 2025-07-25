@@ -77,7 +77,7 @@ resource "aws_secretsmanager_secret" "LDAP_DC_secret" {
 
 resource "aws_secretsmanager_secret_version" "LDAP_DC_version" {
   secret_id     = aws_secretsmanager_secret.LDAP_DC_secret.id
-  secret_string = "dummy"
+  secret_string = "ldaps://IP-C61301AD.i2n.com:636,ldaps://IP-C6130282.i2n.com:636" #a dummy value
   lifecycle {
     ignore_changes = [secret_string]
   }
