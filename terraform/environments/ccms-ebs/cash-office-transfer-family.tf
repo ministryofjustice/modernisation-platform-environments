@@ -38,7 +38,26 @@ resource "aws_route53_record" "transfer_family" {
   records  = [local.application_data.accounts[local.environment].cash_web_app_url]
 }
 
+resource "aws_acm_certificate" "transfer_family" {
+  count                     = local.is-development ? 1 : 0
+  provider                  = "us-east-1"
+  domain_name               = trim(data.aws_route53_zone.external.name, ".") #--Remove the trailing dot from the zone name
+  subject_alternative_names = [aws_route53_record.transfer_family[0].fqdn]
+  validation_method         = "DNS"
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_acm_certificate_validation" "transfer_family" {
+  count                   = local.is-development ? 1 : 0
+  provider                = "us-east-1"
+  certificate_arn         = aws_acm_certificate.transfer_family[0].arn
+  validation_record_fqdns = [for record in aws_route53_record.validation : record.fqdn]
+}
+
 resource "aws_cloudfront_distribution" "transfer_family" {
+  count           = local.is-development ? 1 : 0
   enabled         = true
   comment         = "CloudFront Distribution: cashoffice"
   is_ipv6_enabled = false
@@ -75,7 +94,7 @@ resource "aws_cloudfront_distribution" "transfer_family" {
   }
   viewer_certificate {
     cloudfront_default_certificate = false
-    acm_certificate_arn            = "arn:aws:acm:eu-west-2:767123802783:certificate/e03b12dd-2875-407d-b5da-896e2d771c13"
+    acm_certificate_arn            = aws_acm_certificate_validation.transfer_family[0].certificate_arn
     ssl_support_method             = "sni-only"
   }
 }
