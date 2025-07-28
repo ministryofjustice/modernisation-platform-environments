@@ -17,7 +17,7 @@ resource "aws_sns_topic_policy" "priority_p1_policy" {
         Sid = "AllowPublisherPublishOnly"
         Effect = "Allow"
         Principal = {
-          AWS = aws_iam_role.provider_pub.arn
+          AWS = aws_iam_role.publisher_role.arn
         }
         Action = "sns:Publish"
         Resource = aws_sns_topic.priority_p1.arn
