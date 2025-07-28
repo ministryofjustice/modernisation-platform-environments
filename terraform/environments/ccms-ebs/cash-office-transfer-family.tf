@@ -24,7 +24,7 @@ module "transfer_family" {
   aws_identity_centre_store_arn = local.application_data.accounts[local.environment].cash_office_idp_arn
 }
 
-/* resource "awscc_transfer_web_app" "this" {
+resource "awscc_transfer_web_app" "this" {
   provider = aws.cashoffice
   identity_provider_details = {
     instance_arn = "arn:aws:sso:::instance/ssoins-7535d9af4f41fb26"
@@ -40,7 +40,7 @@ resource "aws_s3control_access_grant" "testing" {
     grantee_type       = "DIRECTORY_GROUP"
     grantee_identifier = "arn:aws:sso:::instance/ssoins-7535d9af4f41fb26"
   }
-} */
+}
 
 /*
 The resourced below here are not a good candidate for inclusion in a module as they require creation
