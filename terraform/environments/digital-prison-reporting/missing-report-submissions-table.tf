@@ -74,65 +74,6 @@ resource "aws_secretsmanager_secret_version" "missing_report_submissions" {
     ignore_changes = [secret_string, ]
   }
 }
-
-################################################################################
-# DPR RDS - Database
-################################################################################
-# module "missing_report_submissions_db" {
-#   source = "./modules/rds/postgres"
-
-#   enable_rds         = local.application_data.accounts[local.environment].missing_report_submissions_rds.enable
-#   create_rds_replica = local.application_data.accounts[local.environment].missing_report_submissions_rds.create_replica
-#   engine             = local.application_data.accounts[local.environment].missing_report_submissions_rds.engine
-#   engine_version     = local.application_data.accounts[local.environment].missing_report_submissions_rds.engine_version
-#   allocated_size     = local.application_data.accounts[local.environment].missing_report_submissions_rds.init_size
-#   max_allocated_size = local.application_data.accounts[local.environment].missing_report_submissions_rds.max_size
-#   subnets            = local.dpr_subnets
-#   vpc_id             = local.dpr_vpc
-#   kms                = aws_kms_key.missing_report_submissions.arn
-#   name               = "${local.application_data.accounts[local.environment].missing_report_submissions_rds.name}_${local.environment}"
-#   db_name            = local.application_data.accounts[local.environment].missing_report_submissions_rds.db_identifier
-#   db_instance_class  = local.application_data.accounts[local.environment].missing_report_submissions_rds.inst_class
-#   master_user        = jsondecode(aws_secretsmanager_secret_version.missing_report_submissions[0].secret_string)["user"]
-#   storage_type       = local.application_data.accounts[local.environment].missing_report_submissions_rds.store_type
-#   ca_cert_identifier = "rds-ca-rsa2048-g1" # Expiry on June 16, 2026
-#   license_model      = "postgresql-license"
-
-#   allow_major_version_upgrade = true
-
-#   parameter_group = "default.postgres16"
-
-#   tags = merge(
-#     local.all_tags,
-#     {
-#       Resource_Group = "RDS"
-#       Jira           = "DPR2-2007"
-#       Resource_Type  = "RDS Instance"
-#       Name           = local.application_data.accounts[local.environment].missing_report_submissions_rds.name
-#     }
-#   )
-# }
-
-### RDS, Postgres KMS
-resource "aws_kms_key" "missing_report_submissions" {
-  #checkov:skip=CKV_AWS_33
-  #checkov:skip=CKV_AWS_227
-  #checkov:skip=CKV_AWS_7
-
-  description         = "Encryption key for RDS Instance"
-  enable_key_rotation = true
-  policy              = data.aws_iam_policy_document.missing_report_submissions-kms.json
-  is_enabled          = true
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "${local.application_name}-rds-kms"
-      Jira = "DPR2-XXXX"
-    }
-  )
-}
-
 data "aws_iam_policy_document" "missing_report_submissions-kms" {
   statement {
     #checkov:skip=CKV_AWS_111
