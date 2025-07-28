@@ -530,8 +530,8 @@ data "aws_iam_policy_document" "domain_builder_preview" {
   #checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
   statement {
     actions = [
-      "athena:GetQueryExecution",
-      "athena:StartQueryExecution",
+      "rds:GetQueryExecution",
+      "rds:StartQueryExecution",
       "glue:GetDatabase",
       "glue:GetTable",
       "s3:GetObject",
@@ -640,21 +640,21 @@ resource "aws_iam_policy" "redshift_dataapi_cross_policy" {
 data "aws_iam_policy_document" "athena_api" {
   statement {
     actions = [
-      "athena:GetDataCatalog",
-      "athena:GetQueryExecution",
-      "athena:GetQueryResults",
-      "athena:GetWorkGroup",
-      "athena:StartQueryExecution",
-      "athena:StopQueryExecution"
+      "rds:GetDataCatalog",
+      "rds:GetQueryExecution",
+      "rds:GetQueryResults",
+      "rds:GetWorkGroup",
+      "rds:StartQueryExecution",
+      "rds:StopQueryExecution"
     ]
     resources = [
-      "arn:aws:athena:${local.account_region}:${local.account_id}:*/*"
+      "arn:aws:rds:${local.account_region}:${local.account_id}:*/*"
     ]
   }
 
   statement {
     actions = [
-      "athena:ListWorkGroups"
+      "rds:ListWorkGroups"
     ]
     resources = [
       "*"
@@ -1076,4 +1076,39 @@ resource "aws_iam_policy" "secretsmanager_read_policy" {
       }
     ]
   })
+}
+
+resource "aws_iam_policy" "rds_cross_policy" {
+  name        = "${local.project}-missing_report_submissions-cross-policy"
+  description = "Extra Policy for AWS RDS"
+  policy      = data.aws_iam_policy_document.rds.json
+}
+
+
+## Athena API Policy Document
+# Policy Document
+data "aws_iam_policy_document" "rds" {
+  statement {
+    actions = [
+      "rds:DescribeDBInstances",
+      "rds-data:*",
+      "rds-db:Connect",
+    ]
+    resources = [
+      "arn:aws:rds:${local.account_region}:${local.account_id}:*/*"
+    ]
+  }
+
+  statement {
+    actions = [
+      "kms:GenerateDataKey",
+      "kms:GenerateDataKeyPair",
+      "kms:Decrypt",
+      "kms:Encrypt"
+    ]
+    resources = [
+      "arn:aws:kms:*:771283872747:key/*"
+    ]
+  }
+
 }
