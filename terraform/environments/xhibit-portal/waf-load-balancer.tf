@@ -168,6 +168,31 @@ resource "aws_alb_listener_rule" "web_listener_rule" {
 
 }
 
+resource "aws_alb_listener_rule" "lb_dns_redirect" {
+  priority = 5
+
+  depends_on   = [aws_lb_listener.waf_lb_listener]
+  listener_arn = aws_lb_listener.waf_lb_listener.arn
+
+  action {
+    type = "redirect"
+
+    redirect {
+      status_code = "HTTP_301"
+      path        = "/Secure/Default.aspx"
+      host        = local.application_data.accounts[local.environment].public_dns_name_web
+    }
+  }
+
+  condition {
+    host_header {
+      values = [
+        aws_lb.waf_lb.dns_name
+      ]
+    }
+  }
+}
+
 resource "aws_route53_record" "external" {
   provider = aws.core-vpc
 
