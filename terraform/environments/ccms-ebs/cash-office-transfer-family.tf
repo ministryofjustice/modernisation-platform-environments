@@ -18,7 +18,7 @@ Until those bugs are addressed, the below resources are created manually:
 */
 
 module "transfer_family" {
-  count                         = local.is-development ? 1 : 0
+  count                         = local.is-production ? 1 : 0
   source                        = "./modules/transfer-family"
   aws_account_id                = data.aws_caller_identity.current.account_id
   app_name                      = local.application_name
@@ -32,7 +32,7 @@ AFTER the manual creation of a webapp/S3 grant and the input of the webapps URL
 */
 
 resource "aws_route53_record" "transfer_family" {
-  count    = local.is-development ? 1 : 0
+  count    = local.is-production ? 1 : 0
   provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.external.zone_id
   name     = local.application_data.accounts[local.environment].cash_office_upload_hostname
@@ -45,7 +45,7 @@ resource "aws_route53_record" "transfer_family" {
 Certs need to be created in us-east-1 as they are associated with Cloudfront
 */
 resource "aws_acm_certificate" "transfer_family" {
-  count                     = local.is-development ? 1 : 0
+  count                     = local.is-production ? 1 : 0
   provider                  = aws.us-east-1
   domain_name               = trim(data.aws_route53_zone.external.name, ".") #--Remove the trailing dot from the zone name
   subject_alternative_names = ["${local.application_data.accounts[local.environment].cash_office_upload_hostname}.${trim(data.aws_route53_zone.external.name, ".")}"]
@@ -56,7 +56,7 @@ resource "aws_acm_certificate" "transfer_family" {
 }
 
 resource "aws_acm_certificate_validation" "transfer_family" {
-  count                   = local.is-development ? 1 : 0
+  count                   = local.is-production ? 1 : 0
   provider                = aws.us-east-1
   certificate_arn         = aws_acm_certificate.transfer_family[0].arn
   validation_record_fqdns = [for record in aws_route53_record.validation : record.fqdn]
@@ -74,7 +74,7 @@ resource "aws_route53_record" "validation" {
 }
 
 resource "aws_cloudfront_distribution" "transfer_family" {
-  count           = local.is-development ? 1 : 0
+  count           = local.is-production ? 1 : 0
   enabled         = true
   comment         = "CloudFront Distribution: cashoffice"
   is_ipv6_enabled = false
@@ -118,5 +118,5 @@ resource "aws_cloudfront_distribution" "transfer_family" {
 
 /*
 Once all resources are created. The Web App must have it's URL manually configured to point to
-the newly created DNS record of ccms-file-uploads.laa-ENVIRONMENT.modernisation-platform.service.justice.gov.uk
+the newly created DNS record of ccms-file-uploads.laa-production.modernisation-platform.service.justice.gov.uk
 */
