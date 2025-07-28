@@ -128,3 +128,21 @@ module "share_dbs_with_roles" {
   de_role_arn             = var.de_role_arn
   db_exists               = var.db_exists
 }
+
+resource "aws_lakeformation_permissions" "catalog_manage" {
+  principal {
+    data_lake_principal_identifier = module.ap_database_sharing.iam_role.arn
+  }
+
+  permissions = [
+    "CREATE_DATABASE",
+    "DROP_DATABASE",
+    "CREATE_TABLE",
+    "DROP_TABLE",
+  ]
+
+  resource {
+    catalog {}
+  }
+}
+
