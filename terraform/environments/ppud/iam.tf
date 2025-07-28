@@ -1474,8 +1474,8 @@ resource "aws_iam_policy" "production-s3-access" {
       "Action" : "s3:ListBucket",
       "Effect" : "Allow",
       "Resource" : [
-          aws_s3_bucket.moj-infrastructure[0].arn,
-          "${aws_s3_bucket.moj-infrastructure[0].arn}/*"
+        "arn:aws:s3:::moj-infrastructure",
+        "arn:aws:s3:::moj-infrastructure/*"
       ]
     }]
   })
