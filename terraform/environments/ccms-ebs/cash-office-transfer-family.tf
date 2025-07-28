@@ -25,7 +25,7 @@ module "transfer_family" {
 }
 
 resource "awscc_transfer_web_app" "this" {
-  provider = aws.cash-office
+  provider = aws.cashoffice
   identity_provider_details = {
     instance_arn = "arn:aws:sso:::instance/ssoins-7535d9af4f41fb26"
     role         = "arn:aws:iam::767123802783:role/ccms-ebs-cashoffice-transfer"
@@ -33,7 +33,7 @@ resource "awscc_transfer_web_app" "this" {
 }
 
 resource "aws_s3control_access_grant" "testing" {
-  provider = aws.cash-office
+  provider = aws.cashoffice
   permission                = "READWRITE"
   access_grants_location_id = "76773da1-d978-4e07-bc68-3af1923a01f1"
   grantee {

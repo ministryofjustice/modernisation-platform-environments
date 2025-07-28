@@ -14,16 +14,6 @@ provider "aws" {
   default_tags { tags = local.tags }
 }
 
-# Cashoffice Provider Only
-provider "aws" {
-  alias = "cash-office"
-  region = "eu-west-2"
-  assume_role {
-    role_arn = "arn:aws:iam::${data.aws_caller_identity.original_session.id}:role/MemberInfrastructureAccess"
-  }
-  default_tags { tags = local.tags }
-}
-
 # AWS provider for the Modernisation Platform, to get things from there if required
 provider "aws" {
   alias  = "modernisation-platform"
