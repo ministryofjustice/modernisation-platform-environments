@@ -6,7 +6,7 @@ locals {
 
   yjb_bucket_id = "${var.project_name}-${var.environment}-${local.yjb_bucket_name}"
 
-  yjb_s3_folder_moj_ap = "moj_ap"
+  yjb_s3_folder_moj_ap  = "moj_ap"
   yjb_s3_folder_landing = "landing"
-  
+
 }
