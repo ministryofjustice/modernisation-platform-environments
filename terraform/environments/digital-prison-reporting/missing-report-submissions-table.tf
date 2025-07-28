@@ -114,7 +114,7 @@ module "aurora_missing_report_submissions" {
   master_password             = local.missing_report_db_credentials.password
   instances = {
     1 = {
-      identifier     = "${local.application_data.accounts[local.environment].missing_report_submissions_rds.name}_${local.environment}"
+      identifier     = "${local.application_data.accounts[local.environment].missing_report_submissions_rds.name}-${local.environment}"
       instance_class = "db.t2.small"
     }
   }
