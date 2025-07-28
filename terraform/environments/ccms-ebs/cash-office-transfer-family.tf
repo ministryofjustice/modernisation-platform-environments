@@ -26,10 +26,9 @@ module "transfer_family" {
   aws_identity_centre_store_arn = local.application_data.accounts[local.environment].cash_office_idp_arn
 }
 
-/*
-The resources below here are not a good candidate for inclusion in a module as they require creation
-AFTER the manual creation of a webapp/S3 grant and the input of the webapps URL
-*/
+
+/* #--The resources below here are not a good candidate for inclusion in a module as they require creation
+#--AFTER the manual creation of a webapp/S3 grant and the input of the webapps URL
 
 resource "aws_route53_record" "transfer_family" {
   count    = local.is-production ? 1 : 0
@@ -41,9 +40,8 @@ resource "aws_route53_record" "transfer_family" {
   records  = [aws_cloudfront_distribution.transfer_family[0].domain_name]
 }
 
-/*
-Certs need to be created in us-east-1 as they are associated with Cloudfront
-*/
+
+#--Certs need to be created in us-east-1 as they are associated with Cloudfront
 resource "aws_acm_certificate" "transfer_family" {
   count                     = local.is-production ? 1 : 0
   provider                  = aws.us-east-1
@@ -116,7 +114,7 @@ resource "aws_cloudfront_distribution" "transfer_family" {
   }
 }
 
-/*
-Once all resources are created. The Web App must have it's URL manually configured to point to
-the newly created DNS record of ccms-file-uploads.laa-production.modernisation-platform.service.justice.gov.uk
-*/
+
+#--Once all resources are created. The Web App must have it's URL manually configured to point to
+#--the newly created DNS record of ccms-file-uploads.laa-production.modernisation-platform.service.justice.gov.uk
+ */
