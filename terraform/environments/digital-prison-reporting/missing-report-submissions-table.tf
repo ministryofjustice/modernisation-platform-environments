@@ -1,5 +1,5 @@
 locals {
-  missing_report_db_credentials = jsondecode(aws_secretsmanager_secret_version.missing_report_submissions.secret_string)
+  missing_report_db_credentials = jsondecode(data.aws_secretsmanager_secret_version.operational_db_secret_version.secret_string)
 }
 
 resource "aws_kms_key" "missing_report_submissions" {
@@ -65,14 +65,18 @@ resource "aws_secretsmanager_secret" "missing_report_submissions" {
   )
 }
 
+resource "random_password" "missing_report_submissions" {
+  length  = 16
+  special = false
+}
+
 # PlaceHolder Secrets
 resource "aws_secretsmanager_secret_version" "missing_report_submissions" {
   secret_id     = aws_secretsmanager_secret.missing_report_submissions.id
-  secret_string = jsonencode(local.dps_secrets_placeholder) # Uses the DPS secret placeholder format
-
-  lifecycle {
-    ignore_changes = [secret_string, ]
-  }
+  secret_string = jsonencode({
+    username = "dpradmin"
+    password = random_password.missing_report_submissions.result
+  })
 }
 data "aws_iam_policy_document" "missing_report_submissions-kms" {
   statement {
