@@ -1,4 +1,4 @@
-resource "awscc_transfer_web_app" "test" {
+resource "awscc_transfer_web_app" "demo" {
     provider = awscc.test-webapp
     identity_provider_details = {
         instance_arn = "arn:aws:sso:::instance/ssoins-7535d9af4f41fb26"
