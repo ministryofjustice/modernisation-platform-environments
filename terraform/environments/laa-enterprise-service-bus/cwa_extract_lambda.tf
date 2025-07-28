@@ -40,7 +40,7 @@ resource "aws_lambda_function" "cwa_extract" {
 
   description      = "Connect to CWA DB, extracts data into JSON files, uploads them to S3 and creates SNS message and SQS entries with S3 references"
   function_name    = "cwa_extract_function"
-  role             = aws_iam_role.cwa_lambda_role.arn
+  role             = aws_iam_role.cwa_extract_lambda_role.arn
   handler          = "index.test"
   filename         = data.archive_file.cwa_extract.output_path
   source_code_hash = data.archive_file.cwa_extract.output_base64sha256

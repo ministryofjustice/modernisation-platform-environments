@@ -2,7 +2,7 @@
 ### Publisher Role for SNS Topic ###
 #####################################
 resource "aws_iam_role" "publisher_role" {
-  name = "SNS Publisher role"
+  name = "SNS_Publisher_role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -19,7 +19,7 @@ resource "aws_iam_role" "publisher_role" {
 }
 
 resource "aws_iam_policy" "publisher_role_policy" {
-  name = "SNS Publisherpolicy"
+  name = "SNS_Publisher_policy"
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -44,7 +44,7 @@ resource "aws_iam_role_policy_attachment" "publisher_role_attach" {
 ### Subscriber Role for SNS Topic ###
 #####################################
 resource "aws_iam_role" "subscriber_role" {
-  name = "SNS Subscriber role"
+  name = "SNS_Subscriber_role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -61,7 +61,7 @@ resource "aws_iam_role" "subscriber_role" {
 }
 
 resource "aws_iam_policy" "subscriber_policy" {
-  name = "SNS Subscriber policy"
+  name = "SNS_Subscriber_policy"
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -87,7 +87,7 @@ resource "aws_iam_role_policy_attachment" "subscriber_attach" {
 ### Admin Role for SNS Topic ###
 #####################################
 resource "aws_iam_role" "admin_role" {
-  name = "SNS Admin role"
+  name = "SNS_Admin_role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -104,7 +104,7 @@ resource "aws_iam_role" "admin_role" {
 }
 
 resource "aws_iam_policy" "admin_policy" {
-  name = "SNS Admin policy"
+  name = "SNS_Admin_policy"
 
   policy = jsonencode({
     Version = "2012-10-17"
