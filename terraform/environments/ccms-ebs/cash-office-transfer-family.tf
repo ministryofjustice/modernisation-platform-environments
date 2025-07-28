@@ -24,6 +24,14 @@ module "transfer_family" {
   aws_identity_centre_store_arn = local.application_data.accounts[local.environment].cash_office_idp_arn
 }
 
+resource "awscc_transfer_web_app" "demo" {
+    provider = awscc.test-webapp
+    identity_provider_details = {
+        instance_arn = local.application_data.accounts[local.environment].cash_office_idp_arn
+        role         = module.transfer_family.transfer_iam_role_arn
+    }
+}
+
 /*
 The resourced below here are not a good candidate for inclusion in a module as they require creation
 AFTER the manual creation of a webapp and the input of the webapps URL
