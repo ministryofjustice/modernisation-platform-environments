@@ -28,7 +28,7 @@ resource "awscc_transfer_web_app" "demo" {
     provider = awscc.test-webapp
     identity_provider_details = {
         instance_arn = local.application_data.accounts[local.environment].cash_office_idp_arn
-        role         = module.transfer_family.transfer_iam_role_arn
+        role         = module.transfer_family[0].transfer_iam_role_arn
     }
 }
 
