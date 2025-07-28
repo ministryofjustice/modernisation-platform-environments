@@ -12,16 +12,6 @@ provider "aws" {
   }
 }
 
-# Cashoffice Provider Only
-provider "aws" {
-  alias = "cashoffice"
-  region = "eu-west-2"
-  assume_role {
-    role_arn = "arn:aws:iam::${data.aws_caller_identity.original_session.id}:role/MemberInfrastructureAccess"
-  }
-  default_tags { tags = local.tags }
-}
-
 # AWS provider for the Modernisation Platform, to get things from there if required
 provider "aws" {
   alias  = "modernisation-platform"
@@ -64,5 +54,23 @@ provider "aws" {
   alias  = "sso-readonly"
   assume_role {
     role_arn = "arn:aws:iam::${local.environment_management.aws_organizations_root_account_id}:role/ModernisationPlatformSSOReadOnly"
+  }
+}
+
+# Cash Office Dedicated Providers
+
+provider "aws" {
+  alias  = "cashoffice"
+  region = "eu-west-2"
+  assume_role {
+    role_arn = "arn:aws:iam::${data.aws_caller_identity.original_session.id}:role/MemberInfrastructureAccess"
+  }
+}
+
+provider "awscc" {
+  alias  = "cashoffice-cc"
+  region = "eu-west-2"
+  assume_role {
+    role_arn = "arn:aws:iam::${data.aws_caller_identity.original_session.id}:role/MemberInfrastructureAccess"
   }
 }
