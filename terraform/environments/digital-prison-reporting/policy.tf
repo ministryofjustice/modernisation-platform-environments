@@ -530,8 +530,8 @@ data "aws_iam_policy_document" "domain_builder_preview" {
   #checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
   statement {
     actions = [
-      "rds:GetQueryExecution",
-      "rds:StartQueryExecution",
+      "athena:GetQueryExecution",
+      "athena:StartQueryExecution",
       "glue:GetDatabase",
       "glue:GetTable",
       "s3:GetObject",
@@ -640,21 +640,21 @@ resource "aws_iam_policy" "redshift_dataapi_cross_policy" {
 data "aws_iam_policy_document" "athena_api" {
   statement {
     actions = [
-      "rds:GetDataCatalog",
-      "rds:GetQueryExecution",
-      "rds:GetQueryResults",
-      "rds:GetWorkGroup",
-      "rds:StartQueryExecution",
-      "rds:StopQueryExecution"
+      "athena:GetDataCatalog",
+      "athena:GetQueryExecution",
+      "athena:GetQueryResults",
+      "athena:GetWorkGroup",
+      "athena:StartQueryExecution",
+      "athena:StopQueryExecution"
     ]
     resources = [
-      "arn:aws:rds:${local.account_region}:${local.account_id}:*/*"
+      "arn:aws:athena:${local.account_region}:${local.account_id}:*/*"
     ]
   }
 
   statement {
     actions = [
-      "rds:ListWorkGroups"
+      "athena:ListWorkGroups"
     ]
     resources = [
       "*"
