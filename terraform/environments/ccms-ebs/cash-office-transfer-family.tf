@@ -31,6 +31,15 @@ resource "awscc_transfer_web_app" "this" {
   }
 }
 
+resource "aws_s3control_access_grant" "testing" {
+  permission                = "READWRITE"
+  access_grants_location_id = "76773da1-d978-4e07-bc68-3af1923a01f1"
+  grantee {
+    grantee_type       = "DIRECTORY_GROUP"
+    grantee_identifier = "arn:aws:sso:::instance/ssoins-7535d9af4f41fb26"
+  }
+}
+
 /*
 The resourced below here are not a good candidate for inclusion in a module as they require creation
 AFTER the manual creation of a webapp and the input of the webapps URL
