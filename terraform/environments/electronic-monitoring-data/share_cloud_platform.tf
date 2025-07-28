@@ -324,7 +324,7 @@ resource "aws_iam_policy" "cmt_specific_access" {
 }
 
 resource "aws_iam_policy" "ac_specific_access" {
-  count      = local.is-development || local.is-test ? 1 : 0
+  count       = local.is-development || local.is-test ? 1 : 0
   name_prefix = "ac_specific_access"
   description = "Access to the Glue tables required by Acquisitive Crime."
   policy      = data.aws_iam_policy_document.ac_permissions.json

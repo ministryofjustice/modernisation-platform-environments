@@ -507,7 +507,7 @@ resource "aws_iam_role" "zero_etl_snow" {
 data "aws_iam_policy_document" "zero_etl_snow" {
   #checkov:skip=CKV_AWS_111 - glue star
   statement {
-    sid = "AllowIntegrationDeploymentDestruction"
+    sid    = "AllowIntegrationDeploymentDestruction"
     effect = "Allow"
     actions = [
       "glue:*Integration*",
@@ -522,7 +522,7 @@ data "aws_iam_policy_document" "zero_etl_snow" {
     ]
   }
   statement {
-    sid = "AllowConnectionDeploymentDestruction"
+    sid    = "AllowConnectionDeploymentDestruction"
     effect = "Allow"
     actions = [
       "glue:CreateConnection",
@@ -536,9 +536,9 @@ data "aws_iam_policy_document" "zero_etl_snow" {
     ]
   }
   statement {
-    sid       = "CreateDatabase"
-    effect    = "Allow"
-    actions   = [
+    sid    = "CreateDatabase"
+    effect = "Allow"
+    actions = [
       "glue:CreateDatabase",
       "glue:GetDatabase"
     ]
@@ -561,8 +561,8 @@ data "aws_iam_policy_document" "zero_etl_snow" {
     resources = ["*"]
   }
   statement {
-    sid = "PassRoleToConn"
-    effect = "Allow"
+    sid     = "PassRoleToConn"
+    effect  = "Allow"
     actions = ["iam:PassRole"]
     resources = [
       aws_iam_role.zero_etl_snow_source.arn,
@@ -591,13 +591,13 @@ resource "aws_iam_role_policy_attachment" "zero_etl_snow" {
 }
 
 resource "aws_lakeformation_permissions" "lambda_servicenow_create_db" {
-  principal = aws_iam_role.zero_etl_snow.arn
-  permissions = ["CREATE_DATABASE"]
+  principal        = aws_iam_role.zero_etl_snow.arn
+  permissions      = ["CREATE_DATABASE"]
   catalog_resource = true
 }
 
 resource "aws_lakeformation_permissions" "lambda_servicenow_bucket" {
-  principal = aws_iam_role.zero_etl_snow.arn
+  principal   = aws_iam_role.zero_etl_snow.arn
   permissions = ["DATA_LOCATION_ACCESS"]
   data_location {
     arn = aws_lakeformation_resource.data_bucket.arn

@@ -1,6 +1,6 @@
 locals {
   #checkov:skip=CKV_SECRET_6 placeholder
-  servicenow_credentials_placeholder = {"USERNAME":"placeholder", "PASSWORD": "placeholders"}
+  servicenow_credentials_placeholder = { "USERNAME" : "placeholder", "PASSWORD" : "placeholders" }
   underscore_env                     = local.is-production ? "" : "_${local.environment_shorthand}"
 }
 
@@ -32,10 +32,10 @@ data "aws_iam_policy_document" "zero_etl_source" {
   #checkov:skip=CKV_AWS_356: glue min permssions *
   #checkov:skip=CKV_AWS_109: secrets
   statement {
-    effect = "Allow"
+    effect  = "Allow"
     actions = ["secretsmanager:*"]
     resources = [
-        "arn:aws:secretsmanager:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:secret:credentials/servicenow*"
+      "arn:aws:secretsmanager:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:secret:credentials/servicenow*"
     ]
   }
   statement {
@@ -63,7 +63,7 @@ data "aws_iam_policy_document" "zero_etl_source" {
 
 data "aws_iam_policy_document" "zero_etl_target" {
   statement {
-    effect = "Allow"
+    effect  = "Allow"
     actions = ["s3:ListBucket"]
     resources = [
       module.s3-create-a-derived-table-bucket.bucket.arn
@@ -95,10 +95,11 @@ data "aws_iam_policy_document" "zero_etl_target" {
     actions = [
       "glue:CreateTable",
       "glue:GetTable",
+      "glue:GetTables",
       "glue:UpdateTable",
       "glue:GetTableVersion",
       "glue:GetTableVersions",
-      "glue:GetResourcePolicy" 
+      "glue:GetResourcePolicy"
     ]
     resources = [
       "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:catalog",
@@ -113,8 +114,8 @@ data "aws_iam_policy_document" "zero_etl_logging" {
   #checkov:skip=CKV_AWS_111: logging min permssions *
   #checkov:skip=CKV_AWS_356: logging min permssions *
   statement {
-    effect = "Allow"
-    actions = ["cloudwatch:PutMetricData"]
+    effect    = "Allow"
+    actions   = ["cloudwatch:PutMetricData"]
     resources = ["*"]
     condition {
       test     = "StringEquals"
@@ -138,54 +139,54 @@ data "aws_iam_policy_document" "zero_etl_logging" {
 # -------------------------------------------------------
 
 resource "aws_iam_policy" "zero_etl_logging" {
-    name = "zero_etl_loggin"
-    policy = data.aws_iam_policy_document.zero_etl_logging.json
+  name   = "zero_etl_loggin"
+  policy = data.aws_iam_policy_document.zero_etl_logging.json
 }
 
 # -------------------------------------------------------
 # Source role
 # -------------------------------------------------------
 resource "aws_iam_role" "zero_etl_snow_source" {
-    name = "zero_etl_snow_source"
-    assume_role_policy = data.aws_iam_policy_document.glue_assume_role.json
+  name               = "zero_etl_snow_source"
+  assume_role_policy = data.aws_iam_policy_document.glue_assume_role.json
 }
 
 resource "aws_iam_policy" "zero_etl_snow_source" {
-    name = "zero_etl_snow_source"
-    policy = data.aws_iam_policy_document.zero_etl_source.json
+  name   = "zero_etl_snow_source"
+  policy = data.aws_iam_policy_document.zero_etl_source.json
 }
 
 resource "aws_iam_role_policy_attachment" "zero_etl_snow_source" {
-    role = aws_iam_role.zero_etl_snow_source.name
-    policy_arn = aws_iam_policy.zero_etl_snow_source.arn
+  role       = aws_iam_role.zero_etl_snow_source.name
+  policy_arn = aws_iam_policy.zero_etl_snow_source.arn
 }
 
 resource "aws_iam_role_policy_attachment" "zero_etl_source_logging" {
-    role = aws_iam_role.zero_etl_snow_source.name
-    policy_arn = aws_iam_policy.zero_etl_logging.arn
+  role       = aws_iam_role.zero_etl_snow_source.name
+  policy_arn = aws_iam_policy.zero_etl_logging.arn
 }
 
 # -------------------------------------------------------
 # Target role
 # -------------------------------------------------------
 resource "aws_iam_role" "zero_etl_snow_target" {
-    name = "zero_etl_snow_target"
-    assume_role_policy = data.aws_iam_policy_document.glue_assume_role.json
+  name               = "zero_etl_snow_target"
+  assume_role_policy = data.aws_iam_policy_document.glue_assume_role.json
 }
 
 resource "aws_iam_policy" "zero_etl_snow_target" {
-    name = "zero_etl_snow_target"
-    policy = data.aws_iam_policy_document.zero_etl_target.json
+  name   = "zero_etl_snow_target"
+  policy = data.aws_iam_policy_document.zero_etl_target.json
 }
 
 resource "aws_iam_role_policy_attachment" "zero_etl_target" {
-    role = aws_iam_role.zero_etl_snow_target.name
-    policy_arn = aws_iam_policy.zero_etl_snow_target.arn
+  role       = aws_iam_role.zero_etl_snow_target.name
+  policy_arn = aws_iam_policy.zero_etl_snow_target.arn
 }
 
 resource "aws_iam_role_policy_attachment" "zero_etl_target_logging" {
-    role = aws_iam_role.zero_etl_snow_target.name
-    policy_arn = aws_iam_policy.zero_etl_logging.arn
+  role       = aws_iam_role.zero_etl_snow_target.name
+  policy_arn = aws_iam_policy.zero_etl_logging.arn
 }
 
 resource "aws_lakeformation_permissions" "zero_etl_snow_s3_access" {
@@ -214,14 +215,6 @@ resource "aws_lakeformation_permissions" "zero_etl_snow_table_access" {
 }
 
 resource "aws_glue_catalog_database" "servicenow" {
-  name = "servicenow${local.underscore_env}"
+  name         = "servicenow${local.underscore_env}"
   location_uri = "s3://${module.s3-create-a-derived-table-bucket.bucket.id}/zero-etl/servicenow${local.underscore_env}/"
-}
-
-resource "aws_lakeformation_permissions" "servicenow" {
-  principal = data.aws_iam_role.github_actions_role.arn
-  permissions = ["ALL"]
-  database {
-    name = aws_glue_catalog_database.servicenow.name
-  } 
 }
