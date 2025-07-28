@@ -35,7 +35,7 @@ resource "aws_route53_record" "transfer_family" {
   name     = "ccms-file-uploads"
   type     = "CNAME"
   ttl      = 300
-  records  = [local.application_data.accounts[local.environment].cash_web_app_url]
+  records  = [aws_cloudfront_distribution.transfer_family.domain_name]
 }
 
 /*
