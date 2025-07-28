@@ -396,8 +396,8 @@ resource "aws_iam_policy" "iam_policy_lambda_get_s3_data_dev" {
           "s3:ListBucket"
         ],
         "Resource" : [
-          "arn:aws:s3:::moj-infrastructure-dev",
-          "arn:aws:s3:::moj-infrastructure-dev/*"
+          aws_s3_bucket.moj-infrastructure-dev[0].arn,
+          "${aws_s3_bucket.moj-infrastructure-dev[0].arn}/*"
         ]
       }
     ]
@@ -810,8 +810,8 @@ resource "aws_iam_policy" "iam_policy_lambda_get_s3_data_uat" {
           "s3:ListBucket"
         ],
         "Resource" : [
-          "arn:aws:s3:::moj-infrastructure-uat",
-          "arn:aws:s3:::moj-infrastructure-uat/*"
+          aws_s3_bucket.moj-infrastructure-uat[0].arn,
+          "${aws_s3_bucket.moj-infrastructure-uat[0].arn}/*"
         ]
       }
     ]
@@ -834,8 +834,8 @@ resource "aws_iam_policy" "iam_policy_lambda_put_s3_data_uat" {
           "s3:ListBucket"
         ],
         "Resource" : [
-          "arn:aws:s3:::moj-log-files-uat",
-          "arn:aws:s3:::moj-log-files-uat/*"
+          aws_s3_bucket.moj-log-files-uat[0].arn,
+          "${aws_s3_bucket.moj-log-files-uat[0].arn}/*"
         ]
       }
     ]
@@ -1298,8 +1298,8 @@ resource "aws_iam_policy" "iam_policy_lambda_get_s3_data_prod" {
           "s3:ListBucket"
         ],
         "Resource" : [
-          "arn:aws:s3:::moj-infrastructure",
-          "arn:aws:s3:::moj-infrastructure/*"
+          aws_s3_bucket.moj-infrastructure[0].arn,
+          "${aws_s3_bucket.moj-infrastructure[0].arn}/*"
         ]
       }
     ]
@@ -1393,7 +1393,9 @@ resource "aws_iam_policy" "iam_policy_lambda_get_ssm_parameter_klayers_prod" {
   })
 }
 
-##########################################################################################################
+##############################################
+# EC2 Roles, Policies, Attachment and Profiles
+##############################################
 
 # IAM EC2 Policy with Assume Role 
 
@@ -1458,7 +1460,7 @@ resource "aws_iam_policy_attachment" "CloudWatchAgentServerPolicy" {
 }
 
 #####################################
-# IAM Policy for Prodcution S3 access
+# IAM Policy for Production S3 access
 #####################################
 
 resource "aws_iam_policy" "production-s3-access" {
@@ -1472,8 +1474,8 @@ resource "aws_iam_policy" "production-s3-access" {
       "Action" : "s3:ListBucket",
       "Effect" : "Allow",
       "Resource" : [
-        "arn:aws:s3:::moj-infrastructure",
-        "arn:aws:s3:::moj-infrastructure/*"
+          aws_s3_bucket.moj-infrastructure[0].arn,
+          "${aws_s3_bucket.moj-infrastructure[0].arn}/*"
       ]
     }]
   })
@@ -1568,6 +1570,9 @@ data "aws_iam_policy_document" "email" {
   }
 }
 
+##########################################################################################
+# S3 Bucket Roles and Policies for S3 Buckets that replicate to Justice Digital S3 Buckets
+##########################################################################################
 
 #########################################################
 # IAM Role & Policy for S3 Bucket Replication to CP - DEV
