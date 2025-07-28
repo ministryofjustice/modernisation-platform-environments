@@ -1100,13 +1100,10 @@ data "aws_iam_policy_document" "rds" {
   statement {
     actions = [
       "rds:DescribeDBInstances",
-      "rds-data:*",
+      "rds-data:*"
     ]
-    resources = [
-      "arn:aws:rds:${local.account_region}:${local.account_id}:*/*"
-    ]
+    resources = module.aurora_missing_report_submissions.cluster_instances
   }
-
   statement {
     actions = [
       "kms:GenerateDataKey",
