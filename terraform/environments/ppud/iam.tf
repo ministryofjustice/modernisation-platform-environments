@@ -967,9 +967,9 @@ resource "aws_iam_role_policy_attachment" "attach_lambda_policies_get_cloudwatch
   policy_arn = each.value
 }
 
-resource "aws_iam_policy_attachment" "attach_lambda_cloudwatch_full_access_prod_new" {
+resource "aws_iam_policy_attachment" "attach_lambda_cloudwatch_full_access_to_get_cloudwatch_prod" {
   count      = local.is-production == true ? 1 : 0
-  name       = "lambda-cloudwatch-full-access-iam-attachment-new"
+  name       = "lambda-cloudwatch-full-access-iam-get-cloudwatch-attachment"
   roles      = [aws_iam_role.lambda_role_get_cloudwatch_prod[0].id]
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchFullAccessV2"
 }
@@ -1083,6 +1083,13 @@ resource "aws_iam_role_policy_attachment" "attach_lambda_policies_get_elb_metric
   for_each   = local.is-production ? local.lambda_get_elb_metrics_policies_prod : {}
   role       = aws_iam_role.lambda_role_get_elb_metrics_prod[0].name
   policy_arn = each.value
+}
+
+resource "aws_iam_policy_attachment" "attach_lambda_cloudwatch_full_access_to_get_metrics_prod" {
+  count      = local.is-production == true ? 1 : 0
+  name       = "lambda-cloudwatch-full-access-to-elb-metrics-iam-attachment"
+  roles      = [aws_iam_role.lambda_role_get_elb_metrics_prod[0].id]
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchFullAccessV2"
 }
 
 ####################### IAM Policies #######################
