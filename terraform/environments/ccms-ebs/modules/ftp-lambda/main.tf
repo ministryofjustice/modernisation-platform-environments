@@ -44,12 +44,12 @@ resource "aws_iam_policy" "ftp_policy" {
         Resource = "*"
       },
       {
-        Action: [
-                "s3:PutObject",
-                "s3:GetObject",
-                "s3:ListBucket",
-                "s3:DeleteObject"
-           ],
+        Action : [
+          "s3:PutObject",
+          "s3:GetObject",
+          "s3:ListBucket",
+          "s3:DeleteObject"
+        ],
         Effect = "Allow",
         Resource = [
           "arn:aws:s3:::${var.ftp_bucket}",
@@ -79,8 +79,8 @@ resource "aws_iam_role_policy_attachment" "ftp_lambda_policy_attach" {
 
 ### lambda layer for python dependencies
 resource "aws_lambda_layer_version" "ftp_layer" {
-  layer_name          = "ftpclientlayer"
-  compatible_runtimes = ["python3.13"]
+  layer_name               = "ftpclientlayer"
+  compatible_runtimes      = ["python3.13"]
   s3_bucket                = var.s3_bucket_ftp
   s3_key                   = var.s3_object_ftp_clientlibs
   compatible_architectures = ["x86_64"]

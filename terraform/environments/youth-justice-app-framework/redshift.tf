@@ -3,8 +3,8 @@ module "redshift" {
 
   project_name = local.project_name
   environment  = local.environment
- 
-  tags         = local.tags
+
+  tags = local.tags
 
   # Network details
   vpc_id           = data.aws_vpc.shared.id

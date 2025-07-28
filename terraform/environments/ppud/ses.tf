@@ -12,7 +12,7 @@ resource "aws_ses_configuration_set" "ses_events_configuration_set_uat" {
   name  = "ses-events-configuration-set-uat"
 
   delivery_options {
-   tls_policy = "Optional"
+    tls_policy = "Optional"
   }
 }
 
@@ -21,7 +21,7 @@ resource "aws_ses_event_destination" "ses_delivery_events_uat" {
   name                   = "ses-delivery-events-uat"
   configuration_set_name = aws_ses_configuration_set.ses_events_configuration_set_uat[0].name
   enabled                = true
-  matching_types         = [ "send" ]
+  matching_types         = ["send"]
 
   sns_destination {
     topic_arn = aws_sns_topic.ses_logging_uat[0].arn

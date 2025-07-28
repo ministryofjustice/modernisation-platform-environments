@@ -7,10 +7,10 @@ resource "aws_appautoscaling_target" "ecs_service" {
 
   # Suspend scaling during deployment
   suspended_state {
-      dynamic_scaling_in_suspended  = true
-      dynamic_scaling_out_suspended = true
-      scheduled_scaling_suspended   = true
-    }
+    dynamic_scaling_in_suspended  = true
+    dynamic_scaling_out_suspended = true
+    scheduled_scaling_suspended   = true
+  }
 }
 
 resource "aws_appautoscaling_policy" "scale_up_amber" {
