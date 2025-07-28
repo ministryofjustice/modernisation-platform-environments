@@ -82,8 +82,8 @@ resource "aws_s3_bucket_versioning" "s3_versioning" {
 #--Dynamic blocks for transfer family policy in production only
 data "aws_iam_policy_document" "inbound_bucket_policy" {
   statement {
-    sid     = "Access_for_ccms-ebs_and_soa"
-    effect  = "Allow"
+    sid    = "Access_for_ccms-ebs_and_soa"
+    effect = "Allow"
     actions = [
       "s3:PutObject",
       "s3:GetObject",
@@ -91,7 +91,7 @@ data "aws_iam_policy_document" "inbound_bucket_policy" {
       "s3:DeleteObject"
     ]
     principals {
-      type        = "AWS"
+      type = "AWS"
       identifiers = [
         "arn:aws:iam::${local.environment_management.account_ids["laa-ccms-soa-${local.environment}"]}:role/ccms-soa-ec2-instance-role",
         "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/role_stsassume_oracle_base"
@@ -122,8 +122,8 @@ data "aws_iam_policy_document" "inbound_bucket_policy" {
   dynamic "statement" {
     for_each = local.is-development ? [1] : []
     content {
-      sid     = "Access_for_s3_transfer_family_contents"
-      effect  = "Allow"
+      sid    = "Access_for_s3_transfer_family_contents"
+      effect = "Allow"
       actions = [
         "s3:GetObject",
         "s3:GetObjectVersion",

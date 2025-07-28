@@ -63,8 +63,8 @@ resource "aws_acm_certificate_validation" "transfer_family" {
 }
 
 resource "aws_route53_record" "validation" {
-  provider = aws.core-vpc
-  for_each = local.transfer_family_dvo_map
+  provider        = aws.core-vpc
+  for_each        = local.transfer_family_dvo_map
   allow_overwrite = true
   name            = each.value.name
   records         = [each.value.record]
@@ -90,6 +90,10 @@ resource "aws_cloudfront_distribution" "transfer_family" {
       origin_protocol_policy = "https-only"
       origin_ssl_protocols   = ["TLSv1.2"]
     }
+    custom_header {
+      name  = "X-Transfer-WebApp-Custom-Domain-Template-Version"
+      value = "2024-12-01"
+    }
   }
   restrictions {
     geo_restriction {
@@ -97,17 +101,13 @@ resource "aws_cloudfront_distribution" "transfer_family" {
     }
   }
   default_cache_behavior {
-    target_origin_id       = "transfer-family"
-    viewer_protocol_policy = "redirect-to-https"
-    allowed_methods        = ["GET", "HEAD"]
-    cached_methods         = ["GET", "HEAD"]
-    forwarded_values {
-      query_string = false
-      cookies {
-        forward = "none"
-      }
-    }
-    compress = true
+    cache_policy_id          = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad" # Caching Disabled
+    origin_request_policy_id = "b689b0a8-53d0-40ab-baf2-68738e2966ac" # AllViewerExceptHostHeader
+    target_origin_id         = "transfer-family"
+    viewer_protocol_policy   = "redirect-to-https"
+    allowed_methods          = ["GET", "HEAD"]
+    cached_methods           = ["GET", "HEAD"]
+    compress                 = true
   }
   viewer_certificate {
     cloudfront_default_certificate = false
