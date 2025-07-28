@@ -19,11 +19,11 @@ resource "aws_glue_security_configuration" "em_glue_security_configuration" {
 }
 
 resource "aws_s3_object" "aws_s3_object_pyzipfile_to_s3folder" {
-  count  = local.is-production || local.is-development ? 1 : 0
-  bucket = module.s3-glue-job-script-bucket.bucket.id
-  key    = "${var.s3_pylib_dir_path}/glue_data_validation_lib.zip"
-  source = data.archive_file.archive_file_zip_py_files.output_path
-  acl    = "private"
+  count       = local.is-production || local.is-development ? 1 : 0
+  bucket      = module.s3-glue-job-script-bucket.bucket.id
+  key         = "${var.s3_pylib_dir_path}/glue_data_validation_lib.zip"
+  source      = data.archive_file.archive_file_zip_py_files.output_path
+  acl         = "private"
   source_hash = filemd5(data.archive_file.archive_file_zip_py_files.output_path)
 }
 
@@ -36,10 +36,10 @@ resource "aws_cloudwatch_log_group" "dms_dv_rds_to_s3_parquet_v1" {
 }
 
 resource "aws_s3_object" "dms_dv_rds_to_s3_parquet_v1" {
-  count  = local.is-production || local.is-development ? 1 : 0
-  bucket = module.s3-glue-job-script-bucket.bucket.id
-  key    = "dms_dv_rds_to_s3_parquet_v1.py"
-  source = "glue-job/dms_dv_rds_to_s3_parquet_v1.py"
+  count       = local.is-production || local.is-development ? 1 : 0
+  bucket      = module.s3-glue-job-script-bucket.bucket.id
+  key         = "dms_dv_rds_to_s3_parquet_v1.py"
+  source      = "glue-job/dms_dv_rds_to_s3_parquet_v1.py"
   source_hash = filemd5("glue-job/dms_dv_rds_to_s3_parquet_v1.py")
 }
 
@@ -116,10 +116,10 @@ resource "aws_cloudwatch_log_group" "dms_dv_rds_to_s3_parquet_v2" {
 }
 
 resource "aws_s3_object" "dms_dv_rds_to_s3_parquet_v2" {
-  count  = local.is-production || local.is-development ? 1 : 0
-  bucket = module.s3-glue-job-script-bucket.bucket.id
-  key    = "dms_dv_rds_to_s3_parquet_v2.py"
-  source = "glue-job/dms_dv_rds_to_s3_parquet_v2.py"
+  count       = local.is-production || local.is-development ? 1 : 0
+  bucket      = module.s3-glue-job-script-bucket.bucket.id
+  key         = "dms_dv_rds_to_s3_parquet_v2.py"
+  source      = "glue-job/dms_dv_rds_to_s3_parquet_v2.py"
   source_hash = filemd5("glue-job/dms_dv_rds_to_s3_parquet_v2.py")
 }
 
@@ -344,10 +344,10 @@ resource "aws_cloudwatch_log_group" "parquet_resize_or_partitionby_yyyy_mm_dd" {
 }
 
 resource "aws_s3_object" "parquet_resize_or_partitionby_yyyy_mm_dd" {
-  count  = local.is-production || local.is-development ? 1 : 0
-  bucket = module.s3-glue-job-script-bucket.bucket.id
-  key    = "parquet_resize_or_partitionby_yyyy_mm_dd.py"
-  source = "glue-job/parquet_resize_or_partitionby_yyyy_mm_dd.py"
+  count       = local.is-production || local.is-development ? 1 : 0
+  bucket      = module.s3-glue-job-script-bucket.bucket.id
+  key         = "parquet_resize_or_partitionby_yyyy_mm_dd.py"
+  source      = "glue-job/parquet_resize_or_partitionby_yyyy_mm_dd.py"
   source_hash = filemd5("glue-job/parquet_resize_or_partitionby_yyyy_mm_dd.py")
 }
 
@@ -417,10 +417,10 @@ resource "aws_cloudwatch_log_group" "etl_table_rows_hashvalue_to_parquet" {
 }
 
 resource "aws_s3_object" "etl_table_rows_hashvalue_to_parquet" {
-  count  = local.is-production || local.is-development ? 1 : 0
-  bucket = module.s3-glue-job-script-bucket.bucket.id
-  key    = "etl_table_rows_hashvalue_to_parquet.py"
-  source = "glue-job/etl_table_rows_hashvalue_to_parquet.py"
+  count       = local.is-production || local.is-development ? 1 : 0
+  bucket      = module.s3-glue-job-script-bucket.bucket.id
+  key         = "etl_table_rows_hashvalue_to_parquet.py"
+  source      = "glue-job/etl_table_rows_hashvalue_to_parquet.py"
   source_hash = filemd5("glue-job/etl_table_rows_hashvalue_to_parquet.py")
 }
 
@@ -487,10 +487,10 @@ resource "aws_cloudwatch_log_group" "dms_dv_on_rows_hashvalue" {
 }
 
 resource "aws_s3_object" "dms_dv_on_rows_hashvalue" {
-  count  = local.is-production || local.is-development ? 1 : 0
-  bucket = module.s3-glue-job-script-bucket.bucket.id
-  key    = "dms_dv_on_rows_hashvalue.py"
-  source = "glue-job/dms_dv_on_rows_hashvalue.py"
+  count       = local.is-production || local.is-development ? 1 : 0
+  bucket      = module.s3-glue-job-script-bucket.bucket.id
+  key         = "dms_dv_on_rows_hashvalue.py"
+  source      = "glue-job/dms_dv_on_rows_hashvalue.py"
   source_hash = filemd5("glue-job/dms_dv_on_rows_hashvalue.py")
 }
 
@@ -558,10 +558,10 @@ resource "aws_cloudwatch_log_group" "etl_rds_tbl_rows_hashvalue_to_s3_prq_yyyy_m
 }
 
 resource "aws_s3_object" "etl_rds_tbl_rows_hashvalue_to_s3_prq_yyyy_mm" {
-  count  = local.is-production || local.is-development ? 1 : 0
-  bucket = module.s3-glue-job-script-bucket.bucket.id
-  key    = "etl_rds_tbl_rows_hashvalue_to_s3_prq_yyyy_mm.py"
-  source = "glue-job/etl_rds_tbl_rows_hashvalue_to_s3_prq_yyyy_mm.py"
+  count       = local.is-production || local.is-development ? 1 : 0
+  bucket      = module.s3-glue-job-script-bucket.bucket.id
+  key         = "etl_rds_tbl_rows_hashvalue_to_s3_prq_yyyy_mm.py"
+  source      = "glue-job/etl_rds_tbl_rows_hashvalue_to_s3_prq_yyyy_mm.py"
   source_hash = filemd5("glue-job/etl_rds_tbl_rows_hashvalue_to_s3_prq_yyyy_mm.py")
 }
 
@@ -641,10 +641,10 @@ resource "aws_cloudwatch_log_group" "etl_rds_sqlserver_query_to_s3_parquet" {
 }
 
 resource "aws_s3_object" "etl_rds_sqlserver_query_to_s3_parquet" {
-  count  = local.is-production || local.is-development ? 1 : 0
-  bucket = module.s3-glue-job-script-bucket.bucket.id
-  key    = "etl_rds_sqlserver_query_to_s3_parquet.py"
-  source = "glue-job/etl_rds_sqlserver_query_to_s3_parquet.py"
+  count       = local.is-production || local.is-development ? 1 : 0
+  bucket      = module.s3-glue-job-script-bucket.bucket.id
+  key         = "etl_rds_sqlserver_query_to_s3_parquet.py"
+  source      = "glue-job/etl_rds_sqlserver_query_to_s3_parquet.py"
   source_hash = filemd5("glue-job/etl_rds_sqlserver_query_to_s3_parquet.py")
 }
 
@@ -731,10 +731,10 @@ resource "aws_cloudwatch_log_group" "create_or_refresh_dv_table" {
 
 
 resource "aws_s3_object" "create_or_refresh_dv_table" {
-  count  = local.is-production || local.is-development ? 1 : 0
-  bucket = module.s3-glue-job-script-bucket.bucket.id
-  key    = "create_or_refresh_dv_table.py"
-  source = "glue-job/create_or_refresh_dv_table.py"
+  count       = local.is-production || local.is-development ? 1 : 0
+  bucket      = module.s3-glue-job-script-bucket.bucket.id
+  key         = "create_or_refresh_dv_table.py"
+  source      = "glue-job/create_or_refresh_dv_table.py"
   source_hash = filemd5("glue-job/create_or_refresh_dv_table.py")
 }
 
@@ -820,10 +820,10 @@ resource "aws_cloudwatch_log_group" "dms_dv_on_rows_hashvalue_partitionby_yyyy_m
 }
 
 resource "aws_s3_object" "dms_dv_on_rows_hashvalue_partitionby_yyyy_mm" {
-  count  = local.is-production || local.is-development ? 1 : 0
-  bucket = module.s3-glue-job-script-bucket.bucket.id
-  key    = "dms_dv_on_rows_hashvalue_partitionby_yyyy_mm.py"
-  source = "glue-job/dms_dv_on_rows_hashvalue_partitionby_yyyy_mm.py"
+  count       = local.is-production || local.is-development ? 1 : 0
+  bucket      = module.s3-glue-job-script-bucket.bucket.id
+  key         = "dms_dv_on_rows_hashvalue_partitionby_yyyy_mm.py"
+  source      = "glue-job/dms_dv_on_rows_hashvalue_partitionby_yyyy_mm.py"
   source_hash = filemd5("glue-job/dms_dv_on_rows_hashvalue_partitionby_yyyy_mm.py")
 }
 

@@ -16,7 +16,7 @@ module "aurora" {
   snapshot_identifier = var.snapshot_identifier
 
   # Engine Update settings
-  allow_major_version_upgrade = true 
+  allow_major_version_upgrade = true
 
   # Master user and Auth
   master_username                                        = var.master_username #"root"
