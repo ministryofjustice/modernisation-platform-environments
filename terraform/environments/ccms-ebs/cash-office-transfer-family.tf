@@ -24,24 +24,6 @@ module "transfer_family" {
   aws_identity_centre_store_arn = local.application_data.accounts[local.environment].cash_office_idp_arn
 }
 
-resource "awscc_transfer_web_app" "this" {
-  provider = awscc.cashoffice-cc
-  identity_provider_details = {
-    instance_arn = "arn:aws:sso:::instance/ssoins-7535d9af4f41fb26"
-    role         = "arn:aws:iam::767123802783:role/ccms-ebs-cashoffice-transfer"
-  }
-}
-
-resource "aws_s3control_access_grant" "testing" {
-  provider = aws.cashoffice
-  permission                = "READWRITE"
-  access_grants_location_id = "76773da1-d978-4e07-bc68-3af1923a01f1"
-  grantee {
-    grantee_type       = "DIRECTORY_GROUP"
-    grantee_identifier = "arn:aws:sso:::instance/ssoins-7535d9af4f41fb26"
-  }
-}
-
 /*
 The resourced below here are not a good candidate for inclusion in a module as they require creation
 AFTER the manual creation of a webapp and the input of the webapps URL
@@ -50,7 +32,7 @@ resource "aws_route53_record" "transfer_family" {
   count    = local.is-development ? 1 : 0
   provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.external.zone_id
-  name     = "ccms-file-uplods"
+  name     = "ccms-file-uploads"
   type     = "CNAME"
   ttl      = 300
   records  = [local.application_data.accounts[local.environment].cash_web_app_url]
@@ -129,3 +111,8 @@ resource "aws_cloudfront_distribution" "transfer_family" {
     ssl_support_method             = "sni-only"
   }
 }
+
+/*
+Once all resources are created. The Web App must have it's URL manually configured to point to
+the newly created DNS record of ccms-file-uploads.laa-ENVIRONMENT.modernisation-platform.service.justice.gov.uk
+*/
