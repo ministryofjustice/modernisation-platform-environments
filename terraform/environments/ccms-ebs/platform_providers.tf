@@ -56,3 +56,11 @@ provider "aws" {
     role_arn = "arn:aws:iam::${local.environment_management.aws_organizations_root_account_id}:role/ModernisationPlatformSSOReadOnly"
   }
 }
+
+provider "awscc" {
+  alias = "test-webapp"
+  region = "eu-west-2"
+  assume_role = {
+    role_arn = "arn:aws:iam::${data.aws_caller_identity.original_session.id}:role/MemberInfrastructureAccess"
+  }
+}
