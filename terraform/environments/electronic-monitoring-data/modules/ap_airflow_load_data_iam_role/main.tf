@@ -134,7 +134,6 @@ resource "aws_lakeformation_permissions" "catalog_manage" {
 
   permissions        = [
     "CREATE_DATABASE",
-    "DROP_DATABASE",
   ]
 
   catalog_resource   = true
