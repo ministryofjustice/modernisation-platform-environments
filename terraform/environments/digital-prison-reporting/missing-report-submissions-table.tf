@@ -123,7 +123,7 @@ module "aurora_missing_report_submissions" {
     static = {
       identifier     = "missing-report-static-any-endpoint"
       type           = "ANY"
-      static_members = ["${local.application_data.accounts[local.environment].missing_report_submissions_rds.name}_${local.environment}"]
+      static_members = ["${local.application_data.accounts[local.environment].missing_report_submissions_rds.name}-${local.environment}"]
       tags           = { Endpoint = "Missing-Report-Any" }
     }
   }
