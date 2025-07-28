@@ -14,7 +14,7 @@ provider "aws" {
   default_tags { tags = local.tags }
 }
 
-# AWS provider for the workspace you're working in (every resource will default to using this, unless otherwise specified)
+# Cashoffice Provider Only
 provider "aws" {
   alias = "cashoffice"
   region = "eu-west-2"
