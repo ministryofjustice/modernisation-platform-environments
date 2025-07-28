@@ -24,15 +24,13 @@ module "transfer_family" {
   aws_identity_centre_store_arn = local.application_data.accounts[local.environment].cash_office_idp_arn
 }
 
-resource "awscc_transfer_web_app" "demo" {
+/* resource "awscc_transfer_web_app" "transfer_family" {
     provider = awscc.test-webapp
     identity_provider_details = {
-        instance_arn = "arn:aws:sso:::instance/ssoins-7535d9af4f41fb26"
-        #instance_arn = local.application_data.accounts[local.environment].cash_office_idp_arn
-        role         = "arn:aws:iam::767123802783:role/ccms-ebs-cashoffice-transfer"
-        #role         = module.transfer_family[0].transfer_iam_role_arn
+        instance_arn = local.application_data.accounts[local.environment].cash_office_idp_arn
+        role         = module.transfer_family[0].transfer_iam_role_arn
     }
-}
+} */
 
 /*
 The resourced below here are not a good candidate for inclusion in a module as they require creation
