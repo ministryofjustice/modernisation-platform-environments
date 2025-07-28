@@ -1,5 +1,5 @@
 locals {
-  missing_report_db_credentials = jsondecode(data.aws_secretsmanager_secret_version.missing_report_submissions.secret_string)
+  missing_report_db_credentials = jsondecode(aws_secretsmanager_secret_version.missing_report_submissions.secret_string)
 }
 
 resource "aws_kms_key" "missing_report_submissions" {
