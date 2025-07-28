@@ -1,4 +1,6 @@
 /*
+S3 Transfer Family Deployment - Used by cash office to upload files to S3 -- PRODUCTION ONLY!!
+
 Due to what appear to be bugs in the aws_s3control_access_grant and awscc_transfer_web_app
 resources. Both of these are created an managed manually until those issues can be ironed out.
 
@@ -7,7 +9,7 @@ out in:
 - modules/transfer-family/grant.tf
 - modules/transfer-family/main.tf
 
-Until those bugs are addressed, the below resources are created manually in PRODUCTION ONLY:
+Until those bugs are addressed, the below resources are created manually:
 - An S3 Transfer Family Web App, using the role ccms-ebs-cashoffice-transfer (created by this module)
 - An S3 grant to s3://laa-ccms-inbound-production-mp/* for the entra/identity centre group
   azure-aws-sso-laa-ccms-ebs-s3-cashoffice (which has the group ID c64272c4-30a1-7039-8ffd-af791143da2e)
@@ -24,18 +26,11 @@ module "transfer_family" {
   aws_identity_centre_store_arn = local.application_data.accounts[local.environment].cash_office_idp_arn
 }
 
-/* resource "awscc_transfer_web_app" "transfer_family" {
-    provider = awscc.test-webapp
-    identity_provider_details = {
-        instance_arn = local.application_data.accounts[local.environment].cash_office_idp_arn
-        role         = module.transfer_family[0].transfer_iam_role_arn
-    }
-} */
-
 /*
-The resourced below here are not a good candidate for inclusion in a module as they require creation
-AFTER the manual creation of a webapp and the input of the webapps URL
+The resources below here are not a good candidate for inclusion in a module as they require creation
+AFTER the manual creation of a webapp/S3 grant and the input of the webapps URL
 */
+
 resource "aws_route53_record" "transfer_family" {
   count    = local.is-development ? 1 : 0
   provider = aws.core-vpc
