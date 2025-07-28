@@ -45,7 +45,7 @@ resource "aws_acm_certificate" "transfer_family" {
   count                     = local.is-development ? 1 : 0
   provider                  = aws.us-east-1
   domain_name               = trim(data.aws_route53_zone.external.name, ".") #--Remove the trailing dot from the zone name
-  subject_alternative_names = [aws_route53_record.transfer_family[0].fqdn]
+  subject_alternative_names = ["${local.application_data.accounts[local.environment].cash_office_upload_hostname}.${trim(data.aws_route53_zone.external.name, ".")}"]
   validation_method         = "DNS"
   lifecycle {
     create_before_destroy = true
