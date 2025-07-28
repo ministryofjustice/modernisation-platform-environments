@@ -1102,7 +1102,7 @@ data "aws_iam_policy_document" "rds" {
       "rds:DescribeDBInstances",
       "rds-data:*"
     ]
-    resources = module.aurora_missing_report_submissions.cluster_instances
+    resources = values(module.aurora_missing_report_submissions.cluster_instances)
   }
   statement {
     actions = [
