@@ -158,7 +158,7 @@ resource "aws_s3_bucket_cors_configuration" "inbound_bucket_cors_policy" {
   cors_rule {
     allowed_headers = ["*"]
     allowed_methods = ["GET", "PUT", "POST"]
-    allowed_origins = [aws_cloudfront_distribution.transfer_family.domain_name]
+    allowed_origins = [aws_cloudfront_distribution.transfer_family[0].domain_name]
     expose_headers = [
       "last-modified",
       "content-length",

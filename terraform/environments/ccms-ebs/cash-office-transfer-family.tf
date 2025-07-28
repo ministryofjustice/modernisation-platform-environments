@@ -35,7 +35,7 @@ resource "aws_route53_record" "transfer_family" {
   name     = local.application_data.accounts[local.environment].cash_office_upload_hostname
   type     = "CNAME"
   ttl      = 300
-  records  = [aws_cloudfront_distribution.transfer_family.domain_name]
+  records  = [aws_cloudfront_distribution.transfer_family[0].domain_name]
 }
 
 /*
