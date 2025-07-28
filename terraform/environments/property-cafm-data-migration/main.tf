@@ -1,10 +1,10 @@
 module "rds_export" {
   source = "github.com/ministryofjustice/terraform-rds-export?ref=4bc9d54fe3868720ab87d1b1a4e47e16fef1c0c3"
 
-  kms_key_arn         = aws_kms_key.sns_kms.arn
-  name                = "cafm"
-  vpc_id              = module.vpc.vpc_id
-  database_subnet_ids = module.vpc.private_subnets
+  kms_key_arn           = aws_kms_key.sns_kms.arn
+  name                  = "cafm"
+  vpc_id                = module.vpc.vpc_id
+  database_subnet_ids   = module.vpc.private_subnets
   master_user_secret_id = aws_secretsmanager_secret.db_master_user_secret.arn
 
   tags = {
