@@ -130,19 +130,13 @@ module "share_dbs_with_roles" {
 }
 
 resource "aws_lakeformation_permissions" "catalog_manage" {
-  principal {
-    data_lake_principal_identifier = module.ap_database_sharing.iam_role.arn
-  }
+  principal          = module.ap_database_sharing.iam_role.arn
 
-  permissions = [
+  permissions        = [
     "CREATE_DATABASE",
     "DROP_DATABASE",
-    "CREATE_TABLE",
-    "DROP_TABLE",
   ]
 
-  resource {
-    catalog {}
-  }
+  catalog_resource   = true
 }
 
