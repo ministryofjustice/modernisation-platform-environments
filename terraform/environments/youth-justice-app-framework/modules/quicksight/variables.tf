@@ -9,7 +9,7 @@ variable "environment" {
 }
 
 variable "account_id" {
-  type = string
+  type        = string
   description = "ID of the curret account."
 }
 

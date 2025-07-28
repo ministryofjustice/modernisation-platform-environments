@@ -27,7 +27,7 @@ locals {
     "servicenow",
     "serco_fms",
     "allied_mdss",
-  ] : [
+    ] : [
     "servicenow",
     "serco_fms"
   ]
