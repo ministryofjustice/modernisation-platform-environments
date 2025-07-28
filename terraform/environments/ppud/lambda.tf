@@ -369,10 +369,10 @@ resource "aws_lambda_function" "terraform_lambda_disable_cpu_alarm_prod" {
   s3_bucket                      = "moj-infrastructure"
   s3_key                         = "lambda/functions/disable_cpu_alarm_prod.zip"
   function_name                  = "disable_cpu_alarm_prod"
-  role                           = aws_iam_role.lambda_role_alarm_suppression[0].arn
+  role                           = aws_iam_role.lambda_role_get_cloudwatch_prod[0].arn
   handler                        = "disable_cpu_alarm_prod.lambda_handler"
   runtime                        = "python3.12"
-  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_alarm_suppression_to_lambda_role_alarm_suppression]
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policies_get_cloudwatch_prod]
   reserved_concurrent_executions = 5
   dead_letter_config {
     target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
@@ -403,10 +403,10 @@ resource "aws_lambda_function" "terraform_lambda_enable_cpu_alarm_prod" {
   s3_bucket                      = "moj-infrastructure"
   s3_key                         = "lambda/functions/enable_cpu_alarm_prod.zip"
   function_name                  = "enable_cpu_alarm_prod"
-  role                           = aws_iam_role.lambda_role_alarm_suppression[0].arn
+  role                           = aws_iam_role.lambda_role_get_cloudwatch_prod[0].arn
   handler                        = "enable_cpu_alarm_prod.lambda_handler"
   runtime                        = "python3.12"
-  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_alarm_suppression_to_lambda_role_alarm_suppression]
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policies_get_cloudwatch_prod]
   reserved_concurrent_executions = 5
   dead_letter_config {
     target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
@@ -830,10 +830,12 @@ resource "aws_lambda_function" "terraform_lambda_func_ppud_elb_trt_data_prod" {
   s3_key                         = "lambda/functions/ppud_elb_trt_data_prod.zip"
   function_name                  = "ppud_elb_trt_data_prod"
   role                           = aws_iam_role.lambda_role_cloudwatch_get_metric_data_prod[0].arn
+# role                           = aws_iam_role.lambda_role_get_elb_metrics_prod[0].arn
   handler                        = "ppud_elb_trt_data_prod.lambda_handler"
   runtime                        = "python3.12"
   timeout                        = 300
   depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_get_metric_data_to_lambda_role_cloudwatch_get_metric_data_prod]
+# depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policies_get_elb_metrics_prod]
   reserved_concurrent_executions = 5
   dead_letter_config {
     target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
@@ -877,10 +879,12 @@ resource "aws_lambda_function" "terraform_lambda_func_ppud_elb_trt_calculate_pro
   s3_key                         = "lambda/functions/ppud_elb_trt_calculate_prod.zip"
   function_name                  = "ppud_elb_trt_calculate_prod"
   role                           = aws_iam_role.lambda_role_cloudwatch_get_metric_data_prod[0].arn
+# role                           = aws_iam_role.lambda_role_get_elb_metrics_prod[0].arn
   handler                        = "ppud_elb_trt_calculate_prod.lambda_handler"
   runtime                        = "python3.12"
   timeout                        = 300
   depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_get_metric_data_to_lambda_role_cloudwatch_get_metric_data_prod]
+# depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policies_get_elb_metrics_prod]
   reserved_concurrent_executions = 5
   dead_letter_config {
     target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
@@ -924,10 +928,12 @@ resource "aws_lambda_function" "terraform_lambda_func_ppud_elb_uptime_data_prod"
   s3_key                         = "lambda/functions/ppud_elb_uptime_data_prod.zip"
   function_name                  = "ppud_elb_uptime_data_prod"
   role                           = aws_iam_role.lambda_role_cloudwatch_get_metric_data_prod[0].arn
+# role                           = aws_iam_role.lambda_role_get_elb_metrics_prod[0].arn
   handler                        = "ppud_elb_uptime_data_prod.lambda_handler"
   runtime                        = "python3.12"
   timeout                        = 300
   depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_get_metric_data_to_lambda_role_cloudwatch_get_metric_data_prod]
+# depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policies_get_elb_metrics_prod]
   reserved_concurrent_executions = 5
   dead_letter_config {
     target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
@@ -971,10 +977,12 @@ resource "aws_lambda_function" "terraform_lambda_func_ppud_elb_uptime_calculate_
   s3_key                         = "lambda/functions/ppud_elb_uptime_calculate_prod.zip"
   function_name                  = "ppud_elb_uptime_calculate_prod"
   role                           = aws_iam_role.lambda_role_cloudwatch_get_metric_data_prod[0].arn
+# role                           = aws_iam_role.lambda_role_get_elb_metrics_prod[0].arn
   handler                        = "ppud_elb_uptime_calculate_prod.lambda_handler"
   runtime                        = "python3.12"
   timeout                        = 300
   depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_get_metric_data_to_lambda_role_cloudwatch_get_metric_data_prod]
+# depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policies_get_elb_metrics_prod]
   reserved_concurrent_executions = 5
   dead_letter_config {
     target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
