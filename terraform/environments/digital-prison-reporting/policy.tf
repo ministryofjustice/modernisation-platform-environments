@@ -1093,7 +1093,7 @@ data "aws_iam_policy_document" "rds" {
       "rds-db:Connect",
     ]
     resources = [
-      "arn:aws:rds:${local.account_region}:${local.account_id}:${local.missing_report_db_credentials.username}:${local.application_data.accounts[local.environment].missing_report_submissions_rds.db_identifier}/${local.missing_report_db_credentials.username}"
+      "arn:aws:rds:${local.account_region}:${local.environment_management.account_ids[terraform.workspace]}:${local.missing_report_db_credentials.username}:${local.application_data.accounts[local.environment].missing_report_submissions_rds.db_identifier}/${local.missing_report_db_credentials.username}"
     ]
   }
 
