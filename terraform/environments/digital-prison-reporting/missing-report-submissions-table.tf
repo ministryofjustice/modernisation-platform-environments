@@ -105,7 +105,7 @@ resource "aws_kms_alias" "missing_report_submissions-kms-alias" {
 module "aurora_missing_report_submissions" {
   source = "./modules/rds/aws-aurora/"
 
-  name                        = "${local.application_data.accounts[local.environment].missing_report_submissions_rds.name}_${local.environment}_cluster"
+  name                        = "${local.application_data.accounts[local.environment].missing_report_submissions_rds.name}-${local.environment}-cluster"
   engine                      = local.application_data.accounts[local.environment].missing_report_submissions_rds.engine
   engine_version              = local.application_data.accounts[local.environment].missing_report_submissions_rds.engine_version
   database_name               = local.application_data.accounts[local.environment].missing_report_submissions_rds.db_identifier
