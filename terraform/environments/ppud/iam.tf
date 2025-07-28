@@ -1048,6 +1048,43 @@ resource "aws_iam_role_policy_attachment" "attach_lambda_policies_get_certificat
   policy_arn = each.value
 }
 
+# Lambda role and attachment for retrieving elastic load balancer metrics from S3
+
+resource "aws_iam_role" "lambda_role_get_elb_metrics_prod" {
+  count              = local.is-production == true ? 1 : 0
+  name               = "PPUD_Lambda_Function_Role_Get_ELB_Metrics_Prod"
+  assume_role_policy = <<EOF
+{
+ "Version": "2012-10-17",
+ "Statement": [
+   {
+     "Action": "sts:AssumeRole",
+     "Principal": {
+       "Service": "lambda.amazonaws.com"
+     },
+     "Effect": "Allow",
+     "Sid": ""
+   }
+ ]
+}
+EOF
+}
+
+locals {
+  lambda_get_elb_metrics_policies_prod = local.is-production ? {
+    "send_message_to_sqs"     = aws_iam_policy.iam_policy_lambda_send_message_to_sqs_prod[0].arn
+    "send_logs_to_cloudwatch" = aws_iam_policy.iam_policy_lambda_send_logs_cloudwatch_prod[0].arn
+    "get_cloudwatch_metrics"  = aws_iam_policy.iam_policy_lambda_get_cloudwatch_metrics_prod[0].arn
+    "get_elb_metrics"         = aws_iam_policy.iam_policy_lambda_get_s3_elb_metrics_prod[0].arn
+  } : {}
+}
+
+resource "aws_iam_role_policy_attachment" "attach_lambda_policies_get_elb_metrics_prod" {
+  for_each   = local.is-production ? local.lambda_get_elb_metrics_policies_prod : {}
+  role       = aws_iam_role.lambda_role_get_elb_metrics_prod[0].name
+  policy_arn = each.value
+}
+
 ####################### IAM Policies #######################
 
 resource "aws_iam_policy" "iam_policy_lambda_send_message_to_sqs_prod" {
@@ -1256,6 +1293,30 @@ resource "aws_iam_policy" "iam_policy_lambda_get_s3_data_prod" {
         "Resource" : [
           "arn:aws:s3:::moj-infrastructure",
           "arn:aws:s3:::moj-infrastructure/*"
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy" "iam_policy_lambda_get_s3_elb_metrics_prod" {
+  count       = local.is-production == true ? 1 : 0
+  name        = "aws_iam_policy_for_lambda_get_s3_elb_metrics_${local.environment}"
+  path        = "/"
+  description = "Allows lambda functions to put and get ELB metric data in and from S3"
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket"
+        ],
+        "Resource" : [
+          aws_s3_bucket.moj-lambda-metrics-prod[0].arn,
+          "${aws_s3_bucket.moj-lambda-metrics-prod[0].arn}/*"
         ]
       }
     ]
