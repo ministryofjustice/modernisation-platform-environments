@@ -11,7 +11,7 @@ resource "aws_secretsmanager_secret" "xsiam_endpoint" {
 resource "aws_secretsmanager_secret_version" "xsiam_endpoint" {
   #checkov:skip=CKV2_AWS_57:xsiam endpoint, no rotation needed
   secret_id         = aws_secretsmanager_secret.xsiam_endpoint.id
-  secret_string     = "changeme"
+  secret_string     = "https://placeholder-url.example.com"
   lifecycle {
     ignore_changes  = [secret_string]
   }
