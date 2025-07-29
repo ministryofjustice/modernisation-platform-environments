@@ -42,6 +42,16 @@ resource "aws_iam_policy" "cwa_extract_lambda_policy" {
           "s3:PutObject"
         ],
         Resource = "${aws_s3_bucket.data.arn}/*"
+      },
+      {
+        Effect   = "Allow"
+        Action   = [
+          "secretsmanager:GetSecretValue",
+        ]
+        Resource = [
+          aws_secretsmanager_secret.cwa_procedures_config.arn,
+          aws_secretsmanager_secret.cwa_db_secret.arn,
+        ]
       }
     ]
   })
