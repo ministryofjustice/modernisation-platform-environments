@@ -53,7 +53,7 @@ resource "aws_kms_key" "firehose_backup_xsiam" {
 
 # Create an alias for easier identification
 resource "aws_kms_alias" "firehose_kms_alias_xsiam" {
-  name          = "alias/firehose-s3-backup-key"
+  name          = "alias/firehose-xsiam-s3-backup-key"
   target_key_id = aws_kms_key.firehose_backup_xsiam.key_id
 }
 
@@ -121,7 +121,7 @@ resource "aws_kms_key_policy" "firehose_backup_xsiam_policy" {
 
 
 resource "aws_cloudwatch_log_group" "firehose_log_group_xsiam" {
-  name              = "yjaf-${var.environment}-firehose-error-logs"
+  name              = "yjaf-${var.environment}-firehose-xsiam-error-logs"
   retention_in_days = 400
   kms_key_id        = aws_kms_key.firehose_backup_xsiam.arn
 }
@@ -131,7 +131,7 @@ data "aws_caller_identity" "current_xsiam" {}
 
 
 resource "aws_iam_role" "cw_logs_to_firehose_xsiam" {
-  name = "cw-logs-to-firehose"
+  name = "cw-logs-to-firehose-xsiam"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -239,7 +239,7 @@ resource "aws_iam_policy" "firehose_policy_xsiam" {
 }
 
 resource "aws_iam_policy" "firehose_secrets_access_xsiam" {
-  name = "FirehoseSecretsAccess"
+  name = "FirehoseSecretsAccessXsiam"
 
   policy = jsonencode({
     Version = "2012-10-17",
@@ -257,7 +257,7 @@ resource "aws_iam_policy" "firehose_secrets_access_xsiam" {
 
 
 resource "aws_iam_policy" "firehose_kms_access_xsiam" {
-  name = "AllowFirehoseToUseCMK"
+  name = "AllowFirehoseToUseCMKXsiam"
 
   policy = jsonencode({
     Version = "2012-10-17",
@@ -280,7 +280,7 @@ resource "aws_iam_policy" "firehose_kms_access_xsiam" {
 }
 
 resource "aws_iam_policy" "firehose_kms_secret_access_xsiam" {
-  name = "FirehoseKMSSecretsDecrypt"
+  name = "FirehoseKMSSecretsDecryptXsiam"
 
   policy = jsonencode({
     Version = "2012-10-17",
