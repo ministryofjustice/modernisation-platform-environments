@@ -1,5 +1,5 @@
 resource "aws_sns_topic_policy" "priority_p1_policy" {
-  arn    = aws_sns_topic.priority_p1.arn
+  arn = aws_sns_topic.priority_p1.arn
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -10,7 +10,15 @@ resource "aws_sns_topic_policy" "priority_p1_policy" {
         Principal = {
           AWS = aws_iam_role.admin_role.arn
         }
-        Action = "sns:*"
+        Action = [
+          "sns:Publish",
+          "sns:Subscribe",
+          "sns:SetTopicAttributes",
+          "sns:RemovePermission",
+          "sns:DeleteTopic",
+          "sns:GetTopicAttributes",
+          "sns:AddPermission"
+        ]
         Resource = aws_sns_topic.priority_p1.arn
       },
       {

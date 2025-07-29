@@ -3,7 +3,9 @@
 ######################################
 
 resource "aws_sns_topic" "priority_p1" {
-  name = "Priority-P1"
+  name = "Priority-P1.fifo"
+  fifo_topic = true
+  content_based_deduplication = true
 }
 
 
