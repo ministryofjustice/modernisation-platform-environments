@@ -212,7 +212,9 @@
       "certificate_expiry_days": 30,
       "certificate_monitor_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com",
       "payment_load_monitor_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com",
-      "alerts_subscription_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com"
+      "alerts_subscription_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com",
+      "cash_office_idp_arn": "arn:aws:sso:::instance/ssoins-7535d9af4f41fb26",
+      "cash_office_sso_group_id": "c64272c4-30a1-7039-8ffd-af791143da2e"
     },
     "preproduction": {
       "short_env": "prep",
@@ -317,7 +319,9 @@
       "certificate_expiry_days": 30,
       "certificate_monitor_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com",
       "payment_load_monitor_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com",
-      "alerts_subscription_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com"
+      "alerts_subscription_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com",
+      "cash_office_idp_arn": "arn:aws:sso:::instance/ssoins-7535d9af4f41fb26",
+      "cash_office_sso_group_id": "c64272c4-30a1-7039-8ffd-af791143da2e"
     },
     "production": {
       "short_env": "prod",
@@ -424,7 +428,10 @@
       "certificate_expiry_days": 30,
       "certificate_monitor_email": "ccms-ebs-prod-monitor-aaaajvsud6ikkogrh4dyt53whq@moj.org.slack.com",
       "payment_load_monitor_email": "ccms-ebs-prod-monitor-aaaajvsud6ikkogrh4dyt53whq@moj.org.slack.com",
-      "alerts_subscription_email": "ccms-ebs-prod-monitor-aaaajvsud6ikkogrh4dyt53whq@moj.org.slack.com"
+      "alerts_subscription_email": "ccms-ebs-prod-monitor-aaaajvsud6ikkogrh4dyt53whq@moj.org.slack.com",
+      "cash_office_idp_arn": "arn:aws:sso:::instance/ssoins-7535d9af4f41fb26",
+      "cash_office_upload_hostname": "ccms-file-uploads",
+      "cash_web_app_url": "webapp-15b7379e05fb4e428.transfer-webapp.eu-west-2.on.aws"
     }
   },
   "webgate_ebs": {
