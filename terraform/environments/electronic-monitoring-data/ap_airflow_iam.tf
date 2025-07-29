@@ -102,6 +102,7 @@ module "p1_export_airflow" {
   iam_policy_document = data.aws_iam_policy_document.p1_export_airflow.json
   secret_code         = jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]
   oidc_arn            = aws_iam_openid_connect_provider.analytical_platform_compute.arn
+  new_airflow         = true
 }
 
 module "load_alcohol_monitoring_database" {
