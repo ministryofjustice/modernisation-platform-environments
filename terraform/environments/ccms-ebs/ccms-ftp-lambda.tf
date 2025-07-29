@@ -105,7 +105,7 @@ data "aws_iam_policy_document" "inbound_bucket_policy" {
 
   #--Cash office. Transfer family. Production only.
   dynamic "statement" {
-    for_each = local.is-production ? [1] : []
+    for_each = (local.is-preproduction || local.is-production) ? [1] : []
     content {
       sid     = "Access_for_s3_transfer_family_list"
       effect  = "Allow"
@@ -122,7 +122,7 @@ data "aws_iam_policy_document" "inbound_bucket_policy" {
 
   #--Cash office. Transfer family. Production only.
   dynamic "statement" {
-    for_each = local.is-production ? [1] : []
+    for_each = (local.is-preproduction || local.is-production) ? [1] : []
     content {
       sid    = "Access_for_s3_transfer_family_contents"
       effect = "Allow"
@@ -155,7 +155,7 @@ resource "aws_s3_bucket_policy" "inbound_bucket_policy" {
 
 #--Cash office. Transfer family CORS. Production only
 resource "aws_s3_bucket_cors_configuration" "inbound_bucket_cors_policy" {
-  count  = local.is-production ? 1 : 0
+  count  = (local.is-preproduction || local.is-production) ? 1 : 0
   bucket = aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket
   cors_rule {
     allowed_headers = ["*"]
