@@ -73,8 +73,10 @@ resource "aws_route53_record" "validation" {
   zone_id         = data.aws_route53_zone.external.zone_id
 }
 
+#--WAF and ACL resources need to be in us-east-1 as they are associated with Cloudfront
 resource "aws_wafv2_ip_set" "transfer_family" {
   count              = (local.is-preproduction || local.is-production) ? 1 : 0
+  provider           = aws.us-east-1
   name               = "laa-allow-list"
   description        = "Allowed Internal Ranges for LAA"
   scope              = "CLOUDFRONT"
@@ -99,6 +101,7 @@ resource "aws_wafv2_ip_set" "transfer_family" {
 
 resource "aws_wafv2_web_acl" "transfer_family" {
   count       = (local.is-preproduction || local.is-production) ? 1 : 0
+  provider    = aws.us-east-1
   name        = "cf-ip-restriction-acl"
   description = "LAA Cash Office Allowed "
   scope       = "CLOUDFRONT"
