@@ -176,4 +176,3 @@ data "aws_subnets" "apc_private" {
     values = ["${local.application_name}-${local.environment}-private*"]
   }
 }
-
