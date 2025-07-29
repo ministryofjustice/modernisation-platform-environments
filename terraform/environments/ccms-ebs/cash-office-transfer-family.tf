@@ -103,7 +103,7 @@ resource "aws_wafv2_web_acl" "transfer_family" {
   count       = (local.is-preproduction || local.is-production) ? 1 : 0
   provider    = aws.us-east-1
   name        = "cf-ip-restriction-acl"
-  description = "LAA Cash Office Allowed "
+  description = "LAA Cash Office Allowed"
   scope       = "CLOUDFRONT"
   default_action {
     block {}
