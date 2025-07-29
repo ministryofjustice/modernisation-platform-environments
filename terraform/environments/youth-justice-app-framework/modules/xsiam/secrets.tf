@@ -31,7 +31,8 @@ resource "aws_secretsmanager_secret_version" "xsiam_api" {
 }
 
 data "aws_secretsmanager_secret" "xsiam_endpoint" {
-  name = "xsiam-endpoint" 
+  name        = "xsiam-endpoint" 
+  depends_on  = [aws_secretsmanager_secret.xsiam_endpoint]
 }
 
 data "aws_secretsmanager_secret_version" "xsiam_endpoint" {
