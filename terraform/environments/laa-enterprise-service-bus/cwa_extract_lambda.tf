@@ -1,17 +1,11 @@
 #####################################################################################
-### Package the Lambda dependencies and create the Lambda layer for Oracle Python ###
+### Create the Lambda layer for Oracle Python ###
 #####################################################################################
-
-data "archive_file" "lambda_layer_oracle_python_dependencies" {
-  type        = "zip"
-  source_dir  = "lambda/cwa_extract_lambda/lambda_dependencies" 
-  output_path = "lambda/cwa_extract_lambda/lambda_dependencies.zip"
-}
 
 resource "aws_lambda_layer_version" "lambda_layer_oracle_python" {
   layer_name          = "cwa-extract-oracle-python"
   description         = "Oracle DB layer for Python"
-  filename            = data.archive_file.lambda_layer_oracle_python_dependencies.output_path
+  filename            = "lambda/cwa_extract_lambda/lambda_dependencies.zip"
   compatible_runtimes = ["python3.10"]
 }
 
