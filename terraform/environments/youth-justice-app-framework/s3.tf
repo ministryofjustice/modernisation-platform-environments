@@ -9,7 +9,7 @@ module "s3-log" {
   project_name = local.project_name
   environment  = local.environment
   tags         = local.tags
-  bucket_name = [local.log_bucket]
+  bucket_name  = [local.log_bucket]
 
   add_log_policy = true
 
@@ -32,7 +32,8 @@ module "s3" {
     "aws-glue-assets", "cloudtrail-logs"
   ]
 
-  transfer_bucket_name = ["bands", "bedunlock", "cmm", "cms", "incident", "mis", "reporting", "yjsm-artefact", "yjsm", "transfer"]
+  transfer_bucket_name = ["bands", "bedunlock", "cmm", "cms", "incident", "mis", "reporting", "yjsm-artefact", "yjsm", "transfer",
+                          "historical-infrastructure", "historical-apps"]
 
   allow_replication = local.application_data.accounts[local.environment].allow_s3_replication
   s3_source_account = local.application_data.accounts[local.environment].source_account

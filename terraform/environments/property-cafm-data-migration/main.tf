@@ -1,11 +1,11 @@
 module "rds_export" {
-  source = "github.com/ministryofjustice/terraform-rds-export?ref=230537b0367f7a55d27ee91c219f13a263ba615e"
+  source = "github.com/ministryofjustice/terraform-rds-export?ref=19c39985ff4988195ac550ebdcefb3dc3b872908"
 
-  # Replace the kms_key_arn, name, vpc_id and (database_subnet_ids in a list)
   kms_key_arn         = aws_kms_key.sns_kms.arn
   name                = "cafm"
   vpc_id              = module.vpc.vpc_id
   database_subnet_ids = module.vpc.private_subnets
+  master_user_secret_id = aws_secretsmanager_secret.db_master_user_secret.arn
 
   tags = {
     business-unit = "Property"
@@ -15,6 +15,11 @@ module "rds_export" {
   }
 }
 
+resource "aws_secretsmanager_secret" "db_master_user_secret" {
+  # checkov:skip=CKV2_AWS_57: Skipping because automatic rotation not needed.
+  name       = "cafm-database-master-user-secret"
+  kms_key_id = aws_kms_key.sns_kms.arn
+}
 
 module "endpoints" {
   # Commit has for v5.21.0
