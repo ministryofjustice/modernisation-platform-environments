@@ -44,12 +44,12 @@ locals {
   domain_type_sub    = [for k, v in local.domain_types : v.type if k != "modernisation-platform.service.justice.gov.uk"]
 
   #--Cash office. Transfer family CSR mapping. Production only
-/*   transfer_family_dvo_map = local.is-production && length(aws_acm_certificate.transfer_family) > 0 ? {
+  transfer_family_dvo_map = local.is-production && length(aws_acm_certificate.transfer_family) > 0 ? {
     for dvo in aws_acm_certificate.transfer_family[0].domain_validation_options :
     dvo.domain_name => {
       name   = dvo.resource_record_name
       record = dvo.resource_record_value
       type   = dvo.resource_record_type
     }
-  } : {} */
+  } : {}
 }
