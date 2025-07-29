@@ -11,10 +11,10 @@ out in:
 
 Until those bugs are addressed, the below resources are created manually:
 - An S3 Transfer Family Web App, using the role ccms-ebs-cashoffice-transfer (created by this module)
-- An S3 grant to s3://laa-ccms-inbound-production-mp/* for the entra/identity centre group
-  azure-aws-sso-laa-ccms-ebs-s3-cashoffice (which has the group ID c64272c4-30a1-7039-8ffd-af791143da2e)
-- A DNS CNAME for ccms-ebs-upload.laa-production.modernisation-platform.service.justice.gov.uk which maps to
-  the S3 Transfer Family Web App
+  and using the custom domain ccms-file-uploads.laa-production.modernisation-platform.service.justice.gov.uk
+- An S3 Access Grant to s3://laa-ccms-inbound-production-mp/* for the AWS Identity Centre Group
+  azure-aws-sso-laa-ccms-ebs-s3-cashoffice (which has the group ID c64272c4-30a1-7039-8ffd-af791143da2e).
+  This group is bound to the Entra group of the same name.
 */
 
 module "transfer_family" {
@@ -26,9 +26,11 @@ module "transfer_family" {
   aws_identity_centre_store_arn = local.application_data.accounts[local.environment].cash_office_idp_arn
 }
 
-
-/* #--The resources below here are not a good candidate for inclusion in a module as they require creation
-#--AFTER the manual creation of a webapp/S3 grant and the input of the webapps URL
+/*
+The resources below here are not a good candidate for inclusion in a module as they require creation
+AFTER the manual creation of a webapp/S3 grant and the input of the webapps URL. Once the bugs
+above are addressed, they can be included in the above module.
+*/
 
 resource "aws_route53_record" "transfer_family" {
   count    = local.is-production ? 1 : 0
@@ -60,6 +62,7 @@ resource "aws_acm_certificate_validation" "transfer_family" {
   validation_record_fqdns = [for record in aws_route53_record.validation : record.fqdn]
 }
 
+#--See member_locals.tf for the validation logic underpinning this resource
 resource "aws_route53_record" "validation" {
   provider        = aws.core-vpc
   for_each        = local.transfer_family_dvo_map
@@ -113,8 +116,3 @@ resource "aws_cloudfront_distribution" "transfer_family" {
     ssl_support_method             = "sni-only"
   }
 }
-
-
-#--Once all resources are created. The Web App must have it's URL manually configured to point to
-#--the newly created DNS record of ccms-file-uploads.laa-production.modernisation-platform.service.justice.gov.uk
- */
