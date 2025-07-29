@@ -32,7 +32,8 @@ module "s3" {
     "aws-glue-assets", "cloudtrail-logs"
   ]
 
-  transfer_bucket_name = ["bands", "bedunlock", "cmm", "cms", "incident", "mis", "reporting", "yjsm-artefact", "yjsm", "transfer"]
+  transfer_bucket_name = ["bands", "bedunlock", "cmm", "cms", "incident", "mis", "reporting", "yjsm-artefact", "yjsm", "transfer",
+                          "historical-infrastructure", "historical-apps"]
 
   allow_replication = local.application_data.accounts[local.environment].allow_s3_replication
   s3_source_account = local.application_data.accounts[local.environment].source_account

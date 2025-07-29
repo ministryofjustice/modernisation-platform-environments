@@ -378,7 +378,6 @@ module "load_mdss" {
   oidc_arn           = aws_iam_openid_connect_provider.analytical_platform_compute.arn
   athena_dump_bucket = module.s3-athena-bucket.bucket
   cadt_bucket        = module.s3-create-a-derived-table-bucket.bucket
-  db_exists          = true
   new_airflow        = true
 }
 
