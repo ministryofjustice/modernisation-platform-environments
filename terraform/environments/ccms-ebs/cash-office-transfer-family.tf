@@ -18,7 +18,7 @@ Until those bugs are addressed, the below resources are created manually:
 */
 
 module "transfer_family" {
-  count           = (local.is-preproduction || local.is-production) ? 1 : 0
+  count                         = (local.is-preproduction || local.is-production) ? 1 : 0
   source                        = "./modules/transfer-family"
   aws_account_id                = data.aws_caller_identity.current.account_id
   app_name                      = local.application_name
@@ -26,13 +26,14 @@ module "transfer_family" {
   aws_identity_centre_store_arn = local.application_data.accounts[local.environment].cash_office_idp_arn
 }
 
-/* 
-#The resources below here are not a good candidate for inclusion in a module as they require creation
-#AFTER the manual creation of a webapp/S3 grant and the input of the webapps URL. Once the bugs
-#above are addressed, they can be included in the above module.
+/*
+The resources below here are not a good candidate for inclusion in a module as they require creation
+AFTER the manual creation of a webapp/S3 grant and the input of the webapps URL. Once the bugs
+above are addressed, they can be included in the above module.
+*/
 
 resource "aws_route53_record" "transfer_family" {
-  count           = (local.is-preproduction || local.is-production) ? 1 : 0
+  count    = (local.is-preproduction || local.is-production) ? 1 : 0
   provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.external.zone_id
   name     = local.application_data.accounts[local.environment].cash_office_upload_hostname
@@ -43,7 +44,7 @@ resource "aws_route53_record" "transfer_family" {
 
 #--Certs need to be created in us-east-1 as they are associated with Cloudfront
 resource "aws_acm_certificate" "transfer_family" {
-  count           = (local.is-preproduction || local.is-production) ? 1 : 0
+  count                     = (local.is-preproduction || local.is-production) ? 1 : 0
   provider                  = aws.us-east-1
   domain_name               = trim(data.aws_route53_zone.external.name, ".") #--Remove the trailing dot from the zone name
   subject_alternative_names = ["${local.application_data.accounts[local.environment].cash_office_upload_hostname}.${trim(data.aws_route53_zone.external.name, ".")}"]
@@ -54,7 +55,7 @@ resource "aws_acm_certificate" "transfer_family" {
 }
 
 resource "aws_acm_certificate_validation" "transfer_family" {
-  count           = (local.is-preproduction || local.is-production) ? 1 : 0
+  count                   = (local.is-preproduction || local.is-production) ? 1 : 0
   provider                = aws.us-east-1
   certificate_arn         = aws_acm_certificate.transfer_family[0].arn
   validation_record_fqdns = [for record in aws_route53_record.validation : record.fqdn]
@@ -73,7 +74,7 @@ resource "aws_route53_record" "validation" {
 }
 
 resource "aws_wafv2_ip_set" "transfer_family" {
-  count           = (local.is-preproduction || local.is-production) ? 1 : 0
+  count              = (local.is-preproduction || local.is-production) ? 1 : 0
   name               = "laa-allow-list"
   description        = "Allowed Internal Ranges for LAA"
   scope              = "CLOUDFRONT"
@@ -97,7 +98,7 @@ resource "aws_wafv2_ip_set" "transfer_family" {
 }
 
 resource "aws_wafv2_web_acl" "transfer_family" {
-  count           = (local.is-preproduction || local.is-production) ? 1 : 0
+  count       = (local.is-preproduction || local.is-production) ? 1 : 0
   name        = "cf-ip-restriction-acl"
   description = "LAA Cash Office Allowed "
   scope       = "CLOUDFRONT"
@@ -171,4 +172,3 @@ resource "aws_cloudfront_distribution" "transfer_family" {
   }
   web_acl_id = aws_wafv2_web_acl.transfer_family[0].arn
 }
- */
