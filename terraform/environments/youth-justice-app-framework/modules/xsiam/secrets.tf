@@ -29,3 +29,11 @@ resource "aws_secretsmanager_secret_version" "xsiam_api" {
   secret_id       = aws_secretsmanager_secret.xsiam_api.id
   secret_string   = "changeme"
 }
+
+data "aws_secretsmanager_secret" "xsiam_endpoint" {
+  name = "xsiam-endpoint" 
+}
+
+data "aws_secretsmanager_secret_version" "xsiam_endpoint" {
+  secret_id = data.aws_secretsmanager_secret.xsiam_endpoint.id
+}
