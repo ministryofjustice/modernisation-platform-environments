@@ -3,7 +3,7 @@
 resource "aws_s3_bucket" "firehose_backup_xsiam" {
   # checkov:skip=CKV2_AWS_62
   # checkov:skip=CKV_AWS_144
-  bucket = "yjaf-${var.environment}-firehose-datadog-backup"
+  bucket = "yjaf-${var.environment}-firehose-xsiam-backup"
 }
 
 resource "aws_s3_bucket_public_access_block" "firehose_backup_xsiam_block" {
@@ -46,7 +46,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "firehose_backup_xsiam_lifecycl
 resource "aws_s3_bucket_logging" "firehose_backup_xsiam_logging" {
   bucket = aws_s3_bucket.firehose_backup_xsiam.id
 
-  target_bucket = "yjaf-${var.environment}-firehose-datadog-backup"
+  target_bucket = "yjaf-${var.environment}-firehose-xsiam-backup"
   target_prefix = "firehose-backup-logs/"
 }
 

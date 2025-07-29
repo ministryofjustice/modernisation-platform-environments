@@ -4,7 +4,7 @@ resource "aws_kinesis_firehose_delivery_stream" "xsiam" {
   destination = "http_endpoint"
 
   http_endpoint_configuration {
-    url                = "https://aws-kinesis-http-intake.logs.datadoghq.eu/v1/input"
+    url                = jsondecode(data.aws_secretsmanager_secret_version.xsiam_endpoint.secret_string)
     name               = "XSIAM"
     buffering_interval = 60
     buffering_size     = 4
