@@ -2,6 +2,7 @@
 module "coat_github_repos_s3_kms" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+  count = local.is-production ? 1 : 0
 
   source  = "terraform-aws-modules/kms/aws"
   version = "3.1.1"

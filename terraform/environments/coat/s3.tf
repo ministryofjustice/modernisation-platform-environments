@@ -293,6 +293,7 @@ resource "aws_s3_object" "pod_waste_reports" {
 # COAT GitHub repositories Terraform state bucket
 module "coat_github_repos_tfstate_bucket" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  count = local.is-production ? 1 : 0
 
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "4.3.0"
@@ -306,7 +307,7 @@ module "coat_github_repos_tfstate_bucket" {
   server_side_encryption_configuration = {
     rule = {
       apply_server_side_encryption_by_default = {
-        kms_master_key_id = module.coat_github_repos_s3_kms.key_arn
+        kms_master_key_id = module.coat_github_repos_s3_kms[0].key_arn
         sse_algorithm     = "aws:kms"
       }
     }
