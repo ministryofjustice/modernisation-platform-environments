@@ -1085,9 +1085,8 @@ resource "aws_iam_policy" "rds_cross_policy" {
 }
 
 
-## Athena API Policy Document
-# Policy Document
 data "aws_iam_policy_document" "rds" {
+  #checkov:skip=CKV_AWS_107: false positive, nothing is output to logs, has been made sensitive
   statement {
     actions = [
       "rds-db:Connect",
