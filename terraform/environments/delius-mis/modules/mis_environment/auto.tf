@@ -62,7 +62,7 @@ module "auto_instance" {
         ad_domain_name          = var.environment_config.ad_domain_name
         ad_ip_list              = aws_directory_service_directory.mis_ad.dns_ip_addresses
         # branch                  = "main" TODO: REVER THIS LATER
-        branch = "TM/TM-1448/UAC-escalation-test"
+        branch = "TM/TM-1448/UAC-escallation-test"
       }
     )
   )
