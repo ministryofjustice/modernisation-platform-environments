@@ -3,9 +3,9 @@
 #####################################################################################
 
 resource "aws_secretsmanager_secret" "cwa_procedures_config" {
-  name = "${local.application_name_short}-${local.environment}-procedures-config"
+  name = "cwa-extract-lambda-procedures-config-${local.environment}"
 }
 
 resource "aws_secretsmanager_secret" "cwa_db_secret" {
-  name = "${local.application_name_short}-${local.environment}-db-secret"
+  name = "cwa-extract-lambda-db-secret-${local.environment}"
 }

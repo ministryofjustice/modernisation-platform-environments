@@ -68,3 +68,8 @@ resource "aws_iam_role_policy_attachment" "cwa_extract_lambda_role_policy_attach
   role       = aws_iam_role.cwa_extract_lambda_role.name
   policy_arn = aws_iam_policy.cwa_extract_lambda_policy.arn
 }
+
+resource "aws_iam_role_policy_attachment" "cwa_extract_lambda_vpc_access" {
+  role       = aws_iam_role.cwa_extract_lambda_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+}

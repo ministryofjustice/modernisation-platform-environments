@@ -45,11 +45,11 @@ resource "aws_s3_bucket_versioning" "lambda_layer_dependencies" {
 #####################################################################################
 
 resource "aws_s3_bucket" "data" {
-  bucket = "${local.application_name_short}-${local.environment}"
+  bucket = "${local.application_name_short}-${local.environment}-cwa-extract-data"
 
   tags = merge(
     local.tags,
-    { Name = "${local.application_name_short}-${local.environment}" }
+    { Name = "${local.application_name_short}-${local.environment}-cwa-extract-data"}
   )
 }
 
