@@ -104,6 +104,12 @@ resource "aws_kms_key_policy" "firehose_backup_xsiam_policy" {
           "kms:GenerateDataKey"
         ],
         Resource = "*"
+        "Condition": {
+          "StringEquals": {
+            "kms:EncryptionContext:aws:logs:arn": "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current_xsiam.account_id}:log-group:yjaf-${var.environment}-firehose-xsiam-error-logs"
+    }
+  }
+
       },
       {
         Sid    = "AllowAccountRootUserFullAccess",
