@@ -1,19 +1,19 @@
-module "rds_export" {
-  source = "github.com/ministryofjustice/terraform-rds-export?ref=19c39985ff4988195ac550ebdcefb3dc3b872908"
+# module "rds_export" {
+#   source = "github.com/ministryofjustice/terraform-rds-export?ref=19c39985ff4988195ac550ebdcefb3dc3b872908"
 
-  kms_key_arn         = aws_kms_key.sns_kms.arn
-  name                = "cafm"
-  vpc_id              = module.vpc.vpc_id
-  database_subnet_ids = module.vpc.private_subnets
-  master_user_secret_id = aws_secretsmanager_secret.db_master_user_secret.arn
+#   kms_key_arn         = aws_kms_key.sns_kms.arn
+#   name                = "cafm"
+#   vpc_id              = module.vpc.vpc_id
+#   database_subnet_ids = module.vpc.private_subnets
+#   master_user_secret_id = aws_secretsmanager_secret.db_master_user_secret.arn
 
-  tags = {
-    business-unit = "Property"
-    application   = local.application_name
-    is-production = "false"
-    owner         = "shanmugapriya.basker@justice.gov.uk"
-  }
-}
+#   tags = {
+#     business-unit = "Property"
+#     application   = local.application_name
+#     is-production = "false"
+#     owner         = "shanmugapriya.basker@justice.gov.uk"
+#   }
+# }
 
 resource "aws_secretsmanager_secret" "db_master_user_secret" {
   # checkov:skip=CKV2_AWS_57: Skipping because automatic rotation not needed.
