@@ -73,7 +73,7 @@ module "serverlessrepo-lambda-canary" {
 }
 
 #ESB to Int load balancer
-resource "aws_security_group_rule" "allow_alb_from_esb" {
+resource "aws_security_group_rule" "allow_alb_from_canary" {
   type                     = "ingress"
   from_port                = 8080
   to_port                  = 8080
