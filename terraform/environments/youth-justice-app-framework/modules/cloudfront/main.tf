@@ -184,11 +184,10 @@ resource "aws_cloudfront_response_headers_policy" "strict_transport_security" {
       override                   = true     # Matches "Origin override"
       preload                    = false    # Matches unchecked preload
       include_subdomains         = false    # Matches unchecked includeSubDomains
-
-      content_security_policy {
-      content_security_policy = "default-src 'none'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://public.tableau.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://www.gov.uk; object-src 'none';"
-      override                 = true
     }
+    content_security_policy {
+      override = true
+      content_security_policy = "default-src 'none'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://public.tableau.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://www.gov.uk; object-src 'none';"
 
     }
   }
