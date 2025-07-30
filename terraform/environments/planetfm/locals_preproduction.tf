@@ -71,6 +71,7 @@ locals {
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          # "xvdd"      = { type = "gp3", size = 6, snapshot_id = "snap-040a13a16f7ffb223" } # Windows 2019 English Installation Media (created outside of code)
         }
         instance = merge(local.ec2_instances.app.instance, {
           disable_api_termination = false

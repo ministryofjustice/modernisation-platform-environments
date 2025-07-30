@@ -667,7 +667,8 @@ data "aws_iam_policy_document" "athena_api" {
     ]
     resources = [
       "arn:aws:lambda:${local.account_region}:${local.account_id}:function:dpr-athena-federated-query-oracle-function",
-      "arn:aws:lambda:${local.account_region}:${local.account_id}:function:dpr-athena-federated-query-postgresql-function"
+      "arn:aws:lambda:${local.account_region}:${local.account_id}:function:dpr-athena-federated-query-postgresql-function",
+      "arn:aws:lambda:${local.account_region}:${local.account_id}:function:dpr-athena-federated-query-redshift-function"
     ]
   }
 
