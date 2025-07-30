@@ -45,7 +45,7 @@ data "aws_iam_policy_document" "missing_report_submissions" {
 }
 
 resource "aws_kms_alias" "missing_report_submissions" {
-  name          = "alias/${local.project}-rds-kms"
+  name          = "alias/${local.project}-missing-report-submissions-kms"
   target_key_id = aws_kms_key.missing_report_submissions.arn
 }
 
