@@ -76,7 +76,7 @@
       "test_mode": true,
       "tableau_website_name": "tableau",
       "database_instance_class": "db.r5.xlarge",
-      "rds_engine_version": "16.6",
+      "rds_engine_version": "17.5",
       "enable_datadog_agent_apm": false,
       "create_rds_sheduler": true,
       "disable_overnight_ecs_scheduler": false,
