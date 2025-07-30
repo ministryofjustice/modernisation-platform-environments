@@ -28,6 +28,9 @@ resource "aws_secretsmanager_secret" "xsiam_api" {
 resource "aws_secretsmanager_secret_version" "xsiam_api" {
   secret_id       = aws_secretsmanager_secret.xsiam_api.id
   secret_string   = "changeme"
+  lifecycle {
+    ignore_changes = [secret_string]
+  }
 }
 
 data "aws_secretsmanager_secret" "xsiam_endpoint" {
