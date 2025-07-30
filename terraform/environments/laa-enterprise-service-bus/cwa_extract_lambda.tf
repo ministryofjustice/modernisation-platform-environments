@@ -49,7 +49,11 @@ resource "aws_lambda_function" "cwa_extract" {
   timeout          = 10
   memory_size      = 128
   runtime          = "python3.10"
-  layers           = [aws_lambda_layer_version.lambda_layer_oracle_python.arn]
+
+  layers = [
+    aws_lambda_layer_version.lambda_layer_oracle_python.arn,
+    "arn:aws:lambda:eu-west-2:017000801446:layer:AWSLambdaPowertoolsPython:2"
+  ]
 
   vpc_config {
     security_group_ids = [aws_security_group.cwa_extract.id]
