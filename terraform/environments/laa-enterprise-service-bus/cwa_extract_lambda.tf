@@ -27,6 +27,13 @@ resource "aws_security_group" "cwa_extract" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+  egress {
+    description = "Outbound 1521 Access to CWA DB"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = [data.aws_vpc.shared.cidr_block]
+  }
 
   tags = merge(
     local.tags,
