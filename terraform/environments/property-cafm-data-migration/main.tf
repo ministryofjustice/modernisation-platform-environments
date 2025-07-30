@@ -1,5 +1,5 @@
 module "rds_export" {
-  source = "github.com/ministryofjustice/terraform-rds-export?ref=d4b2d651c1ffae9c45e63ea13225ec691847970d"
+  source = "github.com/ministryofjustice/terraform-rds-export?ref=sql-backup-restore-rds-updates"
 
   kms_key_arn         = aws_kms_key.sns_kms.arn
   name                = "cafm"
