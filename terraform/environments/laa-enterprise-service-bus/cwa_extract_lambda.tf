@@ -32,7 +32,7 @@ resource "aws_security_group" "cwa_extract" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = [data.aws_vpc.shared.cidr_block]
+    cidr_blocks = ["10.26.60.208/32"]
   }
 
   tags = merge(
