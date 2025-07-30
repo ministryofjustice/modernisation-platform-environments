@@ -319,3 +319,25 @@ resource "helm_release" "keda" {
     )
   ]
 }
+
+/* Velero */
+resource "helm_release" "velero" {
+  name       = "velero"
+  repository = "https://vmware-tanzu.github.io/helm-charts"
+  chart      = "velero"
+  version    = "5.2.0" # should this be the latest version?
+  namespace  = kubernetes_namespace.velero_system.metadata[0].name
+  values = [
+    templatefile(
+      "${path.module}/src/helm/velero/values.yml.tftpl",
+      {
+        eks_role_arn              = module.velero_role.iam_role_arn
+        velero_aws_plugin_version = "v1.8.2" # what should this be?
+        velero_bucket             = module.velero_s3_bucket.bucket.id
+        velero_prefix             = module.eks.cluster_name
+        aws_region                = data.aws_region.current.name
+      }
+    )
+  ]
+  depends_on = [helm_release.gatekeeper] # is this needed?
+}
