@@ -53,10 +53,10 @@ module "ldap_ecs" {
 
   container_health_check = {
     command     = ["CMD-SHELL", "ldapsearch -x -H ldap://localhost:389 -b '' -s base '(objectclass=*)' namingContexts"]
-    interval    = 30
-    retries     = 3
-    startPeriod = 60
-    timeout     = 5
+    interval    = 60
+    retries     = 10
+    startPeriod = 180
+    timeout     = 10
   }
   account_info = var.account_info
 
