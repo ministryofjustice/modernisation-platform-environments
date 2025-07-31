@@ -45,7 +45,7 @@ data "aws_iam_policy_document" "missing_report_submissions" {
 }
 
 resource "aws_kms_alias" "missing_report_submissions" {
-  name          = "alias/${local.project}-rds-kms"
+  name          = "alias/${local.project}-missing-report-submissions-kms"
   target_key_id = aws_kms_key.missing_report_submissions.arn
 }
 
@@ -119,7 +119,7 @@ module "aurora_missing_report_submissions" {
   instances = {
     1 = {
       identifier     = "${local.application_data.accounts[local.environment].missing_report_submissions_rds.name}-${local.environment}"
-      instance_class = "db.t2.small"
+      instance_class = local.application_data.accounts[local.environment].missing_report_submissions_rds.inst_class
     }
   }
 

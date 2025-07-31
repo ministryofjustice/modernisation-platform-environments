@@ -73,4 +73,5 @@ locals {
   db_port      = 1521
   db_tcps_port = 1522
 
+  ap_dev_cidr = "172.24.0.0/16"
 }

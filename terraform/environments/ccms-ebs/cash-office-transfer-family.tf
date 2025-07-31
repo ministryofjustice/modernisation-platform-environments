@@ -95,7 +95,12 @@ resource "aws_wafv2_ip_set" "transfer_family" {
     "35.176.93.186/32",
     "18.130.148.126/32",
     "35.176.148.126/32",
-    "10.200.0.0/19" #--Workspaces
+    "35.176.127.232/32", # London Non-Prod NAT Gateway
+    "35.177.145.193/32", # London Non-Prod NAT Gateway
+    "18.130.39.94/32",   # London Non-Prod NAT Gateway
+    "52.56.212.11/32",   # London Prod NAT Gateway
+    "35.176.254.38/32",  # London Prod NAT Gateway
+    "35.177.173.197/32"  # London Prod NAT Gateway
   ]
 }
 

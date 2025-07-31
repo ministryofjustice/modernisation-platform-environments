@@ -667,7 +667,8 @@ data "aws_iam_policy_document" "athena_api" {
     ]
     resources = [
       "arn:aws:lambda:${local.account_region}:${local.account_id}:function:dpr-athena-federated-query-oracle-function",
-      "arn:aws:lambda:${local.account_region}:${local.account_id}:function:dpr-athena-federated-query-postgresql-function"
+      "arn:aws:lambda:${local.account_region}:${local.account_id}:function:dpr-athena-federated-query-postgresql-function",
+      "arn:aws:lambda:${local.account_region}:${local.account_id}:function:dpr-athena-federated-query-redshift-function"
     ]
   }
 
@@ -888,7 +889,8 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
     actions = [
       "glue:GetTable",
       "glue:GetDatabase",
-      "glue:GetPartition"
+      "glue:GetPartition",
+      "glue:GetTags"
     ]
     resources = flatten([
       for resource in each.value.resource_shares : [
