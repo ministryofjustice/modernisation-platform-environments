@@ -42,9 +42,7 @@ locals {
           availability_zone = "eu-west-2a"
         })
         ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 128 }                                       # root volume
-          "xvde"      = { type = "gp3", size = 6, snapshot_id = "snap-04435aa8246764616" } # Windows 2022 English Installation Media
-          "xvdf"      = { type = "gp3", size = 6, snapshot_id = "snap-040a13a16f7ffb223" } # Windows 2019 English Installation Media
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
         }
         instance = merge(local.ec2_instances.app.instance, {
           disable_api_termination = true
@@ -56,35 +54,6 @@ locals {
           instance-scheduling = "skip-scheduling"
           pre-migration       = "PPFAW011"
         })
-      })
-
-      # upgrade test instance - do not use
-      # rename and join the domain FIRST
-      # Mount drive
-      # Upgrade OS - Server DataCenter 2019
-      # Join domain as pp-cafm-a-19-a
-      # Remove drive
-      # Check E: drive also gone
-      # Reboot
-      pp-cafm-a-20-a = merge(local.ec2_instances.app, {
-        config = merge(local.ec2_instances.app.config, {
-          ami_name          = "pp-cafm-a-11-a-unjoined"
-          availability_zone = "eu-west-2a"
-        })
-        ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
-          # "xvdd"      = { type = "gp3", size = 6, snapshot_id = "snap-040a13a16f7ffb223" } # Windows 2019 English Installation Media (created outside of code)
-        }
-        instance = merge(local.ec2_instances.app.instance, {
-          disable_api_termination = false
-          instance_type           = "t3.large"
-        })
-        tags = merge(local.ec2_instances.app.tags, {
-          ami                 = "pp-cafm-a-11-a-unjoined"
-          description         = "RDS session host and app server upgrade test"
-          instance-scheduling = "skip-scheduling"
-        })
-        cloudwatch_metric_alarms = null
       })
 
       # database servers
