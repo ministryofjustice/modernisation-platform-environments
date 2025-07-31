@@ -10,6 +10,14 @@ resource "aws_lambda_layer_version" "lambda_layer_oracle_python" {
   compatible_runtimes = ["python3.10"]
 }
 
+resource "aws_lambda_layer_version" "lambda_layer_python_powertools" {
+  layer_name          = "cwa-extract-python-powertools"
+  description         = "Python Powertools layer for Python 3.10"
+  s3_bucket           = aws_s3_bucket.lambda_layer_dependencies.bucket
+  s3_key              = "cwa_extract_lambda/powertools-lambda-python-develop_3.10.zip"
+  compatible_runtimes = ["python3.10"]
+}
+
 
 ######################################
 ### Lambda SG
@@ -59,7 +67,7 @@ resource "aws_lambda_function" "cwa_extract" {
 
   layers = [
     aws_lambda_layer_version.lambda_layer_oracle_python.arn,
-    "arn:aws:lambda:eu-west-2:017000801446:layer:AWSLambdaPowertoolsPython:2"
+    aws_lambda_layer_version.lambda_layer_python_powertools.arn
   ]
 
   vpc_config {
