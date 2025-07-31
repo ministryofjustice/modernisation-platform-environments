@@ -24,14 +24,14 @@ resource "aws_security_group" "cwa_extract" {
     description = "Outbound SSH Access to CWA DB"
     from_port   = 22
     to_port     = 22
-    protocol    = "-1"
+    protocol    = "tcp"
     cidr_blocks = ["10.26.60.208/32"]
   }
   egress {
     description = "Outbound 1521 Access to CWA DB"
     from_port   = 1521
     to_port     = 1521
-    protocol    = "-1"
+    protocol    = "tcp"
     cidr_blocks = ["10.26.60.208/32"]
   }
 
