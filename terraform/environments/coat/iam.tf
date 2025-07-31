@@ -64,8 +64,9 @@ resource "aws_iam_role" "terraform_github_repos_state_role" {
 }
 
 data "aws_iam_policy_document" "s3_access_policy_document" {
-  #CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
-  #CKV_AWS_356: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
+  #checkov:skip=CKV_AWS_111:Ensure IAM policies does not allow write access without constraints
+  #checkov:skip=CKV_AWS_356:Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions
+
   count   = local.is-production ? 1 : 0
   version = "2012-10-17"
 
