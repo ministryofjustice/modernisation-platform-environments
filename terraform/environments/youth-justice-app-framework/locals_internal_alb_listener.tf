@@ -308,7 +308,7 @@ locals {
           actions = [
             {
               type             = "forward"
-              target_group_key = "yp-target-group-1"
+              target_group_key = "yp-target-group-2"
             }
           ]
           conditions = [{ #header condition for dal
