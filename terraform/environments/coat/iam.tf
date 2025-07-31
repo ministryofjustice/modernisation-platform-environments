@@ -58,19 +58,21 @@ resource "aws_iam_role_policy_attachment" "coat_cross_account_attachment" {
 
 
 resource "aws_iam_role" "terraform_github_repos_state_role" {
+  count              = local.is-production ? 1 : 0
   name               = "terraform_github_repos_state_role"
   assume_role_policy = data.aws_iam_policy_document.github_actions_assume_role_policy_document.json
 }
 
 data "aws_iam_policy_document" "s3_access_policy_document" {
+  count   = local.is-production ? 1 : 0
   version = "2012-10-17"
 
   statement {
     effect  = "Allow"
     actions = ["s3:*"]
     resources = [
-      module.coat_github_repos_tfstate_bucket.s3_bucket_arn,
-      "${module.coat_github_repos_tfstate_bucket.s3_bucket_arn}/*"
+      module.coat_github_repos_tfstate_bucket[0].s3_bucket_arn,
+      "${module.coat_github_repos_tfstate_bucket[0].s3_bucket_arn}/*"
     ]
   }
 
@@ -82,11 +84,13 @@ data "aws_iam_policy_document" "s3_access_policy_document" {
 }
 
 resource "aws_iam_policy" "s3_access_policy" {
+  count  = local.is-production ? 1 : 0
   name   = "github_role_prod_s3_access_policy"
-  policy = data.aws_iam_policy_document.s3_access_policy_document.json
+  policy = data.aws_iam_policy_document.s3_access_policy_document[0].json
 }
 
 resource "aws_iam_role_policy_attachment" "github_role_perms_attachment" {
-  role       = aws_iam_role.github_repos_state_role.name
-  policy_arn = aws_iam_policy.s3_access_policy.arn
+  count      = local.is-production ? 1 : 0
+  role       = aws_iam_role.github_repos_state_role[0].name
+  policy_arn = aws_iam_policy.s3_access_policy[0].arn
 }
