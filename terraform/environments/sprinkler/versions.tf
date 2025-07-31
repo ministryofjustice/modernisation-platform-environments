@@ -16,6 +16,14 @@ terraform {
       source  = "hashicorp/template"
       version = "~> 2"
     }
+    awscc = {
+      source  = "hashicorp/awscc"
+      version = "1.49.0"
+    }
+    null = {
+      version = "~> 3.2"
+      source  = "hashicorp/null"
+    }
   }
   required_version = "~> 1.10"
 }
