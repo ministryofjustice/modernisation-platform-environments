@@ -1,13 +1,15 @@
-# Create Patch Group
-# DEV, UAT and PROD
+##########################################################################################
+# SSM Patch Management Groups, Baselines, Maintenance Windows and Maintenance Window Tasks
+##########################################################################################
+
+# SSM Patch Groups - All Environments
 
 resource "aws_ssm_patch_group" "win_patch_group" {
   baseline_id = aws_ssm_patch_baseline.windows_os_apps_baseline.id
   patch_group = local.application_data.accounts[local.environment].patch_group
 }
 
-# Create Windows Patch Baseline
-# DEV, UAT and PROD
+# SSM Windows Patch Baseline - All Environments
 
 resource "aws_ssm_patch_baseline" "windows_os_apps_baseline" {
   name             = "WindowsOSAndMicrosoftApps"
@@ -39,20 +41,15 @@ resource "aws_ssm_patch_baseline" "windows_os_apps_baseline" {
       values = ["APPLICATION"]
     }
 
-    # Filter on Microsoft product if necessary
-    patch_filter {
-      key    = "PRODUCT"
-      values = ["Office 2003", "Microsoft 365 Apps/Office 2019/Office LTSC"]
-    }
   }
 }
 
+# SSM Maintenance Windows - All Environments
+# Configuration for each environment is in the application_variables.json file
 
-# Create Maintenance Windows
-
-# Development : Third Tuesday of the month at 18:00
-# UAT: Third Tuesday of the month at 18:00
-# Production: Fourth Tuesday of the month at 20:00
+# Development : Third Tuesday of the month at 17:00 UTC / 18:00 BST
+# UAT:          Third Tuesday of the month at 17:00 UTC / 18:00 BST
+# Production:   Fourth Tuesday of the month at 19:00 UTC / 20:00 BST
 
 resource "aws_ssm_maintenance_window" "patch_maintenance_window" {
   name              = local.application_data.accounts[local.environment].patch_maintenance_window_name
@@ -74,9 +71,7 @@ resource "aws_ssm_maintenance_window_target" "patch_maintenance_window_target" {
   }
 }
 
-
-# Create Maintenance Window Task
-# DEV, UAT and PROD
+# SSM Maintenance Window Task Patch Baseline - All Environments
 
 resource "aws_ssm_maintenance_window_task" "patch_maintenance_window_task" {
   window_id        = aws_ssm_maintenance_window.patch_maintenance_window.id
@@ -108,11 +103,7 @@ resource "aws_ssm_maintenance_window_task" "patch_maintenance_window_task" {
   }
 }
 
-
-
-# Create Maintenance Window Tasks
-
-# Maintenance Window Pre Health Check Task for Dev, UAT and Prod
+# SSM Maintenance Window Task Pre Patch Health Check - All Environments
 
 resource "aws_ssm_maintenance_window_task" "pre_healthcheck_maintenance_window_task" {
   window_id        = aws_ssm_maintenance_window.patch_maintenance_window.id
@@ -139,9 +130,7 @@ resource "aws_ssm_maintenance_window_task" "pre_healthcheck_maintenance_window_t
   }
 }
 
-
-# Maintenance Window Post Health Check Task for Dev, UAT and Prod
-
+# SSM Maintenance Window Task Post Patch Health Check - All Environments
 
 resource "aws_ssm_maintenance_window_task" "post_healthcheck_maintenance_window_task" {
   window_id        = aws_ssm_maintenance_window.patch_maintenance_window.id
@@ -168,9 +157,7 @@ resource "aws_ssm_maintenance_window_task" "post_healthcheck_maintenance_window_
   }
 }
 
-
-
-# Create perform_healthcheck_S3 document
+# SSM Document for Healthcheck Report (to S3 Bucket) - All Environments
 
 resource "aws_ssm_document" "perform_healthcheck_s3" {
   name          = "perform_health_check"
@@ -191,4 +178,3 @@ resource "aws_ssm_document" "perform_healthcheck_s3" {
     }
   )
 }
-
