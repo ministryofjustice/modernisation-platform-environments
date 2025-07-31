@@ -1,5 +1,5 @@
 # define configuration common to all environments here
-# define environment specific configuration in locals_development.tf, locals_test.tf etc.
+# define environment specific configuration in, locals_test.tf etc.
 
 locals {
   baseline_presets_environments_specific = {
@@ -8,6 +8,7 @@ locals {
     preproduction = local.baseline_presets_preproduction
     production    = local.baseline_presets_production
   }
+
   baseline_presets_environment_specific = local.baseline_presets_environments_specific[local.environment]
 
   baseline_environments_specific = {
@@ -16,6 +17,8 @@ locals {
     preproduction = local.baseline_preproduction
     production    = local.baseline_production
   }
+
+
   baseline_environment_specific = local.baseline_environments_specific[local.environment]
 
   baseline_presets_all_environments = {
@@ -52,7 +55,6 @@ locals {
     options = {
       enable_resource_explorer = true
     }
-
     cloudwatch_log_groups = local.ssm_doc_cloudwatch_log_groups
     security_groups       = local.security_groups
   }

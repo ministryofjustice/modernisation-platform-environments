@@ -1,6 +1,6 @@
 # Majority of resources created by baseline module.
 # See common settings in locals.tf and environment specific settings in
-# locals_development.tf, locals_test.tf etc.
+# locals_test.tf etc.
 
 module "ip_addresses" {
   source = "../../modules/ip_addresses"
