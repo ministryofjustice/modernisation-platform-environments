@@ -11,5 +11,5 @@ resource "aws_secretsmanager_secret" "cwa_db_secret" {
 }
 
 resource "aws_secretsmanager_secret" "cwa_db_ssh_key" {
-  name = "cwa-extract-lambda-db-ssh-key-${local.environment}"
+  name = "cwa-extract-lambda-db-ssh-key-secret-${local.environment}"
 }
