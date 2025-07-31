@@ -59,7 +59,7 @@ resource "aws_lambda_function" "cwa_extract" {
 
   layers = [
     aws_lambda_layer_version.lambda_layer_oracle_python.arn,
-    "arn:aws:lambda:eu-west-2:017000801446:layer:AWSLambdaPowertoolsPython:2"
+    "arn:aws:lambda:eu-west-2:017000801446:layer:AWSLambdaPowertoolsPythonV2-30:45"
   ]
 
   vpc_config {
