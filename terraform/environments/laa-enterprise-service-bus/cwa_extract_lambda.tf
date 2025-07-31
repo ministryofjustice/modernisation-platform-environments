@@ -21,11 +21,18 @@ resource "aws_security_group" "cwa_extract" {
   vpc_id      = data.aws_vpc.shared.id
 
   egress {
-    description = "outbound access"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    description = "Outbound SSH Access to CWA DB"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = [local.application_data.accounts[local.environment].cwa_database_ip]
+  }
+  egress {
+    description = "Outbound 1521 Access to CWA DB"
+    from_port   = 1521
+    to_port     = 1521
+    protocol    = "tcp"
+    cidr_blocks = [local.application_data.accounts[local.environment].cwa_database_ip]
   }
 
   tags = merge(
