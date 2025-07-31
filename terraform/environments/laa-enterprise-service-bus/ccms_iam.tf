@@ -24,7 +24,7 @@ resource "aws_iam_role" "ccms_cross_account_s3_read" {
   )
 }
 
-resource "aws_iam_policy" "cross_account_s3_read_policy" {
+resource "aws_iam_policy" "ccms_cross_account_s3_read_policy" {
   name = "${local.application_name_short}-${local.environment}-ccms-cross-account-s3-read-policy"
 
   policy = jsonencode({
