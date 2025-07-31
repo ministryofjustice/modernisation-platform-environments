@@ -21,11 +21,18 @@ resource "aws_security_group" "cwa_extract" {
   vpc_id      = data.aws_vpc.shared.id
 
   egress {
-    description = "outbound access"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    description = "Outbound SSH Access to CWA DB"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = [local.application_data.accounts[local.environment].cwa_database_ip]
+  }
+  egress {
+    description = "Outbound 1521 Access to CWA DB"
+    from_port   = 1521
+    to_port     = 1521
+    protocol    = "tcp"
+    cidr_blocks = [local.application_data.accounts[local.environment].cwa_database_ip]
   }
 
   tags = merge(
@@ -49,7 +56,11 @@ resource "aws_lambda_function" "cwa_extract" {
   timeout          = 10
   memory_size      = 128
   runtime          = "python3.10"
-  layers           = [aws_lambda_layer_version.lambda_layer_oracle_python.arn]
+
+  layers = [
+    aws_lambda_layer_version.lambda_layer_oracle_python.arn,
+    "arn:aws:lambda:eu-west-2:017000801446:layer:AWSLambdaPowertoolsPython:2"
+  ]
 
   vpc_config {
     security_group_ids = [aws_security_group.cwa_extract.id]
