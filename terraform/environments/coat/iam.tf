@@ -91,6 +91,6 @@ resource "aws_iam_policy" "s3_access_policy" {
 
 resource "aws_iam_role_policy_attachment" "github_role_perms_attachment" {
   count      = local.is-production ? 1 : 0
-  role       = aws_iam_role.github_repos_state_role[0].name
+  role       = aws_iam_role.terraform_github_repos_state_role[0].name
   policy_arn = aws_iam_policy.s3_access_policy[0].arn
 }
