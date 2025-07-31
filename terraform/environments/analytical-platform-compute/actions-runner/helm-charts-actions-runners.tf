@@ -348,7 +348,7 @@ resource "helm_release" "actions_runner_moj_data_catalogue" {
   ]
 }
 
-resource "helm_release" "actions_runner_moj_data_catalogue" {
+resource "helm_release" "actions_runner_moj_data_catalogue_test" {
   count = terraform.workspace == "analytical-platform-compute-production" ? 1 : 0
 
   /* https://github.com/ministryofjustice/analytical-platform-actions-runner */
