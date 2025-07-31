@@ -279,7 +279,7 @@
         needs: [plan, fetch-secrets]
         if: inputs.action == 'plan_apply' && needs.plan.outputs.plan_exitcode == '2'
         runs-on: ubuntu-latest
-        environment: "${{ inputs.application }}-${{ inputs.environment }}"
+        environment: ${{ inputs.component != 'root' && format('{0}-{1}-{2}', inputs.application, inputs.environment, inputs.component) || format('{0}-{1}', inputs.application, inputs.environment) }}
         steps:
           - name: Checkout Repository
             uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b  # v4.1.4
