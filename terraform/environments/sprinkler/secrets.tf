@@ -1,1 +1,4 @@
-#### This file can be used to store secrets specific to the member account ####
+resource "aws_secretsmanager_secret" "component" {
+  name        = "component"
+  description = "component environment test"
+}
