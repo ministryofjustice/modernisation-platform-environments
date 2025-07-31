@@ -269,6 +269,16 @@ resource "aws_vpc_security_group_ingress_rule" "db_workspace_winscp" {
   to_port           = 22
 }
 
+resource "aws_security_group_ingress_rule" "allow_https_from_external_sg" {
+  source_security_group_id = data.aws_security_group.hub20_dev_cwa_lambda_sg.id
+  security_group_id        = aws_security_group.database.id
+  description              = "Allow SSH Access from HUB2.0 CWA Lambda"
+  from_port                = 22
+  protocol                 = "tcp"
+  to_port                  = 22
+  count                    = local.environment == "development" ? 1 : 0
+}
+
 resource "aws_vpc_security_group_ingress_rule" "db_workspaces_1" {
   security_group_id = aws_security_group.database.id
   description       = "DB access for Workspaces"
