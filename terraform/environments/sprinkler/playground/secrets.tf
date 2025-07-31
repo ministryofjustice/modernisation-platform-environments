@@ -1,4 +1,4 @@
 resource "aws_secretsmanager_secret" "component" {
-  name        = "component-base-environment"
+  name        = "component-playground"
   description = "component environment test"
 }
