@@ -238,3 +238,23 @@ module "vpc_cni_iam_role" {
 
   tags = local.tags
 }
+
+module "velero_role" {
+  #checkov:skip=CKV_TF_1:Module is from Terraform registry
+
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+  version = "~> 5.0"
+
+  role_name_prefix      = "velero"
+  attach_velero_policy  = true
+  velero_s3_bucket_arns = [module.velero_s3_bucket.bucket.arn]
+
+  oidc_providers = {
+    main = {
+      provider_arn               = module.eks.oidc_provider_arn
+      namespace_service_accounts = ["${kubernetes_namespace.velero_system.metadata[0].name}:velero-server"]
+    }
+  }
+
+  tags = local.tags
+}
