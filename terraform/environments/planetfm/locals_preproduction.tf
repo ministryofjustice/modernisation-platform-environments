@@ -42,7 +42,7 @@ locals {
           availability_zone = "eu-west-2a"
         })
         ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 128 }                                       # root volume
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
         }
         instance = merge(local.ec2_instances.app.instance, {
           disable_api_termination = true
