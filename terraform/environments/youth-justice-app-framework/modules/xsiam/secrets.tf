@@ -2,7 +2,7 @@
 
 resource "aws_secretsmanager_secret" "xsiam_endpoint" {
   #checkov:skip=CKV2_AWS_57:xsiam endpoint, no rotation needed
-  name          = "xsiam-endpoint"
+  name          = "xsiam-url-endpoint"
   description   = "http endpoint for xsiam"
   kms_key_id    = var.kms_key_arn
   tags          = local.tags
