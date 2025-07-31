@@ -58,6 +58,7 @@ resource "aws_iam_policy" "cwa_extract_lambda_policy" {
         Resource = [
           aws_secretsmanager_secret.cwa_procedures_config.arn,
           aws_secretsmanager_secret.cwa_db_secret.arn,
+          aws_secretsmanager_secret.cwa_db_ssh_key.arn
         ]
       }
     ]
