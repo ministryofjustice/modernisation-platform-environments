@@ -72,6 +72,26 @@ module "serverlessrepo-lambda-canary" {
   lambda         = local.serverlessrepo-lambda-canary
 }
 
+#ESB to Int load balancer
+resource "aws_security_group_rule" "allow_alb_from_canary" {
+  type                     = "ingress"
+  from_port                = 8080
+  to_port                  = 8080
+  protocol                 = "tcp"
+  security_group_id        = module.internal_alb.alb_security_group_id
+  source_security_group_id = module.serverlessrepo-lambda-canary-sg.security_group_id
+  description              = "Lambda to YJAF Internal ALB"
+}
+
+resource "aws_cloudwatch_log_subscription_filter" "healthcheck" {
+  count           = contains(["development", "test", "preproduction", "production"], local.environment_management.account_ids[terraform.workspace]) ? 1 : 0
+  name            = "firehose-subscription"
+  log_group_name  = "/aws/lambda/serverlessrepo-lambda-canary"
+  filter_pattern  = ""
+  destination_arn = module.datadog.aws_kinesis_firehose_delivery_stream_arn
+  role_arn        = module.datadog.datadog_firehose_iam_role_arn
+}
+
 #every 15 mins
 resource "aws_cloudwatch_event_rule" "serverlessrepo-lambda-canary" {
   name                = "serverlessrepo-lambda-canary"

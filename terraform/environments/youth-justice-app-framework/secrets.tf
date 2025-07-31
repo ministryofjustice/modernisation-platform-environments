@@ -75,14 +75,6 @@ resource "aws_secretsmanager_secret" "LDAP_DC_secret" {
   tags        = local.tags
 }
 
-resource "aws_secretsmanager_secret_version" "LDAP_DC_version" {
-  secret_id     = aws_secretsmanager_secret.LDAP_DC_secret.id
-  secret_string = "ldaps://IP-C61301AD.i2n.com:636,ldaps://IP-C6130282.i2n.com:636" #a dummy value
-  lifecycle {
-    ignore_changes = [secret_string]
-  }
-}
-
 resource "aws_secretsmanager_secret" "Auth_Email_Account" {
   #checkov:skip=CKV2_AWS_57:doesn't need rotation
   name        = "${local.project_name}_Auth_Email_Account"
