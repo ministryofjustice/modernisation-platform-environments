@@ -20,7 +20,7 @@ resource "aws_secretsmanager_secret_version" "xsiam_endpoint" {
 resource "aws_secretsmanager_secret" "xsiam_api" {
   # checkov:skip=CKV2_AWS_57: "Rotation no applicable to as the xsiam Key is maintainan outside AWS."
 
-  name          = "xsiam-api-key"
+  name          = "xsiam-api"
   description   = "API key for xsiam"
   kms_key_id    = var.kms_key_arn
 }
@@ -34,7 +34,7 @@ resource "aws_secretsmanager_secret_version" "xsiam_api" {
 }
 
 data "aws_secretsmanager_secret" "xsiam_endpoint" {
-  name        = "xsiam-endpoint" 
+  name        = "xsiam-url-endpoint" 
   depends_on  = [aws_secretsmanager_secret.xsiam_endpoint]
 }
 
