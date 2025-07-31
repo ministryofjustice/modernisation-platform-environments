@@ -347,3 +347,26 @@ resource "helm_release" "actions_runner_moj_data_catalogue" {
     )
   ]
 }
+
+resource "helm_release" "actions_runner_moj_data_catalogue" {
+  count = terraform.workspace == "analytical-platform-compute-production" ? 1 : 0
+
+  /* https://github.com/ministryofjustice/analytical-platform-actions-runner */
+  name       = "actions-runner-moj-data-catalogue1"
+  repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
+  version    = "2.326.0-1"
+  chart      = "actions-runner"
+  namespace  = kubernetes_namespace.actions_runners[0].metadata[0].name
+  values = [
+    templatefile(
+      "${path.module}/src/helm/values/actions-runners/data-catalogue/values.yml.tftpl",
+      {
+        github_app_application_id  = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_github_app_apc_self_hosted_runners_secret[0].secret_string)["app_id"]
+        github_app_installation_id = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_github_app_apc_self_hosted_runners_secret[0].secret_string)["installation_id"]
+        github_organisation        = "ministryofjustice"
+        github_repository          = "data-catalogue"
+        github_runner_labels       = "analytical-platform"
+      }
+    )
+  ]
+}

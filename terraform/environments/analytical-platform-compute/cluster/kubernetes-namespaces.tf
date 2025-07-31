@@ -81,3 +81,13 @@ resource "kubernetes_namespace" "mwaa" {
     }
   }
 }
+
+resource "kubernetes_namespace" "test" {
+  metadata {
+    name = "test"
+    labels = {
+      "pod-security.kubernetes.io/enforce"                          = "restricted"
+      "compute.analytical-platform.service.justice.gov.uk/workload" = "test"
+    }
+  }
+}
