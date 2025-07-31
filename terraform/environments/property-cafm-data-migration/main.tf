@@ -38,13 +38,19 @@ module "endpoints" {
     }
   }
   endpoints = {
-
     secrets_manager = {
       service             = "secretsmanager"
       service_type        = "Interface"
       subnet_ids          = module.vpc.private_subnets
       private_dns_enabled = true
-      tags                = { Name = "secretsmanager-eu-west-1-dev" }
+      tags                = { Name = "cafm-secretsmanager-endpoint" }
+     }
+    glue = {
+      service             = "glue"
+      service_type        = "Interface"
+      subnet_ids          = module.vpc.private_subnets
+      private_dns_enabled = true
+      tags                = { Name = "cafm-glue-endpoint" }
     }
   }
 
