@@ -14,7 +14,7 @@ resource "aws_lambda_layer_version" "lambda_layer_oracle_python" {
 ### Lambda SG
 ######################################
 
-resource "aws_security_group" "cwa_extract" {
+resource "aws_security_group" "cwa_extract_2" {
   name        = "${local.application_name_short}-${local.environment}-cwa-extract-lambda-security-group"
   description = "CWA Extract Lambda Security Group"
   vpc_id      = data.aws_vpc.shared.id
@@ -79,7 +79,7 @@ resource "aws_lambda_function" "cwa_extract" {
   ]
 
   vpc_config {
-    security_group_ids = [aws_security_group.cwa_extract.id]
+    security_group_ids = [aws_security_group.cwa_extract_2.id]
     subnet_ids         = [data.aws_subnet.data_subnets_a.id]
   }
   
