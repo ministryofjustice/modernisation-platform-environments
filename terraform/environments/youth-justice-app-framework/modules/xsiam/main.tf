@@ -22,7 +22,6 @@ resource "aws_kinesis_firehose_delivery_stream" "xsiam" {
     cloudwatch_logging_options {
       enabled         = true
       log_group_name  = aws_cloudwatch_log_group.firehose_log_group_xsiam.name
-      log_stream_name = "firehose-xsiam-http"
     }
 
     request_configuration {
