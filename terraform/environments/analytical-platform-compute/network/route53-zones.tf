@@ -11,6 +11,6 @@ module "route53_zones" {
       comment = local.environment_configuration.route53_zone
     }
   }
-
   tags = local.tags
 }
+
