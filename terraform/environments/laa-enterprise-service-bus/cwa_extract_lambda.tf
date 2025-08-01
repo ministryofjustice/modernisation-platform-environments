@@ -19,32 +19,40 @@ resource "aws_security_group" "cwa_extract" {
   description = "CWA Extract Lambda Security Group"
   vpc_id      = data.aws_vpc.shared.id
 
-  egress {
-    description = "Outbound SSH Access to CWA DB"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = [local.application_data.accounts[local.environment].cwa_database_ip]
-  }
-  egress {
-    description = "Outbound 1521 Access to CWA DB"
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
-    cidr_blocks = [local.application_data.accounts[local.environment].cwa_database_ip]
-  }
-  egress {
-    description = "Outbound 443 to LAA VPC Endpoint SG"
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    security_groups = [local.application_data.accounts[local.environment].vpc_endpoint_sg]
-  }
-
   tags = merge(
     local.tags,
     { Name = "${local.application_name_short}-${local.environment}-cwa-extract-lambda-security-group" }
   )
+}
+
+resource "aws_security_group_rule" "cwa_extract_egress_ssh" {
+  type              = "egress"
+  from_port         = 22
+  to_port           = 22
+  protocol          = "tcp"
+  cidr_blocks       = [local.application_data.accounts[local.environment].cwa_database_ip]
+  security_group_id = aws_security_group.cwa_extract.id
+  description       = "Outbound SSH Access to CWA DB"
+}
+
+resource "aws_security_group_rule" "cwa_extract_egress_oracle" {
+  type              = "egress"
+  from_port         = 1521
+  to_port           = 1521
+  protocol          = "tcp"
+  cidr_blocks       = [local.application_data.accounts[local.environment].cwa_database_ip]
+  security_group_id = aws_security_group.cwa_extract.id
+  description       = "Outbound 1521 Access to CWA DB"
+}
+
+resource "aws_security_group_rule" "cwa_extract_egress_https" {
+  type                     = "egress"
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  source_security_group_id = local.application_data.accounts[local.environment].vpc_endpoint_sg
+  security_group_id        = aws_security_group.cwa_extract.id
+  description              = "Outbound 443 to LAA VPC Endpoint SG"
 }
 
 ######################################
