@@ -3,6 +3,15 @@ resource "aws_kinesis_firehose_delivery_stream" "xsiam" {
   name        = "cloudwatch-to-xsiam"
   destination = "http_endpoint"
 
+  depends_on = [
+    aws_secretsmanager_secret.xsiam_api,
+    aws_secretsmanager_secret.xsiam_endpoint,
+    aws_iam_role.firehose_xsiam,
+    aws_cloudwatch_log_group.firehose_log_group_xsiam,
+    aws_s3_bucket.firehose_backup_xsiam,
+    aws_kms_key.firehose_backup_xsiam
+  ]
+
   http_endpoint_configuration {
     url                = data.aws_secretsmanager_secret_version.xsiam_endpoint.secret_string
     name               = "XSIAM"
