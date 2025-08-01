@@ -385,6 +385,8 @@ locals {
       ansible_repo_basedir = "ansible"
       ansible_args         = "oracle_19c_install"
     }
+
+    enable_cloudwatch_alarms = false
   }
 
   fsx_config_stage = {
