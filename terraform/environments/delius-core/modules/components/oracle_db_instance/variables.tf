@@ -183,3 +183,9 @@ variable "inline_ebs" {
   description = "Whether to create EBS volumes inline with the instance"
 }
 
+variable "enable_cloudwatch_alarms" {
+  description = "Enable or disable CloudWatch metric alarms for the instance"
+  type        = bool
+  default     = true
+}
+
