@@ -45,12 +45,26 @@
     {
       "Sid": "AthenaAccess",
       "Effect": "Allow",
-      "Action": ["s3:GetObject", "s3:PutObject"],
+      "Action": [
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:ListBucket",
+        "s3:GetBucketLocation",
+        "s3:ListBucketMultipartUploads",
+        "s3:ListMultipartUploadParts",
+        "s3:AbortMultipartUpload"
+      ],
       "Resource": [
-        "arn:aws:s3:::coat-${environment}-cur-v2-hourly/athena-results/*"
+        "arn:aws:s3:::coat-${environment}-cur-v2-hourly/athena-results/*",
+        "arn:aws:s3:::coat-${environment}-cur-v2-hourly/moj-cost-and-usage-reports/*",
+        "arn:aws:s3:::coat-${environment}-cur-v2-hourly-enriched",
+        "arn:aws:s3:::coat-${environment}-cur-v2-hourly-enriched/*"
       ],
       "Principal": {
-        "Service": ["athena.amazonaws.com"]
+        "Service": [
+          "athena.amazonaws.com",
+          "glue.amazonaws.com"
+        ]
       }
     }
   ]
