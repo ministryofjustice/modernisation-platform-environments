@@ -47,7 +47,7 @@ resource "aws_security_group" "cwa_extract" {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = [local.application_data.accounts[local.environment].vpc_endpoint_sg]
+    security_groups = [local.application_data.accounts[local.environment].vpc_endpoint_sg]
   }
 
   tags = merge(
