@@ -120,7 +120,7 @@ data "aws_iam_policy_document" "greenpixie_inline_policy_document" {
       "kms:DescribeKey",
       "kms:GenerateDataKey*"
     ]
-    resources = ["${kms_master_key_id}", "${kms_dev_key_id}"]
+    resources = [module.cur_s3_kms.key_arn, local.kms_dev_key_id]
   }
 }
 
