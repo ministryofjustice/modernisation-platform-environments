@@ -19,6 +19,8 @@ resource "aws_security_group" "cwa_extract" {
   description = "CWA Extract Lambda Security Group"
   vpc_id      = data.aws_vpc.shared.id
 
+  revoke_rules_on_delete = true
+
   tags = merge(
     local.tags,
     { Name = "${local.application_name_short}-${local.environment}-cwa-extract-lambda-security-group" }
