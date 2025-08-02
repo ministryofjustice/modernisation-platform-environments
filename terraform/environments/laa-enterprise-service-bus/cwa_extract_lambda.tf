@@ -14,7 +14,7 @@ resource "aws_lambda_layer_version" "lambda_layer_oracle_python" {
 ### Lambda SG
 ######################################
 
-resource "aws_security_group" "cwa_extract_2" {
+resource "aws_security_group" "cwa_extract" {
   name        = "${local.application_name_short}-${local.environment}-cwa-extract-lambda-security-group"
   description = "CWA Extract Lambda Security Group"
   vpc_id      = data.aws_vpc.shared.id
@@ -27,35 +27,35 @@ resource "aws_security_group" "cwa_extract_2" {
   )
 }
 
-# resource "aws_security_group_rule" "cwa_extract_egress_ssh" {
-#   type              = "egress"
-#   from_port         = 22
-#   to_port           = 22
-#   protocol          = "tcp"
-#   cidr_blocks       = [local.application_data.accounts[local.environment].cwa_database_ip]
-#   security_group_id = aws_security_group.cwa_extract.id
-#   description       = "Outbound SSH Access to CWA DB"
-# }
+resource "aws_security_group_rule" "cwa_extract_egress_ssh" {
+  type              = "egress"
+  from_port         = 22
+  to_port           = 22
+  protocol          = "tcp"
+  cidr_blocks       = [local.application_data.accounts[local.environment].cwa_database_ip]
+  security_group_id = aws_security_group.cwa_extract.id
+  description       = "Outbound SSH Access to CWA DB"
+}
 
-# resource "aws_security_group_rule" "cwa_extract_egress_oracle" {
-#   type              = "egress"
-#   from_port         = 1521
-#   to_port           = 1521
-#   protocol          = "tcp"
-#   cidr_blocks       = [local.application_data.accounts[local.environment].cwa_database_ip]
-#   security_group_id = aws_security_group.cwa_extract.id
-#   description       = "Outbound 1521 Access to CWA DB"
-# }
+resource "aws_security_group_rule" "cwa_extract_egress_oracle" {
+  type              = "egress"
+  from_port         = 1521
+  to_port           = 1521
+  protocol          = "tcp"
+  cidr_blocks       = [local.application_data.accounts[local.environment].cwa_database_ip]
+  security_group_id = aws_security_group.cwa_extract.id
+  description       = "Outbound 1521 Access to CWA DB"
+}
 
-# resource "aws_security_group_rule" "cwa_extract_egress_https" {
-#   type                     = "egress"
-#   from_port                = 443
-#   to_port                  = 443
-#   protocol                 = "tcp"
-#   source_security_group_id = local.application_data.accounts[local.environment].vpc_endpoint_sg
-#   security_group_id        = aws_security_group.cwa_extract.id
-#   description              = "Outbound 443 to LAA VPC Endpoint SG"
-# }
+resource "aws_security_group_rule" "cwa_extract_egress_https" {
+  type                     = "egress"
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  source_security_group_id = local.application_data.accounts[local.environment].vpc_endpoint_sg
+  security_group_id        = aws_security_group.cwa_extract.id
+  description              = "Outbound 443 to LAA VPC Endpoint SG"
+}
 
 ######################################
 ### Lambda Resources
@@ -79,7 +79,7 @@ resource "aws_lambda_function" "cwa_extract" {
   ]
 
   vpc_config {
-    security_group_ids = [aws_security_group.cwa_extract_2.id]
+    security_group_ids = [aws_security_group.cwa_extract.id]
     subnet_ids         = [data.aws_subnet.data_subnets_a.id]
   }
   
