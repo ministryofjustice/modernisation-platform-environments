@@ -71,6 +71,7 @@ module "cur_v2_hourly" {
 
   policy = local.is-development ? templatefile("${path.module}/templates/coat-cur-v2-hourly-dev-bucket-policy.json",
     {
+      bucket_name          = "coat-${local.environment}-cur-v2-hourly"
       environment          = local.environment
       root_account_id      = local.environment_management.aws_organizations_root_account_id
       cross_env_account_id = local.coat_prod_account_id
@@ -78,6 +79,7 @@ module "cur_v2_hourly" {
     }
     ) : templatefile("${path.module}/templates/coat-cur-v2-hourly-prod-bucket-policy.json",
     {
+      bucket_name     = "coat-${local.environment}-cur-v2-hourly"
       environment     = local.environment
       root_account_id = local.environment_management.aws_organizations_root_account_id
       account_id      = data.aws_caller_identity.current.account_id
@@ -330,6 +332,7 @@ module "cur_v2_hourly_enriched" {
 
   policy = local.is-development ? templatefile("${path.module}/templates/coat-cur-v2-hourly-dev-bucket-policy.json",
     {
+      bucket_name          = "coat-${local.environment}-cur-v2-hourly-enriched"
       environment          = local.environment
       root_account_id      = local.environment_management.aws_organizations_root_account_id
       cross_env_account_id = local.coat_prod_account_id
@@ -337,6 +340,7 @@ module "cur_v2_hourly_enriched" {
     }
     ) : templatefile("${path.module}/templates/coat-cur-v2-hourly-prod-bucket-policy.json",
     {
+      bucket_name     = "coat-${local.environment}-cur-v2-hourly-enriched"
       environment     = local.environment
       root_account_id = local.environment_management.aws_organizations_root_account_id
       account_id      = data.aws_caller_identity.current.account_id
