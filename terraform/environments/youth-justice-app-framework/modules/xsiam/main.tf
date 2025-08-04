@@ -217,14 +217,6 @@ resource "aws_iam_policy" "firehose_policy_xsiam" {
         Resource = aws_cloudwatch_log_group.firehose_log_group_xsiam.arn
       },
       {
-        Sid    = "cloudWatchLog",
-        Effect = "Allow",
-        Action = [
-          "logs:PutLogEvents"
-        ],
-        Resource = aws_cloudwatch_log_group.firehose_log_group_xsiam.arn
-      },
-      {
         Sid    = "CreateLogResources",
         Effect = "Allow",
         Action = [
