@@ -28,6 +28,7 @@ locals {
     handler           = "lambda_function.lambda_handler"
     iam_role_name     = "serverlessrepo-lambda-canary-lambda-role"
     environment_variables = {
+      url      = "http://private-lb.${local.environment}.yjaf:8080/actuator/health" # URL for the health endpoint
       expected = "UP"
       site_1   = "auth"        #auth
       site_11  = "placements"  #placements
