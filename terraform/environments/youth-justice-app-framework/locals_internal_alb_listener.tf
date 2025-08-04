@@ -323,7 +323,7 @@ locals {
           actions = [
             {
               type             = "forward"
-              target_group_key = "auth-target-group-1"
+              target_group_key = "auth-target-group-2"
             }
           ]
           conditions = [{ #header condition for dal
@@ -338,7 +338,7 @@ locals {
           actions = [
             {
               type             = "forward"
-              target_group_key = "bands-target-group-1"
+              target_group_key = "bands-target-group-2"
             }
           ]
           conditions = [{ #header condition for dal
@@ -353,7 +353,7 @@ locals {
           actions = [
             {
               type             = "forward"
-              target_group_key = "bu-target-group-1"
+              target_group_key = "bu-target-group-2"
             }
           ]
           conditions = [{ #header condition for dal
@@ -368,7 +368,7 @@ locals {
           actions = [
             {
               type             = "forward"
-              target_group_key = "case-target-group-1"
+              target_group_key = "case-target-group-2"
             }
           ]
           conditions = [{ #header condition for dal
@@ -383,7 +383,7 @@ locals {
           actions = [
             {
               type             = "forward"
-              target_group_key = "cmm-target-group-1"
+              target_group_key = "cmm-target-group-2"
             }
           ]
           conditions = [{ #header condition for dal
@@ -398,7 +398,7 @@ locals {
           actions = [
             {
               type             = "forward"
-              target_group_key = "conversions-target-group-1"
+              target_group_key = "conversions-target-group-2"
             }
           ]
           conditions = [{ #header condition for dal
@@ -413,7 +413,7 @@ locals {
           actions = [
             {
               type             = "forward"
-              target_group_key = "documents-target-group-1"
+              target_group_key = "documents-target-group-2"
             }
           ]
           conditions = [{ #header condition for dal
@@ -443,7 +443,7 @@ locals {
           actions = [
             {
               type             = "forward"
-              target_group_key = "placements-target-group-1"
+              target_group_key = "placements-target-group-2"
             }
           ]
           conditions = [{ #header condition for dal
@@ -458,7 +458,7 @@ locals {
           actions = [
             {
               type             = "forward"
-              target_group_key = "refdata-target-group-1"
+              target_group_key = "refdata-target-group-2"
             }
           ]
           conditions = [{ #header condition for dal
@@ -488,7 +488,7 @@ locals {
           actions = [
             {
               type             = "forward"
-              target_group_key = "serious-incidents-target-group-1"
+              target_group_key = "serious-incidents-target-group-2"
             }
           ]
           conditions = [{ #header condition for dal
@@ -503,7 +503,7 @@ locals {
           actions = [
             {
               type             = "forward"
-              target_group_key = "transfers-target-group-1"
+              target_group_key = "transfers-target-group-2"
             }
           ]
           conditions = [{ #header condition for dal
@@ -518,7 +518,7 @@ locals {
           actions = [
             {
               type             = "forward"
-              target_group_key = "views-target-group-1"
+              target_group_key = "views-target-group-2"
             }
           ]
           conditions = [{ #header condition for dal
@@ -533,7 +533,7 @@ locals {
           actions = [
             {
               type             = "forward"
-              target_group_key = "workflow-target-group-1"
+              target_group_key = "workflow-target-group-2"
             }
           ]
           conditions = [{ #header condition for dal
@@ -548,7 +548,7 @@ locals {
           actions = [
             {
               type             = "forward"
-              target_group_key = "sentences-target-group-1"
+              target_group_key = "sentences-target-group-2"
             }
           ]
           conditions = [{ #header condition for dal
@@ -563,7 +563,7 @@ locals {
           actions = [
             {
               type             = "forward"
-              target_group_key = "transitions-target-group-1"
+              target_group_key = "transitions-target-group-2"
             }
           ]
           conditions = [{ #header condition for dal
