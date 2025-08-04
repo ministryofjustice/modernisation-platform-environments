@@ -72,7 +72,7 @@ data "aws_iam_policy_document" "s3_access_policy_document" {
 
   statement {
     effect  = "Allow"
-    actions = ["s3:ListBucket", "s3:GetObject"]
+    actions = ["s3:*"]
     resources = [
       module.coat_github_repos_tfstate_bucket[0].s3_bucket_arn,
       "${module.coat_github_repos_tfstate_bucket[0].s3_bucket_arn}/*"
