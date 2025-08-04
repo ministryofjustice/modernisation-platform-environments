@@ -59,6 +59,7 @@
       "inbound_s3_bucket_name": "laa-ccms-inbound-development-mp",
       "outbound_s3_bucket_name": "laa-ccms-outbound-development-mp",
       "workspace_cidr_nonprod": "10.200.0.0/20",
+      "northgate_proxy": "10.120.0.147/32",
       "aws_workspace_cidr": "10.200.0.0/20",
       "cloud_platform_cidr": "172.20.0.0/16"
     },
@@ -121,6 +122,7 @@
       "inbound_s3_bucket_name": "laa-ccms-inbound-test-mp",
       "outbound_s3_bucket_name": "laa-ccms-outbound-test-mp",
       "aws_workspace_cidr": "10.200.0.0/20",
+      "northgate_proxy": "10.120.0.147/32",
       "cloud_platform_cidr": "172.20.0.0/16"
     },
     "preproduction": {
@@ -177,6 +179,7 @@
       "inbound_s3_bucket_name": "laa-ccms-inbound-preproduction-mp",
       "outbound_s3_bucket_name": "laa-ccms-outbound-preproduction-mp",
       "aws_workspace_cidr": "10.200.0.0/19",
+      "northgate_proxy": "10.120.0.147/32",
       "cloud_platform_cidr": "172.20.0.0/16"
     },
     "production": {
@@ -233,6 +236,7 @@
       "inbound_s3_bucket_name": "laa-ccms-inbound-production-mp",
       "outbound_s3_bucket_name": "laa-ccms-outbound-production-mp",
       "aws_workspace_cidr": "10.200.0.0/19",
+      "northgate_proxy": "10.110.0.57/32",
       "cloud_platform_cidr": "172.20.0.0/16"
     }
   }
