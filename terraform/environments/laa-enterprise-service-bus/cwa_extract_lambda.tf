@@ -91,7 +91,7 @@ resource "aws_lambda_function" "cwa_extract" {
   ]
 
   vpc_config {
-    security_group_ids = [aws_security_group.cwa_extract.id]
+    security_group_ids = [aws_security_group.cwa_extract_new.id]
     subnet_ids         = [data.aws_subnet.data_subnets_a.id]
   }
   
