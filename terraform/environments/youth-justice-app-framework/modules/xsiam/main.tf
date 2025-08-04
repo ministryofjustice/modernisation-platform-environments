@@ -3,6 +3,15 @@ resource "aws_kinesis_firehose_delivery_stream" "xsiam" {
   name        = "cloudwatch-to-xsiam"
   destination = "http_endpoint"
 
+  depends_on = [
+    aws_secretsmanager_secret.xsiam_api,
+    aws_secretsmanager_secret.xsiam_endpoint,
+    aws_iam_role.firehose_xsiam,
+    aws_cloudwatch_log_group.firehose_log_group_xsiam,
+    aws_s3_bucket.firehose_backup_xsiam,
+    aws_kms_key.firehose_backup_xsiam
+  ]
+
   http_endpoint_configuration {
     url                = data.aws_secretsmanager_secret_version.xsiam_endpoint.secret_string
     name               = "XSIAM"
@@ -208,14 +217,6 @@ resource "aws_iam_policy" "firehose_policy_xsiam" {
         Resource = aws_cloudwatch_log_group.firehose_log_group_xsiam.arn
       },
       {
-        Sid    = "cloudWatchLog",
-        Effect = "Allow",
-        Action = [
-          "logs:PutLogEvents"
-        ],
-        Resource = aws_cloudwatch_log_group.firehose_log_group_xsiam.arn
-      },
-      {
         Sid    = "CreateLogResources",
         Effect = "Allow",
         Action = [
@@ -329,9 +330,9 @@ resource "aws_iam_role_policy_attachment" "attach_kms_secret_access_xsiam" {
 
 ###### log groups to stream
 
-resource "aws_cloudwatch_log_subscription_filter" "userjourney" {
+resource "aws_cloudwatch_log_subscription_filter" "userjourney_to_xsiam" {
   count           = contains(["test", "preproduction", "production"], var.environment) ? 1 : 0
-  name            = "firehose-subscription"
+  name            = "xsiam-firehose-subscription"
   log_group_name  = "yjaf-${var.environment}/user-journey"
   filter_pattern  = ""
   destination_arn = aws_kinesis_firehose_delivery_stream.xsiam.arn
