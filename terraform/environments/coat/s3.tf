@@ -80,6 +80,7 @@ module "cur_v2_hourly" {
     {
       environment     = local.environment
       root_account_id = local.environment_management.aws_organizations_root_account_id
+      account_id      = data.aws_caller_identity.current.account_id
     }
   )
 
