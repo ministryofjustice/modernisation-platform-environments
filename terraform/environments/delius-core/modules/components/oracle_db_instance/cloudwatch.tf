@@ -4,6 +4,7 @@ locals {
 }
 
 resource "aws_cloudwatch_metric_alarm" "status_check_failed_alarm" {
+  count               = var.enable_cloudwatch_alarms ? 1 : 0
   alarm_name          = local.alarm_name
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = 1
@@ -21,11 +22,13 @@ resource "aws_cloudwatch_metric_alarm" "status_check_failed_alarm" {
 }
 
 resource "aws_cloudwatch_log_group" "ec2_status_check_log_group" {
+  count             = var.enable_cloudwatch_alarms ? 1 : 0
   name              = "/metrics/${var.env_name}/${local.alarm_name}"
   retention_in_days = 0 # Retain indefinitely
 }
 
 resource "aws_cloudwatch_event_rule" "ec2_status_check_failed_event" {
+  count       = var.enable_cloudwatch_alarms ? 1 : 0
   name        = local.alarm_name
   description = "Rule to capture EC2 instance status check failures"
   event_pattern = jsonencode({
@@ -41,7 +44,8 @@ resource "aws_cloudwatch_event_rule" "ec2_status_check_failed_event" {
 }
 
 resource "aws_cloudwatch_event_target" "ec2_status_check_failed_target" {
-  rule      = aws_cloudwatch_event_rule.ec2_status_check_failed_event.name
-  arn       = aws_cloudwatch_log_group.ec2_status_check_log_group.arn
+  count     = var.enable_cloudwatch_alarms ? 1 : 0
+  rule      = aws_cloudwatch_event_rule.ec2_status_check_failed_event[0].name
+  arn       = aws_cloudwatch_log_group.ec2_status_check_log_group[0].arn
   target_id = local.alarm_name
 }
