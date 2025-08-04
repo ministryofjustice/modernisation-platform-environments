@@ -2,11 +2,17 @@
 ### Create the Lambda layer for Oracle Python ###
 #####################################################################################
 
+data "aws_s3_object" "lambda_layer_zip" {
+  bucket = aws_s3_bucket.lambda_layer_dependencies.bucket
+  key    = "cwa_extract_lambda/lambda_dependencies.zip"
+}
+
 resource "aws_lambda_layer_version" "lambda_layer_oracle_python" {
   layer_name          = "cwa-extract-oracle-python"
   description         = "Oracle DB layer for Python"
   s3_bucket           = aws_s3_bucket.lambda_layer_dependencies.bucket
-  s3_key              = "cwa_extract_lambda/lambda_dependenciesV3.zip"
+  s3_key              = "cwa_extract_lambda/lambda_dependencies.zip"
+  s3_object_version   = data.aws_s3_bucket_object.lambda_layer_zip.version_id
   compatible_runtimes = ["python3.10"]
 }
 
