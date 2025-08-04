@@ -152,6 +152,10 @@
         {
           "name": "EBS_USER_PASSWORD",
           "valueFrom": "${ebs_user_password}"
+        },
+        {
+          "name": "EXTRA_JAVA_PROPERTIES",
+          "valueFrom": "${trust_store_password}"
         }
     ]
   }
