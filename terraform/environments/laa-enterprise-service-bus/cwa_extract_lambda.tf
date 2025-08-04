@@ -5,8 +5,9 @@
 resource "aws_lambda_layer_version" "lambda_layer_oracle_python" {
   layer_name          = "cwa-extract-oracle-python"
   description         = "Oracle DB layer for Python"
-  s3_bucket           = aws_s3_bucket.lambda_layer_dependencies.bucket
-  s3_key              = "cwa_extract_lambda/lambda_dependencies.zip"
+  s3_bucket           = aws_s3_object.lambda_layer_zip.bucket
+  s3_key              = aws_s3_object.lambda_layer_zip.key
+  s3_object_version   = aws_s3_object.lambda_layer_zip.version_id
   compatible_runtimes = ["python3.10"]
 }
 
