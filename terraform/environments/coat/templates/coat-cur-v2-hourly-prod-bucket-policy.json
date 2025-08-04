@@ -65,6 +65,11 @@
           "athena.amazonaws.com",
           "glue.amazonaws.com"
         ]
+      },
+      "Condition": {
+        "StringEquals": {
+          "aws:SourceAccount": "${account_id}"
+        }
       }
     }
   ]
