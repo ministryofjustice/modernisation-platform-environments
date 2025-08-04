@@ -108,6 +108,10 @@
         {
           "name": "ADMIN_PASSWORD",
           "valueFrom": "${soa_password}"
+        },
+        {
+          "name": "EXTRA_JAVA_PROPERTIES",
+          "valueFrom": "${trust_store_password}"
         }
     ]
   }
