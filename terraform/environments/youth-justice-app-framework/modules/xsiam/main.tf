@@ -340,7 +340,7 @@ resource "aws_iam_role_policy_attachment" "attach_kms_secret_access_xsiam" {
 
 resource "aws_cloudwatch_log_subscription_filter" "userjourney_to_xsiam" {
   count           = contains(["test", "preproduction", "production"], var.environment) ? 1 : 0
-  name            = "firehose-subscription"
+  name            = "xsiam-firehose-subscription"
   log_group_name  = "yjaf-${var.environment}/user-journey"
   filter_pattern  = ""
   destination_arn = aws_kinesis_firehose_delivery_stream.xsiam.arn
