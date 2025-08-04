@@ -87,8 +87,8 @@ data "aws_iam_policy_document" "greenpixie_inline_policy_document" {
     ]
 
     resources = [
-      "arn:aws:s3:::coat-prod-cur-v2-hourly",
-      "arn:aws:s3:::coat-prod-cur-v2-hourly/*"
+      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly",
+      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/*"
     ]
   }
 
@@ -106,8 +106,8 @@ data "aws_iam_policy_document" "greenpixie_inline_policy_document" {
     ]
 
     resources = [
-      "arn:aws:s3:::coat-prod-cur-v2-hourly-enriched",
-      "arn:aws:s3:::coat-prod-cur-v2-hourly-enriched/*"
+      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly-enriched",
+      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly-enriched/*"
     ]
   }
 
