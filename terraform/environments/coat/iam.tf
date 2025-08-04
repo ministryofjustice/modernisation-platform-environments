@@ -56,6 +56,89 @@ resource "aws_iam_role_policy_attachment" "coat_cross_account_attachment" {
   policy_arn = aws_iam_policy.coat_cross_account_policy[0].arn
 }
 
+data "aws_iam_policy_document" "greenpixie_assume_role_policy_document" {
+  statement {
+    sid     = "AssumeRolePolicy"
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::457748205563:user/gpx-data-moj-user"]
+    }
+    condition {
+      test     = "StringEquals"
+      values   = ["gpx-data-moj-assume-id"]
+      variable = "sts:ExternalId"
+    }
+  }
+}
+
+data "aws_iam_policy_document" "greenpixie_inline_policy_document" {
+  statement {
+    sid = "AccessSourceBucket"
+
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket",
+      "s3:GetBucketLocation",
+      "s3:GetObject",
+      "s3:GetObjectTagging",
+      "s3:GetObjectVersionTagging"
+    ]
+
+    resources = [
+      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly",
+      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/*"
+    ]
+  }
+
+  statement {
+    sid = "AccessDestBucket"
+
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket",
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:DeleteObject",
+      "s3:GetBucketLocation",
+      "s3:PutObjectAcl"
+    ]
+
+    resources = [
+      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly-enriched",
+      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly-enriched/*"
+    ]
+  }
+
+  statement {
+    sid = "KMSPermissionsForSourceAndDestBuckets"
+
+    effect = "Allow"
+    actions = [
+      "kms:Decrypt",
+      "kms:DescribeKey",
+      "kms:GenerateDataKey*"
+    ]
+    resources = [module.cur_s3_kms.key_arn, local.kms_dev_key_id]
+  }
+}
+
+resource "aws_iam_policy" "s3_greenpixie_read_source_write_dest_policy" {
+  name   = "S3GreenPixieReadSourceWriteDestPolicy"
+  policy = data.aws_iam_policy_document.greenpixie_inline_policy_document.json
+}
+
+resource "aws_iam_role" "greenpixie_data_moj_user_role" {
+  name               = "GreenPixieMojUserRole"
+  assume_role_policy = data.aws_iam_policy_document.greenpixie_assume_role_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "greenpixie_role_policy_attachment" {
+  role       = aws_iam_role.greenpixie_data_moj_user_role.name
+  policy_arn = aws_iam_policy.s3_greenpixie_read_source_write_dest_policy.arn
+}
+
 
 resource "aws_iam_role" "terraform_github_repos_state_role" {
   count              = local.is-production ? 1 : 0
