@@ -218,8 +218,8 @@ resource "aws_s3_object" "ftp_lambda_layer" {
 
 resource "aws_s3_object" "ftp_client" {
   bucket = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
-  key    = "lambda/ftp-client.zip"
-  source = "lambda/ftp-client.zip"
+  key    = "lambda/ftp-client-v3.zip"
+  source = "lambda/ftp-client-v3.zip"
 }
 
 # #LAA-ftp-allpay-outbound-ccms
