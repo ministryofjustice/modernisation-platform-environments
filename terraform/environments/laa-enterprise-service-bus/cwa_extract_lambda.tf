@@ -39,7 +39,7 @@ resource "aws_security_group" "cwa_extract_new" {
   )
 }
 
-resource "aws_security_group_rule" "cwa_extract_egress_ssh" {
+resource "aws_security_group_rule" "cwa_extract_egress_ssh_new" {
   type              = "egress"
   from_port         = 22
   to_port           = 22
@@ -49,7 +49,7 @@ resource "aws_security_group_rule" "cwa_extract_egress_ssh" {
   description       = "Outbound SSH Access to CWA DB"
 }
 
-resource "aws_security_group_rule" "cwa_extract_egress_oracle" {
+resource "aws_security_group_rule" "cwa_extract_egress_oracle_new" {
   type              = "egress"
   from_port         = 1521
   to_port           = 1521
@@ -59,7 +59,7 @@ resource "aws_security_group_rule" "cwa_extract_egress_oracle" {
   description       = "Outbound 1521 Access to CWA DB"
 }
 
-resource "aws_security_group_rule" "cwa_extract_egress_https" {
+resource "aws_security_group_rule" "cwa_extract_egress_https_new" {
   type                     = "egress"
   from_port                = 443
   to_port                  = 443
