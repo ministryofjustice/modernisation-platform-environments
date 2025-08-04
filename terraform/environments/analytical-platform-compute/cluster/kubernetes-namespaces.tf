@@ -85,10 +85,5 @@ resource "kubernetes_namespace" "mwaa" {
 resource "kubernetes_namespace" "velero_system" {
   metadata {
     name = "velero-system"
-    labels = {
-      "admission.gatekeeper.sh/ignore" = "true"
-      "policy.sigstore.dev/include"    = "false"
-    }
   }
-  depends_on = [helm_release.gatekeeper] # ???
 }
