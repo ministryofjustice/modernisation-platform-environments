@@ -1,5 +1,7 @@
 module "rds_export" {
-  source = "github.com/ministryofjustice/terraform-rds-export?ref=19c39985ff4988195ac550ebdcefb3dc3b872908"
+  # checkov:skip=CKV_TF_1: using branch instead of a commit hash
+  # checkov:skip=CKV_TF_2: using branch instead of tag with a version number
+  source = "github.com/ministryofjustice/terraform-rds-export?ref=sql-backup-restore-rds-updates"
 
   kms_key_arn         = aws_kms_key.sns_kms.arn
   name                = "cafm"
@@ -36,13 +38,19 @@ module "endpoints" {
     }
   }
   endpoints = {
-
     secrets_manager = {
       service             = "secretsmanager"
       service_type        = "Interface"
       subnet_ids          = module.vpc.private_subnets
       private_dns_enabled = true
-      tags                = { Name = "secretsmanager-eu-west-1-dev" }
+      tags                = { Name = "cafm-secretsmanager-endpoint" }
+     }
+    glue = {
+      service             = "glue"
+      service_type        = "Interface"
+      subnet_ids          = module.vpc.private_subnets
+      private_dns_enabled = true
+      tags                = { Name = "cafm-glue-endpoint" }
     }
   }
 

@@ -1,7 +1,8 @@
 {
   "accounts": {
     "development": {
-      "example_var": "dev-data"
+      "example_var": "dev-data",
+      "cwa_database_ip": "10.26.60.208/32"
     },
     "test": {
       "example_var": "test-data"

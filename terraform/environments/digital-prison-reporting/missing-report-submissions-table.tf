@@ -119,7 +119,7 @@ module "aurora_missing_report_submissions" {
   instances = {
     1 = {
       identifier     = "${local.application_data.accounts[local.environment].missing_report_submissions_rds.name}-${local.environment}"
-      instance_class = "db.t2.small"
+      instance_class = local.application_data.accounts[local.environment].missing_report_submissions_rds.inst_class
     }
   }
 
