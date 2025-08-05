@@ -10,11 +10,6 @@ resource "aws_secretsmanager_secret" "cwa_db_secret" {
   name = "cwa-extract-lambda-db-secret-${local.environment}"
 }
 
-resource "aws_secretsmanager_secret" "cwa_db_ssh_key" {
-  name = "cwa-extract-lambda-db-ssh-key-secret-${local.environment}"
-}
-
-
 #####################################################################################
 ### Secrets used for CCMS Extract Lambda Function ###
 #####################################################################################
