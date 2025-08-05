@@ -6,7 +6,7 @@ resource "aws_secretsmanager_secret" "secret_eucs_entra" {
   description = "Credentials for authenticating to EUCS Entra."
 
   tags = merge(local.tags,
-    { Name = "ftp-s3-${local.environment}-aws-key" }
+    { Name = "eucs-entra-${local.environment}-aws-key" }
   )
 }
 
