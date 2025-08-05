@@ -19,7 +19,10 @@ resource "aws_sns_topic_policy" "priority_p1_policy" {
           "sns:GetTopicAttributes",
           "sns:AddPermission"
         ]
-        Resource = aws_sns_topic.priority_p1.arn
+        Resource = [
+          aws_sns_topic.priority_p1.arn, 
+          aws_sns_topic.provider_banks.arn
+        ]
       },
       {
         Sid = "AllowPublisherPublishOnly"
@@ -28,7 +31,10 @@ resource "aws_sns_topic_policy" "priority_p1_policy" {
           AWS = aws_iam_role.publisher_role.arn
         }
         Action = "sns:Publish"
-        Resource = aws_sns_topic.priority_p1.arn
+        Resource = [
+          aws_sns_topic.priority_p1.arn, 
+          aws_sns_topic.provider_banks.arn
+        ]
       },
       {
         Sid = "AllowSubscriberSubscribeOnly"
@@ -37,7 +43,10 @@ resource "aws_sns_topic_policy" "priority_p1_policy" {
           AWS = aws_iam_role.subscriber_role.arn
         }
         Action = "sns:Subscribe"
-        Resource = aws_sns_topic.priority_p1.arn
+        Resource = [
+          aws_sns_topic.priority_p1.arn, 
+          aws_sns_topic.provider_banks.arn
+        ]
       }
     ]
   })
