@@ -19,7 +19,10 @@ resource "aws_lb_target_group" "ebsdb_nlb" {
   vpc_id               = data.aws_vpc.shared.id
   target_type          = "instance"
   deregistration_delay = 30
-
+  stickiness {
+    enabled = true
+    type    = "source_ip"
+  }
   health_check {
     healthy_threshold   = "3"
     interval            = "30"
