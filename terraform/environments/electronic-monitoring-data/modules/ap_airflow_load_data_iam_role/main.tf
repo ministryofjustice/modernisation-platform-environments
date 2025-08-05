@@ -15,6 +15,18 @@ locals {
   suffix           = var.environment != "production" ? "_${local.env_map[var.environment]}" : ""
   snake-database   = "${replace(var.database_name, "-", "_")}${local.suffix}"
   role_name_suffix = var.full_reload ? "full-reload-${var.name}${local.env_suffixes[var.environment]}" : "load-${var.name}${local.env_suffixes[var.environment]}"
+  source_bucket_paths = var.source_data_bucket != null ? [
+    "${var.source_data_bucket.arn}${var.path_to_data}/*",
+    "${var.source_data_bucket.arn}/staging${var.path_to_data}/*",
+  ] : []
+  list_buckets = var.source_data_bucket != null ? [
+      var.source_data_bucket.arn,
+      var.athena_dump_bucket.arn,
+      var.cadt_bucket.arn
+  ] : [
+    var.athena_dump_bucket.arn,
+    var.cadt_bucket.arn
+  ]
 }
 
 data "aws_region" "current" {}
@@ -33,25 +45,20 @@ data "aws_iam_policy_document" "load_data" {
       "s3:DeleteObject",
       "s3:GetObjectAttributes"
     ]
-    resources = [
-      "${var.source_data_bucket.arn}${var.path_to_data}/*",
-      "${var.source_data_bucket.arn}/staging${var.path_to_data}/*",
+    resources = flatten([
+      local.source_bucket_paths,
       "${var.cadt_bucket.arn}/staging/${local.snake-database}/*",
       "${var.cadt_bucket.arn}/staging${var.path_to_data}/*",
       "${var.cadt_bucket.arn}/staging/${local.snake-database}_pipeline/*",
       "${var.cadt_bucket.arn}/staging${var.path_to_data}_pipeline/*",
       "${var.athena_dump_bucket.arn}/output/*"
-    ]
+    ])
   }
   statement {
     sid     = "ListDataBucket${local.camel-sid}"
     effect  = "Allow"
     actions = ["s3:ListBucket"]
-    resources = [
-      var.source_data_bucket.arn,
-      var.athena_dump_bucket.arn,
-      var.cadt_bucket.arn
-    ]
+    resources = local.list_buckets
   }
   statement {
     sid    = "AthenaPermissionsForLoadData${local.camel-sid}"
