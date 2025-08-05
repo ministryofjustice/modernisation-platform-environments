@@ -26,7 +26,7 @@ resource "aws_s3_object" "folder" {
 
 
 resource "aws_s3_bucket_policy" "default" {
-  bucket   = local.yjb_bucket_id
+  bucket = local.yjb_bucket_id
 
   policy = <<POLICY
 {

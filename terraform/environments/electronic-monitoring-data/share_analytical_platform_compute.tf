@@ -22,15 +22,14 @@ locals {
     "datamart",
     "derived",
     "testing",
+    "servicenow_curated",
+    "servicenow_curated_snapshot",
   ]
-  live_feeds_dbs = local.is-test ? [
+  live_feeds_dbs = [
     "servicenow",
     "serco_fms",
     "allied_mdss",
-  ] : [
-    "servicenow",
-    "serco_fms"
-  ]
+    ]
   prod_dbs_to_grant = local.is-production ? [
     "am_stg",
     "cap_dw_stg",

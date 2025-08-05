@@ -667,7 +667,8 @@ data "aws_iam_policy_document" "athena_api" {
     ]
     resources = [
       "arn:aws:lambda:${local.account_region}:${local.account_id}:function:dpr-athena-federated-query-oracle-function",
-      "arn:aws:lambda:${local.account_region}:${local.account_id}:function:dpr-athena-federated-query-postgresql-function"
+      "arn:aws:lambda:${local.account_region}:${local.account_id}:function:dpr-athena-federated-query-postgresql-function",
+      "arn:aws:lambda:${local.account_region}:${local.account_id}:function:dpr-athena-federated-query-redshift-function"
     ]
   }
 
@@ -888,7 +889,8 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
     actions = [
       "glue:GetTable",
       "glue:GetDatabase",
-      "glue:GetPartition"
+      "glue:GetPartition",
+      "glue:GetTags"
     ]
     resources = flatten([
       for resource in each.value.resource_shares : [
@@ -1076,4 +1078,43 @@ resource "aws_iam_policy" "secretsmanager_read_policy" {
       }
     ]
   })
+}
+
+resource "aws_iam_policy" "rds_cross_policy" {
+  name        = "${local.project}-missing_report_submissions-cross-policy"
+  description = "Extra Policy for AWS RDS"
+  policy      = data.aws_iam_policy_document.rds.json
+}
+
+
+data "aws_iam_policy_document" "rds" {
+  #checkov:skip=CKV_AWS_107: false positive, nothing is output to logs, has been made sensitive
+  statement {
+    actions = [
+      "rds-db:Connect",
+    ]
+    resources = [
+      "arn:aws:rds:${local.account_region}:${local.environment_management.account_ids[terraform.workspace]}:${local.missing_report_db_credentials.username}:${local.application_data.accounts[local.environment].missing_report_submissions_rds.db_identifier}/${local.missing_report_db_credentials.username}"
+    ]
+  }
+
+  statement {
+    actions = [
+      "rds:DescribeDBInstances",
+      "rds-data:*"
+    ]
+    resources = [for instance in values(module.aurora_missing_report_submissions.cluster_instances) : instance.arn]
+  }
+  statement {
+    actions = [
+      "kms:GenerateDataKey",
+      "kms:GenerateDataKeyPair",
+      "kms:Decrypt",
+      "kms:Encrypt"
+    ]
+    resources = [
+      "arn:aws:kms:*:771283872747:key/*"
+    ]
+  }
+
 }

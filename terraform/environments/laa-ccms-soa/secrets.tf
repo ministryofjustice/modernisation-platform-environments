@@ -40,3 +40,12 @@ resource "aws_secretsmanager_secret" "soa_deploy_ssh_key" {
   name        = "ccms/soa/deploy-github-ssh-key"
   description = "Github SSH Deploy Key"
 }
+
+resource "aws_secretsmanager_secret" "trust_store_password" {
+  name        = "ccms/soa/java/trust-store/password"
+  description = "Password for the Java Trust Store used by SOA"
+}
+
+data "aws_secretsmanager_secret_version" "trust_store_password" {
+  secret_id = aws_secretsmanager_secret.trust_store_password.id
+}
