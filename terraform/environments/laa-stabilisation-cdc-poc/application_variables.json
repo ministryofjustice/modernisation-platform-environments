@@ -41,7 +41,8 @@
       "old_mail_server_url": "mail.aws.tst.legalservices.gov.uk",
       "laa_mail_relay_url": "laa-mail.laa-development.modernisation-platform.service.justice.gov.uk",
       "rhel7_ami_id": "ami-0e5f1571c6f046b98",
-      "rhel7_instance_type": "m4.xlarge"
+      "rhel7_instance_type": "m4.xlarge",
+      "hub20_cwa_lambda_sg": "sg-066a581f373591c5e"
     },
     "test": {
       "example_var": "test-data"
