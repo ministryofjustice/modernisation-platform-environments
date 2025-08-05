@@ -48,8 +48,7 @@
       "laa_mail_relay_url": "laa-mail.laa-development.modernisation-platform.service.justice.gov.uk",
       "old_domain_name": "tst.legalservices.gov.uk",
       "app_disk_space_alert_threshold": "92",
-      "lz_account_id": "013163512034",
-      "hub20_cwa_lambda_sg": "sg-05152af51195017fa"
+      "lz_account_id": "013163512034"
     },
     "test": {
       "env_short": "tst",
