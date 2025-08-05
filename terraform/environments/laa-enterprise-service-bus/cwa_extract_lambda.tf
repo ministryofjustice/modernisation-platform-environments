@@ -16,17 +16,6 @@ resource "aws_lambda_layer_version" "lambda_layer_oracle_python" {
 ### Lambda SG
 ######################################
 
-resource "aws_security_group" "cwa_extract" {
-  name        = "${local.application_name_short}-${local.environment}-cwa-extract-lambda-security-group"
-  description = "CWA Extract Lambda Security Group"
-  vpc_id      = data.aws_vpc.shared.id
-
-  tags = merge(
-    local.tags,
-    { Name = "${local.application_name_short}-${local.environment}-cwa-extract-lambda-security-group" }
-  )
-}
-
 resource "aws_security_group" "cwa_extract_new" {
   name        = "${local.application_name_short}-${local.environment}-cwa-extract-lambda-security-group-new"
   description = "CWA Extract Lambda Security Group New"
@@ -52,8 +41,8 @@ resource "aws_security_group_rule" "cwa_extract_egress_ssh_new" {
 
 resource "aws_security_group_rule" "cwa_extract_egress_oracle_new" {
   type              = "egress"
-  from_port         = 1521
-  to_port           = 1521
+  from_port         = 1571
+  to_port           = 1571
   protocol          = "tcp"
   cidr_blocks       = [local.application_data.accounts[local.environment].cwa_database_ip]
   security_group_id = aws_security_group.cwa_extract_new.id
