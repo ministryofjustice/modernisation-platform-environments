@@ -2,7 +2,7 @@
   "accounts": {
     "development": {
       "example_var": "dev-data",
-      "cwa_database_ip": "10.26.60.208/32",
+      "cwa_database_ip": "10.26.60.170",
       "vpc_endpoint_sg": "sg-0754d9a309704addd"
     },
     "test": {
