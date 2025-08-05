@@ -22,6 +22,8 @@ variable "path_to_data" {
 variable "source_data_bucket" {
   type        = object({ arn = string })
   description = "source of the data in s3"
+  nullable    = true
+  default     = null
 }
 
 variable "athena_dump_bucket" {
