@@ -46,7 +46,7 @@ resource "aws_security_group_rule" "cwa_extract_egress_oracle_new" {
   protocol          = "tcp"
   cidr_blocks       = [local.application_data.accounts[local.environment].cwa_database_ip]
   security_group_id = aws_security_group.cwa_extract_new.id
-  description       = "Outbound 1521 Access to CWA DB"
+  description       = "Outbound 1571 Access to CWA DB"
 }
 
 resource "aws_security_group_rule" "cwa_extract_egress_https_new" {
