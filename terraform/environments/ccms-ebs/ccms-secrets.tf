@@ -2,7 +2,7 @@
 
 resource "aws_secretsmanager_secret" "secret_eucs_entra" {
   count       = local.is-development ? 1 : 0
-  name        = "eucs-entra--${local.environment}-aws-key"
+  name        = "eucs-entra-${local.environment}-aws-key"
   description = "Credentials for authenticating to EUCS Entra."
 
   tags = merge(local.tags,
