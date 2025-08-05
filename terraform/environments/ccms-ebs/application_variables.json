@@ -276,7 +276,7 @@
       "ebsapps_u03_size": 200,
       "ebsapps_stage_size": 100,
       "tg_apps_port": 8001,
-      "tg_db_port": 1521,
+      "tg_db_port": 1522,
       "ebs_size_ebsdb_exhome": 100,
       "ebs_size_ebsdb_u01": 300,
       "ebs_size_ebsdb_arch": 500,
