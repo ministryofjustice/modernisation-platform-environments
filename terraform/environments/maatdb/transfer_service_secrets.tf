@@ -3,39 +3,27 @@
 # The secret values are:
 
 
-# 1. The name of the job. This is "xhibit-inbound"
-# 2. The value type  - one of each username, folder, public_key and source_cidr. Note there can be multiple source_cidrs.
-# 3. The secret value
-
-# Add all inbound CIDRs to filter for as required
+# 1. The type - this will be user"
+# 2. The secret values  - one of each username, folder, public_key and one or more source_cidrs.
 
 # For example:
 
 # [
 #   {
-#     "name": "xhibit-inbound",
-#     "type": "username",
-#     "value": "example_user_name"
+#     "type": "user",
+#     "username": "example_user_name_1",
+#     "public_key": "ssh-ed25519 AAAAC3Nz...",
+#     "bucket_name": "xhibit-inbound-user-1",
+#     "folder": "user1/",
+#     "ingress_cidrs": ["1.1.1.1/32"]
 #   },
 #   {
-#     "name": "xhibit-inbound",
-#     "type": "public_key",
-#     "value": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC3dummykeyEXAMPLEonly1234567890abcdefghijklmnopqrstuvwxYzDUMMYKEYexampleFORtestingONLY user@example.com"
-#   },
-#   {
-#     "name": "xhibit-inbound",
-#     "type": "folder",
-#     "value": "/temp/""
-#   },
-#   {
-#     "name": "xhibit-inbound",
-#     "type": "ingress_cidr",
-#     "value": "1.1.1.1/32"
-#   },
-#   {
-#     "name": "xhibit-inbound",
-#     "type": "ingress_cidr",
-#     "value": "2.2.2.2/32"
+#     "type": "user",
+#     "username": "example_user_name_2",
+#     "public_key": "ssh-rsa AAAAB3Nza...",
+#     "bucket_name": "xhibit-inbound-user-2",
+#     "folder": "user2/"
+#     "ingress_cidrs": ["2.2.2.2/32", "3.3.3.3/32"]
 #   }
 # ]
 
