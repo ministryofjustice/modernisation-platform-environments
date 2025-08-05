@@ -9,11 +9,12 @@ resource "aws_lambda_function" "main" {
   #checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable" - not required
   #checkov:skip=CKV_AWS_272: "Ensure AWS Lambda function is configured to validate code-signing" - code signing is not implemented
   #checkov:skip=CKV_AWS_338: "Ensure CloudWatch log groups retains logs for at least 1 year" - only 7 days required, see execution_logs below
-  function_name = var.lambda.function_name
-  runtime       = "python3.12"
-  handler       = var.lambda.handler
-  role          = aws_iam_role.lambda_iam_roles.arn
-  filename      = var.lambda.function_zip_file
+  function_name    = var.lambda.function_name
+  runtime          = "python3.12"
+  handler          = var.lambda.handler
+  role             = aws_iam_role.lambda_iam_roles.arn
+  filename         = var.lambda.function_zip_file
+  source_code_hash = filebase64sha256(var.lambda.function_zip_file)
   environment {
     variables = var.lambda.environment_variables
   }
