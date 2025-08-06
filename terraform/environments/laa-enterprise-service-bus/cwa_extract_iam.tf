@@ -53,12 +53,19 @@ resource "aws_iam_policy" "cwa_extract_lambda_policy" {
       {
         Effect   = "Allow"
         Action   = [
-          "secretsmanager:GetSecretValue",
+          "secretsmanager:GetSecretValue"
         ]
         Resource = [
           aws_secretsmanager_secret.cwa_procedures_config.arn,
           aws_secretsmanager_secret.cwa_db_secret.arn
         ]
+      },
+      {
+        Effect   = "Allow"
+        Action   = [
+          "elasticfilesystem:ClientMount"
+      ],
+        Resource = "arn:aws:elasticfilesystem:<region>:<account-id>:file-system/<file-system-id>"
       }
     ]
   })
