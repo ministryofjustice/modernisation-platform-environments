@@ -80,12 +80,56 @@ resource "aws_iam_role_policy" "transfer_policy" {
   })
 }
 
+# Logging role and policy
+
+resource "aws_iam_role" "transfer_logging" {
+  name = "transfer-logging-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect = "Allow",
+      Principal = {
+        Service = "transfer.amazonaws.com"
+      },
+      Action = "sts:AssumeRole"
+    }]
+  })
+
+  tags = {
+    Name = "transfer-logging-role"
+  }
+}
+
+resource "aws_iam_role_policy" "transfer_logging_policy" {
+  name = "transfer-logging-policy"
+  role = aws_iam_role.transfer_logging.id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Sid    = "AllowCloudWatchLogs",
+        Effect = "Allow",
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ],
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+
 
 resource "aws_transfer_server" "transfer_service_server" {
   count                     = local.build_transfer ? 1 : 0
   endpoint_type             = "PUBLIC"
   identity_provider_type    = "SERVICE_MANAGED"
   security_policy_name      = "TransferSecurityPolicy-SshAuditCompliant-2025-02"
+  logging_role           = aws_iam_role.transfer_logging.arn
 
   protocols = ["SFTP"]
 
