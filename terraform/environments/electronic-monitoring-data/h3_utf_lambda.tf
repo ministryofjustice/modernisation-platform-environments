@@ -1,5 +1,6 @@
 module "h3_lambda_function" {
   source = "terraform-aws-modules/lambda/aws"
+  version = "v7.21.1"
 
   function_name = "h3-udf"
   description   = "Athena udf for Uber h3 hexes"
