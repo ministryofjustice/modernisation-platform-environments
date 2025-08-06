@@ -27,7 +27,7 @@ locals {
     var.athena_dump_bucket.arn,
     var.cadt_bucket.arn
   ]
-  iam_policy_documents = var.secret_arn ? [
+  iam_policy_documents = var.secret_arn != null ? [
     data.aws_iam_policy_document.load_data.json,
     data.aws_iam_policy_document.get_secrets[0].json
   ] : [data.aws_iam_policy_document.load_data.json]
