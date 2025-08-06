@@ -128,6 +128,6 @@ data "kubernetes_service_account" "mwaa_external_secrets_analytical_platform_dat
 }
 
 data "aws_route53_zone" "network_services" {
-  name         = "compute.${local.environment}.analytical-platform.service.justice.gov.uk"
+  name         = local.route53_zone
   private_zone = false
 }

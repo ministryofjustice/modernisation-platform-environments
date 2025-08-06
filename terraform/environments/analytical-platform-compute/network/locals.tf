@@ -37,6 +37,8 @@ locals {
     for idx, id in module.vpc.private_route_table_ids :
     idx => id
   }
+  # fix for data source
+  route53_zone = local.environment_configurations[local.environment].route53_zone
 
 }
 
