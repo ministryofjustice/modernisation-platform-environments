@@ -81,3 +81,24 @@ resource "aws_sqs_queue_policy" "ccr_policy" {
     }]
   })
 }
+
+resource "aws_sqs_queue_policy" "ccms_banks_policy" {
+  queue_url = aws_sqs_queue.ccms_banks_q.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Principal = {
+        Service = "sns.amazonaws.com"
+      }
+      Action = "sqs:SendMessage"
+      Resource = aws_sqs_queue.ccms_banks_q.arn
+      Condition = {
+        ArnEquals = {
+          "aws:SourceArn" = aws_sns_topic.provider_banks.arn
+        }
+      }
+    }]
+  })
+}
