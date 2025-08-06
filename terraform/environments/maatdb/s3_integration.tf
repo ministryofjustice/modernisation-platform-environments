@@ -174,7 +174,7 @@ data "aws_iam_policy_document" "bucket_policy" {
 
       principals {
         type        = "AWS"
-        identifiers = [aws_iam_role.transfer_role[0].arn]
+        identifiers = [aws_iam_role.transfer_role[0].arn, "transfer.amazonaws.com"]
       }
 
       actions = [
