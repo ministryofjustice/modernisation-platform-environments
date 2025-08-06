@@ -164,7 +164,7 @@ resource "aws_transfer_user" "transfer_user" {
   server_id     = aws_transfer_server.transfer_service_server[0].id
   user_name     = local.transfer_users[count.index].username
   role          = aws_iam_role.transfer_role[0].arn
-  home_directory = local.transfer_users[count.index].folder
+  home_directory = "/${local.transfer_users[count.index].bucket_name}/${trim(local.transfer_users[count.index].folder, "/")}/"
 
   tags = merge(
     local.tags,
