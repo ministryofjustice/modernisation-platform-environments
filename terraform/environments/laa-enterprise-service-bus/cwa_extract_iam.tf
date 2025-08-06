@@ -65,7 +65,7 @@ resource "aws_iam_policy" "cwa_extract_lambda_policy" {
         Action   = [
           "elasticfilesystem:ClientMount"
       ],
-        Resource = "arn:aws:elasticfilesystem:<region>:<account-id>:file-system/<file-system-id>"
+        Resource = "arn:aws:elasticfilesystem:eu-west-2:940482439836:file-system/fs-08be7f58b2bd6aaff"
       }
     ]
   })
