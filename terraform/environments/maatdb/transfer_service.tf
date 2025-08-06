@@ -41,27 +41,45 @@ resource "aws_iam_role_policy" "transfer_policy" {
 
   policy = jsonencode({
     Version = "2012-10-17",
-    Statement = concat(
+    Statement = flatten([
       [
-        for idx in range(length(local.transfer_users)) : {
-          Sid    = "S3Access${substr(md5(local.transfer_users[idx].username), 0, 10)}"
-          Effect = "Allow"
-          Action = [
-            "s3:GetObject",
-            "s3:PutObject",
-            "s3:DeleteObject",
-            "s3:ListBucket"
-          ]
-          Resource = [
-            "arn:aws:s3:::${local.transfer_users[idx].bucket_name}",
-            "arn:aws:s3:::${local.transfer_users[idx].bucket_name}/${trim(local.transfer_users[idx].folder, "/")}/*"
-          ]
-          Condition = length(local.transfer_users[idx].ingress_cidrs) > 0 ? {
-            IpAddress = {
-              "aws:SourceIp" = local.transfer_users[idx].ingress_cidrs
-            }
-          } : null
-        }
+        for idx in range(length(local.transfer_users)) : [
+          {
+            Sid    = "S3Access${substr(md5(local.transfer_users[idx].username), 0, 10)}"
+            Effect = "Allow"
+            Action = [
+              "s3:GetObject",
+              "s3:PutObject",
+              "s3:DeleteObject"
+            ]
+            Resource = [
+              "arn:aws:s3:::${local.transfer_users[idx].bucket_name}/${trim(local.transfer_users[idx].folder, "/")}/*"
+            ]
+            Condition = length(local.transfer_users[idx].ingress_cidrs) > 0 ? {
+              IpAddress = {
+                "aws:SourceIp" = local.transfer_users[idx].ingress_cidrs
+              }
+            } : null
+          },
+          {
+            Sid    = "S3List${substr(md5(local.transfer_users[idx].username), 0, 10)}"
+            Effect = "Allow"
+            Action = "s3:ListBucket"
+            Resource = "arn:aws:s3:::${local.transfer_users[idx].bucket_name}"
+            Condition = merge(
+              {
+                StringLike = {
+                  "s3:prefix" = "${trim(local.transfer_users[idx].folder, "/")}/*"
+                }
+              },
+              length(local.transfer_users[idx].ingress_cidrs) > 0 ? {
+                IpAddress = {
+                  "aws:SourceIp" = local.transfer_users[idx].ingress_cidrs
+                }
+              } : {}
+            )
+          }
+        ]
       ],
       [
         {
@@ -76,7 +94,7 @@ resource "aws_iam_role_policy" "transfer_policy" {
           Resource = local.laa_general_kms_arn
         }
       ]
-    )
+    ])
   })
 }
 
