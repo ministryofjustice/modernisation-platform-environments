@@ -17,3 +17,7 @@ resource "aws_secretsmanager_secret" "cwa_db_secret" {
 resource "aws_secretsmanager_secret" "ccms_db_mp_credentials" {
   name = "ccms-db-mp-credentials-${local.environment}"
 }
+
+resource "aws_secretsmanager_secret" "ccms_procedures_config" {
+  name = "ccms-provider-lambda-procedures-config-${local.environment}"
+}
