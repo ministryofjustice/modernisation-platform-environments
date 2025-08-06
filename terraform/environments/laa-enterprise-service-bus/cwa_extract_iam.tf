@@ -65,9 +65,17 @@ resource "aws_iam_policy" "cwa_extract_lambda_policy" {
         Action   = [
           "elasticfilesystem:ClientMount",
           "elasticfilesystem:ClientWrite",
-          "elasticfilesystem:ClientRootAccess"
+          "elasticfilesystem:ClientRootAccess",
+          "elasticfilesystem:DescribeMountTargets"
       ],
         Resource = "arn:aws:elasticfilesystem:eu-west-2:940482439836:file-system/fs-08be7f58b2bd6aaff"
+      },
+      {
+        Effect   = "Allow"
+        Action   = [
+          "elasticfilesystem:DescribeAccessPoints"
+      ],
+        Resource = "arn:aws:elasticfilesystem:eu-west-2:940482439836:access-point/fsap-0294263b7e42ccd8c"
       }
     ]
   })
