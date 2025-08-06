@@ -19,7 +19,7 @@ module "s3_bucket" {
   replication_enabled = false
   replication_region  = local.region
   ownership_controls  = "BucketOwnerEnforced"
-  custom_kms_key = each.key == "inbound" ? aws_kms_key.transfer_kms_key.arn : local.laa_general_kms_arn
+  custom_kms_key = each.key == "outbound" ? local.laa_general_kms_arn : null
 
   providers = {
     aws.bucket-replication = aws
@@ -251,77 +251,3 @@ data "aws_iam_policy_document" "ftp_user_policy" {
   }
 }
 
-# This adds a new local KMS Key and Policy for the Inbound Bucket Only. This allows us fine-grained control over the kms policy rather than amend the scope of the policy of the shared key used by the outbound bucket.
-
-data "aws_caller_identity" "current" {}
-
-resource "aws_s3_bucket" "transfer_bucket" {
-  bucket = "your-transfer-bucket-name"
-}
-
-# KMS Key Policy
-data "aws_iam_policy_document" "kms_key_policy" {
-  # Allow Transfer Family service to use the key
-  statement {
-    sid    = "AllowTransferService"
-    effect = "Allow"
-
-    principals {
-      type        = "Service"
-      identifiers = ["transfer.amazonaws.com"]
-    }
-
-    actions = [
-      "kms:Decrypt",
-      "kms:Encrypt",
-      "kms:GenerateDataKey*",
-      "kms:DescribeKey"
-    ]
-
-    resources = ["*"]
-  }
-
-  # Allow S3 to use the key with condition on bucket ARN and account ID
-  statement {
-    sid    = "AllowS3Usage"
-    effect = "Allow"
-
-    principals {
-      type        = "Service"
-      identifiers = ["s3.amazonaws.com"]
-    }
-
-    actions = [
-      "kms:Decrypt",
-      "kms:Encrypt",
-      "kms:ReEncrypt*",
-      "kms:GenerateDataKey*",
-      "kms:DescribeKey"
-    ]
-
-    resources = ["*"]
-
-    condition {
-      test     = "StringEquals"
-      variable = "aws:SourceArn"
-      values   = [module.s3_bucket["inbound"].bucket.arn]
-    }
-
-    condition {
-      test     = "StringEquals"
-      variable = "aws:SourceAccount"
-      values   = [data.aws_caller_identity.current.account_id]
-    }
-  }
-}
-
-resource "aws_kms_key" "transfer_kms" {
-  description         = "KMS key for AWS Transfer Family and encrypted S3 access"
-  enable_key_rotation = true
-  policy              = data.aws_iam_policy_document.kms_key_policy.json
-}
-
-resource "aws_kms_alias" "transfer_kms_alias" {
-  name          = "alias/transfer-kms-key"
-  target_key_id = aws_kms_key.transfer_kms.key_id
-}
