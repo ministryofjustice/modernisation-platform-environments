@@ -19,6 +19,13 @@ resource "aws_lambda_function" "main" {
     variables = var.lambda.environment_variables
   }
 
+  dynamic "log_group" {
+    for_each = var.lambda.log_group != null ? [var.lambda.log_group] : []
+    content {
+      name = log_group.value.name
+    }
+  }
+
   dynamic "vpc_config" {
     for_each = var.lambda.vpc_config != null ? [var.lambda.vpc_config] : []
     content {
@@ -31,6 +38,14 @@ resource "aws_lambda_function" "main" {
   timeout     = var.lambda.lambda_timeout
 
   tags = merge(var.tags, local.tags)
+}
+
+resource "aws_cloudwatch_log_group" "log_group" {
+  count             = length(var.lambda.log_group) > 0 ? 1 : 0
+  name              = "/aws/lambda/${var.lambda.function_name}"
+  retention_in_days = 365
+
+  tags = var.tags
 }
 
 resource "aws_iam_role" "lambda_iam_roles" {

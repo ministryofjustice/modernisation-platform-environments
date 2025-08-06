@@ -84,7 +84,6 @@ resource "aws_security_group_rule" "allow_alb_from_canary" {
 }
 
 resource "aws_cloudwatch_log_subscription_filter" "healthcheck" {
-  count           = contains(["development", "test", "preproduction", "production"], local.environment_management.account_ids[terraform.workspace]) ? 1 : 0
   name            = "firehose-subscription"
   log_group_name  = "/aws/lambda/serverlessrepo-lambda-canary"
   filter_pattern  = ""
