@@ -43,8 +43,8 @@ resource "aws_iam_role_policy" "transfer_policy" {
     Version = "2012-10-17",
     Statement = concat(
       [
-        for user in local.transfer_users : {
-          Sid    = "S3AccessFor-${user.username}"
+        for idx in range(length(local.transfer_users)) : {
+          Sid    = "S3Access${substr(md5(local.transfer_users[idx].username), 0, 10)}"
           Effect = "Allow"
           Action = [
             "s3:GetObject",
@@ -53,12 +53,12 @@ resource "aws_iam_role_policy" "transfer_policy" {
             "s3:ListBucket"
           ]
           Resource = [
-            "arn:aws:s3:::${user.bucket_name}",
-            "arn:aws:s3:::${user.bucket_name}/${user.folder}"
+            "arn:aws:s3:::${local.transfer_users[idx].bucket_name}",
+            "arn:aws:s3:::${local.transfer_users[idx].bucket_name}/${local.transfer_users[idx].folder}"
           ]
-          Condition = length(user.ingress_cidrs) > 0 ? {
+          Condition = length(local.transfer_users[idx].ingress_cidrs) > 0 ? {
             IpAddress = {
-              "aws:SourceIp" = user.ingress_cidrs
+              "aws:SourceIp" = local.transfer_users[idx].ingress_cidrs
             }
           } : null
         }
@@ -79,6 +79,7 @@ resource "aws_iam_role_policy" "transfer_policy" {
     )
   })
 }
+
 
 resource "aws_transfer_server" "transfer_service_server" {
   count                     = local.build_transfer ? 1 : 0
