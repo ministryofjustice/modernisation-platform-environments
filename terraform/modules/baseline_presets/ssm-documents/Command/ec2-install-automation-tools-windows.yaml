@@ -42,6 +42,7 @@ mainSteps:
           if (Get-Command "git" -ErrorAction SilentlyContinue) {
             Write-Output "git already installed, skipping choco install"
           } else {
+            $env:Path += ";C:\ProgramData\chocolatey\bin"
             Write-Output "choco upgrade chocolatey-compatibility.extension -y"
             choco upgrade chocolatey-compatibility.extension -y
             Write-Output "choco upgrade chocolatey-core.extension -y"
@@ -84,5 +85,6 @@ mainSteps:
             Write-Output "awscli already installed"
           } else {
             Write-Output "choco install awscli -y"
+            $env:Path += ";C:\ProgramData\chocolatey\bin"
             choco install awscli -y
           }
