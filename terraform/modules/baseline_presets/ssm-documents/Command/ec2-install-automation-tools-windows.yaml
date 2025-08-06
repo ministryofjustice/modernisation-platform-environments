@@ -3,7 +3,7 @@ schemaVersion: "2.2"
 description: SSM Document for installing choco git and aws cli on windows servers using powershell
 parameters:
 mainSteps:
-  - name: Install or Upgrade Chocolatey
+  - name: InstallOrUpgradeChocolatey
     action: aws:runPowerShellScript
     precondition:
       StringEquals:
@@ -28,7 +28,7 @@ mainSteps:
             [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
             Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
           }
-  - name: Install Git
+  - name: InstallGit
     action: aws:runPowerShellScript
     precondition:
       StringEquals:
@@ -49,7 +49,7 @@ mainSteps:
             Write-Output "choco install git.install -y"
             choco install git.install -y
           }
-  - name: Install Git Fallback
+  - name: InstallGitFallback
     action: aws:runPowerShellScript
     precondition:
       StringEquals:
@@ -69,7 +69,7 @@ mainSteps:
             Invoke-WebRequest $Url -OutFile ".\Git.exe"
             .\Git.exe /VERYSILENT /NORESTART
           }
-  - name: Install AWS CLI
+  - name: InstallAWSCLI
     action: aws:runPowerShellScript
     precondition:
       StringEquals:
