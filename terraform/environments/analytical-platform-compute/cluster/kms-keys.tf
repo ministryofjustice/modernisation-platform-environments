@@ -250,7 +250,7 @@ module "velero_kms" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "4.0.0"
+  version = "3.1.1"
 
   aliases               = ["velero/default"]
   description           = "Velero KMS key"

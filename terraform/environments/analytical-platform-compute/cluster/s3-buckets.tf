@@ -2,11 +2,7 @@
 module "velero_s3_bucket" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "5.2.0"
-
-  providers = {
-    aws.bucket-replication = aws
-  }
+  version = "4.11.0"
 
   bucket_prefix = "mojap-compute-${local.environment}-velero"
 
