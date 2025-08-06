@@ -29,7 +29,10 @@ resource "aws_iam_policy" "publisher_role_policy" {
         Action = [
           "sns:Publish"
         ]
-        Resource = aws_sns_topic.priority_p1.arn
+        Resource = [
+          aws_sns_topic.priority_p1.arn, 
+          aws_sns_topic.provider_banks.arn
+        ]
       }
     ]
   })
@@ -71,7 +74,10 @@ resource "aws_iam_policy" "subscriber_policy" {
         Action = [
           "sns:Subscribe"
         ]
-        Resource = aws_sns_topic.priority_p1.arn
+        Resource = [
+          aws_sns_topic.priority_p1.arn, 
+          aws_sns_topic.provider_banks.arn
+        ]
       }
     ]
   })
@@ -112,7 +118,10 @@ resource "aws_iam_policy" "admin_policy" {
       {
         Effect = "Allow"
         Action = "sns:*"
-        Resource = aws_sns_topic.priority_p1.arn
+        Resource = [
+          aws_sns_topic.priority_p1.arn, 
+          aws_sns_topic.provider_banks.arn
+        ]
       }
     ]
   })
