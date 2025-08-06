@@ -19,10 +19,11 @@ resource "aws_lambda_function" "main" {
     variables = var.lambda.environment_variables
   }
 
-  dynamic "log_group" {
+  dynamic "logging_config" {
     for_each = var.lambda.log_group != null ? [var.lambda.log_group] : []
     content {
-      name = log_group.value.name
+      log_format = "Text"
+      log_group  = aws_cloudwatch_log_group.log_group.name
     }
   }
 
