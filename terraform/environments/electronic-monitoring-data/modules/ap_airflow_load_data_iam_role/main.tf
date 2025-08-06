@@ -29,6 +29,31 @@ locals {
   ]
 }
 
+data "aws_iam_policy_document" "get_secrets" {
+  #checkov:skip=CKV_AWS_356
+  #checkov:skip=CKV_AWS_111
+  count = var.secret_arn != null ? 1 : 0
+  statement {
+    sid = "GetCredentials${var.secret_arn}"
+    effect = "Allow"
+    actions = [
+      "secretsmanager:GetResourcePolicy",
+      "secretsmanager:GetSecretValue",
+      "secretsmanager:DescribeSecret",
+      "secretsmanager:ListSecretVersionIds"
+    ]
+    resources = [var.secret_arn]
+  }
+  statement {
+    sid = "ListAllSecrets"
+    effect = "Allow"
+    actions = [
+      "secretsmanager:ListSecrets",
+    ]
+    resources = ["*"]
+  }
+}
+
 data "aws_region" "current" {}
 
 data "aws_caller_identity" "current" {}
