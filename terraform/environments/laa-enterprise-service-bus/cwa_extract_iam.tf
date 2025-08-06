@@ -76,6 +76,13 @@ resource "aws_iam_policy" "cwa_extract_lambda_policy" {
           "elasticfilesystem:DescribeAccessPoints"
       ],
         Resource = "arn:aws:elasticfilesystem:eu-west-2:940482439836:access-point/fsap-0294263b7e42ccd8c"
+      },
+      {
+        Effect   = "Allow"
+        Action   = [
+          "elasticfilesystem:DescribeMountTargets"
+        ]
+        Resource = "*"
       }
     ]
   })
