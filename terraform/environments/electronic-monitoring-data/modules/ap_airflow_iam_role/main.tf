@@ -54,8 +54,9 @@ resource "aws_iam_role" "role_ap_airflow" {
 }
 
 resource "aws_iam_policy" "role_ap_airflow" {
+  for_each = toset(var.iam_policy_documents)
   name_prefix = local.role_name
-  policy      = var.iam_policy_document
+  policy      = each.value
 }
 
 resource "aws_iam_role_policy_attachment" "role_ap_airflow" {

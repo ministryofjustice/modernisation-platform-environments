@@ -27,6 +27,10 @@ locals {
     var.athena_dump_bucket.arn,
     var.cadt_bucket.arn
   ]
+  iam_policy_documents = var.secret_arn ? [
+    data.aws_iam_policy_document.load_data.json,
+    data.aws_iam_policy_document.get_secrets[0].json
+  ] : [data.aws_iam_policy_document.load_data.json]
 }
 
 data "aws_iam_policy_document" "get_secrets" {
@@ -145,7 +149,7 @@ module "ap_database_sharing" {
   environment          = var.environment
   role_name_suffix     = local.role_name_suffix
   role_description     = "${var.name} database permissions"
-  iam_policy_document  = data.aws_iam_policy_document.load_data.json
+  iam_policy_documents = local.iam_policy_documents
   secret_code          = var.secret_code
   oidc_arn             = var.oidc_arn
   max_session_duration = var.max_session_duration
