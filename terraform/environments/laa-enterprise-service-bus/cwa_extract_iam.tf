@@ -63,7 +63,9 @@ resource "aws_iam_policy" "cwa_extract_lambda_policy" {
       {
         Effect   = "Allow"
         Action   = [
-          "elasticfilesystem:ClientMount"
+          "elasticfilesystem:ClientMount",
+          "elasticfilesystem:ClientWrite",
+          "elasticfilesystem:ClientRootAccess"
       ],
         Resource = "arn:aws:elasticfilesystem:eu-west-2:940482439836:file-system/fs-08be7f58b2bd6aaff"
       }
