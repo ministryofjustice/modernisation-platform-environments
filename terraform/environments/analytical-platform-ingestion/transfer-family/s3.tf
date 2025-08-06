@@ -20,7 +20,7 @@ module "transfer_landing_bucket" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "5.1.0"
+  version = "5.3.1"
 
   bucket = "mojap-transfer-${local.environment}-landing"
 
