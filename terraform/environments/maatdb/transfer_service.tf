@@ -54,7 +54,7 @@ resource "aws_iam_role_policy" "transfer_policy" {
           ]
           Resource = [
             "arn:aws:s3:::${local.transfer_users[idx].bucket_name}",
-            "arn:aws:s3:::${local.transfer_users[idx].bucket_name}/${local.transfer_users[idx].folder}"
+            "arn:aws:s3:::${local.transfer_users[idx].bucket_name}${local.transfer_users[idx].folder}"
           ]
           Condition = length(local.transfer_users[idx].ingress_cidrs) > 0 ? {
             IpAddress = {
