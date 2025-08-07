@@ -53,7 +53,7 @@ resource "aws_efs_access_point" "cwa_lambda_access_point" {
   }
 
   root_directory {
-    path = "/"
+    path = "/efs"
     creation_info {
       owner_uid   = 0
       owner_gid   = 0
