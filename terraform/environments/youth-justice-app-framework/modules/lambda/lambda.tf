@@ -42,7 +42,7 @@ resource "aws_lambda_function" "main" {
 }
 
 resource "aws_cloudwatch_log_group" "log_group" {
-  count             = length(var.lambda.log_group) > 0 ? 1 : 0
+  count             = var.lambda.vpc_config != null ? 1 : 0
   name              = "/aws/lambda/${var.lambda.function_name}"
   retention_in_days = 365
 
