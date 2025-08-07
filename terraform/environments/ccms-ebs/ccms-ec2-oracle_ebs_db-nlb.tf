@@ -4,8 +4,8 @@ resource "aws_lb" "ebsdb_nlb" {
   internal                         = true
   load_balancer_type               = "network"
   enable_deletion_protection       = false
-  enable_cross_zone_load_balancing = true
-  subnets                          = data.aws_subnets.shared-private.ids
+  enable_cross_zone_load_balancing = false
+  subnets                          = data.aws_subnet.data_subnets_a.ids
   security_groups                  = [aws_security_group.sg_ebsdb_nlb.id]
   tags = merge(local.tags,
     { Name = lower(format("nlb-%s-db", local.application_name)) }
