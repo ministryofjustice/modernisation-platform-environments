@@ -79,6 +79,31 @@ resource "aws_iam_policy" "soa_s3_policy" {
 EOF
 }
 
+resource "aws_iam_policy" "soa_s3_policy_cortex_deps" {
+  #count       = local.is-production ? 1 : 0
+  name        = "${local.application_data.accounts[local.environment].app_name}-s3-policy-cortex-deps"
+  description = "${local.application_data.accounts[local.environment].app_name} s3-policy-cortex-deps"
+
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "s3:ListBucket",
+                "s3:GetObject",
+            ],
+            "Resource": [
+                "arn:aws:s3:::${local.application_data.accounts[local.environment].cortex_deps_bucket_name}/*",
+                "arn:aws:s3:::${local.application_data.accounts[local.environment].cortex_deps_bucket_name}"
+            ]
+        }
+    ]
+}
+EOF
+}
+
 #--EC2
 resource "aws_iam_instance_profile" "ec2_instance_profile" {
   name = "${local.application_data.accounts[local.environment].app_name}-ec2-instance-profile"
@@ -207,6 +232,12 @@ resource "aws_iam_role_policy_attachment" "attach_ec2_policy" {
 resource "aws_iam_role_policy_attachment" "attach_s3_policy" {
   role       = aws_iam_role.ec2_instance_role.name
   policy_arn = aws_iam_policy.soa_s3_policy.arn
+}
+
+resource "aws_iam_role_policy_attachment" "attach_s3_policy" {
+  #count      = local.is-production ? 1 : 0
+  role       = aws_iam_role.ec2_instance_role.name
+  policy_arn = aws_iam_policy.soa_s3_policy_cortex_deps.arn
 }
 
 #--Alerting
