@@ -25,7 +25,10 @@ resource "aws_efs_file_system_policy" "efs_lambda_cross_account" {
       {
         Effect = "Allow",
         Principal = {
-          AWS = "arn:aws:iam::160937340532:role/hub20-cwa-extract-lambda-role"
+          AWS = [
+            "arn:aws:iam::160937340532:role/hub20-cwa-extract-lambda-role",
+            "arn:aws:iam::160937340532:role/MemberInfrastructureAccess"
+          ]
         },
         Action = [
           "elasticfilesystem:ClientMount",
