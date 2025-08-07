@@ -164,13 +164,9 @@ data "aws_iam_policy_document" "bucket_policy" {
   }
 
   dynamic "statement" {
-    for_each = toset([
-      (
-        local.build_transfer &&
-        each.key == "inbound" &&
-        length(aws_iam_role.transfer_role) > 0
-      ) ? 1 : null
-    ])
+    for_each = (
+      local.build_transfer && each.key == "inbound" ? [1] : []
+    )
 
     content {
       sid    = "AllowTransferUserAccess"
@@ -178,7 +174,7 @@ data "aws_iam_policy_document" "bucket_policy" {
 
       principals {
         type        = "AWS"
-        identifiers = [aws_iam_role.transfer_role[0].arn]
+        identifiers = try(aws_iam_role.transfer_role[*].arn, [])
       }
 
       actions = [
@@ -194,6 +190,7 @@ data "aws_iam_policy_document" "bucket_policy" {
       ]
     }
   }
+
 
 }
 
