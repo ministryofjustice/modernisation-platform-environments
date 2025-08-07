@@ -67,7 +67,7 @@ resource "aws_lambda_function" "cwa_extract" {
   ]
 
   file_system_config {
-    arn              = "arn:aws:elasticfilesystem:eu-west-2:940482439836:access-point/fsap-0294263b7e42ccd8c"
+    arn              = "arn:aws:elasticfilesystem:eu-west-2:940482439836:access-point/fsap-025357cb3b01417b9"
     local_mount_path = "/mnt/efs"
   }
 
