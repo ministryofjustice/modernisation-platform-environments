@@ -44,13 +44,23 @@ resource "aws_efs_file_system_policy" "efs_lambda_cross_account" {
   })
 }
 
-# resource "aws_efs_access_point" "cwa_lambda_access_point" {
-#   file_system_id = aws_efs_file_system.cwa.id 
+resource "aws_efs_access_point" "cwa_lambda_access_point" {
+  file_system_id = aws_efs_file_system.cwa.id 
   
-#   root_directory {
-#     path = "/"
-#   }
-# }
+  posix_user {
+    uid = 0
+    gid = 0
+  }
+
+  root_directory {
+    path = "/"
+    creation_info {
+      owner_uid   = 0
+      owner_gid   = 0
+      permissions = "0755"
+    }
+  }
+}
 
 resource "aws_efs_backup_policy" "cwa" {
   file_system_id = aws_efs_file_system.cwa.id
