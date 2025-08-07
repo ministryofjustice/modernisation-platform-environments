@@ -1,17 +1,3 @@
-#####################################################################################
-### Create the Lambda layer for Oracle Python ###
-#####################################################################################
-
-resource "aws_lambda_layer_version" "lambda_layer_oracle_python" {
-  layer_name          = "cwa-extract-oracle-python"
-  description         = "Oracle DB layer for Python"
-  s3_bucket           = aws_s3_object.lambda_layer_zip.bucket
-  s3_key              = aws_s3_object.lambda_layer_zip.key
-  s3_object_version   = aws_s3_object.lambda_layer_zip.version_id
-  source_code_hash    = filebase64sha256("layers/lambda_dependencies.zip")
-  compatible_runtimes = ["python3.10"]
-}
-
 ######################################
 ### Lambda SG
 ######################################
@@ -27,16 +13,6 @@ resource "aws_security_group" "cwa_extract_new" {
     local.tags,
     { Name = "${local.application_name_short}-${local.environment}-cwa-extract-lambda-security-group-new" }
   )
-}
-
-resource "aws_security_group_rule" "cwa_extract_egress_ssh_new" {
-  type              = "egress"
-  from_port         = 22
-  to_port           = 22
-  protocol          = "tcp"
-  cidr_blocks       = [local.application_data.accounts[local.environment].cwa_database_ip]
-  security_group_id = aws_security_group.cwa_extract_new.id
-  description       = "Outbound SSH Access to CWA DB"
 }
 
 resource "aws_security_group_rule" "cwa_extract_egress_oracle_new" {
@@ -59,6 +35,16 @@ resource "aws_security_group_rule" "cwa_extract_egress_https_new" {
   description              = "Outbound 443 to LAA VPC Endpoint SG"
 }
 
+resource "aws_security_group_rule" "cwa_extract_egress_efs" {
+  type                     = "egress"
+  from_port                = 2049
+  to_port                  = 2049
+  protocol                 = "tcp"
+  source_security_group_id = local.application_data.accounts[local.environment].cwa_efs_sg
+  security_group_id        = aws_security_group.cwa_extract_new.id
+  description              = "Outbound NFS to CWA EFS SG"
+}
+
 ######################################
 ### Lambda Resources
 ######################################
@@ -79,6 +65,11 @@ resource "aws_lambda_function" "cwa_extract" {
     aws_lambda_layer_version.lambda_layer_oracle_python.arn,
     "arn:aws:lambda:eu-west-2:017000801446:layer:AWSLambdaPowertoolsPython:2"
   ]
+
+  file_system_config {
+    arn              = "arn:aws:elasticfilesystem:eu-west-2:940482439836:access-point/fsap-0294263b7e42ccd8c"
+    local_mount_path = "/mnt/efs"
+  }
 
   vpc_config {
     security_group_ids = [aws_security_group.cwa_extract_new.id]

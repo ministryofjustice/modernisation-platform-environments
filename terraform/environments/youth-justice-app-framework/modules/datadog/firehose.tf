@@ -126,6 +126,11 @@ resource "aws_cloudwatch_log_group" "firehose_log_group" {
   kms_key_id        = aws_kms_key.firehose_backup.arn
 }
 
+resource "aws_cloudwatch_log_stream" "firehose_log_stream" {
+  name           = "firehose-datadog-http"
+  log_group_name = aws_cloudwatch_log_group.firehose_log_group.name
+}
+
 resource "aws_cloudwatch_log_subscription_filter" "cloudtrail" {
   name            = "firehose-subscription"
   log_group_name  = "cloudtrail"
@@ -207,15 +212,10 @@ resource "aws_iam_policy" "firehose_policy" {
           "logs:DescribeLogStreams",
           "logs:GetLogEvents"
         ],
-        Resource = aws_cloudwatch_log_group.firehose_log_group.arn
-      },
-      {
-        Sid    = "cloudWatchLog",
-        Effect = "Allow",
-        Action = [
-          "logs:PutLogEvents"
-        ],
-        Resource = aws_cloudwatch_log_group.firehose_log_group.arn
+        Resource = [
+          aws_cloudwatch_log_group.firehose_log_group.arn,
+          aws_cloudwatch_log_stream.firehose_log_stream.arn
+        ]
       },
       {
         Sid    = "CreateLogResources",
