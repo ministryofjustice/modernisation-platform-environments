@@ -7,6 +7,7 @@ resource "aws_lb" "ebsdb_nlb" {
   enable_cross_zone_load_balancing = false
   subnets                          = [data.aws_subnet.data_subnets_a.id]
   security_groups                  = [aws_security_group.sg_ebsdb_nlb.id]
+  idle_timeout                     = 600
   tags = merge(local.tags,
     { Name = lower(format("nlb-%s-db", local.application_name)) }
   )
