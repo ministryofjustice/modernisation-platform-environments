@@ -31,8 +31,7 @@ resource "aws_efs_file_system_policy" "efs_lambda_cross_account" {
           "elasticfilesystem:ClientMount",
           "elasticfilesystem:ClientWrite",
           "elasticfilesystem:ClientRootAccess",
-          "elasticfilesystem:DescribeMountTargets",
-          "elasticfilesystem:DescribeAccessPoints"
+          "elasticfilesystem:DescribeMountTargets"
         ],
         Resource = [
           "${aws_efs_file_system.cwa.arn}",
