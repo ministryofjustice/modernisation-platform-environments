@@ -120,6 +120,56 @@ locals {
         })
       })
 
+      pd-cafm-a-14-b = merge(local.ec2_instances.app, {
+        #cloudwatch_metric_alarms = merge(
+        #  local.ec2_instances.app.cloudwatch_metric_alarms,
+        #  module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows
+        #)
+        cloudwatch_metric_alarms = {}
+        config = merge(local.ec2_instances.app.config, {
+          ami_name          = "pd-cafm-a-2022-image-20250806T1436"
+          availability_zone = "eu-west-2b"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "/dev/sdb"  = { type = "gp3", size = 200 }
+        }
+        instance = merge(local.ec2_instances.app.instance, {
+          disable_api_termination = true
+          instance_type           = "t3.xlarge"
+        })
+        tags = merge(local.ec2_instances.app.tags, {
+          description      = "RDS session host and app Server"
+          update-ssm-agent = "patchgroup2"
+          server-type      = "PlanetFMApp"
+        })
+      })
+
+      pd-cafm-a-15-a = merge(local.ec2_instances.app, {
+        #cloudwatch_metric_alarms = merge(
+        #  local.ec2_instances.app.cloudwatch_metric_alarms,
+        #  module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows
+        #)
+        cloudwatch_metric_alarms = {}
+        config = merge(local.ec2_instances.app.config, {
+          ami_name          = "pd-cafm-a-2022-image-20250806T1436"
+          availability_zone = "eu-west-2a"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "/dev/sdb"  = { type = "gp3", size = 200 }
+        }
+        instance = merge(local.ec2_instances.app.instance, {
+          disable_api_termination = true
+          instance_type           = "t3.xlarge"
+        })
+        tags = merge(local.ec2_instances.app.tags, {
+          description      = "RDS session host and app Server"
+          update-ssm-agent = "patchgroup1"
+          server-type      = "PlanetFMApp"
+        })
+      })
+
       # database servers
       pd-cafm-db-a = merge(local.ec2_instances.db, {
         cloudwatch_metric_alarms = merge(

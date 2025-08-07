@@ -164,15 +164,10 @@ resource "aws_iam_policy" "awsconfig_firehose_policy" {
           "logs:DescribeLogStreams",
           "logs:GetLogEvents"
         ],
-        Resource = aws_cloudwatch_log_group.awsconfig_firehose_log_group.arn
-      },
-      {
-        Sid    = "cloudWatchLog",
-        Effect = "Allow",
-        Action = [
-          "logs:PutLogEvents"
-        ],
-        Resource = aws_cloudwatch_log_group.awsconfig_firehose_log_group.arn
+        Resource = [
+          aws_cloudwatch_log_group.awsconfig_firehose_log_group.arn,
+          aws_cloudwatch_log_stream.awsconfig_firehose_log_stream.arn
+        ]
       },
       {
         Sid    = "CreateLogResources",
@@ -339,6 +334,11 @@ resource "aws_cloudwatch_log_group" "awsconfig_firehose_log_group" {
   name              = "yjaf-${var.environment}-awsconfig-firehose-error-logs"
   retention_in_days = 400
   kms_key_id        = aws_kms_key.awsconfig_firehose_backup.arn
+}
+
+resource "aws_cloudwatch_log_stream" "awsconfig_firehose_log_stream" {
+  name           = "awsconfig-datadog-http"
+  log_group_name = aws_cloudwatch_log_group.awsconfig_firehose_log_group.name
 }
 
 resource "aws_sns_topic_subscription" "datadog_config" {
