@@ -47,7 +47,7 @@ locals {
         #)
         cloudwatch_metric_alarms = {}
         config = merge(local.ec2_instances.app.config, {
-          ami_name          = "pd-cafm-a-11-a"
+          ami_name          = "pd-cafm-a-2022-image-20250806T1436"
           availability_zone = "eu-west-2a"
         })
         ebs_volumes = {
@@ -59,10 +59,9 @@ locals {
           instance_type           = "t3.xlarge"
         })
         tags = merge(local.ec2_instances.app.tags, {
-          ami              = "pd-cafm-a-11-a"
           description      = "RDS session host and app server"
-          pre-migration    = "PDFWA0011"
           update-ssm-agent = "patchgroup1"
+          server-type      = "PlanetFMApp"
         })
       })
 
