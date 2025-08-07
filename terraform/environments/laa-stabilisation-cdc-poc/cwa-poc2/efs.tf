@@ -16,6 +16,31 @@ resource "aws_efs_file_system" "cwa" {
 
 }
 
+resource "aws_efs_file_system_policy" "efs_lambda_cross_account" {
+  file_system_id = aws_efs_file_system.cwa.id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Principal = {
+          AWS = "arn:aws:iam::160937340532:role/hub20-cwa-extract-lambda-role"
+        },
+        Action = [
+          "elasticfilesystem:ClientMount",
+          "elasticfilesystem:ClientWrite",
+          "elasticfilesystem:ClientRootAccess",
+          "elasticfilesystem:DescribeMountTargets"
+        ],
+        Resource = [
+          "${aws_efs_file_system.cwa.arn}"
+        ]
+      }
+    ]
+  })
+}
+
 resource "aws_efs_access_point" "cwa_lambda_access_point" {
   file_system_id = aws_efs_file_system.cwa.id
   
