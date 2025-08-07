@@ -27,6 +27,35 @@ locals {
     var.athena_dump_bucket.arn,
     var.cadt_bucket.arn
   ]
+  iam_policy_documents = var.secret_arn != null ? [
+    data.aws_iam_policy_document.load_data.json,
+    data.aws_iam_policy_document.get_secrets[0].json
+  ] : [data.aws_iam_policy_document.load_data.json]
+}
+
+data "aws_iam_policy_document" "get_secrets" {
+  #checkov:skip=CKV_AWS_356
+  #checkov:skip=CKV_AWS_111
+  count = var.secret_arn != null ? 1 : 0
+  statement {
+    sid = "GetCredentials${var.name}"
+    effect = "Allow"
+    actions = [
+      "secretsmanager:GetResourcePolicy",
+      "secretsmanager:GetSecretValue",
+      "secretsmanager:DescribeSecret",
+      "secretsmanager:ListSecretVersionIds"
+    ]
+    resources = [var.secret_arn]
+  }
+  statement {
+    sid = "ListAllSecrets"
+    effect = "Allow"
+    actions = [
+      "secretsmanager:ListSecrets",
+    ]
+    resources = ["*"]
+  }
 }
 
 data "aws_region" "current" {}
@@ -120,7 +149,7 @@ module "ap_database_sharing" {
   environment          = var.environment
   role_name_suffix     = local.role_name_suffix
   role_description     = "${var.name} database permissions"
-  iam_policy_document  = data.aws_iam_policy_document.load_data.json
+  iam_policy_documents = local.iam_policy_documents
   secret_code          = var.secret_code
   oidc_arn             = var.oidc_arn
   max_session_duration = var.max_session_duration
