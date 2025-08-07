@@ -21,17 +21,17 @@ locals {
       /* EKS */
       eks_sso_access_role = "modernisation-platform-sandbox"
       eks_cluster_version = "1.33"
-      eks_node_version    = "1.41.0-bc3ad241"
+      eks_node_version    = "1.42.0-5ed15786"
       eks_cluster_addon_versions = {
-        coredns                           = "v1.12.1-eksbuild.2"
         kube_proxy                        = "v1.33.0-eksbuild.2"
-        aws_ebs_csi_driver                = "v1.44.0-eksbuild.1"
-        aws_efs_csi_driver                = "v2.1.8-eksbuild.1"
-        aws_guardduty_agent               = "v1.10.0-eksbuild.2"
-        aws_network_flow_monitoring_agent = "v1.0.2-eksbuild.5"
-        eks_pod_identity_agent            = "v1.3.7-eksbuild.2"
+        aws_efs_csi_driver                = "v2.1.9-eksbuild.1"
+        aws_network_flow_monitoring_agent = "v1.0.2-eksbuild.6"
         eks_node_monitoring_agent         = "v1.3.0-eksbuild.2"
-        vpc_cni                           = "v1.19.6-eksbuild.1"
+        coredns                           = "v1.12.2-eksbuild.4"
+        eks_pod_identity_agent            = "v1.3.8-eksbuild.2"
+        aws_guardduty_agent               = "v1.10.0-eksbuild.2"
+        aws_ebs_csi_driver                = "v1.46.0-eksbuild.1"
+        vpc_cni                           = "v1.20.0-eksbuild.1"
       }
 
       /* Data Engineering Airflow */
@@ -70,17 +70,17 @@ locals {
       /* EKS */
       eks_sso_access_role = "modernisation-platform-developer"
       eks_cluster_version = "1.33"
-      eks_node_version    = "1.41.0-bc3ad241"
+      eks_node_version    = "1.42.0-5ed15786"
       eks_cluster_addon_versions = {
-        coredns                           = "v1.12.1-eksbuild.2"
         kube_proxy                        = "v1.33.0-eksbuild.2"
-        aws_ebs_csi_driver                = "v1.44.0-eksbuild.1"
-        aws_efs_csi_driver                = "v2.1.8-eksbuild.1"
-        aws_guardduty_agent               = "v1.10.0-eksbuild.2"
-        aws_network_flow_monitoring_agent = "v1.0.2-eksbuild.5"
-        eks_pod_identity_agent            = "v1.3.7-eksbuild.2"
+        aws_efs_csi_driver                = "v2.1.9-eksbuild.1"
+        aws_network_flow_monitoring_agent = "v1.0.2-eksbuild.6"
         eks_node_monitoring_agent         = "v1.3.0-eksbuild.2"
-        vpc_cni                           = "v1.19.6-eksbuild.1"
+        coredns                           = "v1.12.2-eksbuild.4"
+        eks_pod_identity_agent            = "v1.3.8-eksbuild.2"
+        aws_guardduty_agent               = "v1.10.0-eksbuild.2"
+        aws_ebs_csi_driver                = "v1.46.0-eksbuild.1"
+        vpc_cni                           = "v1.20.0-eksbuild.1"
       }
 
       /* Data Engineering Airflow */
@@ -119,17 +119,17 @@ locals {
       /* EKS */
       eks_sso_access_role = "modernisation-platform-developer"
       eks_cluster_version = "1.33"
-      eks_node_version    = "1.41.0-bc3ad241"
+      eks_node_version    = "1.42.0-5ed15786"
       eks_cluster_addon_versions = {
-        coredns                           = "v1.12.1-eksbuild.2"
         kube_proxy                        = "v1.33.0-eksbuild.2"
-        aws_ebs_csi_driver                = "v1.44.0-eksbuild.1"
-        aws_efs_csi_driver                = "v2.1.8-eksbuild.1"
-        aws_guardduty_agent               = "v1.10.0-eksbuild.2"
-        aws_network_flow_monitoring_agent = "v1.0.2-eksbuild.5"
-        eks_pod_identity_agent            = "v1.3.7-eksbuild.2"
+        aws_efs_csi_driver                = "v2.1.9-eksbuild.1"
+        aws_network_flow_monitoring_agent = "v1.0.2-eksbuild.6"
         eks_node_monitoring_agent         = "v1.3.0-eksbuild.2"
-        vpc_cni                           = "v1.19.6-eksbuild.1"
+        coredns                           = "v1.12.2-eksbuild.4"
+        eks_pod_identity_agent            = "v1.3.8-eksbuild.2"
+        aws_guardduty_agent               = "v1.10.0-eksbuild.2"
+        aws_ebs_csi_driver                = "v1.46.0-eksbuild.1"
+        vpc_cni                           = "v1.20.0-eksbuild.1"
       }
 
       /* Data Engineering Airflow */

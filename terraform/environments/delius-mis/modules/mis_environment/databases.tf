@@ -80,6 +80,8 @@ module "oracle_db_dsd" {
 
   deploy_oracle_stats = false
 
+  enable_cloudwatch_alarms = try(var.dsd_db_config.enable_cloudwatch_alarms, true)
+
   sns_topic_arn = aws_sns_topic.delius_mis_alarms.arn
 
   providers = {
@@ -132,6 +134,8 @@ module "oracle_db_boe" {
   instance_profile_policies = local.boe_instance_policies
 
   deploy_oracle_stats = false
+
+  enable_cloudwatch_alarms = try(var.boe_db_config.enable_cloudwatch_alarms, true)
 
   sns_topic_arn = aws_sns_topic.delius_mis_alarms.arn
 
@@ -186,6 +190,8 @@ module "oracle_db_mis" {
   instance_profile_policies = local.mis_instance_policies
 
   deploy_oracle_stats = false
+
+  enable_cloudwatch_alarms = try(var.mis_db_config.enable_cloudwatch_alarms, true)
 
   sns_topic_arn = aws_sns_topic.delius_mis_alarms.arn
 

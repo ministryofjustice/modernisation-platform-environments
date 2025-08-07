@@ -8,6 +8,11 @@ variable "environment" {
   description = "Environment"
 }
 
+variable "account_id" {
+  type        = string
+  description = "ID of the curret account."
+}
+
 variable "tags" {
   type        = map(any)
   description = "Tags to apply to resources, where applicable"

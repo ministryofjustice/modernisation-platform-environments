@@ -3,9 +3,10 @@ module "redshift" {
 
   project_name = local.project_name
   environment  = local.environment
-  tags         = local.tags
 
-  #Network details
+  tags = local.tags
+
+  # Network details
   vpc_id           = data.aws_vpc.shared.id
   database_subnets = local.data_subnet_list[*].id
 
@@ -18,7 +19,7 @@ module "redshift" {
   vpc_cidr = data.aws_vpc.shared.cidr_block
 
   # [TODO] Replace the role below with the equicelent in the new environment
-  # data_science_role = "arn:aws:iam::066012302209:role/data_science"
+  data_science_role = "arn:aws:iam::${local.account_id}:role/${local.yjb_data_scientist_role_name}"
 
   depends_on = [module.aurora, module.s3]
 }

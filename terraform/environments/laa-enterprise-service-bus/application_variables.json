@@ -1,0 +1,19 @@
+{
+  "accounts": {
+    "development": {
+      "example_var": "dev-data",
+      "cwa_database_ip": "10.26.60.170/32",
+      "vpc_endpoint_sg": "sg-0754d9a309704addd",
+      "ccms_database_ip": "10.26.60.223/32"
+    },
+    "test": {
+      "example_var": "test-data"
+    },
+    "preproduction": {
+      "example_var": "preproduction-data"
+    },
+    "production": {
+      "example_var": "production-data"
+    }
+  }
+}

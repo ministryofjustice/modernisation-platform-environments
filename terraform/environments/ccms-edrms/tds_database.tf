@@ -43,6 +43,10 @@ resource "aws_db_instance" "tds_db" {
   db_subnet_group_name    = aws_db_subnet_group.tds.id
   option_group_name       = aws_db_option_group.tds_oracle_19.id
   license_model           = "bring-your-own-license"
+  tags = merge(
+    local.tags,
+    { instance-scheduling = "skip-scheduling" }
+  )
   enabled_cloudwatch_logs_exports = [
     "alert",
     "audit",

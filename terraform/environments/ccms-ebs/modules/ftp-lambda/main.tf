@@ -44,7 +44,12 @@ resource "aws_iam_policy" "ftp_policy" {
         Resource = "*"
       },
       {
-        Action = ["s3:*"],
+        Action : [
+          "s3:PutObject",
+          "s3:GetObject",
+          "s3:ListBucket",
+          "s3:DeleteObject"
+        ],
         Effect = "Allow",
         Resource = [
           "arn:aws:s3:::${var.ftp_bucket}",
@@ -74,10 +79,8 @@ resource "aws_iam_role_policy_attachment" "ftp_lambda_policy_attach" {
 
 ### lambda layer for python dependencies
 resource "aws_lambda_layer_version" "ftp_layer" {
-  layer_name          = "ftpclientlayer"
-  compatible_runtimes = ["python3.13"]
-  # filename    = data.archive_file.lambda_layer.output_path
-  # source_code_hash = data.archive_file.lambda_layer.output_base64sha256
+  layer_name               = "ftpclientlayer"
+  compatible_runtimes      = ["python3.13"]
   s3_bucket                = var.s3_bucket_ftp
   s3_key                   = var.s3_object_ftp_clientlibs
   compatible_architectures = ["x86_64"]
@@ -92,8 +95,7 @@ resource "aws_lambda_function" "ftp_lambda" {
   timeout       = 900
   memory_size   = 256
   layers        = [aws_lambda_layer_version.ftp_layer.arn]
-  # filename      = data.archive_file.lambda_zip.output_path
-  # source_code_hash = data.archive_file.lambda_zip.output_base64sha256
+
   s3_bucket = var.s3_bucket_ftp
   s3_key    = var.s3_object_ftp_client
 
@@ -123,25 +125,25 @@ resource "aws_lambda_function" "ftp_lambda" {
   }
 }
 # ### cw rule for schedule
-# resource "aws_cloudwatch_event_rule" "ftp_schedule" {
-#   count               = var.env == "production" ? 1 : 0
-#   name                = "${var.lambda_name}-schedule"
-#   schedule_expression = var.ftp_cron
-# }
-# ### cw event lambda target
-# resource "aws_cloudwatch_event_target" "ftp_target" {
-#   count     = var.env == "production" ? 1 : 0
-#   rule      = aws_cloudwatch_event_rule.ftp_schedule[count.index].name
-#   target_id = "ftp-lambda"
-#   arn       = aws_lambda_function.ftp_lambda.arn
-# }
+resource "aws_cloudwatch_event_rule" "ftp_schedule" {
+  count               = var.env != "production" ? 1 : 0
+  name                = "${var.lambda_name}-schedule"
+  schedule_expression = var.ftp_cron
+}
+### cw event lambda target
+resource "aws_cloudwatch_event_target" "ftp_target" {
+  count     = var.env != "production" ? 1 : 0
+  rule      = aws_cloudwatch_event_rule.ftp_schedule[count.index].name
+  target_id = "ftp-lambda"
+  arn       = aws_lambda_function.ftp_lambda.arn
+}
 
-# ### allow cw to event in lambda
-# resource "aws_lambda_permission" "ftp_permission" {
-#   count         = var.env == "production" ? 1 : 0
-#   statement_id  = "AllowExecutionFromCloudWatch"
-#   action        = "lambda:InvokeFunction"
-#   function_name = aws_lambda_function.ftp_lambda.function_name
-#   principal     = "events.amazonaws.com"
-#   source_arn    = aws_cloudwatch_event_rule.ftp_schedule[count.index].arn
-# }
+### allow cw to event in lambda
+resource "aws_lambda_permission" "ftp_permission" {
+  count         = var.env != "production" ? 1 : 0
+  statement_id  = "AllowExecutionFromCloudWatch"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.ftp_lambda.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.ftp_schedule[count.index].arn
+}

@@ -112,3 +112,34 @@ module "managed_prometheus_kms_access_iam_policy" {
 
   tags = local.tags
 }
+
+
+data "aws_iam_policy_document" "ecr_pull_through_cache" {
+  statement {
+    sid    = "AllowECRPullThroughCache"
+    effect = "Allow"
+    actions = [
+      "ecr:BatchImportUpstreamImage",
+      "ecr:CreateRepository",
+      "ecr:TagResource"
+    ]
+    resources = [
+      "arn:aws:ecr:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:repository/ecr/*",
+      "arn:aws:ecr:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:repository/github/*"
+    ]
+  }
+}
+
+module "ecr_pull_through_cache_iam_policy" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
+  version = "5.58.0"
+
+  name_prefix = "ecr-pull-through-cache"
+
+  policy = data.aws_iam_policy_document.ecr_pull_through_cache.json
+
+  tags = local.tags
+}

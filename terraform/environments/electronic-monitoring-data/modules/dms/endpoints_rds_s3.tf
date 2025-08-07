@@ -7,7 +7,7 @@ resource "aws_dms_endpoint" "dms_rds_source" {
   endpoint_type = "source"
   engine_name   = "sqlserver"
   #checkov:skip=CKV_AWS_296
-  #   kms_key_arn                 = aws_db_instance.database_2022.kms_key_id
+  #   kms_key_arn                 = aws_db_instance.database_2022[0].kms_key_id
   password    = var.rds_db_instance_pasword
   port        = var.rds_db_instance_port
   server_name = var.rds_db_server_name
@@ -45,7 +45,7 @@ resource "aws_dms_s3_endpoint" "dms_s3_parquet_target" {
   # cdc_path                                    = "cdc/path"
   # compression_type                            = "NONE"
   # csv_delimiter     = ","
-  # csv_no_sup_value  = "false"
+  csv_no_sup_value = "false"
   # csv_null_value    = "null"
   # csv_row_delimiter = "\\n"
   data_format    = "parquet"

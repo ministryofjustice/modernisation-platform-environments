@@ -202,6 +202,21 @@
         "store_type": "gp3",
         "parameter_group_family": "postgres17",
         "parameter_group_name": "pg17-with-pglogical"
+      },
+      "missing_report_submissions_rds": {
+        "enable": true,
+        "create_replica": true,
+        "engine": "aurora-postgresql",
+        "engine_version": "16.8",
+        "init_size": "158",
+        "max_size": "1000",
+        "name": "missingreportsubmissions",
+        "db_identifier": "missingreportsubmissions",
+        "inst_class": "db.t3.medium",
+        "user": "postgres",
+        "store_type": "gp3",
+        "parameter_group_family": "postgres16",
+        "parameter_group_name": "with-pglogical"
       }
     },
     "test": {
@@ -385,6 +400,21 @@
         "name": "testdatabase",
         "db_identifier": "test-database",
         "inst_class": "db.t4g.large",
+        "user": "postgres",
+        "store_type": "gp3",
+        "parameter_group_family": "postgres16",
+        "parameter_group_name": "with-pglogical"
+      },
+      "missing_report_submissions_rds": {
+        "enable": true,
+        "create_replica": true,
+        "engine": "aurora-postgresql",
+        "engine_version": "16.8",
+        "init_size": "158",
+        "max_size": "1000",
+        "name": "missingreportsubmissions",
+        "db_identifier": "missingreportsubmissions",
+        "inst_class": "db.t3.medium",
         "user": "postgres",
         "store_type": "gp3",
         "parameter_group_family": "postgres16",
@@ -593,6 +623,21 @@
         "store_type": "gp3",
         "parameter_group_family": "postgres16",
         "parameter_group_name": "with-pglogical"
+      },
+      "missing_report_submissions_rds": {
+        "enable": true,
+        "create_replica": true,
+        "engine": "aurora-postgresql",
+        "engine_version": "16.8",
+        "init_size": "158",
+        "max_size": "1000",
+        "name": "missingreportsubmissions",
+        "db_identifier": "missingreportsubmissions",
+        "inst_class": "db.t3.medium",
+        "user": "postgres",
+        "store_type": "gp3",
+        "parameter_group_family": "postgres16",
+        "parameter_group_name": "with-pglogical"
       }
     },
     "production": {
@@ -791,6 +836,21 @@
         "name": "testdatabase",
         "db_identifier": "test-database",
         "inst_class": "db.t4g.large",
+        "user": "postgres",
+        "store_type": "gp3",
+        "parameter_group_family": "postgres16",
+        "parameter_group_name": "with-pglogical"
+      },
+      "missing_report_submissions_rds": {
+        "enable": true,
+        "create_replica": true,
+        "engine": "aurora-postgresql",
+        "engine_version": "16.8",
+        "init_size": "158",
+        "max_size": "1000",
+        "name": "missingreportsubmissions",
+        "db_identifier": "missingreportsubmissions",
+        "inst_class": "db.t3.medium",
         "user": "postgres",
         "store_type": "gp3",
         "parameter_group_family": "postgres16",

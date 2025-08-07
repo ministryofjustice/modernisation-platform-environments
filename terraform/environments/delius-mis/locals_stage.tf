@@ -337,9 +337,10 @@ locals {
 
   # MIS DB config
   mis_db_config_stage = {
-    instance_type  = "r7i.4xlarge"
-    instance_count = 0
-    ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
+    instance_type  = "r7i.4xlarge" # manually turn off when not in use to save costs
+    instance_count = 1
+    # most recent 8_5 image, ami builder needs fixing after this
+    ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2025-03-02T00-00-34.442Z"
 
     instance_policies = {
       "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access
@@ -384,6 +385,8 @@ locals {
       ansible_repo_basedir = "ansible"
       ansible_args         = "oracle_19c_install"
     }
+
+    enable_cloudwatch_alarms = false
   }
 
   fsx_config_stage = {
