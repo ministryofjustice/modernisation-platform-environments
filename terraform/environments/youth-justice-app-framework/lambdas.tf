@@ -85,7 +85,7 @@ resource "aws_security_group_rule" "allow_alb_from_canary" {
 
 resource "aws_cloudwatch_log_subscription_filter" "healthcheck" {
   name            = "firehose-subscription"
-  log_group_name  = "/aws/lambda/serverlessrepo-lambda-canary"
+  log_group_name  = module.serverlessrepo-lambda-canary.log_group_name
   filter_pattern  = ""
   destination_arn = module.datadog.aws_kinesis_firehose_delivery_stream_arn
   role_arn        = module.datadog.datadog_firehose_iam_role_arn
