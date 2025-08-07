@@ -49,7 +49,7 @@ module "s3-taskbuilder" {
   project_name = local.project_name
   environment  = local.environment
   tags         = local.tags
-  bucket_name  = ["yjaf-taskbuilder-moj-dev"]
+  bucket_name  = ["taskbuilder"]
 
   add_log_policy = true
 
