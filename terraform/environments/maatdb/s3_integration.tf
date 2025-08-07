@@ -163,33 +163,38 @@ data "aws_iam_policy_document" "bucket_policy" {
     }
   }
 
-  # dynamic "statement" {
-  #   for_each = (
-  #     local.build_transfer && length(aws_iam_role.transfer_role) > 0 && each.key == "inbound" ? [1] : []
-  #   )
+dynamic "statement" {
+  for_each = toset([
+    (
+      local.build_transfer &&
+      each.key == "inbound" &&
+      length(aws_iam_role.transfer_role) > 0
+    ) ? 1 : null
+  ])
 
-  #   content {
-  #     sid    = "AllowTransferUserAccess"
-  #     effect = "Allow"
+  content {
+    sid    = "AllowTransferUserAccess"
+    effect = "Allow"
 
-  #     principals {
-  #       type        = "AWS"
-  #       identifiers = [aws_iam_role.transfer_role[0].arn]
-  #     }
+    principals {
+      type        = "AWS"
+      identifiers = [aws_iam_role.transfer_role[0].arn]
+    }
 
-  #     actions = [
-  #       "s3:GetObject",
-  #       "s3:PutObject",
-  #       "s3:DeleteObject",
-  #       "s3:ListBucket"
-  #     ]
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:DeleteObject",
+      "s3:ListBucket"
+    ]
 
-  #     resources = [
-  #       each.value.bucket.arn,
-  #       "${each.value.bucket.arn}/*"
-  #     ]
-  #   }
-  # }
+    resources = [
+      each.value.bucket.arn,
+      "${each.value.bucket.arn}/*"
+    ]
+  }
+}
+
 
 
 }
