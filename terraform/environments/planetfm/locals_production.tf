@@ -40,31 +40,31 @@ locals {
         })
       })
 
-      pd-cafm-a-11-a = merge(local.ec2_instances.app, {
-        #cloudwatch_metric_alarms = merge(
-        #  local.ec2_instances.app.cloudwatch_metric_alarms,
-        #  module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows,
-        #)
-        cloudwatch_metric_alarms = {}
-        config = merge(local.ec2_instances.app.config, {
-          ami_name          = "pd-cafm-a-11-a"
-          availability_zone = "eu-west-2a"
-        })
-        ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
-          "/dev/sdb"  = { type = "gp3", size = 200 }
-        }
-        instance = merge(local.ec2_instances.app.instance, {
-          disable_api_termination = true
-          instance_type           = "t3.xlarge"
-        })
-        tags = merge(local.ec2_instances.app.tags, {
-          ami              = "pd-cafm-a-11-a"
-          description      = "RDS session host and app server"
-          pre-migration    = "PDFWA0011"
-          update-ssm-agent = "patchgroup1"
-        })
-      })
+      # pd-cafm-a-11-a = merge(local.ec2_instances.app, {
+      #   #cloudwatch_metric_alarms = merge(
+      #   #  local.ec2_instances.app.cloudwatch_metric_alarms,
+      #   #  module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows,
+      #   #)
+      #   cloudwatch_metric_alarms = {}
+      #   config = merge(local.ec2_instances.app.config, {
+      #     ami_name          = "pd-cafm-a-11-a"
+      #     availability_zone = "eu-west-2a"
+      #   })
+      #   ebs_volumes = {
+      #     "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+      #     "/dev/sdb"  = { type = "gp3", size = 200 }
+      #   }
+      #   instance = merge(local.ec2_instances.app.instance, {
+      #     disable_api_termination = true
+      #     instance_type           = "t3.xlarge"
+      #   })
+      #   tags = merge(local.ec2_instances.app.tags, {
+      #     ami              = "pd-cafm-a-11-a"
+      #     description      = "RDS session host and app server"
+      #     pre-migration    = "PDFWA0011"
+      #     update-ssm-agent = "patchgroup1"
+      #   })
+      # })
 
       pd-cafm-a-12-b = merge(local.ec2_instances.app, {
         cloudwatch_metric_alarms = merge(
