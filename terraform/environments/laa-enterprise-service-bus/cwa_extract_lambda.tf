@@ -35,6 +35,16 @@ resource "aws_security_group_rule" "cwa_extract_egress_https_new" {
   description              = "Outbound 443 to LAA VPC Endpoint SG"
 }
 
+resource "aws_security_group_rule" "cwa_extract_egress_efs" {
+  type                     = "egress"
+  from_port                = 2049
+  to_port                  = 2049
+  protocol                 = "tcp"
+  source_security_group_id = local.application_data.accounts[local.environment].cwa_efs_sg
+  security_group_id        = aws_security_group.cwa_extract_new.id
+  description              = "Outbound NFS to CWA EFS SG"
+}
+
 ######################################
 ### Lambda Resources
 ######################################
