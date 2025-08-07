@@ -23,7 +23,7 @@ resource "aws_lambda_function" "main" {
     for_each = var.lambda.log_group != null ? [var.lambda.log_group] : []
     content {
       log_format = "Text"
-      log_group  = aws_cloudwatch_log_group.log_group.name
+      log_group  = aws_cloudwatch_log_group.log_group[0].name
     }
   }
 
