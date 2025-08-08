@@ -11,37 +11,6 @@ data "aws_vpc" "shared" {
   }
 }
 
-data "aws_subnets" "shared_private" {
-  filter {
-    name   = "vpc-id"
-    values = [data.aws_vpc.shared.id]
-  }
-  tags = {
-    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private*"
-  }
-}
-
-data "aws_subnet" "shared_private_subnets_a" {
-  vpc_id = data.aws_vpc.shared.id
-  tags = {
-    "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private-${data.aws_region.current.name}a"
-  }
-}
-
-data "aws_subnet" "shared_private_subnets_b" {
-  vpc_id = data.aws_vpc.shared.id
-  tags = {
-    "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private-${data.aws_region.current.name}b"
-  }
-}
-
-data "aws_subnet" "shared_private_subnets_c" {
-  vpc_id = data.aws_vpc.shared.id
-  tags = {
-    "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private-${data.aws_region.current.name}c"
-  }
-}
-
 data "aws_ssoadmin_instances" "main" {
   provider = aws.sso-readonly
 }
@@ -158,21 +127,7 @@ data "kubernetes_service_account" "mwaa_external_secrets_analytical_platform_dat
   }
 }
 
-# VPC sources
-data "aws_vpc" "apc" {
-  tags = {
-    "Name" = "${local.application_name}-${local.environment}"
-  }
-}
-
-data "aws_subnets" "apc_private" {
-  filter {
-    name   = "vpc-id"
-    values = [data.aws_vpc.apc.id]
-  }
-
-  filter {
-    name   = "tag:Name"
-    values = ["${local.application_name}-${local.environment}-private*"]
-  }
+data "aws_route53_zone" "network_services" {
+  name         = local.route53_zone
+  private_zone = false
 }

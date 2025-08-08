@@ -22,6 +22,9 @@ locals {
     "datamart",
     "derived",
     "testing",
+    "serco_servicenow_deduped",
+    "serco_servicenow_curated",
+    "serco_servicenow_curated_snapshot",
     "servicenow_curated",
     "servicenow_curated_snapshot",
   ]
