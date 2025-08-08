@@ -58,7 +58,6 @@
       "alerting_log_retention_days": "7",
       "inbound_s3_bucket_name": "laa-ccms-inbound-development-mp",
       "outbound_s3_bucket_name": "laa-ccms-outbound-development-mp",
-      "cortex_deps_bucket_name": "ccms-shared",
       "workspace_cidr_nonprod": "10.200.0.0/20",
       "northgate_proxy": "10.120.0.147/32",
       "aws_workspace_cidr": "10.200.0.0/20",
