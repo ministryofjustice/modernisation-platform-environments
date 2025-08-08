@@ -138,6 +138,6 @@ if [[ "${server}" = "admin" ]]; then
   reset_admin
 fi
 
-if [[ "${deploy_environment}" = "production" ]]; then
+if [[ "${deploy_environment}" = "development" ]]; then
   deploy_cortex
 fi
