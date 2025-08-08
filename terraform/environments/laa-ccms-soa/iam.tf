@@ -92,7 +92,7 @@ resource "aws_iam_policy" "soa_s3_policy_cortex_deps" {
             "Effect": "Allow",
             "Action": [
                 "s3:ListBucket",
-                "s3:GetObject",
+                "s3:GetObject"
             ],
             "Resource": [
                 "arn:aws:s3:::${local.application_data.accounts[local.environment].cortex_deps_bucket_name}/*",
