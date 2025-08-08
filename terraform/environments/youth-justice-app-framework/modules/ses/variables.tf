@@ -37,3 +37,9 @@ variable "region" {
   type        = string
   default     = "eu-west-2"
 }
+
+variable "ses_email_identities" {
+  description = "List of SES email identities"
+  type        = list(string)
+  default     = []
+}
