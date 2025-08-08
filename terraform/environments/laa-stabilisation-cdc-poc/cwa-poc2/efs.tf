@@ -45,20 +45,15 @@ resource "aws_efs_file_system_policy" "efs_lambda_cross_account" {
 }
 
 resource "aws_efs_access_point" "cwa_lambda_access_point" {
-  file_system_id = aws_efs_file_system.cwa.id 
+  file_system_id = aws_efs_file_system.cwa.id
   
   posix_user {
-    uid = 0
-    gid = 0
+    uid = 1000
+    gid = 1000
   }
-
+  
   root_directory {
-    path = "/efs"
-    creation_info {
-      owner_uid   = 0
-      owner_gid   = 0
-      permissions = "0755"
-    }
+    path = "/"
   }
 }
 
