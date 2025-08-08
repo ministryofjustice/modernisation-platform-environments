@@ -54,3 +54,17 @@ module "s3-taskbuilder" {
   add_log_policy = true
 
 }
+
+module "s3-sbom" {
+  #only in prod
+  count  = local.environment == "development" ? 1 : 0
+  source = "./modules/s3"
+
+  project_name = local.project_name
+  environment  = local.environment
+  tags         = local.tags
+  bucket_name  = ["application-sbom"]
+
+  add_log_policy = true
+
+}
