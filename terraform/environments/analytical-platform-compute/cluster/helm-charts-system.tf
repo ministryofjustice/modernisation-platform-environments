@@ -51,7 +51,7 @@ resource "helm_release" "aws_for_fluent_bit" {
     templatefile(
       "${path.module}/src/helm/values/aws-for-fluent-bit/values.yml.tftpl",
       {
-        aws_region                = data.aws_region.current.name
+        aws_region                = data.aws_region.current.region
         cluster_name              = module.eks.cluster_name
         cloudwatch_log_group_name = module.eks_log_group.cloudwatch_log_group_name
         eks_role_arn              = module.aws_for_fluent_bit_iam_role.iam_role_arn
@@ -77,7 +77,7 @@ resource "helm_release" "amazon_prometheus_proxy" {
     templatefile(
       "${path.module}/src/helm/values/amazon-prometheus-proxy/values.yml.tftpl",
       {
-        aws_region       = data.aws_region.current.name
+        aws_region       = data.aws_region.current.region
         eks_role_arn     = module.amazon_prometheus_proxy_iam_role.iam_role_arn
         amp_workspace_id = module.managed_prometheus.workspace_id
       }
@@ -103,7 +103,7 @@ resource "helm_release" "cluster_autoscaler" {
     templatefile(
       "${path.module}/src/helm/values/cluster-autoscaler/values.yml.tftpl",
       {
-        aws_region                = data.aws_region.current.name
+        aws_region                = data.aws_region.current.region
         cluster_name              = module.eks.cluster_name
         eks_role_arn              = module.cluster_autoscaler_iam_role.iam_role_arn
         service_monitor_namespace = kubernetes_namespace.cluster_autoscaler.metadata[0].name
@@ -232,7 +232,7 @@ resource "helm_release" "cert_manager_issuers" {
       "${path.module}/src/helm/values/cert-manager-issuers/values.yml.tftpl",
       {
         acme_email               = "analytical-platform+compute-cert-manager@digital.justice.gov.uk"
-        aws_region               = data.aws_region.current.name
+        aws_region               = data.aws_region.current.region
         http_issuer_ingress_name = "default"
       }
     )
