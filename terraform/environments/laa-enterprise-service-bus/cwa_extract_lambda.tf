@@ -66,10 +66,10 @@ resource "aws_lambda_function" "cwa_extract" {
     "arn:aws:lambda:eu-west-2:017000801446:layer:AWSLambdaPowertoolsPython:2"
   ]
 
-  file_system_config {
-    arn              = "arn:aws:elasticfilesystem:eu-west-2:940482439836:access-point/fsap-025357cb3b01417b9"
-    local_mount_path = "/mnt/efs"
-  }
+  # file_system_config {
+  #   arn              = "arn:aws:elasticfilesystem:eu-west-2:940482439836:access-point/fsap-025357cb3b01417b9"
+  #   local_mount_path = "/mnt/efs"
+  # }
 
   vpc_config {
     security_group_ids = [aws_security_group.cwa_extract_new.id]
