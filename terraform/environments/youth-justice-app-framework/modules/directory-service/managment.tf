@@ -73,6 +73,10 @@ resource "aws_iam_role_policy_attachment" "join_ad_role_policy_core" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
+resource "aws_iam_role_policy_attachment" "join_ad_role_policy_Cloudwatch" {
+  role       = aws_iam_role.join_ad_role.name
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+}
 
 
 #Create an instance profile for your EC2 instance
