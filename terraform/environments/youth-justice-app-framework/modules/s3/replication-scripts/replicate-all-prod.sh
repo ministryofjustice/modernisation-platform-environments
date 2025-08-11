@@ -19,3 +19,5 @@
 ./replication.sh prod yjsm-prod-artefact 066012302209 yjaf-production-yjsm-artefact 586794462316
 ./replication.sh prod yjaf-prod-yjsm 066012302209 yjaf-production-yjsm 586794462316
 #./replication.sh prod yjaf-prod-replication-source 066012302209 yjaf-production-transfer 586794462316
+./replication.sh prod historical-prodinfrastructure 066012302209 yjaf-production-historical-infrastructure 586794462316
+./replication.sh prod historical-prodapps 066012302209 yjaf-production-historical-apps 586794462316
