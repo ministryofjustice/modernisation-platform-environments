@@ -42,8 +42,8 @@ module "s3" {
 }
 
 module "s3-taskbuilder" {
-  #only in prod
-  count  = local.environment == "development" ? 1 : 0
+  #only in development or prod
+  count  = local.environment == "development" || local.environment == "preproduction" ? 1 : 0
   source = "./modules/s3"
 
   project_name = local.project_name
@@ -56,8 +56,8 @@ module "s3-taskbuilder" {
 }
 
 module "s3-sbom" {
-  #only in prod
-  count  = local.environment == "development" ? 1 : 0
+  #only in development or prod
+  count  = local.environment == "development" || local.environment == "preproduction" ? 1 : 0
   source = "./modules/s3"
 
   project_name = local.project_name
