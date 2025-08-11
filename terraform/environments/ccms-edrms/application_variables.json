@@ -114,7 +114,8 @@
       "target_min_capacity": "1",
       "target_max_capacity": "3",
       "logging_level_root": "info",
-      "db_log_retention_days": "0"
+      "db_log_retention_days": "0",
+      "cortex_deps_bucket_name": "ccms-shared"
     }
   }
 }
