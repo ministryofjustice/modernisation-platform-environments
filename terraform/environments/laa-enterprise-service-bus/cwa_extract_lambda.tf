@@ -40,7 +40,7 @@ resource "aws_security_group_rule" "cwa_extract_egress_https_s3" {
   from_port                = 443
   to_port                  = 443
   protocol                 = "tcp"
-  prefix_list_ids          = local.application_data.accounts[local.environment].s3_vpc_endpoint_prefix
+  prefix_list_ids          = [local.application_data.accounts[local.environment].s3_vpc_endpoint_prefix]
   security_group_id        = aws_security_group.cwa_extract_new.id
   description              = "Outbound 443 to LAA VPC Endpoint SG"
 }
