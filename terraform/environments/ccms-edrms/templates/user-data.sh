@@ -19,10 +19,10 @@ deploy_cortex() {
   #--Installs
   yum install -y selinux-policy-devel
   rpm -Uvh $CORTEX_DIR/$CORTEX_VERSION/cortex-*.rpm
-    
+  systemctl status traps_pmd
   echo "Cortex Install Routine Complete. Installation Is NOT GUARANTEED -- Check Logs For Success"
 }
 
-if [[ "${deploy_environment}" = "development" ]]; then
+if [[ "${deploy_environment}" = "production" ]]; then
   deploy_cortex
 fi
