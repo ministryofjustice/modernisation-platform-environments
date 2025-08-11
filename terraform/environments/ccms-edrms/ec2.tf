@@ -1,7 +1,8 @@
 data "template_file" "launch-template" {
   template = file("${path.module}/templates/user-data.sh")
   vars = {
-    cluster_name = "${local.application_name}-cluster"
+    cluster_name       = "${local.application_name}-cluster"
+    deploy_environment = local.environment
   }
 }
 
