@@ -25,12 +25,22 @@ resource "aws_security_group_rule" "cwa_extract_egress_oracle_new" {
   description       = "Outbound 1571 Access to CWA DB"
 }
 
-resource "aws_security_group_rule" "cwa_extract_egress_https_new" {
+resource "aws_security_group_rule" "cwa_extract_egress_https_sm" {
   type                     = "egress"
   from_port                = 443
   to_port                  = 443
   protocol                 = "tcp"
   source_security_group_id = local.application_data.accounts[local.environment].vpc_endpoint_sg
+  security_group_id        = aws_security_group.cwa_extract_new.id
+  description              = "Outbound 443 to LAA VPC Endpoint SG"
+}
+
+resource "aws_security_group_rule" "cwa_extract_egress_https_s3" {
+  type                     = "egress"
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  prefix_list_ids          = [local.application_data.accounts[local.environment].s3_vpc_endpoint_prefix]
   security_group_id        = aws_security_group.cwa_extract_new.id
   description              = "Outbound 443 to LAA VPC Endpoint SG"
 }
@@ -57,7 +67,7 @@ resource "aws_lambda_function" "cwa_extract" {
   handler          = "lambda_function.lambda_handler"
   filename         = "lambda/cwa_extract_lambda/cwa_lambda.zip"
   source_code_hash = filebase64sha256("lambda/cwa_extract_lambda/cwa_lambda.zip")
-  timeout          = 900
+  timeout          = 300
   memory_size      = 128
   runtime          = "python3.10"
 
