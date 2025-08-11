@@ -26,5 +26,6 @@ resource "aws_secretsmanager_secret_version" "private_key_version" {
 
   # Format the secret string with username and password
   secret_string_wo = module.key_pair.private_key_pem
+  secret_string_wo_version = 1
 
 }
