@@ -25,7 +25,7 @@ resource "aws_security_group_rule" "cwa_extract_egress_oracle_new" {
   description       = "Outbound 1571 Access to CWA DB"
 }
 
-resource "aws_security_group_rule" "cwa_extract_egress_https_new" {
+resource "aws_security_group_rule" "cwa_extract_egress_https_sm" {
   type                     = "egress"
   from_port                = 443
   to_port                  = 443
@@ -35,7 +35,7 @@ resource "aws_security_group_rule" "cwa_extract_egress_https_new" {
   description              = "Outbound 443 to LAA VPC Endpoint SG"
 }
 
-resource "aws_security_group_rule" "cwa_extract_egress_https_new" {
+resource "aws_security_group_rule" "cwa_extract_egress_https_s3" {
   type                     = "egress"
   from_port                = 443
   to_port                  = 443
