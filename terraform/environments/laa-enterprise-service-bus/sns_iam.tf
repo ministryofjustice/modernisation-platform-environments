@@ -10,7 +10,10 @@ resource "aws_iam_role" "publisher_role" {
       {
         Effect = "Allow"
         Principal = {
-          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+          AWS = [
+            "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root",
+            aws_iam_role.cwa_extract_lambda_role.arn
+          ]
         }
         Action = "sts:AssumeRole"
       }

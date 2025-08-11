@@ -41,15 +41,6 @@ resource "aws_sns_topic_policy" "priority_p1_policy" {
         }
         Action = "sns:Subscribe"
         Resource = aws_sns_topic.priority_p1.arn
-      },
-      {
-        Sid = "AllowCWALambda"
-        Effect = "Allow"
-        Principal = {
-          AWS = aws_iam_role.cwa_extract_lambda_role.arn
-        }
-        Action = "sns:Publish"
-        Resource = aws_sns_topic.priority_p1.arn
       }
     ]
   })
@@ -98,15 +89,6 @@ resource "aws_sns_topic_policy" "provider_banks_policy" {
           AWS = aws_iam_role.subscriber_role.arn
         }
         Action = "sns:Subscribe"
-        Resource = aws_sns_topic.provider_banks.arn
-      },
-      {
-        Sid = "AllowCWALambda"
-        Effect = "Allow"
-        Principal = {
-          AWS = aws_iam_role.cwa_extract_lambda_role.arn
-        }
-        Action = "sns:Publish"
         Resource = aws_sns_topic.provider_banks.arn
       }
     ]
