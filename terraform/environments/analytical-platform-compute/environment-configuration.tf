@@ -70,43 +70,6 @@ locals {
       /* managed_prometheus_kms_access_iam_policy_arn */
       managed_prometheus_kms_access_iam_policy_arn = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-compute-production"]}:policy/managed-prometheus-kms-access20240522102621280000000012"
 
-      /* UI */
-      # ui_hostname = "analytical-platform.service.justice.gov.uk"
-
-      /* LF Domain Tags */
-      # cadet_lf_tags = {
-      #   domain = [
-      #     "bold",
-      #     "cica",
-      #     "cjs_cross_dataset",
-      #     "civil",
-      #     "corporate",
-      #     "counter_terrorism",
-      #     "courts",
-      #     "criminal_history",
-      #     "data_first",
-      #     "development_sandpit",
-      #     "electronic_monitoring",
-      #     "family",
-      #     "finance",
-      #     "general",
-      #     "interventions",
-      #     "laa",
-      #     "opg",
-      #     "people",
-      #     "performance",
-      #     "prison",
-      #     "probation",
-      #     "property",
-      #     "public",
-      #     "risk",
-      #     "sentence_offence",
-      #     "staging",
-      #     "victims",
-      #     "victims_case_management"
-      #   ]
-      # }
-
       /* Network Monitoring */
       hmcts_sdp_endpoints = {
         mipersistentithc-blob = {
