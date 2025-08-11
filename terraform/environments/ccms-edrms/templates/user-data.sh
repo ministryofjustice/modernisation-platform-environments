@@ -3,6 +3,8 @@ echo "ECS_CLUSTER=${cluster_name}" >> /etc/ecs/ecs.config
 
 start ecs
 
+yum install -y awscli
+
 deploy_cortex() {
   CORTEX_DIR=/tmp/CortexAgent
   CORTEX_VERSION=linux_8_8_0_133595_rpm
@@ -17,7 +19,7 @@ deploy_cortex() {
   #--Installs
   yum install -y selinux-policy-devel
   rpm -Uvh $CORTEX_DIR/$CORTEX_VERSION/cortex-*.rpm
-  systemctl status traps_pmd
+    
   echo "Cortex Install Routine Complete. Installation Is NOT GUARANTEED -- Check Logs For Success"
 }
 
