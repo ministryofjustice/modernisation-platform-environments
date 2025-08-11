@@ -27,7 +27,7 @@ module "eks_cluster_logs_kms" {
           identifiers = ["logs.${data.aws_region.current.region}.amazonaws.com"]
         }
       ]
-      conditions = [
+      condition = [
         {
           test     = "ArnEquals"
           variable = "kms:EncryptionContext:aws:logs:arn"
@@ -74,7 +74,7 @@ module "eks_ebs_kms" {
           identifiers = ["*"]
         }
       ]
-      conditions = [
+      condition = [
         {
           test     = "StringEquals"
           variable = "kms:ViaService"
@@ -153,7 +153,7 @@ module "managed_prometheus_kms" {
           identifiers = ["*"]
         }
       ]
-      conditions = [
+      condition = [
         {
           test     = "StringEquals"
           variable = "kms:ViaService"
@@ -232,7 +232,7 @@ module "managed_prometheus_logs_kms" {
           identifiers = ["logs.${data.aws_region.current.region}.amazonaws.com"]
         }
       ]
-      conditions = [
+      condition = [
         {
           test     = "ArnEquals"
           variable = "kms:EncryptionContext:aws:logs:arn"
