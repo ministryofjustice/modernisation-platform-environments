@@ -9,3 +9,22 @@ module "key_pair" {
 
   tags = local.all_tags
 }
+
+#Save private key to secret
+resource "aws_secretsmanager_secret" "private_key" {
+  #checkov:skip=CKV2_AWS_57:todo add rotation if needed
+  #checkov:skip=CKV_AWS_149: it is added
+  name        = var.management_keypair_name
+  description = "Private Key"
+  #kms_key_id  =  var.ds_managed_ad_secret_key # "aws/secretsmanager" # this won't work with cloudformation
+}
+
+#Store secret as key value pair where key is password
+# Store secret as key value pair where key is password
+resource "aws_secretsmanager_secret_version" "private_key_version" {
+  secret_id = aws_secretsmanager_secret.private_key.id
+
+  # Format the secret string with username and password
+  secret_string = module.key_pair.private_key_pem
+
+}
