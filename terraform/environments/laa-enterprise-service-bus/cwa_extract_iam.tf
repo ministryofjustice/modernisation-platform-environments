@@ -79,6 +79,16 @@ resource "aws_iam_policy" "cwa_extract_lambda_policy" {
           "elasticfilesystem:DescribeMountTargets"
       ],
         Resource = "*"
+      },
+      {
+        Effect   = "Allow"
+        Action   = [
+          "sns:Publish"
+      ],
+        Resource = [
+          aws_sns_topic.priority_p1.arn,
+          aws_sns_topic.provider_banks.arn
+        ]
       }
     ]
   })
