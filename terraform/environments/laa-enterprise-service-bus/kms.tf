@@ -57,10 +57,7 @@ resource "aws_kms_key_policy" "sns_sqs_key_policy" {
           AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
         },
         Action = [
-          "kms:Describe*",
-          "kms:Get*",
-          "kms:List*",
-          "kms:RevokeGrant"
+          "kms:*"
         ],
         Resource = "*"
       }
