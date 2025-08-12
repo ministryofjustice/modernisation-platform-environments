@@ -70,7 +70,7 @@ module "serverlessrepo-lambda-canary" {
   environment                     = local.environment
   lambda_role                     = local.serverlessrepo-lambda-canary-role
   lambda                          = local.serverlessrepo-lambda-canary
-  cloudwatch_log_group_kms_key_id = module.kms.kms_key_id
+  cloudwatch_log_group_kms_key_id = module.kms.key_id
 }
 
 #ESB to Int load balancer
