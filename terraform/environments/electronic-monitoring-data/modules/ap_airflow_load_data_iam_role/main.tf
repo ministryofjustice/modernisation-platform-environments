@@ -124,9 +124,12 @@ data "aws_iam_policy_document" "load_data" {
     ]
   }
   statement {
-    sid       = "GetDataAccessForLakeFormation${local.camel-sid}"
+    sid       = "GetDataAccessAndTagsForLakeFormation${local.camel-sid}"
     effect    = "Allow"
-    actions   = ["lakeformation:GetDataAccess"]
+    actions   = [
+      "lakeformation:GetDataAccess",
+      "lakeformation:GetResourceLFTags",
+    ]
     resources = ["*"]
   }
   statement {
