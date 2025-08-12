@@ -44,5 +44,5 @@ module "s3" {
 }
 
 locals {
-  s3_tableau_backup = module.s3.aws_s3_bucket_arn[0]
+  s3_tableau_backup = module.s3.aws_s3_bucket[0].arn
 }
