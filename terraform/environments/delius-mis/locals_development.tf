@@ -357,4 +357,29 @@ locals {
     storage_capacity     = 100
     throughtput_capacity = 16
   }
+
+  # S3 buckets configuration for dev environment
+  s3_buckets_dev = {
+    "mis-data" = {
+      acl                = "private"
+      versioning_enabled = true
+      sse_algorithm      = "aws:kms"
+      iam_policies = {
+        "mis-data-read-write" = [
+          {
+            effect = "Allow"
+            actions = [
+              "s3:GetObject",
+              "s3:PutObject",
+              "s3:ListBucket",
+              "s3:DeleteObject"
+            ]
+          }
+        ]
+      }
+      tags = {
+        Purpose = "MIS data storage"
+      }
+    }
+  }
 }

@@ -39,6 +39,8 @@ module "environment_dev" {
 
   fsx_config = local.fsx_config_dev
 
+  s3_buckets = local.s3_buckets_dev
+
   domain_join_ports = local.domain_join_ports
 
   pagerduty_integration_key = local.pagerduty_integration_key

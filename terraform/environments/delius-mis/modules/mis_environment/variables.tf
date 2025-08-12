@@ -96,3 +96,53 @@ variable "domain_join_ports" {
   description = "Ports required for domain join"
   type        = any
 }
+
+variable "s3_buckets" {
+  description = "map of s3 buckets to create where the map key is the bucket prefix.  See s3_bucket module for more variable details.  Use iam_policies to automatically create a iam policies for the bucket where the key is the name of the policy"
+  type = map(object({
+    acl                 = optional(string, "private")
+    ownership_controls  = optional(string, "BucketOwnerPreferred")
+    versioning_enabled  = optional(bool, true)
+    replication_enabled = optional(bool, false)
+    replication_region  = optional(string)
+    bucket_policy       = optional(list(string), ["{}"])
+    bucket_policy_v2 = optional(list(object({
+      sid     = optional(string, null)
+      effect  = string
+      actions = list(string)
+      principals = optional(object({
+        type        = string
+        identifiers = list(string)
+      }))
+      conditions = optional(list(object({
+        test     = string
+        variable = string
+        values   = list(string)
+      })), [])
+    })), [])
+    custom_kms_key             = optional(string)
+    custom_replication_kms_key = optional(string)
+    lifecycle_rule             = any # see module baseline_presets.s3 for examples
+    log_bucket                 = optional(string)
+    log_prefix                 = optional(string, "")
+    replication_role_arn       = optional(string, "")
+    force_destroy              = optional(bool, false)
+    sse_algorithm              = optional(string, "aws:kms")
+    iam_policies = optional(map(list(object({
+      sid     = optional(string, null)
+      effect  = string
+      actions = list(string)
+      principals = optional(object({
+        type        = string
+        identifiers = list(string)
+      }))
+      conditions = optional(list(object({
+        test     = string
+        variable = string
+        values   = list(string)
+      })), [])
+    }))), {})
+    tags = optional(map(string), {})
+  }))
+  default = {}
+}

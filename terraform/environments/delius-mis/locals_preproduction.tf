@@ -347,4 +347,28 @@ locals {
     storage_capacity     = 200
     throughtput_capacity = 16
   }
+
+  # S3 buckets configuration for preprod environment
+  s3_buckets_preprod = {
+    # Example bucket configuration - customize as needed
+    # "mis-data" = {
+    #   acl                 = "private"
+    #   versioning_enabled  = true
+    #   sse_algorithm       = "aws:kms"
+    #   iam_policies = {
+    #     "mis-data-access" = [
+    #       {
+    #         effect = "Allow"
+    #         actions = [
+    #           "s3:GetObject",
+    #           "s3:PutObject"
+    #         ]
+    #       }
+    #     ]
+    #   }
+    #   tags = {
+    #     Purpose = "MIS data storage"
+    #   }
+    # }
+  }
 }

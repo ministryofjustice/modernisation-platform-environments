@@ -1,0 +1,123 @@
+# Example S3 Bucket Configuration for delius-mis
+# This shows how to configure S3 buckets using the retrofitted module
+
+## Example 1: Simple bucket for data storage
+s3_buckets_example = {
+  "mis-data-storage" = {
+    acl                 = "private"
+    versioning_enabled  = true
+    sse_algorithm       = "aws:kms"
+    
+    # IAM policies automatically created for this bucket
+    iam_policies = {
+      "mis-data-read-write" = [
+        {
+          effect = "Allow"
+          actions = [
+            "s3:GetObject",
+            "s3:PutObject",
+            "s3:DeleteObject",
+            "s3:ListBucket"
+          ]
+        }
+      ]
+      "mis-data-read-only" = [
+        {
+          effect = "Allow"
+          actions = [
+            "s3:GetObject",
+            "s3:ListBucket"
+          ]
+        }
+      ]
+    }
+    
+    lifecycle_rule = [
+      {
+        id      = "transition_and_expiration"
+        enabled = true
+        
+        transition = [
+          {
+            days          = 30
+            storage_class = "STANDARD_IA"
+          },
+          {
+            days          = 90
+            storage_class = "GLACIER"
+          }
+        ]
+        
+        expiration = {
+          days = 365
+        }
+      }
+    ]
+    
+    tags = {
+      Purpose     = "MIS data storage"
+      Environment = "development"
+    }
+  }
+}
+
+## Example 2: Bucket with replication
+s3_buckets_with_replication = {
+  "mis-backup-storage" = {
+    acl                 = "private"
+    versioning_enabled  = true
+    replication_enabled = true
+    replication_region  = "eu-west-1"  # Different from primary region
+    sse_algorithm       = "aws:kms"
+    
+    iam_policies = {
+      "backup-access" = [
+        {
+          effect = "Allow"
+          actions = [
+            "s3:GetObject",
+            "s3:PutObject"
+          ]
+        }
+      ]
+    }
+    
+    tags = {
+      Purpose = "MIS backup storage"
+      Backup  = "true"
+    }
+  }
+}
+
+## Example 3: Bucket with custom bucket policy
+s3_buckets_with_policy = {
+  "mis-shared-data" = {
+    acl                 = "private"
+    versioning_enabled  = true
+    
+    bucket_policy_v2 = [
+      {
+        sid    = "AllowCrossAccountAccess"
+        effect = "Allow"
+        actions = [
+          "s3:GetObject"
+        ]
+        principals = {
+          type        = "AWS"
+          identifiers = ["arn:aws:iam::123456789012:root"]  # Replace with actual account ID
+        }
+        conditions = [
+          {
+            test     = "StringEquals"
+            variable = "s3:prefix"
+            values   = ["shared/*"]
+          }
+        ]
+      }
+    ]
+    
+    tags = {
+      Purpose = "Shared data access"
+    }
+  }
+}
