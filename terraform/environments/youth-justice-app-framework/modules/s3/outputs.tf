@@ -3,7 +3,7 @@ output "aws_s3_bucket_arn" {
   value = {
     for k,v in aws_s3_bucket.default:
       trimprefix(k,"${local.environment_name}-") => {
-        arn = aws_s3_bucket.default.*.arn
+        arn = v.arn
       }
   }
 }
