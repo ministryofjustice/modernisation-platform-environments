@@ -34,7 +34,7 @@ locals {
     "allied_mdss",
     "serco_servicenow",
     ]
-  stg_db = [
+  stg_dbs = [
     "serco_servicenow"
   ]
   prod_dbs_to_grant = local.is-production ? [
