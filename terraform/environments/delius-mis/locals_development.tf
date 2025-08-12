@@ -364,6 +364,7 @@ locals {
       acl                = "private"
       versioning_enabled = true
       sse_algorithm      = "aws:kms"
+      lifecycle_rule     = []
       iam_policies = {
         "mis-data-read-write" = [
           {
