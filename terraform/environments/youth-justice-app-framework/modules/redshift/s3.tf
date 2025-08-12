@@ -11,8 +11,8 @@ module "s3" {
 }
 
 locals {
-  s3-redshift-yjb-reporting-arn = module.s3.aws_s3_bucket_arn[local.yjb_bucket_name]
-  s3-redshift-ycs-reporting-arn = module.s3.aws_s3_bucket_arn[local.ycs_bucket_name]
+  s3-redshift-yjb-reporting-arn = module.s3.aws_s3_bucket[local.yjb_bucket_name].arn
+  s3-redshift-ycs-reporting-arn = module.s3.aws_s3_bucket[local.ycs_bucket_name].arn
 }
 
 
