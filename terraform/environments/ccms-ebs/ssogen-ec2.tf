@@ -2,7 +2,7 @@ resource "aws_instance" "ec2_ssogen" {
   count                  = local.application_data.accounts[local.environment].ssogen_no_instances
   instance_type          = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ssogen
   ami                    = local.application_data.accounts[local.environment].ssogen_ami_id
-  key_name               = local.application_data.accounts[local.environment].key_name
+  key_name               = aws_key_pair.ssogen.key_name
   vpc_security_group_ids = [aws_security_group.ssogen_sg.id]
   subnet_id              = local.private_subnets[count.index]
   monitoring                  = true
