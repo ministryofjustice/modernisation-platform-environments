@@ -17,10 +17,22 @@ resource "aws_sns_topic_subscription" "ccms" {
   endpoint  = aws_sqs_queue.ccms_provider_q.arn
 }
 
+resource "aws_sns_topic_subscription_delivery_status" "ccms_provider_delivery_status" {
+  arn         = aws_sns_topic_subscription.ccms.arn
+  log_success = true
+  log_failure = true
+}
+
 resource "aws_sns_topic_subscription" "maat" {
   topic_arn = aws_sns_topic.priority_p1.arn
   protocol  = "sqs"
   endpoint  = aws_sqs_queue.maat_provider_q.arn
+}
+
+resource "aws_sns_topic_subscription_delivery_status" "maat_provider_delivery_status" {
+  arn         = aws_sns_topic_subscription.maat.arn
+  log_success = true
+  log_failure = true
 }
 
 resource "aws_sns_topic_subscription" "cclf" {
@@ -29,13 +41,23 @@ resource "aws_sns_topic_subscription" "cclf" {
   endpoint  = aws_sqs_queue.cclf_provider_q.arn
 }
 
+resource "aws_sns_topic_subscription_delivery_status" "cclf_provider_delivery_status" {
+  arn         = aws_sns_topic_subscription.cclf.arn
+  log_success = true
+  log_failure = true
+}
+
 resource "aws_sns_topic_subscription" "ccr" {
   topic_arn = aws_sns_topic.priority_p1.arn
   protocol  = "sqs"
   endpoint  = aws_sqs_queue.ccr_provider_q.arn
 }
 
-
+resource "aws_sns_topic_subscription_delivery_status" "ccr_provider_delivery_status" {
+  arn         = aws_sns_topic_subscription.ccr.arn
+  log_success = true
+  log_failure = true
+}
 
 ###########################################
 ### SNS Topic for Provider Banks Messages
@@ -55,4 +77,10 @@ resource "aws_sns_topic_subscription" "ccms_banks" {
   topic_arn = aws_sns_topic.provider_banks.arn
   protocol  = "sqs"
   endpoint  = aws_sqs_queue.ccms_banks_q.arn
+}
+
+resource "aws_sns_topic_subscription_delivery_status" "ccms_banks_delivery_status" {
+  arn         = aws_sns_topic_subscription.ccms_banks.arn
+  log_success = true
+  log_failure = true
 }
