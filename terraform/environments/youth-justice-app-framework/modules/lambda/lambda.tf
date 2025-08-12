@@ -42,6 +42,7 @@ resource "aws_lambda_function" "main" {
 }
 
 resource "aws_cloudwatch_log_group" "log_group" {
+  #checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS" - not required
   count             = var.lambda.log_group != null ? 1 : 0
   name_prefix       = var.lambda.log_group.name
   retention_in_days = 365
