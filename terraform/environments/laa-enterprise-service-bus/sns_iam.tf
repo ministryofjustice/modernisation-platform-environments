@@ -10,7 +10,10 @@ resource "aws_iam_role" "publisher_role" {
       {
         Effect = "Allow"
         Principal = {
-          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+          AWS = [
+            "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root",
+            aws_iam_role.cwa_extract_lambda_role.arn
+          ]
         }
         Action = "sts:AssumeRole"
       }
@@ -29,7 +32,10 @@ resource "aws_iam_policy" "publisher_role_policy" {
         Action = [
           "sns:Publish"
         ]
-        Resource = aws_sns_topic.priority_p1.arn
+        Resource = [
+          aws_sns_topic.priority_p1.arn, 
+          aws_sns_topic.provider_banks.arn
+        ]
       }
     ]
   })
@@ -71,7 +77,10 @@ resource "aws_iam_policy" "subscriber_policy" {
         Action = [
           "sns:Subscribe"
         ]
-        Resource = aws_sns_topic.priority_p1.arn
+        Resource = [
+          aws_sns_topic.priority_p1.arn, 
+          aws_sns_topic.provider_banks.arn
+        ]
       }
     ]
   })
@@ -112,7 +121,10 @@ resource "aws_iam_policy" "admin_policy" {
       {
         Effect = "Allow"
         Action = "sns:*"
-        Resource = aws_sns_topic.priority_p1.arn
+        Resource = [
+          aws_sns_topic.priority_p1.arn, 
+          aws_sns_topic.provider_banks.arn
+        ]
       }
     ]
   })

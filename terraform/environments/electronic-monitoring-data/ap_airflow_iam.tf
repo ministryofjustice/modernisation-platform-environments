@@ -10,12 +10,12 @@ data "aws_iam_policy_document" "test_ap_airflow" {
 module "test_ap_airflow" {
   source = "./modules/ap_airflow_iam_role"
 
-  environment         = local.environment
-  role_name_suffix    = "test-cross-account-access"
-  role_description    = ""
-  iam_policy_document = data.aws_iam_policy_document.test_ap_airflow.json
-  secret_code         = jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]
-  oidc_arn            = aws_iam_openid_connect_provider.analytical_platform_compute.arn
+  environment          = local.environment
+  role_name_suffix     = "test-cross-account-access"
+  role_description     = ""
+  iam_policy_documents = [data.aws_iam_policy_document.test_ap_airflow.json]
+  secret_code          = jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]
+  oidc_arn             = aws_iam_openid_connect_provider.analytical_platform_compute.arn
 }
 
 data "aws_iam_policy_document" "p1_export_airflow" {
@@ -96,13 +96,13 @@ data "aws_iam_policy_document" "p1_export_airflow" {
 module "p1_export_airflow" {
   source = "./modules/ap_airflow_iam_role"
 
-  environment         = local.environment
-  role_name_suffix    = "export-em-data-p1"
-  role_description    = "Permissions to generate P1 export data"
-  iam_policy_document = data.aws_iam_policy_document.p1_export_airflow.json
-  secret_code         = jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]
-  oidc_arn            = aws_iam_openid_connect_provider.analytical_platform_compute.arn
-  new_airflow         = true
+  environment          = local.environment
+  role_name_suffix     = "export-em-data-p1"
+  role_description     = "Permissions to generate P1 export data"
+  iam_policy_documents = [data.aws_iam_policy_document.p1_export_airflow.json]
+  secret_code          = jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]
+  oidc_arn             = aws_iam_openid_connect_provider.analytical_platform_compute.arn
+  new_airflow          = true
 }
 
 module "load_alcohol_monitoring_database" {
@@ -389,12 +389,12 @@ module "load_scram_alcohol_monitoring" {
   count  = local.is-production ? 1 : 0
   source = "./modules/ap_airflow_iam_role"
 
-  environment         = local.environment
-  role_name_suffix    = "load-scram-alcohol-monitoring"
-  role_description    = "Permissions to load data from SCRAM alcohol monitoring"
-  iam_policy_document = data.aws_iam_policy_document.scram_am_ap_airflow.json
-  secret_code         = jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]
-  oidc_arn            = aws_iam_openid_connect_provider.analytical_platform_compute.arn
+  environment          = local.environment
+  role_name_suffix     = "load-scram-alcohol-monitoring"
+  role_description     = "Permissions to load data from SCRAM alcohol monitoring"
+  iam_policy_documents = [data.aws_iam_policy_document.scram_am_ap_airflow.json]
+  secret_code          = jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]
+  oidc_arn             = aws_iam_openid_connect_provider.analytical_platform_compute.arn
 }
 
 data "aws_iam_policy_document" "scram_am_ap_airflow" {
@@ -568,3 +568,41 @@ module "full_reload_mdss" {
   full_reload = true
 }
 
+module "load_servicenow" {
+  count  = local.is-development ? 0 : 1
+  source = "./modules/ap_airflow_load_data_iam_role"
+
+  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+  de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
+
+  name               = "servicenow"
+  environment        = local.environment
+  database_name      = "serco-servicenow"
+  secret_code        = jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]
+  oidc_arn           = aws_iam_openid_connect_provider.analytical_platform_compute.arn
+  athena_dump_bucket = module.s3-athena-bucket.bucket
+  cadt_bucket        = module.s3-create-a-derived-table-bucket.bucket
+  secret_arn         = aws_secretsmanager_secret.servicenow_credentials.arn
+  new_airflow        = true
+}
+
+module "full_reload_servicenow" {
+  count  = local.is-development ? 0 : 1
+  source = "./modules/ap_airflow_load_data_iam_role"
+
+  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+  de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
+
+  name               = "servicenow"
+  environment        = local.environment
+  database_name      = "serco-servicenow"
+  secret_code        = jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]
+  oidc_arn           = aws_iam_openid_connect_provider.analytical_platform_compute.arn
+  athena_dump_bucket = module.s3-athena-bucket.bucket
+  cadt_bucket        = module.s3-create-a-derived-table-bucket.bucket
+  secret_arn         = aws_secretsmanager_secret.servicenow_credentials.arn
+
+  db_exists   = true
+  new_airflow = true
+  full_reload = true
+}
