@@ -30,6 +30,7 @@ module "log_bucket" {
   tags = local.all_tags
 }
 
+
 ## s3 bucket for Tableau backups
 module "s3" {
   source = "../s3"
@@ -37,12 +38,12 @@ module "s3" {
   project_name = var.project_name
   environment  = var.environment
 
-  bucket_name = ["tableau-backups"]
+  bucket_name = [local.tableau-backups-bucket-name]
 
   tags = var.tags
 
 }
 
 locals {
-  s3_tableau_backup = module.s3.aws_s3_bucket[0].arn
+  s3_tableau_backup = module.s3.aws_s3_bucket[local.tableau-backups-bucket-name].arn
 }
