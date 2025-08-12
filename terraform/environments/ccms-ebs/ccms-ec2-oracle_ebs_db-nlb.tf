@@ -42,7 +42,7 @@ resource "aws_lb_listener" "ebsdbnlb_listener" {
   load_balancer_arn = aws_lb.ebsdb_nlb.id
   port              = 443
   protocol          = "TLS"
-  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-Res-2021-06"
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
   certificate_arn   = aws_acm_certificate_validation.external.certificate_arn
   default_action {
     target_group_arn = aws_lb_target_group.ebsdb_nlb.id
