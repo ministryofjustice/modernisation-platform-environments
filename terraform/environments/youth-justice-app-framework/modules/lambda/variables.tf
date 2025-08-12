@@ -60,6 +60,12 @@ variable "lambda" {
   })
 }
 
+variable "cloudwatch_log_group_kms_key_id" {
+  description = "KMS key ID for the CloudWatch log group"
+  type        = string
+  default     = ""
+}
+
 variable "enable_eventbridge_invoke_permission" {
   description = "Enable eventbridge invoke permission"
   type        = bool

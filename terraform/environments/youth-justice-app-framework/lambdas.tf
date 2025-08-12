@@ -62,14 +62,15 @@ module "serverlessrepo-lambda-canary-sg" {
 }
 
 module "serverlessrepo-lambda-canary" {
-  source         = "./modules/lambda"
-  account_number = local.environment_management.account_ids[terraform.workspace]
-  project_name   = local.project_name
-  tags           = local.tags
-  region         = data.aws_region.current.name
-  environment    = local.environment
-  lambda_role    = local.serverlessrepo-lambda-canary-role
-  lambda         = local.serverlessrepo-lambda-canary
+  source                          = "./modules/lambda"
+  account_number                  = local.environment_management.account_ids[terraform.workspace]
+  project_name                    = local.project_name
+  tags                            = local.tags
+  region                          = data.aws_region.current.name
+  environment                     = local.environment
+  lambda_role                     = local.serverlessrepo-lambda-canary-role
+  lambda                          = local.serverlessrepo-lambda-canary
+  cloudwatch_log_group_kms_key_id = module.kms.kms_key_id
 }
 
 #ESB to Int load balancer

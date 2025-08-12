@@ -46,6 +46,8 @@ resource "aws_cloudwatch_log_group" "log_group" {
   name_prefix       = var.lambda.log_group.name
   retention_in_days = 365
 
+  kms_key_id = var.cloudwatch_log_group_kms_key_id
+
   tags = var.tags
 }
 
