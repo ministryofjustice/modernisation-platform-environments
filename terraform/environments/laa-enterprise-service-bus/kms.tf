@@ -5,7 +5,7 @@ resource "aws_kms_key" "sns_sqs_key" {
 }
 
 resource "aws_kms_key_policy" "sns_sqs_key_policy" {
-  key_id = aws_kms_key.sqs_key
+  key_id = aws_kms_key.sns_sqs_key.id
   
   policy = jsonencode({
     Version = "2012-10-17",
