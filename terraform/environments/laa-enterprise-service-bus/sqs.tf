@@ -10,7 +10,7 @@ resource "aws_sqs_queue" "ccms_provider_q" {
   receive_wait_time_seconds = 10
 
 
-  kms_master_key_id         = "alias/aws/sqs"
+  kms_master_key_id         = aws_kms_key.sns_sqs_key.id
   kms_data_key_reuse_period_seconds = 300
 
   tags = merge(
@@ -33,7 +33,7 @@ resource "aws_sqs_queue" "maat_provider_q" {
   message_retention_seconds = 604800
   receive_wait_time_seconds = 10
 
-  kms_master_key_id = "alias/aws/sqs"
+  kms_master_key_id = aws_kms_key.sns_sqs_key.id
   kms_data_key_reuse_period_seconds = 300
 
   tags = merge(
@@ -56,7 +56,7 @@ resource "aws_sqs_queue" "cclf_provider_q" {
   message_retention_seconds = 604800
   receive_wait_time_seconds = 10
 
-  kms_master_key_id         = "alias/aws/sqs"
+  kms_master_key_id         = aws_kms_key.sns_sqs_key.id
   kms_data_key_reuse_period_seconds = 300
 
   tags = merge(
@@ -79,7 +79,7 @@ resource "aws_sqs_queue" "ccr_provider_q" {
   message_retention_seconds = 604800
   receive_wait_time_seconds = 10
 
-  kms_master_key_id         = "alias/aws/sqs"
+  kms_master_key_id         = aws_kms_key.sns_sqs_key.id
   kms_data_key_reuse_period_seconds = 300
 
   tags = merge(
@@ -102,7 +102,7 @@ resource "aws_sqs_queue" "ccms_banks_q" {
   message_retention_seconds = 604800
   receive_wait_time_seconds = 10
 
-  kms_master_key_id         = "alias/aws/sqs"
+  kms_master_key_id         = aws_kms_key.sns_sqs_key.id
   kms_data_key_reuse_period_seconds = 300
 
   tags = merge(
