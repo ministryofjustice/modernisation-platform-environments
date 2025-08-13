@@ -353,6 +353,8 @@ locals {
     }
   })
 
+  dfi_report_bucket_config = {}
+
   fsx_config_dev = {
     storage_capacity     = 100
     throughtput_capacity = 16
