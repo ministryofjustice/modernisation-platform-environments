@@ -4,9 +4,10 @@ resource "aws_lb" "ebsdb_nlb" {
   internal                         = true
   load_balancer_type               = "network"
   enable_deletion_protection       = false
-  enable_cross_zone_load_balancing = true
-  subnets                          = data.aws_subnets.shared-private.ids
+  enable_cross_zone_load_balancing = false
+  subnets                          = [data.aws_subnet.data_subnets_a.id]
   security_groups                  = [aws_security_group.sg_ebsdb_nlb.id]
+  idle_timeout                     = 600
   tags = merge(local.tags,
     { Name = lower(format("nlb-%s-db", local.application_name)) }
   )
@@ -19,7 +20,10 @@ resource "aws_lb_target_group" "ebsdb_nlb" {
   vpc_id               = data.aws_vpc.shared.id
   target_type          = "instance"
   deregistration_delay = 30
-
+  stickiness {
+    enabled = true
+    type    = "source_ip"
+  }
   health_check {
     healthy_threshold   = "3"
     interval            = "30"
