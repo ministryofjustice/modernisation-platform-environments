@@ -5,6 +5,7 @@ module "s3-dfi-report-bucket" { #tfsec:ignore:aws-s3-enable-versioning
 
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
   providers = {
+    aws                    = aws
     aws.bucket-replication = aws
   }
 
