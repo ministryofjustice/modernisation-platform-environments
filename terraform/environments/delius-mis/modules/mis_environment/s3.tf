@@ -1,3 +1,6 @@
+# Data source for organization information
+data "aws_organizations_organization" "root_account" {}
+
 # DFI Report bucket for document and file storage
 # checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 module "s3-dfi-report-bucket" { #tfsec:ignore:aws-s3-enable-versioning
