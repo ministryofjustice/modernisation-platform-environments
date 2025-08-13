@@ -47,7 +47,7 @@ resource "aws_lambda_function" "ccms_provider_load" {
   handler          = "ccms_lambda_function.lambda_handler"
   filename         = "lambda/ccms_provider_load_lambda/ccms_lambda.zip"
   source_code_hash = filebase64sha256("lambda/ccms_provider_load_lambda/ccms_lambda.zip")
-  timeout          = 900
+  timeout          = 300
   memory_size      = 128
   runtime          = "python3.10"
 
