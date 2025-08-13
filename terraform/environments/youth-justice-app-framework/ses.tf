@@ -7,7 +7,7 @@ module "ses" {
   key_id                = module.kms.key_id
   private_subnets       = local.private_subnet_list[*].cidr_block
 
-  ses_email_identities = contains(["development", "test"], var.environment) ? [
+  ses_email_identities = contains(["development", "test"], local.environment) ? [
     "thomas.tipler@necsws.com",
     "andrew.richards1@necsws.com",
     "javaid.arshad@necsws.com",
