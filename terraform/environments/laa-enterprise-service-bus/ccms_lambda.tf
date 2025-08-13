@@ -76,3 +76,9 @@ resource "aws_lambda_function" "ccms_provider_load" {
     { Name = "${local.application_name_short}-${local.environment}-ccms-provider-load" }
   )
 }
+
+resource "aws_lambda_event_source_mapping" "ccms_banks_q_trigger" {
+  event_source_arn = aws_sqs_queue.ccms_banks_q.arn
+  function_name    = aws_lambda_function.ccms_provider_load.arn
+  batch_size       = 1
+}
