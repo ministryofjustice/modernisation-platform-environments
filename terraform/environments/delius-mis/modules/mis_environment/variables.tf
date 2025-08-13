@@ -70,6 +70,11 @@ variable "auto_config" {
   default = null #optional
 }
 
+variable "dfi_config" {
+  type    = any
+  default = null #optional
+}
+
 variable "dfi_report_bucket_config" {
   type    = any
   default = null #optional
