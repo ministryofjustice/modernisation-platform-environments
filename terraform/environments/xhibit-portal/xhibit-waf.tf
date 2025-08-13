@@ -37,6 +37,7 @@ resource "aws_wafv2_ip_set" "prtg_waf_ip_set" {
     "66.155.16.61/32",   // SBEL Wifi
     "66.155.16.68/32",   // SBEL Wifi
     "5.64.250.224/32",   // MP
+    "90.247.66.20/32",   // TM
     "92.236.109.133/32"  // GD Wifi
   ]
 
