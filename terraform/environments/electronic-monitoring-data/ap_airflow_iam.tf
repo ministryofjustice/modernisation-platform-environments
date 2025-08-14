@@ -118,6 +118,31 @@ module "p1_export_airflow" {
   new_airflow          = true
 }
 
+resource "aws_lakeformation_permissions" "p1_s3_access" {
+  principal = module.p1_export_airflow.iam_role.arn
+  permissions = ["workflow_role"]
+  data_location {
+    arn = aws_lakeformation_resource.data_bucket.arn
+  }
+}
+
+resource "aws_lakeformation_permissions" "p1_database_access" {
+  principal = module.p1_export_airflow.iam_role.arn
+  permissions = ["DESCRIBE"]
+  database {
+    name = "allied_mdss${local.db_suffix}"
+  }
+}
+
+resource "aws_lakeformation_permissions" "p1_table_access" {
+  principal = module.p1_export_airflow.iam_role.arn
+  permissions = ["SELECT"]
+  table {
+    database_name = "allied_mdss${local.db_suffix}"
+    wildcard = true
+  }
+}
+
 module "load_alcohol_monitoring_database" {
   count  = local.is-production ? 1 : 0
   source = "./modules/ap_airflow_load_data_iam_role"
