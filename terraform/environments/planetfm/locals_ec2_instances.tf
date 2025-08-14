@@ -6,7 +6,7 @@ locals {
       cloudwatch_metric_alarms = merge(
         module.baseline_presets.cloudwatch_metric_alarms.ec2,
         module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_windows,
-        local.cloudwatch_metric_alarms.windows,
+        # local.cloudwatch_metric_alarms.windows, # servers upgraded to 2022 aren't running procstat yet
       )
       config = {
         ami_owner                     = "self"
