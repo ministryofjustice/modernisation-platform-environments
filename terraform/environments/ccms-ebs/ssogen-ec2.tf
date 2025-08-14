@@ -26,7 +26,7 @@ resource "aws_instance" "ec2_ssogen" {
   }
 
   root_block_device {
-    volume_size = 30
+    volume_size = 60
     volume_type = "gp2"
   }
  
