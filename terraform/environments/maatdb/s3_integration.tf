@@ -36,17 +36,18 @@ lifecycle_rule = [
       autoclean = local.is-production ? "false" : "true"
     }
 
-    # Current version expiry: only in non-prod
-    expiration = local.is-production ? null : {
+    # Current version expiry: only in non-prod.
+    # Use {} in prod so the module skips creating the block.
+    expiration = local.is-production ? {} : {
       days = 7
     }
 
-    # Noncurrent versions: keep shorter in non-prod if you like
+    # Keep noncurrent versions shorter in non-prod if desired
     noncurrent_version_expiration = {
       days = local.is-production ? 31 : 7
     }
 
-    # Transitions only for prod; keep the attribute present in both
+    # Transitions only for prod; keep attribute present in both
     transition = local.is-production ? [
       {
         days          = 90
@@ -59,7 +60,6 @@ lifecycle_rule = [
     ] : []
   }
 ]
-
 
   tags = merge(local.tags, {
     Name = "${local.application_name}-${local.environment}-ftp-${each.key}"
