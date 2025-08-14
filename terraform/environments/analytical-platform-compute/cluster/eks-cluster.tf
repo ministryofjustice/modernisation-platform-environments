@@ -6,7 +6,7 @@ module "eks" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/eks/aws"
-  version = "21.0.7"
+  version = "21.0.9"
 
   name               = local.eks_cluster_name
   kubernetes_version = local.environment_configuration.eks_cluster_version
@@ -259,7 +259,7 @@ module "karpenter" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/eks/aws//modules/karpenter"
-  version = "21.0.7"
+  version = "21.0.9"
 
   cluster_name = module.eks.cluster_name
 
