@@ -16,7 +16,7 @@ parameters:
     default: '$null'
   username:
     type: String
-    description: 'Optionally run script using given domain user. The associated domain SecretsManager secret must contain the user password'
+    description: 'Optionally run script using given domain user. The associated domain SecretsManager secret must contain the user password. Use list format for script args'
     default: ''
   whatIfPreference:
     type: String
