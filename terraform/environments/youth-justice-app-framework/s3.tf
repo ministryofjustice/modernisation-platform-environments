@@ -68,3 +68,17 @@ module "s3-sbom" {
   add_log_policy = true
 
 }
+
+module "s3-sbom" {
+  #only in development or prod
+  count  = local.environment == "development" || local.environment == "preproduction" ? 1 : 0
+  source = "./modules/s3"
+
+  project_name = local.project_name
+  environment  = local.environment
+  tags         = local.tags
+  bucket_name  = ["certs"]
+
+  add_log_policy = true
+
+}
