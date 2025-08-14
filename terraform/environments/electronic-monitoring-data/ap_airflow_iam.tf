@@ -49,15 +49,16 @@ data "aws_iam_policy_document" "p1_export_airflow" {
     ]
   }
   statement {
-    sid    = "S3DataBucketListPutMetadata"
+    sid    = "S3DataBucketListPutMetadataGetRequests"
     effect = "Allow"
     actions = [
       "s3:ListBucket",
-      "s3:PutObject"
+      "s3:PutObject",
+      "s3:GetObject"
     ]
     resources = [
       module.s3-data-bucket.bucket.arn,
-      "${module.s3-data-bucket.bucket.arn}/export_metadata/*"
+      "${module.s3-data-bucket.bucket.arn}/p1/*"
     ]
   }
   statement {
