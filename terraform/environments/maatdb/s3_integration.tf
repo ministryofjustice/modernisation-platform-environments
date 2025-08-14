@@ -25,22 +25,29 @@ module "s3_bucket" {
     aws.bucket-replication = aws
   }
 
-lifecycle_rule = local.is-production ? [
+lifecycle_rule = [
   {
-    id      = "main"
+    id      = local.is-production ? "main" : "main-nonprod"
     enabled = "Enabled"
     prefix  = ""
 
     tags = {
       rule      = "log"
-      autoclean = "false"
+      autoclean = local.is-production ? "false" : "true"
     }
 
+    # Current version expiry: only in non-prod
+    expiration = local.is-production ? null : {
+      days = 7
+    }
+
+    # Noncurrent versions: keep shorter in non-prod if you like
     noncurrent_version_expiration = {
-      days = 31
+      days = local.is-production ? 31 : 7
     }
 
-    transition = [
+    # Transitions only for prod; keep the attribute present in both
+    transition = local.is-production ? [
       {
         days          = 90
         storage_class = "STANDARD_IA"
@@ -49,28 +56,7 @@ lifecycle_rule = local.is-production ? [
         days          = 180
         storage_class = "GLACIER"
       }
-    ]
-  }
-] : [
-  {
-    id      = "main-nonprod"
-    enabled = "Enabled"
-    prefix  = ""
-
-    tags = {
-      rule      = "log"
-      autoclean = "true"
-    }
-
-    # Delete CURRENT versions after 7 days
-    expiration = {
-      days = 7
-    }
-
-    # (Optional) keep versions tidy too; remove if not needed
-    noncurrent_version_expiration = {
-      days = 7
-    }
+    ] : []
   }
 ]
 
