@@ -95,10 +95,11 @@ module "eks" {
       desired_size   = 3
       instance_types = ["m6a.xlarge"]
 
-      ami_release_version = local.environment_configuration.eks_node_version
-      ami_type            = "BOTTLEROCKET_x86_64"
-      platform            = "bottlerocket"
-      enable_monitoring   = true
+      use_latest_ami_release_version = false
+      ami_release_version            = local.environment_configuration.eks_node_version
+      ami_type                       = "BOTTLEROCKET_x86_64"
+      platform                       = "bottlerocket"
+      enable_monitoring              = true
       metadata_options = {
         http_endpoint               = "enabled"
         http_put_response_hop_limit = 1
@@ -149,10 +150,11 @@ module "eks" {
         }
       }
 
-      ami_release_version = local.environment_configuration.eks_node_version
-      ami_type            = "BOTTLEROCKET_x86_64"
-      platform            = "bottlerocket"
-      enable_monitoring   = true
+      use_latest_ami_release_version = false
+      ami_release_version            = local.environment_configuration.eks_node_version
+      ami_type                       = "BOTTLEROCKET_x86_64"
+      platform                       = "bottlerocket"
+      enable_monitoring              = true
       metadata_options = {
         http_endpoint               = "enabled"
         http_put_response_hop_limit = 1
