@@ -33,7 +33,7 @@ locals {
     "serco_fms",
     "allied_mdss",
     "serco_servicenow",
-    ]
+  ]
   stg_dbs = [
     "serco_servicenow"
   ]
@@ -52,14 +52,14 @@ locals {
   dbt_dbs_to_grant       = [for db in local.dbt_dbs : "${db}${local.dbt_suffix}"]
   live_feed_dbs_to_grant = [for db in local.live_feeds_dbs : "${db}${local.db_suffix}"]
   stg_dbs_to_grant       = [for db in local.stg_dbs : "${db}${local.db_suffix}_staging"]
-  dbs_to_grant           = toset(flatten(
+  dbs_to_grant = toset(flatten(
     [
       local.prod_dbs_to_grant,
       local.dev_dbs_to_grant,
       local.dbt_dbs_to_grant,
     ]
   ))
-  existing_dbs_to_grant  = toset(flatten([local.live_feed_dbs_to_grant, local.stg_dbs_to_grant]))
+  existing_dbs_to_grant = toset(flatten([local.live_feed_dbs_to_grant, local.stg_dbs_to_grant]))
 }
 
 # Source Analytics DBT Secrets

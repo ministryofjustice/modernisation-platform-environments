@@ -14,7 +14,7 @@ resource "aws_cloudwatch_event_rule" "dms_task_completed" {
 
 resource "aws_cloudwatch_event_target" "dms_validation_step_function_trigger" {
     rule = aws_cloudwatch_event_rule.dms_task_completed.name
-    arn = module.dms_validation_step_functon.arn
+    arn = var.dms_validation_step_function_arn
     role_arn = aws_iam_role.dms_validation_event_bridge_invoke_sfn_role.arn
     input_path = "$"
 }

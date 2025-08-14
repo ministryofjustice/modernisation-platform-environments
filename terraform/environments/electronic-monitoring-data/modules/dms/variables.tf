@@ -79,3 +79,8 @@ variable "dms_trigger_state" {
     type = string
     default = "COMPLETED"
 }
+
+variable "dms_validation_step_function_arn" {
+    description = "DMS Validation Step Function Arn"
+    type = string
+}

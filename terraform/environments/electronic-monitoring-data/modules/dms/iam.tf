@@ -20,7 +20,7 @@ resource "aws_iam_role_policy" "event_bridge_invoke_sfn_policy" {
             Action  = [
                 "states:StartExecution",
             ]
-            Resource = module.dms_validation_step_function.arn
+            Resource = var.dms_validation_step_function_arn
         }]
     }) 
 }
