@@ -29,7 +29,30 @@ locals {
     dns_suffix          = "${local.application_name}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
     internal_dns_suffix = "${local.application_name}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.internal"
   }
+
   bastion_config = {}
   image_tag = "latest"
+  app_port  = 80
+  internal_security_group_cidrs = []
+  ipv6_cidr_blocks = []
+
+  domain_types = { for dvo in aws_acm_certificate.external.domain_validation_options : dvo.domain_name => {
+    name   = dvo.resource_record_name
+    record = dvo.resource_record_value
+    type   = dvo.resource_record_type
+    }
+  }
+
+  domain             = local.is-production ? "vcms.probation.service.justice.gov.uk" : "modernisation-platform.service.justice.gov.uk"
+  domain_name_main   = [for k, v in local.domain_types : v.name if k == local.domain]
+  domain_record_main = [for k, v in local.domain_types : v.record if k == local.domain]
+  domain_type_main   = [for k, v in local.domain_types : v.type if k == local.domain]
+  domain_name_sub    = [for k, v in local.domain_types : v.name if k == local.app_url]
+  domain_record_sub  = [for k, v in local.domain_types : v.record if k == local.app_url]
+  domain_type_sub    = [for k, v in local.domain_types : v.type if k == local.app_url]
+  validation_record_fqdns = local.is-development ? [local.domain_name_main[0], local.domain_name_sub[0]] : [local.domain_name_main[0], local.domain_name_sub[0]]
+
+  app_url          = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.${local.domain}"
+  acm_subject_alternative_names = [local.app_url]
 
 }
