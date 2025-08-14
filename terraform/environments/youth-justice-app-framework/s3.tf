@@ -69,7 +69,7 @@ module "s3-sbom" {
 
 }
 
-module "s3-sbom" {
+module "s3-certs" {
   #only in development or prod
   count  = local.environment == "development" || local.environment == "preproduction" ? 1 : 0
   source = "./modules/s3"
