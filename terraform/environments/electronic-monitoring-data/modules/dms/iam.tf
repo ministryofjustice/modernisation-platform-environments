@@ -12,7 +12,7 @@ resource "aws_iam_role" "dms_validation_event_bridge_invoke_sfn_role" {
 }
 
 resource "aws_iam_role_policy" "event_bridge_invoke_sfn_policy" {
-    role = aws_iam_role.dms_validation_event_bridge_invoke_sfn_role.arn
+    role = aws_iam_role.dms_validation_event_bridge_invoke_sfn_role.name
     policy = jsonencode({
         Version = "2012-10-17"
         Statement = [{
