@@ -32,7 +32,7 @@ locals {
     "servicenow",
     "serco_fms",
     "allied_mdss",
-    ]
+  ]
   prod_dbs_to_grant = local.is-production ? [
     "am_stg",
     "cap_dw_stg",

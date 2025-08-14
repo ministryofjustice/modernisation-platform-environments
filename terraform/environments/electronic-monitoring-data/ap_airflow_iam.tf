@@ -234,7 +234,7 @@ module "load_emsys_tpims_database" {
   cadt_bucket          = module.s3-create-a-derived-table-bucket.bucket
   max_session_duration = 12 * 60 * 60
 
-  new_airflow          = true
+  new_airflow = true
 }
 
 module "load_fep_database" {

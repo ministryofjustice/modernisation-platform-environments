@@ -17,3 +17,20 @@ resource "aws_iam_policy" "trigger_unzip_lambda" {
   name   = "trigger_unzip_lambda"
   policy = data.aws_iam_policy_document.trigger_unzip_lambda.json
 }
+
+# ------------------------------------------
+# DMS Validation
+# ------------------------------------------
+
+data "aws_iam_policy_document" "dms_validation_step_function_policy_document" {
+  statement {
+    effect    = "Allow"
+    actions   = ["lambda:InvokeFunction"]
+    resources = [module.dms_validation.lambda_function_arn]
+  }
+}
+
+resource "aws_iam_policy" "dms_validation_step_function_policy" {
+  name   = "dms_validation_step_function_role_${locals.environment_shorthand}"
+  policy = data.aws_iam_policy_document.dms_validation_step_function_policy_document.json
+}

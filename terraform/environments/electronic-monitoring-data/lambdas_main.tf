@@ -224,3 +224,21 @@ module "zero_etl_snow" {
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev          = local.is-production ? "prod" : "dev"
 }
+
+#-----------------------------------------------------------------------------------
+# DMS Validation Lambda
+#-----------------------------------------------------------------------------------
+
+module "dms_validation" {
+  source                  = "./modules/lambdas"
+  is_image                = true
+  function_name           = "dms_validation"
+  role_name               = aws_iam_role.dms_validation_lambda_role.name
+  role_arn                = aws_iam_role.dms_validation_lambda_role.arn
+  handler                 = "dms_validation.handler"
+  memory_size             = 10240
+  timeout                 = 900
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : "dev"
+  layers                  = ["arn:aws:lambda:eu-west-2:133256977650:layer:AWS-Parameters-and-Secrets-Lambda-Extension:18"]
+}

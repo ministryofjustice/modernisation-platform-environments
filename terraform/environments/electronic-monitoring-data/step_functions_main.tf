@@ -14,3 +14,20 @@ module "get_zipped_file_api" {
   )
   type = "EXPRESS"
 }
+
+# ------------------------------------------
+# DMS Validation Step Function
+# ------------------------------------------
+
+module "dms_validation_step_function" {
+  source       = "./modules/step_function"
+  name         = "dms_validation_${locals.environment_shorthand}"
+  iam_policies = tomap({ "dms_validation_step_function_policy" = aws_iam_policy.dms_validation_step_function_policy })
+  variable_dictionary = tomap(
+    {
+      "dms_validation_lambda" = module.dms_validation.lambda_function_name,
+    }
+  )
+  type = "EXPRESS"
+}
+
