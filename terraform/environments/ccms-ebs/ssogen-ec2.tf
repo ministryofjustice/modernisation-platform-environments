@@ -10,11 +10,6 @@ resource "aws_instance" "ec2_ssogen" {
   associate_public_ip_address = false
   iam_instance_profile        = aws_iam_instance_profile.ssogen_instance_profile.name
 
-  cpu_options {
-    core_count       = local.application_data.accounts[local.environment].ec2_oracle_instance_cores_ssogen
-    threads_per_core = local.application_data.accounts[local.environment].ec2_oracle_instance_threads_ssogen
-  }
-
   lifecycle {
     ignore_changes = [
       ebs_block_device,
