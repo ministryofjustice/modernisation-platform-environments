@@ -15,7 +15,7 @@ data "aws_iam_policy_document" "openmetadata" {
 
 module "openmetadata_iam_policy" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "~> 5.0"
+  version = "~> 6.0"
 
   name_prefix = "openmetadata"
 
