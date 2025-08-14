@@ -3,7 +3,10 @@
     "development": {
       "example_var": "dev-data",
       "cwa_database_ip": "10.26.60.170/32",
-      "vpc_endpoint_sg": "sg-0754d9a309704addd"
+      "vpc_endpoint_sg": "sg-0754d9a309704addd",
+      "ccms_database_ip": "10.26.60.223/32",
+      "cwa_efs_sg": "sg-051ddf4169a9048a2",
+      "s3_vpc_endpoint_prefix": "pl-7ca54015"
     },
     "test": {
       "example_var": "test-data"

@@ -78,6 +78,14 @@ variable "full_reload" {
   default     = false
 }
 
+variable "secret_arn" {
+  type        = string
+  description = "secret arn to grant access too"
+  nullable    = true
+  default     = null
+}
+
+
 variable "new_airflow" {
   type        = bool
   description = "whether we are using new airflow or not"
