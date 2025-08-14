@@ -183,8 +183,8 @@
       "ftp_lambda_source_file_version": "LKYb32.Rqjizm17IiAsa.YZhOXfumTGj",
       "zip_lambda_source_file": "zip_s3_objects.zip",
       "zip_lambda_source_file_version": "E.U4jcCEI2iQa0pIP48MvUzN4BJ6M1H5",
-      "ftp_lambda_eventbridge_cron": "cron(0 * * * ? 2999)",
-      "zip_lambda_eventbridge_cron": "cron(45 6 * * ? 2999)"
+      "ftp_lambda_eventbridge_cron": "cron(0 * * * ? *)",
+      "zip_lambda_eventbridge_cron": "cron(45 6 * * ? *)"
     }
   }
 }

@@ -19,6 +19,14 @@ resource "aws_lambda_function" "main" {
     variables = var.lambda.environment_variables
   }
 
+  dynamic "logging_config" {
+    for_each = var.lambda.log_group != null ? [var.lambda.log_group] : []
+    content {
+      log_format = "Text"
+      log_group  = aws_cloudwatch_log_group.log_group[0].name
+    }
+  }
+
   dynamic "vpc_config" {
     for_each = var.lambda.vpc_config != null ? [var.lambda.vpc_config] : []
     content {
@@ -31,6 +39,17 @@ resource "aws_lambda_function" "main" {
   timeout     = var.lambda.lambda_timeout
 
   tags = merge(var.tags, local.tags)
+}
+
+resource "aws_cloudwatch_log_group" "log_group" {
+  #checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS" - not required
+  count             = var.lambda.log_group != null ? 1 : 0
+  name_prefix       = var.lambda.log_group.name
+  retention_in_days = 365
+
+  kms_key_id = var.cloudwatch_log_group_kms_key_id
+
+  tags = var.tags
 }
 
 resource "aws_iam_role" "lambda_iam_roles" {
