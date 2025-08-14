@@ -25,7 +25,7 @@ module "dms_validation_step_function" {
   iam_policies = tomap({ "dms_validation_step_function_policy" = aws_iam_policy.dms_validation_step_function_policy })
   variable_dictionary = tomap(
     {
-      "dms_validation_lambda" = module.dms_validation.lambda_function_name,
+      "dms_validation" = module.dms_validation.lambda_function_name,
     }
   )
   type = "EXPRESS"
