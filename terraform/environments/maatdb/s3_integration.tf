@@ -25,33 +25,55 @@ module "s3_bucket" {
     aws.bucket-replication = aws
   }
 
-  lifecycle_rule = [
-    {
-      id      = "main"
-      enabled = "Enabled"
-      prefix  = ""
+lifecycle_rule = local.is-production ? [
+  {
+    id      = "main"
+    enabled = "Enabled"
+    prefix  = ""
 
-      tags = {
-        rule      = "log"
-        autoclean = "false"
-      }
-
-      noncurrent_version_expiration = {
-        days = 31
-      }
-
-      transition = [
-        {
-          days          = 90
-          storage_class = "STANDARD_IA"
-        },
-        {
-          days          = 180
-          storage_class = "GLACIER"
-        }
-      ]
+    tags = {
+      rule      = "log"
+      autoclean = "false"
     }
-  ]
+
+    noncurrent_version_expiration = {
+      days = 31
+    }
+
+    transition = [
+      {
+        days          = 90
+        storage_class = "STANDARD_IA"
+      },
+      {
+        days          = 180
+        storage_class = "GLACIER"
+      }
+    ]
+  }
+] : [
+  {
+    id      = "main-nonprod"
+    enabled = "Enabled"
+    prefix  = ""
+
+    tags = {
+      rule      = "log"
+      autoclean = "true"
+    }
+
+    # Delete CURRENT versions after 7 days
+    expiration = {
+      days = 7
+    }
+
+    # (Optional) keep versions tidy too; remove if not needed
+    noncurrent_version_expiration = {
+      days = 7
+    }
+  }
+]
+
 
   tags = merge(local.tags, {
     Name = "${local.application_name}-${local.environment}-ftp-${each.key}"
