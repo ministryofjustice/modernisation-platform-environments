@@ -43,8 +43,8 @@ module "dms_task" {
   rep_task_table_mapping_filepath = trimspace(file("${path.module}/dms_${each.key}_task_tables_selection.json"))
 
   # DMS Validation Event bridge Rule
-  event_bridge_rule_name = "dms_validation_trigger_rule_${locals.environment_shorthand}"
-  event_bridge_role_name = "dms_validation_trigger_role_${locals.environment_shorthand}"
+  event_bridge_rule_name = "dms_validation_trigger_rule"
+  event_bridge_role_name = "dms_validation_trigger_role"
   dms_trigger_state      = "COMPLETED"
 
   local_tags = local.tags

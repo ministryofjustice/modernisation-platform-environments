@@ -21,7 +21,7 @@ module "get_zipped_file_api" {
 
 module "dms_validation_step_function" {
   source       = "./modules/step_function"
-  name         = "dms_validation_${locals.environment_shorthand}"
+  name         = "dms_validation"
   iam_policies = tomap({ "dms_validation_step_function_policy" = aws_iam_policy.dms_validation_step_function_policy })
   variable_dictionary = tomap(
     {

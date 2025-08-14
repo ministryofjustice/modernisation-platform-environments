@@ -31,6 +31,6 @@ data "aws_iam_policy_document" "dms_validation_step_function_policy_document" {
 }
 
 resource "aws_iam_policy" "dms_validation_step_function_policy" {
-  name   = "dms_validation_step_function_role_${locals.environment_shorthand}"
+  name   = "dms_validation_step_function_role"
   policy = data.aws_iam_policy_document.dms_validation_step_function_policy_document.json
 }

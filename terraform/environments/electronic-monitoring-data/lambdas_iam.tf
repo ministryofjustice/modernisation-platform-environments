@@ -643,12 +643,12 @@ data "aws_iam_policy_document" "dms_validation_lambda_role_policy_document" {
 }
 
 resource "aws_iam_role" "dms_validation_lambda_role" {
-  name               = "dms_validation_lambda_role_${locals.environment_shorthand}"
+  name               = "dms_validation_lambda_role"
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
 }
 
 resource "aws_iam_policy" "dms_validation_lambda_role_policy" {
-  name   = "dms_validation_lambda_policy_${locals.environment_shorthand}"
+  name   = "dms_validation_lambda_policy"
   policy = data.aws_iam_policy_document.dms_validation_lambda_role_policy_document.json
 }
 
