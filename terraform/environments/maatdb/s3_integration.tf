@@ -36,13 +36,14 @@ lifecycle_rule = [
       autoclean = local.is-production ? "false" : "true"
     }
 
-    # Current version expiry: only in non-prod.
-    # Use {} in prod so the module skips creating the block.
+    # Non-prod: delete CURRENT versions after 7 days.
+    # Include a real bool for expired_object_delete_marker to avoid null.
     expiration = local.is-production ? {} : {
-      days = 7
+      days                          = 7
+      expired_object_delete_marker  = false
     }
 
-    # Keep noncurrent versions shorter in non-prod if desired
+    # Noncurrent versions: shorter in non-prod
     noncurrent_version_expiration = {
       days = local.is-production ? 31 : 7
     }
@@ -60,6 +61,7 @@ lifecycle_rule = [
     ] : []
   }
 ]
+
 
   tags = merge(local.tags, {
     Name = "${local.application_name}-${local.environment}-ftp-${each.key}"
