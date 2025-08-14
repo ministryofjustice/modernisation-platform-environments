@@ -78,6 +78,17 @@ resource "aws_ssm_parameter" "maat_app_orch_client_secret" {
   }
 }
 
+resource "aws_ssm_parameter" "maat_app_scheduled_client_secret" {
+  name  = "/maat/APP_SCHEDULED_CLIENT_SECRET"
+  type  = "SecureString"
+  value = "replace in console"
+  lifecycle {
+    ignore_changes = [
+      value,
+    ]
+  }
+}
+
 resource "aws_ssm_parameter" "maat_app_caa_client_id" {
   name  = "/maat/APP_CAA_CLIENT_ID"
   type  = "SecureString"
@@ -91,6 +102,17 @@ resource "aws_ssm_parameter" "maat_app_caa_client_id" {
 
 resource "aws_ssm_parameter" "maat_app_orch_client_id" {
   name  = "/maat/APP_ORCH_CLIENT_ID"
+  type  = "SecureString"
+  value = "replace in console"
+  lifecycle {
+    ignore_changes = [
+      value,
+    ]
+  }
+}
+
+resource "aws_ssm_parameter" "maat_app_scheduled_client_id" {
+  name  = "/maat/APP_SCHEDULED_CLIENT_ID"
   type  = "SecureString"
   value = "replace in console"
   lifecycle {
