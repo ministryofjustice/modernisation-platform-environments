@@ -120,7 +120,7 @@ module "p1_export_airflow" {
 
 resource "aws_lakeformation_permissions" "p1_s3_access" {
   principal = module.p1_export_airflow.iam_role.arn
-  permissions = ["workflow_role"]
+  permissions = ["DATA_LOCATION_ACCESS"]
   data_location {
     arn = aws_lakeformation_resource.data_bucket.arn
   }
