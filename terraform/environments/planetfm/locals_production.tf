@@ -41,10 +41,10 @@ locals {
       })
 
       pd-cafm-a-11-a = merge(local.ec2_instances.app, {
-        #cloudwatch_metric_alarms = merge(
-        #  local.ec2_instances.app.cloudwatch_metric_alarms,
-        #  module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows,
-        #)
+        cloudwatch_metric_alarms = merge(
+          local.ec2_instances.app.cloudwatch_metric_alarms,
+          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows,
+        )
         cloudwatch_metric_alarms = {}
         config = merge(local.ec2_instances.app.config, {
           ami_name          = "pd-cafm-a-2022-image-20250806T1436"
@@ -66,10 +66,10 @@ locals {
       })
 
       pd-cafm-a-12-b = merge(local.ec2_instances.app, {
-        cloudwatch_metric_alarms = merge(
-          local.ec2_instances.app.cloudwatch_metric_alarms,
-          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows
-        )
+        #cloudwatch_metric_alarms = merge(
+        #  local.ec2_instances.app.cloudwatch_metric_alarms,
+        #  module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows
+        #)
         config = merge(local.ec2_instances.app.config, {
           ami_name          = "pd-cafm-a-12-b"
           availability_zone = "eu-west-2b"
@@ -77,8 +77,6 @@ locals {
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
           "/dev/sdb"  = { type = "gp3", size = 200 }
-          # "xvde"      = { type = "gp3", size = 6, snapshot_id = "snap-040a13a16f7ffb223" } # Windows 2019 English Installation Media
-          # "xvdf"      = { type = "gp3", size = 6, snapshot_id = "snap-04435aa8246764616" } # Windows 2022 English Installation Media
         }
         instance = merge(local.ec2_instances.app.instance, {
           disable_api_termination = true
@@ -93,10 +91,10 @@ locals {
       })
 
       pd-cafm-a-13-a = merge(local.ec2_instances.app, {
-        cloudwatch_metric_alarms = merge(
-          local.ec2_instances.app.cloudwatch_metric_alarms,
-          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows
-        )
+        #cloudwatch_metric_alarms = merge(
+        #  local.ec2_instances.app.cloudwatch_metric_alarms,
+        #  module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows
+        #)
         config = merge(local.ec2_instances.app.config, {
           ami_name          = "pd-cafm-a-13-a"
           availability_zone = "eu-west-2a"
@@ -104,8 +102,6 @@ locals {
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
           "/dev/sdb"  = { type = "gp3", size = 28 }
-          # "xvde"      = { type = "gp3", size = 6, snapshot_id = "snap-040a13a16f7ffb223" } # Windows 2019 English Installation Media
-          # "xvdf"      = { type = "gp3", size = 6, snapshot_id = "snap-04435aa8246764616" } # Windows 2022 English Installation Media
         }
         instance = merge(local.ec2_instances.app.instance, {
           disable_api_termination = true
@@ -120,10 +116,10 @@ locals {
       })
 
       pd-cafm-a-14-b = merge(local.ec2_instances.app, {
-        #cloudwatch_metric_alarms = merge(
-        #  local.ec2_instances.app.cloudwatch_metric_alarms,
-        #  module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows
-        #)
+        cloudwatch_metric_alarms = merge(
+          local.ec2_instances.app.cloudwatch_metric_alarms,
+          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows
+        )
         cloudwatch_metric_alarms = {}
         config = merge(local.ec2_instances.app.config, {
           ami_name          = "pd-cafm-a-2022-image-20250806T1436"
@@ -145,10 +141,10 @@ locals {
       })
 
       pd-cafm-a-15-a = merge(local.ec2_instances.app, {
-        #cloudwatch_metric_alarms = merge(
-        #  local.ec2_instances.app.cloudwatch_metric_alarms,
-        #  module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows
-        #)
+        cloudwatch_metric_alarms = merge(
+          local.ec2_instances.app.cloudwatch_metric_alarms,
+          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows
+        )
         cloudwatch_metric_alarms = {}
         config = merge(local.ec2_instances.app.config, {
           ami_name          = "pd-cafm-a-2022-image-20250806T1436"
