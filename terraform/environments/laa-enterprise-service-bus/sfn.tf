@@ -12,7 +12,7 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
         Resource = "arn:aws:states:::lambda:invoke",
         Output   = "{% $states.result.Payload %}",
         Arguments = {
-          FunctionName = aws_lambda_function.cwa_test_1.name,
+          FunctionName = aws_lambda_function.cwa_test_1.arn,
           Payload      = "{% $states.input %}"
         },
         Retry = [{
@@ -34,7 +34,7 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
                 Resource = "arn:aws:states:::lambda:invoke",
                 Output   = "{% $states.result.Payload %}",
                 Arguments = {
-                  FunctionName = aws_lambda_function.cwa_test_2.name,
+                  FunctionName = aws_lambda_function.cwa_test_2.arn,
                   Payload      = "{% $states.input %}"
                 },
                 Retry = [{
@@ -61,7 +61,7 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
                 Resource = "arn:aws:states:::lambda:invoke",
                 Output   = "{% $states.result.Payload %}",
                 Arguments = {
-                  FunctionName = aws_lambda_function.cwa_test_3.name,
+                  FunctionName = aws_lambda_function.cwa_test_3.arn,
                   Payload      = "{% $states.input %}"
                 },
                 Retry = [{
@@ -82,7 +82,7 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
         Resource = "arn:aws:states:::lambda:invoke",
         Output   = "{% $states.result.Payload %}",
         Arguments = {
-          FunctionName = aws_lambda_function.cwa_test_4.name,
+          FunctionName = aws_lambda_function.cwa_test_4.arn,
           Payload      = "{% $states.input %}"
         },
         Retry = [{
