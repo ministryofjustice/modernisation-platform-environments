@@ -7,6 +7,11 @@ locals {
 
   ftp_directions = ["inbound", "outbound"]
 
+  expiration_json = local.is-production ? "{}" : jsonencode({
+        days                         = 7
+        expired_object_delete_marker = false
+      })
+
 }
 
 module "s3_bucket" {
@@ -36,19 +41,13 @@ lifecycle_rule = [
       autoclean = local.is-production ? "false" : "true"
     }
 
-    # Non-prod: delete CURRENT versions after 7 days.
-    # Include a real bool for expired_object_delete_marker to avoid null.
-    expiration = local.is-production ? {} : {
-      days                          = 7
-      expired_object_delete_marker  = false
-    }
+    # Decode to a map. In prod this becomes {}, so the module skips the block.
+    expiration = jsondecode(local.expiration_json)
 
-    # Noncurrent versions: shorter in non-prod
     noncurrent_version_expiration = {
       days = local.is-production ? 31 : 7
     }
 
-    # Transitions only for prod; keep attribute present in both
     transition = local.is-production ? [
       {
         days          = 90
