@@ -14,6 +14,10 @@ parameters:
     type: String
     description: 'Any additional parameters to pass to powershell in hashtable format, e.g. @{"DomainNameFQDN" = "azure.noms.root"}'
     default: '@{}'
+  username:
+    type: String
+    description: 'Optionally run script using given domain user. The associated domain SecretsManager secret must contain the user password'
+    default: ''
   whatIfPreference:
     type: String
     description: 'Optionally set whatIfPreference, e.g. set to $true'
@@ -40,11 +44,12 @@ mainSteps:
           $GitBranch = "{{ branch }}"
           $Script = "{{ powershellScript }}"
           $ScriptArgs = {{ powershellScriptArgs }}
+          $Username = "{{ username }}"
           [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 # since powershell 4 uses Tls1 as default
           Invoke-WebRequest "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform-configuration-management/${GitBranch}/powershell/Scripts/Run-GitScript.ps1" -OutFile "Run-GitScript.ps1"
           Write-Output "Set WhatIfPreference=$WhatIfPreference VerbosePreference=$VerbosePreference"
           $WhatIfPreference = {{ whatIfPreference }}
           $VerbosePreference = "{{ verbosePreference }}"
           Write-Output ("Run-GitScript.ps1 $Script -GitBranch $GitBranch -ScriptArgs " + ($ScriptArgs | ConvertTo-Json -Compress))
-          . ./Run-GitScript.ps1 $Script -GitBranch $GitBranch -ScriptArgs $ScriptArgs
+          . ./Run-GitScript.ps1 $Script -GitBranch $GitBranch -Username $Username -ScriptArgs $ScriptArgs
           Exit $LASTEXITCODE
