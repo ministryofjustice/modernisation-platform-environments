@@ -85,6 +85,7 @@ variable "secret_arn" {
   default     = null
 }
 
+
 variable "new_airflow" {
   type        = bool
   description = "whether we are using new airflow or not"
