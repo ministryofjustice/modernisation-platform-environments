@@ -630,16 +630,6 @@ data "aws_iam_policy_document" "dms_validation_lambda_role_policy_document" {
       module.s3-dms-target-store-bucket.bucket.arn,
     ]
   }
-  statement {
-    sid    = "CloudwatchPermissions"
-    effect = "Allow"
-    actions = [
-      "logs:CreateLogGroup",
-      "logs:CreateLogStream",
-      "logs:PutLogEvents"
-    ]
-    resources = ["arn:aws:logs:*:*:*"]
-  }
 }
 
 resource "aws_iam_role" "dms_validation_lambda_role" {
