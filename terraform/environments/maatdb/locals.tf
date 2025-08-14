@@ -10,8 +10,7 @@ locals {
   build_ftp      = local.application_data.accounts[local.environment].build_ftp
   build_ses      = local.application_data.accounts[local.environment].build_ses
   build_ec2      = local.application_data.accounts[local.environment].build_ec2
-  build_transfer = local.application_data.accounts[local.environment].build_transfer
-
+  
   ftp_layer_bucket          = local.application_data.accounts[local.environment].ftp_layer_bucket
   ftp_layer_folder_location = local.application_data.accounts[local.environment].ftp_layer_folder_location
   ftp_layer_source_zip      = local.application_data.accounts[local.environment].ftp_layer_source_zip
