@@ -19,7 +19,7 @@ module "landing_bucket" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "5.1.0"
+  version = "5.4.0"
 
   bucket = "mojap-ingestion-${local.environment}-landing"
 
@@ -77,7 +77,7 @@ module "quarantine_bucket" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "5.1.0"
+  version = "5.4.0"
 
   bucket = "mojap-ingestion-${local.environment}-quarantine"
 
@@ -112,7 +112,7 @@ module "definitions_bucket" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "5.1.0"
+  version = "5.4.0"
 
   bucket = "mojap-ingestion-${local.environment}-definitions"
 
@@ -150,7 +150,7 @@ module "processed_bucket" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "5.1.0"
+  version = "5.4.0"
 
   bucket = "mojap-ingestion-${local.environment}-processed"
 
@@ -209,7 +209,7 @@ module "bold_egress_bucket" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "5.1.0"
+  version = "5.4.0"
 
   bucket = "mojap-ingestion-${local.environment}-bold-egress"
 
@@ -254,7 +254,7 @@ module "datasync_opg_bucket" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "5.1.0"
+  version = "5.4.0"
 
   bucket = "mojap-ingestion-${local.environment}-datasync-opg"
 
@@ -337,7 +337,7 @@ module "laa_data_analysis_bucket" {
   count = local.environment == "production" ? 1 : 0
 
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "5.1.0"
+  version = "5.4.0"
 
   bucket = "mojap-ingestion-${local.environment}-laa-data-analysis"
 
