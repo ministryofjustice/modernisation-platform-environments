@@ -6,7 +6,7 @@ resource "aws_cloudwatch_event_rule" "dms_task_completed" {
         "source": ["aws.dms"],
         "detail-type": ["DMS Replication Task State Change"],
         "detail": {
-            "EventID": ["DMS-EVENT-0079"],
+            "eventId": ["DMS-EVENT-0079"],
             "eventType" : ["REPLICATION_TASK_STOPPED"]
             "detailMessage": ["Stop Reason ${var.dms_trigger_state}"]
         }
