@@ -127,6 +127,7 @@ locals {
       })
 
       t1-jump2022-2 = merge(local.ec2_instances.jumpserver, {
+        cloudwatch_metric_alarms = {}
         config = merge(local.ec2_instances.jumpserver.config, {
           ami_name          = "hmpps_windows_server_2022_release_2025-01-02T00-00-40.487Z"
           availability_zone = "eu-west-2a"
@@ -163,6 +164,26 @@ locals {
           domain-name = "azure.noms.root"
         })
       })
+
+      test-rds-1-b = merge(local.ec2_instances.rds, {
+        cloudwatch_metric_alarms = {}
+        config = merge(local.ec2_instances.rds.config, {
+          ami_name          = "hmpps_windows_server_2022_release_2025-04-02T00-00-40.543Z"
+          availability_zone = "eu-west-2b"
+          instance_profile_policies = concat(local.ec2_instances.rds.config.instance_profile_policies, [
+            "Ec2SecretPolicy"]
+          )
+        })
+        instance = merge(local.ec2_instances.rds.instance, {
+          tags = {
+            patch-manager = "group2"
+          }
+        })
+        tags = merge(local.ec2_instances.rds.tags, {
+          domain-name  = "azure.noms.root"
+          service-user = "svc_rds"
+        })
+      })
     }
 
     iam_policies = {
@@ -194,6 +215,11 @@ locals {
           test-rds-1-https = merge(local.lbs.public.instance_target_groups.https, {
             attachments = [
               { ec2_instance_name = "test-rds-1-a" },
+            ]
+          })
+          test-rds-2-https = merge(local.lbs.public.instance_target_groups.https, {
+            attachments = [
+              { ec2_instance_name = "test-rds-1-b" },
             ]
           })
         }
@@ -234,6 +260,20 @@ locals {
                   }
                 }]
               }
+              test-rds-2-https = {
+                priority = 300
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "test-rds-2-https"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "rdweb2.test.hmpps-domain.service.justice.gov.uk"
+                    ]
+                  }
+                }]
+              }
             }
           })
         })
@@ -266,6 +306,7 @@ locals {
         lb_alias_records = [
           { name = "rdgateway1", type = "A", lbs_map_key = "public" },
           { name = "rdweb1", type = "A", lbs_map_key = "public" },
+          { name = "rdweb2", type = "A", lbs_map_key = "public" },
         ]
       }
     }
