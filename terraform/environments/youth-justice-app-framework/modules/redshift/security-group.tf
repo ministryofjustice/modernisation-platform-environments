@@ -35,11 +35,24 @@ module "redshift_sg" {
     },
   ]
 
-egress_prefix_list_ids = [ data.aws_prefix_list.s3.id ]
+}
 
-egress_rules = [ "https-443-tcp" ]
+module "redshift_sg_s3" {
+  # checkov:skip=CKV_TF_1
+
+  source  = "terraform-aws-modules/security-group/aws"
+  version = "4.13.0"
+
+  vpc_id            = var.vpc_id
+  security_group_id = module.redshift_sg.security_group_id
+  create_sg         = false
+
+ egress_prefix_list_ids = [ data.aws_prefix_list.s3.id ]
+
+ egress_rules = [ "https-443-tcp" ]
 
 }
+
 
 module "postgres_sg" {
   # checkov:skip=CKV_TF_1
