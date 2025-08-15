@@ -44,6 +44,7 @@ resource "aws_security_group_rule" "redshift_to_s3" {
   from_port         = 443
   protocol          = "tcp"
   prefix_list_ids   = [data.aws_prefix_list.s3.id]
+  description       = "Redshift to S3"
 }
 
 
