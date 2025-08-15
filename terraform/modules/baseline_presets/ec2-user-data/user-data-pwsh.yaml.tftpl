@@ -94,3 +94,26 @@ tasks:
           Invoke-WebRequest "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform-configuration-management/$${GitBranch}/powershell/Scripts/Run-GitScript.ps1" -OutFile "Run-GitScript.ps1"
           . ./Run-GitScript.ps1 $Script -GitBranch $GitBranch
           Exit $LASTEXITCODE
+      - frequency: once
+        type: powershell
+        runAs: admin
+        content: |-
+          # Check whether to run under a given username as well
+          $ErrorActionPreference = "Stop"
+          $Token = Invoke-RestMethod -TimeoutSec 10 -Headers @{"X-aws-ec2-metadata-token-ttl-seconds"=3600} -Method PUT -Uri http://169.254.169.254/latest/api/token
+          $InstanceId = Invoke-RestMethod -TimeoutSec 10 -Headers @{"X-aws-ec2-metadata-token" = $Token} -Method GET -Uri http://169.254.169.254/latest/meta-data/instance-id
+          $TagsRaw = aws ec2 describe-tags --filters "Name=resource-id,Values=$InstanceId"
+          $Tags = "$TagsRaw" | ConvertFrom-Json
+          $Username = ($Tags.Tags | Where-Object {$_.Key -eq "service-user"}).Value
+          if ($Username) {
+            Write-Output "Downloading and running Run-GitScript.ps1"
+            Set-Location -Path ([System.IO.Path]::GetTempPath())
+            $GitBranch = "${branch}"
+            $Script = "Invoke-UserDataScript.ps1"
+            [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 # since powershell 4 uses Tls1 as default
+            Invoke-WebRequest "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform-configuration-management/$${GitBranch}/powershell/Scripts/Run-GitScript.ps1" -OutFile "Run-GitScript.ps1"
+            . ./Run-GitScript.ps1 $Script -GitBranch $GitBranch -Username "tag.service-user" -ScriptArgsList "DomainJoined"
+            Exit $LASTEXITCODE
+          } else {
+            Write-Output("Skipping Run-GitScript with username as service-user tag not found")
+          }
