@@ -119,6 +119,7 @@ module "p1_export_airflow" {
 }
 
 resource "aws_lakeformation_permissions" "p1_s3_access" {
+  count = local.is-development ? 0 : 1
   principal = module.p1_export_airflow.iam_role.arn
   permissions = ["DATA_LOCATION_ACCESS"]
   data_location {
@@ -127,6 +128,7 @@ resource "aws_lakeformation_permissions" "p1_s3_access" {
 }
 
 resource "aws_lakeformation_permissions" "p1_database_access" {
+  count = local.is-development ? 0 : 1
   principal = module.p1_export_airflow.iam_role.arn
   permissions = ["DESCRIBE"]
   database {
@@ -135,6 +137,7 @@ resource "aws_lakeformation_permissions" "p1_database_access" {
 }
 
 resource "aws_lakeformation_permissions" "p1_table_access" {
+  count = local.is-development ? 0 : 1
   principal = module.p1_export_airflow.iam_role.arn
   permissions = ["SELECT"]
   table {
