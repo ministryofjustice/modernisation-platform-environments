@@ -24,7 +24,7 @@ module "redshift_sg" {
       rule        = "https-443-tcp"
       cidr_blocks = var.vpc_cidr
       description = "Redshift to Secrets Manager"
-    }
+    },
   ]
 
   egress_with_source_security_group_id = [
@@ -37,20 +37,13 @@ module "redshift_sg" {
 
 }
 
-module "redshift_sg_s3" {
-  # checkov:skip=CKV_TF_1
-
-  source  = "terraform-aws-modules/security-group/aws"
-  version = "4.13.0"
-
-  vpc_id            = var.vpc_id
+resource "aws_security_group_rule" "redshift_to_s3" {
   security_group_id = module.redshift_sg.security_group_id
-  create_sg         = false
-
- egress_prefix_list_ids = [ data.aws_prefix_list.s3.id ]
-
- egress_rules = [ "https-443-tcp" ]
-
+  type              = "egress"
+  to_port           = 443
+  from_port         = 443
+  protocol          = "tcp"
+  prefix_list_ids   = [data.aws_prefix_list.s3.id]
 }
 
 
