@@ -36,8 +36,7 @@ resource "aws_iam_policy" "step_function_policy" {
         Resource = [
           aws_lambda_function.cwa_test_1.arn,
           aws_lambda_function.cwa_test_2.arn,
-          aws_lambda_function.cwa_test_3.arn,
-          aws_lambda_function.cwa_test_4.arn
+          aws_lambda_function.cwa_test_3.arn
         ]
       }
     ]
