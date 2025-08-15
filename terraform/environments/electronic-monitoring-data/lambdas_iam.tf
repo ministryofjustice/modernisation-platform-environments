@@ -611,3 +611,38 @@ resource "aws_lakeformation_permissions" "lambda_servicenow_read_db" {
     name = "servicenow${local.underscore_env}"
   }
 }
+
+#-----------------------------------------------------------------------------------
+# DMS Validation Lambda Iam Role
+#-----------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "dms_validation_lambda_role_policy_document" {
+  statement {
+    sid    = "S3Permissions"
+    effect = "Allow"
+    actions = [
+      "s3:ListObjects",
+      "s3:GetObject",
+      "s3:GetBucketLocation"
+    ]
+    resources = [
+      "${module.s3-dms-target-store-bucket.bucket.arn}/*",
+      module.s3-dms-target-store-bucket.bucket.arn,
+    ]
+  }
+}
+
+resource "aws_iam_role" "dms_validation_lambda_role" {
+  name               = "dms_validation_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_policy" "dms_validation_lambda_role_policy" {
+  name   = "dms_validation_lambda_policy"
+  policy = data.aws_iam_policy_document.dms_validation_lambda_role_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "validation_lambda_policy_attachment" {
+  role       = aws_iam_role.dms_validation_lambda_role.name
+  policy_arn = aws_iam_policy.dms_validation_lambda_role_policy.arn
+}
