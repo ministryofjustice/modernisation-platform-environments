@@ -24,7 +24,7 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
         Iterator = {
           StartAt = "ProcessFiles",
           States = {
-            "Lambda2" = {
+            "ProcessFiles" = {
               Type     = "Task",
               Resource = "arn:aws:states:::lambda:invoke",
               Parameters = {
