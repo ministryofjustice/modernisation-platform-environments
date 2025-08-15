@@ -8,7 +8,7 @@ resource "aws_cloudwatch_event_rule" "dms_task_completed" {
         "detail": {
             "SourceIdentifier" : ["${replace(var.database_name, "_", "-")}-db-migration-task-tf"],
             "EventID": ["DMS-EVENT-0079"],
-            "ReplicationTaskState": ["Replication task has stopped. Stop Reason ${var.dms_trigger_state}"]
+            "EventMessage": ["Replication task has stopped. Stop Reason ${var.dms_trigger_state}"]
         }
     })
 }
