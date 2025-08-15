@@ -35,7 +35,7 @@ module "redshift_sg" {
     },
   ]
 
-egress_prefix_list_ids = data.aws_prefix_list.s3
+egress_prefix_list_ids = data.aws_prefix_list.s3.id
 
 egress_rules = [ "https-443-tcp" ]
 
