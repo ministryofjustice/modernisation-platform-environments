@@ -162,6 +162,26 @@ resource "aws_security_group_rule" "alb_managed_ingress_cp8001" {
   cidr_blocks       = [local.application_data.accounts[local.environment].cloud_platform_cidr]
 }
 
+resource "aws_security_group_rule" "alb_managed_ingress_nec80" {
+  security_group_id = aws_security_group.alb_managed.id
+  type              = "ingress"
+  description       = "EM HTTP - NEC"
+  protocol          = "TCP"
+  from_port         = 80
+  to_port           = 80
+  cidr_blocks       = [local.application_data.accounts[local.environment].northgate_proxy]
+}
+
+resource "aws_security_group_rule" "alb_managed_ingress_nec443" {
+  security_group_id = aws_security_group.alb_managed.id
+  type              = "ingress"
+  description       = "EM HTTPS - NEC"
+  protocol          = "TCP"
+  from_port         = 443
+  to_port           = 443
+  cidr_blocks       = [local.application_data.accounts[local.environment].northgate_proxy]
+}
+
 resource "aws_security_group_rule" "alb_managed_egress_all" {
   security_group_id = aws_security_group.alb_managed.id
   type              = "egress"

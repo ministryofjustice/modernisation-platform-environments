@@ -210,6 +210,26 @@ resource "aws_lakeformation_permissions" "ac_allied_tables" {
   }
 }
 
+resource "aws_lakeformation_permissions" "ac_servicenow_db" {
+  count       = local.is-test ? 1 : 0
+  principal   = module.acquisitive_crime_assumable_role[0].iam_role_arn
+  permissions = ["DESCRIBE"]
+  database {
+    name = "serco_servicenow_${local.environment_shorthand}"
+  }
+}
+
+resource "aws_lakeformation_permissions" "ac_servicenow_tables" {
+  count       = local.is-test ? 1 : 0
+  principal   = module.acquisitive_crime_assumable_role[0].iam_role_arn
+  permissions = ["SELECT", "DESCRIBE"]
+  table {
+    database_name = "serco_servicenow_${local.environment_shorthand}"
+    wildcard      = true
+  }
+}
+
+
 data "aws_iam_policy_document" "standard_athena_access" {
   statement {
     actions = [

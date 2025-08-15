@@ -1,7 +1,7 @@
 module "rds_export" {
   # checkov:skip=CKV_TF_1: using branch instead of a commit hash
   # checkov:skip=CKV_TF_2: using branch instead of tag with a version number
-  source = "github.com/ministryofjustice/terraform-rds-export?ref=sql-backup-restore-rds-updates"
+  source = "github.com/ministryofjustice/terraform-rds-export?ref=47d47c71000a0a0e5ab6680f7737df61504cf64a"
 
   kms_key_arn         = aws_kms_key.sns_kms.arn
   name                = "cafm"
@@ -30,7 +30,7 @@ module "endpoints" {
   vpc_id                     = module.vpc.vpc_id
   create_security_group      = true
   security_group_description = "Managed by Terraform"
-  security_group_tags        = { Name : "eu-west-1-dev" }
+  security_group_tags        = { Name : "cafm-migration-rds-sg" }
   security_group_rules = {
     ingress_https = {
       description = "HTTPS from VPC"
