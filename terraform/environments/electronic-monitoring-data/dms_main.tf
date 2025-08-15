@@ -45,7 +45,7 @@ module "dms_task" {
   # DMS Validation Event bridge Rule
   event_bridge_rule_name           = "dms_validation_trigger_rule"
   event_bridge_role_name           = "dms_validation_trigger_role"
-  dms_trigger_state                = "COMPLETED"
+  dms_trigger_state                = "FULL_LOAD_ONLY_FINISHED"
   dms_validation_step_function_arn = module.dms_validation_step_function.arn
 
   local_tags = local.tags
