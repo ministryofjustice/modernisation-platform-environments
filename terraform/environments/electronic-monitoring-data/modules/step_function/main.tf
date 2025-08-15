@@ -67,8 +67,8 @@ data "aws_iam_policy_document" "step_function_base_permissions" {
       "logs:PutResourcePolicy",
       "logs:DescribeResourcePolicies",
       "logs:DescribeLogGroups",
-      "logs:PutDestination",
-      "logs:PutDestinationPolicy",
+      # "logs:PutDestination",
+      # "logs:PutDestinationPolicy",
       "logs:PutLogEvents"
     ]
     resources = ["arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:*"]
