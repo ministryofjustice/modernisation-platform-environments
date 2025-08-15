@@ -103,3 +103,78 @@ resource "aws_lambda_function" "cwa_extract" {
     { Name = "${local.application_name_short}-${local.environment}-cwa-extract" }
   )
 }
+
+######################################
+### Lambda Resources For Step Function
+######################################
+resource "aws_lambda_function" "cwa_extract_lambda_new" {
+
+  description      = "Connect to CWA DB, extracts data into JSON files, uploads them to S3 and creates SNS message and SQS entries with S3 references"
+  function_name    = "cwa_extract_lambda_new"
+  role             = aws_iam_role.cwa_extract_lambda_role.arn
+  handler          = "hello.lambda_handler"
+  filename         = "lambda/hello_lambda/hello_lambda.zip"
+  source_code_hash = filebase64sha256("lambda/hello_lambda/hello_lambda.zip")
+  timeout          = 300
+  memory_size      = 128
+  runtime          = "python3.10"
+
+  vpc_config {
+    security_group_ids = [aws_security_group.cwa_extract_new.id]
+    subnet_ids         = [data.aws_subnet.data_subnets_a.id]
+  }
+  
+
+  tags = merge(
+    local.tags,
+    { Name = "${local.application_name_short}-${local.environment}-cwa-extract-test-1" }
+  )
+}
+
+resource "aws_lambda_function" "cwa_file_transfer_lambda" {
+
+  description      = "Connect to CWA DB, extracts data into JSON files, uploads them to S3 and creates SNS message and SQS entries with S3 references"
+  function_name    = "cwa_file_transfer_lambda"
+  role             = aws_iam_role.cwa_extract_lambda_role.arn
+  handler          = "hello.lambda_handler"
+  filename         = "lambda/hello_lambda/hello_lambda.zip"
+  source_code_hash = filebase64sha256("lambda/hello_lambda/hello_lambda.zip")
+  timeout          = 300
+  memory_size      = 128
+  runtime          = "python3.10"
+
+  vpc_config {
+    security_group_ids = [aws_security_group.cwa_extract_new.id]
+    subnet_ids         = [data.aws_subnet.data_subnets_a.id]
+  }
+  
+
+  tags = merge(
+    local.tags,
+    { Name = "${local.application_name_short}-${local.environment}-cwa-extract-test-2" }
+  )
+}
+
+resource "aws_lambda_function" "cwa_sns_lambda" {
+
+  description      = "Connect to CWA DB, extracts data into JSON files, uploads them to S3 and creates SNS message and SQS entries with S3 references"
+  function_name    = "cwa_sns_lambda"
+  role             = aws_iam_role.cwa_extract_lambda_role.arn
+  handler          = "hello.lambda_handler"
+  filename         = "lambda/hello_lambda/hello_lambda.zip"
+  source_code_hash = filebase64sha256("lambda/hello_lambda/hello_lambda.zip")
+  timeout          = 300
+  memory_size      = 128
+  runtime          = "python3.10"
+
+  vpc_config {
+    security_group_ids = [aws_security_group.cwa_extract_new.id]
+    subnet_ids         = [data.aws_subnet.data_subnets_a.id]
+  }
+  
+
+  tags = merge(
+    local.tags,
+    { Name = "${local.application_name_short}-${local.environment}-cwa-extract-test-3" }
+  )
+}
