@@ -4,49 +4,46 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
 
   definition = jsonencode({
     Comment      = "A description of my state machine",
-    StartAt      = "Lambda Invoke",
+    StartAt      = "GetFiles",
     QueryLanguage = "JSONata",
     States = {
-      "Lambda1" = {
+      "GetFiles" = {
         Type     = "Task",
         Resource = "arn:aws:states:::lambda:invoke",
-        Output   = "{% $states.result.Payload %}",
         Arguments = {
-          FunctionName = aws_lambda_function.cwa_test_1.arn,
-          Payload      = "{% $states.input %}"
+          FunctionName = aws_lambda_function.cwa_extract_lambda_new.arn,
+          Payload      = "$"
         },
-        ResultPath = "$.lambda1Result"
-        Next = "MapState"
+        Next = "ProcessFiles"
       },
 
-      "MapState" = {
-        Type          = "Map"
-        ItemsPath     = "$.lambdaAResult.jobs"
-        MaxConcurrency = 8
+      "ProcessFiles" = {
+        Type          = "Map",
+        ItemsPath     = "$.files",
+        MaxConcurrency = 8,
         Iterator = {
-          StartAt = "Lambda2"
+          StartAt = "ProcessFiles",
           States = {
             "Lambda2" = {
-              Type     = "Task"
-              Resource = "arn:aws:states:::lambda:invoke"
+              Type     = "Task",
+              Resource = "arn:aws:states:::lambda:invoke",
               Parameters = {
-                FunctionName = aws_lambda_function.cwa_test_2.arn
-                Payload      = "{% $states.input %}"
-              }
+                FunctionName = aws_lambda_function.cwa_file_transfer_lambda.arn
+                "filename.$" = "$.filename"
+              },
               End = true
             }
           }
         }
-        Next = "Lambda3"
-      }
+        Next = "PublishToSNS"
+      },
 
-      "Lambda3" = {
+      "PublishToSNS" = {
         Type     = "Task",
         Resource = "arn:aws:states:::lambda:invoke",
-        Output   = "{% $states.result.Payload %}",
         Arguments = {
-          FunctionName = aws_lambda_function.cwa_test_3.arn,
-          Payload      = "{% $states.input %}"
+          FunctionName = aws_lambda_function.cwa_sns_lambda.arn,
+          Payload      = "$"
         },
         Retry = [{
           ErrorEquals     = ["Lambda.TooManyRequestsException"],

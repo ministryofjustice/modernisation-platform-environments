@@ -107,10 +107,10 @@ resource "aws_lambda_function" "cwa_extract" {
 ######################################
 ### Lambda Resources For Step Function
 ######################################
-resource "aws_lambda_function" "cwa_test_1" {
+resource "aws_lambda_function" "cwa_extract_lambda_new" {
 
   description      = "Connect to CWA DB, extracts data into JSON files, uploads them to S3 and creates SNS message and SQS entries with S3 references"
-  function_name    = "cwa_test_1"
+  function_name    = "cwa_extract_lambda_new"
   role             = aws_iam_role.cwa_extract_lambda_role.arn
   handler          = "hello.lambda_handler"
   filename         = "lambda/hello_lambda/hello_lambda.zip"
@@ -131,10 +131,10 @@ resource "aws_lambda_function" "cwa_test_1" {
   )
 }
 
-resource "aws_lambda_function" "cwa_test_2" {
+resource "aws_lambda_function" "cwa_file_transfer_lambda" {
 
   description      = "Connect to CWA DB, extracts data into JSON files, uploads them to S3 and creates SNS message and SQS entries with S3 references"
-  function_name    = "cwa_test_2"
+  function_name    = "cwa_file_transfer_lambda"
   role             = aws_iam_role.cwa_extract_lambda_role.arn
   handler          = "hello.lambda_handler"
   filename         = "lambda/hello_lambda/hello_lambda.zip"
@@ -155,10 +155,10 @@ resource "aws_lambda_function" "cwa_test_2" {
   )
 }
 
-resource "aws_lambda_function" "cwa_test_3" {
+resource "aws_lambda_function" "cwa_sns_lambda" {
 
   description      = "Connect to CWA DB, extracts data into JSON files, uploads them to S3 and creates SNS message and SQS entries with S3 references"
-  function_name    = "cwa_test_3"
+  function_name    = "cwa_sns_lambda"
   role             = aws_iam_role.cwa_extract_lambda_role.arn
   handler          = "hello.lambda_handler"
   filename         = "lambda/hello_lambda/hello_lambda.zip"
