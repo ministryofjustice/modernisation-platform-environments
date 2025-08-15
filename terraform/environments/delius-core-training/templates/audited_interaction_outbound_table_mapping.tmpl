@@ -62,6 +62,19 @@
                 "length": "20",
                 "scale": ""
             }
+        },
+        {
+            "rule-type": "transformation",
+            "rule-id": "5",
+            "rule-name": "temporarily_exclude_new_column",
+            "rule-target": "column",
+            "object-locator": {
+                "schema-name": "DELIUS_APP_SCHEMA",
+                "table-name": "AUDITED_INTERACTION",
+                "column-name": "NEW_COLUMN"
+            },
+            "rule-action": "remove-column"
+            }
         }
     ]
 }
