@@ -29,7 +29,7 @@ module "s3" {
 
   archive_bucket_name = ["s3-bucket-access-logging", "redshift-yjb-reporting", "tf-webops-config-service", "tableau-alb-logs", "yjaf-ext-external-logs",
     "yjaf-int-internal-logs", "cloudfront-logs", "cloudtrail-logs", "guardduty-to-fallanx-archive", "tableau-backups",
-    "aws-glue-assets", "cloudtrail-logs", "sbom-application", "application-memory-heap-dump"
+    "aws-glue-assets", "cloudtrail-logs", "application-sbom", "application-memory-heap-dump"
   ]
 
   transfer_bucket_name = ["bands", "bedunlock", "cmm", "cms", "incident", "mis", "reporting", "yjsm-artefact", "yjsm", "transfer",
