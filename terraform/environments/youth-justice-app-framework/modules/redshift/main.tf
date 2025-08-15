@@ -31,7 +31,7 @@ resource "aws_redshiftserverless_workgroup" "default" {
   security_group_ids = [module.redshift_sg.security_group_id]
   subnet_ids         = var.database_subnets
 
-  enhanced_vpc_routing = true
+  enhanced_vpc_routing = false
 
   #  publicly_accessible = var.redshift_serverless_publicly_accessible
 
