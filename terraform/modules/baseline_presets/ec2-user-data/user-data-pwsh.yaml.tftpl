@@ -112,7 +112,7 @@ tasks:
             $Script = "Invoke-UserDataScript.ps1"
             [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 # since powershell 4 uses Tls1 as default
             Invoke-WebRequest "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform-configuration-management/$${GitBranch}/powershell/Scripts/Run-GitScript.ps1" -OutFile "Run-GitScript.ps1"
-            . ./Run-GitScript.ps1 $Script -GitBranch $GitBranch -Username "tag.service-user" -ScriptArgsList "ServiceUser"
+            . ./Run-GitScript.ps1 $Script -GitBranch $GitBranch -Username "tag.service-user" -ScriptArgsList "AsServiceUser"
             Exit $LASTEXITCODE
           } else {
             Write-Output("Skipping Run-GitScript with username as service-user tag not found")
