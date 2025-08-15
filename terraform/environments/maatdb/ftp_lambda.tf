@@ -343,7 +343,8 @@ resource "aws_lambda_function" "zip" {
   runtime       = local.python_runtime
   handler       = "zip_s3_objects.lambda_handler"
 
-  memory_size       = 512
+  # Higher memory and timeout to support large numbers of files being zipped
+  memory_size       = 4096
   timeout           = 900
   s3_bucket         = local.ftp_layer_bucket
   s3_key            = "${local.ftp_layer_folder_location}/${local.zip_lambda_source_file}"
@@ -352,6 +353,11 @@ resource "aws_lambda_function" "zip" {
   reserved_concurrent_executions = 1
 
   kms_key_arn = local.laa_general_kms_arn
+
+  # We max the ephemeral storage to support large numbers of files being zipped
+  ephemeral_storage {
+    size = 10240
+  }
 
   vpc_config {
     subnet_ids         = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id]
