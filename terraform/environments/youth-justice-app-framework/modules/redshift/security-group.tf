@@ -1,3 +1,10 @@
+data "aws_prefix_list" "s3" {
+  filter {
+    name   = "prefix-list-name"
+    values = ["com.amazonaws.eu-west-2.s3"]
+  }
+}
+
 module "redshift_sg" {
   # checkov:skip=CKV_TF_1
 
@@ -27,6 +34,11 @@ module "redshift_sg" {
       description              = "Redshift to Postgres"
     },
   ]
+
+egress_prefix_list_ids = data.aws_prefix_list.s3
+
+egress_rules = [ "https-443-tcp" ]
+
 }
 
 module "postgres_sg" {
