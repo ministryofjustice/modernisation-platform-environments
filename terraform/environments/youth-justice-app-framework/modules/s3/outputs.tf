@@ -1,4 +1,9 @@
-output "aws_s3_bucket_arn" {
-  description = "List of arn for the created s3 buckets created in the same odring as the names were input."
-  value       = [for bucket in aws_s3_bucket.default : bucket.arn]
+output "aws_s3_bucket" {
+  description = "Map of s3 buckets created by this module. Key is the input bucket names (as specified, without the enviroment prefix). Currently contains the arn for each s3 bucket."
+  value = {
+    for k,v in aws_s3_bucket.default:
+      trimprefix(k,"${local.environment_name}-") => {
+        arn = v.arn
+      }
+  }
 }

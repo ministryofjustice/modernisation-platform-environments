@@ -33,10 +33,52 @@ module "s3" {
   ]
 
   transfer_bucket_name = ["bands", "bedunlock", "cmm", "cms", "incident", "mis", "reporting", "yjsm-artefact", "yjsm", "transfer",
-                          "historical-infrastructure", "historical-apps"]
+  "historical-infrastructure", "historical-apps"]
 
   allow_replication = local.application_data.accounts[local.environment].allow_s3_replication
   s3_source_account = local.application_data.accounts[local.environment].source_account
 
   depends_on = [module.s3-log]
+}
+
+module "s3-taskbuilder" {
+  #only in development or prod
+  count  = local.environment == "development" || local.environment == "preproduction" ? 1 : 0
+  source = "./modules/s3"
+
+  project_name = local.project_name
+  environment  = local.environment
+  tags         = local.tags
+  bucket_name  = ["taskbuilder"]
+
+  add_log_policy = true
+
+}
+
+module "s3-sbom" {
+  #only in development or prod
+  count  = local.environment == "development" || local.environment == "preproduction" ? 1 : 0
+  source = "./modules/s3"
+
+  project_name = local.project_name
+  environment  = local.environment
+  tags         = local.tags
+  bucket_name  = ["application-sbom"]
+
+  add_log_policy = true
+
+}
+
+module "s3-certs" {
+  #only in development or prod
+  count  = local.environment == "development" || local.environment == "preproduction" ? 1 : 0
+  source = "./modules/s3"
+
+  project_name = local.project_name
+  environment  = local.environment
+  tags         = local.tags
+  bucket_name  = ["certs"]
+
+  add_log_policy = true
+
 }

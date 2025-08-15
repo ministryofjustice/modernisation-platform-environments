@@ -6,18 +6,18 @@ module "eks" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/eks/aws"
-  version = "20.37.1"
+  version = "21.0.9"
 
-  cluster_name    = local.eks_cluster_name
-  cluster_version = local.environment_configuration.eks_cluster_version
+  name               = local.eks_cluster_name
+  kubernetes_version = local.environment_configuration.eks_cluster_version
 
-  cluster_endpoint_private_access = true
-  cluster_endpoint_public_access  = true
+  endpoint_private_access = true
+  endpoint_public_access  = true
 
   vpc_id                   = data.aws_vpc.apc.id
   control_plane_subnet_ids = data.aws_subnets.apc_intra.ids
   subnet_ids               = data.aws_subnets.apc_private.ids
-  cluster_security_group_additional_rules = {
+  security_group_additional_rules = {
     vpc = {
       description = "Allow traffic from the VPC"
       from_port   = 0
@@ -34,16 +34,16 @@ module "eks" {
 
   cloudwatch_log_group_kms_key_id        = module.eks_cluster_logs_kms.key_arn
   cloudwatch_log_group_retention_in_days = local.eks_cloudwatch_log_group_retention_in_days
-  cluster_enabled_log_types              = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
+  enabled_log_types                      = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
 
   kms_key_aliases        = ["eks/${local.eks_cluster_name}"]
   kms_key_administrators = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/MemberInfrastructureAccess"]
 
-  cluster_encryption_config = {
+  encryption_config = {
     resources = ["secrets"]
   }
 
-  cluster_addons = {
+  addons = {
     /* Core Networking */
     coredns = {
       addon_version = local.environment_configuration.eks_cluster_addon_versions.coredns
@@ -88,51 +88,51 @@ module "eks" {
     "karpenter.sh/discovery" = local.eks_cluster_name
   }
 
-  eks_managed_node_group_defaults = {
-    ami_release_version = local.environment_configuration.eks_node_version
-    ami_type            = "BOTTLEROCKET_x86_64"
-    platform            = "bottlerocket"
-    metadata_options = {
-      http_endpoint               = "enabled"
-      http_put_response_hop_limit = 1
-      http_tokens                 = "required"
-      instance_metadata_tags      = "enabled"
-    }
-
-    block_device_mappings = {
-      xvdb = {
-        device_name = "/dev/xvdb"
-        ebs = {
-          volume_size           = 100
-          volume_type           = "gp3"
-          iops                  = 3000
-          throughput            = 150
-          encrypted             = true
-          kms_key_id            = module.eks_ebs_kms.key_arn
-          delete_on_termination = true
-        }
-      }
-    }
-
-    iam_role_additional_policies = {
-      AmazonEC2ContainerRegistryReadOnly = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
-      AmazonSSMManagedInstanceCore       = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-      CloudWatchAgentServerPolicy        = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
-      ECRPullThroughCachePolicy          = module.ecr_pull_through_cache_iam_policy.arn
-      EKSClusterLogsKMSAccessPolicy      = module.eks_cluster_logs_kms_access_iam_policy.arn
-    }
-
-    node_repair_config = {
-      enabled = true
-    }
-  }
-
   eks_managed_node_groups = {
     general = {
       min_size       = 1
       max_size       = 10
       desired_size   = 3
       instance_types = ["m6a.xlarge"]
+
+      use_latest_ami_release_version = false
+      ami_release_version            = local.environment_configuration.eks_node_version
+      ami_type                       = "BOTTLEROCKET_x86_64"
+      platform                       = "bottlerocket"
+      enable_monitoring              = true
+      metadata_options = {
+        http_endpoint               = "enabled"
+        http_put_response_hop_limit = 1
+        http_tokens                 = "required"
+        instance_metadata_tags      = "enabled"
+      }
+
+      block_device_mappings = {
+        xvdb = {
+          device_name = "/dev/xvdb"
+          ebs = {
+            volume_size           = 100
+            volume_type           = "gp3"
+            iops                  = 3000
+            throughput            = 150
+            encrypted             = true
+            kms_key_id            = module.eks_ebs_kms.key_arn
+            delete_on_termination = true
+          }
+        }
+      }
+
+      iam_role_additional_policies = {
+        AmazonEC2ContainerRegistryReadOnly = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+        AmazonSSMManagedInstanceCore       = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+        CloudWatchAgentServerPolicy        = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+        ECRPullThroughCachePolicy          = module.ecr_pull_through_cache_iam_policy.arn
+        EKSClusterLogsKMSAccessPolicy      = module.eks_cluster_logs_kms_access_iam_policy.arn
+      }
+
+      node_repair_config = {
+        enabled = true
+      }
     }
     airflow-high-memory = {
       min_size       = 0
@@ -142,13 +142,26 @@ module "eks" {
       labels = {
         high-memory = "true"
       }
-      taints = [
-        {
+      taints = {
+        high_memory = {
           key    = "high-memory"
           value  = "true"
           effect = "NO_SCHEDULE"
         }
-      ]
+      }
+
+      use_latest_ami_release_version = false
+      ami_release_version            = local.environment_configuration.eks_node_version
+      ami_type                       = "BOTTLEROCKET_x86_64"
+      platform                       = "bottlerocket"
+      enable_monitoring              = true
+      metadata_options = {
+        http_endpoint               = "enabled"
+        http_put_response_hop_limit = 1
+        http_tokens                 = "required"
+        instance_metadata_tags      = "enabled"
+      }
+
       block_device_mappings = {
         xvdb = {
           device_name = "/dev/xvdb"
@@ -162,6 +175,18 @@ module "eks" {
             delete_on_termination = true
           }
         }
+      }
+
+      iam_role_additional_policies = {
+        AmazonEC2ContainerRegistryReadOnly = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+        AmazonSSMManagedInstanceCore       = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+        CloudWatchAgentServerPolicy        = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+        ECRPullThroughCachePolicy          = module.ecr_pull_through_cache_iam_policy.arn
+        EKSClusterLogsKMSAccessPolicy      = module.eks_cluster_logs_kms_access_iam_policy.arn
+      }
+
+      node_repair_config = {
+        enabled = true
       }
     }
   }
@@ -181,7 +206,7 @@ module "eks" {
     }
     # Analytical Platform Engineering access to cluster
     sso-administrator = {
-      principal_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/${data.aws_region.current.name}/${one(data.aws_iam_roles.eks_sso_access_role.names)}"
+      principal_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/${data.aws_region.current.region}/${one(data.aws_iam_roles.eks_sso_access_role.names)}"
       policy_associations = {
         eks-admin = {
           policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
@@ -192,7 +217,7 @@ module "eks" {
       }
     }
     sso-platform-engineer-admin = {
-      principal_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/${data.aws_region.current.name}/${one(data.aws_iam_roles.platform_engineer_admin_sso_role.names)}"
+      principal_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/${data.aws_region.current.region}/${one(data.aws_iam_roles.platform_engineer_admin_sso_role.names)}"
       policy_associations = {
         eks-admin = {
           policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
@@ -236,11 +261,10 @@ module "karpenter" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/eks/aws//modules/karpenter"
-  version = "20.37.1"
+  version = "21.0.9"
 
   cluster_name = module.eks.cluster_name
 
-  enable_pod_identity             = true
   create_pod_identity_association = true
 
   namespace = kubernetes_namespace.karpenter.metadata[0].name
@@ -254,7 +278,6 @@ module "karpenter" {
   iam_role_policies = {
     KarpenterSQSKMSAccess = module.karpenter_sqs_kms_access_iam_policy.arn
   }
-  enable_v1_permissions = true
 
   node_iam_role_name = "karpenter"
   node_iam_role_additional_policies = {
