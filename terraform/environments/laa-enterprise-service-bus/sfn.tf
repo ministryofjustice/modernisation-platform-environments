@@ -7,7 +7,7 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
     StartAt      = "Lambda Invoke",
     QueryLanguage = "JSONata",
     States = {
-      "Lambda Invoke" = {
+      "Lambda1" = {
         Type     = "Task",
         Resource = "arn:aws:states:::lambda:invoke",
         Output   = "{% $states.result.Payload %}",
@@ -15,74 +15,37 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
           FunctionName = aws_lambda_function.cwa_test_1.arn,
           Payload      = "{% $states.input %}"
         },
-        Retry = [{
-          ErrorEquals     = ["Lambda.TooManyRequestsException"],
-          IntervalSeconds = 2,
-          MaxAttempts     = 2
-        }],
-        Next = "Parallel"
+        ResultPath = "$.lambda1Result"
+        Next = "MapState"
       },
 
-      Parallel = {
-        Type     = "Parallel",
-        Branches = [
-          {
-            StartAt = "Lambda Invoke (1)",
-            States  = {
-              "Lambda Invoke (1)" = {
-                Type     = "Task",
-                Resource = "arn:aws:states:::lambda:invoke",
-                Output   = "{% $states.result.Payload %}",
-                Arguments = {
-                  FunctionName = aws_lambda_function.cwa_test_2.arn,
-                  Payload      = "{% $states.input %}"
-                },
-                Retry = [{
-                  ErrorEquals     = [
-                    "Lambda.ServiceException",
-                    "Lambda.AWSLambdaException",
-                    "Lambda.SdkClientException",
-                    "Lambda.TooManyRequestsException"
-                  ],
-                  IntervalSeconds = 1,
-                  MaxAttempts     = 3,
-                  BackoffRate     = 2,
-                  JitterStrategy  = "FULL"
-                }],
-                End = true
+      "MapState" = {
+        Type          = "Map"
+        ItemsPath     = "$.lambdaAResult.jobs"
+        MaxConcurrency = 8
+        Iterator = {
+          StartAt = "Lambda2"
+          States = {
+            "Lambda2" = {
+              Type     = "Task"
+              Resource = "arn:aws:states:::lambda:invoke"
+              Parameters = {
+                FunctionName = aws_lambda_function.cwa_test_2.arn
+                Payload      = "{% $states.input %}"
               }
-            }
-          },
-          {
-            StartAt = "Lambda Invoke (2)",
-            States  = {
-              "Lambda Invoke (2)" = {
-                Type     = "Task",
-                Resource = "arn:aws:states:::lambda:invoke",
-                Output   = "{% $states.result.Payload %}",
-                Arguments = {
-                  FunctionName = aws_lambda_function.cwa_test_3.arn,
-                  Payload      = "{% $states.input %}"
-                },
-                Retry = [{
-                  ErrorEquals     = ["Lambda.TooManyRequestsException"],
-                  IntervalSeconds = 2,
-                  MaxAttempts     = 2
-                }],
-                End = true
-              }
+              End = true
             }
           }
-        ],
-        Next = "Lambda Invoke (3)"
-      },
+        }
+        Next = "Lambda3"
+      }
 
-      "Lambda Invoke (3)" = {
+      "Lambda3" = {
         Type     = "Task",
         Resource = "arn:aws:states:::lambda:invoke",
         Output   = "{% $states.result.Payload %}",
         Arguments = {
-          FunctionName = aws_lambda_function.cwa_test_4.arn,
+          FunctionName = aws_lambda_function.cwa_test_3.arn,
           Payload      = "{% $states.input %}"
         },
         Retry = [{
