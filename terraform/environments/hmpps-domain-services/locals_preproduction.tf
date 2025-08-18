@@ -91,6 +91,26 @@ locals {
         })
       })
 
+      pp-jump2022-2 = merge(local.ec2_instances.jumpserver, {
+        config = merge(local.ec2_instances.jumpserver.config, {
+          ami_name          = "hmpps_windows_server_2022_release_2025-01-02T00-00-40.487Z"
+          availability_zone = "eu-west-2b"
+          user_data_raw = base64encode(templatefile(
+            "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
+              branch = "TM-1461/powershell/run-as-domain-user"
+            }
+          ))
+        })
+        instance = merge(local.ec2_instances.jumpserver.instance, {
+          tags = {
+            patch-manager = "group2"
+          }
+        })
+        tags = merge(local.ec2_instances.jumpserver.tags, {
+          domain-name = "azure.hmpp.root"
+        })
+      })
+
       pp-rdgw-1-a = merge(local.ec2_instances.rdgw, {
         config = merge(local.ec2_instances.rdgw.config, {
           availability_zone = "eu-west-2a"
@@ -121,6 +141,27 @@ locals {
           domain-name = "azure.hmpp.root"
         })
       })
+
+      pp-rds-2-a = merge(local.ec2_instances.rds, {
+        cloudwatch_metric_alarms = {}
+        config = merge(local.ec2_instances.rds.config, {
+          availability_zone = "eu-west-2a"
+          user_data_raw = base64encode(templatefile(
+            "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
+              branch = "TM-1461/powershell/run-as-domain-user"
+            }
+          ))
+        })
+        instance = merge(local.ec2_instances.rds.instance, {
+          tags = {
+            patch-manager = "group2"
+          }
+        })
+        tags = merge(local.ec2_instances.rds.tags, {
+          domain-name  = "azure.hmpp.root"
+          service-user = "svc_rds"
+        })
+      })
     }
 
     lbs = {
@@ -134,6 +175,11 @@ locals {
           pp-rds-1-https = merge(local.lbs.public.instance_target_groups.https, {
             attachments = [
               { ec2_instance_name = "pp-rds-1-a" },
+            ]
+          })
+          pp-rds-2-https = merge(local.lbs.public.instance_target_groups.https, {
+            attachments = [
+              { ec2_instance_name = "pp-rds-2-a" },
             ]
           })
         }
@@ -174,6 +220,20 @@ locals {
                   }
                 }]
               }
+              pp-rds-2-https = {
+                priority = 300
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "pp-rds-2-https"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "rdweb2.preproduction.hmpps-domain.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
             }
           })
         })
@@ -205,6 +265,7 @@ locals {
         lb_alias_records = [
           { name = "rdgateway1", type = "A", lbs_map_key = "public" },
           { name = "rdweb1", type = "A", lbs_map_key = "public" },
+          { name = "rdweb2", type = "A", lbs_map_key = "public" },
         ]
       }
     }
