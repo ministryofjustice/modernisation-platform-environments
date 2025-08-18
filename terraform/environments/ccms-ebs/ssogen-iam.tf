@@ -31,15 +31,10 @@ resource "aws_iam_role_policy_attachment" "ssogen_ssm" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
-# Optional: Secrets Manager read-only (use only if needed)
+# Secrets Manager read-only 
 resource "aws_iam_role_policy_attachment" "ssogen_secrets_read" {
   role       = aws_iam_role.ssogen_ec2.name
   policy_arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
-}
-
-resource "aws_iam_role_policy_attachment" "ssogen_ssm" {
-  role       = aws_iam_role.ssogen_ec2_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
 resource "aws_vpc_endpoint" "ssm" {
