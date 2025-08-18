@@ -9,8 +9,8 @@ provider "aws" {
 
 # Provider for interacting with the EKS cluster
 provider "kubernetes" {
-  # host                   = module.eks.cluster_endpoint
-  host                   = data.aws_eks_cluster.eks.endpoint
+  host = module.eks.cluster_endpoint
+  # host                   = data.aws_eks_cluster.eks.endpoint
   cluster_ca_certificate = base64decode(data.aws_eks_cluster.eks.certificate_authority[0].data)
   exec {
     api_version = "client.authentication.k8s.io/v1beta1"
