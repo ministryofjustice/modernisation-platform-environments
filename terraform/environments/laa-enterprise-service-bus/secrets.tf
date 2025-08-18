@@ -1,5 +1,5 @@
 #####################################################################################
-### Secrets used for CWA Extract Lambda Function ###
+### Secrets used for CWA Extract Lambda Functions ###
 #####################################################################################
 
 resource "aws_secretsmanager_secret" "cwa_procedures_config" {
@@ -8,6 +8,10 @@ resource "aws_secretsmanager_secret" "cwa_procedures_config" {
 
 resource "aws_secretsmanager_secret" "cwa_db_secret" {
   name = "cwa-extract-lambda-db-secret-${local.environment}"
+}
+
+resource "aws_secretsmanager_secret" "cwa_table_name_secret" {
+  name = "cwa-file-transfer-table-lambda-secret-${local.environment}"
 }
 
 #####################################################################################
