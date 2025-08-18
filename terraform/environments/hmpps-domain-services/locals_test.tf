@@ -126,34 +126,10 @@ locals {
         })
       })
 
-      t1-jump2022-2 = merge(local.ec2_instances.jumpserver, {
-        cloudwatch_metric_alarms = {}
-        config = merge(local.ec2_instances.jumpserver.config, {
-          ami_name          = "hmpps_windows_server_2022_release_2025-01-02T00-00-40.487Z"
-          availability_zone = "eu-west-2a"
-          user_data_raw = base64encode(templatefile(
-            "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
-              branch = "TM-1461/powershell/run-as-domain-user"
-            }
-          ))
-        })
-        instance = merge(local.ec2_instances.jumpserver.instance, {
-          tags = {
-            patch-manager = "group2"
-          }
-        })
-        tags = merge(local.ec2_instances.jumpserver.tags, {
-          domain-name = "azure.noms.root"
-        })
-      })
-
       test-rds-1-a = merge(local.ec2_instances.rds, {
         config = merge(local.ec2_instances.rds.config, {
           ami_name          = "hmpps_windows_server_2022_release_2025-04-02T00-00-40.543Z"
           availability_zone = "eu-west-2a"
-          instance_profile_policies = concat(local.ec2_instances.rds.config.instance_profile_policies, [
-            "Ec2SecretPolicy"]
-          )
         })
         instance = merge(local.ec2_instances.rds.instance, {
           tags = {
@@ -164,49 +140,6 @@ locals {
           domain-name = "azure.noms.root"
         })
       })
-
-      test-rds-2-b = merge(local.ec2_instances.rds, {
-        cloudwatch_metric_alarms = {}
-        config = merge(local.ec2_instances.rds.config, {
-          ami_name          = "hmpps_windows_server_2022_release_2025-04-02T00-00-40.543Z"
-          availability_zone = "eu-west-2b"
-          instance_profile_policies = concat(local.ec2_instances.rds.config.instance_profile_policies, [
-            "Ec2SecretPolicy"]
-          )
-          user_data_raw = base64encode(templatefile(
-            "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
-              branch = "TM-1461/powershell/run-as-domain-user"
-            }
-          ))
-        })
-        instance = merge(local.ec2_instances.rds.instance, {
-          tags = {
-            patch-manager = "group2"
-          }
-        })
-        tags = merge(local.ec2_instances.rds.tags, {
-          domain-name  = "azure.noms.root"
-          service-user = "svc_rds"
-        })
-      })
-    }
-
-    iam_policies = {
-      Ec2SecretPolicy = {
-        description = "Permissions required for secret value access by instances"
-        statements = [
-          {
-            effect = "Allow"
-            actions = [
-              "secretsmanager:GetSecretValue",
-              "secretsmanager:PutSecretValue",
-            ]
-            resources = [
-              "arn:aws:secretsmanager:*:*:secret:/microsoft/AD/azure.noms.root/shared-passwords-*",
-            ]
-          }
-        ]
-      }
     }
 
     lbs = {
@@ -220,11 +153,6 @@ locals {
           test-rds-1-https = merge(local.lbs.public.instance_target_groups.https, {
             attachments = [
               { ec2_instance_name = "test-rds-1-a" },
-            ]
-          })
-          test-rds-2-https = merge(local.lbs.public.instance_target_groups.https, {
-            attachments = [
-              { ec2_instance_name = "test-rds-2-b" },
             ]
           })
         }
@@ -261,20 +189,6 @@ locals {
                   host_header = {
                     values = [
                       "rdweb1.test.hmpps-domain.service.justice.gov.uk"
-                    ]
-                  }
-                }]
-              }
-              test-rds-2-https = {
-                priority = 300
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "test-rds-2-https"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "rdweb2.test.hmpps-domain.service.justice.gov.uk"
                     ]
                   }
                 }]
