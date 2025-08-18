@@ -137,7 +137,8 @@ locals {
           }
         })
         tags = merge(local.ec2_instances.rds.tags, {
-          domain-name = "azure.noms.root"
+          domain-name  = "azure.noms.root"
+          service-user = "svc_rds"
         })
       })
     }
