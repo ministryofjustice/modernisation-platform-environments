@@ -113,8 +113,8 @@ resource "aws_lambda_function" "cwa_extract_lambda" {
   function_name    = "cwa_extract_lambda"
   role             = aws_iam_role.cwa_extract_lambda_role.arn
   handler          = "hello.lambda_handler"
-  filename         = "lambda/hello_lambda/hello_lambda.zip"
-  source_code_hash = filebase64sha256("lambda/hello_lambda/hello_lambda.zip")
+  filename         = "lambda/cwa_extract_lambda/cwa_extract_package.zip"
+  source_code_hash = filebase64sha256("lambda/cwa_extract_lambda/cwa_extract_package.zip")
   timeout          = 300
   memory_size      = 128
   runtime          = "python3.10"
@@ -127,7 +127,7 @@ resource "aws_lambda_function" "cwa_extract_lambda" {
 
   tags = merge(
     local.tags,
-    { Name = "${local.application_name_short}-${local.environment}-cwa-extract-extract-lambda" }
+    { Name = "${local.application_name_short}-${local.environment}-cwa-extract-lambda" }
   )
 }
 
@@ -137,8 +137,8 @@ resource "aws_lambda_function" "cwa_file_transfer_lambda" {
   function_name    = "cwa_file_transfer_lambda"
   role             = aws_iam_role.cwa_extract_lambda_role.arn
   handler          = "hello.lambda_handler"
-  filename         = "lambda/hello_lambda/hello_lambda.zip"
-  source_code_hash = filebase64sha256("lambda/hello_lambda/hello_lambda.zip")
+  filename         = "lambda/cwa_file_transfer_lambda/cwa_file_transfer_package.zip"
+  source_code_hash = filebase64sha256("lambda/cwa_file_transfer_lambda/cwa_file_transfer_package.zip")
   timeout          = 300
   memory_size      = 128
   runtime          = "python3.10"
