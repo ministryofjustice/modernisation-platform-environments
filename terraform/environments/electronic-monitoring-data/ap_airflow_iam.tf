@@ -76,7 +76,8 @@ data "aws_iam_policy_document" "p1_export_airflow" {
     effect = "Allow"
     actions = [
       "s3:PutObject",
-      "s3:ListBucket"
+      "s3:ListBucket",
+      "s3:GetObject"
     ]
     resources = [
       module.s3-p1-export-bucket.bucket_arn,
