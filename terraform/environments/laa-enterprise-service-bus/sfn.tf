@@ -9,7 +9,7 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
       "GetFiles" = {
         Type     = "Task",
         Resource = "arn:aws:states:::lambda:invoke",
-        Arguments = {
+        Parameters = {
           FunctionName = aws_lambda_function.cwa_extract_lambda.arn,
           Payload      = "$"
         },
@@ -40,7 +40,7 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
       "PublishToSNS" = {
         Type     = "Task",
         Resource = "arn:aws:states:::lambda:invoke",
-        Arguments = {
+        Parameters = {
           FunctionName = aws_lambda_function.cwa_sns_lambda.arn,
           Payload      = "$"
         },
