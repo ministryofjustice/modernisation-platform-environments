@@ -159,7 +159,6 @@ resource "aws_lambda_function" "cwa_file_transfer_lambda" {
   runtime          = "python3.10"
 
   layers = [
-    aws_lambda_layer_version.lambda_layer_oracle_python.arn,
     "arn:aws:lambda:eu-west-2:017000801446:layer:AWSLambdaPowertoolsPython:2"
   ]
 
@@ -167,7 +166,14 @@ resource "aws_lambda_function" "cwa_file_transfer_lambda" {
     security_group_ids = [aws_security_group.cwa_extract_new.id]
     subnet_ids         = [data.aws_subnet.data_subnets_a.id]
   }
-  
+
+  environment {
+    variables = {
+      TABLE_NAME_SECRET = aws_secretsmanager_secret.cwa_table_name_secret.name
+      TARGET_BUCKET     = aws_s3_bucket.data.bucket
+      DB_SECRET_NAME    = aws_secretsmanager_secret.cwa_db_secret.name
+    }
+  }
 
   tags = merge(
     local.tags,
