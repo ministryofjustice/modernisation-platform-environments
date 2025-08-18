@@ -11,7 +11,7 @@ resource "aws_secretsmanager_secret" "cwa_db_secret" {
 }
 
 resource "aws_secretsmanager_secret" "cwa_table_name_secret" {
-  name = "cwa-file-transfer-secret-${local.environment}"
+  name = "cwa-file-transfer-table-secret-${local.environment}"
 }
 
 #####################################################################################
