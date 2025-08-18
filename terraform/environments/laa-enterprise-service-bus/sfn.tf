@@ -11,7 +11,7 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
         Type     = "Task",
         Resource = "arn:aws:states:::lambda:invoke",
         Arguments = {
-          FunctionName = aws_lambda_function.cwa_extract_lambda_new.arn,
+          FunctionName = aws_lambda_function.cwa_extract_lambda.arn,
           Payload      = "$"
         },
         Next = "ProcessFiles"
