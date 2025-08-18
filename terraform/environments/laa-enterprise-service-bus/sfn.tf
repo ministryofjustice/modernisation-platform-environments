@@ -20,6 +20,9 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
         Type          = "Map",
         ItemsPath     = "$.Payload.files",
         MaxConcurrency = 8,
+        Parameters = {
+            "timestamp.$" = "$.Payload.timestamp",
+        }
         Iterator = {
           StartAt = "ProcessSingleFile",
           States = {
