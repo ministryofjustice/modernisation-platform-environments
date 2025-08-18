@@ -37,7 +37,7 @@ module "redshift_sg" {
 
 }
 
-resource "aws_security_group_rule" "redshift_to_s3" {
+resource "aws_vpc_security_group_egress_rule" "redshift_to_s3" {
   security_group_id = module.redshift_sg.security_group_id
   type              = "egress"
   to_port           = 443
