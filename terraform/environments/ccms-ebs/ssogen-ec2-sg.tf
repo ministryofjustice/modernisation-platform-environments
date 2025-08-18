@@ -65,14 +65,14 @@ resource "aws_security_group" "ssogen_sg" {
     cidr_blocks = ["10.0.0.0/8"]
   }
 
-  # # Allow outbound HTTPS for patching, time sync, etc.
-  # egress {
-  #   description = "Allow outbound HTTPS"
-  #   from_port   = 443
-  #   to_port     = 443
-  #   protocol    = "tcp"
-  #   cidr_blocks = ["0.0.0.0/0"]
-  # }
+  # Allow outbound HTTPS for patching, time sync, etc.
+  egress {
+    description = "Allow outbound HTTPS"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
   # Allow internal communication within VPC
   egress {
