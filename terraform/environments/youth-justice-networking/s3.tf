@@ -1,6 +1,6 @@
 module "s3-bucket" {
   source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9fc8f8b8e3f93ffbda822028534b9a75399" #v9.0.0
-  bucket_prefix       = "youth-justice-networking-s3-bucket"
+  bucket_prefix       = "juniper-historical"
   versioning_enabled  = true
   ownership_controls  = "BucketOwnerEnforced"
   bucket_policy       = [data.aws_iam_policy_document.bucket_policy.json]
@@ -19,7 +19,7 @@ data "aws_iam_policy_document" "bucket_policy" {
 
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::<SourceAWSAccountNumber>:role/<IAM-Role-created-in-step1-in-source-account>"]
+      identifiers = ["arn:aws:iam::597593175223:role/JuniperRoleS3Replication"]
     }
 
     actions = [
@@ -42,7 +42,7 @@ data "aws_iam_policy_document" "bucket_policy" {
 
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::<SourceAWSAccountNumber>:role/<IAM-Role-created-in-step1-in-source-account>"]
+      identifiers = ["arn:aws:iam::597593175223:role/JuniperRoleS3Replication"]
     }
 
     actions = ["s3:ObjectOwnerOverrideToBucketOwner"]
