@@ -329,13 +329,13 @@ resource "helm_release" "velero" {
   namespace  = kubernetes_namespace.velero_system.metadata[0].name
   values = [
     templatefile(
-      "${path.module}/src/helm/velero/values.yml.tftpl",
+      "${path.module}/src/helm/values/velero/values.yml.tftpl",
       {
         eks_role_arn              = module.velero_role.iam_role_arn
         velero_aws_plugin_version = "v1.12.2"
-        velero_bucket             = module.velero_s3_bucket.bucket.id
+        velero_bucket             = module.velero_s3_bucket.s3_bucket_id
         velero_prefix             = module.eks.cluster_name
-        aws_region                = data.aws_region.current.name
+        aws_region                = data.aws_region.current.region
       }
     )
   ]

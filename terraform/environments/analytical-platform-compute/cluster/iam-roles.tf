@@ -243,11 +243,11 @@ module "velero_role" {
   #checkov:skip=CKV_TF_1:Module is from Terraform registry
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "5.59.0"
+  version = "5.60.0"
 
   role_name_prefix      = "velero"
   attach_velero_policy  = true
-  velero_s3_bucket_arns = [module.velero_s3_bucket.bucket.arn]
+  velero_s3_bucket_arns = [module.velero_s3_bucket.s3_bucket_arn]
 
   oidc_providers = {
     main = {
