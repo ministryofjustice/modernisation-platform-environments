@@ -25,11 +25,11 @@ module "s3" {
 
   log_bucket = "${local.environment_name}-${local.log_bucket}"
 
-  bucket_name = ["install-files"]
+  bucket_name = ["install-files", "application-memory-heap-dump"]
 
   archive_bucket_name = ["s3-bucket-access-logging", "redshift-yjb-reporting", "tf-webops-config-service", "tableau-alb-logs", "yjaf-ext-external-logs",
     "yjaf-int-internal-logs", "cloudfront-logs", "cloudtrail-logs", "guardduty-to-fallanx-archive", "tableau-backups",
-    "aws-glue-assets", "cloudtrail-logs", "application-sbom", "application-memory-heap-dump"
+    "aws-glue-assets", "cloudtrail-logs"
   ]
 
   transfer_bucket_name = ["bands", "bedunlock", "cmm", "cms", "incident", "mis", "reporting", "yjsm-artefact", "yjsm", "transfer",
