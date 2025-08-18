@@ -386,7 +386,7 @@ module "load_mdss" {
 }
 
 module "load_scram_alcohol_monitoring_database" {
-  count  = local.is-production ? 1 : 0
+  count  = local.is-production || local.is-test ? 1 : 0
   source = "./modules/ap_airflow_load_data_iam_role"
 
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
