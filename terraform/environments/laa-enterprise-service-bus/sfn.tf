@@ -13,16 +13,35 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
           FunctionName = aws_lambda_function.cwa_extract_lambda.arn,
           Payload      = {}
         },
-        Next = "ProcessFiles"
+        ResultPath = "$.GetFilesResult"
+        Next = "CheckGetFilesStatus"
+      },
+
+      "CheckGetFilesStatus" = {
+        Type    = "Choice"
+        Choices = [
+          {
+            Variable      = "$.GetFilesResult.StatusCode"
+            NumericEquals = 200
+            Next          = "ProcessFiles"
+          }
+        ]
+        Default = "FailState"
+      },
+
+      "FailState" = {
+        Type  = "Fail"
+        Error = "LambdaError"
+        Cause = "GetFiles returned non-200 status or failed"
       },
 
       "ProcessFiles" = {
         Type          = "Map",
-        ItemsPath     = "$.Payload.files",
+        ItemsPath     = "$.GetFilesResult.Payload.files",
         MaxConcurrency = 8,
         Parameters = {
           "filename.$"  = "$$.Map.Item.Value.filename",
-          "timestamp.$" = "$.Payload.timestamp"
+          "timestamp.$" = "$.GetFilesResult.Payload.timestamp"
         },
         Iterator = {
           StartAt = "ProcessSingleFile",
@@ -37,7 +56,31 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
                     "timestamp.$" = "$.timestamp"
                 }                
               },
-              End = true
+              ResultPath = "$.ProcessSingleFileResult"
+              Next = "CheckProcessFilesStatus"
+            },
+
+            "CheckProcessFilesStatus" = {
+                Type    = "Choice"
+                Choices = [
+                {
+                    Variable      = "$.ProcessSingleFileResult.StatusCode"
+                    NumericEquals = 200
+                    Next          = "NextFileOrEnd"
+                }
+                ]
+                Default = "FailSingleFile"
+            },
+
+            "FailSingleFile" = {
+                Type  = "Fail"
+                Error = "LambdaError"
+                Cause = "File transfer failed"
+            },
+
+            "NextFileOrEnd" = {
+                Type = "Pass"
+                End  = true
             }
           }
         }
