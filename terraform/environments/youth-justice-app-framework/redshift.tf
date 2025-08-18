@@ -1,5 +1,5 @@
 import {
-  id = "sgr-0beb1aea5cb2d4b18"
+  id = local.application_data.accounts[local.environment].redshift_to_s3_rule_id
   to = module.redshift.aws_vpc_security_group_egress_rule.redshift_to_s3
 }
 
