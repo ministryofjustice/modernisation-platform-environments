@@ -890,7 +890,8 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
       "glue:GetTable",
       "glue:GetDatabase",
       "glue:GetPartition",
-      "glue:GetTags"
+      "glue:GetTags",
+      "glue:TagResource"
     ]
     resources = flatten([
       for resource in each.value.resource_shares : [
