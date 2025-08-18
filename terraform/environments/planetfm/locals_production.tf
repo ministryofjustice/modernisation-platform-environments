@@ -123,7 +123,6 @@ locals {
           local.ec2_instances.app.cloudwatch_metric_alarms,
           module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows
         )
-        cloudwatch_metric_alarms = {}
         config = merge(local.ec2_instances.app.config, {
           ami_name          = "pd-cafm-a-2022-image-20250806T1436"
           availability_zone = "eu-west-2b"
@@ -148,7 +147,6 @@ locals {
           local.ec2_instances.app.cloudwatch_metric_alarms,
           module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows
         )
-        cloudwatch_metric_alarms = {}
         config = merge(local.ec2_instances.app.config, {
           ami_name          = "pd-cafm-a-2022-image-20250806T1436"
           availability_zone = "eu-west-2a"
