@@ -20,6 +20,10 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
         Type          = "Map",
         ItemsPath     = "$.Payload.files",
         MaxConcurrency = 8,
+        Parameters = {
+          "filename.$"  = "$$.Map.Item.Value.filename",
+          "timestamp.$" = "$.Payload.timestamp"
+        },
         Iterator = {
           StartAt = "ProcessSingleFile",
           States = {
@@ -29,8 +33,8 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
               Parameters = {
                 FunctionName = aws_lambda_function.cwa_file_transfer_lambda.arn
                 Payload = {
-                    "filename.$" = "$.filename"
-                    "timestamp.$" = "$.Payload.timestamp"
+                    "filename.$" = "$.filename",
+                    "timestamp.$" = "$.timestamp"
                 }                
               },
               End = true
