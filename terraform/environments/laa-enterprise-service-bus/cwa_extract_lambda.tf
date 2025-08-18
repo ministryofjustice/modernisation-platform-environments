@@ -173,6 +173,8 @@ resource "aws_lambda_function" "cwa_file_transfer_lambda" {
       TABLE_NAME_SECRET = aws_secretsmanager_secret.cwa_table_name_secret.name
       TARGET_BUCKET     = aws_s3_bucket.data.bucket
       DB_SECRET_NAME    = aws_secretsmanager_secret.cwa_db_secret.name
+      LD_LIBRARY_PATH   = "/opt/instantclient_12_2_linux"
+      ORACLE_HOME       = "/opt/instantclient_12_2_linux"
     }
   }
 
