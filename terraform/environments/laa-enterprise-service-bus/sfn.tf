@@ -11,7 +11,7 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
         Resource = "arn:aws:states:::lambda:invoke",
         Parameters = {
           FunctionName = aws_lambda_function.cwa_extract_lambda.arn,
-          Payload      = "$"
+          Payload      = {}
         },
         Next = "ProcessFiles"
       },
@@ -28,7 +28,9 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
               Resource = "arn:aws:states:::lambda:invoke",
               Parameters = {
                 FunctionName = aws_lambda_function.cwa_file_transfer_lambda.arn
-                "filename.$" = "$.filename"
+                Payload = {
+                    "filename.$" = "$.filename"
+                }                
               },
               End = true
             }
