@@ -225,7 +225,6 @@ locals {
         lb_alias_records = [
           { name = "rdgateway1", type = "A", lbs_map_key = "public" },
           { name = "rdweb1", type = "A", lbs_map_key = "public" },
-          { name = "rdweb2", type = "A", lbs_map_key = "public" },
         ]
       }
     }
