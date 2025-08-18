@@ -36,3 +36,32 @@ resource "aws_iam_role_policy_attachment" "ssogen_secrets_read" {
   role       = aws_iam_role.ssogen_ec2.name
   policy_arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
 }
+
+resource "aws_iam_role_policy_attachment" "ssogen_ssm" {
+  role       = aws_iam_role.ssogen_ec2_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+resource "aws_vpc_endpoint" "ssm" {
+  vpc_id            = data.aws_vpc.shared.id
+  service_name      = "com.amazonaws.${var.region}.ssm"
+  vpc_endpoint_type = "Interface"
+  subnet_ids        = local.private_subnets
+  security_group_ids = [aws_security_group.ssogen_sg.id]
+}
+
+resource "aws_vpc_endpoint" "ssmmessages" {
+  vpc_id            = data.aws_vpc.shared.id
+  service_name      = "com.amazonaws.${var.region}.ssmmessages"
+  vpc_endpoint_type = "Interface"
+  subnet_ids        = local.private_subnets
+  security_group_ids = [aws_security_group.ssogen_sg.id]
+}
+
+resource "aws_vpc_endpoint" "ec2messages" {
+  vpc_id            = data.aws_vpc.shared.id
+  service_name      = "com.amazonaws.${var.region}.ec2messages"
+  vpc_endpoint_type = "Interface"
+  subnet_ids        = local.private_subnets
+  security_group_ids = [aws_security_group.ssogen_sg.id]
+}
