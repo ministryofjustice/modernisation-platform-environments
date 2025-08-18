@@ -129,6 +129,16 @@ resource "aws_lambda_function" "cwa_extract_lambda" {
     subnet_ids         = [data.aws_subnet.data_subnets_a.id]
   }
   
+  environment {
+    variables = {
+      PROCEDURES_CONFIG = aws_secretsmanager_secret.cwa_procedures_config.name
+      TARGET_BUCKET     = aws_s3_bucket.data.bucket
+      SNS_TOPIC         = aws_sns_topic.priority_p1.arn
+      DB_SECRET_NAME    = aws_secretsmanager_secret.cwa_db_secret.name
+      LD_LIBRARY_PATH   = "/opt/instantclient_12_2_linux"
+      ORACLE_HOME       = "/opt/instantclient_12_2_linux"
+    }
+  }
 
   tags = merge(
     local.tags,
