@@ -1,3 +1,8 @@
+import {
+  id = "sgr-0beb1aea5cb2d4b18"
+  to = "module.redshift.aws_vpc_security_group_egress_rule.redshift_to_s3"
+}
+
 module "redshift" {
   source = "./modules/redshift"
 
