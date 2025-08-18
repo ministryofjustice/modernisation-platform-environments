@@ -905,7 +905,9 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
   statement {
     effect = "Allow"
     actions = [
-      "iam:CreateRole"
+      "iam:CreateRole",
+      "iam:TagRole"
+
     ]
     resources = [
       "arn:aws:iam::${local.current_account_id}:role/*-location"
