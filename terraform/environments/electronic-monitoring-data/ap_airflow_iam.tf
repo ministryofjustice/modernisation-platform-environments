@@ -438,7 +438,7 @@ module "load_scram_alcohol_monitoring_database" {
   environment        = local.environment
   database_name      = "scram-alcohol-monitoring"
   path_to_data       = "/scram/alcohol_monitoring"
-  source_data_bucket = module.s3-raw-formatted-data-bucket.bucket
+  source_data_bucket = module.s3-data-bucket.bucket
   secret_code        = jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]
   oidc_arn           = aws_iam_openid_connect_provider.analytical_platform_compute.arn
   athena_dump_bucket = module.s3-athena-bucket.bucket
