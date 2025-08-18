@@ -27,7 +27,8 @@ data "aws_iam_policy_document" "bucket_policy" {
       "s3:GetBucketVersioning",
       "s3:PutBucketVersioning",
       "s3:ReplicateDelete",
-      "s3:ReplicateObject"
+      "s3:ReplicateObject",
+      "s3:PutObject"
     ]
 
     resources = [
