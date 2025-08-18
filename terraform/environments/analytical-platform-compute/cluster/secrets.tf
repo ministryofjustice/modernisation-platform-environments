@@ -3,7 +3,7 @@ module "ui_sentry_dsn_secret" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/secrets-manager/aws"
-  version = "1.3.1"
+  version = "2.0.0"
 
   name        = "ui/sentry-dsn"
   description = "Sentry DSN for Analytical Platform UI"
@@ -20,7 +20,7 @@ module "ui_azure_client_secret" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/secrets-manager/aws"
-  version = "1.3.1"
+  version = "2.0.0"
 
   name        = "ui/azure-client"
   description = "Azure client secret for Analytical Platform UI"
@@ -37,7 +37,7 @@ module "ui_azure_tenant_secret" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/secrets-manager/aws"
-  version = "1.3.1"
+  version = "2.0.0"
 
   name        = "ui/azure-tenant"
   description = "Azure tenant secret for Analytical Platform UI"
@@ -54,7 +54,7 @@ module "ecr_github_pull_through_cache_secret" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/secrets-manager/aws"
-  version = "1.3.1"
+  version = "2.0.0"
 
   name        = "ecr-pullthroughcache/github"
   description = "GitHub credentials for ECR pull-through cache"
