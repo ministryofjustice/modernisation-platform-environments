@@ -5,7 +5,6 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
   definition = jsonencode({
     Comment      = "A description of my state machine",
     StartAt      = "GetFiles",
-    QueryLanguage = "JSONata",
     States = {
       "GetFiles" = {
         Type     = "Task",
@@ -22,9 +21,9 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
         ItemsPath     = "$.files",
         MaxConcurrency = 8,
         Iterator = {
-          StartAt = "ProcessFiles",
+          StartAt = "ProcessSingleFile",
           States = {
-            "ProcessFiles" = {
+            "ProcessSingleFile" = {
               Type     = "Task",
               Resource = "arn:aws:states:::lambda:invoke",
               Parameters = {
