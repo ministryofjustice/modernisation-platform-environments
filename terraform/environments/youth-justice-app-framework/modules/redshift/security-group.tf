@@ -38,8 +38,8 @@ module "redshift_sg" {
 }
 
 moved {
-  from = aws_security_group_rule.redshift_to_s3
-  to   = aws_vpc_security_group_egress_rule.redshift_to_s3
+  from = module.redshift.aws_security_group_rule.redshift_to_s3
+  to   = module.redshift.aws_vpc_security_group_egress_rule.redshift_to_s3
 }
 
 resource "aws_vpc_security_group_egress_rule" "redshift_to_s3" {
