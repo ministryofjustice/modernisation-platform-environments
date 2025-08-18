@@ -30,6 +30,7 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
                 FunctionName = aws_lambda_function.cwa_file_transfer_lambda.arn
                 Payload = {
                     "filename.$" = "$.filename"
+                    "timestamp.$" = "$.timestamp"
                 }                
               },
               End = true
