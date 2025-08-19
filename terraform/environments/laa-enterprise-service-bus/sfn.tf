@@ -32,8 +32,7 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
       "ParseGetFilesBody" = {
         Type = "Pass",
         Parameters = {
-          "files.$"     = "States.StringToJson($.GetFilesResult.Payload.body).files",
-          "timestamp.$" = "States.StringToJson($.GetFilesResult.Payload.body).timestamp"
+          "parsed.$"     = "States.StringToJson($.GetFilesResult.Payload.body)"
         },
         ResultPath = "$.ParsedBody",
         Next       = "ProcessFiles"
@@ -47,11 +46,11 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
 
       "ProcessFiles" = {
         Type          = "Map",
-        ItemsPath     = "$.ParsedBody.files",
+        ItemsPath     = "$.ParsedBody.parsed.files",
         MaxConcurrency = 8,
         Parameters = {
           "filename.$"  = "$$.Map.Item.Value.filename",
-          "timestamp.$" = "$.ParsedBody.timestamp"
+          "timestamp.$" = "$.ParsedBody.parsed.timestamp"
         },
         Iterator = {
           StartAt = "ProcessSingleFile",
