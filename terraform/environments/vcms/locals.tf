@@ -33,7 +33,26 @@ locals {
   bastion_config = {}
   image_tag = "latest"
   app_port  = 80
-  internal_security_group_cidrs = []
+  internal_security_group_cidrs = distinct(flatten([
+    module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public,
+    module.ip_addresses.moj_cidrs.trusted_moj_enduser_internal,
+    module.ip_addresses.moj_cidrs.trusted_mojo_public,
+    module.ip_addresses.moj_cidr.ark_dc_external_internet,
+    module.ip_addresses.moj_cidr.vodafone_dia_networks,
+    module.ip_addresses.moj_cidr.palo_alto_prisma_access_corporate,
+    module.ip_addresses.moj_cidr.mojo_azure_landing_zone_egress,
+    [
+      # Route53 Healthcheck Access Cidrs
+      # London Region not support yet, so metrics are not yet publised, can be enabled at later stage for Route53 endpoint monitor
+      "15.177.0.0/18",     # GLOBAL Region
+      "54.251.31.128/26",  # ap-southeast-1 Region
+      "54.255.254.192/26", # ap-southeast-1 Region
+      "176.34.159.192/26", # eu-west-1 Region
+      "54.228.16.0/26",    # eu-west-1 Region
+      "107.23.255.0/26",   # us-east-1 Region
+      "54.243.31.192/26"   # us-east-1 Region
+    ]
+  ]))
   ipv6_cidr_blocks = []
 
   domain_types = { for dvo in aws_acm_certificate.external.domain_validation_options : dvo.domain_name => {
