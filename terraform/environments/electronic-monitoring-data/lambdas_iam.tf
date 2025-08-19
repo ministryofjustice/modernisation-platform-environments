@@ -621,7 +621,6 @@ data "aws_iam_policy_document" "dms_validation_lambda_role_policy_document" {
     sid    = "S3Permissions"
     effect = "Allow"
     actions = [
-      "s3:ListObjects",
       "s3:GetObject",
       "s3:GetBucketLocation"
     ]
