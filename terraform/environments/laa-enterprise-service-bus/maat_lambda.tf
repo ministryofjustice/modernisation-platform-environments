@@ -30,7 +30,7 @@ resource "aws_security_group_rule" "maat_provider_load_egress_https_sm" {
   from_port                = 443
   to_port                  = 443
   protocol                 = "tcp"
-  source_security_group_id = local.application_data.accounts[local.environment].vpc_endpoint_sg
+  source_security_group_id = local.application_data.accounts[local.environment].maatdb_sg
   security_group_id        = aws_security_group.maat_provider_load_sg.id
   description              = "Outbound 443 to LAA VPC Endpoint SG"
 }
