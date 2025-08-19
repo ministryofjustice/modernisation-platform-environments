@@ -25,7 +25,7 @@ module "s3" {
 
   log_bucket = "${local.environment_name}-${local.log_bucket}"
 
-  bucket_name = ["install-files"]
+  bucket_name = ["install-files", "application-memory-heap-dump"]
 
   archive_bucket_name = ["s3-bucket-access-logging", "redshift-yjb-reporting", "tf-webops-config-service", "tableau-alb-logs", "yjaf-ext-external-logs",
     "yjaf-int-internal-logs", "cloudfront-logs", "cloudtrail-logs", "guardduty-to-fallanx-archive", "tableau-backups",
@@ -56,8 +56,6 @@ module "s3-taskbuilder" {
 }
 
 module "s3-sbom" {
-  #only in development or prod
-  count  = local.environment == "development" || local.environment == "preproduction" ? 1 : 0
   source = "./modules/s3"
 
   project_name = local.project_name
