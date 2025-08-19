@@ -5,13 +5,31 @@
       "Sid": "ReadWriteToReportsFolder",
       "Effect": "Allow",
       "Action": ["s3:PutObject", "s3:PutObjectAcl", "s3:GetObject"],
-      "Resource": "arn:aws:s3:::coat-reports-${environment}/*"
+      "Resource": [
+      "arn:aws:s3:::coat-reports-${environment}/*",
+      "arn:aws:s3:::coat-${environment}-cur-v2-hourly/*"
+      ]
     },
     {
       "Sid": "ListReportsBucket",
       "Effect": "Allow",
       "Action": ["s3:ListBucket"],
-      "Resource": "arn:aws:s3:::coat-reports-${environment}"
+      "Resource": [
+      "arn:aws:s3:::coat-reports-${environment}",
+      "arn:aws:s3:::coat-${environment}-cur-v2-hourly"
+      ]
+    },
+    {
+      "Sid": "AthenaAccessCurV2Hourly",
+      "Effect": "Allow",
+      "Action": [
+        "athena:StartQueryExecution",
+        "athena:GetQueryExecution",
+        "athena:GetQueryResults",
+        "athena:ListWorkGroups"
+      ],
+      "Resource": "*"
     }
+
   ]
 }
