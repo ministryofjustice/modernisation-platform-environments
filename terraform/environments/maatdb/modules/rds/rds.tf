@@ -289,6 +289,24 @@ resource "aws_security_group" "mlra_ecs_sec_group" {
   }
 }
 
+resource "aws_security_group" "hub20_sec_group" {
+  #checkov:skip=CKV2_AWS_5:"Not applicable"
+  name        = "hub20-sec-group"
+  description = "RDS Access from the HUB 2.0 MAAT Lambda"
+  vpc_id      = var.vpc_shared_id
+
+  ingress {
+    description     = "Sql Net on 1521"
+    from_port       = 1521
+    to_port         = 1521
+    protocol        = "tcp"
+    security_groups = [var.hub20_sec_group_id]
+  }
+
+  tags = {
+    Name = "${var.application_name}-${var.environment}-mlra-ecs-sec-group"
+  }
+}
 
 # Access from Bastion
 
