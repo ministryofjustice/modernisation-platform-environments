@@ -84,8 +84,18 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
             }
           }
         }
-        Next = "PublishToSNS"
+        ResultPath = "$.ProcessedFiles",
+        Next = "WrapMapOutput"
       },
+
+      "WrapMapOutput" = {
+        Type = "Pass",
+        Parameters = {
+            "results.$" = "$.ProcessedFiles"
+        },
+        ResultPath = "$.WrappedResults",
+        Next = "PublishToSNS"
+        },
 
       "PublishToSNS" = {
         Type     = "Task",
@@ -93,7 +103,7 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
         Parameters = {
           FunctionName = aws_lambda_function.cwa_sns_lambda.arn,
           Payload      = {
-            "timestamp.$" = "$.GetFilesResult.Payload.timestamp"
+            "timestamp.$" = "$.WrappedResults.results[0].timestamp"
           }
         },
         ResultPath = "$.PublishToSNSResult",
