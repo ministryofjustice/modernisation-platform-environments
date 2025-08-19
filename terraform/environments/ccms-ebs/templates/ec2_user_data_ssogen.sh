@@ -9,10 +9,14 @@ echo "127.0.0.1   ${hostname}" >> /etc/hosts
 yum update -y
 yum install -y unzip wget curl git lsof tree java-1.8.0-openjdk
 
-# === Install AWS SSM Agent ===
+# Install AWS SSM Agent
 yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
+
+systemctl stop amazon-ssm-agent
+rm -rf /var/lib/amazon/ssm/ipc/
 systemctl enable amazon-ssm-agent
-systemctl restart amazon-ssm-agent
+systemctl start amazon-ssm-agent
+
 
 # === Install AWS CLI ===
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
