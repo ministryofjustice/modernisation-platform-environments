@@ -59,7 +59,7 @@ module "s3-taskbuilder" {
 resource "aws_s3_bucket_policy" "taskbuilder" {
   count = local.environment == "development" || local.environment == "preproduction" ? 1 : 0
 
-  bucket = module.s3-taskbuilder[0].aws_s3_bucket["taskbuilder"].arn
+  bucket = module.s3-taskbuilder[0].aws_s3_bucket_id["taskbuilder"].id
 
 
   policy = jsonencode({
