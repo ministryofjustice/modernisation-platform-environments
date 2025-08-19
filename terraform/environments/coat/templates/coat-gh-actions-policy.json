@@ -40,7 +40,7 @@
       "Effect": "Allow",
       "Action": "athena:ListWorkGroups",
       "Resource": "*"
-    },
+    }
 
   ]
 }
