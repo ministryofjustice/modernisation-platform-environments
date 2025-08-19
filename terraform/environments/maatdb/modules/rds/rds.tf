@@ -304,7 +304,7 @@ resource "aws_security_group" "hub20_sec_group" {
   }
 
   tags = {
-    Name = "${var.application_name}-${var.environment}-mlra-ecs-sec-group"
+    Name = "${var.application_name}-${var.environment}-hub20-sec-group"
   }
 }
 
