@@ -265,7 +265,7 @@ resource "aws_security_group" "vpc_sec_group" {
 resource "aws_security_group" "mlra_ecs_sec_group" {
   #checkov:skip=CKV2_AWS_5:"Not applicable"
   name        = "mlra-ecs-sec-group"
-  description = "RDS Access from the MLRA application and HUB 2.0 Lambda"
+  description = "RDS Access from the MLRA application"
   vpc_id      = var.vpc_shared_id
 
   ingress {
