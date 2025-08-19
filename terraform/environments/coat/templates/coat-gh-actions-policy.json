@@ -32,7 +32,8 @@
       ],
       "Resource": [
         "arn:aws:athena:${region}:${account}:workgroup/${athena_workgroup}",
-        "arn:aws:athena:${region}:${account}:datacatalog/${data_catalog}",
+        "arn:aws:athena:${region}:${account}:datacatalog/${data_catalog}"
+        ]
     },
     {
       "Sid": "ListAthenaWorkGroups",
