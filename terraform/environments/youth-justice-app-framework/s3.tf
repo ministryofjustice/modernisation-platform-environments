@@ -77,7 +77,7 @@ resource "aws_s3_bucket_policy" "taskbuilder" {
           ]
         }
         Action   = "s3:ListBucket"
-        Resource = module.s3-taskbuilder[0].aws_s3_bucket_id["taskbuilder"].id
+        Resource = module.s3-taskbuilder[0].aws_s3_bucket_id["taskbuilder"].aws_s3_bucket
       },
       {
         Sid    = "AllowGetObject"
@@ -91,7 +91,7 @@ resource "aws_s3_bucket_policy" "taskbuilder" {
           ]
         }
         Action   = "s3:GetObject"
-        Resource = "${module.s3-taskbuilder[0].aws_s3_bucket_id["taskbuilder"].id}/*"
+        Resource = "${module.s3-taskbuilder[0].aws_s3_bucket_id["taskbuilder"].aws_s3_bucket}/*"
       }
     ]
   })
