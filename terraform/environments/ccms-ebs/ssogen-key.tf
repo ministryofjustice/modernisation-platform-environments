@@ -1,6 +1,7 @@
 # Generate SSH key pair in Terraform
 resource "tls_private_key" "ssogen" {
-  algorithm = "ED25519"
+  algorithm = "RSA"
+  rsa_bits  = 4096
 }
 
 # Create EC2 key pair
