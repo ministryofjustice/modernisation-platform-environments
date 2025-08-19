@@ -21,7 +21,7 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
         Type    = "Choice"
         Choices = [
           {
-            Variable      = "$.GetFilesResult.StatusCode"
+            Variable      = "$.GetFilesResult.Payload.statusCode"
             NumericEquals = 200
             Next          = "ProcessFiles"
           }
@@ -64,7 +64,7 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
                 Type    = "Choice"
                 Choices = [
                 {
-                    Variable      = "$.ProcessSingleFileResult.StatusCode"
+                    Variable      = "$.ProcessSingleFileResult.Payload.statusCode"
                     NumericEquals = 200
                     Next          = "NextFileOrEnd"
                 }
@@ -113,7 +113,7 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
         Type    = "Choice",
         Choices = [
             {
-            Variable      = "$.PublishToSNSResult.StatusCode",
+            Variable      = "$.PublishToSNSResult.Payload.statusCode",
             NumericEquals = 200,
             Next          = "SuccessState"
             }
