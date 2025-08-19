@@ -14,8 +14,6 @@ resource "aws_instance" "ec2_ssogen" {
     ignore_changes = [
       ebs_block_device,
       ebs_optimized,
-      user_data,
-      user_data_replace_on_change,
       tags
     ]
   }
@@ -25,7 +23,7 @@ resource "aws_instance" "ec2_ssogen" {
     volume_type = "gp2"
   }
  
-  user_data_replace_on_change = false
+  user_data_replace_on_change = true
   user_data = base64encode(templatefile("./templates/ec2_user_data_ssogen.sh", {
     hostname = "ssogen-${count.index + 1}"
   }))
