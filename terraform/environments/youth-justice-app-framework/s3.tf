@@ -59,7 +59,7 @@ module "s3-taskbuilder" {
 resource "aws_s3_bucket_policy" "taskbuilder" {
   count = local.environment == "development" || local.environment == "preproduction" ? 1 : 0
 
-  bucket = module.s3-taskbuilder[0].aws_s3_bucket_id["taskbuilder"].id
+  bucket = module.s3-taskbuilder[0].aws_s3_bucket["taskbuilder"].arn
 
 
   policy = jsonencode({
@@ -77,7 +77,7 @@ resource "aws_s3_bucket_policy" "taskbuilder" {
           ]
         }
         Action   = "s3:ListBucket"
-        Resource = module.s3-taskbuilder[0].aws_s3_bucket_id["taskbuilder"].aws_s3_bucket
+        Resource = module.s3-taskbuilder[0].aws_s3_bucket["taskbuilder"].arn
       },
       {
         Sid    = "AllowGetObject"
@@ -91,7 +91,7 @@ resource "aws_s3_bucket_policy" "taskbuilder" {
           ]
         }
         Action   = "s3:GetObject"
-        Resource = "${module.s3-taskbuilder[0].aws_s3_bucket_id["taskbuilder"].aws_s3_bucket}/*"
+        Resource = "${module.s3-taskbuilder[0].aws_s3_bucket["taskbuilder"].arn}/*"
       }
     ]
   })
