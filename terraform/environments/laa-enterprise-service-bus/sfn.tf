@@ -92,14 +92,33 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
         Resource = "arn:aws:states:::lambda:invoke",
         Parameters = {
           FunctionName = aws_lambda_function.cwa_sns_lambda.arn,
-          Payload      = "$"
+          Payload      = {
+            "timestamp.$" = "$.GetFilesResult.Payload.timestamp"
+          }
         },
-        Retry = [{
-          ErrorEquals     = ["Lambda.TooManyRequestsException"],
-          IntervalSeconds = 2,
-          MaxAttempts     = 2
-        }],
-        End = true
+        ResultPath = "$.PublishToSNSResult",
+        Next       = "CheckPublishToSNSStatus"
+      },
+      "CheckPublishToSNSStatus" = {
+        Type    = "Choice",
+        Choices = [
+            {
+            Variable      = "$.PublishToSNSResult.StatusCode",
+            NumericEquals = 200,
+            Next          = "SuccessState"
+            }
+        ],
+        Default = "FailSNS"
+      },
+
+      "FailSNS" = {
+        Type  = "Fail",
+        Error = "LambdaError",
+        Cause = "PublishToSNS returned non-200 status or failed"
+      },
+
+      "SuccessState" = {
+        Type = "Succeed"
       }
     }
   })
