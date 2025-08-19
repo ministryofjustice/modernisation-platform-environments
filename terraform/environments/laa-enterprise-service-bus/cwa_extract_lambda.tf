@@ -207,8 +207,9 @@ resource "aws_lambda_function" "cwa_sns_lambda" {
 
   environment {
     variables = {
-      PROVIDER_TOPIC_NAME = aws_sns_topic.priority_p1.arn
-      PROVIDER_BANKS_TOPIC_NAME = aws_sns_topic.provider_banks.arn
+      AWS_REGION = data.aws_region.current.region
+      PROVIDER_TOPIC = aws_sns_topic.priority_p1.arn
+      PROVIDER_BANKS_TOPIC = aws_sns_topic.provider_banks.arn
     }
   }
 
