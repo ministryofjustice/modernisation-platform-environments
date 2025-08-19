@@ -65,8 +65,7 @@ locals {
         })
         user_data_cloud_init = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init, {
           args = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init.args, {
-            # branch = "TM-1518/nomis-web-ansible-fix" ## works...
-            branch = "f8ea577571c5ea360da9f7582f0ac1c11ae1268f" # 2025-06-26 tag_release_detail fix
+            branch = "main"
           })
         })
         tags = merge(local.ec2_autoscaling_groups.web.tags, {
