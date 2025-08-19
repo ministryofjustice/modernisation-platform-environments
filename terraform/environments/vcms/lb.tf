@@ -79,7 +79,7 @@ resource "aws_lb_listener" "listener" {
   port              = 443
   protocol          = "HTTPS"
   certificate_arn   = aws_acm_certificate.external.arn
-  ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
+  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
 
   default_action {
     target_group_arn = aws_lb_target_group.target_group_fargate.id
