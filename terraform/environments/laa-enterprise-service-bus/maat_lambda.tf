@@ -20,7 +20,7 @@ resource "aws_security_group_rule" "maat_provider_load_egress_oracle" {
   from_port                = 1521
   to_port                  = 1521
   protocol                 = "tcp"
-  source_security_group_id = local.application_data.accounts[local.environment].maatdb_sg
+  source_security_group_id = local.application_data.accounts[local.environment].vpc_endpoint_sg
   security_group_id        = aws_security_group.maat_provider_load_sg.id
   description              = "Outbound 1521 Access to MAAT DB"
 }
