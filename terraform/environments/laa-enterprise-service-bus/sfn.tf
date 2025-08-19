@@ -23,10 +23,20 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
           {
             Variable      = "$.GetFilesResult.Payload.statusCode"
             NumericEquals = 200
-            Next          = "ProcessFiles"
+            Next          = "ParseGetFilesBody"
           }
         ]
         Default = "FailState"
+      },
+
+      "ParseGetFilesBody" = {
+        Type = "Pass",
+        Parameters = {
+          "files.$"     = "States.StringToJson($.GetFilesResult.Payload.body).files",
+          "timestamp.$" = "States.StringToJson($.GetFilesResult.Payload.body).timestamp"
+        },
+        ResultPath = "$.ParsedBody",
+        Next       = "ProcessFiles"
       },
 
       "FailState" = {
@@ -37,11 +47,11 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
 
       "ProcessFiles" = {
         Type          = "Map",
-        ItemsPath     = "$.GetFilesResult.Payload.files",
+        ItemsPath     = "$.ParsedBody.files",
         MaxConcurrency = 8,
         Parameters = {
           "filename.$"  = "$$.Map.Item.Value.filename",
-          "timestamp.$" = "$.GetFilesResult.Payload.timestamp"
+          "timestamp.$" = "$.ParsedBody.timestamp"
         },
         Iterator = {
           StartAt = "ProcessSingleFile",
