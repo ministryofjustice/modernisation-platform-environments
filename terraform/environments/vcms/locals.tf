@@ -31,7 +31,7 @@ locals {
   }
 
   bastion_config = {}
-  image_tag = "latest"
+  image_tag = "initial-16447252449-1"
   app_port  = 80
   internal_security_group_cidrs = distinct(flatten([
     module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public,
