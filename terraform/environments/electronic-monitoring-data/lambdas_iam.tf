@@ -637,8 +637,7 @@ data "aws_iam_policy_document" "dms_validation_lambda_role_policy_document" {
       "dms:DescribeReplicationTasks",
     ]
     resources = [
-      "${aws_dms_replication_instance.dms_replication_instance[0].replication_instance_arn}/*",
-      aws_dms_replication_instance.dms_replication_instance[0].replication_instance_arn
+      "arn:aws:dms:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:task:*",
     ]
   }
 }
