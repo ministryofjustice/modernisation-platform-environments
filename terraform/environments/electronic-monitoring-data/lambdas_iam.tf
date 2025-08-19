@@ -630,6 +630,17 @@ data "aws_iam_policy_document" "dms_validation_lambda_role_policy_document" {
       module.s3-dms-target-store-bucket.bucket.arn,
     ]
   }
+  statement {
+    sid    = "DMSPersmissions"
+    effect = "Allow"
+    actions = [
+      "dms:DescribeReplicationTasks",
+    ]
+    resources = [
+      "${aws_dms_replication_instance.dms_replication_instance[0].replication_instance_arn}/*",
+      aws_dms_replication_instance.dms_replication_instance[0].replication_instance_arn
+    ]
+  }
 }
 
 resource "aws_iam_role" "dms_validation_lambda_role" {
