@@ -21,7 +21,7 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
         Type    = "Choice"
         Choices = [
           {
-            Variable      = "$.GetFilesResult.StatusCode"
+            Variable      = "$.GetFilesResult.Payload.statusCode"
             NumericEquals = 200
             Next          = "ProcessFiles"
           }
