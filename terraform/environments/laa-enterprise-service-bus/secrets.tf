@@ -27,7 +27,7 @@ resource "aws_secretsmanager_secret" "ccms_procedures_config" {
 }
 
 #####################################################################################
-### Secrets used for CCMS Extract Lambda Function ###
+### Secrets used for MAAT Extract Lambda Function ###
 #####################################################################################
 
 resource "aws_secretsmanager_secret" "maat_db_mp_credentials" {
@@ -36,4 +36,28 @@ resource "aws_secretsmanager_secret" "maat_db_mp_credentials" {
 
 resource "aws_secretsmanager_secret" "maat_procedures_config" {
   name = "maat-provider-lambda-procedures-config-${local.environment}"
+}
+
+#####################################################################################
+### Secrets used for CCR Extract Lambda Function ###
+#####################################################################################
+
+resource "aws_secretsmanager_secret" "ccr_db_mp_credentials" {
+  name = "ccr-db-mp-credentials-${local.environment}"
+}
+
+resource "aws_secretsmanager_secret" "ccr_procedures_config" {
+  name = "ccr-provider-lambda-procedures-config-${local.environment}"
+}
+
+#####################################################################################
+### Secrets used for CCLF Extract Lambda Function ###
+#####################################################################################
+
+resource "aws_secretsmanager_secret" "cclf_db_mp_credentials" {
+  name = "cclf-db-mp-credentials-${local.environment}"
+}
+
+resource "aws_secretsmanager_secret" "cclf_procedures_config" {
+  name = "cclf-provider-lambda-procedures-config-${local.environment}"
 }
