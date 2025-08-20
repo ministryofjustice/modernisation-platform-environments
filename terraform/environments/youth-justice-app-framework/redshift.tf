@@ -1,3 +1,8 @@
+import {
+  id = local.application_data.accounts[local.environment].redshift_to_s3_rule_id
+  to = module.redshift.aws_vpc_security_group_egress_rule.redshift_to_s3
+}
+
 module "redshift" {
   source = "./modules/redshift"
 

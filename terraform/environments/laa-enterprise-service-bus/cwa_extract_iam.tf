@@ -57,7 +57,8 @@ resource "aws_iam_policy" "cwa_extract_lambda_policy" {
         ]
         Resource = [
           aws_secretsmanager_secret.cwa_procedures_config.arn,
-          aws_secretsmanager_secret.cwa_db_secret.arn
+          aws_secretsmanager_secret.cwa_db_secret.arn,
+          aws_secretsmanager_secret.cwa_table_name_secret.arn
         ]
       },
       {
@@ -79,6 +80,16 @@ resource "aws_iam_policy" "cwa_extract_lambda_policy" {
           "elasticfilesystem:DescribeMountTargets"
       ],
         Resource = "*"
+      },
+      {
+        Effect   = "Allow"
+        Action   = [
+          "sns:Publish"
+      ],
+        Resource = [
+          aws_sns_topic.priority_p1.arn,
+          aws_sns_topic.provider_banks.arn
+        ]
       }
     ]
   })

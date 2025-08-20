@@ -2,7 +2,7 @@ locals {
   ecs_services = {
     auth = {
       name                              = "auth"
-      image                             = "673920839910.dkr.ecr.eu-west-2.amazonaws.com/yjaf/auth:preprod"
+      image                             = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/youth-justice-app-framework:auth-preprod"
       task_cpu                          = 1280
       container_cpu                     = 1024
       task_memory                       = 2560
@@ -36,7 +36,7 @@ locals {
       additional_container_definitions = {
         etchosts-container = {
           name          = "etchosts-container"
-          image         = "673920839910.dkr.ecr.eu-west-2.amazonaws.com/yjaf/auth:preprod"
+          image         = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/youth-justice-app-framework:auth-preprod"
           port_mappings = []
           cpu           = 256
           memory        = 512
@@ -100,7 +100,7 @@ locals {
     },
     dal = {
       name        = "dal"
-      image       = "673920839910.dkr.ecr.eu-west-2.amazonaws.com/yjaf/dal:preprod"
+      image       = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/youth-justice-app-framework:dal-preprod"
       task_cpu    = 512
       task_memory = 3072
       additional_environment_variables = [
@@ -117,7 +117,7 @@ locals {
     },
     sentences = {
       name        = "sentences"
-      image       = "673920839910.dkr.ecr.eu-west-2.amazonaws.com/yjaf/sentences:preprod"
+      image       = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/youth-justice-app-framework:sentences-preprod"
       task_cpu    = 512
       task_memory = 1024
       additional_environment_variables = [
@@ -134,7 +134,7 @@ locals {
     },
     yp = {
       name        = "yp"
-      image       = "673920839910.dkr.ecr.eu-west-2.amazonaws.com/yjaf/yp:preprod"
+      image       = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/youth-justice-app-framework:yp-preprod"
       task_cpu    = 768
       task_memory = 3072
       additional_environment_variables = [
@@ -151,7 +151,7 @@ locals {
     },
     bands = {
       name        = "bands"
-      image       = "673920839910.dkr.ecr.eu-west-2.amazonaws.com/yjaf/bands:preprod"
+      image       = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/youth-justice-app-framework:bands-preprod"
       task_cpu    = 512
       task_memory = 1152
       additional_environment_variables = [
@@ -168,7 +168,7 @@ locals {
     },
     bu = {
       name        = "bu"
-      image       = "673920839910.dkr.ecr.eu-west-2.amazonaws.com/yjaf/bu:preprod"
+      image       = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/youth-justice-app-framework:bu-preprod"
       task_cpu    = 512
       task_memory = 2176
       additional_environment_variables = [
@@ -185,7 +185,7 @@ locals {
     },
     case = {
       name                              = "case"
-      image                             = "673920839910.dkr.ecr.eu-west-2.amazonaws.com/yjaf/case:preprod"
+      image                             = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/youth-justice-app-framework:case-preprod"
       task_cpu                          = 512
       task_memory                       = 3072
       health_check_grace_period_seconds = 420
@@ -203,7 +203,7 @@ locals {
     },
     cmm = {
       name        = "cmm"
-      image       = "673920839910.dkr.ecr.eu-west-2.amazonaws.com/yjaf/cmm:preprod"
+      image       = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/youth-justice-app-framework:cmm-preprod"
       task_cpu    = 512
       task_memory = 1152
       additional_environment_variables = [
@@ -220,7 +220,7 @@ locals {
     },
     conversions = {
       name        = "conversions"
-      image       = "673920839910.dkr.ecr.eu-west-2.amazonaws.com/yjaf/conversions:preprod"
+      image       = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/youth-justice-app-framework:conversions-preprod"
       task_cpu    = 512
       task_memory = 2048
       additional_environment_variables = [
@@ -237,7 +237,7 @@ locals {
     },
     documents = {
       name        = "documents"
-      image       = "673920839910.dkr.ecr.eu-west-2.amazonaws.com/yjaf/documents:preprod"
+      image       = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/youth-justice-app-framework:documents-preprod"
       task_cpu    = 512
       task_memory = 1638
       additional_environment_variables = [
@@ -255,7 +255,7 @@ locals {
     gateway-external = {
       name                              = "gateway-external"
       internal_only                     = false
-      image                             = "673920839910.dkr.ecr.eu-west-2.amazonaws.com/yjaf/gateway:preprod"
+      image                             = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/youth-justice-app-framework:gateway-preprod"
       task_cpu                          = 1024
       task_memory                       = 3072
       desired_count                     = 2
@@ -308,7 +308,7 @@ locals {
     gateway-internal = {
       name                              = "gateway-internal"
       internal_only                     = true
-      image                             = "673920839910.dkr.ecr.eu-west-2.amazonaws.com/yjaf/gateway:preprod"
+      image                             = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/youth-justice-app-framework:gateway-preprod"
       task_cpu                          = 1024
       task_memory                       = 3072
       desired_count                     = 2
@@ -360,7 +360,7 @@ locals {
     },
     placements = {
       name        = "placements"
-      image       = "673920839910.dkr.ecr.eu-west-2.amazonaws.com/yjaf/placements:preprod"
+      image       = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/youth-justice-app-framework:placements-preprod"
       task_cpu    = 512
       task_memory = 2560
       additional_environment_variables = [
@@ -377,7 +377,7 @@ locals {
     },
     refdata = {
       name        = "refdata"
-      image       = "673920839910.dkr.ecr.eu-west-2.amazonaws.com/yjaf/refdata:preprod"
+      image       = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/youth-justice-app-framework:refdata-preprod"
       task_cpu    = 512
       task_memory = 2662
       additional_environment_variables = [
@@ -394,7 +394,7 @@ locals {
     },
     returns = {
       name                              = "returns"
-      image                             = "673920839910.dkr.ecr.eu-west-2.amazonaws.com/yjaf/returns:preprod"
+      image                             = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/youth-justice-app-framework:returns-preprod"
       task_cpu                          = 512
       task_memory                       = 3328
       health_check_grace_period_seconds = 600
@@ -412,7 +412,7 @@ locals {
     },
     serious-incidents = {
       name                              = "serious-incidents"
-      image                             = "673920839910.dkr.ecr.eu-west-2.amazonaws.com/yjaf/serious-incidents:preprod"
+      image                             = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/youth-justice-app-framework:serious-incidents-preprod"
       task_cpu                          = 1024
       task_memory                       = 1152
       health_check_grace_period_seconds = 120
@@ -430,7 +430,7 @@ locals {
     },
     transfers = {
       name        = "transfers"
-      image       = "673920839910.dkr.ecr.eu-west-2.amazonaws.com/yjaf/transfers:preprod"
+      image       = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/youth-justice-app-framework:transfers-preprod"
       task_cpu    = 512
       task_memory = 1152
       additional_environment_variables = [
@@ -447,7 +447,7 @@ locals {
     },
     transitions = {
       name                              = "transitions"
-      image                             = "673920839910.dkr.ecr.eu-west-2.amazonaws.com/yjaf/transitions:preprod"
+      image                             = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/youth-justice-app-framework:transitions-preprod"
       task_cpu                          = 512
       task_memory                       = 1152
       health_check_grace_period_seconds = 120
@@ -465,7 +465,7 @@ locals {
     },
     ui = {
       name                              = "ui"
-      image                             = "673920839910.dkr.ecr.eu-west-2.amazonaws.com/yjaf/ui:preprod"
+      image                             = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/youth-justice-app-framework:ui-preprod"
       task_cpu                          = 256
       task_memory                       = 1024
       health_check_grace_period_seconds = 120
@@ -514,7 +514,7 @@ locals {
     },
     views = {
       name        = "views"
-      image       = "673920839910.dkr.ecr.eu-west-2.amazonaws.com/yjaf/views:preprod"
+      image       = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/youth-justice-app-framework:views-preprod"
       task_cpu    = 512
       task_memory = 2048
       additional_environment_variables = [
@@ -531,7 +531,7 @@ locals {
     },
     workflow = {
       name                              = "workflow"
-      image                             = "673920839910.dkr.ecr.eu-west-2.amazonaws.com/yjaf/workflow:preprod"
+      image                             = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/youth-justice-app-framework:workflow-preprod"
       task_cpu                          = 1024
       task_memory                       = 3584
       health_check_grace_period_seconds = 420
