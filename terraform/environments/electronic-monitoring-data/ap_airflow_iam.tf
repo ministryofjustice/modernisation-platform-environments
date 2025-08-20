@@ -427,105 +427,24 @@ module "load_mdss" {
   new_airflow        = true
 }
 
-module "load_scram_alcohol_monitoring" {
-  count  = local.is-production ? 1 : 0
-  source = "./modules/ap_airflow_iam_role"
+module "load_scram_alcohol_monitoring_database" {
+  count  = local.is-production || local.is-test ? 1 : 0
+  source = "./modules/ap_airflow_load_data_iam_role"
 
-  environment          = local.environment
-  role_name_suffix     = "load-scram-alcohol-monitoring"
-  role_description     = "Permissions to load data from SCRAM alcohol monitoring"
-  iam_policy_documents = [data.aws_iam_policy_document.scram_am_ap_airflow.json]
-  secret_code          = jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]
-  oidc_arn             = aws_iam_openid_connect_provider.analytical_platform_compute.arn
+  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+  de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
+
+  name               = "scram-alcohol-monitoring"
+  environment        = local.environment
+  database_name      = "scram-alcohol-monitoring"
+  path_to_data       = "/scram/alcohol_monitoring"
+  source_data_bucket = module.s3-data-bucket.bucket
+  secret_code        = jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]
+  oidc_arn           = aws_iam_openid_connect_provider.analytical_platform_compute.arn
+  athena_dump_bucket = module.s3-athena-bucket.bucket
+  cadt_bucket        = module.s3-create-a-derived-table-bucket.bucket
+  new_airflow        = true
 }
-
-data "aws_iam_policy_document" "scram_am_ap_airflow" {
-  #checkov:skip=CKV_AWS_356
-  #checkov:skip=CKV_AWS_111
-  statement {
-    sid    = "AthenaPermissionsForScramAlcoholMonitoring"
-    effect = "Allow"
-    actions = [
-      "athena:StartQueryExecution",
-      "athena:GetQueryExecution",
-      "athena:GetQueryResults",
-      "athena:StopQueryExecution",
-      "athena:ListQueryExecutions",
-      "athena:GetWorkGroup",
-      "athena:ListWorkGroups"
-    ]
-    resources = ["*"]
-  }
-  statement {
-    sid    = "S3AthenaQueryBucketPermissionsForScramAlcoholMonitoring"
-    effect = "Allow"
-    actions = [
-      "s3:GetObject",
-      "s3:PutObject",
-      "s3:ListBucket"
-    ]
-    resources = [
-      module.s3-athena-bucket.bucket.arn,
-      "${module.s3-athena-bucket.bucket.arn}/output/scram_am/*",
-    ]
-  }
-  statement {
-    sid    = "GluePermissionsForScramAlcoholMonitoring"
-    effect = "Allow"
-    actions = [
-      "glue:GetDatabase",
-      "glue:GetTable",
-      "glue:GetPartitions"
-    ]
-    resources = ["*"]
-  }
-  statement {
-    sid    = "S3BucketPermissionsForScramAlcoholMonitoring"
-    effect = "Allow"
-    actions = [
-      "s3:GetObject",
-      "s3:ListBucket"
-    ]
-    resources = [
-      module.s3-data-bucket.bucket.arn,
-      "${module.s3-data-bucket.bucket.arn}/scram/alcohol_monitoring/*",
-    ]
-  }
-  statement {
-    sid    = "S3PutBucketPermissionsForScramAlcoholMonitoring"
-    effect = "Allow"
-    actions = [
-      "s3:PutObject",
-      "s3:ListBucket"
-    ]
-    resources = [
-      module.s3-create-a-derived-table-bucket.bucket.arn,
-      "${module.s3-create-a-derived-table-bucket.bucket.arn}/*",
-    ]
-  }
-  statement {
-    sid       = "GetDataAccessForLakeFormationForScramAlcoholMonitoring"
-    effect    = "Allow"
-    actions   = ["lakeformation:GetDataAccess"]
-    resources = ["*"]
-  }
-  statement {
-    sid       = "ListAccountAliasForScramAlcoholMonitoring"
-    effect    = "Allow"
-    actions   = ["iam:ListAccountAliases"]
-    resources = ["*"]
-  }
-  statement {
-    sid    = "ListAllBuckesForScramAlcoholMonitoring"
-    effect = "Allow"
-    actions = [
-      "s3:ListAllMyBuckets",
-      "s3:GetBucketLocation"
-    ]
-    resources = ["*"]
-  }
-}
-
 
 module "full_reload_fms" {
   count  = local.is-development ? 0 : 1
