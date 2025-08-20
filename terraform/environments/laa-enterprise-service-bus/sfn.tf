@@ -1,5 +1,5 @@
 resource "aws_sfn_state_machine" "sfn_state_machine" {
-  name     = "my-state-machine"
+  name     = "cwa-step-function"
   role_arn = aws_iam_role.step_function_role.arn
 
   definition = jsonencode({
