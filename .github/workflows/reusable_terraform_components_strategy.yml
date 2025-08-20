@@ -21,7 +21,7 @@ jobs:
       matrix: "${{ steps.strategy.outputs.matrix }}"
     steps:
       - name: Check out Repo
-        uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
         with:
           fetch-depth: 0    # Ensure the full history is fetched so that commits are available.
 

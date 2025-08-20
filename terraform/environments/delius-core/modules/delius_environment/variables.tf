@@ -111,7 +111,14 @@ variable "env_name_to_dms_config_map" {
 
 # Only create one per account
 variable "create_backup_role" {
-  description = "Role used to run AWS Backuos i.e. dev-AWSBackupDefaultServiceRole"
+  description = "Role used to run AWS Backuos i.e. AWSBackupDefaultServiceRole"
+  type        = bool
+  default     = false
+}
+
+# Only create one per account
+variable "create_ecs_lambda" {
+  description = "Lambda that alerts probation-migrations-team Slack channel if ECS tasks are being retired"
   type        = bool
   default     = false
 }
