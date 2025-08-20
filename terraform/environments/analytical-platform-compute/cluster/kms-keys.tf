@@ -252,7 +252,7 @@ module "velero_kms" {
   source  = "terraform-aws-modules/kms/aws"
   version = "4.0.0"
 
-  aliases               = ["velero/default"]
+  aliases               = ["s3/velero"]
   description           = "Velero KMS key"
   enable_default_policy = true
 
