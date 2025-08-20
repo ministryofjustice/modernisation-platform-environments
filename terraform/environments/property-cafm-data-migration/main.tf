@@ -1,7 +1,7 @@
 module "rds_export" {
   # checkov:skip=CKV_TF_1: using branch instead of a commit hash
   # checkov:skip=CKV_TF_2: using branch instead of tag with a version number
-  source = "github.com/ministryofjustice/terraform-rds-export?ref=92baa47054fc239e91acc22c3ec7af02c6f765cb"
+  source = "github.com/ministryofjustice/terraform-rds-export?ref=1a02540acba58172d04bd34fb89ab5adbed2f886"
 
   kms_key_arn         = aws_kms_key.sns_kms.arn
   name                = "cafm"
