@@ -7,8 +7,8 @@
       "Effect": "Allow",
       "Action": ["s3:PutObject"],
       "Resource": [
-        "arn:aws:s3:::coat-${environment}-cur-v2-hourly/*",
-        "arn:aws:s3:::coat-${environment}-cur-v2-hourly"
+        "arn:aws:s3:::${bucket_name}/*",
+        "arn:aws:s3:::${bucket_name}"
       ],
       "Principal": {
         "Service": ["bcm-data-exports.amazonaws.com"]
@@ -18,7 +18,7 @@
       "Sid": "S3ListGetObject",
       "Effect": "Allow",
       "Action": ["s3:ListBucket", "s3:GetBucketLocation"],
-      "Resource": ["arn:aws:s3:::coat-${environment}-cur-v2-hourly"],
+      "Resource": ["arn:aws:s3:::${bucket_name}"],
       "Principal": {
         "Service": ["bcm-data-exports.amazonaws.com"]
       }
@@ -33,8 +33,8 @@
         "s3:PutBucketVersioning"
       ],
       "Resource": [
-        "arn:aws:s3:::coat-${environment}-cur-v2-hourly/*",
-        "arn:aws:s3:::coat-${environment}-cur-v2-hourly"
+        "arn:aws:s3:::${bucket_name}/*",
+        "arn:aws:s3:::${bucket_name}"
       ],
       "Principal": {
         "AWS": [
@@ -47,8 +47,8 @@
       "Effect": "Allow",
       "Action": ["s3:GetObject", "s3:ListBucket", "s3:PutObject"],
       "Resource": [
-        "arn:aws:s3:::coat-${environment}-cur-v2-hourly/*",
-        "arn:aws:s3:::coat-${environment}-cur-v2-hourly"
+        "arn:aws:s3:::${bucket_name}/*",
+        "arn:aws:s3:::${bucket_name}"
       ],
       "Principal": {
         "AWS": [
@@ -61,7 +61,7 @@
       "Effect": "Allow",
       "Action": ["s3:GetObject", "s3:PutObject"],
       "Resource": [
-        "arn:aws:s3:::coat-${environment}-cur-v2-hourly/athena-results/*"
+        "arn:aws:s3:::${bucket_name}/athena-results/*"
       ],
       "Principal": {
         "Service": ["athena.amazonaws.com"]

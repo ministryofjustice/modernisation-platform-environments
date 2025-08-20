@@ -73,7 +73,10 @@ resource "aws_iam_role_policy_attachment" "join_ad_role_policy_core" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
-
+resource "aws_iam_role_policy_attachment" "join_ad_role_policy_Cloudwatch" {
+  role       = aws_iam_role.join_ad_role.name
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+}
 
 #Create an instance profile for your EC2 instance
 resource "aws_iam_instance_profile" "ad_instance_profile" {
@@ -301,6 +304,7 @@ resource "aws_instance" "ad_instance" {
   }
   root_block_device {
     encrypted = true
+    volume_size = 50
     tags = merge(local.all_tags,
       { Name = "root-device-mgmt-ad-instance" },
       { device-name = "/dev/sda1" }

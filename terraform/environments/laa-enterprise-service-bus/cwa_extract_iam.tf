@@ -53,11 +53,42 @@ resource "aws_iam_policy" "cwa_extract_lambda_policy" {
       {
         Effect   = "Allow"
         Action   = [
-          "secretsmanager:GetSecretValue",
+          "secretsmanager:GetSecretValue"
         ]
         Resource = [
           aws_secretsmanager_secret.cwa_procedures_config.arn,
           aws_secretsmanager_secret.cwa_db_secret.arn,
+          aws_secretsmanager_secret.cwa_table_name_secret.arn
+        ]
+      },
+      {
+        Effect   = "Allow"
+        Action   = [
+          "elasticfilesystem:ClientMount",
+          "elasticfilesystem:ClientWrite",
+          "elasticfilesystem:ClientRootAccess",
+          "elasticfilesystem:DescribeAccessPoints"
+      ],
+        Resource = [
+          "arn:aws:elasticfilesystem:eu-west-2:940482439836:file-system/fs-08be7f58b2bd6aaff",
+          "arn:aws:elasticfilesystem:eu-west-2:940482439836:access-point/fsap-0b3ad02899e9b5922"
+        ]
+      },
+      {
+        Effect   = "Allow"
+        Action   = [
+          "elasticfilesystem:DescribeMountTargets"
+      ],
+        Resource = "*"
+      },
+      {
+        Effect   = "Allow"
+        Action   = [
+          "sns:Publish"
+      ],
+        Resource = [
+          aws_sns_topic.priority_p1.arn,
+          aws_sns_topic.provider_banks.arn
         ]
       }
     ]

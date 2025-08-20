@@ -30,7 +30,8 @@
           "create_records": true
         }
       },
-      "quicksight_setup": true
+      "quicksight_setup": true,
+      "redshift_to_s3_rule_id": "sgr-0beb1aea5cb2d4b18"
     },
     "test": {
       "allow_s3_replication": true,
@@ -62,7 +63,8 @@
           "create_records": false
         }
       },
-      "quicksight_setup": true
+      "quicksight_setup": true,
+      "redshift_to_s3_rule_id": "sgr-06c85d127762780ae"
     },
     "preproduction": {
       "allow_s3_replication": true,
@@ -76,8 +78,8 @@
       "test_mode": true,
       "tableau_website_name": "tableau",
       "database_instance_class": "db.r5.xlarge",
-      "rds_engine_version": "16.6",
-      "enable_datadog_agent_apm": true,
+      "rds_engine_version": "17.5",
+      "enable_datadog_agent_apm": false,
       "create_rds_sheduler": true,
       "disable_overnight_ecs_scheduler": false,
       "ses_domain_identities": {
@@ -94,7 +96,8 @@
           "create_records": true
         }
       },
-      "quicksight_setup": true
+      "quicksight_setup": true,
+      "redshift_to_s3_rule_id": "sgr-07eea701a553fc27f"
     },
     "production": {
       "allow_s3_replication": true,
@@ -108,7 +111,7 @@
       "test_mode": true,
       "tableau_website_name": "reporting",
       "database_instance_class": "db.r5.2xlarge",
-      "rds_engine_version": "16.6",
+      "rds_engine_version": "17.5",
       "enable_datadog_agent_apm": true,
       "create_rds_sheduler": false,
       "disable_overnight_ecs_scheduler": true,
@@ -130,7 +133,8 @@
           "create_records": false
         }
       },
-      "quicksight_setup": true
+      "quicksight_setup": true,
+      "redshift_to_s3_rule_id": null
     }
   }
 }

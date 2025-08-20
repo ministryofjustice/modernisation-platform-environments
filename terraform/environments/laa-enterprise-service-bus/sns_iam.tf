@@ -10,7 +10,10 @@ resource "aws_iam_role" "publisher_role" {
       {
         Effect = "Allow"
         Principal = {
-          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+          AWS = [
+            "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root",
+            aws_iam_role.cwa_extract_lambda_role.arn
+          ]
         }
         Action = "sts:AssumeRole"
       }
@@ -29,7 +32,10 @@ resource "aws_iam_policy" "publisher_role_policy" {
         Action = [
           "sns:Publish"
         ]
-        Resource = aws_sns_topic.priority_p1.arn
+        Resource = [
+          aws_sns_topic.priority_p1.arn, 
+          aws_sns_topic.provider_banks.arn
+        ]
       }
     ]
   })
@@ -71,7 +77,10 @@ resource "aws_iam_policy" "subscriber_policy" {
         Action = [
           "sns:Subscribe"
         ]
-        Resource = aws_sns_topic.priority_p1.arn
+        Resource = [
+          aws_sns_topic.priority_p1.arn, 
+          aws_sns_topic.provider_banks.arn
+        ]
       }
     ]
   })
@@ -112,7 +121,10 @@ resource "aws_iam_policy" "admin_policy" {
       {
         Effect = "Allow"
         Action = "sns:*"
-        Resource = aws_sns_topic.priority_p1.arn
+        Resource = [
+          aws_sns_topic.priority_p1.arn, 
+          aws_sns_topic.provider_banks.arn
+        ]
       }
     ]
   })
@@ -121,4 +133,49 @@ resource "aws_iam_policy" "admin_policy" {
 resource "aws_iam_role_policy_attachment" "admin_attach" {
   role       = aws_iam_role.admin_role.name
   policy_arn = aws_iam_policy.admin_policy.arn
+}
+
+#####################################
+### Logging Role for SNS Topics ###
+#####################################
+
+resource "aws_iam_role" "sns_feedback" {
+  name = "sns-feedback-logging"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "sns.amazonaws.com"
+        }
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy" "sns_feedback_logging" {
+  name        = "sns-feedback-logging-policy"
+  description = "Allows SNS to log delivery status to CloudWatch Logs"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ],
+        Resource = "arn:aws:logs:*:*:*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "sns_feedback_attach" {
+  role       = aws_iam_role.sns_feedback.name
+  policy_arn = aws_iam_policy.sns_feedback_logging.arn
 }

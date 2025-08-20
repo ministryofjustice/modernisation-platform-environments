@@ -47,3 +47,11 @@ variable "secret_arn" {}
 variable "s3_bucket_ftp" {}
 variable "s3_object_ftp_client" {}
 variable "s3_object_ftp_clientlibs" {}
+
+variable "lambda_memory" {
+  default = "4096"
+}
+
+variable "lambda_storage" {
+  default = "1024"
+}
