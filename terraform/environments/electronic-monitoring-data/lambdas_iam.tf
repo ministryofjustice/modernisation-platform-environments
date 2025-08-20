@@ -640,6 +640,15 @@ data "aws_iam_policy_document" "dms_validation_lambda_role_policy_document" {
       "*",
     ]
   }
+
+  statement {
+    sid    = "SecretManager"
+    effect = "Allow"
+    actions = [
+      "secretsmanager:GetSecretValue",
+    ]
+    resources = ["arn:aws:secretsmanager:eu-west-2:${data.aws_caller_identity.current.account_id}:secret:${aws_secretsmanager_secret.db_password[0].name}/*"]
+  }
 }
 
 resource "aws_iam_role" "dms_validation_lambda_role" {
