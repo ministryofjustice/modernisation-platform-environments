@@ -25,7 +25,7 @@ module "s3" {
 
   log_bucket = "${local.environment_name}-${local.log_bucket}"
 
-  bucket_name = ["install-files"]
+  bucket_name = ["install-files", "application-memory-heap-dump"]
 
   archive_bucket_name = ["s3-bucket-access-logging", "redshift-yjb-reporting", "tf-webops-config-service", "tableau-alb-logs", "yjaf-ext-external-logs",
     "yjaf-int-internal-logs", "cloudfront-logs", "cloudtrail-logs", "guardduty-to-fallanx-archive", "tableau-backups",
@@ -51,13 +51,53 @@ module "s3-taskbuilder" {
   tags         = local.tags
   bucket_name  = ["taskbuilder"]
 
-  add_log_policy = true
+  add_log_policy = false #we are not recieving logs into this bucket
 
 }
 
+#allow access from circleci to taskbuilder bucket
+resource "aws_s3_bucket_policy" "taskbuilder" {
+  count = local.environment == "development" || local.environment == "preproduction" ? 1 : 0
+
+  bucket = module.s3-taskbuilder[0].aws_s3_bucket_id["taskbuilder"].id
+
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AllowListBucket"
+        Effect = "Allow"
+        Principal = {
+          AWS = [
+            "arn:aws:iam::${local.environment_management.account_ids["youth-justice-app-framework-development"]}:role/circleci_iam_role",
+            "arn:aws:iam::${local.environment_management.account_ids["youth-justice-app-framework-test"]}:role/circleci_iam_role",
+            "arn:aws:iam::${local.environment_management.account_ids["youth-justice-app-framework-preproduction"]}:role/circleci_iam_role",
+            "arn:aws:iam::${local.environment_management.account_ids["youth-justice-app-framework-production"]}:role/circleci_iam_role"
+          ]
+        }
+        Action   = "s3:ListBucket"
+        Resource = module.s3-taskbuilder[0].aws_s3_bucket["taskbuilder"].arn
+      },
+      {
+        Sid    = "AllowGetObject"
+        Effect = "Allow"
+        Principal = {
+          AWS = [
+            "arn:aws:iam::${local.environment_management.account_ids["youth-justice-app-framework-development"]}:role/circleci_iam_role",
+            "arn:aws:iam::${local.environment_management.account_ids["youth-justice-app-framework-test"]}:role/circleci_iam_role",
+            "arn:aws:iam::${local.environment_management.account_ids["youth-justice-app-framework-preproduction"]}:role/circleci_iam_role",
+            "arn:aws:iam::${local.environment_management.account_ids["youth-justice-app-framework-production"]}:role/circleci_iam_role"
+          ]
+        }
+        Action   = "s3:GetObject"
+        Resource = "${module.s3-taskbuilder[0].aws_s3_bucket["taskbuilder"].arn}/*"
+      }
+    ]
+  })
+}
+
 module "s3-sbom" {
-  #only in development or prod
-  count  = local.environment == "development" || local.environment == "preproduction" ? 1 : 0
   source = "./modules/s3"
 
   project_name = local.project_name
