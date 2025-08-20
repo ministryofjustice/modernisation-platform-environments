@@ -71,7 +71,7 @@ module "environment_poc" {
   ldap_config        = local.ldap_config_poc
   db_config          = local.db_config_poc
   create_backup_role = false
-  create_ecs_lambda  = true
+  create_ecs_lambda  = false
 
   delius_microservice_configs = local.delius_microservices_configs_poc
 
