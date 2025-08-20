@@ -245,5 +245,6 @@ module "dms_validation" {
     SOURCE_BUCKET = module.s3-dms-target-store-bucket.bucket.id
     SECRET_NAME   = aws_secretsmanager_secret.db_password[0].name
     USER          = aws_db_instance.database_2022[0].username
+    SERVER_NAME   = split(":", aws_db_instance.database_2022[0].endpoint)[0]
   }
 }
