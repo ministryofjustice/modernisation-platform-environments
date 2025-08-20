@@ -139,7 +139,3 @@ resource "aws_iam_role_policy_attachment" "ccms_cross_account_s3_read_attach" {
   role       = aws_iam_role.ccms_cross_account_s3_read.name
   policy_arn = aws_iam_policy.ccms_cross_account_s3_read_policy.arn
 }
-
-
-
-

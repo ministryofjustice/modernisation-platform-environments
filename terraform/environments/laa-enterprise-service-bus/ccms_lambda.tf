@@ -44,7 +44,7 @@ resource "aws_lambda_function" "ccms_provider_load" {
   description      = "Connect to CCMS DB"
   function_name    = "ccms_provider_load_function"
   role             = aws_iam_role.ccms_provider_load_role.arn
-  handler          = "ccms_lambda_function.lambda_handler"
+  handler          = "lambda_function.lambda_handler"
   filename         = "lambda/ccms_provider_load_lambda/ccms_lambda.zip"
   source_code_hash = filebase64sha256("lambda/ccms_provider_load_lambda/ccms_lambda.zip")
   timeout          = 300
