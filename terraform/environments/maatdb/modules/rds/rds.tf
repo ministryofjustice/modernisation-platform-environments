@@ -276,6 +276,14 @@ resource "aws_security_group" "mlra_ecs_sec_group" {
     security_groups = [var.mlra_ecs_cluster_sec_group_id]
   }
 
+  ingress {
+    description     = "RDS Access from the HUB 2.0 MAAT Lambda"
+    from_port       = 1521
+    to_port         = 1521
+    protocol        = "tcp"
+    security_groups = [var.hub20_sec_group_id]
+  }
+
   egress {
     description     = "Sql Net on 1521"
     from_port       = 1521
@@ -288,7 +296,6 @@ resource "aws_security_group" "mlra_ecs_sec_group" {
     Name = "${var.application_name}-${var.environment}-mlra-ecs-sec-group"
   }
 }
-
 
 # Access from Bastion
 

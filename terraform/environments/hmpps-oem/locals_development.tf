@@ -166,7 +166,6 @@ locals {
           "nomis-development",
           "nomis-data-hub-development",
           "oasys-development",
-          "oasys-national-reporting-development",
           "planetfm-development",
         ]
       }

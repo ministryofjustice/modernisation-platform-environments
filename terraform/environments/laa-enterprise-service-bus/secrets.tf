@@ -25,3 +25,15 @@ resource "aws_secretsmanager_secret" "ccms_db_mp_credentials" {
 resource "aws_secretsmanager_secret" "ccms_procedures_config" {
   name = "ccms-provider-lambda-procedures-config-${local.environment}"
 }
+
+#####################################################################################
+### Secrets used for CCMS Extract Lambda Function ###
+#####################################################################################
+
+resource "aws_secretsmanager_secret" "maat_db_mp_credentials" {
+  name = "maat-db-mp-credentials-${local.environment}"
+}
+
+resource "aws_secretsmanager_secret" "maat_procedures_config" {
+  name = "maat-provider-lambda-procedures-config-${local.environment}"
+}
