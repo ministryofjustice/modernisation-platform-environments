@@ -18,7 +18,7 @@ resource "aws_lambda_function" "task_retirement_lambda" {
   environment {
     variables = {
       ENVIRONMENT   = var.env_name
-      SLACK_TOKEN   = "/alfresco/slack/token"
+      SLACK_TOKEN   = "/deliusawsalerts/slack-token"
       SLACK_CHANNEL = "probation-migrations-team"
     }
   }
