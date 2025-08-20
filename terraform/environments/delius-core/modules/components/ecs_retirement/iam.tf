@@ -2,7 +2,7 @@ resource "aws_iam_role" "lambda_role" {
   name               = "${var.env_name}-slack-alerts-role"
   description        = "Role enabling Lambda to access Slack for sending alerts"
   assume_role_policy = data.aws_iam_policy_document.assume_role_policy_document.json
-  tags               = merge(var.tags, { Name =  "${var.env_name}-slack-alerts-role" })
+  tags               = merge(var.tags, { Name = "${var.env_name}-slack-alerts-role" })
 }
 
 data "aws_iam_policy_document" "assume_role_policy_document" {

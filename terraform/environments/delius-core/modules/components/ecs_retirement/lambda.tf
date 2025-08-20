@@ -1,7 +1,7 @@
 data "archive_file" "lambda_source" {
-    type = "zip"
-    source_dir = "${path.module}/python/"
-    output_path = "${path.module}/assets/ecs_task_retirement.zip"
+  type        = "zip"
+  source_dir  = "${path.module}/python/"
+  output_path = "${path.module}/assets/ecs_task_retirement.zip"
 }
 
 resource "aws_lambda_function" "task_retirement_lambda" {

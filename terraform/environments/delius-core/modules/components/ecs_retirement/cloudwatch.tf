@@ -3,9 +3,9 @@ resource "aws_cloudwatch_event_rule" "ecs_task_retirement" {
   description = "Triggers Lambda on AWS ECS task retirement health events"
 
   event_pattern = jsonencode({
-    "detail-type": ["AWS Health Event"],
-    "detail": {
-      "eventTypeCode": ["AWS_ECS_TASK_PATCHING_RETIREMENT"]
+    "detail-type" : ["AWS Health Event"],
+    "detail" : {
+      "eventTypeCode" : ["AWS_ECS_TASK_PATCHING_RETIREMENT"]
     }
   })
 
