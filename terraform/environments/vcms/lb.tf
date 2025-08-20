@@ -109,7 +109,7 @@ resource "aws_lb_target_group" "target_group_fargate" {
   }
 
   health_check {
-    path                = "/User/Login?ReturnUrl=%2f"
+    path                = "/"
     healthy_threshold   = "5"
     interval            = "120"
     protocol            = "HTTP"
