@@ -131,7 +131,7 @@ jobs:
               SUMMARY+="- **Lock ID:** ${{ github.event.inputs.lock_id }}\n"
           else
               # Convert comma-separated values to newlines for display
-              ADDRESSES_DISPLAY=$(echo "${{ github.event.inputs.resource_addresses }}" | tr ',' '\n')
+              ADDRESSES_DISPLAY=$(echo '${{ github.event.inputs.resource_addresses }}' | tr ',' '\n')
               
               echo "**Resource Addresses:**" >> $GITHUB_STEP_SUMMARY
               echo '```' >> $GITHUB_STEP_SUMMARY
@@ -139,7 +139,7 @@ jobs:
               echo '```' >> $GITHUB_STEP_SUMMARY
               
               # Format for output to next job (keep as comma-separated)
-              SUMMARY+="- **Resources:** ${{ github.event.inputs.resource_addresses }}\n"
+              SUMMARY+='- **Resources:** ${{ github.event.inputs.resource_addresses }}\n'
               
               if [[ "${{ github.event.inputs.operation }}" == "import" ]]; then
                 # Convert comma-separated values to newlines for display
@@ -221,7 +221,7 @@ jobs:
         run: |
           mkdir -p temp
           # Convert comma-separated values to newlines
-          echo "${{ github.event.inputs.resource_addresses }}" | tr ',' '\n' > temp/resource_addresses.txt
+          echo '${{ github.event.inputs.resource_addresses }}' | tr ',' '\n' > temp/resource_addresses.txt
 
       - name: Write Resource IDs to File
         if: github.event.inputs.operation == 'import'
