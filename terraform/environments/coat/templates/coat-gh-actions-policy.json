@@ -40,7 +40,24 @@
       "Effect": "Allow",
       "Action": "athena:ListWorkGroups",
       "Resource": "*"
+    }, 
+    {
+      "Sid": "GlueCatalogAccess",
+      "Effect": "Allow",
+      "Action": [
+        "glue:GetDatabase",
+        "glue:GetDatabases",
+        "glue:GetTable",
+        "glue:GetTables",
+        "glue:GetPartition",
+        "glue:GetPartitions",
+        "glue:GetCatalogImportStatus"
+      ],
+      "Resource": [
+        "arn:aws:glue:${region}:${account}:catalog",
+        "arn:aws:glue:${region}:${account}:database/*",
+        "arn:aws:glue:${region}:${account}:table/*/*"
+      ]
     }
-
   ]
 }
