@@ -189,21 +189,31 @@ resource "aws_lambda_function" "cwa_sns_lambda" {
   description      = "Connect to CWA DB, extracts data into JSON files, uploads them to S3 and creates SNS message and SQS entries with S3 references"
   function_name    = "cwa_sns_lambda"
   role             = aws_iam_role.cwa_extract_lambda_role.arn
-  handler          = "hello.lambda_handler"
-  filename         = "lambda/hello_lambda/hello_lambda.zip"
-  source_code_hash = filebase64sha256("lambda/hello_lambda/hello_lambda.zip")
+  handler          = "lambda_function.lambda_handler"
+  filename         = "lambda/cwa_sns_lambda/cwa_sns_lambda.zip"
+  source_code_hash = filebase64sha256("lambda/cwa_sns_lambda/cwa_sns_lambda.zip")
   timeout          = 300
   memory_size      = 128
   runtime          = "python3.10"
+
+  layers = [
+    "arn:aws:lambda:eu-west-2:017000801446:layer:AWSLambdaPowertoolsPython:2"
+  ]
 
   vpc_config {
     security_group_ids = [aws_security_group.cwa_extract_new.id]
     subnet_ids         = [data.aws_subnet.data_subnets_a.id]
   }
-  
+
+  environment {
+    variables = {
+      PROVIDER_TOPIC = aws_sns_topic.priority_p1.arn
+      PROVIDER_BANKS_TOPIC = aws_sns_topic.provider_banks.arn
+    }
+  }
 
   tags = merge(
     local.tags,
-    { Name = "${local.application_name_short}-${local.environment}-cwa-extract-sns-lambda" }
+    { Name = "${local.application_name_short}-${local.environment}-cwa--sns-lambda" }
   )
 }

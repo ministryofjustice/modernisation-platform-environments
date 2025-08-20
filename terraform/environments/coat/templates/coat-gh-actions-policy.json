@@ -13,7 +13,7 @@
     {
       "Sid": "ListReportsBucket",
       "Effect": "Allow",
-      "Action": ["s3:ListBucket","s3:GetBucketLocation"],
+      "Action": ["s3:ListBucket", "s3:GetBucketLocation"],
       "Resource": [
       "arn:aws:s3:::coat-reports-${environment}",
       "arn:aws:s3:::coat-${environment}-cur-v2-hourly"
