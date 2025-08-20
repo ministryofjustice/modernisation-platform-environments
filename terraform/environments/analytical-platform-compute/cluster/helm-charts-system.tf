@@ -326,7 +326,7 @@ resource "helm_release" "velero" {
   repository = "https://vmware-tanzu.github.io/helm-charts"
   chart      = "velero"
   version    = "10.0.10"
-  namespace  = kubernetes_namespace.velero_system.metadata[0].name
+  namespace  = kubernetes_namespace.velero.metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/values/velero/values.yml.tftpl",
