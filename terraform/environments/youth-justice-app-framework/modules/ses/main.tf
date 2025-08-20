@@ -26,3 +26,9 @@ resource "aws_sesv2_configuration_set" "ses_configuration_set" {
 
   tags = var.tags
 }
+
+
+resource "aws_ses_email_identity" "email_identities" {
+  count = length(var.ses_email_identities)
+  email = var.ses_email_identities[count.index]
+}
