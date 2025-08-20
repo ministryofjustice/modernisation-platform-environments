@@ -27,7 +27,7 @@ resource "aws_iam_policy" "scheduler_invoke_lambda" {
     Statement = [{
       Effect = "Allow",
       Action = "lambda:InvokeFunction",
-      Resource = "${aws_lambda_function.cwa_extract.arn}"
+      Resource = "${aws_lambda_function.cwa_extract_lambda.arn}"
     }]
   })
 }

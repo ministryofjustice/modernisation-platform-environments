@@ -6,6 +6,9 @@ resource "aws_sns_topic" "priority_p1" {
   name = "Priority-P1.fifo"
   fifo_topic = true
   content_based_deduplication = true
+  sqs_success_feedback_role_arn    = aws_iam_role.sns_feedback.arn
+  sqs_success_feedback_sample_rate = 100
+  sqs_failure_feedback_role_arn    = aws_iam_role.sns_feedback.arn
 }
 
 ###############################################
@@ -35,8 +38,6 @@ resource "aws_sns_topic_subscription" "ccr" {
   endpoint  = aws_sqs_queue.ccr_provider_q.arn
 }
 
-
-
 ###########################################
 ### SNS Topic for Provider Banks Messages
 ###########################################
@@ -45,6 +46,9 @@ resource "aws_sns_topic" "provider_banks" {
   name = "Provider-Banks-P1.fifo"
   fifo_topic = true
   content_based_deduplication = true
+  sqs_success_feedback_role_arn    = aws_iam_role.sns_feedback.arn
+  sqs_success_feedback_sample_rate = 100
+  sqs_failure_feedback_role_arn    = aws_iam_role.sns_feedback.arn
 }
 
 ###############################################

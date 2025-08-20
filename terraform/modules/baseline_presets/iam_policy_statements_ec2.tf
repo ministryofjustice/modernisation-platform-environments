@@ -134,6 +134,7 @@ locals {
         sid    = "Ec2SelfProvision"
         effect = "Allow"
         actions = [
+          "autoscaling:CompleteLifecycleAction",
           "ec2:DescribeVolumes",
           "ec2:DescribeTags",
           "ec2:DescribeInstances",

@@ -61,7 +61,16 @@ resource "aws_iam_policy" "ccms_provider_load_policy" {
           aws_secretsmanager_secret.ccms_db_mp_credentials.arn,
           aws_secretsmanager_secret.ccms_procedures_config.arn
         ]
-      }
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "sqs:ReceiveMessage",
+          "sqs:DeleteMessage",
+          "sqs:GetQueueAttributes"
+        ],
+        Resource = aws_sqs_queue.ccms_banks_q.arn
+      },
     ]
   })
 }

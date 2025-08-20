@@ -228,7 +228,7 @@ module "coat_s3_kms" {
       principals = [
         {
           type        = "AWS"
-          identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/CoatGithubActionsReportUpload"]
+          identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/CoatGithubActionsRole"]
         }
       ]
     }

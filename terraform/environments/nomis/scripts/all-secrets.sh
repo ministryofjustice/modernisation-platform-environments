@@ -29,7 +29,6 @@ profiles="corporate-staff-rostering-development
  oasys-test
  oasys-preproduction
  oasys-production
- oasys-national-reporting-development
  oasys-national-reporting-test
  oasys-national-reporting-preproduction
  oasys-national-reporting-production
