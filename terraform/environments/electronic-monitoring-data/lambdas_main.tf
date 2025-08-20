@@ -240,12 +240,10 @@ module "dms_validation" {
   timeout                 = 900
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev          = local.is-production ? "prod" : "dev"
-  layers                  = ["arn:aws:lambda:eu-west-2:133256977650:layer:AWS-Parameters-and-Secrets-Lambda-Extension:18"]
 
   environment_variables = {
     SOURCE_BUCKET = module.s3-dms-target-store-bucket.bucket.id
-    SECRET_ID = aws_secretsmanager_secret.db_password[0].id
-    USER = "admin"
-    PORT = "1433"
+    SECRET_NAME = aws_secretsmanager_secret.db_password.name
+    USER = aws_db_instance.database_2022.name
   }
 }
