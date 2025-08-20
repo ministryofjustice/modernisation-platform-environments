@@ -82,8 +82,8 @@ resource "kubernetes_namespace" "mwaa" {
   }
 }
 
-resource "kubernetes_namespace" "velero_system" {
+resource "kubernetes_namespace" "velero" {
   metadata {
-    name = "velero-system"
+    name = "velero"
   }
 }
