@@ -40,7 +40,7 @@ resource "aws_lambda_function" "maat_provider_load" {
 
   description      = "Connect to MAAT DB"
   function_name    = "maat_provider_load_function"
-  role             = aws_iam_role.ccms_provider_load_role.arn
+  role             = aws_iam_role.maat_provider_load_role.arn
   handler          = "lambda_function.lambda_handler"
   filename         = "lambda/maat_provider_load_lambda/maat_provider_load_package.zip"
   source_code_hash = filebase64sha256("lambda/maat_provider_load_lambda/maat_provider_load_package.zip")
