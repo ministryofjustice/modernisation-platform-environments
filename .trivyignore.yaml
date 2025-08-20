@@ -38,6 +38,7 @@ vulnerabilities:
     expired_at: 2024-08-19
     statement: "Review in 6 months"
   - id: CVE-2025-27152
+  - id: CVE-2025-7783
 
 misconfigurations:
   - id: AVD-GIT-0001

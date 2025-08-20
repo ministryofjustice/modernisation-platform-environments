@@ -62,14 +62,15 @@ module "serverlessrepo-lambda-canary-sg" {
 }
 
 module "serverlessrepo-lambda-canary" {
-  source         = "./modules/lambda"
-  account_number = local.environment_management.account_ids[terraform.workspace]
-  project_name   = local.project_name
-  tags           = local.tags
-  region         = data.aws_region.current.name
-  environment    = local.environment
-  lambda_role    = local.serverlessrepo-lambda-canary-role
-  lambda         = local.serverlessrepo-lambda-canary
+  source                          = "./modules/lambda"
+  account_number                  = local.environment_management.account_ids[terraform.workspace]
+  project_name                    = local.project_name
+  tags                            = local.tags
+  region                          = data.aws_region.current.name
+  environment                     = local.environment
+  lambda_role                     = local.serverlessrepo-lambda-canary-role
+  lambda                          = local.serverlessrepo-lambda-canary
+  cloudwatch_log_group_kms_key_id = module.kms.key_arn
 }
 
 #ESB to Int load balancer
@@ -84,9 +85,8 @@ resource "aws_security_group_rule" "allow_alb_from_canary" {
 }
 
 resource "aws_cloudwatch_log_subscription_filter" "healthcheck" {
-  count           = contains(["development", "test", "preproduction", "production"], local.environment_management.account_ids[terraform.workspace]) ? 1 : 0
   name            = "firehose-subscription"
-  log_group_name  = "/aws/lambda/serverlessrepo-lambda-canary"
+  log_group_name  = module.serverlessrepo-lambda-canary.log_group_name
   filter_pattern  = ""
   destination_arn = module.datadog.aws_kinesis_firehose_delivery_stream_arn
   role_arn        = module.datadog.datadog_firehose_iam_role_arn
