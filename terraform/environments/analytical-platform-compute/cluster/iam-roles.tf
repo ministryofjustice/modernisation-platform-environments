@@ -249,6 +249,10 @@ module "velero_role" {
   attach_velero_policy  = true
   velero_s3_bucket_arns = [module.velero_s3_bucket.s3_bucket_arn]
 
+  role_policy_arns = {
+    VeleroKMSAccessPolicy = module.velero_kms_iam_policy.arn
+  }
+
   oidc_providers = {
     main = {
       provider_arn               = module.eks.oidc_provider_arn
