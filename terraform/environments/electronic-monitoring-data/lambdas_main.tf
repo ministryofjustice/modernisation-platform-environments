@@ -243,7 +243,7 @@ module "dms_validation" {
 
   environment_variables = {
     SOURCE_BUCKET = module.s3-dms-target-store-bucket.bucket.id
-    SECRET_NAME = aws_secretsmanager_secret.db_password.name
-    USER = aws_db_instance.database_2022.name
+    SECRET_NAME   = aws_secretsmanager_secret.db_password[0].name
+    USER          = aws_db_instance.database_2022[0].username
   }
 }
