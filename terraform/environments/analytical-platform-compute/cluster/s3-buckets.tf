@@ -1,10 +1,11 @@
 # Add kms key to this bucket
 module "velero_s3_bucket" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "5.4.0"
 
-  bucket_prefix = "mojap-compute-${local.environment}-velero"
+  bucket = "mojap-compute-${local.environment}-velero"
 
   server_side_encryption_configuration = {
     rule = {
