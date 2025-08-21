@@ -4,8 +4,8 @@ data "aws_secretsmanager_secret_version" "home_office_account_id" {
 }
 
 locals {
-  ho_acct_id  = local.is-production ? data.aws_secretsmanager_secret_version.home_office_account_id[0].secret_string : "000000000000"
-  ho_role_arn = "arn:aws:iam::${local.ho_acct_id}:role/DACC-DataScience-TL"
+  ho_acct_id   = local.is-production ? data.aws_secretsmanager_secret_version.home_office_account_id[0].secret_string : "000000000000"
+  ho_role_arn  = "arn:aws:iam::${local.ho_acct_id}:role/DACC-DataScience-TL"
   ho_admin_arn = "arn:aws:iam::${local.ho_acct_id}:role/HO-FullAdmin"
 }
 
