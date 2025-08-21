@@ -107,3 +107,26 @@ resource "aws_vpc_security_group_ingress_rule" "dms_validation_lambda_ingress_RD
   description                  = "RDS Database +-----[mssql]----- Lambda"
 }
 
+# ----
+resource "aws_vpc_security_group_egress_rule" "dms_validation_lambda_egress_DMS" {
+  count = local.is-production || local.is-development ? 1 : 0
+
+  security_group_id            = aws_security_group.dms_validation_lambda_sg.id
+  referenced_security_group_id = aws_security_group.dms_ri_security_group[0].id
+  ip_protocol                  = "tcp"
+  from_port                    = 1433
+  to_port                      = 1433
+  description                  = "Lambda          -----[mssql]-----+ DMS"
+}
+
+resource "aws_vpc_security_group_ingress_rule" "dms_validation_lambda_ingress_DMS" {
+  count = local.is-production || local.is-development ? 1 : 0
+
+  security_group_id            = aws_security_group.dms_ri_security_group[0].id
+  referenced_security_group_id = aws_security_group.dms_validation_lambda_sg.id
+  ip_protocol                  = "tcp"
+  from_port                    = 1433
+  to_port                      = 1433
+  description                  = "DMS +-----[mssql]----- Lambda"
+}
+
