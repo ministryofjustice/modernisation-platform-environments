@@ -247,4 +247,7 @@ module "dms_validation" {
     USER          = aws_db_instance.database_2022[0].username
     SERVER_NAME   = split(":", aws_db_instance.database_2022[0].endpoint)[0]
   }
+
+  subnet_ids         = [aws_db_subnet_group.db.subnet_ids]
+  security_group_ids = [aws_security_group.db[0].id]
 }
