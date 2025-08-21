@@ -97,7 +97,7 @@ resource "aws_iam_role" "maat_cross_account_s3_read" {
       {
         Effect = "Allow",
         Principal = {
-          AWS = "arn:aws:iam::${local.application_data.accounts[local.environment].maatdb_account_id}:role/role_stsassume_oracle_base"
+          AWS = "arn:aws:iam::${local.application_data.accounts[local.environment].maatdb_account_id}:role/rds-hub20-s3-access"
         },
         Action = "sts:AssumeRole"
       }
