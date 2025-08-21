@@ -1,0 +1,47 @@
+name: VPN Maintenance
+on:
+  workflow_dispatch:
+    inputs:
+      vpn_id:
+        description: 'ID of the VPN to be maintained'
+        required: true
+
+permissions:
+  id-token: write
+  contents: read
+  actions: read
+
+jobs:
+    fetch-secrets:
+            uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@3f9fb1af00462c69c806640652ddf41292963615 # v3.2.5
+            secrets:
+                MODERNISATION_PLATFORM_ACCOUNT_NUMBER: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
+                PASSPHRASE: ${{ secrets.PASSPHRASE }}
+
+    vpn-maintenance:
+            needs: fetch-secrets
+            environment: testing-test
+            runs-on: ubuntu-latest
+            steps:
+              - name: Checkout repository
+                uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+              - name: Get AWS Account Number
+                run: |
+                    ACCOUNT_NUMBER=$(jq -r -e --arg account_name "core-network-services-production" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)
+                    echo "::add-mask::$ACCOUNT_NUMBER"
+                    echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
+
+              - name: Configure AWS Credentials
+                uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
+                with:
+                    role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
+                    role-session-name: githubactionsrolesession
+                    aws-region: "eu-west-2"
+
+              - name: Run VPN maintenance script
+                run: |
+                    aws ec2 describe-vpn-connections | ./scripts/redact-output.sh
+                    # ./scripts/replace-vpn-tunnel.sh "${{ github.event.inputs.vpn_id }}"
+
+
