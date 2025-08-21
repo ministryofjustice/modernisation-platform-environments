@@ -8,7 +8,8 @@
       "cwa_efs_sg": "sg-051ddf4169a9048a2",
       "s3_vpc_endpoint_prefix": "pl-7ca54015",
       "maatdb_sg": "sg-01af07cdeb1fb46d0",
-      "cloud_platform_cidr": "172.20.0.0/16"
+      "cloud_platform_cidr": "172.20.0.0/16",
+      "maatdb_account_id": "110341342196"
     },
     "test": {
       "example_var": "test-data"
