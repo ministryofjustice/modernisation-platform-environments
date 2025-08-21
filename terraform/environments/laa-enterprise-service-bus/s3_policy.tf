@@ -24,9 +24,7 @@ resource "aws_s3_bucket_policy" "data_cross_account_access" {
           "arn:aws:s3:::${aws_s3_bucket.data.bucket}",
           "arn:aws:s3:::${aws_s3_bucket.data.bucket}/*"
         ]
-      }
-    ]
-    Statement = [
+      },
       {
         Sid = "AllowReadAccessFromDB"
         Effect = "Allow",
