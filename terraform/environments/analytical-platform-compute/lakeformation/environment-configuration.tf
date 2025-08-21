@@ -47,7 +47,8 @@ locals {
           "sentence_offence",
           "staging",
           "victims",
-          "victims_case_management"
+          "victims_case_management",
+          "radsai_segmentation"
         ]
       }
     }
