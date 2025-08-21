@@ -296,7 +296,7 @@ locals {
 module "s3-logging-bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9fc8f8b8e3f93ffbda822028534b9a75399"
 
-  bucket_prefix         = "${local.account_name}-bucket-logs-${local.environment}-"
+  bucket_prefix         = "${local.account_name}-bucket-logs-${local.environment_shorthand}-"
   versioning_enabled    = true
 
   # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
@@ -360,7 +360,7 @@ module "s3-logging-bucket" {
 
 module "s3-data-bucket" {
   source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9fc8f8b8e3f93ffbda822028534b9a75399"
-  bucket_prefix       = "${local.account_name}-landing-planetfm-${local.environment}-"
+  bucket_prefix       = "${local.account_name}-landing-planetfm-${local.environment_shorthand}-"
   versioning_enabled  = true
 
   # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
