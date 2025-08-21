@@ -331,7 +331,7 @@ resource "helm_release" "velero" {
     templatefile(
       "${path.module}/src/helm/values/velero/values.yml.tftpl",
       {
-        eks_role_arn              = module.velero_role.iam_role_arn
+        eks_role_arn              = module.velero_iam_role.iam_role_arn
         velero_aws_plugin_version = "v1.12.2"
         velero_bucket             = module.velero_s3_bucket.s3_bucket_id
         velero_prefix             = module.eks.cluster_name
