@@ -5,7 +5,12 @@
       "cwa_database_ip": "10.26.60.170/32",
       "vpc_endpoint_sg": "sg-0754d9a309704addd",
       "ccms_database_ip": "10.26.60.223/32",
-      "cwa_efs_sg": "sg-051ddf4169a9048a2"
+      "cwa_efs_sg": "sg-051ddf4169a9048a2",
+      "s3_vpc_endpoint_prefix": "pl-7ca54015",
+      "maatdb_sg": "sg-01af07cdeb1fb46d0",
+      "cloud_platform_cidr": "172.20.0.0/16",
+      "maatdb_account_id": "110341342196",
+      "ccms_account_id": "767123802783"
     },
     "test": {
       "example_var": "test-data"

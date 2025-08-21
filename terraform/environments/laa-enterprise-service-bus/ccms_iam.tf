@@ -61,7 +61,16 @@ resource "aws_iam_policy" "ccms_provider_load_policy" {
           aws_secretsmanager_secret.ccms_db_mp_credentials.arn,
           aws_secretsmanager_secret.ccms_procedures_config.arn
         ]
-      }
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "sqs:ReceiveMessage",
+          "sqs:DeleteMessage",
+          "sqs:GetQueueAttributes"
+        ],
+        Resource = aws_sqs_queue.ccms_banks_q.arn
+      },
     ]
   })
 }
@@ -88,7 +97,7 @@ resource "aws_iam_role" "ccms_cross_account_s3_read" {
       {
         Effect = "Allow",
         Principal = {
-          AWS = "arn:aws:iam::767123802783:role/role_stsassume_oracle_base"
+          AWS = "arn:aws:iam::${local.application_data.accounts[local.environment].ccms_account_id}:role/role_stsassume_oracle_base"
         },
         Action = "sts:AssumeRole"
       }
@@ -130,7 +139,3 @@ resource "aws_iam_role_policy_attachment" "ccms_cross_account_s3_read_attach" {
   role       = aws_iam_role.ccms_cross_account_s3_read.name
   policy_arn = aws_iam_policy.ccms_cross_account_s3_read_policy.arn
 }
-
-
-
-

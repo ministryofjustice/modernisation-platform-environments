@@ -40,6 +40,12 @@ variable "postgres_security_group_id" {
   description = "The ID of the Security group that represents the PostgreSQL instance which required access to Redshift."
 }
 
+variable "management_server_sg_id" {
+  type        = string
+  description = "The ID of the Security group that represents the Management Server instances which require access to Redshift."
+}
+
+
 variable "vpc_cidr" {
   type        = string
   description = "The VPCs main subnet."

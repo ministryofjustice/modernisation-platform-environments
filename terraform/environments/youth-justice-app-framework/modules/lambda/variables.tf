@@ -50,11 +50,20 @@ variable "lambda" {
     environment_variables = optional(map(string), {})
     lambda_memory_size    = optional(number, 128)
     lambda_timeout        = optional(number, 10)
+    log_group = optional(object({
+      name = string
+    }), null)
     vpc_config = optional(object({
       subnet_ids         = list(string)
       security_group_ids = list(string)
     }), null)
   })
+}
+
+variable "cloudwatch_log_group_kms_key_id" {
+  description = "KMS key ID for the CloudWatch log group"
+  type        = string
+  default     = ""
 }
 
 variable "enable_eventbridge_invoke_permission" {

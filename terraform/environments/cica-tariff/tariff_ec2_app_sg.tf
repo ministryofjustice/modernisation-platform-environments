@@ -59,6 +59,15 @@ resource "aws_security_group" "tariff_app_security_group" {
     cidr_blocks = [data.aws_vpc.shared.cidr_block, local.cidr_cica_ras, local.cidr_cica_lan, local.cidr_cica_ras_nat]
 
   }
+  ingress {
+    protocol    = "tcp"
+    from_port   = 9000
+    to_port     = 65500
+    cidr_blocks = [
+      "0.0.0.0/0"
+    ]
+
+  }
 
 }
 
