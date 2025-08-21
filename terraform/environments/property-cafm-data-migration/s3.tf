@@ -294,7 +294,7 @@ locals {
 }
 
 module "s3-logging-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
 
   bucket_prefix         = "${local.account_name}-bucket-logs-${local.environment_shorthand}-"
   versioning_enabled    = true
@@ -359,7 +359,7 @@ module "s3-logging-bucket" {
 }
 
 module "s3-data-bucket" {
-  source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
+  source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
   bucket_prefix       = "${local.account_name}-landing-planetfm-${local.environment_shorthand}-"
   versioning_enabled  = true
 
