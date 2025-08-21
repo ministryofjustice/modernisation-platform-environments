@@ -108,25 +108,46 @@ resource "aws_vpc_security_group_ingress_rule" "dms_validation_lambda_ingress_RD
 }
 
 # ----
-resource "aws_vpc_security_group_egress_rule" "dms_validation_lambda_egress_DMS" {
-  count = local.is-production || local.is-development ? 1 : 0
+# resource "aws_vpc_security_group_egress_rule" "dms_validation_lambda_egress_DMS" {
+#   count = local.is-production || local.is-development ? 1 : 0
 
-  security_group_id            = aws_security_group.dms_validation_lambda_sg.id
-  referenced_security_group_id = aws_security_group.dms_ri_security_group[0].id
-  ip_protocol                  = "tcp"
-  from_port                    = 443
-  to_port                      = 443
-  description                  = "Lambda ---[boto]---+ DMS"
+#   security_group_id            = aws_security_group.dms_validation_lambda_sg.id
+#   referenced_security_group_id = aws_security_group.dms_ri_security_group[0].id
+#   ip_protocol                  = "tcp"
+#   from_port                    = 443
+#   to_port                      = 443
+#   description                  = "Lambda ---[boto]---+ DMS"
+# }
+
+# resource "aws_vpc_security_group_ingress_rule" "dms_validation_lambda_ingress_DMS" {
+#   count = local.is-production || local.is-development ? 1 : 0
+
+#   security_group_id            = aws_security_group.dms_ri_security_group[0].id
+#   referenced_security_group_id = aws_security_group.dms_validation_lambda_sg.id
+#   ip_protocol                  = "tcp"
+#   from_port                    = 443
+#   to_port                      = 443
+#   description                  = "DMS +-----[boto]----- Lambda"
+# }
+
+
+resource "aws_security_group_rule" "dms_validation_lambda_ingress_generic" {
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block, ]
+  type              = "ingress"
+  description       = "allow all"
+  from_port         = 0
+  to_port           = 65535
+  protocol          = "tcp"
+  security_group_id = aws_security_group.dms_validation_lambda_sg.id
 }
 
-resource "aws_vpc_security_group_ingress_rule" "dms_validation_lambda_ingress_DMS" {
-  count = local.is-production || local.is-development ? 1 : 0
 
-  security_group_id            = aws_security_group.dms_ri_security_group[0].id
-  referenced_security_group_id = aws_security_group.dms_validation_lambda_sg.id
-  ip_protocol                  = "tcp"
-  from_port                    = 443
-  to_port                      = 443
-  description                  = "DMS +-----[boto]----- Lambda"
+resource "aws_security_group_rule" "dms_validation_lambda_egress_generic" {
+  type              = "egress"
+  description       = "allow all"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block, ]
+  security_group_id = aws_security_group.dms_validation_lambda_sg.id
 }
-
