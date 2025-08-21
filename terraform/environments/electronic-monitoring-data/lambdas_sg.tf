@@ -93,7 +93,7 @@ resource "aws_vpc_security_group_egress_rule" "dms_validation_lambda_egress_RDS"
   ip_protocol                  = "tcp"
   from_port                    = 1433
   to_port                      = 1433
-  description                  = "Lambda          -----[mssql]-----+ RDS Database"
+  description                  = "Lambda -----[mssql]-----+ RDS Database"
 }
 
 resource "aws_vpc_security_group_ingress_rule" "dms_validation_lambda_ingress_RDS" {
@@ -114,9 +114,9 @@ resource "aws_vpc_security_group_egress_rule" "dms_validation_lambda_egress_DMS"
   security_group_id            = aws_security_group.dms_validation_lambda_sg.id
   referenced_security_group_id = aws_security_group.dms_ri_security_group[0].id
   ip_protocol                  = "tcp"
-  from_port                    = 1433
-  to_port                      = 1433
-  description                  = "Lambda          -----[mssql]-----+ DMS"
+  from_port                    = 443
+  to_port                      = 443
+  description                  = "Lambda ---[boto]---+ DMS"
 }
 
 resource "aws_vpc_security_group_ingress_rule" "dms_validation_lambda_ingress_DMS" {
@@ -125,8 +125,8 @@ resource "aws_vpc_security_group_ingress_rule" "dms_validation_lambda_ingress_DM
   security_group_id            = aws_security_group.dms_ri_security_group[0].id
   referenced_security_group_id = aws_security_group.dms_validation_lambda_sg.id
   ip_protocol                  = "tcp"
-  from_port                    = 1433
-  to_port                      = 1433
-  description                  = "DMS +-----[mssql]----- Lambda"
+  from_port                    = 443
+  to_port                      = 443
+  description                  = "DMS +-----[boto]----- Lambda"
 }
 
