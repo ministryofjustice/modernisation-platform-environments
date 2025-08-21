@@ -1,5 +1,8 @@
 name: VPN Maintenance
 on:
+  push:
+    branches:
+      - feature/11200-automate-vpn-maintenance
   workflow_dispatch:
     inputs:
       vpn_id:
@@ -38,6 +41,11 @@ jobs:
                     role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
                     role-session-name: githubactionsrolesession
                     aws-region: "eu-west-2"
+              - name: Mask VPN ID
+                run: |
+                    vpn_id=$(cat $GITHUB_EVENT_PATH | jq -r '.inputs.vpn_id' )
+                    echo "::add-mask::$vpn_id" 
+                    echo "vpn_id=$vpn_id" >> $GITHUB_ENV
 
               - name: Run VPN maintenance script
                 run: |
