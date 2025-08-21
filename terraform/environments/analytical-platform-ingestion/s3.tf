@@ -470,3 +470,71 @@ module "laa_data_analysis_bucket" {
   tags = local.tags
 }
 
+data "aws_iam_policy_document" "shared_services_client_team_gov_29148_egress" {
+
+  count = local.is-production ? 1 : 0
+
+  statement {
+    sid    = "ReplicationPermissions"
+    effect = "Allow"
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::593291632749:role/mojap-data-production-ssct-gov-29148-egress"]
+    }
+    actions = [
+      "s3:ReplicateObject",
+      "s3:ObjectOwnerOverrideToBucketOwner",
+      "s3:GetObjectVersionTagging",
+      "s3:ReplicateTags",
+      "s3:ReplicateDelete"
+    ]
+    resources = ["arn:aws:s3:::mojap-ingestion-${local.environment}-ssct-gov-29148-egress/*"]
+  }
+
+  statement {
+    sid    = "DenyS3AccessSandbox"
+    effect = "Deny"
+    principals {
+      type        = "AWS"
+      identifiers = [local.environment == "development" ? "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/sandbox" : "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/developer"]
+    }
+    actions = [
+      "s3:*"
+    ]
+    resources = [
+      "arn:aws:s3:::mojap-ingestion-${local.environment}-ssct-gov-29148-egress/*",
+      "arn:aws:s3:::mojap-ingestion-${local.environment}-ssct-gov-29148-egress"
+    ]
+  }
+}
+
+#tfsec:ignore:avd-aws-0088 - The bucket policy is attached to the bucket
+#tfsec:ignore:avd-aws-0132 - The bucket policy is attached to the bucket
+module "shared_services_client_team_gov_29148_egress_bucket" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+
+  count = local.is-production ? 1 : 0
+
+  source  = "terraform-aws-modules/s3-bucket/aws"
+  version = "5.1.0"
+
+  bucket = "mojap-ingestion-${local.environment}-ssct-gov-29148-egress"
+
+  force_destroy = true
+  attach_policy = true
+
+  versioning = {
+    enabled = true
+  }
+
+  policy = data.aws_iam_policy_document.shared_services_client_team_gov_29148_egress[0].json
+
+  server_side_encryption_configuration = {
+    rule = {
+      apply_server_side_encryption_by_default = {
+        kms_master_key_id = module.shared_services_client_team_gov_29148_egress_kms[0].key_arn
+        sse_algorithm     = "aws:kms"
+      }
+    }
+  }
+}
