@@ -103,6 +103,18 @@ resource "aws_vpc_security_group_ingress_rule" "asg_ec2_instance_legacy_oracle" 
   )
 }
 
+resource "aws_vpc_security_group_ingress_rule" "cp_oracle" {
+  security_group_id = aws_security_group.db_ec2.id
+  cidr_ipv4         = var.account_info.cp_cidr
+  from_port         = local.db_port
+  to_port           = local.db_tcps_port
+  ip_protocol       = "tcp"
+  description       = "Allow communication in on port 1521 from CP"
+  tags = merge(var.tags,
+    { Name = "cp-oracle-in-asg" }
+  )
+}
+
 resource "aws_vpc_security_group_egress_rule" "db_inter_conn" {
   security_group_id            = aws_security_group.db_ec2.id
   description                  = "Allow communication between delius db instances"
