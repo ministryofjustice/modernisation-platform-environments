@@ -398,7 +398,7 @@ resource "aws_iam_role_policy_attachment" "rds_s3_access_policy_attachment" {
 }
 
 resource "aws_db_instance_role_association" "rds_s3_role_association" {
-  db_instance_identifier = aws_db_instance.appdb1.id
+  db_instance_identifier = aws_db_instance.appdb1.identifier
   feature_name           = "S3_INTEGRATION"
   role_arn               = aws_iam_role.rds_s3_access.arn
 }
