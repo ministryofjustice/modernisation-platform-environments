@@ -19,6 +19,14 @@ module "redshift_sg" {
   ingress_with_self = [{ rule = "all-all" }]
   egress_with_self  = [{ rule = "all-all" }]
 
+  ingress_with_source_security_group_id = [
+    {
+      rule                     = "redshift-tcp"
+      source_security_group_id = var.management_server_sg_id
+      description              = "Redshift from Management Servers"
+    },
+  ]
+
   egress_with_cidr_blocks = [
     {
       rule        = "https-443-tcp"
@@ -35,11 +43,6 @@ module "redshift_sg" {
     },
   ]
 
-}
-
-moved {
-  from = module.redshift.aws_security_group_rule.redshift_to_s3
-  to   = module.redshift.aws_vpc_security_group_egress_rule.redshift_to_s3
 }
 
 resource "aws_vpc_security_group_egress_rule" "redshift_to_s3" {
@@ -67,6 +70,28 @@ module "postgres_sg" {
       rule                     = "postgresql-tcp"
       source_security_group_id = module.redshift_sg.security_group_id
       description              = "Postgres from Redshift"
+    },
+
+  ]
+
+}
+
+
+module "mgmt_sg" {
+  # checkov:skip=CKV_TF_1
+
+  source  = "terraform-aws-modules/security-group/aws"
+  version = "4.13.0"
+
+  vpc_id            = var.vpc_id
+  security_group_id = var.management_server_sg_id
+  create_sg         = false
+
+  egress_with_source_security_group_id = [
+    {
+      rule                     = "redshift-tcp"
+      source_security_group_id = module.redshift_sg.security_group_id
+      description              = "Management Servers to Redshift"
     },
 
   ]
