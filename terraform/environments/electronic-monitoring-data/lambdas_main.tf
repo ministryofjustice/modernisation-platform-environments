@@ -248,6 +248,6 @@ module "dms_validation" {
     SERVER_NAME   = split(":", aws_db_instance.database_2022[0].endpoint)[0]
   }
 
-  # security_group_ids = [aws_security_group.dms_validation_lambda_sg.id]
-  # subnet_ids         = aws_db_subnet_group.db[0].subnet_ids
+  security_group_ids = [aws_security_group.dms_validation_lambda_sg.id]
+  subnet_ids         = aws_db_subnet_group.db[0].subnet_ids
 }

@@ -75,6 +75,16 @@ resource "aws_security_group" "dms_validation_lambda_sg" {
   }
 }
 
+resource "aws_security_group_rule" "lambda_ingress_s3" {
+  type              = "ingress"
+  description       = "allow s3"
+  from_port         = 0
+  to_port           = 65535
+  protocol          = "tcp"
+  prefix_list_ids   = [data.aws_prefix_list.s3.id]
+  security_group_id = aws_security_group.dms_validation_lambda_sg.id
+}
+
 resource "aws_security_group_rule" "dms_validation_lambda_egress_s3" {
   type              = "egress"
   description       = "allow s3"
