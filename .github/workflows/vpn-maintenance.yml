@@ -32,18 +32,28 @@ jobs:
                     environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
                     PASSPHRASE: ${{ secrets.PASSPHRASE }}
 
-              - name: Get AWS Account Number
+              - name: Set Account Number
                 run: |
-                    ACCOUNT_NUMBER=$(jq -r -e --arg account_name "core-network-services-production" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)
+                    ACCOUNT_NUMBER=$(jq -r -e '.modernisation_platform_account_id' <<< $ENVIRONMENT_MANAGEMENT)
                     echo "::add-mask::$ACCOUNT_NUMBER"
-                    echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
-
+                    echo ACCOUNT_NUMBER=$ACCOUNT_NUMBER >> $GITHUB_ENV
+                    
               - name: Configure AWS Credentials
                 uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
                 with:
-                    role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
+                    role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions-apply"
                     role-session-name: githubactionsrolesession
-                    aws-region: "eu-west-2"
+                    aws-region: ${{ env.AWS_REGION }}
+
+              - name: Configure AWS Credentials
+                run: |
+                    account_id=$(jq -r -e '.account_ids["core-network-services-production"]' <<< $ENVIRONMENT_MANAGEMENT)
+                    echo "::add-mask::$account_id"
+                    echo "account_id=$account_id" >> $GITHUB_ENV
+                    aws sts assume-role --role-arn "arn:aws:iam::${account_id}:role/ModernisationPlatformAccess" --role-session-name "test" --output json > credentials.json
+                    export AWS_ACCESS_KEY_ID=$(jq -r '.Credentials.AccessKeyId' credentials.json)
+                    export AWS_SECRET_ACCESS_KEY=$(jq -r '.Credentials.SecretAccessKey' credentials.json)
+                    export AWS_SESSION_TOKEN=$(jq -r '.Credentials.SessionToken' credentials.json)
 
               - name: Mask VPN ID
                 run: |
