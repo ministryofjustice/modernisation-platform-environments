@@ -30,8 +30,7 @@
           "create_records": true
         }
       },
-      "quicksight_setup": true,
-      "redshift_to_s3_rule_id": "sgr-0beb1aea5cb2d4b18"
+      "quicksight_setup": true
     },
     "test": {
       "allow_s3_replication": true,
@@ -63,8 +62,7 @@
           "create_records": false
         }
       },
-      "quicksight_setup": true,
-      "redshift_to_s3_rule_id": "sgr-06c85d127762780ae"
+      "quicksight_setup": true
     },
     "preproduction": {
       "allow_s3_replication": true,
@@ -96,8 +94,7 @@
           "create_records": true
         }
       },
-      "quicksight_setup": true,
-      "redshift_to_s3_rule_id": "sgr-07eea701a553fc27f"
+      "quicksight_setup": true
     },
     "production": {
       "allow_s3_replication": true,
@@ -133,8 +130,7 @@
           "create_records": false
         }
       },
-      "quicksight_setup": true,
-      "redshift_to_s3_rule_id": null
+      "quicksight_setup": true
     }
   }
 }
