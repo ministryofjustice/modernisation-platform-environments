@@ -30,8 +30,8 @@ resource "aws_s3_bucket_policy" "data_cross_account_access" {
         Effect = "Allow",
         Principal = {
           AWS = [
-            "arn:aws:iam::${local.application_data.accounts[local.environment].ccms_account_id}:role/role_stsassume_oracle_base",
-            "arn:aws:iam::${local.application_data.accounts[local.environment].maatdb_account_id}:role/rds-hub20-s3-access"
+            aws_iam_role.ccms_cross_account_s3_read.arn,
+            aws_iam_role.maat_cross_account_s3_read.arn
           ]
         },
         Action = [
