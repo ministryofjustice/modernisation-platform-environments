@@ -47,45 +47,57 @@ def lambda_handler(event, context):
     full_zip_name = f"{ARCHIVE_NAME}-{ARCHIVE_SUFFIX}.zip"
     zip_path = os.path.join("/tmp", full_zip_name)
 
+    # --- Collect eligible files ---
+    keys_to_archive = [key for key in iter_keys(s3, BUCKET, prefix) if should_include(key)]
+
+    if not keys_to_archive:
+        LOGGER.info("No files to archive under prefix '%s'", prefix)
+        if context:
+            cloudwatch.put_metric_data(
+                Namespace="lambda_ftp",
+                MetricData=[{
+                    "MetricName": "Fetched S3 Objects",
+                    "Dimensions": [{"Name": "Lambda name", "Value": context.function_name}],
+                    "Timestamp": datetime.datetime.now(datetime.timezone.utc),
+                    "Value": 0,
+                    "Unit": "Count",
+                }],
+            )
+        return {"archived": 0, "archive_key": None}
+
     processed = 0
     keys_to_delete = []
 
     LOGGER.info("Creating ZIP at %s", zip_path)
-    # Only the ZIP resides on /tmp; objects are streamed into it.
+    # --- Create ZIP ---
     with zipfile.ZipFile(zip_path, "w", compression=zipfile.ZIP_DEFLATED) as zf:
-        for key in iter_keys(s3, BUCKET, prefix):
-            if not should_include(key):
-                continue
-
-            # Match original behavior:
-            # - if LOCALPATH set, archive just the basename
-            # - else, store the full key path
+        for key in keys_to_archive:
+            # Determine archive name
             arcname = os.path.basename(key) if prefix else key
             LOGGER.info("Adding %s as %s", key, arcname)
 
             obj = s3.get_object(Bucket=BUCKET, Key=key)
             body = obj["Body"]
             with zf.open(arcname, "w") as dest:
-                # stream 1 MiB chunks from S3 into the zip entry
                 for chunk in iter(lambda: body.read(1024 * 1024), b""):
                     dest.write(chunk)
 
             processed += 1
             keys_to_delete.append(key)
 
-    # Upload the ZIP back to S3 (under LOCALPATH if provided)
+    # --- Upload ZIP to S3 ---
     dest_key = f"{prefix}{full_zip_name}" if prefix else full_zip_name
     LOGGER.info("Uploading ZIP to s3://%s/%s", BUCKET, dest_key)
     s3.upload_file(zip_path, BUCKET, dest_key)
 
-    # Optional cleanup of source objects (batched, 1000 per call)
+    # --- Optional cleanup of source objects ---
     if REMOVEFILESAFTER and keys_to_delete:
         LOGGER.info("Deleting %d source objects", len(keys_to_delete))
         for i in range(0, len(keys_to_delete), 1000):
             batch = [{"Key": k} for k in keys_to_delete[i : i + 1000]]
             s3.delete_objects(Bucket=BUCKET, Delete={"Objects": batch, "Quiet": True})
 
-    # Emit a metric
+    # --- Emit CloudWatch metric ---
     if context:
         cloudwatch.put_metric_data(
             Namespace="lambda_ftp",
@@ -98,7 +110,7 @@ def lambda_handler(event, context):
             }],
         )
 
-    # Optional: remove local zip to free /tmp immediately after upload
+    # --- Clean up local ZIP ---
     try:
         os.remove(zip_path)
     except OSError:
