@@ -249,5 +249,5 @@ module "dms_validation" {
   }
 
   security_group_ids = [aws_security_group.dms_validation_lambda_sg.id]
-  subnet_ids         = aws_db_subnet_group.db[0].subnet_ids
+  subnet_ids         = data.aws_subnets.shared-public.ids
 }

@@ -75,7 +75,7 @@ resource "aws_security_group" "dms_validation_lambda_sg" {
   }
 }
 
-resource "aws_security_group_rule" "lambda_ingress_s3" {
+resource "aws_security_group_rule" "dms_validation_lambda_ingress_s3" {
   type              = "ingress"
   description       = "allow s3"
   from_port         = 0
