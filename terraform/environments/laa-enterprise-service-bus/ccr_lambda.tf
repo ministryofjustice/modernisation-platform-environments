@@ -41,7 +41,7 @@ resource "aws_security_group_rule" "ccr_provider_load_egress_https_sm" {
 
 resource "aws_lambda_function" "ccr_provider_load" {
 
-  description      = "Connect to ccr DB"
+  description      = "Connect to CCR DB"
   function_name    = "ccr_provider_load_function"
   role             = aws_iam_role.ccr_provider_load_role.arn
   handler          = "lambda_function.lambda_handler"
