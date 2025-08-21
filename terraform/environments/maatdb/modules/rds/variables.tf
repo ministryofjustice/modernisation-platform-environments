@@ -184,6 +184,11 @@ variable "tags" {
   description = "Common tags to be used by all resources"
 }
 
+variable "hub20_s3_bucket" {
+  type        = string
+  description = "HUB 2.0 S3 Bucket name"
+}
+
 
 
 

@@ -97,7 +97,7 @@ resource "aws_iam_role" "ccms_cross_account_s3_read" {
       {
         Effect = "Allow",
         Principal = {
-          AWS = "arn:aws:iam::767123802783:role/role_stsassume_oracle_base"
+          AWS = "arn:aws:iam::${local.application_data.accounts[local.environment].ccms_account_id}:role/role_stsassume_oracle_base"
         },
         Action = "sts:AssumeRole"
       }
