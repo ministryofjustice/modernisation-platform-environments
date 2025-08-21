@@ -63,27 +63,27 @@ resource "aws_security_group_rule" "lambda_egress_s3" {
   security_group_id = aws_security_group.lambda_generic.id
 }
 
-resource "aws_vpc_security_group_egress_rule" "dms_validation_lambda_egress_RDS" {
-  count = local.is-production || local.is-development ? 1 : 0
+# resource "aws_vpc_security_group_egress_rule" "dms_validation_lambda_egress_RDS" {
+#   count = local.is-production || local.is-development ? 1 : 0
 
-  security_group_id            = aws_security_group.dms_validation_lambda_sg.id
-  referenced_security_group_id = aws_security_group.db[0].id
-  ip_protocol                  = "tcp"
-  from_port                    = 1433
-  to_port                      = 1433
-  description                  = "Lambda -----[mssql]-----+ RDS Database"
-}
+#   security_group_id            = aws_security_group.dms_validation_lambda_sg.id
+#   referenced_security_group_id = aws_security_group.db[0].id
+#   ip_protocol                  = "tcp"
+#   from_port                    = 1433
+#   to_port                      = 1433
+#   description                  = "Lambda -----[mssql]-----+ RDS Database"
+# }
 
-resource "aws_vpc_security_group_ingress_rule" "dms_validation_lambda_ingress_RDS" {
-  count = local.is-production || local.is-development ? 1 : 0
+# resource "aws_vpc_security_group_ingress_rule" "dms_validation_lambda_ingress_RDS" {
+#   count = local.is-production || local.is-development ? 1 : 0
 
-  security_group_id            = aws_security_group.db[0].id
-  referenced_security_group_id = aws_security_group.dms_validation_lambda_sg.id
-  ip_protocol                  = "tcp"
-  from_port                    = 1433
-  to_port                      = 1433
-  description                  = "RDS Database +-----[mssql]----- Lambda"
-}
+#   security_group_id            = aws_security_group.db[0].id
+#   referenced_security_group_id = aws_security_group.dms_validation_lambda_sg.id
+#   ip_protocol                  = "tcp"
+#   from_port                    = 1433
+#   to_port                      = 1433
+#   description                  = "RDS Database +-----[mssql]----- Lambda"
+# }
 
 
 # DMS Validation 
