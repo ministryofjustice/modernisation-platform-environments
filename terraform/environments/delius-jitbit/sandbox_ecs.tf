@@ -1,7 +1,7 @@
 module "ecs_sandbox" {
   count = local.is-development ? 1 : 0
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//cluster?ref=v2.0.1"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//cluster?ref=v6.0.0"
 
   environment = local.environment
   name        = "${local.application_name}-sandbox"
