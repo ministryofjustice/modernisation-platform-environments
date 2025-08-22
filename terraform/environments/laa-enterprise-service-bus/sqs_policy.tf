@@ -8,7 +8,7 @@ resource "aws_sqs_queue_policy" "ccms_policy" {
       Principal = {
         Service = "sns.amazonaws.com"
       }
-      Action = "sqs:SendMessage"
+      Action   = "sqs:SendMessage"
       Resource = aws_sqs_queue.ccms_provider_q.arn
       Condition = {
         ArnEquals = {
@@ -29,7 +29,7 @@ resource "aws_sqs_queue_policy" "maat_policy" {
       Principal = {
         Service = "sns.amazonaws.com"
       }
-      Action = "sqs:SendMessage"
+      Action   = "sqs:SendMessage"
       Resource = aws_sqs_queue.maat_provider_q.arn
       Condition = {
         ArnEquals = {
@@ -50,7 +50,7 @@ resource "aws_sqs_queue_policy" "cclf_policy" {
       Principal = {
         Service = "sns.amazonaws.com"
       }
-      Action = "sqs:SendMessage"
+      Action   = "sqs:SendMessage"
       Resource = aws_sqs_queue.cclf_provider_q.arn
       Condition = {
         ArnEquals = {
@@ -71,7 +71,7 @@ resource "aws_sqs_queue_policy" "ccr_policy" {
       Principal = {
         Service = "sns.amazonaws.com"
       }
-      Action = "sqs:SendMessage"
+      Action   = "sqs:SendMessage"
       Resource = aws_sqs_queue.ccr_provider_q.arn
       Condition = {
         ArnEquals = {
@@ -92,7 +92,7 @@ resource "aws_sqs_queue_policy" "ccms_banks_policy" {
       Principal = {
         Service = "sns.amazonaws.com"
       }
-      Action = "sqs:SendMessage"
+      Action   = "sqs:SendMessage"
       Resource = aws_sqs_queue.ccms_banks_q.arn
       Condition = {
         ArnEquals = {

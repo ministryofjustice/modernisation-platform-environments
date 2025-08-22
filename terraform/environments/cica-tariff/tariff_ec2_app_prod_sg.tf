@@ -61,9 +61,9 @@ resource "aws_security_group" "tariff_app_prod_security_group" {
   }
 
   ingress {
-    protocol    = "tcp"
-    from_port   = 9000
-    to_port     = 65500
+    protocol  = "tcp"
+    from_port = 9000
+    to_port   = 65500
     cidr_blocks = [
       "0.0.0.0/0"
     ]

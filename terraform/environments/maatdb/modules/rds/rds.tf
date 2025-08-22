@@ -385,7 +385,7 @@ resource "aws_iam_policy" "rds_s3_access_policy" {
         ],
         Resource = [
           "arn:aws:s3:::${var.hub20_s3_bucket}",
-          "arn:aws:s3:::${var.hub20_s3_bucket}/*"  
+          "arn:aws:s3:::${var.hub20_s3_bucket}/*"
         ]
       }
     ]

@@ -3,8 +3,8 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
   role_arn = aws_iam_role.step_function_role.arn
 
   definition = jsonencode({
-    Comment      = "A description of my state machine",
-    StartAt      = "GetFiles",
+    Comment = "A description of my state machine",
+    StartAt = "GetFiles",
     States = {
       "GetFiles" = {
         Type     = "Task",
@@ -14,11 +14,11 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
           Payload      = {}
         },
         ResultPath = "$.GetFilesResult"
-        Next = "CheckGetFilesStatus"
+        Next       = "CheckGetFilesStatus"
       },
 
       "CheckGetFilesStatus" = {
-        Type    = "Choice"
+        Type = "Choice"
         Choices = [
           {
             Variable      = "$.GetFilesResult.Payload.statusCode"
@@ -36,8 +36,8 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
       },
 
       "ProcessFiles" = {
-        Type          = "Map",
-        ItemsPath     = "$.GetFilesResult.Payload.body.files",
+        Type           = "Map",
+        ItemsPath      = "$.GetFilesResult.Payload.body.files",
         MaxConcurrency = 8,
         Parameters = {
           "filename.$"  = "$$.Map.Item.Value.filename",
@@ -52,57 +52,57 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
               Parameters = {
                 FunctionName = aws_lambda_function.cwa_file_transfer_lambda.arn
                 Payload = {
-                    "filename.$" = "$.filename",
-                    "timestamp.$" = "$.timestamp"
-                }                
+                  "filename.$"  = "$.filename",
+                  "timestamp.$" = "$.timestamp"
+                }
               },
               ResultPath = "$.ProcessSingleFileResult"
-              Next = "CheckProcessFilesStatus"
+              Next       = "CheckProcessFilesStatus"
             },
 
             "CheckProcessFilesStatus" = {
-                Type    = "Choice"
-                Choices = [
+              Type = "Choice"
+              Choices = [
                 {
-                    Variable      = "$.ProcessSingleFileResult.Payload.statusCode"
-                    NumericEquals = 200
-                    Next          = "NextFileOrEnd"
+                  Variable      = "$.ProcessSingleFileResult.Payload.statusCode"
+                  NumericEquals = 200
+                  Next          = "NextFileOrEnd"
                 }
-                ]
-                Default = "FailSingleFile"
+              ]
+              Default = "FailSingleFile"
             },
 
             "FailSingleFile" = {
-                Type  = "Fail"
-                Error = "LambdaError"
-                Cause = "File transfer failed"
+              Type  = "Fail"
+              Error = "LambdaError"
+              Cause = "File transfer failed"
             },
 
             "NextFileOrEnd" = {
-                Type = "Pass"
-                End  = true
+              Type = "Pass"
+              End  = true
             }
           }
         }
         ResultPath = "$.ProcessedFiles",
-        Next = "WrapMapOutput"
+        Next       = "WrapMapOutput"
       },
 
       "WrapMapOutput" = {
         Type = "Pass",
         Parameters = {
-            "results.$" = "$.ProcessedFiles"
+          "results.$" = "$.ProcessedFiles"
         },
         ResultPath = "$.WrappedResults",
-        Next = "PublishToSNS"
-        },
+        Next       = "PublishToSNS"
+      },
 
       "PublishToSNS" = {
         Type     = "Task",
         Resource = "arn:aws:states:::lambda:invoke",
         Parameters = {
           FunctionName = aws_lambda_function.cwa_sns_lambda.arn,
-          Payload      = {
+          Payload = {
             "timestamp.$" = "$.WrappedResults.results[0].timestamp"
           }
         },
@@ -110,13 +110,13 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
         Next       = "CheckPublishToSNSStatus"
       },
       "CheckPublishToSNSStatus" = {
-        Type    = "Choice",
+        Type = "Choice",
         Choices = [
-            {
+          {
             Variable      = "$.PublishToSNSResult.Payload.statusCode",
             NumericEquals = 200,
             Next          = "SuccessState"
-            }
+          }
         ],
         Default = "FailSNS"
       },

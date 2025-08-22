@@ -60,14 +60,14 @@ resource "aws_lambda_function" "maat_provider_load" {
     security_group_ids = [aws_security_group.maat_provider_load_sg.id]
     subnet_ids         = [data.aws_subnet.data_subnets_a.id]
   }
-  
+
 
   environment {
     variables = {
-      DB_SECRET_NAME    = aws_secretsmanager_secret.maat_db_mp_credentials.name
+      DB_SECRET_NAME        = aws_secretsmanager_secret.maat_db_mp_credentials.name
       PROCEDURE_SECRET_NAME = aws_secretsmanager_secret.maat_procedures_config.name
-      LD_LIBRARY_PATH   = "/opt/instantclient_12_2_linux"
-      ORACLE_HOME       = "/opt/instantclient_12_2_linux"
+      LD_LIBRARY_PATH       = "/opt/instantclient_12_2_linux"
+      ORACLE_HOME           = "/opt/instantclient_12_2_linux"
     }
   }
 

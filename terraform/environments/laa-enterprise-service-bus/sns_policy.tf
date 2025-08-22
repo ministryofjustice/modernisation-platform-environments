@@ -8,7 +8,7 @@ resource "aws_sns_topic_policy" "priority_p1_policy" {
     Version = "2012-10-17"
     Statement = [
       {
-        Sid = "AllowAdminFullAccess"
+        Sid    = "AllowAdminFullAccess"
         Effect = "Allow"
         Principal = {
           AWS = aws_iam_role.admin_role.arn
@@ -25,21 +25,21 @@ resource "aws_sns_topic_policy" "priority_p1_policy" {
         Resource = aws_sns_topic.priority_p1.arn
       },
       {
-        Sid = "AllowPublisherPublishOnly"
+        Sid    = "AllowPublisherPublishOnly"
         Effect = "Allow"
         Principal = {
           AWS = aws_iam_role.publisher_role.arn
         }
-        Action = "sns:Publish"
+        Action   = "sns:Publish"
         Resource = aws_sns_topic.priority_p1.arn
       },
       {
-        Sid = "AllowSubscriberSubscribeOnly"
+        Sid    = "AllowSubscriberSubscribeOnly"
         Effect = "Allow"
         Principal = {
           AWS = aws_iam_role.subscriber_role.arn
         }
-        Action = "sns:Subscribe"
+        Action   = "sns:Subscribe"
         Resource = aws_sns_topic.priority_p1.arn
       }
     ]
@@ -57,7 +57,7 @@ resource "aws_sns_topic_policy" "provider_banks_policy" {
     Version = "2012-10-17"
     Statement = [
       {
-        Sid = "AllowAdminFullAccess"
+        Sid    = "AllowAdminFullAccess"
         Effect = "Allow"
         Principal = {
           AWS = aws_iam_role.admin_role.arn
@@ -74,21 +74,21 @@ resource "aws_sns_topic_policy" "provider_banks_policy" {
         Resource = aws_sns_topic.provider_banks.arn
       },
       {
-        Sid = "AllowPublisherPublishOnly"
+        Sid    = "AllowPublisherPublishOnly"
         Effect = "Allow"
         Principal = {
           AWS = aws_iam_role.publisher_role.arn
         }
-        Action = "sns:Publish"
+        Action   = "sns:Publish"
         Resource = aws_sns_topic.provider_banks.arn
       },
       {
-        Sid = "AllowSubscriberSubscribeOnly"
+        Sid    = "AllowSubscriberSubscribeOnly"
         Effect = "Allow"
         Principal = {
           AWS = aws_iam_role.subscriber_role.arn
         }
-        Action = "sns:Subscribe"
+        Action   = "sns:Subscribe"
         Resource = aws_sns_topic.provider_banks.arn
       }
     ]

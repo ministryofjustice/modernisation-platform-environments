@@ -8,7 +8,7 @@ resource "aws_s3_bucket_policy" "data_cross_account_access" {
     Version = "2012-10-17",
     Statement = [
       {
-        Sid = "AllowCWALambdaReadWrite"
+        Sid    = "AllowCWALambdaReadWrite"
         Effect = "Allow",
         Principal = {
           AWS = [
@@ -26,7 +26,7 @@ resource "aws_s3_bucket_policy" "data_cross_account_access" {
         ]
       },
       {
-        Sid = "AllowReadAccessFromDB"
+        Sid    = "AllowReadAccessFromDB"
         Effect = "Allow",
         Principal = {
           AWS = [
