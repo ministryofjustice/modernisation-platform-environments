@@ -11,7 +11,7 @@ resource "aws_s3_bucket_cors_configuration" "rekognition_bucket_cors" {
     // TODO: restrict to known environments
     // need to allow for dev
     allowed_origins = ["*"]
-    expose_headers = ["ETag"]
+    expose_headers  = ["ETag"]
     max_age_seconds = 3000
   }
 }
@@ -24,23 +24,23 @@ resource "aws_kms_key" "rekognition_encryption_key" {
 data "aws_iam_policy_document" "rekognition_kms_key_policy" {
   # NOTE: this is the default key policy granting root user access
   statement {
-    sid = "DefaultKeyPolicy"
+    sid    = "DefaultKeyPolicy"
     effect = "Allow"
     principals {
       identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
-      type = "AWS"
+      type        = "AWS"
     }
-    actions = ["kms:*"]
+    actions   = ["kms:*"]
     resources = ["*"]
   }
 
   # Allow access to rekognition user
   statement {
-    sid = "RekognitionUserKeyUser"
+    sid    = "RekognitionUserKeyUser"
     effect = "Allow"
     principals {
       identifiers = [aws_iam_user.rekognition_user.arn]
-      type = "AWS"
+      type        = "AWS"
     }
     actions = [
       "kms:Decrypt",

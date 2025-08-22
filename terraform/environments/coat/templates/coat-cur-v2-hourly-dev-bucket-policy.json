@@ -60,9 +60,7 @@
       "Sid": "AthenaAccess",
       "Effect": "Allow",
       "Action": ["s3:GetObject", "s3:PutObject"],
-      "Resource": [
-        "arn:aws:s3:::${bucket_name}/athena-results/*"
-      ],
+      "Resource": ["arn:aws:s3:::${bucket_name}/athena-results/*"],
       "Principal": {
         "Service": ["athena.amazonaws.com"]
       }

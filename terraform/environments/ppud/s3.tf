@@ -111,9 +111,9 @@ resource "aws_s3_bucket_policy" "PPUD" {
         Effect = "Allow"
         Principal = {
           AWS = [
-          # "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/developer",
-          # "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/sandbox",
-          # "arn:aws:iam::${local.environment_management.account_ids["ppud-preproduction"]}:role/developer",
+            # "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/developer",
+            # "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/sandbox",
+            # "arn:aws:iam::${local.environment_management.account_ids["ppud-preproduction"]}:role/developer",
             "arn:aws:iam::${local.environment_management.account_ids["ppud-production"]}:role/developer"
           ]
         }
@@ -289,8 +289,8 @@ resource "aws_s3_bucket_policy" "moj-infrastructure" {
         ],
         "Principal" : {
           "AWS" : [
-          # "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/ec2-iam-role",     # Cross account access disabled, only turned on when required
-          # "arn:aws:iam::${local.environment_management.account_ids["ppud-preproduction"]}:role/ec2-iam-role",   # Cross account access disabled, only turned on when required
+            # "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/ec2-iam-role",     # Cross account access disabled, only turned on when required
+            # "arn:aws:iam::${local.environment_management.account_ids["ppud-preproduction"]}:role/ec2-iam-role",   # Cross account access disabled, only turned on when required
             "arn:aws:iam::${local.environment_management.account_ids["ppud-production"]}:role/ec2-iam-role"
           ]
         }
@@ -1242,7 +1242,7 @@ resource "aws_s3_bucket_replication_configuration" "moj-database-source-uat-repl
   count = local.is-preproduction == true ? 1 : 0
   # Must have bucket versioning enabled first
   depends_on = [aws_s3_bucket_versioning.moj-database-source-uat]
-  role       = aws_iam_role.iam_role_s3_bucket_moj_report_source_uat[0].arn  # check config
+  role       = aws_iam_role.iam_role_s3_bucket_moj_report_source_uat[0].arn # check config
   bucket     = aws_s3_bucket.moj-database-source-uat[0].id
 
   rule {
@@ -2263,8 +2263,8 @@ resource "aws_s3_bucket_policy" "moj-infrastructure-dev" {
         "Principal" : {
           "AWS" : [
             "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/ec2-iam-role",
-          # "arn:aws:iam::${local.environment_management.account_ids["ppud-preproduction"]}:role/ec2-iam-role", # Cross account access disabled, only turned on when required
-          # "arn:aws:iam::${local.environment_management.account_ids["ppud-production"]}:role/ec2-iam-role"     # Cross account access disabled, only turned on when required
+            # "arn:aws:iam::${local.environment_management.account_ids["ppud-preproduction"]}:role/ec2-iam-role", # Cross account access disabled, only turned on when required
+            # "arn:aws:iam::${local.environment_management.account_ids["ppud-production"]}:role/ec2-iam-role"     # Cross account access disabled, only turned on when required
           ]
         }
       },
@@ -2403,9 +2403,9 @@ resource "aws_s3_bucket_policy" "moj-infrastructure-uat" {
         ],
         "Principal" : {
           "AWS" : [
-          # "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/ec2-iam-role",    # Cross account access disabled, only turned on when required
+            # "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/ec2-iam-role",    # Cross account access disabled, only turned on when required
             "arn:aws:iam::${local.environment_management.account_ids["ppud-preproduction"]}:role/ec2-iam-role",
-          # "arn:aws:iam::${local.environment_management.account_ids["ppud-production"]}:role/ec2-iam-role"      # Cross account access disabled, only turned on when required
+            # "arn:aws:iam::${local.environment_management.account_ids["ppud-production"]}:role/ec2-iam-role"      # Cross account access disabled, only turned on when required
           ]
         }
       },

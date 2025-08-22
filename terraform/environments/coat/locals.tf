@@ -16,6 +16,6 @@ locals {
   oidc_provider = "token.actions.githubusercontent.com"
 
   athena_workgroup = "coat_cur_report"
-  data_catalog = "AwsDataCatalog"
+  data_catalog     = "AwsDataCatalog"
 
 }
