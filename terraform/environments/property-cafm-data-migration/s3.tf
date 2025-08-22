@@ -369,39 +369,6 @@ module "s3_bucket_logs" {
   tags                 = local.tags
 }
 
-data "aws_iam_policy_document" "cross_account_ingestion" {
-  count = local.create_ingestion_policy ? 1 : 0
-
-  statement {
-    sid    = "AllowAnalyticalPlatformIngestionService"
-    effect = "Allow"
-
-    principals {
-      type        = "AWS"
-      identifiers = local.ingestion_principals
-    }
-
-    actions = [
-      "s3:DeleteObject",
-      "s3:GetObject",
-      "s3:GetObjectAcl",
-      "s3:PutObject",
-      "s3:PutObjectAcl",
-      "s3:PutObjectTagging",
-    ]
-
-    resources = [
-      local.bucket_arn,
-      "${local.bucket_arn}/*",
-    ]
-  }
-}
-
-resource "aws_s3_bucket_policy" "cross_account_ingestion" {
-  count  = local.create_ingestion_policy ? 1 : 0
-  bucket = local.bucket_name
-  policy = data.aws_iam_policy_document.cross_account_ingestion[0].json
-}
 
 module "s3_planetfm_data_bucket" {
   source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
@@ -490,15 +457,15 @@ data "aws_iam_policy_document" "cross_account_ingestion" {
     ]
 
     resources = [
-      module.s3_planetfm_data_bucket.bucket.id,
-      "${module.s3_planetfm_data_bucket.bucket.id}/*",
+      local.bucket_arn,
+      "${local.bucket_arn}/*",
     ]
   }
 }
 
 resource "aws_s3_bucket_policy" "cross_account_ingestion" {
   count  = local.create_ingestion_policy ? 1 : 0
-  bucket = module.s3_planetfm_data_bucket.bucket.id
+  bucket = local.bucket_name
   policy = data.aws_iam_policy_document.cross_account_ingestion[0].json
 }
 
