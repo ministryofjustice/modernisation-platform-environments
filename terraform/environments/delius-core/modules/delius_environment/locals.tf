@@ -38,6 +38,12 @@ locals {
   ]
   all_ingress_ips = concat(local.moj_ips, local.unilink_ips)
 
+  legacy_test_natgw_ips = [
+    "35.176.126.163/32",
+    "35.178.162.73/32",
+    "52.56.195.113/32"
+  ]
+
   secret_prefix           = "${var.account_info.application_name}-${var.env_name}-oracle-${var.db_suffix}"
   application_secret_name = "${local.secret_prefix}-application-passwords"
   mis_account_id          = lookup(var.platform_vars.environment_management.account_ids, join("-", ["delius-mis", var.account_info.mp_environment]), null)
