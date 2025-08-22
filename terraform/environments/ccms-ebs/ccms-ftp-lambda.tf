@@ -1,7 +1,7 @@
 locals {
   secret_names = [
     "LAA-ftp-allpay-inbound-ccms",
-    "LAA-ftp-tdx-inbound-ccms-agencyassigmen",
+    # "LAA-ftp-tdx-inbound-ccms-agencyassigmen",
     "LAA-ftp-rossendales-ccms-csv-inbound",
     "LAA-ftp-rossendales-maat-inbound",
     "LAA-ftp-tdx-inbound-ccms-activity",
