@@ -140,7 +140,7 @@ module "logs_s3_bucket" { #tfsec:ignore:aws-s3-enable-versioning
 
 
 module "data_landing_s3_bucket" { #tfsec:ignore:aws-s3-enable-versioning
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
 
   bucket_prefix      = "data-landing-${local.environment}"
   versioning_enabled = false
