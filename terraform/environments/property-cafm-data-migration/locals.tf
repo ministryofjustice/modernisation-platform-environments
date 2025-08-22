@@ -41,4 +41,19 @@ locals {
       if user.environment == local.environment
     }
   }
+  environment_map = {
+    "production"    = "prod"
+    "preproduction" = "preprod"
+    "test"          = "test"
+    "development"   = "dev"
+    "default"       = ""
+  }
+  environment_shorthand = local.environment_map[local.environment]
+
+    # cross-account principal only for envs present in the map
+  ingestion_account_id = try(var.ingestion_account_ids[local.environment], null)
+  ingestion_principals = local.ingestion_account_id != null ? [
+    "arn:aws:iam::${local.ingestion_account_id}:role/${var.ingestion_role_name}"
+  ] : []
+  create_ingestion_policy = length(local.ingestion_principals) > 0
 }
