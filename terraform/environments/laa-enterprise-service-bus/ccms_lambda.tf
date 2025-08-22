@@ -44,7 +44,7 @@ resource "aws_lambda_function" "ccms_provider_load" {
   description      = "Connect to CCMS DB"
   function_name    = "ccms_provider_load_function"
   role             = aws_iam_role.ccms_provider_load_role.arn
-  handler          = "ccms_lambda_function.lambda_handler"
+  handler          = "lambda_function.lambda_handler"
   filename         = "lambda/ccms_provider_load_lambda/ccms_lambda.zip"
   source_code_hash = filebase64sha256("lambda/ccms_provider_load_lambda/ccms_lambda.zip")
   timeout          = 300
@@ -60,14 +60,14 @@ resource "aws_lambda_function" "ccms_provider_load" {
     security_group_ids = [aws_security_group.ccms_provider_load.id]
     subnet_ids         = [data.aws_subnet.data_subnets_a.id]
   }
-  
+
 
   environment {
     variables = {
-      DB_SECRET_NAME    = aws_secretsmanager_secret.ccms_db_mp_credentials.name
+      DB_SECRET_NAME        = aws_secretsmanager_secret.ccms_db_mp_credentials.name
       PROCEDURE_SECRET_NAME = aws_secretsmanager_secret.ccms_procedures_config.name
-      LD_LIBRARY_PATH   = "/opt/instantclient_12_2_linux"
-      ORACLE_HOME       = "/opt/instantclient_12_2_linux"
+      LD_LIBRARY_PATH       = "/opt/instantclient_12_2_linux"
+      ORACLE_HOME           = "/opt/instantclient_12_2_linux"
     }
   }
 

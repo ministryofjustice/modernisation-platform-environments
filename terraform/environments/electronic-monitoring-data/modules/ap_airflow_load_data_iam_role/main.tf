@@ -20,10 +20,10 @@ locals {
     "${var.source_data_bucket.arn}/staging${var.path_to_data}/*",
   ] : []
   list_buckets = var.source_data_bucket != null ? [
-      var.source_data_bucket.arn,
-      var.athena_dump_bucket.arn,
-      var.cadt_bucket.arn
-  ] : [
+    var.source_data_bucket.arn,
+    var.athena_dump_bucket.arn,
+    var.cadt_bucket.arn
+    ] : [
     var.athena_dump_bucket.arn,
     var.cadt_bucket.arn
   ]
@@ -38,7 +38,7 @@ data "aws_iam_policy_document" "get_secrets" {
   #checkov:skip=CKV_AWS_111
   count = var.secret_arn != null ? 1 : 0
   statement {
-    sid = "GetCredentials${var.name}"
+    sid    = "GetCredentials${var.name}"
     effect = "Allow"
     actions = [
       "secretsmanager:GetResourcePolicy",
@@ -49,7 +49,7 @@ data "aws_iam_policy_document" "get_secrets" {
     resources = [var.secret_arn]
   }
   statement {
-    sid = "ListAllSecrets"
+    sid    = "ListAllSecrets"
     effect = "Allow"
     actions = [
       "secretsmanager:ListSecrets",
@@ -84,9 +84,9 @@ data "aws_iam_policy_document" "load_data" {
     ])
   }
   statement {
-    sid     = "ListDataBucket${local.camel-sid}"
-    effect  = "Allow"
-    actions = ["s3:ListBucket"]
+    sid       = "ListDataBucket${local.camel-sid}"
+    effect    = "Allow"
+    actions   = ["s3:ListBucket"]
     resources = local.list_buckets
   }
   statement {
@@ -120,13 +120,17 @@ data "aws_iam_policy_document" "load_data" {
     resources = [
       "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:catalog",
       "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:database/${local.snake-database}*",
-      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/${local.snake-database}*/*"
+      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/${local.snake-database}*/*",
+      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:userDefinedFunction/${local.snake-database}*/*",
     ]
   }
   statement {
-    sid       = "GetDataAccessForLakeFormation${local.camel-sid}"
-    effect    = "Allow"
-    actions   = ["lakeformation:GetDataAccess"]
+    sid    = "GetDataAccessAndTagsForLakeFormation${local.camel-sid}"
+    effect = "Allow"
+    actions = [
+      "lakeformation:GetDataAccess",
+      "lakeformation:GetResourceLFTags",
+    ]
     resources = ["*"]
   }
   statement {
@@ -166,12 +170,12 @@ module "share_dbs_with_roles" {
 }
 
 resource "aws_lakeformation_permissions" "catalog_manage" {
-  principal          = module.ap_database_sharing.iam_role.arn
+  principal = module.ap_database_sharing.iam_role.arn
 
-  permissions        = [
+  permissions = [
     "CREATE_DATABASE",
   ]
 
-  catalog_resource   = true
+  catalog_resource = true
 }
 
