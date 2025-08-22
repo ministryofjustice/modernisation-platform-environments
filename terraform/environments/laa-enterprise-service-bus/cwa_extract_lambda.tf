@@ -132,11 +132,13 @@ resource "aws_lambda_function" "cwa_extract_lambda" {
   environment {
     variables = {
       PROCEDURES_CONFIG = aws_secretsmanager_secret.cwa_procedures_config.name
-      TARGET_BUCKET     = aws_s3_bucket.data.bucket
-      SNS_TOPIC         = aws_sns_topic.priority_p1.arn
+      # TARGET_BUCKET     = aws_s3_bucket.data.bucket
+      # SNS_TOPIC         = aws_sns_topic.priority_p1.arn
       DB_SECRET_NAME    = aws_secretsmanager_secret.cwa_db_secret.name
       LD_LIBRARY_PATH   = "/opt/instantclient_12_2_linux"
       ORACLE_HOME       = "/opt/instantclient_12_2_linux"
+      SERVICE_NAME      = "cwa-extract-service"
+      NAMESPACE         = "CWAProviderExtractService"
     }
   }
 
@@ -175,6 +177,8 @@ resource "aws_lambda_function" "cwa_file_transfer_lambda" {
       DB_SECRET_NAME    = aws_secretsmanager_secret.cwa_db_secret.name
       LD_LIBRARY_PATH   = "/opt/instantclient_12_2_linux"
       ORACLE_HOME       = "/opt/instantclient_12_2_linux"
+      SERVICE_NAME      = "cwa-file-transfer-service"
+      NAMESPACE         = "CWAFileTransferService"
     }
   }
 
@@ -209,6 +213,8 @@ resource "aws_lambda_function" "cwa_sns_lambda" {
     variables = {
       PROVIDER_TOPIC = aws_sns_topic.priority_p1.arn
       PROVIDER_BANKS_TOPIC = aws_sns_topic.provider_banks.arn
+      SERVICE_NAME      = "cwa-sns-service"
+      NAMESPACE         = "CWASNSNotificationService"
     }
   }
 

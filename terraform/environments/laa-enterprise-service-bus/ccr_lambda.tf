@@ -68,6 +68,8 @@ resource "aws_lambda_function" "ccr_provider_load" {
       PROCEDURE_SECRET_NAME = aws_secretsmanager_secret.ccr_procedures_config.name
       LD_LIBRARY_PATH   = "/opt/instantclient_12_2_linux"
       ORACLE_HOME       = "/opt/instantclient_12_2_linux"
+      SERVICE_NAME      = "ccr-load-service"
+      NAMESPACE         = "CCRProviderLoadService"
     }
   }
 
