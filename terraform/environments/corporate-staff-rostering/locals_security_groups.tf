@@ -81,10 +81,16 @@ locals {
         }
       }
     }
-
     web = {
       description = "New security group for web-servers"
       ingress = {
+        all-from-self = {
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
+        }
         http_web = {
           description     = "80: http allow ingress"
           from_port       = 80
@@ -154,30 +160,16 @@ locals {
         }
       }
     }
-
     app = {
       description = "New security group for application servers"
       ingress = {
-        all-from-web = {
-          description     = "Allow all ingress from web"
+        all-from-self = {
+          description     = "Allow all ingress to self"
           from_port       = 0
           to_port         = 0
           protocol        = -1
+          self            = true
           security_groups = ["web"]
-        }
-        rpc_tcp_app2 = {
-          description     = "135: TCP MS-RPC allow ingress from app and db servers"
-          from_port       = 135
-          to_port         = 135
-          protocol        = "TCP"
-          security_groups = ["web", "database"]
-        }
-        smb_tcp_app = {
-          description     = "445: TCP SMB allow ingress from app and db servers"
-          from_port       = 445
-          to_port         = 445
-          protocol        = "TCP"
-          security_groups = ["web", "database"]
         }
         http_2109_csr = {
           description = "2109: TCP CSR ingress"
@@ -193,40 +185,10 @@ locals {
           protocol    = "TCP"
           cidr_blocks = local.security_group_cidrs.enduserclient
         }
-        rpc_dynamic_tcp_app = {
-          description     = "49152-65535: TCP Dynamic Port range"
-          from_port       = 49152
-          to_port         = 65535
-          protocol        = "TCP"
-          security_groups = ["web", "database"]
-        }
       }
     }
-
-    domain = {
-      description = "Common Windows security group for fixngo domain(s) access from Jumpservers and Azure DCs"
-    }
-
-    jumpserver = {
-      description = "New security group for jump-servers"
-    }
-
-    database = {
-      description = "New security group for database servers"
-      ingress = {
-        oracle_1521_db = {
-          description     = "Allow oracle database 1521 ingress"
-          from_port       = "1521"
-          to_port         = "1521"
-          protocol        = "TCP"
-          cidr_blocks     = local.security_group_cidrs.oracle_db
-          security_groups = ["web", "app"]
-        }
-      }
-    }
-
-    fsx_windows = {
-      description = "Security group for fsx windows"
+    prisoner-retail = {
+      description = "Security group for prisoner retail"
       ingress = {
         all-from-self = {
           description = "Allow all ingress to self"
@@ -235,35 +197,26 @@ locals {
           protocol    = -1
           self        = true
         }
-        netbios_fsx = {
-          description = "139: NetBIOS Session Service"
-          from_port   = 139
-          to_port     = 139
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.enduserclient
-        }
-        smb_fsx = {
-          description = "445: Directory Services SMB file sharing"
-          from_port   = 445
-          to_port     = 445
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.enduserclient
-        }
-        winrm_fsx = {
-          description = "5985-5986: WinRM 2.0 (Microsoft Windows Remote Management)"
-          from_port   = 5985
-          to_port     = 5986
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.enduserclient
-        }
       }
-      egress = {
-        all = {
-          description = "Allow all traffic outbound"
-          from_port   = 0
-          to_port     = 0
-          protocol    = "-1"
-          cidr_blocks = ["0.0.0.0/0"]
+    }
+    database = {
+      description = "New security group for database servers"
+      ingress = {
+        all-from-self = {
+          description     = "Allow all ingress to self"
+          from_port       = 0
+          to_port         = 0
+          protocol        = -1
+          self            = true
+          security_groups = ["web", "app"]
+        }
+        oracle_1521_db = {
+          description     = "Allow oracle database 1521 ingress"
+          from_port       = "1521"
+          to_port         = "1521"
+          protocol        = "TCP"
+          cidr_blocks     = local.security_group_cidrs.oracle_db
+          security_groups = ["web", "app"]
         }
       }
     }

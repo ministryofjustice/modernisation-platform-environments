@@ -89,3 +89,32 @@ resource "aws_iam_role_policy_attachment" "attach_secrets_manager_policy" {
   role       = aws_iam_role.yjsm_ec2_role.name
   policy_arn = aws_iam_policy.secrets_manager_policy.arn
 }
+
+resource "aws_iam_policy" "ecs_task_inspection" {
+  name        = "EC2ListAndDescribeTasksPolicy"
+  description = "Allows EC2 role to list and describe ECS tasks"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "ecs:ListTasks"
+        ],
+        Resource = "arn:aws:ecs:${var.region}:${var.account_id}:cluster/${var.cluster_name}"
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "ecs:DescribeTasks"
+        ],
+        Resource = "arn:aws:ecs:${var.region}:${var.account_id}:task/${var.cluster_name}/*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "attach_ecs_task_inspection_policy" {
+  role       = aws_iam_role.yjsm_ec2_role.name
+  policy_arn = aws_iam_policy.ecs_task_inspection.arn
+}

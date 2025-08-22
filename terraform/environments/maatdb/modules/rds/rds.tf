@@ -3,8 +3,11 @@
 #TODO 1) Get ARN for the Shared Key and apply for snapshots & PI.
 #TODO 2) Snapshot ARN in the vars
 
-# RDS Subnet Group
 
+# tflint-ignore: terraform_required_version
+terraform {}
+
+# RDS Subnet Group
 
 resource "aws_db_subnet_group" "subnet_group" {
   name       = "subnet-group"
@@ -34,8 +37,8 @@ resource "aws_db_parameter_group" "parameter_group_19" {
   }
 
   parameter {
-  name  = "db_cache_size"
-  value = "2000000000"
+    name  = "db_cache_size"
+    value = "2000000000"
   }
 
   tags = {
@@ -86,6 +89,7 @@ resource "aws_db_option_group" "appdboptiongroup19" {
 
 # Random Secret for the DB Password.
 
+# tflint-ignore: terraform_required_providers
 resource "random_password" "rds_password" {
   length  = 12
   special = false
@@ -129,7 +133,8 @@ locals {
     aws_security_group.cloud_platform_sec_group.id,
     aws_security_group.bastion_sec_group.id,
     aws_security_group.vpc_sec_group.id,
-    aws_security_group.mlra_ecs_sec_group.id
+    aws_security_group.mlra_ecs_sec_group.id,
+    aws_security_group.ses_sec_group.id
   ])
 }
 
@@ -193,6 +198,7 @@ resource "aws_db_instance" "appdb1" {
 
 # Access from Cloud Platform
 resource "aws_security_group" "cloud_platform_sec_group" {
+  #checkov:skip=CKV2_AWS_5:"Not applicable"
   name        = "cloud-platform-sec-group"
   description = "RDS access from Cloud Platform via Transit gateway"
   vpc_id      = var.vpc_shared_id
@@ -219,10 +225,12 @@ resource "aws_security_group" "cloud_platform_sec_group" {
 }
 
 resource "aws_security_group" "vpc_sec_group" {
+  #checkov:skip=CKV2_AWS_5:"Not applicable"
   name        = "ecs-sec-group"
   description = "RDS Access with the shared vpc"
   vpc_id      = var.vpc_shared_id
 
+  # Ingress and egress with the maat application
   ingress {
     description     = "Sql Net on 1521"
     from_port       = 1521
@@ -239,12 +247,23 @@ resource "aws_security_group" "vpc_sec_group" {
     security_groups = [var.ecs_cluster_sec_group_id]
   }
 
+  # Required to support https calls from the RDS to the S3 endpoint. Note that vpc endpoint times out hence general outbound
+  egress {
+    description = "Access to S3 VPC endpoint"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+
+  }
+
   tags = {
     Name = "${var.application_name}-${var.environment}-vpc-sec-group"
   }
 }
 
 resource "aws_security_group" "mlra_ecs_sec_group" {
+  #checkov:skip=CKV2_AWS_5:"Not applicable"
   name        = "mlra-ecs-sec-group"
   description = "RDS Access from the MLRA application"
   vpc_id      = var.vpc_shared_id
@@ -255,6 +274,14 @@ resource "aws_security_group" "mlra_ecs_sec_group" {
     to_port         = 1521
     protocol        = "tcp"
     security_groups = [var.mlra_ecs_cluster_sec_group_id]
+  }
+
+  ingress {
+    description     = "RDS Access from the HUB 2.0 MAAT Lambda"
+    from_port       = 1521
+    to_port         = 1521
+    protocol        = "tcp"
+    security_groups = [var.hub20_sec_group_id]
   }
 
   egress {
@@ -270,9 +297,11 @@ resource "aws_security_group" "mlra_ecs_sec_group" {
   }
 }
 
-
 # Access from Bastion
+
+# tflint-ignore: terraform_required_providers
 resource "aws_security_group" "bastion_sec_group" {
+  #checkov:skip=CKV2_AWS_5:"Not applicable"
   name        = "bastion-sec-group"
   description = "Bastion Access with the shared vpc"
   vpc_id      = var.vpc_shared_id
@@ -297,6 +326,84 @@ resource "aws_security_group" "bastion_sec_group" {
     Name = "${var.application_name}-${var.environment}-bastion-sec-group"
   }
 }
+
+# Outbound to Port 587 for SES SMTP Endpoint Access
+
+# tflint-ignore: terraform_required_providers
+resource "aws_security_group" "ses_sec_group" {
+  #checkov:skip=CKV2_AWS_5:"Not applicable"
+  name        = "ses-sec-group"
+  description = "SES Outbound Access"
+  vpc_id      = var.vpc_shared_id
+
+  egress {
+    description = "SMTP Outbound to 587"
+    from_port   = 587
+    to_port     = 587
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "${var.application_name}-${var.environment}-ses-sec-group"
+  }
+}
+
+#RDS role to access HUB 2.0 S3 Bucket
+resource "aws_iam_role" "rds_s3_access" {
+  name = "rds-hub20-s3-access"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Principal = {
+          Service = "rds.amazonaws.com"
+        },
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy" "rds_s3_access_policy" {
+  name        = "rds-hub20-s3-bucket-policy"
+  description = "Allow Oracle RDS instance to read objects from HUB 2.0 S3 bucket"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "s3:GetObject",
+          "s3:GetObjectAcl",
+          "s3:GetObjectVersion",
+          "s3:ListBucket",
+          "s3:ListBucketVersions"
+        ],
+        Resource = [
+          "arn:aws:s3:::${var.hub20_s3_bucket}",
+          "arn:aws:s3:::${var.hub20_s3_bucket}/*"
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "rds_s3_access_policy_attachment" {
+  role       = aws_iam_role.rds_s3_access.name
+  policy_arn = aws_iam_policy.rds_s3_access_policy.arn
+}
+
+resource "aws_db_instance_role_association" "rds_s3_role_association" {
+  db_instance_identifier = aws_db_instance.appdb1.identifier
+  feature_name           = "S3_INTEGRATION"
+  role_arn               = aws_iam_role.rds_s3_access.arn
+}
+
+# Outputs
 
 output "db_instance_id" {
   value = aws_db_instance.appdb1.id

@@ -102,7 +102,7 @@ data "aws_iam_policy_document" "secretsmanager_secret_policy" {
         for_each = statement.value.principals != null ? [statement.value.principals] : []
         content {
           type        = principals.value.type
-          identifiers = [for identifier in principals.value.identifiers : try(var.environment.account_root_arns[identifier], identifier)]
+          identifiers = principals.value.identifiers
         }
       }
       dynamic "condition" {

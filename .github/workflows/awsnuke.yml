@@ -20,10 +20,10 @@ on:
 
 env:
   AWS_REGION: "eu-west-2"
-  ENVIRONMENT_MANAGEMENT: ${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}
   TF_IN_AUTOMATION: true
-  NUKE_ACCOUNTS: ${{ secrets.MODERNISATION_PLATFORM_AUTONUKE }}
-  NUKE_BLOCKLIST_ACCOUNTS: ${{ secrets.MODERNISATION_PLATFORM_AUTONUKE_BLOCKLIST }}
+  MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
+  PASSPHRASE: ${{ secrets.PASSPHRASE }}
+
 permissions: {}
 
 defaults:
@@ -31,16 +31,33 @@ defaults:
     shell: bash
 
 jobs:
+
+  fetch-secrets:
+    uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@3f9fb1af00462c69c806640652ddf41292963615 # v3.2.5
+    permissions:
+      id-token: write
+      contents: read
+    secrets:
+        MODERNISATION_PLATFORM_ACCOUNT_NUMBER: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
+        PASSPHRASE: ${{ secrets.PASSPHRASE }}
   setup-prerequisites:
     runs-on: ubuntu-latest
+    needs: fetch-secrets
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
       account_blocklist_str: ${{ steps.set-blocklist-string.outputs.account_blocklist_str }}
     steps:
+      - name: Decrypt Secrets
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@3f9fb1af00462c69c806640652ddf41292963615 # v3.2.5
+        with:
+          environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
+          nuke_account_ids: ${{ needs.fetch-secrets.outputs.nuke_account_ids }} 
+          nuke_account_blocklist: ${{ needs.fetch-secrets.outputs.nuke_account_blocklist }}
+          PASSPHRASE: ${{ secrets.PASSPHRASE }}
       - id: set-matrix
         name: Set Up Matrix
         run: |
-          echo "matrix=$(jq -c '.| map(select(. !="testing-test"))|sort' <<< $NUKE_ACCOUNTS)" >> $GITHUB_OUTPUT
+          echo "matrix=$(jq -c '.nuke_accounts | map(select(. != "testing-test")) | sort' <<< $NUKE_ACCOUNT_IDS)" >> $GITHUB_OUTPUT
 
       - id: set-blocklist-string
         name: Set Up Blocklist
@@ -50,7 +67,7 @@ jobs:
           account_number=$(jq -r -e --arg account_name "$account_alias" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)
           account_blocklist_str+="  - \"${account_number}\" # ${account_alias}"
           account_blocklist_str+=$'\n'
-          done <<< "$(jq -c -r '.[]' <<< $NUKE_BLOCKLIST_ACCOUNTS)" # Taking this approach as piping (|) to a read opens a subshell and passes the variables to it by value
+          done <<< "$(jq -c -r '.blocklist[]' <<< $NUKE_ACCOUNT_BLOCKLIST)" # Taking this approach as piping (|) to a read opens a subshell and passes the variables to it by value
           # Encoding and passing blocklist string as an output
           echo "account_blocklist_str=$(echo -n "${account_blocklist_str}" | base64 -w 0)" >> $GITHUB_OUTPUT
 
@@ -64,17 +81,25 @@ jobs:
       id-token: write # This is required for requesting the JWT
       contents: read # This is required for actions/checkout
     runs-on: ubuntu-latest
-    needs: setup-prerequisites
+    needs: [setup-prerequisites, fetch-secrets]
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      
+      - name: Decrypt Secrets
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@3f9fb1af00462c69c806640652ddf41292963615 # v3.2.5
+        with:
+          environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
+          slack_webhook_url: ${{ needs.fetch-secrets.outputs.slack_webhook_url }}
+          PASSPHRASE: ${{ secrets.PASSPHRASE }}
+
       - name: Set Account Number
         run: |
           ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)
           echo "::add-mask::$ACCOUNT_NUMBER"
           echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
       - name: configure aws credentials
-        uses: aws-actions/configure-aws-credentials@b47578312673ae6fa5b5096b330d9fbac3d116df # v4.2.1
+        uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
         with:
           role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
           role-session-name: githubactionsrolesession
@@ -158,13 +183,13 @@ jobs:
             --no-dry-run
 
       - name: Slack failure notification
-        uses: slackapi/slack-github-action@b0fa283ad8fea605de13dc3f449259339835fc52 # v2.1.0
+        uses: slackapi/slack-github-action@91efab103c0de0a537f72a35f6b8cda0ee76bf0a # v2.1.1
         with:
           webhook-type: incoming-webhook
           payload: |
             {"blocks":[{"type": "section","text": {"type": "mrkdwn","text": ":no_entry: Failed GitHub Action:"}},{"type": "section","fields":[{"type": "mrkdwn","text": "*Workflow:*\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|${{ github.workflow }}>"},{"type": "mrkdwn","text": "*Job:*\n${{ github.job }}"},{"type": "mrkdwn","text": "*Repo:*\n${{ github.repository }}"}]}]}
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_URL: ${{ env.SLACK_WEBHOOK_URL }}
         if: ${{ failure() }}
     env:
       ACCOUNT_NAME: ${{ matrix.nuke_accts }}
@@ -175,11 +200,30 @@ jobs:
     name: Sandbox Nuke (testing-test)
     permissions:
       contents: read # This is required for actions/checkout
+    env:
+      ACCOUNT_NAME: "testing-test"
     runs-on: ubuntu-latest
-    needs: setup-prerequisites
+    needs: [setup-prerequisites, fetch-secrets]
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      - name: Decrypt Secrets
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@3f9fb1af00462c69c806640652ddf41292963615 # v3.2.5
+        with:
+          environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
+          slack_webhook_url: ${{ needs.fetch-secrets.outputs.slack_webhook_url }}
+          testing_ci_iam_user_keys: ${{ needs.fetch-secrets.outputs.testing_ci_iam_user_keys }}
+          PASSPHRASE: ${{ secrets.PASSPHRASE }}
+      
+      - name: Export Testing_CI credentials from JSON
+        run: |
+          echo "${TESTING_CI_IAM_USER_KEYS}" > keys.json
+          echo "::add-mask::$(jq -r '.AWS_ACCESS_KEY_ID' keys.json)"
+          echo "::add-mask::$(jq -r '.AWS_SECRET_ACCESS_KEY' keys.json)"
+          echo "AWS_ACCESS_KEY_ID=$(jq -r '.AWS_ACCESS_KEY_ID' keys.json)" >> $GITHUB_ENV
+          echo "AWS_SECRET_ACCESS_KEY=$(jq -r '.AWS_SECRET_ACCESS_KEY' keys.json)" >> $GITHUB_ENV
+
       - name: Set Account Number
         run: |
           ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)
@@ -263,15 +307,11 @@ jobs:
             --no-dry-run
 
       - name: Slack failure notification
-        uses: slackapi/slack-github-action@b0fa283ad8fea605de13dc3f449259339835fc52 # v2.1.0
+        uses: slackapi/slack-github-action@91efab103c0de0a537f72a35f6b8cda0ee76bf0a # v2.1.1
         with:
           webhook-type: incoming-webhook
           payload: |
             {"blocks":[{"type": "section","text": {"type": "mrkdwn","text": ":no_entry: Failed GitHub Action:"}},{"type": "section","fields":[{"type": "mrkdwn","text": "*Workflow:*\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|${{ github.workflow }}>"},{"type": "mrkdwn","text": "*Job:*\n${{ github.job }}"},{"type": "mrkdwn","text": "*Repo:*\n${{ github.repository }}"}]}]}
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_URL: ${{ env.SLACK_WEBHOOK_URL }}
         if: ${{ failure() }}
-    env:
-      AWS_ACCESS_KEY_ID: ${{ secrets.TESTING_AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.TESTING_AWS_SECRET_ACCESS_KEY }}
-      ACCOUNT_NAME: "testing-test"

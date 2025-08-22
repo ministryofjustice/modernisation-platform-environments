@@ -1,4 +1,6 @@
-
+locals {
+  list_of_target_group_arns = merge(module.external_alb.target_group_arns, module.internal_alb.target_group_arns)
+}
 
 #tfsec:ignore:AVD-AWS-0130
 module "ecs" {
@@ -18,10 +20,10 @@ module "ecs" {
 
   #ECS details
   cluster_name                = "yjaf-cluster"
-  ec2_instance_type           = "m5.xlarge"
-  ec2_min_size                = 11
-  ec2_max_size                = 11
-  ec2_desired_capacity        = 11
+  ec2_instance_type           = "c6a.4xlarge"
+  ec2_min_size                = 8
+  ec2_max_size                = 8
+  ec2_desired_capacity        = 8
   disable_overnight_scheduler = local.application_data.accounts[local.environment].disable_overnight_ecs_scheduler                                  #todo shared from old yjaf, replace with output of ami builder
   nameserver                  = join(".", [split(".", data.aws_vpc.shared.cidr_block)[0], split(".", data.aws_vpc.shared.cidr_block)[1], "0", "2"]) #eg "10.23.0.2"
 
@@ -67,6 +69,8 @@ module "ecs" {
   ecs_role_additional_policies_arns = [
     aws_iam_policy.s3-access.arn
   ]
+
+  list_of_target_group_arns = local.list_of_target_group_arns
 
   depends_on = [module.internal_alb, module.external_alb, module.aurora, module.redshift]
 }

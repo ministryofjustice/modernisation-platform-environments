@@ -24,14 +24,14 @@ locals {
   }
 
   azure_fixngo_cidr = {
-    noms_live_vnet            = "10.40.0.0/18"
-    noms_mgmt_live_vnet       = "10.40.128.0/20"
-    noms_transit_live_vnet    = "10.40.160.0/20"
-    noms_test_vnet            = "10.101.0.0/16"
-    noms_mgmt_vnet            = "10.102.0.0/16"
+    noms_live_vnet         = "10.40.0.0/18"
+    noms_mgmt_live_vnet    = "10.40.128.0/20"
+    noms_transit_live_vnet = "10.40.160.0/20"
+    noms_test_vnet         = "10.101.0.0/16"
+    noms_mgmt_vnet         = "10.102.0.0/16"
 
-    noms_transit_live_fw_devtest    = "52.142.189.87/32"
-    noms_transit_live_fw_prod       = "52.142.189.118/32"
+    noms_transit_live_fw_devtest = "52.142.189.87/32"
+    noms_transit_live_fw_prod    = "52.142.189.118/32"
 
     noms_prod_domain_controller_PCMCW0011 = "10.40.128.196/32"
     noms_prod_domain_controller_PCMCW0012 = "10.40.0.133/32"

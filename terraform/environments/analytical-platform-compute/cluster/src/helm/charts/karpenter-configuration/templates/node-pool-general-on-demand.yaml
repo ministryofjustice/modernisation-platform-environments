@@ -1,0 +1,38 @@
+---
+apiVersion: karpenter.sh/v1
+kind: NodePool
+metadata:
+  name: general-on-demand
+spec:
+  disruption:
+    consolidationPolicy: WhenEmpty
+    consolidateAfter: 5m
+  template:
+    metadata:
+      labels:
+        compute.analytical-platform.service.justice.gov.uk/karpenter-node-pool: "general-on-demand"
+    spec:
+      nodeClassRef:
+        group: karpenter.k8s.aws
+        kind: EC2NodeClass
+        name: bottlerocket-general
+      taints:
+        - key: compute.analytical-platform.service.justice.gov.uk/karpenter-node-pool
+          value: "general-on-demand"
+          effect: NoSchedule
+      requirements:
+        - key: kubernetes.io/arch
+          operator: In
+          values: ["amd64"]
+        - key: kubernetes.io/os
+          operator: In
+          values: ["linux"]
+        - key: karpenter.sh/capacity-type
+          operator: In
+          values: ["on-demand"]
+        - key: karpenter.k8s.aws/instance-category
+          operator: In
+          values: ["c", "m", "r"]
+        - key: karpenter.k8s.aws/instance-generation
+          operator: Gt
+          values: ["4"]

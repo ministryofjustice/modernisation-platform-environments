@@ -90,11 +90,6 @@ variable "services" {
       module_key  = "siac"
       port        = 49115
     },
-    "sscs_venue_pages" = {
-      name_prefix = "sscs"
-      module_key  = "sscs"
-      port        = 49116
-    },
     "tax_chancery_decisions" = {
       name_prefix = "taxandchancery_ut"
       module_key  = "taxchancerydecisions"
@@ -226,11 +221,6 @@ variable "sftp_services" {
       name_prefix = "siac"
       module_key  = "siac"
       sftp_port   = 10027
-    },
-    "sscs_venue_pages" = {
-      name_prefix = "sscsvenues"
-      module_key  = "sscs_venue_pages"
-      sftp_port   = 10028
     },
     "tax_chancery_decisions" = {
       name_prefix = "taxchancerydecisions"

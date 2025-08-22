@@ -62,7 +62,8 @@ resource "aws_secretsmanager_secret_version" "LDAP_administration_version" {
     "password" = "changeme" } #checkov:skip=CKV_SECRET_6: Ignore this
   )
   lifecycle {
-    ignore_changes = [secret_string]
+    prevent_destroy = true
+    ignore_changes  = [secret_string]
   }
 }
 
@@ -72,14 +73,6 @@ resource "aws_secretsmanager_secret" "LDAP_DC_secret" {
   description = "DC connection string for LDAP"
   kms_key_id  = module.kms.key_id
   tags        = local.tags
-}
-
-resource "aws_secretsmanager_secret_version" "LDAP_DC_version" {
-  secret_id     = aws_secretsmanager_secret.LDAP_DC_secret.id
-  secret_string = "dummy"
-  lifecycle {
-    ignore_changes = [secret_string]
-  }
 }
 
 resource "aws_secretsmanager_secret" "Auth_Email_Account" {

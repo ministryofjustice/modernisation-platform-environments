@@ -68,6 +68,13 @@ locals {
     web = {
       description = "Security group for Windows Web Servers"
       ingress = {
+        all-from-self = {
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
+        }
         http_web = {
           description     = "80: Allow HTTP ingress from LB"
           from_port       = 80
@@ -88,11 +95,12 @@ locals {
     app = {
       description = "Security group for Windows App Servers"
       ingress = {
-        all-from-web = {
-          description     = "Allow all ingress from web"
+        all-from-self = {
+          description     = "Allow all ingress to self"
           from_port       = 0
           to_port         = 0
           protocol        = -1
+          self            = true
           security_groups = ["web"]
         }
         web_access_cafm_5504 = {
@@ -119,31 +127,16 @@ locals {
         }
       }
     }
-    domain = {
-      description = "Common Windows security group for fixngo domain(s) access from Jumpservers and Azure DCs"
-    }
-    remotedesktop_sessionhost = {
-      description = "Security group required for AWS remote desktop solution"
-    }
-    jumpserver = {
-      description = "New security group for jump-servers"
-    }
     database = {
       description = "Security group for WINDOWS SQL database servers"
       ingress = {
-        all-from-app = {
-          description     = "Allow all ingress from app"
+        all-from-self = {
+          description     = "Allow all ingress to self"
           from_port       = 0
           to_port         = 0
           protocol        = -1
-          security_groups = ["app"]
-        }
-        all-from-web = {
-          description     = "Allow all ingress from web"
-          from_port       = 0
-          to_port         = 0
-          protocol        = -1
-          security_groups = ["web"]
+          self            = true
+          security_groups = ["web", "app"]
         }
         http_enduser_db = {
           description = "80: HTTP ingress for end-users"

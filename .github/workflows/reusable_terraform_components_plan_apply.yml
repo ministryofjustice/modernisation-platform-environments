@@ -55,7 +55,7 @@
       group: ${{ inputs.application }}-${{ inputs.environment }}-${{ inputs.component }}
     jobs:
       fetch-secrets:
-        uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@c46848c0f17b1550dcf8ecffa0cdad8f0fc858ef # v3.2.3
+        uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@3f9fb1af00462c69c806640652ddf41292963615 # v3.2.5
         secrets:
           MODERNISATION_PLATFORM_ACCOUNT_NUMBER: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
           PASSPHRASE: ${{ secrets.PASSPHRASE }}
@@ -77,9 +77,9 @@
               echo "component=${{ inputs.component }}"
 
           - name: Checkout Repository
-            uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b  # v4.1.4
+            uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8  # v5.0.0
           - name: Decrypt Secrets
-            uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@c46848c0f17b1550dcf8ecffa0cdad8f0fc858ef # v3.2.3
+            uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@3f9fb1af00462c69c806640652ddf41292963615 # v3.2.5
             with:
               environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
               github_ci_user_environments_repo_pat: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}
@@ -101,7 +101,7 @@
               echo "BACKEND_NUMBER=${BACKEND_NUMBER}" >> $GITHUB_ENV
 
           - name: Configure AWS Credentials
-            uses: aws-actions/configure-aws-credentials@b47578312673ae6fa5b5096b330d9fbac3d116df  # v4.2.1
+            uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a  # v4.3.1
             with:
               role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
               role-session-name: githubactionsrolesession
@@ -279,13 +279,13 @@
         needs: [plan, fetch-secrets]
         if: inputs.action == 'plan_apply' && needs.plan.outputs.plan_exitcode == '2'
         runs-on: ubuntu-latest
-        environment: "${{ inputs.application }}-${{ inputs.environment }}"
+        environment: ${{ inputs.component != 'root' && format('{0}-{1}-{2}', inputs.application, inputs.environment, inputs.component) || format('{0}-{1}', inputs.application, inputs.environment) }}
         steps:
           - name: Checkout Repository
-            uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b  # v4.1.4
+            uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8  # v5.0.0
           
           - name: Decrypt Secrets
-            uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@c46848c0f17b1550dcf8ecffa0cdad8f0fc858ef # v3.2.3
+            uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@3f9fb1af00462c69c806640652ddf41292963615 # v3.2.5
             with:
               environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
               PASSPHRASE: ${{ secrets.PASSPHRASE }}
@@ -303,7 +303,7 @@
               echo "BACKEND_NUMBER=${BACKEND_NUMBER}" >> $GITHUB_ENV
 
           - name: Configure AWS Credentials
-            uses: aws-actions/configure-aws-credentials@b47578312673ae6fa5b5096b330d9fbac3d116df  # v4.2.1
+            uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a  # v4.3.1
             with:
               role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
               role-session-name: githubactionsrolesession

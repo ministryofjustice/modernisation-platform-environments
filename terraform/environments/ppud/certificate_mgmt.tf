@@ -1,35 +1,31 @@
-##############################################################################
-# Lambda Function and Eventbridge Rules for Certificate Approaching Expiration
-##############################################################################
+###############################################################################
+# Lambda Functions and Eventbridge Rules for Certificate Approaching Expiration
+###############################################################################
+
+#########################
+# Development Environment
+#########################
 
 # Lambda Function to check for Certificate Expiration - DEV
-
-resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_certificates_expiry_dev" {
-  count         = local.is-development == true ? 1 : 0
-  statement_id  = "AllowExecutionFromCloudWatch"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.terraform_lambda_func_certificate_expiry_dev[0].function_name
-  principal     = "lambda.alarms.cloudwatch.amazonaws.com"
-  source_arn    = "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:alarm:*"
-}
 
 resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_dev" {
   # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
   # checkov:skip=CKV_AWS_173: "PPUD Lambda environmental variables do not contain sensitive information"
+  # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing not required"
   count                          = local.is-development == true ? 1 : 0
-  filename                       = "${path.module}/lambda_scripts/certificate_expiry_dev.zip"
+  s3_bucket                      = "moj-infrastructure-dev"
+  s3_key                         = "lambda/functions/certificate_expiry_dev.zip"
   function_name                  = "certificate_expiry_dev"
-  role                           = aws_iam_role.lambda_role_certificate_expiry_dev[0].arn
+  role                           = aws_iam_role.lambda_role_get_certificate_dev[0].arn
   handler                        = "certificate_expiry_dev.lambda_handler"
   runtime                        = "python3.13"
   timeout                        = 30
   reserved_concurrent_executions = 5
-  code_signing_config_arn        = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:code-signing-config:csc-0c7136ccff2de748f"
-  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_certificate_expiry_to_lambda_role_certificate_expiry_dev]
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policies_get_certificate_dev]
   environment {
     variables = {
-      EXPIRY_DAYS   = "45",
-      SNS_TOPIC_ARN = "arn:aws:sns:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:ec2_cloudwatch_alarms"
+      EXPIRY_DAYS   = "30",
+      SNS_TOPIC_ARN = "arn:aws:sns:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:ppud-dev-cw-alerts"
     }
   }
   dead_letter_config {
@@ -40,13 +36,21 @@ resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_dev" {
   }
 }
 
-# Archive the zip file - DEV
+resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_certificates_expiry_dev" {
+  count         = local.is-development == true ? 1 : 0
+  statement_id  = "AllowExecutionFromCloudWatch"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.terraform_lambda_func_certificate_expiry_dev[0].function_name
+  principal     = "lambda.alarms.cloudwatch.amazonaws.com"
+  source_arn    = "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:alarm:*"
+}
 
-data "archive_file" "zip_the_certificate_expiry_dev" {
-  count       = local.is-development == true ? 1 : 0
-  type        = "zip"
-  source_dir  = "${path.module}/lambda_scripts/"
-  output_path = "${path.module}/lambda_scripts/certificate_expiry_dev.zip"
+resource "aws_cloudwatch_log_group" "lambda_certificate_expiry_dev_log_group" {
+  # checkov:skip=CKV_AWS_338: "Log group is only required for 30 days."
+  # checkov:skip=CKV_AWS_158: "Log group does not require KMS encryption."
+  count             = local.is-development == true ? 1 : 0
+  name              = "/aws/lambda/certificate_expiry_dev"
+  retention_in_days = 30
 }
 
 # Eventbridge Rule for Certificate Expiration - DEV
@@ -79,34 +83,29 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_certificate_approaching_ex
   source_arn    = aws_cloudwatch_event_rule.certificate_approaching_expiration_dev[0].arn
 }
 
+###########################
+# Preproduction Environment
+###########################
 
 # Lambda Function to check for Certificate Expiration - UAT
-
-resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_certificates_expiry_uat" {
-  count         = local.is-preproduction == true ? 1 : 0
-  statement_id  = "AllowExecutionFromCloudWatch"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.terraform_lambda_func_certificate_expiry_uat[0].function_name
-  principal     = "lambda.alarms.cloudwatch.amazonaws.com"
-  source_arn    = "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:alarm:*"
-}
 
 resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_uat" {
   # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
   # checkov:skip=CKV_AWS_173: "PPUD Lambda environmental variables do not contain sensitive information"
+  # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing not required"
   count                          = local.is-preproduction == true ? 1 : 0
-  filename                       = "${path.module}/lambda_scripts/certificate_expiry_uat.zip"
+  s3_bucket                      = "moj-infrastructure-uat"
+  s3_key                         = "lambda/functions/certificate_expiry_uat.zip"
   function_name                  = "certificate_expiry_uat"
-  role                           = aws_iam_role.lambda_role_certificate_expiry_uat[0].arn
+  role                           = aws_iam_role.lambda_role_get_certificate_uat[0].arn
   handler                        = "certificate_expiry_uat.lambda_handler"
   runtime                        = "python3.13"
   timeout                        = 30
   reserved_concurrent_executions = 5
-  code_signing_config_arn        = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:code-signing-config:csc-0db408c5170a8eba6"
-  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_certificate_expiry_to_lambda_role_certificate_expiry_uat]
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policies_get_certificate_uat]
   environment {
     variables = {
-      EXPIRY_DAYS   = "45",
+      EXPIRY_DAYS   = "30",
       SNS_TOPIC_ARN = "arn:aws:sns:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:ppud-uat-cw-alerts"
     }
   }
@@ -118,13 +117,21 @@ resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_uat" {
   }
 }
 
-# Archive the zip file - UAT
+resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_certificates_expiry_uat" {
+  count         = local.is-preproduction == true ? 1 : 0
+  statement_id  = "AllowExecutionFromCloudWatch"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.terraform_lambda_func_certificate_expiry_uat[0].function_name
+  principal     = "lambda.alarms.cloudwatch.amazonaws.com"
+  source_arn    = "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:alarm:*"
+}
 
-data "archive_file" "zip_the_certificate_expiry_uat" {
-  count       = local.is-preproduction == true ? 1 : 0
-  type        = "zip"
-  source_dir  = "${path.module}/lambda_scripts/"
-  output_path = "${path.module}/lambda_scripts/certificate_expiry_uat.zip"
+resource "aws_cloudwatch_log_group" "lambda_certificate_expiry_uat_log_group" {
+  # checkov:skip=CKV_AWS_338: "Log group is only required for 30 days."
+  # checkov:skip=CKV_AWS_158: "Log group does not require KMS encryption."
+  count             = local.is-preproduction == true ? 1 : 0
+  name              = "/aws/lambda/certificate_expiry_uat"
+  retention_in_days = 30
 }
 
 # Eventbridge Rule for Certificate Expiration - UAT
@@ -157,34 +164,29 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_certificate_approaching_ex
   source_arn    = aws_cloudwatch_event_rule.certificate_approaching_expiration_uat[0].arn
 }
 
+########################
+# Production Environment
+########################
 
 # Lambda Function to check for Certificate Expiration - PROD
-
-resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_certificates_expiry_prod" {
-  count         = local.is-production == true ? 1 : 0
-  statement_id  = "AllowExecutionFromCloudWatch"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.terraform_lambda_func_certificate_expiry_prod[0].function_name
-  principal     = "lambda.alarms.cloudwatch.amazonaws.com"
-  source_arn    = "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:alarm:*"
-}
 
 resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_prod" {
   # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
   # checkov:skip=CKV_AWS_173: "PPUD Lambda environmental variables do not contain sensitive information"
+  # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing not required"
   count                          = local.is-production == true ? 1 : 0
-  filename                       = "${path.module}/lambda_scripts/certificate_expiry_prod.zip"
+  s3_bucket                      = "moj-infrastructure"
+  s3_key                         = "lambda/functions/certificate_expiry_prod.zip"
   function_name                  = "certificate_expiry_prod"
-  role                           = aws_iam_role.lambda_role_certificate_expiry_prod[0].arn
+  role                           = aws_iam_role.lambda_role_get_certificate_prod[0].arn
   handler                        = "certificate_expiry_prod.lambda_handler"
   runtime                        = "python3.13"
   timeout                        = 30
   reserved_concurrent_executions = 5
-  code_signing_config_arn        = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:code-signing-config:csc-0bafee04a642a41c1"
-  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_certificate_expiry_to_lambda_role_certificate_expiry_prod]
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policies_get_certificate_prod]
   environment {
     variables = {
-      EXPIRY_DAYS   = "45",
+      EXPIRY_DAYS   = "30",
       SNS_TOPIC_ARN = "arn:aws:sns:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:ppud-prod-cw-alerts"
     }
   }
@@ -196,13 +198,21 @@ resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_prod" {
   }
 }
 
-# Archive the zip file - PROD
+resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_certificates_expiry_prod" {
+  count         = local.is-production == true ? 1 : 0
+  statement_id  = "AllowExecutionFromCloudWatch"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.terraform_lambda_func_certificate_expiry_prod[0].function_name
+  principal     = "lambda.alarms.cloudwatch.amazonaws.com"
+  source_arn    = "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:alarm:*"
+}
 
-data "archive_file" "zip_the_certificate_expiry_prod" {
-  count       = local.is-production == true ? 1 : 0
-  type        = "zip"
-  source_dir  = "${path.module}/lambda_scripts/"
-  output_path = "${path.module}/lambda_scripts/certificate_expiry_prod.zip"
+resource "aws_cloudwatch_log_group" "lambda_certificate_expiry_prod_log_group" {
+  # checkov:skip=CKV_AWS_338: "Log group is only required for 30 days."
+  # checkov:skip=CKV_AWS_158: "Log group does not require KMS encryption."
+  count             = local.is-production == true ? 1 : 0
+  name              = "/aws/lambda/certificate_expiry_prod"
+  retention_in_days = 30
 }
 
 # Eventbridge Rule for Certificate Expiration - PROD

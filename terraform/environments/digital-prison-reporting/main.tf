@@ -652,16 +652,6 @@ module "s3_landing_bucket" {
   custom_kms_key            = local.s3_kms_arn
   create_notification_queue = false # For SQS Queue
   enable_lifecycle          = true
-  enable_notification       = true
-
-  dependency_lambda = [module.landing_zone_antivirus_check_lambda.lambda_function] # Required if bucket_notifications is enabled
-
-  bucket_notifications = {
-    lambda_function_arn = module.landing_zone_antivirus_check_lambda.lambda_function_arn,
-    events              = ["s3:ObjectCreated:*"],
-    filter_prefix       = null,
-    filter_suffix       = null
-  }
 
   tags = merge(
     local.all_tags,
@@ -1133,7 +1123,7 @@ module "generate_test_postgres_data" {
   enable_continuous_log_filter = false
   project_id                   = local.project
   aws_kms_key                  = local.s3_kms_arn
-  connections                  = ["dpr-dps-testing2-connection"]
+  connections                  = ["${local.project}-dps-test-db-connection"]
 
   execution_class             = "STANDARD"
   worker_type                 = "G.1X"
@@ -1153,15 +1143,15 @@ module "generate_test_postgres_data" {
   )
 
   arguments = {
-    "--extra-jars"                             = "s3://dpr-artifact-store-development/build-artifacts/dev-sandbox/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-vLatest-all.jar"
+    "--extra-jars"                             = local.glue_jobs_latest_jar_location
     "--extra-files"                            = local.shared_log4j_properties_path
     "--class"                                  = "uk.gov.justice.digital.job.generator.PostgresLoadGeneratorJob"
     "--dpr.aws.region"                         = local.account_region
     "--dpr.log.level"                          = local.glue_job_common_log_level
-    "--dpr.test.database.secret.id"            = "external/dpr-dps-testing2-source-secrets"
-    "--dpr.test.data.batch.size"               = 1000
+    "--dpr.test.database.secret.id"            = "external/dpr-dps-test-db-source-secrets"
+    "--dpr.test.data.batch.size"               = 5
     "--dpr.test.data.parallelism"              = 100
-    "--dpr.test.data.inter.batch.delay.millis" = 20
+    "--dpr.test.data.inter.batch.delay.millis" = 2000
   }
 }
 

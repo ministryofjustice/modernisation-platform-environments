@@ -235,6 +235,14 @@ locals {
       })
 
       pd-oasys-db-a = merge(local.ec2_instances.db19c, {
+        cloudwatch_metric_alarms = merge(local.ec2_instances.db19c.cloudwatch_metric_alarms, {
+          cpu-iowait-high = merge(module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux["cpu-iowait-high"], {
+            evaluation_periods  = "15"
+            datapoints_to_alarm = "15"
+            threshold           = "50"
+            alarm_description   = "Triggers if the amount of CPU time spent waiting for I/O to complete is continually high for 15 minutes. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4325900634"
+          })
+        })
         config = merge(local.ec2_instances.db19c.config, {
           availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.ec2_instances.db19c.config.instance_profile_policies, [
@@ -262,9 +270,14 @@ locals {
       })
 
       pd-oasys-db-b = merge(local.ec2_instances.db19c, {
-        cloudwatch_metric_alarms = merge(
-          local.cloudwatch_metric_alarms.db,
-        )
+        cloudwatch_metric_alarms = merge(local.cloudwatch_metric_alarms.db, {
+          cpu-iowait-high = merge(module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux["cpu-iowait-high"], {
+            evaluation_periods  = "15"
+            datapoints_to_alarm = "15"
+            threshold           = "50"
+            alarm_description   = "Triggers if the amount of CPU time spent waiting for I/O to complete is continually high for 15 minutes. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4325900634"
+          })
+        })
         config = merge(local.ec2_instances.db19c.config, {
           availability_zone = "eu-west-2b"
           instance_profile_policies = concat(local.ec2_instances.db19c.config.instance_profile_policies, [
@@ -831,6 +844,13 @@ locals {
 
       # for azure, remove when migrated to aws db
       "/oracle/database/OASPROD" = local.secretsmanager_secrets.db_oasys
+    }
+
+    # OASys is not supported out of hours.
+    schedule_alarms_lambda = {
+      alarm_patterns = [
+        "*-cpu-iowait-high", # disable iowait alarm as planned out-of-hours work may trigger it
+      ]
     }
   }
 

@@ -111,12 +111,10 @@ resource "aws_s3_bucket_policy" "PPUD" {
         Effect = "Allow"
         Principal = {
           AWS = [
-            "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/developer",
-            "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/sandbox",
-            "arn:aws:iam::${local.environment_management.account_ids["ppud-preproduction"]}:role/developer",
-            "arn:aws:iam::${local.environment_management.account_ids["ppud-preproduction"]}:role/migration",
-            "arn:aws:iam::${local.environment_management.account_ids["ppud-production"]}:role/developer",
-            "arn:aws:iam::${local.environment_management.account_ids["ppud-production"]}:role/migration"
+            # "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/developer",
+            # "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/sandbox",
+            # "arn:aws:iam::${local.environment_management.account_ids["ppud-preproduction"]}:role/developer",
+            "arn:aws:iam::${local.environment_management.account_ids["ppud-production"]}:role/developer"
           ]
         }
         Action = [
@@ -250,14 +248,6 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-infrastructure" {
     abort_incomplete_multipart_upload {
       days_after_initiation = 7
     }
-    noncurrent_version_transition {
-      noncurrent_days = 183
-      storage_class   = "STANDARD_IA"
-    }
-    transition {
-      days          = 183
-      storage_class = "STANDARD_IA"
-    }
   }
 }
 
@@ -299,9 +289,9 @@ resource "aws_s3_bucket_policy" "moj-infrastructure" {
         ],
         "Principal" : {
           "AWS" : [
-            "arn:aws:iam::${local.environment_management.account_ids["ppud-production"]}:role/ec2-iam-role",
-            "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/ec2-iam-role",
-            "arn:aws:iam::${local.environment_management.account_ids["ppud-preproduction"]}:role/ec2-iam-role"
+            # "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/ec2-iam-role",     # Cross account access disabled, only turned on when required
+            # "arn:aws:iam::${local.environment_management.account_ids["ppud-preproduction"]}:role/ec2-iam-role",   # Cross account access disabled, only turned on when required
+            "arn:aws:iam::${local.environment_management.account_ids["ppud-production"]}:role/ec2-iam-role"
           ]
         }
       },
@@ -1191,8 +1181,165 @@ resource "aws_s3_bucket_policy" "moj-log-files-uat" {
   })
 }
 
+# S3 Bucket for Database Replication to Data Engineering for Preproduction
 
-# S3 Bucket for Report Replication to MPC Service for Preproduction
+resource "aws_s3_bucket" "moj-database-source-uat" {
+  # checkov:skip=CKV_AWS_145: "S3 bucket is not public facing, does not contain any sensitive information and does not need encryption"
+  # checkov:skip=CKV_AWS_62: "S3 bucket event notification is not required"
+  # checkov:skip=CKV2_AWS_62: "S3 bucket event notification is not required"
+  # checkov:skip=CKV_AWS_144: "PPUD has a UK Sovereignty requirement so cross region replication is prohibited"
+  count  = local.is-preproduction == true ? 1 : 0
+  bucket = "moj-database-source-uat"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-moj-database-source-uat"
+    }
+  )
+}
+
+resource "aws_s3_bucket_versioning" "moj-database-source-uat" {
+  count  = local.is-preproduction == true ? 1 : 0
+  bucket = aws_s3_bucket.moj-database-source-uat[0].id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_logging" "moj-database-source-uat" {
+  count         = local.is-preproduction == true ? 1 : 0
+  bucket        = aws_s3_bucket.moj-database-source-uat[0].id
+  target_bucket = aws_s3_bucket.moj-log-files-uat[0].id
+  target_prefix = "s3-logs/moj-database-source-uat-logs/"
+}
+
+resource "aws_s3_bucket_public_access_block" "moj-database-source-uat" {
+  count                   = local.is-preproduction == true ? 1 : 0
+  bucket                  = aws_s3_bucket.moj-database-source-uat[0].id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "moj-database-source-uat" {
+  # checkov:skip=CKV_AWS_300: "S3 bucket has a set period for aborting failed uploads, this is a false positive finding"
+  count  = local.is-preproduction == true ? 1 : 0
+  bucket = aws_s3_bucket.moj-database-source-uat[0].id
+  rule {
+    id     = "delete-moj-database-source-uat"
+    status = "Enabled"
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 3
+    }
+    expiration {
+      days = 6
+    }
+  }
+}
+
+resource "aws_s3_bucket_replication_configuration" "moj-database-source-uat-replication" {
+  count = local.is-preproduction == true ? 1 : 0
+  # Must have bucket versioning enabled first
+  depends_on = [aws_s3_bucket_versioning.moj-database-source-uat]
+  role       = aws_iam_role.iam_role_s3_bucket_moj_report_source_uat[0].arn # check config
+  bucket     = aws_s3_bucket.moj-database-source-uat[0].id
+
+  rule {
+    id     = "ppud-database-replication-rule-uat"
+    status = "Enabled"
+    destination {
+      bucket        = "arn:aws:s3:::mojap-data-engineering-production-ppud-preprod"
+      storage_class = "STANDARD"
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "moj-database-source-uat" {
+  count  = local.is-preproduction == true ? 1 : 0
+  bucket = aws_s3_bucket.moj-database-source-uat[0].id
+
+  policy = jsonencode({
+
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Sid" : "RequireSSLRequests",
+        "Effect" : "Deny",
+        "Principal" : "*",
+        "Action" : "s3:*",
+        "Resource" : [
+          aws_s3_bucket.moj-database-source-uat[0].arn,
+          "${aws_s3_bucket.moj-database-source-uat[0].arn}/*"
+        ],
+        "Condition" : {
+          "Bool" : {
+            "aws:SecureTransport" : "false"
+          }
+        }
+      },
+      {
+        "Action" : [
+          "s3:PutBucketNotification",
+          "s3:GetBucketNotification",
+          "s3:GetBucketAcl",
+          "s3:DeleteObject",
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket"
+        ],
+        "Effect" : "Allow",
+        "Resource" : [
+          aws_s3_bucket.moj-database-source-uat[0].arn,
+          "${aws_s3_bucket.moj-database-source-uat[0].arn}/*"
+        ],
+        "Principal" : {
+          Service = "logging.s3.amazonaws.com"
+        }
+      },
+      {
+        "Action" : [
+          "s3:PutBucketNotification",
+          "s3:GetBucketNotification",
+          "s3:GetBucketAcl",
+          "s3:DeleteObject",
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket"
+        ],
+        "Effect" : "Allow",
+        "Resource" : [
+          aws_s3_bucket.moj-database-source-uat[0].arn,
+          "${aws_s3_bucket.moj-database-source-uat[0].arn}/*"
+        ],
+        "Principal" : {
+          Service = "sns.amazonaws.com"
+        }
+      },
+      {
+        "Action" : [
+          "s3:GetBucketAcl",
+          "s3:DeleteObject",
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket"
+        ],
+        "Effect" : "Allow",
+        "Resource" : [
+          aws_s3_bucket.moj-database-source-uat[0].arn,
+          "${aws_s3_bucket.moj-database-source-uat[0].arn}/*"
+        ],
+        "Principal" : {
+          "AWS" : [
+            "arn:aws:iam::${local.environment_management.account_ids["ppud-preproduction"]}:role/ec2-iam-role"
+          ]
+        }
+      }
+    ]
+  })
+}
+
+# S3 Bucket for MPC Report Replication to Cloud Platform for Preproduction
 
 resource "aws_s3_bucket" "moj-report-source-uat" {
   # checkov:skip=CKV_AWS_145: "S3 bucket is not public facing, does not contain any sensitive information and does not need encryption"
@@ -1705,7 +1852,7 @@ resource "aws_s3_bucket_policy" "moj-lambda-layers-dev" {
   })
 }
 
-# S3 Bucket for Database Replication to Cloud Platform Team for Development
+# S3 Bucket for Database Replication to Data Engineering for Development
 
 resource "aws_s3_bucket" "moj-database-source-dev" {
   # checkov:skip=CKV_AWS_145: "S3 bucket is not public facing, does not contain any sensitive information and does not need encryption"
@@ -1840,7 +1987,6 @@ resource "aws_s3_bucket_policy" "moj-database-source-dev" {
           Service = "sns.amazonaws.com"
         }
       },
-
       {
         "Action" : [
           "s3:GetBucketAcl",
@@ -1864,7 +2010,7 @@ resource "aws_s3_bucket_policy" "moj-database-source-dev" {
   })
 }
 
-# S3 Bucket for Report Replication to MPC Service for Development
+# S3 Bucket for MPC Report Replication to Cloud Platform for Development
 
 resource "aws_s3_bucket" "moj-report-source-dev" {
   # checkov:skip=CKV_AWS_145: "S3 bucket is not public facing, does not contain any sensitive information and does not need encryption"
@@ -2017,6 +2163,288 @@ resource "aws_s3_bucket_policy" "moj-report-source-dev" {
           "AWS" : [
             "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/ec2-iam-role"
           ]
+        }
+      }
+    ]
+  })
+}
+
+# S3 Bucket for PPUD Infrastructure Development
+
+resource "aws_s3_bucket" "moj-infrastructure-dev" {
+  # checkov:skip=CKV_AWS_145: "S3 bucket is not public facing, does not contain any sensitive information and does not need encryption"
+  # checkov:skip=CKV_AWS_62: "S3 bucket event notification is not required"
+  # checkov:skip=CKV2_AWS_62: "S3 bucket event notification is not required"
+  # checkov:skip=CKV_AWS_144: "PPUD has a UK Sovereignty requirement so cross region replication is prohibited"
+  # checkov:skip=CKV_AWS_18: "S3 bucket logging is not required"
+  count  = local.is-development == true ? 1 : 0
+  bucket = "moj-infrastructure-dev"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-moj-infrastructure-dev"
+    }
+  )
+}
+
+resource "aws_s3_bucket_versioning" "moj-infrastructure-dev" {
+  count  = local.is-development == true ? 1 : 0
+  bucket = aws_s3_bucket.moj-infrastructure-dev[0].id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_logging" "moj-infrastructure-dev" {
+  count         = local.is-development == true ? 1 : 0
+  bucket        = aws_s3_bucket.moj-infrastructure-dev[0].id
+  target_bucket = aws_s3_bucket.moj-log-files-dev[0].id
+  target_prefix = "s3-logs/moj-infrastructure-dev-logs/"
+}
+
+resource "aws_s3_bucket_public_access_block" "moj-infrastructure-dev" {
+  count                   = local.is-development == true ? 1 : 0
+  bucket                  = aws_s3_bucket.moj-infrastructure-dev[0].id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "moj-infrastructure-dev" {
+  # checkov:skip=CKV_AWS_300: "S3 bucket has a set period for aborting failed uploads, this is a false positive finding"
+  count  = local.is-development == true ? 1 : 0
+  bucket = aws_s3_bucket.moj-infrastructure-dev[0].id
+  rule {
+    id     = "remove-old-moj-infrastructure-dev"
+    status = "Enabled"
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "moj-infrastructure-dev" {
+  count  = local.is-development == true ? 1 : 0
+  bucket = aws_s3_bucket.moj-infrastructure-dev[0].id
+
+  policy = jsonencode({
+
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Sid" : "RequireSSLRequests",
+        "Effect" : "Deny",
+        "Principal" : "*",
+        "Action" : "s3:*",
+        "Resource" : [
+          aws_s3_bucket.moj-infrastructure-dev[0].arn,
+          "${aws_s3_bucket.moj-infrastructure-dev[0].arn}/*"
+        ],
+        "Condition" : {
+          "Bool" : {
+            "aws:SecureTransport" : "false"
+          }
+        }
+      },
+      {
+        "Action" : [
+          "s3:GetBucketAcl",
+          "s3:DeleteObject",
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket"
+        ],
+        "Effect" : "Allow",
+        "Resource" : [
+          aws_s3_bucket.moj-infrastructure-dev[0].arn,
+          "${aws_s3_bucket.moj-infrastructure-dev[0].arn}/*"
+        ],
+        "Principal" : {
+          "AWS" : [
+            "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/ec2-iam-role",
+            # "arn:aws:iam::${local.environment_management.account_ids["ppud-preproduction"]}:role/ec2-iam-role", # Cross account access disabled, only turned on when required
+            # "arn:aws:iam::${local.environment_management.account_ids["ppud-production"]}:role/ec2-iam-role"     # Cross account access disabled, only turned on when required
+          ]
+        }
+      },
+      {
+        "Action" : [
+          "s3:PutBucketNotification",
+          "s3:GetBucketNotification",
+          "s3:GetBucketAcl",
+          "s3:DeleteObject",
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket"
+        ],
+        "Effect" : "Allow",
+        "Resource" : [
+          aws_s3_bucket.moj-infrastructure-dev[0].arn,
+          "${aws_s3_bucket.moj-infrastructure-dev[0].arn}/*"
+        ],
+        "Principal" : {
+          Service = "logging.s3.amazonaws.com"
+        }
+      },
+      {
+        "Action" : [
+          "s3:PutBucketNotification",
+          "s3:GetBucketNotification",
+          "s3:GetBucketAcl",
+          "s3:DeleteObject",
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket"
+        ],
+        "Effect" : "Allow",
+        "Resource" : [
+          aws_s3_bucket.moj-infrastructure-dev[0].arn,
+          "${aws_s3_bucket.moj-infrastructure-dev[0].arn}/*"
+        ],
+        "Principal" : {
+          Service = "sns.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+
+# S3 Bucket for PPUD Infrastructure Preproduction
+
+resource "aws_s3_bucket" "moj-infrastructure-uat" {
+  # checkov:skip=CKV_AWS_145: "S3 bucket is not public facing, does not contain any sensitive information and does not need encryption"
+  # checkov:skip=CKV_AWS_62: "S3 bucket event notification is not required"
+  # checkov:skip=CKV2_AWS_62: "S3 bucket event notification is not required"
+  # checkov:skip=CKV_AWS_144: "PPUD has a UK Sovereignty requirement so cross region replication is prohibited"
+  # checkov:skip=CKV_AWS_18: "S3 bucket logging is not required"
+  count  = local.is-preproduction == true ? 1 : 0
+  bucket = "moj-infrastructure-uat"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-moj-infrastructure-uat"
+    }
+  )
+}
+
+resource "aws_s3_bucket_versioning" "moj-infrastructure-uat" {
+  count  = local.is-preproduction == true ? 1 : 0
+  bucket = aws_s3_bucket.moj-infrastructure-uat[0].id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_logging" "moj-infrastructure-uat" {
+  count         = local.is-preproduction == true ? 1 : 0
+  bucket        = aws_s3_bucket.moj-infrastructure-uat[0].id
+  target_bucket = aws_s3_bucket.moj-log-files-uat[0].id
+  target_prefix = "s3-logs/moj-infrastructure-uat-logs/"
+}
+
+resource "aws_s3_bucket_public_access_block" "moj-infrastructure-uat" {
+  count                   = local.is-preproduction == true ? 1 : 0
+  bucket                  = aws_s3_bucket.moj-infrastructure-uat[0].id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "moj-infrastructure-uat" {
+  # checkov:skip=CKV_AWS_300: "S3 bucket has a set period for aborting failed uploads, this is a false positive finding"
+  count  = local.is-preproduction == true ? 1 : 0
+  bucket = aws_s3_bucket.moj-infrastructure-uat[0].id
+  rule {
+    id     = "remove-old-moj-infrastructure-uat"
+    status = "Enabled"
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "moj-infrastructure-uat" {
+  count  = local.is-preproduction == true ? 1 : 0
+  bucket = aws_s3_bucket.moj-infrastructure-uat[0].id
+
+  policy = jsonencode({
+
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Sid" : "RequireSSLRequests",
+        "Effect" : "Deny",
+        "Principal" : "*",
+        "Action" : "s3:*",
+        "Resource" : [
+          aws_s3_bucket.moj-infrastructure-uat[0].arn,
+          "${aws_s3_bucket.moj-infrastructure-uat[0].arn}/*"
+        ],
+        "Condition" : {
+          "Bool" : {
+            "aws:SecureTransport" : "false"
+          }
+        }
+      },
+      {
+        "Action" : [
+          "s3:GetBucketAcl",
+          "s3:DeleteObject",
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket"
+        ],
+        "Effect" : "Allow",
+        "Resource" : [
+          aws_s3_bucket.moj-infrastructure-uat[0].arn,
+          "${aws_s3_bucket.moj-infrastructure-uat[0].arn}/*"
+        ],
+        "Principal" : {
+          "AWS" : [
+            # "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/ec2-iam-role",    # Cross account access disabled, only turned on when required
+            "arn:aws:iam::${local.environment_management.account_ids["ppud-preproduction"]}:role/ec2-iam-role",
+            # "arn:aws:iam::${local.environment_management.account_ids["ppud-production"]}:role/ec2-iam-role"      # Cross account access disabled, only turned on when required
+          ]
+        }
+      },
+      {
+        "Action" : [
+          "s3:PutBucketNotification",
+          "s3:GetBucketNotification",
+          "s3:GetBucketAcl",
+          "s3:DeleteObject",
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket"
+        ],
+        "Effect" : "Allow",
+        "Resource" : [
+          aws_s3_bucket.moj-infrastructure-uat[0].arn,
+          "${aws_s3_bucket.moj-infrastructure-uat[0].arn}/*"
+        ],
+        "Principal" : {
+          Service = "logging.s3.amazonaws.com"
+        }
+      },
+      {
+        "Action" : [
+          "s3:PutBucketNotification",
+          "s3:GetBucketNotification",
+          "s3:GetBucketAcl",
+          "s3:DeleteObject",
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket"
+        ],
+        "Effect" : "Allow",
+        "Resource" : [
+          aws_s3_bucket.moj-infrastructure-uat[0].arn,
+          "${aws_s3_bucket.moj-infrastructure-uat[0].arn}/*"
+        ],
+        "Principal" : {
+          Service = "sns.amazonaws.com"
         }
       }
     ]

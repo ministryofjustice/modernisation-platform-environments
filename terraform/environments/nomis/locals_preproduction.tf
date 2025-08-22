@@ -7,6 +7,7 @@ locals {
 
   baseline_presets_preproduction = {
     options = {
+      enable_xsiam_s3_integration = true
       route53_resolver_rules = {
         outbound-data-and-private-subnets = ["azure-fixngo-domain", "infra-int-domain"]
       }
@@ -106,8 +107,8 @@ locals {
       # NOT-ACTIVE (green deployment) - for testing Combined Reporting
       preprod-nomis-web-b = merge(local.ec2_autoscaling_groups.web, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.web.autoscaling_group, {
-          desired_capacity = 1
-          max_size         = 1
+          desired_capacity = 0
+          max_size         = 0
 
           initial_lifecycle_hooks = {
             "ready-hook" = {
@@ -401,6 +402,13 @@ locals {
 
     lbs = {
       private = merge(local.lbs.private, {
+
+        s3_notification_queues = {
+          "cortex-xsiam-s3-alb-log-collection" = {
+            events    = ["s3:ObjectCreated:*"]
+            queue_arn = "cortex-xsiam-s3-alb-log-collection"
+          }
+        }
 
         listeners = merge(local.lbs.private.listeners, {
           https = merge(local.lbs.private.listeners.https, {

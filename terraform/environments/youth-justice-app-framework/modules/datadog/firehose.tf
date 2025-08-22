@@ -126,6 +126,11 @@ resource "aws_cloudwatch_log_group" "firehose_log_group" {
   kms_key_id        = aws_kms_key.firehose_backup.arn
 }
 
+resource "aws_cloudwatch_log_stream" "firehose_log_stream" {
+  name           = "firehose-datadog-http"
+  log_group_name = aws_cloudwatch_log_group.firehose_log_group.name
+}
+
 resource "aws_cloudwatch_log_subscription_filter" "cloudtrail" {
   name            = "firehose-subscription"
   log_group_name  = "cloudtrail"
@@ -207,15 +212,10 @@ resource "aws_iam_policy" "firehose_policy" {
           "logs:DescribeLogStreams",
           "logs:GetLogEvents"
         ],
-        Resource = aws_cloudwatch_log_group.firehose_log_group.arn
-      },
-      {
-        Sid    = "cloudWatchLog",
-        Effect = "Allow",
-        Action = [
-          "logs:PutLogEvents"
-        ],
-        Resource = aws_cloudwatch_log_group.firehose_log_group.arn
+        Resource = [
+          aws_cloudwatch_log_group.firehose_log_group.arn,
+          aws_cloudwatch_log_stream.firehose_log_stream.arn
+        ]
       },
       {
         Sid    = "CreateLogResources",
@@ -352,8 +352,9 @@ resource "aws_sns_topic_subscription" "datadog_securityhub-alarms" {
   subscription_role_arn = aws_iam_role.awsconfig_sns_to_datadog.arn
 }
 
-resource "aws_sns_topic_subscription" "datadog_sechub_findings" {
-  topic_arn             = "arn:aws:sns:eu-west-2:${var.aws_account_id}:sechub_findings_sns_topic"
+
+resource "aws_sns_topic_subscription" "datadog_high-priority-alarms-topic" {
+  topic_arn             = "arn:aws:sns:eu-west-2:${var.aws_account_id}:high-priority-alarms-topic"
   protocol              = "firehose"
   endpoint              = aws_kinesis_firehose_delivery_stream.to_datadog.arn
   subscription_role_arn = aws_iam_role.awsconfig_sns_to_datadog.arn

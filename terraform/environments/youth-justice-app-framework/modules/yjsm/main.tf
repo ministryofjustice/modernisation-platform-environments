@@ -23,9 +23,10 @@ resource "aws_ssm_parameter" "private_key" {
 data "template_file" "userdata" {
   template = file("${path.module}/ec2-userdata.tftpl")
   vars = {
-    env     = var.environment
-    tags    = jsonencode(local.all_tags)
-    project = var.project_name
+    env         = var.environment
+    environment = var.environment
+    tags        = jsonencode(local.all_tags)
+    project     = var.project_name
   }
 }
 

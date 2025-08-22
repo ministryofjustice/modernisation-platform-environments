@@ -84,13 +84,6 @@ locals {
       }
     },
     {
-      name     = "AWSManagedRulesWindowsRuleSet"
-      priority = 9
-      managed_rule_group_statement = {
-        name = "AWSManagedRulesWindowsRuleSet"
-      }
-    },
-    {
       name     = "AWSManagedRulesKnownBadInputsRuleSet"
       priority = 10
       managed_rule_group_statement = {

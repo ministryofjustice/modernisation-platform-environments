@@ -53,6 +53,7 @@ variable "ecs_services" {
       start_period = 60
     })
     desired_count                          = optional(number, 2)
+    autoscaling_min_capacity               = optional(number, 2)
     autoscaling_max_capacity               = optional(number, 4)
     health_check_grace_period_seconds      = optional(number, 360)
     stop_timeout                           = optional(number, 30)
@@ -309,4 +310,10 @@ variable "ecs_role_additional_policies_arns" {
 variable "secret_kms_key_arn" {
   description = "The ARN of the KMS key to use for secrets"
   type        = string
+}
+
+variable "list_of_target_group_arns" {
+  description = "A list of target group ARNs to use for the ECS services. The key must match the name of the ecs service to be picked up"
+  type        = map(string)
+  default     = {}
 }

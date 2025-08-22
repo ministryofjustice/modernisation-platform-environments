@@ -1,0 +1,56 @@
+{
+  "rules": [
+    {
+      "rule-type": "selection",
+      "rule-id": "10",
+      "rule-name": "select_business_interactions",
+      "object-locator": {
+        "schema-name": "DELIUS_APP_SCHEMA",
+        "table-name": "BUSINESS_INTERACTION"
+      },
+      "rule-action": "include"
+    },
+    {
+      "rule-type": "transformation",
+      "rule-id": "12",
+      "rule-name": "rename_to_staging_schema",
+      "rule-target": "schema",
+      "object-locator": {
+        "schema-name": "DELIUS_APP_SCHEMA"
+      },
+      "rule-action": "rename",
+      "value": "DELIUS_AUDIT_DMS_POOL",
+      "old-value": null
+    },
+    {
+      "rule-type": "transformation",
+      "rule-id": "13",
+      "rule-name": "rename_to_staging_table",
+      "rule-target": "table",
+      "object-locator": {
+        "schema-name": "DELIUS_APP_SCHEMA",
+        "table-name": "BUSINESS_INTERACTION"
+      },
+      "rule-action": "rename",
+      "value": "STAGE_BUSINESS_INTERACTION",
+      "old-value": null
+    },
+    {
+      "rule-type": "transformation",
+      "rule-id": "14",
+      "rule-name": "stage_business_interaction_pk",
+      "rule-target": "table",
+      "object-locator": {
+        "schema-name": "DELIUS_AUDIT_DMS_POOL",
+        "table-name": "STAGE_BUSINESS_INTERACTION"
+      },
+      "rule-action": "define-primary-key",
+      "value": null,
+      "old-value": null,
+      "primary-key-def": {
+        "name": "PK_STAGE_BUSINESS_INTERACTION",
+        "columns": ["CLIENT_DB", "BUSINESS_INTERACTION_ID"]
+      }
+    }
+  ]
+}

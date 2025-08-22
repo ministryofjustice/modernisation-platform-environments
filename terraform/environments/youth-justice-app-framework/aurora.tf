@@ -1,4 +1,14 @@
+data "aws_secretsmanager_secret_version" "snapshot_identifier" {
+  count     = aws_secretsmanager_secret.snapshot_identifier.arn != "" ? 1 : 0
+  secret_id = aws_secretsmanager_secret.snapshot_identifier.id
+}
 
+locals {
+  live_snapshot = try(
+    data.aws_secretsmanager_secret_version.snapshot_identifier[0].secret_string,
+    "dummy"
+  )
+}
 
 module "aurora" {
   source       = "./modules/aurora"
@@ -17,7 +27,7 @@ module "aurora" {
   alb_route53_record_name    = "db-yjafrds01"
 
   #one time restore from a shared snapshot #todo remove this post migration. Take from secrets manager
-  snapshot_identifier = aws_secretsmanager_secret_version.snapshot_identifier.secret_string != "dummy" ? aws_secretsmanager_secret_version.snapshot_identifier.secret_string : local.application_data.accounts[local.environment].snapshot_identifier
+  snapshot_identifier = local.live_snapshot != "dummy" ? local.live_snapshot : local.application_data.accounts[local.environment].snapshot_identifier
 
   user_passwords_to_reset_rotated = ["postgres_rotated", "redshift_readonly"]
   user_passwords_to_reset_static  = ["ycs_team", "postgres"] # Need to be static as they are used in Tableau data sources.
@@ -26,7 +36,7 @@ module "aurora" {
   aws_account_id = data.aws_caller_identity.current.account_id
 
   engine          = "aurora-postgresql"
-  engine_version  = "16.6"
+  engine_version  = local.application_data.accounts[local.environment].rds_engine_version
   master_username = "root"
 
   create_sheduler              = local.application_data.accounts[local.environment].create_rds_sheduler

@@ -188,7 +188,7 @@ locals {
         mount_targets = [{
           subnet_name        = "private"
           availability_zones = ["eu-west-2a", "eu-west-2b", "eu-west-2c"]
-          security_groups    = ["boe", "bip-app"]
+          security_groups    = ["efs"]
         }]
         tags = {
           backup      = "false"
@@ -216,10 +216,9 @@ locals {
         ]
 
         self_managed_active_directory = {
-          dns_ips = [
-            module.ip_addresses.azure_fixngo_ip.PCMCW0011,
-            module.ip_addresses.azure_fixngo_ip.PCMCW0012,
-          ]
+          dns_ips = flatten([
+            module.ip_addresses.mp_ips.ad_fixngo_hmpp_domain_controllers,
+          ])
           domain_name                      = "azure.hmpp.root"
           username                         = "svc_fsx_windows"
           password_secret_name             = "/sap/bods/pd/passwords"

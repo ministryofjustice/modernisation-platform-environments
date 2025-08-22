@@ -82,3 +82,18 @@ variable "management_server_sg_id" {
   description = "The ID of the management server security group"
   type        = string
 }
+
+variable "region" {
+  description = "The AWS region"
+  type        = string
+}
+
+variable "account_id" {
+  description = "The AWS account ID"
+  type        = string
+}
+
+variable "cluster_name" {
+  description = "The name of the ECS cluster"
+  type        = string
+}

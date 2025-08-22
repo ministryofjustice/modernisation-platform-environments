@@ -31,6 +31,7 @@ module "environment_prod" {
   ldap_config        = local.ldap_config_prod
   db_config          = local.db_config_prod
   create_backup_role = true
+  create_ecs_lambda  = true
 
   delius_microservice_configs = local.delius_microservices_configs_prod
 
