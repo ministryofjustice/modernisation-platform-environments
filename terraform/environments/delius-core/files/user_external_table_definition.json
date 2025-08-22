@@ -133,7 +133,7 @@
           "ColumnName": "SYSTEM_USER",
           "ColumnType": "INT8",
           "ColumnNullable": "false"
-        }        
+        }
       ],
       "TableColumnsTotal": "23"
     },

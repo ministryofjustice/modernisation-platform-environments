@@ -36,13 +36,13 @@ resource "aws_security_group_rule" "cwa_extract_egress_https_sm" {
 }
 
 resource "aws_security_group_rule" "cwa_extract_egress_https_s3" {
-  type                     = "egress"
-  from_port                = 443
-  to_port                  = 443
-  protocol                 = "tcp"
-  prefix_list_ids          = [local.application_data.accounts[local.environment].s3_vpc_endpoint_prefix]
-  security_group_id        = aws_security_group.cwa_extract_new.id
-  description              = "Outbound 443 to LAA VPC Endpoint SG"
+  type              = "egress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  prefix_list_ids   = [local.application_data.accounts[local.environment].s3_vpc_endpoint_prefix]
+  security_group_id = aws_security_group.cwa_extract_new.id
+  description       = "Outbound 443 to LAA VPC Endpoint SG"
 }
 
 resource "aws_security_group_rule" "cwa_extract_egress_efs" {
@@ -85,7 +85,7 @@ resource "aws_security_group_rule" "cwa_extract_egress_efs" {
 #     security_group_ids = [aws_security_group.cwa_extract_new.id]
 #     subnet_ids         = [data.aws_subnet.data_subnets_a.id]
 #   }
-  
+
 
 #   environment {
 #     variables = {
@@ -128,7 +128,7 @@ resource "aws_lambda_function" "cwa_extract_lambda" {
     security_group_ids = [aws_security_group.cwa_extract_new.id]
     subnet_ids         = [data.aws_subnet.data_subnets_a.id]
   }
-  
+
   environment {
     variables = {
       PROCEDURES_CONFIG = aws_secretsmanager_secret.cwa_procedures_config.name
@@ -211,7 +211,7 @@ resource "aws_lambda_function" "cwa_sns_lambda" {
 
   environment {
     variables = {
-      PROVIDER_TOPIC = aws_sns_topic.priority_p1.arn
+      PROVIDER_TOPIC       = aws_sns_topic.priority_p1.arn
       PROVIDER_BANKS_TOPIC = aws_sns_topic.provider_banks.arn
       SERVICE_NAME      = "cwa-sns-service"
       NAMESPACE         = "CWASNSNotificationService"

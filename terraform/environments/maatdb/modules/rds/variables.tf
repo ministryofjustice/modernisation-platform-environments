@@ -166,7 +166,7 @@ variable "mlra_ecs_cluster_sec_group_id" {
 
 variable "hub20_sec_group_id" {
   type        = string
-  description = "ID of the HUB 2.0 security group allowed to access the RDS" 
+  description = "ID of the HUB 2.0 security group allowed to access the RDS"
 }
 
 variable "bastion_security_group_id" {

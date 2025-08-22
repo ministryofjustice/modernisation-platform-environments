@@ -15,11 +15,11 @@ resource "aws_iam_policy" "coat_gh_actions_policy" {
   name = "GitHubActionsPolicy"
   policy = templatefile("${path.module}/templates/coat-gh-actions-policy.json",
     {
-      environment = local.environment
-      account = data.aws_caller_identity.current.account_id
-      region = data.aws_region.current.name
+      environment      = local.environment
+      account          = data.aws_caller_identity.current.account_id
+      region           = data.aws_region.current.name
       athena_workgroup = local.athena_workgroup
-      data_catalog = local.data_catalog
+      data_catalog     = local.data_catalog
     }
   )
 }
