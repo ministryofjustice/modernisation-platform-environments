@@ -108,13 +108,7 @@ resource "aws_s3_bucket_notification" "landing" {
 # This can be passed in from outside the module
 # but in that case it is assumed all related aws_s3_bucket_* resources are being managed externally
 
-#trivy:ignore:AVD-AWS-0086:Public ACLs block not required
-#trivy:ignore:AVD-AWS-0087:Public ACLs block not required
-#trivy:ignore:AVD-AWS-0088:Bucket encryption not required
 #trivy:ignore:AVD-AWS-0089: No logging required
-#trivy:ignore:AVD-AWS-0091:Public ACLs block not required
-#trivy:ignore:AVD-AWS-0093:Public ACLs block not required
-#trivy:ignore:AVD-AWS-0132:Bucket encryption with CMK not required
 resource "aws_s3_bucket" "raw_history" {
   #checkov:skip=CKV2_AWS_6:False positive, Public access block attached via data.raw_history instead of resource
   #checkov:skip=CKV_AWS_18:Logging not needed
