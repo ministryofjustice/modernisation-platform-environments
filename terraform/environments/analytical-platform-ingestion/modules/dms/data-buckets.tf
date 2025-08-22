@@ -107,19 +107,20 @@ resource "aws_s3_bucket_notification" "landing" {
 # Bucket to store validated data
 # This can be passed in from outside the module
 # but in that case it is assumed all related aws_s3_bucket_* resources are being managed externally
+
+#trivy:ignore:AVD-AWS-0086:Public ACLs block not required
+#trivy:ignore:AVD-AWS-0087:Public ACLs block not required
+#trivy:ignore:AVD-AWS-0088:Bucket encryption not required
 #trivy:ignore:AVD-AWS-0089: No logging required
+#trivy:ignore:AVD-AWS-0091:Public ACLs block not required
+#trivy:ignore:AVD-AWS-0093:Public ACLs block not required
+#trivy:ignore:AVD-AWS-0132:Bucket encryption with CMK not required
 resource "aws_s3_bucket" "raw_history" {
   #checkov:skip=CKV2_AWS_6:False positive, Public access block attached via data.raw_history instead of resource
   #checkov:skip=CKV_AWS_18:Logging not needed
   #checkov:skip=CKV_AWS_21:Versioning not needed
   #checkov:skip=CKV2_AWS_61:Lifecycle configuration not needed
   #checkov:skip=CKV2_AWS_62:Versioning,event notifications,logging not needed
-  #checkov:skip=AVD_AWS_0086:Public ACLs block not required
-  #checkov:skip=AVD_AWS_0087:Public ACLs block not required
-  #checkov:skip=AVD_AWS_0088:Bucket encryption not required
-  #checkov:skip=AVD_AWS_0091:Public ACLs block not required
-  #checkov:skip=AVD_AWS_0093:Public ACLs block not required
-  #checkov:skip=AVD_AWS_0132:Bucket encryption with CMK not required
   #checkov:skip=CKV_AWS_144:Cross-region replication not required
   #checkov:skip=CKV_AWS_145:False positive, KMS envryption attached via data.raw_history instead of resource
   count         = length(var.output_bucket) > 0 ? 0 : 1
