@@ -107,7 +107,6 @@ resource "aws_s3_bucket_notification" "landing" {
 # Bucket to store validated data
 # This can be passed in from outside the module
 # but in that case it is assumed all related aws_s3_bucket_* resources are being managed externally
-
 #trivy:ignore:AVD-AWS-0089: No logging required
 resource "aws_s3_bucket" "raw_history" {
   #checkov:skip=CKV2_AWS_6:False positive, Public access block attached via data.raw_history instead of resource
