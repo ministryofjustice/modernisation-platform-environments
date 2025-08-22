@@ -41,7 +41,7 @@ resource "aws_security_group_rule" "maat_provider_load_egress_https_sm" {
 
 resource "aws_lambda_function" "maat_provider_load" {
 
-  description      = "Connect to MAAT DB"
+  description      = "Connects to MAAT DB and invokes the Load procedure to load the provider data."
   function_name    = "maat_provider_load_function"
   role             = aws_iam_role.maat_provider_load_role.arn
   handler          = "lambda_function.lambda_handler"

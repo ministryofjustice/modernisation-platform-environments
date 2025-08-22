@@ -41,7 +41,7 @@ resource "aws_security_group_rule" "cclf_provider_load_egress_https_sm" {
 
 resource "aws_lambda_function" "cclf_provider_load" {
 
-  description      = "Connect to CCLF DB"
+  description      = "Connects to CCLF DB and invokes the Load procedure to load the provider data."
   function_name    = "cclf_provider_load_function"
   role             = aws_iam_role.cclf_provider_load_role.arn
   handler          = "lambda_function.lambda_handler"

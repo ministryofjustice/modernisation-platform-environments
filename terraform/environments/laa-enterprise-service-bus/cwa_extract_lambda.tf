@@ -109,7 +109,7 @@ resource "aws_security_group_rule" "cwa_extract_egress_efs" {
 ######################################
 resource "aws_lambda_function" "cwa_extract_lambda" {
 
-  description      = "Connect to CWA DB, extracts data into JSON files, uploads them to S3 and creates SNS message and SQS entries with S3 references"
+  description      = "Connect to CWA DB and invoke cwa extract procedure."
   function_name    = "cwa_extract_lambda"
   role             = aws_iam_role.cwa_extract_lambda_role.arn
   handler          = "lambda_function.lambda_handler"
@@ -148,7 +148,7 @@ resource "aws_lambda_function" "cwa_extract_lambda" {
 
 resource "aws_lambda_function" "cwa_file_transfer_lambda" {
 
-  description      = "Connect to CWA DB, extracts data into JSON files, uploads them to S3 and creates SNS message and SQS entries with S3 references"
+  description      = "Connect to CWA DB, retrieve multiple json files of each extract and merge into single JSON file, uploads them to S3"
   function_name    = "cwa_file_transfer_lambda"
   role             = aws_iam_role.cwa_extract_lambda_role.arn
   handler          = "lambda_function.lambda_handler"
@@ -188,7 +188,7 @@ resource "aws_lambda_function" "cwa_file_transfer_lambda" {
 
 resource "aws_lambda_function" "cwa_sns_lambda" {
 
-  description      = "Connect to CWA DB, extracts data into JSON files, uploads them to S3 and creates SNS message and SQS entries with S3 references"
+  description      = "Send SNS message with timestamp for downstream provider load services to extract files"
   function_name    = "cwa_sns_lambda"
   role             = aws_iam_role.cwa_extract_lambda_role.arn
   handler          = "lambda_function.lambda_handler"
