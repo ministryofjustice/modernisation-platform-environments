@@ -6,8 +6,8 @@
       "Effect": "Allow",
       "Action": ["s3:PutObject", "s3:PutObjectAcl", "s3:GetObject"],
       "Resource": [
-      "arn:aws:s3:::coat-reports-${environment}/*",
-      "arn:aws:s3:::coat-${environment}-cur-v2-hourly/*"
+        "arn:aws:s3:::coat-reports-${environment}/*",
+        "arn:aws:s3:::coat-${environment}-cur-v2-hourly/*"
       ]
     },
     {
@@ -15,8 +15,8 @@
       "Effect": "Allow",
       "Action": ["s3:ListBucket", "s3:GetBucketLocation"],
       "Resource": [
-      "arn:aws:s3:::coat-reports-${environment}",
-      "arn:aws:s3:::coat-${environment}-cur-v2-hourly"
+        "arn:aws:s3:::coat-reports-${environment}",
+        "arn:aws:s3:::coat-${environment}-cur-v2-hourly"
       ]
     },
     {
@@ -33,14 +33,14 @@
       "Resource": [
         "arn:aws:athena:${region}:${account}:workgroup/${athena_workgroup}",
         "arn:aws:athena:${region}:${account}:datacatalog/${data_catalog}"
-        ]
+      ]
     },
     {
       "Sid": "ListAthenaWorkGroups",
       "Effect": "Allow",
       "Action": "athena:ListWorkGroups",
       "Resource": "*"
-    }, 
+    },
     {
       "Sid": "GlueCatalogAccess",
       "Effect": "Allow",

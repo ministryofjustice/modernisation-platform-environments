@@ -10,9 +10,9 @@ locals {
     id               = data.aws_caller_identity.current.account_id
   }
   account_config = {
-    shared_vpc_cidr               = data.aws_vpc.shared.cidr_block
-    private_subnet_ids            = data.aws_subnets.shared-private.ids
-    public_subnet_ids             = data.aws_subnets.shared-public.ids
+    shared_vpc_cidr    = data.aws_vpc.shared.cidr_block
+    private_subnet_ids = data.aws_subnets.shared-private.ids
+    public_subnet_ids  = data.aws_subnets.shared-public.ids
     #    ordered_private_subnet_ids    = local.ordered_subnet_ids
     #ordered_subnets               = [local.ordered_subnet_ids]
     data_subnet_ids               = data.aws_subnets.shared-data.ids
@@ -31,8 +31,8 @@ locals {
   }
 
   bastion_config = {}
-  image_tag = "initial-16447252449-1"
-  app_port  = 80
+  image_tag      = "initial-16447252449-1"
+  app_port       = 80
   internal_security_group_cidrs = distinct(flatten([
     module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public,
     module.ip_addresses.moj_cidrs.trusted_moj_enduser_internal,
@@ -62,16 +62,16 @@ locals {
     }
   }
 
-  domain             = local.is-production ? "vcms.probation.service.justice.gov.uk" : "modernisation-platform.service.justice.gov.uk"
-  domain_name_main   = [for k, v in local.domain_types : v.name if k == local.domain]
-  domain_record_main = [for k, v in local.domain_types : v.record if k == local.domain]
-  domain_type_main   = [for k, v in local.domain_types : v.type if k == local.domain]
-  domain_name_sub    = [for k, v in local.domain_types : v.name if k == local.app_url]
-  domain_record_sub  = [for k, v in local.domain_types : v.record if k == local.app_url]
-  domain_type_sub    = [for k, v in local.domain_types : v.type if k == local.app_url]
+  domain                  = local.is-production ? "vcms.probation.service.justice.gov.uk" : "modernisation-platform.service.justice.gov.uk"
+  domain_name_main        = [for k, v in local.domain_types : v.name if k == local.domain]
+  domain_record_main      = [for k, v in local.domain_types : v.record if k == local.domain]
+  domain_type_main        = [for k, v in local.domain_types : v.type if k == local.domain]
+  domain_name_sub         = [for k, v in local.domain_types : v.name if k == local.app_url]
+  domain_record_sub       = [for k, v in local.domain_types : v.record if k == local.app_url]
+  domain_type_sub         = [for k, v in local.domain_types : v.type if k == local.app_url]
   validation_record_fqdns = local.is-development ? [local.domain_name_main[0], local.domain_name_sub[0]] : [local.domain_name_main[0], local.domain_name_sub[0]]
 
-  app_url          = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.${local.domain}"
+  app_url                       = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.${local.domain}"
   acm_subject_alternative_names = [local.app_url]
 
 }
