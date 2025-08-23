@@ -153,7 +153,7 @@ resource "aws_route53_record" "services_nlb_r53_record" {
   count    = length(var.container_port_config) == 0 ? 0 : 1
   provider = aws.core-vpc
   zone_id  = var.account_config.route53_inner_zone.zone_id
-  name     = "${var.name}.service.${var.env_name}"
+  name     = coalesce(var.nlb_r53_record_name, "${var.name}.service.${var.env_name}")
   type     = "A"
   alias {
     evaluate_target_health = false

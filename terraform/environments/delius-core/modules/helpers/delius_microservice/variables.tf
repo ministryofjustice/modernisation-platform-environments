@@ -623,6 +623,12 @@ variable "nlb_egress_security_group_ids" {
   default = []
 }
 
+variable "nlb_r53_record_name" {
+  description = "Route 53 record name for NLB"
+  type        = string
+  default     = null
+}
+
 variable "system_controls" {
   description = "The system controls for the container"
   type        = list(any)

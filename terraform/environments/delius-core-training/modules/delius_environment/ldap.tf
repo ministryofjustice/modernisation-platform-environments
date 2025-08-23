@@ -16,8 +16,9 @@ module "ldap" {
   ldap_config        = var.ldap_config
 
 
-  platform_vars           = var.platform_vars
-  tags                    = local.tags
-  enable_platform_backups = var.enable_platform_backups
-  task_role_arn           = "arn:aws:iam::${var.account_info.id}:role/${var.env_name}-ldap-ecs-task"
+  platform_vars                    = var.platform_vars
+  tags                             = local.tags
+  enable_platform_backups          = var.enable_platform_backups
+  task_role_arn                    = "arn:aws:iam::${var.account_info.id}:role/${var.env_name}-ldap-ecs-task"
+  ldap_data_refresh_s3_bucket_name = "training-ldap-data-refresh-incoming"
 }

@@ -46,3 +46,9 @@ variable "task_role_arn" {
   description = "The ARN of the task role"
   type        = string
 }
+
+variable "ldap_data_refresh_s3_bucket_name" {
+  description = "Name of LDAP data refresh bucket"
+  type        = string
+  default     = null
+}
