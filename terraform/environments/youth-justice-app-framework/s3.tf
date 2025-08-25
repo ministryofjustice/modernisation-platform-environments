@@ -105,8 +105,27 @@ module "s3-sbom" {
   tags         = local.tags
   bucket_name  = ["application-sbom"]
 
-  add_log_policy = true
+  add_log_policy = false
 
+}
+
+# Bucket policy allowing Inspector to put objects
+resource "aws_s3_bucket_policy" "sbom" {
+  bucket     = module.s3-sbom.aws_s3_bucket_id["application-sbom"].id
+  policy     = <<EOF
+{
+  "Version":"2012-10-17",
+  "Statement":[
+    {
+      "Effect":"Allow",
+      "Principal":{"Service":"inspector2.amazonaws.com"},
+      "Action":"s3:PutObject",
+      "Resource":"${module.s3-sbom.aws_s3_bucket["application-sbom"].arn}/*"
+    }
+  ]
+}
+EOF
+  depends_on = [module.s3-sbom]
 }
 
 module "s3-certs" {
@@ -122,3 +141,5 @@ module "s3-certs" {
   add_log_policy = true
 
 }
+
+
