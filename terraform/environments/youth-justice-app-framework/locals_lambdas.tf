@@ -62,7 +62,7 @@ locals {
     handler           = "index.handler"
     iam_role_name     = "inspector-sbom-ec2-lambda-role"
     environment_variables = {
-      S3_BUCKET = module.s3-sbom.aws_s3_bucket["application-sbom"].aws_s3_bucket_id
+      S3_BUCKET = module.s3-sbom.aws_s3_bucket_id["application-sbom"].id
       KMS_KEY   = module.kms.key_arn
     }
   }
