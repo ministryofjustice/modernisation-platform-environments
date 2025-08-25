@@ -20,15 +20,16 @@ resource "aws_cloudwatch_event_rule" "daily_export" {
 resource "aws_cloudwatch_event_target" "sbom_target" {
   rule      = aws_cloudwatch_event_rule.daily_export.name
   target_id = "sbom-export"
-  arn       = module.inspector-sbom-ec2.arn
+  arn       = module.inspector-sbom-ec2.lambda_arn
   input     = jsonencode({})
 }
+
 resource "aws_lambda_permission" "allow_eventbridge" {
-  statement_id  = "AllowEventBridge"
+  statement_id  = "AllowExecutionFromEventBridge"
   action        = "lambda:InvokeFunction"
   function_name = module.inspector-sbom-ec2.function_name
-  principal     = "scheduler.amazonaws.com"
-  source_arn    = aws_eventbridge_schedule.daily_export.arn
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.daily_export.arn
 }
 
 ### todo moj probably have this covered
