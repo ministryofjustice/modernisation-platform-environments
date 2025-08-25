@@ -111,8 +111,8 @@ module "s3-sbom" {
 
 # Bucket policy allowing Inspector to put objects
 resource "aws_s3_bucket_policy" "sbom" {
-  bucket = module.s3-sbom.aws_s3_bucket_id["application-sbom"].id
-  policy = <<EOF
+  bucket     = module.s3-sbom.aws_s3_bucket_id["application-sbom"].id
+  policy     = <<EOF
 {
   "Version":"2012-10-17",
   "Statement":[
@@ -125,6 +125,7 @@ resource "aws_s3_bucket_policy" "sbom" {
   ]
 }
 EOF
+  depends_on = [module.s3-sbom]
 }
 
 module "s3-certs" {
