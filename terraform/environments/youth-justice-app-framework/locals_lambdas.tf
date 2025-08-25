@@ -62,7 +62,7 @@ locals {
     handler           = "index.handler"
     iam_role_name     = "inspector-sbom-ec2-lambda-role"
     environment_variables = {
-      S3_BUCKET = module.s3-sbom.bucket
+      S3_BUCKET = module.s3-sbom.aws_s3_bucket["application-sbom"].aws_s3_bucket_id
       KMS_KEY   = module.kms.key_arn
     }
   }
@@ -101,7 +101,7 @@ locals {
     trust_policy_path = "lambda_policies/lambda-role-trust.json"
     iam_policy_path   = "lambda_policies/inspector-sbom-ec2-role-policy.json"
     policy_template_vars = {
-      aws_s3_bucket_sbom_arn = aws_s3_bucket.sbom.arn
+      aws_s3_bucket_sbom_arn = module.s3-sbom.aws_s3_bucket["application-sbom"].arn
       aws_kms_key_sbom_arn   = module.kms.key_arn
     }
   }

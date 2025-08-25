@@ -11,27 +11,24 @@ module "inspector-sbom-ec2" {
 }
 
 #EventBridge Scheduler to regularly invoke Lambda
-resource "aws_eventbridge_schedule" "daily_export" {
+resource "aws_cloudwatch_event_rule" "daily_export" {
   name                = "sbom-daily-schedule"
   description         = "Trigger SBOM export daily"
-  schedule_expression = "rate(7 days)" # Modify as needed
-  flexible_time_window {
-    mode = "OFF"
-  }
+  schedule_expression = "rate(7 days)"
 }
 
+resource "aws_cloudwatch_event_target" "sbom_target" {
+  rule      = aws_cloudwatch_event_rule.daily_export.name
+  target_id = "sbom-export"
+  arn       = module.inspector-sbom-ec2.arn
+  input     = jsonencode({})
+}
 resource "aws_lambda_permission" "allow_eventbridge" {
   statement_id  = "AllowEventBridge"
   action        = "lambda:InvokeFunction"
   function_name = module.inspector-sbom-ec2.function_name
   principal     = "scheduler.amazonaws.com"
   source_arn    = aws_eventbridge_schedule.daily_export.arn
-}
-
-resource "aws_eventbridge_target" "sbom_target" {
-  rule  = aws_eventbridge_schedule.daily_export.name
-  arn   = module.inspector-sbom-ec2.arn
-  input = jsonencode({}) # Add payload with filters if needed
 }
 
 ### todo moj probably have this covered
