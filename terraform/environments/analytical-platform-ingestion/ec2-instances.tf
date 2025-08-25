@@ -2,7 +2,7 @@ module "datasync_instance" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/ec2-instance/aws"
-  version = "6.0.1"
+  version = "6.1.0"
 
   name = "${local.application_name}-${local.environment}-datasync"
   # ami                    = data.aws_ssm_parameter.datasync_ami.value
