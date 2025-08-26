@@ -36,13 +36,13 @@ resource "aws_security_group_rule" "cwa_extract_egress_https_sm" {
 }
 
 resource "aws_security_group_rule" "cwa_extract_egress_https_s3" {
-  type                     = "egress"
-  from_port                = 443
-  to_port                  = 443
-  protocol                 = "tcp"
-  prefix_list_ids          = [local.application_data.accounts[local.environment].s3_vpc_endpoint_prefix]
-  security_group_id        = aws_security_group.cwa_extract_new.id
-  description              = "Outbound 443 to LAA VPC Endpoint SG"
+  type              = "egress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  prefix_list_ids   = [local.application_data.accounts[local.environment].s3_vpc_endpoint_prefix]
+  security_group_id = aws_security_group.cwa_extract_new.id
+  description       = "Outbound 443 to LAA VPC Endpoint SG"
 }
 
 resource "aws_security_group_rule" "cwa_extract_egress_efs" {
@@ -85,7 +85,7 @@ resource "aws_security_group_rule" "cwa_extract_egress_efs" {
 #     security_group_ids = [aws_security_group.cwa_extract_new.id]
 #     subnet_ids         = [data.aws_subnet.data_subnets_a.id]
 #   }
-  
+
 
 #   environment {
 #     variables = {
@@ -109,7 +109,7 @@ resource "aws_security_group_rule" "cwa_extract_egress_efs" {
 ######################################
 resource "aws_lambda_function" "cwa_extract_lambda" {
 
-  description      = "Connect to CWA DB, extracts data into JSON files, uploads them to S3 and creates SNS message and SQS entries with S3 references"
+  description      = "Connect to CWA DB and invoke cwa extract procedure."
   function_name    = "cwa_extract_lambda"
   role             = aws_iam_role.cwa_extract_lambda_role.arn
   handler          = "lambda_function.lambda_handler"
@@ -128,15 +128,15 @@ resource "aws_lambda_function" "cwa_extract_lambda" {
     security_group_ids = [aws_security_group.cwa_extract_new.id]
     subnet_ids         = [data.aws_subnet.data_subnets_a.id]
   }
-  
+
   environment {
     variables = {
       PROCEDURES_CONFIG = aws_secretsmanager_secret.cwa_procedures_config.name
-      TARGET_BUCKET     = aws_s3_bucket.data.bucket
-      SNS_TOPIC         = aws_sns_topic.priority_p1.arn
       DB_SECRET_NAME    = aws_secretsmanager_secret.cwa_db_secret.name
       LD_LIBRARY_PATH   = "/opt/instantclient_12_2_linux"
       ORACLE_HOME       = "/opt/instantclient_12_2_linux"
+      SERVICE_NAME      = "cwa-extract-service"
+      NAMESPACE         = "CWAProviderExtractService"
     }
   }
 
@@ -148,7 +148,7 @@ resource "aws_lambda_function" "cwa_extract_lambda" {
 
 resource "aws_lambda_function" "cwa_file_transfer_lambda" {
 
-  description      = "Connect to CWA DB, extracts data into JSON files, uploads them to S3 and creates SNS message and SQS entries with S3 references"
+  description      = "Connect to CWA DB, retrieve multiple json files of each extract and merge into single JSON file, uploads them to S3"
   function_name    = "cwa_file_transfer_lambda"
   role             = aws_iam_role.cwa_extract_lambda_role.arn
   handler          = "lambda_function.lambda_handler"
@@ -175,6 +175,8 @@ resource "aws_lambda_function" "cwa_file_transfer_lambda" {
       DB_SECRET_NAME    = aws_secretsmanager_secret.cwa_db_secret.name
       LD_LIBRARY_PATH   = "/opt/instantclient_12_2_linux"
       ORACLE_HOME       = "/opt/instantclient_12_2_linux"
+      SERVICE_NAME      = "cwa-file-transfer-service"
+      NAMESPACE         = "CWAFileTransferService"
     }
   }
 
@@ -186,24 +188,36 @@ resource "aws_lambda_function" "cwa_file_transfer_lambda" {
 
 resource "aws_lambda_function" "cwa_sns_lambda" {
 
-  description      = "Connect to CWA DB, extracts data into JSON files, uploads them to S3 and creates SNS message and SQS entries with S3 references"
+  description      = "Send SNS message with timestamp for downstream provider load services to extract files"
   function_name    = "cwa_sns_lambda"
   role             = aws_iam_role.cwa_extract_lambda_role.arn
-  handler          = "hello.lambda_handler"
-  filename         = "lambda/hello_lambda/hello_lambda.zip"
-  source_code_hash = filebase64sha256("lambda/hello_lambda/hello_lambda.zip")
+  handler          = "lambda_function.lambda_handler"
+  filename         = "lambda/cwa_sns_lambda/cwa_sns_lambda.zip"
+  source_code_hash = filebase64sha256("lambda/cwa_sns_lambda/cwa_sns_lambda.zip")
   timeout          = 300
   memory_size      = 128
   runtime          = "python3.10"
+
+  layers = [
+    "arn:aws:lambda:eu-west-2:017000801446:layer:AWSLambdaPowertoolsPython:2"
+  ]
 
   vpc_config {
     security_group_ids = [aws_security_group.cwa_extract_new.id]
     subnet_ids         = [data.aws_subnet.data_subnets_a.id]
   }
-  
+
+  environment {
+    variables = {
+      PROVIDER_TOPIC       = aws_sns_topic.priority_p1.arn
+      PROVIDER_BANKS_TOPIC = aws_sns_topic.provider_banks.arn
+      SERVICE_NAME      = "cwa-sns-service"
+      NAMESPACE         = "CWASNSNotificationService"
+    }
+  }
 
   tags = merge(
     local.tags,
-    { Name = "${local.application_name_short}-${local.environment}-cwa-extract-sns-lambda" }
+    { Name = "${local.application_name_short}-${local.environment}-cwa--sns-lambda" }
   )
 }

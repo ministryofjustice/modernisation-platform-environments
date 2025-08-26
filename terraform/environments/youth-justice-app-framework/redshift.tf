@@ -1,8 +1,3 @@
-import {
-  id = local.application_data.accounts[local.environment].redshift_to_s3_rule_id
-  to = module.redshift.aws_vpc_security_group_egress_rule.redshift_to_s3
-}
-
 module "redshift" {
   source = "./modules/redshift"
 
@@ -18,6 +13,8 @@ module "redshift" {
   rds_redshift_secret_arns = [module.aurora.rds_redshift_secret_arn, module.aurora.rds_postgres_secret_arn]
 
   postgres_security_group_id = module.aurora.rds_cluster_security_group_id
+  management_server_sg_id    = module.ds.management_server_sg_id
+
 
   kms_key_arn = module.kms.key_arn
 

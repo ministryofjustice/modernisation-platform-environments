@@ -1,8 +1,8 @@
 #########################################
-# CoatGithubActionsReportsUpload
+# CoatGithubActionsRole
 #########################################
-resource "aws_iam_role" "coat_github_actions_report_upload" {
-  name = "CoatGithubActionsReportUpload"
+resource "aws_iam_role" "coat_github_actions_role" {
+  name = "CoatGithubActionsRole"
   assume_role_policy = templatefile("${path.module}/templates/coat-gh-actions-assume-role-policy.json",
     {
       gh_actions_oidc_provider     = "token.actions.githubusercontent.com"
@@ -12,16 +12,20 @@ resource "aws_iam_role" "coat_github_actions_report_upload" {
 }
 
 resource "aws_iam_policy" "coat_gh_actions_policy" {
-  name = "GitHubActionsUploadPolicy"
+  name = "GitHubActionsPolicy"
   policy = templatefile("${path.module}/templates/coat-gh-actions-policy.json",
     {
-      environment = local.environment
+      environment      = local.environment
+      account          = data.aws_caller_identity.current.account_id
+      region           = data.aws_region.current.name
+      athena_workgroup = local.athena_workgroup
+      data_catalog     = local.data_catalog
     }
   )
 }
 
-resource "aws_iam_role_policy_attachment" "coat_github_actions_report_upload_attachment" {
-  role       = aws_iam_role.coat_github_actions_report_upload.name
+resource "aws_iam_role_policy_attachment" "coat_github_actions_attachment" {
+  role       = aws_iam_role.coat_github_actions_role.name
   policy_arn = aws_iam_policy.coat_gh_actions_policy.arn
 }
 

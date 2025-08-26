@@ -1,10 +1,10 @@
 resource "aws_sfn_state_machine" "sfn_state_machine" {
-  name     = "my-state-machine"
+  name     = "cwa-step-function"
   role_arn = aws_iam_role.step_function_role.arn
 
   definition = jsonencode({
-    Comment      = "A description of my state machine",
-    StartAt      = "GetFiles",
+    Comment = "A description of my state machine",
+    StartAt = "GetFiles",
     States = {
       "GetFiles" = {
         Type     = "Task",
@@ -14,14 +14,14 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
           Payload      = {}
         },
         ResultPath = "$.GetFilesResult"
-        Next = "CheckGetFilesStatus"
+        Next       = "CheckGetFilesStatus"
       },
 
       "CheckGetFilesStatus" = {
-        Type    = "Choice"
+        Type = "Choice"
         Choices = [
           {
-            Variable      = "$.GetFilesResult.StatusCode"
+            Variable      = "$.GetFilesResult.Payload.statusCode"
             NumericEquals = 200
             Next          = "ProcessFiles"
           }
@@ -36,12 +36,12 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
       },
 
       "ProcessFiles" = {
-        Type          = "Map",
-        ItemsPath     = "$.GetFilesResult.Payload.files",
+        Type           = "Map",
+        ItemsPath      = "$.GetFilesResult.Payload.body.files",
         MaxConcurrency = 8,
         Parameters = {
           "filename.$"  = "$$.Map.Item.Value.filename",
-          "timestamp.$" = "$.GetFilesResult.Payload.timestamp"
+          "timestamp.$" = "$.GetFilesResult.Payload.body.timestamp"
         },
         Iterator = {
           StartAt = "ProcessSingleFile",
@@ -52,39 +52,49 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
               Parameters = {
                 FunctionName = aws_lambda_function.cwa_file_transfer_lambda.arn
                 Payload = {
-                    "filename.$" = "$.filename",
-                    "timestamp.$" = "$.timestamp"
-                }                
+                  "filename.$"  = "$.filename",
+                  "timestamp.$" = "$.timestamp"
+                }
               },
               ResultPath = "$.ProcessSingleFileResult"
-              Next = "CheckProcessFilesStatus"
+              Next       = "CheckProcessFilesStatus"
             },
 
             "CheckProcessFilesStatus" = {
-                Type    = "Choice"
-                Choices = [
+              Type = "Choice"
+              Choices = [
                 {
-                    Variable      = "$.ProcessSingleFileResult.StatusCode"
-                    NumericEquals = 200
-                    Next          = "NextFileOrEnd"
+                  Variable      = "$.ProcessSingleFileResult.Payload.statusCode"
+                  NumericEquals = 200
+                  Next          = "NextFileOrEnd"
                 }
-                ]
-                Default = "FailSingleFile"
+              ]
+              Default = "FailSingleFile"
             },
 
             "FailSingleFile" = {
-                Type  = "Fail"
-                Error = "LambdaError"
-                Cause = "File transfer failed"
+              Type  = "Fail"
+              Error = "LambdaError"
+              Cause = "File transfer failed"
             },
 
             "NextFileOrEnd" = {
-                Type = "Pass"
-                End  = true
+              Type = "Pass"
+              End  = true
             }
           }
         }
-        Next = "PublishToSNS"
+        ResultPath = "$.ProcessedFiles",
+        Next       = "WrapMapOutput"
+      },
+
+      "WrapMapOutput" = {
+        Type = "Pass",
+        Parameters = {
+          "results.$" = "$.ProcessedFiles"
+        },
+        ResultPath = "$.WrappedResults",
+        Next       = "PublishToSNS"
       },
 
       "PublishToSNS" = {
@@ -92,14 +102,33 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
         Resource = "arn:aws:states:::lambda:invoke",
         Parameters = {
           FunctionName = aws_lambda_function.cwa_sns_lambda.arn,
-          Payload      = "$"
+          Payload = {
+            "timestamp.$" = "$.WrappedResults.results[0].timestamp"
+          }
         },
-        Retry = [{
-          ErrorEquals     = ["Lambda.TooManyRequestsException"],
-          IntervalSeconds = 2,
-          MaxAttempts     = 2
-        }],
-        End = true
+        ResultPath = "$.PublishToSNSResult",
+        Next       = "CheckPublishToSNSStatus"
+      },
+      "CheckPublishToSNSStatus" = {
+        Type = "Choice",
+        Choices = [
+          {
+            Variable      = "$.PublishToSNSResult.Payload.statusCode",
+            NumericEquals = 200,
+            Next          = "SuccessState"
+          }
+        ],
+        Default = "FailSNS"
+      },
+
+      "FailSNS" = {
+        Type  = "Fail",
+        Error = "LambdaError",
+        Cause = "PublishToSNS returned non-200 status or failed"
+      },
+
+      "SuccessState" = {
+        Type = "Succeed"
       }
     }
   })
