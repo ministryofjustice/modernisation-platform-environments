@@ -8,6 +8,6 @@ module "xsiam" {
   environment       = local.environment
   aws_account_id    = data.aws_caller_identity.current.account_id
   depends_on        = [aws_cloudwatch_log_group.userjourney_log_group]
-  ds_log_group_name = module.directory-service.cloudwatch_log_group_name
+  ds_log_group_name = module.ds.cloudwatch_log_group_name
 
 }
