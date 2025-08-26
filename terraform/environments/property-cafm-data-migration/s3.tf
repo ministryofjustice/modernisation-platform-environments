@@ -289,9 +289,9 @@ locals {
   account_name = "cafm"
 
   buckets = {
-    logs     = { name = module.s3_bucket_logs.bucket_id,          arn = module.s3_bucket_logs.bucket_arn }
-    planetfm = { name = module.s3_planetfm_data_bucket.bucket_id, arn = module.s3_planetfm_data_bucket.bucket_arn }
-    concept  = { name = module.s3_concept_data_bucket.bucket_id,  arn = module.s3_concept_data_bucket.bucket_arn }
+    logs     = { name = module.s3_bucket_logs.bucket.id,          arn = module.s3_bucket_logs.bucket.arn }
+    planetfm = { name = module.s3_planetfm_data_bucket.bucket.id, arn = module.s3_planetfm_data_bucket.bucket.arn }
+    concept  = { name = module.s3_concept_data_bucket.bucket.id,  arn = module.s3_concept_data_bucket.bucket.arn }
   }
 
   ingestion_bucket_keys = ["planetfm", "concept"]
