@@ -173,7 +173,6 @@ data "template_file" "launch-template-managed" {
     server             = "managed"
     inbound_bucket     = local.application_data.accounts[local.environment].inbound_s3_bucket_name
     outbound_bucket    = local.application_data.accounts[local.environment].outbound_s3_bucket_name
-    admin_hostname     = aws_route53_record.admin.fqdn
     deploy_environment = local.environment
   }
 }
@@ -186,7 +185,7 @@ data "template_file" "launch-template-admin" {
     server             = "admin"
     inbound_bucket     = local.application_data.accounts[local.environment].inbound_s3_bucket_name
     outbound_bucket    = local.application_data.accounts[local.environment].outbound_s3_bucket_name
-    admin_hostname     = aws_route53_record.admin.fqdn
     deploy_environment = local.environment
   }
 }
+

@@ -99,6 +99,7 @@ reset_admin() {
   DOMAIN_HOME=$EFS_MOUNT_POINT/domains/soainfra
   CONFIG_LOCATION=$DOMAIN_HOME/config
 
+  yum install -y xmlstarlet
   cp -p $CONFIG_LOCATION/config.xml $CONFIG_LOCATION/config.xml.$(date '+%Y%m%d-%H%M').bak
   cp -p $CONFIG_LOCATION/config.xml $CONFIG_LOCATION/config.xml.none
 
@@ -117,39 +118,6 @@ reset_admin() {
   rm -rf $DOMAIN_HOME/servers/AdminServer/cache
   rm -rf $DOMAIN_HOME/servers/AdminServer/logs
   rm -rf $DOMAIN_HOME/servers/AdminServer/tmp
-}
-
-#--Configures config.xml web-server node. Configures Weblogicto listen 
-#--on HTTPS only (prevents https > http redirection loops). CC-3814
-ensure_https() {
-  DOMAIN_HOME=$EFS_MOUNT_POINT/domains/soainfra
-  CONFIG_LOCATION=$DOMAIN_HOME/config
-
-  #--Ensure weblogic-plugin-enabled
-  echo "Configuring weblogic for HTTPS"
-
-  echo "Configuring weblogic https plugin"
-  xmlstarlet ed -P \
-    -N wl="http://xmlns.oracle.com/weblogic/domain" \
-    -u "/wl:domain/wl:server[wl:name='AdminServer']/wl:web-server/wl:weblogic-plugin-enabled" -v "true" \
-    -s "/wl:domain/wl:server[wl:name='AdminServer']/wl:web-server" -t elem -n "weblogic-plugin-enabled" -v "true" \
-    $CONFIG_LOCATION/config.xml > $CONFIG_LOCATION/config.xml.tmp && mv -f $CONFIG_LOCATION/config.xml.tmp $CONFIG_LOCATION/config.xml
-
-  #--Ensure frontend-https-port
-  echo "Configuring weblogic tcp port"
-  xmlstarlet ed -P \
-    -N wl="http://xmlns.oracle.com/weblogic/domain" \
-    -u "/wl:domain/wl:server[wl:name='AdminServer']/wl:web-server/wl:frontend-https-port" -v "443" \
-    -s "/wl:domain/wl:server[wl:name='AdminServer']/wl:web-server" -t elem -n "frontend-https-port" -v "443" \
-    $CONFIG_LOCATION/config.xml > $CONFIG_LOCATION/config.xml.tmp && mv $CONFIG_LOCATION/config.xml.tmp $CONFIG_LOCATION/config.xml
-
-  #--Ensure frontend-host
-  echo "Configuring weblogic frontend host"
-  xmlstarlet ed -P \
-    -N wl="http://xmlns.oracle.com/weblogic/domain" \
-    -u "/wl:domain/wl:server[wl:name='AdminServer']/wl:web-server/wl:frontend-host" -v "$admin_hostname" \
-    -s "/wl:domain/wl:server[wl:name='AdminServer']/wl:web-server" -t elem -n "frontend-host" -v "$admin_hostname" \
-    $CONFIG_LOCATION/config.xml > $CONFIG_LOCATION/config.xml.tmp && mv $CONFIG_LOCATION/config.xml.tmp $CONFIG_LOCATION/config.xml
 }
 
 #--Deploy Cortex Agent (Also known as XDR Agent). SOC Monitoring
@@ -174,8 +142,6 @@ deploy_cortex() {
 }
 
 if [[ "${server}" = "admin" ]]; then
-  yum install -y xmlstarlet
-  ensure_https
   reset_admin
 fi
 
