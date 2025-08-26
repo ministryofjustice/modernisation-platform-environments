@@ -62,7 +62,7 @@ s3fs -o iam_role=auto -o url="https://s3-eu-west-2.amazonaws.com" -o endpoint=eu
 echo s3fs#${inbound_bucket} $EC2_USER_HOME_FOLDER/inbound fuse iam_role=auto,url="https://s3-eu-west-2.amazonaws.com",endpoint=eu-west-2,allow_other,multireq_max=5,use_cache=/tmp,uid=1000,gid=1000 0 0 >> /etc/fstab
 echo s3fs#${outbound_bucket} $EC2_USER_HOME_FOLDER/outbound fuse iam_role=auto,url="https://s3-eu-west-2.amazonaws.com",endpoint=eu-west-2,allow_other,multireq_max=5,use_cache=/tmp,uid=1000,gid=1000 0 0 >> /etc/fstab
 
-#--Create essential subdirs in S3
+#--Create essential subdirs in S3 Bucket
 mkdir -p \
   $INBOUND_S3_MOUNT_POINT/archive \
   $INBOUND_S3_MOUNT_POINT/CCMS_PRD_Allpay \
@@ -89,12 +89,10 @@ mkdir -p \
   $INBOUND_S3_MOUNT_POINT/inprocess \
   $INBOUND_S3_MOUNT_POINT/rejected
 
-# clear all admin files and entries from config.xml on admin host only
+#--Clears all admin files and entries from config.xml on admin host only
 reset_admin() {
   DOMAIN_HOME=$EFS_MOUNT_POINT/domains/soainfra
   CONFIG_LOCATION=$DOMAIN_HOME/config
-
-  yum install -y xmlstarlet
 
   cp -p $CONFIG_LOCATION/config.xml $CONFIG_LOCATION/config.xml.$(date '+%Y%m%d-%H%M').bak
   cp -p $CONFIG_LOCATION/config.xml $CONFIG_LOCATION/config.xml.none
@@ -116,7 +114,15 @@ reset_admin() {
   rm -rf $DOMAIN_HOME/servers/AdminServer/tmp
 }
 
-# deploy cortex agent
+#--Configures config.xml to listen for Weblogic on HTTPS only (prevents https > http redirection loops). CC-3814
+ensure_https() {
+  xmlstarlet ed \
+    -u "/domain/server[name='AdminServer']/web-server/weblogic-plugin-enabled" -v "true" \
+    -s "/domain/server[name='AdminServer']/web-server" -t elem -n "weblogic-plugin-enabled" -v "true" \
+    $CONFIG_LOCATION/config.xml > $CONFIG_LOCATION/config.xml.new && mv $CONFIG_LOCATION/config.xml.new $CONFIG_LOCATION/config.xml
+}
+
+#--Deploy Cortex Agent (Also known as XDR Agent). SOC Monitoring
 deploy_cortex() {
   CORTEX_DIR=/tmp/CortexAgent
   CORTEX_VERSION=linux_8_8_0_133595_rpm
@@ -136,6 +142,8 @@ deploy_cortex() {
 }
 
 if [[ "${server}" = "admin" ]]; then
+  yum install -y xmlstarlet
+  ensure_https
   reset_admin
 fi
 
