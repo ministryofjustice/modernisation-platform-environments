@@ -141,8 +141,8 @@ module "g4s" {
     local.sftp_account_g4s_emsys_mvp,
     # local.sftp_account_g4s_emsys_tpims,
     local.sftp_account_g4s_x_drive,
-    local.sftp_account_g4s_lcm_archive,
-    local.sftp_account_g4s_lcm,
+    # local.sftp_account_g4s_lcm_archive,
+    # local.sftp_account_g4s_lcm,
     # local.sftp_account_g4s_gps,
     # local.sftp_account_g4s_centurion,
   ]
