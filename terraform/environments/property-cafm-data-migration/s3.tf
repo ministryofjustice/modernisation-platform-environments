@@ -294,7 +294,7 @@ locals {
     concept  = { name = module.s3_concept_data_bucket.bucket.id,  arn = module.s3_concept_data_bucket.bucket.arn }
   }
 
-  ingestion_bucket_keys = ["planetfm", "concept"]
+  ingestion_bucket_keys = [planetfm, concept]
 }
 
 ############################################
