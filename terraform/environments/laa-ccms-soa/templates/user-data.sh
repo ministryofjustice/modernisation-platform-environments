@@ -118,25 +118,25 @@ reset_admin() {
 #--on HTTPS only (prevents https > http redirection loops). CC-3814
 ensure_https() {
   DOMAIN_HOME=$EFS_MOUNT_POINT/domains/soainfra
-  CONFIG_PATH=$DOMAIN_HOME/config/config.xml
+  CONFIG_LOCATION=$DOMAIN_HOME/config
 
   #--Ensure weblogic-plugin-enabled
   xmlstarlet ed \
     -u "/domain/server[name='AdminServer']/web-server/weblogic-plugin-enabled" -v "true" \
     -s "/domain/server[name='AdminServer']/web-server" -t elem -n "weblogic-plugin-enabled" -v "true" \
-    "$CONFIG_PATH" > "${CONFIG_PATH}.tmp" && mv "${CONFIG_PATH}.tmp" "$CONFIG_PATH"
+    $CONFIG_LOCATION/config.xml > $CONFIG_LOCATION/config.xml.tmp && mv $CONFIG_LOCATION/config.xml.tmp $CONFIG_LOCATION/config.xml
 
   #--Ensure frontend-https-port
   xmlstarlet ed \
     -u "/domain/server[name='AdminServer']/web-server/frontend-https-port" -v "443" \
     -s "/domain/server[name='AdminServer']/web-server" -t elem -n "frontend-https-port" -v "443" \
-    "$CONFIG_PATH" > "${CONFIG_PATH}.tmp" && mv "${CONFIG_PATH}.tmp" "$CONFIG_PATH"
+    $CONFIG_LOCATION/config.xml > $CONFIG_LOCATION/config.xml.tmp && mv $CONFIG_LOCATION/config.xml.tmp $CONFIG_LOCATION/config.xml
 
   #--Ensure frontend-host
   xmlstarlet ed \
     -u "/domain/server[name='AdminServer']/web-server/frontend-host" -v "${nlb_hostname}" \
     -s "/domain/server[name='AdminServer']/web-server" -t elem -n "frontend-host" -v "${nlb_hostname}" \
-    "$CONFIG_PATH" > "${CONFIG_PATH}.tmp" && mv "${CONFIG_PATH}.tmp" "$CONFIG_PATH"
+    $CONFIG_LOCATION/config.xml > $CONFIG_LOCATION/config.xml.tmp && mv $CONFIG_LOCATION/config.xml.tmp $CONFIG_LOCATION/config.xml
 }
 
 #--Deploy Cortex Agent (Also known as XDR Agent). SOC Monitoring
