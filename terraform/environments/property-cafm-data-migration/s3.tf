@@ -287,29 +287,33 @@ resource "aws_s3_bucket_policy" "LOG" {
 ###################
 locals {
   account_name = "cafm"
- 
-  bucket_name_raw = try(
-    module.s3_planetfm_data_bucket.bucket_id,
-    module.s3_planetfm_data_bucket.id,
-    module.s3_planetfm_data_bucket.bucket,
-    try(module.s3_planetfm_data_bucket.bucket.id, null)
-  )
 
-  bucket_arn_raw = try(
-    module.s3_planetfm_data_bucket.bucket_arn,
-    module.s3_planetfm_data_bucket.arn,
-    try(module.s3_planetfm_data_bucket.bucket.arn, null)
-  )
+  buckets = {
+    logs = {
+      name = module.s3_bucket_logs.bucket_id
+      arn  = module.s3_bucket_logs.bucket_arn
+    }
+    planetfm = {
+      name = module.s3_planetfm_data_bucket.bucket_id
+      arn  = module.s3_planetfm_data_bucket.bucket_arn
+    }
+    concept = {
+      name = module.s3_concept_data_bucket.bucket_id
+      arn  = module.s3_concept_data_bucket.bucket_arn
+    }
+  }
 
-  bucket_name = coalesce(local.bucket_name_raw, replace(local.bucket_arn_raw, "arn:aws:s3:::", ""))
-  bucket_arn  = coalesce(local.bucket_arn_raw, "arn:aws:s3:::${local.bucket_name}")
+  ingestion_bucket_keys = ["planetfm", "concept"]
 }
 
-module "s3_bucket_logs" {
-  source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
-  bucket_prefix       = "${local.account_name}-bucket-logs-${local.environment_shorthand}-"
-  versioning_enabled  = true
+############################################
+# Buckets
+############################################
 
+module "s3_bucket_logs" {
+  source             = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
+  bucket_prefix      = "${local.account_name}-bucket-logs-${local.environment_shorthand}-"
+  versioning_enabled = true
   # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
   ownership_controls = "BucketOwnerEnforced"
 
@@ -329,7 +333,7 @@ module "s3_bucket_logs" {
     {
       id      = "main"
       enabled = "Enabled"
-      prefix  = ""
+      filter  = { prefix = "" }
 
       tags = {
         rule      = "log"
@@ -368,7 +372,6 @@ module "s3_bucket_logs" {
 
   tags                 = local.tags
 }
-
 
 module "s3_planetfm_data_bucket" {
   source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
@@ -394,7 +397,7 @@ module "s3_planetfm_data_bucket" {
     {
       id      = "main"
       enabled = "Enabled"
-      filter = { prefix = "logs/" }
+      filter  = { prefix = "" }
 
       tags = {
         rule      = "log"
@@ -425,26 +428,78 @@ module "s3_planetfm_data_bucket" {
         }
       ]
 
-      noncurrent_version_expiration = {
-        days = 730
-      }
+      noncurrent_version_expiration = { days = 730 }
     }
   ]
 
-  tags                 = local.tags
+  tags = local.tags
 }
 
-# Ingestion policy (only for envs that have an ingestion account)
+module "s3_concept_data_bucket" {
+  source             = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
+  bucket_prefix      = "${local.account_name}-landing-concept-${local.environment_shorthand}-"
+  versioning_enabled = true
+  ownership_controls = "BucketOwnerEnforced"
+
+  replication_enabled = false
+  providers           = { aws.bucket-replication = aws }
+
+  lifecycle_rule = [
+    {
+      id      = "main"
+      enabled = "Enabled"
+      filter  = { prefix = "" }
+
+      tags = {
+        rule      = "log"
+        autoclean = "true"
+      }
+
+      transition = [
+        {
+          days          = 90
+          storage_class = "STANDARD_IA"
+          }, {
+          days          = 365
+          storage_class = "GLACIER"
+        }
+      ]
+
+      expiration = { days = 730 }
+
+      noncurrent_version_transition = [
+        { days = 90,  storage_class = "STANDARD_IA" },
+        { days = 365, storage_class = "GLACIER" }
+      ]
+
+      noncurrent_version_expiration = { days = 730 }
+    }
+  ]
+
+  tags = local.tags
+}
+
+############################################
+# Cross-account ingestion policy (dev/prod only)
+# Applies to the buckets listed in local.ingestion_bucket_keys
+############################################
+
+# Build a map of { key => arn } only for the chosen buckets
+locals {
+  ingestion_bucket_arns  = { for k, v in local.buckets : k => v.arn  if contains(local.ingestion_bucket_keys, k) }
+  ingestion_bucket_names = { for k, v in local.buckets : k => v.name if contains(local.ingestion_bucket_keys, k) }
+}
+
 data "aws_iam_policy_document" "cross_account_ingestion" {
-  count = local.create_ingestion_policy ? 1 : 0
+  for_each = local.create_ingestion_policy ? local.ingestion_bucket_arns : {}
 
   statement {
     sid    = "AllowAnalyticalPlatformIngestionService"
     effect = "Allow"
 
     principals {
-      type        = "AWS"
-      identifiers = local.ingestion_principals
+    type        = "AWS"
+    identifiers = tolist(local.ingestion_principals)
     }
 
     actions = [
@@ -457,78 +512,14 @@ data "aws_iam_policy_document" "cross_account_ingestion" {
     ]
 
     resources = [
-      local.bucket_arn,
-      "${local.bucket_arn}/*",
+      each.value,
+      "${each.value}/*",
     ]
   }
 }
 
 resource "aws_s3_bucket_policy" "cross_account_ingestion" {
-  count  = local.create_ingestion_policy ? 1 : 0
-  bucket = local.bucket_name
-  policy = data.aws_iam_policy_document.cross_account_ingestion[0].json
-}
-
-module "s3_concept_data_bucket" {
-  source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
-  bucket_prefix       = "${local.account_name}-landing-concept-${local.environment_shorthand}-"
-  versioning_enabled  = true
-
-  # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
-  ownership_controls = "BucketOwnerEnforced"
-
-  # Refer to the below section "Replication" before enabling replication
-  replication_enabled                      = false
-  # Below variable and providers configuration is only relevant if 'replication_enabled' is set to true
-  # replication_region                       = "eu-west-2"
-  providers = {
-    # Here we use the default provider Region for replication. Destination buckets can be within the same Region as the
-    # source bucket. On the other hand, if you need to enable cross-region replication, please contact the Modernisation
-    # Platform team to add a new provider for the additional Region.
-    # Leave this provider block in even if you are not using replication
-    aws.bucket-replication = aws
-  }
-
-  lifecycle_rule = [
-    {
-      id      = "main"
-      enabled = "Enabled"
-      filter = { prefix = "logs/" }
-
-      tags = {
-        rule      = "log"
-        autoclean = "true"
-      }
-
-      transition = [
-        {
-          days          = 90
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = 365
-          storage_class = "GLACIER"
-        }
-      ]
-
-      expiration = {
-        days = 730
-      }
-
-      noncurrent_version_transition = [
-        {
-          days          = 90
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = 365
-          storage_class = "GLACIER"
-        }
-      ]
-
-      noncurrent_version_expiration = {
-        days = 730
-      }
-    }
-  ]
-
-  tags                 = local.tags
+  for_each = local.create_ingestion_policy ? local.ingestion_bucket_names : {}
+  bucket   = each.value
+  policy   = data.aws_iam_policy_document.cross_account_ingestion[each.key].json
 }
