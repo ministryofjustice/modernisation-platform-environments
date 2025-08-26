@@ -485,13 +485,7 @@ module "s3_concept_data_bucket" {
 # Applies to the buckets listed in local.ingestion_bucket_keys
 ############################################
 
-# Build a map of { key => arn } only for the chosen buckets
-locals {
-  ingestion_bucket_arns  = { for k, v in local.buckets : k => v.arn  if contains(local.ingestion_bucket_keys, k) }
-  ingestion_bucket_names = { for k, v in local.buckets : k => v.name if contains(local.ingestion_bucket_keys, k) }
-}
-
-data "aws_iam_policy_document" "cross_account_ingestion" {
+data "aws_iam_policy_document" "cafm_cross_account_ingestion" {
   for_each = local.create_ingestion_policy ? local.ingestion_bucket_arns : {}
 
   statement {
@@ -519,8 +513,8 @@ data "aws_iam_policy_document" "cross_account_ingestion" {
   }
 }
 
-resource "aws_s3_bucket_policy" "cross_account_ingestion" {
+resource "aws_s3_bucket_policy" "cafm_cross_account_ingestion" {
   for_each = local.create_ingestion_policy ? local.ingestion_bucket_names : {}
   bucket   = each.value
-  policy   = data.aws_iam_policy_document.cross_account_ingestion[each.key].json
+  policy   = data.aws_iam_policy_document.cafm_cross_account_ingestion[each.key].json
 }
