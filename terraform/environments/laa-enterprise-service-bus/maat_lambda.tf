@@ -35,20 +35,52 @@ resource "aws_security_group_rule" "maat_provider_load_egress_https_sm" {
   description              = "Outbound 443 to LAA VPC Endpoint SG"
 }
 
+######################################
+### Lambda Resources
+######################################
 
-# resource "aws_lambda_function" "maat_lambda" {
-#   filename         = "maat_lambda.zip"
-#   function_name    = "maat_lambda_function"
-#   role             = aws_iam_role.maat_lambda_role.arn
-#   handler          = "index.test"
-#   runtime          = "python3.11"
-#   source_code_hash = filebase64sha256("lambda.zip")
+resource "aws_lambda_function" "maat_provider_load" {
 
-# #   vpc_config {
-# #     subnet_ids         = # Replace with your private subnet(s)
-# #     security_group_ids = # Replace with appropriate SG
-# #   }
+  description      = "Connects to MAAT DB and invokes the Load procedure to load the provider data."
+  function_name    = "maat_provider_load_function"
+  role             = aws_iam_role.maat_provider_load_role.arn
+  handler          = "lambda_function.lambda_handler"
+  filename         = "lambda/provider_load_lambda/provider_load_package.zip"
+  source_code_hash = filebase64sha256("lambda/provider_load_lambda/provider_load_package.zip")
+  timeout          = 300
+  memory_size      = 128
+  runtime          = "python3.10"
 
-#   timeout = 10
-#   memory_size = 128
-# }
+  layers = [
+    aws_lambda_layer_version.lambda_layer_oracle_python.arn,
+    "arn:aws:lambda:eu-west-2:017000801446:layer:AWSLambdaPowertoolsPython:2"
+  ]
+
+  vpc_config {
+    security_group_ids = [aws_security_group.maat_provider_load_sg.id]
+    subnet_ids         = [data.aws_subnet.data_subnets_a.id]
+  }
+
+
+  environment {
+    variables = {
+      DB_SECRET_NAME        = aws_secretsmanager_secret.maat_db_mp_credentials.name
+      PROCEDURE_SECRET_NAME = aws_secretsmanager_secret.maat_procedures_config.name
+      LD_LIBRARY_PATH       = "/opt/instantclient_12_2_linux"
+      ORACLE_HOME           = "/opt/instantclient_12_2_linux"
+      SERVICE_NAME          = "maat-load-service"
+      NAMESPACE             = "MAATProviderLoadService"
+    }
+  }
+
+  tags = merge(
+    local.tags,
+    { Name = "${local.application_name_short}-${local.environment}-maat-provider-load" }
+  )
+}
+
+resource "aws_lambda_event_source_mapping" "maat_provider_q_trigger" {
+  event_source_arn = aws_sqs_queue.maat_provider_q.arn
+  function_name    = aws_lambda_function.maat_provider_load.arn
+  batch_size       = 1
+}

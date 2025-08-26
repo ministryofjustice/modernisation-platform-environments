@@ -6,7 +6,7 @@ resource "aws_kms_key" "sns_sqs_key" {
 
 resource "aws_kms_key_policy" "sns_sqs_key_policy" {
   key_id = aws_kms_key.sns_sqs_key.id
-  
+
   policy = jsonencode({
     Version = "2012-10-17",
     Id      = "sns-sqs-key",
@@ -25,10 +25,10 @@ resource "aws_kms_key_policy" "sns_sqs_key_policy" {
           "kms:CreateGrant",
           "kms:DescribeKey"
         ],
-        Resource  = "*",
+        Resource = "*",
         Condition = {
           StringEquals = {
-            "kms:ViaService"   = "sqs.eu-west-2.amazonaws.com",
+            "kms:ViaService"    = "sqs.eu-west-2.amazonaws.com",
             "kms:CallerAccount" = "${data.aws_caller_identity.current.account_id}"
           }
         }
@@ -43,7 +43,7 @@ resource "aws_kms_key_policy" "sns_sqs_key_policy" {
           "kms:GenerateDataKey",
           "kms:Decrypt"
         ],
-        Resource  = "*",
+        Resource = "*",
         Condition = {
           StringEquals = {
             "aws:SourceAccount" = "${data.aws_caller_identity.current.account_id}"

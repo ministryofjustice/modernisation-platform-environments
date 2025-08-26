@@ -38,7 +38,7 @@ module "vcms_service" {
 
   sns_topic_arn = aws_sns_topic.vcms_alarms.arn
 
-  account_config = local.account_config 
+  account_config = local.account_config
 
   account_info = local.account_info
 

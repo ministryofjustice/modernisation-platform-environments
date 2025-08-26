@@ -31,8 +31,8 @@ resource "aws_iam_policy" "step_function_policy" {
     Version = "2012-10-17",
     Statement = [
       {
-        Effect   = "Allow",
-        Action   = "lambda:InvokeFunction",
+        Effect = "Allow",
+        Action = "lambda:InvokeFunction",
         Resource = [
           aws_lambda_function.cwa_extract_lambda.arn,
           aws_lambda_function.cwa_file_transfer_lambda.arn,
