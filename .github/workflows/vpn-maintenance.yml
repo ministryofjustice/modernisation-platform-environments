@@ -19,11 +19,18 @@ jobs:
                 MODERNISATION_PLATFORM_ACCOUNT_NUMBER: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
                 PASSPHRASE: ${{ secrets.PASSPHRASE }}
 
-    vpn-maintenance:
+    vpn-environment-check:
             needs: fetch-secrets
-            environment: testing-test
             runs-on: ubuntu-latest
+            outputs:
+                vpn_environment: ${{ steps.set_vpn_environment.outputs.vpn_environment }}
             steps:
+              - name: Mask VPN ID
+                run: |
+                    vpn_id=$(cat $GITHUB_EVENT_PATH | jq -r '.inputs.vpn_id' )
+                    echo "::add-mask::$vpn_id" 
+                    echo "vpn_id=$vpn_id" >> $GITHUB_ENV
+                    
               - name: Checkout repository
                 uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
@@ -35,36 +42,62 @@ jobs:
 
               - name: Set Account Number
                 run: |
-                    ACCOUNT_NUMBER=$(jq -r -e '.modernisation_platform_account_id' <<< $ENVIRONMENT_MANAGEMENT)
+                    ACCOUNT_NUMBER=$(jq -r -e '.account_ids["core-network-services-production"]' <<< $ENVIRONMENT_MANAGEMENT)
                     echo "::add-mask::$ACCOUNT_NUMBER"
                     echo ACCOUNT_NUMBER=$ACCOUNT_NUMBER >> $GITHUB_ENV
                     
               - name: Configure AWS Credentials
                 uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
                 with:
-                    role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
+                    role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions-vpn-maintenance"
                     role-session-name: githubactionsrolesession
                     aws-region: ${{ env.AWS_REGION }}
-
-              - name: Configure AWS Credentials
+              
+              - name: Determine VPN Environment
+                id: set_vpn_environment
                 run: |
-                    account_id=$(jq -r -e '.account_ids["core-network-services-production"]' <<< $ENVIRONMENT_MANAGEMENT)
-                    echo "::add-mask::$account_id"
-                    echo "account_id=$account_id" >> $GITHUB_ENV
-                    aws sts assume-role --role-arn "arn:aws:iam::${account_id}:role/ModernisationPlatformAccess" --role-session-name "test" --output json > credentials.json
-                    export AWS_ACCESS_KEY_ID=$(jq -r '.Credentials.AccessKeyId' credentials.json)
-                    export AWS_SECRET_ACCESS_KEY=$(jq -r '.Credentials.SecretAccessKey' credentials.json)
-                    export AWS_SESSION_TOKEN=$(jq -r '.Credentials.SessionToken' credentials.json)
+                    VPN_ENVIRONMENT=$(aws ec2 describe-vpn-connections \
+                    --vpn-connection-ids "${{ env.vpn_id }}" \
+                    --query "VpnConnections[0].Tags[?Key=='github-environment'].Value | [0]" \
+                    --output text)        
+                    echo vpn_environment=$VPN_ENVIRONMENT >> $GITHUB_OUTPUT
+                    echo "VPN Environment is $VPN_ENVIRONMENT"
+              
 
+    vpn-maintenance:
+            needs: [fetch-secrets, vpn-environment-check]
+            environment: ${{ needs.vpn-environment-check.outputs.vpn_environment }}
+            runs-on: ubuntu-latest
+            steps:
               - name: Mask VPN ID
                 run: |
                     vpn_id=$(cat $GITHUB_EVENT_PATH | jq -r '.inputs.vpn_id' )
                     echo "::add-mask::$vpn_id" 
                     echo "vpn_id=$vpn_id" >> $GITHUB_ENV
+                    
+              - name: Checkout repository
+                uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+              - name: Decrypt Secrets
+                uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@3f9fb1af00462c69c806640652ddf41292963615 # v3.2.5
+                with:
+                    environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
+                    PASSPHRASE: ${{ secrets.PASSPHRASE }}
+
+              - name: Set Account Number
+                run: |
+                    ACCOUNT_NUMBER=$(jq -r -e '.account_ids["core-network-services-production"]' <<< $ENVIRONMENT_MANAGEMENT)
+                    echo "::add-mask::$ACCOUNT_NUMBER"
+                    echo ACCOUNT_NUMBER=$ACCOUNT_NUMBER >> $GITHUB_ENV
+                    
+              - name: Configure AWS Credentials
+                uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
+                with:
+                    role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions-vpn-maintenance"
+                    role-session-name: githubactionsrolesession
+                    aws-region: ${{ env.AWS_REGION }}
 
               - name: Run VPN maintenance script
                 run: |
                     aws ec2 describe-vpn-connections --filters "Name=vpn-connection-id,Values=${{ env.vpn_id }}" --query "VpnConnections[0].TunnelOptions[0].OutsideIpAddress" | ./scripts/redact-output.sh
-                    # ./scripts/replace-vpn-tunnel.sh "${{ github.event.inputs.vpn_id }}"
-
-
+                    # ./scripts/replace-vpn-tunnel.sh "${{ env.vpn_id }}"
