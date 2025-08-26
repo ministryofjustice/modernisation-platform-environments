@@ -294,8 +294,18 @@ locals {
     concept  = { name = module.s3_concept_data_bucket.bucket.id,  arn = module.s3_concept_data_bucket.bucket.arn }
   }
 
-  ingestion_bucket_keys = [planetfm, concept]
+  ingestion_bucket_keys = ["planetfm", "concept"]
+
+  ingestion_bucket_arns  = {
+    for k, v in local.buckets : k => v.arn
+    if contains(local.ingestion_bucket_keys, k) && v.arn != null
+  }
+  ingestion_bucket_names = {
+    for k, v in local.buckets : k => v.name
+    if contains(local.ingestion_bucket_keys, k) && v.name != null
+  }
 }
+
 
 ############################################
 # Buckets
