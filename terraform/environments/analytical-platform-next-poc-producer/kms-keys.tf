@@ -48,14 +48,14 @@ module "glue_crawler_logs_kms_key" {
       principals = [
         {
           type        = "Service"
-          identifiers = ["logs.${data.aws_region.current.name}.amazonaws.com"]
+          identifiers = ["logs.${data.aws_region.current.region}.amazonaws.com"]
         }
       ]
       conditions = [
         {
           test     = "ArnEquals"
           variable = "kms:EncryptionContext:aws:logs:arn"
-          values   = ["arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws-glue/*"]
+          values   = ["arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws-glue/*"]
         }
       ]
     }
@@ -107,8 +107,8 @@ module "s3_mojap_next_poc_data_kms_key" {
           test     = "StringEquals"
           variable = "kms:ViaService"
           values = [
-            "s3.${data.aws_region.current.name}.amazonaws.com",
-            "lakeformation.${data.aws_region.current.name}.amazonaws.com"
+            "s3.${data.aws_region.current.region}.amazonaws.com",
+            "lakeformation.${data.aws_region.current.region}.amazonaws.com"
           ]
         }
       ]
