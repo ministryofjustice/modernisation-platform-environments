@@ -59,11 +59,11 @@ locals {
   inspector-sbom-ec2 = {
     function_zip_file = "lambda_code/inspector-sbom-ec2.zip"
     function_name     = "inspector-sbom-ec2"
-    handler           = "index.handler"
+    handler           = "inspector-sbom-ec2.lambda_handler"
     iam_role_name     = "inspector-sbom-ec2-lambda-role"
     environment_variables = {
-      S3_BUCKET = module.s3-sbom.aws_s3_bucket_id["application-sbom"].id
-      KMS_KEY   = module.kms.key_arn
+      S3_BUCKET   = module.s3-sbom.aws_s3_bucket_id["application-sbom"].id
+      KMS_KEY_ARN = module.kms.key_arn
     }
   }
 
