@@ -43,6 +43,29 @@ resource "aws_security_group" "ssogen_sg" {
     security_groups = [aws_security_group.ec2_sg_ebsapps.id]
   }
 
+  # WebLogic (7001) — allow from internal network
+  ingress {
+    description = "Allow WebLogic HTTP from internal network"
+    from_port   = 7001
+    to_port     = 7001
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.0.0/8"]
+  }
+
+  # WebLogic (7001) — allow from WorkSpaces NAT IPs (Non-Prod + Prod)
+  ingress {
+    description = "Allow WebLogic HTTP from WorkSpaces NAT IPs"
+    from_port   = 7001
+    to_port     = 7001
+    protocol    = "tcp"
+    cidr_blocks = [
+      "18.130.39.94/32",
+      "35.177.145.193/32",
+      "52.56.212.11/32",
+      "35.176.254.38/32"
+    ]
+  }
+
   ############################################################
   # ✅ EGRESS RULES — Allow SSOGEN to reach dependencies
   ############################################################
@@ -74,12 +97,28 @@ resource "aws_security_group" "ssogen_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  # Allow outbound HTTP (yum updates, etc.)
   egress {
-  description = "allow yum/http"
-  from_port   = 80
-  to_port     = 80
-  protocol    = "tcp"
-  cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow outbound HTTP"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # Allow outbound WebLogic (7001) back to internal and WorkSpaces NAT IPs
+  egress {
+    description = "Allow WebLogic HTTP responses"
+    from_port   = 7001
+    to_port     = 7001
+    protocol    = "tcp"
+    cidr_blocks = [
+      "10.0.0.0/8",
+      "18.130.39.94/32",
+      "35.177.145.193/32",
+      "52.56.212.11/32",
+      "35.176.254.38/32"
+    ]
   }
 
   tags = merge(local.tags, {
