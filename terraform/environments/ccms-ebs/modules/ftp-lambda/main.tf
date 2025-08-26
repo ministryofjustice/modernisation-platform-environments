@@ -93,11 +93,15 @@ resource "aws_lambda_function" "ftp_lambda" {
   handler       = "ftp-client.lambda_handler"
   runtime       = "python3.13"
   timeout       = 900
-  memory_size   = 256
+  memory_size   = var.lambda_memory # Sets memory defaults to 4gb
   layers        = [aws_lambda_layer_version.ftp_layer.arn]
 
   s3_bucket = var.s3_bucket_ftp
   s3_key    = var.s3_object_ftp_client
+
+  ephemeral_storage {
+    size = var.lambda_storage # Sets ephemeral storage defaults to 1GB (/tmp space)
+  }
 
   vpc_config {
     subnet_ids         = var.subnet_ids

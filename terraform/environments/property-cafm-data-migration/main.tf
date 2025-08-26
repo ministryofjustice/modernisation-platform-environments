@@ -1,12 +1,13 @@
 module "rds_export" {
   # checkov:skip=CKV_TF_1: using branch instead of a commit hash
   # checkov:skip=CKV_TF_2: using branch instead of tag with a version number
-  source = "github.com/ministryofjustice/terraform-rds-export?ref=a03ea3673e04c4e05ffa29ef4b10de04e2e20d3e"
+  source = "github.com/ministryofjustice/terraform-rds-export?ref=92baa47054fc239e91acc22c3ec7af02c6f765cb"
 
-  kms_key_arn         = aws_kms_key.sns_kms.arn
-  name                = "cafm"
-  vpc_id              = module.vpc.vpc_id
-  database_subnet_ids = module.vpc.private_subnets
+  kms_key_arn           = aws_kms_key.sns_kms.arn
+  name                  = "cafm"
+  database_refresh_mode = "full"
+  vpc_id                = module.vpc.vpc_id
+  database_subnet_ids   = module.vpc.private_subnets
   master_user_secret_id = aws_secretsmanager_secret.db_master_user_secret.arn
 
   tags = {
@@ -30,7 +31,7 @@ module "endpoints" {
   vpc_id                     = module.vpc.vpc_id
   create_security_group      = true
   security_group_description = "Managed by Terraform"
-  security_group_tags        = { Name : "eu-west-1-dev" }
+  security_group_tags        = { Name : "cafm-migration-rds-sg" }
   security_group_rules = {
     ingress_https = {
       description = "HTTPS from VPC"
@@ -44,7 +45,7 @@ module "endpoints" {
       subnet_ids          = module.vpc.private_subnets
       private_dns_enabled = true
       tags                = { Name = "cafm-secretsmanager-endpoint" }
-     }
+    }
     glue = {
       service             = "glue"
       service_type        = "Interface"

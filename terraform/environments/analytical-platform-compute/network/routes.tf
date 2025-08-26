@@ -1,6 +1,7 @@
 module "transit_gateway_routes" {
   for_each = toset(module.vpc.private_route_table_ids)
 
+
   source = "./modules/routes"
 
   route_table_id          = each.value

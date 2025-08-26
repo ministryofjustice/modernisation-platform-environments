@@ -266,3 +266,34 @@ module "s3_laa_data_analysis_kms" {
 
   deletion_window_in_days = 7
 }
+
+module "shared_services_client_team_gov_29148_egress_kms" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+
+  count = local.is-production ? 1 : 0
+
+  source  = "terraform-aws-modules/kms/aws"
+  version = "3.1.1"
+
+  aliases               = ["s3/ssct-gov-29148-egress"]
+  description           = "Shared Services Client Team GOV-29148 Egress"
+  enable_default_policy = true
+  key_statements = [
+    {
+      sid = "AllowAnalyticalPlatformDataProduction"
+      actions = [
+        "kms:Encrypt",
+        "kms:GenerateDataKey"
+      ]
+      resources = ["*"]
+      effect    = "Allow"
+      principals = [
+        {
+          type        = "AWS"
+          identifiers = ["arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/mojap-data-production-ssct-gov-29148-egress"]
+        }
+      ]
+    }
+  ]
+  deletion_window_in_days = 7
+}

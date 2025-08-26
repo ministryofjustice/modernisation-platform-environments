@@ -131,7 +131,7 @@ jobs:
               SUMMARY+="- **Lock ID:** ${{ github.event.inputs.lock_id }}\n"
           else
               # Convert comma-separated values to newlines for display
-              ADDRESSES_DISPLAY=$(echo "${{ github.event.inputs.resource_addresses }}" | tr ',' '\n')
+              ADDRESSES_DISPLAY=$(echo '${{ github.event.inputs.resource_addresses }}' | tr ',' '\n')
               
               echo "**Resource Addresses:**" >> $GITHUB_STEP_SUMMARY
               echo '```' >> $GITHUB_STEP_SUMMARY
@@ -139,7 +139,7 @@ jobs:
               echo '```' >> $GITHUB_STEP_SUMMARY
               
               # Format for output to next job (keep as comma-separated)
-              SUMMARY+="- **Resources:** ${{ github.event.inputs.resource_addresses }}\n"
+              SUMMARY+='- **Resources:** ${{ github.event.inputs.resource_addresses }}\n'
               
               if [[ "${{ github.event.inputs.operation }}" == "import" ]]; then
                 # Convert comma-separated values to newlines for display
@@ -175,7 +175,7 @@ jobs:
           echo -e "${{ needs.request_operation.outputs.operation_summary }}"
 
       - name: Checkout repository
-        uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
           ref: ${{ github.event.inputs.branch_name }}
 
@@ -197,7 +197,7 @@ jobs:
           echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
 
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@b47578312673ae6fa5b5096b330d9fbac3d116df # v4.2.1
+        uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
         with:
           role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
           role-session-name: githubactionsrolesession
@@ -221,7 +221,7 @@ jobs:
         run: |
           mkdir -p temp
           # Convert comma-separated values to newlines
-          echo "${{ github.event.inputs.resource_addresses }}" | tr ',' '\n' > temp/resource_addresses.txt
+          echo '${{ github.event.inputs.resource_addresses }}' | tr ',' '\n' > temp/resource_addresses.txt
 
       - name: Write Resource IDs to File
         if: github.event.inputs.operation == 'import'
