@@ -1,9 +1,3 @@
-data "aws_availability_zones" "available" {}
-
-data "aws_iam_session_context" "current" {
-  arn = data.aws_caller_identity.current.arn
-}
-
 data "aws_vpc" "apc" {
   tags = {
     "Name" = "${local.application_name}-${local.environment}"
