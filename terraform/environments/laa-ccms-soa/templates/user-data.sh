@@ -9,6 +9,7 @@ echo 'ECS_VOLUME_PLUGIN_CAPABILITIES=["efsAuth"]' >> /etc/ecs/ecs.config
 echo 'ECS_INSTANCE_ATTRIBUTES={"server": "${server}","latest": "true"}' >> /etc/ecs/ecs.config
 
 #--Configure EFS
+echo "Configuring EFS"
 yum install -y amazon-efs-utils
 mkdir $EFS_MOUNT_POINT
 mount -t efs -o tls ${efs_id}:/ $EFS_MOUNT_POINT
@@ -24,6 +25,7 @@ amazon-linux-extras install epel -y
 yum install -y awscli
 
 # Configure SSH and pull git repo
+echo "Configuring SSH and git clone"
 yum install git -y
 su ec2-user bash -c "aws secretsmanager get-secret-value --secret-id ccms/soa/deploy-github-ssh-key --query SecretString --output text --region eu-west-2 | base64 -d > /home/ec2-user/.ssh/id_rsa"
 chown ec2-user $EC2_USER_HOME_FOLDER/.ssh/id_rsa
@@ -45,6 +47,7 @@ su ec2-user bash -c "git clone ssh://git@ssh.github.com:443/ministryofjustice/la
 su ec2-user bash -c "cp $EFS_MOUNT_POINT/laa-ccms-app-soa/monitoring/* $EFS_MOUNT_POINT/"
 
 #--Install s3fs and pre-reqs
+echo "Configuring S3 integration with EBS"
 yum install fuse -y
 yum install fuse-libs -y
 yum install s3fs-fuse -y
@@ -63,6 +66,7 @@ echo s3fs#${inbound_bucket} $EC2_USER_HOME_FOLDER/inbound fuse iam_role=auto,url
 echo s3fs#${outbound_bucket} $EC2_USER_HOME_FOLDER/outbound fuse iam_role=auto,url="https://s3-eu-west-2.amazonaws.com",endpoint=eu-west-2,allow_other,multireq_max=5,use_cache=/tmp,uid=1000,gid=1000 0 0 >> /etc/fstab
 
 #--Create essential subdirs in S3 Bucket
+echo "Ensuring S3 file structure for EBS integration"
 mkdir -p \
   $INBOUND_S3_MOUNT_POINT/archive \
   $INBOUND_S3_MOUNT_POINT/CCMS_PRD_Allpay \
@@ -91,6 +95,7 @@ mkdir -p \
 
 #--Clears all admin files and entries from config.xml on admin host only
 reset_admin() {
+  echo "Performing admin host cleanup"
   DOMAIN_HOME=$EFS_MOUNT_POINT/domains/soainfra
   CONFIG_LOCATION=$DOMAIN_HOME/config
 
@@ -121,21 +126,29 @@ ensure_https() {
   CONFIG_LOCATION=$DOMAIN_HOME/config
 
   #--Ensure weblogic-plugin-enabled
-  xmlstarlet ed \
-    -u "/domain/server[name='AdminServer']/web-server/weblogic-plugin-enabled" -v "true" \
-    -s "/domain/server[name='AdminServer']/web-server" -t elem -n "weblogic-plugin-enabled" -v "true" \
-    $CONFIG_LOCATION/config.xml > $CONFIG_LOCATION/config.xml.tmp && mv $CONFIG_LOCATION/config.xml.tmp $CONFIG_LOCATION/config.xml
+  echo "Configuring weblogic for HTTPS"
+
+  echo "Configuring weblogic https plugin"
+  xmlstarlet ed -P \
+    -N wl="http://xmlns.oracle.com/weblogic/domain" \
+    -u "/wl:domain/wl:server[wl:name='AdminServer']/wl:web-server/wl:weblogic-plugin-enabled" -v "true" \
+    -s "/wl:domain/wl:server[wl:name='AdminServer']/wl:web-server" -t elem -n "weblogic-plugin-enabled" -v "true" \
+    $CONFIG_LOCATION/config.xml > $CONFIG_LOCATION/config.xml.tmp && mv -f $CONFIG_LOCATION/config.xml.tmp $CONFIG_LOCATION/config.xml
 
   #--Ensure frontend-https-port
-  xmlstarlet ed \
-    -u "/domain/server[name='AdminServer']/web-server/frontend-https-port" -v "443" \
-    -s "/domain/server[name='AdminServer']/web-server" -t elem -n "frontend-https-port" -v "443" \
+  echo "Configuring weblogic tcp port"
+  xmlstarlet ed -P \
+    -N wl="http://xmlns.oracle.com/weblogic/domain" \
+    -u "/wl:domain/wl:server[wl:name='AdminServer']/wl:web-server/wl:frontend-https-port" -v "443" \
+    -s "/wl:domain/wl:server[wl:name='AdminServer']/wl:web-server" -t elem -n "frontend-https-port" -v "443" \
     $CONFIG_LOCATION/config.xml > $CONFIG_LOCATION/config.xml.tmp && mv $CONFIG_LOCATION/config.xml.tmp $CONFIG_LOCATION/config.xml
 
   #--Ensure frontend-host
-  xmlstarlet ed \
-    -u "/domain/server[name='AdminServer']/web-server/frontend-host" -v "${admin_nlb_hostname}" \
-    -s "/domain/server[name='AdminServer']/web-server" -t elem -n "frontend-host" -v "${admin_nlb_hostname}" \
+  echo "Configuring weblogic frontend host"
+  xmlstarlet ed -P \
+    -N wl="http://xmlns.oracle.com/weblogic/domain" \
+    -u "/wl:domain/wl:server[wl:name='AdminServer']/wl:web-server/wl:frontend-host" -v "$admin_hostname" \
+    -s "/wl:domain/wl:server[wl:name='AdminServer']/wl:web-server" -t elem -n "frontend-host" -v "$admin_hostname" \
     $CONFIG_LOCATION/config.xml > $CONFIG_LOCATION/config.xml.tmp && mv $CONFIG_LOCATION/config.xml.tmp $CONFIG_LOCATION/config.xml
 }
 
@@ -145,6 +158,7 @@ deploy_cortex() {
   CORTEX_VERSION=linux_8_8_0_133595_rpm
 
   #--Prep
+  echo "Preparing cortex agent install"
   mkdir -p $CORTEX_DIR/linux_8_8_0_133595_rpm
   mkdir /etc/panw
   aws s3 sync s3://ccms-shared/CortexAgent/ $CORTEX_DIR #--ccms-shared is in the EBS dev account 767123802783. Bucket is shared at the ORG LEVEL.
@@ -152,6 +166,7 @@ deploy_cortex() {
   cp $CORTEX_DIR/$CORTEX_VERSION/cortex.conf /etc/panw/cortex.conf
 
   #--Installs
+  echo "Installing cortex agent"
   yum install -y selinux-policy-devel
   rpm -Uvh $CORTEX_DIR/$CORTEX_VERSION/cortex-*.rpm
   systemctl status traps_pmd
