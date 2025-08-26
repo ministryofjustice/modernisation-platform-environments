@@ -5,7 +5,7 @@ variable "ingestion_account_ids" {
   default     = {
     dev  = "730335344807"
     prod = "471112983409"
-    # preprod omitted => no ingestion policy created there
+    # preprod => no ingestion policy created there
   }
 }
 
