@@ -134,8 +134,8 @@ ensure_https() {
 
   #--Ensure frontend-host
   xmlstarlet ed \
-    -u "/domain/server[name='AdminServer']/web-server/frontend-host" -v "${nlb_hostname}" \
-    -s "/domain/server[name='AdminServer']/web-server" -t elem -n "frontend-host" -v "${nlb_hostname}" \
+    -u "/domain/server[name='AdminServer']/web-server/frontend-host" -v "${admin_nlb_hostname}" \
+    -s "/domain/server[name='AdminServer']/web-server" -t elem -n "frontend-host" -v "${admin_nlb_hostname}" \
     $CONFIG_LOCATION/config.xml > $CONFIG_LOCATION/config.xml.tmp && mv $CONFIG_LOCATION/config.xml.tmp $CONFIG_LOCATION/config.xml
 }
 
