@@ -43,6 +43,7 @@ module "rds" {
   ecs_cluster_sec_group_id              = "${local.environment_management.account_ids["maat-${local.environment}"]}/${local.application_data.accounts[local.environment].ecs_cluster_sec_group_id}"
   mlra_ecs_cluster_sec_group_id         = "${local.environment_management.account_ids["mlra-${local.environment}"]}/${local.application_data.accounts[local.environment].mlra_ecs_cluster_sec_group_id}"
   hub20_sec_group_id                    = "${local.environment_management.account_ids["laa-enterprise-service-bus-${local.environment}"]}/${local.application_data.accounts[local.environment].hub20_sec_group_id}"
+  hub20_s3_bucket                       = local.application_data.accounts[local.environment].hub20_s3_bucket
   kms_key_arn                           = local.rds_kms_key_arn
 
   tags = local.tags

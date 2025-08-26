@@ -16,13 +16,13 @@ resource "aws_security_group" "cclf_provider_load_sg" {
 }
 
 resource "aws_security_group_rule" "cclf_provider_load_egress_oracle" {
-  type                     = "egress"
-  from_port                = 1521
-  to_port                  = 1521
-  protocol                 = "tcp"
-  cidr_blocks              = [local.application_data.accounts[local.environment].cloud_platform_cidr]
-  security_group_id        = aws_security_group.cclf_provider_load_sg.id
-  description              = "Outbound 1521 Access to Cloud Platform"
+  type              = "egress"
+  from_port         = 1521
+  to_port           = 1521
+  protocol          = "tcp"
+  cidr_blocks       = [local.application_data.accounts[local.environment].cloud_platform_cidr]
+  security_group_id = aws_security_group.cclf_provider_load_sg.id
+  description       = "Outbound 1521 Access to Cloud Platform"
 }
 
 resource "aws_security_group_rule" "cclf_provider_load_egress_https_sm" {
@@ -41,7 +41,7 @@ resource "aws_security_group_rule" "cclf_provider_load_egress_https_sm" {
 
 resource "aws_lambda_function" "cclf_provider_load" {
 
-  description      = "Connect to CCLF DB"
+  description      = "Connects to CCLF DB and invokes the Load procedure to load the provider data."
   function_name    = "cclf_provider_load_function"
   role             = aws_iam_role.cclf_provider_load_role.arn
   handler          = "lambda_function.lambda_handler"
@@ -60,14 +60,16 @@ resource "aws_lambda_function" "cclf_provider_load" {
     security_group_ids = [aws_security_group.cclf_provider_load_sg.id]
     subnet_ids         = [data.aws_subnet.data_subnets_a.id]
   }
-  
+
 
   environment {
     variables = {
-      DB_SECRET_NAME    = aws_secretsmanager_secret.cclf_db_mp_credentials.name
+      DB_SECRET_NAME        = aws_secretsmanager_secret.cclf_db_mp_credentials.name
       PROCEDURE_SECRET_NAME = aws_secretsmanager_secret.cclf_procedures_config.name
-      LD_LIBRARY_PATH   = "/opt/instantclient_12_2_linux"
-      ORACLE_HOME       = "/opt/instantclient_12_2_linux"
+      LD_LIBRARY_PATH       = "/opt/instantclient_12_2_linux"
+      ORACLE_HOME           = "/opt/instantclient_12_2_linux"
+      SERVICE_NAME      = "cclf-load-service"
+      NAMESPACE         = "CCLFProviderLoadService"
     }
   }
 

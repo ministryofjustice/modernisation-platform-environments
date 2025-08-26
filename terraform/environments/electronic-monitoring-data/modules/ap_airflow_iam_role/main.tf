@@ -62,7 +62,7 @@ resource "aws_iam_policy" "role_ap_airflow" {
 }
 
 resource "aws_iam_role_policy_attachment" "role_ap_airflow" {
-  for_each = aws_iam_policy.role_ap_airflow
+  for_each   = aws_iam_policy.role_ap_airflow
   role       = aws_iam_role.role_ap_airflow.name
   policy_arn = each.value.arn
 }

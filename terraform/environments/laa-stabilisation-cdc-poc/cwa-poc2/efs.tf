@@ -18,12 +18,12 @@ resource "aws_efs_file_system" "cwa" {
 
 resource "aws_efs_access_point" "cwa_lambda_access_point" {
   file_system_id = aws_efs_file_system.cwa.id
-  
+
   posix_user {
     uid = 1000
     gid = 1000
   }
-  
+
   root_directory {
     path = "/"
   }

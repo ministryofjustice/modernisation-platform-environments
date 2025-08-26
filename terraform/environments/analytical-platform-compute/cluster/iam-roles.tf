@@ -238,3 +238,28 @@ module "vpc_cni_iam_role" {
 
   tags = local.tags
 }
+
+module "velero_iam_role" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+  version = "5.60.0"
+
+  role_name_prefix      = "velero"
+  attach_velero_policy  = true
+  velero_s3_bucket_arns = [module.velero_s3_bucket.s3_bucket_arn]
+
+  role_policy_arns = {
+    VeleroKMSAccessPolicy = module.velero_kms_iam_policy.arn
+  }
+
+  oidc_providers = {
+    main = {
+      provider_arn               = module.eks.oidc_provider_arn
+      namespace_service_accounts = ["${kubernetes_namespace.velero.metadata[0].name}:velero-server"]
+    }
+  }
+
+  tags = local.tags
+}

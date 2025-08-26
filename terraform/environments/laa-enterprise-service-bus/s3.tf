@@ -56,7 +56,7 @@ resource "aws_s3_bucket" "data" {
 
   tags = merge(
     local.tags,
-    { Name = "${local.application_name_short}-${local.environment}-cwa-extract-data"}
+    { Name = "${local.application_name_short}-${local.environment}-cwa-extract-data" }
   )
 }
 

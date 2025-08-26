@@ -166,7 +166,7 @@ variable "mlra_ecs_cluster_sec_group_id" {
 
 variable "hub20_sec_group_id" {
   type        = string
-  description = "ID of the HUB 2.0 security group allowed to access the RDS" 
+  description = "ID of the HUB 2.0 security group allowed to access the RDS"
 }
 
 variable "bastion_security_group_id" {
@@ -182,6 +182,11 @@ variable "kms_key_arn" {
 variable "tags" {
   type        = map(string)
   description = "Common tags to be used by all resources"
+}
+
+variable "hub20_s3_bucket" {
+  type        = string
+  description = "HUB 2.0 S3 Bucket name"
 }
 
 
