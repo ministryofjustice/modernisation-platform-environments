@@ -76,7 +76,7 @@ resource "aws_cloudwatch_log_subscription_filter" "userjourney_to_xsiam" {
 }
 
 resource "aws_cloudwatch_log_subscription_filter" "directory_to_xsiam" {
-  count           = contains(["test", "preproduction", "production"], var.environment) ? 1 : 0
+  count           = contains(["production"], var.environment) ? 1 : 0
   name            = "xsiam-firehose-subscription"
   log_group_name  = "/aws/directoryservice/d-9c67544f89"
   filter_pattern  = ""
