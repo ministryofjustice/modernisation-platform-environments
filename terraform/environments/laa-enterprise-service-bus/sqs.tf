@@ -26,7 +26,7 @@ resource "aws_sqs_queue" "ccms_provider_q" {
 ########     MAAT SQS     ############
 ######################################
 resource "aws_sqs_queue" "maat_provider_dlq" {
-  name                       = "maat-provider-dlq"
+  name                       = "maat_provider_dlq"
   message_retention_seconds  = 604800
   max_message_size           = 262144
   receive_wait_time_seconds  = 10
@@ -63,7 +63,7 @@ resource "aws_sqs_queue" "maat_provider_q" {
 ########     CCLF SQS     ############
 ######################################
 resource "aws_sqs_queue" "cclf_provider_dlq" {
-  name  = "cclf-provider-dlq"
+  name  = "cclf_provider_dlq"
   message_retention_seconds  = 604800
   max_message_size           = 262144
   receive_wait_time_seconds  = 10
@@ -100,7 +100,7 @@ resource "aws_sqs_queue" "cclf_provider_q" {
 ########     CCR SQS     ############
 ######################################
 resource "aws_sqs_queue" "ccr_provider_dlq" {
-  name  = "ccr-provider-dlq"
+  name  = "ccr_provider_dlq"
   message_retention_seconds  = 604800
   max_message_size           = 262144
   receive_wait_time_seconds  = 10
@@ -137,7 +137,7 @@ resource "aws_sqs_queue" "ccr_provider_q" {
 #####     CCMS Banks SQS     #########
 ######################################
 resource "aws_sqs_queue" "ccms_banks_dlq" {
-  name                       = "ccms-banks-dlq"
+  name                       = "ccms_banks_dlq"
   message_retention_seconds  = 604800
   max_message_size           = 262144
   receive_wait_time_seconds  = 10
