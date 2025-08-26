@@ -41,7 +41,7 @@ resource "aws_security_group_rule" "ccr_provider_load_egress_https_sm" {
 
 resource "aws_lambda_function" "ccr_provider_load" {
 
-  description      = "Connect to CCR DB"
+  description      = "Connects to CCR DB and invokes the Load procedure to load the provider data."
   function_name    = "ccr_provider_load_function"
   role             = aws_iam_role.ccr_provider_load_role.arn
   handler          = "lambda_function.lambda_handler"
@@ -68,6 +68,8 @@ resource "aws_lambda_function" "ccr_provider_load" {
       PROCEDURE_SECRET_NAME = aws_secretsmanager_secret.ccr_procedures_config.name
       LD_LIBRARY_PATH       = "/opt/instantclient_12_2_linux"
       ORACLE_HOME           = "/opt/instantclient_12_2_linux"
+      SERVICE_NAME          = "ccr-load-service"
+      NAMESPACE             = "CCRProviderLoadService"
     }
   }
 
