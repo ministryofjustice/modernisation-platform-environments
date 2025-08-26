@@ -394,7 +394,7 @@ module "s3_planetfm_data_bucket" {
     {
       id      = "main"
       enabled = "Enabled"
-      filter = { prefix = "" }
+      filter = { prefix = "logs/" }
 
       tags = {
         rule      = "log"
@@ -493,7 +493,7 @@ module "s3_concept_data_bucket" {
     {
       id      = "main"
       enabled = "Enabled"
-      filter = { prefix = "" }
+      filter = { prefix = "logs/" }
 
       tags = {
         rule      = "log"
