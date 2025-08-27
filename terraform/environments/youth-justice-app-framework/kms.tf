@@ -59,10 +59,12 @@ module "kms" {
     {
       sid    = "AllowInspectorUseOfKMSKey",
       effect = "Allow",
-      principal = {
-        type        = "Service"
-        identifiers = ["inspector2.amazonaws.com"]
-      },
+      principals = [
+        {
+          type        = "Service"
+          identifiers = ["inspector2.amazonaws.com"]
+        }
+      ],
       actions = [
         "kms:Encrypt",
         "kms:Decrypt",
