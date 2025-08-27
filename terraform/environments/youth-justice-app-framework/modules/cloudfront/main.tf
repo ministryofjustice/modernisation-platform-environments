@@ -199,7 +199,7 @@ resource "aws_cloudfront_response_headers_policy" "strict_transport_security" {
     }
     content_security_policy {
       override = true
-      content_security_policy = "default-src 'none'; script-src 'self' https://public.tableau.com https://maps.googleapis.com https://maps.gstatic.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://www.gov.uk; object-src 'none'; frame-ancestors 'none';"
+      content_security_policy = "default-src 'none'; script-src 'self' https://public.tableau.com https://maps.googleapis.com https://maps.gstatic.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://i.imgur.com; font-src 'self'; connect-src 'self' https://www.gov.uk; object-src 'none'; frame-ancestors 'none';"
     }
   }
 }
