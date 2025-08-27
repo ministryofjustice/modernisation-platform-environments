@@ -143,8 +143,8 @@ data "aws_iam_policy_document" "s3_lb_logs_bucket_policy" {
       "s3:ListBucket"
     ]
     resources = [
-      "${module.s3-lb-logs-bucket[0].bucket.arn}/*",
-      module.s3-lb-logs-bucket[0].bucket.arn
+      "${module.s3_lb_logs_bucket[0].bucket.arn}/*",
+      module.s3_lb_logs_bucket[0].bucket.arn
     ]
     principals {
       type        = "AWS"
