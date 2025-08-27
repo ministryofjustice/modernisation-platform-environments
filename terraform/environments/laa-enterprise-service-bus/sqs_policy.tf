@@ -112,9 +112,7 @@ resource "aws_sqs_queue_policy" "maat_dlq_policy" {
     Version = "2012-10-17"
     Statement = [{
       Effect = "Allow"
-      Principal = {
-        Service = "*"
-      }
+      Principal = "*"
       Action   = "sqs:SendMessage"
       Resource = aws_sqs_queue.maat_provider_dlq.arn
       Condition = {
@@ -133,9 +131,7 @@ resource "aws_sqs_queue_policy" "cclf_dlq_policy" {
     Version = "2012-10-17"
     Statement = [{
       Effect = "Allow"
-      Principal = {
-        Service = "*"
-      }
+      Principal = "*"
       Action   = "sqs:SendMessage"
       Resource = aws_sqs_queue.cclf_provider_dlq.arn
       Condition = {
@@ -154,9 +150,7 @@ resource "aws_sqs_queue_policy" "ccr_dlq_policy" {
     Version = "2012-10-17"
     Statement = [{
       Effect = "Allow"
-      Principal = {
-        Service = "*"
-      }
+      Principal = "*"
       Action   = "sqs:SendMessage"
       Resource = aws_sqs_queue.ccr_provider_dlq.arn
       Condition = {
@@ -175,9 +169,7 @@ resource "aws_sqs_queue_policy" "ccms_banks_dlq_policy" {
     Version = "2012-10-17"
     Statement = [{
       Effect = "Allow"
-      Principal = {
-        Service = "*"
-      }
+      Principal = "*"
       Action   = "sqs:SendMessage"
       Resource = aws_sqs_queue.ccms_banks_dlq.arn
       Condition = {
