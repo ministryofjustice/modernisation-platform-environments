@@ -105,7 +105,7 @@ resource "aws_sqs_queue_policy" "ccms_banks_policy" {
 ###############################################
 ### DLQ Policies
 ###############################################
-resource "aws_sqs_queue_policy" "maat_policy" {
+resource "aws_sqs_queue_policy" "maat_dlq_policy" {
   queue_url = aws_sqs_queue.maat_provider_dlq.id
 
   policy = jsonencode({
@@ -126,7 +126,7 @@ resource "aws_sqs_queue_policy" "maat_policy" {
   })
 }
 
-resource "aws_sqs_queue_policy" "cclf_policy" {
+resource "aws_sqs_queue_policy" "cclf_dlq_policy" {
   queue_url = aws_sqs_queue.cclf_provider_dlq.id
 
   policy = jsonencode({
@@ -147,7 +147,7 @@ resource "aws_sqs_queue_policy" "cclf_policy" {
   })
 }
 
-resource "aws_sqs_queue_policy" "ccr_policy" {
+resource "aws_sqs_queue_policy" "ccr_dlq_policy" {
   queue_url = aws_sqs_queue.ccr_provider_dlq.id
 
   policy = jsonencode({
@@ -168,7 +168,7 @@ resource "aws_sqs_queue_policy" "ccr_policy" {
   })
 }
 
-resource "aws_sqs_queue_policy" "ccms_banks_policy" {
+resource "aws_sqs_queue_policy" "ccms_banks_dlq_policy" {
   queue_url = aws_sqs_queue.ccms_banks_dlq.id
 
   policy = jsonencode({
