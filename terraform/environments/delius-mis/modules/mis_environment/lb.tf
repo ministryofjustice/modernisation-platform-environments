@@ -56,7 +56,7 @@ resource "aws_elb" "dfi" {
 resource "aws_elb_attachment" "dfi_attachment" {
   count    = var.lb_config != null && var.dfi_config != null ? var.dfi_config.instance_count : 0
   elb      = aws_elb.dfi[0].id
-  instance = module.dfi_instance[count.index].instance.id
+  instance = module.dfi_instance[count.index].aws_instance.id
 }
 
 resource "aws_lb_cookie_stickiness_policy" "dfi_stickiness" {
