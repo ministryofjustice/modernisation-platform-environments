@@ -1,7 +1,8 @@
 {
   "accounts": {
     "development": {
-      "example_var": "dev-data"
+      "example_var": "dev-data",
+      "developer_role_suffix": "912d55d6a0a637c8"
     },
     "test": {
       "example_var": "test-data"
