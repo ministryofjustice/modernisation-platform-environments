@@ -64,12 +64,13 @@ resource "aws_lambda_function" "ccr_provider_load" {
 
   environment {
     variables = {
-      DB_SECRET_NAME        = aws_secretsmanager_secret.ccr_db_mp_credentials.name
-      PROCEDURE_SECRET_NAME = aws_secretsmanager_secret.ccr_procedures_config.name
-      LD_LIBRARY_PATH       = "/opt/instantclient_12_2_linux"
-      ORACLE_HOME           = "/opt/instantclient_12_2_linux"
-      SERVICE_NAME          = "ccr-load-service"
-      NAMESPACE             = "CCRProviderLoadService"
+      DB_SECRET_NAME          = aws_secretsmanager_secret.ccr_db_mp_credentials.name
+      PROCEDURE_SECRET_NAME   = aws_secretsmanager_secret.ccr_procedures_config.name
+      LD_LIBRARY_PATH         = "/opt/instantclient_12_2_linux"
+      ORACLE_HOME             = "/opt/instantclient_12_2_linux"
+      SERVICE_NAME            = "ccr-load-service"
+      NAMESPACE               = "CCRProviderLoadService"
+      PURGE_LAMBDA_TIMESTAMP  = aws_ssm_parameter.ccr_provider_load_timestamp.name
     }
   }
 
