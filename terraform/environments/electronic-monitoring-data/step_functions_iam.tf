@@ -26,7 +26,7 @@ data "aws_iam_policy_document" "dms_validation_step_function_policy_document" {
   statement {
     effect    = "Allow"
     actions   = ["lambda:InvokeFunction"]
-    resources = [module.dms_validation.lambda_function_arn]
+    resources = [module.dms_validation[0].lambda_function_arn]
   }
 }
 

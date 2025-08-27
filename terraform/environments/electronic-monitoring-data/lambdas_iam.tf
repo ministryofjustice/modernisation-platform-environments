@@ -665,6 +665,6 @@ resource "aws_iam_policy" "dms_validation_lambda_role_policy" {
 
 resource "aws_iam_role_policy_attachment" "validation_lambda_policy_attachment" {
   count      = local.is-production || local.is-development ? 1 : 0
-  role       = aws_iam_role.dms_validation_lambda_role.name
-  policy_arn = aws_iam_policy.dms_validation_lambda_role_policy.arn
+  role       = aws_iam_role.dms_validation_lambda_role[0].name
+  policy_arn = aws_iam_policy.dms_validation_lambda_role_policy[0].arn
 }
