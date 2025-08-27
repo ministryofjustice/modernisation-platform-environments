@@ -84,3 +84,15 @@ resource "aws_lambda_event_source_mapping" "ccms_banks_q_trigger" {
   function_name    = aws_lambda_function.ccms_provider_load.arn
   batch_size       = 1
 }
+
+resource "aws_ssm_parameter" "ccms_provider_load_timestamp" {
+  name        = "/HUB2.0/ccms_processed_timestamp"
+  description = "timestamp value of last successful process"
+  type        = "SecureString"
+  value       = "test-value"
+  key_id      = "alias/aws/ssm"
+
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
