@@ -39,11 +39,11 @@ resource "aws_sqs_queue" "maat_provider_q" {
   max_message_size           = 262144
   message_retention_seconds  = 604800
   receive_wait_time_seconds  = 10
-  visibility_timeout_seconds = 1800
+  visibility_timeout_seconds = 120
 
   redrive_policy = jsonencode({
     deadLetterTargetArn = aws_sqs_queue.maat_provider_dlq.arn
-    maxReceiveCount     = 5
+    maxReceiveCount     = 1
   })
 
   kms_master_key_id                 = aws_kms_key.sns_sqs_key.id
@@ -75,11 +75,11 @@ resource "aws_sqs_queue" "cclf_provider_q" {
   max_message_size           = 262144
   message_retention_seconds  = 604800
   receive_wait_time_seconds  = 10
-  visibility_timeout_seconds = 1800
+  visibility_timeout_seconds = 120
 
   redrive_policy = jsonencode({
     deadLetterTargetArn = aws_sqs_queue.cclf_provider_dlq.arn
-    maxReceiveCount     = 5
+    maxReceiveCount     = 1
   })
 
   kms_master_key_id                 = aws_kms_key.sns_sqs_key.id
@@ -111,11 +111,11 @@ resource "aws_sqs_queue" "ccr_provider_q" {
   max_message_size           = 262144
   message_retention_seconds  = 604800
   receive_wait_time_seconds  = 10
-  visibility_timeout_seconds = 1800
+  visibility_timeout_seconds = 120
 
   redrive_policy = jsonencode({
     deadLetterTargetArn = aws_sqs_queue.ccr_provider_dlq.arn
-    maxReceiveCount     = 5
+    maxReceiveCount     = 1
   })
 
   kms_master_key_id                 = aws_kms_key.sns_sqs_key.id
@@ -147,11 +147,11 @@ resource "aws_sqs_queue" "ccms_banks_q" {
   max_message_size           = 262144
   message_retention_seconds  = 604800
   receive_wait_time_seconds  = 10
-  visibility_timeout_seconds = 1800
+  visibility_timeout_seconds = 120
 
   redrive_policy = jsonencode({
     deadLetterTargetArn = aws_sqs_queue.ccms_banks_dlq.arn
-    maxReceiveCount     = 5
+    maxReceiveCount     = 1
   })
 
   kms_master_key_id                 = aws_kms_key.sns_sqs_key.id

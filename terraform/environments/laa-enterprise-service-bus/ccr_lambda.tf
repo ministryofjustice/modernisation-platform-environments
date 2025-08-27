@@ -47,7 +47,7 @@ resource "aws_lambda_function" "ccr_provider_load" {
   handler          = "lambda_function.lambda_handler"
   filename         = "lambda/provider_load_lambda/provider_load_package.zip"
   source_code_hash = filebase64sha256("lambda/provider_load_lambda/provider_load_package.zip")
-  timeout          = 300
+  timeout          = 100
   memory_size      = 128
   runtime          = "python3.10"
 
