@@ -31,6 +31,8 @@ data "aws_iam_policy_document" "dms_validation_step_function_policy_document" {
 }
 
 resource "aws_iam_policy" "dms_validation_step_function_policy" {
+  count = local.is-development || local.is-production ? 1 : 0
+
   name   = "dms_validation_step_function_role"
   policy = data.aws_iam_policy_document.dms_validation_step_function_policy_document.json
 }

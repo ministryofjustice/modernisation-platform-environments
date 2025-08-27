@@ -652,16 +652,19 @@ data "aws_iam_policy_document" "dms_validation_lambda_role_policy_document" {
 }
 
 resource "aws_iam_role" "dms_validation_lambda_role" {
+  count              = local.is-production || local.is-development ? 1 : 0
   name               = "dms_validation_lambda_role"
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
 }
 
 resource "aws_iam_policy" "dms_validation_lambda_role_policy" {
+  count  = local.is-production || local.is-development ? 1 : 0
   name   = "dms_validation_lambda_policy"
   policy = data.aws_iam_policy_document.dms_validation_lambda_role_policy_document.json
 }
 
 resource "aws_iam_role_policy_attachment" "validation_lambda_policy_attachment" {
+  count      = local.is-production || local.is-development ? 1 : 0
   role       = aws_iam_role.dms_validation_lambda_role.name
   policy_arn = aws_iam_policy.dms_validation_lambda_role_policy.arn
 }
