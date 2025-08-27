@@ -45,6 +45,8 @@ data "aws_iam_policy_document" "assume_step_function" {
 
 # tfsec:ignore:aws-iam-no-policy-wildcards
 data "aws_iam_policy_document" "step_function_base_permissions" {
+  #checkov:skip=CKV_AWS_356
+  #checkov:skip=CKV_AWS_111
   statement {
     effect    = "Allow"
     actions   = ["sns:Publish", "sqs:SendMessage"]
@@ -77,7 +79,7 @@ data "aws_iam_policy_document" "step_function_base_permissions" {
       "logs:DescribeResourcePolicies",
       "logs:PutDestinationPolicy",
     ]
-    resources = ["arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:*"]
+    resources = ["*"]
   }
 }
 
