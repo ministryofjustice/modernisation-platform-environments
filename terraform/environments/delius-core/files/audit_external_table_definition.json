@@ -48,15 +48,15 @@
           "ColumnNullable": "true"
         },
         {
-          "ColumnName": "CLIENT_DB",
-          "ColumnType": "STRING",
-          "ColumnLength": "20",
-          "ColumnNullable": "true"
-        },
-        {
           "ColumnName": "EXTERNAL_SERVICE_CODE",
           "ColumnType": "STRING",
           "ColumnLength": "100",
+          "ColumnNullable": "true"
+        },
+        {
+          "ColumnName": "CLIENT_DB",
+          "ColumnType": "STRING",
+          "ColumnLength": "20",
           "ColumnNullable": "true"
         }
       ],
