@@ -76,8 +76,7 @@ resource "aws_iam_policy" "ccms_provider_load_policy" {
         Action = [
           "ssm:GetParameter",
           "ssm:GetParameters",
-          "ssm:PutParameter",
-          "ssm:DeleteParameter"
+          "ssm:PutParameter"
         ],
         Resource = aws_ssm_parameter.ccms_provider_load_timestamp.arn
       },
