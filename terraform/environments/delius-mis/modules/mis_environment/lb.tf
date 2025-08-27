@@ -52,6 +52,20 @@ resource "aws_elb" "dfi" {
   )
 }
 
+# Attach DFI instances to the load balancer
+resource "aws_elb_attachment" "dfi_attachment" {
+  count    = var.lb_config != null && var.dfi_config != null ? var.dfi_config.instance_count : 0
+  elb      = aws_elb.dfi[0].id
+  instance = module.dfi_instance[count.index].instance.id
+}
+
+resource "aws_lb_cookie_stickiness_policy" "dfi_stickiness" {
+  count         = var.lb_config != null ? 1 : 0
+  name          = "dfi-policy"
+  load_balancer = aws_elb.dfi[0].id
+  lb_port       = 443
+}
+
 # Create route53 entry for lb
 resource "aws_route53_record" "dfi_entry" {
   count    = var.lb_config != null ? 1 : 0
