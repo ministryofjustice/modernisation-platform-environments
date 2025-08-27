@@ -101,3 +101,9 @@ variable "domain_join_ports" {
   description = "Ports required for domain join"
   type        = any
 }
+
+variable "lb_config" {
+  description = "params for Classic Load Balancer"
+  type        = any
+  default     = null
+}
