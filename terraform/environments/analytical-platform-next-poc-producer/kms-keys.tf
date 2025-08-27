@@ -126,6 +126,10 @@ module "s3_mojap_next_poc_data_kms_key" {
         {
           type        = "Service"
           identifiers = ["lakeformation.amazonaws.com"]
+        },
+        {
+          type        = "AWS"
+          identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-service-role/lakeformation.amazonaws.com/AWSServiceRoleForLakeFormationDataAccess"]
         }
       ]
     }
