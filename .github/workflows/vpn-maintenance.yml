@@ -21,7 +21,6 @@ jobs:
 
     vpn-environment-check:
             needs: fetch-secrets
-            environment: nomis-production
             runs-on: ubuntu-latest
             outputs:
                 vpn_environment: ${{ steps.set_vpn_environment.outputs.vpn_environment }}
@@ -100,5 +99,4 @@ jobs:
 
               - name: Run VPN maintenance script
                 run: |
-                    aws ec2 describe-vpn-connections \
-                    --vpn-connection-ids "${{ env.vpn_id }}" | ./scripts/redact-output.sh
+                    ./scripts/vpn-maintenance.sh "${{ env.vpn_id }}"
