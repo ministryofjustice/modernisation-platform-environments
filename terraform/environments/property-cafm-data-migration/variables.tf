@@ -3,8 +3,8 @@ variable "ingestion_account_ids" {
   description = "Map of short env code -> ingestion AWS account ID"
   type        = map(string)
   default     = {
-    dev  = "730335344807"
-    prod = "471112983409"
+    dev  = local.environment_management.account_ids["analytical-platform-ingestion-development"]
+    prod = local.environment_management.account_ids["analytical-platform-ingestion-production"]
     # preprod => no ingestion policy created there
   }
 }
