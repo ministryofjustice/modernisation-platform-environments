@@ -367,7 +367,7 @@ module "s3_bucket_logs" {
 module "s3_planetfm_data_bucket" {
   source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
   bucket_prefix       = "${local.account_name}-landing-planetfm-${local.environment_shorthand}-"
-  bucket_policy       = local.create_ingestion_policy ? data.aws_iam_policy_document.planetfm_cross[0].json : null
+  bucket_policy       = local.create_ingestion_policy ? data.aws_iam_policy_document.planetfm_cross[0].json : []
   versioning_enabled  = true
 
   # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
