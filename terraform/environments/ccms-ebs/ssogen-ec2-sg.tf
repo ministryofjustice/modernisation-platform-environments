@@ -16,11 +16,20 @@ resource "aws_security_group" "ssogen_sg" {
     cidr_blocks = ["10.0.0.0/8"]
   }
 
-  # WebLogic/OHS HTTP access (e.g. from EBS, LASSIE)
+ # WebLogic/OHS HTTP access (e.g. from EBS, LASSIE)
   ingress {
     description = "WebLogic HTTP"
     from_port   = 8000
     to_port     = 8005
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.0.0/8"]
+  }
+
+  # Oracle HTTP Server (7777)
+  ingress {
+    description = "Oracle HTTP Server"
+    from_port   = 7777
+    to_port     = 7777
     protocol    = "tcp"
     cidr_blocks = ["10.0.0.0/8"]
   }
@@ -30,6 +39,15 @@ resource "aws_security_group" "ssogen_sg" {
     description = "WebLogic HTTPS"
     from_port   = 4443
     to_port     = 4444
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.0.0/8"]
+  }
+
+  # WebLogic Node Manager (5556)
+  ingress {
+    description = "Oracle WL Node Manager"
+    from_port   = 5556
+    to_port     = 5556
     protocol    = "tcp"
     cidr_blocks = ["10.0.0.0/8"]
   }
