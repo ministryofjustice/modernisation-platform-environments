@@ -8,7 +8,7 @@ locals {
 
   baseline_presets_production = {
     options = {
-      enable_xsiam_cloudwatch_integration = true
+      enable_xsiam_s3_integration = true
       route53_resolver_rules = {
         outbound-data-and-private-subnets = ["azure-fixngo-domain", "infra-int-domain"]
       }
@@ -240,7 +240,7 @@ locals {
         })
         user_data_cloud_init = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init, {
           args = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init.args, {
-            branch = "753de472568b54954ea0cb8fe6fb8d28ecf33aa3" # 2025-01-14 nomis release
+            branch = "662853f289cc0053f99ba458c3d9d3c4820f3640" # 2025-08-19 crypto requirement fix
           })
         })
         tags = merge(local.ec2_autoscaling_groups.web.tags, {
@@ -284,7 +284,7 @@ locals {
         user_data_cloud_init = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init, {
           args = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init.args, {
             # Comment in instance refresh above if changing branch + want automated instance refresh
-            branch = "753de472568b54954ea0cb8fe6fb8d28ecf33aa3" # 2025-01-14 nomis release
+            branch = "662853f289cc0053f99ba458c3d9d3c4820f3640" # 2025-08-19 crypto requirement fix
           })
         })
         tags = merge(local.ec2_autoscaling_groups.web.tags, {
@@ -511,8 +511,15 @@ locals {
 
     lbs = {
       private = merge(local.lbs.private, {
-
         access_logs_lifecycle_rule = [module.baseline_presets.s3_lifecycle_rules.general_purpose_one_year]
+
+        s3_notification_queues = {
+          "cortex-xsiam-s3-alb-log-collection" = {
+            events    = ["s3:ObjectCreated:*"]
+            queue_arn = "cortex-xsiam-s3-alb-log-collection"
+          }
+        }
+
         listeners = merge(local.lbs.private.listeners, {
           https = merge(local.lbs.private.listeners.https, {
             certificate_names_or_arns = ["nomis_wildcard_cert_v3"]
@@ -676,7 +683,5 @@ locals {
       "/oracle/database/DRCNMAUD" = local.secretsmanager_secrets.db
       "/oracle/database/DRMIS"    = local.secretsmanager_secrets.db_mis
     }
-
-    security_groups = local.security_groups_old
   }
 }

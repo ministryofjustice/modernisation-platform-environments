@@ -4,6 +4,7 @@ variable "region" {
   default     = "eu-west-2"
 }
 
+# tflint-ignore: terraform_typed_variables
 variable "environment_management" {
   description = "The json decoded environment_management secret from modernisation-platform account"
 }

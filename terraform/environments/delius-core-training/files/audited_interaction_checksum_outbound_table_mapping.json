@@ -1,0 +1,14 @@
+{
+  "rules": [
+    {
+      "rule-type": "selection",
+      "rule-id": "50",
+      "rule-name": "select_clientdb_audit_data_checksum",
+      "object-locator": {
+        "schema-name": "DELIUS_AUDIT_DMS_POOL",
+        "table-name": "AUDITED_INTERACTION_CHECKSUM"
+      },
+      "rule-action": "include"
+    }
+  ]
+}

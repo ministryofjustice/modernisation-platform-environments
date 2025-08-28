@@ -19,6 +19,11 @@ locals {
     item.key => item.value.random if item.value.random != null
   }
 
+  ssm_uuid = {
+    for item in local.ssm_parameters_list :
+    item.key => item.value.uuid if item.value.uuid
+  }
+
   ssm_parameters_value = {
     for item in local.ssm_parameters_list :
     item.key => item.value if item.value.value != null
@@ -39,6 +44,13 @@ locals {
     }) if item.value.random != null
   }
 
+  ssm_parameters_uuid = {
+    for item in local.ssm_parameters_list :
+    item.key => merge(item.value, {
+      value = random_uuid.ssm[item.key].result
+    }) if item.value.uuid
+  }
+
   ssm_parameters_file = {
     for item in local.ssm_parameters_list :
     item.key => merge(item.value, {
@@ -50,7 +62,7 @@ locals {
     for item in local.ssm_parameters_list :
     item.key => merge(item.value, {
       value = "placeholder, overwrite me outside of terraform"
-    }) if item.value.value == null && item.value.value_s3_bucket_name == null && item.value.random == null && item.value.file == null
+    }) if item.value.value == null && item.value.value_s3_bucket_name == null && item.value.random == null && item.value.uuid == false && item.value.file == null
   }
 }
 
@@ -104,6 +116,10 @@ resource "random_password" "this" {
   special = each.value.special
 }
 
+resource "random_uuid" "ssm" {
+  for_each = local.ssm_uuid
+}
+
 resource "aws_ssm_parameter" "fixed" {
   #checkov:skip=CKV_AWS_337:Ensure SSM parameters are using KMS CMK; default is now to use general business unit key
   #checkov:skip=CKV2_AWS_34:AWS SSM Parameter should be Encrypted; default is SecureString but some resources don't support this, e.g. cloud watch agent
@@ -112,6 +128,7 @@ resource "aws_ssm_parameter" "fixed" {
     local.ssm_parameters_value,
     local.ssm_parameters_value_s3_bucket_name,
     local.ssm_parameters_random,
+    local.ssm_parameters_uuid,
     local.ssm_parameters_file
   )
 

@@ -1,0 +1,67 @@
+{
+    "rules": [
+        {
+            "rule-type": "selection",
+            "rule-id": "1",
+            "rule-name": "select_locally_populated_audit",
+            "object-locator": {
+                "schema-name": "DELIUS_APP_SCHEMA",
+                "table-name": "AUDITED_INTERACTION"
+            },
+            "rule-action": "include",
+            "filters": [
+                {
+                    "filter-type": "source",
+                    "column-name": "CLIENT_BUSINESS_INTERACT_CODE",
+                    "filter-conditions": [
+                        {
+                            "filter-operator": "null"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "rule-type": "transformation",
+            "rule-id": "2",
+            "rule-name": "remove_client_db",
+            "rule-target": "column",
+            "object-locator": {
+                "schema-name": "DELIUS_APP_SCHEMA",
+                "table-name": "AUDITED_INTERACTION",
+                "column-name": "CLIENT_DB"
+            },
+            "rule-action": "remove-column"
+        },
+        {
+            "rule-type": "transformation",
+            "rule-id": "3",
+            "rule-name": "remove_client_business_interact_code",
+            "rule-target": "column",
+            "object-locator": {
+                "schema-name": "DELIUS_APP_SCHEMA",
+                "table-name": "AUDITED_INTERACTION",
+                "column-name": "CLIENT_BUSINESS_INTERACT_CODE"
+            },
+            "rule-action": "remove-column"
+        },        
+        {
+            "rule-type": "transformation",
+            "rule-id": "4",
+            "rule-name": "add_client_db",
+            "rule-target": "column",
+            "object-locator": {
+                "schema-name": "DELIUS_APP_SCHEMA",
+                "table-name": "AUDITED_INTERACTION"
+            },
+            "rule-action": "add-column",
+            "value": "CLIENT_DB",
+            "expression": "'${client_database}'",
+            "data-type": {
+                "type": "string",
+                "length": "20",
+                "scale": ""
+            }
+        }
+    ]
+}

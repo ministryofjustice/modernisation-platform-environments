@@ -117,7 +117,7 @@ module "dpr_dms_network_receive_throughput" {
 
 module "dpr_postgres_tickle_function_failure_alarm" {
   source              = "./modules/cw_alarm"
-  create_metric_alarm = local.enable_cw_alarm && local.enable_postgres_tickle_function_failure_alarm
+  create_metric_alarm = local.enable_cw_alarm && local.create_postgres_tickle_function_failure_alarm
 
   alarm_name          = "dpr-postgres-tickle-function-failure"
   alarm_description   = "ATTENTION: DPR Postgres Tickle Function Failure, Please investigate!"

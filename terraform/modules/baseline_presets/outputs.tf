@@ -198,3 +198,8 @@ output "sns_topics" {
   description = "Map of sns_topics to create depending on options provided"
   value       = local.sns_topics
 }
+
+output "sqs_queues" {
+  description = "Map of sqs_queues to create depending on options provided"
+  value       = local.sqs_queues
+}

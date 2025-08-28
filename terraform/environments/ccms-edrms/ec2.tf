@@ -1,7 +1,8 @@
 data "template_file" "launch-template" {
   template = file("${path.module}/templates/user-data.sh")
   vars = {
-    cluster_name = "${local.application_name}-cluster"
+    cluster_name       = "${local.application_name}-cluster"
+    deploy_environment = local.environment
   }
 }
 
@@ -43,6 +44,13 @@ resource "aws_launch_template" "ec2-launch-template" {
     resource_type = "instance"
     tags = merge(local.tags,
       { Name = lower(format("%s-%s-ecs-cluster", local.application_name, local.environment)) }
+    )
+  }
+
+  tag_specifications {
+    resource_type = "instance"
+    tags = merge(local.tags,
+      { instance-scheduling = "skip-scheduling" }
     )
   }
 

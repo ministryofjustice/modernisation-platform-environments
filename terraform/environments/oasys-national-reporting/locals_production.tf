@@ -42,7 +42,6 @@ locals {
         instance = merge(local.ec2_instances.bods.instance, {
           instance_type           = "r6i.2xlarge"
           disable_api_termination = true
-          vpc_security_group_ids  = ["bods", "oasys_db", "ec2-windows", "ad-join"]
         })
         tags = merge(local.ec2_instances.bods.tags, {
           oasys-national-reporting-environment = "pd"
@@ -68,7 +67,6 @@ locals {
         instance = merge(local.ec2_instances.bods.instance, {
           instance_type           = "r6i.2xlarge"
           disable_api_termination = true
-          vpc_security_group_ids  = ["bods", "oasys_db", "ec2-windows", "ad-join"]
         })
         tags = merge(local.ec2_instances.bods.tags, {
           oasys-national-reporting-environment = "pd"
@@ -218,10 +216,9 @@ locals {
         ]
 
         self_managed_active_directory = {
-          dns_ips = [
-            module.ip_addresses.azure_fixngo_ip.PCMCW0011,
-            module.ip_addresses.azure_fixngo_ip.PCMCW0012,
-          ]
+          dns_ips = flatten([
+            module.ip_addresses.mp_ips.ad_fixngo_hmpp_domain_controllers,
+          ])
           domain_name                      = "azure.hmpp.root"
           username                         = "svc_fsx_windows"
           password_secret_name             = "/sap/bods/pd/passwords"
@@ -331,6 +328,5 @@ locals {
       "/oracle/database/PDBOSYS" = local.secretsmanager_secrets.db
       "/oracle/database/PDBOAUD" = local.secretsmanager_secrets.db
     }
-    security_groups = local.security_groups_old
   }
 }

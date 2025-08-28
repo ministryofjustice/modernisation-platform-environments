@@ -56,34 +56,6 @@ locals {
         })
       })
 
-      # upgrade test instance - do not use
-      # rename and join the domain FIRST
-      # Mount drive
-      # Upgrade OS - Server DataCenter 2019
-      # Join domain as pp-cafm-a-19-a
-      # Remove drive
-      # Check E: drive also gone
-      # Reboot
-      pp-cafm-a-20-a = merge(local.ec2_instances.app, {
-        config = merge(local.ec2_instances.app.config, {
-          ami_name          = "pp-cafm-a-11-a-unjoined"
-          availability_zone = "eu-west-2a"
-        })
-        ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
-        }
-        instance = merge(local.ec2_instances.app.instance, {
-          disable_api_termination = false
-          instance_type           = "t3.large"
-        })
-        tags = merge(local.ec2_instances.app.tags, {
-          ami                 = "pp-cafm-a-11-a-unjoined"
-          description         = "RDS session host and app server upgrade test"
-          instance-scheduling = "skip-scheduling"
-        })
-        cloudwatch_metric_alarms = null
-      })
-
       # database servers
       pp-cafm-db-a = merge(local.ec2_instances.db, {
         config = merge(local.ec2_instances.db.config, {

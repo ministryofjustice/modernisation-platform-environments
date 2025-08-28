@@ -1,9 +1,10 @@
 # Create a new replication subnet group
 resource "aws_dms_replication_subnet_group" "dms_replication_subnet_group" {
+  count                                = local.is-production || local.is-development ? 1 : 0
   replication_subnet_group_description = "RDS subnet group"
   replication_subnet_group_id          = "rds-replication-subnet-group-tf"
 
-  subnet_ids = tolist(aws_db_subnet_group.db.subnet_ids)
+  subnet_ids = tolist(aws_db_subnet_group.db[0].subnet_ids)
 
   tags = merge(
     local.tags,
@@ -22,6 +23,7 @@ resource "aws_dms_replication_subnet_group" "dms_replication_subnet_group" {
 # Create a new replication instance
 
 resource "aws_dms_replication_instance" "dms_replication_instance" {
+  count = local.is-production || local.is-development ? 1 : 0
   #checkov:skip=CKV_AWS_212
   allocated_storage          = var.dms_allocated_storage_gib
   apply_immediately          = true
@@ -34,7 +36,7 @@ resource "aws_dms_replication_instance" "dms_replication_instance" {
   publicly_accessible         = false
   replication_instance_class  = var.dms_replication_instance_class
   replication_instance_id     = "dms-replication-instance-tf"
-  replication_subnet_group_id = aws_dms_replication_subnet_group.dms_replication_subnet_group.id
+  replication_subnet_group_id = aws_dms_replication_subnet_group.dms_replication_subnet_group[0].id
 
   tags = merge(
     local.tags,
@@ -44,7 +46,7 @@ resource "aws_dms_replication_instance" "dms_replication_instance" {
   )
 
   vpc_security_group_ids = [
-    aws_security_group.dms_ri_security_group.id,
+    aws_security_group.dms_ri_security_group[0].id,
   ]
 
   depends_on = [

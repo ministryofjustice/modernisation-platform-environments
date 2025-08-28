@@ -30,11 +30,11 @@ data "aws_iam_policy_document" "glue-policy-data" {
   #checkov:skip=CKV_AWS_283: "Ensure no IAM policies documents allow ALL or any AWS principal permissions to the resource"
   statement {
     actions = [
-      "glue:CreateTable",
-      "glue:DeleteTable",
-      "glue:CreateSchema",
-      "glue:DeleteSchema",
       "glue:UpdateTable",
+      "glue:DeleteTable",
+      "glue:DeleteSchema",
+      "glue:CreateSchema",
+      "glue:CreateTable",
     ]
     resources = ["arn:aws:glue:${local.current_account_region}:${local.current_account_id}:*"]
     principals {
@@ -85,7 +85,7 @@ resource "aws_iam_policy" "s3_read_access_policy" {
         ],
         "Resource" : [
           "arn:aws:s3:::${local.project}-*/*",
-          "arn:aws:s3:::${local.project}-*"
+          "arn:aws:s3:::${local.project}-*",
         ]
       }
     ]
@@ -120,7 +120,7 @@ resource "aws_iam_policy" "s3_read_write_policy" {
         ],
         "Resource" : [
           "arn:aws:s3:::${local.project}-*/*",
-          "arn:aws:s3:::${local.project}-*"
+          "arn:aws:s3:::${local.project}-*",
         ]
       }
     ]
@@ -139,7 +139,7 @@ resource "aws_iam_policy" "s3_all_object_actions_policy" {
         "Effect" : "Allow",
         "Resource" : [
           "arn:aws:s3:::${local.project}-*/*",
-          "arn:aws:s3:::${local.project}-*"
+          "arn:aws:s3:::${local.project}-*",
         ]
       }
     ]
@@ -158,8 +158,8 @@ resource "aws_iam_policy" "invoke_lambda_policy" {
           "lambda:InvokeFunction"
         ],
         "Resource" : [
+          "arn:aws:lambda:*:${local.account_id}:function:*:*",
           "arn:aws:lambda:*:${local.account_id}:function:*",
-          "arn:aws:lambda:*:${local.account_id}:function:*:*"
         ]
       }
     ]
@@ -195,9 +195,9 @@ resource "aws_iam_policy" "trigger_glue_job_policy" {
         "Effect" : "Allow",
         "Action" : [
           "glue:StartJobRun",
-          "glue:GetJobRun",
           "glue:GetJobRuns",
-          "glue:BatchStopJobRun"
+          "glue:GetJobRun",
+          "glue:BatchStopJobRun",
         ],
         "Resource" : [
           "arn:aws:glue:${local.account_region}:${local.account_id}:*"
@@ -321,12 +321,12 @@ data "aws_iam_policy_document" "redshift-additional-policy" {
   }
   statement {
     actions = [
+      "logs:AssociateKmsKey",
       "logs:CreateLogGroup",
       "logs:CreateLogStream",
-      "logs:PutLogEvents",
-      "logs:AssociateKmsKey",
       "logs:DescribeLogStreams",
       "logs:GetLogEvents",
+      "logs:PutLogEvents",
       "logs:PutRetentionPolicy"
     ]
     resources = [
@@ -666,7 +666,9 @@ data "aws_iam_policy_document" "athena_api" {
       "lambda:InvokeFunction"
     ]
     resources = [
-      "arn:aws:lambda:${local.account_region}:${local.account_id}:function:dpr-athena-federated-query-oracle-function"
+      "arn:aws:lambda:${local.account_region}:${local.account_id}:function:dpr-athena-federated-query-oracle-function",
+      "arn:aws:lambda:${local.account_region}:${local.account_id}:function:dpr-athena-federated-query-postgresql-function",
+      "arn:aws:lambda:${local.account_region}:${local.account_id}:function:dpr-athena-federated-query-redshift-function"
     ]
   }
 
@@ -810,6 +812,12 @@ resource "aws_iam_policy" "lake_formation_tag_management" {
   policy      = data.aws_iam_policy_document.lake_formation_tag_management.json
 }
 
+# LakeFormation service linked role
+resource "aws_iam_service_linked_role" "lakeformation" {
+  count            = local.is-test ? 1 : 0
+  aws_service_name = "lakeformation.amazonaws.com"
+}
+
 # Analytical Platform Share Policy & Role
 
 data "aws_iam_policy_document" "analytical_platform_share_policy" {
@@ -829,7 +837,10 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
       "lakeformation:ListPermissions",
       "lakeformation:DescribeResource",
 
-      # LF tag read permissions (needed to grant tag-based access)
+      # LF tag permissions (needed to create and grant tag-based access)
+      "lakeformation:CreateLFTag",
+      "lakeformation:UpdateLFTag",
+      "lakeformation:DeleteLFTag",
       "lakeformation:GetResourceLFTags",
       "lakeformation:ListLFTags",
       "lakeformation:GetLFTag"
@@ -878,7 +889,8 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
     actions = [
       "glue:GetTable",
       "glue:GetDatabase",
-      "glue:GetPartition"
+      "glue:GetPartition",
+      "glue:GetTags"
     ]
     resources = flatten([
       for resource in each.value.resource_shares : [
@@ -890,24 +902,35 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
   }
 }
 
+data "aws_iam_policy_document" "ap_assume_role" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${local.environment_management.account_ids["analytical-platform-common-production"]}:role/data-engineering-datalake-access-github-actions"]
+    }
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "sts:AssumeRole"
+    ]
+    principals {
+      type = "AWS"
+      identifiers = [
+        "arn:aws:sts::${local.environment_management.account_ids["analytical-platform-management-production"]}:assumed-role/GlobalGitHubActionAccess/GitHubActions"
+      ]
+    }
+  }
+}
+
 resource "aws_iam_role" "analytical_platform_share_role" {
   for_each = local.analytical_platform_share
 
   name = "${each.value.target_account_name}-share-role"
 
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Principal = {
-          # In case consumer has a central location for terraform state storage that isn't the target account.
-          AWS = "arn:aws:iam::${try(each.value.assume_account_id, each.value.target_account_id)}:root"
-        }
-        Action = "sts:AssumeRole"
-      }
-    ]
-  })
+  assume_role_policy = data.aws_iam_policy_document.ap_assume_role.json
 }
 
 resource "aws_iam_role_policy" "analytical_platform_share_policy_attachment" {
@@ -936,9 +959,9 @@ data "aws_iam_policy_document" "eventbridge_execution_assume_policy_document" {
       type = "Service"
 
       identifiers = [
+        "lambda.amazonaws.com",
         "scheduler.amazonaws.com",
-        "states.amazonaws.com",
-        "lambda.amazonaws.com"
+        "states.amazonaws.com"
       ]
     }
   }
@@ -1055,4 +1078,43 @@ resource "aws_iam_policy" "secretsmanager_read_policy" {
       }
     ]
   })
+}
+
+resource "aws_iam_policy" "rds_cross_policy" {
+  name        = "${local.project}-missing_report_submissions-cross-policy"
+  description = "Extra Policy for AWS RDS"
+  policy      = data.aws_iam_policy_document.rds.json
+}
+
+
+data "aws_iam_policy_document" "rds" {
+  #checkov:skip=CKV_AWS_107: false positive, nothing is output to logs, has been made sensitive
+  statement {
+    actions = [
+      "rds-db:Connect",
+    ]
+    resources = [
+      "arn:aws:rds:${local.account_region}:${local.environment_management.account_ids[terraform.workspace]}:${local.missing_report_db_credentials.username}:${local.application_data.accounts[local.environment].missing_report_submissions_rds.db_identifier}/${local.missing_report_db_credentials.username}"
+    ]
+  }
+
+  statement {
+    actions = [
+      "rds:DescribeDBInstances",
+      "rds-data:*"
+    ]
+    resources = [for instance in values(module.aurora_missing_report_submissions.cluster_instances) : instance.arn]
+  }
+  statement {
+    actions = [
+      "kms:GenerateDataKey",
+      "kms:GenerateDataKeyPair",
+      "kms:Decrypt",
+      "kms:Encrypt"
+    ]
+    resources = [
+      "arn:aws:kms:*:771283872747:key/*"
+    ]
+  }
+
 }

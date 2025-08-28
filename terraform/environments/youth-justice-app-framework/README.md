@@ -14,10 +14,10 @@ _If you have any questions surrounding this page please post in the `#team-name`
 ### **Description:**
 
 Description of YJAF:
-The Youth Justice Application Framework (YJAF) comprises of a set of core YJAF application modules which reside on Amazon Web Services (AWS) managed infrastructure which is operated by the MoJ Digital team. These modules provide a number of services to both the Youth Justice Board and Youth Custody Services for overseeing children who needs to be placed into a custodial environment. 
+The Youth Justice Application Framework (YJAF) comprises of a set of core YJAF application modules which reside on Amazon Web Services (AWS) managed infrastructure which is operated by the MoJ Digital team. These modules provide a number of services to both the Youth Justice Board and Youth Custody Services for overseeing children who needs to be placed into a custodial environment.
 The YJAF Core Product modules are:
 Analytics
-AssetPlus   
+AssetPlus
 BedUnlock
 Budget and Staffing
 Connectivity
@@ -27,14 +27,14 @@ Placements
 Quarterly Returns
 Serious Incidents (Go Live December 2022)
 User Management
-Youth Custody Secure Estate 
+Youth Custody Secure Estate
 Local Interfaces/extract services are provided through:
-YJSM/Juniper Network 
+YJSM/Juniper Network
 
 ### **Service URLs:**
 
-https://yjaf.yjbservices.yjb.gov.uk
-https://reporting.yjbservices.yjb.gov.uk/
+<https://yjaf.yjbservices.yjb.gov.uk>
+<https://reporting.yjbservices.yjb.gov.uk/>
 
 ### **Incident response hours:**
 
@@ -51,12 +51,12 @@ team will log the call and it will be allocated to the Support Team to be picked
 ### **Incident contact details:**
 
 📍 HelpHub: NEC Software Solutions | HelpHub
-📧 Email: yajfsupport@necsws.com
+📧 Email: <yajfsupport@necsws.com>
 ☎️ Call: 01429 558255
 
 ### **Service team contact:**
 
-necdigital-subscription@necsws.com
+<necdigital-subscription@necsws.com>
 
 ### **Hosting environment:**
 

@@ -54,6 +54,7 @@
       "enable_dbuilder_apikey": true,
       "enable_slack_alerts": true,
       "enable_pagerduty_alerts": false,
+      "enable_dms_failure_alerts": false,
       "enable_transfer_component_lambda": true,
       "create_transfer_component_lambda_layer": true,
       "setup_fake_data_dms_instance": true,
@@ -150,7 +151,8 @@
         },
         "lambda": {
           "postgres_tickle_function_failure": {
-            "enable": true,
+            "create": false,
+            "enable": false,
             "threshold": 1,
             "period": 60
           }
@@ -176,7 +178,7 @@
           "data_locations": ["dpr-structured-historical-development"],
           "resource_shares": [
             {
-              "glue_database": "*",
+              "glue_database": "curated_prisons_history_dev_dbt",
               "glue_tables": ["*"]
             }
           ]
@@ -185,7 +187,37 @@
       "redshift_table_expiry_days": 7,
       "enable_s3_data_migrate_lambda": true,
       "create_postgres_load_generator_job": true,
-      "enable_probation_discovery_node": true
+      "enable_probation_discovery_node": true,
+      "dpr_rds_db": {
+        "enable": true,
+        "create_replica": true,
+        "engine": "postgres",
+        "engine_version": "17.5",
+        "init_size": "158",
+        "max_size": "1000",
+        "name": "testdatabase",
+        "db_identifier": "test-database-alt",
+        "inst_class": "db.t4g.large",
+        "user": "postgres",
+        "store_type": "gp3",
+        "parameter_group_family": "postgres17",
+        "parameter_group_name": "pg17-with-pglogical"
+      },
+      "missing_report_submissions_rds": {
+        "enable": true,
+        "create_replica": true,
+        "engine": "aurora-postgresql",
+        "engine_version": "16.8",
+        "init_size": "158",
+        "max_size": "1000",
+        "name": "missingreportsubmissions",
+        "db_identifier": "missingreportsubmissions",
+        "inst_class": "db.t3.medium",
+        "user": "postgres",
+        "store_type": "gp3",
+        "parameter_group_family": "postgres16",
+        "parameter_group_name": "with-pglogical"
+      }
     },
     "test": {
       "project_short_id": "dpr",
@@ -241,6 +273,7 @@
       "enable_dbuilder_apikey": true,
       "enable_slack_alerts": true,
       "enable_pagerduty_alerts": false,
+      "enable_dms_failure_alerts": false,
       "enable_transfer_component_lambda": true,
       "create_transfer_component_lambda_layer": true,
       "setup_fake_data_dms_instance": false,
@@ -335,7 +368,8 @@
         },
         "lambda": {
           "postgres_tickle_function_failure": {
-            "enable": true,
+            "create": true,
+            "enable": false,
             "threshold": 1,
             "period": 60
           }
@@ -354,8 +388,38 @@
       "analytics_generic_athena_workgroup": true,
       "redshift_table_expiry_days": 7,
       "enable_s3_data_migrate_lambda": true,
-      "create_postgres_load_generator_job": false,
-      "enable_probation_discovery_node": false
+      "create_postgres_load_generator_job": true,
+      "enable_probation_discovery_node": false,
+      "dpr_rds_db": {
+        "enable": true,
+        "create_replica": true,
+        "engine": "postgres",
+        "engine_version": "16.8",
+        "init_size": "158",
+        "max_size": "1000",
+        "name": "testdatabase",
+        "db_identifier": "test-database",
+        "inst_class": "db.t4g.large",
+        "user": "postgres",
+        "store_type": "gp3",
+        "parameter_group_family": "postgres16",
+        "parameter_group_name": "with-pglogical"
+      },
+      "missing_report_submissions_rds": {
+        "enable": true,
+        "create_replica": true,
+        "engine": "aurora-postgresql",
+        "engine_version": "16.8",
+        "init_size": "158",
+        "max_size": "1000",
+        "name": "missingreportsubmissions",
+        "db_identifier": "missingreportsubmissions",
+        "inst_class": "db.t3.medium",
+        "user": "postgres",
+        "store_type": "gp3",
+        "parameter_group_family": "postgres16",
+        "parameter_group_name": "with-pglogical"
+      }
     },
     "preproduction": {
       "project_short_id": "dpr",
@@ -411,6 +475,7 @@
       "enable_dbuilder_apikey": true,
       "enable_slack_alerts": true,
       "enable_pagerduty_alerts": true,
+      "enable_dms_failure_alerts": false,
       "enable_transfer_component_lambda": true,
       "create_transfer_component_lambda_layer": true,
       "setup_fake_data_dms_instance": false,
@@ -507,7 +572,8 @@
         },
         "lambda": {
           "postgres_tickle_function_failure": {
-            "enable": true,
+            "create": true,
+            "enable": false,
             "threshold": 1,
             "period": 60
           }
@@ -542,7 +608,37 @@
       "redshift_table_expiry_days": 7,
       "enable_s3_data_migrate_lambda": true,
       "create_postgres_load_generator_job": false,
-      "enable_probation_discovery_node": false
+      "enable_probation_discovery_node": false,
+      "dpr_rds_db": {
+        "enable": false,
+        "create_replica": false,
+        "engine": "postgres",
+        "engine_version": "16.8",
+        "init_size": "158",
+        "max_size": "1000",
+        "name": "testdatabase",
+        "db_identifier": "test-database",
+        "inst_class": "db.t4g.large",
+        "user": "postgres",
+        "store_type": "gp3",
+        "parameter_group_family": "postgres16",
+        "parameter_group_name": "with-pglogical"
+      },
+      "missing_report_submissions_rds": {
+        "enable": true,
+        "create_replica": true,
+        "engine": "aurora-postgresql",
+        "engine_version": "16.8",
+        "init_size": "158",
+        "max_size": "1000",
+        "name": "missingreportsubmissions",
+        "db_identifier": "missingreportsubmissions",
+        "inst_class": "db.t3.medium",
+        "user": "postgres",
+        "store_type": "gp3",
+        "parameter_group_family": "postgres16",
+        "parameter_group_name": "with-pglogical"
+      }
     },
     "production": {
       "project_short_id": "dpr",
@@ -598,6 +694,7 @@
       "enable_dbuilder_apikey": true,
       "enable_slack_alerts": true,
       "enable_pagerduty_alerts": false,
+      "enable_dms_failure_alerts": true,
       "enable_transfer_component_lambda": true,
       "create_transfer_component_lambda_layer": true,
       "setup_fake_data_dms_instance": false,
@@ -692,6 +789,7 @@
         },
         "lambda": {
           "postgres_tickle_function_failure": {
+            "create": true,
             "enable": true,
             "threshold": 1,
             "period": 60
@@ -727,7 +825,37 @@
       "redshift_table_expiry_days": 1,
       "enable_s3_data_migrate_lambda": false,
       "create_postgres_load_generator_job": false,
-      "enable_probation_discovery_node": false
+      "enable_probation_discovery_node": false,
+      "dpr_rds_db": {
+        "enable": false,
+        "create_replica": false,
+        "engine": "postgres",
+        "engine_version": "16.8",
+        "init_size": "158",
+        "max_size": "1000",
+        "name": "testdatabase",
+        "db_identifier": "test-database",
+        "inst_class": "db.t4g.large",
+        "user": "postgres",
+        "store_type": "gp3",
+        "parameter_group_family": "postgres16",
+        "parameter_group_name": "with-pglogical"
+      },
+      "missing_report_submissions_rds": {
+        "enable": true,
+        "create_replica": true,
+        "engine": "aurora-postgresql",
+        "engine_version": "16.8",
+        "init_size": "158",
+        "max_size": "1000",
+        "name": "missingreportsubmissions",
+        "db_identifier": "missingreportsubmissions",
+        "inst_class": "db.t3.medium",
+        "user": "postgres",
+        "store_type": "gp3",
+        "parameter_group_family": "postgres16",
+        "parameter_group_name": "with-pglogical"
+      }
     }
   }
 }

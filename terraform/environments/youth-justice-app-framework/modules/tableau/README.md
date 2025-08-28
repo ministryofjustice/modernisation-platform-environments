@@ -156,10 +156,12 @@ On each Tableaus Server administration site import the groups prepared above:
 2. Run the following commands to copy the site export files to Tableau Server:
 
   `aws s3 cp s3://yjaf-preproduction-tableau-backups/Install_Files/site-export-preprod-default.zip /var/opt/tableau/tableau_server/data/tabsvc/files/siteimports/site-export-preprod-default.zip`
-  `chmod tableau:tableau /var/opt/tableau/tableau_server/data/tabsvc/files/siteimports/site-export-preprod-default.zip`
+
+  `chown tableau:tableau /var/opt/tableau/tableau_server/data/tabsvc/files/siteimports/site-export-preprod-default.zip`
 
   `aws s3 cp s3://yjaf-preproduction-tableau-backups/Install_Files/site-export-preprod-guest.zip /var/opt/tableau/tableau_server/data/tabsvc/files/siteimports/site-export-preprod-guest.zip`
- `chmod tableau:tableau /var/opt/tableau/tableau_server/data/tabsvc/files/siteimports/site-export-preprod-guest.zip`
+  
+ `chown tableau:tableau /var/opt/tableau/tableau_server/data/tabsvc/files/siteimports/site-export-preprod-guest.zip`
 
 3. Generate import mppping files:
 

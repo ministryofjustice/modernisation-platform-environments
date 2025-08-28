@@ -4,6 +4,7 @@ locals {
 
 # tfsec:ignore:aws-s3-enable-bucket-encryption tfsec:ignore:aws-s3-encryption-customer-key tfsec:ignore:aws-s3-enable-bucket-logging tfsec:ignore:aws-s3-enable-versioning
 module "rds_bastion" {
+  count  = local.is-production || local.is-development ? 1 : 0
   source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=95ed3c3"
 
   providers = {
@@ -39,7 +40,9 @@ module "rds_bastion" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "access_ms_sql_server" {
-  security_group_id = module.rds_bastion.bastion_security_group
+  count = local.is-production || local.is-development ? 1 : 0
+
+  security_group_id = module.rds_bastion[0].bastion_security_group
   description       = "EC2 MSSQL Access"
   ip_protocol       = "tcp"
   from_port         = 1433
@@ -48,7 +51,9 @@ resource "aws_vpc_security_group_egress_rule" "access_ms_sql_server" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "vpc_access" {
-  security_group_id = module.rds_bastion.bastion_security_group
+  count = local.is-production || local.is-development ? 1 : 0
+
+  security_group_id = module.rds_bastion[0].bastion_security_group
   description       = "Reach vpc endpoints"
   ip_protocol       = "tcp"
   from_port         = 443
@@ -57,12 +62,14 @@ resource "aws_vpc_security_group_egress_rule" "vpc_access" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "rds_via_vpc_access" {
-  security_group_id            = aws_security_group.db.id
+  count = local.is-production || local.is-development ? 1 : 0
+
+  security_group_id            = aws_security_group.db[0].id
   description                  = "EC2 instance connection to RDS"
   ip_protocol                  = "tcp"
   from_port                    = 1433
   to_port                      = 1433
-  referenced_security_group_id = module.rds_bastion.bastion_security_group
+  referenced_security_group_id = module.rds_bastion[0].bastion_security_group
 }
 
 data "aws_iam_policy_document" "ec2_s3_policy" {
@@ -89,18 +96,15 @@ data "aws_iam_policy_document" "ec2_s3_policy" {
 }
 
 resource "aws_iam_role_policy" "ec2_s3_policy" {
+  count = local.is-production || local.is-development ? 1 : 0
+
   name   = "ec2-s3-policy"
-  role   = module.rds_bastion.bastion_iam_role.name
+  role   = module.rds_bastion[0].bastion_iam_role.name
   policy = data.aws_iam_policy_document.ec2_s3_policy.json
 }
 
-resource "aws_iam_policy_attachment" "ssm-attachments" {
-  name       = "ssm-attach-instance-role"
-  roles      = [module.rds_bastion.bastion_iam_role.name, module.zip_bastion.bastion_iam_role.name]
-  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-}
-
 resource "aws_iam_role_policy" "zip_s3_policy" {
+
   name   = "zip_s3_policy"
   role   = module.zip_bastion.bastion_iam_role.name
   policy = data.aws_iam_policy_document.zip_s3_policy.json

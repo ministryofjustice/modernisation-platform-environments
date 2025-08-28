@@ -31,3 +31,15 @@ variable "private_subnets" {
   type        = list(string)
   description = "Private subnets to allow SES SMTP user to send emails"
 }
+
+variable "region" {
+  description = "The region for ses to sns policy"
+  type        = string
+  default     = "eu-west-2"
+}
+
+variable "ses_email_identities" {
+  description = "List of SES email identities to verify"
+  type        = list(string)
+  default     = []
+}

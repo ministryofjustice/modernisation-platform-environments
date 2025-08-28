@@ -25,7 +25,6 @@ locals {
     landschamber             = 15
     phl                      = 16
     siac                     = 17
-    sscs                     = 18
     tax                      = 19
     taxandchancery_ut        = 20
     transportappeals         = 21

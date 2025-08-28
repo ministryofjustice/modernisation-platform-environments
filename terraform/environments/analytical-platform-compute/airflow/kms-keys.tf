@@ -3,7 +3,7 @@ module "mwaa_kms" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "3.1.1"
+  version = "4.0.0"
 
   aliases               = ["mwaa/default"]
   enable_default_policy = true
@@ -23,14 +23,14 @@ module "mwaa_kms" {
       principals = [
         {
           type        = "Service"
-          identifiers = ["logs.${data.aws_region.current.name}.amazonaws.com"]
+          identifiers = ["logs.${data.aws_region.current.region}.amazonaws.com"]
         }
       ]
-      conditions = [
+      condition = [
         {
           test     = "ArnLike"
           variable = "kms:EncryptionContext:aws:logs:arn"
-          values   = ["arn:aws:logs:${data.aws_region.current.name}:*:*"]
+          values   = ["arn:aws:logs:${data.aws_region.current.region}:*:*"]
         }
       ]
     }

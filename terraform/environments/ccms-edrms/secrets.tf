@@ -8,3 +8,13 @@ resource "aws_secretsmanager_secret" "spring_datasource_password" {
 data "aws_secretsmanager_secret_version" "spring_datasource_password" {
   secret_id = aws_secretsmanager_secret.spring_datasource_password.id
 }
+
+# Slack Channel ID for Alerts
+resource "aws_secretsmanager_secret" "slack_channel_id" {
+  name        = "alerts_slack_channel_id"
+  description = "Slack Channel ID for EDRMS Alerts"
+}
+
+data "aws_secretsmanager_secret_version" "slack_channel_id" {
+  secret_id = aws_secretsmanager_secret.slack_channel_id.id
+}

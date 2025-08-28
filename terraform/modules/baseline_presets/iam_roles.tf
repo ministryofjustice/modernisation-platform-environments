@@ -6,6 +6,7 @@ locals {
     var.options.enable_image_builder ? ["EC2ImageBuilderDistributionCrossAccountRole"] : [],
     var.options.enable_ec2_oracle_enterprise_managed_server ? ["EC2OracleEnterpriseManagementSecretsRole"] : [],
     try(length(var.options.cloudwatch_metric_oam_links), 0) != 0 ? ["CloudWatch-CrossAccountSharingRole"] : [],
+    var.options.enable_xsiam_s3_integration ? ["CortexXsiamS3AccessRole"] : [],
     var.options.enable_vmimport ? ["vmimport"] : [],
   ]))
 
@@ -18,7 +19,7 @@ locals {
         actions = ["sts:AssumeRole"]
         principals = {
           type        = "AWS"
-          identifiers = ["core-shared-services-production"]
+          identifiers = [var.environment.account_root_arns["core-shared-services-production"]]
         }
       }]
       policy_attachments = [
@@ -80,14 +81,36 @@ locals {
         effect  = "Allow"
         actions = ["sts:AssumeRole"]
         principals = {
-          type        = "AWS"
-          identifiers = var.options.cloudwatch_metric_oam_links
+          type = "AWS"
+          identifiers = [
+            for identifier in coalesce(var.options.cloudwatch_metric_oam_links, []) : var.environment.account_root_arns[identifier]
+          ]
         }
       }]
       policy_attachments = [
         "arn:aws:iam::aws:policy/CloudWatchReadOnlyAccess",
         "arn:aws:iam::aws:policy/CloudWatchAutomaticDashboardsAccess",
         "arn:aws:iam::aws:policy/AWSXrayReadOnlyAccess"
+      ]
+    }
+
+    # Taken from https://docs-cortex.paloaltonetworks.com/r/Cortex-XDR/Cortex-XDR-Pro-Administrator-Guide/Create-an-Assumed-Role
+    CortexXsiamS3AccessRole = {
+      assume_role_policy = [{
+        effect  = "Allow"
+        actions = ["sts:AssumeRole"]
+        principals = {
+          type        = "AWS"
+          identifiers = [var.environment.account_ids["cortex_account_id"]]
+        }
+        conditions = [{
+          test     = "StringEquals"
+          variable = "sts:ExternalId"
+          values   = ["/xsiam/iam_role_external_id"] # baseline looks up from SSM param
+        }]
+      }]
+      policy_attachments = [
+        "CortexXsiamS3AccessPolicy"
       ]
     }
 

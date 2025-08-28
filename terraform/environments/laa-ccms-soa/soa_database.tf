@@ -30,10 +30,10 @@ resource "aws_db_option_group" "soa_oracle_19" {
 resource "aws_db_instance" "soa_db" {
   identifier                          = "soa-db"
   allocated_storage                   = local.application_data.accounts[local.environment].soa_db_storage_gb
-  auto_minor_version_upgrade          = true
+  auto_minor_version_upgrade          = local.application_data.accounts[local.environment].soa_db_minor_version_upgrade_allowed #--This needs to be set to true if using a JVM in the above option group
   storage_type                        = "gp2"
   engine                              = "oracle-ee"
-  engine_version                      = "19.0.0.0.ru-2025-01.rur-2025-01.r1"
+  engine_version                      = local.application_data.accounts[local.environment].soa_db_version
   instance_class                      = local.application_data.accounts[local.environment].soa_db_instance_type
   multi_az                            = local.application_data.accounts[local.environment].soa_db_deploy_to_multi_azs
   db_name                             = "SOADB"
@@ -54,6 +54,15 @@ resource "aws_db_instance" "soa_db" {
   deletion_protection     = local.application_data.accounts[local.environment].soa_db_deletion_protection
   db_subnet_group_name    = aws_db_subnet_group.soa.id
   option_group_name       = aws_db_option_group.soa_oracle_19.id
+  tags = merge(
+    local.tags,
+    { instance-scheduling = "skip-scheduling" }
+  )
+  enabled_cloudwatch_logs_exports = [
+    "alert",
+    "audit",
+    "listener"
+  ]
 
   timeouts {
     create = "40m"

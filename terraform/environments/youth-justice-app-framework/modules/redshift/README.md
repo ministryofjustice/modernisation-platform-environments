@@ -54,13 +54,35 @@ As, currently, the default AWS key is used for encryption, permissions are not n
 2. In the AWS Management Console for the destination account, launch `Redshift query editor v2`. This can be done using the `Query data` link on the `Amazon Redshift Serverless` `Namespace configuration` page.
 3. On environments, except production, create a user for the IAM role used by the YJB team by running the following command:
     `CREATE USER "IAMR:redshift-serverless-yjb-reporting-moj_ap" PASSWORD DISABLE`
-4. Generate Definitions for materalised views that reference external schema `yjb_case_reporting_stg` using the command below and save them to file `<env>_mv_before.sql`.
+4. Run script `recreate_external_schemas.sql` to recreate the External Schemas.
 
-    `select view_definition from information_schema.views where view_definition like '%yjb_case_reporting_stg%' order by table_name`
-5. Run script `recreate_external_schemas.sql` to recreate the External Schemas.
-6. The above script will fail to remove and recreate `yjb_case_reporting_stg` due to the materalised views. First check that script `recreate_views.sql` contains definitions for all the affected materalised views. Then drop `yjb_case_reporting_stg` manually and rerun that section of the script to recreate it.
+**Note:** The above script will remove aout 130 Materialise Views that are dependant on the Externl Schemas (directly or indirectly).
+
+### Recreate Views ###
+This is to be done in two tranches reflecting the priority of creation.
+
+First recreate the Views in schemas `stg`, `yjb_asses_plus` and `yjb_case_reporting` by running the following scripts in the order listed:
+
+- `recreate_stg_views_pt1.sql`
+- `recreate_stg_views_pt2.sql`
+- `recreate_case_reporting_views_pt1.sql`
+- `recreate_case_reporting_views_pt2.sql`
+- `permissions_case_reporting_views.sql`
 
 
+When all other Cutover acvities are complete recreate the remaining views for `jjb_ianda_team`, `yjb_asses_plus` and `yjb_ckpi_case_level` by running the following scripts in the order listed:
 
-
-
+- `recreate_ianda_team_views_pt1.sql`
+- `recreate_ianda_team_views_pt2.sql`
+- `recreate_ianda_team_views_pt3.sql`
+- `permissions_ianda_team_views.sql`
+- `recreate_asset_plus_views.sql`
+- `recreate_kpi_case_level_views_pt1.sql`
+- `recreate_kpi_case_level_views_pt2.sql`
+- `recreate_kpi_case_level_views_pt3.sql`
+- `recreate_kpi_case_level_views_pt4.sql`
+- `recreate_kpi_case_level_views_pt5.sql`
+- `recreate_kpi_case_level_views_pt6.sql`
+- `recreate_kpi_case_level_views_pt7.sql`
+- `recreate_kpi_case_level_views_pt8.sql`
+- `permissions__kpi_case_level_views.sql`

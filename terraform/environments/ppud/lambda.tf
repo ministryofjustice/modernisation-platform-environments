@@ -17,11 +17,11 @@ resource "aws_lambda_function" "terraform_lambda_func_terminate_cpu_process_dev"
   s3_bucket                      = "moj-infrastructure-dev"
   s3_key                         = "lambda/functions/terminate_cpu_process_dev.zip"
   function_name                  = "terminate_cpu_process_dev"
-  role                           = aws_iam_role.lambda_role_cloudwatch_invoke_lambda_2_dev[0].arn
+  role                           = aws_iam_role.lambda_role_invoke_ssm_dev[0].arn
   handler                        = "terminate_cpu_process_dev.lambda_handler"
   runtime                        = "python3.12"
   timeout                        = 300
-  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_invoke_lambda_to_lambda_role_cloudwatch_invoke_lambda_dev]
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policies_invoke_ssm_dev]
   reserved_concurrent_executions = 5
   dead_letter_config {
     target_arn = aws_sqs_queue.lambda_queue_dev[0].arn
@@ -59,11 +59,11 @@ resource "aws_lambda_function" "terraform_lambda_func_send_cpu_notification_dev"
   s3_bucket                      = "moj-infrastructure-dev"
   s3_key                         = "lambda/functions/send_cpu_notification_dev.zip"
   function_name                  = "send_cpu_notification_dev"
-  role                           = aws_iam_role.lambda_role_cloudwatch_invoke_lambda_dev[0].arn
+  role                           = aws_iam_role.lambda_role_invoke_ssm_dev[0].arn
   handler                        = "send_cpu_notification_dev.lambda_handler"
   runtime                        = "python3.12"
   timeout                        = 300
-  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_invoke_lambda_to_lambda_role_cloudwatch_invoke_lambda_dev]
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policies_invoke_ssm_dev]
   reserved_concurrent_executions = 5
   dead_letter_config {
     target_arn = aws_sqs_queue.lambda_queue_dev[0].arn
@@ -101,11 +101,11 @@ resource "aws_lambda_function" "terraform_lambda_func_send_cpu_graph_dev" {
   s3_bucket                      = "moj-infrastructure-dev"
   s3_key                         = "lambda/functions/send_cpu_graph_dev.zip"
   function_name                  = "send_cpu_graph_dev"
-  role                           = aws_iam_role.lambda_role_cloudwatch_get_metric_data_dev[0].arn
+  role                           = aws_iam_role.lambda_role_get_cloudwatch_dev[0].arn
   handler                        = "send_cpu_graph_dev.lambda_handler"
   runtime                        = "python3.12"
   timeout                        = 300
-  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_get_metric_data_to_lambda_role_cloudwatch_get_metric_data_dev]
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policies_get_cloudwatch_dev]
   reserved_concurrent_executions = 5
   dead_letter_config {
     target_arn = aws_sqs_queue.lambda_queue_dev[0].arn
@@ -148,11 +148,11 @@ resource "aws_lambda_function" "terraform_lambda_func_securityhub_report_dev" {
   s3_bucket                      = "moj-infrastructure-dev"
   s3_key                         = "lambda/functions/securityhub_report_dev.zip"
   function_name                  = "securityhub_report_dev"
-  role                           = aws_iam_role.lambda_role_securityhub_get_data_dev[0].arn
+  role                           = aws_iam_role.lambda_role_get_securityhub_data_dev[0].arn
   handler                        = "securityhub_report_dev.lambda_handler"
   runtime                        = "python3.12"
   timeout                        = 300
-  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_securityhub_get_data_to_lambda_role_securityhub_get_data_dev]
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policies_get_securityhub_data_dev]
   reserved_concurrent_executions = 5
   dead_letter_config {
     target_arn = aws_sqs_queue.lambda_queue_dev[0].arn
@@ -194,11 +194,11 @@ resource "aws_lambda_function" "terraform_lambda_func_terminate_cpu_process_uat"
   s3_bucket                      = "moj-infrastructure-uat"
   s3_key                         = "lambda/functions/terminate_cpu_process_uat.zip"
   function_name                  = "terminate_cpu_process_uat"
-  role                           = aws_iam_role.lambda_role_cloudwatch_invoke_lambda_uat[0].arn
+  role                           = aws_iam_role.lambda_role_invoke_ssm_uat[0].arn
   handler                        = "terminate_cpu_process_uat.lambda_handler"
   runtime                        = "python3.12"
   timeout                        = 300
-  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_invoke_lambda_to_lambda_role_cloudwatch_invoke_lambda_uat]
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policies_invoke_ssm_uat]
   reserved_concurrent_executions = 5
   dead_letter_config {
     target_arn = aws_sqs_queue.lambda_queue_uat[0].arn
@@ -236,11 +236,11 @@ resource "aws_lambda_function" "terraform_lambda_func_send_cpu_notification_uat"
   s3_bucket                      = "moj-infrastructure-uat"
   s3_key                         = "lambda/functions/send_cpu_notification_uat.zip"
   function_name                  = "send_cpu_notification_uat"
-  role                           = aws_iam_role.lambda_role_cloudwatch_invoke_lambda_uat[0].arn
+  role                           = aws_iam_role.lambda_role_invoke_ssm_uat[0].arn
   handler                        = "send_cpu_notification_uat.lambda_handler"
   runtime                        = "python3.12"
   timeout                        = 300
-  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_invoke_lambda_to_lambda_role_cloudwatch_invoke_lambda_uat]
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policies_invoke_ssm_uat]
   reserved_concurrent_executions = 5
   dead_letter_config {
     target_arn = aws_sqs_queue.lambda_queue_uat[0].arn
@@ -278,11 +278,11 @@ resource "aws_lambda_function" "terraform_lambda_func_securityhub_report_uat" {
   s3_bucket                      = "moj-infrastructure-uat"
   s3_key                         = "lambda/functions/securityhub_report_uat.zip"
   function_name                  = "securityhub_report_uat"
-  role                           = aws_iam_role.lambda_role_securityhub_get_data_uat[0].arn
+  role                           = aws_iam_role.lambda_role_get_securityhub_data_uat[0].arn
   handler                        = "securityhub_report_uat.lambda_handler"
   runtime                        = "python3.12"
   timeout                        = 300
-  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_securityhub_get_data_to_lambda_role_securityhub_get_data_uat]
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policies_get_certificate_uat]
   reserved_concurrent_executions = 5
   dead_letter_config {
     target_arn = aws_sqs_queue.lambda_queue_uat[0].arn
@@ -309,6 +309,49 @@ resource "aws_cloudwatch_log_group" "lambda_security_hub_report_uat_log_group" {
   retention_in_days = 30
 }
 
+
+#######################################
+# Lambda Function for SES Logging - UAT
+#######################################
+
+resource "aws_lambda_function" "terraform_lambda_func_ses_logging_uat" {
+  # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
+  # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing temporarily disabled for maintenance purposes"
+  count                          = local.is-preproduction == true ? 1 : 0
+  s3_bucket                      = "moj-infrastructure-uat"
+  s3_key                         = "lambda/functions/ses_logging_uat.zip"
+  function_name                  = "ses_logging_uat"
+  role                           = aws_iam_role.lambda_role_get_ses_logging_uat[0].arn
+  handler                        = "ses_logging_uat.lambda_handler"
+  runtime                        = "python3.12"
+  timeout                        = 300
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policies_get_ses_logging_uat]
+  reserved_concurrent_executions = 5
+  dead_letter_config {
+    target_arn = aws_sqs_queue.lambda_queue_uat[0].arn
+  }
+  tracing_config {
+    mode = "Active"
+  }
+}
+
+resource "aws_lambda_permission" "allow_sns_to_invoke_lambda_ses_logging_uat" {
+  count         = local.is-preproduction == true ? 1 : 0
+  statement_id  = "AllowSNSInvokeLambda"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.terraform_lambda_func_ses_logging_uat[0].function_name
+  principal     = "sns.amazonaws.com"
+  source_arn    = aws_sns_topic.ses_logging_uat[0].arn
+}
+
+resource "aws_cloudwatch_log_group" "lambda_ses_logging_uat_log_group" {
+  # checkov:skip=CKV_AWS_338: "Log group is only required for 30 days."
+  # checkov:skip=CKV_AWS_158: "Log group does not require KMS encryption."
+  count             = local.is-preproduction == true ? 1 : 0
+  name              = "/aws/lambda/ses_logging_uat"
+  retention_in_days = 30
+}
+
 ########################
 # Production Environment
 ########################
@@ -326,10 +369,10 @@ resource "aws_lambda_function" "terraform_lambda_disable_cpu_alarm_prod" {
   s3_bucket                      = "moj-infrastructure"
   s3_key                         = "lambda/functions/disable_cpu_alarm_prod.zip"
   function_name                  = "disable_cpu_alarm_prod"
-  role                           = aws_iam_role.lambda_role_alarm_suppression[0].arn
+  role                           = aws_iam_role.lambda_role_get_cloudwatch_prod[0].arn
   handler                        = "disable_cpu_alarm_prod.lambda_handler"
   runtime                        = "python3.12"
-  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_alarm_suppression_to_lambda_role_alarm_suppression]
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policies_get_cloudwatch_prod]
   reserved_concurrent_executions = 5
   dead_letter_config {
     target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
@@ -360,10 +403,10 @@ resource "aws_lambda_function" "terraform_lambda_enable_cpu_alarm_prod" {
   s3_bucket                      = "moj-infrastructure"
   s3_key                         = "lambda/functions/enable_cpu_alarm_prod.zip"
   function_name                  = "enable_cpu_alarm_prod"
-  role                           = aws_iam_role.lambda_role_alarm_suppression[0].arn
+  role                           = aws_iam_role.lambda_role_get_cloudwatch_prod[0].arn
   handler                        = "enable_cpu_alarm_prod.lambda_handler"
   runtime                        = "python3.12"
-  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_alarm_suppression_to_lambda_role_alarm_suppression]
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policies_get_cloudwatch_prod]
   reserved_concurrent_executions = 5
   dead_letter_config {
     target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
@@ -392,11 +435,11 @@ resource "aws_lambda_function" "terraform_lambda_func_terminate_cpu_process_prod
   s3_bucket                      = "moj-infrastructure"
   s3_key                         = "lambda/functions/terminate_cpu_process_prod.zip"
   function_name                  = "terminate_cpu_process_prod"
-  role                           = aws_iam_role.lambda_role_cloudwatch_invoke_lambda_prod[0].arn
+  role                           = aws_iam_role.lambda_role_invoke_ssm_prod[0].arn
   handler                        = "terminate_cpu_process_prod.lambda_handler"
   runtime                        = "python3.12"
   timeout                        = 300
-  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_invoke_lambda_to_lambda_role_cloudwatch_invoke_lambda_prod]
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policies_invoke_ssm_prod]
   reserved_concurrent_executions = 5
   dead_letter_config {
     target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
@@ -434,11 +477,11 @@ resource "aws_lambda_function" "terraform_lambda_func_send_cpu_notification_prod
   s3_bucket                      = "moj-infrastructure"
   s3_key                         = "lambda/functions/send_cpu_notification_prod.zip"
   function_name                  = "send_cpu_notification_prod"
-  role                           = aws_iam_role.lambda_role_cloudwatch_invoke_lambda_prod[0].arn
+  role                           = aws_iam_role.lambda_role_invoke_ssm_prod[0].arn
   handler                        = "send_cpu_notification_prod.lambda_handler"
   runtime                        = "python3.12"
   timeout                        = 300
-  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_invoke_lambda_to_lambda_role_cloudwatch_invoke_lambda_prod]
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policies_invoke_ssm_prod]
   reserved_concurrent_executions = 5
   dead_letter_config {
     target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
@@ -477,11 +520,11 @@ resource "aws_lambda_function" "terraform_lambda_func_send_cpu_graph_prod" {
   s3_bucket                      = "moj-infrastructure"
   s3_key                         = "lambda/functions/send_cpu_graph_prod.zip"
   function_name                  = "send_cpu_graph_prod"
-  role                           = aws_iam_role.lambda_role_cloudwatch_get_metric_data_prod[0].arn
+  role                           = aws_iam_role.lambda_role_get_cloudwatch_prod[0].arn
   handler                        = "send_cpu_graph_prod.lambda_handler"
   runtime                        = "python3.12"
   timeout                        = 300
-  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_get_metric_data_to_lambda_role_cloudwatch_get_metric_data_prod]
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policies_get_cloudwatch_prod]
   reserved_concurrent_executions = 5
   dead_letter_config {
     target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
@@ -530,11 +573,11 @@ resource "aws_lambda_function" "terraform_lambda_func_ppud_email_report_prod" {
   s3_bucket                      = "moj-infrastructure"
   s3_key                         = "lambda/functions/ppud_email_report_prod.zip"
   function_name                  = "ppud_email_report_prod"
-  role                           = aws_iam_role.lambda_role_cloudwatch_get_metric_data_prod[0].arn
+  role                           = aws_iam_role.lambda_role_get_cloudwatch_prod[0].arn
   handler                        = "ppud_email_report_prod.lambda_handler"
   runtime                        = "python3.12"
   timeout                        = 300
-  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_get_metric_data_to_lambda_role_cloudwatch_get_metric_data_prod]
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policies_get_cloudwatch_prod]
   reserved_concurrent_executions = 5
   dead_letter_config {
     target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
@@ -582,11 +625,11 @@ resource "aws_lambda_function" "terraform_lambda_func_ppud_elb_report_prod" {
   s3_bucket                      = "moj-infrastructure"
   s3_key                         = "lambda/functions/ppud_elb_report_prod.zip"
   function_name                  = "ppud_elb_report_prod"
-  role                           = aws_iam_role.lambda_role_cloudwatch_get_metric_data_prod[0].arn
+  role                           = aws_iam_role.lambda_role_get_cloudwatch_prod[0].arn
   handler                        = "ppud_elb_report_prod.lambda_handler"
   runtime                        = "python3.12"
   timeout                        = 300
-  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_get_metric_data_to_lambda_role_cloudwatch_get_metric_data_prod]
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policies_get_cloudwatch_prod]
   reserved_concurrent_executions = 5
   dead_letter_config {
     target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
@@ -634,11 +677,11 @@ resource "aws_lambda_function" "terraform_lambda_func_wam_elb_report_prod" {
   s3_bucket                      = "moj-infrastructure"
   s3_key                         = "lambda/functions/wam_elb_report_prod.zip"
   function_name                  = "wam_elb_report_prod"
-  role                           = aws_iam_role.lambda_role_cloudwatch_get_metric_data_prod[0].arn
+  role                           = aws_iam_role.lambda_role_get_cloudwatch_prod[0].arn
   handler                        = "wam_elb_report_prod.lambda_handler"
   runtime                        = "python3.12"
   timeout                        = 300
-  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_get_metric_data_to_lambda_role_cloudwatch_get_metric_data_prod]
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policies_get_cloudwatch_prod]
   reserved_concurrent_executions = 5
   dead_letter_config {
     target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
@@ -686,11 +729,11 @@ resource "aws_lambda_function" "terraform_lambda_func_disk_info_report_prod" {
   s3_bucket                      = "moj-infrastructure"
   s3_key                         = "lambda/functions/disk_info_report_prod.zip"
   function_name                  = "disk_info_report_prod"
-  role                           = aws_iam_role.lambda_role_cloudwatch_get_metric_data_prod[0].arn
+  role                           = aws_iam_role.lambda_role_get_cloudwatch_prod[0].arn
   handler                        = "disk_info_report_prod.lambda_handler"
   runtime                        = "python3.12"
   timeout                        = 300
-  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_get_metric_data_to_lambda_role_cloudwatch_get_metric_data_prod]
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policies_get_cloudwatch_prod]
   reserved_concurrent_executions = 5
   dead_letter_config {
     target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
@@ -739,11 +782,11 @@ resource "aws_lambda_function" "terraform_lambda_func_securityhub_report_prod" {
   s3_bucket                      = "moj-infrastructure"
   s3_key                         = "lambda/functions/securityhub_report_prod.zip"
   function_name                  = "securityhub_report_prod"
-  role                           = aws_iam_role.lambda_role_securityhub_get_data_prod[0].arn
+  role                           = aws_iam_role.lambda_role_get_securityhub_data_prod[0].arn
   handler                        = "securityhub_report_prod.lambda_handler"
   runtime                        = "python3.12"
   timeout                        = 300
-  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_securityhub_get_data_to_lambda_role_securityhub_get_data_prod]
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policies_get_securityhub_data_prod]
   reserved_concurrent_executions = 5
   dead_letter_config {
     target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
@@ -786,11 +829,11 @@ resource "aws_lambda_function" "terraform_lambda_func_ppud_elb_trt_data_prod" {
   s3_bucket                      = "moj-infrastructure"
   s3_key                         = "lambda/functions/ppud_elb_trt_data_prod.zip"
   function_name                  = "ppud_elb_trt_data_prod"
-  role                           = aws_iam_role.lambda_role_cloudwatch_get_metric_data_prod[0].arn
+  role                           = aws_iam_role.lambda_role_get_elb_metrics_prod[0].arn
   handler                        = "ppud_elb_trt_data_prod.lambda_handler"
   runtime                        = "python3.12"
   timeout                        = 300
-  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_get_metric_data_to_lambda_role_cloudwatch_get_metric_data_prod]
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policies_get_elb_metrics_prod]
   reserved_concurrent_executions = 5
   dead_letter_config {
     target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
@@ -833,11 +876,11 @@ resource "aws_lambda_function" "terraform_lambda_func_ppud_elb_trt_calculate_pro
   s3_bucket                      = "moj-infrastructure"
   s3_key                         = "lambda/functions/ppud_elb_trt_calculate_prod.zip"
   function_name                  = "ppud_elb_trt_calculate_prod"
-  role                           = aws_iam_role.lambda_role_cloudwatch_get_metric_data_prod[0].arn
+  role                           = aws_iam_role.lambda_role_get_elb_metrics_prod[0].arn
   handler                        = "ppud_elb_trt_calculate_prod.lambda_handler"
   runtime                        = "python3.12"
   timeout                        = 300
-  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_get_metric_data_to_lambda_role_cloudwatch_get_metric_data_prod]
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policies_get_elb_metrics_prod]
   reserved_concurrent_executions = 5
   dead_letter_config {
     target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
@@ -880,11 +923,11 @@ resource "aws_lambda_function" "terraform_lambda_func_ppud_elb_uptime_data_prod"
   s3_bucket                      = "moj-infrastructure"
   s3_key                         = "lambda/functions/ppud_elb_uptime_data_prod.zip"
   function_name                  = "ppud_elb_uptime_data_prod"
-  role                           = aws_iam_role.lambda_role_cloudwatch_get_metric_data_prod[0].arn
+  role                           = aws_iam_role.lambda_role_get_elb_metrics_prod[0].arn
   handler                        = "ppud_elb_uptime_data_prod.lambda_handler"
   runtime                        = "python3.12"
   timeout                        = 300
-  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_get_metric_data_to_lambda_role_cloudwatch_get_metric_data_prod]
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policies_get_elb_metrics_prod]
   reserved_concurrent_executions = 5
   dead_letter_config {
     target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
@@ -927,11 +970,11 @@ resource "aws_lambda_function" "terraform_lambda_func_ppud_elb_uptime_calculate_
   s3_bucket                      = "moj-infrastructure"
   s3_key                         = "lambda/functions/ppud_elb_uptime_calculate_prod.zip"
   function_name                  = "ppud_elb_uptime_calculate_prod"
-  role                           = aws_iam_role.lambda_role_cloudwatch_get_metric_data_prod[0].arn
+  role                           = aws_iam_role.lambda_role_get_elb_metrics_prod[0].arn
   handler                        = "ppud_elb_uptime_calculate_prod.lambda_handler"
   runtime                        = "python3.12"
   timeout                        = 300
-  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_get_metric_data_to_lambda_role_cloudwatch_get_metric_data_prod]
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policies_get_elb_metrics_prod]
   reserved_concurrent_executions = 5
   dead_letter_config {
     target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
@@ -974,11 +1017,11 @@ resource "aws_lambda_function" "terraform_lambda_func_ppud_elb_trt_graph_prod" {
   s3_bucket                      = "moj-infrastructure"
   s3_key                         = "lambda/functions/ppud_elb_trt_graph_prod.zip"
   function_name                  = "ppud_elb_trt_graph_prod"
-  role                           = aws_iam_role.lambda_role_cloudwatch_get_metric_data_prod[0].arn
+  role                           = aws_iam_role.lambda_role_get_cloudwatch_prod[0].arn
   handler                        = "ppud_elb_trt_graph_prod.lambda_handler"
   runtime                        = "python3.12"
   timeout                        = 300
-  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_get_metric_data_to_lambda_role_cloudwatch_get_metric_data_prod]
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policies_get_cloudwatch_prod]
   reserved_concurrent_executions = 5
   dead_letter_config {
     target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
@@ -1026,11 +1069,11 @@ resource "aws_lambda_function" "terraform_lambda_func_wam_elb_trt_graph_prod" {
   s3_bucket                      = "moj-infrastructure"
   s3_key                         = "lambda/functions/wam_elb_trt_graph_prod.zip"
   function_name                  = "wam_elb_trt_graph_prod"
-  role                           = aws_iam_role.lambda_role_cloudwatch_get_metric_data_prod[0].arn
+  role                           = aws_iam_role.lambda_role_get_cloudwatch_prod[0].arn
   handler                        = "wam_elb_trt_graph_prod.lambda_handler"
   runtime                        = "python3.12"
   timeout                        = 300
-  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_get_metric_data_to_lambda_role_cloudwatch_get_metric_data_prod]
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policies_get_cloudwatch_prod]
   reserved_concurrent_executions = 5
   dead_letter_config {
     target_arn = aws_sqs_queue.lambda_queue_prod[0].arn

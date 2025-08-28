@@ -20,9 +20,9 @@ locals {
       ]
 
       /* Image Versions */
-      scan_image_version     = "0.1.6"
-      transfer_image_version = "0.0.21"
-      notify_image_version   = "0.0.22"
+      scan_image_version     = "0.1.7"
+      transfer_image_version = "0.0.22"
+      notify_image_version   = "0.0.23"
 
       /* Target Buckets */
       target_buckets              = ["mojap-land-dev"]
@@ -30,6 +30,7 @@ locals {
       datasync_opg_target_buckets = ["mojap-data-production-datasync-opg-ingress-development"]
 
       /* Target KMS */
+      target_kms_keys                = []
       mojap_land_kms_key             = "arn:aws:kms:eu-west-1:${local.environment_management.account_ids["analytical-platform-data-production"]}:key/8c53fbac-3106-422a-8f3d-409bb3b0c94d"
       datasync_opg_target_bucket_kms = "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["analytical-platform-data-production"]}:key/38cf3d55-b36d-43e8-b91b-6b239a60cbea"
 
@@ -72,18 +73,30 @@ locals {
       ]
 
       /* Image Versions */
-      scan_image_version     = "0.1.6"
-      transfer_image_version = "0.0.21"
-      notify_image_version   = "0.0.22"
+      scan_image_version     = "0.1.7"
+      transfer_image_version = "0.0.22"
+      notify_image_version   = "0.0.23"
 
       /* Target Buckets */
-      target_buckets              = ["mojap-land"]
+      target_buckets = [
+        "mojap-land",
+        "mojap-data-production-shared-services-client-team-gov-29148",
+        "cloud-platform-40748c2df4b92e2dfd779a02841187ec"
+      ]
       datasync_target_buckets     = ["mojap-land"]
       datasync_opg_target_buckets = ["mojap-data-production-datasync-opg-ingress-production"]
 
+      laa_data_analysis_target_buckets = [
+        "mojap-data-production-datasync-laa-ingress-production"
+      ]
+
       /* Target KMS */
-      mojap_land_kms_key             = "arn:aws:kms:eu-west-1:${local.environment_management.account_ids["analytical-platform-data-production"]}:key/2855ac30-4e14-482e-85ca-53258e01f64c"
-      datasync_opg_target_bucket_kms = "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["analytical-platform-data-production"]}:key/96eb04fe-8393-402c-b1f9-71fcece99e75"
+      target_kms_keys = [
+        "arn:aws:kms:eu-west-2:593291632749:key/62503ba6-316e-473d-ae4b-042f8420dd07" # s3/mojap-data-production-shared-services-client-team-gov-29148
+      ]
+      mojap_land_kms_key                  = "arn:aws:kms:eu-west-1:${local.environment_management.account_ids["analytical-platform-data-production"]}:key/2855ac30-4e14-482e-85ca-53258e01f64c"
+      datasync_opg_target_bucket_kms      = "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["analytical-platform-data-production"]}:key/96eb04fe-8393-402c-b1f9-71fcece99e75"
+      laa_data_analysis_target_bucket_kms = "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["analytical-platform-data-production"]}:key/fe4674f4-52dc-4b73-a7c5-259c282742ba"
 
       /* Transfer Server */
       transfer_server_hostname = "sftp.ingestion.analytical-platform.service.justice.gov.uk"
@@ -104,6 +117,10 @@ locals {
           ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCm18Znrr+VfF3K/6frPwEPY7HCBHbUprYpgyCMIykwmn6SL9SEGUehpghd/xjNiFBz27VMTWraZYZ4RFtHQGOPaOzdMIDO+Z9RGX2rt/sjJemA01MOxfW0m9UfZ4wgoh92eYrq7ZnRWbadP2H6W1aUcGBqjh0JJ5VxtSp3wePL4HY90FLI8hMs3xwXpAqCo3ZjYzZCTOpzghwataMEmw5c//vNzGDUa+JGu1U2iGyCJCVaENcKhsKAyK2UbYAkSYBeRjQ7tdkL21Mq4KqHKBVIVlXF6l4fgIFaU11eJthkno5XAGTC3+H0MR8yjGcmufv6Ln2aeZ6zz9e/69wtrrS1qjbgYuPMtTQb7o6FbBwkr0mmfB78xNFNNv5GRzVkwSTiRWF2wjikMaadEJsSH+tKpdmYGgM5THLAyOhuy8Zg0MTsmN2TT3a4i//+T0h8v7mb5w4A87uBDenxIGNSNFKVzUkLL2uSxmn7s0UnuTuDoIthZBUVGYKaEuP2VVWDYWU= glenn.barber@L0429"
           cidr_blocks = ["35.176.93.186/32"]
         }
+        "maat-xhibit" = {
+          ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCuB8p8OaxeX3sILMVUQcD48XBPuVLzddUixUUbYLS1WPiEUz7XcUkozeuhulIy9CzqA9yyAa2uPWhQr3KL2bKpXo8UIJr+3n51mjJp9V+LO65kMN5ewQHzx9phpZba5UOth1aEwn4vAFQwm2q6/ydNrJtRQeaI0DT4njaf0MC9FM/nu25IvUbl2dzUn2MX7/WuMouzcYXTeiLUIMvgRoAw4pjnCmU2AuPTokC7OynFh++SiHRUw6OwNKxqORv3du7qlfcGDWx+oAHbUVOnSaTrUssUuEXPFS5ytwWEp6GpzfZpNvD7Kj7gw/7ntpdTckh+d5INJHu+2L74Ytj2RPLNoHEB9t1ptEI2d2SeKpHqPSak2uQzk4aHV2SJs4IO0omTWKHojtSxo5gxAl4B58UjdzmFn0yNr3rJbKnn2w1H7viaM/0vWRgZrtgo07pd2uJePObaUE9jf1re+woasVWJAy3v9dZszVBcJ62NK/QU3cGfUncBw2OnnDURm7z1YVAj8mrReOkZWFA7nJ4/Gzh5pR8wNhnSLsDFqsQefaQiHBi2vZzDRqaUu03eWvd8BmomWC5joT7qqY8Qv+X5boO9CI0hX9FcoJJMXJwckoVAZGuZKgOwOL4y1Y7hpCO1U5ex9mbyMy5D5r/FNf7B85d/qCxcGwesIzI1b0QRupKxDw=="
+          cidr_blocks = ["20.49.168.141/32", "20.49.168.17/32", "51.11.124.149/32", "51.11.124.158/32"]
+        }
       }
       transfer_server_sftp_users_with_egress = {
         "essex-police" = {
@@ -112,6 +129,14 @@ locals {
           egress_bucket         = module.bold_egress_bucket.s3_bucket_id
           egress_bucket_kms_key = module.s3_bold_egress_kms.key_arn
         }
+        "cgi-ssct-sop" = {
+          ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDG5zvCi9JcKjpyS6MtVqGdUeOXoMCNtrjWcsFCV/KG2u5HWhFJfjZvGIa1qtu/N9MLOhO3uvFwyGZYNrBe0jD9ji7SQUzWTENFoA4KnsFIPicADG34gxgdIurQo5d1z9/sJXM1Xd4G3QRKW4F7//GHNexX/A0DflubU6nZ7lM+dAXyJ72GzPDiareVFh1/o+2jBcDIRibGt9AZQp8Bu+a8ZyfBP5lEVtXCZ3iJyxh+EzBEH46Uj1KOKne1Tdynj48LMzp/QKnGjV5NuDkKoNwnZrJDhuS8+wdigT1O66bmU7VTLAmWBNO4TX8aCLyP2YgQU1ZTIw/YxQ8Qq8IWIgJC47s2NYp8XJEgcHRZG7McgQW7wrGOH10ttrev2y5jYtooxCcGqZDlM6+j3g0wo0LchA/2DsSbRP54yXvAzePleAupsJSpE4y1eojM7E82nv3J92nJkLyb4p/OahxiqxY4+vIEPdLlv/bqdU2ejU9DMg5ba6HJhxnrJ3N/Pd4mUlRD+sA7vn9LNJMMCBQJDBaTLv5C0vJ3EZZb73fUkshrBjCctumlPhjDiPZmNs50O6cF9a8waPjMGi7DgOHpoZCXOjDkyJu1xmWy8KWgtD7efIS2CFE9l57xzKLaRYABT49lQbGlsdCvpUlHr69C9RxBE0SNV559KEoDyBGcQrauXQ=="
+          cidr_blocks = ["20.50.108.242/32", "20.50.109.148/32", "51.11.124.205/32", "51.11.124.216/32"]
+          # These use the try function because the modules are conditional, and only exist in production
+          # Without it, it cannot plan
+          egress_bucket         = try(module.shared_services_client_team_gov_29148_egress_bucket[0].s3_bucket_id, null)
+          egress_bucket_kms_key = try(module.shared_services_client_team_gov_29148_egress_kms[0].key_arn, null)
+        },
       }
 
       /* DataSync */

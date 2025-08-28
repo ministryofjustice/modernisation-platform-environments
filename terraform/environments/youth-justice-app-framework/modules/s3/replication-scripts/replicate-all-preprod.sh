@@ -19,3 +19,5 @@
 ./replication.sh preprod yjaf-preprod-tableau-backups 053556912568 yjaf-preproduction-tableau-backups-archive 888577039394
 ./replication.sh preprod yjsm-preprod-artefact 053556912568 yjaf-preproduction-yjsm-artefact 888577039394
 ./replication.sh preprod yjaf-preprod-yjsm 053556912568 yjaf-preproduction-yjsm 888577039394
+./replication.sh preprod historical-preprodinfrastructure 053556912568 yjaf-preproduction-historical-infrastructure 888577039394
+./replication.sh preprod historical-preprodapps 053556912568 yjaf-preproduction-historical-apps 888577039394

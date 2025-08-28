@@ -12,8 +12,8 @@ locals {
 
   # SES Specific Locals
   hosted_zone = local.application_data.accounts[local.environment].hosted_zone
-  ses_domain = local.application_data.accounts[local.environment].ses_domain
-   
+  ses_domain  = local.application_data.accounts[local.environment].ses_domain
+
   mx_zone_id = try(data.aws_route53_zone.zone.zone_id, null)
 
 }
@@ -25,7 +25,7 @@ resource "aws_iam_user" "smtp_user" {
   tags = merge(
     local.tags,
     {
-       Name = "${local.application_name}-smtp-user"
+      Name = "${local.application_name}-smtp-user"
     }
   )
 }
@@ -49,8 +49,8 @@ resource "aws_secretsmanager_secret" "smtp_access_key_secret" {
 }
 
 resource "aws_secretsmanager_secret_version" "smtp_access_key_secret_version" {
-  count      = local.build_ses ? 1 : 0
-  secret_id  = aws_secretsmanager_secret.smtp_access_key_secret[0].id
+  count     = local.build_ses ? 1 : 0
+  secret_id = aws_secretsmanager_secret.smtp_access_key_secret[0].id
   secret_string = jsonencode({
     IAM_ACCESS_KEY_ID     = aws_iam_access_key.smtp_user_key[0].id
     IAM_SECRET_ACCESS_KEY = aws_iam_access_key.smtp_user_key[0].secret
@@ -70,8 +70,8 @@ data "aws_iam_policy_document" "smtp_user_policy" {
   # checkov:skip=CKV_AWS_111: Wildcard is required given use of email-based identities for testing.
   # checkov:skip=CKV_AWS_356: Wildcard is required given use of email-based identities for testing.
   statement {
-    effect = "Allow"
-    actions = ["ses:SendRawEmail"]
+    effect    = "Allow"
+    actions   = ["ses:SendRawEmail"]
     resources = ["*"]
   }
 }
@@ -92,8 +92,8 @@ resource "aws_secretsmanager_secret" "smtp_credentials" {
 }
 
 resource "aws_secretsmanager_secret_version" "smtp_secret_version" {
-  count        = local.build_ses ? 1 : 0
-  secret_id    = aws_secretsmanager_secret.smtp_credentials[0].id
+  count     = local.build_ses ? 1 : 0
+  secret_id = aws_secretsmanager_secret.smtp_credentials[0].id
 
   secret_string = jsonencode({
     SMTP_USERNAME = aws_iam_access_key.smtp_user_key[0].id
@@ -113,12 +113,12 @@ resource "aws_ses_domain_identity" "domain" {
 # Add SES verification TXT record to Route 53
 resource "aws_route53_record" "verification" {
   provider = aws.core-network-services
-  count   = local.build_ses ? 1 : 0
-  zone_id = data.aws_route53_zone.zone.zone_id
-  name    = "_amazonses.${local.ses_domain}"
-  type    = "TXT"
-  ttl     = 600
-  records = [aws_ses_domain_identity.domain[0].verification_token]
+  count    = local.build_ses ? 1 : 0
+  zone_id  = data.aws_route53_zone.zone.zone_id
+  name     = "_amazonses.${local.ses_domain}"
+  type     = "TXT"
+  ttl      = 600
+  records  = [aws_ses_domain_identity.domain[0].verification_token]
 }
 
 # Enable DKIM
@@ -130,12 +130,12 @@ resource "aws_ses_domain_dkim" "dkim" {
 # Add DKIM CNAME records to Route 53
 resource "aws_route53_record" "dkim" {
   provider = aws.core-network-services
-  count   = local.build_ses ? 3 : 0
-  zone_id = data.aws_route53_zone.zone.zone_id
-  name    = "${aws_ses_domain_dkim.dkim[0].dkim_tokens[count.index]}._domainkey.${local.ses_domain}"
-  type    = "CNAME"
-  ttl     = 600
-  records = ["${aws_ses_domain_dkim.dkim[0].dkim_tokens[count.index]}.dkim.amazonses.com"]
+  count    = local.build_ses ? 3 : 0
+  zone_id  = data.aws_route53_zone.zone.zone_id
+  name     = "${aws_ses_domain_dkim.dkim[0].dkim_tokens[count.index]}._domainkey.${local.ses_domain}"
+  type     = "CNAME"
+  ttl      = 600
+  records  = ["${aws_ses_domain_dkim.dkim[0].dkim_tokens[count.index]}.dkim.amazonses.com"]
 }
 
 # This is the validation of the outgoing email address (laareporders)
@@ -145,7 +145,7 @@ resource "aws_ses_domain_mail_from" "mail_from" {
   count                  = local.build_ses ? 1 : 0
   domain                 = aws_ses_domain_identity.domain[0].domain
   mail_from_domain       = "laareporders.${local.ses_domain}"
-  behavior_on_mx_failure = "RejectMessage"  # Ensures misconfigured MAIL FROM bounces
+  behavior_on_mx_failure = "RejectMessage" # Ensures misconfigured MAIL FROM bounces
 }
 
 # MX record for MAIL FROM

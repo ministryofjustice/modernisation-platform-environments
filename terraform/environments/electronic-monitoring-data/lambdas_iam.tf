@@ -495,3 +495,176 @@ resource "aws_iam_role_policy" "calculate_checksum" {
   policy = data.aws_iam_policy_document.calculate_checksum.json
 }
 
+#-----------------------------------------------------------------------------------
+# Deploy/destroy zero etl
+#-----------------------------------------------------------------------------------
+
+resource "aws_iam_role" "zero_etl_snow" {
+  name               = "zero-etl-snow-lambda-iam-role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+data "aws_iam_policy_document" "zero_etl_snow" {
+  #checkov:skip=CKV_AWS_111 - glue star
+  statement {
+    sid    = "AllowIntegrationDeploymentDestruction"
+    effect = "Allow"
+    actions = [
+      "glue:*Integration*",
+      "glue:*Integration",
+      "glue:CreateIntegration",
+      "glue:CreateIntegrationResourceProperty",
+      "glue:GetIntegrationResourceProperty",
+      "glue:UpdateIntegrationResourceProperty"
+    ]
+    resources = [
+      "*"
+    ]
+  }
+  statement {
+    sid    = "AllowConnectionDeploymentDestruction"
+    effect = "Allow"
+    actions = [
+      "glue:CreateConnection",
+      "glue:DeleteConnection",
+      "glue:BatchDeleteConnection",
+      "glue:GetConnection"
+    ]
+    resources = [
+      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:catalog",
+      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:connection/*",
+    ]
+  }
+  statement {
+    sid    = "CreateDatabase"
+    effect = "Allow"
+    actions = [
+      "glue:CreateDatabase",
+      "glue:GetDatabase"
+    ]
+    resources = [
+      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:database/*",
+      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:catalog",
+    ]
+  }
+  statement {
+    sid       = "ListAccountAlias"
+    effect    = "Allow"
+    actions   = ["iam:ListAccountAliases"]
+    resources = ["*"]
+  }
+  #checkov:skip=CKV_AWS_356: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
+  statement {
+    sid       = "ListAllSecrets"
+    effect    = "Allow"
+    actions   = ["secretsmanager:ListSecrets"]
+    resources = ["*"]
+  }
+  statement {
+    sid     = "PassRoleToConn"
+    effect  = "Allow"
+    actions = ["iam:PassRole"]
+    resources = [
+      aws_iam_role.zero_etl_snow_source.arn,
+      aws_iam_role.zero_etl_snow_target.arn,
+    ]
+  }
+  statement {
+    sid    = "ListAllBuckets"
+    effect = "Allow"
+    actions = [
+      "s3:ListAllMyBuckets",
+      "s3:GetBucketLocation"
+    ]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_policy" "zero_etl_snow" {
+  name   = "zero-etl-snow-policy"
+  policy = data.aws_iam_policy_document.zero_etl_snow.json
+}
+
+resource "aws_iam_role_policy_attachment" "zero_etl_snow" {
+  role       = aws_iam_role.zero_etl_snow.name
+  policy_arn = aws_iam_policy.zero_etl_snow.arn
+}
+
+resource "aws_lakeformation_permissions" "lambda_servicenow_create_db" {
+  principal        = aws_iam_role.zero_etl_snow.arn
+  permissions      = ["CREATE_DATABASE"]
+  catalog_resource = true
+}
+
+resource "aws_lakeformation_permissions" "lambda_servicenow_bucket" {
+  principal   = aws_iam_role.zero_etl_snow.arn
+  permissions = ["DATA_LOCATION_ACCESS"]
+  data_location {
+    arn = aws_lakeformation_resource.data_bucket.arn
+  }
+}
+
+resource "aws_lakeformation_permissions" "lambda_servicenow_read_db" {
+  principal   = aws_iam_role.zero_etl_snow.arn
+  permissions = ["DESCRIBE"]
+  database {
+    name = "servicenow${local.underscore_env}"
+  }
+}
+
+#-----------------------------------------------------------------------------------
+# DMS Validation Lambda Iam Role
+#-----------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "dms_validation_lambda_role_policy_document" {
+  statement {
+    sid    = "S3Permissions"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:GetBucketLocation",
+      "s3:ListBucket"
+    ]
+    resources = [
+      "${module.s3-dms-target-store-bucket.bucket.arn}/*",
+      module.s3-dms-target-store-bucket.bucket.arn,
+    ]
+  }
+  statement {
+    sid    = "DMSPersmissions"
+    effect = "Allow"
+    actions = [
+      "dms:DescribeReplicationTasks",
+    ]
+    resources = [
+      "*",
+    ]
+  }
+
+  statement {
+    sid    = "SecretManager"
+    effect = "Allow"
+    actions = [
+      "secretsmanager:GetSecretValue",
+    ]
+    resources = ["arn:aws:secretsmanager:eu-west-2:${data.aws_caller_identity.current.account_id}:secret:*"]
+  }
+}
+
+resource "aws_iam_role" "dms_validation_lambda_role" {
+  count              = local.is-production || local.is-development ? 1 : 0
+  name               = "dms_validation_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_policy" "dms_validation_lambda_role_policy" {
+  count  = local.is-production || local.is-development ? 1 : 0
+  name   = "dms_validation_lambda_policy"
+  policy = data.aws_iam_policy_document.dms_validation_lambda_role_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "validation_lambda_policy_attachment" {
+  count      = local.is-production || local.is-development ? 1 : 0
+  role       = aws_iam_role.dms_validation_lambda_role[0].name
+  policy_arn = aws_iam_policy.dms_validation_lambda_role_policy[0].arn
+}

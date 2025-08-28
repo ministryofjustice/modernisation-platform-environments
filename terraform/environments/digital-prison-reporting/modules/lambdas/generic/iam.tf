@@ -32,9 +32,9 @@ data "aws_iam_policy_document" "lambda_execution" {
     ]
 
     actions = [
-      "logs:CreateLogGroup",
-      "logs:CreateLogStream",
       "logs:PutLogEvents",
+      "logs:CreateLogStream",
+      "logs:CreateLogGroup",
     ]
   }
 
@@ -60,10 +60,10 @@ data "aws_iam_policy_document" "lambda_execution" {
 
     actions = [
       "ec2:DescribeNetworkInterfaces",
-      "ec2:CreateNetworkInterface",
-      "ec2:DeleteNetworkInterface",
       "ec2:DescribeInstances",
-      "ec2:AttachNetworkInterface"
+      "ec2:DeleteNetworkInterface",
+      "ec2:CreateNetworkInterface",
+      "ec2:AttachNetworkInterface",
     ]
   }
 

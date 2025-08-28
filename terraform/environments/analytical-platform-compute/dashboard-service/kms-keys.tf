@@ -5,7 +5,7 @@ module "dashboard_service_rds_kms" {
   count = terraform.workspace == "analytical-platform-compute-test" ? 0 : 1
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "3.1.1"
+  version = "4.0.0"
 
   aliases               = ["rds/dashboard-service"]
   description           = "Dashboard Service RDS KMS key"

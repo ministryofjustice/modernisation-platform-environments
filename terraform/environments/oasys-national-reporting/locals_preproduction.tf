@@ -111,29 +111,36 @@ locals {
         )
       })
 
-      # Pending sorting out cluster install of Bods in modernisation-platform-configuration-management repo
-      # pp-onr-bods-2 = merge(local.ec2_instances.bods, {
-      #   config = merge(local.ec2_instances.bods.config, {
-      #     availability_zone = "eu-west-2b"
-      #     user_data_raw = base64encode(templatefile(
-      #       "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
-      #         branch   = "main"
-      #       }
-      #     ))
-      #     instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
-      #       "Ec2SecretPolicy",
-      #     ])
-      #   })
-      #   instance = merge(local.ec2_instances.bods.instance, {
-      #     instance_type = "m6i.2xlarge"
-      #   })
-      #   cloudwatch_metric_alarms = null
-      #   tags = merge(local.ec2_instances.bods.tags, {
-      #     oasys-national-reporting-environment = "pp"
-      #     domain-name = "azure.hmpp.root"
-      #   })
-      # cloudwatch_metric_alarms = {}
-      # })
+      pp-onr-bods-2 = merge(local.ec2_instances.bods, {
+        config = merge(local.ec2_instances.bods.config, {
+          ami_name          = "hmpps_windows_server_2019_release_2025-07-02T00-00-37.630Z"
+          availability_zone = "eu-west-2b"
+          user_data_raw = base64encode(templatefile(
+            "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
+              branch = "main"
+            }
+          ))
+          instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
+            "Ec2SecretPolicy",
+          ])
+        })
+        instance = merge(local.ec2_instances.bods.instance, {
+          instance_type           = "r6i.2xlarge"
+          disable_api_termination = false # swap to true once configured
+        })
+        tags = merge(local.ec2_instances.bods.tags, {
+          oasys-national-reporting-environment = "pp"
+          domain-name                          = "azure.hmpp.root"
+        })
+        cloudwatch_metric_alarms = {} # swap with block below once configured
+        # cloudwatch_metric_alarms = merge(
+        #   module.baseline_presets.cloudwatch_metric_alarms.ec2,
+        #   module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_windows,
+        #   module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows,
+        #   local.cloudwatch_metric_alarms.windows,
+        #   local.cloudwatch_metric_alarms.bods_secondary,
+        # )
+      })
 
       pp-onr-cms-1 = merge(local.ec2_instances.bip_cms, {
         config = merge(local.ec2_instances.bip_cms.config, {
@@ -217,10 +224,9 @@ locals {
         ]
 
         self_managed_active_directory = {
-          dns_ips = [
-            module.ip_addresses.azure_fixngo_ip.PCMCW0011,
-            module.ip_addresses.azure_fixngo_ip.PCMCW0012,
-          ]
+          dns_ips = flatten([
+            module.ip_addresses.mp_ips.ad_fixngo_hmpp_domain_controllers,
+          ])
           domain_name                      = "azure.hmpp.root"
           username                         = "svc_fsx_windows"
           password_secret_name             = "/sap/bods/pp/passwords"

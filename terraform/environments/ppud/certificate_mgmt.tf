@@ -16,16 +16,16 @@ resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_dev" {
   s3_bucket                      = "moj-infrastructure-dev"
   s3_key                         = "lambda/functions/certificate_expiry_dev.zip"
   function_name                  = "certificate_expiry_dev"
-  role                           = aws_iam_role.lambda_role_certificate_expiry_dev[0].arn
+  role                           = aws_iam_role.lambda_role_get_certificate_dev[0].arn
   handler                        = "certificate_expiry_dev.lambda_handler"
   runtime                        = "python3.13"
   timeout                        = 30
   reserved_concurrent_executions = 5
-  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_certificate_expiry_to_lambda_role_certificate_expiry_dev]
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policies_get_certificate_dev]
   environment {
     variables = {
-      EXPIRY_DAYS   = "45",
-      SNS_TOPIC_ARN = "arn:aws:sns:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:ec2_cloudwatch_alarms"
+      EXPIRY_DAYS   = "30",
+      SNS_TOPIC_ARN = "arn:aws:sns:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:ppud-dev-cw-alerts"
     }
   }
   dead_letter_config {
@@ -97,15 +97,15 @@ resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_uat" {
   s3_bucket                      = "moj-infrastructure-uat"
   s3_key                         = "lambda/functions/certificate_expiry_uat.zip"
   function_name                  = "certificate_expiry_uat"
-  role                           = aws_iam_role.lambda_role_certificate_expiry_uat[0].arn
+  role                           = aws_iam_role.lambda_role_get_certificate_uat[0].arn
   handler                        = "certificate_expiry_uat.lambda_handler"
   runtime                        = "python3.13"
   timeout                        = 30
   reserved_concurrent_executions = 5
-  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_certificate_expiry_to_lambda_role_certificate_expiry_uat]
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policies_get_certificate_uat]
   environment {
     variables = {
-      EXPIRY_DAYS   = "45",
+      EXPIRY_DAYS   = "30",
       SNS_TOPIC_ARN = "arn:aws:sns:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:ppud-uat-cw-alerts"
     }
   }
@@ -178,15 +178,15 @@ resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_prod" {
   s3_bucket                      = "moj-infrastructure"
   s3_key                         = "lambda/functions/certificate_expiry_prod.zip"
   function_name                  = "certificate_expiry_prod"
-  role                           = aws_iam_role.lambda_role_certificate_expiry_prod[0].arn
+  role                           = aws_iam_role.lambda_role_get_certificate_prod[0].arn
   handler                        = "certificate_expiry_prod.lambda_handler"
   runtime                        = "python3.13"
   timeout                        = 30
   reserved_concurrent_executions = 5
-  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_certificate_expiry_to_lambda_role_certificate_expiry_prod]
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policies_get_certificate_prod]
   environment {
     variables = {
-      EXPIRY_DAYS   = "45",
+      EXPIRY_DAYS   = "30",
       SNS_TOPIC_ARN = "arn:aws:sns:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:ppud-prod-cw-alerts"
     }
   }

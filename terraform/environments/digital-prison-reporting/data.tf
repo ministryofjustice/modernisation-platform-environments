@@ -31,7 +31,7 @@ data "aws_secretsmanager_secret_version" "bodmis" {
 
 # Source OASys Secrets
 data "aws_secretsmanager_secret" "oasys" {
-  count = local.is_dev_or_test ? 1 : 0
+  count = local.is-test ? 1 : 0
 
   name = aws_secretsmanager_secret.oasys[0].id
 
@@ -39,7 +39,7 @@ data "aws_secretsmanager_secret" "oasys" {
 }
 
 data "aws_secretsmanager_secret_version" "oasys" {
-  count = local.is_dev_or_test ? 1 : 0
+  count = local.is-test ? 1 : 0
 
   secret_id = data.aws_secretsmanager_secret.oasys[0].id
 
@@ -48,7 +48,7 @@ data "aws_secretsmanager_secret_version" "oasys" {
 
 # Source ONR Secrets
 data "aws_secretsmanager_secret" "onr" {
-  count = local.is_dev_or_test ? 1 : 0
+  count = local.is-test ? 1 : 0
 
   name = aws_secretsmanager_secret.onr[0].id
 
@@ -56,7 +56,7 @@ data "aws_secretsmanager_secret" "onr" {
 }
 
 data "aws_secretsmanager_secret_version" "onr" {
-  count = local.is_dev_or_test ? 1 : 0
+  count = local.is-test ? 1 : 0
 
   secret_id = data.aws_secretsmanager_secret.onr[0].id
 
@@ -65,7 +65,7 @@ data "aws_secretsmanager_secret_version" "onr" {
 
 # Source nDelius Secrets
 data "aws_secretsmanager_secret" "ndelius" {
-  count = local.is_dev_or_test ? 1 : 0
+  count = local.is-test ? 1 : 0
 
   name = aws_secretsmanager_secret.ndelius[0].id
 
@@ -73,7 +73,7 @@ data "aws_secretsmanager_secret" "ndelius" {
 }
 
 data "aws_secretsmanager_secret_version" "ndelius" {
-  count = local.is_dev_or_test ? 1 : 0
+  count = local.is-test ? 1 : 0
 
   secret_id = data.aws_secretsmanager_secret.ndelius[0].id
 
@@ -125,6 +125,19 @@ data "aws_secretsmanager_secret_version" "dps" {
   secret_id = data.aws_secretsmanager_secret.dps[each.value].id
 
   depends_on = [aws_secretsmanager_secret.dps]
+}
+
+# DPR Secret
+data "aws_secretsmanager_secret" "test_db" {
+  count = local.is_dev_or_test ? 1 : 0
+
+  name = "external/${local.project}-dps-test-db-source-secrets"
+}
+
+data "aws_secretsmanager_secret_version" "test_db" {
+  count = local.is_dev_or_test ? 1 : 0
+
+  secret_id = data.aws_secretsmanager_secret.test_db[0].id
 }
 
 # AWS _IAM_ Policy

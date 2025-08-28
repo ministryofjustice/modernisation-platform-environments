@@ -93,6 +93,7 @@ resource "aws_cloudwatch_event_target" "trigger_lambda_target_send_cpu_graph_pro
   arn       = aws_lambda_function.terraform_lambda_func_send_cpu_graph_prod[0].arn
 }
 
+/*
 # Eventbridge rule to invoke the PPUD ELB report lambda function every weekday at 20:15
 # Set time to 20:15 during UTC and 19:15 during BST
 
@@ -144,6 +145,7 @@ resource "aws_cloudwatch_event_target" "trigger_lambda_target_wam_elb_report_pro
   target_id = "wam_elb_report"
   arn       = aws_lambda_function.terraform_lambda_func_wam_elb_report_prod[0].arn
 }
+*/
 
 # Eventbridge rule to invoke the PPUD Email Report lambda function every Monday at 07:00
 # Set time to 07:15 during UTC and 06:15 during BST
@@ -375,4 +377,54 @@ resource "aws_cloudwatch_event_target" "trigger_lambda_target_elb_trt_calculate_
   rule      = aws_cloudwatch_event_rule.monthly_schedule_elb_trt_calculate_prod[0].name
   target_id = "ppud_elb_trt_calculate_prod"
   arn       = aws_lambda_function.terraform_lambda_func_ppud_elb_trt_calculate_prod[0].arn
+}
+
+# Eventbridge rule to invoke the PPUD load balancer target response time graphing lambda function every weekday at 18:00
+
+resource "aws_lambda_permission" "allow_eventbridge_invoke_ppud_elb_trt_graph_prod" {
+  count         = local.is-production == true ? 1 : 0
+  statement_id  = "AllowEventBridgeInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.terraform_lambda_func_ppud_elb_trt_graph_prod[0].function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.daily_schedule_ppud_elb_trt_graph_prod[0].arn
+}
+
+resource "aws_cloudwatch_event_rule" "daily_schedule_ppud_elb_trt_graph_prod" {
+  count               = local.is-production == true ? 1 : 0
+  name                = "ppud-elb-trt-graph-daily-schedule"
+  description         = "Trigger Lambda at 18:00 each Monday through Friday"
+  schedule_expression = "cron(0 17 ? * MON-FRI *)"
+}
+
+resource "aws_cloudwatch_event_target" "trigger_lambda_target_ppud_elb_trt_graph_prod" {
+  count     = local.is-production == true ? 1 : 0
+  rule      = aws_cloudwatch_event_rule.daily_schedule_ppud_elb_trt_graph_prod[0].name
+  target_id = "ppud_elb_trt_graph_prod"
+  arn       = aws_lambda_function.terraform_lambda_func_ppud_elb_trt_graph_prod[0].arn
+}
+
+# Eventbridge rule to invoke the WAM load balancer target response time graphing lambda function every weekday at 18:00
+
+resource "aws_lambda_permission" "allow_eventbridge_invoke_wam_elb_trt_graph_prod" {
+  count         = local.is-production == true ? 1 : 0
+  statement_id  = "AllowEventBridgeInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.terraform_lambda_func_wam_elb_trt_graph_prod[0].function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.daily_schedule_wam_elb_trt_graph_prod[0].arn
+}
+
+resource "aws_cloudwatch_event_rule" "daily_schedule_wam_elb_trt_graph_prod" {
+  count               = local.is-production == true ? 1 : 0
+  name                = "ppud-wam-trt-graph-daily-schedule"
+  description         = "Trigger Lambda at 18:00 each Monday through Friday"
+  schedule_expression = "cron(0 17 ? * MON-FRI *)"
+}
+
+resource "aws_cloudwatch_event_target" "trigger_lambda_target_wam_elb_trt_graph_prod" {
+  count     = local.is-production == true ? 1 : 0
+  rule      = aws_cloudwatch_event_rule.daily_schedule_wam_elb_trt_graph_prod[0].name
+  target_id = "wam_elb_trt_graph_prod"
+  arn       = aws_lambda_function.terraform_lambda_func_wam_elb_trt_graph_prod[0].arn
 }

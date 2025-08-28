@@ -12,7 +12,11 @@ resource "aws_autoscaling_group" "cluster-scaling-group-managed" {
     id      = aws_launch_template.ec2-launch-template-managed.id
     version = "$Latest"
   }
-
+  tag {
+    key                 = "instance-scheduling"
+    value               = "skip-scheduling"
+    propagate_at_launch = true
+  }
   depends_on = [
     aws_efs_file_system.storage,
     aws_db_instance.soa_db
@@ -31,7 +35,11 @@ resource "aws_autoscaling_group" "cluster-scaling-group-admin" {
     id      = aws_launch_template.ec2-launch-template-admin.id
     version = "$Latest"
   }
-
+  tag {
+    key                 = "instance-scheduling"
+    value               = "skip-scheduling"
+    propagate_at_launch = true
+  }
   depends_on = [
     aws_efs_file_system.storage,
     aws_db_instance.soa_db
@@ -46,7 +54,6 @@ resource "aws_launch_template" "ec2-launch-template-managed" {
   name          = "${local.application_data.accounts[local.environment].app_name}-launch-template-managed"
   image_id      = local.application_data.accounts[local.environment].managed_ami_image_id
   instance_type = local.application_data.accounts[local.environment].managed_ec2_instance_type
-  #key_name      = local.application_data.accounts[local.environment].managed_ec2_key_name
   ebs_optimized = true
 
   monitoring {
@@ -68,8 +75,8 @@ resource "aws_launch_template" "ec2-launch-template-managed" {
     ebs {
       delete_on_termination = true
       encrypted             = true
-      kms_key_id            = data.aws_kms_alias.ebs.target_key_arn #--TEMPORARY. SHOULD USE A CMK. AW
-      volume_size           = 30
+      kms_key_id            = data.aws_kms_alias.ebs.target_key_arn #--Instances would not book with a CMK and time to debug was not available.
+      volume_size           = 30                                    #  Ideally this needs to be debugged and migrated on to a CMK! - AW
       volume_type           = "gp2"
       iops                  = 0
     }
@@ -161,21 +168,23 @@ resource "aws_launch_template" "ec2-launch-template-admin" {
 data "template_file" "launch-template-managed" {
   template = file("${path.module}/templates/user-data.sh")
   vars = {
-    cluster_name    = "${local.application_data.accounts[local.environment].app_name}-cluster"
-    efs_id          = aws_efs_file_system.storage.id
-    server          = "managed"
-    inbound_bucket  = local.application_data.accounts[local.environment].inbound_s3_bucket_name
-    outbound_bucket = local.application_data.accounts[local.environment].outbound_s3_bucket_name
+    cluster_name       = "${local.application_data.accounts[local.environment].app_name}-cluster"
+    efs_id             = aws_efs_file_system.storage.id
+    server             = "managed"
+    inbound_bucket     = local.application_data.accounts[local.environment].inbound_s3_bucket_name
+    outbound_bucket    = local.application_data.accounts[local.environment].outbound_s3_bucket_name
+    deploy_environment = local.environment
   }
 }
 
 data "template_file" "launch-template-admin" {
   template = file("${path.module}/templates/user-data.sh")
   vars = {
-    cluster_name    = "${local.application_data.accounts[local.environment].app_name}-cluster"
-    efs_id          = aws_efs_file_system.storage.id
-    server          = "admin"
-    inbound_bucket  = local.application_data.accounts[local.environment].inbound_s3_bucket_name
-    outbound_bucket = local.application_data.accounts[local.environment].outbound_s3_bucket_name
+    cluster_name       = "${local.application_data.accounts[local.environment].app_name}-cluster"
+    efs_id             = aws_efs_file_system.storage.id
+    server             = "admin"
+    inbound_bucket     = local.application_data.accounts[local.environment].inbound_s3_bucket_name
+    outbound_bucket    = local.application_data.accounts[local.environment].outbound_s3_bucket_name
+    deploy_environment = local.environment
   }
 }

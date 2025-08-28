@@ -20,12 +20,14 @@
       "tds_db_storage_gb": "50",
       "tds_db_deletion_protection": "false",
       "spring_profiles_active": "WithoutNorthgate",
-      "spring_datasource_username": "XXEDRMS",
+      "spring_datasource_username": "XXSOA",
+      "northgate_proxy": "10.120.0.147/32",
       "target_northgate_hub_dime_url": "http://10.120.0.147/DocumentHub/dime",
       "northgate_timeout": "300000",
       "target_min_capacity": "1",
       "target_max_capacity": "3",
-      "logging_level_root": "info"
+      "logging_level_root": "info",
+      "db_log_retention_days": "7"
     },
     "test": {
       "app_name": "ccms-edrms",
@@ -47,12 +49,14 @@
       "tds_db_storage_gb": "50",
       "tds_db_deletion_protection": "false",
       "spring_profiles_active": "WithoutNorthgate",
-      "spring_datasource_username": "XXEDRMS",
+      "spring_datasource_username": "XXSOA",
+      "northgate_proxy": "10.120.0.147/32",
       "target_northgate_hub_dime_url": "http://10.120.0.147/DocumentHub/dime",
       "northgate_timeout": "300000",
       "target_min_capacity": "1",
       "target_max_capacity": "3",
-      "logging_level_root": "info"
+      "logging_level_root": "info",
+      "db_log_retention_days": "14"
     },
     "preproduction": {
       "app_name": "ccms-edrms",
@@ -74,12 +78,14 @@
       "tds_db_storage_gb": "50",
       "tds_db_deletion_protection": "false",
       "spring_profiles_active": "WithNorthgate",
-      "spring_datasource_username": "XXEDRMS",
+      "spring_datasource_username": "XXSOA",
+      "northgate_proxy": "10.120.0.147/32",
       "target_northgate_hub_dime_url": "http://10.120.0.147/DocumentHub/dime",
       "northgate_timeout": "300000",
       "target_min_capacity": "1",
       "target_max_capacity": "3",
-      "logging_level_root": "info"
+      "logging_level_root": "info",
+      "db_log_retention_days": "14"
     },
     "production": {
       "app_name": "ccms-edrms",
@@ -101,12 +107,15 @@
       "tds_db_storage_gb": "50",
       "tds_db_deletion_protection": "false",
       "spring_profiles_active": "WithNorthgate",
-      "spring_datasource_username": "XXEDRMS",
+      "spring_datasource_username": "XXSOA",
+      "northgate_proxy": "10.110.0.57/32",
       "target_northgate_hub_dime_url": "http://10.110.0.57/DocumentHub/dime",
       "northgate_timeout": "300000",
       "target_min_capacity": "1",
       "target_max_capacity": "3",
-      "logging_level_root": "info"
+      "logging_level_root": "info",
+      "db_log_retention_days": "0",
+      "cortex_deps_bucket_name": "ccms-shared"
     }
   }
 }

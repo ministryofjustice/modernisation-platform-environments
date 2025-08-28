@@ -1,3 +1,4 @@
+#trivy:ignore:AVD-AWS-0102
 module "vpc" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 

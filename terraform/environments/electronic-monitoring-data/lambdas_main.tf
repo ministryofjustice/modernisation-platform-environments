@@ -208,5 +208,48 @@ module "calculate_checksum" {
 
 }
 
+#-----------------------------------------------------------------------------------
+# Deploy/destroy zero etl
+#-----------------------------------------------------------------------------------
 
+module "zero_etl_snow" {
+  source                  = "./modules/lambdas"
+  is_image                = true
+  function_name           = "zero_etl_snow"
+  role_name               = aws_iam_role.zero_etl_snow.name
+  role_arn                = aws_iam_role.zero_etl_snow.arn
+  handler                 = "zero_etl_snow.handler"
+  memory_size             = 4096
+  timeout                 = 900
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : "dev"
+}
 
+#-----------------------------------------------------------------------------------
+# DMS Validation Lambda
+#-----------------------------------------------------------------------------------
+
+module "dms_validation" {
+  count = local.is-development || local.is-production ? 1 : 0
+
+  source                  = "./modules/lambdas"
+  is_image                = true
+  function_name           = "dms_validation"
+  role_name               = aws_iam_role.dms_validation_lambda_role[0].name
+  role_arn                = aws_iam_role.dms_validation_lambda_role[0].arn
+  handler                 = "dms_validation.handler"
+  memory_size             = 10240
+  timeout                 = 900
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : "dev"
+
+  environment_variables = {
+    SOURCE_BUCKET = module.s3-dms-target-store-bucket.bucket.id
+    SECRET_NAME   = aws_secretsmanager_secret.db_password[0].name
+    USER          = aws_db_instance.database_2022[0].username
+    SERVER_NAME   = split(":", aws_db_instance.database_2022[0].endpoint)[0]
+  }
+
+  security_group_ids = [aws_security_group.dms_validation_lambda_sg[0].id]
+  subnet_ids         = data.aws_subnets.shared-public.ids
+}

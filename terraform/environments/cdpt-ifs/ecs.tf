@@ -307,7 +307,7 @@ resource "aws_launch_template" "ec2-launch-template" {
   tag_specifications {
     resource_type = "volume"
     tags = merge(tomap({
-      "Name" = "${local.application_name}-ecs-cluster"
+      "Name"         = "${local.application_name}-ecs-cluster"
       "ForceRefresh" = timestamp()
     }), local.tags)
   }
@@ -444,16 +444,6 @@ resource "aws_autoscaling_group" "cluster-scaling-group" {
     version = aws_launch_template.ec2-launch-template.latest_version
   }
 
-  instance_refresh {
-    strategy = "Rolling"
-    
-    preferences {
-      min_healthy_percentage = 50
-      instance_warmup        = 60
-  }
-
-    triggers = ["launch_template"]
-  }
 
   tag {
     key                 = "Name"

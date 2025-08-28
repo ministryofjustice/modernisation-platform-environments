@@ -1,6 +1,6 @@
 # CCMS-SOA - Known Issues
 
-## A Newly Launched Managed Server is not registered in Weblogic:
+## A Newly Launched Managed Server is not registered in Weblogic
 
 In the event that a new managed server has booted correctly (and is showing a stable healthcheck on it's EC2 Loadbalancer) but is not properly registering in Weblogic as shown below, this is likley an issue with caching in the Admin server:
 

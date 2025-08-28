@@ -7,7 +7,7 @@ data "aws_iam_policy_document" "ecr_access" {
     condition {
       test     = "StringEquals"
       variable = "aws:RequestedRegion"
-      values   = [data.aws_region.current.name]
+      values   = [data.aws_region.current.region]
     }
     condition {
       test     = "StringEquals"
@@ -24,13 +24,13 @@ data "aws_iam_policy_document" "ecr_access" {
       "ecr:GetRepositoryPolicy",
       "ecr:SetRepositoryPolicy"
     ]
-    resources = ["arn:aws:ecr:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:repository/*"]
+    resources = ["arn:aws:ecr:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:repository/*"]
   }
   statement {
     sid       = "DenyECRRepositoryPermissions"
     effect    = "Deny"
     actions   = ["ecr:DeleteRepository"]
-    resources = ["arn:aws:ecr:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:repository/*"]
+    resources = ["arn:aws:ecr:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:repository/*"]
   }
   statement {
     sid    = "AllowECRImagePermissions"
@@ -45,7 +45,7 @@ data "aws_iam_policy_document" "ecr_access" {
       "ecr:PutImage",
       "ecr:UploadLayerPart"
     ]
-    resources = ["arn:aws:ecr:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:repository/*"]
+    resources = ["arn:aws:ecr:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:repository/*"]
   }
   statement {
     sid    = "DenyECRImagePermissions"
@@ -54,7 +54,7 @@ data "aws_iam_policy_document" "ecr_access" {
       "ecr:BatchDeleteImage",
       "ecr:DeleteImage",
     ]
-    resources = ["arn:aws:ecr:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:repository/*"]
+    resources = ["arn:aws:ecr:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:repository/*"]
   }
   statement {
     sid    = "AllowECRKMSKeyPermissions"
@@ -72,7 +72,7 @@ module "ecr_access_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.55.0"
+  version = "5.59.0"
 
   name_prefix = "ecr-access"
 
@@ -115,7 +115,7 @@ module "analytical_platform_terraform_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.58.0"
+  version = "5.59.0"
 
   name_prefix = "analytical-platform-terraform"
 
@@ -173,7 +173,7 @@ module "analytical_platform_github_actions_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.58.0"
+  version = "5.59.0"
 
   name_prefix = "analytical-platform-github-actions"
 
@@ -191,6 +191,8 @@ data "aws_iam_policy_document" "data_engineering_datalake_access_github_actions"
       module.data_engineering_datalake_access_terraform_iam_role.iam_role_arn,
       "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/data-engineering-datalake-access",
       "arn:aws:iam::${local.environment_management.account_ids["electronic-monitoring-data-test"]}:role/analytical-platform-data-production-share-role",
+      "arn:aws:iam::${local.environment_management.account_ids["electronic-monitoring-data-preproduction"]}:role/analytical-platform-data-production-share-role",
+      "arn:aws:iam::${local.environment_management.account_ids["electronic-monitoring-data-production"]}:role/analytical-platform-data-production-share-role",
       "arn:aws:iam::${local.environment_management.account_ids["digital-prison-reporting-development"]}:role/analytical-platform-data-production-share-role",
       "arn:aws:iam::${local.environment_management.account_ids["digital-prison-reporting-test"]}:role/analytical-platform-data-production-share-role",
       "arn:aws:iam::${local.environment_management.account_ids["digital-prison-reporting-preproduction"]}:role/analytical-platform-data-production-share-role",
@@ -204,7 +206,7 @@ module "data_engineering_datalake_access_github_actions_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.58.0"
+  version = "5.59.0"
 
   name_prefix = "data-engineering-datalake-access-github-actions"
 
@@ -247,7 +249,7 @@ module "data_engineering_datalake_access_terraform_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.58.0"
+  version = "5.59.0"
 
   name_prefix = "data-engineering-datalake-access-terraform"
 

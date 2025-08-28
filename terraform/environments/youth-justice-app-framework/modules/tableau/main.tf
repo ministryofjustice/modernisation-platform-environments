@@ -66,6 +66,10 @@ module "tableau-alb" {
 
   enable_deletion_protection = local.enable_deletion_protection
 
+  # LB Attributes
+  idle_timeout               = 360
+  drop_invalid_header_fields = false
+
   access_logs = {
     bucket = module.log_bucket.s3_bucket_id
   }
