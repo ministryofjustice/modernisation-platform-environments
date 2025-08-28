@@ -68,4 +68,3 @@ resource "aws_lakeformation_permissions" "user_access_moj_table" {
     }
   }
 }
-
