@@ -287,14 +287,6 @@ resource "aws_s3_bucket_policy" "LOG" {
 ###################
 locals {
   account_name = "cafm"
-
-  buckets = {
-    logs     = { name = module.s3_bucket_logs.bucket.id,          arn = module.s3_bucket_logs.bucket.arn }
-    planetfm = { name = module.s3_planetfm_data_bucket.bucket.id, arn = module.s3_planetfm_data_bucket.bucket.arn }
-    concept  = { name = module.s3_concept_data_bucket.bucket.id,  arn = module.s3_concept_data_bucket.bucket.arn }
-  }
-
-  ingestion_bucket_keys = ["planetfm", "concept"]
 }
 
 ############################################
@@ -371,13 +363,14 @@ module "s3_planetfm_data_bucket" {
       Version = "2012-10-17",
       Statement = [
         {
-            "Sid": "AllowAnalyticalPlatformIngestionService",
-            "Effect": "Allow",
-            "Principal": {
-                "AWS": "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-ingestion-development"]}:role/transfer",
-                "AWS": "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-ingestion-production"]}:role/transfer"
+            Sid = AllowAnalyticalPlatformIngestionService
+            Effect = Allow
+            Principal =  {
+                AWS = ["arn:aws:iam::${local.environment_management.account_ids["analytical-platform-ingestion-development"]}:role/transfer",
+                        "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-ingestion-production"]}:role/transfer"
+                ]
             },
-            "Action": [
+            Action = [
                 "s3:DeleteObject",
                 "s3:GetObject",
                 "s3:GetObjectAcl",
@@ -385,7 +378,7 @@ module "s3_planetfm_data_bucket" {
                 "s3:PutObjectAcl",
                 "s3:PutObjectTagging"
             ],
-            "Resource": [
+            Resource = [
                 module.s3_planetfm_data_bucket.bucket.arn,
                 "${module.s3_planetfm_data_bucket.bucket.arn}/*"
             ]
@@ -458,13 +451,14 @@ module "s3_concept_data_bucket" {
       Version = "2012-10-17",
       Statement = [
         {
-            "Sid": "AllowAnalyticalPlatformIngestionService",
-            "Effect": "Allow",
-            "Principal": {
-                "AWS": "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-ingestion-development"]}:role/transfer",
-                "AWS": "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-ingestion-production"]}:role/transfer"
+            Sid = AllowAnalyticalPlatformIngestionService
+            Effect = Allow
+            Principal =  {
+                AWS = ["arn:aws:iam::${local.environment_management.account_ids["analytical-platform-ingestion-development"]}:role/transfer",
+                        "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-ingestion-production"]}:role/transfer"
+                ]
             },
-            "Action": [
+            Action = [
                 "s3:DeleteObject",
                 "s3:GetObject",
                 "s3:GetObjectAcl",
@@ -472,7 +466,7 @@ module "s3_concept_data_bucket" {
                 "s3:PutObjectAcl",
                 "s3:PutObjectTagging"
             ],
-            "Resource": [
+            Resource = [
                 module.s3_concept_data_bucket.bucket.arn,
                 "${module.s3_concept_data_bucket.bucket.arn}/*"
             ]
@@ -537,76 +531,3 @@ module "s3_concept_data_bucket" {
 
   tags = local.tags
 }
-
-############################################
-# Cross-account ingestion policy (dev/prod only)
-# Applies to the buckets listed in local.ingestion_bucket_keys
-############################################
-
-# Build a map of { key => arn } only for the chosen buckets
-# locals {
-#   ingestion_bucket_arns  = { for k, v in local.buckets : k => v.arn  if contains(local.ingestion_bucket_keys, k) }
-#   ingestion_bucket_names = { for k, v in local.buckets : k => v.name if contains(local.ingestion_bucket_keys, k) }
-# }
-
-# data "aws_iam_policy_document" "planetfm_cross" {
-#   count = local.create_ingestion_policy ? 1 : 0
-
-#   statement {
-#     sid    = "AllowAnalyticalPlatformIngestionService"
-#     effect = "Allow"
-
-#     principals {
-#     type        = "AWS"
-#     identifiers = tolist(local.ingestion_principals)
-#     }
-
-#     actions = [
-#       "s3:DeleteObject",
-#       "s3:GetObject",
-#       "s3:GetObjectAcl",
-#       "s3:PutObject",
-#       "s3:PutObjectAcl",
-#       "s3:PutObjectTagging",
-#     ]
-
-#     resources = [
-#       "arn:aws:s3:::${module.s3_planetfm_data_bucket.bucket.arn}",
-#       "arn:aws:s3:::${module.s3_planetfm_data_bucket.bucket.arn}/*",
-#     ]
-#   }
-# }
-
-# data "aws_iam_policy_document" "concept_cross" {
-#   count = local.create_ingestion_policy ? 1 : 0
-
-#   statement {
-#     sid    = "AllowAnalyticalPlatformIngestionService"
-#     effect = "Allow"
-
-#     principals {
-#     type        = "AWS"
-#     identifiers = tolist(local.ingestion_principals)
-#     }
-
-#     actions = [
-#       "s3:DeleteObject",
-#       "s3:GetObject",
-#       "s3:GetObjectAcl",
-#       "s3:PutObject",
-#       "s3:PutObjectAcl",
-#       "s3:PutObjectTagging",
-#     ]
-
-#     resources = [
-#       "arn:aws:s3:::${module.s3_concept_data_bucket.bucket.arn}",
-#       "arn:aws:s3:::${module.s3_concept_data_bucket.bucket.arn}/*",
-#     ]
-#   }
-# }
-
-# resource "aws_s3_bucket_policy" "cross_account_ingestion" {
-#   for_each = local.create_ingestion_policy ? local.ingestion_bucket_names : {}
-#   bucket   = each.value
-#   policy   = data.aws_iam_policy_document.planetfm_cross[each.key].json
-# }
