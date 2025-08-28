@@ -1,12 +1,15 @@
 data "aws_iam_policy_document" "user_jacobwoffenden" {
   statement {
-    sid    = "AthenaWorkgroupAccess"
+    sid    = "AthenaAccess"
     effect = "Allow"
     actions = [
       "athena:GetWorkGroup",
-      "athena:ListWorkGroups"
+      "athena:ListWorkGroups",
+      "athena:StartQueryExecution",
+      "athena:GetQueryExecution",
+      "athena:GetQueryResults"
     ]
-    resources = ["*"]
+    resources = [aws_athena_workgroup.main.arn]
   }
   statement {
     sid    = "AthenaKMSAccess"
@@ -14,14 +17,18 @@ data "aws_iam_policy_document" "user_jacobwoffenden" {
     actions = [
       "kms:Decrypt",
       "kms:DescribeKey",
-      "kms:Encrypt"
+      "kms:Encrypt",
+      "kms:GenerateDataKey"
     ]
     resources = [module.s3_mojap_next_poc_athena_query_kms_key.key_arn]
   }
   statement {
-    sid       = "AthenaS3BucketAccess"
-    effect    = "Allow"
-    actions   = ["s3:ListBucket"]
+    sid    = "AthenaS3BucketAccess"
+    effect = "Allow"
+    actions = [
+      "s3:GetBucketLocation",
+      "s3:ListBucket"
+    ]
     resources = [module.mojap_next_poc_athena_query_s3_bucket.s3_bucket_arn]
   }
   statement {
@@ -38,7 +45,8 @@ data "aws_iam_policy_document" "user_jacobwoffenden" {
     sid    = "GlueAccess"
     effect = "Allow"
     actions = [
-      "glue:GetDatabases"
+      "glue:GetDatabases",
+      "glue:GetTables"
     ]
     resources = ["*"]
   }
@@ -47,8 +55,15 @@ data "aws_iam_policy_document" "user_jacobwoffenden" {
     effect = "Allow"
     actions = [
       "glue:GetDatabase",
+      "glue:GetTable",
       "glue:SearchTables"
     ]
+    resources = ["*"]
+  }
+  statement {
+    sid       = "LakeFormationAccess"
+    effect    = "Allow"
+    actions   = ["lakeformation:GetDataAccess"]
     resources = ["*"]
   }
 }
