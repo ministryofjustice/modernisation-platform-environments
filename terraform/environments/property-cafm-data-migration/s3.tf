@@ -367,7 +367,31 @@ module "s3_bucket_logs" {
 module "s3_planetfm_data_bucket" {
   source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
   bucket_prefix       = "${local.account_name}-landing-planetfm-${local.environment_shorthand}-"
-  bucket_policy       = local.create_ingestion_policy ? data.aws_iam_policy_document.planetfm_cross[0].json : []
+  bucket_policy       = [jsonencode({
+      Version = "2012-10-17",
+      Statement = [
+        {
+            "Sid": "AllowAnalyticalPlatformIngestionService",
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-ingestion-development"]}:role/transfer",
+                "AWS": "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-ingestion-production"]}:role/transfer"
+            },
+            "Action": [
+                "s3:DeleteObject",
+                "s3:GetObject",
+                "s3:GetObjectAcl",
+                "s3:PutObject",
+                "s3:PutObjectAcl",
+                "s3:PutObjectTagging"
+            ],
+            "Resource": [
+                module.s3_planetfm_data_bucket.bucket.arn,
+                "${module.s3_planetfm_data_bucket.bucket.arn}/*"
+            ]
+        }
+      ]
+    })]
   versioning_enabled  = true
 
   # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
@@ -428,14 +452,49 @@ module "s3_planetfm_data_bucket" {
 }
 
 module "s3_concept_data_bucket" {
-  source             = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
-  bucket_prefix      = "${local.account_name}-landing-concept-${local.environment_shorthand}-"
-  bucket_policy       = local.create_ingestion_policy ? data.aws_iam_policy_document.concept_cross[0].json : []
-  versioning_enabled = true
+  source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
+  bucket_prefix       = "${local.account_name}-landing-concept-${local.environment_shorthand}-"
+  bucket_policy       = [jsonencode({
+      Version = "2012-10-17",
+      Statement = [
+        {
+            "Sid": "AllowAnalyticalPlatformIngestionService",
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-ingestion-development"]}:role/transfer",
+                "AWS": "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-ingestion-production"]}:role/transfer"
+            },
+            "Action": [
+                "s3:DeleteObject",
+                "s3:GetObject",
+                "s3:GetObjectAcl",
+                "s3:PutObject",
+                "s3:PutObjectAcl",
+                "s3:PutObjectTagging"
+            ],
+            "Resource": [
+                module.s3_concept_data_bucket.bucket.arn,
+                "${module.s3_concept_data_bucket.bucket.arn}/*"
+            ]
+        }
+      ]
+    })]
+  versioning_enabled  = true
+
+  # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
   ownership_controls = "BucketOwnerEnforced"
 
-  replication_enabled = false
-  providers           = { aws.bucket-replication = aws }
+  # Refer to the below section "Replication" before enabling replication
+  replication_enabled                      = false
+  # Below variable and providers configuration is only relevant if 'replication_enabled' is set to true
+  # replication_region                       = "eu-west-2"
+  providers = {
+    # Here we use the default provider Region for replication. Destination buckets can be within the same Region as the
+    # source bucket. On the other hand, if you need to enable cross-region replication, please contact the Modernisation
+    # Platform team to add a new provider for the additional Region.
+    # Leave this provider block in even if you are not using replication
+    aws.bucket-replication = aws
+  }
 
   lifecycle_rule = [
     {
@@ -458,11 +517,18 @@ module "s3_concept_data_bucket" {
         }
       ]
 
-      expiration = { days = 730 }
+      expiration = {
+        days = 730
+      }
 
       noncurrent_version_transition = [
-        { days = 90,  storage_class = "STANDARD_IA" },
-        { days = 365, storage_class = "GLACIER" }
+        {
+          days          = 90
+          storage_class = "STANDARD_IA"
+          }, {
+          days          = 365
+          storage_class = "GLACIER"
+        }
       ]
 
       noncurrent_version_expiration = { days = 730 }
@@ -478,66 +544,66 @@ module "s3_concept_data_bucket" {
 ############################################
 
 # Build a map of { key => arn } only for the chosen buckets
-locals {
-  ingestion_bucket_arns  = { for k, v in local.buckets : k => v.arn  if contains(local.ingestion_bucket_keys, k) }
-  ingestion_bucket_names = { for k, v in local.buckets : k => v.name if contains(local.ingestion_bucket_keys, k) }
-}
+# locals {
+#   ingestion_bucket_arns  = { for k, v in local.buckets : k => v.arn  if contains(local.ingestion_bucket_keys, k) }
+#   ingestion_bucket_names = { for k, v in local.buckets : k => v.name if contains(local.ingestion_bucket_keys, k) }
+# }
 
-data "aws_iam_policy_document" "planetfm_cross" {
-  count = local.create_ingestion_policy ? 1 : 0
+# data "aws_iam_policy_document" "planetfm_cross" {
+#   count = local.create_ingestion_policy ? 1 : 0
 
-  statement {
-    sid    = "AllowAnalyticalPlatformIngestionService"
-    effect = "Allow"
+#   statement {
+#     sid    = "AllowAnalyticalPlatformIngestionService"
+#     effect = "Allow"
 
-    principals {
-    type        = "AWS"
-    identifiers = tolist(local.ingestion_principals)
-    }
+#     principals {
+#     type        = "AWS"
+#     identifiers = tolist(local.ingestion_principals)
+#     }
 
-    actions = [
-      "s3:DeleteObject",
-      "s3:GetObject",
-      "s3:GetObjectAcl",
-      "s3:PutObject",
-      "s3:PutObjectAcl",
-      "s3:PutObjectTagging",
-    ]
+#     actions = [
+#       "s3:DeleteObject",
+#       "s3:GetObject",
+#       "s3:GetObjectAcl",
+#       "s3:PutObject",
+#       "s3:PutObjectAcl",
+#       "s3:PutObjectTagging",
+#     ]
 
-    resources = [
-      "arn:aws:s3:::${module.s3_planetfm_data_bucket.bucket.arn}",
-      "arn:aws:s3:::${module.s3_planetfm_data_bucket.bucket.arn}/*",
-    ]
-  }
-}
+#     resources = [
+#       "arn:aws:s3:::${module.s3_planetfm_data_bucket.bucket.arn}",
+#       "arn:aws:s3:::${module.s3_planetfm_data_bucket.bucket.arn}/*",
+#     ]
+#   }
+# }
 
-data "aws_iam_policy_document" "concept_cross" {
-  count = local.create_ingestion_policy ? 1 : 0
+# data "aws_iam_policy_document" "concept_cross" {
+#   count = local.create_ingestion_policy ? 1 : 0
 
-  statement {
-    sid    = "AllowAnalyticalPlatformIngestionService"
-    effect = "Allow"
+#   statement {
+#     sid    = "AllowAnalyticalPlatformIngestionService"
+#     effect = "Allow"
 
-    principals {
-    type        = "AWS"
-    identifiers = tolist(local.ingestion_principals)
-    }
+#     principals {
+#     type        = "AWS"
+#     identifiers = tolist(local.ingestion_principals)
+#     }
 
-    actions = [
-      "s3:DeleteObject",
-      "s3:GetObject",
-      "s3:GetObjectAcl",
-      "s3:PutObject",
-      "s3:PutObjectAcl",
-      "s3:PutObjectTagging",
-    ]
+#     actions = [
+#       "s3:DeleteObject",
+#       "s3:GetObject",
+#       "s3:GetObjectAcl",
+#       "s3:PutObject",
+#       "s3:PutObjectAcl",
+#       "s3:PutObjectTagging",
+#     ]
 
-    resources = [
-      "arn:aws:s3:::${module.s3_concept_data_bucket.bucket.arn}",
-      "arn:aws:s3:::${module.s3_concept_data_bucket.bucket.arn}/*",
-    ]
-  }
-}
+#     resources = [
+#       "arn:aws:s3:::${module.s3_concept_data_bucket.bucket.arn}",
+#       "arn:aws:s3:::${module.s3_concept_data_bucket.bucket.arn}/*",
+#     ]
+#   }
+# }
 
 # resource "aws_s3_bucket_policy" "cross_account_ingestion" {
 #   for_each = local.create_ingestion_policy ? local.ingestion_bucket_names : {}
