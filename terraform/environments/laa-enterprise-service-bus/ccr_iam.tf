@@ -71,6 +71,15 @@ resource "aws_iam_policy" "ccr_provider_load_policy" {
         ],
         Resource = aws_sqs_queue.ccr_provider_q.arn
       },
+      {
+        Effect = "Allow",
+        Action = [
+          "ssm:GetParameter",
+          "ssm:GetParameters",
+          "ssm:PutParameter"
+        ],
+        Resource = aws_ssm_parameter.ccr_provider_load_timestamp.arn
+      },
     ]
   })
 }

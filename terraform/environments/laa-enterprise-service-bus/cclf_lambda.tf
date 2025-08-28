@@ -47,7 +47,7 @@ resource "aws_lambda_function" "cclf_provider_load" {
   handler          = "lambda_function.lambda_handler"
   filename         = "lambda/provider_load_lambda/provider_load_package.zip"
   source_code_hash = filebase64sha256("lambda/provider_load_lambda/provider_load_package.zip")
-  timeout          = 300
+  timeout          = 100
   memory_size      = 128
   runtime          = "python3.10"
 
@@ -64,12 +64,13 @@ resource "aws_lambda_function" "cclf_provider_load" {
 
   environment {
     variables = {
-      DB_SECRET_NAME        = aws_secretsmanager_secret.cclf_db_mp_credentials.name
-      PROCEDURE_SECRET_NAME = aws_secretsmanager_secret.cclf_procedures_config.name
-      LD_LIBRARY_PATH       = "/opt/instantclient_12_2_linux"
-      ORACLE_HOME           = "/opt/instantclient_12_2_linux"
-      SERVICE_NAME      = "cclf-load-service"
-      NAMESPACE         = "CCLFProviderLoadService"
+      DB_SECRET_NAME          = aws_secretsmanager_secret.cclf_db_mp_credentials.name
+      PROCEDURE_SECRET_NAME   = aws_secretsmanager_secret.cclf_procedures_config.name
+      LD_LIBRARY_PATH         = "/opt/instantclient_12_2_linux"
+      ORACLE_HOME             = "/opt/instantclient_12_2_linux"
+      SERVICE_NAME            = "cclf-load-service"
+      NAMESPACE               = "CCLFProviderLoadService"
+      PURGE_LAMBDA_TIMESTAMP  = aws_ssm_parameter.cclf_provider_load_timestamp.name
     }
   }
 
