@@ -285,24 +285,21 @@ resource "aws_s3_bucket_policy" "LOG" {
 }
 
 ###################
-# Resolve environment + cross-account role
 locals {
-  # Accept long ("production") or short ("prod"); default to workspace if not set
-  env_input = coalesce(local.environment, terraform.workspace)
+  account_name = "cafm"
 
-  env = contains(values(local.environment_map), local.env_input)
-    ? local.env_input
-    : lookup(var.environment_map, local.env_input, var.environment_map["default"])
+  buckets = {
+    logs     = { name = module.s3_bucket_logs.bucket.id,          arn = module.s3_bucket_logs.bucket.arn }
+    planetfm = { name = module.s3_planetfm_data_bucket.bucket.id, arn = module.s3_planetfm_data_bucket.bucket.arn }
+    concept  = { name = module.s3_concept_data_bucket.bucket.id,  arn = module.s3_concept_data_bucket.bucket.arn }
+  }
 
-  ingestion_account_id = try(var.ingestion_account_ids[local.env], null)
-
-  # Principal list for the policy (empty => no statement)
-  ingestion_principals = local.ingestion_account_id != null ? [
-    "arn:aws:iam::${local.ingestion_account_id}:role/${var.ingestion_role_name}"
-  ] : []
-
-  create_ingestion_policy = length(local.ingestion_principals) > 0
+  ingestion_bucket_keys = ["planetfm", "concept"]
 }
+
+############################################
+# Buckets
+############################################
 
 module "s3_bucket_logs" {
   source             = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
@@ -427,13 +424,6 @@ module "s3_planetfm_data_bucket" {
   ]
 
   tags = local.tags
-  
-  # Env account mapping
-  ingestion_account_ids = {
-    dev  = "730335344807"
-    prod = "471112983409"
-  }
-  ingestion_role_name = "cafm-cross-account-access"
 }
 
 module "s3_concept_data_bucket" {
@@ -478,43 +468,29 @@ module "s3_concept_data_bucket" {
   ]
 
   tags = local.tags
-    # Env account mapping
-  ingestion_account_ids = {
-    dev  = "730335344807"
-    prod = "471112983409"
-  }
-  ingestion_role_name = "cafm-cross-account-access"
 }
 
-# Resolve bucket name + ARN from child module
+############################################
+# Cross-account ingestion policy (dev/prod only)
+# Applies to the buckets listed in local.ingestion_bucket_keys
+############################################
+
+# Build a map of { key => arn } only for the chosen buckets
 locals {
-  bucket_name = try(
-    module.bucket.bucket_id,
-    module.bucket.id,
-    module.bucket.bucket_name,
-    module.bucket.bucket,
-    try(module.bucket.bucket.id, null)
-  )
-
-  bucket_arn = try(
-    module.bucket.bucket_arn,
-    module.bucket.arn,
-    try(module.bucket.bucket.arn, null),
-    local.bucket_name != null ? "arn:aws:s3:::${local.bucket_name}" : null
-  )
+  ingestion_bucket_arns  = { for k, v in local.buckets : k => v.arn  if contains(local.ingestion_bucket_keys, k) }
+  ingestion_bucket_names = { for k, v in local.buckets : k => v.name if contains(local.ingestion_bucket_keys, k) }
 }
 
-# Cross-account ingestion statement (env-gated)
-data "aws_iam_policy_document" "cross" {
-  count = local.create_ingestion_policy ? 1 : 0
+data "aws_iam_policy_document" "cross_account_ingestion" {
+  for_each = local.create_ingestion_policy ? local.ingestion_bucket_arns : {}
 
   statement {
     sid    = "AllowAnalyticalPlatformIngestionService"
     effect = "Allow"
 
     principals {
-      type        = "AWS"
-      identifiers = tolist(local.ingestion_principals)
+    type        = "AWS"
+    identifiers = tolist(local.ingestion_principals)
     }
 
     actions = [
@@ -526,25 +502,15 @@ data "aws_iam_policy_document" "cross" {
       "s3:PutObjectTagging",
     ]
 
-    # Match your JSON: include both the bucket and object ARNs
     resources = [
-      local.bucket_arn,
-      "${local.bucket_arn}/*",
+      each.value,
+      "${each.value}/*",
     ]
   }
 }
 
-# Merge with an optional baseline policy (if any)
-data "aws_iam_policy_document" "combined" {
-  count = local.create_ingestion_policy ? 1 : 0
-
-  source_policy_documents = var.base_policy_json != null
-    ? [var.base_policy_json, data.aws_iam_policy_document.cross[0].json]
-    : [data.aws_iam_policy_document.cross[0].json]
-}
-
-resource "aws_s3_bucket_policy" "this" {
-  count  = local.create_ingestion_policy ? 1 : 0
-  bucket = local.bucket_name
-  policy = data.aws_iam_policy_document.combined[0].json
+resource "aws_s3_bucket_policy" "cross_account_ingestion" {
+  for_each = local.create_ingestion_policy ? local.ingestion_bucket_names : {}
+  bucket   = each.value
+  policy   = data.aws_iam_policy_document.cross_account_ingestion[each.key].json
 }
