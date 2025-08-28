@@ -5,7 +5,7 @@ resource "aws_glue_catalog_database" "producer_resource_link" {
   target_database {
     catalog_id    = local.producer_account_id
     database_name = local.producer_database
-    region        = data.aws_region.current.name
+    region        = data.aws_region.current.region
   }
 
   lifecycle {
