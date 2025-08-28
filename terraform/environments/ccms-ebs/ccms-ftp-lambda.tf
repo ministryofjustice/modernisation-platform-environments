@@ -253,6 +253,7 @@ module "allpay_ftp_lambda_inbound" {
   s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
   s3_object_ftp_client     = aws_s3_object.ftp_client.key
   ftp_cron                 = "cron(0 10 * * ? *)"
+  enabled_cron_in_environments = local.enable_cron_in_environments
 }
 
 #LAA-xerox-outbound-ccms
