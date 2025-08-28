@@ -513,5 +513,5 @@ data "aws_iam_policy_document" "planetfm_cross" {
 resource "aws_s3_bucket_policy" "cross_account_ingestion" {
   for_each = local.create_ingestion_policy ? local.ingestion_bucket_names : {}
   bucket   = each.value
-  policy   = data.aws_iam_policy_document.cross_account_ingestion[each.key].json
+  policy   = data.aws_iam_policy_document.planetfm_cross[each.key].json
 }

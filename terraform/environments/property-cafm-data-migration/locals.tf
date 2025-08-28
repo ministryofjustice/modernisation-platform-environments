@@ -50,10 +50,18 @@ locals {
   }
   environment_shorthand = local.environment_map[local.environment]
 
-    # cross-account principal only for envs present in the map
-  ingestion_account_id = try(var.ingestion_account_ids[local.environment], null)
-  ingestion_principals = local.ingestion_account_id != null ? [
+  default_ingestion_account_ids = {
+    dev  = local.environment_management.account_ids["analytical-platform-ingestion-development"]
+    prod = local.environment_management.account_ids["analytical-platform-ingestion-production"]
+  }
+  
+  # cross-account principal only for envs present in the map
+  ingestion_account_ids = merge(local.default_ingestion_account_ids, var.ingestion_account_ids)
+
+  env                  = terraform.workspace
+  ingestion_account_id = lookup(local.ingestion_account_ids, local.env, null)
+  ingestion_principals = local.ingestion_account_id == null ? [] : [
     "arn:aws:iam::${local.ingestion_account_id}:role/${var.ingestion_role_name}"
-  ] : []
+  ]
   create_ingestion_policy = length(local.ingestion_principals) > 0
 }
