@@ -1,27 +1,20 @@
 locals {
   secret_names = [
     "LAA-ftp-allpay-inbound-ccms",
-    "LAA-ftp-tdx-inbound-ccms-agencyassigmen",
-    "LAA-ftp-rossendales-ccms-csv-inbound",
-    "LAA-ftp-rossendales-maat-inbound",
-    "LAA-ftp-tdx-inbound-ccms-activity",
-    "LAA-ftp-tdx-inbound-ccms-transaction",
-    "LAA-ftp-tdx-inbound-ccms-livelist",
-    "LAA-ftp-tdx-inbound-ccms-multiplefiles",
     "LAA-ftp-rossendales-ccms-inbound",
-    "LAA-ftp-tdx-inbound-ccms-agencyrecallre",
-    "LAA-ftp-tdx-inbound-ccms-nonfinancialup",
-    "LAA-ftp-tdx-inbound-ccms-exceptionnotif",
     "LAA-ftp-eckoh-inbound-ccms",
     "LAA-ftp-1stlocate-ccms-inbound",
-    "LAA-ftp-rossendales-nct-inbound-product",
-    "LAA-ftp-xerox-outbound",
-    "LAA-ftp-rossendales-maat-tf-outbound"
+    "LAA-ftp-xerox-outbound"
   ]
   base_buckets = ["laa-ccms-inbound", "laa-ccms-outbound", "laa-ccms-ftp-lambda"]
 
   bucket_names = [
     for name in local.base_buckets : "${name}-${local.environment}-mp"
+  ]
+  enable_cron_in_environments =[
+    "development",
+    "test",
+    "preproduction"
   ]
 }
 
@@ -238,6 +231,8 @@ module "allpay_ftp_lambda_outbound" {
   s3_bucket_ftp            = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
   s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
   s3_object_ftp_client     = aws_s3_object.ftp_client.key
+  ftp_cron                 = "cron(0 10 * * ? *)"
+  enabled_cron_in_environments = local.enable_cron_in_environments
 }
 
 
@@ -257,6 +252,7 @@ module "allpay_ftp_lambda_inbound" {
   s3_bucket_ftp            = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
   s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
   s3_object_ftp_client     = aws_s3_object.ftp_client.key
+  ftp_cron                 = "cron(0 10 * * ? *)"
 }
 
 #LAA-xerox-outbound-ccms
@@ -276,6 +272,8 @@ module "LAA-ftp-xerox-ccms-outbound" {
   s3_bucket_ftp            = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
   s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
   s3_object_ftp_client     = aws_s3_object.ftp_client.key
+  ftp_cron                 = "cron(0 10 * * ? *)"
+  enabled_cron_in_environments = local.enable_cron_in_environments
 }
 
 #LAA-xerox-outbound-ccms-peterborough
@@ -294,6 +292,8 @@ module "LAA-ftp-xerox-ccms-outbound-peterborough" {
   s3_bucket_ftp            = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
   s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
   s3_object_ftp_client     = aws_s3_object.ftp_client.key
+  ftp_cron                 = "cron(0 10 * * ? *)"
+  enabled_cron_in_environments = local.enable_cron_in_environments
 }
 
 # #LAA-ftp-eckoh-outbound-ccms
@@ -312,6 +312,8 @@ module "LAA-ftp-eckoh-outbound-ccms" {
   s3_bucket_ftp            = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
   s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
   s3_object_ftp_client     = aws_s3_object.ftp_client.key
+  ftp_cron                 = "cron(0 10 * * ? *)"
+  enabled_cron_in_environments = local.enable_cron_in_environments
 }
 
 
@@ -331,6 +333,8 @@ module "LAA-ftp-eckoh-inbound-ccms" {
   s3_bucket_ftp            = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
   s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
   s3_object_ftp_client     = aws_s3_object.ftp_client.key
+  ftp_cron                 = "cron(0 10 * * ? *)"
+  enabled_cron_in_environments = local.enable_cron_in_environments
 }
 
 # #LAA-ftp-rossendales-ccms-inbound
@@ -349,8 +353,9 @@ module "LAA-ftp-rossendales-ccms-inbound" {
   s3_bucket_ftp            = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
   s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
   s3_object_ftp_client     = aws_s3_object.ftp_client.key
+  ftp_cron                 = "cron(0 10 * * ? *)"
+  enabled_cron_in_environments = local.enable_cron_in_environments
 }
-
 
 # #LAA-ftp-1stlocate-ccms-inbound
 module "LAA-ftp-1stlocate-ccms-inbound" {
@@ -369,4 +374,6 @@ module "LAA-ftp-1stlocate-ccms-inbound" {
   s3_bucket_ftp            = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
   s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
   s3_object_ftp_client     = aws_s3_object.ftp_client.key
+  ftp_cron                 = "cron(0 10 * * ? *)"
+  enabled_cron_in_environments = local.enable_cron_in_environments
 } 
