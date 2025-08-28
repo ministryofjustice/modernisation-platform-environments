@@ -100,4 +100,4 @@ jobs:
 
               - name: Run VPN maintenance script
                 run: |
-                    aws ec2 describe-vpn-connections --filters "Name=vpn-connection-id,Values=${{ env.vpn_id }}" --query "VpnConnections[0].TunnelOptions[0].OutsideIpAddress" | ./scripts/redact-output.sh
+                    aws ec2 describe-vpn-connections --filters "Name=vpn-connection-id,Values=$vpn_id" --query "VpnConnections[0].TunnelOptions[0].OutsideIpAddress" | ./scripts/redact-output.sh
