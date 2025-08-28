@@ -49,3 +49,29 @@ resource "aws_s3_bucket_policy" "data_cross_account_access" {
     ]
   })
 }
+
+#####################################################################################
+##################### S3 Bucket policy for Access Logs Bucket #######################
+#####################################################################################
+resource "aws_s3_bucket_policy" "log_bucket_policy" {
+  bucket = aws_s3_bucket.access_logs.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = { 
+          Service = "logging.s3.amazonaws.com" 
+        }
+        Action   = "s3:PutObject"
+        Resource = "${aws_s3_bucket.access_logs.arn}/*"
+        Condition = {
+          StringEquals = {
+            "aws:SourceArn" = aws_s3_bucket.data.arn
+          }
+        }
+      }
+    ]
+  })
+}
