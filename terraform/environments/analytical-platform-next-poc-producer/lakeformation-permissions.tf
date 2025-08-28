@@ -1,35 +1,35 @@
-# resource "aws_lakeformation_permissions" "allow_consumer_associate_tag" {
-#   principal   = local.hub_account_id
-#   permissions = ["ASSOCIATE"]
+resource "aws_lakeformation_permissions" "share_data_location" {
+  principal                     = local.hub_account_id
+  permissions                   = ["DATA_LOCATION_ACCESS"]
+  permissions_with_grant_option = ["DATA_LOCATION_ACCESS"]
 
-#   lf_tag {
-#     key    = "business-unit"
-#     values = ["Central Digital"]
-#   }
-# }
+  data_location {
+    arn = module.mojap_next_poc_data_s3_bucket.s3_bucket_arn
+  }
+}
 
-# resource "aws_lakeformation_permissions" "share_table_access" {
-#   principal   = local.hub_account_id
-#   permissions = ["SELECT", "DESCRIBE"]
+resource "aws_lakeformation_permissions" "share_database_hub" {
+  principal                     = local.hub_account_id
+  permissions                   = ["DESCRIBE"]
+  permissions_with_grant_option = ["DESCRIBE"]
 
-#   lf_tag_policy {
-#     resource_type = "TABLE"
-#     expression {
-#       key    = "business-unit"
-#       values = ["Central Digital"]
-#     }
-#   }
-# }
+  database {
+    name = aws_glue_catalog_database.moj.name
+  }
+}
 
-# resource "aws_lakeformation_permissions" "share_data_location" {
-#   principal   = local.hub_account_id
-#   permissions = ["DATA_LOCATION_ACCESS"]
+resource "aws_lakeformation_permissions" "share_tables_hub" {
+  principal                     = local.hub_account_id
+  permissions                   = ["SELECT", "DESCRIBE"]
+  permissions_with_grant_option = ["SELECT", "DESCRIBE"]
 
-#   data_location {
-#     arn = module.mojap_next_poc_data_s3_bucket.s3_bucket_arn
-#   }
-# }
+  table {
+    database_name = aws_glue_catalog_database.moj.name
+    wildcard      = true
+  }
+}
 
+## IN ACCOUNT TESTING TAGS
 resource "aws_lakeformation_permissions" "crawler_access_moj" {
   principal   = module.glue_crawler_iam_role.arn
   permissions = ["ALL"]
