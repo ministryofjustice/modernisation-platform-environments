@@ -52,16 +52,6 @@ resource "kubernetes_namespace" "keda" {
   }
 }
 
-resource "kubernetes_namespace" "ui" {
-  metadata {
-    name = "ui"
-    labels = {
-      "pod-security.kubernetes.io/enforce"                          = "restricted"
-      "compute.analytical-platform.service.justice.gov.uk/workload" = "ui"
-    }
-  }
-}
-
 resource "kubernetes_namespace" "velero" {
   metadata {
     name = "velero"
