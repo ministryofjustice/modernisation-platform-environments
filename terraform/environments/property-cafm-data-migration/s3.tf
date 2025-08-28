@@ -363,8 +363,8 @@ module "s3_planetfm_data_bucket" {
       Version = "2012-10-17",
       Statement = [
         {
-            Sid = AllowAnalyticalPlatformIngestionService
-            Effect = Allow
+            Sid = "AllowAnalyticalPlatformIngestionService"
+            Effect = "Allow"
             Principal =  {
                 AWS = ["arn:aws:iam::${local.environment_management.account_ids["analytical-platform-ingestion-development"]}:role/transfer",
                         "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-ingestion-production"]}:role/transfer"
@@ -451,8 +451,8 @@ module "s3_concept_data_bucket" {
       Version = "2012-10-17",
       Statement = [
         {
-            Sid = AllowAnalyticalPlatformIngestionService
-            Effect = Allow
+            Sid = "AllowAnalyticalPlatformIngestionService"
+            Effect = "Allow"
             Principal =  {
                 AWS = ["arn:aws:iam::${local.environment_management.account_ids["analytical-platform-ingestion-development"]}:role/transfer",
                         "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-ingestion-production"]}:role/transfer"
