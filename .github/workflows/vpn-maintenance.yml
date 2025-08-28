@@ -24,13 +24,16 @@ jobs:
             environment: nomis-production
             runs-on: ubuntu-latest
             outputs:
+                vpn_id: ${{ steps.set_vpn_id.outputs.vpn_id }}
                 vpn_environment: ${{ steps.set_vpn_environment.outputs.vpn_environment }}
             steps:
-              - name: Mask VPN ID
+              - name: Set VPN ID
+                id: set_vpn_id
                 run: |
-                    vpn_id=$(cat $GITHUB_EVENT_PATH | jq -r '.inputs.vpn_id' )
-                    echo "::add-mask::$vpn_id" 
+                    vpn_id=$(cat $GITHUB_EVENT_PATH | jq -r '.inputs.vpn_id')
+                    echo "::add-mask::$vpn_id"
                     echo "vpn_id=$vpn_id" >> $GITHUB_ENV
+                    echo "vpn_id=$vpn_id" >> $GITHUB_OUTPUT
                     
               - name: Checkout repository
                 uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
@@ -69,13 +72,7 @@ jobs:
             needs: [fetch-secrets, vpn-environment-check]
             environment: ${{ needs.vpn-environment-check.outputs.vpn_environment }}
             runs-on: ubuntu-latest
-            steps:
-              - name: Mask VPN ID
-                run: |
-                    vpn_id=$(cat $GITHUB_EVENT_PATH | jq -r '.inputs.vpn_id' )
-                    echo "::add-mask::$vpn_id" 
-                    echo "vpn_id=$vpn_id" >> $GITHUB_ENV
-                    
+            steps:  
               - name: Checkout repository
                 uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
@@ -100,5 +97,4 @@ jobs:
 
               - name: Run VPN maintenance script
                 run: |
-                    aws ec2 describe-vpn-connections --filters "Name=vpn-connection-id,Values=${{ env.vpn_id }}" --query "VpnConnections[0].TunnelOptions[0].OutsideIpAddress" | ./scripts/redact-output.sh
-                    # ./scripts/replace-vpn-tunnel.sh "${{ env.vpn_id }}"
+                    aws ec2 describe-vpn-connections --filters "Name=vpn-connection-id,Values="${{ needs.vpn-environment-check.outputs.vpn_id }}"" --query "VpnConnections[0].TunnelOptions[0].OutsideIpAddress" | ./scripts/redact-output.sh
