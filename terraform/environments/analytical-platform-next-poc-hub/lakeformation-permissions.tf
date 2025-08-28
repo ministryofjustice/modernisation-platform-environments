@@ -1,3 +1,4 @@
+# Required Lake Formation permissions to query shared Glue database
 resource "aws_lakeformation_permissions" "jacobwoffenden_database_resource_link" {
   principal                     = module.user_jacobwoffenden_iam_role.arn
   permissions                   = ["DESCRIBE"]

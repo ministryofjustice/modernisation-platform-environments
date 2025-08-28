@@ -1,3 +1,4 @@
+# This registers the Glue Catalog Database that is shared via RAM
 resource "aws_glue_catalog_database" "producer_resource_link" {
   name = "${local.producer_account_id}_${local.producer_database}"
 
