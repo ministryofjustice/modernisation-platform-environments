@@ -65,7 +65,7 @@
       "quicksight_setup": true
     },
     "preproduction": {
-      "allow_s3_replication": true,
+      "allow_s3_replication": false,
       "domain_name": "preproduction.yjbservices.yjb.gov.uk",
       "justice_domain_name": "preproduction.justice.gov.uk",
       "validate_certs": true,
