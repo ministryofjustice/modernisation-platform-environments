@@ -130,14 +130,6 @@ resource "aws_s3_bucket_ownership_controls" "access_logs" {
   }
 }
 
-resource "aws_s3_bucket_acl" "access_logs" {
-  bucket = aws_s3_bucket.access_logs.id
-  acl    = "private"
-  depends_on = [
-    aws_s3_bucket_ownership_controls.data
-  ]
-}
-
 resource "aws_s3_bucket_versioning" "access_logs" {
   bucket = aws_s3_bucket.access_logs.id
   versioning_configuration {
