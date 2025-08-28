@@ -101,5 +101,4 @@ jobs:
               - name: Run VPN maintenance script
                 run: |
                     aws ec2 describe-vpn-connections \
-                    --vpn-connection-ids "${{ env.vpn_id }}" \
-                    ./scripts/redact-output.sh
+                    --vpn-connection-ids "${{ env.vpn_id }}" | ./scripts/redact-output.sh
