@@ -62,16 +62,6 @@ resource "kubernetes_namespace" "airflow" {
   }
 }
 
-resource "kubernetes_namespace" "ui" {
-  metadata {
-    name = "ui"
-    labels = {
-      "pod-security.kubernetes.io/enforce"                          = "restricted"
-      "compute.analytical-platform.service.justice.gov.uk/workload" = "ui"
-    }
-  }
-}
-
 resource "kubernetes_namespace" "mwaa" {
   metadata {
     name = "mwaa"
