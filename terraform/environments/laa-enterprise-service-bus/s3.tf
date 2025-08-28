@@ -93,7 +93,7 @@ resource "aws_s3_bucket_versioning" "data" {
 resource "aws_s3_bucket_logging" "data" {
   bucket = aws_s3_bucket.data.id
 
-  target_bucket = aws_s3_bucket.logging.bucket
+  target_bucket = aws_s3_bucket.access_logs.id
   target_prefix = "log/"
   target_object_key_format {
     partitioned_prefix {
