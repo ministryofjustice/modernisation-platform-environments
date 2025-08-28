@@ -430,6 +430,7 @@ module "s3_planetfm_data_bucket" {
 module "s3_concept_data_bucket" {
   source             = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
   bucket_prefix      = "${local.account_name}-landing-concept-${local.environment_shorthand}-"
+  bucket_policy       = local.create_ingestion_policy ? data.aws_iam_policy_document.concept_cross[0].json : []
   versioning_enabled = true
   ownership_controls = "BucketOwnerEnforced"
 
@@ -510,8 +511,36 @@ data "aws_iam_policy_document" "planetfm_cross" {
   }
 }
 
-resource "aws_s3_bucket_policy" "cross_account_ingestion" {
-  for_each = local.create_ingestion_policy ? local.ingestion_bucket_names : {}
-  bucket   = each.value
-  policy   = data.aws_iam_policy_document.planetfm_cross[each.key].json
+data "aws_iam_policy_document" "concept_cross" {
+  count = local.create_ingestion_policy ? 1 : 0
+
+  statement {
+    sid    = "AllowAnalyticalPlatformIngestionService"
+    effect = "Allow"
+
+    principals {
+    type        = "AWS"
+    identifiers = tolist(local.ingestion_principals)
+    }
+
+    actions = [
+      "s3:DeleteObject",
+      "s3:GetObject",
+      "s3:GetObjectAcl",
+      "s3:PutObject",
+      "s3:PutObjectAcl",
+      "s3:PutObjectTagging",
+    ]
+
+    resources = [
+      "arn:aws:s3:::${module.s3_concept_data_bucket.bucket.arn}",
+      "arn:aws:s3:::${module.s3_concept_data_bucket.bucket.arn}/*",
+    ]
+  }
 }
+
+# resource "aws_s3_bucket_policy" "cross_account_ingestion" {
+#   for_each = local.create_ingestion_policy ? local.ingestion_bucket_names : {}
+#   bucket   = each.value
+#   policy   = data.aws_iam_policy_document.planetfm_cross[each.key].json
+# }
