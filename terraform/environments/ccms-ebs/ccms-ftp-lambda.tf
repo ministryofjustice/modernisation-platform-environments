@@ -18,6 +18,18 @@ locals {
   ]
 }
 
+output "debug_env" {
+  value = local.environment
+}
+
+output "debug_enabled_envs" {
+  value = local.enable_cron_in_environments
+}
+
+output "debug_contains" {
+  value = contains(local.enable_cron_in_environments, local.environment)
+}
+
 ### secrets for ftp user and password
 resource "aws_secretsmanager_secret" "secrets" {
   for_each = toset(local.secret_names)
