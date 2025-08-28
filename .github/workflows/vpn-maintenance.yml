@@ -21,6 +21,7 @@ jobs:
 
     vpn-environment-check:
             needs: fetch-secrets
+            environment: nomis-production
             runs-on: ubuntu-latest
             outputs:
                 vpn_environment: ${{ steps.set_vpn_environment.outputs.vpn_environment }}
