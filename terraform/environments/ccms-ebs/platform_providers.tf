@@ -21,6 +21,14 @@ provider "aws" {
   }
 }
 
+provider "awscc" {
+  alias = "test-webapp"
+  region = "eu-west-2"
+  assume_role = {
+    role_arn = "arn:aws:iam::${data.aws_caller_identity.original_session.id}:role/MemberInfrastructureAccess"
+  }
+}
+
 # AWS provider for core-vpc-<environment>, to access resources in the core-vpc accounts
 provider "aws" {
   alias  = "core-vpc"
