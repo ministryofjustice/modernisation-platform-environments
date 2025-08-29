@@ -1,5 +1,8 @@
 name: VPN Maintenance
 on:
+  push:
+    branches:
+      - feature/11200-automate-vpn-maintenance
   workflow_dispatch:
     inputs:
       vpn_id:
