@@ -70,14 +70,19 @@ resource "aws_secretsmanager_secret_version" "rekognition_user_access_key_value"
 }
 
 data "aws_iam_policy_document" "assume_rekognition_role_policy" {
-  statement {
-    sid = "AllowDevAssume"
-    effect = "Allow"
-    principals {
-      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-developer_${local.developer_role_suffix}"]
-      type = "AWS"
+  dynamic "statement" {
+    for_each = local.allowed_assume_role_principals
+    iterator = principal
+
+    content {
+      sid = "Allow${principal.key}Assume"
+      effect = "Allow"
+      principals {
+        identifiers = [principal.value]
+        type = "AWS"
+      }
+      actions = ["sts:AssumeRole"]
     }
-    actions = ["sts:AssumeRole"]
   }
 }
 
