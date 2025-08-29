@@ -17,9 +17,6 @@ OutsideIPAddresses=($(aws ec2 describe-vpn-connections \
     --query "VpnConnections[0].Options.TunnelOptions[*].OutsideIpAddress" \
     --output text))
 
-# echo "Outside IP Address 1: ${OutsideIPAddresses[0]}"
-# echo "Outside IP Address 2: ${OutsideIPAddresses[1]}"
-
 # Replace VPN tunnel 1
 echo "Replacing 1st VPN tunnel..."
 aws ec2 replace-vpn-tunnel \
@@ -30,15 +27,20 @@ sleep 60
 
 echo "Waiting for tunnel 1 to finish replacing..."
 while true; do
-    STATUS=$(aws ec2 describe-vpn-connections \
-        --filters "Name=vpn-connection-id,Values=$VPN_ID" \
+    PROVISIONING_STATUS=$(aws ec2 get-active-vpn-tunnel-status \
+        --vpn-connection-id "$VPN_ID" \
+        --vpn-tunnel-outside-ip-address "${OutsideIPAddresses[0]}" \
+        --query "ActiveVpnTunnelStatus.ProvisioningStatus" \
+        --output text)
+    TUNNEL_STATUS=$(aws ec2 describe-vpn-connections \
+        --vpn-connection-id "$VPN_ID" \
         --query "VpnConnections[0].VgwTelemetry[0].Status" \
         --output text)
-    if [[ "$STATUS" == "UP" ]]; then
+    if [[ "$PROVISIONING_STATUS" == "available" && "$TUNNEL_STATUS" == "UP" ]]; then
         echo "Tunnel 1 is UP."
         break
     fi
-    echo "Tunnel 1 status: $STATUS. Waiting 1 minute..."
+    echo "Tunnel 1 status: $PROVISIONING_STATUS. Waiting 1 minute..."
     sleep 60
 done
 
@@ -52,15 +54,20 @@ sleep 60
 
 echo "Waiting for tunnel 2 to finish replacing..."
 while true; do
-    STATUS=$(aws ec2 describe-vpn-connections \
-        --filters "Name=vpn-connection-id,Values=$VPN_ID" \
+    PROVISIONING_STATUS=$(aws ec2 get-active-vpn-tunnel-status \
+        --vpn-connection-id "$VPN_ID" \
+        --vpn-tunnel-outside-ip-address "${OutsideIPAddresses[1]}" \
+        --query "ActiveVpnTunnelStatus.ProvisioningStatus" \
+        --output text)
+    TUNNEL_STATUS=$(aws ec2 describe-vpn-connections \
+        --vpn-connection-id "$VPN_ID" \
         --query "VpnConnections[0].VgwTelemetry[1].Status" \
         --output text)
-    if [[ "$STATUS" == "UP" ]]; then
-        echo "Tunnel 2 is UP."
+    if [[ "$PROVISIONING_STATUS" == "available" && "$TUNNEL_STATUS" == "UP" ]]; then
+        echo "Tunnel 1 is UP."
         break
     fi
-    echo "Tunnel 2 status: $STATUS. Waiting 1 minute..."
+    echo "Tunnel 1 status: $PROVISIONING_STATUS. Waiting 1 minute..."
     sleep 60
 done
 echo "Both VPN tunnels have been successfully replaced and are UP."
