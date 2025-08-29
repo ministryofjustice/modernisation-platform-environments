@@ -294,6 +294,11 @@ locals {
     concept  = {}
   }
 
+  landing_prefixes = {
+    for k in keys(local.landing_sets) :
+    k => "${local.account_name}-landing-${k}-${local.environment_shorthand}-"
+  }
+
   # Reused lifecycle rule
   lifecycle_rule_main = [
     {
@@ -344,7 +349,7 @@ module "s3_data_bucket" {
   source   = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
   for_each = local.landing_sets
 
-  bucket_prefix       = "${local.account_name}-landing-${each.key}-${local.environment_shorthand}-"
+  bucket_prefix       = local.landing_prefixes[each.key]
   custom_kms_key      = aws_kms_key.shared_kms_key.arn
   versioning_enabled  = true
   ownership_controls  = "BucketOwnerEnforced"
@@ -376,6 +381,10 @@ module "s3_data_bucket" {
             "s3:PutObject",
             "s3:PutObjectAcl",
             "s3:PutObjectTagging",
+          ],
+          Resource = [
+            "arn:aws:s3:::${local.landing_prefixes[each.key]}*",
+            "arn:aws:s3:::${local.landing_prefixes[each.key]}*/*"
           ]
         }
       ]
