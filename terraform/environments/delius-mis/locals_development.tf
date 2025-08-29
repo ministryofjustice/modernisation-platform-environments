@@ -361,4 +361,8 @@ locals {
     storage_capacity     = 100
     throughtput_capacity = 16
   }
+
+  lb_config = {
+    bucket_policy_enabled = true
+  }
 }

@@ -39,6 +39,7 @@ module "environment_dev" {
 
   fsx_config               = local.fsx_config_dev
   dfi_report_bucket_config = local.dfi_report_bucket_config
+  lb_config                = local.lb_config
 
   domain_join_ports = local.domain_join_ports
 
