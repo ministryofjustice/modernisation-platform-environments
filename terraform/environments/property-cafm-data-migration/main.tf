@@ -3,7 +3,7 @@ module "rds_export" {
   # checkov:skip=CKV_TF_2: using branch instead of tag with a version number
   source = "github.com/ministryofjustice/terraform-rds-export?ref=1a02540acba58172d04bd34fb89ab5adbed2f886"
 
-  kms_key_arn         = aws_kms_key.sns_kms.arn
+  kms_key_arn         = aws_kms_key.shared_kms_key.arn
   name                = "cafm"
   database_refresh_mode = "full"
   vpc_id              = module.vpc.vpc_id
@@ -21,7 +21,7 @@ module "rds_export" {
 resource "aws_secretsmanager_secret" "db_master_user_secret" {
   # checkov:skip=CKV2_AWS_57: Skipping because automatic rotation not needed.
   name       = "cafm-database-master-user-secret"
-  kms_key_id = aws_kms_key.sns_kms.arn
+  kms_key_id = aws_kms_key.shared_kms_key.arn
 }
 
 module "endpoints" {
@@ -75,7 +75,7 @@ module "sftp_user" {
   user_name   = each.value.user_name
   server_id   = module.server.id
   s3_bucket   = each.value.s3_bucket
-  kms_key_arn = aws_kms_key.sns_kms.arn
+  kms_key_arn = aws_kms_key.shared_kms_key.arn
 }
 
 

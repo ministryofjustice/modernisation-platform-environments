@@ -1,15 +1,15 @@
-resource "aws_kms_key" "sns_kms" {
+resource "aws_kms_key" "shared_kms_key" {
   description             = "Customer-managed KMS key for encrypting SNS topic"
   enable_key_rotation     = true
   deletion_window_in_days = 10
 
   tags = {
-    Purpose = "SNS topic encryption"
+    Purpose = "CAFM Shared Key for encryption"
   }
 }
 
-resource "aws_kms_key_policy" "sns_kms_policy" {
-  key_id = aws_kms_key.sns_kms.id
+resource "aws_kms_key_policy" "shared_kms_key_policy" {
+  key_id = aws_kms_key.shared_kms_key.id
 
   policy = jsonencode({
     Version = "2012-10-17",
