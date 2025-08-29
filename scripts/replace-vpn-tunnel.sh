@@ -8,10 +8,7 @@ export AWS_PAGER=""
 
 VPN_ID=$1
 
-# Find VPN tunnels for the given VPN ID
-# aws ec2 describe-vpn-connections \
-#     --filters "Name=vpn-connection-id,Values=$VPN_ID" 
-
+# Get the outside IP addresses of the VPN tunnels
 OutsideIPAddresses=($(aws ec2 describe-vpn-connections \
     --filters "Name=vpn-connection-id,Values=$VPN_ID" \
     --query "VpnConnections[0].Options.TunnelOptions[*].OutsideIpAddress" \
@@ -64,10 +61,10 @@ while true; do
         --query "VpnConnections[0].VgwTelemetry[1].Status" \
         --output text)
     if [[ "$PROVISIONING_STATUS" == "available" && "$TUNNEL_STATUS" == "UP" ]]; then
-        echo "Tunnel 1 is UP."
+        echo "Tunnel 2 is UP."
         break
     fi
-    echo "Tunnel 1 status: $PROVISIONING_STATUS. Waiting 1 minute..."
+    echo "Tunnel 2 status: $PROVISIONING_STATUS. Waiting 1 minute..."
     sleep 60
 done
 echo "Both VPN tunnels have been successfully replaced and are UP."
