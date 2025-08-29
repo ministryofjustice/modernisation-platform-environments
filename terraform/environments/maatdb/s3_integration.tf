@@ -7,6 +7,11 @@ locals {
 
   ftp_directions = ["inbound", "outbound"]
 
+  expiration_json = local.is-production ? "{}" : jsonencode({
+    days                         = 7
+    expired_object_delete_marker = false
+  })
+
 }
 
 module "s3_bucket" {
@@ -27,20 +32,23 @@ module "s3_bucket" {
 
   lifecycle_rule = [
     {
-      id      = "main"
+      id      = local.is-production ? "main" : "main-nonprod"
       enabled = "Enabled"
       prefix  = ""
 
       tags = {
         rule      = "log"
-        autoclean = "false"
+        autoclean = local.is-production ? "false" : "true"
       }
+
+      # Decode to a map. In prod this becomes {}, so the module skips the block.
+      expiration = jsondecode(local.expiration_json)
 
       noncurrent_version_expiration = {
-        days = 31
+        days = local.is-production ? 31 : 7
       }
 
-      transition = [
+      transition = local.is-production ? [
         {
           days          = 90
           storage_class = "STANDARD_IA"
@@ -49,9 +57,10 @@ module "s3_bucket" {
           days          = 180
           storage_class = "GLACIER"
         }
-      ]
+      ] : []
     }
   ]
+
 
   tags = merge(local.tags, {
     Name = "${local.application_name}-${local.environment}-ftp-${each.key}"

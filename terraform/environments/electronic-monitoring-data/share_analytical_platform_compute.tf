@@ -22,6 +22,9 @@ locals {
     "datamart",
     "derived",
     "testing",
+    "serco_servicenow_deduped",
+    "serco_servicenow_curated",
+    "serco_servicenow_curated_snapshot",
     "servicenow_curated",
     "servicenow_curated_snapshot",
   ]
@@ -29,7 +32,8 @@ locals {
     "servicenow",
     "serco_fms",
     "allied_mdss",
-    ]
+    "serco_servicenow",
+  ]
   prod_dbs_to_grant = local.is-production ? [
     "am_stg",
     "cap_dw_stg",

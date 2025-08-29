@@ -71,6 +71,7 @@ module "cur_v2_hourly" {
 
   policy = local.is-development ? templatefile("${path.module}/templates/coat-cur-v2-hourly-dev-bucket-policy.json",
     {
+      bucket_name          = "coat-${local.environment}-cur-v2-hourly"
       environment          = local.environment
       root_account_id      = local.environment_management.aws_organizations_root_account_id
       cross_env_account_id = local.coat_prod_account_id
@@ -78,8 +79,10 @@ module "cur_v2_hourly" {
     }
     ) : templatefile("${path.module}/templates/coat-cur-v2-hourly-prod-bucket-policy.json",
     {
+      bucket_name     = "coat-${local.environment}-cur-v2-hourly"
       environment     = local.environment
       root_account_id = local.environment_management.aws_organizations_root_account_id
+      account_id      = data.aws_caller_identity.current.account_id
     }
   )
 
@@ -225,7 +228,7 @@ module "coat_s3_kms" {
       principals = [
         {
           type        = "AWS"
-          identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/CoatGithubActionsReportUpload"]
+          identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/CoatGithubActionsRole"]
         }
       ]
     }
@@ -312,5 +315,59 @@ module "coat_github_repos_tfstate_bucket" {
       }
     }
   }
+}
+
+module "cur_v2_hourly_enriched" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+
+  source  = "terraform-aws-modules/s3-bucket/aws"
+  version = "4.3.0"
+
+  bucket = "coat-${local.environment}-cur-v2-hourly-enriched"
+
+  force_destroy = true
+
+  attach_deny_insecure_transport_policy = true
+  attach_policy                         = true
+
+  policy = local.is-development ? templatefile("${path.module}/templates/coat-cur-v2-hourly-dev-bucket-policy.json",
+    {
+      bucket_name          = "coat-${local.environment}-cur-v2-hourly-enriched"
+      environment          = local.environment
+      root_account_id      = local.environment_management.aws_organizations_root_account_id
+      cross_env_account_id = local.coat_prod_account_id
+      prod_environment     = local.prod_environment
+    }
+    ) : templatefile("${path.module}/templates/coat-cur-v2-hourly-prod-bucket-policy.json",
+    {
+      bucket_name     = "coat-${local.environment}-cur-v2-hourly-enriched"
+      environment     = local.environment
+      root_account_id = local.environment_management.aws_organizations_root_account_id
+      account_id      = data.aws_caller_identity.current.account_id
+    }
+  )
+
+  server_side_encryption_configuration = {
+    rule = {
+      apply_server_side_encryption_by_default = {
+        kms_master_key_id = module.cur_s3_kms.key_arn
+        sse_algorithm     = "aws:kms"
+      }
+    }
+  }
+
+  versioning = {
+    status = "Enabled"
+  }
+
+  lifecycle_rule = [
+    {
+      id      = "DeleteOldVersions"
+      enabled = true
+      noncurrent_version_expiration = {
+        days = 1
+      }
+    }
+  ]
 }
 

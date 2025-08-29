@@ -13,6 +13,8 @@ module "redshift" {
   rds_redshift_secret_arns = [module.aurora.rds_redshift_secret_arn, module.aurora.rds_postgres_secret_arn]
 
   postgres_security_group_id = module.aurora.rds_cluster_security_group_id
+  management_server_sg_id    = module.ds.management_server_sg_id
+
 
   kms_key_arn = module.kms.key_arn
 

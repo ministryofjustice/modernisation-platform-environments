@@ -47,3 +47,16 @@ variable "secret_arn" {}
 variable "s3_bucket_ftp" {}
 variable "s3_object_ftp_client" {}
 variable "s3_object_ftp_clientlibs" {}
+
+variable "lambda_memory" {
+  default = "4096"
+}
+
+variable "lambda_storage" {
+  default = "1024"
+}
+variable "enabled_cron_in_environments" {
+  description = "List of environments where cron should be enabled"
+  type        = list(string)
+  default     = ["development", "test","perproduction"]
+}
