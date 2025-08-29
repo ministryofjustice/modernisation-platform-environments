@@ -57,6 +57,23 @@ module "kms" {
       ]
     },
     {
+      sid    = "AllowInspectorUseOfKMSKey",
+      effect = "Allow",
+      principals = [
+        {
+          type        = "Service"
+          identifiers = ["inspector2.amazonaws.com"]
+        }
+      ],
+      actions = [
+        "kms:Encrypt",
+        "kms:Decrypt",
+        "kms:GenerateDataKey*",
+        "kms:DescribeKey"
+      ],
+      resource = "*"
+    },
+    {
       sid = "AllowSESPublishToSNSEncryptedTopics"
       actions = [
         "kms:GenerateDataKey*",
