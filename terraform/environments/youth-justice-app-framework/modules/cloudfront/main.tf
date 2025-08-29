@@ -182,8 +182,24 @@ resource "aws_cloudfront_response_headers_policy" "strict_transport_security" {
     strict_transport_security {
       access_control_max_age_sec = 31536000 # 1 year in seconds
       override                   = true     # Matches "Origin override"
-      preload                    = false    # Matches unchecked preload
+      preload                    = true     # Now on for pen test
       include_subdomains         = false    # Matches unchecked includeSubDomains
+    }
+    content_type_options {
+      override                   = true
+    }
+    frame_options{
+      override                   = true
+      frame_option               = "DENY"
+    }
+    xss_protection {
+      override                   = true
+      protection                 = true
+      mode_block                 = true
+    }
+    content_security_policy {
+      override = true
+      content_security_policy = "default-src 'none'; script-src 'self' 'unsafe-inline' 'unsafe-hashes' https://public.tableau.com https://maps.googleapis.com https://maps.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https://*.imgur.com https://maps.gstatic.com https://maps.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://www.gov.uk https://maps.googleapis.com https://maps.gstatic.com; object-src 'self' blob: https://yjaf.test.yjbservices.yjb.gov.uk; frame-src 'self' blob: https://public.tableau.com https://maps.googleapis.com https://maps.gstatic.com; frame-ancestors 'none';"
     }
   }
 }

@@ -80,6 +80,10 @@ resource "aws_db_option_group" "appdboptiongroup19" {
     option_name = "APEX-DEV"
   }
 
+  option {
+    option_name = "S3_INTEGRATION"
+  }
+
   tags = {
     Name = "${var.application_name}-${var.environment}-optiongroup"
   }
