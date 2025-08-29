@@ -284,9 +284,6 @@ resource "aws_s3_bucket_policy" "LOG" {
   })
 }
 
-locals {
-  account_name = "cafm"
-}
 
 ############################################
 # Buckets

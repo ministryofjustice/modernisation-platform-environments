@@ -1,4 +1,5 @@
 locals {
+  account_name = "cafm"
   # Flat list of all users across environments
   sftp_user_list = [
     {
