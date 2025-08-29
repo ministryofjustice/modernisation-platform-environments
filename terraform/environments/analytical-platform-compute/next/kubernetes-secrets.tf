@@ -13,7 +13,6 @@ resource "kubernetes_secret" "rds" {
     password                   = random_password.rds[0].result
     address                    = module.rds[0].db_instance_address
     port                       = module.rds[0].db_instance_port
-    database                   = local.db_dbname
     postgres_connection_string = "postgresql://${module.rds[0].db_instance_username}:${random_password.rds[0].result}@${module.rds[0].db_instance_address}:${module.rds[0].db_instance_port}/${local.db_dbname}"
   }
 }
