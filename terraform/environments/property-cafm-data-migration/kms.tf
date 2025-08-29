@@ -10,7 +10,7 @@ resource "aws_kms_key" "shared_kms_key" {
 
 # Alias for the key
 resource "aws_kms_alias" "shared_kms_key" {
-  name          = "alias/${local.account_name}-shared-${local.environment_shorthand}"
+  name          = "alias/${local.account_name}-shared-key-${local.environment_shorthand}"
   target_key_id = aws_kms_key.shared_kms_key.key_id
 }
 
