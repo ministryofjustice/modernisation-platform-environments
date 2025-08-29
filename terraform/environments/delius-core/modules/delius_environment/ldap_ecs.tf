@@ -83,6 +83,8 @@ module "ldap_ecs" {
     }
   }
 
+  log_retention = var.ldap_config.log_retention
+
   sns_topic_arn           = aws_sns_topic.delius_core_alarms.arn
   enable_platform_backups = var.enable_platform_backups
 
