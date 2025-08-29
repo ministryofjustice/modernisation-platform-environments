@@ -41,4 +41,12 @@ locals {
       if user.environment == local.environment
     }
   }
+  environment_map = {
+    "production"    = "prod"
+    "preproduction" = "preprod"
+    "test"          = "test"
+    "development"   = "dev"
+    "default"       = ""
+  }
+  environment_shorthand = local.environment_map[local.environment]
 }
