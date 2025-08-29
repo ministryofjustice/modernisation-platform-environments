@@ -83,24 +83,24 @@ resource "aws_lb_listener" "listener_http" {
 }
 
 # Listener rules
-# resource "aws_lb_listener_rule" "deny_mobiles_listener_rule" {
-#   listener_arn = aws_lb_listener.listener_https.arn
-#   priority     = 1
-#   condition {
-#     http_header {
-#       http_header_name = "User-Agent"
-#       values           = ["*Mobile*"]
-#     }
-#   }
-#   action {
-#     type = "fixed-response"
-#     fixed_response {
-#       content_type = "text/plain"
-#       message_body = "Access is restricted to MoJ-issued laptops and PCs."
-#       status_code  = "403"
-#     }
-#   }
-# }
+resource "aws_lb_listener_rule" "deny_mobiles_listener_rule" {
+  listener_arn = aws_lb_listener.listener_https.arn
+  priority     = 10
+  condition {
+    http_header {
+      http_header_name = "User-Agent"
+      values           = ["*Mobile*"]
+    }
+  }
+  action {
+    type = "fixed-response"
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "Access is restricted to MoJ-issued laptops and PCs."
+      status_code  = "403"
+    }
+  }
+}
 
 resource "aws_lb_listener_rule" "blocked_paths_listener_rule" {
   listener_arn = aws_lb_listener.listener_https.arn
