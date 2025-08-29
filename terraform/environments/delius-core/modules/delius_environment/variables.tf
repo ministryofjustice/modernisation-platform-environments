@@ -32,6 +32,7 @@ variable "ldap_config" {
     port                        = optional(number)
     tls_port                    = optional(number)
     desired_count               = number
+    log_retention               = number
   })
   default = {
     name                        = "default_name"
@@ -45,6 +46,7 @@ variable "ldap_config" {
     port                        = 389
     tls_port                    = 636
     desired_count               = 0
+    log_retention               = 7
   }
 }
 
