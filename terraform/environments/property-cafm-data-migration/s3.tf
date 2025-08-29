@@ -284,13 +284,14 @@ resource "aws_s3_bucket_policy" "LOG" {
   })
 }
 
+# locals
 locals {
   account_name = "cafm"
 
   # Add more keys here to spin up additional landing buckets
   landing_sets = {
     planetfm = {}
-    concept = {}
+    concept  = {}
   }
 
   # Reused lifecycle rule
@@ -306,14 +307,14 @@ locals {
       }
 
       transition = [
-        { days = 90,  storage_class = "STANDARD_IA" },
+        { days = 90, storage_class = "STANDARD_IA" },
         { days = 365, storage_class = "GLACIER" }
       ]
 
       expiration = { days = 730 }
 
       noncurrent_version_transition = [
-        { days = 90,  storage_class = "STANDARD_IA" },
+        { days = 90, storage_class = "STANDARD_IA" },
         { days = 365, storage_class = "GLACIER" }
       ]
 
@@ -322,10 +323,7 @@ locals {
   ]
 }
 
-############################################
-# Buckets
-############################################
-
+# Landing Buckets
 module "s3_bucket_logs" {
   source             = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
   bucket_prefix      = "${local.account_name}-bucket-logs-${local.environment_shorthand}-"
@@ -343,8 +341,8 @@ module "s3_bucket_logs" {
 
 # One module, many landing buckets
 module "s3_data_bucket" {
-  source        = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
-  for_each      = local.landing_sets
+  source   = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
+  for_each = local.landing_sets
 
   bucket_prefix       = "${local.account_name}-landing-${each.key}-${local.environment_shorthand}-"
   custom_kms_key      = aws_kms_key.shared_kms_key.arn
@@ -358,43 +356,29 @@ module "s3_data_bucket" {
 
   lifecycle_rule = local.lifecycle_rule_main
   tags           = local.tags
-}
-
-# Build the policy per bucket (outside the module to avoid cycles)
-data "aws_iam_policy_document" "ingestion_access" {
-  for_each = local.landing_sets
-
-  statement {
-    sid    = "AllowAnalyticalPlatformIngestionService"
-    effect = "Allow"
-
-    principals {
-      type        = "AWS"
-      identifiers = [
-        "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-ingestion-development"]}:role/transfer",
-        "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-ingestion-production"]}:role/transfer",
+  bucket_policy = [
+    jsonencode({
+      Version = "2012-10-17",
+      Statement = [
+        {
+          Sid    = "AllowAnalyticalPlatformIngestionService",
+          Effect = "Allow",
+          Principal = {
+            AWS = [
+              "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-ingestion-development"]}:role/transfer",
+              "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-ingestion-production"]}:role/transfer",
+            ]
+          },
+          Action = [
+            "s3:DeleteObject",
+            "s3:GetObject",
+            "s3:GetObjectAcl",
+            "s3:PutObject",
+            "s3:PutObjectAcl",
+            "s3:PutObjectTagging",
+          ]
+        }
       ]
-    }
-
-    actions = [
-      "s3:DeleteObject",
-      "s3:GetObject",
-      "s3:GetObjectAcl",
-      "s3:PutObject",
-      "s3:PutObjectAcl",
-      "s3:PutObjectTagging",
-    ]
-
-    resources = [
-      module.s3_data_bucket[each.key].bucket.arn,
-      "${module.s3_data_bucket[each.key].bucket.arn}/*",
-    ]
-  }
-}
-
-resource "aws_s3_bucket_policy" "ingestion_access" {
-  for_each = local.landing_sets
-
-  bucket = module.s3_data_bucket[each.key].bucket.id
-  policy = data.aws_iam_policy_document.ingestion_access[each.key].json
+    })
+  ]
 }

@@ -3,8 +3,8 @@ module "rds_export" {
   # checkov:skip=CKV_TF_2: using branch instead of tag with a version number
   source = "github.com/ministryofjustice/terraform-rds-export?ref=b8e43e20af2f303461c89b23a70ee000d50fa6dd"
 
-  kms_key_arn         = aws_kms_key.shared_kms_key.arn
-  name                = "cafm"
+  kms_key_arn           = aws_kms_key.shared_kms_key.arn
+  name                  = "cafm"
   database_refresh_mode = "full"
   vpc_id                = module.vpc.vpc_id
   database_subnet_ids   = module.vpc.private_subnets
