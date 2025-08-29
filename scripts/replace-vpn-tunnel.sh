@@ -26,7 +26,7 @@ aws ec2 replace-vpn-tunnel \
     --vpn-connection-id "$VPN_ID" \
     --vpn-tunnel-outside-ip-address "${OutsideIPAddresses[0]}" \
     --apply-pending-maintenance
-sleep 15
+sleep 60
 
 echo "Waiting for tunnel 1 to finish replacing..."
 while true; do
@@ -48,7 +48,7 @@ aws ec2 replace-vpn-tunnel \
     --vpn-connection-id "$VPN_ID" \
     --vpn-tunnel-outside-ip-address "${OutsideIPAddresses[1]}" \
     --apply-pending-maintenance
-sleep 15
+sleep 60
 
 echo "Waiting for tunnel 2 to finish replacing..."
 while true; do
