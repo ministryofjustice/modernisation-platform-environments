@@ -1,8 +1,5 @@
 name: VPN Maintenance
 on:
-  push:
-    branches:
-      - feature/11200-automate-vpn-maintenance
   workflow_dispatch:
     inputs:
       vpn_id:
@@ -112,7 +109,7 @@ jobs:
 
               - name: Run VPN maintenance script
                 run: |
-                    ./scripts/vpn-maintenance.sh "${{ env.vpn_id }}"
+                    ./scripts/replace-vpn-tunnel.sh "${{ env.vpn_id }}"
               
               - name: Slack failure notification
                 uses: slackapi/slack-github-action@91efab103c0de0a537f72a35f6b8cda0ee76bf0a # v2.1.1
