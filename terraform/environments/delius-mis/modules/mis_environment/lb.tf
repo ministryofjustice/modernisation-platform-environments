@@ -22,6 +22,11 @@ resource "aws_lb" "dfi" {
     enabled = true
   }
 
+  # Explicit dependency to ensure S3 bucket exists first
+  depends_on = [
+    module.s3_lb_logs_bucket
+  ]
+
   tags = merge(
     local.tags,
     {
@@ -93,6 +98,12 @@ resource "aws_lb_listener" "dfi_https" {
     target_group_arn = aws_lb_target_group.dfi[0].arn
   }
 
+  # Explicit dependency to ensure certificate is fully validated before listener creation
+  depends_on = [
+    aws_acm_certificate_validation.dfi_cert_validation,
+    aws_route53_record.dfi_cert_validation
+  ]
+
   tags = local.tags
 }
 
@@ -133,6 +144,11 @@ resource "aws_route53_record" "dfi_cert_validation" {
   ttl             = 60
   type            = each.value.type
   zone_id         = var.account_config.route53_external_zone.zone_id
+
+  # Explicit dependency to ensure certificate is created first
+  depends_on = [
+    aws_acm_certificate.dfi_self_signed
+  ]
 }
 
 # Certificate validation
@@ -144,8 +160,14 @@ resource "aws_acm_certificate_validation" "dfi_cert_validation" {
   ]
 
   timeouts {
-    create = "5m"
+    create = "10m"  # Increased timeout for DNS propagation
   }
+
+  # Explicit dependencies for proper ordering
+  depends_on = [
+    aws_acm_certificate.dfi_self_signed,
+    aws_route53_record.dfi_cert_validation
+  ]
 }
 
 # Attach DFI instances to the target group
@@ -154,6 +176,12 @@ resource "aws_lb_target_group_attachment" "dfi_attachment" {
   target_group_arn = aws_lb_target_group.dfi[0].arn
   target_id        = module.dfi_instance[count.index].aws_instance.id
   port             = 8080
+
+  # Explicit dependency to ensure instances and target group exist first
+  depends_on = [
+    aws_lb_target_group.dfi,
+    module.dfi_instance
+  ]
 }
 
 # Create route53 entry for lb
