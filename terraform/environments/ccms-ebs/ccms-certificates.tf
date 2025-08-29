@@ -5,10 +5,10 @@
 
 # Certificate
 resource "aws_acm_certificate" "external" {
-  domain_name       = "modernisation-platform.service.justice.gov.uk"
+  domain_name       = local.is-production ? "ccms-ebs.service.justice.gov.uk" : "modernisation-platform.service.justice.gov.uk"
   validation_method = "DNS"
 
-  subject_alternative_names = ["*.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
+  subject_alternative_names = local.is-production ? ["*.ccms-ebs.service.justice.gov.uk"] : ["*.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
 
   tags = merge(local.tags,
     { Environment = local.environment }
@@ -57,15 +57,15 @@ resource "aws_acm_certificate" "external_prod" {
   }
 }
 
-//resource "aws_acm_certificate_validation" "external_prod" {
-//  count = local.is-production ? 1 : 0
+resource "aws_acm_certificate_validation" "external_prod" {
+  count = local.is-production ? 1 : 0
 
-//  certificate_arn         = aws_acm_certificate.external_prod[0].arn
-//  validation_record_fqdns = [aws_route53_record.external_validation_prod[0].fqdn]
-//  timeouts {
-//    create = "10m"
-//  }
-//}
+  certificate_arn         = aws_acm_certificate.external_prod[0].arn
+  validation_record_fqdns = [aws_route53_record.external_validation_prod[0].fqdn]
+  timeouts {
+    create = "10m"
+  }
+}
 
 // Route53 DNS record for certificate validation
 resource "aws_route53_record" "external_validation_prod" {
