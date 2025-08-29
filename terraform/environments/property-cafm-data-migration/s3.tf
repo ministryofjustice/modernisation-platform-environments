@@ -371,8 +371,8 @@ data "aws_iam_policy_document" "ingestion_access" {
     principals {
       type        = "AWS"
       identifiers = [
-        "arn:aws:iam::${local.environment_management.account_ids["ingestion-development"]}:role/transfer",
-        "arn:aws:iam::${local.environment_management.account_ids["ingestion-production"]}:role/transfer",
+        "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-ingestion-development"]}:role/transfer",
+        "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-ingestion-production"]}:role/transfer",
       ]
     }
 
