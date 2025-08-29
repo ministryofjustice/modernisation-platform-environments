@@ -31,7 +31,7 @@ resource "kubernetes_manifest" "azure_secrets" {
             "key"      = tostring(module.azure_secrets[0].secret_id)
             "property" = "client_secret"
           }
-          "secretKey" = "client-secret"
+          "secretKey" = "client-secret" #checkov:skip=CKV_SECRET_6:secretKey is a reference to the key in the secret
         },
         {
           "remoteRef" = {
