@@ -20,17 +20,6 @@ resource "aws_vpc_security_group_egress_rule" "dfi_all_outbound" {
   ip_protocol       = "-1"
 }
 
-# Allow inbound traffic from load balancer to DFI instances on port 8080
-# Note: This rule may be redundant since DFI instances also use mis_ec2_shared security group
-resource "aws_vpc_security_group_ingress_rule" "dfi_from_lb" {
-  description                  = "Allow traffic from load balancer to DFI instances"
-  security_group_id            = aws_security_group.dfi.id
-  referenced_security_group_id = aws_security_group.mis_ec2_shared.id
-  ip_protocol                  = "tcp"
-  from_port                    = 8080
-  to_port                      = 8080
-}
-
 data "aws_security_group" "dsd_db" {
   name = "delius-mis-${var.env_name}-dsd-db-ec2-instance-sg"
 }
