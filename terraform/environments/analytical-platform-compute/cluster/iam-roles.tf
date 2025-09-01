@@ -171,30 +171,6 @@ module "aws_for_fluent_bit_iam_role" {
   tags = local.tags
 }
 
-module "analytical_platform_ui_service_role" {
-  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
-  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
-
-  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "5.60.0"
-
-  create_role = true
-
-  role_name_prefix = "analytical-platform-ui"
-
-  oidc_providers = {
-    main = {
-      provider_arn               = module.eks.oidc_provider_arn
-      namespace_service_accounts = ["${kubernetes_namespace.ui.metadata[0].name}:ui"]
-    }
-  }
-  role_policy_arns = {
-    # "lake_formation_and_quicksight"      = module.analytical_platform_lake_formation_share_policy.arn
-    "lake_formation_cross_account_share" = "arn:aws:iam::aws:policy/AWSLakeFormationCrossAccountManager"
-  }
-  tags = local.tags
-}
-
 module "amazon_prometheus_proxy_iam_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
@@ -233,6 +209,31 @@ module "vpc_cni_iam_role" {
     main = {
       provider_arn               = module.eks.oidc_provider_arn
       namespace_service_accounts = ["kube-system:aws-node"]
+    }
+  }
+
+  tags = local.tags
+}
+
+module "velero_iam_role" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+  version = "5.60.0"
+
+  role_name_prefix      = "velero"
+  attach_velero_policy  = true
+  velero_s3_bucket_arns = [module.velero_s3_bucket.s3_bucket_arn]
+
+  role_policy_arns = {
+    VeleroKMSAccessPolicy = module.velero_kms_iam_policy.arn
+  }
+
+  oidc_providers = {
+    main = {
+      provider_arn               = module.eks.oidc_provider_arn
+      namespace_service_accounts = ["${kubernetes_namespace.velero.metadata[0].name}:velero-server"]
     }
   }
 

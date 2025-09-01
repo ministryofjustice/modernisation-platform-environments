@@ -303,7 +303,7 @@ resource "aws_instance" "ad_instance" {
     http_tokens = "required"
   }
   root_block_device {
-    encrypted = true
+    encrypted   = true
     volume_size = 50
     tags = merge(local.all_tags,
       { Name = "root-device-mgmt-ad-instance" },

@@ -61,10 +61,7 @@
         "arn:aws:s3:::${bucket_name}/*"
       ],
       "Principal": {
-        "Service": [
-          "athena.amazonaws.com",
-          "glue.amazonaws.com"
-        ]
+        "Service": ["athena.amazonaws.com", "glue.amazonaws.com"]
       },
       "Condition": {
         "StringEquals": {

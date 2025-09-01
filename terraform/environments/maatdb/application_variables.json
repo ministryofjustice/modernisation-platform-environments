@@ -28,6 +28,7 @@
       "ecs_cluster_sec_group_id": "sg-050fb73f9c212d1bb",
       "mlra_ecs_cluster_sec_group_id": "sg-08c5bdc7e3c480907",
       "hub20_sec_group_id": "sg-04ca0dba45d2d3580",
+      "hub20_s3_bucket": "hub20-development-cwa-extract-data",
       "build_s3": true,
       "build_ftp": true,
       "build_transfer": false,

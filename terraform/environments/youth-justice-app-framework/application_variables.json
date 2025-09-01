@@ -1,7 +1,7 @@
 {
   "accounts": {
     "development": {
-      "allow_s3_replication": true,
+      "allow_s3_replication": false,
       "domain_name": "development.yjbservices.yjb.gov.uk",
       "justice_domain_name": "development.justice.gov.uk",
       "validate_certs": true,
@@ -13,7 +13,7 @@
       "tableau_website_name": "tableau",
       "database_instance_class": "db.t4g.medium",
       "rds_engine_version": "17.5",
-      "enable_datadog_agent_apm": true,
+      "enable_datadog_agent_apm": false,
       "create_rds_sheduler": true,
       "disable_overnight_ecs_scheduler": false,
       "ses_domain_identities": {
@@ -30,11 +30,10 @@
           "create_records": true
         }
       },
-      "quicksight_setup": true,
-      "redshift_to_s3_rule_id": "sgr-0beb1aea5cb2d4b18"
+      "quicksight_setup": true
     },
     "test": {
-      "allow_s3_replication": true,
+      "allow_s3_replication": false,
       "domain_name": "test.yjbservices.yjb.gov.uk",
       "justice_domain_name": "test.justice.gov.uk",
       "validate_certs": true,
@@ -63,11 +62,10 @@
           "create_records": false
         }
       },
-      "quicksight_setup": true,
-      "redshift_to_s3_rule_id": "sgr-06c85d127762780ae"
+      "quicksight_setup": true
     },
     "preproduction": {
-      "allow_s3_replication": true,
+      "allow_s3_replication": false,
       "domain_name": "preproduction.yjbservices.yjb.gov.uk",
       "justice_domain_name": "preproduction.justice.gov.uk",
       "validate_certs": true,
@@ -96,11 +94,10 @@
           "create_records": true
         }
       },
-      "quicksight_setup": true,
-      "redshift_to_s3_rule_id": "sgr-07eea701a553fc27f"
+      "quicksight_setup": true
     },
     "production": {
-      "allow_s3_replication": true,
+      "allow_s3_replication": false,
       "domain_name": "yjbservices.yjb.gov.uk",
       "justice_domain_name": "justice.gov.uk",
       "validate_certs": true,
@@ -133,8 +130,7 @@
           "create_records": false
         }
       },
-      "quicksight_setup": true,
-      "redshift_to_s3_rule_id": null
+      "quicksight_setup": true
     }
   }
 }

@@ -319,3 +319,24 @@ resource "helm_release" "keda" {
     )
   ]
 }
+
+/* Velero */
+resource "helm_release" "velero" {
+  name       = "velero"
+  repository = "https://vmware-tanzu.github.io/helm-charts"
+  chart      = "velero"
+  version    = "10.0.10"
+  namespace  = kubernetes_namespace.velero.metadata[0].name
+  values = [
+    templatefile(
+      "${path.module}/src/helm/values/velero/values.yml.tftpl",
+      {
+        eks_role_arn              = module.velero_iam_role.iam_role_arn
+        velero_aws_plugin_version = "v1.12.2"
+        velero_bucket             = module.velero_s3_bucket.s3_bucket_id
+        velero_prefix             = module.eks.cluster_name
+        aws_region                = data.aws_region.current.region
+      }
+    )
+  ]
+}

@@ -72,7 +72,7 @@ resource "random_password" "missing_report_submissions" {
 
 # PlaceHolder Secrets
 resource "aws_secretsmanager_secret_version" "missing_report_submissions" {
-  secret_id     = aws_secretsmanager_secret.missing_report_submissions.id
+  secret_id = aws_secretsmanager_secret.missing_report_submissions.id
   secret_string = jsonencode({
     username = "dpradmin"
     password = random_password.missing_report_submissions.result
