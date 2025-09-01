@@ -21,6 +21,7 @@ resource "aws_vpc_security_group_egress_rule" "dfi_all_outbound" {
 }
 
 # Allow inbound traffic from load balancer to DFI instances on port 8080
+# Note: This rule may be redundant since DFI instances also use mis_ec2_shared security group
 resource "aws_vpc_security_group_ingress_rule" "dfi_from_lb" {
   description                  = "Allow traffic from load balancer to DFI instances"
   security_group_id            = aws_security_group.dfi.id

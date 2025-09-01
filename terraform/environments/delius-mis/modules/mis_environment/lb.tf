@@ -5,6 +5,73 @@ locals {
   lb_fqdn = "${local.lb_endpoint}.${var.env_name}.${var.account_config.dns_suffix}"
 }
 
+# Security group for ALB
+resource "aws_security_group" "dfi_alb" {
+  count       = var.lb_config != null ? 1 : 0
+  name        = "${local.lb_name}-sg"
+  description = "Security group for DFI Application Load Balancer"
+  vpc_id      = var.account_config.shared_vpc_id
+
+  tags = merge(
+    local.tags,
+    {
+      "Name" = "${local.lb_name}-sg"
+    },
+  )
+}
+
+# Allow HTTP traffic from internet to ALB
+resource "aws_vpc_security_group_ingress_rule" "dfi_alb_http" {
+  count             = var.lb_config != null ? 1 : 0
+  security_group_id = aws_security_group.dfi_alb[0].id
+  cidr_ipv4         = "0.0.0.0/0"
+  ip_protocol       = "tcp"
+  from_port         = 80
+  to_port           = 80
+  description       = "Allow HTTP traffic from internet"
+
+  tags = local.tags
+}
+
+# Allow HTTPS traffic from internet to ALB
+resource "aws_vpc_security_group_ingress_rule" "dfi_alb_https" {
+  count             = var.lb_config != null ? 1 : 0
+  security_group_id = aws_security_group.dfi_alb[0].id
+  cidr_ipv4         = "0.0.0.0/0"
+  ip_protocol       = "tcp"
+  from_port         = 443
+  to_port           = 443
+  description       = "Allow HTTPS traffic from internet"
+
+  tags = local.tags
+}
+
+# Allow ALB to communicate with backend instances on port 8080
+resource "aws_vpc_security_group_egress_rule" "dfi_alb_backend" {
+  count                        = var.lb_config != null ? 1 : 0
+  security_group_id            = aws_security_group.dfi_alb[0].id
+  referenced_security_group_id = aws_security_group.mis_ec2_shared.id
+  ip_protocol                  = "tcp"
+  from_port                    = 8080
+  to_port                      = 8080
+  description                  = "Allow ALB to communicate with DFI instances"
+
+  tags = local.tags
+}
+
+# Allow EC2 instances to receive traffic from ALB on port 8080
+resource "aws_vpc_security_group_ingress_rule" "ec2_from_alb" {
+  count                        = var.lb_config != null ? 1 : 0
+  security_group_id            = aws_security_group.mis_ec2_shared.id
+  referenced_security_group_id = aws_security_group.dfi_alb[0].id
+  ip_protocol                  = "tcp"
+  from_port                    = 8080
+  to_port                      = 8080
+  description                  = "Allow DFI ALB to reach instances on port 8080"
+
+  tags = local.tags
+}
+
 # Application Load Balancer (modern replacement for Classic ELB)
 resource "aws_lb" "dfi" {
   count              = var.lb_config != null ? 1 : 0
@@ -12,7 +79,7 @@ resource "aws_lb" "dfi" {
   load_balancer_type = "application"
   subnets            = var.account_config.public_subnet_ids
   internal           = false
-  security_groups    = [aws_security_group.mis_ec2_shared.id]
+  security_groups    = [aws_security_group.dfi_alb[0].id]
 
   enable_cross_zone_load_balancing = true
   idle_timeout                     = 300
@@ -45,11 +112,14 @@ resource "aws_lb_target_group" "dfi" {
   protocol = "HTTP"
   vpc_id   = var.account_config.shared_vpc_id
 
+  # Deregistration delay - how long to wait before deregistering targets
+  deregistration_delay = 30
+
   health_check {
     enabled             = true
     healthy_threshold   = 2
-    unhealthy_threshold = 2
-    timeout             = 5
+    unhealthy_threshold = 3
+    timeout             = 10 # Increased from 5 to 10 seconds
     interval            = 30
     path                = "/DataServices/"
     matcher             = "200"
