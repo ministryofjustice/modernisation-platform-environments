@@ -162,8 +162,8 @@ resource "aws_lambda_function" "cwa_sns_lambda" {
     variables = {
       PROVIDER_TOPIC       = aws_sns_topic.priority_p1.arn
       PROVIDER_BANKS_TOPIC = aws_sns_topic.provider_banks.arn
-      SERVICE_NAME      = "cwa-sns-service"
-      NAMESPACE         = "CWASNSNotificationService"
+      SERVICE_NAME         = "cwa-sns-service"
+      NAMESPACE            = "CWASNSNotificationService"
     }
   }
 

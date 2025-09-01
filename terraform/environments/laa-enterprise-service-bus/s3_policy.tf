@@ -61,8 +61,8 @@ resource "aws_s3_bucket_policy" "log_bucket_policy" {
     Statement = [
       {
         Effect = "Allow"
-        Principal = { 
-          Service = "logging.s3.amazonaws.com" 
+        Principal = {
+          Service = "logging.s3.amazonaws.com"
         }
         Action   = "s3:PutObject"
         Resource = "${aws_s3_bucket.access_logs.arn}/*"

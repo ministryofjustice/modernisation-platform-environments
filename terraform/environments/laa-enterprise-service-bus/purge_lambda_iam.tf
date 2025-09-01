@@ -46,7 +46,7 @@ resource "aws_iam_policy" "purge_lambda_policy" {
         Resource = [
           aws_s3_bucket.data.arn,
           "${aws_s3_bucket.data.arn}/*"
-          ]
+        ]
       },
       {
         Effect = "Allow",
@@ -59,7 +59,7 @@ resource "aws_iam_policy" "purge_lambda_policy" {
           aws_ssm_parameter.cclf_provider_load_timestamp.arn,
           aws_ssm_parameter.ccms_provider_load_timestamp.arn,
           aws_ssm_parameter.maat_provider_load_timestamp.arn
-          ]
+        ]
       },
     ]
   })
