@@ -40,3 +40,16 @@ resource "aws_vpc_security_group_egress_rule" "domain_join" {
   security_group_id            = aws_security_group.mis_ec2_shared.id
   referenced_security_group_id = aws_directory_service_directory.mis_ad.security_group_id
 }
+
+# Allow DFI ALB to reach instances on port 8080 (DataServices)
+resource "aws_vpc_security_group_ingress_rule" "dfi_service" {
+  count                        = var.lb_config != null ? 1 : 0
+  security_group_id            = aws_security_group.mis_ec2_shared.id
+  referenced_security_group_id = aws_security_group.dfi_alb[0].id
+  ip_protocol                  = "tcp"
+  from_port                    = 8080
+  to_port                      = 8080
+  description                  = "Allow DFI ALB to reach DataServices on port 8080"
+
+  tags = var.tags
+}
