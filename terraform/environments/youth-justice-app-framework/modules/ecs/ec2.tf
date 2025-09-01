@@ -153,6 +153,10 @@ module "autoscaling" {
     local.all_tags,
     { "OS" = "Linux" }
   )
+  autoscaling_group_tags = merge( #ec2 tags
+    local.all_tags,
+    { "OS" = "Linux" }
+  )
 
 }
 
