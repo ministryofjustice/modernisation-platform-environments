@@ -122,7 +122,7 @@ resource "aws_lb_target_group" "dfi" {
     timeout             = 10 # Increased from 5 to 10 seconds
     interval            = 30
     path                = "/DataServices/"
-    matcher             = "200,302,301" # Accept OK, Found, and Moved Permanently
+    matcher             = "200,302,301"
     port                = "traffic-port"
     protocol            = "HTTP"
   }
