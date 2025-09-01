@@ -75,14 +75,6 @@ resource "aws_s3_bucket_ownership_controls" "data" {
   }
 }
 
-resource "aws_s3_bucket_acl" "data" {
-  bucket = aws_s3_bucket.data.id
-  acl    = "private"
-  depends_on = [
-    aws_s3_bucket_ownership_controls.data
-  ]
-}
-
 resource "aws_s3_bucket_versioning" "data" {
   bucket = aws_s3_bucket.data.id
   versioning_configuration {
