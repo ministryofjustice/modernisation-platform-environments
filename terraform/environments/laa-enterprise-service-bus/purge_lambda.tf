@@ -62,11 +62,11 @@ resource "aws_lambda_function" "purge_lambda" {
 
   environment {
     variables = {
-      CCMS_TIMESTAMP     = aws_ssm_parameter.ccms_provider_load_timestamp.name
-      CCLF_TIMESTAMP     = aws_ssm_parameter.cclf_provider_load_timestamp.name
-      CCR_TIMESTAMP      = aws_ssm_parameter.ccr_provider_load_timestamp.name
-      MAAT_TIMESTAMP     = aws_ssm_parameter.maat_provider_load_timestamp.name
-      TARGET_BUCKET      = aws_s3_bucket.data.bucket
+      CCMS_TIMESTAMP = aws_ssm_parameter.ccms_provider_load_timestamp.name
+      CCLF_TIMESTAMP = aws_ssm_parameter.cclf_provider_load_timestamp.name
+      CCR_TIMESTAMP  = aws_ssm_parameter.ccr_provider_load_timestamp.name
+      MAAT_TIMESTAMP = aws_ssm_parameter.maat_provider_load_timestamp.name
+      TARGET_BUCKET  = aws_s3_bucket.data.bucket
     }
   }
 

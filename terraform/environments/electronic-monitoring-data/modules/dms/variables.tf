@@ -65,22 +65,22 @@ variable "dms_replication_instance_arn" {
 }
 
 variable "event_bridge_rule_name" {
-    description = "Name of the event rule"
-    type        = string
+  description = "Name of the event rule"
+  type        = string
 }
 
 variable "event_bridge_role_name" {
-    description = "Name of the event rule"
-    type        = string
+  description = "Name of the event rule"
+  type        = string
 }
 
 variable "dms_trigger_state" {
-    description = "DMS task state"
-    type = string
-    default = "COMPLETED"
+  description = "DMS task state"
+  type        = string
+  default     = "COMPLETED"
 }
 
 variable "dms_validation_step_function_arn" {
-    description = "DMS Validation Step Function Arn"
-    type = string
+  description = "DMS Validation Step Function Arn"
+  type        = string
 }
