@@ -32,8 +32,8 @@ resource "aws_s3_bucket_policy" "data_cross_account_access" {
           AWS = [
             "arn:aws:iam::${local.application_data.accounts[local.environment].ccms_account_id}:role/role_stsassume_oracle_base",
             "arn:aws:iam::${local.application_data.accounts[local.environment].maatdb_account_id}:role/rds-hub20-s3-access",
-            local.application_data.accounts[local.environment].cclf_rds_role_arn,
-            local.application_data.accounts[local.environment].ccr_rds_role_arn
+            "${local.application_data.accounts[local.environment].cclf_rds_role_arn}",
+            "${local.application_data.accounts[local.environment].ccr_rds_role_arn}"
           ]
         },
         Action = [
