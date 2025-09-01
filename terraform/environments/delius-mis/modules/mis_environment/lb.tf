@@ -2,7 +2,7 @@ locals {
   lb_name     = "${var.env_name}-dfi-alb"
   lb_endpoint = "ndl_dfi"
   # Use original ndl_dfi endpoint
-  lb_fqdn     = "${local.lb_endpoint}.${var.env_name}.${var.account_config.dns_suffix}"
+  lb_fqdn = "${local.lb_endpoint}.${var.env_name}.${var.account_config.dns_suffix}"
 }
 
 # Application Load Balancer (modern replacement for Classic ELB)
@@ -121,7 +121,7 @@ module "acm_certificate" {
   name                    = "${local.lb_name}-cert"
   domain_name             = "modernisation-platform.service.justice.gov.uk"
   subject_alternate_names = [local.lb_fqdn]
-  
+
   validation = {
     "modernisation-platform.service.justice.gov.uk" = {
       account   = "core-network-services"
