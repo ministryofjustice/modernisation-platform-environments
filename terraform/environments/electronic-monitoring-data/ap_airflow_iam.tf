@@ -120,8 +120,8 @@ module "p1_export_airflow" {
 }
 
 resource "aws_lakeformation_permissions" "p1_s3_access" {
-  count = local.is-development ? 0 : 1
-  principal = module.p1_export_airflow.iam_role.arn
+  count       = local.is-development ? 0 : 1
+  principal   = module.p1_export_airflow.iam_role.arn
   permissions = ["DATA_LOCATION_ACCESS"]
   data_location {
     arn = aws_lakeformation_resource.data_bucket.arn
@@ -129,8 +129,8 @@ resource "aws_lakeformation_permissions" "p1_s3_access" {
 }
 
 resource "aws_lakeformation_permissions" "p1_database_access" {
-  count = local.is-development ? 0 : 1
-  principal = module.p1_export_airflow.iam_role.arn
+  count       = local.is-development ? 0 : 1
+  principal   = module.p1_export_airflow.iam_role.arn
   permissions = ["DESCRIBE"]
   database {
     name = "allied_mdss${local.db_suffix}"
@@ -138,12 +138,12 @@ resource "aws_lakeformation_permissions" "p1_database_access" {
 }
 
 resource "aws_lakeformation_permissions" "p1_table_access" {
-  count = local.is-development ? 0 : 1
-  principal = module.p1_export_airflow.iam_role.arn
+  count       = local.is-development ? 0 : 1
+  principal   = module.p1_export_airflow.iam_role.arn
   permissions = ["SELECT"]
   table {
     database_name = "allied_mdss${local.db_suffix}"
-    wildcard = true
+    wildcard      = true
   }
 }
 
@@ -276,7 +276,7 @@ module "load_emsys_tpims_database" {
   cadt_bucket          = module.s3-create-a-derived-table-bucket.bucket
   max_session_duration = 12 * 60 * 60
 
-  new_airflow          = true
+  new_airflow = true
 }
 
 module "load_fep_database" {

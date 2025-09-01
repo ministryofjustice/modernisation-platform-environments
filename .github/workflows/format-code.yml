@@ -7,43 +7,23 @@ on:
 
 permissions: read-all
 
-concurrency:
-  group: '${{ github.ref }}-${{ github.workflow }}'
-  cancel-in-progress: true
-
 jobs:
-  fetch-secrets:
-    uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@c25ccb3c17e1ac869ceafc5430a4caf7e39be2ee
-    secrets:
-      MODERNISATION_PLATFORM_ACCOUNT_NUMBER: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_NUMBER }}
-      PASSPHRASE: ${{ secrets.PASSPHRASE }}
-    permissions:
-      id-token: write
-      contents: read
   format-code:
-    needs: fetch-secrets
     permissions:
       contents: write
+      pull-requests: write
       security-events: write  # needed for SARIF upload
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
-          token: ${{ needs.fetch-secrets.outputs.terraform_github_token }}
           fetch-depth: 0
-
-      - name: Decrypt Secrets
-        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@c25ccb3c17e1ac869ceafc5430a4caf7e39be2ee
-        with:
-          terraform_github_token: ${{ needs.fetch-secrets.outputs.terraform_github_token }}
-          PASSPHRASE: ${{ secrets.PASSPHRASE }}
-
       - name: Prepare Git options
         run: bash ./scripts/git-setup.sh
 
       - name: Run Format Code Action
-        uses: ministryofjustice/modernisation-platform-github-actions/format-code@c25ccb3c17e1ac869ceafc5430a4caf7e39be2ee # v3.4.0
+        uses: ministryofjustice/modernisation-platform-github-actions/format-code@7f78ec79dd45ec7db8966ecb619c85712d4e68d7 # v3.4.2
         with:
           APPLY_FIXES: all # When active, APPLY_FIXES must also be defined as environment variable (in github/workflows/mega-linter.yml or other CI tool)
           APPLY_FIXES_EVENT: all # Decide which event triggers application of fixes in a commit or a PR (pull_request, push, all)
@@ -56,8 +36,8 @@ jobs:
           REPORT_OUTPUT_FOLDER: none
 
       - name: Run Signed Commit Action
-        uses: ministryofjustice/modernisation-platform-github-actions/signed-commit@c25ccb3c17e1ac869ceafc5430a4caf7e39be2ee # v3.4.0
+        uses: ministryofjustice/modernisation-platform-github-actions/signed-commit@7f78ec79dd45ec7db8966ecb619c85712d4e68d7 # v3.4.2
         with:
-          github_token: ${{ needs.fetch-secrets.outputs.terraform_github_token }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           pr_title: "GitHub Actions Code Formatter workflow"
           pr_body: "This pull request includes updates from the GitHub Actions Code Formatter workflow. Please review the changes and merge if everything looks good."

@@ -1,9 +1,3 @@
-# data "aws_availability_zones" "available" {}
-
-# data "aws_iam_session_context" "current" {
-#   arn = data.aws_caller_identity.current.arn
-# }
-
 data "aws_vpc_endpoint" "mwaa_webserver" {
   service_name = aws_mwaa_environment.main.webserver_vpc_endpoint_service
 }
@@ -63,4 +57,9 @@ data "aws_eks_cluster" "apc_cluster" {
 # KMS
 data "aws_kms_key" "common_secrets_manager_kms" {
   key_id = "alias/secretsmanager/common"
+}
+
+
+data "aws_eks_cluster" "eks" {
+  name = local.eks_cluster_name
 }

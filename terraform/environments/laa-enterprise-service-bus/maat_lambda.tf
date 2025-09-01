@@ -41,13 +41,13 @@ resource "aws_security_group_rule" "maat_provider_load_egress_https_sm" {
 
 resource "aws_lambda_function" "maat_provider_load" {
 
-  description      = "Connect to MAAT DB"
+  description      = "Connects to MAAT DB and invokes the Load procedure to load the provider data."
   function_name    = "maat_provider_load_function"
   role             = aws_iam_role.maat_provider_load_role.arn
   handler          = "lambda_function.lambda_handler"
   filename         = "lambda/provider_load_lambda/provider_load_package.zip"
   source_code_hash = filebase64sha256("lambda/provider_load_lambda/provider_load_package.zip")
-  timeout          = 300
+  timeout          = 100
   memory_size      = 128
   runtime          = "python3.10"
 
@@ -60,14 +60,17 @@ resource "aws_lambda_function" "maat_provider_load" {
     security_group_ids = [aws_security_group.maat_provider_load_sg.id]
     subnet_ids         = [data.aws_subnet.data_subnets_a.id]
   }
-  
+
 
   environment {
     variables = {
-      DB_SECRET_NAME    = aws_secretsmanager_secret.maat_db_mp_credentials.name
-      PROCEDURE_SECRET_NAME = aws_secretsmanager_secret.maat_procedures_config.name
-      LD_LIBRARY_PATH   = "/opt/instantclient_12_2_linux"
-      ORACLE_HOME       = "/opt/instantclient_12_2_linux"
+      DB_SECRET_NAME         = aws_secretsmanager_secret.maat_db_mp_credentials.name
+      PROCEDURE_SECRET_NAME  = aws_secretsmanager_secret.maat_procedures_config.name
+      LD_LIBRARY_PATH        = "/opt/instantclient_12_2_linux"
+      ORACLE_HOME            = "/opt/instantclient_12_2_linux"
+      SERVICE_NAME           = "maat-load-service"
+      NAMESPACE              = "MAATProviderLoadService"
+      PURGE_LAMBDA_TIMESTAMP = aws_ssm_parameter.maat_provider_load_timestamp.name
     }
   }
 
