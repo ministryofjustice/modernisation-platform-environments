@@ -15,7 +15,11 @@
       "example_var": "preproduction-data"
     },
     "production": {
-      "example_var": "production-data"
+      "example_var": "production-data",
+      "service_account_roles": {
+        "CloudPlatformPreprod": "arn:aws:iam::754256621582:role/cloud-platform-irsa-7007cde073dea812-live",
+        "CloudPlatformProd": "arn:aws:iam::754256621582:role/cloud-platform-irsa-3d0b407608fa4fc8-live"
+      }
     }
   }
 }
