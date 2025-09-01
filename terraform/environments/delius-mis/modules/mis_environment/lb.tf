@@ -111,7 +111,7 @@ resource "aws_lb_listener" "dfi_https" {
 # ACM certificate using the modernisation platform pattern
 module "acm_certificate" {
   count  = var.lb_config != null ? 1 : 0
-  source = "../../../modules/acm_certificate"
+  source = "../../../../modules/acm_certificate"
 
   providers = {
     aws.core-vpc              = aws.core-vpc
