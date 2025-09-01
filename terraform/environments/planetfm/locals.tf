@@ -1,18 +1,14 @@
 # define configuration common to all environments here
-# define environment specific configuration in locals_development.tf, locals_test.tf etc.
+# define environment specific configuration in locals_preproduction.tf, locals_production.tf etc.
 
 locals {
   baseline_presets_environments_specific = {
-    development   = local.baseline_presets_development
-    test          = local.baseline_presets_test
     preproduction = local.baseline_presets_preproduction
     production    = local.baseline_presets_production
   }
   baseline_presets_environment_specific = local.baseline_presets_environments_specific[local.environment]
 
   baseline_environments_specific = {
-    development   = local.baseline_development
-    test          = local.baseline_test
     preproduction = local.baseline_preproduction
     production    = local.baseline_production
   }
