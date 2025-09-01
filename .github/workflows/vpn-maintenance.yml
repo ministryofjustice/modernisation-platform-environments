@@ -27,8 +27,9 @@ jobs:
             steps:
               - name: Mask VPN ID
                 run: |
-                    echo "::add-mask::${{ github.event.inputs.vpn_id }}"
-                    echo "vpn_id=${{ github.event.inputs.vpn_id }}" >> $GITHUB_ENV
+                    vpn_id=$(cat $GITHUB_EVENT_PATH | jq -r '.inputs.vpn_id')
+                    echo "::add-mask::$vpn_id"
+                    echo "VPN_ID=$vpn_id" >> $GITHUB_ENV
                     
               - name: Checkout repository
                 uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
@@ -79,8 +80,9 @@ jobs:
             steps:  
               - name: Mask VPN ID
                 run: |
-                    echo "::add-mask::${{ github.event.inputs.vpn_id }}"
-                    echo "vpn_id=${{ github.event.inputs.vpn_id }}" >> $GITHUB_ENV
+                    vpn_id=$(cat $GITHUB_EVENT_PATH | jq -r '.inputs.vpn_id')
+                    echo "::add-mask::$vpn_id"
+                    echo "VPN_ID=$vpn_id" >> $GITHUB_ENV
 
               - name: Checkout repository
                 uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
