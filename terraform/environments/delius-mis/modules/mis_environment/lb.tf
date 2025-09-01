@@ -1,8 +1,8 @@
 locals {
   lb_name     = "${var.env_name}-dfi-alb"
   lb_endpoint = "ndl_dfi"
-  # Very short domain for ACM certificate (under 64 chars)
-  alb_domain = "ndmis-${var.env_name}.${var.account_config.dns_suffix}"
+  # Use original ndl_dfi endpoint
+  lb_fqdn     = "${local.lb_endpoint}.${var.env_name}.${var.account_config.dns_suffix}"
 }
 
 # Application Load Balancer (modern replacement for Classic ELB)
@@ -86,14 +86,14 @@ resource "aws_lb_listener" "dfi_http" {
   tags = local.tags
 }
 
-# HTTPS Listener (port 443) - using validated certificate
+# HTTPS Listener (port 443) - using ACM module certificate
 resource "aws_lb_listener" "dfi_https" {
   count             = var.lb_config != null ? 1 : 0
   load_balancer_arn = aws_lb.dfi[0].arn
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
-  certificate_arn   = aws_acm_certificate_validation.dfi_cert_validation[0].certificate_arn
+  certificate_arn   = module.acm_certificate[0].arn
 
   default_action {
     type             = "forward"
@@ -102,74 +102,38 @@ resource "aws_lb_listener" "dfi_https" {
 
   # Explicit dependency to ensure certificate is fully validated before listener creation
   depends_on = [
-    aws_acm_certificate_validation.dfi_cert_validation,
-    aws_route53_record.dfi_cert_validation
+    module.acm_certificate
   ]
 
   tags = local.tags
 }
 
-# ACM certificate for ALB (using shorter domain to avoid 64-char limit)
-resource "aws_acm_certificate" "dfi_self_signed" {
-  count = var.lb_config != null ? 1 : 0
-  # Use shorter domain for certificate (dfi-alb.env.domain)
-  domain_name       = local.alb_domain
-  validation_method = "DNS"
+# ACM certificate using the modernisation platform pattern
+module "acm_certificate" {
+  count  = var.lb_config != null ? 1 : 0
+  source = "../../../modules/acm_certificate"
 
-  lifecycle {
-    create_before_destroy = true
+  providers = {
+    aws.core-vpc              = aws.core-vpc
+    aws.core-network-services = aws.core-network-services
   }
 
-  tags = merge(
-    local.tags,
-    {
-      "Name" = "${local.lb_name}-cert"
-    },
-  )
-}
-
-# DNS validation records for the certificate
-resource "aws_route53_record" "dfi_cert_validation" {
-  provider = aws.core-vpc
-
-  for_each = var.lb_config != null ? {
-    for dvo in aws_acm_certificate.dfi_self_signed[0].domain_validation_options : dvo.domain_name => {
-      name   = dvo.resource_record_name
-      record = dvo.resource_record_value
-      type   = dvo.resource_record_type
+  name                    = "${local.lb_name}-cert"
+  domain_name             = "modernisation-platform.service.justice.gov.uk"
+  subject_alternate_names = [local.lb_fqdn]
+  
+  validation = {
+    "modernisation-platform.service.justice.gov.uk" = {
+      account   = "core-network-services"
+      zone_name = "modernisation-platform.service.justice.gov.uk."
     }
-  } : {}
-
-  allow_overwrite = true
-  name            = each.value.name
-  records         = [each.value.record]
-  ttl             = 60
-  type            = each.value.type
-  zone_id         = var.account_config.route53_external_zone.zone_id
-
-  # Explicit dependency to ensure certificate is created first
-  depends_on = [
-    aws_acm_certificate.dfi_self_signed
-  ]
-}
-
-# Certificate validation
-resource "aws_acm_certificate_validation" "dfi_cert_validation" {
-  count           = var.lb_config != null ? 1 : 0
-  certificate_arn = aws_acm_certificate.dfi_self_signed[0].arn
-  validation_record_fqdns = [
-    for record in aws_route53_record.dfi_cert_validation : record.fqdn
-  ]
-
-  timeouts {
-    create = "10m" # Increased timeout for DNS propagation
+    "${local.lb_fqdn}" = {
+      account   = "core-vpc"
+      zone_name = var.account_config.route53_external_zone.name
+    }
   }
 
-  # Explicit dependencies for proper ordering
-  depends_on = [
-    aws_acm_certificate.dfi_self_signed,
-    aws_route53_record.dfi_cert_validation
-  ]
+  tags = local.tags
 }
 
 # Attach DFI instances to the target group
@@ -186,14 +150,13 @@ resource "aws_lb_target_group_attachment" "dfi_attachment" {
   ]
 }
 
-# Create route53 entry for lb
-# Create A record for ALB using shorter domain (for certificate)
-resource "aws_route53_record" "dfi_alb_entry" {
+# Create route53 entry for ALB
+resource "aws_route53_record" "dfi_entry" {
   count    = var.lb_config != null ? 1 : 0
   provider = aws.core-vpc
 
   zone_id = var.account_config.route53_external_zone.zone_id
-  name    = local.alb_domain
+  name    = local.lb_fqdn
   type    = "A"
 
   alias {
@@ -201,16 +164,4 @@ resource "aws_route53_record" "dfi_alb_entry" {
     zone_id                = aws_lb.dfi[0].zone_id
     evaluate_target_health = false
   }
-}
-
-# Create CNAME record for original ndl-dfi subdomain pointing to ALB domain
-resource "aws_route53_record" "dfi_entry" {
-  count    = var.lb_config != null ? 1 : 0
-  provider = aws.core-vpc
-
-  zone_id = var.account_config.route53_external_zone.zone_id
-  name    = "${local.lb_endpoint}.${var.env_name}.${var.account_config.dns_suffix}"
-  type    = "CNAME"
-  ttl     = 300
-  records = [local.alb_domain]
 }
