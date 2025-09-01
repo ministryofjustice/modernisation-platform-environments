@@ -1,7 +1,7 @@
 locals {
   lb_name     = "${var.env_name}-dfi-alb"
-  lb_endpoint = "ndl_dfi"
-  # Use original ndl_dfi endpoint
+  lb_endpoint = "ndl-dfi" # Changed underscore to hyphen for DNS compliance
+  # Use original ndl-dfi endpoint
   lb_fqdn = "${local.lb_endpoint}.${var.env_name}.${var.account_config.dns_suffix}"
 }
 
