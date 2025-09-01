@@ -132,9 +132,47 @@ module "s3_lb_logs_bucket" {
   tags = local.tags
 }
 
+# Get ELB service account for current region
+data "aws_elb_service_account" "main" {
+  count = var.lb_config != null && var.lb_config.bucket_policy_enabled ? 1 : 0
+}
+
 data "aws_iam_policy_document" "s3_lb_logs_bucket_policy" {
   count = var.lb_config != null && var.lb_config.bucket_policy_enabled ? 1 : 0
 
+  # Allow ALB service account to write access logs
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:PutObject"
+    ]
+    resources = [
+      "${module.s3_lb_logs_bucket[0].bucket.arn}/*"
+    ]
+    principals {
+      type = "AWS"
+      # ELB service account for current region
+      identifiers = [data.aws_elb_service_account.main[0].arn]
+    }
+  }
+
+  # Allow ALB service account to check bucket ACL
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:GetBucketAcl"
+    ]
+    resources = [
+      module.s3_lb_logs_bucket[0].bucket.arn
+    ]
+    principals {
+      type = "AWS"
+      # ELB service account for current region
+      identifiers = [data.aws_elb_service_account.main[0].arn]
+    }
+  }
+
+  # Original policy for organization access
   statement {
     effect = "Allow"
     actions = [

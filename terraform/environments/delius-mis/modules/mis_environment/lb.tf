@@ -110,8 +110,9 @@ resource "aws_lb_listener" "dfi_https" {
 # Self-signed certificate for HTTPS (temporary solution)
 # Note: Replace this with a proper ACM certificate in production
 resource "aws_acm_certificate" "dfi_self_signed" {
-  count             = var.lb_config != null ? 1 : 0
-  domain_name       = "${local.lb_endpoint}.${var.env_name}.${var.account_config.dns_suffix}"
+  count = var.lb_config != null ? 1 : 0
+  # Use a shorter domain name to avoid ACM 64-character limit
+  domain_name       = "ndl-dfi.${var.env_name}.${var.account_config.dns_suffix}"
   validation_method = "DNS"
 
   lifecycle {
@@ -160,7 +161,7 @@ resource "aws_acm_certificate_validation" "dfi_cert_validation" {
   ]
 
   timeouts {
-    create = "10m"  # Increased timeout for DNS propagation
+    create = "10m" # Increased timeout for DNS propagation
   }
 
   # Explicit dependencies for proper ordering
@@ -190,7 +191,7 @@ resource "aws_route53_record" "dfi_entry" {
   provider = aws.core-vpc
 
   zone_id = var.account_config.route53_external_zone.zone_id
-  name    = "${local.lb_endpoint}.${var.env_name}.${var.account_config.dns_suffix}"
+  name    = "ndl-dfi.${var.env_name}.${var.account_config.dns_suffix}"
   type    = "A"
 
   alias {
