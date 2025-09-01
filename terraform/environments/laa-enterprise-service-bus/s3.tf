@@ -32,14 +32,6 @@ resource "aws_s3_bucket_ownership_controls" "lambda_layer_dependencies" {
   }
 }
 
-resource "aws_s3_bucket_acl" "lambda_layer_dependencies" {
-  bucket = aws_s3_bucket.lambda_layer_dependencies.id
-  acl    = "private"
-  depends_on = [
-    aws_s3_bucket_ownership_controls.lambda_layer_dependencies
-  ]
-}
-
 resource "aws_s3_bucket_versioning" "lambda_layer_dependencies" {
   bucket = aws_s3_bucket.lambda_layer_dependencies.id
   versioning_configuration {
