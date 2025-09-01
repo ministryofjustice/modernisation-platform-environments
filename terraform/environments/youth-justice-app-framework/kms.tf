@@ -71,7 +71,7 @@ module "kms" {
         "kms:GenerateDataKey*",
         "kms:DescribeKey"
       ],
-      resource = "*"
+      resources = ["*"]
     },
     {
       sid = "AllowSESPublishToSNSEncryptedTopics"
