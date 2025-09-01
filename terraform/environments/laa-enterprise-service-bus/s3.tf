@@ -2,7 +2,7 @@
 ################## S3 Bucket for Lambda Layer Dependencies ##########################
 #####################################################################################
 resource "aws_s3_bucket" "lambda_layer_dependencies" {
-  bucket = "lambda-layer-dependencies-${local.environment}"
+  bucket = "lambda-layer-dependencies-${local.environment}-bucket"
 
   tags = merge(
     local.tags,
