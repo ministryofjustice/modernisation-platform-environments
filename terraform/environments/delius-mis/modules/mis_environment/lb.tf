@@ -121,8 +121,8 @@ resource "aws_lb_target_group" "dfi" {
     unhealthy_threshold = 3
     timeout             = 10 # Increased from 5 to 10 seconds
     interval            = 30
-    path                = "/DataServices/launch/logon.action" # Target the actual login page
-    matcher             = "200,302,301"                       # Accept OK, Found, and Moved Permanently
+    path                = "/DataServices/"
+    matcher             = "200,302,301" # Accept OK, Found, and Moved Permanently
     port                = "traffic-port"
     protocol            = "HTTP"
   }
