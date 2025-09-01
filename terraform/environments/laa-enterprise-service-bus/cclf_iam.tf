@@ -71,6 +71,15 @@ resource "aws_iam_policy" "cclf_provider_load_policy" {
         ],
         Resource = aws_sqs_queue.cclf_provider_q.arn
       },
+      {
+        Effect = "Allow",
+        Action = [
+          "ssm:GetParameter",
+          "ssm:GetParameters",
+          "ssm:PutParameter"
+        ],
+        Resource = aws_ssm_parameter.cclf_provider_load_timestamp.arn
+      },
     ]
   })
 }

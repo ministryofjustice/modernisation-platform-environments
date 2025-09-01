@@ -71,6 +71,15 @@ resource "aws_iam_policy" "maat_provider_load_policy" {
         ],
         Resource = aws_sqs_queue.maat_provider_q.arn
       },
+      {
+        Effect = "Allow",
+        Action = [
+          "ssm:GetParameter",
+          "ssm:GetParameters",
+          "ssm:PutParameter"
+        ],
+        Resource = aws_ssm_parameter.maat_provider_load_timestamp.arn
+      },
     ]
   })
 }

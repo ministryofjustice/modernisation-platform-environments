@@ -45,9 +45,9 @@ resource "aws_lambda_function" "ccms_provider_load" {
   function_name    = "ccms_provider_load_function"
   role             = aws_iam_role.ccms_provider_load_role.arn
   handler          = "lambda_function.lambda_handler"
-  filename         = "lambda/ccms_provider_load_lambda/ccms_lambda.zip"
-  source_code_hash = filebase64sha256("lambda/ccms_provider_load_lambda/ccms_lambda.zip")
-  timeout          = 300
+  filename         = "lambda/provider_load_lambda/provider_load_package.zip"
+  source_code_hash = filebase64sha256("lambda/provider_load_lambda/provider_load_package.zip")
+  timeout          = 100
   memory_size      = 128
   runtime          = "python3.10"
 
@@ -64,10 +64,13 @@ resource "aws_lambda_function" "ccms_provider_load" {
 
   environment {
     variables = {
-      DB_SECRET_NAME        = aws_secretsmanager_secret.ccms_db_mp_credentials.name
-      PROCEDURE_SECRET_NAME = aws_secretsmanager_secret.ccms_procedures_config.name
-      LD_LIBRARY_PATH       = "/opt/instantclient_12_2_linux"
-      ORACLE_HOME           = "/opt/instantclient_12_2_linux"
+      DB_SECRET_NAME         = aws_secretsmanager_secret.ccms_db_mp_credentials.name
+      PROCEDURE_SECRET_NAME  = aws_secretsmanager_secret.ccms_procedures_config.name
+      LD_LIBRARY_PATH        = "/opt/instantclient_12_2_linux"
+      ORACLE_HOME            = "/opt/instantclient_12_2_linux"
+      SERVICE_NAME           = "ccms-load-service"
+      NAMESPACE              = "CCMSProviderLoadService"
+      PURGE_LAMBDA_TIMESTAMP = aws_ssm_parameter.ccms_provider_load_timestamp.name
     }
   }
 

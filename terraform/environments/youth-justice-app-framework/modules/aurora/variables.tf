@@ -90,13 +90,13 @@ variable "create_sheduler" {
 variable "start_aurora_cluster_schedule" {
   description = "The schedule for starting the Aurora cluster"
   type        = string
-  default     = "cron(00 07 ? * MON-FRI *)"
+  default     = "cron(00 06 ? * MON-FRI *)"
 }
 
 variable "stop_aurora_cluster_schedule" {
   description = "The schedule for stopping the Aurora cluster"
   type        = string
-  default     = "cron(00 18 ? * MON-FRI *)"
+  default     = "cron(00 19 ? * MON-FRI *)"
 }
 
 variable "database_subnets" {

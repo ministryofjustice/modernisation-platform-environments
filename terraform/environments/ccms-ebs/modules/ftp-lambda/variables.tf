@@ -55,3 +55,8 @@ variable "lambda_memory" {
 variable "lambda_storage" {
   default = "1024"
 }
+variable "enabled_cron_in_environments" {
+  description = "List of environments where cron should be enabled"
+  type        = list(string)
+  default     = ["development", "test", "perproduction"]
+}

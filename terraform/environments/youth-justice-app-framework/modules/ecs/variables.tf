@@ -176,7 +176,7 @@ variable "disable_overnight_scheduler" {
 variable "morning_cron_schedule" {
   description = "The cron schedule for the morning scheduler"
   type        = string
-  default     = "0 7 * * 1-5"
+  default     = "0 6 * * 1-5"
 }
 
 variable "overnight_cron_schedule" {
