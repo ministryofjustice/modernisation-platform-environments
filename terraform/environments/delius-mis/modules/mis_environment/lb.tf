@@ -1,6 +1,8 @@
 locals {
   lb_name     = "${var.env_name}-dfi-alb"
   lb_endpoint = "ndl_dfi"
+  # Very short domain for ACM certificate (under 64 chars)
+  alb_domain = "ndmis-${var.env_name}.${var.account_config.dns_suffix}"
 }
 
 # Application Load Balancer (modern replacement for Classic ELB)
@@ -107,12 +109,11 @@ resource "aws_lb_listener" "dfi_https" {
   tags = local.tags
 }
 
-# Self-signed certificate for HTTPS (temporary solution)
-# Note: Replace this with a proper ACM certificate in production
+# ACM certificate for ALB (using shorter domain to avoid 64-char limit)
 resource "aws_acm_certificate" "dfi_self_signed" {
   count = var.lb_config != null ? 1 : 0
-  # Use a shorter domain name to avoid ACM 64-character limit
-  domain_name       = "ndl-dfi.${var.env_name}.${var.account_config.dns_suffix}"
+  # Use shorter domain for certificate (dfi-alb.env.domain)
+  domain_name       = local.alb_domain
   validation_method = "DNS"
 
   lifecycle {
@@ -186,12 +187,13 @@ resource "aws_lb_target_group_attachment" "dfi_attachment" {
 }
 
 # Create route53 entry for lb
-resource "aws_route53_record" "dfi_entry" {
+# Create A record for ALB using shorter domain (for certificate)
+resource "aws_route53_record" "dfi_alb_entry" {
   count    = var.lb_config != null ? 1 : 0
   provider = aws.core-vpc
 
   zone_id = var.account_config.route53_external_zone.zone_id
-  name    = "ndl-dfi.${var.env_name}.${var.account_config.dns_suffix}"
+  name    = local.alb_domain
   type    = "A"
 
   alias {
@@ -199,4 +201,16 @@ resource "aws_route53_record" "dfi_entry" {
     zone_id                = aws_lb.dfi[0].zone_id
     evaluate_target_health = false
   }
+}
+
+# Create CNAME record for original ndl-dfi subdomain pointing to ALB domain
+resource "aws_route53_record" "dfi_entry" {
+  count    = var.lb_config != null ? 1 : 0
+  provider = aws.core-vpc
+
+  zone_id = var.account_config.route53_external_zone.zone_id
+  name    = "${local.lb_endpoint}.${var.env_name}.${var.account_config.dns_suffix}"
+  type    = "CNAME"
+  ttl     = 300
+  records = [local.alb_domain]
 }
