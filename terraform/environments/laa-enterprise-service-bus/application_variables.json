@@ -15,7 +15,7 @@
     "test": {
       "cwa_database_ip": "10.206.1.60/32",
       "vpc_endpoint_sg": "sg-0a8e105b2345a1840",
-      "ccms_database_ip": "10.26.100.162",
+      "ccms_database_ip": "10.26.100.162/32",
       "s3_vpc_endpoint_prefix": "pl-7ca54015",
       "maatdb_sg": "sg-00dd7a4dcbcf3c22e",
       "cloud_platform_cidr": "172.20.0.0/16",
