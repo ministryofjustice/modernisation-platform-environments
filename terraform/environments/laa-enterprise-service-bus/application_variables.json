@@ -1,11 +1,9 @@
 {
   "accounts": {
     "development": {
-      "example_var": "dev-data",
       "cwa_database_ip": "10.26.60.170/32",
       "vpc_endpoint_sg": "sg-0754d9a309704addd",
       "ccms_database_ip": "10.26.60.223/32",
-      "cwa_efs_sg": "sg-051ddf4169a9048a2",
       "s3_vpc_endpoint_prefix": "pl-7ca54015",
       "maatdb_sg": "sg-01af07cdeb1fb46d0",
       "cloud_platform_cidr": "172.20.0.0/16",
@@ -13,7 +11,14 @@
       "ccms_account_id": "767123802783"
     },
     "test": {
-      "example_var": "test-data"
+      "cwa_database_ip": "10.206.1.60/32",
+      "vpc_endpoint_sg": "sg-0a8e105b2345a1840",
+      "ccms_database_ip": "",
+      "s3_vpc_endpoint_prefix": "pl-7ca54015",
+      "maatdb_sg": "sg-00dd7a4dcbcf3c22e",
+      "cloud_platform_cidr": "172.20.0.0/16",
+      "maatdb_account_id": "858669496578",
+      "ccms_account_id": ""
     },
     "preproduction": {
       "example_var": "preproduction-data"
