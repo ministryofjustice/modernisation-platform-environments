@@ -1,7 +1,5 @@
 locals {
-
-  /*  
-security_group_cidrs_devtest = {
+  security_group_cidrs_devtest = {
     enduserclient = [
       "10.0.0.0/8"
     ]
@@ -10,7 +8,6 @@ security_group_cidrs_devtest = {
       module.ip_addresses.mp_cidr[module.environment.vpc_name]
     ])
   }
-*/
 
   security_group_cidrs_preprod_prod = {
     enduserclient = [
