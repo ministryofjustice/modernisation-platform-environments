@@ -58,5 +58,5 @@ variable "lambda_storage" {
 variable "enabled_cron_in_environments" {
   description = "List of environments where cron should be enabled"
   type        = list(string)
-  default     = ["development", "test", "preproduction", production]
+  default     = ["development", "test", "preproduction", "production"]
 }
