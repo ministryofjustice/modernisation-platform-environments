@@ -1,8 +1,7 @@
 locals {
   lb_name     = "${var.env_name}-dfi-alb"
-  lb_endpoint = "ndl-dfi" # Changed underscore to hyphen for DNS compliance
-  # Use original ndl-dfi endpoint
-  lb_fqdn = "${local.lb_endpoint}.${var.env_name}.${var.account_config.dns_suffix}"
+  lb_endpoint = "ndl-dfi" # Use underscores for DNS compliance
+  lb_fqdn     = "${local.lb_endpoint}.${var.env_name}.${var.account_config.dns_suffix}"
 }
 
 # Security group for ALB
@@ -72,7 +71,7 @@ resource "aws_vpc_security_group_ingress_rule" "ec2_from_alb" {
   tags = local.tags
 }
 
-# Application Load Balancer (modern replacement for Classic ELB)
+# Application Load Balancer (replaces legacy environment's classic LB)
 resource "aws_lb" "dfi" {
   count              = var.lb_config != null ? 1 : 0
   name               = local.lb_name
