@@ -76,7 +76,7 @@ resource "aws_lambda_function" "red_button_trigger" {
 
   environment {
     variables = {
-      S3_BUCKET_REDBUTTON = aws_s3_bucket.red_button_backup.id
+      S3_BUCKET_REDBUTTON = aws_s3_bucket.red_button_data.id
       BOOM                = local.application_data.accounts[local.environment].red_button_lambda_boom
       DEBUG               = local.application_data.accounts[local.environment].red_button_lambda_debug
     }
@@ -136,12 +136,12 @@ output "lambda_function_arn" {
 
 output "s3_bucket_name" {
   description = "Name of the S3 bucket for backups"
-  value       = aws_s3_bucket.red_button_backup.id
+  value       = aws_s3_bucket.red_button_data.id
 }
 
 output "s3_bucket_arn" {
   description = "ARN of the S3 bucket for backups"
-  value       = aws_s3_bucket.red_button_backup.arn
+  value       = aws_s3_bucket.red_button_data.arn
 }
 
 output "iam_role_arn" {
