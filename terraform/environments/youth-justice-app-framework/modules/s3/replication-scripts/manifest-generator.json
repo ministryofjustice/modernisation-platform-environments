@@ -1,10 +1,10 @@
 {
   "S3JobManifestGenerator": {
-    "ExpectedBucketOwner": "066012302209",
-    "SourceBucket": "arn:aws:s3:::yjaf-prod-yjsm",
+    "ExpectedBucketOwner": "053556912568",
+    "SourceBucket": "arn:aws:s3:::historical-preprodapps",
     "ManifestOutputLocation": {
-      "ExpectedManifestBucketOwner": "066012302209",
-      "Bucket": "arn:aws:s3:::yjaf-prod-replication-manifests",
+      "ExpectedManifestBucketOwner": "053556912568",
+      "Bucket": "arn:aws:s3:::yjaf-preprod-replication-manifests",
       "ManifestFormat": "S3InventoryReport_CSV_20211130"
     },
     "Filter": {

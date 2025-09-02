@@ -13,8 +13,8 @@ variable "role_description" {
   nullable = false
 }
 
-variable "iam_policy_document" {
-  type     = string
+variable "iam_policy_documents" {
+  type     = list(string)
   nullable = false
 }
 

@@ -41,13 +41,12 @@ locals {
       })
 
       pd-cafm-a-11-a = merge(local.ec2_instances.app, {
-        #cloudwatch_metric_alarms = merge(
-        #  local.ec2_instances.app.cloudwatch_metric_alarms,
-        #  module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows,
-        #)
-        cloudwatch_metric_alarms = {}
+        cloudwatch_metric_alarms = merge(
+          local.ec2_instances.app.cloudwatch_metric_alarms,
+          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows,
+        )
         config = merge(local.ec2_instances.app.config, {
-          ami_name          = "pd-cafm-a-11-a"
+          ami_name          = "pd-cafm-a-2022-image-20250806T1436"
           availability_zone = "eu-west-2a"
         })
         ebs_volumes = {
@@ -59,18 +58,17 @@ locals {
           instance_type           = "t3.xlarge"
         })
         tags = merge(local.ec2_instances.app.tags, {
-          ami              = "pd-cafm-a-11-a"
           description      = "RDS session host and app server"
-          pre-migration    = "PDFWA0011"
           update-ssm-agent = "patchgroup1"
+          server-type      = "PlanetFMApp"
         })
       })
 
       pd-cafm-a-12-b = merge(local.ec2_instances.app, {
-        cloudwatch_metric_alarms = merge(
-          local.ec2_instances.app.cloudwatch_metric_alarms,
-          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows
-        )
+        #cloudwatch_metric_alarms = merge(
+        #  local.ec2_instances.app.cloudwatch_metric_alarms,
+        #  module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows
+        #)
         config = merge(local.ec2_instances.app.config, {
           ami_name          = "pd-cafm-a-12-b"
           availability_zone = "eu-west-2b"
@@ -94,10 +92,10 @@ locals {
       })
 
       pd-cafm-a-13-a = merge(local.ec2_instances.app, {
-        cloudwatch_metric_alarms = merge(
-          local.ec2_instances.app.cloudwatch_metric_alarms,
-          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows
-        )
+        #cloudwatch_metric_alarms = merge(
+        #  local.ec2_instances.app.cloudwatch_metric_alarms,
+        #  module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows
+        #)
         config = merge(local.ec2_instances.app.config, {
           ami_name          = "pd-cafm-a-13-a"
           availability_zone = "eu-west-2a"
@@ -117,6 +115,54 @@ locals {
           description      = "RDS session host and App Server"
           pre-migration    = "PDFAW0013"
           update-ssm-agent = "patchgroup1"
+        })
+      })
+
+      pd-cafm-a-14-b = merge(local.ec2_instances.app, {
+        cloudwatch_metric_alarms = merge(
+          local.ec2_instances.app.cloudwatch_metric_alarms,
+          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows
+        )
+        config = merge(local.ec2_instances.app.config, {
+          ami_name          = "pd-cafm-a-2022-image-20250806T1436"
+          availability_zone = "eu-west-2b"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "/dev/sdb"  = { type = "gp3", size = 200 }
+        }
+        instance = merge(local.ec2_instances.app.instance, {
+          disable_api_termination = true
+          instance_type           = "t3.xlarge"
+        })
+        tags = merge(local.ec2_instances.app.tags, {
+          description      = "RDS session host and app Server"
+          update-ssm-agent = "patchgroup2"
+          server-type      = "PlanetFMApp"
+        })
+      })
+
+      pd-cafm-a-15-a = merge(local.ec2_instances.app, {
+        cloudwatch_metric_alarms = merge(
+          local.ec2_instances.app.cloudwatch_metric_alarms,
+          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows
+        )
+        config = merge(local.ec2_instances.app.config, {
+          ami_name          = "pd-cafm-a-2022-image-20250806T1436"
+          availability_zone = "eu-west-2a"
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "/dev/sdb"  = { type = "gp3", size = 200 }
+        }
+        instance = merge(local.ec2_instances.app.instance, {
+          disable_api_termination = true
+          instance_type           = "t3.xlarge"
+        })
+        tags = merge(local.ec2_instances.app.tags, {
+          description      = "RDS session host and app Server"
+          update-ssm-agent = "patchgroup1"
+          server-type      = "PlanetFMApp"
         })
       })
 

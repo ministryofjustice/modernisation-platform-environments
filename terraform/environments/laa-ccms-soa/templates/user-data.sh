@@ -62,7 +62,7 @@ s3fs -o iam_role=auto -o url="https://s3-eu-west-2.amazonaws.com" -o endpoint=eu
 echo s3fs#${inbound_bucket} $EC2_USER_HOME_FOLDER/inbound fuse iam_role=auto,url="https://s3-eu-west-2.amazonaws.com",endpoint=eu-west-2,allow_other,multireq_max=5,use_cache=/tmp,uid=1000,gid=1000 0 0 >> /etc/fstab
 echo s3fs#${outbound_bucket} $EC2_USER_HOME_FOLDER/outbound fuse iam_role=auto,url="https://s3-eu-west-2.amazonaws.com",endpoint=eu-west-2,allow_other,multireq_max=5,use_cache=/tmp,uid=1000,gid=1000 0 0 >> /etc/fstab
 
-#--Create essential subdirs in S3
+#--Create essential subdirs in S3 Bucket
 mkdir -p \
   $INBOUND_S3_MOUNT_POINT/archive \
   $INBOUND_S3_MOUNT_POINT/CCMS_PRD_Allpay \
@@ -89,34 +89,64 @@ mkdir -p \
   $INBOUND_S3_MOUNT_POINT/inprocess \
   $INBOUND_S3_MOUNT_POINT/rejected
 
-# clear all admin files and entries from config.xml on admin host only
+#--Clears all admin files and entries from config.xml on admin host only
 reset_admin() {
-  domain_home=$EFS_MOUNT_POINT/domains/soainfra
-  config_location=$domain_home/config
+  DOMAIN_HOME=$EFS_MOUNT_POINT/domains/soainfra
+  CONFIG_LOCATION=$DOMAIN_HOME/config
 
-  yum install -y xmlstarlet
+  cp -p $CONFIG_LOCATION/config.xml $CONFIG_LOCATION/config.xml.$(date '+%Y%m%d-%H%M').bak
+  cp -p $CONFIG_LOCATION/config.xml $CONFIG_LOCATION/config.xml.none
 
-  cp -p $config_location/config.xml $config_location/config.xml.$(date '+%Y%m%d-%H%M').bak
-  cp -p $config_location/config.xml $config_location/config.xml.none
+  xmlstarlet ed --inplace -N x="http://xmlns.oracle.com/weblogic/domain" -d "//x:server[./x:name[contains(text(),'ccms_soa_ms')]]" $CONFIG_LOCATION/config.xml.none
+  xmlstarlet ed --inplace -N x="http://xmlns.oracle.com/weblogic/domain" -d "//x:machine[./x:name[contains(text(),'MACHINE-')]]" $CONFIG_LOCATION/config.xml.none
+  xmlstarlet ed --inplace -N x="http://xmlns.oracle.com/weblogic/domain" -d "//x:migratable-target[./x:name[contains(text(),'ccms_soa_ms')]]" $CONFIG_LOCATION/config.xml.none
+  xmlstarlet ed --inplace -N x="http://xmlns.oracle.com/weblogic/domain" -u "//x:coherence-cluster-system-resource/x:target" -v "AdminServer" $CONFIG_LOCATION/config.xml.none
 
-  xmlstarlet ed --inplace -N x="http://xmlns.oracle.com/weblogic/domain" -d "//x:server[./x:name[contains(text(),'ccms_soa_ms')]]" $config_location/config.xml.none
-  xmlstarlet ed --inplace -N x="http://xmlns.oracle.com/weblogic/domain" -d "//x:machine[./x:name[contains(text(),'MACHINE-')]]" $config_location/config.xml.none
-  xmlstarlet ed --inplace -N x="http://xmlns.oracle.com/weblogic/domain" -d "//x:migratable-target[./x:name[contains(text(),'ccms_soa_ms')]]" $config_location/config.xml.none
-  xmlstarlet ed --inplace -N x="http://xmlns.oracle.com/weblogic/domain" -u "//x:coherence-cluster-system-resource/x:target" -v "AdminServer" $config_location/config.xml.none
+  cp -p $CONFIG_LOCATION/config.xml.none $CONFIG_LOCATION/config.xml
 
-  cp -p $config_location/config.xml.none $config_location/config.xml
+  rm -rf $DOMAIN_HOME/original
+  rm -rf $DOMAIN_HOME/pending
+  rm -rf $DOMAIN_HOME/edit
+  rm -f $DOMAIN_HOME/edit.lok
+  rm -rf $DOMAIN_HOME/servers/domain_bak
+  rm -rf $DOMAIN_HOME/servers/AdminServer/cache
+  rm -rf $DOMAIN_HOME/servers/AdminServer/logs
+  rm -rf $DOMAIN_HOME/servers/AdminServer/tmp
+}
 
-  rm -rf $domain_home/original
-  rm -rf $domain_home/pending
-  rm -rf $domain_home/edit
-  rm -f $domain_home/edit.lok
-  rm -rf $domain_home/servers/domain_bak
-  rm -rf $domain_home/servers/AdminServer/cache
-  rm -rf $domain_home/servers/AdminServer/logs
-  rm -rf $domain_home/servers/AdminServer/tmp
+#--Configures config.xml to listen for Weblogic on HTTPS only (prevents https > http redirection loops). CC-3814
+ensure_https() {
+  xmlstarlet ed \
+    -u "/domain/server[name='AdminServer']/web-server/weblogic-plugin-enabled" -v "true" \
+    -s "/domain/server[name='AdminServer']/web-server" -t elem -n "weblogic-plugin-enabled" -v "true" \
+    $CONFIG_LOCATION/config.xml > $CONFIG_LOCATION/config.xml.new && mv $CONFIG_LOCATION/config.xml.new $CONFIG_LOCATION/config.xml
+}
+
+#--Deploy Cortex Agent (Also known as XDR Agent). SOC Monitoring
+deploy_cortex() {
+  CORTEX_DIR=/tmp/CortexAgent
+  CORTEX_VERSION=linux_8_8_0_133595_rpm
+
+  #--Prep
+  mkdir -p $CORTEX_DIR/linux_8_8_0_133595_rpm
+  mkdir /etc/panw
+  aws s3 sync s3://ccms-shared/CortexAgent/ $CORTEX_DIR #--ccms-shared is in the EBS dev account 767123802783. Bucket is shared at the ORG LEVEL.
+  tar zxf $CORTEX_DIR/$CORTEX_VERSION.tar.gz -C $CORTEX_DIR/$CORTEX_VERSION
+  cp $CORTEX_DIR/$CORTEX_VERSION/cortex.conf /etc/panw/cortex.conf
+
+  #--Installs
+  yum install -y selinux-policy-devel
+  rpm -Uvh $CORTEX_DIR/$CORTEX_VERSION/cortex-*.rpm
+  systemctl status traps_pmd
+  echo "Cortex Install Routine Complete. Installation Is NOT GUARANTEED -- Check Logs For Success"
 }
 
 if [[ "${server}" = "admin" ]]; then
+  yum install -y xmlstarlet
+  ensure_https
   reset_admin
 fi
 
+if [[ "${deploy_environment}" = "production" ]]; then
+  deploy_cortex
+fi

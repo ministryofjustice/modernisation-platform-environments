@@ -1,16 +1,87 @@
-# resource "aws_lambda_function" "cclf_lambda" {
-#   filename         = "cclf_lambda.zip"
-#   function_name    = "cclf_lambda_function"
-#   role             = aws_iam_role.cclf_lambda_role.arn
-#   handler          = "index.test"
-#   runtime          = "python3.11"
-#   source_code_hash = filebase64sha256("lambda.zip")
+######################################
+### CCLF Lambda SG
+######################################
 
-# #   vpc_config {
-# #     subnet_ids         = # Replace with your private subnet(s)
-# #     security_group_ids = # Replace with appropriate SG
-# #   }
+resource "aws_security_group" "cclf_provider_load_sg" {
+  name        = "${local.application_name_short}-${local.environment}-cclf-provider-load-lambda-security-group"
+  description = "CCLF Provider Lambda Security Group"
+  vpc_id      = data.aws_vpc.shared.id
 
-#   timeout = 10
-#   memory_size = 128
-# }
+  revoke_rules_on_delete = true
+
+  tags = merge(
+    local.tags,
+    { Name = "${local.application_name_short}-${local.environment}-cclf-provider-load-lambda-security-group" }
+  )
+}
+
+resource "aws_security_group_rule" "cclf_provider_load_egress_oracle" {
+  type              = "egress"
+  from_port         = 1521
+  to_port           = 1521
+  protocol          = "tcp"
+  cidr_blocks       = [local.application_data.accounts[local.environment].cloud_platform_cidr]
+  security_group_id = aws_security_group.cclf_provider_load_sg.id
+  description       = "Outbound 1521 Access to Cloud Platform"
+}
+
+resource "aws_security_group_rule" "cclf_provider_load_egress_https_sm" {
+  type                     = "egress"
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  source_security_group_id = local.application_data.accounts[local.environment].vpc_endpoint_sg
+  security_group_id        = aws_security_group.cclf_provider_load_sg.id
+  description              = "Outbound 443 to LAA VPC Endpoint SG"
+}
+
+######################################
+### Lambda Resources
+######################################
+
+resource "aws_lambda_function" "cclf_provider_load" {
+
+  description      = "Connects to CCLF DB and invokes the Load procedure to load the provider data."
+  function_name    = "cclf_provider_load_function"
+  role             = aws_iam_role.cclf_provider_load_role.arn
+  handler          = "lambda_function.lambda_handler"
+  filename         = "lambda/provider_load_lambda/provider_load_package.zip"
+  source_code_hash = filebase64sha256("lambda/provider_load_lambda/provider_load_package.zip")
+  timeout          = 100
+  memory_size      = 128
+  runtime          = "python3.10"
+
+  layers = [
+    aws_lambda_layer_version.lambda_layer_oracle_python.arn,
+    "arn:aws:lambda:eu-west-2:017000801446:layer:AWSLambdaPowertoolsPython:2"
+  ]
+
+  vpc_config {
+    security_group_ids = [aws_security_group.cclf_provider_load_sg.id]
+    subnet_ids         = [data.aws_subnet.data_subnets_a.id]
+  }
+
+
+  environment {
+    variables = {
+      DB_SECRET_NAME         = aws_secretsmanager_secret.cclf_db_mp_credentials.name
+      PROCEDURE_SECRET_NAME  = aws_secretsmanager_secret.cclf_procedures_config.name
+      LD_LIBRARY_PATH        = "/opt/instantclient_12_2_linux"
+      ORACLE_HOME            = "/opt/instantclient_12_2_linux"
+      SERVICE_NAME           = "cclf-load-service"
+      NAMESPACE              = "CCLFProviderLoadService"
+      PURGE_LAMBDA_TIMESTAMP = aws_ssm_parameter.cclf_provider_load_timestamp.name
+    }
+  }
+
+  tags = merge(
+    local.tags,
+    { Name = "${local.application_name_short}-${local.environment}-cclf-provider-load" }
+  )
+}
+
+resource "aws_lambda_event_source_mapping" "cclf_provider_q_trigger" {
+  event_source_arn = aws_sqs_queue.cclf_provider_q.arn
+  function_name    = aws_lambda_function.cclf_provider_load.arn
+  batch_size       = 1
+}

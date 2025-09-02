@@ -5,12 +5,12 @@ resource "aws_iam_role" "scheduler_invoke_role" {
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
     Statement = [{
-      Effect = "Allow",
+      Effect    = "Allow",
       Principal = { Service = "scheduler.amazonaws.com" },
-      Action = "sts:AssumeRole"
+      Action    = "sts:AssumeRole"
     }]
   })
-  
+
   tags = merge(
     local.tags,
     {
@@ -25,9 +25,9 @@ resource "aws_iam_policy" "scheduler_invoke_lambda" {
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [{
-      Effect = "Allow",
-      Action = "lambda:InvokeFunction",
-      Resource = "${aws_lambda_function.cwa_extract.arn}"
+      Effect   = "Allow",
+      Action   = "lambda:InvokeFunction",
+      Resource = "${aws_lambda_function.cwa_extract_lambda.arn}"
     }]
   })
 }

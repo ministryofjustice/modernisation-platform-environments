@@ -1,12 +1,13 @@
 module "rds_export" {
   # checkov:skip=CKV_TF_1: using branch instead of a commit hash
   # checkov:skip=CKV_TF_2: using branch instead of tag with a version number
-  source = "github.com/ministryofjustice/terraform-rds-export?ref=44129bf84ea4f736781f0c9ab832ea92917e72d3"
+  source = "github.com/ministryofjustice/terraform-rds-export?ref=b8e43e20af2f303461c89b23a70ee000d50fa6dd"
 
-  kms_key_arn         = aws_kms_key.sns_kms.arn
-  name                = "cafm"
-  vpc_id              = module.vpc.vpc_id
-  database_subnet_ids = module.vpc.private_subnets
+  kms_key_arn           = aws_kms_key.shared_kms_key.arn
+  name                  = "cafm"
+  database_refresh_mode = "full"
+  vpc_id                = module.vpc.vpc_id
+  database_subnet_ids   = module.vpc.private_subnets
   master_user_secret_id = aws_secretsmanager_secret.db_master_user_secret.arn
 
   tags = {
@@ -20,7 +21,7 @@ module "rds_export" {
 resource "aws_secretsmanager_secret" "db_master_user_secret" {
   # checkov:skip=CKV2_AWS_57: Skipping because automatic rotation not needed.
   name       = "cafm-database-master-user-secret"
-  kms_key_id = aws_kms_key.sns_kms.arn
+  kms_key_id = aws_kms_key.shared_kms_key.arn
 }
 
 module "endpoints" {
@@ -30,7 +31,7 @@ module "endpoints" {
   vpc_id                     = module.vpc.vpc_id
   create_security_group      = true
   security_group_description = "Managed by Terraform"
-  security_group_tags        = { Name : "eu-west-1-dev" }
+  security_group_tags        = { Name : "cafm-migration-rds-sg" }
   security_group_rules = {
     ingress_https = {
       description = "HTTPS from VPC"
@@ -44,7 +45,7 @@ module "endpoints" {
       subnet_ids          = module.vpc.private_subnets
       private_dns_enabled = true
       tags                = { Name = "cafm-secretsmanager-endpoint" }
-     }
+    }
     glue = {
       service             = "glue"
       service_type        = "Interface"
@@ -74,7 +75,7 @@ module "sftp_user" {
   user_name   = each.value.user_name
   server_id   = module.server.id
   s3_bucket   = each.value.s3_bucket
-  kms_key_arn = aws_kms_key.sns_kms.arn
+  kms_key_arn = aws_kms_key.shared_kms_key.arn
 }
 
 

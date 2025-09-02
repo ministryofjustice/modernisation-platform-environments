@@ -3,7 +3,7 @@ module "eks_cluster_logs_kms" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "3.1.1"
+  version = "4.0.0"
 
   aliases                 = ["eks/cluster-logs"]
   description             = "EKS cluster logs KMS key"
@@ -24,14 +24,14 @@ module "eks_cluster_logs_kms" {
       principals = [
         {
           type        = "Service"
-          identifiers = ["logs.${data.aws_region.current.name}.amazonaws.com"]
+          identifiers = ["logs.${data.aws_region.current.region}.amazonaws.com"]
         }
       ]
-      conditions = [
+      condition = [
         {
           test     = "ArnEquals"
           variable = "kms:EncryptionContext:aws:logs:arn"
-          values   = ["arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/eks/*"]
+          values   = ["arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/eks/*"]
         }
       ]
     }
@@ -45,7 +45,7 @@ module "eks_ebs_kms" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "3.1.1"
+  version = "4.0.0"
 
   aliases                 = ["eks/ebs"]
   description             = "EKS EBS KMS key"
@@ -74,11 +74,11 @@ module "eks_ebs_kms" {
           identifiers = ["*"]
         }
       ]
-      conditions = [
+      condition = [
         {
           test     = "StringEquals"
           variable = "kms:ViaService"
-          values   = ["ec2.${data.aws_region.current.name}.amazonaws.com"]
+          values   = ["ec2.${data.aws_region.current.region}.amazonaws.com"]
         },
         {
           test     = "StringEquals"
@@ -97,7 +97,7 @@ module "karpenter_sqs_kms" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "3.1.1"
+  version = "4.0.0"
 
   aliases               = ["sqs/karpenter"]
   description           = "Karpenter SQS KMS key"
@@ -130,7 +130,7 @@ module "managed_prometheus_kms" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "3.1.1"
+  version = "4.0.0"
 
   aliases                 = ["amp/default"]
   description             = "AMP KMS key"
@@ -153,11 +153,11 @@ module "managed_prometheus_kms" {
           identifiers = ["*"]
         }
       ]
-      conditions = [
+      condition = [
         {
           test     = "StringEquals"
           variable = "kms:ViaService"
-          values   = ["aps.${data.aws_region.current.name}.amazonaws.com"]
+          values   = ["aps.${data.aws_region.current.region}.amazonaws.com"]
         },
         {
           test     = "StringEquals"
@@ -171,28 +171,12 @@ module "managed_prometheus_kms" {
   tags = local.tags
 }
 
-module "ui_rds_kms" {
-  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
-  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
-
-  source  = "terraform-aws-modules/kms/aws"
-  version = "3.1.1"
-
-  aliases               = ["rds/ui"]
-  description           = "UI RDS KMS key"
-  enable_default_policy = true
-
-  deletion_window_in_days = 7
-
-  tags = local.tags
-}
-
 module "common_secrets_manager_kms" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "3.1.1"
+  version = "4.0.0"
 
   aliases               = ["secretsmanager/common"]
   description           = "Common Secrets Manager KMS key"
@@ -208,7 +192,7 @@ module "managed_prometheus_logs_kms" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "3.1.1"
+  version = "4.0.0"
 
   aliases                 = ["amp/logs"]
   description             = "AMP logs KMS key"
@@ -229,18 +213,34 @@ module "managed_prometheus_logs_kms" {
       principals = [
         {
           type        = "Service"
-          identifiers = ["logs.${data.aws_region.current.name}.amazonaws.com"]
+          identifiers = ["logs.${data.aws_region.current.region}.amazonaws.com"]
         }
       ]
-      conditions = [
+      condition = [
         {
           test     = "ArnEquals"
           variable = "kms:EncryptionContext:aws:logs:arn"
-          values   = ["arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:${local.amp_cloudwatch_log_group_name}*"]
+          values   = ["arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:${local.amp_cloudwatch_log_group_name}*"]
         }
       ]
     }
   ]
+
+  tags = local.tags
+}
+
+module "velero_kms" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/kms/aws"
+  version = "4.0.0"
+
+  aliases               = ["s3/velero"]
+  description           = "Velero KMS key"
+  enable_default_policy = true
+
+  deletion_window_in_days = 7
 
   tags = local.tags
 }
