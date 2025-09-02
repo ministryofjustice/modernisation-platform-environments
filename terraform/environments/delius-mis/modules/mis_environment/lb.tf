@@ -4,51 +4,174 @@ locals {
   lb_fqdn     = "${local.lb_endpoint}.${var.env_name}.${var.account_config.dns_suffix}"
 }
 
-# Security group for ALB
-resource "aws_security_group" "dfi_alb" {
+# Security group for ALB - Staff access
+resource "aws_security_group" "dfi_alb_staff" {
   count       = var.lb_config != null ? 1 : 0
-  name        = "${local.lb_name}-sg"
-  description = "Security group for DFI Application Load Balancer"
+  name        = "${local.lb_name}-staff-sg"
+  description = "Security group for DFI ALB - Staff access"
   vpc_id      = var.account_config.shared_vpc_id
 
   tags = merge(
     local.tags,
     {
-      "Name" = "${local.lb_name}-sg"
+      "Name" = "${local.lb_name}-staff-sg"
     },
   )
 }
 
-# Allow HTTP traffic from internal CIDR ranges to ALB
-resource "aws_vpc_security_group_ingress_rule" "dfi_alb_http" {
-  for_each          = var.lb_config != null && length(local.internal_security_group_cidrs) > 0 ? toset(local.internal_security_group_cidrs) : []
-  security_group_id = aws_security_group.dfi_alb[0].id
+# Security group for ALB - End user access
+resource "aws_security_group" "dfi_alb_enduser" {
+  count       = var.lb_config != null ? 1 : 0
+  name        = "${local.lb_name}-enduser-sg"
+  description = "Security group for DFI ALB - End user access"
+  vpc_id      = var.account_config.shared_vpc_id
+
+  tags = merge(
+    local.tags,
+    {
+      "Name" = "${local.lb_name}-enduser-sg"
+    },
+  )
+}
+
+# Security group for ALB - MOJO access
+resource "aws_security_group" "dfi_alb_mojo" {
+  count       = var.lb_config != null ? 1 : 0
+  name        = "${local.lb_name}-mojo-sg"
+  description = "Security group for DFI ALB - MOJO access"
+  vpc_id      = var.account_config.shared_vpc_id
+
+  tags = merge(
+    local.tags,
+    {
+      "Name" = "${local.lb_name}-mojo-sg"
+    },
+  )
+}
+
+# Security group for ALB - Infrastructure access
+resource "aws_security_group" "dfi_alb_infrastructure" {
+  count       = var.lb_config != null ? 1 : 0
+  name        = "${local.lb_name}-infra-sg"
+  description = "Security group for DFI ALB - Infrastructure access"
+  vpc_id      = var.account_config.shared_vpc_id
+
+  tags = merge(
+    local.tags,
+    {
+      "Name" = "${local.lb_name}-infra-sg"
+    },
+  )
+}
+
+# HTTP rules for staff access
+resource "aws_vpc_security_group_ingress_rule" "dfi_alb_http_staff" {
+  for_each          = var.lb_config != null && length(local.internal_security_group_cidrs_staff) > 0 ? toset(local.internal_security_group_cidrs_staff) : []
+  security_group_id = aws_security_group.dfi_alb_staff[0].id
   cidr_ipv4         = each.value
   ip_protocol       = "tcp"
   from_port         = 80
   to_port           = 80
-  description       = "Allow HTTP traffic from internal networks: ${each.value}"
+  description       = "Allow HTTP traffic from staff networks: ${each.value}"
 
   tags = local.tags
 }
 
-# Allow HTTPS traffic from internal CIDR ranges to ALB
-resource "aws_vpc_security_group_ingress_rule" "dfi_alb_https" {
-  for_each          = var.lb_config != null && length(local.internal_security_group_cidrs) > 0 ? toset(local.internal_security_group_cidrs) : []
-  security_group_id = aws_security_group.dfi_alb[0].id
+# HTTPS rules for staff access
+resource "aws_vpc_security_group_ingress_rule" "dfi_alb_https_staff" {
+  for_each          = var.lb_config != null && length(local.internal_security_group_cidrs_staff) > 0 ? toset(local.internal_security_group_cidrs_staff) : []
+  security_group_id = aws_security_group.dfi_alb_staff[0].id
   cidr_ipv4         = each.value
   ip_protocol       = "tcp"
   from_port         = 443
   to_port           = 443
-  description       = "Allow HTTPS traffic from internal networks: ${each.value}"
+  description       = "Allow HTTPS traffic from staff networks: ${each.value}"
 
   tags = local.tags
 }
 
-# Allow ALB to communicate with backend instances on port 8080
-resource "aws_vpc_security_group_egress_rule" "dfi_alb_backend" {
+# HTTP rules for end user access
+resource "aws_vpc_security_group_ingress_rule" "dfi_alb_http_enduser" {
+  for_each          = var.lb_config != null && length(local.internal_security_group_cidrs_enduser) > 0 ? toset(local.internal_security_group_cidrs_enduser) : []
+  security_group_id = aws_security_group.dfi_alb_enduser[0].id
+  cidr_ipv4         = each.value
+  ip_protocol       = "tcp"
+  from_port         = 80
+  to_port           = 80
+  description       = "Allow HTTP traffic from enduser networks: ${each.value}"
+
+  tags = local.tags
+}
+
+# HTTPS rules for end user access
+resource "aws_vpc_security_group_ingress_rule" "dfi_alb_https_enduser" {
+  for_each          = var.lb_config != null && length(local.internal_security_group_cidrs_enduser) > 0 ? toset(local.internal_security_group_cidrs_enduser) : []
+  security_group_id = aws_security_group.dfi_alb_enduser[0].id
+  cidr_ipv4         = each.value
+  ip_protocol       = "tcp"
+  from_port         = 443
+  to_port           = 443
+  description       = "Allow HTTPS traffic from enduser networks: ${each.value}"
+
+  tags = local.tags
+}
+
+# HTTP rules for MOJO access
+resource "aws_vpc_security_group_ingress_rule" "dfi_alb_http_mojo" {
+  for_each          = var.lb_config != null && length(local.internal_security_group_cidrs_mojo) > 0 ? toset(local.internal_security_group_cidrs_mojo) : []
+  security_group_id = aws_security_group.dfi_alb_mojo[0].id
+  cidr_ipv4         = each.value
+  ip_protocol       = "tcp"
+  from_port         = 80
+  to_port           = 80
+  description       = "Allow HTTP traffic from MOJO networks: ${each.value}"
+
+  tags = local.tags
+}
+
+# HTTPS rules for MOJO access
+resource "aws_vpc_security_group_ingress_rule" "dfi_alb_https_mojo" {
+  for_each          = var.lb_config != null && length(local.internal_security_group_cidrs_mojo) > 0 ? toset(local.internal_security_group_cidrs_mojo) : []
+  security_group_id = aws_security_group.dfi_alb_mojo[0].id
+  cidr_ipv4         = each.value
+  ip_protocol       = "tcp"
+  from_port         = 443
+  to_port           = 443
+  description       = "Allow HTTPS traffic from MOJO networks: ${each.value}"
+
+  tags = local.tags
+}
+
+# HTTP rules for infrastructure access
+resource "aws_vpc_security_group_ingress_rule" "dfi_alb_http_infrastructure" {
+  for_each          = var.lb_config != null && length(local.internal_security_group_cidrs_infrastructure) > 0 ? toset(local.internal_security_group_cidrs_infrastructure) : []
+  security_group_id = aws_security_group.dfi_alb_infrastructure[0].id
+  cidr_ipv4         = each.value
+  ip_protocol       = "tcp"
+  from_port         = 80
+  to_port           = 80
+  description       = "Allow HTTP traffic from infrastructure networks: ${each.value}"
+
+  tags = local.tags
+}
+
+# HTTPS rules for infrastructure access
+resource "aws_vpc_security_group_ingress_rule" "dfi_alb_https_infrastructure" {
+  for_each          = var.lb_config != null && length(local.internal_security_group_cidrs_infrastructure) > 0 ? toset(local.internal_security_group_cidrs_infrastructure) : []
+  security_group_id = aws_security_group.dfi_alb_infrastructure[0].id
+  cidr_ipv4         = each.value
+  ip_protocol       = "tcp"
+  from_port         = 443
+  to_port           = 443
+  description       = "Allow HTTPS traffic from infrastructure networks: ${each.value}"
+
+  tags = local.tags
+}
+
+# Allow ALB security groups to communicate with backend instances on port 8080
+resource "aws_vpc_security_group_egress_rule" "dfi_alb_backend_staff" {
   count                        = var.lb_config != null ? 1 : 0
-  security_group_id            = aws_security_group.dfi_alb[0].id
+  security_group_id            = aws_security_group.dfi_alb_staff[0].id
   referenced_security_group_id = aws_security_group.mis_ec2_shared.id
   ip_protocol                  = "tcp"
   from_port                    = 8080
@@ -58,11 +181,83 @@ resource "aws_vpc_security_group_egress_rule" "dfi_alb_backend" {
   tags = local.tags
 }
 
-# Allow EC2 instances to receive traffic from ALB on port 8080
-resource "aws_vpc_security_group_ingress_rule" "ec2_from_alb" {
+resource "aws_vpc_security_group_egress_rule" "dfi_alb_backend_enduser" {
+  count                        = var.lb_config != null ? 1 : 0
+  security_group_id            = aws_security_group.dfi_alb_enduser[0].id
+  referenced_security_group_id = aws_security_group.mis_ec2_shared.id
+  ip_protocol                  = "tcp"
+  from_port                    = 8080
+  to_port                      = 8080
+  description                  = "Allow ALB to communicate with DFI instances"
+
+  tags = local.tags
+}
+
+resource "aws_vpc_security_group_egress_rule" "dfi_alb_backend_mojo" {
+  count                        = var.lb_config != null ? 1 : 0
+  security_group_id            = aws_security_group.dfi_alb_mojo[0].id
+  referenced_security_group_id = aws_security_group.mis_ec2_shared.id
+  ip_protocol                  = "tcp"
+  from_port                    = 8080
+  to_port                      = 8080
+  description                  = "Allow ALB to communicate with DFI instances"
+
+  tags = local.tags
+}
+
+resource "aws_vpc_security_group_egress_rule" "dfi_alb_backend_infrastructure" {
+  count                        = var.lb_config != null ? 1 : 0
+  security_group_id            = aws_security_group.dfi_alb_infrastructure[0].id
+  referenced_security_group_id = aws_security_group.mis_ec2_shared.id
+  ip_protocol                  = "tcp"
+  from_port                    = 8080
+  to_port                      = 8080
+  description                  = "Allow ALB to communicate with DFI instances"
+
+  tags = local.tags
+}
+
+# Allow EC2 instances to receive traffic from ALB security groups on port 8080
+resource "aws_vpc_security_group_ingress_rule" "ec2_from_alb_staff" {
   count                        = var.lb_config != null ? 1 : 0
   security_group_id            = aws_security_group.mis_ec2_shared.id
-  referenced_security_group_id = aws_security_group.dfi_alb[0].id
+  referenced_security_group_id = aws_security_group.dfi_alb_staff[0].id
+  ip_protocol                  = "tcp"
+  from_port                    = 8080
+  to_port                      = 8080
+  description                  = "Allow DFI ALB to reach instances on port 8080"
+
+  tags = local.tags
+}
+
+resource "aws_vpc_security_group_ingress_rule" "ec2_from_alb_enduser" {
+  count                        = var.lb_config != null ? 1 : 0
+  security_group_id            = aws_security_group.mis_ec2_shared.id
+  referenced_security_group_id = aws_security_group.dfi_alb_enduser[0].id
+  ip_protocol                  = "tcp"
+  from_port                    = 8080
+  to_port                      = 8080
+  description                  = "Allow DFI ALB to reach instances on port 8080"
+
+  tags = local.tags
+}
+
+resource "aws_vpc_security_group_ingress_rule" "ec2_from_alb_mojo" {
+  count                        = var.lb_config != null ? 1 : 0
+  security_group_id            = aws_security_group.mis_ec2_shared.id
+  referenced_security_group_id = aws_security_group.dfi_alb_mojo[0].id
+  ip_protocol                  = "tcp"
+  from_port                    = 8080
+  to_port                      = 8080
+  description                  = "Allow DFI ALB to reach instances on port 8080"
+
+  tags = local.tags
+}
+
+resource "aws_vpc_security_group_ingress_rule" "ec2_from_alb_infrastructure" {
+  count                        = var.lb_config != null ? 1 : 0
+  security_group_id            = aws_security_group.mis_ec2_shared.id
+  referenced_security_group_id = aws_security_group.dfi_alb_infrastructure[0].id
   ip_protocol                  = "tcp"
   from_port                    = 8080
   to_port                      = 8080
@@ -78,7 +273,12 @@ resource "aws_lb" "dfi" {
   load_balancer_type = "application"
   subnets            = var.account_config.public_subnet_ids
   internal           = false
-  security_groups    = [aws_security_group.dfi_alb[0].id]
+  security_groups    = compact([
+    aws_security_group.dfi_alb_staff[0].id,
+    aws_security_group.dfi_alb_enduser[0].id,
+    aws_security_group.dfi_alb_mojo[0].id,
+    aws_security_group.dfi_alb_infrastructure[0].id
+  ])
 
   enable_cross_zone_load_balancing = true
   idle_timeout                     = 300
