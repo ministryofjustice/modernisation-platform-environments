@@ -392,14 +392,6 @@ resource "aws_iam_role_policy_attachment" "secrets_manager_policy_lambda" {
   policy_arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
 }
 
-# Map environment -> bucket name
-locals {
-  hub20_bucket_map = {
-    development = "hub20-development-cwa-extract-data"
-    test        = "hub20-test-cwa-extract-data"
-  }
-}
-
 # Hub-20 S3 Permissions Policy (Dev & Test only)
 resource "aws_iam_policy" "hub_20_s3_permissions" {
   count       = contains(["development", "test"], local.environment) ? 1 : 0
@@ -410,18 +402,16 @@ resource "aws_iam_policy" "hub_20_s3_permissions" {
     Version   = "2012-10-17",
     Statement = [
       {
-        Sid    = "Hub20BucketLevel"
         Effect = "Allow"
         Action = [
           "s3:GetBucketLocation",
           "s3:ListBucket"
         ]
         Resource = [
-          "arn:aws:s3:::${local.hub20_bucket_map[local.environment]}"
+          "arn:aws:s3:::hub20-${local.environment}-cwa-extract-data"
         ]
       },
       {
-        Sid    = "Hub20ObjectLevelRW"
         Effect = "Allow"
         Action = [
           "s3:GetObject",
@@ -429,7 +419,7 @@ resource "aws_iam_policy" "hub_20_s3_permissions" {
           "s3:DeleteObject"
         ]
         Resource = [
-          "arn:aws:s3:::${local.hub20_bucket_map[local.environment]}/*"
+          "arn:aws:s3:::hub20-${local.environment}-cwa-extract-data/*"
         ]
       }
     ]
