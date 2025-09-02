@@ -15,6 +15,11 @@
       "Effect":"Allow",
       "Action":"s3:PutObject",
       "Resource":"${aws_s3_bucket_sbom_arn}/*"
+    },
+    {
+      "Effect":"Allow",
+      "Action":"ec2:DescribeInstances",
+      "Resource":"*"
     }
   ]
 }
