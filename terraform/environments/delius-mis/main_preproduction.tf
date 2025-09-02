@@ -41,8 +41,6 @@ module "environment_stage" {
 
   pagerduty_integration_key = local.pagerduty_integration_key
 
-  internal_security_group_cidrs = local.internal_security_group_cidrs
-
   tags = local.tags
 }
 
@@ -85,8 +83,6 @@ module "environment_preproduction" {
   domain_join_ports = local.domain_join_ports
 
   pagerduty_integration_key = local.pagerduty_integration_key
-
-  internal_security_group_cidrs = local.internal_security_group_cidrs
 
   tags = local.tags
 }

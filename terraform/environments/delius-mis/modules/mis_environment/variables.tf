@@ -107,9 +107,3 @@ variable "lb_config" {
   type        = any
   default     = null
 }
-
-variable "internal_security_group_cidrs" {
-  description = "List of CIDR blocks allowed to access internal services"
-  type        = list(string)
-  default     = []
-}

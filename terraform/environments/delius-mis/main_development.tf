@@ -45,7 +45,5 @@ module "environment_dev" {
 
   pagerduty_integration_key = local.pagerduty_integration_key
 
-  internal_security_group_cidrs = local.internal_security_group_cidrs
-
   tags = local.tags
 }

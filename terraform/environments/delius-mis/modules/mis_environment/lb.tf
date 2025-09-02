@@ -21,7 +21,7 @@ resource "aws_security_group" "dfi_alb" {
 
 # Allow HTTP traffic from internal CIDR ranges to ALB
 resource "aws_vpc_security_group_ingress_rule" "dfi_alb_http" {
-  for_each          = var.lb_config != null && length(var.internal_security_group_cidrs) > 0 ? toset(var.internal_security_group_cidrs) : []
+  for_each          = var.lb_config != null && length(local.internal_security_group_cidrs) > 0 ? toset(local.internal_security_group_cidrs) : []
   security_group_id = aws_security_group.dfi_alb[0].id
   cidr_ipv4         = each.value
   ip_protocol       = "tcp"
@@ -34,7 +34,7 @@ resource "aws_vpc_security_group_ingress_rule" "dfi_alb_http" {
 
 # Allow HTTPS traffic from internal CIDR ranges to ALB
 resource "aws_vpc_security_group_ingress_rule" "dfi_alb_https" {
-  for_each          = var.lb_config != null && length(var.internal_security_group_cidrs) > 0 ? toset(var.internal_security_group_cidrs) : []
+  for_each          = var.lb_config != null && length(local.internal_security_group_cidrs) > 0 ? toset(local.internal_security_group_cidrs) : []
   security_group_id = aws_security_group.dfi_alb[0].id
   cidr_ipv4         = each.value
   ip_protocol       = "tcp"
