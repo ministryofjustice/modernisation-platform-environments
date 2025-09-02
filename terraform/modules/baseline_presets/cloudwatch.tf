@@ -21,7 +21,7 @@ locals {
     var.options.enable_ec2_cloud_watch_agent ? ["cwagent-windows-application"] : [],
     var.options.enable_ec2_cloud_watch_agent ? ["cwagent-windows-security"] : [],
     var.options.enable_ec2_cloud_watch_agent ? ["cwagent-windows-security"] : [],
-    var.options.enable_ec2_cloud_watch_agent && enable_ec2_oracle_enterprise_managed_server ? ["cwagent-oracle-listener-log"] : [],
+    var.options.enable_ec2_cloud_watch_agent && var.options.enable_ec2_oracle_enterprise_managed_server ? ["cwagent-oracle-listener-log"] : [],
   ])
 
   cloudwatch_log_groups = {
