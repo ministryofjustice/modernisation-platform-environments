@@ -4,10 +4,10 @@ resource "aws_security_group" "ssogen_sg" {
   vpc_id      = data.aws_vpc.shared.id
 
   ############################################################
-  # ✅ INGRESS RULES — Allow traffic to SSOGEN EC2s
+  # ✅ INGRESS — Allow traffic to SSOGEN EC2s
   ############################################################
 
-  # SSH for admin access — WorkSpaces
+  # SSH for admin access — WorkSpaces (private)
   ingress {
     description = "SSH from WorkSpaces subnets"
     from_port   = 22
@@ -21,9 +21,9 @@ resource "aws_security_group" "ssogen_sg" {
     ]
   }
 
-  # WebLogic Admin (7001) — WorkSpaces (private)
+  # WebLogic Admin (7001) — WorkSpaces (private + NAT)
   ingress {
-    description = "WebLogic 7001 from WorkSpaces subnets"
+    description = "WebLogic 7001 from WorkSpaces subnets (private)"
     from_port   = 7001
     to_port     = 7001
     protocol    = "tcp"
@@ -34,9 +34,8 @@ resource "aws_security_group" "ssogen_sg" {
       local.application_data.accounts[local.environment].lz_aws_workspace_prod_subnet_env,
     ]
   }
-
   ingress {
-    description = "WebLogic 7001 from WorkSpaces NAT IPs"
+    description = "WebLogic 7001 from WorkSpaces NAT IPs (public)"
     from_port   = 7001
     to_port     = 7001
     protocol    = "tcp"
@@ -44,13 +43,14 @@ resource "aws_security_group" "ssogen_sg" {
       "18.130.39.94/32",
       "35.177.145.193/32",
       "52.56.212.11/32",
-      "35.176.254.38/32"
+      "35.176.254.38/32",
+      "35.177.173.197/32" # added
     ]
   }
 
-  # Oracle HTTP Server (7777) — WorkSpaces (private)
+  # Oracle HTTP Server (7777) — WorkSpaces (private + NAT)
   ingress {
-    description = "OHS 7777 from WorkSpaces subnets"
+    description = "OHS 7777 from WorkSpaces subnets (private)"
     from_port   = 7777
     to_port     = 7777
     protocol    = "tcp"
@@ -61,9 +61,8 @@ resource "aws_security_group" "ssogen_sg" {
       local.application_data.accounts[local.environment].lz_aws_workspace_prod_subnet_env,
     ]
   }
-
   ingress {
-    description = "OHS 7777 from WorkSpaces NAT IPs"
+    description = "OHS 7777 from WorkSpaces NAT IPs (public)"
     from_port   = 7777
     to_port     = 7777
     protocol    = "tcp"
@@ -71,13 +70,14 @@ resource "aws_security_group" "ssogen_sg" {
       "18.130.39.94/32",
       "35.177.145.193/32",
       "52.56.212.11/32",
-      "35.176.254.38/32"
+      "35.176.254.38/32",
+      "35.177.173.197/32" # added
     ]
   }
 
   # Oracle HTTPS (4443) — WorkSpaces (private + NAT)
   ingress {
-    description = "OHS 4443 from WorkSpaces subnets"
+    description = "OHS 4443 from WorkSpaces subnets (private)"
     from_port   = 4443
     to_port     = 4443
     protocol    = "tcp"
@@ -88,9 +88,8 @@ resource "aws_security_group" "ssogen_sg" {
       local.application_data.accounts[local.environment].lz_aws_workspace_prod_subnet_env,
     ]
   }
-
   ingress {
-    description = "OHS 4443 from WorkSpaces NAT IPs"
+    description = "OHS 4443 from WorkSpaces NAT IPs (public)"
     from_port   = 4443
     to_port     = 4443
     protocol    = "tcp"
@@ -98,7 +97,8 @@ resource "aws_security_group" "ssogen_sg" {
       "18.130.39.94/32",
       "35.177.145.193/32",
       "52.56.212.11/32",
-      "35.176.254.38/32"
+      "35.176.254.38/32",
+      "35.177.173.197/32" # added
     ]
   }
 
@@ -120,8 +120,31 @@ resource "aws_security_group" "ssogen_sg" {
     self        = true
   }
 
+  # ---- TEMP: ICMP for troubleshooting ----
+  # Allow ICMP Echo Requests to *this* SG from:
+  #  - Other SSOGEN instances (self)
+  #  - WorkSpaces subnets
+  ingress {
+    description = "TEMP: ICMP Echo from SSOGEN (self)"
+    from_port   = 8
+    to_port     = 0
+    protocol    = "icmp"
+    self        = true
+  }
+  ingress {
+    description = "TEMP: ICMP Echo from WorkSpaces subnets"
+    from_port   = 8
+    to_port     = 0
+    protocol    = "icmp"
+    cidr_blocks = [
+      local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_subnet_env,
+      local.application_data.accounts[local.environment].lz_aws_workspace_prod_subnet_env,
+    ]
+  }
+  # ---- END TEMP ----
+
   ############################################################
-  # ✅ EGRESS RULES — Allow SSOGEN to reach dependencies
+  # ✅ EGRESS — Allow SSOGEN to reach dependencies
   ############################################################
 
   # Oracle LDAP (non-SSL)
@@ -159,6 +182,20 @@ resource "aws_security_group" "ssogen_sg" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  # ---- TEMP: ICMP egress so these hosts can ping VPC/WorkSpaces ----
+  egress {
+    description = "TEMP: ICMP Echo egress to VPC + WorkSpaces"
+    from_port   = 8
+    to_port     = 0
+    protocol    = "icmp"
+    cidr_blocks = [
+      data.aws_vpc.shared.cidr_block,
+      local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_subnet_env,
+      local.application_data.accounts[local.environment].lz_aws_workspace_prod_subnet_env,
+    ]
+  }
+  # ---- END TEMP ----
 
   tags = merge(local.tags, {
     Name = "ssogen-sg-${local.environment}"
