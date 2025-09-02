@@ -1,6 +1,6 @@
 locals {
-  lb_name     = "${var.env_name}-dfi-alb-v2" # Added -v2 to force recreation
-  lb_endpoint = "ndl-dfi"                    # Use underscores for DNS compliance
+  lb_name     = "${var.env_name}-dfi-alb"
+  lb_endpoint = "ndl-dfi" # Use underscores for DNS compliance
   lb_fqdn     = "${local.lb_endpoint}.${var.env_name}.${var.account_config.dns_suffix}"
 }
 
