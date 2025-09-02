@@ -1,10 +1,15 @@
-data "aws_iam_policy_document" "user_jacobwoffenden" {
+data "aws_iam_policy_document" "user" {
+  statement {
+    sid       = "AthenaWorkGroupAccess"
+    effect    = "Allow"
+    actions   = ["athena:ListWorkGroups"]
+    resources = ["*"]
+  }
   statement {
     sid    = "AthenaAccess"
     effect = "Allow"
     actions = [
       "athena:GetWorkGroup",
-      "athena:ListWorkGroups",
       "athena:StartQueryExecution",
       "athena:GetQueryExecution",
       "athena:GetQueryResults"
@@ -45,17 +50,10 @@ data "aws_iam_policy_document" "user_jacobwoffenden" {
     sid    = "GlueAccess"
     effect = "Allow"
     actions = [
-      "glue:GetDatabases",
-      "glue:GetTables"
-    ]
-    resources = ["*"]
-  }
-  statement {
-    sid    = "GlueTest"
-    effect = "Allow"
-    actions = [
       "glue:GetDatabase",
+      "glue:GetDatabases",
       "glue:GetTable",
+      "glue:GetTables",
       "glue:SearchTables"
     ]
     resources = ["*"]
@@ -68,14 +66,16 @@ data "aws_iam_policy_document" "user_jacobwoffenden" {
   }
 }
 
-module "user_jacobwoffenden_iam_policy" {
+module "iam_policies" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  for_each = toset(local.users)
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
   version = "6.2.1"
 
   path   = "/users/"
-  name   = "jacobwoffenden"
-  policy = data.aws_iam_policy_document.user_jacobwoffenden.json
+  name   = each.key
+  policy = data.aws_iam_policy_document.user.json
 }
