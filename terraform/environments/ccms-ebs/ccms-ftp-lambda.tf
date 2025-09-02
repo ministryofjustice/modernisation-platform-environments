@@ -14,7 +14,8 @@ locals {
   enable_cron_in_environments = [
     "development",
     "test",
-    "preproduction"
+    "preproduction",
+    "production"
   ]
 }
 
