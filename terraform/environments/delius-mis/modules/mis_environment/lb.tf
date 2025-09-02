@@ -1,6 +1,6 @@
 locals {
-  lb_name     = "${var.env_name}-dfi-alb"
-  lb_endpoint = "ndl-dfi" # Use underscores for DNS compliance
+  lb_name     = "${var.env_name}-dfi-alb-v2" # Added -v2 to force recreation
+  lb_endpoint = "ndl-dfi"                    # Use underscores for DNS compliance
   lb_fqdn     = "${local.lb_endpoint}.${var.env_name}.${var.account_config.dns_suffix}"
 }
 
@@ -273,7 +273,7 @@ resource "aws_lb" "dfi" {
   load_balancer_type = "application"
   subnets            = var.account_config.public_subnet_ids
   internal           = false
-  security_groups    = compact([
+  security_groups = compact([
     aws_security_group.dfi_alb_staff[0].id,
     aws_security_group.dfi_alb_enduser[0].id,
     aws_security_group.dfi_alb_mojo[0].id,
