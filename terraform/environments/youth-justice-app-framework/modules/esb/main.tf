@@ -40,7 +40,10 @@ resource "aws_instance" "esb" {
   vpc_security_group_ids = [aws_security_group.esb_service.id]
   subnet_id              = var.subnet_id
   private_ip             = var.private_ip
-  tags                   = local.all_tags
+  tags = merge(
+    local.all_tags,
+    { "OS" = "Linux" }
+  )
 
 
 
