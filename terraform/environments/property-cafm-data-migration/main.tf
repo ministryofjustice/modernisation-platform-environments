@@ -4,7 +4,7 @@ module "rds_export" {
   source = "github.com/ministryofjustice/terraform-rds-export?ref=b8e43e20af2f303461c89b23a70ee000d50fa6dd"
 
   kms_key_arn           = aws_kms_key.shared_kms_key.arn
-  name                  = "cafm"
+  name                  = "planetfm"
   database_refresh_mode = "full"
   vpc_id                = module.vpc.vpc_id
   database_subnet_ids   = module.vpc.private_subnets
@@ -96,4 +96,15 @@ module "sftp_ssh_key" {
   ssh_key_body = data.aws_ssm_parameter.ssh_keys[each.key].value
 
   depends_on = [module.sftp_user]
+}
+
+module "csv_to_parquet" {
+  source = "./modules/csv_to_parquet"
+
+  name               = "concept"
+  source_bucket_name = module.s3_concept_data_uploads_bucket.bucket.id
+  source_bucket_arn  = module.s3_concept_data_uploads_bucket.bucket.arn
+  dest_bucket_name   = module.s3_concept_data_output_bucket.bucket.id
+  dest_bucket_arn    = module.s3_concept_data_output_bucket.bucket.arn
+  tags               = { Name = "cafm" }
 }

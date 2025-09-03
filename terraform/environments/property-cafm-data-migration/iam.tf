@@ -45,3 +45,4 @@ resource "aws_iam_role_policy_attachment" "sftp_role_attachment" {
   role       = aws_iam_role.sftp_role.name
   policy_arn = aws_iam_policy.sftp_access_policy.arn
 }
+
