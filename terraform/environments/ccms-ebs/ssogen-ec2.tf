@@ -10,6 +10,10 @@ resource "aws_instance" "ec2_ssogen" {
   associate_public_ip_address = false
   iam_instance_profile        = aws_iam_instance_profile.ssogen_instance_profile.name
 
+  lifecycle {
+    create_before_destroy = true
+  }
+
   root_block_device {
     volume_size = 60
     volume_type = "gp2"
