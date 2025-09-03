@@ -1,6 +1,6 @@
 # Majority of resources created by baseline module.
 # See common settings in locals.tf and environment specific settings in
-# locals_test.tf etc.
+# locals_development.tf, locals_test.tf etc.
 
 module "ip_addresses" {
   source = "../../modules/ip_addresses"
@@ -211,6 +211,12 @@ module "baseline" {
     module.baseline_presets.sns_topics,
     lookup(local.baseline_all_environments, "sns_topics", {}),
     lookup(local.baseline_environment_specific, "sns_topics", {}),
+  )
+
+  sqs_queues = merge(
+    module.baseline_presets.sqs_queues,
+    lookup(local.baseline_all_environments, "sqs_queues", {}),
+    lookup(local.baseline_environment_specific, "sqs_queues", {}),
   )
 
   ssm_associations = merge(
