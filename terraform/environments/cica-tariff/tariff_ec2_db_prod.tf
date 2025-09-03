@@ -35,7 +35,7 @@ resource "aws_instance" "tariffdb" {
     Name = "TariffDB-${each.key}"
   }
   # Set security group where Instance will be created. This will also determine VPC
-  vpc_security_group_ids = aws_security_group.tariff_db_prod_security_group[count.index].id
+  vpc_security_group_ids = aws_security_group.tariff_db_prod_security_group[count.index]
   key_name               = aws_key_pair.key_pair_db.key_name
 
 
