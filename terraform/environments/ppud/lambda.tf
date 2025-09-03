@@ -179,6 +179,48 @@ resource "aws_cloudwatch_log_group" "lambda_securityhub_report_dev_log_group" {
   retention_in_days = 30
 }
 
+#######################################
+# Lambda Function for SES Logging - DEV
+#######################################
+
+resource "aws_lambda_function" "terraform_lambda_func_ses_logging_dev" {
+  # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
+  # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing temporarily disabled for maintenance purposes"
+  count                          = local.is-development == true ? 1 : 0
+  s3_bucket                      = "moj-infrastructure-dev"
+  s3_key                         = "lambda/functions/ses_logging_dev.zip"
+  function_name                  = "ses_logging_dev"
+  role                           = aws_iam_role.lambda_role_get_ses_logging_dev[0].arn
+  handler                        = "ses_logging_dev.lambda_handler"
+  runtime                        = "python3.12"
+  timeout                        = 300
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policies_get_ses_logging_dev]
+  reserved_concurrent_executions = 5
+  dead_letter_config {
+    target_arn = aws_sqs_queue.lambda_queue_dev[0].arn
+  }
+  tracing_config {
+    mode = "Active"
+  }
+}
+
+resource "aws_lambda_permission" "allow_sns_to_invoke_lambda_ses_logging_dev" {
+  count         = local.is-development == true ? 1 : 0
+  statement_id  = "AllowSNSInvokeLambda"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.terraform_lambda_func_ses_logging_dev[0].function_name
+  principal     = "sns.amazonaws.com"
+  source_arn    = aws_sns_topic.ses_logging_dev[0].arn
+}
+
+resource "aws_cloudwatch_log_group" "lambda_ses_logging_dev_log_group" {
+  # checkov:skip=CKV_AWS_338: "Log group is only required for 30 days."
+  # checkov:skip=CKV_AWS_158: "Log group does not require KMS encryption."
+  count             = local.is-development == true ? 1 : 0
+  name              = "/aws/lambda/ses_logging_dev"
+  retention_in_days = 30
+}
+
 ###########################
 # Preproduction Environment
 ###########################
@@ -308,7 +350,6 @@ resource "aws_cloudwatch_log_group" "lambda_security_hub_report_uat_log_group" {
   name              = "/aws/lambda/securityhub_report_uat"
   retention_in_days = 30
 }
-
 
 #######################################
 # Lambda Function for SES Logging - UAT

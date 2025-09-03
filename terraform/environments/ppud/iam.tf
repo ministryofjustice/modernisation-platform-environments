@@ -169,6 +169,43 @@ resource "aws_iam_role_policy_attachment" "attach_lambda_policies_get_securityhu
   policy_arn = each.value
 }
 
+# Lambda role and attachment for ses logging
+
+resource "aws_iam_role" "lambda_role_get_ses_logging_dev" {
+  count              = local.is-development == true ? 1 : 0
+  name               = "PPUD_Lambda_Function_Role_Get_SES_Logging_DEV"
+  assume_role_policy = <<EOF
+{
+ "Version": "2012-10-17",
+ "Statement": [
+   {
+     "Action": "sts:AssumeRole",
+     "Principal": {
+       "Service": "lambda.amazonaws.com"
+     },
+     "Effect": "Allow",
+     "Sid": ""
+   }
+ ]
+}
+EOF
+}
+
+locals {
+  lambda_get_ses_logging_policies_dev = local.is-development ? {
+    "send_message_to_sqs"     = aws_iam_policy.iam_policy_lambda_send_message_to_sqs_dev[0].arn
+    "send_logs_to_cloudwatch" = aws_iam_policy.iam_policy_lambda_send_logs_cloudwatch_dev[0].arn
+    "publish_to_sns"          = aws_iam_policy.iam_policy_lambda_publish_to_sns_dev[0].arn
+    "put_data_s3"             = aws_iam_policy.iam_policy_lambda_put_s3_data_dev[0].arn
+  } : {}
+}
+
+resource "aws_iam_role_policy_attachment" "attach_lambda_policies_get_ses_logging_dev" {
+  for_each   = local.is-development ? local.lambda_get_ses_logging_policies_dev : {}
+  role       = aws_iam_role.lambda_role_get_ses_logging_dev[0].name
+  policy_arn = each.value
+}
+
 ####################### IAM Policies #######################
 
 resource "aws_iam_policy" "iam_policy_lambda_send_message_to_sqs_dev" {
@@ -447,6 +484,30 @@ resource "aws_iam_policy" "iam_policy_lambda_get_securityhub_data_dev" {
   })
 }
 
+resource "aws_iam_policy" "iam_policy_lambda_put_s3_data_dev" {
+  count       = local.is-development == true ? 1 : 0
+  name        = "aws_iam_policy_for_lambda_put_s3_data_${local.environment}"
+  path        = "/"
+  description = "Allows lambda functions to put data into S3"
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "s3:PutObject",
+          "s3:PutObjectAcl",
+          "s3:ListBucket"
+        ],
+        "Resource" : [
+          aws_s3_bucket.moj-log-files-dev[0].arn,
+          "${aws_s3_bucket.moj-log-files-dev[0].arn}/*"
+        ]
+      }
+    ]
+  })
+}
+
 ###########################
 # Preproduction Environment
 ###########################
@@ -565,7 +626,6 @@ resource "aws_iam_role_policy_attachment" "attach_lambda_policies_get_certificat
   role       = aws_iam_role.lambda_role_get_certificate_uat[0].name
   policy_arn = each.value
 }
-
 
 # Lambda role and attachment for ses logging
 

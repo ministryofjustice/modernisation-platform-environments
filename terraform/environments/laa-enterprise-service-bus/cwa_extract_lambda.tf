@@ -45,16 +45,6 @@ resource "aws_security_group_rule" "cwa_extract_egress_https_s3" {
   description       = "Outbound 443 to LAA VPC Endpoint SG"
 }
 
-resource "aws_security_group_rule" "cwa_extract_egress_efs" {
-  type                     = "egress"
-  from_port                = 2049
-  to_port                  = 2049
-  protocol                 = "tcp"
-  source_security_group_id = local.application_data.accounts[local.environment].cwa_efs_sg
-  security_group_id        = aws_security_group.cwa_extract_new.id
-  description              = "Outbound NFS to CWA EFS SG"
-}
-
 ######################################
 ### Lambda Resources For Step Function
 ######################################
@@ -162,8 +152,8 @@ resource "aws_lambda_function" "cwa_sns_lambda" {
     variables = {
       PROVIDER_TOPIC       = aws_sns_topic.priority_p1.arn
       PROVIDER_BANKS_TOPIC = aws_sns_topic.provider_banks.arn
-      SERVICE_NAME      = "cwa-sns-service"
-      NAMESPACE         = "CWASNSNotificationService"
+      SERVICE_NAME         = "cwa-sns-service"
+      NAMESPACE            = "CWASNSNotificationService"
     }
   }
 
