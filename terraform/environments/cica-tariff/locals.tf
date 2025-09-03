@@ -64,7 +64,7 @@ locals {
     if mapping.device_name == "xvde"
 
   }
-  snapshot_id_xvde_db = local._db[0].ebs.snapshot_id
+  snapshot_id_xvde_db = local.block_device_mapping_xvde_db[0].ebs.snapshot_id
 
   block_device_mapping_xvdf_db = {
     for mapping in data.aws_ami.shared_db_ami.block_device_mappings : "1" => mapping
