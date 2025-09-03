@@ -14,7 +14,7 @@ resource "aws_key_pair" "key_pair_db" {
 # Create AWS EC2 instance, specifies ami and type. Also Public key to use for pw
 resource "aws_instance" "tariffdb" {
   # count = var.environment != "Production" ? 0 : 
-  for_each = local.environment == "production" ? toset(local.subnets_a_b_map) : []
+  for_each = local.environment == "production" ? local.subnets_a_b_map : []
   ami      = data.aws_ami.shared_db_ami[*].id
   #Ignore changes to most recent ami from data filter, as this would destroy existing instance.
   lifecycle {
