@@ -1,5 +1,6 @@
-
+# checkov:skip=CKV_AWS_356: KMS key policies require Resource="*" by design; scope via principals & conditions.
 data "aws_iam_policy_document" "ssogen_kms_policy" {
+  # 1) Admin: keep root full control (required to avoid lockout)
   statement {
     sid = "AllowRootAccountAdmin"
     principals {
@@ -9,28 +10,27 @@ data "aws_iam_policy_document" "ssogen_kms_policy" {
     actions   = ["kms:*"]
     resources = ["*"]
   }
-
+# checkov:skip=CKV_AWS_109: Root admin required to prevent key lockout; functional access is tightly scoped to EC2 role via conditions.
+  # 2) Allow SSOGEN EC2 role to use the key for Secrets Manager only (tight actions + conditions)
   statement {
-    sid = "AllowUseForSecretsManagerInThisAccount"
+    sid = "AllowEc2RoleUseForSecretsManager"
     principals {
       type        = "AWS"
-      identifiers = ["*"]
+      identifiers = [aws_iam_role.ssogen_ec2.arn]
     }
     actions = [
-      "kms:Encrypt",
       "kms:Decrypt",
-      "kms:ReEncrypt*",
-      "kms:GenerateDataKey*",
-      "kms:DescribeKey"
+      "kms:DescribeKey",
+      "kms:GenerateDataKey*"
     ]
     resources = ["*"]
 
+    # Constrain to Secrets Manager in this account/region
     condition {
       test     = "StringEquals"
       variable = "kms:CallerAccount"
       values   = [data.aws_caller_identity.current.account_id]
     }
-
     condition {
       test     = "StringEquals"
       variable = "kms:ViaService"
@@ -39,7 +39,6 @@ data "aws_iam_policy_document" "ssogen_kms_policy" {
   }
 }
 
-# Update your existing key to use the policy
 resource "aws_kms_key" "ssogen_kms" {
   description         = "KMS for SSH private keys in Secrets Manager"
   enable_key_rotation = true
