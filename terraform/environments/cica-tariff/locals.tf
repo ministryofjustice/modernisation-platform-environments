@@ -60,7 +60,7 @@ locals {
   }
   #get snapshot IDs for each volume. Required to stop instance replacement on apply
   block_device_mapping_xvde_db = {
-    for mapping in tolist(data.aws_ami.shared_db_ami)[*].block_device_mappings : "0" => mapping
+    for mapping in tolist(data.aws_ami.shared_db_ami)[0].block_device_mappings : "0" => mapping
     if mapping.device_name == "xvde"
 
   }
