@@ -15,7 +15,7 @@ resource "aws_key_pair" "key_pair_db" {
 resource "aws_instance" "tariffdb" {
   # count = var.environment != "Production" ? 0 : 
   for_each = local.environment == "production" ? local.subnets_a_b_map : {}
-  ami      = data.aws_ami.shared_db_ami[*].id
+  ami      = data.aws_ami.shared_db_ami[0].id
   #Ignore changes to most recent ami from data filter, as this would destroy existing instance.
   lifecycle {
     ignore_changes = [ami]
