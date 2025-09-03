@@ -1,4 +1,5 @@
-# checkov:skip=CKV_AWS_356: KMS key policies require Resource="*" by design; scope via principals & conditions.
+# checkov:skip=CKV_AWS_356: KMS key policies require Resource="*"; constrained via principals/conditions
+# checkov:skip=CKV_AWS_109: Root admin stanza required; functional use is tightly scoped
 data "aws_iam_policy_document" "ssogen_kms_policy" {
   # 1) Admin: keep root full control (required to avoid lockout)
   statement {
@@ -10,7 +11,6 @@ data "aws_iam_policy_document" "ssogen_kms_policy" {
     actions   = ["kms:*"]
     resources = ["*"]
   }
-# checkov:skip=CKV_AWS_109: Root admin required to prevent key lockout; functional access is tightly scoped to EC2 role via conditions.
   # 2) Allow SSOGEN EC2 role to use the key for Secrets Manager only (tight actions + conditions)
   statement {
     sid = "AllowEc2RoleUseForSecretsManager"
@@ -65,7 +65,7 @@ resource "aws_key_pair" "ssogen" {
     Environment = local.environment
   }
 }
-
+# checkov:skip=CKV2_AWS_57: SSH key rotation is managed operationally; moving to SSM (no SSH keys)
 # Secrets Manager secret metadata
 resource "aws_secretsmanager_secret" "ssogen_privkey" {
   name       = "ssh/${local.environment}/ssogen/private-key"
@@ -79,7 +79,6 @@ resource "aws_secretsmanager_secret" "ssogen_privkey" {
 }
 
 # Store the private key securely in Secrets Manager
-# checkov:skip=CKV2_AWS_57: SSH keypair rotation is handled via a planned key replacement process; moving to SSM Session Manager (no SSH keys) shortly.
 resource "aws_secretsmanager_secret_version" "ssogen_privkey_v1" {
   secret_id = aws_secretsmanager_secret.ssogen_privkey.id
   secret_string = jsonencode({
