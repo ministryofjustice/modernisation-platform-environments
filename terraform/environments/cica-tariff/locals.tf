@@ -60,62 +60,62 @@ locals {
   }
   #get snapshot IDs for each volume. Required to stop instance replacement on apply
   block_device_mapping_xvde_db = {
-    for mapping in data.aws_ami.shared_db_ami[*].block_device_mappings : "0" => mapping
+    for mapping in tolist(data.aws_ami.shared_db_ami)[*].block_device_mappings : "0" => mapping
     if mapping.device_name == "xvde"
 
   }
   snapshot_id_xvde_db = local.environment == "production" ? local.block_device_mapping_xvde_db[0].ebs.snapshot_id : ""
 
   block_device_mapping_xvdf_db = {
-    for mapping in data.aws_ami.shared_db_ami[*].block_device_mappings : "1" => mapping
+    for mapping in tolist(data.aws_ami.shared_db_ami)[*].block_device_mappings : "1" => mapping
     if mapping.device_name == "xvdf"
   }
   snapshot_id_xvdf_db = local.environment == "production" ? local.block_device_mapping_xvdf_db[1].ebs.snapshot_id : ""
 
   block_device_mapping_xvdg_db = {
-    for mapping in data.aws_ami.shared_db_ami[*].block_device_mappings : "2" => mapping
+    for mapping in tolist(data.aws_ami.shared_db_ami)[*].block_device_mappings : "2" => mapping
     if mapping.device_name == "xvdg"
   }
   snapshot_id_xvdg_db = local.environment == "production" ? local.block_device_mapping_xvdg_db[2].ebs.snapshot_id : ""
 
   block_device_mapping_xvdh_db = {
-    for mapping in data.aws_ami.shared_db_ami[*].block_device_mappings : "3" => mapping
+    for mapping in tolist(data.aws_ami.shared_db_ami)[*].block_device_mappings : "3" => mapping
     if mapping.device_name == "xvdh"
   }
   snapshot_id_xvdh_db = local.environment == "production" ? local.block_device_mapping_xvdh_db[3].ebs.snapshot_id : ""
 
   block_device_mapping_xvdi_db = {
-    for mapping in data.aws_ami.shared_db_ami[*].block_device_mappings : "4" => mapping
+    for mapping in tolist(data.aws_ami.shared_db_ami)[*].block_device_mappings : "4" => mapping
     if mapping.device_name == "xvdi"
   }
   snapshot_id_xvdi_db = local.environment == "production" ? local.block_device_mapping_xvdi_db[4].ebs.snapshot_id : ""
 
   block_device_mapping_xvdj_db = {
-    for mapping in data.aws_ami.shared_db_ami[*].block_device_mappings : "5" => mapping
+    for mapping in tolist(data.aws_ami.shared_db_ami)[*].block_device_mappings : "5" => mapping
     if mapping.device_name == "xvdj"
   }
   snapshot_id_xvdj_db = local.environment == "prodution" ? local.block_device_mapping_xvdj_db[5].ebs.snapshot_id : ""
 
   block_device_mapping_xvdk_db = {
-    for mapping in data.aws_ami.shared_db_ami[*].block_device_mappings : "6" => mapping
+    for mapping in tolist(data.aws_ami.shared_db_ami)[*].block_device_mappings : "6" => mapping
     if mapping.device_name == "xvdk"
   }
   snapshot_id_xvdk_db = local.environment == "production" ? local.block_device_mapping_xvdk_db[6].ebs.snapshot_id : ""
 
   block_device_mapping_xvdl_db = {
-    for mapping in data.aws_ami.shared_db_ami[*].block_device_mappings : "7" => mapping
+    for mapping in tolist(data.aws_ami.shared_db_ami)[*].block_device_mappings : "7" => mapping
     if mapping.device_name == "xvdl"
   }
   snapshot_id_xvdl_db = local.environment == "production" ? local.block_device_mapping_xvdl_db[7].ebs.snapshot_id : ""
 
   block_device_mapping_xvdm_db = {
-    for mapping in data.aws_ami.shared_db_ami[*].block_device_mappings : "8" => mapping
+    for mapping in tolist(data.aws_ami.shared_db_ami)[*].block_device_mappings : "8" => mapping
     if mapping.device_name == "xvdm"
   }
   snapshot_id_xvdm_db = local.environment == "production" ? local.block_device_mapping_xvdm_db[8].ebs.snapshot_id : ""
 
   block_device_mapping_xvdn_db = {
-    for mapping in data.aws_ami.shared_db_ami[*].block_device_mappings : "9" => mapping
+    for mapping in tolist(data.aws_ami.shared_db_ami)[*].block_device_mappings : "9" => mapping
     if mapping.device_name == "xvdn"
   }
   snapshot_id_xvdn_db = local.environment == "production" ? local.block_device_mapping_xvdn_db[9].ebs.snapshot_id : ""
