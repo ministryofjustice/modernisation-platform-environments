@@ -34,5 +34,7 @@ useradd -g dba -m oracle || true
 chown -R oracle:dba /oracle
 chmod 775 /oracle
 
+# 
+
 # === Final logs ===
 echo "SSOGEN instance bootstrap completed for ${hostname}" >> /var/log/user-data.log
