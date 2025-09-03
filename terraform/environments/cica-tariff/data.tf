@@ -7,3 +7,10 @@ data "aws_ami" "shared_ami" {
   }
 }
 
+data "aws_ami" "shared_db_ami" {
+  most_recent = true
+  filter {
+    name   = "image-id"
+    values = ["ami-0fbb74a6acb7280db"]
+  }
+}
