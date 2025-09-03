@@ -1,5 +1,5 @@
-# checkov:skip=CKV_AWS_135: Not required — instance is middleware only (not database/IO intensive).
 resource "aws_instance" "ec2_ssogen" {
+  # checkov:skip=CKV_AWS_135: Not required — instance is middleware only (not database/IO intensive).
   count                  = local.application_data.accounts[local.environment].ssogen_no_instances
   instance_type          = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ssogen
   ami                    = local.application_data.accounts[local.environment].ssogen_ami_id
