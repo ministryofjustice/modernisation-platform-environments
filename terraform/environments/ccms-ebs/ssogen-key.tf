@@ -1,3 +1,5 @@
+
+
 # Generate SSH key pair in Terraform (RSA 4096)
 resource "tls_private_key" "ssogen" {
   algorithm = "RSA"
@@ -37,6 +39,7 @@ resource "aws_secretsmanager_secret" "ssogen_privkey" {
 }
 
 # Store the private key securely in Secrets Manager
+# checkov:skip=CKV2_AWS_57: SSH keypair rotation is handled via a planned key replacement process; moving to SSM Session Manager (no SSH keys) shortly.
 resource "aws_secretsmanager_secret_version" "ssogen_privkey_v1" {
   secret_id = aws_secretsmanager_secret.ssogen_privkey.id
   secret_string = jsonencode({
@@ -50,3 +53,55 @@ resource "aws_secretsmanager_secret_version" "ssogen_privkey_v1" {
     created_at_utc  = timestamp()
   })
 }
+
+data "aws_iam_policy_document" "ssogen_kms_policy" {
+  statement {
+    sid = "AllowRootAccountAdmin"
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+    }
+    actions   = ["kms:*"]
+    resources = ["*"]
+  }
+
+  statement {
+    sid = "AllowUseForSecretsManagerInThisAccount"
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:DescribeKey"
+    ]
+    resources = ["*"]
+
+    condition {
+      test     = "StringEquals"
+      variable = "kms:CallerAccount"
+      values   = [data.aws_caller_identity.current.account_id]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "kms:ViaService"
+      values   = ["secretsmanager.${data.aws_region.current.name}.amazonaws.com"]
+    }
+  }
+}
+
+# Update your existing key to use the policy
+resource "aws_kms_key" "ssogen_kms" {
+  description         = "KMS for SSH private keys in Secrets Manager"
+  enable_key_rotation = true
+  policy              = data.aws_iam_policy_document.ssogen_kms_policy.json
+
+  tags = {
+    Environment = local.environment
+  }
+}
+

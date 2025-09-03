@@ -21,6 +21,7 @@ resource "aws_instance" "ec2_ssogen" {
   root_block_device {
     volume_size = 60
     volume_type = "gp2"
+    encrypted   = true
   }
  
   user_data_replace_on_change = true
