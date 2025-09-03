@@ -34,12 +34,21 @@ resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_alb_egress_t
   referenced_security_group_id = aws_security_group.cluster.id
 }
 
+locals {
+  # use a diff app name only when env = training
+  # to ensure alb is less than 32 chars
+  # e.g. delius-core-training-weblogic-alb is 33 chars which AWS does now allow
+  app_alias = var.env_name == "training" ? "delius" : var.app_name
+
+  alb_name = "${local.app_alias}-${var.env_name}-weblogic-alb"
+}
+
 # tfsec:ignore:aws-elb-alb-not-public
 resource "aws_lb" "delius_core_frontend" {
   #checkov:skip=CKV_AWS_91 "ignore"
   #checkov:skip=CKV2_AWS_28 "ignore"
 
-  name               = "${var.app_name}-${var.env_name}-weblogic-alb"
+  name               = local.alb_name
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.delius_frontend_alb_security_group.id]

@@ -1,6 +1,6 @@
 # tags demonstrate inheritance due to merges in the module
 locals {
-  environment_config_prod = {
+  environment_config_training = {
     migration_environment_private_cidr     = ["10.162.100.0/22", "10.162.104.0/22", "10.160.96.0/22"]
     migration_environment_vpc_cidr         = "10.162.96.0/20"
     migration_environment_db_cidr          = ["10.162.110.0/25", "10.162.108.0/24", "10.162.109.0/24"]
@@ -8,12 +8,12 @@ locals {
     migration_environment_abbreviated_name = "del"
     migration_environment_short_name       = "training"
     legacy_engineering_vpc_cidr            = "10.160.98.0/25"
-    ec2_user_ssh_key                       = file("${path.module}/files/.ssh/prod/ec2-user.pub")
+    ec2_user_ssh_key                       = file("${path.module}/files/.ssh/training/ec2-user.pub")
     homepage_path                          = "/"
     has_mis_environment                    = false
   }
 
-  ldap_config_prod = {
+  ldap_config_training = {
     name                        = "ldap"
     encrypted                   = true
     migration_source_account_id = "330914586320"
@@ -28,7 +28,7 @@ locals {
   }
 
 
-  db_config_prod = {
+  db_config_training = {
     instance_type  = "r7i.4xlarge"
     ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-06-04T11-24-58.162Z"
     instance_policies = {
@@ -78,7 +78,7 @@ locals {
     database_port = local.db_port
   }
 
-  delius_microservices_configs_prod = {
+  delius_microservices_configs_training = {
 
     weblogic = {
       image_tag        = "6.2.0.3"
@@ -108,16 +108,21 @@ locals {
       container_cpu    = 16384
       container_memory = 32768
     }
+
+    sfs = {
+      container_cpu    = 2048
+      container_memory = 4096
+    }
   }
 
-  bastion_config_prod = {
+  bastion_config_training = {
     business_unit           = local.vpc_name
     subnet_set              = local.subnet_set
     environment             = local.environment
     extra_user_data_content = "yum install -y openldap-clients"
   }
 
-  dms_config_prod = {
+  dms_config_training = {
     deploy_dms                 = false
     replication_enabled        = false
     replication_instance_class = "dms.t3.medium"

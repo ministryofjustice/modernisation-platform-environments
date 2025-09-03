@@ -11,10 +11,10 @@ locals {
   frontend_image_tag      = "6.2.0.3"
   frontend_container_port = 8080
 
-  #   delius_environments_per_account = {
-  #     # account = [env1, env2]
-  #     prod = ["prod"]
-  #   }
+    # delius_environments_per_account = {
+    #   # account = [env1, env2]
+    #   prod = ["training"]
+    # }
 
   ordered_subnet_ids = [data.aws_subnets.shared-private-a.ids[0], data.aws_subnets.shared-private-b.ids[0], data.aws_subnets.shared-private-c.ids[0]]
 
