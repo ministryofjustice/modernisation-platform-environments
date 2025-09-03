@@ -359,76 +359,76 @@ resource "aws_security_group_rule" "ssogen_sg_ingress_icmp_workspaces_prod" {
 # ✅ EGRESS — Allow SSOGEN to reach dependencies
 ############################################################
 
-# Oracle LDAP (non-SSL)
-resource "aws_security_group_rule" "ssogen_sg_egress_ldap" {
-  type              = "egress"
-  from_port         = 1389
-  to_port           = 1389
-  protocol          = "tcp"
-  description       = "Oracle LDAP"
-  security_group_id = aws_security_group.ssogen_sg.id
-  cidr_blocks       = ["10.0.0.0/8"]
-}
+# # Oracle LDAP (non-SSL)
+# resource "aws_security_group_rule" "ssogen_sg_egress_ldap" {
+#   type              = "egress"
+#   from_port         = 1389
+#   to_port           = 1389
+#   protocol          = "tcp"
+#   description       = "Oracle LDAP"
+#   security_group_id = aws_security_group.ssogen_sg.id
+#   cidr_blocks       = ["10.0.0.0/8"]
+# }
 
-# Oracle LDAP (SSL)
-resource "aws_security_group_rule" "ssogen_sg_egress_ldap_ssl" {
-  type              = "egress"
-  from_port         = 1636
-  to_port           = 1636
-  protocol          = "tcp"
-  description       = "Oracle LDAP SSL"
-  security_group_id = aws_security_group.ssogen_sg.id
-  cidr_blocks       = ["10.0.0.0/8"]
-}
+# # Oracle LDAP (SSL)
+# resource "aws_security_group_rule" "ssogen_sg_egress_ldap_ssl" {
+#   type              = "egress"
+#   from_port         = 1636
+#   to_port           = 1636
+#   protocol          = "tcp"
+#   description       = "Oracle LDAP SSL"
+#   security_group_id = aws_security_group.ssogen_sg.id
+#   cidr_blocks       = ["10.0.0.0/8"]
+# }
 
-# Outbound HTTPS
-resource "aws_security_group_rule" "ssogen_sg_egress_https" {
-  type              = "egress"
-  from_port         = 443
-  to_port           = 443
-  protocol          = "tcp"
-  description       = "Allow outbound HTTPS"
-  security_group_id = aws_security_group.ssogen_sg.id
-  cidr_blocks       = ["0.0.0.0/0"]
-}
+# # Outbound HTTPS
+# resource "aws_security_group_rule" "ssogen_sg_egress_https" {
+#   type              = "egress"
+#   from_port         = 443
+#   to_port           = 443
+#   protocol          = "tcp"
+#   description       = "Allow outbound HTTPS"
+#   security_group_id = aws_security_group.ssogen_sg.id
+#   cidr_blocks       = ["0.0.0.0/0"]
+# }
 
-# Outbound HTTP
-resource "aws_security_group_rule" "ssogen_sg_egress_http" {
-  type              = "egress"
-  from_port         = 80
-  to_port           = 80
-  protocol          = "tcp"
-  description       = "Allow outbound HTTP"
-  security_group_id = aws_security_group.ssogen_sg.id
-  cidr_blocks       = ["0.0.0.0/0"]
-}
+# # Outbound HTTP
+# resource "aws_security_group_rule" "ssogen_sg_egress_http" {
+#   type              = "egress"
+#   from_port         = 80
+#   to_port           = 80
+#   protocol          = "tcp"
+#   description       = "Allow outbound HTTP"
+#   security_group_id = aws_security_group.ssogen_sg.id
+#   cidr_blocks       = ["0.0.0.0/0"]
+# }
 
-# ---- TEMP: ICMP egress so these hosts can ping VPC/WorkSpaces ----
-resource "aws_security_group_rule" "ssogen_sg_egress_icmp_vpc" {
-  type              = "egress"
-  from_port         = 8
-  to_port           = 0
-  protocol          = "icmp"
-  description       = "TEMP: ICMP Echo egress to VPC + WorkSpaces"
-  security_group_id = aws_security_group.ssogen_sg.id
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-}
-resource "aws_security_group_rule" "ssogen_sg_egress_icmp_workspaces_nonprod" {
-  type              = "egress"
-  from_port         = 8
-  to_port           = 0
-  protocol          = "icmp"
-  description       = "TEMP: ICMP Echo egress to VPC + WorkSpaces"
-  security_group_id = aws_security_group.ssogen_sg.id
-  cidr_blocks       = [local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_subnet_env]
-}
-resource "aws_security_group_rule" "ssogen_sg_egress_icmp_workspaces_prod" {
-  type              = "egress"
-  from_port         = 8
-  to_port           = 0
-  protocol          = "icmp"
-  description       = "TEMP: ICMP Echo egress to VPC + WorkSpaces"
-  security_group_id = aws_security_group.ssogen_sg.id
-  cidr_blocks       = [local.application_data.accounts[local.environment].lz_aws_workspace_prod_subnet_env]
-}
-# ---- END TEMP ----
+# # ---- TEMP: ICMP egress so these hosts can ping VPC/WorkSpaces ----
+# resource "aws_security_group_rule" "ssogen_sg_egress_icmp_vpc" {
+#   type              = "egress"
+#   from_port         = 8
+#   to_port           = 0
+#   protocol          = "icmp"
+#   description       = "TEMP: ICMP Echo egress to VPC + WorkSpaces"
+#   security_group_id = aws_security_group.ssogen_sg.id
+#   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+# }
+# resource "aws_security_group_rule" "ssogen_sg_egress_icmp_workspaces_nonprod" {
+#   type              = "egress"
+#   from_port         = 8
+#   to_port           = 0
+#   protocol          = "icmp"
+#   description       = "TEMP: ICMP Echo egress to VPC + WorkSpaces"
+#   security_group_id = aws_security_group.ssogen_sg.id
+#   cidr_blocks       = [local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_subnet_env]
+# }
+# resource "aws_security_group_rule" "ssogen_sg_egress_icmp_workspaces_prod" {
+#   type              = "egress"
+#   from_port         = 8
+#   to_port           = 0
+#   protocol          = "icmp"
+#   description       = "TEMP: ICMP Echo egress to VPC + WorkSpaces"
+#   security_group_id = aws_security_group.ssogen_sg.id
+#   cidr_blocks       = [local.application_data.accounts[local.environment].lz_aws_workspace_prod_subnet_env]
+# }
+# # ---- END TEMP ----
