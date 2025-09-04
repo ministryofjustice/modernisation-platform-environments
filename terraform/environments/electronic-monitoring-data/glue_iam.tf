@@ -254,7 +254,7 @@ resource "aws_iam_role" "glue_iceberg_opt_role" {
       {
         Effect = "allow",
         Principal = {
-          Service = "glue.amazon.com"
+          Service = "glue.amazonaws.com"
         },
         Action = "sts:AssumeRole"
       }
