@@ -94,7 +94,7 @@ locals {
     for mapping in tolist(data.aws_ami.shared_db_ami)[0].block_device_mappings : "5" => mapping
     if mapping.device_name == "xvdj"
   } : {}
-  snapshot_id_xvdj_db = local.environment == "prodution" ? local.block_device_mapping_xvdj_db[5].ebs.snapshot_id : ""
+  snapshot_id_xvdj_db = local.environment == "production" ? local.block_device_mapping_xvdj_db[5].ebs.snapshot_id : ""
 
   block_device_mapping_xvdk_db = local.environment == "production" ? {
     for mapping in tolist(data.aws_ami.shared_db_ami)[0].block_device_mappings : "6" => mapping
