@@ -51,6 +51,10 @@ resource "aws_security_group_rule" "lambda_ingress" {
   to_port           = 1522
   protocol          = "tcp"
   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 # Egress rule of lambda_security_group
@@ -61,6 +65,10 @@ resource "aws_security_group_rule" "lambda_egress" {
   to_port           = 0
   protocol          = "-1"
   cidr_blocks       = ["0.0.0.0/0"]
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 # Lambda Function
