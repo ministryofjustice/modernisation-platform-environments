@@ -27,6 +27,7 @@ locals {
     "serco_fms",
     "serco_fms_deduped",
     "serco_fms_curated",
+    "serco_fms_cross_checked",
     "servicenow_curated",          # to be destroyed
     "servicenow_curated_snapshot", # to be destroyed
   ]
