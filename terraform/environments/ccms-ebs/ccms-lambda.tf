@@ -41,6 +41,10 @@ resource "aws_security_group" "lambda_security_group" {
   tags = merge(local.tags,
     { Name = "${local.application_name}-${local.environment}-lambda-sg" }
   )
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 # Lambda Function
