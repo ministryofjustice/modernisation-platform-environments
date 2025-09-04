@@ -405,6 +405,7 @@ module "load_fms" {
   athena_dump_bucket = module.s3-athena-bucket.bucket
   cadt_bucket        = module.s3-create-a-derived-table-bucket.bucket
   db_exists          = true
+  new_airflow        = true
 }
 
 
