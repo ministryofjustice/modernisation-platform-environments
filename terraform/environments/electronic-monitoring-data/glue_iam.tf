@@ -244,3 +244,71 @@ resource "aws_iam_role_policy" "glue_mig_and_val_iam_role_ec2_policy" {
   role   = aws_iam_role.glue_mig_and_val_iam_role.name
   policy = data.aws_iam_policy_document.dms_dv_athena_iam_policy_document.json
 }
+
+resource "aws_iam_role" "glue_iceberg_opt_role" {
+  name = "glue-iceberg-opt-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "allow",
+        Principal = {
+          Service = "glue.amazon.com"
+        },
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "glue_iceberg_opt_policy" {
+  name = "glue-iceberg-opt-policy"
+  role = aws_iam_role.glue_iceberg_opt_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject",
+          "s3:ListBucket"
+        ],
+        Resource = [
+          "arn:aws:s3:::emds-test-dms-rds-to-parquet-20240923095932358500000011",
+          "arn:aws:s3:::emds-test-dms-rds-to-parquet-20240923095932358500000011/*"
+        ]
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "glue:GetDatabase",
+          "glue:GetDatabases",
+          "glue:CreateTable",
+          "glue:UpdateTable",
+          "glue:DeleteTable",
+          "glue:GetTable",
+          "glue:GetTables",
+          "glue:BatchCreatePartition",
+          "glue:UpdatePartition",
+          "glue:GetPartition",
+          "glue:GetPartitions",
+          "glue:BatchDeletePartition"
+        ],
+        Resource = "*"
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ],
+        Resource = "*"
+      }
+    ]
+  })
+}
