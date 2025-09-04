@@ -1,6 +1,3 @@
-data "aws_caller_identity" "current" {}
-data "aws_region" "current" {}
-
 # checkov:skip=CKV_AWS_356: KMS key policies require Resource="*"; constrained via principals/conditions
 # checkov:skip=CKV_AWS_109: Root admin stanza retained; functional use is tightly scoped
 data "aws_iam_policy_document" "ssogen_kms_policy" {
