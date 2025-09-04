@@ -1,7 +1,4 @@
-resource "aws_iam_user" "rekognition_user" {
-  name = "rekognition"
-}
-
+# policy document for allowing access to rekognition s3 bucket
 data "aws_iam_policy_document" "rekognition_s3_policy_document" {
   statement {
     sid    = "LocateUserBuckets"
@@ -37,38 +34,12 @@ resource "aws_iam_policy" "rekognition_s3_policy" {
   policy = data.aws_iam_policy_document.rekognition_s3_policy_document.json
 }
 
+# find managed policy for read-only rekognition access
 data "aws_iam_policy" "rekognition_read" {
   name = "AmazonRekognitionReadOnlyAccess"
 }
 
-resource "aws_iam_user_policy_attachment" "rekognition_rekognition" {
-  user       = aws_iam_user.rekognition_user.name
-  policy_arn = data.aws_iam_policy.rekognition_read.arn
-}
-
-resource "aws_iam_user_policy_attachment" "rekognition_s3" {
-  user       = aws_iam_user.rekognition_user.name
-  policy_arn = aws_iam_policy.rekognition_s3_policy.arn
-}
-
-# access key
-resource "aws_iam_access_key" "rekognition_user_access_key" {
-  user = aws_iam_user.rekognition_user.name
-}
-
-# store access key secret
-resource "aws_secretsmanager_secret" "rekognition_user_access_key" {
-  name = "rekognition-user-access-key"
-}
-
-resource "aws_secretsmanager_secret_version" "rekognition_user_access_key_value" {
-  secret_id = aws_secretsmanager_secret.rekognition_user_access_key.id
-  secret_string = jsonencode({
-    aws_access_key_id     = aws_iam_access_key.rekognition_user_access_key.id
-    aws_secret_access_key = aws_iam_access_key.rekognition_user_access_key.secret
-  })
-}
-
+# grant configured principals permission to assume the rekognition role
 data "aws_iam_policy_document" "assume_rekognition_role_policy" {
   dynamic "statement" {
     for_each = local.allowed_assume_role_principals
@@ -86,6 +57,7 @@ data "aws_iam_policy_document" "assume_rekognition_role_policy" {
   }
 }
 
+# create rekognition role and attach s3 and rekognition policies
 resource "aws_iam_role" "rekognition_role" {
   name = "rekognition-role"
   assume_role_policy = data.aws_iam_policy_document.assume_rekognition_role_policy.json
