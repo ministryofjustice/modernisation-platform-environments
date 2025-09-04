@@ -1,3 +1,6 @@
+data "aws_caller_identity" "current" {}
+data "aws_region" "current" {}
+
 # checkov:skip=CKV_AWS_356: KMS key policies require Resource="*"; constrained via principals/conditions
 # checkov:skip=CKV_AWS_109: Root admin stanza retained; functional use is tightly scoped
 data "aws_iam_policy_document" "ssogen_kms_policy" {
@@ -11,28 +14,29 @@ data "aws_iam_policy_document" "ssogen_kms_policy" {
     resources = ["*"]
   }
   statement {
-    sid = "AllowEc2RoleUseForSecretsManager"
-    principals {
-      type        = "AWS"
-      identifiers = [aws_iam_role.ssogen_ec2.arn]
+    sid = "AllowUseForSecretsManagerInThisAccount"
+    principals { 
+      type = "AWS"
+      identifiers = ["*"] 
     }
-    actions = [
+    actions    = [
+      "kms:Encrypt",
       "kms:Decrypt",
-      "kms:DescribeKey",
+      "kms:ReEncrypt*",
       "kms:GenerateDataKey*"
+      ,"kms:DescribeKey"
     ]
-    resources = ["*"]
+    resources  = ["*"]
 
-    # Constrain to Secrets Manager in this account/region
     condition {
-      test     = "StringEquals"
+      test = "StringEquals"
       variable = "kms:CallerAccount"
-      values   = [data.aws_caller_identity.current.account_id]
+      values = [data.aws_caller_identity.current.account_id]
     }
     condition {
-      test     = "StringEquals"
+      test = "StringEquals"
       variable = "kms:ViaService"
-      values   = ["secretsmanager.${data.aws_region.current.name}.amazonaws.com"]
+      values = ["secretsmanager.${data.aws_region.current.name}.amazonaws.com"]
     }
   }
 }
