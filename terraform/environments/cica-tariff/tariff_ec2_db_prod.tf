@@ -1,6 +1,7 @@
 #keypair for prod db
 
 resource "aws_key_pair" "key_pair_db" {
+  count = local.environment == "production" ? 1 : 0
   key_name   = lower(format("%s-%s-database-key", local.application_name, local.environment))
   public_key = local.pubkey["database"]
   tags = merge(tomap({
@@ -13,7 +14,6 @@ resource "aws_key_pair" "key_pair_db" {
 
 # Create AWS EC2 instance, specifies ami and type. Also Public key to use for pw
 resource "aws_instance" "tariffdb" {
-  # count = var.environment != "Production" ? 0 : 
   for_each = local.environment == "production" ? local.subnets_a_b_map : {}
   ami      = data.aws_ami.shared_db_ami[0].id
   #Ignore changes to most recent ami from data filter, as this would destroy existing instance.
@@ -36,7 +36,7 @@ resource "aws_instance" "tariffdb" {
   }
   # Set security group where Instance will be created. This will also determine VPC
   vpc_security_group_ids = aws_security_group.tariff_db_prod_security_group[*].id
-  key_name               = aws_key_pair.key_pair_db.key_name
+  key_name               = aws_key_pair.key_pair_db[0].key_name
 
 
   ebs_block_device {
