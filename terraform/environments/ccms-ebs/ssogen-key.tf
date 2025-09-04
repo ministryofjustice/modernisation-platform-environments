@@ -1,7 +1,6 @@
 # checkov:skip=CKV_AWS_356: KMS key policies require Resource="*"; constrained via principals/conditions
-# checkov:skip=CKV_AWS_109: Root admin stanza required; functional use is tightly scoped
+# checkov:skip=CKV_AWS_109: Root admin stanza retained; functional use is tightly scoped
 data "aws_iam_policy_document" "ssogen_kms_policy" {
-  # 1) Admin: keep root full control (required to avoid lockout)
   statement {
     sid = "AllowRootAccountAdmin"
     principals {
@@ -11,7 +10,6 @@ data "aws_iam_policy_document" "ssogen_kms_policy" {
     actions   = ["kms:*"]
     resources = ["*"]
   }
-  # 2) Allow SSOGEN EC2 role to use the key for Secrets Manager only (tight actions + conditions)
   statement {
     sid = "AllowEc2RoleUseForSecretsManager"
     principals {
@@ -40,56 +38,46 @@ data "aws_iam_policy_document" "ssogen_kms_policy" {
 }
 
 resource "aws_kms_key" "ssogen_kms" {
+  count               = local.is_development ? 1 : 0
   description         = "KMS for SSH private keys in Secrets Manager"
   enable_key_rotation = true
   policy              = data.aws_iam_policy_document.ssogen_kms_policy.json
-
-  tags = {
-    Environment = local.environment
-  }
+  tags = { Environment = local.environment }
 }
 
-# Generate SSH key pair in Terraform (RSA 4096)
+# Generate SSH key pair
 resource "tls_private_key" "ssogen" {
+  count     = local.is_development ? 1 : 0
   algorithm = "RSA"
   rsa_bits  = 4096
 }
 
-# Create EC2 key pair
 resource "aws_key_pair" "ssogen" {
+  count      = local.is_development ? 1 : 0
   key_name   = "ssogen_key_name"
-  public_key = tls_private_key.ssogen.public_key_openssh
-
-  tags = {
-    Name        = "ssogen-key"
-    Environment = local.environment
-  }
+  public_key = tls_private_key.ssogen[0].public_key_openssh
+  tags = { Name = "ssogen-key", Environment = local.environment }
 }
-# checkov:skip=CKV2_AWS_57: SSH key rotation is managed operationally; moving to SSM (no SSH keys)
-# Secrets Manager secret metadata
+
 resource "aws_secretsmanager_secret" "ssogen_privkey" {
-  name       = "ssh/${local.environment}/ssogen/private-key"
-  kms_key_id = aws_kms_key.ssogen_kms.arn
+  count                   = local.is_development ? 1 : 0
+  name                    = "ssh/${local.environment}/ssogen/private-key"
+  kms_key_id              = aws_kms_key.ssogen_kms[0].arn
   recovery_window_in_days = 7
-
-  tags = {
-    Environment = local.environment
-    Purpose     = "ec2-ssh"
-  }
+  tags = { Environment = local.environment, Purpose = "ec2-ssh" }
 }
 
-# Store the private key securely in Secrets Manager
 resource "aws_secretsmanager_secret_version" "ssogen_privkey_v1" {
-  secret_id = aws_secretsmanager_secret.ssogen_privkey.id
+  count        = local.is_development ? 1 : 0
+  secret_id    = aws_secretsmanager_secret.ssogen_privkey[0].id
   secret_string = jsonencode({
-    private_key_pem = tls_private_key.ssogen.private_key_pem
-    public_key      = tls_private_key.ssogen.public_key_openssh
-    fingerprint_md5 = tls_private_key.ssogen.public_key_fingerprint_md5
+    private_key_pem = tls_private_key.ssogen[0].private_key_pem
+    public_key      = tls_private_key.ssogen[0].public_key_openssh
+    fingerprint_md5 = tls_private_key.ssogen[0].public_key_fingerprint_md5
     key_type        = "rsa"
-    key_name        = aws_key_pair.ssogen.key_name
+    key_name        = aws_key_pair.ssogen[0].key_name
     environment     = local.environment
     region          = data.aws_region.current.name
     created_at_utc  = timestamp()
   })
 }
-
