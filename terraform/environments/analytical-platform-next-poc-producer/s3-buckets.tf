@@ -3,7 +3,7 @@ module "mojap_next_poc_athena_query_s3_bucket" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "5.6.0"
+  version = "5.7.0"
 
   bucket = local.athena_query_bucket_name
 
@@ -29,7 +29,7 @@ module "mojap_next_poc_data_s3_bucket" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "5.6.0"
+  version = "5.7.0"
 
   bucket = local.datastore_bucket_name
 
