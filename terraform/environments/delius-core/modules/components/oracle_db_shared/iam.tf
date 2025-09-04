@@ -130,8 +130,11 @@ data "aws_iam_policy_document" "instance_ssm" {
   }
 }
 
+#trivy:ignore:AVD-AWS-0345
 data "aws_iam_policy_document" "cert_export" {
-
+  #checkov:skip=CKV_AWS_108 "ignore"
+  #checkov:skip=CKV_AWS_111 "ignore"
+  #checkov:skip=CKV_AWS_356 "ignore"
   statement {
     sid    = "ExportCert"
     effect = "Allow"

@@ -67,9 +67,11 @@ locals {
   #----------------------------------------------------------------------------
   buddi_ssh_keys = [
     "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBIXoHoZO8V5tWMG9JRQtzkjPFEkVYKGP5cte0R9rkeeyGGUP6hUudKK9IsKaW6nn/4c+KMfZG8wyiSFYwzPuor86yjb8hH0q2dRClcPAS7FbAOu3rnBn+QBGzoP2ohJFUQ==",
+    "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQClMm3/4U32lRqOtLpgtne4Kqnl0PnchnUNRgiCKHC550zoGMOs+Vw7SzxFqgEHoPcDGU4l21cL8yu+1g0Eg+EBHGA+72EQH9gWqZr/eDjMCgp669CO5eo3bXQ4nL72obyRQyJPrDS3ytRLRGwNd37DsLngePEksDfc8Qv+65OlQ60CxRpXLMVpfR3d+WDFkVu33lX7X7K9xv7nvDPLGiynvjPQbsbx2z76GAjebdEQt5xf2d4+U6Sptpq8dxVhFFfoaIv8S/xMFkbjOy4k1zBllyisQIai/PVoeBtj2AVQgNyQclauVreyKfaMwRDiLDwG53ZdQ4fzSnFsdLYyjT2K+Uqd1S66Sa6pAiz8ciY6fZ0zdfNsl2IULir2+tiljYzPxPmPFGsk3XxBZVbEgTDHjtVBzvRlHSmEcUU5s7pZz8FtTg/RwrVQ6TAD0YBJoUlH3qPYCSeaBxCqrag7IVWNzua7u6Zym3U6LTGG96AdNZr+he/waq5L/z7lf0iCIss= kane@LAPTOP-Q1BUE8MA"
   ]
   buddi_cidr_ipv4s = [
     "81.179.159.7/32",
+    "3.9.120.181/32"
   ]
   buddi_cidr_ipv6s = []
 
@@ -286,18 +288,14 @@ locals {
   sftp_account_dev = {
     name = "dev_access"
     ssh_keys = [
-      # Matt Price
-      "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBA3BsCFaNiGxbmJffRi9q/W3aLmZWgqE6QkeFJD5O6F4nDdjsV1R0ZMUvTSoi3tKqoAE+1RYYj2Ra/F1buHov9e+sFPrlMl0wql6uMsBA1ndiIiKuq+NLY1NOxEvqm2J9Q==",
       # Matt Heery
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILaZQpz+vBuSa74wW53ONB5ueGfFzotLYaZDPBe/NfKU matt.heery@justice.gov.uk",
+      "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDPo/IGYprUoZqGHzy6pgkSDKy4zY2+xYYWELaK5uMjK+2YIHm99vIVlEsqQIdrH/NlBIKxa97eDRBj3n5NMhrjg7g6hiuzqeJVKx21SBBhfMvFxHgrLWW8ZiaJ+PWHda5LH7BLW6QvMyh4dI/Jl26JvYLvnkXB5QA/MbaHxt59ueBjjxH/+877dHri41aGMqf01UjVCcBC2wqAUCngC3UZvtjbMVSkWlcyKIx8DI+YnThSVbfT7HxAMhbrcO296Ec/G7sfVHibr+pBHqGOSODkRVKezXCIi+UUBJ94c/p17eV+MlTAqvRKvxJ2rvd50UtDvwsTEYvJjptaTEtxY4az matt-heery",
     ]
     cidr_ipv4s = [
-      # fy nhy
-      "2.31.200.65/32",
+      # 10 SC
+      "51.149.2.6/32",
       # Petty France
       "213.121.161.124/32",
-      # my house
-      "81.179.238.104/32"
     ]
     cidr_ipv6s = []
   }
