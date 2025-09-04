@@ -88,7 +88,7 @@ module "weblogic_eis" {
   microservice_lb                    = aws_lb.delius_core_frontend
   microservice_lb_https_listener_arn = aws_lb_listener.listener_https.arn
   alb_listener_rule_paths            = ["/eis"]
-  alb_listener_rule_priority         = 4
+  alb_listener_rule_priority         = 40
 
   container_image = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-weblogic:${var.delius_microservice_configs.weblogic_eis.image_tag}"
 

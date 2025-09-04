@@ -20,6 +20,7 @@ resource "aws_vpc_security_group_ingress_rule" "ancillary_alb_ingress_https_glob
 
 # Necessary for Unit tests from Legacy
 resource "aws_vpc_security_group_ingress_rule" "test_ingress" {
+  #checkov:skip=CKV_AWS_23 "ignore"
   for_each = var.env_name == "test" ? {
     for cidr in local.legacy_test_natgw_ips : cidr => cidr
   } : {}

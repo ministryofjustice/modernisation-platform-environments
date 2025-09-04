@@ -34,12 +34,12 @@ data "aws_iam_policy_document" "rekognition_kms_key_policy" {
     resources = ["*"]
   }
 
-  # Allow access to rekognition user
+  # Allow access to rekognition role
   statement {
-    sid    = "RekognitionUserKeyUser"
+    sid    = "RekognitionRoleKeyUser"
     effect = "Allow"
     principals {
-      identifiers = [aws_iam_user.rekognition_user.arn]
+      identifiers = [aws_iam_role.rekognition_role.arn]
       type        = "AWS"
     }
     actions = [
