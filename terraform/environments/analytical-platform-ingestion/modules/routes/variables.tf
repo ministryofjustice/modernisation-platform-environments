@@ -9,3 +9,4 @@ variable "destination_cidr_blocks" {
 variable "transit_gateway_id" {
   type = string
 }
+
