@@ -31,8 +31,8 @@ locals {
         module.baseline_presets.cloudwatch_dashboard_widgets.ec2_autoscaling_group_cwagent_collectd_service_status_os.service-status-error-os-layer,
         module.baseline_presets.cloudwatch_dashboard_widgets.ec2_autoscaling_group_cwagent_collectd_service_status_app.service-status-error-app-layer,
         module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_windows.free-disk-space-low,
+        module.baseline_presets.cloudwatch_dashboard_widgets.ec2_autoscaling_group_cwagent_windows.free-disk-space-low,
         module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_windows.high-memory-usage,
-        null,
       ]
     }
 
