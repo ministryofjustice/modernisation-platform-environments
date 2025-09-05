@@ -1,3 +1,55 @@
+resource "aws_iam_role" "dms_validation_event_bridge_invoke_sfn_role" {
+  name = "dms_validation_trigger_role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect    = "Allow"
+      Principal = { Service = "events.amazonaws.com" }
+      Action    = "sts:AssumeRole"
+    }]
+
+  })
+}
+
+resource "aws_iam_role_policy" "event_bridge_invoke_sfn_policy" {
+  role = aws_iam_role.dms_validation_event_bridge_invoke_sfn_role.name
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Action = [
+        "states:StartExecution",
+      ]
+      Resource = module.dms_validation_step_function[0].arn
+    }]
+  })
+}
+
+
+
+resource "aws_cloudwatch_event_rule" "dms_task_completed" {
+  name        = "dms_validation_trigger_rule"
+  description = "Triggeres DMS validation Step Function"
+
+  event_pattern = jsonencode({
+    "source" : ["aws.dms"],
+    "detail-type" : ["DMS Replication Task State Change"],
+    "detail" : {
+      "eventId" : ["DMS-EVENT-0079"],
+      "eventType" : ["REPLICATION_TASK_STOPPED"]
+      "detailMessage" : ["Stop Reason FULL_LOAD_ONLY_FINISHED"]
+    }
+  })
+}
+
+resource "aws_cloudwatch_event_target" "dms_validation_step_function_trigger" {
+  rule       = aws_cloudwatch_event_rule.dms_task_completed.name
+  arn        = module.dms_validation_step_function[0].arn
+  role_arn   = aws_iam_role.dms_validation_event_bridge_invoke_sfn_role.arn
+  input_path = "$"
+}
+
+
 module "dms_task" {
   source = "./modules/dms"
 
@@ -41,12 +93,6 @@ module "dms_task" {
   dms_replication_instance_arn    = aws_dms_replication_instance.dms_replication_instance[0].replication_instance_arn
   rep_task_settings_filepath      = trimspace(file("${path.module}/dms_replication_task_settings.json"))
   rep_task_table_mapping_filepath = trimspace(file("${path.module}/dms_${each.key}_task_tables_selection.json"))
-
-  # DMS Validation Event bridge Rule
-  event_bridge_rule_name           = "dms_validation_trigger_rule"
-  event_bridge_role_name           = "dms_validation_trigger_role_${each.key}"
-  dms_trigger_state                = "FULL_LOAD_ONLY_FINISHED"
-  dms_validation_step_function_arn = module.dms_validation_step_function[0].arn
 
   local_tags = local.tags
 }
