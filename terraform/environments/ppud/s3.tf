@@ -1242,7 +1242,7 @@ resource "aws_s3_bucket_replication_configuration" "moj-database-source-uat-repl
   count = local.is-preproduction == true ? 1 : 0
   # Must have bucket versioning enabled first
   depends_on = [aws_s3_bucket_versioning.moj-database-source-uat]
-  role       = aws_iam_role.iam_role_s3_bucket_moj_report_source_uat[0].arn # check config
+  role       = aws_iam_role.iam_role_s3_bucket_moj_database_source_uat[0].arn
   bucket     = aws_s3_bucket.moj-database-source-uat[0].id
 
   rule {

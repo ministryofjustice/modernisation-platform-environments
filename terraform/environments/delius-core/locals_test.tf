@@ -29,6 +29,7 @@ locals {
     port                        = 389
     tls_port                    = 636
     desired_count               = 1
+    log_retention               = 7
   }
 
 

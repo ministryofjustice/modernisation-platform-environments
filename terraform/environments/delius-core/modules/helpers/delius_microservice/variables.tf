@@ -634,3 +634,9 @@ variable "pin_task_definition_revision" {
   description = "The revision of the task definition to use"
   default     = 0
 }
+
+variable "log_retention" {
+  type        = number
+  description = "Number of days to retain the logs"
+  default     = 7
+}

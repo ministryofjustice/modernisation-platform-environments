@@ -149,7 +149,15 @@ module "autoscaling" {
 
   # Scaling policies and tags
   schedules = local.schedules
-  tags      = local.all_tags
+  tags = merge(
+    local.all_tags,
+    { "OS" = "Linux" }
+  )
+  autoscaling_group_tags = merge( #ec2 tags
+    local.all_tags,
+    { "OS" = "Linux" }
+  )
+
 }
 
 module "autoscaling_sg" {

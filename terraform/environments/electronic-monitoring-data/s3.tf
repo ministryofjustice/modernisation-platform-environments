@@ -17,7 +17,7 @@ locals {
   p1_export_bucket_destination_mapping = {
     "production"    = "tct-339712706964-prearrivals"
     "preproduction" = null
-    "test"          = null
+    "test"          = "tct-339712706964-prearrivals-dev"
     "development"   = null
   }
 

@@ -56,6 +56,17 @@ locals {
     }
   }
 
+  inspector-sbom-ec2 = {
+    function_zip_file = "lambda_code/inspector-sbom-ec2.zip"
+    function_name     = "inspector-sbom-ec2"
+    handler           = "inspector-sbom-ec2.lambda_handler"
+    iam_role_name     = "inspector-sbom-ec2-lambda-role"
+    environment_variables = {
+      S3_BUCKET   = module.s3-sbom.aws_s3_bucket_id["application-sbom"].id
+      KMS_KEY_ARN = module.kms.key_arn
+    }
+  }
+
 
   update-dc-names-role = {
     name              = "update-dc-names-lambda-role"
@@ -82,6 +93,16 @@ locals {
     iam_policy_path   = "lambda_policies/serverlessrepo-lambda-canary-role-policy.json"
     policy_template_vars = {
       account_number = local.environment_management.account_ids[terraform.workspace]
+    }
+  }
+
+  inspector-sbom-ec2-role = {
+    name              = "inspector-sbom-ec2-lambda-role"
+    trust_policy_path = "lambda_policies/lambda-role-trust.json"
+    iam_policy_path   = "lambda_policies/inspector-sbom-ec2-role-policy.json"
+    policy_template_vars = {
+      aws_s3_bucket_sbom_arn = module.s3-sbom.aws_s3_bucket["application-sbom"].arn
+      aws_kms_key_sbom_arn   = module.kms.key_arn
     }
   }
 }

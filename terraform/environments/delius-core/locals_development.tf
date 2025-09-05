@@ -29,6 +29,7 @@ locals {
     port                        = 389
     tls_port                    = 636
     desired_count               = 1
+    log_retention               = 7
   }
 
   db_config_dev = {
@@ -82,7 +83,7 @@ locals {
       container_port           = 8080
       container_memory         = 4096
       container_cpu            = 2048
-      task_definition_revision = 9
+      task_definition_revision = 11
     }
 
     weblogic_eis = {

@@ -890,7 +890,9 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
       "glue:GetTable",
       "glue:GetDatabase",
       "glue:GetPartition",
-      "glue:GetTags"
+      "glue:GetTags",
+      "glue:TagResource",
+      "glue:UpdateDatabase"
     ]
     resources = flatten([
       for resource in each.value.resource_shares : [
@@ -899,6 +901,25 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
         "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:catalog"
       ]
     ])
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "iam:CreateRole",
+      "iam:DeleteRole",
+      "iam:GetRole",
+      "iam:TagRole",
+      "iam:ListRolePolicies",
+      "iam:ListAttachedRolePolicies",
+      "iam:ListInstanceProfilesForRole",
+      "iam:PutRolePolicy",
+      "iam:PassRole"
+
+    ]
+    resources = [
+      "arn:aws:iam::${local.current_account_id}:role/*-location"
+    ]
   }
 }
 

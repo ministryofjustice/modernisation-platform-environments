@@ -64,13 +64,13 @@ resource "aws_lambda_function" "maat_provider_load" {
 
   environment {
     variables = {
-      DB_SECRET_NAME          = aws_secretsmanager_secret.maat_db_mp_credentials.name
-      PROCEDURE_SECRET_NAME   = aws_secretsmanager_secret.maat_procedures_config.name
-      LD_LIBRARY_PATH         = "/opt/instantclient_12_2_linux"
-      ORACLE_HOME             = "/opt/instantclient_12_2_linux"
-      SERVICE_NAME            = "maat-load-service"
-      NAMESPACE               = "MAATProviderLoadService"
-      PURGE_LAMBDA_TIMESTAMP  = aws_ssm_parameter.maat_provider_load_timestamp.name
+      DB_SECRET_NAME         = aws_secretsmanager_secret.maat_db_mp_credentials.name
+      PROCEDURE_SECRET_NAME  = aws_secretsmanager_secret.maat_procedures_config.name
+      LD_LIBRARY_PATH        = "/opt/instantclient_12_2_linux"
+      ORACLE_HOME            = "/opt/instantclient_12_2_linux"
+      SERVICE_NAME           = "maat-load-service"
+      NAMESPACE              = "MAATProviderLoadService"
+      PURGE_LAMBDA_TIMESTAMP = aws_ssm_parameter.maat_provider_load_timestamp.name
     }
   }
 

@@ -20,6 +20,8 @@ locals {
     var.options.enable_ec2_cloud_watch_agent ? ["cwagent-windows-system"] : [],
     var.options.enable_ec2_cloud_watch_agent ? ["cwagent-windows-application"] : [],
     var.options.enable_ec2_cloud_watch_agent ? ["cwagent-windows-security"] : [],
+    var.options.enable_ec2_cloud_watch_agent ? ["cwagent-windows-security"] : [],
+    var.options.enable_ec2_cloud_watch_agent && var.options.enable_ec2_oracle_enterprise_managed_server ? ["cwagent-oracle-listener-log"] : [],
   ])
 
   cloudwatch_log_groups = {
@@ -39,6 +41,9 @@ locals {
       retention_in_days = coalesce(var.options.cloudwatch_log_groups_retention_in_days, local.cloudwatch_log_groups_retention_default)
     }
     cwagent-windows-security = {
+      retention_in_days = coalesce(var.options.cloudwatch_log_groups_retention_in_days, local.cloudwatch_log_groups_retention_default)
+    }
+    cwagent-oracle-listener-log = {
       retention_in_days = coalesce(var.options.cloudwatch_log_groups_retention_in_days, local.cloudwatch_log_groups_retention_default)
     }
   }
