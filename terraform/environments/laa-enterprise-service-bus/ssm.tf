@@ -8,6 +8,13 @@ resource "aws_ssm_parameter" "ccms_provider_load_timestamp" {
   lifecycle {
     ignore_changes = [value]
   }
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name_short}-${local.environment}-ccms-provider-load-timestamp"
+    }
+  )
 }
 
 resource "aws_ssm_parameter" "cclf_provider_load_timestamp" {
@@ -20,6 +27,13 @@ resource "aws_ssm_parameter" "cclf_provider_load_timestamp" {
   lifecycle {
     ignore_changes = [value]
   }
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name_short}-${local.environment}-cclf-provider-load-timestamp"
+    }
+  )
 }
 
 resource "aws_ssm_parameter" "maat_provider_load_timestamp" {
@@ -32,6 +46,13 @@ resource "aws_ssm_parameter" "maat_provider_load_timestamp" {
   lifecycle {
     ignore_changes = [value]
   }
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name_short}-${local.environment}-maat-provider-load-timestamp"
+    }
+  )
 }
 
 resource "aws_ssm_parameter" "ccr_provider_load_timestamp" {
@@ -44,4 +65,11 @@ resource "aws_ssm_parameter" "ccr_provider_load_timestamp" {
   lifecycle {
     ignore_changes = [value]
   }
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name_short}-${local.environment}-ccr-provider-load-timestamp"
+    }
+  )
 }
