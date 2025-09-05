@@ -14,7 +14,7 @@ resource "aws_iam_role" "scheduler_invoke_role" {
   tags = merge(
     local.tags,
     {
-      Name = "${local.application_name_short}-scheduler-invoke-cwa-sfn-role"
+      Name = "${local.application_name_short}-${local.environment}-scheduler-invoke-cwa-sfn-role"
     }
   )
 }

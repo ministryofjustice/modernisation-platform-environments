@@ -20,7 +20,7 @@ resource "aws_iam_role" "ccr_provider_load_role" {
   tags = merge(
     local.tags,
     {
-      Name = "${local.application_name_short}-ccr-provider-load-role"
+      Name = "${local.application_name_short}-${local.environment}-ccr-provider-load-role"
     }
   )
 }

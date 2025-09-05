@@ -17,7 +17,7 @@ resource "aws_iam_role" "cwa_extract_lambda_role" {
   tags = merge(
     local.tags,
     {
-      Name = "${local.application_name_short}-cwa-extract-lambda-role"
+      Name = "${local.application_name_short}-${local.environment}-cwa-extract-lambda-role"
     }
   )
 }

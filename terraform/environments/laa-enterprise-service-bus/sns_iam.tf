@@ -19,6 +19,13 @@ resource "aws_iam_role" "publisher_role" {
       }
     ]
   })
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name_short}-${local.environment}-sns-publisher-role"
+    }
+  )
 }
 
 resource "aws_iam_policy" "publisher_role_policy" {
@@ -64,6 +71,13 @@ resource "aws_iam_role" "subscriber_role" {
       }
     ]
   })
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name_short}-${local.environment}-sns-subscriber-role"
+    }
+  )
 }
 
 resource "aws_iam_policy" "subscriber_policy" {
@@ -110,6 +124,13 @@ resource "aws_iam_role" "admin_role" {
       }
     ]
   })
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name_short}-${local.environment}-sns-admin-role"
+    }
+  )
 }
 
 resource "aws_iam_policy" "admin_policy" {
@@ -153,6 +174,13 @@ resource "aws_iam_role" "sns_feedback" {
       }
     ]
   })
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name_short}-${local.environment}-sns-logging-role"
+    }
+  )
 }
 
 resource "aws_iam_policy" "sns_feedback_logging" {
