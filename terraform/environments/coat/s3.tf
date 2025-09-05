@@ -56,7 +56,8 @@ module "cur_s3_kms" {
       actions = [
         "kms:Decrypt*",
         "kms:DescribeKey",
-        "kms:GenerateDataKey*"],
+        "kms:GenerateDataKey*"
+      ]
       resources = ["${local.kms_master_key_id}"],
       effect    = "Allow"
       principals = [
