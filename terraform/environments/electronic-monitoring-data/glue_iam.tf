@@ -296,7 +296,8 @@ resource "aws_iam_role_policy" "glue_iceberg_opt_policy" {
           "glue:UpdatePartition",
           "glue:GetPartition",
           "glue:GetPartitions",
-          "glue:BatchDeletePartition"
+          "glue:BatchDeletePartition",
+          "glue:CreateTableOptimizer"
         ],
         Resource = "*"
       },
