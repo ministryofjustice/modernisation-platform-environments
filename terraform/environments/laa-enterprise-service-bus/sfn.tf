@@ -1,6 +1,6 @@
 resource "aws_sfn_state_machine" "sfn_state_machine" {
   name     = "cwa-step-function"
-  role_arn = aws_iam_role.step_function_role.arn
+  role_arn = aws_iam_role.step_function_role.arn  
 
   definition = jsonencode({
     Comment = "A description of my state machine",
@@ -132,4 +132,11 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
       }
     }
   })
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name_short}-${local.environment}-cwa-step-function"
+    }
+  )
 }
