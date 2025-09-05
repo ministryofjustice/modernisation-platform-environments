@@ -1095,6 +1095,16 @@ locals {
         null
       ]
     }
+    ec2_instance_only_windows = {
+      header_markdown = "## EC2 all Windows standalone instances"
+      width           = 8
+      height          = 8
+      widgets = [
+        local.cloudwatch_dashboard_widgets.ec2_cwagent_windows.free-disk-space-low,
+        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_windows.free-disk-space-low,
+        local.cloudwatch_dashboard_widgets.ec2_cwagent_windows.high-memory-usage,
+      ]
+    }
     ec2_linux = {
       header_markdown = "## EC2 all Linux instances"
       width           = 8
