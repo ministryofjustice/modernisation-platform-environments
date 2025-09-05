@@ -138,7 +138,6 @@ resource "aws_iam_role_policy_attachment" "dms_vpc_role_attachment" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSVPCManagementRole"
 }
 
-# -------------------------------------------------------------
 resource "aws_iam_role" "dms_validation_event_bridge_invoke_sfn_role" {
   count = local.is-production || local.is-development ? 1 : 0
   name  = "dms_validation_trigger_role"
@@ -155,7 +154,7 @@ resource "aws_iam_role" "dms_validation_event_bridge_invoke_sfn_role" {
 
 resource "aws_iam_role_policy" "event_bridge_invoke_sfn_policy" {
   count = local.is-production || local.is-development ? 1 : 0
-  role  = aws_iam_role.dms_validation_event_bridge_invoke_sfn_role.name
+  role  = aws_iam_role.dms_validation_event_bridge_invoke_sfn_role[0].name
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
