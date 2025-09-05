@@ -6,11 +6,12 @@ locals {
 
   region = "eu-west-2"
 
-  build_s3       = local.application_data.accounts[local.environment].build_s3
-  build_ftp      = local.application_data.accounts[local.environment].build_ftp
-  build_ses      = local.application_data.accounts[local.environment].build_ses
-  build_ec2      = local.application_data.accounts[local.environment].build_ec2
-  build_transfer = local.application_data.accounts[local.environment].build_transfer
+  build_s3              = local.application_data.accounts[local.environment].build_s3
+  build_ftp             = local.application_data.accounts[local.environment].build_ftp
+  build_ses             = local.application_data.accounts[local.environment].build_ses
+  build_ec2             = local.application_data.accounts[local.environment].build_ec2
+  build_transfer        = local.application_data.accounts[local.environment].build_transfer
+  build_hub_integration = local.application_data.accounts[local.environment].build_hub_integration
 
   ftp_layer_bucket          = local.application_data.accounts[local.environment].ftp_layer_bucket
   ftp_layer_folder_location = local.application_data.accounts[local.environment].ftp_layer_folder_location
