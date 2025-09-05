@@ -87,7 +87,7 @@
       ],
       "Principal": {
         "AWS": ["arn:aws:iam::${root_account_id}:root"]
-      }
+      },
     }
   ]
 }
