@@ -39,7 +39,7 @@ resource "aws_security_group" "lambda_security_group" {
   }
 
   lifecycle {
-    prevent_destroy = true
+    ignore_changes = [ingress, egress]
   }
 
   tags = merge(local.tags,
