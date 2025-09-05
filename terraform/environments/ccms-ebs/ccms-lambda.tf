@@ -24,19 +24,19 @@ resource "aws_security_group" "lambda_security_group" {
   description = "SG traffic control for Payment Load Lambda"
   vpc_id      = data.aws_vpc.shared.id
 
-  # ingress {
-  #   from_port   = 1521
-  #   to_port     = 1522
-  #   protocol    = "tcp"
-  #   cidr_blocks = [data.aws_vpc.shared.cidr_block]
-  # }
+  ingress {
+    from_port   = 1521
+    to_port     = 1522
+    protocol    = "tcp"
+    cidr_blocks = [data.aws_vpc.shared.cidr_block]
+  }
 
-  # egress {
-  #   from_port   = 0
-  #   to_port     = 0
-  #   protocol    = "-1"
-  #   cidr_blocks = ["0.0.0.0/0"]
-  # }
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
   lifecycle {
     prevent_destroy = true
@@ -47,25 +47,25 @@ resource "aws_security_group" "lambda_security_group" {
   )
 }
 
-# ingress rule of lambda_security_group
-resource "aws_security_group_rule" "lambda_ingress" {
-  security_group_id = aws_security_group.lambda_security_group.id
-  type              = "ingress"
-  from_port         = 1521
-  to_port           = 1522
-  protocol          = "tcp"
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-}
+# # ingress rule of lambda_security_group
+# resource "aws_security_group_rule" "lambda_ingress" {
+#   security_group_id = aws_security_group.lambda_security_group.id
+#   type              = "ingress"
+#   from_port         = 1521
+#   to_port           = 1522
+#   protocol          = "tcp"
+#   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+# }
 
-# Egress rule of lambda_security_group
-resource "aws_security_group_rule" "lambda_egress" {
-  security_group_id = aws_security_group.lambda_security_group.id
-  type              = "egress"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
-  cidr_blocks       = ["0.0.0.0/0"]
-}
+# # Egress rule of lambda_security_group
+# resource "aws_security_group_rule" "lambda_egress" {
+#   security_group_id = aws_security_group.lambda_security_group.id
+#   type              = "egress"
+#   from_port         = 0
+#   to_port           = 0
+#   protocol          = "-1"
+#   cidr_blocks       = ["0.0.0.0/0"]
+# }
 
 # Lambda Function
 resource "aws_lambda_function" "lambda_function" {
