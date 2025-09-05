@@ -68,28 +68,6 @@
           "aws:SourceAccount": ["${account_id}"]
         }
       }
-    },
-    {
-      "Sid": "Allow Management Account to Read and Write",
-      "Effect": "Allow",
-      "Action": [
-        "s3:PutObject", 
-        "s3:PutObjectAcl",
-        "s3:ListBucket",
-        "s3:GetObject",
-        "s3:GetObjectAcl"
-      ],
-      "Resource": [
-        "arn:aws:s3:::moj-cur-reports-v2-hourly",
-        "arn:aws:s3:::moj-cur-reports-v2-hourly/*",
-        "arn:aws:s3:::${bucket_name}/moj-cost-and-usage-reports/*",
-        "arn:aws:s3:::${bucket_name}"
-      ],
-      "Condition": {
-        "StringEquals": {
-          "aws:PrincipalAccount": "${root_account_id}"
-        }
-      }
     }
   ]
 }
