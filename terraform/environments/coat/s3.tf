@@ -59,6 +59,12 @@ module "cur_s3_kms" {
         "kms:GenerateDataKey*"],
       resources = ["${local.kms_master_key_id}"],
       effect    = "Allow"
+      principals = [
+        {
+          type        = "AWS"
+          identifiers = ["arn:aws:iam::${local.coat_prod_account_id}:root"]
+        } 
+      ]
     }
   ]
 
