@@ -259,7 +259,7 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 224 }
           "/dev/sde"  = { type = "gp3", size = 500 }
           "/dev/sdf"  = { type = "gp3", size = 100 }
-          "/dev/sdg"  = { type = "gp3", size = 85 }
+          "/dev/sdg"  = { type = "gp3", size = 170 } # S: drive
           "/dev/sdh"  = { type = "gp3", size = 150 } # T: drive
           "/dev/sdi"  = { type = "gp3", size = 250 } # U: drive
         }
