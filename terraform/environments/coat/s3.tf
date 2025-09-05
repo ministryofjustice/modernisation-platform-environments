@@ -50,6 +50,15 @@ module "cur_s3_kms" {
           identifiers = ["glue.amazonaws.com"]
         }
       ]
+    },
+    {
+      sid = "AllowDecryptMasterCurData"
+      actions = [
+        "kms:Decrypt*",
+        "kms:DescribeKey",
+        "kms:GenerateDataKey*"],
+      resources = ["${local.kms_master_key_id}"],
+      effect    = "Allow"
     }
   ]
 
