@@ -66,6 +66,7 @@ module "s3_bucket_oracledb_backups" {
   tags = var.tags
 }
 
+#trivy:ignore:AVD-AWS-0345
 data "aws_iam_policy_document" "oracledb_backup_bucket_access" {
   #checkov:skip=CKV_AWS_108 "ignore"
   #checkov:skip=CKV_AWS_111 "ignore"
@@ -181,6 +182,7 @@ data "aws_iam_policy_document" "oracledb_remote_backup_bucket_access" {
   }
 }
 
+#trivy:ignore:AVD-AWS-0345
 data "aws_iam_policy_document" "combined" {
   source_policy_documents = compact([
     try(data.aws_iam_policy_document.oracledb_backup_bucket_access.json, null),

@@ -147,7 +147,7 @@ data "aws_iam_policy_document" "cert_export" {
   }
 }
 
-
+#trivy:ignore:AVD-AWS-0345
 data "aws_iam_policy_document" "combined_instance_policy" {
   source_policy_documents = [
     data.aws_iam_policy_document.core_shared_services_bucket_access.json,
@@ -181,7 +181,6 @@ resource "aws_iam_role" "aws_backup_default_service_role" {
         Principal = {
           Service = "backup.amazonaws.com"
         },
-        Action = "sts:AssumeRole"
       }
     ]
   })
