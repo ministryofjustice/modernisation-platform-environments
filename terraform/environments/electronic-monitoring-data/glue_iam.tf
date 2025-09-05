@@ -192,6 +192,23 @@ resource "aws_iam_policy" "glue_user_restricted_notebook_service_role_iam_policy
                     ]
                 }
             }
+        },
+         {  
+            "Sid": "GlueMaintCreateOpt",
+            "Effect": "Allow",
+            "Action": "glue:CreateTableOptimizer",
+            "Resource": "arn:aws:glue:eu-west-2:${local.env_account_id}:*"
+        },
+        {
+            "Sid": "GlueMaint",
+            "Effect": "Allow",
+            "Action": "iam:PassRole",
+            "Resource": "arn:aws:iam::${local.env_account_id}:role/glue-iceberg-opt-role",
+            "Condition": {
+                "StringEquals": {
+                    "iam:PassedToService": "glue.amazonaws.com"
+                }
+            }
         }
     ]
 }
@@ -260,6 +277,11 @@ resource "aws_iam_role" "glue_iceberg_opt_role" {
       }
     ]
   })
+}
+
+resource "aws_iam_role_policy_attachment" "glue_maint_extra_perms" {
+  role       = aws_iam_role.glue_iceberg_opt_role.name
+  policy_arn = aws_iam_policy.glue_user_restricted_notebook_service_role_iam_policy.arn
 }
 
 resource "aws_iam_role_policy" "glue_iceberg_opt_policy" {
