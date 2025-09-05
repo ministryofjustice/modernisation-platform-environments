@@ -85,11 +85,9 @@
         "arn:aws:s3:::${bucket_name}/moj-cost-and-usage-reports/*",
         "arn:aws:s3:::${bucket_name}"
       ],
-      "Condition": {
-        "StringEquals": {
-          "aws:PrincipalAccount": "${root_account_id}"
-        }
-      }
+      "Principal": {
+        "AWS": ["arn:aws:iam::${root_account_id}:root"]
+      },
     }
   ]
 }
