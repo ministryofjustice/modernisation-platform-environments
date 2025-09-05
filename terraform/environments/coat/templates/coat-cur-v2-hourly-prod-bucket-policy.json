@@ -83,7 +83,7 @@
         "arn:aws:s3:::moj-cur-reports-v2-hourly",
         "arn:aws:s3:::moj-cur-reports-v2-hourly/*",
         "arn:aws:s3:::${bucket_name}/moj-cost-and-usage-reports/*",
-        "arn:aws:s3:::${bucket_name}",
+        "arn:aws:s3:::${bucket_name}"
       ],
       "Condition": {
         "StringEquals": {
