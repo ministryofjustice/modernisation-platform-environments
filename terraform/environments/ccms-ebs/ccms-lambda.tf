@@ -24,10 +24,6 @@ resource "aws_security_group" "lambda_security_group" {
   description = "SG traffic control for Payment Load Lambda"
   vpc_id      = data.aws_vpc.shared.id
 
-  lifecycle {
-    ignore_changes = [ingress, egress]
-  }
-
   tags = merge(local.tags,
     { Name = "${local.application_name}-${local.environment}-lambda-sg" }
   )
