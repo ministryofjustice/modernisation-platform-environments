@@ -39,7 +39,7 @@ locals {
       #       "source_environment" = "preprod"
     },
     "training" = {
-      
+
     }
   }
 

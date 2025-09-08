@@ -375,7 +375,7 @@ resource "aws_iam_role" "rds_s3_access" {
 }
 
 resource "aws_iam_policy" "rds_s3_access_policy" {
-  count = length(trimspace(var.hub20_s3_bucket != null ? var.hub20_s3_bucket : "")) > 0 ? 1 : 0
+  count       = length(trimspace(var.hub20_s3_bucket != null ? var.hub20_s3_bucket : "")) > 0 ? 1 : 0
   name        = "rds-hub20-s3-bucket-policy"
   description = "Allow Oracle RDS instance to read objects from HUB 2.0 S3 bucket"
 
@@ -401,7 +401,7 @@ resource "aws_iam_policy" "rds_s3_access_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "rds_s3_access_policy_attachment" {
-  count = length(trimspace(var.hub20_s3_bucket != null ? var.hub20_s3_bucket : "")) > 0 ? 1 : 0
+  count      = length(trimspace(var.hub20_s3_bucket != null ? var.hub20_s3_bucket : "")) > 0 ? 1 : 0
   role       = aws_iam_role.rds_s3_access.name
   policy_arn = aws_iam_policy.rds_s3_access_policy[0].arn
 }

@@ -17,7 +17,7 @@ terraform {
       version = ">= 3.0.0"
     }
     awscc = {
-      source = "hashicorp/awscc"
+      source  = "hashicorp/awscc"
       version = "~> 1.0"
     }
   }
