@@ -7,10 +7,10 @@ locals {
   ho_acct_id   = local.is-production || local.is-test ? data.aws_secretsmanager_secret_version.home_office_account_id[0].secret_string : "000000000000"
   ho_role_arn  = "arn:aws:iam::${local.ho_acct_id}:role/DACC-DataScience-TL"
   ho_admin_arn = "arn:aws:iam::${local.ho_acct_id}:role/HO-FullAdmin"
-  databases_to_share = [
+  databases_to_share = local.is-test ? [
     "serco_servicenow_curated${local.dbt_suffix}",
     "allied_mdss${local.db_suffix}"
-  ]
+  ] : []
 }
 
 resource "aws_lakeformation_permissions" "home_office_share_bucket" {
@@ -72,7 +72,6 @@ resource "aws_lakeformation_permissions" "home_office_admin_share_table" {
 
 resource "aws_lakeformation_permissions" "home_office_share_live_databases" {
   for_each = toset(local.databases_to_share)
-  count       = local.is-test ? 1 : 0
   principal   = local.ho_role_arn
   permissions = ["DESCRIBE"]
   database {
@@ -82,7 +81,6 @@ resource "aws_lakeformation_permissions" "home_office_share_live_databases" {
 
 resource "aws_lakeformation_permissions" "home_office_share_live_tables" {
   for_each = toset(local.databases_to_share)
-  count       = local.is-test ? 1 : 0
   principal   = local.ho_role_arn
   permissions = ["SELECT"]
   table {
