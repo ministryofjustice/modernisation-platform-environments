@@ -75,3 +75,7 @@ locals {
   acm_subject_alternative_names = [local.app_url]
 
 }
+
+module "ip_addresses" {
+  source = "../../modules/ip_addresses"
+}

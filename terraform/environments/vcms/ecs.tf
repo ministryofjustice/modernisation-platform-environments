@@ -57,6 +57,8 @@ module "vcms_service" {
     }
   ]
 
+  certificate_arn = aws_acm_certificate.external.arn
+
   platform_vars = {
     environment_management = local.environment_management
   }
