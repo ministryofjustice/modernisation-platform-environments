@@ -34,7 +34,7 @@
       "build_transfer": false,
       "build_ses": true,
       "build_ec2": true,
-      "build_hub_integration" : true,
+      "build_hub_integration": true,
       "pagerduty_integration_key_name": "laa_maat_nonprod_alarms",
       "hosted_zone": "modernisation-platform.service.justice.gov.uk",
       "ses_domain": "maatdb.dev.modernisation-platform.service.justice.gov.uk",
