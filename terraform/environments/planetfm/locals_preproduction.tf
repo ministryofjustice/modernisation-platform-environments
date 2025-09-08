@@ -13,6 +13,20 @@ locals {
   # please keep resources in alphabetical order
   baseline_preproduction = {
 
+    cloudwatch_dashboards = {
+      "CloudWatch-Default" = {
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.network_lb,
+          local.cloudwatch_dashboard_widget_groups.db,
+          local.cloudwatch_dashboard_widget_groups.app,
+          local.cloudwatch_dashboard_widget_groups.web,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ssm_command,
+        ]
+      }
+    }
+
     ec2_instances = {
 
       # app servers

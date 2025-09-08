@@ -58,6 +58,7 @@ locals {
           module.baseline_presets.cloudwatch_dashboard_widget_groups.lb,
           local.cloudwatch_dashboard_widget_groups.db,
           local.cloudwatch_dashboard_widget_groups.syscon,
+          local.cloudwatch_dashboard_widget_groups.asg,
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ssm_command,
         ]
       }

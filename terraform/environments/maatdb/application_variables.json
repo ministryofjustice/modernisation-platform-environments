@@ -34,6 +34,7 @@
       "build_transfer": false,
       "build_ses": true,
       "build_ec2": true,
+      "build_hub_integration": true,
       "pagerduty_integration_key_name": "laa_maat_nonprod_alarms",
       "hosted_zone": "modernisation-platform.service.justice.gov.uk",
       "ses_domain": "maatdb.dev.modernisation-platform.service.justice.gov.uk",
@@ -44,7 +45,7 @@
       "ftp_lambda_source_file": "ftpclient_1.2.zip",
       "ftp_lambda_source_file_version": "LKYb32.Rqjizm17IiAsa.YZhOXfumTGj",
       "zip_lambda_source_file": "zip_s3_objects.zip",
-      "zip_lambda_source_file_version": ".wom0wRS4Mwe.11JXs8XIFy4xT8dEXW9",
+      "zip_lambda_source_file_version": "TevkiwEbMJttB_5X7VX03Sas1u6ONJbE",
       "ftp_lambda_eventbridge_cron": "cron(0 * * * ? 2999)",
       "zip_lambda_eventbridge_cron": "cron(45 6 * * ? 2999)"
     },
@@ -81,6 +82,7 @@
       "build_transfer": false,
       "build_ses": true,
       "build_ec2": false,
+      "build_hub_integration": false,
       "pagerduty_integration_key_name": "laa_maat_nonprod_alarms",
       "hosted_zone": "modernisation-platform.service.justice.gov.uk",
       "ses_domain": "maatdb.tst.modernisation-platform.service.justice.gov.uk",
@@ -91,7 +93,7 @@
       "ftp_lambda_source_file": "ftpclient_1.2.zip",
       "ftp_lambda_source_file_version": "LKYb32.Rqjizm17IiAsa.YZhOXfumTGj",
       "zip_lambda_source_file": "zip_s3_objects.zip",
-      "zip_lambda_source_file_version": ".wom0wRS4Mwe.11JXs8XIFy4xT8dEXW9",
+      "zip_lambda_source_file_version": "TevkiwEbMJttB_5X7VX03Sas1u6ONJbE",
       "ftp_lambda_eventbridge_cron": "cron(0 * * * ? 2999)",
       "zip_lambda_eventbridge_cron": "cron(45 6 * * ? 2999)"
     },
@@ -127,6 +129,7 @@
       "build_transfer": false,
       "build_ses": true,
       "build_ec2": false,
+      "build_hub_integration": false,
       "pagerduty_integration_key_name": "laa_maat_nonprod_alarms",
       "hosted_zone": "modernisation-platform.service.justice.gov.uk",
       "ses_domain": "maatdb.uat.modernisation-platform.service.justice.gov.uk",
@@ -137,7 +140,7 @@
       "ftp_lambda_source_file": "ftpclient_1.2.zip",
       "ftp_lambda_source_file_version": "LKYb32.Rqjizm17IiAsa.YZhOXfumTGj",
       "zip_lambda_source_file": "zip_s3_objects.zip",
-      "zip_lambda_source_file_version": ".wom0wRS4Mwe.11JXs8XIFy4xT8dEXW9",
+      "zip_lambda_source_file_version": "TevkiwEbMJttB_5X7VX03Sas1u6ONJbE",
       "ftp_lambda_eventbridge_cron": "cron(0 * * * ? 2999)",
       "zip_lambda_eventbridge_cron": "cron(45 6 * * ? 2999)"
     },
@@ -174,6 +177,7 @@
       "build_transfer": false,
       "build_ses": true,
       "build_ec2": false,
+      "build_hub_integration": false,
       "pagerduty_integration_key_name": "laa_maat_prod_alarm",
       "hosted_zone": "legalservices.gov.uk",
       "ses_domain": "legalservices.gov.uk",
@@ -184,7 +188,7 @@
       "ftp_lambda_source_file": "ftpclient_1.2.zip",
       "ftp_lambda_source_file_version": "LKYb32.Rqjizm17IiAsa.YZhOXfumTGj",
       "zip_lambda_source_file": "zip_s3_objects.zip",
-      "zip_lambda_source_file_version": ".wom0wRS4Mwe.11JXs8XIFy4xT8dEXW9",
+      "zip_lambda_source_file_version": "TevkiwEbMJttB_5X7VX03Sas1u6ONJbE",
       "ftp_lambda_eventbridge_cron": "cron(0 * * * ? *)",
       "zip_lambda_eventbridge_cron": "cron(45 6 * * ? *)"
     }

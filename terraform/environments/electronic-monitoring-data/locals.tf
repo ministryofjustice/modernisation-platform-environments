@@ -288,18 +288,14 @@ locals {
   sftp_account_dev = {
     name = "dev_access"
     ssh_keys = [
-      # Matt Price
-      "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBA3BsCFaNiGxbmJffRi9q/W3aLmZWgqE6QkeFJD5O6F4nDdjsV1R0ZMUvTSoi3tKqoAE+1RYYj2Ra/F1buHov9e+sFPrlMl0wql6uMsBA1ndiIiKuq+NLY1NOxEvqm2J9Q==",
       # Matt Heery
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILaZQpz+vBuSa74wW53ONB5ueGfFzotLYaZDPBe/NfKU matt.heery@justice.gov.uk",
+      "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDPo/IGYprUoZqGHzy6pgkSDKy4zY2+xYYWELaK5uMjK+2YIHm99vIVlEsqQIdrH/NlBIKxa97eDRBj3n5NMhrjg7g6hiuzqeJVKx21SBBhfMvFxHgrLWW8ZiaJ+PWHda5LH7BLW6QvMyh4dI/Jl26JvYLvnkXB5QA/MbaHxt59ueBjjxH/+877dHri41aGMqf01UjVCcBC2wqAUCngC3UZvtjbMVSkWlcyKIx8DI+YnThSVbfT7HxAMhbrcO296Ec/G7sfVHibr+pBHqGOSODkRVKezXCIi+UUBJ94c/p17eV+MlTAqvRKvxJ2rvd50UtDvwsTEYvJjptaTEtxY4az matt-heery",
     ]
     cidr_ipv4s = [
-      # fy nhy
-      "2.31.200.65/32",
+      # 10 SC
+      "51.149.2.6/32",
       # Petty France
       "213.121.161.124/32",
-      # my house
-      "81.179.238.104/32"
     ]
     cidr_ipv6s = []
   }
