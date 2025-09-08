@@ -11,7 +11,6 @@
     },
     "production": {
       "example_var": "production-data"
-
     }
   }
 }
