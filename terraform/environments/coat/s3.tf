@@ -82,7 +82,6 @@ module "cur_v2_hourly" {
       bucket_name           = "coat-${local.environment}-cur-v2-hourly"
       environment           = local.environment
       root_account_id       = local.environment_management.aws_organizations_root_account_id
-      cross_env_account_id  = local.coat_prod_account_id
       account_id            = data.aws_caller_identity.current.account_id
     }
   )

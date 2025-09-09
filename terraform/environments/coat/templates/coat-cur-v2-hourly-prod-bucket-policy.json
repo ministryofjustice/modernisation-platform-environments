@@ -78,7 +78,7 @@
         "arn:aws:s3:::${bucket_name}"
       ],
       "Principal": {
-        "arn:aws:iam::${cross_env_account_id}:role/moj-coat-${prod_environment}-cur-reports-cross-role"
+        "arn:aws:iam::${account_id}:role/moj-coat-${environment}-cur-reports-cross-role"
       },
     }
   ]
