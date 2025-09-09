@@ -84,18 +84,6 @@ resource "aws_security_group" "datasync_agent" {
   )
 }
 
-# Allow outbound HTTPS for DataSync service communication (via internet/NAT gateway)
-resource "aws_vpc_security_group_egress_rule" "datasync_agent_https" {
-  count = var.datasync_config != null ? 1 : 0
-
-  security_group_id = aws_security_group.datasync_agent[0].id
-  description       = "HTTPS to DataSync service (via internet)"
-  cidr_ipv4         = "0.0.0.0/0"
-  from_port         = 443
-  ip_protocol       = "tcp"
-  to_port           = 443
-}
-
 # Allow communication with FSX share
 resource "aws_vpc_security_group_egress_rule" "datasync_agent_smb" {
   count = var.datasync_config != null ? 1 : 0
@@ -173,13 +161,7 @@ resource "aws_iam_role_policy" "datasync_s3_source_policy" {
           "s3:ListBucket",
           "s3:ListBucketMultipartUploads",
           "s3:ListBucketVersions",
-          "s3:GetBucketVersioning"
-        ]
-        Resource = var.datasync_config.source_s3_bucket_arn
-      },
-      {
-        Effect = "Allow"
-        Action = [
+          "s3:GetBucketVersioning",
           "s3:GetObject",
           "s3:GetObjectTagging",
           "s3:GetObjectVersion",
@@ -187,7 +169,10 @@ resource "aws_iam_role_policy" "datasync_s3_source_policy" {
           "s3:GetObjectAcl",
           "s3:GetObjectVersionAcl"
         ]
-        Resource = "${var.datasync_config.source_s3_bucket_arn}/*"
+        Resource = [
+          var.datasync_config.source_s3_bucket_arn,
+          "${var.datasync_config.source_s3_bucket_arn}/*"
+        ]
       }
     ]
   })
