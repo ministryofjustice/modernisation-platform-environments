@@ -80,22 +80,10 @@ resource "aws_lb_listener" "frontend_https" {
   port              = 443
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = aws_acm_certificate.frontend_cert.arn
+  certificate_arn   = aws_acm_certificate.external.arn
 
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.frontend.arn
-  }
-}
-
-# Certificate
-resource "aws_acm_certificate" "frontend_cert" {
-  domain_name       = local.domain
-  validation_method = "DNS"
-
-  subject_alternative_names = local.acm_subject_alternative_names
-
-  tags = {
-    Name = "frontend-cert"
   }
 }
