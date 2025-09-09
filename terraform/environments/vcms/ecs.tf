@@ -80,6 +80,22 @@ module "container_definition" {
   readonly_root_filesystem = false
 
   environment = [
+    {
+      name  = "REDIS_HOST"
+      value = aws_elasticache_cluster.redis.cache_nodes[0].address
+    },
+    {
+      name  = "REDIS_PORT"
+      value = "6379"
+    },
+    {
+        name  = "REDIS_DB"
+        value = "0"
+    },
+    {
+      name  = "REDIS_CACHE_DB"
+      value = "1"
+    }
   ]
 
   secrets = [
