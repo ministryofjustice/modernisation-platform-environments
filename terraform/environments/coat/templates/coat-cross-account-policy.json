@@ -9,7 +9,10 @@
         "arn:aws:s3:::coat-${environment}-cur-v2-hourly",
         "arn:aws:s3:::coat-${environment}-cur-v2-hourly/*",
         "arn:aws:s3:::coat-reports-${environment}",
-        "arn:aws:s3:::coat-reports-${environment}/*"
+        "arn:aws:s3:::coat-reports-${environment}/*",
+        "arn:aws:s3:::moj-cur-reports-v2-hourly",
+        "arn:aws:s3:::moj-cur-reports-v2-hourly/*"
+
       ]
     },
     {
@@ -29,7 +32,7 @@
       "Sid": "KMS3CrossAccountAccess",
       "Effect": "Allow",
       "Action": ["kms:Decrypt", "kms:DescribeKey", "kms:GenerateDataKey*"],
-      "Resource": ["${kms_master_key_id}", "${kms_dev_key_id}, "${kms_master_key_id}"]
+      "Resource": ["${kms_master_key_id}", "${kms_dev_key_id}, "${kms_dev_prod_id}"]
     }
   ]
 }
