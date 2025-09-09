@@ -79,7 +79,7 @@
       ],
       "Principal": {
         "arn:aws:iam::${account_id}:role/moj-coat-${environment}-cur-reports-cross-role"
-      },
+      }
     }
   ]
 }
