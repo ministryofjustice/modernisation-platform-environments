@@ -12,6 +12,7 @@ resource "aws_db_instance" "mariadb" {
   username             = local.db_root_user
   password             = random_id.db_password.b64_url
   parameter_group_name = aws_db_parameter_group.vcms-10-5.name
+  db_subnet_group_name   = aws_db_subnet_group.mariadb.name 
   skip_final_snapshot  = true
 }
 
