@@ -29,10 +29,6 @@ resource "aws_vpc_endpoint" "datasync" {
   )
 }
 
-data "aws_region" "current" {
-  count = var.datasync_config != null ? 1 : 0
-}
-
 resource "aws_security_group" "datasync_vpc_endpoint" {
   count = var.datasync_config != null ? 1 : 0
 
