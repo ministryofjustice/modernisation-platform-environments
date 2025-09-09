@@ -11,52 +11,10 @@ data "aws_subnet" "private_subnet" {
 }
 
 #############################################
-### VPC Endpoints for DataSync (for automated activation)
+### VPC Endpoints for DataSync (NOT SUPPORTED in shared VPCs)
 #############################################
-resource "aws_vpc_endpoint" "datasync" {
-  count = var.datasync_config != null ? 1 : 0
-
-  vpc_id              = var.account_info.vpc_id
-  service_name        = "com.amazonaws.${data.aws_region.current.name}.datasync"
-  vpc_endpoint_type   = "Interface"
-  subnet_ids          = [var.account_config.private_subnet_ids[0]]
-  security_group_ids  = [aws_security_group.datasync_vpc_endpoint[0].id]
-  private_dns_enabled = true
-
-  tags = merge(
-    local.tags,
-    { Name = "${var.app_name}-${var.env_name}-datasync-vpc-endpoint" }
-  )
-}
-
-resource "aws_security_group" "datasync_vpc_endpoint" {
-  count = var.datasync_config != null ? 1 : 0
-
-  name        = "${var.app_name}-${var.env_name}-datasync-vpc-endpoint"
-  description = "Security group for DataSync VPC endpoint"
-  vpc_id      = var.account_info.vpc_id
-
-  ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = [var.account_config.shared_vpc_cidr]
-    description = "HTTPS from VPC"
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-    description = "All outbound"
-  }
-
-  tags = merge(
-    local.tags,
-    { Name = "${var.app_name}-${var.env_name}-datasync-vpc-endpoint" }
-  )
-}
+# NOTE: VPC endpoints cannot be created in shared VPCs, so DataSync agent
+# will need to be activated manually or use public internet for activation
 
 #############################################
 ### Secrets Manager for FSX Credentials
@@ -126,16 +84,16 @@ resource "aws_security_group" "datasync_agent" {
   )
 }
 
-# Allow outbound HTTPS for DataSync service communication via VPC endpoint
-resource "aws_vpc_security_group_egress_rule" "datasync_agent_https_vpc" {
+# Allow outbound HTTPS for DataSync service communication (via internet/NAT gateway)
+resource "aws_vpc_security_group_egress_rule" "datasync_agent_https" {
   count = var.datasync_config != null ? 1 : 0
 
-  security_group_id            = aws_security_group.datasync_agent[0].id
-  description                  = "HTTPS to DataSync VPC endpoint"
-  referenced_security_group_id = aws_security_group.datasync_vpc_endpoint[0].id
-  from_port                    = 443
-  ip_protocol                  = "tcp"
-  to_port                      = 443
+  security_group_id = aws_security_group.datasync_agent[0].id
+  description       = "HTTPS to DataSync service (via internet)"
+  cidr_ipv4         = "0.0.0.0/0"
+  from_port         = 443
+  ip_protocol       = "tcp"
+  to_port           = 443
 }
 
 # Allow communication with FSX share
@@ -233,27 +191,6 @@ resource "aws_iam_role_policy" "datasync_s3_source_policy" {
       }
     ]
   })
-}
-
-#############################################
-### DataSync Agent (fully automated)
-#############################################
-resource "aws_datasync_agent" "dfi_sync_agent" {
-  count = var.datasync_config != null ? 1 : 0
-
-  name = "${var.app_name}-${var.env_name}-dfi-sync-agent"
-
-  # Using VPC endpoint for automated activation
-  subnet_arns         = [data.aws_subnet.private_subnet[0].arn]
-  security_group_arns = [aws_security_group.datasync_agent[0].arn]
-  vpc_endpoint_id     = aws_vpc_endpoint.datasync[0].id
-
-  tags = merge(
-    local.tags,
-    { Name = "${var.app_name}-${var.env_name}-dfi-sync-agent" }
-  )
-
-  depends_on = [aws_vpc_endpoint.datasync]
 }
 
 #############################################
@@ -355,7 +292,6 @@ resource "aws_cloudwatch_log_group" "datasync_logs" {
 
   name              = "/aws/datasync/${var.app_name}-${var.env_name}-dfi-sync"
   retention_in_days = 30
-  kms_key_id        = var.account_config.kms_keys.general_shared
 
   tags = merge(
     local.tags,
