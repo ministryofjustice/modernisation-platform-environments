@@ -35,9 +35,9 @@ locals {
     container_cpu = "512"
     task_memory = "1024"
     desired_count = 1
-    deployment_maximum_percent = 200
-    deployment_minimum_healthy_percent = 50
-    health_check_grace_period_seconds = 300
+    deployment_maximum_percent = 100
+    deployment_minimum_healthy_percent = 0
+    health_check_grace_period_seconds = 60
   }
 
   bastion_config = {}
