@@ -28,8 +28,8 @@
     {
       "Sid": "KMS3CrossAccountAccess",
       "Effect": "Allow",
-      "Action": ["kms:Decrypt", "kms:DescribeKey", "kms:GenerateDataKey*"],
-      "Resource": ["${kms_master_key_id}", "${kms_dev_key_id}, "${kms_master_key_id}"]
+      "Action": ["kms:Decrypt", "kms:DescribeKey", "kms:GenerateDataKey*", "kms:Encrypt"],
+      "Resource": ["${kms_master_key_id}", "${kms_dev_key_id}", "${kms_prod_key_id}"]
     }
   ]
 }
