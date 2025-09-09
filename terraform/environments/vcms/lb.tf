@@ -19,6 +19,8 @@ resource "aws_lb_target_group" "frontend" {
     cookie_duration = 86400
   }
 
+  target_type = "ip"
+
   tags = local.tags
 }
 
