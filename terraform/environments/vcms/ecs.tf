@@ -9,6 +9,7 @@ module "ecs" {
 resource "aws_security_group" "cluster" {
   name_prefix = "ecs-cluster-${local.environment}"
   vpc_id      = local.account_config.shared_vpc_id
+  description = "ECS cluster SG"
   lifecycle {
     create_before_destroy = true
   }
