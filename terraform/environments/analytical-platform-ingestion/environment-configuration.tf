@@ -25,9 +25,7 @@ locals {
       notify_image_version   = "0.0.23"
 
       /* Target Buckets */
-      target_buckets = [
-        "mojap-land-dev",
-      "mojap-land-dev/laa/dev/maatxhibit"]
+      target_buckets              = ["mojap-land-dev"]
       datasync_target_buckets     = ["mojap-land-dev"]
       datasync_opg_target_buckets = ["mojap-data-production-datasync-opg-ingress-development"]
 
