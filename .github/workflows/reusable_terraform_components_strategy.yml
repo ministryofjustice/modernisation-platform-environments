@@ -171,7 +171,7 @@ jobs:
             fi
 
             for f in $changed_files; do
-              module_name=$(dirname "${f#$modules_dir/}" | cut -d'/' -f1)
+              module_name=$(dirname "${f#$modules_dir/}")
               if [[ ! " ${changed_modules[@]} " =~ " ${module_name} " ]]; then
                 changed_modules+=("$module_name")
               fi

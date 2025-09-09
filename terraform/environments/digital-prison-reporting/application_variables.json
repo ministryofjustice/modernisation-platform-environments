@@ -178,6 +178,10 @@
           "data_locations": ["dpr-structured-historical-development"],
           "resource_shares": [
             {
+              "glue_database": "dpr_ap_integration_test_newtag_dev_dbt",
+              "glue_tables": ["*"]
+            },
+            {
               "glue_database": "curated_prisons_history_dev_dbt",
               "glue_tables": ["*"]
             }

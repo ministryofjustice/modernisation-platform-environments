@@ -30,5 +30,5 @@ module "dms_validation_step_function" {
       "dms_validation" = module.dms_validation[0].lambda_function_name,
     }
   )
-  type = "EXPRESS"
+  type = "STANDARD"
 }
