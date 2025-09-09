@@ -98,7 +98,10 @@ data "aws_secretsmanager_secret_version" "datasync_fsx_credentials" {
 }
 
 locals {
-  fsx_credentials = var.datasync_config != null ? jsondecode(data.aws_secretsmanager_secret_version.datasync_fsx_credentials[0].secret_string) : {}
+  fsx_credentials = var.datasync_config != null ? jsondecode(data.aws_secretsmanager_secret_version.datasync_fsx_credentials[0].secret_string) : {
+    username = "PLACEHOLDER_USERNAME"
+    password = "PLACEHOLDER_PASSWORD"
+  }
 
   # Check if credentials are still placeholders
   credentials_are_real = var.datasync_config != null ? (
@@ -276,13 +279,15 @@ resource "aws_datasync_location_s3" "dfi_source_bucket" {
 ### DataSync FSX Location (Destination)
 #############################################
 resource "aws_datasync_location_fsx_windows_file_system" "dfi_fsx_destination" {
-  count = var.datasync_config != null && local.credentials_are_real ? 1 : 0
+  count = var.datasync_config != null ? 1 : 0
 
   # Use FSX file system ARN and specific subdirectory for DFI reports
   fsx_filesystem_arn = aws_fsx_windows_file_system.mis_share.arn
   subdirectory       = "/share/dfiinterventions/dfi"
 
-  # Authentication details
+  # Authentication details - using local values that will be set from secrets
+  # NOTE: The credentials must be manually updated in Secrets Manager after initial deployment
+  # for the DataSync task to function properly
   user     = local.fsx_credentials.username
   password = local.fsx_credentials.password
   domain   = var.datasync_config.fsx_domain
@@ -303,7 +308,7 @@ resource "aws_datasync_location_fsx_windows_file_system" "dfi_fsx_destination" {
 ### DataSync Task
 #############################################
 resource "aws_datasync_task" "dfi_s3_to_fsx" {
-  count = var.datasync_config != null && local.credentials_are_real ? 1 : 0
+  count = var.datasync_config != null ? 1 : 0
 
   name                     = "${var.app_name}-${var.env_name}-dfi-s3-to-fsx-sync"
   source_location_arn      = aws_datasync_location_s3.dfi_source_bucket[0].arn
@@ -358,7 +363,7 @@ resource "aws_cloudwatch_log_group" "datasync_logs" {
 
   name              = "/aws/datasync/${var.app_name}-${var.env_name}-dfi-sync"
   retention_in_days = 30
-  kms_key_id        = var.account_config.kms_keys.cloudwatch
+  kms_key_id        = var.account_config.kms_keys.general_shared
 
   tags = merge(
     local.tags,
