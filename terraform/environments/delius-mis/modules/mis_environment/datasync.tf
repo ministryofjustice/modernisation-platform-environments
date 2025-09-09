@@ -318,15 +318,7 @@ resource "aws_datasync_task" "dfi_s3_to_fsx" {
   cloudwatch_log_group_arn = aws_cloudwatch_log_group.datasync_logs[0].arn
 
   options {
-    # Preserve file attributes and timestamps
-    atime                          = "PRESERVE"
-    mtime                          = "PRESERVE"
-    preserve_deleted_files         = "REMOVE" # Delete files on destination if removed from source
-    preserve_devices               = "NONE"
-    posix_permissions              = "NONE"
-    uid                            = "NONE"
-    gid                            = "NONE"
-    security_descriptor_copy_flags = "OWNER_DACL_SACL"
+    preserve_deleted_files = "PRESERVE" # keep files on the destination if they've been removed from source
 
     # Transfer options - Normal sync behavior
     bytes_per_second = var.datasync_config.bandwidth_throttle != null ? var.datasync_config.bandwidth_throttle : -1
