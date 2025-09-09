@@ -9,6 +9,6 @@ locals {
     }
   )
 
-  service_account_principals = lookup(local.application_data.accounts[local.environment], "service_account_roles", {})
+  service_account_principals     = lookup(local.application_data.accounts[local.environment], "service_account_roles", {})
   allowed_assume_role_principals = merge(local.developer_role_principals, local.service_account_principals)
 }

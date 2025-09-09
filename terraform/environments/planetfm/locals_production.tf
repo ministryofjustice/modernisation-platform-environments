@@ -257,11 +257,11 @@ locals {
           "/dev/sdb"  = { type = "gp3", size = 500 }
           "/dev/sdc"  = { type = "gp3", size = 50 }
           "/dev/sdd"  = { type = "gp3", size = 224 }
-          "/dev/sde"  = { type = "gp3", size = 500 }
+          "/dev/sde"  = { type = "gp3", size = 500, throughput = 250 }
           "/dev/sdf"  = { type = "gp3", size = 100 }
-          "/dev/sdg"  = { type = "gp3", size = 170 } # S: drive
-          "/dev/sdh"  = { type = "gp3", size = 150 } # T: drive
-          "/dev/sdi"  = { type = "gp3", size = 250 } # U: drive
+          "/dev/sdg"  = { type = "gp3", size = 170 }                   # S: drive
+          "/dev/sdh"  = { type = "gp3", size = 150 }                   # T: drive
+          "/dev/sdi"  = { type = "gp3", size = 250, throughput = 250 } # U: drive
         }
         instance = merge(local.ec2_instances.db.instance, {
           disable_api_termination = true

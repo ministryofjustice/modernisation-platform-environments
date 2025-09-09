@@ -48,7 +48,8 @@ resource "aws_iam_policy" "coat_cross_account_policy" {
     {
       environment       = local.environment
       dev_environment   = local.dev_environment
-      kms_master_key_id = module.cur_s3_kms.key_arn
+      kms_master_key_id = local.kms_master_key_id
+      kms_prod_key_id   = local.kms_prod_key_id
       kms_dev_key_id    = local.kms_dev_key_id
     }
   )

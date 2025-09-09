@@ -30,6 +30,13 @@ resource "aws_sqs_queue" "maat_provider_dlq" {
   fifo_queue                = true
   message_retention_seconds = 1209600
   max_message_size          = 262144
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name_short}-${local.environment}-maat-provider-dlq"
+    }
+  )
 }
 
 resource "aws_sqs_queue" "maat_provider_q" {
@@ -66,6 +73,13 @@ resource "aws_sqs_queue" "cclf_provider_dlq" {
   fifo_queue                = true
   message_retention_seconds = 1209600
   max_message_size          = 262144
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name_short}-${local.environment}-cclf-provider-dlq"
+    }
+  )
 }
 
 resource "aws_sqs_queue" "cclf_provider_q" {
@@ -102,6 +116,13 @@ resource "aws_sqs_queue" "ccr_provider_dlq" {
   fifo_queue                = true
   message_retention_seconds = 1209600
   max_message_size          = 262144
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name_short}-${local.environment}-ccr-provider-dlq"
+    }
+  )
 }
 
 resource "aws_sqs_queue" "ccr_provider_q" {
@@ -138,6 +159,13 @@ resource "aws_sqs_queue" "ccms_banks_dlq" {
   fifo_queue                = true
   message_retention_seconds = 1209600
   max_message_size          = 262144
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name_short}-${local.environment}-ccms-banks-dlq"
+    }
+  )
 }
 
 resource "aws_sqs_queue" "ccms_banks_q" {

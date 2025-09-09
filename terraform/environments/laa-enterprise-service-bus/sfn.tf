@@ -132,4 +132,11 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
       }
     }
   })
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name_short}-${local.environment}-cwa-step-function"
+    }
+  )
 }
