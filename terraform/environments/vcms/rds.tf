@@ -1,5 +1,5 @@
 locals {
-    db_name      = "vcms-${local.environment}"
+    db_name      = "vcms"
     db_root_user = "vcms"
 }
 
