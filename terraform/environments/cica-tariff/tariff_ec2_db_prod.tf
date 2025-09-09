@@ -1,7 +1,7 @@
 #keypair for prod db
 
 resource "aws_key_pair" "key_pair_db" {
-  count = local.environment == "production" ? 1 : 0
+  count      = local.environment == "production" ? 1 : 0
   key_name   = lower(format("%s-%s-database-key", local.application_name, local.environment))
   public_key = local.pubkey["database"]
   tags = merge(tomap({
