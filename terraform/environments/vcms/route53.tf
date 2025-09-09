@@ -14,9 +14,11 @@ resource "aws_route53_record" "external" {
   name    = local.app_url
   type    = "A"
 
+  #records = [module.vcms_service.nlb_dns_name]
+
   alias {
-    name                   = aws_lb.external.dns_name
-    zone_id                = aws_lb.external.zone_id
+    name                   = module.vcms_service.nlb_dns_name
+    zone_id                = data.aws_lb.service_nlb.zone_id
     evaluate_target_health = true
   }
 }
