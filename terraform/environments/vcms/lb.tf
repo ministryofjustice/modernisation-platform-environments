@@ -90,8 +90,10 @@ resource "aws_lb_listener" "frontend_https" {
 
 # Certificate
 resource "aws_acm_certificate" "frontend_cert" {
-  domain_name       = local.app_url
+  domain_name       = local.domain
   validation_method = "DNS"
+
+  subject_alternative_names = local.acm_subject_alternative_names
 
   tags = {
     Name = "frontend-cert"
