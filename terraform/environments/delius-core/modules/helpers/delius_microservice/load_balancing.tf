@@ -88,8 +88,8 @@ resource "aws_route53_record" "alb_r53_record" {
 
 # NLB for service interconnectivity
 locals {
-  lb_name_full   = "${var.name}-${var.env_name}-service-nlb"
-  lb_name_short  = "${var.name}-${var.env_name}-nlb"
+  lb_name_full  = "${var.name}-${var.env_name}-service-nlb"
+  lb_name_short = "${var.name}-${var.env_name}-nlb"
   # for training env since it makes the NLB name > 32 which AWS doesnt allow
   # e.g. weblogic-eis-training-service-nlb which is 33 chars
 
