@@ -46,11 +46,11 @@ data "aws_iam_policy_document" "assume_rekognition_role_policy" {
     iterator = principal
 
     content {
-      sid = "Allow${principal.key}Assume"
+      sid    = "Allow${principal.key}Assume"
       effect = "Allow"
       principals {
         identifiers = [principal.value]
-        type = "AWS"
+        type        = "AWS"
       }
       actions = ["sts:AssumeRole"]
     }
@@ -59,16 +59,16 @@ data "aws_iam_policy_document" "assume_rekognition_role_policy" {
 
 # create rekognition role and attach s3 and rekognition policies
 resource "aws_iam_role" "rekognition_role" {
-  name = "rekognition-role"
+  name               = "rekognition-role"
   assume_role_policy = data.aws_iam_policy_document.assume_rekognition_role_policy.json
 }
 
 resource "aws_iam_role_policy_attachment" "rekognition_s3" {
-  role = aws_iam_role.rekognition_role.name
+  role       = aws_iam_role.rekognition_role.name
   policy_arn = aws_iam_policy.rekognition_s3_policy.arn
 }
 
 resource "aws_iam_role_policy_attachment" "rekognition_rekognition" {
-  role = aws_iam_role.rekognition_role.name
+  role       = aws_iam_role.rekognition_role.name
   policy_arn = data.aws_iam_policy.rekognition_read.arn
 }
