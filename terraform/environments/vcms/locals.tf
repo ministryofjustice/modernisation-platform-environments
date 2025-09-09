@@ -39,7 +39,7 @@ locals {
     deployment_minimum_healthy_percent = 0
     health_check_grace_period_seconds = 60
   }
-
+  
   bastion_config = {}
   image_tag      = "initial-16447252449-1"
   image_uri      = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/vcms:${local.image_tag}"
