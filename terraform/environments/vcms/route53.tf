@@ -14,7 +14,13 @@ resource "aws_route53_record" "external" {
   name    = local.app_url
   type    = "A"
 
-  records = [module.vcms_service.nlb_dns_name]
+  #records = [module.vcms_service.nlb_dns_name]
+
+  alias {
+    name                   = module.vcms_service.nlb_dns_name
+    zone_id                = data.aws_route53_zone.external.zone_id
+    evaluate_target_health = true
+  }
 }
 
 resource "aws_acm_certificate" "external" {
