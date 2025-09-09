@@ -63,22 +63,16 @@ variable "enabled_cron_in_environments" {
   default     = ["development", "test", "preproduction", "production"]
 }
 
-# variable "weekday_cron_environments" {
-#   description = "List of environments where cron should be enabled"
-#   type        = list(string)
-#   default     = ["development", "test", "preproduction"]
+# Define Weekday cron 
+# variable "weekday_cron" {
+#   description = "Weekday-only cron"
+#   type        = string
+#   default     = "cron(0 15 ? * MON-FRI *)"
 # }
 
-# Define Weekday cron 
-variable "weekday_cron" {
-  description = "Weekday-only cron"
-  type        = string
-  default     = "cron(0 15 ? * MON-FRI *)"
-}
-
 # Define Daily cron
-variable "daily_cron" {
-  description = "Daily cron"
-  type        = string
-  default     = "cron(0 10 * * ? *)"
-}
+# variable "daily_cron" {
+#   description = "Daily cron"
+#   type        = string
+#   default     = "cron(0 10 * * ? *)"
+# }

@@ -234,7 +234,6 @@ module "allpay_ftp_lambda_outbound" {
   s3_object_ftp_client         = aws_s3_object.ftp_client.key
   # ftp_cron                     = "cron(0 10 * * ? *)"
   enabled_cron_in_environments = local.enable_cron_in_environments
-  # weekday_cron = "cron(0 07 ? * MON-FRI *)"
 }
 
 
@@ -256,7 +255,6 @@ module "allpay_ftp_lambda_inbound" {
   s3_object_ftp_client         = aws_s3_object.ftp_client.key
   # ftp_cron                     = "cron(0 10 * * ? *)"
   enabled_cron_in_environments = local.enable_cron_in_environments
-   # weekday_cron = "cron(0 07 ? * MON-FRI *)"
 }
 
 #LAA-xerox-outbound-ccms
@@ -278,7 +276,6 @@ module "LAA-ftp-xerox-ccms-outbound" {
   s3_object_ftp_client         = aws_s3_object.ftp_client.key
   # ftp_cron                     = "cron(0 10 * * ? *)"
   enabled_cron_in_environments = local.enable_cron_in_environments
-   # weekday_cron = "cron(0 07 ? * MON-FRI *)"
 }
 
 #LAA-xerox-outbound-ccms-peterborough
@@ -299,7 +296,6 @@ module "LAA-ftp-xerox-ccms-outbound-peterborough" {
   s3_object_ftp_client         = aws_s3_object.ftp_client.key
   # ftp_cron                     = "cron(0 10 * * ? *)"
   enabled_cron_in_environments = local.enable_cron_in_environments
-   # weekday_cron = "cron(0 07 ? * MON-FRI *)"
 }
 
 # #LAA-ftp-eckoh-outbound-ccms
@@ -320,7 +316,6 @@ module "LAA-ftp-eckoh-outbound-ccms" {
   s3_object_ftp_client         = aws_s3_object.ftp_client.key
   # ftp_cron                     = "cron(0 10 * * ? *)"
   enabled_cron_in_environments = local.enable_cron_in_environments
-   # weekday_cron = "cron(0 07 ? * MON-FRI *)"
 }
 
 
@@ -342,7 +337,6 @@ module "LAA-ftp-eckoh-inbound-ccms" {
   s3_object_ftp_client         = aws_s3_object.ftp_client.key
   # ftp_cron                     = "cron(0 10 * * ? *)"
   enabled_cron_in_environments = local.enable_cron_in_environments
-   # weekday_cron = "cron(0 07 ? * MON-FRI *)"
 }
 
 # #LAA-ftp-rossendales-ccms-inbound
@@ -363,7 +357,6 @@ module "LAA-ftp-rossendales-ccms-inbound" {
   s3_object_ftp_client         = aws_s3_object.ftp_client.key
   # ftp_cron                     = "cron(0 10 * * ? *)"
   enabled_cron_in_environments = local.enable_cron_in_environments
-   # weekday_cron = "cron(0 07 ? * MON-FRI *)"
 }
 
 # #LAA-ftp-1stlocate-ccms-inbound
@@ -385,5 +378,4 @@ module "LAA-ftp-1stlocate-ccms-inbound" {
   s3_object_ftp_client         = aws_s3_object.ftp_client.key
   # ftp_cron                     = "cron(0 10 * * ? *)"
   enabled_cron_in_environments = local.enable_cron_in_environments
-   # weekday_cron = "cron(0 07 ? * MON-FRI *)"
 } 
