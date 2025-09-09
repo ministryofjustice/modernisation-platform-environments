@@ -28,11 +28,14 @@ resource "aws_security_group" "alb_sg" {
   description = "Security group for ALB"
   vpc_id      = local.account_info.vpc_id
 
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+  dynamic "ingress" {
+    for_each = local.internal_security_group_cidrs
+    content {
+      from_port   = 443
+      to_port     = 443
+      protocol    = "tcp"
+      cidr_blocks = [ingress.value]
+    }
   }
 
   egress {
