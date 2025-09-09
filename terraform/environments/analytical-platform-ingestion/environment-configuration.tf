@@ -126,6 +126,10 @@ locals {
         "maat-xhibit" = {
           ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCuB8p8OaxeX3sILMVUQcD48XBPuVLzddUixUUbYLS1WPiEUz7XcUkozeuhulIy9CzqA9yyAa2uPWhQr3KL2bKpXo8UIJr+3n51mjJp9V+LO65kMN5ewQHzx9phpZba5UOth1aEwn4vAFQwm2q6/ydNrJtRQeaI0DT4njaf0MC9FM/nu25IvUbl2dzUn2MX7/WuMouzcYXTeiLUIMvgRoAw4pjnCmU2AuPTokC7OynFh++SiHRUw6OwNKxqORv3du7qlfcGDWx+oAHbUVOnSaTrUssUuEXPFS5ytwWEp6GpzfZpNvD7Kj7gw/7ntpdTckh+d5INJHu+2L74Ytj2RPLNoHEB9t1ptEI2d2SeKpHqPSak2uQzk4aHV2SJs4IO0omTWKHojtSxo5gxAl4B58UjdzmFn0yNr3rJbKnn2w1H7viaM/0vWRgZrtgo07pd2uJePObaUE9jf1re+woasVWJAy3v9dZszVBcJ62NK/QU3cGfUncBw2OnnDURm7z1YVAj8mrReOkZWFA7nJ4/Gzh5pR8wNhnSLsDFqsQefaQiHBi2vZzDRqaUu03eWvd8BmomWC5joT7qqY8Qv+X5boO9CI0hX9FcoJJMXJwckoVAZGuZKgOwOL4y1Y7hpCO1U5ex9mbyMy5D5r/FNf7B85d/qCxcGwesIzI1b0QRupKxDw=="
           cidr_blocks = ["20.49.168.141/32", "20.49.168.17/32", "51.11.124.149/32", "51.11.124.158/32"]
+        },
+        "sscl-epm" = {
+          ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAgEAwR+f0bWWgM4c14HUgk5gFhy8vu2Jv3y7sOiUa0trgEt4ZVOqs2yueRoEtOj3aQF9dHzYkGmZ6ElaUZtg5z/6p7yzNfjZ/eYcDo7Wkz8rclhvUu/Qz2rR9z2KzYVsCW2eeY6EwS4GbddXc+5bb76ETCCRWuXIKbsEcMGEFuixdo70JDuvxm4jEaqNIC6pswTTOzcP1a8mZp89z7ahZGS1p71owjUsUUOxl+bu4mZ5PdAOc27Hlqiaguc8ytKIiQAWImRxg1OSKs3Ux3CA2ze74K2PWCTiEubT29fZIwkF7tSckhQsnItV+ix9+rcv4Nt8gnWSknNYubxoxi9eT2Somq6LbwaY+MShliHlm9XMnxerqqCruSHk0AZZPhE8QCO8lboMIFOBxlEuG6tgZV4Uob2BAMaEhHFDrFG4MAAKR5vO3dPVR4ANjRsJzb96cOZVb+oLprTfY6JkjyJM3PhdAgZtUVbshdTDizHTbyNqu0LU4DTcY5JtPn1wm5LR2PoLudKwxxb2CUNAaZS1TklOcy7RinPuVg49Rg2HQS+7wyIK9KrFrkNNwARPW4y5FgQv5dov+KAiAm7+xwcga5Fksp25khDuzStMSrE2J3ZOyN0c7TzXiQb7sFleGN10vVmOuzLWIWjUvkRGthBRwLiOC54AHcXXm6SP92GX0XYQTb8="
+          cidr_blocks = ["51.140.104.41/32", "51.140.183.67/32"]
         }
       }
       transfer_server_sftp_users_with_egress = {
