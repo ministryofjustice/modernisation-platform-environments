@@ -32,7 +32,7 @@
       "Sid": "KMS3CrossAccountAccess",
       "Effect": "Allow",
       "Action": ["kms:Decrypt", "kms:DescribeKey", "kms:GenerateDataKey*"],
-      "Resource": ["${kms_master_key_id}", "${kms_dev_key_id}, "${kms_dev_prod_id}"]
+      "Resource": ["${kms_master_key_id}", "${kms_dev_key_id}, "${kms_prod_key_id}"]
     }
   ]
 }
