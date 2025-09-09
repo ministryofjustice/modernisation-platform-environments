@@ -365,4 +365,20 @@ locals {
   lb_config = {
     bucket_policy_enabled = true
   }
+
+  # DataSync configuration for syncing S3 bucket to FSX share
+  datasync_config_dev = {
+    # Source S3 bucket ARN from different account (to be provided)
+    source_s3_bucket_arn   = "arn:aws:s3:::eu-west-2-delius-prod-dfi-extracts" # This needs to be updated with actual source bucket
+    source_s3_subdirectory = "/dfinterventions/dfi/csv/reports/"
+
+    # FSX domain for authentication
+    fsx_domain = "delius-mis-dev.internal"
+
+    # Optional: Bandwidth throttle in bytes per second (-1 = unlimited)
+    bandwidth_throttle = -1
+
+    # Optional: Schedule for automatic sync (cron expression)
+    schedule_expression = "cron(0 4 * * ? *)" # Daily at 4 AM UTC
+  }
 }

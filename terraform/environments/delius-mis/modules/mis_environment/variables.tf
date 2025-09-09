@@ -107,3 +107,15 @@ variable "lb_config" {
   type        = any
   default     = null
 }
+
+variable "datasync_config" {
+  description = "Configuration for DataSync agent and task to sync S3 to FSX"
+  type = object({
+    source_s3_bucket_arn   = string
+    source_s3_subdirectory = optional(string, "/")
+    fsx_domain             = string
+    bandwidth_throttle     = optional(number)
+    schedule_expression    = optional(string)
+  })
+  default = null
+}
