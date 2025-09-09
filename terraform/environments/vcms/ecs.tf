@@ -72,8 +72,8 @@ module "ecs_service" {
 
 module "container_definition" {
   source                   = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//container?ref=v6.0.0"
-  name                     = "my-container"
-  image                    = "nginx:latest"
+  name                     = "vcms"
+  image                    = local.image_uri
   memory                   = 512
   cpu                      = 256
   essential                = true
