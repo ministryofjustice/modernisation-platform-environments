@@ -1,4 +1,4 @@
-skip-checks:
+skip-check:
   - CKV_TF_1 # Module version is sufficient
   - CKV_AWS_91 # Not all LBs require logging
   - CKV_AWS_150 # Deletion protetion on every load balancer is unnecessary
