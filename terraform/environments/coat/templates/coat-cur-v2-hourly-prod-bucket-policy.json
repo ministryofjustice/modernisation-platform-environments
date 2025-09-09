@@ -68,6 +68,20 @@
           "aws:SourceAccount": ["${account_id}"]
         }
       }
+    },
+    {
+      "Sid": "S3CrossAccountRoleAccess",
+      "Effect": "Allow",
+      "Action": ["s3:GetObject", "s3:ListBucket", "s3:PutObject", "s3:PutObjectAcl"],
+      "Resource": [
+        "arn:aws:s3:::${bucket_name}/*",
+        "arn:aws:s3:::${bucket_name}"
+      ],
+      "Principal": {
+        "AWS": [
+          "arn:aws:iam::${account_id}:role/moj-coat-${environment}-cur-reports-cross-role"
+        ]
+      }
     }
   ]
 }
