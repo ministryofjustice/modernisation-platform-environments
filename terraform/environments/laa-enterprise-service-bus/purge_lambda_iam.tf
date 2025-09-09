@@ -17,7 +17,7 @@ resource "aws_iam_role" "purge_lambda_role" {
   tags = merge(
     local.tags,
     {
-      Name = "${local.application_name_short}-purge-lambda-role"
+      Name = "${local.application_name_short}-${local.environment}-purge-lambda-role"
     }
   )
 }

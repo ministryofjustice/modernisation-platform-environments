@@ -81,7 +81,8 @@
         "dps-testing2",
         "dps-prison-reg",
         "dps-personal-rela",
-        "dps-organisations"
+        "dps-organisations",
+        "dps-allocations"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -302,7 +303,8 @@
         "dps-calc-rel-date",
         "dps-prison-reg",
         "dps-personal-rela",
-        "dps-organisations"
+        "dps-organisations",
+        "dps-allocations"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -506,7 +508,8 @@
         "dps-calc-rel-date",
         "dps-prison-reg",
         "dps-personal-rela",
-        "dps-organisations"
+        "dps-organisations",
+        "dps-allocations"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -723,7 +726,8 @@
         "dps-calc-rel-date",
         "dps-prison-reg",
         "dps-personal-rela",
-        "dps-organisations"
+        "dps-organisations",
+        "dps-allocations"
       ],
       "alarms": {
         "setup_cw_alarms": true,
