@@ -17,7 +17,7 @@ resource "aws_vpc_endpoint" "datasync" {
   count = var.datasync_config != null ? 1 : 0
 
   vpc_id              = var.account_info.vpc_id
-  service_name        = "com.amazonaws.${data.aws_region.current[0].name}.datasync"
+  service_name        = "com.amazonaws.${data.aws_region.current.name}.datasync"
   vpc_endpoint_type   = "Interface"
   subnet_ids          = [var.account_config.private_subnet_ids[0]]
   security_group_ids  = [aws_security_group.datasync_vpc_endpoint[0].id]
@@ -275,7 +275,7 @@ resource "aws_datasync_location_s3" "dfi_source_bucket" {
 #############################################
 ### DataSync FSX Location (Destination)
 #############################################
-resource "aws_datasync_location_fsx_windows" "dfi_fsx_destination" {
+resource "aws_datasync_location_fsx_windows_file_system" "dfi_fsx_destination" {
   count = var.datasync_config != null && local.credentials_are_real ? 1 : 0
 
   # Use FSX file system ARN and specific subdirectory for DFI reports
@@ -307,7 +307,7 @@ resource "aws_datasync_task" "dfi_s3_to_fsx" {
 
   name                     = "${var.app_name}-${var.env_name}-dfi-s3-to-fsx-sync"
   source_location_arn      = aws_datasync_location_s3.dfi_source_bucket[0].arn
-  destination_location_arn = aws_datasync_location_fsx_windows.dfi_fsx_destination[0].arn
+  destination_location_arn = aws_datasync_location_fsx_windows_file_system.dfi_fsx_destination[0].arn
 
   # CloudWatch logging configuration
   cloudwatch_log_group_arn = aws_cloudwatch_log_group.datasync_logs[0].arn
@@ -345,7 +345,7 @@ resource "aws_datasync_task" "dfi_s3_to_fsx" {
 
   depends_on = [
     aws_datasync_location_s3.dfi_source_bucket,
-    aws_datasync_location_fsx_windows.dfi_fsx_destination,
+    aws_datasync_location_fsx_windows_file_system.dfi_fsx_destination,
     aws_cloudwatch_log_group.datasync_logs
   ]
 }
