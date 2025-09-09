@@ -1,3 +1,7 @@
+data "aws_lb" "service_nlb" {
+  name = "vcms-${local.environment}-service-nlb"
+}
+
 resource "aws_lb_listener" "tls" {
   load_balancer_arn = module.vcms_service.nlb_arn
   port              = 443

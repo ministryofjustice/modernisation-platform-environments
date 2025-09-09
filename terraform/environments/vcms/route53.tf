@@ -18,7 +18,7 @@ resource "aws_route53_record" "external" {
 
   alias {
     name                   = module.vcms_service.nlb_dns_name
-    zone_id                = data.aws_route53_zone.external.zone_id
+    zone_id                = data.aws_lb.service_nlb.zone_id
     evaluate_target_health = true
   }
 }
