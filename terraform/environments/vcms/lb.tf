@@ -21,3 +21,76 @@ resource "aws_lb_target_group" "frontend" {
 
   tags = local.tags
 }
+
+# Security group for ALB
+resource "aws_security_group" "alb_sg" {
+  name        = "alb-sg"
+  description = "Security group for ALB"
+  vpc_id      = local.account_info.vpc_id
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = local.tags
+}
+
+# ALB
+resource "aws_lb" "frontend" {
+  name               = "frontend-alb"
+  internal           = false
+  load_balancer_type = "application"
+  security_groups    = [aws_security_group.alb_sg.id]
+  subnets            = local.account_config.public_subnet_ids
+
+  enable_deletion_protection = false
+  idle_timeout               = 60
+
+  tags = local.tags
+}
+
+# HTTP Listener
+resource "aws_lb_listener" "frontend" {
+  load_balancer_arn = aws_lb.frontend.arn
+  port              = 80
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.frontend.arn
+  }
+}
+
+# HTTPS Listener
+resource "aws_lb_listener" "frontend_https" {
+  load_balancer_arn = aws_lb.frontend.arn
+  port              = 443
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  certificate_arn   = aws_acm_certificate.frontend_cert.arn
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.frontend.arn
+  }
+}
+
+# Certificate
+resource "aws_acm_certificate" "frontend_cert" {
+  domain_name       = local.app_url
+  validation_method = "DNS"
+
+  tags = {
+    Name = "frontend-cert"
+  }
+}
