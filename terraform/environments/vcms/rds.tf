@@ -46,3 +46,9 @@ resource "aws_db_parameter_group" "vcms-10-5" {
   tags = local.tags
 }
 
+resource "aws_db_subnet_group" "mariadb" {
+  name       = "mariadb-subnet-group"
+  subnet_ids = local.account_config.private_subnet_ids
+
+  tags = local.tags
+}
