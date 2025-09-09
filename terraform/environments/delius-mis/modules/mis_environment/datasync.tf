@@ -158,9 +158,7 @@ resource "aws_iam_role_policy" "datasync_s3_source_policy" {
         Effect = "Allow"
         Action = [
           "s3:GetBucketLocation",
-          "s3:ListBucket",
-          "s3:ListBucketMultipartUploads",
-          "s3:ListBucketVersions",
+          "s3:List*",
           "s3:GetBucketVersioning",
           "s3:GetObject",
           "s3:GetObjectTagging",
