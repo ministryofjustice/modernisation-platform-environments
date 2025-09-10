@@ -4,4 +4,9 @@ module "ecs_retirement_lambda" {
 
   env_name = var.env_name
   tags     = var.tags
+
+  providers = {
+    aws     = aws
+    archive = archive
+  }
 }

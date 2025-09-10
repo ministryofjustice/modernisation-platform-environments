@@ -32,6 +32,10 @@ module "ecs_policies" {
   tags                          = var.tags
   extra_task_role_policies      = var.extra_task_role_policies
   extra_task_exec_role_policies = var.extra_task_exec_role_policies
+
+  providers = {
+    aws = aws
+  }
 }
 
 module "ecs_service" {

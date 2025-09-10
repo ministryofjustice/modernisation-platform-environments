@@ -67,6 +67,7 @@ module "ldap_ecs" {
   }
 
   providers = {
+    aws                       = aws
     aws.core-vpc              = aws.core-vpc
     aws.core-network-services = aws.core-network-services
   }
