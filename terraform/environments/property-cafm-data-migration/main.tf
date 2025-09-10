@@ -4,7 +4,7 @@
 # }
 
 module "csv_export" {
-  source = "git::ssh://git@github.com/ministryofjustice/terraform-csv-to-parquet-athena.git?ref=dc9790b1568d834605deb348baaf56654d5e1f61"
+  source = "github.com/ministryofjustice/terraform-csv-to-parquet-athena?ref=dc9790b1568d834605deb348baaf56654d5e1f61"
   kms_key_arn = aws_kms_key.shared_kms_key.arn
   name = "concept"
   load_mode = "overwrite"

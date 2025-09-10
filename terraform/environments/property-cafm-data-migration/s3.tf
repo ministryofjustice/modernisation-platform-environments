@@ -290,7 +290,7 @@ resource "aws_s3_bucket_policy" "LOG" {
 ############################################
 
 module "s3_bucket_logs" {
-  source             = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
+  source             = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9fc8f8b8e3f93ffbda822028534b9a75399"
   bucket_prefix      = "${local.account_name}-bucket-logs-${local.environment_shorthand}-"
   versioning_enabled = true
   # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
@@ -353,7 +353,7 @@ module "s3_bucket_logs" {
 }
 
 module "s3_planetfm_landing_bucket" {
-  source        = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
+  source        = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9fc8f8b8e3f93ffbda822028534b9a75399"
   bucket_prefix = "${local.account_name}-landing-planetfm-${local.environment_shorthand}-"
   bucket_policy = [jsonencode({
     Version = "2012-10-17",
@@ -443,7 +443,7 @@ module "s3_planetfm_landing_bucket" {
 }
 
 module "s3_concept_landing_bucket" {
-  source        = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
+  source        = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9fc8f8b8e3f93ffbda822028534b9a75399"
   bucket_prefix = "${local.account_name}-landing-concept-${local.environment_shorthand}-"
   bucket_policy = [jsonencode({
     Version = "2012-10-17",
