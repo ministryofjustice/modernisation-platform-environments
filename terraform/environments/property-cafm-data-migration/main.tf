@@ -1,17 +1,17 @@
-provider "aws" {
-  alias  = "primary"
-  region = "eu-west-2"
-}
+# provider "aws" {
+#   alias  = "primary"
+#   region = "eu-west-2"
+# }
 
 module "csv_export" {
-  source = "github.com/ministryofjustice/terraform-csv-to-parquet-athena?ref=develop"
+  source = "github.com/ministryofjustice/terraform-csv-to-parquet-athena?ref=dc9790b1568d834605deb348baaf56654d5e1f61"
   kms_key_arn = aws_kms_key.shared_kms_key.arn
   name = "concept"
   load_mode = "overwrite"
   environment = local.environment_shorthand
-  providers = {
-    aws = aws.primary
-  }
+  # providers = {
+  #   aws = aws.primary
+  # }
   tags = {
     business-unit = "Property"
     application   = "cafm"
