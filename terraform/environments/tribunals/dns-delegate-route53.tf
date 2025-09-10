@@ -60,11 +60,11 @@ locals {
 }
 
 resource "aws_route53_record" "nginx_instances_to_cloudfront" {
-  count    = local.is-preproduction ? length(local.nginx_records_to_cloudfront) : 0
+  count    = local.is-production ? length(local.nginx_records_to_cloudfront) : 0
   provider = aws.core-network-services
   zone_id  = local.production_zone_id
   name     = local.nginx_records_to_cloudfront[count.index]
-  type     = "A"
+  type     = "CNAME"
 
   alias {
     name                   = aws_cloudfront_distribution.tribunals_distribution_nginx.domain_name

@@ -14,10 +14,10 @@ resource "aws_cloudfront_distribution" "tribunals_distribution_nginx" {
     prefix          = "cloudfront-logs/"
   }
 
-  aliases = local.is-preproduction ? [
-    "siac.tribunals.gov.uk"
-  ] : [
+  aliases = local.is-development ? [
     "*.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  ] : [
+    "siac.tribunals.gov.uk"
   ]
   
 
@@ -83,9 +83,9 @@ resource "aws_cloudfront_distribution" "tribunals_distribution_nginx" {
 // Create a new certificate for the CloudFront distribution because it needs to be in us-east-1
 resource "aws_acm_certificate" "cloudfront_nginx" {
   provider                  = aws.us-east-1
-  domain_name               = local.is-preproduction ? "siac.tribunals.gov.uk" : "modernisation-platform.service.justice.gov.uk"
+  domain_name               = local.is-development ? "modernisation-platform.service.justice.gov.uk": "siac.tribunals.gov.uk"
   validation_method         = "DNS"
-  subject_alternative_names = local.is-preproduction ? ["siac.tribunals.gov.uk"] : ["*.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
+  subject_alternative_names = local.is-development ? ["*.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"] : ["siac.tribunals.gov.uk"]
 
   tags = {
     Environment = local.environment
@@ -110,26 +110,6 @@ resource "aws_cloudfront_function" "redirect_function" {
     var host    = request.headers.host.value;
     var uri     = request.uri;
 
-    // Redirect rules for ahmlr.gov.uk
-    if (host === "ahmlr.gov.uk") {
-      if (uri.startsWith("/public") || uri.startsWith("/Admin") || uri.startsWith("/Judgments")) {
-        return {
-          statusCode: 301,
-          statusDescription: "Moved Permanently",
-          headers: {
-            "location": { "value": "http://landregistrationdivision.decisions.tribunals.gov.uk" + uri }
-          }
-        };
-      }
-      return {
-        statusCode: 301,
-        statusDescription: "Moved Permanently",
-        headers: {
-          "location": { "value": "https://www.gov.uk/apply-land-registration-tribunal/overview" }
-        }
-      };
-    }
-
     // Redirect rules for siac.tribunals.gov.uk
     if (host === "siac.tribunals.gov.uk") {
       if (uri.toLowerCase() === "/outcomes2007onwards.htm") {
@@ -137,7 +117,7 @@ resource "aws_cloudfront_function" "redirect_function" {
           statusCode: 301,
           statusDescription: "Moved Permanently",
           headers: {
-            "location": { "value": "http://siac.decisions.tribunals.gov.uk" }
+            "location": { "value": "https://siac.decisions.tribunals.gov.uk" }
           }
         };
       }
