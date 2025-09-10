@@ -99,7 +99,7 @@ resource "aws_acm_certificate" "cloudfront_nginx" {
 }
 
 resource "aws_acm_certificate_validation" "cloudfront_cert_validation_nginx" {
-  count = local.is-development ? 0 : 1
+  count = local.is-production ? 1 : 0
   provider        = aws.us-east-1
   certificate_arn = aws_acm_certificate.cloudfront_nginx[0].arn
 }
