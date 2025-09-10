@@ -1,10 +1,30 @@
+provider "aws" {
+  alias  = "primary"
+  region = "eu-west-2"
+}
+
+module "csv_export" {
+  source = "github.com/ministryofjustice/terraform-csv-to-parquet-athena?ref=develop"
+  kms_key_arn = aws_kms_key.shared_kms_key.arn
+  name = "concept"
+  load_mode = "overwrite"
+  environment = local.environment_shorthand
+  providers = {
+    aws = aws.primary
+  }
+  tags = {
+    business-unit = "Property"
+    application   = "cafm"
+    is-production = "false"
+    owner         = "shanmugapriya.basker@justice.gov.uk"
+  }
+}
+
 module "rds_export" {
-  # checkov:skip=CKV_TF_1: using branch instead of a commit hash
-  # checkov:skip=CKV_TF_2: using branch instead of tag with a version number
   source = "github.com/ministryofjustice/terraform-rds-export?ref=b8e43e20af2f303461c89b23a70ee000d50fa6dd"
 
   kms_key_arn           = aws_kms_key.shared_kms_key.arn
-  name                  = "cafm"
+  name                  = "planetfm"
   database_refresh_mode = "full"
   vpc_id                = module.vpc.vpc_id
   database_subnet_ids   = module.vpc.private_subnets

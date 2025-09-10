@@ -290,7 +290,7 @@ resource "aws_s3_bucket_policy" "LOG" {
 ############################################
 
 module "s3_bucket_logs" {
-  source             = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
+  source             = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
   bucket_prefix      = "${local.account_name}-bucket-logs-${local.environment_shorthand}-"
   versioning_enabled = true
   # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
@@ -352,8 +352,8 @@ module "s3_bucket_logs" {
   tags = local.tags
 }
 
-module "s3_planetfm_data_bucket" {
-  source        = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
+module "s3_planetfm_landing_bucket" {
+  source        = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
   bucket_prefix = "${local.account_name}-landing-planetfm-${local.environment_shorthand}-"
   bucket_policy = [jsonencode({
     Version = "2012-10-17",
@@ -375,8 +375,8 @@ module "s3_planetfm_data_bucket" {
           "s3:PutObjectTagging"
         ],
         Resource = [
-          module.s3_planetfm_data_bucket.bucket.arn,
-          "${module.s3_planetfm_data_bucket.bucket.arn}/*"
+          module.s3_planetfm_landing_bucket.bucket.arn,
+          "${module.s3_planetfm_landing_bucket.bucket.arn}/*"
         ]
       }
     ]
@@ -442,8 +442,8 @@ module "s3_planetfm_data_bucket" {
   tags = local.tags
 }
 
-module "s3_concept_data_bucket" {
-  source        = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
+module "s3_concept_landing_bucket" {
+  source        = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
   bucket_prefix = "${local.account_name}-landing-concept-${local.environment_shorthand}-"
   bucket_policy = [jsonencode({
     Version = "2012-10-17",
@@ -465,8 +465,8 @@ module "s3_concept_data_bucket" {
           "s3:PutObjectTagging"
         ],
         Resource = [
-          module.s3_concept_data_bucket.bucket.arn,
-          "${module.s3_concept_data_bucket.bucket.arn}/*"
+          module.s3_concept_landing_bucket.bucket.arn,
+          "${module.s3_concept_landing_bucket.bucket.arn}/*"
         ]
       }
     ]
