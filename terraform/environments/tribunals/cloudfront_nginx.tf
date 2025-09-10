@@ -8,7 +8,7 @@ resource "aws_cloudfront_distribution" "tribunals_distribution_nginx" {
 
   count = local.is-development ? 0 : 1
 
-  web_acl_id = aws_wafv2_web_acl.tribunals_web_acl[0].arn
+  web_acl_id = aws_wafv2_web_acl.tribunals_web_acl.arn
 
   logging_config {
     include_cookies = false
@@ -70,7 +70,7 @@ resource "aws_cloudfront_distribution" "tribunals_distribution_nginx" {
   price_class     = "PriceClass_All"
 
   viewer_certificate {
-    acm_certificate_arn      = aws_acm_certificate.cloudfront[0].arn
+    acm_certificate_arn      = aws_acm_certificate.cloudfront_nginx[0].arn
     ssl_support_method       = "sni-only"
     minimum_protocol_version = "TLSv1.2_2021"
   }
