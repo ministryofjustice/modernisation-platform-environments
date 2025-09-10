@@ -111,14 +111,14 @@ module "container_definition" {
     {
       name  = "DB_USERNAME"
       value = "vcms"
-    },
-    {
-      name  = "DB_PASSWORD"
-      value = random_id.db_password.b64_url
     }
   ]
 
   secrets = [
+    {
+      name = "DB_PASSWORD",
+      valueFrom = aws_ssm_parameter.db_password.arn
+    }
   ]
 
   port_mappings = [
