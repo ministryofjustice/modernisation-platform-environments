@@ -1,19 +1,8 @@
 # .checkov.yml
 skip-check:
-  - id: CKV_TF_1
-    suppress_comment: "Module version is sufficient"
-
-  - id: CKV_AWS_91
-    suppress_comment: "Not all LBs require logging"
-
-  - id: CKV_AWS_150
-    suppress_comment: "Deletion protetion on every load balancer is unnecessary"
-
-  - id: CKV_AWS_152
-    suppress_comment: "Cross-zone load-balancing unecessary"
-
-  - id: CKV_AWS_337
-    suppress_comment: "SSM parameters using default KMS key (alias/aws/ssm)"
-
-  - id: CKV_AWS_338
-    suppress_comment: "1 year log retention is unnecessary"
+  - CKV_TF_1 # Module version is sufficient
+  - CKV_AWS_91 # Not all LBs require logging
+  - CKV_AWS_150 # Deletion protetion on every load balancer is unnecessary
+  - CKV_AWS_152 # Cross-zone load-balancing unecessary
+  - CKV_AWS_337 # SSM parameters using default KMS key (alias/aws/ssm)
+  - CKV_AWS_338 # 1 year log retention is unnecessary
