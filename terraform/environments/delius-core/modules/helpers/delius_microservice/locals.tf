@@ -45,6 +45,7 @@ locals {
     (var.rds_endpoint_environment_variable) = aws_db_instance.this[0].endpoint
   } : {}
 
+  # tflint-ignore: terraform_map_duplicate_keys
   rds_secrets = var.rds_password_secret_variable != "" ? {
     (var.rds_password_secret_variable) = "${aws_db_instance.this[0].master_user_secret[0].secret_arn}:password::"
     (var.rds_user_secret_variable)     = "${aws_db_instance.this[0].master_user_secret[0].secret_arn}:username::"
