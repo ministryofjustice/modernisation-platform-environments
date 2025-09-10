@@ -41,7 +41,6 @@ locals {
     "consumercreditappeals",
     "estateagentappeals",
     "fhsaa",
-    "siac"
   ]
 
   www_records = [
@@ -51,6 +50,10 @@ locals {
     "www.estateagentappeals",
     "www.fhsaa",
     "www.siac"
+  ]
+
+  nginx_records_to_cloudfront = [
+    "siac"
   ]
 
   production_zone_id = data.aws_route53_zone.production_zone.zone_id
