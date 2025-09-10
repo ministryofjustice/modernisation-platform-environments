@@ -15,4 +15,8 @@ module "efs" {
   subnet_ids   = var.account_config.private_subnet_ids
   vpc_cidr     = var.account_config.shared_vpc_cidr
   account_info = var.account_info
+
+  providers = {
+    aws = aws
+  }
 }

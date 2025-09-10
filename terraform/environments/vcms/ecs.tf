@@ -16,6 +16,7 @@ resource "aws_security_group" "cluster" {
 }
 
 module "vcms_service" {
+  # tflint-ignore: terraform_module_pinned_source
   source = "github.com/ministryofjustice/modernisation-platform-environments/terraform/environments/delius-core/modules/helpers/delius_microservice?ref=f191280"
 
   name = local.application_name
