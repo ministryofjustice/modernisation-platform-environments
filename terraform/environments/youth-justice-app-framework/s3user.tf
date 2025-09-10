@@ -36,22 +36,8 @@ resource "aws_iam_policy" "s3" {
   name        = "${local.project_name}-s3-access"
   description = "Policy for S3 user"
   policy = templatefile("${path.module}/iam_policies/s3_user_policy.json", {
-    dal_buckets = jsonencode([
-      "arn:aws:s3:::yjaf-${local.environment}-cms",
-      "arn:aws:s3:::yjaf-${local.environment}-yjsm",
-      "arn:aws:s3:::yjaf-${local.environment}-mis",
-      "arn:aws:s3:::yjaf-${local.environment}-bedunlock",
-      "arn:aws:s3:::yjaf-${local.environment}-bands",
-      "arn:aws:s3:::yjaf-${local.environment}-incident",
-      "arn:aws:s3:::yjaf-${local.environment}-cmm",
-      "arn:aws:s3:::yjaf-${local.environment}-cms/*",
-      "arn:aws:s3:::yjaf-${local.environment}-yjsm/*",
-      "arn:aws:s3:::yjaf-${local.environment}-mis/*",
-      "arn:aws:s3:::yjaf-${local.environment}-bedunlock/*",
-      "arn:aws:s3:::yjaf-${local.environment}-bands/*",
-      "arn:aws:s3:::yjaf-${local.environment}-incident/*",
-      "arn:aws:s3:::yjaf-${local.environment}-cmm/*"
-    ])
+    dal_buckets            = local.dal_buckets            #declared in ecs.tf
+    dal_buckets_wildcarded = local.dal_buckets_wildcarded #declared in ecs.tf
   })
 }
 
