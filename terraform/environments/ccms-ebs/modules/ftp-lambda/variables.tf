@@ -62,17 +62,3 @@ variable "enabled_cron_in_environments" {
   type        = list(string)
   default     = ["development", "test", "preproduction"]
 }
-
-# Define Weekday cron 
-# variable "weekday_cron" {
-#   description = "Weekday-only cron"
-#   type        = string
-#   default     = "cron(0 15 ? * MON-FRI *)"
-# }
-
-# Define Daily cron
-# variable "daily_cron" {
-#   description = "Daily cron"
-#   type        = string
-#   default     = "cron(0 10 * * ? *)"
-# }

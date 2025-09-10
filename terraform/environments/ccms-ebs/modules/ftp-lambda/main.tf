@@ -1,14 +1,3 @@
-# locals {
-#   # treat these as non-prod (use weekdays-only schedule)
-#   nonprod_envs = ["development", "test", "preproduction"]
-
-#   is_nonprod   = contains(local.nonprod_envs, lower(var.env))
-#   cron_enabled = contains(var.enabled_cron_in_environments, lower(var.env))
-
-#   # choose the right schedule for the env
-#   selected_cron = local.is_nonprod ? var.weekday_cron : var.daily_cron
-# }
-
 ## sg for ftp
 resource "aws_security_group" "ftp_sg" {
   name        = "${var.lambda_name}-sg"
@@ -141,11 +130,9 @@ resource "aws_lambda_function" "ftp_lambda" {
 # ### cw rule for schedule
 resource "aws_cloudwatch_event_rule" "ftp_schedule" {
   count               = contains(var.enabled_cron_in_environments, var.env) ? 1 : 0
-  # count               = local.cron_enabled ? 1 : 0
   name                = "${var.lambda_name}-schedule"
   # schedule_expression = var.ftp_cron
   schedule_expression = var.env == "production" ? "cron(0 10 * * ? *)" : "cron(0 13 ? * MON-FRI *)"
-  # schedule_expression = local.selected_cron
 }
 ### cw event lambda target
 resource "aws_cloudwatch_event_target" "ftp_target" {
