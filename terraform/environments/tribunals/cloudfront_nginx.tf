@@ -95,7 +95,7 @@ resource "aws_acm_certificate" "cloudfront_nginx" {
   }
 }
 
-resource "aws_acm_certificate_validation" "cloudfront_cert_validation" {
+resource "aws_acm_certificate_validation" "cloudfront_cert_validation_nginx" {
   provider        = aws.us-east-1
   certificate_arn = aws_acm_certificate.cloudfront_nginx.arn
 }
