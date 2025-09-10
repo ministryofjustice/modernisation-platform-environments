@@ -6,6 +6,8 @@ resource "aws_cloudfront_distribution" "tribunals_distribution_nginx" {
   #checkov:skip=CKV2_AWS_47:"Skip Log4j protection as it is handled via WAF"
   #checkov:skip=CKV2_AWS_46:"Origin Access Identity not applicable as origin is ALB, not S3"
 
+  count = local.is-development ? 0 : 1
+
   web_acl_id = aws_wafv2_web_acl.tribunals_web_acl.arn
 
   logging_config {
@@ -82,6 +84,7 @@ resource "aws_cloudfront_distribution" "tribunals_distribution_nginx" {
 
 // Create a new certificate for the CloudFront distribution because it needs to be in us-east-1
 resource "aws_acm_certificate" "cloudfront_nginx" {
+  count = local.is-development ? 0 : 1
   provider                  = aws.us-east-1
   domain_name               = local.is-development ? "modernisation-platform.service.justice.gov.uk": "siac.tribunals.gov.uk"
   validation_method         = "DNS"
@@ -96,11 +99,13 @@ resource "aws_acm_certificate" "cloudfront_nginx" {
 }
 
 resource "aws_acm_certificate_validation" "cloudfront_cert_validation_nginx" {
+  count = local.is-development ? 0 : 1
   provider        = aws.us-east-1
   certificate_arn = aws_acm_certificate.cloudfront_nginx.arn
 }
 
 resource "aws_cloudfront_function" "redirect_function" {
+  count = local.is-development ? 0 : 1
   name    = "tribunals_redirect_function"
   runtime = "cloudfront-js-2.0"
   publish = true
