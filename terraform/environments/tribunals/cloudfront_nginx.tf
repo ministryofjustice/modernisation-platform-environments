@@ -8,7 +8,7 @@ resource "aws_cloudfront_distribution" "tribunals_distribution_nginx" {
 
   count = local.is-development ? 0 : 1
 
-  web_acl_id = aws_wafv2_web_acl.tribunals_web_acl.arn
+  web_acl_id = aws_wafv2_web_acl.tribunals_web_acl[0].arn
 
   logging_config {
     include_cookies = false
@@ -60,7 +60,7 @@ resource "aws_cloudfront_distribution" "tribunals_distribution_nginx" {
 
     function_association {
       event_type   = "viewer-request"
-      function_arn = aws_cloudfront_function.redirect_function.arn
+      function_arn = aws_cloudfront_function.redirect_function[0].arn
     }
   }
 
@@ -70,7 +70,7 @@ resource "aws_cloudfront_distribution" "tribunals_distribution_nginx" {
   price_class     = "PriceClass_All"
 
   viewer_certificate {
-    acm_certificate_arn      = aws_acm_certificate.cloudfront.arn
+    acm_certificate_arn      = aws_acm_certificate.cloudfront[0].arn
     ssl_support_method       = "sni-only"
     minimum_protocol_version = "TLSv1.2_2021"
   }
@@ -101,7 +101,7 @@ resource "aws_acm_certificate" "cloudfront_nginx" {
 resource "aws_acm_certificate_validation" "cloudfront_cert_validation_nginx" {
   count = local.is-development ? 0 : 1
   provider        = aws.us-east-1
-  certificate_arn = aws_acm_certificate.cloudfront_nginx.arn
+  certificate_arn = aws_acm_certificate.cloudfront_nginx[0].arn
 }
 
 resource "aws_cloudfront_function" "redirect_function" {
