@@ -99,10 +99,11 @@ locals {
         "/dev/sda1" = { type = "gp3", size = 100 }
       }
       tags = {
-        backup           = "false"
-        os-type          = "Windows"
-        server-type      = "RDGateway"
-        update-ssm-agent = "patchgroup2"
+        backup                 = "false"
+        os-type                = "Windows"
+        server-type            = "RDGateway"
+        update-ssm-agent       = "patchgroup2"
+        instance-access-policy = "none"
       }
     }
 
@@ -144,10 +145,11 @@ locals {
         "/dev/sda1" = { type = "gp3", size = 100 }
       }
       tags = {
-        backup           = "false"
-        os-type          = "Windows"
-        server-type      = "RDServices"
-        update-ssm-agent = "patchgroup2"
+        backup                 = "false"
+        os-type                = "Windows"
+        server-type            = "RDServices"
+        update-ssm-agent       = "patchgroup2"
+        instance-access-policy = "none"
       }
     }
   }
