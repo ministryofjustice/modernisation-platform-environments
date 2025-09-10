@@ -132,7 +132,7 @@ resource "aws_cloudwatch_event_rule" "ftp_schedule" {
   count               = contains(var.enabled_cron_in_environments, var.env) ? 1 : 0
   name                = "${var.lambda_name}-schedule"
   # schedule_expression = var.ftp_cron
-  schedule_expression = var.env == "production" ? "cron(0 10 * * ? *)" : "cron(0 13 ? * MON-FRI *)"
+  schedule_expression = var.env == "production" ? "cron(0 10 * * ? *)" : "cron(0 10 ? * MON-FRI *)"
 }
 ### cw event lambda target
 resource "aws_cloudwatch_event_target" "ftp_target" {
