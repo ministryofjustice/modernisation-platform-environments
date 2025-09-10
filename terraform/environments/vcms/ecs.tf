@@ -95,6 +95,26 @@ module "container_definition" {
     {
       name  = "REDIS_CACHE_DB"
       value = "1"
+    },
+    {
+      name  = "DB_HOST"
+      value = aws_db_instance.mariadb.address
+    },
+    {
+      name  = "DB_PORT"
+      value = "3306"
+    },
+    {
+      name  = "DB_DATABASE"
+      value = "vcms"
+    },
+    {
+      name  = "DB_USERNAME"
+      value = "vcms"
+    },
+    {
+      name  = "DB_PASSWORD"
+      value = random_id.db_password.b64_url
     }
   ]
 
@@ -111,7 +131,7 @@ module "container_definition" {
   mount_points = [
     {
       sourceVolume  = "vcms"
-      containerPath = "/tmp/vcms"
+      containerPath = "/mnt/vcmsdocs"
       readOnly      = false
     }
   ]
