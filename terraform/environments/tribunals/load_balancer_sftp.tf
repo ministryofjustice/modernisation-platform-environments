@@ -73,6 +73,7 @@ resource "aws_lb_target_group" "tribunals_target_group_sftp" {
 # Make sure that the ec2 instance tagged as 'tribunals-instance' exists
 # before adding aws_lb_target_group_attachment, otherwise terraform will fail
 resource "aws_lb_target_group_attachment" "tribunals_target_group_attachment_sftp" {
+  count = length(data.aws_instances.primary_instance.ids) > 0 ? 1 : 0
   for_each         = aws_lb_target_group.tribunals_target_group_sftp
   target_group_arn = each.value.arn
   # target_id points to primary ec2 instance, change "primary_instance" to "backup_instance" in order to point at backup ec2 instance

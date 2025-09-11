@@ -269,6 +269,8 @@ resource "aws_autoscaling_group" "tribunals-all-asg" {
     value               = "tribunals-instance"
     propagate_at_launch = true
   }
+
+  wait_for_capacity_timeout = "10m"
 }
 
 resource "aws_instance" "tribunals_backup" {
