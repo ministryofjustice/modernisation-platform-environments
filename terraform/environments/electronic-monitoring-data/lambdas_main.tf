@@ -253,3 +253,23 @@ module "dms_validation" {
   security_group_ids = [aws_security_group.dms_validation_lambda_sg[0].id]
   subnet_ids         = data.aws_subnets.shared-public.ids
 }
+
+
+#-----------------------------------------------------------------------------------
+# Airflow trigger
+#-----------------------------------------------------------------------------------
+
+module "airflow_trigger" {
+  count = local.is-test || local.is-preproduction || local.is-production ? 1 : 0
+
+  source                  = "./modules/lambdas"
+  is_image                = true
+  function_name           = "airflow_trigger"
+  role_name               = aws_iam_role.airflow_trigger_lambda_role[0].name
+  role_arn                = aws_iam_role.airflow_trigger_lambda_role[0].arn
+  handler                 = "airflow_trigger.handler"
+  memory_size             = 10240
+  timeout                 = 900
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : "dev"
+}

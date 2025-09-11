@@ -668,3 +668,33 @@ resource "aws_iam_role_policy_attachment" "validation_lambda_policy_attachment" 
   role       = aws_iam_role.dms_validation_lambda_role[0].name
   policy_arn = aws_iam_policy.dms_validation_lambda_role_policy[0].arn
 }
+
+#-----------------------------------------------------------------------------------
+# Airflow Trigger
+#-----------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "airflow_trigger_lambda_role_policy_document" {
+  statement {
+      effect    = "Allow"
+      actions   = ["airflow:CreateCliToken"]
+      resources = ["arn:aws:airflow:eu-west-2:${local.environment_management.account_ids["analytical-platform-compute-test"]}:environment/test"]
+  }
+}
+
+resource "aws_iam_role" "airflow_trigger_lambda_role" {
+  count              = local.is-production || local.is-preproduction || local.is-test ? 1 : 0
+  name               = "airflow_trigger_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_policy" "airflow_trigger_lambda_role_policy" {
+  count  = local.is-production || local.is-preproduction || local.is-test ? 1 : 0
+  name   = "airflow_trigger_lambda_policy"
+  policy = data.aws_iam_policy_document.dms_validation_lambda_role_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "airflow_trigger_lambda_policy_attachment" {
+  count      = local.is-production || local.is-preproduction || local.is-test ? 1 : 0
+  role       = aws_iam_role.airflow_trigger_lambda_role[0].name
+  policy_arn = aws_iam_policy.airflow_trigger_lambda_role_policy[0].arn
+}
