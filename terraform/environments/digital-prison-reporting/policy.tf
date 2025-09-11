@@ -839,6 +839,8 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
 
       # LF tag permissions (needed to create and grant tag-based access)
       "lakeformation:CreateLFTag",
+      "lakeformation:CreateLFTagExpression",
+      "lakeformation:GetLFTagExpression",
       "lakeformation:UpdateLFTag",
       "lakeformation:DeleteLFTag",
       "lakeformation:GetResourceLFTags",
@@ -891,6 +893,7 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
       "glue:GetDatabase",
       "glue:GetPartition",
       "glue:GetTags",
+      "glue:DeleteDatabase",
       "glue:TagResource",
       "glue:UpdateDatabase"
     ]
@@ -898,6 +901,7 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
       for resource in each.value.resource_shares : [
         "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:database/${resource.glue_database}",
         formatlist("arn:aws:glue:${local.current_account_region}:${local.current_account_id}:table/${resource.glue_database}/%s", resource.glue_tables),
+        "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:userDefinedFunction/${resource.glue_database}/*",
         "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:catalog"
       ]
     ])
@@ -908,6 +912,7 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
     actions = [
       "iam:CreateRole",
       "iam:DeleteRole",
+      "iam:DeleteRolePolicy",
       "iam:GetRole",
       "iam:TagRole",
       "iam:ListRolePolicies",
