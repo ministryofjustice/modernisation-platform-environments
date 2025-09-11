@@ -8,14 +8,10 @@ resource "aws_security_group" "ec2_sg_webgate" {
   )
 }
 
-
-# INGRESS Rules
-
-### HTTP
-
-resource "aws_security_group_rule" "ingress_traffic_webgate_80" {
+### INGRESS
+# HTTP
+resource "aws_vpc_security_group_ingress_rule" "ingress_traffic_webgate_80" {
   security_group_id = aws_security_group.ec2_sg_webgate.id
-  type              = "ingress"
   description       = "HTTP"
   protocol          = "TCP"
   from_port         = 80
@@ -26,11 +22,9 @@ resource "aws_security_group_rule" "ingress_traffic_webgate_80" {
   local.application_data.accounts[local.environment].lz_aws_workspace_prod_subnet_env]
 }
 
-### HTTPS
-
-resource "aws_security_group_rule" "ingress_traffic_webgate_443" {
+# HTTPS
+resource "aws_vpc_security_group_ingress_rule" "ingress_traffic_webgate_443" {
   security_group_id = aws_security_group.ec2_sg_webgate.id
-  type              = "ingress"
   description       = "HTTPS"
   protocol          = "TCP"
   from_port         = 443
@@ -41,11 +35,9 @@ resource "aws_security_group_rule" "ingress_traffic_webgate_443" {
   local.application_data.accounts[local.environment].lz_aws_workspace_prod_subnet_env]
 }
 
-### SSH
-
-resource "aws_security_group_rule" "ingress_traffic_webgate_22" {
+# SSH
+resource "aws_vpc_security_group_ingress_rule" "ingress_traffic_webgate_22" {
   security_group_id = aws_security_group.ec2_sg_webgate.id
-  type              = "ingress"
   description       = "SSH"
   protocol          = "TCP"
   from_port         = 22
@@ -56,11 +48,9 @@ resource "aws_security_group_rule" "ingress_traffic_webgate_22" {
   local.application_data.accounts[local.environment].lz_aws_workspace_prod_subnet_env]
 }
 
-### Oracle LDAP
-
-resource "aws_security_group_rule" "ingress_traffic_webgate_1389" {
+# Oracle LDAP
+resource "aws_vpc_security_group_ingress_rule" "ingress_traffic_webgate_1389" {
   security_group_id = aws_security_group.ec2_sg_webgate.id
-  type              = "ingress"
   description       = "Oracle LDAP"
   protocol          = "TCP"
   from_port         = 1389
@@ -71,11 +61,9 @@ resource "aws_security_group_rule" "ingress_traffic_webgate_1389" {
   local.application_data.accounts[local.environment].lz_aws_workspace_prod_subnet_env]
 }
 
-### Oracle Listerner Port
-
-resource "aws_security_group_rule" "ingress_traffic_webgate_152x" {
+# Oracle Listerner Port
+resource "aws_vpc_security_group_ingress_rule" "ingress_traffic_webgate_152x" {
   security_group_id = aws_security_group.ec2_sg_webgate.id
-  type              = "ingress"
   description       = "Oracle Net Listener"
   protocol          = "TCP"
   from_port         = 1521
@@ -86,11 +74,9 @@ resource "aws_security_group_rule" "ingress_traffic_webgate_152x" {
   local.application_data.accounts[local.environment].lz_aws_workspace_prod_subnet_env]
 }
 
-### Oracle
-
-resource "aws_security_group_rule" "ingress_traffic_webgate_5101" {
+# Oracle
+resource "aws_vpc_security_group_ingress_rule" "ingress_traffic_webgate_5101" {
   security_group_id = aws_security_group.ec2_sg_webgate.id
-  type              = "ingress"
   description       = "Oracle"
   protocol          = "TCP"
   from_port         = 5101
@@ -101,11 +87,9 @@ resource "aws_security_group_rule" "ingress_traffic_webgate_5101" {
   local.application_data.accounts[local.environment].lz_aws_workspace_prod_subnet_env]
 }
 
-### Oracle
-
-resource "aws_security_group_rule" "ingress_traffic_webgate_5401" {
+# Oracle
+resource "aws_vpc_security_group_ingress_rule" "ingress_traffic_webgate_5401" {
   security_group_id = aws_security_group.ec2_sg_webgate.id
-  type              = "ingress"
   description       = "Oracle"
   protocol          = "TCP"
   from_port         = 5401
@@ -116,11 +100,9 @@ resource "aws_security_group_rule" "ingress_traffic_webgate_5401" {
   local.application_data.accounts[local.environment].lz_aws_workspace_prod_subnet_env]
 }
 
-### Oracle
-
-resource "aws_security_group_rule" "ingress_traffic_webgate_5575" {
+# Oracle
+resource "aws_vpc_security_group_ingress_rule" "ingress_traffic_webgate_5575" {
   security_group_id = aws_security_group.ec2_sg_webgate.id
-  type              = "ingress"
   description       = "Oracle"
   protocol          = "TCP"
   from_port         = 5575
@@ -131,11 +113,9 @@ resource "aws_security_group_rule" "ingress_traffic_webgate_5575" {
   local.application_data.accounts[local.environment].lz_aws_workspace_prod_subnet_env]
 }
 
-### Oracle LDAP SSL
-
-resource "aws_security_group_rule" "ingress_traffic_webgate_1636" {
+# Oracle LDAP SSL
+resource "aws_vpc_security_group_ingress_rule" "ingress_traffic_webgate_1636" {
   security_group_id = aws_security_group.ec2_sg_webgate.id
-  type              = "ingress"
   description       = "Oracle LDAP SSL"
   protocol          = "TCP"
   from_port         = 1636
@@ -146,11 +126,9 @@ resource "aws_security_group_rule" "ingress_traffic_webgate_1636" {
   local.application_data.accounts[local.environment].lz_aws_workspace_prod_subnet_env]
 }
 
-### Oracle
-
-resource "aws_security_group_rule" "ingress_traffic_webgate_10401" {
+# Oracle
+resource "aws_vpc_security_group_ingress_rule" "ingress_traffic_webgate_10401" {
   security_group_id = aws_security_group.ec2_sg_webgate.id
-  type              = "ingress"
   description       = "Oracle"
   protocol          = "TCP"
   from_port         = 10401
@@ -161,11 +139,9 @@ resource "aws_security_group_rule" "ingress_traffic_webgate_10401" {
   local.application_data.accounts[local.environment].lz_aws_workspace_prod_subnet_env]
 }
 
-### Oracle HTTP
-
-resource "aws_security_group_rule" "ingress_traffic_webgate_800x" {
+# Oracle HTTP
+resource "aws_vpc_security_group_ingress_rule" "ingress_traffic_webgate_800x" {
   security_group_id = aws_security_group.ec2_sg_webgate.id
-  type              = "ingress"
   description       = "Oracle HTTP"
   protocol          = "TCP"
   from_port         = 8000
@@ -176,11 +152,9 @@ resource "aws_security_group_rule" "ingress_traffic_webgate_800x" {
   local.application_data.accounts[local.environment].lz_aws_workspace_prod_subnet_env]
 }
 
-### Oracle HTTPS
-
-resource "aws_security_group_rule" "ingress_traffic_webgate_4443" {
+# Oracle HTTPS
+resource "aws_vpc_security_group_ingress_rule" "ingress_traffic_webgate_4443" {
   security_group_id = aws_security_group.ec2_sg_webgate.id
-  type              = "ingress"
   description       = "Oracle HTTPS"
   protocol          = "TCP"
   from_port         = 4443
@@ -191,14 +165,10 @@ resource "aws_security_group_rule" "ingress_traffic_webgate_4443" {
   local.application_data.accounts[local.environment].lz_aws_workspace_prod_subnet_env]
 }
 
-
-# EGRESS Rules
-
-### HTTP
-
-resource "aws_security_group_rule" "egress_traffic_webgate_80" {
+### EGRESS
+# HTTP
+resource "aws_vpc_security_group_egress_rule" "egress_traffic_webgate_80" {
   security_group_id = aws_security_group.ec2_sg_webgate.id
-  type              = "egress"
   description       = "Oracle HTTPs"
   protocol          = "TCP"
   from_port         = 80
@@ -206,11 +176,9 @@ resource "aws_security_group_rule" "egress_traffic_webgate_80" {
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
-### HTTPS
-
-resource "aws_security_group_rule" "egress_traffic_webgate_443" {
+# HTTPS
+resource "aws_vpc_security_group_egress_rule" "egress_traffic_webgate_443" {
   security_group_id = aws_security_group.ec2_sg_webgate.id
-  type              = "egress"
   description       = "HTTPS"
   protocol          = "TCP"
   from_port         = 443
@@ -218,11 +186,9 @@ resource "aws_security_group_rule" "egress_traffic_webgate_443" {
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
-### FTP
-
-resource "aws_security_group_rule" "egress_traffic_webgate_2x" {
+# FTP
+resource "aws_vpc_security_group_egress_rule" "egress_traffic_webgate_2x" {
   security_group_id = aws_security_group.ec2_sg_webgate.id
-  type              = "egress"
   description       = "FTP"
   protocol          = "TCP"
   from_port         = 20
@@ -230,11 +196,9 @@ resource "aws_security_group_rule" "egress_traffic_webgate_2x" {
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
-### SSH
-
-resource "aws_security_group_rule" "egress_traffic_webgate_22" {
+# SSH
+resource "aws_vpc_security_group_egress_rule" "egress_traffic_webgate_22" {
   security_group_id = aws_security_group.ec2_sg_webgate.id
-  type              = "egress"
   description       = "SSH"
   protocol          = "TCP"
   from_port         = 22
@@ -242,11 +206,9 @@ resource "aws_security_group_rule" "egress_traffic_webgate_22" {
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
-### ORACLE LDAP
-
-resource "aws_security_group_rule" "egress_traffic_webgate_1389" {
+# ORACLE LDAP
+resource "aws_vpc_security_group_egress_rule" "egress_traffic_webgate_1389" {
   security_group_id = aws_security_group.ec2_sg_webgate.id
-  type              = "egress"
   description       = "ORACLE LDAP"
   protocol          = "TCP"
   from_port         = 1389
@@ -254,11 +216,9 @@ resource "aws_security_group_rule" "egress_traffic_webgate_1389" {
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
-### ORACLE Net Listener
-
-resource "aws_security_group_rule" "egress_traffic_webgate_152x" {
+# ORACLE Net Listener
+resource "aws_vpc_security_group_egress_rule" "egress_traffic_webgate_152x" {
   security_group_id = aws_security_group.ec2_sg_webgate.id
-  type              = "egress"
   description       = "ORACLE Net Listener"
   protocol          = "TCP"
   from_port         = 1521
@@ -266,11 +226,9 @@ resource "aws_security_group_rule" "egress_traffic_webgate_152x" {
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
-### Oracle
-
-resource "aws_security_group_rule" "egress_traffic_webgate_5101" {
+# Oracle
+resource "aws_vpc_security_group_egress_rule" "egress_traffic_webgate_5101" {
   security_group_id = aws_security_group.ec2_sg_webgate.id
-  type              = "egress"
   description       = "Oracle"
   protocol          = "TCP"
   from_port         = 5101
@@ -278,11 +236,9 @@ resource "aws_security_group_rule" "egress_traffic_webgate_5101" {
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
-### Oracle
-
-resource "aws_security_group_rule" "egress_traffic_webgate_5401" {
+# Oracle
+resource "aws_vpc_security_group_egress_rule" "egress_traffic_webgate_5401" {
   security_group_id = aws_security_group.ec2_sg_webgate.id
-  type              = "egress"
   description       = "Oracle"
   protocol          = "TCP"
   from_port         = 5401
@@ -290,11 +246,9 @@ resource "aws_security_group_rule" "egress_traffic_webgate_5401" {
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
-### Oracle
-
-resource "aws_security_group_rule" "egress_traffic_webgate_5575" {
+# Oracle
+resource "aws_vpc_security_group_egress_rule" "egress_traffic_webgate_5575" {
   security_group_id = aws_security_group.ec2_sg_webgate.id
-  type              = "egress"
   description       = "Oracle"
   protocol          = "TCP"
   from_port         = 5575
@@ -302,11 +256,9 @@ resource "aws_security_group_rule" "egress_traffic_webgate_5575" {
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
-### Oracle LDAP SSL
-
-resource "aws_security_group_rule" "egress_traffic_webgate_1636" {
+# Oracle LDAP SSL
+resource "aws_vpc_security_group_egress_rule" "egress_traffic_webgate_1636" {
   security_group_id = aws_security_group.ec2_sg_webgate.id
-  type              = "egress"
   description       = "Oracle LDAP SSL"
   protocol          = "TCP"
   from_port         = 1636
@@ -314,11 +266,9 @@ resource "aws_security_group_rule" "egress_traffic_webgate_1636" {
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
-### Oracle
-
-resource "aws_security_group_rule" "egress_traffic_webgate_10401" {
+# Oracle
+resource "aws_vpc_security_group_egress_rule" "egress_traffic_webgate_10401" {
   security_group_id = aws_security_group.ec2_sg_webgate.id
-  type              = "egress"
   description       = "Oracle"
   protocol          = "TCP"
   from_port         = 10401
@@ -326,11 +276,9 @@ resource "aws_security_group_rule" "egress_traffic_webgate_10401" {
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
-### Lloyds FTP
-
-resource "aws_security_group_rule" "egress_traffic_webgate_50000" {
+# Lloyds FTP
+resource "aws_vpc_security_group_egress_rule" "egress_traffic_webgate_50000" {
   security_group_id = aws_security_group.ec2_sg_webgate.id
-  type              = "egress"
   description       = "Oracle"
   protocol          = "TCP"
   from_port         = 50000
@@ -338,11 +286,9 @@ resource "aws_security_group_rule" "egress_traffic_webgate_50000" {
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
-### Oracle HTTP
-
-resource "aws_security_group_rule" "egress_traffic_webgate_800x" {
+# Oracle HTTP
+resource "aws_vpc_security_group_egress_rule" "egress_traffic_webgate_800x" {
   security_group_id = aws_security_group.ec2_sg_webgate.id
-  type              = "egress"
   description       = "Oracle HTTP"
   protocol          = "TCP"
   from_port         = 8000
@@ -350,15 +296,12 @@ resource "aws_security_group_rule" "egress_traffic_webgate_800x" {
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
-### Oracle HTTPS
-
-resource "aws_security_group_rule" "egress_traffic_webgate_4443" {
+# Oracle HTTPS
+resource "aws_vpc_security_group_egress_rule" "egress_traffic_webgate_4443" {
   security_group_id = aws_security_group.ec2_sg_webgate.id
-  type              = "egress"
   description       = "Oracle HTTPS"
   protocol          = "TCP"
   from_port         = 4443
   to_port           = 4444
   cidr_blocks       = ["0.0.0.0/0"]
 }
-

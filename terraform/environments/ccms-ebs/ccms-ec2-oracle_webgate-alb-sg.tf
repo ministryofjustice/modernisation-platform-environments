@@ -9,14 +9,10 @@ resource "aws_security_group" "sg_webgate_lb" {
   )
 }
 
-
-# INGRESS Rules
-
-### HTTPS
-
-resource "aws_security_group_rule" "ingress_traffic_webgatelb_443" {
+### INGRESS
+# HTTPS
+resource "aws_vpc_security_group_ingress_rule" "ingress_traffic_webgatelb_443" {
   security_group_id = aws_security_group.sg_webgate_lb.id
-  type              = "ingress"
   description       = "HTTPS"
   protocol          = "TCP"
   from_port         = 443
@@ -24,22 +20,13 @@ resource "aws_security_group_rule" "ingress_traffic_webgatelb_443" {
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
-
-# EGRESS Rules
-
-### All
-
-resource "aws_security_group_rule" "egress_traffic_webgatelb_80" {
+### EGRESS
+# All
+resource "aws_vpc_security_group_egress_rule" "egress_traffic_webgatelb_80" {
   security_group_id = aws_security_group.sg_webgate_lb.id
-  type              = "egress"
   description       = "All"
   protocol          = "TCP"
   from_port         = 0
   to_port           = 0
   cidr_blocks       = ["0.0.0.0/0"]
 }
-
-
-
-
-
