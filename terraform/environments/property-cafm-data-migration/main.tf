@@ -4,7 +4,7 @@ provider "aws" {
 }
 
 module "csv_export" {
-  source = "github.com/ministryofjustice/terraform-csv-to-parquet-athena?ref=c3c0a7fb772268e54f1958cc881c566c28e63e50"
+  source = "github.com/ministryofjustice/terraform-csv-to-parquet-athena?ref=8c687aaf2a56b17f135121ea5dfd521d7d4b1531"
   providers = {
     aws = aws.replicattion
   }
@@ -22,7 +22,7 @@ module "csv_export" {
 }
 
 module "rds_export" {
-  source = "github.com/ministryofjustice/terraform-rds-export?ref=10085c3dc7f9f6d5de52e1ef15db681cd52cce98"
+  source = "github.com/ministryofjustice/terraform-rds-export?ref=c3c0a7fb772268e54f1958cc881c566c28e63e50"
 
   kms_key_arn           = aws_kms_key.shared_kms_key.arn
   name                  = "planetfm"
