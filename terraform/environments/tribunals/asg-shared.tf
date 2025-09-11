@@ -271,13 +271,6 @@ resource "aws_autoscaling_group" "tribunals-all-asg" {
   }
 }
 
-resource "aws_autoscaling_attachment" "tribunals_all_asg_attachment" {
-  for_each = aws_lb_target_group.tribunals_target_group
-
-  autoscaling_group_name = aws_autoscaling_group.tribunals-all-asg.name
-  lb_target_group_arn    = each.value.arn
-}
-
 resource "aws_instance" "tribunals_backup" {
   iam_instance_profile = aws_iam_instance_profile.ec2_instance_profile.name
   launch_template {
