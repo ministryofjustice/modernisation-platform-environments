@@ -21,3 +21,22 @@ variable "bucket_name" {
   type        = string
   default     = "t4-environment-bucket-12345678"
 }
+
+variable "subnet_cidrs {
+  description = "The CIDR subnet which is the same as above"
+  type        = string
+  default     = "10.26.24.0/21"
+}
+
+variable "ami" {
+  description = "The ami used in the definition" 
+  type        = string
+  default     = "ami-05dc21b0a2a063708"
+}
+
+variable "instance_type" {
+  description = "instance type"
+  type        = string
+  default     = "t2.micro"
+}
+
