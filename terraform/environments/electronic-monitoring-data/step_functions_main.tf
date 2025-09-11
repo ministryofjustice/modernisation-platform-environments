@@ -28,7 +28,7 @@ module "dms_validation_step_function" {
   variable_dictionary = tomap(
     {
       "dms_retrieve_metadata" = module.dms_retrieve_metadata[0].lambda_function_name,
-      "dms_validation" = module.dms_validation[0].lambda_function_name,
+      "dms_validation"        = module.dms_validation[0].lambda_function_name,
     }
   )
   type = "STANDARD"
