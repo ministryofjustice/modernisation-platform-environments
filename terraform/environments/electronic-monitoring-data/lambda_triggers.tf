@@ -94,7 +94,7 @@ resource "aws_lambda_permission" "historic" {
 
 resource "aws_s3_bucket_notification" "raw_formatted_data_bucket" {
   depends_on = [aws_lambda_permission.airflow_allied_mdss]
-  bucket     = module.s3-raw-formated-data-bucket.bucket.id
+  bucket     = module.s3-raw-formatted-data-bucket.bucket.id
 
   lambda_function {
     lambda_function_arn = module.airflow_trigger.lambda_function_arn
@@ -111,5 +111,5 @@ resource "aws_lambda_permission" "airflow_allied_mdss" {
   action        = "lambda:InvokeFunction"
   function_name = module.airflow_trigger.lambda_function_name
   principal     = "s3.amazonaws.com"
-  source_arn    = module.s3-raw-formated-data-bucket.bucket.arn
+  source_arn    = module.s3-raw-formatted-data-bucket.bucket.arn
 }
