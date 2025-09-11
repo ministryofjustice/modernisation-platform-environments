@@ -164,7 +164,7 @@ resource "aws_iam_role_policy_attachment" "s3_uploads_attachment" {
 #-------------------------------------------------------------------------------------------------
 
 module "ap_landing_bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
 
   bucket_name        = "${local.application_name}-land-${local.environment}"
   ownership_controls = "BucketOwnerEnforced"
