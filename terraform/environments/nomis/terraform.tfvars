@@ -1,0 +1,7 @@
+region             = "eu-west-2"
+vpc_cidr           = "10.26.24.0/21"
+subnet_cidrs       = "10.26.24.0/21"
+availability_zones = "eu-west-2"
+ami                = "ami-05dc21b0a2a063708"
+instance_type      = "t2.micro"
+bucket_name        = "t4-environment-bucket-12345678"
