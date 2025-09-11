@@ -14,7 +14,6 @@ module "environment_prod" {
     aws.core-vpc               = aws.core-vpc
     aws.core-network-services  = aws.core-network-services
     aws.modernisation-platform = aws.modernisation-platform
-    archive                    = archive
   }
 
   env_name      = "prod"
