@@ -8,7 +8,7 @@ module "csv_export" {
   providers = {
     aws = aws.replicattion
   }
-  region_primary = "eu-west-2"
+  region_replication = "eu-west-2"
   kms_key_arn = aws_kms_key.shared_kms_key.arn
   name = "concept"
   load_mode = "overwrite"
