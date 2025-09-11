@@ -97,7 +97,7 @@ resource "aws_s3_bucket_notification" "raw_formatted_data_bucket" {
   bucket     = module.s3-raw-formatted-data-bucket.bucket.id
 
   lambda_function {
-    lambda_function_arn = module.airflow_trigger.lambda_function_arn
+    lambda_function_arn = module.airflow_trigger[0].lambda_function_arn
     events = [
       "s3:ObjectCreated:*"
     ]
@@ -109,7 +109,7 @@ resource "aws_s3_bucket_notification" "raw_formatted_data_bucket" {
 resource "aws_lambda_permission" "airflow_allied_mdss" {
   statement_id  = "InvokeLoadMDSSAirflowJob"
   action        = "lambda:InvokeFunction"
-  function_name = module.airflow_trigger.lambda_function_name
+  function_name = module.airflow_trigger[0].lambda_function_name
   principal     = "s3.amazonaws.com"
   source_arn    = module.s3-raw-formatted-data-bucket.bucket.arn
 }
