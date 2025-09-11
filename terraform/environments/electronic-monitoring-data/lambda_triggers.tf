@@ -86,3 +86,30 @@ resource "aws_lambda_permission" "historic" {
   principal     = "s3.amazonaws.com"
   source_arn    = module.s3-data-bucket.bucket.arn
 }
+
+
+# --------------------------------------------------------
+# Trigger airflow notification
+# --------------------------------------------------------
+
+resource "aws_s3_bucket_notification" "raw_formatted_data_bucket" {
+  depends_on = [aws_lambda_permission.airflow_allied_mdss]
+  bucket     = module.s3-raw-formated-data-bucket.bucket.id
+
+  lambda_function {
+    lambda_function_arn = module.airflow_trigger.lambda_function_arn
+    events = [
+      "s3:ObjectCreated:*"
+    ]
+    filter_prefix = "allied/mdss"
+  }
+}
+
+
+resource "aws_lambda_permission" "airflow_allied_mdss" {
+  statement_id  = "InvokeLoadMDSSAirflowJob"
+  action        = "lambda:InvokeFunction"
+  function_name = module.airflow_trigger.lambda_function_name
+  principal     = "s3.amazonaws.com"
+  source_arn    = module.s3-raw-formated-data-bucket.bucket.arn
+}
