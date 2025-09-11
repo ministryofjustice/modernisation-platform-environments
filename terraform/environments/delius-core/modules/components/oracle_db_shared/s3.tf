@@ -393,7 +393,8 @@ data "aws_iam_policy_document" "db_uplift_bucket_access" {
     effect = "Allow"
     actions = [
       "s3:Get*",
-      "s3:List*"
+      "s3:List*",
+      "s3:PutObject"
     ]
     resources = [
       "${module.s3_bucket_db_uplift[0].bucket.arn}",
