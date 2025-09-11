@@ -35,7 +35,7 @@ module "pagerduty_core_alerts" {
   depends_on = [
     aws_sns_topic.hub2_alerts
   ]
-  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v3.0.0"
   sns_topics                = [aws_sns_topic.hub2_alerts.name]
   pagerduty_integration_key = local.pagerduty_integration_keys[local.pagerduty_integration_key_name]
 }
