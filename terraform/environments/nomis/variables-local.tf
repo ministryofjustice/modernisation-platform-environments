@@ -16,3 +16,12 @@ variable "availability_zones" {
   default     = "eu-west-2"
 }
 
+variable "bucket_name" {
+  description = "The bucket that will be used"
+  type        = string
+  default     = "t4-environment-bucket-12345678"
+}
+
+variable "vpc_cidr" {
+
+}
