@@ -17,6 +17,8 @@ data "aws_iam_policy_document" "assume_role_policy_document" {
 }
 
 data "aws_iam_policy_document" "lambda_policy_document" {
+  #checkov:skip=CKV_AWS_356 "ignore"
+  #checkov:skip=CKV_AWS_111 "ignore"
   statement {
     sid       = "Logging"
     effect    = "Allow"

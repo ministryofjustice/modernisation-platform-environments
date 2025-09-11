@@ -159,7 +159,7 @@
       "managed_container_memory": "15360",
       "managed_app_image": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/soa-managed",
       "managed_server_port": "8001",
-      "managed_app_count": "2",
+      "managed_app_count": "4",
       "managed_container_version": "0.0.11",
       "managed_wl_mem_args": "-Xms8192m -Xmx12288m -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:InitiatingHeapOccupancyPercent=35 -XX:G1HeapRegionSize=16M -XX:MinMetaspaceFreeRatio=50 -XX:MaxMetaspaceFreeRatio=80 -XX:+AlwaysPreTouch",
       "managed_hostname": "ccms-soa-managed",
@@ -179,7 +179,7 @@
       "inbound_s3_bucket_name": "laa-ccms-inbound-preproduction-mp",
       "outbound_s3_bucket_name": "laa-ccms-outbound-preproduction-mp",
       "aws_workspace_cidr": "10.200.0.0/19",
-      "northgate_proxy": "10.120.0.147/32",
+      "northgate_proxy": "10.120.0.0/24",
       "cloud_platform_cidr": "172.20.0.0/16"
     },
     "production": {
@@ -201,7 +201,7 @@
       "alerting_slack_channel_id": "C0945N08MPX",
       "alerting_log_retention_days": "0",
       "admin_xxsoa_ds_username": "XXSOA",
-      "admin_ebs_ds_url": "jdbc:oracle:thin:@tcps://ccms-ebs-db-nlb.laa-production.modernisation-platform.service.justice.gov.uk:443/EBSPROD",
+      "admin_ebs_ds_url": "jdbc:oracle:thin:@tcps://ccms-ebs-db-nlb.ccms-ebs.service.justice.gov.uk:443/EBSPROD",
       "admin_ebs_ds_username": "apps",
       "admin_ebssms_ds_url": "jdbc:oracle:thin:@tcps://cwa-prod-db.aws.prd.legalservices.gov.uk:2484/CWA",
       "admin_hostname": "ccms-soa-admin",
@@ -216,7 +216,7 @@
       "managed_container_memory": "15360",
       "managed_app_image": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/soa-managed",
       "managed_server_port": "8001",
-      "managed_app_count": "2",
+      "managed_app_count": "6",
       "managed_container_version": "0.0.11",
       "managed_wl_mem_args": "-Xms8192m -Xmx12288m -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:InitiatingHeapOccupancyPercent=35 -XX:G1HeapRegionSize=16M -XX:MinMetaspaceFreeRatio=50 -XX:MaxMetaspaceFreeRatio=80 -XX:+AlwaysPreTouch",
       "managed_hostname": "ccms-soa-managed",
@@ -237,7 +237,7 @@
       "outbound_s3_bucket_name": "laa-ccms-outbound-production-mp",
       "cortex_deps_bucket_name": "ccms-shared",
       "aws_workspace_cidr": "10.200.0.0/19",
-      "northgate_proxy": "10.110.0.57/32",
+      "northgate_proxy": "10.110.0.0/24",
       "cloud_platform_cidr": "172.20.0.0/16"
     }
   }

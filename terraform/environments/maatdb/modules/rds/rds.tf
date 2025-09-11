@@ -280,12 +280,15 @@ resource "aws_security_group" "mlra_ecs_sec_group" {
     security_groups = [var.mlra_ecs_cluster_sec_group_id]
   }
 
-  ingress {
-    description     = "RDS Access from the HUB 2.0 MAAT Lambda"
-    from_port       = 1521
-    to_port         = 1521
-    protocol        = "tcp"
-    security_groups = [var.hub20_sec_group_id]
+  dynamic "ingress" {
+    for_each = length(trimspace(var.hub20_sec_group_id != null ? var.hub20_sec_group_id : "")) > 0 ? [1] : []
+    content {
+      description     = "RDS Access from the HUB 2.0 MAAT Lambda"
+      from_port       = 1521
+      to_port         = 1521
+      protocol        = "tcp"
+      security_groups = [var.hub20_sec_group_id]
+    }
   }
 
   egress {
@@ -372,6 +375,7 @@ resource "aws_iam_role" "rds_s3_access" {
 }
 
 resource "aws_iam_policy" "rds_s3_access_policy" {
+  count       = length(trimspace(var.hub20_s3_bucket != null ? var.hub20_s3_bucket : "")) > 0 ? 1 : 0
   name        = "rds-hub20-s3-bucket-policy"
   description = "Allow Oracle RDS instance to read objects from HUB 2.0 S3 bucket"
 
@@ -397,8 +401,9 @@ resource "aws_iam_policy" "rds_s3_access_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "rds_s3_access_policy_attachment" {
+  count      = length(trimspace(var.hub20_s3_bucket != null ? var.hub20_s3_bucket : "")) > 0 ? 1 : 0
   role       = aws_iam_role.rds_s3_access.name
-  policy_arn = aws_iam_policy.rds_s3_access_policy.arn
+  policy_arn = aws_iam_policy.rds_s3_access_policy[0].arn
 }
 
 resource "aws_db_instance_role_association" "rds_s3_role_association" {

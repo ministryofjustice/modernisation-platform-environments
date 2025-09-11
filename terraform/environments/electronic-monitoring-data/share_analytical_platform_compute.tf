@@ -24,9 +24,11 @@ locals {
     "testing",
     "serco_servicenow_deduped",
     "serco_servicenow_curated",
-    "serco_servicenow_curated_snapshot",
-    "servicenow_curated",
-    "servicenow_curated_snapshot",
+    "serco_fms",
+    "serco_fms_deduped",
+    "serco_fms_curated",
+    "servicenow_curated",          # to be destroyed
+    "servicenow_curated_snapshot", # to be destroyed
   ]
   live_feeds_dbs = [
     "servicenow",
