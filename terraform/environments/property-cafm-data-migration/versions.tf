@@ -27,8 +27,3 @@ terraform {
   }
   required_version = "~> 1.0"
 }
-
-provider "aws" {
-  alias  = "replicattion"
-  region = "eu-west-2"
-}
