@@ -7,14 +7,9 @@ resource "aws_security_group" "ec2_sg_mailrelay" {
   )
 }
 
-
-# INGRESS Rules
-
-### SSH
-
-resource "aws_security_group_rule" "ingress_traffic_mailrelay_22" {
+# SSH
+resource "aws_vpc_security_group_ingress_rule" "ingress_traffic_mailrelay_22" {
   security_group_id = aws_security_group.ec2_sg_mailrelay.id
-  type              = "ingress"
   description       = "SSH"
   protocol          = "TCP"
   from_port         = 22
@@ -23,11 +18,9 @@ resource "aws_security_group_rule" "ingress_traffic_mailrelay_22" {
   local.application_data.accounts[local.environment].lz_aws_subnet_env]
 }
 
-### SMTP
-
-resource "aws_security_group_rule" "ingress_traffic_mailrelay_25" {
+# SMTP
+resource "aws_vpc_security_group_ingress_rule" "ingress_traffic_mailrelay_25" {
   security_group_id = aws_security_group.ec2_sg_mailrelay.id
-  type              = "ingress"
   description       = "SMTP"
   protocol          = "TCP"
   from_port         = 25
@@ -36,14 +29,9 @@ resource "aws_security_group_rule" "ingress_traffic_mailrelay_25" {
   local.application_data.accounts[local.environment].lz_aws_subnet_env]
 }
 
-
-# EGRESS Rules
-
-### HTTPS
-
-resource "aws_security_group_rule" "egress_traffic_mailrelay_443" {
+# HTTPS
+resource "aws_vpc_security_group_egress_rule" "egress_traffic_mailrelay_443" {
   security_group_id = aws_security_group.ec2_sg_mailrelay.id
-  type              = "egress"
   description       = "HTTPS"
   protocol          = "TCP"
   from_port         = 443
@@ -51,11 +39,9 @@ resource "aws_security_group_rule" "egress_traffic_mailrelay_443" {
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
-### SES
-
-resource "aws_security_group_rule" "egress_traffic_mailrelay_587" {
+# SES
+resource "aws_vpc_security_group_egress_rule" "egress_traffic_mailrelay_587" {
   security_group_id = aws_security_group.ec2_sg_mailrelay.id
-  type              = "egress"
   description       = "SES"
   protocol          = "TCP"
   from_port         = 587

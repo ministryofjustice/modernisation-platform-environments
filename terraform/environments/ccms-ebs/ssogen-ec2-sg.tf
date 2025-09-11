@@ -13,9 +13,8 @@ resource "aws_security_group" "ssogen_sg" {
 ############################################
 # INGRESS — SSH (22) from WorkSpaces subnets (private)
 ############################################
-resource "aws_security_group_rule" "ing_ssh_workspaces" {
+resource "aws_vpc_security_group_ingress_rule" "ingress_ssh_workspaces" {
   count             = local.is_development ? 1 : 0
-  type              = "ingress"
   description       = "SSH from WorkSpaces subnets"
   security_group_id = aws_security_group.ssogen_sg[0].id
   protocol          = "tcp"
@@ -32,9 +31,8 @@ resource "aws_security_group_rule" "ing_ssh_workspaces" {
 ############################################
 # INGRESS — WebLogic Admin (7001)
 ############################################
-resource "aws_security_group_rule" "ing_7001_workspaces_private" {
+resource "aws_vpc_security_group_ingress_rule" "ingress_7001_workspaces_private" {
   count             = local.is_development ? 1 : 0
-  type              = "ingress"
   description       = "WebLogic 7001 from WorkSpaces subnets (private)"
   security_group_id = aws_security_group.ssogen_sg[0].id
   protocol          = "tcp"
@@ -48,9 +46,8 @@ resource "aws_security_group_rule" "ing_7001_workspaces_private" {
   ]
 }
 
-resource "aws_security_group_rule" "ing_7001_workspaces_nat" {
+resource "aws_vpc_security_group_ingress_rule" "ingress_7001_workspaces_nat" {
   count             = local.is_development ? 1 : 0
-  type              = "ingress"
   description       = "WebLogic 7001 from WorkSpaces NAT IPs (public)"
   security_group_id = aws_security_group.ssogen_sg[0].id
   protocol          = "tcp"
@@ -68,9 +65,8 @@ resource "aws_security_group_rule" "ing_7001_workspaces_nat" {
 ############################################
 # INGRESS — OHS 7777
 ############################################
-resource "aws_security_group_rule" "ing_7777_workspaces_private" {
+resource "aws_vpc_security_group_ingress_rule" "ingress_7777_workspaces_private" {
   count             = local.is_development ? 1 : 0
-  type              = "ingress"
   description       = "OHS 7777 from WorkSpaces subnets (private)"
   security_group_id = aws_security_group.ssogen_sg[0].id
   protocol          = "tcp"
@@ -84,9 +80,8 @@ resource "aws_security_group_rule" "ing_7777_workspaces_private" {
   ]
 }
 
-resource "aws_security_group_rule" "ing_7777_workspaces_nat" {
+resource "aws_vpc_security_group_ingress_rule" "ingress_7777_workspaces_nat" {
   count             = local.is_development ? 1 : 0
-  type              = "ingress"
   description       = "OHS 7777 from WorkSpaces NAT IPs (public)"
   security_group_id = aws_security_group.ssogen_sg[0].id
   protocol          = "tcp"
@@ -104,9 +99,8 @@ resource "aws_security_group_rule" "ing_7777_workspaces_nat" {
 ############################################
 # INGRESS — OHS 4443
 ############################################
-resource "aws_security_group_rule" "ing_4443_workspaces_private" {
+resource "aws_vpc_security_group_ingress_rule" "ingress_4443_workspaces_private" {
   count             = local.is_development ? 1 : 0
-  type              = "ingress"
   description       = "OHS 4443 from WorkSpaces subnets (private)"
   security_group_id = aws_security_group.ssogen_sg[0].id
   protocol          = "tcp"
@@ -120,9 +114,8 @@ resource "aws_security_group_rule" "ing_4443_workspaces_private" {
   ]
 }
 
-resource "aws_security_group_rule" "ing_4443_workspaces_nat" {
+resource "aws_vpc_security_group_ingress_rule" "ingress_4443_workspaces_nat" {
   count             = local.is_development ? 1 : 0
-  type              = "ingress"
   description       = "OHS 4443 from WorkSpaces NAT IPs (public)"
   security_group_id = aws_security_group.ssogen_sg[0].id
   protocol          = "tcp"
@@ -140,9 +133,8 @@ resource "aws_security_group_rule" "ing_4443_workspaces_nat" {
 ############################################
 # INGRESS — WebLogic managed servers (8000–8005) from EBS App SG
 ############################################
-resource "aws_security_group_rule" "ing_8000_8005_from_ebsapps" {
+resource "aws_vpc_security_group_ingress_rule" "ingress_8000_8005_from_ebsapps" {
   count                    = local.is_development ? 1 : 0
-  type                     = "ingress"
   description              = "WebLogic managed servers from EBS App servers"
   security_group_id        = aws_security_group.ssogen_sg[0].id
   protocol                 = "tcp"
@@ -154,9 +146,8 @@ resource "aws_security_group_rule" "ing_8000_8005_from_ebsapps" {
 ############################################
 # INGRESS — Node Manager (5556) intra-cluster (self)
 ############################################
-resource "aws_security_group_rule" "ing_5556_self" {
+resource "aws_vpc_security_group_ingress_rule" "ingress_5556_self" {
   count                    = local.is_development ? 1 : 0
-  type                     = "ingress"
   description              = "WL Node Manager intra-SG"
   security_group_id        = aws_security_group.ssogen_sg[0].id
   protocol                 = "tcp"
@@ -168,9 +159,8 @@ resource "aws_security_group_rule" "ing_5556_self" {
 ############################################
 # TEMP INGRESS — ICMP Echo (self + WorkSpaces)
 ############################################
-resource "aws_security_group_rule" "ing_icmp_self" {
+resource "aws_vpc_security_group_ingress_rule" "ingress_icmp_self" {
   count                    = local.is_development ? 1 : 0
-  type                     = "ingress"
   description              = "TEMP: ICMP Echo from SSOGEN (self)"
   security_group_id        = aws_security_group.ssogen_sg[0].id
   protocol                 = "icmp"
@@ -179,9 +169,8 @@ resource "aws_security_group_rule" "ing_icmp_self" {
   source_security_group_id = aws_security_group.ssogen_sg[0].id
 }
 
-resource "aws_security_group_rule" "ing_icmp_workspaces" {
+resource "aws_vpc_security_group_ingress_rule" "ingress_icmp_workspaces" {
   count             = local.is_development ? 1 : 0
-  type              = "ingress"
   description       = "TEMP: ICMP Echo from WorkSpaces subnets"
   security_group_id = aws_security_group.ssogen_sg[0].id
   protocol          = "icmp"
@@ -196,9 +185,8 @@ resource "aws_security_group_rule" "ing_icmp_workspaces" {
 ############################################
 # EGRESS — Oracle LDAP (non-SSL + SSL)
 ############################################
-resource "aws_security_group_rule" "eg_ldap_1389" {
+resource "aws_vpc_security_group_egress_rule" "egress_ldap_1389" {
   count             = local.is_development ? 1 : 0
-  type              = "egress"
   description       = "Oracle LDAP"
   security_group_id = aws_security_group.ssogen_sg[0].id
   protocol          = "tcp"
@@ -207,9 +195,8 @@ resource "aws_security_group_rule" "eg_ldap_1389" {
   cidr_blocks       = ["10.0.0.0/8"]
 }
 
-resource "aws_security_group_rule" "eg_ldap_1636_ssl" {
+resource "aws_vpc_security_group_egress_rule" "egress_ldap_1636_ssl" {
   count             = local.is_development ? 1 : 0
-  type              = "egress"
   description       = "Oracle LDAP SSL"
   security_group_id = aws_security_group.ssogen_sg[0].id
   protocol          = "tcp"
@@ -221,9 +208,8 @@ resource "aws_security_group_rule" "eg_ldap_1636_ssl" {
 ############################################
 # EGRESS — 80/443
 ############################################
-resource "aws_security_group_rule" "eg_http_80" {
+resource "aws_vpc_security_group_egress_rule" "egress_http_80" {
   count             = local.is_development ? 1 : 0
-  type              = "egress"
   description       = "Allow outbound HTTP"
   security_group_id = aws_security_group.ssogen_sg[0].id
   protocol          = "tcp"
@@ -232,9 +218,8 @@ resource "aws_security_group_rule" "eg_http_80" {
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
-resource "aws_security_group_rule" "eg_https_443" {
+resource "aws_vpc_security_group_egress_rule" "egress_https_443" {
   count             = local.is_development ? 1 : 0
-  type              = "egress"
   description       = "Allow outbound HTTPS"
   security_group_id = aws_security_group.ssogen_sg[0].id
   protocol          = "tcp"
@@ -246,9 +231,8 @@ resource "aws_security_group_rule" "eg_https_443" {
 ############################################
 # TEMP EGRESS — ICMP Echo to VPC + WorkSpaces
 ############################################
-resource "aws_security_group_rule" "eg_icmp_vpc_workspaces" {
+resource "aws_vpc_security_group_egress_rule" "egress_icmp_vpc_workspaces" {
   count             = local.is_development ? 1 : 0
-  type              = "egress"
   description       = "TEMP: ICMP Echo egress to VPC + WorkSpaces"
   security_group_id = aws_security_group.ssogen_sg[0].id
   protocol          = "icmp"

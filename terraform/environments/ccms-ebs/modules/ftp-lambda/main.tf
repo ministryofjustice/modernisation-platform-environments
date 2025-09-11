@@ -1,19 +1,19 @@
-
-## sg for ftp
+# SG for FTP
 resource "aws_security_group" "ftp_sg" {
   name        = "${var.lambda_name}-sg"
   description = "Allow outbound connection"
   vpc_id      = var.vpc_id
-
-  egress {
-    from_port   = 0
-    to_port     = 65535
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
 }
 
-## lambda role for ftp
+resource "aws_vpc_security_group_egress_rule" "egress_ftp_sg" {
+  security_group_id = aws_security_group.ftp_sg.id
+  from_port         = 0
+  to_port           = 65535
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+}
+
+# Lambda role for FTP
 resource "aws_iam_role" "ftp_lambda_role" {
   name = "${var.lambda_name}-role"
 
@@ -69,15 +69,12 @@ resource "aws_iam_policy" "ftp_policy" {
   })
 }
 
-
-
-
 resource "aws_iam_role_policy_attachment" "ftp_lambda_policy_attach" {
   role       = aws_iam_role.ftp_lambda_role.name
   policy_arn = aws_iam_policy.ftp_policy.arn
 }
 
-### lambda layer for python dependencies
+# Lambda layer for Python dependencies
 resource "aws_lambda_layer_version" "ftp_layer" {
   layer_name               = "ftpclientlayer"
   compatible_runtimes      = ["python3.13"]
@@ -86,7 +83,8 @@ resource "aws_lambda_layer_version" "ftp_layer" {
   compatible_architectures = ["x86_64"]
   description              = "Lambda Layer for ccms ebs ftp lambda contains pycurl and other dependencies"
 }
-#### lambda function for ftp inbound
+
+# Lambda function for FTP inbound
 resource "aws_lambda_function" "ftp_lambda" {
   function_name = var.lambda_name
   role          = aws_iam_role.ftp_lambda_role.arn
@@ -128,13 +126,15 @@ resource "aws_lambda_function" "ftp_lambda" {
     }
   }
 }
-# ### cw rule for schedule
+
+# CW rule for schedule
 resource "aws_cloudwatch_event_rule" "ftp_schedule" {
   count               = contains(var.enabled_cron_in_environments, var.env) ? 1 : 0
   name                = "${var.lambda_name}-schedule"
   schedule_expression = var.ftp_cron
 }
-### cw event lambda target
+
+# CW event Lambda target
 resource "aws_cloudwatch_event_target" "ftp_target" {
   count     = contains(var.enabled_cron_in_environments, var.env) ? 1 : 0
   rule      = aws_cloudwatch_event_rule.ftp_schedule[count.index].name
@@ -142,7 +142,7 @@ resource "aws_cloudwatch_event_target" "ftp_target" {
   arn       = aws_lambda_function.ftp_lambda.arn
 }
 
-### allow cw to event in lambda
+# Allow CW to event in Lambda
 resource "aws_lambda_permission" "ftp_permission" {
   count         = contains(var.enabled_cron_in_environments, var.env) ? 1 : 0
   statement_id  = "AllowExecutionFromCloudWatch"
