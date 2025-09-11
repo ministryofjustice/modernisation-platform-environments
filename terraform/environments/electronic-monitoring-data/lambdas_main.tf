@@ -226,8 +226,30 @@ module "zero_etl_snow" {
 }
 
 #-----------------------------------------------------------------------------------
-# DMS Validation Lambda
+# DMS Validation Lambdas
 #-----------------------------------------------------------------------------------
+module "dms_retrieve_metadata" {
+  count = local.is-development || local.is-production ? 1 : 0
+
+  source                  = "./modules/lambdas"
+  is_image                = true
+  function_name           = "dms_retrieve_metadata"
+  role_name               = aws_iam_role.dms_validation_lambda_role[0].name
+  role_arn                = aws_iam_role.dms_validation_lambda_role[0].arn
+  handler                 = "dms_retrieve_metadata.handler"
+  memory_size             = 10240
+  timeout                 = 900
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : "dev"
+
+  environment_variables = {
+    SOURCE_BUCKET = module.s3-dms-target-store-bucket.bucket.id
+  }
+
+  security_group_ids = [aws_security_group.dms_validation_lambda_sg[0].id]
+  subnet_ids         = data.aws_subnets.shared-public.ids
+}
+
 
 module "dms_validation" {
   count = local.is-development || local.is-production ? 1 : 0
