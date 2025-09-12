@@ -64,7 +64,7 @@ resource "aws_cloudfront_distribution" "tribunals_distribution" {
 
     function_association {
       event_type   = "viewer-request"
-      function_arn = aws_cloudfront_function.redirect_function[0].arn
+      function_arn = aws_cloudfront_function.redirect_function.arn
     }
   }
 
