@@ -107,6 +107,7 @@ resource "aws_s3_bucket_notification" "raw_formatted_data_bucket" {
 
 
 resource "aws_lambda_permission" "airflow_allied_mdss" {
+  count = local.is-development ? 0 : 1
   statement_id  = "InvokeLoadMDSSAirflowJob"
   action        = "lambda:InvokeFunction"
   function_name = module.airflow_trigger[0].lambda_function_name
