@@ -67,8 +67,8 @@ resource "aws_route53_record" "nginx_instances_to_cloudfront" {
   type     = "CNAME"
 
   alias {
-    name                   = aws_cloudfront_distribution.tribunals_distribution[0].domain_name
-    zone_id                = aws_cloudfront_distribution.tribunals_distribution[0].hosted_zone_id
+    name                   = aws_cloudfront_distribution.tribunals_distribution.domain_name
+    zone_id                = aws_cloudfront_distribution.tribunals_distribution.hosted_zone_id
     evaluate_target_health = true
   }
 }
