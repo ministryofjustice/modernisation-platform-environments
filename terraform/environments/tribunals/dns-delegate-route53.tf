@@ -104,23 +104,6 @@ resource "aws_route53_record" "afd_instances_migrated" {
   records  = [aws_cloudfront_distribution.tribunals_distribution.domain_name]
 }
 
-# 'A' records for tribunals URLs routed through the NGINX reverse proxy hosted in AWS DSD Account
-# This includes the empty name for the root domain
-# The target ALB is in eu-west-1 zone which has a fixed zone id of "Z32O12XQLNTSW2"
-resource "aws_route53_record" "nginx_instances" {
-  count    = local.is-production ? length(local.nginx_records) : 0
-  provider = aws.core-network-services
-  zone_id  = local.production_zone_id
-  name     = local.nginx_records[count.index]
-  type     = "A"
-
-  alias {
-    name                   = module.nginx_load_balancer[0].nginx_lb_arn
-    zone_id                = module.nginx_load_balancer[0].nginx_lb_zone_id
-    evaluate_target_health = false
-  }
-}
-
 resource "aws_route53_record" "nginx_instances_pre_migration" {
   #checkov:skip=CKV2_AWS_23:"A record points to existing NGINX ALB in pre-migration environment"
   count    = local.is-production ? length(local.nginx_records_pre_migration) : 0
