@@ -1,1 +1,4 @@
-#### This file can be used to store data specific to the member account ####
+data "aws_iam_roles" "sso_platform_engineer_admin" {
+  name_regex  = "AWSReservedSSO_platform-engineer-admin_.*"
+  path_prefix = "/aws-reserved/sso.amazonaws.com/"
+}
