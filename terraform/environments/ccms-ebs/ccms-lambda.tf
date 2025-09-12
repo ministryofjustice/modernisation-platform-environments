@@ -29,25 +29,45 @@ resource "aws_security_group" "lambda_security_group" {
   )
 }
 
-# ingress rule of lambda_security_group
-resource "aws_security_group_rule" "lambda_ingress" {
+# hashicorp recommened Ingress rule of lambda_security_group
+resource "aws_vpc_security_group_ingress_rule" "lambda_ingress" {
   security_group_id = aws_security_group.lambda_security_group.id
-  type              = "ingress"
-  from_port         = 1521
-  to_port           = 1522
-  protocol          = "tcp"
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+
+  cidr_ipv4   = [data.aws_vpc.shared.cidr_block]
+  from_port   = 1521
+  ip_protocol = "tcp"
+  to_port     = 1522
 }
 
-# Egress rule of lambda_security_group
-resource "aws_security_group_rule" "lambda_egress" {
+# hashicorp recommened egress rule of lambda_security_group
+resource "aws_vpc_security_group_egress_rule" "lambda_egress" {
   security_group_id = aws_security_group.lambda_security_group.id
-  type              = "egress"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
-  cidr_blocks       = ["0.0.0.0/0"]
+
+  cidr_ipv4   = ["0.0.0.0/0"]
+  from_port   = 0
+  ip_protocol = "-1"
+  to_port     = 0
 }
+
+# ingress rule of lambda_security_group
+# resource "aws_security_group_rule" "lambda_ingress" {
+#   security_group_id = aws_security_group.lambda_security_group.id
+#   type              = "ingress"
+#   from_port         = 1521
+#   to_port           = 1522
+#   protocol          = "tcp"
+#   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+# }
+
+# Egress rule of lambda_security_group
+# resource "aws_security_group_rule" "lambda_egress" {
+#   security_group_id = aws_security_group.lambda_security_group.id
+#   type              = "egress"
+#   from_port         = 0
+#   to_port           = 0
+#   protocol          = "-1"
+#   cidr_blocks       = ["0.0.0.0/0"]
+# }
 
 # Lambda Function
 resource "aws_lambda_function" "lambda_function" {
