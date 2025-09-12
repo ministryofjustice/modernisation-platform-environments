@@ -23,7 +23,7 @@ resource "aws_security_group" "lambda_security_group" {
   name        = "${local.application_name}-${local.environment}-lambda-sg"
   description = "SG traffic control for Payment Load Lambda"
   vpc_id      = data.aws_vpc.shared.id
-  revoke_rules_on_delete = true
+  # revoke_rules_on_delete = true
   tags = merge(local.tags,
     { Name = "${local.application_name}-${local.environment}-lambda-sg" }
   )
