@@ -52,25 +52,7 @@ locals {
     "www.siac"
   ]
 
-  nginx_records_to_cloudfront = [
-    "siac"
-  ]
-
   production_zone_id = data.aws_route53_zone.production_zone.zone_id
-}
-
-resource "aws_route53_record" "nginx_instances_to_cloudfront" {
-  count    = local.is-production ? length(local.nginx_records_to_cloudfront) : 0
-  provider = aws.core-network-services
-  zone_id  = local.production_zone_id
-  name     = local.nginx_records_to_cloudfront[count.index]
-  type     = "CNAME"
-
-  alias {
-    name                   = aws_cloudfront_distribution.tribunals_distribution_nginx[0].domain_name
-    zone_id                = aws_cloudfront_distribution.tribunals_distribution_nginx[0].hosted_zone_id
-    evaluate_target_health = true
-  }
 }
 
 # 'A' records for sftp services currently routed to the existing EC2 Tribunals instance in DSD account via static ip address
@@ -119,23 +101,6 @@ resource "aws_route53_record" "afd_instances_migrated" {
   type     = "CNAME"
   ttl      = 300
   records  = [aws_cloudfront_distribution.tribunals_distribution.domain_name]
-}
-
-# 'A' records for tribunals URLs routed through the NGINX reverse proxy hosted in AWS DSD Account
-# This includes the empty name for the root domain
-# The target ALB is in eu-west-1 zone which has a fixed zone id of "Z32O12XQLNTSW2"
-resource "aws_route53_record" "nginx_instances" {
-  count    = local.is-production ? length(local.nginx_records) : 0
-  provider = aws.core-network-services
-  zone_id  = local.production_zone_id
-  name     = local.nginx_records[count.index]
-  type     = "A"
-
-  alias {
-    name                   = module.nginx_load_balancer[0].nginx_lb_arn
-    zone_id                = module.nginx_load_balancer[0].nginx_lb_zone_id
-    evaluate_target_health = false
-  }
 }
 
 resource "aws_route53_record" "nginx_instances_pre_migration" {

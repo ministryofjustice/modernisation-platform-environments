@@ -209,24 +209,7 @@ module "calculate_checksum" {
 }
 
 #-----------------------------------------------------------------------------------
-# Deploy/destroy zero etl
-#-----------------------------------------------------------------------------------
-
-module "zero_etl_snow" {
-  source                  = "./modules/lambdas"
-  is_image                = true
-  function_name           = "zero_etl_snow"
-  role_name               = aws_iam_role.zero_etl_snow.name
-  role_arn                = aws_iam_role.zero_etl_snow.arn
-  handler                 = "zero_etl_snow.handler"
-  memory_size             = 4096
-  timeout                 = 900
-  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
-  production_dev          = local.is-production ? "prod" : "dev"
-}
-
-#-----------------------------------------------------------------------------------
-# DMS Validation Lambdas
+# DMS Validation Lambda
 #-----------------------------------------------------------------------------------
 module "dms_retrieve_metadata" {
   count = local.is-development || local.is-production ? 1 : 0
