@@ -39,7 +39,7 @@ resource "aws_cloudwatch_event_rule" "ec2_status_check_failed_event" {
       "state" : {
         "value" : ["ALARM"]
       }
-      "alarmName" : ["${local.alarm_name}"]
+      "alarmName" : [local.alarm_name]
     }
   })
 }

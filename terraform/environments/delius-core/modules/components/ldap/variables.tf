@@ -37,11 +37,6 @@ variable "platform_vars" {
   })
 }
 
-variable "environment_config" {
-  description = "environment config to pass to the instance"
-  type        = any
-}
-
 variable "task_role_arn" {
   description = "The ARN of the task role"
   type        = string

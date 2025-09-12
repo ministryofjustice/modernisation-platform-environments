@@ -9,12 +9,6 @@ variable "account_info" {
   type        = any
 }
 
-variable "replication_instance_class" {
-  description = "instance class to use for dms"
-  type        = string
-  default     = "dms.t3.micro"
-}
-
 variable "env_name" {
   description = "Environment name short ie dev"
   type        = string
@@ -27,20 +21,8 @@ variable "tags" {
   }
 }
 
-variable "engine_version" {
-  description = "instance version to use for dms"
-  type        = string
-  default     = "3.5.1"
-}
-
 variable "dms_config" {
   type = any
-}
-
-variable "db_suffix" {
-  description = "identifier to append to name e.g. dsd, boe"
-  type        = string
-  default     = "db"
 }
 
 variable "database_application_passwords_secret_arn" {
@@ -69,9 +51,4 @@ variable "db_ec2_sg_id" {
 variable "env_name_to_dms_config_map" {
   description = "Map of delius-core environments to DMS configs"
   type        = any
-}
-
-variable "oracle_db_instance_scheduling" {
-  description = "instance_scheduling value.  See https://user-guide.modernisation-platform.service.justice.gov.uk/concepts/environments/instance-scheduling.html"
-  type        = string
 }

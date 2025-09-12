@@ -16,11 +16,11 @@
 
 locals {
   # use a diff app name only when env = training for ssm vars and ssm bucket
-  normalized_app_name = var.env_name == "training" ? "delius-core" : "${var.account_info.application_name}"
+  normalized_app_name = var.env_name == "training" ? "delius-core" : var.account_info.application_name
 
   ssm_app_prefix = format("%s-%s", local.normalized_app_name, var.env_name)
 
-  app_alias_ssm_bucket = var.env_name == "training" ? "delius" : "${var.account_info.application_name}"
+  app_alias_ssm_bucket = var.env_name == "training" ? "delius" : var.account_info.application_name
 
   bucket_prefix_final = "${local.app_alias_ssm_bucket}-${var.env_name}-ssm-sessions"
 }

@@ -1,6 +1,4 @@
 locals {
-  account_id         = data.aws_caller_identity.current.account_id
-  delius_account_id  = var.platform_vars.environment_management.account_ids[join("-", ["delius-core", var.account_info.mp_environment])]
   db_port            = 1521
   db_tcps_port       = 1522
   dms_audit_username = "delius_audit_dms_pool"
@@ -24,7 +22,6 @@ locals {
   client_account_map = { for delius_environment in keys(var.env_name_to_dms_config_map) :
     delius_environment => var.env_name_to_dms_config_map[delius_environment].account_id if try(var.env_name_to_dms_config_map[delius_environment].dms_config.audit_target_endpoint.write_environment, null) == var.env_name
   }
-  client_account_ids = values(local.client_account_map)
 
   # The bucket_list_target_map is, for this environment, either the repository account or all client accounts.
   # These will be mutually exclusive since a repository may not be a client. It provides a map
@@ -40,16 +37,4 @@ locals {
   # We define an S3 writer role for each Delius environment (rather than for the account)
   dms_s3_writer_role_name = "${var.env_name}-dms-s3-writer-role"
   dms_s3_reader_role_name = "${var.env_name}-dms-s3-reader-role"
-
-  replication_task_names = concat(
-    try([aws_dms_replication_task.user_inbound_replication[0].replication_task_id], []),
-    try([aws_dms_replication_task.business_interaction_inbound_replication[0].replication_task_id], []),
-    try([aws_dms_replication_task.audited_interaction_inbound_replication[0].replication_task_id], []),
-    try([aws_dms_replication_task.audited_interaction_checksum_inbound_replication[0].replication_task_id], []),
-    try([aws_dms_replication_task.audited_interaction_outbound_replication[0].replication_task_id], []),
-    try([aws_dms_replication_task.business_interaction_outbound_replication[0].replication_task_id], []),
-    try([aws_dms_replication_task.audited_interaction_outbound_replication[0].replication_task_id], []),
-    try([aws_dms_replication_task.audited_interaction_checksum_outbound_replication[0].replication_task_id], [])
-  )
-
 }
