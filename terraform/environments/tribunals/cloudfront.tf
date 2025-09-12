@@ -17,15 +17,10 @@ resource "aws_cloudfront_distribution" "tribunals_distribution" {
   aliases = local.is-production ? [
   "*.decisions.tribunals.gov.uk",
   "*.venues.tribunals.gov.uk",
-  "*.reports.tribunals.gov.uk"
-] : (
-  local.is-preproduction ? concat(
-    ["siac.tribunal.gov.uk"],
-    ["*.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
-  ) : [
-    "*.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-  ]
-)
+  "*.reports.tribunals.gov.uk",
+  "siac.tribunal.gov.uk"
+] : ["*.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
+
 
   origin {
     domain_name = aws_lb.tribunals_lb.dns_name
@@ -100,9 +95,9 @@ data "aws_cloudfront_origin_request_policy" "all_viewer" {
 // Create a new certificate for the CloudFront distribution because it needs to be in us-east-1
 resource "aws_acm_certificate" "cloudfront" {
   provider                  = aws.us-east-1
-  domain_name               = local.is-production ? "*.decisions.tribunals.gov.uk" : local.is-preproduction ? "siac.tribunals.gov.uk" : "modernisation-platform.service.justice.gov.uk"
+  domain_name               = local.is-production ? "*.decisions.tribunals.gov.uk" : "modernisation-platform.service.justice.gov.uk"
   validation_method         = "DNS"
-  subject_alternative_names = local.is-production ? ["*.venues.tribunals.gov.uk", "*.reports.tribunals.gov.uk"] : concat(["*.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"], ["siac.tribunals.gov.uk"])
+  subject_alternative_names = local.is-production ? ["*.venues.tribunals.gov.uk", "*.reports.tribunals.gov.uk", "siac.tribunals.gov.uk"] : ["*.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
   tags = {
     Environment = local.environment
   }
