@@ -21,7 +21,7 @@ resource "aws_lb" "nginx_lb" {
   load_balancer_type         = "application"
   security_groups            = [var.nginx_lb_sg_id]
   subnets                    = var.subnets_shared_public_ids
-  enable_deletion_protection = true
+  enable_deletion_protection = false
   drop_invalid_header_fields = true
 }
 
