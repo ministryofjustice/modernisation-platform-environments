@@ -30,7 +30,7 @@ resource "aws_instance" "web" {
               yum install -y httpd mod_ssl
               systemctl enable httpd
               systemctl start httpd
-              echo "<h1>WELCOME TO THE MODERNISATION PLATFORM!</h1>" > /var/www/html/index.html
+              echo "<h1>WELCOME TO THE MODERNISATION PLATFORM</h1>" > /var/www/html/index.html
               
               # IMDSv2 token
               TOKEN=$(curl -X PUT "http://169.254.169.254/latest/api/token" \
@@ -60,6 +60,32 @@ resource "aws_instance" "internal" {
   vpc_security_group_ids      = [aws_security_group.internal_server.id]
   associate_public_ip_address = false
   iam_instance_profile        = aws_iam_instance_profile.ssm_instance_profile.name
+
+  user_data = <<-EOF
+              #!/bin/bash
+              yum update -y
+              yum install -y httpd mod_ssl
+              systemctl enable httpd
+              systemctl start httpd
+              # Simple welcome page
+              echo "<h1>WELCOME TO THE MODERNISATION PLATFORM</h1>" > /var/www/html/index.html
+
+              # IMDSv2 token
+              TOKEN=$(curl -X PUT "http://169.254.169.254/latest/api/token" \
+              -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
+
+              # Private IP of this instance
+              PRIVATE_IP=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" \
+              -s http://169.254.169.254/latest/meta-data/local-ipv4)
+
+              # Generate self-signed cert for private IP
+              openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+              -keyout /etc/pki/tls/private/selfsigned.key \
+              -out /etc/pki/tls/certs/selfsigned.crt \
+              -subj "/CN=$PRIVATE_IP"
+
+              systemctl restart httpd
+              EOF
 
   tags = {
     Name = "test-internal-server"
@@ -181,8 +207,11 @@ resource "aws_security_group_rule" "internal_egress_2" {
 
 resource "aws_security_group_rule" "internal_ingress_1" {
 
-  type              = "ingress"
-  cidr_blocks       = ["10.231.8.0/21"]
+  type = "ingress"
+  cidr_blocks = [
+    "10.231.8.0/21", # house-sandbox vpc
+    "10.231.0.0/21"  # garden-sandbox vpc
+  ]
   from_port         = 443
   to_port           = 443
   protocol          = "tcp"
