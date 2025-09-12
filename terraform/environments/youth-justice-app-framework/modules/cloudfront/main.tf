@@ -188,10 +188,6 @@ resource "aws_cloudfront_response_headers_policy" "strict_transport_security" {
     content_type_options {
       override = true
     }
-    frame_options {
-      override     = true
-      frame_option = "DENY"
-    }
     xss_protection {
       override   = true
       protection = true
@@ -202,6 +198,7 @@ resource "aws_cloudfront_response_headers_policy" "strict_transport_security" {
       content_security_policy = "default-src 'none'; script-src 'self' 'unsafe-inline' 'unsafe-hashes' https://public.tableau.com https://maps.googleapis.com https://maps.gstatic.com https://*.yjbservices.yjb.gov.uk; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https://*.imgur.com https://maps.gstatic.com https://maps.googleapis.com https://*.yjbservices.yjb.gov.uk; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://www.gov.uk https://maps.googleapis.com https://maps.gstatic.com https://*.yjbservices.yjb.gov.uk; object-src 'self' blob: https://*.yjbservices.yjb.gov.uk; frame-src 'self' blob: https://public.tableau.com https://maps.googleapis.com https://maps.gstatic.com https://*.yjbservices.yjb.gov.uk; frame-ancestors 'none';"
     }
   }
+  
 }
 
 
