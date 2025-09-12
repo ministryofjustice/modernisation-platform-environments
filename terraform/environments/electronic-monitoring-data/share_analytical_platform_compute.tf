@@ -16,9 +16,6 @@ locals {
     "staging_mdss",
     "intermediate_fms",
     "intermediate_mdss",
-    "staging",      # to be destroyed
-    "intermediate", # to be destroyed
-    "mart",         # to be destroyed
     "datamart",
     "derived",
     "testing",
@@ -27,11 +24,8 @@ locals {
     "serco_fms",
     "serco_fms_deduped",
     "serco_fms_curated",
-    "servicenow_curated",          # to be destroyed
-    "servicenow_curated_snapshot", # to be destroyed
   ]
   live_feeds_dbs = [
-    "servicenow",
     "serco_fms",
     "allied_mdss",
     "serco_servicenow",
