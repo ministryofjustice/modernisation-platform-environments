@@ -247,7 +247,7 @@ module "create_airflow_token_iam_policy" {
 
   name_prefix = "create-airflow-token-"
 
-  policy = data.aws_iam_policy_document.trigger_airflow_dag.json
+  policy = data.aws_iam_policy_document.create_airflow_token.json
 
   tags = local.tags
 }
