@@ -33,7 +33,7 @@ resource "aws_security_group" "lambda_security_group" {
 resource "aws_vpc_security_group_ingress_rule" "lambda_ingress" {
   security_group_id = aws_security_group.lambda_security_group.id
 
-  cidr_ipv4   = [data.aws_vpc.shared.cidr_block]
+  cidr_ipv4   = data.aws_vpc.shared.cidr_block
   from_port   = 1521
   ip_protocol = "tcp"
   to_port     = 1522
@@ -43,7 +43,7 @@ resource "aws_vpc_security_group_ingress_rule" "lambda_ingress" {
 resource "aws_vpc_security_group_egress_rule" "lambda_egress" {
   security_group_id = aws_security_group.lambda_security_group.id
 
-  cidr_ipv4   = ["0.0.0.0/0"]
+  cidr_ipv4   = "0.0.0.0/0"
   from_port   = 0
   ip_protocol = "-1"
   to_port     = 0
