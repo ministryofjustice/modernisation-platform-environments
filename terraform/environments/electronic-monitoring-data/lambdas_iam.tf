@@ -506,7 +506,8 @@ data "aws_iam_policy_document" "dms_validation_lambda_role_policy_document" {
     actions = [
       "s3:GetObject",
       "s3:GetBucketLocation",
-      "s3:ListBucket"
+      "s3:ListBucket",
+      "s3:PutObject",
     ]
     resources = [
       "${module.s3-dms-target-store-bucket.bucket.arn}/*",
