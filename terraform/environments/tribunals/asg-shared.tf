@@ -275,7 +275,7 @@ resource "aws_instance" "tribunals_backup" {
   iam_instance_profile = aws_iam_instance_profile.ec2_instance_profile.name
   launch_template {
     id      = aws_launch_template.tribunals-backup-lt.id
-    version = "4"
+    version = "$Latest"
   }
 
   ebs_optimized = true
