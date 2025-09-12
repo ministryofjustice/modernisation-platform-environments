@@ -249,6 +249,8 @@ resource "aws_datasync_task" "dfi_s3_to_fsx" {
 
     # Windows FSX specific options
     posix_permissions = "NONE" # POSIX permissions not supported for Windows file systems
+    uid               = "NONE" # UID not supported for Windows file systems
+    gid               = "NONE" # GID not supported for Windows file systems
 
     # Logging
     log_level = "TRANSFER"
