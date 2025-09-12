@@ -62,9 +62,12 @@ resource "aws_cloudfront_distribution" "tribunals_distribution" {
     max_ttl                = 31536000
     smooth_streaming       = false
 
-    function_association {
-      event_type   = "viewer-request"
-      function_arn = aws_cloudfront_function.redirect_function.arn
+    dynamic "function_association" {
+      for_each = local.is-development ? [] : [1]
+      content {
+        event_type   = "viewer-request"
+        function_arn = aws_cloudfront_function.redirect_function[0].arn
+      }
     }
   }
 
