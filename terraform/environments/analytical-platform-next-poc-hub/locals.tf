@@ -9,4 +9,9 @@ locals {
     "michaelcollins5",
     "jamesstott"
   ]
+
+  projects = [
+    "alpha",
+    "beta",
+  ]
 }

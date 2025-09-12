@@ -35,15 +35,15 @@ resource "aws_lakeformation_permissions" "sso_platform_engineer_admin_access_tab
 
 ## HUB ACCESS
 # Unsure if this is required still
-# resource "aws_lakeformation_permissions" "share_data_location" {
-#   principal                     = local.hub_account_id
-#   permissions                   = ["DATA_LOCATION_ACCESS"]
-#   permissions_with_grant_option = ["DATA_LOCATION_ACCESS"]
+resource "aws_lakeformation_permissions" "share_data_location" {
+  principal                     = local.hub_account_id
+  permissions                   = ["DATA_LOCATION_ACCESS"]
+  permissions_with_grant_option = ["DATA_LOCATION_ACCESS"]
 
-#   data_location {
-#     arn = module.mojap_next_poc_data_s3_bucket.s3_bucket_arn
-#   }
-# }
+  data_location {
+    arn = module.mojap_next_poc_data_s3_bucket.s3_bucket_arn
+  }
+}
 
 ## WILDCARD
 resource "aws_lakeformation_permissions" "share_wildcard_db_database_hub" {

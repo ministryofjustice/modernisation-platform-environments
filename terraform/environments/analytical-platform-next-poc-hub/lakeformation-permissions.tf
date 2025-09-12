@@ -39,3 +39,46 @@
 #     name = "shared_tbl"
 #   }
 # }
+
+################################################ TAG TESTING FOR ROLE
+
+# resource "aws_lakeformation_permissions" "alpha_electronic_monitoring_nonsensitive" {
+#   principal   = module.project_iam_roles["alpha"].arn
+#   permissions = ["DESCRIBE"]
+
+#   lf_tag_policy {
+#     resource_type = "DATABASE"
+
+#     expression {
+#       key    = "domain"
+#       values = ["electronic-monitoring"]
+#     }
+#     expression {
+#       key    = "sensitivity"
+#       values = ["non-sensitive"]
+#     }
+#   }
+# }
+
+################################################ NAMED GRANTS FOR ROLE (BREAKGLASS)
+
+# resource "aws_lakeformation_permissions" "alpha_database_resource_link" {
+#   principal   = module.project_iam_roles["alpha"].arn
+#   permissions = ["DESCRIBE"]
+
+#   database {
+#     catalog_id = data.aws_caller_identity.current.account_id
+#     name       = "720819236209_wildcard_db"
+#   }
+# }
+
+# resource "aws_lakeformation_permissions" "alpha_tables" {
+#   principal   = module.project_iam_roles["alpha"].arn
+#   permissions = ["DESCRIBE", "SELECT"]
+
+#   table {
+#     catalog_id    = local.producer_account_id
+#     database_name = "wildcard_db"
+#     wildcard      = true
+#   }
+# }

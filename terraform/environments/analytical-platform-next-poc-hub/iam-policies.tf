@@ -1,4 +1,4 @@
-data "aws_iam_policy_document" "user" {
+data "aws_iam_policy_document" "athena" {
   statement {
     sid       = "AthenaWorkGroupAccess"
     effect    = "Allow"
@@ -66,7 +66,7 @@ data "aws_iam_policy_document" "user" {
   }
 }
 
-module "iam_policies" {
+module "user_iam_policies" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
@@ -77,5 +77,16 @@ module "iam_policies" {
 
   path   = "/users/"
   name   = each.key
-  policy = data.aws_iam_policy_document.user.json
+  policy = data.aws_iam_policy_document.athena.json
+}
+
+module "athena_access_policy" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
+  version = "6.2.1"
+
+  name_prefix = "athena-access"
+  policy      = data.aws_iam_policy_document.athena.json
 }

@@ -1,29 +1,35 @@
-resource "aws_lakeformation_lf_tag" "project" {
-  /* 
-    This is a special tag that is populated by the service layer (boto: LakeFormation.Client.update_lf_tag)
-    "data-platform" is a placeholder value as values cannot be an empty list
-    Of note: "Add or remove up to 1000 values; each value must be less than 50 characters"
-  */
-  key    = "project"
-  values = ["data-platform"]
-  lifecycle {
-    ignore_changes = [values]
-  }
+module "lakeformation_tags" {
+  source = "../../modules/analytical-platform-next/lakeformation/tag-ontology"
 }
 
-# resource "aws_lakeformation_lf_tag" "domain" {
-#   key = "domain"
-#   values = [
-#     "electronic-monitoring",
-#     "prisons",
-#     "probation"
-#   ]
+# resource "aws_lakeformation_resource_lf_tags" "wildcard_db_tags" {
+#   database {
+#     name = "720819236209_wildcard_db"
+#   }
+
+#   lf_tag {
+#     key   = "domain"
+#     value = "electronic-monitoring"
+#   }
+
+#   lf_tag {
+#     key   = "sensitivity"
+#     value = "non-sensitive"
+#   }
 # }
 
-# resource "aws_lakeformation_lf_tag" "sensitivity" {
-#   key = "sensitivity"
-#   values = [
-#     "non_sensitive",
-#     "sensitive",
-#   ]
+# resource "aws_lakeformation_resource_lf_tags" "individual_db_tags" {
+#   database {
+#     name = "720819236209_individual_db"
+#   }
+
+#   lf_tag {
+#     key   = "domain"
+#     value = "electronic-monitoring"
+#   }
+
+#   lf_tag {
+#     key   = "sensitivity"
+#     value = "sensitive"
+#   }
 # }
