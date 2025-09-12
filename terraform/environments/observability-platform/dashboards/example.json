@@ -1,0 +1,22 @@
+{
+    "id": null,
+    "uid": "example-dashboard",
+    "title": "Example Dashboard",
+    "tags": ["terraform", "example"],
+    "timezone": "browser",
+    "schemaVersion": 36,
+    "version": 1,
+    "refresh": "5s",
+    "panels": [
+      {
+        "type": "text",
+        "title": "Hello World",
+        "gridPos": { "x": 0, "y": 0, "w": 24, "h": 5 },
+        "options": {
+          "mode": "markdown",
+          "content": "# Hello from Terraform!"
+        }
+      }
+    ]
+  }
+  
