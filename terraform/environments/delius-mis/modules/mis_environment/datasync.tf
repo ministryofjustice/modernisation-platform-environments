@@ -247,6 +247,9 @@ resource "aws_datasync_task" "dfi_s3_to_fsx" {
     verify_mode      = "POINT_IN_TIME_CONSISTENT"
     overwrite_mode   = "ALWAYS" # Overwrite existing files on destination
 
+    # Windows FSX specific options
+    posix_permissions = "NONE" # POSIX permissions not supported for Windows file systems
+
     # Logging
     log_level = "TRANSFER"
   }
