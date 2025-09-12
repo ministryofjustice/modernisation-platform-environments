@@ -17,6 +17,8 @@ data "aws_subnet" "private_azc" {
 ### SECURITY GROUP
 
 module "workspacesweb_security_group" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   count = local.environment == "test" ? 1 : 0
 
@@ -26,10 +28,12 @@ module "workspacesweb_security_group" {
   name   = "workspacesweb"
   vpc_id = data.aws_vpc.shared.id
 
-  ingress_cidr_blocks = ["10.10.0.0/16"]
-  ingress_rules       = ["https-443-tcp"]
-  egress_cidr_blocks  = ["172.20.0.0/16"]
-  egress_rules        = ["https-443-tcp"]
+  /* DEBUGGING */
+  ingress_cidr_blocks = ["0.0.0.0/0"]
+  ingress_rules       = ["all-all"]
+  egress_cidr_blocks  = ["0.0.0.0/0"]
+  egress_rules        = ["all-all"]
+  /* DEBUGGING */
 }
 
 ### NETWORK SETTINGS
@@ -97,6 +101,6 @@ resource "awscc_workspacesweb_user_settings" "main" {
   idle_disconnect_timeout_in_minutes = 15
 
   toolbar_configuration = {
-    hidden_toolbar_items = ["Microphone", "Webcam"] /* THESE NEED DOING MANUALLY 🤡 */
+    hidden_toolbar_items = ["Microphone", "Webcam"] # These need doing manually, they didn't apply properly via Terraform
   }
 }
