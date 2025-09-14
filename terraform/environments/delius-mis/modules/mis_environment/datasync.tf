@@ -96,6 +96,16 @@ resource "aws_vpc_security_group_egress_rule" "datasync_agent_smb" {
   to_port                      = 445
 }
 
+# Allow all communication with FSX security group (for DataSync requirements)
+resource "aws_vpc_security_group_egress_rule" "datasync_agent_fsx_all" {
+  count = var.datasync_config != null ? 1 : 0
+
+  security_group_id            = aws_security_group.datasync_agent[0].id
+  description                  = "All traffic to FSX security group for DataSync"
+  referenced_security_group_id = aws_security_group.fsx.id
+  ip_protocol                  = "-1"
+}
+
 # Allow outbound for S3 access (via NAT Gateway or S3 VPC endpoint)
 resource "aws_vpc_security_group_egress_rule" "datasync_agent_s3" {
   count = var.datasync_config != null ? 1 : 0
@@ -212,7 +222,7 @@ resource "aws_datasync_location_fsx_windows_file_system" "dfi_fsx_destination" {
   password = local.fsx_credentials.password
   domain   = var.datasync_config.fsx_domain
 
-  security_group_arns = [aws_security_group.fsx.arn]
+  security_group_arns = [aws_security_group.datasync_agent[0].arn]
 
   tags = merge(
     local.tags,
@@ -300,4 +310,14 @@ resource "aws_vpc_security_group_ingress_rule" "fsx_datasync_smb" {
   from_port                    = 445
   ip_protocol                  = "tcp"
   to_port                      = 445
+}
+
+# Allow all traffic from DataSync agent to FSX (for DataSync requirements)
+resource "aws_vpc_security_group_ingress_rule" "fsx_datasync_all" {
+  count = var.datasync_config != null ? 1 : 0
+
+  security_group_id            = aws_security_group.fsx.id
+  description                  = "Allow all DataSync traffic to FSX"
+  referenced_security_group_id = aws_security_group.datasync_agent[0].id
+  ip_protocol                  = "-1"
 }
