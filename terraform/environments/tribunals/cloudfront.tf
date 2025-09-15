@@ -151,10 +151,8 @@ resource "aws_s3_bucket_ownership_controls" "cloudfront_logs" {
   #checkov:skip=CKV2_AWS_65:"ACLs are required for CloudFront logging to work"
   bucket = aws_s3_bucket.cloudfront_logs.id
   rule {
-    object_ownership = "BucketOwnerEnforced"
+    object_ownership = "BucketOwnerPreferred"
   }
-
-  depends_on = [aws_s3_bucket.cloudfront_logs]
 }
 
 resource "aws_s3_bucket_public_access_block" "cloudfront_logs" {
