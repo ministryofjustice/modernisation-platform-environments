@@ -53,6 +53,14 @@ resource "aws_cloudfront_distribution" "tribunals_distribution" {
     min_ttl                = 0
     max_ttl                = 31536000
     smooth_streaming       = false
+
+    dynamic "function_association" {
+      for_each = local.is-development ? [] : [1]
+      content {
+        event_type   = "viewer-request"
+        function_arn = aws_cloudfront_function.redirect_function[0].arn
+      }
+    }
   }
 
   enabled         = true
@@ -271,4 +279,39 @@ resource "aws_cloudfront_response_headers_policy" "security_headers_policy" {
       override   = true
     }
   }
+}
+
+resource "aws_cloudfront_function" "redirect_function" {
+  count = local.is-development ? 0 : 1
+  name    = "tribunals_redirect_function"
+  runtime = "cloudfront-js-2.0"
+  publish = true
+  code    = <<EOF
+  function handler(event) {
+    var request = event.request;
+    var host    = request.headers.host.value;
+    var uri     = request.uri;
+    // Redirect rules for siac.tribunals.gov.uk
+    if (host === "siac.tribunals.gov.uk") {
+      if (uri.toLowerCase() === "/outcomes2007onwards.htm") {
+        return {
+          statusCode: 301,
+          statusDescription: "Moved Permanently",
+          headers: {
+            "location": { "value": "https://siac.decisions.tribunals.gov.uk" }
+          }
+        };
+      }
+      return {
+        statusCode: 301,
+        statusDescription: "Moved Permanently",
+        headers: {
+          "location": { "value": "https://www.gov.uk/guidance/appeal-to-the-special-immigration-appeals-commission" }
+        }
+      };
+    }
+    // Default: Pass through to origin
+    return request;
+  }
+  EOF
 }

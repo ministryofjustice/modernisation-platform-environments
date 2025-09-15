@@ -399,7 +399,7 @@ resource "aws_iam_policy" "hub_20_s3_permissions" {
   description = "Allows EC2 instances with role_stsassume_oracle_base to access Hub-20 ${local.environment} bucket"
 
   policy = jsonencode({
-    Version   = "2012-10-17",
+    Version = "2012-10-17",
     Statement = [
       {
         Effect = "Allow"

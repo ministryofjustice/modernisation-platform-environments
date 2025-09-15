@@ -27,7 +27,8 @@ module "dms_validation_step_function" {
   iam_policies = tomap({ "dms_validation_step_function_policy" = aws_iam_policy.dms_validation_step_function_policy[0] })
   variable_dictionary = tomap(
     {
-      "dms_validation" = module.dms_validation[0].lambda_function_name,
+      "dms_retrieve_metadata" = module.dms_retrieve_metadata[0].lambda_function_name,
+      "dms_validation"        = module.dms_validation[0].lambda_function_name,
     }
   )
   type = "STANDARD"
