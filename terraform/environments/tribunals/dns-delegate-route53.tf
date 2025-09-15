@@ -40,7 +40,10 @@ locals {
     "charity",
     "consumercreditappeals",
     "estateagentappeals",
-    "fhsaa",
+    "fhsaa"
+  ]
+
+  nginx_records_to_cloudfront = [
     "siac"
   ]
 
@@ -54,6 +57,20 @@ locals {
   ]
 
   production_zone_id = data.aws_route53_zone.production_zone.zone_id
+}
+
+resource "aws_route53_record" "nginx_instances_to_cloudfront" {
+  count    = local.is-production ? length(local.nginx_records_to_cloudfront) : 0
+  provider = aws.core-network-services
+  zone_id  = local.production_zone_id
+  name     = local.nginx_records_to_cloudfront[count.index]
+  type     = "CNAME"
+
+  alias {
+    name                   = aws_cloudfront_distribution.tribunals_distribution.domain_name
+    zone_id                = aws_cloudfront_distribution.tribunals_distribution.hosted_zone_id
+    evaluate_target_health = true
+  }
 }
 
 # 'A' records for sftp services currently routed to the existing EC2 Tribunals instance in DSD account via static ip address
