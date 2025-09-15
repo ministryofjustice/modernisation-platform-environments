@@ -20,15 +20,9 @@ resource "aws_cloudwatch_metric_alarm" "lambda_failures" {
 
   metric_query {
     id          = "m1"
-    label       = "AllFailureCounts"
+    expression  = "SUM(SEARCH('${each.value.namespace} InvocationFailureCount', 'Sum', 300))"
+    label       = "AllFailures"
     return_data = true
-
-    metric {
-      namespace   = each.value.namespace
-      metric_name = "InvocationFailureCount"
-      stat        = "Sum"
-      period      = 60
-    }
   }
 
   alarm_actions = [aws_sns_topic.hub2_alerts.arn]
