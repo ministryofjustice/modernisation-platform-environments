@@ -242,12 +242,12 @@ resource "aws_datasync_task" "dfi_s3_to_fsx" {
   cloudwatch_log_group_arn = aws_cloudwatch_log_group.datasync_logs[0].arn
 
   options {
-    preserve_deleted_files = "PRESERVE" # keep files on the destination if they've been removed from source
+    preserve_deleted_files = "PRESERVE" # keep files on the destination if they've been removed from source, change to REMOVE if needed
 
     # Transfer options - Normal sync behavior
     bytes_per_second = var.datasync_config.bandwidth_throttle != null ? var.datasync_config.bandwidth_throttle : -1
     task_queueing    = "ENABLED"
-    transfer_mode    = "CHANGED" # Only transfer changed files
+    transfer_mode    = "ALL" # Transfer all files
     verify_mode      = "POINT_IN_TIME_CONSISTENT"
     overwrite_mode   = "ALWAYS" # Overwrite existing files on destination
 
