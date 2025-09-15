@@ -325,6 +325,10 @@ resource "aws_instance" "s609693lo6vw111" {
     http_endpoint = "enabled"
   }
 
+  lifecycle {
+    prevent_destroy = true
+  }
+
   tags = {
     Name        = "s609693lo6vw111"
     patch_group = "dev_win_patch"

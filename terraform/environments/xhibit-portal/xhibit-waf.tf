@@ -30,16 +30,17 @@ resource "aws_wafv2_ip_set" "prtg_waf_ip_set" {
   description        = "List of trusted IP Addresses allowing access via WAF"
 
   addresses = [
-    "100.44.12.86/32",   // MoJ Digital Wifi
-    "35.176.93.186/32",  // MoJ VPN Gateway Proxies
-    "172.10.10.188/32",  // V1 Digital Wifi
-    "194.62.186.170/32", // V1 VPN Gateway Proxies
+    "5.64.250.224/32",   // MP
+    "35.176.93.186/32",  // MoJ Alpha VPN Gateway
     "66.155.16.61/32",   // SBEL Wifi
     "66.155.16.68/32",   // SBEL Wifi
-    "5.64.250.224/32",   // MP
     "86.16.40.31/32",    // ZP
     "90.247.66.20/32",   // TM
-    "92.236.109.133/32"  // GD Wifi
+    "92.236.109.133/32", // GD Wifi
+    "100.44.12.86/32",   // MoJ Digital Wifi
+    "128.77.75.64/26",   // MoJ Prisma VPN Gateway
+    "172.10.10.188/32",  // V1 Digital Wifi
+    "194.62.186.170/32"  // V1 VPN Gateway Proxies
   ]
 
   tags = merge(local.tags,
