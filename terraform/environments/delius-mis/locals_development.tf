@@ -369,6 +369,5 @@ locals {
   # DataSync configuration for syncing S3 bucket to FSX share
   datasync_config_dev = {
     source_s3_bucket_arn = "arn:aws:s3:::eu-west-2-delius-mis-dev-dfi-extracts" # differs per environment
-    schedule_expression  = "cron(15 16 * * ? *)"
   }
 }
