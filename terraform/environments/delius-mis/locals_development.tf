@@ -370,7 +370,7 @@ locals {
   datasync_config_dev = {
     # Source S3 bucket ARN from different account (to be provided)
     source_s3_bucket_arn   = "arn:aws:s3:::eu-west-2-delius-mis-dev-dfi-extracts" # This needs to be updated with actual source bucket
-    source_s3_subdirectory = "/dfinterventions/dfi/*"
+    source_s3_subdirectory = "/dfinterventions/dfi/"
 
     # FSX domain for authentication
     fsx_domain = "delius-mis-dev.internal"
@@ -379,6 +379,6 @@ locals {
     bandwidth_throttle = -1
 
     # Optional: Schedule for automatic sync (cron expression)
-    schedule_expression = "cron(15 11 * * ? *)"
+    schedule_expression = "cron(45 11 * * ? *)"
   }
 }
