@@ -183,7 +183,7 @@ resource "aws_vpc_security_group_ingress_rule" "ingress_7777_workspaces_private_
   cidr_ipv4         = local.application_data.accounts[local.environment].lz_aws_workspace_prod_subnet_env
 }
 
-resource "aws_vpc_security_group_ingress_rule" "ingress_7777_workspaces_nat_!" {
+resource "aws_vpc_security_group_ingress_rule" "ingress_7777_workspaces_nat_1" {
   count             = local.is_development ? 1 : 0
   description       = "OHS 7777 from WorkSpaces NAT IPs (public)"
   security_group_id = aws_security_group.ssogen_sg[0].id
