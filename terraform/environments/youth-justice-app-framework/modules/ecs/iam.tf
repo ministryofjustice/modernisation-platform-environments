@@ -21,10 +21,10 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_policy" {
 }
 
 #Todo refine this it is too permissive
-resource "aws_iam_role_policy_attachment" "ecs_task_ses_policy" {
-  role       = aws_iam_role.ecs_task_execution_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonSESFullAccess"
-}
+#resource "aws_iam_role_policy_attachment" "ecs_task_ses_policy" {
+#  role       = aws_iam_role.ecs_task_execution_role.name
+#  policy_arn = "arn:aws:iam::aws:policy/AmazonSESFullAccess"
+#}
 
 resource "aws_iam_role" "ecs_task_role" {
   name = "${var.cluster_name}-ecs-task-role"
