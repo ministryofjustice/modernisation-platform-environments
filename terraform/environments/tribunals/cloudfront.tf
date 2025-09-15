@@ -49,9 +49,6 @@ resource "aws_cloudfront_distribution" "tribunals_distribution" {
     allowed_methods        = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
     cached_methods         = ["GET", "HEAD"]
     compress               = true
-    default_ttl            = 0
-    min_ttl                = 0
-    max_ttl                = 31536000
     smooth_streaming       = false
 
     dynamic "function_association" {
@@ -190,26 +187,15 @@ resource "aws_s3_bucket_policy" "cloudfront_logs" {
     Version = "2012-10-17"
     Statement = [
       {
-        Sid    = "AllowCloudFrontLogDelivery"
+        Sid = "AllowCloudFrontLogDelivery"
         Effect = "Allow"
-        Principal = {
-          Service = "delivery.logs.amazonaws.com"
-        }
-        Action = [
-          "s3:PutObject",
-          "s3:GetBucketAcl",
-          "s3:PutBucketAcl"
-        ]
-        Resource = [
-          aws_s3_bucket.cloudfront_logs.arn,
-          "${aws_s3_bucket.cloudfront_logs.arn}/*"
-        ]
+        Principal = { Service = "cloudfront.amazonaws.com" }
+        Action = "s3:PutObject"
+        Resource = "${aws_s3_bucket.cloudfront_logs.arn}/cloudfront-logs/*"
         Condition = {
           StringEquals = {
             "aws:SourceAccount" = data.aws_caller_identity.current.account_id
-          }
-          StringLike = {
-            "aws:SourceArn" = "arn:aws:cloudfront::${data.aws_caller_identity.current.account_id}:distribution/${aws_cloudfront_distribution.tribunals_distribution.id}"
+            "aws:SourceArn" = aws_cloudfront_distribution.tribunals_distribution.arn
           }
         }
       }
