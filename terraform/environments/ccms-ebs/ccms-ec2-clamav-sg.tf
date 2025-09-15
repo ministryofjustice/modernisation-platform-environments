@@ -9,53 +9,69 @@ resource "aws_security_group" "ec2_sg_clamav" {
 }
 
 # ClamAV
-resource "aws_vpc_security_group_ingress_rule" "ingress_traffic_clamav_3310" {
+resource "aws_vpc_security_group_ingress_rule" "ingress_traffic_clamav_3310_1" {
   security_group_id = aws_security_group.ec2_sg_clamav.id
   description       = "ClamAV"
-  protocol          = "TCP"
+  ip_protocol       = "TCP"
   from_port         = 3310
   to_port           = 3310
-  cidr_blocks = [data.aws_vpc.shared.cidr_block,
-  local.application_data.accounts[local.environment].lz_aws_subnet_env]
+  cidr_ipv4         = data.aws_vpc.shared.cidr_block
+}
+
+resource "aws_vpc_security_group_ingress_rule" "ingress_traffic_clamav_3310_2" {
+  security_group_id = aws_security_group.ec2_sg_clamav.id
+  description       = "ClamAV"
+  ip_protocol       = "TCP"
+  from_port         = 3310
+  to_port           = 3310
+  cidr_ipv4         = local.application_data.accounts[local.environment].lz_aws_subnet_env
 }
 
 # SSH
-resource "aws_vpc_security_group_ingress_rule" "ingress_traffic_clamav_22" {
+resource "aws_vpc_security_group_ingress_rule" "ingress_traffic_clamav_22_1" {
   security_group_id = aws_security_group.ec2_sg_clamav.id
   description       = "SSH"
-  protocol          = "TCP"
+  ip_protocol       = "TCP"
   from_port         = 22
   to_port           = 22
-  cidr_blocks = [data.aws_vpc.shared.cidr_block,
-  local.application_data.accounts[local.environment].lz_aws_subnet_env]
+  cidr_ipv4         = data.aws_vpc.shared.cidr_block
+}
+
+resource "aws_vpc_security_group_ingress_rule" "ingress_traffic_clamav_22_2" {
+  security_group_id = aws_security_group.ec2_sg_clamav.id
+  description       = "SSH"
+  ip_protocol       = "TCP"
+  from_port         = 22
+  to_port           = 22
+  cidr_ipv4         = local.application_data.accounts[local.environment].lz_aws_subnet_env
 }
 
 # HTTPS
 resource "aws_vpc_security_group_egress_rule" "egress_traffic_clamav_3310" {
   security_group_id = aws_security_group.ec2_sg_clamav.id
   description       = "ClamAV"
-  protocol          = "TCP"
+  ip_protocol       = "TCP"
   from_port         = 3310
   to_port           = 3310
-  cidr_blocks       = ["0.0.0.0/0"]
+  cidr_ipv4         = "0.0.0.0/0"
 }
 
 # SSH
 resource "aws_vpc_security_group_egress_rule" "egress_traffic_clamav_22" {
   security_group_id = aws_security_group.ec2_sg_clamav.id
   description       = "SSH"
-  protocol          = "TCP"
+  ip_protocol       = "TCP"
   from_port         = 22
   to_port           = 22
-  cidr_blocks       = ["0.0.0.0/0"]
+  cidr_ipv4         = "0.0.0.0/0"
 }
 
 # HTTPS
 resource "aws_vpc_security_group_egress_rule" "egress_traffic_clamav_443" {
   security_group_id = aws_security_group.ec2_sg_clamav.id
   description       = "HTTPS"
-  protocol          = "TCP"
+  ip_protocol       = "TCP"
   from_port         = 443
   to_port           = 443
-  cidr_blocks       = ["0.0.0.0/0"]
+  cidr_ipv4         = "0.0.0.0/0"
 }

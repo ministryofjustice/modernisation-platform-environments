@@ -8,43 +8,59 @@ resource "aws_security_group" "ec2_sg_mailrelay" {
 }
 
 # SSH
-resource "aws_vpc_security_group_ingress_rule" "ingress_traffic_mailrelay_22" {
+resource "aws_vpc_security_group_ingress_rule" "ingress_traffic_mailrelay_22_1" {
   security_group_id = aws_security_group.ec2_sg_mailrelay.id
   description       = "SSH"
-  protocol          = "TCP"
+  ip_protocol       = "TCP"
   from_port         = 22
   to_port           = 22
-  cidr_blocks = [data.aws_vpc.shared.cidr_block,
-  local.application_data.accounts[local.environment].lz_aws_subnet_env]
+  cidr_ipv4         = data.aws_vpc.shared.cidr_block
+}
+
+resource "aws_vpc_security_group_ingress_rule" "ingress_traffic_mailrelay_22_2" {
+  security_group_id = aws_security_group.ec2_sg_mailrelay.id
+  description       = "SSH"
+  ip_protocol       = "TCP"
+  from_port         = 22
+  to_port           = 22
+  cidr_ipv4         = local.application_data.accounts[local.environment].lz_aws_subnet_env
 }
 
 # SMTP
-resource "aws_vpc_security_group_ingress_rule" "ingress_traffic_mailrelay_25" {
+resource "aws_vpc_security_group_ingress_rule" "ingress_traffic_mailrelay_25_1" {
   security_group_id = aws_security_group.ec2_sg_mailrelay.id
   description       = "SMTP"
-  protocol          = "TCP"
+  ip_protocol       = "TCP"
   from_port         = 25
   to_port           = 25
-  cidr_blocks = [data.aws_vpc.shared.cidr_block,
-  local.application_data.accounts[local.environment].lz_aws_subnet_env]
+  cidr_ipv4         = data.aws_vpc.shared.cidr_block
+}
+
+resource "aws_vpc_security_group_ingress_rule" "ingress_traffic_mailrelay_25_2" {
+  security_group_id = aws_security_group.ec2_sg_mailrelay.id
+  description       = "SMTP"
+  ip_protocol       = "TCP"
+  from_port         = 25
+  to_port           = 25
+  cidr_ipv4         = local.application_data.accounts[local.environment].lz_aws_subnet_env
 }
 
 # HTTPS
 resource "aws_vpc_security_group_egress_rule" "egress_traffic_mailrelay_443" {
   security_group_id = aws_security_group.ec2_sg_mailrelay.id
   description       = "HTTPS"
-  protocol          = "TCP"
+  ip_protocol       = "TCP"
   from_port         = 443
   to_port           = 443
-  cidr_blocks       = ["0.0.0.0/0"]
+  cidr_ipv4         = ["0.0.0.0/0"]
 }
 
 # SES
 resource "aws_vpc_security_group_egress_rule" "egress_traffic_mailrelay_587" {
   security_group_id = aws_security_group.ec2_sg_mailrelay.id
   description       = "SES"
-  protocol          = "TCP"
+  ip_protocol       = "TCP"
   from_port         = 587
   to_port           = 587
-  cidr_blocks       = ["0.0.0.0/0"]
+  cidr_ipv4         = ["0.0.0.0/0"]
 }

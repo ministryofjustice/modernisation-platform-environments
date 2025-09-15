@@ -42,7 +42,6 @@ data "aws_secretsmanager_secret_version" "secrets" {
 }
 
 # Security Group for FTP Server
-
 resource "aws_security_group" "ec2_sg_ftp" {
   name        = "ec2_sg_ftp"
   description = "Security Group for FTP Server"
@@ -55,22 +54,58 @@ resource "aws_security_group" "ec2_sg_ftp" {
 ### INGRESS Rules
 # FTP
 
-resource "aws_vpc_security_group_ingress_rule" "ingress_private_traffic_lambda" {
+resource "aws_vpc_security_group_ingress_rule" "ingress_private_traffic_lambda_1" {
   security_group_id = aws_security_group.ec2_sg_ftp.id
   description       = "Allow all TCP traffic from Lambda"
-  protocol          = "TCP"
+  ip_protocol       = "TCP"
   from_port         = 0
   to_port           = 65535
-  cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
+  cidr_ipv4         = data.aws_subnet.private_subnets_a.cidr_block
 }
 
-resource "aws_vpc_security_group_ingress_rule" "ingress_data_traffic_ebsdb" {
+resource "aws_vpc_security_group_ingress_rule" "ingress_private_traffic_lambda_2" {
   security_group_id = aws_security_group.ec2_sg_ftp.id
-  description       = "Allow all TCP traffic from EBS DB"
-  protocol          = "TCP"
+  description       = "Allow all TCP traffic from Lambda"
+  ip_protocol       = "TCP"
   from_port         = 0
   to_port           = 65535
-  cidr_blocks       = [data.aws_subnet.data_subnets_a.cidr_block, data.aws_subnet.data_subnets_b.cidr_block, data.aws_subnet.data_subnets_c.cidr_block]
+  cidr_ipv4         = data.aws_subnet.private_subnets_b.cidr_block
+}
+
+resource "aws_vpc_security_group_ingress_rule" "ingress_private_traffic_lambda_3" {
+  security_group_id = aws_security_group.ec2_sg_ftp.id
+  description       = "Allow all TCP traffic from Lambda"
+  ip_protocol       = "TCP"
+  from_port         = 0
+  to_port           = 65535
+  cidr_ipv4         = data.aws_subnet.private_subnets_c.cidr_block
+}
+
+resource "aws_vpc_security_group_ingress_rule" "ingress_data_traffic_ebsdb_1" {
+  security_group_id = aws_security_group.ec2_sg_ftp.id
+  description       = "Allow all TCP traffic from EBS DB"
+  ip_protocol       = "TCP"
+  from_port         = 0
+  to_port           = 65535
+  cidr_ipv4         = data.aws_subnet.data_subnets_a.cidr_block
+}
+
+resource "aws_vpc_security_group_ingress_rule" "ingress_data_traffic_ebsdb_2" {
+  security_group_id = aws_security_group.ec2_sg_ftp.id
+  description       = "Allow all TCP traffic from EBS DB"
+  ip_protocol       = "TCP"
+  from_port         = 0
+  to_port           = 65535
+  cidr_ipv4         = data.aws_subnet.data_subnets_b.cidr_block
+}
+
+resource "aws_vpc_security_group_ingress_rule" "ingress_data_traffic_ebsdb_3" {
+  security_group_id = aws_security_group.ec2_sg_ftp.id
+  description       = "Allow all TCP traffic from EBS DB"
+  ip_protocol       = "TCP"
+  from_port         = 0
+  to_port           = 65535
+  cidr_ipv4         = data.aws_subnet.data_subnets_c.cidr_block
 }
 
 
@@ -82,10 +117,10 @@ resource "aws_vpc_security_group_egress_rule" "egress_traffic_ftp_22_xerox" {
   count             = local.environment != "test" ? 1 : 0
   security_group_id = aws_security_group.ec2_sg_ftp.id
   description       = "SSH for testing third party host xerox"
-  protocol          = "TCP"
+  ip_protocol       = "TCP"
   from_port         = 22
   to_port           = 22
-  cidr_blocks       = [jsondecode(data.aws_secretsmanager_secret_version.secrets["LAA-ftp-xerox-outbound"].secret_string)["HOST_CIDR"]]
+  cidr_ipv4         = jsondecode(data.aws_secretsmanager_secret_version.secrets["LAA-ftp-xerox-outbound"].secret_string)["HOST_CIDR"]
 }
 
 # SSH
@@ -93,10 +128,10 @@ resource "aws_vpc_security_group_egress_rule" "egress_traffic_ftp_22_eckoh" {
   count             = local.environment != "test" ? 1 : 0
   security_group_id = aws_security_group.ec2_sg_ftp.id
   description       = "SSH for testing third party host eckoh"
-  protocol          = "TCP"
+  ip_protocol       = "TCP"
   from_port         = 22
   to_port           = 22
-  cidr_blocks       = [jsondecode(data.aws_secretsmanager_secret_version.secrets["LAA-ftp-eckoh-inbound-ccms"].secret_string)["HOST_CIDR"]]
+  cidr_ipv4         = jsondecode(data.aws_secretsmanager_secret_version.secrets["LAA-ftp-eckoh-inbound-ccms"].secret_string)["HOST_CIDR"]
 }
 
 # SSH
@@ -104,10 +139,10 @@ resource "aws_vpc_security_group_egress_rule" "egress_traffic_ftp_22_allpay" {
   count             = local.environment != "test" ? 1 : 0
   security_group_id = aws_security_group.ec2_sg_ftp.id
   description       = "SSH for testing third party host allpay"
-  protocol          = "TCP"
+  ip_protocol       = "TCP"
   from_port         = 22
   to_port           = 22
-  cidr_blocks       = [jsondecode(data.aws_secretsmanager_secret_version.secrets["LAA-ftp-allpay-inbound-ccms"].secret_string)["HOST_CIDR"]]
+  cidr_ipv4         = jsondecode(data.aws_secretsmanager_secret_version.secrets["LAA-ftp-allpay-inbound-ccms"].secret_string)["HOST_CIDR"]
 }
 
 # SSH
@@ -115,10 +150,10 @@ resource "aws_vpc_security_group_egress_rule" "egress_traffic_ftp_22_rossendales
   count             = local.environment != "test" ? 1 : 0
   security_group_id = aws_security_group.ec2_sg_ftp.id
   description       = "SSH for testing third party host rossendales"
-  protocol          = "TCP"
+  ip_protocol       = "TCP"
   from_port         = 22
   to_port           = 22
-  cidr_blocks       = [jsondecode(data.aws_secretsmanager_secret_version.secrets["LAA-ftp-rossendales-ccms-inbound"].secret_string)["HOST_CIDR"]]
+  cidr_ipv4         = jsondecode(data.aws_secretsmanager_secret_version.secrets["LAA-ftp-rossendales-ccms-inbound"].secret_string)["HOST_CIDR"]
 }
 
 # SFTP
@@ -126,18 +161,18 @@ resource "aws_vpc_security_group_egress_rule" "egress_traffic_ftp_8022" {
   count             = local.environment != "test" ? 1 : 0
   security_group_id = aws_security_group.ec2_sg_ftp.id
   description       = "SFTP for 1stlocate thirdparty"
-  protocol          = "TCP"
+  ip_protocol       = "TCP"
   from_port         = 8022
   to_port           = 8022
-  cidr_blocks       = [jsondecode(data.aws_secretsmanager_secret_version.secrets["LAA-ftp-1stlocate-ccms-inbound"].secret_string)["HOST_CIDR"]]
+  cidr_ipv4         = jsondecode(data.aws_secretsmanager_secret_version.secrets["LAA-ftp-1stlocate-ccms-inbound"].secret_string)["HOST_CIDR"]
 }
 
 # HTTPS
 resource "aws_vpc_security_group_egress_rule" "egress_traffic_ftp_443" {
   security_group_id = aws_security_group.ec2_sg_ftp.id
   description       = "HTTPS"
-  protocol          = "TCP"
+  ip_protocol       = "TCP"
   from_port         = 443
   to_port           = 443
-  cidr_blocks       = ["0.0.0.0/0"]
+  cidr_ipv4         = "0.0.0.0/0"
 }

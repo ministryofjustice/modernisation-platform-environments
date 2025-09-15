@@ -14,10 +14,10 @@ resource "aws_security_group" "sg_ebsapps_lb" {
 resource "aws_vpc_security_group_ingress_rule" "ingress_traffic_ebslb_443" {
   security_group_id = aws_security_group.sg_ebsapps_lb.id
   description       = "HTTPS"
-  protocol          = "TCP"
+  ip_protocol       = "TCP"
   from_port         = 443
   to_port           = 443
-  cidr_blocks       = ["0.0.0.0/0"]
+  cidr_ipv4         = "0.0.0.0/0"
 }
 
 ### EGRESS
@@ -25,8 +25,8 @@ resource "aws_vpc_security_group_ingress_rule" "ingress_traffic_ebslb_443" {
 resource "aws_vpc_security_group_egress_rule" "egress_traffic_ebslb_80" {
   security_group_id = aws_security_group.ec2_sg_ebsapps.id
   description       = "All"
-  protocol          = "TCP"
+  ip_protocol       = "TCP"
   from_port         = 0
   to_port           = 0
-  cidr_blocks       = ["0.0.0.0/0"]
+  cidr_ipv4         = "0.0.0.0/0"
 }
