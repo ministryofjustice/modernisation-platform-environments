@@ -281,7 +281,7 @@ resource "aws_datasync_task" "dfi_s3_to_fsx" {
     gid               = "NONE" # GID not supported for Windows file systems
 
     # Logging
-    log_level = "TRANSFER"
+    log_level = "BASIC"
   }
 
   schedule {
