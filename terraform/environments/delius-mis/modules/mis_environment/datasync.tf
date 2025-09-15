@@ -180,6 +180,30 @@ resource "aws_iam_role_policy" "datasync_s3_source_policy" {
   })
 }
 
+# IAM policy for CloudWatch logging
+resource "aws_iam_role_policy" "datasync_cloudwatch_logs_policy" {
+  count = var.datasync_config != null ? 1 : 0
+
+  name = "${var.app_name}-${var.env_name}-datasync-cloudwatch-logs-policy"
+  role = aws_iam_role.datasync_s3_role[0].id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents",
+          "logs:DescribeLogStreams"
+        ]
+        Resource = "${aws_cloudwatch_log_group.datasync_logs[0].arn}:*"
+      }
+    ]
+  })
+}
+
 #############################################
 ### DataSync S3 Location (Source)
 #############################################
@@ -261,7 +285,7 @@ resource "aws_datasync_task" "dfi_s3_to_fsx" {
   }
 
   schedule {
-    schedule_expression = var.datasync_config.schedule_expression != null ? var.datasync_config.schedule_expression : "cron(* 4 * * ? *)" # DEFAULT Daily at 4:00 AM UTC (5:00 AM BST)
+    schedule_expression = var.datasync_config.schedule_expression != null ? var.datasync_config.schedule_expression : "cron(0 4 * * ? *)" # DEFAULT Daily at 4:00 AM UTC (5:00 AM BST)
   }
 
   tags = merge(
