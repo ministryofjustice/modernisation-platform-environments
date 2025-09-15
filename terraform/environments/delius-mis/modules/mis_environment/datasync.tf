@@ -187,7 +187,7 @@ resource "aws_datasync_location_s3" "dfi_source_bucket" {
   count = var.datasync_config != null ? 1 : 0
 
   s3_bucket_arn = var.datasync_config.source_s3_bucket_arn
-  subdirectory  = var.datasync_config.source_s3_subdirectory
+  subdirectory  = "/dfinterventions/dfi/csv/reports/"
 
   s3_config {
     bucket_access_role_arn = aws_iam_role.datasync_s3_role[0].arn
@@ -214,7 +214,7 @@ resource "aws_datasync_location_fsx_windows_file_system" "dfi_fsx_destination" {
   # for the DataSync task to function properly
   user     = local.fsx_credentials.username
   password = local.fsx_credentials.password
-  domain   = var.datasync_config.fsx_domain
+  domain   = "delius-mis-dev.internal"
 
   security_group_arns = [aws_security_group.datasync_agent[0].arn]
 
@@ -245,7 +245,7 @@ resource "aws_datasync_task" "dfi_s3_to_fsx" {
     preserve_deleted_files = "PRESERVE" # keep files on the destination if they've been removed from source, change to REMOVE if needed
 
     # Transfer options - Normal sync behavior
-    bytes_per_second = var.datasync_config.bandwidth_throttle != null ? var.datasync_config.bandwidth_throttle : -1
+    bytes_per_second = var.datasync_config.bandwidth_throttle != null ? var.datasync_config.bandwidth_throttle : -1 # defaults to unlimited
     task_queueing    = "ENABLED"
     transfer_mode    = "ALL" # Transfer all files
     verify_mode      = "POINT_IN_TIME_CONSISTENT"
