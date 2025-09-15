@@ -370,6 +370,6 @@ locals {
   datasync_config_dev = {
     source_s3_bucket_arn = "arn:aws:s3:::eu-west-2-delius-mis-dev-dfi-extracts" # differs per environment
     # Optional: Schedule for automatic sync (cron expression)
-    schedule_expression = "cron(30 13 * * ? *)"
+    schedule_expression = "cron(45 13 * * ? *)"
   }
 }
