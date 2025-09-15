@@ -1,13 +1,5 @@
-provider "aws" {
-  alias  = "replicattion"
-  region = "eu-west-2"
-}
-
 module "csv_export" {
-  source = "github.com/ministryofjustice/terraform-csv-to-parquet-athena?ref=8c687aaf2a56b17f135121ea5dfd521d7d4b1531"
-  providers = {
-    aws = aws.replicattion
-  }
+  source = "github.com/ministryofjustice/terraform-csv-to-parquet-athena?ref=e7429cba0ec0ba4788d507c211bd2f1f65ca6a7b"
   region_replication = "eu-west-2"
   kms_key_arn = aws_kms_key.shared_kms_key.arn
   name = "concept"
@@ -27,6 +19,7 @@ module "rds_export" {
   kms_key_arn           = aws_kms_key.shared_kms_key.arn
   name                  = "planetfm"
   database_refresh_mode = "full"
+
   vpc_id                = module.vpc.vpc_id
   database_subnet_ids   = module.vpc.private_subnets
   master_user_secret_id = aws_secretsmanager_secret.db_master_user_secret.arn
