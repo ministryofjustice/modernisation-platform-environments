@@ -49,9 +49,6 @@ resource "aws_cloudfront_distribution" "tribunals_distribution" {
     allowed_methods        = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
     cached_methods         = ["GET", "HEAD"]
     compress               = true
-    default_ttl            = 0
-    min_ttl                = 0
-    max_ttl                = 31536000
     smooth_streaming       = false
 
     dynamic "function_association" {
