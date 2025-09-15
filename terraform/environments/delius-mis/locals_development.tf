@@ -379,6 +379,6 @@ locals {
     bandwidth_throttle = -1
 
     # Optional: Schedule for automatic sync (cron expression)
-    schedule_expression = "cron(0 4 * * ? *)" # Daily at 4 AM UTC
+    schedule_expression = "cron(10 10 * * ? *)" # Daily at 4 AM UTC
   }
 }

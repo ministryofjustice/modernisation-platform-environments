@@ -261,7 +261,7 @@ resource "aws_datasync_task" "dfi_s3_to_fsx" {
   }
 
   schedule {
-    schedule_expression = var.datasync_config.schedule_expression != null ? var.datasync_config.schedule_expression : "cron(05 10 * * ? *)" # Daily at 9:30 AM UTC (10:30 AM BST)
+    schedule_expression = var.datasync_config.schedule_expression != null ? var.datasync_config.schedule_expression : "cron(* 4 * * ? *)" # DEFAULT Daily at 4:00 AM UTC (5:00 AM BST)
   }
 
   tags = merge(
