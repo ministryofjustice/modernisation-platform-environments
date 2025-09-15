@@ -193,7 +193,7 @@ resource "aws_s3_bucket_policy" "cloudfront_logs" {
         Sid    = "AllowCloudFrontLogDelivery"
         Effect = "Allow"
         Principal = {
-          Service = "delivery.logs.amazonaws.com"
+          Service = "cloudfront.amazonaws.com"
         }
         Action = [
           "s3:PutObject",
