@@ -154,7 +154,7 @@ resource "aws_s3_bucket_ownership_controls" "cloudfront_logs" {
   #checkov:skip=CKV2_AWS_65:"ACLs are required for CloudFront logging to work"
   bucket = aws_s3_bucket.cloudfront_logs.id
   rule {
-    object_ownership = "BucketOwnerPreferred"
+    object_ownership = "BucketOwnerEnforced"
   }
 }
 
@@ -190,26 +190,15 @@ resource "aws_s3_bucket_policy" "cloudfront_logs" {
     Version = "2012-10-17"
     Statement = [
       {
-        Sid    = "AllowCloudFrontLogDelivery"
+        Sid = "AllowCloudFrontLogDelivery"
         Effect = "Allow"
-        Principal = {
-          Service = "cloudfront.amazonaws.com"
-        }
-        Action = [
-          "s3:PutObject",
-          "s3:GetBucketAcl",
-          "s3:PutBucketAcl"
-        ]
-        Resource = [
-          aws_s3_bucket.cloudfront_logs.arn,
-          "${aws_s3_bucket.cloudfront_logs.arn}/*"
-        ]
+        Principal = { Service = "cloudfront.amazonaws.com" }
+        Action = "s3:PutObject"
+        Resource = "${aws_s3_bucket.cloudfront_logs.arn}/cloudfront-logs/*"
         Condition = {
           StringEquals = {
             "aws:SourceAccount" = data.aws_caller_identity.current.account_id
-          }
-          StringLike = {
-            "aws:SourceArn" = "arn:aws:cloudfront::${data.aws_caller_identity.current.account_id}:distribution/${aws_cloudfront_distribution.tribunals_distribution.id}"
+            "aws:SourceArn" = aws_cloudfront_distribution.tribunals_distribution.arn
           }
         }
       }
