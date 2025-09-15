@@ -73,6 +73,7 @@ resource "aws_kms_key" "s3_encryption_key" {
           Service = "delivery.logs.amazonaws.com"
         }
         Action = [
+          "kms:Encrypt",
           "kms:Decrypt",
           "kms:GenerateDataKey"
         ]
