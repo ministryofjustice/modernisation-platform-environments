@@ -46,5 +46,5 @@ resource "aws_vpc_security_group_egress_rule" "egress_traffic_ebsdbnlb" {
   ip_protocol       = "TCP"
   from_port         = 0
   to_port           = 0
-  cidr_ipv4         = ["0.0.0.0/0"]
+  cidr_ipv4         = "0.0.0.0/0"
 }

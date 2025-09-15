@@ -52,7 +52,7 @@ resource "aws_vpc_security_group_egress_rule" "egress_traffic_mailrelay_443" {
   ip_protocol       = "TCP"
   from_port         = 443
   to_port           = 443
-  cidr_ipv4         = ["0.0.0.0/0"]
+  cidr_ipv4         = "0.0.0.0/0"
 }
 
 # SES
@@ -62,5 +62,5 @@ resource "aws_vpc_security_group_egress_rule" "egress_traffic_mailrelay_587" {
   ip_protocol       = "TCP"
   from_port         = 587
   to_port           = 587
-  cidr_ipv4         = ["0.0.0.0/0"]
+  cidr_ipv4         = "0.0.0.0/0"
 }
