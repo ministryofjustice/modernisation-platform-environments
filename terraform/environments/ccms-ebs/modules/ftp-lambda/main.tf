@@ -9,8 +9,8 @@ resource "aws_vpc_security_group_egress_rule" "egress_ftp_sg" {
   security_group_id = aws_security_group.ftp_sg.id
   from_port         = 0
   to_port           = 65535
-  protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"]
+  ip_protocol       = "tcp"
+  cidr_ipv4         = "0.0.0.0/0"
 }
 
 # Lambda role for FTP
