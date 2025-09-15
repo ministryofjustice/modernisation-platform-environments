@@ -17,6 +17,7 @@ resource "aws_cloudwatch_metric_alarm" "lambda_failures" {
   threshold           = 0
   comparison_operator = "GreaterThanThreshold"
   treat_missing_data  = "notBreaching"
+  period              = 300
 
   metric_query {
     id          = "m1"
