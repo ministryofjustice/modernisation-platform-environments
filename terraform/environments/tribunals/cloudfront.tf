@@ -11,7 +11,7 @@ resource "aws_cloudfront_distribution" "tribunals_distribution" {
   logging_config {
     include_cookies = false
     bucket          = aws_s3_bucket.cloudfront_logs.bucket_domain_name
-    prefix          = "cloudfront-logs/"
+    prefix          = "cloudfront-logs-v2/"
   }
 
   aliases = local.is-production ? [
@@ -189,15 +189,26 @@ resource "aws_s3_bucket_policy" "cloudfront_logs" {
       {
         Sid = "AllowCloudFrontLogDelivery"
         Effect = "Allow"
-        Principal = { Service = "cloudfront.amazonaws.com" }
+        Principal = {
+          Service = "delivery.logs.amazonaws.com"
+        }
         Action = "s3:PutObject"
-        Resource = "${aws_s3_bucket.cloudfront_logs.arn}/cloudfront-logs/*"
+        Resource = "${aws_s3_bucket.cloudfront_logs.arn}/cloudfront-logs-v2/*"
         Condition = {
           StringEquals = {
             "aws:SourceAccount" = data.aws_caller_identity.current.account_id
             "aws:SourceArn" = aws_cloudfront_distribution.tribunals_distribution.arn
           }
         }
+      },
+      {
+        Sid = "AllowCloudFrontLogDeliveryGetBucketAcl"
+        Effect = "Allow"
+        Principal = {
+          Service = "delivery.logs.amazonaws.com"
+        }
+        Action = "s3:GetBucketAcl"
+        Resource = aws_s3_bucket.cloudfront_logs.arn
       }
     ]
   })
