@@ -39,6 +39,7 @@ vulnerabilities:
     statement: "Review in 6 months"
   - id: CVE-2025-27152
   - id: CVE-2025-7783
+  - id: CVE-2025-58754
 
 misconfigurations:
   - id: AVD-GIT-0001

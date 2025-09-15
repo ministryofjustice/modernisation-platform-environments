@@ -17,12 +17,12 @@ resource "aws_security_group" "ccms_provider_load" {
 
 resource "aws_security_group_rule" "ccms_provider_load_egress_oracle" {
   type              = "egress"
-  from_port         = 1521
-  to_port           = 1521
+  from_port         = local.environment == "development" ? 1521 : local.environment == "test" ? 1522 : 0
+  to_port           = local.environment == "development" ? 1521 : local.environment == "test" ? 1522 : 0
   protocol          = "tcp"
   cidr_blocks       = [local.application_data.accounts[local.environment].ccms_database_ip]
   security_group_id = aws_security_group.ccms_provider_load.id
-  description       = "Outbound 1522 Access to CCMS DB"
+  description       = "Outbound 1521/1522 Access to CCMS DB"
 }
 
 resource "aws_security_group_rule" "ccms_provider_load_egress_https" {
@@ -69,7 +69,9 @@ resource "aws_lambda_function" "ccms_provider_load" {
       LD_LIBRARY_PATH        = "/opt/instantclient_12_2_linux"
       ORACLE_HOME            = "/opt/instantclient_12_2_linux"
       SERVICE_NAME           = "ccms-load-service"
-      NAMESPACE              = "CCMSProviderLoadService"
+      NAMESPACE              = "HUB20-CCMS-NS"
+      ENVIRONMENT            = local.environment
+      LOG_LEVEL              = "DEBUG"
       PURGE_LAMBDA_TIMESTAMP = aws_ssm_parameter.ccms_provider_load_timestamp.name
     }
   }

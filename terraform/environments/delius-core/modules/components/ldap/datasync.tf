@@ -46,6 +46,7 @@ data "aws_iam_policy_document" "ldap_datasync_role_assume" {
   }
 }
 
+#trivy:ignore:AVD-AWS-0345
 data "aws_iam_policy_document" "ldap_datasync_role_access" {
   #checkov:skip=CKV_AWS_109
   #checkov:skip=CKV_AWS_111

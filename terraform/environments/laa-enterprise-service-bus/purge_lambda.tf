@@ -67,6 +67,9 @@ resource "aws_lambda_function" "purge_lambda" {
       CCR_TIMESTAMP  = aws_ssm_parameter.ccr_provider_load_timestamp.name
       MAAT_TIMESTAMP = aws_ssm_parameter.maat_provider_load_timestamp.name
       TARGET_BUCKET  = aws_s3_bucket.data.bucket
+      NAMESPACE      = "HUB20-PURGE-DATA-NS"
+      ENVIRONMENT    = local.environment
+      LOG_LEVEL      = "DEBUG"
     }
   }
 

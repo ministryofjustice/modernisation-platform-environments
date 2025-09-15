@@ -2,6 +2,13 @@ resource "aws_kms_key" "sns_sqs_key" {
   description             = "KMS key used to encrypt SQS queues that allow access to SNS topics"
   enable_key_rotation     = true
   deletion_window_in_days = 7
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name_short}-${local.environment}-sns-sqs-key"
+    }
+  )
 }
 
 resource "aws_kms_key_policy" "sns_sqs_key_policy" {

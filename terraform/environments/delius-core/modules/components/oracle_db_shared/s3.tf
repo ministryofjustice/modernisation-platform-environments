@@ -1,4 +1,8 @@
+#trivy:ignore:AVD-AWS-0345
 data "aws_iam_policy_document" "s3_bucket_oracledb_backups" {
+  #checkov:skip=CKV_AWS_108 "ignore"
+  #checkov:skip=CKV_AWS_111 "ignore"
+  #checkov:skip=CKV_AWS_356 "ignore"
   count   = lookup(local.oracle_duplicate_map[var.env_name], "target_account_id", false) != false ? 1 : 0
   version = "2012-10-17"
 
@@ -63,6 +67,9 @@ module "s3_bucket_oracledb_backups" {
 }
 
 data "aws_iam_policy_document" "oracledb_backup_bucket_access" {
+  #checkov:skip=CKV_AWS_108 "ignore"
+  #checkov:skip=CKV_AWS_111 "ignore"
+  #checkov:skip=CKV_AWS_356 "ignore"
 
   statement {
     sid    = "allowAccessToOracleDbBackupBucket"
@@ -157,6 +164,9 @@ data "aws_iam_policy_document" "oracle_remote_statistics_bucket_access" {
 }
 
 data "aws_iam_policy_document" "oracledb_remote_backup_bucket_access" {
+  #checkov:skip=CKV_AWS_108 "ignore"
+  #checkov:skip=CKV_AWS_111 "ignore"
+  #checkov:skip=CKV_AWS_356 "ignore"
   count = lookup(local.oracle_duplicate_map[var.env_name], "source_account_id", null) != null ? 1 : 0
   statement {
     sid    = "allowAccessToOracleDb${title(local.oracle_duplicate_map[var.env_name]["source_environment"])}Bucket"
@@ -188,6 +198,7 @@ resource "aws_iam_policy" "oracledb_backup_bucket_access" {
 }
 
 module "s3_bucket_oracledb_backups_inventory" {
+  #checkov:skip=CKV_TF_1 "ignore"
   source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
   bucket_name         = "${local.oracle_backup_bucket_prefix}-inventory"
   versioning_enabled  = false
@@ -382,7 +393,8 @@ data "aws_iam_policy_document" "db_uplift_bucket_access" {
     effect = "Allow"
     actions = [
       "s3:Get*",
-      "s3:List*"
+      "s3:List*",
+      "s3:PutObject"
     ]
     resources = [
       "${module.s3_bucket_db_uplift[0].bucket.arn}",

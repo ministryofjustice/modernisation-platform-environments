@@ -87,10 +87,22 @@ resource "aws_route53_record" "alb_r53_record" {
 }
 
 # NLB for service interconnectivity
+locals {
+  lb_name_full  = "${var.name}-${var.env_name}-service-nlb"
+  lb_name_short = "${var.name}-${var.env_name}-nlb"
+  # for training env since it makes the NLB name > 32 which AWS doesnt allow
+  # e.g. weblogic-eis-training-service-nlb which is 33 chars
+
+  lb_name_final = (
+    length(local.lb_name_full) > 32 && can(regex("training", local.lb_name_full))
+    ? local.lb_name_short
+    : local.lb_name_full
+  )
+}
 
 resource "aws_lb" "delius_microservices" {
   count                      = length(var.container_port_config) == 0 ? 0 : 1
-  name                       = "${var.name}-${var.env_name}-service-nlb"
+  name                       = local.lb_name_final
   internal                   = true
   load_balancer_type         = "network"
   security_groups            = [aws_security_group.delius_microservices_service_nlb.id]
