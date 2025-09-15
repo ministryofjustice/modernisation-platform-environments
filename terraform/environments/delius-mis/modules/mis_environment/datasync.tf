@@ -60,12 +60,6 @@ locals {
     username = "PLACEHOLDER_USERNAME"
     password = "PLACEHOLDER_PASSWORD"
   }
-
-  # Check if credentials are still placeholders
-  credentials_are_real = var.datasync_config != null ? (
-    local.fsx_credentials.username != "PLACEHOLDER_USERNAME" &&
-    local.fsx_credentials.password != "PLACEHOLDER_PASSWORD"
-  ) : false
 }
 
 #############################################
@@ -267,7 +261,7 @@ resource "aws_datasync_task" "dfi_s3_to_fsx" {
   }
 
   schedule {
-    schedule_expression = var.datasync_config.schedule_expression != null ? var.datasync_config.schedule_expression : "cron(0 2 * * ? *)" # Daily at 2 AM
+    schedule_expression = var.datasync_config.schedule_expression != null ? var.datasync_config.schedule_expression : "cron(30 9 * * ? *)" # Daily at 9:30 AM UTC (10:30 AM BST)
   }
 
   tags = merge(
