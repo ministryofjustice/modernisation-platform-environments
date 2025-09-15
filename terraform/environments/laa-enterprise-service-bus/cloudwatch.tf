@@ -17,13 +17,18 @@ resource "aws_cloudwatch_metric_alarm" "lambda_failures" {
   threshold           = 0
   comparison_operator = "GreaterThanThreshold"
   treat_missing_data  = "notBreaching"
-  period              = 300
 
   metric_query {
     id          = "m1"
-    expression  = "SUM(SEARCH('${each.value.namespace} InvocationFailureCount', 'Sum', 300))"
-    label       = "AllFailures"
+    label       = "AllFailureCounts"
     return_data = true
+
+    metric {
+      namespace   = each.value.namespace
+      metric_name = "InvocationFailureCount"
+      stat        = "Sum"
+      period      = 300
+    }
   }
 
   alarm_actions = [aws_sns_topic.hub2_alerts.arn]
