@@ -187,7 +187,7 @@ resource "aws_datasync_location_s3" "dfi_source_bucket" {
   count = var.datasync_config != null ? 1 : 0
 
   s3_bucket_arn = var.datasync_config.source_s3_bucket_arn
-  subdirectory  = "/dfinterventions/dfi/csv/reports/"
+  subdirectory  = var.datasync_config.source_s3_subdirectory
 
   s3_config {
     bucket_access_role_arn = aws_iam_role.datasync_s3_role[0].arn
@@ -214,7 +214,7 @@ resource "aws_datasync_location_fsx_windows_file_system" "dfi_fsx_destination" {
   # for the DataSync task to function properly
   user     = local.fsx_credentials.username
   password = local.fsx_credentials.password
-  domain   = "delius-mis-dev.internal"
+  domain   = var.datasync_config.fsx_domain
 
   security_group_arns = [aws_security_group.datasync_agent[0].arn]
 
