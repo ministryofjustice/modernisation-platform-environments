@@ -14,7 +14,6 @@ resource "aws_cloudwatch_metric_alarm" "lambda_failures" {
   alarm_name          = "${each.value.servicename}-${local.environment}-InvocationFailureCount-Alarm"
   alarm_description   = "Alarm when ${each.value.servicename} lambda reports failures in ${local.environment}"
   metric_name         = "InvocationFailureCount"
-  period              = 60
   evaluation_periods  = 1
   threshold           = 0
   comparison_operator = "GreaterThanThreshold"
