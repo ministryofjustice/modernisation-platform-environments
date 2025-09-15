@@ -22,6 +22,11 @@ resource "aws_cloudwatch_metric_alarm" "lambda_failures" {
   comparison_operator = "GreaterThanThreshold"
   treat_missing_data  = "notBreaching"
 
+  dimensions = {
+    service     = each.value.servicename
+    environment = local.environment
+  }
+
   alarm_actions = [aws_sns_topic.hub2_alerts.arn]
 
   tags = merge(
