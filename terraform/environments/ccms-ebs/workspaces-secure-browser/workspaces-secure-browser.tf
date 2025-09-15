@@ -11,12 +11,11 @@ module "workspacesweb_security_group" {
   name   = "workspacesweb"
   vpc_id = data.aws_vpc.shared.id
 
-  /* DEBUGGING */
-  ingress_cidr_blocks = ["0.0.0.0/0"]
-  ingress_rules       = ["all-all"]
-  egress_cidr_blocks  = ["0.0.0.0/0"]
-  egress_rules        = ["all-all"]
-  /* DEBUGGING */
+  egress_cidr_blocks = local.cloud_platform_ranges
+  egress_rules       = ["https-443-tcp"]
+
+  egress_with_prefix_list_ids = [aws_ec2_managed_prefix_list.entra_saml_auth.id]
+
 }
 
 ### NETWORK SETTINGS
@@ -60,4 +59,22 @@ resource "awscc_workspacesweb_user_settings" "main" {
   toolbar_configuration = {
     hidden_toolbar_items = ["Microphone", "Webcam"] # These need doing manually, they didn't apply properly via Terraform
   }
+}
+
+resource "aws_ec2_managed_prefix_list" "entra_saml_auth" {
+  name           = "microsoft-entra-saml-auth"
+  address_family = "IPv4"
+  max_entries    = local.prefix_list_capacity
+  tags = {
+    ManagedBy = "terraform"
+    Source    = "MicrosoftServiceTags"
+    Purpose   = "EntraID-SAML-Auth"
+  }
+}
+
+resource "aws_ec2_managed_prefix_list_entry" "entra_saml_auth_entries" {
+  for_each       = { for cidr in local.prefixes_ipv4_unique_sorted : cidr => cidr }
+  prefix_list_id = aws_ec2_managed_prefix_list.entra_saml_auth.id
+  cidr           = each.value
+  description    = "Microsoft Entra SAML auth (AAD + AFD Frontend)"
 }
