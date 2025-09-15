@@ -1,5 +1,8 @@
 module "csv_export" {
   source = "github.com/ministryofjustice/terraform-csv-to-parquet-athena?ref=9e21355a103cce0fbe3089c3e71a5b8d47927374"
+  providers = {
+    aws.bucket-replication = aws
+  }
   region_replication = "eu-west-2"
   kms_key_arn = aws_kms_key.shared_kms_key.arn
   name = "concept"
