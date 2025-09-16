@@ -8,5 +8,9 @@ resource "aws_instance" "my_instance" {
   count         = local.is-development ? 1 : 0
   ami           = "ami-08f714c552929eda9"
   instance_type = "t4g.micro"
+  attachment {
+    instance     = aws_instance.example.id
+    device_index = 0
+  }
 
 }
