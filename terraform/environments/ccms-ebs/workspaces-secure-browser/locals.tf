@@ -1,9 +1,9 @@
 locals {
-  json_links      = regexall("https://download\\.microsoft\\.com/[^\"]*ServiceTags_Public_[^\"]*\\.json", data.http.ms_service_tags_index.response_body)
+  json_links      = regexall("https://download\\.microsoft\\.com/[^\"]*ServiceTags_Public_[^\"]*\\.json", data.http.azure_service_tags_index.response_body)
   latest_json_url = length(local.json_links) > 0 ? local.json_links[0] : ""
 
   # Parse values array safely
-  values = try(jsondecode(data.http.ms_service_tags_json.response_body).values, [])
+  values = try(jsondecode(data.http.azure_service_tags_json.response_body).values, [])
 
   auth_tag_names = [
     "AzureActiveDirectory",
