@@ -1,17 +1,17 @@
-# data "aws_caller_identity" "current" {}
-# data "aws_region" "current" {}
+data "aws_caller_identity" "current" {}
+data "aws_region" "current" {}
 
-# data "archive_file" "waf_toggle_zip" {
-#   type        = "zip"
-#   source_dir  = "${path.module}/lambda/lambda_function.py"
-#   output_path = "${path.module}/lambda.zip"
-# }
+data "archive_file" "waf_toggle_zip" {
+  type        = "zip"
+  source_dir  = "${path.module}/lambda/lambda_function.py"
+  output_path = "${path.module}/lambda.zip"
+}
 
 
-# data "aws_wafv2_web_acl" "ccms_ebs_waf_web_acl" {
-#   name  = var.web_acl_name
-#   scope = "REGIONAL"
-# }
+data "aws_wafv2_web_acl" "ccms_ebs_waf_web_acl" {
+  name  = var.web_acl_name
+  scope = "REGIONAL"
+}
 
 # resource "aws_iam_policy_document" "waf_lambda_assume_role_policy" {
 #   statement {
