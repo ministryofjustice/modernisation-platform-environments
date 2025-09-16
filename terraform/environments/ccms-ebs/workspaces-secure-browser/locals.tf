@@ -20,7 +20,7 @@ locals {
   ])
 
   prefixes_ipv4 = [
-    for p in prefixes_all : p
+    for p in local.prefixes_all : p
     if can(regex("^\\d+\\.\\d+\\.\\d+\\.\\d+\\/\\d+$", p))
   ]
 
