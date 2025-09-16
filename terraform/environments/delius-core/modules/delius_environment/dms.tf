@@ -10,7 +10,6 @@ module "dms" {
 
   database_application_passwords_secret_arn = module.oracle_db_shared.database_application_passwords_secret_arn
   oracle_db_server_names                    = local.oracle_db_server_names
-  oracle_db_instance_scheduling             = module.oracle_db_primary[0].oracle_db_instance_scheduling
   db_ec2_sg_id                              = module.oracle_db_shared.db_ec2_sg_id
   env_name_to_dms_config_map                = var.env_name_to_dms_config_map
 
