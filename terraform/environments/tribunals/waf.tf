@@ -23,6 +23,24 @@ resource "aws_wafv2_web_acl" "tribunals_web_acl" {
   }
 
   rule {
+    name     = "allow-siac"
+    priority = 0
+    action { allow {} }
+    statement {
+      byte_match_statement {
+        search_string = "siac.tribunals.gov.uk"
+        field_to_match { single_header { name = "host" } }
+        positional_constraint = "EXACTLY"
+      }
+    }
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "allow-siac"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  rule {
     name     = "log4j-mitigation"
     priority = 1
 
@@ -204,58 +222,4 @@ resource "aws_wafv2_regex_pattern_set" "blocked_paths" {
   regular_expression {
     regex_string = "(?i)^/secure(/.*)?$"
   }
-}
-
-# Create a CloudWatch log group for WAF logging
-resource "aws_cloudwatch_log_group" "tribunals_waf_logs" {
-  name              = "aws-waf-logs-tribunals-web-acl"   # Must start with "aws-waf-logs-" per AWS requirements. :contentReference[oaicite:0]{index=0}
-  retention_in_days = 30
-  provider          = aws.us-east-1
-  tags = {
-    Environment = local.environment
-    Component   = "WAF"
-  }
-}
-
-# Resource policy for the log group to allow WAF to write logs
-resource "aws_cloudwatch_log_resource_policy" "tribunals_waf_log_policy" {
-  policy_name     = "WAFLoggingPolicy-TribunalsWebACL"
-  policy_document = data.aws_iam_policy_document.tribunals_waf_log_policy.json
-  provider        = aws.us-east-1
-}
-
-data "aws_iam_policy_document" "tribunals_waf_log_policy" {
-  statement {
-    effect = "Allow"
-    principals {
-      type        = "Service"
-      identifiers = ["waf.amazonaws.com"]
-    }
-    actions = [
-      "logs:CreateLogStream",
-      "logs:PutLogEvents"
-    ]
-    resources = [
-      "${aws_cloudwatch_log_group.tribunals_waf_logs.arn}:*"
-    ]
-  }
-}
-
-# Attach logging configuration to the WAF Web ACL
-resource "aws_wafv2_web_acl_logging_configuration" "tribunals_waf_logging" {
-  resource_arn             = aws_wafv2_web_acl.tribunals_web_acl.arn
-  log_destination_configs   = [ aws_cloudwatch_log_group.tribunals_waf_logs.arn ]
-
-  # Optional: redact sensitive fields
-  redacted_fields {
-    single_header {
-      name = "authorization"
-    }
-  }
-
-  depends_on = [
-    aws_wafv2_web_acl.tribunals_web_acl,
-    aws_cloudwatch_log_group.tribunals_waf_logs,
-    aws_cloudwatch_log_resource_policy.tribunals_waf_log_policy
-  ]
 }
