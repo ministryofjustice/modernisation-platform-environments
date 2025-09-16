@@ -6,7 +6,7 @@ output "datasync_task_arn" {
 
 output "datasync_fsx_credentials_secret_arn" {
   description = "ARN of the Secrets Manager secret containing FSX credentials"
-  value       = var.datasync_config != null ? aws_secretsmanager_secret.datasync_fsx_credentials[0].arn : null
+  value       = var.datasync_config != null ? data.aws_secretsmanager_secret.datasync_ad_admin_password[0].arn : null
 }
 
 output "fsx_dns_name" {

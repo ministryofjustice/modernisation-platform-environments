@@ -150,7 +150,7 @@ resource "aws_lambda_function" "datasync_password_updater" {
   environment {
     variables = {
       DATASYNC_LOCATION_ARN = aws_datasync_location_fsx_windows_file_system.dfi_fsx_destination[0].arn
-      SECRET_ARN            = data.aws_secretsmanager_secret.ad_admin_password[0].arn
+      SECRET_ARN            = data.aws_secretsmanager_secret.datasync_ad_admin_password[0].arn
       FSX_DOMAIN            = var.datasync_config.fsx_domain
     }
   }
@@ -165,7 +165,7 @@ resource "aws_cloudwatch_event_rule" "pre_datasync_password_update" {
 
   # Run 30 minutes before the DataSync schedule as a simple approach
   # For development schedule "cron(30 14 * * ? *)" this becomes "cron(0 14 * * ? *)"
-  schedule_expression = "cron(25 8 * * ? *)" # 30 minutes before 14:30
+  schedule_expression = "cron(35 8 * * ? *)" # 30 minutes before 14:30
 }
 
 resource "aws_cloudwatch_event_target" "pre_datasync_lambda_target" {
@@ -405,7 +405,7 @@ resource "aws_datasync_task" "dfi_s3_to_fsx" {
   }
 
   schedule {
-    schedule_expression = var.datasync_config.schedule_expression != null ? var.datasync_config.schedule_expression : "cron(30 8 * * ? *)" # DEFAULT Daily at 4:00 AM UTC (5:00 AM BST)
+    schedule_expression = var.datasync_config.schedule_expression != null ? var.datasync_config.schedule_expression : "cron(40 8 * * ? *)" # DEFAULT Daily at 4:00 AM UTC (5:00 AM BST)
   }
 
   tags = merge(
