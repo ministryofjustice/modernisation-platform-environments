@@ -180,6 +180,7 @@ resource "aws_iam_role" "aws_backup_default_service_role" {
         Principal = {
           Service = "backup.amazonaws.com"
         },
+        Action = "sts:AssumeRole"
       }
     ]
   })
