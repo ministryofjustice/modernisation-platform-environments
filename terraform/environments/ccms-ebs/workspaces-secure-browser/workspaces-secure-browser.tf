@@ -13,16 +13,16 @@ module "workspacesweb_security_group" {
 
   egress_cidr_blocks     = local.cloud_platform_ranges
   egress_rules           = ["https-443-tcp"]
-  # egress_prefix_list_ids = [aws_ec2_managed_prefix_list.entra_saml_auth.id]
-  # egress_with_prefix_list_ids = [
-  #   {
-  #     from_port = "443"
-  #     to_port   = "443"
-  #     protocol  = "tcp"
+  egress_prefix_list_ids = [aws_ec2_managed_prefix_list.entra_saml_auth.id]
+  egress_with_prefix_list_ids = [
+    {
+      from_port = "443"
+      to_port   = "443"
+      protocol  = "tcp"
 
-  #   }
+    }
 
-  # ]
+  ]
 
 }
 

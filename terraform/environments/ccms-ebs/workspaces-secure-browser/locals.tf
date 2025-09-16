@@ -26,7 +26,7 @@ locals {
 
   prefixes_ipv4_unique_sorted = sort(distinct(local.prefixes_ipv4))
 
-  capacity_floor       = 200
+  capacity_floor       = 400
   prefix_list_capacity = max(length(local.prefixes_ipv4_unique_sorted), local.capacity_floor)
 
   cloud_platform_ranges = [
