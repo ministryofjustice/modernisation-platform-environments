@@ -8,6 +8,7 @@ module "environment_dev" {
   count  = local.is-development ? 1 : 0
 
   providers = {
+    aws                        = aws
     aws.bucket-replication     = aws
     aws.core-vpc               = aws.core-vpc
     aws.core-network-services  = aws.core-network-services
