@@ -71,7 +71,7 @@ resource "aws_lakeformation_permissions" "home_office_admin_share_table" {
 
 
 resource "aws_lakeformation_permissions" "home_office_share_live_databases" {
-  for_each = toset(local.databases_to_share)
+  for_each    = toset(local.databases_to_share)
   principal   = local.ho_role_arn
   permissions = ["DESCRIBE"]
   database {
@@ -80,7 +80,7 @@ resource "aws_lakeformation_permissions" "home_office_share_live_databases" {
 }
 
 resource "aws_lakeformation_permissions" "home_office_share_live_tables" {
-  for_each = toset(local.databases_to_share)
+  for_each    = toset(local.databases_to_share)
   principal   = local.ho_role_arn
   permissions = ["SELECT"]
   table {

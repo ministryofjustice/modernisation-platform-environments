@@ -69,7 +69,9 @@ resource "aws_lambda_function" "ccms_provider_load" {
       LD_LIBRARY_PATH        = "/opt/instantclient_12_2_linux"
       ORACLE_HOME            = "/opt/instantclient_12_2_linux"
       SERVICE_NAME           = "ccms-load-service"
-      NAMESPACE              = "CCMSProviderLoadService"
+      NAMESPACE              = "HUB20-CCMS-NS"
+      ENVIRONMENT            = local.environment
+      LOG_LEVEL              = "DEBUG"
       PURGE_LAMBDA_TIMESTAMP = aws_ssm_parameter.ccms_provider_load_timestamp.name
     }
   }

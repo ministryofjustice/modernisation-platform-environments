@@ -77,7 +77,9 @@ resource "aws_lambda_function" "cwa_extract_lambda" {
       LD_LIBRARY_PATH   = "/opt/instantclient_12_2_linux"
       ORACLE_HOME       = "/opt/instantclient_12_2_linux"
       SERVICE_NAME      = "cwa-extract-service"
-      NAMESPACE         = "CWAProviderExtractService"
+      NAMESPACE         = "HUB20-CWA-NS"
+      ENVIRONMENT       = local.environment
+      LOG_LEVEL         = "DEBUG"
     }
   }
 
@@ -117,7 +119,9 @@ resource "aws_lambda_function" "cwa_file_transfer_lambda" {
       LD_LIBRARY_PATH   = "/opt/instantclient_12_2_linux"
       ORACLE_HOME       = "/opt/instantclient_12_2_linux"
       SERVICE_NAME      = "cwa-file-transfer-service"
-      NAMESPACE         = "CWAFileTransferService"
+      NAMESPACE         = "HUB20-CWA-NS"
+      ENVIRONMENT       = local.environment
+      LOG_LEVEL         = "DEBUG"
     }
   }
 
@@ -153,7 +157,9 @@ resource "aws_lambda_function" "cwa_sns_lambda" {
       PROVIDER_TOPIC       = aws_sns_topic.priority_p1.arn
       PROVIDER_BANKS_TOPIC = aws_sns_topic.provider_banks.arn
       SERVICE_NAME         = "cwa-sns-service"
-      NAMESPACE            = "CWASNSNotificationService"
+      NAMESPACE            = "HUB20-CWA-NS"
+      ENVIRONMENT          = local.environment
+      LOG_LEVEL            = "DEBUG"
     }
   }
 
