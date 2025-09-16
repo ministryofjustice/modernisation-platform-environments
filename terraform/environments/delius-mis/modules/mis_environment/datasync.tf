@@ -164,9 +164,9 @@ resource "aws_cloudwatch_event_rule" "pre_datasync_password_update" {
   name  = "${var.app_name}-${var.env_name}-pre-datasync-password-update"
 
   # Run 15 minutes before the DataSync schedule to ensure fresh password
-  # Lambda runs at 04:00 UTC, DataSync runs at 04:15 UTC (default)
+  # Default: Lambda at 04:00 UTC, DataSync at 04:15 UTC
   # Can be overridden with var.datasync_config.lambda_schedule_expression
-  schedule_expression = var.datasync_config.lambda_schedule_expression != null ? var.datasync_config.lambda_schedule_expression : "cron(0 4 * * ? *)" # DEFAULT 04:00 UTC daily
+  schedule_expression = var.datasync_config.lambda_schedule_expression
 }
 
 resource "aws_cloudwatch_event_target" "pre_datasync_lambda_target" {
@@ -406,7 +406,7 @@ resource "aws_datasync_task" "dfi_s3_to_fsx" {
   }
 
   schedule {
-    schedule_expression = var.datasync_config.schedule_expression != null ? var.datasync_config.schedule_expression : "cron(15 4 * * ? *)" # DEFAULT Daily at 04:15 UTC
+    schedule_expression = var.datasync_config.schedule_expression
   }
 
   tags = merge(
