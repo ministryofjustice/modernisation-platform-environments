@@ -1,5 +1,5 @@
 # DataSync configuration for syncing S3 bucket to FSX share
-# This configuration sets up DataSync to transfer files from an S3 bucket in a different account
+# This configuration sets up DataSync to transfer files from an S3 bucket in a different acc      SECRET_ARN           = data.aws_secretsmanager_secret.datasync_ad_admin_password[0].arnunt
 # to the FSX Windows file system share accessible at \\share.delius-mis-<env>.internal\share\dfiinterventions\dfi
 
 #############################################
@@ -14,21 +14,21 @@ data "aws_subnet" "private_subnet" {
 ### Secrets Manager for FSX Credentials
 #############################################
 # Data source to read the existing AD admin password from Secrets Manager
-data "aws_secretsmanager_secret" "ad_admin_password" {
+data "aws_secretsmanager_secret" "datasync_ad_admin_password" {
   count = var.datasync_config != null ? 1 : 0
   name  = "delius-mis-${var.env_name}-ad-admin-password"
 }
 
-data "aws_secretsmanager_secret_version" "ad_admin_password" {
+data "aws_secretsmanager_secret_version" "datasync_ad_admin_password" {
   count     = var.datasync_config != null ? 1 : 0
-  secret_id = data.aws_secretsmanager_secret.ad_admin_password[0].id
+  secret_id = data.aws_secretsmanager_secret.datasync_ad_admin_password[0].id
 }
 
 locals {
   # Use the existing AD admin password and a fixed username
   fsx_credentials = var.datasync_config != null ? {
     username = "Admin" # Use the fixed Admin username
-    password = data.aws_secretsmanager_secret_version.ad_admin_password[0].secret_string
+    password = data.aws_secretsmanager_secret_version.datasync_ad_admin_password[0].secret_string
   } : null
 }
 
@@ -75,7 +75,7 @@ resource "aws_iam_role_policy" "datasync_password_updater_policy" {
         Action = [
           "secretsmanager:GetSecretValue"
         ]
-        Resource = data.aws_secretsmanager_secret.ad_admin_password[0].arn
+        Resource = data.aws_secretsmanager_secret.datasync_ad_admin_password[0].arn
       },
       {
         Effect = "Allow"
@@ -368,7 +368,7 @@ resource "aws_datasync_location_fsx_windows_file_system" "dfi_fsx_destination" {
   )
 
   depends_on = [
-    data.aws_secretsmanager_secret_version.ad_admin_password
+    data.aws_secretsmanager_secret_version.datasync_ad_admin_password
   ]
 }
 
