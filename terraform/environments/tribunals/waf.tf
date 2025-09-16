@@ -23,6 +23,34 @@ resource "aws_wafv2_web_acl" "tribunals_web_acl" {
   }
 
   rule {
+    name     = "allow-siac"
+    priority = 0
+    action {
+        allow {}
+    }
+    statement {
+      byte_match_statement {
+        search_string         = "siac.tribunals.gov.uk"
+        field_to_match {
+          single_header {
+            name = "host"
+          }
+        }
+        positional_constraint = "EXACTLY"
+        text_transformation {
+          priority = 0
+          type     = "NONE"
+        }
+      }
+    }
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "allow-siac"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  rule {
     name     = "log4j-mitigation"
     priority = 1
 
