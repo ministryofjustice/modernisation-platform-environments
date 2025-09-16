@@ -14,35 +14,41 @@ module "workspacesweb_security_group" {
 
 
   # Flat CIDR rules (Cloud Platform + Microsoft Entra)
-  egress_with_cidr_blocks = concat(
-    [
-      {
-        rule        = "https-443-tcp"
-        cidr_block  = local.cloud_platform_ranges[0]
-        description = "Cloud Platform internal (single CIDR)"
-      }
-    ],
-    [
-      for cidr in local.prefixes_ipv4_unique_sorted : {
-        rule        = "https-443-tcp"
-        cidr_block  = cidr
-        description = "Microsoft Entra SAML auth ${cidr}"
-      }
-    ]
-  )
+  # egress_with_cidr_blocks = concat(
+  #   [
+  #     {
+  #       from_port        = "443"
+  #       to_port         = "443"
+  #       protocol        = "tcp"
+  #       cidr_block  = local.cloud_platform_ranges[0]
+  #       description = "Cloud Platform internal (single CIDR)"
+  #     }
+  #   ],
+  #   [
+  #     for cidr in local.prefixes_ipv4_unique_sorted : {
+  #       from_port        = "443"
+  #       to_port         = "443"
+  #       protocol        = "tcp"
+  #       cidr_block  = cidr
+  #       description = "Microsoft Entra SAML auth ${cidr}"
+  #     }
+  #   ]
+  # )
 
-  # egress_cidr_blocks     = local.cloud_platform_ranges
-  # egress_rules           = ["https-443-tcp"]
+  egress_cidr_blocks = local.cloud_platform_ranges
+  egress_rules       = ["https-443-tcp"]
   # egress_prefix_list_ids = [aws_ec2_managed_prefix_list.entra_saml_auth.id]
-  # egress_with_prefix_list_ids = [
-  #   {
-  #     from_port = "443"
-  #     to_port   = "443"
-  #     protocol  = "tcp"
+  egress_with_prefix_list_ids = [
+    {
+      from_port      = "443"
+      to_port        = "443"
+      protocol       = "tcp"
+      prefix_list_id = [aws_ec2_managed_prefix_list.entra_saml_auth.id]
+      description    = "Microsoft Entra SAML auth"
 
-  #   }
+    }
 
-  # ]
+  ]
 
 }
 
