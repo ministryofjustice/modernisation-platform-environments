@@ -11,55 +11,176 @@ data "aws_subnet" "private_subnet" {
 }
 
 #############################################
-### VPC Endpoints for DataSync (NOT SUPPORTED in shared VPCs)
-#############################################
-# NOTE: VPC endpoints cannot be created in shared VPCs, so DataSync agent
-# will need to be activated manually or use public internet for activation
-
-#############################################
 ### Secrets Manager for FSX Credentials
 #############################################
-resource "aws_secretsmanager_secret" "datasync_fsx_credentials" {
+# Data source to read the existing AD admin password from Secrets Manager
+data "aws_secretsmanager_secret" "ad_admin_password" {
   count = var.datasync_config != null ? 1 : 0
-
-  name        = "${var.app_name}-${var.env_name}-datasync-fsx-credentials"
-  description = "FSX credentials for DataSync agent to access the Windows file share. Content should be manually populated after creation."
-
-  tags = merge(
-    local.tags,
-    { Name = "${var.app_name}-${var.env_name}-datasync-fsx-credentials" }
-  )
+  name  = "delius-mis-${var.env_name}-ad-admin-password"
 }
 
-# Create initial placeholder version - content will be manually updated later
-resource "aws_secretsmanager_secret_version" "datasync_fsx_credentials" {
-  count = var.datasync_config != null ? 1 : 0
-
-  secret_id = aws_secretsmanager_secret.datasync_fsx_credentials[0].id
-  secret_string = jsonencode({
-    username = "PLACEHOLDER_USERNAME"
-    password = "PLACEHOLDER_PASSWORD"
-  })
-
-  # Ignore changes to secret content after initial creation
-  # This allows manual updates via AWS Console/CLI without Terraform overwriting
-  lifecycle {
-    ignore_changes = [secret_string]
-  }
-}
-
-# Data source to read the FSX credentials from Secrets Manager
-data "aws_secretsmanager_secret_version" "datasync_fsx_credentials" {
-  count      = var.datasync_config != null ? 1 : 0
-  secret_id  = aws_secretsmanager_secret.datasync_fsx_credentials[0].id
-  depends_on = [aws_secretsmanager_secret_version.datasync_fsx_credentials]
+data "aws_secretsmanager_secret_version" "ad_admin_password" {
+  count     = var.datasync_config != null ? 1 : 0
+  secret_id = data.aws_secretsmanager_secret.ad_admin_password[0].id
 }
 
 locals {
-  fsx_credentials = var.datasync_config != null ? jsondecode(data.aws_secretsmanager_secret_version.datasync_fsx_credentials[0].secret_string) : {
-    username = "PLACEHOLDER_USERNAME"
-    password = "PLACEHOLDER_PASSWORD"
+  # Use the existing AD admin password and a fixed username
+  fsx_credentials = var.datasync_config != null ? {
+    username = "Admin" # Use the fixed Admin username
+    password = data.aws_secretsmanager_secret_version.ad_admin_password[0].secret_string
+  } : null
+}
+
+#############################################
+### Lambda Function for Automatic Password Updates
+#############################################
+resource "aws_iam_role" "datasync_password_updater_role" {
+  count = var.datasync_config != null ? 1 : 0
+  name  = "${var.app_name}-${var.env_name}-datasync-password-updater"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "datasync_password_updater_policy" {
+  count = var.datasync_config != null ? 1 : 0
+  name  = "${var.app_name}-${var.env_name}-datasync-password-updater-policy"
+  role  = aws_iam_role.datasync_password_updater_role[0].id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ]
+        Resource = "arn:aws:logs:*:*:*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "secretsmanager:GetSecretValue"
+        ]
+        Resource = data.aws_secretsmanager_secret.ad_admin_password[0].arn
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "datasync:UpdateLocationFsxWindows",
+          "datasync:DescribeLocationFsxWindows"
+        ]
+        Resource = aws_datasync_location_fsx_windows_file_system.dfi_fsx_destination[0].arn
+      }
+    ]
+  })
+}
+
+# Lambda function code archive
+data "archive_file" "lambda_zip" {
+  count       = var.datasync_config != null ? 1 : 0
+  type        = "zip"
+  output_path = "${path.module}/datasync_password_updater.zip"
+  source {
+    content  = <<EOF
+import boto3
+import json
+import os
+
+def handler(event, context):
+    datasync = boto3.client('datasync')
+    secretsmanager = boto3.client('secretsmanager')
+    
+    try:
+        # Get the current password from Secrets Manager
+        secret_response = secretsmanager.get_secret_value(
+            SecretId=os.environ['SECRET_ARN']
+        )
+        current_password = secret_response['SecretString']
+        
+        # Update the DataSync location with the current password
+        datasync.update_location_fsx_windows(
+            LocationArn=os.environ['DATASYNC_LOCATION_ARN'],
+            User='Admin',
+            Password=current_password,
+            Domain=os.environ['FSX_DOMAIN']
+        )
+        
+        print(f"Successfully updated DataSync location with current password")
+        return {
+            'statusCode': 200,
+            'body': json.dumps('Password updated successfully')
+        }
+        
+    except Exception as e:
+        print(f"Error updating DataSync location: {str(e)}")
+        return {
+            'statusCode': 500,
+            'body': json.dumps(f'Error: {str(e)}')
+        }
+EOF
+    filename = "index.py"
   }
+}
+
+resource "aws_lambda_function" "datasync_password_updater" {
+  count         = var.datasync_config != null ? 1 : 0
+  filename      = data.archive_file.lambda_zip[0].output_path
+  function_name = "${var.app_name}-${var.env_name}-datasync-password-updater"
+  role          = aws_iam_role.datasync_password_updater_role[0].arn
+  handler       = "index.handler"
+  runtime       = "python3.11"
+  timeout       = 60
+
+  source_code_hash = data.archive_file.lambda_zip[0].output_base64sha256
+
+  environment {
+    variables = {
+      DATASYNC_LOCATION_ARN = aws_datasync_location_fsx_windows_file_system.dfi_fsx_destination[0].arn
+      SECRET_ARN            = data.aws_secretsmanager_secret.ad_admin_password[0].arn
+      FSX_DOMAIN            = var.datasync_config.fsx_domain
+    }
+  }
+
+  tags = local.tags
+}
+
+# Schedule the Lambda to run 30 minutes before DataSync task to ensure fresh password
+resource "aws_cloudwatch_event_rule" "pre_datasync_password_update" {
+  count = var.datasync_config != null ? 1 : 0
+  name  = "${var.app_name}-${var.env_name}-pre-datasync-password-update"
+
+  # Run 30 minutes before the DataSync schedule as a simple approach
+  # For development schedule "cron(30 14 * * ? *)" this becomes "cron(0 14 * * ? *)"
+  schedule_expression = "cron(25 8 * * ? *)" # 30 minutes before 14:30
+}
+
+resource "aws_cloudwatch_event_target" "pre_datasync_lambda_target" {
+  count = var.datasync_config != null ? 1 : 0
+  rule  = aws_cloudwatch_event_rule.pre_datasync_password_update[0].name
+  arn   = aws_lambda_function.datasync_password_updater[0].arn
+}
+
+resource "aws_lambda_permission" "allow_scheduled_execution" {
+  count         = var.datasync_config != null ? 1 : 0
+  statement_id  = "AllowExecutionFromSchedule"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.datasync_password_updater[0].function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.pre_datasync_password_update[0].arn
 }
 
 #############################################
@@ -233,9 +354,8 @@ resource "aws_datasync_location_fsx_windows_file_system" "dfi_fsx_destination" {
   fsx_filesystem_arn = aws_fsx_windows_file_system.mis_share.arn
   subdirectory       = "/share/dfiinterventions/dfi"
 
-  # Authentication details - using local values that will be set from secrets
-  # NOTE: The credentials must be manually updated in Secrets Manager after initial deployment
-  # for the DataSync task to function properly
+  # Authentication details - using the existing AD admin credentials
+  # The password comes from the existing AD admin secret that gets rotated automatically
   user     = local.fsx_credentials.username
   password = local.fsx_credentials.password
   domain   = var.datasync_config.fsx_domain
@@ -248,7 +368,7 @@ resource "aws_datasync_location_fsx_windows_file_system" "dfi_fsx_destination" {
   )
 
   depends_on = [
-    data.aws_secretsmanager_secret_version.datasync_fsx_credentials
+    data.aws_secretsmanager_secret_version.ad_admin_password
   ]
 }
 
@@ -285,7 +405,7 @@ resource "aws_datasync_task" "dfi_s3_to_fsx" {
   }
 
   schedule {
-    schedule_expression = var.datasync_config.schedule_expression != null ? var.datasync_config.schedule_expression : "cron(0 4 * * ? *)" # DEFAULT Daily at 4:00 AM UTC (5:00 AM BST)
+    schedule_expression = var.datasync_config.schedule_expression != null ? var.datasync_config.schedule_expression : "cron(30 8 * * ? *)" # DEFAULT Daily at 4:00 AM UTC (5:00 AM BST)
   }
 
   tags = merge(
