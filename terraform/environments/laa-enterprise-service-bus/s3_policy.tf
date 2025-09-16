@@ -41,7 +41,8 @@ resource "aws_s3_bucket_policy" "data_cross_account_access" {
           "s3:GetObjectAcl",
           "s3:GetObjectVersion",
           "s3:ListBucket",
-          "s3:ListBucketVersions"
+          "s3:ListBucketVersions",
+          "s3:PutObject"
         ],
         Resource = [
           "arn:aws:s3:::${aws_s3_bucket.data.bucket}",
