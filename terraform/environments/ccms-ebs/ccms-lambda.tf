@@ -41,7 +41,7 @@ resource "aws_vpc_security_group_ingress_rule" "lambda_ingress" {
 # hashicorp recommened egress rule of lambda_security_group
 resource "aws_vpc_security_group_egress_rule" "lambda_egress" {
   security_group_id = aws_security_group.lambda_security_group.id
-  description       = "Allow FTP lambdaall outbound traffic"
+  description       = "Allow FTP lambda all outbound traffic"
   cidr_ipv4         = "0.0.0.0/0"
   ip_protocol       = "-1"
 }
