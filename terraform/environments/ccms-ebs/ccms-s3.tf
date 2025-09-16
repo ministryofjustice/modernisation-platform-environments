@@ -320,7 +320,7 @@ resource "aws_s3_bucket_versioning" "ccms_ebs_shared" {
   }
 }
 
-### S3 Bucket for Payment Load
+# S3 Bucket for Payment Load
 
 resource "aws_s3_bucket" "lambda_payment_load" {
   bucket = "${local.application_name}-${local.environment}-payment-load"
