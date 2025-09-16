@@ -17,12 +17,16 @@ module "csv_export" {
 }
 
 module "rds_export" {
-  source = "github.com/ministryofjustice/terraform-rds-export?ref=c3c0a7fb772268e54f1958cc881c566c28e63e50"
-
+  source = "github.com/ministryofjustice/terraform-rds-export?ref=a12a52620c8bc96ced3966eec0df765f9f5b9388"
+  providers = {
+    aws.bucket-replication = aws
+  }
   kms_key_arn           = aws_kms_key.shared_kms_key.arn
   name                  = "planetfm"
   database_refresh_mode = "full"
-
+  output_parquet_file_size = 10
+  max_concurrency = 5
+  environment = local.environment_shorthand
   vpc_id                = module.vpc.vpc_id
   database_subnet_ids   = module.vpc.private_subnets
   master_user_secret_id = aws_secretsmanager_secret.db_master_user_secret.arn
