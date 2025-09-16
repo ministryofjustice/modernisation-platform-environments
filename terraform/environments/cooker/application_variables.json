@@ -1,16 +1,10 @@
 {
   "accounts": {
     "sandbox": {
-      "ecs_type": "FARGATE",
-      "rds_storage": 5,
-      "rds_postgresql_version": "16.8",
-      "rds_instance_class": "db.t3.micro"
+      "example_var": "dev-data"
     },
     "production": {
-      "ecs_type": "FARGATE",
-      "rds_storage": 5,
-      "rds_postgresql_version": "16.8",
-      "rds_instance_class": "db.t3.micro"
+      "example_var": "dev-data"
     }
   }
 }
