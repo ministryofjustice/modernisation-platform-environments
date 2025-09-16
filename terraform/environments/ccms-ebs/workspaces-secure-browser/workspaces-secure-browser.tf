@@ -43,7 +43,7 @@ module "workspacesweb_security_group" {
       from_port       = "443"
       to_port         = "443"
       protocol        = "tcp"
-      prefix_list_ids = [aws_ec2_managed_prefix_list.entra_saml_auth.id]
+      prefix_list_ids = aws_ec2_managed_prefix_list.entra_saml_auth.id
       description     = "Microsoft Entra SAML auth"
 
     }
