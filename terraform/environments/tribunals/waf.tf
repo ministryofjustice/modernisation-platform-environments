@@ -1,7 +1,3 @@
-locals {
-    waf_log_group_arn_correct = "arn:aws:wafv2:us-east-1:${data.aws_caller_identity.current.account_id}:global/webacl/tribunals-web-acl/d75bb1aa-52dd-4e9a-8e5a-c9f8ebe421d5"
-}
-
 resource "aws_wafv2_ip_set" "allowed_ip_set" {
   provider = aws.us-east-1
   name     = "allowed-ip-set"
@@ -248,8 +244,7 @@ data "aws_iam_policy_document" "tribunals_waf_log_policy" {
 # Attach logging configuration to the WAF Web ACL
 resource "aws_wafv2_web_acl_logging_configuration" "tribunals_waf_logging" {
   resource_arn             = aws_wafv2_web_acl.tribunals_web_acl.arn
-  #log_destination_configs   = [ aws_cloudwatch_log_group.tribunals_waf_logs.arn ]
-  log_destination_configs = [ local.waf_log_group_arn_correct ]
+  log_destination_configs   = [ aws_cloudwatch_log_group.tribunals_waf_logs.arn ]
 
   # Optional: redact sensitive fields
   redacted_fields {
