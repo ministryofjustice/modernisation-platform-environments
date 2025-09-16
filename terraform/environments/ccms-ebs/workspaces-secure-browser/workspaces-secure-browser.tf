@@ -11,14 +11,14 @@ module "workspacesweb_security_group" {
   name   = "workspacesweb"
   vpc_id = data.aws_vpc.shared.id
 
-  egress_cidr_blocks = local.cloud_platform_ranges
-  egress_rules       = ["https-443-tcp"]
-
+  egress_cidr_blocks     = local.cloud_platform_ranges
+  egress_rules           = ["https-443-tcp"]
+  egress_prefix_list_ids = [aws_ec2_managed_prefix_list.entra_saml_auth.id]
   egress_with_prefix_list_ids = [
     {
-      rule           = "azure-auth-endpoints"
-      prefix_list_id = aws_ec2_managed_prefix_list.entra_saml_auth.id
-      description    = "Entra SAML auth (AAD + AFD)"
+      from_port = "443"
+      to_port   = "443"
+      protocol  = "tcp"
 
     }
 
