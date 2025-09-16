@@ -1035,6 +1035,13 @@ resource "aws_iam_policy_attachment" "attach_lambda_cloudwatch_full_access_to_ge
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchFullAccessV2"
 }
 
+resource "aws_iam_policy_attachment" "attach_lambda_vpc_access_execution_prod" {
+  count      = local.is-production == true ? 1 : 0
+  name       = "lambda-vpc-access-execution-iam-attachment"
+  roles      = [aws_iam_role.lambda_role_get_cloudwatch_prod[0].id]
+  policy_arn = "arn:aws:iam::aws:policy/AWSLambdaVPCAccessExecutionRole"
+}
+
 # Lambda role and attachment for retrieving security hub data
 
 resource "aws_iam_role" "lambda_role_get_securityhub_data_prod" {
