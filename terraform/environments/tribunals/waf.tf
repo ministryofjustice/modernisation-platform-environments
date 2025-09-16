@@ -1,10 +1,3 @@
-provider "aws" {
-  region = "us-east-1"
-  alias  = "us-east-1"
-}
-
-data "aws_caller_identity" "current" {}
-
 # WAF IP Set
 resource "aws_wafv2_ip_set" "allowed_ip_set" {
   provider = aws.us-east-1
