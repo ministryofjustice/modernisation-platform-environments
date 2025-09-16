@@ -30,9 +30,17 @@ resource "aws_wafv2_web_acl" "tribunals_web_acl" {
     }
     statement {
       byte_match_statement {
-        search_string = "siac.tribunals.gov.uk"
-        field_to_match { single_header { name = "host" } }
+        search_string         = "siac.tribunals.gov.uk"
+        field_to_match {
+          single_header {
+            name = "host"
+          }
+        }
         positional_constraint = "EXACTLY"
+        text_transformation {
+          priority = 0
+          type     = "NONE"
+        }
       }
     }
     visibility_config {
