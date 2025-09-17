@@ -25,7 +25,7 @@ resource "aws_lambda_permission" "allow_cloudwatch_logs" {
   statement_id  = "AllowExecutionFromCloudWatchLogs"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.cloudwatch_log_alert.function_name
-  principal     = "logs.${data.aws_region.current.region}.amazonaws.com"
+  principal     = "logs.amazonaws.com"
   source_arn    = "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/ccr_provider_load:*"
 }
 
