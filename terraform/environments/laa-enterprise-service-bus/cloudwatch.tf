@@ -8,27 +8,23 @@ resource "aws_cloudwatch_metric_alarm" "lambda_failures" {
     "ccr-load"          = { namespace = "HUB20-CCR-NS",        servicename = "ccr-load-service" }
     "maat-load"         = { namespace = "HUB20-MAAT-NS",       servicename = "maat-load-service" }
     "ccms-load"         = { namespace = "HUB20-CCMS-NS",       servicename = "ccms-load-service" }
-    "purge-lambda"      = { namespace = "HUB20-PURGE-DATA-NS", servicename = "purge-lambda-service" }
+    "purge-load"        = { namespace = "HUB20-PURGE-DATA-NS", servicename = "purge-lambda-service" }
   }
 
   alarm_name          = "${each.value.servicename}-${local.environment}-InvocationFailureCount-Alarm"
   alarm_description   = "Alarm when ${each.value.servicename} lambda reports failures in ${local.environment}"
+  namespace           = each.value.namespace
+  metric_name         = "InvocationFailureCount"
+  statistic           = "Sum"
+  period              = 60
   evaluation_periods  = 1
   threshold           = 0
   comparison_operator = "GreaterThanThreshold"
   treat_missing_data  = "notBreaching"
 
-  metric_query {
-    id          = "m1"
-    label       = "AllFailureCounts"
-    return_data = true
-
-    metric {
-      namespace   = each.value.namespace
-      metric_name = "InvocationFailureCount"
-      stat        = "Sum"
-      period      = 300
-    }
+  dimensions = {
+    service     = each.value.servicename
+    environment = local.environment
   }
 
   alarm_actions = [aws_sns_topic.hub2_alerts.arn]
