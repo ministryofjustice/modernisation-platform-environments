@@ -1,4 +1,4 @@
-resource "aws_instance" "my_instance" {
+resource "aws_instance" "my_t4_instance" {
   #checkov:skip=CKV_AWS_79: "Ensure Instance Metadata Service Version 1 is not enabled"
   #checkov:skip=CKV_AWS_135: "Ensure that EC2 is EBS optimized"
   #checkov:skip=CKV_AWS_16: "Ensure all data stored in the RDS is securely encrypted at rest"
@@ -8,7 +8,9 @@ resource "aws_instance" "my_instance" {
   count         = local.is-development ? 1 : 0
   ami           = "ami-08f714c552929eda9"
   instance_type = "t4g.micro"
-  # Code from elsewhere
+
+  vpc_security_group_ids = ["subnet-01815760b71d6a619"]
+  # Code from elsewhere  
   associate_public_ip_address = false
   availability_zone           = "eu-west-2a"
   ebs_optimized               = true
