@@ -1,7 +1,6 @@
 #Variables
 variable "env" { 
     type = string
-    default = "dev"
 }
     
 variable "region" {
