@@ -170,7 +170,7 @@ resource "aws_lambda_permission" "waf_events_allow" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.waf_toggle.function_name
   principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.allow_0700_uk.arn
+  source_arn    = aws_cloudwatch_event_rule.waf_allow_0700_uk.arn
 }
 resource "aws_lambda_permission" "waf_events_block" {
   statement_id  = "AllowEvents1900-${var.env}"
