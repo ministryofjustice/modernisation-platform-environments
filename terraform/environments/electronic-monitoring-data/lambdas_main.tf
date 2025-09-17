@@ -98,7 +98,8 @@ module "virus_scan_definition_upload" {
   timeout       = 900
   # security_group_ids      = [aws_security_group.lambda_generic.id]
   # subnet_ids              = data.aws_subnets.shared-public.ids
-  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  reserved_concurrent_executions = 10000
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
   environment_variables = {
     MODE                         = "definition-upload",
     CLAMAV_DEFINITON_BUCKET_NAME = module.s3-clamav-definitions-bucket.bucket.id
