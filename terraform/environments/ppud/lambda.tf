@@ -1175,7 +1175,8 @@ resource "aws_lambda_function" "terraform_lambda_func_wam_web_traffic_analysis_p
   }
   layers = [
     aws_lambda_layer_version.lambda_layer_beautifulsoup_prod[0].arn,
-    aws_lambda_layer_version.lambda_layer_xlsxwriter_prod[0].arn
+    aws_lambda_layer_version.lambda_layer_xlsxwriter_prod[0].arn,
+    aws_lambda_layer_version.lambda_layer_requests_prod[0].arn
   ]
   # VPC configuration
   vpc_config {
