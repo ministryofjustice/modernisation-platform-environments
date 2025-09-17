@@ -151,14 +151,14 @@ resource "aws_cloudwatch_event_rule" "waf_block_1900_uk" {
 }
 
 resource "aws_cloudwatch_event_target" "waf_allow_target" {
-  rule      = aws_cloudwatch_event_rule.allow_0700_uk.name
+  rule      = aws_cloudwatch_event_rule.waf_allow_0700_uk.name
   target_id = "Allow"
   arn       = aws_lambda_function.waf_toggle.arn
   input     = jsonencode({ mode = "ALLOW" })
 }
 
 resource "aws_cloudwatch_event_target" "waf_block_target" {
-  rule      = aws_cloudwatch_event_rule.block_1900_uk.name
+  rule      = aws_cloudwatch_event_rule.waf_block_1900_uk.name
   target_id = "Block"
   arn       = aws_lambda_function.waf_toggle.arn
   input     = jsonencode({ mode = "BLOCK" })
@@ -168,14 +168,14 @@ resource "aws_cloudwatch_event_target" "waf_block_target" {
 resource "aws_lambda_permission" "waf_events_allow" {
   statement_id  = "AllowEvents0700-${var.env}"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.waf_toggle.lambda_function
+  function_name = aws_lambda_function.waf_toggle.function_name
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.allow_0700_uk.arn
 }
 resource "aws_lambda_permission" "waf_events_block" {
   statement_id  = "AllowEvents1900-${var.env}"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.waf_toggle.lambda_function
+  function_name = aws_lambda_function.waf_toggle.function_name
   principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.block_1900_uk.arn
+  source_arn    = aws_cloudwatch_event_rule.waf_block_1900_uk.arn
 }
