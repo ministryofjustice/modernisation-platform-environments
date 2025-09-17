@@ -26,7 +26,7 @@ resource "aws_security_group_rule" "cloudwatch_log_alert_https" {
 }
 
 ######################################
-### Lambda Resources
+### Lambda Function
 ######################################
 resource "aws_lambda_function" "cloudwatch_log_alert" {
   function_name = "cloudwatch_log_alert"
@@ -53,7 +53,51 @@ resource "aws_lambda_function" "cloudwatch_log_alert" {
   )
 }
 
-resource "aws_lambda_permission" "allow_cloudwatch_logs" {
+######################################
+### Lambda Permissions
+######################################
+
+resource "aws_lambda_permission" "allow_cwa_extract_logs" {
+  statement_id  = "AllowExecutionFromCloudWatchLogs"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.cloudwatch_log_alert.function_name
+  principal     = "logs.amazonaws.com"
+  source_arn    = "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/cwa_extract_lambda:*"
+}
+
+resource "aws_lambda_permission" "allow_cwa_file_transfer_logs" {
+  statement_id  = "AllowExecutionFromCloudWatchLogs"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.cloudwatch_log_alert.function_name
+  principal     = "logs.amazonaws.com"
+  source_arn    = "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/cwa_file_transfer_lambda:*"
+}
+
+resource "aws_lambda_permission" "allow_cwa_sns_logs" {
+  statement_id  = "AllowExecutionFromCloudWatchLogs"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.cloudwatch_log_alert.function_name
+  principal     = "logs.amazonaws.com"
+  source_arn    = "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/cwa_sns_lambda:*"
+}
+
+resource "aws_lambda_permission" "allow_ccms_provider_logs" {
+  statement_id  = "AllowExecutionFromCloudWatchLogs"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.cloudwatch_log_alert.function_name
+  principal     = "logs.amazonaws.com"
+  source_arn    = "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/ccms_provider_load_function:*"
+}
+
+resource "aws_lambda_permission" "allow_maat_provider_logs" {
+  statement_id  = "AllowExecutionFromCloudWatchLogs"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.cloudwatch_log_alert.function_name
+  principal     = "logs.amazonaws.com"
+  source_arn    = "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/maat_provider_load_function:*"
+}
+
+resource "aws_lambda_permission" "allow_ccr_provider_logs" {
   statement_id  = "AllowExecutionFromCloudWatchLogs"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.cloudwatch_log_alert.function_name
@@ -61,6 +105,21 @@ resource "aws_lambda_permission" "allow_cloudwatch_logs" {
   source_arn    = "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/ccr_provider_load_function:*"
 }
 
+resource "aws_lambda_permission" "allow_cclf_provider_logs" {
+  statement_id  = "AllowExecutionFromCloudWatchLogs"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.cloudwatch_log_alert.function_name
+  principal     = "logs.amazonaws.com"
+  source_arn    = "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/cclf_provider_load_function:*"
+}
+
+resource "aws_lambda_permission" "allow_purge_lambda_logs" {
+  statement_id  = "AllowExecutionFromCloudWatchLogs"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.cloudwatch_log_alert.function_name
+  principal     = "logs.amazonaws.com"
+  source_arn    = "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/purge_lambda_function:*"
+}
 
 ######################################
 ### IAM Resources
