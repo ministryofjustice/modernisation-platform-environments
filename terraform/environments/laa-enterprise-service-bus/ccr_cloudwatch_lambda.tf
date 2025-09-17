@@ -70,7 +70,7 @@ resource "aws_iam_role_policy_attachment" "ccr_cloudwatch_log_alert_attach" {
   policy_arn = aws_iam_policy.ccr_cloudwatch_log_alert_policy.arn
 }
 
-resource "aws_iam_role_policy_attachment" "ccr_provider_load_lambda_vpc_access" {
+resource "aws_iam_role_policy_attachment" "ccr_cloudwatch_log_alert_vpc_access" {
   role       = aws_iam_role.ccr_cloudwatch_log_alert_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
 }
