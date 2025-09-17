@@ -19,14 +19,14 @@ variable "scope"{
     default = "REGIONAL"
 }
 
-variable "web_acl_name" { 
-    type = string
-    default = "ebs_waf"
-}
+# variable "web_acl_name" { 
+#     type = string
+#     default = "ebs_waf"
+# }
 
-variable "web_acl_id" { 
-    type = string
-}
+# variable "web_acl_id" { 
+#     type = string
+# }
 
 variable "rule_name" {
     default = "Allow" 
@@ -47,9 +47,15 @@ data "archive_file" "waf_toggle_zip" {
   output_path = "${path.module}/lambda_function.zip"
 }
 
+# Pull an existing WAF Rule Group and rules using a dynamic name.
+data "aws_wafv2_web_acl" "waf_web_acl" {
+  name  = "ebs_waf"
+  scope = "REGIONAL"
+}
 
-data "aws_wafv2_web_acl" "ccms_ebs_waf_web_acl" {
-  name  = var.web_acl_name
+
+data "aws_wafv2_rule_group" "waf_rule_group" {
+  name  = "ebs-trusted-rule"
   scope = "REGIONAL"
 }
 
@@ -111,8 +117,8 @@ resource "aws_lambda_function" "waf_toggle" {
   environment {
     variables = {
       SCOPE        = var.scope
-      WEB_ACL_NAME = var.web_acl_name
-      WEB_ACL_ID   = data.aws_wafv2_web_acl.ccms_ebs_waf_web_acl.id
+      WEB_ACL_ARN      = data.aws_wafv2_web_acl.waf_web_acl.arn
+      RULE_GROUP_ARN   = data.aws_wafv2_rule_group.waf_rule_group.arn
       RULE_NAME    = var.rule_name
 
         # New variables for custom body injection
