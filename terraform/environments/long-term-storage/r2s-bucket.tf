@@ -21,7 +21,7 @@ variable "snowflake_external_id" {
 resource "aws_secretsmanager_secret" "genesys_aws_account_id" {
   name        = "genesys_aws_account_id" # you can also use "/r2s/genesys/aws_account_id"
   description = "Account ID for Genesys"
-  tags        = local.tags
+  tags = local.tags
 }
 
 # --- S3 bucket ---
@@ -138,7 +138,7 @@ resource "aws_iam_role" "genesys_role" {
   name               = "r2s-genesys-role"
   assume_role_policy = data.aws_iam_policy_document.genesys_trust.json
   description        = "Role assumed by Genesys Cloud export module to upload recordings to ${local.bucket_name}"
-  tags               = locals.tags
+  tags               = local.tags
 }
 
 resource "aws_iam_role_policy_attachment" "genesys_attach" {
@@ -179,7 +179,7 @@ resource "aws_iam_policy" "snowflake_policy" {
   name        = "r2s-snowflake-access"
   description = "Allow Snowflake (via integration assume-role) to access metadata objects in ${local.bucket_name}"
   policy      = data.aws_iam_policy_document.snowflake_policy_doc.json
-  tags        = locals.tags
+  tags        = local.tags
 }
 
 # Trust: pattern per your guide (same account + external ID). If Snowflake uses a different principal in your setup, swap the principal here.
@@ -203,7 +203,7 @@ resource "aws_iam_role" "snowflake_role" {
   name               = "r2s-snowflake-role"
   assume_role_policy = data.aws_iam_policy_document.snowflake_trust.json
   description        = "Role assumed for Snowflake processing to access metadata in ${local.bucket_name} (no recording-file access beyond object-level actions listed)"
-  tags               = locals.tags
+  tags               = local.tags
 }
 
 resource "aws_iam_role_policy_attachment" "snowflake_attach" {
