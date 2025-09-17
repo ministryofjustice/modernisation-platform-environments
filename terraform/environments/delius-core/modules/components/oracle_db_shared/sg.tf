@@ -202,15 +202,29 @@ resource "aws_vpc_security_group_egress_rule" "delius_db_oem_console" {
 }
 
 # https://dsdmoj.atlassian.net/browse/TM-1162
+# resource "aws_vpc_security_group_ingress_rule" "ap_db_oracle" {
+#   count             = (var.env_name == "dev" || var.env_name == "test") ? 1 : 0
+#   ip_protocol       = "tcp"
+#   from_port         = 1521
+#   to_port           = 1522
+#   cidr_ipv4         = local.ap_dev_cidr
+#   security_group_id = aws_security_group.db_ec2.id
+#   description       = "Allow communication in on port 1521/1522 from AP dev"
+#   tags = merge(var.tags,
+#     { Name = "ap-oracle-in" }
+#   )
+# }
+
 resource "aws_vpc_security_group_ingress_rule" "ap_db_oracle" {
-  count             = var.env_name == "dev" ? 1 : 0
+  for_each = try({ for env, cidr in local.ap_env_cidrs : env => cidr if env == var.env_name }, {})
+
   ip_protocol       = "tcp"
   from_port         = 1521
   to_port           = 1522
-  cidr_ipv4         = local.ap_dev_cidr
+  cidr_ipv4         = each.value
   security_group_id = aws_security_group.db_ec2.id
-  description       = "Allow communication in on port 1521/1522 from AP dev"
+  description       = "Allow communication in on port 1521,1522 from AP ${each.key}"
   tags = merge(var.tags,
-    { Name = "ap-oracle-in" }
+    { Name = "ap-oracle-in-${each.key}" }
   )
 }
