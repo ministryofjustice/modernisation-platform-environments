@@ -26,7 +26,7 @@ resource "aws_lambda_permission" "allow_cloudwatch_logs" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.cloudwatch_log_alert.function_name
   principal     = "logs.amazonaws.com"
-  source_arn    = "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/ccr_provider_load:*"
+  source_arn    = "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/ccr_provider_load_function:*"
 }
 
 
@@ -88,7 +88,7 @@ resource "aws_iam_role_policy_attachment" "ccr_cloudwatch_log_alert_vpc_access" 
 ######################################
 resource "aws_cloudwatch_log_subscription_filter" "lambda_error_alert" {
   name            = "lambda-error-alert"
-  log_group_name  = "/aws/lambda/cwa_extract_lambda"
+  log_group_name  = "/aws/lambda/ccr_provider_load_function"
   filter_pattern  = "ERROR"
   destination_arn = aws_lambda_function.cloudwatch_log_alert.arn
 }
