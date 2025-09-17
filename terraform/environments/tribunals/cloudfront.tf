@@ -101,10 +101,32 @@ resource "aws_acm_certificate" "cloudfront" {
   }
 }
 
-resource "aws_acm_certificate_validation" "cloudfront_cert_validation" {
-  provider        = aws.us-east-1
-  certificate_arn = aws_acm_certificate.cloudfront.arn
+# Take over creation of DNS cert validation records as AWS fails to create the nginx http migrated domains
+resource "aws_route53_record" "cert_validation" {
+  for_each =  var.is-production ? {
+    for dvo in aws_acm_certificate.cloudfront.domain_validation_options : dvo.domain_name => {
+      name    = dvo.resource_record_name
+      record  = dvo.resource_record_value
+      type    = dvo.resource_record_type
+      zone_id = local.production_zone_id
+    }
+  } : {}
+  zone_id = each.value.zone_id
+  name    = each.value.name
+  records = [each.value.record]
+  type    = "CNAME"
+  ttl     = 60
+  provider = aws.core-network-services
 }
+
+# Certificate Validation
+resource "aws_acm_certificate_validation" "cloudfront" {
+  count                   = var.is-production ? 1 : 0
+  provider                = aws.us-east-1
+  certificate_arn         = aws_acm_certificate.cloudfront.arn
+  validation_record_fqdns = [for record in aws_route53_record.cert_validation : record.fqdn]
+}
+
 
 data "aws_ec2_managed_prefix_list" "cloudfront" {
   name = "com.amazonaws.global.cloudfront.origin-facing"
