@@ -113,7 +113,7 @@ resource "aws_lambda_function" "waf_toggle" {
     variables = {
       SCOPE        = var.scope
       WEB_ACL_ARN      = data.aws_wafv2_web_acl.waf_web_acl.arn
-      RULE_GROUP_ARN   = data.aws_wafv2_rule_group.waf_rule_group.arn
+    #   RULE_GROUP_ARN   = data.aws_wafv2_rule_group.waf_rule_group.arn
       RULE_NAME    = var.rule_name
 
         # New variables for custom body injection
