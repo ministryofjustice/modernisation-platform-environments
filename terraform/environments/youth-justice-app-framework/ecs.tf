@@ -64,6 +64,7 @@ module "ecs" {
     aws_secretsmanager_secret.auto_admit_secret.arn,
     aws_secretsmanager_secret.Unit_test.arn,
     aws_secretsmanager_secret.s3_user_secret.arn,
+    aws_secretsmanager_secret.google_api.arn,
     aws_secretsmanager_secret.yjaf_credentials.arn
   ])
   ecs_role_additional_policies_arns = [
