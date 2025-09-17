@@ -1,61 +1,61 @@
 #### This file can be used to store data specific to the member account ####
 
 ## AMI data blocks
-data "aws_ami" "oracle_base_prereqs" {
-  most_recent = true
-  owners      = [local.application_data.accounts[local.environment].ami_owner]
+# data "aws_ami" "oracle_base_prereqs" {
+#   most_recent = true
+#   owners      = [local.application_data.accounts[local.environment].ami_owner]
 
-  filter {
-    name   = "name"
-    values = [local.application_data.accounts[local.environment].orace_base_prereqs_ami_name]
-  }
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-}
+#   filter {
+#     name   = "name"
+#     values = [local.application_data.accounts[local.environment].orace_base_prereqs_ami_name]
+#   }
+#   filter {
+#     name   = "virtualization-type"
+#     values = ["hvm"]
+#   }
+# }
 
-data "aws_ami" "oracle_db" {
-  most_recent = true
-  owners      = [local.application_data.accounts[local.environment].ami_owner]
+# data "aws_ami" "oracle_db" {
+#   most_recent = true
+#   owners      = [local.application_data.accounts[local.environment].ami_owner]
 
-  filter {
-    name   = "name"
-    values = [local.application_data.accounts[local.environment].orace_db_ami_name]
-  }
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-}
+#   filter {
+#     name   = "name"
+#     values = [local.application_data.accounts[local.environment].orace_db_ami_name]
+#   }
+#   filter {
+#     name   = "virtualization-type"
+#     values = ["hvm"]
+#   }
+# }
 
-data "aws_ami" "webgate" {
-  most_recent = true
-  owners      = [local.application_data.accounts[local.environment].ami_owner]
+# data "aws_ami" "webgate" {
+#   most_recent = true
+#   owners      = [local.application_data.accounts[local.environment].ami_owner]
 
-  filter {
-    name   = "name"
-    values = [local.application_data.accounts[local.environment].webgate_ami_name]
-  }
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-}
+#   filter {
+#     name   = "name"
+#     values = [local.application_data.accounts[local.environment].webgate_ami_name]
+#   }
+#   filter {
+#     name   = "virtualization-type"
+#     values = ["hvm"]
+#   }
+# }
 
-data "aws_ami" "accessgate" {
-  most_recent = true
-  owners      = [local.application_data.accounts[local.environment].ami_owner]
+# data "aws_ami" "accessgate" {
+#   most_recent = true
+#   owners      = [local.application_data.accounts[local.environment].ami_owner]
 
-  filter {
-    name   = "name"
-    values = [local.application_data.accounts[local.environment].accessgate_ami_name]
-  }
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-}
+#   filter {
+#     name   = "name"
+#     values = [local.application_data.accounts[local.environment].accessgate_ami_name]
+#   }
+#   filter {
+#     name   = "virtualization-type"
+#     values = ["hvm"]
+#   }
+# }
 
 ## SNS IAM Policies
 
@@ -210,5 +210,11 @@ data "aws_route53_zone" "prod-network-services" {
 data "aws_route53_zone" "application_zone" {
   provider     = aws.core-network-services
   name         = "ccms-ebs.service.justice.gov.uk."
+  private_zone = false
+}
+
+data "aws_route53_zone" "legalservices" {
+  provider     = aws.core-network-services
+  name         = "legalservices.gov.uk"
   private_zone = false
 }

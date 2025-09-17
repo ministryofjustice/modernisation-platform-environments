@@ -1,0 +1,5 @@
+# Ignore requirements.txt created locally in this directory
+requirements.txt
+
+# Ignore zip files created in this directory
+*.zip

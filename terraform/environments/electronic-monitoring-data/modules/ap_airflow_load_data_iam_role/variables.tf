@@ -22,6 +22,8 @@ variable "path_to_data" {
 variable "source_data_bucket" {
   type        = object({ arn = string })
   description = "source of the data in s3"
+  nullable    = true
+  default     = null
 }
 
 variable "athena_dump_bucket" {
@@ -75,6 +77,14 @@ variable "full_reload" {
   nullable    = true
   default     = false
 }
+
+variable "secret_arn" {
+  type        = string
+  description = "secret arn to grant access too"
+  nullable    = true
+  default     = null
+}
+
 
 variable "new_airflow" {
   type        = bool

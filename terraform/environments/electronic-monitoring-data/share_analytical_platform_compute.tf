@@ -6,9 +6,8 @@ locals {
   }
   dbt_suffix = local.is-production ? "" : "_${local.environment_shorthand}_dbt"
   suffix     = local.is-production ? "" : local.is-preproduction ? "-pp" : local.is-test ? "-test" : "-dev"
-  live_feed_dbs = [
-    "serco_fms",
-    "allied_mdss",
+  db_suffix  = local.is-production ? "" : "_${local.environment_shorthand}"
+  dbt_dbs = [
     "staged_fms",
     "staged_mdss",
     "preprocessed_fms",
@@ -17,14 +16,22 @@ locals {
     "staging_mdss",
     "intermediate_fms",
     "intermediate_mdss",
-    "staging",      # to be destroyed
-    "intermediate", # to be destroyed
-    "mart",         # to be destroyed
     "datamart",
     "derived",
     "testing",
+    "serco_servicenow_deduped",
+    "serco_servicenow_curated",
+    "serco_fms",
+    "serco_fms_deduped",
+    "serco_fms_curated",
   ]
-  prod_dbs_to_grant = local.is-production ? ["am_stg",
+  live_feeds_dbs = [
+    "serco_fms",
+    "allied_mdss",
+    "serco_servicenow",
+  ]
+  prod_dbs_to_grant = local.is-production ? [
+    "am_stg",
     "cap_dw_stg",
     "emd_historic_int",
     "historic_api_mart",
@@ -32,10 +39,13 @@ locals {
     "historic_ears_and_sars_int",
     "historic_ears_and_sars_mart",
     "emsys_mvp_stg",
-  "sar_ear_reports_mart"] : []
+    "sar_ear_reports_mart"
+  ] : []
   dev_dbs_to_grant       = local.is-production ? [for db in local.prod_dbs_to_grant : "${db}_historic_dev_dbt"] : []
-  live_feed_dbs_to_grant = [for db in local.live_feed_dbs : "${db}${local.dbt_suffix}"]
-  dbs_to_grant           = toset(flatten([local.prod_dbs_to_grant, local.dev_dbs_to_grant, local.live_feed_dbs_to_grant]))
+  dbt_dbs_to_grant       = [for db in local.dbt_dbs : "${db}${local.dbt_suffix}"]
+  live_feed_dbs_to_grant = [for db in local.live_feeds_dbs : "${db}${local.db_suffix}"]
+  dbs_to_grant           = toset(flatten([local.prod_dbs_to_grant, local.dev_dbs_to_grant, local.dbt_dbs_to_grant]))
+  existing_dbs_to_grant  = toset(local.live_feed_dbs_to_grant)
 }
 
 # Source Analytics DBT Secrets
@@ -520,25 +530,36 @@ data "aws_iam_policy_document" "allow_airflow_ssh_key" {
   }
 }
 
-# This is not referenced anywhere else aha
+data "aws_iam_policy_document" "ap_assume_role" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${local.environment_management.account_ids["analytical-platform-common-production"]}:role/data-engineering-datalake-access-github-actions"]
+    }
+  }
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRoleWithWebIdentity"]
+    principals {
+      type        = "Federated"
+      identifiers = ["arn:aws:iam::${local.environment_management.account_ids["analytical-platform-common-production"]}:oidc-provider/token.actions.githubusercontent.com"]
+    }
+    condition {
+      test     = "StringLike"
+      variable = "token.actions.githubusercontent.com:sub"
+      values   = ["repo:ministryofjustice/data-engineering-datalake-access:ref:refs/heads/*"]
+    }
+  }
+}
+
 resource "aws_iam_role" "analytical_platform_share_role" {
   for_each = local.analytical_platform_share
 
   name                 = "${each.value.target_account_name}-share-role"
   max_session_duration = 12 * 60 * 60
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Principal = {
-          # In case consumer has a central location for terraform state storage that isn't the target account.
-          AWS = "arn:aws:iam::${try(each.value.assume_account_id, each.value.target_account_id)}:root"
-        }
-        Action = "sts:AssumeRole"
-      }
-    ]
-  })
+  assume_role_policy   = data.aws_iam_policy_document.ap_assume_role.json
 }
 
 resource "aws_iam_role_policy" "analytical_platform_share_policy_attachment" {
@@ -579,6 +600,16 @@ module "share_dbs_with_roles" {
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
   role_arn                = aws_iam_role.dataapi_cross_role.arn
   de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
+}
+
+module "share_existing_dbs_with_roles" {
+  count                   = local.is-development ? 0 : 1
+  source                  = "./modules/lakeformation_database_share"
+  dbs_to_grant            = local.existing_dbs_to_grant
+  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+  role_arn                = aws_iam_role.dataapi_cross_role.arn
+  de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
+  db_exists               = true
 }
 
 resource "aws_lakeformation_resource" "rds_bucket" {

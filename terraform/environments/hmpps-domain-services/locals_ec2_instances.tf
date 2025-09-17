@@ -34,7 +34,11 @@ locals {
         instance_type                = "t3.large"
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "required"
-        vpc_security_group_ids       = ["private-jumpserver"]
+        vpc_security_group_ids = [
+          "ad-join",
+          "ec2-windows",
+          "rd-session-host",
+        ]
       }
       secretsmanager_secrets = {
         dso-modernisation-platform-automation = {
@@ -85,16 +89,21 @@ locals {
         instance_type                = "t3.medium"
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "required"
-        vpc_security_group_ids       = ["rds-ec2s"]
+        vpc_security_group_ids = [
+          "rdgw",
+          "ad-join",
+          "ec2-windows",
+        ]
       }
       ebs_volumes = {
         "/dev/sda1" = { type = "gp3", size = 100 }
       }
       tags = {
-        backup           = "false"
-        os-type          = "Windows"
-        server-type      = "RDGateway"
-        update-ssm-agent = "patchgroup2"
+        backup                 = "false"
+        os-type                = "Windows"
+        server-type            = "RDGateway"
+        update-ssm-agent       = "patchgroup2"
+        instance-access-policy = "none"
       }
     }
 
@@ -126,16 +135,21 @@ locals {
         instance_type                = "t3.medium"
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "required"
-        vpc_security_group_ids       = ["rds-ec2s"]
+        vpc_security_group_ids = [
+          "rds",
+          "ad-join",
+          "ec2-windows",
+        ]
       }
       ebs_volumes = {
         "/dev/sda1" = { type = "gp3", size = 100 }
       }
       tags = {
-        backup           = "false"
-        os-type          = "Windows"
-        server-type      = "RDServices"
-        update-ssm-agent = "patchgroup2"
+        backup                 = "false"
+        os-type                = "Windows"
+        server-type            = "RDServices"
+        update-ssm-agent       = "patchgroup2"
+        instance-access-policy = "none"
       }
     }
   }

@@ -14,16 +14,20 @@ resource "aws_instance" "ec2_ftp" {
     ignore_changes = [
       ebs_block_device,
       root_block_device,
-      user_data,
-      user_data_replace_on_change
+      ebs_optimized,
+      # user_data,
+      # user_data_replace_on_change,
+      tags
     ]
   }
-  user_data_replace_on_change = false
+  user_data_replace_on_change = true
   user_data = base64encode(templatefile("./templates/ec2_user_data_ftp.sh", {
     environment               = "${local.environment}"
     lz_aws_account_id_env     = "${local.application_data.accounts[local.environment].lz_aws_account_id_env}"
     lz_ftp_bucket_environment = "${local.application_data.accounts[local.environment].lz_ftp_bucket_environment}"
     hostname                  = "ftp"
+    ftp_inbound_bucket        = "laa-ccms-inbound-${local.environment}-mp"
+    ftp_outbound_bucket       = "laa-ccms-outbound-${local.environment}-mp"
   }))
 
   metadata_options {
@@ -43,7 +47,6 @@ resource "aws_instance" "ec2_ftp" {
       { device-name = "/dev/sda1" }
     )
   }
-
   ebs_block_device {
     device_name = "/dev/sdb"
     volume_type = "gp3"

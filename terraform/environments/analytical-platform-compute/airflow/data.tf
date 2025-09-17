@@ -1,9 +1,3 @@
-data "aws_availability_zones" "available" {}
-
-data "aws_iam_session_context" "current" {
-  arn = data.aws_caller_identity.current.arn
-}
-
 data "aws_vpc_endpoint" "mwaa_webserver" {
   service_name = aws_mwaa_environment.main.webserver_vpc_endpoint_service
 }
@@ -35,7 +29,7 @@ data "aws_subnet" "apc_private_subnet_a" {
     values = [data.aws_vpc.apc_vpc.id]
   }
   tags = {
-    Name = "${var.networking[0].application}-${local.environment}-private-${data.aws_region.current.name}a"
+    Name = "${var.networking[0].application}-${local.environment}-private-${data.aws_region.current.region}a"
   }
 }
 
@@ -45,7 +39,7 @@ data "aws_subnet" "apc_private_subnet_b" {
     values = [data.aws_vpc.apc_vpc.id]
   }
   tags = {
-    Name = "${var.networking[0].application}-${local.environment}-private-${data.aws_region.current.name}b"
+    Name = "${var.networking[0].application}-${local.environment}-private-${data.aws_region.current.region}b"
   }
 }
 
@@ -63,4 +57,9 @@ data "aws_eks_cluster" "apc_cluster" {
 # KMS
 data "aws_kms_key" "common_secrets_manager_kms" {
   key_id = "alias/secretsmanager/common"
+}
+
+
+data "aws_eks_cluster" "eks" {
+  name = local.eks_cluster_name
 }

@@ -2,6 +2,8 @@ locals {
   operational_db_jdbc_connection_string = "jdbc:postgresql://${module.aurora_operational_db.rds_cluster_endpoints["static"]}:${local.operational_db_port}/${local.operational_db_default_database}"
   nomis_jdbc_connection_string          = "jdbc:oracle:thin:@${local.nomis_host}:${local.nomis_port}/${local.nomis_service_name}"
 
+  dpr_test_connection_string = try("jdbc:postgresql://${module.dpr_rds_db[0].rds_host}:${module.dpr_rds_db[0].rds_port}/${jsondecode(data.aws_secretsmanager_secret_version.test_db[0].secret_string)["db_name"]}", "")
+
   dps_endpoint = {
     for item in local.dps_domains_list :
     item => jsondecode(data.aws_secretsmanager_secret_version.dps[item].secret_string)["endpoint"]
@@ -68,6 +70,24 @@ resource "aws_glue_connection" "glue_dps_connection" {
     JDBC_CONNECTION_URL    = local.dps_connection_string[each.value]
     JDBC_DRIVER_CLASS_NAME = "org.postgresql.Driver"
     SECRET_ID              = aws_secretsmanager_secret.dps[each.value].name
+  }
+
+  physical_connection_requirements {
+    availability_zone      = data.aws_subnet.private_subnets_a.availability_zone
+    security_group_id_list = [aws_security_group.glue_job_connection_sg.id]
+    subnet_id              = data.aws_subnet.private_subnets_a.id
+  }
+}
+
+resource "aws_glue_connection" "glue_dpr_test_connection" {
+  count           = (local.create_glue_connection && local.is_dev_or_test) ? 1 : 0
+  name            = "${local.project}-dps-test-db-connection"
+  connection_type = "JDBC"
+
+  connection_properties = {
+    JDBC_CONNECTION_URL    = local.dpr_test_connection_string
+    JDBC_DRIVER_CLASS_NAME = "org.postgresql.Driver"
+    SECRET_ID              = aws_secretsmanager_secret.dpr-test[0].name
   }
 
   physical_connection_requirements {

@@ -96,8 +96,9 @@ locals {
           }
         })
         tags = merge(local.ec2_instances.rds.tags, {
-          description = "Remote Desktop Services for azure.hmpp.root domain"
-          domain-name = "azure.hmpp.root"
+          description  = "Remote Desktop Services for azure.hmpp.root domain"
+          domain-name  = "azure.hmpp.root"
+          service-user = "svc_rds"
         })
       })
     }

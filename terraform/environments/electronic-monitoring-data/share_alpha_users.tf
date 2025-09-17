@@ -1,13 +1,13 @@
 locals {
   alpha_user_permissions = local.is-development ? [] : [
-    {
-      username  = "matt-heery"
-      databases = [{ derived = ["visits"] }]
-    },
-    {
-      username  = "mrixson-moj"
-      databases = [{ derived = ["visits"] }]
-    }
+    # {
+    #   username  = "matt-heery"
+    #   databases = [{ derived = ["visits"] }]
+    # },
+    # {
+    #   username  = "mrixson-moj"
+    #   databases = [{ derived = ["visits"] }]
+    # }
   ]
   alpha_user_permissions_no_filter = local.is-production ? [
     {

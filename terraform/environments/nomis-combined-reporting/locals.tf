@@ -1,9 +1,8 @@
 # define configuration common to all environments here
-# define environment specific configuration in locals_development.tf, locals_test.tf etc.
+# define environment specific configuration in locals_test.tf etc.
 
 locals {
   baseline_presets_environments_specific = {
-    development   = local.baseline_presets_development
     test          = local.baseline_presets_test
     preproduction = local.baseline_presets_preproduction
     production    = local.baseline_presets_production
@@ -11,7 +10,6 @@ locals {
   baseline_presets_environment_specific = local.baseline_presets_environments_specific[local.environment]
 
   baseline_environments_specific = {
-    development   = local.baseline_development
     test          = local.baseline_test
     preproduction = local.baseline_preproduction
     production    = local.baseline_production
@@ -37,6 +35,7 @@ locals {
       enable_business_unit_kms_cmks               = true
       enable_ec2_cloud_watch_agent                = true
       enable_ec2_oracle_enterprise_managed_server = true
+      enable_ec2_security_groups                  = true
       enable_ec2_self_provision                   = true
       enable_ec2_session_manager_cloudwatch_logs  = true
       enable_ec2_ssm_agent_update                 = true

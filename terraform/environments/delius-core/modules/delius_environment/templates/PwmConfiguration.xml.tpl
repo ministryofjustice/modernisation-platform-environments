@@ -115,6 +115,10 @@
       <label>Password Policy Source</label>
       <value><![CDATA[PWM]]></value>
     </setting>
+    <setting key="password.policy.caseSensitivity" syntax="SELECT">
+      <label>Password is Case Sensitive</label>
+      <value><![CDATA[true]]></value>
+    </setting>
     <setting key="password.policy.minimumLength" syntax="NUMERIC" profile="default">
       <label>Minimum Length</label>
       <value>8</value>

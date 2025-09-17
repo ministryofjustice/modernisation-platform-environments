@@ -202,6 +202,7 @@ module "baseline" {
   )
 
   security_groups = merge(
+    module.baseline_presets.security_groups,
     lookup(local.baseline_all_environments, "security_groups", {}),
     lookup(local.baseline_environment_specific, "security_groups", {}),
   )
@@ -210,6 +211,12 @@ module "baseline" {
     module.baseline_presets.sns_topics,
     lookup(local.baseline_all_environments, "sns_topics", {}),
     lookup(local.baseline_environment_specific, "sns_topics", {}),
+  )
+
+  sqs_queues = merge(
+    module.baseline_presets.sqs_queues,
+    lookup(local.baseline_all_environments, "sqs_queues", {}),
+    lookup(local.baseline_environment_specific, "sqs_queues", {}),
   )
 
   ssm_associations = merge(

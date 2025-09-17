@@ -4,7 +4,7 @@ resource "kubernetes_manifest" "actions_runners_token_apc_self_hosted_runners_se
   count = terraform.workspace == "analytical-platform-compute-production" ? 1 : 0
 
   manifest = {
-    "apiVersion" = "external-secrets.io/v1beta1"
+    "apiVersion" = "external-secrets.io/v1"
     "kind"       = "ExternalSecret"
     "metadata" = {
       "name"      = "actions-runners-token-apc-self-hosted-runners"
@@ -37,7 +37,7 @@ resource "kubernetes_manifest" "actions_runners_token_moj_apc_self_hosted_runner
   count = terraform.workspace == "analytical-platform-compute-production" ? 1 : 0
 
   manifest = {
-    "apiVersion" = "external-secrets.io/v1beta1"
+    "apiVersion" = "external-secrets.io/v1"
     "kind"       = "ExternalSecret"
     "metadata" = {
       "name"      = "actions-runners-token-moj-apc-self-hosted-runners"
@@ -70,7 +70,7 @@ resource "kubernetes_manifest" "actions_runners_github_app_apc_self_hosted_runne
   count = terraform.workspace == "analytical-platform-compute-production" ? 1 : 0
 
   manifest = {
-    "apiVersion" = "external-secrets.io/v1beta1"
+    "apiVersion" = "external-secrets.io/v1"
     "kind"       = "ExternalSecret"
     "metadata" = {
       "name"      = "actions-runners-github-app-apc-self-hosted-runners"

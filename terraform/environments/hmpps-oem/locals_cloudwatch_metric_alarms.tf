@@ -143,8 +143,8 @@ locals {
     ["dso-infra-azure-fixngo", "terragrunt-NOMSDevTestEnvironments", "dso-pipelines-pagerduty", {}],
     ["dso-infra-azure-fixngo", "terragrunt-NOMSProduction1", "dso-pipelines-pagerduty", {}],
     ["dso-infra-azure-fixngo", "stale", "dso-pipelines-pagerduty", {}],
-    ["dso-modernisation-platform-automation", "ssm_command_monitoring", "dso-pipelines-pagerduty", { threshold = "2" }],
-    ["dso-modernisation-platform-automation", "github_workflow_monitoring", "dso-pipelines-pagerduty", {}],
+    ["dso-modernisation-platform-automation", "ssm_command_monitoring", "dso-pipelines-pagerduty", { threshold = "10" }], # pipeline sometimes fails due to API errors hence only alarm if it continually fails
+    ["dso-modernisation-platform-automation", "github_workflow_monitoring", "dso-pipelines-pagerduty", { threshold = "10" }],
     ["dso-modernisation-platform-automation", "planetfm_gfsl_data_extract", "dso-pipelines-pagerduty", {}],
     ["dso-modernisation-platform-automation", "nomis_environment_start", "nomis-pagerduty", {}],
     ["dso-modernisation-platform-automation", "certificate_renewal", "dso-pipelines-pagerduty", {}],

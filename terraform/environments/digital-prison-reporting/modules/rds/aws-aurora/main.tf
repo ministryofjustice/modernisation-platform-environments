@@ -54,7 +54,7 @@ resource "aws_rds_cluster" "this" {
   copy_tags_to_snapshot               = var.copy_tags_to_snapshot
   database_name                       = var.is_primary_cluster ? var.database_name : null
   db_cluster_instance_class           = var.db_cluster_instance_class
-  db_cluster_parameter_group_name     = var.create_db_cluster_parameter_group ? aws_rds_cluster_parameter_group.this[0].id : var.db_cluster_parameter_group_name
+  db_cluster_parameter_group_name     = var.db_cluster_parameter_group_name
   db_instance_parameter_group_name    = var.allow_major_version_upgrade ? var.db_cluster_db_instance_parameter_group_name : null
   db_subnet_group_name                = local.db_subnet_group_name
   delete_automated_backups            = var.delete_automated_backups
@@ -170,7 +170,7 @@ resource "aws_rds_cluster_instance" "this" {
   ca_cert_identifier                    = var.ca_cert_identifier
   cluster_identifier                    = aws_rds_cluster.this[0].id
   copy_tags_to_snapshot                 = try(each.value.copy_tags_to_snapshot, var.copy_tags_to_snapshot)
-  db_parameter_group_name               = var.create_db_parameter_group ? aws_db_parameter_group.this[0].id : try(each.value.db_parameter_group_name, var.db_parameter_group_name)
+  db_parameter_group_name               = try(each.value.db_parameter_group_name, var.db_parameter_group_name)
   db_subnet_group_name                  = local.db_subnet_group_name
   engine                                = var.engine
   engine_version                        = var.engine_version
@@ -354,64 +354,6 @@ resource "aws_security_group_rule" "this" {
   ipv6_cidr_blocks         = try(each.value.ipv6_cidr_blocks, null)
   prefix_list_ids          = try(each.value.prefix_list_ids, null)
   source_security_group_id = try(each.value.source_security_group_id, null)
-}
-
-################################################################################
-# Cluster Parameter Group
-################################################################################
-
-resource "aws_rds_cluster_parameter_group" "this" {
-  count = local.create && var.create_db_cluster_parameter_group ? 1 : 0
-
-  name        = var.db_cluster_parameter_group_use_name_prefix ? null : local.cluster_parameter_group_name
-  name_prefix = var.db_cluster_parameter_group_use_name_prefix ? "${local.cluster_parameter_group_name}-" : null
-  description = var.db_cluster_parameter_group_description
-  family      = var.db_cluster_parameter_group_family
-
-  dynamic "parameter" {
-    for_each = var.db_cluster_parameter_group_parameters
-
-    content {
-      name         = parameter.value.name
-      value        = parameter.value.value
-      apply_method = try(parameter.value.apply_method, "immediate")
-    }
-  }
-
-  lifecycle {
-    create_before_destroy = true
-  }
-
-  tags = var.tags
-}
-
-################################################################################
-# DB Parameter Group
-################################################################################
-
-resource "aws_db_parameter_group" "this" {
-  count = local.create && var.create_db_parameter_group ? 1 : 0
-
-  name        = var.db_parameter_group_use_name_prefix ? null : local.db_parameter_group_name
-  name_prefix = var.db_parameter_group_use_name_prefix ? "${local.db_parameter_group_name}-" : null
-  description = var.db_parameter_group_description
-  family      = var.db_parameter_group_family
-
-  dynamic "parameter" {
-    for_each = var.db_parameter_group_parameters
-
-    content {
-      name         = parameter.value.name
-      value        = parameter.value.value
-      apply_method = try(parameter.value.apply_method, "immediate")
-    }
-  }
-
-  lifecycle {
-    create_before_destroy = true
-  }
-
-  tags = var.tags
 }
 
 ################################################################################

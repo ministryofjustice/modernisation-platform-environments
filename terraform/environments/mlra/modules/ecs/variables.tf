@@ -164,6 +164,21 @@ variable "maatdb_password_secret_name" {
   description = "Parameter store secret name containing the MAATDB database password"
 }
 
+variable "app_master_password_name" {
+  type        = string
+  description = "Parameter store secret name containing the master password"
+}
+
+variable "app_salt_name" {
+  type        = string
+  description = "Parameter store secret name containing the salt"
+}
+
+variable "app_derivation_iterations_name" {
+  type        = string
+  description = "Parameter store secret name containing the derivation iterations"
+}
+
 variable "gtm_id_secret_name" {
   type        = string
   description = "Parameter store secret name containing the Google Tag Manager Id"

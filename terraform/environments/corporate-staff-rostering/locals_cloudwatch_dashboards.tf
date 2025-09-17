@@ -17,7 +17,9 @@ locals {
         module.baseline_presets.cloudwatch_dashboard_widgets.ec2.instance-status-check-failed,
         module.baseline_presets.cloudwatch_dashboard_widgets.ec2.system-status-check-failed,
         module.baseline_presets.cloudwatch_dashboard_widgets.ec2.attached-ebs-status-check-failed,
-        # CloudWatch agent not running, monitored by Glenn Bot instead
+        module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_windows.free-disk-space-low,
+        module.baseline_presets.cloudwatch_dashboard_widgets.ec2_instance_cwagent_windows.free-disk-space-low,
+        module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_windows.high-memory-usage,
       ]
     }
 
@@ -69,7 +71,9 @@ locals {
         module.baseline_presets.cloudwatch_dashboard_widgets.ec2.instance-status-check-failed,
         module.baseline_presets.cloudwatch_dashboard_widgets.ec2.system-status-check-failed,
         module.baseline_presets.cloudwatch_dashboard_widgets.ec2.attached-ebs-status-check-failed,
-        # CloudWatch agent not running, monitored by Glenn Bot instead
+        module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_windows.free-disk-space-low,
+        module.baseline_presets.cloudwatch_dashboard_widgets.ec2_instance_cwagent_windows.free-disk-space-low,
+        module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_windows.high-memory-usage,
       ]
     }
 

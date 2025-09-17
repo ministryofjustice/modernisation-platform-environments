@@ -19,7 +19,7 @@ locals {
         disable_api_termination = false
         instance_type           = "t3.xlarge"
         key_name                = "ec2-user"
-        vpc_security_group_ids  = ["bip"]
+        vpc_security_group_ids  = ["bip", "ec2-linux"]
         tags = {
           backup-plan = "daily-and-weekly"
         }
@@ -69,7 +69,7 @@ locals {
         instance_type                = "r6i.4xlarge"
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
-        vpc_security_group_ids       = ["data"]
+        vpc_security_group_ids       = ["data", "ec2-linux", "oem-agent"]
         tags = {
           backup-plan = "daily-and-weekly"
         }
@@ -130,7 +130,7 @@ locals {
         instance_type                = "r6i.4xlarge"
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
-        vpc_security_group_ids       = ["data"]
+        vpc_security_group_ids       = ["data", "ec2-linux", "oem-agent"]
         tags = {
           backup-plan = "daily-and-weekly"
         }

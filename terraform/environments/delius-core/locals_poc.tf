@@ -29,6 +29,7 @@ locals {
     port                        = 389
     tls_port                    = 636
     desired_count               = 0
+    log_retention               = 7
   }
 
   db_config_poc = {

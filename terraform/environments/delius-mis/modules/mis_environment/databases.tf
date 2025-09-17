@@ -80,13 +80,13 @@ module "oracle_db_dsd" {
 
   deploy_oracle_stats = false
 
+  enable_cloudwatch_alarms = try(var.dsd_db_config.enable_cloudwatch_alarms, true)
+
   sns_topic_arn = aws_sns_topic.delius_mis_alarms.arn
 
   providers = {
-    aws                       = aws
-    aws.bucket-replication    = aws
-    aws.core-vpc              = aws.core-vpc
-    aws.core-network-services = aws.core-network-services
+    aws          = aws
+    aws.core-vpc = aws.core-vpc
   }
 }
 
@@ -133,13 +133,13 @@ module "oracle_db_boe" {
 
   deploy_oracle_stats = false
 
+  enable_cloudwatch_alarms = try(var.boe_db_config.enable_cloudwatch_alarms, true)
+
   sns_topic_arn = aws_sns_topic.delius_mis_alarms.arn
 
   providers = {
-    aws                       = aws
-    aws.bucket-replication    = aws
-    aws.core-vpc              = aws.core-vpc
-    aws.core-network-services = aws.core-network-services
+    aws          = aws
+    aws.core-vpc = aws.core-vpc
   }
 }
 
@@ -187,13 +187,13 @@ module "oracle_db_mis" {
 
   deploy_oracle_stats = false
 
+  enable_cloudwatch_alarms = try(var.mis_db_config.enable_cloudwatch_alarms, true)
+
   sns_topic_arn = aws_sns_topic.delius_mis_alarms.arn
 
   providers = {
-    aws                       = aws
-    aws.bucket-replication    = aws
-    aws.core-vpc              = aws.core-vpc
-    aws.core-network-services = aws.core-network-services
+    aws          = aws
+    aws.core-vpc = aws.core-vpc
   }
 }
 

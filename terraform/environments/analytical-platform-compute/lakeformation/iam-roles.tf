@@ -3,7 +3,7 @@ module "lake_formation_share_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.55.0"
+  version = "5.59.0"
 
   create_role       = true
   role_requires_mfa = false
@@ -30,7 +30,7 @@ module "analytical_platform_control_panel_service_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.55.0"
+  version = "5.59.0"
 
   allow_self_assume_role = true
   trusted_role_arns = [
@@ -55,7 +55,7 @@ module "analytical_platform_data_eng_dba_service_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.55.0"
+  version = "5.59.0"
 
   allow_self_assume_role = false
   trusted_role_arns      = formatlist("arn:aws:iam::%s:root", [local.environment_management.account_ids[local.analytical_platform_environment], local.environment_management.account_ids["analytical-platform-management-production"]])
@@ -77,7 +77,7 @@ module "lake_formation_to_data_production_mojap_derived_tables_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.55.0"
+  version = "5.59.0"
 
   create_role       = true
   role_requires_mfa = false
@@ -106,13 +106,13 @@ module "copy_apdp_cadet_metadata_to_compute_assumable_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.55.0"
+  version = "5.59.0"
 
   allow_self_assume_role = false
   trusted_role_arns = [
     "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/create-a-derived-table",
-    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/${data.aws_region.current.name}/${one(data.aws_iam_roles.data_engineering_sso_role.names)}",
-    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/${data.aws_region.current.name}/${one(data.aws_iam_roles.eks_sso_access_role.names)}",
+    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/${data.aws_region.current.region}/${one(data.aws_iam_roles.data_engineering_sso_role.names)}",
+    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/${data.aws_region.current.region}/${one(data.aws_iam_roles.eks_sso_access_role.names)}",
   ]
   create_role       = true
   role_requires_mfa = false
@@ -122,5 +122,3 @@ module "copy_apdp_cadet_metadata_to_compute_assumable_role" {
 
   tags = local.tags
 }
-
-

@@ -52,7 +52,7 @@ locals {
 
       instance = {
         disable_api_termination      = false
-        instance_type                = "r6i.xlarge"
+        instance_type                = "r7i.large"
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
         vpc_security_group_ids       = ["data-oem"]

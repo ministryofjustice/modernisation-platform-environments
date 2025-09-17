@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+set -o pipefail
 
 # Script for removing resources from Terraform state
 # Usage: scripts/terraform-remove.sh <terraform_dir> <addresses_file>
@@ -23,7 +24,6 @@ while IFS= read -r ADDRESS; do
   if [ -z "$ADDRESS" ]; then
     continue
   fi
-  
   echo "Removing from state: $ADDRESS"
   terraform -chdir="$TERRAFORM_DIR" state rm "$ADDRESS" | ./scripts/redact-output.sh
 done < "$ADDRESSES_FILE"

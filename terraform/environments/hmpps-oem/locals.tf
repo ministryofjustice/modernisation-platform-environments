@@ -98,22 +98,6 @@ locals {
       }
     }
 
-    oam_sinks = {
-      "CloudWatchMetricOamSink" = {
-        resource_types = ["AWS::CloudWatch::Metric"]
-        source_account_names = [
-          "corporate-staff-rostering-${local.environment}",
-          "hmpps-domain-services-${local.environment}",
-          "nomis-${local.environment}",
-          "nomis-combined-reporting-${local.environment}",
-          "nomis-data-hub-${local.environment}",
-          "oasys-${local.environment}",
-          "oasys-national-reporting-${local.environment}",
-          "planetfm-${local.environment}",
-        ]
-      }
-    }
-
     security_groups = local.security_groups
   }
 }

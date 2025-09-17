@@ -25,7 +25,8 @@ resource "aws_instance" "ec2_oracle_ebs" {
       ebs_block_device,
       ebs_optimized,
       user_data,
-      user_data_replace_on_change
+      user_data_replace_on_change,
+      tags
     ]
   }
   user_data_replace_on_change = false
@@ -95,7 +96,10 @@ resource "aws_instance" "ec2_oracle_ebs" {
 
 resource "aws_ebs_volume" "export_home" {
   lifecycle {
-    ignore_changes = [kms_key_id]
+    ignore_changes = [
+      kms_key_id,
+      tags
+    ]
   }
   availability_zone = "eu-west-2a"
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_exhome
@@ -117,7 +121,10 @@ resource "aws_volume_attachment" "export_home_att" {
 
 resource "aws_ebs_volume" "u01" {
   lifecycle {
-    ignore_changes = [kms_key_id]
+    ignore_changes = [
+      kms_key_id,
+      tags
+    ]
   }
   availability_zone = "eu-west-2a"
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_u01
@@ -139,7 +146,10 @@ resource "aws_volume_attachment" "u01_att" {
 
 resource "aws_ebs_volume" "arch" {
   lifecycle {
-    ignore_changes = [kms_key_id]
+    ignore_changes = [
+      kms_key_id,
+      tags
+    ]
   }
   availability_zone = "eu-west-2a"
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_arch
@@ -161,7 +171,10 @@ resource "aws_volume_attachment" "arch_att" {
 
 resource "aws_ebs_volume" "redoA" {
   lifecycle {
-    ignore_changes = [kms_key_id]
+    ignore_changes = [
+      kms_key_id,
+      tags
+    ]
   }
   availability_zone = "eu-west-2a"
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_redoA
@@ -183,7 +196,10 @@ resource "aws_volume_attachment" "redoA_att" {
 
 resource "aws_ebs_volume" "techst" {
   lifecycle {
-    ignore_changes = [kms_key_id]
+    ignore_changes = [
+      kms_key_id,
+      tags
+    ]
   }
   availability_zone = "eu-west-2a"
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_techst
@@ -205,7 +221,10 @@ resource "aws_volume_attachment" "techst_att" {
 
 resource "aws_ebs_volume" "backup" {
   lifecycle {
-    ignore_changes = [kms_key_id]
+    ignore_changes = [
+      kms_key_id,
+      tags
+    ]
   }
   availability_zone = "eu-west-2a"
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_backup
@@ -227,7 +246,10 @@ resource "aws_volume_attachment" "backup_att" {
 
 resource "aws_ebs_volume" "backup_clone" {
   lifecycle {
-    ignore_changes = [kms_key_id]
+    ignore_changes = [
+      kms_key_id,
+      tags
+    ]
   }
   availability_zone = "eu-west-2a"
   count             = length(local.application_data.accounts[local.environment].ebs_backup_snapshot_id) > 0 ? 1 : 0
@@ -252,7 +274,10 @@ resource "aws_volume_attachment" "backup_clone_att" {
 
 resource "aws_ebs_volume" "backup_prod" {
   lifecycle {
-    ignore_changes = [kms_key_id]
+    ignore_changes = [
+      kms_key_id,
+      tags
+    ]
   }
   availability_zone = "eu-west-2a"
   count             = length(local.application_data.accounts[local.environment].ebs_backup_prod_snapshot_id) > 0 ? 1 : 0
@@ -277,7 +302,10 @@ resource "aws_volume_attachment" "backup_prod_att" {
 
 resource "aws_ebs_volume" "redoB" {
   lifecycle {
-    ignore_changes = [kms_key_id]
+    ignore_changes = [
+      kms_key_id,
+      tags
+    ]
   }
   availability_zone = "eu-west-2a"
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_redoB
@@ -302,7 +330,10 @@ resource "aws_volume_attachment" "redoB_att" {
 
 resource "aws_ebs_volume" "diag" {
   lifecycle {
-    ignore_changes = [kms_key_id]
+    ignore_changes = [
+      kms_key_id,
+      tags
+    ]
   }
   availability_zone = "eu-west-2a"
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_diag
@@ -327,7 +358,10 @@ resource "aws_volume_attachment" "diag_att" {
 
 resource "aws_ebs_volume" "dbf01" {
   lifecycle {
-    ignore_changes = [kms_key_id]
+    ignore_changes = [
+      kms_key_id,
+      tags
+    ]
   }
   availability_zone = "eu-west-2a"
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_dbf01
@@ -352,7 +386,10 @@ resource "aws_volume_attachment" "dbf01_att" {
 
 resource "aws_ebs_volume" "dbf02" {
   lifecycle {
-    ignore_changes = [kms_key_id]
+    ignore_changes = [
+      kms_key_id,
+      tags
+    ]
   }
   availability_zone = "eu-west-2a"
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_dbf02
@@ -377,7 +414,10 @@ resource "aws_volume_attachment" "dbf02_att" {
 
 resource "aws_ebs_volume" "dbf03" {
   lifecycle {
-    ignore_changes = [kms_key_id]
+    ignore_changes = [
+      kms_key_id,
+      tags
+    ]
   }
   availability_zone = "eu-west-2a"
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_dbf03
@@ -402,7 +442,10 @@ resource "aws_volume_attachment" "dbf03_att" {
 
 resource "aws_ebs_volume" "dbf04" {
   lifecycle {
-    ignore_changes = [kms_key_id]
+    ignore_changes = [
+      kms_key_id,
+      tags
+    ]
   }
   availability_zone = "eu-west-2a"
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_dbf04
@@ -428,7 +471,10 @@ resource "aws_volume_attachment" "dbf04_att" {
 resource "aws_ebs_volume" "swap2" {
   count = local.is-development ? 1 : 0
   lifecycle {
-    ignore_changes = [kms_key_id]
+    ignore_changes = [
+      kms_key_id,
+      tags
+    ]
   }
   availability_zone = "eu-west-2a"
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_swap2
@@ -483,11 +529,12 @@ resource "aws_volume_attachment" "dbf2_att" {
 module "cw-ebs-ec2" {
   source = "./modules/cw-ec2"
 
-  short_env    = local.application_data.accounts[local.environment].short_env
-  name         = "ec2-ebs"
-  topic        = aws_sns_topic.cw_alerts.arn
-  instanceId   = aws_instance.ec2_oracle_ebs.id
-  imageId      = local.environment == "development" ? local.application_data.accounts[local.environment].restored_db_image : data.aws_ami.oracle_db.id
+  short_env  = local.application_data.accounts[local.environment].short_env
+  name       = "ec2-ebs"
+  topic      = aws_sns_topic.cw_alerts.arn
+  instanceId = aws_instance.ec2_oracle_ebs.id
+  # imageId      = local.environment == "development" ? local.application_data.accounts[local.environment].restored_db_image : data.aws_ami.oracle_db.id
+  imageId      = local.application_data.accounts[local.environment].ebsdb_ami_id
   instanceType = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ebsdb
   fileSystem   = "xfs"       # Linux root filesystem
   rootDevice   = "nvme0n1p1" # This is used by default for root on all the ec2 images

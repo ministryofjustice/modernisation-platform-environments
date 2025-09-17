@@ -35,11 +35,13 @@ variable "env_name" {
 
 variable "server_type_tag" {
   description = "tag to set on each instance for key `server_type`"
+  type        = string
   default     = "delius_core_db"
 }
 
 variable "database_tag_prefix" {
   description = "tag to set on each instance for key `database`"
+  type        = string
   default     = "delius"
 }
 
@@ -181,5 +183,11 @@ variable "inline_ebs" {
   default     = false
   type        = bool
   description = "Whether to create EBS volumes inline with the instance"
+}
+
+variable "enable_cloudwatch_alarms" {
+  description = "Enable or disable CloudWatch metric alarms for the instance"
+  type        = bool
+  default     = true
 }
 

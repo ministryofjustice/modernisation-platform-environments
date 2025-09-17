@@ -112,6 +112,18 @@
       {
         "name": "APP_MAAT_API_CLIENT_SECRET",
         "valueFrom": "${maat_api_client_secret}"
+      },
+      {
+        "name": "APP_MASTER_PASSWORD",
+        "valueFrom": "${app_master_password}"
+      },
+      {
+        "name": "APP_SALT",
+        "valueFrom": "${app_salt}"
+      },
+      {
+        "name": "APP_DERIVATION_ITERATIONS",
+        "valueFrom": "${app_derivation_iterations}"
       }
     ]
   }

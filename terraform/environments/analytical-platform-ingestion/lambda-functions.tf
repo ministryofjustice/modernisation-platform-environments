@@ -2,7 +2,7 @@ module "definition_upload_lambda" {
   #checkov:skip=CKV_TF_1:Module is from Terraform registry
 
   source  = "terraform-aws-modules/lambda/aws"
-  version = "7.21.0"
+  version = "8.0.1"
 
   publish        = true
   create_package = false
@@ -60,7 +60,7 @@ module "scan_lambda" {
   #checkov:skip=CKV_TF_1:Module is from Terraform registry
 
   source  = "terraform-aws-modules/lambda/aws"
-  version = "7.21.0"
+  version = "8.0.1"
 
   publish        = true
   create_package = false
@@ -136,7 +136,7 @@ module "transfer_lambda" {
   #checkov:skip=CKV_TF_1:Module is from Terraform registry
 
   source  = "terraform-aws-modules/lambda/aws"
-  version = "7.21.0"
+  version = "8.0.1"
 
   publish        = true
   create_package = false
@@ -158,7 +158,6 @@ module "transfer_lambda" {
     SNS_TOPIC_ARN         = module.transferred_topic.topic_arn
   }
 
-  # TODO: Check if KMS key is actually needed below
   attach_policy_statements = true
   policy_statements = {
     kms_access = {
@@ -171,18 +170,18 @@ module "transfer_lambda" {
         "kms:DescribeKey",
         "kms:Decrypt"
       ]
-      resources = [
+      resources = concat([
         module.s3_processed_kms.key_arn,
         module.supplier_data_kms.key_arn,
         module.transferred_sns_kms.key_arn,
-        module.quarantined_sns_kms.key_arn
-      ]
+        module.quarantined_sns_kms.key_arn,
+      ], coalesce(local.environment_configuration.target_kms_keys, []))
     },
     secretsmanager_access = {
       sid       = "AllowSecretsManager"
       effect    = "Allow"
       actions   = ["secretsmanager:GetSecretValue"]
-      resources = ["arn:aws:secretsmanager:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:secret:ingestion/*"]
+      resources = ["arn:aws:secretsmanager:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:secret:ingestion/*"]
     },
     s3_source_object = {
       sid    = "AllowSourceObject"
@@ -245,7 +244,7 @@ module "notify_quarantined_lambda" {
   #checkov:skip=CKV_TF_1:Module is from Terraform registry
 
   source  = "terraform-aws-modules/lambda/aws"
-  version = "7.21.0"
+  version = "8.0.1"
 
   publish        = true
   create_package = false
@@ -296,13 +295,13 @@ module "notify_quarantined_lambda" {
       sid       = "AllowSecretsManager"
       effect    = "Allow"
       actions   = ["secretsmanager:GetSecretValue"]
-      resources = ["arn:aws:secretsmanager:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:secret:ingestion/*"]
+      resources = ["arn:aws:secretsmanager:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:secret:ingestion/*"]
     }
   }
   allowed_triggers = {
     "sns" = {
       principal  = "sns.amazonaws.com"
-      source_arn = "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${module.quarantined_topic.topic_name}"
+      source_arn = "arn:aws:sns:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:${module.quarantined_topic.topic_name}"
     }
   }
 }
@@ -311,7 +310,7 @@ module "notify_transferred_lambda" {
   #checkov:skip=CKV_TF_1:Module is from Terraform registry
 
   source  = "terraform-aws-modules/lambda/aws"
-  version = "7.21.0"
+  version = "8.0.1"
 
   publish        = true
   create_package = false
@@ -359,13 +358,13 @@ module "notify_transferred_lambda" {
       sid       = "AllowSecretsManager"
       effect    = "Allow"
       actions   = ["secretsmanager:GetSecretValue"]
-      resources = ["arn:aws:secretsmanager:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:secret:ingestion/*"]
+      resources = ["arn:aws:secretsmanager:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:secret:ingestion/*"]
     }
   }
   allowed_triggers = {
     "sns" = {
       principal  = "sns.amazonaws.com"
-      source_arn = "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${module.transferred_topic.topic_name}"
+      source_arn = "arn:aws:sns:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:${module.transferred_topic.topic_name}"
     }
   }
 }

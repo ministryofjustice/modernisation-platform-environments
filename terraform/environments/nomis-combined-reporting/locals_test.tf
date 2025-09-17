@@ -132,7 +132,7 @@ locals {
         mount_targets = [{
           subnet_name        = "private"
           availability_zones = ["eu-west-2a"]
-          security_groups    = ["bip"]
+          security_groups    = ["efs"]
         }]
         tags = {
           backup      = "false"

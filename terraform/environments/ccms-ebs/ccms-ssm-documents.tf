@@ -3,7 +3,7 @@ resource "aws_ssm_document" "create_backup_snapshots" {
   document_type   = "Command"
   document_format = "YAML"
 
-  content = file("ccms-ssm-document-create-backup-snapshots.yaml")
+  content = file("ssm/ccms-ssm-document-create-backup-snapshots.yaml")
 }
 
 resource "aws_ssm_document" "oracle_lms_cpuq" {
@@ -11,7 +11,7 @@ resource "aws_ssm_document" "oracle_lms_cpuq" {
   document_type   = "Command"
   document_format = "YAML"
 
-  content = file("ccms-ssm-document-oracle-lms-cpuq.yaml")
+  content = file("ssm/ccms-ssm-document-oracle-lms-cpuq.yaml")
 }
 
 resource "aws_ssm_document" "service_actions" {
@@ -19,7 +19,7 @@ resource "aws_ssm_document" "service_actions" {
   document_type   = "Command"
   document_format = "YAML"
 
-  content = file("ccms-ssm-document-service-actions.yaml")
+  content = file("ssm/ccms-ssm-document-service-actions.yaml")
 }
 
 resource "aws_ssm_document" "system_update" {
@@ -27,5 +27,5 @@ resource "aws_ssm_document" "system_update" {
   document_type   = "Command"
   document_format = "YAML"
 
-  content = file("ccms-ssm-document-system-update.yaml")
+  content = file("ssm/ccms-ssm-document-system-update.yaml")
 }
