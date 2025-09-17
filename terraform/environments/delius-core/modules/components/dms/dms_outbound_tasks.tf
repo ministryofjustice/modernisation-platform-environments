@@ -66,10 +66,10 @@ resource "aws_dms_replication_task" "user_outbound_replication" {
       "name" = "User Replication from ${var.env_name} to ${each.key}"
     },
     {
-      "audit-client-environment" = "${each.key}"
+      "audit-client-environment" = each.key
     },
     {
-      "audit-repository-environment" = "${var.env_name}"
+      "audit-repository-environment" = var.env_name
     },
   )
 

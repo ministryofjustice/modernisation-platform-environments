@@ -13,7 +13,11 @@
 /terraform/environments/ccms-ebs-upgrade/anonymisation @ministryofjustice/laa-ccms-migration-team @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-ebs-upgrade/sandbox @ministryofjustice/laa-ccms-migration-team @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-ebs @ministryofjustice/laa-ccms-instance-access @ministryofjustice/laa-ccms-migration-team @ministryofjustice/modernisation-platform-security @ministryofjustice/panda-cyber-team @ministryofjustice/modernisation-platform
+/terraform/environments/ccms-ebs/workspaces-secure-browser @ministryofjustice/aws-root-account-admin-team @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-edrms @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
+/terraform/environments/ccms-oia @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
+/terraform/environments/ccms-pui-internal @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
+/terraform/environments/ccms-pui @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
 /terraform/environments/cdpt-chaps @ministryofjustice/azure-aws-sso-cdpt @ministryofjustice/central-digital-product-team @ministryofjustice/modernisation-platform
 /terraform/environments/cdpt-ifs @ministryofjustice/azure-aws-sso-cdpt @ministryofjustice/central-digital-product-team @ministryofjustice/modernisation-platform
 /terraform/environments/cica-copilot @ministryofjustice/cica-copilot-llm-maintainers @ministryofjustice/modernisation-platform
@@ -73,7 +77,7 @@
 /terraform/environments/testing @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform
 /terraform/environments/tipstaff @ministryofjustice/dts-legacy @ministryofjustice/modernisation-platform
 /terraform/environments/tribunals @ministryofjustice/dts-legacy @ministryofjustice/modernisation-platform
-/terraform/environments/vcms @ministryofjustice/hosting-migrations @ministryofjustice/modernisation-platform
+/terraform/environments/vcms @ministryofjustice/hmpps-vcms-write-team @ministryofjustice/hosting-migrations @ministryofjustice/modernisation-platform
 /terraform/environments/wardship @ministryofjustice/dts-legacy @ministryofjustice/modernisation-platform
 /terraform/environments/xhibit-portal @ministryofjustice/cjse-xhibit-portal-discovery @ministryofjustice/panda-cyber-team @ministryofjustice/xhibit-portal-dev @ministryofjustice/modernisation-platform
 /terraform/environments/youth-justice-app-framework @ministryofjustice/modernisation-platform-engineers @ministryofjustice/modernisation-platform

@@ -8,7 +8,8 @@ locals {
 
   baseline_presets_production = {
     options = {
-      enable_xsiam_s3_integration = true
+      enable_xsiam_cloudwatch_integration = true
+      enable_xsiam_s3_integration         = true
       route53_resolver_rules = {
         outbound-data-and-private-subnets = ["azure-fixngo-domain", "infra-int-domain"]
       }

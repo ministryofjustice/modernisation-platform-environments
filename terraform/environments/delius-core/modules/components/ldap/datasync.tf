@@ -98,7 +98,7 @@ locals {
       effect  = "Allow"
       actions = ["s3:*"]
       resources = [
-        "${module.s3_bucket_ldap_data_refresh.bucket.arn}",
+        module.s3_bucket_ldap_data_refresh.bucket.arn,
         "${module.s3_bucket_ldap_data_refresh.bucket.arn}/*",
       ]
       principals = {
