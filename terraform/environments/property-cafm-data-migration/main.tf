@@ -17,7 +17,7 @@ module "csv_export" {
 }
 
 module "rds_export" {
-  source = "github.com/ministryofjustice/terraform-rds-export?ref=6609e0ce791ddf851a016eb121d37c356b7353ed"
+  source = "github.com/ministryofjustice/terraform-rds-export?ref=f9eca56e95dd62999bb02734075496459f8fa70b"
   providers = {
     aws.bucket-replication = aws
   }
@@ -25,7 +25,7 @@ module "rds_export" {
   name                  = "planetfm"
   database_refresh_mode = "full"
   output_parquet_file_size = 10
-  max_concurrency = "5"
+  max_concurrency = 5
   environment = local.environment_shorthand
   vpc_id                = module.vpc.vpc_id
   database_subnet_ids   = module.vpc.private_subnets
