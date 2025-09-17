@@ -25,12 +25,18 @@ locals {
       notify_image_version   = "0.0.23"
 
       /* Target Buckets */
-      target_buckets              = ["mojap-land-dev"]
+      target_buckets              = [
+        "mojap-land-dev",
+        "cafm-landing-planetfm-dev-20250903152111864400000003"
+      ]
       datasync_target_buckets     = ["mojap-land-dev"]
-      datasync_opg_target_buckets = ["mojap-data-production-datasync-opg-ingress-development"]
+      datasync_opg_target_buckets = ["mojap-data-production-datasync-opg-ingress-development"],
+
 
       /* Target KMS */
-      target_kms_keys                = []
+      target_kms_keys                = [
+        "arn:aws:kms:eu-west-2:931816152367:key/d7fbd2bb-2ec7-47b1-a437-8da9f10011e5" # arn:aws:s3:::cafm-landing-planetfm-dev-20250903152111864400000003
+      ]
       mojap_land_kms_key             = "arn:aws:kms:eu-west-1:${local.environment_management.account_ids["analytical-platform-data-production"]}:key/8c53fbac-3106-422a-8f3d-409bb3b0c94d"
       datasync_opg_target_bucket_kms = "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["analytical-platform-data-production"]}:key/38cf3d55-b36d-43e8-b91b-6b239a60cbea"
 
@@ -89,7 +95,8 @@ locals {
       target_buckets = [
         "mojap-land",
         "mojap-data-production-shared-services-client-team-gov-29148",
-        "cloud-platform-40748c2df4b92e2dfd779a02841187ec"
+        "cloud-platform-40748c2df4b92e2dfd779a02841187ec",
+        "cafm-landing-planetfm-prod-20250915150839291300000002"
       ]
       datasync_target_buckets     = ["mojap-land"]
       datasync_opg_target_buckets = ["mojap-data-production-datasync-opg-ingress-production"]
@@ -100,7 +107,8 @@ locals {
 
       /* Target KMS */
       target_kms_keys = [
-        "arn:aws:kms:eu-west-2:593291632749:key/62503ba6-316e-473d-ae4b-042f8420dd07" # s3/mojap-data-production-shared-services-client-team-gov-29148
+        "arn:aws:kms:eu-west-2:593291632749:key/62503ba6-316e-473d-ae4b-042f8420dd07", # s3/mojap-data-production-shared-services-client-team-gov-29148
+        "arn:aws:kms:eu-west-2:437720536440:key/d4cd0acf-5b4f-461f-ba01-886f814afec5" # arn:aws:s3:::cafm-landing-planetfm-prod-20250915150839291300000002
       ]
       mojap_land_kms_key                  = "arn:aws:kms:eu-west-1:${local.environment_management.account_ids["analytical-platform-data-production"]}:key/2855ac30-4e14-482e-85ca-53258e01f64c"
       datasync_opg_target_bucket_kms      = "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["analytical-platform-data-production"]}:key/96eb04fe-8393-402c-b1f9-71fcece99e75"
@@ -119,7 +127,7 @@ locals {
         }
         "glenn-barber-cafm" = {
           ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCm18Znrr+VfF3K/6frPwEPY7HCBHbUprYpgyCMIykwmn6SL9SEGUehpghd/xjNiFBz27VMTWraZYZ4RFtHQGOPaOzdMIDO+Z9RGX2rt/sjJemA01MOxfW0m9UfZ4wgoh92eYrq7ZnRWbadP2H6W1aUcGBqjh0JJ5VxtSp3wePL4HY90FLI8hMs3xwXpAqCo3ZjYzZCTOpzghwataMEmw5c//vNzGDUa+JGu1U2iGyCJCVaENcKhsKAyK2UbYAkSYBeRjQ7tdkL21Mq4KqHKBVIVlXF6l4fgIFaU11eJthkno5XAGTC3+H0MR8yjGcmufv6Ln2aeZ6zz9e/69wtrrS1qjbgYuPMtTQb7o6FbBwkr0mmfB78xNFNNv5GRzVkwSTiRWF2wjikMaadEJsSH+tKpdmYGgM5THLAyOhuy8Zg0MTsmN2TT3a4i//+T0h8v7mb5w4A87uBDenxIGNSNFKVzUkLL2uSxmn7s0UnuTuDoIthZBUVGYKaEuP2VVWDYWU= glenn.barber@L0429"
-          cidr_blocks = ["35.176.93.186/32"]
+          cidr_blocks = ["128.77.75.64/26"] # Dummy CIDR to avoid SG duplicate rule error with existing glenn-barber
         }
         "maat-xhibit" = {
           ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCuB8p8OaxeX3sILMVUQcD48XBPuVLzddUixUUbYLS1WPiEUz7XcUkozeuhulIy9CzqA9yyAa2uPWhQr3KL2bKpXo8UIJr+3n51mjJp9V+LO65kMN5ewQHzx9phpZba5UOth1aEwn4vAFQwm2q6/ydNrJtRQeaI0DT4njaf0MC9FM/nu25IvUbl2dzUn2MX7/WuMouzcYXTeiLUIMvgRoAw4pjnCmU2AuPTokC7OynFh++SiHRUw6OwNKxqORv3du7qlfcGDWx+oAHbUVOnSaTrUssUuEXPFS5ytwWEp6GpzfZpNvD7Kj7gw/7ntpdTckh+d5INJHu+2L74Ytj2RPLNoHEB9t1ptEI2d2SeKpHqPSak2uQzk4aHV2SJs4IO0omTWKHojtSxo5gxAl4B58UjdzmFn0yNr3rJbKnn2w1H7viaM/0vWRgZrtgo07pd2uJePObaUE9jf1re+woasVWJAy3v9dZszVBcJ62NK/QU3cGfUncBw2OnnDURm7z1YVAj8mrReOkZWFA7nJ4/Gzh5pR8wNhnSLsDFqsQefaQiHBi2vZzDRqaUu03eWvd8BmomWC5joT7qqY8Qv+X5boO9CI0hX9FcoJJMXJwckoVAZGuZKgOwOL4y1Y7hpCO1U5ex9mbyMy5D5r/FNf7B85d/qCxcGwesIzI1b0QRupKxDw=="
