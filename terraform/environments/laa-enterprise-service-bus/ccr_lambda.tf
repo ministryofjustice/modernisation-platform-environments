@@ -77,6 +77,10 @@ resource "aws_lambda_function" "ccr_provider_load" {
     }
   }
 
+  dead_letter_config {
+    target_arn = aws_sns_topic.hub2_alerts.arn
+  }
+
   tags = merge(
     local.tags,
     { Name = "${local.application_name_short}-${local.environment}-ccr-provider-load" }
