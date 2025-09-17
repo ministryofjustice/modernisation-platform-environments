@@ -7,12 +7,14 @@ variable "genesys_external_id" {
   description = "Genesys Cloud organization ID"
   type        = string
   sensitive   = true
+  default     = "value"
 }
 
 variable "snowflake_external_id" {
   description = "ExternalId to require when Snowflake assumes the Snowflake role."
   type        = string
   sensitive   = true
+  default     = "value"
 }
 
 # Secret HANDLE only (value will be set manually in the console)
