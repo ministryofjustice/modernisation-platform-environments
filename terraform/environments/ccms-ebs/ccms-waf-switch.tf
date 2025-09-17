@@ -54,11 +54,6 @@ data "aws_wafv2_web_acl" "waf_web_acl" {
 }
 
 
-data "aws_wafv2_rule_group" "waf_rule_group" {
-  name  = "ebs-trusted-rule"
-  scope = "REGIONAL"
-}
-
 # resource "aws_iam_policy_document" "waf_lambda_assume_role_policy" {
 #   statement {
 #     actions = ["sts:AssumeRole"]
