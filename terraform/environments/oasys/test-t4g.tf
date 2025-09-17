@@ -8,6 +8,14 @@ resource "aws_instance" "my_instance" {
   count         = local.is-development ? 1 : 0
   ami           = "ami-08f714c552929eda9"
   instance_type = "t4g.micro"
-  tags          = {}
+  # Code from elsewhere
+  associate_public_ip_address = false
+  availability_zone           = "eu-west-2a"
+  ebs_optimized               = true
+  monitoring                  = true
+  user_data_replace_on_change = true
+  tags = {
+    Name = "First t4 instance"
+  }
 
 }
