@@ -82,6 +82,6 @@ resource "aws_iam_role_policy_attachment" "ccr_cloudwatch_log_alert_vpc_access" 
 resource "aws_cloudwatch_log_subscription_filter" "lambda_error_alert" {
   name            = "lambda-error-alert"
   log_group_name  = "/aws/lambda/cwa_extract_lambda"
-  filter_pattern  = '"ERROR"'
+  filter_pattern  = "ERROR"
   destination_arn = aws_lambda_function.cloudwatch_log_alert.arn
 }
