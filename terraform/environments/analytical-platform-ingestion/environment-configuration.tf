@@ -30,7 +30,7 @@ locals {
         "cafm-landing-planetfm-dev-20250903152111864400000003"
       ]
       datasync_target_buckets     = ["mojap-land-dev"]
-      datasync_opg_target_buckets = ["mojap-data-production-datasync-opg-ingress-development"],
+      datasync_opg_target_buckets = ["mojap-data-production-datasync-opg-ingress-development"]
 
 
       /* Target KMS */
