@@ -9,8 +9,6 @@ module "bastion_linux" {
   }
   # s3 - used for logs and user ssh public keys
   bucket_name          = "bastion-example"
-  bucket_versioning    = true
-  bucket_force_destroy = true
   # public keys
   public_key_data = local.public_key_data.keys[local.environment]
   # logs
