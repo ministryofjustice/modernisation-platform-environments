@@ -12,10 +12,11 @@ resource "aws_instance" "my_t4_instance" {
   associate_public_ip_address = false
   availability_zone           = "eu-west-2a"
   ebs_optimized               = true
-  monitoring                  = true
   user_data_replace_on_change = true
+  subnet_id                   = data.aws_subnet.data_subnets_a.id
   tags = {
     Name = "First t4 instance"
   }
 
 }
+

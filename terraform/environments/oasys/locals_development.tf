@@ -11,4 +11,10 @@ locals {
   # please keep resources in alphabetical order
   baseline_development = {
   }
+
+  data_subnets = [
+    data.aws_subnet.data_subnets_a.id
+
+  ]
+
 }
