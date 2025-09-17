@@ -195,6 +195,22 @@ resource "aws_security_group" "internal_sg" {
   }
 
   ingress {
+    from_port   = 514
+    to_port     = 514
+    protocol    = "udp"
+    cidr_blocks = ["10.0.22.0/24"]
+    description = "Branch Junipers AWS1 access to syslog server"
+  }
+
+  ingress {
+    from_port   = 514
+    to_port     = 514
+    protocol    = "udp"
+    cidr_blocks = ["10.0.24.0/24"]
+    description = "Branch Junipers AWS2 access to syslog server"
+  }
+
+  ingress {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
