@@ -33,7 +33,7 @@ data "aws_wafv2_web_acl" "ccms_ebs_waf_web_acl" {
 #   }
 # }
 
-resource "aws_iam_role" "lambda_role" {
+resource "aws_iam_role" "waf_lambda_role" {
   name = "waf-toggle-role-${var.env}"
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -45,9 +45,9 @@ resource "aws_iam_role" "lambda_role" {
   })
 }
 
-resource "aws_iam_role_policy" "lambda_policy" {
+resource "aws_iam_role_policy" "waf_lambda_policy" {
   name = "waf-toggle-policy-${var.env}"
-  role = aws_iam_role.lambda_role.id
+  role = aws_iam_role.waf_lambda_role.id
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
@@ -63,7 +63,7 @@ resource "aws_iam_role_policy" "lambda_policy" {
 
 resource "aws_lambda_function" "waf_toggle" {
   function_name = "waf-toggle-${var.env}"
-  role          = aws_iam_role.lambda_role.arn
+  role          = aws_iam_role.waf_lambda_role.arn
   filename      = data.archive_file.waf_toggle_zip.output_path
   handler       = "lambda_function.lambda_handler"
   runtime       = "python3.11"
@@ -92,26 +92,26 @@ EOT
 }
 
 # CloudWatch Event Rules to trigger Lambda
-resource "aws_cloudwatch_event_rule" "allow_0700_uk" {
+resource "aws_cloudwatch_event_rule" "waf_allow_0700_uk" {
   name                         = "waf-allow-0700-${var.env}"
   schedule_expression          = "cron(0 7 ? * MON-SUN *)"
   description                  = "Set WAF rule to ALLOW at 07:00 UK daily"
 }
 
-resource "aws_cloudwatch_event_rule" "block_1900_uk" {
+resource "aws_cloudwatch_event_rule" "waf_block_1900_uk" {
   name                         = "waf-block-1900-${var.env}"
   schedule_expression          = "cron(0 19 ? * MON-SUN *)"
   description                  = "Set WAF rule to BLOCK at 19:00 UK daily"
 }
 
-resource "aws_cloudwatch_event_target" "allow_target" {
+resource "aws_cloudwatch_event_target" "waf_allow_target" {
   rule      = aws_cloudwatch_event_rule.allow_0700_uk.name
   target_id = "Allow"
   arn       = aws_lambda_function.waf_toggle.arn
   input     = jsonencode({ mode = "ALLOW" })
 }
 
-resource "aws_cloudwatch_event_target" "block_target" {
+resource "aws_cloudwatch_event_target" "waf_block_target" {
   rule      = aws_cloudwatch_event_rule.block_1900_uk.name
   target_id = "Block"
   arn       = aws_lambda_function.waf_toggle.arn
@@ -119,14 +119,14 @@ resource "aws_cloudwatch_event_target" "block_target" {
 }
 
 # allow Events to invoke the Lambda
-resource "aws_lambda_permission" "events_allow" {
+resource "aws_lambda_permission" "waf_events_allow" {
   statement_id  = "AllowEvents0700-${var.env}"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.waf_toggle.lambda_function
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.allow_0700_uk.arn
 }
-resource "aws_lambda_permission" "events_block" {
+resource "aws_lambda_permission" "waf_events_block" {
   statement_id  = "AllowEvents1900-${var.env}"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.waf_toggle.lambda_function
