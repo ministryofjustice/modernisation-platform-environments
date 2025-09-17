@@ -25,7 +25,7 @@ module "rds_export" {
   name                  = "planetfm"
   database_refresh_mode = "full"
   output_parquet_file_size = 10
-  max_concurrency = 5
+  max_concurrency = "5"
   environment = local.environment_shorthand
   vpc_id                = module.vpc.vpc_id
   database_subnet_ids   = module.vpc.private_subnets
