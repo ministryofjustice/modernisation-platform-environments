@@ -5,7 +5,7 @@ resource "aws_lambda_function" "cloudwatch_log_alert" {
   function_name = "cloudwatch_log_alert"
   handler       = "lambda_function.lambda_handler"
   runtime       = "python3.10"
-  role          = aws_iam_role.cloudwatch_log_alert_role.arn
+  role          = aws_iam_role.ccr_cloudwatch_log_alert_role.arn
   filename      = "lambda/cloudwatch_log_alert/cloudwatch_log_alert.zip"
   timeout       = 60
 
