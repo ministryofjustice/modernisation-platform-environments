@@ -37,7 +37,7 @@ data "aws_iam_policy_document" "allow_s3_to_write" {
     condition {
       test     = "ArnEquals"
       variable = "aws:SourceArn"
-      values   = var.bucket.arn
+      values   = [var.bucket.arn]
     }
   }
 }
