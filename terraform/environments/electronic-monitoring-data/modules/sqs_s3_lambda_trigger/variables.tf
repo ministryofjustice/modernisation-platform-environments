@@ -26,3 +26,8 @@ variable "lambda_function_name" {
   description = "Name to use in naming SQS queue"
   type        = string
 }
+
+variable "environment_shorthand" {
+  description = "Environment prefix for the table"
+  type        = string
+}
