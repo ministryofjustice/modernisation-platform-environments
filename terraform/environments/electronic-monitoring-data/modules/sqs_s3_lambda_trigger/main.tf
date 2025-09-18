@@ -71,7 +71,7 @@ resource "aws_s3_bucket_notification" "s3_notification_suffixes" {
 }
 
 resource "aws_s3_bucket_notification" "s3_notification" {
-  count = len(var.s3_suffixes) == 0 && var.s3_prefix == null ? 1 : 0
+  count = length(var.s3_suffixes) == 0 && var.s3_prefix == null ? 1 : 0
   bucket   = var.bucket.id
 
   queue {
