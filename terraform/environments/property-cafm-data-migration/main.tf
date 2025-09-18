@@ -17,7 +17,7 @@ module "csv_export" {
 }
 
 module "rds_export" {
-  source = "github.com/ministryofjustice/terraform-rds-export?ref=164c85e277e990e1bbce27b6d3e2796579931f1d"
+  source = "github.com/ministryofjustice/terraform-rds-export?ref=9a071725f6471b0e9f1f1e82f2ef70adef0e835b"
   providers = {
     aws.bucket-replication = aws
   }
