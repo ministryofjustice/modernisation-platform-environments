@@ -1,3 +1,30 @@
+data "aws_iam_policy_document" "s3_bucket_policy" {
+  statement {
+    sid    = "AllowDataPlatformEngineers"
+    effect = "Allow"
+    actions = [
+      "s3:DeleteObject",
+      "s3:GetObject",
+      "s3:PutObject"
+    ]
+    resources = ["arn:aws:s3:::mojdp-${local.environment}-${local.component_name}/*"]
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+    condition {
+      test     = "ForAnyValue:StringLike"
+      variable = "aws:PrincipalArn"
+      values   = ["arn:aws:iam::*:role/aws-reserved/sso.amazonaws.com/*/AWSReservedSSO_platform-engineer-admin_*"]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "aws:PrincipalAccount"
+      values   = [local.environment_management.account_ids["data-platform-development"]]
+    }
+  }
+}
+
 module "s3_bucket" {
   count = terraform.workspace == "data-platform-development" ? 1 : 0
 
@@ -7,11 +34,14 @@ module "s3_bucket" {
 
   force_destroy = false
 
+  attach_policy = true
+  policy        = data.aws_iam_policy_document.s3_bucket_policy.json
+
   server_side_encryption_configuration = {
     rule = {
       bucket_key_enabled = true
       apply_server_side_encryption_by_default = {
-        kms_master_key_id = module.kms_key.key_arn
+        kms_master_key_id = module.kms_key[0].key_arn
         sse_algorithm     = "aws:kms"
       }
     }
