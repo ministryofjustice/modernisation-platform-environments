@@ -58,7 +58,7 @@ resource "aws_s3_bucket_notification" "s3_notification_prefix_suffixes" {
 }
 
 resource "aws_s3_bucket_notification" "s3_notification_suffixes" {
-  for_each = len(var.s3_suffixes) > 0 && var.s3_prefix == "" ? toset(var.s3_suffixes) : {}
+  for_each = length(var.s3_suffixes) > 0 && var.s3_prefix == "" ? toset(var.s3_suffixes) : {}
   bucket   = var.bucket.id
 
   queue {
