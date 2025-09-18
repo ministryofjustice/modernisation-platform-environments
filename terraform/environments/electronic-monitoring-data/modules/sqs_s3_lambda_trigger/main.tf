@@ -5,6 +5,12 @@ locals {
   bucket_function          = join("-", slice(local.bucket_function_elements, 0, length(local.bucket_function_elements) - 1))
   queue_base_name          = substr("${local.bucket_function}-${local.s3_prefix_hyphen}-${local.s3_suffixes_hyphen}-${var.lambda_function_name}", 0, 76)
   sid_name                 = replace(local.queue_base_name, "-" ,"")
+  s3_notification_filters  = length(var.s3_suffixes) > 0 ? [
+      for suffix in var.s3_suffixes : {
+        prefix = var.s3_prefix
+        suffix = suffix
+      }
+    ] : []
 }
 
 #trivy:ignore:AVD-AWS-0135 default is sufficient
@@ -21,17 +27,61 @@ resource "aws_sqs_queue" "s3_event_queue" {
 }
 
 
-resource "aws_s3_bucket_notification" "s3_notification" {
+resource "aws_s3_bucket_notification" "s3_notification_prefix_only" {
+  count  = (length(var.s3_suffixes) == 0 && var.s3_prefix != "") ? 1 : 0
   bucket = var.bucket.id
 
   queue {
-    queue_arn     = aws_sqs_queue.s3_event_queue.arn
-    events        = ["s3:ObjectCreated:*"]
+    queue_arn = aws_sqs_queue.s3_event_queue.arn
+    events    = ["s3:ObjectCreated:*"]
     filter_prefix = var.s3_prefix
   }
 
   depends_on = [aws_sqs_queue_policy.allow_s3_to_write]
 }
+
+resource "aws_s3_bucket_notification" "s3_notification_prefix_suffixes" {
+  for_each = {
+    for filter in local.s3_notification_filters :
+    "${filter.prefix}_${filter.suffix}" => filter
+  }
+  bucket   = var.bucket.id
+
+  queue {
+    queue_arn     = aws_sqs_queue.s3_event_queue.arn
+    events        = ["s3:ObjectCreated:*"]
+    filter_prefix = each.value.prefix
+    filter_suffix = each.value.suffix
+  }
+
+  depends_on = [aws_sqs_queue_policy.allow_s3_to_write]
+}
+
+resource "aws_s3_bucket_notification" "s3_notification_suffixes" {
+  for_each = len(var.s3_suffixes) > 0 && var.s3_prefix == "" ? toset(var.s3_suffixes) : {}
+  bucket   = var.bucket.id
+
+  queue {
+    queue_arn     = aws_sqs_queue.s3_event_queue.arn
+    events        = ["s3:ObjectCreated:*"]
+    filter_suffix = each.value
+  }
+
+  depends_on = [aws_sqs_queue_policy.allow_s3_to_write]
+}
+
+resource "aws_s3_bucket_notification" "s3_notification" {
+  count = len(var.s3_suffixes) == 0 && var.s3_prefix == null ? 1 : 0
+  bucket   = var.bucket.id
+
+  queue {
+    queue_arn     = aws_sqs_queue.s3_event_queue.arn
+    events        = ["s3:ObjectCreated:*"]
+  }
+
+  depends_on = [aws_sqs_queue_policy.allow_s3_to_write]
+}
+
 
 data "aws_iam_policy_document" "allow_s3_to_write" {
   statement {
