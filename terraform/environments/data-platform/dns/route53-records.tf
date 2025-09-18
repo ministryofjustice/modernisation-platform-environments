@@ -1,5 +1,5 @@
 module "production_records" {
-  source = "github.com/terraform-aws-modules/terraform-aws-route53.git/modules/records?ref=f56825af8cb08bec2478e2f62b678e51986c1531" # v5.0.0
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-route53.git//modules/records?ref=f56825af8cb08bec2478e2f62b678e51986c1531" # v5.0.0
 
   count = terraform.workspace == "data-platform-production" ? 1 : 0
 
