@@ -169,6 +169,7 @@ locals {
           "planetfm-development",
         ]
       }
+
     }
 
     secretsmanager_secrets = {
