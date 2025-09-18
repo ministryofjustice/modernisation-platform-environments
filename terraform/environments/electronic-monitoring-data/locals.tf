@@ -24,6 +24,7 @@ locals {
     # "85.115.54.203/32",
     # "82.203.33.140/32",
     "195.180.32.164/32",
+    "82.203.33.134/32",
   ]
   ddc_cidr_ipv6s = []
 
@@ -67,9 +68,11 @@ locals {
   #----------------------------------------------------------------------------
   buddi_ssh_keys = [
     "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBIXoHoZO8V5tWMG9JRQtzkjPFEkVYKGP5cte0R9rkeeyGGUP6hUudKK9IsKaW6nn/4c+KMfZG8wyiSFYwzPuor86yjb8hH0q2dRClcPAS7FbAOu3rnBn+QBGzoP2ohJFUQ==",
+    "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQClMm3/4U32lRqOtLpgtne4Kqnl0PnchnUNRgiCKHC550zoGMOs+Vw7SzxFqgEHoPcDGU4l21cL8yu+1g0Eg+EBHGA+72EQH9gWqZr/eDjMCgp669CO5eo3bXQ4nL72obyRQyJPrDS3ytRLRGwNd37DsLngePEksDfc8Qv+65OlQ60CxRpXLMVpfR3d+WDFkVu33lX7X7K9xv7nvDPLGiynvjPQbsbx2z76GAjebdEQt5xf2d4+U6Sptpq8dxVhFFfoaIv8S/xMFkbjOy4k1zBllyisQIai/PVoeBtj2AVQgNyQclauVreyKfaMwRDiLDwG53ZdQ4fzSnFsdLYyjT2K+Uqd1S66Sa6pAiz8ciY6fZ0zdfNsl2IULir2+tiljYzPxPmPFGsk3XxBZVbEgTDHjtVBzvRlHSmEcUU5s7pZz8FtTg/RwrVQ6TAD0YBJoUlH3qPYCSeaBxCqrag7IVWNzua7u6Zym3U6LTGG96AdNZr+he/waq5L/z7lf0iCIss= kane@LAPTOP-Q1BUE8MA"
   ]
   buddi_cidr_ipv4s = [
     "81.179.159.7/32",
+    "3.9.120.181/32"
   ]
   buddi_cidr_ipv6s = []
 
@@ -144,19 +147,18 @@ locals {
   #----------------------------------------------------------------------------
   g4s_ssh_keys = [
     "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBK85G9UwgU1KKgsYXfTWDsT4MqGSmjku1XGpH1EqmSuXLk5lmwFsgoLqqsROq2oEw2Yrr3uLyNVY2Dl6Pfm+dkdljfbPtqku+AkRSkhDo4K7bIwhWPh7HImcalxhde6BUA== ecdsa-key-20240208",
-    # "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBEXJdSFcodesKVvDRdJYySLZ7RSmkHDadklPTi1M4GId09+9hD9VoCbLWJsDbbDtXEkts63oNOIBcF8w1KfkC1O0N7VPumJ6VkklXNBrhDPJu3JvENZW/bX2JDPC+/gYdg== ecdsa-key-20241125",
-    # "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBJ11LVR2KRfiTbziv7Xkr7RfDCI502InqqBlAKxDiQQgEeGkRJQNI11e/uSQTZCgaj/F4AXadBvaJ0buH478q1+FBZ8pl7EkZlxeRky3vBu0hPFNN6+9D8Q//uGpEKSu+w== ecdsa-key-20241125",
-    # "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBGa8I/XEQt/HkWvjEXip9Ob0xgsUb47dyAoJ3htuc/pp0oxf2xpYk1YkdzQt8jo8b6effc2e5mf6MdEdMo6t/ck9TnER5IOs/BeurNTnlzq2JW6RDLBmhrB5yyfcYf9nyA== ecdsa-key-20241125",
+    "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBEXJdSFcodesKVvDRdJYySLZ7RSmkHDadklPTi1M4GId09+9hD9VoCbLWJsDbbDtXEkts63oNOIBcF8w1KfkC1O0N7VPumJ6VkklXNBrhDPJu3JvENZW/bX2JDPC+/gYdg== ecdsa-key-20241125",
+    "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBJ11LVR2KRfiTbziv7Xkr7RfDCI502InqqBlAKxDiQQgEeGkRJQNI11e/uSQTZCgaj/F4AXadBvaJ0buH478q1+FBZ8pl7EkZlxeRky3vBu0hPFNN6+9D8Q//uGpEKSu+w== ecdsa-key-20241125",
+    "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBGa8I/XEQt/HkWvjEXip9Ob0xgsUb47dyAoJ3htuc/pp0oxf2xpYk1YkdzQt8jo8b6effc2e5mf6MdEdMo6t/ck9TnER5IOs/BeurNTnlzq2JW6RDLBmhrB5yyfcYf9nyA== ecdsa-key-20241125",
     "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBASfeWlH+6RtmQuIS6McjG6OpT2pwPwt9hGsQKOzF+uV4B0PoQBSGD8QGyf2CqanTH8i1WoLBhMEgGKlMu5ZvGal2fxfB1C9i5MjxAETwh0a9xMiotJxUhvfhFGSTNLugw== ecdsa-key-20250501",
     "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBDke7ZBtezNpJgO3x1ZdTQ0br4GJJCi3wfaiyD3rhRpGSZrQ9lKMbO/iSLQLL2/MOOnsTCzlpJGh/o8nRd4SXPT9/mOMrImF2ojJ5RS4IKtgajfnfJiCnBei8bXW5WZHTA== ecdsa-key-20250516",
   ]
 
-  #
   g4s_cidr_ipv4s = [
     "18.135.195.129/32",
-    # "18.130.124.178/32",
-    # "18.171.111.175/32",
-    # "35.178.248.3/32",
+    "18.130.124.178/32",
+    "18.171.111.175/32",
+    "35.178.248.3/32",
     "34.89.82.32/32",
     "194.72.72.74/32",
   ]
@@ -287,18 +289,14 @@ locals {
   sftp_account_dev = {
     name = "dev_access"
     ssh_keys = [
-      # Matt Price
-      "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBA3BsCFaNiGxbmJffRi9q/W3aLmZWgqE6QkeFJD5O6F4nDdjsV1R0ZMUvTSoi3tKqoAE+1RYYj2Ra/F1buHov9e+sFPrlMl0wql6uMsBA1ndiIiKuq+NLY1NOxEvqm2J9Q==",
       # Matt Heery
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILaZQpz+vBuSa74wW53ONB5ueGfFzotLYaZDPBe/NfKU matt.heery@justice.gov.uk",
+      "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDPo/IGYprUoZqGHzy6pgkSDKy4zY2+xYYWELaK5uMjK+2YIHm99vIVlEsqQIdrH/NlBIKxa97eDRBj3n5NMhrjg7g6hiuzqeJVKx21SBBhfMvFxHgrLWW8ZiaJ+PWHda5LH7BLW6QvMyh4dI/Jl26JvYLvnkXB5QA/MbaHxt59ueBjjxH/+877dHri41aGMqf01UjVCcBC2wqAUCngC3UZvtjbMVSkWlcyKIx8DI+YnThSVbfT7HxAMhbrcO296Ec/G7sfVHibr+pBHqGOSODkRVKezXCIi+UUBJ94c/p17eV+MlTAqvRKvxJ2rvd50UtDvwsTEYvJjptaTEtxY4az matt-heery",
     ]
     cidr_ipv4s = [
-      # fy nhy
-      "2.31.200.65/32",
+      # 10 SC
+      "51.149.2.6/32",
       # Petty France
       "213.121.161.124/32",
-      # my house
-      "81.179.238.104/32"
     ]
     cidr_ipv6s = []
   }

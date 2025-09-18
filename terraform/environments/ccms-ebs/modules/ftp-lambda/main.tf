@@ -93,11 +93,15 @@ resource "aws_lambda_function" "ftp_lambda" {
   handler       = "ftp-client.lambda_handler"
   runtime       = "python3.13"
   timeout       = 900
-  memory_size   = 256
+  memory_size   = var.lambda_memory # Sets memory defaults to 4gb
   layers        = [aws_lambda_layer_version.ftp_layer.arn]
 
   s3_bucket = var.s3_bucket_ftp
   s3_key    = var.s3_object_ftp_client
+
+  ephemeral_storage {
+    size = var.lambda_storage # Sets ephemeral storage defaults to 1GB (/tmp space)
+  }
 
   vpc_config {
     subnet_ids         = var.subnet_ids
@@ -126,13 +130,13 @@ resource "aws_lambda_function" "ftp_lambda" {
 }
 # ### cw rule for schedule
 resource "aws_cloudwatch_event_rule" "ftp_schedule" {
-  count               = var.env != "production" ? 1 : 0
+  count               = contains(var.enabled_cron_in_environments, var.env) ? 1 : 0
   name                = "${var.lambda_name}-schedule"
-  schedule_expression = var.ftp_cron
+  schedule_expression = var.env == "production" ? "cron(0 10 * * ? *)" : "cron(0 10 ? * MON-FRI *)"
 }
 ### cw event lambda target
 resource "aws_cloudwatch_event_target" "ftp_target" {
-  count     = var.env != "production" ? 1 : 0
+  count     = contains(var.enabled_cron_in_environments, var.env) ? 1 : 0
   rule      = aws_cloudwatch_event_rule.ftp_schedule[count.index].name
   target_id = "ftp-lambda"
   arn       = aws_lambda_function.ftp_lambda.arn
@@ -140,7 +144,7 @@ resource "aws_cloudwatch_event_target" "ftp_target" {
 
 ### allow cw to event in lambda
 resource "aws_lambda_permission" "ftp_permission" {
-  count         = var.env != "production" ? 1 : 0
+  count         = contains(var.enabled_cron_in_environments, var.env) ? 1 : 0
   statement_id  = "AllowExecutionFromCloudWatch"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.ftp_lambda.function_name

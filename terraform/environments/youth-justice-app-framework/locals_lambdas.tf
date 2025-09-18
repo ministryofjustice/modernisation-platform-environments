@@ -25,30 +25,45 @@ locals {
   serverlessrepo-lambda-canary = {
     function_zip_file = "lambda_code/serverlessrepo-lambda-canary.zip"
     function_name     = "serverlessrepo-lambda-canary"
-    handler           = "serverlessrepo-lambda-canary.lambda_handler"
+    handler           = "lambda_function.lambda_handler"
     iam_role_name     = "serverlessrepo-lambda-canary-lambda-role"
+    log_group = {
+      name = "/aws/lambda/serverlessrepo-lambda-canary"
+    }
     environment_variables = {
+      url      = "http://private-lb.${local.environment}.yjaf:8080/actuator/health" # URL for the health endpoint
       expected = "UP"
-      site_1   = "http://private-lb.${local.environment}.yjaf:8080/api/v1/auth/../../../actuator/health"        #auth
-      site_11  = "http://private-lb.${local.environment}.yjaf:8080/api/v1/placements/../../../actuator/health"  #placements
-      site_12  = "http://private-lb.${local.environment}.yjaf:8080/api/v1/refdata/../../../actuator/health"     #refdata
-      site_13  = "http://private-lb.${local.environment}.yjaf:8080/api/v1/returns/../../../actuator/health"     #returns
-      site_14  = "http://private-lb.${local.environment}.yjaf:8080/api/v1/sentences/../../../actuator/health"   #sentences
-      site_15  = "http://private-lb.${local.environment}.yjaf:8080/api/v1/transfers/../../../actuator/health"   #transfers
-      site_17  = "http://private-lb.${local.environment}.yjaf:8080/api/v1/views/../../../actuator/health"       #views
-      site_18  = "http://private-lb.${local.environment}.yjaf:8080/api/v1/workflow/../../../actuator/health"    #workflow
-      site_19  = "http://private-lb.${local.environment}.yjaf:8080/api/v1/yp/../../../actuator/health"          #yp
-      site_2   = "http://private-lb.${local.environment}.yjaf:8080/api/v1/bands/../../../actuator/health"       #bands
-      site_3   = "http://private-lb.${local.environment}.yjaf:8080/api/v1/bu/../../../actuator/health"          #bu
-      site_4   = "http://private-lb.${local.environment}.yjaf:8080/api/v1/case/../../../actuator/health"        #case
-      site_5   = "http://private-lb.${local.environment}.yjaf:8080/api/v1/cmm/../../../actuator/health"         #cmm
-      site_6   = "http://private-lb.${local.environment}.yjaf:8080/api/v1/conversions/../../../actuator/health" #conversions
-      site_8   = "http://private-lb.${local.environment}.yjaf:8080/api/v1/dal/../../../actuator/health"         #dal
-      site_9   = "http://private-lb.${local.environment}.yjaf:8080/api/v1/documents/../../../actuator/health"   #documents
+      site_1   = "auth"        #auth
+      site_11  = "placements"  #placements
+      site_12  = "refdata"     #refdata
+      site_13  = "returns"     #returns
+      site_14  = "sentences"   #sentences
+      site_15  = "transfers"   #transfers
+      site_17  = "views"       #views
+      site_18  = "workflow"    #workflow
+      site_19  = "yp"          #yp
+      site_2   = "bands"       #bands
+      site_3   = "bu"          #bu
+      site_4   = "case"        #case
+      site_5   = "cmm"         #cmm
+      site_6   = "conversions" #conversions
+      site_8   = "dal"         #dal
+      site_9   = "documents"   #documents
     }
     vpc_config = {
       subnet_ids         = local.private_subnet_list[*].id
       security_group_ids = [module.serverlessrepo-lambda-canary-sg.security_group_id]
+    }
+  }
+
+  inspector-sbom-ec2 = {
+    function_zip_file = "lambda_code/inspector-sbom-ec2.zip"
+    function_name     = "inspector-sbom-ec2"
+    handler           = "inspector-sbom-ec2.lambda_handler"
+    iam_role_name     = "inspector-sbom-ec2-lambda-role"
+    environment_variables = {
+      S3_BUCKET   = module.s3-sbom.aws_s3_bucket_id["application-sbom"].id
+      KMS_KEY_ARN = module.kms.key_arn
     }
   }
 
@@ -78,6 +93,16 @@ locals {
     iam_policy_path   = "lambda_policies/serverlessrepo-lambda-canary-role-policy.json"
     policy_template_vars = {
       account_number = local.environment_management.account_ids[terraform.workspace]
+    }
+  }
+
+  inspector-sbom-ec2-role = {
+    name              = "inspector-sbom-ec2-lambda-role"
+    trust_policy_path = "lambda_policies/lambda-role-trust.json"
+    iam_policy_path   = "lambda_policies/inspector-sbom-ec2-role-policy.json"
+    policy_template_vars = {
+      aws_s3_bucket_sbom_arn = module.s3-sbom.aws_s3_bucket["application-sbom"].arn
+      aws_kms_key_sbom_arn   = module.kms.key_arn
     }
   }
 }

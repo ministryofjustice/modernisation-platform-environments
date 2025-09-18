@@ -45,6 +45,8 @@ data "aws_iam_policy_document" "assume_step_function" {
 
 # tfsec:ignore:aws-iam-no-policy-wildcards
 data "aws_iam_policy_document" "step_function_base_permissions" {
+  #checkov:skip=CKV_AWS_356
+  #checkov:skip=CKV_AWS_111
   statement {
     effect    = "Allow"
     actions   = ["sns:Publish", "sqs:SendMessage"]
@@ -58,20 +60,26 @@ data "aws_iam_policy_document" "step_function_base_permissions" {
   statement {
     effect = "Allow"
     actions = [
-      "logs:CreateLogDelivery",
       "logs:CreateLogStream",
+      "logs:DescribeLogGroups",
+      "logs:PutDestination",
+      "logs:PutLogEvents"
+    ]
+    resources = ["arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:*"]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "logs:CreateLogDelivery",
       "logs:GetLogDelivery",
       "logs:UpdateLogDelivery",
       "logs:DeleteLogDelivery",
       "logs:ListLogDeliveries",
       "logs:PutResourcePolicy",
       "logs:DescribeResourcePolicies",
-      "logs:DescribeLogGroups",
-      "logs:PutDestination",
       "logs:PutDestinationPolicy",
-      "logs:PutLogEvents"
     ]
-    resources = ["arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:*"]
+    resources = ["*"]
   }
 }
 

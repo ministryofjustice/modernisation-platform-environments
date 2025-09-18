@@ -17,7 +17,7 @@ resource "aws_iam_role" "cwa_extract_lambda_role" {
   tags = merge(
     local.tags,
     {
-      Name = "${local.application_name_short}-cwa-extract-lambda-role"
+      Name = "${local.application_name_short}-${local.environment}-cwa-extract-lambda-role"
     }
   )
 }
@@ -46,19 +46,29 @@ resource "aws_iam_policy" "cwa_extract_lambda_policy" {
       {
         Effect = "Allow",
         Action = [
-          "s3:GetObject" 
+          "s3:GetObject"
         ],
         Resource = "${aws_s3_bucket.lambda_layer_dependencies.arn}/*"
       },
       {
-        Effect   = "Allow"
-        Action   = [
-          "secretsmanager:GetSecretValue",
+        Effect = "Allow"
+        Action = [
+          "secretsmanager:GetSecretValue"
         ]
         Resource = [
           aws_secretsmanager_secret.cwa_procedures_config.arn,
           aws_secretsmanager_secret.cwa_db_secret.arn,
-          aws_secretsmanager_secret.cwa_db_ssh_key.arn
+          aws_secretsmanager_secret.cwa_table_name_secret.arn
+        ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "sns:Publish"
+        ],
+        Resource = [
+          aws_sns_topic.priority_p1.arn,
+          aws_sns_topic.provider_banks.arn
         ]
       }
     ]

@@ -8,7 +8,8 @@ locals {
 
   baseline_presets_production = {
     options = {
-      enable_xsiam_s3_integration = true
+      enable_xsiam_cloudwatch_integration = true
+      enable_xsiam_s3_integration         = true
       route53_resolver_rules = {
         outbound-data-and-private-subnets = ["azure-fixngo-domain", "infra-int-domain"]
       }
@@ -240,7 +241,7 @@ locals {
         })
         user_data_cloud_init = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init, {
           args = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init.args, {
-            branch = "f8ea577571c5ea360da9f7582f0ac1c11ae1268f" # 2025-06-26 tag_release_detail fix
+            branch = "662853f289cc0053f99ba458c3d9d3c4820f3640" # 2025-08-19 crypto requirement fix
           })
         })
         tags = merge(local.ec2_autoscaling_groups.web.tags, {
@@ -284,7 +285,7 @@ locals {
         user_data_cloud_init = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init, {
           args = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init.args, {
             # Comment in instance refresh above if changing branch + want automated instance refresh
-            branch = "f8ea577571c5ea360da9f7582f0ac1c11ae1268f" # 2025-06-26 tag_release_detail fix
+            branch = "662853f289cc0053f99ba458c3d9d3c4820f3640" # 2025-08-19 crypto requirement fix
           })
         })
         tags = merge(local.ec2_autoscaling_groups.web.tags, {

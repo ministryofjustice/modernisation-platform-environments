@@ -134,6 +134,7 @@ locals {
     var.options.enable_hmpps_domain ? ["ec2-ad-leave-windows"] : [],
     var.options.enable_ec2_self_provision ? ["ec2-configuration-management-windows"] : [],
     var.options.enable_ec2_self_provision ? ["ec2-configuration-management-linux"] : [],
+    var.options.enable_ec2_self_provision ? ["ec2-install-automation-tools-windows"] : [],
     var.options.enable_ec2_session_manager_cloudwatch_logs ? ["SSM-SessionManagerRunShell"] : [],
   ])
 

@@ -15,6 +15,10 @@ resource "aws_security_group_rule" "all_internal_ingress_traffic" {
     data.aws_subnet.private_subnets_b.cidr_block,
     data.aws_subnet.private_subnets_c.cidr_block
   ]
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_security_group_rule" "all_internal_egress_traffic" {
@@ -34,5 +38,9 @@ resource "aws_security_group_rule" "all_internal_egress_traffic" {
     data.aws_subnet.private_subnets_b.cidr_block,
     data.aws_subnet.private_subnets_c.cidr_block
   ]
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 

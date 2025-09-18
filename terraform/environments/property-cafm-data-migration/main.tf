@@ -1,12 +1,30 @@
-module "rds_export" {
-  # checkov:skip=CKV_TF_1: using branch instead of a commit hash
-  # checkov:skip=CKV_TF_2: using branch instead of tag with a version number
-  source = "github.com/ministryofjustice/terraform-rds-export?ref=sql-backup-restore-rds-updates"
+module "csv_export" {
+  source = "github.com/ministryofjustice/terraform-csv-to-parquet-athena?ref=9e21355a103cce0fbe3089c3e71a5b8d47927374"
+  providers = {
+    aws.bucket-replication = aws
+  }
+  region_replication = "eu-west-2"
+  kms_key_arn = aws_kms_key.shared_kms_key.arn
+  name = "concept"
+  load_mode = "overwrite"
+  environment = local.environment_shorthand
+  tags = {
+    business-unit = "Property"
+    application   = "cafm"
+    is-production = "false"
+    owner         = "shanmugapriya.basker@justice.gov.uk"
+  }
+}
 
-  kms_key_arn         = aws_kms_key.sns_kms.arn
-  name                = "cafm"
-  vpc_id              = module.vpc.vpc_id
-  database_subnet_ids = module.vpc.private_subnets
+module "rds_export" {
+  source = "github.com/ministryofjustice/terraform-rds-export?ref=c3c0a7fb772268e54f1958cc881c566c28e63e50"
+
+  kms_key_arn           = aws_kms_key.shared_kms_key.arn
+  name                  = "planetfm"
+  database_refresh_mode = "full"
+
+  vpc_id                = module.vpc.vpc_id
+  database_subnet_ids   = module.vpc.private_subnets
   master_user_secret_id = aws_secretsmanager_secret.db_master_user_secret.arn
 
   tags = {
@@ -20,7 +38,7 @@ module "rds_export" {
 resource "aws_secretsmanager_secret" "db_master_user_secret" {
   # checkov:skip=CKV2_AWS_57: Skipping because automatic rotation not needed.
   name       = "cafm-database-master-user-secret"
-  kms_key_id = aws_kms_key.sns_kms.arn
+  kms_key_id = aws_kms_key.shared_kms_key.arn
 }
 
 module "endpoints" {
@@ -30,7 +48,7 @@ module "endpoints" {
   vpc_id                     = module.vpc.vpc_id
   create_security_group      = true
   security_group_description = "Managed by Terraform"
-  security_group_tags        = { Name : "eu-west-1-dev" }
+  security_group_tags        = { Name : "cafm-migration-rds-sg" }
   security_group_rules = {
     ingress_https = {
       description = "HTTPS from VPC"
@@ -44,7 +62,7 @@ module "endpoints" {
       subnet_ids          = module.vpc.private_subnets
       private_dns_enabled = true
       tags                = { Name = "cafm-secretsmanager-endpoint" }
-     }
+    }
     glue = {
       service             = "glue"
       service_type        = "Interface"
@@ -74,7 +92,7 @@ module "sftp_user" {
   user_name   = each.value.user_name
   server_id   = module.server.id
   s3_bucket   = each.value.s3_bucket
-  kms_key_arn = aws_kms_key.sns_kms.arn
+  kms_key_arn = aws_kms_key.shared_kms_key.arn
 }
 
 

@@ -77,7 +77,7 @@
               echo "component=${{ inputs.component }}"
 
           - name: Checkout Repository
-            uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b  # v4.1.4
+            uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8  # v5.0.0
           - name: Decrypt Secrets
             uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@3f9fb1af00462c69c806640652ddf41292963615 # v3.2.5
             with:
@@ -101,7 +101,7 @@
               echo "BACKEND_NUMBER=${BACKEND_NUMBER}" >> $GITHUB_ENV
 
           - name: Configure AWS Credentials
-            uses: aws-actions/configure-aws-credentials@b47578312673ae6fa5b5096b330d9fbac3d116df  # v4.2.1
+            uses: aws-actions/configure-aws-credentials@a03048d87541d1d9fcf2ecf528a4a65ba9bd7838  # v5.0.0
             with:
               role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
               role-session-name: githubactionsrolesession
@@ -218,7 +218,7 @@
           - name: Check for Approval
             id: check_approval
             if: github.event_name == 'pull_request' && steps.evaluate_terraform_plan.outputs.resources_found == 'true'
-            uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+            uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
             with:
               github-token: ${{ env.GITHUB_TOKEN }}
               script: |
@@ -256,7 +256,7 @@
           - name: Comment if PR Requires Approval
             id: comment_if_not_approved
             if: failure() && github.event_name == 'pull_request' && steps.check_approval.outcome == 'failure'
-            uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+            uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
             with:
               github-token: ${{ env.GITHUB_TOKEN }}
               script: |
@@ -282,7 +282,7 @@
         environment: ${{ inputs.component != 'root' && format('{0}-{1}-{2}', inputs.application, inputs.environment, inputs.component) || format('{0}-{1}', inputs.application, inputs.environment) }}
         steps:
           - name: Checkout Repository
-            uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b  # v4.1.4
+            uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8  # v5.0.0
           
           - name: Decrypt Secrets
             uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@3f9fb1af00462c69c806640652ddf41292963615 # v3.2.5
@@ -303,7 +303,7 @@
               echo "BACKEND_NUMBER=${BACKEND_NUMBER}" >> $GITHUB_ENV
 
           - name: Configure AWS Credentials
-            uses: aws-actions/configure-aws-credentials@b47578312673ae6fa5b5096b330d9fbac3d116df  # v4.2.1
+            uses: aws-actions/configure-aws-credentials@a03048d87541d1d9fcf2ecf528a4a65ba9bd7838  # v5.0.0
             with:
               role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
               role-session-name: githubactionsrolesession

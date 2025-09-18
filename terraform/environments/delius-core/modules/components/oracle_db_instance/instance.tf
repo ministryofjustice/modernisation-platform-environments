@@ -69,7 +69,7 @@ module "instance" {
     var.enable_platform_backups != null ? { "backup" = var.enable_platform_backups ? "true" : "false" } : {}
   )
 
-  cloudwatch_metric_alarms = merge(
+  cloudwatch_metric_alarms = var.enable_cloudwatch_alarms ? merge(
     local.cloudwatch_metric_alarms.ec2
-  )
+  ) : {}
 }

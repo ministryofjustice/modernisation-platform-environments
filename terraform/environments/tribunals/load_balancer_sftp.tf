@@ -11,7 +11,7 @@ resource "aws_lb" "tribunals_lb_sftp" {
   load_balancer_type         = "network"
   security_groups            = [aws_security_group.tribunals_lb_sc_sftp.id]
   subnets                    = data.aws_subnets.shared-public.ids
-  enable_deletion_protection = true
+  enable_deletion_protection = false
 }
 
 resource "aws_security_group" "tribunals_lb_sc_sftp" {
@@ -78,4 +78,6 @@ resource "aws_lb_target_group_attachment" "tribunals_target_group_attachment_sft
   # target_id points to primary ec2 instance, change "primary_instance" to "backup_instance" in order to point at backup ec2 instance
   target_id = data.aws_instances.primary_instance.ids[0]
   port      = each.value.port
+
+  depends_on = [data.aws_instances.primary_instance]
 }

@@ -3,7 +3,7 @@ module "eks_cluster_logs_kms_access_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.58.0"
+  version = "5.60.0"
 
   name_prefix = "eks-cluster-logs-kms-access"
 
@@ -47,7 +47,7 @@ module "karpenter_sqs_kms_access_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.58.0"
+  version = "5.60.0"
 
   name_prefix = "karpenter-sqs-kms-access"
 
@@ -75,7 +75,7 @@ module "amazon_prometheus_proxy_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.58.0"
+  version = "5.60.0"
 
   name_prefix = "amazon-prometheus-proxy"
 
@@ -104,7 +104,7 @@ module "managed_prometheus_kms_access_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.58.0"
+  version = "5.60.0"
 
   name_prefix = "managed-prometheus-kms-access"
 
@@ -124,8 +124,8 @@ data "aws_iam_policy_document" "ecr_pull_through_cache" {
       "ecr:TagResource"
     ]
     resources = [
-      "arn:aws:ecr:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:repository/ecr/*",
-      "arn:aws:ecr:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:repository/github/*"
+      "arn:aws:ecr:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:repository/ecr/*",
+      "arn:aws:ecr:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:repository/github/*"
     ]
   }
 }
@@ -135,11 +135,40 @@ module "ecr_pull_through_cache_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.58.0"
+  version = "5.60.0"
 
   name_prefix = "ecr-pull-through-cache"
 
   policy = data.aws_iam_policy_document.ecr_pull_through_cache.json
+
+  tags = local.tags
+}
+
+data "aws_iam_policy_document" "velero_kms_access" {
+  statement {
+    sid    = "AllowKMS"
+    effect = "Allow"
+    actions = [
+      "kms:Encrypt*",
+      "kms:Decrypt*",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:Describe*"
+    ]
+    resources = [module.velero_kms.key_arn]
+  }
+}
+
+module "velero_kms_iam_policy" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
+  version = "5.60.0"
+
+  name_prefix = "velero-kms-access"
+
+  policy = data.aws_iam_policy_document.velero_kms_access.json
 
   tags = local.tags
 }
