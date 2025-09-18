@@ -34,4 +34,6 @@ locals {
   # example usage:
   # example_data = local.application_data.accounts[local.environment].example_var
   application_data = fileexists("./application_variables.json") ? jsondecode(file("./application_variables.json")) : null
+
+  subject_alternative_names = local.is-production ? ["*.venues.tribunals.gov.uk", "*.reports.tribunals.gov.uk", "siac.tribunals.gov.uk", "adjudicationpanel.tribunals.gov.uk"] : ["*.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
 }
