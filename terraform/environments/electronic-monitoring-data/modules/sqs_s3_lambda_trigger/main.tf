@@ -13,6 +13,90 @@ locals {
     ] : []
 }
 
+data "aws_caller_identity" "current" {}
+
+data "aws_iam_policy_document" "sqs_kms_key_policy" {
+  statement {
+    sid    = "AccountUseOfKey"
+    effect = "Allow"
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+    }
+    actions   = ["kms:*"]
+    resources = ["*"]
+  }
+  statement {
+    sid    = "S3UseofKey"
+    effect = "Allow"
+    principals {
+      type        = "Service"
+      identifiers = ["s3.amazonaws.com"]
+    }
+    actions = [
+      "kms:GenerateDataKey",
+      "kms:Decrpyt",
+    ]
+    resources = ["*"]
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceAccount"
+      values   = [data.aws_caller_identity.current.account_id]
+    }
+    condition {
+      test     = "ArnLike"
+      variable = "aws:SourceArn"
+      values   = [var.bucket.arn]
+    }
+  }
+}
+
+resource "aws_kms_key" "sqs_kms_key" {
+  description             = "KMS key for encrypting S3 event SQS queue"
+  enable_key_rotation     = true
+}
+
+resource "aws_kms_key_policy" "sqs_kms_key_policy" {
+  key_id = aws_kms_key.sqs_kms_key.id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Id      = "key-default-1",
+    Statement = [
+      {
+        Sid       = "Allow account use of the key"
+        Effect    = "Allow"
+        Principal = {
+          AWS = "*"
+        }
+        Action    = "kms:*"
+        Resource  = "*"
+      },
+      {
+        Sid    = "Allow S3 to use the key for sending to SQS"
+        Effect = "Allow"
+        Principal = {
+          Service = "s3.amazonaws.com"
+        }
+        Action = [
+          "kms:GenerateDataKey",
+          "kms:Decrypt"
+        ]
+        Resource = "*"
+        Condition = {
+          StringEquals = {
+            "aws:SourceAccount" = data.aws_caller_identity.current.account_id
+          },
+          ArnLike = {
+            "aws:SourceArn" = var.bucket.arn
+          }
+        }
+      }
+    ]
+  })
+}
+
+
 #trivy:ignore:AVD-AWS-0135 default is sufficient
 resource "aws_sqs_queue" "s3_event_queue" {
   #checkov:skip=CKV2_AWS_73 default is sufficient
