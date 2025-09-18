@@ -41,6 +41,30 @@ module "s3_bucket_workspacesweb_session_logs" {
     }
   }]
 
+  # Bucket policy to allow WorkSpaces Web service access
+  attach_policy = true
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AllowWorkSpacesWebServiceAccess"
+        Effect = "Allow"
+        Principal = {
+          Service = "workspaces-web.amazonaws.com"
+        }
+        Action = [
+          "s3:PutObject",
+          "s3:PutObjectAcl",
+          "s3:GetBucketLocation"
+        ]
+        Resource = [
+          "arn:aws:s3:::laa-workspacesweb-session-logs-${random_string.bucket_suffix.result}",
+          "arn:aws:s3:::laa-workspacesweb-session-logs-${random_string.bucket_suffix.result}/*"
+        ]
+      }
+    ]
+  })
+
   tags = merge(
     local.tags,
     {
