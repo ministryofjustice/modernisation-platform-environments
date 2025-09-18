@@ -9,7 +9,7 @@ locals {
 
 resource "aws_sqs_queue" "s3_event_queue" {
   name                       = local.queue_base_name
-  visibility_timeout_seconds = 300 
+  visibility_timeout_seconds = 20 * 60 # Longer than longest possible lambda
   redrive_policy = jsonencode({
     deadLetterTargetArn = aws_sqs_queue.s3_event_dlq.arn
     maxReceiveCount     = 5
