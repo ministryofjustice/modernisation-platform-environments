@@ -134,32 +134,32 @@ EOT
   }
 }
 
-# # CloudWatch Event Rules to trigger Lambda
-# resource "aws_cloudwatch_event_rule" "waf_allow_0700_uk" {
-#   name                         = "waf-allow-0700-${var.env}"
-#   schedule_expression          = "cron(0 7 ? * MON-SUN *)"
-#   description                  = "Set WAF rule to ALLOW at 07:00 UK daily"
-# }
+# CloudWatch Event Rules to trigger Lambda
+resource "aws_cloudwatch_event_rule" "waf_allow_0700_uk" {
+  name                         = "waf-allow-0700-${var.env}"
+  schedule_expression          = "cron(0 7 ? * MON-SUN *)"
+  description                  = "Set WAF rule to ALLOW at 07:00 UK daily"
+}
 
-# resource "aws_cloudwatch_event_rule" "waf_block_1900_uk" {
-#   name                         = "waf-block-1900-${var.env}"
-#   schedule_expression          = "cron(0 19 ? * MON-SUN *)"
-#   description                  = "Set WAF rule to BLOCK at 19:00 UK daily"
-# }
+resource "aws_cloudwatch_event_rule" "waf_block_1900_uk" {
+  name                         = "waf-block-1900-${var.env}"
+  schedule_expression          = "cron(0 19 ? * MON-SUN *)"
+  description                  = "Set WAF rule to BLOCK at 19:00 UK daily"
+}
 
-# resource "aws_cloudwatch_event_target" "waf_allow_target" {
-#   rule      = aws_cloudwatch_event_rule.waf_allow_0700_uk.name
-#   target_id = "Allow"
-#   arn       = aws_lambda_function.waf_toggle.arn
-#   input     = jsonencode({ mode = "ALLOW" })
-# }
+resource "aws_cloudwatch_event_target" "waf_allow_target" {
+  rule      = aws_cloudwatch_event_rule.waf_allow_0700_uk.name
+  target_id = "Allow"
+  arn       = aws_lambda_function.waf_toggle.arn
+  input     = jsonencode({ mode = "ALLOW" })
+}
 
-# resource "aws_cloudwatch_event_target" "waf_block_target" {
-#   rule      = aws_cloudwatch_event_rule.waf_block_1900_uk.name
-#   target_id = "Block"
-#   arn       = aws_lambda_function.waf_toggle.arn
-#   input     = jsonencode({ mode = "BLOCK" })
-# }
+resource "aws_cloudwatch_event_target" "waf_block_target" {
+  rule      = aws_cloudwatch_event_rule.waf_block_1900_uk.name
+  target_id = "Block"
+  arn       = aws_lambda_function.waf_toggle.arn
+  input     = jsonencode({ mode = "BLOCK" })
+}
 
 
 
