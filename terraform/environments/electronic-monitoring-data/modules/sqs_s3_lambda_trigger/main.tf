@@ -14,6 +14,8 @@ resource "aws_sqs_queue" "s3_event_queue" {
     deadLetterTargetArn = aws_sqs_queue.s3_event_dlq.arn
     maxReceiveCount     = 5
   })
+  kms_master_key_id                 = "alias/aws/sqs"
+  kms_data_key_reuse_period_seconds = 300
 }
 
 
@@ -65,4 +67,6 @@ resource "aws_lambda_event_source_mapping" "sqs_trigger" {
 
 resource "aws_sqs_queue" "s3_event_dlq" {
   name = "${local.queue_base_name}-dlq"
+  kms_master_key_id                 = "alias/aws/sqs"
+  kms_data_key_reuse_period_seconds = 300
 }
