@@ -309,6 +309,24 @@ resource "aws_cloudfront_function" "redirect_function" {
           }
         };
 
+      case "fhsaa.tribunals.gov.uk":
+        if (uri.toLowerCase() === "/decisions.htm") {
+          return {
+            statusCode: 301,
+            statusDescription: "Moved Permanently",
+            headers: {
+              "location": {"value": "http://phl.decisions.tribunals.gov.uk"}
+            }
+          };
+        }
+        return {
+          statusCode: 301,
+          statusDescription: "Moved Permanently",
+          headers: {
+            "location": {"value": "https://www.gov.uk/guidance/appeal-to-the-primary-health-lists-tribunal"}
+          }
+        };
+
       case "adjudicationpanel.tribunals.gov.uk":
         if (/^\/(Public|Admin|Decisions|Judgments)/i.test(uri)) {
           return {

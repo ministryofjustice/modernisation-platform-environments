@@ -36,15 +36,15 @@ locals {
 
   nginx_records_pre_migration = [
     "",
+    "adjudicationpanel",
     "charity",
     "consumercreditappeals",
-    "estateagentappeals",
-    "fhsaa"
+    "estateagentappeals"
   ]
 
   nginx_records_to_cloudfront = [
     "siac",
-    "adjudicationpanel"
+    "fhsaa"
   ]
 
   www_records = [
