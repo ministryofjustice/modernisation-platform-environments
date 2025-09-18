@@ -1,9 +1,10 @@
 locals {
-  s3_prefix_hyphen         = replace(var.s3_prefix, "/", "-")
-  s3_suffixes_hyphen       = replace(join("-", var.s3_suffixes), ".", "-")
+  s3_prefix_hyphen         = var.s3_prefix != null ? replace(var.s3_prefix, "/", "-") : ""
+  s3_suffixes_hyphen       = var.s3_suffixes != null ? replace(join("-", var.s3_suffixes), ".", "-") : ""
   bucket_function_elements = split(trimprefix(var.bucket.id, var.bucket_prefix), "-")
   bucket_function          = join("-", slice(local.bucket_function_elements, 0, length(local.bucket_function_elements) - 1))
   queue_base_name          = substr("${local.bucket_function}-${local.s3_prefix_hyphen}-${local.s3_suffixes_hyphen}-${var.lambda_function_name}", 0, 76)
+  sid_name                 = replace(local.queue_base_name, "-" ,"")
 }
 
 resource "aws_sqs_queue" "s3_event_queue" {
@@ -30,7 +31,7 @@ resource "aws_s3_bucket_notification" "s3_notification" {
 
 data "aws_iam_policy_document" "allow_s3_to_write" {
   statement {
-    sid    = "S3${var.bucket.id}/${var.s3_prefix}ToSQS"
+    sid    = "${local.sid_name}Permissions"
     effect = "Allow"
     principals {
         type        = "Service"
