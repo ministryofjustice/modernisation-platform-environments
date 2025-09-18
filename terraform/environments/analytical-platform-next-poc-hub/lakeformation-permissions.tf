@@ -82,3 +82,27 @@
 #     wildcard      = true
 #   }
 # }
+
+######
+resource "aws_lakeformation_permissions" "main_alpha_db" {
+  principal   = module.project_iam_roles["alpha"].arn
+  permissions = ["DESCRIBE"]
+
+  database {
+    name = aws_glue_catalog_database.main.name
+  }
+}
+
+resource "aws_lakeformation_permissions" "main_alpha_tag" {
+  principal   = module.project_iam_roles["alpha"].arn
+  permissions = ["DESCRIBE", "SELECT"]
+
+  lf_tag_policy {
+    resource_type = "TABLE"
+
+    expression {
+      key    = "access"
+      values = ["yes"]
+    }
+  }
+}

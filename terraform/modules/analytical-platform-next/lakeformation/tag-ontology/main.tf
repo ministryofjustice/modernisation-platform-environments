@@ -15,3 +15,11 @@ resource "aws_lakeformation_lf_tag" "sensitivity" {
     "contains-pii",
   ]
 }
+
+resource "aws_lakeformation_lf_tag" "access" {
+  key = "access"
+  values = [
+    "yes",
+    "no",
+  ]
+}
