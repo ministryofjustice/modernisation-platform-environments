@@ -58,7 +58,7 @@ resource "aws_lambda_function" "cloudwatch_log_alert" {
 ######################################
 
 resource "aws_lambda_permission" "allow_cwa_extract_logs" {
-  statement_id  = "AllowExecutionFromCloudWatchLogs"
+  statement_id  = "AllowExecutionFromCWAExtractLogs"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.cloudwatch_log_alert.function_name
   principal     = "logs.amazonaws.com"
@@ -66,7 +66,7 @@ resource "aws_lambda_permission" "allow_cwa_extract_logs" {
 }
 
 resource "aws_lambda_permission" "allow_cwa_file_transfer_logs" {
-  statement_id  = "AllowExecutionFromCloudWatchLogs"
+  statement_id  = "AllowExecutionFromCWAFileTransferLogs"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.cloudwatch_log_alert.function_name
   principal     = "logs.amazonaws.com"
