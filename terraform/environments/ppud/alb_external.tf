@@ -144,21 +144,6 @@ resource "aws_lb_listener" "WAM-Front-End-Prod" {
   }
 }
 
-resource "aws_lb_listener" "WAM-Front-End-Prod" {
-  count             = local.is-production == true ? 1 : 0
-  load_balancer_arn = aws_lb.WAM-ALB.arn
-  port              = "443"
-  protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
-  certificate_arn   = data.aws_acm_certificate.WAM_PROD_ALB[0].arn
-
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.WAM-Target-Group-Prod-2[0].arn
-  }
-}
-
-
 /*
 resource "aws_lb_target_group" "WAM-Target-Group" {
   name     = "WAM"
