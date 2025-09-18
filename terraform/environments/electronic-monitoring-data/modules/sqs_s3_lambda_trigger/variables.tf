@@ -19,6 +19,7 @@ variable "s3_suffixes" {
   description = "Suffixes to filter S3 events on"
   type        = list(string)
   nullable    = true
+  default     = null
 }
 
 variable "lambda_function_name" {
