@@ -6,6 +6,7 @@ module "quicksight" {
 
   project_name = local.project_name
   environment  = local.environment
+  account_id   = local.account_id
   tags         = local.tags
 
   notification_email = "david.seekins@necsws.com" # For testing change later.

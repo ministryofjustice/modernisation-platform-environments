@@ -1,0 +1,25 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "inspector2:CreateSbomExport",
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": "kms:GenerateDataKey*",
+      "Resource": "${aws_kms_key_sbom_arn}"
+    },
+    {
+      "Effect": "Allow",
+      "Action": "s3:PutObject",
+      "Resource": "${aws_s3_bucket_sbom_arn}/*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": "ec2:DescribeInstances",
+      "Resource": "*"
+    }
+  ]
+}

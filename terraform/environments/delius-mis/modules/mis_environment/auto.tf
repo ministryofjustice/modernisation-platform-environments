@@ -20,10 +20,6 @@ resource "aws_vpc_security_group_egress_rule" "auto_all_outbound" {
   ip_protocol       = "-1"
 }
 
-data "aws_security_group" "dsd_db" {
-  name = "delius-mis-${var.env_name}-dsd-db-ec2-instance-sg"
-}
-
 module "auto_instance" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v3.0.1"
 
@@ -65,7 +61,7 @@ module "auto_instance" {
         ad_password_secret_name = aws_secretsmanager_secret.ad_admin_password.name
         ad_domain_name          = var.environment_config.ad_domain_name
         ad_ip_list              = aws_directory_service_directory.mis_ad.dns_ip_addresses
-        branch                  = "TM/TM-1305/MIS-auto-config"
+        branch                  = "main"
       }
     )
   )

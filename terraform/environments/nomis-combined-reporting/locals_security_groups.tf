@@ -196,6 +196,13 @@ locals {
     web = {
       description = "Security group for tomcat web servers"
       ingress = {
+        all-from-self = {
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
+        }
         http7010 = {
           description     = "Allow http7010 ingress"
           from_port       = 7010
@@ -233,6 +240,13 @@ locals {
     bip = {
       description = "Security group for bip"
       ingress = {
+        all-from-self = {
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
+        }
         all-from-web = {
           description     = "Allow all ingress from web"
           from_port       = 0
@@ -252,6 +266,13 @@ locals {
     data = {
       description = "Security group for data subnet"
       ingress = {
+        all-from-self = {
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
+        }
         oracle1521 = {
           description = "Allow oracle database 1521 ingress"
           from_port   = "1521"

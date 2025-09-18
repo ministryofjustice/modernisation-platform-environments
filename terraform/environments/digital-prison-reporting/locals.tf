@@ -69,9 +69,7 @@ locals {
   federated_query_lambda_timeout_seconds       = local.application_data.accounts[local.environment].athena_federated_query_lambda_timeout_seconds
   federated_query_lambda_concurrent_executions = local.application_data.accounts[local.environment].athena_federated_query_lambda_concurrent_executions
   lambda_oracle_handler                        = "com.amazonaws.athena.connectors.oracle.OracleMuxCompositeHandler"
-  lambda_postgresql_handler                    = "com.amazonaws.athena.connectors.postgresql.PostGreSqlMuxCompositeHandler"
   athena_oracle_connector_type                 = "oracle"
-  athena_postgresql_connector_type             = "postgresql"
 
   # Glue Job parameters
   glue_placeholder_script_location = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/scripts/digital-prison-reporting-jobs-vLatest.scala"
@@ -116,6 +114,8 @@ locals {
   enable_slack_alerts     = local.application_data.accounts[local.environment].enable_slack_alerts
   enable_pagerduty_alerts = local.application_data.accounts[local.environment].enable_pagerduty_alerts
 
+  enable_dms_failure_alerts = local.application_data.accounts[local.environment].enable_dms_failure_alerts
+
   # DPR RDS Database
   enable_dpr_rds_db              = local.application_data.accounts[local.environment].dpr_rds_db.enable
   create_rds_replica             = local.application_data.accounts[local.environment].dpr_rds_db.create_replica
@@ -143,7 +143,7 @@ locals {
   rds_dbuilder_store_type        = "gp2"
   rds_dbuilder_init_size         = 10
   rds_dbuilder_max_size          = 50
-  rds_dbuilder_parameter_group   = "default.postgres14"
+  rds_dbuilder_parameter_group   = local.application_data.accounts[local.environment].domain_builder_rds_parameter_group
   rds_dbuilder_port              = 5432
   rds_dbuilder_user              = "domain_builder"
   enable_dbuilder_lambda         = local.application_data.accounts[local.environment].enable_domain_builder_lambda
@@ -361,6 +361,7 @@ locals {
   thrld_dms_cdc_inc_events_check    = local.application_data.accounts[local.environment].alarms.dms.cdc_inc_events_check.threshold
   period_dms_cdc_inc_events_check   = local.application_data.accounts[local.environment].alarms.dms.cdc_inc_events_check.period
 
+  create_postgres_tickle_function_failure_alarm = local.application_data.accounts[local.environment].alarms.lambda.postgres_tickle_function_failure.create
   enable_postgres_tickle_function_failure_alarm = local.application_data.accounts[local.environment].alarms.lambda.postgres_tickle_function_failure.enable
   thrld_postgres_tickle_function_failure_alarm  = local.application_data.accounts[local.environment].alarms.lambda.postgres_tickle_function_failure.threshold
   period_postgres_tickle_function_failure_alarm = local.application_data.accounts[local.environment].alarms.lambda.postgres_tickle_function_failure.period

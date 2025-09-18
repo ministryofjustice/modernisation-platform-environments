@@ -24,7 +24,7 @@ resource "aws_mwaa_environment" "main" {
   airflow_configuration_options = {
     "secrets.backend"                    = "airflow.providers.amazon.aws.secrets.secrets_manager.SecretsManagerBackend"
     "secrets.backend_kwargs"             = "{\"connections_prefix\": \"airflow/connections\", \"variables_prefix\": \"airflow/variables\"}"
-    "smtp.smtp_host"                     = "email-smtp.${data.aws_region.current.name}.amazonaws.com"
+    "smtp.smtp_host"                     = "email-smtp.${data.aws_region.current.region}.amazonaws.com"
     "smtp.smtp_port"                     = 587
     "smtp.smtp_starttls"                 = 1
     "smtp.smtp_user"                     = module.mwaa_ses_iam_user.iam_access_key_id

@@ -74,6 +74,14 @@ resource "aws_iam_role" "dataapi_cross_role" {
   )
 }
 
+# CrossAccount RDS Role/Policy Attachement
+resource "aws_iam_role_policy_attachment" "rds" {
+  #checkov:skip=CKV_AWS_274:Disallow IAM roles, users, and groups from using the AWS AdministratorAccess policy
+
+  role       = aws_iam_role.dataapi_cross_role.name
+  policy_arn = aws_iam_policy.rds_cross_policy.arn
+}
+
 # CrossAccount DataAPI Role/Policy Attachement
 resource "aws_iam_role_policy_attachment" "redshift_dataapi" {
   #checkov:skip=CKV_AWS_274:Disallow IAM roles, users, and groups from using the AWS AdministratorAccess policy

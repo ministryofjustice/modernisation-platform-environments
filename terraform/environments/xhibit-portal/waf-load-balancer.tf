@@ -30,6 +30,7 @@ resource "aws_lb" "waf_lb" {
   # checkov:skip=CKV_AWS_131: "Ensure that ALB drops HTTP headers"
   # checkov:skip=CKV_AWS_150: "Ensure that Load Balancer has deletion protection enabled"
   # checkov:skip=CKV2_AWS_76: "Ensure AWS ALB attached WAFv2 WebACL is configured with AMR for Log4j Vulnerability"
+  # checkov:skip=CKV2_AWS_28: "Ensure public facing ALB are protected by WAF"
   depends_on = [
     aws_security_group.waf_lb,
   ]
@@ -167,6 +168,31 @@ resource "aws_alb_listener_rule" "web_listener_rule" {
 
 }
 
+resource "aws_alb_listener_rule" "lb_dns_redirect" {
+  priority = 5
+
+  depends_on   = [aws_lb_listener.waf_lb_listener]
+  listener_arn = aws_lb_listener.waf_lb_listener.arn
+
+  action {
+    type = "redirect"
+
+    redirect {
+      status_code = "HTTP_301"
+      path        = "/Secure/Default.aspx"
+      host        = local.application_data.accounts[local.environment].public_dns_name_web
+    }
+  }
+
+  condition {
+    host_header {
+      values = [
+        aws_lb.waf_lb.dns_name
+      ]
+    }
+  }
+}
+
 resource "aws_route53_record" "external" {
   provider = aws.core-vpc
 
@@ -227,80 +253,79 @@ resource "aws_acm_certificate_validation" "waf_lb_cert_validation" {
   validation_record_fqdns = [for record in local.domain_types : record.name]
 }
 
-resource "aws_wafv2_web_acl" "waf_acl" {
-  # checkov:skip=CKV_AWS_192: "Ensure WAF prevents message lookup in Log4j2. See CVE-2021-44228 aka log4jshell"
-  name        = "waf-acl"
-  count       = local.is-production ? 0 : 1
-  description = "WAF for Xhibit Portal."
-  scope       = "REGIONAL"
+#resource "aws_wafv2_web_acl" "waf_acl" {
+#  # checkov:skip=CKV_AWS_192: "Ensure WAF prevents message lookup in Log4j2. See CVE-2021-44228 aka log4jshell"
+#  name        = "waf-acl"
+#  count       = local.is-production ? 0 : 1
+#  description = "WAF for Xhibit Portal."
+#  scope       = "REGIONAL"
 
-  default_action {
-    block {}
-  }
+#  default_action {
+#    block {}
+#  }
 
-  rule {
-    name     = "block-non-gb"
-    priority = 0
+#  rule {
+#    name     = "block-non-gb"
+#    priority = 0
 
-    action {
-      allow {}
-    }
+#    action {
+#      allow {}
+#    }
 
-    statement {
-      geo_match_statement {
-        country_codes = ["GB"]
-      }
-    }
+#    statement {
+#      geo_match_statement {
+#        country_codes = ["GB"]
+#      }
+#    }
 
-    visibility_config {
-      cloudwatch_metrics_enabled = true
-      metric_name                = "waf-acl-block-non-gb-rule-metric"
-      sampled_requests_enabled   = true
-    }
-  }
+#    visibility_config {
+#      cloudwatch_metrics_enabled = true
+#      metric_name                = "waf-acl-block-non-gb-rule-metric"
+#      sampled_requests_enabled   = true
+#    }
+#  }
 
-  rule {
-    name     = "aws-waf-common-rules"
-    priority = 1
+#  rule {
+#    name     = "aws-waf-common-rules"
+#    priority = 1
 
-    override_action {
-      count {}
-    }
+#    override_action {
+#      count {}
+#    }
 
-    statement {
-      managed_rule_group_statement {
-        name        = "AWSManagedRulesCommonRuleSet"
-        vendor_name = "AWS"
-      }
-    }
+#    statement {
+#      managed_rule_group_statement {
+#        name        = "AWSManagedRulesCommonRuleSet"
+#        vendor_name = "AWS"
+#      }
+#    }
 
-    visibility_config {
-      cloudwatch_metrics_enabled = true
-      metric_name                = "waf-acl-common-rules-metric"
-      sampled_requests_enabled   = true
-    }
-  }
+#    visibility_config {
+#      cloudwatch_metrics_enabled = true
+#      metric_name                = "waf-acl-common-rules-metric"
+#      sampled_requests_enabled   = true
+#    }
+#  }
 
-  tags = merge(
-    local.tags,
-    {
-      Name = "waf-acl-${var.networking[0].application}"
-    },
-  )
+#  tags = merge(
+#    local.tags,
+#    {
+#      Name = "waf-acl-${var.networking[0].application}"
+#    },
+#  )
 
-  visibility_config {
-    cloudwatch_metrics_enabled = true
-    metric_name                = "waf-acl-metric"
-    sampled_requests_enabled   = true
-  }
+#  visibility_config {
+#    cloudwatch_metrics_enabled = true
+#    metric_name                = "waf-acl-metric"
+#    sampled_requests_enabled   = true
+#  }
+#}
 
-}
-
-resource "aws_wafv2_web_acl_association" "aws_lb_waf_association" {
-  resource_arn = aws_lb.waf_lb.arn
-  count        = local.is-production ? 0 : 1
-  web_acl_arn  = aws_wafv2_web_acl.waf_acl[0].arn
-}
+# resource "aws_wafv2_web_acl_association" "aws_lb_waf_association" {
+#   resource_arn = aws_lb.waf_lb.arn
+#   count        = local.is-production ? 0 : 1
+#   web_acl_arn  = aws_wafv2_web_acl.waf_acl[0].arn
+# }
 
 # trivy:ignore:AVD-AWS-0086 reason: (HIGH): No public access block so not blocking public acls
 # trivy:ignore:AVD-AWS-0087 reason: (HIGH): No public access block so not blocking public policies
@@ -442,11 +467,11 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "default_encryptio
   }
 }
 
-resource "aws_wafv2_web_acl_logging_configuration" "waf_logs" {
-  count                   = local.is-production ? 0 : 1
-  log_destination_configs = [aws_s3_bucket.waf_logs[0].arn]
-  resource_arn            = aws_wafv2_web_acl.waf_acl[0].arn
-}
+#resource "aws_wafv2_web_acl_logging_configuration" "waf_logs" {
+#  count                   = local.is-production ? 0 : 1
+#  log_destination_configs = [aws_s3_bucket.waf_logs[0].arn]
+#  resource_arn            = aws_wafv2_web_acl.waf_acl[0].arn
+#}
 
 resource "aws_s3_bucket_policy" "waf_logs_policy" {
   count  = local.is-production ? 0 : 1

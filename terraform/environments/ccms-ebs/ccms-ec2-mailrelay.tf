@@ -16,8 +16,10 @@ resource "aws_instance" "ec2_mailrelay" {
     ignore_changes = [
       ebs_block_device,
       root_block_device,
+      ebs_optimized,
       user_data,
-      user_data_replace_on_change
+      user_data_replace_on_change,
+      tags
     ]
   }
 

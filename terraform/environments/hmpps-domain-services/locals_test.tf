@@ -126,13 +126,10 @@ locals {
         })
       })
 
-      test-rds-2-b = merge(local.ec2_instances.rds, {
+      test-rds-1-a = merge(local.ec2_instances.rds, {
         config = merge(local.ec2_instances.rds.config, {
           ami_name          = "hmpps_windows_server_2022_release_2025-04-02T00-00-40.543Z"
-          availability_zone = "eu-west-2b"
-          instance_profile_policies = concat(local.ec2_instances.rds.config.instance_profile_policies, [
-            "Ec2SecretPolicy"]
-          )
+          availability_zone = "eu-west-2a"
         })
         instance = merge(local.ec2_instances.rds.instance, {
           tags = {
@@ -140,28 +137,10 @@ locals {
           }
         })
         tags = merge(local.ec2_instances.rds.tags, {
-          domain-name = "azure.noms.root"
+          domain-name  = "azure.noms.root"
+          service-user = "svc_rds"
         })
-        cloudwatch_metric_alarms = null
       })
-    }
-
-    iam_policies = {
-      Ec2SecretPolicy = {
-        description = "Permissions required for secret value access by instances"
-        statements = [
-          {
-            effect = "Allow"
-            actions = [
-              "secretsmanager:GetSecretValue",
-              "secretsmanager:PutSecretValue",
-            ]
-            resources = [
-              "arn:aws:secretsmanager:*:*:secret:/microsoft/AD/azure.noms.root/shared-passwords-*",
-            ]
-          }
-        ]
-      }
     }
 
     lbs = {
@@ -174,7 +153,7 @@ locals {
           })
           test-rds-1-https = merge(local.lbs.public.instance_target_groups.https, {
             attachments = [
-              { ec2_instance_name = "test-rds-2-b" },
+              { ec2_instance_name = "test-rds-1-a" },
             ]
           })
         }
@@ -223,14 +202,15 @@ locals {
 
     patch_manager = {
       patch_schedules = {
-        group1 = "cron(00 06 ? * WED *)" # 3am wed for prod for non-prod env's we have to work around the overnight shutdown  
-        group2 = "cron(00 06 ? * THU *)" # 3am thu for prod
+        group1 = "cron(00 06 ? * WED *)" # 6am wed for prod for non-prod env's we have to work around the overnight shutdown  
+        group2 = "cron(00 06 ? * THU *)" # 6am thu for prod
+        manual = "cron(00 21 31 2 ? *)"  # 9pm 31 feb e.g. impossible date to allow for manual patching of otherwise enrolled instances
       }
       maintenance_window_duration = 2 # 4 for prod
       maintenance_window_cutoff   = 1 # 2 for prod
       patch_classifications = {
-        # REDHAT_ENTERPRISE_LINUX = ["Security", "Bugfix"] # Linux Options=(Security,Bugfix,Enhancement,Recommended,Newpackage)
-        WINDOWS = ["SecurityUpdates", "CriticalUpdates"]
+        REDHAT_ENTERPRISE_LINUX = ["Security", "Bugfix"] # Linux Options=(Security,Bugfix,Enhancement,Recommended,Newpackage)
+        WINDOWS                 = ["SecurityUpdates", "CriticalUpdates"]
       }
     }
 

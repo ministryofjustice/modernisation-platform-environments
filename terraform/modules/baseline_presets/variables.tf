@@ -46,6 +46,7 @@ variable "options" {
     enable_ssm_missing_metric_monitoring         = optional(bool, false)           # create alarm if SSM command metrics are missing
     enable_vmimport                              = optional(bool, false)           # create role for vm imports
     enable_xsiam_cloudwatch_integration          = optional(bool, false)           # create data_firehose for cloudwatch groups for xsiam
+    enable_xsiam_s3_integration                  = optional(bool, false)           # create IAM role and policy for xsiam for S3 log collection
     route53_resolver_rules                       = optional(map(list(string)), {}) # create route53 resolver rules; list of map keys to filter local.route53_resolver_rules_all
     iam_service_linked_roles                     = optional(list(string))          # create iam service linked roles; list of map keys to filter local.iam_service_linked_roles; default is to create all
     s3_bucket_name                               = optional(string)                # override default general purpose bucket name

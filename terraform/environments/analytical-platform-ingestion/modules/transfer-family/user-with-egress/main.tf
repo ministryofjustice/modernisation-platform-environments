@@ -26,9 +26,12 @@ data "aws_iam_policy_document" "this" {
     ]
   }
   statement {
-    sid       = "AllowS3LandingBucketObjectActions"
-    effect    = "Allow"
-    actions   = ["s3:PutObject"]
+    sid    = "AllowS3LandingBucketObjectActions"
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:GetObject"
+    ]
     resources = ["arn:aws:s3:::${var.landing_bucket}/${var.name}/*"]
   }
   statement {
@@ -47,7 +50,7 @@ module "policy" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.44.1"
+  version = "5.58.0"
 
   name_prefix = "transfer-user-${var.name}"
 
@@ -58,7 +61,7 @@ module "role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.44.1"
+  version = "5.58.0"
 
   create_role = true
 

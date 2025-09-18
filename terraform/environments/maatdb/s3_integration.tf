@@ -1,17 +1,16 @@
 # S3 buckets for MAATDB
 
-# These are build from the local bucket_names and whether the variable build_s3 is true.
-
-
-data "aws_kms_key" "laa_general" {
-  key_id = "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["core-shared-services-production"]}:alias/general-laa"
-}
+# These are build from the local bucket_names and IAM resources whether the variable build_s3 is true.
+# These support integration between MAATDB RDS and S3 for use by outbound ftp jobs.
 
 locals {
 
-  laa_general_kms_arn = data.aws_kms_key.laa_general.arn
-
   ftp_directions = ["inbound", "outbound"]
+
+  expiration_json = local.is-production ? "{}" : jsonencode({
+    days                         = 7
+    expired_object_delete_marker = false
+  })
 
 }
 
@@ -33,16 +32,23 @@ module "s3_bucket" {
 
   lifecycle_rule = [
     {
-      id      = "main"
+      id      = local.is-production ? "main" : "main-nonprod"
       enabled = "Enabled"
       prefix  = ""
 
       tags = {
         rule      = "log"
-        autoclean = "false"
+        autoclean = local.is-production ? "false" : "true"
       }
 
-      transition = [
+      # Decode to a map. In prod this becomes {}, so the module skips the block.
+      expiration = jsondecode(local.expiration_json)
+
+      noncurrent_version_expiration = {
+        days = local.is-production ? 31 : 7
+      }
+
+      transition = local.is-production ? [
         {
           days          = 90
           storage_class = "STANDARD_IA"
@@ -51,9 +57,10 @@ module "s3_bucket" {
           days          = 180
           storage_class = "GLACIER"
         }
-      ]
+      ] : []
     }
   ]
+
 
   tags = merge(local.tags, {
     Name = "${local.application_name}-${local.environment}-ftp-${each.key}"
@@ -189,22 +196,22 @@ resource "aws_iam_access_key" "ftp_user_key" {
 
 # Secrets Manager to capture the access key
 
-resource "aws_secretsmanager_secret" "ftp_access_key_secret" {
+resource "aws_secretsmanager_secret" "s3ftp_access_key_secret" {
   #checkov:skip=CKV_AWS_149:"Secret to be manually rotated"
   #checkov:skip=CKV2_AWS_57:"Secret to be manually rotated"
   count = local.build_s3 ? 1 : 0
-  name  = "ses-ftp-user-access-key"
+  name  = "s3ftp-user-access-key"
   tags = merge(
     local.tags,
     {
-      Name = "ses-ftp-user-access-key"
+      Name = "s3ftp-user-access-key"
     }
   )
 }
 
-resource "aws_secretsmanager_secret_version" "ftp_access_key_secret_version" {
+resource "aws_secretsmanager_secret_version" "s3ftp_access_key_secret_version" {
   count     = local.build_s3 ? 1 : 0
-  secret_id = aws_secretsmanager_secret.ftp_access_key_secret[0].id
+  secret_id = aws_secretsmanager_secret.s3ftp_access_key_secret[0].id
   secret_string = jsonencode({
     IAM_ACCESS_KEY_ID     = aws_iam_access_key.ftp_user_key[0].id
     IAM_SECRET_ACCESS_KEY = aws_iam_access_key.ftp_user_key[0].secret
@@ -223,6 +230,7 @@ resource "aws_iam_user_policy" "ftp_user_policy" {
 
 data "aws_iam_policy_document" "ftp_user_policy" {
   statement {
+    sid    = "S3BucketAccess"
     effect = "Allow"
     actions = [
       "s3:DeleteObject",
@@ -239,6 +247,16 @@ data "aws_iam_policy_document" "ftp_user_policy" {
         "${bucket.bucket.arn}/*"
       ]
     ])
+  }
+  statement {
+    sid    = "KMSPermissions"
+    effect = "Allow"
+    actions = [
+      "kms:GenerateDataKey",
+      "kms:Decrypt",
+      "kms:Encrypt"
+    ]
+    resources = [local.laa_general_kms_arn]
   }
 }
 

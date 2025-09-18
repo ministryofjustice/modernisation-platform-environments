@@ -2,7 +2,7 @@ module "definition_upload_lambda" {
   #checkov:skip=CKV_TF_1:Module is from Terraform registry
 
   source  = "terraform-aws-modules/lambda/aws"
-  version = "7.21.0"
+  version = "8.0.1"
 
   publish        = true
   create_package = false
@@ -60,7 +60,7 @@ module "scan_lambda" {
   #checkov:skip=CKV_TF_1:Module is from Terraform registry
 
   source  = "terraform-aws-modules/lambda/aws"
-  version = "7.21.0"
+  version = "8.0.1"
 
   publish        = true
   create_package = false
@@ -136,7 +136,7 @@ module "transfer_lambda" {
   #checkov:skip=CKV_TF_1:Module is from Terraform registry
 
   source  = "terraform-aws-modules/lambda/aws"
-  version = "7.21.0"
+  version = "8.0.1"
 
   publish        = true
   create_package = false
@@ -181,7 +181,7 @@ module "transfer_lambda" {
       sid       = "AllowSecretsManager"
       effect    = "Allow"
       actions   = ["secretsmanager:GetSecretValue"]
-      resources = ["arn:aws:secretsmanager:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:secret:ingestion/*"]
+      resources = ["arn:aws:secretsmanager:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:secret:ingestion/*"]
     },
     s3_source_object = {
       sid    = "AllowSourceObject"
@@ -244,7 +244,7 @@ module "notify_quarantined_lambda" {
   #checkov:skip=CKV_TF_1:Module is from Terraform registry
 
   source  = "terraform-aws-modules/lambda/aws"
-  version = "7.21.0"
+  version = "8.0.1"
 
   publish        = true
   create_package = false
@@ -295,13 +295,13 @@ module "notify_quarantined_lambda" {
       sid       = "AllowSecretsManager"
       effect    = "Allow"
       actions   = ["secretsmanager:GetSecretValue"]
-      resources = ["arn:aws:secretsmanager:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:secret:ingestion/*"]
+      resources = ["arn:aws:secretsmanager:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:secret:ingestion/*"]
     }
   }
   allowed_triggers = {
     "sns" = {
       principal  = "sns.amazonaws.com"
-      source_arn = "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${module.quarantined_topic.topic_name}"
+      source_arn = "arn:aws:sns:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:${module.quarantined_topic.topic_name}"
     }
   }
 }
@@ -310,7 +310,7 @@ module "notify_transferred_lambda" {
   #checkov:skip=CKV_TF_1:Module is from Terraform registry
 
   source  = "terraform-aws-modules/lambda/aws"
-  version = "7.21.0"
+  version = "8.0.1"
 
   publish        = true
   create_package = false
@@ -358,13 +358,13 @@ module "notify_transferred_lambda" {
       sid       = "AllowSecretsManager"
       effect    = "Allow"
       actions   = ["secretsmanager:GetSecretValue"]
-      resources = ["arn:aws:secretsmanager:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:secret:ingestion/*"]
+      resources = ["arn:aws:secretsmanager:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:secret:ingestion/*"]
     }
   }
   allowed_triggers = {
     "sns" = {
       principal  = "sns.amazonaws.com"
-      source_arn = "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${module.transferred_topic.topic_name}"
+      source_arn = "arn:aws:sns:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:${module.transferred_topic.topic_name}"
     }
   }
 }

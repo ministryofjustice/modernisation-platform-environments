@@ -176,7 +176,7 @@ variable "disable_overnight_scheduler" {
 variable "morning_cron_schedule" {
   description = "The cron schedule for the morning scheduler"
   type        = string
-  default     = "0 7 * * 1-5"
+  default     = "0 6 * * 1-5"
 }
 
 variable "overnight_cron_schedule" {
@@ -310,4 +310,10 @@ variable "ecs_role_additional_policies_arns" {
 variable "secret_kms_key_arn" {
   description = "The ARN of the KMS key to use for secrets"
   type        = string
+}
+
+variable "list_of_target_group_arns" {
+  description = "A list of target group ARNs to use for the ECS services. The key must match the name of the ecs service to be picked up"
+  type        = map(string)
+  default     = {}
 }

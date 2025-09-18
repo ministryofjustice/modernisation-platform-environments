@@ -2,7 +2,7 @@
 resource "aws_ecs_capacity_provider" "managed" {
   name = "${local.application_data.accounts[local.environment].app_name}-capacity-provider-managed"
   auto_scaling_group_provider {
-    auto_scaling_group_arn = aws_autoscaling_group.cluster-scaling-group-managed.arn #--OUTSTANDING RESOURCE
+    auto_scaling_group_arn = aws_autoscaling_group.cluster-scaling-group-managed.arn
   }
 }
 
@@ -45,12 +45,12 @@ resource "aws_ecs_task_definition" "admin" {
   }
   volume {
     name      = "inbound_volume"
-    host_path = "/home/ec2-user/inbound" #--Don't like the look of this, revisit. AW
+    host_path = "/home/ec2-user/inbound"
   }
 
   volume {
     name      = "outbound_volume"
-    host_path = "/home/ec2-user/outbound" #--Don't like the look of this, revisit. AW
+    host_path = "/home/ec2-user/outbound"
   }
 
   container_definitions = templatefile(
@@ -74,6 +74,7 @@ resource "aws_ecs_task_definition" "admin" {
       ebs_ds_url           = local.application_data.accounts[local.environment].admin_ebs_ds_url
       ebs_ds_username      = local.application_data.accounts[local.environment].admin_ebs_ds_username
       ebs_ds_password      = aws_secretsmanager_secret.ebs_ds_password.arn
+      trust_store_password = aws_secretsmanager_secret.trust_store_password.arn
       ebssms_ds_url        = local.application_data.accounts[local.environment].admin_ebssms_ds_url
       ebssms_ds_username   = local.application_data.accounts[local.environment].admin_ebs_ds_username
       ebssms_ds_password   = aws_secretsmanager_secret.ebssms_ds_password.arn
@@ -161,16 +162,17 @@ resource "aws_ecs_task_definition" "managed" {
   container_definitions = templatefile(
     "${path.module}/templates/task_definition_managed.json.tpl",
     {
-      app_name            = local.application_data.accounts[local.environment].app_name
-      app_image           = local.application_data.accounts[local.environment].managed_app_image
-      managed_server_port = local.application_data.accounts[local.environment].managed_server_port
-      admin_server_port   = local.application_data.accounts[local.environment].admin_server_port
-      aws_region          = local.application_data.accounts[local.environment].aws_region
-      container_version   = local.application_data.accounts[local.environment].managed_container_version
-      admin_host          = aws_route53_record.admin.fqdn
-      soa_password        = aws_secretsmanager_secret.soa_password.arn
-      ms_hostname         = aws_route53_record.managed.fqdn
-      wl_mem_args         = local.application_data.accounts[local.environment].managed_wl_mem_args
+      app_name             = local.application_data.accounts[local.environment].app_name
+      app_image            = local.application_data.accounts[local.environment].managed_app_image
+      managed_server_port  = local.application_data.accounts[local.environment].managed_server_port
+      admin_server_port    = local.application_data.accounts[local.environment].admin_server_port
+      aws_region           = local.application_data.accounts[local.environment].aws_region
+      container_version    = local.application_data.accounts[local.environment].managed_container_version
+      admin_host           = aws_route53_record.admin.fqdn
+      soa_password         = aws_secretsmanager_secret.soa_password.arn
+      trust_store_password = aws_secretsmanager_secret.trust_store_password.arn
+      ms_hostname          = aws_route53_record.managed.fqdn
+      wl_mem_args          = local.application_data.accounts[local.environment].managed_wl_mem_args
     }
   )
 }

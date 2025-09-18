@@ -34,14 +34,14 @@ The NECSWS helpdesk hours are 24 x 7 x 365
 ### **Incident contact details:**
 
 YJS Helpdesk Tel:    01429 558255
-YJS Helpdesk Email:    yjafsupport@necsws.com
+YJS Helpdesk Email:    <yjafsupport@necsws.com>
 
 <!-- How people can raise an urgent issue with your service. This must not be the email address or phone number of an individual on your team, it should be a shared email address, phone number, or website that allows someone with an urgent issue to raise it quickly. -->
 
 ### **Service team contact:**
 
 YJS Helpdesk Tel:    01429 558255
-YJS Helpdesk Email:    yjafsupport@necsws.com
+YJS Helpdesk Email:    <yjafsupport@necsws.com>
 
 <!-- How people with non-urgent issues or questions can get in touch with your team. As with incident contact details, this must not be the email address or phone number of an individual on the team, it should be a shared email address or a ticket tracking system.-->
 

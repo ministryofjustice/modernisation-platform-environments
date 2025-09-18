@@ -44,45 +44,64 @@ resource "aws_iam_policy" "ftp_policy" {
         Resource = "*"
       },
       {
-        Action = ["s3:*"],
+        Action : [
+          "s3:PutObject",
+          "s3:GetObject",
+          "s3:ListBucket",
+          "s3:DeleteObject"
+        ],
         Effect = "Allow",
         Resource = [
           "arn:aws:s3:::${var.ftp_bucket}",
           "arn:aws:s3:::${var.ftp_bucket}/*"
         ]
+      },
+      {
+        Action : [
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:DescribeSecret",
+          "secretsmanager:ListSecretVersionIds"
+        ],
+        Effect   = "Allow",
+        Resource = var.secret_arn
       }
     ]
   })
 }
+
+
+
 
 resource "aws_iam_role_policy_attachment" "ftp_lambda_policy_attach" {
   role       = aws_iam_role.ftp_lambda_role.name
   policy_arn = aws_iam_policy.ftp_policy.arn
 }
 
-
 ### lambda layer for python dependencies
 resource "aws_lambda_layer_version" "ftp_layer" {
-  layer_name               = "ftpclientlibs"
-  compatible_runtimes      = ["python3.7"]
+  layer_name               = "ftpclientlayer"
+  compatible_runtimes      = ["python3.13"]
   s3_bucket                = var.s3_bucket_ftp
   s3_key                   = var.s3_object_ftp_clientlibs
   compatible_architectures = ["x86_64"]
-  description              = "Lambda Layer for ccms ebs ftp lambda"
+  description              = "Lambda Layer for ccms ebs ftp lambda contains pycurl and other dependencies"
 }
 #### lambda function for ftp inbound
 resource "aws_lambda_function" "ftp_lambda" {
   function_name = var.lambda_name
   role          = aws_iam_role.ftp_lambda_role.arn
   handler       = "ftp-client.lambda_handler"
-  runtime       = "python3.7"
-  timeout       = 300
-  memory_size   = 256
-  # filename         = "ftp-client.zip"
-  # source_code_hash = filebase64sha256(data.archive_file.ftp_zip.output_path)
+  runtime       = "python3.13"
+  timeout       = 900
+  memory_size   = var.lambda_memory # Sets memory defaults to 4gb
+  layers        = [aws_lambda_layer_version.ftp_layer.arn]
+
   s3_bucket = var.s3_bucket_ftp
   s3_key    = var.s3_object_ftp_client
-  layers    = [aws_lambda_layer_version.ftp_layer.arn]
+
+  ephemeral_storage {
+    size = var.lambda_storage # Sets ephemeral storage defaults to 1GB (/tmp space)
+  }
 
   vpc_config {
     subnet_ids         = var.subnet_ids
@@ -91,66 +110,44 @@ resource "aws_lambda_function" "ftp_lambda" {
 
   environment {
     variables = {
-      HOST         = var.ftp_host
-      PORT         = var.ftp_port
-      PROTOCOL     = var.ftp_protocol
-      FILETYPES    = var.ftp_file_types
-      TRANSFERTYPE = var.ftp_transfer_type
-      LOCALPATH    = var.ftp_local_path
-      REMOTEPATH   = var.ftp_remote_path
-      REQUIRE_SSL  = var.ftp_require_ssl
-      INSECURE     = var.ftp_insecure
-      CA_CERT      = var.ftp_ca_cert
-      CERT         = var.ftp_cert
-      KEY          = var.ftp_key
-      KEY_TYPE     = var.ftp_key_type
-      USER         = var.ftp_user
-      PASSWORD     = var.ftp_password_path
-      SSH_KEY      = var.ssh_key_path
-      S3BUCKET     = var.ftp_bucket
-      FILEREMOVE   = var.ftp_file_remove
+      PORT                  = var.ftp_port
+      PROTOCOL              = var.ftp_protocol
+      FILETYPES             = var.ftp_file_types
+      TRANSFERTYPE          = var.ftp_transfer_type
+      LOCALPATH             = var.ftp_local_path
+      REMOTEPATH            = var.ftp_remote_path
+      REQUIRE_SSL           = var.ftp_require_ssl
+      CA_CERT               = var.ftp_ca_cert
+      CERT                  = var.ftp_cert
+      KEY                   = var.ftp_key
+      KEY_TYPE              = var.ftp_key_type
+      S3BUCKET              = var.ftp_bucket
+      FILEREMOVE            = var.ftp_file_remove
+      SKIP_KEY_VERIFICATION = var.skip_key_verification
+      SECRET_NAME           = var.secret_name
     }
   }
 }
-### cw rule for schedule
+# ### cw rule for schedule
 resource "aws_cloudwatch_event_rule" "ftp_schedule" {
+  count               = contains(var.enabled_cron_in_environments, var.env) ? 1 : 0
   name                = "${var.lambda_name}-schedule"
-  schedule_expression = var.ftp_cron
+  schedule_expression = var.env == "production" ? "cron(0 10 * * ? *)" : "cron(0 10 ? * MON-FRI *)"
 }
 ### cw event lambda target
 resource "aws_cloudwatch_event_target" "ftp_target" {
-  rule      = aws_cloudwatch_event_rule.ftp_schedule.name
+  count     = contains(var.enabled_cron_in_environments, var.env) ? 1 : 0
+  rule      = aws_cloudwatch_event_rule.ftp_schedule[count.index].name
   target_id = "ftp-lambda"
   arn       = aws_lambda_function.ftp_lambda.arn
 }
 
-### attaching lambda iam role to inbound bucket
+### allow cw to event in lambda
 resource "aws_lambda_permission" "ftp_permission" {
+  count         = contains(var.enabled_cron_in_environments, var.env) ? 1 : 0
   statement_id  = "AllowExecutionFromCloudWatch"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.ftp_lambda.function_name
   principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.ftp_schedule.arn
+  source_arn    = aws_cloudwatch_event_rule.ftp_schedule[count.index].arn
 }
-
-
-### crating cw metric alarm
-# resource "aws_cloudwatch_metric_alarm" "ftp_errors" {
-#   alarm_name          = "${var.lambda_name}-Errors"
-#   comparison_operator = "GreaterThanThreshold"
-#   evaluation_periods  = 1
-#   metric_name         = "Errors"
-#   namespace           = "AWS/Lambda"
-#   period              = 60
-#   statistic           = "Sum"
-#   threshold           = 0
-#   treat_missing_data  = "ignore"
-
-#   dimensions = {
-#     FunctionName = aws_lambda_function.ftp_lambda.function_name
-#   }
-
-#   alarm_description = "Errors occurred in Lambda"
-#   alarm_actions     = [var.sns_topic_sev5, var.sns_topic_ops]
-#   ok_actions        = [var.sns_topic_sev5, var.sns_topic_ops]
-# }

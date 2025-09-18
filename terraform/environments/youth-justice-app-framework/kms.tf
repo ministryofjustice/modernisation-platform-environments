@@ -55,6 +55,47 @@ module "kms" {
           identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/update-dc-names-lambda-role"]
         }
       ]
+    },
+    {
+      sid    = "AllowInspectorUseOfKMSKey",
+      effect = "Allow",
+      principals = [
+        {
+          type        = "Service"
+          identifiers = ["inspector2.amazonaws.com"]
+        }
+      ],
+      actions = [
+        "kms:Encrypt",
+        "kms:Decrypt",
+        "kms:GenerateDataKey*",
+        "kms:DescribeKey"
+      ],
+      resources = ["*"]
+    },
+    {
+      sid = "AllowSESPublishToSNSEncryptedTopics"
+      actions = [
+        "kms:GenerateDataKey*",
+        "kms:Decrypt",
+        "kms:Encrypt"
+      ]
+      resources = ["*"]
+
+      principals = [
+        {
+          type        = "Service"
+          identifiers = ["ses.amazonaws.com"]
+        }
+      ]
+
+      conditions = [
+        {
+          test     = "StringEquals"
+          variable = "AWS:SourceAccount"
+          values   = [data.aws_caller_identity.current.account_id]
+        }
+      ]
     }
   ]
   tags = local.tags

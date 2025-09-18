@@ -39,7 +39,7 @@
       "support_email": "dts-legacy-apps-support-team@hmcts.net",
       "rds_port": "5432",
       "domain_name": "modernisation-platform.service.justice.gov.uk",
-      "ecs_memory": 4096,
+      "ecs_memory": 8192,
       "ecs_cpu": 2048
     },
     "production": {

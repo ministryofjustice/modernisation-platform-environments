@@ -10,6 +10,7 @@ locals {
     migration_environment_abbreviated_name = "del"
     migration_environment_short_name       = "stage"
     migration_environment_private_cidr     = ["10.160.32.0/22", "10.160.36.0/22", "10.160.40.0/22"]
+    migration_environment_db_cidr          = ["10.162.110.0/25", "10.162.108.0/24", "10.162.109.0/24"]
     cloudwatch_alarm_schedule              = true
     cloudwatch_alarm_disable_time          = "20:45"
     cloudwatch_alarm_enable_time           = "06:15"
@@ -336,9 +337,10 @@ locals {
 
   # MIS DB config
   mis_db_config_stage = {
-    instance_type  = "r7i.4xlarge"
-    instance_count = 0
-    ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
+    instance_type  = "r7i.4xlarge" # manually turn off when not in use to save costs
+    instance_count = 1
+    # most recent 8_5 image, ami builder needs fixing after this
+    ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2025-03-02T00-00-34.442Z"
 
     instance_policies = {
       "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access
@@ -383,6 +385,8 @@ locals {
       ansible_repo_basedir = "ansible"
       ansible_args         = "oracle_19c_install"
     }
+
+    enable_cloudwatch_alarms = false
   }
 
   fsx_config_stage = {

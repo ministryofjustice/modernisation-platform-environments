@@ -166,7 +166,9 @@ locals {
           "nomis-development",
           "nomis-data-hub-development",
           "oasys-development",
+#TM-1524-remove-dev-test-environments
           "oasys-national-reporting-development",
+main
         ]
       }
     }

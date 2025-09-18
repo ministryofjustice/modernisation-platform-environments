@@ -61,15 +61,6 @@ resource "aws_iam_policy" "maat_ec2_instance_role_policy" {
           "s3:*Object*",
           "s3:GetObjectACL",
           "s3:putObjectACL",
-          "ecs:ExecuteCommand",
-          "ssm:StartSession",
-          "ssm:DescribeSessions",
-          "ssm:GetSession",
-          "ssm:TerminateSession",
-          "ssmmessages:CreateControlChannel",
-          "ssmmessages:CreateDataChannel",
-          "ssmmessages:OpenControlChannel",
-          "ssmmessages:OpenDataChannel",
           "kms:Decrypt",
           "kms:Encrypt",
           "kms:GenerateDataKey",
@@ -537,7 +528,7 @@ resource "aws_iam_role_policy_attachment" "maat_ecs_tasks_role_policy_attachment
 resource "aws_ecs_task_definition" "maat_ecs_task_definition" {
   family             = "${local.application_name}-ecs-task-definition"
   execution_role_arn = aws_iam_role.maat_ec2_instance_role.arn
-  task_role_arn            = aws_iam_role.maat_ec2_instance_role.arn
+  task_role_arn      = aws_iam_role.maat_ec2_instance_role.arn
 
   container_definitions = templatefile("maat-task-definition.json",
     {

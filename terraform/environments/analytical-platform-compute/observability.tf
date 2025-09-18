@@ -9,7 +9,7 @@ module "observability_platform_tenant" {
   enable_prometheus                 = true
   enable_xray                       = true
   additional_policies = {
-    managed_prometheus_kms_access = module.managed_prometheus_kms_access_iam_policy.arn
+    managed_prometheus_kms_access = local.environment_configuration.managed_prometheus_kms_access_iam_policy_arn
   }
 
   tags = local.tags
@@ -22,7 +22,7 @@ module "analytical_platform_observability" {
   enable_aws_xray_read_only_access      = true
 
   additional_policies = {
-    managed_prometheus_kms_access = module.managed_prometheus_kms_access_iam_policy.arn
+    managed_prometheus_kms_access = local.environment_configuration.managed_prometheus_kms_access_iam_policy_arn
   }
 
   tags = local.tags

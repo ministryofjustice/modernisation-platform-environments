@@ -87,7 +87,7 @@ resource "aws_ecs_task_definition" "dacp_task_definition" {
     }
   ])
   runtime_platform {
-    operating_system_family = "WINDOWS_SERVER_2019_CORE"
+    operating_system_family = "WINDOWS_SERVER_2022_CORE"
     cpu_architecture        = "X86_64"
   }
 }
@@ -162,7 +162,7 @@ resource "aws_ecs_task_definition" "dacp_task_definition_dev" {
     }
   ])
   runtime_platform {
-    operating_system_family = "WINDOWS_SERVER_2019_CORE"
+    operating_system_family = "WINDOWS_SERVER_2022_CORE"
     cpu_architecture        = "X86_64"
   }
 }
@@ -172,7 +172,7 @@ resource "aws_ecs_service" "dacp_ecs_service" {
     aws_lb_listener.dacp_lb
   ]
   count                             = local.is-development ? 0 : 1
-  name                              = var.networking[0].application
+  name                              = "${var.networking[0].application}-win2022"
   cluster                           = aws_ecs_cluster.dacp_cluster.id
   task_definition                   = aws_ecs_task_definition.dacp_task_definition[0].arn
   launch_type                       = "FARGATE"
@@ -195,6 +195,10 @@ resource "aws_ecs_service" "dacp_ecs_service" {
   deployment_controller {
     type = "ECS"
   }
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_ecs_service" "dacp_ecs_service_dev" {
@@ -202,7 +206,7 @@ resource "aws_ecs_service" "dacp_ecs_service_dev" {
     aws_lb_listener.dacp_lb
   ]
   count                             = local.is-development ? 1 : 0
-  name                              = var.networking[0].application
+  name                              = "${var.networking[0].application}-win2022"
   cluster                           = aws_ecs_cluster.dacp_cluster.id
   task_definition                   = aws_ecs_task_definition.dacp_task_definition_dev[0].arn
   launch_type                       = "FARGATE"
@@ -224,6 +228,10 @@ resource "aws_ecs_service" "dacp_ecs_service_dev" {
 
   deployment_controller {
     type = "ECS"
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 }
 

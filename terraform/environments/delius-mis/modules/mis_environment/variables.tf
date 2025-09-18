@@ -70,6 +70,16 @@ variable "auto_config" {
   default = null #optional
 }
 
+variable "dfi_config" {
+  type    = any
+  default = null #optional
+}
+
+variable "dfi_report_bucket_config" {
+  type    = any
+  default = null #optional
+}
+
 variable "deploy_oracle_stats" {
   description = "for deploying Oracle stats bucket"
   default     = true
@@ -90,4 +100,23 @@ variable "pagerduty_integration_key" {
 variable "domain_join_ports" {
   description = "Ports required for domain join"
   type        = any
+}
+
+variable "lb_config" {
+  description = "params for Classic Load Balancer"
+  type        = any
+  default     = null
+}
+
+variable "datasync_config" {
+  description = "Configuration for DataSync agent and task to sync S3 to FSX"
+  type = object({
+    source_s3_bucket_arn       = string
+    source_s3_subdirectory     = optional(string, "/dfinterventions/dfi/csv/reports/")
+    fsx_domain                 = optional(string, "delius-mis-dev.internal")
+    bandwidth_throttle         = optional(number)
+    schedule_expression        = optional(string, "cron(15 4 * * ? *)")  # Default: DataSync at 04:15 UTC
+    lambda_schedule_expression = optional(string, "cron(0 4 * * ? *)")   # Default: Lambda at 04:00 UTC
+  })
+  default = null
 }

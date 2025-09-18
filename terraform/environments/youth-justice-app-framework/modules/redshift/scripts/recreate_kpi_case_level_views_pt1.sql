@@ -1,6 +1,4 @@
 SET enable_case_sensitive_identifier TO true;
- 
- SET enable_case_sensitive_identifier TO true;
 
 /* RQEV2-nu8Ad7ecuv */
 CREATE MATERIALIZED VIEW yjb_kpi_case_level.kpi10_victim_template distkey (return_status_id) sortkey (return_status_id) AS WITH template AS (

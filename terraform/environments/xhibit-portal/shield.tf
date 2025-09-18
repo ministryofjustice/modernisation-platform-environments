@@ -1,6 +1,6 @@
 # Retrieve the protection ID of the ingestion-lb protection, so it can be excluded
 locals {
-  excluded_resource_arns = [aws_elb.ingestion_lb.arn]
+  excluded_resource_arns = [aws_elb.ingestion_lb.arn, aws_lb.waf_lb.arn, aws_lb.prtg_lb.arn]
 }
 
 data "aws_shield_protection" "excluded" {
@@ -17,14 +17,6 @@ module "shield" {
   application_name     = local.application_name
   excluded_protections = [for e in data.aws_shield_protection.excluded : e.id]
   resources = {
-    prtg_lb = {
-      action = "block"
-      arn    = aws_lb.prtg_lb.arn
-    }
-    waf_lb = {
-      action = "block"
-      arn    = aws_lb.waf_lb.arn
-    }
   }
   waf_acl_rules = {
     example = {

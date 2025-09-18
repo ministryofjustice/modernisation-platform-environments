@@ -18,6 +18,20 @@ resource "aws_vpc_security_group_ingress_rule" "ancillary_alb_ingress_https_glob
   cidr_ipv4         = each.key # Global Protect VPN
 }
 
+# Necessary for Unit tests from Legacy
+resource "aws_vpc_security_group_ingress_rule" "test_ingress" {
+  #checkov:skip=CKV_AWS_23 "ignore"
+  for_each = var.env_name == "test" ? {
+    for cidr in local.legacy_test_natgw_ips : cidr => cidr
+  } : {}
+
+  security_group_id = aws_security_group.ancillary_alb_security_group.id
+  cidr_ipv4         = each.value
+  from_port         = "443"
+  to_port           = "443"
+  ip_protocol       = "tcp"
+}
+
 # resource "aws_vpc_security_group_ingress_rule" "ancillary_alb_ingress_http_global_protect_allowlist" {
 #   for_each          = toset(local.all_ingress_ips)
 #   security_group_id = aws_security_group.ancillary_alb_security_group.id
