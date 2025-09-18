@@ -11,6 +11,7 @@ module "calculate_checksum_sqs" {
     ".csv",
   ]
   lambda_function_name = module.calculate_checksum.lambda_function_name
+  bucket_prefix        = local.bucket_prefix
 }
 
 module "format_json_fms_data_sqs" {
@@ -19,6 +20,7 @@ module "format_json_fms_data_sqs" {
   s3_prefix            = "serco/fms/"
   s3_suffixes          = [".JSON"]
   lambda_function_name = module.format_json_fms_data.lambda_function_name
+  bucket_prefix        = local.bucket_prefix
 }
 
 module "copy_mdss_data_sqs" {
@@ -27,4 +29,5 @@ module "copy_mdss_data_sqs" {
   s3_prefix            = "serco/fms/"
   s3_suffixes          = [".JSON"]
   lambda_function_name = module.copy_mdss_data.lambda_function_name
+  bucket_prefix        = local.bucket_prefix
 }

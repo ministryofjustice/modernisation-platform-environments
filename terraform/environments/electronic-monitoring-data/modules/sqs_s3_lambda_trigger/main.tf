@@ -1,9 +1,9 @@
 locals {
-  s3_prefix_hyphen       = replace(var.s3_prefix, "/", "-")
-  s3_suffixes_hyphen     = replace(join("-", var.s3_suffixes), ".", "-")
-  bucket_prefix_elements = split(trimprefix(var.bucket.id, "emds-${var.environment_shorthand}-"), "-")
-  bucket_prefix          = join(slice(local.bucket_prefix_elements, 0, length(local.bucket_prefix_elements)))
-  queue_base_name        = substr("${local.bucket_prefix}-${local.s3_prefix_hyphen}-${local.s3_suffixes_hyphen}-${var.lambda_function_name}", 0, 76)
+  s3_prefix_hyphen         = replace(var.s3_prefix, "/", "-")
+  s3_suffixes_hyphen       = replace(join("-", var.s3_suffixes), ".", "-")
+  bucket_function_elements = split(trimprefix(var.bucket.id, var.bucket_prefix), "-")
+  bucket_function          = join(slice(local.bucket_function_elements, 0, length(local.bucket_function_elements)))
+  queue_base_name          = substr("${local.bucket_function}-${local.s3_prefix_hyphen}-${local.s3_suffixes_hyphen}-${var.lambda_function_name}", 0, 76)
 }
 
 resource "aws_sqs_queue" "s3_event_queue" {

@@ -27,7 +27,7 @@ variable "lambda_function_name" {
   type        = string
 }
 
-variable "environment_shorthand" {
-  description = "Environment prefix for the table"
+variable "bucket_prefix" {
+  description = "The predefined local.bucket_prefix"
   type        = string
 }
