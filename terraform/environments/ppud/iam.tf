@@ -1018,6 +1018,7 @@ locals {
     "get_cloudwatch_metrics"  = aws_iam_policy.iam_policy_lambda_get_cloudwatch_metrics_prod[0].arn
     "get_data_s3"             = aws_iam_policy.iam_policy_lambda_get_s3_data_prod[0].arn
     "get_klayers"             = aws_iam_policy.iam_policy_lambda_get_ssm_parameter_klayers_prod[0].arn
+    "ec2_permissions"         = aws_iam_policy.iam_policy_lambda_ec2_permissions_prod[0].arn
   } : {}
 }
 
@@ -1027,11 +1028,16 @@ resource "aws_iam_role_policy_attachment" "attach_lambda_policies_get_cloudwatch
   policy_arn = each.value
 }
 
-resource "aws_iam_policy_attachment" "attach_lambda_cloudwatch_full_access_to_get_cloudwatch_prod" {
+resource "aws_iam_role_policy_attachment" "attach_lambda_cloudwatch_full_access_to_get_cloudwatch_prod" {
   count      = local.is-production == true ? 1 : 0
-  name       = "lambda-cloudwatch-full-access-iam-get-cloudwatch-attachment"
-  roles      = [aws_iam_role.lambda_role_get_cloudwatch_prod[0].id]
+  role       = aws_iam_role.lambda_role_get_cloudwatch_prod[0].name
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchFullAccessV2"
+}
+
+resource "aws_iam_role_policy_attachment" "attach_lambda_vpc_access_execution_prod" {
+  count      = local.is-production == true ? 1 : 0
+  role       = aws_iam_role.lambda_role_get_cloudwatch_prod[0].name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
 }
 
 # Lambda role and attachment for retrieving security hub data
@@ -1447,6 +1453,28 @@ resource "aws_iam_policy" "iam_policy_lambda_get_ssm_parameter_klayers_prod" {
         ],
         "Resource" : [
           "arn:aws:ssm:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:parameter/klayers-account"
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy" "iam_policy_lambda_ec2_permissions_prod" {
+  count       = local.is-production == true ? 1 : 0
+  name        = "aws_iam_policy_for_lambda_ec2_permissions_${local.environment}"
+  path        = "/"
+  description = "Allows lambda functions to have required ec2 permissions"
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "ec2:CreateNetworkInterface",
+          "ec2:DescribeNetworkInterface"
+        ],
+        "Resource" : [
+          "arn:aws:ec2:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:*"
         ]
       }
     ]

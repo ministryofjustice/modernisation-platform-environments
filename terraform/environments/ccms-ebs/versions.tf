@@ -9,7 +9,7 @@ terraform {
       source  = "hashicorp/aws"
     }
     awscc = {
-      source = "hashicorp/awscc"
+      source  = "hashicorp/awscc"
       version = "~> 1.0"
     }
     http = {

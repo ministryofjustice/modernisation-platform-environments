@@ -25,9 +25,11 @@ resource "aws_iam_policy" "trigger_unzip_lambda" {
 data "aws_iam_policy_document" "dms_validation_step_function_policy_document" {
   count = local.is-development || local.is-production ? 1 : 0
   statement {
-    effect    = "Allow"
-    actions   = ["lambda:InvokeFunction"]
-    resources = [module.dms_validation[0].lambda_function_arn]
+    effect  = "Allow"
+    actions = ["lambda:InvokeFunction"]
+    resources = [
+      module.dms_retrieve_metadata[0].lambda_function_arn,
+    module.dms_validation[0].lambda_function_arn]
   }
 }
 

@@ -1,0 +1,4 @@
+skip-check:
+  - CKV_TF_1 # Module version is sufficient
+  - CKV2_AWS_5 # "Ensure that Security Groups are attached to another resource"
+  - CKV_AWS_26 # "Ensure all data stored in the SNS topic is encrypted"

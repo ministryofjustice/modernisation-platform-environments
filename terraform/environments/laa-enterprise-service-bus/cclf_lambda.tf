@@ -69,8 +69,11 @@ resource "aws_lambda_function" "cclf_provider_load" {
       LD_LIBRARY_PATH        = "/opt/instantclient_12_2_linux"
       ORACLE_HOME            = "/opt/instantclient_12_2_linux"
       SERVICE_NAME           = "cclf-load-service"
-      NAMESPACE              = "CCLFProviderLoadService"
+      NAMESPACE              = "HUB20-CCLF-NS"
+      ENVIRONMENT            = local.environment
+      LOG_LEVEL              = "DEBUG"
       PURGE_LAMBDA_TIMESTAMP = aws_ssm_parameter.cclf_provider_load_timestamp.name
+      SOURCE_BUCKET          = aws_s3_bucket.data.bucket
     }
   }
 
