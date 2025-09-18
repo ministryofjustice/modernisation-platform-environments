@@ -65,13 +65,13 @@ resource "aws_lambda_permission" "allow_cwa_extract_logs" {
   source_arn    = "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/cwa_extract_lambda:*"
 }
 
-# resource "aws_lambda_permission" "allow_cwa_file_transfer_logs" {
-#   statement_id  = "AllowExecutionFromCloudWatchLogs"
-#   action        = "lambda:InvokeFunction"
-#   function_name = aws_lambda_function.cloudwatch_log_alert.function_name
-#   principal     = "logs.amazonaws.com"
-#   source_arn    = "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/cwa_file_transfer_lambda:*"
-# }
+resource "aws_lambda_permission" "allow_cwa_file_transfer_logs" {
+  statement_id  = "AllowExecutionFromCloudWatchLogs"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.cloudwatch_log_alert.function_name
+  principal     = "logs.amazonaws.com"
+  source_arn    = "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/cwa_file_transfer_lambda:*"
+}
 
 # resource "aws_lambda_permission" "allow_cwa_sns_logs" {
 #   statement_id  = "AllowExecutionFromCloudWatchLogs"
@@ -184,12 +184,12 @@ resource "aws_cloudwatch_log_subscription_filter" "cwa_extract_error_alert" {
   destination_arn = aws_lambda_function.cloudwatch_log_alert.arn
 }
 
-# resource "aws_cloudwatch_log_subscription_filter" "cwa_file_transfer_error_alert" {
-#   name            = "cwa-file-transfer-lambda-error-alert"
-#   log_group_name  = "/aws/lambda/cwa_file_transfer_lambda"
-#   filter_pattern  = "ERROR"
-#   destination_arn = aws_lambda_function.cloudwatch_log_alert.arn
-# }
+resource "aws_cloudwatch_log_subscription_filter" "cwa_file_transfer_error_alert" {
+  name            = "cwa-file-transfer-lambda-error-alert"
+  log_group_name  = "/aws/lambda/cwa_file_transfer_lambda"
+  filter_pattern  = "ERROR"
+  destination_arn = aws_lambda_function.cloudwatch_log_alert.arn
+}
 
 # resource "aws_cloudwatch_log_subscription_filter" "cwa_sns_error_alert" {
 #   name            = "cwa-sns-lambda-error-alert"
