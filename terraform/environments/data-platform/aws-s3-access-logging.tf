@@ -32,16 +32,3 @@ module "s3_access_logs_s3_bucket" {
     status = "Disabled"
   }
 }
-
-module "s3_access_logs_testing_s3_bucket" {
-  source = "github.com/terraform-aws-modules/terraform-aws-s3-bucket.git?ref=c375418373496865e2770ad8aabfaf849d4caee5" # v5.7.0
-
-  bucket = "mojdp-${local.environment}-s3-access-logs-testing"
-
-  force_destroy = true
-
-  logging = {
-    target_bucket = module.s3_access_logs_s3_bucket.s3_bucket_id
-    target_prefix = "${module.s3_access_logs_testing_s3_bucket.s3_bucket_id}/"
-  }
-}
