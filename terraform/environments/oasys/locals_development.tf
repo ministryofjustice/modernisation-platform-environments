@@ -14,7 +14,6 @@ locals {
 
   data_subnets = [
     data.aws_subnet.data_subnets_a.id
-
   ]
 
 }
