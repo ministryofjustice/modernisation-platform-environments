@@ -8,7 +8,7 @@ resource "aws_instance" "my_t4_instance" {
   count                       = local.is-development ? 1 : 0
   ami                         = "ami-08f714c552929eda9"
   instance_type               = "t4g.micro"
-  vpc_security_group_ids      = ["subnet-01815760b71d6a619"]
+  vpc_security_group_ids      = ["subnet-072949a209fe05fb3"]
   associate_public_ip_address = false
   availability_zone           = "eu-west-2a"
   ebs_optimized               = true
