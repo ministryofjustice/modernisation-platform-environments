@@ -52,9 +52,7 @@ resource "aws_workspacesweb_user_settings" "main" {
       "Microphone",
       "FullScreen",
       "DualMonitor",
-      "CycleWindows",
-      "PrintToLocalDevice",
-      "SecureBrowserExtension"
+      "Windows"
     ]
   }
 }
