@@ -273,16 +273,16 @@ resource "aws_lb_target_group" "WAM-Target-Group-Preprod-2" {
 resource "aws_lb_target_group" "WAM-Target-Group-Prod" {
   count    = local.is-production == true ? 1 : 0
   name     = "WAM-Prod"
-  port     = 443
-  protocol = "HTTPS"
+  port     = 80
+  protocol = "HTTP"
   vpc_id   = data.aws_vpc.shared.id
 
   health_check {
     enabled             = true
     path                = "/"
     interval            = 30
-    protocol            = "HTTPS"
-    port                = 443
+    protocol            = "HTTP"
+    port                = 80
     timeout             = 5
     healthy_threshold   = 5
     unhealthy_threshold = 2
