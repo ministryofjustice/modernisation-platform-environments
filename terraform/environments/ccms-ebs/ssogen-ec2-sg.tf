@@ -30,6 +30,20 @@ resource "aws_security_group_rule" "ing_ssh_workspaces" {
 }
 
 ############################################
+# INGRESS — SSH (22) intra-cluster (self) for SCP/SSH between nodes
+############################################
+resource "aws_security_group_rule" "ing_ssh_self" {
+  count                    = local.is_development ? 1 : 0
+  type                     = "ingress"
+  description              = "SSH between SSOGEN nodes (self)"
+  security_group_id        = aws_security_group.ssogen_sg[0].id
+  protocol                 = "tcp"
+  from_port                = 22
+  to_port                  = 22
+  source_security_group_id = aws_security_group.ssogen_sg[0].id
+}
+
+############################################
 # INGRESS — WebLogic Admin (7001)
 ############################################
 resource "aws_security_group_rule" "ing_7001_workspaces_private" {
@@ -56,6 +70,42 @@ resource "aws_security_group_rule" "ing_7001_workspaces_nat" {
   protocol          = "tcp"
   from_port         = 7001
   to_port           = 7001
+  cidr_blocks = [
+    "18.130.39.94/32",
+    "35.177.145.193/32",
+    "52.56.212.11/32",
+    "35.176.254.38/32",
+    "35.177.173.197/32"
+  ]
+}
+
+############################################
+# INGRESS — WebLogic Admin SSL (7002)
+############################################
+resource "aws_security_group_rule" "ing_7002_workspaces_private" {
+  count             = local.is_development ? 1 : 0
+  type              = "ingress"
+  description       = "WebLogic 7002 from WorkSpaces subnets (private)"
+  security_group_id = aws_security_group.ssogen_sg[0].id
+  protocol          = "tcp"
+  from_port         = 7002
+  to_port           = 7002
+  cidr_blocks = [
+    data.aws_vpc.shared.cidr_block,
+    local.application_data.accounts[local.environment].lz_aws_subnet_env,
+    local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_subnet_env,
+    local.application_data.accounts[local.environment].lz_aws_workspace_prod_subnet_env,
+  ]
+}
+
+resource "aws_security_group_rule" "ing_7002_workspaces_nat" {
+  count             = local.is_development ? 1 : 0
+  type              = "ingress"
+  description       = "WebLogic 7002 from WorkSpaces NAT IPs (public)"
+  security_group_id = aws_security_group.ssogen_sg[0].id
+  protocol          = "tcp"
+  from_port         = 7002
+  to_port           = 7002
   cidr_blocks = [
     "18.130.39.94/32",
     "35.177.145.193/32",
@@ -241,6 +291,20 @@ resource "aws_security_group_rule" "eg_https_443" {
   from_port         = 443
   to_port           = 443
   cidr_blocks       = ["0.0.0.0/0"]
+}
+
+############################################
+# EGRESS — SSH (22) to VPC (for node↔node SCP/SSH)  ← NEW
+############################################
+resource "aws_security_group_rule" "eg_ssh_vpc" {
+  count             = local.is_development ? 1 : 0
+  type              = "egress"
+  description       = "SSH egress to peers in VPC (for SCP/SSH between nodes)"
+  security_group_id = aws_security_group.ssogen_sg[0].id
+  protocol          = "tcp"
+  from_port         = 22
+  to_port           = 22
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
 }
 
 ############################################
