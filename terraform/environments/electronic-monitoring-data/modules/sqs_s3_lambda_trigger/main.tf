@@ -98,7 +98,7 @@ data "aws_iam_policy_document" "allow_s3_to_write" {
       aws_sqs_queue.s3_event_queue.arn
     ]
     condition {
-      test     = "ArnEquals"
+      test     = "ArnLike"
       variable = "aws:SourceArn"
       values   = [var.bucket.arn]
     }
