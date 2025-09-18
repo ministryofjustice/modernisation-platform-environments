@@ -44,7 +44,7 @@ locals {
 
   nginx_records_to_cloudfront = [
     "siac",
-     "adjudicationpanel"
+    "adjudicationpanel"
   ]
 
   www_records = [

@@ -280,36 +280,57 @@ resource "aws_cloudfront_response_headers_policy" "security_headers_policy" {
 }
 
 resource "aws_cloudfront_function" "redirect_function" {
-  count = local.is-development ? 0 : 1
+  count   = local.is-development ? 0 : 1
   name    = "tribunals_redirect_function"
   runtime = "cloudfront-js-2.0"
   publish = true
   code    = <<EOF
   function handler(event) {
     var request = event.request;
-    var host    = request.headers.host.value;
-    var uri     = request.uri;
-    // Redirect rules for siac.tribunals.gov.uk
-    if (host === "siac.tribunals.gov.uk") {
-      if (uri.toLowerCase() === "/outcomes2007onwards.htm") {
+    var host = request.headers.host.value;
+    var uri = request.uri;
+
+    switch (host) {
+      case "siac.tribunals.gov.uk":
+        if (uri.toLowerCase() === "/outcomes2007onwards.htm") {
+          return {
+            statusCode: 301,
+            statusDescription: "Moved Permanently",
+            headers: {
+              "location": {"value": "https://siac.decisions.tribunals.gov.uk"}
+            }
+          };
+        }
         return {
           statusCode: 301,
           statusDescription: "Moved Permanently",
           headers: {
-            "location": { "value": "https://siac.decisions.tribunals.gov.uk" }
+            "location": {"value": "https://www.gov.uk/guidance/appeal-to-the-special-immigration-appeals-commission"}
           }
         };
-      }
-      return {
-        statusCode: 301,
-        statusDescription: "Moved Permanently",
-        headers: {
-          "location": { "value": "https://www.gov.uk/guidance/appeal-to-the-special-immigration-appeals-commission" }
+
+      case "adjudicationpanel.tribunals.gov.uk":
+        if (/^\/(Public|Admin|Decisions|Judgments)/i.test(uri)) {
+          return {
+            statusCode: 301,
+            statusDescription: "Moved Permanently",
+            headers: {
+              "location": {"value": "http://localgovernmentstandards.decisions.tribunals.gov.uk" + uri}
+            }
+          };
         }
-      };
+        return {
+          statusCode: 301,
+          statusDescription: "Moved Permanently",
+          headers: {
+            "location": {"value": "https://www.gov.uk/government/organisations/hm-courts-and-tribunals-service"}
+          }
+        };
+
+      default:
+        // Default: Pass through to origin
+        return request;
     }
-    // Default: Pass through to origin
-    return request;
   }
   EOF
 }
