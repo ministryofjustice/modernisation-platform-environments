@@ -243,7 +243,6 @@ locals {
           "planetfm-test",
         ]
       }
-
     }
 
     route53_zones = {
