@@ -73,53 +73,53 @@ resource "aws_lambda_permission" "allow_cwa_file_transfer_logs" {
   source_arn    = "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/cwa_file_transfer_lambda:*"
 }
 
-# resource "aws_lambda_permission" "allow_cwa_sns_logs" {
-#   statement_id  = "AllowExecutionFromCloudWatchLogs"
-#   action        = "lambda:InvokeFunction"
-#   function_name = aws_lambda_function.cloudwatch_log_alert.function_name
-#   principal     = "logs.amazonaws.com"
-#   source_arn    = "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/cwa_sns_lambda:*"
-# }
+resource "aws_lambda_permission" "allow_cwa_sns_logs" {
+  statement_id  = "AllowExecutionFromCWASNSLogs"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.cloudwatch_log_alert.function_name
+  principal     = "logs.amazonaws.com"
+  source_arn    = "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/cwa_sns_lambda:*"
+}
 
-# resource "aws_lambda_permission" "allow_ccms_provider_logs" {
-#   statement_id  = "AllowExecutionFromCloudWatchLogs"
-#   action        = "lambda:InvokeFunction"
-#   function_name = aws_lambda_function.cloudwatch_log_alert.function_name
-#   principal     = "logs.amazonaws.com"
-#   source_arn    = "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/ccms_provider_load_function:*"
-# }
+resource "aws_lambda_permission" "allow_ccms_provider_logs" {
+  statement_id  = "AllowExecutionFromCCMSProviderhLogs"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.cloudwatch_log_alert.function_name
+  principal     = "logs.amazonaws.com"
+  source_arn    = "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/ccms_provider_load_function:*"
+}
 
-# resource "aws_lambda_permission" "allow_maat_provider_logs" {
-#   statement_id  = "AllowExecutionFromCloudWatchLogs"
-#   action        = "lambda:InvokeFunction"
-#   function_name = aws_lambda_function.cloudwatch_log_alert.function_name
-#   principal     = "logs.amazonaws.com"
-#   source_arn    = "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/maat_provider_load_function:*"
-# }
+resource "aws_lambda_permission" "allow_maat_provider_logs" {
+  statement_id  = "AllowExecutionFromMAATProviderLogs"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.cloudwatch_log_alert.function_name
+  principal     = "logs.amazonaws.com"
+  source_arn    = "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/maat_provider_load_function:*"
+}
 
-# resource "aws_lambda_permission" "allow_ccr_provider_logs" {
-#   statement_id  = "AllowExecutionFromCloudWatchLogs"
-#   action        = "lambda:InvokeFunction"
-#   function_name = aws_lambda_function.cloudwatch_log_alert.function_name
-#   principal     = "logs.amazonaws.com"
-#   source_arn    = "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/ccr_provider_load_function:*"
-# }
+resource "aws_lambda_permission" "allow_ccr_provider_logs" {
+  statement_id  = "AllowExecutionFromCCRProviderLogs"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.cloudwatch_log_alert.function_name
+  principal     = "logs.amazonaws.com"
+  source_arn    = "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/ccr_provider_load_function:*"
+}
 
-# resource "aws_lambda_permission" "allow_cclf_provider_logs" {
-#   statement_id  = "AllowExecutionFromCloudWatchLogs"
-#   action        = "lambda:InvokeFunction"
-#   function_name = aws_lambda_function.cloudwatch_log_alert.function_name
-#   principal     = "logs.amazonaws.com"
-#   source_arn    = "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/cclf_provider_load_function:*"
-# }
+resource "aws_lambda_permission" "allow_cclf_provider_logs" {
+  statement_id  = "AllowExecutionFromCCLFProviderLogs"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.cloudwatch_log_alert.function_name
+  principal     = "logs.amazonaws.com"
+  source_arn    = "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/cclf_provider_load_function:*"
+}
 
-# resource "aws_lambda_permission" "allow_purge_lambda_logs" {
-#   statement_id  = "AllowExecutionFromCloudWatchLogs"
-#   action        = "lambda:InvokeFunction"
-#   function_name = aws_lambda_function.cloudwatch_log_alert.function_name
-#   principal     = "logs.amazonaws.com"
-#   source_arn    = "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/purge_lambda_function:*"
-# }
+resource "aws_lambda_permission" "allow_purge_lambda_logs" {
+  statement_id  = "AllowExecutionFromPurgeLambdaLogs"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.cloudwatch_log_alert.function_name
+  principal     = "logs.amazonaws.com"
+  source_arn    = "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/purge_lambda_function:*"
+}
 
 ######################################
 ### IAM Resources
@@ -191,44 +191,44 @@ resource "aws_cloudwatch_log_subscription_filter" "cwa_file_transfer_error_alert
   destination_arn = aws_lambda_function.cloudwatch_log_alert.arn
 }
 
-# resource "aws_cloudwatch_log_subscription_filter" "cwa_sns_error_alert" {
-#   name            = "cwa-sns-lambda-error-alert"
-#   log_group_name  = "/aws/lambda/cwa_sns_lambda"
-#   filter_pattern  = "ERROR"
-#   destination_arn = aws_lambda_function.cloudwatch_log_alert.arn
-# }
+resource "aws_cloudwatch_log_subscription_filter" "cwa_sns_error_alert" {
+  name            = "cwa-sns-lambda-error-alert"
+  log_group_name  = "/aws/lambda/cwa_sns_lambda"
+  filter_pattern  = "ERROR"
+  destination_arn = aws_lambda_function.cloudwatch_log_alert.arn
+}
 
-# resource "aws_cloudwatch_log_subscription_filter" "ccms_provider_error_alert" {
-#   name            = "ccms-provider-lambda-error-alert"
-#   log_group_name  = "/aws/lambda/ccms_provider_load_function"
-#   filter_pattern  = "ERROR"
-#   destination_arn = aws_lambda_function.cloudwatch_log_alert.arn
-# }
+resource "aws_cloudwatch_log_subscription_filter" "ccms_provider_error_alert" {
+  name            = "ccms-provider-lambda-error-alert"
+  log_group_name  = "/aws/lambda/ccms_provider_load_function"
+  filter_pattern  = "ERROR"
+  destination_arn = aws_lambda_function.cloudwatch_log_alert.arn
+}
 
-# resource "aws_cloudwatch_log_subscription_filter" "maat_provider_error_alert" {
-#   name            = "maat-provider-lambda-error-alert"
-#   log_group_name  = "/aws/lambda/maat_provider_load_function"
-#   filter_pattern  = "ERROR"
-#   destination_arn = aws_lambda_function.cloudwatch_log_alert.arn
-# }
+resource "aws_cloudwatch_log_subscription_filter" "maat_provider_error_alert" {
+  name            = "maat-provider-lambda-error-alert"
+  log_group_name  = "/aws/lambda/maat_provider_load_function"
+  filter_pattern  = "ERROR"
+  destination_arn = aws_lambda_function.cloudwatch_log_alert.arn
+}
 
-# resource "aws_cloudwatch_log_subscription_filter" "ccr_provider_error_alert" {
-#   name            = "ccr-provider-lambda-error-alert"
-#   log_group_name  = "/aws/lambda/ccr_provider_load_function"
-#   filter_pattern  = "ERROR"
-#   destination_arn = aws_lambda_function.cloudwatch_log_alert.arn
-# }
+resource "aws_cloudwatch_log_subscription_filter" "ccr_provider_error_alert" {
+  name            = "ccr-provider-lambda-error-alert"
+  log_group_name  = "/aws/lambda/ccr_provider_load_function"
+  filter_pattern  = "ERROR"
+  destination_arn = aws_lambda_function.cloudwatch_log_alert.arn
+}
 
-# resource "aws_cloudwatch_log_subscription_filter" "cclf_provider_error_alert" {
-#   name            = "cclf-provider-lambda-error-alert"
-#   log_group_name  = "/aws/lambda/cclf_provider_load_function"
-#   filter_pattern  = "ERROR"
-#   destination_arn = aws_lambda_function.cloudwatch_log_alert.arn
-# }
+resource "aws_cloudwatch_log_subscription_filter" "cclf_provider_error_alert" {
+  name            = "cclf-provider-lambda-error-alert"
+  log_group_name  = "/aws/lambda/cclf_provider_load_function"
+  filter_pattern  = "ERROR"
+  destination_arn = aws_lambda_function.cloudwatch_log_alert.arn
+}
 
-# resource "aws_cloudwatch_log_subscription_filter" "purge_lambda_error_alert" {
-#   name            = "purge-lambda-error-alert"
-#   log_group_name  = "/aws/lambda/purge_lambda_function"
-#   filter_pattern  = "ERROR"
-#   destination_arn = aws_lambda_function.cloudwatch_log_alert.arn
-# }
+resource "aws_cloudwatch_log_subscription_filter" "purge_lambda_error_alert" {
+  name            = "purge-lambda-error-alert"
+  log_group_name  = "/aws/lambda/purge_lambda_function"
+  filter_pattern  = "ERROR"
+  destination_arn = aws_lambda_function.cloudwatch_log_alert.arn
+}
