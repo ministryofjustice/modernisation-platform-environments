@@ -5,18 +5,20 @@ module "s3_bucket_workspacesweb_session_logs" {
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "~> 4.0"
 
-  bucket = "laa-workspacesweb-session-logs-${random_string.bucket_suffix.result}"
+  bucket        = "laa-workspacesweb-session-logs-${random_string.bucket_suffix.result}"
+  force_destroy = true
 
   # Versioning
   versioning = {
     enabled = true
   }
 
-  # Server side encryption
+  # Server side encryption with KMS
   server_side_encryption_configuration = {
     rule = {
       apply_server_side_encryption_by_default = {
-        sse_algorithm = "AES256"
+        sse_algorithm     = "aws:kms"
+        kms_master_key_id = aws_kms_key.workspacesweb_session_logs.arn
       }
     }
   }
@@ -41,29 +43,9 @@ module "s3_bucket_workspacesweb_session_logs" {
     }
   }]
 
-  # Bucket policy to allow WorkSpaces Web service access
+  # Bucket policy using the IAM policy document
   attach_policy = true
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Sid    = "AllowWorkSpacesWebServiceAccess"
-        Effect = "Allow"
-        Principal = {
-          Service = "workspaces-web.amazonaws.com"
-        }
-        Action = [
-          "s3:PutObject",
-          "s3:PutObjectAcl",
-          "s3:GetBucketLocation"
-        ]
-        Resource = [
-          "arn:aws:s3:::laa-workspacesweb-session-logs-${random_string.bucket_suffix.result}",
-          "arn:aws:s3:::laa-workspacesweb-session-logs-${random_string.bucket_suffix.result}/*"
-        ]
-      }
-    ]
-  })
+  policy        = data.aws_iam_policy_document.s3_bucket_policy.json
 
   tags = merge(
     local.tags,
@@ -77,4 +59,21 @@ resource "random_string" "bucket_suffix" {
   length  = 8
   special = false
   upper   = false
+}
+
+data "aws_iam_policy_document" "s3_bucket_policy" {
+  statement {
+    effect = "Allow"
+    principals {
+      type        = "Service"
+      identifiers = ["workspaces-web.amazonaws.com"]
+    }
+    actions = [
+      "s3:PutObject"
+    ]
+    resources = [
+      "arn:aws:s3:::laa-workspacesweb-session-logs-${random_string.bucket_suffix.result}",
+      "arn:aws:s3:::laa-workspacesweb-session-logs-${random_string.bucket_suffix.result}/*"
+    ]
+  }
 }

@@ -1,38 +1,35 @@
-### KMS KEY FOR SESSION LOGGING ENCRYPTION
+### KMS KEY FOR WORKSPACES WEB SESSION LOGGING
+
+data "aws_partition" "current" {}
+
+data "aws_iam_policy_document" "kms_key_policy" {
+  statement {
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:root"]
+    }
+    actions   = ["kms:*"]
+    resources = ["*"]
+  }
+
+  statement {
+    principals {
+      type        = "Service"
+      identifiers = ["workspaces-web.amazonaws.com"]
+    }
+    actions = [
+      "kms:Encrypt",
+      "kms:GenerateDataKey*",
+      "kms:ReEncrypt*",
+      "kms:Decrypt"
+    ]
+    resources = ["*"]
+  }
+}
 
 resource "aws_kms_key" "workspacesweb_session_logs" {
-  description             = "KMS key for WorkSpaces Web session logs encryption"
-  deletion_window_in_days = 7
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Sid    = "Enable IAM User Permissions"
-        Effect = "Allow"
-        Principal = {
-          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
-        }
-        Action   = "kms:*"
-        Resource = "*"
-      },
-      {
-        Sid    = "Allow WorkSpaces Web to use the key"
-        Effect = "Allow"
-        Principal = {
-          Service = "workspaces-web.amazonaws.com"
-        }
-        Action = [
-          "kms:Encrypt",
-          "kms:Decrypt",
-          "kms:ReEncrypt*",
-          "kms:GenerateDataKey*",
-          "kms:DescribeKey"
-        ]
-        Resource = "*"
-      }
-    ]
-  })
+  description = "KMS key for WorkSpaces Web Session Logger"
+  policy      = data.aws_iam_policy_document.kms_key_policy.json
 
   tags = merge(
     local.tags,

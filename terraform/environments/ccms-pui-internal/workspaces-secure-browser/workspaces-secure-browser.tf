@@ -173,7 +173,13 @@ resource "aws_workspacesweb_browser_settings" "main" {
 ### SESSION LOGGER FOR SESSION LOGGING
 
 resource "aws_workspacesweb_session_logger" "main" {
-  display_name = "laa-workspaces-web-session-logger"
+  display_name         = "laa-workspaces-web-session-logger"
+  customer_managed_key = aws_kms_key.workspacesweb_session_logs.arn
+
+  additional_encryption_context = {
+    Environment = local.environment
+    Application = "ccms-pui-internal"
+  }
 
   event_filter {
     all {}
@@ -182,8 +188,10 @@ resource "aws_workspacesweb_session_logger" "main" {
   log_configuration {
     s3 {
       bucket           = module.s3_bucket_workspacesweb_session_logs.s3_bucket_id
-      folder_structure = "Flat"
-      log_file_format  = "Json"
+      bucket_owner     = data.aws_caller_identity.current.account_id
+      folder_structure = "NestedByDate"
+      key_prefix       = "workspaces-web-logs/"
+      log_file_format  = "JsonLines"
     }
   }
 
@@ -193,6 +201,7 @@ resource "aws_workspacesweb_session_logger" "main" {
       Name = "workspacesweb-session-logger"
     }
   )
+
 }
 
 ### NETWORK SETTINGS ASSOCIATION
