@@ -24,7 +24,7 @@ data "aws_iam_policy_document" "sqs_kms_key_policy" {
       identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
     }
     actions   = ["kms:*"]
-    resources = ["*"]
+    resources = [""]
   }
   statement {
     sid    = "S3UseofKey"
@@ -58,55 +58,18 @@ resource "aws_kms_key" "sqs_kms_key" {
 
 resource "aws_kms_key_policy" "sqs_kms_key_policy" {
   key_id = aws_kms_key.sqs_kms_key.id
-
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Id      = "key-default-1",
-    Statement = [
-      {
-        Sid       = "Allow account use of the key"
-        Effect    = "Allow"
-        Principal = {
-          AWS = "*"
-        }
-        Action    = "kms:*"
-        Resource  = "*"
-      },
-      {
-        Sid    = "Allow S3 to use the key for sending to SQS"
-        Effect = "Allow"
-        Principal = {
-          Service = "s3.amazonaws.com"
-        }
-        Action = [
-          "kms:GenerateDataKey",
-          "kms:Decrypt"
-        ]
-        Resource = "*"
-        Condition = {
-          StringEquals = {
-            "aws:SourceAccount" = data.aws_caller_identity.current.account_id
-          },
-          ArnLike = {
-            "aws:SourceArn" = var.bucket.arn
-          }
-        }
-      }
-    ]
-  })
+  policy = data.aws_iam_policy_document.sqs_kms_key_policy.json
 }
 
 
-#trivy:ignore:AVD-AWS-0135 default is sufficient
 resource "aws_sqs_queue" "s3_event_queue" {
-  #checkov:skip=CKV2_AWS_73 default is sufficient
   name                       = local.queue_base_name
   visibility_timeout_seconds = 20 * 60 # Longer than longest possible lambda
-  redrive_policy = jsonencode({
+  redrive_policy             = jsonencode({
     deadLetterTargetArn = aws_sqs_queue.s3_event_dlq.arn
     maxReceiveCount     = 5
   })
-  kms_master_key_id                 = "alias/aws/sqs"
+  kms_master_key_id                 = aws_kms_key.sqs_kms_key.id
   kms_data_key_reuse_period_seconds = 300
 }
 
@@ -201,10 +164,8 @@ resource "aws_lambda_event_source_mapping" "sqs_trigger" {
   enabled          = true
 }
 
-#trivy:ignore:AVD-AWS-0135 default is sufficient
 resource "aws_sqs_queue" "s3_event_dlq" {
-  #checkov:skip=CKV2_AWS_73 default is sufficient
-  name = "${local.queue_base_name}-dlq"
-  kms_master_key_id                 = "alias/aws/sqs"
+  name                              = "${local.queue_base_name}-dlq"
+  kms_master_key_id                 = aws_kms_key.sqs_kms_key.id
   kms_data_key_reuse_period_seconds = 300
 }
