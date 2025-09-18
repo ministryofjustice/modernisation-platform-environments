@@ -182,14 +182,21 @@ resource "aws_lb_target_group_attachment" "WAM-Portal-preproduction" {
   port             = 443
 }
 
-
+/*
 resource "aws_lb_target_group_attachment" "WAM-Portal-production" {
   count            = local.is-production == true ? 1 : 0
   target_group_arn = aws_lb_target_group.WAM-Target-Group-Prod-2[0].arn
   target_id        = aws_instance.s618358rgvw204[0].id
   port             = 443
 }
+*/
 
+resource "aws_lb_target_group_attachment" "WAM-Portal-production-2" {
+  count            = local.is-production == true ? 1 : 0
+  target_group_arn = aws_lb_target_group.WAM-Target-Group-Prod-2[0].arn
+  target_id        = aws_instance.s618358rgvw204[0].id
+  port             = 443
+}
 
 resource "aws_lb_target_group" "WAM-Target-Group-Dev" {
   count    = local.is-development == true ? 1 : 0
