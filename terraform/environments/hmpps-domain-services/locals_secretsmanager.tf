@@ -31,6 +31,7 @@ locals {
       "arn:aws:iam::${module.environment.account_ids.oasys-national-reporting-preproduction}:role/EC2HmppsDomainSecretsRole",
       "arn:aws:iam::${module.environment.account_ids.oasys-national-reporting-production}:role/EC2HmppsDomainSecretsRole",
     ]
+
   }
 
   secretsmanager_secret_policies = {
