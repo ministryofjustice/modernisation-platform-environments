@@ -2,7 +2,7 @@ locals {
   s3_prefix_hyphen         = replace(var.s3_prefix, "/", "-")
   s3_suffixes_hyphen       = replace(join("-", var.s3_suffixes), ".", "-")
   bucket_function_elements = split(trimprefix(var.bucket.id, var.bucket_prefix), "-")
-  bucket_function          = join(slice(local.bucket_function_elements, 0, length(local.bucket_function_elements)))
+  bucket_function          = join("-", slice(local.bucket_function_elements, 0, length(local.bucket_function_elements) - 1))
   queue_base_name          = substr("${local.bucket_function}-${local.s3_prefix_hyphen}-${local.s3_suffixes_hyphen}-${var.lambda_function_name}", 0, 76)
 }
 
