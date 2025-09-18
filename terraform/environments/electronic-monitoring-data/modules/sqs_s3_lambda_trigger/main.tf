@@ -5,7 +5,7 @@ locals {
   bucket_function          = join("-", slice(local.bucket_function_elements, 0, length(local.bucket_function_elements) - 1))
   queue_base_name          = substr("${local.bucket_function}-${local.s3_prefix_hyphen}-${local.s3_suffixes_hyphen}-${var.lambda_function_name}", 0, 76)
   sid_name                 = replace(local.queue_base_name, "-" ,"")
-  s3_notification_filters  = length(var.s3_suffixes) > 0 ? [
+  s3_notification_filters  = length(var.s3_suffixes) > 0 && var.s3_prefix != null ? [
       for suffix in var.s3_suffixes : {
         prefix = var.s3_prefix
         suffix = suffix
@@ -28,7 +28,7 @@ resource "aws_sqs_queue" "s3_event_queue" {
 
 
 resource "aws_s3_bucket_notification" "s3_notification_prefix_only" {
-  count  = (length(var.s3_suffixes) == 0 && var.s3_prefix != "") ? 1 : 0
+  count  = (length(var.s3_suffixes) == 0 && var.s3_prefix != null) ? 1 : 0
   bucket = var.bucket.id
 
   queue {
@@ -58,7 +58,7 @@ resource "aws_s3_bucket_notification" "s3_notification_prefix_suffixes" {
 }
 
 resource "aws_s3_bucket_notification" "s3_notification_suffixes" {
-  for_each = length(var.s3_suffixes) > 0 && var.s3_prefix == "" ? toset(var.s3_suffixes) : toset([])
+  for_each = length(var.s3_suffixes) > 0 && var.s3_prefix == null ? toset(var.s3_suffixes) : toset([])
   bucket   = var.bucket.id
 
   queue {
