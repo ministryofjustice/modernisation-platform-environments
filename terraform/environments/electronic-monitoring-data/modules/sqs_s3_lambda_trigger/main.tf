@@ -8,6 +8,7 @@ locals {
 }
 
 resource "aws_sqs_queue" "s3_event_queue" {
+  #checkov:skip=CKV2_AWS_73 default is sufficient
   name                       = local.queue_base_name
   visibility_timeout_seconds = 20 * 60 # Longer than longest possible lambda
   redrive_policy = jsonencode({
@@ -66,6 +67,7 @@ resource "aws_lambda_event_source_mapping" "sqs_trigger" {
 }
 
 resource "aws_sqs_queue" "s3_event_dlq" {
+  #checkov:skip=CKV2_AWS_73 default is sufficient
   name = "${local.queue_base_name}-dlq"
   kms_master_key_id                 = "alias/aws/sqs"
   kms_data_key_reuse_period_seconds = 300
