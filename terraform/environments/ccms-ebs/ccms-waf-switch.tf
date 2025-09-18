@@ -43,7 +43,7 @@ variable "rule_name" {
 
 data "archive_file" "waf_toggle_zip" {
   type        = "zip"
-  source_dir  = "${path.module}"
+  source_file = "${path.module}/lambda_function.py"
   output_path = "${path.module}/lambda_function.zip"
 }
 
@@ -106,6 +106,7 @@ resource "aws_lambda_function" "waf_toggle" {
   function_name = "waf-toggle-${var.env}"
   role          = aws_iam_role.waf_lambda_role.arn
   filename      = data.archive_file.waf_toggle_zip.output_path
+  source_code_hash = data.archive_file.waf_toggle_zip.output_base64sha256
   handler       = "lambda_function.lambda_handler"
   runtime       = "python3.11"
   timeout       = 30
