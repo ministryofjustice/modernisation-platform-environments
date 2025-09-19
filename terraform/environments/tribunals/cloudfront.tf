@@ -92,10 +92,12 @@ resource "aws_acm_certificate" "cloudfront" {
   provider                  = aws.us-east-1
   domain_name               = local.is-production ? "*.decisions.tribunals.gov.uk" : "modernisation-platform.service.justice.gov.uk"
   validation_method         = "DNS"
-  subject_alternative_names = local.subject_alternative_names
+  subject_alternative_names = local.is_production ? concat(local.common_sans, local.cloudfront_sans) : local.nonprod_sans
+
   tags = {
     Environment = local.environment
   }
+
   lifecycle {
     create_before_destroy = true
   }
@@ -104,6 +106,33 @@ resource "aws_acm_certificate" "cloudfront" {
 resource "aws_acm_certificate_validation" "cloudfront_cert_validation" {
   provider        = aws.us-east-1
   certificate_arn = aws_acm_certificate.cloudfront.arn
+  validation_record_fqdns = [
+    for record in aws_route53_record.cloudfront_cert_cname_validation : record.fqdn
+  ]
+}
+
+// Route53 DNS records for certificate validation
+// Don't duplicate the common_sans domains here - already generated in dns_ssl.tf
+resource "aws_route53_record" "cloudfront_cert_cname_validation" {
+  provider = aws.core-network-services
+
+  for_each = {
+    for dvo in aws_acm_certificate.cloudfront.domain_validation_options :
+    dvo.domain_name => {
+      name  = dvo.resource_record_name
+      type  = dvo.resource_record_type
+      value = dvo.resource_record_value
+    }
+    # Only generate for the cloudfront_sans and the main domain
+    if contains(concat(local.cloudfront_sans, [aws_acm_certificate.cloudfront.domain_name]), dvo.domain_name)
+  }
+
+  allow_overwrite = true
+  name            = each.value.name
+  records         = [each.value.value]
+  ttl             = 300
+  type            = each.value.type
+  zone_id         = local.is_production ? data.aws_route53_zone.production_zone.zone_id : data.aws_route53_zone.network_services.zone_id
 }
 
 data "aws_ec2_managed_prefix_list" "cloudfront" {
@@ -315,7 +344,7 @@ resource "aws_cloudfront_function" "redirect_function" {
             statusCode: 301,
             statusDescription: "Moved Permanently",
             headers: {
-              "location": {"value": "http://phl.decisions.tribunals.gov.uk"}
+              "location": {"value": "https://phl.decisions.tribunals.gov.uk"}
             }
           };
         }
