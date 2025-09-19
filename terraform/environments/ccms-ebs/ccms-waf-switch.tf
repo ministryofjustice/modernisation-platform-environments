@@ -19,27 +19,11 @@ variable "scope"{
     default = "REGIONAL"
 }
 
-# variable "web_acl_name" { 
-#     type = string
-#     default = "ebs_waf"
+
+# variable "rule_name" {
+#     default = "Allow" 
 # }
 
-# variable "web_acl_id" { 
-#     type = string
-# }
-
-variable "rule_name" {
-    default = "Allow" 
-}
-
-# (Optional) tweak times
-#variable "timezone"       { type = string  default = "Europe/London" }
-#variable "cron_block"     { type = string  default = "cron(0 19 ? * MON-SUN *)" }
-#variable "cron_allow"     { type = string  default = "cron(0 7 ? * MON-SUN *)" }
-
-# #Data Sources and Resources
-# data "aws_caller_identity" "current" {}
-# data "aws_region" "current" {}
 
 data "archive_file" "waf_toggle_zip" {
   type        = "zip"
@@ -115,8 +99,7 @@ resource "aws_lambda_function" "waf_toggle" {
       SCOPE        = var.scope
       WEB_ACL_NAME = data.aws_wafv2_web_acl.waf_web_acl.name
       WEB_ACL_ID   = data.aws_wafv2_web_acl.waf_web_acl.id
-      # WEB_ACL_ARN      = data.aws_wafv2_web_acl.waf_web_acl.arn
-      RULE_NAME    = var.rule_name
+      RULE_NAME    = data.aws_wafv2_web_acl.waf_web_acl.rules[0].name
 
         # New variables for custom body injection
       CUSTOM_BODY_NAME   = "maintenance_html"
@@ -127,14 +110,14 @@ resource "aws_lambda_function" "waf_toggle" {
 .card{max-width:600px;margin:auto;background:#12243a;padding:2rem;border-radius:10px;}
 </style></head><body><div class="card">
 <h1>Scheduled Maintenance</h1>
-<p>The service is unavailable from 19:00 to 07:00 UK time.</p>
+<p>The service is unavailable from 19:00 to 07:00 UK time. Apologies for any inconvenience caused.</p>
 </div></body></html>
 EOT
     }
   }
 }
 
-# CloudWatch Event Rules to trigger Lambda
+# CloudWatch (EventBridge)Event Rules to trigger Lambda
 resource "aws_cloudwatch_event_rule" "waf_allow_0700_uk" {
   name                         = "waf-allow-0700-${var.env}"
   schedule_expression          = "cron(0 7 ? * MON-SUN *)"
@@ -147,6 +130,7 @@ resource "aws_cloudwatch_event_rule" "waf_block_1900_uk" {
   description                  = "Set WAF rule to BLOCK at 19:00 UK daily"
 }
 
+# CloudWatch (EventBridge)Event targets to Lambda
 resource "aws_cloudwatch_event_target" "waf_allow_target" {
   rule      = aws_cloudwatch_event_rule.waf_allow_0700_uk.name
   target_id = "Allow"
