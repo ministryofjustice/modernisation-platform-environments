@@ -41,6 +41,23 @@ data "aws_iam_policy_document" "sqs_kms_key_policy" {
       values   = [var.bucket.arn]
     }
   }
+  statement {
+    sid    = "AllowLambdaToDecrypt"
+    effect = "Allow"
+    principals {
+      type        = "Service"
+      identifiers = ["lambda.amazonaws.com"]
+    }
+    actions = [
+      "kms:Decrypt"
+    ]
+    resources = ["*"]
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceAccount"
+      values   = [data.aws_caller_identity.current.account_id]
+    }
+  }
 }
 
 resource "aws_kms_key" "sqs_kms_key" {
