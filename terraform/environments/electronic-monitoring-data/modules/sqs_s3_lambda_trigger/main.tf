@@ -63,6 +63,7 @@ resource "aws_sqs_queue" "s3_event_queue" {
   })
   kms_master_key_id                 = aws_kms_key.sqs_kms_key.id
   kms_data_key_reuse_period_seconds = 300
+
 }
 
 data "aws_iam_policy_document" "allow_s3_to_write" {
@@ -95,8 +96,11 @@ resource "aws_sqs_queue_policy" "allow_s3_to_write" {
 resource "aws_lambda_event_source_mapping" "sqs_trigger" {
   event_source_arn = aws_sqs_queue.s3_event_queue.arn
   function_name    = var.lambda_function_name
-  batch_size       = 10
-  enabled          = true
+  batch_size       = 1
+  scaling_config {
+    maximum_concurrency = 10
+  }
+
 }
 
 resource "aws_sqs_queue" "s3_event_dlq" {
