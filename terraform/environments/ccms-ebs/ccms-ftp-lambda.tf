@@ -72,6 +72,26 @@ resource "aws_s3_bucket_versioning" "s3_versioning" {
   }
 }
 
+# Lifecycle configuration: expire current objects and noncurrent versions after 30 days
+resource "aws_s3_bucket_lifecycle_configuration" "buckets_lifecycle" {
+  for_each = aws_s3_bucket.buckets
+
+  bucket = each.value.id
+
+  rule {
+    id     = "expire-30-days"
+    status = "Enabled"
+
+    expiration {
+      days = 30
+    }
+
+    noncurrent_version_expiration {
+      noncurrent_days = 30
+    }
+  }
+}
+
 #--Dynamic blocks for transfer family policy in production only
 data "aws_iam_policy_document" "inbound_bucket_policy" {
   statement {
