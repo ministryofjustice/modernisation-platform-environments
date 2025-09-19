@@ -211,7 +211,7 @@ resource "aws_lb_target_group" "WAM-Target-Group-Preprod-2" {
   }
 }
 
-
+/*
 resource "aws_lb_target_group" "WAM-Target-Group-Prod" {
   count    = local.is-production == true ? 1 : 0
   name     = "WAM-Prod"
@@ -234,7 +234,7 @@ resource "aws_lb_target_group" "WAM-Target-Group-Prod" {
     Name = "${var.networking[0].business-unit}-${local.environment}"
   }
 }
-
+*/
 
 resource "aws_lb_target_group" "WAM-Target-Group-Prod-2" {
   count    = local.is-production == true ? 1 : 0
