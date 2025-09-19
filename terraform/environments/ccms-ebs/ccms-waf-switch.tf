@@ -20,14 +20,6 @@ variable "scope"{
 }
 
 
-# variable "rule_name" {
-#     default = "ebs-trusted-rule" 
-# }
-
-locals {
-  waf_rule_name = data.aws_wafv2_web_acl.waf_web_acl.rules[0].name
-}
-
 data "archive_file" "waf_toggle_zip" {
   type        = "zip"
   source_file = "${path.module}/lambda_function.py"
@@ -102,7 +94,7 @@ resource "aws_lambda_function" "waf_toggle" {
       SCOPE        = var.scope
       WEB_ACL_NAME = data.aws_wafv2_web_acl.waf_web_acl.name
       WEB_ACL_ID   = data.aws_wafv2_web_acl.waf_web_acl.id
-      RULE_NAME    = local.waf_rule_name
+      RULE_NAME    = data.aws_wafv2_web_acl.waf_web_acl.rule[0].name
 
       # New variables for custom body injection
       CUSTOM_BODY_NAME   = "maintenance_html"
