@@ -39,7 +39,7 @@ resource "aws_s3_bucket_notification" "historic_data_checksum" {
     filter_prefix = "allied/mdss"
   }
   queue {
-    queue_arn     = module.format_json_fms_data.sqs_queue.arn
+    queue_arn     = module.format_json_fms_data_sqs.sqs_queue.arn
     events        = ["s3:ObjectCreated:*"]
     filter_suffix = ".JSON"
     filter_prefix = "serco/fms"
