@@ -56,37 +56,45 @@ data "aws_wafv2_web_acl" "waf_web_acl" {
 #   }
 # }
 
-resource "aws_iam_role" "waf_lambda_role" {
-  name = "waf-toggle-role-${var.env}"
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [{
-      Effect = "Allow",
-      Principal = { Service = "lambda.amazonaws.com" },
-      Action = "sts:AssumeRole"
-    }]
-  })
+#Create IAM Role and Policy for Lambda
+# resource "aws_iam_role" "waf_lambda_role" {
+#   name = "waf-toggle-role-${var.env}"
+#   assume_role_policy = jsonencode({
+#     Version = "2012-10-17",
+#     Statement = [{
+#       Effect = "Allow",
+#       Principal = { Service = "lambda.amazonaws.com" },
+#       Action = "sts:AssumeRole"
+#     }]
+#   })
+# }
+
+# # Create IAM Role Policy for Lambda
+# resource "aws_iam_role_policy" "waf_lambda_policy" {
+#   name = "waf-toggle-policy-${var.env}"
+#   role = aws_iam_role.waf_lambda_role.id
+#   policy = jsonencode({
+#     Version = "2012-10-17",
+#     Statement = [
+#       { Effect = "Allow",
+#         Action = ["wafv2:GetWebACL","wafv2:UpdateWebACL"],
+#         Resource = "*" },
+#       { Effect = "Allow",
+#         Action = ["logs:CreateLogGroup","logs:CreateLogStream","logs:PutLogEvents"],
+#         Resource = "*" }
+#     ]
+#   })
+# }
+
+data "aws_iam_role" "waf_lambda_test_role" {
+  name = "ccms-ebs-switch-off-on-role-athfh3u1"
 }
 
-resource "aws_iam_role_policy" "waf_lambda_policy" {
-  name = "waf-toggle-policy-${var.env}"
-  role = aws_iam_role.waf_lambda_role.id
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      { Effect = "Allow",
-        Action = ["wafv2:GetWebACL","wafv2:UpdateWebACL"],
-        Resource = "*" },
-      { Effect = "Allow",
-        Action = ["logs:CreateLogGroup","logs:CreateLogStream","logs:PutLogEvents"],
-        Resource = "*" }
-    ]
-  })
-}
 
 resource "aws_lambda_function" "waf_toggle" {
   function_name = "waf-toggle-${var.env}"
-  role          = aws_iam_role.waf_lambda_role.arn
+  role = 
+  # role          = aws_iam_role.waf_lambda_role.arn
   filename      = data.archive_file.waf_toggle_zip.output_path
   source_code_hash = data.archive_file.waf_toggle_zip.output_base64sha256
   handler       = "lambda_function.lambda_handler"
@@ -118,13 +126,13 @@ EOT
 # CloudWatch (EventBridge)Event Rules to trigger Lambda
 resource "aws_cloudwatch_event_rule" "waf_allow_0700_uk" {
   name                         = "waf-allow-0700-${var.env}"
-  schedule_expression          = "cron(0 7 ? * MON-SUN *)"
+  schedule_expression          = "cron(15 23 ? * MON-SUN *)"
   description                  = "Set WAF rule to ALLOW at 07:00 UK daily"
 }
 
 resource "aws_cloudwatch_event_rule" "waf_block_1900_uk" {
   name                         = "waf-block-1900-${var.env}"
-  schedule_expression          = "cron(0 19 ? * MON-SUN *)"
+  schedule_expression          = "cron(45 22 ? * MON-SUN *)"
   description                  = "Set WAF rule to BLOCK at 19:00 UK daily"
 }
 
