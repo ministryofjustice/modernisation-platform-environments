@@ -130,7 +130,6 @@ module "s3_to_lambda" {
   bucket               = module.this-bucket.bucket
   lambda_function_name = module.process_landing_bucket_files.lambda_function_name
   bucket_prefix        = var.local_bucket_prefix
-  s3_suffixes          = []
 }
 
 
