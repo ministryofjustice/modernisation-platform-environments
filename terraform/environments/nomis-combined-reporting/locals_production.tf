@@ -35,6 +35,7 @@ locals {
     ec2_instances = {
 
       pd-ncr-app-1 = merge(local.ec2_instances.bip_app, {
+        cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_app_prod
         config = merge(local.ec2_instances.bip_app.config, {
           availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.ec2_instances.bip_app.config.instance_profile_policies, [
@@ -47,6 +48,7 @@ locals {
         })
       })
       pd-ncr-app-2 = merge(local.ec2_instances.bip_app, {
+        cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_app_prod
         config = merge(local.ec2_instances.bip_app.config, {
           availability_zone = "eu-west-2b"
           instance_profile_policies = concat(local.ec2_instances.bip_app.config.instance_profile_policies, [
@@ -59,6 +61,7 @@ locals {
         })
       })
       pd-ncr-app-3 = merge(local.ec2_instances.bip_app, {
+        cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_app_prod
         config = merge(local.ec2_instances.bip_app.config, {
           availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.ec2_instances.bip_app.config.instance_profile_policies, [
@@ -71,6 +74,7 @@ locals {
         })
       })
       pd-ncr-app-4 = merge(local.ec2_instances.bip_app, {
+        cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_app_prod
         config = merge(local.ec2_instances.bip_app.config, {
           availability_zone = "eu-west-2b"
           instance_profile_policies = concat(local.ec2_instances.bip_app.config.instance_profile_policies, [
@@ -128,6 +132,7 @@ locals {
       })
 
       pd-ncr-cms-1 = merge(local.ec2_instances.bip_cms, {
+        cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_app_prod
         config = merge(local.ec2_instances.bip_cms.config, {
           availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.ec2_instances.bip_cms.config.instance_profile_policies, [
@@ -140,6 +145,7 @@ locals {
       })
 
       pd-ncr-cms-2 = merge(local.ec2_instances.bip_cms, {
+        cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_app_prod
         config = merge(local.ec2_instances.bip_cms.config, {
           availability_zone = "eu-west-2b"
           instance_profile_policies = concat(local.ec2_instances.bip_cms.config.instance_profile_policies, [
@@ -152,6 +158,7 @@ locals {
       })
 
       pd-ncr-webadmin-1 = merge(local.ec2_instances.bip_webadmin, {
+        cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_web_prod
         config = merge(local.ec2_instances.bip_webadmin.config, {
           availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.ec2_instances.bip_webadmin.config.instance_profile_policies, [
@@ -164,6 +171,7 @@ locals {
       })
 
       pd-ncr-web-1 = merge(local.ec2_instances.bip_web, {
+        cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_web_prod
         config = merge(local.ec2_instances.bip_web.config, {
           availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.ec2_instances.bip_web.config.instance_profile_policies, [
@@ -176,6 +184,7 @@ locals {
       })
 
       pd-ncr-web-2 = merge(local.ec2_instances.bip_web, {
+        cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_web_prod
         config = merge(local.ec2_instances.bip_web.config, {
           availability_zone = "eu-west-2b"
           instance_profile_policies = concat(local.ec2_instances.bip_web.config.instance_profile_policies, [
@@ -188,6 +197,7 @@ locals {
       })
 
       pd-ncr-web-3 = merge(local.ec2_instances.bip_web, {
+        cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_web_prod
         config = merge(local.ec2_instances.bip_web.config, {
           availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.ec2_instances.bip_web.config.instance_profile_policies, [
@@ -200,6 +210,7 @@ locals {
       })
 
       pd-ncr-web-4 = merge(local.ec2_instances.bip_web, {
+        cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_web_prod
         config = merge(local.ec2_instances.bip_web.config, {
           availability_zone = "eu-west-2b"
           instance_profile_policies = concat(local.ec2_instances.bip_web.config.instance_profile_policies, [
