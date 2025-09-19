@@ -21,7 +21,7 @@ resource "aws_security_group" "tribunals_lb_sc_sftp" {
   description = "control access to the network load balancer for sftp"
   vpc_id      = data.aws_vpc.shared.id
   dynamic "ingress" {
-    for_each = var.sftp_services
+    for_each = { for k, v in var.sftp_services : k => v if v.enabled }
     content {
       description = "allow all traffic on port ${ingress.value.sftp_port}"
       from_port   = ingress.value.sftp_port
@@ -41,7 +41,7 @@ resource "aws_security_group" "tribunals_lb_sc_sftp" {
 }
 
 resource "aws_lb_listener" "tribunals_lb_sftp" {
-  for_each          = var.sftp_services
+  for_each          = { for k, v in var.sftp_services : k => v if v.enabled }
   load_balancer_arn = aws_lb.tribunals_lb_sftp.arn
   port              = each.value.sftp_port
   protocol          = "TCP"
@@ -53,7 +53,7 @@ resource "aws_lb_listener" "tribunals_lb_sftp" {
 }
 
 resource "aws_lb_target_group" "tribunals_target_group_sftp" {
-  for_each             = var.sftp_services
+  for_each             = { for k, v in var.sftp_services : k => v if v.enabled }
   name                 = "${each.value.name_prefix}-sftp-tg"
   port                 = each.value.sftp_port
   protocol             = "TCP"
