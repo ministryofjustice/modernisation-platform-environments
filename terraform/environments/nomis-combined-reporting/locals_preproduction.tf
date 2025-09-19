@@ -205,7 +205,6 @@ locals {
             ]
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/sap/bip/lsast/*",
-              "arn:aws:secretsmanager:*:*:secret:/sap/bods/lsast/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*LS/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/LS*/*",
             ]
@@ -258,7 +257,6 @@ locals {
             ]
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/sap/bip/pp/*",
-              "arn:aws:secretsmanager:*:*:secret:/sap/bods/pp/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*PP/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/PP*/*",
             ]
@@ -438,8 +436,6 @@ locals {
       "/oracle/database/LSBIAUD"  = local.secretsmanager_secrets.db
       "/sap/bip/lsast"            = local.secretsmanager_secrets.bip
       "/sap/bip/pp"               = local.secretsmanager_secrets.bip
-      "/sap/bods/lsast"           = local.secretsmanager_secrets.bods
-      "/sap/bods/pp"              = local.secretsmanager_secrets.bods
     }
   }
 }
