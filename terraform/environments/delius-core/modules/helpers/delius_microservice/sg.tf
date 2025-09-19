@@ -51,6 +51,7 @@ resource "aws_security_group_rule" "ecs_service_tls_egress" {
 
 resource "aws_security_group_rule" "all_cluster_to_ecs_service_tcp" {
   for_each                 = toset([for _, v in var.container_port_config : tostring(v.containerPort)])
+  description              = "In from ECS cluster"
   security_group_id        = aws_security_group.ecs_service.id
   type                     = "ingress"
   from_port                = each.value
@@ -61,6 +62,7 @@ resource "aws_security_group_rule" "all_cluster_to_ecs_service_tcp" {
 
 resource "aws_security_group_rule" "bastion_to_ecs_service_tcp" {
   for_each                 = toset([for _, v in var.container_port_config : tostring(v.containerPort)])
+  description              = "In from Bastion"
   security_group_id        = aws_security_group.ecs_service.id
   type                     = "ingress"
   from_port                = each.value

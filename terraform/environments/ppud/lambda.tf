@@ -1164,7 +1164,8 @@ resource "aws_lambda_function" "terraform_lambda_func_wam_web_traffic_analysis_p
   role                           = aws_iam_role.lambda_role_get_cloudwatch_prod[0].arn
   handler                        = "wam_web_traffic_analysis_prod.lambda_handler"
   runtime                        = "python3.12"
-  timeout                        = 300
+  timeout                        = 900
+  memory_size                    = 1024
   depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policies_get_cloudwatch_prod]
   reserved_concurrent_executions = 5
   dead_letter_config {
@@ -1174,9 +1175,9 @@ resource "aws_lambda_function" "terraform_lambda_func_wam_web_traffic_analysis_p
     mode = "Active"
   }
   layers = [
-    "arn:aws:lambda:eu-west-2:${data.aws_ssm_parameter.klayers_account_prod[0].value}:layer:Klayers-p312-numpy:8",
-    "arn:aws:lambda:eu-west-2:${data.aws_ssm_parameter.klayers_account_prod[0].value}:layer:Klayers-p312-pillow:1",
-    aws_lambda_layer_version.lambda_layer_matplotlib_prod_new[0].arn
+    aws_lambda_layer_version.lambda_layer_beautifulsoup_prod[0].arn,
+    aws_lambda_layer_version.lambda_layer_xlsxwriter_prod[0].arn,
+    aws_lambda_layer_version.lambda_layer_requests_prod[0].arn
   ]
   # VPC configuration
   vpc_config {
