@@ -275,7 +275,6 @@ locals {
             ]
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/sap/bip/pd/*",
-              "arn:aws:secretsmanager:*:*:secret:/sap/bods/pd/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*PD/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/PD*/*",
             ]
@@ -465,7 +464,6 @@ locals {
       "/oracle/database/DRBISYS"  = local.secretsmanager_secrets.db
       "/oracle/database/DRBIAUD"  = local.secretsmanager_secrets.db
       "/sap/bip/pd"               = local.secretsmanager_secrets.bip
-      "/sap/bods/pd"              = local.secretsmanager_secrets.bods
     }
   }
 }
