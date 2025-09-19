@@ -110,15 +110,13 @@ module "ecs_service" {
     type = each.value.deployment_controller
   }
 
-  subnet_ids                 = var.ecs_subnet_ids
-  create_security_group      = false
-  security_group_ids         = each.value.internal_only ? [aws_security_group.common_ecs_service_internal.id] : [aws_security_group.common_ecs_service_external.id]
-  tasks_iam_role_name        = each.value.ecs_task_iam_role_name
-  tasks_iam_role_arn         = aws_iam_role.ecs_task_role.arn
-  create_tasks_iam_role      = false
-  tasks_iam_role_description = "IAM role for ECS tasks"
-  create_task_exec_iam_role  = false
-  task_exec_iam_role_arn     = aws_iam_role.ecs_task_execution_role.arn
+  subnet_ids                = var.ecs_subnet_ids
+  create_security_group     = false
+  security_group_ids        = each.value.internal_only ? [aws_security_group.common_ecs_service_internal.id] : [aws_security_group.common_ecs_service_external.id]
+  tasks_iam_role_arn        = aws_iam_role.ecs_task_role.arn
+  create_tasks_iam_role     = false
+  create_task_exec_iam_role = false
+  task_exec_iam_role_arn    = aws_iam_role.ecs_task_execution_role.arn
 
   tags = merge(each.value.tags, local.all_tags)
 }
