@@ -295,6 +295,10 @@ resource "aws_instance" "tribunals_backup" {
     Name        = "tribunals-backup-instance"
     Role        = "Backup"
   }
+
+  lifecycle {
+    ignore_changes = [user_data]
+  }
 }
 
 ###########################################################################

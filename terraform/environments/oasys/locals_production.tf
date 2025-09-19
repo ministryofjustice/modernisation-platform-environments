@@ -4,8 +4,9 @@ locals {
 
   baseline_presets_production = {
     options = {
-      db_backup_lifecycle_rule    = "rman_backup_one_month"
-      enable_xsiam_s3_integration = true
+      db_backup_lifecycle_rule            = "rman_backup_one_month"
+      enable_xsiam_cloudwatch_integration = true
+      enable_xsiam_s3_integration         = true
 
       sns_topics = {
         pagerduty_integrations = {

@@ -52,7 +52,7 @@ variable "db_suffix" {
 # The following variables are required for setting up the Data Guard Observer as a Microservice
 variable "app_name" {
   type    = string
-  default = null
+  default = ""
 }
 
 variable "database_name" {

@@ -11,13 +11,14 @@ resource "aws_cloudfront_distribution" "tribunals_distribution" {
   logging_config {
     include_cookies = false
     bucket          = aws_s3_bucket.cloudfront_logs.bucket_domain_name
-    prefix          = "cloudfront-logs/"
+    prefix          = "cloudfront-logs-v2/"
   }
 
   aliases = local.is-production ? [
     "*.decisions.tribunals.gov.uk",
     "*.venues.tribunals.gov.uk",
-    "*.reports.tribunals.gov.uk"
+    "*.reports.tribunals.gov.uk",
+    "siac.tribunals.gov.uk"
   ] : ["*.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
   origin {
     domain_name = aws_lb.tribunals_lb.dns_name
@@ -49,9 +50,6 @@ resource "aws_cloudfront_distribution" "tribunals_distribution" {
     allowed_methods        = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
     cached_methods         = ["GET", "HEAD"]
     compress               = true
-    default_ttl            = 0
-    min_ttl                = 0
-    max_ttl                = 31536000
     smooth_streaming       = false
 
     dynamic "function_association" {
@@ -94,7 +92,7 @@ resource "aws_acm_certificate" "cloudfront" {
   provider                  = aws.us-east-1
   domain_name               = local.is-production ? "*.decisions.tribunals.gov.uk" : "modernisation-platform.service.justice.gov.uk"
   validation_method         = "DNS"
-  subject_alternative_names = local.is-production ? ["*.venues.tribunals.gov.uk", "*.reports.tribunals.gov.uk"] : ["*.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
+  subject_alternative_names = local.is-production ? ["*.venues.tribunals.gov.uk", "*.reports.tribunals.gov.uk", "siac.tribunals.gov.uk"] : ["*.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
   tags = {
     Environment = local.environment
   }
@@ -190,28 +188,28 @@ resource "aws_s3_bucket_policy" "cloudfront_logs" {
     Version = "2012-10-17"
     Statement = [
       {
-        Sid    = "AllowCloudFrontLogDelivery"
+        Sid = "AllowCloudFrontLogDelivery"
         Effect = "Allow"
         Principal = {
           Service = "delivery.logs.amazonaws.com"
         }
-        Action = [
-          "s3:PutObject",
-          "s3:GetBucketAcl",
-          "s3:PutBucketAcl"
-        ]
-        Resource = [
-          aws_s3_bucket.cloudfront_logs.arn,
-          "${aws_s3_bucket.cloudfront_logs.arn}/*"
-        ]
+        Action = "s3:PutObject"
+        Resource = "${aws_s3_bucket.cloudfront_logs.arn}/cloudfront-logs-v2/*"
         Condition = {
           StringEquals = {
             "aws:SourceAccount" = data.aws_caller_identity.current.account_id
-          }
-          StringLike = {
-            "aws:SourceArn" = "arn:aws:cloudfront::${data.aws_caller_identity.current.account_id}:distribution/${aws_cloudfront_distribution.tribunals_distribution.id}"
+            "aws:SourceArn" = aws_cloudfront_distribution.tribunals_distribution.arn
           }
         }
+      },
+      {
+        Sid = "AllowCloudFrontLogDeliveryGetBucketAcl"
+        Effect = "Allow"
+        Principal = {
+          Service = "delivery.logs.amazonaws.com"
+        }
+        Action = "s3:GetBucketAcl"
+        Resource = aws_s3_bucket.cloudfront_logs.arn
       }
     ]
   })
