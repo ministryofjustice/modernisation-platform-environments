@@ -50,4 +50,21 @@ resource "aws_lakeformation_permissions" "data_location_access_working" {
 }
 
 
+locals {
+  super_dbs = [
+    "curated_prisons_history_dev_dbt",
+    "staged_prisons_history_dev_dbt"
+  ]
+}
 
+resource "aws_lakeformation_permissions" "super_permissions" {
+  for_each = toset(local.super_dbs)
+
+  principal                     = "arn:aws:iam::771283872747:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-data-eng_a2da3e45320e1580"
+  permissions                   = ["ALL"]
+  permissions_with_grant_option = ["ALL"]
+
+  database {
+    name = each.value
+  }
+}
