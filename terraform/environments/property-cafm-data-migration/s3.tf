@@ -78,25 +78,22 @@ resource "aws_s3_bucket_policy" "CAFM" {
   bucket = aws_s3_bucket.CAFM.id
 
   policy = jsonencode({
-    Version = "2012-10-17"
+    Version = "2012-10-17",
     Statement = [
       {
-        "Sid" : "RequireSSLRequests",
-        "Effect" : "Deny",
-        "Principal" : "*",
-        "Action" : "s3:*",
-        "Resource" : [
+        Sid       = "RequireSSLRequests",
+        Effect    = "Deny",
+        Principal = "*",
+        Action    = "s3:*",
+        Resource  = [
           aws_s3_bucket.CAFM.arn,
           "${aws_s3_bucket.CAFM.arn}/*"
         ],
-        "Condition" : {
-          "Bool" : {
-            "aws:SecureTransport" : "false"
-          }
-        }
+        Condition = { Bool = { "aws:SecureTransport" = false } }
       },
       {
-        Effect = "Allow"
+        Sid       = "XAccountBucketLevel",
+        Effect    = "Allow",
         Principal = {
           AWS = [
             "arn:aws:iam::${local.environment_management.account_ids["property-cafm-data-migration-development"]}:role/developer",
@@ -106,16 +103,36 @@ resource "aws_s3_bucket_policy" "CAFM" {
             "arn:aws:iam::${local.environment_management.account_ids["property-cafm-data-migration-production"]}:role/developer",
             "arn:aws:iam::${local.environment_management.account_ids["property-cafm-data-migration-production"]}:role/migration"
           ]
-        }
+        },
+        Action   = ["s3:ListBucket", "s3:GetBucketLocation", "s3:ListBucketMultipartUploads"],
+        Resource = aws_s3_bucket.CAFM.arn
+      },
+      {
+        Sid       = "XAccountObjectLevel",
+        Effect    = "Allow",
+        Principal = {
+          AWS = [
+            "arn:aws:iam::${local.environment_management.account_ids["property-cafm-data-migration-development"]}:role/developer",
+            "arn:aws:iam::${local.environment_management.account_ids["property-cafm-data-migration-development"]}:role/sandbox",
+            "arn:aws:iam::${local.environment_management.account_ids["property-cafm-data-migration-preproduction"]}:role/developer",
+            "arn:aws:iam::${local.environment_management.account_ids["property-cafm-data-migration-preproduction"]}:role/migration",
+            "arn:aws:iam::${local.environment_management.account_ids["property-cafm-data-migration-production"]}:role/developer",
+            "arn:aws:iam::${local.environment_management.account_ids["property-cafm-data-migration-production"]}:role/migration"
+          ]
+        },
         Action = [
           "s3:GetObject",
-          "s3:PutObject"
-        ]
+          "s3:PutObject",
+          "s3:PutObjectTagging",
+          "s3:AbortMultipartUpload",
+          "s3:ListMultipartUploadParts"
+        ],
         Resource = "${aws_s3_bucket.CAFM.arn}/*"
       }
     ]
   })
 }
+
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "CAFM" {
   bucket = aws_s3_bucket.CAFM.id
@@ -378,7 +395,7 @@ module "s3_planetfm_landing_bucket" {
           module.s3_planetfm_landing_bucket.bucket.arn,
           "${module.s3_planetfm_landing_bucket.bucket.arn}/*"
         ]
-      }
+      },
     ]
   })]
 
