@@ -240,7 +240,6 @@ locals {
           "nomis-data-hub-test",
           "oasys-test",
           "oasys-national-reporting-test",
-          "planetfm-test",
         ]
       }
     }
