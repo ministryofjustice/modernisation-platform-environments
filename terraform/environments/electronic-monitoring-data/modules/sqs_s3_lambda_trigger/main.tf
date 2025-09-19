@@ -24,7 +24,7 @@ data "aws_iam_policy_document" "sqs_kms_key_policy" {
       identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
     }
     actions   = ["kms:*"]
-    resources = [""]
+    resources = [aws_kms_key.sqs_kms_key.arn]
   }
   statement {
     sid    = "S3UseofKey"
@@ -35,7 +35,7 @@ data "aws_iam_policy_document" "sqs_kms_key_policy" {
     }
     actions = [
       "kms:GenerateDataKey",
-      "kms:Decrpyt",
+      "kms:Decrypt",
     ]
     resources = ["*"]
     condition {
