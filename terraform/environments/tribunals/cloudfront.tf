@@ -124,7 +124,7 @@ resource "aws_route53_record" "cloudfront_cert_cname_validation" {
       value = dvo.resource_record_value
     }
     # Only generate for the cloudfront_sans and the main domain
-    if contains(concat(local.cloudfront_sans, [aws_acm_certificate.cloudfront.domain_name]), dvo.domain_name)
+    if contains(concat(local.cloudfront_sans, [aws_acm_certificate.cloudfront.domain_name], local.nonprod_sans), dvo.domain_name)
   }
 
   allow_overwrite = true
