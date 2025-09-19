@@ -578,8 +578,8 @@ module "full_load_g4s_centurion" {
 
   name               = "g4s-centurion"
   environment        = local.environment
-  database_name      = "g4s-centurion"
-  path_to_data       = "g4s-centurion"
+  database_name      = "g4s_centurion"
+  path_to_data       = "g4s_centurion"
   source_data_bucket = module.s3-dms-target-store-bucket.bucket
   secret_code        = jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]
   oidc_arn           = aws_iam_openid_connect_provider.analytical_platform_compute.arn
