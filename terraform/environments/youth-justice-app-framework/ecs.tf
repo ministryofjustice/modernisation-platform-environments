@@ -97,7 +97,8 @@ module "ecs" {
     aws_secretsmanager_secret.google_api.arn,
     aws_secretsmanager_secret.yjaf_credentials.arn,
     module.redshift.returns_secret_arn,
-    module.datadog.datadog_api_key_secret_arn
+    module.datadog.datadog_api_key_secret_arn,
+    module.datadog.datadog_api_key_plain_secret_arn
   ])
   ecs_role_additional_policies_arns = [
     aws_iam_policy.s3-access.arn,
