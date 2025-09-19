@@ -165,3 +165,46 @@ resource "aws_iam_role_policy_attachment" "attach_ec2_policy" {
   role       = aws_iam_role.ec2_instance_role.name
   policy_arn = aws_iam_policy.ec2_instance_policy.arn
 }
+
+# S3 Access Policy
+resource "aws_iam_policy" "s3_access_policy" {
+  name        = "${local.application_name}-${local.environment}-s3-access"
+  description = "S3 access policy for ${local.application_name} documents"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "S3BucketAccess"
+        Effect = "Allow"
+        Action = [
+          "s3:ListBucket",
+          "s3:GetBucketLocation",
+          "s3:GetBucketVersioning"
+        ]
+        Resource = module.s3_pui_docs.arn
+      },
+      {
+        Sid    = "S3ObjectAccess"
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:GetObjectVersion",
+          "s3:PutObject",
+          "s3:PutObjectAcl",
+          "s3:DeleteObject",
+          "s3:DeleteObjectVersion"
+        ]
+        Resource = "${module.s3_pui_docs.arn}/*"
+      }
+    ]
+  })
+
+  tags = local.tags
+}
+
+# Attach S3 policy to existing EC2 instance role
+resource "aws_iam_role_policy_attachment" "ec2_s3_access" {
+  role       = aws_iam_role.ec2_instance_role.name
+  policy_arn = aws_iam_policy.s3_access_policy.arn
+}
