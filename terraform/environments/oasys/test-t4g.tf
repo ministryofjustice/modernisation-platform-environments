@@ -19,6 +19,5 @@ resource "aws_instance" "my_t4_instance" {
   tags = {
     Name = "First t4 instance"
   }
-
 }
 
