@@ -93,7 +93,7 @@ data "aws_iam_role" "waf_lambda_test_role" {
 
 resource "aws_lambda_function" "waf_toggle" {
   function_name = "waf-toggle-${var.env}"
-  role = 
+  role =  data.aws_iam_role.waf_lambda_test_role.arn
   # role          = aws_iam_role.waf_lambda_role.arn
   filename      = data.archive_file.waf_toggle_zip.output_path
   source_code_hash = data.archive_file.waf_toggle_zip.output_base64sha256
