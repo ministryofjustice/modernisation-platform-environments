@@ -21,7 +21,7 @@ resource "aws_ssm_parameter" "cclf_provider_load_timestamp" {
   name        = "/${local.application_name_short}/cclf-load-timestamp-${local.environment}"
   description = "timestamp value of last successful process CCLF lambda"
   type        = "SecureString"
-  value       = "test-value"
+  value       = "20000101000000"
   key_id      = "alias/aws/ssm"
 
   lifecycle {
