@@ -25,6 +25,16 @@ resource "aws_security_group_rule" "cloudwatch_log_alert_https" {
   description              = "Outbound 443 to LAA VPC Endpoint SG"
 }
 
+resource "aws_security_group_rule" "cloudwatch_log_alert_https_to_internet" {
+  type              = "egress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]           
+  security_group_id = aws_security_group.cloudwatch_log_alert_sg.id
+  description       = "Allow outbound HTTPS to any destination (0.0.0.0/0) for Slack webhook"
+}
+
 ######################################
 ### Lambda Function
 ######################################
@@ -38,7 +48,7 @@ resource "aws_lambda_function" "cloudwatch_log_alert" {
 
   environment {
     variables = {
-      ALERT_TOPIC_ARN = aws_sns_topic.hub2_alerts.arn
+      SLACK_WEBHOOK_URL  = aws_secretsmanager_secret.slack_alert_channel_webhook.name
     }
   }
 
@@ -158,6 +168,15 @@ resource "aws_iam_policy" "cloudwatch_log_alert_policy" {
           "sns:Publish"
         ]
         Resource = aws_sns_topic.hub2_alerts.arn
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "secretsmanager:GetSecretValue",
+        ]
+        Resource = [
+          aws_secretsmanager_secret.slack_alert_channel_webhook.arn
+        ]
       }
     ]
   })
