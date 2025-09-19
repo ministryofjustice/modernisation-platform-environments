@@ -87,7 +87,7 @@ data "aws_wafv2_web_acl" "waf_web_acl" {
 # }
 
 data "aws_iam_role" "waf_lambda_test_role" {
-  name = "ccms-ebs-switch-off-on-role-athfh3u1"
+  name = "ccms-switch-off-role"
 }
 
 
@@ -126,13 +126,13 @@ EOT
 # CloudWatch (EventBridge)Event Rules to trigger Lambda
 resource "aws_cloudwatch_event_rule" "waf_allow_0700_uk" {
   name                         = "waf-allow-0700-${var.env}"
-  schedule_expression          = "cron(15 23 ? * MON-SUN *)"
+  schedule_expression          = "cron(30 23 ? * MON-SUN *)"
   description                  = "Set WAF rule to ALLOW at 07:00 UK daily"
 }
 
 resource "aws_cloudwatch_event_rule" "waf_block_1900_uk" {
   name                         = "waf-block-1900-${var.env}"
-  schedule_expression          = "cron(00 23 ? * MON-SUN *)"
+  schedule_expression          = "cron(25 23 ? * MON-SUN *)"
   description                  = "Set WAF rule to BLOCK at 19:00 UK daily"
 }
 
