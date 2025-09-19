@@ -1,24 +1,54 @@
 module "calculate_checksum_sqs" {
   source               = "./modules/sqs_s3_lambda_trigger"
   bucket               = module.s3-data-bucket.bucket
-  s3_suffixes          = [
-    ".bak",
-    ".zip",
-    ".bacpac",
-    ".7z",
-    ".xlsx",
-    ".gz",
-    ".csv",
-  ]
   lambda_function_name = module.calculate_checksum.lambda_function_name
   bucket_prefix        = local.bucket_prefix
+}
+
+resource "aws_s3_bucket_notification" "historic_data_checksum" {
+  bucket = module.s3-data-bucket.bucket.id
+  queue {
+    queue_arn     = module.calculate_checksum_sqs.sqs_queue.arn
+    events        = ["s3:ObjectCreated:*"]
+    filter_suffix = ".zip"
+  }
+  queue {
+    queue_arn     = module.calculate_checksum_sqs.sqs_queue.arn
+    events        = ["s3:ObjectCreated:*"]
+    filter_suffix = ".bak"
+  }
+  queue {
+    queue_arn     = module.calculate_checksum_sqs.sqs_queue.arn
+    events        = ["s3:ObjectCreated:*"]
+    filter_suffix = ".bacpac"
+  }
+  queue {
+    queue_arn     = module.calculate_checksum_sqs.sqs_queue.arn
+    events        = ["s3:ObjectCreated:*"]
+    filter_suffix = ".csv"
+  }
+  queue {
+    queue_arn     = module.calculate_checksum_sqs.sqs_queue.arn
+    events        = ["s3:ObjectCreated:*"]
+    filter_suffix = ".7z"
+  }
+  queue {
+    queue_arn     = module.copy_mdss_data_sqs.sqs_queue.arn
+    events        = ["s3:ObjectCreated:*"]
+    filter_suffix = ".jsonl"
+    filter_prefix = "allied/mdss"
+  }
+  queue {
+    queue_arn     = module.format_json_fms_data.sqs_queue.arn
+    events        = ["s3:ObjectCreated:*"]
+    filter_suffix = ".JSON"
+    filter_prefix = "serco/fms"
+  }
 }
 
 module "format_json_fms_data_sqs" {
   source               = "./modules/sqs_s3_lambda_trigger"
   bucket               = module.s3-data-bucket.bucket
-  s3_prefix            = "serco/fms/"
-  s3_suffixes          = [".JSON"]
   lambda_function_name = module.format_json_fms_data.lambda_function_name
   bucket_prefix        = local.bucket_prefix
 }
@@ -26,8 +56,6 @@ module "format_json_fms_data_sqs" {
 module "copy_mdss_data_sqs" {
   source               = "./modules/sqs_s3_lambda_trigger"
   bucket               = module.s3-data-bucket.bucket
-  s3_prefix            = "serco/fms/"
-  s3_suffixes          = [".JSON"]
   lambda_function_name = module.copy_mdss_data.lambda_function_name
   bucket_prefix        = local.bucket_prefix
 }
