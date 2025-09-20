@@ -123,35 +123,33 @@ EOT
   }
 }
 
-# CloudWatch (EventBridge)Event Rules to trigger Lambda
-resource "aws_cloudwatch_event_rule" "waf_allow_0700_uk" {
-  name                         = "waf-allow-0700-${var.env}"
-  schedule_expression          = "cron(00 18 ? * MON-SUN *)"
-  description                  = "Set WAF rule to ALLOW at 07:00 UK daily"
+// EventBridge scheduled rules to trigger Lambda
+resource "aws_eventbridge_rule" "waf_allow_0700_uk" {
+  name                = "waf-allow-0700-${var.env}"
+  schedule_expression = "cron(20 18 ? * MON-SUN *)"
+  description         = "Set WAF rule to ALLOW at 07:00 UK daily"
 }
 
-resource "aws_cloudwatch_event_rule" "waf_block_1900_uk" {
-  name                         = "waf-block-1900-${var.env}"
-  schedule_expression          = "cron(50 17 ? * MON-SUN *)"
-  description                  = "Set WAF rule to BLOCK at 19:00 UK daily"
+resource "aws_eventbridge_rule" "waf_block_1900_uk" {
+  name                = "waf-block-1900-${var.env}"
+  schedule_expression = "cron(10 18 ? * MON-SUN *)"
+  description         = "Set WAF rule to BLOCK at 19:00 UK daily"
 }
 
-# CloudWatch (EventBridge)Event targets to Lambda
-resource "aws_cloudwatch_event_target" "waf_allow_target" {
-  rule      = aws_cloudwatch_event_rule.waf_allow_0700_uk.name
+// EventBridge targets to invoke the Lambda
+resource "aws_eventbridge_target" "waf_allow_target" {
+  rule      = aws_eventbridge_rule.waf_allow_0700_uk.name
   target_id = "Allow"
   arn       = aws_lambda_function.waf_toggle.arn
-  input     = jsonencode({ mode = "Allow" })
+  input     = jsonencode({ mode = "ALLOW" })
 }
 
-resource "aws_cloudwatch_event_target" "waf_block_target" {
-  rule      = aws_cloudwatch_event_rule.waf_block_1900_uk.name
+resource "aws_eventbridge_target" "waf_block_target" {
+  rule      = aws_eventbridge_rule.waf_block_1900_uk.name
   target_id = "Block"
   arn       = aws_lambda_function.waf_toggle.arn
-  input     = jsonencode({ mode = "Block" })
+  input     = jsonencode({ mode = "BLOCK" })
 }
-
-
 
 # allow Events to invoke the Lambda
 resource "aws_lambda_permission" "waf_events_allow" {
@@ -159,12 +157,12 @@ resource "aws_lambda_permission" "waf_events_allow" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.waf_toggle.function_name
   principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.waf_allow_0700_uk.arn
+  source_arn    = aws_eventbridge_rule.waf_allow_0700_uk.arn
 }
 resource "aws_lambda_permission" "waf_events_block" {
   statement_id  = "AllowEvents1900-${var.env}"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.waf_toggle.function_name
   principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.waf_block_1900_uk.arn
+  source_arn    = aws_eventbridge_rule.waf_block_1900_uk.arn
 }
