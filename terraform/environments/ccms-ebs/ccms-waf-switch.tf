@@ -124,13 +124,13 @@ EOT
 // EventBridge scheduled rules to trigger Lambda
 resource "aws_cloudwatch_event_rule" "waf_allow_0700_uk" {
   name                = "waf-allow-0700-${var.env}"
-  schedule_expression = "cron(40 18 ? * MON-SUN *)"
+  schedule_expression = "cron(00 21 ? * MON-SUN *)"
   description         = "Set WAF rule to ALLOW at 07:00 UK daily"
 }
 
 resource "aws_cloudwatch_event_rule" "waf_block_1900_uk" {
   name                = "waf-block-1900-${var.env}"
-  schedule_expression = "cron(00 20 ? * MON-SUN *)"
+  schedule_expression = "cron(50 20 ? * MON-SUN *)"
   description         = "Set WAF rule to BLOCK at 19:00 UK daily"
 }
 
@@ -145,7 +145,7 @@ resource "aws_cloudwatch_event_target" "waf_block_target" {
   rule      = aws_cloudwatch_event_rule.waf_block_1900_uk.name
   target_id = "Block"
   arn       = aws_lambda_function.waf_toggle.arn
-  input     = jsonencode({ mode = "Block" })
+  input     = jsonencode({ mode = "BLOCK" })
 }
 
 # allow Events to invoke the Lambda
@@ -162,4 +162,84 @@ resource "aws_lambda_permission" "waf_events_block" {
   function_name = aws_lambda_function.waf_toggle.function_name
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.waf_block_1900_uk.arn
+}
+
+// Outputs
+output "waf_web_acl_name" {
+  description = "WAF Web ACL name"
+  value       = data.aws_wafv2_web_acl.waf_web_acl.name
+}
+
+output "waf_web_acl_id" {
+  description = "WAF Web ACL id"
+  value       = data.aws_wafv2_web_acl.waf_web_acl.id
+}
+
+output "waf_lambda_role_arn" {
+  description = "IAM role ARN used by the Lambda"
+  value       = aws_iam_role.waf_lambda_role.arn
+}
+
+output "waf_lambda_role_name" {
+  description = "IAM role name used by the Lambda"
+  value       = aws_iam_role.waf_lambda_role.name
+}
+
+output "waf_lambda_role_policy_id" {
+  description = "IAM role inline policy id attached to Lambda role"
+  value       = aws_iam_role_policy.waf_lambda_policy.id
+}
+
+output "waf_lambda_function_arn" {
+  description = "Lambda function ARN"
+  value       = aws_lambda_function.waf_toggle.arn
+}
+
+output "waf_lambda_function_name" {
+  description = "Lambda function name"
+  value       = aws_lambda_function.waf_toggle.function_name
+}
+
+output "waf_allow_rule_arn" {
+  description = "CloudWatch event rule ARN for allow schedule"
+  value       = aws_cloudwatch_event_rule.waf_allow_0700_uk.arn
+}
+
+output "waf_allow_rule_name" {
+  description = "CloudWatch event rule name for allow schedule"
+  value       = aws_cloudwatch_event_rule.waf_allow_0700_uk.name
+}
+
+output "waf_block_rule_arn" {
+  description = "CloudWatch event rule ARN for block schedule"
+  value       = aws_cloudwatch_event_rule.waf_block_1900_uk.arn
+}
+
+output "waf_block_rule_name" {
+  description = "CloudWatch event rule name for block schedule"
+  value       = aws_cloudwatch_event_rule.waf_block_1900_uk.name
+}
+
+output "waf_allow_target_id" {
+  description = "Event target id for allow schedule"
+  value       = aws_cloudwatch_event_target.waf_allow_target.target_id
+}
+
+output "waf_block_target_id" {
+  description = "Event target id for block schedule"
+  value       = aws_cloudwatch_event_target.waf_block_target.target_id
+}
+
+output "waf_events_allow_permission_id" {
+  description = "Lambda permission id allowing events to invoke the lambda (allow)"
+  value       = aws_lambda_permission.waf_events_allow.id
+}
+
+output "waf_events_block_permission_id" {
+  description = "Lambda permission id allowing events to invoke the lambda (block)"
+  value       = aws_lambda_permission.waf_events_block.id
+}
+
+output "waf_web_acl_full" {
+  value = data.aws_wafv2_web_acl.waf_web_acl
 }
