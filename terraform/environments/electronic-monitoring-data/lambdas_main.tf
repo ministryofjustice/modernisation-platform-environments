@@ -209,7 +209,7 @@ module "calculate_checksum" {
 }
 
 #-----------------------------------------------------------------------------------
-# DMS Validation Lambda
+# DMS Validation Lambdas
 #-----------------------------------------------------------------------------------
 module "dms_retrieve_metadata" {
   count = local.is-development || local.is-production ? 1 : 0
@@ -255,6 +255,27 @@ module "dms_validation" {
     SERVER_NAME   = split(":", aws_db_instance.database_2022[0].endpoint)[0]
   }
 
+  security_group_ids = [aws_security_group.dms_validation_lambda_sg[0].id]
+  subnet_ids         = data.aws_subnets.shared-public.ids
+}
+
+#-----------------------------------------------------------------------------------
+# Process FMS metadata
+#-----------------------------------------------------------------------------------
+
+module "process_fms_metadata" {
+  count = local.is-development ? 0 : 1
+
+  source                  = "./modules/lambdas"
+  is_image                = true
+  function_name           = "process_fms_metadata"
+  role_name               = aws_iam_role.process_fms_metadata[0].name
+  role_arn                = aws_iam_role.process_fms_metadata[0].arn
+  handler                 = "process_fms_metadata.handler"
+  memory_size             = 10240
+  timeout                 = 900
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : "dev"
   security_group_ids = [aws_security_group.dms_validation_lambda_sg[0].id]
   subnet_ids         = data.aws_subnets.shared-public.ids
 }

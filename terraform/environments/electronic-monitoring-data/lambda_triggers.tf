@@ -2,7 +2,6 @@
 # Data bucket notification triggers
 # ---------------------------------------
 resource "aws_s3_bucket_notification" "historic_data_store" {
-  depends_on = [aws_lambda_permission.historic, aws_lambda_permission.live_serco_fms]
   bucket     = module.s3-data-bucket.bucket.id
 
   lambda_function {
@@ -52,40 +51,8 @@ resource "aws_s3_bucket_notification" "historic_data_store" {
 }
 
 # ---------------------------------------
-# mdss data jsonl lambda trigger
+# virus scan trigger
 # ---------------------------------------
-
-resource "aws_lambda_permission" "live_allied_mdss" {
-  statement_id  = "LiveSercoFMSLambdaAllowExecutionFromS3Bucket"
-  action        = "lambda:InvokeFunction"
-  function_name = module.copy_mdss_data.lambda_function_name
-  principal     = "s3.amazonaws.com"
-  source_arn    = module.s3-data-bucket.bucket.arn
-}
-
-# ---------------------------------------
-# fms data JSON lambda trigger
-# ---------------------------------------
-
-resource "aws_lambda_permission" "live_serco_fms" {
-  statement_id  = "LiveSercoFMSLambdaAllowExecutionFromS3Bucket"
-  action        = "lambda:InvokeFunction"
-  function_name = module.format_json_fms_data.lambda_function_name
-  principal     = "s3.amazonaws.com"
-  source_arn    = module.s3-data-bucket.bucket.arn
-}
-
-# ---------------------------------------
-# historic data checksum trigger
-# ---------------------------------------
-
-resource "aws_lambda_permission" "historic" {
-  statement_id  = "ChecksumLambdaAllowExecutionFromHistoricData"
-  action        = "lambda:InvokeFunction"
-  function_name = module.calculate_checksum.lambda_function_name
-  principal     = "s3.amazonaws.com"
-  source_arn    = module.s3-data-bucket.bucket.arn
-}
 
 module "virus_scan_sqs" {
   source               = "./modules/sqs_s3_lambda_trigger"
@@ -102,5 +69,25 @@ resource "aws_s3_bucket_notification" "scan_received_files" {
     events              = ["s3:ObjectCreated:*"]
   }
 
-  depends_on = [aws_lambda_permission.scan_received_files]
+}
+
+# ---------------------------------------
+# Metadata process trigger
+# ---------------------------------------
+
+module "process_fms_metadata_sqs" {
+  source               = "./modules/sqs_s3_lambda_trigger"
+  bucket               = module.s3-raw-formatted-data-bucket.bucket
+  lambda_function_name = module.process_fms_metadata.lambda_function_name
+  bucket_prefix        = local.bucket_prefix
+}
+
+resource "aws_s3_bucket_notification" "process_fms_metadata" {
+  bucket = module.s3-received-files-bucket.bucket.id
+
+  lambda_function {
+    lambda_function_arn = module.process_fms_metadata.lambda_function_arn
+    events              = ["s3:ObjectCreated:*"]
+  }
+
 }
