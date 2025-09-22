@@ -15,5 +15,8 @@ locals {
   data_subnets = [
     data.aws_subnet.data_subnets_a.id
   ]
-
+cloudwatch_metric_alarms_endpoint_monitoring = [
+  Decription = "Set the endpoint location"
+  type = string
+  ]
 }
