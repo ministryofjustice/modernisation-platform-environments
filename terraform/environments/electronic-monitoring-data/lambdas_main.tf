@@ -277,3 +277,26 @@ module "process_fms_metadata" {
   security_group_ids = [aws_security_group.lambda_generic.id]
   subnet_ids         = data.aws_subnets.shared-public.ids
 }
+
+#-----------------------------------------------------------------------------------
+# FMS Fan Out
+#-----------------------------------------------------------------------------------
+
+module "fms_fan_out" {
+  source                  = "./modules/lambdas"
+  is_image                = true
+  function_name           = "fms_fan_out"
+  role_name               = aws_iam_role.fms_fan_out.name
+  role_arn                = aws_iam_role.fms_fan_out.arn
+  handler                 = "fms_fan_out.handler"
+  memory_size             = 256
+  timeout                 = 900
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : "dev"
+  security_group_ids = [aws_security_group.lambda_generic.id]
+  subnet_ids         = data.aws_subnets.shared-public.ids
+  environment_variables = {
+    PROCESS_METADATA_LAMBDA = module.process_fms_metadata.lambda_function_name
+    PROCESS_DATA_LAMBDA     = module.format_json_fms_data.function_name
+  }
+}
