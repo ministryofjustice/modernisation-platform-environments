@@ -20,7 +20,7 @@ locals {
 }
 
 resource "aws_acm_certificate" "uat_certificates" {
-  for_each                  = local.preprod_domains
+  for_each                  = local.is-preproduction ? local.preprod_domains : {}
   domain_name               = each.value
   validation_method         = "DNS"
   subject_alternative_names = ["www.${each.value}"]
@@ -34,6 +34,7 @@ resource "aws_acm_certificate" "uat_certificates" {
   }
 }
 
+/*
 resource "aws_acm_certificate_validation" "uat_certificate_validation" {
   for_each = aws_acm_certificate.uat_certificates
 
@@ -77,7 +78,7 @@ resource "aws_route53_record" "uat_dns_record" {
   # zone_id = var.shared_zone_id      # shared hosted zone
   zone_id = each.value.zone.zone_id   # multiple zones
 }
-
+*/
 
 ########################
 # Production Environment
