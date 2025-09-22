@@ -168,7 +168,7 @@ resource "aws_launch_template" "tribunals-all-lt" {
   update_default_version = true
 
   lifecycle {
-  ignore_changes = [default_version, latest_version]
+  ignore_changes = [default_version, latest_version, image_id]
 }
 
   iam_instance_profile {
