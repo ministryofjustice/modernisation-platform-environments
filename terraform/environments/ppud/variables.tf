@@ -39,10 +39,12 @@ variable "vpc_security_group_ids_uat" {
   default     = ["sg-08db11360e6a2c1ed", "sg-03b8ceff365eeca3e", "sg-038cc3700cb9a62eb", "sg-0d8ddeb9445642a35", "sg-03f153349ecce0840"]
 }
 
+/*
 variable "shared_zone_id" {
   description = "The Route53 zone ID used for DNS validation"
   type        = string
 }
+*/
 
 ########################
 # Production Environment
