@@ -7,75 +7,15 @@ locals {
 
 data "aws_caller_identity" "current" {}
 
-data "aws_iam_policy_document" "sqs_kms_key_policy" {
-  statement {
-    sid    = "AccountUseOfKey"
-    effect = "Allow"
-    principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
-    }
-    actions   = ["kms:*"]
-    resources = [aws_kms_key.sqs_kms_key.arn]
-  }
-  statement {
-    sid    = "S3UseofKey"
-    effect = "Allow"
-    principals {
-      type        = "Service"
-      identifiers = ["s3.amazonaws.com"]
-    }
-    actions = [
-      "kms:GenerateDataKey",
-      "kms:Decrypt",
-    ]
-    resources = ["*"]
-    condition {
-      test     = "StringEquals"
-      variable = "aws:SourceAccount"
-      values   = [data.aws_caller_identity.current.account_id]
-    }
-  }
-  statement {
-    sid    = "AllowLambdaToDecrypt"
-    effect = "Allow"
-    principals {
-      type        = "Service"
-      identifiers = ["lambda.amazonaws.com"]
-    }
-    actions = [
-      "kms:Decrypt"
-    ]
-    resources = ["*"]
-    condition {
-      test     = "StringEquals"
-      variable = "aws:SourceAccount"
-      values   = [data.aws_caller_identity.current.account_id]
-    }
-  }
-}
-
-resource "aws_kms_key" "sqs_kms_key" {
-  description             = "KMS key for encrypting S3 event SQS queue"
-  enable_key_rotation     = true
-}
-
-resource "aws_kms_key_policy" "sqs_kms_key_policy" {
-  key_id = aws_kms_key.sqs_kms_key.id
-  policy = data.aws_iam_policy_document.sqs_kms_key_policy.json
-}
-
 
 resource "aws_sqs_queue" "s3_event_queue" {
   name                       = local.queue_base_name
-  visibility_timeout_seconds = 20 * 60 # Longer than longest possible lambda
+  visibility_timeout_seconds = 6 * 15 * 60 # 6 x longer than longest possible lambda
   redrive_policy             = jsonencode({
     deadLetterTargetArn = aws_sqs_queue.s3_event_dlq.arn
     maxReceiveCount     = 5
   })
-  kms_master_key_id                 = aws_kms_key.sqs_kms_key.id
-  kms_data_key_reuse_period_seconds = 300
-
+  sqs_managed_sse_enabled = true
 }
 
 data "aws_iam_policy_document" "allow_s3_to_write" {
@@ -122,6 +62,5 @@ resource "aws_lambda_event_source_mapping" "sqs_trigger" {
 
 resource "aws_sqs_queue" "s3_event_dlq" {
   name                              = "${local.queue_base_name}-dlq"
-  kms_master_key_id                 = aws_kms_key.sqs_kms_key.id
-  kms_data_key_reuse_period_seconds = 300
+  sqs_managed_sse_enabled = true
 }
