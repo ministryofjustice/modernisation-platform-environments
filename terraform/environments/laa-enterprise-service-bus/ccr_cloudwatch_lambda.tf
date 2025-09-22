@@ -62,8 +62,8 @@ resource "aws_iam_policy" "ccr_cloudwatch_log_alert_policy" {
     Version = "2012-10-17",
     Statement = [
       {
-        Effect   = "Allow"
-        Action   = [
+        Effect = "Allow"
+        Action = [
           "sns:Publish"
         ]
         Resource = aws_sns_topic.hub2_alerts.arn

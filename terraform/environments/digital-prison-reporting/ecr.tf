@@ -26,11 +26,11 @@ resource "aws_ecr_repository_policy" "file_transfer_in_clamav_scanner_policy" {
   repository = aws_ecr_repository.file_transfer_in_clamav_scanner.name
 
   policy = jsonencode({
-    Version   = "2008-10-17"
+    Version = "2008-10-17"
     Statement = [
       {
-        Sid       = "LambdaECRImageRetrievalPolicy"
-        Effect    = "Allow"
+        Sid    = "LambdaECRImageRetrievalPolicy"
+        Effect = "Allow"
         Principal = {
           Service = ["lambda.amazonaws.com"]
         }
