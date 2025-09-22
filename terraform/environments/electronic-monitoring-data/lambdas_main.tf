@@ -289,7 +289,7 @@ module "fms_fan_out" {
   role_name               = aws_iam_role.fms_fan_out.name
   role_arn                = aws_iam_role.fms_fan_out.arn
   handler                 = "fms_fan_out.handler"
-  memory_size             = 256
+  memory_size             = 10240
   timeout                 = 900
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev          = local.is-production ? "prod" : "dev"
