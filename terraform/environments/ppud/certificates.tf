@@ -40,7 +40,7 @@ resource "aws_acm_certificate_validation" "preprod_certificate_validation" {
   certificate_arn = each.value.arn
 
   validation_record_fqdns = [
-    for record_key, record in aws_route53_record.uat_dns_record :
+    for record_key, record in aws_route53_record.preprod_dns_record :
     record.fqdn if startswith(record_key, each.key)
   ]
   depends_on = [
