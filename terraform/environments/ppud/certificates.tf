@@ -34,10 +34,9 @@ resource "aws_acm_certificate" "uat_certificates" {
   }
 }
 
-/*
-resource "aws_acm_certificate_validation" "uat_certificate_validation" {
-  for_each = aws_acm_certificate.uat_certificates
-
+resource "aws_acm_certificate_validation" "preprod_certificate_validation" {
+  count           = local.is-preproduction == true ? 1 : 0
+  for_each        = aws_acm_certificate.uat_certificates
   certificate_arn = each.value.arn
 
   validation_record_fqdns = [
@@ -45,12 +44,12 @@ resource "aws_acm_certificate_validation" "uat_certificate_validation" {
     record.fqdn if startswith(record_key, each.key)
   ]
   depends_on = [
-    aws_route53_record.uat_dns_record
+    aws_route53_record.preprod_dns_record
   ]
 }
 
 locals {
-  uat_dns_records = merge(
+  preprod_dns_records = local.is-preproduction ? merge(
     flatten([
       for cert_key, cert in aws_acm_certificate.uat_certificates : [
         for option in cert.domain_validation_options : {
@@ -62,11 +61,11 @@ locals {
         }
       ]
     ])
-  )
+  ) : {}
 }
 
-resource "aws_route53_record" "uat_dns_record" {
-  for_each = local.uat_dns_records
+resource "aws_route53_record" "preprod_dns_record" {
+  for_each = local.is-preproduction ? local.preprod_dns_records : {}
 
   provider = aws.core-network-services
 
@@ -78,7 +77,7 @@ resource "aws_route53_record" "uat_dns_record" {
   # zone_id = var.shared_zone_id      # shared hosted zone
   zone_id = each.value.zone.zone_id   # multiple zones
 }
-*/
+
 
 ########################
 # Production Environment
