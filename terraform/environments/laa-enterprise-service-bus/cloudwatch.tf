@@ -1,13 +1,13 @@
 # 🔹 Alarm for InvocationFailureCount (all Lambdas)
 resource "aws_cloudwatch_metric_alarm" "lambda_failures" {
   for_each = {
-    "cwa-extract"       = { namespace = "HUB20-CWA-NS",        servicename = "cwa-extract-service" }
-    "cwa-file-transfer" = { namespace = "HUB20-CWA-NS",        servicename = "cwa-file-transfer-service" }
-    "cwa-sns"           = { namespace = "HUB20-CWA-NS",        servicename = "cwa-sns-service" }
-    "cclf-load"         = { namespace = "HUB20-CCLF-NS",       servicename = "cclf-load-service" }
-    "ccr-load"          = { namespace = "HUB20-CCR-NS",        servicename = "ccr-load-service" }
-    "maat-load"         = { namespace = "HUB20-MAAT-NS",       servicename = "maat-load-service" }
-    "ccms-load"         = { namespace = "HUB20-CCMS-NS",       servicename = "ccms-load-service" }
+    "cwa-extract"       = { namespace = "HUB20-CWA-NS", servicename = "cwa-extract-service" }
+    "cwa-file-transfer" = { namespace = "HUB20-CWA-NS", servicename = "cwa-file-transfer-service" }
+    "cwa-sns"           = { namespace = "HUB20-CWA-NS", servicename = "cwa-sns-service" }
+    "cclf-load"         = { namespace = "HUB20-CCLF-NS", servicename = "cclf-load-service" }
+    "ccr-load"          = { namespace = "HUB20-CCR-NS", servicename = "ccr-load-service" }
+    "maat-load"         = { namespace = "HUB20-MAAT-NS", servicename = "maat-load-service" }
+    "ccms-load"         = { namespace = "HUB20-CCMS-NS", servicename = "ccms-load-service" }
     "purge-lambda"      = { namespace = "HUB20-PURGE-DATA-NS", servicename = "purge-lambda-service" }
   }
 

@@ -122,19 +122,27 @@ module "kms_key" {
 }
 
 #-----------------------------------------------------------------------------------
-# Process landing bucket files - lambda triggers
+# Process landing bucket files - lambda triggers via SQS
 #-----------------------------------------------------------------------------------
 
-resource "aws_s3_bucket_notification" "bucket_notification" {
-  bucket = module.this-bucket.bucket.id
-
-  lambda_function {
-    lambda_function_arn = module.process_landing_bucket_files.lambda_function_arn
-    events              = ["s3:ObjectCreated:*"]
-  }
-
+module "s3_to_lambda" {
+  source               = "../sqs_s3_lambda_trigger"
+  bucket               = module.this-bucket.bucket
+  lambda_function_name = module.process_landing_bucket_files.lambda_function_name
+  bucket_prefix        = var.local_bucket_prefix
 }
 
+
+resource "aws_s3_bucket_notification" "s3_notification_prefix_suffixes" {
+  bucket   = module.this-bucket.bucket.id
+
+  queue {
+    queue_arn     = module.s3_to_lambda.sqs_queue.arn
+    events        = ["s3:ObjectCreated:*"]
+  }
+
+  depends_on = [module.s3_to_lambda]
+}
 #-----------------------------------------------------------------------------------
 # Process landing bucket files - lambda
 #-----------------------------------------------------------------------------------

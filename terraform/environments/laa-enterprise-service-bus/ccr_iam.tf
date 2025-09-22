@@ -81,8 +81,8 @@ resource "aws_iam_policy" "ccr_provider_load_policy" {
         Resource = aws_ssm_parameter.ccr_provider_load_timestamp.arn
       },
       {
-        Effect   = "Allow"
-        Action   = [
+        Effect = "Allow"
+        Action = [
           "sns:Publish"
         ]
         Resource = aws_sns_topic.hub2_alerts.arn
