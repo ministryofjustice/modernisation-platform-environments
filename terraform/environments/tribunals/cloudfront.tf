@@ -123,8 +123,8 @@ resource "aws_route53_record" "cloudfront_cert_cname_validation" {
       type  = dvo.resource_record_type
       value = dvo.resource_record_value
     }
-    # Only generate for the cloudfront_sans and the main domain
-    if contains(concat(local.cloudfront_sans, [aws_acm_certificate.cloudfront.domain_name], local.nonprod_sans), dvo.domain_name)
+    # Generate for all SANs required by CloudFront, including common_sans (reports/venues), main domain and nonprod
+    if contains(concat(local.cloudfront_sans, local.common_sans, [aws_acm_certificate.cloudfront.domain_name], local.nonprod_sans), dvo.domain_name)
   }
 
   allow_overwrite = true
