@@ -14,12 +14,7 @@ resource "aws_cloudfront_distribution" "tribunals_distribution" {
     prefix          = "cloudfront-logs-v2/"
   }
 
-  aliases = local.is-production ? [
-    "*.decisions.tribunals.gov.uk",
-    "*.venues.tribunals.gov.uk",
-    "*.reports.tribunals.gov.uk",
-    "siac.tribunals.gov.uk"
-  ] : ["*.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
+  aliases = local.is-production ? concat(local.common_sans, local.cloudfront_sans, ["*.decisions.tribunals.gov.uk"]) : local.nonprod_sans
   origin {
     domain_name = aws_lb.tribunals_lb.dns_name
     origin_id   = "tribunalsOrigin"
@@ -123,8 +118,6 @@ resource "aws_route53_record" "cloudfront_cert_cname_validation" {
       type  = dvo.resource_record_type
       value = dvo.resource_record_value
     }
-    # Only generate for the cloudfront_sans and the main domain
-    if contains(concat(local.cloudfront_sans, [aws_acm_certificate.cloudfront.domain_name], local.nonprod_sans), dvo.domain_name)
   }
 
   allow_overwrite = true
