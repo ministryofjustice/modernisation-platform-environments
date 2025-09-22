@@ -264,13 +264,11 @@ module "dms_validation" {
 #-----------------------------------------------------------------------------------
 
 module "process_fms_metadata" {
-  count = local.is-development ? 0 : 1
-
   source                  = "./modules/lambdas"
   is_image                = true
   function_name           = "process_fms_metadata"
-  role_name               = aws_iam_role.process_fms_metadata[0].name
-  role_arn                = aws_iam_role.process_fms_metadata[0].arn
+  role_name               = aws_iam_role.process_fms_metadata.name
+  role_arn                = aws_iam_role.process_fms_metadata.arn
   handler                 = "process_fms_metadata.handler"
   memory_size             = 10240
   timeout                 = 900
