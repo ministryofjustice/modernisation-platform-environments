@@ -74,4 +74,6 @@ resource "aws_s3_bucket_notification" "virus_scan_file" {
     queue_arn = module.virus_scan_file_sqs.sqs_queue.arn
     events    = ["s3:ObjectCreated:*"]
   }
+
+  depends_on = [module.virus_scan_file_sqs]
 }
