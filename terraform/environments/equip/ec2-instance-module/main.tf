@@ -8,8 +8,12 @@ resource "aws_instance" "this" {
 
   ami                  = var.ami
   instance_type        = var.instance_type
-  cpu_core_count       = var.cpu_core_count
-  cpu_threads_per_core = var.cpu_threads_per_core
+
+  cpu_options {
+    core_count       = var.cpu_core_count
+    threads_per_core = var.cpu_threads_per_core
+  }
+
   user_data            = var.user_data
   user_data_base64     = var.user_data_base64
   hibernation          = var.hibernation
