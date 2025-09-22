@@ -1,3 +1,4 @@
+# WAF IP Set
 resource "aws_wafv2_ip_set" "allowed_ip_set" {
   provider = aws.us-east-1
   name     = "allowed-ip-set"
@@ -20,6 +21,34 @@ resource "aws_wafv2_web_acl" "tribunals_web_acl" {
 
   default_action {
     allow {}
+  }
+
+  rule {
+    name     = "allow-siac"
+    priority = 0
+    action {
+      allow {}
+    }
+    statement {
+      byte_match_statement {
+        search_string = "siac.tribunals.gov.uk"
+        field_to_match {
+          single_header {
+            name = "host"
+          }
+        }
+        positional_constraint = "EXACTLY"
+        text_transformation {
+          priority = 0
+          type     = "NONE"
+        }
+      }
+    }
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "allow-siac"
+      sampled_requests_enabled   = true
+    }
   }
 
   rule {
@@ -204,4 +233,57 @@ resource "aws_wafv2_regex_pattern_set" "blocked_paths" {
   regular_expression {
     regex_string = "(?i)^/secure(/.*)?$"
   }
+}
+
+# CloudWatch Log Group for WAF Logging
+resource "aws_cloudwatch_log_group" "tribunals_waf_logs" {
+  #checkov:skip=CKV_AWS_158:"Ensure that CloudWatch Log Group is encrypted by KMS"
+  name              = "aws-waf-logs-tribunals-web-acl"
+  retention_in_days = 365
+  provider          = aws.us-east-1
+  tags = {
+    Environment = local.environment
+    Component   = "WAF"
+  }
+}
+
+# IAM Policy for WAF Logging
+resource "aws_cloudwatch_log_resource_policy" "tribunals_waf_log_policy" {
+  policy_name     = "WAFLoggingPolicy-TribunalsWebACL"
+  policy_document = data.aws_iam_policy_document.tribunals_waf_log_policy.json
+  provider        = aws.us-east-1
+}
+
+data "aws_iam_policy_document" "tribunals_waf_log_policy" {
+  statement {
+    effect = "Allow"
+    principals {
+      type        = "Service"
+      identifiers = ["waf.amazonaws.com"]
+    }
+    actions = [
+      "logs:CreateLogStream",
+      "logs:PutLogEvents"
+    ]
+    resources = [
+      "${aws_cloudwatch_log_group.tribunals_waf_logs.arn}:*"
+    ]
+  }
+}
+
+# WAF Logging Configuration
+resource "aws_wafv2_web_acl_logging_configuration" "tribunals_waf_logging" {
+  resource_arn            = aws_wafv2_web_acl.tribunals_web_acl.arn
+  log_destination_configs = [aws_cloudwatch_log_group.tribunals_waf_logs.arn]
+  redacted_fields {
+    single_header {
+      name = "authorization"
+    }
+  }
+  provider = aws.us-east-1
+  depends_on = [
+    aws_wafv2_web_acl.tribunals_web_acl,
+    aws_cloudwatch_log_group.tribunals_waf_logs,
+    aws_cloudwatch_log_resource_policy.tribunals_waf_log_policy
+  ]
 }

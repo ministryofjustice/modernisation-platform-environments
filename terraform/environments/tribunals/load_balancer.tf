@@ -41,7 +41,7 @@ resource "aws_lb" "tribunals_lb" {
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.tribunals_lb_sc.id]
   subnets                    = data.aws_subnets.shared-public.ids
-  enable_deletion_protection = false
+  enable_deletion_protection = true
   internal                   = false
   drop_invalid_header_fields = true
 }

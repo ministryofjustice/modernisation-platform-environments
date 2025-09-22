@@ -195,6 +195,22 @@ resource "aws_security_group" "internal_sg" {
   }
 
   ingress {
+    from_port   = 514
+    to_port     = 514
+    protocol    = "udp"
+    cidr_blocks = ["10.0.22.0/24"]
+    description = "Branch Junipers AWS1 access to syslog server"
+  }
+
+  ingress {
+    from_port   = 514
+    to_port     = 514
+    protocol    = "udp"
+    cidr_blocks = ["10.0.24.0/24"]
+    description = "Branch Junipers AWS2 access to syslog server"
+  }
+
+  ingress {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
@@ -351,28 +367,6 @@ resource "aws_instance" "juniper_kms" {
   tags = merge(local.tags, {
     Name          = "Juniper Key Management Server"
     "Patch Group" = "Windows"
-  })
-}
-
-#  EC2 Instance (Juniper Syslog Server)
-resource "aws_instance" "juniper_syslog" {
-  ami                    = data.aws_ami.amazon_linux_2.id # Use data source instead of hardcoded AMI
-  instance_type          = "t3.medium"
-  key_name               = "Juniper_KeyPair" # Replace with your SSH key name
-  iam_instance_profile   = aws_iam_instance_profile.yjb_juniper_instance_profile.name
-  subnet_id              = aws_subnet.vsrx_subnets["Juniper Management & KMS"].id
-  private_ip             = "10.100.50.50"
-  vpc_security_group_ids = [aws_security_group.internal_sg.id]
-
-  user_data = file("${path.module}/scripts/cloudwatch-syslog-userdata.sh")
-
-  lifecycle {
-    ignore_changes = [ami]
-  }
-
-  tags = merge(local.tags, {
-    Name          = "Juniper Syslog Server"
-    "Patch Group" = "Linux2"
   })
 }
 

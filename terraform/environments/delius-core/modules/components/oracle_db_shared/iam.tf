@@ -55,8 +55,7 @@ data "aws_iam_policy_document" "allow_access_to_ssm_parameter_store" {
   }
 }
 
-# Policy document for both Oracle Database and Probation Integration secrets
-
+# Policy document for both Oracle Database and Probation Integration secret
 data "aws_iam_policy_document" "db_access_to_secrets_manager" {
   statement {
     sid = "DbAccessToSecretsManager"
@@ -71,7 +70,7 @@ data "aws_iam_policy_document" "db_access_to_secrets_manager" {
     effect = "Allow"
     resources = concat(
       [aws_secretsmanager_secret.database_dba_passwords.arn, aws_secretsmanager_secret.database_application_passwords.arn],
-    length(aws_secretsmanager_secret.probation_integration_passwords) > 0 ? ["${aws_secretsmanager_secret.probation_integration_passwords[0].arn}"] : [])
+    length(aws_secretsmanager_secret.probation_integration_passwords) > 0 ? [aws_secretsmanager_secret.probation_integration_passwords[0].arn] : [])
   }
 }
 
@@ -147,7 +146,7 @@ data "aws_iam_policy_document" "cert_export" {
   }
 }
 
-
+#trivy:ignore:AVD-AWS-0345
 data "aws_iam_policy_document" "combined_instance_policy" {
   source_policy_documents = [
     data.aws_iam_policy_document.core_shared_services_bucket_access.json,

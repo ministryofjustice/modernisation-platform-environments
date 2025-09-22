@@ -73,6 +73,7 @@ resource "aws_lambda_function" "cclf_provider_load" {
       ENVIRONMENT            = local.environment
       LOG_LEVEL              = "DEBUG"
       PURGE_LAMBDA_TIMESTAMP = aws_ssm_parameter.cclf_provider_load_timestamp.name
+      SOURCE_BUCKET          = aws_s3_bucket.data.bucket
     }
   }
 

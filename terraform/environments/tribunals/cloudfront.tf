@@ -11,13 +11,14 @@ resource "aws_cloudfront_distribution" "tribunals_distribution" {
   logging_config {
     include_cookies = false
     bucket          = aws_s3_bucket.cloudfront_logs.bucket_domain_name
-    prefix          = "cloudfront-logs/"
+    prefix          = "cloudfront-logs-v2/"
   }
 
   aliases = local.is-production ? [
     "*.decisions.tribunals.gov.uk",
     "*.venues.tribunals.gov.uk",
-    "*.reports.tribunals.gov.uk"
+    "*.reports.tribunals.gov.uk",
+    "siac.tribunals.gov.uk"
   ] : ["*.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
   origin {
     domain_name = aws_lb.tribunals_lb.dns_name
@@ -49,9 +50,6 @@ resource "aws_cloudfront_distribution" "tribunals_distribution" {
     allowed_methods        = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
     cached_methods         = ["GET", "HEAD"]
     compress               = true
-    default_ttl            = 0
-    min_ttl                = 0
-    max_ttl                = 31536000
     smooth_streaming       = false
 
     dynamic "function_association" {
@@ -94,10 +92,12 @@ resource "aws_acm_certificate" "cloudfront" {
   provider                  = aws.us-east-1
   domain_name               = local.is-production ? "*.decisions.tribunals.gov.uk" : "modernisation-platform.service.justice.gov.uk"
   validation_method         = "DNS"
-  subject_alternative_names = local.is-production ? ["*.venues.tribunals.gov.uk", "*.reports.tribunals.gov.uk"] : ["*.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
+  subject_alternative_names = local.is-production ? concat(local.common_sans, local.cloudfront_sans) : local.nonprod_sans
+
   tags = {
     Environment = local.environment
   }
+
   lifecycle {
     create_before_destroy = true
   }
@@ -106,6 +106,33 @@ resource "aws_acm_certificate" "cloudfront" {
 resource "aws_acm_certificate_validation" "cloudfront_cert_validation" {
   provider        = aws.us-east-1
   certificate_arn = aws_acm_certificate.cloudfront.arn
+  validation_record_fqdns = [
+    for record in aws_route53_record.cloudfront_cert_cname_validation : record.fqdn
+  ]
+}
+
+// Route53 DNS records for certificate validation
+// Don't duplicate the common_sans domains here - already generated in dns_ssl.tf
+resource "aws_route53_record" "cloudfront_cert_cname_validation" {
+  provider = aws.core-network-services
+
+  for_each = {
+    for dvo in aws_acm_certificate.cloudfront.domain_validation_options :
+    dvo.domain_name => {
+      name  = dvo.resource_record_name
+      type  = dvo.resource_record_type
+      value = dvo.resource_record_value
+    }
+    # Only generate for the cloudfront_sans and the main domain
+    if contains(concat(local.cloudfront_sans, [aws_acm_certificate.cloudfront.domain_name], local.nonprod_sans), dvo.domain_name)
+  }
+
+  allow_overwrite = true
+  name            = each.value.name
+  records         = [each.value.value]
+  ttl             = 300
+  type            = each.value.type
+  zone_id         = local.is-production ? data.aws_route53_zone.production_zone.zone_id : data.aws_route53_zone.network-services.zone_id
 }
 
 data "aws_ec2_managed_prefix_list" "cloudfront" {
@@ -195,23 +222,23 @@ resource "aws_s3_bucket_policy" "cloudfront_logs" {
         Principal = {
           Service = "delivery.logs.amazonaws.com"
         }
-        Action = [
-          "s3:PutObject",
-          "s3:GetBucketAcl",
-          "s3:PutBucketAcl"
-        ]
-        Resource = [
-          aws_s3_bucket.cloudfront_logs.arn,
-          "${aws_s3_bucket.cloudfront_logs.arn}/*"
-        ]
+        Action   = "s3:PutObject"
+        Resource = "${aws_s3_bucket.cloudfront_logs.arn}/cloudfront-logs-v2/*"
         Condition = {
           StringEquals = {
             "aws:SourceAccount" = data.aws_caller_identity.current.account_id
-          }
-          StringLike = {
-            "aws:SourceArn" = "arn:aws:cloudfront::${data.aws_caller_identity.current.account_id}:distribution/${aws_cloudfront_distribution.tribunals_distribution.id}"
+            "aws:SourceArn"     = aws_cloudfront_distribution.tribunals_distribution.arn
           }
         }
+      },
+      {
+        Sid    = "AllowCloudFrontLogDeliveryGetBucketAcl"
+        Effect = "Allow"
+        Principal = {
+          Service = "delivery.logs.amazonaws.com"
+        }
+        Action   = "s3:GetBucketAcl"
+        Resource = aws_s3_bucket.cloudfront_logs.arn
       }
     ]
   })
@@ -282,36 +309,75 @@ resource "aws_cloudfront_response_headers_policy" "security_headers_policy" {
 }
 
 resource "aws_cloudfront_function" "redirect_function" {
-  count = local.is-development ? 0 : 1
+  count   = local.is-development ? 0 : 1
   name    = "tribunals_redirect_function"
   runtime = "cloudfront-js-2.0"
   publish = true
   code    = <<EOF
   function handler(event) {
     var request = event.request;
-    var host    = request.headers.host.value;
-    var uri     = request.uri;
-    // Redirect rules for siac.tribunals.gov.uk
-    if (host === "siac.tribunals.gov.uk") {
-      if (uri.toLowerCase() === "/outcomes2007onwards.htm") {
+    var host = request.headers.host.value;
+    var uri = request.uri;
+
+    switch (host) {
+      case "siac.tribunals.gov.uk":
+        if (uri.toLowerCase() === "/outcomes2007onwards.htm") {
+          return {
+            statusCode: 301,
+            statusDescription: "Moved Permanently",
+            headers: {
+              "location": {"value": "https://siac.decisions.tribunals.gov.uk"}
+            }
+          };
+        }
         return {
           statusCode: 301,
           statusDescription: "Moved Permanently",
           headers: {
-            "location": { "value": "https://siac.decisions.tribunals.gov.uk" }
+            "location": {"value": "https://www.gov.uk/guidance/appeal-to-the-special-immigration-appeals-commission"}
           }
         };
-      }
-      return {
-        statusCode: 301,
-        statusDescription: "Moved Permanently",
-        headers: {
-          "location": { "value": "https://www.gov.uk/guidance/appeal-to-the-special-immigration-appeals-commission" }
+
+      case "fhsaa.tribunals.gov.uk":
+        if (uri.toLowerCase() === "/decisions.htm") {
+          return {
+            statusCode: 301,
+            statusDescription: "Moved Permanently",
+            headers: {
+              "location": {"value": "https://phl.decisions.tribunals.gov.uk"}
+            }
+          };
         }
-      };
+        return {
+          statusCode: 301,
+          statusDescription: "Moved Permanently",
+          headers: {
+            "location": {"value": "https://www.gov.uk/guidance/appeal-to-the-primary-health-lists-tribunal"}
+          }
+        };
+
+      case "adjudicationpanel.tribunals.gov.uk":
+        if (/^\/(Public|Admin|Decisions|Judgments)/i.test(uri)) {
+          return {
+            statusCode: 301,
+            statusDescription: "Moved Permanently",
+            headers: {
+              "location": {"value": "http://localgovernmentstandards.decisions.tribunals.gov.uk" + uri}
+            }
+          };
+        }
+        return {
+          statusCode: 301,
+          statusDescription: "Moved Permanently",
+          headers: {
+            "location": {"value": "https://www.gov.uk/government/organisations/hm-courts-and-tribunals-service"}
+          }
+        };
+
+      default:
+        // Default: Pass through to origin
+        return request;
     }
-    // Default: Pass through to origin
-    return request;
   }
   EOF
 }
