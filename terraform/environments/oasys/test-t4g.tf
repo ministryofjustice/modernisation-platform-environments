@@ -1,5 +1,5 @@
 resource "aws_security_group" "test-sg-for-t4" {
-
+  vpc_id      = data.aws_vpc.shared.id
   name        = "test-sec-group"
   description = "Allow all outbound traffic"
   egress {
@@ -40,5 +40,5 @@ resource "aws_instance" "my_t4_instance" {
   tags = {
     Name = "First t4 test instance"
   }
-  depends_on = [aws_security_group.test-sg-for-t4]
+
 }
