@@ -165,7 +165,6 @@ resource "aws_launch_template" "tribunals-all-lt" {
   name_prefix            = "tribunals-all"
   image_id               = data.aws_ssm_parameter.ecs_optimized_ami.value
   instance_type          = "m5.4xlarge"
-  update_default_version = true
 
   iam_instance_profile {
     name = aws_iam_instance_profile.ec2_instance_profile.name
@@ -210,7 +209,6 @@ resource "aws_launch_template" "tribunals-backup-lt" {
   name_prefix            = "tribunals-backup"
   image_id               = data.aws_ssm_parameter.ecs_optimized_ami.value
   instance_type          = "m5.4xlarge"
-  update_default_version = true
 
   iam_instance_profile {
     name = aws_iam_instance_profile.ec2_instance_profile.name
