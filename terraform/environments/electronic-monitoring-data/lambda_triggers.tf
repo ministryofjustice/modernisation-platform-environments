@@ -86,3 +86,21 @@ resource "aws_lambda_permission" "historic" {
   principal     = "s3.amazonaws.com"
   source_arn    = module.s3-data-bucket.bucket.arn
 }
+
+module "virus_scan_sqs" {
+  source               = "./modules/sqs_s3_lambda_trigger"
+  bucket               = module.s3-received-files-bucket.bucket
+  lambda_function_name = module.virus_scan_file.lambda_function_name
+  bucket_prefix        = local.bucket_prefix
+}
+
+resource "aws_s3_bucket_notification" "scan_received_files" {
+  bucket = module.s3-received-files-bucket.bucket.id
+
+  lambda_function {
+    lambda_function_arn = module.virus_scan_file.lambda_function_arn
+    events              = ["s3:ObjectCreated:*"]
+  }
+
+  depends_on = [aws_lambda_permission.scan_received_files]
+}
