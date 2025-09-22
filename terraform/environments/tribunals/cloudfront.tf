@@ -14,7 +14,7 @@ resource "aws_cloudfront_distribution" "tribunals_distribution" {
     prefix          = "cloudfront-logs-v2/"
   }
 
-  aliases = local.is-production ? concat(local.common_sans, local.cloudfront_sans) : local.nonprod_sans
+  aliases = local.is-production ? concat(local.common_sans, local.cloudfront_sans, ["*.decisions.tribunals.gov.uk"]) : local.nonprod_sans
   origin {
     domain_name = aws_lb.tribunals_lb.dns_name
     origin_id   = "tribunalsOrigin"
