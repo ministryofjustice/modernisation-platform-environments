@@ -74,7 +74,7 @@ module "process_fms_metadata_sqs" {
 }
 
 resource "aws_s3_bucket_notification" "virus_scan" {
-  bucket = module.s3-received-files-bucket.bucket
+  bucket = module.s3-received-files-bucket.bucket.id
 
   queue {
     queue_arn = module.virus_scan_file.lambda_function_name
