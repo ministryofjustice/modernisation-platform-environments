@@ -382,6 +382,12 @@ resource "aws_instance" "juniper_management" {
     volume_size = 70    # Define the root volume size in GB
     volume_type = "gp3" # Optional: Specify the volume type (e.g., gp3, gp2, io1)
   }
+esb_block_device {
+    encrypted             = true
+    delete_on_termination = false
+    volume_size           = 80
+    volume_type           = "gp2"
+  }
   vpc_security_group_ids = [aws_security_group.internal_sg.id]
 
   lifecycle {
