@@ -66,7 +66,7 @@ module "copy_mdss_data_sqs" {
   bucket_prefix        = local.bucket_prefix
 }
 
-module process_fms_metadata_sqs" {
+module "process_fms_metadata_sqs" {
   source               = "./modules/sqs_s3_lambda_trigger"
   bucket               = module.s3-data-bucket.bucket
   lambda_function_name = module.process_fms_metadata.lambda_function_name
