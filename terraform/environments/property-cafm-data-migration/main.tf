@@ -4,10 +4,10 @@ module "csv_export" {
     aws.bucket-replication = aws
   }
   region_replication = "eu-west-2"
-  kms_key_arn = aws_kms_key.shared_kms_key.arn
-  name = "concept"
-  load_mode = "overwrite"
-  environment = local.environment_shorthand
+  kms_key_arn        = aws_kms_key.shared_kms_key.arn
+  name               = "concept"
+  load_mode          = "overwrite"
+  environment        = local.environment_shorthand
   tags = {
     business-unit = "Property"
     application   = "cafm"
@@ -21,15 +21,15 @@ module "rds_export" {
   providers = {
     aws.bucket-replication = aws
   }
-  kms_key_arn           = aws_kms_key.shared_kms_key.arn
-  name                  = "planetfm"
-  database_refresh_mode = "full"
+  kms_key_arn              = aws_kms_key.shared_kms_key.arn
+  name                     = "planetfm"
+  database_refresh_mode    = "full"
   output_parquet_file_size = 10
-  max_concurrency = 5
-  environment = local.environment_shorthand
-  vpc_id                = module.vpc.vpc_id
-  database_subnet_ids   = module.vpc.private_subnets
-  master_user_secret_id = aws_secretsmanager_secret.db_master_user_secret.arn
+  max_concurrency          = 5
+  environment              = local.environment_shorthand
+  vpc_id                   = module.vpc.vpc_id
+  database_subnet_ids      = module.vpc.private_subnets
+  master_user_secret_id    = aws_secretsmanager_secret.db_master_user_secret.arn
 
   tags = {
     business-unit = "Property"
