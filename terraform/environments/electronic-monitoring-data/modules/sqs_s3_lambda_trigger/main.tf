@@ -35,11 +35,6 @@ data "aws_iam_policy_document" "sqs_kms_key_policy" {
       variable = "aws:SourceAccount"
       values   = [data.aws_caller_identity.current.account_id]
     }
-    condition {
-      test     = "ArnLike"
-      variable = "aws:SourceArn"
-      values   = [var.bucket.arn]
-    }
   }
   statement {
     sid    = "AllowLambdaToDecrypt"
