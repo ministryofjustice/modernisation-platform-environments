@@ -35,7 +35,6 @@ resource "aws_acm_certificate" "uat_certificates" {
 }
 
 resource "aws_acm_certificate_validation" "preprod_certificate_validation" {
-  count           = local.is-preproduction == true ? 1 : 0
   for_each        = aws_acm_certificate.uat_certificates
   certificate_arn = each.value.arn
 
