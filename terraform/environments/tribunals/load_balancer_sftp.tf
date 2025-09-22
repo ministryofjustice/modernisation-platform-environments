@@ -11,7 +11,7 @@ resource "aws_lb" "tribunals_lb_sftp" {
   load_balancer_type         = "network"
   security_groups            = [aws_security_group.tribunals_lb_sc_sftp.id]
   subnets                    = data.aws_subnets.shared-public.ids
-  enable_deletion_protection = false
+  enable_deletion_protection = true
 }
 
 resource "aws_security_group" "tribunals_lb_sc_sftp" {
