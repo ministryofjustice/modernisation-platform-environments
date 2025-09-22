@@ -274,6 +274,6 @@ module "process_fms_metadata" {
   timeout                 = 900
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev          = local.is-production ? "prod" : "dev"
-  security_group_ids = [aws_security_group.dms_validation_lambda_sg[0].id]
+  security_group_ids = [aws_security_group.lambda_generic.id]
   subnet_ids         = data.aws_subnets.shared-public.ids
 }
