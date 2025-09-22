@@ -60,18 +60,18 @@ module "copy_mdss_data_sqs" {
   bucket_prefix        = local.bucket_prefix
 }
 
-module "virus_scan_sqs" {
+module "virus_scan_file_sqs" {
   source               = "./modules/sqs_s3_lambda_trigger"
   bucket               = module.s3-data-bucket.bucket
-  lambda_function_name = module.virus_scan.lambda_function_name
+  lambda_function_name = module.virus_scan_file.lambda_function_name
   bucket_prefix        = local.bucket_prefix
 }
 
-resource "aws_s3_bucket_notification" "virus_scan" {
+resource "aws_s3_bucket_notification" "virus_scan_file" {
   bucket = module.s3-received-files-bucket.bucket.id
 
   queue {
-    queue_arn = module.virus_scan_sqs.sqs_queue.arn
+    queue_arn = module.virus_scan_file_sqs.sqs_queue.arn
     events    = ["s3:ObjectCreated:*"]
   }
 }
