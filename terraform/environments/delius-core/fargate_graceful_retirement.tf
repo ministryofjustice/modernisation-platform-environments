@@ -1,7 +1,22 @@
+locals {
+  # Restart schedules for envs, testing for dev only now
+  fargate_restart_schedules = {
+    development = {
+      day  = "MONDAY"
+      time = "22:00"
+    }
+  }
+
+  # Debug logging control per environment
+  fargate_debug_logging = {
+    development = true
+  }
+}
 module "fargate_graceful_retirement" {
-  count                   = local.environment == "development" ? 1 : 0
+  # count                   = local.environment == "development" ? 1 : 0
+  count                   = contains(keys(local.fargate_restart_schedules), local.environment) ? 1 : 0
   source                  = "../../modules/fargate_graceful_retirement"
-  restart_time            = "22:00"
-  restart_day_of_the_week = "WEDNESDAY"
-  debug_logging           = true
+  restart_time            = local.fargate_restart_schedules[local.environment].time
+  restart_day_of_the_week = local.fargate_restart_schedules[local.environment].day
+  debug_logging           = lookup(local.fargate_debug_logging, local.environment, false)
 }
