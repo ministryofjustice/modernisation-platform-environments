@@ -49,15 +49,19 @@ resource "aws_acm_certificate_validation" "uat_certificate_validation" {
 }
 
 locals {
-  uat_dns_records = {
-    for cert_key, cert in aws_acm_certificate.uat_certificates :
-    for option in cert.domain_validation_options :
-    "${cert_key}-${option.resource_record_name}" => {
-      name   = option.resource_record_name
-      type   = option.resource_record_type
-      record = option.resource_record_value
-    }
-  }
+  uat_dns_records = merge(
+    flatten([
+      for cert_key, cert in aws_acm_certificate.uat_certificates : [
+        for option in cert.domain_validation_options : {
+          "${cert_key}-${option.resource_record_name}" = {
+            name   = option.resource_record_name
+            type   = option.resource_record_type
+            record = option.resource_record_value
+          }
+        }
+      ]
+    ])
+  )
 }
 
 resource "aws_route53_record" "uat_dns_record" {
