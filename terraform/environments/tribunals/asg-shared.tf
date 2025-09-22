@@ -167,6 +167,10 @@ resource "aws_launch_template" "tribunals-all-lt" {
   instance_type          = "m5.4xlarge"
   update_default_version = true
 
+  lifecycle {
+  ignore_changes = [default_version, image_id]
+}
+
   iam_instance_profile {
     name = aws_iam_instance_profile.ec2_instance_profile.name
   }
