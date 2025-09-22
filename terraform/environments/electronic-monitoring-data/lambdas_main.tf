@@ -297,6 +297,6 @@ module "fms_fan_out" {
   subnet_ids         = data.aws_subnets.shared-public.ids
   environment_variables = {
     PROCESS_METADATA_LAMBDA = module.process_fms_metadata.lambda_function_name
-    PROCESS_DATA_LAMBDA     = module.format_json_fms_data.function_name
+    PROCESS_DATA_LAMBDA     = module.format_json_fms_data.lambda_function_name
   }
 }
