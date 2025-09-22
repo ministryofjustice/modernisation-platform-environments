@@ -1,37 +1,33 @@
+############################################################
+# Locals for this bucket setup
+############################################################
+
 locals {
   bucket_name = "r2s-resources"
-  genesys_aws_account_id = aws_secretsmanager_secret.genesys_aws_account_id.id
+  genesys_aws_account_id            = nonsensitive(data.aws_secretsmanager_secret_version.genesys_account_id.secret_string)
+  genesys_external_id               = nonsensitive(data.aws_secretsmanager_secret_version.genesys_external_id.secret_string)
+  snowflake_principal_account_id    = nonsensitive(data.aws_secretsmanager_secret_version.snowflake_principal_account_id.secret_string)
+  snowflake_external_id             = nonsensitive(data.aws_secretsmanager_secret_version.snowflake_external_id.secret_string)
+  snowflake_prefix = "metadata/"
+    genesys_roles = {
+    role1 = { name = "r2s-genesys-role-1", prefix = "role-1/" }
+    role2 = { name = "r2s-genesys-role-2", prefix = "role-2/" }
+    role3 = { name = "r2s-genesys-role-3", prefix = "role-3/" }
+    role4 = { name = "r2s-genesys-role-4", prefix = "role-4/" }
+    role5 = { name = "r2s-genesys-role-5", prefix = "role-5/" }
+    role6 = { name = "r2s-genesys-role-6", prefix = "role-6/" }
+  }
 }
 
-variable "genesys_external_id" {
-  description = "Genesys Cloud organization ID"
-  type        = string
-  sensitive   = true
-  default     = "value"
-}
-
-variable "snowflake_external_id" {
-  description = "ExternalId to require when Snowflake assumes the Snowflake role."
-  type        = string
-  sensitive   = true
-  default     = "value"
-}
-
-# Secret HANDLE only (value will be set manually in the console)
-resource "aws_secretsmanager_secret" "genesys_aws_account_id" {
-  name        = "genesys_aws_account_id" # you can also use "/r2s/genesys/aws_account_id"
-  description = "Account ID for Genesys"
-  tags = local.tags
-}
-
-# --- S3 bucket ---
+############################################################
+# S3 bucket + hardening
+############################################################
 
 resource "aws_s3_bucket" "r2s" {
   bucket = local.bucket_name
   tags   = local.tags
 }
 
-# Public access blocked
 resource "aws_s3_bucket_public_access_block" "r2s" {
   bucket                  = aws_s3_bucket.r2s.id
   block_public_acls       = true
@@ -40,7 +36,6 @@ resource "aws_s3_bucket_public_access_block" "r2s" {
   restrict_public_buckets = true
 }
 
-# Ownership controls (helpful for cross-account uploads with ACLs)
 resource "aws_s3_bucket_ownership_controls" "r2s" {
   bucket = aws_s3_bucket.r2s.id
   rule {
@@ -48,7 +43,6 @@ resource "aws_s3_bucket_ownership_controls" "r2s" {
   }
 }
 
-# Default encryption at rest (SSE-S3)
 resource "aws_s3_bucket_server_side_encryption_configuration" "r2s" {
   bucket = aws_s3_bucket.r2s.id
   rule {
@@ -58,7 +52,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "r2s" {
   }
 }
 
-# Optional but recommended: require TLS in transit
+# Deny insecure (non-TLS) access
 data "aws_iam_policy_document" "r2s_tls_only" {
   statement {
     sid     = "DenyInsecureTransport"
@@ -85,39 +79,64 @@ resource "aws_s3_bucket_policy" "r2s" {
   policy = data.aws_iam_policy_document.r2s_tls_only.json
 }
 
-# --- IAM: Genesys Cloud role & policy ---
+############################################################
+# Secrets Manager: create empty secrets (populate in console)
+############################################################
+# These four hold the strings needed by IAM trust policies.
 
-# Policy with least-privilege per your instructions
-data "aws_iam_policy_document" "genesys_policy_doc" {
-  statement {
-    sid     = "ObjectLevel"
-    effect  = "Allow"
-    actions = [
-      "s3:PutObject",
-      "s3:PutObjectAcl"
-    ]
-    resources = ["${aws_s3_bucket.r2s.arn}/*"]
-  }
-
-  statement {
-    sid     = "BucketLevel"
-    effect  = "Allow"
-    actions = [
-      "s3:GetBucketLocation",
-      "s3:GetEncryptionConfiguration"
-    ]
-    resources = [aws_s3_bucket.r2s.arn]
-  }
-}
-
-resource "aws_iam_policy" "genesys_policy" {
-  name        = "r2s-genesys-upload"
-  description = "Allow Genesys to put objects & read bucket location/encryption on ${local.bucket_name}"
-  policy      = data.aws_iam_policy_document.genesys_policy_doc.json
+# 1) Genesys AWS Account ID 
+resource "aws_secretsmanager_secret" "genesys_account_id" {
+  name        = "r2s/genesys/aws_account_id"
+  description = "Genesys Cloud AWS Account ID (populate manually)."
   tags        = local.tags
 }
 
-# Trust: allow assume from Genesys account with ExternalId condition
+# 2) Genesys External ID 
+resource "aws_secretsmanager_secret" "genesys_external_id" {
+  name        = "r2s/genesys/external_id"
+  description = "Genesys Cloud Org ID used as ExternalId (populate manually)."
+  tags        = local.tags
+}
+
+# 3) Snowflake AWS Account ID 
+resource "aws_secretsmanager_secret" "snowflake_principal_account_id" {
+  name        = "r2s/snowflake/principal_account_id"
+  description = "Snowflake AWS Account ID (populate manually)."
+  tags        = local.tags
+}
+
+# 4) Snowflake External ID 
+resource "aws_secretsmanager_secret" "snowflake_external_id" {
+  name        = "r2s/snowflake/external_id"
+  description = "Snowflake External ID (populate manually)."
+  tags        = local.tags
+}
+
+# --- Read the latest secret values (we populate manually) ---
+
+data "aws_secretsmanager_secret_version" "genesys_account_id" {
+  secret_id = aws_secretsmanager_secret.genesys_account_id.id
+}
+
+data "aws_secretsmanager_secret_version" "genesys_external_id" {
+  secret_id = aws_secretsmanager_secret.genesys_external_id.id
+}
+
+data "aws_secretsmanager_secret_version" "snowflake_principal_account_id" {
+  secret_id = aws_secretsmanager_secret.snowflake_principal_account_id.id
+}
+
+data "aws_secretsmanager_secret_version" "snowflake_external_id" {
+  secret_id = aws_secretsmanager_secret.snowflake_external_id.id
+}
+
+
+############################################################
+# IAM: Genesys trust + 6 roles + per-prefix policies
+############################################################
+
+
+# Trust policy for Genesys (Another AWS Account + ExternalId)
 data "aws_iam_policy_document" "genesys_trust" {
   statement {
     effect = "Allow"
@@ -129,30 +148,125 @@ data "aws_iam_policy_document" "genesys_trust" {
     condition {
       test     = "StringEquals"
       variable = "sts:ExternalId"
-      values   = [var.genesys_external_id]
+      values   = [local.genesys_external_id]
     }
   }
 }
 
+# Create 6 roles
 resource "aws_iam_role" "genesys_role" {
-  name               = "r2s-genesys-role"
+  for_each = local.genesys_roles
+
+  name               = each.value.name
   assume_role_policy = data.aws_iam_policy_document.genesys_trust.json
-  description        = "Role assumed by Genesys Cloud export module to upload recordings to ${local.bucket_name}"
+  description        = "Role assumed by Genesys Cloud export module to upload recordings to ${local.bucket_name} in ${each.value.prefix}"
   tags               = local.tags
 }
 
-resource "aws_iam_role_policy_attachment" "genesys_attach" {
-  role       = aws_iam_role.genesys_role.name
-  policy_arn = aws_iam_policy.genesys_policy.arn
+# Per-role S3 policy document restricted to its own prefix
+data "aws_iam_policy_document" "genesys_prefix" {
+  for_each = local.genesys_roles
+
+  # List only within the specific prefix
+  statement {
+    sid     = "ListBucketWithinPrefix"
+    effect  = "Allow"
+    actions = ["s3:ListBucket"]
+    resources = [aws_s3_bucket.r2s.arn]
+    condition {
+      test     = "StringLike"
+      variable = "s3:prefix"
+      values   = ["${each.value.prefix}*"]
+    }
+  }
+
+  # Object access only inside the folder
+  statement {
+    sid    = "ObjectAccessInPrefix"
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:PutObjectAcl",
+      "s3:GetObject",
+      "s3:DeleteObject",
+      "s3:AbortMultipartUpload",
+      "s3:ListMultipartUploadParts"
+    ]
+    resources = [
+      "arn:aws:s3:::${local.bucket_name}/${each.value.prefix}*"
+    ]
+  }
+
+  # Bucket metadata reads
+  statement {
+    sid     = "BucketMetadata"
+    effect  = "Allow"
+    actions = [
+      "s3:GetBucketLocation",
+      "s3:GetEncryptionConfiguration"
+    ]
+    resources = [aws_s3_bucket.r2s.arn]
+  }
 }
 
-# --- IAM: Snowflake role & policy ---
+# Managed policy per role from the above doc
+resource "aws_iam_policy" "genesys_prefix" {
+  for_each = data.aws_iam_policy_document.genesys_prefix
 
-# Policy per your sample + steps (includes Put/Delete/Get/GetVersion/List + bucket info; also PutObjectAcl & GetEncryptionConfiguration as noted)
-data "aws_iam_policy_document" "snowflake_policy_doc" {
+  name        = "r2s-genesys-prefix-${each.key}"
+  description = "Restrict ${local.genesys_roles[each.key].name} to s3://${local.bucket_name}/${local.genesys_roles[each.key].prefix}"
+  policy      = each.value.json
+  tags        = local.tags
+}
+
+# Attach the restricted policy to the matching role
+resource "aws_iam_role_policy_attachment" "genesys_prefix_attach" {
+  for_each = local.genesys_roles
+
+  role       = aws_iam_role.genesys_role[each.key].name
+  policy_arn = aws_iam_policy.genesys_prefix[each.key].arn
+}
+
+############################################################
+# IAM: Snowflake trust + policy (metadata-only) + role
+############################################################
+
+# Trust policy for Snowflake (Another AWS Account + ExternalId)
+data "aws_iam_policy_document" "snowflake_trust" {
   statement {
-    sid     = "ObjectLevel"
+    effect = "Allow"
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${local.snowflake_principal_account_id}:root"]
+    }
+    actions = ["sts:AssumeRole"]
+    condition {
+      test     = "StringEquals"
+      variable = "sts:ExternalId"
+      values   = [local.snowflake_external_id]
+    }
+  }
+}
+
+# Snowflake policy: metadata-only prefix
+data "aws_iam_policy_document" "snowflake_policy_doc" {
+  # List only within metadata prefix
+  statement {
+    sid     = "ListBucketMetadataPrefix"
     effect  = "Allow"
+    actions = ["s3:ListBucket"]
+    resources = [aws_s3_bucket.r2s.arn]
+    condition {
+      test     = "StringLike"
+      variable = "s3:prefix"
+      values   = ["${local.snowflake_prefix}*"]
+    }
+  }
+
+  # Object access only within metadata prefix
+  statement {
+    sid    = "ObjectAccessInMetadataPrefix"
+    effect = "Allow"
     actions = [
       "s3:PutObject",
       "s3:GetObject",
@@ -160,14 +274,16 @@ data "aws_iam_policy_document" "snowflake_policy_doc" {
       "s3:DeleteObject",
       "s3:PutObjectAcl"
     ]
-    resources = ["${aws_s3_bucket.r2s.arn}/*"]
+    resources = [
+      "arn:aws:s3:::${local.bucket_name}/${local.snowflake_prefix}*"
+    ]
   }
 
+  # Bucket metadata reads
   statement {
-    sid     = "BucketLevel"
+    sid     = "BucketMetadata"
     effect  = "Allow"
     actions = [
-      "s3:ListBucket",
       "s3:GetBucketLocation",
       "s3:GetEncryptionConfiguration"
     ]
@@ -176,33 +292,16 @@ data "aws_iam_policy_document" "snowflake_policy_doc" {
 }
 
 resource "aws_iam_policy" "snowflake_policy" {
-  name        = "r2s-snowflake-access"
-  description = "Allow Snowflake (via integration assume-role) to access metadata objects in ${local.bucket_name}"
+  name        = "r2s-snowflake-metadata-only"
+  description = "Allow Snowflake to access metadata objects only in s3://${local.bucket_name}/${local.snowflake_prefix}"
   policy      = data.aws_iam_policy_document.snowflake_policy_doc.json
   tags        = local.tags
-}
-
-# Trust: pattern per your guide (same account + external ID). If Snowflake uses a different principal in your setup, swap the principal here.
-data "aws_iam_policy_document" "snowflake_trust" {
-  statement {
-    effect = "Allow"
-    principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::${local.genesys_aws_account_id}:root"]
-    }
-    actions = ["sts:AssumeRole"]
-    condition {
-      test     = "StringEquals"
-      variable = "sts:ExternalId"
-      values   = [var.snowflake_external_id]
-    }
-  }
 }
 
 resource "aws_iam_role" "snowflake_role" {
   name               = "r2s-snowflake-role"
   assume_role_policy = data.aws_iam_policy_document.snowflake_trust.json
-  description        = "Role assumed for Snowflake processing to access metadata in ${local.bucket_name} (no recording-file access beyond object-level actions listed)"
+  description        = "Role for Snowflake to process metadata in ${local.bucket_name} (no access to recordings)."
   tags               = local.tags
 }
 
