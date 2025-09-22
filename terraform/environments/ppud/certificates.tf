@@ -48,7 +48,7 @@ resource "aws_acm_certificate_validation" "preprod_certificate_validation" {
 }
 
 locals {
-  preprod_dns_records = local.is-preproduction ? merge(
+  preprod_dns_records = local.is-preproduction ? tomap(merge(
     flatten([
       for cert_key, cert in aws_acm_certificate.uat_certificates : [
         for option in cert.domain_validation_options : {
@@ -60,7 +60,7 @@ locals {
         }
       ]
     ])
-  ) : {}
+  )) : {}
 }
 
 resource "aws_route53_record" "preprod_dns_record" {
