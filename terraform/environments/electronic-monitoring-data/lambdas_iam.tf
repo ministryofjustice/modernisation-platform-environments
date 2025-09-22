@@ -576,7 +576,7 @@ data "aws_iam_policy_document" "process_fms_metadata_lambda_role_policy_document
   }
 }
 
-resource "aws_iam_role" "process_fms_metadata_lambda_role" {
+resource "aws_iam_role" "process_fms_metadata" {
   name               = "process_fms_metadata_lambda_role"
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
 }
@@ -587,6 +587,6 @@ resource "aws_iam_policy" "process_fms_metadata_lambda_role_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "process_fms_metadata_lambda_policy_attachment" {
-  role       = aws_iam_role.process_fms_metadata_lambda_role.name
+  role       = aws_iam_role.process_fms_metadata.name
   policy_arn = aws_iam_policy.process_fms_metadata_lambda_role_policy.arn
 }
