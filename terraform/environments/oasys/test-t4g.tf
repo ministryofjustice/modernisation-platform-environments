@@ -4,6 +4,16 @@ locals {
     type       = "string"
   }
 }
+resource "aws_security_group" "test-sg-for-t4" {
+  name        = "test-sg"
+  description = "Allow all outbound traffic"
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
 resource "aws_instance" "my_t4_instance" {
   #checkov:skip=CKV_AWS_79: "Ensure Instance Metadata Service Version 1 is not enabled"
   #checkov:skip=CKV_AWS_135: "Ensure that EC2 is EBS optimized"
@@ -15,7 +25,7 @@ resource "aws_instance" "my_t4_instance" {
   ami           = "ami-08f714c552929eda9"
   instance_type = "t4g.micro"
 
-  vpc_security_group_ids = ["subnet-01815760b71d6a619"]
+  vpc_security_group_ids = [aws_security_group.test-sg-for-t4.id]
 
   associate_public_ip_address = false
   availability_zone           = "eu-west-2a"
