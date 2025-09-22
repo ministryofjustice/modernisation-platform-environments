@@ -102,6 +102,11 @@ data "aws_iam_policy_document" "allow_s3_to_write" {
       variable = "aws:SourceArn"
       values   = [var.bucket.arn]
     }
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceAccount"
+      values   = [data.aws_caller_identity.current.account_id]
+    }
   }
 }
 
