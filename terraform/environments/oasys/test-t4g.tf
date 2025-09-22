@@ -1,17 +1,22 @@
-locals {
-  cloudwatch_metric_alarms_endpoint_monitoring = {
-    Decription = "Set the endpoint location"
-    type       = "string"
-  }
-}
 resource "aws_security_group" "test-sg-for-t4" {
-  name        = "test-sg"
+
+  name        = "test-sec-group"
   description = "Allow all outbound traffic"
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    vpc-name = "VPC created for the T4 test"
+  }
+}
+locals {
+  cloudwatch_metric_alarms_endpoint_monitoring = {
+    Decription = "Set the endpoint location"
+    type       = "string"
   }
 }
 resource "aws_instance" "my_t4_instance" {
@@ -33,7 +38,7 @@ resource "aws_instance" "my_t4_instance" {
   user_data_replace_on_change = true
   subnet_id                   = data.aws_subnet.data_subnets_a.id
   tags = {
-    Name = "First t4 instance"
+    Name = "First t4 test instance"
   }
-
+  depends_on = [aws_security_group.test-sg-for-t4]
 }
