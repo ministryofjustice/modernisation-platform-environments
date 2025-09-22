@@ -239,3 +239,9 @@ variable "sftp_services" {
     }
   }
 }
+
+variable "ecs_optimized_ami" {
+  type        = string
+  description = "The ECS optimized AMI"
+  default     = "ami-08b32d78bce8fc05e"
+}

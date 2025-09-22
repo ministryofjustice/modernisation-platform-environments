@@ -163,8 +163,9 @@ data "aws_ssm_parameter" "ecs_optimized_ami" {
 resource "aws_launch_template" "tribunals-all-lt" {
   #checkov:skip=CKV_AWS_88:"EC2 instances require public IPs as they are internet-facing application servers"
   name_prefix            = "tribunals-all"
-  image_id               = data.aws_ssm_parameter.ecs_optimized_ami.value
+  image_id               = var.ecs_optimized_ami
   instance_type          = "m5.4xlarge"
+  update_default_version = true
 
   iam_instance_profile {
     name = aws_iam_instance_profile.ec2_instance_profile.name
@@ -207,8 +208,9 @@ resource "aws_launch_template" "tribunals-all-lt" {
 
 resource "aws_launch_template" "tribunals-backup-lt" {
   name_prefix            = "tribunals-backup"
-  image_id               = data.aws_ssm_parameter.ecs_optimized_ami.value
+  image_id               = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"]
   instance_type          = "m5.4xlarge"
+  update_default_version = true
 
   iam_instance_profile {
     name = aws_iam_instance_profile.ec2_instance_profile.name
