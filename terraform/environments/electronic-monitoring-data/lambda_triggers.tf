@@ -45,7 +45,7 @@ resource "aws_s3_bucket_notification" "historic_data_checksum" {
     filter_prefix = "serco/fms"
   }
   queue {
-    queue_arn     = module.process_fms_metadata.sqs_queue.arn
+    queue_arn     = module.process_fms_metadata_sqs.sqs_queue.arn
     events        = ["s3:ObjectCreated:*"]
     filter_suffix = ".JSON"
     filter_prefix = "serco/fms"
