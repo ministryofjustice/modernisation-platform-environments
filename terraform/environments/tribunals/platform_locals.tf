@@ -36,6 +36,7 @@ locals {
   application_data = fileexists("./application_variables.json") ? jsondecode(file("./application_variables.json")) : null
 
   common_sans = [
+      "*.decisions.tribunals.gov.uk",
       "*.venues.tribunals.gov.uk",
       "*.reports.tribunals.gov.uk"
   ]
