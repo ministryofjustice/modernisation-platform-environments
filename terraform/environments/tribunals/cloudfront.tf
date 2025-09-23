@@ -355,7 +355,7 @@ resource "aws_cloudfront_function" "redirect_function" {
             statusCode: 301,
             statusDescription: "Moved Permanently",
             headers: {
-              "location": {"value": "http://estateagentappeals.decisions.tribunals.gov.uk"}
+              "location": {"value": "https://estateagentappeals.decisions.tribunals.gov.uk"}
             }
           };
         }
@@ -373,7 +373,7 @@ resource "aws_cloudfront_function" "redirect_function" {
             statusCode: 301,
             statusDescription: "Moved Permanently",
             headers: {
-              "location": {"value": "http://localgovernmentstandards.decisions.tribunals.gov.uk" + uri}
+              "location": {"value": "https://localgovernmentstandards.decisions.tribunals.gov.uk" + uri}
             }
           };
         }
