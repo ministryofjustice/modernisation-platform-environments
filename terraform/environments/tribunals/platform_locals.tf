@@ -44,7 +44,8 @@ locals {
   cloudfront_sans = [
     "siac.tribunals.gov.uk",
     "fhsaa.tribunals.gov.uk",
-    "estateagentappeals.tribunals.gov.uk"
+    "estateagentappeals.tribunals.gov.uk",
+    "consumercreditappeals.tribunals.gov.uk"
   ]
 
   nonprod_sans = [

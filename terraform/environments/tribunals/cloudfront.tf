@@ -367,6 +367,24 @@ resource "aws_cloudfront_function" "redirect_function" {
           }
         };
 
+      case "consumercreditappeals.tribunals.gov.uk":
+        if (uri.toLowerCase() === "/decisions.htm") {
+          return {
+            statusCode: 301,
+            statusDescription: "Moved Permanently",
+            headers: {
+              "location": {"value": "https://consumercreditappeals.decisions.tribunals.gov.uk"}
+            }
+          };
+        }
+        return {
+          statusCode: 301,
+          statusDescription: "Moved Permanently",
+          headers: {
+            "location": {"value": "https://www.gov.uk/courts-tribunals/upper-tribunal-tax-and-chancery-chamber"}
+          }
+        };
+
       case "adjudicationpanel.tribunals.gov.uk":
         if (/^\/(Public|Admin|Decisions|Judgments)/i.test(uri)) {
           return {
