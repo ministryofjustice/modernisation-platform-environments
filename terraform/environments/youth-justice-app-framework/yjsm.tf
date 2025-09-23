@@ -102,7 +102,7 @@ resource "aws_iam_policy" "yjsm-s3-access" {
   })
 }
 
-resource "aws_iam_policy" "ses-access" {
+resource "aws_iam_policy" "yjsm-ses-access" {
   name        = "${local.project_name}-yjsm-ses-access"
   description = "Policy for yjsm task role to access SES"
   policy      = file("${path.module}/iam_policies/ses_user_policy.json")
