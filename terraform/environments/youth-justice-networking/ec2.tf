@@ -381,9 +381,9 @@ resource "aws_instance" "juniper_management" {
   root_block_device {
     volume_size = 70    # Define the root volume size in GB
     volume_type = "gp3" # Optional: Specify the volume type (e.g., gp3, gp2, io1)
-    device_name = "Extradriveforsyslogs"
   }
-ebs_block_device {
+  ebs_block_device {
+    device_name           = "/dev/sdf"
     encrypted             = true
     delete_on_termination = false
     volume_size           = 80
