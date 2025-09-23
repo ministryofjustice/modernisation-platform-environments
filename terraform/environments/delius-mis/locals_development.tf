@@ -205,8 +205,7 @@ locals {
       templatefile(
         "${path.module}/templates/AutoEC2LaunchV2.yaml.tftpl",
         {
-          ad_domain_name = var.environment_config.ad_domain_name
-          branch         = "TM/TM-1414/ips-dataservices-bods-refactor"
+          branch = "TM/TM-1414/ips-dataservices-bods-refactor"
         }
       )
     )
