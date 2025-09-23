@@ -60,7 +60,7 @@ resource "aws_route53_record" "preprod_dns_record" {
 }
 
 resource "aws_acm_certificate_validation" "preprod_certificate_validation" {
-  for_each        = aws_acm_certificate.preprod_certificates
+  for_each = local.is-preproduction ? aws_acm_certificate.preprod_certificates : {}
   certificate_arn = each.value.arn
 
   validation_record_fqdns = [
