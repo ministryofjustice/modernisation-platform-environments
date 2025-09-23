@@ -28,7 +28,7 @@ resource "aws_instance" "my_t4_instance" {
   #checkov:skip=CKV_AWS_8: "Ensure all data stored in the Launch configuration or instance Elastic Blocks Store is securely encrypted"
 
   count = local.is-development ? 1 : 0
-  ami   = "ami-08982f1c5bf93d976"
+  ami   = "ami-046c2381f11878233"
 
   instance_type = "t4g.micro"
 
