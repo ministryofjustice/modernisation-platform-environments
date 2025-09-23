@@ -46,7 +46,8 @@ locals {
     "fhsaa.tribunals.gov.uk",
     "estateagentappeals.tribunals.gov.uk",
     "consumercreditappeals.tribunals.gov.uk",
-    "charity.tribunals.gov.uk"
+    "charity.tribunals.gov.uk",
+    "adjudicationpanel.tribunals.gov.uk"
   ]
 
   nonprod_sans = [
