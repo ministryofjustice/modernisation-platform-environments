@@ -36,7 +36,17 @@ variable "bws_config" {
 }
 
 variable "dis_config" {
-  type = any
+  description = "Configuration for DIS instances"
+  type = object({
+    instance_count           = number
+    ami_name                 = string
+    ebs_volumes              = any
+    ebs_volumes_config       = any
+    instance_config          = any
+    branch                   = optional(string, "main")
+    cloudwatch_metric_alarms = optional(any, null)
+  })
+  default = null
 }
 
 variable "tags" {
