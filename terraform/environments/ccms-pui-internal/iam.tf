@@ -182,7 +182,7 @@ resource "aws_iam_policy" "s3_access_policy" {
           "s3:GetBucketLocation",
           "s3:GetBucketVersioning"
         ]
-        Resource = module.s3_pui_docs.arn
+        Resource = "arn:aws:s3:::${module.s3_pui_docs.bucket_name}"
       },
       {
         Sid    = "S3ObjectAccess"
@@ -193,7 +193,7 @@ resource "aws_iam_policy" "s3_access_policy" {
           "s3:PutObject",
           "s3:PutObjectAcl"
         ]
-        Resource = "${module.s3_pui_docs.arn}/*"
+        Resource = "arn:aws:s3:::${module.s3_pui_docs.bucket_name}/*"
       }
     ]
   })
