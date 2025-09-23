@@ -62,7 +62,7 @@ resource "aws_cloudfront_distribution" "tribunals_distribution" {
   price_class     = "PriceClass_All"
 
   viewer_certificate {
-    acm_certificate_arn      = aws_acm_certificate.cloudfront.arn
+    acm_certificate_arn      = aws_acm_certificate_validation.cloudfront_cert_validation.certificate_arn
     ssl_support_method       = "sni-only"
     minimum_protocol_version = "TLSv1.2_2021"
   }
@@ -349,13 +349,67 @@ resource "aws_cloudfront_function" "redirect_function" {
           }
         };
 
+      case "estateagentappeals.tribunals.gov.uk":
+        if (uri.toLowerCase() === "/decisions.htm") {
+          return {
+            statusCode: 301,
+            statusDescription: "Moved Permanently",
+            headers: {
+              "location": {"value": "https://estateagentappeals.decisions.tribunals.gov.uk"}
+            }
+          };
+        }
+        return {
+          statusCode: 301,
+          statusDescription: "Moved Permanently",
+          headers: {
+            "location": {"value": "https://www.gov.uk/guidance/estate-agents-appeal-against-a-ban-or-warning-order"}
+          }
+        };
+
+      case "consumercreditappeals.tribunals.gov.uk":
+        if (uri.toLowerCase() === "/decisions.htm") {
+          return {
+            statusCode: 301,
+            statusDescription: "Moved Permanently",
+            headers: {
+              "location": {"value": "https://consumercreditappeals.decisions.tribunals.gov.uk"}
+            }
+          };
+        }
+        return {
+          statusCode: 301,
+          statusDescription: "Moved Permanently",
+          headers: {
+            "location": {"value": "https://www.gov.uk/courts-tribunals/upper-tribunal-tax-and-chancery-chamber"}
+          }
+        };
+
+      case "charity.tribunals.gov.uk":
+        if (uri.toLowerCase() === "/decisions.htm") {
+          return {
+            statusCode: 301,
+            statusDescription: "Moved Permanently",
+            headers: {
+              "location": {"value": "https://charity.decisions.tribunals.gov.uk"}
+            }
+          };
+        }
+        return {
+          statusCode: 301,
+          statusDescription: "Moved Permanently",
+          headers: {
+            "location": {"value": "https://www.gov.uk/guidance/appeal-against-a-charity-commission-decision-about-your-charity"}
+          }
+        };
+
       case "adjudicationpanel.tribunals.gov.uk":
         if (/^\/(Public|Admin|Decisions|Judgments)/i.test(uri)) {
           return {
             statusCode: 301,
             statusDescription: "Moved Permanently",
             headers: {
-              "location": {"value": "http://localgovernmentstandards.decisions.tribunals.gov.uk" + uri}
+              "location": {"value": "https://localgovernmentstandards.decisions.tribunals.gov.uk" + uri}
             }
           };
         }
