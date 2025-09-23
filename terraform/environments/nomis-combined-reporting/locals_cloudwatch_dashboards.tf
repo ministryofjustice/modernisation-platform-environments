@@ -37,10 +37,6 @@ locals {
       header_markdown = "## EC2 CMS"
       width           = 8
       height          = 8
-      add_ebs_widgets = {
-        iops       = true
-        throughput = true
-      }
       search_filter = {
         ec2_tag = [
           { tag_name = "server-type", tag_value = "ncr-bip-cms" },
@@ -66,10 +62,6 @@ locals {
       header_markdown = "## EC2 APP"
       width           = 8
       height          = 8
-      add_ebs_widgets = {
-        iops       = true
-        throughput = true
-      }
       search_filter = {
         ec2_tag = [
           { tag_name = "server-type", tag_value = "ncr-bip-app" },
@@ -95,10 +87,6 @@ locals {
       header_markdown = "## EC2 WEB"
       width           = 8
       height          = 8
-      add_ebs_widgets = {
-        iops       = true
-        throughput = true
-      }
       search_filter = {
         ec2_tag = [
           { tag_name = "server-type", tag_value = "ncr-web" },
@@ -124,13 +112,9 @@ locals {
       header_markdown = "## EC2 WEBADMIN"
       width           = 8
       height          = 8
-      add_ebs_widgets = {
-        iops       = true
-        throughput = true
-      }
       search_filter = {
         ec2_tag = [
-          { tag_name = "server-type", tag_value = "ncr-web" },
+          { tag_name = "server-type", tag_value = "ncr-webadmin" },
         ]
       }
       widgets = [
