@@ -120,8 +120,8 @@
             working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
             run: |
               terraform --version
-              echo "terraform init"
-              terraform init
+              echo "terraform init -input=false -upgrade"
+              terraform init -input=false -upgrade
 
           #
           # Terraform Workspace Select
@@ -319,8 +319,8 @@
             working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
             run: |
               terraform --version
-              echo "terraform init"
-              terraform init
+              echo "terraform init -input=false -upgrade"
+              terraform init -input=false -upgrade
 
           - name: Terraform Workspace Select
             working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"

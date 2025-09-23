@@ -205,7 +205,7 @@ jobs:
 
       - name: Terraform Init
         working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
-        run: terraform init
+        run: terraform init -input=false -upgrade
 
       - name: Select Workspace
         working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
