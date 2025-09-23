@@ -394,6 +394,21 @@ resource "aws_instance" "juniper_management" {
   })
 }
 
+resource "aws_ebs_volume" "data_volume" {
+  availability_zone = aws_instance.juniper_management.availability_zone
+  size              = 80
+  type              = "gp3"
+  encrypted         = true
+  tags              = local.tags
+}
+
+resource "aws_volume_attachment" "data_attach" {
+  device_name  = "/dev/sdf"
+  volume_id    = aws_ebs_volume.data_volume.id
+  instance_id  = aws_instance.juniper_management.id
+  force_detach = true
+}
+
 # Add data sources for AMIs
 data "aws_ami" "amazon_linux_2" {
   most_recent = true
