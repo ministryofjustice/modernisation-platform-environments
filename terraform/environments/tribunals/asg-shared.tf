@@ -167,6 +167,10 @@ resource "aws_launch_template" "tribunals-all-lt" {
   instance_type          = "m5.4xlarge"
   update_default_version = true
 
+  lifecycle {
+  ignore_changes = [default_version, image_id]
+}
+
   iam_instance_profile {
     name = aws_iam_instance_profile.ec2_instance_profile.name
   }
@@ -272,22 +276,9 @@ resource "aws_autoscaling_group" "tribunals-all-asg" {
 }
 
 resource "aws_instance" "tribunals_backup" {
-  iam_instance_profile = aws_iam_instance_profile.ec2_instance_profile.name
   launch_template {
     id      = aws_launch_template.tribunals-backup-lt.id
     version = "$Latest"
-  }
-
-  ebs_optimized = true
-
-
-  metadata_options {
-    http_endpoint = "enabled"
-    http_tokens   = "required"
-  }
-
-  root_block_device {
-    encrypted = true
   }
 
   tags = {
