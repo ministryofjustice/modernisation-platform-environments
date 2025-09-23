@@ -191,9 +191,7 @@ resource "aws_iam_policy" "s3_access_policy" {
           "s3:GetObject",
           "s3:GetObjectVersion",
           "s3:PutObject",
-          "s3:PutObjectAcl",
-          "s3:DeleteObject",
-          "s3:DeleteObjectVersion"
+          "s3:PutObjectAcl"
         ]
         Resource = "${module.s3_pui_docs.arn}/*"
       }

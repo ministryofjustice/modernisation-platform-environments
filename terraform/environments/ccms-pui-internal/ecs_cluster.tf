@@ -45,7 +45,7 @@ resource "aws_ecs_task_definition" "pui" {
       idpMetadataUrl                                                = local.application_data.accounts[local.environment].idpMetadataUrl
       loginUrl                                                      = local.application_data.accounts[local.environment].loginUrl
       postcodeApiUrl                                                = local.application_data.accounts[local.environment].postcodeApiUrl
-      postcodeApiKey                                                = local.application_data.accounts[local.environment].postcodeApiKey
+      postcodeApiKey                                                = aws_secretsmanager_secret.postcodeApiKey.arn
       aws_endpoint                                                  = local.application_data.accounts[local.environment].aws_endpoint
       ccms_s3_documents                                             = local.application_data.accounts[local.environment].ccms_s3_documents
       ccms_pui_feedback_url                                         = local.application_data.accounts[local.environment].ccms_pui_feedback_url
@@ -67,7 +67,7 @@ resource "aws_ecs_task_definition" "pui" {
       ccms_soa_url_ebsPrintInvoiceEndpoint                          = local.application_data.accounts[local.environment].ccms_soa_url_ebsPrintInvoiceEndpoint
       ccms_soa_url_ebsGetInvoiceDetailsEndpoint                     = local.application_data.accounts[local.environment].ccms_soa_url_ebsGetInvoiceDetailsEndpoint
       ccms_soa_url_ebsUpdateUserEndpoint                            = local.application_data.accounts[local.environment].ccms_soa_url_ebsUpdateUserEndpoint
-      ccms_soa_soapHeaderUserPassword                               = local.application_data.accounts[local.environment].ccms_soa_soapHeaderUserPassword
+      ccms_soa_soapHeaderUserPassword                               = aws_secretsmanager_secret.ccms_soa_soapHeaderUserPassword.arn
       ccms_soa_soapHeaderUserName                                   = local.application_data.accounts[local.environment].ccms_soa_soapHeaderUserName
       opa12_assess_service_servlet                                  = local.application_data.accounts[local.environment].opa12_assess_service_servlet
       ccms_owd_rulebase_baseurl                                     = local.application_data.accounts[local.environment].ccms_owd_rulebase_baseurl

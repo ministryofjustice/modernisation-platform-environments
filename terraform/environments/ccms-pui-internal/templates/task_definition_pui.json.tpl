@@ -26,10 +26,6 @@
         "value": "${spring_datasource_username}"
       },
       {
-        "name": "SPRING_DATASOURCE_PASSWORD",
-        "value": "${spring_datasource_password}"
-      },
-      {
         "name": "SPRING_DATASOURCE_URL",
         "value": "${spring_datasource_url}"
       },
@@ -52,10 +48,6 @@
       {
         "name": "POSTCODEAPIURL",
         "value": "${postcodeApiUrl}"
-      },
-      {
-        "name": "POSTCODEAPIKEY",
-        "value": "${postcodeApiKey}"
       },
       {
         "name": "CCMS_S3_DOCUMENTS",
@@ -142,10 +134,6 @@
         "value": "${ccms_soa_url_ebsUpdateUserEndpoint}"
       },
       {
-        "name": "ccms_soa_soapHeaderUserPassword",
-        "value": "${ccms_soa_soapHeaderUserPassword}"
-      },
-      {
         "name": "ccms_soa_soapHeaderUserName",
         "value": "${ccms_soa_soapHeaderUserName}"
       },
@@ -210,7 +198,19 @@
       {
         "name": "SPPRIVATEKEY",
         "valueFrom": "${spprivatekey}"
-      }
+      },
+      {
+        "name": "SPRING_DATASOURCE_PASSWORD",
+        "value": "${spring_datasource_password}"
+      },
+      {
+        "name": "POSTCODEAPIKEY",
+        "value": "${postcodeApiKey}"
+      },
+      {
+        "name": "ccms_soa_soapHeaderUserPassword",
+        "value": "${ccms_soa_soapHeaderUserPassword}"
+      },
     ]
   }
 ]
