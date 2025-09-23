@@ -38,13 +38,13 @@ locals {
     "",
     "adjudicationpanel",
     "charity",
-    "consumercreditappeals",
-    "estateagentappeals"
+    "consumercreditappeals"
   ]
 
   nginx_records_to_cloudfront = [
     "siac",
-    "fhsaa"
+    "fhsaa",
+    "estateagentappeals"
   ]
 
   www_records = [

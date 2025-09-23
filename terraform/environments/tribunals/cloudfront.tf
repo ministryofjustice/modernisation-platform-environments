@@ -349,13 +349,31 @@ resource "aws_cloudfront_function" "redirect_function" {
           }
         };
 
+      case "estateagentappeals.tribunals.gov.uk":
+        if (uri.toLowerCase() === "/decisions.htm") {
+          return {
+            statusCode: 301,
+            statusDescription: "Moved Permanently",
+            headers: {
+              "location": {"value": "https://estateagentappeals.decisions.tribunals.gov.uk"}
+            }
+          };
+        }
+        return {
+          statusCode: 301,
+          statusDescription: "Moved Permanently",
+          headers: {
+            "location": {"value": "https://www.gov.uk/guidance/estate-agents-appeal-against-a-ban-or-warning-order"}
+          }
+        };
+
       case "adjudicationpanel.tribunals.gov.uk":
         if (/^\/(Public|Admin|Decisions|Judgments)/i.test(uri)) {
           return {
             statusCode: 301,
             statusDescription: "Moved Permanently",
             headers: {
-              "location": {"value": "http://localgovernmentstandards.decisions.tribunals.gov.uk" + uri}
+              "location": {"value": "https://localgovernmentstandards.decisions.tribunals.gov.uk" + uri}
             }
           };
         }
