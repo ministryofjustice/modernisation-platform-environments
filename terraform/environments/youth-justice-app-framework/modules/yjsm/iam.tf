@@ -44,8 +44,8 @@ resource "aws_iam_role_policy_attachment" "yjsm_role_additional_policies" {
 }
 
 resource "aws_iam_policy" "secrets_manager_policy" {
-  name        = "${var.cluster_name}-ecs-secrets-access"
-  description = "Allows ECS tasks to access secrets in Secrets Manager"
+  name        = "${var.cluster_name}-yjsm-secrets-access"
+  description = "Allows yjsm tasks to access secrets in Secrets Manager"
   policy = templatefile("${path.module}/yjsm_secrets_access.json", {
     secret_arns    = var.yjsm_secrets_access_policy_secret_arns
     secret_kms_key = var.secret_kms_key_arn
