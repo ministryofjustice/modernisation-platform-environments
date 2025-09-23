@@ -201,7 +201,8 @@ locals {
         }
       )
     }
-    branch = "TM/TM-1414/ips-dataservices-bods-refactor"
+    branch                   = "TM/TM-1414/ips-dataservices-bods-refactor"
+    cloudwatch_metric_alarms = {}
   }
   # automation test instance only - do not use
   auto_config_dev = {
