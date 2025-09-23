@@ -10,6 +10,7 @@ resource "aws_security_group" "test-sg-for-t4" {
   }
 
   tags = {
+
     vpc-name = "VPC created for the T4 test"
   }
 }
@@ -26,8 +27,9 @@ resource "aws_instance" "my_t4_instance" {
   #checkov:skip=CKV2_AWS_41: "Ensure an IAM role is attached to EC2 instance"
   #checkov:skip=CKV_AWS_8: "Ensure all data stored in the Launch configuration or instance Elastic Blocks Store is securely encrypted"
 
-  count         = local.is-development ? 1 : 0
-  ami           = "ami-08f714c552929eda9"
+  count = local.is-development ? 1 : 0
+  ami   = "ami-08982f1c5bf93d976"
+
   instance_type = "t4g.micro"
 
   vpc_security_group_ids = [aws_security_group.test-sg-for-t4.id]
