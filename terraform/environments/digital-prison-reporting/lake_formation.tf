@@ -1,9 +1,7 @@
 resource "aws_lakeformation_data_lake_settings" "lake_formation" {
-  admins = flatten([
-    [for share in local.analytical_platform_share : aws_iam_role.analytical_platform_share_role[share.target_account_name].arn],
+  admins = [
     data.aws_iam_session_context.current.issuer_arn,
-    ]
-  )
+  ]
 
   # Ensure permissions are null to avoid LF being
   create_database_default_permissions {
@@ -20,6 +18,16 @@ resource "aws_lakeformation_data_lake_settings" "lake_formation" {
 
   parameters = {
     "CROSS_ACCOUNT_VERSION" = "4"
+  }
+}
+
+resource "aws_lakeformation_permissions" "share_role_all_permissions" {
+  for_each    = toset([for share in local.analytical_platform_share : share.target_account_name])
+  principal   = aws_iam_role.analytical_platform_share_role[each.key].arn
+  permissions = ["ALL"]
+
+  database {
+    name = local.lake_formation_database_name
   }
 }
 
