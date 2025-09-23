@@ -15,15 +15,15 @@ resource "aws_security_group" "cloudwatch_log_alert_sg" {
   )
 }
 
-# resource "aws_security_group_rule" "cloudwatch_log_alert_https" {
-#   type                     = "egress"
-#   from_port                = 443
-#   to_port                  = 443
-#   protocol                 = "tcp"
-#   source_security_group_id = local.application_data.accounts[local.environment].vpc_endpoint_sg
-#   security_group_id        = aws_security_group.cloudwatch_log_alert_sg.id
-#   description              = "Outbound 443 to LAA VPC Endpoint SG"
-# }
+resource "aws_security_group_rule" "cloudwatch_log_alert_https" {
+  type                     = "egress"
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  source_security_group_id = local.application_data.accounts[local.environment].vpc_endpoint_sg
+  security_group_id        = aws_security_group.cloudwatch_log_alert_sg.id
+  description              = "Outbound 443 to LAA VPC Endpoint SG"
+}
 
 resource "aws_security_group_rule" "cloudwatch_log_alert_https_to_internet" {
   type              = "egress"
