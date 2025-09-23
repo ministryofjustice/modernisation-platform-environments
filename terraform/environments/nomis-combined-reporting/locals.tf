@@ -18,15 +18,6 @@ locals {
 
   baseline_presets_all_environments = {
     options = {
-      cloudwatch_dashboard_default_widget_groups = [
-        "lb",
-        "ec2",
-        "ec2_linux",
-        "ec2_instance_linux",
-        "ec2_instance_oracle_db_with_backup",
-        "ec2_windows",
-        "ssm_command",
-      ]
       cloudwatch_metric_alarms_default_actions    = ["pagerduty"]
       cloudwatch_metric_oam_links_ssm_parameters  = ["hmpps-oem-${local.environment}"]
       cloudwatch_metric_oam_links                 = ["hmpps-oem-${local.environment}"]
