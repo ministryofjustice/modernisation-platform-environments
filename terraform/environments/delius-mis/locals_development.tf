@@ -201,14 +201,7 @@ locals {
         }
       )
     }
-    user_data_raw = base64encode(
-      templatefile(
-        "modules/mis_environment/templates/AutoEC2LaunchV2.yaml.tftpl",
-        {
-          branch = "TM/TM-1414/ips-dataservices-bods-refactor"
-        }
-      )
-    )
+    branch = "TM/TM-1414/ips-dataservices-bods-refactor"
   }
   # automation test instance only - do not use
   auto_config_dev = {
