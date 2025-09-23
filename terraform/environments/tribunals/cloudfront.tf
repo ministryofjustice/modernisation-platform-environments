@@ -385,6 +385,24 @@ resource "aws_cloudfront_function" "redirect_function" {
           }
         };
 
+      case "charity.tribunals.gov.uk":
+        if (uri.toLowerCase() === "/decisions.htm") {
+          return {
+            statusCode: 301,
+            statusDescription: "Moved Permanently",
+            headers: {
+              "location": {"value": "https://charity.decisions.tribunals.gov.uk"}
+            }
+          };
+        }
+        return {
+          statusCode: 301,
+          statusDescription: "Moved Permanently",
+          headers: {
+            "location": {"value": "https://www.gov.uk/guidance/appeal-against-a-charity-commission-decision-about-your-charity"}
+          }
+        };
+
       case "adjudicationpanel.tribunals.gov.uk":
         if (/^\/(Public|Admin|Decisions|Judgments)/i.test(uri)) {
           return {
