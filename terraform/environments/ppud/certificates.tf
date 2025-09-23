@@ -49,11 +49,6 @@ resource "aws_acm_certificate_validation" "preprod_certificate_validation" {
 }
 
 locals {
-  preprod_zone_ids = local.is-preproduction ? {
-    uat    = data.aws_route53_zone.uat[0].zone_id
-    wamuat = data.aws_route53_zone.wamuat[0].zone_id
-  } : {}
-
   preprod_dns_records = local.is-preproduction ? merge([
     for cert_key, cert in aws_acm_certificate.preprod_certificates : {
       for option in cert.domain_validation_options : "${cert_key}-${option.resource_record_name}" => {
