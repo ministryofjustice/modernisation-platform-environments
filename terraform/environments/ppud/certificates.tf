@@ -19,7 +19,7 @@ locals {
   } : {}
 }
 
-resource "aws_acm_certificate" "uat_certificates" {
+resource "aws_acm_certificate" "preprod_certificates" {
   for_each                  = local.is-preproduction ? local.preprod_domains : {}
   domain_name               = each.value
   validation_method         = "DNS"
@@ -35,39 +35,39 @@ resource "aws_acm_certificate" "uat_certificates" {
 }
 
 /*
-resource "aws_acm_certificate_validation" "uat_certificate_validation" {
-  for_each = aws_acm_certificate.uat_certificates
-
+resource "aws_acm_certificate_validation" "preprod_certificate_validation" {
+  for_each        = aws_acm_certificate.preprod_certificates
   certificate_arn = each.value.arn
 
   validation_record_fqdns = [
-    for record_key, record in aws_route53_record.uat_dns_record :
+    for record_key, record in aws_route53_record.preprod_dns_record :
     record.fqdn if startswith(record_key, each.key)
   ]
   depends_on = [
-    aws_route53_record.uat_dns_record
+    aws_route53_record.preprod_dns_record
   ]
 }
 
 locals {
-  uat_dns_records = merge(
-    flatten([
-      for cert_key, cert in aws_acm_certificate.uat_certificates : [
-        for option in cert.domain_validation_options : {
-          "${cert_key}-${option.resource_record_name}" = {
-            name   = option.resource_record_name
-            type   = option.resource_record_type
-            record = option.resource_record_value
-          }
-        }
-      ]
-    ])
-  )
+  preprod_zone_ids = local.is-preproduction ? {
+    uat    = data.aws_route53_zone.uat[0].zone_id
+    wamuat = data.aws_route53_zone.wamuat[0].zone_id
+  } : {}
+
+  preprod_dns_records = local.is-preproduction ? merge([
+    for cert_key, cert in aws_acm_certificate.preprod_certificates : {
+      for option in cert.domain_validation_options : "${cert_key}-${option.resource_record_name}" => {
+        name    = option.resource_record_name
+        type    = option.resource_record_type
+        record  = option.resource_record_value
+        zone_id = data.aws_route53_zone.ppud.zone_id
+      }
+    }
+  ]...) : {}
 }
 
-resource "aws_route53_record" "uat_dns_record" {
-  for_each = local.uat_dns_records
-
+resource "aws_route53_record" "preprod_dns_record" {
+  for_each = local.is-preproduction ? local.preprod_dns_records : {}
   provider = aws.core-network-services
 
   allow_overwrite = true
@@ -75,8 +75,7 @@ resource "aws_route53_record" "uat_dns_record" {
   type    = each.value.type
   records = [each.value.record]
   ttl     = 60
-  # zone_id = var.shared_zone_id      # shared hosted zone
-  zone_id = each.value.zone.zone_id   # multiple zones
+  zone_id = each.value.zone_id
 }
 */
 
