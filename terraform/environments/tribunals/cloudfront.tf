@@ -62,7 +62,7 @@ resource "aws_cloudfront_distribution" "tribunals_distribution" {
   price_class     = "PriceClass_All"
 
   viewer_certificate {
-    acm_certificate_arn      = aws_acm_certificate.cloudfront.arn
+    acm_certificate_arn      = aws_acm_certificate_validation.cloudfront_cert_validation.certificate_arn
     ssl_support_method       = "sni-only"
     minimum_protocol_version = "TLSv1.2_2021"
   }
