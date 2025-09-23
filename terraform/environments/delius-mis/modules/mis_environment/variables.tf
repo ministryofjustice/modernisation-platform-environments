@@ -71,7 +71,15 @@ variable "auto_config" {
 }
 
 variable "dfi_config" {
-  type    = any
+  description = "Configuration for DFI instances"
+  type = object({
+    instance_count     = number
+    ami_name          = string
+    ebs_volumes       = any
+    ebs_volumes_config = any
+    instance_config   = any
+    branch            = optional(string, "main")
+  })
   default = null #optional
 }
 
