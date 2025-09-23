@@ -9,6 +9,6 @@ terraform {
     key                  = "terraform.tfstate"
     region               = "eu-west-2"
     use_lockfile         = true
-    workspace_key_prefix = "environments/members/ccms-edrms" # This will store the object as environments/members/ccms-edrms/${workspace}/terraform.tfstate
+    workspace_key_prefix = "environments/members/ccms-oia" # This will store the object as environments/members/ccms-oia/${workspace}/terraform.tfstate
   }
 }
