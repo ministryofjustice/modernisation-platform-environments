@@ -161,7 +161,7 @@ locals {
     ami_name       = "delius_mis_windows_server_patch_2025-*"
     ebs_volumes = {
       "/dev/sda1" = { label = "root", size = 100 }
-      "xvdd"      = { label = "data", size = 300 }
+      "/dev/xvdf" = { label = "data", size = 300 }
     }
 
     ebs_volumes_config = {
@@ -203,7 +203,7 @@ locals {
     }
     user_data_raw = base64encode(
       templatefile(
-        "${path.module}/templates/AutoEC2LaunchV2.yaml.tftpl",
+        "modules/mis_environment/templates/AutoEC2LaunchV2.yaml.tftpl",
         {
           branch = "TM/TM-1414/ips-dataservices-bods-refactor"
         }
