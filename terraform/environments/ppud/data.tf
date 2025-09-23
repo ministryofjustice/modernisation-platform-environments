@@ -1,5 +1,14 @@
 #### This file can be used to store data specific to the member account ####
 
+# Route 53 Zones for Certificate Domain Validation
+
+/*
+data "aws_route53_zone" "ppud" {
+  provider     = aws.core-network-services
+  name         = "ppud.justice.gov.uk."
+  private_zone = false
+}
+*/
 
 # ACM certificate for PPUD TEST ALB
 data "aws_acm_certificate" "PPUD_internaltest_cert" {
