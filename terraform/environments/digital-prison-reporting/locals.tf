@@ -73,7 +73,7 @@ locals {
 
   # Glue Job parameters
   glue_placeholder_script_location = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/scripts/digital-prison-reporting-jobs-vLatest.scala"
-  glue_jobs_latest_jar_location    = "s3://dpr-artifact-store-development/build-artifacts/dev-sandbox/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-v1.0.121-dev.1+DHS-334.1800c9df-all.jar"
+  glue_jobs_latest_jar_location    = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-vLatest-all.jar"
   glue_log_retention_in_days       = local.application_data.accounts[local.environment].glue_log_retention_in_days
 
   # Common Maintenance Job settings
