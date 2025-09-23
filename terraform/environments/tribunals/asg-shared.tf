@@ -281,6 +281,12 @@ resource "aws_instance" "tribunals_backup" {
     version = "$Latest"
   }
 
+  tags = {
+    Environment = local.environment
+    Name        = "tribunals-backup-instance"
+    Role        = "Backup"
+  }
+
   lifecycle {
     ignore_changes = [user_data]
   }
