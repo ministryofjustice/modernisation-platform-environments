@@ -1,5 +1,5 @@
 module "s3_pui_docs" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.0.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
   
   bucket_name         = "${local.application_name}-docs-${local.environment}"
   versioning_enabled  = true
