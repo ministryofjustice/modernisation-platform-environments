@@ -84,7 +84,7 @@ module "dfi_instance" {
       server-type = "MISDis"
     }
   )
-  cloudwatch_metric_alarms = merge(
+  cloudwatch_metric_alarms = var.dfi_config.cloudwatch_metric_alarms != null ? var.dfi_config.cloudwatch_metric_alarms : merge(
     local.cloudwatch_metric_alarms.ec2
   )
 }
