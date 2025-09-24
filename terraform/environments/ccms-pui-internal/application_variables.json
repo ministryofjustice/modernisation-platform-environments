@@ -15,6 +15,8 @@
       "container_cpu": "4096",
       "container_memory": "2048",
       "instance_role_clamav": "clamav",
+      "ec2_instance_type_clamav": "c5d.large",
+      "clamav_ami_id": "ami-0965b5afb3ac7174e",
       "spring_datasource_username": "XXCCMS_PUI",
       "spring_profiles_active": "prod",
       "spring_datasource_url": "jdbc:oracle:thin:@ccms-ebs-db.laa-development.modernisation-platform.service.justice.gov.uk:1521:EBSDB",
