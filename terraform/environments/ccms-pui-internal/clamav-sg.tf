@@ -4,7 +4,7 @@ resource "aws_security_group" "ec2_sg_clamav" {
   description = "Security Group for ClamAV Server"
   vpc_id      = data.aws_vpc.shared.id
   tags = merge(local.tags,
-    { Name = lower(format("clamav-%s-sg", local.application_name, local.environment)) }
+    { Name = lower(format("clamav-%s-sg", local.environment)) }
   )
 }
 

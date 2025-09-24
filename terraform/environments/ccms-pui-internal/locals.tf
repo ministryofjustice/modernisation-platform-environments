@@ -38,6 +38,6 @@ locals {
   }
 
   # Split domain validation by domain type
-  modernisation_platform_validations = [for k, v in local.domain_types : v if contains(k, "modernisation-platform.service.justice.gov.uk")]
-  legalservices_validations = [for k, v in local.domain_types : v if contains(k, "legalservices.gov.uk")]
+  modernisation_platform_validations = [for k, v in local.domain_types : v if strcontains(k, "modernisation-platform.service.justice.gov.uk")]
+  legalservices_validations = [for k, v in local.domain_types : v if strcontains(k, "legalservices.gov.uk")]
 }

@@ -7,6 +7,9 @@
       "app_image": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/ccms-pui",
       "container_version": "dev",
       "ec2_instance_type": "m5.large",
+      "ec2_desired_capacity": "1",
+      "ec2_max_capacity": "2",
+      "ec2_min_capacity": "1",
       "app_count": "1",
       "pui_server_port": "8080",
       "container_cpu": "4096",
@@ -17,6 +20,10 @@
       "spring_datasource_url": "jdbc:oracle:thin:@ccms-ebs-db.laa-development.modernisation-platform.service.justice.gov.uk:1521:EBSDB",
       "aws_endpoint": "http://ccms-pui-internal-docs-development",
       "ccms_s3_documents": "ccms-pui-internal-docs-development",
+      "idpLogoutUrl": "https://portal.dev.legalservices.gov.uk/oam/server/logout?end_url=https://portal.dev.legalservices.gov.uk/LAALogin/pages/Logout.jsp",
+      "idpMetadataUrl": "https://portal.dev.legalservices.gov.uk/oamfed/idp/metadata",
+      "loginUrl": "https://portal.dev.legalservices.gov.uk",
+      "postcodeApiUrl": "https://api.os.uk/search/places/v1/postcode",
       "ccms_pui_feedback_url": "https://ccms-opa.dev.legalservices.gov.uk/opa/web-determinations/startsession/FeedbackForm",
       "ccms_pui_owd_return_url": "https://ccmspui.dev.legalservices.gov.uk/civil",
       "ccms_soa_url_ebsClientEndpoint": "https://ccms-soa-managed.laa-development.modernisation-platform.service.justice.gov.uk/soa-infra/services/default/ClientServices/ClientServices_ep",
@@ -36,19 +43,20 @@
       "ccms_soa_url_ebsUpdateUserEndpoint": "https://ccms-soa-managed.laa-development.modernisation-platform.service.justice.gov.uk/soa-infra/services/default/UpdateUser/UpdateUser_ep",
       "ccms_soa_soapHeaderUserName": "pui_user",
       "opa12_assess_service_servlet": "http://connector.dev.legalservices.gov.uk/service-tds/puiAssessService",
+      "ccms_soa_url_opaBillingAssessmentEndpoint": "http://set-me.legalservices.gov.uk",
+      "ccms_soa_url_opaPOAAssessmentEndpoint": "http://set-me.legalservices.gov.uk",
       "ccms_owd_rulebase_baseurl": "https://ccms-opa.dev.legalservices.gov.uk/opa/web-determinations",
       "ccms_pui_av_port": "3310",
       "ccms_pui_av_host": "ccms-pui-internal-clamav.laa-development.modernisation-platform.service.justice.gov.uk",
       "ccms_pui_av_socketTimeout": "20000",
       "ccms_pui_av_scannerEnabled": "true",
       "ccms_pui_auditLogin_enabled": "true",
+      "aws_workspace": "10.200.0.0/19",
       "logging_level_root": "info",
       "logging_level_com_ezgov": "debug",
       "logging_level_com_legalservices": "debug",
       "logging_level_uk_gov_laa_opa": "debug",
       "logging_level_com_ezgov_roof_view_vim_control_BundleAwareText": "error"
-
-
     },
     "test": {
       "example_var": "test-data"
