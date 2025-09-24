@@ -22,12 +22,24 @@ resource "aws_lakeformation_data_lake_settings" "lake_formation" {
 }
 
 resource "aws_lakeformation_permissions" "share_role_all_permissions" {
-  for_each    = toset([for share in local.analytical_platform_share : share.target_account_name])
-  principal   = aws_iam_role.analytical_platform_share_role[each.key].arn
+  for_each = {
+    for pair in flatten([
+      for share_index, share in local.analytical_platform_share : [
+        for rs_index, resource_share in share.resource_shares : {
+          key = "${share_index}-${rs_index}"
+          resource_share = resource_share
+          share_index = share_index
+        }
+      ]
+    ]) : pair.key => pair
+  }
+  
+  principal   = aws_iam_role.analytical_platform_share_role[each.value.share_index].arn
   permissions = ["ALL"]
+  permissions_with_grant_option = ["ALL"]
 
   database {
-    name = local.lake_formation_database_name
+    name = each.value.resource_share.glue_database
   }
 }
 
