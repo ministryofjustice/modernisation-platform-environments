@@ -82,11 +82,8 @@ def lambda_handler(event, context):
                         "ContentType": "TEXT_HTML"
                     }
                     print(f"Registered custom response body: {CUSTOM_BODY_NAME}")
-                # Optional: Remove custom body on ALLOW — not required, safe to leave
-                # elif mode == "ALLOW" and CUSTOM_BODY_NAME in custom_response_bodies:
-                #     del custom_response_bodies[CUSTOM_BODY_NAME]
             else:
-                print("ℹ️ Action already set — no change needed.")
+                print("Action already set — no change needed.")
 
             new_rules.append(rr)
 
@@ -98,7 +95,7 @@ def lambda_handler(event, context):
         raise RuntimeError(f" Rule '{RULE_NAME}' not found in WebACL '{WEB_ACL_NAME}'")
 
     if not changed:
-        print("ℹ️ No changes needed.")
+        print("No changes needed.")
         return {"ok": True, "updated": False, "mode": mode}
 
     # Update Web ACL
