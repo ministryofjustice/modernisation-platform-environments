@@ -275,10 +275,12 @@ resource "aws_autoscaling_group" "tribunals-all-asg" {
   }
 }
 
-#trivy:ignore:AVD-AWS-0028: "IMDSv2 enforced at the LT"
+#trivy:ignore:AVD-AWS-0131: "Root block device enforced at LT"
 #trivy:ignore:AVD-AWS-0130: "IMDSv2 enforced at the LT"
 resource "aws_instance" "tribunals_backup" {
-  #checkov:skip=CKV_AWS_79: "IMDSv2 enforced at LT"
+  #checkov:skip=CKV_AWS_135: "EBS optimized enforced at LT"
+  #checkov:skip=CKV_AWS_8: "EBS encryption enforced at LT"
+  #checkov:skip=CKV2_AWS_41: "IAM role is attached enforced at LT"
   launch_template {
     id      = aws_launch_template.tribunals-backup-lt.id
     version = "$Latest"
