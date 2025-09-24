@@ -45,7 +45,7 @@ resource "aws_iam_policy" "ecs_secrets_policy" {
     {
       "Effect": "Allow",
       "Action": ["secretsmanager:GetSecretValue"],
-      "Resource": ["arn:aws:secretsmanager:eu-west-2:*:secret:ccms/edrms*"]
+      "Resource": ["arn:aws:secretsmanager:eu-west-2:*:secret:*"]
     }
   ]
 }
