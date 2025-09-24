@@ -206,11 +206,14 @@ resource "aws_ecs_service" "ecs_service_sftp" {
     container_port   = var.server_port
   }
 
-  # Additional load balancer for SFTP connections
-  load_balancer {
-    target_group_arn = var.sftp_lb_tg_arn
-    container_name   = "${var.app_name}-container"
-    container_port   = 22
+  # Additional load balancer for SFTP connections (optional)
+  dynamic "load_balancer" {
+    for_each = var.sftp_lb_tg_arn == null ? [] : [var.sftp_lb_tg_arn]
+    content {
+      target_group_arn = load_balancer.value
+      container_name   = "${var.app_name}-container"
+      container_port   = 22
+    }
   }
 
   deployment_circuit_breaker {

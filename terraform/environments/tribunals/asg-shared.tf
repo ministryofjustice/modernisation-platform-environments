@@ -210,26 +210,18 @@ resource "aws_launch_template" "tribunals-all-lt" {
   user_data = filebase64("ec2-shared-user-data.sh")
 }
 
+#trivy:ignore:AVD-AWS-0028: "IMDSv2 enforced at the aws_instance level instead of LT"
+#trivy:ignore:AVD-AWS-0130: "IMDSv2 enforced at the aws_instance level instead of LT"
 resource "aws_launch_template" "tribunals-backup-lt" {
+  #checkov:skip=CKV_AWS_79: "IMDSv2 enforced at the aws_instance level instead of LT"
   name_prefix            = "tribunals-backup"
   image_id               = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"]
   instance_type          = "m5.4xlarge"
   update_default_version = true
 
-  iam_instance_profile {
-    name = aws_iam_instance_profile.ec2_instance_profile.name
-  }
-
   block_device_mappings {
     device_name = "/dev/sda1"
-
-    ebs {
-      volume_size = 120
-      volume_type = "gp2"
-      encrypted   = true
-    }
   }
-  ebs_optimized = true
 
   network_interfaces {
     device_index                = 0
@@ -237,10 +229,6 @@ resource "aws_launch_template" "tribunals-backup-lt" {
     subnet_id                   = data.aws_subnet.private_subnets_b.id
     delete_on_termination       = true
     associate_public_ip_address = false
-  }
-
-  metadata_options {
-    http_tokens = "required"
   }
 
   tag_specifications {
@@ -276,10 +264,23 @@ resource "aws_autoscaling_group" "tribunals-all-asg" {
 }
 
 resource "aws_instance" "tribunals_backup" {
+  iam_instance_profile = aws_iam_instance_profile.ec2_instance_profile.name
+  ebs_optimized        = true
+
   launch_template {
     id      = aws_launch_template.tribunals-backup-lt.id
     version = "$Latest"
   }
+
+  metadata_options {
+    http_tokens = "required"
+  }
+
+  root_block_device {
+      volume_size = 120
+      volume_type = "gp2"
+      encrypted   = true
+    }
 
   tags = {
     Environment = local.environment
