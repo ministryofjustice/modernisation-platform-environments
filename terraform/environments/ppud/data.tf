@@ -1,6 +1,5 @@
 #### This file can be used to store data specific to the member account ####
 
-
 # ACM certificate for PPUD TEST ALB
 data "aws_acm_certificate" "PPUD_internaltest_cert" {
   count    = local.is-development == true ? 1 : 0

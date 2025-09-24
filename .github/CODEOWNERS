@@ -9,10 +9,10 @@
 /terraform/environments/analytical-platform-next-poc-hub @ministryofjustice/analytical-platform-engineers @ministryofjustice/modernisation-platform
 /terraform/environments/analytical-platform-next-poc-producer @ministryofjustice/analytical-platform-engineers @ministryofjustice/modernisation-platform
 /terraform/environments/apex @ministryofjustice/laa-apex-developer @ministryofjustice/laa-aws-infrastructure @ministryofjustice/modernisation-platform
-/terraform/environments/ccms-ebs-upgrade @ministryofjustice/laa-ccms-migration-team @ministryofjustice/modernisation-platform
+/terraform/environments/ccms-ebs-upgrade @ministryofjustice/laa-ccms-migration-team @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-ebs-upgrade/anonymisation @ministryofjustice/laa-ccms-migration-team @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-ebs-upgrade/sandbox @ministryofjustice/laa-ccms-migration-team @ministryofjustice/modernisation-platform
-/terraform/environments/ccms-ebs @ministryofjustice/laa-ccms-instance-access @ministryofjustice/laa-ccms-migration-team @ministryofjustice/modernisation-platform-security @ministryofjustice/panda-cyber-team @ministryofjustice/modernisation-platform
+/terraform/environments/ccms-ebs @ministryofjustice/laa-ccms-instance-access @ministryofjustice/laa-ccms-migration-team @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform-security @ministryofjustice/panda-cyber-team @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-ebs/workspaces-secure-browser @ministryofjustice/aws-root-account-admin-team @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-edrms @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-oia @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
