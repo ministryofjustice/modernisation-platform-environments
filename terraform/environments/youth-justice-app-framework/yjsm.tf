@@ -6,6 +6,7 @@ locals {
     "arn:aws:s3:::yjaf-${local.environment}-yjsm",
     "arn:aws:s3:::yjaf-${local.environment}-mis",
     "arn:aws:s3:::yjaf-${local.environment}-bedunlock",
+    "arn:aws:s3:::yjaf-${local.environment}-yjsm-artefact",
     "arn:aws:s3:::yjaf-${local.environment}-bands",
     "arn:aws:s3:::yjaf-${local.environment}-cmm"
   ])
@@ -15,6 +16,7 @@ locals {
     "arn:aws:s3:::yjaf-${local.environment}-mis/*",
     "arn:aws:s3:::yjaf-${local.environment}-bedunlock/*",
     "arn:aws:s3:::yjaf-${local.environment}-bands/*",
+    "arn:aws:s3:::yjaf-${local.environment}-yjsm-artefact/*",
     "arn:aws:s3:::yjaf-${local.environment}-cmm/*"
   ])
 }
