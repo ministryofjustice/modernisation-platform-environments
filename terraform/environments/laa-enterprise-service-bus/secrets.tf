@@ -127,3 +127,17 @@ resource "aws_secretsmanager_secret" "cclf_procedures_config" {
     }
   )
 }
+
+#####################################################################################
+### Secrets used for Cloudwatch Alert Lambda Functions ###
+#####################################################################################
+
+resource "aws_secretsmanager_secret" "slack_alert_channel_webhook" {
+  name = "slack-alert-channel-webhook-${local.environment}"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name_short}-${local.environment}-slack-alert-channel-webhook"
+    }
+  )
+}
