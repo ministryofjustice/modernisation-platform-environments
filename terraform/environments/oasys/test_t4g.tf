@@ -33,7 +33,7 @@ resource "aws_instance" "my_t4_instance" {
 
   count = local.is-development ? 1 : 0
 
-  ami           = "ami-00cc4c3fee6bb6c22"
+  ami           = "ami-01e9af7b9c1dfb736"
   instance_type = "t4g.micro"
 
   vpc_security_group_ids = [aws_security_group.test-sg-for-t4.id]
