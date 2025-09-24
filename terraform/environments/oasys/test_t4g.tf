@@ -11,19 +11,18 @@ resource "aws_security_group" "test-sg-for-t4" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
   tags = {
     Name     = "First t4 test instance"
     vpc-name = "VPC created for the T4 test"
   }
 }
-
-/*locals {
+locals {
   cloudwatch_metric_alarms_endpoint_monitoring = {
     Decription = "Set the endpoint location"
     type       = "string"
   }
-}*/
-
+}
 resource "aws_instance" "my_t4_instance" {
   #checkov:skip=CKV_AWS_8: "Ensure all data stored in the Launch configuration or instance Elastic Blocks Store is securely encrypted"
   #checkov:skip=CKV_AWS_16: "Ensure all data stored in the RDS is securely encrypted at rest"
@@ -31,9 +30,13 @@ resource "aws_instance" "my_t4_instance" {
   #checkov:skip=CKV_AWS_79: "Ensure Instance Metadata Service Version 1 is not enabled"
   #checkov:skip=CKV_AWS_135: "Ensure that EC2 is EBS optimized"
 
+
+
   count = local.is-development ? 1 : 0
 
-  ami           = "ami-01e9af7b9c1dfb736"
+  ami = "ami-01e9af7b9c1dfb736"
+  # development = local.baseline_development
+  # ami           = local.image_id
   instance_type = "t4g.micro"
 
   vpc_security_group_ids = [aws_security_group.test-sg-for-t4.id]
