@@ -201,15 +201,15 @@
       },
       {
         "name": "SPRING_DATASOURCE_PASSWORD",
-        "value": "${spring_datasource_password}"
+        "valueFrom": "${spring_datasource_password}"
       },
       {
         "name": "POSTCODEAPIKEY",
-        "value": "${postcodeApiKey}"
+        "valueFrom": "${postcodeApiKey}"
       },
       {
         "name": "ccms_soa_soapHeaderUserPassword",
-        "value": "${ccms_soa_soapHeaderUserPassword}"
+        "valueFrom": "${ccms_soa_soapHeaderUserPassword}"
       }
     ]
   }
