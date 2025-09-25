@@ -82,9 +82,3 @@ resource "aws_lambda_function" "ccr_provider_load" {
     { Name = "${local.application_name_short}-${local.environment}-ccr-provider-load" }
   )
 }
-
-resource "aws_lambda_event_source_mapping" "ccr_provider_q_trigger" {
-  event_source_arn = aws_sqs_queue.ccr_provider_q.arn
-  function_name    = aws_lambda_function.ccr_provider_load.arn
-  batch_size       = 1
-}

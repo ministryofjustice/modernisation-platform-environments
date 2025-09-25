@@ -9,6 +9,7 @@ resource "aws_sns_topic" "priority_p1" {
   sqs_success_feedback_role_arn    = aws_iam_role.sns_feedback.arn
   sqs_success_feedback_sample_rate = 100
   sqs_failure_feedback_role_arn    = aws_iam_role.sns_feedback.arn
+  kms_master_key_id                = "alias/aws/sns"
 
   tags = merge(
     local.tags,
@@ -56,6 +57,7 @@ resource "aws_sns_topic" "provider_banks" {
   sqs_success_feedback_role_arn    = aws_iam_role.sns_feedback.arn
   sqs_success_feedback_sample_rate = 100
   sqs_failure_feedback_role_arn    = aws_iam_role.sns_feedback.arn
+  kms_master_key_id                = "alias/aws/sns"
 
   tags = merge(
     local.tags,
