@@ -2,7 +2,7 @@
 locals {
   lf_principals_not_admin = toset(concat(
     [aws_iam_role.dataapi_cross_role.arn],
-    try(data.aws_iam_roles.data_engineering_roles.arns, [])
+    tolist(try(data.aws_iam_roles.data_engineering_roles.arns, toset([])))
   ))
 }
 
