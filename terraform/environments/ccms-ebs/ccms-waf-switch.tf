@@ -1,18 +1,22 @@
 #Variables
-variable "env" { 
-  description = "The target deployment environment (development, test, or production)."
-  type        = string
-  default     = "development"
+# variable "env" { 
+#   description = "The target deployment environment (development, test, or production)."
+#   type        = string
+#   default     = "development"
 
-  # Optional: Add a validation to ensure the input is one of the allowed values.
-  validation {
-    condition     = contains(["development", "test", "preproduction", "production"], var.env)
-    error_message = "The environment must be one of 'development', 'test', 'preproduction', or 'production'."
-  }
-}
+#   # Optional: Add a validation to ensure the input is one of the allowed values.
+#   validation {
+#     condition     = contains(["development", "test", "preproduction", "production"], var.env)
+#     error_message = "The environment must be one of 'development', 'test', 'preproduction', or 'production'."
+#   }
+# }
     
-variable "region" {
-    default = "eu-west-2"
+# variable "region" {
+#     default = "eu-west-2"
+# }
+
+locals {
+  env = "data-${local.environment}"
 }
 
 variable "scope"{
@@ -38,7 +42,7 @@ data "aws_wafv2_web_acl" "waf_web_acl" {
 
 #Create IAM Role and Policy for Lambda
 resource "aws_iam_role" "waf_lambda_role" {
-  name = "waf-toggle-role-${var.env}"
+  name = "waf-toggle-role-${local.environment}"
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
     Statement = [{
@@ -51,7 +55,7 @@ resource "aws_iam_role" "waf_lambda_role" {
 
 # Create IAM Role Policy for Lambda
 resource "aws_iam_role_policy" "waf_lambda_policy" {
-  name = "waf-toggle-policy-${var.env}"
+  name = "waf-toggle-policy-${local.environment}"
   role = aws_iam_role.waf_lambda_role.id
   policy = jsonencode({
     Version = "2012-10-17",
@@ -70,7 +74,7 @@ resource "aws_iam_role_policy" "waf_lambda_policy" {
 }
 
 resource "aws_lambda_function" "waf_toggle" {
-  function_name = "waf-toggle-${var.env}"
+  function_name = "waf-toggle-${local.environment}"
   role          = aws_iam_role.waf_lambda_role.arn
   filename      = data.archive_file.waf_toggle_zip.output_path
   source_code_hash = data.archive_file.waf_toggle_zip.output_base64sha256
@@ -103,13 +107,13 @@ EOT
 
 // EventBridge scheduled rules to trigger Lambda
 resource "aws_cloudwatch_event_rule" "waf_allow_0700_uk" {
-  name                = "waf-allow-0700-${var.env}"
+  name                = "waf-allow-0700-${local.environment}"
   schedule_expression = "cron(00 06 ? * MON-SUN *)"
   description         = "Set WAF rule to ALLOW at 07:00 UK daily"
 }
 
 resource "aws_cloudwatch_event_rule" "waf_block_1900_uk" {
-  name                = "waf-block-1900-${var.env}"
+  name                = "waf-block-1900-${local.environment}"
   schedule_expression = "cron(00 18 ? * MON-SUN *)"
   description         = "Set WAF rule to BLOCK at 19:00 UK daily"
 }
@@ -132,7 +136,7 @@ resource "aws_cloudwatch_event_target" "waf_block_target" {
 
 # allow Events to invoke the Lambda
 resource "aws_lambda_permission" "waf_events_allow" {
-  statement_id  = "AllowEvents0700-${var.env}"
+  statement_id  = "AllowEvents0700-${local.environment}"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.waf_toggle.arn
   principal     = "events.amazonaws.com"
@@ -141,7 +145,7 @@ resource "aws_lambda_permission" "waf_events_allow" {
 
 
 resource "aws_lambda_permission" "waf_events_block" {
-  statement_id  = "AllowEvents1900-${var.env}"
+  statement_id  = "AllowEvents1900-${local.environment}"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.waf_toggle.arn
   principal     = "events.amazonaws.com"
