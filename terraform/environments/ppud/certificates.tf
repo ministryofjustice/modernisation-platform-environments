@@ -59,8 +59,6 @@ resource "aws_route53_record" "preprod_dns_record" {
   zone_id = each.value.zone_id
 }
 
-# Commenting out ACM cert validation to give DNS time to propagate, seeing timeout issues with the validation.
-/*
 resource "aws_acm_certificate_validation" "preprod_certificate_validation" {
   for_each = local.is-preproduction ? aws_acm_certificate.preprod_certificates : {}
   certificate_arn = each.value.arn
@@ -73,7 +71,6 @@ resource "aws_acm_certificate_validation" "preprod_certificate_validation" {
     aws_route53_record.preprod_dns_record
   ]
 }
-*/
 
 ########################
 # Production Environment

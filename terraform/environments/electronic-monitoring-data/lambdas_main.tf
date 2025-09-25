@@ -122,7 +122,7 @@ module "virus_scan_file" {
   function_name           = "scan"
   is_image                = true
   ecr_repo_name           = "analytical-platform-ingestion-scan"
-  function_tag            = "0.2.0-rc1"
+  function_tag            = "0.2.0-rc3"
   role_name               = aws_iam_role.virus_scan_file.name
   role_arn                = aws_iam_role.virus_scan_file.arn
   ephemeral_storage_size  = 10240

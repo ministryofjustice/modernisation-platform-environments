@@ -72,6 +72,14 @@ resource "aws_iam_policy" "ccms_provider_load_policy" {
         Resource = aws_sqs_queue.ccms_banks_q.arn
       },
       {
+        Effect   = "Allow"
+        Action   = [
+            "sqs:SendMessage",
+            "sqs:GetQueueAttributes",
+          ]
+        Resource = aws_sqs_queue.ccms_banks_dlq.arn
+      },
+      {
         Effect = "Allow",
         Action = [
           "ssm:GetParameter",

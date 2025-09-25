@@ -44,7 +44,7 @@ resource "aws_security_group_rule" "yjsm_8092" {
   description              = "ESB Mule 2 from YJSM"
 }
 
-#TEMP RULE FOR FIXING AMI KEEP UNTIL DONE IN PROD
+#Used for accessing ESB from Tableau is ssm goes down
 resource "aws_security_group_rule" "tableau_to_esb_ssh" {
   type                     = "ingress"
   from_port                = 22
@@ -52,7 +52,18 @@ resource "aws_security_group_rule" "tableau_to_esb_ssh" {
   protocol                 = "tcp"
   security_group_id        = aws_security_group.esb_service.id
   source_security_group_id = var.tableau_sg_id
-  description              = "tableau to esb ssh temp"
+  description              = "tableau to esb ssh"
+}
+
+# Mgmt server access to ESB
+resource "aws_security_group_rule" "mgmt_to_esb_ssh" {
+  type                     = "ingress"
+  from_port                = 22
+  to_port                  = 22
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.esb_service.id
+  source_security_group_id = var.mgmt_instance_sg_id
+  description              = "management instance to esb ssh"
 }
 
 #ESB to ECS
