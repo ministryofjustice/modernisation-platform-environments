@@ -804,6 +804,11 @@ locals {
           )
         }
       ]
+      metadata_options = {
+          http_endpoint = "enabled"
+          http_tokens   = "required"
+      }
+
       tags = merge(local.tags,
         { Name = "${local.name}-COR-A-SQL01"
         Role = "Spotfire Database Server" }
@@ -885,6 +890,7 @@ module "win2022_SQL_multiple" {
   enable_volume_tags = false
   root_block_device  = lookup(each.value, "root_block_device", [])
   ebs_block_device   = lookup(each.value, "ebs_block_device", [])
+  metadata_options   = lookup(each.value, "metadata_options", null)
 
   tags = merge(each.value.tags, local.tags, {
     Environment = "development"

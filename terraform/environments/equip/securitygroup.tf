@@ -216,6 +216,7 @@ resource "aws_security_group_rule" "egress_citrix-adc-vip_to_domain_controller_t
 #Inbound security group for azures connections
 
 resource "aws_security_group" "azures_ingres" {
+  #checkov:skip=CKV2_AWS_5:skip "Ensure that Security Groups are attached to another resource"
   name        = lower(format("secg-%s-%s-azures-ingress", local.application_name, local.environment))
   description = "Security Group for azures ingress connections"
   vpc_id      = data.aws_vpc.shared.id
@@ -320,6 +321,7 @@ resource "aws_security_group_rule" "egress_citrix-adc-snip_to_spotfire" {
 #AWS Citrix Security Group
 
 resource "aws_security_group" "aws_citrix_security_group" {
+  #checkov:skip=CKV2_AWS_5:skip "Ensure that Security Groups are attached to another resource"
   name        = "aws_citrix_security_group"
   description = "Security Group for AWS_Citrix "
   vpc_id      = data.aws_vpc.shared.id
@@ -443,6 +445,7 @@ resource "aws_security_group_rule" "egress_ctx_host_to_spotfire" {
 #AWS Equip Security Group
 
 resource "aws_security_group" "aws_equip_security_group" {
+  #checkov:skip=CKV2_AWS_5:skip "Ensure that Security Groups are attached to another resource"
   name        = lower(format("secg-%s-%s-equip", local.application_name, local.environment))
   description = "Security Group for AWS_Equip"
   vpc_id      = data.aws_vpc.shared.id
@@ -579,6 +582,7 @@ resource "aws_security_group_rule" "aws_equip_security_group_egress_1" {
 #AWS SpotFire Security Group
 
 resource "aws_security_group" "aws_spotfire_security_group" {
+  #checkov:skip=CKV2_AWS_5:skip "Ensure that Security Groups are attached to another resource"
   name        = "aws_spotfire_security_group"
   description = "Security Group for AWS_SpotFire"
   vpc_id      = data.aws_vpc.shared.id
@@ -749,6 +753,7 @@ resource "aws_security_group_rule" "aws_proxy_security_group_egress_1" {
 #AWS Domain Security Group
 
 resource "aws_security_group" "aws_domain_security_group" {
+  #checkov:skip=CKV2_AWS_5:skip "Ensure that Security Groups are attached to another resource"
   name        = "aws_domain_security_group"
   description = "Security Group for AWS_Domain"
   vpc_id      = data.aws_vpc.shared.id

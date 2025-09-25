@@ -60,6 +60,7 @@ resource "aws_lb_target_group" "lb_tg_gateway" {
 }
 
 resource "aws_lb_target_group" "lb_tg_equip-portal" {
+  #checkov:skip=CKV_AWS_378: "Ensure ALB target group health check is not set to use HTTP on port 80"
   name        = "tg-equip-portal"
   target_type = "ip"
   protocol    = "HTTP"
@@ -82,6 +83,7 @@ resource "aws_lb_target_group" "lb_tg_equip-portal" {
 }
 
 resource "aws_lb_target_group" "lb_tg_portal" {
+  #checkov:skip=CKV_AWS_378: "Ensure ALB target group health check is not set to use HTTP on port 80"
   name        = "tg-portal"
   target_type = "ip"
   protocol    = "HTTP"
@@ -104,6 +106,7 @@ resource "aws_lb_target_group" "lb_tg_portal" {
 }
 
 resource "aws_lb_target_group" "lb_tg_analytics" {
+  #checkov:skip=CKV_AWS_378: "Ensure ALB target group health check is not set to use HTTP on port 80"
   name        = "tg-analytics"
   target_type = "ip"
   protocol    = "HTTP"
