@@ -220,7 +220,7 @@ locals {
         }
         listeners = merge(local.lbs.private.listeners, {
           http-7777 = merge(local.lbs.private.listeners.http-7777, {
-            alarm_target_group_names = []
+            alarm_target_group_names = [] # don't enable as environments are powered up/down frequently
             rules = {
               web = {
                 priority = 200
@@ -270,7 +270,7 @@ locals {
         }
         listeners = merge(local.lbs.public.listeners, {
           https = merge(local.lbs.public.listeners.https, {
-            alarm_target_group_names = []
+            alarm_target_group_names = [] # don't enable as environments are powered up/down frequently
             rules = {
               web = {
                 priority = 200
