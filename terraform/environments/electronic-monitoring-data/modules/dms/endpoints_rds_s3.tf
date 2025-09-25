@@ -36,7 +36,7 @@ resource "aws_dms_s3_endpoint" "dms_s3_parquet_target" {
   # Extra settings:
   # add_column_name = true
   # add_trailing_padding_character              = false
-  bucket_folder = var.database_name
+  bucket_folder = "${var.database_name}_second_drop"
   # canned_acl_for_objects                      = "NONE"
   # cdc_inserts_and_updates                     = false
   # cdc_inserts_only                            = false
