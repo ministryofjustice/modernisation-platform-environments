@@ -368,6 +368,11 @@ resource "aws_datasync_location_fsx_windows_file_system" "dfi_fsx_destination" {
     { Name = "${var.app_name}-${var.env_name}-dfi-fsx-destination" }
   )
 
+  # Ignore password changes since Lambda function handles password updates automatically
+  lifecycle {
+    ignore_changes = [password]
+  }
+
   depends_on = [
     data.aws_secretsmanager_secret_version.datasync_ad_admin_password
   ]
