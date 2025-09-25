@@ -112,7 +112,7 @@ resource "aws_s3_bucket_policy" "CAFM" {
           "s3:PutObject"
         ]
         Resource = "${aws_s3_bucket.CAFM.arn}/*"
-      }
+      },
     ]
   })
 }
@@ -378,7 +378,7 @@ module "s3_planetfm_landing_bucket" {
           module.s3_planetfm_landing_bucket.bucket.arn,
           "${module.s3_planetfm_landing_bucket.bucket.arn}/*"
         ]
-      }
+      },
     ]
   })]
 
