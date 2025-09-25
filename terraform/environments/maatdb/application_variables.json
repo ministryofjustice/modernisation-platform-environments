@@ -77,6 +77,8 @@
       "manual_added_cidr": "10.221.0.0/16",
       "ecs_cluster_sec_group_id": "sg-07fd7e0b7ad2c76e1",
       "mlra_ecs_cluster_sec_group_id": "sg-0b27b5bb199b70f2b",
+      "hub20_sec_group_id": "sg-0b9b9cac123f32ca2",
+      "hub20_s3_bucket": "hub20-test-cwa-extract-data",
       "build_s3": true,
       "build_ftp": false,
       "build_transfer": false,
