@@ -1,6 +1,6 @@
 # IAM Role and Policy for Scheduler to invoke Step Function
 resource "aws_iam_role" "scheduler_invoke_sfn_role" {
-  name = "scheduler-invoke-cwa-sfn-role"
+  name = "scheduler-invoke-sfn-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -59,7 +59,7 @@ resource "aws_iam_role" "scheduler_invoke_lambda_role" {
 }
 
 resource "aws_iam_policy" "scheduler_invoke_lambda" {
-  name = "scheduler-invoke-sfn-policy"
+  name = "scheduler-invoke-lambda-policy"
 
   policy = jsonencode({
     Version = "2012-10-17",
