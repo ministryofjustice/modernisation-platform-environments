@@ -840,9 +840,7 @@ locals {
           tags = merge(local.tags,
             { Name = "NPS-COR-A-SOC02-ebs-block1" }
           )
-        }
-      ]
-      ebs_block_device = [
+        },
         {
           device_name = "/dev/sdg"
           volume_type = "gp3"
@@ -854,12 +852,10 @@ locals {
           )
         }
       ]
-      metadata_options = [
-        {
+      metadata_options = {
           http_endpoint = "enabled"
           http_tokens   = "required"
-        }
-      ]
+      }
 
       tags = merge(local.tags,
         { Name = "NPS-COR-A-SOC01"
