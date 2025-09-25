@@ -21,12 +21,12 @@ locals {
           health_check = {
             enabled             = true
             healthy_threshold   = 3
-            interval            = 30
+            interval            = 5
             matcher             = "200-399"
             path                = "/keepalive.htm"
             port                = 7777
-            timeout             = 5
-            unhealthy_threshold = 5
+            timeout             = 4
+            unhealthy_threshold = 2
           }
           stickiness = {
             enabled = true
@@ -70,12 +70,12 @@ locals {
           health_check = {
             enabled             = true
             healthy_threshold   = 3
-            interval            = 30
+            interval            = 5
             matcher             = "200-399"
             path                = "/keepalive.htm"
             port                = 7010
-            timeout             = 5
-            unhealthy_threshold = 5
+            timeout             = 4
+            unhealthy_threshold = 2
           }
           stickiness = {
             enabled = true
@@ -88,12 +88,12 @@ locals {
           health_check = {
             enabled             = true
             healthy_threshold   = 3
-            interval            = 30
+            interval            = 5
             matcher             = "200-399"
             path                = "/keepalive.htm"
             port                = 7777
-            timeout             = 5
-            unhealthy_threshold = 5
+            timeout             = 4
+            unhealthy_threshold = 2
           }
           stickiness = {
             enabled = true

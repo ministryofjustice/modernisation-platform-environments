@@ -15,15 +15,15 @@ resource "aws_security_group" "cloudwatch_log_alert_sg" {
   )
 }
 
-# resource "aws_security_group_rule" "cloudwatch_log_alert_https" {
-#   type                     = "egress"
-#   from_port                = 443
-#   to_port                  = 443
-#   protocol                 = "tcp"
-#   source_security_group_id = local.application_data.accounts[local.environment].vpc_endpoint_sg
-#   security_group_id        = aws_security_group.cloudwatch_log_alert_sg.id
-#   description              = "Outbound 443 to LAA VPC Endpoint SG"
-# }
+resource "aws_security_group_rule" "cloudwatch_log_alert_https" {
+  type                     = "egress"
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  source_security_group_id = local.application_data.accounts[local.environment].vpc_endpoint_sg
+  security_group_id        = aws_security_group.cloudwatch_log_alert_sg.id
+  description              = "Outbound 443 to LAA VPC Endpoint SG"
+}
 
 resource "aws_security_group_rule" "cloudwatch_log_alert_https_to_internet" {
   type              = "egress"
@@ -201,55 +201,55 @@ resource "aws_iam_role_policy_attachment" "cloudwatch_log_alert_vpc_access" {
 resource "aws_cloudwatch_log_subscription_filter" "cwa_extract_error_alert" {
   name            = "cwa-extract-lambda-error-alert"
   log_group_name  = "/aws/lambda/cwa_extract_lambda"
-  filter_pattern  = "ERROR"
+  filter_pattern  = "{ $.level = \"ERROR\" && $.location = \"lambda_handler*\" }"
   destination_arn = aws_lambda_function.cloudwatch_log_alert.arn
 }
 
 resource "aws_cloudwatch_log_subscription_filter" "cwa_file_transfer_error_alert" {
   name            = "cwa-file-transfer-lambda-error-alert"
   log_group_name  = "/aws/lambda/cwa_file_transfer_lambda"
-  filter_pattern  = "ERROR"
+  filter_pattern  = "{ $.level = \"ERROR\" && $.location = \"lambda_handler*\" }"
   destination_arn = aws_lambda_function.cloudwatch_log_alert.arn
 }
 
 resource "aws_cloudwatch_log_subscription_filter" "cwa_sns_error_alert" {
   name            = "cwa-sns-lambda-error-alert"
   log_group_name  = "/aws/lambda/cwa_sns_lambda"
-  filter_pattern  = "ERROR"
+  filter_pattern  = "{ $.level = \"ERROR\" && $.location = \"lambda_handler*\" }"
   destination_arn = aws_lambda_function.cloudwatch_log_alert.arn
 }
 
 resource "aws_cloudwatch_log_subscription_filter" "ccms_provider_error_alert" {
   name            = "ccms-provider-lambda-error-alert"
   log_group_name  = "/aws/lambda/ccms_provider_load_function"
-  filter_pattern  = "ERROR"
+  filter_pattern  = "{ $.level = \"ERROR\" && $.location = \"lambda_handler*\" }"
   destination_arn = aws_lambda_function.cloudwatch_log_alert.arn
 }
 
 resource "aws_cloudwatch_log_subscription_filter" "maat_provider_error_alert" {
   name            = "maat-provider-lambda-error-alert"
   log_group_name  = "/aws/lambda/maat_provider_load_function"
-  filter_pattern  = "ERROR"
+  filter_pattern  = "{ $.level = \"ERROR\" && $.location = \"lambda_handler*\" }"
   destination_arn = aws_lambda_function.cloudwatch_log_alert.arn
 }
 
 resource "aws_cloudwatch_log_subscription_filter" "ccr_provider_error_alert" {
   name            = "ccr-provider-lambda-error-alert"
   log_group_name  = "/aws/lambda/ccr_provider_load_function"
-  filter_pattern  = "ERROR"
+  filter_pattern  = "{ $.level = \"ERROR\" && $.location = \"lambda_handler*\" }"
   destination_arn = aws_lambda_function.cloudwatch_log_alert.arn
 }
 
 resource "aws_cloudwatch_log_subscription_filter" "cclf_provider_error_alert" {
   name            = "cclf-provider-lambda-error-alert"
   log_group_name  = "/aws/lambda/cclf_provider_load_function"
-  filter_pattern  = "ERROR"
+  filter_pattern  = "{ $.level = \"ERROR\" && $.location = \"lambda_handler*\" }"
   destination_arn = aws_lambda_function.cloudwatch_log_alert.arn
 }
 
 resource "aws_cloudwatch_log_subscription_filter" "purge_lambda_error_alert" {
   name            = "purge-lambda-error-alert"
   log_group_name  = "/aws/lambda/purge_lambda_function"
-  filter_pattern  = "ERROR"
+  filter_pattern  = "{ $.level = \"ERROR\" && $.location = \"lambda_handler*\" }"
   destination_arn = aws_lambda_function.cloudwatch_log_alert.arn
 }
