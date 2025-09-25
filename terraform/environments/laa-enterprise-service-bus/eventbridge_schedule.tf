@@ -55,7 +55,7 @@ resource "aws_scheduler_schedule" "maat_load_schedule" {
 # CCR Load Schedule
 resource "aws_scheduler_schedule" "ccr_load_schedule" {
   count      = local.environment == "development" ? 1 : 0
-  name       = "ccr-cclf-load-schedule"
+  name       = "ccr-load-schedule"
   group_name = "default"
 
   flexible_time_window {
@@ -73,7 +73,7 @@ resource "aws_scheduler_schedule" "ccr_load_schedule" {
 # CCLF Load Schedule
 resource "aws_scheduler_schedule" "cclf_load_schedule" {
   count      = local.environment == "development" ? 1 : 0
-  name       = "ccr-cclf-load-schedule"
+  name       = "cclf-load-schedule"
   group_name = "default"
 
   flexible_time_window {
