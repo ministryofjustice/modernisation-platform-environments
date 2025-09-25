@@ -3,7 +3,7 @@ resource "aws_dms_endpoint" "dms_rds_source" {
 
   #   certificate_arn             = ""
   database_name = var.database_name
-  endpoint_id   = "rds-mssql-${replace(var.database_name, "_", "-")}-tf"
+  endpoint_id   = "rds-mssql-${replace(var.database_name, "_", "-")}-${var.dump_number_suffix}-tf"
   endpoint_type = "source"
   engine_name   = "sqlserver"
   #checkov:skip=CKV_AWS_296
@@ -28,7 +28,7 @@ resource "aws_dms_endpoint" "dms_rds_source" {
 resource "aws_dms_s3_endpoint" "dms_s3_parquet_target" {
 
   # Minimal Config:
-  endpoint_id             = "s3-${replace(var.database_name, "_", "-")}-tf"
+  endpoint_id             = "s3-${replace(var.database_name, "_", "-")}-${var.dump_number_suffix}-tf"
   endpoint_type           = "target"
   bucket_name             = var.target_s3_bucket_name
   service_access_role_arn = var.ep_service_access_role_arn
