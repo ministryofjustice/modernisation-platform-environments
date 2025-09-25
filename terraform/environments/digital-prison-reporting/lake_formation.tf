@@ -1,3 +1,11 @@
+# Combine the SSO role(s) with the cross-account role
+locals {
+  lf_principals_not_admin = toset(concat(
+    [aws_iam_role.dataapi_cross_role.arn],
+    try(data.aws_iam_roles.data_engineering_roles.arns, [])
+  ))
+}
+
 resource "aws_lakeformation_data_lake_settings" "lake_formation" {
   admins = flatten([
     [for share in local.analytical_platform_share : aws_iam_role.analytical_platform_share_role[share.target_account_name].arn],
@@ -29,10 +37,11 @@ resource "aws_iam_role_policy_attachment" "dataapi_cross_role_lake_formation_dat
   policy_arn = aws_iam_policy.lake_formation_data_access.arn
 }
 
-# Give the cadet cross-account role data location access
-# structured and working are required
+# Give LF DATA_LOCATION_ACCESS on structured-historical to all (non LF admin) principals
+# Note: LF admin can't have ASSOCIATE permissions on LF tags
 resource "aws_lakeformation_permissions" "data_location_access_structured_historical" {
-  principal   = aws_iam_role.dataapi_cross_role.arn
+  for_each    = local.lf_principals_not_admin
+  principal   = each.value
   permissions = ["DATA_LOCATION_ACCESS"]
 
   data_location {
@@ -40,14 +49,15 @@ resource "aws_lakeformation_permissions" "data_location_access_structured_histor
   }
 }
 
+# Give LF DATA_LOCATION_ACCESS on working to all (non LF admin) principals
+# Note: LF admin can't have ASSOCIATE permissions on LF tags
 resource "aws_lakeformation_permissions" "data_location_access_working" {
-  principal   = aws_iam_role.dataapi_cross_role.arn
+  for_each    = local.lf_principals_not_admin
+  principal   = each.value
   permissions = ["DATA_LOCATION_ACCESS"]
 
   data_location {
     arn = "arn:aws:s3:::${local.project}-working-${local.environment}"
   }
 }
-
-
 
