@@ -17,7 +17,7 @@ locals {
     forwarded_values_headers                   = ["Authorization", "CloudFront-Forwarded-Proto", "CloudFront-Is-Desktop-Viewer", "CloudFront-Is-Mobile-Viewer", "CloudFront-Is-SmartTV-Viewer", "CloudFront-Is-Tablet-Viewer", "CloudFront-Viewer-Country", "Host", "User-Agent"]
     forwarded_values_cookies_forward           = "whitelist"
     forwarded_values_cookies_whitelisted_names = ["AWSALB", "JSESSIONID"]
-    viewer_protocol_policy                     = "https-only"
+    viewer_protocol_policy                     = "redirect-to-https"
   }
 
   # Other cache behaviors are processed in the order in which they're listed in the CloudFront console or, if you're using the CloudFront API, the order in which they're listed in the DistributionConfig element for the distribution.
