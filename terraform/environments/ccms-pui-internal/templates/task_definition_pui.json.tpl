@@ -210,7 +210,7 @@
       {
         "name": "ccms_soa_soapHeaderUserPassword",
         "value": "${ccms_soa_soapHeaderUserPassword}"
-      },
+      }
     ]
   }
 ]
