@@ -6,7 +6,7 @@
 
 This repository contains the Modernisation Platform infrastructure and workflow for user environments (AWS accounts).
 
-Here you can add infrastructure to your environment with [Terraform](https://www.terraform.io/). This currently is manually deployed to your environment by a Modernisation Platform engineer, but we plan to introduce Github workflows to automate this.
+Here you can add infrastructure to your environment with [Terraform](https://www.terraform.io/). The terraform is then applied using github workflows, each environment having its own workflow.
 
 To learn more about how the Modernisation Platform works, please see our main repo [modernisation-platform](https://github.com/ministryofjustice/modernisation-platform), or our [user guidance](https://ministryofjustice.github.io/modernisation-platform)
 
