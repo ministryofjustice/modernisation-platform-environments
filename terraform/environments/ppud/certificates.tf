@@ -34,6 +34,28 @@ resource "aws_acm_certificate" "preprod_certificates" {
   }
 }
 
+output "preprod_cname_validation_records" {
+  value = local.is-preproduction ? {
+    for cert_key, cert in aws_acm_certificate.preprod_certificates : cert_key => [
+      for option in cert.domain_validation_options : {
+        name   = option.resource_record_name
+        type   = option.resource_record_type
+        value  = option.resource_record_value
+      }
+    ]
+  } : {}
+}
+
+resource "aws_acm_certificate_validation" "preprod_certificate_validation" {
+  for_each        = local.is-preproduction ? aws_acm_certificate.preprod_certificates : {}
+  certificate_arn = each.value.arn
+
+  validation_record_fqdns = [
+    for option in each.value.domain_validation_options : option.resource_record_name
+  ]
+}
+
+/*
 locals {
   preprod_dns_records = local.is-preproduction ? merge([
     for cert_key, cert in aws_acm_certificate.preprod_certificates : {
@@ -71,6 +93,7 @@ resource "aws_acm_certificate_validation" "preprod_certificate_validation" {
     aws_route53_record.preprod_dns_record
   ]
 }
+*/
 
 ########################
 # Production Environment
