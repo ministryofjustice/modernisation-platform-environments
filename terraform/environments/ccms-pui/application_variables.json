@@ -56,9 +56,9 @@
       "ccms_pui_auditLogin_enabled": "true",
       "aws_workspace": "10.200.0.0/19",
       "logging_level_root": "info",
-      "logging_level_com_ezgov": "debug",
-      "logging_level_com_legalservices": "debug",
-      "logging_level_uk_gov_laa_opa": "debug",
+      "logging_level_com_ezgov": "info",
+      "logging_level_com_legalservices": "info",
+      "logging_level_uk_gov_laa_opa": "info",
       "logging_level_com_ezgov_roof_view_vim_control_BundleAwareText": "error"
     },
     "test": {
