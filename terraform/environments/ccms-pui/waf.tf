@@ -34,7 +34,7 @@ resource "aws_wafv2_ip_set" "pui_waf_ip_set" {
 
 # Default block on the WAF for now - only allow trusted IPs above
 resource "aws_wafv2_web_acl" "pui_web_acl" {
-  name        = "PUI Web ACL"
+  name        = "PUI-Web-ACL"
   scope       = "REGIONAL"
   description = "AWS WAF Web ACL for PUI Application Load Balancer"
 
