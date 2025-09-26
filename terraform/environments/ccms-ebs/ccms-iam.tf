@@ -460,5 +460,5 @@ resource "aws_iam_policy" "ccms_ebs_ftp_get_secrets_value" {
 resource "aws_iam_role_policy_attachment" "ccms_ebs_ftp_get_secrets_value_attach" {
   count      = contains(["development", "test"], local.environment) ? 1 : 0
   role       = aws_iam_role.role_stsassume_oracle_base.name
-  policy_arn = one(ccms_ebs_ftp_get_secrets_value[*].arn)
+  policy_arn = one(aws_iam_policy.ccms_ebs_ftp_get_secrets_value[*].arn)
 }
