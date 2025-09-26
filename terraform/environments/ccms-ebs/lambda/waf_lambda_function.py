@@ -120,21 +120,3 @@ def lambda_handler(event, context):
     except ClientError as e:
         print(f"Failed to update WebACL: {e}")
         raise
-    # try:
-    #     update_resp = waf.update_web_acl(
-    #         Name=WEB_ACL_NAME,
-    #         Scope=SCOPE,
-    #         Id=WEB_ACL_ID,
-    #         LockToken=lock_token,
-    #         DefaultAction=web_acl["DefaultAction"],
-    #         Description=web_acl.get("Description", ""),
-    #         VisibilityConfig=web_acl["VisibilityConfig"],
-    #         Rules=new_rules,
-    #         CustomResponseBodies=custom_response_bodies  # Critical: preserve or update custom bodies
-    #     )
-    #     print("WebACL updated successfully.")
-    #     return {"ok": True, "updated": True, "mode": mode, "lockToken": lock_token}
-
-    # except ClientError as e:
-    #     print(f"Failed to update WebACL: {e}")
-    #     raise

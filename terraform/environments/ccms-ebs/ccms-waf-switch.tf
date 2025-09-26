@@ -1,20 +1,4 @@
-#Variables
-# variable "env" { 
-#   description = "The target deployment environment (development, test, or production)."
-#   type        = string
-#   default     = "development"
-
-#   # Optional: Add a validation to ensure the input is one of the allowed values.
-#   validation {
-#     condition     = contains(["development", "test", "preproduction", "production"], var.env)
-#     error_message = "The environment must be one of 'development', 'test', 'preproduction', or 'production'."
-#   }
-# }
-    
-# variable "region" {
-#     default = "eu-west-2"
-# }
-
+#Environment variable come from Platform local file
 locals {
   env = "data-${local.environment}"
 }
