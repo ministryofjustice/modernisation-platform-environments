@@ -232,6 +232,7 @@ module "win2016_multiple" {
   enable_volume_tags = false
   root_block_device  = lookup(each.value, "root_block_device", [])
   ebs_block_device   = lookup(each.value, "ebs_block_device", [])
+  metadata_options = lookup(each.value, "metadata_options", null)
 
   tags = merge(each.value.tags, local.tags,
     { Environment = "development"
@@ -385,6 +386,7 @@ module "win2019_SQL_multiple" {
   enable_volume_tags = false
   root_block_device  = lookup(each.value, "root_block_device", [])
   ebs_block_device   = lookup(each.value, "ebs_block_device", [])
+  metadata_options = lookup(each.value, "metadata_options", null)
 
   tags = merge(each.value.tags, local.tags, {
     Environment = "development"
@@ -685,6 +687,7 @@ module "win2022_STD_multiple" {
   enable_volume_tags = false
   root_block_device  = lookup(each.value, "root_block_device", [])
   ebs_block_device   = lookup(each.value, "ebs_block_device", [])
+  metadata_options = lookup(each.value, "metadata_options", null)
 
   tags = merge(each.value.tags, local.tags, {
     Environment = "development"
@@ -752,6 +755,7 @@ module "PowerBI_server" {
   enable_volume_tags = false
   root_block_device  = lookup(each.value, "root_block_device", [])
   ebs_block_device   = lookup(each.value, "ebs_block_device", [])
+  metadata_options = lookup(each.value, "metadata_options", null)
 
   tags = merge(each.value.tags, local.tags, {
     Environment = "development"
