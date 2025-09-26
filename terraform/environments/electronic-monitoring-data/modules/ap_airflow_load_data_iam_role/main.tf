@@ -17,8 +17,8 @@ locals {
   am_workaround_name  = var.name == "alcohol-monitoring" ? "am": var.name
   role_name_suffix    = var.full_reload ? "full-reload-${var.name}${local.env_suffixes[var.environment]}" : "load-${local.am_workaround_name}${local.env_suffixes[var.environment]}"
   source_bucket_paths = var.source_data_bucket != null ? [
-    "${var.source_data_bucket.arn}${var.path_to_data}/*",
-    "${var.source_data_bucket.arn}/staging${var.path_to_data}/*",
+    "${var.source_data_bucket.arn}${var.path_to_data}*/*",
+    "${var.source_data_bucket.arn}/staging${var.path_to_data}*/*",
   ] : []
   list_buckets = var.source_data_bucket != null ? [
     var.source_data_bucket.arn,
