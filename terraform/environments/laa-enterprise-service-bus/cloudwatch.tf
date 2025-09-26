@@ -20,7 +20,7 @@ resource "aws_cloudwatch_metric_alarm" "lambda_failures" {
   evaluation_periods  = 1
   threshold           = 0
   comparison_operator = "GreaterThanThreshold"
-  treat_missing_data  = "notBreaching"
+  treat_missing_data  = "ignore"
 
   dimensions = {
     service     = each.value.servicename
