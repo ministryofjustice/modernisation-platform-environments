@@ -76,7 +76,7 @@ resource "aws_wafv2_web_acl" "pui_web_acl" {
 
 # WAF Logging to CloudWatch
 resource "aws_cloudwatch_log_group" "pui_waf_logs" {
-  name              = "${local.application_name}-waf-logs"
+  name              = "aws-waf-logs-${local.application_name}"
   retention_in_days = 30
 
   tags = merge(local.tags,
