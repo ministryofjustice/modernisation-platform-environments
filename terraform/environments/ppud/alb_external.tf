@@ -170,7 +170,7 @@ resource "aws_lb_listener" "WAM-Front-End-Preprod" {
   }
 }
 
-resource "aws_lb_listener_certificate" "WAM_listener_certificate" {
+resource "aws_lb_listener_certificate" "WAM-Listener-Certificate-Preprod" {
   count           = local.is-preproduction == true ? 1 : 0
   listener_arn    = aws_lb_listener.WAM-Front-End-Preprod[0].arn
   certificate_arn = data.aws_acm_certificate.WAM_UAT_ALB[0].arn

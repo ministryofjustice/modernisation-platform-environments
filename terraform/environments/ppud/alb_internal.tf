@@ -53,6 +53,12 @@ resource "aws_lb_listener_certificate" "PPUD-Training-Certificate" {
   certificate_arn = data.aws_acm_certificate.PPUD_Training_ALB[0].arn
 }
 
+resource "aws_lb_listener_certificate" "PPUD-Listener-Certificate-Preprod" {
+  count           = local.is-preproduction == true ? 1 : 0
+  listener_arn    = aws_lb_listener.PPUD-Front-End-Preprod[0].arn
+  certificate_arn = data.aws_acm_certificate.PPUD_UAT_ALB[0].arn
+}
+
 resource "aws_lb_target_group" "PPUD-internal-Target-Group" {
   count    = local.is-development == false ? 1 : 0
   name     = local.application_data.accounts[local.environment].PPUD_Target
