@@ -1,7 +1,7 @@
 # WAF FOR PUI APP - Temporary restricted access to trusted IPs only
 
 resource "aws_wafv2_ip_set" "pui_waf_ip_set" {
-  name               = "PUI-WAF-IP-Set"
+  name               = "${local.application_name}-waf-ip-set"
   scope              = "REGIONAL"
   ip_address_version = "IPV4"
   description        = "List of trusted IP Addresses allowing access via WAF"
@@ -34,7 +34,7 @@ resource "aws_wafv2_ip_set" "pui_waf_ip_set" {
 
 # Default block on the WAF for now - only allow trusted IPs above
 resource "aws_wafv2_web_acl" "pui_web_acl" {
-  name        = "PUI-Web-ACL"
+  name        = "${local.application_name}-web-acl"
   scope       = "REGIONAL"
   description = "AWS WAF Web ACL for PUI Application Load Balancer"
 
@@ -43,7 +43,7 @@ resource "aws_wafv2_web_acl" "pui_web_acl" {
   }
 
   rule {
-    name = "PUI-WAF-IP-Set"
+    name = "${local.application_name}-waf-ip-set"
 
     priority = 1
     action {
@@ -58,7 +58,7 @@ resource "aws_wafv2_web_acl" "pui_web_acl" {
 
     visibility_config {
       cloudwatch_metrics_enabled = true
-      metric_name                = "PUI_WAF_Metrics"
+      metric_name                = "${local.application_name}-waf-metrics"
       sampled_requests_enabled   = true
     }
   }
@@ -69,14 +69,14 @@ resource "aws_wafv2_web_acl" "pui_web_acl" {
 
   visibility_config {
     cloudwatch_metrics_enabled = true
-    metric_name                = "PUI_WAF_Metrics"
+    metric_name                = "${local.application_name}-waf-metrics"
     sampled_requests_enabled   = true
   }
 }
 
 # WAF Logging to CloudWatch
 resource "aws_cloudwatch_log_group" "pui_waf_logs" {
-  name              = "PUI-WAF-Logs"
+  name              = "${local.application_name}-waf-logs"
   retention_in_days = 30
 
   tags = merge(local.tags,
