@@ -269,7 +269,7 @@ data "aws_iam_policy_document" "coat_cur_v2_hourly_prod_bucket_policy" {
     condition {
       test     = "StringEquals"
       variable = "aws:SourceAccount"
-      values   = ["${data.aws_caller_identity.current.account_id}"]
+      values   = [data.aws_caller_identity.current.account_id]
     }
   }
 }
@@ -694,7 +694,7 @@ data "aws_iam_policy_document" "coat_cur_v2_hourly_enriched_prod_bucket_policy" 
     condition {
       test     = "StringEquals"
       variable = "aws:SourceAccount"
-      values   = ["${data.aws_caller_identity.current.account_id}"]
+      values   = [data.aws_caller_identity.current.account_id]
     }
   }
 }
