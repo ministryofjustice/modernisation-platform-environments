@@ -552,3 +552,75 @@ resource "aws_iam_role_policy_attachment" "validation_lambda_policy_attachment" 
   role       = aws_iam_role.dms_validation_lambda_role[0].name
   policy_arn = aws_iam_policy.dms_validation_lambda_role_policy[0].arn
 }
+
+
+
+#-----------------------------------------------------------------------------------
+# Process FMS metadata IAM Role
+#-----------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "process_fms_metadata_lambda_role_policy_document" {
+  statement {
+    sid    = "S3Permissions"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:GetBucketLocation",
+      "s3:ListBucket",
+      "s3:PutObject",
+    ]
+    resources = [
+      "${module.s3-data-bucket.bucket.arn}/*",
+      module.s3-data-bucket.bucket.arn,
+    ]
+  }
+}
+
+resource "aws_iam_role" "process_fms_metadata" {
+  name               = "process_fms_metadata_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_policy" "process_fms_metadata_lambda_role_policy" {
+  name   = "process_fms_metadata_lambda_policy"
+  policy = data.aws_iam_policy_document.process_fms_metadata_lambda_role_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "process_fms_metadata_lambda_policy_attachment" {
+  role       = aws_iam_role.process_fms_metadata.name
+  policy_arn = aws_iam_policy.process_fms_metadata_lambda_role_policy.arn
+}
+
+
+#-----------------------------------------------------------------------------------
+# FMS Fan Out
+#-----------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "fms_fan_out_lambda_role_policy_document" {
+  statement {
+    sid    = "LambdaInvokePermissions"
+    effect = "Allow"
+    actions = [
+      "lambda:InvokeFunction",
+    ]
+    resources = [
+      module.process_fms_metadata.lambda_function_arn,
+      module.format_json_fms_data.lambda_function_arn
+    ]
+  }
+}
+
+resource "aws_iam_role" "fms_fan_out" {
+  name               = "fms_fan_out_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_policy" "fms_fan_out_lambda_role_policy" {
+  name   = "fms_fan_out_lambda_policy"
+  policy = data.aws_iam_policy_document.fms_fan_out_lambda_role_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "fms_fan_out_lambda_policy_attachment" {
+  role       = aws_iam_role.fms_fan_out.name
+  policy_arn = aws_iam_policy.fms_fan_out_lambda_role_policy.arn
+}

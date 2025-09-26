@@ -31,6 +31,7 @@ module "ds" {
   ds_managed_ad_short_name     = "i2n"
   management_keypair_name      = "ad_management_server"
   ds_managed_ad_secret_key     = module.kms.key_arn
+  esb_security_group_id        = module.esb.esb_security_group_id
 
   ds_managed_ad_vpc_id = data.aws_vpc.shared.id
   private_subnet_ids   = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id]

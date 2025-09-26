@@ -833,24 +833,6 @@ module "s3-received-files-bucket" {
   tags = local.tags
 }
 
-resource "aws_lambda_permission" "scan_received_files" {
-  statement_id  = "AllowExecutionFromReceivedFilesS3Bucket"
-  action        = "lambda:InvokeFunction"
-  function_name = module.virus_scan_file.lambda_function_arn
-  principal     = "s3.amazonaws.com"
-  source_arn    = module.s3-received-files-bucket.bucket.arn
-}
-
-resource "aws_s3_bucket_notification" "scan_received_files" {
-  bucket = module.s3-received-files-bucket.bucket.id
-
-  lambda_function {
-    lambda_function_arn = module.virus_scan_file.lambda_function_arn
-    events              = ["s3:ObjectCreated:*"]
-  }
-
-  depends_on = [aws_lambda_permission.scan_received_files]
-}
 
 module "s3-quarantine-files-bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"

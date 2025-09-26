@@ -82,9 +82,3 @@ resource "aws_lambda_function" "maat_provider_load" {
     { Name = "${local.application_name_short}-${local.environment}-maat-provider-load" }
   )
 }
-
-resource "aws_lambda_event_source_mapping" "maat_provider_q_trigger" {
-  event_source_arn = aws_sqs_queue.maat_provider_q.arn
-  function_name    = aws_lambda_function.maat_provider_load.arn
-  batch_size       = 1
-}
