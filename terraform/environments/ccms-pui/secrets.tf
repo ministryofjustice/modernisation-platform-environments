@@ -59,3 +59,13 @@ resource "aws_secretsmanager_secret" "ccms_soa_soapHeaderUserPassword" {
 data "aws_secretsmanager_secret_version" "ccms_soa_soapHeaderUserPassword" {
   secret_id = aws_secretsmanager_secret.ccms_soa_soapHeaderUserPassword.id
 }
+
+# User Management API Access Token
+resource "aws_secretsmanager_secret" "user_management_api_access_token" {
+  name        = "user_management_api_access_token"
+  description = "User Management API Access Token"
+}
+
+data "aws_secretsmanager_secret_version" "user_management_api_access_token" {
+  secret_id = aws_secretsmanager_secret.user_management_api_access_token.id
+}

@@ -26,6 +26,7 @@
       "idpMetadataUrl": "https://portal.dev.legalservices.gov.uk/oamfed/idp/metadata",
       "loginUrl": "https://portal.dev.legalservices.gov.uk",
       "postcodeApiUrl": "https://api.os.uk/search/places/v1/postcode",
+      "user_management_api_hostname": "https://laa-ccms-user-management-api-dev.apps.live.cloud-platform.service.justice.gov.uk",
       "ccms_pui_feedback_url": "https://ccms-opa.dev.legalservices.gov.uk/opa/web-determinations/startsession/FeedbackForm",
       "ccms_pui_owd_return_url": "https://ccmspui.dev.legalservices.gov.uk/civil",
       "ccms_soa_url_ebsClientEndpoint": "https://ccms-soa-managed.laa-development.modernisation-platform.service.justice.gov.uk/soa-infra/services/default/ClientServices/ClientServices_ep",

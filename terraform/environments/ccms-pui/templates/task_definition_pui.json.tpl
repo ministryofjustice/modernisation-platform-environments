@@ -34,6 +34,10 @@
         "value": "60000"
       },
       {
+        "name": "USER_MANAGEMENT_API_HOSTNAME",
+        "value": "${user_management_api_hostname}"
+      },
+      {
         "name": "IDPLOGOUTURL",
         "value": "${idpLogoutUrl}"
       },
@@ -210,6 +214,10 @@
       {
         "name": "ccms_soa_soapHeaderUserPassword",
         "valueFrom": "${ccms_soa_soapHeaderUserPassword}"
+      },
+      {
+        "name": "USER_MANAGEMENT_API_ACCESS_TOKEN",
+        "valueFrom": "${user_management_api_access_token}"
       }
     ]
   }
