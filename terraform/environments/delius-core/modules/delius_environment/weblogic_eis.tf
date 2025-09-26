@@ -30,7 +30,8 @@ module "weblogic_eis" {
   container_secrets_default = merge({
     for name in local.weblogic_ssm.secrets : name => module.weblogic_ssm.arn_map[name]
     }, {
-    "JDBC_PASSWORD" = "${module.oracle_db_shared.database_application_passwords_secret_arn}:delius_pool::"
+    "JDBC_PASSWORD"         = "${module.oracle_db_shared.database_application_passwords_secret_arn}:delius_pool::",
+    "USERMANAGEMENT_SECRET" = data.aws_ssm_parameter.usermanagement_secret.arn
     }
   )
   container_secrets_env_specific = try(var.delius_microservice_configs.weblogic_eis.container_secrets_env_specific, {})
@@ -81,30 +82,28 @@ module "weblogic_eis" {
 # Weblogic EIS Params #
 #######################
 
-# May not need
+resource "aws_ssm_parameter" "weblogic_eis_google_analytics_id" {
+  name  = "/${var.env_name}/delius/monitoring/analytics/google_id"
+  type  = "String"
+  value = "DEFAULT"
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
 
-# resource "aws_ssm_parameter" "weblogic_eis_google_analytics_id" {
-#   name  = "/${var.env_name}/delius/monitoring/analytics/google_id"
-#   type  = "String"
-#   value = "DEFAULT"
-#   lifecycle {
-#     ignore_changes = [value]
-#   }
-# }
+data "aws_ssm_parameter" "weblogic_eis_google_analytics_id" {
+  name = aws_ssm_parameter.weblogic_eis_google_analytics_id.name
+}
 
-# data "aws_ssm_parameter" "weblogic_eis_google_analytics_id" {
-#   name = aws_ssm_parameter.weblogic_eis_google_analytics_id.name
-# }
+resource "aws_ssm_parameter" "usermanagement_secret" {
+  name  = "/${var.env_name}/delius/umt/umt/delius_secret"
+  type  = "SecureString"
+  value = "DEFAULT"
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
 
-# resource "aws_ssm_parameter" "usermanagement_secret" {
-#   name  = "/${var.env_name}/delius/umt/umt/delius_secret"
-#   type  = "SecureString"
-#   value = "DEFAULT"
-#   lifecycle {
-#     ignore_changes = [value]
-#   }
-# }
-
-# data "aws_ssm_parameter" "usermanagement_secret" {
-#   name = aws_ssm_parameter.usermanagement_secret.name
-# }
+data "aws_ssm_parameter" "usermanagement_secret" {
+  name = aws_ssm_parameter.usermanagement_secret.name
+}
