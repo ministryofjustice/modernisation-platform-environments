@@ -239,6 +239,7 @@ locals {
   }
 }
 
+#trivy:ignore:AVD-AWS-0028: "IMDSv2 enforced at the aws_instance level instead of LT"
 module "win2016_multiple" {
   #  source = "git::https://github.com/rvadisala/ec2-instance?ref=tags/v2.0"
   source = "./ec2-instance-module"
@@ -397,6 +398,7 @@ locals {
   }
 }
 
+#trivy:ignore:AVD-AWS-0028: "IMDSv2 enforced at the aws_instance level instead of LT"
 module "win2019_SQL_multiple" {
   source = "./ec2-instance-module"
 
@@ -730,7 +732,7 @@ locals {
   }
 }
 
-
+#trivy:ignore:AVD-AWS-0028: "IMDSv2 enforced at the aws_instance level instead of LT"
 module "win2022_STD_multiple" {
   source = "./ec2-instance-module"
 
@@ -803,6 +805,7 @@ locals {
   }
 }
 
+#trivy:ignore:AVD-AWS-0028: "IMDSv2 enforced at the aws_instance level instead of LT"
 module "PowerBI_server" {
   source = "./ec2-instance-module"
 
@@ -943,6 +946,7 @@ locals {
   }
 }
 
+#trivy:ignore:AVD-AWS-0028: "IMDSv2 enforced at the aws_instance level instead of LT"
 module "win2022_SQL_multiple" {
   source = "./ec2-instance-module"
 
