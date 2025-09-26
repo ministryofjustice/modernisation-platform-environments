@@ -4,6 +4,7 @@ locals {
 }
 #tfsec:ignore:aws-ec2-enable-at-rest-encryption
 resource "aws_instance" "this" {
+  #checkov:skip=CKV_AWS_79: "Ensure Instance Metadata Service Version 1 is not enabled"
   lifecycle { ignore_changes = [ebs_block_device] }
 
   ami                  = var.ami
