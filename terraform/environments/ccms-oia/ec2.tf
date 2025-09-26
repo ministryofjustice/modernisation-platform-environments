@@ -1,17 +1,15 @@
-data "template_file" "launch-template" {
-  template = file("${path.module}/templates/user-data.sh")
-  vars = {
+# Render user-data from template
+locals {
+  user_data = templatefile("${path.module}/templates/user-data.sh", {
     cluster_name       = "${local.application_name}-cluster"
     deploy_environment = local.environment
-  }
+  })
 }
 
-
-resource "aws_launch_template" "ec2-launch-template" {
+resource "aws_launch_template" "ec2_launch_template" {
   name_prefix   = local.application_name
   image_id      = local.application_data.accounts[local.environment].ami_image_id
   instance_type = local.application_data.accounts[local.environment].ec2_instance_type
-  # key_name      = var.key_name
   ebs_optimized = true
 
   monitoring {
@@ -31,26 +29,18 @@ resource "aws_launch_template" "ec2-launch-template" {
     device_name = "/dev/sda1"
     ebs {
       delete_on_termination = true
-      encrypted             = false
+      encrypted             = true
       volume_size           = 30
       volume_type           = "gp2"
-      iops                  = 0
     }
   }
 
-  user_data = base64encode(data.template_file.launch-template.rendered)
+  user_data = base64encode(local.user_data)
 
   tag_specifications {
     resource_type = "instance"
     tags = merge(local.tags,
       { Name = lower(format("%s-%s-ecs-cluster", local.application_name, local.environment)) }
-    )
-  }
-
-  tag_specifications {
-    resource_type = "instance"
-    tags = merge(local.tags,
-      { instance-scheduling = "skip-scheduling" }
     )
   }
 
@@ -64,10 +54,9 @@ resource "aws_launch_template" "ec2-launch-template" {
   tags = merge(local.tags,
     { Name = lower(format("%s-%s-ecs-cluster-template", local.application_name, local.environment)) }
   )
-
 }
 
-resource "aws_autoscaling_group" "cluster-scaling-group" {
+resource "aws_autoscaling_group" "cluster_scaling_group" {
   name                = "${local.application_name}-auto-scaling-group"
   vpc_zone_identifier = data.aws_subnets.shared-private.ids
   desired_capacity    = 2
@@ -75,8 +64,13 @@ resource "aws_autoscaling_group" "cluster-scaling-group" {
   min_size            = 2
 
   launch_template {
-    id      = aws_launch_template.ec2-launch-template.id
+    id      = aws_launch_template.ec2_launch_template.id
     version = "$Latest"
   }
 
+  tag {
+    key                 = "Name"
+    value               = "${local.application_name}-ecs-instance"
+    propagate_at_launch = true
+  }
 }

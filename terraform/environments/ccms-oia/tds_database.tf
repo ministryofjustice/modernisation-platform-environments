@@ -24,7 +24,7 @@ resource "aws_db_instance" "tds_db" {
   engine_version                      = "19.0.0.0.ru-2025-04.rur-2025-04.r1"
   instance_class                      = local.application_data.accounts[local.environment].tds_db_instance_type
   multi_az                            = local.application_data.accounts[local.environment].tds_db_deploy_to_multi_azs
-  db_name                             = "EDRMSTDS"
+  db_name                             = "OIATDS"
   username                            = local.application_data.accounts[local.environment].tds_db_user
   password                            = data.aws_secretsmanager_secret_version.spring_datasource_password.secret_string
   port                                = "1521"
@@ -43,10 +43,12 @@ resource "aws_db_instance" "tds_db" {
   db_subnet_group_name    = aws_db_subnet_group.tds.id
   option_group_name       = aws_db_option_group.tds_oracle_19.id
   license_model           = "bring-your-own-license"
+
   tags = merge(
     local.tags,
     { instance-scheduling = "skip-scheduling" }
   )
+
   enabled_cloudwatch_logs_exports = [
     "alert",
     "audit",

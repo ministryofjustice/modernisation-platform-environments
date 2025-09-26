@@ -12,7 +12,7 @@
       "container_cpu": "1024",
       "container_memory": "2048",
       "spring_profiles_active": "dev",
-      "db_username": "oia_admin",
+      "db_username": "OIA_ADMIN",
       "db_instance_type": "db.t3.small",
       "db_storage_gb": "50",
       "db_deletion_protection": "false",
@@ -31,13 +31,12 @@
       "container_cpu": "1024",
       "container_memory": "2048",
       "spring_profiles_active": "test",
-      "db_username": "oia_admin",
+      "db_username": "OIA_ADMIN",
       "db_instance_type": "db.t3.small",
       "db_storage_gb": "50",
       "db_deletion_protection": "false",
       "logging_level_root": "info",
       "db_log_retention_days": "14"
     }
-    // 👆 add preproduction and production similar to edrms when ready
   }
 }

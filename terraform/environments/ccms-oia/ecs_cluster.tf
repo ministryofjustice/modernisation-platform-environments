@@ -1,8 +1,9 @@
-resource "aws_ecs_capacity_provider" "capacity-provider" {
+# Capacity Provider
+resource "aws_ecs_capacity_provider" "capacity_provider" {
   name = "${local.application_name}-capacity-provider"
 
   auto_scaling_group_provider {
-    auto_scaling_group_arn = aws_autoscaling_group.cluster-scaling-group.arn
+    auto_scaling_group_arn = aws_autoscaling_group.cluster_scaling_group.arn
   }
 
   tags = merge(local.tags,
@@ -10,8 +11,10 @@ resource "aws_ecs_capacity_provider" "capacity-provider" {
   )
 }
 
+# ECS Cluster
 resource "aws_ecs_cluster" "main" {
   name = "${local.application_name}-cluster"
+
   setting {
     name  = "containerInsights"
     value = "enabled"
@@ -20,9 +23,10 @@ resource "aws_ecs_cluster" "main" {
 
 resource "aws_ecs_cluster_capacity_providers" "main" {
   cluster_name       = aws_ecs_cluster.main.name
-  capacity_providers = [aws_ecs_capacity_provider.capacity-provider.name]
+  capacity_providers = [aws_ecs_capacity_provider.capacity_provider.name]
 }
 
+# ECS Task Definition
 resource "aws_ecs_task_definition" "oia" {
   family             = "${local.application_name}-task"
   execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
@@ -35,16 +39,16 @@ resource "aws_ecs_task_definition" "oia" {
   container_definitions = templatefile(
     "${path.module}/templates/task_definition_oia.json.tpl",
     {
-      app_name          = local.application_name
-      app_image         = local.application_data.accounts[local.environment].app_image
-      app_port          = local.application_data.accounts[local.environment].app_port
-      aws_region        = local.application_data.accounts[local.environment].aws_region
+      app_name      = local.application_name
+      app_image     = local.application_data.accounts[local.environment].app_image
       container_version = local.application_data.accounts[local.environment].container_version
-      spring_profiles   = local.application_data.accounts[local.environment].spring_profiles_active
-      db_username       = local.application_data.accounts[local.environment].db_username
-      db_password       = aws_secretsmanager_secret.db_password.arn
-      db_url            = aws_db_instance.oia_db.endpoint
-      logging_level     = local.application_data.accounts[local.environment].logging_level_root
+      aws_region    = local.application_data.accounts[local.environment].aws_region
+      app_port      = local.application_data.accounts[local.environment].app_port
+      spring_profiles = local.application_data.accounts[local.environment].spring_profiles_active
+      db_username   = local.application_data.accounts[local.environment].spring_datasource_username
+      db_password   = aws_secretsmanager_secret.spring_datasource_password.arn
+      db_url        = aws_db_instance.tds_db.endpoint
+      logging_level = local.application_data.accounts[local.environment].logging_level_root
     }
   )
 
@@ -53,6 +57,7 @@ resource "aws_ecs_task_definition" "oia" {
   )
 }
 
+# ECS Service
 resource "aws_ecs_service" "oia" {
   name            = local.application_name
   cluster         = aws_ecs_cluster.main.id
@@ -76,6 +81,6 @@ resource "aws_ecs_service" "oia" {
   depends_on = [
     aws_lb_listener.oia,
     aws_iam_role_policy_attachment.ecs_task_execution_role,
-    aws_autoscaling_group.cluster-scaling-group
+    aws_autoscaling_group.cluster_scaling_group
   ]
 }

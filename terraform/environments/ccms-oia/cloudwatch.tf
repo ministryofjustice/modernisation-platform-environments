@@ -1,7 +1,7 @@
-# CloudWatch Alarm for EDRMS Container Count
+# CloudWatch Alarm for OIA Container Count
 resource "aws_cloudwatch_metric_alarm" "container_count" {
   alarm_name                = "${local.application_name}-ecs-task-count"
-  alarm_description         = "The number of EDRMS ECS tasks is less than ${local.application_data.accounts[local.environment].app_count}, Runbook - https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
+  alarm_description         = "The number of OIA ECS tasks is less than ${local.application_data.accounts[local.environment].app_count}, Runbook - https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
   comparison_operator       = "LessThanThreshold"
   metric_name               = "DesiredTaskCount"
   namespace                 = "ECS/ContainerInsights"
@@ -23,10 +23,10 @@ resource "aws_cloudwatch_metric_alarm" "container_count" {
   tags = local.tags
 }
 
-# CloudWatch Alarm for EDRMS Unhealthy Hosts
-resource "aws_cloudwatch_metric_alarm" "edrms_UnHealthy_Hosts" {
+# CloudWatch Alarm for OIA Unhealthy Hosts
+resource "aws_cloudwatch_metric_alarm" "oia_UnHealthy_Hosts" {
   alarm_name          = "${local.application_name}-unhealthy-hosts"
-  alarm_description   = "There is an unhealthy host in the edrms target group for over 15min, Runbook - https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
+  alarm_description   = "There is an unhealthy host in the OIA target group for over 15min, Runbook - https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
   comparison_operator = "GreaterThanThreshold"
   metric_name         = "UnHealthyHostCount"
   statistic           = "Average"
@@ -36,8 +36,8 @@ resource "aws_cloudwatch_metric_alarm" "edrms_UnHealthy_Hosts" {
   threshold           = "0"
   treat_missing_data  = "notBreaching"
   dimensions = {
-    LoadBalancer = aws_lb.edrms.arn_suffix
-    TargetGroup  = aws_lb_target_group.edrms_target_group.arn_suffix
+    LoadBalancer = aws_lb.oia.arn_suffix
+    TargetGroup  = aws_lb_target_group.oia_target_group.arn_suffix
   }
 
   alarm_actions = [aws_sns_topic.cloudwatch_slack.arn]
@@ -49,7 +49,7 @@ resource "aws_cloudwatch_metric_alarm" "edrms_UnHealthy_Hosts" {
 # Underlying EC2 Instance Status Check Failure
 resource "aws_cloudwatch_metric_alarm" "Status_Check_Failure" {
   alarm_name          = "${local.application_name}-status-check-failure"
-  alarm_description   = "A edrms cluster EC2 instance has failed a status check, Runbook - https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
+  alarm_description   = "An OIA cluster EC2 instance has failed a status check, Runbook - https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
   comparison_operator = "GreaterThanThreshold"
   metric_name         = "StatusCheckFailed"
   statistic           = "Average"
@@ -59,7 +59,7 @@ resource "aws_cloudwatch_metric_alarm" "Status_Check_Failure" {
   threshold           = "1"
   treat_missing_data  = "notBreaching"
   dimensions = {
-    AutoScalingGroupName = aws_autoscaling_group.cluster-scaling-group.name
+    AutoScalingGroupName = aws_autoscaling_group.cluster_scaling_group.name
   }
 
   alarm_actions = [aws_sns_topic.cloudwatch_slack.arn]
@@ -69,7 +69,6 @@ resource "aws_cloudwatch_metric_alarm" "Status_Check_Failure" {
 }
 
 # TDS RDS CPU Utilization Alarm
-
 resource "aws_cloudwatch_metric_alarm" "tds_rds_cpu_over_threshold" {
   alarm_name          = "${local.application_name}-tds-rds-cpu-high-threshold"
   alarm_description   = "TDS RDS CPU is above 85%, Runbook - https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"

@@ -1,4 +1,5 @@
 locals {
+  # Subnet CIDR blocks
   data_subnets_cidr_blocks = [
     data.aws_subnet.data_subnets_a.cidr_block,
     data.aws_subnet.data_subnets_b.cidr_block,
@@ -11,7 +12,11 @@ locals {
     data.aws_subnet.private_subnets_c.cidr_block
   ]
 
+  # Certificates
   cert_opts    = aws_acm_certificate.external.domain_validation_options
   cert_arn     = aws_acm_certificate.external.arn
   cert_zone_id = data.aws_route53_zone.external.zone_id
+
+  # ✅ Fix: use the correct AWS region attribute
+  aws_region = data.aws_region.current.name
 }
