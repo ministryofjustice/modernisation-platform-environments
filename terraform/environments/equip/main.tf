@@ -58,6 +58,10 @@ locals {
           )
         }
       ]
+      metadata_options = {
+        http_endpoint = "enabled"
+        http_tokens   = "required"
+      }
       tags = merge(local.tags,
         { Name = "${local.name}-COR-A-DC01"
         Role = "Domain Controller" }
@@ -79,6 +83,10 @@ locals {
           )
         }
       ]
+      metadata_options = {
+        http_endpoint = "enabled"
+        http_tokens   = "required"
+      }
       tags = merge(local.tags,
         { Name = "${local.name}-COR-A-DC02"
         Role = "Domain Controller" }
@@ -111,6 +119,10 @@ locals {
           )
         }
       ]
+      metadata_options = {
+        http_endpoint = "enabled"
+        http_tokens   = "required"
+      }
       tags = merge(local.tags,
         { Name = "${local.name}-COR-A-CTX01"
         Role = "Citrix Infrastructure" }
@@ -131,6 +143,10 @@ locals {
           )
         }
       ]
+      metadata_options = {
+        http_endpoint = "enabled"
+        http_tokens   = "required"
+      }
       tags = merge(local.tags,
         { Name = "${local.name}-COR-A-CTX02"
         Role = "Citrix Session Host" }
@@ -151,6 +167,10 @@ locals {
           )
         }
       ]
+      metadata_options = {
+        http_endpoint = "enabled"
+        http_tokens   = "required"
+      }
       tags = merge(local.tags,
         { Name = "${local.name}-COR-A-CTX03"
         Role = "Citrix Session Host" }
@@ -183,6 +203,10 @@ locals {
           )
         }
       ]
+      metadata_options = {
+        http_endpoint = "enabled"
+        http_tokens   = "required"
+      }
       tags = merge(local.tags,
         { Name = "${local.name}-COR-A-PXY01"
         Role = "Proxy Services" }
@@ -203,6 +227,10 @@ locals {
           )
         }
       ]
+      metadata_options = {
+        http_endpoint = "enabled"
+        http_tokens   = "required"
+      }
       tags = merge(local.tags,
         { Name = "${local.name}-COR-A-TST01"
         Role = "Test Server" }
@@ -357,6 +385,10 @@ locals {
           )
         }
       ]
+      metadata_options = {
+        http_endpoint = "enabled"
+        http_tokens   = "required"
+      }
       tags = merge(local.tags,
         { Name = "${local.name}-COR-A-SF02"
         Role = "Spotfire Database Server" }
@@ -450,6 +482,10 @@ locals {
           )
         }
       ]
+      metadata_options = {
+        http_endpoint = "enabled"
+        http_tokens   = "required"
+      }
       tags = merge(local.tags,
         { Name = "${local.name}-COR-A-EQP04"
         Role = "Nimbus Application Services" }
@@ -492,6 +528,10 @@ locals {
           )
         }
       ]
+      metadata_options = {
+        http_endpoint = "enabled"
+        http_tokens   = "required"
+      }
       tags = merge(local.tags,
         { Name = "${local.name}-COR-A-EQP05"
         Role = "Nimbus Application Services" }
@@ -513,6 +553,10 @@ locals {
           )
         }
       ]
+      metadata_options = {
+        http_endpoint = "enabled"
+        http_tokens   = "required"
+      }
       tags = merge(local.tags,
         { Name = "${local.name}-COR-A-DC03"
         Role = "Domain Controller" }
@@ -534,6 +578,10 @@ locals {
           )
         }
       ]
+      metadata_options = {
+        http_endpoint = "enabled"
+        http_tokens   = "required"
+      }
       tags = merge(local.tags,
         { Name = "${local.name}-COR-A-DC04"
         Role = "Domain Controller" }
@@ -554,6 +602,10 @@ locals {
           )
         }
       ]
+      metadata_options = {
+        http_endpoint = "enabled"
+        http_tokens   = "required"
+      }
       tags = merge(local.tags,
         { Name = "${local.name}-COR-A-TST02"
         Role = "Test Server" }
@@ -586,6 +638,10 @@ locals {
           )
         }
       ]
+      metadata_options = {
+        http_endpoint = "enabled"
+        http_tokens   = "required"
+      }
       tags = merge(local.tags,
         { Name = "${local.name}-COR-A-CTX04"
         Role = "Citrix Infrastructure" }
@@ -626,6 +682,10 @@ locals {
           )
         }
       ]
+      metadata_options = {
+        http_endpoint = "enabled"
+        http_tokens   = "required"
+      }
       tags = merge(local.tags,
         { Name = "${local.name}-COR-A-CTX06"
         Role = "Citrix Session Host" }
@@ -658,6 +718,10 @@ locals {
           )
         }
       ]
+      metadata_options = {
+        http_endpoint = "enabled"
+        http_tokens   = "required"
+      }
       tags = merge(local.tags,
         { Name = "${local.name}-COR-A-PXY02"
         Role = "Proxy Services" }
@@ -725,8 +789,12 @@ locals {
             { Name = "${local.name}-COR-A-GW01-ebs-block-1" }
           )
         }
-
       ]
+      metadata_options = {
+        http_endpoint = "enabled"
+        http_tokens   = "required"
+      }
+
       tags = merge(local.tags,
         { Name = "${local.name}-COR-A-GW01"
         Role = "Nimbus PowerBI Services" }

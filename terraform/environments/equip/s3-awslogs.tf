@@ -10,7 +10,7 @@ resource "random_string" "bucket_suffix" {
 #trivy:ignore:avd-aws-0087 trivy:ignore:avd-aws-0089 trivy:ignore:avd-aws-0090 trivy:ignore:avd-aws-0091 trivy:ignore:avd-aws-0093
 resource "aws_s3_bucket" "this" {
   #checkov:skip=CKV_AWS_145: "Ensure that S3 buckets are encrypted with KMS by default"
-  #checkov:skip=CKV_AWS_62: "S3 bucket event notification is not required"
+  #checkov:skip=CKV2_AWS_62: "S3 bucket event notification is not required"
   #checkov:skip=CKV_AWS_18:"Access logging not required"
   #checkov:skip=CKV_AWS_21: "Ensure all data stored in the S3 bucket have versioning enabled"
   #checkov:skip=CKV_AWS_144:Cross-region replication not required
