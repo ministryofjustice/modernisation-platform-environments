@@ -30,7 +30,7 @@ resource "aws_security_group_rule" "cloudwatch_log_alert_https_to_internet" {
   from_port         = 443
   to_port           = 443
   protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"]           
+  cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.cloudwatch_log_alert_sg.id
   description       = "Allow outbound HTTPS to any destination (0.0.0.0/0) for Slack webhook"
 }
@@ -50,7 +50,7 @@ resource "aws_lambda_function" "cloudwatch_log_alert" {
 
   environment {
     variables = {
-      SLACK_WEBHOOK_URL  = aws_secretsmanager_secret.slack_alert_channel_webhook.name
+      SLACK_WEBHOOK_URL = aws_secretsmanager_secret.slack_alert_channel_webhook.name
     }
   }
 
@@ -165,8 +165,8 @@ resource "aws_iam_policy" "cloudwatch_log_alert_policy" {
     Version = "2012-10-17",
     Statement = [
       {
-        Effect   = "Allow"
-        Action   = [
+        Effect = "Allow"
+        Action = [
           "sns:Publish"
         ]
         Resource = aws_sns_topic.hub2_alerts.arn
