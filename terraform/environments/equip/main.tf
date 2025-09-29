@@ -649,7 +649,7 @@ locals {
       )
     }
     COR-A-CTX04 = {
-      instance_type          = "t3a.large"
+      instance_type          = "t3a.xlarge" 
       subnet_id              = data.aws_subnet.private_subnets_a.id
       vpc_security_group_ids = [aws_security_group.aws_citrix_security_group.id, aws_security_group.all_internal_groups.id]
       root_block_device = [
@@ -685,7 +685,7 @@ locals {
       )
     }
     COR-A-CTX05 = {
-      instance_type          = "t3a.large"
+      instance_type          = "t3a.xlarge"
       subnet_id              = data.aws_subnet.private_subnets_a.id
       vpc_security_group_ids = [aws_security_group.aws_citrix_security_group.id, aws_security_group.all_internal_groups.id]
       root_block_device = [
@@ -705,7 +705,7 @@ locals {
       )
     }
     COR-A-CTX06 = {
-      instance_type          = "t3a.large"
+      instance_type          = "t3a.xlarge"
       subnet_id              = data.aws_subnet.private_subnets_a.id
       vpc_security_group_ids = [aws_security_group.aws_citrix_security_group.id, aws_security_group.all_internal_groups.id]
       root_block_device = [
