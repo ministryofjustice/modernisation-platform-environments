@@ -3,6 +3,11 @@ locals {
   db_root_user = "vcms"
 }
 
+data "aws_db_snapshot" "shared_snapshot" {
+  db_snapshot_identifier = "rds-vcmsdev-db-backup-2025-09-26-14-04-mpcp"
+  include_shared         = true
+}
+
 resource "aws_db_instance" "mariadb" {
   allocated_storage      = 200
   db_name                = local.db_name
@@ -15,7 +20,7 @@ resource "aws_db_instance" "mariadb" {
   db_subnet_group_name   = aws_db_subnet_group.mariadb.name
   vpc_security_group_ids = [aws_security_group.mariadb.id]
   skip_final_snapshot    = true
-  snapshot_identifier    = "rds-vcmsdev-db-backup-2025-09-26-14-04-mpcp"
+  snapshot_identifier    = data.aws_db_snapshot.share_snapshot.id
 }
 
 resource "random_id" "db_password" {
