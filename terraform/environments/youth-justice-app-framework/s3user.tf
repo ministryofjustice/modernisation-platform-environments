@@ -1,5 +1,32 @@
 ### Legacy S3 bucket user, to be replaced by iam role before full migration
-
+locals {
+  s3_buckets = jsonencode([
+    "arn:aws:s3:::yjaf-${local.environment}-cms",
+    "arn:aws:s3:::yjaf-${local.environment}-yjsm",
+    "arn:aws:s3:::yjaf-${local.environment}-mis",
+    "arn:aws:s3:::yjaf-${local.environment}-bedunlock",
+    "arn:aws:s3:::yjaf-${local.environment}-bands",
+    "arn:aws:s3:::yjaf-${local.environment}-incident",
+    "arn:aws:s3:::yjaf-${local.environment}-reporting",
+    "arn:aws:s3:::yjaf-${local.environment}-application-memory-heap-dump",
+    "arn:aws:s3:::yjaf-${local.environment}-certs",
+    "arn:aws:s3:::yjaf-${local.environment}-transfer",
+    "arn:aws:s3:::yjaf-${local.environment}-cmm"
+  ])
+  s3_buckets_wildcarded = jsonencode([
+    "arn:aws:s3:::yjaf-${local.environment}-cms/*",
+    "arn:aws:s3:::yjaf-${local.environment}-yjsm/*",
+    "arn:aws:s3:::yjaf-${local.environment}-mis/*",
+    "arn:aws:s3:::yjaf-${local.environment}-bedunlock/*",
+    "arn:aws:s3:::yjaf-${local.environment}-bands/*",
+    "arn:aws:s3:::yjaf-${local.environment}-incident/*",
+    "arn:aws:s3:::yjaf-${local.environment}-reporting/*",
+    "arn:aws:s3:::yjaf-${local.environment}-application-memory-heap-dump/*",
+    "arn:aws:s3:::yjaf-${local.environment}-certs/*",
+    "arn:aws:s3:::yjaf-${local.environment}-transfer/*",
+    "arn:aws:s3:::yjaf-${local.environment}-cmm/*"
+  ])
+}
 
 resource "aws_iam_user" "s3" {
   #checkov:skip=CKV_AWS_273: Will be replaced by iam role
@@ -36,22 +63,8 @@ resource "aws_iam_policy" "s3" {
   name        = "${local.project_name}-s3-access"
   description = "Policy for S3 user"
   policy = templatefile("${path.module}/iam_policies/s3_user_policy.json", {
-    dal_buckets = jsonencode([
-      "arn:aws:s3:::yjaf-${local.environment}-cms",
-      "arn:aws:s3:::yjaf-${local.environment}-yjsm",
-      "arn:aws:s3:::yjaf-${local.environment}-mis",
-      "arn:aws:s3:::yjaf-${local.environment}-bedunlock",
-      "arn:aws:s3:::yjaf-${local.environment}-bands",
-      "arn:aws:s3:::yjaf-${local.environment}-incident",
-      "arn:aws:s3:::yjaf-${local.environment}-cmm",
-      "arn:aws:s3:::yjaf-${local.environment}-cms/*",
-      "arn:aws:s3:::yjaf-${local.environment}-yjsm/*",
-      "arn:aws:s3:::yjaf-${local.environment}-mis/*",
-      "arn:aws:s3:::yjaf-${local.environment}-bedunlock/*",
-      "arn:aws:s3:::yjaf-${local.environment}-bands/*",
-      "arn:aws:s3:::yjaf-${local.environment}-incident/*",
-      "arn:aws:s3:::yjaf-${local.environment}-cmm/*"
-    ])
+    dal_buckets            = local.s3_buckets            #declared in ecs.tf
+    dal_buckets_wildcarded = local.s3_buckets_wildcarded #declared in ecs.tf
   })
 }
 

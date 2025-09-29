@@ -36,8 +36,8 @@ locals {
   application_data = fileexists("./application_variables.json") ? jsondecode(file("./application_variables.json")) : null
 
   common_sans = [
-      "*.venues.tribunals.gov.uk",
-      "*.reports.tribunals.gov.uk"
+    "*.venues.tribunals.gov.uk",
+    "*.reports.tribunals.gov.uk"
   ]
 
   # the http-only domains only relevant for CloudFront cert
