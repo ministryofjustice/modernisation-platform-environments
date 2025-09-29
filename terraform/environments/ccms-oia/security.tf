@@ -83,11 +83,11 @@ resource "aws_security_group" "cluster_ec2" {
 resource "aws_security_group_rule" "cluster_ec2_ingress_22" {
   security_group_id = aws_security_group.cluster_ec2.id
   type              = "ingress"
-  description       = "SSH"
+  description       = "SSH from private subnets"
   protocol          = "TCP"
   from_port         = 22
   to_port           = 22
-  cidr_blocks       = [local.application_data.accounts[local.environment].aws_workspace]
+  cidr_blocks       = local.private_subnets_cidr_blocks
 }
 
 resource "aws_security_group_rule" "cluster_ec2_ingress_lb" {
@@ -129,13 +129,14 @@ resource "aws_vpc_security_group_ingress_rule" "tds_db_ingress" {
   cidr_ipv4         = local.private_subnets_cidr_blocks[count.index]
 }
 
+# Removed aws_workspace (not in JSON) → allow private subnets instead
 resource "aws_vpc_security_group_ingress_rule" "tds_db_workspace_ingress" {
   security_group_id = aws_security_group.tds_db.id
-  description       = "Workspace to Database Ingress"
+  description       = "Workspace/Private Subnets to Database Ingress"
   ip_protocol       = "TCP"
   from_port         = 1521
   to_port           = 1521
-  cidr_ipv4         = local.application_data.accounts[local.environment].aws_workspace
+  cidr_ipv4         = local.private_subnets_cidr_blocks[0] # first subnet only
 }
 
 resource "aws_security_group_rule" "tds_db_egress_all" {
