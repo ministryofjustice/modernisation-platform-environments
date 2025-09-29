@@ -274,8 +274,8 @@ module "process_fms_metadata" {
   timeout                 = 900
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev          = local.is-production ? "prod" : "dev"
-  security_group_ids = [aws_security_group.lambda_generic.id]
-  subnet_ids         = data.aws_subnets.shared-public.ids
+  security_group_ids      = [aws_security_group.lambda_generic.id]
+  subnet_ids              = data.aws_subnets.shared-public.ids
 }
 
 #-----------------------------------------------------------------------------------
@@ -293,8 +293,8 @@ module "fms_fan_out" {
   timeout                 = 900
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev          = local.is-production ? "prod" : "dev"
-  security_group_ids = [aws_security_group.lambda_generic.id]
-  subnet_ids         = data.aws_subnets.shared-public.ids
+  security_group_ids      = [aws_security_group.lambda_generic.id]
+  subnet_ids              = data.aws_subnets.shared-public.ids
   environment_variables = {
     PROCESS_METADATA_LAMBDA = module.process_fms_metadata.lambda_function_name
     PROCESS_DATA_LAMBDA     = module.format_json_fms_data.lambda_function_name

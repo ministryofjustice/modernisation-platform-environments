@@ -1,9 +1,9 @@
 variable "bucket" {
-    description = "aws_s3_bucket resource where notifications will originate from"
-    type        = object({
-        id  = string
-        arn = string
-    })
+  description = "aws_s3_bucket resource where notifications will originate from"
+  type = object({
+    id  = string
+    arn = string
+  })
 }
 
 variable "lambda_function_name" {
