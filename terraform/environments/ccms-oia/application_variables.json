@@ -40,7 +40,7 @@
       "logging_level_root": "info",
       "db_log_retention_days": "14"
     },
-    "pre-production": {
+    "preproduction": {
       "app_name": "ccms-oia",
       "aws_region": "eu-west-2",
       "ami_image_id": "ami-0d6d764bbe794b8ca",
