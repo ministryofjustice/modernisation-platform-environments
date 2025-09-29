@@ -9,14 +9,15 @@
 /terraform/environments/analytical-platform-next-poc-hub @ministryofjustice/analytical-platform-engineers @ministryofjustice/modernisation-platform
 /terraform/environments/analytical-platform-next-poc-producer @ministryofjustice/analytical-platform-engineers @ministryofjustice/modernisation-platform
 /terraform/environments/apex @ministryofjustice/laa-apex-developer @ministryofjustice/laa-aws-infrastructure @ministryofjustice/modernisation-platform
-/terraform/environments/ccms-ebs-upgrade @ministryofjustice/laa-ccms-migration-team @ministryofjustice/modernisation-platform
+/terraform/environments/ccms-ebs-upgrade @ministryofjustice/laa-ccms-migration-team @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-ebs-upgrade/anonymisation @ministryofjustice/laa-ccms-migration-team @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-ebs-upgrade/sandbox @ministryofjustice/laa-ccms-migration-team @ministryofjustice/modernisation-platform
-/terraform/environments/ccms-ebs @ministryofjustice/laa-ccms-instance-access @ministryofjustice/laa-ccms-migration-team @ministryofjustice/modernisation-platform-security @ministryofjustice/panda-cyber-team @ministryofjustice/modernisation-platform
+/terraform/environments/ccms-ebs @ministryofjustice/laa-ccms-instance-access @ministryofjustice/laa-ccms-migration-team @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform-security @ministryofjustice/panda-cyber-team @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-ebs/workspaces-secure-browser @ministryofjustice/aws-root-account-admin-team @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-edrms @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-oia @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-pui-internal @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
+/terraform/environments/ccms-pui-internal/workspaces-secure-browser @ministryofjustice/aws-root-account-admin-team @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-pui @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
 /terraform/environments/cdpt-chaps @ministryofjustice/azure-aws-sso-cdpt @ministryofjustice/central-digital-product-team @ministryofjustice/modernisation-platform
 /terraform/environments/cdpt-ifs @ministryofjustice/azure-aws-sso-cdpt @ministryofjustice/central-digital-product-team @ministryofjustice/modernisation-platform
@@ -41,6 +42,7 @@
 /terraform/environments/equip @ministryofjustice/modernisation-platform-engineers @ministryofjustice/modernisation-platform
 /terraform/environments/example @ministryofjustice/green-ops @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform
 /terraform/environments/genesys-call-centre-data @ministryofjustice/genesys-call-centre-data @ministryofjustice/modernisation-platform
+/terraform/environments/hmcts-claude-provider @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform
 /terraform/environments/hmpps-domain-services @ministryofjustice/hosting-migrations @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
 /terraform/environments/hmpps-esupervision @ministryofjustice/stg-pathfinders @ministryofjustice/modernisation-platform
 /terraform/environments/hmpps-oem @ministryofjustice/hmpps-dba @ministryofjustice/hmpps-migration @ministryofjustice/hosting-migrations @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform

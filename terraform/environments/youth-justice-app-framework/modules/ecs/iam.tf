@@ -14,28 +14,9 @@ resource "aws_iam_role" "ecs_task_execution_role" {
   })
 }
 
-#todo add missing policies to this role
 resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_policy" {
   role       = aws_iam_role.ecs_task_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
-}
-
-#Todo refine this it is too permissive
-resource "aws_iam_role_policy_attachment" "ecs_task_secrets_policy" {
-  role       = aws_iam_role.ecs_task_execution_role.name
-  policy_arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
-}
-
-#Todo refine this it is too permissive
-resource "aws_iam_role_policy_attachment" "ecs_task_s3_policy" {
-  role       = aws_iam_role.ecs_task_execution_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
-}
-
-#Todo refine this it is too permissive
-resource "aws_iam_role_policy_attachment" "ecs_task_ses_policy" {
-  role       = aws_iam_role.ecs_task_execution_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonSESFullAccess"
 }
 
 resource "aws_iam_role" "ecs_task_role" {
@@ -79,4 +60,22 @@ resource "aws_iam_role_policy_attachment" "ecs_task_role_additional_policies" {
 
   role       = aws_iam_role.ecs_task_role.name
   policy_arn = each.value
+}
+
+#todo remove me once all 20 apps have iam role
+resource "aws_iam_role_policy_attachment" "ecs_task_secrets_policy" {
+  role       = aws_iam_role.ecs_task_execution_role.name
+  policy_arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
+}
+
+#todo remove me once all 20 apps have iam role
+resource "aws_iam_role_policy_attachment" "ecs_task_s3_policy" {
+  role       = aws_iam_role.ecs_task_execution_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+}
+
+#todo remove me once all 20 apps have iam role
+resource "aws_iam_role_policy_attachment" "ecs_task_ses_policy" {
+  role       = aws_iam_role.ecs_task_execution_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSESFullAccess"
 }

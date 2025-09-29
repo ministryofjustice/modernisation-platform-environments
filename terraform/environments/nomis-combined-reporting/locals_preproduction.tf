@@ -32,6 +32,22 @@ locals {
       }
     }
 
+    cloudwatch_dashboards = {
+      "CloudWatch-Default" = {
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.lb,
+          local.cloudwatch_dashboard_widget_groups.db,
+          local.cloudwatch_dashboard_widget_groups.cms,
+          local.cloudwatch_dashboard_widget_groups.app,
+          local.cloudwatch_dashboard_widget_groups.web,
+          local.cloudwatch_dashboard_widget_groups.webadmin,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ssm_command,
+        ]
+      }
+    }
+
     ec2_instances = {
 
       ls-ncr-db-1-a = merge(local.ec2_instances.db, {
@@ -205,7 +221,6 @@ locals {
             ]
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/sap/bip/lsast/*",
-              "arn:aws:secretsmanager:*:*:secret:/sap/bods/lsast/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*LS/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/LS*/*",
             ]
@@ -258,7 +273,6 @@ locals {
             ]
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/sap/bip/pp/*",
-              "arn:aws:secretsmanager:*:*:secret:/sap/bods/pp/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*PP/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/PP*/*",
             ]
@@ -295,7 +309,7 @@ locals {
         }
         listeners = merge(local.lbs.private.listeners, {
           http-7777 = merge(local.lbs.private.listeners.http-7777, {
-            alarm_target_group_names = []
+            alarm_target_group_names = [] # don't enable as environments are powered up/down frequently
             rules = {
               web = {
                 priority = 200
@@ -350,7 +364,7 @@ locals {
         }
         listeners = merge(local.lbs.public.listeners, {
           https = merge(local.lbs.public.listeners.https, {
-            alarm_target_group_names = []
+            alarm_target_group_names = [] # don't enable as environments are powered up/down frequently
             rules = {
               webadmin = {
                 priority = 100
@@ -438,8 +452,6 @@ locals {
       "/oracle/database/LSBIAUD"  = local.secretsmanager_secrets.db
       "/sap/bip/lsast"            = local.secretsmanager_secrets.bip
       "/sap/bip/pp"               = local.secretsmanager_secrets.bip
-      "/sap/bods/lsast"           = local.secretsmanager_secrets.bods
-      "/sap/bods/pp"              = local.secretsmanager_secrets.bods
     }
   }
 }

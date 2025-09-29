@@ -64,3 +64,8 @@ variable "dms_replication_instance_arn" {
   type        = string
 }
 
+variable "dump_number_suffix" {
+  description = "Suffix for job signifying the number of drops"
+  type        = string
+  default     = ""
+}

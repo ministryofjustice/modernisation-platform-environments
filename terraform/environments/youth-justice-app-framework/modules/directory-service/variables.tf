@@ -76,3 +76,8 @@ variable "rds_cluster_security_group_id" {
   type        = string
   description = "The Id of the Security Grpoip that enables access to the RDS PostgreSQL Cluster."
 }
+
+variable "esb_security_group_id" {
+  type        = string
+  description = "The security group ID for the ESB server"
+}

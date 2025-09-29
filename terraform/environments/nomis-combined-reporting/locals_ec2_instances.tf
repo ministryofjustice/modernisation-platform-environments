@@ -3,6 +3,7 @@ locals {
   ec2_instances = {
 
     bip_app = {
+      cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_app_nonprod
       config = {
         ami_name                  = "base_rhel_8_5_2023-07*" # RHEL 8.8
         iam_resource_names_prefix = "ec2-bip"
@@ -51,6 +52,7 @@ locals {
     }
 
     bip_cms = {
+      cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_app_nonprod
       config = {
         ami_name                  = "base_rhel_8_5_2023-07*" # RHEL 8.8
         iam_resource_names_prefix = "ec2-bip"
@@ -99,6 +101,7 @@ locals {
     }
 
     bip_webadmin = {
+      cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_web_nonprod
       config = {
         ami_name                  = "base_rhel_8_5_2023-07*" # RHEL 8.8
         iam_resource_names_prefix = "ec2-web"
@@ -147,6 +150,7 @@ locals {
     }
 
     bip_web = {
+      cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_web_nonprod
       config = {
         ami_name                  = "base_rhel_8_5_2023-07*" # RHEL 8.8
         iam_resource_names_prefix = "ec2-web"
@@ -194,6 +198,7 @@ locals {
     }
 
     db = {
+      cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.db
       config = {
         ami_name                  = "hmpps_ol_8_5_oracledb_19c_release_2023-08-08T13-49-56.195Z"
         ami_owner                 = "self"

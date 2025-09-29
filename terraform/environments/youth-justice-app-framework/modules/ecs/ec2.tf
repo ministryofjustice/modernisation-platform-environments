@@ -82,10 +82,10 @@ module "autoscaling" {
     AmazonEC2RoleforSSM                 = "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM",
     AmazonEC2ContainerServiceforEC2Role = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
     ecs-fetch-secrets-policy            = "arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess"
-    AmazonS3FullAccess                  = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
-    AmazonSESFullAccess                 = "arn:aws:iam::aws:policy/AmazonSESFullAccess"
+    AmazonS3FullAccess                  = "arn:aws:iam::aws:policy/AmazonS3FullAccess"  #todo remove me once all 20 apps have iam role
+    AmazonSESFullAccess                 = "arn:aws:iam::aws:policy/AmazonSESFullAccess" #todo remove me once all 20 apps have iam role
     ecs-eni-policy                      = aws_iam_policy.ecs-eni-policy.arn
-    ecs-secrets-policy                  = aws_iam_policy.ecs-secrets-policy.arn
+    ecs-secrets-policy                  = aws_iam_policy.ecs-secrets-policy.arn #todo remove me once all 20 apps have iam role
     ecs-quicksight-policy               = aws_iam_policy.ecs-quicksight-policy.arn
   }
   security_groups = [module.autoscaling_sg.security_group_id]

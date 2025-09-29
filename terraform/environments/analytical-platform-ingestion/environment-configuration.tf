@@ -45,10 +45,6 @@ locals {
           ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCuB8p8OaxeX3sILMVUQcD48XBPuVLzddUixUUbYLS1WPiEUz7XcUkozeuhulIy9CzqA9yyAa2uPWhQr3KL2bKpXo8UIJr+3n51mjJp9V+LO65kMN5ewQHzx9phpZba5UOth1aEwn4vAFQwm2q6/ydNrJtRQeaI0DT4njaf0MC9FM/nu25IvUbl2dzUn2MX7/WuMouzcYXTeiLUIMvgRoAw4pjnCmU2AuPTokC7OynFh++SiHRUw6OwNKxqORv3du7qlfcGDWx+oAHbUVOnSaTrUssUuEXPFS5ytwWEp6GpzfZpNvD7Kj7gw/7ntpdTckh+d5INJHu+2L74Ytj2RPLNoHEB9t1ptEI2d2SeKpHqPSak2uQzk4aHV2SJs4IO0omTWKHojtSxo5gxAl4B58UjdzmFn0yNr3rJbKnn2w1H7viaM/0vWRgZrtgo07pd2uJePObaUE9jf1re+woasVWJAy3v9dZszVBcJ62NK/QU3cGfUncBw2OnnDURm7z1YVAj8mrReOkZWFA7nJ4/Gzh5pR8wNhnSLsDFqsQefaQiHBi2vZzDRqaUu03eWvd8BmomWC5joT7qqY8Qv+X5boO9CI0hX9FcoJJMXJwckoVAZGuZKgOwOL4y1Y7hpCO1U5ex9mbyMy5D5r/FNf7B85d/qCxcGwesIzI1b0QRupKxDw=="
           cidr_blocks = ["20.49.168.141/32", "20.49.168.17/32", "51.11.124.149/32", "51.11.124.158/32"]
         }
-        "glenn-barber-cafm" = {
-          ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCm18Znrr+VfF3K/6frPwEPY7HCBHbUprYpgyCMIykwmn6SL9SEGUehpghd/xjNiFBz27VMTWraZYZ4RFtHQGOPaOzdMIDO+Z9RGX2rt/sjJemA01MOxfW0m9UfZ4wgoh92eYrq7ZnRWbadP2H6W1aUcGBqjh0JJ5VxtSp3wePL4HY90FLI8hMs3xwXpAqCo3ZjYzZCTOpzghwataMEmw5c//vNzGDUa+JGu1U2iGyCJCVaENcKhsKAyK2UbYAkSYBeRjQ7tdkL21Mq4KqHKBVIVlXF6l4fgIFaU11eJthkno5XAGTC3+H0MR8yjGcmufv6Ln2aeZ6zz9e/69wtrrS1qjbgYuPMtTQb7o6FbBwkr0mmfB78xNFNNv5GRzVkwSTiRWF2wjikMaadEJsSH+tKpdmYGgM5THLAyOhuy8Zg0MTsmN2TT3a4i//+T0h8v7mb5w4A87uBDenxIGNSNFKVzUkLL2uSxmn7s0UnuTuDoIthZBUVGYKaEuP2VVWDYWU= glenn.barber@L0429"
-          cidr_blocks = ["35.176.93.186/32"]
-        }
       }
       transfer_server_sftp_users_with_egress = {
         "essex-police" = {
@@ -100,7 +96,7 @@ locals {
 
       /* Target KMS */
       target_kms_keys = [
-        "arn:aws:kms:eu-west-2:593291632749:key/62503ba6-316e-473d-ae4b-042f8420dd07" # s3/mojap-data-production-shared-services-client-team-gov-29148
+        "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["analytical-platform-data-production"]}:key/62503ba6-316e-473d-ae4b-042f8420dd07" # s3/mojap-data-production-shared-services-client-team-gov-29148
       ]
       mojap_land_kms_key                  = "arn:aws:kms:eu-west-1:${local.environment_management.account_ids["analytical-platform-data-production"]}:key/2855ac30-4e14-482e-85ca-53258e01f64c"
       datasync_opg_target_bucket_kms      = "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["analytical-platform-data-production"]}:key/96eb04fe-8393-402c-b1f9-71fcece99e75"
@@ -112,14 +108,6 @@ locals {
         "cgi-cps" = {
           ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDXxYA8eLvZ1spaM2LUl/EmBhqsLUPUDM1DwjoLD/eDnDnR+DQQ/F7fCNihYML44vgjVmXXMIVkLuvtjJZ5YUmss38UwcMg1FKGG/iMC5CF3nFtDig7sDc3mfMHM5phGM1BPu1lB5K4K/DGnvSUBvim8iOlZV72X832m9QtH3FQXKM7j2O9M9Y65C50OeDJF1KFPjYbsJWRpCDD5eifSV5tfJIgmm9VcLqMLXDelQGuYStok4dh47fF+LhdKHDyNjzc24LvU/p6r5sY26FuVuEoSsL+MGBs/Kiu8KllVkapM0Edztsz/oHh2WwrZFyNMXuuPrMbEoY2KXwzYmvj7mXxxYlj1NLzYxoFVdv1SUhCkBB1WOJMqbbpQT7Nlcyn5n48oUrf+DmRk7PAR/EUZ250mlPhRSqZpaBPghXLg/LXQ/KqVLccVBr3RdlJKhNCIO5NFkE9vfVCgLLKof0LRcAmduI+rn4RrRm1cMH6zdx2ZfVKpWOf4svRg23N+alV/zfUZGdoG8FcEyb6Hcgp/jw5UHGmgUc86HZnfX2Llxz5YCMUDF3Q0qNl2rZR/lS9zxvH+XhrYq8pYvSWilaeU8ZsxJj8GLkxuMrJHt+eT7s+EuHoPoptlMvzqjFKh6ut92sBuXb+XsvtreeBhln9jb+g1xUZnjlArjOxNXRFL7YjUw=="
           cidr_blocks = ["185.157.224.141/32", "185.157.225.141/32"]
-        }
-        "glenn-barber" = {
-          ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCm18Znrr+VfF3K/6frPwEPY7HCBHbUprYpgyCMIykwmn6SL9SEGUehpghd/xjNiFBz27VMTWraZYZ4RFtHQGOPaOzdMIDO+Z9RGX2rt/sjJemA01MOxfW0m9UfZ4wgoh92eYrq7ZnRWbadP2H6W1aUcGBqjh0JJ5VxtSp3wePL4HY90FLI8hMs3xwXpAqCo3ZjYzZCTOpzghwataMEmw5c//vNzGDUa+JGu1U2iGyCJCVaENcKhsKAyK2UbYAkSYBeRjQ7tdkL21Mq4KqHKBVIVlXF6l4fgIFaU11eJthkno5XAGTC3+H0MR8yjGcmufv6Ln2aeZ6zz9e/69wtrrS1qjbgYuPMtTQb7o6FbBwkr0mmfB78xNFNNv5GRzVkwSTiRWF2wjikMaadEJsSH+tKpdmYGgM5THLAyOhuy8Zg0MTsmN2TT3a4i//+T0h8v7mb5w4A87uBDenxIGNSNFKVzUkLL2uSxmn7s0UnuTuDoIthZBUVGYKaEuP2VVWDYWU= glenn.barber@L0429"
-          cidr_blocks = ["35.176.93.186/32"]
-        }
-        "glenn-barber-cafm" = {
-          ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCm18Znrr+VfF3K/6frPwEPY7HCBHbUprYpgyCMIykwmn6SL9SEGUehpghd/xjNiFBz27VMTWraZYZ4RFtHQGOPaOzdMIDO+Z9RGX2rt/sjJemA01MOxfW0m9UfZ4wgoh92eYrq7ZnRWbadP2H6W1aUcGBqjh0JJ5VxtSp3wePL4HY90FLI8hMs3xwXpAqCo3ZjYzZCTOpzghwataMEmw5c//vNzGDUa+JGu1U2iGyCJCVaENcKhsKAyK2UbYAkSYBeRjQ7tdkL21Mq4KqHKBVIVlXF6l4fgIFaU11eJthkno5XAGTC3+H0MR8yjGcmufv6Ln2aeZ6zz9e/69wtrrS1qjbgYuPMtTQb7o6FbBwkr0mmfB78xNFNNv5GRzVkwSTiRWF2wjikMaadEJsSH+tKpdmYGgM5THLAyOhuy8Zg0MTsmN2TT3a4i//+T0h8v7mb5w4A87uBDenxIGNSNFKVzUkLL2uSxmn7s0UnuTuDoIthZBUVGYKaEuP2VVWDYWU= glenn.barber@L0429"
-          cidr_blocks = ["35.176.93.186/32"]
         }
         "maat-xhibit" = {
           ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCuB8p8OaxeX3sILMVUQcD48XBPuVLzddUixUUbYLS1WPiEUz7XcUkozeuhulIy9CzqA9yyAa2uPWhQr3KL2bKpXo8UIJr+3n51mjJp9V+LO65kMN5ewQHzx9phpZba5UOth1aEwn4vAFQwm2q6/ydNrJtRQeaI0DT4njaf0MC9FM/nu25IvUbl2dzUn2MX7/WuMouzcYXTeiLUIMvgRoAw4pjnCmU2AuPTokC7OynFh++SiHRUw6OwNKxqORv3du7qlfcGDWx+oAHbUVOnSaTrUssUuEXPFS5ytwWEp6GpzfZpNvD7Kj7gw/7ntpdTckh+d5INJHu+2L74Ytj2RPLNoHEB9t1ptEI2d2SeKpHqPSak2uQzk4aHV2SJs4IO0omTWKHojtSxo5gxAl4B58UjdzmFn0yNr3rJbKnn2w1H7viaM/0vWRgZrtgo07pd2uJePObaUE9jf1re+woasVWJAy3v9dZszVBcJ62NK/QU3cGfUncBw2OnnDURm7z1YVAj8mrReOkZWFA7nJ4/Gzh5pR8wNhnSLsDFqsQefaQiHBi2vZzDRqaUu03eWvd8BmomWC5joT7qqY8Qv+X5boO9CI0hX9FcoJJMXJwckoVAZGuZKgOwOL4y1Y7hpCO1U5ex9mbyMy5D5r/FNf7B85d/qCxcGwesIzI1b0QRupKxDw=="
