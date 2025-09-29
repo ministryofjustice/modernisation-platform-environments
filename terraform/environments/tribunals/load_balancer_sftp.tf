@@ -23,7 +23,7 @@ resource "aws_security_group" "tribunals_lb_sc_sftp" {
   dynamic "ingress" {
     for_each = {
       for k, v in var.sftp_services : k => v if v.upload_enabled
-      }
+    }
     content {
       description = "allow all traffic on port ${ingress.value.sftp_port}"
       from_port   = ingress.value.sftp_port

@@ -18,9 +18,9 @@ module "weblogic_eis" {
   pin_task_definition_revision           = try(var.delius_microservice_configs.weblogic_eis.task_definition_revision, 0)
   ignore_changes_service_task_definition = false
 
-  ecs_cluster_arn              = module.ecs.ecs_cluster_arn
-  container_memory             = var.delius_microservice_configs.weblogic_eis.container_memory
-  container_cpu                = var.delius_microservice_configs.weblogic_eis.container_cpu
+  ecs_cluster_arn  = module.ecs.ecs_cluster_arn
+  container_memory = var.delius_microservice_configs.weblogic_eis.container_memory
+  container_cpu    = var.delius_microservice_configs.weblogic_eis.container_cpu
 
   container_vars_default = {
     for name in local.weblogic_ssm.vars : name => data.aws_ssm_parameter.weblogic_ssm[name].value
@@ -60,7 +60,7 @@ module "weblogic_eis" {
   }
 
   certificate_arn = aws_acm_certificate.external.arn
-  
+
   db_ingress_security_groups = []
 
   microservice_lb                    = aws_lb.delius_core_frontend

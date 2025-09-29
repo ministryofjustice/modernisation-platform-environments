@@ -3,12 +3,12 @@ locals {
   env = "data-${local.environment}"
 }
 
-variable "scope"{
-    default = "REGIONAL"
+variable "scope" {
+  default = "REGIONAL"
 }
 
 variable "rule_name" {
-    default = "ebs-trusted-rule" 
+  default = "ebs-trusted-rule"
 }
 
 data "archive_file" "waf_toggle_zip" {
@@ -30,9 +30,9 @@ resource "aws_iam_role" "waf_lambda_role" {
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
     Statement = [{
-      Effect = "Allow",
+      Effect    = "Allow",
       Principal = { Service = "lambda.amazonaws.com" },
-      Action = "sts:AssumeRole"
+      Action    = "sts:AssumeRole"
     }]
   })
 }
@@ -45,26 +45,26 @@ resource "aws_iam_role_policy" "waf_lambda_policy" {
     Version = "2012-10-17",
     Statement = [
       { Effect = "Allow",
-        Action = ["wafv2:GetWebACL","wafv2:UpdateWebACL"],
-        Resource = "*" },
+        Action = ["wafv2:GetWebACL", "wafv2:UpdateWebACL"],
+      Resource = "*" },
       { Effect = "Allow",
         Action = ["wafv2:GetRuleGroup"],
-        Resource = "*" },
+      Resource = "*" },
       { Effect = "Allow",
-        Action = ["logs:CreateLogGroup","logs:CreateLogStream","logs:PutLogEvents"],
-        Resource = "*" }
+        Action = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"],
+      Resource = "*" }
     ]
   })
 }
 
 resource "aws_lambda_function" "waf_toggle" {
-  function_name = "waf-toggle-${local.environment}"
-  role          = aws_iam_role.waf_lambda_role.arn
-  filename      = data.archive_file.waf_toggle_zip.output_path
+  function_name    = "waf-toggle-${local.environment}"
+  role             = aws_iam_role.waf_lambda_role.arn
+  filename         = data.archive_file.waf_toggle_zip.output_path
   source_code_hash = data.archive_file.waf_toggle_zip.output_base64sha256
-  handler       = "waf_lambda_function.lambda_handler"
-  runtime       = "python3.11"
-  timeout       = 30
+  handler          = "waf_lambda_function.lambda_handler"
+  runtime          = "python3.11"
+  timeout          = 30
   environment {
     variables = {
       SCOPE        = var.scope
@@ -73,8 +73,8 @@ resource "aws_lambda_function" "waf_toggle" {
       RULE_NAME    = var.rule_name
 
       # New variables for custom body injection
-      CUSTOM_BODY_NAME   = "maintenance_html"
-      CUSTOM_BODY_HTML   = <<EOT
+      CUSTOM_BODY_NAME = "maintenance_html"
+      CUSTOM_BODY_HTML = <<EOT
 <!doctype html><html lang="en"><head>
 <meta charset="utf-8"><title>Maintenance</title>
 <style>body{font-family:sans-serif;background:#0b1a2b;color:#fff;text-align:center;padding:4rem;}
