@@ -38,12 +38,28 @@
         "value": "${user_management_api_hostname}"
       },
       {
+        "name": "IDPENTITYID",
+        "value": "${idpIdentityID}"
+      },
+      {
         "name": "IDPLOGOUTURL",
         "value": "${idpLogoutUrl}"
       },
       {
         "name": "IDPMETADATAURL",
         "value": "${idpMetadataUrl}"
+      },
+      {
+        "name": "IDPSAMLMOCKENABLED",
+        "value": "${IdpSamlMockEnabled}"
+      },
+      {
+        "name": "SPENTITYID",
+        "value": "${SpEntityId}"
+      },
+      {
+        "name": "SPENTITYURL",
+        "value": "${SpEntityUrl}"
       },
       {
         "name": "LOGINURL",
