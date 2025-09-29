@@ -20,3 +20,5 @@ locals {
   # ✅ Fix: use the correct AWS region attribute
   aws_region = data.aws_region.current.name
 }
+
+
