@@ -16,16 +16,18 @@ data "aws_acm_certificate" "WAM_internaltest_cert" {
 
 # ACM certificate for PPUD UAT ALB
 data "aws_acm_certificate" "PPUD_UAT_ALB" {
-  count    = local.is-preproduction == true ? 1 : 0
-  domain   = "uat.ppud.justice.gov.uk"
-  statuses = ["ISSUED"]
+  count       = local.is-preproduction == true ? 1 : 0
+  domain      = "uat.ppud.justice.gov.uk"
+  most_recent = true
+  statuses    = ["ISSUED"]
 }
 
 # ACM certificate for WAM UAT ALB
 data "aws_acm_certificate" "WAM_UAT_ALB" {
-  count    = local.is-preproduction == true ? 1 : 0
-  domain   = "wamuat.ppud.justice.gov.uk"
-  statuses = ["ISSUED"]
+  count       = local.is-preproduction == true ? 1 : 0
+  domain      = "wamuat.ppud.justice.gov.uk"
+  most_recent = true
+  statuses    = ["ISSUED"]
 }
 
 # ACM certificate for PPUD Training ALB
