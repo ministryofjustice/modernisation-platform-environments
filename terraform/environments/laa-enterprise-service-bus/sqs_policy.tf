@@ -61,7 +61,7 @@ resource "aws_sqs_queue_policy" "ccr_policy" {
   })
 }
 
-resource "aws_sqs_queue_policy" "ccms_provider_policy" {
+resource "aws_sqs_queue_policy" "ccms_policy" {
   queue_url = aws_sqs_queue.ccms_provider_q.id
 
   policy = jsonencode({
@@ -141,7 +141,7 @@ resource "aws_sqs_queue_policy" "ccr_dlq_policy" {
   })
 }
 
-resource "aws_sqs_queue_policy" "ccms_provider_dlq_policy" {
+resource "aws_sqs_queue_policy" "ccms_dlq_policy" {
   queue_url = aws_sqs_queue.ccms_provider_dlq.id
 
   policy = jsonencode({
