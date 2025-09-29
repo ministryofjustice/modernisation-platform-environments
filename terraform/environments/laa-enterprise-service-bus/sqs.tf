@@ -2,8 +2,7 @@
 ########     MAAT SQS     ############
 ######################################
 resource "aws_sqs_queue" "maat_provider_dlq" {
-  name                      = "maat_provider_dlq.fifo"
-  fifo_queue                = true
+  name                      = "maat_provider_dlq"
   message_retention_seconds = 1209600
   max_message_size          = 262144
 
@@ -40,8 +39,7 @@ resource "aws_sqs_queue" "maat_provider_q" {
 ########     CCLF SQS     ############
 ######################################
 resource "aws_sqs_queue" "cclf_provider_dlq" {
-  name                      = "cclf_provider_dlq.fifo"
-  fifo_queue                = true
+  name                      = "cclf_provider_dlq"
   message_retention_seconds = 1209600
   max_message_size          = 262144
 
@@ -78,8 +76,7 @@ resource "aws_sqs_queue" "cclf_provider_q" {
 ########     CCR SQS     ############
 ######################################
 resource "aws_sqs_queue" "ccr_provider_dlq" {
-  name                      = "ccr_provider_dlq.fifo"
-  fifo_queue                = true
+  name                      = "ccr_provider_dlq"
   message_retention_seconds = 1209600
   max_message_size          = 262144
 
@@ -116,8 +113,7 @@ resource "aws_sqs_queue" "ccr_provider_q" {
 #####     CCMS Provider SQS     #########
 ######################################
 resource "aws_sqs_queue" "ccms_provider_dlq" {
-  name                      = "ccms_provider_dlq.fifo"
-  fifo_queue                = true
+  name                      = "ccms_provider_dlq"
   message_retention_seconds = 1209600
   max_message_size          = 262144
 
