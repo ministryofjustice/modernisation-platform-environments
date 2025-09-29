@@ -592,10 +592,10 @@ locals {
           actions = [
             {
               type             = "forward"
-              target_group_key = "assets-target-group-2"
+              target_group_key = "assets-target-group-1"
             }
           ]
-          conditions = [{ #header condition for dal
+          conditions = [{ #header condition for assets
             http_header = {
               http_header_name = "service-health"
               values           = ["assets"]
