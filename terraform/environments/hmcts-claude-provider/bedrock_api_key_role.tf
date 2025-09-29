@@ -8,7 +8,7 @@ resource "aws_iam_role" "bedrock_api_key_creator" {
       {
         Effect = "Allow"
         Principal = {
-          AWS = "arn:aws:sts::313941174580:assumed-role/developer/*"
+          AWS = "arn:aws:iam::313941174580:role/developer"
         }
         Action = "sts:AssumeRole"
       }
