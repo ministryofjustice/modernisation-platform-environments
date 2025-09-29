@@ -39,6 +39,46 @@
       "db_deletion_protection": "false",
       "logging_level_root": "info",
       "db_log_retention_days": "14"
+    },
+    "pre-production": {
+      "app_name": "ccms-oia",
+      "aws_region": "eu-west-2",
+      "ami_image_id": "ami-0d6d764bbe794b8ca",
+      "app_image": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/ccms-oia",
+      "container_version": "latest",
+      "ec2_instance_type": "m5.large",
+      "app_count": "2",
+      "app_port": "8080",
+      "container_cpu": "1024",
+      "container_memory": "2048",
+      "spring_profiles_active": "preprod",
+      "db_username": "OIA_ADMIN",
+      "spring_datasource_username": "OIA_ADMIN",
+      "db_instance_type": "db.t3.medium",
+      "db_storage_gb": "100",
+      "db_deletion_protection": "true",
+      "logging_level_root": "info",
+      "db_log_retention_days": "30"
+    },
+    "production": {
+      "app_name": "ccms-oia",
+      "aws_region": "eu-west-2",
+      "ami_image_id": "ami-0d6d764bbe794b8ca",
+      "app_image": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/ccms-oia",
+      "container_version": "latest",
+      "ec2_instance_type": "m5.large",
+      "app_count": "3",
+      "app_port": "8080",
+      "container_cpu": "2048",
+      "container_memory": "4096",
+      "spring_profiles_active": "prod",
+      "db_username": "OIA_ADMIN",
+      "spring_datasource_username": "OIA_ADMIN",
+      "db_instance_type": "db.t3.medium",
+      "db_storage_gb": "200",
+      "db_deletion_protection": "true",
+      "logging_level_root": "warn",
+      "db_log_retention_days": "60"
     }
   }
 }
