@@ -53,6 +53,16 @@ module "vpc_endpoints" {
       )
     }
   }
+  athena = {
+      service         = "athena"
+      service_type    = "Interface"
+      route_table_ids = module.vpc.private_route_table_ids
+      tags = merge(
+        local.tags,
+        { Name = format("%s-athena-vpc-endpoint", local.application_name) }
+      )
+    }
+  }
 }
 
 resource "aws_security_group" "vpc_endpoints" {
