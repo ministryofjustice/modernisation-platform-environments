@@ -45,6 +45,14 @@ locals {
           ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCuB8p8OaxeX3sILMVUQcD48XBPuVLzddUixUUbYLS1WPiEUz7XcUkozeuhulIy9CzqA9yyAa2uPWhQr3KL2bKpXo8UIJr+3n51mjJp9V+LO65kMN5ewQHzx9phpZba5UOth1aEwn4vAFQwm2q6/ydNrJtRQeaI0DT4njaf0MC9FM/nu25IvUbl2dzUn2MX7/WuMouzcYXTeiLUIMvgRoAw4pjnCmU2AuPTokC7OynFh++SiHRUw6OwNKxqORv3du7qlfcGDWx+oAHbUVOnSaTrUssUuEXPFS5ytwWEp6GpzfZpNvD7Kj7gw/7ntpdTckh+d5INJHu+2L74Ytj2RPLNoHEB9t1ptEI2d2SeKpHqPSak2uQzk4aHV2SJs4IO0omTWKHojtSxo5gxAl4B58UjdzmFn0yNr3rJbKnn2w1H7viaM/0vWRgZrtgo07pd2uJePObaUE9jf1re+woasVWJAy3v9dZszVBcJ62NK/QU3cGfUncBw2OnnDURm7z1YVAj8mrReOkZWFA7nJ4/Gzh5pR8wNhnSLsDFqsQefaQiHBi2vZzDRqaUu03eWvd8BmomWC5joT7qqY8Qv+X5boO9CI0hX9FcoJJMXJwckoVAZGuZKgOwOL4y1Y7hpCO1U5ex9mbyMy5D5r/FNf7B85d/qCxcGwesIzI1b0QRupKxDw=="
           cidr_blocks = ["20.49.168.141/32", "20.49.168.17/32", "51.11.124.149/32", "51.11.124.158/32"]
         }
+        "tjf-dev-1" = {
+          ssh_key     = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKOfpfqMJkqsjNZMsFa0bfYn/ZEkjJ69xXwJpk0inFM2 tamsin.forbes@digital.justice.gov.uk"
+          cidr_blocks = ["84.71.188.242/32"]
+        }
+        "tjf-dev-2" = {
+          ssh_key     = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKOfpfqMJkqsjNZMsFa0bfYn/ZEkjJ69xXwJpk0inFM2 tamsin.forbes@digital.justice.gov.uk"
+          cidr_blocks = ["84.71.188.242/32"]
+        }
       }
       transfer_server_sftp_users_with_egress = {
         "essex-police" = {
