@@ -767,6 +767,7 @@ locals {
   }
 }
 
+#trivy:ignore:AVD-AWS-0028: "IMDSv2 enforced at the aws_instance level instead of LT"
 module "win2022_STD_Datacenter" {
   source = "./ec2-instance-module"
 
