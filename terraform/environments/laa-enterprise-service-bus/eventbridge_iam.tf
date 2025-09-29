@@ -64,14 +64,14 @@ resource "aws_iam_policy" "scheduler_invoke_lambda" {
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [{
-      Effect   = "Allow",
-      Action   = "lambda:InvokeFunction",
+      Effect = "Allow",
+      Action = "lambda:InvokeFunction",
       Resource = [
         aws_lambda_function.ccms_provider_load.arn,
         aws_lambda_function.maat_provider_load.arn,
         aws_lambda_function.ccr_provider_load.arn,
         aws_lambda_function.cclf_provider_load.arn
-     ]
+      ]
     }]
   })
 }

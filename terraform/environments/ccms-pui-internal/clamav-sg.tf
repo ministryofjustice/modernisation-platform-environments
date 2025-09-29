@@ -19,7 +19,7 @@ resource "aws_security_group_rule" "ingress_traffic_clamav_3310" {
   protocol          = "TCP"
   from_port         = 3310
   to_port           = 3310
-  cidr_blocks = [data.aws_vpc.shared.cidr_block]
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
 }
 
 # EGRESS Rules
