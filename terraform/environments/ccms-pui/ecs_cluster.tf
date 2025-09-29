@@ -71,6 +71,8 @@ resource "aws_ecs_task_definition" "pui" {
       ccms_soa_soapHeaderUserName                                   = local.application_data.accounts[local.environment].ccms_soa_soapHeaderUserName
       user_management_api_access_token                              = aws_secretsmanager_secret.user_management_api_access_token.arn
       user_management_api_hostname                                  = local.application_data.accounts[local.environment].user_management_api_hostname
+      entra_custom_user_id_claim                                    = local.application_data.accounts[local.environment].entra_custom_user_id_claim
+      is_silas_enabled                                              = local.application_data.accounts[local.environment].is_silas_enabled
       idpIdentityID                                                 = local.application_data.accounts[local.environment].idpIdentityID
       IdpSamlMockEnabled                                            = local.application_data.accounts[local.environment].IdpSamlMockEnabled
       SpEntityId                                                    = local.application_data.accounts[local.environment].SpEntityId

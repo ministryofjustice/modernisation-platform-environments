@@ -38,6 +38,14 @@
         "value": "${user_management_api_hostname}"
       },
       {
+        "name": "ENTRA_CUSTOM_USER_ID_CLAIM",
+        "value": "${entra_custom_user_id_claim}"
+      },
+      {
+        "name": "IS_SILAS_ENABLED",
+        "value": "${is_silas_enabled}"
+      },
+      {
         "name": "IDPENTITYID",
         "value": "${idpIdentityID}"
       },
