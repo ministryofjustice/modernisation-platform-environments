@@ -15,7 +15,7 @@ resource "aws_db_instance" "mariadb" {
   db_subnet_group_name   = aws_db_subnet_group.mariadb.name
   vpc_security_group_ids = [aws_security_group.mariadb.id]
   skip_final_snapshot    = true
-  snapshot_identifier    = "rds:eu-west-2:356676313489:snapshot:rds-vcmsdev-db-backup-2025-09-26-14-04-mpcp"
+  snapshot_identifier    = "rds-vcmsdev-db-backup-2025-09-26-14-04-mpcp"
 }
 
 resource "random_id" "db_password" {
