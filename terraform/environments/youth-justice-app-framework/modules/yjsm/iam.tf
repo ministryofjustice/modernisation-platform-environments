@@ -14,8 +14,6 @@ resource "aws_iam_role" "yjsm_ec2_role" {
   })
 }
 
-data "aws_secretsmanager_secrets" "all_secrets" {}
-
 resource "aws_iam_instance_profile" "yjsm_ec2_profile" {
   name = "yjsm-ec2-instance"
   role = aws_iam_role.yjsm_ec2_role.name
@@ -37,53 +35,22 @@ resource "aws_iam_role_policy_attachment" "yjsm_ec2_readonly_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess"
 }
 
-resource "aws_iam_role_policy_attachment" "yjsm_s3_policy" {
+#for each for any other policies
+resource "aws_iam_role_policy_attachment" "yjsm_role_additional_policies" {
+  for_each = { for idx, arn in var.yjsm_role_additional_policies_arns : idx => arn }
+
   role       = aws_iam_role.yjsm_ec2_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+  policy_arn = each.value
 }
 
-resource "aws_iam_role_policy_attachment" "yjsm_secret_tmp_policy" {
-  role       = aws_iam_role.yjsm_ec2_role.name
-  policy_arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
-}
-
-resource "aws_iam_role_policy_attachment" "yjsm_ses_policy" {
-  role       = aws_iam_role.yjsm_ec2_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonSESFullAccess"
-}
-
-# TODO FIX POLICY SO WE CAN REMOVE SecretsManagerReadWrite
 resource "aws_iam_policy" "secrets_manager_policy" {
-  name        = "secrets_manager_access"
-  description = "Policy to allow access to specific secrets in Secrets Manager"
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = [
-          "secretsmanager:GetRandomPassword",
-          "secretsmanager:GetResourcePolicy",
-          "secretsmanager:GetSecretValue",
-          "secretsmanager:DescribeSecret",
-          "secretsmanager:ListSecretVersionIds",
-          "secretsmanager:ListSecrets",
-          "secretsmanager:CancelRotateSecret"
-        ]
-        Effect   = "Allow"
-        Resource = data.aws_secretsmanager_secrets.all_secrets.arns
-      },
-      {
-        Action = [
-          "kms:Decrypt",
-          "kms:DescribeKey"
-        ]
-        Effect   = "Allow"
-        Resource = var.secret_kms_key_arn
-      }
-    ]
+  name        = "${var.cluster_name}-yjsm-secrets-access"
+  description = "Allows yjsm tasks to access secrets in Secrets Manager"
+  policy = templatefile("${path.module}/yjsm_secrets_access.json", {
+    secret_arns    = var.yjsm_secrets_access_policy_secret_arns
+    secret_kms_key = var.secret_kms_key_arn
   })
 }
-
 
 resource "aws_iam_role_policy_attachment" "attach_secrets_manager_policy" {
   role       = aws_iam_role.yjsm_ec2_role.name
