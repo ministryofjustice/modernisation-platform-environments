@@ -32,6 +32,12 @@ data "aws_identitystore_group" "all_identity_centre_teams" {
   }
 }
 
-data "aws_secretsmanager_secret_version" "github_token" {
-  secret_id = aws_secretsmanager_secret.github_token.id
+data "aws_secretsmanager_secret" "github_ci_user_environments_repo_pat" {
+  provider = aws.modernisation-platform
+  name     = "github_ci_user_environments_repo_pat"
+}
+
+data "aws_secretsmanager_secret_version" "github_ci_user_environments_repo_pat" {
+  provider  = aws.modernisation-platform
+  secret_id = data.aws_secretsmanager_secret.github_ci_user_environments_repo_pat.id
 }
