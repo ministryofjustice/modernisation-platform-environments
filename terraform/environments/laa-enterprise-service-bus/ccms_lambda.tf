@@ -56,6 +56,10 @@ resource "aws_lambda_function" "ccms_provider_load" {
     "arn:aws:lambda:eu-west-2:017000801446:layer:AWSLambdaPowertoolsPython:2"
   ]
 
+  dead_letter_config {
+    target_arn = aws_sqs_queue.ccms_provider_dlq.arn
+  }
+
   vpc_config {
     security_group_ids = [aws_security_group.ccms_provider_load.id]
     subnet_ids         = [data.aws_subnet.data_subnets_a.id]
