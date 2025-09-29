@@ -91,14 +91,11 @@ resource "aws_sqs_queue_policy" "maat_dlq_policy" {
     Version = "2012-10-17"
     Statement = [{
       Effect    = "Allow"
-      Principal = "*"
-      Action    = "sqs:SendMessage"
-      Resource  = aws_sqs_queue.maat_provider_dlq.arn
-      Condition = {
-        ArnEquals = {
-          "aws:SourceArn" = aws_sqs_queue.maat_provider_q.arn
-        }
+      Principal = {
+        Service = "lambda.amazonaws.com"
       }
+      Action   = "sqs:SendMessage"
+      Resource = aws_sqs_queue.maat_provider_dlq.arn
     }]
   })
 }
@@ -110,14 +107,11 @@ resource "aws_sqs_queue_policy" "cclf_dlq_policy" {
     Version = "2012-10-17"
     Statement = [{
       Effect    = "Allow"
-      Principal = "*"
-      Action    = "sqs:SendMessage"
-      Resource  = aws_sqs_queue.cclf_provider_dlq.arn
-      Condition = {
-        ArnEquals = {
-          "aws:SourceArn" = aws_sqs_queue.cclf_provider_q.arn
-        }
+      Principal = {
+        Service = "lambda.amazonaws.com"
       }
+      Action   = "sqs:SendMessage"
+      Resource = aws_sqs_queue.cclf_provider_dlq.arn
     }]
   })
 }
@@ -129,14 +123,11 @@ resource "aws_sqs_queue_policy" "ccr_dlq_policy" {
     Version = "2012-10-17"
     Statement = [{
       Effect    = "Allow"
-      Principal = "*"
-      Action    = "sqs:SendMessage"
-      Resource  = aws_sqs_queue.ccr_provider_dlq.arn
-      Condition = {
-        ArnEquals = {
-          "aws:SourceArn" = aws_sqs_queue.ccr_provider_dlq.arn
-        }
+      Principal = {
+        Service = "lambda.amazonaws.com"
       }
+      Action   = "sqs:SendMessage"
+      Resource = aws_sqs_queue.ccr_provider_dlq.arn
     }]
   })
 }
@@ -148,14 +139,11 @@ resource "aws_sqs_queue_policy" "ccms_dlq_policy" {
     Version = "2012-10-17"
     Statement = [{
       Effect    = "Allow"
-      Principal = "*"
-      Action    = "sqs:SendMessage"
-      Resource  = aws_sqs_queue.ccms_provider_dlq.arn
-      Condition = {
-        ArnEquals = {
-          "aws:SourceArn" = aws_sqs_queue.ccms_provider_q.arn
-        }
+      Principal = {
+        Service = "lambda.amazonaws.com"
       }
+      Action   = "sqs:SendMessage"
+      Resource = aws_sqs_queue.ccms_provider_dlq.arn
     }]
   })
 }
