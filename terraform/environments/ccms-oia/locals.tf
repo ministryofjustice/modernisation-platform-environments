@@ -4,7 +4,7 @@
 
 locals {
   # AWS region (from data source)
-  aws_region = data.aws_region.current.name
+  aws_region = data.aws_region.current.id
 
   # Subnet CIDR blocks
   data_subnets_cidr_blocks = [
