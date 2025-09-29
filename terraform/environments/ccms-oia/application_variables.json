@@ -18,7 +18,8 @@
       "db_storage_gb": "50",
       "db_deletion_protection": "false",
       "logging_level_root": "info",
-      "db_log_retention_days": "7"
+      "db_log_retention_days": "7",
+      "cortex_deps_bucket_name": "ccms-oia-cortex-deps-${local.environment}"
     },
     "test": {
       "app_name": "ccms-oia",
@@ -38,7 +39,8 @@
       "db_storage_gb": "50",
       "db_deletion_protection": "false",
       "logging_level_root": "info",
-      "db_log_retention_days": "14"
+      "db_log_retention_days": "14",
+      "cortex_deps_bucket_name": "ccms-oia-cortex-deps-${local.environment}"
     },
     "preproduction": {
       "app_name": "ccms-oia",
@@ -58,7 +60,8 @@
       "db_storage_gb": "100",
       "db_deletion_protection": "true",
       "logging_level_root": "info",
-      "db_log_retention_days": "30"
+      "db_log_retention_days": "30",
+      "cortex_deps_bucket_name": "ccms-oia-cortex-deps-${local.environment}"
     },
     "production": {
       "app_name": "ccms-oia",
@@ -78,7 +81,8 @@
       "db_storage_gb": "200",
       "db_deletion_protection": "true",
       "logging_level_root": "warn",
-      "db_log_retention_days": "60"
+      "db_log_retention_days": "60",
+      "cortex_deps_bucket_name": "ccms-oia-cortex-deps-${local.environment}"
     }
   }
 }
