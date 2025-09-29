@@ -6,6 +6,7 @@ resource "aws_instance" "ec2_clamav" {
   monitoring                  = true
   ebs_optimized               = true
   associate_public_ip_address = false
+  iam_instance_profile        = aws_iam_instance_profile.iam_instace_profile_clamav.name
 
   # Due to a bug in terraform wanting to rebuild the ec2 if more than 1 ebs block is attached, we need the lifecycle clause below.
   lifecycle {
