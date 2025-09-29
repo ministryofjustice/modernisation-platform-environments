@@ -60,17 +60,30 @@ resource "aws_iam_policy" "bedrock_api_key_creator_policy" {
           "bedrock:DeleteApiKey",
           "bedrock:GetApiKey"
         ]
-        Resource = "*"
+        Resource = [
+          "arn:aws:bedrock:*:313941174580:api-key/*",
+          "arn:aws:bedrock:*:313941174580:*"
+        ]
       },
       {
         Sid    = "AllowListingPolicies"
         Effect = "Allow"
         Action = [
-          "iam:ListPolicies",
+          "iam:ListPolicies"
+        ]
+        Resource = "*"
+      },
+      {
+        Sid    = "AllowGettingPolicies"
+        Effect = "Allow"
+        Action = [
           "iam:GetPolicy",
           "iam:GetPolicyVersion"
         ]
-        Resource = "*"
+        Resource = [
+          "arn:aws:iam::313941174580:policy/*",
+          "arn:aws:iam::aws:policy/*"
+        ]
       }
     ]
   })
