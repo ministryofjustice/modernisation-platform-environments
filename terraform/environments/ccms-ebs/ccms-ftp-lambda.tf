@@ -96,17 +96,17 @@ resource "aws_s3_bucket_lifecycle_configuration" "buckets_lifecycle" {
   for_each = aws_s3_bucket.buckets
 
   bucket = each.value.id
-
+  
   rule {
-    id     = "expire-30-days"
+    id     = local.is-production ? "expire-90-days" : "expire-30-days"
     status = "Enabled"
 
     expiration {
-      days = 30
+      days = local.is-production ? 90 : 30
     }
 
     noncurrent_version_expiration {
-      noncurrent_days = 30
+      noncurrent_days = local.is-production ? 90 : 30
     }
   }
 }
