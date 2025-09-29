@@ -52,7 +52,6 @@ module "vpc_endpoints" {
         { Name = format("%s-s3-vpc-endpoint", local.application_name) }
       )
     }
-  }
   athena = {
       service         = "athena"
       service_type    = "Interface"
