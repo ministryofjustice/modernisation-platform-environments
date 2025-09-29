@@ -539,6 +539,41 @@ locals {
         Role = "Nimbus Application Services" }
       )
     }
+  }
+}
+
+#trivy:ignore:AVD-AWS-0028: "IMDSv2 enforced at the aws_instance level instead of LT"
+module "win2022_STD_multiple" {
+  source = "./ec2-instance-module"
+
+
+  for_each = local.win2022_STD_instances
+
+  name                   = "${local.name}-${each.key}"
+  ami                    = "ami-088bb7db420bf535c"
+  instance_type          = each.value.instance_type
+  vpc_security_group_ids = each.value.vpc_security_group_ids
+  subnet_id              = each.value.subnet_id
+  monitoring             = true
+  ebs_optimized          = true
+  key_name               = aws_key_pair.windowskey.key_name
+  user_data              = data.template_file.windows-userdata.rendered
+  iam_instance_profile   = aws_iam_instance_profile.instance-profile-moj.name
+
+  enable_volume_tags = false
+  root_block_device  = lookup(each.value, "root_block_device", [])
+  ebs_block_device   = lookup(each.value, "ebs_block_device", [])
+  metadata_options = lookup(each.value, "metadata_options", null)
+
+  tags = merge(each.value.tags, local.tags, {
+    Environment = "development"
+    terraform_managed = "true" },
+    { instance-scheduling = local.application_data.accounts[local.environment].instance-scheduling }
+  )
+}
+
+locals {
+  win2022_STD_Datacenter_instances = {
     COR-A-DC03 = {
       instance_type          = "t3a.xlarge"
       subnet_id              = data.aws_subnet.private_subnets_a.id
@@ -732,15 +767,13 @@ locals {
   }
 }
 
-#trivy:ignore:AVD-AWS-0028: "IMDSv2 enforced at the aws_instance level instead of LT"
-module "win2022_STD_multiple" {
+module "win2022_STD_Datacenter" {
   source = "./ec2-instance-module"
 
-
-  for_each = local.win2022_STD_instances
+  for_each = local.win2022_STD_Datacenter_instances
 
   name                   = "${local.name}-${each.key}"
-  ami                    = "ami-088bb7db420bf535c"
+  ami                    = data.aws_ami.windows_2022_std_ami.id
   instance_type          = each.value.instance_type
   vpc_security_group_ids = each.value.vpc_security_group_ids
   subnet_id              = each.value.subnet_id
@@ -762,6 +795,7 @@ module "win2022_STD_multiple" {
   )
 }
 
+################################################################################
 
 locals {
   win2022_STD_powerBI_instances = {
