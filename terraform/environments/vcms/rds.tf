@@ -4,7 +4,7 @@ locals {
 }
 
 data "aws_db_snapshot" "shared_snapshot" {
-  db_snapshot_identifier = "rds-vcmsdev-db-backup-2025-09-26-14-04-mpcp"
+  db_snapshot_identifier = "arn:aws:rds:eu-west-2:356676313489:snapshot:rds-vcmsdev-db-backup-2025-09-26-14-04-mpcp"
   include_shared         = true
 }
 
