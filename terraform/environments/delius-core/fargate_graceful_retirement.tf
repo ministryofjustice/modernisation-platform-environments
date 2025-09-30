@@ -1,10 +1,8 @@
 locals {
   # Restart schedules for envs, testing for dev only now
   fargate_restart_schedules = {
-    development = {
-      day  = "MONDAY"
-      time = "22:00"
-    }
+    development = { day = "TUESDAY", time = "22:00" }
+    test        = { day = "TUESDAY", time = "22:00" }
   }
 
   # Debug logging control per environment
