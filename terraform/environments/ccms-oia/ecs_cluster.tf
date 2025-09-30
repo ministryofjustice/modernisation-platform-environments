@@ -1,5 +1,5 @@
 #######################################
-# ECS Cluster and Task Definition
+# ECS Cluster and Service for OIA
 #######################################
 
 # Capacity Provider
@@ -43,16 +43,16 @@ resource "aws_ecs_task_definition" "oia" {
   container_definitions = templatefile(
     "${path.module}/templates/task_definition_oia.json.tpl",
     {
-      app_name          = local.application_name
-      app_image         = local.application_data.accounts[local.environment].app_image
+      app_name         = local.application_name
+      app_image        = local.application_data.accounts[local.environment].app_image
       container_version = local.application_data.accounts[local.environment].container_version
-      aws_region        = local.application_data.accounts[local.environment].aws_region
-      app_port          = local.application_data.accounts[local.environment].app_port
-      spring_profiles   = local.application_data.accounts[local.environment].spring_profiles_active
-      db_username       = local.application_data.accounts[local.environment].spring_datasource_username
-      db_password       = aws_secretsmanager_secret.spring_datasource_password.arn
-      db_url            = aws_db_instance.oia_db.endpoint   # ✅ switched to MySQL DB
-      logging_level     = local.application_data.accounts[local.environment].logging_level_root
+      aws_region       = local.application_data.accounts[local.environment].aws_region
+      app_port         = local.application_data.accounts[local.environment].app_port
+      spring_profiles  = local.application_data.accounts[local.environment].spring_profiles_active
+      db_username      = local.application_data.accounts[local.environment].spring_datasource_username
+      db_password      = aws_secretsmanager_secret.oia_db_password.arn   # ✅ updated secret
+      db_url           = aws_db_instance.oia_db.address                  # ✅ MySQL RDS endpoint
+      logging_level    = local.application_data.accounts[local.environment].logging_level_root
     }
   )
 

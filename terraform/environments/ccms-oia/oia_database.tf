@@ -30,10 +30,10 @@ resource "aws_db_instance" "oia_db" {
 
   db_name                 = "oia"
   username                = local.application_data.accounts[local.environment].spring_datasource_username
-  password                = aws_secretsmanager_secret.spring_datasource_password.arn
+  password                = data.aws_secretsmanager_secret_version.oia_db_password.secret_string
   port                    = 3306
 
-  vpc_security_group_ids  = [aws_security_group.tds_db.id]
+  vpc_security_group_ids  = [aws_security_group.oia_db.id]
   db_subnet_group_name    = aws_db_subnet_group.oia_db_subnets.name
 
   backup_retention_period = 7

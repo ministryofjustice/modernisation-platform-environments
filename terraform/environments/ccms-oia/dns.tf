@@ -1,9 +1,10 @@
 # DNS Configuration
 
+# Route53 record for OIA ALB
 resource "aws_route53_record" "route53_record_oia" {
   provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.external.zone_id
-  name     = local.application_name
+  name     = "${local.application_name}-${local.environment}"
   type     = "A"
 
   alias {

@@ -1,4 +1,7 @@
+#######################################
 # ECS Task Execution Role
+#######################################
+
 data "aws_iam_policy_document" "ecs_task_execution_role" {
   version = "2012-10-17"
   statement {
@@ -13,7 +16,7 @@ data "aws_iam_policy_document" "ecs_task_execution_role" {
 }
 
 resource "aws_iam_role" "ecs_task_execution_role" {
-  name               = "${local.application_name}-WorldTaskExecutionRole"
+  name               = "${local.application_name}-ecs-task-execution-role"
   assume_role_policy = data.aws_iam_policy_document.ecs_task_execution_role.json
 
   tags = merge(local.tags,
@@ -26,9 +29,12 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_role" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
+#######################################
 # ECS Secrets Manager Policy
+#######################################
+
 resource "aws_iam_policy" "ecs_secrets_policy" {
-  name = "${local.application_name}-ecs-secrets-policy"
+  name = "${local.application_name}-${local.environment}-ecs-secrets-policy"
 
   policy = <<EOF
 {
@@ -36,8 +42,11 @@ resource "aws_iam_policy" "ecs_secrets_policy" {
   "Statement": [
     {
       "Effect": "Allow",
-      "Action": ["secretsmanager:GetSecretValue"],
-      "Resource": ["arn:aws:secretsmanager:eu-west-2:*:secret:ccms/oia*"]
+      "Action": [
+        "secretsmanager:GetSecretValue",
+        "secretsmanager:DescribeSecret"
+      ],
+      "Resource": "${aws_secretsmanager_secret.oia_db_password.arn}"
     }
   ]
 }
@@ -49,7 +58,10 @@ resource "aws_iam_role_policy_attachment" "ecs_secrets_policy_attachment" {
   policy_arn = aws_iam_policy.ecs_secrets_policy.arn
 }
 
+#######################################
 # EC2 Instance Role + Profile
+#######################################
+
 resource "aws_iam_instance_profile" "ec2_instance_profile" {
   name = "${local.application_name}-ec2-instance-profile"
   role = aws_iam_role.ec2_instance_role.name
@@ -145,36 +157,4 @@ EOF
 resource "aws_iam_role_policy_attachment" "attach_ec2_policy" {
   role       = aws_iam_role.ec2_instance_role.name
   policy_arn = aws_iam_policy.ec2_instance_policy.arn
-}
-
-# Cortex S3 bucket access (production only)
-resource "aws_iam_policy" "s3_policy_cortex_deps" {
-  count       = local.is-production ? 1 : 0
-  name        = "${local.application_data.accounts[local.environment].app_name}-s3-policy-cortex-deps"
-  description = "${local.application_data.accounts[local.environment].app_name} s3-policy-cortex-deps"
-
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": [
-        "s3:ListBucket",
-        "s3:GetObject"
-      ],
-      "Resource": [
-        "arn:aws:s3:::${local.application_data.accounts[local.environment].cortex_deps_bucket_name}/*",
-        "arn:aws:s3:::${local.application_data.accounts[local.environment].cortex_deps_bucket_name}"
-      ]
-    }
-  ]
-}
-EOF
-}
-
-resource "aws_iam_role_policy_attachment" "s3_policy_cortex_deps" {
-  count      = local.is-production ? 1 : 0
-  role       = aws_iam_role.ec2_instance_role.name
-  policy_arn = aws_iam_policy.s3_policy_cortex_deps[0].arn
 }

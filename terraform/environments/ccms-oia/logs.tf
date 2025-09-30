@@ -1,30 +1,43 @@
-# Set up CloudWatch group and log stream and retain logs for 30 days
-resource "aws_cloudwatch_log_group" "log_group_edrms" {
+#######################################
+# CloudWatch Log Groups for OIA
+#######################################
+
+# ECS Application Logs
+resource "aws_cloudwatch_log_group" "ecs" {
   name              = "${local.application_name}-ecs"
   retention_in_days = 30
 
   tags = merge(local.tags,
-    { Name = lower(format("%s-%s-logs", local.application_name, local.environment)) }
+    { Name = lower(format("%s-%s-ecs-logs", local.application_name, local.environment)) }
   )
 }
 
-resource "aws_cloudwatch_log_stream" "log_stream_edrms" {
-  name           = "${local.application_name}-log-stream"
-  log_group_name = aws_cloudwatch_log_group.log_group_edrms.name
-}
-
-#--RDS
+# RDS Logs - Alert
 resource "aws_cloudwatch_log_group" "rds_alert" {
-  name              = "/aws/rds/instance/oracle-db/alert"
+  name              = "${local.application_name}-rds-alert"
   retention_in_days = local.application_data.accounts[local.environment].db_log_retention_days
+
+  tags = merge(local.tags,
+    { Name = lower(format("%s-%s-rds-alert-logs", local.application_name, local.environment)) }
+  )
 }
 
+# RDS Logs - Audit
 resource "aws_cloudwatch_log_group" "rds_audit" {
-  name              = "/aws/rds/instance/oracle-db/audit"
+  name              = "${local.application_name}-rds-audit"
   retention_in_days = local.application_data.accounts[local.environment].db_log_retention_days
+
+  tags = merge(local.tags,
+    { Name = lower(format("%s-%s-rds-audit-logs", local.application_name, local.environment)) }
+  )
 }
 
+# RDS Logs - Listener
 resource "aws_cloudwatch_log_group" "rds_listener" {
-  name              = "/aws/rds/instance/oracle-db/listener"
+  name              = "${local.application_name}-rds-listener"
   retention_in_days = local.application_data.accounts[local.environment].db_log_retention_days
+
+  tags = merge(local.tags,
+    { Name = lower(format("%s-%s-rds-listener-logs", local.application_name, local.environment)) }
+  )
 }

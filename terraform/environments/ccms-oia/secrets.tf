@@ -1,13 +1,13 @@
 #### This file stores secrets specific to the ccms-oia member account ####
 
 # Database password secret
-resource "aws_secretsmanager_secret" "spring_datasource_password" {
+resource "aws_secretsmanager_secret" "oia_db_password" {
   name        = "ccms/oia/mysql/password"
   description = "OIA MySQL database password for CCMS OIA application"
 }
 
-data "aws_secretsmanager_secret_version" "spring_datasource_password" {
-  secret_id = aws_secretsmanager_secret.spring_datasource_password.id
+data "aws_secretsmanager_secret_version" "oia_db_password" {
+  secret_id = aws_secretsmanager_secret.oia_db_password.id
 }
 
 # Slack Channel ID for Alerts

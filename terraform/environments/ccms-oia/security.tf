@@ -1,4 +1,6 @@
-### Load Balancer Security Group
+#######################################
+# Load Balancer Security Group
+#######################################
 
 resource "aws_security_group" "load_balancer" {
   name_prefix = "${local.application_name}-load-balancer-sg"
@@ -17,25 +19,22 @@ resource "aws_security_group_rule" "alb_ingress_443" {
   protocol          = "TCP"
   from_port         = 443
   to_port           = 443
-  cidr_blocks       = [
-    data.aws_subnet.private_subnets_a.cidr_block,
-    data.aws_subnet.private_subnets_b.cidr_block,
-    data.aws_subnet.private_subnets_c.cidr_block
-  ]
+  cidr_blocks       = local.private_subnets_cidr_blocks
 }
 
 resource "aws_security_group_rule" "alb_egress_all" {
   security_group_id = aws_security_group.load_balancer.id
   type              = "egress"
-  description       = "All"
+  description       = "All outbound"
   protocol          = -1
   from_port         = 0
   to_port           = 0
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
-
-### Container Security Group
+#######################################
+# Container Security Group
+#######################################
 
 resource "aws_security_group" "ecs_tasks_oia" {
   name_prefix = "${local.application_name}-ecs-tasks-security-group"
@@ -60,19 +59,20 @@ resource "aws_security_group_rule" "ecs_tasks_oia_ingress" {
 resource "aws_security_group_rule" "ecs_tasks_oia_egress_all" {
   security_group_id = aws_security_group.ecs_tasks_oia.id
   type              = "egress"
-  description       = "All"
+  description       = "All outbound"
   protocol          = -1
   from_port         = 0
   to_port           = 0
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
-
-### EC2 Instances Security Group
+#######################################
+# EC2 Instances Security Group
+#######################################
 
 resource "aws_security_group" "cluster_ec2" {
   name        = "${local.application_name}-cluster-ec2-security-group"
-  description = "Controls access to the cluster ec2 instance"
+  description = "Controls access to the cluster EC2 instances"
   vpc_id      = data.aws_vpc.shared.id
 
   tags = merge(local.tags,
@@ -93,7 +93,7 @@ resource "aws_security_group_rule" "cluster_ec2_ingress_22" {
 resource "aws_security_group_rule" "cluster_ec2_ingress_lb" {
   security_group_id        = aws_security_group.cluster_ec2.id
   type                     = "ingress"
-  description              = "Application Traffic from LB"
+  description              = "Traffic from ALB"
   protocol                 = "TCP"
   from_port                = 0
   to_port                  = 65535
@@ -103,46 +103,41 @@ resource "aws_security_group_rule" "cluster_ec2_ingress_lb" {
 resource "aws_security_group_rule" "cluster_ec2_egress_all" {
   security_group_id = aws_security_group.cluster_ec2.id
   type              = "egress"
-  description       = "All Egress"
+  description       = "All outbound"
   protocol          = -1
   from_port         = 0
   to_port           = 0
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
+#######################################
+# RDS Security Group
+#######################################
 
-### RDS Security Group
-
-resource "aws_security_group" "tds_db" {
-  name        = "${local.application_name}-tds-allow-db"
-  description = "Allow DB inbound traffic"
+resource "aws_security_group" "oia_db" {
+  name        = "${local.application_name}-mysql-db"
+  description = "Allow MySQL DB inbound traffic"
   vpc_id      = data.aws_vpc.shared.id
+
+  tags = merge(local.tags,
+    { Name = lower(format("%s-%s-mysql-sg", local.application_name, local.environment)) }
+  )
 }
 
-resource "aws_vpc_security_group_ingress_rule" "tds_db_ingress" {
-  count             = length(local.private_subnets_cidr_blocks)
-  security_group_id = aws_security_group.tds_db.id
-  description       = "Database Ingress"
-  ip_protocol       = "TCP"
-  from_port         = 1521
-  to_port           = 1521
-  cidr_ipv4         = local.private_subnets_cidr_blocks[count.index]
+resource "aws_security_group_rule" "oia_db_ingress" {
+  security_group_id        = aws_security_group.oia_db.id
+  type                     = "ingress"
+  description              = "MySQL access from ECS tasks"
+  protocol                 = "TCP"
+  from_port                = 3306
+  to_port                  = 3306
+  source_security_group_id = aws_security_group.ecs_tasks_oia.id
 }
 
-# Removed aws_workspace (not in JSON) → allow private subnets instead
-resource "aws_vpc_security_group_ingress_rule" "tds_db_workspace_ingress" {
-  security_group_id = aws_security_group.tds_db.id
-  description       = "Workspace/Private Subnets to Database Ingress"
-  ip_protocol       = "TCP"
-  from_port         = 1521
-  to_port           = 1521
-  cidr_ipv4         = local.private_subnets_cidr_blocks[0] # first subnet only
-}
-
-resource "aws_security_group_rule" "tds_db_egress_all" {
-  security_group_id = aws_security_group.tds_db.id
+resource "aws_security_group_rule" "oia_db_egress_all" {
+  security_group_id = aws_security_group.oia_db.id
   type              = "egress"
-  description       = "All Egress"
+  description       = "All outbound"
   protocol          = -1
   from_port         = 0
   to_port           = 0
