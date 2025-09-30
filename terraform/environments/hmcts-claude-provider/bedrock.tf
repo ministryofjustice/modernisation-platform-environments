@@ -10,8 +10,6 @@ resource "aws_iam_policy" "bedrock_claude_policy" {
         Action = [
           "bedrock:InvokeModel",
           "bedrock:InvokeModelWithResponseStream",
-          "bedrock:CreateInferenceProfile",
-          "bedrock:DeleteInferenceProfile",
           "bedrock:GetInferenceProfile",
           "bedrock:ListInferenceProfiles",
           "bedrock:Get*",
@@ -24,6 +22,15 @@ resource "aws_iam_policy" "bedrock_claude_policy" {
           "arn:aws:bedrock:eu-west-2::inference-profile/eu.anthropic.claude-3-7-sonnet-20250219-v1:0",
           "arn:aws:bedrock:eu-west-2::inference-profile/hmcts-claude-sonnet-4-5-eu-west-2"
         ]
+      },
+      {
+        Sid    = "BedrockInferenceProfileManagement",
+        Effect = "Allow",
+        Action = [
+          "bedrock:CreateInferenceProfile",
+          "bedrock:DeleteInferenceProfile"
+        ],
+        Resource = "arn:aws:bedrock:eu-west-2::foundation-model/anthropic.claude-sonnet-4-5-20250929-v1:0"
       }
     ]
   })

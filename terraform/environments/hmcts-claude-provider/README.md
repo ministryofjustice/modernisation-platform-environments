@@ -1,9 +1,87 @@
-# Service Runbook
+# HMCTS Claude Provider
 
-<!-- This is a template that should be populated by the development team when moving to the modernisation platform, but also reviewed and kept up to date.
-To ensure that people looking at your runbook can get the information they need quickly, your runbook should be short but clear. Throughout, only use acronyms if you’re confident that someone who has just been woken up at 3am would understand them. -->
+This environment provides AWS Bedrock access for Claude AI models in the eu-west-2 (London) region.
 
-_If you have any questions surrounding this page please post in the `#team-name` channel._
+## AWS Bedrock Setup
+
+This environment is configured to use AWS Bedrock with Claude models. The following manual setup steps are required:
+
+### 1. Create Bedrock API Key
+
+The Terraform creates the necessary IAM policies and roles, but you need to manually create the Bedrock API key user:
+
+```bash
+# Assume the BedrockAPIKeyCreator role (created by Terraform)
+aws sts assume-role \
+  --role-arn arn:aws:iam::313941174580:role/BedrockAPIKeyCreator \
+  --role-session-name bedrock-key-creation \
+  --profile hmcts-claude-provider-development
+
+# Setup the profile in your AWS CLI config
+aws configure set profile.hmcts-claude-provider-development.region eu-west-2
+aws configure set profile.hmcts-claude-provider-development.source_profile default
+
+# Create the Bedrock API key via AWS IAM
+aws iam create-service-specific-credential \
+  --user-name BedrockAPIKey-hmcts-claude \
+  --service-name bedrock.amazonaws.com \
+  --profile hmcts-claude-provider-development \
+  --region eu-west-2
+
+# Save the returned ServiceSpecificCredentialId and ServicePassword
+```
+
+### 2. Create Application Inference Profile
+
+To ensure all requests stay in eu-west-2 (avoiding SCP restrictions in other regions), create a custom inference profile:
+
+```bash
+aws bedrock create-inference-profile \
+  --region eu-west-2 \
+  --profile hmcts-claude-provider-development \
+  --inference-profile-name hmcts-claude-sonnet-4-5-eu-west-2 \
+  --model-source '{"copyFrom":"arn:aws:bedrock:eu-west-2::foundation-model/anthropic.claude-sonnet-4-5-20250929-v1:0"}'
+```
+
+The inference profile ID will be `hmcts-claude-sonnet-4-5-eu-west-2` (the name you specified).
+
+### 3. Configure Claude Code
+
+Create a `claude.sh` script to configure Claude Code for Bedrock:
+
+```bash
+#!/usr/bin/env bash
+
+export CLAUDE_CODE_MAX_OUTPUT_TOKENS=4096
+export MAX_THINKING_TOKENS=1024
+export ANTHROPIC_MODEL='arn:aws:bedrock:eu-west-2:313941174580:application-inference-profile/hmcts-claude-sonnet-4-5-eu-west-2'
+export AWS_BEARER_TOKEN_BEDROCK='<your-bedrock-api-key>'    # From step 1
+export AWS_REGION=eu-west-2
+export CLAUDE_CODE_USE_BEDROCK=1
+
+claude
+```
+
+Make it executable and run:
+
+```bash
+chmod +x claude.sh
+./claude.sh
+```
+
+## Available Models
+
+- **Claude Sonnet 4.5**: `anthropic.claude-sonnet-4-5-20250929-v1:0`
+- **Claude Sonnet 3.7**: `anthropic.claude-3-7-sonnet-20250219-v1:0`
+- **Claude Sonnet 3**: `anthropic.claude-3-sonnet-20240229-v1:0`
+- **Claude Haiku 3**: `anthropic.claude-3-haiku-20240307-v1:0`
+
+## Troubleshooting
+
+### SCP Denied Errors
+
+If you get "explicit deny in a service control policy" errors, ensure you're using the custom inference profile (`hmcts-claude-sonnet-4-5-eu-west-2`) rather than the system-defined regional profiles (e.g., `eu.anthropic.claude-*`). The custom profile ensures all requests stay in eu-west-2.
+
 
 ## Mandatory Information
 
