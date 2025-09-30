@@ -1,6 +1,6 @@
 # HMCTS Claude Provider
 
-This environment provides AWS Bedrock access for Claude AI models in the eu-west-2 (London) region.
+This environment provides AWS Bedrock access for Claude AI models in the eu-west-1 (Ireland) region.
 
 ## AWS Bedrock Setup
 
@@ -45,17 +45,17 @@ aws iam create-service-specific-credential \
 
 ### 2. Create Application Inference Profile
 
-To ensure all requests stay in eu-west-2 (avoiding SCP restrictions in other regions), create a custom inference profile:
+To ensure all requests stay in eu-west-1 (avoiding SCP restrictions in other regions), create a custom inference profile:
 
 ```bash
 aws bedrock create-inference-profile \
-  --region eu-west-2 \
+  --region eu-west-1 \
   --profile hmcts-claude-provider-development \
-  --inference-profile-name hmcts-claude-sonnet-4-5-eu-west-2 \
-  --model-source '{"copyFrom":"arn:aws:bedrock:eu-west-2::foundation-model/anthropic.claude-sonnet-4-5-20250929-v1:0"}'
+  --inference-profile-name hmcts-claude-sonnet-4-5-ireland \
+  --model-source '{"copyFrom":"arn:aws:bedrock:eu-west-1::foundation-model/anthropic.claude-sonnet-4-5-20250929-v1:0"}'
 ```
 
-The inference profile ID will be `hmcts-claude-sonnet-4-5-eu-west-2` (the name you specified).
+Save the returned `inferenceProfileArn` - you'll need it for Claude Code configuration.
 
 ### 3. Configure Claude Code
 
@@ -66,12 +66,12 @@ Create a `claude.sh` script to configure Claude Code for Bedrock:
 
 export CLAUDE_CODE_MAX_OUTPUT_TOKENS=4096
 export MAX_THINKING_TOKENS=1024
-export ANTHROPIC_MODEL='arn:aws:bedrock:eu-west-2:313941174580:application-inference-profile/hmcts-claude-sonnet-4-5-eu-west-2'
-export AWS_BEARER_TOKEN_BEDROCK='<your-bedrock-api-key>'    # From step 1
-export AWS_REGION=eu-west-2
+export ANTHROPIC_MODEL='<inference-profile-arn-from-step-2>'  # e.g., arn:aws:bedrock:eu-west-1:313941174580:application-inference-profile/abc123
+export AWS_BEARER_TOKEN_BEDROCK='<your-bedrock-api-key>'     # From step 1
+export AWS_REGION=eu-west-1
 export CLAUDE_CODE_USE_BEDROCK=1
 
-claude
+claude --dangerously-skip-permissions
 ```
 
 Make it executable and run:
@@ -92,7 +92,7 @@ chmod +x claude.sh
 
 ### SCP Denied Errors
 
-If you get "explicit deny in a service control policy" errors, ensure you're using the custom inference profile (`hmcts-claude-sonnet-4-5-eu-west-2`) rather than the system-defined regional profiles (e.g., `eu.anthropic.claude-*`). The custom profile ensures all requests stay in eu-west-2.
+If you get "explicit deny in a service control policy" errors, ensure you're using the custom application inference profile rather than the system-defined regional profiles (e.g., `eu.anthropic.claude-*`). The custom profile ensures all requests stay in eu-west-1.
 
 
 ## Mandatory Information
