@@ -20,7 +20,7 @@ resource "aws_iam_policy" "bedrock_claude_policy" {
           "arn:aws:bedrock:eu-west-2::foundation-model/anthropic.claude-3-7-sonnet-20250219-v1:0",
           "arn:aws:bedrock:eu-west-2::inference-profile/eu.anthropic.claude-sonnet-4-5-20250929-v1:0",
           "arn:aws:bedrock:eu-west-2::inference-profile/eu.anthropic.claude-3-7-sonnet-20250219-v1:0",
-          "arn:aws:bedrock:eu-west-2::inference-profile/hmcts-claude-sonnet-4-5-eu-west-2"
+          "arn:aws:bedrock:eu-west-2:313941174580:application-inference-profile/hoca5fxn3xen"
         ]
       },
       {
