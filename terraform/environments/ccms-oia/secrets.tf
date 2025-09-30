@@ -2,8 +2,8 @@
 
 # Database password secret
 resource "aws_secretsmanager_secret" "spring_datasource_password" {
-  name        = "ccms/oia/datasource"
-  description = "OIA TDS database password for CCMS OIA application"
+  name        = "ccms/oia/mysql/password"
+  description = "OIA MySQL database password for CCMS OIA application"
 }
 
 data "aws_secretsmanager_secret_version" "spring_datasource_password" {

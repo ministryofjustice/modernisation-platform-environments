@@ -1,3 +1,7 @@
+#######################################
+# ECS Cluster and Task Definition
+#######################################
+
 # Capacity Provider
 resource "aws_ecs_capacity_provider" "capacity_provider" {
   name = "${local.application_name}-capacity-provider"
@@ -28,9 +32,9 @@ resource "aws_ecs_cluster_capacity_providers" "main" {
 
 # ECS Task Definition
 resource "aws_ecs_task_definition" "oia" {
-  family             = "${local.application_name}-task"
-  execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
-  network_mode       = "bridge"
+  family                   = "${local.application_name}-task"
+  execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
+  network_mode             = "bridge"
   requires_compatibilities = ["EC2"]
 
   cpu    = local.application_data.accounts[local.environment].container_cpu
@@ -39,16 +43,16 @@ resource "aws_ecs_task_definition" "oia" {
   container_definitions = templatefile(
     "${path.module}/templates/task_definition_oia.json.tpl",
     {
-      app_name      = local.application_name
-      app_image     = local.application_data.accounts[local.environment].app_image
+      app_name          = local.application_name
+      app_image         = local.application_data.accounts[local.environment].app_image
       container_version = local.application_data.accounts[local.environment].container_version
-      aws_region    = local.application_data.accounts[local.environment].aws_region
-      app_port      = local.application_data.accounts[local.environment].app_port
-      spring_profiles = local.application_data.accounts[local.environment].spring_profiles_active
-      db_username   = local.application_data.accounts[local.environment].spring_datasource_username
-      db_password   = aws_secretsmanager_secret.spring_datasource_password.arn
-      db_url        = aws_db_instance.tds_db.endpoint
-      logging_level = local.application_data.accounts[local.environment].logging_level_root
+      aws_region        = local.application_data.accounts[local.environment].aws_region
+      app_port          = local.application_data.accounts[local.environment].app_port
+      spring_profiles   = local.application_data.accounts[local.environment].spring_profiles_active
+      db_username       = local.application_data.accounts[local.environment].spring_datasource_username
+      db_password       = aws_secretsmanager_secret.spring_datasource_password.arn
+      db_url            = aws_db_instance.oia_db.endpoint   # ✅ switched to MySQL DB
+      logging_level     = local.application_data.accounts[local.environment].logging_level_root
     }
   )
 

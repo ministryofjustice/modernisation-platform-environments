@@ -27,7 +27,7 @@
       },
       {
         "name": "SPRING_DATASOURCE_URL",
-        "value": "jdbc:oracle:thin:@${db_url}/OIATDS"
+        "value": "jdbc:mysql://${db_url}:3306/oia"
       },
       {
         "name": "LOGGING_LEVEL_ROOT",

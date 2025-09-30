@@ -1,61 +1,45 @@
-resource "aws_db_subnet_group" "tds" {
-  name       = "${local.application_name}-tds-subnet-group"
-  subnet_ids = data.aws_subnets.shared-data.ids
-}
+#######################################
+# RDS MySQL Instance for OIA
+#######################################
 
-resource "aws_db_option_group" "tds_oracle_19" {
-  name_prefix          = "${local.application_name}-tds-db-option-group"
-  engine_name          = "oracle-se2"
-  major_engine_version = "19"
-
-  option {
-    option_name = "S3_INTEGRATION"
-    port        = 0
-    version     = "1.0"
-  }
-}
-
-resource "aws_db_instance" "tds_db" {
-  identifier                          = "${local.application_name}-tds-db"
-  allocated_storage                   = local.application_data.accounts[local.environment].db_storage_gb
-  auto_minor_version_upgrade          = true
-  storage_type                        = "gp2"
-  engine                              = "oracle-se2"
-  engine_version                      = "19.0.0.0.ru-2025-04.rur-2025-04.r1"
-  instance_class                      = local.application_data.accounts[local.environment].db_instance_type
-  multi_az                            = false # JSON has no key, so default
-  db_name                             = "OIATDS"
-  username                            = local.application_data.accounts[local.environment].db_username
-  password                            = data.aws_secretsmanager_secret_version.spring_datasource_password.secret_string
-  port                                = "1521"
-  kms_key_id                          = data.aws_kms_key.rds_shared.arn
-  storage_encrypted                   = true
-  skip_final_snapshot                 = true
-  iam_database_authentication_enabled = false
-  vpc_security_group_ids              = [aws_security_group.tds_db.id]
-  backup_retention_period             = 30
-  maintenance_window                  = "Mon:00:00-Mon:03:00"
-  backup_window                       = "03:00-06:00"
-  character_set_name                  = "AL32UTF8"
-  deletion_protection                 = local.application_data.accounts[local.environment].db_deletion_protection
-  db_subnet_group_name                = aws_db_subnet_group.tds.id
-  option_group_name                   = aws_db_option_group.tds_oracle_19.id
-  license_model                       = "bring-your-own-license"
-
-  tags = merge(
-    local.tags,
-    { instance-scheduling = "skip-scheduling" }
-  )
-
-  enabled_cloudwatch_logs_exports = [
-    "alert",
-    "audit",
-    "listener"
+resource "aws_db_subnet_group" "oia_db_subnets" {
+  name       = "${local.application_name}-${local.environment}-db-subnet-group"
+  subnet_ids = [
+    data.aws_subnet.private_subnets_a.id,
+    data.aws_subnet.private_subnets_b.id,
+    data.aws_subnet.private_subnets_c.id
   ]
 
-  timeouts {
-    create = "40m"
-    delete = "40m"
-    update = "80m"
-  }
+  tags = merge(local.tags, {
+    Name = "${local.application_name}-${local.environment}-db-subnet-group"
+  })
+}
+
+resource "aws_db_instance" "oia_db" {
+  identifier              = "${local.application_name}-${local.environment}-db"
+  engine                  = "mysql"
+  engine_version          = "8.0"
+  instance_class          = local.application_data.accounts[local.environment].db_instance_type
+  allocated_storage       = local.application_data.accounts[local.environment].db_storage_gb
+  max_allocated_storage   = 100
+  storage_encrypted       = true
+  deletion_protection     = local.application_data.accounts[local.environment].db_deletion_protection
+  skip_final_snapshot     = true
+  multi_az                = false
+  publicly_accessible     = false
+
+  db_name                 = "oia"
+  username                = local.application_data.accounts[local.environment].spring_datasource_username
+  password                = aws_secretsmanager_secret.spring_datasource_password.arn
+  port                    = 3306
+
+  vpc_security_group_ids  = [aws_security_group.tds_db.id]
+  db_subnet_group_name    = aws_db_subnet_group.oia_db_subnets.name
+
+  backup_retention_period = 7
+  storage_type            = "gp3"
+
+  tags = merge(local.tags, {
+    Name = "${local.application_name}-${local.environment}-db"
+  })
 }
