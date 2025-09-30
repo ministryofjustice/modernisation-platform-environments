@@ -47,7 +47,12 @@ resource "aws_iam_policy" "bedrock_api_key_creator_policy" {
           "iam:ListUserPolicies",
           "iam:AttachUserPolicy",
           "iam:DetachUserPolicy",
-          "iam:ListAttachedUserPolicies"
+          "iam:ListAttachedUserPolicies",
+          "iam:CreateServiceSpecificCredential",
+          "iam:DeleteServiceSpecificCredential",
+          "iam:ListServiceSpecificCredentials",
+          "iam:ResetServiceSpecificCredential",
+          "iam:UpdateServiceSpecificCredential"
         ]
         Resource = "arn:aws:iam::313941174580:user/BedrockAPIKey-*"
       },
