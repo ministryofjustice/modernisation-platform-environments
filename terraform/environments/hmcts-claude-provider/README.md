@@ -8,27 +8,28 @@ This environment is configured to use AWS Bedrock with Claude models. The follow
 
 ### 1. Create Bedrock API Key
 
-The Terraform creates the necessary IAM policies and roles, but you need to manually create the Bedrock API key user:
+The Terraform creates the necessary IAM policies and roles, including a `BedrockAPIKeyCreator` role. Use this role to create the Bedrock API key:
 
 ```bash
-# Assume the BedrockAPIKeyCreator role (created by Terraform)
+# 1. Assume the BedrockAPIKeyCreator role
 aws sts assume-role \
-  --role-arn arn:aws:iam::313941174580:role/BedrockAPIKeyCreator \
-  --role-session-name bedrock-key-creation \
+  --role-arn "arn:aws:iam::313941174580:role/BedrockAPIKeyCreator" \
+  --role-session-name "create-bedrock-key" \
   --profile hmcts-claude-provider-development
 
-# Setup the profile in your AWS CLI config
-aws configure set profile.hmcts-claude-provider-development.region eu-west-2
-aws configure set profile.hmcts-claude-provider-development.source_profile default
+# 2. Export the credentials returned from the above command
+export AWS_ACCESS_KEY_ID="<AccessKeyId from output>"
+export AWS_SECRET_ACCESS_KEY="<SecretAccessKey from output>"
+export AWS_SESSION_TOKEN="<SessionToken from output>"
 
-# Create the Bedrock API key via AWS IAM
+# 3. Create the service-specific credential for Bedrock (30-day expiration)
 aws iam create-service-specific-credential \
   --user-name BedrockAPIKey-hmcts-claude \
   --service-name bedrock.amazonaws.com \
-  --profile hmcts-claude-provider-development \
-  --region eu-west-2
+  --credential-age-days 30
 
-# Save the returned ServiceSpecificCredentialId and ServicePassword
+# 4. Save the returned 'ServicePassword' - this is your AWS_BEARER_TOKEN_BEDROCK
+# Note: The password is only shown once and cannot be retrieved again
 ```
 
 ### 2. Create Application Inference Profile
