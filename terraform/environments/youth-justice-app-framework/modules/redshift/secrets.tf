@@ -70,7 +70,7 @@ resource "aws_secretsmanager_secret" "yjb_schedular" {
   kms_key_id  = var.kms_key_arn
 }
 
-resource "aws_secretsmanager_secret_version" "yjb_publish" {
+resource "aws_secretsmanager_secret_version" "yjb_schedular" {
   secret_id = aws_secretsmanager_secret.yjb_publish.id
   secret_string = jsonencode({
     username = "yjb_schedular"
