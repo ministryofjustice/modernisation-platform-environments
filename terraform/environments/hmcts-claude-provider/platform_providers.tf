@@ -44,7 +44,7 @@ provider "aws" {
   default_tags { tags = local.tags }
 }
 
-# Provider for creating resources in us-east-1, eg ACM resources for CloudFront, Bedrock resources
+# Provider for creating resources in us-east-1, eg ACM resources for CloudFront
 provider "aws" {
   alias  = "us-east-1"
   region = "us-east-1"

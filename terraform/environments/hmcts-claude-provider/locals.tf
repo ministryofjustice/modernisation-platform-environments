@@ -2,9 +2,9 @@
 
 locals {
   # Bedrock configuration
-  bedrock_region = "us-east-1"
+  bedrock_region = "eu-west-2"
   bedrock_models = {
-    opus_4_1   = "us.anthropic.claude-opus-4-20250514-v1:0"
-    sonnet_4_0 = "us.anthropic.claude-sonnet-4-20250514-v1:0"
+    sonnet_4_5 = "eu.anthropic.claude-sonnet-4-5-20250929-v1:0"
+    sonnet_3_7 = "eu.anthropic.claude-3-7-sonnet-20250219-v1:0"
   }
 }

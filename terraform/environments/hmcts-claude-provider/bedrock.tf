@@ -14,10 +14,10 @@ resource "aws_iam_policy" "bedrock_claude_policy" {
           "bedrock:List*"
         ],
         Resource = [
-          "arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-opus-4-20250514-v1:0",
-          "arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-sonnet-4-20250514-v1:0",
-          "arn:aws:bedrock:us-east-1:*:inference-profile/us.anthropic.claude-opus-4-20250514-v1:0",
-          "arn:aws:bedrock:us-east-1:*:inference-profile/us.anthropic.claude-sonnet-4-20250514-v1:0"
+          "arn:aws:bedrock:eu-west-2::foundation-model/anthropic.claude-sonnet-4-5-20250929-v1:0",
+          "arn:aws:bedrock:eu-west-2::foundation-model/anthropic.claude-3-7-sonnet-20250219-v1:0",
+          "arn:aws:bedrock:eu-west-2:*:inference-profile/eu.anthropic.claude-sonnet-4-5-20250929-v1:0",
+          "arn:aws:bedrock:eu-west-2:*:inference-profile/eu.anthropic.claude-3-7-sonnet-20250219-v1:0"
         ]
       }
     ]
