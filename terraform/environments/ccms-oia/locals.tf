@@ -24,8 +24,6 @@ locals {
   cert_arn     = aws_acm_certificate.external.arn
   cert_zone_id = data.aws_route53_zone.external.zone_id
 
-  # Application data (from environments JSON)
-  application_data = jsondecode(data.http.environments_file.response_body)
 
   # Build datasource URL for MySQL RDS
   spring_datasource_url = "jdbc:mysql://${aws_db_instance.oia_db.address}:3306/oia"
