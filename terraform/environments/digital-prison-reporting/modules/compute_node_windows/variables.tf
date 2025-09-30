@@ -23,9 +23,12 @@ variable "aws_region" {
   type = string
 }
 variable "description" {
+  type    = string
   default = "Security group for Windows compute node"
 }
-variable "ec2_terminate_behavior" {}
+variable "ec2_terminate_behavior" {
+   type    = string
+}
 
 variable "associate_public_ip_address" {
   type    = bool
@@ -36,6 +39,7 @@ variable "enable_compute_node" {
   default = false
 }
 variable "ebs_size" {
+  type    = number
   default = 50
 }
 variable "ebs_optimized" {
