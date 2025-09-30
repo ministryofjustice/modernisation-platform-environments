@@ -6,8 +6,14 @@ locals {
         claude-sonnet-4-5 = "eu.anthropic.claude-sonnet-4-5-20250929-v1:0"
       }
     }
-    test          = {}
-    preproduction = {}
-    production    = {}
+    test = {
+      bedrock_inference_profiles = {}
+    }
+    preproduction = {
+      bedrock_inference_profiles = {}
+    }
+    production = {
+      bedrock_inference_profiles = {}
+    }
   }
 }
