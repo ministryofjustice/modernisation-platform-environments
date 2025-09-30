@@ -28,7 +28,7 @@
       "IdpSamlMockEnabled": "false",
       "SpEntityId": "sts.windows.net-8352c342-da15-413a-8b5b-d89545766f0c",
       "SpEntityUrl": "https://sts.windows.net/8352c342-da15-413a-8b5b-d89545766f0c/",
-      "loginUrl": "https://login.microsoftonline.com/c6874728-71e6-41fe-a9e1-2e8c36776ad8/saml2",
+      "loginUrl": "https://login.microsoftonline.com/8352c342-da15-413a-8b5b-d89545766f0c/saml2",
       "postcodeApiUrl": "https://api.os.uk/search/places/v1/postcode",
       "user_management_api_hostname": "https://laa-ccms-user-management-api-dev.apps.live.cloud-platform.service.justice.gov.uk",
       "entra_custom_user_id_claim": "https://justice.org.uk/claims/USERNAME",
