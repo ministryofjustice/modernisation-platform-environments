@@ -9,6 +9,11 @@ resource "random_string" "bucket_suffix" {
 #tfsec:ignore:aws-s3-enable-bucket-encryption tfsec:ignore:aws-s3-enable-bucket-logging tfsec:ignore:aws-s3-enable-versioning tfsec:ignore:aws-s3-block-public-acls  tfsec:ignore:aws-s3-block-public-policy  tfsec:ignore:aws-s3-ignore-public-acls  tfsec:ignore:aws-s3-no-public-buckets  tfsec:ignore:aws-s3-specify-public-access-block
 #trivy:ignore:avd-aws-0087 trivy:ignore:avd-aws-0089 trivy:ignore:avd-aws-0090 trivy:ignore:avd-aws-0091 trivy:ignore:avd-aws-0093
 resource "aws_s3_bucket" "this" {
+  #checkov:skip=CKV_AWS_145: "Ensure that S3 buckets are encrypted with KMS by default"
+  #checkov:skip=CKV2_AWS_62: "S3 bucket event notification is not required"
+  #checkov:skip=CKV_AWS_18:"Access logging not required"
+  #checkov:skip=CKV_AWS_21: "Ensure all data stored in the S3 bucket have versioning enabled"
+  #checkov:skip=CKV_AWS_144:Cross-region replication not required
   bucket_prefix = "moj-alb-citrix-access-logs-bucket"
 
   tags = {
@@ -26,6 +31,7 @@ resource "aws_s3_bucket_public_access_block" "this" {
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "bucket-config" {
+  # checkov:skip=CKV_AWS_300: "S3 bucket has a set period for aborting failed uploads, this is a false positive finding"
   bucket = aws_s3_bucket.this.bucket
 
   rule {

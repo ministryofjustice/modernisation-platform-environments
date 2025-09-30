@@ -309,122 +309,105 @@ resource "aws_cloudfront_function" "redirect_function" {
   code    = <<EOF
   function handler(event) {
     var request = event.request;
-    var host = request.headers.host.value;
-    var uri = request.uri;
+    var host = request.headers.host ? request.headers.host.value : '';
+    var uri = request.uri || '/';
 
-    switch (host) {
-      case "siac.tribunals.gov.uk":
-        if (uri.toLowerCase() === "/outcomes2007onwards.htm") {
-          return {
-            statusCode: 301,
-            statusDescription: "Moved Permanently",
-            headers: {
-              "location": {"value": "https://siac.decisions.tribunals.gov.uk"}
-            }
-          };
+    var redirectMap = {
+        'siac.tribunals.gov.uk': {
+            defaultRedirect: 'https://www.gov.uk/guidance/appeal-to-the-special-immigration-appeals-commission',
+            pathRedirects: [
+                {
+                    paths: ['/outcomes2007onwards.htm'],
+                    target: 'https://siac.decisions.tribunals.gov.uk',
+                    exactMatch: true
+                }
+            ]
+        },
+        'fhsaa.tribunals.gov.uk': {
+            defaultRedirect: 'https://www.gov.uk/guidance/appeal-to-the-primary-health-lists-tribunal',
+            pathRedirects: [
+                {
+                    paths: ['/decisions.htm'],
+                    target: 'https://phl.decisions.tribunals.gov.uk',
+                    exactMatch: true
+                }
+            ]
+        },
+        'estateagentappeals.tribunals.gov.uk': {
+            defaultRedirect: 'https://www.gov.uk/guidance/estate-agents-appeal-against-a-ban-or-warning-order',
+            pathRedirects: [
+                {
+                    paths: ['/decisions.htm'],
+                    target: 'https://estateagentappeals.decisions.tribunals.gov.uk',
+                    exactMatch: true
+                }
+            ]
+        },
+        'consumercreditappeals.tribunals.gov.uk': {
+            defaultRedirect: 'https://www.gov.uk/courts-tribunals/upper-tribunal-tax-and-chancery-chamber',
+            pathRedirects: [
+                {
+                    paths: ['/decisions.htm'],
+                    target: 'https://consumercreditappeals.decisions.tribunals.gov.uk',
+                    exactMatch: true
+                }
+            ]
+        },
+        'charity.tribunals.gov.uk': {
+            defaultRedirect: 'https://www.gov.uk/guidance/appeal-against-a-charity-commission-decision-about-your-charity',
+            pathRedirects: [
+                {
+                    paths: ['/decisions.htm'],
+                    target: 'https://charity.decisions.tribunals.gov.uk',
+                    exactMatch: true
+                }
+            ]
+        },
+        'adjudicationpanel.tribunals.gov.uk': {
+            defaultRedirect: 'https://www.gov.uk/government/organisations/hm-courts-and-tribunals-service',
+            pathRedirects: [
+                {
+                    paths: ['/Public', '/Admin', '/Decisions', '/Judgments'],
+                    target: 'https://localgovernmentstandards.decisions.tribunals.gov.uk',
+                    exactMatch: false
+                }
+            ]
         }
-        return {
-          statusCode: 301,
-          statusDescription: "Moved Permanently",
-          headers: {
-            "location": {"value": "https://www.gov.uk/guidance/appeal-to-the-special-immigration-appeals-commission"}
-          }
-        };
+        // Add more domains here as provided
+    };
 
-      case "fhsaa.tribunals.gov.uk":
-        if (uri.toLowerCase() === "/decisions.htm") {
-          return {
-            statusCode: 301,
-            statusDescription: "Moved Permanently",
-            headers: {
-              "location": {"value": "https://phl.decisions.tribunals.gov.uk"}
+    if (redirectMap[host]) {
+        var config = redirectMap[host];
+
+        for (var i = 0; i < config.pathRedirects.length; i++) {
+            var pathConfig = config.pathRedirects[i];
+            for (var j = 0; j < pathConfig.paths.length; j++) {
+                var path = pathConfig.paths[j];
+                var isMatch = pathConfig.exactMatch
+                    ? uri.toLowerCase() === path.toLowerCase()
+                    : (path.indexOf('.*\\.') === 0 ? new RegExp(path, 'i').test(uri) : uri.toLowerCase().indexOf(path.toLowerCase()) === 0);
+                if (isMatch) {
+                    var redirectUrl = pathConfig.exactMatch ? pathConfig.target : pathConfig.target + uri;
+                    return {
+                        statusCode: 301,
+                        statusDescription: 'Moved Permanently',
+                        headers: {
+                            'location': { value: redirectUrl }
+                        }
+                    };
+                }
             }
-          };
         }
-        return {
-          statusCode: 301,
-          statusDescription: "Moved Permanently",
-          headers: {
-            "location": {"value": "https://www.gov.uk/guidance/appeal-to-the-primary-health-lists-tribunal"}
-          }
-        };
 
-      case "estateagentappeals.tribunals.gov.uk":
-        if (uri.toLowerCase() === "/decisions.htm") {
-          return {
+        return {
             statusCode: 301,
-            statusDescription: "Moved Permanently",
+            statusDescription: 'Moved Permanently',
             headers: {
-              "location": {"value": "https://estateagentappeals.decisions.tribunals.gov.uk"}
+                'location': { value: config.defaultRedirect }
             }
-          };
-        }
-        return {
-          statusCode: 301,
-          statusDescription: "Moved Permanently",
-          headers: {
-            "location": {"value": "https://www.gov.uk/guidance/estate-agents-appeal-against-a-ban-or-warning-order"}
-          }
         };
-
-      case "consumercreditappeals.tribunals.gov.uk":
-        if (uri.toLowerCase() === "/decisions.htm") {
-          return {
-            statusCode: 301,
-            statusDescription: "Moved Permanently",
-            headers: {
-              "location": {"value": "https://consumercreditappeals.decisions.tribunals.gov.uk"}
-            }
-          };
-        }
-        return {
-          statusCode: 301,
-          statusDescription: "Moved Permanently",
-          headers: {
-            "location": {"value": "https://www.gov.uk/courts-tribunals/upper-tribunal-tax-and-chancery-chamber"}
-          }
-        };
-
-      case "charity.tribunals.gov.uk":
-        if (uri.toLowerCase() === "/decisions.htm") {
-          return {
-            statusCode: 301,
-            statusDescription: "Moved Permanently",
-            headers: {
-              "location": {"value": "https://charity.decisions.tribunals.gov.uk"}
-            }
-          };
-        }
-        return {
-          statusCode: 301,
-          statusDescription: "Moved Permanently",
-          headers: {
-            "location": {"value": "https://www.gov.uk/guidance/appeal-against-a-charity-commission-decision-about-your-charity"}
-          }
-        };
-
-      case "adjudicationpanel.tribunals.gov.uk":
-        if (/^\/(Public|Admin|Decisions|Judgments)/i.test(uri)) {
-          return {
-            statusCode: 301,
-            statusDescription: "Moved Permanently",
-            headers: {
-              "location": {"value": "https://localgovernmentstandards.decisions.tribunals.gov.uk" + uri}
-            }
-          };
-        }
-        return {
-          statusCode: 301,
-          statusDescription: "Moved Permanently",
-          headers: {
-            "location": {"value": "https://www.gov.uk/government/organisations/hm-courts-and-tribunals-service"}
-          }
-        };
-
-      default:
-        // Default: Pass through to origin
-        return request;
     }
+    return request;
   }
   EOF
 }
