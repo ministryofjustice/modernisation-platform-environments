@@ -11,7 +11,7 @@ variable "ec2_instance_type" {
   type = string
 }
 variable "subnet_ids" {
-  type = list(string)
+  type = string
 }
 variable "vpc" {
   type = string
