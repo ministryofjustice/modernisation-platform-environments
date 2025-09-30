@@ -30,7 +30,11 @@ resource "aws_iam_policy" "bedrock_claude_policy" {
           "bedrock:CreateInferenceProfile",
           "bedrock:DeleteInferenceProfile"
         ],
-        Resource = "arn:aws:bedrock:eu-west-2::foundation-model/anthropic.claude-sonnet-4-5-20250929-v1:0"
+        Resource = [
+          "arn:aws:bedrock:eu-west-2::foundation-model/anthropic.claude-sonnet-4-5-20250929-v1:0",
+          "arn:aws:bedrock:eu-west-2::foundation-model/*",
+          "arn:aws:bedrock:eu-west-2:*:application-inference-profile/*"
+        ]
       }
     ]
   })
