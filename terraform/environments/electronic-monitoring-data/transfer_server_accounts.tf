@@ -60,6 +60,7 @@ module "buddi" {
   local_tags = local.tags
 }
 
+#scram update 4pm
 module "scram" {
   source = "./modules/landing_zone/"
   count  = local.is-production ? 1 : 0
