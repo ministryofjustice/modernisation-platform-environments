@@ -20,7 +20,7 @@ resource "aws_lb" "opahub" {
 # Target Group
 ########################################
 resource "aws_lb_target_group" "opahub_target_group" {
-  name_prefix          = "${local.opa_app_name}-tg"
+  name                 = "${local.opa_app_name}-tg"
   port                 = local.application_data.accounts[local.environment].opa_server_port
   protocol             = "HTTP"
   vpc_id               = data.aws_vpc.shared.id
