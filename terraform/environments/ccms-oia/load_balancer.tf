@@ -1,56 +1,64 @@
-# OIA Load Balancer Configuration
+########################################
+# Application Load Balancer for OPAHUB
+########################################
 
-resource "aws_lb" "oia" {
-  name               = "${local.application_name}-lb"
-  internal           = true
+resource "aws_lb" "opahub" {
+  name               = "${local.opa_app_name}-lb"
   load_balancer_type = "application"
-  subnets            = data.aws_subnets.shared-private.ids
+  internal           = false
 
-  security_groups = [aws_security_group.load_balancer.id]
+  subnets = data.aws_subnets.shared-public.ids
+
+  security_groups = [aws_security_group.opahub_load_balancer.id]
 
   tags = merge(local.tags,
-    { Name = lower(format("%s-%s-lb", local.application_name, local.environment)) }
+    { Name = lower(format("%s-lb", local.opa_app_name)) }
   )
 }
 
-resource "aws_lb_target_group" "oia_target_group" {
-  name                 = "${local.application_name}-tg"
-  port                 = local.application_data.accounts[local.environment].app_port
+########################################
+# Target Group
+########################################
+resource "aws_lb_target_group" "opahub_target_group" {
+  name_prefix          = "${local.opa_app_name}-tg"
+  port                 = local.application_data.accounts[local.environment].server_port
   protocol             = "HTTP"
   vpc_id               = data.aws_vpc.shared.id
   target_type          = "instance"
   deregistration_delay = 30
 
+  stickiness {
+    type = "lb_cookie"
+  }
+
   health_check {
-    path                = "/actuator/health"
-    healthy_threshold   = "5"
-    interval            = "120"
+    path                = "/opa/opa-hub/manager"
+    healthy_threshold   = 5
+    interval            = 120
     protocol            = "HTTP"
-    unhealthy_threshold = "2"
+    unhealthy_threshold = 5
     matcher             = "200"
-    timeout             = "5"
+    timeout             = 5
   }
 
   tags = merge(local.tags,
-    { Name = lower(format("%s-%s-tg", local.application_name, local.environment)) }
+    { Name = lower(format("%s-tg", local.opa_app_name)) }
   )
-
-  lifecycle {
-    create_before_destroy = true
-  }
 }
 
-# Redirect all traffic from the LB to the target group
-resource "aws_lb_listener" "oia" {
-  load_balancer_arn = aws_lb.oia.id
-  port              = 443
-  protocol          = "HTTPS"
+########################################
+# Listeners
+########################################
 
-  ssl_policy      = "ELBSecurityPolicy-TLS13-1-2-2021-06"
-  certificate_arn = aws_acm_certificate.external.arn
+resource "aws_lb_listener" "opahub_listener" {
+  load_balancer_arn = aws_lb.opahub.id
+  port              = local.application_data.accounts[local.environment].server_port
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+  certificate_arn   = aws_acm_certificate.external.arn
 
   default_action {
-    target_group_arn = aws_lb_target_group.oia_target_group.id
+    target_group_arn = aws_lb_target_group.opahub_target_group.id
     type             = "forward"
   }
 }

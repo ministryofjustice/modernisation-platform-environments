@@ -1,13 +1,13 @@
-module "s3_ccms_oia_docs" {
+module "s3_ccms_oia" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
 
-  bucket_name        = "${local.application_name}-docs-${local.environment}"
+  bucket_name        = "${local.application_name}-${local.environment}"
   versioning_enabled = true
   ownership_controls = "BucketOwnerEnforced"
 
   lifecycle_rule = [
     {
-      id      = "ccms_oia_docs_lifecycle"
+      id      = "ccms_oia_lifecycle"
       enabled = "Enabled"
       prefix  = ""
 
@@ -40,7 +40,7 @@ module "s3_ccms_oia_docs" {
   ]
 
   tags = merge(local.tags,
-    { Name = lower(format("%s-docs-%s", local.application_name, local.environment)) }
+    { Name = lower(format("%s-%s", local.application_name, local.environment)) }
   )
 
   providers = {

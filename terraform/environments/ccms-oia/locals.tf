@@ -3,6 +3,10 @@
 #######################################
 
 locals {
+  opa_app_name = "ccms-opa"
+  connector_app_name = "ccms-connector"
+  adaptor_app_name = "ccms-service-adaptor"
+  
   # AWS region (from data source)
   aws_region = data.aws_region.current.id
 
@@ -20,8 +24,8 @@ locals {
   ]
 
   # Certificates (used by ALB/Ingress)
-  cert_opts    = aws_acm_certificate.external.domain_validation_options
-  cert_arn     = aws_acm_certificate.external.arn
+  cert_opts    = aws_acm_certificate.oia.domain_validation_options
+  cert_arn     = aws_acm_certificate.oia.arn
   cert_zone_id = data.aws_route53_zone.external.zone_id
 
 
