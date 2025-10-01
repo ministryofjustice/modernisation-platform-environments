@@ -1,5 +1,6 @@
 # CWA Extract Schedule
 resource "aws_scheduler_schedule" "cwa_extract_schedule" {
+  count      = local.environment == "development" ? 1 : 0
   name       = "cwa-extract-schedule"
   group_name = "default"
 
