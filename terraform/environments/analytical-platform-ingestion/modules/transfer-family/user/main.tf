@@ -73,14 +73,34 @@ resource "aws_transfer_ssh_key" "this" {
   body      = var.ssh_key
 }
 
-resource "aws_security_group_rule" "this" {
+# Create an aws_security_group per user as part of this module
+resource "aws_security_group" "this" {
+  description = "Security Group for Transfer Server User ${var.name}"
+  name        = "transfer-server-${var.name}"
+  vpc_id      = var.isolated_vpc_id
+  # tags        = local.tags # Not picking this up
+}
+
+# resource "aws_security_group_rule" "this" {
+#   description       = var.name
+#   type              = "ingress"
+#   from_port         = 2222
+#   to_port           = 2222
+#   protocol          = "tcp"
+#   cidr_blocks       = var.cidr_blocks
+#   security_group_id = var.transfer_server_security_group
+# }
+
+# Replace aws_security_group_rule with recommended resource
+resource "aws_vpc_security_group_ingress_rule" "this" {
   description       = var.name
-  type              = "ingress"
   from_port         = 2222
+  ip_protocol       = "tcp"
   to_port           = 2222
-  protocol          = "tcp"
-  cidr_blocks       = var.cidr_blocks
-  security_group_id = var.transfer_server_security_group
+  security_group_id = aws_security_group.this.id
+  # security_group_id = var.transfer_server_security_group
+  for_each          = var.cidr_blocks
+  cidr_ipv4         = each.value
 }
 
 resource "aws_secretsmanager_secret" "this" {
