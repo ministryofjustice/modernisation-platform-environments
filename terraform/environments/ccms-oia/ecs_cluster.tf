@@ -43,13 +43,13 @@ resource "aws_ecs_task_definition" "opahub" {
   container_definitions = templatefile(
     "${path.module}/templates/task_definition_opahub.json.tpl",
     {
-      app_name          = local.application_name
+      app_name          = local.opa_app_name
       app_image         = local.application_data.accounts[local.environment].app_image
-      server_port       = local.application_data.accounts[local.environment].server_port
+      server_port       = local.application_data.accounts[local.environment].opa_server_port
       aws_region        = local.application_data.accounts[local.environment].aws_region
       container_version = local.application_data.accounts[local.environment].container_version
       opahub_password   = aws_secretsmanager_secret.opahub_password.arn
-      db_host           = local.application_data.accounts[local.environment].db_host
+      db_host           = aws_db_instance.opahub_db.endpoint
       db_user           = local.application_data.accounts[local.environment].db_user
       db_password       = aws_secretsmanager_secret.opahub_db_password.arn
       wl_user           = local.application_data.accounts[local.environment].wl_user
@@ -82,7 +82,7 @@ resource "aws_ecs_service" "opahub" {
   load_balancer {
     target_group_arn = aws_lb_target_group.opahub_target_group.id
     container_name   = local.opa_app_name
-    container_port   = local.application_data.accounts[local.environment].opa_app_port
+    container_port   = local.application_data.accounts[local.environment].opa_server_port
   }
 
   depends_on = [

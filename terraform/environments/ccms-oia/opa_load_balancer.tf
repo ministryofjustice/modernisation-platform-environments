@@ -21,7 +21,7 @@ resource "aws_lb" "opahub" {
 ########################################
 resource "aws_lb_target_group" "opahub_target_group" {
   name_prefix          = "${local.opa_app_name}-tg"
-  port                 = local.application_data.accounts[local.environment].server_port
+  port                 = local.application_data.accounts[local.environment].opa_server_port
   protocol             = "HTTP"
   vpc_id               = data.aws_vpc.shared.id
   target_type          = "instance"
@@ -52,7 +52,7 @@ resource "aws_lb_target_group" "opahub_target_group" {
 
 resource "aws_lb_listener" "opahub_listener" {
   load_balancer_arn = aws_lb.opahub.id
-  port              = local.application_data.accounts[local.environment].server_port
+  port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
   certificate_arn   = aws_acm_certificate.external.arn
