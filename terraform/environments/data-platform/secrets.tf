@@ -6,8 +6,9 @@ module "cloud_platform_live_secret" {
   name = "cloud-platform/live"
 
   secret_string = jsonencode({
-    oidc_provider  = "CHANGEME"
-    ca_certificate = "CHANGEME"
+    ca_certificate   = "CHANGEME"
+    cluster_endpoint = "CHANGEME"
+    oidc_provider    = "CHANGEME"
   })
   ignore_secret_changes = true
 }
