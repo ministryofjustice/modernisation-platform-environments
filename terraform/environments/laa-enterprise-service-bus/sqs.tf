@@ -23,11 +23,6 @@ resource "aws_sqs_queue" "maat_provider_q" {
   receive_wait_time_seconds  = 10
   visibility_timeout_seconds = 120
 
-  redrive_policy = jsonencode({
-    deadLetterTargetArn = aws_sqs_queue.maat_provider_dlq.arn
-    maxReceiveCount     = 1
-  })
-
   kms_master_key_id                 = aws_kms_key.sns_sqs_key.id
   kms_data_key_reuse_period_seconds = 300
 
@@ -68,11 +63,6 @@ resource "aws_sqs_queue" "cclf_provider_q" {
   kms_master_key_id                 = aws_kms_key.sns_sqs_key.id
   kms_data_key_reuse_period_seconds = 300
 
-  redrive_policy = jsonencode({
-    deadLetterTargetArn = aws_sqs_queue.cclf_provider_dlq.arn
-    maxReceiveCount     = 1
-  })
-
   tags = merge(
     local.tags,
     {
@@ -109,11 +99,6 @@ resource "aws_sqs_queue" "ccr_provider_q" {
 
   kms_master_key_id                 = aws_kms_key.sns_sqs_key.id
   kms_data_key_reuse_period_seconds = 300
-
-  redrive_policy = jsonencode({
-    deadLetterTargetArn = aws_sqs_queue.ccr_provider_dlq.arn
-    maxReceiveCount     = 1
-  })
 
   tags = merge(
     local.tags,
