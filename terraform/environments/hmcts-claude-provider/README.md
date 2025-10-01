@@ -6,93 +6,64 @@ This environment provides AWS Bedrock access for Claude AI models in the eu-west
 
 This environment is configured to use AWS Bedrock with Claude models. The following manual setup steps are required:
 
-### 1. Create Bedrock API Key
+### 1. Request Model Access
 
-The Terraform creates the necessary IAM policies and roles, including a `BedrockAPIKeyCreator` role. Use this role to create the Bedrock API key:
+First, request access to Claude models in the AWS Bedrock console:
 
-```bash
-# 1. Create the IAM user (if it doesn't exist already)
-aws iam create-user \
-  --user-name BedrockAPIKey-hmcts-claude \
-  --profile hmcts-claude-provider-development
+1. Go to the [Bedrock Model Access page](https://eu-west-1.console.aws.amazon.com/bedrock/home?region=eu-west-1#/modelaccess)
+2. Request access to:
+   - Claude Sonnet 4.5
+   - Claude Sonnet 4 (optional - requires marketplace subscription)
 
-# 2. Attach the Bedrock access policy to the user
-aws iam attach-user-policy \
-  --user-name BedrockAPIKey-hmcts-claude \
-  --policy-arn arn:aws:iam::313941174580:policy/HMCTSClaudeBedrockPolicy \
-  --profile hmcts-claude-provider-development
+### 2. Create Bedrock API Key
 
-# 3. Assume the BedrockAPIKeyCreator role
-aws sts assume-role \
-  --role-arn "arn:aws:iam::313941174580:role/BedrockAPIKeyCreator" \
-  --role-session-name "create-bedrock-key" \
-  --profile hmcts-claude-provider-development
-
-# 4. Export the credentials returned from the above command
-export AWS_ACCESS_KEY_ID="<AccessKeyId from output>"
-export AWS_SECRET_ACCESS_KEY="<SecretAccessKey from output>"
-export AWS_SESSION_TOKEN="<SessionToken from output>"
-
-# 5. Create the service-specific credential for Bedrock (30-day expiration)
-aws iam create-service-specific-credential \
-  --user-name BedrockAPIKey-hmcts-claude \
-  --service-name bedrock.amazonaws.com \
-  --credential-age-days 30
-
-# 6. Save the returned 'ServicePassword' - this is your AWS_BEARER_TOKEN_BEDROCK
-# Note: The password is only shown once and cannot be retrieved again
-```
-
-### 2. Create Application Inference Profile
-
-To ensure all requests stay in eu-west-1 (avoiding SCP restrictions in other regions), create a custom inference profile:
+Run the provided script to create a Bedrock API key with 90-day expiry:
 
 ```bash
-aws bedrock create-inference-profile \
-  --region eu-west-1 \
-  --profile hmcts-claude-provider-development \
-  --inference-profile-name hmcts-claude-sonnet-4-5-ireland \
-  --model-source '{"copyFrom":"arn:aws:bedrock:eu-west-1::foundation-model/anthropic.claude-sonnet-4-5-20250929-v1:0"}'
+./create-bedrock-api-key.sh
 ```
 
-Save the returned `inferenceProfileArn` - you'll need it for Claude Code configuration.
+This script will:
+- Assume the BedrockAPIKeyCreator role (which bypasses the common_policy deny)
+- Create the IAM user if needed
+- Generate a service-specific credential (bearer token)
+- Output the configuration for Claude Code
+
+**Important:** Save the bearer token shown in the output - it cannot be retrieved again!
 
 ### 3. Configure Claude Code
 
-Create a `claude.sh` script to configure Claude Code for Bedrock:
+Add the environment variables from the script output to your `~/.bashrc` or `~/.zshrc`:
 
 ```bash
-#!/usr/bin/env bash
-
+# Claude Code Bedrock Configuration
 export CLAUDE_CODE_MAX_OUTPUT_TOKENS=4096
 export MAX_THINKING_TOKENS=1024
-export ANTHROPIC_MODEL='<inference-profile-arn-from-step-2>'  # e.g., arn:aws:bedrock:eu-west-1:313941174580:application-inference-profile/abc123
-export AWS_BEARER_TOKEN_BEDROCK='<your-bedrock-api-key>'     # From step 1
-export AWS_REGION=eu-west-1
+export ANTHROPIC_MODEL='eu.anthropic.claude-sonnet-4-5-20250929-v1:0'
 export CLAUDE_CODE_USE_BEDROCK=1
-
-claude --dangerously-skip-permissions
+export AWS_BEARER_TOKEN_BEDROCK='<your-bearer-token>'
 ```
 
-Make it executable and run:
+Then reload your shell:
 
 ```bash
-chmod +x claude.sh
-./claude.sh
+source ~/.bashrc  # or source ~/.zshrc
 ```
 
 ## Available Models
 
-- **Claude Sonnet 4.5**: `anthropic.claude-sonnet-4-5-20250929-v1:0`
-- **Claude Sonnet 3.7**: `anthropic.claude-3-7-sonnet-20250219-v1:0`
-- **Claude Sonnet 3**: `anthropic.claude-3-sonnet-20240229-v1:0`
-- **Claude Haiku 3**: `anthropic.claude-3-haiku-20240307-v1:0`
+Use the system-defined EU inference profiles for cross-region load balancing:
+
+- **Claude Sonnet 4.5**: `eu.anthropic.claude-sonnet-4-5-20250929-v1:0` (recommended)
+- **Claude Sonnet 4**: `eu.anthropic.claude-sonnet-4-20250514-v1:0`
+
+These inference profiles route requests across multiple EU regions (eu-west-1, eu-central-1, eu-north-1, eu-west-3, etc.) for optimal availability.
 
 ## Troubleshooting
 
-### SCP Denied Errors
+### Bearer Token Authentication
 
-If you get "explicit deny in a service control policy" errors, ensure you're using the custom application inference profile rather than the system-defined regional profiles (e.g., `eu.anthropic.claude-*`). The custom profile ensures all requests stay in eu-west-1.
+Note: The bearer token (BSK...) format may not work with all Bedrock API endpoints. If you encounter authentication issues with Claude Code, you may need to use AWS credential-based authentication instead.
 
 
 ## Mandatory Information
