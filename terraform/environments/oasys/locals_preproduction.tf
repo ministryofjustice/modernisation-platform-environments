@@ -347,23 +347,21 @@ locals {
 }
 
 resource "aws_backup_vault" "dev_back" {
-  name = "dev_back"
+  name = "dev_back_backup_vault"
+}
+resource "aws_backup_plan" "for_dev" {
+  name = "tf_for_dev_backup_plan"
 
-
-  resource "aws_backup_plan" "for_dev" {
-    name = "tf_for_dev_backup_plan"
-
-    rule {
-      rule_name         = "tf_example_backup_rule"
-      target_vault_name = aws_backup_plan.dev_back.name
-      schedule          = "cron(0 13 * * ? *)"
-
-      lifecycle {
-        delete_after = 5
-      }
+  rule {
+    rule_name         = "tf_example_backup_rule"
+    target_vault_name = aws_backup_vault.dev_back.name
+    schedule          = "cron(0 6 * * ? *)"
+    lifecycle {
+      delete_after = 5
     }
   }
 }
+
 variable "dev_back" {
   default = " "
   type    = string
