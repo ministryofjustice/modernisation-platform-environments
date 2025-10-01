@@ -17,6 +17,7 @@
       "db_instance_type": "db.t3.large",
       "db_storage_gb": "100",
       "db_deletion_protection": "false",
+      "db_log_retention_days": "30",
       "aws_workspace": "10.200.0.0/19",
       "logging_level_root": "info"
     },

@@ -73,8 +73,8 @@ resource "aws_security_group_rule" "ecs_tasks_opa_ingress" {
   type                     = "ingress"
   description              = "OPAHUB App Port"
   protocol                 = "TCP"
-  from_port                = local.application_data.accounts[local.environment].server_port
-  to_port                  = local.application_data.accounts[local.environment].server_port
+  from_port                = local.application_data.accounts[local.environment].opa_server_port
+  to_port                  = local.application_data.accounts[local.environment].opa_server_port
   source_security_group_id = aws_security_group.opahub_load_balancer.id
 }
 
