@@ -19,7 +19,7 @@
       "s3_vpc_endpoint_prefix": "pl-7ca54015",
       "maatdb_sg": "sg-00dd7a4dcbcf3c22e",
       "cloud_platform_cidr": "172.20.0.0/16",
-      "maatdb_account_id": "110341342196",
+      "maatdb_account_id": "858669496578",
       "ccms_account_id": "249362002469",
       "cclf_rds_role_arn": "arn:aws:iam::754256621582:role/rds-hub20-s3-access",
       "ccr_rds_role_arn": "arn:aws:iam::754256621582:role/ccr-rds-hub20-s3-access"
