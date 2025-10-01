@@ -38,6 +38,10 @@
         "value": "${user_management_api_hostname}"
       },
       {
+        "name": "SERVER_FORWARD_HEADERS_STRATEGY",
+        "value": "framework"
+      },
+      {
         "name": "ENTRA_CUSTOM_USER_ID_CLAIM",
         "value": "${entra_custom_user_id_claim}"
       },
