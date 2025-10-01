@@ -74,9 +74,11 @@ resource "aws_iam_policy" "ccr_provider_load_policy" {
       {
         Effect   = "Allow"
         Action   = [
-            "sqs:SendMessage",
-            "sqs:GetQueueAttributes",
-          ]
+          "sqs:SendMessage",
+          "sqs:ReceiveMessage",
+          "sqs:DeleteMessage",
+          "sqs:GetQueueAttributes"
+        ]
         Resource = aws_sqs_queue.ccr_provider_dlq.arn
       },
       {
