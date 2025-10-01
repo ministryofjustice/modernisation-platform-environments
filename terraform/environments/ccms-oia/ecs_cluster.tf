@@ -86,7 +86,7 @@ resource "aws_ecs_service" "opahub" {
   }
 
   depends_on = [
-    aws_lb_listener.opahub,
+    aws_lb_listener.opahub_listener,
     aws_iam_role_policy_attachment.ecs_task_execution_role,
     aws_autoscaling_group.cluster_scaling_group
   ]
