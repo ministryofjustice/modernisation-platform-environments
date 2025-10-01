@@ -44,6 +44,12 @@ variable "handler" {
   type        = string
 }
 
+variable "skip_destroy_of_log_group" {
+  description = "Skip destroying of the cloudwatch logs when the lambda is destroyed"
+  type        = bool
+  default     = false
+}
+
 variable "log_retention_in_days" {
   description = "Log retention in number of days."
   type        = number

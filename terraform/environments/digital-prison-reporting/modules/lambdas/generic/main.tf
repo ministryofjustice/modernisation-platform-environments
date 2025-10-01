@@ -4,6 +4,8 @@ resource "aws_cloudwatch_log_group" "this" {
   count = var.enable_lambda ? 1 : 0
   name  = "/aws/lambda/${var.name}-function"
 
+  skip_destroy = var.skip_destroy_of_log_group
+
   retention_in_days = var.log_retention_in_days
 
   tags = var.tags
