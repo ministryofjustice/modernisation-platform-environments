@@ -1,13 +1,13 @@
-module "cloud_platform_live_secret" {
+module "cloud_platform_live_namespace_secret" {
   count = terraform.workspace == "data-platform-development" ? 1 : 0
 
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=f7fef2d8f63f1595c3e2b0ee14a6810dc7bdb9af" # v2.0.0
 
-  name = "cloud-platform/live"
+  name = "cloud-platform/live/${local.component_name}"
 
   secret_string = jsonencode({
-    oidc_provider  = "CHANGEME"
-    ca_certificate = "CHANGEME"
+    namespace = "CHANGEME"
+    token     = "CHANGEME"
   })
   ignore_secret_changes = true
 }
