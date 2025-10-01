@@ -35,6 +35,19 @@ resource "aws_iam_policy" "bedrock_claude_policy" {
           "arn:aws:bedrock:eu-west-1::foundation-model/*",
           "arn:aws:bedrock:eu-west-1:*:application-inference-profile/*"
         ]
+      },
+      {
+        Sid    = "BedrockModelAccess",
+        Effect = "Allow",
+        Action = [
+          "bedrock:CreateFoundationModelAgreement",
+          "bedrock:PutFoundationModelEntitlement",
+          "bedrock:GetFoundationModelAvailability"
+        ],
+        Resource = [
+          "arn:aws:bedrock:eu-west-1::foundation-model/anthropic.claude-sonnet-4-5-20250929-v1:0",
+          "arn:aws:bedrock:eu-west-1::foundation-model/anthropic.claude-sonnet-4-20250514-v1:0"
+        ]
       }
     ]
   })
