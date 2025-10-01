@@ -1,8 +1,8 @@
 data "template_file" "launch-template" {
   template = file("${path.module}/templates/user-data.sh")
   vars = {
-    cluster_name       = "${local.application_name}-cluster"
-    deploy_environment = local.environment
+    cluster_name = "${local.application_name}-cluster"
+    efs_id       = aws_efs_file_system.oia-storage.id
   }
 }
 
@@ -36,7 +36,7 @@ resource "aws_launch_template" "ec2_launch_template" {
   }
 
   user_data = base64encode(data.template_file.launch-template.rendered)
-  
+
   tag_specifications {
     resource_type = "instance"
     tags = merge(local.tags,
