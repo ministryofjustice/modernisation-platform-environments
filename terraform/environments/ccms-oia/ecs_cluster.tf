@@ -44,10 +44,10 @@ resource "aws_ecs_task_definition" "opahub" {
     "${path.module}/templates/task_definition_opahub.json.tpl",
     {
       app_name          = local.opa_app_name
-      app_image         = local.application_data.accounts[local.environment].app_image
+      app_image         = local.application_data.accounts[local.environment].opa_app_image
       server_port       = local.application_data.accounts[local.environment].opa_server_port
       aws_region        = local.application_data.accounts[local.environment].aws_region
-      container_version = local.application_data.accounts[local.environment].container_version
+      container_version = local.application_data.accounts[local.environment].opa_container_version
       opahub_password   = aws_secretsmanager_secret.opahub_password.arn
       db_host           = aws_db_instance.opahub_db.endpoint
       db_user           = local.application_data.accounts[local.environment].db_user
