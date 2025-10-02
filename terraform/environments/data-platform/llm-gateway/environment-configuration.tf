@@ -4,7 +4,7 @@ locals {
     development = {
       bedrock_inference_profiles = {
         claude-sonnet-4 = {
-          model_id = "eu.anthropic.claude-sonnet-4-5-20250929-v1:0"
+          model_id = "eu.anthropic.claude-sonnet-4-20250514-v1:0"
           region   = "eu-west-1"
         }
         claude-sonnet-3-7 = {

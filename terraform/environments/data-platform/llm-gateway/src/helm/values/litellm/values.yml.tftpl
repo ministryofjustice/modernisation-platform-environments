@@ -53,13 +53,14 @@ ingress:
   annotations:
     external-dns.alpha.kubernetes.io/set-identifier: "${ingressIdentifier}-${namespace}-${ingressColour}"
     external-dns.alpha.kubernetes.io/aws-weight: "100"
+    external-dns.alpha.kubernetes.io/hostname: "${ingressHostname}"
     nginx.ingress.kubernetes.io/whitelist-source-range: "81.77.57.111/32"
   hosts:
-    - host: ${namespace}.apps.live.cloud-platform.service.justice.gov.uk
+    - host: ${ingressHostname}
       paths:
         - path: /
           pathType: ImplementationSpecific
   tls:
-   - secretName: ${ingressIdentifier}-tls
+   - secretName: ${ingressTlsSecretName}
      hosts:
-       - ${namespace}.apps.live.cloud-platform.service.justice.gov.uk
+       - ${ingressHostname}

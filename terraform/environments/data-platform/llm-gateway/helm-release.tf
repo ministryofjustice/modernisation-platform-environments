@@ -11,12 +11,14 @@ resource "helm_release" "litellm" {
       "${path.module}/src/helm/values/litellm/values.yml.tftpl",
       {
         # Kubernetes
-        namespace          = jsondecode(data.aws_secretsmanager_secret_version.cloud_platform_live_namespace[0].secret_string)["namespace"]
-        ingressIdentifier  = "litellm"
-        ingressColour      = "green"
-        imageRepository    = "ghcr.io/berriai/litellm-non_root"
-        imageTag           = local.environment_configuration.litellm_versions.application
-        serviceAccountName = data.kubernetes_secret.irsa[0].data["serviceaccount"]
+        namespace            = jsondecode(data.aws_secretsmanager_secret_version.cloud_platform_live_namespace[0].secret_string)["namespace"]
+        ingressIdentifier    = "litellm"
+        ingressColour        = "green"
+        imageRepository      = "ghcr.io/berriai/litellm-non_root"
+        imageTag             = local.environment_configuration.litellm_versions.application
+        serviceAccountName   = data.kubernetes_secret.irsa[0].data["serviceaccount"]
+        ingressHostname      = "llm-gateway.development.data-platform.service.justice.gov.uk"
+        ingressTlsSecretName = "llms-gateway-tls" # what an annoying typo on my part
 
         # Database
         databaseSecret      = data.kubernetes_secret.rds[0].metadata[0].name
