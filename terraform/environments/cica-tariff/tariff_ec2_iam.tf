@@ -47,12 +47,16 @@ data "aws_iam_policy_document" "tariff_instance_cica_s3_access_data" {
   statement {
     effect    = "Allow"
     actions   = ["s3:GetObject*"]
-    resources = ["${local.cica_s3_resource}/export/*"]
+    resources = [
+      for bucket in local.cica_s3_resource : "${bucket}/export/*"
+    ]
   }
   statement {
     effect    = "Allow"
     actions   = ["s3:ListBucket*"]
-    resources = ["${local.cica_s3_resource}/"]
+    resources = [
+      for bucket in local.cica_s3_resource : "${bucket}/"
+    ]
     condition {
       test     = "StringLike"
       variable = "s3:prefix"
