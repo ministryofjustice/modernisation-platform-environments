@@ -20,7 +20,7 @@ locals {
       ]
 
       /* Image Versions */
-      scan_image_version     = "0.1.7"
+      scan_image_version     = "0.2.0"
       transfer_image_version = "0.0.22"
       notify_image_version   = "0.0.23"
 
@@ -77,7 +77,7 @@ locals {
       ]
 
       /* Image Versions */
-      scan_image_version     = "0.1.7"
+      scan_image_version     = "0.2.0"
       transfer_image_version = "0.0.22"
       notify_image_version   = "0.0.23"
 
