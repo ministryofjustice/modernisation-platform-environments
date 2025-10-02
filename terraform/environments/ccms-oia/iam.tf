@@ -46,7 +46,7 @@ resource "aws_iam_policy" "ecs_secrets_policy" {
         "secretsmanager:GetSecretValue",
         "secretsmanager:DescribeSecret"
       ],
-      "Resource": "${aws_secretsmanager_secret.opahub_db_password.id}"
+      "Resource": "*"
     }
   ]
 }
