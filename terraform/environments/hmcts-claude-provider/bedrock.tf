@@ -20,6 +20,7 @@ resource "aws_iam_policy" "bedrock_claude_policy" {
           "arn:aws:bedrock:eu-*::foundation-model/anthropic.claude-sonnet-4-20250514-v1:0",
           "arn:aws:bedrock:us-*::foundation-model/anthropic.claude-3-5-haiku-20241022-v1:0",
           "arn:aws:bedrock:eu-*::foundation-model/anthropic.claude-3-5-haiku-20241022-v1:0",
+          "arn:aws:bedrock:eu-*::foundation-model/anthropic.claude-3-haiku-20240307-v1:0",
           "arn:aws:bedrock:*::inference-profile/*",
           "arn:aws:bedrock:*:313941174580:inference-profile/*"
         ]
