@@ -186,13 +186,13 @@
               "glue_tables": ["*"]
             },
             {
-              "glue_database": "staged_prisons_history_dev_dbt",
+              "glue_database": "curated_prisons_history_dev_dbt",
               "glue_tables": ["*"]
             },
             {
-              "glue_database": "curated_prisons_history_dev_dbt",
+              "glue_database": "staged_prisons_history_dev_dbt",
               "glue_tables": ["*"]
-            }
+            },
           ]
         }
       ],
