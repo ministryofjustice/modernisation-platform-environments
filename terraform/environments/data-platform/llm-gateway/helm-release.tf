@@ -30,7 +30,7 @@ resource "helm_release" "litellm" {
 
         # LiteLLM
         masterkeySecretName = kubernetes_secret.litellm_master_key[0].metadata[0].name
-        masterkeySecretKey  = "master-key"
+        masterkeySecretKey  = "master-key" #checkov:skip=CKV_SECRET_6:secretKey is a reference to the key in the secret
         environmentSecrets = [
           data.kubernetes_secret.elasticache[0].metadata[0].name,
           kubernetes_secret.litellm_license[0].metadata[0].name,

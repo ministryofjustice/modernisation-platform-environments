@@ -31,6 +31,7 @@ proxy_config:
   general_settings:
     litellm_license: os.environ/LITELLM_LICENSE
     master_key: os.environ/PROXY_MASTER_KEY
+    proxy_admin_email: "Jacob.Woffenden@justice.gov.uk"
   litellm_settings:
     cache: true
     cache_params:
@@ -39,10 +40,14 @@ proxy_config:
       port: 6379
       password: os.environ/auth_token
     callbacks: ["prometheus"]
+    success_callback: ["prometheus"]
+    failure_callback: ["prometheus"]
     prometheus_initialize_budget_metrics: true
     service_callback: ["prometheus_system"]
     default_internal_user_params:
       user_role: "internal_user"
+    max_internal_user_budget: 20
+    internal_user_budget_duration: "1mo"
   router_settings:
     routing_strategy: simple-shuffle
     redis_host: os.environ/primary_endpoint_address
