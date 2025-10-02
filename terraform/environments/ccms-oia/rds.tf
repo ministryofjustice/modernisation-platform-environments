@@ -5,9 +5,9 @@
 resource "aws_db_subnet_group" "opahub_db_subnets" {
   name = "${local.opa_app_name}-db-subnet-group"
   subnet_ids = [
-    data.aws_subnet.private_subnets_a.id,
-    data.aws_subnet.private_subnets_b.id,
-    data.aws_subnet.private_subnets_c.id
+    data.aws_subnet.data_subnets_a.id,
+    data.aws_subnet.data_subnets_b.id,
+    data.aws_subnet.data_subnets_c.id
   ]
 
   tags = merge(local.tags, {
