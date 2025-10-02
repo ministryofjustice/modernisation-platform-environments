@@ -21,8 +21,8 @@
       "cloud_platform_cidr": "172.20.0.0/16",
       "maatdb_account_id": "858669496578",
       "ccms_account_id": "249362002469",
-      "cclf_rds_role_arn": "arn:aws:iam::754256621582:role/rds-hub20-s3-access",
-      "ccr_rds_role_arn": "arn:aws:iam::754256621582:role/ccr-rds-hub20-s3-access"
+      "cclf_rds_role_arn": "arn:aws:iam::754256621582:role/cclf-rds-hub20-uat-s3-access",
+      "ccr_rds_role_arn": "arn:aws:iam::754256621582:role/ccr-rds-hub20-uat-s3-access"
     },
     "preproduction": {
       "example_var": "preproduction-data"
