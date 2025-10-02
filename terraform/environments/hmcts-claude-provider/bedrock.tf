@@ -44,14 +44,12 @@ resource "aws_iam_policy" "bedrock_claude_policy" {
         Action = [
           "bedrock:CreateFoundationModelAgreement",
           "bedrock:PutFoundationModelEntitlement",
-          "bedrock:GetFoundationModelAvailability"
+          "bedrock:GetFoundationModelAvailability",
+          "aws-marketplace:Subscribe",
+          "aws-marketplace:Unsubscribe",
+          "aws-marketplace:ViewSubscriptions"
         ],
-        Resource = [
-          "arn:aws:bedrock:*::foundation-model/anthropic.claude-sonnet-4-5-20250929-v1:0",
-          "arn:aws:bedrock:*::foundation-model/anthropic.claude-sonnet-4-20250514-v1:0",
-          "arn:aws:bedrock:*::foundation-model/anthropic.claude-3-5-haiku-20241022-v1:0",
-          "arn:aws:bedrock:*::foundation-model/anthropic.claude-3-haiku-20240307-v1:0"
-        ]
+        Resource = "*"
       }
     ]
   })
