@@ -71,7 +71,7 @@ resource "aws_secretsmanager_secret" "yjb_schedular" {
 }
 
 resource "aws_secretsmanager_secret_version" "yjb_schedular" {
-  secret_id = aws_secretsmanager_secret.yjb_publish.id
+  secret_id = aws_secretsmanager_secret.yjb_schedular.id
   secret_string = jsonencode({
     username = "yjb_schedular"
     password = "changeme"
