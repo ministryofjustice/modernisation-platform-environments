@@ -58,7 +58,7 @@ resource "aws_ecs_task_definition" "opahub" {
 
 # ECS Service
 resource "aws_ecs_service" "opahub" {
-  name            = local.opa_app_name
+  name            = "${local.opa_app_name}-service"
   cluster         = aws_ecs_cluster.main.id
   task_definition = aws_ecs_task_definition.opahub.arn
   desired_count   = local.application_data.accounts[local.environment].opa_app_count
@@ -73,7 +73,7 @@ resource "aws_ecs_service" "opahub" {
 
   load_balancer {
     target_group_arn = aws_lb_target_group.opahub_target_group.id
-    container_name   = local.opa_app_name
+    container_name   = "${local.opa_app_name}-container"
     container_port   = local.application_data.accounts[local.environment].opa_server_port
   }
 
