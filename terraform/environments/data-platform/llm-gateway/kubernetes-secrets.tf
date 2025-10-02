@@ -1,5 +1,5 @@
 locals {
-  litellm_master_key = "sk-${random_password.litellm_secret_key[0].result}" # "sk-" prefix is required by LiteLLM
+  litellm_master_key = terraform.workspace == "data-platform-development" ? "sk-${random_password.litellm_secret_key[0].result}" : "" # "sk-" prefix is required by LiteLLM
 }
 
 resource "kubernetes_secret" "litellm_master_key" {
