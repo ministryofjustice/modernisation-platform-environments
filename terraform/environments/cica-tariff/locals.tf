@@ -127,11 +127,9 @@ locals {
   }
   target_prefix = local.env_to_cica_map[local.environment]
 
-  cica_s3_resource = flatten([
-    for v in values(local.target_prefix) : [
-      for prefix in v : "arn:aws:s3:::${prefix}storagebucket"
-    ]
-  ])
+  cica_s3_resource = [
+    for prefix in local.target_prefix : "arn:aws:s3:::${prefix}storagebucket"
+  ]
 
 }
 #
