@@ -90,7 +90,7 @@ resource "aws_lakeformation_permissions" "table_all_permissions" {
   table {
     database_name = each.value.database_name
     # Applies to every current and future table in the database
-    wildcard {}
+    wildcard = true
   }
 }
 
