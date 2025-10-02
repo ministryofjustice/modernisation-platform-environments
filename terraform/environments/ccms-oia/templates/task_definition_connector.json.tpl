@@ -18,10 +18,6 @@
     "essential": true,
     "environment": [
       {
-        "name": "ccms_soa_soapHeaderUserPassword",
-        "value": "${ccms_soa_soapHeaderUserPassword}"
-      },
-      {
         "name": "ccms_pui_connector_environmentId",
         "value": "${environment_connector}"
       },
@@ -34,16 +30,8 @@
         "value": "${ccms_connector_service_userid}"
       },
       {
-        "name": "ccms_connector_service_password",
-        "value": "${ccms_connector_service_password}"
-      },
-      {
         "name": "ccms_pui_connector_assess_service_userid",
         "value": "${client_opa12assess_security_user_name}"
-      },
-      {
-        "name": "ccms_pui_connector_assess_service_password",
-        "value": "${client_opa12assess_security_user_password}"
       },
       {
         "name": "ccms_soa_url_ebsReferenceDataEndpoint",
@@ -80,10 +68,6 @@
       {
         "name": "spring_datasource_username",
         "value": "${spring_datasource_username}"
-      },
-      {
-        "name": "spring_datasource_password",
-        "value": "${spring_datasource_password}"
       },
       {
         "name": "AWS_REGION",
@@ -124,6 +108,24 @@
       {
         "name": "spring_datasource_hikari_keepalive-time",
         "value": "60000"
+      }
+    ],
+    "secrets": [
+      {
+        "name": "ccms_soa_soapHeaderUserPassword",
+        "valueFrom": "${ccms_soa_soapHeaderUserPassword}"
+      },
+      {
+        "name": "ccms_connector_service_password",
+        "valueFrom": "${ccms_connector_service_password}"
+      },
+      {
+        "name": "spring_datasource_password",
+        "valueFrom": "${spring_datasource_password}"
+      },
+      {
+        "name": "ccms_pui_connector_assess_service_password",
+        "valueFrom": "${client_opa12assess_security_user_password}"
       }
     ]
   }

@@ -39,7 +39,7 @@
       "spring_datasource_url": "jdbc:oracle:thin:@ccms-ebs-db.laa-development.modernisation-platform.service.justice.gov.uk:1521:EBSDB",
       "spring_datasource_username": "XXCCMS_PUI",
       "connector_dns_name": "ccms-connector.laa-development.modernisation-platform.service.justice.gov.uk",
-      "connector_app_count": "1", 
+      "connector_app_count": "2",
       "connector_container_cpu": "512",
       "connector_container_memory": "2048",
       "logging_level_com_ezgov_model": "info",
