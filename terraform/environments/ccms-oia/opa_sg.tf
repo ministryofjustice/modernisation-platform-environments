@@ -8,7 +8,7 @@ resource "aws_security_group" "opahub_load_balancer" {
   vpc_id      = data.aws_vpc.shared.id
 
   tags = merge(local.tags,
-    { Name = lower(format("%s-lb-sg", local.application_name)) }
+    { Name = lower(format("%s-lb-sg", local.opa_app_name)) }
   )
 }
 

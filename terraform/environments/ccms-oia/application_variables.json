@@ -19,6 +19,7 @@
       "db_deletion_protection": "false",
       "db_log_retention_days": "30",
       "aws_workspace": "10.200.0.0/19",
+      "create_database": "false",
       "logging_level_root": "info"
     },
     "test": {

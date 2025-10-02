@@ -61,7 +61,7 @@
       },
       {
         "name": "CREATE_DATABASE",
-        "value": "false"
+        "value": "${create_database}"
       }
     ],
     "secrets": [

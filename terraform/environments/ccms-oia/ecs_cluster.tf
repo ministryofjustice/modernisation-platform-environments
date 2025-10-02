@@ -25,7 +25,7 @@ resource "aws_ecs_task_definition" "opahub" {
   memory = local.application_data.accounts[local.environment].opa_container_memory
 
   volume {
-    name      = "opa_volume"
+    name = "opa_volume"
     efs_volume_configuration {
       file_system_id = aws_efs_file_system.oia-storage.id
     }
@@ -48,6 +48,7 @@ resource "aws_ecs_task_definition" "opahub" {
       wl_password       = aws_secretsmanager_secret.wl_password.arn
       wl_mem_args       = local.application_data.accounts[local.environment].wl_mem_args
       secret_key        = aws_secretsmanager_secret.secret_key.arn
+      create_database   = local.application_data.accounts[local.environment].create_database
     }
   )
 
