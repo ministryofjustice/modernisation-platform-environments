@@ -63,6 +63,38 @@ resource "aws_lakeformation_permissions" "share_dbs_all_permissions" {
   }
 }
 
+# Grant 'ALL' on *all tables* within each shared database
+resource "aws_lakeformation_permissions" "table_all_permissions" {
+  # one instance per (share_index, resource_share, principal)
+  for_each = {
+    for combo in flatten([
+      for share_index, share in local.analytical_platform_share : [
+        for rs_index, resource_share in share.resource_shares : [
+          for principal in toset(concat(
+            [aws_iam_role.analytical_platform_share_role[share_index].arn],
+            tolist(local.lf_principals_not_admin)
+            )) : {
+            key           = "tbl-${share_index}-${rs_index}-${substr(md5(principal), 0, 10)}"
+            principal     = principal
+            database_name = resource_share.glue_database
+          }
+        ]
+      ]
+    ]) : combo.key => combo
+  }
+
+  principal                     = each.value.principal
+  permissions                   = ["ALL"]
+  permissions_with_grant_option = ["ALL"]
+
+  table {
+    database_name = each.value.database_name
+    # Applies to every current and future table in the database
+    wildcard {}
+  }
+}
+
+
 # Grant DATA_LOCATION_ACCESS to analytical platform share roles on their configured S3 buckets
 resource "aws_lakeformation_permissions" "share_role_data_location_permissions" {
   for_each = {
