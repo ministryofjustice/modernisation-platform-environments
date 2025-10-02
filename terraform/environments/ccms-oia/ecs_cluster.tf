@@ -24,6 +24,14 @@ resource "aws_ecs_task_definition" "opahub" {
   cpu    = local.application_data.accounts[local.environment].opa_container_cpu
   memory = local.application_data.accounts[local.environment].opa_container_memory
 
+  volume {
+    name      = "opa_volume"
+    efs_volume_configuration {
+      file_system_id = aws_efs_file_system.oia-storage.id
+    }
+  }
+
+
   container_definitions = templatefile(
     "${path.module}/templates/task_definition_opahub.json.tpl",
     {
