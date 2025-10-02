@@ -61,4 +61,21 @@ resource "aws_security_group" "tariff_db_prod_security_group" {
     ]
 
   }
+  #Allow connectivity between db instances
+  ingress {
+    protocol    = -1
+    from_port   = 0
+    to_port     = 0
+    self        = true
+    description = "Allow all traffic between db instances"
+  }
+
+  # Allow Commvault ingress from Shared Services
+  ingress {
+    protocol    = TCP
+    from_port   = 8400
+    to_port     = 8403
+    cidr_blocks = [local.cidr_cica_ss_a, local.cidr_cica_ss_b]
+    description = "Allow Commvault inbound from Shared Services"
+  }
 }
