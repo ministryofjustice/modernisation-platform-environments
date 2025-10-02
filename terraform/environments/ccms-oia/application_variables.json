@@ -20,7 +20,6 @@
       "db_log_retention_days": "30",
       "aws_workspace": "10.200.0.0/19",
       "create_database": "false",
-      "logging_level_root": "info",
       "connector_ecr_repo": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/ccms-connector",
       "connector_container_version": "latest",
       "connector_server_port": "8080",
@@ -39,7 +38,12 @@
       "ccms_pui_connector_assessservice_url_merits": "https://ccms-opa.laa-development.modernisation-platform.service.justice.gov.uk/opa/determinations-server/assess/soap/generic/12.2.1/MeritsAssessment",
       "spring_datasource_url": "jdbc:oracle:thin:@ccms-ebs-db.laa-development.modernisation-platform.service.justice.gov.uk:1521:EBSDB",
       "spring_datasource_username": "XXCCMS_PUI",
-      "connector_dns_name": "ccms-connector.laa-development.modernisation-platform.service.justice.gov.uk"
+      "connector_dns_name": "ccms-connector.laa-development.modernisation-platform.service.justice.gov.uk",
+      "logging_level_com_ezgov_model": "info",
+      "logging_level_com_ezgov_opa": "info",
+      "logging_level_oracle_ocs_opa_laa": "info",
+      "logging_level_root": "info",
+      "logging_level_uk_gov_laa_opa": "info"
     },
     "test": {
       "app_name": "ccms-oia",
