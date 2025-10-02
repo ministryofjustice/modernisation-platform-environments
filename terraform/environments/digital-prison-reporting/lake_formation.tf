@@ -29,20 +29,32 @@ resource "aws_lakeformation_data_lake_settings" "lake_formation" {
   }
 }
 
-resource "aws_lakeformation_permissions" "share_role_all_permissions" {
+# Give the key roles role 'All' permissions on all DBs in 
+# application_variables.json
+resource "aws_lakeformation_permissions" "share_dbs_all_permissions" {
+  # Build one element per (database_to_share × principal) pair
   for_each = {
-    for pair in flatten([
+    for combo in flatten([
       for share_index, share in local.analytical_platform_share : [
-        for rs_index, resource_share in share.resource_shares : {
-          key            = "${share_index}-${rs_index}"
-          resource_share = resource_share
-          share_index    = share_index
-        }
+        for rs_index, resource_share in share.resource_shares : [
+          for principal in toset(concat(
+            # analytical platform share role
+            [aws_iam_role.analytical_platform_share_role[share_index].arn],
+            # plus every non (LF) admin principal 
+            tolist(local.lf_principals_not_admin)
+            )) : {
+            # Stable, unique key per (share_index, rs_index, principal)
+            key            = "${share_index}-${rs_index}-${substr(md5(principal), 0, 10)}"
+            share_index    = share_index
+            resource_share = resource_share
+            principal      = principal
+          }
+        ]
       ]
-    ]) : pair.key => pair
+    ]) : combo.key => combo
   }
 
-  principal                     = aws_iam_role.analytical_platform_share_role[each.value.share_index].arn
+  principal                     = each.value.principal
   permissions                   = ["ALL"]
   permissions_with_grant_option = ["ALL"]
 
