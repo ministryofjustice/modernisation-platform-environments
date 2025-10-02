@@ -38,7 +38,7 @@ resource "aws_ecs_task_definition" "ecs_connector_task_definition" {
       spring_datasource_url                        = local.application_data.accounts[local.environment].spring_datasource_url
       spring_datasource_username                   = local.application_data.accounts[local.environment].spring_datasource_username
       spring_datasource_password                   = aws_secretsmanager_secret.spring_datasource_password.arn
-      environment_connector                        = local.application_data.accounts[local.environment].environment_connector
+      environment_connector                        = local.application_data.accounts[local.environment].connector_dns_name
       logging_level_root                           = local.application_data.accounts[local.environment].logging_level_root
       logging_level_com_ezgov_model                = local.application_data.accounts[local.environment].logging_level_com_ezgov_model
       logging_level_com_ezgov_opa                  = local.application_data.accounts[local.environment].logging_level_com_ezgov_opa

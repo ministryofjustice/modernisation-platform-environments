@@ -30,8 +30,16 @@
       "ccms_s3_documents": "ccms-oia-development",
       "aws_endpoint": "http://ccms-oia-development",
       "client_opa12assess_security_user_name": "ccms_api_user",
-      
-
+      "ccms_soa_url_ebsReferenceDataEndpoint": "https://ccms-soa-managed.laa-development.modernisation-platform.service.justice.gov.uk/soa-infra/services/default/GetReferenceData/getreferencedata_ep",
+      "ccms_pui_connector_answerservice_url_billing": "https://ccms-opa.laa-development.modernisation-platform.service.justice.gov.uk/opa/determinations-server/answer/soap/12.2.1/BillingAssessment",
+      "ccms_pui_connector_answerservice_url_means": "https://ccms-opa.laa-development.modernisation-platform.service.justice.gov.uk/opa/determinations-server/answer/soap/12.2.1/MeansAssessment",
+      "ccms_pui_connector_answerservice_url_merits": "https://ccms-opa.laa-development.modernisation-platform.service.justice.gov.uk/opa/determinations-server/answer/soap/12.2.1/MeritsAssessment",
+      "ccms_pui_connector_assessservice_url_billing": "https://ccms-opa.laa-development.modernisation-platform.service.justice.gov.uk/opa/determinations-server/assess/soap/generic/12.2.1/BillingAssessment",
+      "ccms_pui_connector_assessservice_url_means": "https://ccms-opa.laa-development.modernisation-platform.service.justice.gov.uk/opa/determinations-server/assess/soap/generic/12.2.1/MeansAssessment",
+      "ccms_pui_connector_assessservice_url_merits": "https://ccms-opa.laa-development.modernisation-platform.service.justice.gov.uk/opa/determinations-server/assess/soap/generic/12.2.1/MeritsAssessment",
+      "spring_datasource_url": "jdbc:oracle:thin:@ccms-ebs-db.laa-development.modernisation-platform.service.justice.gov.uk:1521:EBSDB",
+      "spring_datasource_username": "XXCCMS_PUI",
+      "connector_dns_name": "ccms-connector.laa-development.modernisation-platform.service.justice.gov.uk"
     },
     "test": {
       "app_name": "ccms-oia",
