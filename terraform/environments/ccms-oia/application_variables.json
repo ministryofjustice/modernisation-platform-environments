@@ -20,7 +20,18 @@
       "db_log_retention_days": "30",
       "aws_workspace": "10.200.0.0/19",
       "create_database": "false",
-      "logging_level_root": "info"
+      "logging_level_root": "info",
+      "connector_ecr_repo": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/ccms-connector",
+      "connector_container_version": "latest",
+      "connector_server_port": "8080",
+      "spring_profiles_active": "prod",
+      "ccms_soa_soapHeaderUserName": "pui_user",
+      "ccms_connector_service_userid": "laa",
+      "ccms_s3_documents": "ccms-oia-development",
+      "aws_endpoint": "http://ccms-oia-development",
+      "client_opa12assess_security_user_name": "ccms_api_user",
+      
+
     },
     "test": {
       "app_name": "ccms-oia",
