@@ -19,6 +19,7 @@ resource "helm_release" "litellm" {
         serviceAccountName   = data.kubernetes_secret.irsa[0].data["serviceaccount"]
         ingressHostname      = "llm-gateway.development.data-platform.service.justice.gov.uk"
         ingressTlsSecretName = "llms-gateway-tls" # what an annoying typo on my part
+        ingressAllowList     = local.environment_configuration.llm_gateway_ingress_allowlist
 
         # Database
         databaseSecret      = data.kubernetes_secret.rds[0].metadata[0].name

@@ -38,6 +38,11 @@ proxy_config:
       host: os.environ/primary_endpoint_address
       port: 6379
       password: os.environ/auth_token
+    callbacks: ["prometheus"]
+    prometheus_initialize_budget_metrics: true
+    service_callback: ["prometheus_system"]
+    default_internal_user_params:
+      user_role: "internal_user"
   router_settings:
     routing_strategy: simple-shuffle
     redis_host: os.environ/primary_endpoint_address
@@ -68,6 +73,7 @@ ingress:
     external-dns.alpha.kubernetes.io/set-identifier: "${ingressIdentifier}-${namespace}-${ingressColour}"
     external-dns.alpha.kubernetes.io/aws-weight: "100"
     external-dns.alpha.kubernetes.io/hostname: "${ingressHostname}"
+    nginx.ingress.kubernetes.io/whitelist-source-range: ${join(",", ingressAllowList)}
   hosts:
     - host: ${ingressHostname}
       paths:
