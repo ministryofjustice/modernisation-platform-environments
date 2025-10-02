@@ -31,3 +31,21 @@ resource "kubernetes_secret" "litellm_license" {
 
   type = "Opaque"
 }
+
+resource "kubernetes_secret" "litellm_entra_id" {
+  count = terraform.workspace == "data-platform-development" ? 1 : 0
+
+  metadata {
+    namespace = jsondecode(data.aws_secretsmanager_secret_version.cloud_platform_live_namespace[0].secret_string)["namespace"]
+    name      = "litellm-entra-id"
+  }
+
+  data = {
+    MICROSOFT_CLIENT_ID     = jsondecode(data.aws_secretsmanager_secret_version.litellm_entra_id[0].secret_string)["client_id"]
+    MICROSOFT_CLIENT_SECRET = jsondecode(data.aws_secretsmanager_secret_version.litellm_entra_id[0].secret_string)["client_secret"]
+    MICROSOFT_TENANT        = jsondecode(data.aws_secretsmanager_secret_version.litellm_entra_id[0].secret_string)["tenant_id"]
+    PROXY_ADMIN_ID          = jsondecode(data.aws_secretsmanager_secret_version.litellm_entra_id[0].secret_string)["proxy_admin_id"]
+  }
+
+  type = "Opaque"
+}

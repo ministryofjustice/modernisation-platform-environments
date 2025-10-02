@@ -16,6 +16,12 @@ data "aws_secretsmanager_secret_version" "litellm_license" {
   secret_id = module.litellm_license_secret[0].secret_id
 }
 
+data "aws_secretsmanager_secret_version" "litellm_entra_id" {
+  count = terraform.workspace == "data-platform-development" ? 1 : 0
+
+  secret_id = module.litellm_entra_id_secret[0].secret_id
+}
+
 data "kubernetes_secret" "elasticache" {
   count = terraform.workspace == "data-platform-development" ? 1 : 0
 

@@ -29,7 +29,21 @@ proxyConfigMap:
   create: true
 proxy_config:
   general_settings:
+    litellm_license: os.environ/LITELLM_LICENSE
     master_key: os.environ/PROXY_MASTER_KEY
+  litellm_settings:
+    cache: true
+    cache_params:
+      type: redis
+      host: os.environ/primary_endpoint_address
+      port: 6379
+      password: os.environ/auth_token
+  router_settings:
+    routing_strategy: simple-shuffle
+    redis_host: os.environ/primary_endpoint_address
+    redis_port: 6379
+    redis_password: os.environ/auth_token
+      
   model_list:
 %{ for key, profile in bedrockInferenceProfiles ~}
     - model_name: bedrock-${key}
@@ -54,7 +68,6 @@ ingress:
     external-dns.alpha.kubernetes.io/set-identifier: "${ingressIdentifier}-${namespace}-${ingressColour}"
     external-dns.alpha.kubernetes.io/aws-weight: "100"
     external-dns.alpha.kubernetes.io/hostname: "${ingressHostname}"
-    nginx.ingress.kubernetes.io/whitelist-source-range: "81.77.57.111/32"
   hosts:
     - host: ${ingressHostname}
       paths:
@@ -64,3 +77,9 @@ ingress:
    - secretName: ${ingressTlsSecretName}
      hosts:
        - ${ingressHostname}
+
+envVars: {
+    LITELLM_MODE: "PRODUCTION",
+    PROXY_BASE_URL: "https://${ingressHostname}",
+    REDIS_SSL: "True"
+}

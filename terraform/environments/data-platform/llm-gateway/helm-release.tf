@@ -31,7 +31,9 @@ resource "helm_release" "litellm" {
         masterkeySecretName = kubernetes_secret.litellm_master_key[0].metadata[0].name
         masterkeySecretKey  = "master-key"
         environmentSecrets = [
-          kubernetes_secret.litellm_license[0].metadata[0].name
+          data.kubernetes_secret.elasticache[0].metadata[0].name,
+          kubernetes_secret.litellm_license[0].metadata[0].name,
+          kubernetes_secret.litellm_entra_id[0].metadata[0].name
         ]
 
         # AWS
@@ -46,6 +48,7 @@ resource "helm_release" "litellm" {
   depends_on = [
     module.iam_role,
     kubernetes_secret.litellm_master_key,
-    kubernetes_secret.litellm_license
+    kubernetes_secret.litellm_license,
+    kubernetes_secret.litellm_entra_id
   ]
 }

@@ -4,7 +4,6 @@ locals {
     development = {
       route53_zone_name = "development.data-platform.service.justice.gov.uk"
       route53_records = [
-
         {
           /* 
             Delegate llm-gateway to Cloud Platform 
