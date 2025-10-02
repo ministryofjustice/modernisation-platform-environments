@@ -1,10 +1,65 @@
 ---
 image:
+  repository: ${imageRepository}
   tag: ${imageTag}
 
 serviceAccount:
   name: ${serviceAccountName}
 
 db:
+  deployStandalone: false
   useExisting: true
-  url: ${dbUrl}
+  url: postgresql://$(DATABASE_USERNAME):$(DATABASE_PASSWORD)@$(DATABASE_HOST)/$(DATABASE_NAME)
+  database: ${databaseName}
+  secret:
+    name: ${databaseSecret}
+    usernameKey: ${databaseUserNameKey}
+    passwordKey: ${databasePasswordKey}
+    endpointKey: ${databaseEndpointKey}
+  
+masterkeySecretName: ${masterkeySecretName}
+masterkeySecretKey: ${masterkeySecretKey}
+
+environmentSecrets:
+%{ for secret in environmentSecrets ~}
+  - ${secret}
+%{ endfor ~}
+
+proxyConfigMap:
+  create: true
+proxy_config:
+  general_settings:
+    master_key: os.environ/PROXY_MASTER_KEY
+  model_list:
+%{ for key, profile in bedrockInferenceProfiles ~}
+    - model_name: bedrock-${key}
+      litellm_params:
+        model: bedrock/${profile.model_id}
+        aws_role_name: ${iamRole}
+        aws_region_name: ${profile.region}
+%{ endfor ~}
+
+securityContext:
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: false
+  runAsNonRoot: true
+  runAsUser: 65534
+
+ingress:
+  enabled: true
+  className: default
+  annotations:
+    external-dns.alpha.kubernetes.io/set-identifier: "${ingressIdentifier}-${namespace}-${ingressColour}"
+    external-dns.alpha.kubernetes.io/aws-weight: "100"
+    nginx.ingress.kubernetes.io/whitelist-source-range: "81.77.57.111/32"
+  hosts:
+    - host: ${namespace}.apps.live.cloud-platform.service.justice.gov.uk
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls:
+   - secretName: ${ingressIdentifier}-tls
+     hosts:
+       - ${namespace}.apps.live.cloud-platform.service.justice.gov.uk

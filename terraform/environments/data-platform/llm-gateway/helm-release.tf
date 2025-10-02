@@ -1,23 +1,49 @@
-# resource "helm_release" "litellm" {
-#   name       = "litellm"
-#   repository = "oci://ghcr.io/berriai"
-#   version    = "0.1.785"
-#   chart      = "litellm-helm"
-#   namespace  = jsondecode(data.aws_secretsmanager_secret_version.cloud_platform_live_namespace[0].secret_string)["namespace"]
-#   values = [
-#     templatefile(
-#       "${path.module}/src/helm/values/litellm/values.yml.tftpl",
-#       {
-#         imageTag           = "v1.77.3-stable"
-#         serviceAccountName = data.kubernetes_secret.irsa[0].data["serviceaccount"]
-#         dbUrl              = data.kubernetes_secret.rds[0].data["url"]
-#       }
-#     )
-#   ]
-#   # depends_on = [
-#   #   module.mlflow_iam_role,
-#   #   kubernetes_secret.mlflow_admin,
-#   #   kubernetes_secret.mlflow_auth_rds,
-#   #   kubernetes_secret.mlflow_rds
-#   # ]
-# }
+resource "helm_release" "litellm" {
+  count = terraform.workspace == "data-platform-development" ? 1 : 0
+
+  name       = "litellm"
+  repository = "oci://ghcr.io/berriai"
+  version    = local.environment_configuration.litellm_versions.chart
+  chart      = "litellm-helm"
+  namespace  = jsondecode(data.aws_secretsmanager_secret_version.cloud_platform_live_namespace[0].secret_string)["namespace"]
+  values = [
+    templatefile(
+      "${path.module}/src/helm/values/litellm/values.yml.tftpl",
+      {
+        # Kubernetes
+        namespace          = jsondecode(data.aws_secretsmanager_secret_version.cloud_platform_live_namespace[0].secret_string)["namespace"]
+        ingressIdentifier  = "litellm"
+        ingressColour      = "green"
+        imageRepository    = "ghcr.io/berriai/litellm-non_root"
+        imageTag           = local.environment_configuration.litellm_versions.application
+        serviceAccountName = data.kubernetes_secret.irsa[0].data["serviceaccount"]
+
+        # Database
+        databaseSecret      = data.kubernetes_secret.rds[0].metadata[0].name
+        databaseUserNameKey = "database_username"
+        databasePasswordKey = "database_password"
+        databaseEndpointKey = "rds_instance_endpoint"
+        databaseName        = data.kubernetes_secret.rds[0].data["database_name"]
+
+        # LiteLLM
+        masterkeySecretName = kubernetes_secret.litellm_master_key[0].metadata[0].name
+        masterkeySecretKey  = "master-key"
+        environmentSecrets = [
+          kubernetes_secret.litellm_license[0].metadata[0].name
+        ]
+
+        # AWS
+        iamRole = module.iam_role[0].arn
+
+        # LiteLLM Models
+        bedrockInferenceProfiles = local.environment_configuration.bedrock_inference_profiles
+      }
+    )
+  ]
+
+  depends_on = [
+    module.iam_role,
+    kubernetes_secret.litellm_master_key,
+    kubernetes_secret.litellm_license
+  ]
+}
