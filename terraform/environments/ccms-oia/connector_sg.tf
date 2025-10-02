@@ -22,7 +22,7 @@ resource "aws_security_group_rule" "connector_alb_ingress_443" {
   cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
 }
 
-resource "aws_security_group_rule" "alb_egress_all" {
+resource "aws_security_group_rule" "connector_alb_egress_all" {
   security_group_id = aws_security_group.connector_load_balancer.id
   type              = "egress"
   description       = "All outbound"
