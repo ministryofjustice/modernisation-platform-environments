@@ -19,7 +19,7 @@ resource "aws_ecs_task_definition" "ecs_connector_task_definition" {
       connector_server_port                        = local.application_data.accounts[local.environment].connector_server_port
       aws_region                                   = local.application_data.accounts[local.environment].aws_region
       spring_profiles_active                       = local.application_data.accounts[local.environment].spring_profiles_active
-      connector_container_version                  = local.application_data.accounts[local.environment].connector_container_version
+      container_version                            = local.application_data.accounts[local.environment].connector_container_version
       ccms_soa_soapHeaderUserPassword              = aws_secretsmanager_secret.ccms_soa_soapHeaderUserPassword.arn
       ccms_soa_soapHeaderUserName                  = local.application_data.accounts[local.environment].ccms_soa_soapHeaderUserName
       ccms_connector_service_userid                = local.application_data.accounts[local.environment].ccms_connector_service_userid
