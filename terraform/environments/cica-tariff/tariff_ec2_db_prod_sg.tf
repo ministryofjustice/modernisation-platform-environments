@@ -72,7 +72,7 @@ resource "aws_security_group" "tariff_db_prod_security_group" {
 
   # Allow Commvault ingress from Shared Services
   ingress {
-    protocol    = TCP
+    protocol    = "tcp"
     from_port   = 8400
     to_port     = 8403
     cidr_blocks = [local.cidr_cica_ss_a, local.cidr_cica_ss_b]
