@@ -1,5 +1,5 @@
 resource "aws_security_group" "test-sg-for-t4" {
-
+  count = local.is-development ? 1 : 0
   #checkov:skip=CKV_AWS_23: "Ensure every security group and rule has a description"
   #checkov:skip=CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
   vpc_id      = data.aws_vpc.shared.id
@@ -37,7 +37,7 @@ resource "aws_instance" "my_t4_instance" {
   ami           = "ami-01e9af7b9c1dfb736"
   instance_type = "t4g.xlarge"
 
-  vpc_security_group_ids = [aws_security_group.test-sg-for-t4.id]
+  vpc_security_group_ids = [aws_security_group.test-sg-for-t4[0].id]
 
   associate_public_ip_address = false
   availability_zone           = "eu-west-2a"
