@@ -1249,8 +1249,8 @@ resource "aws_cloudwatch_metric_alarm" "malware_event_signature_update_failed_de
   alarm_description   = "Monitors for windows defender malware signature update failed events"
   alarm_actions       = [aws_sns_topic.cw_dev_alerts[0].arn]
   dimensions = {
-    Instance               = each.key
-    MalwareSignatureFailed = "MalwareSignatureFailed"
+    Instance          = each.key
+    EventName         = "MalwareSignatureFailed"
   }
 }
 
@@ -1271,8 +1271,8 @@ resource "aws_cloudwatch_metric_alarm" "malware_event_state_detected_dev" {
   alarm_description   = "Monitors for windows defender malware state detected events"
   alarm_actions       = [aws_sns_topic.cw_dev_alerts[0].arn]
   dimensions = {
-    Instance             = each.key
-    MalwareStateDetected = "MalwareStateDetected"
+    Instance          = each.key
+    EventName         = "MalwareStateDetected"
   }
 }
 
@@ -1294,7 +1294,7 @@ resource "aws_cloudwatch_metric_alarm" "malware_event_scan_failed_dev" {
   alarm_actions       = [aws_sns_topic.cw_dev_alerts[0].arn]
   dimensions = {
     Instance          = each.key
-    MalwareScanFailed = "MalwareScanFailed"
+    EventName         = "MalwareScanFailed"
   }
 }
 
@@ -1315,8 +1315,8 @@ resource "aws_cloudwatch_metric_alarm" "malware_event_engine_update_failed_dev" 
   alarm_description   = "Monitors for windows defender malware engine update events"
   alarm_actions       = [aws_sns_topic.cw_dev_alerts[0].arn]
   dimensions = {
-    Instance            = each.key
-    MalwareEngineFailed = "MalwareEngineFailed"
+    Instance          = each.key
+    EventName         = "MalwareEngineFailed"
   }
 }
 
@@ -1337,8 +1337,8 @@ resource "aws_cloudwatch_metric_alarm" "malware_event_engine_out_of_date_dev" {
   alarm_description   = "Monitors for windows defender malware engine out of date events"
   alarm_actions       = [aws_sns_topic.cw_dev_alerts[0].arn]
   dimensions = {
-    Instance               = each.key
-    MalwareEngineOutofDate = "MalwareEngineOutofDate"
+    Instance          = each.key
+    EventName         = "MalwareEngineOutofDate"
   }
 }
 
@@ -1359,7 +1359,7 @@ resource "aws_cloudwatch_metric_alarm" "malware_event_behavior_detected_dev" {
   alarm_description   = "Monitors for windows defender malware behavior detected events"
   alarm_actions       = [aws_sns_topic.cw_dev_alerts[0].arn]
   dimensions = {
-    Instance                = each.key
-    MalwareBehaviorDetected = "MalwareBehaviorDetected"
+    Instance          = each.key
+    EventName         = "MalwareBehaviorDetected"
   }
 }

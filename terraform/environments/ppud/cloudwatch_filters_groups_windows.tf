@@ -490,6 +490,39 @@ resource "aws_cloudwatch_log_metric_filter" "MalwareEngineOutofDate-Preproductio
 
 # Windows Defender Event Metric Filters
 
+locals {
+  malware_metrics = local.is-development ? {
+    MalwareScanStarted        = 1000
+    MalwareScanFinished       = 1001
+    MalwareScanStopped        = 1002
+    MalwareScanFailed         = 1005
+    MalwareBehaviorDetected   = 1015
+    MalwareStateDetected      = 1116
+    MalwareSignatureFailed    = 2001
+    MalwareEngineFailed       = 2003
+    MalwareEngineOutofDate    = 2005
+  } : {}
+}
+
+
+resource "aws_cloudwatch_log_metric_filter" "malware_metrics_development" {
+  for_each       = local.is-development ? local.malware_metrics : {}
+  name           = each.key
+  log_group_name = aws_cloudwatch_log_group.Windows-Defender-Logs-Development[0].name
+  pattern        = "[date, time, Instance, EventName, status=${each.value}]"
+
+  metric_transformation {
+    name       = each.key
+    namespace  = "WindowsDefender"
+    value      = "1"
+	  dimensions = {
+      Instance  = "$Instance"
+      EventName = "$EventName"
+    }
+  }
+}
+
+/*
 resource "aws_cloudwatch_log_metric_filter" "MalwareScanStarted-Development" {
   count          = local.is-development == true ? 1 : 0
   name           = "MalwareScanStarted"
@@ -633,6 +666,7 @@ resource "aws_cloudwatch_log_metric_filter" "MalwareEngineOutofDate-Development"
     }
   }
 }
+*/
 
 # EmailSender Log Application Metric Filters
 
