@@ -842,6 +842,7 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
       "lakeformation:CreateLFTagExpression",
       "lakeformation:GetLFTagExpression",
       "lakeformation:UpdateLFTag",
+      "lakeformation:UpdateLFTagExpression",
       "lakeformation:DeleteLFTag",
       "lakeformation:GetResourceLFTags",
       "lakeformation:ListLFTags",
