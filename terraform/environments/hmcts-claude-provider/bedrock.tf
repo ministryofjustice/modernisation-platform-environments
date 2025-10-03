@@ -12,7 +12,6 @@ resource "aws_iam_policy" "bedrock_claude_policy" {
           "bedrock:InvokeModelWithResponseStream",
           "bedrock:GetInferenceProfile",
           "bedrock:ListInferenceProfiles",
-          "bedrock:CallWithBearerToken",
           "bedrock:Get*",
           "bedrock:List*"
         ],
@@ -25,6 +24,12 @@ resource "aws_iam_policy" "bedrock_claude_policy" {
           "arn:aws:bedrock:*::inference-profile/*",
           "arn:aws:bedrock:*:313941174580:inference-profile/*"
         ]
+      },
+      {
+        Sid    = "BedrockBearerTokenAuth",
+        Effect = "Allow",
+        Action = "bedrock:CallWithBearerToken",
+        Resource = "*"
       },
       {
         Sid    = "BedrockInferenceProfileManagement",
