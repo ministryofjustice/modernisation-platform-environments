@@ -425,7 +425,7 @@ resource "aws_cloudwatch_metric_alarm" "Windows_IIS_check" {
 }
 
 # CloudWatch Alarms for Malware Events (Signature Update Failed, State Detected, Scan Failed, Engine Update Failed, Engine Out of Date & Behavior Detected)
-/*
+
 locals {
   malware_alarm_metadata_prod    = local.is-production ? {
     MalwareScanFailed       = "Scan Failed"
@@ -475,10 +475,9 @@ resource "aws_cloudwatch_metric_alarm" "malware_event_alarms_prod" {
     EventName = each.value.metric_name
   }
 }
-*/
 
 # Malware Event Signature Update Failed
-
+/*
 resource "aws_cloudwatch_metric_alarm" "malware_event_signature_update_failed" {
   for_each            = toset(data.aws_instances.windows_tagged_instances.ids)
   alarm_name          = "Malware-Event-Signature-Update-Failed-${each.key}"
@@ -608,6 +607,7 @@ resource "aws_cloudwatch_metric_alarm" "malware_event_behavior_detected" {
     MalwareBehaviorDetected = "MalwareBehaviorDetected"
   }
 }
+*/
 
 # Service Status Alarms
 
@@ -1129,7 +1129,7 @@ data "aws_instance" "windows_instance_details_uat" {
 #################################
 
 # CloudWatch Alarms for Malware Events (Signature Update Failed, State Detected, Scan Failed, Engine Update Failed, Engine Out of Date & Behavior Detected)
-/*
+
 locals {
   malware_alarm_metadata_preprod    = local.is-preproduction ? {
     MalwareScanFailed       = "Scan Failed"
@@ -1179,10 +1179,9 @@ resource "aws_cloudwatch_metric_alarm" "malware_event_alarms_preprod" {
     EventName = each.value.metric_name
   }
 }
-*/
 
 # Malware Event Signature Update Failed
-
+/*
 resource "aws_cloudwatch_metric_alarm" "malware_event_signature_update_failed_uat" {
   for_each            = toset(data.aws_instances.windows_tagged_instances_uat.ids)
   alarm_name          = "Malware-Event-Signature-Update-Failed-${each.key}"
@@ -1312,6 +1311,7 @@ resource "aws_cloudwatch_metric_alarm" "malware_event_behavior_detected_uat" {
     MalwareBehaviorDetected = "MalwareBehaviorDetected"
   }
 }
+*/
 
 ##########################
 # Data Sources Development

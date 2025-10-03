@@ -207,7 +207,7 @@ locals {
 resource "aws_cloudwatch_log_metric_filter" "malware_metrics_production" {
   for_each       = local.is-production ? local.malware_metrics_prod : {}
   name           = each.key
-  log_group_name = aws_cloudwatch_log_group.Windows-Defender-Logs-Development[0].name
+  log_group_name = aws_cloudwatch_log_group.Windows-Defender-Logs[0].name
   pattern        = "[date, time, Instance, EventName, status=${each.value}]"
 
   metric_transformation {
@@ -390,7 +390,7 @@ locals {
 resource "aws_cloudwatch_log_metric_filter" "malware_metrics_preproduction" {
   for_each       = local.is-preproduction ? local.malware_metrics_preprod : {}
   name           = each.key
-  log_group_name = aws_cloudwatch_log_group.Windows-Defender-Logs-Development[0].name
+  log_group_name = aws_cloudwatch_log_group.Windows-Defender-Logs-Preproduction[0].name
   pattern        = "[date, time, Instance, EventName, status=${each.value}]"
 
   metric_transformation {
