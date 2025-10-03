@@ -39,11 +39,11 @@ locals {
       transfer_server_sftp_users = {
         "analytical-platform" = {
           ssh_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC082exhcUBZ2Wrzm9zjm+CtMuIUzWjWPBgXs5ezC5XEgPGqovGZ4UMOPz+7Wd/KJY5isa7IbU/ZFtq5PwCILrwI+yHsEaT93qI2pI82Xby7qCvNoCaMVDBb08pd1VBfyN3gEmxPmWeejyD6kEHiksksE3wpT/zAuUQ7LFZRzUm3rKs6THalP5CCV7aAXCxAKh+P7ObXKCvyWgjJ0fm3trOcsZxG2PS1AoBfcYgv8gyQwJLEDLZFFugMAydrkwUVHwRqWnh//Xj9AWzwGcGk3zoItLOdhF4tAkNsF0eIPtq6sq+jT7NiTG2sAAvFzjYKtK1KMzLTW4UEXQJ2vsPemPgrrqJtMzMWLdcstNiIYpbBBKdNlSWCZNwQfse9U0BnM4NQ6b3epsbuVYPec2P6tZHUzbWL3+1A2rECnzY2KFAYappLeeEioia3uD2om7CEmFNMMFFiXkt45urVUEYQ1WJrO3UqQknEJvGefNzWfi0UBAdmeB1I/OQGnryqYd1P3k="
-          cidr_blocks = ["51.179.205.105/32"]
+          cidr_blocks = ["51.179.205.105/32", "51.11.124.158/32"] # 2nd added to check deduplication
         }
         "opg-restore-ocr" = {
           ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCWz7ue/saomMAKrVgo6FifjpGQfl7B4fs2s/MJa2jhpBVWXk9tquGDXp1/Yfk4C7FIneGKfh8fWHz9FPS+u6h3a9hMW8d/5onNuSr9S6T2mN7ydZQzGez5qyG2vNFLyip3ls6mQjIpXSo2aow7+3Y2lbDe8UamiYNVgvvWB+hVl5RJjcaReDDbi0xwdjGjep0LcvgAyKa8evmcEbFVkrLhWyc30xn1+OesqPWSpoIb/IlBDFxCqR46GW/zlOldEIatONhXWgvJ6dS5T1YmHsE4U0Py3BV8O5zvc+XRYjr/3w9LOwmTHS1xbzlhNBjO1o6O9hSBsowBjsWLL5aNWcdBH0DiWfIWkoq9Fy8VEAa/T5v7GCaKvDs9pGBpjQSQsWyKXbwP0Z2RGyU2CSGVzMM6gzrjaxanOK9QbLOqCpTSSIYWfokt+MNrHcQU+9mBTjq20URF7RW6tsM8GvzGRNk0hlkX3ueq86uLpQzRctGBTjN74qBba0WbauIcSl4OIrc+NEwjaFTmuIs0NIG5aoAop8WHOC8cxFAST2XjMF30eEh6/W9Gh0uPor4L5tUqJ/JuI2wcfYLuk1KLDcOUVin79QficX93zbaTPNXWW052ct50B0KnCmZyvQORwOH8gBFgkFe5MO/bqevG9Xpof/QvpCLKEON/fBAW4bEdIIv5qw=="
-          cidr_blocks = ["51.11.176.157/32", "51.11.124.158/32"] # 2nd added to check deduplication
+          cidr_blocks = ["51.11.176.157/32"]
         }
         "maat-xhibit-dev" = {
           ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCuB8p8OaxeX3sILMVUQcD48XBPuVLzddUixUUbYLS1WPiEUz7XcUkozeuhulIy9CzqA9yyAa2uPWhQr3KL2bKpXo8UIJr+3n51mjJp9V+LO65kMN5ewQHzx9phpZba5UOth1aEwn4vAFQwm2q6/ydNrJtRQeaI0DT4njaf0MC9FM/nu25IvUbl2dzUn2MX7/WuMouzcYXTeiLUIMvgRoAw4pjnCmU2AuPTokC7OynFh++SiHRUw6OwNKxqORv3du7qlfcGDWx+oAHbUVOnSaTrUssUuEXPFS5ytwWEp6GpzfZpNvD7Kj7gw/7ntpdTckh+d5INJHu+2L74Ytj2RPLNoHEB9t1ptEI2d2SeKpHqPSak2uQzk4aHV2SJs4IO0omTWKHojtSxo5gxAl4B58UjdzmFn0yNr3rJbKnn2w1H7viaM/0vWRgZrtgo07pd2uJePObaUE9jf1re+woasVWJAy3v9dZszVBcJ62NK/QU3cGfUncBw2OnnDURm7z1YVAj8mrReOkZWFA7nJ4/Gzh5pR8wNhnSLsDFqsQefaQiHBi2vZzDRqaUu03eWvd8BmomWC5joT7qqY8Qv+X5boO9CI0hX9FcoJJMXJwckoVAZGuZKgOwOL4y1Y7hpCO1U5ex9mbyMy5D5r/FNf7B85d/qCxcGwesIzI1b0QRupKxDw=="
