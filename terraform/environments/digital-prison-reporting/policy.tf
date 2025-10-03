@@ -845,6 +845,7 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
       "lakeformation:DeleteLFTag",
       "lakeformation:GetResourceLFTags",
       "lakeformation:ListLFTags",
+      "lakeformation:ListLFTagExpressions",
       "lakeformation:GetLFTag"
 
     ]
