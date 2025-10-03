@@ -70,8 +70,8 @@ def lambda_handler(event=None, context=None):
             snap_date = snapshot["StartTime"].date()
             description = snapshot.get("Description", "").lower()
             tags = snapshot.get("Tags", [])
-                if not isinstance(tags, list):
-                    tags = []
+            if not isinstance(tags, list):
+                tags = []
 
              # Check the AWS Backup service managed snapshots for skipping them
             is_backup_managed = (
