@@ -12,6 +12,7 @@ resource "aws_iam_policy" "bedrock_claude_policy" {
           "bedrock:InvokeModelWithResponseStream",
           "bedrock:GetInferenceProfile",
           "bedrock:ListInferenceProfiles",
+          "bedrock:CallWithBearerToken",
           "bedrock:Get*",
           "bedrock:List*"
         ],
