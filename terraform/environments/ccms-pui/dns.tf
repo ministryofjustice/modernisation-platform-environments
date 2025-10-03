@@ -9,8 +9,8 @@ resource "aws_route53_record" "route53_record_pui_nonprod" {
   type     = "A"
 
   alias {
-    name                   = aws_lb.pui.dns_name
-    zone_id                = aws_lb.pui.zone_id
+    name                   = "d239cfft3oabrj.cloudfront.net"
+    zone_id                = "Z2FDTNDATAQYW2"
     evaluate_target_health = false
   }
 }

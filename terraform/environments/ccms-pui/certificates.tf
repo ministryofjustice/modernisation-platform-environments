@@ -7,7 +7,7 @@
 # Certificate
 
 resource "aws_acm_certificate" "external" {
-  provider                  = aws.us-east-1
+#  provider                  = aws.us-east-1
   validation_method         = "DNS"
   domain_name               = local.primary_domain
   subject_alternative_names = local.subject_alternative_names
