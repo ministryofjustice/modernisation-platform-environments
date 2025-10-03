@@ -34,7 +34,7 @@
           "data_locations": ["emds-test-bucket-name"],
           "resource_shares": [
             {
-              "glue_database": "staged_fms_test_dbt",
+              "glue_database": "serco_fms_curated_test_dbt",
               "glue_tables": ["*"]
             }
           ]
