@@ -46,7 +46,7 @@ proxy_config:
     service_callback: ["prometheus_system"]
     default_internal_user_params:
       user_role: "internal_user"
-    max_internal_user_budget: 20
+    default_max_internal_user_budget: 20
     internal_user_budget_duration: "1mo"
   router_settings:
     routing_strategy: simple-shuffle
