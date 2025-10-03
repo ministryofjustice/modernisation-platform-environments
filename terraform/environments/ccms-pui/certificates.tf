@@ -15,10 +15,6 @@ resource "aws_acm_certificate" "external" {
   tags = merge(local.tags,
     { Environment = local.environment }
   )
-
-  lifecycle {
-    create_before_destroy = true
-  }
 }
 
 ## Validation Records
