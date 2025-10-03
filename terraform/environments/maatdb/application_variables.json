@@ -155,6 +155,8 @@
       "allocated_storage": 600,
       "engine": "oracle-se2",
       "engine_version": "19.0.0.0.ru-2025-04.rur-2025-04.r1",
+      "hub20_sec_group_id": "",
+      "hub20_s3_bucket": "",
       "instance_class": "db.m5.xlarge",
       "allow_major_version_upgrade": false,
       "auto_minor_version_upgrade": false,
