@@ -1,5 +1,5 @@
 #######################################
-# AWS Secrets Manager - adaptor Secrets
+# AWS Secrets Manager - Adaptor Secrets
 #######################################
 
 # Client OPA12Assess Security User Password

@@ -1,5 +1,5 @@
 #######################################
-# adaptor Load Balancer Security Group
+# Adaptor Load Balancer Security Group
 #######################################
 
 resource "aws_security_group" "adaptor_load_balancer" {
@@ -33,7 +33,7 @@ resource "aws_security_group_rule" "adaptor_alb_egress_all" {
 }
 
 #######################################
-# Container Security Group
+# Adapter Security Group
 #######################################
 
 resource "aws_security_group" "ecs_tasks_adaptor" {

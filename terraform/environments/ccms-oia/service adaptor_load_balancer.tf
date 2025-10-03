@@ -1,5 +1,5 @@
 ########################################
-# Application Load Balancer for adaptor
+# Application Load Balancer for Adaptor
 ########################################
 
 resource "aws_lb" "adaptor" {
@@ -28,9 +28,9 @@ resource "aws_lb_target_group" "adaptor_target_group" {
   deregistration_delay = 30
 
   health_check {
-    path                = "/service-tds/actuator/health"
+    path                = "/health"
     healthy_threshold   = 5
-    interval            = 120
+    interval            = 30
     protocol            = "HTTP"
     unhealthy_threshold = 5
     matcher             = "200"

@@ -1,5 +1,5 @@
 
-# Task Definition for adaptor
+# Task Definition for CCMS Service Adaptor
 
 resource "aws_ecs_task_definition" "ecs_adaptor_task_definition" {
   family             = "${local.adaptor_app_name}-task"
@@ -18,7 +18,7 @@ resource "aws_ecs_task_definition" "ecs_adaptor_task_definition" {
       adaptor_ecr_repo                          = local.application_data.accounts[local.environment].adaptor_ecr_repo
       adaptor_server_port                       = local.application_data.accounts[local.environment].adaptor_server_port
       aws_region                                = local.application_data.accounts[local.environment].aws_region
-      spring_profiles_active                    = local.application_data.accounts[local.environment].spring_profiles_active
+      adaptor_spring_profile                    = local.application_data.accounts[local.environment].adaptor_spring_profile
       container_version                         = local.application_data.accounts[local.environment].adaptor_container_version
       client_opa12assess_means_address          = local.application_data.accounts[local.environment].client_opa12assess_means_address
       client_opa12assess_billing_address        = local.application_data.accounts[local.environment].client_opa12assess_billing_address
@@ -37,7 +37,7 @@ resource "aws_ecs_task_definition" "ecs_adaptor_task_definition" {
 # ECS Service for adaptor
 
 resource "aws_ecs_service" "ecs_adaptor_service" {
-  name            = "${local.adaptor_app_name}-service"
+  name            = "${local.adaptor_app_name}"
   cluster         = aws_ecs_cluster.main.id
   task_definition = aws_ecs_task_definition.ecs_adaptor_task_definition.arn
   desired_count   = local.application_data.accounts[local.environment].adaptor_app_count

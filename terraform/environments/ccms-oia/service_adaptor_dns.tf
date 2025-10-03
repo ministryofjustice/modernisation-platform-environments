@@ -1,6 +1,6 @@
 # DNS Configuration
 
-# Creates Route53 DNS records for the adaptor LB in Non-Prod
+# Creates Route53 DNS records for the Adaptor LB in Non-Prod
 resource "aws_route53_record" "route53_record_adaptor_nonprod" {
   count    = local.is-production ? 0 : 1
   provider = aws.core-vpc
@@ -16,7 +16,7 @@ resource "aws_route53_record" "route53_record_adaptor_nonprod" {
 }
 
 
-# Creates Route53 DNS records for the adaptor LB in PROD
+# Creates Route53 DNS records for the Adaptor LB in PROD
 resource "aws_route53_record" "route53_record_adaptor_prod" {
   count    = local.is-production ? 1 : 0
   provider = aws.core-network-services
