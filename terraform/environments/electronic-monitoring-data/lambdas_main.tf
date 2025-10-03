@@ -122,7 +122,7 @@ module "virus_scan_file" {
   function_name           = "scan"
   is_image                = true
   ecr_repo_name           = "analytical-platform-ingestion-scan"
-  function_tag            = "0.1.3"
+  function_tag            = "0.2.0-rc3"
   role_name               = aws_iam_role.virus_scan_file.name
   role_arn                = aws_iam_role.virus_scan_file.arn
   ephemeral_storage_size  = 10240
@@ -209,7 +209,7 @@ module "calculate_checksum" {
 }
 
 #-----------------------------------------------------------------------------------
-# DMS Validation Lambda
+# DMS Validation Lambdas
 #-----------------------------------------------------------------------------------
 module "dms_retrieve_metadata" {
   count = local.is-development || local.is-production ? 1 : 0
@@ -257,4 +257,46 @@ module "dms_validation" {
 
   security_group_ids = [aws_security_group.dms_validation_lambda_sg[0].id]
   subnet_ids         = data.aws_subnets.shared-public.ids
+}
+
+#-----------------------------------------------------------------------------------
+# Process FMS metadata
+#-----------------------------------------------------------------------------------
+
+module "process_fms_metadata" {
+  source                  = "./modules/lambdas"
+  is_image                = true
+  function_name           = "process_fms_metadata"
+  role_name               = aws_iam_role.process_fms_metadata.name
+  role_arn                = aws_iam_role.process_fms_metadata.arn
+  handler                 = "process_fms_metadata.handler"
+  memory_size             = 10240
+  timeout                 = 900
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : "dev"
+  security_group_ids      = [aws_security_group.lambda_generic.id]
+  subnet_ids              = data.aws_subnets.shared-public.ids
+}
+
+#-----------------------------------------------------------------------------------
+# FMS Fan Out
+#-----------------------------------------------------------------------------------
+
+module "fms_fan_out" {
+  source                  = "./modules/lambdas"
+  is_image                = true
+  function_name           = "fms_fan_out"
+  role_name               = aws_iam_role.fms_fan_out.name
+  role_arn                = aws_iam_role.fms_fan_out.arn
+  handler                 = "fms_fan_out.handler"
+  memory_size             = 10240
+  timeout                 = 900
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : "dev"
+  security_group_ids      = [aws_security_group.lambda_generic.id]
+  subnet_ids              = data.aws_subnets.shared-public.ids
+  environment_variables = {
+    PROCESS_METADATA_LAMBDA = module.process_fms_metadata.lambda_function_name
+    PROCESS_DATA_LAMBDA     = module.format_json_fms_data.lambda_function_name
+  }
 }

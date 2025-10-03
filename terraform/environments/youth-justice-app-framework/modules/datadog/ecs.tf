@@ -15,9 +15,9 @@ module "ecs_service_datadog_agent" {
   scheduling_strategy                = "DAEMON" # Run one task per EC2 instance
 
 
-  cpu                            = 128
-  memory                         = 512
-  ignore_task_definition_changes = true
+  cpu                            = var.agent_datadog_cpu    #128
+  memory                         = var.agent_datadog_memory #512
+  ignore_task_definition_changes = false
   create_security_group          = false
   create_tasks_iam_role          = false
   create_task_exec_iam_role      = false
@@ -31,8 +31,8 @@ module "ecs_service_datadog_agent" {
     datadog = {
       name      = "datadog-agent"
       image     = "datadog/agent:latest-jmx"
-      cpu       = 100
-      memory    = 512
+      cpu       = var.agent_datadog_container_cpu    #100
+      memory    = var.agent_datadog_container_memory #512
       essential = true
 
       readonly_root_filesystem = false

@@ -32,6 +32,23 @@ locals {
       }
     }
 
+    cloudwatch_dashboards = {
+      "CloudWatch-Default" = {
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.lb,
+          local.cloudwatch_dashboard_widget_groups.all_ec2,
+          local.cloudwatch_dashboard_widget_groups.db,
+          local.cloudwatch_dashboard_widget_groups.cms,
+          local.cloudwatch_dashboard_widget_groups.app,
+          local.cloudwatch_dashboard_widget_groups.web,
+          local.cloudwatch_dashboard_widget_groups.webadmin,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ssm_command,
+        ]
+      }
+    }
+
     ec2_instances = {
 
       ls-ncr-db-1-a = merge(local.ec2_instances.db, {
@@ -293,7 +310,7 @@ locals {
         }
         listeners = merge(local.lbs.private.listeners, {
           http-7777 = merge(local.lbs.private.listeners.http-7777, {
-            alarm_target_group_names = []
+            alarm_target_group_names = [] # don't enable as environments are powered up/down frequently
             rules = {
               web = {
                 priority = 200
@@ -348,7 +365,7 @@ locals {
         }
         listeners = merge(local.lbs.public.listeners, {
           https = merge(local.lbs.public.listeners.https, {
-            alarm_target_group_names = []
+            alarm_target_group_names = [] # don't enable as environments are powered up/down frequently
             rules = {
               webadmin = {
                 priority = 100
