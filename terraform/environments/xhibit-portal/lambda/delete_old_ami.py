@@ -56,13 +56,6 @@ def lambda_handler(event=None, context=None):
     evidence_in_use = []
     evidence_other = []
 
-    # Check the AWS Backup service managed snapshots for skipping them
-    is_backup_managed = (
-        "aws backup" in description or
-        "created by the aws backup service" in description or
-        any(tag["Key"] == "aws:backup:source-resource" for tag in tags)
-    )
-
     # Build AMI snapshot map
     ami_snapshot_ids = {
         bdm["Ebs"]["SnapshotId"]: image["ImageId"]
@@ -76,6 +69,13 @@ def lambda_handler(event=None, context=None):
             snap_id = snapshot["SnapshotId"]
             snap_date = snapshot["StartTime"].date()
             description = snapshot.get("Description", "").lower()
+            
+            # Check the AWS Backup service managed snapshots for skipping them
+            is_backup_managed = (
+                "aws backup" in description or
+                "created by the aws backup service" in description or
+                any(tag["Key"] == "aws:backup:source-resource" for tag in tags)
+            )
 
             if is_backup_managed:
                 backup_managed_count += 1
