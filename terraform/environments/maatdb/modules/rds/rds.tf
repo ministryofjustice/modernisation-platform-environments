@@ -80,8 +80,11 @@ resource "aws_db_option_group" "appdboptiongroup19" {
     option_name = "APEX-DEV"
   }
 
-  option {
-    option_name = "S3_INTEGRATION"
+  dynamic "option" {
+    for_each = trimspace(var.hub20_s3_bucket) != "" ? [1] : []
+    content {
+      option_name = "S3_INTEGRATION"
+    }
   }
 
   tags = {
