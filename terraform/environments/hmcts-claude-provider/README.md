@@ -1,9 +1,70 @@
-# Service Runbook
+# HMCTS Claude Provider
 
-<!-- This is a template that should be populated by the development team when moving to the modernisation platform, but also reviewed and kept up to date.
-To ensure that people looking at your runbook can get the information they need quickly, your runbook should be short but clear. Throughout, only use acronyms if you’re confident that someone who has just been woken up at 3am would understand them. -->
+This environment provides AWS Bedrock access for Claude AI models in the eu-west-1 (Ireland) region.
 
-_If you have any questions surrounding this page please post in the `#team-name` channel._
+## AWS Bedrock Setup
+
+This environment is configured to use AWS Bedrock with Claude models. The following manual setup steps are required:
+
+### 1. Request Model Access
+
+First, request access to Claude models in the AWS Bedrock console:
+
+1. Go to the [Bedrock Model Access page](https://eu-west-1.console.aws.amazon.com/bedrock/home?region=eu-west-1#/modelaccess)
+2. Request access to:
+   - Claude Sonnet 4.5
+   - Claude Sonnet 4 (optional - requires marketplace subscription)
+
+### 2. Create Bedrock API Key
+
+Run the provided script to create a Bedrock API key with 90-day expiry:
+
+```bash
+./create-bedrock-api-key.sh
+```
+
+This script will:
+- Assume the BedrockAPIKeyCreator role (which bypasses the common_policy deny)
+- Create the IAM user if needed
+- Generate a service-specific credential (bearer token)
+- Output the configuration for Claude Code
+
+**Important:** Save the bearer token shown in the output - it cannot be retrieved again!
+
+### 3. Configure Claude Code
+
+Add the environment variables from the script output to your `~/.bashrc` or `~/.zshrc`:
+
+```bash
+# Claude Code Bedrock Configuration
+export CLAUDE_CODE_MAX_OUTPUT_TOKENS=4096
+export MAX_THINKING_TOKENS=1024
+export ANTHROPIC_MODEL='eu.anthropic.claude-sonnet-4-5-20250929-v1:0'
+export CLAUDE_CODE_USE_BEDROCK=1
+export AWS_BEARER_TOKEN_BEDROCK='<your-bearer-token>'
+```
+
+Then reload your shell:
+
+```bash
+source ~/.bashrc  # or source ~/.zshrc
+```
+
+## Available Models
+
+Use the system-defined EU inference profiles for cross-region load balancing:
+
+- **Claude Sonnet 4.5**: `eu.anthropic.claude-sonnet-4-5-20250929-v1:0` (recommended)
+- **Claude Sonnet 4**: `eu.anthropic.claude-sonnet-4-20250514-v1:0`
+
+These inference profiles route requests across multiple EU regions (eu-west-1, eu-central-1, eu-north-1, eu-west-3, etc.) for optimal availability.
+
+## Troubleshooting
+
+### Bearer Token Authentication
+
+Note: The bearer token (BSK...) format may not work with all Bedrock API endpoints. If you encounter authentication issues with Claude Code, you may need to use AWS credential-based authentication instead.
+
 
 ## Mandatory Information
 
