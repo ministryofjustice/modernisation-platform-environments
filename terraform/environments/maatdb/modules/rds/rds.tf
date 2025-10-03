@@ -358,7 +358,7 @@ resource "aws_security_group" "ses_sec_group" {
 
 #RDS role to access HUB 2.0 S3 Bucket
 resource "aws_iam_role" "rds_s3_access" {
-  for_each = trimspace(var.hub20_s3_bucket) != "" ? [1] : []
+  count = trimspace(var.hub20_s3_bucket) != "" ? 1 : 0
   name = "rds-hub20-s3-access"
 
   assume_role_policy = jsonencode({
@@ -376,7 +376,7 @@ resource "aws_iam_role" "rds_s3_access" {
 }
 
 resource "aws_iam_policy" "rds_s3_access_policy" {
-  for_each = trimspace(var.hub20_s3_bucket) != "" ? [1] : []
+  count       = trimspace(var.hub20_s3_bucket) != "" ? 1 : 0
   name        = "rds-hub20-s3-bucket-policy"
   description = "Allow Oracle RDS instance to read objects from HUB 2.0 S3 bucket"
 
@@ -402,13 +402,13 @@ resource "aws_iam_policy" "rds_s3_access_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "rds_s3_access_policy_attachment" {
-  for_each   = trimspace(var.hub20_s3_bucket) != "" ? [1] : []
+  count      = trimspace(var.hub20_s3_bucket) != "" ? 1 : 0
   role       = aws_iam_role.rds_s3_access.name
   policy_arn = aws_iam_policy.rds_s3_access_policy[0].arn
 }
 
 resource "aws_db_instance_role_association" "rds_s3_role_association" {
-  for_each               = trimspace(var.hub20_s3_bucket) != "" ? [1] : []
+  count                  = trimspace(var.hub20_s3_bucket) != "" ? 1 : 0
   db_instance_identifier = aws_db_instance.appdb1.identifier
   feature_name           = "S3_INTEGRATION"
   role_arn               = aws_iam_role.rds_s3_access.arn
