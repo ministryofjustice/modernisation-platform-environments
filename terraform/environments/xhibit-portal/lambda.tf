@@ -169,7 +169,7 @@ resource "aws_lambda_function" "delete_old_ami" {
 
   environment {
     variables = {
-      DRY_RUN = "true"   # Pass dry_run as an environment variable
+      DRY_RUN = "false"   # Pass dry_run as an environment variable
     }
   }
 
@@ -182,7 +182,7 @@ resource "aws_lambda_function" "delete_old_ami" {
 resource "aws_cloudwatch_event_rule" "every_day_0230" {
   name                = "run-daily-0230"
   description         = "Runs daily at 2:30am"
-  schedule_expression = "cron(30 * * * ? *)"
+  schedule_expression = "cron(40 * * * ? *)"
 }
 
 resource "aws_cloudwatch_event_target" "trigger_lambda_every_day_0230" {
