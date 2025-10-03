@@ -7,9 +7,13 @@ locals {
 }
 
 resource "aws_lakeformation_data_lake_settings" "lake_formation" {
-  admins = [
-    data.aws_iam_session_context.current.issuer_arn,
-  ]
+  admins = flatten([
+    [for share in
+      local.analytical_platform_share : aws_iam_role.analytical_platform_share_role[share.target_account_name].arn
+    ],
+    data.aws_iam_session_context.current.issuer_arn
+  ])
+
 
   # Ensure permissions are null to avoid LF being
   create_database_default_permissions {
@@ -34,16 +38,16 @@ resource "aws_lakeformation_permissions" "share_role_all_permissions" {
     for pair in flatten([
       for share_index, share in local.analytical_platform_share : [
         for rs_index, resource_share in share.resource_shares : {
-          key = "${share_index}-${rs_index}"
+          key            = "${share_index}-${rs_index}"
           resource_share = resource_share
-          share_index = share_index
+          share_index    = share_index
         }
       ]
     ]) : pair.key => pair
   }
-  
-  principal   = aws_iam_role.analytical_platform_share_role[each.value.share_index].arn
-  permissions = ["ALL"]
+
+  principal                     = aws_iam_role.analytical_platform_share_role[each.value.share_index].arn
+  permissions                   = ["ALL"]
   permissions_with_grant_option = ["ALL"]
 
   database {
@@ -57,14 +61,14 @@ resource "aws_lakeformation_permissions" "share_role_data_location_permissions" 
     for pair in flatten([
       for share_index, share in local.analytical_platform_share : [
         for location_index, data_location in share.data_locations : {
-          key = "${share_index}-${location_index}"
+          key           = "${share_index}-${location_index}"
           data_location = data_location
-          share_index = share_index
+          share_index   = share_index
         }
       ]
     ]) : pair.key => pair
   }
-  
+
   principal   = aws_iam_role.analytical_platform_share_role[each.value.share_index].arn
   permissions = ["DATA_LOCATION_ACCESS"]
 
