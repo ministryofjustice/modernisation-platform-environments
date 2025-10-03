@@ -8,9 +8,13 @@ locals {
 }
 
 resource "aws_lakeformation_data_lake_settings" "lake_formation" {
-  admins = [
-    data.aws_iam_session_context.current.issuer_arn,
-  ]
+  admins = flatten([
+    [for share in
+      local.analytical_platform_share : aws_iam_role.analytical_platform_share_role[share.target_account_name].arn
+    ],
+    data.aws_iam_session_context.current.issuer_arn
+  ])
+
 
   # Ensure permissions are null to avoid LF being
   create_database_default_permissions {
