@@ -18,6 +18,7 @@ resource "aws_scheduler_schedule" "cwa_extract_schedule" {
 
 # CCMS Load Schedule
 resource "aws_scheduler_schedule" "ccms_load_schedule" {
+  count      = local.environment == "development" ? 1 : 0
   name       = "ccms-load-schedule"
   group_name = "default"
 
