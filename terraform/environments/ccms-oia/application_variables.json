@@ -47,18 +47,16 @@
       "logging_level_oracle_ocs_opa_laa": "info",
       "logging_level_root": "info",
       "logging_level_uk_gov_laa_opa": "info",
-      
-      "adaptor_app_name": "ccms-service-adaptor",
       "adaptor_ecr_repo": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/ccms-service-adaptor",
       "adaptor_container_version": "latest",
       "adaptor_server_port": "8080",
       "adaptor_app_count": "2",
-      "adaptor_spring_profile": "prod",
+      "adaptor_spring_profile": "aws",
       "adaptor_container_cpu": "512",
       "adaptor_container_memory": "2048",
       "client_opa12assess_means_address": "https://ccms-opa.laa-development.modernisation-platform.service.justice.gov.uk/opa/determinations-server/answer/soap/12.2.1/MeansAssessment",
       "client_opa12assess_billing_address": "https://ccms-opa.laa-development.modernisation-platform.service.justice.gov.uk/opa/determinations-server/answer/soap/12.2.1/BillingAssessment",
-      "server_opa10assess_security_user_name": "pui_user"
+      "server_opa10assess_security_user_name": "admin"
     },
     "test": {
       "app_name": "ccms-oia",
