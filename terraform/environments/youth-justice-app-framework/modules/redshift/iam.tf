@@ -165,18 +165,16 @@ resource "aws_iam_role" "yjb-moj-team" {
     Statement = [
       {
         Effect = "Allow",
-        Principal = merge(
-          {
+        Principal = {
             Service = [
               "redshift.amazonaws.com",
               "events.amazonaws.com"
+            ],
+            AWS = [
+              var.data_science_role,
+              var.reports_admin_role
             ]
-          },
-          coalesce(var.data_science_role != null && var.data_science_role != "" ?
-            {
-              AWS = var.data_science_role
-          } : null, {})
-        ),
+        },
         Action = "sts:AssumeRole"
       }
     ]
