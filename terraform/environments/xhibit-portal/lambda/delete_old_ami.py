@@ -2,8 +2,10 @@ import boto3
 import botocore
 from datetime import datetime, timedelta
 from dateutil import parser
+import os
 
-def lambda_handler(event=None, context=None, dry_run=False):
+def lambda_handler(event=None, context=None):
+    dry_run = os.getenv("DRY_RUN", "false").lower() == "true"
     today = datetime.utcnow()
     deletion_date = today.date() - timedelta(days=122)
     ec2 = boto3.client("ec2", region_name="eu-west-2")
