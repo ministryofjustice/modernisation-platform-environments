@@ -1232,6 +1232,63 @@ data "aws_instance" "windows_instance_details_dev" {
 # CloudWatch Alarms Development
 ###############################
 
+# CloudWatch Alarms for Malware Events (Signature Update Failed, State Detected, Scan Failed...
+# Engine Update Failed, Engine Out of Date, Behavior Detected)
+
+locals {
+  malware_alarm_metadata    = local.is-development ? {
+    MalwareScanStarted      = "Scan Started"
+    MalwareScanFinished     = "Scan Finished"
+    MalwareScanStopped      = "Scan Stopped"
+    MalwareScanFailed       = "Scan Failed"
+    MalwareBehaviorDetected = "Behavior Detected"
+    MalwareStateDetected    = "State Detected"
+    MalwareSignatureFailed  = "Signature Failed"
+    MalwareEngineFailed     = "Engine Failed"
+    MalwareEngineOutofDate  = "Engine Out of Date"
+  } : {}
+}
+
+locals {
+  malware_alarm_matrix = local.is-development ? tomap({
+    for pair in flatten([
+      for instance_id in data.aws_instances.windows_tagged_instances_dev.ids : [
+        for metric_name, description in local.malware_alarm_metadata : {
+          key = "${instance_id}-${metric_name}"
+          value = {
+            instance_id = instance_id
+            metric_name = metric_name
+            description = description
+          }
+        }
+      ]
+    ]) : pair.key => pair.value
+  }) : {}
+}
+
+resource "aws_cloudwatch_metric_alarm" "malware_event_alarms_dev" {
+  for_each = local.malware_alarm_matrix
+
+  alarm_name          = "Malware-Event-${each.value.metric_name}-${each.value.instance_id}"
+  comparison_operator = "GreaterThanThreshold"
+  period              = 60
+  threshold           = 0
+  evaluation_periods  = 1
+  datapoints_to_alarm = 1
+  metric_name         = each.value.metric_name
+  namespace           = "WindowsDefender"
+  statistic           = "Sum"
+  treat_missing_data  = "notBreaching"
+  alarm_description   = "Monitors for Windows Defender malware event: ${each.value.description}"
+  alarm_actions       = [aws_sns_topic.cw_dev_alerts[0].arn]
+
+  dimensions = {
+    Instance  = each.value.instance_id
+    EventName = each.value.metric_name
+  }
+}
+
+/*
 # Malware Event Signature Update Failed
 
 resource "aws_cloudwatch_metric_alarm" "malware_event_signature_update_failed_dev" {
@@ -1363,3 +1420,4 @@ resource "aws_cloudwatch_metric_alarm" "malware_event_behavior_detected_dev" {
     EventName         = "MalwareBehaviorDetected"
   }
 }
+*/
