@@ -15,6 +15,7 @@ resource "aws_ecs_cluster_capacity_providers" "main" {
 }
 
 # ECS Task Definition
+
 resource "aws_ecs_task_definition" "opahub" {
   family                   = "${local.opa_app_name}-task"
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
