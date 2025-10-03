@@ -509,7 +509,7 @@ resource "aws_cloudwatch_log_metric_filter" "malware_metrics_development" {
   for_each       = local.is-development ? local.malware_metrics : {}
   name           = each.key
   log_group_name = aws_cloudwatch_log_group.Windows-Defender-Logs-Development[0].name
-  pattern        = "[date, time, Instance, ${each.key}, status=${each.value}]"
+  pattern        = "[date, time, Instance, EventName, status=${each.value}]"
 
   metric_transformation {
     name       = each.key
@@ -517,7 +517,7 @@ resource "aws_cloudwatch_log_metric_filter" "malware_metrics_development" {
     value      = "1"
 	  dimensions = {
       Instance  = "$Instance"
-      EventName = each.key
+      EventName = "$EventName"
     }
   }
 }
