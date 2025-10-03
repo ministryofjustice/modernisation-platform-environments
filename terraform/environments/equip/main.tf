@@ -627,7 +627,7 @@ locals {
     COR-A-TST02 = {
       instance_type          = "t3a.xlarge"
       subnet_id              = data.aws_subnet.private_subnets_a.id
-      vpc_security_group_ids = [aws_security_group.aws_equip_security_group.id, aws_security_group.all_internal_groups.id]
+      vpc_security_group_ids = [aws_security_group.aws_equip_security_group.id, aws_security_group.aws_citrix_security_group.id, aws_security_group.all_internal_groups.id]
       root_block_device = [
         {
           encrypted   = true
