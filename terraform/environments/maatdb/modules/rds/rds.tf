@@ -403,7 +403,7 @@ resource "aws_iam_policy" "rds_s3_access_policy" {
 
 resource "aws_iam_role_policy_attachment" "rds_s3_access_policy_attachment" {
   count      = trimspace(var.hub20_s3_bucket) != "" ? 1 : 0
-  role       = aws_iam_role.rds_s3_access.name
+  role       = aws_iam_role.rds_s3_access[0].name
   policy_arn = aws_iam_policy.rds_s3_access_policy[0].arn
 }
 
@@ -411,7 +411,7 @@ resource "aws_db_instance_role_association" "rds_s3_role_association" {
   count                  = trimspace(var.hub20_s3_bucket) != "" ? 1 : 0
   db_instance_identifier = aws_db_instance.appdb1.identifier
   feature_name           = "S3_INTEGRATION"
-  role_arn               = aws_iam_role.rds_s3_access.arn
+  role_arn               = aws_iam_role.rds_s3_access[0].arn
 }
 
 # Outputs
