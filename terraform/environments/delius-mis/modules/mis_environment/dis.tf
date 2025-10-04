@@ -5,7 +5,7 @@ resource "aws_security_group" "dis" {
 }
 
 module "dis_instance" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=49e289239aec2845924f00fc5969f35ae76122e2"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v3.0.1"
 
   # allow environment not to have this var set and still work
   count = var.dis_config != null ? var.dis_config.instance_count : 0
@@ -46,7 +46,7 @@ module "dis_instance" {
         ad_password_secret_name = aws_secretsmanager_secret.ad_admin_password.name
         ad_domain_name          = var.environment_config.ad_domain_name
         ad_ip_list              = aws_directory_service_directory.mis_ad.dns_ip_addresses
-        branch                  = "main"
+        branch                  = var.dis_config.branch
       }
     )
   )
@@ -65,7 +65,7 @@ module "dis_instance" {
     }
   )
 
-  cloudwatch_metric_alarms = merge(
+  cloudwatch_metric_alarms = var.dis_config.cloudwatch_metric_alarms != null ? var.dis_config.cloudwatch_metric_alarms : merge(
     local.cloudwatch_metric_alarms.ec2
   )
 }
