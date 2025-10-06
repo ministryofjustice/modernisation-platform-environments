@@ -158,7 +158,7 @@ locals {
 
   dis_config_dev = {
     instance_count = 1
-    ami_name       = "delius_mis_windows_server_patch_2025-*"
+    ami_name       = "delius_mis_windows_server_patch_2025-10-01T13-00-02.504Z"
     ebs_volumes = {
       "/dev/sda1" = { label = "root", size = 100 }
       "xvdd"      = { label = "data", size = 300 }
@@ -201,8 +201,6 @@ locals {
         }
       )
     }
-    branch                   = "TM/TM-1414/ips-dataservices-bods-refactor"
-    cloudwatch_metric_alarms = {}
   }
   # automation test instance only - do not use
   auto_config_dev = {
