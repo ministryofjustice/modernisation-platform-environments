@@ -5,8 +5,9 @@
 ###############################
 
 resource "aws_sfn_state_machine" "patch_sfn_state_machine" {
+  count    = local.environment == "test" ? 1 : 0
   name     = "patch-cwa-step-function"
-  role_arn = aws_iam_role.patch_step_function_role.arn
+  role_arn = aws_iam_role.patch_step_function_role[0].arn
 
   definition = jsonencode({
     Comment = "A description of my state machine",
@@ -16,7 +17,7 @@ resource "aws_sfn_state_machine" "patch_sfn_state_machine" {
         Type     = "Task",
         Resource = "arn:aws:states:::lambda:invoke",
         Parameters = {
-          FunctionName = aws_lambda_function.patch_cwa_extract_lambda.arn,
+          FunctionName = aws_lambda_function.patch_cwa_extract_lambda[0].arn,
           Payload      = {}
         },
         ResultPath = "$.GetFilesResult"
@@ -56,7 +57,7 @@ resource "aws_sfn_state_machine" "patch_sfn_state_machine" {
               Type     = "Task",
               Resource = "arn:aws:states:::lambda:invoke",
               Parameters = {
-                FunctionName = aws_lambda_function.patch_cwa_file_transfer_lambda.arn
+                FunctionName = aws_lambda_function.patch_cwa_file_transfer_lambda[0].arn
                 Payload = {
                   "filename.$"  = "$.filename",
                   "timestamp.$" = "$.timestamp"
@@ -107,7 +108,7 @@ resource "aws_sfn_state_machine" "patch_sfn_state_machine" {
         Type     = "Task",
         Resource = "arn:aws:states:::lambda:invoke",
         Parameters = {
-          FunctionName = aws_lambda_function.patch_cwa_sns_lambda.arn,
+          FunctionName = aws_lambda_function.patch_cwa_sns_lambda[0].arn,
           Payload = {
             "timestamp.$" = "$.WrappedResults.results[0].timestamp"
           }

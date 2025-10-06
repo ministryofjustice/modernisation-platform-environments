@@ -40,9 +40,9 @@ resource "aws_iam_policy" "patch_step_function_policy" {
         Effect = "Allow",
         Action = "lambda:InvokeFunction",
         Resource = [
-          aws_lambda_function.patch_cwa_extract_lambda.arn,
-          aws_lambda_function.patch_cwa_file_transfer_lambda.arn,
-          aws_lambda_function.patch_cwa_sns_lambda.arn
+          aws_lambda_function.patch_cwa_extract_lambda[0].arn,
+          aws_lambda_function.patch_cwa_file_transfer_lambda[0].arn,
+          aws_lambda_function.patch_cwa_sns_lambda[0].arn
         ]
       }
     ]
