@@ -77,3 +77,26 @@ resource "aws_s3_bucket_notification" "virus_scan_file" {
 
   depends_on = [module.virus_scan_file_sqs]
 }
+
+
+# ---------------------------------------------------------------
+# Event bridge rules
+# ---------------------------------------------------------------
+
+resource "aws_cloudwatch_event_rule" "serco_secretsmanager_key_update" {
+  name        = "serco-secretsmanager-key-update"
+  description = "Capture each time the"
+
+  event_pattern = jsonencode({
+    source = [ "aws.secretsmanager" ]
+    $or = [
+        { "detail-type": ["AWS API Call via CloudTrail"] }, 
+        { "detail-type": ["AWS Service Event via CloudTrail"] }
+    ],
+    detail = {
+        "eventSource": ["secretsmanager.amazonaws.com"],
+        "eventName": ["PutSecretValue", "UpdateSecret", "RotationSucceeded"]
+    }
+  })
+}
+
