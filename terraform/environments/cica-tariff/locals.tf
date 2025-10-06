@@ -120,5 +120,16 @@ locals {
   } : {}
   snapshot_id_xvdn_db = local.environment == "production" ? local.block_device_mapping_xvdn_db[9].ebs.snapshot_id : ""
 
+  env_to_cica_map = {
+    "development" = ["dev"]
+    "test"        = ["uat"]
+    "production"  = ["uat", "prod"]
+  }
+  target_prefix = local.env_to_cica_map[local.environment]
+
+  cica_s3_resource = [
+    for prefix in local.target_prefix : "arn:aws:s3:::${prefix}storagebucket"
+  ]
+
 }
 #
