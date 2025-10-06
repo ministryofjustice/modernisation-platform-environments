@@ -4,7 +4,7 @@
 
 
 
-resource "aws_secretsmanager_secret" "cwa_db_secret" {
+resource "aws_secretsmanager_secret" "patch_cwa_db_secret" {
   count = local.environment == "test" ? 1 : 0
   name  = "patch-cwa-extract-lambda-db-secret-${local.environment}"
   tags  = merge(
