@@ -22,7 +22,7 @@ module "s3-bucket-ukcloud-replica" {
           autoclean = "true"
         }
       }
-      
+
       transition = [
         {
           days          = 90

@@ -38,7 +38,7 @@ locals {
       transfer_server_hostname = "sftp.development.ingestion.analytical-platform.service.justice.gov.uk"
       transfer_server_sftp_users = {
         "analytical-platform" = {
-          ssh_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC082exhcUBZ2Wrzm9zjm+CtMuIUzWjWPBgXs5ezC5XEgPGqovGZ4UMOPz+7Wd/KJY5isa7IbU/ZFtq5PwCILrwI+yHsEaT93qI2pI82Xby7qCvNoCaMVDBb08pd1VBfyN3gEmxPmWeejyD6kEHiksksE3wpT/zAuUQ7LFZRzUm3rKs6THalP5CCV7aAXCxAKh+P7ObXKCvyWgjJ0fm3trOcsZxG2PS1AoBfcYgv8gyQwJLEDLZFFugMAydrkwUVHwRqWnh//Xj9AWzwGcGk3zoItLOdhF4tAkNsF0eIPtq6sq+jT7NiTG2sAAvFzjYKtK1KMzLTW4UEXQJ2vsPemPgrrqJtMzMWLdcstNiIYpbBBKdNlSWCZNwQfse9U0BnM4NQ6b3epsbuVYPec2P6tZHUzbWL3+1A2rECnzY2KFAYappLeeEioia3uD2om7CEmFNMMFFiXkt45urVUEYQ1WJrO3UqQknEJvGefNzWfi0UBAdmeB1I/OQGnryqYd1P3k="
+          ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC082exhcUBZ2Wrzm9zjm+CtMuIUzWjWPBgXs5ezC5XEgPGqovGZ4UMOPz+7Wd/KJY5isa7IbU/ZFtq5PwCILrwI+yHsEaT93qI2pI82Xby7qCvNoCaMVDBb08pd1VBfyN3gEmxPmWeejyD6kEHiksksE3wpT/zAuUQ7LFZRzUm3rKs6THalP5CCV7aAXCxAKh+P7ObXKCvyWgjJ0fm3trOcsZxG2PS1AoBfcYgv8gyQwJLEDLZFFugMAydrkwUVHwRqWnh//Xj9AWzwGcGk3zoItLOdhF4tAkNsF0eIPtq6sq+jT7NiTG2sAAvFzjYKtK1KMzLTW4UEXQJ2vsPemPgrrqJtMzMWLdcstNiIYpbBBKdNlSWCZNwQfse9U0BnM4NQ6b3epsbuVYPec2P6tZHUzbWL3+1A2rECnzY2KFAYappLeeEioia3uD2om7CEmFNMMFFiXkt45urVUEYQ1WJrO3UqQknEJvGefNzWfi0UBAdmeB1I/OQGnryqYd1P3k="
           cidr_blocks = ["51.179.205.105/32"]
         }
         "opg-restore-ocr" = {

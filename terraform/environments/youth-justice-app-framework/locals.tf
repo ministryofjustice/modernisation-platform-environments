@@ -11,7 +11,7 @@ locals {
 
 ## Locals for the report admin and YJB Data Scientist Team access ##
 locals {
-  reports_admin_role_name = "reporting-operations"
+  reports_admin_role_name      = "reporting-operations"
   yjb_data_scientist_role_name = "data-scientist"
 }
 
