@@ -89,9 +89,9 @@ resource "aws_cloudwatch_event_rule" "serco_secretsmanager_key_update" {
 
   event_pattern = jsonencode({
     source = [ "aws.secretsmanager" ]
-    $or = [
-        { "detail-type": ["AWS API Call via CloudTrail"] }, 
-        { "detail-type": ["AWS Service Event via CloudTrail"] }
+    detail-type = [
+      "AWS API Call via CloudTrail",
+      "AWS Service Event via CloudTrail"
     ],
     detail = {
         "eventSource": ["secretsmanager.amazonaws.com"],
