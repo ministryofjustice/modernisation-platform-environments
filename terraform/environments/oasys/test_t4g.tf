@@ -13,6 +13,7 @@ resource "aws_security_group" "test-sg-for-t4" {
   }
 
   tags = {
+    label    = "app"
     Name     = "First t4 test instance"
     vpc-name = "VPC created for the T4 test"
   }
@@ -30,15 +31,11 @@ resource "aws_instance" "my_t4_instance" {
   #checkov:skip=CKV_AWS_79: "Ensure Instance Metadata Service Version 1 is not enabled"
   #checkov:skip=CKV_AWS_135: "Ensure that EC2 is EBS optimized"
 
-
-
   count = local.is-development ? 1 : 0
 
-  ami           = "ami-01e9af7b9c1dfb736"
-  instance_type = "t4g.xlarge"
-
-  vpc_security_group_ids = [aws_security_group.test-sg-for-t4[0].id]
-
+  ami                         = "ami-01e9af7b9c1dfb736"
+  instance_type               = "t4g.xlarge"
+  vpc_security_group_ids      = [aws_security_group.test-sg-for-t4[0].id]
   associate_public_ip_address = false
   availability_zone           = "eu-west-2a"
   ebs_optimized               = true
@@ -48,3 +45,48 @@ resource "aws_instance" "my_t4_instance" {
     Name = "First t4 test instance"
   }
 }
+
+module "test-sg-for-t4" { #"my_t4_instance" {
+  #checkov:skip=CKV_TF_1:Ensure Terraform module sources use a commit hash; skip as this is MoJ Repo
+  source    = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v3.0.1"
+  subnet_id = ip_address.value
+  count     = local.is-development ? 1 : 0
+  providers = { aws.core-vpc = aws.core-vpc
+  }
+  name = "test-t4-instance"
+  tags = {
+    Name = "test-t4-instance"
+  }
+  instance = "vpc-01d7a2da8f9f1dfec"
+  instance_profile_policies = {
+  account_ids = local.environment_management.account_ids }
+  environment = "test_y4g.tf"
+  ami_name    = "ami-01e9af7b9c1dfb736"
+  ebs_volume_config = {
+    data = {
+      iops       = 3000
+      throughput = 125
+      type       = "gp3"
+  } }
+  /* ebs_volumes                = { "/dev/xvda" = {"app", size = 30} }*/
+  ebs_volumes = {
+    "/dev/xvda" = {
+      size = 30
+      type = "gp3"
+    }
+  }
+  route53_records = {
+    create_internal_record = false
+    create_external_record = false
+  }
+
+  business_unit    = module.environment.business_unit
+  application_name = module.environment.application_name
+
+}
+
+/* instance = {
+    associate_public_ip_address = false
+    instance_type               = "t4g.xlarge"
+    vpc_security_group_ids      = [aws_security_group.test-sg-for-t4.id]
+  } */
