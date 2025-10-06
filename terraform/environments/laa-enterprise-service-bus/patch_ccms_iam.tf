@@ -43,8 +43,8 @@ resource "aws_iam_policy" "patch_ccms_provider_load_policy" {
           "s3:ListBucketVersions"
         ],
         Resource = [
-          "${aws_s3_bucket.data.arn}",
-          "${aws_s3_bucket.data.arn}/*"
+          "${aws_s3_bucket.patch_data.arn}",
+          "${aws_s3_bucket.patch_data.arn}/*"
         ]
       },
       {
