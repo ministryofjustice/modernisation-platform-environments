@@ -436,7 +436,7 @@ resource "aws_lambda_permission" "allow_eventbridge_invoke_wam_web_traffic_analy
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.terraform_lambda_func_wam_web_traffic_analysis_prod[0].function_name
   principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.monthly_schedule_wam_web_traffic_analysis_pro[0].arn
+  source_arn    = aws_cloudwatch_event_rule.monthly_schedule_wam_web_traffic_analysis_prod[0].arn
 }
 
 resource "aws_cloudwatch_event_rule" "monthly_schedule_wam_web_traffic_analysis_prod" {
