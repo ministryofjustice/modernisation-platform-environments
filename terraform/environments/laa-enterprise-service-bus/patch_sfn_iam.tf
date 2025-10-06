@@ -49,7 +49,7 @@ resource "aws_iam_policy" "patch_step_function_policy" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "patch_step_function_role_policy_attachment_PATCH" {
+resource "aws_iam_role_policy_attachment" "patch_step_function_role_policy_attachment" {
   count      = local.environment == "test" ? 1 : 0
   role       = aws_iam_role.patch_step_function_role.name
   policy_arn = aws_iam_policy.patch_step_function_policy.arn

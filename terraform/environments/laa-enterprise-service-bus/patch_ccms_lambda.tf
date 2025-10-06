@@ -19,10 +19,10 @@ resource "aws_security_group" "patch_ccms_provider_load" {
 resource "aws_security_group_rule" "patch_ccms_provider_load_egress_oracle" {
   count             = local.environment == "test" ? 1 : 0
   type              = "egress"
-  from_port         = local.environment == "development" ? 1521 : local.environment == "test" ? 1522 : 0
-  to_port           = local.environment == "development" ? 1521 : local.environment == "test" ? 1522 : 0
+  from_port         = 1521
+  to_port           = 1521
   protocol          = "tcp"
-  cidr_blocks       = [local.application_data.accounts[local.environment].ccms_database_ip]
+  cidr_blocks       = ["10.26.100.243/32"] # Patch CCMS Database IP
   security_group_id = aws_security_group.patch_ccms_provider_load.id
   description       = "Outbound 1521/1522 Access to CCMS DB"
 }
@@ -45,7 +45,7 @@ resource "aws_security_group_rule" "patch_ccms_provider_load_egress_https" {
 resource "aws_lambda_function" "patch_ccms_provider_load" {
   count            = local.environment == "test" ? 1 : 0
   description      = "Connect to CCMS DB"
-  function_name    = "ccms_provider_load_function"
+  function_name    = "patch_ccms_provider_load_function"
   role             = aws_iam_role.patch_ccms_provider_load_role.arn
   handler          = "lambda_function.lambda_handler"
   filename         = "lambda/provider_load_lambda/provider_load_package.zip"

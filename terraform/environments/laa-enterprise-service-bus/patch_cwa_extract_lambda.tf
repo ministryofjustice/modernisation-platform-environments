@@ -18,12 +18,12 @@ resource "aws_security_group" "patch_cwa_extract_sg" {
 resource "aws_security_group_rule" "patch_cwa_extract_egress_oracle" {
   count             = local.environment == "test" ? 1 : 0
   type              = "egress"
-  from_port         = 1571
-  to_port           = 1571
+  from_port         = 2484
+  to_port           = 2484
   protocol          = "tcp"
-  cidr_blocks       = [local.application_data.accounts[local.environment].cwa_database_ip]
+  cidr_blocks       = ["10.205.11.0/26", "10.205.11.64/26"] # Patch CCMS Database IP
   security_group_id = aws_security_group.patch_cwa_extract_sg.id
-  description       = "Outbound 1571 Access to CWA DB"
+  description       = "Outbound 2484 Access to CWA DB Safe3 in ECP"
 }
 
 resource "aws_security_group_rule" "patch_cwa_extract_egress_https_endpoint" {
