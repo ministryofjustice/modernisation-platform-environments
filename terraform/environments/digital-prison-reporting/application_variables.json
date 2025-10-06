@@ -664,6 +664,7 @@
         "parameter_group_name": "with-pglogical"
       }
     },
+
     "production": {
       "project_short_id": "dpr",
       "create_database": true,
