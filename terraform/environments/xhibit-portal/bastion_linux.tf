@@ -5,8 +5,7 @@ locals {
 
 # tfsec:ignore:aws-s3-enable-bucket-encryption tfsec:ignore:aws-s3-encryption-customer-key tfsec:ignore:aws-s3-enable-bucket-logging tfsec:ignore:aws-s3-enable-versioning
 module "bastion_linux" {
-  # checkov:skip=CKV_TF_1: "Ensure Terraform module sources use a commit hash"
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=v4.2.1"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=1eaf3c96af26ea7134c412c925efbdb5c961f594"
 
   providers = {
     aws.share-host   = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
