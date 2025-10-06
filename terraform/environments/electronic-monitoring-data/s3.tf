@@ -1374,32 +1374,12 @@ module "s3-export-bucket" {
         autoclean = "true"
       }
 
-      transition = [
-        {
-          days          = 7
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = 14
-          storage_class = "GLACIER"
-        }
-      ]
-
       expiration = {
-        days = 28
+        days = 7
       }
 
-      noncurrent_version_transition = [
-        {
-          days          = 14
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = 28
-          storage_class = "GLACIER"
-        }
-      ]
-
       noncurrent_version_expiration = {
-        days = 56
+        days = 14
       }
     }
   ]
