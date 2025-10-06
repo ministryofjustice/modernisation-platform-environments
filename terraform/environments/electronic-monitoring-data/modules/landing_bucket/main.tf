@@ -134,11 +134,11 @@ module "s3_to_lambda" {
 
 
 resource "aws_s3_bucket_notification" "s3_notification_prefix_suffixes" {
-  bucket   = module.this-bucket.bucket.id
+  bucket = module.this-bucket.bucket.id
 
   queue {
-    queue_arn     = module.s3_to_lambda.sqs_queue.arn
-    events        = ["s3:ObjectCreated:*"]
+    queue_arn = module.s3_to_lambda.sqs_queue.arn
+    events    = ["s3:ObjectCreated:*"]
   }
 
   depends_on = [module.s3_to_lambda]

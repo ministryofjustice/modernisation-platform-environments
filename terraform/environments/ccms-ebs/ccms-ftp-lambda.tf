@@ -45,10 +45,29 @@ resource "aws_s3_bucket" "buckets" {
 
   bucket = each.value
 
-  tags = {
-    Name        = each.value
-    Environment = local.environment
-  }
+  tags = merge(
+    {
+      Name        = each.value
+      Environment = local.environment
+    },
+    {
+      "business-unit"          = "LAA",
+      "infrastructure-support" = "laa-role-sre@digital.justice.gov.uk",
+      "source-code"            = "https://github.com/ministryofjustice/modernisation-platform-environments"
+    }
+  )
+
+  # server access logging is configured via aws_s3_bucket_logging resource below
+}
+
+# Server access logging: send access logs to the environment logging bucket
+resource "aws_s3_bucket_logging" "buckets_access_logging" {
+  for_each = aws_s3_bucket.buckets
+
+  bucket = each.value.id
+
+  target_bucket = local.logging_bucket_name
+  target_prefix = "s3-access-logs/${each.key}/"
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "bucket_encryption" {
@@ -69,6 +88,26 @@ resource "aws_s3_bucket_versioning" "s3_versioning" {
 
   versioning_configuration {
     status = "Enabled"
+  }
+}
+
+# Lifecycle configuration: expire current objects and noncurrent versions after 30 days
+resource "aws_s3_bucket_lifecycle_configuration" "buckets_lifecycle" {
+  for_each = aws_s3_bucket.buckets
+
+  bucket = each.value.id
+
+  rule {
+    id     = local.is-production ? "expire-90-days" : "expire-30-days"
+    status = "Enabled"
+
+    expiration {
+      days = local.is-production ? 90 : 30
+    }
+
+    noncurrent_version_expiration {
+      noncurrent_days = local.is-production ? 90 : 30
+    }
   }
 }
 
