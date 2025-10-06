@@ -40,4 +40,16 @@ locals {
   # Split domain validation by domain type
   modernisation_platform_validations = [for k, v in local.domain_types : v if strcontains(k, "modernisation-platform.service.justice.gov.uk")]
   legalservices_validations = [for k, v in local.domain_types : v if strcontains(k, "legalservices.gov.uk")]
+
+  # CloudFront certificate domain validation options
+  cloudfront_domain_types = { for dvo in aws_acm_certificate.cloudfront.domain_validation_options : dvo.domain_name => {
+    name   = dvo.resource_record_name
+    record = dvo.resource_record_value
+    type   = dvo.resource_record_type
+    }
+  }
+
+  # Split CloudFront domain validation by domain type
+  cloudfront_modernisation_platform_validations = [for k, v in local.cloudfront_domain_types : v if strcontains(k, "modernisation-platform.service.justice.gov.uk")]
+  cloudfront_legalservices_validations = [for k, v in local.cloudfront_domain_types : v if strcontains(k, "legalservices.gov.uk")]
 }
