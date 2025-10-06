@@ -72,7 +72,7 @@ resource "aws_lambda_function" "patch_ccms_provider_load" {
   environment {
     variables = {
       DB_SECRET_NAME         = aws_secretsmanager_secret.patch_ccms_db_mp_credentials[0].name
-      PROCEDURE_SECRET_NAME  = aws_secretsmanager_secret.patch_ccms_procedures_config.name
+      PROCEDURE_SECRET_NAME  = aws_secretsmanager_secret.patch_ccms_procedures_config[0].name
       LD_LIBRARY_PATH        = "/opt/instantclient_12_2_linux"
       ORACLE_HOME            = "/opt/instantclient_12_2_linux"
       SERVICE_NAME           = "ccms-load-service"

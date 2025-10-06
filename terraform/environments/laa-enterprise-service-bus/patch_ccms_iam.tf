@@ -61,7 +61,7 @@ resource "aws_iam_policy" "patch_ccms_provider_load_policy" {
         ]
         Resource = [
           aws_secretsmanager_secret.patch_ccms_db_mp_credentials[0].arn,
-          aws_secretsmanager_secret.patch_ccms_procedures_config.arn
+          aws_secretsmanager_secret.patch_ccms_procedures_config[0].arn
         ]
       },
       {

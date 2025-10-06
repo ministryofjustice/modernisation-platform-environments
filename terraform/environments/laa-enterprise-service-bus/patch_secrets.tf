@@ -29,6 +29,7 @@ resource "aws_secretsmanager_secret" "patch_ccms_db_mp_credentials" {
 }
 
 resource "aws_secretsmanager_secret" "patch_ccms_procedures_config" {
+  count = local.environment == "test" ? 1 : 0
   name = "patch-ccms-provider-lambda-procedures-config-${local.environment}"
   tags = merge(
     local.tags,
