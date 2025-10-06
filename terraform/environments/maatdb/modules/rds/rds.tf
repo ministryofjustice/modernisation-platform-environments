@@ -80,8 +80,11 @@ resource "aws_db_option_group" "appdboptiongroup19" {
     option_name = "APEX-DEV"
   }
 
-  option {
-    option_name = "S3_INTEGRATION"
+  dynamic "option" {
+    for_each = trimspace(var.hub20_s3_bucket) != "" ? [1] : []
+    content {
+      option_name = "S3_INTEGRATION"
+    }
   }
 
   tags = {
@@ -281,7 +284,7 @@ resource "aws_security_group" "mlra_ecs_sec_group" {
   }
 
   dynamic "ingress" {
-    for_each = length(trimspace(var.hub20_sec_group_id != null ? var.hub20_sec_group_id : "")) > 0 ? [1] : []
+    for_each = trimspace(var.hub20_sec_group_id) != "" ? [1] : []
     content {
       description     = "RDS Access from the HUB 2.0 MAAT Lambda"
       from_port       = 1521
@@ -358,7 +361,8 @@ resource "aws_security_group" "ses_sec_group" {
 
 #RDS role to access HUB 2.0 S3 Bucket
 resource "aws_iam_role" "rds_s3_access" {
-  name = "rds-hub20-s3-access"
+  count = trimspace(var.hub20_s3_bucket) != "" ? 1 : 0
+  name  = "rds-hub20-s3-access"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -375,7 +379,7 @@ resource "aws_iam_role" "rds_s3_access" {
 }
 
 resource "aws_iam_policy" "rds_s3_access_policy" {
-  count       = length(trimspace(var.hub20_s3_bucket != null ? var.hub20_s3_bucket : "")) > 0 ? 1 : 0
+  count       = trimspace(var.hub20_s3_bucket) != "" ? 1 : 0
   name        = "rds-hub20-s3-bucket-policy"
   description = "Allow Oracle RDS instance to read objects from HUB 2.0 S3 bucket"
 
@@ -401,15 +405,16 @@ resource "aws_iam_policy" "rds_s3_access_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "rds_s3_access_policy_attachment" {
-  count      = length(trimspace(var.hub20_s3_bucket != null ? var.hub20_s3_bucket : "")) > 0 ? 1 : 0
-  role       = aws_iam_role.rds_s3_access.name
+  count      = trimspace(var.hub20_s3_bucket) != "" ? 1 : 0
+  role       = aws_iam_role.rds_s3_access[0].name
   policy_arn = aws_iam_policy.rds_s3_access_policy[0].arn
 }
 
 resource "aws_db_instance_role_association" "rds_s3_role_association" {
+  count                  = trimspace(var.hub20_s3_bucket) != "" ? 1 : 0
   db_instance_identifier = aws_db_instance.appdb1.identifier
   feature_name           = "S3_INTEGRATION"
-  role_arn               = aws_iam_role.rds_s3_access.arn
+  role_arn               = aws_iam_role.rds_s3_access[0].arn
 }
 
 # Outputs
