@@ -326,7 +326,7 @@ resource "aws_iam_policy" "hub_20_s3_permissions" {
           "s3:ListBucket"
         ]
         Resource = [
-          "arn:aws:s3:::hub20-${local.environment}-cwa-extract-data"
+          "arn:aws:s3:::hub20-${local.environment}-patch-cwa-extract-data"
         ]
       },
       {
@@ -337,7 +337,7 @@ resource "aws_iam_policy" "hub_20_s3_permissions" {
           "s3:DeleteObject"
         ]
         Resource = [
-          "arn:aws:s3:::hub20-${local.environment}-cwa-extract-data/*"
+          "arn:aws:s3:::hub20-${local.environment}-patch-cwa-extract-data/*"
         ]
       }
     ]
