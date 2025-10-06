@@ -1,35 +1,32 @@
 # trivy:ignore:AVD-AWS-0107 (HIGH): Security group rule allows unrestricted ingress from any IP address.
 resource "aws_security_group" "importmachine" {
-
-  # checkov:skip=CKV_AWS_24: "Ensure no security groups allow ingress from 0.0.0.0:0 to port 22"
-  # checkov:skip=CKV_AWS_260: "Ensure no security groups allow ingress from 0.0.0.0:0 to port 80"
   # checkov:skip=CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
-  # checkov:skip=CKV_AWS_25: "Ensure no security groups allow ingress from 0.0.0.0:0 to port 3389"
-  # checkov:skip=CKV_AWS_277: "Ensure no security groups allow ingress from 0.0.0.0:0 to port -1"
 
-  description = "Configure importmachine access - ingress should be only from Bastion"
+  description = "Secure access to importmachine"
   name        = "importmachine-${local.application_name}"
   vpc_id      = local.vpc_id
 
+  # Allow RDP from Bastion
   ingress {
-    description     = "SSH from Bastion"
-    from_port       = 0
+    description     = "RDP from Bastion"
+    from_port       = "3389"
     to_port         = "3389"
-    protocol        = "TCP"
+    protocol        = "tcp"
     security_groups = [module.bastion_linux.bastion_security_group.id]
   }
 
+  # Allow HTTP from PRTG LB
   ingress {
-    description      = "from all"
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
+    description     = "HTTP from PRTG LB"
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
+    security_groups = [aws_security_group.prtg_lb.id]
   }
 
+  # Allow outbound traffic for auto-update
   egress {
-    description      = "allow all"
+    description      = "Allow all outbound for auto-update"
     from_port        = 0
     to_port          = 0
     protocol         = "-1"
@@ -37,6 +34,16 @@ resource "aws_security_group" "importmachine" {
     ipv6_cidr_blocks = ["::/0"]
   }
 
+  lifecycle {
+    prevent_destroy = true
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "importmachine-${local.application_name}"
+    }
+  )
 }
 
 resource "aws_key_pair" "george" {
