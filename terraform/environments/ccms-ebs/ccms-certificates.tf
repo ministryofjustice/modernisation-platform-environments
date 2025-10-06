@@ -5,10 +5,10 @@
 
 # Certificate
 resource "aws_acm_certificate" "external" {
-  domain_name       = local.is-production ? "ccms-ebs.service.justice.gov.uk" : "modernisation-platform.service.justice.gov.uk"
+  domain_name       = local.is-production ? "laa.service.justice.gov.uk" : "modernisation-platform.service.justice.gov.uk"
   validation_method = "DNS"
 
-  subject_alternative_names = local.is-production ? ["*.ccms-ebs.service.justice.gov.uk"] : ["*.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
+  subject_alternative_names = local.is-production ? ["*.laa.service.justice.gov.uk"] : ["*.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
 
   tags = merge(local.tags,
     { Environment = local.environment }
@@ -46,16 +46,16 @@ resource "aws_route53_record" "external_validation_subdomain" {
   zone_id         = data.aws_route53_zone.external.zone_id
 }
 
-# Production Certificate
-resource "aws_acm_certificate" "external_prod" {
-  count = local.is-production ? 1 : 0
+# # Production Certificate
+# resource "aws_acm_certificate" "external_prod" {
+#   count = local.is-production ? 1 : 0
 
-  domain_name       = "ccms-ebs.service.justice.gov.uk"
-  validation_method = "DNS"
-  lifecycle {
-    create_before_destroy = true
-  }
-}
+#   domain_name       = "laa.service.justice.gov.uk"
+#   validation_method = "DNS"
+#   lifecycle {
+#     create_before_destroy = true
+#   }
+# }
 
 // resource "aws_acm_certificate_validation" "external_prod" {
 //   count = local.is-production ? 1 : 0
