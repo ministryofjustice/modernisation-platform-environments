@@ -23,7 +23,7 @@ resource "aws_security_group_rule" "patch_ccms_provider_load_egress_oracle" {
   to_port           = 1521
   protocol          = "tcp"
   cidr_blocks       = ["10.26.100.243/32"] # Patch CCMS Database IP
-  security_group_id = aws_security_group.patch_ccms_provider_load.id
+  security_group_id = aws_security_group.patch_ccms_provider_load[0].id
   description       = "Outbound 1521/1522 Access to CCMS DB"
 }
 
@@ -34,7 +34,7 @@ resource "aws_security_group_rule" "patch_ccms_provider_load_egress_https" {
   to_port                  = 443
   protocol                 = "tcp"
   source_security_group_id = local.application_data.accounts[local.environment].vpc_endpoint_sg
-  security_group_id        = aws_security_group.patch_ccms_provider_load.id
+  security_group_id        = aws_security_group.patch_ccms_provider_load[0].id
   description              = "Outbound 443 to LAA VPC Endpoint SG"
 }
 
@@ -46,7 +46,7 @@ resource "aws_lambda_function" "patch_ccms_provider_load" {
   count            = local.environment == "test" ? 1 : 0
   description      = "Connect to CCMS DB"
   function_name    = "patch_ccms_provider_load_function"
-  role             = aws_iam_role.patch_ccms_provider_load_role.arn
+  role             = aws_iam_role.patch_ccms_provider_load_role[0].arn
   handler          = "lambda_function.lambda_handler"
   filename         = "lambda/provider_load_lambda/provider_load_package.zip"
   source_code_hash = filebase64sha256("lambda/provider_load_lambda/provider_load_package.zip")
@@ -64,14 +64,14 @@ resource "aws_lambda_function" "patch_ccms_provider_load" {
   }
 
   vpc_config {
-    security_group_ids = [aws_security_group.patch_ccms_provider_load.id]
+    security_group_ids = [aws_security_group.patch_ccms_provider_load[0].id]
     subnet_ids         = [data.aws_subnet.data_subnets_a.id]
   }
 
 
   environment {
     variables = {
-      DB_SECRET_NAME         = aws_secretsmanager_secret.patch_ccms_db_mp_credentials.name
+      DB_SECRET_NAME         = aws_secretsmanager_secret.patch_ccms_db_mp_credentials[0].name
       PROCEDURE_SECRET_NAME  = aws_secretsmanager_secret.ccms_procedures_config.name
       LD_LIBRARY_PATH        = "/opt/instantclient_12_2_linux"
       ORACLE_HOME            = "/opt/instantclient_12_2_linux"

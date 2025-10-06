@@ -59,7 +59,7 @@ resource "aws_iam_policy" "patch_cwa_extract_lambda_policy" {
         ]
         Resource = [
           aws_secretsmanager_secret.cwa_procedures_config.arn,
-          aws_secretsmanager_secret.patch_cwa_db_secret.arn,
+          aws_secretsmanager_secret.patch_cwa_db_secret[0].arn,
           aws_secretsmanager_secret.cwa_table_name_secret.arn
         ]
       },
@@ -79,12 +79,12 @@ resource "aws_iam_policy" "patch_cwa_extract_lambda_policy" {
 
 resource "aws_iam_role_policy_attachment" "patch_cwa_extract_lambda_role_policy_attachment" {
   count      = local.environment == "test" ? 1 : 0
-  role       = aws_iam_role.patch_cwa_extract_lambda_role.name
-  policy_arn = aws_iam_policy.patch_cwa_extract_lambda_policy.arn
+  role       = aws_iam_role.patch_cwa_extract_lambda_role[0].name
+  policy_arn = aws_iam_policy.patch_cwa_extract_lambda_policy[0].arn
 }
 
 resource "aws_iam_role_policy_attachment" "patch_cwa_extract_lambda_vpc_access" {
   count      = local.environment == "test" ? 1 : 0
-  role       = aws_iam_role.patch_cwa_extract_lambda_role.name
+  role       = aws_iam_role.patch_cwa_extract_lambda_role[0].name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
 }

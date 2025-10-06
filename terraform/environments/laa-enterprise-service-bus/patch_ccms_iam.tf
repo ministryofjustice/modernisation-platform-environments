@@ -26,7 +26,7 @@ resource "aws_iam_role" "patch_ccms_provider_load_role" {
   )
 }
 
-resource "aws_iam_policy" "patch-ccms_provider_load_policy" {
+resource "aws_iam_policy" "patch_ccms_provider_load_policy" {
   count = local.environment == "test" ? 1 : 0
   name  = "${local.application_name_short}-patch-ccms-provider-load-policy"
 
@@ -60,7 +60,7 @@ resource "aws_iam_policy" "patch-ccms_provider_load_policy" {
           "secretsmanager:GetSecretValue",
         ]
         Resource = [
-          aws_secretsmanager_secret.patch_ccms_db_mp_credentials.arn,
+          aws_secretsmanager_secret.patch_ccms_db_mp_credentials[0].arn,
           aws_secretsmanager_secret.ccms_procedures_config.arn
         ]
       },
@@ -98,13 +98,13 @@ resource "aws_iam_policy" "patch-ccms_provider_load_policy" {
 
 resource "aws_iam_role_policy_attachment" "patch_ccms_provider_load_lambda_role_policy_attachment" {
   count      = local.environment == "test" ? 1 : 0
-  role       = aws_iam_role.patch_ccms_provider_load_role.name
-  policy_arn = aws_iam_policy.patch_ccms_provider_load_policy.arn
+  role       = aws_iam_role.patch_ccms_provider_load_role[0].name
+  policy_arn = aws_iam_policy.patch_ccms_provider_load_policy[0].arn
 }
 
 resource "aws_iam_role_policy_attachment" "patch_ccms_provider_load_lambda_vpc_access" {
   count      = local.environment == "test" ? 1 : 0
-  role       = aws_iam_role.patch_ccms_provider_load_role.name
+  role       = aws_iam_role.patch_ccms_provider_load_role[0].name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
 }
 
@@ -162,6 +162,6 @@ resource "aws_iam_policy" "patch_ccms_cross_account_s3_read_policy" {
 
 resource "aws_iam_role_policy_attachment" "patch_ccms_cross_account_s3_read_attach" {
   count      = local.environment == "test" ? 1 : 0
-  role       = aws_iam_role.patch_ccms_cross_account_s3_read.name
-  policy_arn = aws_iam_policy.patch_ccms_cross_account_s3_read_policy.arn
+  role       = aws_iam_role.patch_ccms_cross_account_s3_read[0].name
+  policy_arn = aws_iam_policy.patch_ccms_cross_account_s3_read_policy[0].arn
 }

@@ -22,7 +22,7 @@ resource "aws_security_group_rule" "patch_cwa_extract_egress_oracle" {
   to_port           = 2484
   protocol          = "tcp"
   cidr_blocks       = ["10.205.11.0/26", "10.205.11.64/26"] # Patch CCMS Database IP
-  security_group_id = aws_security_group.patch_cwa_extract_sg.id
+  security_group_id = aws_security_group.patch_cwa_extract_sg[0].id
   description       = "Outbound 2484 Access to CWA DB Safe3 in ECP"
 }
 
@@ -33,7 +33,7 @@ resource "aws_security_group_rule" "patch_cwa_extract_egress_https_endpoint" {
   to_port                  = 443
   protocol                 = "tcp"
   source_security_group_id = local.application_data.accounts[local.environment].vpc_endpoint_sg
-  security_group_id        = aws_security_group.patch_cwa_extract_sg.id
+  security_group_id        = aws_security_group.patch_cwa_extract_sg[0].id
   description              = "Outbound 443 to LAA VPC Endpoint SG"
 }
 
@@ -44,7 +44,7 @@ resource "aws_security_group_rule" "patch_cwa_extract_egress_https_s3" {
   to_port           = 443
   protocol          = "tcp"
   prefix_list_ids   = [local.application_data.accounts[local.environment].s3_vpc_endpoint_prefix]
-  security_group_id = aws_security_group.patch_cwa_extract_sg.id
+  security_group_id = aws_security_group.patch_cwa_extract_sg[0].id
   description       = "Outbound 443 to LAA VPC Endpoint SG"
 }
 
@@ -52,7 +52,7 @@ resource "aws_lambda_function" "patch_cwa_extract_lambda" {
   count            = local.environment == "test" ? 1 : 0
   description      = "Connect to CWA DB and invoke cwa extract procedure."
   function_name    = "patch_cwa_extract_lambda"
-  role             = aws_iam_role.patch_cwa_extract_lambda_role.arn
+  role             = aws_iam_role.patch_cwa_extract_lambda_role[0].arn
   handler          = "lambda_function.lambda_handler"
   filename         = "lambda/cwa_extract_lambda/cwa_extract_package.zip"
   source_code_hash = filebase64sha256("lambda/cwa_extract_lambda/cwa_extract_package.zip")
@@ -66,14 +66,14 @@ resource "aws_lambda_function" "patch_cwa_extract_lambda" {
   ]
 
   vpc_config {
-    security_group_ids = [aws_security_group.patch_cwa_extract_sg.id]
+    security_group_ids = [aws_security_group.patch_cwa_extract_sg[0].id]
     subnet_ids         = [data.aws_subnet.data_subnets_a.id]
   }
 
   environment {
     variables = {
       PROCEDURES_CONFIG = aws_secretsmanager_secret.cwa_procedures_config.name
-      DB_SECRET_NAME    = aws_secretsmanager_secret.patch_cwa_db_secret.name
+      DB_SECRET_NAME    = aws_secretsmanager_secret.patch_cwa_db_secret[0].name
       LD_LIBRARY_PATH   = "/opt/instantclient_12_2_linux"
       ORACLE_HOME       = "/opt/instantclient_12_2_linux"
       SERVICE_NAME      = "cwa-extract-service"
@@ -93,7 +93,7 @@ resource "aws_lambda_function" "patch_cwa_file_transfer_lambda" {
   count            = local.environment == "test" ? 1 : 0    
   description      = "Connect to CWA DB, retrieve multiple json files of each extract and merge into single JSON file, uploads them to S3"
   function_name    = "patch_cwa_file_transfer_lambda"
-  role             = aws_iam_role.patch_cwa_extract_lambda_role.arn
+  role             = aws_iam_role.patch_cwa_extract_lambda_role[0].arn
   handler          = "lambda_function.lambda_handler"
   filename         = "lambda/cwa_file_transfer_lambda/cwa_file_transfer_package.zip"
   source_code_hash = filebase64sha256("lambda/cwa_file_transfer_lambda/cwa_file_transfer_package.zip")
@@ -107,7 +107,7 @@ resource "aws_lambda_function" "patch_cwa_file_transfer_lambda" {
   ]
 
   vpc_config {
-    security_group_ids = [aws_security_group.patch_cwa_extract_sg.id]
+    security_group_ids = [aws_security_group.patch_cwa_extract_sg[0].id]
     subnet_ids         = [data.aws_subnet.data_subnets_a.id]
   }
 
@@ -115,7 +115,7 @@ resource "aws_lambda_function" "patch_cwa_file_transfer_lambda" {
     variables = {
       TABLE_NAME_SECRET = aws_secretsmanager_secret.cwa_table_name_secret.name
       TARGET_BUCKET     = aws_s3_bucket.data.bucket
-      DB_SECRET_NAME    = aws_secretsmanager_secret.patch_cwa_db_secret.name
+      DB_SECRET_NAME    = aws_secretsmanager_secret.patch_cwa_db_secret[0].name
       LD_LIBRARY_PATH   = "/opt/instantclient_12_2_linux"
       ORACLE_HOME       = "/opt/instantclient_12_2_linux"
       SERVICE_NAME      = "cwa-file-transfer-service"
@@ -135,7 +135,7 @@ resource "aws_lambda_function" "patch_cwa_sns_lambda" {
   count            = local.environment == "test" ? 1 : 0
   description      = "Send SNS message with timestamp for downstream provider load services to extract files"
   function_name    = "patch_cwa_sns_lambda"
-  role             = aws_iam_role.patch_cwa_extract_lambda_role.arn
+  role             = aws_iam_role.patch_cwa_extract_lambda_role[0].arn
   handler          = "lambda_function.lambda_handler"
   filename         = "lambda/cwa_sns_lambda/cwa_sns_lambda.zip"
   source_code_hash = filebase64sha256("lambda/cwa_sns_lambda/cwa_sns_lambda.zip")
@@ -148,7 +148,7 @@ resource "aws_lambda_function" "patch_cwa_sns_lambda" {
   ]
 
   vpc_config {
-    security_group_ids = [aws_security_group.patch_cwa_extract_sg.id]
+    security_group_ids = [aws_security_group.patch_cwa_extract_sg[0].id]
     subnet_ids         = [data.aws_subnet.data_subnets_a.id]
   }
 
