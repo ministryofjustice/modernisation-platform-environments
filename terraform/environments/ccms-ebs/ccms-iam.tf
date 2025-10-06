@@ -441,20 +441,20 @@ resource "aws_iam_policy" "ccms_ebs_ftp_get_secrets_value" {
   description = "Policy to allow getting the secrets from aws secrets manager"
   count       = contains(["development", "test", "preproduction", "production"], local.environment) ? 1 : 0
   name        = "ccms_ebs_tp_get_secrets_value-${local.environment}"
-  policy      = jsonencode({
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Sid": "AllowEC2InstanceToReadSecrets",
-            "Effect": "Allow",
-            "Action": [
-                "secretsmanager:GetSecretValue",
-                "secretsmanager:DescribeSecret"
-            ],
-            "Resource": "arn:aws:secretsmanager:eu-west-2:${data.aws_caller_identity.current.account_id}:secret:ftp-s3-${local.environment}-aws-key-*",
-        }
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Sid" : "AllowEC2InstanceToReadSecrets",
+        "Effect" : "Allow",
+        "Action" : [
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:DescribeSecret"
+        ],
+        "Resource" : "arn:aws:secretsmanager:eu-west-2:${data.aws_caller_identity.current.account_id}:secret:ftp-s3-${local.environment}-aws-key-*",
+      }
     ]
-})
+  })
 }
 # Attach get_secrets_value policy to EC2 role (Dev, test only)
 resource "aws_iam_role_policy_attachment" "ccms_ebs_ftp_get_secrets_value_attach" {

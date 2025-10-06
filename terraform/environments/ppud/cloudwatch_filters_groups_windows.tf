@@ -192,15 +192,15 @@ resource "aws_cloudwatch_log_metric_filter" "SQLBackupStatus-Failed" {
 
 locals {
   malware_metrics_prod = local.is-production ? {
-    MalwareScanStarted        = 1000
-    MalwareScanFinished       = 1001
-    MalwareScanStopped        = 1002
-    MalwareScanFailed         = 1005
-    MalwareBehaviorDetected   = 1015
-    MalwareStateDetected      = 1116
-    MalwareSignatureFailed    = 2001
-    MalwareEngineFailed       = 2003
-    MalwareEngineOutofDate    = 2005
+    MalwareScanStarted      = 1000
+    MalwareScanFinished     = 1001
+    MalwareScanStopped      = 1002
+    MalwareScanFailed       = 1005
+    MalwareBehaviorDetected = 1015
+    MalwareStateDetected    = 1116
+    MalwareSignatureFailed  = 2001
+    MalwareEngineFailed     = 2003
+    MalwareEngineOutofDate  = 2005
   } : {}
 }
 
@@ -211,10 +211,10 @@ resource "aws_cloudwatch_log_metric_filter" "malware_metrics_production" {
   pattern        = "[date, time, Instance, EventName, status=${each.value}]"
 
   metric_transformation {
-    name       = each.key
-    namespace  = "WindowsDefender"
-    value      = "1"
-	  dimensions = {
+    name      = each.key
+    namespace = "WindowsDefender"
+    value     = "1"
+    dimensions = {
       Instance  = "$Instance"
       EventName = "$EventName"
     }
@@ -375,15 +375,15 @@ resource "aws_cloudwatch_log_metric_filter" "MalwareEngineOutofDate" {
 
 locals {
   malware_metrics_preprod = local.is-preproduction ? {
-    MalwareScanStarted        = 1000
-    MalwareScanFinished       = 1001
-    MalwareScanStopped        = 1002
-    MalwareScanFailed         = 1005
-    MalwareBehaviorDetected   = 1015
-    MalwareStateDetected      = 1116
-    MalwareSignatureFailed    = 2001
-    MalwareEngineFailed       = 2003
-    MalwareEngineOutofDate    = 2005
+    MalwareScanStarted      = 1000
+    MalwareScanFinished     = 1001
+    MalwareScanStopped      = 1002
+    MalwareScanFailed       = 1005
+    MalwareBehaviorDetected = 1015
+    MalwareStateDetected    = 1116
+    MalwareSignatureFailed  = 2001
+    MalwareEngineFailed     = 2003
+    MalwareEngineOutofDate  = 2005
   } : {}
 }
 
@@ -394,10 +394,10 @@ resource "aws_cloudwatch_log_metric_filter" "malware_metrics_preproduction" {
   pattern        = "[date, time, Instance, EventName, status=${each.value}]"
 
   metric_transformation {
-    name       = each.key
-    namespace  = "WindowsDefender"
-    value      = "1"
-	  dimensions = {
+    name      = each.key
+    namespace = "WindowsDefender"
+    value     = "1"
+    dimensions = {
       Instance  = "$Instance"
       EventName = "$EventName"
     }
@@ -558,15 +558,15 @@ resource "aws_cloudwatch_log_metric_filter" "MalwareEngineOutofDate-Preproductio
 
 locals {
   malware_metrics_dev = local.is-development ? {
-    MalwareScanStarted        = 1000
-    MalwareScanFinished       = 1001
-    MalwareScanStopped        = 1002
-    MalwareScanFailed         = 1005
-    MalwareBehaviorDetected   = 1015
-    MalwareStateDetected      = 1116
-    MalwareSignatureFailed    = 2001
-    MalwareEngineFailed       = 2003
-    MalwareEngineOutofDate    = 2005
+    MalwareScanStarted      = 1000
+    MalwareScanFinished     = 1001
+    MalwareScanStopped      = 1002
+    MalwareScanFailed       = 1005
+    MalwareBehaviorDetected = 1015
+    MalwareStateDetected    = 1116
+    MalwareSignatureFailed  = 2001
+    MalwareEngineFailed     = 2003
+    MalwareEngineOutofDate  = 2005
   } : {}
 }
 
@@ -578,10 +578,10 @@ resource "aws_cloudwatch_log_metric_filter" "malware_metrics_development" {
   pattern        = "[date, time, Instance, EventName, status=${each.value}]"
 
   metric_transformation {
-    name       = each.key
-    namespace  = "WindowsDefender"
-    value      = "1"
-	  dimensions = {
+    name      = each.key
+    namespace = "WindowsDefender"
+    value     = "1"
+    dimensions = {
       Instance  = "$Instance"
       EventName = "$EventName"
     }
