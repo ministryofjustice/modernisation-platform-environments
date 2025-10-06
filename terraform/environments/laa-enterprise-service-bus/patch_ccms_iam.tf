@@ -71,7 +71,7 @@ resource "aws_iam_policy" "patch_ccms_provider_load_policy" {
           "sqs:DeleteMessage",
           "sqs:GetQueueAttributes"
         ],
-        Resource = aws_sqs_queue.ccms_provider_q.arn
+        Resource = aws_sqs_queue.patch_ccms_provider_q[0].arn
       },
       {
         Effect = "Allow"
@@ -81,7 +81,7 @@ resource "aws_iam_policy" "patch_ccms_provider_load_policy" {
           "sqs:DeleteMessage",
           "sqs:GetQueueAttributes"
         ]
-        Resource = aws_sqs_queue.ccms_provider_dlq.arn
+        Resource = aws_sqs_queue.patch_ccms_provider_dlq[0].arn
       },
       {
         Effect = "Allow",

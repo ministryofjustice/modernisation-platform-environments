@@ -3,7 +3,7 @@
 #####################################################################################
 resource "aws_s3_bucket_policy" "patch_data_cross_account_access" {
   count  = local.environment == "test" ? 1 : 0
-  bucket = aws_s3_bucket.data.id
+  bucket = aws_s3_bucket.patch_data[0].id
 
   policy = jsonencode({
     Version = "2012-10-17",
