@@ -51,9 +51,9 @@ resource "aws_s3_bucket" "buckets" {
       Environment = local.environment
     },
     {
-      "business-unit"         = "LAA",
+      "business-unit"          = "LAA",
       "infrastructure-support" = "laa-role-sre@digital.justice.gov.uk",
-      "source-code"           = "https://github.com/ministryofjustice/modernisation-platform-environments"
+      "source-code"            = "https://github.com/ministryofjustice/modernisation-platform-environments"
     }
   )
 
@@ -96,7 +96,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "buckets_lifecycle" {
   for_each = aws_s3_bucket.buckets
 
   bucket = each.value.id
-  
+
   rule {
     id     = local.is-production ? "expire-90-days" : "expire-30-days"
     status = "Enabled"

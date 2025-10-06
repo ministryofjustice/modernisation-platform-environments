@@ -427,7 +427,7 @@ resource "aws_cloudwatch_metric_alarm" "Windows_IIS_check" {
 # CloudWatch Alarms for Malware Events (Signature Update Failed, State Detected, Scan Failed, Engine Update Failed, Engine Out of Date & Behavior Detected)
 
 locals {
-  malware_alarm_metadata_prod    = local.is-production ? {
+  malware_alarm_metadata_prod = local.is-production ? {
     MalwareScanFailed       = "Scan Failed"
     MalwareBehaviorDetected = "Behavior Detected"
     MalwareStateDetected    = "State Detected"
@@ -1131,7 +1131,7 @@ data "aws_instance" "windows_instance_details_uat" {
 # CloudWatch Alarms for Malware Events (Signature Update Failed, State Detected, Scan Failed, Engine Update Failed, Engine Out of Date & Behavior Detected)
 
 locals {
-  malware_alarm_metadata_preprod    = local.is-preproduction ? {
+  malware_alarm_metadata_preprod = local.is-preproduction ? {
     MalwareScanFailed       = "Scan Failed"
     MalwareBehaviorDetected = "Behavior Detected"
     MalwareStateDetected    = "State Detected"
@@ -1340,7 +1340,7 @@ data "aws_instance" "windows_instance_details_dev" {
 # CloudWatch Alarms for Malware Events (Signature Update Failed, State Detected, Scan Failed, Engine Update Failed, Engine Out of Date & Behavior Detected)
 
 locals {
-  malware_alarm_metadata_dev    = local.is-development ? {
+  malware_alarm_metadata_dev = local.is-development ? {
     MalwareScanFailed       = "Scan Failed"
     MalwareBehaviorDetected = "Behavior Detected"
     MalwareStateDetected    = "State Detected"
