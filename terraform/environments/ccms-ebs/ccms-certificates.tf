@@ -46,16 +46,16 @@ resource "aws_route53_record" "external_validation_subdomain" {
   zone_id         = data.aws_route53_zone.external.zone_id
 }
 
-# # Production Certificate
-# resource "aws_acm_certificate" "external_prod" {
-#   count = local.is-production ? 1 : 0
+# Production Certificate
+resource "aws_acm_certificate" "external_prod" {
+  count = local.is-production ? 1 : 0
 
-#   domain_name       = "laa.service.justice.gov.uk"
-#   validation_method = "DNS"
-#   lifecycle {
-#     create_before_destroy = true
-#   }
-# }
+  domain_name       = "laa.service.justice.gov.uk"
+  validation_method = "DNS"
+  lifecycle {
+    create_before_destroy = true
+  }
+}
 
 // resource "aws_acm_certificate_validation" "external_prod" {
 //   count = local.is-production ? 1 : 0
