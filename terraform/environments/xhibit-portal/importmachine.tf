@@ -5,6 +5,7 @@ resource "aws_security_group" "importmachine" {
   description = "Secure access to importmachine"
   name        = "importmachine-${local.application_name}"
   vpc_id      = local.vpc_id
+  depends_on  = [aws_security_group.prtg_lb]
 
   # Allow RDP from Bastion
   ingress {
@@ -12,7 +13,7 @@ resource "aws_security_group" "importmachine" {
     from_port       = "3389"
     to_port         = "3389"
     protocol        = "tcp"
-    security_groups = [module.bastion_linux.bastion_security_group.id]
+    security_groups = [module.bastion_linux.bastion_security_group]
   }
 
   # Allow HTTP from PRTG LB
