@@ -55,7 +55,7 @@ data "aws_iam_policy_document" "tariff_instance_cica_s3_access_data" {
     effect    = "Allow"
     actions   = ["s3:ListBucket*"]
     resources = [
-      for bucket in local.cica_s3_resource : "${bucket}/"
+      for bucket in local.cica_s3_resource : "${bucket}"
     ]
     condition {
       test     = "StringLike"
