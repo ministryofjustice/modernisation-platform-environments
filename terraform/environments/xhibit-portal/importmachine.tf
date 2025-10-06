@@ -34,9 +34,9 @@ resource "aws_security_group" "importmachine" {
     ipv6_cidr_blocks = ["::/0"]
   }
 
-  lifecycle {
-    prevent_destroy = true
-  }
+  # lifecycle {
+  #   prevent_destroy = true
+  # }
 
   tags = merge(
     local.tags,
