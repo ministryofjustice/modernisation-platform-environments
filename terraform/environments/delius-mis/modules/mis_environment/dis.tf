@@ -4,6 +4,26 @@ resource "aws_security_group" "dis" {
   vpc_id      = var.account_info.vpc_id
 }
 
+resource "aws_vpc_security_group_egress_rule" "mis_oracle_db" {
+  description                  = "Oracle DB connection to MIS database"
+  security_group_id            = aws_security_group.dis.id
+  referenced_security_group_id = data.aws_security_group.mis_db.id
+  ip_protocol                  = "tcp"
+  from_port                    = 1521
+  to_port                      = 1521
+}
+
+resource "aws_vpc_security_group_egress_rule" "dis_all_outbound" {
+  description       = "Allow all outbound traffic"
+  security_group_id = aws_security_group.dis.id
+  cidr_ipv4         = "0.0.0.0/0"
+  ip_protocol       = "-1"
+}
+
+data "aws_security_group" "mis_db" {
+  name = "delius-mis-${var.env_name}-mis-db-ec2-instance-sg"
+}
+
 module "dis_instance" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v3.0.1"
 
