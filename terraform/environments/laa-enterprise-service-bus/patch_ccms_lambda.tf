@@ -60,7 +60,7 @@ resource "aws_lambda_function" "patch_ccms_provider_load" {
   ]
 
   dead_letter_config {
-    target_arn = aws_sqs_queue.ccms_provider_dlq.arn
+    target_arn = aws_sqs_queue.patch_ccms_provider_dlq[0].arn
   }
 
   vpc_config {

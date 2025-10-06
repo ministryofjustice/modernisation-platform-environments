@@ -43,7 +43,7 @@ resource "aws_iam_policy" "patch_cwa_extract_lambda_policy" {
         Action = [
           "s3:PutObject"
         ],
-        Resource = "${aws_s3_bucket.data.arn}/*"
+        Resource = "${aws_s3_bucket.patch_data[0].arn}/*"
       },
       {
         Effect = "Allow",
@@ -69,8 +69,8 @@ resource "aws_iam_policy" "patch_cwa_extract_lambda_policy" {
           "sns:Publish"
         ],
         Resource = [
-          aws_sns_topic.priority_p1.arn,
-          aws_sns_topic.provider_banks.arn
+          aws_sns_topic.patch_priority_p1[0].arn,
+          aws_sns_topic.patch_provider_banks[0].arn
         ]
       }
     ]

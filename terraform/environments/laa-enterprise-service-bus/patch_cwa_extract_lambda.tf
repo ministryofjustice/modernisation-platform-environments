@@ -114,7 +114,7 @@ resource "aws_lambda_function" "patch_cwa_file_transfer_lambda" {
   environment {
     variables = {
       TABLE_NAME_SECRET = aws_secretsmanager_secret.cwa_table_name_secret.name
-      TARGET_BUCKET     = aws_s3_bucket.data.bucket
+      TARGET_BUCKET     = aws_s3_bucket.patch_data[0].bucket
       DB_SECRET_NAME    = aws_secretsmanager_secret.patch_cwa_db_secret[0].name
       LD_LIBRARY_PATH   = "/opt/instantclient_12_2_linux"
       ORACLE_HOME       = "/opt/instantclient_12_2_linux"
@@ -154,8 +154,8 @@ resource "aws_lambda_function" "patch_cwa_sns_lambda" {
 
   environment {
     variables = {
-      PROVIDER_TOPIC       = aws_sns_topic.priority_p1.arn
-      PROVIDER_BANKS_TOPIC = aws_sns_topic.provider_banks.arn
+      PROVIDER_TOPIC       = aws_sns_topic.patch_priority_p1[0].arn
+      PROVIDER_BANKS_TOPIC = aws_sns_topic.patch_provider_banks[0].arn
       SERVICE_NAME         = "cwa-sns-service"
       NAMESPACE            = "HUB20-CWA-NS"
       ENVIRONMENT          = local.environment

@@ -121,7 +121,7 @@ resource "aws_iam_role" "patch_ccms_cross_account_s3_read" {
       {
         Effect = "Allow",
         Principal = {
-          AWS = "arn:aws:iam::${local.application_data.accounts[local.environment].ccms_account_id}:role/role_stsassume_oracle_base"
+          AWS = "arn:aws:iam::730335523459:role/role_stsassume_oracle_base"
         },
         Action = "sts:AssumeRole"
       }
@@ -152,8 +152,8 @@ resource "aws_iam_policy" "patch_ccms_cross_account_s3_read_policy" {
           "s3:ListBucketVersions"
         ],
         Resource = [
-          "${aws_s3_bucket.data.arn}",
-          "${aws_s3_bucket.data.arn}/*"
+          "${aws_s3_bucket.patch_data[0].arn}",
+          "${aws_s3_bucket.patch_data[0].arn}/*"
         ]
       }
     ]
