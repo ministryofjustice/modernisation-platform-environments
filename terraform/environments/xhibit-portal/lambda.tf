@@ -169,7 +169,7 @@ resource "aws_lambda_function" "delete_old_ami" {
 
   environment {
     variables = {
-      DRY_RUN = "false"   # Pass dry_run as an environment variable
+      DRY_RUN = "false" # Pass dry_run as an environment variable
     }
   }
 
