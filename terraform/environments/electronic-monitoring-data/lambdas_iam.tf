@@ -590,3 +590,58 @@ resource "aws_iam_role_policy_attachment" "process_fms_metadata_lambda_policy_at
   role       = aws_iam_role.process_fms_metadata.name
   policy_arn = aws_iam_policy.process_fms_metadata_lambda_role_policy.arn
 }
+
+#-----------------------------------------------------------------------------------
+# Generate Encryption Key for Serco IAM Role
+#-----------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "generate_encrypted_key_serco_lambda_role_policy_document" {
+  statement {
+    sid    = "S3Permissions"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:GetBucketLocation",
+      "s3:ListBucket",
+      "s3:PutObject",
+    ]
+    resources = [
+      "${module.s3-export-bucket.bucket.arn}/*",
+      module.s3-export-bucket.bucket.arn,
+    ]
+  }
+  statement {
+    sid    = "SecretsManagerListPermissions"
+    effect = "Allow"
+    actions = [
+      "secretsmanager:ListSecrets"
+    ]
+    resources = "*"
+  }
+  statement {
+    sid = "SecretsManagerPermissions"
+    actions = [
+      "secretsmanager:GetSecretValue",
+    ]
+    resources = [
+      module.s3-fms-general-landing-bucket-iam-user.secret_obj.secret_arn,
+      module.s3-fms-specials-landing-bucket-iam-user.secret_obj.secret_arn,
+      module.s3-fms-ho-landing-bucket-iam-user.secret_obj.secret_arn,
+    ]
+  }
+}
+
+resource "aws_iam_role" "generate_encrypted_key_serco" {
+  name               = "generate_encrypted_key_serco_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_policy" "generate_encrypted_key_serco_lambda_role_policy" {
+  name   = "generate_encrypted_key_serco_lambda_policy"
+  policy = data.aws_iam_policy_document.generate_encrypted_key_serco_lambda_role_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "generate_encrypted_key_serco_lambda_policy_attachment" {
+  role       = aws_iam_role.generate_encrypted_key_serco.name
+  policy_arn = aws_iam_policy.generate_encrypted_key_serco_lambda_role_policy.arn
+}
