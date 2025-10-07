@@ -42,8 +42,8 @@ resource "aws_security_group_rule" "egress_traffic_ebsalb_internal_all" {
   type              = "egress"
   description       = "All"
   protocol          = "TCP"
-  from_port         = 0
-  to_port           = 0
+  from_port         = 8000
+  to_port           = 8000
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
