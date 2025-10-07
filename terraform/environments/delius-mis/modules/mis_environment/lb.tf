@@ -260,55 +260,53 @@ resource "aws_vpc_security_group_egress_rule" "mis_alb_backend_infrastructure" {
 }
 
 # Allow EC2 instances to receive traffic from ALB security groups on port 8080
-# TEMPORARILY COMMENTED OUT to break dependency chain with old dfi_alb_* security groups
-# Uncomment after old security groups are deleted and new ones are created
-# resource "aws_vpc_security_group_ingress_rule" "ec2_from_alb_staff" {
-#   count                        = var.lb_config != null ? 1 : 0
-#   security_group_id            = aws_security_group.mis_ec2_shared.id
-#   referenced_security_group_id = aws_security_group.mis_alb_staff[0].id
-#   ip_protocol                  = "tcp"
-#   from_port                    = 8080
-#   to_port                      = 8080
-#   description                  = "Allow MIS ALB to reach instances on port 8080"
-# 
-#   tags = local.tags
-# }
-# 
-# resource "aws_vpc_security_group_ingress_rule" "ec2_from_alb_enduser" {
-#   count                        = var.lb_config != null ? 1 : 0
-#   security_group_id            = aws_security_group.mis_ec2_shared.id
-#   referenced_security_group_id = aws_security_group.mis_alb_enduser[0].id
-#   ip_protocol                  = "tcp"
-#   from_port                    = 8080
-#   to_port                      = 8080
-#   description                  = "Allow MIS ALB to reach instances on port 8080"
-# 
-#   tags = local.tags
-# }
-# 
-# resource "aws_vpc_security_group_ingress_rule" "ec2_from_alb_mojo" {
-#   count                        = var.lb_config != null ? 1 : 0
-#   security_group_id            = aws_security_group.mis_ec2_shared.id
-#   referenced_security_group_id = aws_security_group.mis_alb_mojo[0].id
-#   ip_protocol                  = "tcp"
-#   from_port                    = 8080
-#   to_port                      = 8080
-#   description                  = "Allow MIS ALB to reach instances on port 8080"
-# 
-#   tags = local.tags
-# }
-# 
-# resource "aws_vpc_security_group_ingress_rule" "ec2_from_alb_infrastructure" {
-#   count                        = var.lb_config != null ? 1 : 0
-#   security_group_id            = aws_security_group.mis_ec2_shared.id
-#   referenced_security_group_id = aws_security_group.mis_alb_infrastructure[0].id
-#   ip_protocol                  = "tcp"
-#   from_port                    = 8080
-#   to_port                      = 8080
-#   description                  = "Allow MIS ALB to reach instances on port 8080"
-# 
-#   tags = local.tags
-# }
+resource "aws_vpc_security_group_ingress_rule" "ec2_from_alb_staff" {
+  count                        = var.lb_config != null ? 1 : 0
+  security_group_id            = aws_security_group.mis_ec2_shared.id
+  referenced_security_group_id = aws_security_group.mis_alb_staff[0].id
+  ip_protocol                  = "tcp"
+  from_port                    = 8080
+  to_port                      = 8080
+  description                  = "Allow MIS ALB to reach instances on port 8080"
+
+  tags = local.tags
+}
+
+resource "aws_vpc_security_group_ingress_rule" "ec2_from_alb_enduser" {
+  count                        = var.lb_config != null ? 1 : 0
+  security_group_id            = aws_security_group.mis_ec2_shared.id
+  referenced_security_group_id = aws_security_group.mis_alb_enduser[0].id
+  ip_protocol                  = "tcp"
+  from_port                    = 8080
+  to_port                      = 8080
+  description                  = "Allow MIS ALB to reach instances on port 8080"
+
+  tags = local.tags
+}
+
+resource "aws_vpc_security_group_ingress_rule" "ec2_from_alb_mojo" {
+  count                        = var.lb_config != null ? 1 : 0
+  security_group_id            = aws_security_group.mis_ec2_shared.id
+  referenced_security_group_id = aws_security_group.mis_alb_mojo[0].id
+  ip_protocol                  = "tcp"
+  from_port                    = 8080
+  to_port                      = 8080
+  description                  = "Allow MIS ALB to reach instances on port 8080"
+
+  tags = local.tags
+}
+
+resource "aws_vpc_security_group_ingress_rule" "ec2_from_alb_infrastructure" {
+  count                        = var.lb_config != null ? 1 : 0
+  security_group_id            = aws_security_group.mis_ec2_shared.id
+  referenced_security_group_id = aws_security_group.mis_alb_infrastructure[0].id
+  ip_protocol                  = "tcp"
+  from_port                    = 8080
+  to_port                      = 8080
+  description                  = "Allow MIS ALB to reach instances on port 8080"
+
+  tags = local.tags
+}
 
 # Application Load Balancer - shared by DFI and DIS services
 resource "aws_lb" "mis" {
