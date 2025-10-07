@@ -616,7 +616,7 @@ data "aws_iam_policy_document" "generate_encrypted_key_serco_lambda_role_policy_
     actions = [
       "secretsmanager:ListSecrets"
     ]
-    resources = "*"
+    resources = ["*"]
   }
   statement {
     sid = "SecretsManagerPermissions"
