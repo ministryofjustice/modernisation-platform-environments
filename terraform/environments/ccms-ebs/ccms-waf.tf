@@ -32,9 +32,9 @@ resource "aws_wafv2_ip_set" "ebs_waf_ip_set" {
     "194.33.218.0/24",    // PRP DIA Sites
     "128.77.75.64/26",    // Palo Alto Prisma Access Egress IP Addresses
 
-    data.aws_subnet.public_subnets_a,
-    data.aws_subnet.public_subnets_b,
-    data.aws_subnet.public_subnets_c
+    data.aws_subnet.public_subnets_a.cidr_block,
+    data.aws_subnet.public_subnets_b.cidr_block,
+    data.aws_subnet.public_subnets_c.cidr_block
   ]
 
   tags = merge(local.tags,
