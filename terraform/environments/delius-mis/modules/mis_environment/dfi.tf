@@ -66,7 +66,7 @@ module "dfi_instance" {
         ad_password_secret_name = aws_secretsmanager_secret.ad_admin_password.name
         ad_domain_name          = var.environment_config.ad_domain_name
         ad_ip_list              = aws_directory_service_directory.mis_ad.dns_ip_addresses
-        branch                  = "main"
+        branch                  = var.dfi_config.branch
       }
     )
   )
@@ -84,7 +84,7 @@ module "dfi_instance" {
       server-type = "MISDis"
     }
   )
-  cloudwatch_metric_alarms = merge(
+  cloudwatch_metric_alarms = var.dfi_config.cloudwatch_metric_alarms != null ? var.dfi_config.cloudwatch_metric_alarms : merge(
     local.cloudwatch_metric_alarms.ec2
   )
 }
