@@ -28,3 +28,5 @@ terraform/modules/**/*.zip
 terraform/environments/youth-justice-app-framework/modules/quicksight/assets/run_time
 
 megalinter-reports
+
+datasync_password_updater.zip
