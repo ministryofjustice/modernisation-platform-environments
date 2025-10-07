@@ -100,6 +100,11 @@ resource "aws_cloudwatch_event_rule" "serco_secretsmanager_key_update" {
   })
 }
 
+resource "aws_cloudwatch_event_target" "serco_secretsmanager_key_update" {
+  rule = aws_cloudwatch_event_rule.serco_secretsmanager_key_update.name
+  arn  = module.generate_encrypted_key_serco.lambda_function_arn
+}
+
 resource "aws_lambda_permission" "allow_eventbridge" {
   statement_id  = "AllowExecutionFromEventBridge"
   action        = "lambda:InvokeFunction"
