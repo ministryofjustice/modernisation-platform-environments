@@ -36,11 +36,13 @@ locals {
   
   # Subject Alternative Names based on environment
   nonprod_sans = [
-    format("ccmsebs.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment)
+    format("ccmsebs.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment),
+    format("ccms-ebs-db-nlb.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment)
   ]
   
   prod_sans = [
-    format("ccmsebs.%s", local.prod_domain)
+    format("ccmsebs.%s", local.prod_domain),
+    format("ccms-ebs-db-nlb.%s", local.prod_domain)
   ]
   
   subject_alternative_names = local.is-production ? local.prod_sans : local.nonprod_sans
