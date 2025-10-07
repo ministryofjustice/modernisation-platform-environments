@@ -86,4 +86,39 @@ locals {
       type   = dvo.resource_record_type
     }
   } : {}
+
+  # Environment-specific NLB subnet CIDRs
+  nlb_subnets = {
+    development = [
+      "10.26.59.0/25",      # DEV NLB Subnet eu-west-2a
+      "10.26.59.128/25",    # DEV NLB Subnet eu-west-2b
+      "10.26.60.0/25",      # DEV NLB Subnet eu-west-2c
+    ]
+
+    test = [
+      "10.26.99.0/25",      # TEST NLB Subnet eu-west-2a
+      "10.26.99.128/25",    # TEST NLB Subnet eu-west-2b
+      "10.26.100.0/25",     # TEST NLB Subnet eu-west-2c
+    ]
+
+    preproduction = [
+      "10.27.75.0/25",      # PREPROD NLB Subnet eu-west-2a
+      "10.27.75.128/25",    # PREPROD NLB Subnet eu-west-2b
+      "10.27.76.0/25",      # PREPROD NLB Subnet eu-west-2c
+    ]
+
+    production = [
+      "10.27.67.0/25",      # PROD NLB Subnet eu-west-2a
+      "10.27.68.0/25",      # PROD NLB Subnet eu-west-2b
+      "10.27.67.128/25",    # PROD NLB Subnet eu-west-2c
+    ]
+  }
+  
+  selected_nlb_subnets = (
+    local.is-development   ? local.nlb_subnets["development"] :
+    local.is-test          ? local.nlb_subnets["test"] :
+    local.is-preproduction ? local.nlb_subnets["preproduction"] :
+    local.is-production    ? local.nlb_subnets["production"] :
+    []
+  )
 }
