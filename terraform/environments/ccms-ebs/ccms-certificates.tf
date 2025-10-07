@@ -39,7 +39,7 @@ resource "aws_route53_record" "external_validation_prod" {
   records         = [local.laa_validations[count.index].record]
   ttl             = 60
   type            = local.laa_validations[count.index].type
-  zone_id         = data.aws_route53_zone.legalservices.zone_id
+  zone_id         = data.aws_route53_zone.laa.zone_id
 }
 
 ## Certificate Validation
