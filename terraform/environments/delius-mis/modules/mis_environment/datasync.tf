@@ -353,7 +353,7 @@ resource "aws_datasync_location_fsx_windows_file_system" "dfi_fsx_destination" {
 
   # Use FSX file system ARN and specific subdirectory for DFI reports
   fsx_filesystem_arn = aws_fsx_windows_file_system.mis_share.arn
-  subdirectory       = "/share/dfiinterventions/dfi/"
+  subdirectory       = "/share/dfiinterventions/dfi"
 
   # Authentication details - using the existing AD admin credentials
   # The password comes from the existing AD admin secret that gets rotated automatically
