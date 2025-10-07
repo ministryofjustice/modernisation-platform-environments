@@ -22,9 +22,6 @@ resource "aws_lb" "webgate_public_lb" {
 
 resource "aws_lb_listener" "webgate_public_listener" {
   count = local.is-production ? 1 : 1
-  depends_on = [
-    aws_acm_certificate_validation.external
-  ]
 
   load_balancer_arn = aws_lb.webgate_public_lb.arn
   port              = "443"
