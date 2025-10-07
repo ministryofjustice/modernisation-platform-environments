@@ -7,12 +7,9 @@ resource "aws_wafv2_ip_set" "ebs_waf_ip_set" {
   description        = "List of trusted IP Addresses allowing access via WAF"
 
   addresses = [
-    "35.176.127.232/32",  // Management DMZ Subnet A - London Non-Prod NAT Gateway
-    "35.177.145.193/32",  // Management DMZ Subnet B - London Non-Prod NAT Gateway
-    "18.130.39.94/32",    // Management DMC Subnet C - London Non-Prod NAT Gateway
-    "52.56.212.11/32",    // Management DMZ Subnet A - London Prod NAT Gateway
-    "35.176.254.38/32",   // Management DMZ Subnet B - London Prod NAT Gateway
-    "35.177.173.197/32",  // Management DMC Subnet C - London Prod NAT Gateway
+    local.application_data.accounts[local.environment].lz_aws_workspace_public_nat_gateway_a,
+    local.application_data.accounts[local.environment].lz_aws_workspace_public_nat_gateway_b,
+    local.application_data.accounts[local.environment].lz_aws_workspace_public_nat_gateway_c,
     "195.59.75.0/24",     // ARK Data Center External Internet access addresses - NPS and HMCTS users transitioned under TTP
     "194.33.192.0/25",    // ARK Data Center External Internet access addresses - NPS and HMCTS users transitioned under TTP
     "194.33.193.0/25",    // ARK Data Center External Internet access addresses - NPS and HMCTS users transitioned under TTP
@@ -31,7 +28,6 @@ resource "aws_wafv2_ip_set" "ebs_waf_ip_set" {
     "194.33.216.0/23",    // PRP DIA Sites
     "194.33.218.0/24",    // PRP DIA Sites
     "128.77.75.64/26",    // Palo Alto Prisma Access Egress IP Addresses
-
     data.aws_subnet.public_subnets_a.cidr_block,
     data.aws_subnet.public_subnets_b.cidr_block,
     data.aws_subnet.public_subnets_c.cidr_block
