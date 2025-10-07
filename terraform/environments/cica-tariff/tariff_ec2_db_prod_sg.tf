@@ -32,14 +32,14 @@ resource "aws_security_group" "tariff_db_prod_security_group" {
     protocol    = "icmp"
     from_port   = -1
     to_port     = -1
-    cidr_blocks = [data.aws_vpc.shared.cidr_block, local.cidr_cica_ss_a, local.cidr_cica_ss_b, local.cidr_cica_prod_a, local.cidr_cica_prod_b]
+    cidr_blocks = [data.aws_vpc.shared.cidr_block, local.cidr_cica_ss_a, local.cidr_cica_ss_b, local.cidr_cica_prod_a, local.cidr_cica_prod_b, local.cidr_cica_prod_c, local.cidr_cica_prod_d]
   }
 
   ingress {
     protocol    = "tcp"
     from_port   = 1521
     to_port     = 1521
-    cidr_blocks = [data.aws_vpc.shared.cidr_block, local.cidr_cica_ss_a, local.cidr_cica_ss_b, local.cidr_cica_ras, local.cidr_cica_lan, local.cidr_cica_ras_nat, local.cidr_cica_prod_a, local.cidr_cica_prod_b]
+    cidr_blocks = [data.aws_vpc.shared.cidr_block, local.cidr_cica_ss_a, local.cidr_cica_ss_b, local.cidr_cica_ras, local.cidr_cica_lan, local.cidr_cica_ras_nat, local.cidr_cica_prod_a, local.cidr_cica_prod_b, local.cidr_cica_prod_c, local.cidr_cica_prod_d]
 
   }
 
@@ -60,5 +60,22 @@ resource "aws_security_group" "tariff_db_prod_security_group" {
       "0.0.0.0/0"
     ]
 
+  }
+  #Allow connectivity between db instances
+  ingress {
+    protocol    = -1
+    from_port   = 0
+    to_port     = 0
+    self        = true
+    description = "Allow all traffic between db instances"
+  }
+
+  # Allow Commvault ingress from Shared Services
+  ingress {
+    protocol    = "tcp"
+    from_port   = 8400
+    to_port     = 8403
+    cidr_blocks = [local.cidr_cica_ss_a, local.cidr_cica_ss_b]
+    description = "Allow Commvault inbound from Shared Services"
   }
 }
