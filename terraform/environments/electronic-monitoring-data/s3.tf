@@ -75,7 +75,7 @@ data "aws_secretsmanager_secret_version" "allied_account_id" {
 # ------------------------------------------------------------------------
 
 module "s3-logging-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9f"
 
   bucket_prefix      = "${local.bucket_prefix}-bucket-logs-"
   versioning_enabled = true
@@ -190,8 +190,7 @@ resource "aws_s3_bucket_logging" "s3_buckets_logging" {
 # ------------------------------------------------------------------------
 
 module "s3-metadata-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
-
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9f"
   bucket_prefix      = "${local.bucket_prefix}-metadata-"
   versioning_enabled = true
 
@@ -260,8 +259,7 @@ module "s3-metadata-bucket" {
 # ----------------------------------
 
 module "s3-athena-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
-
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9f"
   bucket_prefix      = "${local.bucket_prefix}-athena-query-results-"
   versioning_enabled = true
 
@@ -330,8 +328,7 @@ module "s3-athena-bucket" {
 # ----------------------------------
 
 module "s3-unzipped-files-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
-
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9f"
   bucket_prefix      = "${local.bucket_prefix}-unzipped-files-"
   versioning_enabled = true
 
@@ -376,8 +373,7 @@ module "s3-unzipped-files-bucket" {
 # ------------------------------------------------------------------------
 
 module "s3-dms-premigrate-assess-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
-
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9f"
   bucket_prefix      = "${local.bucket_prefix}-dms-premigrate-assess-"
   versioning_enabled = true
 
@@ -446,8 +442,7 @@ module "s3-dms-premigrate-assess-bucket" {
 # ------------------------------------------------------------------------
 
 module "s3-json-directory-structure-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
-
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9f"
   bucket_prefix      = local.is-preproduction ? "emds-p-prod-json-directory-structure-" : "${local.bucket_prefix}-json-directory-structure-"
   versioning_enabled = true
 
@@ -792,8 +787,7 @@ module "s3-serco-export-bucket" {
 # ----------------------------------
 
 module "s3-received-files-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
-
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9f"
   bucket_prefix      = "${local.bucket_prefix}-received-files-"
   versioning_enabled = true
 
@@ -835,8 +829,7 @@ module "s3-received-files-bucket" {
 
 
 module "s3-quarantine-files-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
-
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9f"
   bucket_prefix      = "${local.bucket_prefix}-quarantined-files-"
   versioning_enabled = true
 
@@ -877,8 +870,7 @@ module "s3-quarantine-files-bucket" {
 }
 
 module "s3-clamav-definitions-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
-
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9f"
   bucket_prefix      = "${local.bucket_prefix}-clamav-definitions-"
   versioning_enabled = true
 
@@ -922,8 +914,7 @@ module "s3-clamav-definitions-bucket" {
 # DMS data validation bucket
 # ------------------------------------------------------------------------
 module "s3-dms-data-validation-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
-
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9f"
   bucket_prefix      = "${local.bucket_prefix}-dms-data-validation-"
   versioning_enabled = true
 
@@ -992,8 +983,7 @@ module "s3-dms-data-validation-bucket" {
 # ------------------------------------------------------------------------
 
 module "s3-glue-job-script-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
-
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9f"
   bucket_prefix      = "${local.bucket_prefix}-glue-job-store-"
   versioning_enabled = true
 
@@ -1063,8 +1053,7 @@ module "s3-glue-job-script-bucket" {
 
 
 module "s3-dms-target-store-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
-
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9f"
   bucket_prefix      = "${local.bucket_prefix}-dms-rds-to-parquet-"
   versioning_enabled = true
 
@@ -1130,8 +1119,7 @@ module "s3-dms-target-store-bucket" {
 
 
 module "s3-create-a-derived-table-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
-
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9f"
   bucket_name        = "${local.bucket_prefix}-cadt"
   versioning_enabled = true
 
@@ -1270,8 +1258,7 @@ module "s3-raw-formatted-data-bucket" {
 # -----------------------------
 
 module "s3-lambda-store-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
-
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9f"
   bucket_prefix      = "${local.bucket_prefix}-lambda-store-"
   versioning_enabled = true
 
