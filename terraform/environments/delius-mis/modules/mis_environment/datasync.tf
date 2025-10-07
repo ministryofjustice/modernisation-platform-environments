@@ -441,6 +441,30 @@ resource "aws_cloudwatch_log_group" "datasync_logs" {
   )
 }
 
+# Resource policy to allow DataSync service to write to CloudWatch Logs
+resource "aws_cloudwatch_log_resource_policy" "datasync_logs_policy" {
+  count = var.datasync_config != null ? 1 : 0
+
+  policy_name = "${var.app_name}-${var.env_name}-datasync-logs-policy"
+
+  policy_document = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "datasync.amazonaws.com"
+        }
+        Action = [
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ]
+        Resource = "${aws_cloudwatch_log_group.datasync_logs[0].arn}:*"
+      }
+    ]
+  })
+}
+
 #############################################
 ### Security Group Rules for FSX to allow DataSync
 #############################################
