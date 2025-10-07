@@ -511,7 +511,7 @@ module "s3-json-directory-structure-bucket" {
 # ------------------------------------------------------------------------
 
 module "s3-data-bucket" {
-  source             = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
+  source             = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9f"
   bucket_prefix      = "${local.bucket_prefix}-data-"
   versioning_enabled = true
 
@@ -1188,7 +1188,7 @@ module "s3-create-a-derived-table-bucket" {
 # ------------------------------------------------------------------------
 
 module "s3-raw-formatted-data-bucket" {
-  source             = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
+  source             = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9f"
   bucket_prefix      = "${local.bucket_prefix}-raw-formatted-data-"
   versioning_enabled = true
 

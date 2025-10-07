@@ -89,7 +89,7 @@ module "kms_key" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "3.1.1"
+  version = "4.1.0"
 
   aliases     = ["s3/landing_bucket_${var.data_feed}_${var.order_type}"]
   description = "${var.data_feed} ${var.order_type} landing bucket KMS key"
