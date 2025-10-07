@@ -37,9 +37,6 @@ resource "aws_lb_target_group" "ebsapp_internal_tg" {
 }
 
 resource "aws_lb_listener" "ebsapps_internal_listener" {
-  depends_on = [
-    aws_acm_certificate_validation.external
-  ]
 
   load_balancer_arn = aws_lb.ebsapps_internal_alb.arn
   port              = "443"
