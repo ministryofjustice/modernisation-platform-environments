@@ -13,7 +13,7 @@ resource "aws_lambda_function" "redshift_scheduler" {
       REDSHIFT_WORKGROUP = aws_redshiftserverless_workgroup.default.workgroup_name
       SECRET_ARN         = aws_secretsmanager_secret.yjb_schedular.arn
       SQL_QUERY_1        = "CALL yjb_ianda_team.refresh_materialized_views();"
-      SQL_QUERY_2_FILE   = "/var/task/scripts/fte_redshift.sql"
+      SQL_QUERY_2_FILE   = "/var/task/scripts/qs2-fte_redshift.sql"
       DATABASE_NAME      = "yjb_returns"
     }
   }
@@ -74,42 +74,51 @@ resource "aws_iam_role_policy" "lambda_redshift_policy" {
 
 
 
-# EventBridge Rule - Daily at 5am
-resource "aws_cloudwatch_event_rule" "daily_5am" {
-  name                = "daily-redshift-refresh-mvs-${var.environment}"
-  schedule_expression = "cron(0 5 * * ? *)"  # UTC time
+# Daily materialized views refresh at 5am UTC
+resource "aws_cloudwatch_event_rule" "daily_mvs_refresh" {
+  name                = "daily-mvs-refresh-${var.environment}"
+  schedule_expression = "cron(0 5 * * ? *)"
 }
 
-resource "aws_cloudwatch_event_target" "daily_5am_target" {
-  rule = aws_cloudwatch_event_rule.daily_5am.name
+resource "aws_cloudwatch_event_target" "daily_mvs_refresh_lambda" {
+  rule = aws_cloudwatch_event_rule.daily_mvs_refresh.name
   arn  = aws_lambda_function.redshift_scheduler.arn
+
+  input = jsonencode({
+    query = "materialized_views"
+  })
 }
 
 
-# EventBridge Rule - Weekly Monday at 08:30
-resource "aws_cloudwatch_event_rule" "weekly_monday" {
-  name                = "weekly-fte-redshift-${var.environment}"
-  schedule_expression = "cron(30 8 ? * MON *)"  # UTC time
+# Weekly FTE refresh on Mondays at 08:30 UTC
+resource "aws_cloudwatch_event_rule" "weekly_fte_refresh" {
+  name                = "weekly-fte-refresh-${var.environment}"
+  schedule_expression = "cron(30 8 ? * 2 *)"  # Monday 08:30 UTC
 }
 
-resource "aws_cloudwatch_event_target" "weekly_monday_target" {
-  rule = aws_cloudwatch_event_rule.weekly_monday.name
+resource "aws_cloudwatch_event_target" "weekly_fte_refresh_lambda" {
+  rule = aws_cloudwatch_event_rule.weekly_fte_refresh.name
   arn  = aws_lambda_function.redshift_scheduler.arn
+
+  input = jsonencode({
+    query = "fte_redshift"
+  })
 }
 
 
+# Allow EventBridge to invoke Lambda
 resource "aws_lambda_permission" "allow_eventbridge_daily" {
-  statement_id  = "AllowExecutionFromEventBridgeDaily"
+  statement_id  = "AllowEventBridgeDaily"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.redshift_scheduler.function_name
   principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.daily_5am.arn
+  source_arn    = aws_cloudwatch_event_rule.daily_mvs_refresh.arn
 }
 
 resource "aws_lambda_permission" "allow_eventbridge_weekly" {
-  statement_id  = "AllowExecutionFromEventBridgeWeekly"
+  statement_id  = "AllowEventBridgeWeekly"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.redshift_scheduler.function_name
   principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.weekly_monday.arn
+  source_arn    = aws_cloudwatch_event_rule.weekly_fte_refresh.arn
 }
