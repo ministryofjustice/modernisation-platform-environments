@@ -2,7 +2,7 @@ resource "aws_lb" "webgate_alb_internal" {
   name               = lower(format("lb-%s-wgate-internal", local.application_name))
   internal           = true
   load_balancer_type = "application"
-  security_groups    = [aws_security_group.sg_webgate_internal_alb.id]
+  # security_groups    = [aws_security_group.sg_webgate_internal_alb.id]
   subnets            = data.aws_subnets.shared-private.ids
 
   drop_invalid_header_fields = true
