@@ -42,9 +42,11 @@ resource "aws_iam_role_policy" "lambda_redshift_policy" {
       {
         Effect   = "Allow"
         Action   = [
-          "redshift-data:ExecuteStatement",
-          "redshift-data:DescribeStatement",
-          "redshift-data:GetStatementResult"
+          "redshift-serverless:GetCredentials",
+          "redshift-serverless:ExecuteStatement",
+          "redshift-serverless:BatchExecuteStatement",
+          "redshift-serverless:DescribeStatement",
+          "redshift-serverless:CancelStatement"
         ]
         Resource = "*"
       },
