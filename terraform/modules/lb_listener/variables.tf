@@ -14,7 +14,7 @@ variable "environment" {
 }
 
 variable "load_balancer" {
-  type        = string
+  type        = object
   description = "Provide aws_lb resource or data resource"
   default     = null
 }
