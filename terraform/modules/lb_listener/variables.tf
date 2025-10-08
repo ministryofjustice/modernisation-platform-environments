@@ -26,7 +26,6 @@ variable "load_balancer_arn" {
 }
 
 variable "existing_target_groups" {
-  type        = map(object)
   description = "Map of existing aws_lb_target_groups, if looking up target group by name (map key)"
   default     = {}
 }
