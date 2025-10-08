@@ -187,15 +187,6 @@ resource "aws_lambda_function" "datasync_password_updater" {
   tags = local.tags
 }
 
-resource "aws_lambda_permission" "allow_scheduled_execution" {
-  count         = var.datasync_config != null ? 1 : 0
-  statement_id  = "AllowExecutionFromSchedule"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.datasync_password_updater[0].function_name
-  principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.pre_datasync_password_update[0].arn
-}
-
 # Schedule the Lambda to run 30 minutes before DataSync task to ensure fresh password
 resource "aws_cloudwatch_event_rule" "pre_datasync_password_update" {
   count = var.datasync_config != null ? 1 : 0
