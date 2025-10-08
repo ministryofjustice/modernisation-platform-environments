@@ -14,7 +14,6 @@ variable "environment" {
 }
 
 variable "load_balancer" {
-  type        = map(any)
   description = "Provide aws_lb resource or data resource"
   default     = null
 }
