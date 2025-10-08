@@ -14,6 +14,7 @@ variable "environment" {
 }
 
 variable "load_balancer" {
+  type        = string
   description = "Provide aws_lb resource or data resource"
   default     = null
 }
@@ -25,6 +26,7 @@ variable "load_balancer_arn" {
 }
 
 variable "existing_target_groups" {
+  type        = map(any)
   description = "Map of existing aws_lb_target_groups, if looking up target group by name (map key)"
   default     = {}
 }
