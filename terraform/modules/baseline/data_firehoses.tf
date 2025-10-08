@@ -6,9 +6,10 @@ locals {
 }
 
 module "data_firehose" {
+  #checkov:skip=CKV_TF_1:Ensure Terraform module sources use a commit hash; skip as this is MoJ Repo
   for_each = local.data_firehoses
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-aws-data-firehose?ref=204ccb4d5160a83774fa9585d060ee925640426b" # v2.0.0
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-aws-data-firehose?ref=v3.0.0"
 
   cloudwatch_log_group_names   = each.value.cloudwatch_log_group_names
   destination_http_endpoint    = aws_ssm_parameter.placeholder[each.value.destination_http_endpoint_ssm_parameter_name].value
