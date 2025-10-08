@@ -170,44 +170,44 @@ resource "aws_lambda_function" "patch_cwa_sns_lambda" {
   )
 }
 
-# # Duplicate Lambda Function for Patch CWA Extract
-# resource "aws_lambda_function" "oracledb_patch_cwa_extract_lambda" {
-#   count            = local.environment == "test" ? 1 : 0
-#   description      = "Connect to CWA DB and invoke cwa extract procedure."
-#   function_name    = "oracledb_patch_cwa_extract_lambda"
-#   role             = aws_iam_role.patch_cwa_extract_lambda_role[0].arn
-#   handler          = "lambda_function.lambda_handler"
-#   filename         = "lambda/oracledb_extract_lambda/oracledb_extract_package.zip"
-#   source_code_hash = filebase64sha256("lambda/oracledb_extract_lambda/oracledb_extract_package.zip")
-#   timeout          = 300
-#   memory_size      = 128
-#   runtime          = "python3.10"
+# Duplicate Lambda Function for Patch CWA Extract
+resource "aws_lambda_function" "oracledb_patch_cwa_extract_lambda" {
+  count            = local.environment == "test" ? 1 : 0
+  description      = "Connect to CWA DB and invoke cwa extract procedure."
+  function_name    = "oracledb_patch_cwa_extract_lambda"
+  role             = aws_iam_role.patch_cwa_extract_lambda_role[0].arn
+  handler          = "lambda_function.lambda_handler"
+  filename         = "lambda/oracledb_extract_lambda/oracledb_extract_package.zip"
+  source_code_hash = filebase64sha256("lambda/oracledb_extract_lambda/oracledb_extract_package.zip")
+  timeout          = 300
+  memory_size      = 128
+  runtime          = "python3.10"
 
-#   layers = [
-#     aws_lambda_layer_version.lambda_layer_oracle_python.arn,
-#     "arn:aws:lambda:eu-west-2:017000801446:layer:AWSLambdaPowertoolsPython:2"
-#   ]
+  layers = [
+    aws_lambda_layer_version.lambda_layer_oracle_python.arn,
+    "arn:aws:lambda:eu-west-2:017000801446:layer:AWSLambdaPowertoolsPython:2"
+  ]
 
-#   vpc_config {
-#     security_group_ids = [aws_security_group.patch_cwa_extract_sg[0].id]
-#     subnet_ids         = [data.aws_subnet.data_subnets_a.id]
-#   }
+  vpc_config {
+    security_group_ids = [aws_security_group.patch_cwa_extract_sg[0].id]
+    subnet_ids         = [data.aws_subnet.data_subnets_a.id]
+  }
 
-#   environment {
-#     variables = {
-#       PROCEDURES_CONFIG = aws_secretsmanager_secret.cwa_procedures_config.name
-#       DB_SECRET_NAME    = aws_secretsmanager_secret.patch_cwa_db_secret[0].name
-#       LD_LIBRARY_PATH   = "/opt/instantclient_12_2_linux"
-#       ORACLE_HOME       = "/opt/instantclient_12_2_linux"
-#       SERVICE_NAME      = "cwa-extract-service"
-#       NAMESPACE         = "HUB20-CWA-NS"
-#       ENVIRONMENT       = local.environment
-#       LOG_LEVEL         = "DEBUG"
-#     }
-#   }
+  environment {
+    variables = {
+      PROCEDURES_CONFIG = aws_secretsmanager_secret.cwa_procedures_config.name
+      DB_SECRET_NAME    = aws_secretsmanager_secret.patch_cwa_db_secret[0].name
+      LD_LIBRARY_PATH   = "/opt/instantclient_12_2_linux"
+      ORACLE_HOME       = "/opt/instantclient_12_2_linux"
+      SERVICE_NAME      = "cwa-extract-service"
+      NAMESPACE         = "HUB20-CWA-NS"
+      ENVIRONMENT       = local.environment
+      LOG_LEVEL         = "DEBUG"
+    }
+  }
 
-#   tags = merge(
-#     local.tags,
-#     { Name = "${local.application_name_short}-${local.environment}-oracledb-patch-cwa-extract-lambda" }
-#   )
-# }
+  tags = merge(
+    local.tags,
+    { Name = "${local.application_name_short}-${local.environment}-oracledb-patch-cwa-extract-lambda" }
+  )
+}
