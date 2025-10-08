@@ -90,7 +90,7 @@ resource "aws_iam_role_policy" "datasync_password_updater_policy" {
         Action = [
           "fsx:DescribeFileSystems"
         ]
-        Resource = aws_fsx_windows_file_system.mis_share.arn
+        Resource = "*"
       }
     ]
   })
