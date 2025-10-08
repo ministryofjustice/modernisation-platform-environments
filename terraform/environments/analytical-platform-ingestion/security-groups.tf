@@ -30,13 +30,13 @@ resource "aws_security_group" "transfer_server" {
   tags        = local.tags
 }
 
-module "to_be_transfer_server_security_group" {
+module "transfer_server_security_group" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/security-group/aws"
   version = "5.3.0"
 
-  name        = "to-be-transfer-server"
+  name        = "${local.application_name}-${local.environment}-transfer-server"
   description = "To Be Security Group for Transfer Server"
 
   vpc_id = module.isolated_vpc.vpc_id
