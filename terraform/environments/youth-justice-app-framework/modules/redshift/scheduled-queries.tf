@@ -54,6 +54,12 @@ resource "aws_iam_role_policy" "lambda_redshift_policy" {
         Resource = aws_secretsmanager_secret.yjb_schedular.arn
       },
       {
+        Sid      = "AllowKMSDecryptForSecret",
+        Effect   = "Allow",
+        Action   = ["kms:Decrypt"],
+        Resource = var.kms_key_arn
+      },
+      {
         Effect   = "Allow"
         Action   = [
           "logs:CreateLogGroup",
