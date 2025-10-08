@@ -1,4 +1,5 @@
-# Combine the SSO role(s) with the cross-account role
+# Combine the SSO role(s) with the cross-account role used by 
+# create a derived table (cadet)
 locals {
   lf_principals_not_admin = toset(concat(
     [aws_iam_role.dataapi_cross_role.arn],
@@ -7,20 +8,24 @@ locals {
 }
 
 resource "aws_lakeformation_data_lake_settings" "lake_formation" {
-  admins = [
-    data.aws_iam_session_context.current.issuer_arn,
-  ]
+  admins = flatten([
+    [for share in
+      local.analytical_platform_share : aws_iam_role.analytical_platform_share_role[share.target_account_name].arn
+    ],
+    data.aws_iam_session_context.current.issuer_arn
+  ])
+
 
   # Ensure permissions are null to avoid LF being
   create_database_default_permissions {
     # These settings should replicate current behaviour: LakeFormation is Ignored
-    permissions = []
+    permissions = ["ALL"]
     principal   = "IAM_ALLOWED_PRINCIPALS"
   }
 
   create_table_default_permissions {
     # These settings should replicate current behaviour: LakeFormation is Ignored
-    permissions = []
+    permissions = ["ALL"]
     principal   = "IAM_ALLOWED_PRINCIPALS"
   }
 
@@ -29,25 +34,63 @@ resource "aws_lakeformation_data_lake_settings" "lake_formation" {
   }
 }
 
-resource "aws_lakeformation_permissions" "share_role_all_permissions" {
+# Give the key roles role 'All' permissions on all DBs in 
+# application_variables.json
+resource "aws_lakeformation_permissions" "share_dbs_all_permissions" {
+  # one instance per (database × principal)
   for_each = {
-    for pair in flatten([
+    for combo in flatten([
       for share_index, share in local.analytical_platform_share : [
-        for rs_index, resource_share in share.resource_shares : {
-          key = "${share_index}-${rs_index}"
-          resource_share = resource_share
-          share_index = share_index
-        }
+        for resource_share in share.resource_shares : [
+          for principal in toset(concat(
+            [aws_iam_role.analytical_platform_share_role[share_index].arn],
+            tolist(local.lf_principals_not_admin)
+            )) : {
+            key            = "db-${resource_share.glue_database}-${substr(md5(principal), 0, 10)}"
+            resource_share = resource_share
+            principal      = principal
+          }
+        ]
       ]
-    ]) : pair.key => pair
+    ]) : combo.key => combo
   }
-  
-  principal   = aws_iam_role.analytical_platform_share_role[each.value.share_index].arn
-  permissions = ["ALL"]
+
+  principal                     = each.value.principal
+  permissions                   = ["ALL"]
   permissions_with_grant_option = ["ALL"]
 
   database {
     name = each.value.resource_share.glue_database
+  }
+}
+
+# Grant 'ALL' on *all tables* within each shared database
+resource "aws_lakeformation_permissions" "table_all_permissions" {
+  # reuse the same keying pattern
+  for_each = {
+    for combo in flatten([
+      for share_index, share in local.analytical_platform_share : [
+        for resource_share in share.resource_shares : [
+          for principal in toset(concat(
+            [aws_iam_role.analytical_platform_share_role[share_index].arn],
+            tolist(local.lf_principals_not_admin)
+            )) : {
+            key           = "tbl-${resource_share.glue_database}-${substr(md5(principal), 0, 10)}"
+            database_name = resource_share.glue_database
+            principal     = principal
+          }
+        ]
+      ]
+    ]) : combo.key => combo
+  }
+
+  principal                     = each.value.principal
+  permissions                   = ["ALL"]
+  permissions_with_grant_option = ["ALL"]
+
+  table {
+    database_name = each.value.database_name
+    wildcard      = true
   }
 }
 
@@ -57,14 +100,14 @@ resource "aws_lakeformation_permissions" "share_role_data_location_permissions" 
     for pair in flatten([
       for share_index, share in local.analytical_platform_share : [
         for location_index, data_location in share.data_locations : {
-          key = "${share_index}-${location_index}"
+          key           = "${share_index}-${location_index}"
           data_location = data_location
-          share_index = share_index
+          share_index   = share_index
         }
       ]
     ]) : pair.key => pair
   }
-  
+
   principal   = aws_iam_role.analytical_platform_share_role[each.value.share_index].arn
   permissions = ["DATA_LOCATION_ACCESS"]
 
