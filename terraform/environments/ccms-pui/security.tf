@@ -10,37 +10,24 @@ resource "aws_security_group" "load_balancer" {
   )
 }
 
-# resource "aws_security_group_rule" "alb_ingress_443" {
-#   security_group_id = aws_security_group.load_balancer.id
-#   type              = "ingress"
-#   description       = "HTTPS"
-#   protocol          = "TCP"
-#   from_port         = 443
-#   to_port           = 443
-#   cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
-# }
-
-resource "aws_security_group_rule" "alb_ingress_443_workspace" {
+resource "aws_vpc_security_group_ingress_rule" "alb_ingress_443_workspace" {
   security_group_id = aws_security_group.load_balancer.id
-  type              = "ingress"
-  description       = "HTTPS"
-  protocol          = "TCP"
-  from_port         = 443
-  to_port           = 443
-  cidr_blocks       = [local.application_data.accounts[local.environment].aws_workspace]
+
+  cidr_ipv4   = local.application_data.accounts[local.environment].aws_workspace
+  description = "HTTPS from AWS Workspace"
+  ip_protocol = "tcp"
+  from_port   = 443
+  to_port     = 443
 }
 
-
-resource "aws_security_group_rule" "alb_egress_all" {
+resource "aws_vpc_security_group_egress_rule" "alb_egress_all" {
   security_group_id = aws_security_group.load_balancer.id
-  type              = "egress"
-  description       = "All"
-  protocol          = -1
-  from_port         = 0
-  to_port           = 0
-  cidr_blocks       = ["0.0.0.0/0"]
-}
 
+  cidr_ipv4   = "0.0.0.0/0"
+  ip_protocol = "tcp"
+  from_port   = 0
+  to_port     = 65535
+}
 
 ### Container Security Group
 
@@ -54,24 +41,22 @@ resource "aws_security_group" "ecs_tasks_pui" {
   )
 }
 
-resource "aws_security_group_rule" "ecs_tasks_pui" {
-  security_group_id        = aws_security_group.ecs_tasks_pui.id
-  type                     = "ingress"
-  description              = "PUI Server Port"
-  protocol                 = "TCP"
-  from_port                = local.application_data.accounts[local.environment].pui_server_port
-  to_port                  = local.application_data.accounts[local.environment].pui_server_port
-  source_security_group_id = aws_security_group.load_balancer.id
+resource "aws_vpc_security_group_ingress_rule" "ecs_tasks_pui" {
+  security_group_id            = aws_security_group.ecs_tasks_pui.id
+  description                  = "PUI ALB into ECS tasks"
+  ip_protocol                  = "tcp"
+  from_port                    = local.application_data.accounts[local.environment].pui_server_port
+  to_port                      = local.application_data.accounts[local.environment].pui_server_port
+  referenced_security_group_id = aws_security_group.load_balancer.id
 }
 
-resource "aws_security_group_rule" "ecs_tasks_egress_all" {
+resource "aws_vpc_security_group_egress_rule" "ecs_tasks_egress_all" {
   security_group_id = aws_security_group.ecs_tasks_pui.id
-  type              = "egress"
-  description       = "All"
-  protocol          = -1
-  from_port         = 0
-  to_port           = 0
-  cidr_blocks       = ["0.0.0.0/0"]
+
+  cidr_ipv4   = "0.0.0.0/0"
+  ip_protocol = "tcp"
+  from_port   = 0
+  to_port     = 65535
 }
 
 
@@ -84,35 +69,13 @@ resource "aws_security_group" "cluster_ec2" {
   tags = merge(local.tags,
     { Name = lower(format("%s-%s-ec2-sg", local.application_name, local.environment)) }
   )
-
 }
 
-resource "aws_security_group_rule" "cluster_ec2_ingress_22" {
+resource "aws_vpc_security_group_egress_rule" "cluster_ec2_egress_all" {
   security_group_id = aws_security_group.cluster_ec2.id
-  type              = "ingress"
-  description       = "SSH"
-  protocol          = "TCP"
-  from_port         = 22
-  to_port           = 22
-  cidr_blocks       = [local.application_data.accounts[local.environment].aws_workspace]
-}
 
-resource "aws_security_group_rule" "cluster_ec2_ingress_lb" {
-  security_group_id        = aws_security_group.cluster_ec2.id
-  type                     = "ingress"
-  description              = "Application Traffic"
-  protocol                 = "TCP"
-  from_port                = 0
-  to_port                  = 65535
-  source_security_group_id = aws_security_group.load_balancer.id # Allow the LB to access the EC2 instances
-}
-
-resource "aws_security_group_rule" "cluster_ec2_egress_all" {
-  security_group_id = aws_security_group.cluster_ec2.id
-  type              = "egress"
-  description       = "All Egress"
-  protocol          = -1
-  from_port         = 0
-  to_port           = 0
-  cidr_blocks       = ["0.0.0.0/0"] # Restrict to what's needed
+  cidr_ipv4   = "0.0.0.0/0"
+  ip_protocol = "tcp"
+  from_port   = 0
+  to_port     = 65535
 }
