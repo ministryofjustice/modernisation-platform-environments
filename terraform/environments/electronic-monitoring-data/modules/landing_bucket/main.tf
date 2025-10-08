@@ -134,11 +134,11 @@ module "s3_to_lambda" {
 
 
 resource "aws_s3_bucket_notification" "s3_notification_prefix_suffixes" {
-  bucket   = module.this-bucket.bucket.id
+  bucket = module.this-bucket.bucket.id
 
   queue {
-    queue_arn     = module.s3_to_lambda.sqs_queue.arn
-    events        = ["s3:ObjectCreated:*"]
+    queue_arn = module.s3_to_lambda.sqs_queue.arn
+    events    = ["s3:ObjectCreated:*"]
   }
 
   depends_on = [module.s3_to_lambda]
@@ -148,18 +148,19 @@ resource "aws_s3_bucket_notification" "s3_notification_prefix_suffixes" {
 #-----------------------------------------------------------------------------------
 
 module "process_landing_bucket_files" {
-  source                  = "../lambdas"
-  function_name           = "process_landing_bucket_files_${var.data_feed}_${var.order_type}"
-  image_name              = "process_landing_bucket_files"
-  is_image                = true
-  role_name               = aws_iam_role.process_landing_bucket_files.name
-  role_arn                = aws_iam_role.process_landing_bucket_files.arn
-  memory_size             = 1024
-  timeout                 = 900
-  core_shared_services_id = var.core_shared_services_id
-  production_dev          = var.production_dev
-  security_group_ids      = var.security_group_ids
-  subnet_ids              = var.subnet_ids
+  source                         = "../lambdas"
+  function_name                  = "process_landing_bucket_files_${var.data_feed}_${var.order_type}"
+  image_name                     = "process_landing_bucket_files"
+  is_image                       = true
+  role_name                      = aws_iam_role.process_landing_bucket_files.name
+  role_arn                       = aws_iam_role.process_landing_bucket_files.arn
+  memory_size                    = 1024
+  timeout                        = 900
+  core_shared_services_id        = var.core_shared_services_id
+  production_dev                 = var.production_dev
+  security_group_ids             = var.security_group_ids
+  subnet_ids                     = var.subnet_ids
+  reserved_concurrent_executions = 1000
   environment_variables = {
     DESTINATION_BUCKET = var.received_files_bucket_id
   }

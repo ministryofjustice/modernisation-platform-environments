@@ -1,5 +1,34 @@
 locals {
   list_of_target_group_arns = merge(module.external_alb.target_group_arns, module.internal_alb.target_group_arns)
+  dal_buckets = jsonencode([
+    "arn:aws:s3:::yjaf-${local.environment}-cms",
+    "arn:aws:s3:::yjaf-${local.environment}-yjsm",
+    "arn:aws:s3:::yjaf-${local.environment}-mis",
+    "arn:aws:s3:::yjaf-${local.environment}-bedunlock",
+    "arn:aws:s3:::yjaf-${local.environment}-bands",
+    "arn:aws:s3:::yjaf-${local.environment}-incident",
+    "arn:aws:s3:::yjaf-${local.environment}-reporting",
+    "arn:aws:s3:::yjaf-${local.environment}-application-memory-heap-dump",
+    "arn:aws:s3:::yjaf-${local.environment}-certs",
+    "arn:aws:s3:::yjaf-${local.environment}-transfer",
+    "arn:aws:s3:::yjaf-${local.environment}-cmm"
+  ])
+  dal_buckets_wildcarded = jsonencode([
+    "arn:aws:s3:::yjaf-${local.environment}-cms/*",
+    "arn:aws:s3:::yjaf-${local.environment}-yjsm/*",
+    "arn:aws:s3:::yjaf-${local.environment}-mis/*",
+    "arn:aws:s3:::yjaf-${local.environment}-bedunlock/*",
+    "arn:aws:s3:::yjaf-${local.environment}-bands/*",
+    "arn:aws:s3:::yjaf-${local.environment}-incident/*",
+    "arn:aws:s3:::yjaf-${local.environment}-reporting/*",
+    "arn:aws:s3:::yjaf-${local.environment}-application-memory-heap-dump/*",
+    "arn:aws:s3:::yjaf-${local.environment}-certs/*",
+    "arn:aws:s3:::yjaf-${local.environment}-transfer/*",
+    "arn:aws:s3:::yjaf-${local.environment}-cmm/*"
+  ])
+  ses_identity_list = [
+    for k, v in local.application_data.accounts[local.environment].ses_domain_identities : v.identity
+  ]
 }
 
 #tfsec:ignore:AVD-AWS-0130
@@ -64,31 +93,34 @@ module "ecs" {
     aws_secretsmanager_secret.auto_admit_secret.arn,
     aws_secretsmanager_secret.Unit_test.arn,
     aws_secretsmanager_secret.s3_user_secret.arn,
-    aws_secretsmanager_secret.yjaf_credentials.arn
+    aws_secretsmanager_secret.yjaf_credentials.arn,
+    aws_secretsmanager_secret.google_api.arn,
+    aws_secretsmanager_secret.ordnance_survey_api.arn,
+    aws_secretsmanager_secret.yjaf_credentials.arn,
+    module.redshift.returns_secret_arn,
+    module.datadog.datadog_api_key_secret_arn,
+    module.datadog.datadog_api_key_plain_secret_arn
   ])
   ecs_role_additional_policies_arns = [
-    aws_iam_policy.s3-access.arn
+    aws_iam_policy.s3-access.arn,
+    aws_iam_policy.ses-access.arn
   ]
-
   list_of_target_group_arns = local.list_of_target_group_arns
 
   depends_on = [module.internal_alb, module.external_alb, module.aurora, module.redshift]
 }
 
-
 resource "aws_iam_policy" "s3-access" {
   name        = "${local.project_name}-ecs-s3-access"
   description = "Policy for ecs task role to access yjaf buckets"
   policy = templatefile("${path.module}/iam_policies/s3_user_policy.json", {
-    dal_buckets = jsonencode([
-      "arn:aws:s3:::yjaf-${local.environment}-cms/*",
-      "arn:aws:s3:::yjaf-${local.environment}-yjsm/*",
-      "arn:aws:s3:::yjaf-${local.environment}-mis/*",
-      "arn:aws:s3:::yjaf-${local.environment}-bedunlock/*",
-      "arn:aws:s3:::yjaf-${local.environment}-bands/*",
-      "arn:aws:s3:::yjaf-${local.environment}-incident/*",
-      "arn:aws:s3:::yjaf-${local.environment}-cmm/*"
-    ])
+    dal_buckets            = local.dal_buckets
+    dal_buckets_wildcarded = local.dal_buckets_wildcarded
   })
 }
 
+resource "aws_iam_policy" "ses-access" {
+  name        = "${local.project_name}-ecs-ses-access"
+  description = "Policy for ecs task role to access SES"
+  policy      = file("${path.module}/iam_policies/ses_user_policy.json")
+}
