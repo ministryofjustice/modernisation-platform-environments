@@ -812,6 +812,55 @@ resource "aws_iam_policy" "lake_formation_tag_management" {
   policy      = data.aws_iam_policy_document.lake_formation_tag_management.json
 }
 
+# LakeFormation tag management - specific resources (AP share)
+
+# Get ARNS for resources defined in application_variables.json
+locals {
+  lakeformation_tag_resource_arns = flatten([
+    for share in local.analytical_platform_share : flatten([
+      for rs in share.resource_shares : concat(
+        [
+          # Database ARN
+          "arn:aws:glue:${var.region}:${share.target_account_id}:database/${rs.glue_database}"
+        ],
+        [
+          # Table ARNs (can include wildcards)
+          for table in rs.glue_tables :
+          "arn:aws:glue:${var.region}:${share.target_account_id}:table/${rs.glue_database}/${table}"
+        ]
+      )
+    ])
+  ])
+}
+
+# Define AP share policy document
+data "aws_iam_policy_document" "lake_formation_tag_management_ap_share" {
+  statement {
+    sid    = "LakeFormationTagManagement"
+    effect = "Allow"
+
+    actions = [
+      "lakeformation:AddLFTagsToResource",
+      "lakeformation:RemoveLFTagsFromResource",
+      "lakeformation:GetLFTag",
+      "lakeformation:GetResourceLFTags",
+    ]
+
+    resources = concat(
+      local.lakeformation_tag_resource_arns,
+      ["arn:aws:lakeformation:${var.region}:${data.aws_caller_identity.current.account_id}:catalog"]
+    )
+  }
+}
+
+# Create the policy
+resource "aws_iam_policy" "lake_formation_tag_management_ap_share" {
+  name   = "lake_formation_tag_management"
+  path   = "/"
+  policy = data.aws_iam_policy_document.lake_formation_tag_management.json
+}
+
+
 # LakeFormation service linked role
 resource "aws_iam_service_linked_role" "lakeformation" {
   count            = local.is-test ? 1 : 0

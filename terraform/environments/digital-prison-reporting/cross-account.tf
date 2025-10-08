@@ -134,4 +134,9 @@ resource "aws_iam_role_policy_attachment" "lake_formation_tag_management" {
   policy_arn = aws_iam_policy.lake_formation_tag_management.arn
 }
 
-
+# Lake formation tag management attachment 
+# AP share only
+resource "aws_iam_role_policy_attachment" "lake_formation_tag_management_ap_share" {
+  role       = tolist(try(data.aws_iam_roles.data_engineering_roles.arns, toset([])))
+  policy_arn = aws_iam_policy.lake_formation_tag_management_ap_share.arn
+}
