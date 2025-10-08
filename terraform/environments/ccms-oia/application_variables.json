@@ -100,7 +100,7 @@
       "ccms_pui_connector_assessservice_url_billing": "https://ccms-opa.laa-production.modernisation-platform.service.justice.gov.uk/opa/determinations-server/assess/soap/generic/12.2.1/BillingAssessment",
       "ccms_pui_connector_assessservice_url_means": "https://ccms-opa.laa-production.modernisation-platform.service.justice.gov.uk/opa/determinations-server/assess/soap/generic/12.2.1/MeansAssessment",
       "ccms_pui_connector_assessservice_url_merits": "https://ccms-opa.laa-production.modernisation-platform.service.justice.gov.uk/opa/determinations-server/assess/soap/generic/12.2.1/MeritsAssessment",
-      "spring_datasource_url": "jdbc:oracle:thin:@tcps://ccms-ebs-db.laa-production.modernisation-platform.service.justice.gov.uk:1522/EBSDB",
+      "spring_datasource_url": "jdbc:oracle:thin:@tcps://ccms-ebs-db.laa-production.modernisation-platform.service.justice.gov.uk:1522/EBSPROD",
       "spring_datasource_username": "XXCCMS_PUI",
       "connector_dns_name": "ccms-connector.laa-production.modernisation-platform.service.justice.gov.uk",
       "connector_app_count": "2",
