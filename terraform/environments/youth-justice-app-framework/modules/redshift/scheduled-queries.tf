@@ -1,5 +1,5 @@
 resource "aws_lambda_function" "redshift_scheduler" {
-  function_name = "redshift_scheduler_${var.environment}"
+  function_name = "redshift_scheduler"
   runtime       = "python3.11"
   handler       = "index.handler"
   role          = aws_iam_role.lambda_redshift.arn
@@ -36,6 +36,7 @@ resource "aws_iam_role" "lambda_redshift" {
 # IAM Policy for Lambda
 resource "aws_iam_role_policy" "lambda_redshift_policy" {
   role = aws_iam_role.lambda_redshift.id
+  name = "lambda-redshift-scheduler-policy"
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
