@@ -13,7 +13,7 @@ locals {
 
   # Certificate configuration based on environment
   nonprod_domain = format("%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment)
-  prod_domain    = "legalservices.gov.uk"
+  prod_domain    = "laa.service.justice.gov.uk"
   
   # Primary domain name based on environment
   primary_domain = local.is-production ? local.prod_domain : local.nonprod_domain
@@ -39,17 +39,6 @@ locals {
 
   # Split domain validation by domain type
   modernisation_platform_validations = [for k, v in local.domain_types : v if strcontains(k, "modernisation-platform.service.justice.gov.uk")]
-  legalservices_validations = [for k, v in local.domain_types : v if strcontains(k, "legalservices.gov.uk")]
+  laa_validations = [for k, v in local.domain_types : v if strcontains(k, "laa.service.justice.gov.uk")]
 
-  # # CloudFront certificate domain validation options
-  # cloudfront_domain_types = { for dvo in aws_acm_certificate.cloudfront.domain_validation_options : dvo.domain_name => {
-  #   name   = dvo.resource_record_name
-  #   record = dvo.resource_record_value
-  #   type   = dvo.resource_record_type
-  #   }
-  # }
-
-  # # Split CloudFront domain validation by domain type
-  # cloudfront_modernisation_platform_validations = [for k, v in local.cloudfront_domain_types : v if strcontains(k, "modernisation-platform.service.justice.gov.uk")]
-  # cloudfront_legalservices_validations = [for k, v in local.cloudfront_domain_types : v if strcontains(k, "legalservices.gov.uk")]
 }
