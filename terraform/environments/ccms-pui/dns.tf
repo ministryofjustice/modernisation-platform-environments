@@ -20,7 +20,7 @@ resource "aws_route53_record" "route53_record_pui_nonprod" {
 resource "aws_route53_record" "route53_record_pui_prod" {
   count    = local.is-production ? 1 : 0
   provider = aws.core-network-services
-  zone_id  = data.aws_route53_zone.legalservices.zone_id
+  zone_id  = data.aws_route53_zone.laa.zone_id
   name     = local.application_name
   type     = "A"
   alias {
