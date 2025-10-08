@@ -99,37 +99,66 @@ data "archive_file" "lambda_zip" {
 import boto3
 import json
 import os
+from datetime import datetime
 
 def handler(event, context):
     datasync = boto3.client('datasync')
     secretsmanager = boto3.client('secretsmanager')
     
     try:
+        print(f"Starting password update at {datetime.utcnow().isoformat()}")
+        
         # Get the current password from Secrets Manager
         secret_response = secretsmanager.get_secret_value(
             SecretId=os.environ['SECRET_ARN']
         )
         current_password = secret_response['SecretString']
         
+        print(f"Retrieved password from Secrets Manager (length: {len(current_password)})")
+        
+        # Get current location configuration to verify it exists
+        location_arn = os.environ['DATASYNC_LOCATION_ARN']
+        try:
+            location_info = datasync.describe_location_fsx_windows(
+                LocationArn=location_arn
+            )
+            print(f"Current location user: {location_info.get('User', 'Unknown')}")
+        except Exception as e:
+            print(f"Warning: Could not describe location: {str(e)}")
+        
         # Update the DataSync location with the current password
-        datasync.update_location_fsx_windows(
-            LocationArn=os.environ['DATASYNC_LOCATION_ARN'],
+        print(f"Updating DataSync location: {location_arn}")
+        response = datasync.update_location_fsx_windows(
+            LocationArn=location_arn,
             User='Admin',
             Password=current_password,
             Domain=os.environ['FSX_DOMAIN']
         )
         
         print(f"Successfully updated DataSync location with current password")
+        print(f"Update response: {json.dumps(response, default=str)}")
+        
         return {
             'statusCode': 200,
-            'body': json.dumps('Password updated successfully')
+            'body': json.dumps({
+                'message': 'Password updated successfully',
+                'timestamp': datetime.utcnow().isoformat(),
+                'location_arn': location_arn
+            })
         }
         
     except Exception as e:
-        print(f"Error updating DataSync location: {str(e)}")
+        error_msg = f"Error updating DataSync location: {str(e)}"
+        print(error_msg)
+        import traceback
+        print(f"Traceback: {traceback.format_exc()}")
+        
         return {
             'statusCode': 500,
-            'body': json.dumps(f'Error: {str(e)}')
+            'body': json.dumps({
+                'error': str(e),
+                'timestamp': datetime.utcnow().isoformat()
+            })
         }
 EOF
     filename = "index.py"
@@ -158,6 +187,15 @@ resource "aws_lambda_function" "datasync_password_updater" {
   tags = local.tags
 }
 
+resource "aws_lambda_permission" "allow_scheduled_execution" {
+  count         = var.datasync_config != null ? 1 : 0
+  statement_id  = "AllowExecutionFromSchedule"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.datasync_password_updater[0].function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.pre_datasync_password_update[0].arn
+}
+
 # Schedule the Lambda to run 30 minutes before DataSync task to ensure fresh password
 resource "aws_cloudwatch_event_rule" "pre_datasync_password_update" {
   count = var.datasync_config != null ? 1 : 0
@@ -167,6 +205,9 @@ resource "aws_cloudwatch_event_rule" "pre_datasync_password_update" {
   # Default: Lambda at 04:00 UTC, DataSync at 04:15 UTC
   # Can be overridden with var.datasync_config.lambda_schedule_expression
   schedule_expression = var.datasync_config.lambda_schedule_expression
+
+  # Ensure the rule is enabled
+  state = "ENABLED"
 }
 
 resource "aws_cloudwatch_event_target" "pre_datasync_lambda_target" {
@@ -456,6 +497,7 @@ resource "aws_cloudwatch_log_resource_policy" "datasync_logs_policy" {
           Service = "datasync.amazonaws.com"
         }
         Action = [
+          "logs:CreateLogGroup",
           "logs:CreateLogStream",
           "logs:PutLogEvents"
         ]
@@ -463,6 +505,7 @@ resource "aws_cloudwatch_log_resource_policy" "datasync_logs_policy" {
       }
     ]
   })
+  depends_on = [aws_cloudwatch_log_group.datasync_logs]
 }
 
 #############################################
