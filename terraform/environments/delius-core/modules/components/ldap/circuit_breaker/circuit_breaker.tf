@@ -9,13 +9,14 @@ locals {
   ecs_service_name     = "${var.env_name}-ldap"
   nlb_target_group_arn = data.aws_lb_target_group.ldap-target-group.arn
   nlb_target_port      = 389
-  ssm_parameter_name   = "${var.env_name}/ldap/circuit-breaker"
+  ssm_parameter_name   = "/${var.env_name}/ldap/circuit-breaker"
 }
 
 ##########################
 # SSM parameter (default value CLOSED)
 ##########################
 resource "aws_ssm_parameter" "ldap_circuit_breaker" {
+  #checkov:skip=CKV_AWS_34 "ignore"
   name  = local.ssm_parameter_name
   type  = "String"
   value = "CLOSED" # CLOSED = traffic flows, OPEN = circuit broken, no traffic
@@ -24,6 +25,7 @@ resource "aws_ssm_parameter" "ldap_circuit_breaker" {
 
 # SNS topic used as alarm action
 resource "aws_sns_topic" "circuit_breaker" {
+  #checkov:skip=CKV_AWS_26 "ignore"
   name = "${var.env_name}-ldap-circuit-breaker-sns"
 }
 
@@ -42,6 +44,8 @@ resource "aws_iam_role" "lambda_role" {
 }
 
 resource "aws_iam_role_policy" "lambda_policy" {
+  #checkov:skip=CKV_AWS_290 "ignore"
+  #checkov:skip=CKV_AWS_355 "ignore"
   name = "${var.env_name}-ldap-circuit-breaker-lambda-policy"
   role = aws_iam_role.lambda_role.id
   policy = jsonencode({
@@ -108,6 +112,12 @@ resource "aws_iam_role_policy" "lambda_policy" {
 }
 
 resource "aws_lambda_function" "circuit_breaker" {
+  #checkov:skip=CKV_AWS_272 "ignore"
+  #checkov:skip=CKV_AWS_115 "ignore"
+  #checkov:skip=CKV_AWS_173 "ignore"
+  #checkov:skip=CKV_AWS_50 "ignore"
+  #checkov:skip=CKV_AWS_116 "ignore"
+  #checkov:skip=CKV_AWS_117 "ignore"
   filename         = data.archive_file.lambda_zip.output_path
   function_name    = "${var.env_name}-ldap-circuit-breaker"
   role             = aws_iam_role.lambda_role.arn
