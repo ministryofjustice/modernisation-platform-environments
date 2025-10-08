@@ -48,7 +48,7 @@
       "logging_level_root": "info",
       "logging_level_uk_gov_laa_opa": "info",
       "adaptor_ecr_repo": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/ccms-service-adaptor",
-      "adaptor_container_version": "latest",
+      "adaptor_container_version": "laa-ccms-assess-service-adaptor-dev-a49e9c1-SNAPSHOT",
       "adaptor_server_port": "8080",
       "adaptor_app_count": "2",
       "adaptor_spring_profile": "aws",
