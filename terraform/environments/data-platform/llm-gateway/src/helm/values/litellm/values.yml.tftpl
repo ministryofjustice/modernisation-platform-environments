@@ -55,6 +55,13 @@ proxy_config:
     redis_password: os.environ/auth_token
       
   model_list:
+    # EXPERIMENTAL Azure OpenAI
+    - model_name: azure-gpt-5
+      litellm_params:
+        model: azure/gpt-5
+        api_base: os.environ/JUSTICEAI_AZURE_OPENAI_API_BASE
+        api_key: os.environ/JUSTICEAI_AZURE_OPENAI_API_KEY
+        api_version: "2024-12-01-preview"
 %{ for key, profile in bedrockInferenceProfiles ~}
     - model_name: bedrock-${key}
       litellm_params:
