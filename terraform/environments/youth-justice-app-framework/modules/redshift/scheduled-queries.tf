@@ -5,9 +5,8 @@ resource "aws_lambda_function" "redshift_scheduler" {
   role          = aws_iam_role.lambda_redshift.arn
   timeout       = 30
   memory_size   = 128
-
-  # Path to your deployment package (zip file containing index.py and scripts/)
   filename = "${path.module}/lambda/redshift_scheduler.zip"
+  source_code_hash = filebase64sha256("${path.module}/lambda/redshift_scheduler.zip")
 
   environment {
     variables = {
@@ -15,11 +14,10 @@ resource "aws_lambda_function" "redshift_scheduler" {
       SECRET_ARN         = aws_secretsmanager_secret.yjb_schedular.arn
       SQL_QUERY_1        = "CALL yjb_ianda_team.refresh_materialized_views();"
       SQL_QUERY_2_FILE   = "/var/task/scripts/fte_redshift.sql"
-      DATABASE_NAME      = "dev" # replace with your Redshift DB name
+      DATABASE_NAME      = "yjb_returns"
     }
   }
 }
-
 
 
 # IAM Role for Lambda
@@ -69,9 +67,8 @@ resource "aws_iam_role_policy" "lambda_redshift_policy" {
 }
 
 
-#######################################################
+
 # EventBridge Rule - Daily at 5am
-#######################################################
 resource "aws_cloudwatch_event_rule" "daily_5am" {
   name                = "daily-redshift-refresh-mvs-${var.environment}"
   schedule_expression = "cron(0 5 * * ? *)"  # UTC time
@@ -82,9 +79,8 @@ resource "aws_cloudwatch_event_target" "daily_5am_target" {
   arn  = aws_lambda_function.redshift_scheduler.arn
 }
 
-#######################################################
+
 # EventBridge Rule - Weekly Monday at 08:30
-#######################################################
 resource "aws_cloudwatch_event_rule" "weekly_monday" {
   name                = "weekly-fte-redshift-${var.environment}"
   schedule_expression = "cron(30 8 ? * MON *)"  # UTC time
