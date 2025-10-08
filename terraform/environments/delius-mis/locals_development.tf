@@ -385,9 +385,11 @@ locals {
   # To override schedules, add schedule_expression and/or lambda_schedule_expression parameters:
   # Note: Always ensure Lambda runs 15+ minutes before DataSync for credential refresh
   datasync_config_dev = {
-    source_s3_bucket_arn       = "arn:aws:s3:::eu-west-2-delius-mis-dev-dfi-extracts" # differs per environment
-    schedule_expression        = "cron(45 11 * * ? *)"                                # Uncomment to run DataSync at 09:30 UTC (10:30 BST)
-    lambda_schedule_expression = "cron(40 11 * * ? *)"                                # Uncomment to run Lambda at 09:15 UTC (10:15 BST)
+    source_s3_bucket_arn = "arn:aws:s3:::eu-west-2-delius-mis-dev-dfi-extracts" # differs per environment
     # fsx_domain = "delius-mis-dev.internal"            # Override FSX domain if needed
+    # lambda_schedule_expression = "cron(15 9 * * ? *)"                                # Uncomment to run Lambda at 09:15 UTC (10:15 BST) must be before schedule expression
+    # schedule_expression        = "cron(30 9 * * ? *)"                                # Uncomment to run DataSync at 09:30 UTC (10:30 BST)
+
+
   }
 }

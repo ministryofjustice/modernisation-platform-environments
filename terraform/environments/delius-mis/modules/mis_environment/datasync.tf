@@ -90,7 +90,7 @@ resource "aws_iam_role_policy" "datasync_password_updater_policy" {
         Action = [
           "fsx:DescribeFileSystems"
         ]
-        Resource = "*"
+        Resource = "*" # Read metadata only so not a security issue
       }
     ]
   })
