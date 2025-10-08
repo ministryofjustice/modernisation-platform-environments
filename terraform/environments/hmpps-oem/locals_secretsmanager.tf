@@ -2,7 +2,6 @@ locals {
 
   oem_share_secret_principal_ids = {
     development = [
-      "arn:aws:iam::${module.environment.account_ids.corporate-staff-rostering-development}:role/EC2OracleEnterpriseManagementSecretsRole",
       "arn:aws:iam::${module.environment.account_ids.delius-core-development}:role/EC2OracleEnterpriseManagementSecretsRole",
       "arn:aws:iam::${module.environment.account_ids.delius-core-development}:role/modernisation-platform-oidc-cicd",
       "arn:aws:iam::${module.environment.account_ids.delius-core-development}:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-sandbox_2b97f512e6658764",
@@ -12,7 +11,6 @@ locals {
       "arn:aws:iam::${module.environment.account_ids.oasys-development}:role/EC2OracleEnterpriseManagementSecretsRole",
     ]
     test = [
-      "arn:aws:iam::${module.environment.account_ids.corporate-staff-rostering-test}:role/EC2OracleEnterpriseManagementSecretsRole",
       "arn:aws:iam::${module.environment.account_ids.delius-core-test}:role/EC2OracleEnterpriseManagementSecretsRole",
       "arn:aws:iam::${module.environment.account_ids.delius-core-test}:role/modernisation-platform-oidc-cicd",
       "arn:aws:iam::${module.environment.account_ids.nomis-combined-reporting-test}:role/EC2OracleEnterpriseManagementSecretsRole",
