@@ -5,10 +5,10 @@ locals {
   # CAPITA
   #----------------------------------------------------------------------------
   capita_ssh_keys = [
-    "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBMzzvEd8KCDG8lp9O6/D2tHK8aKZKIQiPWbcoPxr0I9CmDhr+DNVH8MnevXFrMx+aVreuK0lHEHWKInJBrxHXaK8OnsJjZwYjzAQSG4oBZYmHFW8r7xDkbKelOby0gNDzg==",
+    "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBDEMaR2/Fk/XjgxYMHyLarpeArHEaPB6vwKwFfMsw8mlZ3BR5MnE72ZOEIqD4WwN6d2Tnrok3Y7DNUQCv9D/Mh/JwG3NyMeM6uinbQMHzkmMQn6/cMTuY30I6XD5nt4h2A==",
   ]
   capita_cidr_ipv4s = [
-    "195.59.155.38/32",
+    "172.167.3.97/32",
   ]
   capita_cidr_ipv6s = []
 
