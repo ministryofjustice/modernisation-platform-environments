@@ -1,23 +1,23 @@
-# resource "aws_lb" "webgate_alb_internal" {
-#   name               = lower(format("lb-%s-wgate-internal", local.application_name))
-#   internal           = true
-#   load_balancer_type = "application"
-#   security_groups    = [aws_security_group.sg_webgate_internal_alb.id]
-#   subnets            = data.aws_subnets.shared-private.ids
+resource "aws_lb" "webgate_alb_internal" {
+  name               = lower(format("lb-%s-wgate-internal", local.application_name))
+  internal           = true
+  load_balancer_type = "application"
+  security_groups    = [aws_security_group.sg_webgate_internal_alb.id]
+  subnets            = data.aws_subnets.shared-private.ids
 
-#   drop_invalid_header_fields = true
-#   enable_deletion_protection = true
+  drop_invalid_header_fields = true
+  enable_deletion_protection = false
 
-#   access_logs {
-#     bucket  = module.s3-bucket-logging.bucket.id
-#     prefix  = local.lb_log_prefix_webgate_internal
-#     enabled = true
-#   }
+  access_logs {
+    bucket  = module.s3-bucket-logging.bucket.id
+    prefix  = local.lb_log_prefix_webgate_internal
+    enabled = true
+  }
 
-#   tags = merge(local.tags,
-#     { Name = lower(format("lb-wgate-internal")) }
-#   )
-# }
+  tags = merge(local.tags,
+    { Name = lower(format("lb-wgate-internal")) }
+  )
+}
 
 # resource "aws_lb_target_group" "webgate_internal_tg" {
 #   name     = lower(format("tg-%s-wgate", local.application_name))
