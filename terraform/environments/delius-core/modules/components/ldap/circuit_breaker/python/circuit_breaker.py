@@ -15,7 +15,7 @@ CLUSTER = os.environ["ECS_CLUSTER"]
 SERVICE = os.environ["ECS_SERVICE"]
 TARGET_GROUP_ARN = os.environ["TARGET_GROUP_ARN"]
 TARGET_PORT = int(os.environ.get("TARGET_PORT", 389))
-SSM_PARAM = os.environ.get("SSM_PARAM_NAME", "${var.env_name}/ldap/circuit-breaker")
+SSM_PARAM = os.environ.get("SSM_PARAM_NAME")
 
 # valid parameter values for ENABLED/OPEN vs CLOSED
 OPEN_VALUES = set(["open", "OPEN", "1", "true", "True", "YES", "yes"])
@@ -31,6 +31,7 @@ def get_ssm_flag(name):
     except ClientError as e:
         logger.error("Error reading SSM parameter %s: %s", name, e)
         raise
+
 
 def get_running_task_arns(cluster, service):
     resp = ecs.list_tasks(cluster=cluster, serviceName=service, desiredStatus="RUNNING")
