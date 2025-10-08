@@ -30,22 +30,22 @@ resource "aws_security_group" "lambda_security_group" {
 }
 
 # hashicorp recommened Ingress rule of lambda_security_group
-resource "aws_vpc_security_group_ingress_rule" "lambda_ingress" {
-  security_group_id = aws_security_group.lambda_security_group.id
-  description       = "Allow FTP lambda inbound traffic"
-  cidr_ipv4         = data.aws_vpc.shared.cidr_block
-  from_port         = 1521
-  ip_protocol       = "tcp"
-  to_port           = 1522
-}
+# resource "aws_vpc_security_group_ingress_rule" "lambda_ingress" {
+#   security_group_id = aws_security_group.lambda_security_group.id
+#   description       = "Allow FTP lambda inbound traffic"
+#   cidr_ipv4         = data.aws_vpc.shared.cidr_block
+#   from_port         = 1521
+#   ip_protocol       = "tcp"
+#   to_port           = 1522
+# }
 
 # hashicorp recommened egress rule of lambda_security_group
-resource "aws_vpc_security_group_egress_rule" "lambda_egress" {
-  security_group_id = aws_security_group.lambda_security_group.id
-  description       = "Allow FTP lambdaall outbound traffic"
-  cidr_ipv4         = "0.0.0.0/0"
-  ip_protocol       = "-1"
-}
+# resource "aws_vpc_security_group_egress_rule" "lambda_egress" {
+#   security_group_id = aws_security_group.lambda_security_group.id
+#   description       = "Allow FTP lambdaall outbound traffic"
+#   cidr_ipv4         = "0.0.0.0/0"
+#   ip_protocol       = "-1"
+# }
 
 # Lambda Function
 resource "aws_lambda_function" "lambda_function" {
