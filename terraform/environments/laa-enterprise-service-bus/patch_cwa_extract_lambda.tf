@@ -176,7 +176,7 @@ resource "aws_lambda_function" "oracledb_patch_cwa_extract_lambda" {
   description      = "Connect to CWA DB and invoke cwa extract procedure."
   function_name    = "oracledb_patch_cwa_extract_lambda"
   role             = aws_iam_role.patch_cwa_extract_lambda_role[0].arn
-  handler          = "lambda_function.lambda_handler"
+  handler          = "db_connection_lambda.lambda_handler"
   filename         = "lambda/oracledb_extract_lambda/oracledb_extract_package.zip"
   source_code_hash = filebase64sha256("lambda/oracledb_extract_lambda/oracledb_extract_package.zip")
   timeout          = 300
