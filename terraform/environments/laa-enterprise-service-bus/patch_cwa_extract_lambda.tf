@@ -184,7 +184,7 @@ resource "aws_lambda_function" "oracledb_patch_cwa_extract_lambda" {
   runtime          = "python3.10"
 
   layers = [
-    aws_lambda_layer_version.lambda_layer_oracle_python.arn,
+    aws_lambda_layer_version.oracledb_lambda_layer_python.arn,
     "arn:aws:lambda:eu-west-2:017000801446:layer:AWSLambdaPowertoolsPython:2"
   ]
 
