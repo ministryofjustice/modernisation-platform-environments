@@ -280,3 +280,22 @@ module "process_fms_metadata" {
   security_group_ids             = [aws_security_group.lambda_generic.id]
   subnet_ids                     = data.aws_subnets.shared-public.ids
 }
+
+#-----------------------------------------------------------------------------------
+# Generate Encryption Key for Serco
+#-----------------------------------------------------------------------------------
+
+module "generate_encrypted_key_serco" {
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "generate_encrypted_key_serco"
+  role_name                      = aws_iam_role.generate_encrypted_key_serco.name
+  role_arn                       = aws_iam_role.generate_encrypted_key_serco.arn
+  handler                        = "generate_encrypted_key_serco.handler"
+  memory_size                    = 10240
+  timeout                        = 900
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev                 = local.is-production ? "prod" : "dev"
+  security_group_ids             = [aws_security_group.lambda_generic.id]
+  subnet_ids                     = data.aws_subnets.shared-public.ids
+}

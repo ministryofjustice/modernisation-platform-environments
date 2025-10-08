@@ -77,3 +77,39 @@ resource "aws_s3_bucket_notification" "virus_scan_file" {
 
   depends_on = [module.virus_scan_file_sqs]
 }
+
+
+# ---------------------------------------------------------------
+# Event bridge rules
+# ---------------------------------------------------------------
+
+resource "aws_cloudwatch_event_rule" "serco_secretsmanager_key_update" {
+  name        = "serco-secretsmanager-key-update"
+  description = "Capture each time the"
+
+  event_pattern = jsonencode({
+    source = [ "aws.secretsmanager" ]
+    detail-type = [
+      "AWS API Call via CloudTrail",
+      "AWS Service Event via CloudTrail"
+    ],
+    detail = {
+        "eventSource": ["secretsmanager.amazonaws.com"],
+        "eventName": ["PutSecretValue", "UpdateSecret", "RotationSucceeded"]
+    }
+  })
+}
+
+resource "aws_cloudwatch_event_target" "serco_secretsmanager_key_update" {
+  rule = aws_cloudwatch_event_rule.serco_secretsmanager_key_update.name
+  arn  = module.generate_encrypted_key_serco.lambda_function_arn
+}
+
+resource "aws_lambda_permission" "allow_eventbridge" {
+  statement_id  = "AllowExecutionFromEventBridge"
+  action        = "lambda:InvokeFunction"
+  function_name = module.generate_encrypted_key_serco.lambda_function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.serco_secretsmanager_key_update.arn
+}
+
