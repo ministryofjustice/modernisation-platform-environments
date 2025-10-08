@@ -3,26 +3,20 @@ locals {
   environment_configurations = {
     development = {
       bedrock_inference_profiles = {
-        claude-haiku-3 = {
-          model_id = "eu.anthropic.claude-3-haiku-20240307-v1:0"
-          region   = "eu-west-1"
+        claude-sonnet-4-5 = {
+          model_id = "eu.anthropic.claude-sonnet-4-5-20250929-v1:0"
+          region   = "eu-west-2"
         }
         claude-sonnet-4 = {
           model_id = "eu.anthropic.claude-sonnet-4-20250514-v1:0"
           region   = "eu-west-1"
         }
-        claude-sonnet-3-7 = {
-          model_id = "eu.anthropic.claude-3-7-sonnet-20250219-v1:0"
-          region   = "eu-west-1"
-        }
       }
       litellm_versions = {
-        application = "main-v1.77.3-stable"
-        chart       = "0.1.785"
+        application = "main-v1.77.7.rc.1"
+        chart       = "0.1.789"
       }
       llm_gateway_ingress_allowlist = [
-        # Personal
-        "81.77.57.111/32", # @jacobwoffenden
         # VPN
         "128.77.75.64/26",  # Prisma Corporate
         "35.176.93.186/32", # GlobalProtect
