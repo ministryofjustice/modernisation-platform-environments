@@ -37,7 +37,7 @@ module "transfer_server_security_group" {
   version = "5.3.0"
 
   name        = "${local.application_name}-${local.environment}-transfer-server"
-  description = "To Be Security Group for Transfer Server"
+  description = "Security Group for Transfer Server"
 
   vpc_id = module.isolated_vpc.vpc_id
 
