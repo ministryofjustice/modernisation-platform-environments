@@ -5,15 +5,13 @@ resource "aws_secretsmanager_secret" "edrms_secret" {
   description = "EDRMS secret for CCMS EDRMS application"
 }
 
-# resource "aws_secretsmanager_secret_version" "edrms_secret_version" {
-#   secret_id = aws_secretsmanager_secret.edrms_secret.id
-#   secret_string = jsonencode({
-#      "ccms/edrms/datasource" = "secret1"
-#      "alerts_slack_channel_id" = "secret2"
-#   })
-# }
 
-data "aws_secretsmanager_secret_version" "edrms_secret_version" {
+resource "aws_secretsmanager_secret_version" "edrms_secret_version" {
+  secret_id     = aws_secretsmanager_secret.edrms_secret.id
+  secret_string = jsonencode(local.edrms_secret_values)
+}
+
+data "aws_secretsmanager_secret_version" "edrms_secret_version_current" {
   secret_id = aws_secretsmanager_secret.edrms_secret.id
 }
 
