@@ -11,6 +11,11 @@ locals {
     data.aws_subnet.private_subnets_c.cidr_block
   ]
 
+  edrms_secret = jsondecode(data.aws_secretmanager_secret_version.edrms_secret_version)
+  spring_datasource_password_arn = data.aws_secretsmanager_secret.edrms_secret.arn
+  rendered_json = templatefile("$(path.module)/task_definition.tpl.json", {
+    spring_datasource_password= local.spring_datasource_password_arn
+  })
   cert_opts    = aws_acm_certificate.external.domain_validation_options
   cert_arn     = aws_acm_certificate.external.arn
   cert_zone_id = data.aws_route53_zone.external.zone_id
