@@ -4,6 +4,10 @@ terraform {
       version = "~> 6.0"
       source  = "hashicorp/aws"
     }
+    awscc = {
+      source  = "hashicorp/awscc"
+      version = "~> 1.0"
+    }
     dns = {
       version = "~> 3.0"
       source  = "hashicorp/dns"
