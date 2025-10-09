@@ -6,7 +6,7 @@
       "ami_image_id": "ami-0d6d764bbe794b8ca",
       "opa_app_image": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/ccms-oia",
       "opa_container_version": "ccms-oia-dev-bf589eb-SNAPSHOT",
-      "ec2_instance_type": "m5.large",
+      "ec2_instance_type": "m5.xlarge",
       "ec2_desired_capacity": "2",
       "ec2_max_size": "3",
       "ec2_min_size": "2",
