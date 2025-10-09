@@ -233,6 +233,7 @@ locals {
       "CloudWatchMetricOamSink" = {
         resource_types = ["AWS::CloudWatch::Metric"]
         source_account_names = [
+          "corporate-staff-rostering-test",
           "hmpps-domain-services-test",
           "nomis-test",
           "nomis-combined-reporting-test",
