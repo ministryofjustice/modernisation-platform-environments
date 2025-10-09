@@ -53,7 +53,9 @@ resource "aws_iam_role_policy" "lambda_redshift_policy" {
           "redshift-data:DescribeStatement",
           "redshift-data:GetStatementResult"
         ]
-        Resource = "*"
+        Resource = [
+          aws_redshiftserverless_workgroup.default.arn
+        ]
       },
       {
         Effect   = "Allow"
@@ -73,12 +75,16 @@ resource "aws_iam_role_policy" "lambda_redshift_policy" {
           "logs:CreateLogStream",
           "logs:PutLogEvents"
         ]
-        Resource = "*"
+        Resource = [
+          "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/redshift_scheduler*"
+        ]
       }
     ]
   })
 }
 
+data "aws_region" "current" {}
+data "aws_caller_identity" "current" {}
 
 
 # Daily materialized views refresh at 5am UTC
