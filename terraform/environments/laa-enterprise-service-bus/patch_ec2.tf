@@ -54,6 +54,24 @@ resource "aws_iam_role" "ec2_debug_role" {
   })
 }
 
+resource "aws_iam_role_policy" "ec2_debug_policy" {
+  name = "ec2-debug-policy"
+  role = aws_iam_role.ec2_debug_role[0].id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "s3:GetObject",
+          "s3:ListBucket"
+        ],
+        Resource = "*"
+      },
+    ]
+  })
+}
+
 # Attach SSM managed policy
 resource "aws_iam_role_policy_attachment" "ec2_debug_policy_attach" {
   count      = local.environment == "test" ? 1 : 0
@@ -70,8 +88,8 @@ resource "aws_iam_instance_profile" "ec2_debug_instance_profile" {
 
 # EC2 Instance
 resource "aws_instance" "ssm_instance" {
-  count                      = local.environment == "test" ? 1 : 0
-  ami                         = "ami-0336cdd409ab5eec4" # Amazon Linux 2 in us-east-1, change region if needed
+  count                       = local.environment == "test" ? 1 : 0
+  ami                         = "ami-0336cdd409ab5eec4"
   instance_type               = "t3.micro"
   subnet_id                   = data.aws_subnet.data_subnets_a.id
   vpc_security_group_ids      = [aws_security_group.ec2_debug_sg[0].id]
