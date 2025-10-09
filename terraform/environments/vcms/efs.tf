@@ -7,7 +7,10 @@ resource "aws_efs_file_system" "vcms" {
   throughput_mode                 = "bursting"
   provisioned_throughput_in_mibps = null
 
-  tags = local.tags
+  tags = merge(
+    local.tags,
+    { "backups" = local.app_config.efs_backups }
+  )
 }
 
 resource "aws_efs_mount_target" "vcms" {

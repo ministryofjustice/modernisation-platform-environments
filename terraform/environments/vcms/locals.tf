@@ -1,6 +1,7 @@
 #### This file can be used to store locals specific to the member account ####
 
 locals {
+
   account_info = {
     business_unit    = var.networking[0].business-unit
     region           = "eu-west-2"
@@ -9,6 +10,7 @@ locals {
     mp_environment   = local.environment
     id               = data.aws_caller_identity.current.account_id
   }
+
   account_config = {
     shared_vpc_cidr    = data.aws_vpc.shared.cidr_block
     private_subnet_ids = data.aws_subnets.shared-private.ids
@@ -38,12 +40,23 @@ locals {
     deployment_maximum_percent         = 100
     deployment_minimum_healthy_percent = 0
     health_check_grace_period_seconds  = 60
+
+    efs_backups = true
+  }
+
+  db_config = {
+    # backup_retention_period = 7
+    # preferred_backup_window = "03:00-04:00"
+    # deletion_protection     = false
+    # final_snapshot_identifier = "mariadb-final-snapshot"
+    backups = true
   }
 
   bastion_config = {}
   image_tag      = "initial-16447252449-1"
   image_uri      = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/vcms:${local.image_tag}"
   app_port       = 80
+
   internal_security_group_cidrs = distinct(flatten([
     module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public,
     module.ip_addresses.moj_cidrs.trusted_moj_enduser_internal,
