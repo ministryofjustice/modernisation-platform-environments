@@ -279,4 +279,7 @@ module "process_fms_metadata" {
   production_dev                 = local.is-production ? "prod" : "dev"
   security_group_ids             = [aws_security_group.lambda_generic.id]
   subnet_ids                     = data.aws_subnets.shared-public.ids
+  environment_variables = {
+    SQS_QUEUE_URL = aws_sqs_queue.format_fms_json_event_queue.arn
+  }
 }

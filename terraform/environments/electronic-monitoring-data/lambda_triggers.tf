@@ -77,3 +77,65 @@ resource "aws_s3_bucket_notification" "virus_scan_file" {
 
   depends_on = [module.virus_scan_file_sqs]
 }
+
+
+# ----------------------------------------------
+# Format Json data sqs queue
+# ----------------------------------------------
+
+resource "aws_sqs_queue" "format_fms_json_event_queue" {
+  name                       = "format-fms-json-queue"
+  visibility_timeout_seconds = 6 * 15 * 60 # 6 x longer than longest possible lambda
+  redrive_policy = jsonencode({
+    deadLetterTargetArn = aws_sqs_queue.format_fms_json_event_dlq.arn
+    maxReceiveCount     = 5
+  })4
+  sqs_managed_sse_enabled = true
+}
+
+resource "aws_sqs_queue" "format_fms_json_event_dlq" {
+  name                    = "format-fms-json-dlq"
+  sqs_managed_sse_enabled = true
+}
+
+data "aws_iam_policy_document" "allow_lambda_to_write" {
+  statement {
+    sid    = "FormatFMSJsonPermissions"
+    effect = "Allow"
+    principals {
+      type        = "Service"
+      identifiers = ["lambda.amazonaws.com"]
+    }
+    actions = [
+      "SQS:SendMessage"
+    ]
+    resources = [
+      aws_sqs_queue.format_fms_json_event_queue.arn
+    ]
+    condition {
+      test     = "ArnLike"
+      variable = "aws:SourceArn"
+      values   = [module.process_fms_metadata.lambda_function_arn]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceAccount"
+      values   = [data.aws_caller_identity.current.account_id]
+    }
+  }
+}
+
+resource "aws_sqs_queue_policy" "allow_lambda_to_write" {
+  queue_url = aws_sqs_queue.format_fms_json_event_queue.id
+  policy    = data.aws_iam_policy_document.allow_lambda_to_write.json
+}
+
+
+resource "aws_lambda_event_source_mapping" "sqs_trigger" {
+  event_source_arn = aws_sqs_queue.format_fms_json_event_queue.arn
+  function_name    = module.format_json_fms_data.lambda_function_name
+  batch_size       = 10
+  scaling_config {
+    maximum_concurrency = 1000
+  }
+}
