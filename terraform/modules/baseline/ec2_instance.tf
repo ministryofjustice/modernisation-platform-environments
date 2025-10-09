@@ -3,7 +3,7 @@ module "ec2_instance" {
 
   for_each = var.ec2_instances
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v4.0.0" # replace managed_policy_arns argument in module with aws_iam_role_policy_attachment
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=00d70e3c6be2ae53b45068acf86df33c2a5348be"
 
   providers = {
     aws.core-vpc = aws.core-vpc
