@@ -1,9 +1,7 @@
 #!/bin/bash
 # wrapper script to perform ssm operations across all accounts
 
-profiles="corporate-staff-rostering-development
-corporate-staff-rostering-test
-corporate-staff-rostering-preproduction
+profiles="corporate-staff-rostering-preproduction
  corporate-staff-rostering-production
  hmpps-domain-services-development
  hmpps-domain-services-test

@@ -10,8 +10,6 @@ locals {
       "arn:aws:iam::${module.environment.account_ids.nomis-test}:role/EC2HmppsDomainSecretsRole",
       "arn:aws:iam::${module.environment.account_ids.nomis-data-hub-test}:role/EC2HmppsDomainSecretsRole",
       "arn:aws:iam::${module.environment.account_ids.oasys-national-reporting-test}:role/EC2HmppsDomainSecretsRole",
-      "arn:aws:iam::${module.environment.account_ids.corporate-staff-rostering-development}:role/EC2HmppsDomainSecretsRole",
-      "arn:aws:iam::${module.environment.account_ids.corporate-staff-rostering-test}:role/EC2HmppsDomainSecretsRole",
     ]
     preproduction = []
     production = [
