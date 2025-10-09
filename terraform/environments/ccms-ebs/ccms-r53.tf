@@ -118,36 +118,36 @@ resource "aws_route53_record" "prod_ebsapps" {
   records = [aws_route53_record.ebsapps[count.index].fqdn]
 }*/
 
-## EBSWEBGATE
-resource "aws_route53_record" "ebswgate" {
-  #count    = (local.environment == "development" || local.environment == "test") ? 1 : 0
-  count    = local.is-production ? 0 : 1
-  provider = aws.core-vpc
-  zone_id  = data.aws_route53_zone.external.zone_id
-  //  count    = local.application_data.accounts[local.environment].webgate_no_instances
-  name = "portal-ag.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-  #name    = "wgate${local.application_data.accounts[local.environment].short_env}${count.index + 1}.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-  type = "A"
-  alias {
-    name                   = aws_lb.webgate_lb[count.index].dns_name
-    zone_id                = aws_lb.webgate_lb[count.index].zone_id
-    evaluate_target_health = false
-  }
-}
+# ## EBSWEBGATE
+# resource "aws_route53_record" "ebswgate" {
+#   #count    = (local.environment == "development" || local.environment == "test") ? 1 : 0
+#   count    = local.is-production ? 0 : 1
+#   provider = aws.core-vpc
+#   zone_id  = data.aws_route53_zone.external.zone_id
+#   //  count    = local.application_data.accounts[local.environment].webgate_no_instances
+#   name = "portal-ag.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+#   #name    = "wgate${local.application_data.accounts[local.environment].short_env}${count.index + 1}.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+#   type = "A"
+#   alias {
+#     name                   = aws_lb.webgate_lb[count.index].dns_name
+#     zone_id                = aws_lb.webgate_lb[count.index].zone_id
+#     evaluate_target_health = false
+#   }
+# }
 
-## PROD EBSWEBGATE
-resource "aws_route53_record" "prod_ebswgate" {
-  count    = local.is-production ? 1 : 0
-  provider = aws.core-network-services
-  zone_id  = data.aws_route53_zone.prod-network-services.zone_id
-  name     = "portal-ag.ccms-ebs.service.justice.gov.uk"
-  type     = "A"
-  alias {
-    name                   = aws_lb.webgate_lb[count.index].dns_name
-    zone_id                = aws_lb.webgate_lb[count.index].zone_id
-    evaluate_target_health = false
-  }
-}
+# ## PROD EBSWEBGATE
+# resource "aws_route53_record" "prod_ebswgate" {
+#   count    = local.is-production ? 1 : 0
+#   provider = aws.core-network-services
+#   zone_id  = data.aws_route53_zone.prod-network-services.zone_id
+#   name     = "portal-ag.ccms-ebs.service.justice.gov.uk"
+#   type     = "A"
+#   alias {
+#     name                   = aws_lb.webgate_lb[count.index].dns_name
+#     zone_id                = aws_lb.webgate_lb[count.index].zone_id
+#     evaluate_target_health = false
+#   }
+# }
 
 resource "aws_route53_record" "webgate_ec2" {
   provider = aws.core-vpc
