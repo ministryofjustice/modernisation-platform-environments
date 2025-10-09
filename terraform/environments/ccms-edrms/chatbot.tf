@@ -3,7 +3,7 @@
 
 module "template" {
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-aws-chatbot?ref=73280f80ce8a4557cec3a76ee56eb913452ca9aa" # v2.0.0
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-aws-chatbot?ref=0ec33c7bfde5649af3c23d0834ea85c849edf3ac" # v3.0.0
 
   # slack_channel_id = data.aws_secretsmanager_secret_version.slack_channel_id.secret_string
   slack_channel_id = local.edrms_secret["alerts_slack_channel_id"]
