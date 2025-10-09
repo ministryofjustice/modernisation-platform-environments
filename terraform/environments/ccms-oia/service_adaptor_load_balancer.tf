@@ -28,7 +28,7 @@ resource "aws_lb_target_group" "adaptor_target_group" {
   deregistration_delay = 30
 
   health_check {
-    path                = "/acutuator/health"
+    path                = "/actuator/health"
     healthy_threshold   = 5
     interval            = 30
     protocol            = "HTTP"
