@@ -146,6 +146,7 @@ locals {
         })
       })
 
+
       # remember to delete associated backup plan
       qa11g-nomis-web12-a = merge(local.ec2_autoscaling_groups.web12, {
         autoscaling_schedules = {}
