@@ -37,6 +37,10 @@ resource "aws_vpc_security_group_ingress_rule" "lambda_ingress" {
   from_port         = 1521
   ip_protocol       = "tcp"
   to_port           = 1522
+
+  lifecycle {
+    ignore_changes        = [cidr_ipv4]
+  }
 }
 
 # hashicorp recommened egress rule of lambda_security_group
@@ -45,6 +49,10 @@ resource "aws_vpc_security_group_egress_rule" "lambda_egress" {
   description       = "Allow FTP lambdaall outbound traffic"
   cidr_ipv4         = "0.0.0.0/0"
   ip_protocol       = "-1"
+
+  lifecycle {
+    ignore_changes        = [cidr_ipv4]
+  }
 }
 
 # Lambda Function
