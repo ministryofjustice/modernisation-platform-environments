@@ -34,7 +34,8 @@ resource "helm_release" "litellm" {
         environmentSecrets = [
           data.kubernetes_secret.elasticache[0].metadata[0].name,
           kubernetes_secret.litellm_license[0].metadata[0].name,
-          kubernetes_secret.litellm_entra_id[0].metadata[0].name
+          kubernetes_secret.litellm_entra_id[0].metadata[0].name,
+          kubernetes_secret.justiceai_azure_openai[0].metadata[0].name,
         ]
 
         # AWS

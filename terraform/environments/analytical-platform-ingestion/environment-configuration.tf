@@ -25,7 +25,10 @@ locals {
       notify_image_version   = "0.0.23"
 
       /* Target Buckets */
-      target_buckets              = ["mojap-land-dev"]
+      target_buckets              = [
+        "mojap-land-dev",
+        "cloud-platform-40748c2df4b92e2dfd779a02841187ec"
+      ]
       datasync_target_buckets     = ["mojap-land-dev"]
       datasync_opg_target_buckets = ["mojap-data-production-datasync-opg-ingress-development"]
 
@@ -89,7 +92,7 @@ locals {
       target_buckets = [
         "mojap-land",
         "mojap-data-production-shared-services-client-team-gov-29148",
-        "cloud-platform-40748c2df4b92e2dfd779a02841187ec"
+        "cloud-platform-623c2bd763adf52b51a0c0cee5c1ec72"
       ]
       datasync_target_buckets     = ["mojap-land"]
       datasync_opg_target_buckets = ["mojap-data-production-datasync-opg-ingress-production"]
