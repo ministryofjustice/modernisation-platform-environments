@@ -20,8 +20,19 @@ resource "aws_security_group_rule" "ec2_debug_egress_ecp" {
   to_port           = 2484
   protocol          = "tcp"
   cidr_blocks       = ["10.205.11.0/26", "10.205.11.64/26"] # Patch CCMS Database IP
-  security_group_id = aws_security_group.patch_cwa_extract_sg[0].id
+  security_group_id = aws_security_group.ec2_debug_sg[0].id
   description       = "Outbound 2484 Access to CWA DB Safe3 in ECP"
+}
+
+resource "aws_security_group_rule" "ec2_debug_egress_https_endpoint" {
+  count                    = local.environment == "test" ? 1 : 0
+  type                     = "egress"
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  cidr_blocks              = ["0.0.0.0/0"]
+  security_group_id        = aws_security_group.ec2_debug_sg[0].id
+  description              = "Outbound 443 to internet"
 }
 
 # IAM Role for SSM
@@ -64,7 +75,7 @@ resource "aws_instance" "ssm_instance" {
   instance_type               = "t3.micro"
   subnet_id                   = data.aws_subnet.data_subnets_a.id
   vpc_security_group_ids      = [aws_security_group.ec2_debug_sg[0].id]
-  iam_instance_profile        = aws_iam_instance_profile.ssm_instance_profile[0].name
+  iam_instance_profile        = aws_iam_instance_profile.ec2_debug_instance_profile[0].name
   associate_public_ip_address = false
 
   tags = {
