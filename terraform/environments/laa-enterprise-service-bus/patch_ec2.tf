@@ -55,6 +55,7 @@ resource "aws_iam_role" "ec2_debug_role" {
 }
 
 resource "aws_iam_role_policy" "ec2_debug_policy" {
+  count = local.environment == "test" ? 1 : 0
   name = "ec2-debug-policy"
   role = aws_iam_role.ec2_debug_role[0].id
   policy = jsonencode({
