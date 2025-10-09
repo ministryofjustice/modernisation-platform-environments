@@ -139,6 +139,13 @@ locals {
         })
       })
 
+      # temporary test
+      dev-nomis-client-b = merge(local.ec2_autoscaling_groups.client, {
+        tags = merge(local.ec2_autoscaling_groups.client.tags, {
+          domain-name = "azure.noms.root"
+        })
+      })
+
       # remember to delete associated backup plan
       qa11g-nomis-web12-a = merge(local.ec2_autoscaling_groups.web12, {
         autoscaling_schedules = {}
