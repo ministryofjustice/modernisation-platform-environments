@@ -2,7 +2,7 @@
 #   *.laa-development.modernisation-platform.service.justice.gov.uk
 #   *.laa-test.modernisation-platform.service.justice.gov.uk
 #   *.laa-preproduction.modernisation-platform.service.justice.gov.uk
-#   *.legalservices.gov.uk
+#   *.laa.service.justice.gov.uk
 
 # Certificate
 
@@ -35,15 +35,15 @@ resource "aws_route53_record" "external_validation_nonprod" {
 }
 
 resource "aws_route53_record" "external_validation_prod" {
-  count    = local.is-production ? length(local.legalservices_validations) : 0
+  count    = local.is-production ? length(local.laa_validations) : 0
   provider = aws.core-network-services
 
   allow_overwrite = true
-  name            = local.legalservices_validations[count.index].name
-  records         = [local.legalservices_validations[count.index].record]
+  name            = local.laa_validations[count.index].name
+  records         = [local.laa_validations[count.index].record]
   ttl             = 60
-  type            = local.legalservices_validations[count.index].type
-  zone_id         = data.aws_route53_zone.legalservices.zone_id
+  type            = local.laa_validations[count.index].type
+  zone_id         = data.aws_route53_zone.laa.zone_id
 }
 
 ## Certificate Validation

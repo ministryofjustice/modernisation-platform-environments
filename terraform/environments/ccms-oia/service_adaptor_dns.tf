@@ -20,7 +20,7 @@ resource "aws_route53_record" "route53_record_adaptor_nonprod" {
 resource "aws_route53_record" "route53_record_adaptor_prod" {
   count    = local.is-production ? 1 : 0
   provider = aws.core-network-services
-  zone_id  = data.aws_route53_zone.legalservices.zone_id
+  zone_id  = data.aws_route53_zone.laa.zone_id
   name     = local.adaptor_app_name
   type     = "A"
   alias {
