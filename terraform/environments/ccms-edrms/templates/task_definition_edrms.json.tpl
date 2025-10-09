@@ -45,7 +45,7 @@
     "secrets": [
         {
           "name": "SPRING_DATASOURCE_PASSWORD",
-          "valueFrom": "${spring_datasource_password}"
+          "valueFrom": "${local.spring_datasource_password_arn}"
         }
     ]
   }
