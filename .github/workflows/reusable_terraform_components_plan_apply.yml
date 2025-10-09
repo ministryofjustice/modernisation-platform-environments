@@ -320,7 +320,7 @@
             run: |
               terraform --version
               echo "terraform init"
-              terraform init
+              terraform init -upgrade
 
           - name: Terraform Workspace Select
             working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
