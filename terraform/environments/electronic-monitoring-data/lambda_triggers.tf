@@ -89,7 +89,7 @@ resource "aws_sqs_queue" "format_fms_json_event_queue" {
   redrive_policy = jsonencode({
     deadLetterTargetArn = aws_sqs_queue.format_fms_json_event_dlq.arn
     maxReceiveCount     = 5
-  })4
+  })
   sqs_managed_sse_enabled = true
 }
 
