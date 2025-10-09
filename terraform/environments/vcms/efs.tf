@@ -9,7 +9,7 @@ resource "aws_efs_file_system" "vcms" {
 
   tags = merge(
     local.tags,
-    { "backups" = local.app_config.efs_backups }
+    { "backup" = local.app_config.efs_backup }
   )
 }
 

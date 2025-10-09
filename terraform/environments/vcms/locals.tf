@@ -41,7 +41,7 @@ locals {
     deployment_minimum_healthy_percent = 0
     health_check_grace_period_seconds  = 60
 
-    efs_backups = true
+    efs_backup = true
   }
 
   db_config = {
@@ -49,7 +49,7 @@ locals {
     # preferred_backup_window = "03:00-04:00"
     # deletion_protection     = false
     # final_snapshot_identifier = "mariadb-final-snapshot"
-    backups = true
+    backup = true
   }
 
   bastion_config = {}

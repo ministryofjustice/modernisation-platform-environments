@@ -22,7 +22,7 @@ resource "aws_db_instance" "mariadb" {
   # final_snapshot_identifier = local.db_config.final_snapshot_identifier
   tags = merge(
     local.tags,
-    { "backups" = local.db_config.backups }
+    { "backup" = local.db_config.backup }
   )
 }
 
