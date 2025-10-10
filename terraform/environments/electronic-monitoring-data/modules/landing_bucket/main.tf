@@ -1,7 +1,7 @@
 terraform {
   required_providers {
     aws = {
-      version = "~> 5.0, != 5.86.0"
+      version = "~> 6.3, != 5.86.0"
       source  = "hashicorp/aws"
     }
   }
@@ -9,8 +9,7 @@ terraform {
 }
 
 module "this-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
-
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9f"
   bucket_prefix      = "${var.local_bucket_prefix}-land-${var.data_feed}-${var.order_type}-"
   versioning_enabled = true
 
@@ -90,7 +89,7 @@ module "kms_key" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "3.1.1"
+  version = "4.1.0"
 
   aliases     = ["s3/landing_bucket_${var.data_feed}_${var.order_type}"]
   description = "${var.data_feed} ${var.order_type} landing bucket KMS key"
