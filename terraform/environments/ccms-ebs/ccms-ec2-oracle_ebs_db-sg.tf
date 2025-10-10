@@ -77,7 +77,7 @@ resource "aws_security_group_rule" "ingress_traffic_ebsdb_152x" {
   security_group_id = aws_security_group.ec2_sg_ebsdb.id
   type              = "ingress"
   description       = "Oracle Net Listener"
-  protocol          = "TCP"
+  protocol          = "tcp"
   from_port         = 1521
   to_port           = 1522
   cidr_blocks = [data.aws_vpc.shared.cidr_block,
@@ -265,7 +265,7 @@ resource "aws_security_group_rule" "egress_traffic_ebsdb_152x" {
   security_group_id = aws_security_group.ec2_sg_ebsdb.id
   type              = "egress"
   description       = "ORACLE Net Listener"
-  protocol          = "TCP"
+  protocol          = "tcp"
   from_port         = 1521
   to_port           = 1522
   cidr_blocks       = ["0.0.0.0/0"]
