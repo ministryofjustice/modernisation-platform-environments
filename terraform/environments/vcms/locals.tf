@@ -45,10 +45,6 @@ locals {
   }
 
   db_config = {
-    # backup_retention_period = 7
-    # preferred_backup_window = "03:00-04:00"
-    # deletion_protection     = false
-    # final_snapshot_identifier = "mariadb-final-snapshot"
     backup = true
   }
 

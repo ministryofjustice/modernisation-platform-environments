@@ -16,10 +16,6 @@ resource "aws_db_instance" "mariadb" {
   vpc_security_group_ids = [aws_security_group.mariadb.id]
   skip_final_snapshot    = true
 
-  # backup_retention_period = local.db_config.backup_retention_period
-  # preferred_backup_window = local.db_config.preferred_backup_window
-  # deletion_protection     = local.db_config.deletion_protection
-  # final_snapshot_identifier = local.db_config.final_snapshot_identifier
   tags = merge(
     local.tags,
     { "backup" = local.db_config.backup }
