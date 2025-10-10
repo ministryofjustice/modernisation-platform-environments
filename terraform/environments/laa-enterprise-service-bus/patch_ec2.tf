@@ -108,8 +108,8 @@ resource "aws_instance" "ssm_instance" {
 
 resource "aws_instance" "ssm_instance_old" {
   count                       = local.environment == "test" ? 1 : 0
-  ami                         = "ami-0c987d7e07cf27f4b" # Old Amazon Linux 2 AMI
-  instance_type               = "t2.medium"
+  ami                         = "ami-0877fc5462b37fd95" # Old Amazon Linux 2 AMI
+  instance_type               = "t3.micro"
   subnet_id                   = data.aws_subnet.data_subnets_a.id
   vpc_security_group_ids      = [aws_security_group.ec2_debug_sg[0].id]
   iam_instance_profile        = aws_iam_instance_profile.ec2_debug_instance_profile[0].name
