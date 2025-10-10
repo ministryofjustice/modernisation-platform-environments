@@ -30,8 +30,6 @@ resource "aws_security_group" "lambda_security_group" {
     to_port          = 1522
     protocol         = "tcp"
     cidr_blocks      = [data.aws_vpc.shared.cidr_block]
-    security_groups  = []
-    self             = false
   }
   egress {
     description      = "Allow FTP outbound traffic"
