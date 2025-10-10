@@ -1578,5 +1578,21 @@ resource "aws_glue_catalog_table" "report" {
       name = "resource_tags_user_source_code"
       type = "string"
     }
+    columns {
+      name = "resource_tags_user_dpr_is_service_bundle"
+      type = "string"
+    }
+    columns {
+      name = "resource_tags_user_dpr_resource_type"
+      type = "string"
+    }
+    columns {
+      name = "resource_tags_user_dpr_domain"
+      type = "string"
+    }
+    columns {
+      name = "resource_tags_user_dpr_domain_category"
+      type = "string"
+    }
   }
 }
