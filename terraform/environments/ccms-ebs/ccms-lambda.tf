@@ -38,6 +38,10 @@ resource "aws_security_group" "lambda_security_group" {
     protocol         = "-1"
     cidr_blocks      = ["0.0.0.0/0"]
   }
+ 
+ lifecycle {
+    ignore_changes = [ingress, egress]
+  }
 
   tags = merge(local.tags,
     { Name = "${local.application_name}-${local.environment}-lambda-sg" }
