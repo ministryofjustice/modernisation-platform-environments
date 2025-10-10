@@ -14,7 +14,7 @@ resource "aws_secretsmanager_secret_version" "edrms_secret_version" {
   })
 
   lifecycle {
-    ignore_changes = [ secret_string ]
+    ignore_changes = [ secret_string["alerts_slack_channel_id"] ]
   }
 }
 
