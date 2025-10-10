@@ -9,7 +9,10 @@ resource "aws_wafv2_ip_set" "opahub_waf_ip_set" {
   addresses = [
     local.application_data.accounts[local.environment].lz_aws_workspace_public_nat_gateway_a,
     local.application_data.accounts[local.environment].lz_aws_workspace_public_nat_gateway_b,
-    local.application_data.accounts[local.environment].lz_aws_workspace_public_nat_gateway_c
+    local.application_data.accounts[local.environment].lz_aws_workspace_public_nat_gateway_c,
+    local.application_data.accounts[local.environment].mp_nat_gateway_a,
+    local.application_data.accounts[local.environment].mp_nat_gateway_b,
+    local.application_data.accounts[local.environment].mp_nat_gateway_c
   ]
 
   tags = merge(local.tags,
