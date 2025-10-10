@@ -3,8 +3,9 @@ module "data_platform_access_iam_role" {
 
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role?ref=dc7a9f3bed20aaaba05d151b0789745070424b3a" # v6.2.1
 
-  path = "/github-actions/"
-  name = "data-platform-access"
+  path            = "/github-actions/"
+  name            = "data-platform-access"
+  use_name_prefix = false
 
   enable_github_oidc = true
 
