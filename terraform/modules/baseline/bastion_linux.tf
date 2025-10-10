@@ -3,7 +3,7 @@ module "bastion_linux" {
 
   count = var.bastion_linux.public_key_data != null ? 1 : 0
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=v4.4.2"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=v5.0.0"
 
   providers = {
     aws.share-host   = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts

@@ -5,10 +5,10 @@ locals {
   # CAPITA
   #----------------------------------------------------------------------------
   capita_ssh_keys = [
-    "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBMzzvEd8KCDG8lp9O6/D2tHK8aKZKIQiPWbcoPxr0I9CmDhr+DNVH8MnevXFrMx+aVreuK0lHEHWKInJBrxHXaK8OnsJjZwYjzAQSG4oBZYmHFW8r7xDkbKelOby0gNDzg==",
+    "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBDEMaR2/Fk/XjgxYMHyLarpeArHEaPB6vwKwFfMsw8mlZ3BR5MnE72ZOEIqD4WwN6d2Tnrok3Y7DNUQCv9D/Mh/JwG3NyMeM6uinbQMHzkmMQn6/cMTuY30I6XD5nt4h2A==",
   ]
   capita_cidr_ipv4s = [
-    "195.59.155.38/32",
+    "172.167.3.97/32",
   ]
   capita_cidr_ipv6s = []
 
@@ -120,7 +120,7 @@ locals {
   # scram
   #----------------------------------------------------------------------------
   scram_ssh_keys = [
-    "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACbS3xgiLcHRQsA6HrlGh9/+KUy8JMbkyQoUjacdkQz+0mywL1H4wEBtLi1AX7fLbjkHVuQDWpe/yPfmYwSy5eUSljrwJxV4IsluQVK401VjMdwuFMobu+hE4Iq7S2W5/0xRIFllk3qvJDvY7roFCXONJGhuoXhzRS833M7DtAtmCx0IRwrH4X+MAj7oXbC67ihzbsOtYxLukEsQ0xAC1KyGvmChM3Knr/GnzsmQGD0nKZEr4tIegNjPMHobcF5Zvuub+FBQabrRWsop+BXsP1Dfjzg9yS0joDjqyDx24tFBWK3FheI1mM+auVdnhLVQfje2rGKXbwKFPA37R+v/HlefRzhoxBSBzbSBqFNXVF/3ZJYq2N5/aqUO3TzcAFh+UfjihrQkaVMWmKZADOraiM5H1Cy77hKx5q76/1WpEoVSVAP/BuMBk2DmJCyqheAC9ywL0Q0lfbfLdYOQv0GXiBdgsEd3QmdZu0ZC5xAULNcVBVvNxYiDTVTJ4wKNbm+fF5SNdeO/QBEVQFVb7tF9sMr2J5vKTSAYtaV7r0bY5BXb228r0yh5HaKDsv90YPRgpuZjY+KC9zP5EN+fKwhrkGES3kqyMasYhAoDnvFow1gPTkjL1YLUxr6WGSYIcZgnChNc4nV2NYPs1qX7aM4suubePLMyB+By8Jw+Qi51yCsuUvQA8SBQlAKNDy6bQ7uk90vCrijvw/xKWEyiMDXTxf/GdbrzgXREjs7NqsdK0/Zf+JLfD1+uiYcdeLerAuXYNJ9HdEsGfZ6jbzJGmp4tGoY9NrQ9sXploPjQ+0XhtZvjMlaTBIbavHUVsvsj1cQw==",
+    "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDJ4URBaRy0SZgwZKsMHNMjyqFQ+zbsBRI/tekxQq7CBO8GNtDSfEYrHBu9t9D3sI2rAeBFqed7dI8YUlMJngBTxs77X5V2bUiCcpyj6XhDWjAiX9mzdAq+Gsp6H5Zt5dQjf0HsIeEu9K0EdUVbkDHCs+OQ7fHbfGvHvK4j6Kvd9lJX34E7t5mg/jUOVadGWIH/4H9Xrq8DNqqUj83ZXD4aHObyxCB1fRJMfYjxHDHY/ee19T2UhnhV1Wc/aVyCs/lBiXexhgPDh+qS33Q7HPZxZvDkPwcPtXWW7ZJWtca6IylbBdFqcYazv/XUByl5QWx+O6IzgJIFMaUndXILUsc5xDr4bk+KgEIgH4CjMfaVfvpMpYHDElBNfPVYjyKW31dI1Q6igNilIySEjQX7+yy+5gF+qRfaCEBS05bUDPE3oZ7r9pmP8zltzL/aDPffPMrdGoHklSEGnOJIrXFvksAB9OGOO9d2URW4YlFpcqe4uFnwsNkZ9lk8R5DCDEuQ5VqPxkcW9tv5pTc4F3vbpx5Wk7JOPLzSwbPJKAw8iVpU+wWuOXbRarB3iDPuojeHtjH1HZ3o2nizG/FrT26wdfeKDZgsWbA9y2DbPHp5MQ+mONGMb7+9t/2C//RXntz/Y2U3DuT1gKq38rfx2Bveo0i6aWPNBvLSxRH+Kvg6vpobGQ==",
   ]
   scram_cidr_ipv4s = [
     "216.241.100.251/32",
@@ -291,12 +291,17 @@ locals {
     ssh_keys = [
       # Matt Heery
       "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDPo/IGYprUoZqGHzy6pgkSDKy4zY2+xYYWELaK5uMjK+2YIHm99vIVlEsqQIdrH/NlBIKxa97eDRBj3n5NMhrjg7g6hiuzqeJVKx21SBBhfMvFxHgrLWW8ZiaJ+PWHda5LH7BLW6QvMyh4dI/Jl26JvYLvnkXB5QA/MbaHxt59ueBjjxH/+877dHri41aGMqf01UjVCcBC2wqAUCngC3UZvtjbMVSkWlcyKIx8DI+YnThSVbfT7HxAMhbrcO296Ec/G7sfVHibr+pBHqGOSODkRVKezXCIi+UUBJ94c/p17eV+MlTAqvRKvxJ2rvd50UtDvwsTEYvJjptaTEtxY4az matt-heery",
+      # Khristiania Raihan
+      "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC7+3IYrXHqSyLRRK0BN99P1rcDMLEDlPJAuImLBz2MH/PyWQp34FNUaxwlZ0QsrTaCzsKTde2JEE7KTNNe1b+Dcp6z0gz+9l9J2SoWZvQVUwrASwb3Ox2rfQFjh+ZjllslbZkYEpKr8Js53krCToTwi5gqXddwXTnxy6TMdGjfVRRrWQqYGVUJYd5vbw7vnqUDqtnb0J6pLsQdh5X0j10a9yfjggwzrzCgrMDtKUMxJQpB3c596kf1Uzf05U+F9M10/CcByRSNBzU1NAsLpNH9xUPYOP/KYTFoIBdnaPF4ePDL6SnHWUzbp0CkGM8Izp/jZkZuCuKe5yGgHztBskt5qduc3EmI0E2yYcnqGMooCDC2k3WMt+GBc5StctnhlcvtTK+Yr35ij3GrO5hpgO/jv4LJe3jUIdztLQJ1cPiFqoG1SgW9SdtVrEweLDR12N0fngLDrI0VaI4xxylybeXn8q3+6UAUdJPoOM5M1D7tokw8Ug44r3gLXLT6n1VkbLforu0aeQYObWli8f/HtSVezbbNY/29o/QF+ye3fsZ4TxAlwu/K8Gxg0x7lh4YtBbjyuFGEuCIWGSbF4jg9gdfsFv2ST3X70+TrgDja9G+Lx6jac4W6VTTQs6XgyA5uLqHBBf4SJoX8DaQZmAEZwtLVWE/9pS7vQl6QYiJm4UZTfw== khristiania.raihan@justice.gov.uk",
+
     ]
     cidr_ipv4s = [
       # 10 SC
       "51.149.2.6/32",
       # Petty France
       "213.121.161.124/32",
+      # SCRAM DEV
+      "3.9.254.251/32",
     ]
     cidr_ipv6s = []
   }

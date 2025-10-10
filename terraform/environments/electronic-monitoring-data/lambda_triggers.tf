@@ -5,7 +5,7 @@ module "calculate_checksum_sqs" {
   bucket_prefix        = local.bucket_prefix
 }
 
-resource "aws_s3_bucket_notification" "historic_data_checksum" {
+resource "aws_s3_bucket_notification" "data_bucket_triggers" {
   bucket = module.s3-data-bucket.bucket.id
   queue {
     queue_arn     = module.calculate_checksum_sqs.sqs_queue.arn
@@ -39,17 +39,17 @@ resource "aws_s3_bucket_notification" "historic_data_checksum" {
     filter_prefix = "allied/mdss"
   }
   queue {
-    queue_arn     = module.fms_fan_out_sqs.sqs_queue.arn
+    queue_arn     = module.process_fms_metadata_sqs.sqs_queue.arn
     events        = ["s3:ObjectCreated:*"]
     filter_suffix = ".JSON"
     filter_prefix = "serco/fms"
   }
 }
 
-module "fms_fan_out_sqs" {
+module "process_fms_metadata_sqs" {
   source               = "./modules/sqs_s3_lambda_trigger"
   bucket               = module.s3-data-bucket.bucket
-  lambda_function_name = module.fms_fan_out.lambda_function_name
+  lambda_function_name = module.process_fms_metadata.lambda_function_name
   bucket_prefix        = local.bucket_prefix
 }
 

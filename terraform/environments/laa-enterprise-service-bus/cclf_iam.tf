@@ -72,8 +72,8 @@ resource "aws_iam_policy" "cclf_provider_load_policy" {
         Resource = aws_sqs_queue.cclf_provider_q.arn
       },
       {
-        Effect   = "Allow"
-        Action   = [
+        Effect = "Allow"
+        Action = [
           "sqs:SendMessage",
           "sqs:ReceiveMessage",
           "sqs:DeleteMessage",

@@ -20,8 +20,8 @@ module "redshift" {
 
   vpc_cidr = data.aws_vpc.shared.cidr_block
 
-  # [TODO] Replace the role below with the equicelent in the new environment
-  data_science_role = "arn:aws:iam::${local.account_id}:role/${local.yjb_data_scientist_role_name}"
+  data_science_role  = "arn:aws:iam::${local.account_id}:role/${local.yjb_data_scientist_role_name}"
+  reports_admin_role = "arn:aws:iam::${local.account_id}:role/${local.reports_admin_role_name}"
 
   depends_on = [module.aurora, module.s3]
 }

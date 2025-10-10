@@ -47,17 +47,17 @@ output "aws_route53_record_prod_ebsapps_fqdn" {
 
 #
 
-output "aws_route53_record_ebswgate_fqdn" {
-  description = "aws_route53_record ebswgate fqdn"
-  value       = aws_route53_record.ebswgate[*].fqdn
-}
+# output "aws_route53_record_ebswgate_fqdn" {
+#   description = "aws_route53_record ebswgate fqdn"
+#   value       = aws_route53_record.ebswgate[*].fqdn
+# }
 
 #
 
-output "aws_route53_record_prod_ebswgate_fqdn" {
-  description = "aws_route53_record prod_ebswgate fqdn"
-  value       = aws_route53_record.prod_ebswgate[*].fqdn
-}
+# output "aws_route53_record_prod_ebswgate_fqdn" {
+#   description = "aws_route53_record prod_ebswgate fqdn"
+#   value       = aws_route53_record.prod_ebswgate[*].fqdn
+# }
 
 #
 

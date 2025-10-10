@@ -1,6 +1,6 @@
 variable "name" {
   type = string
-  }
+}
 variable "app_key" {
   type = string
 }
@@ -27,7 +27,7 @@ variable "description" {
   default = "Security group for Windows compute node"
 }
 variable "ec2_terminate_behavior" {
-   type    = string
+  type = string
 }
 
 variable "associate_public_ip_address" {
