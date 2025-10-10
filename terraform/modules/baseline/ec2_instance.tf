@@ -34,6 +34,7 @@ module "ec2_instance" {
   ebs_volume_tags               = each.value.ebs_volume_tags
   ebs_volumes                   = each.value.ebs_volumes
   user_data_raw                 = each.value.config.user_data_raw
+  user_data_base64              = each.value.config.user_data_base64
   user_data_cloud_init          = each.value.user_data_cloud_init
   ssm_parameters_prefix         = each.value.config.ssm_parameters_prefix
   secretsmanager_secrets_prefix = each.value.config.secretsmanager_secrets_prefix
