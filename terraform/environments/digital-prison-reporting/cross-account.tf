@@ -129,9 +129,9 @@ resource "aws_iam_role_policy_attachment" "lake_formation_data_access" {
 }
 
 # Lake formation list permissions
-resource "aws_iam_role_policy_attachment" "lake_formation_list_permissions" {
+resource "aws_iam_role_policy_attachment" "lake_formation_permissions_management" {
   role       = aws_iam_role.dataapi_cross_role.name
-  policy_arn = aws_iam_policy.lake_formation_list_permissions.arn
+  policy_arn = aws_iam_policy.lake_formation_permissions_management.arn
 }
 
 # Lake Formation Tag Management Attachement
