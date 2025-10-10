@@ -61,8 +61,7 @@ resource "aws_lambda_function" "cwa_extract_lambda" {
   runtime          = "python3.10"
 
   layers = [
-    aws_lambda_layer_version.lambda_layer_oracle_python.arn,
-    "arn:aws:lambda:eu-west-2:017000801446:layer:AWSLambdaPowertoolsPython:2"
+    aws_lambda_layer_version.lambda_layer_oracle_python.arn
   ]
 
   vpc_config {
@@ -74,8 +73,8 @@ resource "aws_lambda_function" "cwa_extract_lambda" {
     variables = {
       PROCEDURES_CONFIG = aws_secretsmanager_secret.cwa_procedures_config.name
       DB_SECRET_NAME    = aws_secretsmanager_secret.cwa_db_secret.name
-      LD_LIBRARY_PATH   = "/opt/instantclient_12_2_linux"
-      ORACLE_HOME       = "/opt/instantclient_12_2_linux"
+      LD_LIBRARY_PATH   = "/opt/instantclient_12_1"
+      ORACLE_HOME       = "/opt/instantclient_12_1"
       SERVICE_NAME      = "cwa-extract-service"
       NAMESPACE         = "HUB20-CWA-NS"
       ENVIRONMENT       = local.environment
@@ -102,8 +101,7 @@ resource "aws_lambda_function" "cwa_file_transfer_lambda" {
   runtime          = "python3.10"
 
   layers = [
-    aws_lambda_layer_version.lambda_layer_oracle_python.arn,
-    "arn:aws:lambda:eu-west-2:017000801446:layer:AWSLambdaPowertoolsPython:2"
+    aws_lambda_layer_version.lambda_layer_oracle_python.arn
   ]
 
   vpc_config {
@@ -116,8 +114,8 @@ resource "aws_lambda_function" "cwa_file_transfer_lambda" {
       TABLE_NAME_SECRET = aws_secretsmanager_secret.cwa_table_name_secret.name
       TARGET_BUCKET     = aws_s3_bucket.data.bucket
       DB_SECRET_NAME    = aws_secretsmanager_secret.cwa_db_secret.name
-      LD_LIBRARY_PATH   = "/opt/instantclient_12_2_linux"
-      ORACLE_HOME       = "/opt/instantclient_12_2_linux"
+      LD_LIBRARY_PATH   = "/opt/instantclient_12_1"
+      ORACLE_HOME       = "/opt/instantclient_12_1"
       SERVICE_NAME      = "cwa-file-transfer-service"
       NAMESPACE         = "HUB20-CWA-NS"
       ENVIRONMENT       = local.environment
