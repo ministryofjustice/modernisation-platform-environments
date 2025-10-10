@@ -789,12 +789,18 @@ resource "aws_iam_policy" "lake_formation_data_access" {
   policy      = data.aws_iam_policy_document.lake_formation_data_access.json
 }
 
-# Lake formation list permissions
+# Lake formation permissions management
 
-data "aws_iam_policy_document" "lake_formation_list_permissions" {
+data "aws_iam_policy_document" "lake_formation_permissions_management" {
   statement {
     actions = [
-      "lakeformation:ListPermissions"
+
+      # Permission management
+      "lakeformation:GrantPermissions",
+      "lakeformation:RevokePermissions",
+      "lakeformation:BatchGrantPermissions",
+      "lakeformation:BatchRevokePermissions",
+      "lakeformation:ListPermissions",
     ]
     resources = [
       "*"
@@ -802,10 +808,10 @@ data "aws_iam_policy_document" "lake_formation_list_permissions" {
   }
 }
 
-resource "aws_iam_policy" "lake_formation_list_permissions" {
-  name        = "${local.project}-lake-formation-permissions"
-  description = "LakeFormation list permissions on resources"
-  policy      = data.aws_iam_policy_document.lake_formation_list_permissions.json
+resource "aws_iam_policy" "lake_formation_permissions_management" {
+  name        = "${local.project}-lake-formation-permissions-management"
+  description = "LakeFormation permission management"
+  policy      = data.aws_iam_policy_document.lake_formation_permissions_management.json
 }
 
 
