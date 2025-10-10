@@ -20,7 +20,7 @@ locals {
     for key in local.edrms_secret_keys : replace(replace(key, "/", "_"), "-", "_") => "dummy"
   }
 
-  edrms_secret = jsondecode(data.aws_secretsmanager_secret_version.edrms_secret_version_current.secret_string)
+  edrms_secret = length(local.edrms_secret_values) > 0 ? jsondecode(data.aws_secretsmanager_secret_version.edrms_secret_version_current[0].secret_string) : null
   spring_datasource_password_arn = length(local.edrms_secret_values) > 0 ? aws_secretsmanager_secret.edrms_secret[0].arn : null
   
   cert_opts    = aws_acm_certificate.external.domain_validation_options

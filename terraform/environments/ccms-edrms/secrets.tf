@@ -13,7 +13,8 @@ resource "aws_secretsmanager_secret_version" "edrms_secret_version" {
 }
 
 data "aws_secretsmanager_secret_version" "edrms_secret_version_current" {
-  secret_id = aws_secretsmanager_secret.edrms_secret.id
+  count       = length(local.edrms_secret_values) > 0 ? 1 : 0
+  secret_id = aws_secretsmanager_secret.edrms_secret[count.index].id
 }
 
 /*
