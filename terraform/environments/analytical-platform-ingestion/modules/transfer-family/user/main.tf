@@ -73,16 +73,6 @@ resource "aws_transfer_ssh_key" "this" {
   body      = var.ssh_key
 }
 
-# resource "aws_security_group_rule" "this" {
-#   description       = var.name
-#   type              = "ingress"
-#   from_port         = 2222
-#   to_port           = 2222
-#   protocol          = "tcp"
-#   cidr_blocks       = var.cidr_blocks
-#   security_group_id = var.transfer_server_security_group
-# }
-
 resource "aws_secretsmanager_secret" "this" {
   #checkov:skip=CKV2_AWS_57:Automatic rotation is not required for this secret
 

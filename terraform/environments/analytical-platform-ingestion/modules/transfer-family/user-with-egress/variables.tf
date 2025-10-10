@@ -6,17 +6,9 @@ variable "ssh_key" {
   type = string
 }
 
-# variable "cidr_blocks" {
-#   type = list(string)
-# }
-
 variable "transfer_server" {
   type = string
 }
-
-# variable "transfer_server_security_group" {
-#   type = string
-# }
 
 variable "landing_bucket" {
   type = string

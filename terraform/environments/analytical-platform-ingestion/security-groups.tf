@@ -23,13 +23,6 @@ resource "aws_security_group" "isolated_vpc_endpoints" {
   tags        = local.tags
 }
 
-# resource "aws_security_group" "transfer_server" {
-#   description = "Security Group for Transfer Server"
-#   name        = "transfer-server"
-#   vpc_id      = module.isolated_vpc.vpc_id
-#   tags        = local.tags
-# }
-
 module "transfer_server_security_group" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
