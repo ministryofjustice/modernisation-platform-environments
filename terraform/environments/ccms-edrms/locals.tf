@@ -12,7 +12,7 @@ locals {
   ]
 
   app_vars = jsondecode(file("${path.module}/application_variables.json"))
-  environment     = trimprefix(terraform.workspace, "${var.networking[0].application}-")
+  # environment     = trimprefix(terraform.workspace, "${var.networking[0].application}-")
 
   edrms_secret_keys = local.app_vars.accounts[local.environment].edrms_secret_keys
 
