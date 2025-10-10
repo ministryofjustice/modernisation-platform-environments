@@ -197,8 +197,8 @@ resource "aws_lambda_function" "oracledb_patch_cwa_extract_lambda" {
     variables = {
       PROCEDURES_CONFIG = aws_secretsmanager_secret.cwa_procedures_config.name
       DB_SECRET_NAME    = aws_secretsmanager_secret.patch_cwa_db_secret[0].name
-      LD_LIBRARY_PATH   = "/opt/instantclient_12_2_linux"
-      ORACLE_HOME       = "/opt/instantclient_12_2_linux"
+      LD_LIBRARY_PATH   = "/opt/instantclient_12_1"
+      ORACLE_HOME       = "/opt/instantclient_12_1"
       SERVICE_NAME      = "cwa-extract-service"
       NAMESPACE         = "HUB20-CWA-NS"
       ENVIRONMENT       = local.environment
