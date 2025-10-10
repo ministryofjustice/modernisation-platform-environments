@@ -95,7 +95,7 @@ locals {
           recovery_window_in_days = 0 # so instances can be deleted and re-created without issue
         }
       }
-      user_data_raw = {
+      user_data = {
         args = {
           branch       = "main"
           ansible_args = "--tags ec2provision"
