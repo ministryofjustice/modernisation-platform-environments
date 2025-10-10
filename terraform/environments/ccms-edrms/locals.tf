@@ -12,7 +12,7 @@ locals {
   ]
 
   edrms_secret = jsondecode(data.aws_secretsmanager_secret_version.edrms_secret_version_current.secret_string)
-  spring_datasource_password_arn = aws_secretsmanager_secret.edrms_secret.arn
+  secret_arn = aws_secretsmanager_secret.edrms_secret.arn
   
   cert_opts    = aws_acm_certificate.external.domain_validation_options
   cert_arn     = aws_acm_certificate.external.arn
