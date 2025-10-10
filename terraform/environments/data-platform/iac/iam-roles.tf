@@ -9,7 +9,7 @@ module "data_platform_access_iam_role" {
 
   enable_github_oidc = true
 
-  oidc_subjects = ["ministryofjustice/data-platform-access:*"]
+  oidc_wildcard_subjects = ["ministryofjustice/data-platform-access:*"]
 
   create_inline_policy = true
   inline_policy_permissions = {
@@ -25,6 +25,7 @@ module "data_platform_access_iam_role" {
     S3Access = {
       effect = "Allow"
       actions = [
+        "s3:DeleteObject",
         "s3:GetObject",
         "s3:PutObject"
       ]
