@@ -20,7 +20,6 @@
       "tds_db_storage_gb": "50",
       "tds_db_deletion_protection": "false",
       "spring_profiles_active": "WithoutNorthgate",
-      "spring_datasource_username": "XXSOA",
       "northgate_proxy": "10.120.0.147/32",
       "target_northgate_hub_dime_url": "http://10.120.0.147/DocumentHub/dime",
       "northgate_timeout": "300000",
