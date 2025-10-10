@@ -33,25 +33,42 @@ resource "aws_security_group" "opahub_load_balancer" {
 # }
 
 # Allow traffic from anywhere - WAF will control access
-resource "aws_security_group_rule" "alb_ingress_443_all" {
+
+# resource "aws_security_group_rule" "alb_ingress_443_all" {
+#   security_group_id = aws_security_group.opahub_load_balancer.id
+#   type              = "ingress"
+#   description       = "HTTPS from AWS Workspaces"
+#   protocol          = "TCP"
+#   from_port         = 443
+#   to_port           = 443
+#   cidr_blocks       = ["0.0.0.0/0"]
+# }
+
+
+# resource "aws_security_group_rule" "alb_egress_all" {
+#   security_group_id = aws_security_group.opahub_load_balancer.id
+#   type              = "egress"
+#   description       = "All outbound"
+#   protocol          = -1
+#   from_port         = 0
+#   to_port           = 0
+#   cidr_blocks       = ["0.0.0.0/0"]
+# }
+
+resource "aws_vpc_security_group_ingress_rule" "alb_ingress_443_all" {
   security_group_id = aws_security_group.opahub_load_balancer.id
-  type              = "ingress"
-  description       = "HTTPS from AWS Workspaces"
-  protocol          = "TCP"
+  cidr_ipv4         = "0.0.0.0/0"
+  ip_protocol       = "tcp"
   from_port         = 443
   to_port           = 443
-  cidr_blocks       = ["0.0.0.0/0"]
+  description       = "HTTPS from anywhere (WAF controlled)"
 }
 
-
-resource "aws_security_group_rule" "alb_egress_all" {
+resource "aws_vpc_security_group_egress_rule" "alb_egress_all" {
   security_group_id = aws_security_group.opahub_load_balancer.id
-  type              = "egress"
-  description       = "All outbound"
-  protocol          = -1
-  from_port         = 0
-  to_port           = 0
-  cidr_blocks       = ["0.0.0.0/0"]
+  cidr_ipv4         = "0.0.0.0/0"
+  ip_protocol       = "-1"
+  description       = "Allow all outbound"
 }
 
 #######################################
@@ -68,24 +85,40 @@ resource "aws_security_group" "ecs_tasks_opa" {
   )
 }
 
-resource "aws_security_group_rule" "ecs_tasks_opa_ingress" {
-  security_group_id        = aws_security_group.ecs_tasks_opa.id
-  type                     = "ingress"
-  description              = "OPAHUB App Port"
-  protocol                 = "TCP"
-  from_port                = local.application_data.accounts[local.environment].opa_server_port
-  to_port                  = local.application_data.accounts[local.environment].opa_server_port
-  source_security_group_id = aws_security_group.opahub_load_balancer.id
+# resource "aws_security_group_rule" "ecs_tasks_opa_ingress" {
+#   security_group_id        = aws_security_group.ecs_tasks_opa.id
+#   type                     = "ingress"
+#   description              = "OPAHUB App Port"
+#   protocol                 = "TCP"
+#   from_port                = local.application_data.accounts[local.environment].opa_server_port
+#   to_port                  = local.application_data.accounts[local.environment].opa_server_port
+#   source_security_group_id = aws_security_group.opahub_load_balancer.id
+# }
+
+# resource "aws_security_group_rule" "ecs_tasks_opa_egress_all" {
+#   security_group_id = aws_security_group.ecs_tasks_opa.id
+#   type              = "egress"
+#   description       = "All outbound"
+#   protocol          = -1
+#   from_port         = 0
+#   to_port           = 0
+#   cidr_blocks       = ["0.0.0.0/0"]
+# }
+
+resource "aws_vpc_security_group_ingress_rule" "ecs_tasks_opa_ingress" {
+  security_group_id            = aws_security_group.ecs_tasks_opa.id
+  referenced_security_group_id = aws_security_group.opahub_load_balancer.id
+  ip_protocol                  = "tcp"
+  from_port                    = local.application_data.accounts[local.environment].opa_server_port
+  to_port                      = local.application_data.accounts[local.environment].opa_server_port
+  description                  = "Allow ALB to reach ECS app port"
 }
 
-resource "aws_security_group_rule" "ecs_tasks_opa_egress_all" {
+resource "aws_vpc_security_group_egress_rule" "ecs_tasks_opa_egress_all" {
   security_group_id = aws_security_group.ecs_tasks_opa.id
-  type              = "egress"
-  description       = "All outbound"
-  protocol          = -1
-  from_port         = 0
-  to_port           = 0
-  cidr_blocks       = ["0.0.0.0/0"]
+  cidr_ipv4         = "0.0.0.0/0"
+  ip_protocol       = "-1"
+  description       = "Allow all outbound traffic"
 }
 
 
@@ -103,31 +136,59 @@ resource "aws_security_group" "opahub_db" {
   )
 }
 
-resource "aws_security_group_rule" "opahub_db_ingress_workspaces" {
+# resource "aws_security_group_rule" "opahub_db_ingress_workspaces" {
+#   security_group_id = aws_security_group.opahub_db.id
+#   type              = "ingress"
+#   description       = "MySQL access from Workspaces"
+#   protocol          = "TCP"
+#   from_port         = 3306
+#   to_port           = 3306
+#   cidr_blocks       = local.application_data.accounts[local.environment].aws_workspace
+# }
+# resource "aws_security_group_rule" "opahub_db_ingress_ec2" {
+#   security_group_id        = aws_security_group.opahub_db.id
+#   type                     = "ingress"
+#   description              = "MySQL access from ECS Cluster EC2s"
+#   protocol                 = "TCP"
+#   from_port                = 3306
+#   to_port                  = 3306
+#   source_security_group_id = aws_security_group.cluster_ec2.id
+# }
+
+# resource "aws_security_group_rule" "opahub_db_egress_all" {
+#   security_group_id = aws_security_group.opahub_db.id
+#   type              = "egress"
+#   description       = "All outbound"
+#   protocol          = -1
+#   from_port         = 0
+#   to_port           = 0
+#   cidr_blocks       = ["0.0.0.0/0"]
+# }
+
+# Ingress from AWS Workspaces
+resource "aws_vpc_security_group_ingress_rule" "opahub_db_ingress_workspaces" {
   security_group_id = aws_security_group.opahub_db.id
-  type              = "ingress"
-  description       = "MySQL access from Workspaces"
-  protocol          = "TCP"
+  cidr_ipv4         = local.application_data.accounts[local.environment].aws_workspace
+  ip_protocol       = "tcp"
   from_port         = 3306
   to_port           = 3306
-  cidr_blocks       = local.application_data.accounts[local.environment].aws_workspace
-}
-resource "aws_security_group_rule" "opahub_db_ingress_ec2" {
-  security_group_id        = aws_security_group.opahub_db.id
-  type                     = "ingress"
-  description              = "MySQL access from ECS Cluster EC2s"
-  protocol                 = "TCP"
-  from_port                = 3306
-  to_port                  = 3306
-  source_security_group_id = aws_security_group.cluster_ec2.id
+  description       = "Allow MySQL access from Workspaces"
 }
 
-resource "aws_security_group_rule" "opahub_db_egress_all" {
+# Ingress from ECS Cluster EC2s
+resource "aws_vpc_security_group_ingress_rule" "opahub_db_ingress_ec2" {
+  security_group_id            = aws_security_group.opahub_db.id
+  referenced_security_group_id = aws_security_group.cluster_ec2.id
+  ip_protocol                  = "tcp"
+  from_port                    = 3306
+  to_port                      = 3306
+  description                  = "Allow MySQL access from ECS Cluster EC2s"
+}
+
+# Allow all outbound
+resource "aws_vpc_security_group_egress_rule" "opahub_db_egress_all" {
   security_group_id = aws_security_group.opahub_db.id
-  type              = "egress"
-  description       = "All outbound"
-  protocol          = -1
-  from_port         = 0
-  to_port           = 0
-  cidr_blocks       = ["0.0.0.0/0"]
+  cidr_ipv4         = "0.0.0.0/0"
+  ip_protocol       = "-1"
+  description       = "Allow all outbound traffic"
 }

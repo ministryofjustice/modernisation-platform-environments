@@ -12,24 +12,60 @@ resource "aws_security_group" "adaptor_load_balancer" {
   )
 }
 
-resource "aws_security_group_rule" "adaptor_alb_ingress_443" {
+# resource "aws_security_group_rule" "adaptor_alb_ingress_443" {
+#   security_group_id = aws_security_group.adaptor_load_balancer.id
+#   type              = "ingress"
+#   description       = "HTTPS"
+#   protocol          = "TCP"
+#   from_port         = 443
+#   to_port           = 443
+#   cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
+# }
+
+# resource "aws_security_group_rule" "adaptor_alb_egress_all" {
+#   security_group_id = aws_security_group.adaptor_load_balancer.id
+#   type              = "egress"
+#   description       = "All outbound"
+#   protocol          = -1
+#   from_port         = 0
+#   to_port           = 0
+#   cidr_blocks       = ["0.0.0.0/0"] # Will need to be locked down later
+# }
+
+# HTTPS ingress from private subnets (one rule per CIDR)
+resource "aws_vpc_security_group_ingress_rule" "adaptor_alb_ingress_443_a" {
   security_group_id = aws_security_group.adaptor_load_balancer.id
-  type              = "ingress"
-  description       = "HTTPS"
-  protocol          = "TCP"
+  cidr_ipv4         = data.aws_subnet.private_subnets_a.cidr_block
+  ip_protocol       = "tcp"
   from_port         = 443
   to_port           = 443
-  cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
+  description       = "HTTPS from private subnet A"
 }
 
-resource "aws_security_group_rule" "adaptor_alb_egress_all" {
+resource "aws_vpc_security_group_ingress_rule" "adaptor_alb_ingress_443_b" {
   security_group_id = aws_security_group.adaptor_load_balancer.id
-  type              = "egress"
-  description       = "All outbound"
-  protocol          = -1
-  from_port         = 0
-  to_port           = 0
-  cidr_blocks       = ["0.0.0.0/0"] # Will need to be locked down later
+  cidr_ipv4         = data.aws_subnet.private_subnets_b.cidr_block
+  ip_protocol       = "tcp"
+  from_port         = 443
+  to_port           = 443
+  description       = "HTTPS from private subnet B"
+}
+
+resource "aws_vpc_security_group_ingress_rule" "adaptor_alb_ingress_443_c" {
+  security_group_id = aws_security_group.adaptor_load_balancer.id
+  cidr_ipv4         = data.aws_subnet.private_subnets_c.cidr_block
+  ip_protocol       = "tcp"
+  from_port         = 443
+  to_port           = 443
+  description       = "HTTPS from private subnet C"
+}
+
+# All outbound traffic (to be locked down later)
+resource "aws_vpc_security_group_egress_rule" "adaptor_alb_egress_all" {
+  security_group_id = aws_security_group.adaptor_load_balancer.id
+  cidr_ipv4         = "0.0.0.0/0"
+  ip_protocol       = "-1"
+  description       = "Allow all outbound traffic (to be restricted later)"
 }
 
 #######################################
@@ -46,22 +82,40 @@ resource "aws_security_group" "ecs_tasks_adaptor" {
   )
 }
 
-resource "aws_security_group_rule" "ecs_tasks_adaptor_ingress" {
-  security_group_id        = aws_security_group.ecs_tasks_adaptor.id
-  type                     = "ingress"
-  description              = "adaptor App Port"
-  protocol                 = "TCP"
-  from_port                = local.application_data.accounts[local.environment].adaptor_server_port
-  to_port                  = local.application_data.accounts[local.environment].adaptor_server_port
-  source_security_group_id = aws_security_group.adaptor_load_balancer.id
+# resource "aws_security_group_rule" "ecs_tasks_adaptor_ingress" {
+#   security_group_id        = aws_security_group.ecs_tasks_adaptor.id
+#   type                     = "ingress"
+#   description              = "adaptor App Port"
+#   protocol                 = "TCP"
+#   from_port                = local.application_data.accounts[local.environment].adaptor_server_port
+#   to_port                  = local.application_data.accounts[local.environment].adaptor_server_port
+#   source_security_group_id = aws_security_group.adaptor_load_balancer.id
+# }
+
+# resource "aws_security_group_rule" "ecs_tasks_adaptor_egress_all" {
+#   security_group_id = aws_security_group.ecs_tasks_adaptor.id
+#   type              = "egress"
+#   description       = "All outbound"
+#   protocol          = -1
+#   from_port         = 0
+#   to_port           = 0
+#   cidr_blocks       = ["0.0.0.0/0"]
+# }
+
+# Ingress from ALB to ECS container port
+resource "aws_vpc_security_group_ingress_rule" "ecs_tasks_adaptor_ingress" {
+  security_group_id            = aws_security_group.ecs_tasks_adaptor.id
+  referenced_security_group_id = aws_security_group.adaptor_load_balancer.id
+  ip_protocol                  = "tcp"
+  from_port                    = local.application_data.accounts[local.environment].adaptor_server_port
+  to_port                      = local.application_data.accounts[local.environment].adaptor_server_port
+  description                  = "Allow ALB to reach adaptor container port"
 }
 
-resource "aws_security_group_rule" "ecs_tasks_adaptor_egress_all" {
+# All outbound traffic from ECS tasks
+resource "aws_vpc_security_group_egress_rule" "ecs_tasks_adaptor_egress_all" {
   security_group_id = aws_security_group.ecs_tasks_adaptor.id
-  type              = "egress"
-  description       = "All outbound"
-  protocol          = -1
-  from_port         = 0
-  to_port           = 0
-  cidr_blocks       = ["0.0.0.0/0"]
+  cidr_ipv4         = "0.0.0.0/0"
+  ip_protocol       = "-1"
+  description       = "Allow all outbound traffic"
 }
