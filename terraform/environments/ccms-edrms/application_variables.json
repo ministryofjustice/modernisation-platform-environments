@@ -12,7 +12,8 @@
       "container_cpu": "1024",
       "container_memory": "2048",
       "edrms_secret_keys": [
-        "ccms/edrms/datasource",
+        "spring_datasource_username",
+        "spring_datasource_password",
         "alerts_slack_channel_id"
       ],
       "northgate_gateway_ip": "152.114.58.102",

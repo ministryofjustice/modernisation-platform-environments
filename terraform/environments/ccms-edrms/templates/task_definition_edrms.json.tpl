@@ -22,10 +22,6 @@
         "value": "${spring_profiles_active}"
       },      
       {
-        "name": "SPRING_DATASOURCE_USERNAME",
-        "value": "${spring_datasource_username}"
-      },
-      {
         "name": "TARGET_NORTHGATE_HUB_DIME_URL",
         "value": "${target_northgate_hub_dime_url}"
       },
@@ -43,6 +39,10 @@
       }
     ],
     "secrets": [
+        {
+        "name": "SPRING_DATASOURCE_USERNAME",
+        "value": "${spring_datasource_username}"
+        },
         {
           "name": "SPRING_DATASOURCE_PASSWORD",
           "valueFrom": "${spring_datasource_password}"

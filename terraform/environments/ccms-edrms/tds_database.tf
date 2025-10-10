@@ -27,7 +27,7 @@ resource "aws_db_instance" "tds_db" {
   db_name                             = "EDRMSTDS"
   username                            = local.application_data.accounts[local.environment].tds_db_user
   # password                            = data.aws_secretsmanager_secret_version.spring_datasource_password.secret_string
-  password                            = local.edrms_secret["ccms/edrms/datasource"]
+  password                            = local.edrms_secret["spring_datasource_password"]
   port                                = "1521"
   kms_key_id                          = data.aws_kms_key.rds_shared.arn
   storage_encrypted                   = true
