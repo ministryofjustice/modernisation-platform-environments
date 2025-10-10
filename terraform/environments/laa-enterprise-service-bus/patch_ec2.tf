@@ -65,9 +65,13 @@ resource "aws_iam_role_policy" "ec2_debug_policy" {
         Effect = "Allow",
         Action = [
           "s3:GetObject",
-          "s3:ListBucket"
+          "s3:ListBucket",
+          "s3:PutObject"
         ],
-        Resource = "*"
+        Resource = [
+          aws_s3_bucket.patch_data[0].arn,
+          "${aws_s3_bucket.patch_data[0].arn}/*"
+        ]
       },
     ]
   })
