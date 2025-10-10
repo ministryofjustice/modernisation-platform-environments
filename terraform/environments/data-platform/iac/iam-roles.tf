@@ -30,5 +30,10 @@ module "data_platform_access_iam_role" {
       ]
       resources = ["${module.s3_bucket[0].s3_bucket_arn}/data-platform-access/*"]
     }
+    SecretsManagerAccess = {
+      effect    = "Allow"
+      actions   = ["secretsmanager:GetSecretValue"]
+      resources = [module.github_token_secret[0].secret_arn]
+    }
   }
 }
