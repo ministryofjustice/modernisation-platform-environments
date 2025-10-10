@@ -11,17 +11,8 @@ locals {
     data.aws_subnet.private_subnets_c.cidr_block
   ]
 
-  app_vars = jsondecode(file("${path.module}/application_variables.json"))
-  # environment     = trimprefix(terraform.workspace, "${var.networking[0].application}-")
-
-  edrms_secret_keys = local.app_vars.accounts[local.environment].edrms_secret_keys
-
-  edrms_secret_values = {
-    for key in local.edrms_secret_keys : replace(replace(key, "/", "_"), "-", "_") => "dummy"
-  }
-
-  edrms_secret = length(local.edrms_secret_values) > 0 ? jsondecode(data.aws_secretsmanager_secret_version.edrms_secret_version_current[0].secret_string) : null
-  spring_datasource_password_arn = length(local.edrms_secret_values) > 0 ? aws_secretsmanager_secret.edrms_secret[0].arn : null
+  edrms_secret = jsondecode(data.aws_secretsmanager_secret_version.edrms_secret_version_current.secret_string)
+  spring_datasource_password_arn = aws_secretsmanager_secret.edrms_secret.arn
   
   cert_opts    = aws_acm_certificate.external.domain_validation_options
   cert_arn     = aws_acm_certificate.external.arn

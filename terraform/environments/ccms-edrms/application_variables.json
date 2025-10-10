@@ -11,11 +11,6 @@
       "edrms_server_port": "8080",
       "container_cpu": "1024",
       "container_memory": "2048",
-      "edrms_secret_keys": [
-        "SPRING_DATASOURCE_USERNAME",
-        "SPRING_DATASOURCE_PASSWORD",
-        "alerts_slack_channel_id"
-      ],
       "northgate_gateway_ip": "152.114.58.102",
       "northgate_destination_cidr": "10.120.0.0/24",
       "aws_workspace": "10.200.0.0/19",
