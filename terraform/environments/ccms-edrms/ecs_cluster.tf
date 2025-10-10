@@ -50,7 +50,7 @@ resource "aws_ecs_task_definition" "edrms" {
       aws_region                    = local.application_data.accounts[local.environment].aws_region
       container_version             = local.application_data.accounts[local.environment].container_version
       spring_profiles_active        = local.application_data.accounts[local.environment].spring_profiles_active
-      # spring_datasource_username    = local.spring_datasource_password_arn
+      spring_datasource_username    = local.spring_datasource_password_arn
       # spring_datasource_password    = aws_secretsmanager_secret.spring_datasource_password.arn
       spring_datasource_password    = local.spring_datasource_password_arn
       target_northgate_hub_dime_url = local.application_data.accounts[local.environment].target_northgate_hub_dime_url
