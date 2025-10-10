@@ -103,14 +103,23 @@ resource "aws_security_group" "opahub_db" {
   )
 }
 
-resource "aws_security_group_rule" "opahub_db_ingress" {
+resource "aws_security_group_rule" "opahub_db_ingress_workspaces" {
+  security_group_id = aws_security_group.opahub_db.id
+  type              = "ingress"
+  description       = "MySQL access from Workspaces"
+  protocol          = "TCP"
+  from_port         = 3306
+  to_port           = 3306
+  cidr_blocks       = local.application_data.accounts[local.environment].aws_workspace
+}
+resource "aws_security_group_rule" "opahub_db_ingress_ec2" {
   security_group_id        = aws_security_group.opahub_db.id
   type                     = "ingress"
-  description              = "MySQL access from ECS tasks"
+  description              = "MySQL access from ECS Cluster EC2s"
   protocol                 = "TCP"
   from_port                = 3306
   to_port                  = 3306
-  source_security_group_id = aws_security_group.ecs_tasks_opa.id
+  source_security_group_id = aws_security_group.cluster_ec2.id
 }
 
 resource "aws_security_group_rule" "opahub_db_egress_all" {

@@ -7,24 +7,9 @@ resource "aws_wafv2_ip_set" "opahub_waf_ip_set" {
   description        = "List of trusted IP Addresses allowing access via WAF"
 
   addresses = [
-    "35.176.127.232/32", // Management DMZ Subnet A - London Non-Prod NAT Gateway
-    "35.177.145.193/32", // Management DMZ Subnet B - London Non-Prod NAT Gateway
-    "18.130.39.94/32",   // Management DMC Subnet C - London Non-Prod NAT Gateway
-    "52.56.212.11/32",   // Management DMZ Subnet A - London Prod NAT Gateway
-    "35.176.254.38/32",  // Management DMZ Subnet B - London Prod NAT Gateway
-    "35.177.173.197/32", // Management DMC Subnet C - London Prod NAT Gateway
-    "10.26.59.0/25",     // DEV NLB Subnet eu-west-2a
-    "10.26.59.128/25",   // DEV NLB Subnet eu-west-2b
-    "10.26.60.0/25",     // DEV NLB Subnet eu-west-2c
-    "10.26.99.0/25",     // TEST NLB Subnet eu-west-2a
-    "10.26.99.128/25",   // TEST NLB Subnet eu-west-2b
-    "10.26.100.0/25",    // TEST NLB Subnet eu-west-2c
-    "10.27.75.0/25",     // PREPROD NLB Subnet eu-west-2a
-    "10.27.75.128/25",   // PREPROD NLB Subnet eu-west-2b
-    "10.27.76.0/25",     // PREPROD NLB Subnet eu-west-2c
-    "10.27.67.0/25",     // PROD NLB Subnet eu-west-2a
-    "10.27.68.0/25",     // PROD NLB Subnet eu-west-2b
-    "10.27.67.128/25",   // PROD NLB Subnet eu-west-2c
+    local.application_data.accounts[local.environment].lz_aws_workspace_public_nat_gateway_a,
+    local.application_data.accounts[local.environment].lz_aws_workspace_public_nat_gateway_b,
+    local.application_data.accounts[local.environment].lz_aws_workspace_public_nat_gateway_c
   ]
 
   tags = merge(local.tags,
