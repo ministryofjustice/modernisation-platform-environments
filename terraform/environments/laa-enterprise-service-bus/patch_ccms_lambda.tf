@@ -55,8 +55,7 @@ resource "aws_lambda_function" "patch_ccms_provider_load" {
   runtime          = "python3.10"
 
   layers = [
-    aws_lambda_layer_version.lambda_layer_oracle_python.arn,
-    "arn:aws:lambda:eu-west-2:017000801446:layer:AWSLambdaPowertoolsPython:2"
+    aws_lambda_layer_version.lambda_layer_oracle_python.arn
   ]
 
   dead_letter_config {
@@ -73,8 +72,8 @@ resource "aws_lambda_function" "patch_ccms_provider_load" {
     variables = {
       DB_SECRET_NAME         = aws_secretsmanager_secret.patch_ccms_db_mp_credentials[0].name
       PROCEDURE_SECRET_NAME  = aws_secretsmanager_secret.patch_ccms_procedures_config[0].name
-      LD_LIBRARY_PATH        = "/opt/instantclient_12_2_linux"
-      ORACLE_HOME            = "/opt/instantclient_12_2_linux"
+      LD_LIBRARY_PATH        = "/opt/instantclient_12_1"
+      ORACLE_HOME            = "/opt/instantclient_12_1"
       SERVICE_NAME           = "ccms-load-service"
       NAMESPACE              = "HUB20-CCMS-NS"
       ENVIRONMENT            = local.environment

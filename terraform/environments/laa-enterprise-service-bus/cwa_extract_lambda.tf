@@ -61,8 +61,7 @@ resource "aws_lambda_function" "cwa_extract_lambda" {
   runtime          = "python3.10"
 
   layers = [
-    aws_lambda_layer_version.lambda_layer_oracle_python.arn,
-    "arn:aws:lambda:eu-west-2:017000801446:layer:AWSLambdaPowertoolsPython:2"
+    aws_lambda_layer_version.lambda_layer_oracle_python.arn
   ]
 
   vpc_config {
@@ -102,8 +101,7 @@ resource "aws_lambda_function" "cwa_file_transfer_lambda" {
   runtime          = "python3.10"
 
   layers = [
-    aws_lambda_layer_version.lambda_layer_oracle_python.arn,
-    "arn:aws:lambda:eu-west-2:017000801446:layer:AWSLambdaPowertoolsPython:2"
+    aws_lambda_layer_version.lambda_layer_oracle_python.arn
   ]
 
   vpc_config {
