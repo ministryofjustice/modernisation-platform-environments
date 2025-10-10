@@ -768,6 +768,7 @@ resource "aws_iam_policy" "glue_catalog_readonly" {
   policy      = data.aws_iam_policy_document.glue_catalog_readonly.json
 }
 
+
 # LakeFormation Data Access
 # Policy Document
 
@@ -786,6 +787,31 @@ resource "aws_iam_policy" "lake_formation_data_access" {
   name        = "${local.project}-lake-formation-data-access"
   description = "LakeFormation Get Data Access Policy"
   policy      = data.aws_iam_policy_document.lake_formation_data_access.json
+}
+
+# Lake formation permissions management
+
+data "aws_iam_policy_document" "lake_formation_permissions_management" {
+  statement {
+    actions = [
+
+      # Permission management
+      "lakeformation:GrantPermissions",
+      "lakeformation:RevokePermissions",
+      "lakeformation:BatchGrantPermissions",
+      "lakeformation:BatchRevokePermissions",
+      "lakeformation:ListPermissions",
+    ]
+    resources = [
+      "*"
+    ]
+  }
+}
+
+resource "aws_iam_policy" "lake_formation_permissions_management" {
+  name        = "${local.project}-lake-formation-permissions-management"
+  description = "LakeFormation permission management"
+  policy      = data.aws_iam_policy_document.lake_formation_permissions_management.json
 }
 
 
