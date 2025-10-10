@@ -85,6 +85,10 @@ resource "aws_security_group_rule" "ingress_traffic_ebsdb_152x" {
     local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_prod,
     local.application_data.accounts[local.environment].lz_aws_appstream_subnet_a_b,
   local.application_data.accounts[local.environment].cloud_platform_subnet]
+
+  lifecycle {
+    ignore_changes = [cidr_blocks]
+  }
 }
 
 ### Oracle
@@ -265,6 +269,10 @@ resource "aws_security_group_rule" "egress_traffic_ebsdb_152x" {
   from_port         = 1521
   to_port           = 1522
   cidr_blocks       = ["0.0.0.0/0"]
+
+  lifecycle {
+    ignore_changes = [cidr_blocks]
+  }
 }
 
 ### Oracle
