@@ -1,13 +1,14 @@
 #### This file can be used to store secrets specific to the member account ####
 
 resource "aws_secretsmanager_secret" "edrms_secret" {
+  count       = length(local.edrms_secret_values) > 0 ? 1 : 0
   name        = "edrms-secret"
   description = "EDRMS secret for CCMS EDRMS application"
 }
 
-
 resource "aws_secretsmanager_secret_version" "edrms_secret_version" {
-  secret_id     = aws_secretsmanager_secret.edrms_secret.id
+  count         = length(local.edrms_secret_values) > 0 ? 1 : 0
+  secret_id     = aws_secretsmanager_secret.edrms_secret[0].id
   secret_string = jsonencode(local.edrms_secret_values)
 }
 

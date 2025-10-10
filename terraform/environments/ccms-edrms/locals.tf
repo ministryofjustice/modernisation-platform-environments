@@ -17,8 +17,7 @@ locals {
   edrms_secret_keys = local.app_vars.accounts[local.environment].edrms_secret_keys
 
   edrms_secret_values = {
-    for key in local.edrms_secret_keys :
-    key => try(local.app_vars.accounts[local.environment][replace(replace(key, "/", "_"), "-", "_")], "dummy")
+    for key in local.edrms_secret_keys : replace(replace(key, "/", "_"), "-", "_") => "dummy"
   }
 
   edrms_secret = jsondecode(data.aws_secretsmanager_secret_version.edrms_secret_version_current.secret_string)
