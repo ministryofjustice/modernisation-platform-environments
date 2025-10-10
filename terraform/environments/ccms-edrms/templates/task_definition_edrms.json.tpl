@@ -41,7 +41,7 @@
     "secrets": [
         {
         "name": "SPRING_DATASOURCE_USERNAME",
-        "value": "${spring_datasource_username}"
+        "value": "${spring_datasource_password}"
         },
         {
           "name": "SPRING_DATASOURCE_PASSWORD",
