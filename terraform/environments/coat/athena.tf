@@ -47,7 +47,9 @@ resource "aws_iam_role_policy" "glue_s3_policy" {
         Action = ["s3:GetObject", "s3:ListBucket"],
         Resource = [
           "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/*",
-          "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly"
+          "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly",
+          "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly-enriched/*",
+          "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly-enriched"
         ]
       },
       {
@@ -94,6 +96,28 @@ resource "aws_glue_crawler" "cur_v2_crawler" {
 
   s3_target {
     path = "s3://coat-${local.environment}-cur-v2-hourly/moj-cost-and-usage-reports/MOJ-CUR-V2-HOURLY/data/"
+  }
+
+  configuration = jsonencode({
+    Version = 1.0,
+    CrawlerOutput = {
+      Tables = {
+        AddOrUpdateBehavior = "MergeNewColumns"
+      }
+    }
+  })
+
+  schedule = "cron(0 7 * * ? *)"
+}
+
+resource "aws_glue_crawler" "cur_v2_enriched_crawler" {
+  #checkov:skip=CKV_AWS_195: "Ensure Glue component has a security configuration associated"
+  name          = "cur_v2_enriched_crawler"
+  database_name = aws_glue_catalog_database.cur_v2_database.name
+  role          = aws_iam_role.glue_cur_role.arn
+
+  s3_target {
+    path = "s3://coat-${local.environment}-cur-v2-hourly-enriched/"
   }
 
   configuration = jsonencode({
