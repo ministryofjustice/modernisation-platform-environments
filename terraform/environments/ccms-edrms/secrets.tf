@@ -20,9 +20,9 @@ resource "aws_secretsmanager_secret_version" "edrms_secret_version" {
   }
 }
 
-# data "aws_secretsmanager_secret_version" "edrms_secret_version_current" {
-#   secret_id = aws_secretsmanager_secret.edrms_secret.id
-# }
+data "aws_secretsmanager_secret_version" "edrms_secret_version_current" {
+  secret_id = aws_secretsmanager_secret.edrms_secret.id
+}
 
 /*
   The combined secret above (resource: aws_secretsmanager_secret.edrms_secret
