@@ -227,7 +227,7 @@ variable "sftp_services" {
       name_prefix    = "siac"
       module_key     = "siac"
       sftp_port      = 10027
-      upload_enabled = true
+      upload_enabled = false
     },
     "tax_chancery_decisions" = {
       name_prefix    = "taxchancerydecisions"
