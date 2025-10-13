@@ -15,7 +15,7 @@
 module "s3_bucket_dms_destination" {
   #checkov:skip=CKV_TF_1
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
 
   bucket_name        = local.dms_s3_local_bucket_name
   versioning_enabled = false
