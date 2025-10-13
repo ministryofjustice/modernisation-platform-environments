@@ -25,7 +25,7 @@ data "aws_security_group" "dsd_db" {
 }
 
 module "dfi_instance" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v3.0.1"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v4.1.0"
 
   # allow environment not to have this var set and still work
   count = var.dfi_config != null ? var.dfi_config.instance_count : 0
@@ -53,7 +53,7 @@ module "dfi_instance" {
   }
   iam_resource_names_prefix = "${var.env_name}-dfi-${count.index + 1}"
   instance_profile_policies = [
-    "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+    # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore", added by module
     aws_iam_policy.secrets_manager.arn,
     aws_iam_policy.ec2_automation.arn
   ]

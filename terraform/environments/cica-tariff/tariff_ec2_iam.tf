@@ -45,15 +45,15 @@ resource "aws_iam_role_policy_attachment" "tariff_instance_ssm" {
 
 data "aws_iam_policy_document" "tariff_instance_cica_s3_access_data" {
   statement {
-    effect    = "Allow"
-    actions   = ["s3:GetObject*"]
+    effect  = "Allow"
+    actions = ["s3:GetObject*"]
     resources = [
       for bucket in local.cica_s3_resource : "${bucket}/export/*"
     ]
   }
   statement {
-    effect    = "Allow"
-    actions   = ["s3:ListBucket*"]
+    effect  = "Allow"
+    actions = ["s3:ListBucket*"]
     resources = [
       for bucket in local.cica_s3_resource : "${bucket}"
     ]
