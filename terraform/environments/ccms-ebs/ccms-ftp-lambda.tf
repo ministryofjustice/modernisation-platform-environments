@@ -36,8 +36,8 @@ locals {
   is_production    = local.environment == "production"
 
   # Days and ID label based on environment
-  expire_days = local.is_production ? 90 : 1
-  expire_id   = local.is_production ? "expire-90-days" : "expire-1-day"
+  expire_days = local.is_production ? 90 : 60
+  expire_id   = local.is_production ? "expire-90-days" : "expire-60-day"
  
 }
 
