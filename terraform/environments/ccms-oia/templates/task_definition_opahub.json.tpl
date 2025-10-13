@@ -80,7 +80,7 @@
       {
         "name": "WL_USER",
         "valueFrom": "${wl_user}"
-      },
+      }
     ]
   }
 ]
