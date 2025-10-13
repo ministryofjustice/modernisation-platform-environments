@@ -321,7 +321,8 @@ function handler(event) {
                     target: 'https://siac.decisions.tribunals.gov.uk',
                     exactMatch: true
                 }
-            ]
+            ],
+            aliases: ['www.siac.tribunals.gov.uk']
         },
         'fhsaa.tribunals.gov.uk': {
             defaultRedirect: 'https://www.gov.uk/guidance/appeal-to-the-primary-health-lists-tribunal',
@@ -331,7 +332,8 @@ function handler(event) {
                     target: 'https://phl.decisions.tribunals.gov.uk',
                     exactMatch: true
                 }
-            ]
+            ],
+            aliases: ['www.fhsaa.tribunals.gov.uk']
         },
         'estateagentappeals.tribunals.gov.uk': {
             defaultRedirect: 'https://www.gov.uk/guidance/estate-agents-appeal-against-a-ban-or-warning-order',
@@ -341,7 +343,8 @@ function handler(event) {
                     target: 'https://estateagentappeals.decisions.tribunals.gov.uk',
                     exactMatch: true
                 }
-            ]
+            ],
+            aliases: ['www.estateagentappeals.tribunals.gov.uk']
         },
         'consumercreditappeals.tribunals.gov.uk': {
             defaultRedirect: 'https://www.gov.uk/courts-tribunals/upper-tribunal-tax-and-chancery-chamber',
@@ -351,7 +354,8 @@ function handler(event) {
                     target: 'https://consumercreditappeals.decisions.tribunals.gov.uk',
                     exactMatch: true
                 }
-            ]
+            ],
+            aliases: ['www.consumercreditappeals.tribunals.gov.uk']
         },
         'charity.tribunals.gov.uk': {
             defaultRedirect: 'https://www.gov.uk/guidance/appeal-against-a-charity-commission-decision-about-your-charity',
@@ -361,7 +365,8 @@ function handler(event) {
                     target: 'https://charity.decisions.tribunals.gov.uk',
                     exactMatch: true
                 }
-            ]
+            ],
+            aliases: ['www.charity.tribunals.gov.uk']
         },
         'adjudicationpanel.tribunals.gov.uk': {
             defaultRedirect: 'https://www.gov.uk/government/organisations/hm-courts-and-tribunals-service',
@@ -371,7 +376,8 @@ function handler(event) {
                     target: 'https://localgovernmentstandards.decisions.tribunals.gov.uk',
                     exactMatch: false
                 }
-            ]
+            ],
+            aliases: ['www.adjudicationpanel.tribunals.gov.uk']
         },
         'asylum-support-tribunal.gov.uk': {
             defaultRedirect: 'https://www.gov.uk/courts-tribunals/first-tier-tribunal-asylum-support',
@@ -386,8 +392,11 @@ function handler(event) {
                     target: 'https://administrativeappeals.decisions.tribunals.gov.uk',
                     exactMatch: false
                 }
-            ]
+            ],
+            aliases: ['www.asylum-support-tribunal.gov.uk']
         },
+        // The following redirects are for domains not hosted in Modernisation Platform Route53
+        // Their external R53 will be updated by Tony Bishop to point to this CloudFront Server
         'ahmlr.gov.uk': {
             defaultRedirect: 'https://www.gov.uk/apply-land-registration-tribunal/overview',
             pathRedirects: [
@@ -396,11 +405,13 @@ function handler(event) {
                     target: 'https://landregistrationdivision.decisions.tribunals.gov.uk',
                     exactMatch: false
                 }
-            ]
+            ],
+            aliases: ['www.ahmlr.gov.uk']
         },
         'appeals-service.gov.uk': {
             defaultRedirect: 'https://www.gov.uk/social-security-child-support-tribunal',
-            pathRedirects: []
+            pathRedirects: [],
+            aliases: ['www.appeals-service.gov.uk']
         },
         'asylum-support-tribunals.gov.uk': {
             defaultRedirect: 'https://www.gov.uk/courts-tribunals/first-tier-tribunal-asylum-support',
@@ -415,7 +426,8 @@ function handler(event) {
                     target: 'https://administrativeappeals.decisions.tribunals.gov.uk',
                     exactMatch: false
                 }
-            ]
+            ],
+            aliases: ['www.asylum-support-tribunals.gov.uk']
         },
         'carestandardstribunal.gov.uk': {
             defaultRedirect: 'https://www.gov.uk/guidance/appeal-to-the-care-standards-tribunal',
@@ -430,7 +442,8 @@ function handler(event) {
                     target: 'https://cicap.decisions.tribunals.gov.uk',
                     exactMatch: false
                 }
-            ]
+            ],
+            aliases: ['www.carestandardstribunal.gov.uk']
         },
         'cicap.gov.uk': {
             defaultRedirect: 'https://www.gov.uk/criminal-injuries-compensation-tribunal',
@@ -445,156 +458,151 @@ function handler(event) {
                     target: 'https://cicap.decisions.tribunals.gov.uk',
                     exactMatch: false
                 }
-            ]
+            ],
+            aliases: ['www.cicap.gov.uk']
         },
         'civilappeals.gov.uk': {
             defaultRedirect: 'https://www.gov.uk/courts-tribunals/court-of-appeal-civil-division',
-            pathRedirects: []
+            pathRedirects: [],
+            aliases: ['www.civilappeals.gov.uk']
         },
         'cjit.gov.uk': {
             defaultRedirect: 'https://www.gov.uk/government/organisations/ministry-of-justice$request_uri',
-            pathRedirects: []
-        },
-        'www.cjit.gov.uk': {
-            defaultRedirect: 'https://www.gov.uk/government/organisations/ministry-of-justice$request_uri',
-            pathRedirects: []
+            pathRedirects: [],
+            aliases: ['www.cjit.gov.uk']
         },
         'cjs.gov.uk': {
             defaultRedirect: 'https://www.gov.uk/government/organisations/ministry-of-justice$request_uri',
-            pathRedirects: []
-        },
-        'www.cjs.gov.uk': {
-            defaultRedirect: 'https://www.gov.uk/government/organisations/ministry-of-justice$request_uri',
-            pathRedirects: []
+            pathRedirects: [],
+            aliases: ['www.cjs.gov.uk']
         },
         'cjsonline.gov.uk': {
             defaultRedirect: 'https://www.gov.uk/government/organisations/ministry-of-justice$request_uri',
-            pathRedirects: []
-        },
-        'www.cjsonline.gov.uk': {
-            defaultRedirect: 'https://www.gov.uk/government/organisations/ministry-of-justice$request_uri',
-            pathRedirects: []
+            pathRedirects: [],
+            aliases: ['www.cjsonline.gov.uk']
         },
         'complaints.judicialconduct.gov.uk': {
             defaultRedirect: 'https://www.complaints.judicialconduct.gov.uk$request_uri',
-            pathRedirects: []
+            pathRedirects: [],
+            aliases: ['www.complaints.judicialconduct.gov.uk']
         },
         'courtfines.justice.gov.uk': {
             defaultRedirect: 'https://courtfines.direct.gov.uk$request_uri',
-            pathRedirects: []
+            pathRedirects: [],
+            aliases: ['www.courtfines.justice.gov.uk']
         },
         'courtfunds.gov.uk': {
             defaultRedirect: 'https://www.gov.uk/contact-court-funds-office',
-            pathRedirects: []
-        },
-        'www.courtfunds.gov.uk': {
-            defaultRedirect: 'https://www.gov.uk/contact-court-funds-office',
-            pathRedirects: []
+            pathRedirects: [],
+            aliases: ['www.courtfunds.gov.uk']
         },
         'criminal-justice-system.gov.uk': {
             defaultRedirect: 'https://www.gov.uk/government/organisations/ministry-of-justice$request_uri',
-            pathRedirects: []
-        },
-        'www.criminal-justice-system.gov.uk': {
-            defaultRedirect: 'https://www.gov.uk/government/organisations/ministry-of-justice$request_uri',
-            pathRedirects: []
+            pathRedirects: [],
+            aliases: ['www.criminal-justice-system.gov.uk']
         },
         'dugganinquest.independent.gov.uk': {
             defaultRedirect: 'https://webarchive.nationalarchives.gov.uk/20151002140003/http://dugganinquest.independent.gov.uk$request_uri',
-            pathRedirects: []
+            pathRedirects: [],
+            aliases: ['www.dugganinquest.independent.gov.uk']
         },
         'employmentappeals.gov.uk': {
             defaultRedirect: 'https://www.gov.uk/courts-tribunals/employment-appeal-tribunal',
             pathRedirects: [
                 {
-                    paths: ['^/Public', '^/images', '^/Secure'],
-                    target: 'https://employmentappeals.decisions.tribunals.gov.uk/$request_uri',
+                    paths: ['/Public', '/public'],
+                    target: 'https://employmentappeals.decisions.tribunals.gov.uk$request_uri',
                     exactMatch: false
                 },
                 {
-                    paths: ['^/Judgments/tips.htm'],
+                    paths: ['/images', '/Images'],
+                    target: 'https://employmentappeals.decisions.tribunals.gov.uk$request_uri',
+                    exactMatch: false
+                },
+                {
+                    paths: ['/Secure', '/secure'],
+                    target: 'https://employmentappeals.decisions.tribunals.gov.uk$request_uri',
+                    exactMatch: false
+                },
+                {
+                    paths: ['/Judgments/tips.htm', '/judgments/tips.htm'],
                     target: 'https://employmentappeals.decisions.tribunals.gov.uk/Judgments/tips.htm',
-                    exactMatch: false
+                    exactMatch: true
                 },
                 {
-                    paths: ['^/login.aspx'],
+                    paths: ['/login.aspx'],
                     target: 'https://employmentappeals.decisions.tribunals.gov.uk/secure',
-                    exactMatch: false
+                    exactMatch: true
                 },
                 {
                     paths: ['.*\\.(css|js|png|ico|gif|jpg|jpeg)$'],
-                    target: 'https://cicap.decisions.tribunals.gov.uk/$request_uri',
+                    target: 'https://cicap.decisions.tribunals.gov.uk$request_uri',
                     exactMatch: false
                 }
-            ]
+            ],
+            aliases: ['www.employmentappeals.gov.uk']
         },
         'financeandtaxtribunals.gov.uk': {
             defaultRedirect: 'https://www.gov.uk/government/collections/upper-tribunal-tax-and-chancery-chamber',
             pathRedirects: [
                 {
-                    paths: ['^/aspx', '^/Decisions', '^/Admin', '^/JudgmentFiles', '.*\\.(css|js|png|ico|gif|jpg|jpeg)$'],
-                    target: 'https://financeandtax.decisions.tribunals.gov.uk/$request_uri',
+                    paths: ['/aspx', '/Aspx'],
+                    target: 'https://financeandtax.decisions.tribunals.gov.uk$request_uri',
+                    exactMatch: false
+                },
+                {
+                    paths: ['/Decisions', '/decisions'],
+                    target: 'https://financeandtax.decisions.tribunals.gov.uk$request_uri',
+                    exactMatch: false
+                },
+                {
+                    paths: ['/Admin', '/admin'],
+                    target: 'https://financeandtax.decisions.tribunals.gov.uk$request_uri',
+                    exactMatch: false
+                },
+                {
+                    paths: ['/JudgmentFiles', '/judgmentfiles'],
+                    target: 'https://financeandtax.decisions.tribunals.gov.uk$request_uri',
+                    exactMatch: false
+                },
+                {
+                    paths: ['.*\\.(css|js|png|ico|gif|jpg|jpeg)$'],
+                    target: 'https://financeandtax.decisions.tribunals.gov.uk$request_uri',
                     exactMatch: false
                 }
-            ]
+            ],
+            aliases: ['www.financeandtaxtribunals.gov.uk']
         },
         'hillsboroughinquests.independent.gov.uk': {
             defaultRedirect: 'https://webarchive.nationalarchives.gov.uk/20170404105742/https://hillsboroughinquests.independent.gov.uk$request_uri',
-            pathRedirects: []
-        },
-        'www.hillsboroughinquests.independent.gov.uk': {
-            defaultRedirect: 'https://webarchive.nationalarchives.gov.uk/20170404105742/https://hillsboroughinquests.independent.gov.uk$request_uri',
-            pathRedirects: []
+            pathRedirects: [],
+            aliases: ['www.hillsboroughinquests.independent.gov.uk']
         },
         'immigrationservicestribunal.gov.uk': {
             defaultRedirect: 'https://www.gov.uk/guidance/appeal-a-decision-on-your-registration-as-an-immigration-adviser',
             pathRedirects: [
                 {
-                    paths: ['^/Aspx', '^/aspx'],
+                    paths: ['/Aspx', '/aspx'],
                     target: 'https://immigrationservices.decisions.tribunals.gov.uk$request_uri',
                     exactMatch: false
                 },
                 {
-                    paths: ['^/Decisions', '^/decisions'],
+                    paths: ['/Decisions', '/decisions'],
                     target: 'https://immigrationservices.decisions.tribunals.gov.uk$request_uri',
                     exactMatch: false
                 },
                 {
-                    paths: ['^/Admin', '^/admin'],
+                    paths: ['/Admin', '/admin'],
                     target: 'https://immigrationservices.decisions.tribunals.gov.uk$request_uri',
                     exactMatch: false
                 },
                 {
-                    paths: ['^/JudgmentFiles', '^/judgmentfiles'],
+                    paths: ['/JudgmentFiles', '/judgmentfiles'],
                     target: 'https://immigrationservices.decisions.tribunals.gov.uk$request_uri',
                     exactMatch: false
                 }
-            ]
-        },
-        'www.immigrationservicestribunal.gov.uk': {
-            defaultRedirect: 'https://www.gov.uk/guidance/appeal-a-decision-on-your-registration-as-an-immigration-adviser',
-            pathRedirects: [
-                {
-                    paths: ['^/Aspx', '^/aspx'],
-                    target: 'https://immigrationservices.decisions.tribunals.gov.uk$request_uri',
-                    exactMatch: false
-                },
-                {
-                    paths: ['^/Decisions', '^/decisions'],
-                    target: 'https://immigrationservices.decisions.tribunals.gov.uk$request_uri',
-                    exactMatch: false
-                },
-                {
-                    paths: ['^/Admin', '^/admin'],
-                    target: 'https://immigrationservices.decisions.tribunals.gov.uk$request_uri',
-                    exactMatch: false
-                },
-                {
-                    paths: ['^/JudgmentFiles', '^/judgmentfiles'],
-                    target: 'https://immigrationservices.decisions.tribunals.gov.uk$request_uri',
-                    exactMatch: false
-                }
-            ]
+            ],
+            aliases: ['www.immigrationservicestribunal.gov.uk']
         },
         'informationtribunal.gov.uk': {
             defaultRedirect: 'https://www.gov.uk/guidance/information-rights-appeal-against-the-commissioners-decision',
@@ -604,7 +612,8 @@ function handler(event) {
                     target: 'https://informationrights.decisions.tribunals.gov.uk$request_uri',
                     exactMatch: false
                 }
-            ]
+            ],
+            aliases: ['www.informationtribunal.gov.uk']
         },
         'informationtribunal.dsd.io': {
             defaultRedirect: 'https://www.gov.uk/guidance/information-rights-appeal-against-the-commissioners-decision$request_uri',
@@ -619,13 +628,15 @@ function handler(event) {
                     target: 'https://www.google.com$request_uri',
                     exactMatch: false
                 }
-            ]
+            ],
+            aliases: ['www.informationtribunal.dsd.io']
         },
         'judicialombudsman.gov.uk': {
             defaultRedirect: 'https://www.gov.uk/government/organisations/judicial-appointments-and-conduct-ombudsman$request_uri',
-            pathRedirects: []
+            pathRedirects: [],
+            aliases: ['www.judicialombudsman.gov.uk']
         },
-        'www.landstribunal.gov.uk': {
+        'landstribunal.gov.uk': {
             defaultRedirect: 'https://www.gov.uk/appeal-upper-tribunal-lands',
             pathRedirects: [
                 {
@@ -638,11 +649,13 @@ function handler(event) {
                     target: 'https://landschamber.decisions.tribunals.gov.uk$request_uri',
                     exactMatch: false
                 }
-            ]
+            ],
+            aliases: ['www.landstribunal.gov.uk']
         },
         'obr.co.uk': {
             defaultRedirect: 'https://obr.uk$request_uri',
-            pathRedirects: []
+            pathRedirects: [],
+            aliases: ['www.obr.co.uk']
         },
         'osscsc.gov.uk': {
             defaultRedirect: 'https://www.gov.uk/courts-tribunals/upper-tribunal-administrative-appeals-chamber',
@@ -652,15 +665,18 @@ function handler(event) {
                     target: 'https://administrativeappeals.decisions.tribunals.gov.uk$request_uri',
                     exactMatch: false
                 }
-            ]
+            ],
+            aliases: ['www.osscsc.gov.uk']
         },
         'paroleboard.gov.uk': {
             defaultRedirect: 'https://www.gov.uk/government/organisations/parole-board',
-            pathRedirects: []
+            pathRedirects: [],
+            aliases: ['www.paroleboard.gov.uk']
         },
         'sendmoneytoaprisoner.justice.gov.uk': {
             defaultRedirect: 'https://sendmoneytoaprisoner.service.justice.gov.uk$request_uri',
-            pathRedirects: []
+            pathRedirects: [],
+            aliases: ['www.sendmoneytoaprisoner.justice.gov.uk']
         },
         'transporttribunal.gov.uk': {
             defaultRedirect: 'https://www.gov.uk/guidance/approved-driving-instructors-appeal-a-decision-by-the-registrar',
@@ -670,60 +686,67 @@ function handler(event) {
                     target: 'https://transportappeals.decisions.tribunals.gov.uk$request_uri',
                     exactMatch: false
                 }
-            ]
+            ],
+            aliases: ['www.transporttribunal.gov.uk']
         },
         'victiminformationservice.org.uk': {
             defaultRedirect: 'https://victimsinformationservice.org.uk$request_uri',
-            pathRedirects: []
+            pathRedirects: [],
+            aliases: ['www.victiminformationservice.org.uk']
         },
         'yjbpublications.justice.gov.uk': {
             defaultRedirect: 'https://www.gov.uk/government/publications?departments[]=youth-justice-board-for-england-and-wales',
-            pathRedirects: []
-        },
-        'www.yjbpublications.justice.gov.uk': {
-            defaultRedirect: 'https://www.gov.uk/government/publications?departments[]=youth-justice-board-for-england-and-wales',
-            pathRedirects: []
+            pathRedirects: [],
+            aliases: ['www.yjbpublications.justice.gov.uk']
         },
         // Add more domains here as provided
     };
 
-    if (redirectMap[host]) {
-        const config = redirectMap[host];
+    // Find matching config, checking aliases
+    var redirectConfig = null;
+    for (var domain in redirectMap) {
+        if (host === domain || (redirectMap[domain].aliases && redirectMap[domain].aliases.includes(host))) {
+            redirectConfig = redirectMap[domain];
+            break;
+        }
+    }
 
-        for (const pathConfig of config.pathRedirects) {
-            for (const path of pathConfig.paths) {
-                const isMatch = pathConfig.exactMatch
-                    ? uri.toLowerCase() === path.toLowerCase()
-                    : (path.startsWith('.*\\.') ? new RegExp(path, 'i').test(uri) : uri.toLowerCase().startsWith(path.toLowerCase()));
-                if (isMatch) {
-                    const redirectUrl = pathConfig.exactMatch
-                        ? pathConfig.target
-                        : pathConfig.target.includes('$request_uri')
-                            ? pathConfig.target.replace('$request_uri', uri)
-                            : pathConfig.target + uri;
-                    return {
-                        statusCode: 301,
-                        statusDescription: 'Moved Permanently',
-                        headers: {
-                            'location': { value: redirectUrl }
-                        }
-                    };
-                }
+    if (!redirectConfig) {
+        return request; // Pass through for unsupported domains
+    }
+
+    for (const pathConfig of redirectConfig.pathRedirects) {
+        for (const path of pathConfig.paths) {
+            const isMatch = pathConfig.exactMatch
+                ? uri.toLowerCase() === path.toLowerCase()
+                : (path.startsWith('.*\\.') ? new RegExp(path, 'i').test(uri) : uri.toLowerCase().startsWith(path.toLowerCase()));
+            if (isMatch) {
+                const redirectUrl = pathConfig.exactMatch
+                    ? pathConfig.target
+                    : pathConfig.target.includes('$request_uri')
+                        ? pathConfig.target.replace('$request_uri', uri)
+                        : pathConfig.target + uri;
+                return {
+                    statusCode: 301,
+                    statusDescription: 'Moved Permanently',
+                    headers: {
+                        'location': { value: redirectUrl }
+                    }
+                };
             }
         }
-
-        const defaultRedirectUrl = config.defaultRedirect.endsWith('$request_uri')
-            ? config.defaultRedirect.replace('$request_uri', uri)
-            : config.defaultRedirect;
-        return {
-            statusCode: 301,
-            statusDescription: 'Moved Permanently',
-            headers: {
-                'location': { value: defaultRedirectUrl }
-            }
-        };
     }
-    return request;
+
+    const defaultRedirectUrl = redirectConfig.defaultRedirect.endsWith('$request_uri')
+        ? redirectConfig.defaultRedirect.replace('$request_uri', uri)
+        : redirectConfig.defaultRedirect;
+    return {
+        statusCode: 301,
+        statusDescription: 'Moved Permanently',
+        headers: {
+            'location': { value: defaultRedirectUrl }
+        }
+    };
   }
   EOF
 }
