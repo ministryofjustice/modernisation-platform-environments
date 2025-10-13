@@ -48,7 +48,7 @@ module "auto_instance" {
   }
   iam_resource_names_prefix = "${var.env_name}-auto-${count.index + 1}"
   instance_profile_policies = [
-    "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+    # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore", added by module
     aws_iam_policy.secrets_manager.arn,
     aws_iam_policy.ec2_automation.arn
   ]
