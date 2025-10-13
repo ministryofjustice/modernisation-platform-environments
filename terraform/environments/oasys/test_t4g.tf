@@ -68,7 +68,6 @@ module "test-sg-for-t4" { #"my_t4_instance" {
       throughput = 125
       type       = "gp3"
   } }
-  /* ebs_volumes                = { "/dev/xvda" = {"app", size = 30} }*/
   ebs_volumes = {
     "/dev/xvda" = {
       size = 30
@@ -79,7 +78,9 @@ module "test-sg-for-t4" { #"my_t4_instance" {
     create_internal_record = false
     create_external_record = false
   }
-
+  /*instance_profile_policies = {
+  var.instance_profile_policies
+}*/
   business_unit    = module.environment.business_unit
   application_name = module.environment.application_name
 
