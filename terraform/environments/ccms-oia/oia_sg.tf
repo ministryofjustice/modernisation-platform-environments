@@ -1,6 +1,4 @@
-#######################################
 # OIA EC2 Instances Security Group
-#######################################
 
 resource "aws_security_group" "cluster_ec2" {
   name        = "${local.application_name}-cluster-ec2-security-group"
@@ -12,42 +10,14 @@ resource "aws_security_group" "cluster_ec2" {
   )
 }
 
-# resource "aws_security_group_rule" "cluster_ec2_ingress_opahub_lb" {
-#   security_group_id        = aws_security_group.cluster_ec2.id
-#   type                     = "ingress"
-#   description              = "Traffic from OPAHUB ALB to OIA EC2 instances"
-#   protocol                 = "TCP"
-#   from_port                = 0
-#   to_port                  = 65535
-#   source_security_group_id = aws_security_group.opahub_load_balancer.id
-# }
-
-# resource "aws_security_group_rule" "cluster_ec2_ingress_connector_lb" {
-#   security_group_id        = aws_security_group.cluster_ec2.id
-#   type                     = "ingress"
-#   description              = "Traffic from Connector ALB to OIA EC2 instances"
-#   protocol                 = "TCP"
-#   from_port                = 0
-#   to_port                  = 65535
-#   source_security_group_id = aws_security_group.connector_load_balancer.id
-# }
-
-# resource "aws_security_group_rule" "cluster_ec2_ingress_service_adaptor_lb" {
-#   security_group_id        = aws_security_group.cluster_ec2.id
-#   type                     = "ingress"
-#   description              = "Traffic from Service Adaptor ALB to OIA EC2 instances"
-#   protocol                 = "TCP"
-#   from_port                = 0
-#   to_port                  = 65535
-#   source_security_group_id = aws_security_group.adaptor_load_balancer.id
-# }
+# INGRESS Rules
 
 resource "aws_vpc_security_group_ingress_rule" "cluster_ec2_opahub_lb" {
   security_group_id            = aws_security_group.cluster_ec2.id
   referenced_security_group_id = aws_security_group.opahub_load_balancer.id
   ip_protocol                  = "tcp"
-  from_port                    = 0
-  to_port                      = 65535
+  from_port                    = local.application_data.accounts[local.environment].opa_server_port
+  to_port                      = local.application_data.accounts[local.environment].opa_server_port
   description                  = "Traffic from OPAHUB ALB to OIA EC2 instances"
 }
 
@@ -55,8 +25,8 @@ resource "aws_vpc_security_group_ingress_rule" "cluster_ec2_connector_lb" {
   security_group_id            = aws_security_group.cluster_ec2.id
   referenced_security_group_id = aws_security_group.connector_load_balancer.id
   ip_protocol                  = "tcp"
-  from_port                    = 0
-  to_port                      = 65535
+  from_port                    = local.application_data.accounts[local.environment].connector_server_port
+  to_port                      = local.application_data.accounts[local.environment].connector_server_port
   description                  = "Traffic from Connector ALB to OIA EC2 instances"
 }
 
@@ -64,21 +34,13 @@ resource "aws_vpc_security_group_ingress_rule" "cluster_ec2_service_adaptor_lb" 
   security_group_id            = aws_security_group.cluster_ec2.id
   referenced_security_group_id = aws_security_group.adaptor_load_balancer.id
   ip_protocol                  = "tcp"
-  from_port                    = 0
-  to_port                      = 65535
+  from_port                    = local.application_data.accounts[local.environment].adaptor_server_port
+  to_port                      = local.application_data.accounts[local.environment].adaptor_server_port
   description                  = "Traffic from Service Adaptor ALB to OIA EC2 instances"
 }
 
 
-# resource "aws_security_group_rule" "cluster_ec2_egress_all" {
-#   security_group_id = aws_security_group.cluster_ec2.id
-#   type              = "egress"
-#   description       = "All outbound"
-#   protocol          = -1
-#   from_port         = 0
-#   to_port           = 0
-#   cidr_blocks       = ["0.0.0.0/0"]
-# }
+# EGRESS Rules
 
 resource "aws_vpc_security_group_egress_rule" "cluster_ec2_all" {
   security_group_id = aws_security_group.cluster_ec2.id
