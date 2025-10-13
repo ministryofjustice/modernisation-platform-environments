@@ -25,8 +25,8 @@ resource "aws_db_instance" "tds_db" {
   instance_class                      = local.application_data.accounts[local.environment].tds_db_instance_type
   multi_az                            = local.application_data.accounts[local.environment].tds_db_deploy_to_multi_azs
   db_name                             = "EDRMSTDS"
-  # username                            = local.application_data.accounts[local.environment].tds_db_user
-  username                            =  "${aws_secretsmanager_secret.edrms_secret.arn}:tds_db_user::"
+  username                            = local.application_data.accounts[local.environment].tds_db_user
+  # username                            =  "${aws_secretsmanager_secret.edrms_secret.arn}:tds_db_user::"
   # password                            = data.aws_secretsmanager_secret_version.spring_datasource_password.secret_string
   password                            = "${aws_secretsmanager_secret.edrms_secret.arn}:spring_datasource_password::"
   port                                = "1521"
