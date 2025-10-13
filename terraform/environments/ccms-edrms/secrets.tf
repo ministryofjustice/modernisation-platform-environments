@@ -8,9 +8,9 @@ resource "aws_secretsmanager_secret" "edrms_secret" {
 resource "aws_secretsmanager_secret_version" "edrms_secret_version" {
   secret_id     = aws_secretsmanager_secret.edrms_secret.id
   secret_string = jsonencode({
-    "spring_datasource_username" = "dummy",
-    "spring_datasource_password" = "dummy",
-    "alerts_slack_channel_id"    = "dummy"
+    "spring_datasource_username" = "",
+    "spring_datasource_password" = "",
+    "alerts_slack_channel_id"    = ""
   })
 
   lifecycle {
