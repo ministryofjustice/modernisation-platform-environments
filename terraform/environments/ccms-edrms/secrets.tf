@@ -10,14 +10,15 @@ resource "aws_secretsmanager_secret_version" "edrms_secret_version" {
   secret_string = jsonencode({
     "spring_datasource_username" = "",
     "spring_datasource_password" = "",
-    "alerts_slack_channel_id"    = ""
+    "alerts_slack_channel_id"    = "",
+    "tds_db_user"    = "admin"
   })
 
-  lifecycle {
-    ignore_changes = [
-      secret_string
-    ]
-  }
+  # lifecycle {
+  #   ignore_changes = [
+  #     secret_string
+  #   ]
+  # }
 }
 
 data "aws_secretsmanager_secret_version" "edrms_secret_version_current" {
