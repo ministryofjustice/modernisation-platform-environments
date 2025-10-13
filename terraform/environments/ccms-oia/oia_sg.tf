@@ -16,8 +16,8 @@ resource "aws_vpc_security_group_ingress_rule" "cluster_ec2_opahub_lb" {
   security_group_id            = aws_security_group.cluster_ec2.id
   referenced_security_group_id = aws_security_group.opahub_load_balancer.id
   ip_protocol                  = "tcp"
-  from_port                    = local.application_data.accounts[local.environment].opa_server_port
-  to_port                      = local.application_data.accounts[local.environment].opa_server_port
+  from_port                    = 0
+  to_port                      = 65353
   description                  = "Traffic from OPAHUB ALB to OIA EC2 instances"
 }
 
@@ -25,8 +25,8 @@ resource "aws_vpc_security_group_ingress_rule" "cluster_ec2_connector_lb" {
   security_group_id            = aws_security_group.cluster_ec2.id
   referenced_security_group_id = aws_security_group.connector_load_balancer.id
   ip_protocol                  = "tcp"
-  from_port                    = local.application_data.accounts[local.environment].connector_server_port
-  to_port                      = local.application_data.accounts[local.environment].connector_server_port
+  from_port                    = 0
+  to_port                      = 65353
   description                  = "Traffic from Connector ALB to OIA EC2 instances"
 }
 
@@ -34,8 +34,8 @@ resource "aws_vpc_security_group_ingress_rule" "cluster_ec2_service_adaptor_lb" 
   security_group_id            = aws_security_group.cluster_ec2.id
   referenced_security_group_id = aws_security_group.adaptor_load_balancer.id
   ip_protocol                  = "tcp"
-  from_port                    = local.application_data.accounts[local.environment].adaptor_server_port
-  to_port                      = local.application_data.accounts[local.environment].adaptor_server_port
+  from_port                    = 0
+  to_port                      = 65353
   description                  = "Traffic from Service Adaptor ALB to OIA EC2 instances"
 }
 
