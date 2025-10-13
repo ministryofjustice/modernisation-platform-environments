@@ -5,7 +5,7 @@ module "template" {
 
   source = "github.com/ministryofjustice/modernisation-platform-terraform-aws-chatbot?ref=0ec33c7bfde5649af3c23d0834ea85c849edf3ac" # v3.0.0
 
-  slack_channel_id = aws_secretsmanager_secret.edrms_secret_version.secret_string["alerts_slack_channel_id"]
+  slack_channel_id = aws_secretsmanager_secret_version.edrms_secret_version.secret_string["alerts_slack_channel_id"]
   sns_topic_arns   = ["arn:aws:sns:eu-west-2:${local.environment_management.account_ids[terraform.workspace]}:cloudwatch-slack-alerts"]
   tags             = local.tags
   application_name = local.application_name
