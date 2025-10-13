@@ -29,7 +29,7 @@ resource "aws_security_group" "lambda_security_group" {
   )
 }
 
-# hashicorp recommened Ingress rule of lambda_security_group
+# hashicorp recommened Ingress rule of INGRESS lambda_security_group
 resource "aws_vpc_security_group_ingress_rule" "lambda_ingress" {
   security_group_id = aws_security_group.lambda_security_group.id
   description       = "Allow FTP lambda inbound traffic"
@@ -39,7 +39,7 @@ resource "aws_vpc_security_group_ingress_rule" "lambda_ingress" {
   to_port           = 1522
 }
 
-# hashicorp recommened egress rule of lambda_security_group
+# hashicorp recommened egress rule of EGRESS lambda_security_group
 resource "aws_vpc_security_group_egress_rule" "lambda_egress" {
   security_group_id = aws_security_group.lambda_security_group.id
   description       = "Allow FTP lambdaall outbound traffic"
