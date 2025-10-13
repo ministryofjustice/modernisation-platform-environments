@@ -30,9 +30,9 @@ resource "aws_wafv2_ip_set" "opahub_waf_ip_set_web_determinations" {
   description        = "Trusted IPs for /opa/web-determinations/* path (Prod only)"
 
   addresses = [
-    local.application_data.accounts[local.environment].restricted_nat_gateway_a,
-    local.application_data.accounts[local.environment].restricted_nat_gateway_b,
-    local.application_data.accounts[local.environment].restricted_nat_gateway_c,
+    local.application_data.accounts[local.environment].mp_nat_gateway_a,
+    local.application_data.accounts[local.environment].mp_nat_gateway_b,
+    local.application_data.accounts[local.environment].mp_nat_gateway_c,
     "89.45.177.118/32" # Sahid
   ]
 
