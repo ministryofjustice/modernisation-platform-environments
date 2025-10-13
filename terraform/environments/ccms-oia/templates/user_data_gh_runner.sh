@@ -24,10 +24,10 @@ chown -R ec2-user:ec2-user /home/ec2-user/actions-runner
 
 # Install Git
 
-dnf install -y git
+dnf install -y git git-lfs
 
-# Install Git LFS
-git lfs install --system
+# # Install Git LFS
+# git lfs install --system
 
 # Install Java
 dnf install -y java-17-amazon-corretto java-17-amazon-corretto-devel
