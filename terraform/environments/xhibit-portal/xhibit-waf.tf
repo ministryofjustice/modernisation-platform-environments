@@ -35,7 +35,7 @@ resource "aws_wafv2_ip_set" "prtg_waf_ip_set" {
     "66.155.16.61/32",   // SBEL Wifi
     "66.155.16.68/32",   // SBEL Wifi
     "86.16.40.31/32",    // ZP
-    "90.247.66.20/32",   // TM
+    "90.247.105.163/32", // TM
     "92.236.109.133/32", // GD Wifi
     "100.44.12.86/32",   // MoJ Digital Wifi
     "128.77.75.64/26",   // MoJ Prisma VPN Gateway

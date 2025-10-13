@@ -141,56 +141,52 @@ locals {
       })
 
       pd-cafm-a-12-b = merge(local.ec2_instances.app, {
+        cloudwatch_metric_alarms = {}
         #cloudwatch_metric_alarms = merge(
         #  local.ec2_instances.app.cloudwatch_metric_alarms,
         #  module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows
         #)
         config = merge(local.ec2_instances.app.config, {
-          ami_name          = "pd-cafm-a-12-b"
+          ami_name          = "pd-cafm-a-2022-image-20250806T1436"
           availability_zone = "eu-west-2b"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
           "/dev/sdb"  = { type = "gp3", size = 200 }
-          # "xvde"      = { type = "gp3", size = 6, snapshot_id = "snap-040a13a16f7ffb223" } # Windows 2019 English Installation Media
-          # "xvdf"      = { type = "gp3", size = 6, snapshot_id = "snap-04435aa8246764616" } # Windows 2022 English Installation Media
         }
         instance = merge(local.ec2_instances.app.instance, {
           disable_api_termination = true
           instance_type           = "t3.xlarge"
         })
         tags = merge(local.ec2_instances.app.tags, {
-          ami              = "pd-cafm-a-12-b"
           description      = "RDS session host and app Server"
-          pre-migration    = "PDFAW0012"
           update-ssm-agent = "patchgroup2"
+          server-type      = "PlanetFMApp"
         })
       })
 
       pd-cafm-a-13-a = merge(local.ec2_instances.app, {
+        cloudwatch_metric_alarms = {}
         #cloudwatch_metric_alarms = merge(
         #  local.ec2_instances.app.cloudwatch_metric_alarms,
         #  module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows
         #)
         config = merge(local.ec2_instances.app.config, {
-          ami_name          = "pd-cafm-a-13-a"
+          ami_name          = "pd-cafm-a-2022-image-20250806T1436"
           availability_zone = "eu-west-2a"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
-          "/dev/sdb"  = { type = "gp3", size = 28 }
-          # "xvde"      = { type = "gp3", size = 6, snapshot_id = "snap-040a13a16f7ffb223" } # Windows 2019 English Installation Media
-          # "xvdf"      = { type = "gp3", size = 6, snapshot_id = "snap-04435aa8246764616" } # Windows 2022 English Installation Media
+          "/dev/sdb"  = { type = "gp3", size = 200 }
         }
         instance = merge(local.ec2_instances.app.instance, {
           disable_api_termination = true
           instance_type           = "t3.xlarge"
         })
         tags = merge(local.ec2_instances.app.tags, {
-          ami              = "pd-cafm-a-13-a"
-          description      = "RDS session host and App Server"
-          pre-migration    = "PDFAW0013"
+          description      = "RDS session host and app Server"
           update-ssm-agent = "patchgroup1"
+          server-type      = "PlanetFMApp"
         })
       })
 

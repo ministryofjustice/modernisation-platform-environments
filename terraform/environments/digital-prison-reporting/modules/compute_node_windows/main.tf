@@ -70,8 +70,9 @@ resource "aws_security_group_rule" "windows_egress" {
   security_group_id = aws_security_group.windows_sg[0].id
   description       = "Allow windows egress"
 }
-# checkov:skip=CKV_AWS_79: IMDSv1 is required for compatibility with legacy systems
+
 resource "aws_launch_template" "windows_template" {
+  # checkov:skip=CKV_AWS_79: IMDSv1 is required for compatibility with legacy systems
   count = var.enable_compute_node ? 1 : 0
 
   name_prefix   = "${var.name}-win-template"

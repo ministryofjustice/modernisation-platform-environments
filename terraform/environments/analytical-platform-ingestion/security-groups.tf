@@ -1,3 +1,10 @@
+locals {
+  transfer_server_cidr_blocks_distinct = setunion(
+    flatten([for k, v in local.environment_configuration.transfer_server_sftp_users : v.cidr_blocks]),
+    flatten([for k, v in local.environment_configuration.transfer_server_sftp_users_with_egress : v.cidr_blocks])
+  )
+}
+
 resource "aws_security_group" "connected_vpc_endpoints" {
   #checkov:skip=CKV2_AWS_5
 
@@ -16,11 +23,28 @@ resource "aws_security_group" "isolated_vpc_endpoints" {
   tags        = local.tags
 }
 
-resource "aws_security_group" "transfer_server" {
+module "transfer_server_security_group" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+
+  source  = "terraform-aws-modules/security-group/aws"
+  version = "5.3.0"
+
+  name        = "${local.application_name}-${local.environment}-transfer-server"
   description = "Security Group for Transfer Server"
-  name        = "transfer-server"
-  vpc_id      = module.isolated_vpc.vpc_id
-  tags        = local.tags
+
+  vpc_id = module.isolated_vpc.vpc_id
+
+  ingress_with_cidr_blocks = [
+    {
+      from_port   = 2222
+      to_port     = 2222
+      protocol    = "tcp"
+      description = ""
+      cidr_blocks = join(",", [for s in local.transfer_server_cidr_blocks_distinct : s])
+    }
+  ]
+
+  tags = local.tags
 }
 
 #tfsec:ignore:avd-aws-0104 - The security group is attached to the resource

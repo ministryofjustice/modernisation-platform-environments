@@ -120,7 +120,7 @@ locals {
 
 module "s3_bucket_ldap_data_refresh" {
   #checkov:skip=CKV_TF_1
-  source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
+  source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
   bucket_name         = "${var.env_name}-ldap-data-refresh-incoming"
   versioning_enabled  = false
   ownership_controls  = "BucketOwnerEnforced"
