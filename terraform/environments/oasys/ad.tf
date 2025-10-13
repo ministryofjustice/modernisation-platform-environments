@@ -1,21 +1,20 @@
-resource "aws_security_group" "mis_ad_dns_resolver_security_group" {
-  dynamic "ip_address" {
-    for_each = var.account_config.private_subnet_ids
-    content {
-      subnet_id = ip_address.value
-    }
-  }
-}
-
 variable "instance_profile_policies" {
   type        = string
   description = "A list of managed IAM policy document ARNs to be attached to the database instance profile"
+  default     = " "
 }
-/*resource "aws_iam_role_policy_attachment" "this" {*/
-/* policy = { 
+/*resource "aws_iam_role_policy_attachment" "this" {
+policy = { 
   var.instance_profile_policies
   }
-/*}*/
+}*/
+
+resource "aws_subnet" "public_a" {
+  public = subnetaws_subnet.public_a
+  vpc_id = vpc
+
+}
+
 variable "default_policy_arn" {
   description = "Default policy ARN to attach"
   type        = string

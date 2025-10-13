@@ -2,7 +2,7 @@ resource "aws_security_group" "test-sg-for-t4" {
   count = local.is-development ? 1 : 0
   #checkov:skip=CKV_AWS_23: "Ensure every security group and rule has a description"
   #checkov:skip=CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
-  vpc_id      = data.aws_vpc.shared.id
+  vpc_id      = resource.aws_subnet.public_a.id
   name        = "test-sec-group"
   description = "Allow all outbound traffic"
   egress {
@@ -40,7 +40,7 @@ resource "aws_instance" "my_t4_instance" {
   availability_zone           = "eu-west-2a"
   ebs_optimized               = true
   user_data_replace_on_change = true
-  subnet_id                   = data.aws_subnet.data_subnets_a.id
+
   tags = {
     Name = "First t4 test instance"
   }
@@ -49,7 +49,7 @@ resource "aws_instance" "my_t4_instance" {
 module "test-sg-for-t4" { #"my_t4_instance" {
   #checkov:skip=CKV_TF_1:Ensure Terraform module sources use a commit hash; skip as this is MoJ Repo
   source    = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v3.0.1"
-  subnet_id = ip_address.value
+  subnet_id = aws_subnet.public_a.id /*ip_address.values*/
   count     = local.is-development ? 1 : 0
   providers = { aws.core-vpc = aws.core-vpc
   }
@@ -57,7 +57,7 @@ module "test-sg-for-t4" { #"my_t4_instance" {
   tags = {
     Name = "test-t4-instance"
   }
-  instance = "vpc-01d7a2da8f9f1dfec"
+  instance = vpc-01d7a2da8f9f1dfec /* true */
   instance_profile_policies = {
   account_ids = local.environment_management.account_ids }
   environment = "test_y4g.tf"
