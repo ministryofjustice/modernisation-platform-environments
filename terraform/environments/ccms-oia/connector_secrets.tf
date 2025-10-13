@@ -21,11 +21,11 @@ resource "aws_secretsmanager_secret_version" "connector_secrets" {
     "spring_datasource_password" = ""
   })
 
-  # lifecycle {
-  #   ignore_changes = [
-  #     secret_string
-  #   ]
-  # }
+  lifecycle {
+    ignore_changes = [
+      secret_string
+    ]
+  }
 }
 
 # CCMS SOA SOAP User Password

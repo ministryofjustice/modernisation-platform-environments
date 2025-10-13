@@ -18,12 +18,17 @@ resource "aws_secretsmanager_secret_version" "opahub_secrets" {
     "secret_key" = ""
   })
 
-  # lifecycle {
-  #   ignore_changes = [
-  #     secret_string
-  #   ]
-  # }
+  lifecycle {
+    ignore_changes = [
+      secret_string
+    ]
+  }
 }
+
+data "aws_secretsmanager_secret_version" "opahub_secrets" {
+  secret_id = aws_secretsmanager_secret.opahub_secrets.id
+}
+
 
 # OPAHub App Password
 resource "aws_secretsmanager_secret" "opahub_password" {
