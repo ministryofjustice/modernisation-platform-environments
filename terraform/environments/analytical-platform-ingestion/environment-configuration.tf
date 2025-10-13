@@ -25,7 +25,7 @@ locals {
       notify_image_version   = "0.0.23"
 
       /* Target Buckets */
-      target_buckets              = [
+      target_buckets = [
         "mojap-land-dev",
         "cloud-platform-40748c2df4b92e2dfd779a02841187ec"
       ]

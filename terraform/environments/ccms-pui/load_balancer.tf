@@ -23,7 +23,7 @@ resource "aws_lb_target_group" "pui_target_group" {
   stickiness {
     type            = "lb_cookie"
     cookie_duration = 7200
-    enabled = true
+    enabled         = true
   }
 
   health_check {

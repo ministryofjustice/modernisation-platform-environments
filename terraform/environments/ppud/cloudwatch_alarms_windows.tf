@@ -81,7 +81,7 @@ resource "aws_cloudwatch_metric_alarm" "low_disk_space_D_volume" {
 
 locals {
   volume_alert_config = local.is-production ? {
-      "i-00413756d2dfcf6d2" = {
+    "i-00413756d2dfcf6d2" = {
       volumes = {
         "E:" = 5
       },
@@ -134,7 +134,7 @@ locals {
   volume_alarm_map = {
     for item in local.volume_alarm_matrix :
     item.key => item
-  } 
+  }
 }
 
 resource "aws_cloudwatch_metric_alarm" "low_disk_space_EFGH_volume" {
