@@ -126,7 +126,7 @@
       {
         "name": "spring_datasource_username",
         "valueFrom": "${spring_datasource_username}"
-      },
+      }
     ]
   }
 ]
