@@ -25,8 +25,8 @@ resource "aws_db_instance" "opahub_db" {
   storage_encrypted   = true
   deletion_protection = false
   multi_az            = true
-  username            = "${aws_secretsmanager_secret.opahub_secrets.arn}:db_user::"
-  password            = "${aws_secretsmanager_secret.opahub_secrets.arn}:db_password::"
+  username            = jsondecode(aws_secretsmanager_secret_version.opahub_secrets.secret_string)["db_user"]
+  password            = jsondecode(aws_secretsmanager_secret_version.opahub_secrets.secret_string)["db_password"]
   port                = 3306
 
   vpc_security_group_ids  = [aws_security_group.opahub_db.id]
@@ -40,9 +40,9 @@ resource "aws_db_instance" "opahub_db" {
   tags = merge(local.tags, {
     Name = "${local.opa_app_name}-db"
   })
-  lifecycle {
-    ignore_changes = [
-      username
-    ]
-  }
+  # lifecycle {
+  #   ignore_changes = [
+  #     username
+  #   ]
+  # }
 }
