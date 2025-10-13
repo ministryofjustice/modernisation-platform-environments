@@ -575,7 +575,7 @@ data "aws_iam_policy_document" "process_fms_metadata_lambda_role_policy_document
     ]
   }
   statement {
-    sid = "SQSQueuePermissions"
+    sid    = "SQSQueuePermissions"
     effect = "Allow"
     actions = [
       "sqs:SendMessage"
