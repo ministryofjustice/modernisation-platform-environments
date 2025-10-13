@@ -16,11 +16,11 @@ resource "aws_secretsmanager_secret_version" "service_adaptor_secrets" {
     "server_opa10assess_security_user_password" = ""
   })
 
-  # lifecycle {
-  #   ignore_changes = [
-  #     secret_string
-  #   ]
-  # }
+  lifecycle {
+    ignore_changes = [
+      secret_string
+    ]
+  }
 }
 
 
