@@ -28,14 +28,6 @@
         "value": "${db_host}"
       },
       {
-        "name": "DB_USER",
-        "value": "${db_user}"
-      },
-      {
-        "name": "WL_USER",
-        "value": "${wl_user}"
-      },
-      {
         "name": "USER_MEM_ARGS",
         "value": "${wl_mem_args}"
       },
@@ -80,7 +72,15 @@
       {
         "name": "SECRET_KEY",
         "valueFrom": "${secret_key}"
-      }
+      },
+      {
+        "name": "DB_USER",
+        "valueFrom": "${db_user}"
+      },
+      {
+        "name": "WL_USER",
+        "valueFrom": "${wl_user}"
+      },
     ]
   }
 ]

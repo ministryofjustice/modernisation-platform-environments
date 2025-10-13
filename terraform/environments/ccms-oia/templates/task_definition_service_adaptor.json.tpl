@@ -30,16 +30,8 @@
         "value": "${client_opa12assess_billing_address}"
       },
       {
-        "name": "CLIENT_OPA12ASSESS_SECURITY_USER_NAME",
-        "value": "${client_opa12assess_security_user_name}"
-      },
-      {
         "name": "SERVER_OPA10ASSESS_PATH",
         "value": "/opadrulebase"
-      },
-      {
-        "name": "SERVER_OPA10ASSESS_SECURITY_USER_NAME",
-        "value": "${server_opa10assess_security_user_name}"
       },
       {
         "name": "CXF_PATH",
@@ -58,6 +50,14 @@
       {
         "name": "SERVER_OPA10ASSESS_SECURITY_USER_PASSWORD",
         "valueFrom": "${server_opa10assess_security_user_password}"
+      },
+      {
+        "name": "SERVER_OPA10ASSESS_SECURITY_USER_NAME",
+        "value": "${server_opa10assess_security_user_name}"
+      },
+      {
+        "name": "CLIENT_OPA12ASSESS_SECURITY_USER_NAME",
+        "value": "${client_opa12assess_security_user_name}"
       }
     ]
   }

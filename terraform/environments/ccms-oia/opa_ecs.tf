@@ -41,14 +41,14 @@ resource "aws_ecs_task_definition" "opahub" {
       server_port       = local.application_data.accounts[local.environment].opa_server_port
       aws_region        = local.application_data.accounts[local.environment].aws_region
       container_version = local.application_data.accounts[local.environment].opa_container_version
-      opahub_password   = aws_secretsmanager_secret.opahub_password.arn
+      opahub_password   = "${aws_secretsmanager_secret.connector_secrets.arn}:opahub_password::"
       db_host           = aws_db_instance.opahub_db.endpoint
-      db_user           = local.application_data.accounts[local.environment].db_user
-      db_password       = aws_secretsmanager_secret.opahub_db_password.arn
-      wl_user           = local.application_data.accounts[local.environment].wl_user
-      wl_password       = aws_secretsmanager_secret.wl_password.arn
+      db_user           = "${aws_secretsmanager_secret.connector_secrets.arn}:db_user::"
+      db_password       = "${aws_secretsmanager_secret.connector_secrets.arn}:db_password::"
+      wl_user           = "${aws_secretsmanager_secret.connector_secrets.arn}:wl_user::"
+      wl_password       = "${aws_secretsmanager_secret.connector_secrets.arn}:wl_password::"
       wl_mem_args       = local.application_data.accounts[local.environment].wl_mem_args
-      secret_key        = aws_secretsmanager_secret.secret_key.arn
+      secret_key        = "${aws_secretsmanager_secret.connector_secrets.arn}:secret_key::"
       create_database   = local.application_data.accounts[local.environment].create_database
     }
   )

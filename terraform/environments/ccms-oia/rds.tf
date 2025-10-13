@@ -25,8 +25,8 @@ resource "aws_db_instance" "opahub_db" {
   storage_encrypted   = true
   deletion_protection = false
   multi_az            = true
-  username            = local.application_data.accounts[local.environment].db_user
-  password            = data.aws_secretsmanager_secret_version.opahub_db_password.secret_string
+  username            = "${aws_secretsmanager_secret.connector_secrets.arn}:db_user::"
+  password            = "${aws_secretsmanager_secret.connector_secrets.arn}:db_password::"
   port                = 3306
 
   vpc_security_group_ids  = [aws_security_group.opahub_db.id]

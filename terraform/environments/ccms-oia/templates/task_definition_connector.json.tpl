@@ -22,18 +22,6 @@
         "value": "${environment_connector}"
       },
       {
-        "name": "ccms_soa_soapHeaderUserName",
-        "value": "${ccms_soa_soapHeaderUserName}"
-      },
-      {
-        "name": "ccms_connector_service_userid",
-        "value": "${ccms_connector_service_userid}"
-      },
-      {
-        "name": "ccms_pui_connector_assess_service_userid",
-        "value": "${client_opa12assess_security_user_name}"
-      },
-      {
         "name": "ccms_soa_url_ebsReferenceDataEndpoint",
         "value": "${ccms_soa_url_ebsReferenceDataEndpoint}"
       },
@@ -60,14 +48,6 @@
       {
         "name": "ccms_pui_connector_answerservice_url_billing",
         "value": "${ccms_pui_connector_answerservice_url_billing}"
-      },
-      {
-        "name": "spring_datasource_url",
-        "value": "${spring_datasource_url}"
-      },
-      {
-        "name": "spring_datasource_username",
-        "value": "${spring_datasource_username}"
       },
       {
         "name": "AWS_REGION",
@@ -126,7 +106,27 @@
       {
         "name": "ccms_pui_connector_assess_service_password",
         "valueFrom": "${client_opa12assess_security_user_password}"
-      }
+      },
+      {
+        "name": "ccms_soa_soapHeaderUserName",
+        "valueFrom": "${ccms_soa_soapHeaderUserName}"
+      },
+      {
+        "name": "ccms_connector_service_userid",
+        "valueFrom": "${ccms_connector_service_userid}"
+      },
+      {
+        "name": "ccms_pui_connector_assess_service_userid",
+        "valueFrom": "${client_opa12assess_security_user_name}"
+      },
+      {
+        "name": "spring_datasource_url",
+        "valueFrom": "${spring_datasource_url}"
+      },
+      {
+        "name": "spring_datasource_username",
+        "valueFrom": "${spring_datasource_username}"
+      },
     ]
   }
 ]
