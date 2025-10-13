@@ -22,10 +22,10 @@ resource "aws_ecs_task_definition" "ecs_adaptor_task_definition" {
       container_version                         = local.application_data.accounts[local.environment].adaptor_container_version
       client_opa12assess_means_address          = local.application_data.accounts[local.environment].client_opa12assess_means_address
       client_opa12assess_billing_address        = local.application_data.accounts[local.environment].client_opa12assess_billing_address
-      client_opa12assess_security_user_name     = "${aws_secretsmanager_secret.connector_secrets.arn}:client_opa12assess_security_user_name::"
-      client_opa12assess_security_user_password = "${aws_secretsmanager_secret.connector_secrets.arn}:client_opa12assess_security_user_password::"
-      server_opa10assess_security_user_name     = "${aws_secretsmanager_secret.connector_secrets.arn}:server_opa10assess_security_user_name::"
-      server_opa10assess_security_user_password = "${aws_secretsmanager_secret.connector_secrets.arn}:server_opa10assess_security_user_password::"
+      client_opa12assess_security_user_name     = "${aws_secretsmanager_secret.service_adaptor_secrets.arn}:client_opa12assess_security_user_name::"
+      client_opa12assess_security_user_password = "${aws_secretsmanager_secret.service_adaptor_secrets.arn}:client_opa12assess_security_user_password::"
+      server_opa10assess_security_user_name     = "${aws_secretsmanager_secret.service_adaptor_secrets.arn}:server_opa10assess_security_user_name::"
+      server_opa10assess_security_user_password = "${aws_secretsmanager_secret.service_adaptor_secrets.arn}:server_opa10assess_security_user_password::"
       }
   )
 
