@@ -53,11 +53,11 @@
       },
       {
         "name": "SERVER_OPA10ASSESS_SECURITY_USER_NAME",
-        "value": "${server_opa10assess_security_user_name}"
+        "valueFrom": "${server_opa10assess_security_user_name}"
       },
       {
         "name": "CLIENT_OPA12ASSESS_SECURITY_USER_NAME",
-        "value": "${client_opa12assess_security_user_name}"
+        "valueFrom": "${client_opa12assess_security_user_name}"
       }
     ]
   }
