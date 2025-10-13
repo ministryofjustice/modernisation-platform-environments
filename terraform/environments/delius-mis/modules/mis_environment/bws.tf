@@ -5,7 +5,7 @@ resource "aws_security_group" "bws" {
 }
 
 module "bws_instance" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=49e289239aec2845924f00fc5969f35ae76122e2"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v4.1.0"
 
   count = var.bws_config.instance_count
 
