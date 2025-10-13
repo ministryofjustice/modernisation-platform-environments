@@ -1,6 +1,32 @@
-#######################################
 # AWS Secrets Manager - Connector Secrets
-#######################################
+
+# Connector AWS Secrets
+
+resource "aws_secretsmanager_secret" "connector_secrets" {
+  name        = "${local.connector_app_name}-secrets"
+  description = "Connector Application Secrets"
+}
+
+resource "aws_secretsmanager_secret_version" "connector_secrets" {
+  secret_id     = aws_secretsmanager_secret.connector_secrets.id
+  secret_string = jsonencode({
+    "ccms_soa_soapHeaderUserName" = "",
+    "ccms_soa_soapHeaderUserPassword" = "",
+    "ccms_connector_service_userid" = "",
+    "ccms_connector_service_password" = "",
+    "client_opa12assess_security_user_name" = "",
+    "client_opa12assess_security_user_password" = "",
+    "spring_datasource_url" = "",
+    "spring_datasource_username" = "",
+    "spring_datasource_password" = ""
+  })
+
+  # lifecycle {
+  #   ignore_changes = [
+  #     secret_string
+  #   ]
+  # }
+}
 
 # CCMS SOA SOAP User Password
 resource "aws_secretsmanager_secret" "ccms_soa_soapHeaderUserPassword" {

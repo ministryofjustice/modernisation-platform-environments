@@ -1,6 +1,29 @@
-#######################################
 # AWS Secrets Manager - OPAHub Secrets
-#######################################
+
+# OPA HUB AWS Secrets
+
+resource "aws_secretsmanager_secret" "opahub_secrets" {
+  name        = "${local.opa_app_name}-secrets"
+  description = "OPAHub Application Secrets"
+}
+
+resource "aws_secretsmanager_secret_version" "opahub_secrets" {
+  secret_id     = aws_secretsmanager_secret.opahub_secrets.id
+  secret_string = jsonencode({
+    "opahub_password" = "",
+    "db_user" = "",
+    "db_password" = "",
+    "wl_user" = "",
+    "wl_password" = "",
+    "secret_key" = ""
+  })
+
+  # lifecycle {
+  #   ignore_changes = [
+  #     secret_string
+  #   ]
+  # }
+}
 
 # OPAHub App Password
 resource "aws_secretsmanager_secret" "opahub_password" {
