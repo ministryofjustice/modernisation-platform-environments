@@ -305,20 +305,20 @@ resource "helm_release" "external_secrets_cluster_secret_store" {
 }
 
 /* KEDA */
-resource "helm_release" "keda" {
-  /* https://artifacthub.io/packages/helm/kedacore/keda */
-  name       = "keda"
-  repository = "https://kedacore.github.io/charts"
-  chart      = "keda"
-  version    = "2.17.2"
-  namespace  = kubernetes_namespace.keda.metadata[0].name
-  values = [
-    templatefile(
-      "${path.module}/src/helm/values/keda/values.yml.tftpl",
-      {}
-    )
-  ]
-}
+# resource "helm_release" "keda" {
+#   /* https://artifacthub.io/packages/helm/kedacore/keda */
+#   name       = "keda"
+#   repository = "https://kedacore.github.io/charts"
+#   chart      = "keda"
+#   version    = "2.17.2"
+#   namespace  = kubernetes_namespace.keda.metadata[0].name
+#   values = [
+#     templatefile(
+#       "${path.module}/src/helm/values/keda/values.yml.tftpl",
+#       {}
+#     )
+#   ]
+# }
 
 /* Velero */
 resource "helm_release" "velero" {
