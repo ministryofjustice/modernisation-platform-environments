@@ -298,6 +298,11 @@ locals {
         instance = merge(local.ec2_instances.db19c.instance, {
           disable_api_termination = true
         })
+        user_data_cloud_init = merge(local.ec2_instances.db19c.user_data_cloud_init, {
+          args = merge(local.ec2_instances.db19c.user_data_cloud_init.args, {
+            branch = "TM-1660/nomis/oracle-19c-diskgroup-compat"
+          })
+        })
         tags = merge(local.ec2_instances.db19c.tags, {
           description         = "T1 NOMIS database 19c"
           instance-scheduling = "skip-scheduling"
