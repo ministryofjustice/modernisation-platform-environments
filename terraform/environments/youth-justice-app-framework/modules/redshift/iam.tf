@@ -166,14 +166,14 @@ resource "aws_iam_role" "yjb-moj-team" {
       {
         Effect = "Allow",
         Principal = {
-            Service = [
-              "redshift.amazonaws.com",
-              "events.amazonaws.com"
-            ],
-            AWS = [
-              var.data_science_role,
-              var.reports_admin_role
-            ]
+          Service = [
+            "redshift.amazonaws.com",
+            "events.amazonaws.com"
+          ],
+          AWS = [
+            var.data_science_role,
+            var.reports_admin_role
+          ]
         },
         Action = "sts:AssumeRole"
       }

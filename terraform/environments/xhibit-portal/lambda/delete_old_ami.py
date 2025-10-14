@@ -69,19 +69,22 @@ def lambda_handler(event=None, context=None):
             snap_id = snapshot["SnapshotId"]
             snap_date = snapshot["StartTime"].date()
             description = snapshot.get("Description", "").lower()
-            
-            # Check the AWS Backup service managed snapshots for skipping them
+            tags = snapshot.get("Tags", [])
+            if not isinstance(tags, list):
+                tags = []
+
+             # Check the AWS Backup service managed snapshots for skipping them
             is_backup_managed = (
                 "aws backup" in description or
                 "created by the aws backup service" in description or
-                any(tag["Key"] == "aws:backup:source-resource" for tag in tags)
+                any(isinstance(tag, dict) and tag.get("Key") == "aws:backup:source-resource" for tag in tags)
             )
 
             if is_backup_managed:
                 backup_managed_count += 1
                 if len(evidence_backup) < 5:
                     evidence_backup.append(f"{snap_id}: {description}")
-                continue  #  Skip deletion attempt
+                continue
 
             if snap_date < deletion_date:
                 older_snapshots += 1
