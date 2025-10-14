@@ -27,7 +27,7 @@ resource "aws_wafv2_ip_set" "opahub_waf_ip_set_web_determinations" {
   name               = "${local.opa_app_name}-waf-ip-set-web-determinations"
   scope              = "REGIONAL"
   ip_address_version = "IPV4"
-  description        = "Trusted IPs for /opa/web-determinations/* path - Prod only"
+  description        = "Trusted IPs for Web Determinations path"
 
   addresses = [
     local.application_data.accounts[local.environment].mp_nat_gateway_a,
