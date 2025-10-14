@@ -160,7 +160,7 @@ resource "aws_athena_data_catalog" "bodmis_catalog" {
 
 # Adds an Athena data source / catalog for OASys
 resource "aws_athena_data_catalog" "oasys_catalog" {
-  count = local.is_dev_or_test ? 1 : 0
+  count = local.is-test ? 1 : 0
 
   name        = "oasys"
   description = "OASys Athena data catalog"
@@ -173,7 +173,7 @@ resource "aws_athena_data_catalog" "oasys_catalog" {
 
 # Adds an Athena data source / catalog for ONR
 resource "aws_athena_data_catalog" "onr_catalog" {
-  count = local.is_dev_or_test ? 1 : 0
+  count = local.is-test ? 1 : 0
 
   name        = "onr"
   description = "ONR Athena data catalog"
@@ -186,7 +186,7 @@ resource "aws_athena_data_catalog" "onr_catalog" {
 
 # Adds an Athena data source / catalog for nDelius
 resource "aws_athena_data_catalog" "ndelius_catalog" {
-  count = local.is_dev_or_test ? 1 : 0
+  count = local.is-test ? 1 : 0
 
   name        = "ndelius"
   description = "nDelius Athena data catalog"
