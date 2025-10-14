@@ -1,5 +1,44 @@
 #### This file can be used to store secrets specific to the member account ####
 
+# PUI Application Secrets
+resource "aws_secretsmanager_secret" "pui_secrets" {
+  name        = "${local.application_name}-secrets"
+  description = "PUI Application Secrets"
+}
+
+resource "aws_secretsmanager_secret_version" "pui_secrets" {
+  secret_id = aws_secretsmanager_secret.pui_secrets.id
+  secret_string = jsonencode({
+    spring_datasource_username       = "",
+    spring_datasource_password       = "",
+    spring_datasource_url            = "",
+    idp_cert                         = "",
+    spcert                           = "",
+    spprivatekey                     = "",
+    idpMetadataUrl                   = "",
+    loginUrl                         = "",
+    postcodeApiUrl                   = "",
+    postcodeApiKey                   = "",
+    user_management_api_access_token = "",
+    user_management_api_hostname     = "",
+    idpIdentityID                    = "",
+    SpEntityId                       = "",
+    SpEntityUrl                      = "",
+    ccms_soa_soapHeaderUserPassword  = "",
+    ccms_soa_soapHeaderUserName      = ""
+  })
+
+  # lifecycle {
+  #   ignore_changes = [
+  #     secret_string
+  #   ]
+  # }
+}
+
+data "aws_secretsmanager_secret_version" "pui_secrets" {
+  secret_id = aws_secretsmanager_secret.pui_secrets.id
+}
+
 # CCMS EBS Database Password
 resource "aws_secretsmanager_secret" "spring_datasource_password" {
   name        = "spring_datasource_password"
