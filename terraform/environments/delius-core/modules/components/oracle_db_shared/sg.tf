@@ -139,7 +139,8 @@ resource "aws_vpc_security_group_ingress_rule" "delius_db_security_group_ingress
   from_port                    = local.db_port
   to_port                      = local.db_tcps_port
   ip_protocol                  = "tcp"
-  referenced_security_group_id = var.bastion_sg_id
+  # referenced_security_group_id = var.bastion_sg_id # # Temporarily removed to recreate bastion SG
+  cidr_ipv4                    = var.account_config.shared_vpc_cidr
 }
 
 resource "aws_vpc_security_group_ingress_rule" "delius_db_security_group_ssh_ingress_bastion" {
@@ -149,7 +150,8 @@ resource "aws_vpc_security_group_ingress_rule" "delius_db_security_group_ssh_ing
   from_port                    = 22
   to_port                      = 22
   ip_protocol                  = "tcp"
-  referenced_security_group_id = var.bastion_sg_id
+  # referenced_security_group_id = var.bastion_sg_id # Temporarily removed to recreate bastion SG
+  cidr_ipv4                    = var.account_config.shared_vpc_cidr
 }
 
 resource "aws_vpc_security_group_ingress_rule" "delius_db_oem_db" {

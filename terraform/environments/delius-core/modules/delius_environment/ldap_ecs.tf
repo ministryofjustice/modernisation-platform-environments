@@ -135,7 +135,8 @@ module "ldap_ecs" {
     {
       port                         = var.ldap_config.port
       ip_protocol                  = "udp"
-      referenced_security_group_id = module.bastion_linux.bastion_security_group
+      # referenced_security_group_id = module.bastion_linux.bastion_security_group # Temporarily removed to recreate bastion SG
+      cidr_ipv4                    = var.account_config.shared_vpc_cidr
       description                  = "Allow inbound traffic from bastion"
     },
     {
@@ -183,7 +184,8 @@ module "ldap_ecs" {
     {
       port                         = var.ldap_config.tls_port
       ip_protocol                  = "udp"
-      referenced_security_group_id = module.bastion_linux.bastion_security_group
+      # referenced_security_group_id = module.bastion_linux.bastion_security_group # Temporarily removed to recreate bastion SG
+      cidr_ipv4                    = var.account_config.shared_vpc_cidr
       description                  = "Allow inbound traffic from bastion"
     },
     {
@@ -228,7 +230,8 @@ module "ldap_ecs" {
     {
       port                         = var.ldap_config.port
       ip_protocol                  = "udp"
-      referenced_security_group_id = module.bastion_linux.bastion_security_group
+      # referenced_security_group_id = module.bastion_linux.bastion_security_group # Temporarily removed to recreate bastion SG
+      cidr_ipv4                    = var.account_config.shared_vpc_cidr
       description                  = "Allow inbound traffic from bastion"
     },
     {
