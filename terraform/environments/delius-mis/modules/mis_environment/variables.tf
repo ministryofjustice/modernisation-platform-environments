@@ -139,3 +139,10 @@ variable "datasync_config" {
   })
   default = null
 }
+
+# Only create one per account
+variable "create_backup_role" {
+  description = "Role used to run AWS Backups i.e. AWSBackupDefaultServiceRole"
+  type        = bool
+  default     = false
+}
