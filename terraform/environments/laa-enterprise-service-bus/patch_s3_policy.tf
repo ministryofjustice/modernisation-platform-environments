@@ -9,26 +9,6 @@ resource "aws_s3_bucket_policy" "patch_data_cross_account_access" {
     Version = "2012-10-17",
     Statement = [
       {
-        Sid    = "AllowEC2DebugRead"
-        Effect = "Allow",
-        Principal = {
-          AWS = [
-            aws_iam_role.ec2_debug_role[0].arn
-          ]
-        },
-        Action = [
-          "s3:GetObject",
-          "s3:GetObjectAcl",
-          "s3:GetObjectVersion",
-          "s3:ListBucket",
-          "s3:ListBucketVersions"
-        ],
-        Resource = [
-          "arn:aws:s3:::${aws_s3_bucket.patch_data[0].bucket}",
-          "arn:aws:s3:::${aws_s3_bucket.patch_data[0].bucket}/*"
-        ]
-      },
-      {
         Sid    = "AllowCWALambdaReadWrite"
         Effect = "Allow",
         Principal = {
