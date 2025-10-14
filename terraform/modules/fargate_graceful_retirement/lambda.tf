@@ -59,6 +59,7 @@ resource "aws_lambda_function" "ecs_restart_handler" {
     variables = merge(
       {
         DEBUG_LOGGING = var.debug_logging
+        ENVIRONMENT   = var.environment
       },
       var.extra_environment_vars
     )
@@ -87,6 +88,7 @@ resource "aws_lambda_function" "calculate_wait_time" {
     variables = merge(
       {
         DEBUG_LOGGING = var.debug_logging
+        ENVIRONMENT   = var.environment
       },
       var.extra_environment_vars
     )
