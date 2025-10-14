@@ -20,22 +20,10 @@
       {
         "name": "SPRING_PROFILES_ACTIVE",
         "value": "${spring_profiles_active}"
-      },      
-      {
-        "name": "SPRING_DATASOURCE_USERNAME",
-        "value": "${spring_datasource_username}"
-      },
-      {
-        "name": "SPRING_DATASOURCE_URL",
-        "value": "${spring_datasource_url}"
       },
       {
         "name": "SPRING_DATASOURCE_HIKARI_KEEPALIVE-TIME",
         "value": "60000"
-      },
-      {
-        "name": "USER_MANAGEMENT_API_HOSTNAME",
-        "value": "${user_management_api_hostname}"
       },
       {
         "name": "SERVER_FORWARD_HEADERS_STRATEGY",
@@ -50,36 +38,12 @@
         "value": "${is_silas_enabled}"
       },
       {
-        "name": "IDPENTITYID",
-        "value": "${idpIdentityID}"
-      },
-      {
         "name": "IDPLOGOUTURL",
         "value": "${idpLogoutUrl}"
       },
       {
-        "name": "IDPMETADATAURL",
-        "value": "${idpMetadataUrl}"
-      },
-      {
         "name": "IDPSAMLMOCKENABLED",
         "value": "${IdpSamlMockEnabled}"
-      },
-      {
-        "name": "SPENTITYID",
-        "value": "${SpEntityId}"
-      },
-      {
-        "name": "SPENTITYURL",
-        "value": "${SpEntityUrl}"
-      },
-      {
-        "name": "LOGINURL",
-        "value": "${loginUrl}"
-      },
-      {
-        "name": "POSTCODEAPIURL",
-        "value": "${postcodeApiUrl}"
       },
       {
         "name": "CCMS_S3_DOCUMENTS",
@@ -166,10 +130,6 @@
         "value": "${ccms_soa_url_ebsUpdateUserEndpoint}"
       },
       {
-        "name": "ccms_soa_soapHeaderUserName",
-        "value": "${ccms_soa_soapHeaderUserName}"
-      },
-      {
         "name": "opa12_assess_service_servlet",
         "value": "${opa12_assess_service_servlet}"
       },
@@ -221,7 +181,7 @@
     "secrets": [
       {
         "name": "IDPCERT",
-        "valueFrom": "${portal_cert}"
+        "valueFrom": "${idp_cert}"
       },
       {
         "name": "SPCERT",
@@ -240,12 +200,52 @@
         "valueFrom": "${postcodeApiKey}"
       },
       {
+        "name": "ccms_soa_soapHeaderUserName",
+        "valueFrom": "${ccms_soa_soapHeaderUserName}"
+      },
+      {
         "name": "ccms_soa_soapHeaderUserPassword",
         "valueFrom": "${ccms_soa_soapHeaderUserPassword}"
       },
       {
         "name": "USER_MANAGEMENT_API_ACCESS_TOKEN",
         "valueFrom": "${user_management_api_access_token}"
+      },
+      {
+        "name": "SPRING_DATASOURCE_USERNAME",
+        "valueFrom": "${spring_datasource_username}"
+      },
+      {
+        "name": "SPRING_DATASOURCE_URL",
+        "valueFrom": "${spring_datasource_url}"
+      },
+      {
+        "name": "USER_MANAGEMENT_API_HOSTNAME",
+        "valueFrom": "${user_management_api_hostname}"
+      },
+      {
+        "name": "IDPMETADATAURL",
+        "valueFrom": "${idpMetadataUrl}"
+      },
+      {
+        "name": "IDPENTITYID",
+        "valueFrom": "${idpIdentityID}"
+      },
+      {
+        "name": "SPENTITYID",
+        "valueFrom": "${SpEntityId}"
+      },
+      {
+        "name": "SPENTITYURL",
+        "valueFrom": "${SpEntityUrl}"
+      },
+      {
+        "name": "LOGINURL",
+        "valueFrom": "${loginUrl}"
+      },
+      {
+        "name": "POSTCODEAPIURL",
+        "valueFrom": "${postcodeApiUrl}"
       }
     ]
   }
