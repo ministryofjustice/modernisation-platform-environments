@@ -25,8 +25,8 @@ resource "aws_db_instance" "opahub_db" {
   storage_encrypted   = true
   deletion_protection = false
   multi_az            = true
-  username            = jsondecode(aws_secretsmanager_secret_version.opahub_secrets.secret_string)["db_user"]
-  password            = jsondecode(aws_secretsmanager_secret_version.opahub_secrets.secret_string)["db_password"]
+  username            = jsondecode(data.aws_secretsmanager_secret_version.opahub_secrets.secret_string)["db_user"]
+  password            = jsondecode(data.aws_secretsmanager_secret_version.opahub_secrets.secret_string)["db_password"]
   port                = 3306
 
   vpc_security_group_ids  = [aws_security_group.opahub_db.id]
