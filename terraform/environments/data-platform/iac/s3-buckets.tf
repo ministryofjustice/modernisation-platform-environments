@@ -1,4 +1,6 @@
 data "aws_iam_policy_document" "s3_bucket_policy" {
+  count = terraform.workspace == "data-platform-development" ? 1 : 0
+
   # Explicit deny for all principals except allowed ones
   statement {
     sid     = "DenyAllExceptAllowedPrincipals"
@@ -123,7 +125,7 @@ module "s3_bucket" {
   force_destroy = false
 
   attach_policy = true
-  policy        = data.aws_iam_policy_document.s3_bucket_policy.json
+  policy        = data.aws_iam_policy_document.s3_bucket_policy[0].json
 
   server_side_encryption_configuration = {
     rule = {
