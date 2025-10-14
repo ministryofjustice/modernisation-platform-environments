@@ -17,7 +17,8 @@ data "aws_iam_policy_document" "s3_bucket_policy" {
       variable = "aws:PrincipalArn"
       values = [
         module.data_platform_access_iam_role[0].arn,
-        "arn:aws:iam::*:role/aws-reserved/sso.amazonaws.com/*/AWSReservedSSO_platform-engineer-admin_*"
+        "arn:aws:iam::*:role/aws-reserved/sso.amazonaws.com/*/AWSReservedSSO_platform-engineer-admin_*",
+        "arn:aws:iam::*:role/MemberInfrastructureAccess"
       ]
     }
     condition {
