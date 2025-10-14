@@ -5,13 +5,13 @@ resource "aws_lambda_function" "redshift_scheduler" {
   #checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC" - irrelevant for this module
   #checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable" - not required
   #checkov:skip=CKV_AWS_272: "Ensure AWS Lambda function is configured to validate code-signing" - code signing is not implemented
-  function_name = "redshift_scheduler"
-  runtime       = "python3.11"
-  handler       = "index.handler"
-  role          = aws_iam_role.lambda_redshift.arn
-  timeout       = 30
-  memory_size   = 128
-  filename = "${path.module}/lambda/redshift_scheduler.zip"
+  function_name    = "redshift_scheduler"
+  runtime          = "python3.11"
+  handler          = "index.handler"
+  role             = aws_iam_role.lambda_redshift.arn
+  timeout          = 30
+  memory_size      = 128
+  filename         = "${path.module}/lambda/redshift_scheduler.zip"
   source_code_hash = filebase64sha256("${path.module}/lambda/redshift_scheduler.zip")
 
   environment {
@@ -47,8 +47,8 @@ resource "aws_iam_role_policy" "lambda_redshift_policy" {
     Version = "2012-10-17"
     Statement = [
       {
-        Effect   = "Allow"
-        Action   = [
+        Effect = "Allow"
+        Action = [
           "redshift-data:ExecuteStatement",
           "redshift-data:DescribeStatement",
           "redshift-data:GetStatementResult"
@@ -69,8 +69,8 @@ resource "aws_iam_role_policy" "lambda_redshift_policy" {
         Resource = var.kms_key_arn
       },
       {
-        Effect   = "Allow"
-        Action   = [
+        Effect = "Allow"
+        Action = [
           "logs:CreateLogGroup",
           "logs:CreateLogStream",
           "logs:PutLogEvents"
@@ -106,7 +106,7 @@ resource "aws_cloudwatch_event_target" "daily_mvs_refresh_lambda" {
 # Weekly FTE refresh on Mondays at 08:30 UTC
 resource "aws_cloudwatch_event_rule" "weekly_fte_refresh" {
   name                = "weekly-fte-refresh-${var.environment}"
-  schedule_expression = "cron(30 8 ? * 2 *)"  # Monday 08:30 UTC
+  schedule_expression = "cron(30 8 ? * 2 *)" # Monday 08:30 UTC
 }
 
 resource "aws_cloudwatch_event_target" "weekly_fte_refresh_lambda" {
