@@ -62,3 +62,15 @@ resource "aws_lb_listener" "opahub_listener" {
     type             = "forward"
   }
 }
+
+# Temp only required on first install
+resource "aws_lb_listener" "opahub_listener_7001" {
+  load_balancer_arn = aws_lb.opahub.id
+  port              = "7001"
+  protocol          = "HTTP"
+
+  default_action {
+    target_group_arn = aws_lb_target_group.opahub_target_group.id
+    type             = "forward"
+  }
+}
