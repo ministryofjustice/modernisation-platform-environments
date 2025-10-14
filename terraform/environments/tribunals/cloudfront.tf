@@ -395,8 +395,6 @@ function handler(event) {
             ],
             aliases: ['www.asylum-support-tribunal.gov.uk']
         },
-        // The following redirects are for domains not hosted in Modernisation Platform Route53
-        // Their external R53 will be updated by Tony Bishop to point to this CloudFront Server
         'ahmlr.gov.uk': {
             defaultRedirect: 'https://www.gov.uk/apply-land-registration-tribunal/overview',
             pathRedirects: [
@@ -412,22 +410,6 @@ function handler(event) {
             defaultRedirect: 'https://www.gov.uk/social-security-child-support-tribunal',
             pathRedirects: [],
             aliases: ['www.appeals-service.gov.uk']
-        },
-        'asylum-support-tribunals.gov.uk': {
-            defaultRedirect: 'https://www.gov.uk/courts-tribunals/first-tier-tribunal-asylum-support',
-            pathRedirects: [
-                {
-                    paths: ['/Public', '/admin', '/Judgments', '/decisions.htm'],
-                    target: 'https://asylumsupport.decisions.tribunals.gov.uk',
-                    exactMatch: false
-                },
-                {
-                    paths: ['.*\\.(css|js|png|ico|gif|jpg|jpeg)$'],
-                    target: 'https://administrativeappeals.decisions.tribunals.gov.uk',
-                    exactMatch: false
-                }
-            ],
-            aliases: ['www.asylum-support-tribunals.gov.uk']
         },
         'carestandardstribunal.gov.uk': {
             defaultRedirect: 'https://www.gov.uk/guidance/appeal-to-the-care-standards-tribunal',
@@ -449,12 +431,7 @@ function handler(event) {
             defaultRedirect: 'https://www.gov.uk/criminal-injuries-compensation-tribunal',
             pathRedirects: [
                 {
-                    paths: ['/Public', '/images', '/DBFiles', '/Admin'],
-                    target: 'https://cicap.decisions.tribunals.gov.uk',
-                    exactMatch: false
-                },
-                {
-                    paths: ['.*\\.(css|js|png|ico|gif|jpg|jpeg)$'],
+                    paths: ['/Public', '/images', '/DBFiles', '/Admin', '.*\\.(css|js|png|ico|gif|jpg|jpeg)$'],
                     target: 'https://cicap.decisions.tribunals.gov.uk',
                     exactMatch: false
                 }
@@ -510,22 +487,12 @@ function handler(event) {
             defaultRedirect: 'https://www.gov.uk/courts-tribunals/employment-appeal-tribunal',
             pathRedirects: [
                 {
-                    paths: ['/Public', '/public'],
+                    paths: ['/Public', '/images', '/Secure'],
                     target: 'https://employmentappeals.decisions.tribunals.gov.uk$request_uri',
                     exactMatch: false
                 },
                 {
-                    paths: ['/images', '/Images'],
-                    target: 'https://employmentappeals.decisions.tribunals.gov.uk$request_uri',
-                    exactMatch: false
-                },
-                {
-                    paths: ['/Secure', '/secure'],
-                    target: 'https://employmentappeals.decisions.tribunals.gov.uk$request_uri',
-                    exactMatch: false
-                },
-                {
-                    paths: ['/Judgments/tips.htm', '/judgments/tips.htm'],
+                    paths: ['/Judgments/tips.htm'],
                     target: 'https://employmentappeals.decisions.tribunals.gov.uk/Judgments/tips.htm',
                     exactMatch: true
                 },
@@ -546,27 +513,7 @@ function handler(event) {
             defaultRedirect: 'https://www.gov.uk/government/collections/upper-tribunal-tax-and-chancery-chamber',
             pathRedirects: [
                 {
-                    paths: ['/aspx', '/Aspx'],
-                    target: 'https://financeandtax.decisions.tribunals.gov.uk$request_uri',
-                    exactMatch: false
-                },
-                {
-                    paths: ['/Decisions', '/decisions'],
-                    target: 'https://financeandtax.decisions.tribunals.gov.uk$request_uri',
-                    exactMatch: false
-                },
-                {
-                    paths: ['/Admin', '/admin'],
-                    target: 'https://financeandtax.decisions.tribunals.gov.uk$request_uri',
-                    exactMatch: false
-                },
-                {
-                    paths: ['/JudgmentFiles', '/judgmentfiles'],
-                    target: 'https://financeandtax.decisions.tribunals.gov.uk$request_uri',
-                    exactMatch: false
-                },
-                {
-                    paths: ['.*\\.(css|js|png|ico|gif|jpg|jpeg)$'],
+                    paths: ['/aspx', '/Decisions', '/Admin', '/JudgmentFiles', '.*\\.(css|js|png|ico|gif|jpg|jpeg)$'],
                     target: 'https://financeandtax.decisions.tribunals.gov.uk$request_uri',
                     exactMatch: false
                 }
@@ -582,22 +529,7 @@ function handler(event) {
             defaultRedirect: 'https://www.gov.uk/guidance/appeal-a-decision-on-your-registration-as-an-immigration-adviser',
             pathRedirects: [
                 {
-                    paths: ['/Aspx', '/aspx'],
-                    target: 'https://immigrationservices.decisions.tribunals.gov.uk$request_uri',
-                    exactMatch: false
-                },
-                {
-                    paths: ['/Decisions', '/decisions'],
-                    target: 'https://immigrationservices.decisions.tribunals.gov.uk$request_uri',
-                    exactMatch: false
-                },
-                {
-                    paths: ['/Admin', '/admin'],
-                    target: 'https://immigrationservices.decisions.tribunals.gov.uk$request_uri',
-                    exactMatch: false
-                },
-                {
-                    paths: ['/JudgmentFiles', '/judgmentfiles'],
+                    paths: ['/Aspx', '/Decisions', '/Admin', '/JudgmentFiles'],
                     target: 'https://immigrationservices.decisions.tribunals.gov.uk$request_uri',
                     exactMatch: false
                 }
@@ -608,28 +540,12 @@ function handler(event) {
             defaultRedirect: 'https://www.gov.uk/guidance/information-rights-appeal-against-the-commissioners-decision',
             pathRedirects: [
                 {
-                    paths: ['/Public', '/public', '/images', '/Images', '/DBFiles', '/dbfiles', '/Admin', '/admin', '.*\\.(css|js|png|ico|gif|jpg|jpeg)$'],
+                    paths: ['/Public', '/images', '/DBFiles', '/Admin', '.*\\.(css|js|png|ico|gif|jpg|jpeg)$'],
                     target: 'https://informationrights.decisions.tribunals.gov.uk$request_uri',
                     exactMatch: false
                 }
             ],
             aliases: ['www.informationtribunal.gov.uk']
-        },
-        'informationtribunal.dsd.io': {
-            defaultRedirect: 'https://www.gov.uk/guidance/information-rights-appeal-against-the-commissioners-decision$request_uri',
-            pathRedirects: [
-                {
-                    paths: ['/Public', '/public', '/DBFiles', '/dbfiles'],
-                    target: 'https://informationrights.decisions.tribunals.gov.uk$request_uri',
-                    exactMatch: false
-                },
-                {
-                    paths: ['/admin', '/Admin'],
-                    target: 'https://www.google.com$request_uri',
-                    exactMatch: false
-                }
-            ],
-            aliases: ['www.informationtribunal.dsd.io']
         },
         'judicialombudsman.gov.uk': {
             defaultRedirect: 'https://www.gov.uk/government/organisations/judicial-appointments-and-conduct-ombudsman$request_uri',
@@ -640,12 +556,12 @@ function handler(event) {
             defaultRedirect: 'https://www.gov.uk/appeal-upper-tribunal-lands',
             pathRedirects: [
                 {
-                    paths: ['/NEWstyles.css', '/newstyles.css'],
+                    paths: ['/NEWstyles.css'],
                     target: 'https://landschamber.decisions.tribunals.gov.uk/NEWstyles.css',
                     exactMatch: true
                 },
                 {
-                    paths: ['/Aspx', '/aspx', '/images', '/Images', '/Decisions', '/decisions', '/Admin', '/admin', '/JudgmentFiles', '/judgmentfiles', '.*\\.(css|js|png|ico|gif|jpg|jpeg)$'],
+                    paths: ['/Aspx', '/images', '/Decisions', '/Admin', '/JudgmentFiles', '.*\\.(css|js|png|ico|gif|jpg|jpeg)$'],
                     target: 'https://landschamber.decisions.tribunals.gov.uk$request_uri',
                     exactMatch: false
                 }
@@ -661,7 +577,7 @@ function handler(event) {
             defaultRedirect: 'https://www.gov.uk/courts-tribunals/upper-tribunal-administrative-appeals-chamber',
             pathRedirects: [
                 {
-                    paths: ['/aspx', '/Aspx', '/Decisions', '/decisions', '/Admin', '/admin', '/JudgmentFiles', '/judgmentfiles', '.*\\.(css|js|png|ico|gif|jpg|jpeg)$'],
+                    paths: ['/aspx', '/Decisions', '/Admin', '/JudgmentFiles', '.*\\.(css|js|png|ico|gif|jpg|jpeg)$'],
                     target: 'https://administrativeappeals.decisions.tribunals.gov.uk$request_uri',
                     exactMatch: false
                 }
@@ -682,7 +598,7 @@ function handler(event) {
             defaultRedirect: 'https://www.gov.uk/guidance/approved-driving-instructors-appeal-a-decision-by-the-registrar',
             pathRedirects: [
                 {
-                    paths: ['/Aspx', '/aspx', '/images', '/Images', '/DBFiles', '/dbfiles', '/Admin', '/admin', '.*\\.(css|js|png|ico|gif|jpg|jpeg)$'],
+                    paths: ['/Aspx', '/images', '/DBFiles', '/Admin', '.*\\.(css|js|png|ico|gif|jpg|jpeg)$'],
                     target: 'https://transportappeals.decisions.tribunals.gov.uk$request_uri',
                     exactMatch: false
                 }
@@ -698,8 +614,7 @@ function handler(event) {
             defaultRedirect: 'https://www.gov.uk/government/publications?departments[]=youth-justice-board-for-england-and-wales',
             pathRedirects: [],
             aliases: ['www.yjbpublications.justice.gov.uk']
-        },
-        // Add more domains here as provided
+        }
     };
 
     // Find matching config, checking aliases
