@@ -5,6 +5,11 @@ module "waf" {
   block_non_uk_traffic     = true
   associated_resource_arns = [aws_lb.waf_lb.arn]
 
+  providers = {
+    aws                        = aws
+    aws.modernisation-platform = aws.modernisation-platform
+  }
+
   managed_rule_actions = {
     AWSManagedRulesKnownBadInputsRuleSet = false
     AWSManagedRulesCommonRuleSet         = false
