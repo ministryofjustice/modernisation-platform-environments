@@ -44,6 +44,7 @@ module "data_platform_access_iam_role" {
       effect  = "Allow"
       actions = ["secretsmanager:GetSecretValue"]
       resources = [
+        module.entra_secret[0].secret_arn,
         module.github_token_secret[0].secret_arn,
         module.slack_token_secret[0].secret_arn
       ]
