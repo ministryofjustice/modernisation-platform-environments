@@ -1,3 +1,25 @@
+module "entra_secret" {
+  count = terraform.workspace == "data-platform-development" ? 1 : 0
+
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=f7fef2d8f63f1595c3e2b0ee14a6810dc7bdb9af" # v2.0.0
+
+  name        = "entra/data-platform-access"
+  description = "https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/~/Overview/appId/fecb63c0-54ac-47a8-98d7-6490aa61312e"
+
+  secret_string = jsonencode({
+    client_id     = "CHANGEME"
+    client_secret = "CHANGEME"
+    secret_id     = "CHANGEME"
+    tenant_id     = "CHANGEME"
+  })
+  ignore_secret_changes = true
+
+  tags = merge(
+    local.tags,
+    { "credential-expiration" = "2026-04-12" }
+  )
+}
+
 module "github_token_secret" {
   count = terraform.workspace == "data-platform-development" ? 1 : 0
 
