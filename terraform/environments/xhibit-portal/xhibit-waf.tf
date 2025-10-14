@@ -20,9 +20,12 @@ module "waf" {
   }
 
   managed_rule_priorities = {
-    AWSManagedRulesSQLiRuleSet           = 5  
-    AWSManagedRulesKnownBadInputsRuleSet = 6
-    AWSManagedRulesCommonRuleSet         = 7
+    AWSManagedRulesAnonymousIpList       = 10
+    AWSManagedRulesKnownBadInputsRuleSet = 11
+    AWSManagedRulesCommonRuleSet         = 12
+    AWSManagedRulesSQLiRuleSet           = 13
+    AWSManagedRulesLinuxRuleSet          = 14
+    AWSManagedRulesBotControlRuleSet     = 15
   }
 
   core_logging_account_id = local.environment_management.account_ids["core-logging-production"]
