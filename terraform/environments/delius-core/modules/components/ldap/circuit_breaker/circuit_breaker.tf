@@ -23,12 +23,6 @@ resource "aws_ssm_parameter" "ldap_circuit_breaker" {
   tags  = var.tags
 }
 
-# SNS topic used as alarm action
-resource "aws_sns_topic" "circuit_breaker" {
-  #checkov:skip=CKV_AWS_26 "ignore"
-  name = "${var.env_name}-ldap-circuit-breaker-sns"
-}
-
 resource "aws_iam_role" "lambda_role" {
   name = "${var.env_name}-ldap-circuit-breaker-lambda-role"
   assume_role_policy = jsonencode({
@@ -88,15 +82,6 @@ resource "aws_iam_role_policy" "lambda_policy" {
           "ec2:DescribeNetworkInterfaces"
         ]
         Resource = "*"
-      },
-      {
-        Sid    = "SNS"
-        Effect = "Allow"
-        Action = [
-          "sns:Subscribe",
-          "sns:ListSubscriptionsByTopic"
-        ]
-        Resource = aws_sns_topic.circuit_breaker.arn
       },
       {
         "Sid" : "SSMRead",
@@ -162,7 +147,7 @@ resource "aws_cloudwatch_event_target" "invoke_lambda" {
 }
 
 resource "aws_lambda_permission" "allow_eventbridge" {
-  statement_id  = "AllowExecutionFromEventBridge-in-${var.env_name}-"
+  statement_id  = "AllowExecutionFromEventBridge-in-${var.env_name}"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.circuit_breaker.function_name
   principal     = "events.amazonaws.com"
