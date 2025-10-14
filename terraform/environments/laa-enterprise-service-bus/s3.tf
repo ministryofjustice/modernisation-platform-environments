@@ -17,6 +17,14 @@ resource "aws_s3_object" "lambda_layer_zip" {
   source_hash = filemd5("layers/lambda_dependencies.zip")
 }
 
+# resource "aws_s3_object" "oracledb_lambda_layer_zip" {
+#   count       = local.environment == "test" ? 1 : 0
+#   bucket      = aws_s3_bucket.lambda_layer_dependencies.bucket
+#   key         = "cwa_extract_lambda/oracledb_lambda_dependencies.zip"
+#   source      = "layers/oracledb_lambda_dependencies.zip"
+#   source_hash = filemd5("layers/oracledb_lambda_dependencies.zip")
+# }
+
 resource "aws_s3_bucket_public_access_block" "lambda_layer_dependencies" {
   bucket                  = aws_s3_bucket.lambda_layer_dependencies.bucket
   block_public_acls       = true
