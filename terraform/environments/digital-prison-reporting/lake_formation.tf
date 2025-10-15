@@ -146,3 +146,16 @@ resource "aws_lakeformation_permissions" "data_location_access_working" {
   }
 }
 
+
+# Describe on LF tag expressions
+resource "aws_lakeformation_permissions" "data_eng_describe" {
+
+  principal   = "arn:aws:iam::771283872747:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-data-eng_a2da3e45320e1580"
+  permissions = ["DESCRIBE"]
+
+  lf_tag_policy {
+
+    expression_name = "test_project-prison_non_sensitive"
+  }
+
+}
