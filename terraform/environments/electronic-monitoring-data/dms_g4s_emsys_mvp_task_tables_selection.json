@@ -6,7 +6,7 @@
       "rule-name": "all",
       "object-locator": {
         "schema-name": "%",
-        "table-name": "GPSPosition"
+        "table-name": "%"
       },
       "rule-action": "include",
       "filters": [],
@@ -14,14 +14,33 @@
       "isAutoSegmentationChecked": false
     },
     {
-      "rule-type": "selection",
-      "rule-id": "02",
-      "rule-name": "02_exclude",
+      "rule-type": "transformation",
+      "rule-id": "2",
+      "rule-name": "TransformLatitudePrecision",
+      "rule-target": "column",
       "object-locator": {
         "schema-name": "dbo",
-        "table-name": "GPSPosition"
+        "table-name": "GPSPosition",
+        "column-name": "Latitude"
       },
-      "rule-action": "exclude"
+      "rule-action": "change-data-type",
+      "data-type": {
+        "type": "decimal(10,7)"
+      }
+    },
+    {
+      "rule-type": "transformation",
+      "rule-id": "3",
+      "rule-name": "TransformLongitudePrecision",
+      "object-locator": {
+        "schema-name": "dbo",
+        "table-name": "GPSPosition",
+        "column-name": "Longitude"
+      },
+      "rule-action": "change-data-type",
+      "data-type": {
+        "type": "decimal(10,7)"
+      }
     }
   ]
 }
