@@ -22,7 +22,16 @@ module "data_platform_access_iam_role" {
       ]
       resources = [module.kms_key[0].key_arn]
     }
-    S3Access = {
+    S3BucketAccess = {
+      effect = "Allow"
+      actions = [
+        "s3:ListBucket",
+        "s3:GetBucketLocation",
+        "s3:ListBucketVersions"
+      ]
+      resources = [module.s3_bucket[0].s3_bucket_arn]
+    }
+    S3ObjectAccess = {
       effect = "Allow"
       actions = [
         "s3:DeleteObject",
@@ -32,9 +41,13 @@ module "data_platform_access_iam_role" {
       resources = ["${module.s3_bucket[0].s3_bucket_arn}/data-platform-access/*"]
     }
     SecretsManagerAccess = {
-      effect    = "Allow"
-      actions   = ["secretsmanager:GetSecretValue"]
-      resources = [module.github_token_secret[0].secret_arn]
+      effect  = "Allow"
+      actions = ["secretsmanager:GetSecretValue"]
+      resources = [
+        module.entra_secret[0].secret_arn,
+        module.github_token_secret[0].secret_arn,
+        module.slack_token_secret[0].secret_arn
+      ]
     }
   }
 }

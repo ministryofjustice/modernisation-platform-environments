@@ -19,3 +19,14 @@ variable "debug_logging" {
   type        = bool
   default     = false
 }
+
+variable "environment" {
+  description = "Environment name (dev, stage, preprod, prod etc)"
+  type        = string
+}
+
+variable "extra_environment_vars" {
+  description = "Optional env specific envs that needs to be injected."
+  type        = map(string)
+  default     = {}
+}
