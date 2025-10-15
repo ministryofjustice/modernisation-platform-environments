@@ -574,6 +574,16 @@ data "aws_iam_policy_document" "process_fms_metadata_lambda_role_policy_document
       module.s3-data-bucket.bucket.arn,
     ]
   }
+  statement {
+    sid    = "SQSQueuePermissions"
+    effect = "Allow"
+    actions = [
+      "sqs:SendMessage"
+    ]
+    resources = [
+      aws_sqs_queue.format_fms_json_event_queue.arn
+    ]
+  }
 }
 
 resource "aws_iam_role" "process_fms_metadata" {

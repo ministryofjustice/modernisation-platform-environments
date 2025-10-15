@@ -8,6 +8,10 @@ terraform {
       version = "~> 3.0"
       source  = "hashicorp/http"
     }
+    tls = {
+      version = "~> 4.0"
+      source  = "hashicorp/tls"
+    }
     local = {
       source  = "hashicorp/local"
       version = "~> 2.0"
