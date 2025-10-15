@@ -159,3 +159,14 @@ resource "aws_lakeformation_permissions" "data_eng_describe" {
   }
 
 }
+
+# Visibility on a tag
+resource "aws_lakeformation_permissions" "can_view_tag_expression" {
+
+  principal   = "arn:aws:iam::771283872747:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-data-eng_a2da3e45320e1580"
+  permissions = ["DESCRIBE"]
+
+  lf_tag_expression {
+    name = "test_project-prison_non_sensitive"
+  }
+}
