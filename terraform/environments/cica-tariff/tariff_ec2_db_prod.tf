@@ -51,7 +51,7 @@ resource "aws_instance" "tariffdb" {
     device_name           = "xvdf"
     delete_on_termination = true
     encrypted             = true
-    volume_size           = 900
+    volume_size           = 2000
     snapshot_id           = local.snapshot_id_xvdf_db
   }
   ebs_block_device {
