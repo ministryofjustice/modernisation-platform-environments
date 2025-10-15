@@ -42,7 +42,7 @@ resource "helm_release" "litellm" {
         iamRole = module.iam_role[0].arn
 
         # LiteLLM Models
-        bedrockInferenceProfiles = local.environment_configuration.bedrock_inference_profiles
+        bedrockModels = local.environment_configuration.llm_gateway_models.bedrock
       }
     )
   ]

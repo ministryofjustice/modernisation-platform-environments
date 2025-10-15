@@ -2,16 +2,6 @@ locals {
   environment_configuration = local.environment_configurations[local.environment]
   environment_configurations = {
     development = {
-      bedrock_inference_profiles = {
-        claude-sonnet-4-5 = {
-          model_id = "eu.anthropic.claude-sonnet-4-5-20250929-v1:0"
-          region   = "eu-west-2"
-        }
-        claude-sonnet-4 = {
-          model_id = "eu.anthropic.claude-sonnet-4-20250514-v1:0"
-          region   = "eu-west-1"
-        }
-      }
       litellm_versions = {
         application = "main-v1.77.7-stable"
         chart       = "0.1.794"
@@ -43,24 +33,36 @@ locals {
         "35.177.252.54/32",
         "35.178.209.113/32",
       ]
+      llm_gateway_models = {
+        bedrock = {
+          claude-sonnet-4-5 = {
+            model_id = "eu.anthropic.claude-sonnet-4-5-20250929-v1:0"
+            region   = "eu-west-2"
+          }
+          claude-sonnet-4 = {
+            model_id = "eu.anthropic.claude-sonnet-4-20250514-v1:0"
+            region   = "eu-west-1"
+          }
+        }
+      }
     }
     test = {
-      bedrock_inference_profiles    = {}
       litellm_versions              = {}
       llm_gateway_hostname          = ""
       llm_gateway_ingress_allowlist = []
+      llm_gateway_models            = {}
     }
     preproduction = {
-      bedrock_inference_profiles    = {}
       litellm_versions              = {}
       llm_gateway_hostname          = ""
       llm_gateway_ingress_allowlist = []
+      llm_gateway_models            = {}
     }
     production = {
-      bedrock_inference_profiles    = {}
       litellm_versions              = {}
       llm_gateway_hostname          = ""
       llm_gateway_ingress_allowlist = []
+      llm_gateway_models            = {}
     }
   }
 }

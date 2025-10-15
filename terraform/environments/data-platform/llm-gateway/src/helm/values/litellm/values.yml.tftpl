@@ -62,7 +62,7 @@ proxy_config:
         api_base: os.environ/JUSTICEAI_AZURE_OPENAI_API_BASE
         api_key: os.environ/JUSTICEAI_AZURE_OPENAI_API_KEY
         api_version: "2024-12-01-preview"
-%{ for key, profile in bedrockInferenceProfiles ~}
+%{ for key, profile in bedrockModels ~}
     - model_name: bedrock-${key}
       litellm_params:
         model: bedrock/${profile.model_id}
