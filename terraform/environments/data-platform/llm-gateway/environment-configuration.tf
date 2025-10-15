@@ -16,6 +16,7 @@ locals {
         application = "main-v1.77.7-stable"
         chart       = "0.1.794"
       }
+      llm_gateway_hostname = "llm-gateway.development.data-platform.service.justice.gov.uk"
       llm_gateway_ingress_allowlist = [
         # VPN
         "128.77.75.64/26",  # Prisma Corporate
@@ -46,16 +47,19 @@ locals {
     test = {
       bedrock_inference_profiles    = {}
       litellm_versions              = {}
+      llm_gateway_hostname          = ""
       llm_gateway_ingress_allowlist = []
     }
     preproduction = {
       bedrock_inference_profiles    = {}
       litellm_versions              = {}
+      llm_gateway_hostname          = ""
       llm_gateway_ingress_allowlist = []
     }
     production = {
       bedrock_inference_profiles    = {}
       litellm_versions              = {}
+      llm_gateway_hostname          = ""
       llm_gateway_ingress_allowlist = []
     }
   }
