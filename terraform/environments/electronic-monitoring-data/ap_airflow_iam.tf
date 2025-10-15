@@ -569,3 +569,69 @@ module "full_reload_servicenow" {
   new_airflow = true
   full_reload = true
 }
+
+# ---------------------------------------------------------------------------
+# Additional permission for MDSS (BOTH LOAD & FULL RELOAD)
+# ---------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "load_mdss_athena_perms" {
+  statement {
+    sid    = "AthenaPermissionsForMdssPatch"
+    effect = "Allow"
+    actions = [
+      "athena:StartQueryExecution",
+      "athena:GetQueryExecution",
+      "athena:GetQueryResults",
+      "athena:StopQueryExecution",
+      "athena:GetWorkGroup",
+      "athena:ListWorkGroups",
+      "athena:ListQueryExecutions"
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "S3AthenaQueryBucketForMdssPatch"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:ListBucket"
+    ]
+    resources = [
+      module.s3-athena-bucket.bucket.arn,
+      "${module.s3-athena-bucket.bucket.arn}/*",
+    ]
+  }
+
+  statement {
+    sid    = "GlueReadForMdssPatch"
+    effect = "Allow"
+    actions = [
+      "glue:GetDatabase",
+      "glue:GetTable"
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    sid       = "LakeFormationGetDataAccessForMdssPatch"
+    effect    = "Allow"
+    actions   = ["lakeformation:GetDataAccess"]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_role_policy" "load_mdss_athena_perms" {
+  count  = local.is-development ? 0 : length(module.load_mdss)
+  name   = "load-mdss-athena-permissions-${local.environment}"
+  role   = module.load_mdss[count.index].iam_role.name
+  policy = data.aws_iam_policy_document.load_mdss_athena_perms.json
+}
+
+resource "aws_iam_role_policy" "full_reload_mdss_athena_perms" {
+  count  = local.is-development ? 0 : length(module.full_reload_mdss)
+  name   = "full-reload-mdss-athena-permissions-${local.environment}"
+  role   = module.full_reload_mdss[count.index].iam_role.name
+  policy = data.aws_iam_policy_document.load_mdss_athena_perms.json
+}
