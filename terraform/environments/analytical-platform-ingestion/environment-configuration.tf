@@ -20,9 +20,9 @@ locals {
       ]
 
       /* Image Versions */
-      scan_image_version     = "0.2.0"
-      transfer_image_version = "0.0.22"
-      notify_image_version   = "0.0.23"
+      scan_image_version     = "0.2.1"
+      transfer_image_version = "0.0.23"
+      notify_image_version   = "0.0.24"
 
       /* Target Buckets */
       target_buckets = [
@@ -84,9 +84,9 @@ locals {
       ]
 
       /* Image Versions */
-      scan_image_version     = "0.2.0"
-      transfer_image_version = "0.0.22"
-      notify_image_version   = "0.0.23"
+      scan_image_version     = "0.2.1"
+      transfer_image_version = "0.0.23"
+      notify_image_version   = "0.0.24"
 
       /* Target Buckets */
       target_buckets = [

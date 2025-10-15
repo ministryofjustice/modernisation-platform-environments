@@ -281,6 +281,8 @@ module "process_fms_metadata" {
   security_group_ids             = [aws_security_group.lambda_generic.id]
   subnet_ids                     = data.aws_subnets.shared-public.ids
   environment_variables = {
-    SQS_QUEUE_URL = aws_sqs_queue.format_fms_json_event_queue.id
+    SQS_QUEUE_URL                = aws_sqs_queue.format_fms_json_event_queue.id
+    POWERTOOLS_METRICS_NAMESPACE = "FMSLiveFeed"
+    POWERTOOLS_SERVICE_NAME      = "process-fms-metadata-lambda"
   }
 }
