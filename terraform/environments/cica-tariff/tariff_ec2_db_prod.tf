@@ -112,3 +112,15 @@ resource "aws_instance" "tariffdb" {
     snapshot_id           = local.snapshot_id_xvdn_db
   }
 }
+
+# AMI backup of tariffdb prior to CDI-274 refactor
+resource "aws_ami_from_instance" "tariffdb_a_bkp" {
+  count              = local.environment == "production" ? 1 : 0
+  name               = "TariffDB_A_Bkp"
+  source_instance_id = "i-030db90a2de02f56e"
+}
+resource "aws_ami_from_instance" "tariffdb_b_bkp" {
+  count              = local.environment == "production" ? 1 : 0
+  name               = "TariffDB_B_Bkp"
+  source_instance_id = "i-0939a0ee8fb520bc9"
+}
