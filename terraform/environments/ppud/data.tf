@@ -34,6 +34,7 @@ data "aws_acm_certificate" "WAM_UAT_ALB" {
 data "aws_acm_certificate" "PPUD_Training_ALB" {
   count    = local.is-preproduction == true ? 1 : 0
   domain   = "training.ppud.justice.gov.uk"
+  most_recent = true
   statuses = ["ISSUED"]
 }
 
