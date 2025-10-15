@@ -79,7 +79,7 @@ securityContext:
   runAsUser: 65534
 
 ingress:
-  enabled: true
+  enabled: false
   className: default
   annotations:
     external-dns.alpha.kubernetes.io/set-identifier: "${ingressIdentifier}-${namespace}-${ingressColour}"
