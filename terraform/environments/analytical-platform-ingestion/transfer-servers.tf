@@ -13,7 +13,7 @@ resource "aws_transfer_server" "this" {
       aws_eip.transfer_server[2].id,
     ]
     security_group_ids = [
-      aws_security_group.transfer_server.id
+      module.transfer_server_security_group.security_group_id
     ]
   }
 

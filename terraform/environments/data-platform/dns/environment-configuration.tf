@@ -3,7 +3,23 @@ locals {
   environment_configurations = {
     development = {
       route53_zone_name = "development.data-platform.service.justice.gov.uk"
-      route53_records   = []
+      route53_records = [
+        {
+          /* 
+            Delegate llm-gateway to Cloud Platform 
+            https://github.com/ministryofjustice/cloud-platform-environments/blob/main/namespaces/live.cloud-platform.service.justice.gov.uk/data-platform-llm-gateway-development/resources/route53.tf
+          */
+          type = "NS"
+          name = "llm-gateway"
+          ttl  = 86400
+          records = [
+            "ns-1340.awsdns-39.org.",
+            "ns-1602.awsdns-08.co.uk.",
+            "ns-440.awsdns-55.com.",
+            "ns-885.awsdns-46.net."
+          ]
+        }
+      ]
     }
     test = {
       route53_zone_name = "test.data-platform.service.justice.gov.uk"

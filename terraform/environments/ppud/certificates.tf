@@ -14,8 +14,9 @@
 
 locals {
   preprod_domains = local.is-preproduction ? {
-    "uat"    = "uat.ppud.justice.gov.uk"
-    "wamuat" = "wamuat.ppud.justice.gov.uk"
+    "uat"      = "uat.ppud.justice.gov.uk"
+    "wamuat"   = "wamuat.ppud.justice.gov.uk"
+    "training" = "training.ppud.justice.gov.uk"
   } : {}
 }
 
@@ -35,7 +36,7 @@ resource "aws_acm_certificate" "preprod_certificates" {
 }
 
 # Output only needs to be enabled to view the CNAME records required for the justice.gov.uk DNS zone.
-/*
+
 output "preprod_cname_validation_records" {
   value = local.is-preproduction ? {
     for cert_key, cert in aws_acm_certificate.preprod_certificates : cert_key => [
@@ -47,7 +48,7 @@ output "preprod_cname_validation_records" {
     ]
   } : {}
 }
-*/
+
 
 resource "aws_acm_certificate_validation" "preprod_certificate_validation" {
   for_each        = local.is-preproduction ? aws_acm_certificate.preprod_certificates : {}

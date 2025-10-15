@@ -47,7 +47,9 @@ resource "aws_iam_role_policy" "glue_s3_policy" {
         Action = ["s3:GetObject", "s3:ListBucket"],
         Resource = [
           "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/*",
-          "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly"
+          "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly",
+          "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly-enriched/*",
+          "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly-enriched"
         ]
       },
       {
@@ -94,6 +96,10 @@ resource "aws_glue_crawler" "cur_v2_crawler" {
 
   s3_target {
     path = "s3://coat-${local.environment}-cur-v2-hourly/moj-cost-and-usage-reports/MOJ-CUR-V2-HOURLY/data/"
+  }
+
+  s3_target {
+    path = "s3://coat-${local.environment}-cur-v2-hourly-enriched/"
   }
 
   configuration = jsonencode({
