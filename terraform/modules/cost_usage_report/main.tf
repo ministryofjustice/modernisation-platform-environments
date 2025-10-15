@@ -18,7 +18,7 @@ resource "aws_cur_report_definition" "cost_usage_report" {
 module "s3_bucket" {
   #checkov:skip=CKV_TF_1:Ensure Terraform module sources use a commit hash; skip as this is MoJ Repo
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v8.2.1"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
 
   bucket_prefix      = "cost-usage-report-"
   versioning_enabled = false

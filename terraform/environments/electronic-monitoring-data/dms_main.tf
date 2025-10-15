@@ -1,3 +1,11 @@
+locals {
+  dms_tasks_with_transformations = {
+    g4s_emsys_mvp = true
+    # Add more as needed, e.g.:
+    # another_task = true
+  }
+}
+
 module "dms_task" {
   source = "./modules/dms"
 
@@ -40,8 +48,11 @@ module "dms_task" {
   # DMS Migration Task Inputs
   dms_replication_instance_arn    = aws_dms_replication_instance.dms_replication_instance[0].replication_instance_arn
   rep_task_settings_filepath      = trimspace(file("${path.module}/dms_replication_task_settings.json"))
-  rep_task_table_mapping_filepath = trimspace(file("${path.module}/dms_${each.key}_task_tables_selection.json"))
-
+  rep_task_table_mapping_filepath = trimspace(
+    file(
+      "${path.module}/dms_${each.key}_task_${lookup(local.dms_tasks_with_transformations, each.key, false) ? "transformations" : "tables_selection"}.json"
+    )
+  )
   local_tags = local.tags
 }
 
@@ -51,6 +62,8 @@ module "dms_second_task" {
 
   for_each = toset(local.is-production ? [
     "capita_alcohol_monitoring",
+    "g4s_emsys_mvp",
+    "g4s_atrium",
   ] : local.is-development ? ["test"] : [])
 
   database_name      = each.key
@@ -70,7 +83,11 @@ module "dms_second_task" {
   # DMS Migration Task Inputs
   dms_replication_instance_arn    = aws_dms_replication_instance.dms_replication_instance[0].replication_instance_arn
   rep_task_settings_filepath      = trimspace(file("${path.module}/dms_replication_task_settings.json"))
-  rep_task_table_mapping_filepath = trimspace(file("${path.module}/dms_${each.key}_task_tables_selection.json"))
+  rep_task_table_mapping_filepath = trimspace(
+    file(
+      "${path.module}/dms_${each.key}_task_${lookup(local.dms_tasks_with_transformations, each.key, false) ? "transformations" : "tables_selection"}.json"
+    )
+  )
 
   local_tags = local.tags
 }
