@@ -1,43 +1,34 @@
 # WAF FOR PUI APP
 
-# Only required in Non-Prod - To restrict access to trusted IPs only
 resource "aws_wafv2_ip_set" "pui_waf_ip_set" {
-  count              = local.is-production ? 0 : 1
   name               = "${local.application_name}-waf-ip-set"
   scope              = "REGIONAL"
   ip_address_version = "IPV4"
   description        = "List of trusted IP Addresses allowing access via WAF"
 
-  addresses = [
-    local.application_data.accounts[local.environment].lz_aws_workspace_public_nat_gateway_a,
-    local.application_data.accounts[local.environment].lz_aws_workspace_public_nat_gateway_b,
-    local.application_data.accounts[local.environment].lz_aws_workspace_public_nat_gateway_c
-  ]
+  addresses = (
+    local.is-production
+    ? [
+      local.application_data.accounts[local.environment].lz_aws_workspace_public_nat_gateway_a,
+      local.application_data.accounts[local.environment].lz_aws_workspace_public_nat_gateway_b,
+      local.application_data.accounts[local.environment].lz_aws_workspace_public_nat_gateway_c,
+      "89.45.177.118/32" # Sahid
+    ]
+    : 
+    [
+      local.application_data.accounts[local.environment].lz_aws_workspace_public_nat_gateway_a,
+      local.application_data.accounts[local.environment].lz_aws_workspace_public_nat_gateway_b,
+      local.application_data.accounts[local.environment].lz_aws_workspace_public_nat_gateway_c,
+    ]
+  )
 
-  tags = merge(local.tags,
+  tags = merge(
+    local.tags,
     { Name = lower(format("%s-%s-ip-set", local.application_name, local.environment)) }
   )
 }
 
-# Only required in Prod - Will be left open to all IPs
-resource "aws_wafv2_ip_set" "pui_waf_ip_set" {
-  count              = local.is-production ? 1 : 0
-  name               = "${local.application_name}-waf-ip-set"
-  scope              = "REGIONAL"
-  ip_address_version = "IPV4"
-  description        = "List of trusted IP Addresses allowing access via WAF"
 
-  addresses = [
-    local.application_data.accounts[local.environment].lz_aws_workspace_public_nat_gateway_a,
-    local.application_data.accounts[local.environment].lz_aws_workspace_public_nat_gateway_b,
-    local.application_data.accounts[local.environment].lz_aws_workspace_public_nat_gateway_c,
-    "89.45.177.118/32" # Sahid
-  ]
-
-  tags = merge(local.tags,
-    { Name = lower(format("%s-%s-ip-set", local.application_name, local.environment)) }
-  )
-}
 
 # Default block on the WAF for now - only allow trusted IPs above
 resource "aws_wafv2_web_acl" "pui_web_acl" {
