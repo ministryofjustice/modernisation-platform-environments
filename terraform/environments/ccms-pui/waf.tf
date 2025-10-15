@@ -166,13 +166,6 @@ resource "aws_wafv2_web_acl" "pui_web_acl" {
         }
 
         rule_action_override {
-          name = "RestrictedExtensions_URIPATH"
-          action_to_use {
-            block {}
-          }
-        }
-
-        rule_action_override {
           name = "RestrictedExtensions_QUERYARGUMENTS"
           action_to_use {
             allow {}
@@ -180,21 +173,7 @@ resource "aws_wafv2_web_acl" "pui_web_acl" {
         }
 
         rule_action_override {
-          name = "GenericRFI_QUERYARGUMENTS"
-          action_to_use {
-            block {}
-          }
-        }
-
-        rule_action_override {
           name = "GenericRFI_BODY"
-          action_to_use {
-            block {}
-          }
-        }
-
-        rule_action_override {
-          name = "GenericRFI_URIPATH"
           action_to_use {
             block {}
           }
