@@ -14,7 +14,7 @@ resource "aws_wafv2_ip_set" "pui_waf_ip_set" {
       local.application_data.accounts[local.environment].lz_aws_workspace_public_nat_gateway_c,
       "89.45.177.118/32" # Sahid
     ]
-    : 
+    :
     [
       local.application_data.accounts[local.environment].lz_aws_workspace_public_nat_gateway_a,
       local.application_data.accounts[local.environment].lz_aws_workspace_public_nat_gateway_b,
@@ -60,6 +60,183 @@ resource "aws_wafv2_web_acl" "pui_web_acl" {
       sampled_requests_enabled   = true
     }
   }
+
+  rule {
+    name     = "AWS-AWSManagedRulesCommonRuleSet"
+    priority = 2
+
+    override_action {
+      none {}
+    }
+
+    statement {
+      managed_rule_group_statement {
+        name        = "AWSManagedRulesCommonRuleSet"
+        vendor_name = "AWS"
+
+        rule_action_override {
+          name = "NoUserAgent_HEADER"
+          action_to_use {
+            allow {}
+          }
+        }
+
+        rule_action_override {
+          name = "UserAgent_BadBots_HEADER"
+          action_to_use {
+            block {}
+          }
+        }
+
+        rule_action_override {
+          name = "SizeRestrictions_QUERYSTRING"
+          action_to_use {
+            block {}
+          }
+        }
+
+        rule_action_override {
+          name = "SizeRestrictions_Cookie_HEADER"
+          action_to_use {
+            block {}
+          }
+        }
+
+        rule_action_override {
+          name = "SizeRestrictions_BODY"
+          action_to_use {
+            allow {}
+          }
+        }
+
+        rule_action_override {
+          name = "SizeRestrictions_URIPATH"
+          action_to_use {
+            block {}
+          }
+        }
+
+        rule_action_override {
+          name = "EC2MetaDataSSRF_BODY"
+          action_to_use {
+            block {}
+          }
+        }
+
+        rule_action_override {
+          name = "EC2MetaDataSSRF_COOKIE"
+          action_to_use {
+            block {}
+          }
+        }
+
+        rule_action_override {
+          name = "EC2MetaDataSSRF_URIPATH"
+          action_to_use {
+            block {}
+          }
+        }
+
+        rule_action_override {
+          name = "EC2MetaDataSSRF_QUERYARGUMENTS"
+          action_to_use {
+            block {}
+          }
+        }
+
+        rule_action_override {
+          name = "GenericLFI_QUERYARGUMENTS"
+          action_to_use {
+            block {}
+          }
+        }
+
+        rule_action_override {
+          name = "GenericLFI_URIPATH"
+          action_to_use {
+            block {}
+          }
+        }
+
+        rule_action_override {
+          name = "GenericLFI_BODY"
+          action_to_use {
+            block {}
+          }
+        }
+
+        rule_action_override {
+          name = "RestrictedExtensions_URIPATH"
+          action_to_use {
+            block {}
+          }
+        }
+
+        rule_action_override {
+          name = "RestrictedExtensions_QUERYARGUMENTS"
+          action_to_use {
+            allow {}
+          }
+        }
+
+        rule_action_override {
+          name = "GenericRFI_QUERYARGUMENTS"
+          action_to_use {
+            block {}
+          }
+        }
+
+        rule_action_override {
+          name = "GenericRFI_BODY"
+          action_to_use {
+            block {}
+          }
+        }
+
+        rule_action_override {
+          name = "GenericRFI_URIPATH"
+          action_to_use {
+            block {}
+          }
+        }
+
+        rule_action_override {
+          name = "CrossSiteScripting_COOKIE"
+          action_to_use {
+            block {}
+          }
+        }
+
+        rule_action_override {
+          name = "CrossSiteScripting_QUERYARGUMENTS"
+          action_to_use {
+            block {}
+          }
+        }
+
+        rule_action_override {
+          name = "CrossSiteScripting_BODY"
+          action_to_use {
+            block {}
+          }
+        }
+
+        rule_action_override {
+          name = "CrossSiteScripting_URIPATH"
+          action_to_use {
+            block {}
+          }
+        }
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "AWS-AWSManagedRulesCommonRuleSet"
+      sampled_requests_enabled   = true
+    }
+  }
+
 
   tags = merge(local.tags,
     { Name = lower(format("%s-%s-web-acl", local.application_name, local.environment)) }
