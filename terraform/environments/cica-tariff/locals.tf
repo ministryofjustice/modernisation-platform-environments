@@ -125,14 +125,7 @@ locals {
     if mapping.device_name == "xvdn"
   } : {}
   snapshot_id_xvdn_db = local.environment == "production" ? local.block_device_mapping_xvdn_db[9].ebs.snapshot_id : ""
-
-  block_device_mapping_xvdo_db = local.environment == "production" ? {
-    for mapping in tolist(data.aws_ami.shared_db_ami)[0].block_device_mappings : "10" => mapping
-    if mapping.device_name == "xvdo"
-  } : {}
-  snapshot_id_xvdo_db = local.environment == "production" ? local.block_device_mapping_xvdo_db[10].ebs.snapshot_id : ""
-
-
+  
   env_to_cica_map = {
     "development" = ["dev"]
     "test"        = ["uat"]
