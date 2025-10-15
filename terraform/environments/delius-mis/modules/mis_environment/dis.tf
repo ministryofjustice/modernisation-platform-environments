@@ -25,7 +25,7 @@ data "aws_security_group" "mis_db" {
 }
 
 module "dis_instance" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v3.0.1"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v4.1.0"
 
   # allow environment not to have this var set and still work
   count = var.dis_config != null ? var.dis_config.instance_count : 0
@@ -53,7 +53,7 @@ module "dis_instance" {
   }
   iam_resource_names_prefix = "${var.env_name}-dis-${count.index + 1}"
   instance_profile_policies = [
-    "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+    # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore", added by module
     aws_iam_policy.secrets_manager.arn,
     aws_iam_policy.ec2_automation.arn
   ]

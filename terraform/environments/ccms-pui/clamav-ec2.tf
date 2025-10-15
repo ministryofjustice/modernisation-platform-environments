@@ -47,8 +47,8 @@ resource "aws_instance" "ec2_clamav" {
     device_name = "/dev/sdb"
     volume_type = "gp3"
     volume_size = 50
-    encrypted  = true
-    kms_key_id = data.aws_kms_key.ebs_shared.key_id
+    encrypted   = true
+    kms_key_id  = data.aws_kms_key.ebs_shared.key_id
     tags = merge(local.tags,
       { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_clamav, "swap")) },
       { device-name = "/dev/sdb" }
