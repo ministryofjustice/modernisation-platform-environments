@@ -111,4 +111,11 @@ resource "aws_instance" "tariffdb" {
     volume_size           = 500
     snapshot_id           = local.snapshot_id_xvdn_db
   }
+  ebs_block_device {
+    device_name           = "xvdo"
+    delete_on_termination = true
+    encrypted             = true
+    volume_size           = 2000
+    snapshot_id           = local.snapshot_id_xvdo_db
+  }
 }
