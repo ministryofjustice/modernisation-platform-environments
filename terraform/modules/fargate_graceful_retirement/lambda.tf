@@ -27,6 +27,14 @@ resource "aws_iam_role_policy_attachment" "basic_execution" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
+
+# Lambda Log Group
+resource "aws_cloudwatch_log_group" "ecs_restart_handler" {
+  # Environment-specific log group name
+  name              = "/aws/lambda/ecs_restart_handler/${var.environment}"
+  retention_in_days = 30
+}
+
 data "aws_iam_policy_document" "lambda_ecs" {
   statement {
     actions = [
