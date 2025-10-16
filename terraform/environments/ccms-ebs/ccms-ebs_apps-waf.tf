@@ -28,7 +28,7 @@ resource "aws_wafv2_regex_pattern_set" "ebsapps_blocked_paths" {
   }
 
   tags = merge(local.tags,
-    { Name = lower(format("ebs_apps-%s-%s-waf-patterns", local.application_name, local.environment)) }
+    { Name = lower(format("%s-%s-ebs_apps-waf-patterns", local.application_name, local.environment)) }
   )
 }
 
@@ -66,34 +66,34 @@ resource "aws_wafv2_web_acl" "ebsapps_waf_acl" {
 
     visibility_config {
       cloudwatch_metrics_enabled = true
-      metric_name                = "BlockEBSOAHTMLpaths"
+      metric_name                = "Block-EBS-OA_HTML-paths"
       sampled_requests_enabled   = true
     }
   }
 
   visibility_config {
     cloudwatch_metrics_enabled = true
-    metric_name                = "EBSAppsWAF"
+    metric_name                = "EBS-Apps-WAF"
     sampled_requests_enabled   = true
   }
 
   tags = merge(local.tags,
-    { Name = lower(format("ebs_apps-%s-%s-waf-acl", local.application_name, local.environment)) }
+    { Name = lower(format("%s-%s-ebs_apps-waf-acl", local.application_name, local.environment)) }
   )
 }
 
-resource "aws_cloudwatch_log_group" "waf_log_group" {
-  name              = "/aws/wafv2/ebsapps"
-  retention_in_days = 30
+resource "aws_cloudwatch_log_group" "ebsapps_oa_html" {
+  name              = "/aws/waf/ebsapps/oa_html"
+  retention_in_days = local.is_production ? 90 : 30
 
   tags = merge(local.tags,
-    { Name = lower(format("ebs_apps-%s-%s-waf-log-group", local.application_name, local.environment)) }
+    { Name = lower(format("%s-%s-ebs_apps-waf", local.application_name, local.environment)) }
   )
 }
 
 resource "aws_wafv2_web_acl_logging_configuration" "ebsapps_waf_logging" {
   resource_arn            = aws_wafv2_web_acl.ebsapps_waf_acl.arn
-  log_destination_configs = [aws_cloudwatch_log_group.waf_log_group.arn]
+  log_destination_configs = [aws_cloudwatch_log_group.ebsapps_oa_html.arn]
 
   redacted_fields {
     single_header {
@@ -125,7 +125,7 @@ output "waf_acl_arn" {
 
 output "waf_log_group_name" {
   description = "The name of the CloudWatch Log Group for WAF logs"
-  value       = aws_cloudwatch_log_group.waf_log_group.name
+  value       = aws_cloudwatch_log_group.ebsapps_oa_html.name
 }
 
 output "regex_pattern_set_arn" {
