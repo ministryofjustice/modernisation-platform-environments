@@ -92,8 +92,8 @@ resource "aws_cloudwatch_log_group" "ebsapps_oa_html" {
 }
 
 resource "aws_wafv2_web_acl_logging_configuration" "ebsapps_waf_logging" {
+  log_destination_configs = [aws_cloudwatch_log_group.ebsapps_oa_html.arn]
   resource_arn            = aws_wafv2_web_acl.ebsapps_waf_acl.arn
-  log_destination_configs = ["${aws_cloudwatch_log_group.ebsapps_oa_html.arn}:*"]
 
   redacted_fields {
     single_header {
