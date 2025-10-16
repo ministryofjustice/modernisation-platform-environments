@@ -2,7 +2,7 @@
 
 data "aws_secretsmanager_secret" "spring_datasource_password" {
   name        = "ccms/edrms/datasource"
-  description = "EDRMS TDS database password for CCMS EDRMS application"
+  # description = "EDRMS TDS database password for CCMS EDRMS application"
 }
 
 data "aws_secretsmanager_secret_version" "spring_datasource_password" {
@@ -12,7 +12,7 @@ data "aws_secretsmanager_secret_version" "spring_datasource_password" {
 # Slack Channel ID for Alerts
 data "aws_secretsmanager_secret" "slack_channel_id" {
   name        = "alerts_slack_channel_id"
-  description = "Slack Channel ID for EDRMS Alerts"
+  # description = "Slack Channel ID for EDRMS Alerts"
 }
 
 data "aws_secretsmanager_secret_version" "slack_channel_id" {
