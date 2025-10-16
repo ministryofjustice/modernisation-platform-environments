@@ -77,7 +77,7 @@ resource "aws_ecs_task_definition" "pui" {
       IdpSamlMockEnabled                                            = local.application_data.accounts[local.environment].IdpSamlMockEnabled
       SpEntityId                                                    = "${aws_secretsmanager_secret.pui_secrets.arn}:SpEntityId::"
       SpEntityUrl                                                   = "${aws_secretsmanager_secret.pui_secrets.arn}:SpEntityUrl::"
-      opa_security_password                                         = "${aws_secretsmanager_secret.opa_secrets.arn}:opa_security_password::"
+      opa_security_password                                         = "${aws_secretsmanager_secret.pui_secrets.arn}:opa_security_password::"
       opa12_assess_service_servlet                                  = local.application_data.accounts[local.environment].opa12_assess_service_servlet
       ccms_owd_rulebase_baseurl                                     = local.application_data.accounts[local.environment].ccms_owd_rulebase_baseurl
       ccms_pui_av_port                                              = local.application_data.accounts[local.environment].ccms_pui_av_port
