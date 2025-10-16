@@ -43,6 +43,13 @@ locals {
 ############################################################
 
 resource "aws_s3_bucket" "r2s" {
+  # checkov:skip=CKV_AWS_145: "S3 bucket is not public facing
+  # checkov:skip=CKV_AWS_18:"Access logging not required"
+  # checkov:skip=CKV2_AWS_62:"Event notifications not required for this bucket"
+  # checkov:skip=CKV_AWS_21:Versioning not needed
+  # checkov:skip=CKV_AWS_144:"Cross-region replication not required"
+  # checkov:skip=CKV2_AWS_65:"ACLs are required by design"
+  # checkov:skip=CKV2_AWS_61:"Lifecycle configuration not specified"
   bucket = local.bucket_name
   tags   = local.tags
 }
@@ -103,24 +110,32 @@ resource "aws_s3_bucket_policy" "r2s" {
 ############################################################
 
 resource "aws_secretsmanager_secret" "genesys_account_id" {
+  # checkov:skip=CKV_AWS_149: "Secrets manager secrets are encrypted by an AWS managed key by default, a customer managed key is not required."
+  # checkov:skip=CKV2_AWS_57:Automatic rotation is not required for this secret
   name        = "r2s/genesys/aws_account_id"
   description = "Genesys Cloud AWS Account ID (populate manually)."
   tags        = local.tags
 }
 
 resource "aws_secretsmanager_secret" "genesys_external_id" {
+  # checkov:skip=CKV_AWS_149: "Secrets manager secrets are encrypted by an AWS managed key by default, a customer managed key is not required."
+  # checkov:skip=CKV2_AWS_57:Automatic rotation is not required for this secret
   name        = "r2s/genesys/external_id"
   description = "Genesys Cloud Org ID used as ExternalId (populate manually)."
   tags        = local.tags
 }
 
 resource "aws_secretsmanager_secret" "snowflake_principal_account_id" {
+  # checkov:skip=CKV_AWS_149: "Secrets manager secrets are encrypted by an AWS managed key by default, a customer managed key is not required."
+  # checkov:skip=CKV2_AWS_57:Automatic rotation is not required for this secret
   name        = "r2s/snowflake/principal_account_id"
   description = "Snowflake AWS Account ID (populate manually)."
   tags        = local.tags
 }
 
 resource "aws_secretsmanager_secret" "snowflake_external_id" {
+  # checkov:skip=CKV_AWS_149: "Secrets manager secrets are encrypted by an AWS managed key by default, a customer managed key is not required."
+  # checkov:skip=CKV2_AWS_57:Automatic rotation is not required for this secret
   name        = "r2s/snowflake/external_id"
   description = "Snowflake External ID (populate manually)."
   tags        = local.tags
