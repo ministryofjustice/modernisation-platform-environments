@@ -73,18 +73,21 @@ locals {
       llm_gateway_hostname          = ""
       llm_gateway_ingress_allowlist = []
       llm_gateway_models            = {}
+      llm_gateway_teams             = {}
     }
     preproduction = {
       litellm_versions              = {}
       llm_gateway_hostname          = ""
       llm_gateway_ingress_allowlist = []
       llm_gateway_models            = {}
+      llm_gateway_teams             = {}
     }
     production = {
       litellm_versions              = {}
       llm_gateway_hostname          = ""
       llm_gateway_ingress_allowlist = []
       llm_gateway_models            = {}
+      llm_gateway_teams             = {}
     }
   }
 }
