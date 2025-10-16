@@ -70,6 +70,11 @@ resource "aws_cloudfront_distribution" "tribunals_distribution" {
       restriction_type = "none"
     }
   }
+  depends_on = [
+    aws_iam_role_policy.lambda_edge_policy,
+    aws_lambda_function.cloudfront_redirect_lambda,
+    aws_lambda_permission.allow_cloudfront
+  ]
 }
 
 data "aws_cloudfront_cache_policy" "caching_disabled" {
@@ -301,7 +306,7 @@ resource "aws_cloudfront_response_headers_policy" "security_headers_policy" {
 
 # IAM Role for Lambda@Edge
 resource "aws_iam_role" "lambda_edge_role" {
-  name = "cloudfront-redirect-lambda-edge-role"
+  name = "CloudfrontRedirectLambdaRole"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -316,13 +321,29 @@ resource "aws_iam_role" "lambda_edge_role" {
   })
 }
 
-# IAM Policy for Lambda@Edge (basic execution and CloudWatch logs)
+
+# IAM Policy for Lambda@Edge
 resource "aws_iam_role_policy" "lambda_edge_policy" {
-  name = "cloudfront-redirect-lambda-edge-policy"
-  role = aws_iam_role.lambda_edge_role.id
+  provider = aws.us-east-1
+  name     = "CloudfrontRedirectLambdaPolicy"
+  role     = aws_iam_role.lambda_edge_role.id
+
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "lambda:CreateFunction",
+          "lambda:UpdateFunctionCode",
+          "lambda:PublishVersion",
+          "lambda:GetFunction",
+          "lambda:UpdateFunctionConfiguration",
+          "lambda:AddPermission",
+          "lambda:InvokeFunction"
+        ]
+        Resource = "arn:aws:lambda:us-east-1:${data.aws_caller_identity.current.account_id}:function:CloudfrontRedirectLambda"
+      },
       {
         Effect = "Allow"
         Action = [
@@ -330,11 +351,27 @@ resource "aws_iam_role_policy" "lambda_edge_policy" {
           "logs:CreateLogStream",
           "logs:PutLogEvents"
         ]
-        Resource = "*"
+        Resource = "arn:aws:logs:us-east-1:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/CloudfrontRedirectLambda:*"
+      },
+      {
+        Effect = "Allow"
+        Action = "iam:PassRole"
+        Resource = aws_iam_role.lambda_edge_role.arn
+        Condition = {
+          StringEquals = {
+            "iam:PassedToService" = ["lambda.amazonaws.com", "edgelambda.amazonaws.com"]
+          }
+        }
       }
     ]
   })
 }
+
+# Get current AWS account ID
+data "aws_caller_identity" "current" {
+  provider = aws.us-east-1
+}
+
 
 # Create ZIP archive for Lambda@Edge function
 data "archive_file" "lambda_zip" {
@@ -363,4 +400,12 @@ resource "aws_lambda_function" "cloudfront_redirect_lambda" {
   memory_size      = 128
 }
 
-
+# Lambda Permission for CloudFront
+resource "aws_lambda_permission" "allow_cloudfront" {
+  provider      = aws.us-east-1
+  statement_id  = "AllowCloudFrontExecution"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.cloudfront_redirect_lambda.function_name
+  principal     = "edgelambda.amazonaws.com"
+  source_arn    = aws_cloudfront_distribution.tribunals_redirect.arn
+}
