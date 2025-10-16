@@ -60,7 +60,7 @@ proxy_config:
     redis_password: os.environ/auth_token
       
   model_list:
-%{ for key, profile in azureOpenAIModels ~}
+%{ for key, profile in azureModels ~}
     - model_name: azure-${key}
       litellm_params:
         model: azure/${profile.model_id}

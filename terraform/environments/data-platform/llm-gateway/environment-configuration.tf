@@ -34,7 +34,7 @@ locals {
         "35.178.209.113/32",
       ]
       llm_gateway_models = {
-        azure_openai = {
+        azure = {
           gpt-5 = {
             model_id    = "gpt-5"
             api_version = "2024-12-01-preview"
@@ -48,6 +48,22 @@ locals {
           claude-sonnet-4 = {
             model_id = "eu.anthropic.claude-sonnet-4-20250514-v1:0"
             region   = "eu-west-1"
+          }
+        }
+      }
+      llm_gateway_teams = {
+        data-platform = {
+          models = [
+            "azure-gpt-5",
+            "bedrock-claude-sonnet-4-5"
+          ]
+          keys = {
+            app-1 = {
+              models = [
+                "azure-gpt-5",
+                "bedrock-claude-sonnet-4-5"
+              ]
+            }
           }
         }
       }
