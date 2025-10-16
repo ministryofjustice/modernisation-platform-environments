@@ -1,21 +1,40 @@
 ############################################################
+# Inputs / toggles
+############################################################
+
+variable "secrets_populated" {
+  description = "For when the secrets have been populated"
+  type        = bool
+  default     = true
+}
+
+############################################################
 # Locals for this bucket setup
 ############################################################
 
 locals {
-  bucket_name = "r2s-resources"
-  genesys_aws_account_id            = nonsensitive(data.aws_secretsmanager_secret_version.genesys_account_id.secret_string)
-  genesys_external_id               = nonsensitive(data.aws_secretsmanager_secret_version.genesys_external_id.secret_string)
-  snowflake_principal_account_id    = nonsensitive(data.aws_secretsmanager_secret_version.snowflake_principal_account_id.secret_string)
-  snowflake_external_id             = nonsensitive(data.aws_secretsmanager_secret_version.snowflake_external_id.secret_string)
+  # Ensure global uniqueness to avoid BucketAlreadyExists
+  bucket_name = "r2s-resources-${data.aws_caller_identity.current.account_id}-${data.aws_region.current.name}"
+
+  # Read secrets only when populated; stay null otherwise (prevents eval errors)
+  genesys_aws_account_id         = var.secrets_populated ? try(nonsensitive(data.aws_secretsmanager_secret_version.genesys_account_id[0].secret_string), null) : null
+  genesys_external_id            = var.secrets_populated ? try(nonsensitive(data.aws_secretsmanager_secret_version.genesys_external_id[0].secret_string), null) : null
+  snowflake_principal_account_id = var.secrets_populated ? try(nonsensitive(data.aws_secretsmanager_secret_version.snowflake_principal_account_id[0].secret_string), null) : null
+  snowflake_external_id          = var.secrets_populated ? try(nonsensitive(data.aws_secretsmanager_secret_version.snowflake_external_id[0].secret_string), null) : null
+
+  # Convenience flags: only create IAM bits when we truly have the values
+  genesys_ready    = var.secrets_populated && local.genesys_aws_account_id != null && local.genesys_external_id != null
+  snowflake_ready  = var.secrets_populated && local.snowflake_principal_account_id != null && local.snowflake_external_id != null
+
   snowflake_prefix = "metadata/"
-    genesys_roles = {
-    role1 = { name = "r2s-genesys-cica-role", prefix = "cica/" }
-    role2 = { name = "r2s-genesys-opg-role", prefix = "opg/" }
-    role3 = { name = "r2s-genesys-laa-role", prefix = "laa/" }
-    role4 = { name = "r2s-genesys-hmpps-role", prefix = "hmpps/" }
+
+  genesys_roles = {
+    role1 = { name = "r2s-genesys-cica-role",             prefix = "cica/" }
+    role2 = { name = "r2s-genesys-opg-role",              prefix = "opg/" }
+    role3 = { name = "r2s-genesys-laa-role",              prefix = "laa/" }
+    role4 = { name = "r2s-genesys-hmpps-role",            prefix = "hmpps/" }
     role5 = { name = "r2s-genesys-london-probation-role", prefix = "london-probation/" }
-    role6 = { name = "r2s-genesys-nle-role", prefix = "nle/" }
+    role6 = { name = "r2s-genesys-nle-role",              prefix = "nle/" }
   }
 }
 
@@ -82,62 +101,61 @@ resource "aws_s3_bucket_policy" "r2s" {
 ############################################################
 # Secrets Manager: create empty secrets (populate in console)
 ############################################################
-# These four hold the strings needed by IAM trust policies.
 
-# 1) Genesys AWS Account ID 
 resource "aws_secretsmanager_secret" "genesys_account_id" {
   name        = "r2s/genesys/aws_account_id"
   description = "Genesys Cloud AWS Account ID (populate manually)."
   tags        = local.tags
 }
 
-# 2) Genesys External ID 
 resource "aws_secretsmanager_secret" "genesys_external_id" {
   name        = "r2s/genesys/external_id"
   description = "Genesys Cloud Org ID used as ExternalId (populate manually)."
   tags        = local.tags
 }
 
-# 3) Snowflake AWS Account ID 
 resource "aws_secretsmanager_secret" "snowflake_principal_account_id" {
   name        = "r2s/snowflake/principal_account_id"
   description = "Snowflake AWS Account ID (populate manually)."
   tags        = local.tags
 }
 
-# 4) Snowflake External ID 
 resource "aws_secretsmanager_secret" "snowflake_external_id" {
   name        = "r2s/snowflake/external_id"
   description = "Snowflake External ID (populate manually)."
   tags        = local.tags
 }
 
-# --- Read the latest secret values (we populate manually) ---
+# --- Read the latest secret values (only when flagged as populated) ---
 
 data "aws_secretsmanager_secret_version" "genesys_account_id" {
+  count     = var.secrets_populated ? 1 : 0
   secret_id = aws_secretsmanager_secret.genesys_account_id.id
 }
 
 data "aws_secretsmanager_secret_version" "genesys_external_id" {
+  count     = var.secrets_populated ? 1 : 0
   secret_id = aws_secretsmanager_secret.genesys_external_id.id
 }
 
 data "aws_secretsmanager_secret_version" "snowflake_principal_account_id" {
+  count     = var.secrets_populated ? 1 : 0
   secret_id = aws_secretsmanager_secret.snowflake_principal_account_id.id
 }
 
 data "aws_secretsmanager_secret_version" "snowflake_external_id" {
+  count     = var.secrets_populated ? 1 : 0
   secret_id = aws_secretsmanager_secret.snowflake_external_id.id
 }
-
 
 ############################################################
 # IAM: Genesys trust + 6 roles + per-prefix policies
 ############################################################
 
-
-# Trust policy for Genesys (Another AWS Account + ExternalId)
+# Trust policy for Genesys (create only when we truly have values)
 data "aws_iam_policy_document" "genesys_trust" {
+  count = local.genesys_ready ? 1 : 0
+
   statement {
     effect = "Allow"
     principals {
@@ -153,19 +171,19 @@ data "aws_iam_policy_document" "genesys_trust" {
   }
 }
 
-# Create 6 roles
+# Create 6 roles only when ready
 resource "aws_iam_role" "genesys_role" {
-  for_each = local.genesys_roles
+  for_each = local.genesys_ready ? local.genesys_roles : {}
 
   name               = each.value.name
-  assume_role_policy = data.aws_iam_policy_document.genesys_trust.json
+  assume_role_policy = data.aws_iam_policy_document.genesys_trust[0].json
   description        = "Role assumed by Genesys Cloud export module to upload recordings to ${local.bucket_name} in ${each.value.prefix}"
   tags               = local.tags
 }
 
 # Per-role S3 policy document restricted to its own prefix
 data "aws_iam_policy_document" "genesys_prefix" {
-  for_each = local.genesys_roles
+  for_each = local.genesys_ready ? local.genesys_roles : {}
 
   # List only within the specific prefix
   statement {
@@ -209,7 +227,7 @@ data "aws_iam_policy_document" "genesys_prefix" {
   }
 }
 
-# Managed policy per role from the above doc
+# Managed policy per role
 resource "aws_iam_policy" "genesys_prefix" {
   for_each = data.aws_iam_policy_document.genesys_prefix
 
@@ -221,7 +239,7 @@ resource "aws_iam_policy" "genesys_prefix" {
 
 # Attach the restricted policy to the matching role
 resource "aws_iam_role_policy_attachment" "genesys_prefix_attach" {
-  for_each = local.genesys_roles
+  for_each = local.genesys_ready ? local.genesys_roles : {}
 
   role       = aws_iam_role.genesys_role[each.key].name
   policy_arn = aws_iam_policy.genesys_prefix[each.key].arn
@@ -231,8 +249,10 @@ resource "aws_iam_role_policy_attachment" "genesys_prefix_attach" {
 # IAM: Snowflake trust + policy (metadata-only) + role
 ############################################################
 
-# Trust policy for Snowflake (Another AWS Account + ExternalId)
+# Trust policy for Snowflake (only when ready)
 data "aws_iam_policy_document" "snowflake_trust" {
+  count = local.snowflake_ready ? 1 : 0
+
   statement {
     effect = "Allow"
     principals {
@@ -248,7 +268,7 @@ data "aws_iam_policy_document" "snowflake_trust" {
   }
 }
 
-# Snowflake policy: metadata-only prefix
+# Snowflake policy: metadata-only prefix (can be created regardless)
 data "aws_iam_policy_document" "snowflake_policy_doc" {
   # List only within metadata prefix
   statement {
@@ -299,13 +319,15 @@ resource "aws_iam_policy" "snowflake_policy" {
 }
 
 resource "aws_iam_role" "snowflake_role" {
+  count              = local.snowflake_ready ? 1 : 0
   name               = "r2s-snowflake-role"
-  assume_role_policy = data.aws_iam_policy_document.snowflake_trust.json
+  assume_role_policy = data.aws_iam_policy_document.snowflake_trust[0].json
   description        = "Role for Snowflake to process metadata in ${local.bucket_name} (no access to recordings)."
   tags               = local.tags
 }
 
 resource "aws_iam_role_policy_attachment" "snowflake_attach" {
-  role       = aws_iam_role.snowflake_role.name
+  count      = local.snowflake_ready ? 1 : 0
+  role       = aws_iam_role.snowflake_role[0].name
   policy_arn = aws_iam_policy.snowflake_policy.arn
 }
