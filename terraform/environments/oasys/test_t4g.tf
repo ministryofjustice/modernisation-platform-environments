@@ -26,7 +26,8 @@ resource "aws_instance" "my_t4_instance" {
   #checkov:skip=CKV_AWS_79: "Ensure Instance Metadata Service Version 1 is not enabled"
   #checkov:skip=CKV_AWS_135: "Ensure that EC2 is EBS optimized"
 
-  count = local.is-development ? 1 : 0
+  #count = local.is-development ? 1 : 0
+  count = 0 # disabling for now as we are trying to use module
 
   ami                         = "ami-01e9af7b9c1dfb736"
   instance_type               = "t4g.xlarge"
@@ -72,16 +73,23 @@ module "test-ec2-t4" { #"my_t4_instance" {
   instance_profile_policies     = []
 
   instance = {
-    disable_api_stop            = false
-    disable_api_termination     = true
-    instance_type               = "t4g.xlarge"
-    key_name                    = null
-    vpc_security_group_ids      = [aws_security_group.test-sg-for-t4[0].id]
+    disable_api_stop        = false
+    disable_api_termination = true
+    instance_type           = "t4g.xlarge"
+    key_name                = null
+    vpc_security_group_ids  = [aws_security_group.test-sg-for-t4[0].id]
   }
 
   route53_records = {
     create_internal_record = false
     create_external_record = false
+  }
+
+  user_data_cloud_init = {
+    args = {}
+    scripts = [ # paths are relative to templates/ dir
+      "../../../modules/baseline_presets/ec2-user-data/install-ssm-agent-multi-os.sh",
+    ]
   }
 
   tags = {
