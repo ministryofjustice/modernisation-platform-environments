@@ -29,11 +29,11 @@ resource "aws_secretsmanager_secret_version" "pui_secrets" {
     opa_security_password            = ""
   })
 
-  # lifecycle {
-  #   ignore_changes = [
-  #     secret_string
-  #   ]
-  # }
+  lifecycle {
+    ignore_changes = [
+      secret_string
+    ]
+  }
 }
 
 data "aws_secretsmanager_secret_version" "pui_secrets" {
