@@ -1,9 +1,14 @@
 module "waf" {
-  source                   = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-waf?ref=ecc855f212ce6a2f36a7a77e78c42d968f15ee8d"
+  source                   = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-aws-waf?ref=b9cf6f92b142e80845ae30252aee2f84f57a71a9"
   enable_ddos_protection   = true
   ddos_rate_limit          = 3000
   block_non_uk_traffic     = true
   associated_resource_arns = [aws_lb.waf_lb.arn]
+
+  providers = {
+    aws                        = aws
+    aws.modernisation-platform = aws.modernisation-platform
+  }
 
   managed_rule_actions = {
     AWSManagedRulesKnownBadInputsRuleSet = false
@@ -12,6 +17,15 @@ module "waf" {
     AWSManagedRulesLinuxRuleSet          = false
     AWSManagedRulesAnonymousIpList       = false
     AWSManagedRulesBotControlRuleSet     = false
+  }
+
+  managed_rule_priorities = {
+    AWSManagedRulesAnonymousIpList       = 10
+    AWSManagedRulesKnownBadInputsRuleSet = 11
+    AWSManagedRulesCommonRuleSet         = 12
+    AWSManagedRulesSQLiRuleSet           = 13
+    AWSManagedRulesLinuxRuleSet          = 14
+    AWSManagedRulesBotControlRuleSet     = 15
   }
 
   core_logging_account_id = local.environment_management.account_ids["core-logging-production"]
