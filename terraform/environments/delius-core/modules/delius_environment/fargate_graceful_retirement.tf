@@ -1,7 +1,7 @@
 locals {
   # Restart schedules for envs, testing for dev only now
   fargate_restart_schedules = {
-    dev  = { day = "THURSDAY", time = "10:30" }
+    dev  = { day = "THURSDAY", time = "11:30" }
     poc  = { day = "MONDAY", time = "20:00" }
     test = { day = "TUESDAY", time = "22:00" }
   }
