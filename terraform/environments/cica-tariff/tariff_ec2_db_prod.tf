@@ -132,10 +132,10 @@ resource "aws_ami_from_instance" "tariffdb_b_bkp" {
 }
 # AMIs imported due to Terraform timeout
 import {
-  to = aws_ami_from_instance.tariffdb_a_bkp
+  to = aws_ami_from_instance.tariffdb_a_bkp[0]
   id = "ami-03b1bc3a5f61dfb99"
 }
 import {
-  to = aws_ami_from_instance.tariffdb_b_bkp
+  to = aws_ami_from_instance.tariffdb_b_bkp[0]
   id = "ami-0a28f7de7635e740c"
 }
