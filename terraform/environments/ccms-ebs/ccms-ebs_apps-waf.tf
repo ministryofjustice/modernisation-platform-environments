@@ -1,6 +1,6 @@
 resource "aws_wafv2_regex_pattern_set" "ebsapps_blocked_paths" {
   name        = "ebs_apps-blocked-paths"
-  description = "Blocked EBS OA_HTML paths"
+  description = "Blocked EBS /OA_HTML/ paths"
   scope       = "REGIONAL"
 
   regular_expression {
