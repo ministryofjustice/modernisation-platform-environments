@@ -51,7 +51,7 @@ resource "aws_instance" "tariffdb" {
     device_name           = "xvdf"
     delete_on_termination = true
     encrypted             = true
-    volume_size           = 900
+    volume_size           = 2000
     snapshot_id           = local.snapshot_id_xvdf_db
   }
   ebs_block_device {
@@ -111,4 +111,16 @@ resource "aws_instance" "tariffdb" {
     volume_size           = 500
     snapshot_id           = local.snapshot_id_xvdn_db
   }
+}
+
+# AMI backup of tariffdb prior to CDI-274 refactor
+resource "aws_ami_from_instance" "tariffdb_a_bkp" {
+  count              = local.environment == "production" ? 1 : 0
+  name               = "TariffDB_A_Bkp"
+  source_instance_id = "i-030db90a2de02f56e"
+}
+resource "aws_ami_from_instance" "tariffdb_b_bkp" {
+  count              = local.environment == "production" ? 1 : 0
+  name               = "TariffDB_B_Bkp"
+  source_instance_id = "i-0939a0ee8fb520bc9"
 }
