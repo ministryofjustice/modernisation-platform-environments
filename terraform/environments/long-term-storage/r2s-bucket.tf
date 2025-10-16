@@ -10,12 +10,12 @@ locals {
   snowflake_external_id             = nonsensitive(data.aws_secretsmanager_secret_version.snowflake_external_id.secret_string)
   snowflake_prefix = "metadata/"
     genesys_roles = {
-    role1 = { name = "r2s-genesys-role-1", prefix = "role-1/" }
-    role2 = { name = "r2s-genesys-role-2", prefix = "role-2/" }
-    role3 = { name = "r2s-genesys-role-3", prefix = "role-3/" }
-    role4 = { name = "r2s-genesys-role-4", prefix = "role-4/" }
-    role5 = { name = "r2s-genesys-role-5", prefix = "role-5/" }
-    role6 = { name = "r2s-genesys-role-6", prefix = "role-6/" }
+    role1 = { name = "r2s-genesys-cica-role", prefix = "cica/" }
+    role2 = { name = "r2s-genesys-opg-role", prefix = "opg/" }
+    role3 = { name = "r2s-genesys-laa-role", prefix = "laa/" }
+    role4 = { name = "r2s-genesys-hmpps-role", prefix = "hmpps/" }
+    role5 = { name = "r2s-genesys-london-probation-role", prefix = "london-probation/" }
+    role6 = { name = "r2s-genesys-nle-role", prefix = "nle/" }
   }
 }
 
