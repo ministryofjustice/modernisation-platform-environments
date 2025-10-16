@@ -132,10 +132,12 @@ resource "aws_ami_from_instance" "tariffdb_b_bkp" {
 }
 # AMIs imported due to Terraform timeout
 import {
+  for_each = { for k, v in local.prod_ami_import_target : k => v if k == "db_a" }
   to = aws_ami_from_instance.tariffdb_a_bkp[0]
-  id = "ami-03b1bc3a5f61dfb99"
+  id = each.value 
 }
 import {
+  for_each = { for k, v in local.prod_ami_import_target : k => v if k == "db_b" }
   to = aws_ami_from_instance.tariffdb_b_bkp[0]
-  id = "ami-0a28f7de7635e740c"
+  id = each.value 
 }
