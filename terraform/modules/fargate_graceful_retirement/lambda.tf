@@ -31,7 +31,7 @@ resource "aws_iam_role_policy_attachment" "basic_execution" {
 # Lambda Log Group
 resource "aws_cloudwatch_log_group" "ecs_restart_handler" {
   # Environment-specific log group name
-  name              = "/aws/lambda/ecs_restart_handler/${var.environment}"
+  name              = "/aws/lambda/${var.environment}_ecs_restart_handler"
   retention_in_days = 30
 }
 
