@@ -7,7 +7,7 @@ resource "kubernetes_ingress_v1" "litellm" {
     annotations = {
       "external-dns.alpha.kubernetes.io/aws-weight"        = "100"
       "external-dns.alpha.kubernetes.io/hostname"          = local.environment_configuration.llm_gateway_hostname
-      "external-dns.alpha.kubernetes.io/set-identifier"    = "litellm-data-platform-llm-gateway-development-green"
+      "external-dns.alpha.kubernetes.io/set-identifier"    = "litellm-${local.application_name}-${local.component_name}-${local.environment}-green"
       "nginx.ingress.kubernetes.io/whitelist-source-range" = join(",", local.environment_configuration.llm_gateway_ingress_allowlist)
     }
     labels = {}
@@ -30,6 +30,7 @@ resource "kubernetes_ingress_v1" "litellm" {
             }
           }
         }
+        // This path is to stop metrics being accessed externally
         path {
           path      = "/metrics"
           path_type = "ImplementationSpecific"
