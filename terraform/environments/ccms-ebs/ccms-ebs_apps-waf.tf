@@ -4,31 +4,15 @@ resource "aws_wafv2_regex_pattern_set" "ebsapps_blocked_paths" {
   scope       = "REGIONAL"
 
   regular_expression {
-    regex_string = "^/OA_HTML/.*SyncServlet"
+    regex_string = "^/OA_HTML/.*SyncServlet.*"
   }
 
   regular_expression {
-    regex_string = "^/OA_HTML/CZErrorPage\\.jsp"
+    regex_string = "^/OA_HTML/CZ(ErrorPage|Info|InitializationErrorPage|Initialize)\\.jsp"
   }
 
   regular_expression {
-    regex_string = "^/OA_HTML/CZInfo\\.jsp"
-  }
-
-  regular_expression {
-    regex_string = "^/OA_HTML/CZInitializationErrorPage\\.jsp"
-  }
-
-  regular_expression {
-    regex_string = "^/OA_HTML/CZInitialize\\.jsp"
-  }
-
-  regular_expression {
-    regex_string = "^/OA_HTML/CfgLaunch\\.jsp"
-  }
-
-  regular_expression {
-    regex_string = "^/OA_HTML/CfgSebl\\.jsp"
+    regex_string = "^/OA_HTML/Cfg(Launch|Sebl)\\.jsp"
   }
 
   regular_expression {
@@ -36,35 +20,11 @@ resource "aws_wafv2_regex_pattern_set" "ebsapps_blocked_paths" {
   }
 
   regular_expression {
-    regex_string = "^/OA_HTML/configurator/Decache"
+    regex_string = "^/OA_HTML/configurator/(Decache|DisplayCXResult|UiServlet)"
   }
 
   regular_expression {
-    regex_string = "^/OA_HTML/configurator/DisplayCXResult"
-  }
-
-  regular_expression {
-    regex_string = "^/OA_HTML/configurator/UiServlet"
-  }
-
-  regular_expression {
-    regex_string = "^/OA_HTML/czContainer\\.jsp"
-  }
-
-  regular_expression {
-    regex_string = "^/OA_HTML/czEmbed\\.jsp"
-  }
-
-  regular_expression {
-    regex_string = "^/OA_HTML/czHeartBeat\\.jsp"
-  }
-
-  regular_expression {
-    regex_string = "^/OA_HTML/czJradHeartBeat\\.jsp"
-  }
-
-  regular_expression {
-    regex_string = "^/OA_HTML/czSummary\\.jsp"
+    regex_string = "^/OA_HTML/cz(Container|Embed|HeartBeat|JradHeartBeat|Summary)\\.jsp"
   }
 
   tags = merge(local.tags,
