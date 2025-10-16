@@ -18,7 +18,8 @@ resource "aws_secretsmanager_secret_version" "connector_secrets" {
     "client_opa12assess_security_user_password" = "",
     "spring_datasource_url" = "",
     "spring_datasource_username" = "",
-    "spring_datasource_password" = ""
+    "spring_datasource_password" = "",
+    "opa_security_password" = ""
   })
 
   lifecycle {

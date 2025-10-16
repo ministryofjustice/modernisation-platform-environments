@@ -16,7 +16,6 @@ resource "aws_secretsmanager_secret_version" "opahub_secrets" {
     "wl_user" = "",
     "wl_password" = "",
     "secret_key" = ""
-  })
 
   lifecycle {
     ignore_changes = [
