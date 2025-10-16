@@ -367,11 +367,6 @@ resource "aws_iam_role_policy" "lambda_edge_policy" {
   })
 }
 
-# Get current AWS account ID
-data "aws_caller_identity" "current" {
-  provider = aws.us-east-1
-}
-
 
 # Create ZIP archive for Lambda@Edge function
 data "archive_file" "lambda_zip" {
