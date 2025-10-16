@@ -45,9 +45,14 @@ proxy_config:
     prometheus_initialize_budget_metrics: true
     service_callback: ["prometheus_system"]
     default_internal_user_params:
-      user_role: "internal_user"
-    default_max_internal_user_budget: 20
-    internal_user_budget_duration: "1mo"
+      user_role: internal_user_viewer
+      max_budget: 20
+      budget_duration: 30d
+      models: []
+    default_team_params:
+      max_budget: 100
+      budget_duration: 30d
+      models: []
   router_settings:
     routing_strategy: simple-shuffle
     redis_host: os.environ/primary_endpoint_address
@@ -55,13 +60,14 @@ proxy_config:
     redis_password: os.environ/auth_token
       
   model_list:
-    # EXPERIMENTAL Azure OpenAI
-    - model_name: azure-gpt-5
+%{ for key, profile in azureOpenAIModels ~}
+    - model_name: azure-${key}
       litellm_params:
-        model: azure/gpt-5
+        model: azure/${profile.model_id}
         api_base: os.environ/JUSTICEAI_AZURE_OPENAI_API_BASE
         api_key: os.environ/JUSTICEAI_AZURE_OPENAI_API_KEY
-        api_version: "2024-12-01-preview"
+        api_version: ${profile.api_version}
+%{ endfor ~}
 %{ for key, profile in bedrockModels ~}
     - model_name: bedrock-${key}
       litellm_params:

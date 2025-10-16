@@ -42,7 +42,8 @@ resource "helm_release" "litellm" {
         iamRole = module.iam_role[0].arn
 
         # LiteLLM Models
-        bedrockModels = local.environment_configuration.llm_gateway_models.bedrock
+        azureOpenAIModels = local.environment_configuration.llm_gateway_models.azure_openai
+        bedrockModels     = local.environment_configuration.llm_gateway_models.bedrock
       }
     )
   ]
