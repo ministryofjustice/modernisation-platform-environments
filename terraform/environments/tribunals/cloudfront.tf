@@ -402,5 +402,5 @@ resource "aws_lambda_permission" "allow_cloudfront" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.cloudfront_redirect_lambda.function_name
   principal     = "edgelambda.amazonaws.com"
-  source_arn    = aws_cloudfront_distribution.tribunals_redirect.arn
+  source_arn    = aws_cloudfront_distribution.tribunals_distribution.arn
 }
