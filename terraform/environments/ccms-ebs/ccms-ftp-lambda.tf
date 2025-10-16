@@ -33,12 +33,12 @@ locals {
     "outbound-lambda-runs/"
   ]
 
-  is_production    = local.environment == "production"
+  is_production = local.environment == "production"
 
   # Days and ID label based on environment
   expire_days = local.is_production ? 90 : 60
   expire_id   = local.is_production ? "expire-90-days" : "expire-60-day"
- 
+
 }
 
 ### secrets for ftp user and password
@@ -124,7 +124,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "buckets_lifecycle" {
   dynamic "rule" {
     for_each = local.target_prefixes
     content {
-      id     = "expire-${replace(each.value.id, "/","-")}-${replace(rule.value, "/","-")}-${local.expire_days}d"
+      id     = "expire-${replace(each.value.id, "/", "-")}-${replace(rule.value, "/", "-")}-${local.expire_days}d"
       status = "Enabled"
 
       filter {
