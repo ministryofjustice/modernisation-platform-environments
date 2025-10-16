@@ -83,7 +83,7 @@ resource "aws_wafv2_web_acl" "ebsapps_waf_acl" {
 }
 
 resource "aws_cloudwatch_log_group" "ebsapps_oa_html" {
-  name              = "/aws/waf/ebsapps/oa_html"
+  name              = "aws-waf-ebsapps/ebsapps-oahtml"
   retention_in_days = local.is_production ? 90 : 30
 
   tags = merge(local.tags,
