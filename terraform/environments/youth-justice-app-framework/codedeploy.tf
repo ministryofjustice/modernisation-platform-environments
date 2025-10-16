@@ -5,9 +5,10 @@ module "codedeploy" {
   cluster_name     = "yjaf-cluster"
   environment      = local.environment
   ec2_enabled      = true
-  ec2_applications = ["yjsm-hub", "yjsm-hubadmin", "yjsm-ui", "assets"]
+  ec2_applications = ["yjsm-hub", "yjsm-hubadmin", "yjsm-ui"]
   services = [
     { "auth" = "internal" },
+    { "assets" = "internal" },
     { "bands" = "internal" },
     { "bu" = "internal" },
     { "case" = "internal" },

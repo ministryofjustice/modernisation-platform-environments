@@ -6,7 +6,7 @@ data "archive_file" "lambda_function_ecs_restart_payload" {
 }
 
 resource "aws_iam_role" "lambda_execution_role" {
-  name = "lambda_execution_role"
+  name = "${var.environment}_lambda_execution_role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -20,10 +20,11 @@ resource "aws_iam_role" "lambda_execution_role" {
       },
     ]
   })
+}
 
-  managed_policy_arns = [
-    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-  ]
+resource "aws_iam_role_policy_attachment" "basic_execution" {
+  role       = aws_iam_role.lambda_execution_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
 data "aws_iam_policy_document" "lambda_ecs" {
@@ -38,7 +39,7 @@ data "aws_iam_policy_document" "lambda_ecs" {
 }
 
 resource "aws_iam_policy" "lambda_ecs" {
-  name        = "lambda_ecs_policy"
+  name        = "${var.environment}_lambda_ecs_policy"
   description = "IAM policy for Lambda to interact with ECS"
   policy      = data.aws_iam_policy_document.lambda_ecs.json
 }
@@ -50,15 +51,19 @@ resource "aws_iam_role_policy_attachment" "lambda_ecs" {
 
 
 resource "aws_lambda_function" "ecs_restart_handler" {
-  function_name = "ecs_restart_handler"
+  function_name = "${var.environment}_ecs_restart_handler"
   runtime       = "python3.12"
   handler       = "lambda_function.lambda_handler"
   role          = aws_iam_role.lambda_execution_role.arn
 
   environment {
-    variables = {
-      DEBUG_LOGGING = var.debug_logging
-    }
+    variables = merge(
+      {
+        DEBUG_LOGGING = var.debug_logging
+        ENVIRONMENT   = var.environment
+      },
+      var.extra_environment_vars
+    )
   }
 
   filename         = data.archive_file.lambda_function_ecs_restart_payload.output_path
@@ -66,7 +71,7 @@ resource "aws_lambda_function" "ecs_restart_handler" {
 }
 
 resource "aws_lambda_permission" "allow_eventbridge" {
-  statement_id  = "AllowExecutionFromEventBridge"
+  statement_id  = "${var.environment}-AllowExecutionFromEventBridge"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.ecs_restart_handler.function_name
   principal     = "events.amazonaws.com"
@@ -75,15 +80,19 @@ resource "aws_lambda_permission" "allow_eventbridge" {
 
 
 resource "aws_lambda_function" "calculate_wait_time" {
-  function_name = "calculate_wait_time"
+  function_name = "${var.environment}_calculate_wait_time"
   runtime       = "python3.12"
   handler       = "lambda_function.lambda_handler"
   role          = aws_iam_role.lambda_execution_role.arn
 
   environment {
-    variables = {
-      DEBUG_LOGGING = var.debug_logging
-    }
+    variables = merge(
+      {
+        DEBUG_LOGGING = var.debug_logging
+        ENVIRONMENT   = var.environment
+      },
+      var.extra_environment_vars
+    )
   }
 
   filename         = data.archive_file.lambda_function_calculate_wait_time_payload.output_path
