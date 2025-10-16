@@ -1,5 +1,5 @@
 resource "aws_wafv2_regex_pattern_set" "ebsapps_blocked_paths" {
-  name        = "ebs-blocked-paths"
+  name        = "ebs_apps-blocked-paths"
   description = "Blocked EBS OA_HTML paths"
   scope       = "REGIONAL"
 
@@ -33,8 +33,8 @@ resource "aws_wafv2_regex_pattern_set" "ebsapps_blocked_paths" {
 }
 
 resource "aws_wafv2_web_acl" "ebsapps_waf_acl" {
-  name        = "ebsapps-waf-acl"
-  description = "WAF ACL to block access to Oracle EBS configurator endpoints"
+  name        = "ebs_apps-waf-acl"
+  description = "WAF ACL to block access to Oracle EBS /OA_HTML/ endpoints"
   scope       = "REGIONAL"
 
   default_action {
@@ -42,7 +42,7 @@ resource "aws_wafv2_web_acl" "ebsapps_waf_acl" {
   }
 
   rule {
-    name     = "block-ebs-configurator-paths"
+    name     = "block-ebs-oa_html-paths"
     priority = 1
 
     action {
@@ -113,22 +113,22 @@ resource "aws_wafv2_web_acl_association" "ebsapps_waf_alb" {
   web_acl_arn  = aws_wafv2_web_acl.ebsapps_waf_acl.arn
 }
 
-output "waf_acl_id" {
+output "ebs_apps_waf_acl_id" {
   description = "The ID of the WAF Web ACL"
   value       = aws_wafv2_web_acl.ebsapps_waf_acl.id
 }
 
-output "waf_acl_arn" {
+output "ebs_apps_waf_acl_arn" {
   description = "The ARN of the WAF Web ACL"
   value       = aws_wafv2_web_acl.ebsapps_waf_acl.arn
 }
 
-output "waf_log_group_name" {
+output "ebs_apps_waf_log_group_name" {
   description = "The name of the CloudWatch Log Group for WAF logs"
   value       = aws_cloudwatch_log_group.ebsapps_oa_html.name
 }
 
-output "regex_pattern_set_arn" {
+output "ebs_apps_waf_regex_pattern_set_arn" {
   description = "The ARN of the regex pattern set for blocked paths"
   value       = aws_wafv2_regex_pattern_set.ebsapps_blocked_paths.arn
 }
