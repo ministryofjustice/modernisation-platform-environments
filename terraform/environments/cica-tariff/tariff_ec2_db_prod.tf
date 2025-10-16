@@ -118,9 +118,24 @@ resource "aws_ami_from_instance" "tariffdb_a_bkp" {
   count              = local.environment == "production" ? 1 : 0
   name               = "TariffDB_A_Bkp"
   source_instance_id = "i-030db90a2de02f56e"
+  tags = {
+    Name = "CDI-272-TariffDB-A-Backup"
+  }
 }
 resource "aws_ami_from_instance" "tariffdb_b_bkp" {
   count              = local.environment == "production" ? 1 : 0
   name               = "TariffDB_B_Bkp"
   source_instance_id = "i-0939a0ee8fb520bc9"
+  tags = {
+    Name = "CDI-272-TariffDB-A-Backup"
+  }
+}
+# AMIs imported due to Terraform timeout
+import {
+  to = aws_ami_from_instance.tariffdb_a_bkp
+  id = "ami-03b1bc3a5f61dfb99"
+}
+import {
+  to = aws_ami_from_instance.tariffdb_b_bkp
+  id = "ami-0a28f7de7635e740c"
 }
