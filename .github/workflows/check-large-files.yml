@@ -39,18 +39,18 @@ jobs:
             if [ -f "$file" ]; then
               # Get file size in KB
               FILE_SIZE=$(du -k "$file" | cut -f1)
-              
+              echo "DEBUG: Checking $file ($FILE_SIZE KB)"
               # Check if file is binary/compressed
               FILE_TYPE=$(file -b "$file")
-              
               # Check for large files
               if [ "$FILE_SIZE" -gt "$SIZE_THRESHOLD" ]; then
                 SIZE_MB=$(echo "scale=2; $FILE_SIZE / 1024" | bc)
+                echo "DEBUG: Large file detected: $file (${SIZE_MB}MB)"
                 LARGE_FILES+=("- \`$file\` (${SIZE_MB}MB)")
               fi
-              
               # Check for binary/compressed files
               if echo "$FILE_TYPE" | grep -qE "compressed|archive|executable|shared object|zip|gzip|bzip2|tar|binary"; then
+                echo "DEBUG: Binary/compressed file detected: $file (Type: $FILE_TYPE)"
                 BINARY_FILES+=("- \`$file\` (Type: $FILE_TYPE)")
               fi
             fi
