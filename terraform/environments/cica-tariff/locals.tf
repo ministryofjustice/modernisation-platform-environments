@@ -137,10 +137,5 @@ locals {
     for prefix in local.target_prefix : "arn:aws:s3:::${prefix}storagebucket"
   ]
 
-  prod_ami_import_target = local.environment == "production" ? {
-    "db_a" : "ami-03b1bc3a5f61dfb99",
-    "db_a" : "ami-0a28f7de7635e740c"
-  } : {}
-
 }
 #
