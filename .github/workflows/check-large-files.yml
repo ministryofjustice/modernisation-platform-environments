@@ -1,0 +1,163 @@
+name: Check Large Files
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  check-file-sizes:
+    name: Check for Large Files
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for large files
+        id: check_files
+        run: |
+          # Set size threshold in KB (e.g., 5MB = 5120KB)
+          SIZE_THRESHOLD=5120
+          
+          # Get the list of files changed in this PR
+          git fetch origin ${{ github.base_ref }}
+          CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
+          
+          # Arrays to store results
+          LARGE_FILES=()
+          BINARY_FILES=()
+          
+          echo "Checking files for size and type..."
+          
+          for file in $CHANGED_FILES; do
+            if [ -f "$file" ]; then
+              # Get file size in KB
+              FILE_SIZE=$(du -k "$file" | cut -f1)
+              
+              # Check if file is binary/compressed
+              FILE_TYPE=$(file -b "$file")
+              
+              # Check for large files
+              if [ "$FILE_SIZE" -gt "$SIZE_THRESHOLD" ]; then
+                SIZE_MB=$(echo "scale=2; $FILE_SIZE / 1024" | bc)
+                LARGE_FILES+=("- \`$file\` (${SIZE_MB}MB)")
+              fi
+              
+              # Check for binary/compressed files
+              if echo "$FILE_TYPE" | grep -qE "compressed|archive|executable|shared object|zip|gzip|bzip2|tar|binary"; then
+                BINARY_FILES+=("- \`$file\` (Type: $FILE_TYPE)")
+              fi
+            fi
+          done
+          
+          # Create warning message
+          WARNING_MESSAGE=""
+          
+          if [ ${#LARGE_FILES[@]} -gt 0 ]; then
+            WARNING_MESSAGE+="## ⚠️ Large Files Detected\n\n"
+            WARNING_MESSAGE+="The following files exceed ${SIZE_THRESHOLD}KB ($(echo "scale=2; $SIZE_THRESHOLD / 1024" | bc)MB):\n\n"
+            for item in "${LARGE_FILES[@]}"; do
+              WARNING_MESSAGE+="$item\n"
+            done
+            WARNING_MESSAGE+="\n**Please consider:**\n"
+            WARNING_MESSAGE+="- Using Git LFS for large files\n"
+            WARNING_MESSAGE+="- Storing files in S3 or other object storage\n"
+            WARNING_MESSAGE+="- Compressing files if possible\n"
+            WARNING_MESSAGE+="- Removing unnecessary large files\n\n"
+          fi
+          
+          if [ ${#BINARY_FILES[@]} -gt 0 ]; then
+            WARNING_MESSAGE+="## 🔍 Binary/Compressed Files Detected\n\n"
+            WARNING_MESSAGE+="The following binary or compressed files were found:\n\n"
+            for item in "${BINARY_FILES[@]}"; do
+              WARNING_MESSAGE+="$item\n"
+            done
+            WARNING_MESSAGE+="\n**Please verify:**\n"
+            WARNING_MESSAGE+="- These files are necessary in the repository\n"
+            WARNING_MESSAGE+="- They cannot be generated during build/deployment\n"
+            WARNING_MESSAGE+="- Consider alternatives like package managers or artifact repositories\n\n"
+          fi
+          
+          # Save to file for PR comment
+          if [ -n "$WARNING_MESSAGE" ]; then
+            echo -e "$WARNING_MESSAGE" > warning_message.txt
+            echo "has_warnings=true" >> $GITHUB_OUTPUT
+          else
+            echo "✅ No large or binary files detected."
+            echo "has_warnings=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Comment on PR
+        if: steps.check_files.outputs.has_warnings == 'true'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const warningMessage = fs.readFileSync('warning_message.txt', 'utf8');
+            
+            // Find existing comment
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            
+            const botComment = comments.find(comment => 
+              comment.user.type === 'Bot' && 
+              comment.body.includes('Large Files Detected')
+            );
+            
+            const commentBody = warningMessage + '\n\n---\n*This is an automated check. If you believe these files are necessary, please document the reason in the PR description.*';
+            
+            if (botComment) {
+              // Update existing comment
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: commentBody
+              });
+            } else {
+              // Create new comment
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: commentBody
+              });
+            }
+
+      - name: Request review from team
+        if: steps.check_files.outputs.has_warnings == 'true'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            // Request review from a modernisation-platform GitHub team
+            const teamSlug = 'modernisation-platform';
+            
+            try {
+              await github.rest.pulls.requestReviewers({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: context.issue.number,
+                team_reviewers: [teamSlug]
+              });
+              console.log(`✅ Review requested from team: @${context.repo.owner}/${teamSlug}`);
+            } catch (error) {
+              console.error(`❌ Failed to request review from team: ${error.message}`);
+              console.log('Make sure the team exists and the GITHUB_TOKEN has permissions.');
+            }
+
+      - name: Warning summary
+        if: steps.check_files.outputs.has_warnings == 'true'
+        run: |
+          echo "⚠️ Large or binary files detected in this PR. Please review the PR comment for details."
+          cat warning_message.txt
