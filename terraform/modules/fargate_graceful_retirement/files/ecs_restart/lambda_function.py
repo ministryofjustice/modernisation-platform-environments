@@ -4,7 +4,7 @@ import os
 import boto3
 
 ssm = boto3.client("ssm")
-ENV = os.getenviron("ENVIRONMENT")
+ENV = os.environ.get("ENVIRONMENT")
 # Use env to determine
 # - SSM circuit breaker path
 # - ECS cluster/service
