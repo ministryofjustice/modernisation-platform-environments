@@ -19,6 +19,11 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: List all files and sizes (debug)
+        run: |
+          echo "Listing all files and their sizes after checkout:"
+          find . -type f -exec ls -lh {} \;
+
       - name: Check for large files
         id: check_files
         run: |
