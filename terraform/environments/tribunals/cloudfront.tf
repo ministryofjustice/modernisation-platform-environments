@@ -323,7 +323,6 @@ resource "aws_iam_role" "lambda_edge_role" {
 
 # IAM Policy for Lambda@Edge
 resource "aws_iam_role_policy" "lambda_edge_policy" {
-  provider = aws.us-east-1
   name     = "CloudfrontRedirectLambdaPolicy"
   role     = aws_iam_role.lambda_edge_role.id
 
@@ -382,7 +381,6 @@ data "archive_file" "lambda_zip_nonprod" {
 
 # Lambda@Edge Function (must be in us-east-1 for CloudFront)
 resource "aws_lambda_function" "cloudfront_redirect_lambda" {
-  provider         = aws.us-east-1
   function_name    = "CloudfrontRedirectLambda"
   filename         = local.is-production ? data.archive_file.lambda_zip.output_path : data.archive_file.lambda_zip_nonprod.output_path
   source_code_hash = local.is-production ? data.archive_file.lambda_zip.output_base64sha256 : data.archive_file.lambda_zip_nonprod.output_base64sha256
@@ -396,7 +394,6 @@ resource "aws_lambda_function" "cloudfront_redirect_lambda" {
 
 # Lambda Permission for CloudFront
 resource "aws_lambda_permission" "allow_cloudfront" {
-  provider      = aws.us-east-1
   statement_id  = "AllowCloudFrontExecution"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.cloudfront_redirect_lambda.function_name
