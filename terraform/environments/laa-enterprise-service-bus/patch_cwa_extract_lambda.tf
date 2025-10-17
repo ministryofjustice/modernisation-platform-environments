@@ -26,7 +26,7 @@ resource "aws_security_group_rule" "patch_cwa_extract_egress_oracle" {
   description       = "Outbound 2484 Access to CWA DB Safe3 in ECP"
 }
 
-resource "aws_security_group_rule" "patch_cwa_extract_egress_oracle" {
+resource "aws_security_group_rule" "patch_cwa_extract_egress_blue_green" {
   count             = local.environment == "test" ? 1 : 0
   type              = "egress"
   from_port         = 2484
