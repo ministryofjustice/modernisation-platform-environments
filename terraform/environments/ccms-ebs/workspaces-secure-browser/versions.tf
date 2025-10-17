@@ -12,6 +12,10 @@ terraform {
       version = "~> 2.0"
       source  = "hashicorp/external"
     }
+    awscc = {
+      source  = "hashicorp/awscc"
+      version = "~> 1.0"
+    }
     http = {
       version = "~> 3.0"
       source  = "hashicorp/http"
