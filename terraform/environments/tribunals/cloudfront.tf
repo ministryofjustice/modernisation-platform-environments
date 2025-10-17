@@ -304,7 +304,6 @@ resource "aws_cloudfront_response_headers_policy" "security_headers_policy" {
 
 # IAM Role for Lambda@Edge
 resource "aws_iam_role" "lambda_edge_role" {
-  provider = aws.us-east-1
   name = "CloudfrontRedirectLambdaRole"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
