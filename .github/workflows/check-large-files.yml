@@ -23,7 +23,7 @@ jobs:
         id: check_files
         run: |
           # Set size threshold in KB (e.g., 5MB = 5120KB)
-          SIZE_THRESHOLD=5120
+          SIZE_THRESHOLD=1024
           
           # Get the list of files changed in this PR
           git fetch origin ${{ github.base_ref }}
