@@ -282,6 +282,49 @@ module "load_emsys_tpims_database" {
   new_airflow = true
 }
 
+
+module "load_lcm_archive_database" {
+  count  = local.is-production ? 1 : 0
+  source = "./modules/ap_airflow_load_data_iam_role"
+
+  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+  de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
+
+  name                 = "lcm-archive"
+  environment          = local.environment
+  database_name        = "g4s-lcm-archive"
+  path_to_data         = "/g4s_lcm_archive"
+  source_data_bucket   = module.s3-dms-target-store-bucket.bucket
+  secret_code          = jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]
+  oidc_arn             = aws_iam_openid_connect_provider.analytical_platform_compute.arn
+  athena_dump_bucket   = module.s3-athena-bucket.bucket
+  cadt_bucket          = module.s3-create-a-derived-table-bucket.bucket
+  max_session_duration = 12 * 60 * 60
+
+  new_airflow = true
+}
+
+module "load_centurion_database" {
+  count  = local.is-production ? 1 : 0
+  source = "./modules/ap_airflow_load_data_iam_role"
+
+  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+  de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
+
+  name                 = "centurion"
+  environment          = local.environment
+  database_name        = "g4s-centurion"
+  path_to_data         = "/g4s_centurion"
+  source_data_bucket   = module.s3-dms-target-store-bucket.bucket
+  secret_code          = jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]
+  oidc_arn             = aws_iam_openid_connect_provider.analytical_platform_compute.arn
+  athena_dump_bucket   = module.s3-athena-bucket.bucket
+  cadt_bucket          = module.s3-create-a-derived-table-bucket.bucket
+  max_session_duration = 12 * 60 * 60
+
+  new_airflow = true
+}
+
 module "load_fep_database" {
   count  = local.is-production ? 1 : 0
   source = "./modules/ap_airflow_load_data_iam_role"

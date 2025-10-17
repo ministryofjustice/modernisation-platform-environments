@@ -1,4 +1,4 @@
-# WAF FOR PUI APP - Temporary restricted access to trusted IPs only
+# WAF FOR PUI APP
 
 resource "aws_wafv2_ip_set" "pui_waf_ip_set" {
   name               = "${local.application_name}-waf-ip-set"
@@ -6,16 +6,29 @@ resource "aws_wafv2_ip_set" "pui_waf_ip_set" {
   ip_address_version = "IPV4"
   description        = "List of trusted IP Addresses allowing access via WAF"
 
-  addresses = [
-    local.application_data.accounts[local.environment].lz_aws_workspace_public_nat_gateway_a,
-    local.application_data.accounts[local.environment].lz_aws_workspace_public_nat_gateway_b,
-    local.application_data.accounts[local.environment].lz_aws_workspace_public_nat_gateway_c
-  ]
+  addresses = (
+    local.is-production
+    ? [
+      local.application_data.accounts[local.environment].lz_aws_workspace_public_nat_gateway_a,
+      local.application_data.accounts[local.environment].lz_aws_workspace_public_nat_gateway_b,
+      local.application_data.accounts[local.environment].lz_aws_workspace_public_nat_gateway_c,
+      "89.45.177.118/32" # Sahid
+    ]
+    :
+    [
+      local.application_data.accounts[local.environment].lz_aws_workspace_public_nat_gateway_a,
+      local.application_data.accounts[local.environment].lz_aws_workspace_public_nat_gateway_b,
+      local.application_data.accounts[local.environment].lz_aws_workspace_public_nat_gateway_c,
+    ]
+  )
 
-  tags = merge(local.tags,
+  tags = merge(
+    local.tags,
     { Name = lower(format("%s-%s-ip-set", local.application_name, local.environment)) }
   )
 }
+
+
 
 # Default block on the WAF for now - only allow trusted IPs above
 resource "aws_wafv2_web_acl" "pui_web_acl" {
@@ -47,6 +60,36 @@ resource "aws_wafv2_web_acl" "pui_web_acl" {
       sampled_requests_enabled   = true
     }
   }
+
+  rule {
+    name     = "AWS-AWSManagedRulesCommonRuleSet"
+    priority = 2
+
+    override_action {
+      none {}
+    }
+
+    statement {
+      managed_rule_group_statement {
+        name        = "AWSManagedRulesCommonRuleSet"
+        vendor_name = "AWS"
+
+        rule_action_override {
+          name = "NoUserAgent_HEADER"
+          action_to_use {
+            allow {}
+          }
+        }
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "AWS-AWSManagedRulesCommonRuleSet"
+      sampled_requests_enabled   = true
+    }
+  }
+
 
   tags = merge(local.tags,
     { Name = lower(format("%s-%s-web-acl", local.application_name, local.environment)) }

@@ -44,6 +44,7 @@ resource "aws_ecs_task_definition" "ecs_connector_task_definition" {
       logging_level_com_ezgov_opa                  = local.application_data.accounts[local.environment].logging_level_com_ezgov_opa
       logging_level_oracle_ocs_opa_laa             = local.application_data.accounts[local.environment].logging_level_oracle_ocs_opa_laa
       logging_level_uk_gov_laa_opa                 = local.application_data.accounts[local.environment].logging_level_uk_gov_laa_opa
+      opa_security_password                        = "${aws_secretsmanager_secret.connector_secrets.arn}:opa_security_password::"
     }
   )
 

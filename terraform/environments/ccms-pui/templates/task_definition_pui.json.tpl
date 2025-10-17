@@ -246,6 +246,10 @@
       {
         "name": "POSTCODEAPIURL",
         "valueFrom": "${postcodeApiUrl}"
+      },
+      {
+        "name": "OPA_SECURITY_PASSWORD",
+        "valueFrom": "${opa_security_password}"
       }
     ]
   }
