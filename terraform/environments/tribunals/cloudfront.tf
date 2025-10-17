@@ -331,6 +331,23 @@ resource "aws_iam_role_policy" "lambda_edge_policy" {
     Version = "2012-10-17"
     Statement = [
       {
+        "Effect": "Allow",
+        "Action": [
+          "iam:GetRolePolicy",
+          "iam:PutRolePolicy",
+          "iam:DeleteRolePolicy",
+          "iam:CreatePolicy",
+          "iam:AttachRolePolicy",
+          "iam:UpdateRole",
+          "iam:CreateRole",
+          "iam:GetRole"
+        ],
+        "Resource": [
+          "arn:aws:iam::*:role/CloudfrontRedirectLambdaRole",
+          "arn:aws:iam::*:policy/CloudfrontRedirectLambdaPolicy"
+        ]
+      },
+      {
         Effect = "Allow"
         Action = [
           "lambda:CreateFunction",
