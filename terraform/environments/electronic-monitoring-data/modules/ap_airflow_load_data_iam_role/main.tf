@@ -180,3 +180,39 @@ resource "aws_lakeformation_permissions" "catalog_manage" {
   catalog_resource = true
 }
 
+################################################################################
+# broaden mdss loader permissions
+################################################################################
+
+locals {
+  mdss_is_this_module = lower(var.name) == "mdss"
+}
+
+data "aws_iam_policy_document" "mdss_athena_extras" {
+  count = local.mdss_is_this_module ? 1 : 0
+
+  statement {
+    sid     = "AthenaQueryApisWildcardForMdss"
+    effect  = "Allow"
+    actions = [
+      "athena:StartQueryExecution",
+      "athena:GetQueryExecution",
+      "athena:GetQueryResults",
+      "athena:StopQueryExecution",
+      "athena:GetWorkGroup",
+      "athena:ListWorkGroups"
+    ]
+    resources = ["*"]
+  }
+}
+
+# Attach as an inline policy to the role created by the submodule above.
+# We extract the role name from its ARN for compatibility.
+resource "aws_iam_role_policy" "mdss_athena_extras" {
+  count = local.mdss_is_this_module ? 1 : 0
+
+  name = "mdss-athena-extras"
+  role = element(split("/", module.ap_database_sharing.iam_role.arn), 1)
+
+  policy = data.aws_iam_policy_document.mdss_athena_extras[0].json
+}
