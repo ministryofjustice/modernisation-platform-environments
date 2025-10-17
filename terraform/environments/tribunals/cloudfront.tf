@@ -71,7 +71,6 @@ resource "aws_cloudfront_distribution" "tribunals_distribution" {
     }
   }
   depends_on = [
-    aws_iam_role_policy.lambda_edge_policy,
     aws_lambda_function.cloudfront_redirect_lambda
   ]
 }
@@ -301,6 +300,24 @@ resource "aws_cloudfront_response_headers_policy" "security_headers_policy" {
       override   = true
     }
   }
+}
+
+# IAM Role for Lambda@Edge
+resource "aws_iam_role" "lambda_edge_role" {
+  provider = aws.us-east-1
+  name = "CloudfrontRedirectLambdaRole"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = ["lambda.amazonaws.com", "edgelambda.amazonaws.com"]
+        }
+      }
+    ]
+  })
 }
 
 # Create ZIP archive for Lambda@Edge function
