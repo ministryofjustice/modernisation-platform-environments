@@ -13,7 +13,7 @@ resource "aws_cloudwatch_metric_alarm" "ddos_attack_external_ebsapps_alb" {
   treat_missing_data  = "notBreaching"
   alarm_actions       = [aws_sns_topic.ddos_alarm.arn]
   dimensions = {
-    ResourceArn = aws_lb.ebsapps_lb.arn
+    ResourceArn = aws_lb.ebsapps_lb[count.index].arn
   }
 }
 
@@ -30,7 +30,7 @@ resource "aws_cloudwatch_metric_alarm" "ddos_attack_external_ebsapps_nlb" {
   treat_missing_data  = "notBreaching"
   alarm_actions       = [aws_sns_topic.ddos_alarm.arn]
   dimensions = {
-    ResourceArn = aws_lb.ebsapps_nlb.arn
+    ResourceArn = aws_lb.ebsapps_nlb[count.index].arn
   }
 }
 

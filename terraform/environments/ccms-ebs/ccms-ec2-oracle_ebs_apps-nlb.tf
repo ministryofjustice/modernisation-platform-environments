@@ -44,13 +44,13 @@ resource "aws_lb" "ebsapps_nlb" {
 
 resource "aws_lb_listener" "ebsnlb_listener" {
   count  = local.is-development ? 0 : 1
-  load_balancer_arn = aws_lb.ebsapps_nlb.arn
+  load_balancer_arn = aws_lb.ebsapps_nlb[count.index].arn
   port              = "443"
   protocol          = "TCP"
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.ebsnlb_tg.arn
+    target_group_arn = aws_lb_target_group.ebsnlb_tg[count.index].arn
   }
 }
 
@@ -69,7 +69,7 @@ resource "aws_lb_target_group" "ebsnlb_tg" {
 
 resource "aws_lb_target_group_attachment" "ebsnlb" {
   count  = local.is-development ? 0 : 1
-  target_group_arn = aws_lb_target_group.ebsnlb_tg.arn
-  target_id        = aws_lb.ebsapps_lb.id
+  target_group_arn = aws_lb_target_group.ebsnlb_tg[count.index].arn
+  target_id        = aws_lb.ebsapps_lb[count.index].id
   port             = "443"
 }
