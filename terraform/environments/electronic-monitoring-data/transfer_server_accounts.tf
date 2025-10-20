@@ -1,4 +1,3 @@
-# Updated module
 module "capita" {
   source = "./modules/landing_zone/"
   count  = local.is-production ? 1 : 0
