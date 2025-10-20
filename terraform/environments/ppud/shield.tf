@@ -1,6 +1,6 @@
 # Exclude WAM ALB from shield
 locals {
-  excluded_resource_arns = local.environment == "development" ? [] : [aws_lb.WAM-LB.arn]
+  excluded_resource_arns = local.environment == "development" ? [] : [aws_lb.WAM-ALB.arn]
 }
 
 data "aws_shield_protection" "excluded" {
