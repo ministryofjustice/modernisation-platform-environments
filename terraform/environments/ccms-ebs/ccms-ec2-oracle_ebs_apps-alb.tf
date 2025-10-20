@@ -1,4 +1,5 @@
 resource "aws_lb" "ebsapps_lb" {
+  count              = local.is-development ? 0 : 1
   name               = lower(format("lb-%s-%s-ebsapp", local.application_name, local.environment))
   internal           = false
   load_balancer_type = "application"
@@ -20,7 +21,7 @@ resource "aws_lb" "ebsapps_lb" {
 }
 
 resource "aws_lb_listener" "ebsapps_listener" {
-  count = local.is-production ? 1 : 1
+  count = local.is-development ? 0 : 1
 
   load_balancer_arn = aws_lb.ebsapps_lb.arn
   port              = "443"
@@ -35,6 +36,7 @@ resource "aws_lb_listener" "ebsapps_listener" {
 }
 
 resource "aws_lb_target_group" "ebsapp_tg" {
+  count    = local.is-development ? 0 : 1
   name     = lower(format("tg-%s-%s-ebsapp", local.application_name, local.environment))
   port     = local.application_data.accounts[local.environment].tg_apps_port
   protocol = "HTTP"
@@ -52,7 +54,7 @@ resource "aws_lb_target_group" "ebsapp_tg" {
 }
 
 resource "aws_lb_target_group_attachment" "ebsapps" {
-  count            = local.application_data.accounts[local.environment].accessgate_no_instances
+  count            = local.is-development ? 0 : local.application_data.accounts[local.environment].accessgate_no_instances
   target_group_arn = aws_lb_target_group.ebsapp_tg.arn
   target_id        = element(aws_instance.ec2_ebsapps.*.id, count.index)
   port             = local.application_data.accounts[local.environment].tg_apps_port

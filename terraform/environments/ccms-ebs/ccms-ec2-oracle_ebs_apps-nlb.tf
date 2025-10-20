@@ -14,6 +14,7 @@ resource "aws_eip" "ebs_eip" {
 
 # NLB for EBS
 resource "aws_lb" "ebsapps_nlb" {
+  count  = local.is-development ? 0 : 1
   name               = lower(format("nlb-%s-%s-ebs", local.application_name, local.environment))
   internal           = false
   load_balancer_type = "network"
@@ -42,6 +43,7 @@ resource "aws_lb" "ebsapps_nlb" {
 }
 
 resource "aws_lb_listener" "ebsnlb_listener" {
+  count  = local.is-development ? 0 : 1
   load_balancer_arn = aws_lb.ebsapps_nlb.arn
   port              = "443"
   protocol          = "TCP"
@@ -53,6 +55,7 @@ resource "aws_lb_listener" "ebsnlb_listener" {
 }
 
 resource "aws_lb_target_group" "ebsnlb_tg" {
+  count  = local.is-development ? 0 : 1
   name        = lower(format("tg-%s-%s-ebsnlb", local.application_name, local.environment))
   target_type = "alb"
   port        = "443"
@@ -65,6 +68,7 @@ resource "aws_lb_target_group" "ebsnlb_tg" {
 }
 
 resource "aws_lb_target_group_attachment" "ebsnlb" {
+  count  = local.is-development ? 0 : 1
   target_group_arn = aws_lb_target_group.ebsnlb_tg.arn
   target_id        = aws_lb.ebsapps_lb.id
   port             = "443"
