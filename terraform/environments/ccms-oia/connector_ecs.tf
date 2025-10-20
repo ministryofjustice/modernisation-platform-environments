@@ -4,6 +4,7 @@
 resource "aws_ecs_task_definition" "ecs_connector_task_definition" {
   family             = "${local.connector_app_name}-task"
   execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
+  task_role_arn      = aws_iam_role.connector_ecs_task_role.arn
   network_mode       = "bridge"
   requires_compatibilities = [
     "EC2",
@@ -56,7 +57,7 @@ resource "aws_ecs_task_definition" "ecs_connector_task_definition" {
 # ECS Service for Connector
 
 resource "aws_ecs_service" "ecs_connector_service" {
-  name            = "${local.connector_app_name}"
+  name            = local.connector_app_name
   cluster         = aws_ecs_cluster.main.id
   task_definition = aws_ecs_task_definition.ecs_connector_task_definition.arn
   desired_count   = local.application_data.accounts[local.environment].connector_app_count
