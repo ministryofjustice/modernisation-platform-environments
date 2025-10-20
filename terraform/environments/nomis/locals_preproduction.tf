@@ -105,7 +105,7 @@ locals {
         })
       })
 
-      # NOT-ACTIVE (green deployment) - for testing Combined Reporting
+      # NOT-ACTIVE (green deployment)
       preprod-nomis-web-b = merge(local.ec2_autoscaling_groups.web, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.web.autoscaling_group, {
           desired_capacity = 0
