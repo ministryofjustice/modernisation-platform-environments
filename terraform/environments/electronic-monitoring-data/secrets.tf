@@ -48,3 +48,24 @@ resource "aws_secretsmanager_secret_version" "home_office_account_id" {
   depends_on = [aws_secretsmanager_secret.home_office_account_id[0]]
 }
 
+# add a module for managing the encryption key rotation
+module "secrets_manager" {
+  source  = "terraform-aws-modules/secrets-manager/aws"
+  version = "1.3.0"
+
+  name        = "iam-${aws_iam_user.supplier.name}"
+  description = "IAM user access credentials for file to encrypt"
+  secret_string = jsonencode({
+    key    = "placeholder_key",
+    secret = "placeholder_secret"
+  })
+  ignore_secret_changes = true
+
+  enable_rotation     = true
+  rotation_lambda_arn = var.rotation_lambda.lambda_function_arn
+  rotation_rules = {
+    # Runs at 10:00 AM on the first Tuesday of Feb, May, Aug, Nov.
+    schedule_expression = "cron(0 10 ? FEB,MAY,AUG,NOV TUE#1 *)"
+  }
+}
+
