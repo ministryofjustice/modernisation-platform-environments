@@ -1,10 +1,13 @@
-/*
+locals {
+  associated_load_balancers_arns = local.environment == "development" ? [aws_lb.WAM-ALB.arn] : []
+}
+
 module "waf" {
   source                   = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-aws-waf?ref=b9cf6f92b142e80845ae30252aee2f84f57a71a9"
   enable_ddos_protection   = true
   ddos_rate_limit          = 150
   block_non_uk_traffic     = true
-# associated_resource_arns = [aws_lb.WAM-ALB.arn]
+  associated_resource_arns = local.associated_load_balancer_arns
 
   providers = {
     aws                        = aws
@@ -158,4 +161,3 @@ resource "aws_wafv2_web_acl_logging_configuration" "wam_waf_logging" {
   log_destination_configs = [aws_cloudwatch_log_group.wam_waf_logs.arn]
   resource_arn            = aws_wafv2_web_acl.wam_web_acl.arn
 }
-*/
