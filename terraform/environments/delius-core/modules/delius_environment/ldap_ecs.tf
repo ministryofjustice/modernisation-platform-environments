@@ -134,11 +134,11 @@ module "ldap_ecs" {
     },
     # Access is covered by above rule, using temp localhost CIDR so all rules aren't recreated/reordered
     {
-      port                         = var.ldap_config.port
-      ip_protocol                  = "udp"
+      port        = var.ldap_config.port
+      ip_protocol = "udp"
       # referenced_security_group_id = module.bastion_linux.bastion_security_group # Temporarily removed to recreate bastion SG
-      cidr_ipv4                    = "127.0.0.1/32"
-      description                  = "Allow inbound traffic from bastion"
+      cidr_ipv4   = "127.0.0.1/32"
+      description = "Allow inbound traffic from bastion"
     },
     {
       port        = var.ldap_config.port
@@ -184,11 +184,11 @@ module "ldap_ecs" {
     },
     # Access is covered by above rule, using temp localhost CIDR so all rules aren't recreated/reordered
     {
-      port                         = var.ldap_config.tls_port
-      ip_protocol                  = "udp"
+      port        = var.ldap_config.tls_port
+      ip_protocol = "udp"
       # referenced_security_group_id = module.bastion_linux.bastion_security_group # Temporarily removed to recreate bastion SG
-      cidr_ipv4                    = "127.0.0.1/32"
-      description                  = "Allow inbound traffic from bastion"
+      cidr_ipv4   = "127.0.0.1/32"
+      description = "Allow inbound traffic from bastion"
     },
     {
       port        = var.ldap_config.tls_port
@@ -231,11 +231,11 @@ module "ldap_ecs" {
     },
     # Access is covered by above rule, using temp localhost CIDR so all rules aren't recreated/reordered
     {
-      port                         = var.ldap_config.port
-      ip_protocol                  = "udp"
+      port        = var.ldap_config.port
+      ip_protocol = "udp"
       # referenced_security_group_id = module.bastion_linux.bastion_security_group # Temporarily removed to recreate bastion SG
-      cidr_ipv4                    = "127.0.0.1/32"
-      description                  = "Allow inbound traffic from bastion"
+      cidr_ipv4   = "127.0.0.1/32"
+      description = "Allow inbound traffic from bastion"
     },
     {
       port        = var.ldap_config.port
