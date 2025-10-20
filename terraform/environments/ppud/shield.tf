@@ -15,7 +15,7 @@ module "shield" {
     aws.modernisation-platform = aws.modernisation-platform
   }
   application_name = local.application_name
-  excluded_protections = [for e in data.aws_shield_protection.excluded : e.id]
+  excluded_protections = local.environment == "development" ? [for e in data.aws_shield_protection.excluded : e.id] : []
   resources = {
     WAM-ALB = {
       action = "block"
