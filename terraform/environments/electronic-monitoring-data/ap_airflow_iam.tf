@@ -628,6 +628,7 @@ module "load_capita_blob_storage" {
   oidc_arn           = aws_iam_openid_connect_provider.analytical_platform_compute.arn
   athena_dump_bucket = module.s3-athena-bucket.bucket
   cadt_bucket        = module.s3-create-a-derived-table-bucket.bucket
+  source_data_bucket = module.s3-json-directory-structure-bucket.bucket
   secret_arn         = aws_secretsmanager_secret.servicenow_credentials.arn
   new_airflow        = true
 }
