@@ -1,67 +1,6 @@
 #### This file can be used to store locals specific to the member account ####
 locals {
   env_account_id = local.environment_management.account_ids[terraform.workspace]
-  #----------------------------------------------------------------------------
-  # CAPITA
-  #----------------------------------------------------------------------------
-  capita_ssh_keys = [
-    "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBDEMaR2/Fk/XjgxYMHyLarpeArHEaPB6vwKwFfMsw8mlZ3BR5MnE72ZOEIqD4WwN6d2Tnrok3Y7DNUQCv9D/Mh/JwG3NyMeM6uinbQMHzkmMQn6/cMTuY30I6XD5nt4h2A==",
-  ]
-  capita_cidr_ipv4s = [
-    "172.167.3.97/32",
-  ]
-  capita_cidr_ipv6s = []
-
-  ddc_ssh_keys = [
-    "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBDl9q5Gq/SJb6UGbr56E5VxF7gXLk3zccTBahHVdrRrk8vKyhJSrrNM264V6tF4AmZpY87qrmQaicUHqYGZH3z8RgSMhoH9814K+JbtW5/NrnA7q/dU1jHkE9YMAS/zVFA==",
-  ]
-  ddc_cidr_ipv4s = [
-    # "82.203.33.112/28",
-    # "82.203.33.128/28",
-    # "85.115.52.0/24",
-    # "85.115.53.0/24",
-    # "85.115.54.0/24",
-    # "85.115.54.203/32",
-    # "82.203.33.140/32",
-    "195.180.32.164/32",
-    "82.203.33.134/32",
-  ]
-  ddc_cidr_ipv6s = []
-
-  sftp_account_capita_test = {
-    name       = "test"
-    ssh_keys   = local.capita_ssh_keys
-    cidr_ipv4s = local.capita_cidr_ipv4s
-    cidr_ipv6s = local.capita_cidr_ipv6s
-  }
-
-  sftp_account_capita_alcohol_monitoring = {
-    name       = "alcohol_monitoring"
-    ssh_keys   = local.ddc_ssh_keys
-    cidr_ipv4s = local.ddc_cidr_ipv4s
-    cidr_ipv6s = local.ddc_cidr_ipv6s
-  }
-
-  sftp_account_capita_blob_storage = {
-    name       = "blob_storage"
-    ssh_keys   = local.ddc_ssh_keys
-    cidr_ipv4s = local.ddc_cidr_ipv4s
-    cidr_ipv6s = local.ddc_cidr_ipv6s
-  }
-
-  sftp_account_capita_forms_and_subject_id = {
-    name       = "forms_and_subject_id"
-    ssh_keys   = local.ddc_ssh_keys
-    cidr_ipv4s = local.ddc_cidr_ipv4s
-    cidr_ipv6s = local.ddc_cidr_ipv6s
-  }
-
-  sftp_account_capita_specials_mailbox = {
-    name       = "specials_mailbox"
-    ssh_keys   = local.capita_ssh_keys
-    cidr_ipv4s = local.capita_cidr_ipv4s
-    cidr_ipv6s = local.capita_cidr_ipv6s
-  }
 
   #----------------------------------------------------------------------------
   # BUDDI
@@ -114,33 +53,6 @@ locals {
     cidr_ipv4s = local.civica_cidr_ipv4s
     cidr_ipv6s = local.civica_cidr_ipv6s
   }
-
-
-  #----------------------------------------------------------------------------
-  # scram
-  #----------------------------------------------------------------------------
-  scram_ssh_keys = [
-    "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDJ4URBaRy0SZgwZKsMHNMjyqFQ+zbsBRI/tekxQq7CBO8GNtDSfEYrHBu9t9D3sI2rAeBFqed7dI8YUlMJngBTxs77X5V2bUiCcpyj6XhDWjAiX9mzdAq+Gsp6H5Zt5dQjf0HsIeEu9K0EdUVbkDHCs+OQ7fHbfGvHvK4j6Kvd9lJX34E7t5mg/jUOVadGWIH/4H9Xrq8DNqqUj83ZXD4aHObyxCB1fRJMfYjxHDHY/ee19T2UhnhV1Wc/aVyCs/lBiXexhgPDh+qS33Q7HPZxZvDkPwcPtXWW7ZJWtca6IylbBdFqcYazv/XUByl5QWx+O6IzgJIFMaUndXILUsc5xDr4bk+KgEIgH4CjMfaVfvpMpYHDElBNfPVYjyKW31dI1Q6igNilIySEjQX7+yy+5gF+qRfaCEBS05bUDPE3oZ7r9pmP8zltzL/aDPffPMrdGoHklSEGnOJIrXFvksAB9OGOO9d2URW4YlFpcqe4uFnwsNkZ9lk8R5DCDEuQ5VqPxkcW9tv5pTc4F3vbpx5Wk7JOPLzSwbPJKAw8iVpU+wWuOXbRarB3iDPuojeHtjH1HZ3o2nizG/FrT26wdfeKDZgsWbA9y2DbPHp5MQ+mONGMb7+9t/2C//RXntz/Y2U3DuT1gKq38rfx2Bveo0i6aWPNBvLSxRH+Kvg6vpobGQ==",
-  ]
-  scram_cidr_ipv4s = [
-    "216.241.100.251/32",
-  ]
-  scram_cidr_ipv6s = []
-
-  sftp_account_scram_test = {
-    name       = "test"
-    ssh_keys   = local.scram_ssh_keys
-    cidr_ipv4s = local.scram_cidr_ipv4s
-    cidr_ipv6s = local.scram_cidr_ipv6s
-  }
-
-  sftp_account_scram_am = {
-    name       = "alcohol_monitoring"
-    ssh_keys   = local.scram_ssh_keys
-    cidr_ipv4s = local.scram_cidr_ipv4s
-    cidr_ipv6s = local.scram_cidr_ipv6s
-  }
-
 
   #----------------------------------------------------------------------------
   # G4S
