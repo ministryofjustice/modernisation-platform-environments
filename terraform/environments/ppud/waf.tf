@@ -50,7 +50,7 @@ locals {
 }
 
 resource "aws_wafv2_ip_set" "ncsc_waf_ip_set" {
-  count              = (local.is-development || local.is-preproduction || local.is-production) ? 1 : 0
+# count              = (local.is-development || local.is-preproduction || local.is-production) ? 1 : 0
   name               = "ncsc-waf-ip-set"
   scope              = "REGIONAL"
   ip_address_version = "IPV4"
@@ -82,7 +82,7 @@ resource "aws_wafv2_web_acl" "wam_web_acl" {
     }
     statement {
       ip_set_reference_statement {
-        arn = aws_wafv2_ip_set.ncsc_waf_ip_set.arn[0]
+        arn = aws_wafv2_ip_set.ncsc_waf_ip_set.arn
       }
     }
     visibility_config {
