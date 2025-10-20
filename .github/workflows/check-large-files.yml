@@ -43,13 +43,16 @@ jobs:
           for file in $CHANGED_FILES; do
             if [ -f "$file" ]; then
               # Get file size in KB
-              FILE_SIZE=$(du -k "$file" | cut -f1)
-              echo "DEBUG: Checking $file ($FILE_SIZE KB)"
+              # For Linux:
+              FILE_SIZE_BYTES=$(stat -c "%s" "$file")
+
+              FILE_SIZE_KB=$((FILE_SIZE_BYTES / 1024))
+              echo "DEBUG: Checking $file ($FILE_SIZE_KB KB)"
               # Check if file is binary/compressed
               FILE_TYPE=$(file -b "$file")
               # Check for large files
-              if [ "$FILE_SIZE" -gt "$SIZE_THRESHOLD" ]; then
-                SIZE_MB=$(echo "scale=2; $FILE_SIZE / 1024" | bc)
+              if [ "$FILE_SIZE_KB" -gt "$SIZE_THRESHOLD" ]; then
+                SIZE_MB=$(echo "scale=2; $FILE_SIZE_KB / 1024" | bc)
                 echo "DEBUG: Large file detected: $file (${SIZE_MB}MB)"
                 LARGE_FILES+=("- \`$file\` (${SIZE_MB}MB)")
               fi
