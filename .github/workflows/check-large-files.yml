@@ -112,7 +112,7 @@ jobs:
               comment.body.includes('Large Files Detected')
             );
             
-            const commentBody = warningMessage + '\n\n---\n*This is an automated check. If you believe these files are necessary, please contact the Modernisation Platform Team on [Slack](https://moj.enterprise.slack.com/archives/C01A7QK5VM1).*';
+            const commentBody = warningMessage + '\n\n---\n*This is an automated check. If you believe these files are necessary, please contact the [Modernisation Platform Team](https://moj.enterprise.slack.com/archives/C01A7QK5VM1).*';
             
             if (botComment) {
               // Update existing comment
@@ -141,17 +141,21 @@ jobs:
             // Request review from a modernisation-platform GitHub team
             const teamSlug = 'modernisation-platform';
             
-            try {
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+            });
+
+            const teamAlreadyReviewer = pr.requested_teams.some(team => team.slug === teamSlug);
+
+            if (!teamAlreadyReviewer) {
               await github.rest.pulls.requestReviewers({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 pull_number: context.issue.number,
                 team_reviewers: [teamSlug]
               });
-              console.log(`✅ Review requested from team: @${context.repo.owner}/${teamSlug}`);
-            } catch (error) {
-              console.error(`❌ Failed to request review from team: ${error.message}`);
-              console.log('Make sure the team exists and the GITHUB_TOKEN has permissions.');
             }
 
       - name: Warning summary
