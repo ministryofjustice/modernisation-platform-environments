@@ -52,11 +52,12 @@ locals {
     ec2_instances = {
 
       ls-ncr-db-1-a = merge(local.ec2_instances.db, {
-        cloudwatch_metric_alarms = merge(
-          local.cloudwatch_metric_alarms.db,
-          local.cloudwatch_metric_alarms.db_connected,
-          local.cloudwatch_metric_alarms.db_backup,
-        )
+        cloudwatch_metric_alarms = {}
+        #cloudwatch_metric_alarms = merge(
+        #  local.cloudwatch_metric_alarms.db,
+        #  local.cloudwatch_metric_alarms.db_connected,
+        #  local.cloudwatch_metric_alarms.db_backup,
+        #)
         config = merge(local.ec2_instances.db.config, {
           availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.ec2_instances.db.config.instance_profile_policies, [

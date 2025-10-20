@@ -146,13 +146,13 @@ resource "aws_vpc_security_group_ingress_rule" "db_inter_conn" {
 
 resource "aws_vpc_security_group_ingress_rule" "delius_db_security_group_ssh_ingress_bastion" {
   #checkov:skip=CKV_AWS_24
-  security_group_id            = aws_security_group.db_ec2.id
-  description                  = "bastion to testing db"
-  from_port                    = 22
-  to_port                      = 22
-  ip_protocol                  = "tcp"
+  security_group_id = aws_security_group.db_ec2.id
+  description       = "bastion to testing db"
+  from_port         = 22
+  to_port           = 22
+  ip_protocol       = "tcp"
   # referenced_security_group_id = var.bastion_sg_id # Temporarily removed to recreate bastion SG
-  cidr_ipv4                    = var.account_config.shared_vpc_cidr
+  cidr_ipv4 = var.account_config.shared_vpc_cidr
 }
 
 resource "aws_vpc_security_group_ingress_rule" "delius_db_oem_db" {
