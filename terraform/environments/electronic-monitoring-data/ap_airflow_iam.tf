@@ -201,7 +201,6 @@ module "load_atrium_database" {
   athena_dump_bucket = module.s3-athena-bucket.bucket
   cadt_bucket        = module.s3-create-a-derived-table-bucket.bucket
   new_airflow        = true
-  db_exists          = true
 }
 
 module "load_atv_database" {
