@@ -90,7 +90,7 @@ resource "aws_lambda_function" "patch_cwa_extract_lambda" {
 }
 
 resource "aws_lambda_function" "patch_cwa_file_transfer_lambda" {
-  count            = local.environment == "test" ? 1 : 0    
+  count            = local.environment == "test" ? 1 : 0
   description      = "Connect to CWA DB, retrieve multiple json files of each extract and merge into single JSON file, uploads them to S3"
   function_name    = "patch_cwa_file_transfer_lambda"
   role             = aws_iam_role.patch_cwa_extract_lambda_role[0].arn
