@@ -67,7 +67,7 @@ resource "aws_wafv2_web_acl" "opahub_web_acl" {
         and_statement {
           statement {
             byte_match_statement {
-              search_string         = "/opa/web-determinations/"
+              search_string = "/opa/web-determinations/"
               field_to_match {
                 uri_path {}
               }
