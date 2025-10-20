@@ -4,6 +4,7 @@
 resource "aws_ecs_task_definition" "ecs_connector_task_definition" {
   family             = "${local.connector_app_name}-task"
   execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
+  task_role_arn      = aws_iam_role.connector_ecs_task_role.arn
   network_mode       = "bridge"
   requires_compatibilities = [
     "EC2",
