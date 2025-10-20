@@ -137,11 +137,10 @@ locals {
           })
         })
         tags = merge(local.ec2_autoscaling_groups.web.tags, {
-          nomis-environment     = "preprod"
-          oracle-db-hostname-a  = "ppnomis-a.preproduction.nomis.service.justice.gov.uk"
-          oracle-db-hostname-b  = "ppnomis-b.preproduction.nomis.service.justice.gov.uk"
-          oracle-db-name        = "PPCNOM"
-          reporting-environment = "aws"
+          nomis-environment    = "preprod"
+          oracle-db-hostname-a = "ppnomis-a.preproduction.nomis.service.justice.gov.uk"
+          oracle-db-hostname-b = "ppnomis-b.preproduction.nomis.service.justice.gov.uk"
+          oracle-db-name       = "PPCNOM"
         })
       })
 

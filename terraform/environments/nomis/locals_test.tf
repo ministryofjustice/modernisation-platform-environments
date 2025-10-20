@@ -48,7 +48,7 @@ locals {
     }
 
     ec2_autoscaling_groups = {
-      # NOT-ACTIVE (blue deployment) - for testing Combined Reporting
+      # NOT-ACTIVE (blue deployment)
       t1-nomis-web-a = merge(local.ec2_autoscaling_groups.web, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.web.autoscaling_group, {
           desired_capacity = 0
@@ -69,11 +69,10 @@ locals {
           })
         })
         tags = merge(local.ec2_autoscaling_groups.web.tags, {
-          nomis-environment     = "t1"
-          oracle-db-hostname-a  = "t1nomis-a.test.nomis.service.justice.gov.uk"
-          oracle-db-hostname-b  = "t1nomis-b.test.nomis.service.justice.gov.uk"
-          oracle-db-name        = "T1CNOM"
-          reporting-environment = "aws"
+          nomis-environment    = "t1"
+          oracle-db-hostname-a = "t1nomis-a.test.nomis.service.justice.gov.uk"
+          oracle-db-hostname-b = "t1nomis-b.test.nomis.service.justice.gov.uk"
+          oracle-db-name       = "T1CNOM"
         })
       })
 
