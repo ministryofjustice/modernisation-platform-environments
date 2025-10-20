@@ -7,7 +7,7 @@ module "waf" {
   enable_ddos_protection   = true
   ddos_rate_limit          = 150
   block_non_uk_traffic     = true
-  associated_resource_arns = local.associated_load_balancer_arns
+  associated_resource_arns = local.associated_load_balancers_arns
 
   providers = {
     aws                        = aws
