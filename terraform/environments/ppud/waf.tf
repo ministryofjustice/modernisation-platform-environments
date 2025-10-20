@@ -158,6 +158,6 @@ resource "aws_cloudwatch_log_group" "wam_waf_logs" {
 # Send WebACL logs to CloudWatch
 resource "aws_wafv2_web_acl_logging_configuration" "wam_waf_logging" {
   count                   = local.is-development == true ? 1 : 0
-  log_destination_configs = [aws_cloudwatch_log_group.wam_waf_logs.arn[0]]
-  resource_arn            = aws_wafv2_web_acl.wam_web_acl.arn[0]
+  log_destination_configs = [aws_cloudwatch_log_group.wam_waf_logs[count.index].arn]
+  resource_arn            = aws_wafv2_web_acl.wam_web_acl[count.index].arn
 }
