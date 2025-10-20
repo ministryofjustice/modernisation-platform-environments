@@ -615,7 +615,7 @@ module "full_reload_servicenow" {
 }
 
 module "load_capita_blob_storage" {
-  count  = local.is-development ? 0 : 1
+  count  = local.is-production || local.is-development ? 1 : 0
   source = "./modules/ap_airflow_load_data_iam_role"
 
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
