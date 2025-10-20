@@ -40,7 +40,8 @@ locals {
     "historic_ears_and_sars_int",
     "historic_ears_and_sars_mart",
     "emsys_mvp_stg",
-    "sar_ear_reports_mart"
+    "sar_ear_reports_mart",
+    "capita_alcohol_monitoring"
   ] : []
   dev_dbs_to_grant       = local.is-production ? [for db in local.prod_dbs_to_grant : "${db}_historic_dev_dbt"] : []
   dbt_dbs_to_grant       = [for db in local.dbt_dbs : "${db}${local.dbt_suffix}"]
