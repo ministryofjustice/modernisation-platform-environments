@@ -163,3 +163,9 @@ jobs:
         run: |
           echo "⚠️ Large or binary files detected in this PR. Please review the PR comment for details."
           cat warning_message.txt
+
+      - name: Fail workflow if large files detected
+        if: steps.check_files.outputs.has_warnings == 'true'
+        run: |
+          echo "❌ Large files detected. Failing the workflow."
+          exit 1
