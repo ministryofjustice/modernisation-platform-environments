@@ -94,5 +94,6 @@ module "test-ec2-t4" { #"my_t4_instance" {
 
   tags = {
     description = "test for T4G instance size"
+    os-type     = "Linux"
   }
 }
