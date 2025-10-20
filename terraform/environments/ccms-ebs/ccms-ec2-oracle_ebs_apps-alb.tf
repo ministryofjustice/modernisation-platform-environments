@@ -61,6 +61,6 @@ resource "aws_lb_target_group_attachment" "ebsapps" {
 }
 
 resource "aws_wafv2_web_acl_association" "ebs_waf_association" {
-  resource_arn = aws_lb.ebsapps_lb[count.index].arn
+  resource_arn = aws_lb.ebsapps_lb.arn
   web_acl_arn  = aws_wafv2_web_acl.ebs_web_acl.arn
 }

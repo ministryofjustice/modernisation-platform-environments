@@ -1,6 +1,7 @@
 # DDoS Alarm
 
 resource "aws_cloudwatch_metric_alarm" "ddos_attack_external_ebsapps_alb" {
+  count               = local.is-development ? 0 : 1
   alarm_name          = "DDoSDetectedEBSALB"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = "3"
@@ -13,11 +14,12 @@ resource "aws_cloudwatch_metric_alarm" "ddos_attack_external_ebsapps_alb" {
   treat_missing_data  = "notBreaching"
   alarm_actions       = [aws_sns_topic.ddos_alarm.arn]
   dimensions = {
-    ResourceArn = aws_lb.ebsapps_lb[count.index].arn
+    ResourceArn = aws_lb.ebsapps_lb.arn
   }
 }
 
 resource "aws_cloudwatch_metric_alarm" "ddos_attack_external_ebsapps_nlb" {
+  count               = local.is-development ? 0 : 1
   alarm_name          = "DDoSDetectedEBSNLB"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = "3"
@@ -30,7 +32,7 @@ resource "aws_cloudwatch_metric_alarm" "ddos_attack_external_ebsapps_nlb" {
   treat_missing_data  = "notBreaching"
   alarm_actions       = [aws_sns_topic.ddos_alarm.arn]
   dimensions = {
-    ResourceArn = aws_lb.ebsapps_nlb[count.index].arn
+    ResourceArn = aws_lb.ebsapps_nlb.arn
   }
 }
 
