@@ -121,13 +121,13 @@ data "aws_subnet" "subnet_az" {
 }
 
 resource "aws_ebs_volume" "tariffdb_storage" {
-  for_each = {
+  for_each = local.environment == "production" ? {
     for pair in setproduct(keys(local.subnets_a_b_map), local.tarrifdb_volume_layout) :
     "${pair[0]}-${pair[1].device_name}" => {
       instance_key = pair[0]
       volume_data  = pair[1]
     }
-  }
+  } : {}
   availability_zone = data.aws_subnet.subnet_az[each.value.instance_key].availability_zone
   size              = each.value.volume_data.size
   type              = "gp3"
@@ -137,13 +137,13 @@ resource "aws_ebs_volume" "tariffdb_storage" {
 }
 
 resource "aws_volume_attachment" "tariffdb_attachment" {
-  for_each = {
+  for_each = local.environment == "production" ? {
     for pair in setproduct(keys(local.subnets_a_b_map), local.tarrifdb_volume_layout) :
     "${pair[0]}-${pair[1].device_name}" => {
       instance_key = pair[0]
       volume_data  = pair[1]
     }
-  }
+  } : {}
   device_name = each.value.volume_data.device_name
   volume_id   = aws_ebs_volume.tariffdb_storage[each.key].id
   instance_id = aws_instance.tariffdb[each.value.instance_key].id
