@@ -23,44 +23,44 @@ jobs:
       - name: Check for large files
         id: check_files
         run: |
-          # Set size threshold in KB (e.g., 5MB = 5120KB)
-          SIZE_THRESHOLD=1024
+          # List of binary or archive file extensions
+          BINARY_ARCHIVE_EXTS="zip tar gz tgz bz2 7z rar exe bin dll iso img"
           
           # Get the list of files changed in this PR
           git fetch origin ${{ github.base_ref }}
           CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
           
           # Array to store results
-          LARGE_FILES=()
+          BINARY_ARCHIVE_FILES=()
           
-          echo "Checking files for size and type..."
+          echo "Checking for binary or archive file types..."
           
           for file in $CHANGED_FILES; do
             if [ -f "$file" ]; then
-              # Get file size in KB
               FILE_SIZE_BYTES=$(stat -c "%s" "$file")
               FILE_SIZE_KB=$((FILE_SIZE_BYTES / 1024))
-              # Check for large files
-              if [ "$FILE_SIZE_KB" -gt "$SIZE_THRESHOLD" ]; then
-                SIZE_MB=$(echo "scale=2; $FILE_SIZE_KB / 1024" | bc)
-                LARGE_FILES+=("- \`$file\` (${SIZE_MB}MB)")
-              fi
+              EXT="${file##*.}"
+              for ba in $BINARY_ARCHIVE_EXTS; do
+                if [ "$EXT" = "$ba" ]; then
+                  SIZE_MB=$(echo "scale=2; $FILE_SIZE_KB / 1024" | bc)
+                  BINARY_ARCHIVE_FILES+=("- \`$file\` (Extension: .$ba, Size: ${SIZE_MB}MB)")
+                fi
+              done
             fi
           done
           
           # Create warning message
           WARNING_MESSAGE=""
           
-          if [ ${#LARGE_FILES[@]} -gt 0 ]; then
-            WARNING_MESSAGE+="## ⚠️ Large Files Detected\n\n"
-            WARNING_MESSAGE+="The following files exceed ${SIZE_THRESHOLD}KB ($(echo "scale=2; $SIZE_THRESHOLD / 1024" | bc)MB):\n\n"
-            for item in "${LARGE_FILES[@]}"; do
+          if [ ${#BINARY_ARCHIVE_FILES[@]} -gt 0 ]; then
+            WARNING_MESSAGE+="## 🚩 Binary or Archive Files Requiring Team Review\n\n"
+            WARNING_MESSAGE+="The following files match binary or archive extensions and will require review from the Modernisation Platform Team (via CODEOWNERS):\n\n"
+            for item in "${BINARY_ARCHIVE_FILES[@]}"; do
               WARNING_MESSAGE+="$item\n"
             done
-            WARNING_MESSAGE+="\n**Please consider:**\n"
-            WARNING_MESSAGE+="- Storing files in S3 or other object storage\n"
-            WARNING_MESSAGE+="- Compressing files if possible\n"
-            WARNING_MESSAGE+="- Removing unnecessary large files\n\n"
+            WARNING_MESSAGE+="\n**Why is this required?**\n"
+            WARNING_MESSAGE+="- These file types can be problematic in git repositories (large, binary, hard to diff, etc.)\n"
+            WARNING_MESSAGE+="- Please ensure these files are necessary and cannot be managed outside git (e.g., S3, package manager, etc.)\n\n"
           fi
           
           # Save to file for PR comment
@@ -68,7 +68,7 @@ jobs:
             echo -e "$WARNING_MESSAGE" > warning_message.txt
             echo "has_warnings=true" >> $GITHUB_OUTPUT
           else
-            echo "✅ No large files detected."
+            echo "✅ No binary or archive file types detected."
             echo "has_warnings=false" >> $GITHUB_OUTPUT
           fi
 
@@ -115,7 +115,7 @@ jobs:
       - name: Warning summary and fail if large files detected
         if: steps.check_files.outputs.has_warnings == 'true'
         run: |
-          echo "⚠️ Large files detected in this PR. Please review the PR comment for details."
+          echo "🚩 Binary or archive file types detected in this PR. Please review the PR comment for details."
           cat warning_message.txt
-          echo "❌ Large files detected. Failing the workflow."
+          echo "❌ Binary or archive file types detected. Failing the workflow."
           exit 1
