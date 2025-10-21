@@ -18,7 +18,7 @@ resource "aws_lb" "webgate_nlb" {
   internal           = false
   load_balancer_type = "network"
 
-  enable_deletion_protection       = true
+  enable_deletion_protection       = false
   enable_cross_zone_load_balancing = true
 
   subnet_mapping {
