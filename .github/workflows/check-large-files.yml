@@ -91,12 +91,14 @@ jobs:
               issue_number: context.issue.number,
             });
             
+            // Use a hidden marker for reliable comment updates
+            const marker = '<!-- binary-archive-check -->';
             const botComment = comments.find(comment => 
               comment.user.type === 'Bot' && 
-              comment.body.includes('Large Files Detected')
+              comment.body.includes(marker)
             );
             
-            const commentBody = warningMessage + '\n\n---\n*If you believe these files are necessary, please contact the [Modernisation Platform Team](https://moj.enterprise.slack.com/archives/C01A7QK5VM1) for a review.*';
+            const commentBody = warningMessage + '\n\n' + marker + '\n---\n*If you believe these files are necessary, please contact the [Modernisation Platform Team](https://moj.enterprise.slack.com/archives/C01A7QK5VM1) for a review.*';
             
             if (botComment) {
               // Update existing comment
