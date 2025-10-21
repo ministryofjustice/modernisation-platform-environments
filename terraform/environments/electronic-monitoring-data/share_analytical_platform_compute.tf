@@ -31,6 +31,9 @@ locals {
     "allied_mdss",
     "serco_servicenow",
   ]
+  historic_source_dbs = [
+    "capita_alcohol_monitoring",
+  ]
   prod_dbs_to_grant = local.is-production ? [
     "am_stg",
     "cap_dw_stg",
@@ -46,7 +49,7 @@ locals {
   dbt_dbs_to_grant       = [for db in local.dbt_dbs : "${db}${local.dbt_suffix}"]
   live_feed_dbs_to_grant = [for db in local.live_feeds_dbs : "${db}${local.db_suffix}"]
   dbs_to_grant           = toset(flatten([local.prod_dbs_to_grant, local.dev_dbs_to_grant, local.dbt_dbs_to_grant]))
-  existing_dbs_to_grant  = toset(local.live_feed_dbs_to_grant)
+  existing_dbs_to_grant  = toset(flatten([local.live_feed_dbs_to_grant, local.historic_source_dbs]))
 }
 
 # Source Analytics DBT Secrets
