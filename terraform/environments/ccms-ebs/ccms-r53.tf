@@ -51,7 +51,7 @@ resource "aws_route53_record" "ebslb_cname" {
   name    = "ccms-ebslb"
   ttl     = "300"
   type    = "CNAME"
-  records = [aws_route53_record.external.fqdn]
+  records = [aws_route53_record.external[0].fqdn]
 }
 
 ## EBSDB
