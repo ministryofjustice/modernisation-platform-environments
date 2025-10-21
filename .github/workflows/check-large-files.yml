@@ -53,14 +53,16 @@ jobs:
           WARNING_MESSAGE=""
           
           if [ ${#BINARY_ARCHIVE_FILES[@]} -gt 0 ]; then
-            WARNING_MESSAGE+="## 🚩 Binary or Archive Files Requiring Team Review\n\n"
-            WARNING_MESSAGE+="The following files match binary or archive extensions and will require review from the Modernisation Platform Team (via CODEOWNERS):\n\n"
+            WARNING_MESSAGE+="## ⚠️ Binary or Archive Files Detected\n\n"
+            WARNING_MESSAGE+="The following files match binary or archive extensions and will require review from the Modernisation Platform Team:\n\n"
             for item in "${BINARY_ARCHIVE_FILES[@]}"; do
               WARNING_MESSAGE+="$item\n"
             done
             WARNING_MESSAGE+="\n**Why is this required?**\n"
-            WARNING_MESSAGE+="- These file types can be problematic in git repositories (large, binary, hard to diff, etc.)\n"
-            WARNING_MESSAGE+="- Please ensure these files are necessary and cannot be managed outside git (e.g., S3, package manager, etc.)\n\n"
+            WARNING_MESSAGE+="- These file types are often large, which can bloat the repository and slow down cloning and fetching for all users.\n"
+            WARNING_MESSAGE+="- Binary and archive files cannot be efficiently diffed or merged, making code review and collaboration difficult.\n"
+            WARNING_MESSAGE+="- Storing such files in git goes against best practices; they are better managed in object storage (e.g., S3) or artifact repositories.\n"
+            WARNING_MESSAGE+="- Frequent changes to large binaries or archives can rapidly increase repository size and degrade performance.\n\n"
           fi
           
           # Save to file for PR comment
@@ -115,7 +117,7 @@ jobs:
       - name: Warning summary and fail if large files detected
         if: steps.check_files.outputs.has_warnings == 'true'
         run: |
-          echo "🚩 Binary or archive file types detected in this PR. Please review the PR comment for details."
+          echo "⚠️ Binary or archive file types detected in this PR. Please review the PR comment for details."
           cat warning_message.txt
           echo "❌ Binary or archive file types detected. Failing the workflow."
           exit 1
