@@ -7,7 +7,7 @@ resource "aws_lb" "webgate_public_lb" {
   subnets            = data.aws_subnets.shared-public.ids
 
   drop_invalid_header_fields = true
-  enable_deletion_protection = true
+  enable_deletion_protection = false
 
   access_logs {
     bucket  = module.s3-bucket-logging.bucket.id
