@@ -16,7 +16,7 @@ data "aws_subnets" "shared-data" {
     values = [data.aws_vpc.shared.id]
   }
   tags = {
-    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-data*"
+    dpr-name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-data*"
   }
 }
 
@@ -26,7 +26,7 @@ data "aws_subnets" "shared-private" {
     values = [data.aws_vpc.shared.id]
   }
   tags = {
-    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private*"
+    dpr-name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private*"
   }
 }
 
@@ -36,7 +36,7 @@ data "aws_subnets" "shared-public" {
     values = [data.aws_vpc.shared.id]
   }
   tags = {
-    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public*"
+    dpr-name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public*"
   }
 }
 
@@ -85,21 +85,21 @@ data "aws_subnet" "private_subnets_c" {
 data "aws_subnet" "public_subnets_a" {
   vpc_id = data.aws_vpc.shared.id
   tags = {
-    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public-${data.aws_region.current.name}a"
+    dpr-name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public-${data.aws_region.current.name}a"
   }
 }
 
 data "aws_subnet" "public_subnets_b" {
   vpc_id = data.aws_vpc.shared.id
   tags = {
-    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public-${data.aws_region.current.name}b"
+    dpr-name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public-${data.aws_region.current.name}b"
   }
 }
 
 data "aws_subnet" "public_subnets_c" {
   vpc_id = data.aws_vpc.shared.id
   tags = {
-    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public-${data.aws_region.current.name}c"
+    dpr-name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public-${data.aws_region.current.name}c"
   }
 }
 

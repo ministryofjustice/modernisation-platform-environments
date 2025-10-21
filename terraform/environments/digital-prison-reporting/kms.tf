@@ -12,10 +12,11 @@ resource "aws_kms_key" "s3" {
 
 
   tags = merge(
-    local.tags,
+    local.all_tags,
     {
-      Name = "${local.application_name}-s3-kms"
-      Jira = "DPR2-XXXX"
+      dpr-name          = "${local.application_name}-s3-kms"
+      dpr-resource-type = "KMS Key"
+      dpr-jira          = "DPR2-XXXX"
     }
   )
 }
@@ -66,10 +67,11 @@ resource "aws_kms_key" "kinesis-kms-key" {
 
 
   tags = merge(
-    local.tags,
+    local.all_tags,
     {
-      Name = "${local.application_name}-kinesis-kms"
-      Jira = "DPR2-XXXX"
+      dpr-name          = "${local.application_name}-kinesis-kms"
+      dpr-resource-type = "KMS Key"
+      dpr-jira          = "DPR2-XXXX"
     }
   )
 }
@@ -107,10 +109,11 @@ resource "aws_kms_key" "redshift-kms-key" {
   is_enabled          = true
 
   tags = merge(
-    local.tags,
+    local.all_tags,
     {
-      Name = "${local.application_name}-redshift-kms"
-      Jira = "DPR2-XXXX"
+      dpr-name          = "${local.application_name}-redshift-kms"
+      dpr-resource-type = "KMS Key"
+      dpr-jira          = "DPR2-XXXX"
     }
   )
 }
@@ -155,10 +158,11 @@ resource "aws_kms_key" "rds" {
   is_enabled          = true
 
   tags = merge(
-    local.tags,
+    local.all_tags,
     {
-      Name = "${local.application_name}-rds-kms"
-      Jira = "DPR2-XXXX"
+      dpr-name          = "${local.application_name}-rds-kms"
+      dpr-resource-type = "KMS Key"
+      dpr-jira          = "DPR2-XXXX"
     }
   )
 }
@@ -205,10 +209,11 @@ resource "aws_kms_key" "operational_db" {
 
 
   tags = merge(
-    local.tags,
+    local.all_tags,
     {
-      Name = "${local.project}-operational-db-key"
-      Jira = "DPR2-XXXX"
+      dpr-name          = "${local.project}-operational-db-key"
+      dpr-resource-type = "KMS Key"
+      dpr-jira          = "DPR2-XXXX"
     }
   )
 }
@@ -227,10 +232,11 @@ resource "aws_kms_key" "cloudtrail" {
 
 
   tags = merge(
-    local.tags,
+    local.all_tags,
     {
-      Name = "${local.application_name}-cloudtrail-kms"
-      Jira = "DPR2-XXXX"
+      dpr-name          = "${local.application_name}-cloudtrail-kms"
+      dpr-resource-type = "KMS Key"
+      dpr-jira          = "DPR2-XXXX"
     }
   )
 }

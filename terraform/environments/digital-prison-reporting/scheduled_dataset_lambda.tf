@@ -30,10 +30,10 @@ module "scheduled_dataset_lambda" {
   tags = merge(
     local.all_tags,
     {
-      Name           = local.lambda_scheduled_dataset_name
-      Jira           = "DPR2-1513"
-      Resource_Group = "Front-End"
-      Resource_Type  = "lambda"
+      dpr-name           = local.lambda_scheduled_dataset_name
+      dpr-jira           = "DPR2-1513"
+      dpr-resource-group = "Front-End"
+      dpr-resource-type  = "lambda"
     }
   )
 

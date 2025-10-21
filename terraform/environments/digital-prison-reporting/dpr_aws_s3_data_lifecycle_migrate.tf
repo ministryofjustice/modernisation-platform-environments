@@ -27,10 +27,10 @@ module "aws_s3_data_migrate" {
   tags = merge(
     local.all_tags,
     {
-      Resource_Group = "dpr-operations"
-      Jira           = "DPR2-1368"
-      Resource_Type  = "lambda"
-      Name           = local.lambda_s3_data_migrate_name
+      dpr-resource-group = "dpr-operations"
+      dpr-jira           = "DPR2-1368"
+      dpr-resource-type  = "lambda"
+      dpr-name           = local.lambda_s3_data_migrate_name
     }
   )
 

@@ -19,10 +19,12 @@ resource "aws_security_group" "lambda_generic" {
   tags = merge(
     local.all_tags,
     {
-      Resource_Type = "sg_group"
-      Name          = "${local.generic_lambda}-sg"
-      Used_By       = "service_bundle"
-      Jira          = "DPR2-XXXX"
+      dpr-resource-type = "sg_group"
+      dpr-name          = "${local.generic_lambda}-sg"
+      dpr-is-service-bundle  = true
+      dpr-domain          = "Common"
+      dpr-domain-category = "Common"
+      dpr-jira          = "DPR2-XXXX"
     }
   )
 }
@@ -70,8 +72,8 @@ resource "aws_security_group" "serverless_gw" {
   tags = merge(
     local.all_tags,
     {
-      Resource_Type = "sg_group"
-      Name          = "${local.serverless_gw_dbuilder_name}-sg"
+      dpr-resource-type = "sg_group"
+      dpr-name          = "${local.serverless_gw_dbuilder_name}-sg"
     }
   )
 }
@@ -131,8 +133,8 @@ resource "aws_security_group" "gateway_endpoint_sg" {
   tags = merge(
     local.all_tags,
     {
-      Resource_Type = "sg_group"
-      Name          = "${local.serverless_gw_dbuilder_name}-sg-${local.env}"
+      dpr-resource-type = "sg_group"
+      dpr-name          = "${local.serverless_gw_dbuilder_name}-sg-${local.env}"
     }
   )
 }

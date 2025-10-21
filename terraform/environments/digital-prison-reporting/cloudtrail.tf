@@ -23,9 +23,9 @@ resource "aws_cloudtrail" "trail" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-cloud-trail-${local.environment}"
-      Resource_Type = "Cloud Trail"
-      Jira          = "DPR-471"
+      dpr-name          = "${local.project}-cloud-trail-${local.environment}"
+      dpr-resource-type = "Cloud Trail"
+      dpr-jira          = "DPR-471"
     }
   )
 

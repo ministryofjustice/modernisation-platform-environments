@@ -65,10 +65,10 @@ resource "aws_iam_role" "datahub_ingestion_github_actions" {
   tags = merge(
     local.tags,
     {
-      Name           = "${local.project}_datahub-ingestion-github-actions"
-      Resource_Type  = "iam"
-      Jira           = "DPR2-751"
-      Resource_Group = "Front-End"
+      dpr-name           = "${local.project}_datahub-ingestion-github-actions"
+      dpr-resource-type  = "iam"
+      dpr-jira           = "DPR2-751"
+      dpr-resource-group = "Front-End"
     }
   )
 }

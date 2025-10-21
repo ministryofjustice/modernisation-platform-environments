@@ -11,9 +11,9 @@ module "s3_audit_logging_bucket" {
   tags = merge(
     local.all_tags,
     {
-      name          = "${local.project}-audit-logging-${local.environment}"
-      Resource_Type = "S3 Bucket"
-      Jira          = "DPR-471"
+      dpr-name          = "${local.project}-audit-logging-${local.environment}"
+      dpr-resource-type = "S3 Bucket"
+      dpr-jira          = "DPR-471"
     }
   )
 }
@@ -31,9 +31,9 @@ module "s3_transfer_artifacts_bucket" {
   tags = merge(
     local.all_tags,
     {
-      name          = "${local.project}-transfer-artifacts-${local.environment}"
-      Resource_Type = "S3 Bucket"
-      Jira          = "DPR-504"
+      dpr-name          = "${local.project}-transfer-artifacts-${local.environment}"
+      dpr-resource-type = "S3 Bucket"
+      dpr-jira          = "DPR-504"
     }
   )
 }
@@ -51,9 +51,9 @@ module "s3_domain_preview_bucket" {
   tags = merge(
     local.all_tags,
     {
-      name          = "${local.project}-domain-preview-${local.environment}"
-      Resource_Type = "S3 Bucket"
-      Jira          = "DPR-637"
+      dpr-name          = "${local.project}-domain-preview-${local.environment}"
+      dpr-resource-type = "S3 Bucket"
+      dpr-jira          = "DPR-637"
     }
   )
 }
@@ -71,9 +71,9 @@ module "s3_structured_historical_bucket" {
   tags = merge(
     local.all_tags,
     {
-      name          = "${local.project}-structured-historical-${local.environment}"
-      Resource_Type = "S3 Bucket"
-      Jira          = "DPR2-717"
+      dpr-name          = "${local.project}-structured-historical-${local.environment}"
+      dpr-resource-type = "S3 Bucket"
+      dpr-jira          = "DPR2-717"
     }
   )
 }
