@@ -80,6 +80,7 @@ resource "aws_s3_bucket_public_access_block" "r2s" {
 }
 
 resource "aws_s3_bucket_ownership_controls" "r2s" {
+  # checkov:skip=CKV2_AWS_65:"ACLs are required by design"
   bucket = aws_s3_bucket.r2s.id
   rule {
     object_ownership = "BucketOwnerPreferred"
@@ -87,6 +88,7 @@ resource "aws_s3_bucket_ownership_controls" "r2s" {
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "r2s" {
+  #tfsec:ignore:avd-aws-0132 - The bucket policy is attached to the bucket  
   bucket = aws_s3_bucket.r2s.id
   rule {
     apply_server_side_encryption_by_default {
