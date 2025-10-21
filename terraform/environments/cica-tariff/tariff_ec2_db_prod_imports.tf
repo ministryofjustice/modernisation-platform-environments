@@ -112,5 +112,5 @@ import {
 import {
   for_each = local.environment == "production" ? local.tariffdb_vol_import_data : {}
   to = aws_volume_attachment.tariffdb_attachment[each.key]
-  id = "${each.value.device_name}:${each.value.instance_id}:${each.value.volume_id}"
+  id = "${each.value.device_name}:${each.value.volume_id}:${each.value.instance_id}"
 }
