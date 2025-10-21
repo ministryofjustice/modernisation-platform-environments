@@ -5,7 +5,6 @@
 
 1. Authenticate
 
-   > [!NOTE]
    > This command may take several minutes to complete if you have access to a lot of AWS accounts.
 
     ```bash
