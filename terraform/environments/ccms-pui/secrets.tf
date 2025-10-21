@@ -25,14 +25,15 @@ resource "aws_secretsmanager_secret_version" "pui_secrets" {
     SpEntityId                       = "",
     SpEntityUrl                      = "",
     ccms_soa_soapHeaderUserPassword  = "",
-    ccms_soa_soapHeaderUserName      = ""
+    ccms_soa_soapHeaderUserName      = "",
+    opa_security_password            = ""
   })
 
-  # lifecycle {
-  #   ignore_changes = [
-  #     secret_string
-  #   ]
-  # }
+  lifecycle {
+    ignore_changes = [
+      secret_string
+    ]
+  }
 }
 
 data "aws_secretsmanager_secret_version" "pui_secrets" {

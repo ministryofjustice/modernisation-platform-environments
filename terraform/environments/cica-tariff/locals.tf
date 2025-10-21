@@ -125,7 +125,7 @@ locals {
     if mapping.device_name == "xvdn"
   } : {}
   snapshot_id_xvdn_db = local.environment == "production" ? local.block_device_mapping_xvdn_db[9].ebs.snapshot_id : ""
-  
+
   env_to_cica_map = {
     "development" = ["dev"]
     "test"        = ["uat"]
