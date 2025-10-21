@@ -106,7 +106,7 @@ locals {
 import {
   for_each = local.environment == "production" ? local.tariffdb_vol_import_data : {}
   to = aws_ebs_volume.tariffdb_storage[each.key]
-  id = each.value
+  id = each.value.volume_id
 }
 
 import {
