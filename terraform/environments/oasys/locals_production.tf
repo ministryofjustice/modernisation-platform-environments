@@ -366,9 +366,9 @@ locals {
             "Ec2TrnBipPolicy",
           ])
         })
-        instance = merge(local.ec2_instances.db19c.instance, {
-          disable_api_termination = true
-          instance_type           = "r6i.4xlarge"
+        instance = merge(local.ec2_instances.bip.instance, {
+          ami                     = "ami-0d206b8546ea2b68a" # to prevent instances being re-created due to recreated AMI
+          instance_type           = "r6i.4xlarge"           # this is massively over provisioned FIXME
         })
         tags = merge(local.ec2_instances.bip.tags, {
           bip-db-hostname   = "ptctrn-oasys-db-a"
