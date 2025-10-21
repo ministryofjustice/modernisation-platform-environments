@@ -36,7 +36,7 @@ resource "aws_glue_catalog_database" "logs_database" {
 resource "aws_glue_crawler" "internal_lb_logs_crawler" {
   name          = "internal-lb-logs-crawler"
   role          = aws_iam_role.glue_role.arn
-  database_name = aws.glue_catalog_database.logs_database.name
+  database_name = aws_glue_catalog_database.logs_database.name
   table_prefix  = "internal_lb_logs"
 
   s3_target {
