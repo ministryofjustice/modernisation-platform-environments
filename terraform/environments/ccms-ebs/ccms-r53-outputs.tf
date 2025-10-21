@@ -14,7 +14,7 @@ output "aws_route53_record_prod_ebsapp_lb_fqdn" {
 
 output "aws_route53_record_ebslb_cname_fqdn" {
   description = "aws_route53_record ebslb_cname fqdn"
-  value       = aws_route53_record.ebslb_cname.fqdn
+  value       = aws_route53_record.ebslb_cname[*].fqdn
 }
 
 #
