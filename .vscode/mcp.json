@@ -1,0 +1,28 @@
+{
+  "inputs": [
+    {
+      "type": "promptString",
+      "id": "aws-profile",
+      "description": "AWS Profile",
+      "password": true
+    }
+  ],
+  "servers": {
+    "awslabs.terraform-mcp-server": {
+      "command": "uvx",
+      "args": ["awslabs.terraform-mcp-server@latest"],
+      "env": {
+        "AWS_PROFILE": "${input:aws-profile}"
+      }
+    },
+    "terraform": {
+      "command": "docker",
+      "args": [
+        "run",
+        "--interactive",
+        "--rm",
+        "docker.io/hashicorp/terraform-mcp-server:latest"
+      ]
+    }
+  }
+}
