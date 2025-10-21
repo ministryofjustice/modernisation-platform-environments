@@ -20,29 +20,9 @@ module "waf" {
 
  additional_managed_rules = [
     {
-      name     = "allow-ncsc-ip-list"
-      priority = 10
-      action   = "allow"
-      ip_set_reference_statement = {
-        arn = aws_wafv2_ip_set.ncsc_waf_ip_set.arn
-      }
-    },
-    {
-      name     = "allow-circle-ci-ip-list"
-      priority = 20
-      action   = "allow"
-      ip_set_reference_statement = {
-        arn = aws_wafv2_ip_set.circle_ci_waf_ip_set.arn
-      }
-    },
-    {
-      name     = "block-non-uk"
-      priority = 30
-      action   = "block"
-      geo_match_statement = {
-        country_codes = ["GB"]
-        invert        = true
-      }
+      arn             = aws_wafv2_rule_group.wam_waf_acl.arn
+      override_action = "none"   # respect the group's action (BLOCK). Use "count" to dry-run.
+      priority        = 9        # unique; runs before managed rules at 10..15
     }
   ]
 
@@ -71,6 +51,58 @@ module "waf" {
 
 }
 
+resource "aws_wafv2_rule_group" "wam_waf_acl" {
+  name        = "custom-wam-waf-rule-group"
+  description = "A custom rule group to include additional rules to the WAF ACL"
+  scope       = "REGIONAL"
+  capacity    = 2
+
+  rule {
+    name     = "allow-ncsc-ip-list"
+    priority = 10
+    action {
+      allow {}
+    }
+    statement {
+      ip_set_reference_statement {
+        arn = aws_wafv2_ip_set.ncsc_waf_ip_set.arn
+      }
+    }
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "allow-ncsc-ip-list"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  rule {
+    name     = "allow-circle-ci-ip-list"
+    priority = 20
+    action {
+      allow {}
+    }
+    statement {
+      ip_set_reference_statement {
+        arn = aws_wafv2_ip_set.circle_ci_waf_ip_set.arn
+      }
+    }
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "allow-circle-ci-ip-list"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  visibility_config {
+    cloudwatch_metrics_enabled = true
+    metric_name                = "custom-wam-waf-rule-group"
+    sampled_requests_enabled   = true
+  }
+
+  tags = merge(local.tags,
+    { Name = lower(format("%s-custom-wam-waf-rule-group-%s", local.application_name, local.environment)) }
+  )
+}
 
 # WAF IP allow list for NCSC WebCheck & Detectify Services
 
