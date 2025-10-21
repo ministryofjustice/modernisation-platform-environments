@@ -3,7 +3,7 @@
     {
       "rule-type": "selection",
       "rule-id": "01",
-      "rule-name": "all",
+      "rule-name": "SelectAllTables",
       "object-locator": {
         "schema-name": "%",
         "table-name": "%"
@@ -25,7 +25,9 @@
       },
       "rule-action": "change-data-type",
       "data-type": {
-        "type": "decimal(10,7)"
+        "type": "numeric",
+        "precision": 10,
+        "scale": 7
       }
     },
     {
@@ -39,7 +41,9 @@
       },
       "rule-action": "change-data-type",
       "data-type": {
-        "type": "decimal(10,7)"
+        "type": "numeric",
+        "precision": 10,
+        "scale": 7
       }
     }
   ]

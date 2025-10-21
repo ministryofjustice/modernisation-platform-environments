@@ -854,6 +854,10 @@
             {
               "glue_database": "curated_prisons_history",
               "glue_tables": ["*"]
+            },
+            {
+              "glue_database": "prison_derived",
+              "glue_tables": ["*"]
             }
           ]
         }

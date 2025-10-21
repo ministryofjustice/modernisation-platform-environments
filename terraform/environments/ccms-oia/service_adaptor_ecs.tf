@@ -26,7 +26,7 @@ resource "aws_ecs_task_definition" "ecs_adaptor_task_definition" {
       client_opa12assess_security_user_password = "${aws_secretsmanager_secret.service_adaptor_secrets.arn}:client_opa12assess_security_user_password::"
       server_opa10assess_security_user_name     = "${aws_secretsmanager_secret.service_adaptor_secrets.arn}:server_opa10assess_security_user_name::"
       server_opa10assess_security_user_password = "${aws_secretsmanager_secret.service_adaptor_secrets.arn}:server_opa10assess_security_user_password::"
-      }
+    }
   )
 
   tags = merge(local.tags,
@@ -37,7 +37,7 @@ resource "aws_ecs_task_definition" "ecs_adaptor_task_definition" {
 # ECS Service for adaptor
 
 resource "aws_ecs_service" "ecs_adaptor_service" {
-  name            = "${local.adaptor_app_name}"
+  name            = local.adaptor_app_name
   cluster         = aws_ecs_cluster.main.id
   task_definition = aws_ecs_task_definition.ecs_adaptor_task_definition.arn
   desired_count   = local.application_data.accounts[local.environment].adaptor_app_count

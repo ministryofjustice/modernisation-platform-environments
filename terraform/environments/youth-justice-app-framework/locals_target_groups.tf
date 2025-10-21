@@ -24,6 +24,12 @@ locals {
     auth-target-group-2 = {
       name = "auth-target-group-2"
     },
+    assets-target-group-1 = {
+      name = "assets-target-group-1",
+    },
+    assets-target-group-2 = {
+      name = "assets-target-group-2"
+    },
     bands-target-group-1 = {
       name = "bands-target-group-1"
     },

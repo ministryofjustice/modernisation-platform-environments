@@ -126,6 +126,10 @@
       {
         "name": "spring_datasource_username",
         "valueFrom": "${spring_datasource_username}"
+      },
+      {
+        "name": "OPA_SECURITY_PASSWORD",
+        "valueFrom": "${opa_security_password}"
       }
     ]
   }

@@ -13,8 +13,8 @@ locals {
         }
       }
       litellm_versions = {
-        application = "main-v1.77.7.rc.1"
-        chart       = "0.1.789"
+        application = "main-v1.77.7-stable"
+        chart       = "0.1.794"
       }
       llm_gateway_ingress_allowlist = [
         # VPN

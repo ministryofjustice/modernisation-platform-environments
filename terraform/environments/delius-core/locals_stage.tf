@@ -36,7 +36,7 @@ locals {
     instance_type  = "r7i.2xlarge"
     ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-06-04T11-24-58.162Z"
 
-    primary_instance_count = 0
+    primary_instance_count = 1
     standby_count          = 0
 
     instance_policies = {

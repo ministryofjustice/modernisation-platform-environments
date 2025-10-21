@@ -8,11 +8,11 @@ resource "aws_secretsmanager_secret" "service_adaptor_secrets" {
 }
 
 resource "aws_secretsmanager_secret_version" "service_adaptor_secrets" {
-  secret_id     = aws_secretsmanager_secret.service_adaptor_secrets.id
+  secret_id = aws_secretsmanager_secret.service_adaptor_secrets.id
   secret_string = jsonencode({
-    "client_opa12assess_security_user_name" = "",
+    "client_opa12assess_security_user_name"     = "",
     "client_opa12assess_security_user_password" = "",
-    "server_opa10assess_security_user_name" = "",
+    "server_opa10assess_security_user_name"     = "",
     "server_opa10assess_security_user_password" = ""
   })
 
