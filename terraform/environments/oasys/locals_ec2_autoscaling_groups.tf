@@ -14,7 +14,7 @@ locals {
         ami_name                  = "oasys_webserver_release_2023-07-02*"
         iam_resource_names_prefix = "ec2-web"
         instance_profile_policies = [
-          "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+          # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore", # now included automatically by module
           "EC2Default",
           "EC2S3BucketWriteAndDeleteAccessPolicy",
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
