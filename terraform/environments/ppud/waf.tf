@@ -50,7 +50,7 @@ data "aws_ssm_parameter" "ncsc_waf_ip_set" {
 }
 
 locals {
-  ncsc_ip_addresses = [for ip in split(",", data.aws_ssm_parameter.ncsc_waf_ip_set.value) : trim(ip)]
+  ncsc_ip_addresses = [for ip in split(",", data.aws_ssm_parameter.ncsc_waf_ip_set.value) : trim(ip, " ")]
 }
 
 resource "aws_wafv2_ip_set" "ncsc_waf_ip_set" {
