@@ -621,7 +621,7 @@ module "load_capita_blob_storage" {
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
   de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
 
-  name               = "capital_blob_storage"
+  name               = "capita-blob-storage"
   environment        = local.environment
   database_name      = "capita-blob-storage"
   secret_code        = jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]
