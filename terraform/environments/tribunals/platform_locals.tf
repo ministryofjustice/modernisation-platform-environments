@@ -51,8 +51,7 @@ locals {
   ]
 
   nonprod_sans = [
-    "*.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk",
-    "dev.ahmlr.gov.uk"
+    "*.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   ]
 
 }
