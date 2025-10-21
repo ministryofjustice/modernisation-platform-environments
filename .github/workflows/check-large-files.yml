@@ -1,4 +1,4 @@
-name: Check Large Files
+name: Check for Binary and Archive Files
 
 on:
   pull_request:
@@ -10,8 +10,8 @@ permissions:
   pull-requests: write
 
 jobs:
-  check-file-sizes:
-    name: Check for Large Files
+  check-binary-archive-files:
+    name: Check for Binary and Archive Files
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -20,7 +20,7 @@ jobs:
           fetch-depth: 0
 
 
-      - name: Check for large files
+      - name: Check for binary and archive files
         id: check_files
         run: |
           # List of binary or archive file extensions
@@ -54,10 +54,11 @@ jobs:
           
           if [ ${#BINARY_ARCHIVE_FILES[@]} -gt 0 ]; then
             WARNING_MESSAGE+="## ⚠️ Binary or Archive Files Detected\n\n"
-            WARNING_MESSAGE+="The following files match binary or archive extensions and will require review from the Modernisation Platform Team:\n\n"
+            WARNING_MESSAGE+="The following files match binary or archive extensions:\n\n"
             for item in "${BINARY_ARCHIVE_FILES[@]}"; do
               WARNING_MESSAGE+="$item\n"
             done
+            WARNING_MESSAGE+="The Modernisation Platform Team urge you to consider managing these file types outside of this git repository.\n"
             WARNING_MESSAGE+="\n**Why is this required?**\n"
             WARNING_MESSAGE+="- These file types are often large, which can bloat the repository and slow down cloning and fetching for all users.\n"
             WARNING_MESSAGE+="- Binary and archive files cannot be efficiently diffed or merged, making code review and collaboration difficult.\n"
@@ -95,7 +96,7 @@ jobs:
               comment.body.includes('Large Files Detected')
             );
             
-            const commentBody = warningMessage + '\n\n---\n*This is an automated check. If you believe these files are necessary, please contact the [Modernisation Platform Team](https://moj.enterprise.slack.com/archives/C01A7QK5VM1) for a review.*';
+            const commentBody = warningMessage + '\n\n---\n*If you believe these files are necessary, please contact the [Modernisation Platform Team](https://moj.enterprise.slack.com/archives/C01A7QK5VM1) for a review.*';
             
             if (botComment) {
               // Update existing comment
