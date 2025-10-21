@@ -75,6 +75,17 @@ locals {
       }
     }
 
+    patch_manager = {
+      patch_schedules = {
+        group1 = "cron(10 06 ? * WED *)" # 06:10 for non-prod env's as we have to work around the overnight shutdown  
+      }
+      maintenance_window_duration = 2
+      maintenance_window_cutoff   = 1
+      patch_classifications = {
+        WINDOWS = ["SecurityUpdates", "CriticalUpdates"]
+      }
+    }
+
     #when changing the ems entries in preproduction, also stop and start xtag to reconnect it.
     route53_zones = {
       "preproduction.ndh.nomis.service.justice.gov.uk" = {
