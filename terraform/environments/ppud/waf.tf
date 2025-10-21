@@ -18,6 +18,34 @@ module "waf" {
     aws.modernisation-platform = aws.modernisation-platform
   }
 
+ additional_managed_rules = [
+    {
+      name     = "allow-ncsc-ip-list"
+      priority = 10
+      action   = "allow"
+      ip_set_reference_statement = {
+        arn = aws_wafv2_ip_set.ncsc_waf_ip_set.arn
+      }
+    },
+    {
+      name     = "allow-circle-ci-ip-list"
+      priority = 20
+      action   = "allow"
+      ip_set_reference_statement = {
+        arn = aws_wafv2_ip_set.circle_ci_waf_ip_set.arn
+      }
+    },
+    {
+      name     = "block-non-uk"
+      priority = 30
+      action   = "block"
+      geo_match_statement = {
+        country_codes = ["GB"]
+        invert        = true
+      }
+    }
+  ]
+
   managed_rule_actions = {
     AWSManagedRulesKnownBadInputsRuleSet = false
     AWSManagedRulesCommonRuleSet         = false
@@ -59,7 +87,7 @@ resource "aws_wafv2_ip_set" "ncsc_waf_ip_set" {
   name               = "ncsc-waf-ip-set"
   scope              = "REGIONAL"
   ip_address_version = "IPV4"
-  description        = "List of trusted IP Addresses allowing access via WAF"
+  description        = "List of trusted NCSC & Detectify IP Addresses allowing access via WAF"
   addresses          = local.ncsc_ip_addresses
 
   tags = merge(local.tags,
@@ -82,7 +110,7 @@ resource "aws_wafv2_ip_set" "circle_ci_waf_ip_set" {
   name               = "circle-ci-waf-ip-set"
   scope              = "REGIONAL"
   ip_address_version = "IPV4"
-  description        = "List of trusted IP Addresses allowing access via WAF"
+  description        = "List of trusted Circle CI IP Addresses allowing access via WAF"
   addresses          = local.circle_ci_ip_addresses
 
   tags = merge(local.tags,
@@ -197,7 +225,6 @@ resource "aws_wafv2_web_acl_association" "wam_alb_waf_association" {
   resource_arn = aws_lb.WAM-ALB.arn
   web_acl_arn  = aws_wafv2_web_acl.wam_web_acl.arn
 }
-*/
 
 # Create CloudWatch log group for PRTG
 resource "aws_cloudwatch_log_group" "wam_waf_logs" {
@@ -217,3 +244,4 @@ resource "aws_wafv2_web_acl_logging_configuration" "wam_waf_logging" {
 # resource_arn            = aws_wafv2_web_acl.wam_web_acl[count.index].arn 
   resource_arn            = module.waf.web_acl_arn
 }
+*/
