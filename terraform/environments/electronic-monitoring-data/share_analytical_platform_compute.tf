@@ -31,9 +31,10 @@ locals {
     "allied_mdss",
     "serco_servicenow",
   ]
-  historic_source_dbs = [
+  historic_source_dbs = local.is-production ? [
     "capita_alcohol_monitoring",
-  ]
+  ] : []
+
   prod_dbs_to_grant = local.is-production ? [
     "am_stg",
     "cap_dw_stg",
