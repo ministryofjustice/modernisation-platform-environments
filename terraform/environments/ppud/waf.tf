@@ -18,7 +18,7 @@ module "waf" {
     aws.modernisation-platform = aws.modernisation-platform
   }
 
-  custom_rules = [
+  custom_simple_rules = [
     {
       name     = "allow-ncsc-ip-list"
       priority = 10
