@@ -97,7 +97,7 @@ locals {
     },
     "subnet_b-xvdn" = {
       device_name = "xvdn"
-      instance_id = "i-030db90a2de02f56e"
+      instance_id = "i-0939a0ee8fb520bc9"
       volume_id   = "vol-05f9b59545f6f6609"
     } 
   }
