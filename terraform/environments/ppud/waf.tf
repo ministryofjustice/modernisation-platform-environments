@@ -1,6 +1,6 @@
-##########################################################################################
-# Web Application Firewall 
-##########################################################################################
+###################################################################
+# Web Application Firewall ACL, IP Sets & CloudWatch Configuration
+###################################################################
 
 locals {
   associated_load_balancers_arns = local.environment == "development" ? [aws_lb.WAM-ALB.arn] : []
@@ -18,6 +18,25 @@ module "waf" {
     aws.modernisation-platform = aws.modernisation-platform
   }
 
+  custom_rules = [
+    {
+      name     = "allow-ncsc-ip-list"
+      priority = 10
+      action   = "allow"
+      ip_set_reference_statement = {
+        arn = aws_wafv2_ip_set.ncsc_waf_ip_set.arn
+      }
+    },
+    {
+      name     = "allow-circle-ci-ip-list"
+      priority = 20
+      action   = "allow"
+      ip_set_reference_statement = {
+        arn = aws_wafv2_ip_set.circle_ci_waf_ip_set.arn
+      }
+    }
+  ]
+
   managed_rule_actions = {
     AWSManagedRulesKnownBadInputsRuleSet = false
     AWSManagedRulesCommonRuleSet         = false
@@ -28,12 +47,12 @@ module "waf" {
   }
 
   managed_rule_priorities = {
-    AWSManagedRulesAnonymousIpList       = 30
-    AWSManagedRulesKnownBadInputsRuleSet = 40
-    AWSManagedRulesCommonRuleSet         = 50
-    AWSManagedRulesSQLiRuleSet           = 60
-    AWSManagedRulesLinuxRuleSet          = 70
-    AWSManagedRulesBotControlRuleSet     = 80
+    AWSManagedRulesAnonymousIpList       = 40
+    AWSManagedRulesKnownBadInputsRuleSet = 50
+    AWSManagedRulesCommonRuleSet         = 60
+    AWSManagedRulesSQLiRuleSet           = 70
+    AWSManagedRulesLinuxRuleSet          = 80
+    AWSManagedRulesBotControlRuleSet     = 90
   }
 
   core_logging_account_id = local.environment_management.account_ids["core-logging-production"]
@@ -42,6 +61,7 @@ module "waf" {
   tags             = local.tags
 
 }
+
 
 # WAF IP allow list for NCSC WebCheck & Detectify Services
 
@@ -66,6 +86,30 @@ resource "aws_wafv2_ip_set" "ncsc_waf_ip_set" {
   )
 }
 
+# WAF IP allow list for Circle CI Services
+
+data "aws_ssm_parameter" "circle_ci_waf_ip_set" {
+  name = "circle_ci_waf_ip_set"
+}
+
+locals {
+  circle_ci_ip_addresses = [for ip in split(",", data.aws_ssm_parameter.circle_ci_waf_ip_set.value) : trim(ip, " ")]
+}
+
+resource "aws_wafv2_ip_set" "circle_ci_waf_ip_set" {
+# count              = (local.is-development || local.is-preproduction || local.is-production) ? 1 : 0
+  name               = "circle-ci-waf-ip-set"
+  scope              = "REGIONAL"
+  ip_address_version = "IPV4"
+  description        = "List of trusted IP Addresses allowing access via WAF"
+  addresses          = local.circle_ci_ip_addresses
+
+  tags = merge(local.tags,
+    { Name = lower(format("%s-circle-ci-waf-ip-set-%s", local.application_name, local.environment)) }
+  )
+}
+
+/*
 # WebACL for WAM
 resource "aws_wafv2_web_acl" "wam_web_acl" {
   # checkov:skip=CKV_AWS_192: "Ensure WAF prevents message lookup in Log4j2. See CVE-2021-44228 aka log4jshell"
@@ -97,8 +141,26 @@ resource "aws_wafv2_web_acl" "wam_web_acl" {
   }
 
   rule {
-    name     = "Block-non-UK-Traffic"
+    name = "Circle-CI-WAF-IP-List"
     priority = 20
+    action {
+      allow {}
+    }
+    statement {
+      ip_set_reference_statement {
+        arn = aws_wafv2_ip_set.circle_ci_waf_ip_set.arn
+      }
+    }
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "wam-circle-ci-waf-ip-list"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  rule {
+    name     = "Block-non-UK-Traffic"
+    priority = 30
     action {
       block {}
     }
@@ -148,6 +210,14 @@ resource "aws_wafv2_web_acl" "wam_web_acl" {
   }
 }
 
+# ALB Attachment to WAF ACL
+resource "aws_wafv2_web_acl_association" "wam_alb_waf_association" {
+  count        = local.is-development == true ? 1 : 0
+  resource_arn = aws_lb.WAM-ALB.arn
+  web_acl_arn  = aws_wafv2_web_acl.wam_web_acl.arn
+}
+*/
+
 # Create CloudWatch log group for PRTG
 resource "aws_cloudwatch_log_group" "wam_waf_logs" {
   # checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS"
@@ -163,5 +233,5 @@ resource "aws_cloudwatch_log_group" "wam_waf_logs" {
 resource "aws_wafv2_web_acl_logging_configuration" "wam_waf_logging" {
   count                   = local.is-development == true ? 1 : 0
   log_destination_configs = [aws_cloudwatch_log_group.wam_waf_logs[count.index].arn]
-  resource_arn            = aws_wafv2_web_acl.wam_web_acl[count.index].arn
+  resource_arn            = aws_wafv2_web_acl.wam_web_acl[count.index].arn  # will need updating
 }
