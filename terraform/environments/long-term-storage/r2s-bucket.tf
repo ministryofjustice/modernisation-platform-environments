@@ -123,6 +123,33 @@ resource "aws_s3_bucket_policy" "r2s" {
 }
 
 ############################################################
+# S3 "folders" 
+############################################################
+
+# Create one folder per Genesys prefix secret
+resource "aws_s3_object" "genesys_folders" {
+  # only when secrets are populated, and ignore empty values
+  for_each = var.secrets_populated ? {
+    for k, v in local.genesys_prefix : k => v if v != null && v != "/"
+  } : {}
+
+  bucket  = aws_s3_bucket.r2s.id
+  key     = each.value                 # e.g. "cica/" (we normalized with trailing slash)
+  content = ""                         # zero-byte marker object
+  server_side_encryption = "AES256"
+}
+
+# Optional: ensure the Snowflake metadata/ prefix exists too
+resource "aws_s3_object" "snowflake_folder" {
+  count   = 1
+  bucket  = aws_s3_bucket.r2s.id
+  key     = local.snowflake_prefix     # "metadata/"
+  content = ""
+  server_side_encryption = "AES256"
+}
+
+
+############################################################
 # Secrets Manager: create empty secrets (populate in console)
 ############################################################
 
