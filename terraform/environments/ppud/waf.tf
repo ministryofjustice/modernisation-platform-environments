@@ -1,10 +1,17 @@
-/*
+##########################################################################################
+# Web Application Firewall 
+##########################################################################################
+
+locals {
+  associated_load_balancers_arns = local.environment == "development" ? [aws_lb.WAM-ALB.arn] : []
+}
+
 module "waf" {
   source                   = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-aws-waf?ref=b9cf6f92b142e80845ae30252aee2f84f57a71a9"
   enable_ddos_protection   = true
   ddos_rate_limit          = 150
   block_non_uk_traffic     = true
-# associated_resource_arns = [aws_lb.WAM-ALB.arn]
+  associated_resource_arns = local.associated_load_balancers_arns
 
   providers = {
     aws                        = aws
@@ -43,11 +50,11 @@ data "aws_ssm_parameter" "ncsc_waf_ip_set" {
 }
 
 locals {
-  ncsc_ip_addresses = split(",", data.aws_ssm_parameter.ncsc_waf_ip_set.value)
+  ncsc_ip_addresses = [for ip in split(",", data.aws_ssm_parameter.ncsc_waf_ip_set.value) : trim(ip)]
 }
 
 resource "aws_wafv2_ip_set" "ncsc_waf_ip_set" {
-  count              = (local.is-development || local.is-preproduction || local.is-production) ? 1 : 0
+# count              = (local.is-development || local.is-preproduction || local.is-production) ? 1 : 0
   name               = "ncsc-waf-ip-set"
   scope              = "REGIONAL"
   ip_address_version = "IPV4"
@@ -72,7 +79,7 @@ resource "aws_wafv2_web_acl" "wam_web_acl" {
   }
 
   rule {
-    name = "ncsc-waf-ip-list"
+    name = "NCSC-WAF-IP-List"
     priority = 10
     action {
       allow {}
@@ -90,7 +97,7 @@ resource "aws_wafv2_web_acl" "wam_web_acl" {
   }
 
   rule {
-    name     = "block-non-uk"
+    name     = "Block-non-UK-Traffic"
     priority = 20
     action {
       block {}
@@ -155,7 +162,6 @@ resource "aws_cloudwatch_log_group" "wam_waf_logs" {
 # Send WebACL logs to CloudWatch
 resource "aws_wafv2_web_acl_logging_configuration" "wam_waf_logging" {
   count                   = local.is-development == true ? 1 : 0
-  log_destination_configs = [aws_cloudwatch_log_group.wam_waf_logs.arn]
-  resource_arn            = aws_wafv2_web_acl.wam_web_acl.arn
+  log_destination_configs = [aws_cloudwatch_log_group.wam_waf_logs[count.index].arn]
+  resource_arn            = aws_wafv2_web_acl.wam_web_acl[count.index].arn
 }
-*/
