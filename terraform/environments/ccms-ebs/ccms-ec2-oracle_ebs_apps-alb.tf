@@ -61,6 +61,7 @@ resource "aws_lb_target_group_attachment" "ebsapps" {
 }
 
 resource "aws_wafv2_web_acl_association" "ebs_waf_association" {
-  resource_arn = aws_lb.ebsapps_lb.arn
+  count        = local.is-development ? 0 : 1
+  resource_arn = aws_lb.ebsapps_lb[0].arn
   web_acl_arn  = aws_wafv2_web_acl.ebs_web_acl.arn
 }
