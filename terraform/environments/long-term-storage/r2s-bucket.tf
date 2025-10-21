@@ -1,9 +1,9 @@
 ############################################################
-# Inputs / toggles
+# Inputs 
 ############################################################
 
 variable "secrets_populated" {
-  description = "For when the secrets have been populated"
+  description = "Flip to true only after you've populated all Secrets Manager values. If rebuilding it will need to be false first"
   type        = bool
   default     = true
 }
@@ -16,26 +16,43 @@ locals {
   # Ensure global uniqueness to avoid BucketAlreadyExists
   bucket_name = "r2s-resources-${data.aws_caller_identity.current.account_id}-${data.aws_region.current.name}"
 
-  # Read secrets only when populated; stay null otherwise (prevents eval errors)
+  # Read base secrets only when populated; stay null otherwise (prevents eval errors)
   genesys_aws_account_id         = var.secrets_populated ? try(nonsensitive(data.aws_secretsmanager_secret_version.genesys_account_id[0].secret_string), null) : null
   genesys_external_id            = var.secrets_populated ? try(nonsensitive(data.aws_secretsmanager_secret_version.genesys_external_id[0].secret_string), null) : null
   snowflake_principal_account_id = var.secrets_populated ? try(nonsensitive(data.aws_secretsmanager_secret_version.snowflake_principal_account_id[0].secret_string), null) : null
   snowflake_external_id          = var.secrets_populated ? try(nonsensitive(data.aws_secretsmanager_secret_version.snowflake_external_id[0].secret_string), null) : null
 
-  # Convenience flags: only create IAM bits when we truly have the values
-  genesys_ready    = var.secrets_populated && local.genesys_aws_account_id != null && local.genesys_external_id != null
-  snowflake_ready  = var.secrets_populated && local.snowflake_principal_account_id != null && local.snowflake_external_id != null
-
   snowflake_prefix = "metadata/"
 
+  # Define Genesys roles (no literal prefixes; fetch from Secrets Manager)
   genesys_roles = {
-    role1 = { name = "r2s-genesys-cica-role",             prefix = "cica/" }
-    role2 = { name = "r2s-genesys-opg-role",              prefix = "opg/" }
-    role3 = { name = "r2s-genesys-laa-role",              prefix = "laa/" }
-    role4 = { name = "r2s-genesys-hmpps-role",            prefix = "hmpps/" }
-    role5 = { name = "r2s-genesys-london-probation-role", prefix = "london-probation/" }
-    role6 = { name = "r2s-genesys-nle-role",              prefix = "nle/" }
+    role1 = { name = "r2s-genesys-cica-role",             prefix_key = "cica" }
+    role2 = { name = "r2s-genesys-opg-role",              prefix_key = "opg" }
+    role3 = { name = "r2s-genesys-laa-role",              prefix_key = "laa" }
+    role4 = { name = "r2s-genesys-hmpps-role",            prefix_key = "hmpps" }
+    role5 = { name = "r2s-genesys-london-probation-role", prefix_key = "london-probation" }
+    role6 = { name = "r2s-genesys-nle-role",              prefix_key = "nle" }
   }
+
+  # Map role key -> full secret name "<prefix>_ou"
+  genesys_prefix_secret_name = {
+    for k, v in local.genesys_roles :
+    k => "r2s/genesys/prefixes/${v.prefix_key}_ou"
+  }
+
+  # Build a map role -> normalized prefix (trailing slash); null if not populated
+  genesys_prefix = {
+    for k in keys(local.genesys_roles) :
+    k => (
+      var.secrets_populated
+      ? "${trimsuffix(try(nonsensitive(data.aws_secretsmanager_secret_version.genesys_prefix[k].secret_string), ""), "/")}/"
+      : null
+    )
+  }
+
+  # Simple, predictable gates: depend ONLY on the toggle
+  genesys_ready   = var.secrets_populated
+  snowflake_ready = var.secrets_populated
 }
 
 ############################################################
@@ -109,33 +126,43 @@ resource "aws_s3_bucket_policy" "r2s" {
 # Secrets Manager: create empty secrets (populate in console)
 ############################################################
 
+# Create 6 empty secrets for the prefixes (<prefix>_ou)
+resource "aws_secretsmanager_secret" "genesys_prefix" {
+  # checkov:skip=CKV_AWS_149
+  # checkov:skip=CKV2_AWS_57
+  for_each    = local.genesys_roles
+  name        = local.genesys_prefix_secret_name[each.key]
+  description = "S3 prefix (folder) for ${each.value.name}. Example value: '${each.value.prefix_key}/'"
+  tags        = local.tags
+}
+
 resource "aws_secretsmanager_secret" "genesys_account_id" {
-  # checkov:skip=CKV_AWS_149: "Secrets manager secrets are encrypted by an AWS managed key by default, a customer managed key is not required."
-  # checkov:skip=CKV2_AWS_57:Automatic rotation is not required for this secret
+  # checkov:skip=CKV_AWS_149
+  # checkov:skip=CKV2_AWS_57
   name        = "r2s/genesys/aws_account_id"
   description = "Genesys Cloud AWS Account ID (populate manually)."
   tags        = local.tags
 }
 
 resource "aws_secretsmanager_secret" "genesys_external_id" {
-  # checkov:skip=CKV_AWS_149: "Secrets manager secrets are encrypted by an AWS managed key by default, a customer managed key is not required."
-  # checkov:skip=CKV2_AWS_57:Automatic rotation is not required for this secret
+  # checkov:skip=CKV_AWS_149
+  # checkov:skip=CKV2_AWS_57
   name        = "r2s/genesys/external_id"
   description = "Genesys Cloud Org ID used as ExternalId (populate manually)."
   tags        = local.tags
 }
 
 resource "aws_secretsmanager_secret" "snowflake_principal_account_id" {
-  # checkov:skip=CKV_AWS_149: "Secrets manager secrets are encrypted by an AWS managed key by default, a customer managed key is not required."
-  # checkov:skip=CKV2_AWS_57:Automatic rotation is not required for this secret
+  # checkov:skip=CKV_AWS_149
+  # checkov:skip=CKV2_AWS_57
   name        = "r2s/snowflake/principal_account_id"
   description = "Snowflake AWS Account ID (populate manually)."
   tags        = local.tags
 }
 
 resource "aws_secretsmanager_secret" "snowflake_external_id" {
-  # checkov:skip=CKV_AWS_149: "Secrets manager secrets are encrypted by an AWS managed key by default, a customer managed key is not required."
-  # checkov:skip=CKV2_AWS_57:Automatic rotation is not required for this secret
+  # checkov:skip=CKV_AWS_149
+  # checkov:skip=CKV2_AWS_57
   name        = "r2s/snowflake/external_id"
   description = "Snowflake External ID (populate manually)."
   tags        = local.tags
@@ -143,6 +170,12 @@ resource "aws_secretsmanager_secret" "snowflake_external_id" {
 
 # --- Read the latest secret values (only when flagged as populated) ---
 
+# Genesys prefix secrets (all six) — single reader with for_each
+data "aws_secretsmanager_secret_version" "genesys_prefix" {
+  for_each = var.secrets_populated ? local.genesys_roles : {}
+  secret_id = aws_secretsmanager_secret.genesys_prefix[each.key].id
+}
+# Other 4 are not created with a for each
 data "aws_secretsmanager_secret_version" "genesys_account_id" {
   count     = var.secrets_populated ? 1 : 0
   secret_id = aws_secretsmanager_secret.genesys_account_id.id
@@ -167,9 +200,9 @@ data "aws_secretsmanager_secret_version" "snowflake_external_id" {
 # IAM: Genesys trust + 6 roles + per-prefix policies
 ############################################################
 
-# Trust policy for Genesys (create only when we truly have values)
+# Trust policy for Genesys (only rendered when populated)
 data "aws_iam_policy_document" "genesys_trust" {
-  count = local.genesys_ready ? 1 : 0
+  count = var.secrets_populated ? 1 : 0
 
   statement {
     effect = "Allow"
@@ -186,17 +219,17 @@ data "aws_iam_policy_document" "genesys_trust" {
   }
 }
 
-# Create 6 roles only when ready
+# Create 6 roles 
 resource "aws_iam_role" "genesys_role" {
   for_each = local.genesys_ready ? local.genesys_roles : {}
 
   name               = each.value.name
-  assume_role_policy = data.aws_iam_policy_document.genesys_trust[0].json
-  description        = "Role assumed by Genesys Cloud export module to upload recordings to ${local.bucket_name} in ${each.value.prefix}"
+  assume_role_policy = one(data.aws_iam_policy_document.genesys_trust[*].json)
+  description        = "Role assumed by Genesys Cloud export module to upload recordings to ${local.bucket_name} in ${local.genesys_prefix[each.key]}"
   tags               = local.tags
 }
 
-# Per-role S3 policy document restricted to its own prefix
+# S3 policy document restricted to its own prefix
 data "aws_iam_policy_document" "genesys_prefix" {
   for_each = local.genesys_ready ? local.genesys_roles : {}
 
@@ -209,7 +242,7 @@ data "aws_iam_policy_document" "genesys_prefix" {
     condition {
       test     = "StringLike"
       variable = "s3:prefix"
-      values   = ["${each.value.prefix}*"]
+      values   = ["${local.genesys_prefix[each.key]}*"]
     }
   }
 
@@ -226,7 +259,7 @@ data "aws_iam_policy_document" "genesys_prefix" {
       "s3:ListMultipartUploadParts"
     ]
     resources = [
-      "arn:aws:s3:::${local.bucket_name}/${each.value.prefix}*"
+      "arn:aws:s3:::${local.bucket_name}/${local.genesys_prefix[each.key]}*"
     ]
   }
 
@@ -247,7 +280,7 @@ resource "aws_iam_policy" "genesys_prefix" {
   for_each = data.aws_iam_policy_document.genesys_prefix
 
   name        = "r2s-genesys-prefix-${each.key}"
-  description = "Restrict ${local.genesys_roles[each.key].name} to s3://${local.bucket_name}/${local.genesys_roles[each.key].prefix}"
+  description = "Restrict ${local.genesys_roles[each.key].name} to s3://${local.bucket_name}/${local.genesys_prefix[each.key]}"
   policy      = each.value.json
   tags        = local.tags
 }
@@ -264,9 +297,9 @@ resource "aws_iam_role_policy_attachment" "genesys_prefix_attach" {
 # IAM: Snowflake trust + policy (metadata-only) + role
 ############################################################
 
-# Trust policy for Snowflake (only when ready)
+# Trust policy for Snowflake (only rendered when populated)
 data "aws_iam_policy_document" "snowflake_trust" {
-  count = local.snowflake_ready ? 1 : 0
+  count = var.secrets_populated ? 1 : 0
 
   statement {
     effect = "Allow"
@@ -283,9 +316,9 @@ data "aws_iam_policy_document" "snowflake_trust" {
   }
 }
 
+
 # Snowflake policy: metadata-only prefix (can be created regardless)
 data "aws_iam_policy_document" "snowflake_policy_doc" {
-  # List only within metadata prefix
   statement {
     sid     = "ListBucketMetadataPrefix"
     effect  = "Allow"
@@ -298,7 +331,6 @@ data "aws_iam_policy_document" "snowflake_policy_doc" {
     }
   }
 
-  # Object access only within metadata prefix
   statement {
     sid    = "ObjectAccessInMetadataPrefix"
     effect = "Allow"
@@ -314,7 +346,6 @@ data "aws_iam_policy_document" "snowflake_policy_doc" {
     ]
   }
 
-  # Bucket metadata reads
   statement {
     sid     = "BucketMetadata"
     effect  = "Allow"
@@ -334,15 +365,15 @@ resource "aws_iam_policy" "snowflake_policy" {
 }
 
 resource "aws_iam_role" "snowflake_role" {
-  count              = local.snowflake_ready ? 1 : 0
+  for_each           = local.snowflake_ready ? { main = true } : {}
   name               = "r2s-snowflake-role"
-  assume_role_policy = data.aws_iam_policy_document.snowflake_trust[0].json
+  assume_role_policy = one(data.aws_iam_policy_document.snowflake_trust[*].json)
   description        = "Role for Snowflake to process metadata in ${local.bucket_name} (no access to recordings)."
   tags               = local.tags
 }
 
 resource "aws_iam_role_policy_attachment" "snowflake_attach" {
-  count      = local.snowflake_ready ? 1 : 0
-  role       = aws_iam_role.snowflake_role[0].name
+  for_each  = local.snowflake_ready ? { main = true } : {}
+  role       = aws_iam_role.snowflake_role["main"].name
   policy_arn = aws_iam_policy.snowflake_policy.arn
 }
