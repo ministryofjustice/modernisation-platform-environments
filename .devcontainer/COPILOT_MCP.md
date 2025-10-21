@@ -5,9 +5,6 @@
 
 1. Authenticate
 
-> [!NOTE]
-> This may take a while if you have access to a lot of AWS accounts
-
     ```bash
     aws-sso login
     ```
