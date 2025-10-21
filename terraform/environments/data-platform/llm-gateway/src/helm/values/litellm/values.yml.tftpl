@@ -77,12 +77,15 @@ proxy_config:
 %{ endfor ~}
 
 securityContext:
+  allowPrivilegeEscalation: false
   capabilities:
     drop:
       - ALL
   readOnlyRootFilesystem: false
   runAsNonRoot: true
   runAsUser: 65534
+  seccompProfile:
+    type: RuntimeDefault
 
 ingress:
   enabled: false
