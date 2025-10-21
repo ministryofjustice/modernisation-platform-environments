@@ -58,7 +58,7 @@ jobs:
             for item in "${BINARY_ARCHIVE_FILES[@]}"; do
               WARNING_MESSAGE+="$item\n"
             done
-            WARNING_MESSAGE+="The Modernisation Platform Team urge you to consider managing these file types outside of this git repository.\n"
+            WARNING_MESSAGE+="\nThe Modernisation Platform Team urge you to consider storing these files outside of this git repository.\n"
             WARNING_MESSAGE+="\n**Why is this required?**\n"
             WARNING_MESSAGE+="- These file types are often large, which can bloat the repository and slow down cloning and fetching for all users.\n"
             WARNING_MESSAGE+="- Binary and archive files cannot be efficiently diffed or merged, making code review and collaboration difficult.\n"
