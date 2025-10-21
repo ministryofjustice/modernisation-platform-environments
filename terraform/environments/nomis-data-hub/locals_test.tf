@@ -83,7 +83,7 @@ locals {
         })
         instance = merge(local.ec2_instances.ndh_mgmt.instance, {
           disable_api_termination = true
-          tags = {
+          tags = merge(local.ec2_instances.ndh_mgmt.instance.tags, {
             patch-manager = "group1"
           }
         })
