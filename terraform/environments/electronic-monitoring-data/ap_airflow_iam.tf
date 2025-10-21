@@ -623,7 +623,7 @@ module "load_capita_blob_storage" {
 
   name               = "capital_blob_storage"
   environment        = local.environment
-  database_name      = "capital-blob-storage"
+  database_name      = "capita-blob-storage"
   secret_code        = jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]
   oidc_arn           = aws_iam_openid_connect_provider.analytical_platform_compute.arn
   athena_dump_bucket = module.s3-athena-bucket.bucket
