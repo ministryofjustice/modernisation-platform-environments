@@ -1,6 +1,6 @@
 output "aws_route53_record_external_fqdn" {
   description = "aws_route53_record external fqdn"
-  value       = aws_route53_record.external[count.index].fqdn
+  value       = aws_route53_record.external[*].fqdn
 }
 
 #
