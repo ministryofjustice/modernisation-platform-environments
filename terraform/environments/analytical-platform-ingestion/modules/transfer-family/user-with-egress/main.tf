@@ -32,7 +32,6 @@ data "aws_iam_policy_document" "this" {
       "s3:PutObject",
       "s3:GetObject",
       "s3:DeleteObject"
-
     ]
     resources = ["arn:aws:s3:::${var.landing_bucket}/${var.name}/*"]
   }
