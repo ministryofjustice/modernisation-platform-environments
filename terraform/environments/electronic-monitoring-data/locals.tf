@@ -1,67 +1,6 @@
 #### This file can be used to store locals specific to the member account ####
 locals {
   env_account_id = local.environment_management.account_ids[terraform.workspace]
-  #----------------------------------------------------------------------------
-  # CAPITA
-  #----------------------------------------------------------------------------
-  capita_ssh_keys = [
-    "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBDEMaR2/Fk/XjgxYMHyLarpeArHEaPB6vwKwFfMsw8mlZ3BR5MnE72ZOEIqD4WwN6d2Tnrok3Y7DNUQCv9D/Mh/JwG3NyMeM6uinbQMHzkmMQn6/cMTuY30I6XD5nt4h2A==",
-  ]
-  capita_cidr_ipv4s = [
-    "172.167.3.97/32",
-  ]
-  capita_cidr_ipv6s = []
-
-  ddc_ssh_keys = [
-    "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBDl9q5Gq/SJb6UGbr56E5VxF7gXLk3zccTBahHVdrRrk8vKyhJSrrNM264V6tF4AmZpY87qrmQaicUHqYGZH3z8RgSMhoH9814K+JbtW5/NrnA7q/dU1jHkE9YMAS/zVFA==",
-  ]
-  ddc_cidr_ipv4s = [
-    # "82.203.33.112/28",
-    # "82.203.33.128/28",
-    # "85.115.52.0/24",
-    # "85.115.53.0/24",
-    # "85.115.54.0/24",
-    # "85.115.54.203/32",
-    # "82.203.33.140/32",
-    "195.180.32.164/32",
-    "82.203.33.134/32",
-  ]
-  ddc_cidr_ipv6s = []
-
-  sftp_account_capita_test = {
-    name       = "test"
-    ssh_keys   = local.capita_ssh_keys
-    cidr_ipv4s = local.capita_cidr_ipv4s
-    cidr_ipv6s = local.capita_cidr_ipv6s
-  }
-
-  sftp_account_capita_alcohol_monitoring = {
-    name       = "alcohol_monitoring"
-    ssh_keys   = local.ddc_ssh_keys
-    cidr_ipv4s = local.ddc_cidr_ipv4s
-    cidr_ipv6s = local.ddc_cidr_ipv6s
-  }
-
-  sftp_account_capita_blob_storage = {
-    name       = "blob_storage"
-    ssh_keys   = local.ddc_ssh_keys
-    cidr_ipv4s = local.ddc_cidr_ipv4s
-    cidr_ipv6s = local.ddc_cidr_ipv6s
-  }
-
-  sftp_account_capita_forms_and_subject_id = {
-    name       = "forms_and_subject_id"
-    ssh_keys   = local.ddc_ssh_keys
-    cidr_ipv4s = local.ddc_cidr_ipv4s
-    cidr_ipv6s = local.ddc_cidr_ipv6s
-  }
-
-  sftp_account_capita_specials_mailbox = {
-    name       = "specials_mailbox"
-    ssh_keys   = local.capita_ssh_keys
-    cidr_ipv4s = local.capita_cidr_ipv4s
-    cidr_ipv6s = local.capita_cidr_ipv6s
-  }
 
   #----------------------------------------------------------------------------
   # BUDDI
@@ -114,33 +53,6 @@ locals {
     cidr_ipv4s = local.civica_cidr_ipv4s
     cidr_ipv6s = local.civica_cidr_ipv6s
   }
-
-
-  #----------------------------------------------------------------------------
-  # scram
-  #----------------------------------------------------------------------------
-  scram_ssh_keys = [
-    "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDJ4URBaRy0SZgwZKsMHNMjyqFQ+zbsBRI/tekxQq7CBO8GNtDSfEYrHBu9t9D3sI2rAeBFqed7dI8YUlMJngBTxs77X5V2bUiCcpyj6XhDWjAiX9mzdAq+Gsp6H5Zt5dQjf0HsIeEu9K0EdUVbkDHCs+OQ7fHbfGvHvK4j6Kvd9lJX34E7t5mg/jUOVadGWIH/4H9Xrq8DNqqUj83ZXD4aHObyxCB1fRJMfYjxHDHY/ee19T2UhnhV1Wc/aVyCs/lBiXexhgPDh+qS33Q7HPZxZvDkPwcPtXWW7ZJWtca6IylbBdFqcYazv/XUByl5QWx+O6IzgJIFMaUndXILUsc5xDr4bk+KgEIgH4CjMfaVfvpMpYHDElBNfPVYjyKW31dI1Q6igNilIySEjQX7+yy+5gF+qRfaCEBS05bUDPE3oZ7r9pmP8zltzL/aDPffPMrdGoHklSEGnOJIrXFvksAB9OGOO9d2URW4YlFpcqe4uFnwsNkZ9lk8R5DCDEuQ5VqPxkcW9tv5pTc4F3vbpx5Wk7JOPLzSwbPJKAw8iVpU+wWuOXbRarB3iDPuojeHtjH1HZ3o2nizG/FrT26wdfeKDZgsWbA9y2DbPHp5MQ+mONGMb7+9t/2C//RXntz/Y2U3DuT1gKq38rfx2Bveo0i6aWPNBvLSxRH+Kvg6vpobGQ==",
-  ]
-  scram_cidr_ipv4s = [
-    "216.241.100.251/32",
-  ]
-  scram_cidr_ipv6s = []
-
-  sftp_account_scram_test = {
-    name       = "test"
-    ssh_keys   = local.scram_ssh_keys
-    cidr_ipv4s = local.scram_cidr_ipv4s
-    cidr_ipv6s = local.scram_cidr_ipv6s
-  }
-
-  sftp_account_scram_am = {
-    name       = "alcohol_monitoring"
-    ssh_keys   = local.scram_ssh_keys
-    cidr_ipv4s = local.scram_cidr_ipv4s
-    cidr_ipv6s = local.scram_cidr_ipv6s
-  }
-
 
   #----------------------------------------------------------------------------
   # G4S
@@ -285,7 +197,6 @@ locals {
       "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDPo/IGYprUoZqGHzy6pgkSDKy4zY2+xYYWELaK5uMjK+2YIHm99vIVlEsqQIdrH/NlBIKxa97eDRBj3n5NMhrjg7g6hiuzqeJVKx21SBBhfMvFxHgrLWW8ZiaJ+PWHda5LH7BLW6QvMyh4dI/Jl26JvYLvnkXB5QA/MbaHxt59ueBjjxH/+877dHri41aGMqf01UjVCcBC2wqAUCngC3UZvtjbMVSkWlcyKIx8DI+YnThSVbfT7HxAMhbrcO296Ec/G7sfVHibr+pBHqGOSODkRVKezXCIi+UUBJ94c/p17eV+MlTAqvRKvxJ2rvd50UtDvwsTEYvJjptaTEtxY4az matt-heery",
       # Khristiania Raihan
       "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC7+3IYrXHqSyLRRK0BN99P1rcDMLEDlPJAuImLBz2MH/PyWQp34FNUaxwlZ0QsrTaCzsKTde2JEE7KTNNe1b+Dcp6z0gz+9l9J2SoWZvQVUwrASwb3Ox2rfQFjh+ZjllslbZkYEpKr8Js53krCToTwi5gqXddwXTnxy6TMdGjfVRRrWQqYGVUJYd5vbw7vnqUDqtnb0J6pLsQdh5X0j10a9yfjggwzrzCgrMDtKUMxJQpB3c596kf1Uzf05U+F9M10/CcByRSNBzU1NAsLpNH9xUPYOP/KYTFoIBdnaPF4ePDL6SnHWUzbp0CkGM8Izp/jZkZuCuKe5yGgHztBskt5qduc3EmI0E2yYcnqGMooCDC2k3WMt+GBc5StctnhlcvtTK+Yr35ij3GrO5hpgO/jv4LJe3jUIdztLQJ1cPiFqoG1SgW9SdtVrEweLDR12N0fngLDrI0VaI4xxylybeXn8q3+6UAUdJPoOM5M1D7tokw8Ug44r3gLXLT6n1VkbLforu0aeQYObWli8f/HtSVezbbNY/29o/QF+ye3fsZ4TxAlwu/K8Gxg0x7lh4YtBbjyuFGEuCIWGSbF4jg9gdfsFv2ST3X70+TrgDja9G+Lx6jac4W6VTTQs6XgyA5uLqHBBf4SJoX8DaQZmAEZwtLVWE/9pS7vQl6QYiJm4UZTfw== khristiania.raihan@justice.gov.uk",
-
     ]
     cidr_ipv4s = [
       # 10 SC
