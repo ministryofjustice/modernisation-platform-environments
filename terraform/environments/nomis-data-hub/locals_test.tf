@@ -85,7 +85,7 @@ locals {
           disable_api_termination = true
           tags = merge(local.ec2_instances.ndh_mgmt.instance.tags, {
             patch-manager = "group1"
-          }
+          })
         })
         tags = merge(local.ec2_instances.ndh_mgmt.tags, {
           nomis-data-hub-environment = "test"
