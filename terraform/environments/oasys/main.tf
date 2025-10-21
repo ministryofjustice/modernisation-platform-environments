@@ -35,7 +35,7 @@ module "baseline_presets" {
 }
 
 module "baseline" {
-  source = "../../modules/baseline"
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-environments.git//terraform/modules/baseline?ref=3e328739c4c0bdc62ed70461ea8d0c79652cbdec" # ignore ami change
 
   providers = {
     aws                       = aws
