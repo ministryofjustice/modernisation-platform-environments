@@ -33,6 +33,10 @@ locals {
   ]
   historic_source_dbs = local.is-production ? [
     "capita_alcohol_monitoring",
+    "g4s_cap_dw",
+    "g4s_emsys_mvp",
+    "g4s_emsys_tpims",
+    "scram_alcohol_monitoring",
   ] : []
 
   prod_dbs_to_grant = local.is-production ? [
