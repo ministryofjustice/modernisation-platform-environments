@@ -77,6 +77,9 @@ locals {
             "Ec2PreprodBipPolicy",
           ])
         })
+        instance = merge(local.ec2_instances.bip.instance, {
+          ami = "ami-0d206b8546ea2b68a" # to prevent instances being re-created due to recreated AMI
+        })
         tags = merge(local.ec2_instances.bip.tags, {
           bip-db-hostname     = "pp-oasys-db-a"
           bip-db-name         = "PPBIPINF"

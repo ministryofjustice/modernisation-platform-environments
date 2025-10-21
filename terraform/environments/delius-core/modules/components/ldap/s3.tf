@@ -1,7 +1,7 @@
 module "s3_bucket_migration" {
   #checkov:skip=CKV_TF_1
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
 
   providers = {
     aws.bucket-replication = aws.bucket-replication
@@ -103,7 +103,7 @@ module "s3_bucket_migration" {
 module "s3_bucket_app_deployment" {
   #checkov:skip=CKV_TF_1
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
 
   bucket_prefix      = "ldap-${var.env_name}-deployment-state"
   versioning_enabled = true

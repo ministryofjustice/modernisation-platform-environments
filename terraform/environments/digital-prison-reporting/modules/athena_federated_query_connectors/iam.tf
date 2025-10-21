@@ -4,7 +4,7 @@
 resource "aws_iam_policy" "athena_federated_query_connector_policy" {
   #checkov:skip=CKV_AWS_355: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions.TO DO Will be addressed as part of https://dsdmoj.atlassian.net/browse/DPR2-1083"
 
-  name        = "${var.project_prefix}_athena_${var.athena_connector_type}_federated_query_connector_policy"
+  name        = "${var.name}_policy"
   description = "The policy the connector will use"
 
   policy = jsonencode({
@@ -111,7 +111,7 @@ resource "aws_iam_policy" "athena_federated_query_connector_policy" {
 
 resource "aws_iam_role" "athena_federated_query_lambda_execution_role" {
 
-  name        = "${var.project_prefix}-athena-${var.athena_connector_type}-federated-query-lambda-execution-role"
+  name        = "${var.name}-execution-role"
   description = "Lambda will assume this role to run the connector"
 
   assume_role_policy = jsonencode({

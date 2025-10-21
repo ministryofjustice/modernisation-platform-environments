@@ -353,7 +353,7 @@ resource "aws_datasync_location_fsx_windows_file_system" "dfi_fsx_destination" {
 
   # Use FSX file system ARN and specific subdirectory for DFI reports
   fsx_filesystem_arn = aws_fsx_windows_file_system.mis_share.arn
-  subdirectory       = "/share/dfiinterventions/dfi"
+  subdirectory       = "/share/dfiinterventions/dfi/"
 
   # Authentication details - using the existing AD admin credentials
   # The password comes from the existing AD admin secret that gets rotated automatically
@@ -367,6 +367,11 @@ resource "aws_datasync_location_fsx_windows_file_system" "dfi_fsx_destination" {
     local.tags,
     { Name = "${var.app_name}-${var.env_name}-dfi-fsx-destination" }
   )
+
+  # Ignore password changes since Lambda function handles password updates automatically
+  lifecycle {
+    ignore_changes = [password]
+  }
 
   depends_on = [
     data.aws_secretsmanager_secret_version.datasync_ad_admin_password
@@ -434,6 +439,30 @@ resource "aws_cloudwatch_log_group" "datasync_logs" {
     local.tags,
     { Name = "${var.app_name}-${var.env_name}-datasync-logs" }
   )
+}
+
+# Resource policy to allow DataSync service to write to CloudWatch Logs
+resource "aws_cloudwatch_log_resource_policy" "datasync_logs_policy" {
+  count = var.datasync_config != null ? 1 : 0
+
+  policy_name = "${var.app_name}-${var.env_name}-datasync-logs-policy"
+
+  policy_document = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "datasync.amazonaws.com"
+        }
+        Action = [
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ]
+        Resource = "${aws_cloudwatch_log_group.datasync_logs[0].arn}:*"
+      }
+    ]
+  })
 }
 
 #############################################

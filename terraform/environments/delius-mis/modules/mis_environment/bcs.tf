@@ -5,7 +5,7 @@ resource "aws_security_group" "bcs" {
 }
 
 module "bcs_instance" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=49e289239aec2845924f00fc5969f35ae76122e2"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v4.1.0"
 
   count = var.bcs_config.instance_count
 
@@ -32,7 +32,7 @@ module "bcs_instance" {
   }
   iam_resource_names_prefix = "${var.env_name}-bcs-${count.index + 1}"
   instance_profile_policies = [
-    "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+    # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore", added by module
     aws_iam_policy.secrets_manager.arn
   ]
 

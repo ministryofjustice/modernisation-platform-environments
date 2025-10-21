@@ -11,7 +11,8 @@ module "ses" {
     "thomas.tipler@necsws.com",
     "andrew.richards1@necsws.com",
     "javaid.arshad@necsws.com",
-    "ryan.smith@necsws.com"
+    "ryan.smith@necsws.com",
+    "vasil.dimitrov@necsws.com"
   ] : []
 
   depends_on = [

@@ -6,7 +6,6 @@
 # Development Environment
 #########################
 
-
 # Eventbridge rule to invoke the Security Hub Report Dev lambda function every Monday to Friday at 07:00
 # Set time to 07:00 during UTC and 06:00 during BST
 
@@ -427,4 +426,29 @@ resource "aws_cloudwatch_event_target" "trigger_lambda_target_wam_elb_trt_graph_
   rule      = aws_cloudwatch_event_rule.daily_schedule_wam_elb_trt_graph_prod[0].name
   target_id = "wam_elb_trt_graph_prod"
   arn       = aws_lambda_function.terraform_lambda_func_wam_elb_trt_graph_prod[0].arn
+}
+
+# Eventbridge rule to invoke the WAM directory traversal traffic (IIS logs) lambda function on the 15th of every month at 02:00
+
+resource "aws_lambda_permission" "allow_eventbridge_invoke_wam_web_traffic_analysis_prod" {
+  count         = local.is-production == true ? 1 : 0
+  statement_id  = "AllowEventBridgeInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.terraform_lambda_func_wam_web_traffic_analysis_prod[0].function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.monthly_schedule_wam_web_traffic_analysis_prod[0].arn
+}
+
+resource "aws_cloudwatch_event_rule" "monthly_schedule_wam_web_traffic_analysis_prod" {
+  count               = local.is-production == true ? 1 : 0
+  name                = "wam-web-traffic-analysis-monthly-schedule"
+  description         = "Trigger Lambda at 02:00 every 15th of the month."
+  schedule_expression = "cron(0 2 15 * ? *)"
+}
+
+resource "aws_cloudwatch_event_target" "trigger_lambda_target_wam_web_traffic_analysis_prod" {
+  count     = local.is-production == true ? 1 : 0
+  rule      = aws_cloudwatch_event_rule.monthly_schedule_wam_web_traffic_analysis_prod[0].name
+  target_id = "wam_web_traffic_analysis_prod"
+  arn       = aws_lambda_function.terraform_lambda_func_wam_web_traffic_analysis_prod[0].arn
 }

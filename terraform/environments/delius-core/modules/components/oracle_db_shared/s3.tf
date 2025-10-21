@@ -25,7 +25,7 @@ data "aws_iam_policy_document" "s3_bucket_oracledb_backups" {
 
 module "s3_bucket_oracledb_backups" {
   #checkov:skip=CKV_TF_1 "ignore"
-  source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
+  source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
   bucket_name         = local.oracle_backup_bucket_prefix
   versioning_enabled  = false
   ownership_controls  = "BucketOwnerEnforced"
@@ -201,7 +201,7 @@ resource "aws_iam_policy" "oracledb_backup_bucket_access" {
 
 module "s3_bucket_oracledb_backups_inventory" {
   #checkov:skip=CKV_TF_1 "ignore"
-  source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
+  source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
   bucket_name         = "${local.oracle_backup_bucket_prefix}-inventory"
   versioning_enabled  = false
   ownership_controls  = "BucketOwnerEnforced"
@@ -335,7 +335,7 @@ module "s3_bucket_oracle_statistics" {
   #checkov:skip=CKV_TF_1 "ignore"
   count = var.deploy_oracle_stats ? 1 : 0
 
-  source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.0.0"
+  source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
   bucket_name         = "${var.account_info.application_name}-${var.env_name}-oracle-${var.db_suffix}-statistics-backup-data"
   versioning_enabled  = false
   ownership_controls  = "BucketOwnerEnforced"
@@ -377,7 +377,7 @@ module "s3_bucket_oracle_statistics" {
 
 module "s3_bucket_db_uplift" {
   count  = contains(["delius-mis"], var.app_name) ? 0 : 1
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v8.2.1"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
 
   providers = {
     aws.bucket-replication = aws.bucket-replication

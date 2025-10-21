@@ -1,6 +1,10 @@
-#################################################################################
-# PPUD and WAM External Load Balancers, Listeners, Target Groups and Attachments
-#################################################################################
+#######################################################################################################
+# PPUD and WAM External Load Balancers, Listeners, Listener Certificates, Target Groups and Attachments
+#######################################################################################################
+
+#########################
+# Development Environment
+#########################
 
 # PPUD Internet Facing ALB
 
@@ -116,80 +120,6 @@ resource "aws_lb_listener" "WAM-Front-End-DEV" {
   }
 }
 
-resource "aws_lb_listener" "WAM-Front-End-Preprod" {
-  count             = local.is-preproduction == true ? 1 : 0
-  load_balancer_arn = aws_lb.WAM-ALB.arn
-  port              = "443"
-  protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
-  certificate_arn   = data.aws_acm_certificate.WAM_UAT_ALB[0].arn
-
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.WAM-Target-Group-Preprod-2[0].arn
-  }
-}
-
-resource "aws_lb_listener" "WAM-Front-End-Prod" {
-  count             = local.is-production == true ? 1 : 0
-  load_balancer_arn = aws_lb.WAM-ALB.arn
-  port              = "443"
-  protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
-  certificate_arn   = data.aws_acm_certificate.WAM_PROD_ALB[0].arn
-
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.WAM-Target-Group-Prod[0].arn
-  }
-}
-
-/*
-resource "aws_lb_target_group" "WAM-Target-Group" {
-  name     = "WAM"
-  port     = 80
-  protocol = "HTTP"
-  vpc_id   = data.aws_vpc.shared.id
-
-  health_check {
-    enabled             = true
-    path                = "/"
-    interval            = 30
-    protocol            = "HTTP"
-    port                = 80
-    timeout             = 5
-    healthy_threshold   = 5
-    unhealthy_threshold = 2
-    matcher             = "302"
-  }
-  tags = {
-    Name = "${var.networking[0].business-unit}-${local.environment}"
-  }
-}
-*/
-
-resource "aws_lb_target_group_attachment" "WAM-Portal-development" {
-  count            = local.is-development == true ? 1 : 0
-  target_group_arn = aws_lb_target_group.WAM-Target-Group-Dev[0].arn
-  target_id        = aws_instance.s609693lo6vw105[0].id
-  port             = 443
-}
-
-resource "aws_lb_target_group_attachment" "WAM-Portal-preproduction" {
-  count            = local.is-preproduction == true ? 1 : 0
-  target_group_arn = aws_lb_target_group.WAM-Target-Group-Preprod-2[0].arn
-  target_id        = aws_instance.s618358rgvw201[0].id
-  port             = 443
-}
-
-
-resource "aws_lb_target_group_attachment" "WAM-Portal-production" {
-  count            = local.is-production == true ? 1 : 0
-  target_group_arn = aws_lb_target_group.WAM-Target-Group-Prod[0].arn
-  target_id        = aws_instance.s618358rgvw204[0].id
-  port             = 80
-}
-
 resource "aws_lb_target_group" "WAM-Target-Group-Dev" {
   count    = local.is-development == true ? 1 : 0
   name     = "WAM-Dev"
@@ -213,30 +143,38 @@ resource "aws_lb_target_group" "WAM-Target-Group-Dev" {
   }
 }
 
-/*
-resource "aws_lb_target_group" "WAM-Target-Group-Preprod" {
-  count    = local.is-preproduction == true ? 1 : 0
-  name     = "WAM-Preprod"
-  port     = 80
-  protocol = "HTTP"
-  vpc_id   = data.aws_vpc.shared.id
+resource "aws_lb_target_group_attachment" "WAM-Portal-development" {
+  count            = local.is-development == true ? 1 : 0
+  target_group_arn = aws_lb_target_group.WAM-Target-Group-Dev[0].arn
+  target_id        = aws_instance.s609693lo6vw105[0].id
+  port             = 443
+}
 
-  health_check {
-    enabled             = true
-    path                = "/"
-    interval            = 30
-    protocol            = "HTTP"
-    port                = 80
-    timeout             = 5
-    healthy_threshold   = 5
-    unhealthy_threshold = 2
-    matcher             = "302"
-  }
-  tags = {
-    Name = "${var.networking[0].business-unit}-${local.environment}"
+###########################
+# Preproduction Environment
+###########################
+
+# The resource "aws_lb" "WAM-ALB" above serves the Preproduction environment
+
+resource "aws_lb_listener" "WAM-Front-End-Preprod" {
+  count             = local.is-preproduction == true ? 1 : 0
+  load_balancer_arn = aws_lb.WAM-ALB.arn
+  port              = "443"
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+  certificate_arn   = data.aws_acm_certificate.WAM_UAT_ALB[0].arn
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.WAM-Target-Group-Preprod-2[0].arn
   }
 }
-*/
+
+resource "aws_lb_listener_certificate" "WAM-Listener-Certificate-Preprod" {
+  count           = local.is-preproduction == true ? 1 : 0
+  listener_arn    = aws_lb_listener.WAM-Front-End-Preprod[0].arn
+  certificate_arn = data.aws_acm_certificate.WAM_UAT_ALB[0].arn
+}
 
 resource "aws_lb_target_group" "WAM-Target-Group-Preprod-2" {
   count    = local.is-preproduction == true ? 1 : 0
@@ -261,6 +199,68 @@ resource "aws_lb_target_group" "WAM-Target-Group-Preprod-2" {
   }
 }
 
+resource "aws_lb_target_group_attachment" "WAM-Portal-preproduction" {
+  count            = local.is-preproduction == true ? 1 : 0
+  target_group_arn = aws_lb_target_group.WAM-Target-Group-Preprod-2[0].arn
+  target_id        = aws_instance.s618358rgvw201[0].id
+  port             = 443
+}
+
+########################
+# Production Environment
+########################
+
+# The resource "aws_lb" "WAM-ALB" above serves the Production environment
+
+resource "aws_lb_listener" "WAM-Front-End-Prod" {
+  count             = local.is-production == true ? 1 : 0
+  load_balancer_arn = aws_lb.WAM-ALB.arn
+  port              = "443"
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+  certificate_arn   = data.aws_acm_certificate.WAM_PROD_ALB[0].arn
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.WAM-Target-Group-Prod-2[0].arn
+  }
+}
+
+resource "aws_lb_target_group" "WAM-Target-Group-Prod-2" {
+  count    = local.is-production == true ? 1 : 0
+  name     = "WAM-Prod-2"
+  port     = 443
+  protocol = "HTTPS"
+  vpc_id   = data.aws_vpc.shared.id
+
+  health_check {
+    enabled             = true
+    path                = "/"
+    interval            = 30
+    protocol            = "HTTPS"
+    port                = 443
+    timeout             = 5
+    healthy_threshold   = 5
+    unhealthy_threshold = 2
+    matcher             = "302"
+  }
+  tags = {
+    Name = "${var.networking[0].business-unit}-${local.environment}"
+  }
+}
+
+resource "aws_lb_target_group_attachment" "WAM-Portal-production-2" {
+  count            = local.is-production == true ? 1 : 0
+  target_group_arn = aws_lb_target_group.WAM-Target-Group-Prod-2[0].arn
+  target_id        = aws_instance.s618358rgvw204[0].id
+  port             = 443
+}
+
+
+
+
+
+/*
 resource "aws_lb_target_group" "WAM-Target-Group-Prod" {
   count    = local.is-production == true ? 1 : 0
   name     = "WAM-Prod"
@@ -283,3 +283,5 @@ resource "aws_lb_target_group" "WAM-Target-Group-Prod" {
     Name = "${var.networking[0].business-unit}-${local.environment}"
   }
 }
+*/
+

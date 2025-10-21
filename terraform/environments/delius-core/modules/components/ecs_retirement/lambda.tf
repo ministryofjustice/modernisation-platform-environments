@@ -14,7 +14,7 @@ resource "aws_lambda_function" "task_retirement_lambda" {
   function_name = "${var.env_name}-core-task-retirement-slack-alarm"
   description   = "Capture Task Retirement Events"
   handler       = "task_retirement.lambda_handler"
-  runtime       = "python3.9"
+  runtime       = "python3.12"
   role          = aws_iam_role.lambda_role.arn
   timeout       = 10
 

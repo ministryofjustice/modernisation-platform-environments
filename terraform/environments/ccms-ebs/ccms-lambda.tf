@@ -23,7 +23,7 @@ resource "aws_security_group" "lambda_security_group" {
   name        = "${local.application_name}-${local.environment}-lambda-sg"
   description = "SG traffic control for Payment Load Lambda"
   vpc_id      = data.aws_vpc.shared.id
-  
+
   tags = merge(local.tags,
     { Name = "${local.application_name}-${local.environment}-lambda-sg" }
   )
@@ -32,19 +32,19 @@ resource "aws_security_group" "lambda_security_group" {
 # hashicorp recommened Ingress rule of lambda_security_group
 resource "aws_vpc_security_group_ingress_rule" "lambda_ingress" {
   security_group_id = aws_security_group.lambda_security_group.id
-  description = "Allow FTP lambda inbound traffic"
-  cidr_ipv4   = data.aws_vpc.shared.cidr_block
-  from_port   = 1521
-  ip_protocol = "tcp"
-  to_port     = 1522
+  description       = "Allow FTP lambda inbound traffic"
+  cidr_ipv4         = data.aws_vpc.shared.cidr_block
+  from_port         = 1521
+  ip_protocol       = "tcp"
+  to_port           = 1522
 }
 
 # hashicorp recommened egress rule of lambda_security_group
 resource "aws_vpc_security_group_egress_rule" "lambda_egress" {
   security_group_id = aws_security_group.lambda_security_group.id
-  description = "Allow FTP lambdaall outbound traffic"
-  cidr_ipv4   = "0.0.0.0/0"
-  ip_protocol = "-1"
+  description       = "Allow FTP lambdaall outbound traffic"
+  cidr_ipv4         = "0.0.0.0/0"
+  ip_protocol       = "-1"
 }
 
 # Lambda Function

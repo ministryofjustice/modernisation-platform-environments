@@ -97,7 +97,7 @@ module "aurora_operational_db" {
 
   name                        = "${local.name}-cluster"
   engine                      = "aurora-postgresql"
-  engine_version              = "16.6"
+  engine_version              = "16"
   database_name               = "operational_db"
   manage_master_user_password = false
   master_username             = local.operational_db_credentials.username

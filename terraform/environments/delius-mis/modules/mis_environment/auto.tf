@@ -21,7 +21,7 @@ resource "aws_vpc_security_group_egress_rule" "auto_all_outbound" {
 }
 
 module "auto_instance" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v3.0.1"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v4.1.0"
 
   count = var.auto_config != null ? var.auto_config.instance_count : 0
 
@@ -48,7 +48,7 @@ module "auto_instance" {
   }
   iam_resource_names_prefix = "${var.env_name}-auto-${count.index + 1}"
   instance_profile_policies = [
-    "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+    # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore", added by module
     aws_iam_policy.secrets_manager.arn,
     aws_iam_policy.ec2_automation.arn
   ]

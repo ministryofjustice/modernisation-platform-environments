@@ -43,7 +43,8 @@ locals {
       nomis-pp    = ["c.preproduction.nomis.service.justice.gov.uk", true, "nomis-pagerduty"]
 
       # nomis-combined-reporting
-      nomis-reporting-pp = ["reporting.pp-nomis.az.justice.gov.uk", true, "nomis-combined-reporting-pagerduty"]
+      nomis-reporting-pp-aws   = ["preproduction.reporting.nomis.service.justice.gov.uk", true, "nomis-combined-reporting-pagerduty"]
+      nomis-reporting-pp-admin = ["admin.preproduction.reporting.nomis.service.justice.gov.uk", true, "nomis-combined-reporting-pagerduty"]
 
       # oasys
       oasys-pp = ["pp.oasys.service.justice.gov.uk", true, "oasys-pagerduty"]
@@ -76,7 +77,8 @@ locals {
       nomis = ["c.nomis.az.justice.gov.uk", true, "nomis-pagerduty"]
 
       # nomis-combined-reporting
-      nomis-reporting = ["reporting.nomis.az.justice.gov.uk", true, "nomis-combined-reporting-pagerduty"]
+      nomis-reporting-aws   = ["reporting.nomis.service.justice.gov.uk", true, "nomis-combined-reporting-pagerduty"]
+      nomis-reporting-admin = ["admin.reporting.nomis.service.justice.gov.uk", true, "nomis-combined-reporting-pagerduty"]
 
       # oasys
       oasys          = ["oasys.service.justice.gov.uk", true, "oasys-pagerduty"]
@@ -98,6 +100,8 @@ locals {
     for key, value in local.endpoint_alarms[local.environment] : "endpoint-down-${key}" => merge(
       module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_endpoint_monitoring["endpoint-down"],
       {
+        evaluation_periods  = local.environment == "production" ? "1" : "3"
+        datapoints_to_alarm = local.environment == "production" ? "1" : "3"
         dimensions = {
           type          = "exitcode"
           type_instance = value[0]

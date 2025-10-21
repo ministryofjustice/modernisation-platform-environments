@@ -1,20 +1,20 @@
 locals {
-    db_name      = "vcms"
-    db_root_user = "vcms"
+  db_name      = "vcms"
+  db_root_user = "vcms"
 }
 
 resource "aws_db_instance" "mariadb" {
-  allocated_storage    = 200
-  db_name              = local.db_name
-  engine               = "mariadb"
-  engine_version       = "10.5.27"
-  instance_class       = "db.t4g.medium"
-  username             = local.db_root_user
-  password             = random_id.db_password.b64_url
-  parameter_group_name = aws_db_parameter_group.vcms-10-5.name
-  db_subnet_group_name = aws_db_subnet_group.mariadb.name
+  allocated_storage      = 200
+  db_name                = local.db_name
+  engine                 = "mariadb"
+  engine_version         = "10.5.27"
+  instance_class         = "db.t4g.medium"
+  username               = local.db_root_user
+  password               = random_id.db_password.b64_url
+  parameter_group_name   = aws_db_parameter_group.vcms-10-5.name
+  db_subnet_group_name   = aws_db_subnet_group.mariadb.name
   vpc_security_group_ids = [aws_security_group.mariadb.id]
-  skip_final_snapshot  = true
+  skip_final_snapshot    = true
 }
 
 resource "random_id" "db_password" {

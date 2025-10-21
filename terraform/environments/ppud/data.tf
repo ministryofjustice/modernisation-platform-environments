@@ -1,6 +1,5 @@
 #### This file can be used to store data specific to the member account ####
 
-
 # ACM certificate for PPUD TEST ALB
 data "aws_acm_certificate" "PPUD_internaltest_cert" {
   count    = local.is-development == true ? 1 : 0
@@ -17,23 +16,26 @@ data "aws_acm_certificate" "WAM_internaltest_cert" {
 
 # ACM certificate for PPUD UAT ALB
 data "aws_acm_certificate" "PPUD_UAT_ALB" {
-  count    = local.is-preproduction == true ? 1 : 0
-  domain   = "uat.ppud.justice.gov.uk"
-  statuses = ["ISSUED"]
+  count       = local.is-preproduction == true ? 1 : 0
+  domain      = "uat.ppud.justice.gov.uk"
+  most_recent = true
+  statuses    = ["ISSUED"]
 }
 
 # ACM certificate for WAM UAT ALB
 data "aws_acm_certificate" "WAM_UAT_ALB" {
-  count    = local.is-preproduction == true ? 1 : 0
-  domain   = "wamuat.ppud.justice.gov.uk"
-  statuses = ["ISSUED"]
+  count       = local.is-preproduction == true ? 1 : 0
+  domain      = "wamuat.ppud.justice.gov.uk"
+  most_recent = true
+  statuses    = ["ISSUED"]
 }
 
 # ACM certificate for PPUD Training ALB
 data "aws_acm_certificate" "PPUD_Training_ALB" {
-  count    = local.is-preproduction == true ? 1 : 0
-  domain   = "training.ppud.justice.gov.uk"
-  statuses = ["ISSUED"]
+  count       = local.is-preproduction == true ? 1 : 0
+  domain      = "training.ppud.justice.gov.uk"
+  most_recent = true
+  statuses    = ["ISSUED"]
 }
 
 

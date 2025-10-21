@@ -1,5 +1,5 @@
 resource "aws_iam_role" "step_function_role" {
-  name = "step_function_execution_role"
+  name = "${var.environment}_step_function_execution_role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -16,7 +16,7 @@ resource "aws_iam_role" "step_function_role" {
 }
 
 resource "aws_iam_policy" "step_function_policy" {
-  name = "step_function_policy"
+  name = "${var.environment}_step_function_policy"
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -40,11 +40,11 @@ resource "aws_iam_role_policy_attachment" "step_function_policy_attachment" {
 }
 
 resource "aws_cloudwatch_log_group" "log_group_for_sfn" {
-  name = "/aws/states/ecs_restart_state_machine"
+  name = "/aws/states/ecs_restart_state_machine/${var.environment}"
 }
 
 resource "aws_sfn_state_machine" "ecs_restart_state_machine" {
-  name     = "ecs_restart_state_machine"
+  name     = "${var.environment}_ecs_restart_state_machine"
   role_arn = aws_iam_role.step_function_role.arn
 
   logging_configuration {

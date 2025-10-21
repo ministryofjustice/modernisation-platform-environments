@@ -11,7 +11,7 @@ module "pagerduty_core_alerts" {
     aws_sns_topic.delius_core_alarms
   ]
 
-  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v3.0.0"
   sns_topics                = [aws_sns_topic.delius_core_alarms.name]
   pagerduty_integration_key = var.pagerduty_integration_key
 }

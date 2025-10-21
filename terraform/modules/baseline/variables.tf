@@ -192,7 +192,8 @@ variable "ec2_autoscaling_groups" {
       availability_zone             = optional(string)
     })
     instance = object({
-      disable_api_termination      = bool
+      ami                          = optional(string)
+      disable_api_termination      = optional(bool)
       disable_api_stop             = optional(bool, false)
       instance_type                = string
       key_name                     = string
@@ -335,27 +336,30 @@ variable "ec2_instances" {
   description = "map of ec2 instances to create where the map key is the tags.Name.  See ec2_instance module for more variable details"
   type = map(object({
     config = object({
-      ami_name                      = string
+      ami_name                      = optional(string)
       ami_owner                     = optional(string, "core-shared-services-production")
+      default_policy_arn            = optional(string, "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore")
+      ebs_volume_root_name          = optional(string)
       ebs_volumes_copy_all_from_ami = optional(bool, true)
       ebs_kms_key_id                = optional(string) # business unit wide "ebs" key used by default
       user_data_raw                 = optional(string)
       iam_resource_names_prefix     = optional(string, "ec2")
-      instance_profile_policies     = list(string)
+      instance_profile_policies     = optional(list(string))
       ssm_parameters_prefix         = optional(string, "")
       secretsmanager_secrets_prefix = optional(string, "")
       subnet_name                   = string
       availability_zone             = string
     })
     instance = object({
-      disable_api_termination      = bool
-      disable_api_stop             = optional(bool, false)
+      ami                          = optional(string)
+      disable_api_termination      = optional(bool)
+      disable_api_stop             = optional(bool)
       instance_type                = string
-      key_name                     = string
+      key_name                     = optional(string)
       monitoring                   = optional(bool, true)
       metadata_options_http_tokens = optional(string, "required")
       metadata_endpoint_enabled    = optional(string, "enabled")
-      vpc_security_group_ids       = list(string)
+      vpc_security_group_ids       = optional(list(string))
       private_dns_name_options = optional(object({
         enable_resource_name_dns_aaaa_record = optional(bool)
         enable_resource_name_dns_a_record    = optional(bool)

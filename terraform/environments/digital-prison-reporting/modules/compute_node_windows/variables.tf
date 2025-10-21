@@ -1,17 +1,34 @@
-variable "name" {}
-variable "app_key" {}
-variable "ami_image_id" {}
-variable "ec2_instance_type" {}
-variable "subnet_ids" {}
-variable "vpc" {}
+variable "name" {
+  type = string
+}
+variable "app_key" {
+  type = string
+}
+variable "ami_image_id" {
+  type = string
+}
+variable "ec2_instance_type" {
+  type = string
+}
+variable "subnet_ids" {
+  type = string
+}
+variable "vpc" {
+  type = string
+}
 variable "cidr" {
   type = list(string)
 }
-variable "aws_region" {}
+variable "aws_region" {
+  type = string
+}
 variable "description" {
+  type    = string
   default = "Security group for Windows compute node"
 }
-variable "ec2_terminate_behavior" {}
+variable "ec2_terminate_behavior" {
+  type = string
+}
 
 variable "associate_public_ip_address" {
   type    = bool
@@ -22,6 +39,7 @@ variable "enable_compute_node" {
   default = false
 }
 variable "ebs_size" {
+  type    = number
   default = 50
 }
 variable "ebs_optimized" {

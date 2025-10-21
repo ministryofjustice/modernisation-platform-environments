@@ -36,7 +36,17 @@ variable "bws_config" {
 }
 
 variable "dis_config" {
-  type = any
+  description = "Configuration for DIS instances"
+  type = object({
+    instance_count           = number
+    ami_name                 = string
+    ebs_volumes              = any
+    ebs_volumes_config       = any
+    instance_config          = any
+    branch                   = optional(string, "main")
+    cloudwatch_metric_alarms = optional(any, null)
+  })
+  default = null
 }
 
 variable "tags" {
@@ -71,7 +81,16 @@ variable "auto_config" {
 }
 
 variable "dfi_config" {
-  type    = any
+  description = "Configuration for DFI instances"
+  type = object({
+    instance_count           = number
+    ami_name                 = string
+    ebs_volumes              = any
+    ebs_volumes_config       = any
+    instance_config          = any
+    branch                   = optional(string, "main")
+    cloudwatch_metric_alarms = optional(any, null)
+  })
   default = null #optional
 }
 
@@ -115,8 +134,15 @@ variable "datasync_config" {
     source_s3_subdirectory     = optional(string, "/dfinterventions/dfi/csv/reports/")
     fsx_domain                 = optional(string, "delius-mis-dev.internal")
     bandwidth_throttle         = optional(number)
-    schedule_expression        = optional(string, "cron(15 4 * * ? *)")  # Default: DataSync at 04:15 UTC
-    lambda_schedule_expression = optional(string, "cron(0 4 * * ? *)")   # Default: Lambda at 04:00 UTC
+    schedule_expression        = optional(string, "cron(15 4 * * ? *)") # Default: DataSync at 04:15 UTC
+    lambda_schedule_expression = optional(string, "cron(0 4 * * ? *)")  # Default: Lambda at 04:00 UTC
   })
   default = null
+}
+
+# Only create one per account
+variable "create_backup_role" {
+  description = "Role used to run AWS Backups i.e. AWSBackupDefaultServiceRole"
+  type        = bool
+  default     = false
 }

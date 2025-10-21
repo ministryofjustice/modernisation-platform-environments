@@ -18,8 +18,8 @@ resource "aws_route53_record" "ebsdbnlb-prod" {
   # This count only be 1 in Prod
   count    = local.is-production ? 1 : 0
   provider = aws.core-network-services
-  zone_id  = data.aws_route53_zone.prod-network-services.zone_id
-  name     = "ccms-ebs-db-nlb.ccms-ebs.service.justice.gov.uk"
+  zone_id  = data.aws_route53_zone.laa.zone_id
+  name     = "ccms-ebs-db-nlb.laa.service.justice.gov.uk"
   type     = "A"
   alias {
     name                   = aws_lb.ebsdb_nlb.dns_name

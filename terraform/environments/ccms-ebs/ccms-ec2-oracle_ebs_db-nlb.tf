@@ -43,7 +43,7 @@ resource "aws_lb_listener" "ebsdbnlb_listener" {
   port              = 443
   protocol          = "TLS"
   ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-Res-2021-06"
-  certificate_arn   = aws_acm_certificate_validation.external.certificate_arn
+  certificate_arn   = aws_acm_certificate.external.arn
   default_action {
     target_group_arn = aws_lb_target_group.ebsdb_nlb.id
     type             = "forward"

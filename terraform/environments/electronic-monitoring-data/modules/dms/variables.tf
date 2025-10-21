@@ -54,13 +54,13 @@ variable "rep_task_settings_filepath" {
   type        = string
 }
 
-variable "rep_task_table_mapping_filepath" {
-  description = "JSON file with DMS table mappings"
-  type        = string
-}
-
 variable "dms_replication_instance_arn" {
   description = "Assign the Replication Instance-ARN to be used"
   type        = string
 }
 
+variable "dump_number_suffix" {
+  description = "Suffix for job signifying the number of drops"
+  type        = string
+  default     = ""
+}

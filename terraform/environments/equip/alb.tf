@@ -13,7 +13,7 @@ data "aws_acm_certificate" "equip_cert" {
 #Load balancer needs to be publicly accessible
 #tfsec:ignore:aws-elb-alb-not-public
 resource "aws_lb" "citrix_alb" {
-
+  # checkov:skip=CKV2_AWS_28: "ALB is already protected by WAF"
   name               = format("alb-%s-%s-citrix", local.application_name, local.environment)
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb_sg.id]
@@ -60,6 +60,7 @@ resource "aws_lb_target_group" "lb_tg_gateway" {
 }
 
 resource "aws_lb_target_group" "lb_tg_equip-portal" {
+  #checkov:skip=CKV_AWS_378: "Ensure ALB target group health check is not set to use HTTP on port 80"
   name        = "tg-equip-portal"
   target_type = "ip"
   protocol    = "HTTP"
@@ -82,6 +83,7 @@ resource "aws_lb_target_group" "lb_tg_equip-portal" {
 }
 
 resource "aws_lb_target_group" "lb_tg_portal" {
+  #checkov:skip=CKV_AWS_378: "Ensure ALB target group health check is not set to use HTTP on port 80"
   name        = "tg-portal"
   target_type = "ip"
   protocol    = "HTTP"
@@ -104,6 +106,7 @@ resource "aws_lb_target_group" "lb_tg_portal" {
 }
 
 resource "aws_lb_target_group" "lb_tg_analytics" {
+  #checkov:skip=CKV_AWS_378: "Ensure ALB target group health check is not set to use HTTP on port 80"
   name        = "tg-analytics"
   target_type = "ip"
   protocol    = "HTTP"

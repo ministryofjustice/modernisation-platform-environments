@@ -97,3 +97,14 @@ variable "cluster_name" {
   description = "The name of the ECS cluster"
   type        = string
 }
+
+variable "yjsm_role_additional_policies_arns" {
+  description = "List of additional policy ARNs to attach to the YJSM role"
+  type        = list(string)
+  default     = []
+}
+
+variable "yjsm_secrets_access_policy_secret_arns" {
+  description = "A list of secret ARNs to allow access to"
+  type        = string
+}

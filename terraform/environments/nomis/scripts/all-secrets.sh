@@ -1,9 +1,7 @@
 #!/bin/bash
 # wrapper script to perform secret operations across all accounts
 
-profiles="corporate-staff-rostering-development
- corporate-staff-rostering-test
- corporate-staff-rostering-preproduction
+profiles="corporate-staff-rostering-preproduction
  corporate-staff-rostering-production
  hmpps-domain-services-development
  hmpps-domain-services-test
@@ -32,8 +30,6 @@ profiles="corporate-staff-rostering-development
  oasys-national-reporting-test
  oasys-national-reporting-preproduction
  oasys-national-reporting-production
- planetfm-development
- planetfm-test
  planetfm-preproduction
  planetfm-production"
 

@@ -16,7 +16,7 @@ resource "aws_security_group" "cluster" {
 }
 
 module "ecs_service" {
-  source                = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=v6.0.0"
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=v6.0.0"
 
   container_definitions = module.container_definition.json_encoded_list
   cluster_arn           = module.ecs.ecs_cluster_arn
@@ -89,8 +89,8 @@ module "container_definition" {
       value = "6379"
     },
     {
-        name  = "REDIS_DB"
-        value = "0"
+      name  = "REDIS_DB"
+      value = "0"
     },
     {
       name  = "REDIS_CACHE_DB"
@@ -116,7 +116,7 @@ module "container_definition" {
 
   secrets = [
     {
-      name = "DB_PASSWORD",
+      name      = "DB_PASSWORD",
       valueFrom = aws_ssm_parameter.db_password.arn
     }
   ]
@@ -149,7 +149,7 @@ module "container_definition" {
 resource "aws_cloudwatch_log_group" "vcms" {
   name              = "/ecs/vcms"
   retention_in_days = 14
-  tags = local.tags
+  tags              = local.tags
 }
 
 resource "aws_security_group" "ecs_service" {

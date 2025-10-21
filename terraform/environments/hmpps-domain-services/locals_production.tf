@@ -44,6 +44,7 @@ locals {
           ])
         })
         instance = merge(local.ec2_instances.jumpserver.instance, {
+          instance_type = "r6i.large"
           tags = {
             patch-manager = "group1"
           }

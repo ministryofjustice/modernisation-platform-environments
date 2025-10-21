@@ -54,7 +54,7 @@ output "aws_acm_certificate-external-status" {
 
 #
 
-output "aws_acm_certificate_validation-external-id" {
-  description = "aws_acm_certificate_validation external id"
-  value       = try(aws_acm_certificate_validation.external[*].id, "None")
-}
+# output "aws_acm_certificate_validation-external-id" {
+#   description = "aws_acm_certificate_validation external id"
+#   value       = try(aws_acm_certificate_validation.external[*].id, "None")
+# }

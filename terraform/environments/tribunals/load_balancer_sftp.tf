@@ -11,7 +11,7 @@ resource "aws_lb" "tribunals_lb_sftp" {
   load_balancer_type         = "network"
   security_groups            = [aws_security_group.tribunals_lb_sc_sftp.id]
   subnets                    = data.aws_subnets.shared-public.ids
-  enable_deletion_protection = false
+  enable_deletion_protection = true
 }
 
 resource "aws_security_group" "tribunals_lb_sc_sftp" {
@@ -21,7 +21,9 @@ resource "aws_security_group" "tribunals_lb_sc_sftp" {
   description = "control access to the network load balancer for sftp"
   vpc_id      = data.aws_vpc.shared.id
   dynamic "ingress" {
-    for_each = var.sftp_services
+    for_each = {
+      for k, v in var.sftp_services : k => v if v.upload_enabled
+    }
     content {
       description = "allow all traffic on port ${ingress.value.sftp_port}"
       from_port   = ingress.value.sftp_port

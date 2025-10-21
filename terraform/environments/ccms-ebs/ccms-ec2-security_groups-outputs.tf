@@ -47,7 +47,7 @@ output "aws_security_group_ec2_sg_clamav_arn" {
 
 #
 
-output "aws_security_group_sg_webgate_lb_arn" {
-  description = "aws_security_group sg_webgate_lb arn"
-  value       = aws_security_group.sg_webgate_lb.arn
-}
+# output "aws_security_group_sg_webgate_lb_arn" {
+#   description = "aws_security_group sg_webgate_lb arn"
+#   value       = aws_security_group.sg_webgate_lb.arn
+# }

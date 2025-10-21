@@ -30,7 +30,7 @@ resource "aws_cloudwatch_metric_alarm" "edrms_UnHealthy_Hosts" {
   comparison_operator = "GreaterThanThreshold"
   metric_name         = "UnHealthyHostCount"
   statistic           = "Average"
-  namespace           = "AWS/NetworkELB"
+  namespace           = "AWS/ApplicationELB"
   period              = "60"
   evaluation_periods  = "5"
   threshold           = "0"

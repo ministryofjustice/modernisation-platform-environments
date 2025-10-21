@@ -27,11 +27,11 @@ resource "aws_wafv2_web_acl" "tribunals_web_acl" {
     name     = "allow-siac"
     priority = 0
     action {
-        allow {}
+      allow {}
     }
     statement {
       byte_match_statement {
-        search_string         = "siac.tribunals.gov.uk"
+        search_string = "siac.tribunals.gov.uk"
         field_to_match {
           single_header {
             name = "host"
@@ -237,8 +237,9 @@ resource "aws_wafv2_regex_pattern_set" "blocked_paths" {
 
 # CloudWatch Log Group for WAF Logging
 resource "aws_cloudwatch_log_group" "tribunals_waf_logs" {
+  #checkov:skip=CKV_AWS_158:"Ensure that CloudWatch Log Group is encrypted by KMS"
   name              = "aws-waf-logs-tribunals-web-acl"
-  retention_in_days = 30
+  retention_in_days = 365
   provider          = aws.us-east-1
   tags = {
     Environment = local.environment

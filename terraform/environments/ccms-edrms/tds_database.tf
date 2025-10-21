@@ -21,7 +21,7 @@ resource "aws_db_instance" "tds_db" {
   auto_minor_version_upgrade          = true
   storage_type                        = "gp2"
   engine                              = "oracle-se2"
-  engine_version                      = "19.0.0.0.ru-2025-04.rur-2025-04.r1"
+  engine_version                      = "19.0.0.0.ru-2025-07.rur-2025-07.r1"
   instance_class                      = local.application_data.accounts[local.environment].tds_db_instance_type
   multi_az                            = local.application_data.accounts[local.environment].tds_db_deploy_to_multi_azs
   db_name                             = "EDRMSTDS"

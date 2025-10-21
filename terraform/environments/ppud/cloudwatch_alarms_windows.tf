@@ -76,36 +76,70 @@ resource "aws_cloudwatch_metric_alarm" "low_disk_space_D_volume" {
   }
 }
 
-# Low Disk Alarms for all Windows instances with E Volumes
-# There are currently 3 instances; RGVW021, RGVW022 and RGVW027
-# Each have different alert thresholds
+# Low Disk Alarms for all Windows instances with E, F, G and H Volumes
+# Used for RGVW021, RGVW022, RGSW025 & RGVW027
 
-resource "aws_cloudwatch_metric_alarm" "low_disk_space_E_volume_rgvw021" {
-  count               = local.is-production == true ? 1 : 0
-  alarm_name          = "Low-Disk-Space-E-Volume-i-080498c4c9d25e6bd"
-  comparison_operator = "LessThanOrEqualToThreshold"
-  evaluation_periods  = "5"
-  datapoints_to_alarm = "5"
-  metric_name         = "LogicalDisk % Free Space"
-  namespace           = "CWAgent"
-  period              = "60"
-  statistic           = "Average"
-  threshold           = "5"
-  treat_missing_data  = "notBreaching"
-  alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 5% for 5 minutes, the alarm will trigger"
-  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
-  dimensions = {
-    InstanceId   = "i-080498c4c9d25e6bd"
-    instance     = "E:"
-    ImageId      = "ami-05ddec53aa481cbc3"
-    InstanceType = "m5.2xlarge"
-    objectname   = "LogicalDisk"
+locals {
+  volume_alert_config = local.is-production ? {
+    "i-00413756d2dfcf6d2" = {
+      volumes = {
+        "E:" = 5
+      },
+      ImageId      = "ami-0b8f6843db88aa8a6",
+      InstanceType = "c5.4xlarge"
+    },
+    "i-080498c4c9d25e6bd" = {
+      volumes = {
+        "E:" = 5,
+        "F:" = 5,
+        "G:" = 5
+      },
+      ImageId      = "ami-05ddec53aa481cbc3",
+      InstanceType = "m5.2xlarge"
+    },
+    "i-029d2b17679dab982" = {
+      volumes = {
+        "E:" = 0.5,
+        "F:" = 0.5,
+        "G:" = 0.5
+      },
+      ImageId      = "ami-02f8251c8cdf2464f",
+      InstanceType = "m5.xlarge"
+    },
+    "i-00cbccc46d25e77c6" = {
+      volumes = {
+        "E:" = 1,
+        "F:" = 2,
+        "H:" = 1
+      },
+      ImageId      = "ami-0e203fec985af6465",
+      InstanceType = "m5.xlarge"
+    }
+  } : {}
+}
+
+locals {
+  volume_alarm_matrix = flatten([
+    for instance_id, config in local.volume_alert_config : [
+      for volume_letter, threshold in config.volumes : {
+        key           = "${instance_id}-${volume_letter}"
+        instance_id   = instance_id
+        volume_letter = volume_letter
+        threshold     = threshold
+        ImageId       = config.ImageId
+        InstanceType  = config.InstanceType
+      }
+    ]
+  ])
+  volume_alarm_map = {
+    for item in local.volume_alarm_matrix :
+    item.key => item
   }
 }
 
-resource "aws_cloudwatch_metric_alarm" "low_disk_space_E_volume_rgvw022" {
-  count               = local.is-production == true ? 1 : 0
-  alarm_name          = "Low-Disk-Space-E-Volume-i-029d2b17679dab982"
+resource "aws_cloudwatch_metric_alarm" "low_disk_space_EFGH_volume" {
+  for_each            = local.is-production ? local.volume_alarm_map : {}
+  alarm_name          = "Low-Disk-Space-${each.value.volume_letter}-Volume-${each.value.instance_id}"
   comparison_operator = "LessThanOrEqualToThreshold"
   evaluation_periods  = "5"
   datapoints_to_alarm = "5"
@@ -113,187 +147,15 @@ resource "aws_cloudwatch_metric_alarm" "low_disk_space_E_volume_rgvw022" {
   namespace           = "CWAgent"
   period              = "60"
   statistic           = "Average"
-  threshold           = "0.5"
+  threshold           = each.value.threshold
   treat_missing_data  = "notBreaching"
-  alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 5% for 5 minutes, the alarm will trigger"
+  alarm_description   = "This metric monitors free disk space on ${each.value.volume_letter} of ${each.value.instance_id}. Alarm triggers below ${each.value.threshold}% for 5 minutes."
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
-    InstanceId   = "i-029d2b17679dab982"
-    instance     = "E:"
-    ImageId      = "ami-02f8251c8cdf2464f"
-    InstanceType = "m5.xlarge"
-    objectname   = "LogicalDisk"
-  }
-}
-
-resource "aws_cloudwatch_metric_alarm" "low_disk_space_E_volume_rgvw027" {
-  count               = local.is-production == true ? 1 : 0
-  alarm_name          = "Low-Disk-Space-E-Volume-i-00cbccc46d25e77c6"
-  comparison_operator = "LessThanOrEqualToThreshold"
-  evaluation_periods  = "5"
-  datapoints_to_alarm = "5"
-  metric_name         = "LogicalDisk % Free Space"
-  namespace           = "CWAgent"
-  period              = "60"
-  statistic           = "Average"
-  threshold           = "1"
-  treat_missing_data  = "notBreaching"
-  alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 5% for 5 minutes, the alarm will trigger"
-  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
-  dimensions = {
-    InstanceId   = "i-00cbccc46d25e77c6"
-    instance     = "E:"
-    ImageId      = "ami-0e203fec985af6465"
-    InstanceType = "m5.xlarge"
-    objectname   = "LogicalDisk"
-  }
-}
-
-# Low Disk Alarms for all Windows instances with F Volumes
-# There are currently 3 instances; RGVW021, RGVW022 and RGVW027
-# Each have different alert thresholds
-
-resource "aws_cloudwatch_metric_alarm" "low_disk_space_F_volume_rgvw021" {
-  count               = local.is-production == true ? 1 : 0
-  alarm_name          = "Low-Disk-Space-F-Volume-i-080498c4c9d25e6bd"
-  comparison_operator = "LessThanOrEqualToThreshold"
-  evaluation_periods  = "5"
-  datapoints_to_alarm = "5"
-  metric_name         = "LogicalDisk % Free Space"
-  namespace           = "CWAgent"
-  period              = "60"
-  statistic           = "Average"
-  threshold           = "5"
-  treat_missing_data  = "notBreaching"
-  alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 5% for 5 minutes, the alarm will trigger"
-  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
-  dimensions = {
-    InstanceId   = "i-080498c4c9d25e6bd"
-    instance     = "F:"
-    ImageId      = "ami-05ddec53aa481cbc3"
-    InstanceType = "m5.2xlarge"
-    objectname   = "LogicalDisk"
-  }
-}
-
-resource "aws_cloudwatch_metric_alarm" "low_disk_space_F_volume_rgvw022" {
-  count               = local.is-production == true ? 1 : 0
-  alarm_name          = "Low-Disk-Space-F-Volume-i-029d2b17679dab982"
-  comparison_operator = "LessThanOrEqualToThreshold"
-  evaluation_periods  = "5"
-  datapoints_to_alarm = "5"
-  metric_name         = "LogicalDisk % Free Space"
-  namespace           = "CWAgent"
-  period              = "60"
-  statistic           = "Average"
-  threshold           = "0.5"
-  treat_missing_data  = "notBreaching"
-  alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 5% for 5 minutes, the alarm will trigger"
-  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
-  dimensions = {
-    InstanceId   = "i-029d2b17679dab982"
-    instance     = "E:"
-    ImageId      = "ami-02f8251c8cdf2464f"
-    InstanceType = "m5.xlarge"
-    objectname   = "LogicalDisk"
-  }
-}
-
-resource "aws_cloudwatch_metric_alarm" "low_disk_space_F_volume_rgvw027" {
-  count               = local.is-production == true ? 1 : 0
-  alarm_name          = "Low-Disk-Space-F-Volume-i-00cbccc46d25e77c6"
-  comparison_operator = "LessThanOrEqualToThreshold"
-  evaluation_periods  = "5"
-  datapoints_to_alarm = "5"
-  metric_name         = "LogicalDisk % Free Space"
-  namespace           = "CWAgent"
-  period              = "60"
-  statistic           = "Average"
-  threshold           = "2"
-  treat_missing_data  = "notBreaching"
-  alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 5% for 5 minutes, the alarm will trigger"
-  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
-  dimensions = {
-    InstanceId   = "i-00cbccc46d25e77c6"
-    instance     = "F:"
-    ImageId      = "ami-0e203fec985af6465"
-    InstanceType = "m5.xlarge"
-    objectname   = "LogicalDisk"
-  }
-}
-
-# Low Disk Alarms for all Windows instances with G Volumes
-# There are currently 3 instances; RGVW021 and RGVW022
-# Each have different alert thresholds
-
-resource "aws_cloudwatch_metric_alarm" "low_disk_space_G_volume_rgvw021" {
-  count               = local.is-production == true ? 1 : 0
-  alarm_name          = "Low-Disk-Space-G-Volume-i-080498c4c9d25e6bd"
-  comparison_operator = "LessThanOrEqualToThreshold"
-  evaluation_periods  = "5"
-  datapoints_to_alarm = "5"
-  metric_name         = "LogicalDisk % Free Space"
-  namespace           = "CWAgent"
-  period              = "60"
-  statistic           = "Average"
-  threshold           = "5"
-  treat_missing_data  = "notBreaching"
-  alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 5% for 5 minutes, the alarm will trigger"
-  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
-  dimensions = {
-    InstanceId   = "i-080498c4c9d25e6bd"
-    instance     = "G:"
-    ImageId      = "ami-05ddec53aa481cbc3"
-    InstanceType = "m5.2xlarge"
-    objectname   = "LogicalDisk"
-  }
-}
-
-resource "aws_cloudwatch_metric_alarm" "low_disk_space_G_volume_rgvw022" {
-  count               = local.is-production == true ? 1 : 0
-  alarm_name          = "Low-Disk-Space-G-Volume-i-029d2b17679dab982"
-  comparison_operator = "LessThanOrEqualToThreshold"
-  evaluation_periods  = "5"
-  datapoints_to_alarm = "5"
-  metric_name         = "LogicalDisk % Free Space"
-  namespace           = "CWAgent"
-  period              = "60"
-  statistic           = "Average"
-  threshold           = "2"
-  treat_missing_data  = "notBreaching"
-  alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 5% for 5 minutes, the alarm will trigger"
-  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
-  dimensions = {
-    InstanceId   = "i-029d2b17679dab982"
-    instance     = "G:"
-    ImageId      = "ami-02f8251c8cdf2464f"
-    InstanceType = "m5.xlarge"
-    objectname   = "LogicalDisk"
-  }
-}
-
-# Low Disk Alarms for all Windows instances with H Volumes
-# There is currently only 1 instance RGVW027
-
-resource "aws_cloudwatch_metric_alarm" "low_disk_space_H_volume_rgvw027" {
-  count               = local.is-production == true ? 1 : 0
-  alarm_name          = "Low-Disk-Space-H-Volume-i-00cbccc46d25e77c6"
-  comparison_operator = "LessThanOrEqualToThreshold"
-  evaluation_periods  = "5"
-  datapoints_to_alarm = "5"
-  metric_name         = "LogicalDisk % Free Space"
-  namespace           = "CWAgent"
-  period              = "60"
-  statistic           = "Average"
-  threshold           = "3"
-  treat_missing_data  = "notBreaching"
-  alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 3% for 5 minutes, the alarm will trigger"
-  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
-  dimensions = {
-    InstanceId   = "i-00cbccc46d25e77c6"
-    instance     = "H:"
-    ImageId      = "ami-0e203fec985af6465"
-    InstanceType = "m5.xlarge"
+    InstanceId   = each.value.instance_id
+    instance     = each.value.volume_letter
+    ImageId      = each.value.ImageId
+    InstanceType = each.value.InstanceType
     objectname   = "LogicalDisk"
   }
 }
@@ -424,135 +286,55 @@ resource "aws_cloudwatch_metric_alarm" "Windows_IIS_check" {
   }
 }
 
-# Malware Event Signature Update Failed
+# CloudWatch Alarms for Malware Events (Signature Update Failed, State Detected, Scan Failed, Engine Update Failed, Engine Out of Date & Behavior Detected)
 
-resource "aws_cloudwatch_metric_alarm" "malware_event_signature_update_failed" {
-  for_each            = toset(data.aws_instances.windows_tagged_instances.ids)
-  alarm_name          = "Malware-Event-Signature-Update-Failed-${each.key}"
-  comparison_operator = "GreaterThanThreshold"
-  period              = "60"
-  threshold           = "0"
-  evaluation_periods  = "1"
-  datapoints_to_alarm = "1"
-  metric_name         = "MalwareSignatureFailed"
-  treat_missing_data  = "notBreaching"
-  namespace           = "WindowsDefender"
-  statistic           = "Sum"
-  alarm_description   = "Monitors for windows defender malware signature update failed events"
-  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
-  dimensions = {
-    Instance               = each.key
-    MalwareSignatureFailed = "MalwareSignatureFailed"
-  }
+locals {
+  malware_alarm_metadata_prod = local.is-production ? {
+    MalwareScanFailed       = "Scan Failed"
+    MalwareBehaviorDetected = "Behavior Detected"
+    MalwareStateDetected    = "State Detected"
+    MalwareSignatureFailed  = "Signature Failed"
+    MalwareEngineFailed     = "Engine Failed"
+    MalwareEngineOutofDate  = "Engine Out of Date"
+  } : {}
 }
 
-# Malware Event State Detected
-
-resource "aws_cloudwatch_metric_alarm" "malware_event_state_detected" {
-  for_each            = toset(data.aws_instances.windows_tagged_instances.ids)
-  alarm_name          = "Malware-Event-State-Detected-${each.key}"
-  comparison_operator = "GreaterThanThreshold"
-  period              = "60"
-  threshold           = "0"
-  evaluation_periods  = "1"
-  datapoints_to_alarm = "1"
-  metric_name         = "MalwareStateDetected"
-  treat_missing_data  = "notBreaching"
-  namespace           = "WindowsDefender"
-  statistic           = "Sum"
-  alarm_description   = "Monitors for windows defender malware state detected events"
-  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
-  dimensions = {
-    Instance             = each.key
-    MalwareStateDetected = "MalwareStateDetected"
-  }
+locals {
+  malware_alarm_matrix_prod = local.is-production ? tomap({
+    for pair in flatten([
+      for instance_id in data.aws_instances.windows_tagged_instances.ids : [
+        for metric_name, description in local.malware_alarm_metadata_prod : {
+          key = "${instance_id}-${metric_name}"
+          value = {
+            instance_id = instance_id
+            metric_name = metric_name
+            description = description
+          }
+        }
+      ]
+    ]) : pair.key => pair.value
+  }) : {}
 }
 
-# Malware Event Scan Failed
+resource "aws_cloudwatch_metric_alarm" "malware_event_alarms_prod" {
+  for_each = local.malware_alarm_matrix_prod
 
-resource "aws_cloudwatch_metric_alarm" "malware_event_scan_failed" {
-  for_each            = toset(data.aws_instances.windows_tagged_instances.ids)
-  alarm_name          = "Malware-Event-Scan-Failed-${each.key}"
+  alarm_name          = "Malware-Event-${each.value.metric_name}-${each.value.instance_id}"
   comparison_operator = "GreaterThanThreshold"
-  period              = "60"
-  threshold           = "0"
-  evaluation_periods  = "1"
-  datapoints_to_alarm = "1"
-  metric_name         = "MalwareScanFailed"
-  treat_missing_data  = "notBreaching"
+  period              = 60
+  threshold           = 0
+  evaluation_periods  = 1
+  datapoints_to_alarm = 1
+  metric_name         = each.value.metric_name
   namespace           = "WindowsDefender"
   statistic           = "Sum"
-  alarm_description   = "Monitors for windows defender malware scan failed events"
-  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
-  dimensions = {
-    Instance          = each.key
-    MalwareScanFailed = "MalwareScanFailed"
-  }
-}
-
-# Malware Event Engine Update Failed
-
-resource "aws_cloudwatch_metric_alarm" "malware_event_engine_update_failed" {
-  for_each            = toset(data.aws_instances.windows_tagged_instances.ids)
-  alarm_name          = "Malware-Event-Engine-Update-Failed-${each.key}"
-  comparison_operator = "GreaterThanThreshold"
-  period              = "60"
-  threshold           = "0"
-  evaluation_periods  = "1"
-  datapoints_to_alarm = "1"
-  metric_name         = "MalwareEngineFailed"
   treat_missing_data  = "notBreaching"
-  namespace           = "WindowsDefender"
-  statistic           = "Sum"
-  alarm_description   = "Monitors for windows defender malware engine update events"
+  alarm_description   = "Monitors for Windows Defender malware event: ${each.value.description}"
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
+
   dimensions = {
-    Instance            = each.key
-    MalwareEngineFailed = "MalwareEngineFailed"
-  }
-}
-
-# Malware Event Engine Out of Date
-
-resource "aws_cloudwatch_metric_alarm" "malware_event_engine_out_of_date" {
-  for_each            = toset(data.aws_instances.windows_tagged_instances.ids)
-  alarm_name          = "Malware-Event-Engine-Out-Of-Date-${each.key}"
-  comparison_operator = "GreaterThanThreshold"
-  period              = "60"
-  threshold           = "0"
-  evaluation_periods  = "1"
-  datapoints_to_alarm = "1"
-  metric_name         = "MalwareEngineOutofDate"
-  treat_missing_data  = "notBreaching"
-  namespace           = "WindowsDefender"
-  statistic           = "Sum"
-  alarm_description   = "Monitors for windows defender malware engine out of date events"
-  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
-  dimensions = {
-    Instance               = each.key
-    MalwareEngineOutofDate = "MalwareEngineOutofDate"
-  }
-}
-
-# Malware Event Behavior Detected
-
-resource "aws_cloudwatch_metric_alarm" "malware_event_behavior_detected" {
-  for_each            = toset(data.aws_instances.windows_tagged_instances.ids)
-  alarm_name          = "Malware-Event-Engine-Behavior-Detected-${each.key}"
-  comparison_operator = "GreaterThanThreshold"
-  period              = "60"
-  threshold           = "0"
-  evaluation_periods  = "1"
-  datapoints_to_alarm = "1"
-  metric_name         = "MalwareBehaviorDetected"
-  treat_missing_data  = "notBreaching"
-  namespace           = "WindowsDefender"
-  statistic           = "Sum"
-  alarm_description   = "Monitors for windows defender malware behavior detected events"
-  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
-  dimensions = {
-    Instance                = each.key
-    MalwareBehaviorDetected = "MalwareBehaviorDetected"
+    Instance  = each.value.instance_id
+    EventName = each.value.metric_name
   }
 }
 
@@ -1071,140 +853,59 @@ data "aws_instance" "windows_instance_details_uat" {
   instance_id = each.value
 }
 
-
 #################################
 # CloudWatch Alarms Preproduction
 #################################
 
-# Malware Event Signature Update Failed
+# CloudWatch Alarms for Malware Events (Signature Update Failed, State Detected, Scan Failed, Engine Update Failed, Engine Out of Date & Behavior Detected)
 
-resource "aws_cloudwatch_metric_alarm" "malware_event_signature_update_failed_uat" {
-  for_each            = toset(data.aws_instances.windows_tagged_instances_uat.ids)
-  alarm_name          = "Malware-Event-Signature-Update-Failed-${each.key}"
-  comparison_operator = "GreaterThanThreshold"
-  period              = "60"
-  threshold           = "0"
-  evaluation_periods  = "1"
-  datapoints_to_alarm = "1"
-  metric_name         = "MalwareSignatureFailed"
-  treat_missing_data  = "notBreaching"
-  namespace           = "WindowsDefender"
-  statistic           = "Sum"
-  alarm_description   = "Monitors for windows defender malware signature update failed events"
-  alarm_actions       = [aws_sns_topic.cw_uat_alerts[0].arn]
-  dimensions = {
-    Instance               = each.key
-    MalwareSignatureFailed = "MalwareSignatureFailed"
-  }
+locals {
+  malware_alarm_metadata_preprod = local.is-preproduction ? {
+    MalwareScanFailed       = "Scan Failed"
+    MalwareBehaviorDetected = "Behavior Detected"
+    MalwareStateDetected    = "State Detected"
+    MalwareSignatureFailed  = "Signature Failed"
+    MalwareEngineFailed     = "Engine Failed"
+    MalwareEngineOutofDate  = "Engine Out of Date"
+  } : {}
 }
 
-# Malware Event State Detected
-
-resource "aws_cloudwatch_metric_alarm" "malware_event_state_detected_uat" {
-  for_each            = toset(data.aws_instances.windows_tagged_instances_uat.ids)
-  alarm_name          = "Malware-Event-State-Detected-${each.key}"
-  comparison_operator = "GreaterThanThreshold"
-  period              = "60"
-  threshold           = "0"
-  evaluation_periods  = "1"
-  datapoints_to_alarm = "1"
-  metric_name         = "MalwareStateDetected"
-  treat_missing_data  = "notBreaching"
-  namespace           = "WindowsDefender"
-  statistic           = "Sum"
-  alarm_description   = "Monitors for windows defender malware state detected events"
-  alarm_actions       = [aws_sns_topic.cw_uat_alerts[0].arn]
-  dimensions = {
-    Instance             = each.key
-    MalwareStateDetected = "MalwareStateDetected"
-  }
+locals {
+  malware_alarm_matrix_preprod = local.is-preproduction ? tomap({
+    for pair in flatten([
+      for instance_id in data.aws_instances.windows_tagged_instances_uat.ids : [
+        for metric_name, description in local.malware_alarm_metadata_preprod : {
+          key = "${instance_id}-${metric_name}"
+          value = {
+            instance_id = instance_id
+            metric_name = metric_name
+            description = description
+          }
+        }
+      ]
+    ]) : pair.key => pair.value
+  }) : {}
 }
 
-# Malware Event Scan Failed
+resource "aws_cloudwatch_metric_alarm" "malware_event_alarms_preprod" {
+  for_each = local.malware_alarm_matrix_preprod
 
-resource "aws_cloudwatch_metric_alarm" "malware_event_scan_failed_uat" {
-  for_each            = toset(data.aws_instances.windows_tagged_instances_uat.ids)
-  alarm_name          = "Malware-Event-Scan-Failed-${each.key}"
+  alarm_name          = "Malware-Event-${each.value.metric_name}-${each.value.instance_id}"
   comparison_operator = "GreaterThanThreshold"
-  period              = "60"
-  threshold           = "0"
-  evaluation_periods  = "1"
-  datapoints_to_alarm = "1"
-  metric_name         = "MalwareScanFailed"
-  treat_missing_data  = "notBreaching"
+  period              = 60
+  threshold           = 0
+  evaluation_periods  = 1
+  datapoints_to_alarm = 1
+  metric_name         = each.value.metric_name
   namespace           = "WindowsDefender"
   statistic           = "Sum"
-  alarm_description   = "Monitors for windows defender malware scan failed events"
-  alarm_actions       = [aws_sns_topic.cw_uat_alerts[0].arn]
-  dimensions = {
-    Instance          = each.key
-    MalwareScanFailed = "MalwareScanFailed"
-  }
-}
-
-# Malware Event Engine Update Failed
-
-resource "aws_cloudwatch_metric_alarm" "malware_event_engine_update_failed_uat" {
-  for_each            = toset(data.aws_instances.windows_tagged_instances_uat.ids)
-  alarm_name          = "Malware-Event-Engine-Update-Failed-${each.key}"
-  comparison_operator = "GreaterThanThreshold"
-  period              = "60"
-  threshold           = "0"
-  evaluation_periods  = "1"
-  datapoints_to_alarm = "1"
-  metric_name         = "MalwareEngineFailed"
   treat_missing_data  = "notBreaching"
-  namespace           = "WindowsDefender"
-  statistic           = "Sum"
-  alarm_description   = "Monitors for windows defender malware engine update events"
+  alarm_description   = "Monitors for Windows Defender malware event: ${each.value.description}"
   alarm_actions       = [aws_sns_topic.cw_uat_alerts[0].arn]
+
   dimensions = {
-    Instance            = each.key
-    MalwareEngineFailed = "MalwareEngineFailed"
-  }
-}
-
-# Malware Event Engine Out of Date
-
-resource "aws_cloudwatch_metric_alarm" "malware_event_engine_out_of_date_uat" {
-  for_each            = toset(data.aws_instances.windows_tagged_instances_uat.ids)
-  alarm_name          = "Malware-Event-Engine-Out-Of-Date-${each.key}"
-  comparison_operator = "GreaterThanThreshold"
-  period              = "60"
-  threshold           = "0"
-  evaluation_periods  = "1"
-  datapoints_to_alarm = "1"
-  metric_name         = "MalwareEngineOutofDate"
-  treat_missing_data  = "notBreaching"
-  namespace           = "WindowsDefender"
-  statistic           = "Sum"
-  alarm_description   = "Monitors for windows defender malware engine out of date events"
-  alarm_actions       = [aws_sns_topic.cw_uat_alerts[0].arn]
-  dimensions = {
-    Instance               = each.key
-    MalwareEngineOutofDate = "MalwareEngineOutofDate"
-  }
-}
-
-# Malware Event Behavior Detected
-
-resource "aws_cloudwatch_metric_alarm" "malware_event_behavior_detected_uat" {
-  for_each            = toset(data.aws_instances.windows_tagged_instances_uat.ids)
-  alarm_name          = "Malware-Event-Engine-Behavior-Detected-${each.key}"
-  comparison_operator = "GreaterThanThreshold"
-  period              = "60"
-  threshold           = "0"
-  evaluation_periods  = "1"
-  datapoints_to_alarm = "1"
-  metric_name         = "MalwareBehaviorDetected"
-  treat_missing_data  = "notBreaching"
-  namespace           = "WindowsDefender"
-  statistic           = "Sum"
-  alarm_description   = "Monitors for windows defender malware behavior detected events"
-  alarm_actions       = [aws_sns_topic.cw_uat_alerts[0].arn]
-  dimensions = {
-    Instance                = each.key
-    MalwareBehaviorDetected = "MalwareBehaviorDetected"
+    Instance  = each.value.instance_id
+    EventName = each.value.metric_name
   }
 }
 
@@ -1232,134 +933,54 @@ data "aws_instance" "windows_instance_details_dev" {
 # CloudWatch Alarms Development
 ###############################
 
-# Malware Event Signature Update Failed
+# CloudWatch Alarms for Malware Events (Signature Update Failed, State Detected, Scan Failed, Engine Update Failed, Engine Out of Date & Behavior Detected)
 
-resource "aws_cloudwatch_metric_alarm" "malware_event_signature_update_failed_dev" {
-  for_each            = toset(data.aws_instances.windows_tagged_instances_dev.ids)
-  alarm_name          = "Malware-Event-Signature-Update-Failed-${each.key}"
-  comparison_operator = "GreaterThanThreshold"
-  period              = "60"
-  threshold           = "0"
-  evaluation_periods  = "1"
-  datapoints_to_alarm = "1"
-  metric_name         = "MalwareSignatureFailed"
-  treat_missing_data  = "notBreaching"
-  namespace           = "WindowsDefender"
-  statistic           = "Sum"
-  alarm_description   = "Monitors for windows defender malware signature update failed events"
-  alarm_actions       = [aws_sns_topic.cw_dev_alerts[0].arn]
-  dimensions = {
-    Instance               = each.key
-    MalwareSignatureFailed = "MalwareSignatureFailed"
-  }
+locals {
+  malware_alarm_metadata_dev = local.is-development ? {
+    MalwareScanFailed       = "Scan Failed"
+    MalwareBehaviorDetected = "Behavior Detected"
+    MalwareStateDetected    = "State Detected"
+    MalwareSignatureFailed  = "Signature Failed"
+    MalwareEngineFailed     = "Engine Failed"
+    MalwareEngineOutofDate  = "Engine Out of Date"
+  } : {}
 }
 
-# Malware Event State Detected
-
-resource "aws_cloudwatch_metric_alarm" "malware_event_state_detected_dev" {
-  for_each            = toset(data.aws_instances.windows_tagged_instances_dev.ids)
-  alarm_name          = "Malware-Event-State-Detected-${each.key}"
-  comparison_operator = "GreaterThanThreshold"
-  period              = "60"
-  threshold           = "0"
-  evaluation_periods  = "1"
-  datapoints_to_alarm = "1"
-  metric_name         = "MalwareStateDetected"
-  treat_missing_data  = "notBreaching"
-  namespace           = "WindowsDefender"
-  statistic           = "Sum"
-  alarm_description   = "Monitors for windows defender malware state detected events"
-  alarm_actions       = [aws_sns_topic.cw_dev_alerts[0].arn]
-  dimensions = {
-    Instance             = each.key
-    MalwareStateDetected = "MalwareStateDetected"
-  }
+locals {
+  malware_alarm_matrix_dev = local.is-development ? tomap({
+    for pair in flatten([
+      for instance_id in data.aws_instances.windows_tagged_instances_dev.ids : [
+        for metric_name, description in local.malware_alarm_metadata_dev : {
+          key = "${instance_id}-${metric_name}"
+          value = {
+            instance_id = instance_id
+            metric_name = metric_name
+            description = description
+          }
+        }
+      ]
+    ]) : pair.key => pair.value
+  }) : {}
 }
 
-# Malware Event Scan Failed
+resource "aws_cloudwatch_metric_alarm" "malware_event_alarms_dev" {
+  for_each = local.malware_alarm_matrix_dev
 
-resource "aws_cloudwatch_metric_alarm" "malware_event_scan_failed_dev" {
-  for_each            = toset(data.aws_instances.windows_tagged_instances_dev.ids)
-  alarm_name          = "Malware-Event-Scan-Failed-${each.key}"
+  alarm_name          = "Malware-Event-${each.value.metric_name}-${each.value.instance_id}"
   comparison_operator = "GreaterThanThreshold"
-  period              = "60"
-  threshold           = "0"
-  evaluation_periods  = "1"
-  datapoints_to_alarm = "1"
-  metric_name         = "MalwareScanFailed"
-  treat_missing_data  = "notBreaching"
+  period              = 60
+  threshold           = 0
+  evaluation_periods  = 1
+  datapoints_to_alarm = 1
+  metric_name         = each.value.metric_name
   namespace           = "WindowsDefender"
   statistic           = "Sum"
-  alarm_description   = "Monitors for windows defender malware scan failed events"
-  alarm_actions       = [aws_sns_topic.cw_dev_alerts[0].arn]
-  dimensions = {
-    Instance          = each.key
-    MalwareScanFailed = "MalwareScanFailed"
-  }
-}
-
-# Malware Event Engine Update Failed
-
-resource "aws_cloudwatch_metric_alarm" "malware_event_engine_update_failed_dev" {
-  for_each            = toset(data.aws_instances.windows_tagged_instances_dev.ids)
-  alarm_name          = "Malware-Event-Engine-Update-Failed-${each.key}"
-  comparison_operator = "GreaterThanThreshold"
-  period              = "60"
-  threshold           = "0"
-  evaluation_periods  = "1"
-  datapoints_to_alarm = "1"
-  metric_name         = "MalwareEngineFailed"
   treat_missing_data  = "notBreaching"
-  namespace           = "WindowsDefender"
-  statistic           = "Sum"
-  alarm_description   = "Monitors for windows defender malware engine update events"
+  alarm_description   = "Monitors for Windows Defender malware event: ${each.value.description}"
   alarm_actions       = [aws_sns_topic.cw_dev_alerts[0].arn]
+
   dimensions = {
-    Instance            = each.key
-    MalwareEngineFailed = "MalwareEngineFailed"
-  }
-}
-
-# Malware Event Engine Out of Date
-
-resource "aws_cloudwatch_metric_alarm" "malware_event_engine_out_of_date_dev" {
-  for_each            = toset(data.aws_instances.windows_tagged_instances_dev.ids)
-  alarm_name          = "Malware-Event-Engine-Out-Of-Date-${each.key}"
-  comparison_operator = "GreaterThanThreshold"
-  period              = "60"
-  threshold           = "0"
-  evaluation_periods  = "1"
-  datapoints_to_alarm = "1"
-  metric_name         = "MalwareEngineOutofDate"
-  treat_missing_data  = "notBreaching"
-  namespace           = "WindowsDefender"
-  statistic           = "Sum"
-  alarm_description   = "Monitors for windows defender malware engine out of date events"
-  alarm_actions       = [aws_sns_topic.cw_dev_alerts[0].arn]
-  dimensions = {
-    Instance               = each.key
-    MalwareEngineOutofDate = "MalwareEngineOutofDate"
-  }
-}
-
-# Malware Event Behavior Detected
-
-resource "aws_cloudwatch_metric_alarm" "malware_event_behavior_detected_dev" {
-  for_each            = toset(data.aws_instances.windows_tagged_instances_dev.ids)
-  alarm_name          = "Malware-Event-Engine-Behavior-Detected-${each.key}"
-  comparison_operator = "GreaterThanThreshold"
-  period              = "60"
-  threshold           = "0"
-  evaluation_periods  = "1"
-  datapoints_to_alarm = "1"
-  metric_name         = "MalwareBehaviorDetected"
-  treat_missing_data  = "notBreaching"
-  namespace           = "WindowsDefender"
-  statistic           = "Sum"
-  alarm_description   = "Monitors for windows defender malware behavior detected events"
-  alarm_actions       = [aws_sns_topic.cw_dev_alerts[0].arn]
-  dimensions = {
-    Instance                = each.key
-    MalwareBehaviorDetected = "MalwareBehaviorDetected"
+    Instance  = each.value.instance_id
+    EventName = each.value.metric_name
   }
 }

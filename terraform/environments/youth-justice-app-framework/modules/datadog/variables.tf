@@ -77,3 +77,27 @@ variable "aws_account_id" {
   description = "The AWS account ID"
   type        = string
 }
+
+variable "agent_datadog_memory" {
+  description = "The memory for the Datadog agent"
+  type        = number
+  default     = 512
+}
+
+variable "agent_datadog_cpu" {
+  description = "The CPU for the Datadog agent"
+  type        = number
+  default     = 128
+}
+
+variable "agent_datadog_container_cpu" {
+  description = "The CPU for the Datadog agent container"
+  type        = number
+  default     = 100
+}
+
+variable "agent_datadog_container_memory" {
+  description = "The memory for the Datadog agent container"
+  type        = number
+  default     = 512
+}

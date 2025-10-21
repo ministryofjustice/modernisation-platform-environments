@@ -309,3 +309,48 @@ resource "aws_iam_role_policy_attachment" "ccms_ebs_shared_s3" {
   role       = aws_iam_role.role_stsassume_oracle_base.name
   policy_arn = aws_iam_policy.ccms_ebs_shared_s3.arn
 }
+
+# Hub-20 S3 Permissions Policy (Test only)
+resource "aws_iam_policy" "hub_20_s3_permissions" {
+  count       = local.environment == "test" ? 1 : 0
+  name        = "hub-20-s3-permissions-${local.environment}"
+  description = "Allows EC2 instances with role_stsassume_oracle_base to access Hub-20 test bucket"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetBucketLocation",
+          "s3:ListBucket"
+        ]
+        Resource = [
+          "arn:aws:s3:::hub20-${local.environment}-patch-cwa-extract-data"
+        ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject"
+        ]
+        Resource = [
+          "arn:aws:s3:::hub20-${local.environment}-patch-cwa-extract-data/*"
+        ]
+      }
+    ]
+  })
+
+  tags = merge(local.tags, {
+    Name = "hub-20-s3-permissions-${local.environment}"
+  })
+}
+
+# Attach Hub-20 S3 policy to EC2 role (Test only)
+resource "aws_iam_role_policy_attachment" "hub_20_s3_permissions_attach" {
+  count      = local.environment == "test" ? 1 : 0
+  role       = aws_iam_role.role_stsassume_oracle_base.name
+  policy_arn = one(aws_iam_policy.hub_20_s3_permissions[*].arn)
+}

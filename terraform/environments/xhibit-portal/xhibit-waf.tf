@@ -1,9 +1,14 @@
 module "waf" {
-  source                   = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-waf?ref=ecc855f212ce6a2f36a7a77e78c42d968f15ee8d"
+  source                   = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-aws-waf?ref=86fa9d802455114baf80628f3c5670dddc732a7f"
   enable_ddos_protection   = true
   ddos_rate_limit          = 3000
   block_non_uk_traffic     = true
   associated_resource_arns = [aws_lb.waf_lb.arn]
+
+  providers = {
+    aws                        = aws
+    aws.modernisation-platform = aws.modernisation-platform
+  }
 
   managed_rule_actions = {
     AWSManagedRulesKnownBadInputsRuleSet = false
@@ -12,6 +17,15 @@ module "waf" {
     AWSManagedRulesLinuxRuleSet          = false
     AWSManagedRulesAnonymousIpList       = false
     AWSManagedRulesBotControlRuleSet     = false
+  }
+
+  managed_rule_priorities = {
+    AWSManagedRulesAnonymousIpList       = 10
+    AWSManagedRulesKnownBadInputsRuleSet = 11
+    AWSManagedRulesCommonRuleSet         = 12
+    AWSManagedRulesSQLiRuleSet           = 13
+    AWSManagedRulesLinuxRuleSet          = 14
+    AWSManagedRulesBotControlRuleSet     = 15
   }
 
   core_logging_account_id = local.environment_management.account_ids["core-logging-production"]
@@ -35,7 +49,7 @@ resource "aws_wafv2_ip_set" "prtg_waf_ip_set" {
     "66.155.16.61/32",   // SBEL Wifi
     "66.155.16.68/32",   // SBEL Wifi
     "86.16.40.31/32",    // ZP
-    "90.247.66.20/32",   // TM
+    "90.247.105.163/32", // TM
     "92.236.109.133/32", // GD Wifi
     "100.44.12.86/32",   // MoJ Digital Wifi
     "128.77.75.64/26",   // MoJ Prisma VPN Gateway

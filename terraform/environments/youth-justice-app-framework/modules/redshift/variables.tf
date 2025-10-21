@@ -54,5 +54,9 @@ variable "vpc_cidr" {
 variable "data_science_role" {
   type        = string
   description = "The arn of a role that is adpopted by YJB Data Scientests."
-  default     = null #"arn:aws:iam::066012302209:role/data_science"
+}
+
+variable "reports_admin_role" {
+  type        = string
+  description = "The arn of a role that is used to administer Redshift."
 }

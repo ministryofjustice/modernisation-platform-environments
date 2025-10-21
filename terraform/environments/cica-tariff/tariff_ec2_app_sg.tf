@@ -31,14 +31,14 @@ resource "aws_security_group" "tariff_app_security_group" {
     protocol    = "icmp"
     from_port   = -1
     to_port     = -1
-    cidr_blocks = [data.aws_vpc.shared.cidr_block, local.cidr_cica_ss_a, local.cidr_cica_ss_b, local.cidr_cica_uat_a, local.cidr_cica_uat_b, local.cidr_cica_onprem_uat]
+    cidr_blocks = [data.aws_vpc.shared.cidr_block, local.cidr_cica_ss_a, local.cidr_cica_ss_b, local.cidr_cica_uat_a, local.cidr_cica_uat_b, local.cidr_cica_uat_c, local.cidr_cica_uat_d, local.cidr_cica_onprem_uat]
   }
 
   ingress {
     protocol    = "tcp"
     from_port   = 1521
     to_port     = 1521
-    cidr_blocks = [data.aws_vpc.shared.cidr_block, local.cidr_cica_ss_a, local.cidr_cica_ss_b, local.cidr_cica_uat_a, local.cidr_cica_uat_b, local.cidr_cica_onprem_uat, local.cidr_cica_dev_a, local.cidr_cica_dev_b, local.cidr_cica_ras, local.cidr_cica_lan, local.cidr_cica_ras_nat]
+    cidr_blocks = [data.aws_vpc.shared.cidr_block, local.cidr_cica_ss_a, local.cidr_cica_ss_b, local.cidr_cica_uat_a, local.cidr_cica_uat_b, local.cidr_cica_uat_c, local.cidr_cica_uat_d, local.cidr_cica_dev_a, local.cidr_cica_dev_b, local.cidr_cica_dev_c, local.cidr_cica_dev_d, local.cidr_cica_ras_nat]
 
   }
 
