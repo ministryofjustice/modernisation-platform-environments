@@ -34,39 +34,39 @@ resource "aws_cloudwatch_metric_alarm" "ddos_attack_external_ebsapps_nlb" {
   }
 }
 
-resource "aws_cloudwatch_metric_alarm" "ddos_attack_external_webgate_alb" {
-  alarm_name          = "DDoSDetectedWebGateALB"
-  comparison_operator = "GreaterThanThreshold"
-  evaluation_periods  = "3"
-  metric_name         = "DDoSDetected"
-  namespace           = "AWS/DDoSProtection"
-  period              = "60"
-  statistic           = "Average"
-  threshold           = "0"
-  alarm_description   = "Triggers when AWS Shield Advanced detects a DDoS attack"
-  treat_missing_data  = "notBreaching"
-  alarm_actions       = [aws_sns_topic.ddos_alarm.arn]
-  dimensions = {
-    ResourceArn = aws_lb.webgate_public_lb.arn
-  }
-}
+# resource "aws_cloudwatch_metric_alarm" "ddos_attack_external_webgate_alb" {
+#   alarm_name          = "DDoSDetectedWebGateALB"
+#   comparison_operator = "GreaterThanThreshold"
+#   evaluation_periods  = "3"
+#   metric_name         = "DDoSDetected"
+#   namespace           = "AWS/DDoSProtection"
+#   period              = "60"
+#   statistic           = "Average"
+#   threshold           = "0"
+#   alarm_description   = "Triggers when AWS Shield Advanced detects a DDoS attack"
+#   treat_missing_data  = "notBreaching"
+#   alarm_actions       = [aws_sns_topic.ddos_alarm.arn]
+#   dimensions = {
+#     ResourceArn = aws_lb.webgate_public_lb.arn
+#   }
+# }
 
-resource "aws_cloudwatch_metric_alarm" "ddos_attack_external_webgate_nlb" {
-  alarm_name          = "DDoSDetectedWebGateNLB"
-  comparison_operator = "GreaterThanThreshold"
-  evaluation_periods  = "3"
-  metric_name         = "DDoSDetected"
-  namespace           = "AWS/DDoSProtection"
-  period              = "60"
-  statistic           = "Average"
-  threshold           = "0"
-  alarm_description   = "Triggers when AWS Shield Advanced detects a DDoS attack"
-  treat_missing_data  = "notBreaching"
-  alarm_actions       = [aws_sns_topic.ddos_alarm.arn]
-  dimensions = {
-    ResourceArn = aws_lb.webgate_nlb.arn
-  }
-}
+# resource "aws_cloudwatch_metric_alarm" "ddos_attack_external_webgate_nlb" {
+#   alarm_name          = "DDoSDetectedWebGateNLB"
+#   comparison_operator = "GreaterThanThreshold"
+#   evaluation_periods  = "3"
+#   metric_name         = "DDoSDetected"
+#   namespace           = "AWS/DDoSProtection"
+#   period              = "60"
+#   statistic           = "Average"
+#   threshold           = "0"
+#   alarm_description   = "Triggers when AWS Shield Advanced detects a DDoS attack"
+#   treat_missing_data  = "notBreaching"
+#   alarm_actions       = [aws_sns_topic.ddos_alarm.arn]
+#   dimensions = {
+#     ResourceArn = aws_lb.webgate_nlb.arn
+#   }
+# }
 
 /*
 ## Pager duty integration
