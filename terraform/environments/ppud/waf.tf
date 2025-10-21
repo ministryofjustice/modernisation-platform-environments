@@ -18,25 +18,6 @@ module "waf" {
     aws.modernisation-platform = aws.modernisation-platform
   }
 
-  custom_simple_rules = [
-    {
-      name     = "allow-ncsc-ip-list"
-      priority = 10
-      action   = "allow"
-      ip_set_reference_statement = {
-        arn = aws_wafv2_ip_set.ncsc_waf_ip_set.arn
-      }
-    },
-    {
-      name     = "allow-circle-ci-ip-list"
-      priority = 20
-      action   = "allow"
-      ip_set_reference_statement = {
-        arn = aws_wafv2_ip_set.circle_ci_waf_ip_set.arn
-      }
-    }
-  ]
-
   managed_rule_actions = {
     AWSManagedRulesKnownBadInputsRuleSet = false
     AWSManagedRulesCommonRuleSet         = false
@@ -233,5 +214,6 @@ resource "aws_cloudwatch_log_group" "wam_waf_logs" {
 resource "aws_wafv2_web_acl_logging_configuration" "wam_waf_logging" {
   count                   = local.is-development == true ? 1 : 0
   log_destination_configs = [aws_cloudwatch_log_group.wam_waf_logs[count.index].arn]
-  resource_arn            = aws_wafv2_web_acl.wam_web_acl[count.index].arn  # will need updating
+# resource_arn            = aws_wafv2_web_acl.wam_web_acl[count.index].arn 
+  resource_arn            = module.waf.web_acl_arn
 }
