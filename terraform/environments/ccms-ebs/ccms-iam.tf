@@ -344,9 +344,7 @@ resource "aws_iam_role_policy_attachment" "ccms_ebs_shared_s3" {
   policy_arn = aws_iam_policy.ccms_ebs_shared_s3.arn
 }
 
-
-### Role for Lambda Execution
-
+# Role for Lambda Execution
 resource "aws_iam_role" "lambda_execution_role" {
   name = "lambda_execution_role"
   assume_role_policy = jsonencode(
@@ -432,10 +430,11 @@ resource "aws_iam_policy" "hub_20_s3_permissions" {
 
 # Attach Hub-20 S3 policy to EC2 role (Dev & Test only)
 resource "aws_iam_role_policy_attachment" "hub_20_s3_permissions_attach" {
-  count      = contains(["development", "test"], local.environment) ? 1 : 0
+  count      = contains(["development", "test", "production"], local.environment) ? 1 : 0
   role       = aws_iam_role.role_stsassume_oracle_base.name
   policy_arn = one(aws_iam_policy.hub_20_s3_permissions[*].arn)
 }
+
 # Create policy to fetch secrets from secrets manager
 resource "aws_iam_policy" "ccms_ebs_ftp_get_secrets_value" {
   description = "Policy to allow getting the secrets from aws secrets manager"
@@ -456,6 +455,7 @@ resource "aws_iam_policy" "ccms_ebs_ftp_get_secrets_value" {
     ]
   })
 }
+
 # Attach get_secrets_value policy to EC2 role (Dev, test only)
 resource "aws_iam_role_policy_attachment" "ccms_ebs_ftp_get_secrets_value_attach" {
   count      = contains(["development", "test", "preproduction", "production"], local.environment) ? 1 : 0
