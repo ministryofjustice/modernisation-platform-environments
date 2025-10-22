@@ -19,6 +19,9 @@ resource "aws_wafv2_ip_set" "pui_waf_ip_set" {
       local.application_data.accounts[local.environment].lz_aws_workspace_public_nat_gateway_a,
       local.application_data.accounts[local.environment].lz_aws_workspace_public_nat_gateway_b,
       local.application_data.accounts[local.environment].lz_aws_workspace_public_nat_gateway_c,
+      "35.176.254.38/32", # Temp AWS PROD Workspace
+      "35.177.173.197/32", # Temp AWS PROD Workspace
+      "52.56.212.11/32" # Temp AWS PROD Workspace
     ]
   )
 
