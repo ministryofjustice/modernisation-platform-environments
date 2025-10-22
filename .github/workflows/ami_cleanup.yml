@@ -35,6 +35,9 @@ on:
         required: true
         default: true
         type: boolean
+  push:
+    branches:
+      - feature-11321-identifying-snapshots-to-be-deleted
 
 permissions:
   id-token: write
@@ -140,4 +143,4 @@ jobs:
           else
             scripts/ebs_cleanup.sh -m "$months" delete
           fi
-          
+       
