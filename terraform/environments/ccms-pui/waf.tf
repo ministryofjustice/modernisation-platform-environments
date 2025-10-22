@@ -74,12 +74,12 @@ resource "aws_wafv2_web_acl" "pui_web_acl" {
         name        = "AWSManagedRulesCommonRuleSet"
         vendor_name = "AWS"
 
-        rule_action_override {
-          name = "NoUserAgent_HEADER"
-          action_to_use {
-            allow {}
-          }
-        }
+        # rule_action_override {
+        #   name = "NoUserAgent_HEADER"
+        #   action_to_use {
+        #     allow {}
+        #   }
+        # }
       }
     }
 
