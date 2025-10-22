@@ -71,6 +71,18 @@ resource "aws_s3_bucket" "r2s" {
   tags   = local.tags
 }
 
+resource "aws_s3_bucket_server_side_encryption_configuration" "r2s" {
+  bucket = aws_s3_bucket.r2s.id
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm     = "aws:kms"
+      kms_master_key_id = aws_kms_key.r2s_s3.arn
+    }
+    bucket_key_enabled = true
+  }
+}
+
+
 resource "aws_s3_bucket_public_access_block" "r2s" {
   bucket                  = aws_s3_bucket.r2s.id
   block_public_acls       = true
@@ -84,16 +96,6 @@ resource "aws_s3_bucket_ownership_controls" "r2s" {
   bucket = aws_s3_bucket.r2s.id
   rule {
     object_ownership = "BucketOwnerPreferred"
-  }
-}
-
-resource "aws_s3_bucket_server_side_encryption_configuration" "r2s" {
-  #tfsec:ignore:avd-aws-0132 - The bucket policy is attached to the bucket  
-  bucket = aws_s3_bucket.r2s.id
-  rule {
-    apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
-    }
   }
 }
 
@@ -117,11 +119,98 @@ data "aws_iam_policy_document" "r2s_tls_only" {
       values   = ["false"]
     }
   }
+    # Require SSE-KMS
+  statement {
+    sid     = "DenyIncorrectEncryptionHeader"
+    effect  = "Deny"
+    actions = ["s3:PutObject"]
+    principals { type = "*", identifiers = ["*"] }
+    resources = ["${aws_s3_bucket.r2s.arn}/*"]
+    condition {
+      test     = "StringNotEquals"
+      variable = "s3:x-amz-server-side-encryption"
+      values   = ["aws:kms"]
+    }
+  }
+
+  # Require our specific CMK
+  statement {
+    sid     = "DenyWrongKmsKey"
+    effect  = "Deny"
+    actions = ["s3:PutObject"]
+    principals { type = "*", identifiers = ["*"] }
+    resources = ["${aws_s3_bucket.r2s.arn}/*"]
+    condition {
+      test     = "StringNotEquals"
+      variable = "s3:x-amz-server-side-encryption-aws-kms-key-id"
+      values   = [aws_kms_key.r2s_s3.arn]
+    }
+  }
+
 }
 
 resource "aws_s3_bucket_policy" "r2s" {
   bucket = aws_s3_bucket.r2s.id
   policy = data.aws_iam_policy_document.r2s_tls_only.json
+}
+
+
+############################################################
+# KMS for S3 bucket encryption
+############################################################
+
+# Key policy: full admin to account; S3 use gated by IAM policies
+data "aws_iam_policy_document" "r2s_kms_policy" {
+  statement {
+    sid     = "EnableRootPermissions"
+    effect  = "Allow"
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+    }
+    actions   = ["kms:*"]
+    resources = ["*"]
+  }
+
+  # Allow S3 to create grants when accessed via S3 in this region
+  statement {
+    sid    = "AllowS3ToUseKeyViaService"
+    effect = "Allow"
+    principals {
+      type        = "Service"
+      identifiers = ["s3.amazonaws.com"]   # <-- principal should be regionless
+    }
+    actions = [
+      "kms:Decrypt",
+      "kms:Encrypt",
+      "kms:GenerateDataKey",
+      "kms:GenerateDataKeyWithoutPlaintext",
+      "kms:ReEncryptFrom",
+      "kms:ReEncryptTo",
+      "kms:DescribeKey",
+      "kms:CreateGrant"
+    ]
+    resources = ["*"]
+    condition {
+      test     = "StringEquals"
+      variable = "kms:ViaService"
+      values   = ["s3.${data.aws_region.current.name}.amazonaws.com"]  # <-- region stays here
+    }
+  }
+}
+
+
+resource "aws_kms_key" "r2s_s3" {
+  description             = "KMS key for server-side encryption of ${local.bucket_name}"
+  enable_key_rotation     = true
+  policy                  = data.aws_iam_policy_document.r2s_kms_policy.json
+  deletion_window_in_days = 30
+  tags                    = local.tags
+}
+
+resource "aws_kms_alias" "r2s_s3" {
+  name          = "alias/r2s-s3"
+  target_key_id = aws_kms_key.r2s_s3.key_id
 }
 
 ############################################################
@@ -138,7 +227,8 @@ resource "aws_s3_object" "genesys_folders" {
   bucket  = aws_s3_bucket.r2s.id
   key     = each.value                 # e.g. "cica/" (we normalized with trailing slash)
   content = ""                         # zero-byte marker object
-  server_side_encryption = "AES256"
+  server_side_encryption = "aws:kms"
+  kms_key_id             = aws_kms_key.r2s_s3.arn
 }
 
 # Optional: ensure the Snowflake metadata/ prefix exists too
@@ -147,7 +237,8 @@ resource "aws_s3_object" "snowflake_folder" {
   bucket  = aws_s3_bucket.r2s.id
   key     = local.snowflake_prefix     # "metadata/"
   content = ""
-  server_side_encryption = "AES256"
+  server_side_encryption = "aws:kms"
+  kms_key_id             = aws_kms_key.r2s_s3.arn
 }
 
 
@@ -258,7 +349,7 @@ resource "aws_iam_role" "genesys_role" {
   tags               = local.tags
 }
 
-# S3 policy document restricted to its own prefix
+# S3 policy document restricted to its own prefix + KMS usage
 data "aws_iam_policy_document" "genesys_prefix" {
   for_each = local.genesys_ready ? local.genesys_roles : {}
 
@@ -271,7 +362,10 @@ data "aws_iam_policy_document" "genesys_prefix" {
     condition {
       test     = "StringLike"
       variable = "s3:prefix"
-      values   = ["${local.genesys_prefix[each.key]}*"]
+        values   = [
+            "${local.genesys_prefix[each.key]}",
+            "${local.genesys_prefix[each.key]}*"
+          ]
     }
   }
 
@@ -292,7 +386,6 @@ data "aws_iam_policy_document" "genesys_prefix" {
     ]
   }
 
-  # Bucket metadata reads
   statement {
     sid     = "BucketMetadata"
     effect  = "Allow"
@@ -302,7 +395,29 @@ data "aws_iam_policy_document" "genesys_prefix" {
     ]
     resources = [aws_s3_bucket.r2s.arn]
   }
+
+  statement {
+    sid    = "KmsUseForPrefix"
+    effect = "Allow"
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:DescribeKey"
+    ]
+    resources = [aws_kms_key.r2s_s3.arn]
+
+    condition {
+      test     = "StringLike"
+      variable = "kms:EncryptionContext:aws:s3:arn"
+      values   = [
+        "arn:aws:s3:::${local.bucket_name}/${local.genesys_prefix[each.key]}*"
+      ]
+    }
+  }
 }
+
 
 # Managed policy per role
 resource "aws_iam_policy" "genesys_prefix" {
@@ -356,7 +471,10 @@ data "aws_iam_policy_document" "snowflake_policy_doc" {
     condition {
       test     = "StringLike"
       variable = "s3:prefix"
-      values   = ["${local.snowflake_prefix}*"]
+        values   = [
+          "${local.snowflake_prefix}",
+          "${local.snowflake_prefix}*"
+    ]
     }
   }
 
@@ -384,6 +502,26 @@ data "aws_iam_policy_document" "snowflake_policy_doc" {
     ]
     resources = [aws_s3_bucket.r2s.arn]
   }
+    statement {
+    sid    = "KmsUseForSnowflakePrefix"
+    effect = "Allow"
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:DescribeKey"
+    ]
+    resources = [aws_kms_key.r2s_s3.arn]
+    condition {
+      test     = "StringLike"
+      variable = "kms:EncryptionContext:aws:s3:arn"
+      values   = [
+        "arn:aws:s3:::${local.bucket_name}/${local.snowflake_prefix}*"
+      ]
+    }
+  }
+
 }
 
 resource "aws_iam_policy" "snowflake_policy" {
