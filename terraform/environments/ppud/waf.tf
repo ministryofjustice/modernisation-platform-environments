@@ -10,8 +10,13 @@ locals {
   associated_load_balancers_arns = local.environment == "development" ? [aws_lb.WAM-ALB.arn] : []
 }
 
+# Module URL - temporarily removed for testing purposes
+# source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-aws-waf?ref=b9cf6f92b142e80845ae30252aee2f84f57a71a9"
+
 module "waf" {
   source                   = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-aws-waf.git?ref=feature/adding-custom-rules"
+  name                     = "WAM Web ACL"
+  description              = "WAF protecting the WAM ALB."
   enable_ddos_protection   = true
   ddos_rate_limit          = 150
   block_non_uk_traffic     = true
