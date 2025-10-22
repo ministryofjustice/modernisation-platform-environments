@@ -111,6 +111,17 @@ locals {
       }
     }
 
+    patch_manager = {
+      patch_schedules = {
+        group1 = "cron(00 03 ? * THU *)"  
+      }
+      maintenance_window_duration = 4
+      maintenance_window_cutoff   = 2
+      patch_classifications = {
+        WINDOWS = ["SecurityUpdates", "CriticalUpdates"]
+      }
+    }
+
     #when changing the ems entries in prod or t2, also stop and start xtag to reconnect it.
     route53_zones = {
       "ndh.nomis.service.justice.gov.uk" = {
