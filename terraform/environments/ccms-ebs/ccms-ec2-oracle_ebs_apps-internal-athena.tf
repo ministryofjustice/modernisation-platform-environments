@@ -1,8 +1,3 @@
-
-# Data sources for account and region information
-data "aws_caller_identity" "current" {}
-data "aws_region" "current" {}
-
 # S3 bucket with data
 data "aws_s3_bucket" "data_bucket" {
   bucket = "ccms-ebs-development-logging"
