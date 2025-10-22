@@ -32,6 +32,7 @@ locals {
     data.aws_iam_policy_document.load_data.json,
     data.aws_iam_policy_document.get_secrets[0].json
   ] : [data.aws_iam_policy_document.load_data.json]
+  create_stg_db = var.full_reload ? false : true
 }
 
 data "aws_iam_policy_document" "get_secrets" {
@@ -176,7 +177,7 @@ module "share_stg_db_with_roles" {
   data_bucket_lf_resource = var.data_bucket_lf_resource
   role_arn                = module.ap_database_sharing.iam_role.arn
   de_role_arn             = var.de_role_arn
-  db_exists               = false
+  db_exists               = local.create_stg_db
 }
 
 
