@@ -16,10 +16,7 @@ on:
         required: true
         default: 'both'
         type: choice
-        options:
-          - ami
-          - ebs
-          - both
+        options: [ami, ebs, both]
       ami_cleanup_sh_args:
         description: 'Arguments passed to ami_cleanup.sh'
         required: false
@@ -43,6 +40,18 @@ permissions:
   id-token: write
   contents: read
 
+# ===== TEMP DRY-RUN OVERRIDE (FOR PUSH TESTING) =====
+# These env defaults make push-triggered runs behave like a DRY RUN.
+# Remove this whole block after testing.
+env:
+  APPLICATION: ${{ github.event.inputs.application || 'nomis' }}
+  ENVIRONMENTS: ${{ github.event.inputs.environments || 'development' }}
+  CLEANUP_TYPE: ${{ github.event.inputs.cleanup_type || 'both' }}
+  AMI_ARGS: ${{ github.event.inputs.ami_cleanup_sh_args || '-c -m 3' }}
+  EBS_MONTHS: ${{ github.event.inputs.ebs_age_in_months || '1' }}
+  DRYRUN: ${{ (github.event.inputs.dryrun != '' && github.event.inputs.dryrun) || 'true' }}
+# ===== END TEMP DRY-RUN OVERRIDE =====
+
 jobs:
   build-matrix:
     name: Build Account Matrix
@@ -53,8 +62,8 @@ jobs:
       - name: Build strategy matrix
         id: strategy
         run: |
-          app="${{ github.event.inputs.application }}"
-          envs_str="${{ github.event.inputs.environments }}"
+          app="${APPLICATION}"
+          envs_str="${ENVIRONMENTS}"
           IFS=', ' read -r -a envs <<< "$envs_str"
           echo "Application: $app"
           echo "Environments: ${envs[@]}"
@@ -69,11 +78,14 @@ jobs:
           echo 'matrix<<EOF' >> $GITHUB_OUTPUT
           echo "${matrix}" >> $GITHUB_OUTPUT
           echo 'EOF' >> $GITHUB_OUTPUT
+
   ami-cleanup:
     name: AMI Cleanup
     runs-on: ubuntu-latest
     needs: build-matrix
-    if: ${{ github.event.inputs.cleanup_type == 'ami' || github.event.inputs.cleanup_type == 'both' }}
+    # On manual runs: obey inputs.cleanup_type.
+    # On push: run (defaults make it a DRY RUN).
+    if: ${{ (github.event_name == 'workflow_dispatch' && (github.event.inputs.cleanup_type == 'ami' || github.event.inputs.cleanup_type == 'both')) || (github.event_name == 'push') }}
     strategy:
       matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
       max-parallel: 1
@@ -84,6 +96,7 @@ jobs:
           account_id="${{ fromJSON(secrets.MODERNISATION_PLATFORM_ENVIRONMENT_MANAGEMENT).account_ids[matrix.account_name] }}"
           role_arn="arn:aws:iam::${account_id}:role/modernisation-platform-oidc-cicd"
           echo "role_arn=${role_arn}" >> $GITHUB_OUTPUT
+
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502
         with:
@@ -94,13 +107,23 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
 
+      # SAFE: do NOT pass 'delete' when DRYRUN is true
       - name: Run AMI Cleanup (Collect)
         run: |
-          app="${{ github.event.inputs.application }}"
-          args="${{ github.event.inputs.ami_cleanup_sh_args }}"
-          scripts/ami_cleanup.sh -a "$app" -s ami_commands.sh $args delete
+          set -euo pipefail
+          app="${APPLICATION}"
+          args="${AMI_ARGS}"
+          if [[ "${DRYRUN}" == 'true' ]]; then
+            echo "[DRY RUN] Collecting AMI delete candidates (no delete arg passed)"
+            scripts/ami_cleanup.sh -a "$app" -s ami_commands.sh $args
+          else
+            echo "[LIVE] Collecting and preparing deletes"
+            scripts/ami_cleanup.sh -a "$app" -s ami_commands.sh $args delete
+          fi
+
+      # Only execute on manual runs with dryrun=false
       - name: Execute AMI Deregistration (if not dryrun)
-        if: ${{ github.event.inputs.dryrun == 'false' }}
+        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.dryrun == 'false' }}
         run: |
           if [[ -f ami_commands.sh ]]; then
             grep 'aws ec2 deregister-image' ami_commands.sh | while read -r cmd; do
@@ -110,11 +133,22 @@ jobs:
           else
             echo "No AMI commands to execute."
           fi
+
+      - name: Upload AMI Commands (Dry-Run Preview)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ami-commands-${{ matrix.account_name }}
+          path: ami_commands.sh
+          if-no-files-found: ignore
+
   ebs-cleanup:
     name: EBS Cleanup
     runs-on: ubuntu-latest
     needs: build-matrix
-    if: ${{ github.event.inputs.cleanup_type == 'ebs' || github.event.inputs.cleanup_type == 'both' }}
+    # On manual runs: obey inputs.cleanup_type.
+    # On push: run (defaults make it a DRY RUN).
+    if: ${{ (github.event_name == 'workflow_dispatch' && (github.event.inputs.cleanup_type == 'ebs' || github.event.inputs.cleanup_type == 'both')) || (github.event_name == 'push') }}
     strategy:
       matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
       max-parallel: 1
@@ -125,6 +159,7 @@ jobs:
           account_id="${{ fromJSON(secrets.MODERNISATION_PLATFORM_ENVIRONMENT_MANAGEMENT).account_ids[matrix.account_name] }}"
           role_arn="arn:aws:iam::${account_id}:role/modernisation-platform-oidc-cicd"
           echo "role_arn=${role_arn}" >> $GITHUB_OUTPUT
+
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502
         with:
@@ -137,10 +172,12 @@ jobs:
 
       - name: Run EBS Cleanup
         run: |
-          months="${{ github.event.inputs.ebs_age_in_months }}"
-          if [[ ${{ github.event.inputs.dryrun }} == 'true' ]]; then
+          set -euo pipefail
+          months="${EBS_MONTHS}"
+          if [[ "${DRYRUN}" == 'true' ]]; then
+            echo "[DRY RUN] Listing unattached EBS volumes (no deletion)"
             scripts/ebs_cleanup.sh -m "$months" unattached
           else
+            echo "[LIVE] Deleting unattached EBS volumes"
             scripts/ebs_cleanup.sh -m "$months" delete
           fi
-       
