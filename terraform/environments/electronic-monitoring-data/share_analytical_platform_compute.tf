@@ -48,7 +48,17 @@ locals {
     "historic_ears_and_sars_int",
     "historic_ears_and_sars_mart",
     "emsys_mvp_stg",
-    "sar_ear_reports_mart"
+    "sar_ear_reports_mart",
+    "preprocessed_alcohol_monitoring",
+    "staged_alcohol_monitoring",
+    "preprocessed_cap_dw",
+    "staged_cap_dw",
+    "preprocessed_emsys_mvp",
+    "staged_emsys_mvp",
+    "preprocessed_emsys_tpims",
+    "staged_emsys_tpims",
+    "preprocessed_scram_alcohol_monitoring",
+    "staged_scram_alcohol_monitoring",
   ] : []
   dev_dbs_to_grant       = local.is-production ? [for db in local.prod_dbs_to_grant : "${db}_historic_dev_dbt"] : []
   dbt_dbs_to_grant       = [for db in local.dbt_dbs : "${db}${local.dbt_suffix}"]
