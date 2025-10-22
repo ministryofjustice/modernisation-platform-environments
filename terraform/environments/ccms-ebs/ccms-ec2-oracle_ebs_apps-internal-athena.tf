@@ -77,6 +77,26 @@ resource "aws_iam_role_policy" "glue_policy" {
   })
 }
 
+# Glue Security Configuration
+resource "aws_glue_security_configuration" "crawler_security_config" {
+  name = "internal-lb-logs-security-config"
+
+  encryption_configuration {
+    cloudwatch_encryption {
+      cloudwatch_encryption_mode = "SSE-S3"
+    }
+
+    job_bookmarks_encryption {
+      job_bookmarks_encryption_mode = "CSE-KMS"
+      kms_key_arn = data.aws_kms_key.ebs_shared.key_id
+    }
+
+    s3_encryption {
+      s3_encryption_mode = "SSE-S3"
+    }
+  }
+}
+
 # Glue Catalog Database
 resource "aws_glue_catalog_database" "logs_database" {
   name = "internal_loadbalancer_access_logs"
@@ -109,8 +129,13 @@ resource "aws_athena_workgroup" "internal_lb_logs_workgroup" {
   name = "internal-lb-logs-workgroup"
 
   configuration {
+    enforce_workgroup_configuration = true
+    publish_cloudwatch_metrics_enabled = true
+
     result_configuration {
       output_location = "s3://${data.aws_s3_bucket.data_bucket.bucket}/results/"
+      encryption_configuration {
+        encryption_option = "SSE_S3"      }
     }
   }
 }
