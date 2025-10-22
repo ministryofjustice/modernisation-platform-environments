@@ -140,3 +140,4 @@ jobs:
           else
             scripts/ebs_cleanup.sh -m "$months" delete
           fi
+          
