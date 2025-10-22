@@ -22,7 +22,7 @@ resource "aws_athena_workgroup" "lb-access-logs" {
   }
 }
 
-# SQL query to creates the table in the athena db
+# SQL query to creates the table in the athena db, these queries needs to be executed manually after creation
 resource "aws_athena_named_query" "main_table_ebsapp" {
   name      = lower(format("%s-%s-create-table", local.application_name, local.environment))
   workgroup = aws_athena_workgroup.lb-access-logs.id
@@ -38,7 +38,7 @@ resource "aws_athena_named_query" "main_table_ebsapp" {
   )
 }
 
-# SQL query to count the number of HTTP GET requests to the loadbalancer grouped by IP
+# SQL query to count the number of HTTP GET requests to the loadbalancer grouped by IP, these queries needs to be executed manually after creation
 resource "aws_athena_named_query" "http_requests_ebsapp" {
   name      = lower(format("%s-%s-http-get-requests-ebsapp", local.application_name, local.environment))
   workgroup = aws_athena_workgroup.lb-access-logs.id
@@ -54,7 +54,7 @@ resource "aws_athena_named_query" "http_requests_ebsapp" {
   )
 }
 
-# SQL query to creates the table in the athena db
+# SQL query to creates the table in the athena db, these queries needs to be executed manually after creation
 resource "aws_athena_named_query" "main_table_ebsapp_internal" {
   name      = lower(format("%s-%s-create-table-internal", local.application_name, local.environment))
   workgroup = aws_athena_workgroup.lb-access-logs.id
@@ -70,7 +70,7 @@ resource "aws_athena_named_query" "main_table_ebsapp_internal" {
   )
 }
 
-# SQL query to count the number of HTTP GET requests to the loadbalancer grouped by IP
+# SQL query to count the number of HTTP GET requests to the loadbalancer grouped by IP, these queries needs to be executed manually after creation
 resource "aws_athena_named_query" "http_requests_ebsapp_internal" {
   name      = lower(format("%s-%s-http-get-requests-ebsapp-internal", local.application_name, local.environment))
   workgroup = aws_athena_workgroup.lb-access-logs.id
