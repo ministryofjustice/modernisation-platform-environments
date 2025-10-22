@@ -1,4 +1,8 @@
 
+# Data sources for account and region information
+data "aws_caller_identity" "current" {}
+data "aws_region" "current" {}
+
 # S3 bucket with data
 data "aws_s3_bucket" "data_bucket" {
   bucket = "ccms-ebs-development-logging"
@@ -16,15 +20,66 @@ resource "aws_iam_role" "glue_role" {
         Service = "glue.amazonaws.com"
       },
       Effect = "Allow",
-      "Sid": "AllowGlueAccessToS3"
+      Sid    = "AllowGlueAccessToS3",
+      Condition = {
+        StringEquals = {
+          "aws:SourceAccount": data.aws_caller_identity.current.account_id
+        },
+        ArnLike = {
+          "aws:SourceArn": "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:crawler/${aws_glue_crawler.internal_lb_logs_crawler.name}"
+        }
+      }
     }]
   })
 }
 
-# IAM Policy Attachment
-resource "aws_iam_role_policy_attachment" "glue_policy_attach" {
-  role       = aws_iam_role.glue_role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
+# Custom IAM policy for Glue
+resource "aws_iam_role_policy" "glue_policy" {
+  name = "glue-crawler-custom-policy"
+  role = aws_iam_role.glue_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "glue:GetTable",
+          "glue:GetTables",
+          "glue:UpdateTable",
+          "glue:CreateTable",
+          "glue:DeleteTable"
+        ]
+        Resource = [
+          "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:catalog",
+          "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:database/${aws_glue_catalog_database.logs_database.name}",
+          "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/${aws_glue_catalog_database.logs_database.name}/*"
+        ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:ListBucket"
+        ]
+        Resource = [
+          data.aws_s3_bucket.data_bucket.arn,
+          "${data.aws_s3_bucket.data_bucket.arn}/*"
+        ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ]
+        Resource = [
+          "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws-glue/crawlers:*"
+        ]
+      }
+    ]
+  })
 }
 
 # Glue Catalog Database
