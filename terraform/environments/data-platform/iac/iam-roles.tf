@@ -100,6 +100,7 @@ module "octo_access_iam_role" {
       resources = [
         module.github_token_secret[0].secret_arn, # This will be replaced with a dedicated OCTO Access GitHub Application
         module.octo_entra_secret[0].secret_arn,
+        module.octo_github_app_secret[0].secret_arn,
         module.octo_slack_token_secret[0].secret_arn
       ]
     }
