@@ -161,14 +161,24 @@ module "ap_database_sharing" {
   new_airflow          = var.new_airflow
 }
 
-module "share_dbs_with_roles" {
+module "share_db_with_roles" {
   source                  = "../lakeformation_database_share"
-  dbs_to_grant            = toset([local.snake-database, "${local.snake-database}_staging"])
+  dbs_to_grant            = toset([local.snake-database,])
   data_bucket_lf_resource = var.data_bucket_lf_resource
   role_arn                = module.ap_database_sharing.iam_role.arn
   de_role_arn             = var.de_role_arn
   db_exists               = var.db_exists
 }
+
+module "share_stg_db_with_roles" {
+  source                  = "../lakeformation_database_share"
+  dbs_to_grant            = toset(["${local.snake-database}_staging"])
+  data_bucket_lf_resource = var.data_bucket_lf_resource
+  role_arn                = module.ap_database_sharing.iam_role.arn
+  de_role_arn             = var.de_role_arn
+  db_exists               = false
+}
+
 
 resource "aws_lakeformation_permissions" "catalog_manage" {
   principal = module.ap_database_sharing.iam_role.arn
