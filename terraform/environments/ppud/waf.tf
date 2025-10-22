@@ -125,7 +125,7 @@ resource "aws_wafv2_ip_set" "ncsc_waf_ip_set" {
   name               = "ncsc-waf-ip-set"
   scope              = "REGIONAL"
   ip_address_version = "IPV4"
-  description        = "List of trusted NCSC & Detectify IP Addresses allowing access via WAF"
+  description        = "List of trusted NCSC and Detectify IP Addresses allowing access via WAF"
   addresses          = local.ncsc_ip_addresses
 
   tags = merge(local.tags,
