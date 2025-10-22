@@ -1,3 +1,59 @@
+# IAM role for Athena
+resource "aws_iam_role" "athena_role" {
+  name = "athena-query-execution-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "athena.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "athena_policy" {
+  name = "athena-query-execution-policy"
+  role = aws_iam_role.athena_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetBucketLocation",
+          "s3:GetObject",
+          "s3:ListBucket",
+          "s3:ListBucketMultipartUploads",
+          "s3:ListMultipartUploadParts",
+          "s3:AbortMultipartUpload",
+          "s3:CreateBucket",
+          "s3:PutObject"
+        ]
+        Resource = [
+          module.s3-bucket-logging.bucket.arn,
+          "${module.s3-bucket-logging.bucket.arn}/*"
+        ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "athena:StartQueryExecution",
+          "athena:GetQueryExecution",
+          "athena:GetQueryResults"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+
 resource "aws_athena_database" "lb-access-logs" {
   name   = "loadbalancer_access_logs"
   bucket = module.s3-bucket-logging.bucket.id
