@@ -1,8 +1,3 @@
-# S3 bucket with data
-data "aws_s3_bucket" "data_bucket" {
-  bucket = "ccms-ebs-development-logging"
-}
-
 # IAM Role for Glue Crawler
 resource "aws_iam_role" "glue_role" {
   name = "glue-crawler-role"
@@ -61,7 +56,7 @@ resource "aws_iam_role_policy" "glue_policy" {
         ]
         Resource = [
           data.aws_s3_bucket.data_bucket.arn,
-          "${data.aws_s3_bucket.data_bucket.arn}/*"
+          "${module.s3-bucket-logging.bucket.id}/*"
         ]
       },
       {
@@ -112,7 +107,7 @@ resource "aws_glue_crawler" "internal_lb_logs_crawler" {
   table_prefix  = "internal_lb_logs"
 
   s3_target {
-    path = "s3://${data.aws_s3_bucket.data_bucket.bucket}/ebsapps-internal-lb/"
+    path = "s3://${module.s3-bucket-logging.bucket.id}/ebsapps-internal-lb/"
   }
 
   schema_change_policy {
@@ -135,9 +130,10 @@ resource "aws_athena_workgroup" "internal_lb_logs_workgroup" {
     publish_cloudwatch_metrics_enabled = true
 
     result_configuration {
-      output_location = "s3://${data.aws_s3_bucket.data_bucket.bucket}/results/"
+      output_location = "s3://${module.s3-bucket-logging.bucket.id}/output/"
       encryption_configuration {
-        encryption_option = "SSE_S3"      }
+        encryption_option = "SSE_S3"
+      }
     }
   }
 }
