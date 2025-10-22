@@ -25,6 +25,7 @@ module "waf" {
  additional_managed_rules = [
     {
       arn             = aws_wafv2_rule_group.wam_waf_acl.arn
+      name            = "custom-wam-waf-rule-group"
       override_action = "none"   # respect the group's action (BLOCK). Use "count" to dry-run.
       priority        = 9        # unique; runs before managed rules at 10..15
     }
