@@ -17,10 +17,10 @@ resource "aws_security_group" "cwa_extract_new" {
 
 resource "aws_security_group_rule" "cwa_extract_egress_oracle_new" {
   type              = "egress"
-  from_port         = 1571
-  to_port           = 1571
+  from_port         = local.environment == "production" ? 2484 : 1571
+  to_port           = local.environment == "production" ? 2484 : 1571
   protocol          = "tcp"
-  cidr_blocks       = [local.application_data.accounts[local.environment].cwa_database_ip]
+  cidr_blocks       = local.application_data.accounts[local.environment].cwa_database_ip
   security_group_id = aws_security_group.cwa_extract_new.id
   description       = "Outbound 1571 Access to CWA DB"
 }
