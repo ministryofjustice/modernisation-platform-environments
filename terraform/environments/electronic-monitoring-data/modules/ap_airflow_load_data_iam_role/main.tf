@@ -163,7 +163,7 @@ module "ap_database_sharing" {
 
 module "share_dbs_with_roles" {
   source                  = "../lakeformation_database_share"
-  dbs_to_grant            = toset([local.snake-database])
+  dbs_to_grant            = toset([local.snake-database, "${local.snake-database}_staging"])
   data_bucket_lf_resource = var.data_bucket_lf_resource
   role_arn                = module.ap_database_sharing.iam_role.arn
   de_role_arn             = var.de_role_arn
