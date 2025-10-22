@@ -59,7 +59,7 @@ resource "aws_lb_listener" "listener_sandbox" {
 resource "aws_lb_listener_rule" "listener_rule_blue" {
   count        = local.is-development ? 1 : 0
   listener_arn = aws_lb_listener.listener_sandbox[0].arn
-  priority     = 10
+  priority     = 20
 
   action {
     target_group_arn = aws_lb_target_group.target_group_fargate_sandbox_blue[0].arn
@@ -76,7 +76,7 @@ resource "aws_lb_listener_rule" "listener_rule_blue" {
 resource "aws_lb_listener_rule" "listener_rule_green" {
   count        = local.is-development ? 1 : 0
   listener_arn = aws_lb_listener.listener_sandbox[0].arn
-  priority     = 10
+  priority     = 30
 
   action {
     target_group_arn = aws_lb_target_group.target_group_fargate_sandbox_green[0].arn
