@@ -177,7 +177,7 @@ module "share_stg_db_with_roles" {
   data_bucket_lf_resource = var.data_bucket_lf_resource
   role_arn                = module.ap_database_sharing.iam_role.arn
   de_role_arn             = var.de_role_arn
-  db_exists               = local.create_stg_db
+  db_exists               = !local.create_stg_db
 }
 
 
