@@ -26,6 +26,8 @@ resource "aws_iam_role" "glue_role" {
       }
     }]
   })
+
+  depends_on = [ aws_glue_crawler.internal_lb_logs_crawler ]
 }
 
 # Custom IAM policy for Glue
