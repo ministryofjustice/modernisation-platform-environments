@@ -92,3 +92,25 @@ module "octo_slack_token_secret" {
     { "credential-expiration" = "none" }
   )
 }
+
+module "octo_github_app_secret" {
+  count = terraform.workspace == "data-platform-development" ? 1 : 0
+
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=f7fef2d8f63f1595c3e2b0ee14a6810dc7bdb9af" # v2.0.0
+
+  name        = "github/octo-access-github-app"
+  description = "https://github.com/settings/apps/office-of-the-cto-access"
+
+  secret_string = jsonencode({
+    app_id          = "CHANGEME"
+    client_id       = "CHANGEME"
+    installation_id = "CHANGEME"
+    private_key     = "CHANGEME"
+  })
+  ignore_secret_changes = true
+
+  tags = merge(
+    local.tags,
+    { "credential-expiration" = "none" }
+  )
+}
