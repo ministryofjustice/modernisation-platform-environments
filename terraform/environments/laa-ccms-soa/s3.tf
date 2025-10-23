@@ -79,15 +79,17 @@ module "s3-bucket-logging" {
 #     filter_suffix = ".log"
 #   }
 # }
-  # statement {
-  #   principals {
-  #     type        = "AWS"
-  #     identifiers = ["arn:aws:iam::652711504416:root"]
-  #   }
-  #   actions   = ["s3:PutObject"]
-  #   resources = ["${module.s3-bucket-logging.bucket.arn}/*"]
-  # }
+
 data "aws_iam_policy_document" "logging_s3_policy" {
+  statement {
+    effect = "Allow"
+      principals {
+        type     = "Service"
+        identifiers = ["logdelivery.elasticloadbalancing.amazonaws.com"]
+      },
+    actions   = ["s3:PutObject"]
+    resources = ["${module.s3-bucket-logging.bucket.arn}/*"]
+  }
   statement {
     effect = "Allow"
     principals {
