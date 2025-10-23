@@ -57,7 +57,7 @@ resource "aws_iam_role_policy" "lambda_elb_policy" {
           "elasticloadbalancing:RegisterTargets",
           "elasticloadbalancing:DeregisterTargets"
         ],
-        Resource = "arn:aws:elasticloadbalancing:eu-west-2:${data.aws_caller_identity.current.account_id}:targetgroup/*"
+        Resource = "*"
       }
     ]
   })
