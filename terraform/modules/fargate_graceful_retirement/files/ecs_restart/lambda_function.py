@@ -1,14 +1,15 @@
 import json
 import os
+import time
 
 import boto3
 
 ssm = boto3.client("ssm")
 ENV = os.environ.get("ENVIRONMENT")
+
 # Use env to determine
 # - SSM circuit breaker path
 # - ECS cluster/service
-# - Logging
 ssm_path = f"/{ENV}/ldap/circuit_breaker/state"
 
 def lambda_handler(event, context):
@@ -47,12 +48,46 @@ def lambda_handler(event, context):
 
                 print(f"Restarting service {service_name} in cluster {cluster_name} for ENV={ENV}")
 
-                # Force a new deployment for the specified service in the specified cluster
-                response = ecs_client.update_service(
-                    cluster=cluster_name,
-                    service=service_name,
-                    forceNewDeployment=True,
-                )
+                # LDAP specific
+                if "ldap" in service_name.lower():
+                    print("LDAP service detected. Initiating circuit breaker...")
+        
+                    param_name = f"/{ENV}/ldap/circuit-breaker"
+                    target_group_arn = os.environ.get("LDAP_NLB_ARN", None)
+
+                    # open circuit breaker
+                    open_circuit_breaker(param_name=param_name)
+                    print(f"Circuit breaker opened for {service_name}")
+
+                    # wait for NLB deregistration to complete
+                    wait_for_deregistration(target_group_arn)
+
+                    # restart LDAP ECS service
+                    print(f"Restart triggered for {service_name}")
+                    ecs_client.update_service(
+                        cluster=cluster_name,
+                        service=service_name,
+                        forceNewDeployment=True
+                    )
+
+                    # running cache warm up queries
+
+                    # now wait for service and its registration again
+                    wait_for_registration(target_group_arn)
+
+                    # finally close circuit breaker
+                    close_circuit_breaker(param_name=param_name)
+                    print(f"Circuit breaker closed for {service_name}")
+
+                else:
+                    # Non-LDAP services – restart immediately
+                    print(f"{service_name} is not LDAP. Skipping circuit breaker.")
+                    # Force a new deployment for the specified service in the specified cluster
+                    response = ecs_client.update_service(
+                        cluster=cluster_name,
+                        service=service_name,
+                        forceNewDeployment=True,
+                    )
                 if os.environ.get("DEBUG_LOGGING", False):
                     print("[DEBUG] Update service response:", response)
             else:
@@ -69,6 +104,38 @@ def lambda_handler(event, context):
         return {"statusCode": 500, "body": json.dumps("Error updating service")}
 
 
+def wait_for_deregistration(target_group_arn):
+    """Wait until all targets in the TG are in 'unused' or 'draining' state."""
+    if target_group_arn is None:
+        print("Empty target group passed.")
+        return
+    
+    print("Waiting for LDAP targets to deregister from NLB...")
+    while True:
+        resp = elbv2.describe_target_health(TargetGroupArn=target_group_arn)
+        active = [
+            t for t in resp["TargetHealthDescriptions"]
+            if t["TargetHealth"]["State"] not in ("draining", "unused")
+        ]
+        if not active:
+            print("All LDAP targets deregistered from NLB.")
+            break
+        print("Still draining... waiting 20 seconds")
+        time.sleep(20)
+
+
+def wait_for_registration(target_group_arn):
+    while True:
+        resp = elbv2.describe_target_health(TargetGroupArn=target_group_arn)
+        healthy = [t for t in resp["TargetHealthDescriptions"]
+                   if t["TargetHealth"]["State"] == "healthy"]
+        if healthy:
+            print("LDAP target healthy again.")
+            break
+        print("Waiting for target to become healthy...")
+        time.sleep(20)
+
+
 def open_circuit_breaker(param_name):
     print(f"Opening circuit breaker {param_name}")
     ssm.put_parameter(Name=param_name, Value="OPEN", Overwrite=True)
@@ -77,8 +144,3 @@ def open_circuit_breaker(param_name):
 def close_circuit_breaker(param_name):
     print(f"Closing circuit breaker {param_name}")
     ssm.put_parameter(Name=param_name, Value="CLOSED", Overwrite=True)
-
-
-def force_ecs_restart(cluster, service):
-    print(f"Forcing new deployment for {service}")
-    ecs.update_service(cluster=cluster, service=service, forceNewDeployment=True)

@@ -37,7 +37,7 @@ def lambda_handler(event, context):
     current_day_of_the_week = days_of_week[time.weekday()]
 
     if current_day_of_the_week == restart_day_of_the_week:
-        days_until_restart = 7
+        # days_until_restart = 7
         logging.debug("[DEBUG] Restart day is today, restarting next week instead.")
     else:
         # get the number of days until the next desired day of the week
