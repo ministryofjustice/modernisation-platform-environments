@@ -20,6 +20,8 @@ resource "aws_lb" "admin" {
   tags = merge(local.tags,
     { Name = lower(format("lb-%s-admin-internal", "${local.application_data.accounts[local.environment].app_name}")) }
   )
+
+  depends_on = [ module.s3-bucket-logging ]
 }
 
 resource "aws_lb_target_group" "admin" {
@@ -92,6 +94,8 @@ resource "aws_lb" "managed" {
   tags = merge(local.tags,
     { Name = lower(format("lb-%s-managed-internal", "${local.application_data.accounts[local.environment].app_name}")) }
   )
+
+  depends_on = [ module.s3-bucket-logging ]
 }
 
 resource "aws_lb_target_group" "managed" {
