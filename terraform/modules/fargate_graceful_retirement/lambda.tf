@@ -22,6 +22,26 @@ resource "aws_iam_role" "lambda_execution_role" {
   })
 }
 
+resource "aws_iam_role_policy" "lambda_ssm_policy" {
+  name = "${var.environment}_lambda_ssm_policy"
+  role = aws_iam_role.lambda_execution_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "ssm:PutParameter",
+          "ssm:GetParameter",
+          "ssm:GetParameters"
+        ]
+        Resource = "arn:aws:ssm:eu-west-2:${data.aws_caller_identity.current.account_id}:parameter/${var.environment}/ldap/circuit-breaker"
+      }
+    ]
+  })
+}
+
 resource "aws_iam_role_policy_attachment" "basic_execution" {
   role       = aws_iam_role.lambda_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
