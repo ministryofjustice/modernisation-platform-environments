@@ -87,7 +87,7 @@ data "aws_iam_policy_document" "logging_s3_policy" {
       type        = "Service"
       identifiers = ["logdelivery.elasticloadbalancing.amazonaws.com"]
     }
-    actions   = ["s3:PutObject"]
+    actions   = ["s3:PutObject","s3:PutObjectAcl"]
     resources = ["${module.s3-bucket-logging.bucket.arn}/*"]
   }
   statement {
@@ -96,7 +96,7 @@ data "aws_iam_policy_document" "logging_s3_policy" {
       type        = "Service"
       identifiers = ["logging.s3.amazonaws.com"]
     }
-    actions   = ["s3:PutObject"]
+    actions   = ["s3:PutObject","s3:PutObjectAcl"]
     resources = ["arn:aws:s3:::${local.application_data.accounts[local.environment].app_name}-${local.environment}-logging/*"]
     condition {
       test     = "StringEquals"
