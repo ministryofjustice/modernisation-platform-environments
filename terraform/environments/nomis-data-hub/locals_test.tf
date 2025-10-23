@@ -83,6 +83,9 @@ locals {
         })
         instance = merge(local.ec2_instances.ndh_mgmt.instance, {
           disable_api_termination = true
+          tags = merge(local.ec2_instances.ndh_mgmt.instance.tags, {
+            patch-manager = "group1"
+          })
         })
         tags = merge(local.ec2_instances.ndh_mgmt.tags, {
           nomis-data-hub-environment = "test"
@@ -119,6 +122,17 @@ locals {
             ]
           }
         ]
+      }
+    }
+
+    patch_manager = {
+      patch_schedules = {
+        group1 = "cron(10 06 ? * TUE *)" # 06:10 for non-prod env's as we have to work around the overnight shutdown  
+      }
+      maintenance_window_duration = 2
+      maintenance_window_cutoff   = 1
+      patch_classifications = {
+        WINDOWS = ["SecurityUpdates", "CriticalUpdates"]
       }
     }
 
