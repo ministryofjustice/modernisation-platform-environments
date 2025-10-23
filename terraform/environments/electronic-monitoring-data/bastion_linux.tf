@@ -195,7 +195,7 @@ module "zip_bastion" {
   subnet_set    = local.subnet_set
   environment   = local.environment
   region        = "eu-west-2"
-  volume_size   = 1000
+  volume_size   = 1500
   # tags
   tags_common = local.tags
   tags_prefix = terraform.workspace
