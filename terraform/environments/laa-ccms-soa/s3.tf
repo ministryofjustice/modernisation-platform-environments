@@ -84,7 +84,7 @@ data "aws_iam_policy_document" "logging_s3_policy" {
   statement {
     effect = "Allow"
     principals {
-      type     = "Service"
+      type        = "Service"
       identifiers = ["logdelivery.elasticloadbalancing.amazonaws.com"]
     }
     actions   = ["s3:PutObject"]
