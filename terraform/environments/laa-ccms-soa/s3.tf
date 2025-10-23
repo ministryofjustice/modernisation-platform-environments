@@ -83,10 +83,10 @@ module "s3-bucket-logging" {
 data "aws_iam_policy_document" "logging_s3_policy" {
   statement {
     effect = "Allow"
-      principals {
-        type     = "Service"
-        identifiers = ["logdelivery.elasticloadbalancing.amazonaws.com"]
-      },
+    principals {
+      type     = "Service"
+      identifiers = ["logdelivery.elasticloadbalancing.amazonaws.com"]
+    }
     actions   = ["s3:PutObject"]
     resources = ["${module.s3-bucket-logging.bucket.arn}/*"]
   }
