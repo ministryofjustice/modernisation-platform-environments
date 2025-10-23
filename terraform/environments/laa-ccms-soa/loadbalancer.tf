@@ -7,6 +7,19 @@ resource "aws_lb" "admin" {
   internal           = true
   subnets            = data.aws_subnets.shared-private.ids
   security_groups    = [aws_security_group.alb_admin.id]
+
+  drop_invalid_header_fields = true
+  enable_deletion_protection = true
+
+  access_logs {
+    bucket  = module.s3-bucket-logging.bucket.id
+    prefix  = local.lb_log_prefix_soa_admin_internal
+    enabled = true
+  }
+
+  tags = merge(local.tags,
+    { Name = lower(format("lb-%s-admin-internal", "${local.application_data.accounts[local.environment].app_name}")) }
+  )
 }
 
 resource "aws_lb_target_group" "admin" {
@@ -66,6 +79,19 @@ resource "aws_lb" "managed" {
   internal           = true
   subnets            = data.aws_subnets.shared-private.ids
   security_groups    = [aws_security_group.alb_managed.id]
+
+  drop_invalid_header_fields = true
+  enable_deletion_protection = true
+
+  access_logs {
+    bucket  = module.s3-bucket-logging.bucket.id
+    prefix  = local.lb_log_prefix_soa_managed_internal
+    enabled = true
+  }
+
+  tags = merge(local.tags,
+    { Name = lower(format("lb-%s-managed-internal", "${local.application_data.accounts[local.environment].app_name}")) }
+  )
 }
 
 resource "aws_lb_target_group" "managed" {
