@@ -5,7 +5,7 @@ module "s3-bucket-logging" {
 
   bucket_name        = local.logging_bucket_name
   versioning_enabled = true
-  bucket_policy      = [aws_s3_bucket_policy.opa-lb-access-logs-policy.policy]
+  bucket_policy      = [aws_s3_bucket_policy.lb_access_logs.policy]
 
   log_bucket = local.logging_bucket_name
   log_prefix = "s3access/${local.logging_bucket_name}"
