@@ -37,6 +37,7 @@ locals {
     "g4s_emsys_mvp",
     "g4s_emsys_tpims",
     "scram_alcohol_monitoring",
+    "g4s_atrium",
   ] : []
 
   prod_dbs_to_grant = local.is-production ? [
@@ -59,6 +60,7 @@ locals {
     "staged_emsys_tpims",
     "preprocessed_scram_alcohol_monitoring",
     "staged_scram_alcohol_monitoring",
+    "g4s_atrium_curated",
   ] : []
   dev_dbs_to_grant       = local.is-production ? [for db in local.prod_dbs_to_grant : "${db}_historic_dev_dbt"] : []
   dbt_dbs_to_grant       = [for db in local.dbt_dbs : "${db}${local.dbt_suffix}"]
