@@ -72,16 +72,6 @@ module "s3-bucket-logging" {
   )
 }
 
-resource "aws_s3_bucket_notification" "logging_bucket_notification" {
-  bucket = module.s3-bucket-logging.bucket.id
-
-  topic {
-    topic_arn     = aws_sns_topic.s3_topic.arn
-    events        = ["s3:ObjectCreated:*"]
-    filter_suffix = ".log"
-  }
-}
-
 data "aws_iam_policy_document" "logging_s3_policy" {
   statement {
     principals {

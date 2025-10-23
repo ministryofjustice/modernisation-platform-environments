@@ -22,18 +22,6 @@ output "aws_athena_workgroup_lb_access_logs_id" {
 
 #
 
-output "aws_athena_named_query_main_table_edrmsapp" {
-  description = "aws_athena_named_query main_table_edrmsapp id"
-  value       = aws_athena_named_query.main_table_edrmsapp.id
-}
-
-#
-
-output "aws_athena_named_query_http_requests_edrmsapp" {
-  description = "aws_athena_named_query http_requests_edrmsapp id"
-  value       = aws_athena_named_query.http_requests_edrmsapp.id
-}
-
 output "aws_athena_named_query_main_table_edrmsapp_internal" {
   description = "aws_athena_named_query main_table_edrmsapp_internal id"
   value       = aws_athena_named_query.main_table_edrmsapp_internal.id
