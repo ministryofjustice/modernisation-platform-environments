@@ -1,7 +1,8 @@
 # Execute the create table queries automatically after creation
 resource "null_resource" "execute_create_table_queries" {
   triggers = {
-    query_ids = "${aws_athena_named_query.main_table_admin_internal.id}", "${aws_athena_named_query.main_table_managed_internal.id}", "${aws_athena_named_query.http_requests_admin_internal.id}", "${aws_athena_named_query.http_requests_managed_internal.id}"
+    query_ids = join(",",["${aws_athena_named_query.main_table_admin_internal.id}", "${aws_athena_named_query.main_table_managed_internal.id}", "${aws_athena_named_query.http_requests_admin_internal.id}", "${aws_athena_named_query.http_requests_managed_internal.id}"
+    ])
   }
 
   provisioner "local-exec" {
