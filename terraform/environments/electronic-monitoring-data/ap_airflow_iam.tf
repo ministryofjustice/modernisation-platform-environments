@@ -631,3 +631,21 @@ module "load_capita_blob_storage" {
   source_data_bucket = module.s3-json-directory-structure-bucket.bucket
   new_airflow        = true
 }
+
+module "load_g4s_atrium_unstructured" {
+  count  = local.is-production || local.is-development ? 1 : 0
+  source = "./modules/ap_airflow_load_data_iam_role"
+
+  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+  de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
+
+  name               = "g4s-atrium-unstructured"
+  environment        = local.environment
+  database_name      = "g4s-atrium-unstructured"
+  secret_code        = jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]
+  oidc_arn           = aws_iam_openid_connect_provider.analytical_platform_compute.arn
+  athena_dump_bucket = module.s3-athena-bucket.bucket
+  cadt_bucket        = module.s3-create-a-derived-table-bucket.bucket
+  source_data_bucket = module.s3-json-directory-structure-bucket.bucket
+  new_airflow        = true
+}
