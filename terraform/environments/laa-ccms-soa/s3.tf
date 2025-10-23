@@ -115,14 +115,6 @@ resource "aws_s3_bucket_policy" "opa-lb-access-logs-policy" {
         }
         Action = "s3:PutObject"
         Resource = "arn:aws:s3:::${module.s3-bucket-logging.bucket.arn}/*"
-      },
-      {
-        Effect =  "Allow"
-        Principal = {
-          Service: "logdelivery.elasticloadbalancing.amazonaws.com"
-        }
-        Action = "s3:PutObject"
-        Resource = "arn:aws:s3:::${module.s3-bucket-logging.bucket.arn}"
       }
     ]
   })
