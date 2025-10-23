@@ -123,20 +123,24 @@ resource "aws_s3_bucket_policy" "opa-lb-access-logs-policy" {
         Resource = "${module.s3-bucket-logging.bucket.arn}"
       },
       {
-        Effect =  "Allow"
+        Sid    = "AllowNLBAccessLogs"
+        Effect = "Allow"
         Principal = {
-          Service: "logdelivery.elasticloadbalancing.amazonaws.com"
+          Service = "elasticloadbalancing.amazonaws.com"
         }
-        Action = "s3:PutObject"
+        Action = [
+          "s3:PutObject",
+          "s3:PutObjectAcl"
+        ]
         Resource = "${module.s3-bucket-logging.bucket.arn}/*"
-      },
-      {
-        Effect =  "Allow"
-        Principal = {
-          Service: "logdelivery.elasticloadbalancing.amazonaws.com"
+        Condition = {
+          StringEquals = {
+            "aws:SourceAccount" = data.aws_caller_identity.current.account_id
+          }
+          ArnLike = {
+            "aws:SourceArn": "arn:aws:elasticloadbalancing:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:loadbalancer/net/*"
+          }
         }
-        Action = "s3:PutObjectAcl"
-        Resource = "${module.s3-bucket-logging.bucket.arn}/*"
       }
     ]
   })
