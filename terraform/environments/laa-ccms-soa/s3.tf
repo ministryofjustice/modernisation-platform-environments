@@ -79,54 +79,26 @@ module "s3-bucket-logging" {
 #     filter_suffix = ".log"
 #   }
 # }
-resource "aws_s3_bucket_policy" "opa-lb-access-logs-policy" {
+resource "aws_s3_bucket_policy" "lb_access_logs" {
   bucket = module.s3-bucket-logging.bucket.id
+
   policy = jsonencode({
     Version = "2012-10-17"
-    Id      = "Policy1660747337396"
     Statement = [
+      # Allow NLB (network) log delivery principal (elasticloadbalancing.amazonaws.com).
+      # If the bucket is in a different account, set the aws:SourceAccount to the LB account id.
       {
-        Sid    = "AWSLogDeliveryWrite"
+        Sid = "AllowNLBLogDelivery"
         Effect = "Allow"
-        Principal = {
-          Service = "delivery.logs.amazonaws.com"
-        }
-        Action   = "s3:PutObject"
-        Resource = "${module.s3-bucket-logging.bucket.arn}/*"
+        Principal = { Service = "elasticloadbalancing.amazonaws.com" }
+        Action    = [ "s3:PutObject", "s3:PutObjectAcl" ]
+        Resource  = "${module.s3-bucket-logging.bucket.arn}/*"
         Condition = {
-          StringEquals = {
-            "s3:x-amz-acl" = "bucket-owner-full-control"
-          }
+          # If bucket is in the same account as the load balancer, this keeps it scoped to your account:
+          StringEquals = { "aws:SourceAccount" = data.aws_caller_identity.current.account_id }
+          # Restrict to network load balancers only (optional but recommended)
+          ArnLike = { "aws:SourceArn" = "arn:aws:elasticloadbalancing:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:loadbalancer/net/*" }
         }
-      },
-      {
-        Sid    = "AWSLogDeliveryAclCheck"
-        Effect = "Allow"
-        Principal = {
-          Service = "delivery.logs.amazonaws.com"
-        }
-        Action   = "s3:GetBucketAcl"
-        Resource = "${module.s3-bucket-logging.bucket.arn}"
-      },
-      {
-        Sid    = "AllowELBLogDelivery"
-        Effect = "Allow"
-        Principal = {
-          Service = "logdelivery.elasticloadbalancing.amazonaws.com"
-        }
-        Action   = "s3:PutObject"
-        Resource = "${module.s3-bucket-logging.bucket.arn}/*"
-      },
-      {
-        Sid    = "AllowNLBLogDelivery"
-        Effect = "Allow"
-        Principal = {
-          Service = "elasticloadbalancing.amazonaws.com"
-        }
-        Action = [
-          "s3:PutObject"
-        ]
-        Resource = "${module.s3-bucket-logging.bucket.arn}/*"
       }
     ]
   })
