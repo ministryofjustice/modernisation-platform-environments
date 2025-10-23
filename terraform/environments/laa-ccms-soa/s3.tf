@@ -83,52 +83,40 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
   bucket = module.s3-bucket-logging.bucket.id
 
   policy = jsonencode({
-    Version = "2012-10-17"
-    Id = "AWSLogDeliveryWrite"
+    Version = "2012-10-17",
     Statement = [
-      # Allow NLB (network) log delivery principal (elasticloadbalancing.amazonaws.com).
-      # If the bucket is in a different account, set the aws:SourceAccount to the LB account id.
       {
-        Sid = "AllowNLBLogDelivery"
-        Effect = "Allow"
-        Principal = { Service = "delivery.logs.amazonaws.com" }
-        Action    = [ "s3:GetBucketAcl" ]
-        Resource  = "${module.s3-bucket-logging.bucket.arn}/*"
+        Sid = "AllowELBLogDeliveryPutObject",
+        Effect = "Allow",
+        Principal = {
+          Service = [
+            "elasticloadbalancing.amazonaws.com",
+            "logdelivery.elasticloadbalancing.amazonaws.com",
+            "delivery.logs.amazonaws.com"
+          ]
+        },
+        Action = [ "s3:PutObject", "s3:PutObjectAcl" ],
+        Resource = "${module.s3-bucket-logging.bucket.arn}/*",
         Condition = {
-          # If bucket is in the same account as the load balancer, this keeps it scoped to your account:
-          StringEquals = { 
-            "s3:x-amz-acl" = "bucket-owner-full-control" 
-          }
-          # Restrict to network load balancers only (optional but recommended)
-          ArnLike = { "aws:SourceArn" = "arn:aws:elasticloadbalancing:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:loadbalancer/net/*" }
-        }
-      },
-      {
-        Sid = "AllowNLBLogDelivery"
-        Effect = "Allow"
-        Principal = { Service = "delivery.logs.amazonaws.com" }
-        Action    = [ "s3:GetBucketAcl" ]
-        Resource  = "${module.s3-bucket-logging.bucket.arn}/*"
-        Condition = {
-          # If bucket is in the same account as the load balancer, this keeps it scoped to your account:
-          StringEquals = { 
+          StringEquals = {
+            "s3:x-amz-acl"     = "bucket-owner-full-control",
             "aws:SourceAccount" = data.aws_caller_identity.current.account_id
+          },
+          ArnLike = {
+            "aws:SourceArn" = "arn:aws:elasticloadbalancing:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:loadbalancer/*/*"
           }
-          # Restrict to network load balancers only (optional but recommended)
-          ArnLike = { "aws:SourceArn" = "arn:aws:elasticloadbalancing:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:loadbalancer/net/*" }
         }
       },
       {
-        Sid = "AllowNLBLogDelivery"
-        Effect = "Allow"
-        Principal = { Service = "delivery.logs.amazonaws.com" }
-        Action    = [ "s3:PutObject" ]
-        Resource  = "${module.s3-bucket-logging.bucket.arn}/*"
+        Sid = "AllowELBLogDeliveryGetBucketAcl",
+        Effect = "Allow",
+        Principal = {
+          Service = [ "elasticloadbalancing.amazonaws.com", "logdelivery.elasticloadbalancing.amazonaws.com", "delivery.logs.amazonaws.com" ]
+        },
+        Action = "s3:GetBucketAcl",
+        Resource = "${module.s3-bucket-logging.bucket.arn}",
         Condition = {
-          # If bucket is in the same account as the load balancer, this keeps it scoped to your account:
           StringEquals = { "aws:SourceAccount" = data.aws_caller_identity.current.account_id }
-          # Restrict to network load balancers only (optional but recommended)
-          ArnLike = { "aws:SourceArn" = "arn:aws:elasticloadbalancing:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:loadbalancer/net/*" }
         }
       }
     ]
