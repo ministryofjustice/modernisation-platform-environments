@@ -5,7 +5,7 @@ module "s3-bucket-logging" {
 
   bucket_name        = local.logging_bucket_name
   versioning_enabled = true
-  bucket_policy      = [data.aws_iam_policy_document.logging_s3_policy.json]
+  bucket_policy      = [aws_iam_policy_document.logging_s3_policy.json]
 
   log_bucket = local.logging_bucket_name
   log_prefix = "s3access/${local.logging_bucket_name}"
@@ -80,28 +80,59 @@ module "s3-bucket-logging" {
 #   }
 # }
 
-data "aws_iam_policy_document" "logging_s3_policy" {
-  statement {
-    effect = "Allow"
-    principals {
-      type        = "Service"
-      identifiers = ["logdelivery.elasticloadbalancing.amazonaws.com"]
-    }
-    actions   = ["s3:PutObject","s3:PutObjectAcl"]
-    resources = ["${module.s3-bucket-logging.bucket.arn}/*"]
-  }
-  statement {
-    effect = "Allow"
-    principals {
-      type        = "Service"
-      identifiers = ["logging.s3.amazonaws.com"]
-    }
-    actions   = ["s3:PutObject","s3:PutObjectAcl"]
-    resources = ["arn:aws:s3:::${local.application_data.accounts[local.environment].app_name}-${local.environment}-logging/*"]
-    condition {
-      test     = "StringEquals"
-      variable = "aws:SourceAccount"
-      values   = ["${data.aws_caller_identity.current.account_id}"]
-    }
-  }
+resource "aws_iam_policy_document" "logging_s3_policy" {
+  bucket = module.s3-bucket-logging.bucket.id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Sid    = "AllowELBv2ToPutAccessLogs"
+        Effect = "Allow"
+        Principal = {
+          Service = "elasticloadbalancing.amazonaws.com"
+        }
+        Action = [
+          "s3:PutObject",
+          "s3:PutObjectAcl"
+        ]
+        Resource = "${module.s3-bucket-logging.bucket.arn}/*"
+        Condition = {
+          StringEquals = {
+            "aws:SourceAccount" = data.aws_caller_identity.current.account_id
+          }
+          ArnLike = {
+            # restrict to ELBv2 loadbalancers in this account/region
+            "aws:SourceArn" = "arn:aws:elasticloadbalancing:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:loadbalancer/*/*"
+          }
+        }
+      }
+    ]
+  })
 }
+
+# data "aws_iam_policy_document" "logging_s3_policy" {
+#   statement {
+#     effect = "Allow"
+#     principals {
+#       type        = "Service"
+#       identifiers = ["logdelivery.elasticloadbalancing.amazonaws.com"]
+#     }
+#     actions   = ["s3:PutObject","s3:PutObjectAcl"]
+#     resources = ["${module.s3-bucket-logging.bucket.arn}/*"]
+#   }
+#   statement {
+#     effect = "Allow"
+#     principals {
+#       type        = "Service"
+#       identifiers = ["logging.s3.amazonaws.com"]
+#     }
+#     actions   = ["s3:PutObject","s3:PutObjectAcl"]
+#     resources = ["arn:aws:s3:::${local.application_data.accounts[local.environment].app_name}-${local.environment}-logging/*"]
+#     condition {
+#       test     = "StringEquals"
+#       variable = "aws:SourceAccount"
+#       values   = ["${data.aws_caller_identity.current.account_id}"]
+#     }
+#   }
+# }
