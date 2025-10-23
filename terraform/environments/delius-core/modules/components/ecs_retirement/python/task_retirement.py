@@ -83,9 +83,9 @@ def service_message_markup(resources, env, event):
 
     def detect_environment_from_cluster(cluster_name):
         cluster_name = cluster_name.lower()
-        if "prod" in cluster_name:
+        if "-prod-" in cluster_name:
             return "prod"
-        elif "preprod" in cluster_name:
+        elif "-preprod-" in cluster_name:
             return "preprod"
         elif "stage" in cluster_name:
             return "stage"
