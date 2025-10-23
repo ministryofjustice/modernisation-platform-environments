@@ -96,7 +96,10 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
         Resource  = "${module.s3-bucket-logging.bucket.arn}/*"
         Condition = {
           # If bucket is in the same account as the load balancer, this keeps it scoped to your account:
-          StringEquals = { "s3:x-amz-acl" = "bucket-owner-full-control", "aws:SourceAccount" = data.aws_caller_identity.current.account_id }
+          StringEquals = { 
+            "s3:x-amz-acl" = "bucket-owner-full-control" 
+            "aws:SourceAccount" = data.aws_caller_identity.current.account_id 
+          }
           # Restrict to network load balancers only (optional but recommended)
           ArnLike = { "aws:SourceArn" = "arn:aws:elasticloadbalancing:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:loadbalancer/net/*" }
         }
