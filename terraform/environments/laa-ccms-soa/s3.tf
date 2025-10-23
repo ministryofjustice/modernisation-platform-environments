@@ -98,10 +98,11 @@ data "aws_iam_policy_document" "logging_s3_policy" {
     }
     actions   = ["s3:PutObject"]
     resources = ["arn:aws:s3:::${local.application_data.accounts[local.environment].app_name}-${local.environment}-logging/*"]
-    condition {
-      test     = "StringEquals"
-      variable = "aws:SourceAccount"
-      values   = ["${data.aws_caller_identity.current.account_id}"]
-    }
   }
 }
+
+    # condition {
+    #   test     = "StringEquals"
+    #   variable = "aws:SourceAccount"
+    #   values   = ["${data.aws_caller_identity.current.account_id}"]
+    # }
