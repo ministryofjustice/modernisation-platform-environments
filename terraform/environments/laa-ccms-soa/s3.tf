@@ -100,20 +100,6 @@ resource "aws_s3_bucket_policy" "opa-lb-access-logs-policy" {
         }
       },
       {
-        Sid    = "AWSLogDeliveryWrite"
-        Effect = "Allow"
-        Principal = {
-          Service = "delivery.logs.amazonaws.com"
-        }
-        Action   = "s3:PutObjectAcl"
-        Resource = "${module.s3-bucket-logging.bucket.arn}/*"
-        Condition = {
-          StringEquals = {
-            "s3:x-amz-acl" = "bucket-owner-full-control"
-          }
-        }
-      },
-      {
         Sid    = "AWSLogDeliveryAclCheck"
         Effect = "Allow"
         Principal = {
@@ -123,24 +109,24 @@ resource "aws_s3_bucket_policy" "opa-lb-access-logs-policy" {
         Resource = "${module.s3-bucket-logging.bucket.arn}"
       },
       {
-        Sid    = "AllowNLBAccessLogs"
+        Sid    = "AllowELBLogDelivery"
+        Effect = "Allow"
+        Principal = {
+          Service = "logdelivery.elasticloadbalancing.amazonaws.com"
+        }
+        Action   = "s3:PutObject"
+        Resource = "${module.s3-bucket-logging.bucket.arn}/*"
+      },
+      {
+        Sid    = "AllowNLBLogDelivery"
         Effect = "Allow"
         Principal = {
           Service = "elasticloadbalancing.amazonaws.com"
         }
         Action = [
-          "s3:PutObject",
-          "s3:PutObjectAcl"
+          "s3:PutObject"
         ]
         Resource = "${module.s3-bucket-logging.bucket.arn}/*"
-        Condition = {
-          StringEquals = {
-            "aws:SourceAccount" = data.aws_caller_identity.current.account_id
-          }
-          ArnLike = {
-            "aws:SourceArn": "arn:aws:elasticloadbalancing:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:loadbalancer/net/*"
-          }
-        }
       }
     ]
   })
