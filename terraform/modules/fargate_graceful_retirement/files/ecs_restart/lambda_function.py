@@ -5,6 +5,7 @@ import time
 import boto3
 
 ssm = boto3.client("ssm")
+elbv2 = boto3.client("elbv2", region_name="eu-west-2")
 ENV = os.environ.get("ENVIRONMENT")
 
 # Use env to determine
