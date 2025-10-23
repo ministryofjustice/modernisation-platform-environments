@@ -92,7 +92,7 @@ resource "aws_s3_bucket_policy" "opa-lb-access-logs-policy" {
           Service = "delivery.logs.amazonaws.com"
         }
         Action   = "s3:PutObject"
-        Resource = "arn:aws:s3:::${module.s3-bucket-logging.bucket.arn}/*"
+        Resource = "${module.s3-bucket-logging.bucket.arn}/*"
         Condition = {
           StringEquals = {
             "s3:x-amz-acl" = "bucket-owner-full-control"
@@ -106,7 +106,7 @@ resource "aws_s3_bucket_policy" "opa-lb-access-logs-policy" {
           Service = "delivery.logs.amazonaws.com"
         }
         Action   = "s3:GetBucketAcl"
-        Resource = "arn:aws:s3:::${module.s3-bucket-logging.bucket.arn}"
+        Resource = "${module.s3-bucket-logging.bucket.arn}"
       },
       {
         Effect =  "Allow"
@@ -114,7 +114,7 @@ resource "aws_s3_bucket_policy" "opa-lb-access-logs-policy" {
           Service: "logdelivery.elasticloadbalancing.amazonaws.com"
         }
         Action = "s3:PutObject"
-        Resource = "arn:aws:s3:::${module.s3-bucket-logging.bucket.arn}/*"
+        Resource = "${module.s3-bucket-logging.bucket.arn}/*"
       }
     ]
   })
