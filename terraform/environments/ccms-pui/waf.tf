@@ -19,6 +19,9 @@ resource "aws_wafv2_ip_set" "pui_waf_ip_set" {
       local.application_data.accounts[local.environment].lz_aws_workspace_public_nat_gateway_a,
       local.application_data.accounts[local.environment].lz_aws_workspace_public_nat_gateway_b,
       local.application_data.accounts[local.environment].lz_aws_workspace_public_nat_gateway_c,
+      "35.176.254.38/32",  # Temp AWS PROD Workspace
+      "35.177.173.197/32", # Temp AWS PROD Workspace
+      "52.56.212.11/32"    # Temp AWS PROD Workspace
     ]
   )
 
@@ -41,6 +44,34 @@ resource "aws_wafv2_web_acl" "pui_web_acl" {
   }
 
   rule {
+    name     = "AWS-AWSManagedRulesCommonRuleSet"
+    priority = 2
+
+    override_action {
+      none {}
+    }
+
+    statement {
+      managed_rule_group_statement {
+        name        = "AWSManagedRulesCommonRuleSet"
+        vendor_name = "AWS"
+
+        # rule_action_override {
+        #   name = "NoUserAgent_HEADER"
+        #   action_to_use {
+        #     allow {}
+        #   }
+        # }
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "AWS-AWSManagedRulesCommonRuleSet"
+      sampled_requests_enabled   = true
+    }
+  }
+  rule {
     name = "${local.application_name}-waf-ip-set"
 
     priority = 1
@@ -61,34 +92,26 @@ resource "aws_wafv2_web_acl" "pui_web_acl" {
     }
   }
 
-  rule {
-    name     = "AWS-AWSManagedRulesCommonRuleSet"
-    priority = 2
+  # rule {
+  #   name     = "allow-uk-traffic-only"
+  #   priority = 3
 
-    override_action {
-      none {}
-    }
+  #   statement {
+  #     geo_match_statement {
+  #       country_codes = ["GB"]
+  #     }
+  #   }
 
-    statement {
-      managed_rule_group_statement {
-        name        = "AWSManagedRulesCommonRuleSet"
-        vendor_name = "AWS"
+  #   action {
+  #     allow {}
+  #   }
 
-        rule_action_override {
-          name = "NoUserAgent_HEADER"
-          action_to_use {
-            allow {}
-          }
-        }
-      }
-    }
-
-    visibility_config {
-      cloudwatch_metrics_enabled = true
-      metric_name                = "AWS-AWSManagedRulesCommonRuleSet"
-      sampled_requests_enabled   = true
-    }
-  }
+  #   visibility_config {
+  #     cloudwatch_metrics_enabled = true
+  #     metric_name                = "allow-uk-traffic-only"
+  #     sampled_requests_enabled   = true
+  #   }
+  # }
 
 
   tags = merge(local.tags,

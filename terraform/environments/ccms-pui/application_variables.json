@@ -124,7 +124,8 @@
       "logging_level_com_ezgov": "info",
       "logging_level_com_legalservices": "info",
       "logging_level_uk_gov_laa_opa": "info",
-      "logging_level_com_ezgov_roof_view_vim_control_BundleAwareText": "error"
+      "logging_level_com_ezgov_roof_view_vim_control_BundleAwareText": "error",
+      "cortex_deps_bucket_name": "ccms-shared"
     }
   }
 }

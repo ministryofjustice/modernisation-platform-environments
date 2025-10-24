@@ -55,10 +55,6 @@ resource "aws_lambda_function" "cclf_provider_load" {
     aws_lambda_layer_version.lambda_layer_oracle_python.arn
   ]
 
-  dead_letter_config {
-    target_arn = aws_sqs_queue.cclf_provider_dlq.arn
-  }
-
   vpc_config {
     security_group_ids = [aws_security_group.cclf_provider_load_sg.id]
     subnet_ids         = [data.aws_subnet.data_subnets_a.id]
