@@ -105,6 +105,20 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
  policy = jsonencode({
    Version = "2012-10-17",
    Statement = [
+    {
+        Sid    = "EnforceTLSv12orHigher",
+        Effect = "Deny",
+        Principal = {
+          AWS = "*"
+        },
+        Action   = "s3:*",
+        Resource =  ["${module.s3-bucket-logging.bucket.arn}/*", "${module.s3-bucket-logging.bucket.arn}" ],
+        Condition = {
+          NumericLessThan = {
+            "s3:TlsVersion" = "1.2"
+          }
+        }
+      },
      {
        Sid = "AllowELBLogDeliveryPutObject",
        Effect = "Allow",
@@ -115,6 +129,12 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
        },
        Action = [ "s3:PutObject" ],
        Resource = "${module.s3-bucket-logging.bucket.arn}/*",
+       Condition = {
+          StringEquals = {
+            "s3:x-amz-acl"      = "bucket-owner-full-control",
+            "aws:SourceAccount" = data.aws_caller_identity.current.account_id
+          }
+        }
      }
    ]
  })
