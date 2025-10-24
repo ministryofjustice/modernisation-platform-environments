@@ -77,3 +77,26 @@ resource "aws_s3_bucket_public_access_block" "rekognition_bucket_policy" {
   ignore_public_acls      = true
   restrict_public_buckets = true
 }
+
+# server access logs for rekognition bucket
+resource "aws_s3_bucket" "rekognition_logs_bucket" {
+  bucket = local.rekog_logs_s3_bucket_name
+}
+
+# configure server access logging for the rekognition upload bucket
+# logs are written to the rekognition-logs bucket
+resource "aws_s3_bucket_logging" "rekognition_bucket_logging" {
+  bucket = aws_s3_bucket.rekognition_bucket.bucket
+
+  target_bucket = aws_s3_bucket.rekognition_logs_bucket.bucket
+  target_prefix = "${local.rekog_logs_prefix}/"
+
+  # use date-based partitioning for log objects
+  # object key format should be /logs/[SourceAccountId]/[SourceRegion]/[SourceBucket]/[YYYY]/[MM]/[DD]/[YYYY]-[MM]-[DD]-[hh]-[mm]-[ss]-[UniqueString]
+  # see https://docs.aws.amazon.com/AmazonS3/latest/userguide/ServerLogs.html
+  target_object_key_format {
+    partitioned_prefix {
+      partition_date_source = "EventTime"
+    }
+  }
+}
