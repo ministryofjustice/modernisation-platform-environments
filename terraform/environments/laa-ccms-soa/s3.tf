@@ -7,9 +7,10 @@ module "s3-bucket-logging" {
   versioning_enabled = true
   bucket_policy      = [aws_s3_bucket_policy.lb_access_logs.policy]
 
-  log_bucket = local.logging_bucket_name
-  log_prefix = "s3access/${local.logging_bucket_name}"
-
+  log_bucket     = local.logging_bucket_name
+  log_prefix     = "s3access/${local.logging_bucket_name}"
+  sse_algorithm  = "AES256"
+  custom_kms_key = ""
   # Refer to the below section "Replication" before enabling replication
   replication_enabled = false
   # Below three variables and providers configuration are only relevant if 'replication_enabled' is set to true
