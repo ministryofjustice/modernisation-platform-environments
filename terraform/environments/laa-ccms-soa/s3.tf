@@ -71,15 +71,6 @@ module "s3-bucket-logging" {
   )
 }
 
-# resource "aws_s3_bucket_notification" "logging_bucket_notification" {
-#   bucket = module.s3-bucket-logging.bucket.id
-
-#   topic {
-#     topic_arn     = aws_sns_topic.s3_topic.arn
-#     events        = ["s3:ObjectCreated:*"]
-#     filter_suffix = ".log"
-#   }
-# }
 resource "aws_s3_bucket_policy" "lb_access_logs" {
   bucket = module.s3-bucket-logging.bucket.id
 
@@ -132,20 +123,3 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
     ]
   })
 }
-
-# data "aws_iam_policy_document" "logging_s3_policy" {
-#   statement {
-#     effect = "Allow"
-#     principals {
-#       type        = "Service"
-#       identifiers = ["elasticloadbalancing.amazonaws.com", "logging.s3.amazonaws.com"]
-#     }
-#     actions   = ["s3:PutObject","s3:PutObjectAcl"]
-#     resources = ["${module.s3-bucket-logging.bucket.arn}","${module.s3-bucket-logging.bucket.arn}/*"]
-#     condition {
-#       test     = "StringEquals"
-#       variable = "aws:SourceAccount"
-#       values   = ["${data.aws_caller_identity.current.account_id}"]
-#     }
-#   }
-# }
