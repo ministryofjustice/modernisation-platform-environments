@@ -13,12 +13,12 @@ resource "aws_lb" "admin" {
 
   access_logs {
     bucket  = module.s3-bucket-logging.bucket.id
-    prefix  = local.lb_log_prefix_soa_admin_internal
+    prefix  = local.lb_log_prefix_soa_admin
     enabled = true
   }
 
   tags = merge(local.tags,
-    { Name = lower(format("lb-%s-admin-internal", "${local.application_data.accounts[local.environment].app_name}")) }
+    { Name = lower(format("lb-%s-admin", "${local.application_data.accounts[local.environment].app_name}")) }
   )
 
   depends_on = [module.s3-bucket-logging]
@@ -87,12 +87,12 @@ resource "aws_lb" "managed" {
 
   access_logs {
     bucket  = module.s3-bucket-logging.bucket.id
-    prefix  = local.lb_log_prefix_soa_managed_internal
+    prefix  = local.lb_log_prefix_soa_managed
     enabled = true
   }
 
   tags = merge(local.tags,
-    { Name = lower(format("lb-%s-managed-internal", "${local.application_data.accounts[local.environment].app_name}")) }
+    { Name = lower(format("lb-%s-managed", "${local.application_data.accounts[local.environment].app_name}")) }
   )
 
   depends_on = [module.s3-bucket-logging]

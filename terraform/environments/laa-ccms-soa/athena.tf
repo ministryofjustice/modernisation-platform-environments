@@ -32,7 +32,7 @@ resource "aws_athena_named_query" "main_table_admin" {
     "./templates/create_table.sql",
     {
       bucket     = module.s3-bucket-logging.bucket.id
-      key        = local.lb_log_prefix_soa_admin_internal
+      key        = local.lb_log_prefix_soa_admin
       account_id = data.aws_caller_identity.current.id
       region     = data.aws_region.current.id
     }
@@ -45,10 +45,10 @@ resource "aws_athena_named_query" "tls_requests_admin" {
   workgroup = aws_athena_workgroup.lb-access-logs.id
   database  = aws_athena_database.lb-access-logs.name
   query = templatefile(
-    "./templates/lb_internal_tls_version_gets.sql",
+    "./templates/lb_tls_version_gets.sql",
     {
       bucket     = module.s3-bucket-logging.bucket.id
-      key        = local.lb_log_prefix_soa_admin_internal
+      key        = local.lb_log_prefix_soa_admin
       account_id = data.aws_caller_identity.current.id
       region     = data.aws_region.current.id
     }
@@ -63,7 +63,7 @@ resource "aws_athena_named_query" "main_table_managed" {
     "./templates/create_table.sql",
     {
       bucket     = module.s3-bucket-logging.bucket.id
-      key        = local.lb_log_prefix_soa_managed_internal
+      key        = local.lb_log_prefix_soa_managed
       account_id = data.aws_caller_identity.current.id
       region     = data.aws_region.current.id
     }
@@ -75,10 +75,10 @@ resource "aws_athena_named_query" "tls_requests_managed" {
   workgroup = aws_athena_workgroup.lb-access-logs.id
   database  = aws_athena_database.lb-access-logs.name
   query = templatefile(
-    "./templates/lb_internal_tls_version_gets.sql",
+    "./templates/lb_tls_version_gets.sql",
     {
       bucket     = module.s3-bucket-logging.bucket.id
-      key        = local.lb_log_prefix_soa_managed_internal
+      key        = local.lb_log_prefix_soa_managed
       account_id = data.aws_caller_identity.current.id
       region     = data.aws_region.current.id
     }
