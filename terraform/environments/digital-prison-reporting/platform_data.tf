@@ -85,21 +85,21 @@ data "aws_subnet" "private_subnets_c" {
 data "aws_subnet" "public_subnets_a" {
   vpc_id = data.aws_vpc.shared.id
   tags = {
-    dpr-name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public-${data.aws_region.current.name}a"
+    "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public-${data.aws_region.current.name}a"
   }
 }
 
 data "aws_subnet" "public_subnets_b" {
   vpc_id = data.aws_vpc.shared.id
   tags = {
-    dpr-name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public-${data.aws_region.current.name}b"
+    "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public-${data.aws_region.current.name}b"
   }
 }
 
 data "aws_subnet" "public_subnets_c" {
   vpc_id = data.aws_vpc.shared.id
   tags = {
-    dpr-name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public-${data.aws_region.current.name}c"
+    "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public-${data.aws_region.current.name}c"
   }
 }
 
