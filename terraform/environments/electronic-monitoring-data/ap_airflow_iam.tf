@@ -163,6 +163,7 @@ module "load_alcohol_monitoring_database" {
   oidc_arn           = aws_iam_openid_connect_provider.analytical_platform_compute.arn
   athena_dump_bucket = module.s3-athena-bucket.bucket
   cadt_bucket        = module.s3-create-a-derived-table-bucket.bucket
+  new_airflow        = true
 }
 
 module "load_orca_database" {
@@ -199,6 +200,7 @@ module "load_atrium_database" {
   oidc_arn           = aws_iam_openid_connect_provider.analytical_platform_compute.arn
   athena_dump_bucket = module.s3-athena-bucket.bucket
   cadt_bucket        = module.s3-create-a-derived-table-bucket.bucket
+  new_airflow        = true
 }
 
 module "load_atv_database" {
@@ -269,6 +271,49 @@ module "load_emsys_tpims_database" {
   environment          = local.environment
   database_name        = "g4s-emsys-tpims"
   path_to_data         = "/g4s_emsys_tpims"
+  source_data_bucket   = module.s3-dms-target-store-bucket.bucket
+  secret_code          = jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]
+  oidc_arn             = aws_iam_openid_connect_provider.analytical_platform_compute.arn
+  athena_dump_bucket   = module.s3-athena-bucket.bucket
+  cadt_bucket          = module.s3-create-a-derived-table-bucket.bucket
+  max_session_duration = 12 * 60 * 60
+
+  new_airflow = true
+}
+
+
+module "load_lcm_archive_database" {
+  count  = local.is-production ? 1 : 0
+  source = "./modules/ap_airflow_load_data_iam_role"
+
+  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+  de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
+
+  name                 = "lcm-archive"
+  environment          = local.environment
+  database_name        = "g4s-lcm-archive"
+  path_to_data         = "/g4s_lcm_archive"
+  source_data_bucket   = module.s3-dms-target-store-bucket.bucket
+  secret_code          = jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]
+  oidc_arn             = aws_iam_openid_connect_provider.analytical_platform_compute.arn
+  athena_dump_bucket   = module.s3-athena-bucket.bucket
+  cadt_bucket          = module.s3-create-a-derived-table-bucket.bucket
+  max_session_duration = 12 * 60 * 60
+
+  new_airflow = true
+}
+
+module "load_centurion_database" {
+  count  = local.is-production ? 1 : 0
+  source = "./modules/ap_airflow_load_data_iam_role"
+
+  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+  de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
+
+  name                 = "centurion"
+  environment          = local.environment
+  database_name        = "g4s-centurion"
+  path_to_data         = "/g4s_centurion"
   source_data_bucket   = module.s3-dms-target-store-bucket.bucket
   secret_code          = jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]
   oidc_arn             = aws_iam_openid_connect_provider.analytical_platform_compute.arn
@@ -567,4 +612,22 @@ module "full_reload_servicenow" {
   db_exists   = true
   new_airflow = true
   full_reload = true
+}
+
+module "load_capita_blob_storage" {
+  count  = local.is-production || local.is-development ? 1 : 0
+  source = "./modules/ap_airflow_load_data_iam_role"
+
+  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+  de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
+
+  name               = "capita-blob-storage"
+  environment        = local.environment
+  database_name      = "capita-blob-storage"
+  secret_code        = jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]
+  oidc_arn           = aws_iam_openid_connect_provider.analytical_platform_compute.arn
+  athena_dump_bucket = module.s3-athena-bucket.bucket
+  cadt_bucket        = module.s3-create-a-derived-table-bucket.bucket
+  source_data_bucket = module.s3-json-directory-structure-bucket.bucket
+  new_airflow        = true
 }

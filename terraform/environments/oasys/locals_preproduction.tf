@@ -2,7 +2,8 @@ locals {
 
   baseline_presets_preproduction = {
     options = {
-      enable_xsiam_s3_integration = true
+      enable_xsiam_cloudwatch_integration = true
+      enable_xsiam_s3_integration         = true
       sns_topics = {
         pagerduty_integrations = {
           pagerduty = "oasys-preproduction"
@@ -75,6 +76,9 @@ locals {
           instance_profile_policies = concat(local.ec2_instances.bip.config.instance_profile_policies, [
             "Ec2PreprodBipPolicy",
           ])
+        })
+        instance = merge(local.ec2_instances.bip.instance, {
+          ami = "ami-0d206b8546ea2b68a" # to prevent instances being re-created due to recreated AMI
         })
         tags = merge(local.ec2_instances.bip.tags, {
           bip-db-hostname     = "pp-oasys-db-a"

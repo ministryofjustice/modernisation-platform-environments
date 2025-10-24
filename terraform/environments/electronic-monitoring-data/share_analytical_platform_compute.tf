@@ -18,7 +18,8 @@ locals {
     "intermediate_mdss",
     "datamart",
     "derived",
-    "testing",
+    "testing", # delete this one
+    "test_results",
     "serco_servicenow_deduped",
     "serco_servicenow_curated",
     "serco_fms",
@@ -30,6 +31,16 @@ locals {
     "allied_mdss",
     "serco_servicenow",
   ]
+  historic_source_dbs = local.is-production ? [
+    "capita_alcohol_monitoring",
+    "g4s_cap_dw",
+    "g4s_emsys_mvp",
+    "g4s_emsys_tpims",
+    "scram_alcohol_monitoring",
+    "g4s_atrium",
+    "g4s_centurion",
+  ] : []
+
   prod_dbs_to_grant = local.is-production ? [
     "am_stg",
     "cap_dw_stg",
@@ -39,13 +50,25 @@ locals {
     "historic_ears_and_sars_int",
     "historic_ears_and_sars_mart",
     "emsys_mvp_stg",
-    "sar_ear_reports_mart"
+    "sar_ear_reports_mart",
+    "preprocessed_alcohol_monitoring",
+    "staged_alcohol_monitoring",
+    "preprocessed_cap_dw",
+    "staged_cap_dw",
+    "preprocessed_emsys_mvp",
+    "staged_emsys_mvp",
+    "preprocessed_emsys_tpims",
+    "staged_emsys_tpims",
+    "preprocessed_scram_alcohol_monitoring",
+    "staged_scram_alcohol_monitoring",
+    "g4s_atrium_curated",
+    "g4s_centurion_curated",
   ] : []
   dev_dbs_to_grant       = local.is-production ? [for db in local.prod_dbs_to_grant : "${db}_historic_dev_dbt"] : []
   dbt_dbs_to_grant       = [for db in local.dbt_dbs : "${db}${local.dbt_suffix}"]
   live_feed_dbs_to_grant = [for db in local.live_feeds_dbs : "${db}${local.db_suffix}"]
   dbs_to_grant           = toset(flatten([local.prod_dbs_to_grant, local.dev_dbs_to_grant, local.dbt_dbs_to_grant]))
-  existing_dbs_to_grant  = toset(local.live_feed_dbs_to_grant)
+  existing_dbs_to_grant  = toset(flatten([local.live_feed_dbs_to_grant, local.historic_source_dbs]))
 }
 
 # Source Analytics DBT Secrets

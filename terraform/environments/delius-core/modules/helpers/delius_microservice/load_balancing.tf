@@ -123,6 +123,7 @@ resource "aws_security_group" "delius_microservices_service_nlb" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "from_vpc" {
+  description       = "In from Shared VPC"
   cidr_ipv4         = var.account_config.shared_vpc_cidr
   ip_protocol       = "-1"
   security_group_id = aws_security_group.delius_microservices_service_nlb.id
@@ -130,6 +131,7 @@ resource "aws_vpc_security_group_ingress_rule" "from_vpc" {
 
 resource "aws_vpc_security_group_egress_rule" "nlb_to_ecs_service" {
   for_each                     = toset([for _, v in var.container_port_config : tostring(v.containerPort)])
+  description                  = "Out to ECS"
   ip_protocol                  = "TCP"
   from_port                    = each.value
   to_port                      = each.value
@@ -177,7 +179,7 @@ resource "aws_route53_record" "services_nlb_r53_record" {
 resource "aws_vpc_security_group_ingress_rule" "nlb_custom_rules" {
   for_each                     = { for index, rule in var.nlb_ingress_security_group_ids : index => rule }
   security_group_id            = aws_security_group.delius_microservices_service_nlb.id
-  description                  = "custom rule"
+  description                  = lookup(each.value, "description", "custom rule")
   from_port                    = each.value.port
   to_port                      = each.value.port
   ip_protocol                  = each.value.ip_protocol
@@ -188,7 +190,7 @@ resource "aws_vpc_security_group_ingress_rule" "nlb_custom_rules" {
 resource "aws_vpc_security_group_egress_rule" "nlb_custom_rules" {
   for_each                     = { for index, rule in var.nlb_egress_security_group_ids : index => rule }
   security_group_id            = aws_security_group.delius_microservices_service_nlb.id
-  description                  = "custom rule"
+  description                  = lookup(each.value, "description", "custom rule")
   from_port                    = each.value.port
   to_port                      = each.value.port
   ip_protocol                  = each.value.ip_protocol

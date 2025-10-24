@@ -43,7 +43,7 @@
       "PPUD_Target": "PPUD",
       "patch_group": "prod_win_patch",
       "patch_maintenance_window_name": "prod_patch_maintenance_window",
-      "patch_maintenance_schedule_cron": "cron(0 20 ? * 3#4 *)",
+      "patch_maintenance_schedule_cron": "cron(0 20 ? * 3#3 *)",
       "patch_maintenance_window_duration": 4,
       "maintenance_window_target_name": "prod_patch_maintenance_window_target",
       "maintenance_window_target_description": "This is the production patch maintenance window target",

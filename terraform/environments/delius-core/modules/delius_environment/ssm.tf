@@ -16,11 +16,11 @@
 
 locals {
   # use a diff app name only when env = training for ssm vars and ssm bucket
-  normalized_app_name = var.env_name == "training" ? "delius-core" : "${var.account_info.application_name}"
+  normalized_app_name = var.env_name == "training" ? "delius-core" : var.account_info.application_name
 
   ssm_app_prefix = format("%s-%s", local.normalized_app_name, var.env_name)
 
-  app_alias_ssm_bucket = var.env_name == "training" ? "delius" : "${var.account_info.application_name}"
+  app_alias_ssm_bucket = var.env_name == "training" ? "delius" : var.account_info.application_name
 
   bucket_prefix_final = "${local.app_alias_ssm_bucket}-${var.env_name}-ssm-sessions"
 }
@@ -368,7 +368,7 @@ resource "aws_ssm_parameter" "delius_core_merge_db_pool_password" {
 ######################################
 module "s3_bucket_ssm_sessions" {
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
 
   bucket_prefix      = local.bucket_prefix_final
   versioning_enabled = false

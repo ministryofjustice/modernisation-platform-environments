@@ -32,9 +32,27 @@ locals {
       }
     }
 
+    cloudwatch_dashboards = {
+      "CloudWatch-Default" = {
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.lb,
+          local.cloudwatch_dashboard_widget_groups.all_ec2,
+          local.cloudwatch_dashboard_widget_groups.db,
+          local.cloudwatch_dashboard_widget_groups.cms,
+          local.cloudwatch_dashboard_widget_groups.app,
+          local.cloudwatch_dashboard_widget_groups.web,
+          local.cloudwatch_dashboard_widget_groups.webadmin,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ssm_command,
+        ]
+      }
+    }
+
     ec2_instances = {
 
       pd-ncr-app-1 = merge(local.ec2_instances.bip_app, {
+        cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_app_prod
         config = merge(local.ec2_instances.bip_app.config, {
           availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.ec2_instances.bip_app.config.instance_profile_policies, [
@@ -47,6 +65,7 @@ locals {
         })
       })
       pd-ncr-app-2 = merge(local.ec2_instances.bip_app, {
+        cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_app_prod
         config = merge(local.ec2_instances.bip_app.config, {
           availability_zone = "eu-west-2b"
           instance_profile_policies = concat(local.ec2_instances.bip_app.config.instance_profile_policies, [
@@ -59,6 +78,7 @@ locals {
         })
       })
       pd-ncr-app-3 = merge(local.ec2_instances.bip_app, {
+        cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_app_prod
         config = merge(local.ec2_instances.bip_app.config, {
           availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.ec2_instances.bip_app.config.instance_profile_policies, [
@@ -71,6 +91,7 @@ locals {
         })
       })
       pd-ncr-app-4 = merge(local.ec2_instances.bip_app, {
+        cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_app_prod
         config = merge(local.ec2_instances.bip_app.config, {
           availability_zone = "eu-west-2b"
           instance_profile_policies = concat(local.ec2_instances.bip_app.config.instance_profile_policies, [
@@ -128,6 +149,7 @@ locals {
       })
 
       pd-ncr-cms-1 = merge(local.ec2_instances.bip_cms, {
+        cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_app_prod
         config = merge(local.ec2_instances.bip_cms.config, {
           availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.ec2_instances.bip_cms.config.instance_profile_policies, [
@@ -140,6 +162,7 @@ locals {
       })
 
       pd-ncr-cms-2 = merge(local.ec2_instances.bip_cms, {
+        cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_app_prod
         config = merge(local.ec2_instances.bip_cms.config, {
           availability_zone = "eu-west-2b"
           instance_profile_policies = concat(local.ec2_instances.bip_cms.config.instance_profile_policies, [
@@ -152,6 +175,7 @@ locals {
       })
 
       pd-ncr-webadmin-1 = merge(local.ec2_instances.bip_webadmin, {
+        cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_web_prod
         config = merge(local.ec2_instances.bip_webadmin.config, {
           availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.ec2_instances.bip_webadmin.config.instance_profile_policies, [
@@ -164,6 +188,7 @@ locals {
       })
 
       pd-ncr-web-1 = merge(local.ec2_instances.bip_web, {
+        cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_web_prod
         config = merge(local.ec2_instances.bip_web.config, {
           availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.ec2_instances.bip_web.config.instance_profile_policies, [
@@ -176,6 +201,7 @@ locals {
       })
 
       pd-ncr-web-2 = merge(local.ec2_instances.bip_web, {
+        cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_web_prod
         config = merge(local.ec2_instances.bip_web.config, {
           availability_zone = "eu-west-2b"
           instance_profile_policies = concat(local.ec2_instances.bip_web.config.instance_profile_policies, [
@@ -188,6 +214,7 @@ locals {
       })
 
       pd-ncr-web-3 = merge(local.ec2_instances.bip_web, {
+        cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_web_prod
         config = merge(local.ec2_instances.bip_web.config, {
           availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.ec2_instances.bip_web.config.instance_profile_policies, [
@@ -200,6 +227,7 @@ locals {
       })
 
       pd-ncr-web-4 = merge(local.ec2_instances.bip_web, {
+        cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_web_prod
         config = merge(local.ec2_instances.bip_web.config, {
           availability_zone = "eu-west-2b"
           instance_profile_policies = concat(local.ec2_instances.bip_web.config.instance_profile_policies, [
@@ -275,7 +303,6 @@ locals {
             ]
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/sap/bip/pd/*",
-              "arn:aws:secretsmanager:*:*:secret:/sap/bods/pd/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*PD/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/PD*/*",
             ]
@@ -315,7 +342,9 @@ locals {
         }
         listeners = merge(local.lbs.private.listeners, {
           http-7777 = merge(local.lbs.private.listeners.http-7777, {
-            alarm_target_group_names = []
+            alarm_target_group_names = [
+              "private-pd-http-7777"
+            ]
             rules = {
               web = {
                 priority = 200
@@ -373,7 +402,10 @@ locals {
         }
         listeners = merge(local.lbs.public.listeners, {
           https = merge(local.lbs.public.listeners.https, {
-            alarm_target_group_names = []
+            alarm_target_group_names = [
+              "pd-http-7010",
+              "pd-http-7777",
+            ]
             rules = {
               webadmin = {
                 priority = 100
@@ -465,7 +497,6 @@ locals {
       "/oracle/database/DRBISYS"  = local.secretsmanager_secrets.db
       "/oracle/database/DRBIAUD"  = local.secretsmanager_secrets.db
       "/sap/bip/pd"               = local.secretsmanager_secrets.bip
-      "/sap/bods/pd"              = local.secretsmanager_secrets.bods
     }
   }
 }

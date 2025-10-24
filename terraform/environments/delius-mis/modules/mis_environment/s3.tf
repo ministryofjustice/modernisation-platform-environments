@@ -6,7 +6,7 @@ data "aws_organizations_organization" "root_account" {}
 module "s3-dfi-report-bucket" { #tfsec:ignore:aws-s3-enable-versioning
   count = var.dfi_report_bucket_config != null ? 1 : 0
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v8.2.2"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
   providers = {
     aws                    = aws
     aws.bucket-replication = aws
@@ -83,7 +83,7 @@ data "aws_iam_policy_document" "dfi_report_bucket_policy" {
 
 module "s3_lb_logs_bucket" {
   count  = var.lb_config != null ? 1 : 0
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v8.2.2"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
   providers = {
     aws                    = aws
     aws.bucket-replication = aws

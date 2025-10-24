@@ -13,7 +13,7 @@ locals {
       cloudwatch_log_group_names = [
         "cwagent-oracle-listener-log",
       ]
-      destination_http_secret_name                 = "/xsiam/http_endpoint_token_linux_syslog"
+      destination_http_secret_name                 = "/xsiam/http_endpoint_token_linux_oracle_listener"
       destination_http_endpoint_ssm_parameter_name = "/xsiam/http_endpoint_url"
     }
     linux-syslog = {

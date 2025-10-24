@@ -34,13 +34,13 @@ locals {
   nginx_records = [
   ]
 
-  nginx_records_pre_migration = [
-    "",
-    "adjudicationpanel",
-    "charity",
-    "consumercreditappeals",
-    "estateagentappeals",
+  nginx_records_to_cloudfront = [
+    "siac",
     "fhsaa",
+    "estateagentappeals",
+    "consumercreditappeals",
+    "charity",
+    "adjudicationpanel"
   ]
 
   www_records = [
@@ -53,6 +53,16 @@ locals {
   ]
 
   production_zone_id = data.aws_route53_zone.production_zone.zone_id
+}
+
+resource "aws_route53_record" "nginx_instances_to_cloudfront" {
+  count    = local.is-production ? length(local.nginx_records_to_cloudfront) : 0
+  provider = aws.core-network-services
+  zone_id  = local.production_zone_id
+  name     = local.nginx_records_to_cloudfront[count.index]
+  type     = "CNAME"
+  ttl      = 300
+  records  = [aws_cloudfront_distribution.tribunals_distribution.domain_name]
 }
 
 # 'A' records for sftp services currently routed to the existing EC2 Tribunals instance in DSD account via static ip address
@@ -101,21 +111,6 @@ resource "aws_route53_record" "afd_instances_migrated" {
   type     = "CNAME"
   ttl      = 300
   records  = [aws_cloudfront_distribution.tribunals_distribution.domain_name]
-}
-
-resource "aws_route53_record" "nginx_instances_pre_migration" {
-  #checkov:skip=CKV2_AWS_23:"A record points to existing NGINX ALB in pre-migration environment"
-  count    = local.is-production ? length(local.nginx_records_pre_migration) : 0
-  provider = aws.core-network-services
-  zone_id  = local.production_zone_id
-  name     = local.nginx_records_pre_migration[count.index]
-  type     = "A"
-
-  alias {
-    name                   = "tribunals-nginx-1184258455.eu-west-1.elb.amazonaws.com"
-    zone_id                = "Z32O12XQLNTSW2"
-    evaluate_target_health = false
-  }
 }
 
 # 'A' records for tribunals www. URLs redirects to existing entries - subtract the "www."
