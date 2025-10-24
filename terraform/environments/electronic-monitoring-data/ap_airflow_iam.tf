@@ -662,7 +662,7 @@ module "load_integrity_customdb_database" {
 
   name                 = "integrity_customdb"
   environment          = local.environment
-  database_name        = "g4s-integrity_customdb"
+  database_name        = "g4s-integrity-customdb"
   path_to_data         = "/g4s_integrity_customdb"
   source_data_bucket   = module.s3-dms-target-store-bucket.bucket
   secret_code          = jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]
