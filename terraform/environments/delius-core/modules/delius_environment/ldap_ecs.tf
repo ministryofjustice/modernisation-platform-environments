@@ -377,3 +377,45 @@ resource "aws_cloudwatch_log_group" "ldap_automation" {
   retention_in_days = 7
   tags              = var.tags
 }
+
+resource "aws_cloudwatch_log_data_protection_policy" "ldap_automation" {
+  log_group_name = aws_cloudwatch_log_group.ldap_automation.name
+
+  policy_document = jsonencode({
+    Name        = "data-protection-policy",
+    Description = "",
+    Version     = "2021-06-01",
+    Statement = [
+      {
+        Sid = "audit-policy",
+        DataIdentifier = [
+          "MatchSshaHashes"
+        ],
+        Operation = {
+          Audit = {
+            FindingsDestination = {}
+          }
+        }
+      },
+      {
+        Sid = "redact-policy",
+        DataIdentifier = [
+          "MatchSshaHashes"
+        ],
+        Operation = {
+          Deidentify = {
+            MaskConfig = {}
+          }
+        }
+      }
+    ],
+    Configuration = {
+      CustomDataIdentifier = [
+        {
+          Name  = "MatchSshaHashes",
+          Regex = "{ssha}[A-Za-z0-9+/]+={0,2}"
+        }
+      ]
+    }
+  })
+}
