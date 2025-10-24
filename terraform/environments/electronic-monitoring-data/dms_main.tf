@@ -61,7 +61,7 @@ module "dms_second_task" {
     "civica_orca",
     "g4s_atrium",
     "g4s_cap_dw",
-    "g4s_centurion"
+    "g4s_centurion",
     "g4s_emsys_mvp",
     "g4s_emsys_tpims",
     "g4s_integrity",
