@@ -21,7 +21,7 @@ resource "aws_lb" "admin" {
     { Name = lower(format("lb-%s-admin-internal", "${local.application_data.accounts[local.environment].app_name}")) }
   )
 
-  depends_on = [ module.s3-bucket-logging ]
+  depends_on = [ aws_s3_bucket_policy.lb_access_logs ]
 }
 
 resource "aws_lb_target_group" "admin" {
@@ -95,7 +95,7 @@ resource "aws_lb" "managed" {
     { Name = lower(format("lb-%s-managed-internal", "${local.application_data.accounts[local.environment].app_name}")) }
   )
 
-  depends_on = [ module.s3-bucket-logging ]
+  depends_on = [ aws_s3_bucket_policy.lb_access_logs ]
 }
 
 resource "aws_lb_target_group" "managed" {

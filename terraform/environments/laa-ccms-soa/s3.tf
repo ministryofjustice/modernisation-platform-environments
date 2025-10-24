@@ -80,46 +80,52 @@ module "s3-bucket-logging" {
 #   }
 # }
 resource "aws_s3_bucket_policy" "lb_access_logs" {
-  bucket = module.s3-bucket-logging.bucket.id
+ bucket = module.s3-bucket-logging.bucket.id
 
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Sid = "AllowELBLogDeliveryPutObject",
-        Effect = "Allow",
-        Principal = {
-          Service = [
-            "logdelivery.elasticloadbalancing.amazonaws.com",
-            "delivery.logs.amazonaws.com"
-          ]
-        },
-        Action = [ "s3:PutObject", "s3:PutObjectAcl" ],
-        Resource = "${module.s3-bucket-logging.bucket.arn}/AWSLogs/${data.aws_caller_identity.current.account_id}/*",
-        Condition = {
-          StringEquals = {
-            "s3:x-amz-acl"     = "bucket-owner-full-control",
-            "aws:SourceAccount" = data.aws_caller_identity.current.account_id
-          },
-          ArnLike = {
-            "aws:SourceArn" = "arn:aws:elasticloadbalancing:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:loadbalancer/*/*"
-          }
-        }
-      },
-      {
-        Sid = "AllowELBLogDeliveryGetBucketAcl",
-        Effect = "Allow",
-        Principal = {
-          Service = [ "logdelivery.elasticloadbalancing.amazonaws.com", "delivery.logs.amazonaws.com" ]
-        },
-        Action = "s3:GetBucketAcl",
-        Resource = "${module.s3-bucket-logging.bucket.arn}/AWSLogs/${data.aws_caller_identity.current.account_id}/*",
-        Condition = {
-          StringEquals = { "aws:SourceAccount" = data.aws_caller_identity.current.account_id }
-        }
-      }
-    ]
-  })
+ policy = jsonencode({
+   Version = "2012-10-17",
+   Statement = [
+     {
+       Sid = "AllowELBLogDeliveryPutObject",
+       Effect = "Allow",
+       Principal = {
+         Service = [
+           "logdelivery.elasticloadbalancing.amazonaws.com",
+           "delivery.logs.amazonaws.com"
+         ]
+       },
+       Action = [ "s3:PutObject", "s3:PutObjectAcl" ],
+       Resource = "${module.s3-bucket-logging.bucket.arn}/AWSLogs/${data.aws_caller_identity.current.account_id}/*",
+       Condition = {
+         StringEquals = {
+           "s3:x-amz-acl"      = "bucket-owner-full-control",
+           "aws:SourceAccount" = data.aws_caller_identity.current.account_id
+         },
+         ArnLike = {
+           "aws:SourceArn" = "arn:aws:elasticloadbalancing:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:loadbalancer/*/*"
+         }
+       }
+     },
+     {
+       Sid = "AllowELBLogDeliveryGetBucketAcl",
+       Effect = "Allow",
+       Principal = {
+         Service = [
+           "elasticloadbalancing.amazonaws.com",
+           "logdelivery.elasticloadbalancing.amazonaws.com",
+           "delivery.logs.amazonaws.com"
+         ]
+       },
+       Action = "s3:GetBucketAcl",
+       Resource = "${module.s3-bucket-logging.bucket.arn}",
+       Condition = {
+         StringEquals = {
+           "aws:SourceAccount" = data.aws_caller_identity.current.account_id
+         }
+       }
+     }
+   ]
+ })
 }
 
 # data "aws_iam_policy_document" "logging_s3_policy" {
