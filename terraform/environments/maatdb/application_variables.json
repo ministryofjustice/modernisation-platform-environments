@@ -5,7 +5,7 @@
       "port": "1521",
       "allocated_storage": 300,
       "engine": "oracle-se2",
-      "engine_version": "19.0.0.0.ru-2025-01.rur-2025-01.r1",
+      "engine_version": "19.0.0.0.ru-2025-07.rur-2025-07.r1",
       "instance_class": "db.t3.medium",
       "allow_major_version_upgrade": false,
       "auto_minor_version_upgrade": false,
