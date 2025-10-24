@@ -5,7 +5,7 @@ SELECT tls_protocol_version,
          COUNT(tls_protocol_version) AS 
          num_connections,
          client_ip
-FROM "nlb_logs"
+FROM "nlb_managed_logs"
 WHERE from_iso8601_timestamp(time) > current_timestamp - interval '1' day 
 and tls_protocol_version < 'tlsv13'
 GROUP BY tls_protocol_version, client_ip

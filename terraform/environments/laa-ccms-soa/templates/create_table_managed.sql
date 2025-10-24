@@ -1,4 +1,4 @@
-CREATE EXTERNAL TABLE IF NOT EXISTS nlb_logs (
+CREATE EXTERNAL TABLE IF NOT EXISTS nlb_managed_logs (
             type string,
             version string,
             time string,

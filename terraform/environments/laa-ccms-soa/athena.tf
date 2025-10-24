@@ -29,7 +29,7 @@ resource "aws_athena_named_query" "main_table_admin" {
   workgroup = aws_athena_workgroup.lb-access-logs.id
   database  = aws_athena_database.lb-access-logs.name
   query = templatefile(
-    "./templates/create_table.sql",
+    "./templates/create_table_admin.sql",
     {
       bucket     = module.s3-bucket-logging.bucket.id
       key        = local.lb_log_prefix_soa_admin
@@ -45,7 +45,7 @@ resource "aws_athena_named_query" "tls_requests_admin" {
   workgroup = aws_athena_workgroup.lb-access-logs.id
   database  = aws_athena_database.lb-access-logs.name
   query = templatefile(
-    "./templates/lb_tls_version_gets.sql",
+    "./templates/lb_tls_version_admin_gets.sql",
     {
       bucket     = module.s3-bucket-logging.bucket.id
       key        = local.lb_log_prefix_soa_admin
@@ -60,7 +60,7 @@ resource "aws_athena_named_query" "main_table_managed" {
   workgroup = aws_athena_workgroup.lb-access-logs.id
   database  = aws_athena_database.lb-access-logs.name
   query = templatefile(
-    "./templates/create_table.sql",
+    "./templates/create_table_managed.sql",
     {
       bucket     = module.s3-bucket-logging.bucket.id
       key        = local.lb_log_prefix_soa_managed
@@ -75,7 +75,7 @@ resource "aws_athena_named_query" "tls_requests_managed" {
   workgroup = aws_athena_workgroup.lb-access-logs.id
   database  = aws_athena_database.lb-access-logs.name
   query = templatefile(
-    "./templates/lb_tls_version_gets.sql",
+    "./templates/lb_tls_version_managed_gets.sql",
     {
       bucket     = module.s3-bucket-logging.bucket.id
       key        = local.lb_log_prefix_soa_managed
