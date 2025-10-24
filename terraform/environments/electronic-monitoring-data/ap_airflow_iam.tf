@@ -614,7 +614,6 @@ module "full_reload_servicenow" {
   full_reload = true
 }
 
-
 module "load_capita_blob_storage" {
   count  = local.is-production || local.is-development ? 1 : 0
   source = "./modules/ap_airflow_load_data_iam_role"
