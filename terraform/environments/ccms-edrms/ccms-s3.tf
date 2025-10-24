@@ -7,7 +7,7 @@ module "s3-bucket-logging" {
 
   bucket_name        = local.logging_bucket_name
   versioning_enabled = true
-  bucket_policy      = [data.aws_iam_policy_document.logging_s3_policy.json]
+  bucket_policy      = [aws_s3_bucket_policy.lb_access_logs.policy]
 
   log_bucket = local.logging_bucket_name
   log_prefix = "s3access/${local.logging_bucket_name}"
@@ -72,27 +72,59 @@ module "s3-bucket-logging" {
   )
 }
 
-data "aws_iam_policy_document" "logging_s3_policy" {
-  statement {
-    principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::652711504416:root"]
-    }
-    actions   = ["s3:PutObject"]
-    resources = ["${module.s3-bucket-logging.bucket.arn}/*"]
-  }
-  statement {
-    effect = "Allow"
-    principals {
-      type        = "Service"
-      identifiers = ["logging.s3.amazonaws.com"]
-    }
-    actions   = ["s3:PutObject"]
-    resources = ["arn:aws:s3:::ccms-ebs-${local.environment}-logging/*"]
-    condition {
-      test     = "StringEquals"
-      variable = "aws:SourceAccount"
-      values   = ["${data.aws_caller_identity.current.account_id}"]
-    }
-  }
+# data "aws_iam_policy_document" "logging_s3_policy" {
+#   statement {
+#     principals {
+#       type        = "AWS"
+#       identifiers = ["arn:aws:iam::652711504416:root"]
+#     }
+#     actions   = ["s3:PutObject"]
+#     resources = ["${module.s3-bucket-logging.bucket.arn}/*"]
+#   }
+#   statement {
+#     effect = "Allow"
+#     principals {
+#       type        = "Service"
+#       identifiers = ["logging.s3.amazonaws.com"]
+#     }
+#     actions   = ["s3:PutObject"]
+#     resources = ["arn:aws:s3:::ccms-ebs-${local.environment}-logging/*"]
+#     condition {
+#       test     = "StringEquals"
+#       variable = "aws:SourceAccount"
+#       values   = ["${data.aws_caller_identity.current.account_id}"]
+#     }
+#   }
+# }
+
+resource "aws_s3_bucket_policy" "lb_access_logs" {
+ bucket = module.s3-bucket-logging.bucket.id
+
+ policy = jsonencode({
+   Version = "2012-10-17",
+   Statement = [
+     {
+       Sid = "AllowELBLogDeliveryPutObject",
+       Effect = "Allow",
+       Principal = {
+         Service = [
+           "logdelivery.elasticloadbalancing.amazonaws.com"
+         ]
+       },
+       Action = [ "s3:PutObject" ],
+       Resource = "${module.s3-bucket-logging.bucket.arn}/*",
+     }
+   ]
+ })
 }
+
+
+      #  Condition = {
+      #    StringEquals = {
+      #      "s3:x-amz-acl"      = "bucket-owner-full-control",
+      #      "aws:SourceAccount" = data.aws_caller_identity.current.account_id
+      #    },
+      #    ArnLike = {
+      #      "aws:SourceArn" = "arn:aws:elasticloadbalancing:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:loadbalancer/*/*"
+      #    }
+      #  }
