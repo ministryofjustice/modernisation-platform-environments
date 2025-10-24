@@ -90,11 +90,12 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
         Effect = "Allow",
         Principal = {
           Service = [
+            "logdelivery.elasticloadbalancing.amazonaws.com",
             "delivery.logs.amazonaws.com"
           ]
         },
         Action = [ "s3:PutObject", "s3:PutObjectAcl" ],
-        Resource = "${module.s3-bucket-logging.bucket.arn}/*",
+        Resource = "${module.s3-bucket-logging.bucket.arn}/AWSLogs/${data.aws_caller_identity.current.account_id}/*",
         Condition = {
           StringEquals = {
             "s3:x-amz-acl"     = "bucket-owner-full-control",
@@ -112,7 +113,7 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
           Service = [ "elasticloadbalancing.amazonaws.com", "logdelivery.elasticloadbalancing.amazonaws.com", "delivery.logs.amazonaws.com" ]
         },
         Action = "s3:GetBucketAcl",
-        Resource = "${module.s3-bucket-logging.bucket.arn}",
+        Resource = "${module.s3-bucket-logging.bucket.arn}/AWSLogs/${data.aws_caller_identity.current.account_id}/*",
         Condition = {
           StringEquals = { "aws:SourceAccount" = data.aws_caller_identity.current.account_id }
         }
