@@ -1,8 +1,9 @@
 data "template_file" "launch-template" {
   template = file("${path.module}/templates/user-data.sh")
   vars = {
-    cluster_name = "${local.application_name}-cluster"
-    efs_id       = aws_efs_file_system.oia-storage.id
+    cluster_name       = "${local.application_name}-cluster"
+    efs_id             = aws_efs_file_system.oia-storage.id
+    deploy_environment = local.environment
   }
 }
 
