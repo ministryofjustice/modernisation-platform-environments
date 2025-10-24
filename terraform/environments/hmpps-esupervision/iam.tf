@@ -100,5 +100,5 @@ data "aws_iam_policy_document" "rekognition_logs_bucket_policy_document" {
 
 resource "aws_s3_bucket_policy" "rekognition_logs_bucket_policy" {
   bucket = aws_s3_bucket.rekognition_logs_bucket.bucket
-  policy = data.aws_iam_policy_document.rekognition_logs_bucket_policy_document
+  policy = data.aws_iam_policy_document.rekognition_logs_bucket_policy_document.json
 }

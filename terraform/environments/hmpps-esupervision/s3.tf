@@ -86,7 +86,7 @@ resource "aws_s3_bucket" "rekognition_logs_bucket" {
 # configure server access logging for the rekognition upload bucket
 # logs are written to the rekognition-logs bucket
 resource "aws_s3_bucket_logging" "rekognition_bucket_logging" {
-  bucket = aws_s3_bucket.rekognition_bucket
+  bucket = aws_s3_bucket.rekognition_bucket.bucket
 
   target_bucket = aws_s3_bucket.rekognition_logs_bucket.bucket
   target_prefix = "${local.rekog_logs_prefix}/"
