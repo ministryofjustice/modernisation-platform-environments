@@ -38,7 +38,7 @@ resource "aws_instance" "tariffdb" {
   vpc_security_group_ids = aws_security_group.tariff_db_prod_security_group[*].id
   key_name               = aws_key_pair.key_pair_db[0].key_name
 
-/*
+  /*
   ebs_block_device {
     device_name           = "xvde"
     delete_on_termination = true
@@ -121,7 +121,7 @@ data "aws_subnet" "subnet_az" {
 
 resource "aws_ebs_volume" "tariffdb_storage" {
   for_each = local.environment == "production" ? {
-    for pair in setproduct(keys(local.subnets_a_b_map), local.tarrifdb_volume_layout) :
+    for pair in setproduct(keys(local.subnets_a_b_map), local.tariffdb_volume_layout) :
     "${pair[0]}-${pair[1].device_name}" => {
       instance_key = pair[0]
       volume_data  = pair[1]
@@ -131,13 +131,13 @@ resource "aws_ebs_volume" "tariffdb_storage" {
   size              = each.value.volume_data.size
   type              = "gp3"
   tags = {
-    Name      = "TariffDB-${each.value.instance_key}-volume-${each.value.volume_data.device_name}"
+    Name = "TariffDB-${each.value.instance_key}-volume-${each.value.volume_data.device_name}"
   }
 }
 
 resource "aws_volume_attachment" "tariffdb_attachment" {
   for_each = local.environment == "production" ? {
-    for pair in setproduct(keys(local.subnets_a_b_map), local.tarrifdb_volume_layout) :
+    for pair in setproduct(keys(local.subnets_a_b_map), local.tariffdb_volume_layout) :
     "${pair[0]}-${pair[1].device_name}" => {
       instance_key = pair[0]
       volume_data  = pair[1]
