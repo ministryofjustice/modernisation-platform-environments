@@ -97,9 +97,9 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
         Condition = {
           StringEquals = {
             "s3:x-amz-acl"      = "bucket-owner-full-control",
-            "aws:SourceAccount" = data.aws_caller_identity.current.account_id
+            "aws:SourceAccount" = [ "data.aws_caller_identity.current.account_id" ]
           },
-          ArnLike = { "aws:SourceArn" = "arn:aws:elasticloadbalancing:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:loadbalancer/net/*" }
+          ArnLike = { "aws:SourceArn" = [ "arn:aws:elasticloadbalancing:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:loadbalancer/net/*" ] }
         }
       },
       {
@@ -113,9 +113,9 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
         Condition = {
           StringEquals = {
             "s3:x-amz-acl"      = "bucket-owner-full-control",
-            "aws:SourceAccount" = data.aws_caller_identity.current.account_id
+            "aws:SourceAccount" = [ "data.aws_caller_identity.current.account_id" ]
           },
-          ArnLike = { "aws:SourceArn" = "arn:aws:elasticloadbalancing:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:loadbalancer/net/*" }
+          ArnLike = { "aws:SourceArn" = [ "arn:aws:elasticloadbalancing:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:loadbalancer/net/*" ] }
         }
       }
     ]
