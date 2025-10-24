@@ -100,9 +100,6 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
           StringEquals = {
             "s3:x-amz-acl"     = "bucket-owner-full-control",
             "aws:SourceAccount" = data.aws_caller_identity.current.account_id
-          },
-          ArnLike = {
-            "aws:SourceArn" = "arn:aws:elasticloadbalancing:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:loadbalancer/*/*"
           }
         }
       },
@@ -115,10 +112,7 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
         Action = "s3:GetBucketAcl",
         Resource = "${module.s3-bucket-logging.bucket.arn}",
         Condition = {
-          StringEquals = { "aws:SourceAccount" = data.aws_caller_identity.current.account_id },
-          ArnLike = {
-            "aws:SourceArn" = "arn:aws:elasticloadbalancing:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:loadbalancer/*/*"
-          }
+          StringEquals = { "aws:SourceAccount" = data.aws_caller_identity.current.account_id }
         }
       }
     ]
