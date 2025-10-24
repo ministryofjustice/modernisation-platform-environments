@@ -87,32 +87,32 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
     Version = "2012-10-17",
     Statement = [
       {
-        Sid = "AllowELBLogDeliveryPutObject",
+        Sid    = "AWSLogDeliveryWrite",
         Effect = "Allow",
         Principal = {
-          Service = [
-            "logdelivery.elasticloadbalancing.amazonaws.com"
-          ]
+          Service = "delivery.logs.amazonaws.com"
         },
-        Action = [ "s3:PutObject" ],
-        Resource = "${module.s3-bucket-logging.bucket.arn}/*",
+        Action   = "s3:PutObject",
+        Resource = "${module.s3-bucket-logging.bucket.arn}/AWSLogs/${data.aws_caller_identity.current.account_id}/*",
         Condition = {
           StringEquals = {
-            "s3:x-amz-acl"     = "bucket-owner-full-control",
+            "s3:x-amz-acl"      = "bucket-owner-full-control",
             "aws:SourceAccount" = data.aws_caller_identity.current.account_id
           }
         }
       },
       {
-        Sid = "AllowELBLogDeliveryGetBucketAcl",
+        Sid    = "AWSLogDeliveryAclCheck",
         Effect = "Allow",
         Principal = {
-          Service = [ "delivery.logs.amazonaws.com" ]
+          Service = "delivery.logs.amazonaws.com"
         },
-        Action = "s3:GetBucketAcl",
-        Resource = "${module.s3-bucket-logging.bucket.arn}",
+        Action   = "s3:GetBucketAcl",
+        Resource = module.s3-bucket-logging.bucket.arn,
         Condition = {
-          StringEquals = { "aws:SourceAccount" = data.aws_caller_identity.current.account_id }
+          StringEquals = {
+            "aws:SourceAccount" = data.aws_caller_identity.current.account_id
+          }
         }
       }
     ]
