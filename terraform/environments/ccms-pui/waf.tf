@@ -19,9 +19,9 @@ resource "aws_wafv2_ip_set" "pui_waf_ip_set" {
       local.application_data.accounts[local.environment].lz_aws_workspace_public_nat_gateway_a,
       local.application_data.accounts[local.environment].lz_aws_workspace_public_nat_gateway_b,
       local.application_data.accounts[local.environment].lz_aws_workspace_public_nat_gateway_c,
-      "35.176.254.38/32", # Temp AWS PROD Workspace
+      "35.176.254.38/32",  # Temp AWS PROD Workspace
       "35.177.173.197/32", # Temp AWS PROD Workspace
-      "52.56.212.11/32" # Temp AWS PROD Workspace
+      "52.56.212.11/32"    # Temp AWS PROD Workspace
     ]
   )
 
@@ -89,6 +89,27 @@ resource "aws_wafv2_web_acl" "pui_web_acl" {
     visibility_config {
       cloudwatch_metrics_enabled = true
       metric_name                = "AWS-AWSManagedRulesCommonRuleSet"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  rule {
+    name     = "allow-uk-traffic-only"
+    priority = 3
+
+    statement {
+      geo_match_statement {
+        country_codes = ["GB"]
+      }
+    }
+
+    action {
+      allow {}
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "allow-uk-traffic-only"
       sampled_requests_enabled   = true
     }
   }
