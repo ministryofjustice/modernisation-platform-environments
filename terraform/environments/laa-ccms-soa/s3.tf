@@ -87,35 +87,38 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
     Version = "2012-10-17",
     Statement = [
       {
-        Sid    = "AWSLogDeliveryWrite",
+        Sid = "AllowELBLogDeliveryPutObject",
         Effect = "Allow",
         Principal = {
-          Service = "delivery.logs.amazonaws.com"
+          Service = [
+            "logdelivery.elasticloadbalancing.amazonaws.com"
+          ]
         },
-        Action   = "s3:PutObject",
+        Action = [ "s3:PutObject" ],
         Resource = "${module.s3-bucket-logging.bucket.arn}/*",
         Condition = {
           StringEquals = {
-            "s3:x-amz-acl"      = "bucket-owner-full-control",
-            "aws:SourceAccount" = [ "data.aws_caller_identity.current.account_id" ]
+            "s3:x-amz-acl"     = "bucket-owner-full-control",
+            "aws:SourceAccount" = data.aws_caller_identity.current.account_id
           },
-          ArnLike = { "aws:SourceArn" = [ "arn:aws:elasticloadbalancing:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:loadbalancer/net/*" ] }
+          ArnLike = {
+            "aws:SourceArn" = "arn:aws:elasticloadbalancing:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:loadbalancer/*/*"
+          }
         }
       },
       {
-        Sid    = "AWSLogDeliveryAclCheck",
+        Sid = "AllowELBLogDeliveryGetBucketAcl",
         Effect = "Allow",
         Principal = {
-          Service = "delivery.logs.amazonaws.com"
+          Service = [ "delivery.logs.amazonaws.com" ]
         },
-        Action   = "s3:GetBucketAcl",
-        Resource = "${module.s3-bucket-logging.bucket.arn}/*",
+        Action = "s3:GetBucketAcl",
+        Resource = "${module.s3-bucket-logging.bucket.arn}",
         Condition = {
-          StringEquals = {
-            "s3:x-amz-acl"      = "bucket-owner-full-control",
-            "aws:SourceAccount" = [ "data.aws_caller_identity.current.account_id" ]
-          },
-          ArnLike = { "aws:SourceArn" = [ "arn:aws:elasticloadbalancing:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:loadbalancer/net/*" ] }
+          StringEquals = { "aws:SourceAccount" = data.aws_caller_identity.current.account_id },
+          ArnLike = {
+            "aws:SourceArn" = "arn:aws:elasticloadbalancing:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:loadbalancer/*/*"
+          }
         }
       }
     ]
