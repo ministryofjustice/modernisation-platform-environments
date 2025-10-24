@@ -18,22 +18,22 @@ output "aws_athena_workgroup_lb_access_logs_id" {
   value       = aws_athena_workgroup.lb-access-logs.id
 }
 
-output "aws_athena_named_query_main_table_admin_internal" {
-  description = "aws_athena_named_query main_table_admin_internal id"
-  value       = aws_athena_named_query.main_table_admin_internal.id
+output "aws_athena_named_query_main_table_admin" {
+  description = "aws_athena_named_query main_table_admin id"
+  value       = aws_athena_named_query.main_table_admin.id
 }
 
-output "aws_athena_named_query_http_requests_admin_internal" {
-  description = "aws_athena_named_query http_requests_admin_internal id"
-  value       = aws_athena_named_query.http_requests_admin_internal.id
+output "aws_athena_named_query_tls_requests_admin" {
+  description = "aws_athena_named_query tls_requests_admin id"
+  value       = aws_athena_named_query.tls_requests_admin.id
 }
 
-output "aws_athena_named_query_main_table_managed_internal" {
-  description = "aws_athena_named_query main_table_managed_internal id"
-  value       = aws_athena_named_query.main_table_managed_internal.id
+output "aws_athena_named_query_main_table_managed" {
+  description = "aws_athena_named_query main_table_managed id"
+  value       = aws_athena_named_query.main_table_managed.id
 }
 
-output "aws_athena_named_query_http_requests_managed_internal" {
-  description = "aws_athena_named_query http_requests_managed_internal id"
-  value       = aws_athena_named_query.http_requests_managed_internal.id
+output "aws_athena_named_query_tls_requests_managed" {
+  description = "aws_athena_named_query tls_requests_managed id"
+  value       = aws_athena_named_query.tls_requests_managed.id
 }
