@@ -80,20 +80,20 @@ resource "aws_instance" "tariff_app_2" {
 }
 
 resource "aws_ebs_volume" "tariff_app2_storage" {
-  for_each = local.environment == "production" ? { for v in local.tariffapp_volume_layout : v.device_name => v } : {}
+  for_each          = local.environment == "production" ? { for v in local.tariffapp_volume_layout : v.device_name => v } : {}
   availability_zone = data.aws_subnet.private_subnets_b.availability_zone
   size              = each.value.size
   type              = "gp3"
   tags = merge(tomap({
-    "Name"               = "${local.application_name}-app-root",
-    "volume-attach-host" = "app",
+    "Name"               = "${local.application_name}-app2-root",
+    "volume-attach-host" = "app2",
     "volume-mount-path"  = "/"
   }), local.tags)
 }
 
 resource "aws_volume_attachment" "tariff_app2_storage_attachment" {
-  for_each = local.environment == "production" ? { for v in local.tariffapp_volume_layout : v.device_name => v } : {}
+  for_each    = local.environment == "production" ? { for v in local.tariffapp_volume_layout : v.device_name => v } : {}
   device_name = each.key
   volume_id   = aws_ebs_volume.tariff_app2_storage[each.key].id
-  instance_id = aws_instance.tariff_app_2.id
+  instance_id = aws_instance.tariff_app_2[0].id
 }

@@ -88,7 +88,7 @@ resource "aws_instance" "tariff_app" {
 }
 
 resource "aws_ebs_volume" "tariff_app_storage" {
-  for_each = { for v in local.tariffapp_volume_layout : v.device_name => v }
+  for_each          = { for v in local.tariffapp_volume_layout : v.device_name => v }
   availability_zone = data.aws_subnet.private_subnets_a.availability_zone
   size              = each.value.size
   type              = "gp3"
@@ -100,7 +100,7 @@ resource "aws_ebs_volume" "tariff_app_storage" {
 }
 
 resource "aws_volume_attachment" "tariff_app_storage_attachment" {
-  for_each = { for v in local.tariffapp_volume_layout : v.device_name => v }
+  for_each    = { for v in local.tariffapp_volume_layout : v.device_name => v }
   device_name = each.key
   volume_id   = aws_ebs_volume.tariff_app_storage[each.key].id
   instance_id = aws_instance.tariff_app.id
