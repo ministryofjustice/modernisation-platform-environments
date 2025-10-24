@@ -660,7 +660,7 @@ module "load_integrity_customdb_database" {
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
   de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
 
-  name                 = "integrity_customdb"
+  name                 = "integrity-customdb"
   environment          = local.environment
   database_name        = "g4s-integrity-customdb"
   path_to_data         = "/g4s_integrity_customdb"
