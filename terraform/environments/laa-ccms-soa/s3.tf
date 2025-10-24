@@ -87,6 +87,20 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
     Version = "2012-10-17",
     Statement = [
       {
+        Sid    = "EnforceTLSv12orHigher",
+        Effect = "Deny",
+        Principal = {
+          AWS = "*"
+        },
+        Action   = "s3:*",
+        Resource =  ["${module.s3-bucket-logging.bucket.arn}/*", "${module.s3-bucket-logging.bucket.arn}" ],
+        Condition = {
+          NumericLessThan = {
+            "s3:TlsVersion" = "1.2"
+          }
+        }
+      },
+      {
         Sid    = "AWSLogDeliveryWrite",
         Effect = "Allow",
         Principal = {
