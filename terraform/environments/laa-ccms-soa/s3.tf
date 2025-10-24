@@ -92,12 +92,13 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
           Service = "delivery.logs.amazonaws.com"
         },
         Action   = "s3:PutObject",
-        Resource = "${module.s3-bucket-logging.bucket.arn}/AWSLogs/${data.aws_caller_identity.current.account_id}/*",
+        Resource = "${module.s3-bucket-logging.bucket.arn}/*",
         Condition = {
           StringEquals = {
             "s3:x-amz-acl"      = "bucket-owner-full-control",
             "aws:SourceAccount" = data.aws_caller_identity.current.account_id
-          }
+          },
+          ArnLike = { "aws:SourceArn" = "arn:aws:elasticloadbalancing:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:loadbalancer/net/*" }
         }
       },
       {
@@ -107,11 +108,13 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
           Service = "delivery.logs.amazonaws.com"
         },
         Action   = "s3:GetBucketAcl",
-        Resource = module.s3-bucket-logging.bucket.arn,
+        Resource = "${module.s3-bucket-logging.bucket.arn}/*",
         Condition = {
           StringEquals = {
+            "s3:x-amz-acl"      = "bucket-owner-full-control",
             "aws:SourceAccount" = data.aws_caller_identity.current.account_id
-          }
+          },
+          ArnLike = { "aws:SourceArn" = "arn:aws:elasticloadbalancing:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:loadbalancer/net/*" }
         }
       }
     ]
