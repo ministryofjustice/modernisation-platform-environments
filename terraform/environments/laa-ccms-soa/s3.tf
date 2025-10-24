@@ -90,6 +90,7 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
         Effect = "Allow",
         Principal = {
           Service = [
+            "elasticloadbalancing.amazonaws.com", 
             "logdelivery.elasticloadbalancing.amazonaws.com",
             "delivery.logs.amazonaws.com"
           ]
