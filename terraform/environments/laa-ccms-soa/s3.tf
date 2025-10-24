@@ -90,7 +90,6 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
         Effect = "Allow",
         Principal = {
           Service = [
-            "elasticloadbalancing.amazonaws.com", 
             "logdelivery.elasticloadbalancing.amazonaws.com",
             "delivery.logs.amazonaws.com"
           ]
@@ -103,7 +102,7 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
             "aws:SourceAccount" = data.aws_caller_identity.current.account_id
           },
           ArnLike = {
-            "aws:SourceArn" = "arn:aws:elasticloadbalancing:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:loadbalancer/*/*"
+            "aws:SourceArn" = "arn:aws:elasticloadbalancing:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:loadbalancer/*/*"
           }
         }
       },
@@ -111,7 +110,7 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
         Sid = "AllowELBLogDeliveryGetBucketAcl",
         Effect = "Allow",
         Principal = {
-          Service = [ "elasticloadbalancing.amazonaws.com", "logdelivery.elasticloadbalancing.amazonaws.com", "delivery.logs.amazonaws.com" ]
+          Service = [ "logdelivery.elasticloadbalancing.amazonaws.com", "delivery.logs.amazonaws.com" ]
         },
         Action = "s3:GetBucketAcl",
         Resource = "${module.s3-bucket-logging.bucket.arn}/AWSLogs/${data.aws_caller_identity.current.account_id}/*",
