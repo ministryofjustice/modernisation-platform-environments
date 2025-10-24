@@ -53,3 +53,14 @@ module "justiceai_azure_openai_secret" {
   })
   ignore_secret_changes = true
 }
+
+module "litellm_keys_secret" {
+  for_each = terraform.workspace == "data-platform-development" ? litellm_key.keys : {}
+
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=f7fef2d8f63f1595c3e2b0ee14a6810dc7bdb9af" # v2.0.0
+
+  name = "litellm/keys/${each.value.key_alias}"
+
+  secret_string = each.value.id
+}
+

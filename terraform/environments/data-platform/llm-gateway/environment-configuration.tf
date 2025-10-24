@@ -26,6 +26,10 @@ locals {
         # Sites
         "213.121.161.112/28", # 102PF
         "51.149.2.0/24",      # 10SC
+        # Analytical Platform Compute Development
+        "18.133.132.50/32",
+        "18.132.51.177/32",
+        "13.42.93.133/32",
         # Analytical Platform Tooling Production
         "54.195.74.96/32",
         "79.125.36.56/32",
@@ -60,11 +64,14 @@ locals {
             "bedrock-claude-sonnet-4-5"
           ]
           keys = {
-            app-1 = {
+            jacobwoffenden = {
               models = [
                 "azure-gpt-5",
                 "bedrock-claude-sonnet-4-5"
               ]
+            }
+            mlops-poc = {
+              models = ["bedrock-claude-sonnet-4-5"]
             }
           }
         }
