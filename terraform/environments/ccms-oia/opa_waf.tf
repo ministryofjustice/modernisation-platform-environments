@@ -57,7 +57,7 @@ resource "aws_wafv2_web_acl" "opahub_web_acl" {
 
   rule {
     name     = "AWS-AWSManagedRulesCommonRuleSet"
-    priority = 1
+    priority = 4
 
     override_action {
       none {}
@@ -149,26 +149,26 @@ resource "aws_wafv2_web_acl" "opahub_web_acl" {
     }
   }
 
-    rule {
-    name     = "allow-uk-traffic-only"
-    priority = 4
+  #   rule {
+  #   name     = "allow-uk-traffic-only"
+  #   priority = 4
 
-    statement {
-      geo_match_statement {
-        country_codes = ["GB"]
-      }
-    }
+  #   statement {
+  #     geo_match_statement {
+  #       country_codes = ["GB"]
+  #     }
+  #   }
 
-    action {
-      allow {}
-    }
+  #   action {
+  #     allow {}
+  #   }
 
-    visibility_config {
-      cloudwatch_metrics_enabled = true
-      metric_name                = "allow-uk-traffic-only"
-      sampled_requests_enabled   = true
-    }
-  }
+  #   visibility_config {
+  #     cloudwatch_metrics_enabled = true
+  #     metric_name                = "allow-uk-traffic-only"
+  #     sampled_requests_enabled   = true
+  #   }
+  # }
 
   visibility_config {
     cloudwatch_metrics_enabled = true
