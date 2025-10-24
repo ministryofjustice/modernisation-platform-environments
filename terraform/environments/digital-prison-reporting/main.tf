@@ -483,7 +483,7 @@ module "s3_raw_archive_bucket" {
   tags = merge(
     local.all_tags,
     {
-      dpr-name          = "${local.project}-raw-archive-${local.env}-s3"
+      dpr-name          = "${local.project}-raw-archive-${local.env}"
       dpr-resource-type = "S3 Bucket"
       dpr-jira          = "DPR2-209"
     }

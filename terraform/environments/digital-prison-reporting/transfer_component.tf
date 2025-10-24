@@ -53,10 +53,10 @@ module "transfer_comp_Lambda" {
   tags = merge(
     local.all_tags,
     {
-      Name           = local.lambda_transfercomp_name
-      Jira           = "DPR-504"
-      Resource_Group = "transfer-component"
-      Resource_Type  = "lambda"
+      dpr-name           = local.lambda_transfercomp_name
+      dpr-jira           = "DPR-504"
+      dpr-resource-group = "transfer-component"
+      dpr-resource-type  = "lambda"
     }
   )
 

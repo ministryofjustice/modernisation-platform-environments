@@ -10,9 +10,8 @@ module "notifications_sns" {
   tags = merge(
     local.all_tags,
     {
-      Name = "${local.project}-notifications-sns-${local.environment}"
-      Jira = "DPR-569",
-      Dept = "Digital-Prison-Reporting"
+      dpr-name = "${local.project}-notifications-sns-${local.environment}"
+      dpr-jira = "DPR-569"
     }
   )
 }
@@ -29,9 +28,8 @@ module "slack_alerts" {
   tags = merge(
     local.all_tags,
     {
-      Name = "${local.project}-slack-alerts-${local.environment}"
-      Jira = "DPR-569",
-      Dept = "Digital-Prison-Reporting"
+      dpr-name = "${local.project}-slack-alerts-${local.environment}"
+      dpr-jira = "DPR-569"
     }
   )
 
@@ -71,9 +69,8 @@ PATTERN
   tags = merge(
     local.all_tags,
     {
-      Name = "${local.project}-glue-status-change-rule-${local.environment}",
-      Jira = "DPR-569",
-      Dept = "Digital-Prison-Reporting"
+      dpr-name = "${local.project}-glue-status-change-rule-${local.environment}",
+      dpr-jira = "DPR-569"
     }
   )
 
@@ -103,9 +100,8 @@ PATTERN
   tags = merge(
     local.all_tags,
     {
-      Name = "${local.project}-dms-task-failure-state-rule-${local.environment}",
-      Jira = "DPR2-849",
-      Dept = "Digital-Prison-Reporting"
+      dpr-name = "${local.project}-dms-task-failure-state-rule-${local.environment}",
+      dpr-jira = "DPR2-849"
     }
   )
 
@@ -139,9 +135,8 @@ PATTERN
   tags = merge(
     local.all_tags,
     {
-      Name = "${local.project}-postgres-tickle-function-failure-rule-${local.environment}",
-      Jira = "DPR2-1966",
-      Dept = "Digital-Prison-Reporting"
+      dpr-name = "${local.project}-postgres-tickle-function-failure-rule-${local.environment}",
+      dpr-jira = "DPR2-1966"
     }
   )
 
@@ -159,9 +154,8 @@ module "pagerduty_sns" {
   tags = merge(
     local.all_tags,
     {
-      Name = "${local.project}-pagerduty-topic-${local.environment}"
-      Jira = "DPR2-116",
-      Dept = "Digital-Prison-Reporting"
+      dpr-name = "${local.project}-pagerduty-topic-${local.environment}"
+      dpr-jira = "DPR2-116"
     }
   )
 }

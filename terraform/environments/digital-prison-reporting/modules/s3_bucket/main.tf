@@ -46,6 +46,11 @@ resource "aws_s3_bucket_lifecycle_configuration" "lifecycle" {
       id     = var.name
       status = "Enabled"
 
+      filter {
+        # Apply to all objects
+        prefix = ""
+      }
+
       # Short-Term Retention Policy
       dynamic "transition" {
         for_each = var.lifecycle_category == "short_term" ? [{ days = 30, storage_class = "STANDARD_IA" }] : []

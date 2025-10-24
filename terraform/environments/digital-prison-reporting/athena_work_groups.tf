@@ -10,11 +10,11 @@ module "athena_workgroup_dpr_generic" {
   tags = merge(
     local.all_tags,
     {
-      Resource_Group = "Athena"
-      Resource_Type  = "Athena-Workgroup"
-      Jira           = "DPR2-716"
-      project        = local.project
-      Name           = format("%s-generic-athena-workgroup", local.project)
+      dpr-resource-group = "Athena"
+      dpr-resource-type  = "Athena-Workgroup"
+      dpr-jira           = "DPR2-716"
+      project            = local.project
+      dpr-name           = format("%s-generic-athena-workgroup", local.project)
     }
   )
 
@@ -32,11 +32,11 @@ module "athena_workgroup_analytics_generic" {
   tags = merge(
     local.all_tags,
     {
-      Resource_Group = "Athena"
-      Resource_Type  = "Athena-Workgroup"
-      Jira           = "DPR2-716"
-      project        = local.analytics_project_id
-      Name           = format("%s-generic-athena-workgroup", local.analytics_project_id)
+      dpr-resource-group = "Athena"
+      dpr-resource-type  = "Athena-Workgroup"
+      dpr-jira           = "DPR2-716"
+      project            = local.analytics_project_id
+      dpr-name           = format("%s-generic-athena-workgroup", local.analytics_project_id)
     }
   )
 }
