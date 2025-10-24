@@ -85,11 +85,11 @@ data "aws_iam_policy_document" "rekognition_logs_bucket_policy_document" {
       type = "Service"
       identifiers = ["logging.s3.amazonaws.com"]
     }
-    # condition {
-    #   variable = "aws:SourceAccount"
-    #   test     = "StringEquals"
-    #   values = [data.aws_caller_identity.current.account_id]
-    # }
+    condition {
+      variable = "aws:SourceAccount"
+      test     = "StringEquals"
+      values = [data.aws_caller_identity.current.account_id]
+    }
     # condition {
     #   variable = "aws:SourceArn"
     #   test = "ArnEquals"
