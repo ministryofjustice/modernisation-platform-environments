@@ -55,12 +55,41 @@ resource "aws_wafv2_web_acl" "opahub_web_acl" {
     block {}
   }
 
-  # Rule 1: /opa/web-determinations/* (Prod only)
+  rule {
+    name     = "AWS-AWSManagedRulesCommonRuleSet"
+    priority = 4
+
+    override_action {
+      none {}
+    }
+
+    statement {
+      managed_rule_group_statement {
+        name        = "AWSManagedRulesCommonRuleSet"
+        vendor_name = "AWS"
+
+        # rule_action_override {
+        #   name = "NoUserAgent_HEADER"
+        #   action_to_use {
+        #     allow {}
+        #   }
+        # }
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "AWS-AWSManagedRulesCommonRuleSet"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  # Rule 2: /opa/web-determinations/* (Prod only)
   dynamic "rule" {
     for_each = local.is-production ? [1] : []
     content {
       name     = "${local.opa_app_name}-waf-web-determinations"
-      priority = 1
+      priority = 2
 
       action {
         allow {}
@@ -98,10 +127,10 @@ resource "aws_wafv2_web_acl" "opahub_web_acl" {
     }
   }
 
-  # Rule 2: Allow OPA HUB access from trusted IPs
+  # Rule 3: Allow OPA HUB access from trusted IPs
   rule {
     name     = "${local.opa_app_name}-waf-ip-set"
-    priority = local.is-production ? 2 : 1
+    priority = local.is-production ? 3 : 2
 
     action {
       allow {}
@@ -120,55 +149,26 @@ resource "aws_wafv2_web_acl" "opahub_web_acl" {
     }
   }
 
-  rule {
-    name     = "AWS-AWSManagedRulesCommonRuleSet"
-    priority = 3
+  #   rule {
+  #   name     = "allow-uk-traffic-only"
+  #   priority = 4
 
-    override_action {
-      none {}
-    }
+  #   statement {
+  #     geo_match_statement {
+  #       country_codes = ["GB"]
+  #     }
+  #   }
 
-    statement {
-      managed_rule_group_statement {
-        name        = "AWSManagedRulesCommonRuleSet"
-        vendor_name = "AWS"
+  #   action {
+  #     allow {}
+  #   }
 
-        # rule_action_override {
-        #   name = "NoUserAgent_HEADER"
-        #   action_to_use {
-        #     allow {}
-        #   }
-        # }
-      }
-    }
-
-    visibility_config {
-      cloudwatch_metrics_enabled = true
-      metric_name                = "AWS-AWSManagedRulesCommonRuleSet"
-      sampled_requests_enabled   = true
-    }
-  }
-
-    rule {
-    name     = "allow-uk-traffic-only"
-    priority = 4
-
-    statement {
-      geo_match_statement {
-        country_codes = ["GB"]
-      }
-    }
-
-    action {
-      allow {}
-    }
-
-    visibility_config {
-      cloudwatch_metrics_enabled = true
-      metric_name                = "allow-uk-traffic-only"
-      sampled_requests_enabled   = true
-    }
-  }
+  #   visibility_config {
+  #     cloudwatch_metrics_enabled = true
+  #     metric_name                = "allow-uk-traffic-only"
+  #     sampled_requests_enabled   = true
+  #   }
+  # }
 
   visibility_config {
     cloudwatch_metrics_enabled = true

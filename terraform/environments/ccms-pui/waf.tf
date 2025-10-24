@@ -44,27 +44,6 @@ resource "aws_wafv2_web_acl" "pui_web_acl" {
   }
 
   rule {
-    name = "${local.application_name}-waf-ip-set"
-
-    priority = 1
-    action {
-      allow {}
-    }
-
-    statement {
-      ip_set_reference_statement {
-        arn = aws_wafv2_ip_set.pui_waf_ip_set.arn
-      }
-    }
-
-    visibility_config {
-      cloudwatch_metrics_enabled = true
-      metric_name                = "${local.application_name}-waf-metrics"
-      sampled_requests_enabled   = true
-    }
-  }
-
-  rule {
     name     = "AWS-AWSManagedRulesCommonRuleSet"
     priority = 2
 
@@ -92,27 +71,47 @@ resource "aws_wafv2_web_acl" "pui_web_acl" {
       sampled_requests_enabled   = true
     }
   }
-
   rule {
-    name     = "allow-uk-traffic-only"
-    priority = 3
+    name = "${local.application_name}-waf-ip-set"
 
-    statement {
-      geo_match_statement {
-        country_codes = ["GB"]
-      }
-    }
-
+    priority = 1
     action {
       allow {}
     }
 
+    statement {
+      ip_set_reference_statement {
+        arn = aws_wafv2_ip_set.pui_waf_ip_set.arn
+      }
+    }
+
     visibility_config {
       cloudwatch_metrics_enabled = true
-      metric_name                = "allow-uk-traffic-only"
+      metric_name                = "${local.application_name}-waf-metrics"
       sampled_requests_enabled   = true
     }
   }
+
+  # rule {
+  #   name     = "allow-uk-traffic-only"
+  #   priority = 3
+
+  #   statement {
+  #     geo_match_statement {
+  #       country_codes = ["GB"]
+  #     }
+  #   }
+
+  #   action {
+  #     allow {}
+  #   }
+
+  #   visibility_config {
+  #     cloudwatch_metrics_enabled = true
+  #     metric_name                = "allow-uk-traffic-only"
+  #     sampled_requests_enabled   = true
+  #   }
+  # }
 
 
   tags = merge(local.tags,
