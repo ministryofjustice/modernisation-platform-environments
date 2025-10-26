@@ -63,9 +63,11 @@ locals {
       }
       llm_gateway_teams = {
         data-platform = {
+          max_budget = "5000"
           models = [
             "azure-gpt-5",
             "azure-gpt-5-codex",
+            "bedrock-claude-haiku-4-5",
             "bedrock-claude-sonnet-4-5"
           ]
           keys = {
@@ -73,6 +75,7 @@ locals {
               models = [
                 "azure-gpt-5",
                 "azure-gpt-5-codex",
+                "bedrock-claude-haiku-4-5",
                 "bedrock-claude-sonnet-4-5"
               ]
             }
@@ -80,6 +83,13 @@ locals {
               models = ["bedrock-claude-sonnet-4-5"]
             }
           }
+        }
+        data-science = {
+          models = [
+            "bedrock-claude-haiku-4-5",
+            "bedrock-claude-sonnet-4-5"
+          ]
+          keys = {}
         }
       }
     }
