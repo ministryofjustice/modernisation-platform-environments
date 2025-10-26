@@ -3,8 +3,8 @@ locals {
   environment_configurations = {
     development = {
       litellm_versions = {
-        application = "main-v1.77.7-stable"
-        chart       = "0.1.794"
+        application = "main-v1.78.5-stable"
+        chart       = "0.1.804"
       }
       llm_gateway_hostname = "llm-gateway.development.data-platform.service.justice.gov.uk"
       llm_gateway_ingress_allowlist = [
@@ -45,15 +45,19 @@ locals {
             model_id    = "gpt-5"
             api_version = "2024-12-01-preview"
           }
+          gpt-5-codex = {
+            model_id    = "gpt-5-codex"
+            api_version = "2025-03-01-preview"
+          }
         }
         bedrock = {
+          claude-haiku-4-5 = {
+            model_id = "eu.anthropic.claude-haiku-4-5-20251001-v1:0"
+            region   = "eu-west-2"
+          }
           claude-sonnet-4-5 = {
             model_id = "eu.anthropic.claude-sonnet-4-5-20250929-v1:0"
             region   = "eu-west-2"
-          }
-          claude-sonnet-4 = {
-            model_id = "eu.anthropic.claude-sonnet-4-20250514-v1:0"
-            region   = "eu-west-1"
           }
         }
       }
@@ -61,12 +65,14 @@ locals {
         data-platform = {
           models = [
             "azure-gpt-5",
+            "azure-gpt-5-codex",
             "bedrock-claude-sonnet-4-5"
           ]
           keys = {
             jacobwoffenden = {
               models = [
                 "azure-gpt-5",
+                "azure-gpt-5-codex",
                 "bedrock-claude-sonnet-4-5"
               ]
             }
