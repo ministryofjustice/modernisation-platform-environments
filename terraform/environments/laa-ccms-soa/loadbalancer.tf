@@ -2,13 +2,11 @@
 
 #--Admin
 resource "aws_lb" "admin" {
-  name               = "${local.application_data.accounts[local.environment].app_name}-admin-lb"
-  load_balancer_type = "network"
-  internal           = true
-  subnets            = data.aws_subnets.shared-private.ids
-  security_groups    = [aws_security_group.alb_admin.id]
-
-  drop_invalid_header_fields = true
+  name                       = "${local.application_data.accounts[local.environment].app_name}-admin-lb"
+  load_balancer_type         = "network"
+  internal                   = true
+  subnets                    = data.aws_subnets.shared-private.ids
+  security_groups            = [aws_security_group.alb_admin.id]
   enable_deletion_protection = true
 
   access_logs {
@@ -76,13 +74,11 @@ resource "aws_lb_listener" "admin_server_port" {
 
 #--Managed
 resource "aws_lb" "managed" {
-  name               = "${local.application_data.accounts[local.environment].app_name}-managed-api-lb"
-  load_balancer_type = "network"
-  internal           = true
-  subnets            = data.aws_subnets.shared-private.ids
-  security_groups    = [aws_security_group.alb_managed.id]
-
-  drop_invalid_header_fields = true
+  name                       = "${local.application_data.accounts[local.environment].app_name}-managed-api-lb"
+  load_balancer_type         = "network"
+  internal                   = true
+  subnets                    = data.aws_subnets.shared-private.ids
+  security_groups            = [aws_security_group.alb_managed.id]
   enable_deletion_protection = true
 
   access_logs {
