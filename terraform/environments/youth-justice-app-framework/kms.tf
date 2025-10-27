@@ -141,6 +141,10 @@ resource "aws_kms_key" "multi_region_waf_key" {
   })
 }
 
+provider "aws" {
+  alias  = "us_east_1"
+  region = "us-east-1"
+}
 
 resource "aws_kms_replica_key" "multi_region_replica" {
   description             = "Multi-Region replica key"
