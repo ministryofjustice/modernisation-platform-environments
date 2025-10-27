@@ -102,7 +102,7 @@ resource "aws_cloudwatch_event_rule" "waf_allow_0600_uk" {
   description         = "Set WAF rule to ALLOW at 06:00 UK on Thursday-30-Oct-2025 only"
 }
 
-# The following Schedue is for Tuesay to Sunday at 19:00 UK time
+# The following Schedue is for Monday to Sunday at 19:00 UK time
 resource "aws_cloudwatch_event_rule" "waf_block_1900_uk" {
   name                = "waf-block-1900-${local.environment}"
   schedule_expression = "cron(00 19 ? * MON-SUN *)"
