@@ -1,9 +1,11 @@
 
 module "waf" {
-  source       = "./modules/waf"
-  project_name = local.project_name
-  tags         = local.tags
-  waf_name     = "yjaf-default-alb"
+  source        = "./modules/waf"
+  project_name  = local.project_name
+  tags          = local.tags
+  waf_name      = "yjaf-default-alb"
+  kms_key_arn   = module.kms.key_arn
+  kms_key_id    = module.kms.key_id
 
   providers = {
     aws           = aws

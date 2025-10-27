@@ -1,6 +1,8 @@
 
 module "waf-cf" {
-  source = "./modules/waf"
+  source      = "./modules/waf"
+  kms_key_arn = module.kms.key_arn
+  kms_key_id  = module.kms.key_id
   providers = {
     aws           = aws
     aws.us-east-1 = aws.us-east-1

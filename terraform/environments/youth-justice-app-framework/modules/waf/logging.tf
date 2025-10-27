@@ -1,7 +1,8 @@
 resource "aws_cloudwatch_log_group" "waf_logs" {
-  name              = "aws-waf-logs-${var.waf_name}" # must start with aws-waf-logs-
-  retention_in_days = 30
-  tags              = local.tags
+  name               = "aws-waf-logs-${var.waf_name}" # must start with aws-waf-logs-
+  retention_in_days  = 400
+  kms_key_id         = var.kms_key_arn
+  tags               = local.tags
 }
 
 data "aws_iam_policy_document" "waf_logging" {
@@ -55,10 +56,11 @@ resource "aws_wafv2_web_acl_logging_configuration" "regional" {
 
 #Must create log group in us-east-1
 resource "aws_cloudwatch_log_group" "waf_logs_cf" {
-  provider          = aws.us-east-1
-  name              = "aws-waf-logs-${var.waf_name}-cf"
-  retention_in_days = 30
-  tags              = local.tags
+  provider           = aws.us-east-1
+  name               = "aws-waf-logs-${var.waf_name}-cf"
+  retention_in_days  = 400
+  kms_key_id         = var.kms_key_arn
+  tags               = local.tags
 }
 
 resource "aws_cloudwatch_log_resource_policy" "waf_logs_policy_cf" {
