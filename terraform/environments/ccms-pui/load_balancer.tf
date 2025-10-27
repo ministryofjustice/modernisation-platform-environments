@@ -7,6 +7,12 @@ resource "aws_lb" "pui" {
 
   security_groups = [aws_security_group.load_balancer.id]
 
+  access_logs {
+    bucket  = module.s3-bucket-logging.bucket.id
+    prefix  = "${local.application_name}-lb"
+    enabled = true
+  }
+
   tags = merge(local.tags,
     { Name = lower(format("%s-%s-lb", local.application_name, local.environment)) }
   )
