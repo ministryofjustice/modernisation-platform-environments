@@ -52,7 +52,7 @@ resource "aws_lakeformation_permissions" "grant_cadt_tables_new" {
   permissions_with_grant_option = ["ALL"]
 
   table {
-    database_name = each.value.name
+    database_name = each.value
     wildcard      = true
   }
 
@@ -109,7 +109,7 @@ resource "aws_lakeformation_permissions" "grant_cadt_tables_de_new" {
   permissions_with_grant_option = ["ALL"]
 
   table {
-    database_name = each.value.name
+    database_name = each.value
     wildcard      = true
   }
 
