@@ -65,7 +65,7 @@ module "s3-bucket-logging" {
   custom_kms_key     = ""
 
   log_bucket = "${local.application_name}-${local.environment}-logging"
-  log_prefix = "s3access/${local.logging_bucket_name}"
+  log_prefix = "s3access/${local.application_name}-${local.environment}-logging"
 
   # Refer to the below section "Replication" before enabling replication
   replication_enabled = false
