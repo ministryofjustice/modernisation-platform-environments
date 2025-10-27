@@ -102,59 +102,59 @@ module "kms" {
 }
 #todo add to all secrets
 
-/*
+
 ## KMS for CloudFront WAF logs - multi-region key
 
-resource "aws_kms_key" "multi_region_waf_key" {
-  description             = "KMS key for WAF CloudWatch Logs"
-  enable_key_rotation     = true
-  multi_region            = true
-  deletion_window_in_days = 7
+#resource "aws_kms_key" "multi_region_waf_key" {
+#  description             = "KMS key for WAF CloudWatch Logs"
+#  enable_key_rotation     = true
+#  multi_region            = true
+#  deletion_window_in_days = 7
+#
+#  policy = jsonencode({
+#    Version = "2012-10-17"
+#    Statement = [
+#      {
+#        Sid = "AllowAccountFullAccess"
+#        Effect = "Allow"
+#        Principal = {
+#          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+#        }
+#        Action = "kms:*"
+#        Resource = "*"
+#      },
+#      {
+#        Sid = "AllowCloudWatchLogs"
+#        Effect = "Allow"
+#        Principal = {
+#          Service = "logs.${data.aws_region.current.name}.amazonaws.com"
+#        }
+##        Action = [
+#          "kms:Encrypt",
+#          "kms:Decrypt",
+#          "kms:ReEncrypt*",
+#          "kms:GenerateDataKey*",
+#          "kms:DescribeKey"
+#        ]
+#        Resource = "*"
+#      }
+#    ]
+#  })
+#}
 
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Sid = "AllowAccountFullAccess"
-        Effect = "Allow"
-        Principal = {
-          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
-        }
-        Action = "kms:*"
-        Resource = "*"
-      },
-      {
-        Sid = "AllowCloudWatchLogs"
-        Effect = "Allow"
-        Principal = {
-          Service = "logs.${data.aws_region.current.name}.amazonaws.com"
-        }
-        Action = [
-          "kms:Encrypt",
-          "kms:Decrypt",
-          "kms:ReEncrypt*",
-          "kms:GenerateDataKey*",
-          "kms:DescribeKey"
-        ]
-        Resource = "*"
-      }
-    ]
-  })
-}
+#provider "aws" {
+#  alias  = "us_east_1"
+#  region = "us-east-1"
+#}
 
-provider "aws" {
-  alias  = "us_east_1"
-  region = "us-east-1"
-}
+#resource "aws_kms_replica_key" "multi_region_replica" {
+#  provider                = aws.us_east_1
+#  description             = "Multi-Region replica key"
+#  deletion_window_in_days = 7
+#  primary_key_arn         = aws_kms_key.multi_region_waf_key.arn
+#}
 
-resource "aws_kms_replica_key" "multi_region_replica" {
-  provider                = aws.us_east_1
-  description             = "Multi-Region replica key"
-  deletion_window_in_days = 7
-  primary_key_arn         = aws_kms_key.multi_region_waf_key.arn
-}
-
-resource "aws_kms_alias" "multi_region_waf_key_alias" {
-  name          = "alias/waf-logs-multi-region-key"
-  target_key_id = aws_kms_key.multi_region_waf_key.id
-}
+#resource "aws_kms_alias" "multi_region_waf_key_alias" {
+#  name          = "alias/waf-logs-multi-region-key"
+#  target_key_id = aws_kms_key.multi_region_waf_key.id
+#}
