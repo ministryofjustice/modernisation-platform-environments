@@ -109,7 +109,6 @@ resource "aws_kms_key" "multi_region_waf_key" {
   enable_key_rotation     = true
   multi_region            = true
   deletion_window_in_days = 7
-  aliases                 = "waf-logs-multi-region-key"
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -147,4 +146,9 @@ resource "aws_kms_replica_key" "multi_region_replica" {
   description             = "Multi-Region replica key"
   deletion_window_in_days = 7
   primary_key_arn         = aws_kms_key.multi_region_waf_key.arn
+}
+
+resource "aws_kms_alias" "multi_region_waf_key_alias" {
+  name          = "alias/waf-logs-multi-region-key"
+  target_key_id = aws_kms_key.multi_region_waf_key.id
 }
