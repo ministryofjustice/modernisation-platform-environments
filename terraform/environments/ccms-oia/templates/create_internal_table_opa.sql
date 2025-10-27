@@ -1,4 +1,4 @@
-CREATE EXTERNAL TABLE IF NOT EXISTS alb_opa_internal_logs (
+CREATE EXTERNAL TABLE IF NOT EXISTS alb_opa_logs (
   type string,
   time string,
   elb string,
