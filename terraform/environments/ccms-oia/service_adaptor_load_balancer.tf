@@ -12,7 +12,7 @@ resource "aws_lb" "adaptor" {
   security_groups = [aws_security_group.adaptor_load_balancer.id]
   access_logs {
     bucket  = module.s3-bucket-logging.bucket.id
-    prefix  = "${local.adaptor_app_name}-internal"
+    prefix  = "${local.adaptor_app_name}-internal-lb"
     enabled = true
   }
   tags = merge(local.tags,

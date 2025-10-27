@@ -31,7 +31,7 @@ resource "aws_athena_named_query" "main_table_connector_internal" {
     "./templates/create_internal_table_connector.sql",
     {
       bucket     = module.s3-bucket-logging.bucket.id
-      key        = "${local.connector_app_name}-internal"
+      key        = "${local.connector_app_name}-internal-lb"
       account_id = data.aws_caller_identity.current.id
       region     = data.aws_region.current.id
     }
@@ -47,7 +47,7 @@ resource "aws_athena_named_query" "http_requests_connector_internal" {
     "./templates/lb_internal_http_gets_connector.sql",
     {
       bucket     = module.s3-bucket-logging.bucket.id
-      key        = "${local.connector_app_name}-internal"
+      key        = "${local.connector_app_name}-internal-lb"
       account_id = data.aws_caller_identity.current.id
       region     = data.aws_region.current.id
     }
@@ -63,7 +63,7 @@ resource "aws_athena_named_query" "main_table_opa" {
     "./templates/create_internal_table_opa.sql",
     {
       bucket     = module.s3-bucket-logging.bucket.id
-      key        = "${local.opa_app_name}"
+      key        = "${local.opa_app_name}-lb"
       account_id = data.aws_caller_identity.current.id
       region     = data.aws_region.current.id
     }
@@ -79,7 +79,7 @@ resource "aws_athena_named_query" "http_requests_opa" {
     "./templates/lb_internal_http_gets_opa.sql",
     {
       bucket     = module.s3-bucket-logging.bucket.id
-      key        = "${local.opa_app_name}"
+      key        = "${local.opa_app_name}-lb"
       account_id = data.aws_caller_identity.current.id
       region     = data.aws_region.current.id
     }
@@ -95,7 +95,7 @@ resource "aws_athena_named_query" "main_table_adapter_internal" {
     "./templates/create_internal_table_adaptor.sql",
     {
       bucket     = module.s3-bucket-logging.bucket.id
-      key        = "${local.adaptor_app_name}-internal"
+      key        = "${local.adaptor_app_name}-internal-lb"
       account_id = data.aws_caller_identity.current.id
       region     = data.aws_region.current.id
     }
@@ -111,7 +111,7 @@ resource "aws_athena_named_query" "http_requests_adaptor_internal" {
     "./templates/lb_internal_http_gets_adaptor.sql",
     {
       bucket     = module.s3-bucket-logging.bucket.id
-      key        = "${local.adaptor_app_name}-internal"
+      key        = "${local.adaptor_app_name}-internal-lb"
       account_id = data.aws_caller_identity.current.id
       region     = data.aws_region.current.id
     }
