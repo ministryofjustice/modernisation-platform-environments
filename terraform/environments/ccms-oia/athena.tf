@@ -87,7 +87,7 @@ resource "aws_athena_named_query" "http_requests_opa" {
 }
 
 # SQL query to creates the table in the athena db
-resource "aws_athena_named_query" "main_table_adapter_internal" {
+resource "aws_athena_named_query" "main_table_adaptor_internal" {
   name      = lower(format("%s-%s-create-table-internal", local.adaptor_app_name, local.environment))
   workgroup = aws_athena_workgroup.lb-access-logs.id
   database  = aws_athena_database.lb-access-logs.name
