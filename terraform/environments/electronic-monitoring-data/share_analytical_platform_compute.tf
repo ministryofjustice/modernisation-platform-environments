@@ -50,6 +50,7 @@ locals {
     "historic_ears_and_sars_int",
     "historic_ears_and_sars_mart",
     "emsys_mvp_stg",
+    "emsys_tpims_stg",
     "sar_ear_reports_mart",
     "preprocessed_alcohol_monitoring",
     "staged_alcohol_monitoring",
