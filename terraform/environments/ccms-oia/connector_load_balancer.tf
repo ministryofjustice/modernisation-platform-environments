@@ -12,7 +12,7 @@ resource "aws_lb" "connector" {
   security_groups = [aws_security_group.connector_load_balancer.id]
   access_logs {
     bucket  = module.s3-bucket-logging.bucket.id
-    prefix  = "${connector_app_name}-internal"
+    prefix  = "${local.connector_app_name}-internal"
     enabled = true
   }
   tags = merge(local.tags,

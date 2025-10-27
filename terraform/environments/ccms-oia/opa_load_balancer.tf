@@ -12,7 +12,7 @@ resource "aws_lb" "opahub" {
   security_groups = [aws_security_group.opahub_load_balancer.id]
   access_logs {
     bucket  = module.s3-bucket-logging.bucket.id
-    prefix  = "${opa_app_name}-internal"
+    prefix  = "${local.opa_app_name}-internal"
     enabled = true
   }
   tags = merge(local.tags,
