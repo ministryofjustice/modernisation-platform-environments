@@ -55,7 +55,7 @@ resource "aws_athena_named_query" "http_requests_connector_internal" {
 }
 
 # SQL query to creates the table in the athena db
-resource "aws_athena_named_query" "main_table_opa_internal" {
+resource "aws_athena_named_query" "main_table_opa" {
   name      = lower(format("%s-%s-create-table-opa", local.application_name, local.environment))
   workgroup = aws_athena_workgroup.lb-access-logs.id
   database  = aws_athena_database.lb-access-logs.name
@@ -71,7 +71,7 @@ resource "aws_athena_named_query" "main_table_opa_internal" {
 }
 
 # SQL query to count the number of HTTP GET requests to the loadbalancer grouped by IP 
-resource "aws_athena_named_query" "http_requests_opa_internal" {
+resource "aws_athena_named_query" "http_requests_opa" {
   name      = lower(format("%s-%s-http-get-requests-opa", local.application_name, local.environment))
   workgroup = aws_athena_workgroup.lb-access-logs.id
   database  = aws_athena_database.lb-access-logs.name
