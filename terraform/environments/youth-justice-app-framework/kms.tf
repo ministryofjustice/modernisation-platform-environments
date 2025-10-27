@@ -101,3 +101,18 @@ module "kms" {
   tags = local.tags
 }
 #todo add to all secrets
+
+## KMS for CloudFront WAF logs
+module "kms_us_east_1" {
+  source  = "terraform-aws-modules/kms/aws"
+  version = "3.1.1"
+  providers = { aws = aws.us-east-1 }
+
+  description         = "KMS key for CloudFront WAF logs"
+  enable_key_rotation = true
+  key_usage           = "ENCRYPT_DECRYPT"
+  deletion_window_in_days = 7
+  aliases = ["${local.project_name}-cf-logs"]
+
+  tags = local.tags
+}

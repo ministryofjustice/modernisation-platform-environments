@@ -86,3 +86,8 @@ variable "kms_key_id" {
   description = "KMS Key ID to encrypt CloudWatch log groups"
   default     = null
 }
+
+variable "kms_key_arn_cf" {
+  type        = string
+  description = "KMS Key ARN for CloudFront WAF logs in us-east-1"
+}
