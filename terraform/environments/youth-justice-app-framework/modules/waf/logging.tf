@@ -59,7 +59,7 @@ resource "aws_cloudwatch_log_group" "waf_logs_cf" {
   provider           = aws.us-east-1
   name               = "aws-waf-logs-${var.waf_name}-cf"
   retention_in_days  = 400
-  kms_key_id         = var.multi_region_replica
+#  kms_key_id         = var.multi_region_replica
   tags               = local.tags
 }
 

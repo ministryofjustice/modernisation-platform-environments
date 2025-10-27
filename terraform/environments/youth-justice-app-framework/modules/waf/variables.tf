@@ -87,6 +87,7 @@ variable "kms_key_id" {
   default     = null
 }
 
+/*
 variable "multi_region_replica" {
   type        = string
   description = "KMS Key ARN for CloudFront WAF logs in us-east-1"

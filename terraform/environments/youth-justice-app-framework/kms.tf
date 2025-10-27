@@ -102,6 +102,7 @@ module "kms" {
 }
 #todo add to all secrets
 
+/*
 ## KMS for CloudFront WAF logs - multi-region key
 
 resource "aws_kms_key" "multi_region_waf_key" {
