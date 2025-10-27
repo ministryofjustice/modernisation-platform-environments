@@ -6,7 +6,7 @@ module "waf" {
   waf_name           = "yjaf-default-alb"
   kms_key_arn        = module.kms.key_arn
   kms_key_id         = module.kms.key_id
-  kms_key_us_east_1  = aws_kms_key.multi_region_waf_key.arn # WAF multi-region key
+  kms_key_us_east_1  = aws_kms_key.multi_region_replica.arn # WAF multi-region key
 
   providers = {
     aws           = aws

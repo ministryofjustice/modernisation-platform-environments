@@ -147,6 +147,7 @@ provider "aws" {
 }
 
 resource "aws_kms_replica_key" "multi_region_replica" {
+  provider                = aws.us_east_1
   description             = "Multi-Region replica key"
   deletion_window_in_days = 7
   primary_key_arn         = aws_kms_key.multi_region_waf_key.arn
