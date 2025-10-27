@@ -92,13 +92,20 @@ EOT
 // EventBridge scheduled rules to trigger Lambda
 resource "aws_cloudwatch_event_rule" "waf_allow_0700_uk" {
   name                = "waf-allow-0700-${local.environment}"
-  schedule_expression = "cron(00 06 ? * MON-SUN *)"
+  schedule_expression = "cron(00 07 ? * MON-SUN *)"
   description         = "Set WAF rule to ALLOW at 07:00 UK daily"
 }
 
+# The following rule is a one-off to switch to ALLOW at 06:00 UK on Thursday-30-Oct-2025 only
+# resource "aws_cloudwatch_event_rule" "waf_allow_0600_uk" {
+#   name                = "waf-allow-0600-${local.environment}"
+#   schedule_expression = "cron(00 06 ? * THU *)"
+#   description         = "Set WAF rule to ALLOW at 06:00 UK on Thursday-30-Oct-2025 only"
+# }
+
 resource "aws_cloudwatch_event_rule" "waf_block_1900_uk" {
   name                = "waf-block-1900-${local.environment}"
-  schedule_expression = "cron(00 18 ? * MON-SUN *)"
+  schedule_expression = "cron(00 19 ? * MON-SUN *)"
   description         = "Set WAF rule to BLOCK at 19:00 UK daily"
 }
 
