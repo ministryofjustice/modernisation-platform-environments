@@ -20,6 +20,7 @@ resource "aws_lb" "edrms" {
   tags = merge(local.tags,
     { Name = lower(format("%s-%s-lb", local.application_name, local.environment)) }
   )
+  depends_on = [module.s3-bucket-logging]
 }
 
 resource "aws_lb_target_group" "edrms_target_group" {
