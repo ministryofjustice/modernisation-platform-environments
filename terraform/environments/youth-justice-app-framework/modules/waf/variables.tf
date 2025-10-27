@@ -87,7 +87,7 @@ variable "kms_key_id" {
   default     = null
 }
 
-variable "kms_key_arn_cf" {
+variable "kms_key_us_east_1" {
   type        = string
   description = "KMS Key ARN for CloudFront WAF logs in us-east-1"
 }

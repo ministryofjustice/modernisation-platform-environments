@@ -102,17 +102,42 @@ module "kms" {
 }
 #todo add to all secrets
 
-## KMS for CloudFront WAF logs
-module "kms_us_east_1" {
-  source  = "terraform-aws-modules/kms/aws"
-  version = "3.1.1"
-  providers = { aws = aws.us-east-1 }
+## KMS for CloudFront WAF logs - multi-region key
+data "aws_caller_identity" "current" {}
 
-  description         = "KMS key for CloudFront WAF logs"
+resource "aws_kms_key" "multi_region_waf_key" {
+  description         = "KMS key for WAF CloudWatch Logs"
   enable_key_rotation = true
-  key_usage           = "ENCRYPT_DECRYPT"
+  multi_region        = true
   deletion_window_in_days = 7
-  aliases = ["${local.project_name}-cf-logs"]
 
-  tags = local.tags
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid = "AllowAccountFullAccess"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+        }
+        Action = "kms:*"
+        Resource = "*"
+      },
+      {
+        Sid = "AllowCloudWatchLogs"
+        Effect = "Allow"
+        Principal = {
+          Service = "logs.${data.aws_region.current.name}.amazonaws.com"
+        }
+        Action = [
+          "kms:Encrypt",
+          "kms:Decrypt",
+          "kms:ReEncrypt*",
+          "kms:GenerateDataKey*",
+          "kms:DescribeKey"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
 }
