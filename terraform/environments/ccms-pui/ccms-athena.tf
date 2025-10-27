@@ -24,11 +24,11 @@ resource "aws_athena_workgroup" "lb-access-logs" {
 
 # SQL query to creates the table in the athena db, 
 resource "aws_athena_named_query" "main_table_pui" {
-  name      = lower(format("%s-%s-create-table-internal", local.application_name, local.environment))
+  name      = lower(format("%s-%s-create-table", local.application_name, local.environment))
   workgroup = aws_athena_workgroup.lb-access-logs.id
   database  = aws_athena_database.lb-access-logs.name
   query = templatefile(
-    "./templates/create_internal_table.sql",
+    "./templates/create_table.sql",
     {
       bucket     = module.s3-bucket-logging.bucket.id
       key        = "${local.application_name}-lb"
@@ -44,7 +44,7 @@ resource "aws_athena_named_query" "http_requests_pui" {
   workgroup = aws_athena_workgroup.lb-access-logs.id
   database  = aws_athena_database.lb-access-logs.name
   query = templatefile(
-    "./templates/lb_internal_http_gets.sql",
+    "./templates/lb_http_gets.sql",
     {
       bucket     = module.s3-bucket-logging.bucket.id
       key        = "${local.application_name}-lb"
