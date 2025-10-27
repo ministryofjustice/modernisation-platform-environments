@@ -90,28 +90,28 @@ EOT
 
 
 // EventBridge scheduled rules to trigger Lambda
-resource "aws_cloudwatch_event_rule" "waf_allow_0700_uk" {
-  name                = "waf-allow-0700-${local.environment}"
-  schedule_expression = "cron(00 06 ? * MON-SUN *)"
-  description         = "Set WAF rule to ALLOW at 07:00 UK daily"
+resource "aws_cloudwatch_event_rule" "waf_allow_0500_uk" {
+  name                = "waf-allow-0500-${local.environment}"
+  schedule_expression = "cron(00 05 ? * MON-SUN *)"
+  description         = "Set WAF rule to ALLOW at 05:00 UK daily"
 }
 
-resource "aws_cloudwatch_event_rule" "waf_block_1900_uk" {
-  name                = "waf-block-1900-${local.environment}"
-  schedule_expression = "cron(00 18 ? * MON-SUN *)"
-  description         = "Set WAF rule to BLOCK at 19:00 UK daily"
+resource "aws_cloudwatch_event_rule" "waf_block_2200_uk" {
+  name                = "waf-block-2200-${local.environment}"
+  schedule_expression = "cron(00 22 ? * MON-SUN *)"
+  description         = "Set WAF rule to BLOCK at 22:00 UK daily"
 }
 
 
 resource "aws_cloudwatch_event_target" "waf_allow_target" {
-  rule      = aws_cloudwatch_event_rule.waf_allow_0700_uk.name
+  rule      = aws_cloudwatch_event_rule.waf_allow_0500_uk.name
   target_id = "AllowWAF"
   arn       = aws_lambda_function.waf_toggle.arn
   input     = jsonencode({ mode = "ALLOW" })
 }
 
 resource "aws_cloudwatch_event_target" "waf_block_target" {
-  rule      = aws_cloudwatch_event_rule.waf_block_1900_uk.name
+  rule      = aws_cloudwatch_event_rule.waf_block_2200_uk.name
   target_id = "BlockWAF"
   arn       = aws_lambda_function.waf_toggle.arn
   input     = jsonencode({ mode = "BLOCK" })
@@ -124,7 +124,7 @@ resource "aws_lambda_permission" "waf_events_allow" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.waf_toggle.arn
   principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.waf_allow_0700_uk.arn
+  source_arn    = aws_cloudwatch_event_rule.waf_allow_0500_uk.arn
 }
 
 
@@ -133,7 +133,7 @@ resource "aws_lambda_permission" "waf_events_block" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.waf_toggle.arn
   principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.waf_block_1900_uk.arn
+  source_arn    = aws_cloudwatch_event_rule.waf_block_2200_uk.arn
 }
 
 // Outputs
@@ -174,22 +174,22 @@ output "waf_lambda_function_name" {
 
 output "waf_allow_rule_arn" {
   description = "CloudWatch event rule ARN for allow schedule"
-  value       = aws_cloudwatch_event_rule.waf_allow_0700_uk.arn
+  value       = aws_cloudwatch_event_rule.waf_allow_0500_uk.arn
 }
 
 output "waf_allow_rule_name" {
   description = "CloudWatch event rule name for allow schedule"
-  value       = aws_cloudwatch_event_rule.waf_allow_0700_uk.name
+  value       = aws_cloudwatch_event_rule.waf_allow_0500_uk.name
 }
 
 output "waf_block_rule_arn" {
   description = "CloudWatch event rule ARN for block schedule"
-  value       = aws_cloudwatch_event_rule.waf_block_1900_uk.arn
+  value       = aws_cloudwatch_event_rule.waf_block_2200_uk.arn
 }
 
 output "waf_block_rule_name" {
   description = "CloudWatch event rule name for block schedule"
-  value       = aws_cloudwatch_event_rule.waf_block_1900_uk.name
+  value       = aws_cloudwatch_event_rule.waf_block_2200_uk.name
 }
 
 output "waf_web_acl_full" {
