@@ -90,6 +90,10 @@ locals {
         "mojap-data-production-datasync-laa-ingress-production"
       ]
 
+      property_datahub_target_bucket = [
+        "property-datahub-landing-production"
+      ]
+
       /* Target KMS */
       target_kms_keys = [
         "arn:aws:kms:eu-west-2:593291632749:key/62503ba6-316e-473d-ae4b-042f8420dd07" # s3/mojap-data-production-shared-services-client-team-gov-29148
@@ -97,6 +101,7 @@ locals {
       mojap_land_kms_key                  = "arn:aws:kms:eu-west-1:${local.environment_management.account_ids["analytical-platform-data-production"]}:key/2855ac30-4e14-482e-85ca-53258e01f64c"
       datasync_opg_target_bucket_kms      = "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["analytical-platform-data-production"]}:key/96eb04fe-8393-402c-b1f9-71fcece99e75"
       laa_data_analysis_target_bucket_kms = "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["analytical-platform-data-production"]}:key/fe4674f4-52dc-4b73-a7c5-259c282742ba"
+      property_datahub_landing_kms_key    = "arn:aws:kms:eu-west-2:437720536440:key/d4cd0acf-5b4f-461f-ba01-886f814afec5"
 
       /* Transfer Server */
       transfer_server_hostname = "sftp.ingestion.analytical-platform.service.justice.gov.uk"
@@ -121,6 +126,10 @@ locals {
           ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCuB8p8OaxeX3sILMVUQcD48XBPuVLzddUixUUbYLS1WPiEUz7XcUkozeuhulIy9CzqA9yyAa2uPWhQr3KL2bKpXo8UIJr+3n51mjJp9V+LO65kMN5ewQHzx9phpZba5UOth1aEwn4vAFQwm2q6/ydNrJtRQeaI0DT4njaf0MC9FM/nu25IvUbl2dzUn2MX7/WuMouzcYXTeiLUIMvgRoAw4pjnCmU2AuPTokC7OynFh++SiHRUw6OwNKxqORv3du7qlfcGDWx+oAHbUVOnSaTrUssUuEXPFS5ytwWEp6GpzfZpNvD7Kj7gw/7ntpdTckh+d5INJHu+2L74Ytj2RPLNoHEB9t1ptEI2d2SeKpHqPSak2uQzk4aHV2SJs4IO0omTWKHojtSxo5gxAl4B58UjdzmFn0yNr3rJbKnn2w1H7viaM/0vWRgZrtgo07pd2uJePObaUE9jf1re+woasVWJAy3v9dZszVBcJ62NK/QU3cGfUncBw2OnnDURm7z1YVAj8mrReOkZWFA7nJ4/Gzh5pR8wNhnSLsDFqsQefaQiHBi2vZzDRqaUu03eWvd8BmomWC5joT7qqY8Qv+X5boO9CI0hX9FcoJJMXJwckoVAZGuZKgOwOL4y1Y7hpCO1U5ex9mbyMy5D5r/FNf7B85d/qCxcGwesIzI1b0QRupKxDw=="
           cidr_blocks = ["20.49.168.141/32", "20.49.168.17/32", "51.11.124.149/32", "51.11.124.158/32"]
         }
+        "kbr" = {
+          ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDisbHrQRFCaa5oHvma0V2fFw8sesdhr4Nl17SbFlIlOaM495bJVlVpm3XgojSndPCcn9JvAX6QiWM2DewBuxP9gfD6ZC7HoHonFvECMkxDPV4t6NoiY8FTSiDE7myIGHztiiLKN56poos7x5uPpcstOfmxj7MbVRfWV4snK08unm9pZcemrRBkcs46q8kxxqGHOSfWWQ2Zc0hUnQXQIinzsLEp72NJRDb4nCpS2aIz5mhL2rIqdj5cK1IXUJHD9j6KmA1gMFB5L+oS8geEgLbEOvrfVOCkxe0OdUu4tUETC1ogO+oMBLXB2jnf9nFHkaspBYpot8PfZLxS4rSLUBA1K/UvlWKsfX1HHxCoAHApAA0MU0tmJwGuFSd5jiwOmrwhmu2bIT8eiD1qGtkaStGr12x08hEpL5rZ8xZ9tNTYjCfW7fkbS1YAA6+ZQHprwxIXB+5vRSqO+lMtjQM0v4OwT4cSszMCfqyuNfO6tYuqk28Ht+xe37kLWDV07kyp4oR+YTGcM3+cWnz6NOPsDmqiahXWPwU15NvFjPKdoX45Bc4swsz1UERRUxnZhBF3I72RJEGg1MMkHZFhIHV0mk8hXeWuaozU5299wXbRg3NB9fb2uf3bjgjReqbfkvspms8/ieGDfKDtB4KFQY2ACVfo8NLAkh7Kh0SqaV40NjcOww=="
+          cidr_blocks = ["213.143.153.95/32"]
+        }
       }
       transfer_server_sftp_users_with_egress = {
         "essex-police" = {
@@ -136,7 +145,7 @@ locals {
           # Without it, it cannot plan
           egress_bucket         = try(module.shared_services_client_team_gov_29148_egress_bucket[0].s3_bucket_id, null)
           egress_bucket_kms_key = try(module.shared_services_client_team_gov_29148_egress_kms[0].key_arn, null)
-        },
+        }
       }
 
       /* DataSync */
