@@ -17,12 +17,12 @@ resource "aws_security_group" "ccms_provider_load" {
 
 resource "aws_security_group_rule" "ccms_provider_load_egress_oracle" {
   type              = "egress"
-  from_port         = 1521
-  to_port           = 1521
+  from_port         = local.environment == "development" ? 1521 : 1522
+  to_port           = local.environment == "development" ? 1521 : 1522
   protocol          = "tcp"
   cidr_blocks       = [local.application_data.accounts[local.environment].ccms_database_ip]
   security_group_id = aws_security_group.ccms_provider_load.id
-  description       = "Outbound 1522 Access to CCMS DB"
+  description       = "Outbound 1521/1522 Access to CCMS DB"
 }
 
 resource "aws_security_group_rule" "ccms_provider_load_egress_https" {
@@ -47,13 +47,12 @@ resource "aws_lambda_function" "ccms_provider_load" {
   handler          = "lambda_function.lambda_handler"
   filename         = "lambda/provider_load_lambda/provider_load_package.zip"
   source_code_hash = filebase64sha256("lambda/provider_load_lambda/provider_load_package.zip")
-  timeout          = 300
+  timeout          = 100
   memory_size      = 128
   runtime          = "python3.10"
 
   layers = [
-    aws_lambda_layer_version.lambda_layer_oracle_python.arn,
-    "arn:aws:lambda:eu-west-2:017000801446:layer:AWSLambdaPowertoolsPython:2"
+    aws_lambda_layer_version.lambda_layer_oracle_python.arn
   ]
 
   vpc_config {
@@ -64,12 +63,15 @@ resource "aws_lambda_function" "ccms_provider_load" {
 
   environment {
     variables = {
-      DB_SECRET_NAME        = aws_secretsmanager_secret.ccms_db_mp_credentials.name
-      PROCEDURE_SECRET_NAME = aws_secretsmanager_secret.ccms_procedures_config.name
-      LD_LIBRARY_PATH       = "/opt/instantclient_12_2_linux"
-      ORACLE_HOME           = "/opt/instantclient_12_2_linux"
-      SERVICE_NAME          = "ccms-load-service"
-      NAMESPACE             = "CCMSProviderLoadService"
+      DB_SECRET_NAME         = aws_secretsmanager_secret.ccms_db_mp_credentials.name
+      PROCEDURE_SECRET_NAME  = aws_secretsmanager_secret.ccms_procedures_config.name
+      LD_LIBRARY_PATH        = "/opt/instantclient_12_1"
+      ORACLE_HOME            = "/opt/instantclient_12_1"
+      SERVICE_NAME           = "ccms-load-service"
+      NAMESPACE              = "HUB20-CCMS-NS"
+      ENVIRONMENT            = local.environment
+      LOG_LEVEL              = "DEBUG"
+      PURGE_LAMBDA_TIMESTAMP = aws_ssm_parameter.ccms_provider_load_timestamp.name
     }
   }
 
@@ -77,10 +79,4 @@ resource "aws_lambda_function" "ccms_provider_load" {
     local.tags,
     { Name = "${local.application_name_short}-${local.environment}-ccms-provider-load" }
   )
-}
-
-resource "aws_lambda_event_source_mapping" "ccms_banks_q_trigger" {
-  event_source_arn = aws_sqs_queue.ccms_banks_q.arn
-  function_name    = aws_lambda_function.ccms_provider_load.arn
-  batch_size       = 1
 }

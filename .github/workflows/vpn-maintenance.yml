@@ -1,0 +1,122 @@
+name: VPN Maintenance
+on:
+  workflow_dispatch:
+    inputs:
+      vpn_id:
+        description: 'ID of the VPN to be maintained'
+        required: true
+env:
+  AWS_REGION: eu-west-2
+permissions:
+  id-token: write
+  contents: read
+  actions: read
+
+jobs:
+    fetch-secrets:
+            uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@39db49635a1a20aee7dcffce535321cd01760135 # v3.4.5
+            secrets:
+                MODERNISATION_PLATFORM_ACCOUNT_NUMBER: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
+                PASSPHRASE: ${{ secrets.PASSPHRASE }}
+
+    vpn-environment-check:
+            needs: fetch-secrets
+            runs-on: ubuntu-latest
+            outputs:
+                vpn_environment: ${{ steps.set_vpn_environment.outputs.vpn_environment }}
+            steps:
+              - name: Mask VPN ID
+                run: |
+                    vpn_id=$(cat $GITHUB_EVENT_PATH | jq -r '.inputs.vpn_id')
+                    echo "::add-mask::$vpn_id"
+                    echo "VPN_ID=$vpn_id" >> $GITHUB_ENV
+                    
+              - name: Checkout repository
+                uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+              - name: Decrypt Secrets
+                uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@39db49635a1a20aee7dcffce535321cd01760135 # v3.4.5
+                with:
+                    environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
+                    slack_webhook_url: ${{ needs.fetch-secrets.outputs.slack_webhook_url }} 
+                    PASSPHRASE: ${{ secrets.PASSPHRASE }}
+
+              - name: Set Account Number
+                run: |
+                    ACCOUNT_NUMBER=$(jq -r -e '.account_ids["core-network-services-production"]' <<< $ENVIRONMENT_MANAGEMENT)
+                    echo "::add-mask::$ACCOUNT_NUMBER"
+                    echo ACCOUNT_NUMBER=$ACCOUNT_NUMBER >> $GITHUB_ENV
+                    
+              - name: Configure AWS Credentials
+                uses: aws-actions/configure-aws-credentials@00943011d9042930efac3dcd3a170e4273319bc8 # v5.1.0
+                with:
+                    role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions-vpn-environment-check"
+                    role-session-name: githubactionsrolesession
+                    aws-region: ${{ env.AWS_REGION }}
+              
+              - name: Determine VPN Environment
+                id: set_vpn_environment
+                run: |
+                    VPN_ENVIRONMENT=$(aws ec2 describe-vpn-connections \
+                    --vpn-connection-ids "${{ env.VPN_ID }}" \
+                    --query "VpnConnections[0].Tags[?Key=='github-environment'].Value | [0]" \
+                    --output text)        
+                    echo vpn_environment=$VPN_ENVIRONMENT >> $GITHUB_OUTPUT
+                    echo "VPN Environment is $VPN_ENVIRONMENT"
+              - name: Slack failure notification
+                uses: slackapi/slack-github-action@91efab103c0de0a537f72a35f6b8cda0ee76bf0a # v2.1.1
+                with:
+                  webhook-type: incoming-webhook
+                  payload: |
+                    {"blocks":[{"type": "section","text": {"type": "mrkdwn","text": ":no_entry: Failed GitHub Action:"}},{"type": "section","fields":[{"type": "mrkdwn","text": "*Workflow:*\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|${{ github.workflow }}>"},{"type": "mrkdwn","text": "*Job:*\n${{ github.job }}"},{"type": "mrkdwn","text": "*Repo:*\n${{ github.repository }}"}]}]}
+                env:
+                  SLACK_WEBHOOK_URL: ${{ env.SLACK_WEBHOOK_URL }}
+                if: ${{ failure() }}
+              
+    vpn-maintenance:
+            needs: [fetch-secrets, vpn-environment-check]
+            environment: ${{ needs.vpn-environment-check.outputs.vpn_environment }}
+            runs-on: ubuntu-latest
+            steps:  
+              - name: Mask VPN ID
+                run: |
+                    vpn_id=$(cat $GITHUB_EVENT_PATH | jq -r '.inputs.vpn_id')
+                    echo "::add-mask::$vpn_id"
+                    echo "VPN_ID=$vpn_id" >> $GITHUB_ENV
+
+              - name: Checkout repository
+                uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+              - name: Decrypt Secrets
+                uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@39db49635a1a20aee7dcffce535321cd01760135 # v3.4.5
+                with:
+                    environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
+                    slack_webhook_url: ${{ needs.fetch-secrets.outputs.slack_webhook_url }}
+                    PASSPHRASE: ${{ secrets.PASSPHRASE }}
+
+              - name: Set Account Number
+                run: |
+                    ACCOUNT_NUMBER=$(jq -r -e '.account_ids["core-network-services-production"]' <<< $ENVIRONMENT_MANAGEMENT)
+                    echo "::add-mask::$ACCOUNT_NUMBER"
+                    echo ACCOUNT_NUMBER=$ACCOUNT_NUMBER >> $GITHUB_ENV
+                    
+              - name: Configure AWS Credentials
+                uses: aws-actions/configure-aws-credentials@00943011d9042930efac3dcd3a170e4273319bc8 # v5.1.0
+                with:
+                    role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions-vpn-maintenance"
+                    role-session-name: githubactionsrolesession
+                    aws-region: ${{ env.AWS_REGION }}
+
+              - name: Run VPN maintenance script
+                run: |
+                    ./scripts/replace-vpn-tunnel.sh "${{ env.VPN_ID }}"
+              
+              - name: Slack failure notification
+                uses: slackapi/slack-github-action@91efab103c0de0a537f72a35f6b8cda0ee76bf0a # v2.1.1
+                with:
+                  webhook-type: incoming-webhook
+                  payload: |
+                    {"blocks":[{"type": "section","text": {"type": "mrkdwn","text": ":no_entry: Failed GitHub Action:"}},{"type": "section","fields":[{"type": "mrkdwn","text": "*Workflow:*\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|${{ github.workflow }}>"},{"type": "mrkdwn","text": "*Job:*\n${{ github.job }}"},{"type": "mrkdwn","text": "*Repo:*\n${{ github.repository }}"}]}]}
+                env:
+                  SLACK_WEBHOOK_URL: ${{ env.SLACK_WEBHOOK_URL }}
+                if: ${{ failure() }}

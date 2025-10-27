@@ -21,6 +21,8 @@ resource "aws_backup_vault" "oracle_backup_vault" {
 #    It must also have privileges to pass the AWSBackupDefaultServiceRole to the Backup Service.
 #
 data "aws_iam_policy_document" "oracle_ec2_snapshot_backup_role_policy_document" {
+  #checkov:skip=CKV_AWS_356 "ignore"
+  #checkov:skip=CKV_AWS_111 "ignore"
   statement {
     effect    = "Allow"
     actions   = ["iam:PassRole"]

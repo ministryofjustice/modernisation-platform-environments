@@ -50,25 +50,6 @@ resource "aws_iam_policy_attachment" "image_builder_kms" {
   policy_arn = aws_iam_policy.image_builder_kms.arn
 }
 
-data "aws_iam_policy_document" "ImageBuilderLaunchTemplatePolicy" {
-  statement {
-    effect = "Allow"
-    actions = [
-      "ec2:CreateLaunchTemplateVersion",
-      "ec2:ModifyLaunchTemplate",
-      "ec2:DescribeLaunchTemplates"
-    ]
-    resources = [
-      "*"
-    ]
-    condition {
-      test     = "StringEquals"
-      values   = ["EC2 Image Builder"]
-      variable = "aws:ResourceTag/CreatedBy"
-    }
-  }
-}
-
 resource "aws_iam_policy" "ImageBuilderLaunchTemplatePolicy" {
   name   = "ImageBuilderLaunchTemplatePolicy"
   policy = data.aws_iam_policy_document.image_builder_kms.json

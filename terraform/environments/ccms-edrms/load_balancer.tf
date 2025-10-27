@@ -8,9 +8,19 @@ resource "aws_lb" "edrms" {
 
   security_groups = [aws_security_group.load_balancer.id]
 
+  drop_invalid_header_fields = true
+  enable_deletion_protection = true
+
+  access_logs {
+    bucket  = module.s3-bucket-logging.bucket.id
+    prefix  = local.lb_log_prefix_edrmsapp_internal
+    enabled = true
+  }
+
   tags = merge(local.tags,
     { Name = lower(format("%s-%s-lb", local.application_name, local.environment)) }
   )
+  depends_on = [module.s3-bucket-logging]
 }
 
 resource "aws_lb_target_group" "edrms_target_group" {

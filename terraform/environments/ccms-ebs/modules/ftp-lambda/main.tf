@@ -130,13 +130,13 @@ resource "aws_lambda_function" "ftp_lambda" {
 }
 # ### cw rule for schedule
 resource "aws_cloudwatch_event_rule" "ftp_schedule" {
-  count               = var.env != "production" ? 1 : 0
+  count               = contains(var.enabled_cron_in_environments, var.env) ? 1 : 0
   name                = "${var.lambda_name}-schedule"
-  schedule_expression = var.ftp_cron
+  schedule_expression = var.env == "production" ? "cron(0 10 * * ? *)" : "cron(0 10 ? * MON-FRI *)"
 }
 ### cw event lambda target
 resource "aws_cloudwatch_event_target" "ftp_target" {
-  count     = var.env != "production" ? 1 : 0
+  count     = contains(var.enabled_cron_in_environments, var.env) ? 1 : 0
   rule      = aws_cloudwatch_event_rule.ftp_schedule[count.index].name
   target_id = "ftp-lambda"
   arn       = aws_lambda_function.ftp_lambda.arn
@@ -144,7 +144,7 @@ resource "aws_cloudwatch_event_target" "ftp_target" {
 
 ### allow cw to event in lambda
 resource "aws_lambda_permission" "ftp_permission" {
-  count         = var.env != "production" ? 1 : 0
+  count         = contains(var.enabled_cron_in_environments, var.env) ? 1 : 0
   statement_id  = "AllowExecutionFromCloudWatch"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.ftp_lambda.function_name

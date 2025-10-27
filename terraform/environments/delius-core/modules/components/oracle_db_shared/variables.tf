@@ -52,7 +52,7 @@ variable "db_suffix" {
 # The following variables are required for setting up the Data Guard Observer as a Microservice
 variable "app_name" {
   type    = string
-  default = null
+  default = ""
 }
 
 variable "database_name" {
@@ -99,7 +99,7 @@ variable "ecs_cluster_arn" {
 
 # Only create one per account
 variable "create_backup_role" {
-  description = "Role used to run AWS Backuos i.e. dev-AWSBackupDefaultServiceRole"
+  description = "Role used to run AWS Backups i.e. AWSBackupDefaultServiceRole"
   type        = bool
   default     = false
 }

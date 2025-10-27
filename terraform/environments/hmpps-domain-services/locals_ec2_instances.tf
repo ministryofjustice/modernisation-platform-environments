@@ -14,7 +14,6 @@ locals {
         ebs_volumes_copy_all_from_ami = false
         iam_resource_names_prefix     = "ec2-instance"
         instance_profile_policies = [
-          "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
           "EC2Default",
           "EC2S3BucketWriteAndDeleteAccessPolicy",
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
@@ -71,7 +70,6 @@ locals {
         ebs_volumes_copy_all_from_ami = false
         iam_resource_names_prefix     = "ec2-instance"
         instance_profile_policies = [
-          "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
           "arn:aws:iam::aws:policy/AWSEC2VssSnapshotPolicy",
           "EC2Default",
           "EC2S3BucketWriteAndDeleteAccessPolicy",
@@ -99,10 +97,11 @@ locals {
         "/dev/sda1" = { type = "gp3", size = 100 }
       }
       tags = {
-        backup           = "false"
-        os-type          = "Windows"
-        server-type      = "RDGateway"
-        update-ssm-agent = "patchgroup2"
+        backup                 = "false"
+        os-type                = "Windows"
+        server-type            = "RDGateway"
+        update-ssm-agent       = "patchgroup2"
+        instance-access-policy = "none"
       }
     }
 
@@ -117,7 +116,6 @@ locals {
         ebs_volumes_copy_all_from_ami = false
         iam_resource_names_prefix     = "ec2-instance"
         instance_profile_policies = [
-          "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
           "EC2Default",
           "EC2S3BucketWriteAndDeleteAccessPolicy",
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
@@ -144,10 +142,11 @@ locals {
         "/dev/sda1" = { type = "gp3", size = 100 }
       }
       tags = {
-        backup           = "false"
-        os-type          = "Windows"
-        server-type      = "RDServices"
-        update-ssm-agent = "patchgroup2"
+        backup                 = "false"
+        os-type                = "Windows"
+        server-type            = "RDServices"
+        update-ssm-agent       = "patchgroup2"
+        instance-access-policy = "none"
       }
     }
   }

@@ -75,6 +75,15 @@ resource "aws_cloudwatch_log_subscription_filter" "userjourney_to_xsiam" {
   role_arn        = aws_iam_role.cw_logs_to_firehose_xsiam.arn
 }
 
+resource "aws_cloudwatch_log_subscription_filter" "directory_to_xsiam" {
+  count           = contains(["test", "preproduction", "production"], var.environment) ? 1 : 0
+  name            = "xsiam-firehose-subscription"
+  log_group_name  = var.ds_log_group_name
+  filter_pattern  = ""
+  destination_arn = aws_kinesis_firehose_delivery_stream.xsiam.arn
+  role_arn        = aws_iam_role.cw_logs_to_firehose_xsiam.arn
+}
+
 
 # Data source to get current account ID
 data "aws_caller_identity" "current_xsiam" {}

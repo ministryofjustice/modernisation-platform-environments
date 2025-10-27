@@ -32,6 +32,7 @@ variable "ldap_config" {
     port                        = optional(number)
     tls_port                    = optional(number)
     desired_count               = number
+    log_retention               = number
   })
   default = {
     name                        = "default_name"
@@ -45,6 +46,7 @@ variable "ldap_config" {
     port                        = 389
     tls_port                    = 636
     desired_count               = 0
+    log_retention               = 7
   }
 }
 
@@ -111,7 +113,7 @@ variable "env_name_to_dms_config_map" {
 
 # Only create one per account
 variable "create_backup_role" {
-  description = "Role used to run AWS Backuos i.e. AWSBackupDefaultServiceRole"
+  description = "Role used to run AWS Backups i.e. AWSBackupDefaultServiceRole"
   type        = bool
   default     = false
 }

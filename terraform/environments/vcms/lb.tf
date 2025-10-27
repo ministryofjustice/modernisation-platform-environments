@@ -1,127 +1,91 @@
-# checkov:skip=CKV_AWS_226
-# checkov:skip=CKV2_AWS_28
-
-module "ip_addresses" {
-  source = "../../modules/ip_addresses"
-}
-
-#tfsec:ignore:aws-elb-alb-not-public
-resource "aws_lb" "external" {
-  # checkov:skip=CKV_AWS_91
-  # checkov:skip=CKV2_AWS_28
-
-  name               = "${local.application_name}-lb"
-  internal           = false
-  load_balancer_type = "application"
-  security_groups    = [aws_security_group.load_balancer_security_group.id]
-  subnets            = data.aws_subnets.shared-public.ids
-
-  enable_deletion_protection = true
-  drop_invalid_header_fields = true
-
-  tags = merge(
-    local.tags,
-    {
-      Name = local.application_name
-    }
-  )
-}
-
-resource "aws_security_group" "load_balancer_security_group" {
-  name_prefix = "${local.application_name}-loadbalancer-security-group"
-  description = "controls access to lb"
-  vpc_id      = data.aws_vpc.shared.id
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "${local.application_name}-loadbalancer-security-group"
-    }
-  )
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
-resource "aws_vpc_security_group_ingress_rule" "load_balancer_ingress_rule" {
-  for_each          = toset(local.internal_security_group_cidrs)
-  description       = "Allow ingress from allow listed CIDRs"
-  security_group_id = aws_security_group.load_balancer_security_group.id
-  from_port         = 443
-  to_port           = 443
-  ip_protocol       = "tcp"
-  cidr_ipv4         = each.value
-}
-
-resource "aws_vpc_security_group_ingress_rule" "load_balancer_ingress_rule_ipv6" {
-  for_each          = toset(local.ipv6_cidr_blocks)
-  description       = "Allow ingress from allow listed CIDRs"
-  security_group_id = aws_security_group.load_balancer_security_group.id
-  from_port         = 443
-  to_port           = 443
-  ip_protocol       = "tcp"
-  cidr_ipv6         = each.value
-}
-
-resource "aws_vpc_security_group_egress_rule" "load_balancer_egress_rule" {
-  for_each          = toset([data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block])
-  description       = "Allow egress to ECS instances"
-  security_group_id = aws_security_group.load_balancer_security_group.id
-  from_port         = local.app_port
-  to_port           = local.app_port
-  ip_protocol       = "tcp"
-  cidr_ipv4         = each.value
-}
-
-resource "aws_lb_listener" "listener" {
-  load_balancer_arn = aws_lb.external.id
-  port              = 443
-  protocol          = "HTTPS"
-  certificate_arn   = aws_acm_certificate.external.arn
-  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
-
-  default_action {
-    target_group_arn = aws_lb_target_group.target_group_fargate.id
-    type             = "forward"
-  }
-
-  tags = merge(
-    local.tags,
-    {
-      Name = local.application_name
-    }
-  )
-}
-
-resource "aws_lb_target_group" "target_group_fargate" {
-  # checkov:skip=CKV_AWS_261
-
-  name                 = local.application_name
-  port                 = local.app_port
-  protocol             = "HTTP"
-  vpc_id               = data.aws_vpc.shared.id
-  target_type          = "ip"
-  deregistration_delay = 30
-
-  stickiness {
-    type = "lb_cookie"
-  }
+resource "aws_lb_target_group" "frontend" {
+  name     = "vcms-frontend"
+  port     = 80
+  protocol = "HTTP"
+  vpc_id   = local.account_info.vpc_id
 
   health_check {
+    healthy_threshold   = 3
+    unhealthy_threshold = 3
+    timeout             = 5
+    interval            = 30
     path                = "/"
-    healthy_threshold   = "5"
-    interval            = "120"
-    protocol            = "HTTP"
-    unhealthy_threshold = "2"
-    matcher             = "200-499"
-    timeout             = "5"
+    matcher             = "200-399"
   }
 
-  tags = merge(
-    local.tags,
-    {
-      Name = local.application_name
+  stickiness {
+    type            = "lb_cookie"
+    enabled         = true
+    cookie_duration = 86400
+  }
+
+  target_type = "ip"
+
+  tags = local.tags
+}
+
+# Security group for ALB
+resource "aws_security_group" "alb_sg" {
+  name        = "alb-sg"
+  description = "Security group for ALB"
+  vpc_id      = local.account_info.vpc_id
+
+  dynamic "ingress" {
+    for_each = local.internal_security_group_cidrs
+    content {
+      from_port   = 443
+      to_port     = 443
+      protocol    = "tcp"
+      cidr_blocks = [ingress.value]
     }
-  )
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = local.tags
+}
+
+# ALB
+resource "aws_lb" "frontend" {
+  name               = "frontend-alb"
+  internal           = false
+  load_balancer_type = "application"
+  security_groups    = [aws_security_group.alb_sg.id]
+  subnets            = local.account_config.public_subnet_ids
+
+  enable_deletion_protection = false
+  idle_timeout               = 60
+
+  tags = local.tags
+}
+
+# HTTP Listener
+# resource "aws_lb_listener" "frontend" {
+#   load_balancer_arn = aws_lb.frontend.arn
+#   port              = 80
+#   protocol          = "HTTP"
+
+#   default_action {
+#     type             = "forward"
+#     target_group_arn = aws_lb_target_group.frontend.arn
+#   }
+# }
+
+# HTTPS Listener
+resource "aws_lb_listener" "frontend_https" {
+  load_balancer_arn = aws_lb.frontend.arn
+  port              = 443
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  certificate_arn   = aws_acm_certificate.external.arn
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.frontend.arn
+  }
 }

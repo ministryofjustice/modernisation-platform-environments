@@ -50,6 +50,9 @@ resource "aws_s3_bucket_lifecycle_configuration" "PPUD" {
   rule {
     id     = "tf-s3-lifecycle"
     status = "Enabled"
+    filter {
+      prefix = ""
+    }
     abort_incomplete_multipart_upload {
       days_after_initiation = 7
     }
@@ -57,7 +60,6 @@ resource "aws_s3_bucket_lifecycle_configuration" "PPUD" {
       noncurrent_days = 30
       storage_class   = "STANDARD_IA"
     }
-
     transition {
       days          = 60
       storage_class = "STANDARD_IA"
@@ -160,11 +162,11 @@ resource "aws_s3_bucket_lifecycle_configuration" "MoJ-Health-Check-Reports" {
   rule {
     id     = "Remove-Old-SSM-Health-Check-Reports"
     status = "Enabled"
-    abort_incomplete_multipart_upload {
-      days_after_initiation = 7
-    }
     filter {
       prefix = "ssm_output/"
+    }
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
     }
     noncurrent_version_transition {
       noncurrent_days = 90
@@ -245,6 +247,9 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-infrastructure" {
   rule {
     id     = "remove-old-moj-infrastructure"
     status = "Enabled"
+    filter {
+      prefix = ""
+    }
     abort_incomplete_multipart_upload {
       days_after_initiation = 7
     }
@@ -386,6 +391,9 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-lambda-metrics-prod" {
   rule {
     id     = "remove-old-moj-lambda-metrics-prod"
     status = "Enabled"
+    filter {
+      prefix = ""
+    }
     abort_incomplete_multipart_upload {
       days_after_initiation = 3
     }
@@ -528,6 +536,9 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-database-source-prod" {
   rule {
     id     = "delete-moj-database-source-prod"
     status = "Enabled"
+    filter {
+      prefix = ""
+    }
     abort_incomplete_multipart_upload {
       days_after_initiation = 3
     }
@@ -669,6 +680,9 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-report-source-prod" {
   rule {
     id     = "delete-moj-report-source-prod"
     status = "Enabled"
+    filter {
+      prefix = ""
+    }
     abort_incomplete_multipart_upload {
       days_after_initiation = 3
     }
@@ -841,6 +855,9 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-log-files-prod" {
   rule {
     id     = "Move-to-IA-then-delete-moj-log-files-prod"
     status = "Enabled"
+    filter {
+      prefix = ""
+    }
     abort_incomplete_multipart_upload {
       days_after_initiation = 7
     }
@@ -1044,6 +1061,9 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-log-files-uat" {
   rule {
     id     = "Move-to-IA-then-delete-moj-log-files-uat"
     status = "Enabled"
+    filter {
+      prefix = ""
+    }
     abort_incomplete_multipart_upload {
       days_after_initiation = 7
     }
@@ -1229,6 +1249,9 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-database-source-uat" {
   rule {
     id     = "delete-moj-database-source-uat"
     status = "Enabled"
+    filter {
+      prefix = ""
+    }
     abort_incomplete_multipart_upload {
       days_after_initiation = 3
     }
@@ -1242,7 +1265,7 @@ resource "aws_s3_bucket_replication_configuration" "moj-database-source-uat-repl
   count = local.is-preproduction == true ? 1 : 0
   # Must have bucket versioning enabled first
   depends_on = [aws_s3_bucket_versioning.moj-database-source-uat]
-  role       = aws_iam_role.iam_role_s3_bucket_moj_report_source_uat[0].arn # check config
+  role       = aws_iam_role.iam_role_s3_bucket_moj_database_source_uat[0].arn
   bucket     = aws_s3_bucket.moj-database-source-uat[0].id
 
   rule {
@@ -1387,6 +1410,9 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-report-source-uat" {
   rule {
     id     = "delete-moj-report-source-uat"
     status = "Enabled"
+    filter {
+      prefix = ""
+    }
     abort_incomplete_multipart_upload {
       days_after_initiation = 3
     }
@@ -1395,7 +1421,6 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-report-source-uat" {
     }
   }
 }
-
 
 resource "aws_s3_bucket_replication_configuration" "moj-report-source-uat-replication" {
   count = local.is-preproduction == true ? 1 : 0
@@ -1566,6 +1591,9 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-log-files-dev" {
   rule {
     id     = "Move-to-IA-then-delete-moj-log-files-dev"
     status = "Enabled"
+    filter {
+      prefix = ""
+    }
     abort_incomplete_multipart_upload {
       days_after_initiation = 7
     }
@@ -1754,6 +1782,9 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-lambda-layers-dev" {
   rule {
     id     = "Move-to-IA-then-delete-moj-lambda-layers-dev"
     status = "Enabled"
+    filter {
+      prefix = ""
+    }
     abort_incomplete_multipart_upload {
       days_after_initiation = 7
     }
@@ -1900,6 +1931,9 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-database-source-dev" {
   rule {
     id     = "delete-moj-database-source-dev"
     status = "Enabled"
+    filter {
+      prefix = ""
+    }
     abort_incomplete_multipart_upload {
       days_after_initiation = 3
     }
@@ -2058,6 +2092,9 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-report-source-dev" {
   rule {
     id     = "delete-moj-report-source-dev"
     status = "Enabled"
+    filter {
+      prefix = ""
+    }
     abort_incomplete_multipart_upload {
       days_after_initiation = 3
     }
@@ -2066,7 +2103,6 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-report-source-dev" {
     }
   }
 }
-
 
 resource "aws_s3_bucket_replication_configuration" "moj-report-source-dev-replication" {
   count = local.is-development == true ? 1 : 0
@@ -2218,6 +2254,9 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-infrastructure-dev" {
   rule {
     id     = "remove-old-moj-infrastructure-dev"
     status = "Enabled"
+    filter {
+      prefix = ""
+    }
     abort_incomplete_multipart_upload {
       days_after_initiation = 7
     }
@@ -2359,6 +2398,9 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-infrastructure-uat" {
   rule {
     id     = "remove-old-moj-infrastructure-uat"
     status = "Enabled"
+    filter {
+      prefix = ""
+    }
     abort_incomplete_multipart_upload {
       days_after_initiation = 7
     }

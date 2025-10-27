@@ -133,23 +133,26 @@ resource "aws_vpc_security_group_ingress_rule" "db_inter_conn" {
   referenced_security_group_id = aws_security_group.db_ec2.id
 }
 
-resource "aws_vpc_security_group_ingress_rule" "delius_db_security_group_ingress_bastion" {
-  security_group_id            = aws_security_group.db_ec2.id
-  description                  = "bastion to testing db"
-  from_port                    = local.db_port
-  to_port                      = local.db_tcps_port
-  ip_protocol                  = "tcp"
-  referenced_security_group_id = var.bastion_sg_id
-}
+# Access covered by: resource "aws_vpc_security_group_ingress_rule" "delius_db_oem_db"
+# resource "aws_vpc_security_group_ingress_rule" "delius_db_security_group_ingress_bastion" {
+#   security_group_id            = aws_security_group.db_ec2.id
+#   description                  = "bastion to testing db"
+#   from_port                    = local.db_port
+#   to_port                      = local.db_tcps_port
+#   ip_protocol                  = "tcp"
+#   # referenced_security_group_id = var.bastion_sg_id # # Temporarily removed to recreate bastion SG
+#   cidr_ipv4                    = var.account_config.shared_vpc_cidr
+# }
 
 resource "aws_vpc_security_group_ingress_rule" "delius_db_security_group_ssh_ingress_bastion" {
   #checkov:skip=CKV_AWS_24
-  security_group_id            = aws_security_group.db_ec2.id
-  description                  = "bastion to testing db"
-  from_port                    = 22
-  to_port                      = 22
-  ip_protocol                  = "tcp"
-  referenced_security_group_id = var.bastion_sg_id
+  security_group_id = aws_security_group.db_ec2.id
+  description       = "bastion to testing db"
+  from_port         = 22
+  to_port           = 22
+  ip_protocol       = "tcp"
+  # referenced_security_group_id = var.bastion_sg_id # Temporarily removed to recreate bastion SG
+  cidr_ipv4 = var.account_config.shared_vpc_cidr
 }
 
 resource "aws_vpc_security_group_ingress_rule" "delius_db_oem_db" {
@@ -202,15 +205,29 @@ resource "aws_vpc_security_group_egress_rule" "delius_db_oem_console" {
 }
 
 # https://dsdmoj.atlassian.net/browse/TM-1162
+# resource "aws_vpc_security_group_ingress_rule" "ap_db_oracle" {
+#   count             = (var.env_name == "dev" || var.env_name == "test") ? 1 : 0
+#   ip_protocol       = "tcp"
+#   from_port         = 1521
+#   to_port           = 1522
+#   cidr_ipv4         = local.ap_dev_cidr
+#   security_group_id = aws_security_group.db_ec2.id
+#   description       = "Allow communication in on port 1521/1522 from AP dev"
+#   tags = merge(var.tags,
+#     { Name = "ap-oracle-in" }
+#   )
+# }
+
 resource "aws_vpc_security_group_ingress_rule" "ap_db_oracle" {
-  count             = var.env_name == "dev" ? 1 : 0
+  for_each = try({ for env, cidr in local.ap_env_cidrs : env => cidr if env == var.env_name }, {})
+
   ip_protocol       = "tcp"
   from_port         = 1521
   to_port           = 1522
-  cidr_ipv4         = local.ap_dev_cidr
+  cidr_ipv4         = each.value
   security_group_id = aws_security_group.db_ec2.id
-  description       = "Allow communication in on port 1521/1522 from AP dev"
+  description       = "Allow communication in on port 1521,1522 from AP ${each.key}"
   tags = merge(var.tags,
-    { Name = "ap-oracle-in" }
+    { Name = "ap-oracle-in-${each.key}" }
   )
 }

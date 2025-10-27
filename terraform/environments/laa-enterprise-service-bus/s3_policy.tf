@@ -31,7 +31,9 @@ resource "aws_s3_bucket_policy" "data_cross_account_access" {
         Principal = {
           AWS = [
             "arn:aws:iam::${local.application_data.accounts[local.environment].ccms_account_id}:role/role_stsassume_oracle_base",
-            "arn:aws:iam::${local.application_data.accounts[local.environment].maatdb_account_id}:role/rds-hub20-s3-access"
+            "arn:aws:iam::${local.application_data.accounts[local.environment].maatdb_account_id}:role/rds-hub20-s3-access",
+            local.application_data.accounts[local.environment].cclf_rds_role_arn,
+            local.application_data.accounts[local.environment].ccr_rds_role_arn
           ]
         },
         Action = [
@@ -45,6 +47,32 @@ resource "aws_s3_bucket_policy" "data_cross_account_access" {
           "arn:aws:s3:::${aws_s3_bucket.data.bucket}",
           "arn:aws:s3:::${aws_s3_bucket.data.bucket}/*"
         ]
+      }
+    ]
+  })
+}
+
+#####################################################################################
+##################### S3 Bucket policy for Access Logs Bucket #######################
+#####################################################################################
+resource "aws_s3_bucket_policy" "log_bucket_policy" {
+  bucket = aws_s3_bucket.access_logs.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "logging.s3.amazonaws.com"
+        }
+        Action   = "s3:PutObject"
+        Resource = "${aws_s3_bucket.access_logs.arn}/*"
+        Condition = {
+          StringEquals = {
+            "aws:SourceArn" = aws_s3_bucket.data.arn
+          }
+        }
       }
     ]
   })

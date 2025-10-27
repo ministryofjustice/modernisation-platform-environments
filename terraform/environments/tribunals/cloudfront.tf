@@ -11,14 +11,10 @@ resource "aws_cloudfront_distribution" "tribunals_distribution" {
   logging_config {
     include_cookies = false
     bucket          = aws_s3_bucket.cloudfront_logs.bucket_domain_name
-    prefix          = "cloudfront-logs/"
+    prefix          = "cloudfront-logs-v2/"
   }
 
-  aliases = local.is-production ? [
-    "*.decisions.tribunals.gov.uk",
-    "*.venues.tribunals.gov.uk",
-    "*.reports.tribunals.gov.uk"
-  ] : ["*.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
+  aliases = local.is-production ? concat(local.common_sans, local.cloudfront_sans, ["*.decisions.tribunals.gov.uk"]) : local.nonprod_sans
   origin {
     domain_name = aws_lb.tribunals_lb.dns_name
     origin_id   = "tribunalsOrigin"
@@ -49,10 +45,13 @@ resource "aws_cloudfront_distribution" "tribunals_distribution" {
     allowed_methods        = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
     cached_methods         = ["GET", "HEAD"]
     compress               = true
-    default_ttl            = 0
-    min_ttl                = 0
-    max_ttl                = 31536000
     smooth_streaming       = false
+
+    lambda_function_association {
+      event_type   = "viewer-request"
+      lambda_arn   = aws_lambda_function.cloudfront_redirect_lambda.qualified_arn
+      include_body = false
+    }
   }
 
   enabled         = true
@@ -61,7 +60,7 @@ resource "aws_cloudfront_distribution" "tribunals_distribution" {
   price_class     = "PriceClass_All"
 
   viewer_certificate {
-    acm_certificate_arn      = aws_acm_certificate.cloudfront.arn
+    acm_certificate_arn      = aws_acm_certificate_validation.cloudfront_cert_validation.certificate_arn
     ssl_support_method       = "sni-only"
     minimum_protocol_version = "TLSv1.2_2021"
   }
@@ -71,6 +70,9 @@ resource "aws_cloudfront_distribution" "tribunals_distribution" {
       restriction_type = "none"
     }
   }
+  depends_on = [
+    aws_lambda_function.cloudfront_redirect_lambda
+  ]
 }
 
 data "aws_cloudfront_cache_policy" "caching_disabled" {
@@ -86,10 +88,12 @@ resource "aws_acm_certificate" "cloudfront" {
   provider                  = aws.us-east-1
   domain_name               = local.is-production ? "*.decisions.tribunals.gov.uk" : "modernisation-platform.service.justice.gov.uk"
   validation_method         = "DNS"
-  subject_alternative_names = local.is-production ? ["*.venues.tribunals.gov.uk", "*.reports.tribunals.gov.uk"] : ["*.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
+  subject_alternative_names = local.is-production ? concat(local.common_sans, local.cloudfront_sans) : local.nonprod_sans
+
   tags = {
     Environment = local.environment
   }
+
   lifecycle {
     create_before_destroy = true
   }
@@ -98,6 +102,31 @@ resource "aws_acm_certificate" "cloudfront" {
 resource "aws_acm_certificate_validation" "cloudfront_cert_validation" {
   provider        = aws.us-east-1
   certificate_arn = aws_acm_certificate.cloudfront.arn
+  validation_record_fqdns = [
+    for record in aws_route53_record.cloudfront_cert_cname_validation : record.fqdn
+  ]
+}
+
+// Route53 DNS records for certificate validation
+// Don't duplicate the common_sans domains here - already generated in dns_ssl.tf
+resource "aws_route53_record" "cloudfront_cert_cname_validation" {
+  provider = aws.core-network-services
+
+  for_each = {
+    for dvo in aws_acm_certificate.cloudfront.domain_validation_options :
+    dvo.domain_name => {
+      name  = dvo.resource_record_name
+      type  = dvo.resource_record_type
+      value = dvo.resource_record_value
+    }
+  }
+
+  allow_overwrite = true
+  name            = each.value.name
+  records         = [each.value.value]
+  ttl             = 300
+  type            = each.value.type
+  zone_id         = local.is-production ? data.aws_route53_zone.production_zone.zone_id : data.aws_route53_zone.network-services.zone_id
 }
 
 data "aws_ec2_managed_prefix_list" "cloudfront" {
@@ -187,23 +216,23 @@ resource "aws_s3_bucket_policy" "cloudfront_logs" {
         Principal = {
           Service = "delivery.logs.amazonaws.com"
         }
-        Action = [
-          "s3:PutObject",
-          "s3:GetBucketAcl",
-          "s3:PutBucketAcl"
-        ]
-        Resource = [
-          aws_s3_bucket.cloudfront_logs.arn,
-          "${aws_s3_bucket.cloudfront_logs.arn}/*"
-        ]
+        Action   = "s3:PutObject"
+        Resource = "${aws_s3_bucket.cloudfront_logs.arn}/cloudfront-logs-v2/*"
         Condition = {
           StringEquals = {
             "aws:SourceAccount" = data.aws_caller_identity.current.account_id
-          }
-          StringLike = {
-            "aws:SourceArn" = "arn:aws:cloudfront::${data.aws_caller_identity.current.account_id}:distribution/${aws_cloudfront_distribution.tribunals_distribution.id}"
+            "aws:SourceArn"     = aws_cloudfront_distribution.tribunals_distribution.arn
           }
         }
+      },
+      {
+        Sid    = "AllowCloudFrontLogDeliveryGetBucketAcl"
+        Effect = "Allow"
+        Principal = {
+          Service = "delivery.logs.amazonaws.com"
+        }
+        Action   = "s3:GetBucketAcl"
+        Resource = aws_s3_bucket.cloudfront_logs.arn
       }
     ]
   })
@@ -271,4 +300,102 @@ resource "aws_cloudfront_response_headers_policy" "security_headers_policy" {
       override   = true
     }
   }
+}
+
+# IAM Policy for Lambda@Edge
+resource "aws_iam_role_policy" "lambda_edge_policy" {
+  name     = "CloudfrontRedirectLambdaPolicy"
+  role     = aws_iam_role.lambda_edge_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "lambda:CreateFunction",
+          "lambda:UpdateFunctionCode",
+          "lambda:PublishVersion",
+          "lambda:GetFunction",
+          "lambda:UpdateFunctionConfiguration",
+          "lambda:AddPermission",
+          "lambda:InvokeFunction"
+        ]
+        Resource = "arn:aws:lambda:us-east-1:${data.aws_caller_identity.current.account_id}:function:CloudfrontRedirectLambda"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ]
+        Resource = "arn:aws:logs:us-east-1:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/CloudfrontRedirectLambda:*"
+      },
+      {
+        Effect = "Allow"
+        Action = "iam:PassRole"
+        Resource = aws_iam_role.lambda_edge_role.arn
+        Condition = {
+          StringEquals = {
+            "iam:PassedToService" = ["lambda.amazonaws.com", "edgelambda.amazonaws.com"]
+          }
+        }
+      }
+    ]
+  })
+}
+
+# IAM Role for Lambda@Edge
+resource "aws_iam_role" "lambda_edge_role" {
+  name = "CloudfrontRedirectLambdaRole"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = ["lambda.amazonaws.com", "edgelambda.amazonaws.com"]
+        }
+      }
+    ]
+  })
+}
+
+# Create ZIP archive for Lambda@Edge function
+data "archive_file" "lambda_zip" {
+  type        = "zip"
+  source_file = "lambda/cloudfront-redirect.js"
+  output_path = "lambda/cloudfront-redirect.zip"
+}
+
+data "archive_file" "lambda_zip_nonprod" {
+  type        = "zip"
+  source_file = "lambda/cloudfront-redirect-nonprod.js"
+  output_path = "lambda/cloudfront-redirect-nonprod.zip"
+}
+
+# Lambda@Edge Function (must be in us-east-1 for CloudFront)
+resource "aws_lambda_function" "cloudfront_redirect_lambda" {
+  provider         = aws.us-east-1
+  function_name    = "CloudfrontRedirectLambda"
+  filename         = local.is-production ? data.archive_file.lambda_zip.output_path : data.archive_file.lambda_zip_nonprod.output_path
+  source_code_hash = local.is-production ? data.archive_file.lambda_zip.output_base64sha256 : data.archive_file.lambda_zip_nonprod.output_base64sha256
+  role             = aws_iam_role.lambda_edge_role.arn
+  handler          = "cloudfront-redirect.handler"
+  runtime          = "nodejs18.x"
+  publish          = true
+  timeout          = 5
+  memory_size      = 128
+}
+
+# Lambda Permission for CloudFront
+resource "aws_lambda_permission" "allow_cloudfront" {
+  provider      = aws.us-east-1
+  statement_id  = "AllowCloudFrontExecution"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.cloudfront_redirect_lambda.function_name
+  principal     = "edgelambda.amazonaws.com"
+  source_arn    = aws_cloudfront_distribution.tribunals_distribution.arn
 }

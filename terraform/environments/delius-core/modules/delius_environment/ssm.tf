@@ -14,6 +14,17 @@
 # SECRET_/delius-core-dev/delius-core/merge/api/client_secret="secret"
 # SECRET_/delius-core-dev/delius-core/weblogic/ndelius-domain/umt_client_secret="secret"
 
+locals {
+  # use a diff app name only when env = training for ssm vars and ssm bucket
+  normalized_app_name = var.env_name == "training" ? "delius-core" : var.account_info.application_name
+
+  ssm_app_prefix = format("%s-%s", local.normalized_app_name, var.env_name)
+
+  app_alias_ssm_bucket = var.env_name == "training" ? "delius" : var.account_info.application_name
+
+  bucket_prefix_final = "${local.app_alias_ssm_bucket}-${var.env_name}-ssm-sessions"
+}
+
 resource "aws_ssm_parameter" "ldap_bind_password" {
   name  = format("/%s-%s/LDAP_BIND_PASSWORD", var.account_info.application_name, var.env_name)
   type  = "SecureString"
@@ -357,9 +368,9 @@ resource "aws_ssm_parameter" "delius_core_merge_db_pool_password" {
 ######################################
 module "s3_bucket_ssm_sessions" {
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
 
-  bucket_prefix      = "${var.account_info.application_name}-${var.env_name}-ssm-sessions"
+  bucket_prefix      = local.bucket_prefix_final
   versioning_enabled = false
 
   providers = {

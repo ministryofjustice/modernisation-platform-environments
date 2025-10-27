@@ -7,7 +7,8 @@ locals {
 
   baseline_presets_preproduction = {
     options = {
-      enable_xsiam_s3_integration = true
+      enable_xsiam_cloudwatch_integration = true
+      enable_xsiam_s3_integration         = true
       route53_resolver_rules = {
         outbound-data-and-private-subnets = ["azure-fixngo-domain", "infra-int-domain"]
       }
@@ -104,7 +105,7 @@ locals {
         })
       })
 
-      # NOT-ACTIVE (green deployment) - for testing Combined Reporting
+      # NOT-ACTIVE (green deployment)
       preprod-nomis-web-b = merge(local.ec2_autoscaling_groups.web, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.web.autoscaling_group, {
           desired_capacity = 0
@@ -136,11 +137,10 @@ locals {
           })
         })
         tags = merge(local.ec2_autoscaling_groups.web.tags, {
-          nomis-environment     = "preprod"
-          oracle-db-hostname-a  = "ppnomis-a.preproduction.nomis.service.justice.gov.uk"
-          oracle-db-hostname-b  = "ppnomis-b.preproduction.nomis.service.justice.gov.uk"
-          oracle-db-name        = "PPCNOM"
-          reporting-environment = "aws"
+          nomis-environment    = "preprod"
+          oracle-db-hostname-a = "ppnomis-a.preproduction.nomis.service.justice.gov.uk"
+          oracle-db-hostname-b = "ppnomis-b.preproduction.nomis.service.justice.gov.uk"
+          oracle-db-name       = "PPCNOM"
         })
       })
 

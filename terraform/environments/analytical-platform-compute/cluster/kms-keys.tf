@@ -171,22 +171,6 @@ module "managed_prometheus_kms" {
   tags = local.tags
 }
 
-module "ui_rds_kms" {
-  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
-  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
-
-  source  = "terraform-aws-modules/kms/aws"
-  version = "4.0.0"
-
-  aliases               = ["rds/ui"]
-  description           = "UI RDS KMS key"
-  enable_default_policy = true
-
-  deletion_window_in_days = 7
-
-  tags = local.tags
-}
-
 module "common_secrets_manager_kms" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions

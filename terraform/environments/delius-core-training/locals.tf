@@ -11,11 +11,6 @@ locals {
   frontend_image_tag      = "6.2.0.3"
   frontend_container_port = 8080
 
-  #   delius_environments_per_account = {
-  #     # account = [env1, env2]
-  #     prod = ["prod"]
-  #   }
-
   ordered_subnet_ids = [data.aws_subnets.shared-private-a.ids[0], data.aws_subnets.shared-private-b.ids[0], data.aws_subnets.shared-private-c.ids[0]]
 
   # Define a mapping of delius_environments to DMS configuration for that environment.  We include the ID of the AWS

@@ -667,7 +667,7 @@ data "aws_iam_policy_document" "athena_api" {
     ]
     resources = [
       "arn:aws:lambda:${local.account_region}:${local.account_id}:function:dpr-athena-federated-query-oracle-function",
-      "arn:aws:lambda:${local.account_region}:${local.account_id}:function:dpr-athena-federated-query-postgresql-function",
+      "arn:aws:lambda:${local.account_region}:${local.account_id}:function:dpr-dps-*-federated-query-function",
       "arn:aws:lambda:${local.account_region}:${local.account_id}:function:dpr-athena-federated-query-redshift-function"
     ]
   }
@@ -768,6 +768,7 @@ resource "aws_iam_policy" "glue_catalog_readonly" {
   policy      = data.aws_iam_policy_document.glue_catalog_readonly.json
 }
 
+
 # LakeFormation Data Access
 # Policy Document
 
@@ -786,6 +787,31 @@ resource "aws_iam_policy" "lake_formation_data_access" {
   name        = "${local.project}-lake-formation-data-access"
   description = "LakeFormation Get Data Access Policy"
   policy      = data.aws_iam_policy_document.lake_formation_data_access.json
+}
+
+# Lake formation permissions management
+
+data "aws_iam_policy_document" "lake_formation_permissions_management" {
+  statement {
+    actions = [
+
+      # Permission management
+      "lakeformation:GrantPermissions",
+      "lakeformation:RevokePermissions",
+      "lakeformation:BatchGrantPermissions",
+      "lakeformation:BatchRevokePermissions",
+      "lakeformation:ListPermissions",
+    ]
+    resources = [
+      "*"
+    ]
+  }
+}
+
+resource "aws_iam_policy" "lake_formation_permissions_management" {
+  name        = "${local.project}-lake-formation-permissions-management"
+  description = "LakeFormation permission management"
+  policy      = data.aws_iam_policy_document.lake_formation_permissions_management.json
 }
 
 
@@ -839,7 +865,10 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
 
       # LF tag permissions (needed to create and grant tag-based access)
       "lakeformation:CreateLFTag",
+      "lakeformation:CreateLFTagExpression",
+      "lakeformation:GetLFTagExpression",
       "lakeformation:UpdateLFTag",
+      "lakeformation:UpdateLFTagExpression",
       "lakeformation:DeleteLFTag",
       "lakeformation:GetResourceLFTags",
       "lakeformation:ListLFTags",
@@ -890,15 +919,39 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
       "glue:GetTable",
       "glue:GetDatabase",
       "glue:GetPartition",
-      "glue:GetTags"
+      "glue:GetTags",
+      "glue:DeleteDatabase",
+      "glue:TagResource",
+      "glue:UpdateDatabase"
     ]
     resources = flatten([
       for resource in each.value.resource_shares : [
         "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:database/${resource.glue_database}",
         formatlist("arn:aws:glue:${local.current_account_region}:${local.current_account_id}:table/${resource.glue_database}/%s", resource.glue_tables),
+        "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:userDefinedFunction/${resource.glue_database}/*",
         "arn:aws:glue:${local.current_account_region}:${local.current_account_id}:catalog"
       ]
     ])
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "iam:CreateRole",
+      "iam:DeleteRole",
+      "iam:DeleteRolePolicy",
+      "iam:GetRole",
+      "iam:TagRole",
+      "iam:ListRolePolicies",
+      "iam:ListAttachedRolePolicies",
+      "iam:ListInstanceProfilesForRole",
+      "iam:PutRolePolicy",
+      "iam:PassRole"
+
+    ]
+    resources = [
+      "arn:aws:iam::${local.current_account_id}:role/*-location"
+    ]
   }
 }
 

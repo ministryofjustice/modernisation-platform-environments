@@ -1,6 +1,7 @@
+# eventbridge rule for ECS Task Retirements
 resource "aws_cloudwatch_event_rule" "ecs_restart_rule" {
-  name        = "ecs_task_retirement_rule"
-  description = "Rule to catch AWS ECS Task Patching Retirement events"
+  name        = "RuleToRestartECSTasksWhenEventsReceived-in-${var.environment}"
+  description = "Rule to catch AWS ECS Task Patching Retirement events for ${var.environment}"
 
   event_pattern = jsonencode({
     "detail-type" : ["AWS Health Event"],
@@ -17,47 +18,22 @@ resource "aws_cloudwatch_event_target" "step_function_target" {
 }
 
 
-# test rule for all aws health events
-resource "aws_cloudwatch_event_rule" "all_health_events" {
-  name        = "all_health_events"
-  description = "Rule to catch all AWS Health events"
-
-  event_pattern = jsonencode({
-    "source" : ["aws.health"]
-  })
+# CloudWatch log group to capture events
+resource "aws_cloudwatch_log_group" "ecs_restart_events" {
+  name = "/aws/health/ecs_restart_events/${var.environment}"
 }
 
-resource "aws_cloudwatch_log_group" "all_health_events" {
-  name = "/aws/health/all_health_events"
-}
-
-data "aws_iam_policy_document" "all_health_events" {
+# IAM policy to allow EventBridge to write logs
+data "aws_iam_policy_document" "ecs_restart_logging" {
   statement {
     effect = "Allow"
     actions = [
-      "logs:CreateLogStream"
-    ]
-
-    resources = [
-      "${aws_cloudwatch_log_group.all_health_events.arn}:*"
-    ]
-
-    principals {
-      type = "Service"
-      identifiers = [
-        "events.amazonaws.com",
-        "delivery.logs.amazonaws.com"
-      ]
-    }
-  }
-  statement {
-    effect = "Allow"
-    actions = [
+      "logs:CreateLogStream",
       "logs:PutLogEvents"
     ]
 
     resources = [
-      "${aws_cloudwatch_log_group.all_health_events.arn}:*:*"
+      "${aws_cloudwatch_log_group.ecs_restart_events.arn}:*"
     ]
 
     principals {
@@ -67,28 +43,23 @@ data "aws_iam_policy_document" "all_health_events" {
         "delivery.logs.amazonaws.com"
       ]
     }
-
-    condition {
-      test     = "ArnEquals"
-      values   = [aws_cloudwatch_event_rule.all_health_events.arn]
-      variable = "aws:SourceArn"
-    }
   }
 }
 
-resource "aws_cloudwatch_log_resource_policy" "all_health_events" {
-  policy_document = data.aws_iam_policy_document.all_health_events.json
-  policy_name     = "all-health-events-log-publishing-policy"
+resource "aws_cloudwatch_log_resource_policy" "ecs_restart_logging_policy" {
+  policy_document = data.aws_iam_policy_document.ecs_restart_logging.json
+  policy_name     = "ecs-restart-events-log-policy-${var.environment}"
 }
 
-resource "aws_cloudwatch_event_target" "all_health_events" {
-  rule = aws_cloudwatch_event_rule.all_health_events.name
-  arn  = aws_cloudwatch_log_group.all_health_events.arn
-}
 
+# event bridge target to push to log groups
+resource "aws_cloudwatch_event_target" "ecs_restart_logging_target" {
+  rule = aws_cloudwatch_event_rule.ecs_restart_rule.name
+  arn  = aws_cloudwatch_log_group.ecs_restart_events.arn
+}
 
 resource "aws_iam_role" "eventbridge_execution_role" {
-  name = "eventbridge_execution_role"
+  name = "${var.environment}_eventbridge_execution_role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -105,7 +76,7 @@ resource "aws_iam_role" "eventbridge_execution_role" {
 }
 
 resource "aws_iam_policy" "eventbridge_execution_role_policy" {
-  name = "eventbridge_execution_role_policy"
+  name = "${var.environment}_eventbridge_execution_role_policy"
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [

@@ -161,6 +161,46 @@ locals {
         }
       }
     }
+    ec2_instance_cwagent_windows = {
+      free-disk-space-low = {
+        type            = "metric"
+        alarm_threshold = local.cloudwatch_metric_alarms.ec2_cwagent_windows.free-disk-space-low.threshold
+        expression      = "SORT(SEARCH('{CWAgent,InstanceId,instance,objectname} MetricName=\"DISK_FREE\"','Minimum'),MIN,ASC)"
+        properties = {
+          view    = "timeSeries"
+          stacked = false
+          region  = "eu-west-2"
+          title   = "EC2 Instance Windows free-disk-space-low"
+          stat    = "Minimum"
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "disk free %"
+            }
+          }
+        }
+      }
+    }
+    ec2_autoscaling_group_cwagent_windows = {
+      free-disk-space-low = {
+        type            = "metric"
+        alarm_threshold = local.cloudwatch_metric_alarms.ec2_cwagent_windows.free-disk-space-low.threshold
+        expression      = "SORT(SEARCH('{CWAgent,AutoScalingGroupName,InstanceId,instance,objectname} MetricName=\"DISK_FREE\"','Minimum'),MIN,ASC)"
+        properties = {
+          view    = "timeSeries"
+          stacked = false
+          region  = "eu-west-2"
+          title   = "EC2 Autoscaling Group Windows free-disk-space-low"
+          stat    = "Minimum"
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "disk used %"
+            }
+          }
+        }
+      }
+    }
 
     ec2_cwagent_linux = {
       free-disk-space-low = {
@@ -247,7 +287,7 @@ locals {
           view    = "timeSeries"
           stacked = false
           region  = "eu-west-2"
-          title   = "EC2 Autoscaling Group free-disk-space-low"
+          title   = "EC2 Autoscaling Group Linux free-disk-space-low"
           stat    = "Maximum"
           yAxis = {
             left = {
@@ -1053,6 +1093,16 @@ locals {
         local.cloudwatch_dashboard_widgets.ec2_cwagent_windows.free-disk-space-low,
         local.cloudwatch_dashboard_widgets.ec2_cwagent_windows.high-memory-usage,
         null
+      ]
+    }
+    ec2_instance_only_windows = {
+      header_markdown = "## EC2 all Windows standalone instances"
+      width           = 8
+      height          = 8
+      widgets = [
+        local.cloudwatch_dashboard_widgets.ec2_cwagent_windows.free-disk-space-low,
+        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_windows.free-disk-space-low,
+        local.cloudwatch_dashboard_widgets.ec2_cwagent_windows.high-memory-usage,
       ]
     }
     ec2_linux = {

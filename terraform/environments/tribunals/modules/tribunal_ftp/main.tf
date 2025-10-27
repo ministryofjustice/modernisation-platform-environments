@@ -44,7 +44,7 @@ resource "aws_ecr_repository" "app-ecr-repo" {
   #checkov:skip=CKV_AWS_136:"Using default AWS encryption for ECR which is sufficient for our needs"
   #checkov:skip=CKV_AWS_51:"Repository needs to be mutable to support latest tag deployments"
   name                 = "${var.app_name}-ecr-repo"
-  force_delete         = var.app_name == "ftp-sscs-venues" ? true : false
+  force_delete         = false
   image_tag_mutability = "MUTABLE"
 
   image_scanning_configuration {

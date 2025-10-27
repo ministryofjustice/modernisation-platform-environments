@@ -83,6 +83,8 @@ module "ldap_ecs" {
     }
   }
 
+  log_retention = var.ldap_config.log_retention
+
   sns_topic_arn           = aws_sns_topic.delius_core_alarms.arn
   enable_platform_backups = var.enable_platform_backups
 
@@ -130,11 +132,13 @@ module "ldap_ecs" {
       cidr_ipv4   = var.account_config.shared_vpc_cidr
       description = "Allow inbound traffic from VPC"
     },
+    # Access is covered by above rule, using temp localhost CIDR so all rules aren't recreated/reordered
     {
-      port                         = var.ldap_config.port
-      ip_protocol                  = "udp"
-      referenced_security_group_id = module.bastion_linux.bastion_security_group
-      description                  = "Allow inbound traffic from bastion"
+      port        = var.ldap_config.port
+      ip_protocol = "udp"
+      # referenced_security_group_id = module.bastion_linux.bastion_security_group # Temporarily removed to recreate bastion SG
+      cidr_ipv4   = "127.0.0.1/32"
+      description = "Allow inbound traffic from bastion"
     },
     {
       port        = var.ldap_config.port
@@ -178,11 +182,13 @@ module "ldap_ecs" {
       cidr_ipv4   = var.account_config.shared_vpc_cidr
       description = "Allow inbound traffic from VPC"
     },
+    # Access is covered by above rule, using temp localhost CIDR so all rules aren't recreated/reordered
     {
-      port                         = var.ldap_config.tls_port
-      ip_protocol                  = "udp"
-      referenced_security_group_id = module.bastion_linux.bastion_security_group
-      description                  = "Allow inbound traffic from bastion"
+      port        = var.ldap_config.tls_port
+      ip_protocol = "udp"
+      # referenced_security_group_id = module.bastion_linux.bastion_security_group # Temporarily removed to recreate bastion SG
+      cidr_ipv4   = "127.0.0.1/32"
+      description = "Allow inbound traffic from bastion"
     },
     {
       port        = var.ldap_config.tls_port
@@ -223,11 +229,13 @@ module "ldap_ecs" {
       cidr_ipv4   = var.account_config.shared_vpc_cidr
       description = "Allow inbound traffic from VPC"
     },
+    # Access is covered by above rule, using temp localhost CIDR so all rules aren't recreated/reordered
     {
-      port                         = var.ldap_config.port
-      ip_protocol                  = "udp"
-      referenced_security_group_id = module.bastion_linux.bastion_security_group
-      description                  = "Allow inbound traffic from bastion"
+      port        = var.ldap_config.port
+      ip_protocol = "udp"
+      # referenced_security_group_id = module.bastion_linux.bastion_security_group # Temporarily removed to recreate bastion SG
+      cidr_ipv4   = "127.0.0.1/32"
+      description = "Allow inbound traffic from bastion"
     },
     {
       port        = var.ldap_config.port
@@ -368,4 +376,46 @@ resource "aws_cloudwatch_log_group" "ldap_automation" {
   name              = "/ecs/ldap-automation-${var.env_name}"
   retention_in_days = 7
   tags              = var.tags
+}
+
+resource "aws_cloudwatch_log_data_protection_policy" "ldap_automation" {
+  log_group_name = aws_cloudwatch_log_group.ldap_automation.name
+
+  policy_document = jsonencode({
+    Name        = "data-protection-policy",
+    Description = "",
+    Version     = "2021-06-01",
+    Statement = [
+      {
+        Sid = "audit-policy",
+        DataIdentifier = [
+          "MatchSshaHashes"
+        ],
+        Operation = {
+          Audit = {
+            FindingsDestination = {}
+          }
+        }
+      },
+      {
+        Sid = "redact-policy",
+        DataIdentifier = [
+          "MatchSshaHashes"
+        ],
+        Operation = {
+          Deidentify = {
+            MaskConfig = {}
+          }
+        }
+      }
+    ],
+    Configuration = {
+      CustomDataIdentifier = [
+        {
+          Name  = "MatchSshaHashes",
+          Regex = "{ssha}[A-Za-z0-9+/]+={0,2}"
+        }
+      ]
+    }
+  })
 }

@@ -167,6 +167,7 @@ variable "mlra_ecs_cluster_sec_group_id" {
 variable "hub20_sec_group_id" {
   type        = string
   description = "ID of the HUB 2.0 security group allowed to access the RDS"
+  default     = ""
 }
 
 variable "bastion_security_group_id" {
@@ -187,6 +188,7 @@ variable "tags" {
 variable "hub20_s3_bucket" {
   type        = string
   description = "HUB 2.0 S3 Bucket name"
+  default     = ""
 }
 
 

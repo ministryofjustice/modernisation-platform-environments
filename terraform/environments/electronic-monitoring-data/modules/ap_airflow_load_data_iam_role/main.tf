@@ -11,13 +11,14 @@ locals {
     "test"          = ""
     "development"   = ""
   }
-  camel-sid        = join("", [for word in split("-", var.name) : title(word)])
-  suffix           = var.environment != "production" ? "_${local.env_map[var.environment]}" : ""
-  snake-database   = "${replace(var.database_name, "-", "_")}${local.suffix}"
-  role_name_suffix = var.full_reload ? "full-reload-${var.name}${local.env_suffixes[var.environment]}" : "load-${var.name}${local.env_suffixes[var.environment]}"
+  camel-sid          = join("", [for word in split("-", var.name) : title(word)])
+  suffix             = var.environment != "production" ? "_${local.env_map[var.environment]}" : ""
+  snake-database     = "${replace(var.database_name, "-", "_")}${local.suffix}"
+  am_workaround_name = var.name == "alcohol-monitoring" ? "am" : var.name
+  role_name_suffix   = var.full_reload ? "full-reload-${var.name}${local.env_suffixes[var.environment]}" : "load-${local.am_workaround_name}${local.env_suffixes[var.environment]}"
   source_bucket_paths = var.source_data_bucket != null ? [
-    "${var.source_data_bucket.arn}${var.path_to_data}/*",
-    "${var.source_data_bucket.arn}/staging${var.path_to_data}/*",
+    "${var.source_data_bucket.arn}${var.path_to_data}*/*",
+    "${var.source_data_bucket.arn}/staging${var.path_to_data}*/*",
   ] : []
   list_buckets = var.source_data_bucket != null ? [
     var.source_data_bucket.arn,
@@ -31,6 +32,7 @@ locals {
     data.aws_iam_policy_document.load_data.json,
     data.aws_iam_policy_document.get_secrets[0].json
   ] : [data.aws_iam_policy_document.load_data.json]
+  create_stg_db = var.full_reload ? false : true
 }
 
 data "aws_iam_policy_document" "get_secrets" {
@@ -168,6 +170,16 @@ module "share_dbs_with_roles" {
   de_role_arn             = var.de_role_arn
   db_exists               = var.db_exists
 }
+
+module "share_stg_db_with_roles" {
+  source                  = "../lakeformation_database_share"
+  dbs_to_grant            = toset(["${local.snake-database}_staging"])
+  data_bucket_lf_resource = var.data_bucket_lf_resource
+  role_arn                = module.ap_database_sharing.iam_role.arn
+  de_role_arn             = var.de_role_arn
+  db_exists               = !local.create_stg_db
+}
+
 
 resource "aws_lakeformation_permissions" "catalog_manage" {
   principal = module.ap_database_sharing.iam_role.arn

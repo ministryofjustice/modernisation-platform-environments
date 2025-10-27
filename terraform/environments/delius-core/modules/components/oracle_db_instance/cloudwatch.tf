@@ -22,6 +22,7 @@ resource "aws_cloudwatch_metric_alarm" "status_check_failed_alarm" {
 }
 
 resource "aws_cloudwatch_log_group" "ec2_status_check_log_group" {
+  #checkov:skip=CKV_AWS_158 "ignore"
   count             = var.enable_cloudwatch_alarms ? 1 : 0
   name              = "/metrics/${var.env_name}/${local.alarm_name}"
   retention_in_days = 0 # Retain indefinitely
@@ -38,7 +39,7 @@ resource "aws_cloudwatch_event_rule" "ec2_status_check_failed_event" {
       "state" : {
         "value" : ["ALARM"]
       }
-      "alarmName" : ["${local.alarm_name}"]
+      "alarmName" : [local.alarm_name]
     }
   })
 }

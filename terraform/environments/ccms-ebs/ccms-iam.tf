@@ -344,9 +344,7 @@ resource "aws_iam_role_policy_attachment" "ccms_ebs_shared_s3" {
   policy_arn = aws_iam_policy.ccms_ebs_shared_s3.arn
 }
 
-
-### Role for Lambda Execution
-
+# Role for Lambda Execution
 resource "aws_iam_role" "lambda_execution_role" {
   name = "lambda_execution_role"
   assume_role_policy = jsonencode(
@@ -392,3 +390,75 @@ resource "aws_iam_role_policy_attachment" "secrets_manager_policy_lambda" {
   policy_arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
 }
 
+# Hub-20 S3 Permissions Policy (Dev, Test, Production)
+resource "aws_iam_policy" "hub_20_s3_permissions" {
+  count       = contains(["development", "test", "production"], local.environment) ? 1 : 0
+  name        = "hub-20-s3-permissions-${local.environment}"
+  description = "Allows EC2 instances with role_stsassume_oracle_base to access Hub-20 ${local.environment} bucket"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetBucketLocation",
+          "s3:ListBucket"
+        ]
+        Resource = [
+          "arn:aws:s3:::hub20-${local.environment}-cwa-extract-data"
+        ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject"
+        ]
+        Resource = [
+          "arn:aws:s3:::hub20-${local.environment}-cwa-extract-data/*"
+        ]
+      }
+    ]
+  })
+
+  tags = merge(local.tags,
+    { Name = "hub-20-s3-permissions-${local.environment}" }
+  )
+}
+
+# Attach Hub-20 S3 policy to EC2 role (Dev, Test, Production)
+resource "aws_iam_role_policy_attachment" "hub_20_s3_permissions_attach" {
+  count      = contains(["development", "test", "production"], local.environment) ? 1 : 0
+  role       = aws_iam_role.role_stsassume_oracle_base.name
+  policy_arn = one(aws_iam_policy.hub_20_s3_permissions[*].arn)
+}
+
+# Create policy to fetch secrets from secrets manager
+resource "aws_iam_policy" "ccms_ebs_ftp_get_secrets_value" {
+  description = "Policy to allow getting the secrets from aws secrets manager"
+  count       = contains(["development", "test", "preproduction", "production"], local.environment) ? 1 : 0
+  name        = "ccms_ebs_tp_get_secrets_value-${local.environment}"
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Sid" : "AllowEC2InstanceToReadSecrets",
+        "Effect" : "Allow",
+        "Action" : [
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:DescribeSecret"
+        ],
+        "Resource" : "arn:aws:secretsmanager:eu-west-2:${data.aws_caller_identity.current.account_id}:secret:ftp-s3-${local.environment}-aws-key-*",
+      }
+    ]
+  })
+}
+
+# Attach get_secrets_value policy to EC2 role (Dev, test only)
+resource "aws_iam_role_policy_attachment" "ccms_ebs_ftp_get_secrets_value_attach" {
+  count      = contains(["development", "test", "preproduction", "production"], local.environment) ? 1 : 0
+  role       = aws_iam_role.role_stsassume_oracle_base.name
+  policy_arn = one(aws_iam_policy.ccms_ebs_ftp_get_secrets_value[*].arn)
+}

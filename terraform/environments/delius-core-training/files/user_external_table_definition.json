@@ -128,9 +128,14 @@
           "ColumnType": "DATETIME",
           "ColumnDateFormat": "YYYY-MM-dd HH:mm:ss",
           "ColumnNullable": "true"
+        },
+        {
+          "ColumnName": "SYSTEM_USER",
+          "ColumnType": "INT8",
+          "ColumnNullable": "false"
         }
       ],
-      "TableColumnsTotal": "22"
+      "TableColumnsTotal": "23"
     },
     {
       "TableName": "PROBATION_AREA_USER",

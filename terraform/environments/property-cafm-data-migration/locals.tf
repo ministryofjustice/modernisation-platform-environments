@@ -1,4 +1,5 @@
 locals {
+  account_name = "cafm"
   # Flat list of all users across environments
   sftp_user_list = [
     {
@@ -41,4 +42,12 @@ locals {
       if user.environment == local.environment
     }
   }
+  environment_map = {
+    "production"    = "prod"
+    "preproduction" = "preprod"
+    "test"          = "test"
+    "development"   = "dev"
+    "default"       = ""
+  }
+  environment_shorthand = local.environment_map[local.environment]
 }

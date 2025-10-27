@@ -157,11 +157,11 @@ locals {
   }
 
   dis_config_dev = {
-    instance_count = 0
-    ami_name       = "delius_mis_windows_server_patch_2025-*"
+    instance_count = 1
+    ami_name       = "delius_mis_windows_server_patch_2025-10-01T13-00-02.504Z"
     ebs_volumes = {
       "/dev/sda1" = { label = "root", size = 100 }
-      "/dev/xvdf" = { label = "data", size = 300 }
+      "xvdd"      = { label = "data", size = 300 }
     }
 
     ebs_volumes_config = {
@@ -200,6 +200,13 @@ locals {
           backup = true
         }
       )
+    }
+    # Load balancer configuration for DIS
+    lb_target_config = {
+      endpoint             = "ndl-dis"
+      port                 = 8080
+      health_check_path    = "/BOE/CMC/"
+      health_check_matcher = "200,302,301"
     }
   }
   # automation test instance only - do not use
@@ -291,6 +298,13 @@ locals {
         }
       )
     }
+    # Load balancer configuration for DFI
+    lb_target_config = {
+      endpoint             = "ndl-dfi"
+      port                 = 8080
+      health_check_path    = "/DataServices/"
+      health_check_matcher = "200,302,301"
+    }
   }
 
   # base config for each database
@@ -360,5 +374,20 @@ locals {
   fsx_config_dev = {
     storage_capacity     = 100
     throughtput_capacity = 16
+  }
+
+  lb_config = {
+    bucket_policy_enabled = true
+  }
+
+  # DataSync configuration for syncing S3 bucket to FSX share
+  # Default schedule: Lambda at 04:00 UTC, DataSync at 04:15 UTC
+  # To override schedules, add schedule_expression and/or lambda_schedule_expression parameters:
+  # Note: Always ensure Lambda runs 15+ minutes before DataSync for credential refresh
+  datasync_config_dev = {
+    source_s3_bucket_arn = "arn:aws:s3:::eu-west-2-delius-mis-dev-dfi-extracts" # differs per environment
+    # schedule_expression = "cron(30 9 * * ? *)"        # Uncomment to run DataSync at 09:30 UTC (10:30 BST)
+    # lambda_schedule_expression = "cron(15 9 * * ? *)"  # Uncomment to run Lambda at 09:15 UTC (10:15 BST)
+    # fsx_domain = "delius-mis-dev.internal"            # Override FSX domain if needed
   }
 }

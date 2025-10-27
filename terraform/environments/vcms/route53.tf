@@ -15,8 +15,8 @@ resource "aws_route53_record" "external" {
   type    = "A"
 
   alias {
-    name                   = aws_lb.external.dns_name
-    zone_id                = aws_lb.external.zone_id
+    name                   = aws_lb.frontend.dns_name
+    zone_id                = aws_lb.frontend.zone_id
     evaluate_target_health = true
   }
 }
@@ -63,3 +63,4 @@ resource "aws_acm_certificate_validation" "external" {
   certificate_arn         = aws_acm_certificate.external.arn
   validation_record_fqdns = local.validation_record_fqdns
 }
+

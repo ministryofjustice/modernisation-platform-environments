@@ -4,7 +4,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = ">= 4.0.0"
+      version = "= 5.97.0"
     }
   }
 }
@@ -151,7 +151,7 @@ resource "aws_ecs_service" "ecs_service" {
   count           = var.is_ftp_app ? 0 : 1
   name            = var.app_name
   cluster         = var.cluster_id
-  task_definition = aws_ecs_task_definition.ecs_task_definition.id
+  task_definition = aws_ecs_task_definition.ecs_task_definition.arn
   desired_count   = var.app_count
   launch_type     = "EC2"
 
@@ -194,7 +194,7 @@ resource "aws_ecs_service" "ecs_service_sftp" {
   count           = var.is_ftp_app ? 1 : 0
   name            = var.app_name
   cluster         = var.cluster_id
-  task_definition = aws_ecs_task_definition.ecs_task_definition.id
+  task_definition = aws_ecs_task_definition.ecs_task_definition.arn
   desired_count   = var.app_count
   launch_type     = "EC2"
 

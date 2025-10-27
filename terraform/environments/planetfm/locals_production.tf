@@ -13,6 +13,82 @@ locals {
   # please keep resources in alphabetical order
   baseline_production = {
 
+    cloudwatch_dashboards = {
+      "CloudWatch-Default" = {
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.network_lb,
+          local.cloudwatch_dashboard_widget_groups.db,
+          local.cloudwatch_dashboard_widget_groups.app,
+          local.cloudwatch_dashboard_widget_groups.web,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ssm_command,
+        ]
+      }
+
+      "pd-cafm-db-a" = {
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          {
+            width         = 8
+            height        = 8
+            search_filter = { ec2_tag = [{ tag_name = "Name", tag_value = "pd-cafm-db-a" }] }
+            widgets = [
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.cpu-utilization-high,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.network-in-bandwidth,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.network-out-bandwidth,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.instance-status-check-failed,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.system-status-check-failed,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.attached-ebs-status-check-failed,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_instance_cwagent_windows.free-disk-space-low,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_windows.high-memory-usage,
+              null,
+            ]
+          },
+          {
+            header_markdown = "## EBS PERFORMANCE"
+            width           = 8
+            height          = 8
+            add_ebs_widgets = { iops = true, throughput = true }
+            search_filter   = { ec2_tag = [{ tag_name = "Name", tag_value = "pd-cafm-db-a" }] }
+            widgets         = []
+          }
+        ]
+      }
+
+      "pd-cafm-db-b" = {
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          {
+            width         = 8
+            height        = 8
+            search_filter = { ec2_tag = [{ tag_name = "Name", tag_value = "pd-cafm-db-b" }] }
+            widgets = [
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.cpu-utilization-high,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.network-in-bandwidth,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.network-out-bandwidth,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.instance-status-check-failed,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.system-status-check-failed,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.attached-ebs-status-check-failed,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_instance_cwagent_windows.free-disk-space-low,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_windows.high-memory-usage,
+              null,
+            ]
+          },
+          {
+            header_markdown = "## EBS PERFORMANCE"
+            width           = 8
+            height          = 8
+            add_ebs_widgets = { iops = true, throughput = true }
+            search_filter   = { ec2_tag = [{ tag_name = "Name", tag_value = "pd-cafm-db-b" }] }
+            widgets         = []
+          }
+        ]
+      }
+    }
+
     ec2_instances = {
       # app servers
       pd-cafm-a-10-b = merge(local.ec2_instances.app, {
@@ -65,56 +141,52 @@ locals {
       })
 
       pd-cafm-a-12-b = merge(local.ec2_instances.app, {
+        cloudwatch_metric_alarms = {}
         #cloudwatch_metric_alarms = merge(
         #  local.ec2_instances.app.cloudwatch_metric_alarms,
         #  module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows
         #)
         config = merge(local.ec2_instances.app.config, {
-          ami_name          = "pd-cafm-a-12-b"
+          ami_name          = "pd-cafm-a-2022-image-20250806T1436"
           availability_zone = "eu-west-2b"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
           "/dev/sdb"  = { type = "gp3", size = 200 }
-          # "xvde"      = { type = "gp3", size = 6, snapshot_id = "snap-040a13a16f7ffb223" } # Windows 2019 English Installation Media
-          # "xvdf"      = { type = "gp3", size = 6, snapshot_id = "snap-04435aa8246764616" } # Windows 2022 English Installation Media
         }
         instance = merge(local.ec2_instances.app.instance, {
           disable_api_termination = true
           instance_type           = "t3.xlarge"
         })
         tags = merge(local.ec2_instances.app.tags, {
-          ami              = "pd-cafm-a-12-b"
           description      = "RDS session host and app Server"
-          pre-migration    = "PDFAW0012"
           update-ssm-agent = "patchgroup2"
+          server-type      = "PlanetFMApp"
         })
       })
 
       pd-cafm-a-13-a = merge(local.ec2_instances.app, {
+        cloudwatch_metric_alarms = {}
         #cloudwatch_metric_alarms = merge(
         #  local.ec2_instances.app.cloudwatch_metric_alarms,
         #  module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows
         #)
         config = merge(local.ec2_instances.app.config, {
-          ami_name          = "pd-cafm-a-13-a"
+          ami_name          = "pd-cafm-a-2022-image-20250806T1436"
           availability_zone = "eu-west-2a"
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
-          "/dev/sdb"  = { type = "gp3", size = 28 }
-          # "xvde"      = { type = "gp3", size = 6, snapshot_id = "snap-040a13a16f7ffb223" } # Windows 2019 English Installation Media
-          # "xvdf"      = { type = "gp3", size = 6, snapshot_id = "snap-04435aa8246764616" } # Windows 2022 English Installation Media
+          "/dev/sdb"  = { type = "gp3", size = 200 }
         }
         instance = merge(local.ec2_instances.app.instance, {
           disable_api_termination = true
           instance_type           = "t3.xlarge"
         })
         tags = merge(local.ec2_instances.app.tags, {
-          ami              = "pd-cafm-a-13-a"
-          description      = "RDS session host and App Server"
-          pre-migration    = "PDFAW0013"
+          description      = "RDS session host and app Server"
           update-ssm-agent = "patchgroup1"
+          server-type      = "PlanetFMApp"
         })
       })
 
@@ -181,11 +253,11 @@ locals {
           "/dev/sdb"  = { type = "gp3", size = 500 }
           "/dev/sdc"  = { type = "gp3", size = 50 }
           "/dev/sdd"  = { type = "gp3", size = 224 }
-          "/dev/sde"  = { type = "gp3", size = 500 }
+          "/dev/sde"  = { type = "gp3", size = 500, throughput = 250 }
           "/dev/sdf"  = { type = "gp3", size = 100 }
-          "/dev/sdg"  = { type = "gp3", size = 85 }
-          "/dev/sdh"  = { type = "gp3", size = 150 } # T: drive
-          "/dev/sdi"  = { type = "gp3", size = 250 } # U: drive
+          "/dev/sdg"  = { type = "gp3", size = 170 }                   # S: drive
+          "/dev/sdh"  = { type = "gp3", size = 150 }                   # T: drive
+          "/dev/sdi"  = { type = "gp3", size = 250, throughput = 250 } # U: drive
         }
         instance = merge(local.ec2_instances.db.instance, {
           disable_api_termination = true

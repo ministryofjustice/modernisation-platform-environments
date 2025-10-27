@@ -1,5 +1,5 @@
 module "shield" {
-  source = "../../modules/shield_advanced"
+  source = "../../modules/shield_advanced_v6"
 
   providers = {
     aws.modernisation-platform = aws.modernisation-platform

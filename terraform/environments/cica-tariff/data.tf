@@ -7,3 +7,11 @@ data "aws_ami" "shared_ami" {
   }
 }
 
+data "aws_ami" "shared_db_ami" {
+  count       = local.environment == "production" ? 1 : 0
+  most_recent = true
+  filter {
+    name   = "image-id"
+    values = ["ami-0fbb74a6acb7280db"]
+  }
+}

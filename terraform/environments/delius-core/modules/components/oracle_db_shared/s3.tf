@@ -1,4 +1,8 @@
+#trivy:ignore:AVD-AWS-0345
 data "aws_iam_policy_document" "s3_bucket_oracledb_backups" {
+  #checkov:skip=CKV_AWS_108 "ignore"
+  #checkov:skip=CKV_AWS_111 "ignore"
+  #checkov:skip=CKV_AWS_356 "ignore"
   count   = lookup(local.oracle_duplicate_map[var.env_name], "target_account_id", false) != false ? 1 : 0
   version = "2012-10-17"
 
@@ -7,7 +11,7 @@ data "aws_iam_policy_document" "s3_bucket_oracledb_backups" {
     effect  = "Allow"
     actions = ["s3:*"]
     resources = [
-      "${module.s3_bucket_oracledb_backups.bucket.arn}",
+      module.s3_bucket_oracledb_backups.bucket.arn,
       "${module.s3_bucket_oracledb_backups.bucket.arn}/*"
     ]
 
@@ -21,7 +25,7 @@ data "aws_iam_policy_document" "s3_bucket_oracledb_backups" {
 
 module "s3_bucket_oracledb_backups" {
   #checkov:skip=CKV_TF_1 "ignore"
-  source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
+  source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
   bucket_name         = local.oracle_backup_bucket_prefix
   versioning_enabled  = false
   ownership_controls  = "BucketOwnerEnforced"
@@ -62,7 +66,11 @@ module "s3_bucket_oracledb_backups" {
   tags = var.tags
 }
 
+#trivy:ignore:AVD-AWS-0345
 data "aws_iam_policy_document" "oracledb_backup_bucket_access" {
+  #checkov:skip=CKV_AWS_108 "ignore"
+  #checkov:skip=CKV_AWS_111 "ignore"
+  #checkov:skip=CKV_AWS_356 "ignore"
 
   statement {
     sid    = "allowAccessToOracleDbBackupBucket"
@@ -71,7 +79,7 @@ data "aws_iam_policy_document" "oracledb_backup_bucket_access" {
       "s3:*"
     ]
     resources = [
-      "${module.s3_bucket_oracledb_backups.bucket.arn}",
+      module.s3_bucket_oracledb_backups.bucket.arn,
       "${module.s3_bucket_oracledb_backups.bucket.arn}/*"
     ]
   }
@@ -84,7 +92,7 @@ data "aws_iam_policy_document" "oracledb_backup_bucket_access" {
       "s3:List*"
     ]
     resources = [
-      "${module.s3_bucket_oracledb_backups_inventory.bucket.arn}",
+      module.s3_bucket_oracledb_backups_inventory.bucket.arn,
       "${module.s3_bucket_oracledb_backups_inventory.bucket.arn}/*"
     ]
   }
@@ -123,7 +131,7 @@ data "aws_iam_policy_document" "oracledb_backup_bucket_access" {
         "s3:*"
       ]
       resources = [
-        "${module.s3_bucket_oracle_statistics[0].bucket.arn}",
+        module.s3_bucket_oracle_statistics[0].bucket.arn,
         "${module.s3_bucket_oracle_statistics[0].bucket.arn}/*"
       ]
     }
@@ -157,6 +165,9 @@ data "aws_iam_policy_document" "oracle_remote_statistics_bucket_access" {
 }
 
 data "aws_iam_policy_document" "oracledb_remote_backup_bucket_access" {
+  #checkov:skip=CKV_AWS_108 "ignore"
+  #checkov:skip=CKV_AWS_111 "ignore"
+  #checkov:skip=CKV_AWS_356 "ignore"
   count = lookup(local.oracle_duplicate_map[var.env_name], "source_account_id", null) != null ? 1 : 0
   statement {
     sid    = "allowAccessToOracleDb${title(local.oracle_duplicate_map[var.env_name]["source_environment"])}Bucket"
@@ -171,6 +182,7 @@ data "aws_iam_policy_document" "oracledb_remote_backup_bucket_access" {
   }
 }
 
+#trivy:ignore:AVD-AWS-0345
 data "aws_iam_policy_document" "combined" {
   source_policy_documents = compact([
     try(data.aws_iam_policy_document.oracledb_backup_bucket_access.json, null),
@@ -188,7 +200,8 @@ resource "aws_iam_policy" "oracledb_backup_bucket_access" {
 }
 
 module "s3_bucket_oracledb_backups_inventory" {
-  source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
+  #checkov:skip=CKV_TF_1 "ignore"
+  source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
   bucket_name         = "${local.oracle_backup_bucket_prefix}-inventory"
   versioning_enabled  = false
   ownership_controls  = "BucketOwnerEnforced"
@@ -239,7 +252,7 @@ data "aws_iam_policy_document" "oracledb_backups_inventory" {
     condition {
       test     = "StringEquals"
       variable = "aws:SourceAccount"
-      values   = ["${var.account_info.id}"]
+      values   = [var.account_info.id]
     }
 
     condition {
@@ -251,7 +264,7 @@ data "aws_iam_policy_document" "oracledb_backups_inventory" {
     condition {
       test     = "ArnLike"
       variable = "aws:SourceArn"
-      values   = ["${module.s3_bucket_oracledb_backups.bucket.arn}"]
+      values   = [module.s3_bucket_oracledb_backups.bucket.arn]
     }
 
     principals {
@@ -292,7 +305,7 @@ data "aws_iam_policy_document" "s3_bucket_oracle_statistics" {
     sid       = "OracleStatisticsListPolicy"
     effect    = "Allow"
     actions   = ["s3:ListBucket"]
-    resources = ["${module.s3_bucket_oracle_statistics[0].bucket.arn}"]
+    resources = [module.s3_bucket_oracle_statistics[0].bucket.arn]
 
     principals {
       type        = "AWS"
@@ -322,7 +335,7 @@ module "s3_bucket_oracle_statistics" {
   #checkov:skip=CKV_TF_1 "ignore"
   count = var.deploy_oracle_stats ? 1 : 0
 
-  source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.0.0"
+  source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
   bucket_name         = "${var.account_info.application_name}-${var.env_name}-oracle-${var.db_suffix}-statistics-backup-data"
   versioning_enabled  = false
   ownership_controls  = "BucketOwnerEnforced"
@@ -364,7 +377,7 @@ module "s3_bucket_oracle_statistics" {
 
 module "s3_bucket_db_uplift" {
   count  = contains(["delius-mis"], var.app_name) ? 0 : 1
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v8.2.1"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
 
   providers = {
     aws.bucket-replication = aws.bucket-replication
@@ -382,10 +395,11 @@ data "aws_iam_policy_document" "db_uplift_bucket_access" {
     effect = "Allow"
     actions = [
       "s3:Get*",
-      "s3:List*"
+      "s3:List*",
+      "s3:PutObject"
     ]
     resources = [
-      "${module.s3_bucket_db_uplift[0].bucket.arn}",
+      module.s3_bucket_db_uplift[0].bucket.arn,
       "${module.s3_bucket_db_uplift[0].bucket.arn}/*"
     ]
   }

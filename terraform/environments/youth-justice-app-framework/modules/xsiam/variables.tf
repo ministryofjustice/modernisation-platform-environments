@@ -29,3 +29,8 @@ variable "aws_account_id" {
   description = "The AWS account ID"
   type        = string
 }
+
+variable "ds_log_group_name" {
+  description = "Directory service log group"
+  type        = string
+}

@@ -1,16 +1,14 @@
+module "cloud_platform_live_secret" {
+  count = terraform.workspace == "data-platform-development" ? 1 : 0
 
-# API auth secret (this should be a key-value secret with an api-auth-token key)
-resource "aws_secretsmanager_secret" "api_auth" {
-  name = "data-platform-api-auth-token"
-  tags = local.tags
-}
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=f7fef2d8f63f1595c3e2b0ee14a6810dc7bdb9af" # v2.0.0
 
-data "aws_secretsmanager_secret_version" "api_auth" {
-  secret_id = aws_secretsmanager_secret.api_auth.id
-}
+  name = "cloud-platform/live"
 
-# openmeta jwt for api
-resource "aws_secretsmanager_secret" "openmetadata" {
-  name = "data-platform-openmetadata-token"
-  tags = local.tags
+  secret_string = jsonencode({
+    ca_certificate   = "CHANGEME"
+    cluster_endpoint = "CHANGEME"
+    oidc_provider    = "CHANGEME"
+  })
+  ignore_secret_changes = true
 }

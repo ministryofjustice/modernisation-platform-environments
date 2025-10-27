@@ -19,7 +19,7 @@ resource "aws_dms_replication_task" "user_inbound_replication" {
       "name" = "User Replication from ${var.dms_config.audit_target_endpoint.write_environment} to ${var.env_name}"
     },
     {
-      "audit-client-environment" = "${var.env_name}"
+      "audit-client-environment" = var.env_name
     },
     {
       "audit-repository-environment" = var.dms_config.audit_target_endpoint.write_environment

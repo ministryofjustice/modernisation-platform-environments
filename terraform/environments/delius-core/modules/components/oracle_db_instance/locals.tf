@@ -45,8 +45,6 @@ locals {
       }
       status-check-failed-attached-ebs = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
-        evaluation_periods  = "60"
-        datapoints_to_alarm = "1"
         metric_name         = "StatusCheckFailed_AttachedEBS"
         namespace           = "AWS/EC2"
         period              = "60"
@@ -54,7 +52,7 @@ locals {
         threshold           = "1"
         datapoints_to_alarm = "10"
         evaluation_periods  = "10"
-        alarm_description   = "Triggers if there has been a status check failure for attached EBS volumes within the last hour."
+        alarm_description   = "Triggers if there has been a status check failure for attached EBS volumes within the last 10 minutes."
         alarm_actions       = [var.sns_topic_arn]
         ok_actions          = [var.sns_topic_arn]
       }

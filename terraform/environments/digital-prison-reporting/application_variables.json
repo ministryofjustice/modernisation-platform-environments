@@ -47,6 +47,7 @@
       "scheduled_s3_file_transfer_retention_period_amount": 0,
       "scheduled_s3_file_transfer_retention_period_unit": "days",
       "enable_domain_builder_rds": true,
+      "domain_builder_rds_parameter_group": "default.postgres14",
       "enable_domain_builder_agent": true,
       "enable_cloud_trail": false,
       "include_dbuilder_gw_vpclink": false,
@@ -81,7 +82,11 @@
         "dps-testing2",
         "dps-prison-reg",
         "dps-personal-rela",
-        "dps-organisations"
+        "dps-organisations",
+        "dps-allocations",
+        "dps-applications",
+        "dps-manage-pom",
+        "dps-san"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -178,7 +183,15 @@
           "data_locations": ["dpr-structured-historical-development"],
           "resource_shares": [
             {
+              "glue_database": "dpr_ap_integration_test_newtag_dev_dbt",
+              "glue_tables": ["*"]
+            },
+            {
               "glue_database": "curated_prisons_history_dev_dbt",
+              "glue_tables": ["*"]
+            },
+            {
+              "glue_database": "staged_prisons_history_dev_dbt",
               "glue_tables": ["*"]
             }
           ]
@@ -266,6 +279,7 @@
       "scheduled_s3_file_transfer_retention_period_amount": 0,
       "scheduled_s3_file_transfer_retention_period_unit": "days",
       "enable_domain_builder_rds": true,
+      "domain_builder_rds_parameter_group": "default.postgres14",
       "enable_domain_builder_agent": true,
       "enable_cloud_trail": false,
       "include_dbuilder_gw_vpclink": false,
@@ -298,7 +312,11 @@
         "dps-calc-rel-date",
         "dps-prison-reg",
         "dps-personal-rela",
-        "dps-organisations"
+        "dps-organisations",
+        "dps-allocations",
+        "dps-applications",
+        "dps-manage-pom",
+        "dps-san"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -468,6 +486,7 @@
       "scheduled_s3_file_transfer_retention_period_amount": 0,
       "scheduled_s3_file_transfer_retention_period_unit": "days",
       "enable_domain_builder_rds": true,
+      "domain_builder_rds_parameter_group": "default.postgres14",
       "enable_domain_builder_agent": true,
       "enable_cloud_trail": false,
       "include_dbuilder_gw_vpclink": false,
@@ -502,7 +521,11 @@
         "dps-calc-rel-date",
         "dps-prison-reg",
         "dps-personal-rela",
-        "dps-organisations"
+        "dps-organisations",
+        "dps-allocations",
+        "dps-applications",
+        "dps-manage-pom",
+        "dps-san"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -599,6 +622,10 @@
           "data_locations": ["dpr-structured-historical-preproduction"],
           "resource_shares": [
             {
+              "glue_database": "staged_prisons_history_preprod_dbt",
+              "glue_tables": ["*"]
+            },
+            {
               "glue_database": "curated_prisons_history_preprod_dbt",
               "glue_tables": ["*"]
             }
@@ -687,6 +714,7 @@
       "scheduled_s3_file_transfer_retention_period_amount": 0,
       "scheduled_s3_file_transfer_retention_period_unit": "days",
       "enable_domain_builder_rds": true,
+      "domain_builder_rds_parameter_group": "default.postgres15",
       "enable_domain_builder_agent": true,
       "enable_cloud_trail": false,
       "include_dbuilder_gw_vpclink": false,
@@ -719,7 +747,11 @@
         "dps-calc-rel-date",
         "dps-prison-reg",
         "dps-personal-rela",
-        "dps-organisations"
+        "dps-organisations",
+        "dps-allocations",
+        "dps-applications",
+        "dps-manage-pom",
+        "dps-san"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -816,7 +848,15 @@
           "data_locations": ["dpr-structured-historical-production"],
           "resource_shares": [
             {
+              "glue_database": "staged_prisons_history",
+              "glue_tables": ["*"]
+            },
+            {
               "glue_database": "curated_prisons_history",
+              "glue_tables": ["*"]
+            },
+            {
+              "glue_database": "prison_derived",
               "glue_tables": ["*"]
             }
           ]

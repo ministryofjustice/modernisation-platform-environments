@@ -34,4 +34,24 @@ locals {
   # example usage:
   # example_data = local.application_data.accounts[local.environment].example_var
   application_data = fileexists("./application_variables.json") ? jsondecode(file("./application_variables.json")) : null
+
+  common_sans = [
+    "*.venues.tribunals.gov.uk",
+    "*.reports.tribunals.gov.uk"
+  ]
+
+  # the http-only domains only relevant for CloudFront cert
+  cloudfront_sans = [
+    "siac.tribunals.gov.uk",
+    "fhsaa.tribunals.gov.uk",
+    "estateagentappeals.tribunals.gov.uk",
+    "consumercreditappeals.tribunals.gov.uk",
+    "charity.tribunals.gov.uk",
+    "adjudicationpanel.tribunals.gov.uk"
+  ]
+
+  nonprod_sans = [
+    "*.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  ]
+
 }

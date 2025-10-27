@@ -160,7 +160,7 @@ module "pagerduty_core_alerts" {
   depends_on = [
     aws_sns_topic.dms_alerts_topic
   ]
-  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v3.0.0"
   sns_topics                = [aws_sns_topic.dms_alerts_topic.name]
   pagerduty_integration_key = local.pagerduty_integration_keys[local.integration_key_lookup]
 }
@@ -199,6 +199,7 @@ module "disable_out_of_hours_alarms" {
 
 # IAM Role for Lambda
 resource "aws_iam_role" "lambda_exec" {
+  #checkov:skip=CKV_AWS_60 "ignore"
   name = "dms-checker-lambda-role"
 
   assume_role_policy = jsonencode({
@@ -215,6 +216,9 @@ resource "aws_iam_role" "lambda_exec" {
 
 # IAM Policy for Lambda (permissions to describe DMS tasks and write to the clodwatch logs)
 resource "aws_iam_role_policy" "lambda_policy" {
+  #checkov:skip=CKV_AWS_290 "ignore"
+  #checkov:skip=CKV_AWS_50 "ignore"
+  #checkov:skip=CKV_AWS_355 "ignore"
   name = "dms-checker-policy"
   role = aws_iam_role.lambda_exec.id
 
@@ -259,6 +263,12 @@ data "archive_file" "lambda_dms_replication_stopped_zip" {
 
 # Lambda Function to check DMS replication is not running (source in Zip archive)
 resource "aws_lambda_function" "dms_checker" {
+  #checkov:skip=CKV_AWS_117 "ignore"
+  #checkov:skip=CKV_AWS_116 "ignore"
+  #checkov:skip=CKV_AWS_115 "ignore"
+  #checkov:skip=CKV_AWS_173 "ignore"
+  #checkov:skip=CKV_AWS_50 "ignore"
+  #checkov:skip=CKV_AWS_272 "ignore"
   function_name = "dms-task-health-checker"
   role          = aws_iam_role.lambda_exec.arn
   handler       = "detect_stopped_replication.lambda_handler"

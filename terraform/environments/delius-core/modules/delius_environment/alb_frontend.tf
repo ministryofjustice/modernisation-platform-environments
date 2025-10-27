@@ -34,12 +34,21 @@ resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_alb_egress_t
   referenced_security_group_id = aws_security_group.cluster.id
 }
 
+locals {
+  # use a diff app name only when env = training
+  # to ensure alb is less than 32 chars
+  # e.g. delius-core-training-weblogic-alb is 33 chars which AWS does now allow
+  app_alias = var.env_name == "training" ? "delius" : var.app_name
+
+  alb_name = "${local.app_alias}-${var.env_name}-weblogic-alb"
+}
+
 # tfsec:ignore:aws-elb-alb-not-public
 resource "aws_lb" "delius_core_frontend" {
   #checkov:skip=CKV_AWS_91 "ignore"
   #checkov:skip=CKV2_AWS_28 "ignore"
 
-  name               = "${var.app_name}-${var.env_name}-weblogic-alb"
+  name               = local.alb_name
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.delius_frontend_alb_security_group.id]
@@ -85,7 +94,7 @@ resource "aws_lb_listener" "listener_http" {
 # Listener rules
 resource "aws_lb_listener_rule" "deny_mobiles_listener_rule" {
   listener_arn = aws_lb_listener.listener_https.arn
-  priority     = 1
+  priority     = 10
   condition {
     http_header {
       http_header_name = "User-Agent"
@@ -104,7 +113,7 @@ resource "aws_lb_listener_rule" "deny_mobiles_listener_rule" {
 
 resource "aws_lb_listener_rule" "blocked_paths_listener_rule" {
   listener_arn = aws_lb_listener.listener_https.arn
-  priority     = 2 # must be before ndelius_allowed_paths_rule
+  priority     = 20 # must be before ndelius_allowed_paths_rule
   condition {
     path_pattern {
       values = [
@@ -123,7 +132,7 @@ resource "aws_lb_listener_rule" "blocked_paths_listener_rule" {
 
 resource "aws_lb_listener_rule" "allowed_paths_listener_rule" {
   listener_arn = aws_lb_listener.listener_https.arn
-  priority     = 3
+  priority     = 30
   condition {
     path_pattern {
       values = [
@@ -142,7 +151,7 @@ resource "aws_lb_listener_rule" "allowed_paths_listener_rule" {
 
 resource "aws_lb_listener_rule" "homepage_listener_rule" {
   listener_arn = aws_lb_listener.listener_https.arn
-  priority     = 5
+  priority     = 50
   condition {
     path_pattern {
       values = ["/"]

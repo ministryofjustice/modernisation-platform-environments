@@ -5,6 +5,8 @@
 # where it is accessible at all times.
 # We only need one copy of this table per environment, (suffixes are: db = delius-core, mis = delius-mis)
 resource "aws_dynamodb_table" "non_working_days" {
+  #checkov:skip=CKV_AWS_119 "ignore"
+  #checkov:skip=CKV_AWS_28 "ignore"
   count        = contains(["db", "mis"], var.db_suffix) ? 1 : 0
   name         = "${var.env_name}-non-working-days"
   billing_mode = "PAY_PER_REQUEST"

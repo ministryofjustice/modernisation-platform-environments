@@ -48,7 +48,7 @@ locals {
     }
 
     ec2_autoscaling_groups = {
-      # NOT-ACTIVE (blue deployment) - for testing Combined Reporting
+      # NOT-ACTIVE (blue deployment)
       t1-nomis-web-a = merge(local.ec2_autoscaling_groups.web, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.web.autoscaling_group, {
           desired_capacity = 0
@@ -69,11 +69,10 @@ locals {
           })
         })
         tags = merge(local.ec2_autoscaling_groups.web.tags, {
-          nomis-environment     = "t1"
-          oracle-db-hostname-a  = "t1nomis-a.test.nomis.service.justice.gov.uk"
-          oracle-db-hostname-b  = "t1nomis-b.test.nomis.service.justice.gov.uk"
-          oracle-db-name        = "T1CNOM"
-          reporting-environment = "aws"
+          nomis-environment    = "t1"
+          oracle-db-hostname-a = "t1nomis-a.test.nomis.service.justice.gov.uk"
+          oracle-db-hostname-b = "t1nomis-b.test.nomis.service.justice.gov.uk"
+          oracle-db-name       = "T1CNOM"
         })
       })
 
@@ -273,6 +272,70 @@ locals {
         })
         tags = merge(local.ec2_instances.db.tags, {
           description         = "for testing oracle19c upgrade"
+          instance-scheduling = "skip-scheduling"
+          nomis-environment   = "t1"
+          oracle-sids         = ""
+        })
+      })
+
+      t1-nomis-db19c-1-a = merge(local.ec2_instances.db19c, {
+        cloudwatch_metric_alarms = {}
+        config = merge(local.ec2_instances.db19c.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.db19c.config.instance_profile_policies, [
+            "Ec2T1DatabasePolicy",
+          ])
+        })
+        ebs_volumes = merge(local.ec2_instances.db19c.ebs_volumes, {
+          "/dev/sdb" = { label = "app", size = 100 }
+          "/dev/sdc" = { label = "app", size = 100 }
+        })
+        ebs_volume_config = merge(local.ec2_instances.db19c.ebs_volume_config, {
+          data  = { total_size = 500 }
+          flash = { total_size = 50 }
+        })
+        instance = merge(local.ec2_instances.db19c.instance, {
+          disable_api_termination = false
+        })
+        user_data_cloud_init = merge(local.ec2_instances.db19c.user_data_cloud_init, {
+          args = merge(local.ec2_instances.db19c.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+        tags = merge(local.ec2_instances.db19c.tags, {
+          description         = "T1 NOMIS database 19c"
+          instance-scheduling = "skip-scheduling"
+          nomis-environment   = "t1"
+          oracle-sids         = ""
+        })
+      })
+
+      t1-nomis-db19c-1-b = merge(local.ec2_instances.db19c, {
+        cloudwatch_metric_alarms = {}
+        config = merge(local.ec2_instances.db19c.config, {
+          availability_zone = "eu-west-2b"
+          instance_profile_policies = concat(local.ec2_instances.db19c.config.instance_profile_policies, [
+            "Ec2T1DatabasePolicy",
+          ])
+        })
+        ebs_volumes = merge(local.ec2_instances.db19c.ebs_volumes, {
+          "/dev/sdb" = { label = "app", size = 100 }
+          "/dev/sdc" = { label = "app", size = 100 }
+        })
+        ebs_volume_config = merge(local.ec2_instances.db19c.ebs_volume_config, {
+          data  = { total_size = 500 }
+          flash = { total_size = 50 }
+        })
+        instance = merge(local.ec2_instances.db19c.instance, {
+          disable_api_termination = false
+        })
+        user_data_cloud_init = merge(local.ec2_instances.db19c.user_data_cloud_init, {
+          args = merge(local.ec2_instances.db19c.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+        tags = merge(local.ec2_instances.db19c.tags, {
+          description         = "T1 NOMIS database 19c"
           instance-scheduling = "skip-scheduling"
           nomis-environment   = "t1"
           oracle-sids         = ""

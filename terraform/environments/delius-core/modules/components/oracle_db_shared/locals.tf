@@ -37,6 +37,9 @@ locals {
     "prod" = {
       #       "source_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-preproduction"]
       #       "source_environment" = "preprod"
+    },
+    "training" = {
+
     }
   }
 
@@ -64,6 +67,8 @@ locals {
     "prod" = {
       #       "source_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-preproduction"]
       #       "source_environment" = "preprod"
+    },
+    "training" = {
     }
   }
 
@@ -73,5 +78,13 @@ locals {
   db_port      = 1521
   db_tcps_port = 1522
 
-  ap_dev_cidr = "172.24.0.0/16"
+  # ap_dev_cidr = "172.24.0.0/16"
+
+  ap_env_cidrs = {
+    dev  = "172.24.0.0/16"
+    test = "172.24.0.0/16"
+    # dev and test ranges are same as they dont have test DMS task
+    # and use dev to connect to TEST oracle DB instance
+    # include higher envs later
+  }
 }

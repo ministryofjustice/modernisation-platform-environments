@@ -9,12 +9,10 @@ module "ldap" {
     aws.core-network-services = aws.core-network-services
   }
 
-  env_name           = var.env_name
-  account_config     = var.account_config
-  account_info       = var.account_info
-  environment_config = var.environment_config
-  ldap_config        = var.ldap_config
-
+  env_name       = var.env_name
+  account_config = var.account_config
+  account_info   = var.account_info
+  ldap_config    = var.ldap_config
 
   platform_vars           = var.platform_vars
   tags                    = local.tags

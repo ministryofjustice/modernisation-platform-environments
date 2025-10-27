@@ -9,17 +9,19 @@ resource "aws_sns_topic" "priority_p1" {
   sqs_success_feedback_role_arn    = aws_iam_role.sns_feedback.arn
   sqs_success_feedback_sample_rate = 100
   sqs_failure_feedback_role_arn    = aws_iam_role.sns_feedback.arn
+  kms_master_key_id                = "alias/aws/sns"
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name_short}-${local.environment}-sns-priority-p1-topic"
+    }
+  )
 }
 
 ###############################################
 ### Subscribe SQS Provider queues to SNS Topic
 ###############################################
-resource "aws_sns_topic_subscription" "ccms" {
-  topic_arn = aws_sns_topic.priority_p1.arn
-  protocol  = "sqs"
-  endpoint  = aws_sqs_queue.ccms_provider_q.arn
-}
-
 resource "aws_sns_topic_subscription" "maat" {
   topic_arn = aws_sns_topic.priority_p1.arn
   protocol  = "sqs"
@@ -49,14 +51,22 @@ resource "aws_sns_topic" "provider_banks" {
   sqs_success_feedback_role_arn    = aws_iam_role.sns_feedback.arn
   sqs_success_feedback_sample_rate = 100
   sqs_failure_feedback_role_arn    = aws_iam_role.sns_feedback.arn
+  kms_master_key_id                = "alias/aws/sns"
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name_short}-${local.environment}-sns-provider-banks-topic"
+    }
+  )
 }
 
 ###############################################
 ### Subscribe SQS Provider queues to SNS Topic
 ###############################################
 
-resource "aws_sns_topic_subscription" "ccms_banks" {
+resource "aws_sns_topic_subscription" "ccms_provider" {
   topic_arn = aws_sns_topic.provider_banks.arn
   protocol  = "sqs"
-  endpoint  = aws_sqs_queue.ccms_banks_q.arn
+  endpoint  = aws_sqs_queue.ccms_provider_q.arn
 }

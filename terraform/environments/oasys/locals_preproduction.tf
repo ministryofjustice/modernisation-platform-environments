@@ -2,7 +2,8 @@ locals {
 
   baseline_presets_preproduction = {
     options = {
-
+      enable_xsiam_cloudwatch_integration = true
+      enable_xsiam_s3_integration         = true
       sns_topics = {
         pagerduty_integrations = {
           pagerduty = "oasys-preproduction"
@@ -75,6 +76,9 @@ locals {
           instance_profile_policies = concat(local.ec2_instances.bip.config.instance_profile_policies, [
             "Ec2PreprodBipPolicy",
           ])
+        })
+        instance = merge(local.ec2_instances.bip.instance, {
+          ami = "ami-0d206b8546ea2b68a" # to prevent instances being re-created due to recreated AMI
         })
         tags = merge(local.ec2_instances.bip.tags, {
           bip-db-hostname     = "pp-oasys-db-a"
@@ -215,6 +219,14 @@ locals {
     # options for LBs https://docs.google.com/presentation/d/1RpXpfNY_hw7FjoMw0sdMAdQOF7kZqLUY6qVVtLNavWI/edit?usp=sharing
     lbs = {
       public = merge(local.lbs.public, {
+
+        s3_notification_queues = {
+          "cortex-xsiam-s3-public-alb-log-collection" = {
+            events    = ["s3:ObjectCreated:*"]
+            queue_arn = "cortex-xsiam-s3-alb-log-collection"
+          }
+        }
+
         listeners = merge(local.lbs.public.listeners, {
           https = merge(local.lbs.public.listeners.https, {
             certificate_names_or_arns = ["pp_oasys_cert"]
@@ -244,6 +256,14 @@ locals {
       })
 
       private = merge(local.lbs.private, {
+
+        s3_notification_queues = {
+          "cortex-xsiam-s3-private-alb-log-collection" = {
+            events    = ["s3:ObjectCreated:*"]
+            queue_arn = "cortex-xsiam-s3-alb-log-collection"
+          }
+        }
+
         listeners = merge(local.lbs.private.listeners, {
           https = merge(local.lbs.private.listeners.https, {
             certificate_names_or_arns = ["pp_oasys_cert"]

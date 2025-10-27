@@ -169,6 +169,43 @@ resource "aws_iam_role_policy_attachment" "attach_lambda_policies_get_securityhu
   policy_arn = each.value
 }
 
+# Lambda role and attachment for ses logging
+
+resource "aws_iam_role" "lambda_role_get_ses_logging_dev" {
+  count              = local.is-development == true ? 1 : 0
+  name               = "PPUD_Lambda_Function_Role_Get_SES_Logging_DEV"
+  assume_role_policy = <<EOF
+{
+ "Version": "2012-10-17",
+ "Statement": [
+   {
+     "Action": "sts:AssumeRole",
+     "Principal": {
+       "Service": "lambda.amazonaws.com"
+     },
+     "Effect": "Allow",
+     "Sid": ""
+   }
+ ]
+}
+EOF
+}
+
+locals {
+  lambda_get_ses_logging_policies_dev = local.is-development ? {
+    "send_message_to_sqs"     = aws_iam_policy.iam_policy_lambda_send_message_to_sqs_dev[0].arn
+    "send_logs_to_cloudwatch" = aws_iam_policy.iam_policy_lambda_send_logs_cloudwatch_dev[0].arn
+    "publish_to_sns"          = aws_iam_policy.iam_policy_lambda_publish_to_sns_dev[0].arn
+    "put_data_s3"             = aws_iam_policy.iam_policy_lambda_put_s3_data_dev[0].arn
+  } : {}
+}
+
+resource "aws_iam_role_policy_attachment" "attach_lambda_policies_get_ses_logging_dev" {
+  for_each   = local.is-development ? local.lambda_get_ses_logging_policies_dev : {}
+  role       = aws_iam_role.lambda_role_get_ses_logging_dev[0].name
+  policy_arn = each.value
+}
+
 ####################### IAM Policies #######################
 
 resource "aws_iam_policy" "iam_policy_lambda_send_message_to_sqs_dev" {
@@ -447,6 +484,30 @@ resource "aws_iam_policy" "iam_policy_lambda_get_securityhub_data_dev" {
   })
 }
 
+resource "aws_iam_policy" "iam_policy_lambda_put_s3_data_dev" {
+  count       = local.is-development == true ? 1 : 0
+  name        = "aws_iam_policy_for_lambda_put_s3_data_${local.environment}"
+  path        = "/"
+  description = "Allows lambda functions to put data into S3"
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "s3:PutObject",
+          "s3:PutObjectAcl",
+          "s3:ListBucket"
+        ],
+        "Resource" : [
+          aws_s3_bucket.moj-log-files-dev[0].arn,
+          "${aws_s3_bucket.moj-log-files-dev[0].arn}/*"
+        ]
+      }
+    ]
+  })
+}
+
 ###########################
 # Preproduction Environment
 ###########################
@@ -565,7 +626,6 @@ resource "aws_iam_role_policy_attachment" "attach_lambda_policies_get_certificat
   role       = aws_iam_role.lambda_role_get_certificate_uat[0].name
   policy_arn = each.value
 }
-
 
 # Lambda role and attachment for ses logging
 
@@ -957,7 +1017,9 @@ locals {
     "send_logs_to_cloudwatch" = aws_iam_policy.iam_policy_lambda_send_logs_cloudwatch_prod[0].arn
     "get_cloudwatch_metrics"  = aws_iam_policy.iam_policy_lambda_get_cloudwatch_metrics_prod[0].arn
     "get_data_s3"             = aws_iam_policy.iam_policy_lambda_get_s3_data_prod[0].arn
+    "get_elb_metrics"         = aws_iam_policy.iam_policy_lambda_get_s3_elb_metrics_prod[0].arn
     "get_klayers"             = aws_iam_policy.iam_policy_lambda_get_ssm_parameter_klayers_prod[0].arn
+    "ec2_permissions"         = aws_iam_policy.iam_policy_lambda_ec2_permissions_prod[0].arn
   } : {}
 }
 
@@ -967,11 +1029,16 @@ resource "aws_iam_role_policy_attachment" "attach_lambda_policies_get_cloudwatch
   policy_arn = each.value
 }
 
-resource "aws_iam_policy_attachment" "attach_lambda_cloudwatch_full_access_to_get_cloudwatch_prod" {
+resource "aws_iam_role_policy_attachment" "attach_lambda_cloudwatch_full_access_to_get_cloudwatch_prod" {
   count      = local.is-production == true ? 1 : 0
-  name       = "lambda-cloudwatch-full-access-iam-get-cloudwatch-attachment"
-  roles      = [aws_iam_role.lambda_role_get_cloudwatch_prod[0].id]
+  role       = aws_iam_role.lambda_role_get_cloudwatch_prod[0].name
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchFullAccessV2"
+}
+
+resource "aws_iam_role_policy_attachment" "attach_lambda_vpc_access_execution_prod" {
+  count      = local.is-production == true ? 1 : 0
+  role       = aws_iam_role.lambda_role_get_cloudwatch_prod[0].name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
 }
 
 # Lambda role and attachment for retrieving security hub data
@@ -1387,6 +1454,28 @@ resource "aws_iam_policy" "iam_policy_lambda_get_ssm_parameter_klayers_prod" {
         ],
         "Resource" : [
           "arn:aws:ssm:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:parameter/klayers-account"
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy" "iam_policy_lambda_ec2_permissions_prod" {
+  count       = local.is-production == true ? 1 : 0
+  name        = "aws_iam_policy_for_lambda_ec2_permissions_${local.environment}"
+  path        = "/"
+  description = "Allows lambda functions to have required ec2 permissions"
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "ec2:CreateNetworkInterface",
+          "ec2:DescribeNetworkInterface"
+        ],
+        "Resource" : [
+          "arn:aws:ec2:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:*"
         ]
       }
     ]

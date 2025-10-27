@@ -25,7 +25,7 @@ locals {
         "ec2",
         "ec2_linux",
         "ec2_instance_linux",
-        "ec2_windows",
+        "ec2_instance_only_windows",
         "ssm_command",
       ]
       cloudwatch_metric_alarms_default_actions   = ["pagerduty"]

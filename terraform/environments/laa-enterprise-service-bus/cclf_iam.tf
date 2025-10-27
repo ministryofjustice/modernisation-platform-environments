@@ -20,7 +20,7 @@ resource "aws_iam_role" "cclf_provider_load_role" {
   tags = merge(
     local.tags,
     {
-      Name = "${local.application_name_short}-cclf-provider-load-role"
+      Name = "${local.application_name_short}-${local.environment}-cclf-provider-load-role"
     }
   )
 }
@@ -70,6 +70,25 @@ resource "aws_iam_policy" "cclf_provider_load_policy" {
           "sqs:GetQueueAttributes"
         ],
         Resource = aws_sqs_queue.cclf_provider_q.arn
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "sqs:SendMessage",
+          "sqs:ReceiveMessage",
+          "sqs:DeleteMessage",
+          "sqs:GetQueueAttributes"
+        ]
+        Resource = aws_sqs_queue.cclf_provider_dlq.arn
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "ssm:GetParameter",
+          "ssm:GetParameters",
+          "ssm:PutParameter"
+        ],
+        Resource = aws_ssm_parameter.cclf_provider_load_timestamp.arn
       },
     ]
   })

@@ -17,7 +17,7 @@ resource "aws_iam_role" "cwa_extract_lambda_role" {
   tags = merge(
     local.tags,
     {
-      Name = "${local.application_name_short}-cwa-extract-lambda-role"
+      Name = "${local.application_name_short}-${local.environment}-cwa-extract-lambda-role"
     }
   )
 }
@@ -60,26 +60,6 @@ resource "aws_iam_policy" "cwa_extract_lambda_policy" {
           aws_secretsmanager_secret.cwa_db_secret.arn,
           aws_secretsmanager_secret.cwa_table_name_secret.arn
         ]
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "elasticfilesystem:ClientMount",
-          "elasticfilesystem:ClientWrite",
-          "elasticfilesystem:ClientRootAccess",
-          "elasticfilesystem:DescribeAccessPoints"
-        ],
-        Resource = [
-          "arn:aws:elasticfilesystem:eu-west-2:940482439836:file-system/fs-08be7f58b2bd6aaff",
-          "arn:aws:elasticfilesystem:eu-west-2:940482439836:access-point/fsap-0b3ad02899e9b5922"
-        ]
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "elasticfilesystem:DescribeMountTargets"
-        ],
-        Resource = "*"
       },
       {
         Effect = "Allow"

@@ -11,6 +11,34 @@ locals {
   bucket_names = [
     for name in local.base_buckets : "${name}-${local.environment}-mp"
   ]
+  enable_cron_in_environments = [
+    "development",
+    "test",
+    "preproduction"
+  ]
+
+  # Folders in the FTP lambda inbound and outbound S3 buckets(ensure trailing slash)
+  target_prefixes = [
+    "CCMS_PRD_Allpay/Inbound/",
+    "CCMS_PRD_Allpay/Outbound/",
+    "CCMS_PRD_Eckoh/Inbound/",
+    "CCMS_PRD_Eckoh/Outbound/",
+    "CCMS_PRD_1stlocate/Inbound/",
+    "CCMS_PRD_1stlocate/Outbound/",
+    "CCMS_PRD_DST/Inbound/",
+    "CCMS_PRD_DST/Outbound/",
+    "CCMS_PRD_Rossendales/Inbound/",
+    "CCMS_PRD_Rossendales/Outbound/",
+    "CCMS_PRD_TDX_DECRYPTED/Inbound/",
+    "outbound-lambda-runs/"
+  ]
+
+  is_production = local.environment == "production"
+
+  # Days and ID label based on environment
+  expire_days = local.is_production ? 90 : 60
+  expire_id   = local.is_production ? "expire-90-days" : "expire-60-day"
+
 }
 
 ### secrets for ftp user and password
@@ -40,10 +68,29 @@ resource "aws_s3_bucket" "buckets" {
 
   bucket = each.value
 
-  tags = {
-    Name        = each.value
-    Environment = local.environment
-  }
+  tags = merge(
+    {
+      Name        = each.value
+      Environment = local.environment
+    },
+    {
+      "business-unit"          = "LAA",
+      "infrastructure-support" = "laa-role-sre@digital.justice.gov.uk",
+      "source-code"            = "https://github.com/ministryofjustice/modernisation-platform-environments"
+    }
+  )
+
+  # server access logging is configured via aws_s3_bucket_logging resource below
+}
+
+# Server access logging: send access logs to the environment logging bucket
+resource "aws_s3_bucket_logging" "buckets_access_logging" {
+  for_each = aws_s3_bucket.buckets
+
+  bucket = each.value.id
+
+  target_bucket = local.logging_bucket_name
+  target_prefix = "s3-access-logs/${each.key}/"
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "bucket_encryption" {
@@ -64,6 +111,37 @@ resource "aws_s3_bucket_versioning" "s3_versioning" {
 
   versioning_configuration {
     status = "Enabled"
+  }
+}
+
+# Lifecycle configuration: expire current objects and noncurrent versions after 30 days
+resource "aws_s3_bucket_lifecycle_configuration" "buckets_lifecycle" {
+  for_each = aws_s3_bucket.buckets
+
+  bucket = each.value.id
+
+  # One lifecycle rule per prefix
+  dynamic "rule" {
+    for_each = local.target_prefixes
+    content {
+      id     = "expire-${replace(each.value.id, "/", "-")}-${replace(rule.value, "/", "-")}-${local.expire_days}d"
+      status = "Enabled"
+
+      filter {
+        and {
+          prefix                   = rule.value
+          object_size_greater_than = 0
+        }
+      }
+
+      expiration {
+        days = local.expire_days
+      }
+
+      noncurrent_version_expiration {
+        noncurrent_days = local.expire_days
+      }
+    }
   }
 }
 
@@ -226,6 +304,8 @@ module "allpay_ftp_lambda_outbound" {
   s3_bucket_ftp            = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
   s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
   s3_object_ftp_client     = aws_s3_object.ftp_client.key
+  #ftp_cron                     = "cron(0 10 * * ? *)"
+  enabled_cron_in_environments = local.enable_cron_in_environments
 }
 
 
@@ -245,6 +325,8 @@ module "allpay_ftp_lambda_inbound" {
   s3_bucket_ftp            = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
   s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
   s3_object_ftp_client     = aws_s3_object.ftp_client.key
+  #ftp_cron                     = "cron(0 10 * * ? *)"
+  enabled_cron_in_environments = local.enable_cron_in_environments
 }
 
 #LAA-xerox-outbound-ccms
@@ -264,6 +346,8 @@ module "LAA-ftp-xerox-ccms-outbound" {
   s3_bucket_ftp            = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
   s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
   s3_object_ftp_client     = aws_s3_object.ftp_client.key
+  #ftp_cron                     = "cron(0 10 * * ? *)"
+  enabled_cron_in_environments = local.enable_cron_in_environments
 }
 
 #LAA-xerox-outbound-ccms-peterborough
@@ -282,6 +366,8 @@ module "LAA-ftp-xerox-ccms-outbound-peterborough" {
   s3_bucket_ftp            = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
   s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
   s3_object_ftp_client     = aws_s3_object.ftp_client.key
+  #ftp_cron                     = "cron(0 10 * * ? *)"
+  enabled_cron_in_environments = local.enable_cron_in_environments
 }
 
 # #LAA-ftp-eckoh-outbound-ccms
@@ -300,6 +386,8 @@ module "LAA-ftp-eckoh-outbound-ccms" {
   s3_bucket_ftp            = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
   s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
   s3_object_ftp_client     = aws_s3_object.ftp_client.key
+  #ftp_cron                     = "cron(0 10 * * ? *)"
+  enabled_cron_in_environments = local.enable_cron_in_environments
 }
 
 
@@ -319,6 +407,8 @@ module "LAA-ftp-eckoh-inbound-ccms" {
   s3_bucket_ftp            = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
   s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
   s3_object_ftp_client     = aws_s3_object.ftp_client.key
+  #ftp_cron                     = "cron(0 10 * * ? *)"
+  enabled_cron_in_environments = local.enable_cron_in_environments
 }
 
 # #LAA-ftp-rossendales-ccms-inbound
@@ -337,8 +427,9 @@ module "LAA-ftp-rossendales-ccms-inbound" {
   s3_bucket_ftp            = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
   s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
   s3_object_ftp_client     = aws_s3_object.ftp_client.key
+  #ftp_cron                     = "cron(0 10 * * ? *)"
+  enabled_cron_in_environments = local.enable_cron_in_environments
 }
-
 
 # #LAA-ftp-1stlocate-ccms-inbound
 module "LAA-ftp-1stlocate-ccms-inbound" {
@@ -357,4 +448,6 @@ module "LAA-ftp-1stlocate-ccms-inbound" {
   s3_bucket_ftp            = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
   s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
   s3_object_ftp_client     = aws_s3_object.ftp_client.key
+  #ftp_cron                     = "cron(0 10 * * ? *)"
+  enabled_cron_in_environments = local.enable_cron_in_environments
 } 

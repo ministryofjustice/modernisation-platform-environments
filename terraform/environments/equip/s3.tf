@@ -1,6 +1,6 @@
 module "equip-s3-bucket" {
   count               = local.is-production ? 1 : 0
-  source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
+  source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9fc8f8b8e3f93ffbda822028534b9a75399" # v9.0.0
   bucket_prefix       = format("%s-%s", local.application_name, local.environment)
   versioning_enabled  = false
   replication_enabled = false
@@ -13,11 +13,13 @@ module "equip-s3-bucket" {
     {
       id      = "tmp"
       enabled = "Enabled"
-      prefix  = "/tmp"
 
-      tags = {
-        rule      = "log"
-        autoclean = "true"
+      filter = {
+        prefix = "/tmp"
+        tags = {
+          rule      = "log"
+          autoclean = "true"
+        }
       }
 
       transition = [
