@@ -304,8 +304,8 @@ resource "aws_cloudfront_response_headers_policy" "security_headers_policy" {
 
 # IAM Policy for Lambda@Edge
 resource "aws_iam_role_policy" "lambda_edge_policy" {
-  name     = "CloudfrontRedirectLambdaPolicy"
-  role     = aws_iam_role.lambda_edge_role.id
+  name = "CloudfrontRedirectLambdaPolicy"
+  role = aws_iam_role.lambda_edge_role.id
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -333,8 +333,8 @@ resource "aws_iam_role_policy" "lambda_edge_policy" {
         Resource = "arn:aws:logs:us-east-1:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/CloudfrontRedirectLambda:*"
       },
       {
-        Effect = "Allow"
-        Action = "iam:PassRole"
+        Effect   = "Allow"
+        Action   = "iam:PassRole"
         Resource = aws_iam_role.lambda_edge_role.arn
         Condition = {
           StringEquals = {

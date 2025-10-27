@@ -116,7 +116,7 @@ locals {
 
     patch_manager = {
       patch_schedules = {
-        group1 = "cron(00 03 ? * THU *)"  
+        group1 = "cron(00 03 ? * THU *)"
       }
       maintenance_window_duration = 4
       maintenance_window_cutoff   = 2

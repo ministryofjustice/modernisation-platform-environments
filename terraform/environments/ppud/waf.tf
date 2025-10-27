@@ -22,13 +22,13 @@ module "waf" {
     aws.modernisation-platform = aws.modernisation-platform
   }
 
- #additional_managed_rules = [
- #   {
- #     arn             = aws_wafv2_rule_group.wam_waf_acl.arn
- #     override_action = "none"   # respect the group's action (BLOCK). Use "count" to dry-run.
- #     priority        = 9        # unique; runs before managed rules at 10..15
- #   }
- # ]
+  #additional_managed_rules = [
+  #   {
+  #     arn             = aws_wafv2_rule_group.wam_waf_acl.arn
+  #     override_action = "none"   # respect the group's action (BLOCK). Use "count" to dry-run.
+  #     priority        = 9        # unique; runs before managed rules at 10..15
+  #   }
+  # ]
 
   managed_rule_actions = {
     AWSManagedRulesKnownBadInputsRuleSet = false
@@ -121,7 +121,7 @@ locals {
 }
 
 resource "aws_wafv2_ip_set" "ncsc_waf_ip_set" {
-# count              = (local.is-development || local.is-preproduction || local.is-production) ? 1 : 0
+  # count              = (local.is-development || local.is-preproduction || local.is-production) ? 1 : 0
   name               = "ncsc-waf-ip-set"
   scope              = "REGIONAL"
   ip_address_version = "IPV4"
@@ -144,7 +144,7 @@ locals {
 }
 
 resource "aws_wafv2_ip_set" "circle_ci_waf_ip_set" {
-# count              = (local.is-development || local.is-preproduction || local.is-production) ? 1 : 0
+  # count              = (local.is-development || local.is-preproduction || local.is-production) ? 1 : 0
   name               = "circle-ci-waf-ip-set"
   scope              = "REGIONAL"
   ip_address_version = "IPV4"
