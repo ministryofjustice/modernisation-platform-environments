@@ -56,7 +56,7 @@ resource "aws_wafv2_web_acl_logging_configuration" "regional" {
 
 #Must create log group in us-east-1
 resource "aws_cloudwatch_log_group" "waf_logs_cf" {
-  #checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS" - not required
+  #checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS" - fix later us east-1 region issues
   provider           = aws.us-east-1
   name               = "aws-waf-logs-${var.waf_name}-cf"
   retention_in_days  = 400
