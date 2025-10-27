@@ -36,7 +36,7 @@ All other environment details are in the below link
 
 ### **Incident contact details:**
 
-Team can be reached on slack channel #laa-ccms-support.
+Team can be reached on slack channel #laa-ccms-support .
 Please tag the primary/platforms DM in case of platforms P1/P2 incidents or a secondary DM if the primary/platforms DM is unavailable
 
 <!-- How people can raise an urgent issue with your service. This must not be the email address or phone number of an individual on your team, it should be a shared email address, phone number, or website that allows someone with an urgent issue to raise it quickly. -->
