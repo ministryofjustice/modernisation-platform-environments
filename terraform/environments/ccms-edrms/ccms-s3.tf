@@ -118,8 +118,8 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
             "s3:TlsVersion" = "1.2"
           }
         }
-      },
-     {
+    },
+    {
        Sid = "AllowELBLogDeliveryPutObject",
        Effect = "Allow",
        Principal = {
@@ -135,7 +135,7 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
             "aws:SourceAccount" = data.aws_caller_identity.current.account_id
           }
         }
-     }
+   }
    ]
  })
 }
