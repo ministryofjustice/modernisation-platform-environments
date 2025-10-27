@@ -144,7 +144,8 @@
       "adaptor_container_memory": "2048",
       "client_opa12assess_means_address": "https://ccms-opa.laa.service.justice.gov.uk/opa/determinations-server/answer/soap/12.2.1/MeansAssessment",
       "client_opa12assess_billing_address": "https://ccms-opa.laa.service.justice.gov.uk/opa/determinations-server/answer/soap/12.2.1/BillingAssessment",
-      "server_opa10assess_security_user_name": "admin"
+      "server_opa10assess_security_user_name": "admin",
+      "cortex_deps_bucket_name": "ccms-shared"
     }
   }
 }

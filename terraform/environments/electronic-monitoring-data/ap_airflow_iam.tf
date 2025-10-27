@@ -631,3 +631,81 @@ module "load_capita_blob_storage" {
   source_data_bucket = module.s3-json-directory-structure-bucket.bucket
   new_airflow        = true
 }
+
+module "load_g4s_atrium_unstructured" {
+  count  = local.is-production || local.is-development ? 1 : 0
+  source = "./modules/ap_airflow_load_data_iam_role"
+
+  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+  de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
+
+  name               = "g4s-atrium-unstructured"
+  environment        = local.environment
+  database_name      = "g4s-atrium-unstructured"
+  secret_code        = jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]
+  oidc_arn           = aws_iam_openid_connect_provider.analytical_platform_compute.arn
+  athena_dump_bucket = module.s3-athena-bucket.bucket
+  cadt_bucket        = module.s3-create-a-derived-table-bucket.bucket
+  source_data_bucket = module.s3-json-directory-structure-bucket.bucket
+  new_airflow        = true
+}
+module "load_integrity_database" {
+  count  = local.is-production ? 1 : 0
+  source = "./modules/ap_airflow_load_data_iam_role"
+
+  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+  de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
+
+  name                 = "integrity"
+  environment          = local.environment
+  database_name        = "g4s-integrity"
+  path_to_data         = "/g4s_integrity"
+  source_data_bucket   = module.s3-dms-target-store-bucket.bucket
+  secret_code          = jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]
+  oidc_arn             = aws_iam_openid_connect_provider.analytical_platform_compute.arn
+  athena_dump_bucket   = module.s3-athena-bucket.bucket
+  cadt_bucket          = module.s3-create-a-derived-table-bucket.bucket
+  max_session_duration = 12 * 60 * 60
+
+  new_airflow = true
+}
+
+module "load_integrity_customdb_database" {
+  count  = local.is-production ? 1 : 0
+  source = "./modules/ap_airflow_load_data_iam_role"
+
+  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+  de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
+
+  name                 = "integrity-customdb"
+  environment          = local.environment
+  database_name        = "g4s-integrity-customdb"
+  path_to_data         = "/g4s_integrity_customdb"
+  source_data_bucket   = module.s3-dms-target-store-bucket.bucket
+  secret_code          = jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]
+  oidc_arn             = aws_iam_openid_connect_provider.analytical_platform_compute.arn
+  athena_dump_bucket   = module.s3-athena-bucket.bucket
+  cadt_bucket          = module.s3-create-a-derived-table-bucket.bucket
+  max_session_duration = 12 * 60 * 60
+
+  new_airflow = true
+}
+
+module "load_buddi_database" {
+  count  = local.is-production || local.is-test ? 1 : 0
+  source = "./modules/ap_airflow_load_data_iam_role"
+
+  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+  de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
+
+  name               = "buddi"
+  environment        = local.environment
+  database_name      = "buddi"
+  path_to_data       = "/buddi/buddi"
+  source_data_bucket = module.s3-data-bucket.bucket
+  secret_code        = jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]
+  oidc_arn           = aws_iam_openid_connect_provider.analytical_platform_compute.arn
+  athena_dump_bucket = module.s3-athena-bucket.bucket
+  cadt_bucket        = module.s3-create-a-derived-table-bucket.bucket
+  new_airflow        = true
+}

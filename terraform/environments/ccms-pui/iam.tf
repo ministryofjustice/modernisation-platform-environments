@@ -206,3 +206,36 @@ resource "aws_iam_role_policy_attachment" "ec2_s3_access" {
   role       = aws_iam_role.ec2_instance_role.name
   policy_arn = aws_iam_policy.s3_access_policy.arn
 }
+
+
+# S3 Cortex Deps Bucket Access Policy
+resource "aws_iam_policy" "s3_policy_cortex_deps" {
+  count       = local.is-production ? 1 : 0
+  name        = "${local.application_name}-s3-policy-cortex-deps"
+  description = "${local.application_name} s3-policy-cortex-deps"
+
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "s3:ListBucket",
+                "s3:GetObject"
+            ],
+            "Resource": [
+                "arn:aws:s3:::${local.application_data.accounts[local.environment].cortex_deps_bucket_name}/*",
+                "arn:aws:s3:::${local.application_data.accounts[local.environment].cortex_deps_bucket_name}"
+            ]
+        }
+    ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "s3_policy_cortex_deps" {
+  count      = local.is-production ? 1 : 0
+  role       = aws_iam_role.ec2_instance_role.name
+  policy_arn = aws_iam_policy.s3_policy_cortex_deps[0].arn
+}

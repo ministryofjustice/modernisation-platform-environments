@@ -82,12 +82,14 @@ locals {
           availability_zone = "eu-west-2a"
         })
         instance = merge(local.ec2_instances.jumpserver.instance, {
+          instance_type = "r6i.large"
           tags = {
             patch-manager = "group2"
           }
         })
         tags = merge(local.ec2_instances.jumpserver.tags, {
-          domain-name = "azure.hmpp.root"
+          domain-name         = "azure.hmpp.root"
+          instance-scheduling = "skip-scheduling"
         })
       })
 
@@ -102,8 +104,9 @@ locals {
           }
         })
         tags = merge(local.ec2_instances.rdgw.tags, {
-          description = "Remote Desktop Gateway for azure.hmpp.root domain"
-          domain-name = "azure.hmpp.root"
+          description         = "Remote Desktop Gateway for azure.hmpp.root domain"
+          domain-name         = "azure.hmpp.root"
+          instance-scheduling = "skip-scheduling"
         })
       })
 
@@ -117,9 +120,10 @@ locals {
           }
         })
         tags = merge(local.ec2_instances.rds.tags, {
-          description  = "Remote Desktop Services for azure.hmpp.root domain"
-          domain-name  = "azure.hmpp.root"
-          service-user = "svc_rds"
+          description         = "Remote Desktop Services for azure.hmpp.root domain"
+          domain-name         = "azure.hmpp.root"
+          service-user        = "svc_rds"
+          instance-scheduling = "skip-scheduling"
         })
       })
     }

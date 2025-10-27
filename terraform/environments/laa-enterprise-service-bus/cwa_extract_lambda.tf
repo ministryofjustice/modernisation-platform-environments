@@ -56,7 +56,7 @@ resource "aws_lambda_function" "cwa_extract_lambda" {
   handler          = "lambda_function.lambda_handler"
   filename         = "lambda/cwa_extract_lambda/cwa_extract_package.zip"
   source_code_hash = filebase64sha256("lambda/cwa_extract_lambda/cwa_extract_package.zip")
-  timeout          = 300
+  timeout          = 900
   memory_size      = 128
   runtime          = "python3.10"
 
@@ -96,7 +96,7 @@ resource "aws_lambda_function" "cwa_file_transfer_lambda" {
   handler          = "lambda_function.lambda_handler"
   filename         = "lambda/cwa_file_transfer_lambda/cwa_file_transfer_package.zip"
   source_code_hash = filebase64sha256("lambda/cwa_file_transfer_lambda/cwa_file_transfer_package.zip")
-  timeout          = 300
+  timeout          = 900
   memory_size      = 128
   runtime          = "python3.10"
 
