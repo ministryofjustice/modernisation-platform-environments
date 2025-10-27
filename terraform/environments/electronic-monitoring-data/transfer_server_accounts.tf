@@ -71,7 +71,7 @@ module "g4s" {
 
     # Accounts for each system to be migrated.
     # local.sftp_account_g4s_atrium,
-    # local.sftp_account_g4s_atrium_unstructured,
+    local.sftp_account_g4s_atrium_unstructured,
     # local.sftp_account_g4s_cap_dw,
     # local.sftp_account_g4s_integrity,
     local.sftp_account_g4s_telephony,
