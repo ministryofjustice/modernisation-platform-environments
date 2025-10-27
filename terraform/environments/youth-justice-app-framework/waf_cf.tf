@@ -3,7 +3,7 @@ module "waf-cf" {
   source             = "./modules/waf"
   kms_key_arn        = module.kms.key_arn
   kms_key_id         = module.kms.key_id
-  kms_key_us_east_1  = aws_kms_key.multi_region_replica.arn # WAF multi-region key
+  multi_region_replica = aws_kms_replica_key.multi_region_replica.arn # WAF multi-region key
   providers = {
     aws           = aws
     aws.us-east-1 = aws.us-east-1
