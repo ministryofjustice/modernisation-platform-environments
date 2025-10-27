@@ -58,6 +58,13 @@
       "logging_level_com_ezgov": "info",
       "logging_level_com_legalservices": "info",
       "logging_level_uk_gov_laa_opa": "info",
+      "s3_lifecycle_days_abort_incomplete_multipart_upload_days": 6,
+      "s3_lifecycle_days_expiration_current": 730,
+      "s3_lifecycle_days_expiration_noncurrent": 730,
+      "s3_lifecycle_days_transition_current_glacier": 365,
+      "s3_lifecycle_days_transition_current_standard": 90,
+      "s3_lifecycle_days_transition_noncurrent_glacier": 365,
+      "s3_lifecycle_days_transition_noncurrent_standard": 90,
       "logging_level_com_ezgov_roof_view_vim_control_BundleAwareText": "error"
     },
     "test": {
@@ -125,6 +132,13 @@
       "logging_level_com_legalservices": "info",
       "logging_level_uk_gov_laa_opa": "info",
       "logging_level_com_ezgov_roof_view_vim_control_BundleAwareText": "error",
+      "s3_lifecycle_days_abort_incomplete_multipart_upload_days": 6,
+      "s3_lifecycle_days_expiration_current": 730,
+      "s3_lifecycle_days_expiration_noncurrent": 730,
+      "s3_lifecycle_days_transition_current_glacier": 365,
+      "s3_lifecycle_days_transition_current_standard": 90,
+      "s3_lifecycle_days_transition_noncurrent_glacier": 365,
+      "s3_lifecycle_days_transition_noncurrent_standard": 90,
       "cortex_deps_bucket_name": "ccms-shared"
     }
   }
