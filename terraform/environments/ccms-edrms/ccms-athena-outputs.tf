@@ -34,15 +34,3 @@ output "aws_athena_named_query_http_requests_edrmsapp_internal" {
   value       = aws_athena_named_query.http_requests_edrmsapp_internal.id
 }
 #
-
-# output "aws_athena_named_query_main_table_wgate" {
-#   description = "aws_athena_named_query main_table_wgate id"
-#   value       = aws_athena_named_query.main_table_wgate.id
-# }
-
-# #
-
-# output "aws_athena_named_query_http_requests_wgate" {
-#   description = "aws_athena_named_query http_requests_wgate id"
-#   value       = aws_athena_named_query.http_requests_wgate.id
-# }
