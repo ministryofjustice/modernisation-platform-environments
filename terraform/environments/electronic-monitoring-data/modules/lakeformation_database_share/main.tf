@@ -1,6 +1,6 @@
 locals {
   dbs_to_create = var.db_exists ? toset([]) : toset(var.dbs_to_grant)
-  grant_dbs     = var.db_exists ? { for db in var.dbs_to_grant : db.name => db } : { for k, v in aws_glue_catalog_database.cadt_databases : k => v.name }
+  grant_dbs     = var.db_exists ? { for db in var.dbs_to_grant : db => db } : { for k, v in aws_glue_catalog_database.cadt_databases : k => v.name }
 }
 data "aws_caller_identity" "current" {}
 
@@ -24,7 +24,7 @@ resource "aws_lakeformation_permissions" "grant_cadt_databases_existing" {
 }
 
 resource "aws_lakeformation_permissions" "grant_cadt_databases_new" {
-  for_each = var.db_exists ? {} : { for db in aws_glue_catalog_database.cadt_databases : db.name => db }
+  for_each = var.db_exists ? {} : { for db in aws_glue_catalog_database.cadt_databases : db.name => db.name}
   principal                     = var.role_arn
   permissions                   = ["ALL"]
   permissions_with_grant_option = ["ALL"]
@@ -46,7 +46,7 @@ resource "aws_lakeformation_permissions" "grant_cadt_tables_existing" {
 }
 
 resource "aws_lakeformation_permissions" "grant_cadt_tables_new" {
-  for_each = var.db_exists ? {} :  { for db in aws_glue_catalog_database.cadt_databases : db.name => db }
+  for_each = var.db_exists ? {} :  { for db in aws_glue_catalog_database.cadt_databases : db.name => db.name}
   principal = var.role_arn
   permissions = ["ALL"]
   permissions_with_grant_option = ["ALL"]
@@ -81,7 +81,7 @@ resource "aws_lakeformation_permissions" "grant_cadt_databases_de_existing" {
 }
 
 resource "aws_lakeformation_permissions" "grant_cadt_databases_de_new" {
-  for_each = var.db_exists ? {} : { for db in aws_glue_catalog_database.cadt_databases : db.name => db }
+  for_each = var.db_exists ? {} : { for db in aws_glue_catalog_database.cadt_databases : db.name => db.name}
   principal                     = var.de_role_arn
   permissions                   = ["ALL"]
   permissions_with_grant_option = ["ALL"]
@@ -103,7 +103,7 @@ resource "aws_lakeformation_permissions" "grant_cadt_tables_de_existing" {
 }
 
 resource "aws_lakeformation_permissions" "grant_cadt_tables_de_new" {
-  for_each = var.db_exists ? {} :  { for db in aws_glue_catalog_database.cadt_databases : db.name => db }
+  for_each = var.db_exists ? {} :  { for db in aws_glue_catalog_database.cadt_databases : db.name => db.name}
   principal                     = var.de_role_arn
   permissions                   = ["ALL"]
   permissions_with_grant_option = ["ALL"]
