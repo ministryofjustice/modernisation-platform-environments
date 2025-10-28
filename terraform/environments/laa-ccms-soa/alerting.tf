@@ -519,8 +519,8 @@ resource "aws_cloudwatch_event_rule" "guardduty" {
       "GuardDuty Malware Protection Resource Status Error"
       ]
     detail: {
-      "scanResultDetails": {
-        "scanResultStatus": ["THREATS_FOUND", "FAILED", "ACCESS_DENIED"]
+      scanResultDetails: {
+        scanResultStatus: ["THREATS_FOUND", "FAILED", "ACCESS_DENIED"]
       }
     }
   })
