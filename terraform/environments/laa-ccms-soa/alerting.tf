@@ -512,6 +512,7 @@ resource "aws_cloudwatch_event_rule" "guardduty" {
   name = "${local.application_name}-guardduty-findings"
   event_pattern = jsonencode({
     source = ["aws.guardduty"]
+    "detail-type": ["GuardDuty Malware Protection Object Scan Result"]
     # detail-type can be "GuardDuty Finding" in some accounts - adapt if necessary.
   })
 }
