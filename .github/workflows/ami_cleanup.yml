@@ -40,7 +40,6 @@ permissions:
   id-token: write
   contents: read
 
-# ===== TEMP DRY-RUN OVERRIDE (FOR PUSH TESTING) =====
 env:
   APPLICATION: ${{ github.event.inputs.application || 'nomis' }}
   ENVIRONMENTS: ${{ github.event.inputs.environments || 'development' }}
@@ -48,7 +47,6 @@ env:
   AMI_ARGS: ${{ github.event.inputs.ami_cleanup_sh_args || '-c -m 3' }}
   EBS_MONTHS: ${{ github.event.inputs.ebs_age_in_months || '1' }}
   DRYRUN: ${{ (github.event.inputs.dryrun != '' && github.event.inputs.dryrun) || 'true' }}
-# ===== END TEMP DRY-RUN OVERRIDE =====
 
 jobs:
   build-matrix:
@@ -78,10 +76,9 @@ jobs:
           echo "${matrix}" >> $GITHUB_OUTPUT
           echo 'EOF' >> $GITHUB_OUTPUT
 
-  # Reusable workflow MUST be referenced at jobs.*.uses (not in steps)
   fetch-secrets:
     name: Fetch ENV management secrets
-    uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@4eceb2a416a197e91dc557c2ef0b5dd9afe29e0c # v3.4.6
+    uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@4eceb2a416a197e91dc557c2ef0b5dd9afe29e0c
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_NUMBER: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
@@ -98,8 +95,11 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
 
+      - name: Ensure scripts are executable
+        run: chmod +x scripts/*.sh
+
       - name: Decrypt Secrets (ENVIRONMENT_MANAGEMENT)
-        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@4eceb2a416a197e91dc557c2ef0b5dd9afe29e0c # v3.4.6
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@4eceb2a416a197e91dc557c2ef0b5dd9afe29e0c
         with:
           environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
           github_ci_user_environments_repo_pat: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}
@@ -120,7 +120,6 @@ jobs:
           role-session-name: "ami-cleanup-${{ matrix.account_name }}"
           aws-region: eu-west-2
 
-      # SAFE: do NOT pass 'delete' when DRYRUN is true
       - name: Run AMI Cleanup (Collect)
         run: |
           set -euo pipefail
@@ -134,7 +133,6 @@ jobs:
             scripts/ami_cleanup.sh -a "$app" -s ami_commands.sh $args delete
           fi
 
-      # Only execute on manual runs with dryrun=false
       - name: Execute AMI Deregistration (if not dryrun)
         if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.dryrun == 'false' }}
         run: |
@@ -168,8 +166,11 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
 
+      - name: Ensure scripts are executable
+        run: chmod +x scripts/*.sh
+
       - name: Decrypt Secrets (ENVIRONMENT_MANAGEMENT)
-        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@4eceb2a416a197e91dc557c2ef0b5dd9afe29e0c # v3.4.6
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@4eceb2a416a197e91dc557c2ef0b5dd9afe29e0c
         with:
           environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
           github_ci_user_environments_repo_pat: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}
