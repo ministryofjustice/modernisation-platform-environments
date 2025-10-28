@@ -17,7 +17,7 @@ module "chatbot_prod" {
   application_name = local.application_data.accounts[local.environment].app_name
 }
 
-module "chatbot_nonprod" {
+module "guardduty_chatbot_nonprod" {
   source           = "github.com/ministryofjustice/modernisation-platform-terraform-aws-chatbot"
   count            = local.is-production ? 0 : 1
   slack_channel_id = data.aws_secretsmanager_secret_version.slack_channel_id.secret_string
@@ -26,7 +26,7 @@ module "chatbot_nonprod" {
   application_name = local.application_data.accounts[local.environment].app_name
 }
 
-module "chatbot_prod" {
+module "guardduty_chatbot_prod" {
   source           = "github.com/ministryofjustice/modernisation-platform-terraform-aws-chatbot"
   count            = local.is-production ? 1 : 0
   slack_channel_id = data.aws_secretsmanager_secret_version.slack_channel_id.secret_string
