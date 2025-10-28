@@ -22,10 +22,16 @@ resource "aws_workspacesweb_network_settings" "main" {
   security_group_ids = [module.workspacesweb_security_group.security_group_id]
 }
 
-### WORKSPACES WEB PORTAL
+### WORKSPACES WEB PORTALS
+moved {
+  from = aws_workspacesweb_portal.main
+  to   = aws_workspacesweb_portal.external["external_1"]
+}
 
-resource "aws_workspacesweb_portal" "main" {
-  display_name = "laa-workspaces-web"
+resource "aws_workspacesweb_portal" "external" {
+  for_each = local.portals
+
+  display_name = each.value
 }
 
 ### USER SETTINGS
@@ -190,31 +196,58 @@ resource "aws_workspacesweb_session_logger" "main" {
 
 }
 
-### NETWORK SETTINGS ASSOCIATION
+### NETWORK SETTINGS ASSOCIATIONS
 
-resource "aws_workspacesweb_network_settings_association" "main" {
-  portal_arn           = aws_workspacesweb_portal.main.portal_arn
+moved {
+  from = aws_workspacesweb_network_settings_association.main
+  to   = aws_workspacesweb_network_settings_association.external["external_1"]
+}
+
+resource "aws_workspacesweb_network_settings_association" "external" {
+  for_each = local.portals
+
+  portal_arn           = aws_workspacesweb_portal.external[each.key].portal_arn
   network_settings_arn = aws_workspacesweb_network_settings.main.network_settings_arn
 }
 
-### USER SETTINGS ASSOCIATION
+### USER SETTINGS ASSOCIATIONS
 
-resource "aws_workspacesweb_user_settings_association" "main" {
-  portal_arn        = aws_workspacesweb_portal.main.portal_arn
+moved {
+  from = aws_workspacesweb_user_settings_association.main
+  to   = aws_workspacesweb_user_settings_association.external["external_1"]
+}
+
+resource "aws_workspacesweb_user_settings_association" "external" {
+  for_each = local.portals
+
+  portal_arn        = aws_workspacesweb_portal.external[each.key].portal_arn
   user_settings_arn = aws_workspacesweb_user_settings.main.user_settings_arn
 }
 
-### BROWSER SETTINGS ASSOCIATION
+### BROWSER SETTINGS ASSOCIATIONS
 
-resource "aws_workspacesweb_browser_settings_association" "main" {
-  portal_arn           = aws_workspacesweb_portal.main.portal_arn
+moved {
+  from = aws_workspacesweb_browser_settings_association.main
+  to   = aws_workspacesweb_browser_settings_association.external["external_1"]
+}
+
+resource "aws_workspacesweb_browser_settings_association" "external" {
+  for_each = local.portals
+
+  portal_arn           = aws_workspacesweb_portal.external[each.key].portal_arn
   browser_settings_arn = aws_workspacesweb_browser_settings.main.browser_settings_arn
 }
 
+### SESSION LOGGER ASSOCIATIONS
 
-### SESSION LOGGER ASSOCIATION
+moved {
+  from = aws_workspacesweb_session_logger_association.main
+  to   = aws_workspacesweb_session_logger_association.external["external_1"]
+}
 
-resource "aws_workspacesweb_session_logger_association" "main" {
-  portal_arn         = aws_workspacesweb_portal.main.portal_arn
+resource "aws_workspacesweb_session_logger_association" "external" {
+  for_each = local.portals
+
+  portal_arn         = aws_workspacesweb_portal.external[each.key].portal_arn
   session_logger_arn = aws_workspacesweb_session_logger.main.session_logger_arn
 }

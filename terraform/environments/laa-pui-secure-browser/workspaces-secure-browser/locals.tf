@@ -1,5 +1,9 @@
+# locals {
+#   cloud_platform_ranges = [  ]
+# }
 locals {
-  cloud_platform_ranges = [
-    "172.20.0.0/16"
-  ]
+  portals = {
+    "external_1" = "laa-workspaces-web-external-1"
+    "external_2" = "laa-workspaces-web-external-2"
+  }
 }
