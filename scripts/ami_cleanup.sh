@@ -1,9 +1,8 @@
-# scripts/ami_cleanup.sh
 #!/bin/bash
 # Don't forget to set your default profile
 # export AWS_DEFAULT_PROFILE=nomis-development
 
-set -eo pipefail
+set -euo pipefail
 
 # defaults
 aws_cmd_file=
@@ -38,17 +37,17 @@ And:
 main() {
   parse_inputs "$@"
   set_date_cmd
-  case $action in
+  case ${action:-} in
     used)
       get_in_use_images_csv "$include_images_on_ec2" "$include_images_in_code" "$application" ;;
     account)
-      get_account_images_csv "$months" "$include_backup" | clean_sort ;;
+      get_account_images_csv "${months:-}" "$include_backup" | clean_sort ;;
     code)
       get_code_image_names "$application" ;;
     delete)
-      csv=$(get_images_to_delete_csv "$include_images_on_ec2" "$include_images_in_code" "$application" "$months" "$include_backup")
-      printf "%s\n" "$csv" > ami_candidates.csv
-      delete_images "$dryrun" "$aws_cmd_file" "$csv" ;;
+      csv=$(get_images_to_delete_csv "$include_images_on_ec2" "$include_images_in_code" "$application" "${months:-}" "$include_backup" || true)
+      printf "%s\n" "${csv:-}" > ami_candidates.csv
+      delete_images "$dryrun" "$aws_cmd_file" "${csv:-}" ;;
     *)
       usage >&2
       exit 1 ;;
@@ -78,15 +77,15 @@ parse_inputs() {
   done
   shift $((OPTIND-1))
 
-  if [[ -n $2 ]]; then  
+  if [[ -n ${2-} ]]; then  
     echo "Unexpected argument: $1 $2"
     usage >&2
     exit 1
   fi
 
-  action=$1
-  if [[ "$application" == "core-shared-services" ]]; then 
-    if [[ -n "$environment" ]]; then 
+  action=${1-}
+  if [[ "${application:-}" == "core-shared-services" ]]; then 
+    if [[ -n "${environment:-}" ]]; then 
       profile="--profile $application-$environment"
     else
       echo "for core-shared-services need to specify environment"
@@ -125,7 +124,8 @@ get_date_filter() {
   local date_filter
   local i
   local m=$1
-  local m1=$(date_minus_month "$m" "+%m")
+  local m1
+  m1=$(date_minus_month "$m" "+%m")
   local m2=${m1#0}
   local m3=$((m+m2))
 
@@ -162,7 +162,7 @@ get_account_images_csv() {
   local include_backup=$2  
 
   local filters=''
-  if [[ -n $months ]]; then
+  if [[ -n ${months:-} ]]; then
     local date_filter
     date_filter=$(get_date_filter "$months")
     filters="--filters Name=creation-date,Values=$date_filter"
@@ -172,10 +172,10 @@ get_account_images_csv() {
   out=$(aws ec2 describe-images $filters $profile \
            --owners self \
            --query 'Images[].[ImageId, OwnerId, CreationDate, Public, Name]' \
-           --output text 2> $aws_error_log | aws_text_to_csv)
+           --output text 2> "$aws_error_log" | aws_text_to_csv)
   check_aws_error
 
-  if [[ $include_backup == 0 ]]; then
+  if [[ $include_backup -eq 0 ]]; then
     echo "$out" | grep -v 'AwsBackup' || true
   else
     echo "$out"
@@ -183,9 +183,10 @@ get_account_images_csv() {
 }
 
 get_usage_report_csv() {
-  mapfile -t account_images < <(get_account_images_csv $months $include_backup)
-  for ami in "${account_images[@]}"; do
+  mapfile -t account_images < <(get_account_images_csv "${months:-}" "$include_backup" || true)
+  for ami in "${account_images[@]:-}"; do
     IFS=',' read -r image_id owner_id creation_date public name <<< "$ami"
+    [[ -z "${image_id:-}" ]] && continue
 
     report_id=$(aws ec2 create-image-usage-report $profile \
                   --image-id "$image_id" \
@@ -194,23 +195,24 @@ get_usage_report_csv() {
     report_usage=$(aws ec2 describe-image-usage-report-entries $profile \
                      --report-id "$report_id" \
                      --output text || true)
-    [[ -n $report_usage ]] && echo "$ami"
+    [[ -n ${report_usage:-} ]] && echo "$ami"
   done
 }
 
 get_ec2_instance_images_csv() {
-  if [[ "$application" == "core-shared-services-production" ]]; then
+  if [[ "${application:-}" == "core-shared-services-production" ]]; then
     get_usage_report_csv
   else
+    # Collect unique ImageIds actually in use
     mapfile -t ids < <(aws ec2 describe-instances $profile \
             --query "Reservations[*].Instances[*].ImageId" \
-            --output text 2> $aws_error_log | tr '\t' '\n' | sed '/^$/d' | sort -u)
+            --output text 2> "$aws_error_log" | tr '\t' '\n' | sed '/^$/d' | sort -u || true)
     check_aws_error
-    [[ ${#ids[@]} -eq 0 ]] && return 0
+    [[ ${#ids[@]:-0} -eq 0 ]] && return 0
     aws ec2 describe-images $profile \
             --image-ids "${ids[@]}" \
             --query 'Images[].[ImageId, OwnerId, CreationDate, Public, Name]' \
-            --output text 2> $aws_error_log | aws_text_to_csv
+            --output text 2> "$aws_error_log" | aws_text_to_csv
     check_aws_error
   fi
 }
@@ -234,23 +236,26 @@ get_code_image_names() {
   else
     tf_files="${envdir}/*/*.tf"
   fi
-  grep -Eo 'ami_name[[:space:]]*=[[:space:]]*"[^"]*"' $tf_files | cut -d\" -f2 | sort -u | grep -vF '*' | sort -u || true
+  # shellcheck disable=SC2086
+  grep -Eo 'ami_name[[:space:]]*=[[:space:]]*"[^"]*"' $tf_files | cut -d\" -f2 | LC_ALL=C sort -u | grep -vF '*' | LC_ALL=C sort -u || true
 }
 
 get_code_csv() {
   local ami code
-  ami=$(get_account_images_csv 0 | LC_ALL=C sort -t, -k5,5)
-  code=$(get_code_image_names "$1")
-  join -o 1.1,1.2,1.3,1.4,1.5  -t, -1 5 <(echo "$ami") <(echo "$code" | LC_ALL=C sort) | clean_sort
+  ami=$(get_account_images_csv 0 | LC_ALL=C sort -t, -k5,5 || true)
+  code=$(get_code_image_names "$1" | LC_ALL=C sort || true)
+  # join returns exit code 1 when there are no matching keys; tolerate that
+  join -o 1.1,1.2,1.3,1.4,1.5 -t, -1 5 <(echo "${ami:-}") <(echo "${code:-}") 2>/dev/null || true
 }
 
 get_ec2_and_code_csv() {
   local ami code amicode ec2
-  ami=$(get_account_images_csv 0 | LC_ALL=C sort -t, -k5,5)
-  code=$(get_code_image_names "$1")
-  amicode=$(join -o 1.1,1.2,1.3,1.4,1.5  -t, -1 5 <(echo "$ami") <(echo "$code" | LC_ALL=C sort) | LC_ALL=C sort)
-  ec2=$(get_ec2_instance_images_csv | LC_ALL=C sort)
-  comm <(echo "$amicode") <(echo "$ec2") | tr -d ' \t' | clean_sort
+  ami=$(get_account_images_csv 0 | LC_ALL=C sort -t, -k5,5 || true)
+  code=$(get_code_image_names "$1" | LC_ALL=C sort || true)
+  amicode=$(join -o 1.1,1.2,1.3,1.4,1.5 -t, -1 5 <(echo "${ami:-}") <(echo "${code:-}") 2>/dev/null | LC_ALL=C sort || true)
+  ec2=$(get_ec2_instance_images_csv | LC_ALL=C sort || true)
+  # comm returns 1 if one input is empty; tolerate that and normalize output
+  (comm <(echo "${amicode:-}") <(echo "${ec2:-}") 2>/dev/null || true) | tr -d ' \t' | clean_sort
 }
 
 get_in_use_images_csv() {
@@ -260,12 +265,12 @@ get_in_use_images_csv() {
   local csv_ec2=""
   local csv_code=""
   if [[ "$include_ec2" == "1" ]]; then
-    csv_ec2=$(get_ec2_instance_images_csv | clean_sort)
+    csv_ec2=$(get_ec2_instance_images_csv | clean_sort || true)
   fi
   if [[ "$include_code" == "1" ]]; then
-    csv_code=$(get_code_csv "$app" | clean_sort)
+    csv_code=$(get_code_csv "$app" | clean_sort || true)
   fi
-  printf "%s\n%s\n" "$csv_ec2" "$csv_code" | clean_sort
+  printf "%s\n%s\n" "${csv_ec2:-}" "${csv_code:-}" | clean_sort
 }
 
 get_images_to_delete_csv() {
@@ -276,16 +281,18 @@ get_images_to_delete_csv() {
   local include_backup=$5
 
   local account in_use
-  account=$(get_account_images_csv "$months" "$include_backup" | clean_sort)
-  in_use=$(get_in_use_images_csv "$include_ec2" "$include_code" "$app" | clean_sort)
-  comm -23 <(echo "$account") <(echo "$in_use") || true
+  account=$(get_account_images_csv "${months:-}" "$include_backup" | clean_sort || true)
+  in_use=$(get_in_use_images_csv "$include_ec2" "$include_code" "$app" | clean_sort || true)
+
+  # comm returns 1 when one file is empty; tolerate that
+  comm -23 <(echo "${account:-}") <(echo "${in_use:-}") 2>/dev/null || true
 }
 
 delete_images() {
   local dryrun=$1
   local aws_cmd_file=$2
   local csv=$3
-  [[ -z "$aws_cmd_file" ]] && aws_cmd_file="ami_delete_commands.sh"
+  [[ -z "${aws_cmd_file:-}" ]] && aws_cmd_file="ami_delete_commands.sh"
 
   local tmp
   tmp=$(mktemp)
@@ -297,10 +304,10 @@ delete_images() {
 
   local count=0
   while IFS=',' read -r image_id owner_id creation_date public name; do
-    [[ -z "$image_id" ]] && continue
+    [[ -z "${image_id:-}" ]] && continue
     echo "aws ec2 deregister-image --image-id $image_id $profile" >> "$tmp"
     ((count++))
-  done <<< "$csv"
+  done <<< "${csv:-}"
 
   {
     echo ""
@@ -324,7 +331,7 @@ delete_images() {
 }
 
 check_aws_error() {
-  if grep -q 'Error' "$aws_error_log" 2>/dev/null; then
+  if [[ -s "$aws_error_log" ]] && grep -q 'Error' "$aws_error_log"; then
     echo "AWS CLI error detected:" >&2
     cat "$aws_error_log" >&2
     exit 1
