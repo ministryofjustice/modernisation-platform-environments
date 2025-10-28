@@ -1,3 +1,4 @@
+# .github/workflows/ami_cleanup.yml
 name: Cloud Cleanup (AMI & EBS)
 
 on:
@@ -132,6 +133,9 @@ jobs:
             echo "[LIVE] Collecting and preparing deletes"
             scripts/ami_cleanup.sh -a "$app" -s ami_commands.sh $args delete
           fi
+          echo "---------- Summary ----------"
+          [[ -f ami_candidates.csv ]] && echo "Candidates CSV rows: $(wc -l < ami_candidates.csv)" || echo "No ami_candidates.csv produced"
+          [[ -f ami_commands.sh ]] && echo "Commands lines: $(grep -c '^aws ec2 deregister-image' ami_commands.sh)" || echo "No ami_commands.sh produced"
 
       - name: Execute AMI Deregistration (if not dryrun)
         if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.dryrun == 'false' }}
@@ -152,6 +156,14 @@ jobs:
         with:
           name: ami-commands-${{ matrix.account_name }}
           path: ami_commands.sh
+          if-no-files-found: ignore
+
+      - name: Upload AMI Candidates (Dry-Run Preview)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ami-candidates-${{ matrix.account_name }}
+          path: ami_candidates.csv
           if-no-files-found: ignore
 
   ebs-cleanup:

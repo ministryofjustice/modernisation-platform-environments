@@ -1,3 +1,4 @@
+# scripts/ami_cleanup.sh
 #!/bin/bash
 # Don't forget to set your default profile
 # export AWS_DEFAULT_PROFILE=nomis-development
@@ -46,6 +47,7 @@ main() {
       get_code_image_names "$application" ;;
     delete)
       csv=$(get_images_to_delete_csv "$include_images_on_ec2" "$include_images_in_code" "$application" "$months" "$include_backup")
+      printf "%s\n" "$csv" > ami_candidates.csv
       delete_images "$dryrun" "$aws_cmd_file" "$csv" ;;
     *)
       usage >&2
@@ -140,12 +142,12 @@ get_date_filter() {
   echo "$date_filter"
 }
 
-# Normalize, de-CRLF, drop blanks, and sort consistently for comm/join
+# Normalize, drop CRLF/blank lines, sort deterministically
 clean_sort() {
   sed -e 's/\r$//' -e '/^$/d' | LC_ALL=C sort -u
 }
 
-# Use tab-aware parsing to preserve AMI names with spaces/tabs
+# Parse AWS TEXT (tab-delimited) to CSV while preserving AMI names with spaces
 aws_text_to_csv() {
   awk -F'\t' 'BEGIN{OFS=","} {
     name=$5;
@@ -200,7 +202,6 @@ get_ec2_instance_images_csv() {
   if [[ "$application" == "core-shared-services-production" ]]; then
     get_usage_report_csv
   else
-    # Collect unique ImageIds actually in use
     mapfile -t ids < <(aws ec2 describe-instances $profile \
             --query "Reservations[*].Instances[*].ImageId" \
             --output text 2> $aws_error_log | tr '\t' '\n' | sed '/^$/d' | sort -u)
@@ -277,7 +278,6 @@ get_images_to_delete_csv() {
   local account in_use
   account=$(get_account_images_csv "$months" "$include_backup" | clean_sort)
   in_use=$(get_in_use_images_csv "$include_ec2" "$include_code" "$app" | clean_sort)
-
   comm -23 <(echo "$account") <(echo "$in_use") || true
 }
 
@@ -285,25 +285,41 @@ delete_images() {
   local dryrun=$1
   local aws_cmd_file=$2
   local csv=$3
-  if [[ -z "$aws_cmd_file" ]]; then
-    aws_cmd_file="ami_delete_commands.sh"
-  fi
+  [[ -z "$aws_cmd_file" ]] && aws_cmd_file="ami_delete_commands.sh"
 
-  echo "#!/bin/bash" > "$aws_cmd_file"
-  echo "# Generated AWS deregistration commands" >> "$aws_cmd_file"
+  local tmp
+  tmp=$(mktemp)
 
-  echo "$csv" | while IFS=',' read -r image_id owner_id creation_date public name; do
+  {
+    echo "#!/bin/bash"
+    echo "# Generated AWS deregistration commands"
+  } > "$tmp"
+
+  local count=0
+  while IFS=',' read -r image_id owner_id creation_date public name; do
     [[ -z "$image_id" ]] && continue
-    echo "aws ec2 deregister-image --image-id $image_id $profile" >> "$aws_cmd_file"
-  done
+    echo "aws ec2 deregister-image --image-id $image_id $profile" >> "$tmp"
+    ((count++))
+  done <<< "$csv"
 
-  chmod +x "$aws_cmd_file"
+  {
+    echo ""
+    echo "# Summary: $count AMI(s) slated for deregistration"
+  } >> "$tmp"
 
+  chmod +x "$tmp"
+  mv "$tmp" "$aws_cmd_file"
+
+  echo "Found $count AMI(s) to deregister."
   if [[ "$dryrun" -eq 1 ]]; then
     echo "[DRY RUN] Commands written to $aws_cmd_file"
   else
-    echo "[LIVE] Deregistering AMIs..."
-    bash "$aws_cmd_file"
+    if (( count > 0 )); then
+      echo "[LIVE] Deregistering AMIs..."
+      bash "$aws_cmd_file"
+    else
+      echo "[LIVE] No AMIs to deregister."
+    fi
   fi
 }
 
