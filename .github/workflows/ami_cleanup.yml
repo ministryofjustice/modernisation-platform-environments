@@ -41,8 +41,6 @@ permissions:
   contents: read
 
 # ===== TEMP DRY-RUN OVERRIDE (FOR PUSH TESTING) =====
-# These env defaults make push-triggered runs behave like a DRY RUN.
-# Remove this whole block after testing.
 env:
   APPLICATION: ${{ github.event.inputs.application || 'nomis' }}
   ENVIRONMENTS: ${{ github.event.inputs.environments || 'development' }}
@@ -80,49 +78,44 @@ jobs:
           echo "${matrix}" >> $GITHUB_OUTPUT
           echo 'EOF' >> $GITHUB_OUTPUT
 
-  # Reuse the same secrets bootstrap pattern as terraform plan/apply
-  fetch-secrets:
-    uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@4eceb2a416a197e91dc557c2ef0b5dd9afe29e0c # v3.4.6
-    secrets:
-      MODERNISATION_PLATFORM_ACCOUNT_NUMBER: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
-      PASSPHRASE: ${{ secrets.PASSPHRASE }}
-
   ami-cleanup:
     name: AMI Cleanup
     runs-on: ubuntu-latest
-    needs: [build-matrix, fetch-secrets]
-    # Manual: respect inputs.cleanup_type; Push: run (dry-run via env)
+    needs: build-matrix
     if: ${{ (github.event_name == 'workflow_dispatch' && (github.event.inputs.cleanup_type == 'ami' || github.event.inputs.cleanup_type == 'both')) || (github.event_name == 'push') }}
     strategy:
       matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
       max-parallel: 1
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Decrypt Secrets (ENVIRONMENT_MANAGEMENT)
-        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@4eceb2a416a197e91dc557c2ef0b5dd9afe29e0c # v3.4.6
-        with:
-          environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
-          github_ci_user_environments_repo_pat: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}
+      - name: Fetch Secrets
+        uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@4eceb2a416a197e91dc557c2ef0b5dd9afe29e0c
+        secrets:
+          MODERNISATION_PLATFORM_ACCOUNT_NUMBER: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
           PASSPHRASE: ${{ secrets.PASSPHRASE }}
 
-      - name: Set ACCOUNT_NAME and resolve ACCOUNT_NUMBER
+      - name: Decrypt Secrets
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@4eceb2a416a197e91dc557c2ef0b5dd9afe29e0c
+        with:
+          environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
+          PASSPHRASE: ${{ secrets.PASSPHRASE }}
+
+      - name: Get AWS Account Number
         run: |
           set -euo pipefail
-          echo "ACCOUNT_NAME=${{ matrix.account_name }}" >> $GITHUB_ENV
-          ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${{ matrix.account_name }}" '.account_ids[$account_name]' <<< "$ENVIRONMENT_MANAGEMENT")
-          echo "::add-mask::$ACCOUNT_NUMBER"
+          ACCOUNT_NAME="${{ matrix.account_name }}"
+          ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)
           echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502
         with:
-          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/modernisation-platform-oidc-cicd"
+          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
           role-session-name: "ami-cleanup-${{ matrix.account_name }}"
           aws-region: eu-west-2
 
-      # SAFE: do NOT pass 'delete' when DRYRUN is true
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
       - name: Run AMI Cleanup (Collect)
         run: |
           set -euo pipefail
@@ -136,7 +129,6 @@ jobs:
             scripts/ami_cleanup.sh -a "$app" -s ami_commands.sh $args delete
           fi
 
-      # Only execute on manual runs with dryrun=false
       - name: Execute AMI Deregistration (if not dryrun)
         if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.dryrun == 'false' }}
         run: |
@@ -161,37 +153,40 @@ jobs:
   ebs-cleanup:
     name: EBS Cleanup
     runs-on: ubuntu-latest
-    needs: [build-matrix, fetch-secrets]
-    # Manual: respect inputs.cleanup_type; Push: run (dry-run via env)
+    needs: build-matrix
     if: ${{ (github.event_name == 'workflow_dispatch' && (github.event.inputs.cleanup_type == 'ebs' || github.event.inputs.cleanup_type == 'both')) || (github.event_name == 'push') }}
     strategy:
       matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
       max-parallel: 1
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Decrypt Secrets (ENVIRONMENT_MANAGEMENT)
-        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@4eceb2a416a197e91dc557c2ef0b5dd9afe29e0c # v3.4.6
-        with:
-          environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
-          github_ci_user_environments_repo_pat: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}
+      - name: Fetch Secrets
+        uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@4eceb2a416a197e91dc557c2ef0b5dd9afe29e0c
+        secrets:
+          MODERNISATION_PLATFORM_ACCOUNT_NUMBER: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
           PASSPHRASE: ${{ secrets.PASSPHRASE }}
 
-      - name: Set ACCOUNT_NAME and resolve ACCOUNT_NUMBER
+      - name: Decrypt Secrets
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@4eceb2a416a197e91dc557c2ef0b5dd9afe29e0c
+        with:
+          environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
+          PASSPHRASE: ${{ secrets.PASSPHRASE }}
+
+      - name: Get AWS Account Number
         run: |
           set -euo pipefail
-          echo "ACCOUNT_NAME=${{ matrix.account_name }}" >> $GITHUB_ENV
-          ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${{ matrix.account_name }}" '.account_ids[$account_name]' <<< "$ENVIRONMENT_MANAGEMENT")
-          echo "::add-mask::$ACCOUNT_NUMBER"
+          ACCOUNT_NAME="${{ matrix.account_name }}"
+          ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)
           echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502
         with:
-          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/modernisation-platform-oidc-cicd"
+          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
           role-session-name: "ebs-cleanup-${{ matrix.account_name }}"
           aws-region: eu-west-2
+
+      - name: Checkout Repo
+        uses: actions/checkout@v4
 
       - name: Run EBS Cleanup
         run: |
