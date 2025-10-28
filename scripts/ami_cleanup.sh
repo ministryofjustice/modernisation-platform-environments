@@ -18,6 +18,7 @@ aws_error_log='aws_error.log'
 
 usage() {
   echo -e "Usage:\n $0 [<opts>] $(IFS='|'; echo "${valid_actions[*]}")
+
 Where <opts>:
   -a <application>       Specify which application for images e.g. nomis or core-shared-services
   -b                     Optionally include AwsBackup images
@@ -26,6 +27,7 @@ Where <opts>:
   -e <environment>       Specify which environment for images e.g. production (only needed for core-shared-services)
   -m <months>            Exclude images younger than this number of months
   -s <file>              Output AWS shell commands to file
+
 And:
   used                   List all images in use (and -c flag to include code)
   account                List all images in the current account
@@ -126,7 +128,7 @@ get_date_filter() {
   local m1=$(date_minus_month "$m" "+%m")
   local m2=${m1#0}
   local m3=$((m+m2))
-
+  
   if ((m2<12)); then
     for ((i=m;i<m3;i++)); do
       date_filter=${date_filter}$(date_minus_month "$i" "+%Y-%m-*"),
@@ -143,7 +145,7 @@ get_date_filter() {
 get_account_images_csv() {
   local months=$1
   local include_backup=$2  
-
+  
   if [[ -z $months ]]; then
     filters=''
   else
@@ -203,7 +205,7 @@ get_code_image_names() {
   local app=$1
   local envdir
   local tf_files
-
+  
   if [[ "$app" == "core-shared-services-production" ]]; then 
     envdir=$(dirname "$0")/../../modernisation-platform/terraform/environments/core-shared-services
   else 
@@ -236,4 +238,68 @@ get_ec2_and_code_csv() {
 }
 
 get_in_use_images_csv() {
-  local ec2=$
+  local include_ec2=$1
+  local include_code=$2
+  local app=$3
+  local csv_ec2=""
+  local csv_code=""
+  if [[ "$include_ec2" == "1" ]]; then
+    csv_ec2=$(get_ec2_instance_images_csv | sort -u)
+  fi
+  if [[ "$include_code" == "1" ]]; then
+    csv_code=$(get_code_csv "$app" | sort -u)
+  fi
+  echo -e "$csv_ec2\n$csv_code" | sort -u
+}
+
+get_images_to_delete_csv() {
+  local include_ec2=$1
+  local include_code=$2
+  local app=$3
+  local months=$4
+  local include_backup=$5
+
+  local account=$(get_account_images_csv "$months" "$include_backup" | sort -t, -k5)
+  local in_use=$(get_in_use_images_csv "$include_ec2" "$include_code" "$app" | sort -t, -k5)
+  comm -23 <(echo "$account") <(echo "$in_use") || true
+}
+
+delete_images() {
+  local dryrun=$1
+  local aws_cmd_file=$2
+  local csv=$3
+  if [[ -z "$aws_cmd_file" ]]; then
+    aws_cmd_file="ami_delete_commands.sh"
+  fi
+
+  echo "#!/bin/bash" > "$aws_cmd_file"
+  echo "# Generated AWS deregistration commands" >> "$aws_cmd_file"
+
+  echo "$csv" | while IFS=',' read -r image_id owner_id creation_date public name; do
+    [[ -z "$image_id" ]] && continue
+    echo "aws ec2 deregister-image --image-id $image_id $profile" >> "$aws_cmd_file"
+  done
+
+  chmod +x "$aws_cmd_file"
+
+  if [[ "$dryrun" -eq 1 ]]; then
+    echo "[DRY RUN] Commands written to $aws_cmd_file"
+  else
+    echo "[LIVE] Deregistering AMIs..."
+    bash "$aws_cmd_file"
+  fi
+}
+
+check_aws_error() {
+  if grep -q 'Error' "$aws_error_log"; then
+    echo "AWS CLI error detected:" >&2
+    cat "$aws_error_log" >&2
+    exit 1
+  fi
+}
+
+cleanup() {
+  rm -f "$aws_error_log" || true
+}
+
+main "$@"
