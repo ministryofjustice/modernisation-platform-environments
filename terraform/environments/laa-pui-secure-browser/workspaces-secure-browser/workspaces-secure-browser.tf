@@ -46,7 +46,7 @@ resource "aws_workspacesweb_user_settings" "main" {
   upload_allowed   = "Enabled"
 
   # Optional settings
-  deep_link_allowed                  = "Disabled"
+  deep_link_allowed                  = "Enabled"
   disconnect_timeout_in_minutes      = 60
   idle_disconnect_timeout_in_minutes = 15
 
@@ -127,7 +127,8 @@ resource "aws_workspacesweb_browser_settings" "main" {
           "chrome://new-tab-page",
           "mysignins.microsoft.com",
           "go.microsoft.com",
-          "portal.manage.microsoft.com"
+          "portal.manage.microsoft.com",
+          "laa-sign-in.external-identity.service.justice.gov.uk/"
         ]
       }
       "AllowDeletingBrowserHistory" = {
