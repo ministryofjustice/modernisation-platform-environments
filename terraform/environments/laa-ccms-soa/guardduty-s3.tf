@@ -30,5 +30,5 @@ resource "aws_guardduty_malware_protection_plan" "s3_scan" {
 }
 
 data "aws_iam_role" "guardduty_s3_scan" {
-  name = "GuardDutyS3MalwareScanRole-0c025c41-d0be-4fe9-af40-bacce35b6021"
+  name = "GuardDutyS3MalwareProtectionRole"
 }
