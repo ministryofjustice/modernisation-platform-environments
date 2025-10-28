@@ -507,3 +507,17 @@ resource "aws_cloudwatch_metric_alarm" "SOA_Benefit_Checker_Rollback_Error_Admin
   alarm_actions       = [aws_sns_topic.alerts.arn]
   ok_actions          = [aws_sns_topic.alerts.arn]
 } */
+
+resource "aws_cloudwatch_event_rule" "guardduty" {
+  name = "${local.application_name}-guardduty-findings"
+  event_pattern = jsonencode({
+    source = ["aws.guardduty"]
+    # detail-type can be "GuardDuty Finding" in some accounts - adapt if necessary.
+  })
+}
+
+resource "aws_cloudwatch_event_target" "guardduty_to_sns" {
+  rule = aws_cloudwatch_event_rule.guardduty.name
+  arn  = aws_sns_topic.alerts.arn
+}
+

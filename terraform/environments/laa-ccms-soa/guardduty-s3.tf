@@ -1,5 +1,10 @@
 resource "aws_guardduty_detector" "main" {
   enable = true
+  finding_publishing_frequency = "SIX_HOURS"
+   tags = merge(local.tags,
+    { Name = lower(format("s3-%s-%s-awsgaurdduty-detector", "${local.application_data.accounts[local.environment].app_name}", local.environment)) }
+  )
+
 }
 
 resource "aws_guardduty_malware_protection_plan" "s3_scan" {
@@ -18,7 +23,7 @@ resource "aws_guardduty_malware_protection_plan" "s3_scan" {
   }
 
   tags = merge(local.tags,
-    { Name = lower(format("s3-%s-%s-logging", "${local.application_data.accounts[local.environment].app_name}", local.environment)) }
+    { Name = lower(format("s3-%s-%s-awsgaurdduty-mpp", "${local.application_data.accounts[local.environment].app_name}", local.environment)) }
   )
 
   depends_on = [ module.s3-bucket-logging ]
