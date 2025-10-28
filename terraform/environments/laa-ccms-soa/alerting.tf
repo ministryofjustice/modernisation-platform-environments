@@ -518,7 +518,11 @@ resource "aws_cloudwatch_event_rule" "guardduty" {
       "GuardDuty Malware Protection Resource Status Warning",
       "GuardDuty Malware Protection Resource Status Error"
       ]
-    # detail-type can be "GuardDuty Finding" in some accounts - adapt if necessary.
+    "detail": {
+      "scanResultDetails": {
+        "scanResultStatus": ["THREATS_FOUND", "FAILED", "ACCESS_DENIED"]
+      }
+    }
   })
 }
 
