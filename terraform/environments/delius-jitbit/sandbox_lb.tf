@@ -1,11 +1,11 @@
 locals {
-  target_groups = {
+  sandbox_target_groups = {
     blue  = aws_lb_target_group.target_group_fargate_sandbox_blue[0].id
     green = aws_lb_target_group.target_group_fargate_sandbox_green[0].id
   }
 
-  active_target_group_arn = lookup(
-    local.target_groups,
+  sandbox_active_target_group_arn = lookup(
+    local.sandbox_target_groups,
     data.aws_ssm_parameter.active_deployment_colour.value,
     null
   )
@@ -44,7 +44,7 @@ resource "aws_lb_listener" "listener_sandbox" {
   ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
 
   default_action {
-    target_group_arn = local.active_target_group_arn
+    target_group_arn = local.sandbox_active_target_group_arn
     type             = "forward"
   }
 
@@ -56,7 +56,7 @@ resource "aws_lb_listener" "listener_sandbox" {
   )
 }
 
-resource "aws_lb_listener_rule" "listener_rule_blue" {
+resource "aws_lb_listener_rule" "listener_rule_sandbox_blue" {
   count        = local.is-development ? 1 : 0
   listener_arn = aws_lb_listener.listener_sandbox[0].arn
   priority     = 20
@@ -73,7 +73,7 @@ resource "aws_lb_listener_rule" "listener_rule_blue" {
   }
 }
 
-resource "aws_lb_listener_rule" "listener_rule_green" {
+resource "aws_lb_listener_rule" "listener_rule_sandbox_green" {
   count        = local.is-development ? 1 : 0
   listener_arn = aws_lb_listener.listener_sandbox[0].arn
   priority     = 30

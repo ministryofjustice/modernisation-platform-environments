@@ -1,5 +1,17 @@
 # checkov:skip=CKV_AWS_226
 # checkov:skip=CKV2_AWS_28
+locals {  
+  target_groups = {
+    blue  = aws_lb_target_group.target_group_fargate_blue.id
+    green = aws_lb_target_group.target_group_fargate_green.id
+  }
+
+  active_target_group_arn = lookup(
+    local.target_groups,
+    data.aws_ssm_parameter.active_deployment_colour.value,
+    null
+  )
+}
 
 module "ip_addresses" {
   source = "../../modules/ip_addresses"
@@ -82,7 +94,7 @@ resource "aws_lb_listener" "listener" {
   ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
 
   default_action {
-    target_group_arn = aws_lb_target_group.target_group_fargate.id
+    target_group_arn = local.active_target_group_arn
     type             = "forward"
   }
 
@@ -94,10 +106,42 @@ resource "aws_lb_listener" "listener" {
   )
 }
 
-resource "aws_lb_target_group" "target_group_fargate" {
+# resource "aws_lb_target_group" "target_group_fargate" {
+#   # checkov:skip=CKV_AWS_261
+
+#   name                 = local.application_name
+#   port                 = local.app_port
+#   protocol             = "HTTP"
+#   vpc_id               = data.aws_vpc.shared.id
+#   target_type          = "ip"
+#   deregistration_delay = 30
+
+#   stickiness {
+#     type = "lb_cookie"
+#   }
+
+#   health_check {
+#     path                = "/User/Login?ReturnUrl=%2f"
+#     healthy_threshold   = "5"
+#     interval            = "120"
+#     protocol            = "HTTP"
+#     unhealthy_threshold = "2"
+#     matcher             = "200-499"
+#     timeout             = "5"
+#   }
+
+#   tags = merge(
+#     local.tags,
+#     {
+#       Name = local.application_name
+#     }
+#   )
+# }
+
+resource "aws_lb_target_group" "target_group_fargate_blue" {
   # checkov:skip=CKV_AWS_261
 
-  name                 = local.application_name
+  name                 = "${local.application_name}-blue"
   port                 = local.app_port
   protocol             = "HTTP"
   vpc_id               = data.aws_vpc.shared.id
@@ -111,7 +155,7 @@ resource "aws_lb_target_group" "target_group_fargate" {
   health_check {
     path                = "/User/Login?ReturnUrl=%2f"
     healthy_threshold   = "5"
-    interval            = "120"
+    interval            = "30"
     protocol            = "HTTP"
     unhealthy_threshold = "2"
     matcher             = "200-499"
@@ -121,7 +165,71 @@ resource "aws_lb_target_group" "target_group_fargate" {
   tags = merge(
     local.tags,
     {
-      Name = local.application_name
+      Name = "${local.application_name}-blue"
     }
   )
+}
+
+resource "aws_lb_target_group" "target_group_fargate_green" {
+  # checkov:skip=CKV_AWS_261
+
+  name                 = "${local.application_name}-green"
+  port                 = local.app_port
+  protocol             = "HTTP"
+  vpc_id               = data.aws_vpc.shared.id
+  target_type          = "ip"
+  deregistration_delay = 30
+
+  stickiness {
+    type = "lb_cookie"
+  }
+
+  health_check {
+    path                = "/User/Login?ReturnUrl=%2f"
+    healthy_threshold   = "5"
+    interval            = "30"
+    protocol            = "HTTP"
+    unhealthy_threshold = "2"
+    matcher             = "200-499"
+    timeout             = "5"
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-green"
+    }
+  )
+}
+
+resource "aws_lb_listener_rule" "listener_rule_blue" {
+  listener_arn = aws_lb_listener.listener.arn
+  priority     = 20
+
+  action {
+    target_group_arn = aws_lb_target_group.target_group_fargate_blue.arn
+    type             = "forward"
+  }
+
+  condition {
+    host_header {
+      values = ["blue-${local.app_url}"]
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "listener_rule_green" {
+  listener_arn = aws_lb_listener.listener.arn
+  priority     = 30
+
+  action {
+    target_group_arn = aws_lb_target_group.target_group_fargate_green.arn
+    type             = "forward"
+  }
+
+  condition {
+    host_header {
+      values = ["green-${local.app_url}"]
+    }
+  }
 }
