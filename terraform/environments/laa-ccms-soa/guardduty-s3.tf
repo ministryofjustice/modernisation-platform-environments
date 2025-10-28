@@ -8,7 +8,7 @@ resource "aws_guardduty_detector" "main" {
 }
 
 resource "aws_guardduty_malware_protection_plan" "s3_scan" {
-  role = aws_iam_role.guardduty_s3_scan.arn
+  role = data.aws_iam_role.guardduty_s3_scan.arn
 
   protected_resource {
     s3_bucket {
