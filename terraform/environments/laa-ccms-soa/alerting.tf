@@ -524,7 +524,7 @@ resource "aws_cloudwatch_event_rule" "guardduty" {
       },
 
       "s3ObjectDetails": {
-        "bucketName": "${module.s3-bucket-logging.bucket.id}"
+        "bucketName": module.s3-bucket-logging.bucket.id
       }
     }
   })
