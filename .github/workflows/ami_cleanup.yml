@@ -126,8 +126,8 @@ jobs:
           app="${APPLICATION}"
           args="${AMI_ARGS}"
           if [[ "${DRYRUN}" == 'true' ]]; then
-            echo "[DRY RUN] Collecting AMI delete candidates (no delete arg passed)"
-            scripts/ami_cleanup.sh -a "$app" -s ami_commands.sh $args
+            echo "[DRY RUN] Collecting AMI delete candidates via dry-run delete (-d)"
+            scripts/ami_cleanup.sh -a "$app" -s ami_commands.sh $args -d delete
           else
             echo "[LIVE] Collecting and preparing deletes"
             scripts/ami_cleanup.sh -a "$app" -s ami_commands.sh $args delete
