@@ -521,6 +521,10 @@ resource "aws_cloudwatch_event_rule" "guardduty" {
     "detail": {
       "scanResultDetails": {
         "scanResultStatus": ["THREATS_FOUND", "FAILED", "ACCESS_DENIED"]
+      },
+
+      "s3ObjectDetails": {
+        "bucketName": "${module.s3-bucket-logging.bucket.id}"
       }
     }
   })
