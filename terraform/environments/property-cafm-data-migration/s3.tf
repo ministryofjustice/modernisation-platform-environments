@@ -112,6 +112,28 @@ resource "aws_s3_bucket_policy" "CAFM" {
           "s3:PutObject"
         ]
         Resource = "${aws_s3_bucket.CAFM.arn}/*"
+      },
+      {
+        Sid    = "AllowAnalyticalPlatformIngestionService"
+        Effect = "Allow"
+        Principal = {
+          AWS = [
+            "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-ingestion-development"]}:role/transfer",
+            "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-ingestion-production"]}:role/transfer"
+          ]
+        },
+        Action = [
+          "s3:DeleteObject",
+          "s3:GetObject",
+          "s3:GetObjectAcl",
+          "s3:PutObject",
+          "s3:PutObjectAcl",
+          "s3:PutObjectTagging"
+        ],
+        Resource = [
+          aws_s3_bucket.CAFM.arn,
+          "${aws_s3_bucket.CAFM.arn}/*"
+        ]
       }
     ]
   })
