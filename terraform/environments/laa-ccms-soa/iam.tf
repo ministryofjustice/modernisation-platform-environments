@@ -250,7 +250,7 @@ data "aws_iam_policy_document" "alerting_sns" {
       "sns:Publish",
     ]
     resources = [
-      aws_sns_topic.alerts.arn, aws_sns_topic.guardduty_alerts.arn
+      aws_sns_topic.alerts.arn
     ]
     principals {
       type = "Service"
@@ -266,7 +266,7 @@ data "aws_iam_policy_document" "alerting_sns" {
       "sns:Publish",
     ]
     resources = [
-      aws_sns_topic.alerts.arn, aws_sns_topic.guardduty_alerts.arn
+      aws_sns_topic.alerts.arn
     ]
     principals {
       type = "AWS"
@@ -289,7 +289,66 @@ data "aws_iam_policy_document" "alerting_sns" {
       "sns:Publish",
     ]
     resources = [
-      aws_sns_topic.alerts.arn, aws_sns_topic.guardduty_alerts.arn
+      aws_sns_topic.alerts.arn
+    ]
+    principals {
+      type = "AWS"
+      identifiers = [
+        "arn:aws:iam::${local.aws_account_id}:root",
+      ]
+    }
+  }
+}
+
+data "aws_iam_policy_document" "guardduty_alerting_sns" {
+  version = "2012-10-17"
+  statement {
+    sid    = "EventsAllowPublishSnsTopic"
+    effect = "Allow"
+    actions = [
+      "sns:Publish",
+    ]
+    resources = [
+      aws_sns_topic.guardduty_alerts.arn
+    ]
+    principals {
+      type = "Service"
+      identifiers = [
+        "events.amazonaws.com",
+      ]
+    }
+  }
+  statement {
+    sid    = "AlarmsAllowPublishSnsTopic"
+    effect = "Allow"
+    actions = [
+      "sns:Publish",
+    ]
+    resources = [
+      aws_sns_topic.guardduty_alerts.arn
+    ]
+    principals {
+      type = "AWS"
+      identifiers = [
+        "*",
+      ]
+    }
+    condition {
+      test     = "ArnLike"
+      variable = "AWS:SourceArn"
+      values = [
+        "arn:aws:cloudwatch:eu-west-2:${local.aws_account_id}:alarm:*"
+      ]
+    }
+  }
+  statement {
+    sid    = "AllowPublishSnsTopicRoot"
+    effect = "Allow"
+    actions = [
+      "sns:Publish",
+    ]
+    resources = [
+      aws_sns_topic.guardduty_alerts.arn
     ]
     principals {
       type = "AWS"
