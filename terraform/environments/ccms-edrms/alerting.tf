@@ -9,7 +9,7 @@ module "guardduty_chatbot" {
 
 resource "aws_sns_topic_policy" "guardduty_default" {
   arn    = aws_sns_topic.guardduty_alerts.arn
-  policy = data.aws_iam_policy_document.alerting_sns.json
+  policy = data.aws_iam_policy_document.guardduty_alerting_sns.json
 }
 
 resource "aws_sns_topic_subscription" "guardduty_alerts" {
