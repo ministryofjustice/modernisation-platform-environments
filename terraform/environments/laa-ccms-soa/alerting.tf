@@ -1,6 +1,6 @@
 #--Alerting Chatbot
 module "chatbot_nonprod" {
-  source           = "github.com/ministryofjustice/modernisation-platform-terraform-aws-chatbot"
+  source           = "github.com/ministryofjustice/modernisation-platform-terraform-aws-chatbot?ref=0ec33c7bfde5649af3c23d0834ea85c849edf3ac" # v3.0.0"
   count            = local.is-production ? 0 : 1
   slack_channel_id = local.application_data.accounts[local.environment].alerting_slack_channel_id
   sns_topic_arns   = [aws_sns_topic.alerts.arn]
@@ -9,7 +9,7 @@ module "chatbot_nonprod" {
 }
 
 module "chatbot_prod" {
-  source           = "github.com/ministryofjustice/modernisation-platform-terraform-aws-chatbot"
+  source           = "github.com/ministryofjustice/modernisation-platform-terraform-aws-chatbot?ref=0ec33c7bfde5649af3c23d0834ea85c849edf3ac" # v3.0.0"
   count            = local.is-production ? 1 : 0
   slack_channel_id = local.application_data.accounts[local.environment].alerting_slack_channel_id
   sns_topic_arns   = [aws_sns_topic.alerts.arn]
@@ -18,7 +18,7 @@ module "chatbot_prod" {
 }
 
 module "guardduty_chatbot_nonprod" {
-  source           = "github.com/ministryofjustice/modernisation-platform-terraform-aws-chatbot"
+  source           = "github.com/ministryofjustice/modernisation-platform-terraform-aws-chatbot?ref=0ec33c7bfde5649af3c23d0834ea85c849edf3ac" # v3.0.0"
   count            = local.is-production ? 0 : 1
   slack_channel_id = data.aws_secretsmanager_secret_version.slack_channel_id.secret_string
   sns_topic_arns   = [aws_sns_topic.guardduty_alerts.arn]
@@ -27,7 +27,7 @@ module "guardduty_chatbot_nonprod" {
 }
 
 module "guardduty_chatbot_prod" {
-  source           = "github.com/ministryofjustice/modernisation-platform-terraform-aws-chatbot"
+  source           = "github.com/ministryofjustice/modernisation-platform-terraform-aws-chatbot?ref=0ec33c7bfde5649af3c23d0834ea85c849edf3ac" # v3.0.0"
   count            = local.is-production ? 1 : 0
   slack_channel_id = data.aws_secretsmanager_secret_version.slack_channel_id.secret_string
   sns_topic_arns   = [aws_sns_topic.guardduty_alerts.arn]
