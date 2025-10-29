@@ -68,6 +68,18 @@ resource "aws_workspacesweb_user_settings" "main" {
 resource "aws_workspacesweb_browser_settings" "main" {
   browser_policy = jsonencode({
     "chromePolicies" = {
+      "ManagedBookmarks" = {
+        "value" = [
+          {
+            "name" = "PUI"
+            "url"  = "https://production-provider-ui-laa-pui-prod.apps.live.cloud-platform.service.justice.gov.uk/civil"
+          },
+          {
+            "name" = "OPA Hub"
+            "url"  = "https://production-opa-hub-laa-pui-prod.apps.live.cloud-platform.service.justice.gov.uk/opa/web-determinations"
+          }
+        ]
+      }
       "BookmarkBarEnabled" = {
         "value" = true
       }
@@ -124,6 +136,8 @@ resource "aws_workspacesweb_browser_settings" "main" {
           "[*.]msftauthimages.net",
           "[*.]phonefactor.net",
           "enterpriseregistration.windows.net",
+          "production-provider-ui-laa-pui-prod.apps.live.cloud-platform.service.justice.gov.uk",
+          "production-opa-hub-laa-pui-prod.apps.live.cloud-platform.service.justice.gov.uk",
           "chrome://new-tab-page",
           "mysignins.microsoft.com",
           "go.microsoft.com",
