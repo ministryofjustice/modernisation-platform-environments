@@ -4,9 +4,11 @@ locals {
     green = aws_lb_target_group.target_group_fargate_sandbox_green[0].id
   }
 
+  active_sandbox_colour = local.is-development ? data.aws_ssm_parameter.sandbox_active_deployment_colour[0].value : null
+
   sandbox_active_target_group_arn = lookup(
     local.sandbox_target_groups,
-    data.aws_ssm_parameter.active_deployment_colour.value,
+    local.active_sandbox_colour,
     null
   )
 }
