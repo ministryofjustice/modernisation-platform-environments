@@ -309,6 +309,8 @@ locals {
   # s3 transfer
   scheduled_s3_file_transfer_retention_period_amount = local.application_data.accounts[local.environment].scheduled_s3_file_transfer_retention_period_amount
   scheduled_s3_file_transfer_retention_period_unit   = local.application_data.accounts[local.environment].scheduled_s3_file_transfer_retention_period_unit
+  scheduled_file_transfer_use_default_parallelism    = local.application_data.accounts[local.environment].scheduled_file_transfer_use_default_parallelism
+  scheduled_file_transfer_parallelism                = local.application_data.accounts[local.environment].scheduled_file_transfer_parallelism
 
   # step function notification lambda
   step_function_notification_lambda_handler = "uk.gov.justice.digital.lambda.StepFunctionDMSNotificationLambda::handleRequest"
