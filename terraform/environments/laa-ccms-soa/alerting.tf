@@ -21,7 +21,7 @@ module "guardduty_chatbot_nonprod" {
   source           = "github.com/ministryofjustice/modernisation-platform-terraform-aws-chatbot"
   count            = local.is-production ? 0 : 1
   slack_channel_id = data.aws_secretsmanager_secret_version.slack_channel_id.secret_string
-  sns_topic_arns   = [aws_sns_topic.alerts.arn]
+  sns_topic_arns   = [aws_sns_topic.guardduty_alerts.arn]
   tags             = local.tags #--This doesn't seem to pass to anything in the module but is a mandatory var. Consider submitting a PR to the module. AW
   application_name = local.application_data.accounts[local.environment].app_name
 }
@@ -30,7 +30,7 @@ module "guardduty_chatbot_prod" {
   source           = "github.com/ministryofjustice/modernisation-platform-terraform-aws-chatbot"
   count            = local.is-production ? 1 : 0
   slack_channel_id = data.aws_secretsmanager_secret_version.slack_channel_id.secret_string
-  sns_topic_arns   = [aws_sns_topic.alerts.arn]
+  sns_topic_arns   = [aws_sns_topic.guardduty_alerts.arn]
   tags             = local.tags #--This doesn't seem to pass to anything in the module but is a mandatory var. Consider submitting a PR to the module. AW
   application_name = local.application_data.accounts[local.environment].app_name
 }
@@ -570,6 +570,6 @@ resource "aws_cloudwatch_event_rule" "guardduty" {
 
 resource "aws_cloudwatch_event_target" "guardduty_to_sns" {
   rule = aws_cloudwatch_event_rule.guardduty.name
-  arn  = aws_sns_topic.alerts.arn
+  arn  = aws_sns_topic.guardduty_alerts.arn
 }
 
