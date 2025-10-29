@@ -70,6 +70,40 @@ resource "aws_sns_topic_subscription" "alerts" {
   endpoint  = "https://global.sns-api.chatbot.amazonaws.com"
 }
 
+resource "aws_sns_topic" "guardduty_alerts" {
+  name            = "${local.application_data.accounts[local.environment].app_name}-guardduty-alerts"
+  delivery_policy = <<EOF
+{
+  "http": {
+    "defaultHealthyRetryPolicy": {
+      "minDelayTarget": 20,
+      "maxDelayTarget": 20,
+      "numRetries": 3,
+      "numMaxDelayRetries": 0,
+      "numNoDelayRetries": 0,
+      "numMinDelayRetries": 0,
+      "backoffFunction": "linear"
+    },
+    "disableSubscriptionOverrides": false,
+    "defaultRequestPolicy": {
+      "headerContentType": "text/plain; charset=UTF-8"
+    }
+  }
+}
+EOF
+}
+
+resource "aws_sns_topic_policy" "guarduty_default" {
+  arn    = aws_sns_topic.guardduty_alerts.arn
+  policy = data.aws_iam_policy_document.alerting_sns.json
+}
+
+resource "aws_sns_topic_subscription" "guardduty_alerts" {
+  topic_arn = aws_sns_topic.guardduty_alerts.arn
+  protocol  = "https"
+  endpoint  = "https://global.sns-api.chatbot.amazonaws.com"
+}
+
 #--Alerts RDS
 resource "aws_db_event_subscription" "rds_events" {
   name        = "${local.application_data.accounts[local.environment].app_name}-rds-event-sub"

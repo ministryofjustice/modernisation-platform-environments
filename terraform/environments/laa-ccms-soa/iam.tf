@@ -266,7 +266,7 @@ data "aws_iam_policy_document" "alerting_sns" {
       "sns:Publish",
     ]
     resources = [
-      aws_sns_topic.alerts.arn,
+      aws_sns_topic.alerts.arn, aws_sns_topic.guardduty_alerts.arn
     ]
     principals {
       type = "AWS"
@@ -289,7 +289,7 @@ data "aws_iam_policy_document" "alerting_sns" {
       "sns:Publish",
     ]
     resources = [
-      aws_sns_topic.alerts.arn,
+      aws_sns_topic.alerts.arn, aws_sns_topic.guardduty_alerts.arn
     ]
     principals {
       type = "AWS"
