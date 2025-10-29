@@ -63,6 +63,66 @@ resource "aws_workspacesweb_user_settings" "main" {
   }
 }
 
+# User settings with SSO extension (cookie sync) for external_1
+resource "aws_workspacesweb_user_settings" "sso" {
+  # Required settings
+  copy_allowed     = "Enabled"
+  download_allowed = "Disabled"
+  paste_allowed    = "Enabled"
+  print_allowed    = "Disabled"
+  upload_allowed   = "Enabled"
+
+  # Enable deep links
+  deep_link_allowed                  = "Enabled"
+  disconnect_timeout_in_minutes      = 60
+  idle_disconnect_timeout_in_minutes = 15
+
+  # Enable SSO extension and define which cookies to sync
+  cookie_synchronization_configuration {
+    # Microsoft Entra ID
+    allowlist {
+      domain = "microsoftonline.com"
+    }
+
+    # Microsoft authentication domains
+    allowlist {
+      domain = "microsoft.com"
+    }
+
+    allowlist {
+      domain = "msftidentity.com"
+    }
+
+    allowlist {
+      domain = "msidentity.com"
+    }
+
+    # LAA sign-in domain
+    allowlist {
+      domain = "laa-sign-in.external-identity.service.justice.gov.uk"
+    }
+  }
+
+  toolbar_configuration {
+    toolbar_type = "Docked"
+    visual_mode  = "Dark"
+    hidden_toolbar_items = [
+      "Webcam",
+      "Microphone",
+      "FullScreen",
+      "DualMonitor",
+      "Windows"
+    ]
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "workspacesweb-user-settings-sso"
+    }
+  )
+}
+
 ### BROWSER SETTINGS
 
 resource "aws_workspacesweb_browser_settings" "main" {
@@ -229,13 +289,18 @@ resource "aws_workspacesweb_network_settings_association" "external" {
 
 moved {
   from = aws_workspacesweb_user_settings_association.main
-  to   = aws_workspacesweb_user_settings_association.external["external_1"]
+  to   = aws_workspacesweb_user_settings_association.external_1
 }
 
-resource "aws_workspacesweb_user_settings_association" "external" {
-  for_each = local.portals
+# External_1 uses SSO user settings with cookie synchronization
+resource "aws_workspacesweb_user_settings_association" "external_1" {
+  portal_arn        = aws_workspacesweb_portal.external["external_1"].portal_arn
+  user_settings_arn = aws_workspacesweb_user_settings.sso.user_settings_arn
+}
 
-  portal_arn        = aws_workspacesweb_portal.external[each.key].portal_arn
+# External_2 uses standard user settings without SSO
+resource "aws_workspacesweb_user_settings_association" "external_2" {
+  portal_arn        = aws_workspacesweb_portal.external["external_2"].portal_arn
   user_settings_arn = aws_workspacesweb_user_settings.main.user_settings_arn
 }
 
