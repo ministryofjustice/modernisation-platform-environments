@@ -36,7 +36,7 @@ resource "aws_workspacesweb_portal" "external" {
 
 ### USER SETTINGS
 
-# Create a user settings configuration
+# Standard user settings for external_2 (no SSO)
 resource "aws_workspacesweb_user_settings" "main" {
   # Required settings
   copy_allowed     = "Enabled"
@@ -61,18 +61,25 @@ resource "aws_workspacesweb_user_settings" "main" {
       "Windows"
     ]
   }
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "workspacesweb-user-settings-main"
+    }
+  )
 }
 
 # User settings with SSO extension (cookie sync) for external_1
 resource "aws_workspacesweb_user_settings" "sso" {
-  # Required settings
+  # Required settings - same as main
   copy_allowed     = "Enabled"
   download_allowed = "Disabled"
   paste_allowed    = "Enabled"
   print_allowed    = "Disabled"
   upload_allowed   = "Enabled"
 
-  # Enable deep links
+  # Optional settings - same as main
   deep_link_allowed                  = "Enabled"
   disconnect_timeout_in_minutes      = 60
   idle_disconnect_timeout_in_minutes = 15
@@ -137,6 +144,10 @@ resource "aws_workspacesweb_browser_settings" "main" {
           {
             "name" = "OPA Hub"
             "url"  = "https://production-opa-hub-laa-pui-prod.apps.live.cloud-platform.service.justice.gov.uk/opa/web-determinations"
+          },
+          {
+            "name" = "LAA Sign In"
+            "url"  = "https://laa-sign-in.external-identity.service.justice.gov.uk/"
           }
         ]
       }
@@ -202,7 +213,7 @@ resource "aws_workspacesweb_browser_settings" "main" {
           "mysignins.microsoft.com",
           "go.microsoft.com",
           "portal.manage.microsoft.com",
-          "laa-sign-in.external-identity.service.justice.gov.uk/"
+          "portal-laa.dev.external-identity.service.justice.gov.uk"
         ]
       }
       "AllowDeletingBrowserHistory" = {
