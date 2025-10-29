@@ -137,6 +137,54 @@ resource "aws_cloudwatch_log_group" "lambda_send_cpu_graph_dev_log_group" {
   retention_in_days = 30
 }
 
+##################################################
+# Lambda Function to analyse WAF ACL traffic - DEV
+##################################################
+
+resource "aws_lambda_function" "terraform_lambda_func_wam_waf_analysis_dev" {
+  # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
+  # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing temporarily disabled for maintenance purposes"
+  count                          = local.is-development == true ? 1 : 0
+  s3_bucket                      = "moj-infrastructure-dev"
+  s3_key                         = "lambda/functions/wam_waf_analysis_dev.zip"
+  function_name                  = "wam_waf_analysis_dev"
+  role                           = aws_iam_role.lambda_role_get_cloudwatch_dev[0].arn
+  handler                        = "wam_waf_analysis_dev.lambda_handler"
+  runtime                        = "python3.12"
+  timeout                        = 300
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policies_get_cloudwatch_dev]
+  reserved_concurrent_executions = 5
+  dead_letter_config {
+    target_arn = aws_sqs_queue.lambda_queue_dev[0].arn
+  }
+  tracing_config {
+    mode = "Active"
+  }
+  layers = [
+    "arn:aws:lambda:eu-west-2:${data.aws_ssm_parameter.klayers_account_dev[0].value}:layer:Klayers-p312-numpy:8",
+    "arn:aws:lambda:eu-west-2:${data.aws_ssm_parameter.klayers_account_dev[0].value}:layer:Klayers-p312-pillow:1",   
+    aws_lambda_layer_version.lambda_layer_requests_dev[0].arn,
+    aws_lambda_layer_version.lambda_layer_matplotlib_dev[0].arn
+  ]
+}
+
+resource "aws_lambda_permission" "allow_lambda_to_query_cloudwatch_wam_waf_analysis_dev" {
+  count         = local.is-development == true ? 1 : 0
+  statement_id  = "AllowAccesstoCloudWatch"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.terraform_lambda_func_wam_waf_analysis_dev[0].function_name
+  principal     = "cloudwatch.amazonaws.com"
+  source_arn    = "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
+}
+
+resource "aws_cloudwatch_log_group" "lambda_wam_waf_analysis_dev_log_group" {
+  # checkov:skip=CKV_AWS_338: "Log group is only required for 30 days."
+  # checkov:skip=CKV_AWS_158: "Log group does not require KMS encryption."
+  count             = local.is-development == true ? 1 : 0
+  name              = "/aws/lambda/wam_waf_analysis_dev"
+  retention_in_days = 30
+}
+
 ###############################################
 # Lambda Function for Security Hub Report - DEV
 ###############################################
