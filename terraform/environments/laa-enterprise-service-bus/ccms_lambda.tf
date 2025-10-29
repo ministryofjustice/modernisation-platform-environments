@@ -17,8 +17,8 @@ resource "aws_security_group" "ccms_provider_load" {
 
 resource "aws_security_group_rule" "ccms_provider_load_egress_oracle" {
   type              = "egress"
-  from_port         = local.environment == "test" ? 1522 : 1521
-  to_port           = local.environment == "test" ? 1522 : 1521
+  from_port         = local.environment == "development" ? 1521 : 1522
+  to_port           = local.environment == "development" ? 1521 : 1522
   protocol          = "tcp"
   cidr_blocks       = [local.application_data.accounts[local.environment].ccms_database_ip]
   security_group_id = aws_security_group.ccms_provider_load.id
