@@ -319,29 +319,6 @@ data "aws_iam_policy_document" "guardduty_alerting_sns" {
     }
   }
   statement {
-    sid    = "AlarmsAllowPublishSnsTopic"
-    effect = "Allow"
-    actions = [
-      "sns:Publish",
-    ]
-    resources = [
-      aws_sns_topic.guardduty_alerts.arn
-    ]
-    principals {
-      type = "AWS"
-      identifiers = [
-        "*",
-      ]
-    }
-    condition {
-      test     = "ArnLike"
-      variable = "AWS:SourceArn"
-      values = [
-        "arn:aws:cloudwatch:eu-west-2:${local.aws_account_id}:alarm:*"
-      ]
-    }
-  }
-  statement {
     sid    = "AllowPublishSnsTopicRoot"
     effect = "Allow"
     actions = [
