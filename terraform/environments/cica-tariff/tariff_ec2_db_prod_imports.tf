@@ -99,18 +99,18 @@ locals {
       device_name = "xvdn"
       instance_id = "i-0939a0ee8fb520bc9"
       volume_id   = "vol-05f9b59545f6f6609"
-    } 
+    }
   }
 }
 
 import {
   for_each = local.environment == "production" ? local.tariffdb_vol_import_data : {}
-  to = aws_ebs_volume.tariffdb_storage[each.key]
-  id = each.value.volume_id
+  to       = aws_ebs_volume.tariffdb_storage[each.key]
+  id       = each.value.volume_id
 }
 
 import {
   for_each = local.environment == "production" ? local.tariffdb_vol_import_data : {}
-  to = aws_volume_attachment.tariffdb_attachment[each.key]
-  id = "${each.value.device_name}:${each.value.volume_id}:${each.value.instance_id}"
+  to       = aws_volume_attachment.tariffdb_attachment[each.key]
+  id       = "${each.value.device_name}:${each.value.volume_id}:${each.value.instance_id}"
 }

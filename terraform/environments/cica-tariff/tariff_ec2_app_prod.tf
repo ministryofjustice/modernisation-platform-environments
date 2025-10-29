@@ -23,6 +23,7 @@ resource "aws_instance" "tariff_app_2" {
     encrypted             = true
     volume_size           = 20
   }
+  /*
   ebs_block_device {
     device_name           = "xvde"
     delete_on_termination = true
@@ -60,6 +61,7 @@ resource "aws_instance" "tariff_app_2" {
     volume_size           = 30
     snapshot_id           = local.snapshot_id_xvdi
   }
+  */
 
   volume_tags = merge(tomap({
     "Name"               = "${local.application_name}-app2-root",
@@ -75,4 +77,23 @@ resource "aws_instance" "tariff_app_2" {
   lifecycle {
     ignore_changes = [ami, user_data]
   }
+}
+
+resource "aws_ebs_volume" "tariff_app2_storage" {
+  for_each          = local.environment == "production" ? { for v in local.tariffapp_volume_layout : v.device_name => v } : {}
+  availability_zone = data.aws_subnet.private_subnets_b.availability_zone
+  size              = each.value.size
+  type              = "gp3"
+  tags = merge(tomap({
+    "Name"               = "${local.application_name}-app2-root",
+    "volume-attach-host" = "app2",
+    "volume-mount-path"  = "/"
+  }), local.tags)
+}
+
+resource "aws_volume_attachment" "tariff_app2_storage_attachment" {
+  for_each    = local.environment == "production" ? { for v in local.tariffapp_volume_layout : v.device_name => v } : {}
+  device_name = each.key
+  volume_id   = aws_ebs_volume.tariff_app2_storage[each.key].id
+  instance_id = aws_instance.tariff_app_2[0].id
 }
