@@ -483,7 +483,7 @@ module "s3_raw_archive_bucket" {
   tags = merge(
     local.all_tags,
     {
-      dpr-name          = "${local.project}-raw-archive-${local.env}-s3"
+      dpr-name          = "${local.project}-raw-archive-${local.env}"
       dpr-resource-type = "S3 Bucket"
       dpr-jira          = "DPR2-209"
     }
@@ -874,6 +874,7 @@ module "ec2_kinesis_agent" {
   tags = merge(
     local.all_tags,
     {
+      Name              = "${local.project}-ec2-kinesis-agent-${local.env}"
       dpr-name          = "${local.project}-ec2-kinesis-agent-${local.env}"
       dpr-resource-type = "EC2 Instance"
       dpr-jira          = "DPR-108"

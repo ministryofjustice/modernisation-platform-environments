@@ -536,8 +536,9 @@ locals {
   all_tags = merge(
     local.tags,
     {
-      Name = local.application_name
-      Jira = "DPR-108"
+      dpr-name          = local.application_name
+      dpr-jira          = "DPR-108"
+      dpr-is-backend = true
     }
   )
 
@@ -559,7 +560,7 @@ locals {
   create_postgres_load_generator_job = local.application_data.accounts[local.environment].create_postgres_load_generator_job
 
   # Probation Discovery
-  probation_discovery_windows_ami_id = "ami-0ba9276d1fb25ed77"
+  probation_discovery_windows_ami_id = "ami-03c8cd9ad2f2d6256"
   enable_probation_discovery_node    = local.application_data.accounts[local.environment].enable_probation_discovery_node
 
   dpr_windows_rdp_credentials_placeholder = {
