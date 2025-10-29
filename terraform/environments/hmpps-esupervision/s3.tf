@@ -100,3 +100,11 @@ resource "aws_s3_bucket_logging" "rekognition_bucket_logging" {
     }
   }
 }
+
+resource "aws_s3_bucket_public_access_block" "rekognition_logs_bucket_policy" {
+  bucket                  = aws_s3_bucket.rekognition_logs_bucket.id
+  block_public_policy     = true
+  block_public_acls       = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
