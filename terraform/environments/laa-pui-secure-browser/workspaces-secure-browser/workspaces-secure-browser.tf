@@ -108,6 +108,16 @@ resource "aws_workspacesweb_user_settings" "sso" {
     allowlist {
       domain = "laa-sign-in.external-identity.service.justice.gov.uk"
     }
+
+    # LAA portal dev domain
+    allowlist {
+      domain = "portal-laa.dev.external-identity.service.justice.gov.uk"
+    }
+
+    # LAA legal aid services dev domain
+    allowlist {
+      domain = "dev.your-legal-aid-services.service.justice.gov.uk"
+    }
   }
 
   toolbar_configuration {
@@ -213,7 +223,8 @@ resource "aws_workspacesweb_browser_settings" "main" {
           "mysignins.microsoft.com",
           "go.microsoft.com",
           "portal.manage.microsoft.com",
-          "portal-laa.dev.external-identity.service.justice.gov.uk"
+          "portal-laa.dev.external-identity.service.justice.gov.uk",
+          "dev.your-legal-aid-services.service.justice.gov.uk"
         ]
       }
       "AllowDeletingBrowserHistory" = {
