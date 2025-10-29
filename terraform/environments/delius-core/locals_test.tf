@@ -140,7 +140,7 @@ locals {
     # Times must be specified in UTC
     disable_latency_alarms = {
       start_time      = "19:59"
-      end_time        = "06:00"
+      end_time        = "06:45"
       disable_weekend = true
     }
   }

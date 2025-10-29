@@ -10,10 +10,15 @@ resource "aws_lb" "opahub" {
   subnets = data.aws_subnets.shared-public.ids
 
   security_groups = [aws_security_group.opahub_load_balancer.id]
-
+  access_logs {
+    bucket  = module.s3-bucket-logging.bucket.id
+    prefix  = "${local.opa_app_name}-lb"
+    enabled = true
+  }
   tags = merge(local.tags,
     { Name = lower(format("%s-lb", local.opa_app_name)) }
   )
+  depends_on = [module.s3-bucket-logging]
 }
 
 ########################################
