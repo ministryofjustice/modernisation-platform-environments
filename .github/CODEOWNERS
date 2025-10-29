@@ -69,7 +69,7 @@
 /terraform/environments/observability-platform @ministryofjustice/observability-platform @ministryofjustice/modernisation-platform
 /terraform/environments/operations-engineering @ministryofjustice/github-audit-log-viewer @ministryofjustice/operations-engineering @ministryofjustice/modernisation-platform
 /terraform/environments/panda-cyber-appsec-lab @ministryofjustice/panda-cyber-team @ministryofjustice/modernisation-platform
-/terraform/environments/performance-hub @ministryofjustice/performance-hub-developers @ministryofjustice/modernisation-platform
+/terraform/environments/performance-hub @ministryofjustice/azure-aws-sso-performancehub @ministryofjustice/performance-hub-developers @ministryofjustice/modernisation-platform
 /terraform/environments/planetfm @ministryofjustice/azure-aws-sso-digital-studio-operations @ministryofjustice/csr-application-support @ministryofjustice/hosting-migrations @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
 /terraform/environments/portal @ministryofjustice/laa-aws-infrastructure @ministryofjustice/modernisation-platform
 /terraform/environments/ppud @ministryofjustice/modernisation-platform @ministryofjustice/ppud-replacement-devs @ministryofjustice/modernisation-platform
