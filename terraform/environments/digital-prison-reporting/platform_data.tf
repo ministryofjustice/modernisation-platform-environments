@@ -16,7 +16,7 @@ data "aws_subnets" "shared-data" {
     values = [data.aws_vpc.shared.id]
   }
   tags = {
-    dpr-name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-data*"
+    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-data*"
   }
 }
 
@@ -26,7 +26,7 @@ data "aws_subnets" "shared-private" {
     values = [data.aws_vpc.shared.id]
   }
   tags = {
-    dpr-name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private*"
+    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private*"
   }
 }
 
@@ -36,7 +36,7 @@ data "aws_subnets" "shared-public" {
     values = [data.aws_vpc.shared.id]
   }
   tags = {
-    dpr-name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public*"
+    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public*"
   }
 }
 
