@@ -215,20 +215,4 @@ data "aws_iam_policy_document" "guardduty_alerting_sns" {
       ]
     }
   }
-  statement {
-    sid    = "AllowPublishSnsTopicRoot"
-    effect = "Allow"
-    actions = [
-      "sns:Publish",
-    ]
-    resources = [
-      aws_sns_topic.guardduty_alerts.arn
-    ]
-    principals {
-      type = "AWS"
-      identifiers = [
-        "arn:aws:iam::${local.aws_account_id}:root",
-      ]
-    }
-  }
 }

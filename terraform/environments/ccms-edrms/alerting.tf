@@ -1,66 +1,14 @@
-#--Alerting Chatbot
-module "chatbot_nonprod" {
-  source           = "github.com/ministryofjustice/modernisation-platform-terraform-aws-chatbot?ref=0ec33c7bfde5649af3c23d0834ea85c849edf3ac" # v3.0.0"
-  count            = local.is-production ? 0 : 1
-  slack_channel_id = local.application_data.accounts[local.environment].alerting_slack_channel_id
-  sns_topic_arns   = [aws_sns_topic.alerts.arn]
-  tags             = local.tags #--This doesn't seem to pass to anything in the module but is a mandatory var. Consider submitting a PR to the module. AW
-  application_name = local.application_data.accounts[local.environment].app_name
-}
 
-module "chatbot_prod" {
+module "guardduty_chatbot" {
   source           = "github.com/ministryofjustice/modernisation-platform-terraform-aws-chatbot?ref=0ec33c7bfde5649af3c23d0834ea85c849edf3ac" # v3.0.0"
-  count            = local.is-production ? 1 : 0
-  slack_channel_id = local.application_data.accounts[local.environment].alerting_slack_channel_id
-  sns_topic_arns   = [aws_sns_topic.alerts.arn]
-  tags             = local.tags #--This doesn't seem to pass to anything in the module but is a mandatory var. Consider submitting a PR to the module. AW
-  application_name = local.application_data.accounts[local.environment].app_name
-}
-
-module "guardduty_chatbot_nonprod" {
-  source           = "github.com/ministryofjustice/modernisation-platform-terraform-aws-chatbot?ref=0ec33c7bfde5649af3c23d0834ea85c849edf3ac" # v3.0.0"
-  count            = local.is-production ? 0 : 1
   slack_channel_id = data.aws_secretsmanager_secret_version.slack_channel_id.secret_string
   sns_topic_arns   = [aws_sns_topic.guardduty_alerts.arn]
   tags             = local.tags #--This doesn't seem to pass to anything in the module but is a mandatory var. Consider submitting a PR to the module. AW
   application_name = local.application_data.accounts[local.environment].app_name
-}
-
-module "guardduty_chatbot_prod" {
-  source           = "github.com/ministryofjustice/modernisation-platform-terraform-aws-chatbot?ref=0ec33c7bfde5649af3c23d0834ea85c849edf3ac" # v3.0.0"
-  count            = local.is-production ? 1 : 0
-  slack_channel_id = data.aws_secretsmanager_secret_version.slack_channel_id.secret_string
-  sns_topic_arns   = [aws_sns_topic.guardduty_alerts.arn]
-  tags             = local.tags #--This doesn't seem to pass to anything in the module but is a mandatory var. Consider submitting a PR to the module. AW
-  application_name = local.application_data.accounts[local.environment].app_name
-}
-
-#--Altering SNS
-resource "aws_sns_topic" "guardduty_alerts" {
-  name            = "${local.application_data.accounts[local.environment].app_name}-alerts"
-  delivery_policy = <<EOF
-{
-  "http": {
-    "defaultHealthyRetryPolicy": {
-      "minDelayTarget": 20,
-      "maxDelayTarget": 20,
-      "numRetries": 3,
-      "numMaxDelayRetries": 0,
-      "numNoDelayRetries": 0,
-      "numMinDelayRetries": 0,
-      "backoffFunction": "linear"
-    },
-    "disableSubscriptionOverrides": false,
-    "defaultRequestPolicy": {
-      "headerContentType": "text/plain; charset=UTF-8"
-    }
-  }
-}
-EOF
 }
 
 resource "aws_sns_topic_policy" "guardduty_default" {
-  arn    = aws_sns_topic.alerts.arn
+  arn    = aws_sns_topic.guardduty_alerts.arn
   policy = data.aws_iam_policy_document.alerting_sns.json
 }
 
