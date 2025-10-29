@@ -153,7 +153,7 @@ data "aws_vpc_endpoint" "api" {
   vpc_id       = data.aws_vpc.shared.id
   service_name = "com.amazonaws.${data.aws_region.current.name}.execute-api"
   tags = {
-    "Name" = "${var.networking[0].business-unit}-${local.environment}-com.amazonaws.${data.aws_region.current.name}.execute-api"
+    Name = "${var.networking[0].business-unit}-${local.environment}-com.amazonaws.${data.aws_region.current.name}.execute-api"
   }
 }
 
