@@ -1,8 +1,8 @@
 resource "null_resource" "execute_create_table_queries" {
   triggers = {
-    query_ids = join(",",["${aws_athena_named_query.main_table_connector_internal.id}", "${aws_athena_named_query.http_requests_connector_internal.id}",
-    "${aws_athena_named_query.main_table_opa.id}", "${aws_athena_named_query.http_requests_opa.id}",
-    "${aws_athena_named_query.main_table_adaptor_internal.id}", "${aws_athena_named_query.http_requests_adaptor_internal.id}"
+    query_ids = join(",", ["${aws_athena_named_query.main_table_connector_internal.id}", "${aws_athena_named_query.http_requests_connector_internal.id}",
+      "${aws_athena_named_query.main_table_opa.id}", "${aws_athena_named_query.http_requests_opa.id}",
+      "${aws_athena_named_query.main_table_adaptor_internal.id}", "${aws_athena_named_query.http_requests_adaptor_internal.id}"
     ])
   }
 
