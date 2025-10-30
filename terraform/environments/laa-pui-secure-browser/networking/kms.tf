@@ -9,7 +9,7 @@ module "vpc_flow_logs_kms" {
   description = "VPC Flow Logs KMS key"
 
   key_administrators = [
-    data.aws_iam_session_context.whoami.issuer_arn
+    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
   ]
 
   key_service_roles_for_autoscaling = [
