@@ -133,6 +133,8 @@ module "glue_s3_file_transfer_job" {
     "--dpr.file.transfer.destination.bucket"      = module.s3_raw_archive_bucket.bucket_id
     "--dpr.file.transfer.retention.period.amount" = tostring(local.scheduled_s3_file_transfer_retention_period_amount)
     "--dpr.file.transfer.retention.period.unit"   = tostring(local.scheduled_s3_file_transfer_retention_period_unit)
+    "--dpr.file.transfer.use.default.parallelism" = tostring(local.scheduled_file_transfer_use_default_parallelism)
+    "--dpr.file.transfer.parallelism"             = tostring(local.scheduled_file_transfer_parallelism)
     "--dpr.file.transfer.delete.copied.files"     = true,
     "--dpr.allowed.s3.file.extensions"            = "*",
     "--dpr.log.level"                             = local.glue_job_common_log_level
