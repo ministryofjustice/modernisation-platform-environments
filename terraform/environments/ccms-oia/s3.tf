@@ -58,8 +58,8 @@ module "s3-bucket-logging" {
   bucket_name        = local.logging_bucket_name
   versioning_enabled = true
   bucket_policy      = [aws_s3_bucket_policy.lb_access_logs.policy]
-  sse_algorithm  = "AES256"
-  custom_kms_key = ""
+  sse_algorithm      = "AES256"
+  custom_kms_key     = ""
 
   log_bucket = local.logging_bucket_name
   log_prefix = "s3access/${local.logging_bucket_name}"
@@ -125,42 +125,42 @@ module "s3-bucket-logging" {
 }
 
 resource "aws_s3_bucket_policy" "lb_access_logs" {
- bucket = module.s3-bucket-logging.bucket.id
+  bucket = module.s3-bucket-logging.bucket.id
 
- policy = jsonencode({
-   Version = "2012-10-17",
-   Statement = [
-    {
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
         Sid    = "EnforceTLSv12orHigher",
         Effect = "Deny",
         Principal = {
           AWS = "*"
         },
         Action   = "s3:*",
-        Resource =  ["${module.s3-bucket-logging.bucket.arn}/*", "${module.s3-bucket-logging.bucket.arn}" ],
+        Resource = ["${module.s3-bucket-logging.bucket.arn}/*", "${module.s3-bucket-logging.bucket.arn}"],
         Condition = {
           NumericLessThan = {
             "s3:TlsVersion" = "1.2"
           }
         }
-    },
-    {
-       Sid = "AllowELBLogDeliveryPutObject",
-       Effect = "Allow",
-       Principal = {
-         Service = [
-           "logdelivery.elasticloadbalancing.amazonaws.com"
-         ]
-       },
-       Action = [ "s3:PutObject" ],
-       Resource = "${module.s3-bucket-logging.bucket.arn}/*",
-       Condition = {
+      },
+      {
+        Sid    = "AllowELBLogDeliveryPutObject",
+        Effect = "Allow",
+        Principal = {
+          Service = [
+            "logdelivery.elasticloadbalancing.amazonaws.com"
+          ]
+        },
+        Action   = ["s3:PutObject"],
+        Resource = "${module.s3-bucket-logging.bucket.arn}/*",
+        Condition = {
           StringEquals = {
             "s3:x-amz-acl"      = "bucket-owner-full-control",
             "aws:SourceAccount" = data.aws_caller_identity.current.account_id
           }
         }
-   }
-   ]
- })
+      }
+    ]
+  })
 }
