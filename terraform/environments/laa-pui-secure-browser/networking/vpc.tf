@@ -10,7 +10,7 @@ module "vpc" {
   version = "5.21.0"
 
   name            = local.vpc_name
-  azs             = slice(data.aws_availability_zones.available.names, 0, 2)
+  azs             = ["eu-west-2a", "eu-west-2b"]
   cidr            = local.environment_configuration.vpc_cidr
   public_subnets  = local.environment_configuration.vpc_public_subnets
   intra_subnets   = local.environment_configuration.vpc_intra_subnets
