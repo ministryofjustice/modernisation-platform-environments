@@ -2,12 +2,6 @@
 # Lambda@Edge – ONLY for HTTP distribution
 ###############################
 
-# Required: us-east-1 for Lambda@Edge
-provider "aws" {
-  alias  = "us-east-1"
-  region = "us-east-1"
-}
-
 # -------------------------------------------------
 # 1. IAM Role
 # -------------------------------------------------
