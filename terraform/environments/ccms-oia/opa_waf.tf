@@ -91,7 +91,7 @@ resource "aws_wafv2_web_acl" "opahub_web_acl" {
     }
   }
 
-#### WHEN READY TO GO LIVE WITH WEB DETERMINATIONS, SWITCH TO GEO MATCH INSTEAD OF IP SET
+  #### WHEN READY TO GO LIVE WITH WEB DETERMINATIONS, SWITCH TO GEO MATCH INSTEAD OF IP SET
 
   # Rule 2: /opa/web-determinations/* (Prod only)
   dynamic "rule" {
@@ -136,7 +136,7 @@ resource "aws_wafv2_web_acl" "opahub_web_acl" {
     }
   }
 
-#### WHEN READY TO GO LIVE WITH WEB DETERMINATIONS, SWITCH TO GEO MATCH INSTEAD OF IP SET
+  #### WHEN READY TO GO LIVE WITH WEB DETERMINATIONS, SWITCH TO GEO MATCH INSTEAD OF IP SET
 
   # # Rule 2: /opa/web-determinations/* (Prod only)
   # dynamic "rule" {
