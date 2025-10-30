@@ -41,6 +41,4 @@ locals {
   modernisation_platform_validations = [for k, v in local.domain_types : v if strcontains(k, "modernisation-platform.service.justice.gov.uk")]
   laa_validations                    = [for k, v in local.domain_types : v if strcontains(k, "laa.service.justice.gov.uk")]
 
-  secret_data = jsondecode(data.aws_secretsmanager_secret_version.pui_secrets.secret_string)
-
 }
