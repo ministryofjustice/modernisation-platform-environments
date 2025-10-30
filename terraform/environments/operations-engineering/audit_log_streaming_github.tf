@@ -1,3 +1,7 @@
+###################################
+# GitHub Audit Log Infrastructure #
+###################################
+
 # tflint-ignore: terraform_required_providers
 data "external" "build_lambdas" {
   program = [
@@ -23,6 +27,17 @@ module "github-cloudtrail-auditlog" {
 
 data "aws_kms_key" "key" {
   key_id = "alias/GitHubCloudTrailOpenEvent"
+}
+
+################################################
+# GitHub to S3 Audit Log Streaming Permissions #
+################################################
+resource "aws_iam_openid_connect_provider" "github" {
+  url = "https://oidc-configuration.audit-log.githubusercontent.com"
+
+  client_id_list = [
+    "sts.amazonaws.com"
+  ]
 }
 
 resource "aws_iam_policy" "github_audit_log_write_policy" {
