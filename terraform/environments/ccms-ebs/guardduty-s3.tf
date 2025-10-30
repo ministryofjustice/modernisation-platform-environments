@@ -25,7 +25,7 @@ resource "aws_guardduty_malware_protection_plan" "s3_scan_bucket2" {
 
   protected_resource {
     s3_bucket {
-      bucket_name     = module.s3-bucket-logging.id
+      bucket_name     = module.s3-bucket-logging.bucket.id
     }
   }
 
@@ -47,7 +47,7 @@ resource "aws_guardduty_malware_protection_plan" "s3_scan_bucket3" {
 
   protected_resource {
     s3_bucket {
-      bucket_name     = module.s3-bucket-dbbackup.id
+      bucket_name     = module.s3-bucket-dbbackup.bucket.id
     }
   }
 
@@ -106,7 +106,7 @@ resource "aws_guardduty_malware_protection_plan" "s3_scan_bucket5" {
     { Name = lower(format("s3-%s-%s-awsgaurdduty-mpp", "${local.application_data.accounts[local.environment].app_name}", local.environment)) }
   )
 
-  depends_on = [ each.value.id ]
+  depends_on = [ each.value ]
 }
 
 resource "aws_guardduty_malware_protection_plan" "s3_scan_bucket6" {
