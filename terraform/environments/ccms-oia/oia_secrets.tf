@@ -14,10 +14,13 @@ resource "aws_secretsmanager_secret_version" "oia_secrets" {
     "alerts_slack_channel_id"    = ""
   })
 
-  lifecycle {
-    ignore_changes = [
-      secret_string
-    ]
-  }
+  # lifecycle {
+  #   ignore_changes = [
+  #     secret_string
+  #   ]
+  # }
 }
 
+data "aws_secretsmanager_secret_version" "oia_secrets" {
+  secret_id = aws_secretsmanager_secret.oia_secrets.id
+}
