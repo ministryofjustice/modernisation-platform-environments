@@ -29,7 +29,7 @@ module "alb" {
 module "log_bucket" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "4.1.2"
+  version = "5.8.2"
 
   bucket = "${var.project_name}-${var.environment}-${var.alb_name}-${local.alb_suffix}-logs"
   acl    = "log-delivery-write"
