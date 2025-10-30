@@ -22,7 +22,7 @@ module "mojap_compute_logs_bucket_eu_west_2" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "4.10.1"
+  version = "5.8.2"
 
   bucket = "mojap-compute-${local.environment}-logs-eu-west-2"
 
@@ -77,7 +77,7 @@ module "mojap_compute_logs_bucket_eu_west_1" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "4.10.1"
+  version = "5.8.2"
 
   providers = {
     aws = aws.analytical-platform-compute-eu-west-1
