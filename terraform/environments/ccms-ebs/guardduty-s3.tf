@@ -106,7 +106,7 @@ resource "aws_guardduty_malware_protection_plan" "s3_scan_bucket5" {
     { Name = lower(format("s3-%s-%s-awsgaurdduty-mpp", "${local.application_data.accounts[local.environment].app_name}", local.environment)) }
   )
 
-  depends_on = [ each.value ]
+  depends_on = [ aws_s3_bucket.buckets ]
 }
 
 resource "aws_guardduty_malware_protection_plan" "s3_scan_bucket6" {
