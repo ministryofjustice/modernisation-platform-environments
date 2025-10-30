@@ -491,6 +491,10 @@ resource "aws_secretsmanager_secret" "operational_db_secret" {
   tags = {
     dpr-name = "${local.project}-rds-operational-db-secret"
   }
+
+  lifecycle {
+    ignore_changes = [tags]
+  }
 }
 
 resource "aws_secretsmanager_secret_version" "operational_db_secret_version" {
