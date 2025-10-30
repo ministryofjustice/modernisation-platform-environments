@@ -19,7 +19,7 @@ resource "aws_sqs_queue" "maat_provider_q" {
   fifo_queue                 = true
   delay_seconds              = 90
   max_message_size           = 262144
-  message_retention_seconds  = 604800
+  message_retention_seconds  = 1209600
   receive_wait_time_seconds  = 10
   visibility_timeout_seconds = 120
 
@@ -56,7 +56,7 @@ resource "aws_sqs_queue" "cclf_provider_q" {
   fifo_queue                 = true
   delay_seconds              = 90
   max_message_size           = 262144
-  message_retention_seconds  = 604800
+  message_retention_seconds  = 1209600
   receive_wait_time_seconds  = 10
   visibility_timeout_seconds = 120
 
@@ -93,7 +93,7 @@ resource "aws_sqs_queue" "ccr_provider_q" {
   fifo_queue                 = true
   delay_seconds              = 90
   max_message_size           = 262144
-  message_retention_seconds  = 604800
+  message_retention_seconds  = 1209600
   receive_wait_time_seconds  = 10
   visibility_timeout_seconds = 120
 
@@ -130,7 +130,7 @@ resource "aws_sqs_queue" "ccms_provider_q" {
   fifo_queue                 = true
   delay_seconds              = 90
   max_message_size           = 262144
-  message_retention_seconds  = 604800
+  message_retention_seconds  = 1209600
   receive_wait_time_seconds  = 10
   visibility_timeout_seconds = 120
 
