@@ -3,12 +3,6 @@
 #  DNS records managed by
 ###############################
 
-# Lambda@Edge + ACM must be in us-east-1
-provider "aws" {
-  alias  = "us-east-1"
-  region = "us-east-1"
-}
-
 # -------------------------------------------------
 # 1. ACM Certificate (HTTP-only domains only)
 # -------------------------------------------------
