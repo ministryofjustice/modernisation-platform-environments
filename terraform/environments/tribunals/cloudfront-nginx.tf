@@ -14,49 +14,14 @@ provider "aws" {
 # -------------------------------------------------
 resource "aws_acm_certificate" "http_redirect_cert" {
   provider          = aws.us-east-1
-  domain_name       = "siac.tribunals.gov.uk"  # any one of your HTTP domains
+  domain_name       = "ahmlr.gov.uk"  # any one of the HTTP domains
   validation_method = "DNS"
 
-  subject_alternative_names = [
-    "siac.tribunals.gov.uk",
-    "fhsaa.tribunals.gov.uk",
-    "estateagentappeals.tribunals.gov.uk",
-    "consumercreditappeals.tribunals.gov.uk",
-    "charity.tribunals.gov.uk",
-    "adjudicationpanel.tribunals.gov.uk",
-    "asylum-support-tribunal.gov.uk",
-    "ahmlr.gov.uk",
-    "appeals-service.gov.uk",
-    "carestandardstribunal.gov.uk",
-    "cicap.gov.uk",
-    "civilappeals.gov.uk",
-    "cjit.gov.uk",
-    "cjs.gov.uk",
-    "cjsonline.gov.uk",
-    "complaints.judicialconduct.gov.uk",
-    "courtfines.justice.gov.uk",
-    "courtfunds.gov.uk",
-    "criminal-justice-system.gov.uk",
-    "dugganinquest.independent.gov.uk",
-    "employmentappeals.gov.uk",
-    "financeandtaxtribunals.gov.uk",
-    "hillsboroughinquests.independent.gov.uk",
-    "immigrationservicestribunal.gov.uk",
-    "informationtribunal.gov.uk",
-    "judicialombudsman.gov.uk",
-    "landstribunal.gov.uk",
-    "obr.co.uk",
-    "osscsc.gov.uk",
-    "paroleboard.gov.uk",
-    "sendmoneytoaprisoner.justice.gov.uk",
-    "transporttribunal.gov.uk",
-    "victiminformationservice.org.uk",
-    "yjbpublications.justice.gov.uk"
-  ]
+  subject_alternative_names = local.is-production ? cloudfront_nginx_sans : cloudfront_nginx_nonprod_sans
 
   tags = {
     Name        = "tribunals-http-redirect-cert"
-    Environment = "production"
+    Environment = local.environment
   }
 
   lifecycle {
@@ -149,7 +114,7 @@ resource "aws_cloudfront_distribution" "tribunals_http_redirect" {
 
   tags = {
     Name        = "tribunals-http-redirect"
-    Environment = "production"
+    Environment = local.environment
   }
 
   # Wait for cert to be issued before creating distribution
@@ -166,48 +131,4 @@ resource "aws_cloudfront_distribution" "tribunals_http_redirect" {
 output "http_redirect_distribution_domain" {
   description = "CNAME target for HTTP domains (give to external DNS admins)"
   value       = aws_cloudfront_distribution.tribunals_http_redirect.domain_name
-}
-
-# IAM Role for Lambda@Edge
-resource "aws_iam_role" "lambda_edge_role" {
-  name = "CloudfrontRedirectLambdaRole"
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
-        Principal = {
-          Service = ["lambda.amazonaws.com", "edgelambda.amazonaws.com"]
-        }
-      }
-    ]
-  })
-}
-
-# Create ZIP archive for Lambda@Edge function
-data "archive_file" "lambda_zip" {
-  type        = "zip"
-  source_file = "lambda/cloudfront-redirect.js"
-  output_path = "lambda/cloudfront-redirect.zip"
-}
-
-data "archive_file" "lambda_zip_nonprod" {
-  type        = "zip"
-  source_file = "lambda/cloudfront-redirect-nonprod.js"
-  output_path = "lambda/cloudfront-redirect-nonprod.zip"
-}
-
-# Lambda@Edge Function (must be in us-east-1 for CloudFront)
-resource "aws_lambda_function" "cloudfront_redirect_lambda" {
-  provider         = aws.us-east-1
-  function_name    = "CloudfrontRedirectLambda"
-  filename         = local.is-production ? data.archive_file.lambda_zip.output_path : data.archive_file.lambda_zip_nonprod.output_path
-  source_code_hash = local.is-production ? data.archive_file.lambda_zip.output_base64sha256 : data.archive_file.lambda_zip_nonprod.output_base64sha256
-  role             = aws_iam_role.lambda_edge_role.arn
-  handler          = "cloudfront-redirect.handler"
-  runtime          = "nodejs18.x"
-  publish          = true
-  timeout          = 5
-  memory_size      = 128
 }
