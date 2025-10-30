@@ -4,6 +4,6 @@ resource "aws_sns_topic_subscription" "email_alerts" {
   endpoint  = var.email_url
 
    lifecycle {
-    ignore_changes = [topic_arn]
+    ignore_changes = [tags]
   }
 }
