@@ -1,5 +1,5 @@
 #--Alerting Chatbot
-module "guardduty_chatbot" {
+module "cloudwatch_chatbot" {
   source           = "github.com/ministryofjustice/modernisation-platform-terraform-aws-chatbot?ref=0ec33c7bfde5649af3c23d0834ea85c849edf3ac" # v3.0.0"
   slack_channel_id = jsondecode(data.aws_secretsmanager_secret_version.oia_secrets.secret_string)["cloudwatch_slack_channel_id"]
   sns_topic_arns   = [aws_sns_topic.cloudwatch_alerts.arn]
