@@ -447,7 +447,7 @@ resource "aws_secretsmanager_secret_version" "dbt_secrets" {
   secret_string = jsonencode(local.dbt_k8s_secrets_placeholder)
 
   lifecycle {
-    ignore_changes = [secret_string, ]
+    ignore_changes = [secret_string, tags, ]
   }
 
   depends_on = [aws_secretsmanager_secret.dbt_secrets]
