@@ -85,7 +85,7 @@
 /terraform/environments/vcms @ministryofjustice/hmpps-vcms-write-team @ministryofjustice/hosting-migrations @ministryofjustice/modernisation-platform
 /terraform/environments/wardship @ministryofjustice/dts-legacy @ministryofjustice/modernisation-platform
 /terraform/environments/xhibit-portal @ministryofjustice/cjse-xhibit-portal-discovery @ministryofjustice/panda-cyber-team @ministryofjustice/xhibit-portal-dev @ministryofjustice/modernisation-platform
-/terraform/environments/youth-justice-app-framework @ministryofjustice/modernisation-platform-engineers @ministryofjustice/modernisation-platform
+/terraform/environments/youth-justice-app-framework @ministryofjustice/azure-aws-sso-yjb-statistics-and-analytics @ministryofjustice/modernisation-platform-engineers @ministryofjustice/modernisation-platform
 /terraform/environments/youth-justice-networking @ministryofjustice/modernisation-platform-engineers @ministryofjustice/modernisation-platform
 **/backend.tf @ministryofjustice/modernisation-platform
 **/subnet_share.tf @ministryofjustice/modernisation-platform
