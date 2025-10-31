@@ -78,14 +78,14 @@ resource "aws_iam_role_policy" "lambda_edge_policy" {
 # -------------------------------------------------
 data "archive_file" "lambda_zip" {
   type        = "zip"
-  source_file = "${path.module}/../lambda/cloudfront-redirect.js"
-  output_path = "${path.module}/../lambda/cloudfront-redirect.zip"
+  source_file = "lambda/cloudfront-redirect.js"
+  output_path = "lambda/cloudfront-redirect.zip"
 }
 
 data "archive_file" "lambda_zip_nonprod" {
   type        = "zip"
-  source_file = "${path.module}/../lambda/cloudfront-redirect-nonprod.js"
-  output_path = "${path.module}/../lambda/cloudfront-redirect-nonprod.zip"
+  source_file = "lambda/cloudfront-redirect-nonprod.js"
+  output_path = "lambda/cloudfront-redirect-nonprod.zip"
 }
 
 # -------------------------------------------------
