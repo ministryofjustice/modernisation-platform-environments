@@ -1,6 +1,8 @@
 ### SECURITY GROUP
 
 module "workspacesweb_security_group" {
+  count = local.create_resources ? 1 : 0
+
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
@@ -17,9 +19,11 @@ module "workspacesweb_security_group" {
 ### NETWORK SETTINGS
 
 resource "aws_workspacesweb_network_settings" "main" {
+  count = local.create_resources ? 1 : 0
+
   vpc_id             = local.vpc_id
   subnet_ids         = local.subnet_ids
-  security_group_ids = [module.workspacesweb_security_group.security_group_id]
+  security_group_ids = [module.workspacesweb_security_group[0].security_group_id]
 }
 
 ### WORKSPACES WEB PORTALS
@@ -29,7 +33,7 @@ moved {
 }
 
 resource "aws_workspacesweb_portal" "external" {
-  for_each = local.portals
+  for_each = local.create_resources ? local.portals : {}
 
   display_name = each.value
 }
@@ -38,6 +42,8 @@ resource "aws_workspacesweb_portal" "external" {
 
 # Standard user settings for external_2 (no SSO)
 resource "aws_workspacesweb_user_settings" "main" {
+  count = local.create_resources ? 1 : 0
+
   # Required settings
   copy_allowed     = "Enabled"
   download_allowed = "Disabled"
@@ -72,6 +78,8 @@ resource "aws_workspacesweb_user_settings" "main" {
 
 # User settings with SSO extension (cookie sync) for external_1
 resource "aws_workspacesweb_user_settings" "sso" {
+  count = local.create_resources ? 1 : 0
+
   # Required settings - same as main
   copy_allowed     = "Enabled"
   download_allowed = "Disabled"
@@ -106,17 +114,12 @@ resource "aws_workspacesweb_user_settings" "sso" {
 
     # LAA sign-in domain
     allowlist {
-      domain = "laa-sign-in.external-identity.service.justice.gov.uk"
+      domain = local.laa_sign_in_url
     }
 
-    # LAA portal dev domain
+    # LAA legal aid services domain
     allowlist {
-      domain = "portal-laa.dev.external-identity.service.justice.gov.uk"
-    }
-
-    # LAA legal aid services dev domain
-    allowlist {
-      domain = "dev.your-legal-aid-services.service.justice.gov.uk"
+      domain = local.legal_aid_services_url
     }
   }
 
@@ -143,21 +146,23 @@ resource "aws_workspacesweb_user_settings" "sso" {
 ### BROWSER SETTINGS
 
 resource "aws_workspacesweb_browser_settings" "main" {
+  count = local.create_resources ? 1 : 0
+
   browser_policy = jsonencode({
     "chromePolicies" = {
       "ManagedBookmarks" = {
         "value" = [
           {
             "name" = "PUI"
-            "url"  = "https://production-provider-ui-laa-pui-prod.apps.live.cloud-platform.service.justice.gov.uk/civil"
+            "url"  = "https://${local.pui_url}"
           },
           {
-            "name" = "OPA Hub"
-            "url"  = "https://production-opa-hub-laa-pui-prod.apps.live.cloud-platform.service.justice.gov.uk/opa/web-determinations"
+            "name" = "OIA Hub"
+            "url"  = "https://${local.oia_url}"
           },
           {
             "name" = "LAA Sign In"
-            "url"  = "https://laa-sign-in.external-identity.service.justice.gov.uk/"
+            "url"  = "https://${local.laa_sign_in_url}/"
           }
         ]
       }
@@ -217,14 +222,15 @@ resource "aws_workspacesweb_browser_settings" "main" {
           "[*.]msftauthimages.net",
           "[*.]phonefactor.net",
           "enterpriseregistration.windows.net",
-          "production-provider-ui-laa-pui-prod.apps.live.cloud-platform.service.justice.gov.uk",
-          "production-opa-hub-laa-pui-prod.apps.live.cloud-platform.service.justice.gov.uk",
+          local.pui_url,
+          local.oia_url,
+          local.laa_sign_in_url,
+          local.legal_aid_services_url,
           "chrome://new-tab-page",
           "mysignins.microsoft.com",
           "go.microsoft.com",
           "portal.manage.microsoft.com",
-          "portal-laa.dev.external-identity.service.justice.gov.uk",
-          "dev.your-legal-aid-services.service.justice.gov.uk"
+          "login.live.com"
         ]
       }
       "AllowDeletingBrowserHistory" = {
@@ -262,6 +268,8 @@ resource "aws_workspacesweb_browser_settings" "main" {
 ### SESSION LOGGER FOR SESSION LOGGING
 
 resource "aws_workspacesweb_session_logger" "main" {
+  count = local.create_resources ? 1 : 0
+
   display_name         = "laa-workspaces-web-session-logger"
   customer_managed_key = aws_kms_key.workspacesweb_session_logs.arn
 
@@ -301,10 +309,10 @@ moved {
 }
 
 resource "aws_workspacesweb_network_settings_association" "external" {
-  for_each = local.portals
+  for_each = local.create_resources ? local.portals : {}
 
   portal_arn           = aws_workspacesweb_portal.external[each.key].portal_arn
-  network_settings_arn = aws_workspacesweb_network_settings.main.network_settings_arn
+  network_settings_arn = aws_workspacesweb_network_settings.main[0].network_settings_arn
 }
 
 ### USER SETTINGS ASSOCIATIONS
@@ -316,14 +324,18 @@ moved {
 
 # External_1 uses SSO user settings with cookie synchronization
 resource "aws_workspacesweb_user_settings_association" "external_1" {
+  count = local.create_resources ? 1 : 0
+
   portal_arn        = aws_workspacesweb_portal.external["external_1"].portal_arn
-  user_settings_arn = aws_workspacesweb_user_settings.sso.user_settings_arn
+  user_settings_arn = aws_workspacesweb_user_settings.sso[0].user_settings_arn
 }
 
 # External_2 uses standard user settings without SSO
 resource "aws_workspacesweb_user_settings_association" "external_2" {
+  count = local.create_resources ? 1 : 0
+
   portal_arn        = aws_workspacesweb_portal.external["external_2"].portal_arn
-  user_settings_arn = aws_workspacesweb_user_settings.main.user_settings_arn
+  user_settings_arn = aws_workspacesweb_user_settings.main[0].user_settings_arn
 }
 
 ### BROWSER SETTINGS ASSOCIATIONS
@@ -334,10 +346,10 @@ moved {
 }
 
 resource "aws_workspacesweb_browser_settings_association" "external" {
-  for_each = local.portals
+  for_each = local.create_resources ? local.portals : {}
 
   portal_arn           = aws_workspacesweb_portal.external[each.key].portal_arn
-  browser_settings_arn = aws_workspacesweb_browser_settings.main.browser_settings_arn
+  browser_settings_arn = aws_workspacesweb_browser_settings.main[0].browser_settings_arn
 }
 
 ### SESSION LOGGER ASSOCIATIONS
@@ -348,8 +360,8 @@ moved {
 }
 
 resource "aws_workspacesweb_session_logger_association" "external" {
-  for_each = local.portals
+  for_each = local.create_resources ? local.portals : {}
 
   portal_arn         = aws_workspacesweb_portal.external[each.key].portal_arn
-  session_logger_arn = aws_workspacesweb_session_logger.main.session_logger_arn
+  session_logger_arn = aws_workspacesweb_session_logger.main[0].session_logger_arn
 }
