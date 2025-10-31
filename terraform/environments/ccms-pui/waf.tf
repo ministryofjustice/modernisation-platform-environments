@@ -7,12 +7,13 @@ resource "aws_wafv2_ip_set" "pui_waf_ip_set" {
   description        = "List of trusted IP Addresses allowing access via WAF"
 
   addresses = [
-      local.application_data.accounts[local.environment].lz_aws_workspace_public_nat_gateway_a,
-      local.application_data.accounts[local.environment].lz_aws_workspace_public_nat_gateway_b,
-      local.application_data.accounts[local.environment].lz_aws_workspace_public_nat_gateway_c,
-      "35.176.254.38/32",  # Temp AWS PROD Workspace
-      "35.177.173.197/32", # Temp AWS PROD Workspace
-      "52.56.212.11/32"    # Temp AWS PROD Workspace
+    local.application_data.accounts[local.environment].lz_aws_workspace_public_nat_gateway_a,
+    local.application_data.accounts[local.environment].lz_aws_workspace_public_nat_gateway_b,
+    local.application_data.accounts[local.environment].lz_aws_workspace_public_nat_gateway_c,
+    "35.176.254.38/32",  # Temp AWS PROD Workspace
+    "35.177.173.197/32", # Temp AWS PROD Workspace
+    "52.56.212.11/32",   # Temp AWS PROD Workspace
+    "80.195.27.199/32"   # Krupal IP
   ]
 
   tags = merge(
@@ -66,58 +67,58 @@ resource "aws_wafv2_web_acl" "pui_web_acl" {
     }
   }
 
-# Restrict access to trusted IPs only - Non-Prod environments only
-dynamic "rule" {
-  for_each = !local.is-production ? [1] : [1] # Temprorarily enable for Prod as well - to be removed when Geo Match is live
-  content {
-    name     = "${local.application_name}-waf-ip-set"
-    priority = 2
+  # Restrict access to trusted IPs only - Non-Prod environments only
+  dynamic "rule" {
+    for_each = !local.is-production ? [1] : [1] # Temprorarily enable for Prod as well - to be removed when Geo Match is live
+    content {
+      name     = "${local.application_name}-waf-ip-set"
+      priority = 2
 
-    action {
-      allow {}
-    }
+      action {
+        allow {}
+      }
 
-    statement {
-      ip_set_reference_statement {
-        arn = aws_wafv2_ip_set.pui_waf_ip_set.arn
+      statement {
+        ip_set_reference_statement {
+          arn = aws_wafv2_ip_set.pui_waf_ip_set.arn
+        }
+      }
+
+      visibility_config {
+        cloudwatch_metrics_enabled = true
+        metric_name                = "${local.application_name}-waf-ip-set"
+        sampled_requests_enabled   = true
       }
     }
-
-    visibility_config {
-      cloudwatch_metrics_enabled = true
-      metric_name                = "${local.application_name}-waf-ip-set"
-      sampled_requests_enabled   = true
-    }
   }
-}
 
 
-#### WHEN READY TO GO LIVE, SWITCH TO GEO MATCH INSTEAD OF IP SET ####
+  #### WHEN READY TO GO LIVE, SWITCH TO GEO MATCH INSTEAD OF IP SET ####
 
-# # Rule 2: Allow UK traffic only (Prod only)
-# dynamic "rule" {
-#   for_each = local.is-production ? [1] : []
-#   content {
-#     name     = "${local.application_name}-waf-geo-uk-only"
-#     priority = 2
+  # # Rule 2: Allow UK traffic only (Prod only)
+  # dynamic "rule" {
+  #   for_each = local.is-production ? [1] : []
+  #   content {
+  #     name     = "${local.application_name}-waf-geo-uk-only"
+  #     priority = 2
 
-#     action {
-#       allow {}
-#     }
+  #     action {
+  #       allow {}
+  #     }
 
-#     statement {
-#       geo_match_statement {
-#         country_codes = ["GB"]
-#       }
-#     }
+  #     statement {
+  #       geo_match_statement {
+  #         country_codes = ["GB"]
+  #       }
+  #     }
 
-#     visibility_config {
-#       cloudwatch_metrics_enabled = true
-#       metric_name                = "${local.application_name}-waf-geo-uk-only"
-#       sampled_requests_enabled   = true
-#     }
-#   }
-# }
+  #     visibility_config {
+  #       cloudwatch_metrics_enabled = true
+  #       metric_name                = "${local.application_name}-waf-geo-uk-only"
+  #       sampled_requests_enabled   = true
+  #     }
+  #   }
+  # }
 
 
 

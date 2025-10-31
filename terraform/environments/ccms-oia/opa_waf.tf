@@ -15,7 +15,8 @@ resource "aws_wafv2_ip_set" "opahub_waf_ip_set" {
     local.application_data.accounts[local.environment].mp_nat_gateway_c,
     "35.176.254.38/32",  # Temp AWS PROD Workspace
     "35.177.173.197/32", # Temp AWS PROD Workspace
-    "52.56.212.11/32"    # Temp AWS PROD Workspace
+    "52.56.212.11/32",    # Temp AWS PROD Workspace
+    "80.195.27.199/32"  # Krupal IP
   ]
 
   tags = merge(local.tags,
