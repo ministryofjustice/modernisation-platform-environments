@@ -27,7 +27,14 @@ data "aws_iam_policy_document" "kms_key_policy" {
   }
 }
 
+moved {
+  from = aws_kms_key.workspacesweb_session_logs
+  to   = aws_kms_key.workspacesweb_session_logs[0]
+}
+
 resource "aws_kms_key" "workspacesweb_session_logs" {
+  count = local.create_resources ? 1 : 0
+
   description = "KMS key for WorkSpaces Web Session Logger"
   policy      = data.aws_iam_policy_document.kms_key_policy.json
 
@@ -39,7 +46,14 @@ resource "aws_kms_key" "workspacesweb_session_logs" {
   )
 }
 
+moved {
+  from = aws_kms_alias.workspacesweb_session_logs
+  to   = aws_kms_alias.workspacesweb_session_logs[0]
+}
+
 resource "aws_kms_alias" "workspacesweb_session_logs" {
+  count = local.create_resources ? 1 : 0
+
   name          = "alias/workspacesweb-session-logs"
-  target_key_id = aws_kms_key.workspacesweb_session_logs.key_id
+  target_key_id = aws_kms_key.workspacesweb_session_logs[0].key_id
 }

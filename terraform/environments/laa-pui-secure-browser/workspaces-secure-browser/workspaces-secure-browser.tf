@@ -271,7 +271,7 @@ resource "aws_workspacesweb_session_logger" "main" {
   count = local.create_resources ? 1 : 0
 
   display_name         = "laa-workspaces-web-session-logger"
-  customer_managed_key = aws_kms_key.workspacesweb_session_logs.arn
+  customer_managed_key = aws_kms_key.workspacesweb_session_logs[0].arn
 
   additional_encryption_context = {
     Environment = local.environment
@@ -284,7 +284,7 @@ resource "aws_workspacesweb_session_logger" "main" {
 
   log_configuration {
     s3 {
-      bucket           = module.s3_bucket_workspacesweb_session_logs.s3_bucket_id
+      bucket           = module.s3_bucket_workspacesweb_session_logs[0].s3_bucket_id
       bucket_owner     = data.aws_caller_identity.current.account_id
       folder_structure = "NestedByDate"
       key_prefix       = "workspaces-web-logs/"

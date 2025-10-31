@@ -1,11 +1,18 @@
 ### S3 BUCKET FOR WORKSPACES WEB SESSION LOGGING
 
+moved {
+  from = module.s3_bucket_workspacesweb_session_logs
+  to   = module.s3_bucket_workspacesweb_session_logs[0]
+}
+
 module "s3_bucket_workspacesweb_session_logs" {
+  count = local.create_resources ? 1 : 0
+
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "~> 4.0"
 
-  bucket        = "laa-workspacesweb-session-logs-${random_string.bucket_suffix.result}"
+  bucket        = "laa-workspacesweb-session-logs-${random_string.bucket_suffix[0].result}"
   force_destroy = true
 
   # Versioning
@@ -18,7 +25,7 @@ module "s3_bucket_workspacesweb_session_logs" {
     rule = {
       apply_server_side_encryption_by_default = {
         sse_algorithm     = "aws:kms"
-        kms_master_key_id = aws_kms_key.workspacesweb_session_logs.arn
+        kms_master_key_id = aws_kms_key.workspacesweb_session_logs[0].arn
       }
     }
   }
@@ -45,7 +52,7 @@ module "s3_bucket_workspacesweb_session_logs" {
 
   # Bucket policy using the IAM policy document
   attach_policy = true
-  policy        = data.aws_iam_policy_document.s3_bucket_policy.json
+  policy        = data.aws_iam_policy_document.s3_bucket_policy[0].json
 
   tags = merge(
     local.tags,
@@ -55,13 +62,22 @@ module "s3_bucket_workspacesweb_session_logs" {
   )
 }
 
+moved {
+  from = random_string.bucket_suffix
+  to   = random_string.bucket_suffix[0]
+}
+
 resource "random_string" "bucket_suffix" {
+  count = local.create_resources ? 1 : 0
+
   length  = 8
   special = false
   upper   = false
 }
 
 data "aws_iam_policy_document" "s3_bucket_policy" {
+  count = local.create_resources ? 1 : 0
+
   statement {
     effect = "Allow"
     principals {
@@ -72,8 +88,8 @@ data "aws_iam_policy_document" "s3_bucket_policy" {
       "s3:PutObject"
     ]
     resources = [
-      "arn:aws:s3:::laa-workspacesweb-session-logs-${random_string.bucket_suffix.result}",
-      "arn:aws:s3:::laa-workspacesweb-session-logs-${random_string.bucket_suffix.result}/*"
+      "arn:aws:s3:::laa-workspacesweb-session-logs-${random_string.bucket_suffix[0].result}",
+      "arn:aws:s3:::laa-workspacesweb-session-logs-${random_string.bucket_suffix[0].result}/*"
     ]
   }
 }
