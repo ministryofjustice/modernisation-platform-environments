@@ -99,9 +99,36 @@ resource "aws_lambda_function" "calculate_wait_time" {
   source_code_hash = data.archive_file.lambda_function_calculate_wait_time_payload.output_base64sha256
 }
 
-data "archive_file" "lambda_function_calculate_wait_time_payload" {
+data "archive_file" "lambda_function_ldap_circuit_handler_payload" {
   type        = "zip"
   source_dir  = "${path.module}/files/calculate_wait_time"
   output_path = "${path.module}/files/calculate_wait_time.zip"
   excludes    = ["calculate_wait_time.zip", "ecs_restart.zip"]
+}
+
+data "archive_file" "lambda_function_calculate_wait_time_payload" {
+  type        = "zip"
+  source_dir  = "${path.module}/files/ldap_circuit_handler"
+  output_path = "${path.module}/files/ldap_circuit_handler.zip"
+  excludes    = ["calculate_wait_time.zip", "ecs_restart.zip", "ldap_circuit_handler.zip"]
+}
+
+resource "aws_lambda_function" "ldap_circuit_handler" {
+  function_name = "${var.environment}_ldap_circuit_handler"
+  runtime       = "python3.12"
+  handler       = "lambda_function.lambda_handler"
+  role          = aws_iam_role.lambda_execution_role.arn
+
+  environment {
+    variables = merge(
+      {
+        DEBUG_LOGGING = var.debug_logging
+        ENVIRONMENT   = var.environment
+      },
+      var.extra_environment_vars
+    )
+  }
+
+  filename         = data.archive_file.lambda_function_ldap_circuit_handler_payload.output_path
+  source_code_hash = data.archive_file.lambda_function_ldap_circuit_handler_payload.output_base64sha256
 }

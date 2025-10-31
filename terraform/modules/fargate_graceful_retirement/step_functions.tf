@@ -71,16 +71,97 @@ resource "aws_sfn_state_machine" "ecs_restart_state_machine" {
       WaitUntilRestartTime : {
         Type : "Wait",
         TimestampPath : "$.waitTimestamp.timestamp", # Use the computed timestamp
-        Next : "InvokeLambdaFunction"
+        Next : "FilterLDAPServices"
       },
-      InvokeLambdaFunction : {
+      # Filter affectedEntities for LDAP services
+      FilterLDAPServices : {
+        Type : "Pass",
+        Parameters : {
+          "ldapServices.$" : "States.ArrayFilter($.detail.affectedEntities, States.StringMatches($, '*-ldap'))"
+        },
+        ResultPath : "$.ldapServices",
+        Next : "CheckIfLDAPExists"
+      },
+      # Choice state to branch if LDAP services exist
+      CheckIfLDAPExists : {
+        Type : "Choice",
+        Choices : [
+          {
+            Variable : "$.ldapServices[0]",
+            IsPresent : true,
+            Next : "OpenCircuitBreaker"
+          }
+        ],
+        Default : "RestartECSService"
+      },
+      OpenCircuitBreaker : {
+        Type : "Task",
+        Resource : "arn:aws:states:::lambda:invoke",
+        Parameters : {
+          "FunctionName" : aws_lambda_function.ldap_circuit_handler.arn,
+          "Payload" : {
+            "action" : "open"
+          }
+        },
+        Next : "RestartECSService"
+      },
+      RestartECSService : {
         Type : "Task",
         Resource : "arn:aws:states:::lambda:invoke",
         Parameters : {
           "FunctionName" : aws_lambda_function.ecs_restart_handler.arn,
           "Payload.$" : "$"
         },
-        End : true
+        ResultPath : "$.restartECSResult",
+        Next : "PostRestartChoice"
+      },
+      # After restart, check again: if LDAP then wait for targets + close circuit breaker
+      # else just end the steps
+      PostRestartChoice : {
+        Type : "Choice",
+        Choices = [
+          {
+            Variable : "$.ldapServices[0]",
+            IsPresent : true,
+            Next : "WaitForTargetsHealthy"
+          }
+        ],
+        Default : "EndStep"
+      },
+
+      WaitForTargetsHealthy : {
+        Type : "Task",
+        Resource : "arn:aws:states:::lambda:invoke",
+        Parameters : {
+          "FunctionName" : aws_lambda_function.ldap_circuit_handler.arn,
+          "Payload" : {
+            "action" : "check_health"
+          }
+        },
+        Retry : [
+          {
+            ErrorEquals : ["TargetsNotReady"],
+            IntervalSeconds : 20,
+            BackoffRate : 1.2,
+            MaxAttempts : 30
+          }
+        ],
+        Next : "CloseCircuitBreaker"
+      },
+      # finally close circuit breaker
+      CloseCircuitBreaker : {
+        Type : "Task",
+        Resource : "arn:aws:states:::lambda:invoke",
+        Parameters : {
+          "FunctionName" : aws_lambda_function.ldap_circuit_handler.arn,
+          "Payload" : {
+            "action" : "close"
+          }
+        },
+        Next : "EndStep"
+      },
+      EndStep : {
+        Type : "Succeed"
       }
     }
   })
