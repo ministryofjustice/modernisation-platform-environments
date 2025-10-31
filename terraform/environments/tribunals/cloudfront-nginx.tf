@@ -46,7 +46,6 @@ EOF
 # 3. CloudFront Distribution – HTTP only
 # -------------------------------------------------
 resource "aws_cloudfront_distribution" "tribunals_http_redirect" {
-  provider = aws.us-east-1
 
   enabled             = true
   is_ipv6_enabled     = true
