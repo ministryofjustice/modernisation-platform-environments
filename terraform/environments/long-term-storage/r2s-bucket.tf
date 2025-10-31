@@ -34,6 +34,8 @@ locals {
     role6 = { name = "r2s-genesys-nle-role",              prefix_key = "nle" }
   }
 
+  genesys_role_arns = [for r in aws_iam_role.genesys_role : r.arn]
+
   # Map role key -> full secret name "<prefix>_ou"
   genesys_prefix_secret_name = {
     for k, v in local.genesys_roles :
@@ -45,7 +47,7 @@ locals {
     for k in keys(local.genesys_roles) :
     k => (
       var.secrets_populated
-      ? "${trimsuffix(try(nonsensitive(data.aws_secretsmanager_secret_version.genesys_prefix[k].secret_string), ""), "/")}/"
+      ? trimsuffix(try(nonsensitive(data.aws_secretsmanager_secret_version.genesys_prefix[k].secret_string), ""), "/")
       : null
     )
   }
@@ -121,32 +123,28 @@ data "aws_iam_policy_document" "r2s_tls_only" {
   }
     # Require SSE-KMS
   statement {
-    sid     = "DenyIncorrectEncryptionHeader"
-    effect  = "Deny"
+    sid     = "AllowRolePutGetWithSSEKMS"
+    effect  = "Allow"
     actions = ["s3:PutObject"]
-    principals { type = "*", identifiers = ["*"] }
-    resources = ["${aws_s3_bucket.r2s.arn}/*"]
+    principals { 
+     type = "AWS"
+     identifiers = local.genesys_role_arns
+    }
+    resources = [
+      aws_s3_bucket.r2s.arn,
+      "${aws_s3_bucket.r2s.arn}/*"
+    ]
     condition {
-      test     = "StringNotEquals"
+      test     = "StringEquals"
       variable = "s3:x-amz-server-side-encryption"
       values   = ["aws:kms"]
     }
-  }
-
-  # Require our specific CMK
-  statement {
-    sid     = "DenyWrongKmsKey"
-    effect  = "Deny"
-    actions = ["s3:PutObject"]
-    principals { type = "*", identifiers = ["*"] }
-    resources = ["${aws_s3_bucket.r2s.arn}/*"]
     condition {
-      test     = "StringNotEquals"
+      test     = "StringEquals"
       variable = "s3:x-amz-server-side-encryption-aws-kms-key-id"
       values   = [aws_kms_key.r2s_s3.arn]
     }
   }
-
 }
 
 resource "aws_s3_bucket_policy" "r2s" {
@@ -162,7 +160,7 @@ resource "aws_s3_bucket_policy" "r2s" {
 # Key policy: full admin to account; S3 use gated by IAM policies
 data "aws_iam_policy_document" "r2s_kms_policy" {
   statement {
-    sid     = "EnableRootPermissions"
+    sid     = "EnableRootUserFullAccess"
     effect  = "Allow"
     principals {
       type        = "AWS"
@@ -172,30 +170,22 @@ data "aws_iam_policy_document" "r2s_kms_policy" {
     resources = ["*"]
   }
 
-  # Allow S3 to create grants when accessed via S3 in this region
+  # Allow Role From Account To Use Key
   statement {
-    sid    = "AllowS3ToUseKeyViaService"
+    sid    = "AllowRoleFromAccountToUseKey"
     effect = "Allow"
     principals {
-      type        = "Service"
-      identifiers = ["s3.amazonaws.com"]   # <-- principal should be regionless
+      type        = "AWS"
+      identifiers = local.genesys_role_arns
     }
     actions = [
-      "kms:Decrypt",
       "kms:Encrypt",
-      "kms:GenerateDataKey",
-      "kms:GenerateDataKeyWithoutPlaintext",
-      "kms:ReEncryptFrom",
-      "kms:ReEncryptTo",
-      "kms:DescribeKey",
-      "kms:CreateGrant"
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:DescribeKey"
     ]
     resources = ["*"]
-    condition {
-      test     = "StringEquals"
-      variable = "kms:ViaService"
-      values   = ["s3.${data.aws_region.current.name}.amazonaws.com"]  # <-- region stays here
-    }
   }
 }
 
@@ -211,34 +201,6 @@ resource "aws_kms_key" "r2s_s3" {
 resource "aws_kms_alias" "r2s_s3" {
   name          = "alias/r2s-s3"
   target_key_id = aws_kms_key.r2s_s3.key_id
-}
-
-############################################################
-# S3 "folders" 
-############################################################
-
-# Create one folder per Genesys prefix secret
-resource "aws_s3_object" "genesys_folders" {
-  # only when secrets are populated, and ignore empty values
-  for_each = var.secrets_populated ? {
-    for k, v in local.genesys_prefix : k => v if v != null && v != "/"
-  } : {}
-
-  bucket  = aws_s3_bucket.r2s.id
-  key     = each.value                 # e.g. "cica/" (we normalized with trailing slash)
-  content = ""                         # zero-byte marker object
-  server_side_encryption = "aws:kms"
-  kms_key_id             = aws_kms_key.r2s_s3.arn
-}
-
-# Optional: ensure the Snowflake metadata/ prefix exists too
-resource "aws_s3_object" "snowflake_folder" {
-  count   = 1
-  bucket  = aws_s3_bucket.r2s.id
-  key     = local.snowflake_prefix     # "metadata/"
-  content = ""
-  server_side_encryption = "aws:kms"
-  kms_key_id             = aws_kms_key.r2s_s3.arn
 }
 
 
@@ -322,7 +284,7 @@ data "aws_secretsmanager_secret_version" "snowflake_external_id" {
 
 # Trust policy for Genesys (only rendered when populated)
 data "aws_iam_policy_document" "genesys_trust" {
-  count = var.secrets_populated ? 1 : 0
+  for_each = var.secrets_populated ? local.genesys_roles : {}
 
   statement {
     effect = "Allow"
@@ -334,7 +296,7 @@ data "aws_iam_policy_document" "genesys_trust" {
     condition {
       test     = "StringEquals"
       variable = "sts:ExternalId"
-      values   = [local.genesys_external_id]
+      values   = [local.genesys_prefix[each.key]]
     }
   }
 }
@@ -344,7 +306,7 @@ resource "aws_iam_role" "genesys_role" {
   for_each = local.genesys_ready ? local.genesys_roles : {}
 
   name               = each.value.name
-  assume_role_policy = one(data.aws_iam_policy_document.genesys_trust[*].json)
+  assume_role_policy = data.aws_iam_policy_document.genesys_trust[each.key].json
   description        = "Role assumed by Genesys Cloud export module to upload recordings to ${local.bucket_name} in ${local.genesys_prefix[each.key]}"
   tags               = local.tags
 }
@@ -353,51 +315,23 @@ resource "aws_iam_role" "genesys_role" {
 data "aws_iam_policy_document" "genesys_prefix" {
   for_each = local.genesys_ready ? local.genesys_roles : {}
 
-  # List only within the specific prefix
   statement {
-    sid     = "ListBucketWithinPrefix"
+    sid     = "BucketAccess"
     effect  = "Allow"
-    actions = ["s3:ListBucket"]
-    resources = [aws_s3_bucket.r2s.arn]
-    condition {
-      test     = "StringLike"
-      variable = "s3:prefix"
-        values   = [
-            "${local.genesys_prefix[each.key]}",
-            "${local.genesys_prefix[each.key]}*"
-          ]
-    }
-  }
-
-  # Object access only inside the folder
-  statement {
-    sid    = "ObjectAccessInPrefix"
-    effect = "Allow"
     actions = [
       "s3:PutObject",
-      "s3:PutObjectAcl",
-      "s3:GetObject",
-      "s3:DeleteObject",
-      "s3:AbortMultipartUpload",
-      "s3:ListMultipartUploadParts"
+      "s3:GetEncryptionConfiguration",
+      "s3:PutBucketAcl",
+      "s3:GetBucketLocation"
     ]
     resources = [
-      "arn:aws:s3:::${local.bucket_name}/${local.genesys_prefix[each.key]}*"
+      aws_s3_bucket.r2s.arn,
+      "arn:aws:s3:::${local.bucket_name}/*"
     ]
   }
 
   statement {
-    sid     = "BucketMetadata"
-    effect  = "Allow"
-    actions = [
-      "s3:GetBucketLocation",
-      "s3:GetEncryptionConfiguration"
-    ]
-    resources = [aws_s3_bucket.r2s.arn]
-  }
-
-  statement {
-    sid    = "KmsUseForPrefix"
+    sid    = "KmsUseForBucketObjects"
     effect = "Allow"
     actions = [
       "kms:Encrypt",
@@ -412,7 +346,7 @@ data "aws_iam_policy_document" "genesys_prefix" {
       test     = "StringLike"
       variable = "kms:EncryptionContext:aws:s3:arn"
       values   = [
-        "arn:aws:s3:::${local.bucket_name}/${local.genesys_prefix[each.key]}*"
+        "arn:aws:s3:::${local.bucket_name}/*"
       ]
     }
   }
@@ -423,7 +357,7 @@ data "aws_iam_policy_document" "genesys_prefix" {
 resource "aws_iam_policy" "genesys_prefix" {
   for_each = data.aws_iam_policy_document.genesys_prefix
 
-  name        = "r2s-genesys-prefix-${each.key}"
+  name        = "r2s-genesys-${local.genesys_roles[each.key].prefix_key}-policy"
   description = "Restrict ${local.genesys_roles[each.key].name} to s3://${local.bucket_name}/${local.genesys_prefix[each.key]}"
   policy      = each.value.json
   tags        = local.tags
