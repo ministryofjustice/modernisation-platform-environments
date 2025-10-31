@@ -64,9 +64,11 @@ module "dms_second_task" {
     "g4s_centurion",
     "g4s_emsys_mvp",
     "g4s_emsys_tpims",
+    "g4s_fep",
     "g4s_integrity",
     "g4s_integrity_customdb",
-    "g4s_fep",
+    "g4s_rf_hours",
+    "g4s_tasking",
   ] : local.is-development ? ["test"] : [])
 
   database_name      = each.key
