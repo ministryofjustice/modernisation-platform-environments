@@ -13,7 +13,7 @@ _If you have any questions surrounding this page please post in the `#team-name`
 
 ### **Description:**
 
-<!-- A short (less than 50 word) description of what your service does, and who it’s for.-->
+The CCMS-PUI-Internal `workspaces-secure-browser` component is supported by the Emergency Containment Platform team.
 
 ### **Service URLs:**
 
@@ -21,7 +21,7 @@ _If you have any questions surrounding this page please post in the `#team-name`
 
 ### **Incident response hours:**
 
-<!-- When your service receives support for urgent issues. This should be written in a clear, unambiguous way. For example: 24/7/365, Office hours, usually 9am-6pm on working days, or 7am-10pm, 365 days a year. -->
+The CCMS-PUI-Internal `workspaces-secure-browser` component is supported between 0630-2200 seven days a week.
 
 ### **Incident contact details:**
 
@@ -65,7 +65,7 @@ Modernisation Platform
 
 ### **Services consumed by this:**
 
-<!-- List which other services (with links to their runbooks) this service relies on. -->
+CCMS-PUI-Internal `workspaces-secure-browser` connects to the PUI service hosted on Cloud Platform.
 
 ### **Restrictions on access:**
 
