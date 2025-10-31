@@ -1,0 +1,20 @@
+onboarding:
+  - changed-files:
+    - any-glob-to-any-file:
+      - "environments/**"
+
+dependencies:
+  - changed-files:
+    - any-glob-to-any-file:
+      - "terraform/**/*.lock.hcl"
+
+github-workflow:
+  - changed-files:
+    - any-glob-to-any-file:
+      - ".github/workflows/**"
+
+environments-repository:
+  - changed-files:
+    - any-glob-to-any-file:
+      - "**/*.*"
+      - "**/*"

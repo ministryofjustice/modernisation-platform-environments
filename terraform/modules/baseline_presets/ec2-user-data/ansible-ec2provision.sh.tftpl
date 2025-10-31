@@ -1,0 +1,145 @@
+#!/bin/bash
+# Don't set set -u as ansible activate script fails with it on RHEL6
+set -eo pipefail
+
+run_ansible() {
+  export PATH=/usr/local/bin:$PATH
+
+  echo "ansible_repo:         modernisation-platform-configuration-management"
+  echo "ansible_repo_basedir: ansible"
+  echo "ansible_args:         ${ansible_args}"
+  echo "branch:               ${branch}"
+
+  if [[ -z modernisation-platform-configuration-management ]]; then
+    echo "ansible_repo not defined, not installing any ansible" >&2
+    exit 0
+  fi
+
+  if ! command -v aws > /dev/null; then
+    echo "aws cli must be installed, not installing any ansible" >&2
+    exit 0
+  fi
+
+  if ! command -v git > /dev/null; then
+    echo "git must be installed, not installing any ansible" >&2
+    exit 0
+  fi
+
+  echo "# Retrieving API Token"
+  token=$(curl -sS -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
+
+  echo "# Retrieving Instance ID"
+  instance_id=$(curl -sS -H "X-aws-ec2-metadata-token: $token" -v http://169.254.169.254/latest/meta-data/instance-id)
+
+  echo "# Retrieving tags using aws cli"
+  IFS=$'\n'
+  tags=($(aws ec2 describe-tags --filters "Name=resource-id,Values=$instance_id" "Name=key,Values=Name,os-type,ami,server-type,environment-name,application" --output=text))
+  unset IFS
+
+  # clone ansible roles and playbook
+  ansible_dir=$(mktemp -d)
+  echo "# Cloning modernisation-platform-configuration-management into $ansible_dir using branch=${branch}"
+  cd $ansible_dir
+  git clone "https://github.com/ministryofjustice/modernisation-platform-configuration-management.git"
+  cd $ansible_dir/modernisation-platform-configuration-management
+  git checkout "${branch}"
+  cd $ansible_dir
+
+  # find the group_var yaml files
+  ansible_group_vars=
+  aws_environment=
+  application=
+  for ((i=0; i<$${#tags[@]}; i++)); do
+    tag=($${tags[i]})
+    group=$(echo "$${tag[1]}_$${tag[4]}" | tr [:upper:] [:lower:] | sed "s/-/_/g")
+    if [[ "$${tag[1]}" == "Name" ]]; then
+      ansible_group_vars="$ansible_group_vars --extra-vars ec2_name=$${tag[4]}"
+    elif [[ "$${tag[1]}" == "application" ]]; then
+      application="$${tag[4]}"
+    elif [[ -e $ansible_dir/modernisation-platform-configuration-management/ansible/group_vars/$group.yml ]]; then
+      ansible_group_vars="$ansible_group_vars --extra-vars @group_vars/$group.yml"
+    elif [[ -e $ansible_dir/modernisation-platform-configuration-management/ansible/group_vars/$group/ansible.yml ]]; then
+      ansible_group_vars="$ansible_group_vars --extra-vars @group_vars/$group/ansible.yml"
+    else
+      echo "Could not find group_vars $group yml"
+      exit 1
+    fi
+    if [[ "$${tag[1]}" == "environment-name" ]]; then
+      aws_environment=$(echo $${tag[4]} | rev | cut -d- -f1 | rev)
+    fi
+  done
+
+  if [[ -n $aws_environment ]]; then
+    ansible_group_vars="$ansible_group_vars --extra-vars aws_environment=$aws_environment"
+  fi
+  if [[ -n $application ]]; then
+    ansible_group_vars="$ansible_group_vars --extra-vars application=$application"
+
+    echo "# Checking for $application-environment tag using aws cli"
+    application_environment=$(aws ec2 describe-tags --filters "Name=resource-id,Values=$instance_id" "Name=key,Values=$application-environment" --output=text | head -1 | cut -f5)
+    if [[ -n $application_environment ]]; then
+      for ((i=0; i<$${#tags[@]}; i++)); do
+        tag=($${tags[i]})
+        group=$(echo "$${tag[1]}_$${tag[4]}_$${application_environment}" | tr [:upper:] [:lower:] | sed "s/-/_/g")
+        if [[ -e $ansible_dir/modernisation-platform-configuration-management/ansible/group_vars/$group.yml ]]; then
+          ansible_group_vars="$ansible_group_vars --extra-vars @group_vars/$group.yml"
+        elif [[ -e $ansible_dir/modernisation-platform-configuration-management/ansible/group_vars/$group/ansible.yml ]]; then
+          ansible_group_vars="$ansible_group_vars --extra-vars @group_vars/$group/ansible.yml"
+        fi
+      done
+    fi
+  fi
+
+  # set python version
+  if [[ $(which python3.9 2> /dev/null) ]]; then
+    python=$(which python3.9)
+  elif [[ $(which python3.6 2> /dev/null) ]]; then
+    python=$(which python3.6)
+  else
+    echo "Python3.9/3.6 not found"
+    exit 1
+  fi
+  echo "# Using python: $python"
+
+  # activate virtual environment
+  mkdir $ansible_dir/python-venv && cd "$_"
+  $python -m venv ansible
+  source ansible/bin/activate
+  $python -m pip install --upgrade pip
+  requirements_yml=requirements.yml
+  if [[ "$python" =~ 3.6 ]]; then
+    $python -m pip install wheel
+    $python -m pip install cryptography==2.3
+    export LC_ALL=en_US.UTF-8
+    $python -m pip install ansible-core==2.11.12
+    requirements_yml=requirements.rhel6.yml
+  else
+    $python -m pip install ansible==6.0.0
+  fi
+
+  # install requirements in virtual env
+  echo "# Installing ansible requirements"
+  cd $ansible_dir/modernisation-platform-configuration-management/ansible
+  $python -m pip install -r requirements.txt
+  ansible-galaxy role install -r $requirements_yml
+  ansible-galaxy collection install -r $requirements_yml
+
+  # run ansible (comma after localhost deliberate)
+  echo "# Execute ansible site.yml ${ansible_args} $ansible_group_vars ..."
+  ansible-playbook site.yml ${ansible_args} $ansible_group_vars \
+   --connection=local \
+   --inventory localhost, \
+   --extra-vars "ansible_python_interpreter=$python" \
+   --extra-vars "target=localhost" \
+   --become
+
+  echo "# Cleanup"
+  deactivate
+  rm -rf $ansible_dir/python-venv
+  rm -rf $ansible_dir/modernisation-platform-configuration-management
+  rmdir $ansible_dir
+}
+
+echo "ansible-ec2provision.sh start" | logger -p local3.info -t user-data
+run_ansible 2>&1 | logger -p local3.info -t user-data
+echo "ansible-ec2provision.sh end" | logger -p local3.info -t user-data

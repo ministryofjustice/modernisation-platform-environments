@@ -1,0 +1,61 @@
+{
+  "accounts": {
+    "development": {
+      "ec2_oem_ami_id_app": "ami-05c1d7b2770fe7bc0",
+      "ec2_oem_ami_id_db": "ami-02a203da06f8e6bf8",
+      "ec2_oem_ami_id_wl": "",
+      "ec2_oem_instance_type_app": "m5.xlarge",
+      "ec2_oem_instance_type_db": "c5.2xlarge",
+      "ec2_oem_instance_type_wl": "m5.xlarge",
+      "ec2_oem_key_name_app": "oem-ec2-key-development",
+      "ec2_oem_key_name_db": "oem-ec2-key-development",
+      "ec2_oem_key_name_wl": "",
+      "ec2_zone": "eu-west-2a",
+      "env_in_fqdn": "dev",
+      "key_name": "oem-ec2-key-development"
+    },
+    "test": {
+      "ec2_oem_ami_id_app": "ami-00a433d5bdf0bd23b",
+      "ec2_oem_ami_id_db": "ami-0383b69679d229ff9",
+      "ec2_oem_ami_id_wl": "",
+      "ec2_oem_instance_type_app": "m5.xlarge",
+      "ec2_oem_instance_type_db": "c5.2xlarge",
+      "ec2_oem_instance_type_wl": "m5.xlarge",
+      "ec2_oem_key_name_app": "oem-ec2-key-app-test",
+      "ec2_oem_key_name_db": "oem-ec2-key-db-test",
+      "ec2_oem_key_name_wl": "oem-ec2-key-wl-test",
+      "ec2_zone": "eu-west-2a",
+      "env_in_fqdn": "test",
+      "key_name": "oem-ec2-key-test"
+    },
+    "preproduction": {
+      "ec2_oem_ami_id_app": "ami-0dc9e412061b87365",
+      "ec2_oem_ami_id_db": "ami-00ee36632a2a3e413",
+      "ec2_oem_ami_id_wl": "",
+      "ec2_oem_instance_type_app": "m5.xlarge",
+      "ec2_oem_instance_type_db": "c5.2xlarge",
+      "ec2_oem_instance_type_wl": "m5.xlarge",
+      "ec2_oem_key_name_app": "oem-ec2-key-app-preproduction",
+      "ec2_oem_key_name_db": "oem-ec2-key-db-preproduction",
+      "ec2_oem_key_name_wl": "oem-ec2-key-wl-preproduction",
+      "ec2_zone": "eu-west-2a",
+      "env_in_fqdn": "preprod",
+      "key_name": "oem-ec2-key-preproduction"
+    },
+    "production": {
+      "ec2_oem_ami_id_app": "ami-0dc9e412061b87365",
+      "ec2_oem_ami_id_db": "ami-00ee36632a2a3e413",
+      "ec2_oem_ami_id_wl": "",
+      "ec2_oem_instance_type_app": "m5.xlarge",
+      "ec2_oem_instance_type_db": "c5.2xlarge",
+      "ec2_oem_instance_type_wl": "m5.xlarge",
+      "ec2_oem_key_name_app": "oem-ec2-key-app-production",
+      "ec2_oem_key_name_db": "oem-ec2-key-db-production",
+      "ec2_oem_key_name_wl": "",
+      "ec2_zone": "eu-west-2a",
+      "ec2_zone": "eu-west-2a",
+      "env_in_fqdn": "prod",
+      "key_name": "oem-ec2-key-production"
+    }
+  }
+}

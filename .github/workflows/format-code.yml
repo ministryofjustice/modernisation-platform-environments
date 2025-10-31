@@ -1,0 +1,43 @@
+name: 'Format Code: ensure code formatting guidelines are met'
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: 45 4 * * 1
+
+permissions: read-all
+
+jobs:
+  format-code:
+    permissions:
+      contents: write
+      pull-requests: write
+      security-events: write  # needed for SARIF upload
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          fetch-depth: 0
+      - name: Prepare Git options
+        run: bash ./scripts/git-setup.sh
+
+      - name: Run Format Code Action
+        uses: ministryofjustice/modernisation-platform-github-actions/format-code@4eceb2a416a197e91dc557c2ef0b5dd9afe29e0c # v3.4.6
+        with:
+          APPLY_FIXES: all # When active, APPLY_FIXES must also be defined as environment variable (in github/workflows/mega-linter.yml or other CI tool)
+          APPLY_FIXES_EVENT: all # Decide which event triggers application of fixes in a commit or a PR (pull_request, push, all)
+          APPLY_FIXES_MODE: pull_request # If APPLY_FIXES is used, defines if the fixes are directly committed (commit) or posted in a PR (pull_request)
+          DISABLE_ERRORS: true
+          EMAIL_REPORTER: false
+          ENABLE_LINTERS: JSON_PRETTIER,YAML_PRETTIER,TERRAFORM_TERRAFORM_FMT,MARKDOWN_MARKDOWNLINT
+          VALIDATE_ALL_CODEBASE: true
+          YAML_PRETTIER_FILTER_REGEX_EXCLUDE: (.github/*)
+          REPORT_OUTPUT_FOLDER: none
+
+      - name: Run Signed Commit Action
+        uses: ministryofjustice/modernisation-platform-github-actions/signed-commit@4eceb2a416a197e91dc557c2ef0b5dd9afe29e0c # v3.4.6
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          pr_title: "GitHub Actions Code Formatter workflow"
+          pr_body: "This pull request includes updates from the GitHub Actions Code Formatter workflow. Please review the changes and merge if everything looks good."

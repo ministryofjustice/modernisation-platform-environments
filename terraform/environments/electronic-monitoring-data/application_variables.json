@@ -1,0 +1,88 @@
+{
+  "accounts": {
+    "development": {
+      "example_var": "dev-data",
+      "enable_dbt_k8s_secrets": true,
+      "analytical_platform_share": [
+        {
+          "target_account_name": "electronic-monitoring-data-development",
+          "target_account_id": "800964199911",
+          "assume_account_name": "electronic-monitoring-data-development",
+          "assume_account_id": "800964199911",
+          "data_locations": [
+            "emds-dev-dms-data-validation-20240917144028498200000007"
+          ],
+          "resource_shares": [
+            {
+              "glue_database": "dms_data_validation",
+              "glue_tables": ["*"]
+            }
+          ]
+        }
+      ],
+      "enable_airflow_secret": true
+    },
+    "test": {
+      "example_var": "test-data",
+      "enable_dbt_k8s_secrets": true,
+      "analytical_platform_share": [
+        {
+          "target_account_name": "analytical-platform-data-production",
+          "target_account_id": "593291632749",
+          "assume_account_name": "analytical-platform-management-production",
+          "assume_account_id": "042130406152",
+          "data_locations": ["emds-test-bucket-name"],
+          "resource_shares": [
+            {
+              "glue_database": "staged_fms_test_dbt",
+              "glue_tables": ["*"]
+            }
+          ]
+        }
+      ],
+      "enable_airflow_secret": true
+    },
+    "preproduction": {
+      "example_var": "preproduction-data",
+      "enable_dbt_k8s_secrets": true,
+      "enable_airflow_secret": true,
+      "analytical_platform_share": [
+        {
+          "target_account_name": "analytical-platform-data-production",
+          "target_account_id": "593291632749",
+          "assume_account_name": "analytical-platform-management-production",
+          "assume_account_id": "042130406152",
+          "data_locations": [
+            "emds-dev-dms-data-validation-20240917144028498200000007"
+          ],
+          "resource_shares": [
+            {
+              "glue_database": "dms_data_validation",
+              "glue_tables": ["*"]
+            }
+          ]
+        }
+      ]
+    },
+    "production": {
+      "example_var": "production-data",
+      "enable_dbt_k8s_secrets": true,
+      "analytical_platform_share": [
+        {
+          "target_account_name": "analytical-platform-data-production",
+          "target_account_id": "593291632749",
+          "assume_account_name": "analytical-platform-management-production",
+          "assume_account_id": "042130406152",
+          "data_locations": ["emds-prod-bucket-name"],
+          "resource_shares": [
+            {
+              "glue_database": "capita_alcohol_monitoring",
+              "glue_tables": ["*"]
+            }
+          ]
+        }
+      ],
+      "enable_airflow_secret": true
+    }
+  }
+}

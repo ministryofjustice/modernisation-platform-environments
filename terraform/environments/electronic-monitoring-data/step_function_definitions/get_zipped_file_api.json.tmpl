@@ -1,0 +1,42 @@
+{
+  "Comment": "A Step Function state machine that retrieves a file from a zip store, and posts a presigned url to download from.",
+  "StartAt": "GetZipFile",
+  "States": {
+    "GetZipFile": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "OutputPath": "$.Payload",
+      "Parameters": {
+        "Payload.$": "$",
+        "FunctionName": "${unzip_file_name}"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": ["States.TaskFailed", "Lambda.ServiceException", "Lambda.AWSLambdaException", "Lambda.SdkClientException"],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 3,
+          "BackoffRate": 2.0
+        }
+      ],
+      "Next": "CreatePreSignedUrl"
+    },
+    "CreatePreSignedUrl": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "OutputPath": "$.Payload",
+      "Parameters": {
+        "Payload.$": "$",
+        "FunctionName": "${pre_signed_url_lambda_name}"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": ["States.TaskFailed", "Lambda.ServiceException", "Lambda.AWSLambdaException", "Lambda.SdkClientException"],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 3,
+          "BackoffRate": 2.0
+        }
+      ],
+      "End": true
+    }
+  }
+}

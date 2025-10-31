@@ -1,0 +1,15 @@
+# ssm-document-system-update.yaml
+---
+schemaVersion: "2.2"
+description: Run 'yum -y update'.
+mainSteps:
+  - name: YumUpdate
+    action: aws:runShellScript
+    isEnd: true
+    precondition:
+      StringEquals:
+        - platformType
+        - Linux
+    inputs:
+      runCommand:
+        - "yum -y update"

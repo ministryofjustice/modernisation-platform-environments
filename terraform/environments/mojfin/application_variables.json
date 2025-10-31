@@ -1,0 +1,39 @@
+{
+  "accounts": {
+    "development": {
+      "landing_zone_vpc_cidr": "10.202.0.0/20",
+      "analytic_platform_cidr": "10.200.0.0/16",
+      "cp_vpc_cidr": "172.20.0.0/16",
+      "london_workspace_cidr": "10.200.0.0/20",
+      "mojfinrdssnapshotid": "mojfin-04jul20231459-finalsnapshot",
+      "deletion_protection": "false",
+      "pagerduty_integration_key_name": "laa_mojfin_non_prod_alarms",
+      "allocated_storage_size": "2500",
+      "max_allocated_storage_size": "3500"
+    },
+    "test": {
+      "landing_zone_vpc_cidr": "test-data",
+      "pagerduty_integration_key_name": "laa_mojfin_non_prod_alarms"
+    },
+    "preproduction": {
+      "landing_zone_vpc_cidr": "10.204.0.0/20",
+      "pagerduty_integration_key_name": "laa_mojfin_non_prod_alarms",
+      "analytic_platform_cidr": "10.201.0.0/16",
+      "cp_vpc_cidr": "172.20.0.0/16",
+      "london_workspace_cidr": "10.200.16.0/20",
+      "deletion_protection": "true",
+      "allocated_storage_size": "4000",
+      "max_allocated_storage_size": "4500"
+    },
+    "production": {
+      "landing_zone_vpc_cidr": "10.205.0.0/20",
+      "analytic_platform_cidr": "10.201.0.0/16",
+      "cp_vpc_cidr": "172.20.0.0/16",
+      "london_workspace_cidr": "10.200.16.0/20",
+      "deletion_protection": "true",
+      "pagerduty_integration_key_name": "laa_mojfin_prod_alarms",
+      "allocated_storage_size": "5000",
+      "max_allocated_storage_size": "6000"
+    }
+  }
+}

@@ -1,0 +1,31 @@
+# This file is auto-generated, do not manually amend.
+# https://github.com/ministryofjustice/modernisation-platform-environments/blob/main/scripts/generate-dependabot-file.sh
+
+
+version: 2
+
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 50
+  - package-ecosystem: "devcontainers"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 50
+    reviewers:
+      - "ministryofjustice/devcontainer-community"
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/**/*"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 150
+  - package-ecosystem: "gomod"
+    directories:
+      - "scripts/**/*"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 50

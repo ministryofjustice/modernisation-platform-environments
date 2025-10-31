@@ -1,0 +1,12 @@
+{
+  "keys": {
+    "development": {},
+    "test": {},
+    "stage": {
+      "snorris": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFNDVP6ERDzZNXUtrx3CRgpS//bnm7U4iOCCmbJ95J+e sebastian.norris@digital.justice.gov.uk"
+    },
+    "preproduction": {
+      "snorris": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFNDVP6ERDzZNXUtrx3CRgpS//bnm7U4iOCCmbJ95J+e sebastian.norris@digital.justice.gov.uk"
+    }
+  }
+}

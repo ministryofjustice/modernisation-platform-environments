@@ -1,0 +1,2 @@
+skip-check:
+  - CKV_AWS_189 # skip "Ensure EBS Volume is encrypted by KMS using a customer managed Key (CMK)". This is low severity, volumes are encrypted with default aws/ebs key.  CMK would allow more granular control that we probably don't need.

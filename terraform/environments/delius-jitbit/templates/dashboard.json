@@ -1,0 +1,438 @@
+{
+  "widgets": [
+    {
+      "height": 6,
+      "width": 12,
+      "y": 1,
+      "x": 0,
+      "type": "metric",
+      "properties": {
+        "metrics": [
+          [
+            "ECS/ContainerInsights",
+            "CpuUtilized",
+            "ServiceName",
+            "hmpps-${environment}-${app_name}",
+            "ClusterName",
+            "hmpps-${environment}-${app_name}",
+            { "label": "delius-jitbit-service" }
+          ],
+          [".", ".", "ClusterName", ".", { "label": "delius-jitbit-cluster" }]
+        ],
+        "view": "timeSeries",
+        "stacked": true,
+        "region": "eu-west-2",
+        "title": "CPU Utilization",
+        "stat": "Average",
+        "period": 300
+      }
+    },
+    {
+      "height": 6,
+      "width": 12,
+      "y": 1,
+      "x": 12,
+      "type": "metric",
+      "properties": {
+        "metrics": [
+          [
+            "ECS/ContainerInsights",
+            "MemoryUtilized",
+            "ServiceName",
+            "hmpps-${environment}-${app_name}",
+            "ClusterName",
+            "hmpps-${environment}-${app_name}",
+            { "label": "delius-jitbit-service" }
+          ],
+          [".", ".", "ClusterName", ".", { "label": "delius-jitbit-cluster" }]
+        ],
+        "view": "timeSeries",
+        "stacked": true,
+        "region": "eu-west-2",
+        "title": "Memory Utilization",
+        "stat": "Average",
+        "period": 300
+      }
+    },
+    {
+      "height": 6,
+      "width": 12,
+      "y": 7,
+      "x": 0,
+      "type": "metric",
+      "properties": {
+        "metrics": [["JitbitMetrics", "ErrorCount", { "color": "#d62728" }]],
+        "view": "timeSeries",
+        "stacked": true,
+        "region": "eu-west-2",
+        "stat": "Average",
+        "period": 300,
+        "title": "Jitbit Application Errors"
+      }
+    },
+    {
+      "height": 6,
+      "width": 12,
+      "y": 7,
+      "x": 12,
+      "type": "log",
+      "properties": {
+        "query": "SOURCE '${app_log_group_name}' | fields @timestamp, @message, @logStream, @log\n| filter @message like /Error in Helpdesk/\n| sort @timestamp desc\n| limit 20",
+        "region": "eu-west-2",
+        "stacked": false,
+        "view": "table",
+        "title": "Jitbit Error Logs"
+      }
+    },
+    {
+      "height": 1,
+      "width": 24,
+      "y": 0,
+      "x": 0,
+      "type": "text",
+      "properties": {
+        "markdown": "App Metrics"
+      }
+    },
+    {
+      "height": 1,
+      "width": 24,
+      "y": 13,
+      "x": 0,
+      "type": "text",
+      "properties": {
+        "markdown": "LB Metrics"
+      }
+    },
+    {
+      "height": 6,
+      "width": 8,
+      "y": 14,
+      "x": 16,
+      "type": "metric",
+      "properties": {
+        "view": "timeSeries",
+        "stacked": true,
+        "metrics": [
+          [
+            "AWS/ApplicationELB",
+            "HealthyHostCount",
+            "TargetGroup",
+            "${target_group_arn}",
+            "LoadBalancer",
+            "${load_balancer_arn}"
+          ]
+        ],
+        "region": "eu-west-2"
+      }
+    },
+    {
+      "height": 1,
+      "width": 24,
+      "y": 20,
+      "x": 0,
+      "type": "text",
+      "properties": {
+        "markdown": "RDS Metrics"
+      }
+    },
+    {
+      "height": 6,
+      "width": 6,
+      "y": 21,
+      "x": 0,
+      "type": "metric",
+      "properties": {
+        "view": "timeSeries",
+        "stacked": false,
+        "metrics": [
+          [
+            "AWS/RDS",
+            "ReadIOPS",
+            "DBInstanceIdentifier",
+            "${app_name}-${environment}-database"
+          ],
+          [".", "WriteIOPS", ".", "."]
+        ],
+        "region": "eu-west-2",
+        "title": "IOPS"
+      }
+    },
+    {
+      "height": 6,
+      "width": 6,
+      "y": 21,
+      "x": 6,
+      "type": "metric",
+      "properties": {
+        "view": "timeSeries",
+        "stacked": false,
+        "metrics": [
+          [
+            "AWS/RDS",
+            "CPUUtilization",
+            "DBInstanceIdentifier",
+            "${app_name}-${environment}-database"
+          ]
+        ],
+        "region": "eu-west-2",
+        "title": "CPU Utilization"
+      }
+    },
+    {
+      "height": 6,
+      "width": 6,
+      "y": 21,
+      "x": 12,
+      "type": "metric",
+      "properties": {
+        "view": "timeSeries",
+        "stacked": false,
+        "metrics": [
+          [
+            "AWS/RDS",
+            "FreeStorageSpace",
+            "DBInstanceIdentifier",
+            "${app_name}-${environment}-database"
+          ]
+        ],
+        "region": "eu-west-2",
+        "title": "Free Storage Space"
+      }
+    },
+    {
+      "height": 6,
+      "width": 6,
+      "y": 21,
+      "x": 18,
+      "type": "metric",
+      "properties": {
+        "view": "timeSeries",
+        "stacked": true,
+        "metrics": [
+          [
+            "AWS/RDS",
+            "DatabaseConnections",
+            "DBInstanceIdentifier",
+            "${app_name}-${environment}-database"
+          ]
+        ],
+        "region": "eu-west-2",
+        "title": "DB Connections"
+      }
+    },
+    {
+      "height": 6,
+      "width": 6,
+      "y": 27,
+      "x": 0,
+      "type": "metric",
+      "properties": {
+        "view": "timeSeries",
+        "stacked": true,
+        "metrics": [
+          [
+            "AWS/RDS",
+            "ReadLatency",
+            "DBInstanceIdentifier",
+            "${app_name}-${environment}-database"
+          ],
+          [".", "WriteLatency", ".", "."]
+        ],
+        "region": "eu-west-2",
+        "title": "Latency"
+      }
+    },
+    {
+      "height": 6,
+      "width": 6,
+      "y": 27,
+      "x": 6,
+      "type": "metric",
+      "properties": {
+        "view": "timeSeries",
+        "stacked": true,
+        "metrics": [
+          [
+            "AWS/RDS",
+            "NetworkTransmitThroughput",
+            "DBInstanceIdentifier",
+            "${app_name}-${environment}-database"
+          ],
+          [".", "NetworkReceiveThroughput", ".", "."]
+        ],
+        "region": "eu-west-2",
+        "title": "Network Throughput"
+      }
+    },
+    {
+      "height": 6,
+      "width": 6,
+      "y": 27,
+      "x": 12,
+      "type": "metric",
+      "properties": {
+        "view": "timeSeries",
+        "stacked": false,
+        "metrics": [
+          [
+            "AWS/RDS",
+            "FreeableMemory",
+            "DBInstanceIdentifier",
+            "${app_name}-${environment}-database"
+          ]
+        ],
+        "region": "eu-west-2"
+      }
+    },
+    {
+      "height": 6,
+      "width": 6,
+      "y": 27,
+      "x": 18,
+      "type": "metric",
+      "properties": {
+        "metrics": [
+          [
+            "AWS/RDS",
+            "DiskQueueDepth",
+            "DBInstanceIdentifier",
+            "${app_name}-${environment}-database",
+            { "color": "#9467bd" }
+          ]
+        ],
+        "view": "timeSeries",
+        "stacked": false,
+        "region": "eu-west-2",
+        "stat": "Average",
+        "period": 300
+      }
+    },
+    {
+      "height": 6,
+      "width": 8,
+      "y": 14,
+      "x": 0,
+      "type": "metric",
+      "properties": {
+        "view": "timeSeries",
+        "stacked": false,
+        "metrics": [
+          [
+            "AWS/ApplicationELB",
+            "HTTPCode_Target_4XX_Count",
+            "LoadBalancer",
+            "${load_balancer_arn}"
+          ]
+        ],
+        "region": "eu-west-2"
+      }
+    },
+    {
+      "height": 6,
+      "width": 8,
+      "y": 14,
+      "x": 8,
+      "type": "metric",
+      "properties": {
+        "view": "timeSeries",
+        "stacked": false,
+        "metrics": [
+          [
+            "AWS/ApplicationELB",
+            "TargetResponseTime",
+            "LoadBalancer",
+            "${load_balancer_arn}"
+          ]
+        ],
+        "region": "eu-west-2"
+      }
+    },
+    {
+      "type": "log",
+      "x": 0,
+      "y": 33,
+      "width": 24,
+      "height": 6,
+      "properties": {
+        "query": "SOURCE 'delius-jitbit-ecs' | fields @timestamp, @message, @logStream\n| sort @timestamp desc\n| filter @message like /useless/\n| limit 1000",
+        "region": "eu-west-2",
+        "stacked": false,
+        "title": "Log group: delius-jitbit-ecs",
+        "view": "table"
+      }
+    },
+    {
+      "type": "log",
+      "x": 0,
+      "y": 37,
+      "width": 12,
+      "height": 5,
+      "properties": {
+        "query": "SOURCE 'delius-jitbit-ses-logs' | fields @timestamp, @message\n| sort @timestamp desc\n| filter @message like /bounce/\n| limit 1000",
+        "region": "eu-west-2",
+        "stacked": false,
+        "title": "Bounced Emails",
+        "view": "table"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 34,
+      "width": 12,
+      "height": 3,
+      "properties": {
+        "metrics": [
+          [
+            "AWS/SES",
+            "Send",
+            { "id": "m1", "label": "Sent", "region": "eu-west-2" }
+          ],
+          [".", "Bounce", { "region": "eu-west-2" }],
+          [".", "Delivery", { "region": "eu-west-2" }]
+        ],
+        "sparkline": false,
+        "view": "singleValue",
+        "region": "eu-west-2",
+        "stat": "Sum",
+        "period": 86400,
+        "setPeriodToTimeRange": true,
+        "trend": false,
+        "liveData": true,
+        "title": "SES: Totals"
+      }
+    },
+    {
+      "height": 1,
+      "width": 24,
+      "y": 33,
+      "x": 0,
+      "type": "text",
+      "properties": {
+        "markdown": "Email"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 12,
+      "y": 34,
+      "width": 12,
+      "height": 8,
+      "properties": {
+        "metrics": [
+          ["AWS/SES", "Send", { "label": "Sent", "region": "eu-west-2" }],
+          [".", "Delivery", { "region": "eu-west-2" }],
+          [".", "Bounce", { "region": "eu-west-2" }]
+        ],
+        "view": "timeSeries",
+        "stacked": false,
+        "region": "eu-west-2",
+        "period": 900,
+        "stat": "Sum",
+        "liveData": true,
+        "title": "SES"
+      }
+    }
+  ]
+}

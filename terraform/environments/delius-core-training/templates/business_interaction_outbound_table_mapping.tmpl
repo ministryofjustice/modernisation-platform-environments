@@ -1,0 +1,33 @@
+{
+    "rules": [
+        {
+            "rule-type": "selection",
+            "rule-id": "10",
+            "rule-name": "select_business_interactions",
+            "object-locator": {
+                "schema-name": "DELIUS_APP_SCHEMA",
+                "table-name": "BUSINESS_INTERACTION"
+            },
+            "rule-action": "include"
+        },
+        {
+            "rule-type": "transformation",
+            "rule-id": "11",
+            "rule-name": "add_business_interaction_client_db",
+            "rule-target": "column",
+            "object-locator": {
+                "schema-name": "DELIUS_APP_SCHEMA",
+                "table-name": "BUSINESS_INTERACTION"
+            },
+            "rule-action": "add-column",
+            "value": "CLIENT_DB",
+            "expression": "'${client_database}'",
+            "old-value": null,
+            "data-type": {
+                "type": "string",
+                "length": "20",
+                "scale": ""
+            }
+        }
+    ]
+}

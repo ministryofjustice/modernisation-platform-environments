@@ -1,0 +1,30 @@
+---
+schemaVersion: "2.2"
+description: "SSM Document for joining Windows EC2 instances to the AZURE\ or HMPP\ domain. Moving Computers to a different OU must be done manually on the relevant domain controller."
+parameters:
+  newHostname:
+    type: "String"
+    description: "By default uses the Name tag. Otherwise set to keep-existing or the desired hostname 15 chars or less"
+    default: "tag:Name"
+    maxChars: 15
+mainSteps:
+  - name: WindowsDomainJoin
+    action: aws:runPowerShellScript
+    precondition:
+      StringEquals:
+        - platformType
+        - Windows
+    inputs:
+      runCommand:
+        - |
+          $ErrorActionPreference = "Stop" # all errors will terminate the script
+          $NewHostname = "{{newHostname}}"
+
+          Set-Location -Path ([System.IO.Path]::GetTempPath())
+          $GitBranch = "main"
+          $Script = "ModPlatformAD/Join-ModPlatformAD.ps1"
+          $ScriptArgs = @{"NewHostname" = $NewHostname}
+          [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 # since powershell 4 uses Tls1 as default
+          Invoke-WebRequest "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform-configuration-management/${GitBranch}/powershell/Scripts/Run-GitScript.ps1" -OutFile "Run-GitScript.ps1"
+          . ./Run-GitScript.ps1 -Script $Script -ScriptArgs $ScriptArgs -GitBranch $GitBranch
+          Exit $LASTEXITCODE

@@ -1,0 +1,77 @@
+---
+schemaVersion: "2.2"
+description: "Powershell doc for MGN-replicated Azure VMs." 
+mainSteps:
+  - name: newHostName
+    action: aws:runPowerShellScript
+    onFailure: Abort
+    inputs:
+      runCommand: 
+      - |  
+        $currentHostName = hostname
+        if ($currentHostName -like '*t*') { 
+          Write-Output $currentHostName 
+          $newHostName = $currentHostName -replace 't', ''
+          Rename-Computer -NewName $newHostname -Force
+          exit 3010
+          Write-Host "INFO: Hostname has been succesfully changed to $newHostname"
+        } else {
+          Write-Host "Hostname looks good, continue"
+        }
+        hostname
+
+  - name: activeDirectoryModulePresent
+    action: aws:runPowerShellScript
+    inputs: 
+      runCommand:
+        - |
+          $module = Get-Module -ListAvailable -Name ActiveDirectory
+          if (-not $module) {
+            Write-Host "Active Directory module is not installed, installing now..."
+            Install-WindowsFeature -Name "RSAT-AD-PowerShell" -IncludeAllSubFeature
+          } else {
+            Write-Host "Active Directory module is already installed." 
+          }
+
+  - name: getRootVolumeSpace
+    action: aws:runPowerShellScript
+    maxAttempts: 1
+    inputs:
+      runCommand:
+        - |
+          $rootVolume = Get-WmiObject -Query "SELECT * FROM Win32_LogicalDisk WHERE DeviceID = 'C:'"
+          $availableSpaceGB = [math]::Round(($rootVolume.FreeSpace / 1GB), 4)
+          $totalSpaceGB = [math]::Round(($rootVolume.Size / 1GB), 4) # good 
+          $availablePercentage = [math]::Round((($availableSpaceGB / $totalSpaceGB) * 100), 4)
+
+          Write-Output "Available space on the C drive is $availableSpaceGB GB, which is $availablePercentage% % of the total space"
+          
+          if ($availablePercentage -lt 25) {
+            Write-Output "Available disk space is less than 25 %; stopping AMI build."
+            Exit 1
+          } else {
+            Write-Output "Available disk space is more than 25 %; Continuing with AMI build"
+          }
+
+  - name: uninstallAwsDiscoveryAgent
+    action: aws:runPowerShellScript 
+    inputs:
+      runCommand:
+        - |
+          $output = Try {
+            Stop-Service -Name 'AWSDiscoveryService'-ErrorAction Stop 
+          } Catch {
+            $errorOutput = $_.Exception.Message
+          }
+          if ($errorOutput -eq "Cannot find any service with service name 'AWSDiscoveryService'.") {
+            Write-Host "No Discovery Agent installed"
+          } else {
+            cmd.exe /c "wmic product where name='AWS Discovery Agent' call uninstall"
+          }
+
+  - name: InstallEC2LaunchV2
+    action: aws:configurePackage
+    onFailure: Abort
+    inputs: 
+      name: AWSEC2Launch-Agent
+      action: Install

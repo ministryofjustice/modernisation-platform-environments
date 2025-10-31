@@ -1,0 +1,7 @@
+{
+  "accounts": {
+    "sandbox": {
+      "example_var": "dev-data"
+    }
+  }
+}

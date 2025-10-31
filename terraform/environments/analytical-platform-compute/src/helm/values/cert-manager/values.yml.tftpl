@@ -1,0 +1,10 @@
+---
+installCRDs: true
+
+serviceAccount:
+  annotations:
+    eks.amazonaws.com/role-arn: ${eks_role_arn}
+
+prometheus:
+  servicemonitor:
+    enabled: true

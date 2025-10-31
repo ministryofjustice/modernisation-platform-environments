@@ -1,0 +1,61 @@
+{
+  "accounts": {
+    "development": {
+      "db_instance_class": "db.t3.2xlarge",
+      "db_user": "dbadmin",
+      "db_allocated_storage": "100",
+      "db_name": "chaps-dev",
+      "env_name": "DEVELOPMENT",
+      "db_instance_identifier": "db-chaps-dev",
+      "db_snapshot_identifier": "arn:aws:rds:eu-west-2:613903586696:snapshot:cdpt-dev-staging-2024-jan-24",
+      "environment_name": "development",
+      "app_count": 1,
+      "ec2_desired_capacity": 1,
+      "ec2_max_size": 2,
+      "ec2_min_size": 1,
+      "instance_type": "t3.xlarge",
+      "container_port": 80,
+      "dotnet_client_id": "37156e23-43dd-4325-ae36-f998ce4c32ff",
+      "TenantId": "c6874728-71e6-41fe-a9e1-2e8c36776ad8",
+      "CallbackPath": "/signin-oidc"
+    },
+    "preproduction": {
+      "db_instance_class": "db.t3.2xlarge",
+      "db_user": "dbadmin",
+      "db_allocated_storage": "100",
+      "db_name": "chaps-staging",
+      "env_name": "STAGING",
+      "db_instance_identifier": "chaps-preprod-instance",
+      "db_snapshot_identifier": "arn:aws:rds:eu-west-2:613903586696:snapshot:cdpt-dev-staging-2024-jan-24",
+      "environment_name": "staging",
+      "app_count": 2,
+      "ec2_desired_capacity": 3,
+      "ec2_max_size": 3,
+      "ec2_min_size": 3,
+      "instance_type": "m5.xlarge",
+      "container_port": 80,
+      "dotnet_client_id": "efdcd721-93a1-46c1-b0da-29532763b12d",
+      "TenantId": "c6874728-71e6-41fe-a9e1-2e8c36776ad8",
+      "CallbackPath": "/signin-oidc"
+    },
+    "production": {
+      "db_instance_class": "db.t3.2xlarge",
+      "db_user": "dbadmin",
+      "db_allocated_storage": "100",
+      "db_name": "CHAPS_Prod",
+      "env_name": "PRODUCTION",
+      "db_instance_identifier": "chaps-prod-instance",
+      "db_snapshot_identifier": "arn:aws:rds:eu-west-2:613903586696:snapshot:chaps-prod-20-02-2024",
+      "environment_name": "production",
+      "app_count": 2,
+      "ec2_desired_capacity": 3,
+      "ec2_max_size": 3,
+      "ec2_min_size": 3,
+      "instance_type": "m5.xlarge",
+      "container_port": 80,
+      "dotnet_client_id": "7361e073-5dc6-43a2-80fb-6cbb742166bb",
+      "TenantId": "c6874728-71e6-41fe-a9e1-2e8c36776ad8",
+      "CallbackPath": "/signin-oidc"
+    }
+  }
+}

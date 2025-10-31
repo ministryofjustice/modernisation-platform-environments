@@ -1,0 +1,16 @@
+{
+  "keys": {
+    "development": {
+      "acurtis": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIP7Z+QprFiensJ1Kw08i9shm5lfritcI3/71nrDu2S3H alistair.curtis@digital.justice.gov.uk",
+      "fshafaatmoj": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILld2dm07e0cxdw6CZoF9S8fSBwxq03n6C2HAU+dRkQ1 fawaz.shafaat@MJ004238"
+    },
+    "preproduction": {
+      "acurtis": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIP7Z+QprFiensJ1Kw08i9shm5lfritcI3/71nrDu2S3H alistair.curtis@digital.justice.gov.uk",
+      "fshafaatmoj": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILld2dm07e0cxdw6CZoF9S8fSBwxq03n6C2HAU+dRkQ1 fawaz.shafaat@MJ004238"
+    },
+    "production": {
+      "acurtis": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIP7Z+QprFiensJ1Kw08i9shm5lfritcI3/71nrDu2S3H alistair.curtis@digital.justice.gov.uk",
+      "fshafaatmoj": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILld2dm07e0cxdw6CZoF9S8fSBwxq03n6C2HAU+dRkQ1 fawaz.shafaat@MJ004238"
+    }
+  }
+}

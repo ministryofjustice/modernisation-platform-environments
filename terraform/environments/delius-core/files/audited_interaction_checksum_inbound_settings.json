@@ -1,0 +1,37 @@
+{
+  "TargetMetadata": {
+    "TargetSchema": "DELIUS_AUDIT_DMS_POOL",
+    "SupportLobs": false,
+    "BatchApplyEnabled": true,
+    "TaskRecoveryTableEnabled": false
+  },
+  "FullLoadSettings": {
+    "TargetTablePrepMode": "DO_NOTHING",
+    "CreatePkAfterFullLoad": false,
+    "StopTaskCachedChangesApplied": false,
+    "StopTaskCachedChangesNotApplied": false,
+    "MaxFullLoadSubTasks": 8,
+    "TransactionConsistencyTimeout": 600,
+    "CommitRate": 10000
+  },
+  "ControlTablesSettings": {
+    "ControlSchema": "DELIUS_AUDIT_DMS_POOL"
+  },
+  "ErrorBehavior": {
+    "RecoverableErrorThrottlingMax": 1800,
+    "RecoverableErrorStopRetryAfterThrottlingMax": false
+  },
+  "Logging": {
+    "EnableLogging": true,
+    "LogComponents": [
+      {
+        "Id": "SOURCE_UNLOAD",
+        "Severity": "LOGGER_SEVERITY_DEFAULT"
+      },
+      {
+        "Id": "TARGET_LOAD",
+        "Severity": "LOGGER_SEVERITY_DEFAULT"
+      }
+    ]
+  }
+}

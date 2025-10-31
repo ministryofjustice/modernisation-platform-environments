@@ -1,0 +1,22 @@
+
+SET enable_case_sensitive_identifier TO true;
+
+/* RQEV2-TQbA5s8osP */
+SET enable_case_sensitive_identifier TO true;
+create materialized view stg.return_part_kpi_data
+distkey
+    (kpi_name) DISTSTYLE KEY
+sortkey
+    (return_id DESC) 
+as
+SELECT
+    id,
+    return_id,
+    kpi_name,
+    json_parse(kpi_data) as kpi_data
+FROM
+    "yjb_returns"."yjb_case_reporting_stg"."return_kpi_json";
+
+alter table stg.return_part_kpi_data owner to "IAMR:admin";
+grant select on table stg.return_part_kpi_data to "IAMR:redshift-serverless-yjb-reporting-moj_ap";
+

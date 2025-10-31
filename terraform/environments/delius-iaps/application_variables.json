@@ -1,0 +1,273 @@
+{
+  "accounts": {
+    "development": {
+      "short_environment_name": "dev",
+      "db_engine_version": "19.0.0.0.ru-2024-04.rur-2024-04.r1",
+      "db_auto_minor_version_upgrade": "false",
+      "db_allow_major_version_upgrade": "false",
+      "db_apply_immediately": "true",
+      "db_backup_window": "03:00-06:00",
+      "db_backup_retention_period": "7",
+      "db_maintenance_window": "mon:00:00-mon:03:00",
+      "db_instance_class": "db.t3.small",
+      "db_user": "iaps",
+      "db_allocated_storage": "500",
+      "db_max_allocated_storage": "0",
+      "db_multi_az": "false",
+      "db_iam_database_authentication_enabled": "false",
+      "db_monitoring_interval": "5",
+      "db_enabled_cloudwatch_logs_exports": ["alert", "listener"],
+      "db_performance_insights_enabled": "false",
+      "db_skip_final_snapshot": "true",
+      "ec2_iaps_instance_type": "t3.medium",
+      "cloudwatch_agent_log_group_retention_period": "7",
+      "iaps_ndelius_interface_url": "placeholder.nd.address",
+      "iaps_im_interface_url": "placeholder.im.address",
+      "iaps_im_db_url": "placeholder.db.address"
+    },
+    "preproduction": {
+      "short_environment_name": "preprod",
+      "db_engine_version": "19.0.0.0.ru-2024-04.rur-2024-04.r1",
+      "db_snapshot_identifier": "iaps-2023-09-19-03-06-refresh",
+      "db_auto_minor_version_upgrade": "false",
+      "db_allow_major_version_upgrade": "false",
+      "db_apply_immediately": "true",
+      "db_backup_window": "03:00-06:00",
+      "db_backup_retention_period": "14",
+      "db_maintenance_window": "mon:00:00-mon:03:00",
+      "db_instance_class": "db.t3.medium",
+      "db_user": "iaps",
+      "db_allocated_storage": "500",
+      "db_max_allocated_storage": "0",
+      "db_multi_az": "false",
+      "db_iam_database_authentication_enabled": "false",
+      "db_monitoring_interval": "5",
+      "db_enabled_cloudwatch_logs_exports": [
+        "trace",
+        "audit",
+        "alert",
+        "listener",
+        "oemagent"
+      ],
+      "db_performance_insights_enabled": "false",
+      "db_skip_final_snapshot": "true",
+      "ec2_iaps_instance_type": "t3.medium",
+      "ec2_iaps_instance_ami_name": "delius_iaps_server_patch_2024-07-04T09-24-39.818Z",
+      "cloudwatch_agent_log_group_retention_period": "365",
+      "iaps_ndelius_interface_url": "interface.stage.probation.service.justice.gov.uk",
+      "iaps_im_interface_url": "preprod-im-data.i2ncloud.com"
+    },
+    "production": {
+      "short_environment_name": "prod",
+      "db_engine_version": "19.0.0.0.ru-2023-04.rur-2023-04.r1",
+      "db_snapshot_identifier": "kms-key-correction",
+      "db_auto_minor_version_upgrade": "false",
+      "db_allow_major_version_upgrade": "false",
+      "db_apply_immediately": "true",
+      "db_backup_window": "03:00-06:00",
+      "db_backup_retention_period": "14",
+      "db_maintenance_window": "mon:00:00-mon:03:00",
+      "db_instance_class": "db.t3.large",
+      "db_user": "iaps",
+      "db_allocated_storage": "500",
+      "db_max_allocated_storage": "0",
+      "db_multi_az": "true",
+      "db_iam_database_authentication_enabled": "false",
+      "db_monitoring_interval": "5",
+      "db_enabled_cloudwatch_logs_exports": [
+        "trace",
+        "audit",
+        "alert",
+        "listener",
+        "oemagent"
+      ],
+      "db_performance_insights_enabled": "false",
+      "db_skip_final_snapshot": "true",
+      "ec2_iaps_instance_type": "t3.large",
+      "ec2_iaps_instance_ami_name": "delius_iaps_server_patch_2023-05-03T08-43-16.039Z",
+      "cloudwatch_agent_log_group_retention_period": "365",
+      "iaps_ndelius_interface_url": "interface.probation.service.justice.gov.uk",
+      "iaps_im_interface_url": "im-data.i2ncloud.com"
+    }
+  },
+  "ec2_iaps_instance_label": "iaps-server",
+  "ec2_iaps_instance_ami_owner": "core-shared-services-production",
+  "ec2_iaps_instance_subnet_name": "private",
+  "iaps_sg_ingress_rules_vpc": {
+    "TCP_80": {
+      "from_port": 80,
+      "to_port": 80,
+      "protocol": "TCP"
+    },
+    "TCP_443": {
+      "from_port": 443,
+      "to_port": 443,
+      "protocol": "TCP"
+    },
+    "TCP_3389": {
+      "from_port": 3389,
+      "to_port": 3389,
+      "protocol": "TCP"
+    }
+  },
+  "iaps_sg_egress_rules_vpc": {
+    "TCP_1521": {
+      "from_port": 1521,
+      "to_port": 1521,
+      "protocol": "TCP"
+    }
+  },
+  "iaps_sg_egress_rules_cidr": {
+    "TCP_80": {
+      "from_port": 80,
+      "to_port": 80,
+      "protocol": "TCP",
+      "destination_cidr": "0.0.0.0/0"
+    },
+    "TCP_443": {
+      "from_port": 443,
+      "to_port": 443,
+      "protocol": "TCP",
+      "destination_cidr": "0.0.0.0/0"
+    }
+  },
+  "iaps_sg_egress_rules_ad": {
+    "TCP_25": {
+      "from_port": 25,
+      "to_port": 25,
+      "protocol": "TCP"
+    },
+    "TCP_53": {
+      "from_port": 53,
+      "to_port": 53,
+      "protocol": "TCP"
+    },
+    "UDP_53": {
+      "from_port": 53,
+      "to_port": 53,
+      "protocol": "UDP"
+    },
+    "UDP_67": {
+      "from_port": 67,
+      "to_port": 67,
+      "protocol": "UDP"
+    },
+    "TCP_88": {
+      "from_port": 88,
+      "to_port": 88,
+      "protocol": "TCP"
+    },
+    "UDP_88": {
+      "from_port": 88,
+      "to_port": 88,
+      "protocol": "UDP"
+    },
+    "UDP_123": {
+      "from_port": 123,
+      "to_port": 123,
+      "protocol": "UDP"
+    },
+    "TCP_135": {
+      "from_port": 135,
+      "to_port": 135,
+      "protocol": "TCP"
+    },
+    "UDP_137-138": {
+      "from_port": 137,
+      "to_port": 138,
+      "protocol": "UDP"
+    },
+    "TCP_139": {
+      "from_port": 139,
+      "to_port": 139,
+      "protocol": "TCP"
+    },
+    "TCP_389": {
+      "from_port": 389,
+      "to_port": 389,
+      "protocol": "TCP"
+    },
+    "UDP_389": {
+      "from_port": 389,
+      "to_port": 389,
+      "protocol": "UDP"
+    },
+    "TCP_445": {
+      "from_port": 445,
+      "to_port": 445,
+      "protocol": "TCP"
+    },
+    "UDP_445": {
+      "from_port": 445,
+      "to_port": 445,
+      "protocol": "UDP"
+    },
+    "TCP_464": {
+      "from_port": 464,
+      "to_port": 464,
+      "protocol": "TCP"
+    },
+    "UDP_464": {
+      "from_port": 464,
+      "to_port": 464,
+      "protocol": "UDP"
+    },
+    "TCP_636": {
+      "from_port": 636,
+      "to_port": 636,
+      "protocol": "TCP"
+    },
+    "TCP_1025-5000": {
+      "from_port": 1025,
+      "to_port": 5000,
+      "protocol": "TCP"
+    },
+    "UDP_2535": {
+      "from_port": 2535,
+      "to_port": 2535,
+      "protocol": "UDP"
+    },
+    "TCP_3268-3269": {
+      "from_port": 3268,
+      "to_port": 3269,
+      "protocol": "TCP"
+    },
+    "TCP_5722": {
+      "from_port": 5722,
+      "to_port": 5722,
+      "protocol": "TCP"
+    },
+    "TCP_9389": {
+      "from_port": 9389,
+      "to_port": 9389,
+      "protocol": "TCP"
+    },
+    "TCP_49152-65535": {
+      "from_port": 49152,
+      "to_port": 65535,
+      "protocol": "TCP"
+    },
+    "ICMP_ALL": {
+      "from_port": -1,
+      "to_port": -1,
+      "protocol": "ICMP"
+    }
+  },
+  "dns_endpoint_egress_rules": {
+    "TCP_53": {
+      "from_port": 53,
+      "to_port": 53,
+      "protocol": "TCP"
+    },
+    "UDP_53": {
+      "from_port": 53,
+      "to_port": 53,
+      "protocol": "UDP"
+    }
+  },
+  "launch_template_tag_resource_types": [
+    "instance",
+    "volume",
+    "network-interface"
+  ]
+}

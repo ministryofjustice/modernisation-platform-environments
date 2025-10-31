@@ -1,0 +1,38 @@
+[
+  {
+    "name": "${app_name}",
+    "image": "${ecr_url}:${docker_image_tag}",
+    "essential": true,
+    "cpu": 1024,
+    "portMappings": [
+      {
+        "containerPort": 8080
+      }
+    ],
+    "memory": ${memory_allocation},
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
+        "awslogs-region": "${region}",
+        "awslogs-stream-prefix": "${app_name}-app",
+        "awslogs-group": "${app_name}-ecs-container-logs"
+      }
+    },
+    "environment": [
+      {
+        "name": "APP_DB_URL",
+        "value": "${app_db_url}"
+      },
+      {
+        "name": "APP_DEBUG_ENABLED",
+        "value": "${app_debug_enabled}"
+      }
+    ],
+    "secrets": [
+      {
+        "name": "APP_DB_PASSWORD",
+        "valueFrom": "${db_secret_arn}"
+      }
+    ]
+  }
+]

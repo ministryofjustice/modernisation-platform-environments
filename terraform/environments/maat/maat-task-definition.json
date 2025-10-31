@@ -1,0 +1,191 @@
+[
+  {
+    "name": "xray-daemon",
+    "image": "${ecr_url}:${xray_docker_image_tag}",
+    "cpu": 32,
+    "memory": 256,
+    "portMappings": [
+      {
+        "containerPort": 2000,
+        "hostPort": 0,
+        "protocol": "udp"
+      }
+    ],
+    "essential": false,
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
+        "awslogs-group": "${maat_ecs_log_group}",
+        "awslogs-region": "${region}",
+        "awslogs-stream-prefix": "${maat_aws_stream_prefix}"
+      }
+    }
+  },
+  {
+    "name": "MAAT",
+    "image": "${ecr_url}:${maat_docker_image_tag}",
+    "cpu": 992,
+    "memory": 3000,
+    "links": ["xray-daemon"],
+    "portMappings": [
+      {
+        "containerPort": 8080,
+        "hostPort": 0,
+        "protocol": "tcp"
+      }
+    ],
+    "essential": true,
+    "secrets": [
+      {
+        "name": "APP_BC_CLIENT_USER_ID",
+        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_BC_CLIENT_USER_ID"
+      },
+      {
+        "name": "APP_ORCH_OAUTH_SCOPE",
+        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_ORCH_OAUTH_SCOPE"
+      },
+      {
+        "name": "APP_MAAT_GOOGLE_TAG_MANAGER_ID",
+        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_MAAT_GOOGLE_ANALYTICS_4_TAG_ID"
+      },
+      {
+        "name": "APP_BC_CLIENT_ORIG_ID",
+        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_BC_CLIENT_ORIG_ID"
+      },
+      {
+        "name": "APP_DB_PASSWORD",
+        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_DB_PASSWORD"
+      },
+      {
+        "name": "APP_CAA_CLIENT_SECRET",
+        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_CAA_CLIENT_SECRET"
+      },
+      {
+        "name": "APP_ORCH_CLIENT_SECRET",
+        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_ORCH_CLIENT_SECRET"
+      },
+      {
+        "name": "APP_CAA_CLIENT_ID",
+        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_CAA_CLIENT_ID"
+      },
+      {
+        "name": "APP_ORCH_CLIENT_ID",
+        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_ORCH_CLIENT_ID"
+      },
+      {
+        "name": "APP_DB_USERID",
+        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_DB_USERID"
+      },
+      {
+        "name": "APP_ORCH_ENDPOINT",
+        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_ORCH_ENDPOINT"
+      },
+      {
+        "name": "APP_CAA_ENDPOINT",
+        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_CAA_ENDPOINT"
+      },
+      {
+        "name": "APP_BC_SERVICE_NAME",
+        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_BC_SERVICE_NAME"
+      },
+      {
+        "name": "APP_ATS_CLIENT_SECRET",
+        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_ATS_CLIENT_SECRET"
+      },
+      {
+        "name": "APP_ATS_CLIENT_ID",
+        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_ATS_CLIENT_ID"
+      },
+      {
+        "name": "APP_ATS_OAUTH_SCOPE",
+        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_ATS_OAUTH_SCOPE"
+      },
+      {
+        "name": "APP_MASTER_PASSWORD",
+        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_MASTER_PASSWORD"
+      },
+      {
+        "name": "APP_SALT",
+        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_SALT"
+      },
+      {
+        "name": "APP_DERIVATION_ITERATIONS",
+        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_DERIVATION_ITERATIONS"
+      }
+    ],
+    "environment": [
+      {
+        "name": "APP_ORCH_BASE_URL",
+        "value": "${maat_orch_base_url}"
+      },
+      {
+        "name": "APP_DB_POOL_MAX_CONNECTION",
+        "value": "200"
+      },
+      {
+        "name": "APP_TEMP_TRIGGER_GARBAGE",
+        "value": "arandomstring"
+      },
+      {
+        "name": "APP_ORCH_OAUTH_URL",
+        "value": "${maat_orch_oauth_url}"
+      },
+      {
+        "name": "APP_LOG_LEVEL",
+        "value": "${app_log_level}"
+      },
+      {
+        "name": "APP_DB_URL",
+        "value": "${maat_db_url}"
+      },
+      {
+        "name": "APP_CAA_OAUTH_URL",
+        "value": "${maat_caa_oauth_url}"
+      },
+      {
+        "name": "SENTRY_ENVIRONMENT",
+        "value": "${sentry_env}"
+      },
+      {
+        "name": "APP_BC_ENDPOINT",
+        "value": "${maat_bc_endpoint_url}"
+      },
+      {
+        "name": "APP_CAA_OAUTH_SCOPE",
+        "value": "${maat_caa_oauth_scope}"
+      },
+      {
+        "name": "AWS_XRAY_DAEMON_ADDRESS",
+        "value": "xray-daemon:2000"
+      },
+      {
+        "name": "APP_MLRA_LOCATION",
+        "value": "${maat_mlra_url}"
+      },
+      {
+        "name": "APP_CAA_BASE_URL",
+        "value": "${maat_caa_base_url}"
+      },
+      {
+        "name": "APP_ATS_OAUTH_URL",
+        "value": "${maat_ats_oauth_url}"
+      },
+      {
+        "name": "APP_ATS_ENDPOINT",
+        "value": "${maat_ats_endpoint}"
+      },
+      {
+        "name": "APP_ATS_BASE_URL",
+        "value": "${maat_ats_base_url}"
+      }
+    ],
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
+        "awslogs-group": "${maat_ecs_log_group}",
+        "awslogs-region": "eu-west-2",
+        "awslogs-stream-prefix": "${maat_aws_stream_prefix}"
+      }
+    }
+  }
+]

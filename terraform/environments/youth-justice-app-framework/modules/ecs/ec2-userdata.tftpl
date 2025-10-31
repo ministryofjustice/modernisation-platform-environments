@@ -1,0 +1,49 @@
+#!/bin/bash
+yum install amazon-cloudwatch-agent -y
+cat >>/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json <<EOF
+{
+    "agent": {
+        "run_as_user": "root"
+    },
+    "logs": {
+        "logs_collected": {
+            "files": {
+                "collect_list": [
+                    {
+                        "file_path": "/var/log/messages",
+                        "log_group_name": "${project}-${env}/OSSystem",
+                        "log_stream_name": "{instance_id}",
+                        "retention_in_days": 400
+                    },
+                    {
+                        "file_path": "/var/lib/docker/volumes/gateway-logs/_data/dev-info.log",
+                        "log_group_name": "${project}-${env}/gateway-dev-info",
+                        "log_stream_name": "{instance_id}",
+                        "retention_in_days": 400
+                    },
+                    {
+                        "file_path": "/var/lib/docker/volumes/gateway-logs/_data/user-journey.log",
+                        "log_group_name": "${project}-${env}/user-journey",
+                        "log_stream_name": "{instance_id}",
+                        "retention_in_days": 400
+                    }
+                ]
+            }
+        }
+    }
+}
+EOF
+systemctl enable amazon-cloudwatch-agent.service
+systemctl start amazon-cloudwatch-agent.service
+echo add config for metadata
+echo ECS_ENABLE_CONTAINER_METADATA=true >> /etc/ecs/ecs.config
+
+#todo only for spot
+#echo ECS_ENABLE_SPOT_INSTANCE_DRAINING=true >> /etc/ecs/ecs.config 
+echo ECS_CLUSTER=${cluster_name} >> /etc/ecs/ecs.config
+
+#set ssh key Algorithms
+echo KexAlgorithms curve25519-sha256,curve25519-sha256@libssh.org,diffie-hellman-group14-sha256,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512,ecdh-sha2-nistp521,ecdh-sha2-nistp384,ecdh-sha2-nistp256,diffie-hellman-group-exchange-sha256  >> /etc/ssh/sshd_config 
+
+#set Ciphers
+echo  "Ciphers aes256-ctr,aes192-ctr,aes128-ctr" >> /etc/ssh/sshd_config

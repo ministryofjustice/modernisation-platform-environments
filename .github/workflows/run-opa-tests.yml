@@ -1,0 +1,27 @@
+name: "Open Policy Agent: validate terraform"
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  run-opa-policy-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - name: Install Conftest
+        run: |
+          wget https://github.com/open-policy-agent/conftest/releases/download/v0.21.0/conftest_0.21.0_Linux_x86_64.tar.gz
+          tar xzf conftest_0.21.0_Linux_x86_64.tar.gz
+          sudo mv conftest /usr/local/bin
+      - name: Run Conftest
+        run: bash scripts/tests/validate/run-opa-tests.sh

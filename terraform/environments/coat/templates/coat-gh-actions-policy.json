@@ -1,0 +1,63 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ReadWriteToReportsFolder",
+      "Effect": "Allow",
+      "Action": ["s3:PutObject", "s3:PutObjectAcl", "s3:GetObject"],
+      "Resource": [
+        "arn:aws:s3:::coat-reports-${environment}/*",
+        "arn:aws:s3:::coat-${environment}-cur-v2-hourly/*"
+      ]
+    },
+    {
+      "Sid": "ListReportsBucket",
+      "Effect": "Allow",
+      "Action": ["s3:ListBucket", "s3:GetBucketLocation"],
+      "Resource": [
+        "arn:aws:s3:::coat-reports-${environment}",
+        "arn:aws:s3:::coat-${environment}-cur-v2-hourly"
+      ]
+    },
+    {
+      "Sid": "AthenaAccessCurV2Hourly",
+      "Effect": "Allow",
+      "Action": [
+        "athena:GetDataCatalog",
+        "athena:StartQueryExecution",
+        "athena:GetQueryExecution",
+        "athena:GetQueryResults",
+        "athena:StopQueryExecution",
+        "athena:GetWorkGroup"
+      ],
+      "Resource": [
+        "arn:aws:athena:${region}:${account}:workgroup/${athena_workgroup}",
+        "arn:aws:athena:${region}:${account}:datacatalog/${data_catalog}"
+      ]
+    },
+    {
+      "Sid": "ListAthenaWorkGroups",
+      "Effect": "Allow",
+      "Action": "athena:ListWorkGroups",
+      "Resource": "*"
+    },
+    {
+      "Sid": "GlueCatalogAccess",
+      "Effect": "Allow",
+      "Action": [
+        "glue:GetDatabase",
+        "glue:GetDatabases",
+        "glue:GetTable",
+        "glue:GetTables",
+        "glue:GetPartition",
+        "glue:GetPartitions",
+        "glue:GetCatalogImportStatus"
+      ],
+      "Resource": [
+        "arn:aws:glue:${region}:${account}:catalog",
+        "arn:aws:glue:${region}:${account}:database/*",
+        "arn:aws:glue:${region}:${account}:table/*/*"
+      ]
+    }
+  ]
+}

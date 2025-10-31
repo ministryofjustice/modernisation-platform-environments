@@ -1,0 +1,21 @@
+# .checkov.yml
+skip-check:
+  # CKV_AWS_135 — EBS optimization
+  - id: CKV_AWS_135
+    suppress_comment: "Middleware host; not IO-intensive. Acceptable to keep ebs_optimized=false for SSOGEN."
+
+  # CKV_AWS_356 — KMS key policy must use Resource="*"
+  - id: CKV_AWS_356
+    suppress_comment: "KMS key policies require Resource='*' by design; access constrained via principals and conditions."
+
+  # CKV_AWS_111 — write access without constraints (KMS policy)
+  - id: CKV_AWS_111
+    suppress_comment: "Root admin stanza required to prevent lockout; functional use scoped to EC2 role with kms:ViaService and CallerAccount conditions."
+
+  # CKV_AWS_109 — permissions management / resource exposure (KMS policy)
+  - id: CKV_AWS_109
+    suppress_comment: "Wildcard principals removed; root admin stanza retained intentionally; EC2 role permissions constrained via conditions."
+
+  # CKV2_AWS_57 — Secrets Manager secret rotation
+  - id: CKV2_AWS_57
+    suppress_comment: "SSH private key rotation not applicable; operationally managed and being phased out in favour of SSM Session Manager."

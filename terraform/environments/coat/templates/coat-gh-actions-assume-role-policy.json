@@ -1,0 +1,23 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AssumeRoleWithWebIdentity",
+      "Effect": "Allow",
+      "Principal": {
+        "Federated": "${gh_actions_oidc_provider_arn}"
+      },
+      "Action": ["sts:AssumeRoleWithWebIdentity"],
+      "Condition": {
+        "StringEquals": {
+          "${gh_actions_oidc_provider}:aud": "sts.amazonaws.com"
+        },
+        "StringLike": {
+          "${gh_actions_oidc_provider}:sub": [
+            "repo:ministryofjustice/cloud-optimisation-and-accountability:ref:refs/heads/*"
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+version: 1.0
+tasks:
+- task: executeScript
+  inputs:
+  - frequency: always
+    type: powershell
+    runAs: admin
+    content: |-
+      # Join computer to domain if not already joined
+      if (! ((Get-WmiObject -Class Win32_ComputerSystem).PartOfDomain) ) {
+        # Server is not joined to the domain
+        $domainJoinUserName = "${ad_domain_name}\Admin"
+        $domainJoinPassword = ConvertTo-SecureString((Get-SECSecretValue -SecretId ${ad_password_secret_name}).SecretString) -AsPlainText -Force
+        $domainJoinCredential = New-Object System.Management.Automation.PSCredential($domainJoinUserName, $domainJoinPassword)
+        $token = invoke-restmethod -Headers @{"X-aws-ec2-metadata-token-ttl-seconds"=3600} -Method PUT -Uri http://169.254.169.254/latest/api/token
+        $instanceId = invoke-restmethod -Headers @{"X-aws-ec2-metadata-token" = $token} -Method GET -uri http://169.254.169.254/latest/meta-data/instance-id
+        Add-Computer -DomainName "${ad_domain_name}" -Credential $domainJoinCredential -NewName $instanceId -Force
+
+        # Install AD Management Tools
+        Install-WindowsFeature -Name RSAT-AD-PowerShell
+        Install-WindowsFeature -Name RSAT-ADDS-Tools
+
+        # Allow Domain Users to connect via RDP and give them local admin rights
+        Add-LocalGroupMember -Group "Administrators" -Member "Domain Users@${ad_domain_name}"
+
+        "Domain joined" | Out-File -FilePath C:\domain_join_log.txt
+        exit 3010 # Reboot instance, see https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2launch-v2-settings.html#ec2launch-v2-exit-codes-reboots
+      }

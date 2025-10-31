@@ -1,0 +1,20 @@
+# ccms-ssm-document-ebs-apps-service-status.yaml
+---
+schemaVersion: "2.2"
+description: Execute the statusAPP.sh script.
+parameters:
+  action:
+    type: String
+    allowedValues:
+    - status
+mainSteps:
+  - name: statusAPP
+    action: aws:runShellScript
+    isEnd: true
+    precondition:
+      StringEquals:
+        - "{{ action }}"
+        - status
+    inputs:
+      runCommand:
+        - "/home/applmgr/scripts/statusAPP.sh"

@@ -1,0 +1,83 @@
+---
+name: ccms-ebs-upgrade
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'terraform/environments/ccms-ebs-upgrade/**'
+      - '.github/workflows/ccms-ebs-upgrade.yml'
+      - '.github/workflows/reusable_terraform_components_strategy.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'terraform/environments/ccms-ebs-upgrade/**'
+      - '.github/workflows/ccms-ebs-upgrade.yml'
+
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Set either [deploy|destroy].'
+        default: 'deploy'
+        required: true
+        type: string
+        options:
+          - deploy
+          - destroy
+      component:
+        description: "Optional: Target a specific component for destroy. Defaults to 'root' to destroy the root or <application> folder."
+        required: false
+        default: "root"
+        type: string
+
+permissions:
+  id-token: write  # This is required for requesting the JWT
+  contents: read  # This is required for actions/checkout
+
+jobs:
+  strategy:
+    # This job generates a matrix of environments (and possibly components) by calling your reusable strategy workflow.
+    uses: ./.github/workflows/reusable_terraform_components_strategy.yml
+    if: inputs.action != 'destroy'
+    with:
+      application: "${{ github.workflow }}"
+
+  skipping_terraform:
+      needs: strategy
+      if: ${{ inputs.action != 'destroy' && (needs.strategy.outputs.matrix == '' || toJson(fromJson(needs.strategy.outputs.matrix)) == '[]')}}  # conversion from and to Json standardises output
+      runs-on: ubuntu-latest
+      steps:
+        - name: Skip Terraform
+          run: echo "No terraform changes detected. Skipping Terraform plan/apply."
+
+  terraform:
+    needs: strategy
+    if: ${{ inputs.action != 'destroy' && needs.strategy.outputs.matrix != '' && toJson(fromJson(needs.strategy.outputs.matrix)) != '[]'}}  # conversion from and to Json standardises output
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.strategy.outputs.matrix) }}
+    # Calls the plan/apply reusable workflow with each item in the matrix
+    uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
+    with:
+      # Pass along the "application" and "environment" from the matrix
+      application: "${{ github.workflow }}"
+      environment: "${{ matrix.target }}"
+      action: "${{ matrix.action }}"
+      component: "${{ matrix.component }}"
+    secrets:
+      MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
+      PASSPHRASE: ${{ secrets.PASSPHRASE }}
+
+  destroy-development:
+    if: inputs.action == 'destroy'
+    uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
+    with:
+      application: "${{ github.workflow }}"
+      environment: "development"
+      action: "plan_apply"
+      plan_apply_tfargs: "-destroy"
+      component: "${{ inputs.component }}"  # Targets a specific component for the destroy operation; defaults to 'root' if not specified.
+    secrets:
+      MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
+      PASSPHRASE: ${{ secrets.PASSPHRASE }}

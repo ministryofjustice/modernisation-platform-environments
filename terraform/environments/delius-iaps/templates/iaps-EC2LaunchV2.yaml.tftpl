@@ -1,0 +1,195 @@
+version: 1.0
+tasks:
+- task: executeScript
+  inputs:
+  - frequency: once
+    type: powershell
+    runAs: admin
+    content: |-
+      Set-TimeZone 'GMT Standard Time'
+
+      $tnsNamesOraPath = "C:\app\client\Administrator\product\12.1.0\client_1\network\admin\tnsnames.ora"
+      (Get-Content $tnsNamesOraPath).replace('iaps-db', '${delius_iaps_rds_db_address}') | Set-Content $tnsNamesOraPath
+
+      $nginxConfPath = (Resolve-Path 'C:\tools\nginx-*\conf').Path
+      $nginxLogPath = (Resolve-Path 'C:\tools\nginx-*\logs').Path
+      $nginxPath = (Resolve-Path 'C:\tools\nginx-*\').Path
+      Invoke-Expression 'openssl req -new -newkey rsa:4096 -days 36500 -nodes -x509 -subj "/C=GB/ST=London/L=London/O=HMPPS/OU=HMPPS Digital and Technology/CN=localhost" -keyout "$${nginxConfPath}\server.key" -out "$${nginxConfPath}\server.crt"' 2>&1
+      Import-Certificate -FilePath $${nginxConfPath}\server.crt -CertStoreLocation Cert:\LocalMachine\TrustedPeople
+
+      $nginxConfContents = @"
+      worker_processes auto;
+
+      error_log  logs/error.log;
+
+      events {
+        worker_connections  1024;
+      }
+
+      http {
+        include              mime.types;
+        default_type         application/octet-stream;
+        sendfile             on;
+        client_max_body_size 10M;
+        keepalive_timeout    65;
+
+        resolver ${vpc_dns_ip};
+
+        server {
+          listen 443 ssl;
+          server_name localhost;
+          ssl_certificate     server.crt;
+          ssl_certificate_key server.key;
+
+          allow 127.0.0.1;
+          deny  all;
+
+          set `$ndelius_interface_url "${ndelius_interface_url}";
+          set `$im_interface_url "${im_interface_url}";
+
+          # Proxy requests to the NDelius Interface
+          location ^~ /NDeliusIAPS {
+            proxy_pass        https://`$ndelius_interface_url;
+            proxy_ssl_ciphers ALL:!aNULL:!EXPORT56:RC4+RSA:+HIGH:+MEDIUM:+LOW:+SSLv2:+EXP;
+          }
+
+          # Proxy all other requests IM servers
+          location / {
+            proxy_pass                    https://`$im_interface_url;
+            proxy_ssl_protocols           TLSv1.3;
+            proxy_ssl_ciphers             EECDH+CHACHA20:EECDH+AESGCM:EECDH+AES;
+            proxy_http_version            1.1;
+            client_max_body_size          10m;
+          }
+        }
+      }
+      "@
+      $Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
+      [System.IO.File]::WriteAllLines("$${nginxConfPath}\nginx.conf", $nginxConfContents, $Utf8NoBomEncoding)
+
+      # Configure log rotation using NSSM service that is pre-configured by choco install of nginx
+      nssm set "nginx" AppStdout $nginxLogPath\access.log
+      nssm set "nginx" AppStderr $nginxLogPath\error.log
+      nssm set "nginx" AppRotateFiles 1
+      nssm set "nginx" AppRotateOnline 1
+      nssm set "nginx" AppTimestampLog 1
+      nssm set "nginx" AppRotateSeconds 86400
+      nssm set "nginx" AppRotateBytes 1048576
+
+      $nginxRotateLogsScript = @"
+      `$nginxLogPath = (Resolve-Path "C:\tools\nginx-*\logs").Path
+      # compress
+      Get-ChildItem "`$${nginxLogPath}\*.log" | Where {`$_.lastwritetime -lt (Get-Date).AddDays(-1)} | write-zip
+
+      # purge yesterday zip
+      Get-ChildItem "`$${nginxLogPath}\*.zip" | Where {`$_.lastwritetime -lt (Get-Date).AddDays(-2)} | Remove-Item -Force
+      "@
+      $Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
+      [System.IO.File]::WriteAllLines("$${nginxPath}\log-rotate-helper.ps1", $nginxRotateLogsScript, $Utf8NoBomEncoding)
+
+      # create schedule powershell task to purge nginx logs
+      $taskName = "Purge Nginx Logs"
+      $taskTrigger = New-ScheduledTaskTrigger -Daily -At 3am
+      $taskAction = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-File $nginxPath\log-rotate-helper.ps1"
+      $taskPrincipal = New-ScheduledTaskPrincipal -UserId "SYSTEM" -LogonType ServiceAccount -RunLevel Highest
+      Register-ScheduledTask -TaskName $taskName -Trigger $taskTrigger -Action $taskAction -Principal $taskPrincipal
+
+      Restart-Service -Name nginx
+      Set-Service -Name nginx -StartupType Automatic
+      "nginx config written" | Out-File -FilePath C:\nginx_config_log.txt
+  - frequency: once
+    type: powershell
+    runAs: admin
+    content: |-
+      # Join computer to domain if not already joined
+      if (! ((Get-WmiObject -Class Win32_ComputerSystem).PartOfDomain) ) {
+        # Server is not joined to the domain
+        $secretName = "${delius_iaps_ad_password_secret_name}"
+        $domainJoinUserName = "Admin"
+        $domainJoinPassword = ConvertTo-SecureString((Get-SECSecretValue -SecretId $secretName).SecretString) -AsPlainText -Force
+        $domainJoinCredential = New-Object System.Management.Automation.PSCredential($domainJoinUserName, $domainJoinPassword)
+        $token = invoke-restmethod -Headers @{"X-aws-ec2-metadata-token-ttl-seconds"=3600} -Method PUT -Uri http://169.254.169.254/latest/api/token
+        $instanceId = invoke-restmethod -Headers @{"X-aws-ec2-metadata-token" = $token} -Method GET -uri http://169.254.169.254/latest/meta-data/instance-id
+        Add-Computer -DomainName "${delius_iaps_ad_domain_name}" -Credential $domainJoinCredential -NewName $instanceId -Force
+
+        # Install AD Management Tools
+        Install-WindowsFeature -Name RSAT-AD-PowerShell
+        Install-WindowsFeature -Name RSAT-ADDS-Tools
+
+        # Allow Domain Users to connect via RDP and give them local admin rights
+        Add-LocalGroupMember -Group "Administrators" -Member "Domain Users@${delius_iaps_ad_domain_name}"
+
+        "Domain joined" | Out-File -FilePath C:\domain_join_log.txt
+        exit 3010 # Reboot instance, see https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2launch-v2-settings.html#ec2launch-v2-exit-codes-reboots
+      }
+  - frequency: once
+    type: powershell
+    runAs: admin
+    content: |-
+      # Configure IM Interface
+      $ErrorActionPreference = "Stop"
+      $VerbosePreference = "Continue"
+
+      $IMConfigFile = "C:\Program Files (x86)\I2N\IapsIMInterface\Config\IMIAPS.xml"
+
+      $configXML = [xml](Get-Content $IMConfigFile)
+      $configXML.DLLDEF.IAPSORACLE.USER = (Get-SSMParameter -Name "/IMInterface/IAPSOracle/user" -WithDecryption $true).Value
+      $configXML.DLLDEF.IAPSORACLE.PASSWORD = (Get-SSMParameter -Name "/IMInterface/IAPSOracle/password" -WithDecryption $true).Value
+
+      $SOAPServerODBCdsn = (Get-SSMParameter -Name "/IMInterface/SOAPServer/ODBC/dsn" -WithDecryption $true).Value
+      $SOAPServerODBCserver = (Get-SSMParameter -Name "/IMInterface/SOAPServer/ODBC/server" -WithDecryption $true).Value
+      $SOAPServerODBCdatabase = (Get-SSMParameter -Name "/IMInterface/SOAPServer/ODBC/database" -WithDecryption $true).Value
+      $SOAPServerODBCuid = (Get-SSMParameter -Name "/IMInterface/SOAPServer/ODBC/uid" -WithDecryption $true).Value
+      $SOAPServerODBCpwd = (Get-SSMParameter -Name "/IMInterface/SOAPServer/ODBC/pwd" -WithDecryption $true).Value
+      $configXML.DLLDEF.SOAPSERVER.ODBC = "DSN=$${SOAPServerODBCdsn};Server=$${SOAPServerODBCserver};Database=$${SOAPServerODBCdatabase};uid=$${SOAPServerODBCuid};pwd=$${SOAPServerODBCpwd}"
+      $configXML.save($IMConfigFile)
+
+      $service = Restart-Service -Name IMIapsInterfaceWinService -Force -PassThru
+      if ($service.Status -match "Running") {
+          Write-Host('Restart of IMIapsInterfaceWinService successful')
+          Set-Service -Name IMIapsInterfaceWinService -StartupType Automatic
+          "IM Interface configured" | Out-File -FilePath C:\im_interface_config_log.txt
+      } else {
+          Write-Host('Error - Failed to restart IMIapsInterfaceWinService - see logs')
+          "Error - Failed to restart IMIapsInterfaceWinService - see logs" | Out-File -FilePath C:\im_interface_config_log.txt
+          Exit 1
+      }
+  - frequency: once
+    type: powershell
+    runAs: admin
+    content: |-
+      # Configure NDelius Interface
+      $ErrorActionPreference = "Stop"
+      $VerbosePreference = "Continue"
+
+      $NDeliusIAPSCMSConfigFile = "C:\Program Files (x86)\I2N\IapsNDeliusInterface\Config\IAPSCMSIF.xml"
+      (Get-Content $NDeliusIAPSCMSConfigFile).replace('[ND_IAPS_CMSIF_DB_USER]', (Get-SSMParameter -Name "/NDeliusInterface/IAPSCMSIF/Interface/user" -WithDecryption $true).Value) | Set-Content $NDeliusIAPSCMSConfigFile
+      (Get-Content $NDeliusIAPSCMSConfigFile).replace('[ND_IAPS_CMSIF_DB_PASSWORDCODED]', (Get-SSMParameter -Name "/NDeliusInterface/IAPSCMSIF/Interface/passwordcoded" -WithDecryption $true).Value) | Set-Content $NDeliusIAPSCMSConfigFile
+
+      $NDeliusConfigFile = "C:\Program Files (x86)\I2N\IapsNDeliusInterface\Config\NDELIUSIF.xml"
+      (Get-Content $NDeliusConfigFile).replace('[ND_IF_DB_USER]', (Get-SSMParameter -Name "/NDeliusInterface/Interface/dbuser" -WithDecryption $true).Value) | Set-Content $NDeliusConfigFile
+      (Get-Content $NDeliusConfigFile).replace('[ND_IF_DB_PASSWORDCODED]', (Get-SSMParameter -Name "/NDeliusInterface/Interface/dbpwdcoded" -WithDecryption $true).Value) | Set-Content $NDeliusConfigFile
+
+      (Get-Content $NDeliusConfigFile).replace('[ND_SOAP_USER]', (Get-SSMParameter -Name "/NDeliusInterface/Interface/soapuser" -WithDecryption $true).Value) | Set-Content $NDeliusConfigFile
+      (Get-Content $NDeliusConfigFile).replace('[ND_SOAP_PASSWORDCODED]', (Get-SSMParameter -Name "/NDeliusInterface/Interface/soappwdcoded" -WithDecryption $true).Value) | Set-Content $NDeliusConfigFile
+
+      (Get-Content $NDeliusConfigFile).replace('[SMTP_USER]', (Get-SSMParameter -Name "/NDeliusInterface/Email/smtpuser" -WithDecryption $true).Value) | Set-Content $NDeliusConfigFile
+      (Get-Content $NDeliusConfigFile).replace('[SMTP_PASSWORDCODED]', (Get-SSMParameter -Name "/NDeliusInterface/Email/passwordcoded" -WithDecryption $true).Value) | Set-Content $NDeliusConfigFile
+      (Get-Content $NDeliusConfigFile).replace('[SMTP_FROMADDRESS]', (Get-SSMParameter -Name "/NDeliusInterface/Email/fromaddress" -WithDecryption $true).Value) | Set-Content $NDeliusConfigFile
+
+      $service = Restart-Service -Name IapsNDeliusInterfaceWinService -Force -PassThru
+      if ($service.Status -match "Running") {
+          Write-Host('Restart of IapsNDeliusInterfaceWinService successful')
+          Set-Service -Name IapsNDeliusInterfaceWinService -StartupType Automatic
+          "NDelius Interface configured" | Out-File -FilePath C:\ndelius_interface_config_log.txt
+      } else {
+          Write-Host('Error - Failed to restart IapsNDeliusInterfaceWinService - see logs')
+          "Error - Failed to restart IapsNDeliusInterfaceWinService - see logs" | Out-File -FilePath C:\ndelius_interface_config_log.txt
+          Exit 1
+      }
+  - frequency: once
+    type: powershell
+    runAs: admin
+    content: |-
+        $connectionsXMLTemplateFile = "C:\scripts\connections.xml"
+        (Get-Content $connectionsXMLTemplateFile).replace('[DB_HOST_PLACEHOLDER]', '${delius_iaps_rds_db_address}') | Set-Content $connectionsXMLTemplateFile

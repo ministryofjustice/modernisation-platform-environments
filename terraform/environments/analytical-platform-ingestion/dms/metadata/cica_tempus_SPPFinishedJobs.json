@@ -1,0 +1,148 @@
+{
+  "objects_from": "tempus_spp_finished_jobs",
+  "extraction_date": "2025-03-26T14:26:16.931099",
+  "objects": ["dbo.FINISHED_JOB_HISTORY", "dbo.FINISHED_JOB_VARIABLE"],
+  "blobs": [],
+  "columns_to_exclude": [
+    {
+      "object_name": "dbo.FINISHED_JOB_HISTORY",
+      "column_name": "AUTOMATIC"
+    },
+    {
+      "object_name": "dbo.FINISHED_JOB_HISTORY",
+      "column_name": "COST"
+    },
+    {
+      "object_name": "dbo.FINISHED_JOB_HISTORY",
+      "column_name": "DEPENDENCY_INCLUDE"
+    },
+    {
+      "object_name": "dbo.FINISHED_JOB_HISTORY",
+      "column_name": "DESIGN_TIME_TYPE"
+    },
+    {
+      "object_name": "dbo.FINISHED_JOB_HISTORY",
+      "column_name": "DOCUMENT_COUNT"
+    },
+    {
+      "object_name": "dbo.FINISHED_JOB_HISTORY",
+      "column_name": "DUE_DATE"
+    },
+    {
+      "object_name": "dbo.FINISHED_JOB_HISTORY",
+      "column_name": "EMBEDDED_PROCESS_COUNT"
+    },
+    {
+      "object_name": "dbo.FINISHED_JOB_HISTORY",
+      "column_name": "EXPECTED_COST"
+    },
+    {
+      "object_name": "dbo.FINISHED_JOB_HISTORY",
+      "column_name": "MACHINE_ID"
+    },
+    {
+      "object_name": "dbo.FINISHED_JOB_HISTORY",
+      "column_name": "MACHINE_NAME"
+    },
+    {
+      "object_name": "dbo.FINISHED_JOB_HISTORY",
+      "column_name": "MONITORING_DUE_DATE"
+    },
+    {
+      "object_name": "dbo.FINISHED_JOB_HISTORY",
+      "column_name": "NODE_ID"
+    },
+    {
+      "object_name": "dbo.FINISHED_JOB_HISTORY",
+      "column_name": "NODE_ID_AFTER_DECISION"
+    },
+    {
+      "object_name": "dbo.FINISHED_JOB_HISTORY",
+      "column_name": "OUTCOME_NODE_INFO"
+    },
+    {
+      "object_name": "dbo.FINISHED_JOB_HISTORY",
+      "column_name": "OVERDUE"
+    },
+    {
+      "object_name": "dbo.FINISHED_JOB_HISTORY",
+      "column_name": "OVERRUN"
+    },
+    {
+      "object_name": "dbo.FINISHED_JOB_HISTORY",
+      "column_name": "OVERRUN_EXCEPTION"
+    },
+    {
+      "object_name": "dbo.FINISHED_JOB_HISTORY",
+      "column_name": "PAGE_COUNT"
+    },
+    {
+      "object_name": "dbo.FINISHED_JOB_HISTORY",
+      "column_name": "PERF_RES_INCLUDE"
+    },
+    {
+      "object_name": "dbo.FINISHED_JOB_HISTORY",
+      "column_name": "PROCESS_ID"
+    },
+    {
+      "object_name": "dbo.FINISHED_JOB_HISTORY",
+      "column_name": "PROCESS_NAME"
+    },
+    {
+      "object_name": "dbo.FINISHED_JOB_HISTORY",
+      "column_name": "RESOURCE_NAME"
+    },
+    {
+      "object_name": "dbo.FINISHED_JOB_HISTORY",
+      "column_name": "SET_TIME_MILLISECS"
+    },
+    {
+      "object_name": "dbo.FINISHED_JOB_HISTORY",
+      "column_name": "STARTED_SUB_JOB_ID"
+    },
+    {
+      "object_name": "dbo.FINISHED_JOB_HISTORY",
+      "column_name": "SUB_JOB_ID"
+    },
+    {
+      "object_name": "dbo.FINISHED_JOB_HISTORY",
+      "column_name": "TARGET_TIME_IN_SECONDS"
+    },
+    {
+      "object_name": "dbo.FINISHED_JOB_HISTORY",
+      "column_name": "TIME_PENDING_IN_SECS"
+    },
+    {
+      "object_name": "dbo.FINISHED_JOB_HISTORY",
+      "column_name": "USE_ADV_WORKFLOW_RULES"
+    },
+    {
+      "object_name": "dbo.FINISHED_JOB_HISTORY",
+      "column_name": "VERSION"
+    },
+    {
+      "object_name": "dbo.FINISHED_JOB_HISTORY",
+      "column_name": "WORKING_TIME_PENDING_IN_SECS"
+    },
+    {
+      "object_name": "dbo.FINISHED_JOB_HISTORY",
+      "column_name": "WORKING_TIME_SPENT_IN_SECONDS"
+    },
+    {
+      "object_name": "dbo.FINISHED_JOB_VARIABLE",
+      "column_name": "DISPLAY_NAME"
+    },
+    {
+      "object_name": "dbo.FINISHED_JOB_VARIABLE",
+      "column_name": "DYNAMIC"
+    },
+    {
+      "object_name": "dbo.FINISHED_JOB_VARIABLE",
+      "column_name": "VAR_TYPE"
+    },
+    {
+      "object_name": "dbo.FINISHED_JOB_VARIABLE",
+      "column_name": "VERSION"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+---
+schemaVersion: "2.2"
+description: "Powershell doc to remove all local users from Windows servers"
+parameters:
+  InstanceId:
+    type: "String"
+    description: "ID of the instance being targetted"
+mainSteps:
+  - name: RemoveLocalUsers
+    action: "aws:runPowerShellScript"
+    inputs:
+      runCommand:
+        - |
+          # Fetch 'Developer' and 'Migration' local users (case-insensitive, user name might also have a number appended to it)
+          $users = Get-WmiObject -Class Win32_UserAccount -Filter "LocalAccount='True'" -Namespace 'root\cimv2'
+
+          # Filter users using Where-Object based on the specified pattern
+          $usersToRemove = $users | Where-Object { $_.Name -match '(?i)migration\d+' -or $_.Name -match 'Migration' -or $_.Name -match '(?i)developer\d+' -or $_.Name -match 'Developer' -and $_.Name -notin @('Administrator', 'Guest', 'DefaultAccount', 'abootstrap') }
+
+          foreach ($user in $usersToRemove) {
+            $username = $user.Name
+            Write-Output "User $username should be removed. Removing now..."
+            net user $username /delete
+            Write-Output "User $username is removed."
+          }

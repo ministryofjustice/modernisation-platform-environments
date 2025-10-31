@@ -1,0 +1,96 @@
+name: Terraform Static Code Analysis
+# Runs changed scan on pull request, full scan on workflow_dispatch and scheduled.
+on:
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    - cron:  '0 7 * * 1-5'
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'terraform/**'
+      - '.github/workflows/terraform-static-analysis.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  terraform-static-analysis:
+    permissions:
+      pull-requests: write
+    name: Terraform Static Analysis
+    runs-on: ubuntu-latest
+    if: github.event_name != 'workflow_dispatch' && github.event_name != 'schedule'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          fetch-depth: 0
+      - name: Run Analysis
+        uses: ministryofjustice/modernisation-platform-github-actions/terraform-static-analysis@4eceb2a416a197e91dc557c2ef0b5dd9afe29e0c # v3.4.6
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          scan_type: changed
+          trivy_severity: HIGH,CRITICAL
+          trivy_ignore: ./.trivyignore.yaml
+          checkov_exclude: CKV_GIT_1,CKV_AWS_126,CKV2_AWS_38,CKV2_AWS_39
+          tflint_exclude: terraform_unused_declarations
+          tflint_call_module_type: none
+          tfsec_trivy: trivy
+          use_trivy_ecr_database: true
+
+  terraform-static-analysis-full-scan:
+    permissions:
+      contents: read
+      actions: read
+      security-events: write
+      pull-requests: write
+    name: Terraform Static Analysis - scan all directories
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          fetch-depth: 0
+      - name: Run Analysis
+        uses: ministryofjustice/modernisation-platform-github-actions/terraform-static-analysis@4eceb2a416a197e91dc557c2ef0b5dd9afe29e0c # v3.4.6
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          scan_type: full
+          tfsec_trivy: trivy
+          trivy_skip_dir: ""
+          trivy_severity: HIGH,CRITICAL
+          trivy_ignore: ./.trivyignore.yaml
+          tfsec_exclude: aws-ssm-secret-use-customer-key,github-repositories-private,aws-vpc-no-excessive-port-access,github-repositories-require-signed-commits
+          checkov_exclude: CKV_GIT_1,CKV_AWS_126,CKV2_AWS_38,CKV2_AWS_39
+          tflint_exclude: terraform_unused_declarations
+          tflint_call_module_type: none
+          use_trivy_ecr_database: true
+
+  terraform-static-analysis-scheduled-scan:
+    name: Terraform Static Analysis - scheduled scan of all directories
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          fetch-depth: 0
+      - name: Run Analysis
+        uses: ministryofjustice/modernisation-platform-github-actions/terraform-static-analysis@4eceb2a416a197e91dc557c2ef0b5dd9afe29e0c # v3.4.6
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          scan_type: full
+          tfsec_trivy: trivy
+          trivy_severity: HIGH,CRITICAL
+          trivy_ignore: ./.trivyignore.yaml
+          tfsec_exclude: aws-ssm-secret-use-customer-key,github-repositories-private,aws-vpc-no-excessive-port-access,github-repositories-require-signed-commits
+          checkov_exclude: CKV_GIT_1,CKV_AWS_126,CKV2_AWS_38,CKV2_AWS_39
+          tflint_exclude: terraform_unused_declarations
+          tflint_call_module_type: none
+          use_trivy_ecr_database: true

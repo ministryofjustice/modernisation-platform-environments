@@ -1,0 +1,14 @@
+{
+  "DataSetId": "b2717907-0301-4daa-b777-5f662a2ebd40",
+  "AwsAccountId": "${aws_account_id}",
+  "Schedule": {
+    "ScheduleId": "ef796555-0848-448c-9848-5b371e9f47cb",
+    "ScheduleFrequency": {
+      "Interval": "DAILY",
+      "Timezone": "Europe/London",
+      "TimeOfTheDay": "09:05"
+    },
+    "RefreshType": "FULL_REFRESH",
+    "Arn": "arn:aws:quicksight:eu-west-2:${aws_account_id}:dataset/b2717907-0301-4daa-b777-5f662a2ebd40/refresh-schedule/ef796555-0848-448c-9848-5b371e9f47cb"
+  }
+}

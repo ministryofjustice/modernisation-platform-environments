@@ -1,0 +1,12 @@
+{
+  "keys": {
+    "development": {
+      "vincent": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIrHS/9UPdtogPHfBQZaHRg3cwNf0otQFG9E95IUvJbw vincent.cheung@MJ004609"
+    },
+    "test": {},
+    "preproduction": {},
+    "production": {
+      "vincent": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHSFcCOB9t3SES6asvoSMSQELOa6sy0E55DOOY+i+cYR vincent.cheung@MJ004609"
+    }
+  }
+}

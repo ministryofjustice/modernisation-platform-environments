@@ -1,0 +1,32 @@
+.env
+.terraform
+*.tfstate*
+.DS_Store
+tmp/
+.vscode/
+.terraform.lock.hcl
+**/node_modules
+**/package-lock.json
+**/*-draft.*
+
+##########################
+## IntelliJ
+##########################
+*.iml
+.idea/
+*.ipr
+*.iws
+out/
+.idea_modules/
+
+.tfsec/
+
+# vim
+**/*.swp
+
+terraform/modules/**/*.zip
+terraform/environments/youth-justice-app-framework/modules/quicksight/assets/run_time
+
+megalinter-reports
+
+datasync_password_updater.zip

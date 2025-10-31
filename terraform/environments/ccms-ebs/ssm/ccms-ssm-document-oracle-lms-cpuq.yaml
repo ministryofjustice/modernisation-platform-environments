@@ -1,0 +1,15 @@
+# ccms-ssm-document-oracle-lms-cpuq.yaml
+---
+schemaVersion: "2.2"
+description: Run the lms_cpuq.sh script.
+mainSteps:
+  - name: OracleLMScpuq
+    action: aws:runShellScript
+    isEnd: true
+    precondition:
+      StringEquals:
+        - platformType
+        - Linux
+    inputs:
+      runCommand:
+        - "bash /mnt/s3-shared/lms_cpuq.sh"

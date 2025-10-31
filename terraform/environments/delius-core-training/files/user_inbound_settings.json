@@ -1,0 +1,56 @@
+{
+  "TargetMetadata": {
+    "ParallelApplyBufferSize": 0,
+    "ParallelApplyQueuesPerThread": 0,
+    "ParallelApplyThreads": 0,
+    "TargetSchema": "DELIUS_APP_SCHEMA",
+    "InlineLobMaxSize": 0,
+    "ParallelLoadQueuesPerThread": 0,
+    "SupportLobs": true,
+    "LobChunkSize": 64,
+    "TaskRecoveryTableEnabled": false,
+    "ParallelLoadThreads": 0,
+    "LobMaxSize": 0,
+    "BatchApplyEnabled": false,
+    "FullLobMode": true,
+    "LimitedSizeLobMode": false,
+    "LoadMaxFileSize": 0,
+    "ParallelLoadBufferSize": 0
+  },
+  "FullLoadSettings": {
+    "TargetTablePrepMode": "DO_NOTHING",
+    "CreatePkAfterFullLoad": false,
+    "StopTaskCachedChangesApplied": false,
+    "StopTaskCachedChangesNotApplied": false,
+    "MaxFullLoadSubTasks": 8,
+    "TransactionConsistencyTimeout": 600,
+    "CommitRate": 10000
+  },
+  "ControlTablesSettings": {
+    "historyTimeslotInMinutes": 5,
+    "HistoryTimeslotInMinutes": 5,
+    "StatusTableEnabled": false,
+    "SuspendedTablesTableEnabled": true,
+    "HistoryTableEnabled": false,
+    "ControlSchema": "DELIUS_AUDIT_DMS_POOL",
+    "FullLoadExceptionTableEnabled": false
+  },
+  "ErrorBehavior": {
+    "RecoverableErrorThrottlingMax": 1800,
+    "RecoverableErrorStopRetryAfterThrottlingMax": false,
+    "ApplyErrorInsertPolicy": "INSERT_RECORD"
+  },
+  "Logging": {
+    "EnableLogging": true,
+    "LogComponents": [
+      {
+        "Id": "SOURCE_UNLOAD",
+        "Severity": "LOGGER_SEVERITY_DEFAULT"
+      },
+      {
+        "Id": "TARGET_LOAD",
+        "Severity": "LOGGER_SEVERITY_DEFAULT"
+      }
+    ]
+  }
+}

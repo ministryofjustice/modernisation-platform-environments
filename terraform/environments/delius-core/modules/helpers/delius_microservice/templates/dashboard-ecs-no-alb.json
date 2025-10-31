@@ -1,0 +1,126 @@
+{
+  "widgets": [
+    {
+      "height": 6,
+      "width": 12,
+      "y": 1,
+      "x": 0,
+      "type": "metric",
+      "properties": {
+        "metrics": [
+          [
+            "AWS/ECS",
+            "CPUUtilization",
+            "ServiceName",
+            "${ecs_service_name}",
+            "ClusterName",
+            "${ecs_cluster_name}",
+            {
+              "label": "${ecs_service_name}"
+            }
+          ],
+          [
+            ".",
+            ".",
+            "ClusterName",
+            ".",
+            {
+              "label": "${ecs_cluster_name}"
+            }
+          ]
+        ],
+        "view": "timeSeries",
+        "stacked": true,
+        "region": "eu-west-2",
+        "title": "CPU Utilization",
+        "stat": "Average",
+        "period": 300
+      }
+    },
+    {
+      "height": 6,
+      "width": 12,
+      "y": 1,
+      "x": 12,
+      "type": "metric",
+      "properties": {
+        "metrics": [
+          [
+            "AWS/ECS",
+            "MemoryUtilization",
+            "ServiceName",
+            "${ecs_service_name}",
+            "ClusterName",
+            "${ecs_cluster_name}",
+            {
+              "label": "${ecs_service_name}"
+            }
+          ],
+          [
+            ".",
+            ".",
+            "ClusterName",
+            ".",
+            {
+              "label": "${ecs_cluster_name}"
+            }
+          ]
+        ],
+        "view": "timeSeries",
+        "stacked": true,
+        "region": "eu-west-2",
+        "title": "Memory Utilization",
+        "stat": "Average",
+        "period": 300
+      }
+    },
+    {
+      "height": 6,
+      "width": 12,
+      "y": 7,
+      "x": 0,
+      "type": "metric",
+      "properties": {
+        "metrics": [
+          [
+            "${name}Metrics",
+            "ErrorCount",
+            {
+              "color": "#d62728"
+            }
+          ]
+        ],
+        "view": "timeSeries",
+        "stacked": true,
+        "region": "eu-west-2",
+        "stat": "Average",
+        "period": 300,
+        "title": "${name} Application Errors"
+      }
+    },
+    {
+      "height": 6,
+      "width": 12,
+      "y": 7,
+      "x": 12,
+      "type": "log",
+      "properties": {
+        "query": "SOURCE '${name}' | fields @timestamp, @message, @logStream, @log\n| filter @message like ${cloudwatch_error_pattern}\n| sort @timestamp desc\n| limit 20",
+        "region": "eu-west-2",
+        "stacked": false,
+        "view": "table",
+        "title": "${name} Error Logs"
+      }
+    },
+    {
+      "height": 1,
+      "width": 24,
+      "y": 0,
+      "x": 0,
+      "type": "text",
+      "properties": {
+        "markdown": "App Metrics"
+      }
+    }
+  ]
+}

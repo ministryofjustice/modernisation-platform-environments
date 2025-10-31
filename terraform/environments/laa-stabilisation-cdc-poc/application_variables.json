@@ -1,0 +1,56 @@
+{
+  "accounts": {
+    "development": {
+      "env_short": "dev",
+      "lb_access_logs_existing_bucket_name": "",
+      "db_ami_id": "ami-021837208e2ca2def",
+      "db_instance_type": "m4.xlarge",
+      "workspaces_local_cidr1": "10.200.2.0/24",
+      "workspaces_local_cidr2": "10.200.3.0/24",
+      "ebs_oradata_size": "800",
+      "ebs_oracle_size": "20",
+      "ebs_oraarch_size": "600",
+      "ebs_oratmp_size": "100",
+      "ebs_oraredo_size": "100",
+      "ebs_share_size": "50",
+      "cwa_ec2_key": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDAQUcMqXMcs+lOLPXySeSXvPZdaOO4gAZ34yBefe0UFZp867gRepg/J8MgMfNus4qzcw1pEOBW7sZb1fTw5bijJVMjNsqI260fo9yTslRgIVgB4m+5rBuFpWCH1NA3tZ906+2X3shRXAvfAW6pGsjEDZ5caMvut1zpWZueHDGNfxrTw6ZpWaEfD56L7m3TsP7Ng38Ejmron6Nf/CjxLrNehTmtf3eq+oTbf4kLiaD+gdm1XIBGg5cXDIutRFtuK6iAKPofGWHFe+LO7SzuEblThA6L9jhbZsxUtPKe1UZkQwO3EirXam0Z/Kses/q7ATOGsRmKT3aQsquNDutYlh1EJwCU7sEKFR4JM0au8YiYDSz8rNAouEpRNZijdfNlnO0rE+wILWkpa3wuEQIgQBRSWzkShffcY5SSswnjGSWJuFbsn5jyZcQTB7pYpgVry+ZSK8FdWUjZoDpj6/zVQ5mlRDcy7B1r/sO/DWtyNcWeeyuuCgg7dRoHLNjggAQCyL8= vincent.cheung@MJ004609",
+      "oradata_snapshot_id": "snap-0f9d4701fbe6b03cd",
+      "oracle_snapshot_id": "snap-0ce3857d7b4ad8e85",
+      "oraarch_snapshot_id": "snap-05e1cb7e47ed25970",
+      "oratmp_snapshot_id": "snap-0f313ed0cb6e23533",
+      "oraredo_snapshot_id": "snap-05bb18f43eb0d445a",
+      "share_snapshot_id": "snap-024bcbbd00404fa13",
+      "old_domain_name": "tst.legalservices.gov.uk",
+      "cwa_poc2_app_ami_id": "ami-0ef40b85457e0369d",
+      "cwa_poc2_app_instance_type": "m4.xlarge",
+      "cwa_poc2_ebs_app_size": "200",
+      "cwa_poc2_app_snapshot_id": "snap-0329caef83f4a6c51",
+      "cwa_poc2_cm_ami_id": "ami-0289054775271c368",
+      "cwa_poc2_cm_instance_type": "m4.xlarge",
+      "cwa_poc2_ebs_concurrent_manager_size": "200",
+      "cwa_poc2_concurrent_manager_snapshot_id": "snap-0d6366a360e73405b",
+      "cwa_poc2_db_ami_id": "ami-056d148e298f95dcc",
+      "cwa_poc2_db_instance_type": "m4.xlarge",
+      "cwa_poc2_oradata_snapshot_id": "snap-0865afc8902cf3e33",
+      "cwa_poc2_oracle_snapshot_id": "snap-0aa1170623941a0c0",
+      "cwa_poc2_oraarch_snapshot_id": "snap-0cc5afafa1d02dda9",
+      "cwa_poc2_oratmp_snapshot_id": "snap-006681e789612afd5",
+      "cwa_poc2_oraredo_snapshot_id": "snap-02f13c959c57891f1",
+      "cwa_poc2_share_snapshot_id": "snap-02e8ec5eb874dd9e0",
+      "app_disk_space_alert_threshold": "92",
+      "old_mail_server_url": "mail.aws.tst.legalservices.gov.uk",
+      "laa_mail_relay_url": "laa-mail.laa-development.modernisation-platform.service.justice.gov.uk",
+      "rhel7_ami_id": "ami-0e5f1571c6f046b98",
+      "rhel7_instance_type": "m4.xlarge"
+    },
+    "test": {
+      "example_var": "test-data"
+    },
+    "preproduction": {
+      "example_var": "preproduction-data"
+    },
+    "production": {
+      "example_var": "production-data"
+    }
+  }
+}

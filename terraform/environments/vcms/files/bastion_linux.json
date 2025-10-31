@@ -1,0 +1,12 @@
+{
+  "keys": {
+    "poc": {},
+    "development": {
+      "snorris": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHFcBHvDJ9uKCokIWtg2tnv1NzMMkWb6C9E9oyN0TueQ sebastian.norris@digital.justice.gov.uk"
+    },
+    "test": {},
+    "stage": {},
+    "preprod": {},
+    "prod": {}
+  }
+}

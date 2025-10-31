@@ -1,0 +1,140 @@
+{
+  "objects_from": "tempus_case_work",
+  "extraction_date": "2025-03-26T10:43:35.561892",
+  "objects": ["dbo.CaseTrimDocuments"],
+  "blobs": [],
+  "columns_to_exclude": [
+    {
+      "object_name": "dbo.CaseTrimDocuments",
+      "column_name": "BankSeqNo"
+    },
+    {
+      "object_name": "dbo.CaseTrimDocuments",
+      "column_name": "BankSeqNo2"
+    },
+    {
+      "object_name": "dbo.CaseTrimDocuments",
+      "column_name": "BarcodeID"
+    },
+    {
+      "object_name": "dbo.CaseTrimDocuments",
+      "column_name": "BatchData"
+    },
+    {
+      "object_name": "dbo.CaseTrimDocuments",
+      "column_name": "CaseTrimDocID"
+    },
+    {
+      "object_name": "dbo.CaseTrimDocuments",
+      "column_name": "CopiedFrom"
+    },
+    {
+      "object_name": "dbo.CaseTrimDocuments",
+      "column_name": "DESCRIPTION"
+    },
+    {
+      "object_name": "dbo.CaseTrimDocuments",
+      "column_name": "DateRequested"
+    },
+    {
+      "object_name": "dbo.CaseTrimDocuments",
+      "column_name": "DecisionDueDate"
+    },
+    {
+      "object_name": "dbo.CaseTrimDocuments",
+      "column_name": "Direction"
+    },
+    {
+      "object_name": "dbo.CaseTrimDocuments",
+      "column_name": "DocumentFileLocation"
+    },
+    {
+      "object_name": "dbo.CaseTrimDocuments",
+      "column_name": "DocumentFolderLocation"
+    },
+    {
+      "object_name": "dbo.CaseTrimDocuments",
+      "column_name": "DocumentReviewStatus"
+    },
+    {
+      "object_name": "dbo.CaseTrimDocuments",
+      "column_name": "DocumentReviewedBy"
+    },
+    {
+      "object_name": "dbo.CaseTrimDocuments",
+      "column_name": "DocumentScanDate"
+    },
+    {
+      "object_name": "dbo.CaseTrimDocuments",
+      "column_name": "DocumentSentTo"
+    },
+    {
+      "object_name": "dbo.CaseTrimDocuments",
+      "column_name": "DocumentStatus"
+    },
+    {
+      "object_name": "dbo.CaseTrimDocuments",
+      "column_name": "DueDate"
+    },
+    {
+      "object_name": "dbo.CaseTrimDocuments",
+      "column_name": "EventRaised"
+    },
+    {
+      "object_name": "dbo.CaseTrimDocuments",
+      "column_name": "ForPrinting"
+    },
+    {
+      "object_name": "dbo.CaseTrimDocuments",
+      "column_name": "FullDocumentURL"
+    },
+    {
+      "object_name": "dbo.CaseTrimDocuments",
+      "column_name": "IVB_ID"
+    },
+    {
+      "object_name": "dbo.CaseTrimDocuments",
+      "column_name": "JobID"
+    },
+    {
+      "object_name": "dbo.CaseTrimDocuments",
+      "column_name": "PagesToExtract"
+    },
+    {
+      "object_name": "dbo.CaseTrimDocuments",
+      "column_name": "Payment1Made"
+    },
+    {
+      "object_name": "dbo.CaseTrimDocuments",
+      "column_name": "Payment2Made"
+    },
+    {
+      "object_name": "dbo.CaseTrimDocuments",
+      "column_name": "PaymentID"
+    },
+    {
+      "object_name": "dbo.CaseTrimDocuments",
+      "column_name": "ProcessID"
+    },
+    {
+      "object_name": "dbo.CaseTrimDocuments",
+      "column_name": "RedactNumber"
+    },
+    {
+      "object_name": "dbo.CaseTrimDocuments",
+      "column_name": "ReminderCount"
+    },
+    {
+      "object_name": "dbo.CaseTrimDocuments",
+      "column_name": "ReminderFragmentID"
+    },
+    {
+      "object_name": "dbo.CaseTrimDocuments",
+      "column_name": "ReminderTask"
+    },
+    {
+      "object_name": "dbo.CaseTrimDocuments",
+      "column_name": "SentBy"
+    }
+  ]
+}

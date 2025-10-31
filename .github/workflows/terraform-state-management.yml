@@ -1,0 +1,245 @@
+name: Terraform State Management
+
+on:
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: "State operation to perform"
+        required: true
+        type: choice
+        options:
+          - unlock
+          - import
+          - remove
+      application:
+        description: "Application name (e.g. apex)"
+        required: true
+        type: string
+      workspace:
+        description: "Environment workspace"
+        required: true
+        type: choice
+        options:
+          - development
+          - test
+          - preproduction
+          - production
+      lock_id:
+        description: "Lock ID (required for unlock operation)"
+        required: false
+        type: string
+      resource_addresses:
+        description: "Resource addresses (comma-separated, required for import/remove operations)"
+        required: false
+        type: string
+      resource_ids:
+        description: "Resource IDs for import (comma-separated, must match resource_addresses order)"
+        required: false
+        type: string
+      branch_name:
+        description: "Feature branch to checkout (Required for import operation)"
+        required: false
+        type: string
+        default: "main"
+      component:
+        type: string
+        required: false
+        default: "root"
+        description: "Component (Optional: subfolder in 'terraform/environments/<application>' if present)"
+
+permissions:
+  id-token: write
+  contents: read
+  actions: read
+
+jobs:
+  request_operation:
+    runs-on: ubuntu-latest
+    outputs:
+      operation_summary: ${{ steps.create_summary.outputs.summary }}
+    steps:
+      - name: Validate Inputs
+        run: |
+          if [[ "${{ github.event.inputs.operation }}" == "unlock" && -z "${{ github.event.inputs.lock_id }}" ]]; then
+            echo "Error: lock_id is required for unlock operation"
+            exit 1
+          fi
+
+          if [[ "${{ github.event.inputs.operation }}" != "unlock" && -z "${{ github.event.inputs.resource_addresses }}" ]]; then
+            echo "Error: resource_addresses is required for import/remove operations"
+            exit 1
+          fi
+
+          if [[ "${{ github.event.inputs.operation }}" == "import" && -z "${{ github.event.inputs.resource_ids }}" ]]; then
+            echo "Error: resource_ids is required for import operation"
+            exit 1
+          fi
+
+      - name: Show Operation Details
+        run: |
+          echo "Requested operation: ${{ github.event.inputs.operation }}"
+          echo "Application: ${{ github.event.inputs.application }}"
+          echo "Workspace: ${{ github.event.inputs.workspace }}"
+          echo "Target folder: terraform/environments/${{ github.event.inputs.application }}"
+          echo "Target workspace: ${{ github.event.inputs.application }}-${{ github.event.inputs.workspace }}"
+
+          if [[ "${{ github.event.inputs.component }}" != "root" ]]; then
+            echo "Component: ${{ github.event.inputs.component }}"
+          fi
+
+          if [[ "${{ github.event.inputs.branch_name }}" != "main" ]]; then
+            echo "Branch: ${{ github.event.inputs.branch_name }}"
+          fi
+
+          if [[ "${{ github.event.inputs.operation }}" == "unlock" ]]; then
+            echo "Lock ID: ${{ github.event.inputs.lock_id }}"
+          else
+            echo "Resource Addresses (comma-separated):"
+            echo "${{ github.event.inputs.resource_addresses }}"
+            if [[ "${{ github.event.inputs.operation }}" == "import" ]]; then
+              echo "Resource IDs (comma-separated):"
+              echo "${{ github.event.inputs.resource_ids }}"
+            fi
+          fi
+
+      - name: Create Operation Summary
+        id: create_summary
+        run: |
+          # Create markdown formatted summary
+          echo "# Terraform State Operation Request" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Operation:** ${{ github.event.inputs.operation }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Target workspace:** ${{ github.event.inputs.application }}-${{ github.event.inputs.workspace }}" >> $GITHUB_STEP_SUMMARY
+
+          SUMMARY="## Operation Details\n"
+          SUMMARY+="- **Operation:** ${{ github.event.inputs.operation }}\n"
+          SUMMARY+="- **Application:** ${{ github.event.inputs.application }}\n"
+          SUMMARY+="- **Workspace:** ${{ github.event.inputs.workspace }}\n"
+
+          if [[ "${{ github.event.inputs.component }}" != "root" ]]; then
+            echo "**Component:** ${{ github.event.inputs.component }}" >> $GITHUB_STEP_SUMMARY
+            SUMMARY+="- **Component:** ${{ github.event.inputs.component }}\n"
+          fi
+
+          if [[ "${{ github.event.inputs.branch_name }}" != "main" ]]; then
+            echo "**Branch:** ${{ github.event.inputs.branch_name }}" >> $GITHUB_STEP_SUMMARY
+            SUMMARY+="- **Branch:** ${{ github.event.inputs.branch_name }}\n"
+          fi
+
+          if [[ "${{ github.event.inputs.operation }}" == "unlock" ]]; then
+              echo "**Lock ID:** ${{ github.event.inputs.lock_id }}" >> $GITHUB_STEP_SUMMARY
+              SUMMARY+="- **Lock ID:** ${{ github.event.inputs.lock_id }}\n"
+          else
+              # Convert comma-separated values to newlines for display
+              ADDRESSES_DISPLAY=$(echo '${{ github.event.inputs.resource_addresses }}' | tr ',' '\n')
+              
+              echo "**Resource Addresses:**" >> $GITHUB_STEP_SUMMARY
+              echo '```' >> $GITHUB_STEP_SUMMARY
+              echo "$ADDRESSES_DISPLAY" >> $GITHUB_STEP_SUMMARY
+              echo '```' >> $GITHUB_STEP_SUMMARY
+              
+              # Format for output to next job (keep as comma-separated)
+              SUMMARY+='- **Resources:** ${{ github.event.inputs.resource_addresses }}\n'
+              
+              if [[ "${{ github.event.inputs.operation }}" == "import" ]]; then
+                # Convert comma-separated values to newlines for display
+                IDS_DISPLAY=$(echo "${{ github.event.inputs.resource_ids }}" | tr ',' '\n')
+                
+                echo "**Resource IDs:**" >> $GITHUB_STEP_SUMMARY
+                echo '```' >> $GITHUB_STEP_SUMMARY
+                echo "$IDS_DISPLAY" >> $GITHUB_STEP_SUMMARY
+                echo '```' >> $GITHUB_STEP_SUMMARY
+              fi
+          fi
+
+          echo "summary<<EOF" >> $GITHUB_OUTPUT
+          echo -e "$SUMMARY" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+  fetch-secrets:
+        uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@4eceb2a416a197e91dc557c2ef0b5dd9afe29e0c # v3.4.6
+        secrets:
+          MODERNISATION_PLATFORM_ACCOUNT_NUMBER: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
+          PASSPHRASE: ${{ secrets.PASSPHRASE }}
+
+  approve_operation:
+    needs: [request_operation, fetch-secrets]
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.application }}-${{ github.event.inputs.workspace }}
+    steps:
+      - name: Display Operation Details
+        run: |
+          echo -e "${{ needs.request_operation.outputs.operation_summary }}" >> $GITHUB_STEP_SUMMARY
+
+          # Also output to console for logs
+          echo -e "${{ needs.request_operation.outputs.operation_summary }}"
+
+      - name: Checkout repository
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          ref: ${{ github.event.inputs.branch_name }}
+
+      - name: Decrypt Secrets
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@4eceb2a416a197e91dc557c2ef0b5dd9afe29e0c # v3.4.6
+        with:
+          environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
+          PASSPHRASE: ${{ secrets.PASSPHRASE }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3.1.2
+        with:
+          terraform_version: "~1"
+
+      - name: Get AWS Account Number
+        run: |
+          ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${{ github.event.inputs.application }}-${{ github.event.inputs.workspace }}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)
+          echo "::add-mask::$ACCOUNT_NUMBER"
+          echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@00943011d9042930efac3dcd3a170e4273319bc8 # v5.1.0
+        with:
+          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
+          role-session-name: githubactionsrolesession
+          aws-region: "eu-west-2"
+
+      - name: Terraform Init
+        working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
+        run: terraform init
+
+      - name: Select Workspace
+        working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
+        run: terraform workspace select ${{ github.event.inputs.application }}-${{ github.event.inputs.workspace }}
+
+      - name: Perform Unlock Operation
+        if: github.event.inputs.operation == 'unlock'
+        working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
+        run: terraform force-unlock -force ${{ github.event.inputs.lock_id }}
+
+      - name: Write Resource Addresses to File
+        if: github.event.inputs.operation != 'unlock'
+        run: |
+          mkdir -p temp
+          # Convert comma-separated values to newlines
+          echo '${{ github.event.inputs.resource_addresses }}' | tr ',' '\n' > temp/resource_addresses.txt
+
+      - name: Write Resource IDs to File
+        if: github.event.inputs.operation == 'import'
+        run: |
+          # Convert comma-separated values to newlines
+          echo "${{ github.event.inputs.resource_ids }}" | tr ',' '\n' > temp/resource_ids.txt
+
+      - name: Execute Import Script
+        if: github.event.inputs.operation == 'import'
+        run: |
+          scripts/terraform-import.sh \
+            "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}" \
+            temp/resource_addresses.txt \
+            temp/resource_ids.txt
+
+      - name: Execute Remove Script
+        if: github.event.inputs.operation == 'remove'
+        run: |
+          scripts/terraform-remove.sh \
+            "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}" \
+            temp/resource_addresses.txt

@@ -1,0 +1,51 @@
+{
+  "accounts": {
+    "development": {
+      "example_var": "dev-data",
+      "ec2amiid": "ami-09859dcb9823d3418",
+      "ec2instancetype": "r5a.large",
+      "bucketname": "laa-oracle-software",
+      "orahomesize": "200",
+      "orahome_snapshot": "snap-0bf30e49cb9bc2421",
+      "stageesize": "150",
+      "stage_snapshot": "snap-09d54ad454edbd1cf",
+      "managementcidr": "10.200.0.0/20",
+      "outbound_access_cidr": "0.0.0.0/0",
+      "inbound_cidr_lz": "10.202.0.0/20",
+      "region": "eu-west-2",
+      "allocated_storage": "50",
+      "engine": "oracle-ee",
+      "engine_version": "19.0.0.0.ru-2021-10.rur-2021-10.r1",
+      "instance_class": "db.t3.small",
+      "allow_major_version_upgrade": true,
+      "auto_minor_version_upgrade": false,
+      "storage_type": "gp2",
+      "backup_retention_period": 35,
+      "backup_window": "22:00-01:00",
+      "maintenance_window": "Mon:01:15-Mon:06:00",
+      "character_set_name": "AL32UTF8",
+      "availability_zone": "eu-west-2a",
+      "multi_az": false,
+      "username": "sysdba",
+      "db_password_rotation_period": 28,
+      "license_model": "bring-your-own-license",
+      "rds_snapshot_name": "firstdbsetup",
+      "lz_vpc_cidr": "10.202.0.0/20",
+      "deletion_protection": "false",
+      "dashboard_widget_period": 60,
+      "pagerduty_integration_key_name": "laa_oas_nonprod_alarms",
+      "rotate_secret_lambda_retention": 180,
+      "iam_role_arn": "arn:aws:iam::711138931639:role/AWSBackup"
+    },
+    "test": {
+      "example_var": "test-data"
+    },
+    "preproduction": {
+      "example_var": "preproduction-data"
+    },
+    "production": {
+      "example_var": "production-data",
+      "pagerduty_integration_key_name": "laa_oas_prod_alarms"
+    }
+  }
+}

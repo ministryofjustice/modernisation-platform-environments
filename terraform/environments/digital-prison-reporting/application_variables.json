@@ -1,0 +1,909 @@
+{
+  "accounts": {
+    "development": {
+      "project_short_id": "dpr",
+      "create_database": true,
+      "db_description": "DPR Data Catalog",
+      "create_job": true,
+      "glue_log_retention_in_days": 3,
+      "lambda_log_retention_in_days": 3,
+      "dms_log_retention_in_days": 3,
+      "other_log_retention_in_days": 30,
+      "athena_federated_query_lambda_memory_mb": 550,
+      "athena_federated_query_lambda_timeout_seconds": 900,
+      "athena_federated_query_lambda_concurrent_executions": 20,
+      "glue_job_name": "glue-job-ingester",
+      "glue_job_common_log_level": "INFO",
+      "maintenance_job_retry_max_attempts": 10,
+      "maintenance_job_retry_min_wait_millis": 1000,
+      "maintenance_job_retry_max_wait_millis": 20000,
+      "compact_job_worker_type": "G.1X",
+      "compact_job_num_workers": 3,
+      "compact_job_log_level": "INFO",
+      "retention_job_worker_type": "G.1X",
+      "retention_job_num_workers": 2,
+      "retention_job_log_level": "INFO",
+      "hive_table_creation_job_schema_cache_max_size": 0,
+      "create_security_conf": true,
+      "setup_buckets": true,
+      "create_glue_registries": false,
+      "setup_s3_buckets": true,
+      "create_glue_connections": true,
+      "enable_operational_datastore_job_access": true,
+      "kinesis_agent_autoscale": false,
+      "ec2_instance_type": "t3.small",
+      "ami_image_id": "ami-00cc4c3fee6bb6c22",
+      "setup_redshift": true,
+      "setup_dms_instance": true,
+      "enable_dms_replication_task": true,
+      "enable_domain_builder_lambda": true,
+      "enable_dbuilder_flyway_lambda": true,
+      "enable_scheduled_dataset_lambda": true,
+      "enable_generate_dataset_lambda": true,
+      "enable_multiphase_query_lambda": true,
+      "multiphase_query_lambda_version": "vLatest",
+      "enable_multiphase_cleanup_lambda": true,
+      "multiphase_cleanup_lambda_version": "vLatest",
+      "scheduled_s3_file_transfer_retention_period_amount": 0,
+      "scheduled_s3_file_transfer_retention_period_unit": "days",
+      "scheduled_file_transfer_use_default_parallelism": "false",
+      "scheduled_file_transfer_parallelism": 128,
+      "enable_domain_builder_rds": true,
+      "domain_builder_rds_parameter_group": "default.postgres14",
+      "enable_domain_builder_agent": true,
+      "enable_cloud_trail": false,
+      "include_dbuilder_gw_vpclink": false,
+      "enable_dbuilder_serverless_gw": true,
+      "enable_dbuilder_apikey": true,
+      "enable_slack_alerts": true,
+      "enable_pagerduty_alerts": false,
+      "enable_dms_failure_alerts": false,
+      "enable_transfer_component_lambda": true,
+      "create_transfer_component_lambda_layer": true,
+      "setup_fake_data_dms_instance": true,
+      "enable_fake_data_dms_replication_task": true,
+      "setup_sonatype_secrets": true,
+      "setup_scheduled_action_iam_role": true,
+      "setup_redshift_schedule": true,
+      "scheduled_dataset_lambda_version": "vLatest",
+      "dps_domains": [
+        "dps-activities",
+        "dps-case-notes",
+        "dps-basm",
+        "dps-inc-reporting",
+        "dps-csip",
+        "dps-alerts",
+        "dps-use-of-force",
+        "dps-locations",
+        "dps-calc-rel-date",
+        "dps-incentives",
+        "dps-non-associations",
+        "dps-health-and-me",
+        "dps-mj-and-ma",
+        "dps-testing",
+        "dps-testing2",
+        "dps-prison-reg",
+        "dps-personal-rela",
+        "dps-organisations",
+        "dps-allocations",
+        "dps-applications",
+        "dps-manage-pom",
+        "dps-san"
+      ],
+      "alarms": {
+        "setup_cw_alarms": true,
+        "redshift": {
+          "health_check": {
+            "enable": true,
+            "threshold": 1,
+            "period": 60
+          }
+        },
+        "dms": {
+          "stop_check": {
+            "enable": true,
+            "threshold": 0,
+            "period": 30
+          },
+          "start_check": {
+            "enable": true,
+            "threshold": 0,
+            "period": 30
+          },
+          "cpu_check": {
+            "enable": true,
+            "threshold": 80,
+            "period": 300
+          },
+          "freemem_check": {
+            "enable": true,
+            "threshold": 1000000000,
+            "period": 300
+          },
+          "freeablemem_check": {
+            "enable": true,
+            "threshold": 1000000000,
+            "period": 300
+          },
+          "swapusage_check": {
+            "enable": true,
+            "threshold": 750000000,
+            "period": 300
+          },
+          "network_trans_tp_check": {
+            "enable": true,
+            "threshold": 10,
+            "period": 300
+          },
+          "network_rec_tp_check": {
+            "enable": true,
+            "threshold": 10,
+            "period": 300
+          },
+          "cdc_src_lat_check": {
+            "enable": true,
+            "threshold": 3600,
+            "period": 900
+          },
+          "cdc_targ_lat_check": {
+            "enable": true,
+            "threshold": 3600,
+            "period": 900
+          },
+          "cdc_inc_events_check": {
+            "enable": true,
+            "threshold": 100,
+            "period": 60
+          }
+        },
+        "lambda": {
+          "postgres_tickle_function_failure": {
+            "create": false,
+            "enable": false,
+            "threshold": 1,
+            "period": 60
+          }
+        }
+      },
+      "biprws": {
+        "enable": true,
+        "endpoint": "http://T1PWL1NTVQX0001.azure.noms.root:7777",
+        "endpoint_type": "domain_name"
+      },
+      "setup_cw_insights": true,
+      "enable_cp_k8s_secrets": true,
+      "enable_cp_bodmis_k8s_secrets": true,
+      "enable_dbt_k8s_secrets": true,
+      "dpr_generic_athena_workgroup": true,
+      "analytics_generic_athena_workgroup": true,
+      "analytical_platform_share": [
+        {
+          "target_account_name": "analytical-platform-data-production",
+          "target_account_id": "593291632749",
+          "assume_account_name": "analytical-platform-management-production",
+          "assume_account_id": "042130406152",
+          "data_locations": ["dpr-structured-historical-development"],
+          "resource_shares": [
+            {
+              "glue_database": "dpr_ap_integration_test_newtag_dev_dbt",
+              "glue_tables": ["*"]
+            },
+            {
+              "glue_database": "curated_prisons_history_dev_dbt",
+              "glue_tables": ["*"]
+            },
+            {
+              "glue_database": "staged_prisons_history_dev_dbt",
+              "glue_tables": ["*"]
+            }
+          ]
+        }
+      ],
+      "redshift_table_expiry_days": 7,
+      "enable_s3_data_migrate_lambda": true,
+      "create_postgres_load_generator_job": true,
+      "enable_probation_discovery_node": true,
+      "dpr_rds_db": {
+        "enable": true,
+        "create_replica": true,
+        "engine": "postgres",
+        "engine_version": "17.5",
+        "init_size": "158",
+        "max_size": "1000",
+        "name": "testdatabase",
+        "db_identifier": "test-database-alt",
+        "inst_class": "db.t4g.large",
+        "user": "postgres",
+        "store_type": "gp3",
+        "parameter_group_family": "postgres17",
+        "parameter_group_name": "pg17-with-pglogical"
+      },
+      "missing_report_submissions_rds": {
+        "enable": true,
+        "create_replica": true,
+        "engine": "aurora-postgresql",
+        "engine_version": "16.8",
+        "init_size": "158",
+        "max_size": "1000",
+        "name": "missingreportsubmissions",
+        "db_identifier": "missingreportsubmissions",
+        "inst_class": "db.t3.medium",
+        "user": "postgres",
+        "store_type": "gp3",
+        "parameter_group_family": "postgres16",
+        "parameter_group_name": "with-pglogical"
+      }
+    },
+    "test": {
+      "project_short_id": "dpr",
+      "create_database": true,
+      "db_description": "DPR Data Catalog",
+      "create_job": true,
+      "glue_log_retention_in_days": 3,
+      "lambda_log_retention_in_days": 3,
+      "dms_log_retention_in_days": 3,
+      "other_log_retention_in_days": 30,
+      "athena_federated_query_lambda_memory_mb": 550,
+      "athena_federated_query_lambda_timeout_seconds": 900,
+      "athena_federated_query_lambda_concurrent_executions": 20,
+      "glue_job_name": "glue-job-ingester",
+      "glue_job_common_log_level": "INFO",
+      "maintenance_job_retry_max_attempts": 10,
+      "maintenance_job_retry_min_wait_millis": 1000,
+      "maintenance_job_retry_max_wait_millis": 20000,
+      "compact_job_worker_type": "G.1X",
+      "compact_job_num_workers": 3,
+      "compact_job_log_level": "INFO",
+      "retention_job_worker_type": "G.1X",
+      "retention_job_num_workers": 2,
+      "retention_job_log_level": "INFO",
+      "hive_table_creation_job_schema_cache_max_size": 0,
+      "create_security_conf": true,
+      "setup_buckets": true,
+      "create_glue_registries": false,
+      "setup_s3_buckets": true,
+      "create_glue_connections": true,
+      "enable_operational_datastore_job_access": true,
+      "kinesis_agent_autoscale": true,
+      "ec2_instance_type": "t3.small",
+      "ami_image_id": "ami-00cc4c3fee6bb6c22",
+      "setup_redshift": true,
+      "setup_dms_instance": true,
+      "enable_dms_replication_task": true,
+      "enable_domain_builder_lambda": true,
+      "enable_dbuilder_flyway_lambda": true,
+      "enable_scheduled_dataset_lambda": true,
+      "enable_generate_dataset_lambda": true,
+      "enable_multiphase_query_lambda": true,
+      "multiphase_query_lambda_version": "vLatest",
+      "enable_multiphase_cleanup_lambda": true,
+      "multiphase_cleanup_lambda_version": "vLatest",
+      "scheduled_s3_file_transfer_retention_period_amount": 0,
+      "scheduled_s3_file_transfer_retention_period_unit": "days",
+      "scheduled_file_transfer_use_default_parallelism": "false",
+      "scheduled_file_transfer_parallelism": 128,
+      "enable_domain_builder_rds": true,
+      "domain_builder_rds_parameter_group": "default.postgres14",
+      "enable_domain_builder_agent": true,
+      "enable_cloud_trail": false,
+      "include_dbuilder_gw_vpclink": false,
+      "enable_dbuilder_serverless_gw": true,
+      "enable_dbuilder_apikey": true,
+      "enable_slack_alerts": true,
+      "enable_pagerduty_alerts": false,
+      "enable_dms_failure_alerts": false,
+      "enable_transfer_component_lambda": true,
+      "create_transfer_component_lambda_layer": true,
+      "setup_fake_data_dms_instance": false,
+      "enable_fake_data_dms_replication_task": false,
+      "setup_sonatype_secrets": false,
+      "setup_scheduled_action_iam_role": true,
+      "setup_redshift_schedule": true,
+      "scheduled_dataset_lambda_version": "vLatest",
+      "dps_domains": [
+        "dps-activities",
+        "dps-case-notes",
+        "dps-basm",
+        "dps-inc-reporting",
+        "dps-csip",
+        "dps-alerts",
+        "dps-use-of-force",
+        "dps-incentives",
+        "dps-non-associations",
+        "dps-health-and-me",
+        "dps-mj-and-ma",
+        "dps-locations",
+        "dps-calc-rel-date",
+        "dps-prison-reg",
+        "dps-personal-rela",
+        "dps-organisations",
+        "dps-allocations",
+        "dps-applications",
+        "dps-manage-pom",
+        "dps-san"
+      ],
+      "alarms": {
+        "setup_cw_alarms": true,
+        "redshift": {
+          "health_check": {
+            "enable": true,
+            "threshold": 1,
+            "period": 60
+          }
+        },
+        "dms": {
+          "stop_check": {
+            "enable": true,
+            "threshold": 0,
+            "period": 30
+          },
+          "start_check": {
+            "enable": true,
+            "threshold": 0,
+            "period": 30
+          },
+          "cpu_check": {
+            "enable": true,
+            "threshold": 80,
+            "period": 300
+          },
+          "freemem_check": {
+            "enable": true,
+            "threshold": 1000000000,
+            "period": 300
+          },
+          "freeablemem_check": {
+            "enable": true,
+            "threshold": 1000000000,
+            "period": 300
+          },
+          "swapusage_check": {
+            "enable": true,
+            "threshold": 750000000,
+            "period": 300
+          },
+          "network_trans_tp_check": {
+            "enable": true,
+            "threshold": 10,
+            "period": 300
+          },
+          "network_rec_tp_check": {
+            "enable": true,
+            "threshold": 10,
+            "period": 300
+          },
+          "cdc_src_lat_check": {
+            "enable": true,
+            "threshold": 3600,
+            "period": 900
+          },
+          "cdc_targ_lat_check": {
+            "enable": true,
+            "threshold": 3600,
+            "period": 900
+          },
+          "cdc_inc_events_check": {
+            "enable": true,
+            "threshold": 100,
+            "period": 60
+          }
+        },
+        "lambda": {
+          "postgres_tickle_function_failure": {
+            "create": true,
+            "enable": false,
+            "threshold": 1,
+            "period": 60
+          }
+        }
+      },
+      "biprws": {
+        "enable": true,
+        "endpoint": "http://T1PWL1NTVQX0001.azure.noms.root:7777",
+        "endpoint_type": "domain_name"
+      },
+      "setup_cw_insights": false,
+      "enable_cp_k8s_secrets": false,
+      "enable_cp_bodmis_k8s_secrets": false,
+      "enable_dbt_k8s_secrets": true,
+      "dpr_generic_athena_workgroup": true,
+      "analytics_generic_athena_workgroup": true,
+      "redshift_table_expiry_days": 7,
+      "enable_s3_data_migrate_lambda": true,
+      "create_postgres_load_generator_job": true,
+      "enable_probation_discovery_node": false,
+      "dpr_rds_db": {
+        "enable": true,
+        "create_replica": true,
+        "engine": "postgres",
+        "engine_version": "16.8",
+        "init_size": "158",
+        "max_size": "1000",
+        "name": "testdatabase",
+        "db_identifier": "test-database",
+        "inst_class": "db.t4g.large",
+        "user": "postgres",
+        "store_type": "gp3",
+        "parameter_group_family": "postgres16",
+        "parameter_group_name": "with-pglogical"
+      },
+      "missing_report_submissions_rds": {
+        "enable": true,
+        "create_replica": true,
+        "engine": "aurora-postgresql",
+        "engine_version": "16.8",
+        "init_size": "158",
+        "max_size": "1000",
+        "name": "missingreportsubmissions",
+        "db_identifier": "missingreportsubmissions",
+        "inst_class": "db.t3.medium",
+        "user": "postgres",
+        "store_type": "gp3",
+        "parameter_group_family": "postgres16",
+        "parameter_group_name": "with-pglogical"
+      }
+    },
+    "preproduction": {
+      "project_short_id": "dpr",
+      "create_database": true,
+      "db_description": "DPR Data Catalog",
+      "create_job": true,
+      "glue_log_retention_in_days": 7,
+      "lambda_log_retention_in_days": 7,
+      "dms_log_retention_in_days": 14,
+      "other_log_retention_in_days": 30,
+      "athena_federated_query_lambda_memory_mb": 550,
+      "athena_federated_query_lambda_timeout_seconds": 900,
+      "athena_federated_query_lambda_concurrent_executions": 20,
+      "glue_job_name": "glue-job-ingester",
+      "glue_job_common_log_level": "INFO",
+      "maintenance_job_retry_max_attempts": 10,
+      "maintenance_job_retry_min_wait_millis": 1000,
+      "maintenance_job_retry_max_wait_millis": 20000,
+      "compact_job_worker_type": "G.1X",
+      "compact_job_num_workers": 4,
+      "compact_job_log_level": "INFO",
+      "retention_job_worker_type": "G.1X",
+      "retention_job_num_workers": 2,
+      "retention_job_log_level": "INFO",
+      "hive_table_creation_job_schema_cache_max_size": 0,
+      "create_security_conf": true,
+      "setup_buckets": true,
+      "create_glue_registries": false,
+      "setup_s3_buckets": true,
+      "create_glue_connections": true,
+      "enable_operational_datastore_job_access": true,
+      "kinesis_agent_autoscale": true,
+      "ec2_instance_type": "t3.small",
+      "ami_image_id": "ami-00cc4c3fee6bb6c22",
+      "setup_redshift": true,
+      "setup_dms_instance": true,
+      "enable_dms_replication_task": true,
+      "enable_domain_builder_lambda": true,
+      "enable_dbuilder_flyway_lambda": true,
+      "enable_scheduled_dataset_lambda": true,
+      "enable_generate_dataset_lambda": true,
+      "enable_multiphase_query_lambda": true,
+      "multiphase_query_lambda_version": "vLatest",
+      "enable_multiphase_cleanup_lambda": true,
+      "multiphase_cleanup_lambda_version": "vLatest",
+      "scheduled_s3_file_transfer_retention_period_amount": 0,
+      "scheduled_s3_file_transfer_retention_period_unit": "days",
+      "scheduled_file_transfer_use_default_parallelism": "false",
+      "scheduled_file_transfer_parallelism": 128,
+      "enable_domain_builder_rds": true,
+      "domain_builder_rds_parameter_group": "default.postgres14",
+      "enable_domain_builder_agent": true,
+      "enable_cloud_trail": false,
+      "include_dbuilder_gw_vpclink": false,
+      "enable_dbuilder_serverless_gw": true,
+      "enable_dbuilder_apikey": true,
+      "enable_slack_alerts": true,
+      "enable_pagerduty_alerts": true,
+      "enable_dms_failure_alerts": false,
+      "enable_transfer_component_lambda": true,
+      "create_transfer_component_lambda_layer": true,
+      "setup_fake_data_dms_instance": false,
+      "enable_fake_data_dms_replication_task": false,
+      "setup_sonatype_secrets": false,
+      "setup_cw_alarms": true,
+      "setup_scheduled_action_iam_role": true,
+      "setup_redshift_schedule": true,
+      "enable_redshift_health_check": true,
+      "scheduled_dataset_lambda_version": "vLatest",
+      "dps_domains": [
+        "dps-activities",
+        "dps-case-notes",
+        "dps-basm",
+        "dps-inc-reporting",
+        "dps-csip",
+        "dps-alerts",
+        "dps-use-of-force",
+        "dps-incentives",
+        "dps-non-associations",
+        "dps-health-and-me",
+        "dps-mj-and-ma",
+        "dps-locations",
+        "dps-calc-rel-date",
+        "dps-prison-reg",
+        "dps-personal-rela",
+        "dps-organisations",
+        "dps-allocations",
+        "dps-applications",
+        "dps-manage-pom",
+        "dps-san"
+      ],
+      "alarms": {
+        "setup_cw_alarms": true,
+        "redshift": {
+          "health_check": {
+            "enable": true,
+            "threshold": 1,
+            "period": 60
+          }
+        },
+        "dms": {
+          "stop_check": {
+            "enable": true,
+            "threshold": 0,
+            "period": 30
+          },
+          "start_check": {
+            "enable": true,
+            "threshold": 0,
+            "period": 30
+          },
+          "cpu_check": {
+            "enable": true,
+            "threshold": 80,
+            "period": 300
+          },
+          "freemem_check": {
+            "enable": true,
+            "threshold": 1000000000,
+            "period": 300
+          },
+          "freeablemem_check": {
+            "enable": true,
+            "threshold": 1000000000,
+            "period": 300
+          },
+          "swapusage_check": {
+            "enable": true,
+            "threshold": 750000000,
+            "period": 300
+          },
+          "network_trans_tp_check": {
+            "enable": true,
+            "threshold": 10,
+            "period": 300
+          },
+          "network_rec_tp_check": {
+            "enable": true,
+            "threshold": 10,
+            "period": 300
+          },
+          "cdc_src_lat_check": {
+            "enable": true,
+            "threshold": 3600,
+            "period": 900
+          },
+          "cdc_targ_lat_check": {
+            "enable": true,
+            "threshold": 3600,
+            "period": 900
+          },
+          "cdc_inc_events_check": {
+            "enable": true,
+            "threshold": 100,
+            "period": 60
+          }
+        },
+        "lambda": {
+          "postgres_tickle_function_failure": {
+            "create": true,
+            "enable": false,
+            "threshold": 1,
+            "period": 60
+          }
+        }
+      },
+      "biprws": {
+        "enable": true,
+        "endpoint": "https://reporting.preprod.nomis.az.justice.gov.uk",
+        "endpoint_type": "load_balancer"
+      },
+      "setup_cw_insights": false,
+      "enable_cp_k8s_secrets": false,
+      "enable_cp_bodmis_k8s_secrets": false,
+      "enable_dbt_k8s_secrets": true,
+      "dpr_generic_athena_workgroup": true,
+      "analytics_generic_athena_workgroup": true,
+      "analytical_platform_share": [
+        {
+          "target_account_name": "analytical-platform-data-production",
+          "target_account_id": "593291632749",
+          "assume_account_name": "analytical-platform-management-production",
+          "assume_account_id": "042130406152",
+          "data_locations": ["dpr-structured-historical-preproduction"],
+          "resource_shares": [
+            {
+              "glue_database": "staged_prisons_history_preprod_dbt",
+              "glue_tables": ["*"]
+            },
+            {
+              "glue_database": "curated_prisons_history_preprod_dbt",
+              "glue_tables": ["*"]
+            }
+          ]
+        }
+      ],
+      "redshift_table_expiry_days": 7,
+      "enable_s3_data_migrate_lambda": true,
+      "create_postgres_load_generator_job": false,
+      "enable_probation_discovery_node": false,
+      "dpr_rds_db": {
+        "enable": false,
+        "create_replica": false,
+        "engine": "postgres",
+        "engine_version": "16.8",
+        "init_size": "158",
+        "max_size": "1000",
+        "name": "testdatabase",
+        "db_identifier": "test-database",
+        "inst_class": "db.t4g.large",
+        "user": "postgres",
+        "store_type": "gp3",
+        "parameter_group_family": "postgres16",
+        "parameter_group_name": "with-pglogical"
+      },
+      "missing_report_submissions_rds": {
+        "enable": true,
+        "create_replica": true,
+        "engine": "aurora-postgresql",
+        "engine_version": "16.8",
+        "init_size": "158",
+        "max_size": "1000",
+        "name": "missingreportsubmissions",
+        "db_identifier": "missingreportsubmissions",
+        "inst_class": "db.t3.medium",
+        "user": "postgres",
+        "store_type": "gp3",
+        "parameter_group_family": "postgres16",
+        "parameter_group_name": "with-pglogical"
+      }
+    },
+    "production": {
+      "project_short_id": "dpr",
+      "create_database": true,
+      "db_description": "DPR Data Catalog",
+      "create_job": true,
+      "glue_log_retention_in_days": 7,
+      "lambda_log_retention_in_days": 7,
+      "dms_log_retention_in_days": 14,
+      "other_log_retention_in_days": 30,
+      "athena_federated_query_lambda_memory_mb": 550,
+      "athena_federated_query_lambda_timeout_seconds": 900,
+      "athena_federated_query_lambda_concurrent_executions": 20,
+      "glue_job_name": "glue-job-ingester",
+      "glue_job_common_log_level": "INFO",
+      "maintenance_job_retry_max_attempts": 10,
+      "maintenance_job_retry_min_wait_millis": 1000,
+      "maintenance_job_retry_max_wait_millis": 20000,
+      "compact_job_worker_type": "G.1X",
+      "compact_job_num_workers": 5,
+      "compact_job_log_level": "INFO",
+      "retention_job_worker_type": "G.1X",
+      "retention_job_num_workers": 2,
+      "retention_job_log_level": "INFO",
+      "hive_table_creation_job_schema_cache_max_size": 0,
+      "create_security_conf": true,
+      "setup_buckets": true,
+      "create_glue_registries": false,
+      "setup_s3_buckets": true,
+      "create_glue_connections": true,
+      "enable_operational_datastore_job_access": false,
+      "kinesis_agent_autoscale": true,
+      "ec2_instance_type": "t3.small",
+      "ami_image_id": "ami-00cc4c3fee6bb6c22",
+      "setup_redshift": true,
+      "setup_dms_instance": true,
+      "enable_dms_replication_task": true,
+      "enable_domain_builder_lambda": true,
+      "enable_dbuilder_flyway_lambda": true,
+      "enable_scheduled_dataset_lambda": false,
+      "enable_generate_dataset_lambda": false,
+      "enable_multiphase_query_lambda": false,
+      "multiphase_query_lambda_version": "vLatest",
+      "enable_multiphase_cleanup_lambda": false,
+      "multiphase_cleanup_lambda_version": "vLatest",
+      "scheduled_s3_file_transfer_retention_period_amount": 0,
+      "scheduled_s3_file_transfer_retention_period_unit": "days",
+      "scheduled_file_transfer_use_default_parallelism": "false",
+      "scheduled_file_transfer_parallelism": 128,
+      "enable_domain_builder_rds": true,
+      "domain_builder_rds_parameter_group": "default.postgres15",
+      "enable_domain_builder_agent": true,
+      "enable_cloud_trail": false,
+      "include_dbuilder_gw_vpclink": false,
+      "enable_dbuilder_serverless_gw": true,
+      "enable_dbuilder_apikey": true,
+      "enable_slack_alerts": true,
+      "enable_pagerduty_alerts": false,
+      "enable_dms_failure_alerts": true,
+      "enable_transfer_component_lambda": true,
+      "create_transfer_component_lambda_layer": true,
+      "setup_fake_data_dms_instance": false,
+      "enable_fake_data_dms_replication_task": false,
+      "setup_sonatype_secrets": false,
+      "setup_scheduled_action_iam_role": false,
+      "setup_redshift_schedule": false,
+      "scheduled_dataset_lambda_version": "vLatest",
+      "dps_domains": [
+        "dps-activities",
+        "dps-case-notes",
+        "dps-basm",
+        "dps-inc-reporting",
+        "dps-csip",
+        "dps-alerts",
+        "dps-use-of-force",
+        "dps-incentives",
+        "dps-non-associations",
+        "dps-health-and-me",
+        "dps-mj-and-ma",
+        "dps-locations",
+        "dps-calc-rel-date",
+        "dps-prison-reg",
+        "dps-personal-rela",
+        "dps-organisations",
+        "dps-allocations",
+        "dps-applications",
+        "dps-manage-pom",
+        "dps-san"
+      ],
+      "alarms": {
+        "setup_cw_alarms": true,
+        "redshift": {
+          "health_check": {
+            "enable": true,
+            "threshold": 1,
+            "period": 60
+          }
+        },
+        "dms": {
+          "stop_check": {
+            "enable": true,
+            "threshold": 0,
+            "period": 30
+          },
+          "start_check": {
+            "enable": true,
+            "threshold": 0,
+            "period": 30
+          },
+          "cpu_check": {
+            "enable": true,
+            "threshold": 80,
+            "period": 300
+          },
+          "freemem_check": {
+            "enable": true,
+            "threshold": 1000000000,
+            "period": 300
+          },
+          "freeablemem_check": {
+            "enable": true,
+            "threshold": 1000000000,
+            "period": 300
+          },
+          "swapusage_check": {
+            "enable": true,
+            "threshold": 750000000,
+            "period": 300
+          },
+          "network_trans_tp_check": {
+            "enable": true,
+            "threshold": 10,
+            "period": 300
+          },
+          "network_rec_tp_check": {
+            "enable": true,
+            "threshold": 10,
+            "period": 300
+          },
+          "cdc_src_lat_check": {
+            "enable": true,
+            "threshold": 3600,
+            "period": 900
+          },
+          "cdc_targ_lat_check": {
+            "enable": true,
+            "threshold": 3600,
+            "period": 900
+          },
+          "cdc_inc_events_check": {
+            "enable": true,
+            "threshold": 100,
+            "period": 60
+          }
+        },
+        "lambda": {
+          "postgres_tickle_function_failure": {
+            "create": true,
+            "enable": true,
+            "threshold": 1,
+            "period": 60
+          }
+        }
+      },
+      "biprws": {
+        "enable": true,
+        "endpoint": "placeholder",
+        "endpoint_type": "load_balancer"
+      },
+      "setup_cw_insights": false,
+      "enable_cp_k8s_secrets": false,
+      "enable_cp_bodmis_k8s_secrets": false,
+      "enable_dbt_k8s_secrets": true,
+      "dpr_generic_athena_workgroup": true,
+      "analytics_generic_athena_workgroup": true,
+      "analytical_platform_share": [
+        {
+          "target_account_name": "analytical-platform-data-production",
+          "target_account_id": "593291632749",
+          "assume_account_name": "analytical-platform-management-production",
+          "assume_account_id": "042130406152",
+          "data_locations": ["dpr-structured-historical-production"],
+          "resource_shares": [
+            {
+              "glue_database": "staged_prisons_history",
+              "glue_tables": ["*"]
+            },
+            {
+              "glue_database": "curated_prisons_history",
+              "glue_tables": ["*"]
+            },
+            {
+              "glue_database": "prison_derived",
+              "glue_tables": ["*"]
+            }
+          ]
+        }
+      ],
+      "redshift_table_expiry_days": 1,
+      "enable_s3_data_migrate_lambda": false,
+      "create_postgres_load_generator_job": false,
+      "enable_probation_discovery_node": false,
+      "dpr_rds_db": {
+        "enable": false,
+        "create_replica": false,
+        "engine": "postgres",
+        "engine_version": "16.8",
+        "init_size": "158",
+        "max_size": "1000",
+        "name": "testdatabase",
+        "db_identifier": "test-database",
+        "inst_class": "db.t4g.large",
+        "user": "postgres",
+        "store_type": "gp3",
+        "parameter_group_family": "postgres16",
+        "parameter_group_name": "with-pglogical"
+      },
+      "missing_report_submissions_rds": {
+        "enable": true,
+        "create_replica": true,
+        "engine": "aurora-postgresql",
+        "engine_version": "16.8",
+        "init_size": "158",
+        "max_size": "1000",
+        "name": "missingreportsubmissions",
+        "db_identifier": "missingreportsubmissions",
+        "inst_class": "db.t3.medium",
+        "user": "postgres",
+        "store_type": "gp3",
+        "parameter_group_family": "postgres16",
+        "parameter_group_name": "with-pglogical"
+      }
+    }
+  }
+}

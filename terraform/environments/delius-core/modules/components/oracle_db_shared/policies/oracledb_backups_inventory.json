@@ -1,0 +1,24 @@
+{
+  "Version": "2012-10-17",
+
+  "Statement": [
+    {
+      "Sid": "InventoryPolicy",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "s3.amazonaws.com"
+      },
+      "Action": "s3:PutObject",
+      "Resource": "${inventory_s3bucket_arn}/*",
+      "Condition": {
+        "StringEquals": {
+          "aws:SourceAccount": "${aws_account_id}",
+          "s3:x-amz-acl": "bucket-owner-full-control"
+        },
+        "ArnLike": {
+          "aws:SourceArn": "${backup_s3bucket_arn}"
+        }
+      }
+    }
+  ]
+}
