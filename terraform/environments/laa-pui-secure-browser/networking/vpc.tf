@@ -10,7 +10,7 @@ module "vpc" {
   version = "5.21.0"
 
   name            = "${local.vpc_name}-${local.environment}-secure-browser"
-  azs             = ["eu-west-2a", "eu-west-2b"]
+  azs             = local.wssb_supported_az_names
   cidr            = local.environment_configuration.vpc_cidr
   public_subnets  = local.environment_configuration.vpc_public_subnets
   intra_subnets   = local.environment_configuration.vpc_intra_subnets
