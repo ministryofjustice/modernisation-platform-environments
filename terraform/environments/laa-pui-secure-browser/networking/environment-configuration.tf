@@ -9,6 +9,14 @@ locals {
       vpc_enable_nat_gateway     = true
       vpc_one_nat_gateway_per_az = true
       vpc_single_nat_gateway     = false
+
+      /* Transit Gateway */
+      transit_gateway_routes = [
+        "10.0.0.0/8",      # Internal 10.x.x.x
+        "172.20.0.0/16",   # Cloud Platform
+        "194.33.254.0/24", # SOP
+        "194.33.255.0/24", # SOP
+      ]
     }
   }
 
