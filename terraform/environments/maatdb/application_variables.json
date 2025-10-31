@@ -104,7 +104,7 @@
       "port": "1521",
       "allocated_storage": 300,
       "engine": "oracle-se2",
-      "engine_version": "19.0.0.0.ru-2025-01.rur-2025-01.r1",
+      "engine_version": "19.0.0.0.ru-2025-07.rur-2025-07.r1",
       "hub20_sec_group_id": "",
       "hub20_s3_bucket": "",
       "instance_class": "db.t3.medium",
