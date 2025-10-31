@@ -7,15 +7,23 @@ data "aws_vpc" "secure_browser" {
 }
 
 # Look up subnets in the new VPC for production
-data "aws_subnet" "secure_browser_private_a" {
+data "aws_subnets" "secure_browser_private_a" {
   count = local.environment == "production" ? 1 : 0
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.secure_browser[0].id]
+  }
   tags = {
     "Name" = "laa-private-${data.aws_region.current.name}a"
   }
 }
 
-data "aws_subnet" "secure_browser_private_b" {
+data "aws_subnets" "secure_browser_private_b" {
   count = local.environment == "production" ? 1 : 0
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.secure_browser[0].id]
+  }
   tags = {
     "Name" = "laa-private-${data.aws_region.current.name}b"
   }

@@ -11,10 +11,10 @@ locals {
   vpc_id = local.environment == "production" ? data.aws_vpc.secure_browser[0].id : data.aws_vpc.shared.id
 
   # Use new VPC subnets in production, shared VPC subnets in other environments
-  subnet_ids = local.environment == "production" ? [
-    data.aws_subnet.secure_browser_private_a[0].id,
-    data.aws_subnet.secure_browser_private_b[0].id
-    ] : [
+  subnet_ids = local.environment == "production" ? concat(
+    data.aws_subnets.secure_browser_private_a[0].ids,
+    data.aws_subnets.secure_browser_private_b[0].ids
+    ) : [
     data.aws_subnet.private_aza.id,
     data.aws_subnet.private_azc.id
   ]
