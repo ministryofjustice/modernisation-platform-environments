@@ -102,6 +102,9 @@ resource "aws_lambda_function" "patch_cwa_extract_lambda" {
       NAMESPACE         = "HUB20-CWA-NS"
       ENVIRONMENT       = local.environment
       LOG_LEVEL         = "DEBUG"
+      TNS_ADMIN         = "/tmp/wallet_dir"
+      BUCKET            = aws_s3_bucket.wallet_files.bucket
+      WALLET_OBJ        = "CWA/wallet_dir.zip"
     }
   }
 
@@ -143,6 +146,9 @@ resource "aws_lambda_function" "patch_cwa_file_transfer_lambda" {
       NAMESPACE         = "HUB20-CWA-NS"
       ENVIRONMENT       = local.environment
       LOG_LEVEL         = "DEBUG"
+      TNS_ADMIN         = "/tmp/wallet_dir"
+      BUCKET            = aws_s3_bucket.wallet_files.bucket
+      WALLET_OBJ        = "CWA/wallet_dir.zip"
     }
   }
 

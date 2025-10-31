@@ -95,6 +95,53 @@ resource "aws_s3_bucket_logging" "data" {
 }
 
 #####################################################################################
+######################## S3 Bucket for Extracted Data ###############################
+#####################################################################################
+
+resource "aws_s3_bucket" "wallet_files" {
+  bucket = "${local.application_name_short}-${local.environment}-wallet-files"
+
+  tags = merge(
+    local.tags,
+    { Name = "${local.application_name_short}-${local.environment}-wallet-files" }
+  )
+}
+
+resource "aws_s3_bucket_public_access_block" "wallet_files" {
+  bucket                  = aws_s3_bucket.wallet_files.bucket
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_ownership_controls" "wallet_files" {
+  bucket = aws_s3_bucket.wallet_files.id
+  rule {
+    object_ownership = "BucketOwnerEnforced"
+  }
+}
+
+resource "aws_s3_bucket_versioning" "wallet_files" {
+  bucket = aws_s3_bucket.wallet_files.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_logging" "wallet_files" {
+  bucket = aws_s3_bucket.wallet_files.id
+
+  target_bucket = aws_s3_bucket.access_logs.id
+  target_prefix = "log/"
+  target_object_key_format {
+    partitioned_prefix {
+      partition_date_source = "EventTime"
+    }
+  }
+}
+
+#####################################################################################
 ######################## S3 Bucket for Access Logs ###############################
 #####################################################################################
 

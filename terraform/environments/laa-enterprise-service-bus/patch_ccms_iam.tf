@@ -55,6 +55,13 @@ resource "aws_iam_policy" "patch_ccms_provider_load_policy" {
         Resource = "${aws_s3_bucket.lambda_layer_dependencies.arn}/*"
       },
       {
+        Effect = "Allow",
+        Action = [
+          "s3:GetObject"
+        ],
+        Resource = "${aws_s3_bucket.wallet_files.arn}/*"
+      },
+      {
         Effect = "Allow"
         Action = [
           "secretsmanager:GetSecretValue",
