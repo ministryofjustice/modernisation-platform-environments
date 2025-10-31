@@ -75,7 +75,7 @@ resource "aws_sns_topic_subscription" "ddos_subscription" {
 
 #--Altering SNS
 resource "aws_sns_topic" "guardduty_alerts" {
-  name            = "${local.application_data.accounts[local.environment].app_name}-guardduty-alerts"
+  name            = "${local.application_name}-guardduty-alerts"
   delivery_policy = <<EOF
 {
   "http": {

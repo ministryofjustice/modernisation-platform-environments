@@ -14,7 +14,7 @@ resource "aws_guardduty_malware_protection_plan" "s3_scan_bucket1" {
   }
 
   tags = merge(local.tags,
-    { Name = lower(format("s3-%s-%s-awsgaurdduty-mpp", "${local.application_data.accounts[local.environment].app_name}", local.environment)) }
+    { Name = lower(format("s3-%s-%s-awsgaurdduty-mpp", "${local.application_name}", local.environment)) }
   )
 
   depends_on = [ module.s3-bucket ]
@@ -36,7 +36,7 @@ resource "aws_guardduty_malware_protection_plan" "s3_scan_bucket2" {
   }
 
   tags = merge(local.tags,
-    { Name = lower(format("s3-%s-%s-awsgaurdduty-mpp", "${local.application_data.accounts[local.environment].app_name}", local.environment)) }
+    { Name = lower(format("s3-%s-%s-awsgaurdduty-mpp", "${local.application_name}", local.environment)) }
   )
 
   depends_on = [ module.s3-bucket-logging ]
@@ -58,7 +58,7 @@ resource "aws_guardduty_malware_protection_plan" "s3_scan_bucket3" {
   }
 
   tags = merge(local.tags,
-    { Name = lower(format("s3-%s-%s-awsgaurdduty-mpp", "${local.application_data.accounts[local.environment].app_name}", local.environment)) }
+    { Name = lower(format("s3-%s-%s-awsgaurdduty-mpp", "${local.application_name}", local.environment)) }
   )
 
   depends_on = [ module.s3-bucket-dbbackup ]
@@ -80,7 +80,7 @@ resource "aws_guardduty_malware_protection_plan" "s3_scan_bucket4" {
   }
 
   tags = merge(local.tags,
-    { Name = lower(format("s3-%s-%s-awsgaurdduty-mpp", "${local.application_data.accounts[local.environment].app_name}", local.environment)) }
+    { Name = lower(format("s3-%s-%s-awsgaurdduty-mpp", "${local.application_name}", local.environment)) }
   )
 
   depends_on = [ aws_s3_bucket.lambda_payment_load ]
@@ -103,7 +103,7 @@ resource "aws_guardduty_malware_protection_plan" "s3_scan_bucket5" {
   }
 
   tags = merge(local.tags,
-    { Name = lower(format("s3-%s-%s-awsgaurdduty-mpp", "${local.application_data.accounts[local.environment].app_name}", local.environment)) }
+    { Name = lower(format("s3-%s-%s-awsgaurdduty-mpp", "${local.application_name}", local.environment)) }
   )
 
   depends_on = [ aws_s3_bucket.buckets ]
@@ -125,7 +125,7 @@ resource "aws_guardduty_malware_protection_plan" "s3_scan_bucket6" {
   }
 
   tags = merge(local.tags,
-    { Name = lower(format("s3-%s-%s-awsgaurdduty-mpp", "${local.application_data.accounts[local.environment].app_name}", local.environment)) }
+    { Name = lower(format("s3-%s-%s-awsgaurdduty-mpp", "${local.application_name}", local.environment)) }
   )
 
   depends_on = [ aws_s3_bucket.red_button_data ]
