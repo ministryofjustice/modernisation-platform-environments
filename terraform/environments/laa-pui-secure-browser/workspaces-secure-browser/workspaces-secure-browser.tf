@@ -8,7 +8,7 @@ module "workspacesweb_security_group" {
   version = "5.3.0"
 
   name   = "workspacesweb"
-  vpc_id = data.aws_vpc.shared.id
+  vpc_id = local.vpc_id
 
   egress_cidr_blocks = ["0.0.0.0/0"]
   egress_rules       = ["https-443-tcp"]
@@ -17,8 +17,8 @@ module "workspacesweb_security_group" {
 ### NETWORK SETTINGS
 
 resource "aws_workspacesweb_network_settings" "main" {
-  vpc_id             = data.aws_vpc.shared.id
-  subnet_ids         = [data.aws_subnet.private_aza.id, data.aws_subnet.private_azc.id]
+  vpc_id             = local.vpc_id
+  subnet_ids         = local.subnet_ids
   security_group_ids = [module.workspacesweb_security_group.security_group_id]
 }
 
