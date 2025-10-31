@@ -22,10 +22,60 @@ resource "aws_iam_role" "lambda_execution_role" {
   })
 }
 
+
+resource "aws_iam_role_policy" "lambda_ssm_policy" {
+  name = "${var.environment}_lambda_ssm_policy"
+  role = aws_iam_role.lambda_execution_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "ssm:PutParameter",
+          "ssm:GetParameter",
+          "ssm:GetParameters"
+        ]
+        Resource = "arn:aws:ssm:eu-west-2:${data.aws_caller_identity.current.account_id}:parameter/${var.environment}/ldap/circuit-breaker"
+      }
+    ]
+  })
+}
+
+
+resource "aws_iam_role_policy" "lambda_elb_policy" {
+  name = "${var.environment}_lambda_elb_policy"
+  role = aws_iam_role.lambda_execution_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "elasticloadbalancing:DescribeTargetHealth",
+          "elasticloadbalancing:RegisterTargets",
+          "elasticloadbalancing:DeregisterTargets"
+        ],
+        Resource = "*"
+      }
+    ]
+  })
+}
+
 resource "aws_iam_role_policy_attachment" "basic_execution" {
   role       = aws_iam_role.lambda_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
+
+# # Lambda Log Group
+# resource "aws_cloudwatch_log_group" "ecs_restart_handler" {
+#   # Environment-specific log group name
+#   name              = "/aws/lambda/${var.environment}_ecs_restart_handler"
+#   retention_in_days = 30
+# }
+
 
 data "aws_iam_policy_document" "lambda_ecs" {
   statement {

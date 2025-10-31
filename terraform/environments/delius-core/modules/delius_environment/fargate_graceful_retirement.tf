@@ -1,7 +1,11 @@
+data "aws_lb_target_group" "ldap-target-group" {
+  name = "ldap-${var.env_name}-at-389"
+}
+
 locals {
   # Restart schedules for envs, testing for dev only now
   fargate_restart_schedules = {
-    dev  = { day = "FRIDAY", time = "11:35" }
+    dev  = { day = "FRIDAY", time = "12:45" }
     poc  = { day = "MONDAY", time = "12:05" }
     test = { day = "TUESDAY", time = "22:00" }
   }
@@ -21,4 +25,7 @@ module "fargate_graceful_retirement" {
   restart_day_of_the_week = local.fargate_restart_schedules[var.env_name].day
   debug_logging           = lookup(local.fargate_debug_logging, var.env_name, false)
   environment             = var.env_name
+  extra_environment_vars = {
+    LDAP_NLB_ARN = data.aws_lb_target_group.ldap-target-group.arn
+  }
 }

@@ -6,11 +6,18 @@ import os
 import logging
 
 ecs = boto3.client('ecs')
+ssm = boto3.client("ssm")
 elbv2 = boto3.client('elbv2', region_name="eu-west-2")
 ENV = os.environ.get("ENVIRONMENT")
 
+# Use env to determine
+# - SSM circuit breaker path
+# - ECS cluster/service
+ssm_path = f"/{ENV}/ldap/circuit_breaker"
+
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
+
 
 def lambda_handler(event, context):
     print("Event received:", json.dumps(event))
@@ -38,38 +45,49 @@ def lambda_handler(event, context):
             print("Cluster name:", cluster_name)
             print("Service name:", service_name)
 
+            # only do this for ldap and for ENV!
+            print(f"Only starting services: for {ENV}")
+
+            # Filter only services belonging to the current environment
+            if ENV.lower() not in cluster_name.lower():
+                print(f"Skipping service {service_name} in cluster {cluster_name} (not {ENV})")
+                continue
+
+            print(f"Updating service {service_name} in cluster {cluster_name} for ENV={ENV}")
+
             target_group_arn = os.environ.get("LDAP_NLB_ARN", None)
 
             logger.info(f"Action={action}, Service={service_name}, Cluster={cluster_name}")
 
             if action == "open":
-                return open_circuit_breaker(cluster_name, service_name)
+                return open_circuit_breaker(ssm_path, service_name, cluster_name)
 
             elif action == "close":
-                return close_circuit_breaker(cluster_name, service_name)
+                return close_circuit_breaker(ssm_path, service_name, cluster_name)
 
             elif action == "check_health":
-                return check_target_health(target_group_arn)
+                return check_target_health(target_group_arn, service_name, cluster_name)
 
             else:
                 raise ValueError(f"Unknown action: {action}")
 
 
-def open_circuit_breaker(cluster, service):
-    # disable NLB registration
-    logger.info(f"Opening circuit breaker for {service}")
-    ecs.update_service(cluster=cluster, service=service, desiredCount=0)
+def open_circuit_breaker(ssm_path, service, cluster_name):
+    # open circuit and disable NLB registration
+    logger.info(f"Opening circuit breaker {ssm_path} for {service} in {cluster_name}")
+    ssm.put_parameter(Name=ssm_path, Value="OPEN", Overwrite=True)
     return {"status": "opened"}
 
 
-def close_circuit_breaker(cluster, service):
-    # re-enable NLB registration
-    logger.info(f"Closing circuit breaker for {service}")
-    ecs.update_service(cluster=cluster, service=service, desiredCount=1)
+def close_circuit_breaker(ssm_path, service, cluster_name):
+    # close circuit and re-enable NLB registration
+    logger.info(f"Closing circuit breaker {ssm_path} for {service} in {cluster_name}")
+    ssm.put_parameter(Name=ssm_path, Value="CLOSED", Overwrite=True)
     return {"status": "closed"}
 
 
-def check_target_health(target_group_arn):
+def check_target_health(target_group_arn, service_name, cluster_name):
+    logger.info(f"Checking Target health for {service_name} in {cluster_name}")
     targets = elbv2.describe_target_health(TargetGroupArn=target_group_arn)
     states = [t["TargetHealth"]["State"] for t in targets["TargetHealthDescriptions"]]
     logger.info(f"Target states: {states}")
