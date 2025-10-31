@@ -682,7 +682,7 @@ module "load_buddi_database" {
 
   name               = "buddi"
   environment        = local.environment
-  database_name      = "buddi"
+  database_name      = "buddi_buddi"
   path_to_data       = "/buddi/buddi"
   source_data_bucket = module.s3-data-bucket.bucket
   secret_code        = jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]
