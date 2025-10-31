@@ -30,10 +30,10 @@ module "redshift_table_expiry_lambda" {
   tags = merge(
     local.all_tags,
     {
-      Name           = local.lambda_redshift_table_expiry_name
-      Jira           = "DPR2-991"
-      Resource_Group = "Front-End"
-      Resource_Type  = "lambda"
+      dpr-name           = local.lambda_redshift_table_expiry_name
+      dpr-jira           = "DPR2-991"
+      dpr-resource-group = "Front-End"
+      dpr-resource-type  = "lambda"
     }
   )
 

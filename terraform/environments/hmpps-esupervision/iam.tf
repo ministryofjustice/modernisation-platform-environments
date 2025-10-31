@@ -72,3 +72,33 @@ resource "aws_iam_role_policy_attachment" "rekognition_rekognition" {
   role       = aws_iam_role.rekognition_role.name
   policy_arn = data.aws_iam_policy.rekognition_read.arn
 }
+
+# server access logs bucket policy
+data "aws_iam_policy_document" "rekognition_logs_bucket_policy_document" {
+  # allow the logging service to write to the logs bucket
+  # see https://docs.aws.amazon.com/AmazonS3/latest/userguide/enable-server-access-logging.html#grant-log-delivery-permissions-general
+  statement {
+    sid = "AllowLoggingServiceWrite"
+    actions = ["s3:PutObject"]
+    resources = ["${aws_s3_bucket.rekognition_logs_bucket.arn}/${local.rekog_logs_prefix}*"]
+    principals {
+      type = "Service"
+      identifiers = ["logging.s3.amazonaws.com"]
+    }
+    condition {
+      variable = "aws:SourceAccount"
+      test     = "StringEquals"
+      values = [data.aws_caller_identity.current.account_id]
+    }
+    condition {
+      variable = "aws:SourceArn"
+      test = "ArnLike"
+      values = [aws_s3_bucket.rekognition_bucket.arn]
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "rekognition_logs_bucket_policy" {
+  bucket = aws_s3_bucket.rekognition_logs_bucket.bucket
+  policy = data.aws_iam_policy_document.rekognition_logs_bucket_policy_document.json
+}

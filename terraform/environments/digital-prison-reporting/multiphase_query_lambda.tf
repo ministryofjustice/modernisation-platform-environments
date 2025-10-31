@@ -29,10 +29,10 @@ module "multiphase_query_lambda" {
   tags = merge(
     local.all_tags,
     {
-      Name           = local.lambda_multiphase_query_name
-      Jira           = "DPR2-1906"
-      Resource_Group = "Front-End"
-      Resource_Type  = "lambda"
+      dpr-name           = local.lambda_multiphase_query_name
+      dpr-jira           = "DPR2-1906"
+      dpr-resource-group = "Front-End"
+      dpr-resource-type  = "lambda"
     }
   )
 }

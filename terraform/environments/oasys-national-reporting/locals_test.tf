@@ -77,6 +77,9 @@ locals {
         })
         instance = merge(local.ec2_instances.bods.instance, {
           instance_type = "m4.xlarge"
+          tags = merge(local.ec2_instances.bods.instance.tags, {
+            patch-manager = "weds1500"
+          })
         })
         cloudwatch_metric_alarms = merge(
           module.baseline_presets.cloudwatch_metric_alarms.ec2,
@@ -101,6 +104,9 @@ locals {
         })
         instance = merge(local.ec2_instances.bods.instance, {
           instance_type = "m4.xlarge"
+          tags = merge(local.ec2_instances.bods.instance.tags, {
+            patch-manager = "thurs1500"
+          })
         })
         cloudwatch_metric_alarms = merge(
           module.baseline_presets.cloudwatch_metric_alarms.ec2,
@@ -261,6 +267,20 @@ locals {
           })
         })
       })
+    }
+
+    patch_manager = {
+      patch_schedules = {
+        weds1500  = "cron(00 15 ? * WED *)" # 3pm wed 
+        thurs1500 = "cron(00 15 ? * THU *)" # 3pm thu
+        # manual    = "cron(00 21 31 2 ? *)"  # 9pm 31 feb e.g. impossible date to allow for manual patching of otherwise enrolled instances
+      }
+      maintenance_window_duration = 2 # 4 for prod
+      maintenance_window_cutoff   = 1 # 2 for prod
+      patch_classifications = {
+        # REDHAT_ENTERPRISE_LINUX = ["Security", "Bugfix"] # Linux Options=(Security,Bugfix,Enhancement,Recommended,Newpackage)
+        WINDOWS = ["SecurityUpdates", "CriticalUpdates"]
+      }
     }
 
     route53_zones = {

@@ -133,6 +133,8 @@ module "glue_s3_file_transfer_job" {
     "--dpr.file.transfer.destination.bucket"      = module.s3_raw_archive_bucket.bucket_id
     "--dpr.file.transfer.retention.period.amount" = tostring(local.scheduled_s3_file_transfer_retention_period_amount)
     "--dpr.file.transfer.retention.period.unit"   = tostring(local.scheduled_s3_file_transfer_retention_period_unit)
+    "--dpr.file.transfer.use.default.parallelism" = tostring(local.scheduled_file_transfer_use_default_parallelism)
+    "--dpr.file.transfer.parallelism"             = tostring(local.scheduled_file_transfer_parallelism)
     "--dpr.file.transfer.delete.copied.files"     = true,
     "--dpr.allowed.s3.file.extensions"            = "*",
     "--dpr.log.level"                             = local.glue_job_common_log_level
@@ -483,7 +485,7 @@ module "s3_raw_archive_bucket" {
   tags = merge(
     local.all_tags,
     {
-      dpr-name          = "${local.project}-raw-archive-${local.env}-s3"
+      dpr-name          = "${local.project}-raw-archive-${local.env}"
       dpr-resource-type = "S3 Bucket"
       dpr-jira          = "DPR2-209"
     }
@@ -874,6 +876,7 @@ module "ec2_kinesis_agent" {
   tags = merge(
     local.all_tags,
     {
+      Name              = "${local.project}-ec2-kinesis-agent-${local.env}"
       dpr-name          = "${local.project}-ec2-kinesis-agent-${local.env}"
       dpr-resource-type = "EC2 Instance"
       dpr-jira          = "DPR-108"
