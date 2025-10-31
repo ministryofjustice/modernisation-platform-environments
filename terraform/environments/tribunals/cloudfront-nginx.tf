@@ -95,7 +95,7 @@ resource "aws_cloudfront_distribution" "tribunals_http_redirect" {
     # Reuse existing Lambda@Edge
     lambda_function_association {
       event_type   = "viewer-request"
-      lambda_arn   = aws_lambda_function.tribunals_redirect_lambda.qualified_arn
+      lambda_arn   = aws_lambda_function.cloudfront_redirect_lambda.qualified_arn
       include_body = false
     }
   }
