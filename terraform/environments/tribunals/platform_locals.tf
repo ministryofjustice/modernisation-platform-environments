@@ -54,4 +54,40 @@ locals {
     "*.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   ]
 
+  cloudfront_nginx_sans = [
+    "asylum-support-tribunal.gov.uk",
+    "ahmlr.gov.uk",
+    "appeals-service.gov.uk",
+    "carestandardstribunal.gov.uk",
+    "cicap.gov.uk",
+    "civilappeals.gov.uk",
+    "cjit.gov.uk",
+    "cjs.gov.uk",
+    "cjsonline.gov.uk",
+    "complaints.judicialconduct.gov.uk",
+    "courtfines.justice.gov.uk",
+    "courtfunds.gov.uk",
+    "criminal-justice-system.gov.uk",
+    "dugganinquest.independent.gov.uk",
+    "employmentappeals.gov.uk",
+    "financeandtaxtribunals.gov.uk",
+    "hillsboroughinquests.independent.gov.uk",
+    "immigrationservicestribunal.gov.uk",
+    "informationtribunal.gov.uk",
+    "judicialombudsman.gov.uk",
+    "landstribunal.gov.uk",
+    "obr.co.uk",
+    "osscsc.gov.uk",
+    "paroleboard.gov.uk",
+    "sendmoneytoaprisoner.justice.gov.uk",
+    "transporttribunal.gov.uk",
+    "victiminformationservice.org.uk",
+    "yjbpublications.justice.gov.uk"
+  ]
+
+  cloudfront_nginx_nonprod_sans = [
+    "dev.ahmlr.gov.uk"
+  ]
+
+
 }
