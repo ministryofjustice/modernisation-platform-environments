@@ -22,7 +22,7 @@ resource "aws_workspacesweb_network_settings" "main" {
   count = local.create_resources ? 1 : 0
 
   vpc_id             = local.vpc_id
-  subnet_ids         = slice(local.subnet_ids, 0, min(length(local.subnet_ids), 3))
+  subnet_ids         = local.subnet_ids
   security_group_ids = [module.workspacesweb_security_group[0].security_group_id]
 }
 
