@@ -22,7 +22,7 @@ resource "aws_workspacesweb_network_settings" "main" {
   count = local.create_resources ? 1 : 0
 
   vpc_id             = local.vpc_id
-  subnet_ids         = local.subnet_ids
+  subnet_ids         = slice(local.subnet_ids, 0, min(length(local.subnet_ids), 3))
   security_group_ids = [module.workspacesweb_security_group[0].security_group_id]
 }
 
@@ -92,36 +92,36 @@ resource "aws_workspacesweb_user_settings" "sso" {
   disconnect_timeout_in_minutes      = 60
   idle_disconnect_timeout_in_minutes = 15
 
-  # Enable SSO extension and define which cookies to sync
-  cookie_synchronization_configuration {
-    # Microsoft Entra ID
-    allowlist {
-      domain = "microsoftonline.com"
-    }
+  # Enable SSO extension and define which cookies to sync -- DISABLED PENDING SEC REVIEW
+  # cookie_synchronization_configuration {
+  #   # Microsoft Entra ID
+  #   allowlist {
+  #     domain = "microsoftonline.com"
+  #   }
 
-    # Microsoft authentication domains
-    allowlist {
-      domain = "microsoft.com"
-    }
+  #   # Microsoft authentication domains
+  #   allowlist {
+  #     domain = "microsoft.com"
+  #   }
 
-    allowlist {
-      domain = "msftidentity.com"
-    }
+  #   allowlist {
+  #     domain = "msftidentity.com"
+  #   }
 
-    allowlist {
-      domain = "msidentity.com"
-    }
+  #   allowlist {
+  #     domain = "msidentity.com"
+  #   }
 
-    # LAA sign-in domain
-    allowlist {
-      domain = local.laa_sign_in_url
-    }
+  #   # LAA sign-in domain
+  #   allowlist {
+  #     domain = local.laa_sign_in_url
+  #   }
 
-    # LAA legal aid services domain
-    allowlist {
-      domain = local.legal_aid_services_url
-    }
-  }
+  #   # LAA legal aid services domain
+  #   allowlist {
+  #     domain = local.legal_aid_services_url
+  #   }
+  # }
 
   toolbar_configuration {
     toolbar_type = "Docked"
