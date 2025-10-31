@@ -110,9 +110,8 @@ resource "aws_cloudfront_distribution" "tribunals_http_redirect" {
     Environment = local.environment
   }
 
-  # Wait for cert to be issued before creating distribution
+  # Make sure lambda exists
   depends_on = [
-    aws_acm_certificate.http_redirect_cert,
     aws_lambda_function.cloudfront_redirect_lambda
   ]
 }
