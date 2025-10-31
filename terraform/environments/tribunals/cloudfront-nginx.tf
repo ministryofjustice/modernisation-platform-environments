@@ -11,7 +11,7 @@ resource "aws_acm_certificate" "http_redirect_cert" {
   domain_name       = "ahmlr.gov.uk"  # any one of the HTTP domains
   validation_method = "DNS"
 
-  subject_alternative_names = local.is-production ? local.cloudfront_nginx_sans : local.cloudfront_nginx_nonprod_sans
+  #subject_alternative_names = local.is-production ? local.cloudfront_nginx_sans : local.cloudfront_nginx_nonprod_sans
 
   tags = {
     Name        = "tribunals-http-redirect-cert"
@@ -110,8 +110,9 @@ resource "aws_cloudfront_distribution" "tribunals_http_redirect" {
     Environment = local.environment
   }
 
-  # Make sure lambda exists
+  # Wait for cert to be issued before creating distribution
   depends_on = [
+    aws_acm_certificate.http_redirect_cert,
     aws_lambda_function.cloudfront_redirect_lambda
   ]
 }
