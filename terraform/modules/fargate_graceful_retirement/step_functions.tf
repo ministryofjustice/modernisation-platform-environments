@@ -71,15 +71,6 @@ resource "aws_sfn_state_machine" "ecs_restart_state_machine" {
       WaitUntilRestartTime : {
         Type : "Wait",
         TimestampPath : "$.waitTimestamp.timestamp", # Use the computed timestamp
-        Next : "FilterLDAPServices"
-      },
-      # Filter affectedEntities for LDAP services
-      FilterLDAPServices : {
-        Type : "Pass",
-        Parameters : {
-          "ldapServices.$" : "States.ArrayFilter($.detail.affectedEntities, States.StringMatches($, '*-ldap'))"
-        },
-        ResultPath : "$.ldapServices",
         Next : "CheckIfLDAPExists"
       },
       # Choice state to branch if LDAP services exist
@@ -87,8 +78,8 @@ resource "aws_sfn_state_machine" "ecs_restart_state_machine" {
         Type : "Choice",
         Choices : [
           {
-            Variable : "$.ldapServices[0]",
-            IsPresent : true,
+            Variable : "$.detail.affectedEntities[0].entityValue",
+            StringMatches : "*-ldap",
             Next : "OpenCircuitBreaker"
           }
         ],
