@@ -22,7 +22,8 @@ resource "aws_iam_role" "lambda_edge_role" {
   })
 
   tags = {
-    Purpose = "Lambda@Edge for HTTP → HTTPS redirect"
+    Name        = "lambda_edge_role"
+    Environment = local.environment
   }
 }
 
@@ -104,7 +105,8 @@ resource "aws_lambda_function" "cloudfront_redirect_lambda" {
   memory_size      = 128
 
   tags = {
-    Purpose = "HTTP → HTTPS redirect via Lambda@Edge"
+   Name        = "cloudfront_redirect_lambda"
+   Environment = local.environment
   }
 }
 
