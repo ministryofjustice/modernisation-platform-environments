@@ -4,7 +4,7 @@ module "guardduty_chatbot" {
   slack_channel_id = data.aws_secretsmanager_secret_version.guardduty_slack_channel_id.secret_string
   sns_topic_arns   = [aws_sns_topic.guardduty_alerts.arn]
   tags             = local.tags #--This doesn't seem to pass to anything in the module but is a mandatory var. Consider submitting a PR to the module. AW
-  application_name = local.application_data.accounts[local.environment].app_name
+  application_name = local.application_data.accounts[local.environment].local.application_name
 }
 
 resource "aws_sns_topic_policy" "guarduty_default" {
