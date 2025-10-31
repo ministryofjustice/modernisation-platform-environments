@@ -14,7 +14,7 @@ data "aws_subnets" "secure_browser_private_a" {
     values = [data.aws_vpc.secure_browser[0].id]
   }
   tags = {
-    "Name" = "laa-private-${data.aws_region.current.name}a"
+    "Name" = "${var.networking[0].business-unit}-${local.environment}-secure-browser-private-${data.aws_region.current.name}a"
   }
 }
 
@@ -25,7 +25,7 @@ data "aws_subnets" "secure_browser_private_b" {
     values = [data.aws_vpc.secure_browser[0].id]
   }
   tags = {
-    "Name" = "laa-private-${data.aws_region.current.name}b"
+    "Name" = "${var.networking[0].business-unit}-${local.environment}-secure-browser-private-${data.aws_region.current.name}b"
   }
 }
 
