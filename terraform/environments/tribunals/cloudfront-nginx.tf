@@ -115,7 +115,7 @@ resource "aws_cloudfront_distribution" "tribunals_http_redirect" {
   depends_on = [
     aws_acm_certificate.http_redirect_cert,
     aws_lambda_function.cloudfront_redirect_lambda,
-    aws_lambda_permission.allow_cloudfront
+    aws_lambda_permission.allow_http_cloudfront
   ]
 }
 
