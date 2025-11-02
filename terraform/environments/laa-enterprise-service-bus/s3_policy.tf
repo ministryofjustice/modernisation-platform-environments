@@ -53,6 +53,37 @@ resource "aws_s3_bucket_policy" "data_cross_account_access" {
 }
 
 #####################################################################################
+##################### S3 Bucket policy for Wallet Files Bucket ######################
+#####################################################################################
+resource "aws_s3_bucket_policy" "wallet_files_access" {
+  bucket = aws_s3_bucket.wallet_files.id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Sid    = "AllowCWAandCCMSLambdaRead"
+        Effect = "Allow",
+        Principal = {
+          AWS = [
+            aws_iam_role.cwa_extract_lambda_role.arn,
+            aws_iam_role.ccms_provider_load_role.arn,
+            aws_iam_role.patch_cwa_extract_lambda_role[0].arn,
+            aws_iam_role.patch_ccms_provider_load_role[0].arn
+          ]
+        },
+        Action = [
+          "s3:GetObject"
+        ],
+        Resource = [
+          "arn:aws:s3:::${aws_s3_bucket.wallet_files.bucket}/*"
+        ]
+      }
+    ]
+  })
+}
+
+#####################################################################################
 ##################### S3 Bucket policy for Access Logs Bucket #######################
 #####################################################################################
 resource "aws_s3_bucket_policy" "log_bucket_policy" {
