@@ -75,7 +75,7 @@ resource "aws_cloudfront_distribution" "tribunals_http_redirect" {
 
   default_cache_behavior {
     target_origin_id       = "dummy-http-origin"
-    viewer_protocol_policy = "redirect-to-https"
+    viewer_protocol_policy = "allow-all"
 
     allowed_methods = ["GET", "HEAD", "OPTIONS"]
     cached_methods  = ["GET", "HEAD"]
@@ -99,6 +99,15 @@ resource "aws_cloudfront_distribution" "tribunals_http_redirect" {
     }
   }
 
+  # -------------------------------------------------
+  # LOGGING – S3 bucket in same region as dist (us-east-1)
+  # -------------------------------------------------
+  logging_config {
+    include_cookies = false
+    bucket          = aws_s3_bucket.cf_logs.bucket_domain_name
+    prefix          = "http-redirect/"
+  }
+
   restrictions {
     geo_restriction {
       restriction_type = "none"
@@ -113,7 +122,8 @@ resource "aws_cloudfront_distribution" "tribunals_http_redirect" {
   # Wait for cert to be issued before creating distribution
   depends_on = [
     aws_acm_certificate.http_cloudfront_nginx,
-    aws_lambda_function.cloudfront_redirect_lambda
+    aws_lambda_function.cloudfront_redirect_lambda,
+    aws_s3_bucket.cf_logs
   ]
 }
 
@@ -123,4 +133,40 @@ resource "aws_cloudfront_distribution" "tribunals_http_redirect" {
 output "http_redirect_distribution_domain" {
   description = "CNAME target for HTTP domains (give to external DNS admins)"
   value       = aws_cloudfront_distribution.tribunals_http_redirect.domain_name
+}
+
+# -------------------------------------------------
+# S3 Bucket for CloudFront Logs
+# -------------------------------------------------
+resource "aws_s3_bucket" "cf_logs" {
+  provider = aws.us-east-1
+  bucket   = "tribunals-http-redirect-logs-dev-${data.aws_caller_identity.current.account_id}"
+}
+
+resource "aws_s3_bucket_versioning" "cf_logs" {
+  provider = aws.us-east-1
+  bucket   = aws_s3_bucket.cf_logs.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "cf_logs" {
+  provider = aws.us-east-1
+  bucket   = aws_s3_bucket.cf_logs.id
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+# Block public access
+resource "aws_s3_bucket_public_access_block" "cf_logs" {
+  provider                = aws.us-east-1
+  bucket                  = aws_s3_bucket.cf_logs.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
 }

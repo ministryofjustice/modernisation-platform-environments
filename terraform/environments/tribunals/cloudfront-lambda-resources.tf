@@ -115,7 +115,7 @@ resource "aws_lambda_function" "cloudfront_redirect_lambda" {
 # -------------------------------------------------
 resource "aws_lambda_permission" "allow_http_cloudfront" {
   provider      = aws.us-east-1
-  statement_id  = "AllowHttpCloudFrontExecution"
+  statement_id  = "AllowHttpCloudFrontExecution1"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.cloudfront_redirect_lambda.function_name
   principal     = "edgelambda.amazonaws.com"
