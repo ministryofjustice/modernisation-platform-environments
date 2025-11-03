@@ -75,7 +75,7 @@ resource "aws_wafv2_web_acl" "pui_web_acl" {
     }
     statement {
       and_statement {
-        statements {
+        statement {
           xss_match_statement {
             field_to_match {
               body {
@@ -88,11 +88,11 @@ resource "aws_wafv2_web_acl" "pui_web_acl" {
             }
           }
         }
-        statements {
+        statement {
           not_statement {
             statement {
               or_statement {
-                statements {
+                statement {
                   byte_match_statement {
                     search_string       = "/civil/evidenceUpload"
                     field_to_match {
@@ -105,7 +105,7 @@ resource "aws_wafv2_web_acl" "pui_web_acl" {
                     }
                   }
                 }
-                statements {
+                statement {
                   byte_match_statement {
                     search_string       = "/civil/CCMS_PD03.form"
                     field_to_match {
@@ -118,7 +118,7 @@ resource "aws_wafv2_web_acl" "pui_web_acl" {
                     }
                   }
                 }
-                statements {
+                statement {
                   byte_match_statement {
                     search_string       = "/civil/evidenceUpload.do"
                     field_to_match {
@@ -135,7 +135,7 @@ resource "aws_wafv2_web_acl" "pui_web_acl" {
             }
           }
         }
-        statements {
+        statement {
           not_statement {
             statement {
               ip_set_reference_statement {
@@ -162,9 +162,9 @@ resource "aws_wafv2_web_acl" "pui_web_acl" {
     }
     statement {
       and_statement {
-        statements {
+        statement {
           or_statement {
-            statements {
+            statement {
               byte_match_statement {
                 search_string       = "/civil/evidenceUpload"
                 field_to_match {
@@ -177,7 +177,7 @@ resource "aws_wafv2_web_acl" "pui_web_acl" {
                 }
               }
             }
-            statements {
+            statement {
               byte_match_statement {
                 search_string       = "/civil/CCMS_PD03.form"
                 field_to_match {
@@ -190,7 +190,7 @@ resource "aws_wafv2_web_acl" "pui_web_acl" {
                 }
               }
             }
-            statements {
+            statement {
               byte_match_statement {
                 search_string       = "/civil/evidenceUpload.do"
                 field_to_match {
@@ -205,7 +205,7 @@ resource "aws_wafv2_web_acl" "pui_web_acl" {
             }
           }
         }
-        statements {
+        statement {
           ip_set_reference_statement {
             arn = aws_wafv2_ip_set.pui_waf_ip_set.arn
           }

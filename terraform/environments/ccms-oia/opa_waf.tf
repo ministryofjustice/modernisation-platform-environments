@@ -100,7 +100,7 @@ resource "aws_wafv2_web_acl" "opahub_web_acl" {
     }
     statement {
       and_statement {
-        statements {
+        statement {
           xss_match_statement {
             field_to_match {
               body {
@@ -113,11 +113,11 @@ resource "aws_wafv2_web_acl" "opahub_web_acl" {
             }
           }
         }
-        statements {
+        statement {
           not_statement {
             statement {
               or_statement {
-                statements {
+                statement {
                   byte_match_statement {
                     field_to_match {
                       uri_path {}
@@ -130,7 +130,7 @@ resource "aws_wafv2_web_acl" "opahub_web_acl" {
                     }
                   }
                 }
-                statements {
+                statement {
                   byte_match_statement {
                     field_to_match {
                       uri_path {}
@@ -143,7 +143,7 @@ resource "aws_wafv2_web_acl" "opahub_web_acl" {
                     }
                   }
                 }
-                statements {
+                statement {
                   byte_match_statement {
                     field_to_match {
                       uri_path {}
@@ -156,7 +156,7 @@ resource "aws_wafv2_web_acl" "opahub_web_acl" {
                     }
                   }
                 }
-                statements {
+                statement {
                   byte_match_statement {
                     field_to_match {
                       uri_path {}
@@ -169,7 +169,7 @@ resource "aws_wafv2_web_acl" "opahub_web_acl" {
                     }
                   }
                 }
-                statements {
+                statement {
                   byte_match_statement {
                     field_to_match {
                       uri_path {}
@@ -182,7 +182,7 @@ resource "aws_wafv2_web_acl" "opahub_web_acl" {
                     }
                   }
                 }
-                statements {
+                statement {
                   byte_match_statement {
                     field_to_match {
                       uri_path {}
@@ -199,7 +199,7 @@ resource "aws_wafv2_web_acl" "opahub_web_acl" {
             }
           }
         }
-        statements {
+        statement {
           not_statement {
             statement {
               ip_set_reference_statement {
@@ -225,7 +225,7 @@ resource "aws_wafv2_web_acl" "opahub_web_acl" {
     }
     statement {
       and_statement {
-        statements {
+        statement {
           size_constraint_statement {
             comparison_operator = "GT"
             size                = 8192
@@ -240,9 +240,9 @@ resource "aws_wafv2_web_acl" "opahub_web_acl" {
             }
           }
         }
-        statements {
+        statement {
           or_statement {
-            statements {
+            statement {
               byte_match_statement {
                 search_string       = "/opa/determinations-server/assess/soap/generic/12.2.1/BillingAssessment"
                 field_to_match {
@@ -255,7 +255,7 @@ resource "aws_wafv2_web_acl" "opahub_web_acl" {
                 }
               }
             }
-            statements {
+            statement {
               byte_match_statement {
                 search_string       = "/opa/determinations-server/answer/soap/12.2.1/MeritsAssessment"
                 field_to_match {
@@ -268,7 +268,7 @@ resource "aws_wafv2_web_acl" "opahub_web_acl" {
                 }
               }
             }
-            statements {
+            statement {
               byte_match_statement {
                 search_string       = "/opa/determinations-server/answer/soap/12.2.1/MeansAssessment"
                 field_to_match {
@@ -281,7 +281,7 @@ resource "aws_wafv2_web_acl" "opahub_web_acl" {
                 }
               }
             }
-            statements {
+            statement {
               byte_match_statement {
                 search_string       = "/opa/determinations-server/answer/soap/12.2.1/BillingAssessment"
                 field_to_match {
@@ -294,7 +294,7 @@ resource "aws_wafv2_web_acl" "opahub_web_acl" {
                 }
               }
             }
-            statements {
+            statement {
               byte_match_statement {
                 search_string       = "/opa/determinations-server/assess/soap/generic/12.2.1/MeansAssessment"
                 field_to_match {
@@ -307,7 +307,7 @@ resource "aws_wafv2_web_acl" "opahub_web_acl" {
                 }
               }
             }
-            statements {
+            statement {
               byte_match_statement {
                 search_string       = "/opa/determinations-server/assess/soap/generic/12.2.1/MeritsAssessment"
                 field_to_match {
@@ -322,7 +322,7 @@ resource "aws_wafv2_web_acl" "opahub_web_acl" {
             }
           }
         }
-        statements {
+        statement {
           ip_set_reference_statement {
             arn = aws_wafv2_ip_set.opahub_waf_ip_set_web_determinations[0].arn
           }
