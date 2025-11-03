@@ -12,7 +12,7 @@ resource "aws_cloudwatch_log_resource_policy" "log_group_policy" {
         "logs:CreateLogStream",
         "logs:PutLogEvents"
       ],
-      "Resource" : "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.id}:log-group:/metrics/${var.env_name}/*"
+      "Resource" : "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.id}:log-group:/metrics/${var.env_name}/*"
     }]
   })
 }
