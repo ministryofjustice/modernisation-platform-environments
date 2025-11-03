@@ -65,12 +65,12 @@ resource "aws_s3_bucket_policy" "wallet_files_access" {
         Sid    = "AllowCWAandCCMSLambdaRead"
         Effect = "Allow",
         Principal = {
-          AWS = [
+          AWS = compact([
             aws_iam_role.cwa_extract_lambda_role.arn,
             aws_iam_role.ccms_provider_load_role.arn,
-            aws_iam_role.patch_cwa_extract_lambda_role[0].arn,
-            aws_iam_role.patch_ccms_provider_load_role[0].arn
-          ]
+            try(aws_iam_role.patch_cwa_extract_lambda_role[0].arn, null),
+            try(aws_iam_role.patch_ccms_provider_load_role[0].arn, null)
+          ])
         },
         Action = [
           "s3:GetObject"
