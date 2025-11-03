@@ -60,7 +60,7 @@ resource "aws_ecs_task_definition" "opahub" {
 
 # ECS Service
 resource "aws_ecs_service" "opahub" {
-  name            = "${local.opa_app_name}"
+  name            = local.opa_app_name
   cluster         = aws_ecs_cluster.main.id
   task_definition = aws_ecs_task_definition.opahub.arn
   desired_count   = local.application_data.accounts[local.environment].opa_app_count

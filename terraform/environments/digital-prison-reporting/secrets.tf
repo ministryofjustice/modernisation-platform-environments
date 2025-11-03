@@ -10,9 +10,9 @@ resource "aws_secretsmanager_secret" "nomis" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "external/${local.project}-nomis-source-secrets"
-      Resource_Type = "Secrets"
-      Jira          = "DPR-XXXX"
+      dpr-name          = "external/${local.project}-nomis-source-secrets"
+      dpr-resource-type = "Secrets"
+      dpr-jira          = "DPR-XXXX"
     }
   )
 }
@@ -36,9 +36,9 @@ resource "aws_secretsmanager_secret" "nomis-test" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "external/${local.project}-nomis-testing-source-secrets"
-      Resource_Type = "Secrets"
-      Jira          = "DPR2-1159"
+      dpr-name          = "external/${local.project}-nomis-testing-source-secrets"
+      dpr-resource-type = "Secrets"
+      dpr-jira          = "DPR2-1159"
     }
   )
 }
@@ -63,9 +63,9 @@ resource "aws_secretsmanager_secret" "bodmis" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "external/${local.project}-bodmis-source-secret"
-      Resource_Type = "Secrets"
-      Jira          = "DPR2-721"
+      dpr-name          = "external/${local.project}-bodmis-source-secret"
+      dpr-resource-type = "Secrets"
+      dpr-jira          = "DPR2-721"
     }
   )
 }
@@ -91,9 +91,9 @@ resource "aws_secretsmanager_secret" "oasys" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "external/${local.project}-oasys-source-secret"
-      Resource_Type = "Secrets"
-      Jira          = "DPR2-XXX"
+      dpr-name          = "external/${local.project}-oasys-source-secret"
+      dpr-resource-type = "Secrets"
+      dpr-jira          = "DPR2-XXX"
     }
   )
 }
@@ -121,9 +121,9 @@ resource "aws_secretsmanager_secret" "onr" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "external/${local.project}-onr-source-secret"
-      Resource_Type = "Secrets"
-      Jira          = "DPR2-XXX"
+      dpr-name          = "external/${local.project}-onr-source-secret"
+      dpr-resource-type = "Secrets"
+      dpr-jira          = "DPR2-XXX"
     }
   )
 }
@@ -151,8 +151,8 @@ resource "aws_secretsmanager_secret" "ndelius" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "external/${local.project}-ndelius-source-secret"
-      Resource_Type = "Secrets"
+      dpr-name          = "external/${local.project}-ndelius-source-secret"
+      dpr-resource-type = "Secrets"
     }
   )
 }
@@ -180,8 +180,8 @@ resource "aws_secretsmanager_secret" "ndmis" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "external/${local.project}-ndmis-source-secret"
-      Resource_Type = "Secrets"
+      dpr-name          = "external/${local.project}-ndmis-source-secret"
+      dpr-resource-type = "Secrets"
     }
   )
 }
@@ -212,11 +212,11 @@ resource "aws_secretsmanager_secret" "dps" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "external/${local.project}-${each.value}-source-secrets"
-      Resource_Type = "Secrets"
-      Source        = "DPS"
-      Domain        = each.value
-      Jira          = "DPR2-341"
+      dpr-name          = "external/${local.project}-${each.value}-source-secrets"
+      dpr-resource-type = "Secrets"
+      dpr-source        = "DPS"
+      dpr-domain        = each.value
+      dpr-jira          = "DPR2-341"
     }
   )
 }
@@ -244,10 +244,10 @@ resource "aws_secretsmanager_secret" "redshift" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "dpr-redshift-sqlworkbench-${local.env}"
-      Resource_Type = "Secrets"
-      Jira          = "DPR-XXXX"
-      Redshift      = "redshift"
+      dpr-name          = "dpr-redshift-sqlworkbench-${local.env}"
+      dpr-resource-type = "Secrets"
+      dpr-jira          = "DPR-XXXX"
+      dpr-service       = "redshift"
     }
   )
 }
@@ -272,10 +272,10 @@ module "slack_alerts_url" {
   tags = merge(
     local.all_tags,
     {
-      Resource_Group = "monitoring"
-      Jira           = "DPR-569"
-      Resource_Type  = "Secret"
-      Name           = "${local.project}-slack-alerts-url-${local.environment}"
+      dpr-resource-group = "monitoring"
+      dpr-jira           = "DPR-569"
+      dpr-resource-type  = "Secret"
+      dpr-name           = "${local.project}-slack-alerts-url-${local.environment}"
     }
   )
 }
@@ -294,10 +294,10 @@ module "pagerduty_integration_key" {
   tags = merge(
     local.all_tags,
     {
-      Resource_Group = "monitoring"
-      Jira           = "DPR-569"
-      Resource_Type  = "Secret"
-      Name           = "${local.project}-pagerduty-integration-key-${local.environment}"
+      dpr-resource-group = "monitoring"
+      dpr-jira           = "DPR-569"
+      dpr-resource-type  = "Secret"
+      dpr-name           = "${local.project}-pagerduty-integration-key-${local.environment}"
     }
   )
 }
@@ -316,10 +316,10 @@ module "sonatype_registry_secrets" {
   tags = merge(
     local.all_tags,
     {
-      Resource_Group = "monitoring"
-      Jira           = "DPR2-69"
-      Resource_Type  = "Secret"
-      Name           = "${local.project}-sonatype-registry-${local.environment}"
+      dpr-resource-group = "monitoring"
+      dpr-jira           = "DPR2-69"
+      dpr-resource-type  = "Secret"
+      dpr-name           = "${local.project}-sonatype-registry-${local.environment}"
     }
   )
 }
@@ -354,10 +354,10 @@ resource "aws_secretsmanager_secret" "biprws" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "external/busobj-converter/biprws"
-      Resource_Type = "Secrets"
-      Source        = "NART"
-      Jira          = "DPR2-527"
+      dpr-name          = "external/busobj-converter/biprws"
+      dpr-resource-type = "Secrets"
+      dpr-source        = "NART"
+      dpr-jira          = "DPR2-527"
     }
   )
 }
@@ -392,10 +392,10 @@ resource "aws_secretsmanager_secret" "cp_k8s_secrets" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "external/cloud_platform/k8s_auth"
-      Resource_Type = "Secrets"
-      Source        = "CP"
-      Jira          = "DPR2-768"
+      dpr-name          = "external/cloud_platform/k8s_auth"
+      dpr-resource-type = "Secrets"
+      dpr-source        = "CP"
+      dpr-jira          = "DPR2-768"
     }
   )
 }
@@ -430,10 +430,10 @@ resource "aws_secretsmanager_secret" "cp_bodmis_k8s_secrets" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "external/cloud_platform/bodmis_k8s_auth"
-      Resource_Type = "Secrets"
-      Source        = "CP"
-      Jira          = "DPR2-908"
+      dpr-name          = "external/cloud_platform/bodmis_k8s_auth"
+      dpr-resource-type = "Secrets"
+      dpr-source        = "CP"
+      dpr-jira          = "DPR2-908"
     }
   )
 }
@@ -466,12 +466,16 @@ resource "aws_secretsmanager_secret" "dbt_secrets" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "external/cloud_platform/k8s_auth"
-      Resource_Type = "Secrets"
-      Source        = "Analytics-Platform"
-      Jira          = "DPR2-751"
+      dpr-name          = "external/cloud_platform/k8s_auth"
+      dpr-resource-type = "Secrets"
+      dpr-source        = "Analytics-Platform"
+      dpr-jira          = "DPR2-751"
     }
   )
+
+  lifecycle {
+    ignore_changes = [tags]
+  }
 }
 
 # AWS Secrets Manager for Operational DB Credentials
@@ -489,7 +493,11 @@ resource "aws_secretsmanager_secret" "operational_db_secret" {
   description = "Secret for RDS master username and password"
 
   tags = {
-    Name = "${local.project}-rds-operational-db-secret"
+    dpr-name = "${local.project}-rds-operational-db-secret"
+  }
+
+  lifecycle {
+    ignore_changes = [tags]
   }
 }
 
@@ -517,7 +525,7 @@ resource "aws_secretsmanager_secret" "transfer_component_role_secret" {
   description = "Secret for transfer-component-role username and password"
 
   tags = {
-    Name = "${local.project}-rds-transfer-component-role-secret"
+    dpr-name = "${local.project}-rds-transfer-component-role-secret"
   }
 }
 
@@ -541,9 +549,9 @@ resource "aws_secretsmanager_secret" "ods_dps_inc_reporting_access" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "dpr-ods-dps-inc-reporting-${local.env}"
-      Resource_Type = "Secrets"
-      Jira          = "DPR-1751"
+      dpr-name          = "dpr-ods-dps-inc-reporting-${local.env}"
+      dpr-resource-type = "Secrets"
+      dpr-jira          = "DPR-1751"
     }
   )
 
@@ -567,9 +575,9 @@ resource "aws_secretsmanager_secret" "dpr_windows_rdp_credentials" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "compute/dpr-windows-rdp-credentials"
-      Resource_Type = "Secrets"
-      Jira          = "DPR2-1980"
+      dpr-name          = "compute/dpr-windows-rdp-credentials"
+      dpr-resource-type = "Secrets"
+      dpr-jira          = "DPR2-1980"
     }
   )
 
@@ -595,9 +603,9 @@ resource "aws_secretsmanager_secret" "dpr-test" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "external/${local.project}-dps-test-db-source-secrets"
-      Resource_Type = "Secrets"
-      Jira          = "DPR2-2072"
+      dpr-name          = "external/${local.project}-dps-test-db-source-secrets"
+      dpr-resource-type = "Secrets"
+      dpr-jira          = "DPR2-2072"
     }
   )
 }

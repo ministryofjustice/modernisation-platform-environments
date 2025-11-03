@@ -150,6 +150,8 @@ resource "aws_rds_cluster" "this" {
       # See docs here https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/rds_global_cluster#new-global-cluster-from-existing-db-cluster
       global_cluster_identifier,
       snapshot_identifier,
+      # Ignore master_username changes to prevent force replacement during tag refactoring
+      master_username,
     ]
   }
 
@@ -193,6 +195,13 @@ resource "aws_rds_cluster_instance" "this" {
     update = try(var.instance_timeouts.update, null)
     delete = try(var.instance_timeouts.delete, null)
   }
+
+  lifecycle {
+    ignore_changes = [
+      # Ignore cluster_identifier changes to prevent force replacement during tag refactoring
+      cluster_identifier,
+    ]
+  }
 }
 
 ################################################################################
@@ -208,6 +217,13 @@ resource "aws_rds_cluster_endpoint" "this" {
   excluded_members            = try(each.value.excluded_members, null)
   static_members              = try(each.value.static_members, null)
   tags                        = merge(var.tags, try(each.value.tags, {}))
+
+  lifecycle {
+    ignore_changes = [
+      # Ignore cluster_identifier changes to prevent force replacement during tag refactoring
+      cluster_identifier,
+    ]
+  }
 
   depends_on = [
     aws_rds_cluster_instance.this

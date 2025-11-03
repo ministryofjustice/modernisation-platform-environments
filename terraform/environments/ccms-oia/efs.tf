@@ -38,9 +38,9 @@ resource "aws_security_group" "oia-efs-security-group" {
 
   // Allow inbound access from container instances
   ingress {
-    protocol  = "tcp"
-    from_port = 2049
-    to_port   = 2049
+    protocol    = "tcp"
+    from_port   = 2049
+    to_port     = 2049
     cidr_blocks = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
   }
 

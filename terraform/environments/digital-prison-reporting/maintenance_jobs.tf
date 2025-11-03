@@ -40,8 +40,8 @@ module "glue_compact_job" {
   tags = merge(
     local.all_tags,
     {
-      Name          = local.compaction_job_name
-      Resource_Type = "Glue Job"
+      dpr-name          = local.compaction_job_name
+      dpr-resource-type = "Glue Job"
     }
   )
 
@@ -88,8 +88,8 @@ module "glue_retention_job" {
   tags = merge(
     local.all_tags,
     {
-      Name          = local.retention_job_name
-      Resource_Type = "Glue Job"
+      dpr-name          = local.retention_job_name
+      dpr-resource-type = "Glue Job"
     }
   )
 

@@ -16,7 +16,7 @@ locals {
 module "fargate_graceful_retirement" {
   # count                   = local.environment == "development" ? 1 : 0
   count                   = contains(keys(local.fargate_restart_schedules), var.env_name) ? 1 : 0
-  source                  = "../../../../modules/fargate_graceful_retirement"
+  source                  = "../components/fargate_graceful_retirement"
   restart_time            = local.fargate_restart_schedules[var.env_name].time
   restart_day_of_the_week = local.fargate_restart_schedules[var.env_name].day
   debug_logging           = lookup(local.fargate_debug_logging, var.env_name, false)

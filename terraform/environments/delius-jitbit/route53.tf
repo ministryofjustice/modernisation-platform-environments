@@ -98,7 +98,6 @@ resource "aws_route53_record" "external_validation_subdomain_sandbox" {
   zone_id         = data.aws_route53_zone.external.zone_id
 }
 
-
 resource "aws_route53_record" "external_validation_subdomain_prod" {
   count    = local.is-production ? 1 : 0
   provider = aws.core-network-services

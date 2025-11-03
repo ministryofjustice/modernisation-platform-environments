@@ -5,8 +5,7 @@ locals {
 # tfsec:ignore:aws-s3-enable-bucket-encryption tfsec:ignore:aws-s3-encryption-customer-key tfsec:ignore:aws-s3-enable-bucket-logging tfsec:ignore:aws-s3-enable-versioning
 module "rds_bastion" {
   count  = local.is-production || local.is-development ? 1 : 0
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=95ed3c3"
-
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=e4a3840d4b7b327228d1397bb684bc79cd4e76cb"
   providers = {
     aws.share-host   = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
     aws.share-tenant = aws          # The default provider (unaliased, `aws`) is the tenant
@@ -166,7 +165,7 @@ data "aws_iam_policy_document" "zip_s3_policy" {
 
 # tfsec:ignore:aws-s3-enable-bucket-encryption tfsec:ignore:aws-s3-encryption-customer-key tfsec:ignore:aws-s3-enable-bucket-logging tfsec:ignore:aws-s3-enable-versioning
 module "zip_bastion" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=e4a3840"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=e4a3840d4b7b327228d1397bb684bc79cd4e76cb"
 
   providers = {
     aws.share-host   = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
@@ -196,7 +195,7 @@ module "zip_bastion" {
   subnet_set    = local.subnet_set
   environment   = local.environment
   region        = "eu-west-2"
-  volume_size   = 1000
+  volume_size   = 1500
   # tags
   tags_common = local.tags
   tags_prefix = terraform.workspace

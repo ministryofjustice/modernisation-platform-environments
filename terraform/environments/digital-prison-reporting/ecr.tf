@@ -15,9 +15,9 @@ resource "aws_ecr_repository" "file_transfer_in_clamav_scanner" {
   tags = merge(
     local.all_tags,
     {
-      name          = "${local.project}-container-images/hmpps-dpr-landing-zone-antivirus-check"
-      resource-type = "ECR repository"
-      jira          = "DPR2-1499"
+      dpr-name          = "${local.project}-container-images/hmpps-dpr-landing-zone-antivirus-check"
+      dpr-resource-type = "ECR repository"
+      dpr-jira          = "DPR2-1499"
     }
   )
 }

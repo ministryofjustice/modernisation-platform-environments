@@ -3,7 +3,7 @@ module "ec2_instance" {
 
   for_each = var.ec2_instances
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v4.1.0" # replace managed_policy_arns argument in module with aws_iam_role_policy_attachment
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v4.2.0"
 
   providers = {
     aws.core-vpc = aws.core-vpc
@@ -27,8 +27,10 @@ module "ec2_instance" {
   })
 
   availability_zone             = each.value.config.availability_zone
+  default_policy_arn            = each.value.config.default_policy_arn
   subnet_id                     = var.environment.subnet[each.value.config.subnet_name][each.value.config.availability_zone].id
   ebs_volumes_copy_all_from_ami = each.value.config.ebs_volumes_copy_all_from_ami
+  ebs_volume_root_name          = each.value.config.ebs_volume_root_name
   ebs_kms_key_id                = coalesce(each.value.config.ebs_kms_key_id, var.environment.kms_keys["ebs"].arn)
   ebs_volume_config             = each.value.ebs_volume_config
   ebs_volume_tags               = each.value.ebs_volume_tags

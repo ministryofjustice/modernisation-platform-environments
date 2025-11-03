@@ -1,5 +1,6 @@
 ## LOADBALANCER
 resource "aws_route53_record" "external" {
+  count    = local.is-development ? 0 : 1
   provider = aws.core-vpc
 
   zone_id = data.aws_route53_zone.external.zone_id
@@ -7,8 +8,8 @@ resource "aws_route53_record" "external" {
   type    = "A"
 
   alias {
-    name                   = aws_lb.ebsapps_nlb.dns_name
-    zone_id                = aws_lb.ebsapps_nlb.zone_id
+    name                   = aws_lb.ebsapps_nlb[count.index].dns_name
+    zone_id                = aws_lb.ebsapps_nlb[count.index].zone_id
     evaluate_target_health = true
   }
 }
@@ -21,8 +22,8 @@ resource "aws_route53_record" "prod_ebs_nlb" {
   name     = "ccmsebs.legalservices.gov.uk"
   type     = "A"
   alias {
-    name                   = aws_lb.ebsapps_nlb.dns_name
-    zone_id                = aws_lb.ebsapps_nlb.zone_id
+    name                   = aws_lb.ebsapps_nlb[count.index].dns_name
+    zone_id                = aws_lb.ebsapps_nlb[count.index].zone_id
     evaluate_target_health = true
   }
 }
@@ -36,20 +37,21 @@ resource "aws_route53_record" "prod_ebsapp_lb" {
   type     = "A"
 
   alias {
-    name                   = aws_lb.ebsapps_nlb.dns_name
-    zone_id                = aws_lb.ebsapps_nlb.zone_id
+    name                   = aws_lb.ebsapps_nlb[count.index].dns_name
+    zone_id                = aws_lb.ebsapps_nlb[count.index].zone_id
     evaluate_target_health = true
   }
 }
 
 resource "aws_route53_record" "ebslb_cname" {
+  count    = local.is-development ? 0 : 1
   provider = aws.core-vpc
 
   zone_id = data.aws_route53_zone.external.zone_id
   name    = "ccms-ebslb"
   ttl     = "300"
   type    = "CNAME"
-  records = [aws_route53_record.external.fqdn]
+  records = [aws_route53_record.external[0].fqdn]
 }
 
 ## EBSDB

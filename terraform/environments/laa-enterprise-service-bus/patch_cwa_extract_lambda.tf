@@ -21,9 +21,31 @@ resource "aws_security_group_rule" "patch_cwa_extract_egress_oracle" {
   from_port         = 2484
   to_port           = 2484
   protocol          = "tcp"
-  cidr_blocks       = ["10.205.11.0/26", "10.205.11.64/26"] # Patch CCMS Database IP
+  cidr_blocks       = ["10.205.11.0/26", "10.205.11.64/26"] # CWA ECP Safe03 Subnet IP
   security_group_id = aws_security_group.patch_cwa_extract_sg[0].id
   description       = "Outbound 2484 Access to CWA DB Safe3 in ECP"
+}
+
+resource "aws_security_group_rule" "patch_cwa_extract_egress_blue_green" {
+  count             = local.environment == "test" ? 1 : 0
+  type              = "egress"
+  from_port         = 2484
+  to_port           = 2484
+  protocol          = "tcp"
+  cidr_blocks       = ["10.205.10.0/26", "10.205.10.64/26"] # CWA ECP Blue Green Subnet IP
+  security_group_id = aws_security_group.patch_cwa_extract_sg[0].id
+  description       = "CWA Prod - Blue Green LB"
+}
+
+resource "aws_security_group_rule" "patch_cwa_extract_egress_safe02" {
+  count             = local.environment == "test" ? 1 : 0
+  type              = "egress"
+  from_port         = 2484
+  to_port           = 2484
+  protocol          = "tcp"
+  cidr_blocks       = ["10.205.15.64/26", "10.205.15.0/26"] # CWA ECP SAFE02 Loadbalancer subnets
+  security_group_id = aws_security_group.patch_cwa_extract_sg[0].id
+  description       = "CWA Prod - Safe02 DB"
 }
 
 resource "aws_security_group_rule" "patch_cwa_extract_egress_https_endpoint" {
@@ -90,7 +112,7 @@ resource "aws_lambda_function" "patch_cwa_extract_lambda" {
 }
 
 resource "aws_lambda_function" "patch_cwa_file_transfer_lambda" {
-  count            = local.environment == "test" ? 1 : 0    
+  count            = local.environment == "test" ? 1 : 0
   description      = "Connect to CWA DB, retrieve multiple json files of each extract and merge into single JSON file, uploads them to S3"
   function_name    = "patch_cwa_file_transfer_lambda"
   role             = aws_iam_role.patch_cwa_extract_lambda_role[0].arn

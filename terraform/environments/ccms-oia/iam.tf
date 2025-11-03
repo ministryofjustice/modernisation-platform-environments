@@ -5,7 +5,7 @@
 data "aws_iam_policy_document" "ecs_task_execution_role" {
   version = "2012-10-17"
   statement {
-    effect = "Allow"
+    effect  = "Allow"
     actions = ["sts:AssumeRole"]
 
     principals {
@@ -157,4 +157,77 @@ EOF
 resource "aws_iam_role_policy_attachment" "attach_ec2_policy" {
   role       = aws_iam_role.ec2_instance_role.name
   policy_arn = aws_iam_policy.ec2_instance_policy.arn
+}
+
+
+# S3 Cortex Deps Bucket Access Policy
+resource "aws_iam_policy" "s3_policy_cortex_deps" {
+  count       = local.is-production ? 1 : 0
+  name        = "${local.application_name}-s3-policy-cortex-deps"
+  description = "${local.application_name} s3-policy-cortex-deps"
+
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "s3:ListBucket",
+                "s3:GetObject"
+            ],
+            "Resource": [
+                "arn:aws:s3:::${local.application_data.accounts[local.environment].cortex_deps_bucket_name}/*",
+                "arn:aws:s3:::${local.application_data.accounts[local.environment].cortex_deps_bucket_name}"
+            ]
+        }
+    ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "s3_policy_cortex_deps" {
+  count      = local.is-production ? 1 : 0
+  role       = aws_iam_role.ec2_instance_role.name
+  policy_arn = aws_iam_policy.s3_policy_cortex_deps[0].arn
+}
+
+data "aws_iam_policy_document" "guardduty_alerting_sns" {
+  version = "2012-10-17"
+  statement {
+    sid    = "EventsAllowPublishSnsTopic"
+    effect = "Allow"
+    actions = [
+      "sns:Publish",
+    ]
+    resources = [
+      aws_sns_topic.guardduty_alerts.arn
+    ]
+    principals {
+      type = "Service"
+      identifiers = [
+        "events.amazonaws.com",
+      ]
+    }
+  }
+}
+
+data "aws_iam_policy_document" "cloudwatch_alerting_sns" {
+  version = "2012-10-17"
+  statement {
+    sid    = "EventsAllowPublishSnsTopic"
+    effect = "Allow"
+    actions = [
+      "sns:Publish",
+    ]
+    resources = [
+      aws_sns_topic.cloudwatch_alerts.arn
+    ]
+    principals {
+      type = "Service"
+      identifiers = [
+        "events.amazonaws.com",
+      ]
+    }
+  }
 }

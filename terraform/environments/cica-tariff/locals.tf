@@ -125,7 +125,7 @@ locals {
     if mapping.device_name == "xvdn"
   } : {}
   snapshot_id_xvdn_db = local.environment == "production" ? local.block_device_mapping_xvdn_db[9].ebs.snapshot_id : ""
-  
+
   env_to_cica_map = {
     "development" = ["dev"]
     "test"        = ["uat"]
@@ -137,5 +137,69 @@ locals {
     for prefix in local.target_prefix : "arn:aws:s3:::${prefix}storagebucket"
   ]
 
+  tariffdb_volume_layout = [
+    {
+      device_name = "xvde"
+      size        = 100
+    },
+    {
+      device_name = "xvdf"
+      size        = 2000
+    },
+    {
+      device_name = "xvdg"
+      size        = 100
+    },
+    {
+      device_name = "xvdh"
+      size        = 16
+    },
+    {
+      device_name = "xvdi"
+      size        = 30
+    },
+    {
+      device_name = "xvdj"
+      size        = 8
+    },
+    {
+      device_name = "xvdk"
+      size        = 1
+    },
+    {
+      device_name = "xvdl"
+      size        = 200
+    },
+    {
+      device_name = "xvdm"
+      size        = 500
+    },
+    {
+      device_name = "xvdn"
+      size        = 500
+    }
+  ]
+  tariffapp_volume_layout = [
+    {
+      device_name = "xvde"
+      size        = 100
+    },
+    {
+      device_name = "xvdf"
+      size        = 100
+    },
+    {
+      device_name = "xvdg"
+      size        = 100
+    },
+    {
+      device_name = "xvdh"
+      size        = 16
+    },
+    {
+      device_name = "xvdi"
+      size        = 30
+    }
+  ]
 }
 #
