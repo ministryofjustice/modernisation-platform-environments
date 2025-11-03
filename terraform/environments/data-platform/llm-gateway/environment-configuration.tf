@@ -3,8 +3,8 @@ locals {
   environment_configurations = {
     development = {
       litellm_versions = {
-        application = "main-v1.78.5-stable"
-        chart       = "0.1.804"
+        application = "main-v1.79.0-stable"
+        chart       = "0.1.807"
       }
       llm_gateway_hostname = "llm-gateway.development.data-platform.service.justice.gov.uk"
       llm_gateway_ingress_allowlist = [
@@ -12,7 +12,7 @@ locals {
         "83.105.252.164/32", # @jacobwoffenden
         # VPN
         "128.77.75.64/26",  # Prisma Corporate
-        "35.176.93.186/32", # GlobalProtect
+        "35.176.93.186/32", # GlobalProtect (Alpha)
         # DOM1
         "157.203.176.138/31",
         "157.203.176.140/32",
