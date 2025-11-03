@@ -10,15 +10,26 @@ locals {
     "external_2" = "laa-workspaces-web-external-2"
   }
 
+  # Map zone IDs to AZ names
+  wssb_supported_zone_ids = ["euw2-az1", "euw2-az2"]
+
+  azid_to_name = {
+    for idx, zid in data.aws_availability_zones.available.zone_ids :
+    zid => data.aws_availability_zones.available.names[idx]
+  }
+
+  wssb_supported_az_names = [
+    for zid in local.wssb_supported_zone_ids : local.azid_to_name[zid]
+  ]
+
   # Use new VPC in production, shared VPC in other environments
   vpc_id = local.environment == "production" ? data.aws_vpc.secure_browser[0].id : data.aws_vpc.shared.id
 
   # Use new VPC subnets in production, shared VPC subnets in other environments
   # Take first subnet from each AZ (WorkSpaces Web requires 2-3 subnets from at least 2 AZs)
-  subnet_ids = local.environment == "production" ? [
-    data.aws_subnets.secure_browser_private_a[0].ids[0],
-    data.aws_subnets.secure_browser_private_b[0].ids[0]
-    ] : [
+  subnet_ids = local.environment == "production" ? flatten([
+    for az in local.wssb_supported_az_names : data.aws_subnets.secure_browser_private[az].ids
+    ]) : [
     data.aws_subnet.private_aza.id,
     data.aws_subnet.private_azc.id
   ]

@@ -154,7 +154,7 @@ resource "aws_workspacesweb_browser_settings" "main" {
         "value" = [
           {
             "name" = "PUI"
-            "url"  = "https://${local.pui_url}"
+            "url"  = "https://${local.pui_url}/civil"
           },
           {
             "name" = "OIA Hub"
