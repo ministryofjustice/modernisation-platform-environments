@@ -2,6 +2,9 @@
 name: Cloud Cleanup (AMI & EBS)
 
 on:
+  push:
+    branches:
+      - feature-11321-identifying-snapshots-to-be-deleted
   workflow_dispatch:
     inputs:
       application:
@@ -33,9 +36,6 @@ on:
         required: true
         default: false
         type: boolean
-  push:
-    branches:
-      - feature-11321-identifying-snapshots-to-be-deleted
 
 permissions:
   id-token: write
@@ -228,6 +228,7 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' && (github.event.inputs.cleanup_type == 'ami' || github.event.inputs.cleanup_type == 'both') && github.event.inputs.confirm_delete == 'true' }}
     strategy:
       matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
+      max-parallel: 1
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -264,8 +265,6 @@ jobs:
           args="${AMI_ARGS}"
           echo "[LIVE] Collecting candidates and deregistering (if any)"
           scripts/ami_cleanup.sh -a "$app" -s ami_commands.sh $args delete
-
-          # Count and show a preview of executed commands (top 20)
           TOTAL="$(grep -c '^aws ec2 deregister-image' ami_commands.sh || true)"
           echo "Total deregister-image commands generated (and executed): ${TOTAL}"
           if [[ -s ami_commands.sh ]]; then
@@ -274,7 +273,6 @@ jobs:
             grep '^aws ec2 deregister-image' ami_commands.sh | head -n 20
             echo ""
           fi
-
           [[ -f ami_candidates.csv ]] || touch ami_candidates.csv
           [[ -f ami_commands.sh ]] || touch ami_commands.sh
 
@@ -295,6 +293,7 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' && (github.event.inputs.cleanup_type == 'ebs' || github.event.inputs.cleanup_type == 'both') && github.event.inputs.confirm_delete == 'true' }}
     strategy:
       matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
+      max-parallel: 1
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -330,19 +329,14 @@ jobs:
           months="${EBS_MONTHS}"
           echo "[LIVE] Deleting unattached EBS volumes older than ${months} month(s)"
           scripts/ebs_cleanup.sh -m "$months" delete | tee ebs_delete_log.txt
-
-          # Count deleted (or attempted) based on script output lines
           DELETED_COUNT="$( (grep -Eo 'vol-[0-9a-f]+' ebs_delete_log.txt || true) | sort -u | wc -l | tr -d ' ' )"
           echo "Total volumes processed for deletion: ${DELETED_COUNT}"
-
-          # Show top 20 deleted/attempted IDs
           if [[ -s ebs_delete_log.txt ]]; then
             echo ""
             echo "First 20 volume IDs processed:"
             (grep -Eo 'vol-[0-9a-f]+' ebs_delete_log.txt || true) | sort -u | head -n 20
             echo ""
           fi
-
           [[ -f ebs_delete_log.txt ]] || touch ebs_delete_log.txt
 
       - name: Upload EBS Live Artifacts
