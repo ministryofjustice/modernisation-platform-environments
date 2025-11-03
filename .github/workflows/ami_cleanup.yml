@@ -28,10 +28,10 @@ on:
         required: false
         default: "1"
         type: string
-      dryrun:
-        description: 'Dry run mode'
+      confirm_delete:
+        description: 'Set to true to perform deletion. false = preview only.'
         required: true
-        default: true
+        default: false
         type: boolean
   push:
     branches:
@@ -44,10 +44,8 @@ permissions:
 env:
   APPLICATION: ${{ github.event.inputs.application || 'example' }}
   ENVIRONMENTS: ${{ github.event.inputs.environments || 'development' }}
-  CLEANUP_TYPE: ${{ github.event.inputs.cleanup_type || 'both' }}
   AMI_ARGS: ${{ github.event.inputs.ami_cleanup_sh_args || '-c -m 3' }}
   EBS_MONTHS: ${{ github.event.inputs.ebs_age_in_months || '1' }}
-  DRYRUN: ${{ (github.event.inputs.dryrun != '' && github.event.inputs.dryrun) || 'true' }}
 
 jobs:
   build-matrix:
@@ -84,11 +82,14 @@ jobs:
       MODERNISATION_PLATFORM_ACCOUNT_NUMBER: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
 
-  ami-cleanup:
-    name: AMI Cleanup
+  # -------------------------
+  # PREVIEW (Dry-Run) STAGE
+  # -------------------------
+  preview:
+    name: Preview Deletions (Dry-Run)
     runs-on: ubuntu-latest
     needs: [build-matrix, fetch-secrets]
-    if: ${{ (github.event_name == 'workflow_dispatch' && (github.event.inputs.cleanup_type == 'ami' || github.event.inputs.cleanup_type == 'both')) || (github.event_name == 'push') }}
+    if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.confirm_delete == 'false' }}
     strategy:
       matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
       max-parallel: 1
@@ -118,59 +119,71 @@ jobs:
         uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502
         with:
           role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
-          role-session-name: "ami-cleanup-${{ matrix.account_name }}"
+          role-session-name: "cleanup-preview-${{ matrix.account_name }}"
           aws-region: eu-west-2
 
-      - name: Run AMI Cleanup (Collect)
+      - name: AMI Preview (dry-run)
+        if: ${{ github.event.inputs.cleanup_type == 'ami' || github.event.inputs.cleanup_type == 'both' }}
+        id: ami_preview
         run: |
           set -euo pipefail
           app="${APPLICATION}"
           args="${AMI_ARGS}"
-          if [[ "${DRYRUN}" == 'true' ]]; then
-            echo "[DRY RUN] Collecting AMI delete candidates via dry-run delete (-d)"
-            scripts/ami_cleanup.sh -a "$app" -s ami_commands.sh $args -d delete
-          else
-            echo "[LIVE] Collecting and preparing deletes"
-            scripts/ami_cleanup.sh -a "$app" -s ami_commands.sh $args delete
-          fi
-          echo "---------- Summary ----------"
-          [[ -f ami_candidates.csv ]] && echo "Candidates CSV rows: $(wc -l < ami_candidates.csv)" || echo "No ami_candidates.csv produced"
-          [[ -f ami_commands.sh ]] && echo "Commands lines: $(grep -c '^aws ec2 deregister-image' ami_commands.sh)" || echo "No ami_commands.sh produced"
+          echo "[PREVIEW] Collecting AMI delete candidates (dry-run)"
+          scripts/ami_cleanup.sh -a "$app" -s ami_commands.sh $args -d delete
+          AMI_COUNT="$(grep -c '^aws ec2 deregister-image' ami_commands.sh || true)"
+          echo "ami_count=${AMI_COUNT}" >> "$GITHUB_OUTPUT"
+          [[ -f ami_candidates.csv ]] || touch ami_candidates.csv
+          [[ -f ami_commands.sh ]] || touch ami_commands.sh
+          {
+            echo "### AMI Preview — ${{ matrix.account_name }}"
+            echo ""
+            echo "- Candidates: ${AMI_COUNT}"
+          } >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Execute AMI Deregistration (if not dryrun)
-        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.dryrun == 'false' }}
+      - name: Upload AMI Preview Artifacts
+        if: ${{ (github.event.inputs.cleanup_type == 'ami' || github.event.inputs.cleanup_type == 'both') && always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ami-preview-${{ matrix.account_name }}
+          path: |
+            ami_candidates.csv
+            ami_commands.sh
+          if-no-files-found: warn
+
+      - name: EBS Preview (dry-run)
+        if: ${{ github.event.inputs.cleanup_type == 'ebs' || github.event.inputs.cleanup_type == 'both' }}
+        id: ebs_preview
         run: |
           set -euo pipefail
-          if [[ -f ami_commands.sh ]]; then
-            grep 'aws ec2 deregister-image' ami_commands.sh | while read -r cmd; do
-              echo "Executing: $cmd"
-              eval "$cmd"
-            done
-          else
-            echo "No AMI commands to execute."
-          fi
+          months="${EBS_MONTHS}"
+          echo "[PREVIEW] Listing unattached EBS volumes older than ${months} month(s) (dry-run only; no deletion)"
+          scripts/ebs_cleanup.sh -m "$months" unattached | tee ebs_candidates.txt
+          EBS_COUNT="$(grep -Eo 'vol-[0-9a-f]+' ebs_candidates.txt | wc -l | tr -d ' ')"
+          echo "ebs_count=${EBS_COUNT}" >> "$GITHUB_OUTPUT"
+          [[ -f ebs_candidates.txt ]] || touch ebs_candidates.txt
+          {
+            echo "### EBS Preview — ${{ matrix.account_name }}"
+            echo ""
+            echo "- Unattached volumes slated by age filter: ${EBS_COUNT}"
+          } >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Upload AMI Commands (Dry-Run Preview)
-        if: always()
+      - name: Upload EBS Preview Artifacts
+        if: ${{ (github.event.inputs.cleanup_type == 'ebs' || github.event.inputs.cleanup_type == 'both') && always() }}
         uses: actions/upload-artifact@v4
         with:
-          name: ami-commands-${{ matrix.account_name }}
-          path: ami_commands.sh
-          if-no-files-found: ignore
+          name: ebs-preview-${{ matrix.account_name }}
+          path: ebs_candidates.txt
+          if-no-files-found: warn
 
-      - name: Upload AMI Candidates (Dry-Run Preview)
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: ami-candidates-${{ matrix.account_name }}
-          path: ami_candidates.csv
-          if-no-files-found: ignore
-
-  ebs-cleanup:
-    name: EBS Cleanup
+  # -------------------------
+  # LIVE (Deletion) STAGE — triggered explicitly with confirm_delete=true
+  # -------------------------
+  ami-delete:
+    name: AMI Delete (Live)
     runs-on: ubuntu-latest
     needs: [build-matrix, fetch-secrets]
-    if: ${{ (github.event_name == 'workflow_dispatch' && (github.event.inputs.cleanup_type == 'ebs' || github.event.inputs.cleanup_type == 'both')) || (github.event_name == 'push') }}
+    if: ${{ github.event_name == 'workflow_dispatch' && (github.event.inputs.cleanup_type == 'ami' || github.event.inputs.cleanup_type == 'both') && github.event.inputs.confirm_delete == 'true' }}
     strategy:
       matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
       max-parallel: 1
@@ -200,17 +213,78 @@ jobs:
         uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502
         with:
           role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
-          role-session-name: "ebs-cleanup-${{ matrix.account_name }}"
+          role-session-name: "ami-delete-${{ matrix.account_name }}"
           aws-region: eu-west-2
 
-      - name: Run EBS Cleanup
+      - name: Recompute & Delete AMIs (Live)
+        run: |
+          set -euo pipefail
+          app="${APPLICATION}"
+          args="${AMI_ARGS}"
+          echo "[LIVE] Collecting candidates and deregistering (if any)"
+          scripts/ami_cleanup.sh -a "$app" -s ami_commands.sh $args delete
+          [[ -f ami_candidates.csv ]] || touch ami_candidates.csv
+          [[ -f ami_commands.sh ]] || touch ami_commands.sh
+
+      - name: Upload AMI Live Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ami-live-${{ matrix.account_name }}
+          path: |
+            ami_candidates.csv
+            ami_commands.sh
+          if-no-files-found: warn
+
+  ebs-delete:
+    name: EBS Delete (Live)
+    runs-on: ubuntu-latest
+    needs: [build-matrix, fetch-secrets]
+    if: ${{ github.event_name == 'workflow_dispatch' && (github.event.inputs.cleanup_type == 'ebs' || github.event.inputs.cleanup_type == 'both') && github.event.inputs.confirm_delete == 'true' }}
+    strategy:
+      matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
+      max-parallel: 1
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Ensure scripts are executable
+        run: chmod +x scripts/*.sh
+
+      - name: Decrypt Secrets (ENVIRONMENT_MANAGEMENT)
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@4eceb2a416a197e91dc557c2ef0b5dd9afe29e0c
+        with:
+          environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
+          github_ci_user_environments_repo_pat: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}
+          PASSPHRASE: ${{ secrets.PASSPHRASE }}
+
+      - name: Resolve AWS Account Number
+        run: |
+          set -euo pipefail
+          ACCOUNT_NAME="${{ matrix.account_name }}"
+          ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< "$ENVIRONMENT_MANAGEMENT")
+          echo "::add-mask::$ACCOUNT_NUMBER"
+          echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
+
+      - name: Configure AWS Credentials (github-actions role)
+        uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502
+        with:
+          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
+          role-session-name: "ebs-delete-${{ matrix.account_name }}"
+          aws-region: eu-west-2
+
+      - name: Delete EBS Volumes (Live)
         run: |
           set -euo pipefail
           months="${EBS_MONTHS}"
-          if [[ "${DRYRUN}" == 'true' ]]; then
-            echo "[DRY RUN] Listing unattached EBS volumes (no deletion)"
-            scripts/ebs_cleanup.sh -m "$months" unattached
-          else
-            echo "[LIVE] Deleting unattached EBS volumes"
-            scripts/ebs_cleanup.sh -m "$months" delete
-          fi
+          echo "[LIVE] Deleting unattached EBS volumes older than ${months} month(s)"
+          scripts/ebs_cleanup.sh -m "$months" delete | tee ebs_delete_log.txt
+          [[ -f ebs_delete_log.txt ]] || touch ebs_delete_log.txt
+
+      - name: Upload EBS Live Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ebs-live-${{ matrix.account_name }}
+          path: ebs_delete_log.txt
+          if-no-files-found: warn
