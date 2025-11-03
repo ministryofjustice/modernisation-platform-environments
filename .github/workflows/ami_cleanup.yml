@@ -124,7 +124,7 @@ jobs:
           role-session-name: "cleanup-preview-${{ matrix.account_name }}"
           aws-region: eu-west-2
 
-      # ------- AMI preview with descriptive logs -------
+      # ------- AMI preview with hybrid logs (top-N) + artifacts -------
       - name: AMI Preview (dry-run)
         if: ${{ github.event_name == 'push' || github.event.inputs.cleanup_type == 'ami' || github.event.inputs.cleanup_type == 'both' }}
         id: ami_preview
@@ -149,7 +149,7 @@ jobs:
           if [[ -s ami_candidates.csv ]]; then
             echo ""
             echo "Top AMI candidates (ImageId,OwnerId,CreationDate,Public,Name):"
-            head -n 10 ami_candidates.csv
+            head -n 20 ami_candidates.csv
             echo ""
           else
             echo "No AMIs found matching cleanup filters."
@@ -166,6 +166,7 @@ jobs:
             echo ""
             echo "- Region: ${region}"
             echo "- Total AMIs eligible for cleanup: ${TOTAL}"
+            echo "- Full candidate list and commands attached as artifacts."
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload AMI Preview Artifacts
@@ -178,6 +179,7 @@ jobs:
             ami_commands.sh
           if-no-files-found: warn
 
+      # ------- EBS preview with hybrid logs (top-N) + artifacts -------
       - name: EBS Preview (dry-run)
         if: ${{ github.event_name == 'push' || github.event.inputs.cleanup_type == 'ebs' || github.event.inputs.cleanup_type == 'both' }}
         id: ebs_preview
@@ -187,12 +189,25 @@ jobs:
           echo "[PREVIEW] Listing unattached EBS volumes older than ${months} month(s) (dry-run only; no deletion)"
           scripts/ebs_cleanup.sh -m "$months" unattached | tee ebs_candidates.txt
           EBS_COUNT="$( (grep -Eo 'vol-[0-9a-f]+' ebs_candidates.txt || true) | wc -l | tr -d ' ' )"
+          echo "Total unattached volumes matching filter: ${EBS_COUNT}"
+
+          # Show top 20 unique volume IDs in logs
+          if [[ -s ebs_candidates.txt ]]; then
+            echo ""
+            echo "Top EBS candidates (volume IDs):"
+            (grep -Eo 'vol-[0-9a-f]+' ebs_candidates.txt || true) | sort -u | head -n 20
+            echo ""
+          else
+            echo "No unattached volumes found matching the filter."
+          fi
+
           echo "ebs_count=${EBS_COUNT}" >> "$GITHUB_OUTPUT"
           [[ -f ebs_candidates.txt ]] || touch ebs_candidates.txt
           {
             echo "### EBS Preview — ${{ matrix.account_name }}"
             echo ""
             echo "- Unattached volumes slated by age filter: ${EBS_COUNT}"
+            echo "- Full candidate list attached as artifact."
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload EBS Preview Artifacts
@@ -213,7 +228,6 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' && (github.event.inputs.cleanup_type == 'ami' || github.event.inputs.cleanup_type == 'both') && github.event.inputs.confirm_delete == 'true' }}
     strategy:
       matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
-      max-parallel: 1
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -250,6 +264,17 @@ jobs:
           args="${AMI_ARGS}"
           echo "[LIVE] Collecting candidates and deregistering (if any)"
           scripts/ami_cleanup.sh -a "$app" -s ami_commands.sh $args delete
+
+          # Count and show a preview of executed commands (top 20)
+          TOTAL="$(grep -c '^aws ec2 deregister-image' ami_commands.sh || true)"
+          echo "Total deregister-image commands generated (and executed): ${TOTAL}"
+          if [[ -s ami_commands.sh ]]; then
+            echo ""
+            echo "First 20 deregistration commands:"
+            grep '^aws ec2 deregister-image' ami_commands.sh | head -n 20
+            echo ""
+          fi
+
           [[ -f ami_candidates.csv ]] || touch ami_candidates.csv
           [[ -f ami_commands.sh ]] || touch ami_commands.sh
 
@@ -270,7 +295,6 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' && (github.event.inputs.cleanup_type == 'ebs' || github.event.inputs.cleanup_type == 'both') && github.event.inputs.confirm_delete == 'true' }}
     strategy:
       matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
-      max-parallel: 1
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -306,6 +330,19 @@ jobs:
           months="${EBS_MONTHS}"
           echo "[LIVE] Deleting unattached EBS volumes older than ${months} month(s)"
           scripts/ebs_cleanup.sh -m "$months" delete | tee ebs_delete_log.txt
+
+          # Count deleted (or attempted) based on script output lines
+          DELETED_COUNT="$( (grep -Eo 'vol-[0-9a-f]+' ebs_delete_log.txt || true) | sort -u | wc -l | tr -d ' ' )"
+          echo "Total volumes processed for deletion: ${DELETED_COUNT}"
+
+          # Show top 20 deleted/attempted IDs
+          if [[ -s ebs_delete_log.txt ]]; then
+            echo ""
+            echo "First 20 volume IDs processed:"
+            (grep -Eo 'vol-[0-9a-f]+' ebs_delete_log.txt || true) | sort -u | head -n 20
+            echo ""
+          fi
+
           [[ -f ebs_delete_log.txt ]] || touch ebs_delete_log.txt
 
       - name: Upload EBS Live Artifacts
