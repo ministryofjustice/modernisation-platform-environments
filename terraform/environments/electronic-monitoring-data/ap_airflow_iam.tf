@@ -238,6 +238,7 @@ module "load_cap_dw_database" {
   athena_dump_bucket   = module.s3-athena-bucket.bucket
   cadt_bucket          = module.s3-create-a-derived-table-bucket.bucket
   max_session_duration = 12 * 60 * 60
+  new_airflow          = true
 }
 
 module "load_emsys_mvp_database" {
