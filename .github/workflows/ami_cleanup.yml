@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       application:
-        description: 'Application folder name (e.g. nomis)'
+        description: 'Application folder name (e.g. example)'
         required: true
         type: string
       environments:
@@ -42,7 +42,7 @@ permissions:
   contents: read
 
 env:
-  APPLICATION: ${{ github.event.inputs.application || 'nomis' }}
+  APPLICATION: ${{ github.event.inputs.application || 'example' }}
   ENVIRONMENTS: ${{ github.event.inputs.environments || 'development' }}
   CLEANUP_TYPE: ${{ github.event.inputs.cleanup_type || 'both' }}
   AMI_ARGS: ${{ github.event.inputs.ami_cleanup_sh_args || '-c -m 3' }}
