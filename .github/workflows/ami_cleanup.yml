@@ -2,9 +2,12 @@
 name: Cloud Cleanup (AMI & EBS)
 
 on:
+  # Run previews automatically on commits to your feature branch
   push:
     branches:
       - feature-11321-identifying-snapshots-to-be-deleted
+
+  # Allow manual runs from THIS BRANCH (via gh CLI or API with "ref")
   workflow_dispatch:
     inputs:
       application:
@@ -31,31 +34,29 @@ on:
         required: false
         default: "1"
         type: string
-      # Live/preview toggle
       confirm_delete:
-        description: 'Set to true to perform deletion. false = preview only.'
+        description: 'true = perform deletion; false = preview only'
         required: true
         default: false
         type: boolean
-      # Test-mode minute window (AMI)
+      # Optional minute-based testing toggles
       ami_test_mode:
-        description: 'Enable test mode (minute-based age) for AMI cleanup'
+        description: 'Set true to enable minute-based test window for AMI script (if supported)'
         required: false
         default: false
         type: boolean
       ami_age_minutes:
-        description: 'In test mode, consider AMIs older than N minutes'
+        description: 'Minutes threshold for AMI test mode (if supported)'
         required: false
         default: "10"
         type: string
-      # Test-mode minute window (EBS)
       ebs_test_mode:
-        description: 'Enable test mode (minute-based age) for EBS cleanup'
+        description: 'Set true to enable minute-based test window for EBS script (if supported)'
         required: false
         default: false
         type: boolean
       ebs_age_minutes:
-        description: 'In test mode, consider EBS volumes older than N minutes'
+        description: 'Minutes threshold for EBS test mode (if supported)'
         required: false
         default: "10"
         type: string
@@ -65,11 +66,11 @@ permissions:
   contents: read
 
 env:
-  APPLICATION: ${{ github.event.inputs.application || 'example' }}
+  APPLICATION:  ${{ github.event.inputs.application || 'example' }}
   ENVIRONMENTS: ${{ github.event.inputs.environments || 'development' }}
-  AMI_ARGS: ${{ github.event.inputs.ami_cleanup_sh_args || '-c -m 3' }}
-  EBS_MONTHS: ${{ github.event.inputs.ebs_age_in_months || '1' }}
-  # test-mode env defaults so push events work without inputs
+  AMI_ARGS:     ${{ github.event.inputs.ami_cleanup_sh_args || '-c -m 3' }}
+  EBS_MONTHS:   ${{ github.event.inputs.ebs_age_in_months || '1' }}
+  # Pass-through testing envs (scripts can optionally read them)
   AMI_TEST_MODE: ${{ github.event.inputs.ami_test_mode || 'false' }}
   AMI_AGE_MINUTES: ${{ github.event.inputs.ami_age_minutes || '10' }}
   EBS_TEST_MODE: ${{ github.event.inputs.ebs_test_mode || 'false' }}
@@ -111,15 +112,15 @@ jobs:
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
 
   # -------------------------
-  # PREVIEW (Dry-Run) STAGE
-  # - Runs on push for BOTH AMI & EBS
+  # PREVIEW (Dry-Run)
+  # - Runs on push
   # - Runs on workflow_dispatch when confirm_delete == false
   # -------------------------
   preview:
     name: Preview Deletions (Dry-Run)
     runs-on: ubuntu-latest
     needs: [build-matrix, fetch-secrets]
-    if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.confirm_delete == 'false') }}
+    if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && fromJSON(github.event.inputs.confirm_delete) == false) }}
     strategy:
       matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
       max-parallel: 1
@@ -152,27 +153,22 @@ jobs:
           role-session-name: "cleanup-preview-${{ matrix.account_name }}"
           aws-region: eu-west-2
 
-      # ------- AMI preview with hybrid logs (top-N) + artifacts -------
+      # ------- AMI preview (top-N to logs + artifacts) -------
       - name: AMI Preview (dry-run)
         if: ${{ github.event_name == 'push' || github.event.inputs.cleanup_type == 'ami' || github.event.inputs.cleanup_type == 'both' }}
         id: ami_preview
         run: |
           set -euo pipefail
           app="${APPLICATION}"
-          base_args="${AMI_ARGS}"
-
-          test_flags=""
-          if [[ "${AMI_TEST_MODE}" == 'true' ]]; then
-            test_flags="--test-mode --age-minutes ${AMI_AGE_MINUTES}"
-          fi
-
+          args="${AMI_ARGS}"
           region="eu-west-2"
+
           echo "[PREVIEW] Scanning AMIs in ${region} (dry-run; no deletion)"
-          echo "Base args: ${base_args}"
-          echo "Test flags: ${test_flags}"
+          echo "AMI_ARGS: ${args}"
+          echo "Test mode: ${AMI_TEST_MODE}, minutes: ${AMI_AGE_MINUTES}"
           echo "----------------------------------------------------"
 
-          scripts/ami_cleanup.sh -a "$app" -s ami_commands.sh ${base_args} ${test_flags} -d delete
+          scripts/ami_cleanup.sh -a "$app" -s ami_commands.sh $args -d delete
 
           TOTAL="$(grep -c '^aws ec2 deregister-image' ami_commands.sh || true)"
           [[ -f ami_candidates.csv ]] || touch ami_candidates.csv
@@ -182,15 +178,11 @@ jobs:
           if [[ -s ami_candidates.csv ]]; then
             echo ""
             echo "Top AMI candidates (ImageId,OwnerId,CreationDate,Public,Name):"
-            head -n 20 ami_candidates.csv
+            head -n 20 ami_candidates.csv || true
             echo ""
           else
             echo "No AMIs found matching cleanup filters."
           fi
-
-          echo "----------------------------------------------------"
-          echo "[DRY RUN COMPLETE] Total AMIs eligible for cleanup: ${TOTAL}"
-          echo "----------------------------------------------------"
 
           echo "ami_count=${TOTAL}" >> "$GITHUB_OUTPUT"
           {
@@ -211,24 +203,17 @@ jobs:
             ami_commands.sh
           if-no-files-found: warn
 
-      # ------- EBS preview with hybrid logs (top-N) + artifacts -------
+      # ------- EBS preview (top-N to logs + artifacts) -------
       - name: EBS Preview (dry-run)
         if: ${{ github.event_name == 'push' || github.event.inputs.cleanup_type == 'ebs' || github.event.inputs.cleanup_type == 'both' }}
         id: ebs_preview
         run: |
           set -euo pipefail
           months="${EBS_MONTHS}"
-
-          ebs_flags=""
-          if [[ "${EBS_TEST_MODE}" == 'true' ]]; then
-            ebs_flags="--test-mode --age-minutes ${EBS_AGE_MINUTES}"
-          fi
-
           echo "[PREVIEW] Listing unattached EBS volumes older than ${months} month(s) (dry-run only; no deletion)"
-          echo "EBS test flags: ${ebs_flags}"
-          scripts/ebs_cleanup.sh ${ebs_flags} -m "$months" unattached | tee ebs_candidates.txt
-
-          EBS_COUNT="$( (grep -Eo 'vol-[0-9a-f]+' ebs_candidates.txt || true) | wc -l | tr -d ' ' )"
+          echo "Test mode: ${EBS_TEST_MODE}, minutes: ${EBS_AGE_MINUTES}"
+          scripts/ebs_cleanup.sh -m "$months" unattached | tee ebs_candidates.txt
+          EBS_COUNT="$( (grep -Eo 'vol-[0-9a-f]+' ebs_candidates.txt || true) | sort -u | wc -l | tr -d ' ' )"
           echo "Total unattached volumes matching filter: ${EBS_COUNT}"
 
           if [[ -s ebs_candidates.txt ]]; then
@@ -258,13 +243,14 @@ jobs:
           if-no-files-found: warn
 
   # -------------------------
-  # LIVE (Deletion) STAGE — only via manual dispatch with confirm_delete=true
+  # LIVE (Deletion) — only when manually dispatched with confirm_delete=true
+  # Works from the feature branch when dispatched with ref to that branch.
   # -------------------------
   ami-delete:
     name: AMI Delete (Live)
     runs-on: ubuntu-latest
     needs: [build-matrix, fetch-secrets]
-    if: ${{ github.event_name == 'workflow_dispatch' && (github.event.inputs.cleanup_type == 'ami' || github.event.inputs.cleanup_type == 'both') && github.event.inputs.confirm_delete == 'true' }}
+    if: ${{ github.event_name == 'workflow_dispatch' && (github.event.inputs.cleanup_type == 'ami' || github.event.inputs.cleanup_type == 'both') && fromJSON(github.event.inputs.confirm_delete) == true }}
     strategy:
       matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
       max-parallel: 1
@@ -301,16 +287,9 @@ jobs:
         run: |
           set -euo pipefail
           app="${APPLICATION}"
-          base_args="${AMI_ARGS}"
-
-          test_flags=""
-          if [[ "${AMI_TEST_MODE}" == 'true' ]]; then
-            test_flags="--test-mode --age-minutes ${AMI_AGE_MINUTES}"
-          fi
-
+          args="${AMI_ARGS}"
           echo "[LIVE] Collecting candidates and deregistering (if any)"
-          scripts/ami_cleanup.sh -a "$app" -s ami_commands.sh ${base_args} ${test_flags} delete
-
+          scripts/ami_cleanup.sh -a "$app" -s ami_commands.sh $args delete
           TOTAL="$(grep -c '^aws ec2 deregister-image' ami_commands.sh || true)"
           echo "Total deregister-image commands generated (and executed): ${TOTAL}"
           if [[ -s ami_commands.sh ]]; then
@@ -336,7 +315,7 @@ jobs:
     name: EBS Delete (Live)
     runs-on: ubuntu-latest
     needs: [build-matrix, fetch-secrets]
-    if: ${{ github.event_name == 'workflow_dispatch' && (github.event.inputs.cleanup_type == 'ebs' || github.event.inputs.cleanup_type == 'both') && github.event.inputs.confirm_delete == 'true' }}
+    if: ${{ github.event_name == 'workflow_dispatch' && (github.event.inputs.cleanup_type == 'ebs' || github.event.inputs.cleanup_type == 'both') && fromJSON(github.event.inputs.confirm_delete) == true }}
     strategy:
       matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
       max-parallel: 1
@@ -373,16 +352,8 @@ jobs:
         run: |
           set -euo pipefail
           months="${EBS_MONTHS}"
-
-          ebs_flags=""
-          if [[ "${EBS_TEST_MODE}" == 'true' ]]; then
-            ebs_flags="--test-mode --age-minutes ${EBS_AGE_MINUTES}"
-          fi
-
           echo "[LIVE] Deleting unattached EBS volumes older than ${months} month(s)"
-          echo "EBS test flags: ${ebs_flags}"
-          scripts/ebs_cleanup.sh ${ebs_flags} -m "$months" delete | tee ebs_delete_log.txt
-
+          scripts/ebs_cleanup.sh -m "$months" delete | tee ebs_delete_log.txt
           DELETED_COUNT="$( (grep -Eo 'vol-[0-9a-f]+' ebs_delete_log.txt || true) | sort -u | wc -l | tr -d ' ' )"
           echo "Total volumes processed for deletion: ${DELETED_COUNT}"
           if [[ -s ebs_delete_log.txt ]]; then
@@ -399,4 +370,3 @@ jobs:
         with:
           name: ebs-live-${{ matrix.account_name }}
           path: ebs_delete_log.txt
-          if-no-files-found: warn
