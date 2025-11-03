@@ -124,6 +124,7 @@ jobs:
           role-session-name: "cleanup-preview-${{ matrix.account_name }}"
           aws-region: eu-west-2
 
+      # ------- ONLY CHANGE: more descriptive AMI preview logs -------
       - name: AMI Preview (dry-run)
         if: ${{ github.event_name == 'push' || github.event.inputs.cleanup_type == 'ami' || github.event.inputs.cleanup_type == 'both' }}
         id: ami_preview
@@ -131,17 +132,42 @@ jobs:
           set -euo pipefail
           app="${APPLICATION}"
           args="${AMI_ARGS}"
-          echo "[PREVIEW] Collecting AMI delete candidates (dry-run)"
+          region="eu-west-2"
+
+          echo "[PREVIEW] Scanning AMIs in ${region} (dry-run; no deletion)"
+          echo "Arguments: ${args}"
+          echo "----------------------------------------------------"
+
           scripts/ami_cleanup.sh -a "$app" -s ami_commands.sh $args -d delete
-          AMI_COUNT="$(grep -c '^aws ec2 deregister-image' ami_commands.sh || true)"
-          echo "ami_count=${AMI_COUNT}" >> "$GITHUB_OUTPUT"
+
+          # Stats
+          TOTAL="$(grep -c '^aws ec2 deregister-image' ami_commands.sh || true)"
           [[ -f ami_candidates.csv ]] || touch ami_candidates.csv
-          [[ -f ami_commands.sh ]] || touch ami_commands.sh
+
+          echo "Total deregister-image commands generated: ${TOTAL}"
+
+          if [[ -s ami_candidates.csv ]]; then
+            echo ""
+            echo "Top AMI candidates (ImageId,OwnerId,CreationDate,Public,Name):"
+            head -n 10 ami_candidates.csv
+            echo ""
+          else
+            echo "No AMIs found matching cleanup filters."
+          fi
+
+          echo "----------------------------------------------------"
+          echo "[DRY RUN COMPLETE] Total AMIs eligible for cleanup: ${TOTAL}"
+          echo "----------------------------------------------------"
+
+          # Output for downstream / summary
+          echo "ami_count=${TOTAL}" >> "$GITHUB_OUTPUT"
           {
             echo "### AMI Preview — ${{ matrix.account_name }}"
             echo ""
-            echo "- Candidates: ${AMI_COUNT}"
+            echo "- Region: ${region}"
+            echo "- Total AMIs eligible for cleanup: ${TOTAL}"
           } >> "$GITHUB_STEP_SUMMARY"
+      # --------------------------------------------------------------
 
       - name: Upload AMI Preview Artifacts
         if: ${{ (github.event_name == 'push' || github.event.inputs.cleanup_type == 'ami' || github.event.inputs.cleanup_type == 'both') && always() }}
@@ -161,7 +187,7 @@ jobs:
           months="${EBS_MONTHS}"
           echo "[PREVIEW] Listing unattached EBS volumes older than ${months} month(s) (dry-run only; no deletion)"
           scripts/ebs_cleanup.sh -m "$months" unattached | tee ebs_candidates.txt
-          EBS_COUNT="$( (grep -Eo 'vol-[0-9a-f]+' ebs_candidates.txt || true) | wc -l | tr -d ' ' )"
+          EBS_COUNT="$(grep -Eo 'vol-[0-9a-f]+' ebs_candidates.txt | wc -l | tr -d ' ')"
           echo "ebs_count=${EBS_COUNT}" >> "$GITHUB_OUTPUT"
           [[ -f ebs_candidates.txt ]] || touch ebs_candidates.txt
           {
