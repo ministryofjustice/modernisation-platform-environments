@@ -1,4 +1,5 @@
 resource "aws_security_group" "tariff_app_security_group" {
+  count       = local.environment != "production" ? 1 : 0
   name_prefix = "${local.application_name}-app-server-sg-"
   description = "Access to the app server"
   vpc_id      = data.aws_vpc.shared.id
