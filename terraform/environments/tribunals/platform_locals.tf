@@ -85,9 +85,7 @@ locals {
     "yjbpublications.justice.gov.uk"
   ]
 
-  cloudfront_nginx_nonprod_sans = [
-    "dev.ahmlr.gov.uk"
-  ]
+  cloudfront_nginx_nonprod_sans = []
 
 
 }

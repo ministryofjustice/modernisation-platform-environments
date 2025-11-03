@@ -8,10 +8,10 @@
 # -------------------------------------------------
 resource "aws_acm_certificate" "http_redirect_cert" {
   provider          = aws.us-east-1
-  domain_name       = "ahmlr.gov.uk"  # any one of the HTTP domains
+  domain_name       = local.is-production ? "ahmlr.gov.uk" : "dev.ahmlr.gov.uk"
   validation_method = "DNS"
 
-  #subject_alternative_names = local.is-production ? local.cloudfront_nginx_sans : local.cloudfront_nginx_nonprod_sans
+  subject_alternative_names = local.is-production ? local.cloudfront_nginx_sans : local.cloudfront_nginx_nonprod_sans
 
   tags = {
     Name        = "tribunals-http-redirect-cert"
