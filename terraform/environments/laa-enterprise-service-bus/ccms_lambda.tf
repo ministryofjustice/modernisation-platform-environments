@@ -17,8 +17,8 @@ resource "aws_security_group" "ccms_provider_load" {
 
 resource "aws_security_group_rule" "ccms_provider_load_egress_oracle" {
   type              = "egress"
-  from_port         = local.environment == "development" ? 1521 : 1522
-  to_port           = local.environment == "development" ? 1521 : 1522
+  from_port         = local.environment == "test" ? 1521 : 1522
+  to_port           = local.environment == "test" ? 1521 : 1522
   protocol          = "tcp"
   cidr_blocks       = [local.application_data.accounts[local.environment].ccms_database_ip]
   security_group_id = aws_security_group.ccms_provider_load.id
@@ -33,6 +33,16 @@ resource "aws_security_group_rule" "ccms_provider_load_egress_https" {
   source_security_group_id = local.application_data.accounts[local.environment].vpc_endpoint_sg
   security_group_id        = aws_security_group.ccms_provider_load.id
   description              = "Outbound 443 to LAA VPC Endpoint SG"
+}
+
+resource "aws_security_group_rule" "ccms_provider_load_egress_https_s3" {
+  type              = "egress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  prefix_list_ids   = [local.application_data.accounts[local.environment].s3_vpc_endpoint_prefix]
+  security_group_id = aws_security_group.ccms_provider_load.id
+  description       = "Outbound 443 to LAA VPC Endpoint SG"
 }
 
 ######################################
@@ -73,7 +83,7 @@ resource "aws_lambda_function" "ccms_provider_load" {
       LOG_LEVEL              = "DEBUG"
       PURGE_LAMBDA_TIMESTAMP = aws_ssm_parameter.ccms_provider_load_timestamp.name
       TNS_ADMIN              = "/tmp/wallet_dir"
-      BUCKET                 = aws_s3_bucket.wallet_files.bucket
+      WALLET_BUCKET          = aws_s3_bucket.wallet_files.bucket
       WALLET_OBJ             = "CCMS/wallet_dir.zip"
     }
   }
