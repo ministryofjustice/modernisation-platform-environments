@@ -4,8 +4,28 @@ resource "aws_security_group" "dis" {
   vpc_id      = var.account_info.vpc_id
 }
 
+resource "aws_vpc_security_group_egress_rule" "mis_oracle_db" {
+  description                  = "Oracle DB connection to MIS database"
+  security_group_id            = aws_security_group.dis.id
+  referenced_security_group_id = data.aws_security_group.mis_db.id
+  ip_protocol                  = "tcp"
+  from_port                    = 1521
+  to_port                      = 1521
+}
+
+resource "aws_vpc_security_group_egress_rule" "dis_all_outbound" {
+  description       = "Allow all outbound traffic"
+  security_group_id = aws_security_group.dis.id
+  cidr_ipv4         = "0.0.0.0/0"
+  ip_protocol       = "-1"
+}
+
+data "aws_security_group" "mis_db" {
+  name = "delius-mis-${var.env_name}-mis-db-ec2-instance-sg"
+}
+
 module "dis_instance" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=49e289239aec2845924f00fc5969f35ae76122e2"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v4.1.0"
 
   # allow environment not to have this var set and still work
   count = var.dis_config != null ? var.dis_config.instance_count : 0
@@ -33,7 +53,7 @@ module "dis_instance" {
   }
   iam_resource_names_prefix = "${var.env_name}-dis-${count.index + 1}"
   instance_profile_policies = [
-    "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+    # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore", added by module
     aws_iam_policy.secrets_manager.arn,
     aws_iam_policy.ec2_automation.arn
   ]
@@ -46,7 +66,7 @@ module "dis_instance" {
         ad_password_secret_name = aws_secretsmanager_secret.ad_admin_password.name
         ad_domain_name          = var.environment_config.ad_domain_name
         ad_ip_list              = aws_directory_service_directory.mis_ad.dns_ip_addresses
-        branch                  = "main"
+        branch                  = var.dis_config.branch
       }
     )
   )
@@ -65,7 +85,7 @@ module "dis_instance" {
     }
   )
 
-  cloudwatch_metric_alarms = merge(
+  cloudwatch_metric_alarms = var.dis_config.cloudwatch_metric_alarms != null ? var.dis_config.cloudwatch_metric_alarms : merge(
     local.cloudwatch_metric_alarms.ec2
   )
 }

@@ -16,6 +16,29 @@ locals {
     "test",
     "preproduction"
   ]
+
+  # Folders in the FTP lambda inbound and outbound S3 buckets(ensure trailing slash)
+  target_prefixes = [
+    "CCMS_PRD_Allpay/Inbound/",
+    "CCMS_PRD_Allpay/Outbound/",
+    "CCMS_PRD_Eckoh/Inbound/",
+    "CCMS_PRD_Eckoh/Outbound/",
+    "CCMS_PRD_1stlocate/Inbound/",
+    "CCMS_PRD_1stlocate/Outbound/",
+    "CCMS_PRD_DST/Inbound/",
+    "CCMS_PRD_DST/Outbound/",
+    "CCMS_PRD_Rossendales/Inbound/",
+    "CCMS_PRD_Rossendales/Outbound/",
+    "CCMS_PRD_TDX_DECRYPTED/Inbound/",
+    "outbound-lambda-runs/"
+  ]
+
+  is_production = local.environment == "production"
+
+  # Days and ID label based on environment
+  expire_days = local.is_production ? 90 : 60
+  expire_id   = local.is_production ? "expire-90-days" : "expire-60-day"
+
 }
 
 ### secrets for ftp user and password
@@ -51,9 +74,9 @@ resource "aws_s3_bucket" "buckets" {
       Environment = local.environment
     },
     {
-      "business-unit"         = "LAA",
+      "business-unit"          = "LAA",
       "infrastructure-support" = "laa-role-sre@digital.justice.gov.uk",
-      "source-code"           = "https://github.com/ministryofjustice/modernisation-platform-environments"
+      "source-code"            = "https://github.com/ministryofjustice/modernisation-platform-environments"
     }
   )
 
@@ -96,17 +119,28 @@ resource "aws_s3_bucket_lifecycle_configuration" "buckets_lifecycle" {
   for_each = aws_s3_bucket.buckets
 
   bucket = each.value.id
-  
-  rule {
-    id     = local.is-production ? "expire-90-days" : "expire-30-days"
-    status = "Enabled"
 
-    expiration {
-      days = local.is-production ? 90 : 30
-    }
+  # One lifecycle rule per prefix
+  dynamic "rule" {
+    for_each = local.target_prefixes
+    content {
+      id     = "expire-${replace(each.value.id, "/", "-")}-${replace(rule.value, "/", "-")}-${local.expire_days}d"
+      status = "Enabled"
 
-    noncurrent_version_expiration {
-      noncurrent_days = local.is-production ? 90 : 30
+      filter {
+        and {
+          prefix                   = rule.value
+          object_size_greater_than = 0
+        }
+      }
+
+      expiration {
+        days = local.expire_days
+      }
+
+      noncurrent_version_expiration {
+        noncurrent_days = local.expire_days
+      }
     }
   }
 }

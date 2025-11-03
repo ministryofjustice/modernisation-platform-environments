@@ -72,11 +72,13 @@ resource "aws_iam_policy" "maat_provider_load_policy" {
         Resource = aws_sqs_queue.maat_provider_q.arn
       },
       {
-        Effect   = "Allow"
-        Action   = [
-            "sqs:SendMessage",
-            "sqs:GetQueueAttributes",
-          ]
+        Effect = "Allow"
+        Action = [
+          "sqs:SendMessage",
+          "sqs:ReceiveMessage",
+          "sqs:DeleteMessage",
+          "sqs:GetQueueAttributes"
+        ]
         Resource = aws_sqs_queue.maat_provider_dlq.arn
       },
       {

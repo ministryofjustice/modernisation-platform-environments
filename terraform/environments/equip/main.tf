@@ -261,7 +261,7 @@ module "win2016_multiple" {
   enable_volume_tags = false
   root_block_device  = lookup(each.value, "root_block_device", [])
   ebs_block_device   = lookup(each.value, "ebs_block_device", [])
-  metadata_options = lookup(each.value, "metadata_options", null)
+  metadata_options   = lookup(each.value, "metadata_options", null)
 
   tags = merge(each.value.tags, local.tags,
     { Environment = "development"
@@ -420,7 +420,7 @@ module "win2019_SQL_multiple" {
   enable_volume_tags = false
   root_block_device  = lookup(each.value, "root_block_device", [])
   ebs_block_device   = lookup(each.value, "ebs_block_device", [])
-  metadata_options = lookup(each.value, "metadata_options", null)
+  metadata_options   = lookup(each.value, "metadata_options", null)
 
   tags = merge(each.value.tags, local.tags, {
     Environment = "development"
@@ -563,7 +563,7 @@ module "win2022_STD_multiple" {
   enable_volume_tags = false
   root_block_device  = lookup(each.value, "root_block_device", [])
   ebs_block_device   = lookup(each.value, "ebs_block_device", [])
-  metadata_options = lookup(each.value, "metadata_options", null)
+  metadata_options   = lookup(each.value, "metadata_options", null)
 
   tags = merge(each.value.tags, local.tags, {
     Environment = "development"
@@ -627,7 +627,7 @@ locals {
     COR-A-TST02 = {
       instance_type          = "t3a.xlarge"
       subnet_id              = data.aws_subnet.private_subnets_a.id
-      vpc_security_group_ids = [aws_security_group.aws_equip_security_group.id, aws_security_group.all_internal_groups.id]
+      vpc_security_group_ids = [aws_security_group.aws_equip_security_group.id, aws_security_group.aws_citrix_security_group.id, aws_security_group.all_internal_groups.id]
       root_block_device = [
         {
           encrypted   = true
@@ -649,7 +649,7 @@ locals {
       )
     }
     COR-A-CTX04 = {
-      instance_type          = "t3a.large"
+      instance_type          = "t3a.xlarge"
       subnet_id              = data.aws_subnet.private_subnets_a.id
       vpc_security_group_ids = [aws_security_group.aws_citrix_security_group.id, aws_security_group.all_internal_groups.id]
       root_block_device = [
@@ -685,7 +685,7 @@ locals {
       )
     }
     COR-A-CTX05 = {
-      instance_type          = "t3a.large"
+      instance_type          = "t3a.xlarge"
       subnet_id              = data.aws_subnet.private_subnets_a.id
       vpc_security_group_ids = [aws_security_group.aws_citrix_security_group.id, aws_security_group.all_internal_groups.id]
       root_block_device = [
@@ -705,7 +705,7 @@ locals {
       )
     }
     COR-A-CTX06 = {
-      instance_type          = "t3a.large"
+      instance_type          = "t3a.xlarge"
       subnet_id              = data.aws_subnet.private_subnets_a.id
       vpc_security_group_ids = [aws_security_group.aws_citrix_security_group.id, aws_security_group.all_internal_groups.id]
       root_block_device = [
@@ -787,7 +787,7 @@ module "win2022_STD_Datacenter" {
   enable_volume_tags = false
   root_block_device  = lookup(each.value, "root_block_device", [])
   ebs_block_device   = lookup(each.value, "ebs_block_device", [])
-  metadata_options = lookup(each.value, "metadata_options", null)
+  metadata_options   = lookup(each.value, "metadata_options", null)
 
   tags = merge(each.value.tags, local.tags, {
     Environment = "development"
@@ -861,7 +861,7 @@ module "PowerBI_server" {
   enable_volume_tags = false
   root_block_device  = lookup(each.value, "root_block_device", [])
   ebs_block_device   = lookup(each.value, "ebs_block_device", [])
-  metadata_options = lookup(each.value, "metadata_options", null)
+  metadata_options   = lookup(each.value, "metadata_options", null)
 
   tags = merge(each.value.tags, local.tags, {
     Environment = "development"
@@ -877,7 +877,7 @@ data "aws_ami" "windows_2022_std_SQL22_ami" {
   most_recent = true
   filter {
     name   = "name"
-    values = ["Windows_Server-2022-English-Full-SQL_2017_Standard*"]
+    values = ["Windows_Server-2022-English-Full-SQL_2022_Standard*"]
   }
   filter {
     name   = "virtualization-type"
@@ -906,7 +906,7 @@ locals {
         {
           device_name = "/dev/sdf"
           volume_type = "gp3"
-          volume_size = 300
+          volume_size = 500
           encrypted   = true
           kms_key_id  = aws_kms_key.this.arn
           tags = merge(local.tags,
@@ -915,8 +915,8 @@ locals {
         }
       ]
       metadata_options = {
-          http_endpoint = "enabled"
-          http_tokens   = "required"
+        http_endpoint = "enabled"
+        http_tokens   = "required"
       }
 
       tags = merge(local.tags,
@@ -968,8 +968,8 @@ locals {
         }
       ]
       metadata_options = {
-          http_endpoint = "enabled"
-          http_tokens   = "required"
+        http_endpoint = "enabled"
+        http_tokens   = "required"
       }
 
       tags = merge(local.tags,

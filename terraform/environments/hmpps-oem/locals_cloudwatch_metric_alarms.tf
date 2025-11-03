@@ -43,7 +43,6 @@ locals {
       nomis-pp    = ["c.preproduction.nomis.service.justice.gov.uk", true, "nomis-pagerduty"]
 
       # nomis-combined-reporting
-      nomis-reporting-pp-azure = ["reporting.pp-nomis.az.justice.gov.uk", true, "nomis-combined-reporting-pagerduty"]
       nomis-reporting-pp-aws   = ["preproduction.reporting.nomis.service.justice.gov.uk", true, "nomis-combined-reporting-pagerduty"]
       nomis-reporting-pp-admin = ["admin.preproduction.reporting.nomis.service.justice.gov.uk", true, "nomis-combined-reporting-pagerduty"]
 
@@ -78,7 +77,6 @@ locals {
       nomis = ["c.nomis.az.justice.gov.uk", true, "nomis-pagerduty"]
 
       # nomis-combined-reporting
-      nomis-reporting-azure = ["reporting.nomis.az.justice.gov.uk", true, "nomis-combined-reporting-pagerduty"]
       nomis-reporting-aws   = ["reporting.nomis.service.justice.gov.uk", true, "nomis-combined-reporting-pagerduty"]
       nomis-reporting-admin = ["admin.reporting.nomis.service.justice.gov.uk", true, "nomis-combined-reporting-pagerduty"]
 

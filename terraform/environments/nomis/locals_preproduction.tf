@@ -105,7 +105,7 @@ locals {
         })
       })
 
-      # NOT-ACTIVE (green deployment) - for testing Combined Reporting
+      # NOT-ACTIVE (green deployment)
       preprod-nomis-web-b = merge(local.ec2_autoscaling_groups.web, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.web.autoscaling_group, {
           desired_capacity = 0
@@ -137,11 +137,10 @@ locals {
           })
         })
         tags = merge(local.ec2_autoscaling_groups.web.tags, {
-          nomis-environment     = "preprod"
-          oracle-db-hostname-a  = "ppnomis-a.preproduction.nomis.service.justice.gov.uk"
-          oracle-db-hostname-b  = "ppnomis-b.preproduction.nomis.service.justice.gov.uk"
-          oracle-db-name        = "PPCNOM"
-          reporting-environment = "aws"
+          nomis-environment    = "preprod"
+          oracle-db-hostname-a = "ppnomis-a.preproduction.nomis.service.justice.gov.uk"
+          oracle-db-hostname-b = "ppnomis-b.preproduction.nomis.service.justice.gov.uk"
+          oracle-db-name       = "PPCNOM"
         })
       })
 

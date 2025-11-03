@@ -2,7 +2,9 @@
 # SQS Lambda Queues and Dead Letter Queues
 ##########################################
 
-# Production
+########################
+# Production Environment
+########################
 
 resource "aws_sqs_queue" "lambda_queue_prod" {
   # checkov:skip=CKV_AWS_27: "SQS queue encryption is not required as no sensitive data is processed through it"
@@ -34,7 +36,9 @@ resource "aws_sqs_queue_redrive_allow_policy" "lambda_queue_redrive_allow_policy
   })
 }
 
-# UAT
+###########################
+# Preproduction Environment
+###########################
 
 resource "aws_sqs_queue" "lambda_queue_uat" {
   # checkov:skip=CKV_AWS_27: "SQS queue encryption is not required as no sensitive data is processed through it"
@@ -66,7 +70,9 @@ resource "aws_sqs_queue_redrive_allow_policy" "lambda_queue_redrive_allow_policy
   })
 }
 
-# DEV
+#########################
+# Development Environment
+#########################
 
 resource "aws_sqs_queue" "lambda_queue_dev" {
   # checkov:skip=CKV_AWS_27: "SQS queue encryption is not required as no sensitive data is processed through it"

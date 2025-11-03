@@ -17,8 +17,8 @@ resource "aws_security_group" "ccms_provider_load" {
 
 resource "aws_security_group_rule" "ccms_provider_load_egress_oracle" {
   type              = "egress"
-  from_port         = local.environment == "development" ? 1521 : local.environment == "test" ? 1522 : 0
-  to_port           = local.environment == "development" ? 1521 : local.environment == "test" ? 1522 : 0
+  from_port         = local.environment == "development" ? 1521 : 1522
+  to_port           = local.environment == "development" ? 1521 : 1522
   protocol          = "tcp"
   cidr_blocks       = [local.application_data.accounts[local.environment].ccms_database_ip]
   security_group_id = aws_security_group.ccms_provider_load.id
@@ -52,13 +52,8 @@ resource "aws_lambda_function" "ccms_provider_load" {
   runtime          = "python3.10"
 
   layers = [
-    aws_lambda_layer_version.lambda_layer_oracle_python.arn,
-    "arn:aws:lambda:eu-west-2:017000801446:layer:AWSLambdaPowertoolsPython:2"
+    aws_lambda_layer_version.lambda_layer_oracle_python.arn
   ]
-
-  dead_letter_config {
-    target_arn = aws_sqs_queue.ccms_provider_dlq.arn
-  }
 
   vpc_config {
     security_group_ids = [aws_security_group.ccms_provider_load.id]
@@ -70,8 +65,8 @@ resource "aws_lambda_function" "ccms_provider_load" {
     variables = {
       DB_SECRET_NAME         = aws_secretsmanager_secret.ccms_db_mp_credentials.name
       PROCEDURE_SECRET_NAME  = aws_secretsmanager_secret.ccms_procedures_config.name
-      LD_LIBRARY_PATH        = "/opt/instantclient_12_2_linux"
-      ORACLE_HOME            = "/opt/instantclient_12_2_linux"
+      LD_LIBRARY_PATH        = "/opt/instantclient_12_1"
+      ORACLE_HOME            = "/opt/instantclient_12_1"
       SERVICE_NAME           = "ccms-load-service"
       NAMESPACE              = "HUB20-CCMS-NS"
       ENVIRONMENT            = local.environment

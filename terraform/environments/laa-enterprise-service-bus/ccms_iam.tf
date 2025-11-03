@@ -75,7 +75,9 @@ resource "aws_iam_policy" "ccms_provider_load_policy" {
         Effect = "Allow"
         Action = [
           "sqs:SendMessage",
-          "sqs:GetQueueAttributes",
+          "sqs:ReceiveMessage",
+          "sqs:DeleteMessage",
+          "sqs:GetQueueAttributes"
         ]
         Resource = aws_sqs_queue.ccms_provider_dlq.arn
       },

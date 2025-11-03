@@ -6,6 +6,7 @@ locals {
       managed_prometheus_kms_access_iam_policy_arn = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-compute-development"]}:policy/managed-prometheus-kms-access20240521093109516600000001"
 
       /* Network Monitoring */
+      cloud_platform_endpoints     = {}
       hmcts_sdp_endpoints          = {}
       hmcts_sdp_onecrown_endpoints = {}
     }
@@ -15,6 +16,17 @@ locals {
       managed_prometheus_kms_access_iam_policy_arn = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-compute-test"]}:policy/managed-prometheus-kms-access20240521093123650600000001"
 
       /* Network Monitoring */
+      cloud_platform_endpoints = {
+        non-prod = {
+          destination      = "ingress.internal-non-prod.cloud-platform.service.justice.gov.uk"
+          destination_port = "443"
+        }
+        prod = {
+          destination      = "ingress.internal.cloud-platform.service.justice.gov.uk"
+          destination_port = "443"
+        }
+      }
+
       hmcts_sdp_endpoints = {
         mipersistentithc-blob = {
           destination      = "10.168.4.13"
@@ -71,6 +83,17 @@ locals {
       managed_prometheus_kms_access_iam_policy_arn = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-compute-production"]}:policy/managed-prometheus-kms-access20240522102621280000000012"
 
       /* Network Monitoring */
+      cloud_platform_endpoints = {
+        non-prod = {
+          destination      = "ingress.internal-non-prod.cloud-platform.service.justice.gov.uk"
+          destination_port = "443"
+        }
+        prod = {
+          destination      = "ingress.internal.cloud-platform.service.justice.gov.uk"
+          destination_port = "443"
+        }
+      }
+
       hmcts_sdp_endpoints = {
         mipersistentithc-blob = {
           destination      = "10.168.4.13"

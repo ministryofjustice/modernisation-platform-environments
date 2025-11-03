@@ -7,7 +7,7 @@ locals {
 
 # tfsec:ignore:aws-s3-enable-bucket-encryption tfsec:ignore:aws-s3-encryption-customer-key tfsec:ignore:aws-s3-enable-bucket-logging tfsec:ignore:aws-s3-enable-versioning
 module "bastion_linux" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=c918b2189d9f81d224e07e98fa1bc9ff38e4ba12"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=v5.0.0"
 
   providers = {
     aws.share-host   = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
@@ -17,9 +17,7 @@ module "bastion_linux" {
   instance_name = "bastion-${var.env_name}"
 
   # s3 - used for logs and user ssh public keys
-  bucket_name          = "bastion-${var.env_name}"
-  bucket_versioning    = true
-  bucket_force_destroy = true
+  bucket_name = "bastion-${var.env_name}"
   # public keys
   public_key_data = local.public_key_data.keys[var.env_name]
   # logs

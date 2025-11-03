@@ -16,11 +16,11 @@ locals {
   operational_db_tags = merge(
     local.all_tags,
     {
-      Resource_Group = "Operational-DB"
-      Resource_Type  = "RDS"
-      Jira           = "DPR2-892"
+      dpr-resource-group = "Operational-DB"
+      dpr-resource-type  = "RDS"
+      dpr-jira           = "DPR2-892"
       project        = local.project
-      Name           = "operational-db"
+      dpr-name           = "operational-db"
     }
   )
 
@@ -58,7 +58,7 @@ module "operational_db_parameter_group" {
   tags = merge(
     local.operational_db_tags,
     {
-      Resource_Type = "RDS Parameter Group"
+      dpr-resource-type = "RDS Parameter Group"
     }
   )
 }
@@ -97,7 +97,7 @@ module "aurora_operational_db" {
 
   name                        = "${local.name}-cluster"
   engine                      = "aurora-postgresql"
-  engine_version              = "16.6"
+  engine_version              = "16"
   database_name               = "operational_db"
   manage_master_user_password = false
   master_username             = local.operational_db_credentials.username

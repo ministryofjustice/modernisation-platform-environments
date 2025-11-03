@@ -1,3 +1,11 @@
+locals {
+  dms_tasks_with_transformations = {
+    g4s_emsys_mvp = true
+    # Add more as needed, e.g.:
+    # another_task = true
+  }
+}
+
 module "dms_task" {
   source = "./modules/dms"
 
@@ -38,9 +46,8 @@ module "dms_task" {
   ep_service_access_role_arn = aws_iam_role.dms_endpoint_role[0].arn
 
   # DMS Migration Task Inputs
-  dms_replication_instance_arn    = aws_dms_replication_instance.dms_replication_instance[0].replication_instance_arn
-  rep_task_settings_filepath      = trimspace(file("${path.module}/dms_replication_task_settings.json"))
-  rep_task_table_mapping_filepath = trimspace(file("${path.module}/dms_${each.key}_task_tables_selection.json"))
+  dms_replication_instance_arn = aws_dms_replication_instance.dms_replication_instance[0].replication_instance_arn
+  rep_task_settings_filepath   = trimspace(file("${path.module}/dms_replication_task_settings.json"))
 
   local_tags = local.tags
 }
@@ -51,6 +58,17 @@ module "dms_second_task" {
 
   for_each = toset(local.is-production ? [
     "capita_alcohol_monitoring",
+    "civica_orca",
+    "g4s_atrium",
+    "g4s_cap_dw",
+    "g4s_centurion",
+    "g4s_emsys_mvp",
+    "g4s_emsys_tpims",
+    "g4s_fep",
+    "g4s_integrity",
+    "g4s_integrity_customdb",
+    "g4s_rf_hours",
+    "g4s_tasking",
   ] : local.is-development ? ["test"] : [])
 
   database_name      = each.key
@@ -68,9 +86,8 @@ module "dms_second_task" {
   ep_service_access_role_arn = aws_iam_role.dms_endpoint_role[0].arn
 
   # DMS Migration Task Inputs
-  dms_replication_instance_arn    = aws_dms_replication_instance.dms_replication_instance[0].replication_instance_arn
-  rep_task_settings_filepath      = trimspace(file("${path.module}/dms_replication_task_settings.json"))
-  rep_task_table_mapping_filepath = trimspace(file("${path.module}/dms_${each.key}_task_tables_selection.json"))
+  dms_replication_instance_arn = aws_dms_replication_instance.dms_replication_instance[0].replication_instance_arn
+  rep_task_settings_filepath   = trimspace(file("${path.module}/dms_replication_task_settings.json"))
 
   local_tags = local.tags
 }

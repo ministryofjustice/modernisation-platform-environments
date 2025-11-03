@@ -103,6 +103,11 @@ resource "aws_wafv2_web_acl" "waf" {
           statement {
             geo_match_statement {
               country_codes = rule.value.geo_match_statement.country_codes
+
+              forwarded_ip_config {
+                header_name       = "X-Forwarded-For"
+                fallback_behavior = "MATCH"
+              }
             }
           }
         }

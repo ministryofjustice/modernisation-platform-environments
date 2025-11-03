@@ -368,7 +368,7 @@ resource "aws_ssm_parameter" "delius_core_merge_db_pool_password" {
 ######################################
 module "s3_bucket_ssm_sessions" {
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
 
   bucket_prefix      = local.bucket_prefix_final
   versioning_enabled = false
