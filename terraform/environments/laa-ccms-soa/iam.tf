@@ -299,3 +299,23 @@ data "aws_iam_policy_document" "alerting_sns" {
     }
   }
 }
+
+data "aws_iam_policy_document" "guardduty_alerting_sns" {
+  version = "2012-10-17"
+  statement {
+    sid    = "EventsAllowPublishSnsTopic"
+    effect = "Allow"
+    actions = [
+      "sns:Publish",
+    ]
+    resources = [
+      aws_sns_topic.guardduty_alerts.arn
+    ]
+    principals {
+      type = "Service"
+      identifiers = [
+        "events.amazonaws.com",
+      ]
+    }
+  }
+}

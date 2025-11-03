@@ -30,15 +30,17 @@ resource "aws_instance" "tariffdb" {
     tags = {
       Name = "TariffDB-${each.key}"
     }
+
   }
-  tags = {
-    Name = "TariffDB-${each.key}"
-  }
+  tags = merge(tomap({
+    "Name"     = lower(format("ec2-%s-%s-db-${each.key}", local.application_name, local.environment)),
+    "hostname" = "${local.application_name}-db-${each.key}",
+  }), local.tags)
   # Set security group where Instance will be created. This will also determine VPC
   vpc_security_group_ids = aws_security_group.tariff_db_prod_security_group[*].id
   key_name               = aws_key_pair.key_pair_db[0].key_name
 
-/*
+  /*
   ebs_block_device {
     device_name           = "xvde"
     delete_on_termination = true
@@ -121,7 +123,7 @@ data "aws_subnet" "subnet_az" {
 
 resource "aws_ebs_volume" "tariffdb_storage" {
   for_each = local.environment == "production" ? {
-    for pair in setproduct(keys(local.subnets_a_b_map), local.tarrifdb_volume_layout) :
+    for pair in setproduct(keys(local.subnets_a_b_map), local.tariffdb_volume_layout) :
     "${pair[0]}-${pair[1].device_name}" => {
       instance_key = pair[0]
       volume_data  = pair[1]
@@ -130,14 +132,15 @@ resource "aws_ebs_volume" "tariffdb_storage" {
   availability_zone = data.aws_subnet.subnet_az[each.value.instance_key].availability_zone
   size              = each.value.volume_data.size
   type              = "gp3"
-  tags = {
-    Name      = "TariffDB-${each.value.instance_key}-volume-${each.value.volume_data.device_name}"
-  }
+
+  tags = merge(tomap({
+    "Name" = "TariffDB-${each.value.instance_key}-volume-${each.value.volume_data.device_name}",
+  }), local.tags)
 }
 
 resource "aws_volume_attachment" "tariffdb_attachment" {
   for_each = local.environment == "production" ? {
-    for pair in setproduct(keys(local.subnets_a_b_map), local.tarrifdb_volume_layout) :
+    for pair in setproduct(keys(local.subnets_a_b_map), local.tariffdb_volume_layout) :
     "${pair[0]}-${pair[1].device_name}" => {
       instance_key = pair[0]
       volume_data  = pair[1]

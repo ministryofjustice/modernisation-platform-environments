@@ -296,9 +296,9 @@ resource "aws_iam_role" "redshift-role" {
   tags = merge(
     local.tags,
     {
-      name    = "redshift-service-role"
-      project = "dpr"
-      Jira    = "DPR2-XXXX"
+      dpr-name          = "redshift-service-role"
+      dpr-resource-type = "IAM Role"
+      dpr-jira          = "DPR2-XXXX"
     }
   )
 }
@@ -390,9 +390,9 @@ resource "aws_iam_role" "dms_cloudwatch_logs_role" {
   tags = merge(
     local.tags,
     {
-      name    = "dms-service-cw-role"
-      project = "dpr"
-      Jira    = "DPR2-XXXX"
+      dpr-name          = "dms-service-cw-role"
+      dpr-resource-type = "IAM Role"
+      dpr-jira          = "DPR2-XXXX"
     }
   )
 }
@@ -409,9 +409,9 @@ resource "aws_iam_role" "dmsvpcrole" {
   tags = merge(
     local.tags,
     {
-      name    = "dms-service-vpc-role"
-      project = "dpr"
-      Jira    = "DPR2-XXXX"
+      dpr-name          = "dms-service-vpc-role"
+      dpr-resource-type = "IAM Role"
+      dpr-jira          = "DPR2-XXXX"
     }
   )
 }
@@ -468,9 +468,9 @@ resource "aws_iam_role" "redshift-spectrum-role" {
   tags = merge(
     local.tags,
     {
-      name    = "redshift-spectrum-role"
-      project = "dpr"
-      Jira    = "DPR2-XXXX"
+      dpr-name          = "redshift-spectrum-role"
+      dpr-resource-type = "IAM Role"
+      dpr-jira          = "DPR2-XXXX"
     }
   )
 }

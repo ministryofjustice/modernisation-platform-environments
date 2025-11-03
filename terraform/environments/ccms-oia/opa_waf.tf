@@ -13,9 +13,9 @@ resource "aws_wafv2_ip_set" "opahub_waf_ip_set" {
     local.application_data.accounts[local.environment].mp_nat_gateway_a,
     local.application_data.accounts[local.environment].mp_nat_gateway_b,
     local.application_data.accounts[local.environment].mp_nat_gateway_c,
-    "35.176.254.38/32", # Temp AWS PROD Workspace
+    "35.176.254.38/32",  # Temp AWS PROD Workspace
     "35.177.173.197/32", # Temp AWS PROD Workspace
-    "52.56.212.11/32" # Temp AWS PROD Workspace
+    "52.56.212.11/32"    # Temp AWS PROD Workspace
   ]
 
   tags = merge(local.tags,
@@ -36,7 +36,10 @@ resource "aws_wafv2_ip_set" "opahub_waf_ip_set_web_determinations" {
     local.application_data.accounts[local.environment].mp_nat_gateway_a,
     local.application_data.accounts[local.environment].mp_nat_gateway_b,
     local.application_data.accounts[local.environment].mp_nat_gateway_c,
-    "89.45.177.118/32" # Sahid
+    "89.45.177.118/32", # Sahid
+    "80.195.27.199/32", # Krupal IP
+    "35.179.83.235/32", # Secure Browser
+    "13.43.42.69/32"    # Secure Browser
   ]
 
   tags = merge(local.tags,
@@ -55,9 +58,10 @@ resource "aws_wafv2_web_acl" "opahub_web_acl" {
     block {}
   }
 
+  # Rule 1: AWS Managed Rules Common Rule Set with overrides
   rule {
     name     = "AWS-AWSManagedRulesCommonRuleSet"
-    priority = 4
+    priority = 1
 
     override_action {
       none {}
@@ -68,12 +72,18 @@ resource "aws_wafv2_web_acl" "opahub_web_acl" {
         name        = "AWSManagedRulesCommonRuleSet"
         vendor_name = "AWS"
 
-        # rule_action_override {
-        #   name = "NoUserAgent_HEADER"
-        #   action_to_use {
-        #     allow {}
-        #   }
-        # }
+        rule_action_override {
+          name = "SizeRestrictions_BODY"
+          action_to_use {
+            count {}
+          }
+        }
+        rule_action_override {
+          name = "CrossSiteScripting_BODY"
+          action_to_use {
+            count {}
+          }
+        }
       }
     }
 
@@ -83,6 +93,8 @@ resource "aws_wafv2_web_acl" "opahub_web_acl" {
       sampled_requests_enabled   = true
     }
   }
+
+  #### WHEN READY TO GO LIVE WITH WEB DETERMINATIONS, SWITCH TO GEO MATCH INSTEAD OF IP SET
 
   # Rule 2: /opa/web-determinations/* (Prod only)
   dynamic "rule" {
@@ -127,6 +139,53 @@ resource "aws_wafv2_web_acl" "opahub_web_acl" {
     }
   }
 
+  #### WHEN READY TO GO LIVE WITH WEB DETERMINATIONS, SWITCH TO GEO MATCH INSTEAD OF IP SET
+
+  # # Rule 2: /opa/web-determinations/* (Prod only)
+  # dynamic "rule" {
+  #   for_each = local.is-production ? [1] : []
+  #   content {
+  #     name     = "${local.opa_app_name}-waf-web-determinations"
+  #     priority = 2
+
+  #     action {
+  #       allow {}
+  #     }
+
+  #     statement {
+  #       and_statement {
+  #         # Condition 1: URI path starts with /opa/web-determinations/
+  #         statement {
+  #           byte_match_statement {
+  #             search_string = "/opa/web-determinations/"
+  #             field_to_match {
+  #               uri_path {}
+  #             }
+  #             positional_constraint = "STARTS_WITH"
+  #             text_transformation {
+  #               priority = 0
+  #               type     = "NONE"
+  #             }
+  #           }
+  #         }
+
+  #         # Condition 2: Request originates from United Kingdom
+  #         statement {
+  #           geo_match_statement {
+  #             country_codes = ["GB"]
+  #           }
+  #         }
+  #       }
+  #     }
+
+  #     visibility_config {
+  #       cloudwatch_metrics_enabled = true
+  #       metric_name                = "${local.opa_app_name}-waf-web-determinations"
+  #       sampled_requests_enabled   = true
+  #     }
+  #   }
+  # }
+
   # Rule 3: Allow OPA HUB access from trusted IPs
   rule {
     name     = "${local.opa_app_name}-waf-ip-set"
@@ -148,27 +207,6 @@ resource "aws_wafv2_web_acl" "opahub_web_acl" {
       sampled_requests_enabled   = true
     }
   }
-
-  #   rule {
-  #   name     = "allow-uk-traffic-only"
-  #   priority = 4
-
-  #   statement {
-  #     geo_match_statement {
-  #       country_codes = ["GB"]
-  #     }
-  #   }
-
-  #   action {
-  #     allow {}
-  #   }
-
-  #   visibility_config {
-  #     cloudwatch_metrics_enabled = true
-  #     metric_name                = "allow-uk-traffic-only"
-  #     sampled_requests_enabled   = true
-  #   }
-  # }
 
   visibility_config {
     cloudwatch_metrics_enabled = true

@@ -1,5 +1,9 @@
 locals {
-  rekog_s3_bucket_name = "${terraform.workspace}-rekognition-uploads"
+  rekog_s3_bucket_name      = "${terraform.workspace}-rekognition-uploads"
+  rekog_logs_s3_bucket_name = "${local.rekog_s3_bucket_name}-logs"
+
+  # prefix for all log objects in the access logs bucket
+  rekog_logs_prefix = "logs"
 
   developer_role_suffix = lookup(local.application_data.accounts[local.environment], "developer_role_suffix", null)
   developer_role_principals = (local.developer_role_suffix == null ?

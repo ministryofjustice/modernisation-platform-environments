@@ -519,6 +519,7 @@ data "aws_iam_policy_document" "dms_validation_lambda_role_policy_document" {
     effect = "Allow"
     actions = [
       "dms:DescribeReplicationTasks",
+      "dms:DescribeEndpoints",
     ]
     resources = [
       "*",

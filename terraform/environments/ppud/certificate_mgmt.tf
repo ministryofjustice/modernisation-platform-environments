@@ -13,6 +13,7 @@ resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_dev" {
   # checkov:skip=CKV_AWS_173: "PPUD Lambda environmental variables do not contain sensitive information"
   # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing not required"
   count                          = local.is-development == true ? 1 : 0
+  description                    = "Function to send certificate expiry reminder emails."
   s3_bucket                      = "moj-infrastructure-dev"
   s3_key                         = "lambda/functions/certificate_expiry_dev.zip"
   function_name                  = "certificate_expiry_dev"
@@ -94,6 +95,7 @@ resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_uat" {
   # checkov:skip=CKV_AWS_173: "PPUD Lambda environmental variables do not contain sensitive information"
   # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing not required"
   count                          = local.is-preproduction == true ? 1 : 0
+  description                    = "Function to send certificate expiry reminder emails."
   s3_bucket                      = "moj-infrastructure-uat"
   s3_key                         = "lambda/functions/certificate_expiry_uat.zip"
   function_name                  = "certificate_expiry_uat"
@@ -175,6 +177,7 @@ resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_prod" {
   # checkov:skip=CKV_AWS_173: "PPUD Lambda environmental variables do not contain sensitive information"
   # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing not required"
   count                          = local.is-production == true ? 1 : 0
+  description                    = "Function to send certificate expiry reminder emails."
   s3_bucket                      = "moj-infrastructure"
   s3_key                         = "lambda/functions/certificate_expiry_prod.zip"
   function_name                  = "certificate_expiry_prod"

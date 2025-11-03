@@ -39,6 +39,7 @@ locals {
     "scram_alcohol_monitoring",
     "g4s_atrium",
     "g4s_centurion",
+    "g4s_fep",
   ] : []
 
   prod_dbs_to_grant = local.is-production ? [
@@ -50,6 +51,7 @@ locals {
     "historic_ears_and_sars_int",
     "historic_ears_and_sars_mart",
     "emsys_mvp_stg",
+    "emsys_tpims_stg",
     "sar_ear_reports_mart",
     "preprocessed_alcohol_monitoring",
     "staged_alcohol_monitoring",
@@ -63,6 +65,7 @@ locals {
     "staged_scram_alcohol_monitoring",
     "g4s_atrium_curated",
     "g4s_centurion_curated",
+    "curated_fep",
   ] : []
   dev_dbs_to_grant       = local.is-production ? [for db in local.prod_dbs_to_grant : "${db}_historic_dev_dbt"] : []
   dbt_dbs_to_grant       = [for db in local.dbt_dbs : "${db}${local.dbt_suffix}"]
@@ -194,7 +197,7 @@ data "aws_iam_policy_document" "dataapi_cross_assume" {
     }
     condition {
       test     = "StringEquals"
-      values   = ["system:serviceaccount:airflow:*"]
+      values   = ["system:serviceaccount:mwaa:electronic-monitoring-data-store-cadet"]
       variable = "oidc.eks.eu-west-2.amazonaws.com/id/${jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]}:sub"
     }
     condition {

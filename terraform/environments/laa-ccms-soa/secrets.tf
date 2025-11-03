@@ -49,3 +49,12 @@ resource "aws_secretsmanager_secret" "trust_store_password" {
 data "aws_secretsmanager_secret_version" "trust_store_password" {
   secret_id = aws_secretsmanager_secret.trust_store_password.id
 }
+# Slack Channel ID for Alerts
+resource "aws_secretsmanager_secret" "slack_channel_id" {
+  name        = "guardduty_slack_channel_id"
+  description = "Slack Channel ID for GuardDuty Alerts"
+}
+
+data "aws_secretsmanager_secret_version" "slack_channel_id" {
+  secret_id = aws_secretsmanager_secret.slack_channel_id.id
+}

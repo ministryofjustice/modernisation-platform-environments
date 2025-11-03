@@ -69,4 +69,13 @@ resource "aws_security_group" "tariff_app_prod_security_group" {
     ]
 
   }
+
+  #Commvault ports from SS
+  ingress {
+    protocol    = "tcp"
+    from_port   = 8400
+    to_port     = 8403
+    cidr_blocks = [local.cidr_cica_ss_a, local.cidr_cica_ss_b]
+    description = "Allow Commvault inbound from Shared Services"
+  }
 }
