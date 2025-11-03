@@ -171,7 +171,7 @@ resource "aws_wafv2_web_acl" "pui_web_acl" {
                   uri_path {}
                 }
                 positional_constraint = "EXACTLY"
-                text_transformations {
+                text_transformation {
                   priority = 0
                   type     = "NONE"
                 }
@@ -184,7 +184,7 @@ resource "aws_wafv2_web_acl" "pui_web_acl" {
                   uri_path {}
                 }
                 positional_constraint = "EXACTLY"
-                text_transformations {
+                text_transformation {
                   priority = 0
                   type     = "NONE"
                 }
@@ -197,7 +197,7 @@ resource "aws_wafv2_web_acl" "pui_web_acl" {
                   uri_path {}
                 }
                 positional_constraint = "EXACTLY"
-                text_transformations {
+                text_transformation {
                   priority = 0
                   type     = "NONE"
                 }
