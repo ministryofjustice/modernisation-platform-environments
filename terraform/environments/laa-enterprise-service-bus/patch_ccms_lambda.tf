@@ -70,7 +70,7 @@ resource "aws_lambda_function" "patch_ccms_provider_load" {
       PROCEDURE_SECRET_NAME  = aws_secretsmanager_secret.patch_ccms_procedures_config[0].name
       LD_LIBRARY_PATH        = "/opt/instantclient_12_1"
       ORACLE_HOME            = "/opt/instantclient_12_1"
-      SERVICE_NAME           = "ccms-load-service"
+      SERVICE_NAME           = "patch-ccms-load-service"
       NAMESPACE              = "HUB20-CCMS-NS"
       ENVIRONMENT            = local.environment
       LOG_LEVEL              = "DEBUG"
