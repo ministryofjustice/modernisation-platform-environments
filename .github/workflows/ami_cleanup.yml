@@ -84,12 +84,14 @@ jobs:
 
   # -------------------------
   # PREVIEW (Dry-Run) STAGE
+  # - Runs on push for BOTH AMI & EBS
+  # - Runs on workflow_dispatch when confirm_delete == false
   # -------------------------
   preview:
     name: Preview Deletions (Dry-Run)
     runs-on: ubuntu-latest
     needs: [build-matrix, fetch-secrets]
-    if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.confirm_delete == 'false' }}
+    if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.confirm_delete == 'false') }}
     strategy:
       matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
       max-parallel: 1
@@ -123,7 +125,7 @@ jobs:
           aws-region: eu-west-2
 
       - name: AMI Preview (dry-run)
-        if: ${{ github.event.inputs.cleanup_type == 'ami' || github.event.inputs.cleanup_type == 'both' }}
+        if: ${{ github.event_name == 'push' || github.event.inputs.cleanup_type == 'ami' || github.event.inputs.cleanup_type == 'both' }}
         id: ami_preview
         run: |
           set -euo pipefail
@@ -142,7 +144,7 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload AMI Preview Artifacts
-        if: ${{ (github.event.inputs.cleanup_type == 'ami' || github.event.inputs.cleanup_type == 'both') && always() }}
+        if: ${{ (github.event_name == 'push' || github.event.inputs.cleanup_type == 'ami' || github.event.inputs.cleanup_type == 'both') && always() }}
         uses: actions/upload-artifact@v4
         with:
           name: ami-preview-${{ matrix.account_name }}
@@ -152,7 +154,7 @@ jobs:
           if-no-files-found: warn
 
       - name: EBS Preview (dry-run)
-        if: ${{ github.event.inputs.cleanup_type == 'ebs' || github.event.inputs.cleanup_type == 'both' }}
+        if: ${{ github.event_name == 'push' || github.event.inputs.cleanup_type == 'ebs' || github.event.inputs.cleanup_type == 'both' }}
         id: ebs_preview
         run: |
           set -euo pipefail
@@ -169,7 +171,7 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload EBS Preview Artifacts
-        if: ${{ (github.event.inputs.cleanup_type == 'ebs' || github.event.inputs.cleanup_type == 'both') && always() }}
+        if: ${{ (github.event_name == 'push' || github.event.inputs.cleanup_type == 'ebs' || github.event.inputs.cleanup_type == 'both') && always() }}
         uses: actions/upload-artifact@v4
         with:
           name: ebs-preview-${{ matrix.account_name }}
@@ -177,7 +179,7 @@ jobs:
           if-no-files-found: warn
 
   # -------------------------
-  # LIVE (Deletion) STAGE — triggered explicitly with confirm_delete=true
+  # LIVE (Deletion) STAGE — only via manual dispatch with confirm_delete=true
   # -------------------------
   ami-delete:
     name: AMI Delete (Live)
