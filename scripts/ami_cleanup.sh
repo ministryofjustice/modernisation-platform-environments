@@ -1,9 +1,9 @@
-#!/bin/bash
 # scripts/ami_cleanup.sh
-# Usage example:
-#   scripts/ami_cleanup.sh -a nomis -m 3 -c -d -s ami_commands.sh delete
+#!/bin/bash
+# Usage examples:
+#   scripts/ami_cleanup.sh -a example -m 3 -c -d -s ami_commands.sh delete
+#   scripts/ami_cleanup.sh -a example -c --test-mode --age-minutes 10 -d delete
 
-# Be strict, but we'll locally guard commands that can legitimately "fail" (no matches/empty).
 set -euo pipefail
 
 # ---------------------------
@@ -19,6 +19,10 @@ dryrun=0                       # -d flag
 aws_cmd_file=""                # -s file
 profile=""                     # only used for core-shared-services with -e
 aws_error_log="aws_error.log"
+
+# Test-mode overrides (minutes-based age)
+test_mode=0
+age_minutes=""
 
 # tmp files (deleted on exit)
 tmpdir="$(mktemp -d)"
@@ -38,25 +42,25 @@ trap cleanup EXIT
 usage() {
   cat <<EOF
 Usage: $0 [options] <action>
-
 Options:
-  -a <application>      Application (e.g., nomis or core-shared-services)
+  -a <application>      Application (e.g., example or core-shared-services)
   -e <environment>      Environment (required if -a core-shared-services)
-  -m <months>           Only consider AMIs older than this many months; empty/0 = no filter
+  -m <months>           Only consider AMIs older than this many months; empty/0 = no month filter
   -b                    Include AwsBackup images (default excludes them)
   -c                    Include images referenced in code (protect by name)
   -d                    Dry-run (don't deregister)
   -s <file>             Output AWS deregister commands to this file (default: ami_delete_commands.sh)
   -x                    Exclude images in use on EC2 (testing switch; default includes EC2 use)
-
+  --test-mode           Enable test mode (required when using --age-minutes)
+  --age-minutes <N>     In test mode, consider AMIs older than N minutes (overrides month filter)
 Actions:
   used      Print images in use (EC2 and/or code if -c)
   account   Print all account AMIs (after filters)
   code      Print AMI names referenced in code
-  delete    Write deregister commands for unused AMIs
-
+  delete    Write deregister commands for unused AMIs (or execute if not dry-run)
 Examples:
-  $0 -a nomis -m 3 -c -d -s ami_commands.sh delete
+  $0 -a example -m 3 -c -d -s ami_commands.sh delete
+  $0 -a example -c --test-mode --age-minutes 10 -d delete
 EOF
 }
 
@@ -92,12 +96,10 @@ date_minus_month() { local m="${1}"; shift; "$date_cmd" -d "-${m} month" "$@"; }
 build_creation_date_filter() {
   local m="${1:-}"
   [[ -z "$m" || "$m" == "0" ]] && { echo ""; return 0; }
-
   local df="" i m1 m2 m3
   m1="$(date_minus_month "$m" "+%m")"
   m2="${m1#0}"
   m3=$((m + m2))
-
   if (( m2 < 12 )); then
     for (( i=m; i<m3; i++ )); do
       df+=$(date_minus_month "$i" "+%Y-%m-*"),
@@ -116,9 +118,14 @@ build_creation_date_filter() {
 # ---------------------------
 collect_account_images() {
   local filters="" df
-  df="$(build_creation_date_filter "${months}")"
-  if [[ -n "$df" ]]; then
-    filters="--filters Name=creation-date,Values=$df"
+  if (( test_mode == 1 && -n "${age_minutes:-}" )); then
+    # In test mode with minutes, do not constrain by month at the AWS API; we'll filter client-side by minutes.
+    filters=""
+  else
+    df="$(build_creation_date_filter "${months}")"
+    if [[ -n "$df" ]]; then
+      filters="--filters Name=creation-date,Values=$df"
+    fi
   fi
 
   local out=""
@@ -140,9 +147,7 @@ collect_account_images() {
   fi
 }
 
-# Special path uses image usage report (as per your earlier variant)
 collect_inuse_ids_via_usage_report() {
-  # Only for core-shared-services-production
   : > "$inuse_ids"
   while IFS=',' read -r image_id _rest; do
     [[ -z "$image_id" ]] && continue
@@ -174,14 +179,11 @@ collect_inuse_ids_via_instances() {
 
 collect_inuse_from_ec2() {
   [[ "$include_images_on_ec2" -eq 1 ]] || { : > "$inuse_ids"; return 0; }
-
   if [[ "$application" == "core-shared-services" && "$environment" == "production" ]]; then
     collect_inuse_ids_via_usage_report
   else
     collect_inuse_ids_via_instances
   fi
-
-  # If we have IDs, enrich to CSV rows (so we can see Image Name if needed)
   if [[ -s "$inuse_ids" ]]; then
     local img_out=""
     mapfile -t ids < "$inuse_ids"
@@ -222,9 +224,18 @@ collect_code_names() {
 }
 
 # ---------------------------
-# Set operations (no comm/join)
+# Set operations & test-mode time filter
 # ---------------------------
-# Build in-use names set = intersection of code names with account names (only names present in account)
+within_minutes_cutoff() {
+  # Return 0 (true) if CreationDate <= now - age_minutes
+  local creation_iso="$1"
+  local cutoff_secs="$2"
+  # creation_iso like 2025-11-03T11:04:22.026Z or +00:00
+  local created_epoch
+  created_epoch="$("$date_cmd" -d "${creation_iso}" +%s 2>/dev/null || echo 0)"
+  [[ "$created_epoch" -le "$cutoff_secs" ]]
+}
+
 build_inuse_names_from_code() {
   : > "$inuse_names"
   [[ "$include_images_in_code" -eq 1 ]] || return 0
@@ -237,30 +248,56 @@ build_inuse_names_from_code() {
   ' "$account_csv" "$code_names" | normalize_sort > "$inuse_names"
 }
 
-# Compute candidates: account minus (in-use IDs or in-use names)
 compute_candidates() {
   : > "$candidates_csv"
-  awk -F',' -v ec2_ids="$inuse_ids" -v code_names="$inuse_names" '
+  local cutoff_secs=0
+  if (( test_mode == 1 )) && [[ -n "${age_minutes:-}" ]] && [[ "$age_minutes" =~ ^[0-9]+$ ]] && (( age_minutes > 0 )); then
+    local now_secs; now_secs="$("$date_cmd" +%s)"
+    cutoff_secs=$(( now_secs - age_minutes*60 ))
+  fi
+
+  awk -F',' -v ec2_ids="$inuse_ids" -v code_names="$inuse_names" -v cutoff_secs="$cutoff_secs" -v test_mode="$test_mode" -v datecmd="$date_cmd" '
+    function to_secs(iso,    cmd,cmdout) {
+      # We cannot run external date here portably; precomputed cutoff only.
+      return 0
+    }
     BEGIN {
-      # load EC2 in-use image IDs
       while ((getline line < ec2_ids) > 0) { gsub(/\r/,"",line); if (line!="") id[line]=1 }
       close(ec2_ids)
-      # load code in-use names
       while ((getline nm < code_names) > 0) { gsub(/\r/,"",nm); if (nm!="") name[nm]=1 }
       close(code_names)
     }
     {
-      img=$1; nm=$5
+      img=$1; created=$3; nm=$5
       if (img in id) next
       if (nm in name) next
-      print $0
+      if (test_mode==1 && cutoff_secs>0) {
+        # Defer time compare to shell (post-filter). Mark candidate for time check.
+        print $0
+      } else {
+        print $0
+      }
     }
   ' "$account_csv" | normalize_sort > "$candidates_csv"
+
+  # When in test mode with minutes, post-filter by CreationDate using cutoff_secs
+  if (( test_mode == 1 )) && [[ "$cutoff_secs" -gt 0 ]]; then
+    awk -F',' -v cutoff_secs="$cutoff_secs" -v dc="$date_cmd" '
+      function to_epoch(iso,   cmd) {
+        cmd = sprintf("%s -d \"%s\" +%%s 2>/dev/null", dc, iso)
+        cmd | getline out
+        close(cmd)
+        return out+0
+      }
+      {
+        created=$3
+        if (to_epoch(created) <= cutoff_secs) print $0
+      }
+    ' "$candidates_csv" | normalize_sort > "${candidates_csv}.tmp"
+    mv "${candidates_csv}.tmp" "$candidates_csv"
+  fi
 }
 
-# ---------------------------
-# Emit commands / Outputs
-# ---------------------------
 emit_commands() {
   local outfile="$1"
   [[ -n "$outfile" ]] || outfile="ami_delete_commands.sh"
@@ -288,10 +325,22 @@ emit_commands() {
 }
 
 # ---------------------------
-# Actions
+# Argument parsing
 # ---------------------------
 action=""
 parse_inputs() {
+  # support long opts by normalizing into positional array
+  long_args=()
+  while (( "$#" )); do
+    case "$1" in
+      --test-mode) test_mode=1; shift ;;
+      --age-minutes) age_minutes="${2:-}"; shift 2 ;;
+      --age-minutes=*) age_minutes="${1#*=}"; shift ;;
+      *) long_args+=("$1"); shift ;;
+    esac
+  done
+  set -- "${long_args[@]}"
+
   while getopts "a:bcde:xm:s:" opt; do
     case "$opt" in
       a) application="${OPTARG}" ;;
@@ -314,7 +363,11 @@ parse_inputs() {
   fi
   action="$1"
 
-  # Only set AWS profile for core-shared-services; GH runner already assumes role via OIDC.
+  if [[ -n "${age_minutes:-}" && "$test_mode" -ne 1 ]]; then
+    echo "--age-minutes requires --test-mode" >&2
+    exit 1
+  fi
+
   if [[ "$application" == "core-shared-services" && -z "${environment}" ]]; then
     echo "For core-shared-services you must specify -e <environment>" >&2
     exit 1
@@ -322,15 +375,17 @@ parse_inputs() {
   if [[ "$application" == "core-shared-services" ]]; then
     profile="--profile ${application}-${environment}"
   else
-    profile="" # use environment credentials
+    profile=""
   fi
 }
 
+# ---------------------------
+# Main
+# ---------------------------
 main() {
   parse_inputs "$@"
   set_date_cmd
 
-  # Collect base data
   collect_account_images
 
   case "$action" in
@@ -348,10 +403,7 @@ main() {
       collect_inuse_from_ec2
       collect_code_names
       build_inuse_names_from_code
-      # Show combined in-use as CSV (by ID records + name-only hints)
-      # First EC2-backed rows (CSV)
       if [[ -s "$ec2_csv" ]]; then cat "$ec2_csv"; fi
-      # Then name-only rows (emit as pseudo CSV with empty id fields to avoid confusion)
       if [[ -s "$inuse_names" ]]; then
         awk '{print ",,,," $0}' "$inuse_names"
       fi
@@ -363,7 +415,6 @@ main() {
       build_inuse_names_from_code
       compute_candidates
 
-      # Ensure outfile exists for artifact upload even if 0 candidates
       [[ -n "$aws_cmd_file" ]] || aws_cmd_file="ami_commands.sh"
       count="$(emit_commands "$aws_cmd_file")"
 
@@ -377,8 +428,7 @@ main() {
           echo "[LIVE] No AMIs to deregister."
         fi
       fi
-      # Also upload candidates list for visibility (AMIId,...)
-      cp "$candidates_csv" ./ami_candidates.csv || : 
+      cp "$candidates_csv" ./ami_candidates.csv || :
       return 0
       ;;
     *)

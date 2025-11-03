@@ -31,11 +31,34 @@ on:
         required: false
         default: "1"
         type: string
+      # Live/preview toggle
       confirm_delete:
         description: 'Set to true to perform deletion. false = preview only.'
         required: true
         default: false
         type: boolean
+      # Test-mode minute window (AMI)
+      ami_test_mode:
+        description: 'Enable test mode (minute-based age) for AMI cleanup'
+        required: false
+        default: false
+        type: boolean
+      ami_age_minutes:
+        description: 'In test mode, consider AMIs older than N minutes'
+        required: false
+        default: "10"
+        type: string
+      # Test-mode minute window (EBS)
+      ebs_test_mode:
+        description: 'Enable test mode (minute-based age) for EBS cleanup'
+        required: false
+        default: false
+        type: boolean
+      ebs_age_minutes:
+        description: 'In test mode, consider EBS volumes older than N minutes'
+        required: false
+        default: "10"
+        type: string
 
 permissions:
   id-token: write
@@ -46,6 +69,11 @@ env:
   ENVIRONMENTS: ${{ github.event.inputs.environments || 'development' }}
   AMI_ARGS: ${{ github.event.inputs.ami_cleanup_sh_args || '-c -m 3' }}
   EBS_MONTHS: ${{ github.event.inputs.ebs_age_in_months || '1' }}
+  # test-mode env defaults so push events work without inputs
+  AMI_TEST_MODE: ${{ github.event.inputs.ami_test_mode || 'false' }}
+  AMI_AGE_MINUTES: ${{ github.event.inputs.ami_age_minutes || '10' }}
+  EBS_TEST_MODE: ${{ github.event.inputs.ebs_test_mode || 'false' }}
+  EBS_AGE_MINUTES: ${{ github.event.inputs.ebs_age_minutes || '10' }}
 
 jobs:
   build-matrix:
@@ -131,16 +159,21 @@ jobs:
         run: |
           set -euo pipefail
           app="${APPLICATION}"
-          args="${AMI_ARGS}"
-          region="eu-west-2"
+          base_args="${AMI_ARGS}"
 
+          test_flags=""
+          if [[ "${AMI_TEST_MODE}" == 'true' ]]; then
+            test_flags="--test-mode --age-minutes ${AMI_AGE_MINUTES}"
+          fi
+
+          region="eu-west-2"
           echo "[PREVIEW] Scanning AMIs in ${region} (dry-run; no deletion)"
-          echo "Arguments: ${args}"
+          echo "Base args: ${base_args}"
+          echo "Test flags: ${test_flags}"
           echo "----------------------------------------------------"
 
-          scripts/ami_cleanup.sh -a "$app" -s ami_commands.sh $args -d delete
+          scripts/ami_cleanup.sh -a "$app" -s ami_commands.sh ${base_args} ${test_flags} -d delete
 
-          # Stats
           TOTAL="$(grep -c '^aws ec2 deregister-image' ami_commands.sh || true)"
           [[ -f ami_candidates.csv ]] || touch ami_candidates.csv
 
@@ -159,7 +192,6 @@ jobs:
           echo "[DRY RUN COMPLETE] Total AMIs eligible for cleanup: ${TOTAL}"
           echo "----------------------------------------------------"
 
-          # Output for downstream / summary
           echo "ami_count=${TOTAL}" >> "$GITHUB_OUTPUT"
           {
             echo "### AMI Preview — ${{ matrix.account_name }}"
@@ -186,12 +218,19 @@ jobs:
         run: |
           set -euo pipefail
           months="${EBS_MONTHS}"
+
+          ebs_flags=""
+          if [[ "${EBS_TEST_MODE}" == 'true' ]]; then
+            ebs_flags="--test-mode --age-minutes ${EBS_AGE_MINUTES}"
+          fi
+
           echo "[PREVIEW] Listing unattached EBS volumes older than ${months} month(s) (dry-run only; no deletion)"
-          scripts/ebs_cleanup.sh -m "$months" unattached | tee ebs_candidates.txt
+          echo "EBS test flags: ${ebs_flags}"
+          scripts/ebs_cleanup.sh ${ebs_flags} -m "$months" unattached | tee ebs_candidates.txt
+
           EBS_COUNT="$( (grep -Eo 'vol-[0-9a-f]+' ebs_candidates.txt || true) | wc -l | tr -d ' ' )"
           echo "Total unattached volumes matching filter: ${EBS_COUNT}"
 
-          # Show top 20 unique volume IDs in logs
           if [[ -s ebs_candidates.txt ]]; then
             echo ""
             echo "Top EBS candidates (volume IDs):"
@@ -262,9 +301,16 @@ jobs:
         run: |
           set -euo pipefail
           app="${APPLICATION}"
-          args="${AMI_ARGS}"
+          base_args="${AMI_ARGS}"
+
+          test_flags=""
+          if [[ "${AMI_TEST_MODE}" == 'true' ]]; then
+            test_flags="--test-mode --age-minutes ${AMI_AGE_MINUTES}"
+          fi
+
           echo "[LIVE] Collecting candidates and deregistering (if any)"
-          scripts/ami_cleanup.sh -a "$app" -s ami_commands.sh $args delete
+          scripts/ami_cleanup.sh -a "$app" -s ami_commands.sh ${base_args} ${test_flags} delete
+
           TOTAL="$(grep -c '^aws ec2 deregister-image' ami_commands.sh || true)"
           echo "Total deregister-image commands generated (and executed): ${TOTAL}"
           if [[ -s ami_commands.sh ]]; then
@@ -327,8 +373,16 @@ jobs:
         run: |
           set -euo pipefail
           months="${EBS_MONTHS}"
+
+          ebs_flags=""
+          if [[ "${EBS_TEST_MODE}" == 'true' ]]; then
+            ebs_flags="--test-mode --age-minutes ${EBS_AGE_MINUTES}"
+          fi
+
           echo "[LIVE] Deleting unattached EBS volumes older than ${months} month(s)"
-          scripts/ebs_cleanup.sh -m "$months" delete | tee ebs_delete_log.txt
+          echo "EBS test flags: ${ebs_flags}"
+          scripts/ebs_cleanup.sh ${ebs_flags} -m "$months" delete | tee ebs_delete_log.txt
+
           DELETED_COUNT="$( (grep -Eo 'vol-[0-9a-f]+' ebs_delete_log.txt || true) | sort -u | wc -l | tr -d ' ' )"
           echo "Total volumes processed for deletion: ${DELETED_COUNT}"
           if [[ -s ebs_delete_log.txt ]]; then
