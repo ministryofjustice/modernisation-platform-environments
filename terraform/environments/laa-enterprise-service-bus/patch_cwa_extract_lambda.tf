@@ -100,7 +100,7 @@ resource "aws_lambda_function" "patch_cwa_extract_lambda" {
       ORACLE_HOME       = "/opt/instantclient_12_1"
       SERVICE_NAME      = "cwa-extract-service"
       NAMESPACE         = "HUB20-CWA-NS"
-      ENVIRONMENT       = local.environment
+      ENVIRONMENT       = "patch"
       LOG_LEVEL         = "DEBUG"
       TNS_ADMIN         = "/tmp/wallet_dir"
       BUCKET            = aws_s3_bucket.wallet_files.bucket
@@ -144,7 +144,7 @@ resource "aws_lambda_function" "patch_cwa_file_transfer_lambda" {
       ORACLE_HOME       = "/opt/instantclient_12_1"
       SERVICE_NAME      = "cwa-file-transfer-service"
       NAMESPACE         = "HUB20-CWA-NS"
-      ENVIRONMENT       = local.environment
+      ENVIRONMENT       = "patch"
       LOG_LEVEL         = "DEBUG"
       TNS_ADMIN         = "/tmp/wallet_dir"
       BUCKET            = aws_s3_bucket.wallet_files.bucket
@@ -185,7 +185,7 @@ resource "aws_lambda_function" "patch_cwa_sns_lambda" {
       PROVIDER_BANKS_TOPIC = aws_sns_topic.patch_provider_banks[0].arn
       SERVICE_NAME         = "cwa-sns-service"
       NAMESPACE            = "HUB20-CWA-NS"
-      ENVIRONMENT          = local.environment
+      ENVIRONMENT          = "patch"
       LOG_LEVEL            = "DEBUG"
     }
   }
