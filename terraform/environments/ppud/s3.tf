@@ -1076,7 +1076,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-log-files-uat" {
       storage_class = "STANDARD_IA"
     }
     expiration {
-      days = 60
+      days = 180
     }
   }
 }
@@ -1606,7 +1606,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-log-files-dev" {
       storage_class = "STANDARD_IA"
     }
     expiration {
-      days = 60
+      days = 180
     }
   }
 }
@@ -1726,156 +1726,6 @@ resource "aws_s3_bucket_policy" "moj-log-files-dev" {
         "Principal" : {
           "AWS" : [
             "arn:aws:iam::${data.aws_ssm_parameter.elb-account-eu-west-2-dev[0].value}:root" # This ID is the elb-account-id for eu-west-2 obtained from https://docs.aws.amazon.com/elasticloadbalancing/latest/application/enable-access-logging.html
-          ]
-        }
-      }
-    ]
-  })
-}
-
-# S3 Bucket for Lambda Layers for Development
-
-resource "aws_s3_bucket" "moj-lambda-layers-dev" {
-  # checkov:skip=CKV_AWS_145: "S3 bucket is not public facing, does not contain any sensitive information and does not need encryption"
-  # checkov:skip=CKV_AWS_62: "S3 bucket event notification is not required"
-  # checkov:skip=CKV2_AWS_62: "S3 bucket event notification is not required"
-  # checkov:skip=CKV_AWS_144: "PPUD has a UK Sovereignty requirement so cross region replication is prohibited"
-  # checkov:skip=CKV_AWS_18: "S3 bucket logging is not required"
-  count  = local.is-development == true ? 1 : 0
-  bucket = "moj-lambda-layers-dev"
-  tags = merge(
-    local.tags,
-    {
-      Name = "${local.application_name}-moj-lambda-layers-dev"
-    }
-  )
-}
-
-resource "aws_s3_bucket_versioning" "moj-lambda-layers-dev" {
-  count  = local.is-development == true ? 1 : 0
-  bucket = aws_s3_bucket.moj-lambda-layers-dev[0].id
-  versioning_configuration {
-    status = "Enabled"
-  }
-}
-
-resource "aws_s3_bucket_logging" "moj-lambda-layers-dev" {
-  count         = local.is-development == true ? 1 : 0
-  bucket        = aws_s3_bucket.moj-lambda-layers-dev[0].id
-  target_bucket = aws_s3_bucket.moj-log-files-dev[0].id
-  target_prefix = "s3-logs/moj-lambda-layers-dev-logs/"
-}
-
-resource "aws_s3_bucket_public_access_block" "moj-lambda-layers-dev" {
-  count                   = local.is-development == true ? 1 : 0
-  bucket                  = aws_s3_bucket.moj-lambda-layers-dev[0].id
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
-}
-
-resource "aws_s3_bucket_lifecycle_configuration" "moj-lambda-layers-dev" {
-  # checkov:skip=CKV_AWS_300: "S3 bucket has a set period for aborting failed uploads, this is a false positive finding"
-  count  = local.is-development == true ? 1 : 0
-  bucket = aws_s3_bucket.moj-lambda-layers-dev[0].id
-  rule {
-    id     = "Move-to-IA-then-delete-moj-lambda-layers-dev"
-    status = "Enabled"
-    filter {
-      prefix = ""
-    }
-    abort_incomplete_multipart_upload {
-      days_after_initiation = 7
-    }
-    noncurrent_version_transition {
-      noncurrent_days = 30
-      storage_class   = "STANDARD_IA"
-    }
-    transition {
-      days          = 30
-      storage_class = "STANDARD_IA"
-    }
-  }
-}
-
-resource "aws_s3_bucket_policy" "moj-lambda-layers-dev" {
-  count  = local.is-development == true ? 1 : 0
-  bucket = aws_s3_bucket.moj-lambda-layers-dev[0].id
-
-  policy = jsonencode({
-
-    "Version" : "2012-10-17",
-    "Statement" : [
-      {
-        "Sid" : "RequireSSLRequests",
-        "Effect" : "Deny",
-        "Principal" : "*",
-        "Action" : "s3:*",
-        "Resource" : [
-          aws_s3_bucket.moj-lambda-layers-dev[0].arn,
-          "${aws_s3_bucket.moj-lambda-layers-dev[0].arn}/*"
-        ],
-        "Condition" : {
-          "Bool" : {
-            "aws:SecureTransport" : "false"
-          }
-        }
-      },
-      {
-        "Action" : [
-          "s3:PutBucketNotification",
-          "s3:GetBucketNotification",
-          "s3:GetBucketAcl",
-          "s3:DeleteObject",
-          "s3:GetObject",
-          "s3:PutObject",
-          "s3:ListBucket"
-        ],
-        "Effect" : "Allow",
-        "Resource" : [
-          aws_s3_bucket.moj-lambda-layers-dev[0].arn,
-          "${aws_s3_bucket.moj-lambda-layers-dev[0].arn}/*"
-        ],
-        "Principal" : {
-          Service = "logging.s3.amazonaws.com"
-        }
-      },
-      {
-        "Action" : [
-          "s3:PutBucketNotification",
-          "s3:GetBucketNotification",
-          "s3:GetBucketAcl",
-          "s3:DeleteObject",
-          "s3:GetObject",
-          "s3:PutObject",
-          "s3:ListBucket"
-        ],
-        "Effect" : "Allow",
-        "Resource" : [
-          aws_s3_bucket.moj-lambda-layers-dev[0].arn,
-          "${aws_s3_bucket.moj-lambda-layers-dev[0].arn}/*"
-        ],
-        "Principal" : {
-          Service = "sns.amazonaws.com"
-        }
-      },
-      {
-        "Action" : [
-          "s3:GetBucketAcl",
-          "s3:DeleteObject",
-          "s3:GetObject",
-          "s3:PutObject",
-          "s3:ListBucket"
-        ],
-        "Effect" : "Allow",
-        "Resource" : [
-          aws_s3_bucket.moj-lambda-layers-dev[0].arn,
-          "${aws_s3_bucket.moj-lambda-layers-dev[0].arn}/*"
-        ],
-        "Principal" : {
-          "AWS" : [
-            "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/ec2-iam-role"
           ]
         }
       }
