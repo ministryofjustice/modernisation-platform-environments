@@ -82,7 +82,7 @@ locals {
           availability_zone = "eu-west-2a"
         })
         instance = merge(local.ec2_instances.jumpserver.instance, {
-          instance_type = "r6i.large"
+          instance_type = "r6i.xlarge"
           tags = {
             patch-manager = "group2"
           }
