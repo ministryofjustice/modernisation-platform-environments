@@ -3,7 +3,7 @@ module "velero_s3_bucket" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "5.4.0"
+  version = "5.8.2"
 
   bucket = "mojap-compute-${local.environment}-velero"
 
