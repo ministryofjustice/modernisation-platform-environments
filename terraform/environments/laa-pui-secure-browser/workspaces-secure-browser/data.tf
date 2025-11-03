@@ -3,12 +3,6 @@ data "aws_availability_zones" "available" {
   state = "available"
 }
 
-# Get current AWS region
-data "aws_region" "current" {}
-
-# Get current caller identity
-data "aws_caller_identity" "current" {}
-
 # Look up subnet details for CIDR blocks (used in security group rules)
 data "aws_subnet" "secure_browser_subnets" {
   for_each = local.create_resources ? toset(local.subnet_ids) : toset([])
