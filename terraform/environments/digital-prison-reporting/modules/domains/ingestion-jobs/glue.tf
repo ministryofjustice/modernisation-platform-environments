@@ -6,6 +6,7 @@ module "glue_reporting_hub_cdc_job" {
   name                          = var.glue_cdc_job_name
   short_name                    = var.glue_cdc_job_short_name
   command_type                  = "gluestreaming"
+  glue_version                  = var.glue_cdc_glue_version
   description                   = var.glue_cdc_description
   create_security_configuration = var.glue_cdc_create_sec_conf
   job_language                  = var.glue_cdc_language
@@ -48,6 +49,7 @@ module "glue_reporting_hub_batch_job" {
   name                          = var.glue_batch_job_name
   short_name                    = var.glue_batch_job_short_name
   command_type                  = "glueetl"
+  glue_version                  = var.glue_batch_glue_version
   description                   = var.glue_batch_description
   create_security_configuration = var.glue_batch_create_sec_conf
   job_language                  = var.glue_batch_language
@@ -87,6 +89,7 @@ module "unprocessed_raw_files_check_job" {
   name                          = var.glue_unprocessed_raw_files_check_job_name
   short_name                    = var.glue_unprocessed_raw_files_check_job_short_name
   command_type                  = "glueetl"
+  glue_version                  = var.glue_unprocessed_raw_files_check_job_glue_version
   description                   = var.glue_unprocessed_raw_files_check_description
   create_security_configuration = var.glue_unprocessed_raw_files_check_create_sec_conf
   job_language                  = var.glue_unprocessed_raw_files_check_language
@@ -126,6 +129,7 @@ module "glue_archive_job" {
   name                          = var.glue_archive_job_name
   short_name                    = var.glue_archive_job_short_name
   command_type                  = "glueetl"
+  glue_version                  = var.glue_archive_job_glue_version
   description                   = var.glue_archive_description
   create_security_configuration = var.glue_archive_create_sec_conf
   job_language                  = var.glue_archive_language
@@ -164,6 +168,7 @@ module "create_reload_diff_job" {
   name                          = var.glue_create_reload_diff_job_name
   short_name                    = var.glue_create_reload_diff_job_short_name
   command_type                  = "glueetl"
+  glue_version                  = var.glue_create_reload_diff_job_glue_version
   description                   = var.glue_create_reload_diff_job_description
   create_security_configuration = var.glue_create_reload_diff_job_create_sec_conf
   job_language                  = var.glue_create_reload_diff_job_language

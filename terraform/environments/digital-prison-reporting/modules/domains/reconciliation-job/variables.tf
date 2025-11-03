@@ -18,6 +18,12 @@ variable "script_file_version" {
   description = "The filename of the glue script, including version"
 }
 
+variable "glue_version" {
+  type        = string
+  default     = "4.0"
+  description = "(Optional) The version of glue to use."
+}
+
 variable "create_job" {
   description = "Enable Reconciliation Job, True or False"
   type        = bool

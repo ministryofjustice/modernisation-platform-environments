@@ -7,6 +7,7 @@ module "glue_s3_data_reconciliation_job" {
   name                          = var.job_name
   short_name                    = var.short_name
   command_type                  = "glueetl"
+  glue_version                  = var.glue_version
   description                   = "Reconciles data across DataHub.\nArguments:\n--dpr.config.key: (Required) config key e.g. prisoner\n--dpr.dms.replication.task.id: (Required) ID of the DMS replication task to reconcile against the raw zone\n--dpr.reconciliation.checks.to.run: (Optional) Allows restricting the set of checks that will be run"
   create_security_configuration = var.create_sec_conf
   job_language                  = "scala"
