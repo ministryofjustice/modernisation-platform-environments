@@ -252,7 +252,7 @@ resource "aws_wafv2_web_acl" "pui_web_acl" {
     for_each = !local.is-production ? [1] : [1] # Temprorarily enable for Prod as well - to be removed when Geo Match is live
     content {
       name     = "${local.application_name}-waf-ip-set"
-      priority = 2
+      priority = 5
 
       action {
         allow {}

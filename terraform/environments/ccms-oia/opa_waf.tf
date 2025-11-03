@@ -371,7 +371,7 @@ resource "aws_wafv2_web_acl" "opahub_web_acl" {
     for_each = local.is-production ? [1] : []
     content {
       name     = "${local.opa_app_name}-waf-web-determinations"
-      priority = 2
+      priority = 5
 
       action {
         allow {}
@@ -416,7 +416,7 @@ resource "aws_wafv2_web_acl" "opahub_web_acl" {
   #   for_each = local.is-production ? [1] : []
   #   content {
   #     name     = "${local.opa_app_name}-waf-web-determinations"
-  #     priority = 2
+  #     priority = 5
 
   #     action {
   #       allow {}
