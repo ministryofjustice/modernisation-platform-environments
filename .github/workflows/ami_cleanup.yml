@@ -2,12 +2,11 @@
 name: Cloud Cleanup (AMI & EBS)
 
 on:
-  # Run previews automatically on commits to your feature branch
   push:
     branches:
       - feature-11321-identifying-snapshots-to-be-deleted
 
-  # Optional: allow manual runs too (kept for flexibility)
+  # Keep manual dispatch available (but you can rely on push-only flow)
   workflow_dispatch:
     inputs:
       application:
@@ -39,42 +38,17 @@ on:
         required: true
         default: false
         type: boolean
-      # Optional minute-based testing toggles (pass-through envs)
-      ami_test_mode:
-        description: 'Set true to enable minute-based test window for AMI script (if supported)'
-        required: false
-        default: false
-        type: boolean
-      ami_age_minutes:
-        description: 'Minutes threshold for AMI test mode (if supported)'
-        required: false
-        default: "10"
-        type: string
-      ebs_test_mode:
-        description: 'Set true to enable minute-based test window for EBS script (if supported)'
-        required: false
-        default: false
-        type: boolean
-      ebs_age_minutes:
-        description: 'Minutes threshold for EBS test mode (if supported)'
-        required: false
-        default: "10"
-        type: string
 
 permissions:
   id-token: write
   contents: read
 
+# Defaults (can be overridden by commit-message tokens at run-time)
 env:
   APPLICATION:  ${{ github.event.inputs.application || 'example' }}
   ENVIRONMENTS: ${{ github.event.inputs.environments || 'development' }}
   AMI_ARGS:     ${{ github.event.inputs.ami_cleanup_sh_args || '-c -m 3' }}
   EBS_MONTHS:   ${{ github.event.inputs.ebs_age_in_months || '1' }}
-  # Pass-through testing envs (scripts can optionally read them)
-  AMI_TEST_MODE:   ${{ github.event.inputs.ami_test_mode   || 'false' }}
-  AMI_AGE_MINUTES: ${{ github.event.inputs.ami_age_minutes || '10' }}
-  EBS_TEST_MODE:   ${{ github.event.inputs.ebs_test_mode   || 'false' }}
-  EBS_AGE_MINUTES: ${{ github.event.inputs.ebs_age_minutes || '10' }}
 
 jobs:
   build-matrix:
@@ -90,8 +64,6 @@ jobs:
           app="${APPLICATION}"
           envs_str="${ENVIRONMENTS}"
           IFS=', ' read -r -a envs <<< "$envs_str"
-          echo "Application: $app"
-          echo "Environments: ${envs[@]}"
           echo '{"include":[' > matrix.json
           for env in "${envs[@]}"; do
             acc="${app}-${env}"
@@ -111,11 +83,10 @@ jobs:
       MODERNISATION_PLATFORM_ACCOUNT_NUMBER: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
 
-  # -------------------------
-  # PREVIEW (Dry-Run)
-  # - Always runs on push
-  # - Runs on workflow_dispatch when confirm_delete == false
-  # -------------------------
+  # ---------------------------------------
+  # PREVIEW (Dry-Run) — always on push,
+  # or manual dispatch with confirm_delete=false
+  # ---------------------------------------
   preview:
     name: Preview Deletions (Dry-Run)
     runs-on: ubuntu-latest
@@ -153,18 +124,39 @@ jobs:
           role-session-name: "cleanup-preview-${{ matrix.account_name }}"
           aws-region: eu-west-2
 
+      - name: Compute effective thresholds (preview)
+        id: thresholds_preview
+        env:
+          COMMIT_MSG: ${{ github.event.head_commit.message || '' }}
+        run: |
+          set -euo pipefail
+          # Defaults
+          eff_ami="${AMI_ARGS}"
+          eff_ebs="${EBS_MONTHS}"
+
+          # If commit message contains the test token, lower thresholds to 0
+          # Token: [CLEANUP TEST NOW]
+          case "${COMMIT_MSG}" in
+            *"[CLEANUP TEST NOW]"*)
+              eff_ami="-m 0"
+              eff_ebs="0"
+              ;;
+          esac
+
+          echo "EFF_AMI_ARGS=${eff_ami}"   >> $GITHUB_ENV
+          echo "EFF_EBS_MONTHS=${eff_ebs}" >> $GITHUB_ENV
+
       - name: AMI Preview (dry-run)
         if: ${{ github.event_name == 'push' || github.event.inputs.cleanup_type == 'ami' || github.event.inputs.cleanup_type == 'both' }}
         id: ami_preview
         run: |
           set -euo pipefail
           app="${APPLICATION}"
-          args="${AMI_ARGS}"
+          args="${EFF_AMI_ARGS:-$AMI_ARGS}"
           region="eu-west-2"
 
           echo "[PREVIEW] Scanning AMIs in ${region} (dry-run; no deletion)"
-          echo "AMI_ARGS: ${args}"
-          echo "Test mode: ${AMI_TEST_MODE}, minutes: ${AMI_AGE_MINUTES}"
+          echo "AMI_ARGS (effective): ${args}"
           echo "----------------------------------------------------"
 
           scripts/ami_cleanup.sh -a "$app" -s ami_commands.sh $args -d delete
@@ -188,8 +180,8 @@ jobs:
             echo "### AMI Preview — ${{ matrix.account_name }}"
             echo ""
             echo "- Region: ${region}"
+            echo "- Effective AMI args: ${args}"
             echo "- Total AMIs eligible for cleanup: ${TOTAL}"
-            echo "- Full candidate list and commands attached as artifacts."
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload AMI Preview Artifacts
@@ -207,9 +199,8 @@ jobs:
         id: ebs_preview
         run: |
           set -euo pipefail
-          months="${EBS_MONTHS}"
+          months="${EFF_EBS_MONTHS:-$EBS_MONTHS}"
           echo "[PREVIEW] Listing unattached EBS volumes older than ${months} month(s) (dry-run only; no deletion)"
-          echo "Test mode: ${EBS_TEST_MODE}, minutes: ${EBS_AGE_MINUTES}"
           scripts/ebs_cleanup.sh -m "$months" unattached | tee ebs_candidates.txt
           EBS_COUNT="$( (grep -Eo 'vol-[0-9a-f]+' ebs_candidates.txt || true) | sort -u | wc -l | tr -d ' ' )"
           echo "Total unattached volumes matching filter: ${EBS_COUNT}"
@@ -228,8 +219,8 @@ jobs:
           {
             echo "### EBS Preview — ${{ matrix.account_name }}"
             echo ""
+            echo "- Effective EBS age (months): ${months}"
             echo "- Unattached volumes slated by age filter: ${EBS_COUNT}"
-            echo "- Full candidate list attached as artifact."
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload EBS Preview Artifacts
@@ -240,16 +231,15 @@ jobs:
           path: ebs_candidates.txt
           if-no-files-found: warn
 
-  # -------------------------
-  # LIVE (Deletion) — Push tokens or manual dispatch
-  #
-  # Push tokens (put in the latest commit message to trigger live deletes):
+  # ---------------------------------------
+  # LIVE (Deletion) — PUSH-ONLY via tokens
+  # Commit message tokens to trigger live:
   #   [CLEANUP LIVE AMI]   -> AMI Delete (Live)
   #   [CLEANUP LIVE EBS]   -> EBS Delete (Live)
-  #   [CLEANUP LIVE BOTH]  -> Both AMI & EBS Live
+  #   [CLEANUP LIVE BOTH]  -> Both live jobs
   #
-  # Manual still works on workflow_dispatch with confirm_delete=true.
-  # -------------------------
+  # (Manual dispatch still supported with confirm_delete=true)
+  # ---------------------------------------
   ami-delete:
     name: AMI Delete (Live)
     runs-on: ubuntu-latest
@@ -294,11 +284,24 @@ jobs:
           role-session-name: "ami-delete-${{ matrix.account_name }}"
           aws-region: eu-west-2
 
+      - name: Compute effective thresholds (live AMI)
+        env:
+          COMMIT_MSG: ${{ github.event.head_commit.message || '' }}
+        run: |
+          set -euo pipefail
+          eff_ami="${AMI_ARGS}"
+          case "${COMMIT_MSG}" in
+            *"[CLEANUP TEST NOW]"*)
+              eff_ami="-m 0"
+              ;;
+          esac
+          echo "EFF_AMI_ARGS=${eff_ami}" >> $GITHUB_ENV
+
       - name: Recompute & Delete AMIs (Live)
         run: |
           set -euo pipefail
           app="${APPLICATION}"
-          args="${AMI_ARGS}"
+          args="${EFF_AMI_ARGS:-$AMI_ARGS}"
           echo "[LIVE] Collecting candidates and deregistering (if any)"
           scripts/ami_cleanup.sh -a "$app" -s ami_commands.sh $args delete
           TOTAL="$(grep -c '^aws ec2 deregister-image' ami_commands.sh || true)"
@@ -366,10 +369,23 @@ jobs:
           role-session-name: "ebs-delete-${{ matrix.account_name }}"
           aws-region: eu-west-2
 
+      - name: Compute effective thresholds (live EBS)
+        env:
+          COMMIT_MSG: ${{ github.event.head_commit.message || '' }}
+        run: |
+          set -euo pipefail
+          eff_ebs="${EBS_MONTHS}"
+          case "${COMMIT_MSG}" in
+            *"[CLEANUP TEST NOW]"*)
+              eff_ebs="0"
+              ;;
+          esac
+          echo "EFF_EBS_MONTHS=${eff_ebs}" >> $GITHUB_ENV
+
       - name: Delete EBS Volumes (Live)
         run: |
           set -euo pipefail
-          months="${EBS_MONTHS}"
+          months="${EFF_EBS_MONTHS:-$EBS_MONTHS}"
           echo "[LIVE] Deleting unattached EBS volumes older than ${months} month(s)"
           scripts/ebs_cleanup.sh -m "$months" delete | tee ebs_delete_log.txt
           DELETED_COUNT="$( (grep -Eo 'vol-[0-9a-f]+' ebs_delete_log.txt || true) | sort -u | wc -l | tr -d ' ' )"
