@@ -18,11 +18,6 @@ module "workspacesweb_security_group" {
 
 ### NETWORK SETTINGS
 
-import {
-  to = aws_workspacesweb_network_settings.main[0]
-  id = "a4529835-a0ad-47dc-b71d-95fd43a3ffcf"
-}
-
 resource "aws_workspacesweb_network_settings" "main" {
   count = local.create_resources ? 1 : 0
 
