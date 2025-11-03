@@ -120,28 +120,28 @@ resource "aws_volume_attachment" "u01_att" {
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
 
-# resource "aws_ebs_volume" "arch" {
-#   lifecycle {
-#     ignore_changes = [kms_key_id]
-#   }
-#   availability_zone = "eu-west-2a"
-#   snapshot_id       = length(local.application_data.accounts[local.environment].arch_snapshot_id) > 0 ? local.application_data.accounts[local.environment].arch_snapshot_id : null
-#   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_arch
-#   type              = "io2"
-#   iops              = 3000
-#   encrypted         = true
-#   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-#   tags = merge(local.tags,
-#     { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "arch")) },
-#     { device-name = "/dev/sdj" }
-#   )
-# }
-# 
-# resource "aws_volume_attachment" "arch_att" {
-#   device_name = "/dev/sdj"
-#   volume_id   = aws_ebs_volume.arch.id
-#   instance_id = aws_instance.ec2_oracle_ebs.id
-# }
+resource "aws_ebs_volume" "arch" {
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+  availability_zone = "eu-west-2a"
+  snapshot_id       = length(local.application_data.accounts[local.environment].arch_snapshot_id) > 0 ? local.application_data.accounts[local.environment].arch_snapshot_id : null
+  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_arch
+  type              = "io2"
+  iops              = 3000
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  tags = merge(local.tags,
+    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "arch")) },
+    { device-name = "/dev/sdj" }
+  )
+}
+
+resource "aws_volume_attachment" "arch_att" {
+  device_name = "/dev/sdj"
+  volume_id   = aws_ebs_volume.arch.id
+  instance_id = aws_instance.ec2_oracle_ebs.id
+}
 
 resource "aws_ebs_volume" "dbf" {
   lifecycle {
@@ -165,132 +165,132 @@ resource "aws_volume_attachment" "dbf_att" {
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
 
-#resource "aws_ebs_volume" "dbf01" {
-#  lifecycle {
-#    ignore_changes = [kms_key_id]
-#  }
-#  availability_zone = "eu-west-2a"
-#  snapshot_id       = length(local.application_data.accounts[local.environment].dbf01_snapshot_id) > 0 ? local.application_data.accounts[local.environment].dbf01_snapshot_id : null
-#  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_dbf01
-#  type              = "io2"
-#  iops              = local.application_data.accounts[local.environment].ebs_iops_ebsdb_dbf01
-#  encrypted         = true
-#  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-#  tags = merge(local.tags,
-#    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "dbf01")) },
-#    { device-name = "/dev/sde" }
-#  )
-#}
-#
-#resource "aws_volume_attachment" "dbf01_att" {
-#  depends_on = [
-#    aws_ebs_volume.dbf01
-#  ]
-#  device_name = "/dev/sde"
-#  volume_id   = aws_ebs_volume.dbf01.id
-#  instance_id = aws_instance.ec2_oracle_ebs.id
-#}
-#
-#resource "aws_ebs_volume" "dbf02" {
-#  lifecycle {
-#    ignore_changes = [kms_key_id]
-#  }
-#  availability_zone = "eu-west-2a"
-#  snapshot_id       = length(local.application_data.accounts[local.environment].dbf02_snapshot_id) > 0 ? local.application_data.accounts[local.environment].dbf02_snapshot_id : null
-#  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_dbf02
-#  type              = "io2"
-#  iops              = local.application_data.accounts[local.environment].ebs_iops_ebsdb_dbf02
-#  encrypted         = true
-#  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-#  tags = merge(local.tags,
-#    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "dbf02")) },
-#    { device-name = "/dev/sdf" }
-#  )
-#}
-#
-#resource "aws_volume_attachment" "dbf02_att" {
-#  depends_on = [
-#    aws_ebs_volume.dbf02
-#  ]
-#  device_name = "/dev/sdf"
-#  volume_id   = aws_ebs_volume.dbf02.id
-#  instance_id = aws_instance.ec2_oracle_ebs.id
-#}
-#
-#resource "aws_ebs_volume" "dbf03" {
-#  lifecycle {
-#    ignore_changes = [kms_key_id]
-#  }
-#  availability_zone = "eu-west-2a"
-#  snapshot_id       = length(local.application_data.accounts[local.environment].dbf03_snapshot_id) > 0 ? local.application_data.accounts[local.environment].dbf03_snapshot_id : null
-#  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_dbf03
-#  type              = "io2"
-#  iops              = local.application_data.accounts[local.environment].ebs_iops_ebsdb_dbf03
-#  encrypted         = true
-#  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-#  tags = merge(local.tags,
-#    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "dbf03")) },
-#    { device-name = "/dev/sdg" }
-#  )
-#}
-#
-#resource "aws_volume_attachment" "dbf03_att" {
-#  depends_on = [
-#    aws_ebs_volume.dbf03
-#  ]
-#  device_name = "/dev/sdg"
-#  volume_id   = aws_ebs_volume.dbf03.id
-#  instance_id = aws_instance.ec2_oracle_ebs.id
-#}
-#
-#resource "aws_ebs_volume" "dbf04" {
-#  lifecycle {
-#    ignore_changes = [kms_key_id]
-#  }
-#  availability_zone = "eu-west-2a"
-#  snapshot_id       = length(local.application_data.accounts[local.environment].dbf04_snapshot_id) > 0 ? local.application_data.accounts[local.environment].dbf04_snapshot_id : null
-#  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_dbf04
-#  type              = "io2"
-#  iops              = local.application_data.accounts[local.environment].ebs_iops_ebsdb_dbf04
-#  encrypted         = true
-#  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-#  tags = merge(local.tags,
-#    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "dbf04")) },
-#    { device-name = "/dev/sdt" }
-#  )
-#}
-#
-#resource "aws_volume_attachment" "dbf04_att" {
-#  depends_on = [
-#    aws_ebs_volume.dbf04
-#  ]
-#  device_name = "/dev/sdt"
-#  volume_id   = aws_ebs_volume.dbf04.id
-#  instance_id = aws_instance.ec2_oracle_ebs.id
-#}
-#
-#resource "aws_ebs_volume" "redoA" {
-#  lifecycle {
-#    ignore_changes = [kms_key_id]
-#  }
-#  availability_zone = "eu-west-2a"
-#  snapshot_id       = length(local.application_data.accounts[local.environment].redoa_snapshot_id) > 0 ? local.application_data.accounts[local.environment].redoa_snapshot_id : null
-#  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_redoA
-#  type              = "io2"
-#  iops              = 3000
-#  encrypted         = true
-#  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-#  tags = merge(local.tags,
-#    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "redoA")) },
-#    { device-name = "/dev/sdl" }
-#  )
-#}
-#
-#resource "aws_volume_attachment" "redoA_att" {
-#  device_name = "/dev/sdl"
-#  volume_id   = aws_ebs_volume.redoA.id
-#  instance_id = aws_instance.ec2_oracle_ebs.id
-#}
+resource "aws_ebs_volume" "dbf01" {
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+  availability_zone = "eu-west-2a"
+  snapshot_id       = length(local.application_data.accounts[local.environment].dbf01_snapshot_id) > 0 ? local.application_data.accounts[local.environment].dbf01_snapshot_id : null
+  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_dbf01
+  type              = "io2"
+  iops              = local.application_data.accounts[local.environment].ebs_iops_ebsdb_dbf01
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  tags = merge(local.tags,
+    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "dbf01")) },
+    { device-name = "/dev/sde" }
+  )
+}
+
+resource "aws_volume_attachment" "dbf01_att" {
+  depends_on = [
+    aws_ebs_volume.dbf01
+  ]
+  device_name = "/dev/sde"
+  volume_id   = aws_ebs_volume.dbf01.id
+  instance_id = aws_instance.ec2_oracle_ebs.id
+}
+
+resource "aws_ebs_volume" "dbf02" {
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+  availability_zone = "eu-west-2a"
+  snapshot_id       = length(local.application_data.accounts[local.environment].dbf02_snapshot_id) > 0 ? local.application_data.accounts[local.environment].dbf02_snapshot_id : null
+  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_dbf02
+  type              = "io2"
+  iops              = local.application_data.accounts[local.environment].ebs_iops_ebsdb_dbf02
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  tags = merge(local.tags,
+    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "dbf02")) },
+    { device-name = "/dev/sdf" }
+  )
+}
+
+resource "aws_volume_attachment" "dbf02_att" {
+  depends_on = [
+    aws_ebs_volume.dbf02
+  ]
+  device_name = "/dev/sdf"
+  volume_id   = aws_ebs_volume.dbf02.id
+  instance_id = aws_instance.ec2_oracle_ebs.id
+}
+
+resource "aws_ebs_volume" "dbf03" {
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+  availability_zone = "eu-west-2a"
+  snapshot_id       = length(local.application_data.accounts[local.environment].dbf03_snapshot_id) > 0 ? local.application_data.accounts[local.environment].dbf03_snapshot_id : null
+  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_dbf03
+  type              = "io2"
+  iops              = local.application_data.accounts[local.environment].ebs_iops_ebsdb_dbf03
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  tags = merge(local.tags,
+    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "dbf03")) },
+    { device-name = "/dev/sdg" }
+  )
+}
+
+resource "aws_volume_attachment" "dbf03_att" {
+  depends_on = [
+    aws_ebs_volume.dbf03
+  ]
+  device_name = "/dev/sdg"
+  volume_id   = aws_ebs_volume.dbf03.id
+  instance_id = aws_instance.ec2_oracle_ebs.id
+}
+
+resource "aws_ebs_volume" "dbf04" {
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+  availability_zone = "eu-west-2a"
+  snapshot_id       = length(local.application_data.accounts[local.environment].dbf04_snapshot_id) > 0 ? local.application_data.accounts[local.environment].dbf04_snapshot_id : null
+  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_dbf04
+  type              = "io2"
+  iops              = local.application_data.accounts[local.environment].ebs_iops_ebsdb_dbf04
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  tags = merge(local.tags,
+    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "dbf04")) },
+    { device-name = "/dev/sdt" }
+  )
+}
+
+resource "aws_volume_attachment" "dbf04_att" {
+  depends_on = [
+    aws_ebs_volume.dbf04
+  ]
+  device_name = "/dev/sdt"
+  volume_id   = aws_ebs_volume.dbf04.id
+  instance_id = aws_instance.ec2_oracle_ebs.id
+}
+
+resource "aws_ebs_volume" "redoA" {
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+  availability_zone = "eu-west-2a"
+  snapshot_id       = length(local.application_data.accounts[local.environment].redoa_snapshot_id) > 0 ? local.application_data.accounts[local.environment].redoa_snapshot_id : null
+  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_redoA
+  type              = "io2"
+  iops              = 3000
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  tags = merge(local.tags,
+    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "redoA")) },
+    { device-name = "/dev/sdl" }
+  )
+}
+
+resource "aws_volume_attachment" "redoA_att" {
+  device_name = "/dev/sdl"
+  volume_id   = aws_ebs_volume.redoA.id
+  instance_id = aws_instance.ec2_oracle_ebs.id
+}
 
 resource "aws_ebs_volume" "techst" {
   lifecycle {
@@ -338,31 +338,31 @@ resource "aws_volume_attachment" "backup_att" {
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
 
-#resource "aws_ebs_volume" "redoB" {
-#  lifecycle {
-#    ignore_changes = [kms_key_id]
-#  }
-#  availability_zone = "eu-west-2a"
-#  snapshot_id       = length(local.application_data.accounts[local.environment].redob_snapshot_id) > 0 ? local.application_data.accounts[local.environment].redob_snapshot_id : null
-#  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_redoB
-#  type              = "io2"
-#  iops              = 3000
-#  encrypted         = true
-#  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-#  tags = merge(local.tags,
-#    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "redoB")) },
-#    { device-name = "/dev/sdo" }
-#  )
-#}
-#
-#resource "aws_volume_attachment" "redoB_att" {
-#  depends_on = [
-#    aws_ebs_volume.redoB
-#  ]
-#  device_name = "/dev/sdo"
-#  volume_id   = aws_ebs_volume.redoB.id
-#  instance_id = aws_instance.ec2_oracle_ebs.id
-#}
+resource "aws_ebs_volume" "redoB" {
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+  availability_zone = "eu-west-2a"
+  snapshot_id       = length(local.application_data.accounts[local.environment].redob_snapshot_id) > 0 ? local.application_data.accounts[local.environment].redob_snapshot_id : null
+  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_redoB
+  type              = "io2"
+  iops              = 3000
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  tags = merge(local.tags,
+    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "redoB")) },
+    { device-name = "/dev/sdo" }
+  )
+}
+
+resource "aws_volume_attachment" "redoB_att" {
+  depends_on = [
+    aws_ebs_volume.redoB
+  ]
+  device_name = "/dev/sdo"
+  volume_id   = aws_ebs_volume.redoB.id
+  instance_id = aws_instance.ec2_oracle_ebs.id
+}
 
 resource "aws_ebs_volume" "diag" {
   lifecycle {
