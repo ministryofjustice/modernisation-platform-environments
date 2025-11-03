@@ -124,7 +124,7 @@ jobs:
           role-session-name: "cleanup-preview-${{ matrix.account_name }}"
           aws-region: eu-west-2
 
-      # ------- ONLY CHANGE: more descriptive AMI preview logs -------
+      # ------- AMI preview with descriptive logs -------
       - name: AMI Preview (dry-run)
         if: ${{ github.event_name == 'push' || github.event.inputs.cleanup_type == 'ami' || github.event.inputs.cleanup_type == 'both' }}
         id: ami_preview
@@ -167,7 +167,6 @@ jobs:
             echo "- Region: ${region}"
             echo "- Total AMIs eligible for cleanup: ${TOTAL}"
           } >> "$GITHUB_STEP_SUMMARY"
-      # --------------------------------------------------------------
 
       - name: Upload AMI Preview Artifacts
         if: ${{ (github.event_name == 'push' || github.event.inputs.cleanup_type == 'ami' || github.event.inputs.cleanup_type == 'both') && always() }}
@@ -187,7 +186,7 @@ jobs:
           months="${EBS_MONTHS}"
           echo "[PREVIEW] Listing unattached EBS volumes older than ${months} month(s) (dry-run only; no deletion)"
           scripts/ebs_cleanup.sh -m "$months" unattached | tee ebs_candidates.txt
-          EBS_COUNT="$(grep -Eo 'vol-[0-9a-f]+' ebs_candidates.txt | wc -l | tr -d ' ')"
+          EBS_COUNT="$( (grep -Eo 'vol-[0-9a-f]+' ebs_candidates.txt || true) | wc -l | tr -d ' ' )"
           echo "ebs_count=${EBS_COUNT}" >> "$GITHUB_OUTPUT"
           [[ -f ebs_candidates.txt ]] || touch ebs_candidates.txt
           {
