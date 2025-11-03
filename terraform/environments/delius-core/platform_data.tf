@@ -36,7 +36,7 @@ data "aws_subnets" "shared-public" {
     values = [data.aws_vpc.shared.id]
   }
   filter {
-    name = "tag:Name"
+    name   = "tag:Name"
     values = ["${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public*"]
   }
 }
@@ -44,7 +44,7 @@ data "aws_subnets" "shared-public" {
 data "aws_subnet" "data_subnets_a" {
   vpc_id = data.aws_vpc.shared.id
   filter {
-    name = "tag:Name"
+    name   = "tag:Name"
     values = ["${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-data-${data.aws_region.current.region}a"]
   }
 }
@@ -52,7 +52,7 @@ data "aws_subnet" "data_subnets_a" {
 data "aws_subnet" "data_subnets_b" {
   vpc_id = data.aws_vpc.shared.id
   filter {
-    name = "tag:Name"
+    name   = "tag:Name"
     values = ["${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-data-${data.aws_region.current.region}b"]
   }
 }
@@ -60,7 +60,7 @@ data "aws_subnet" "data_subnets_b" {
 data "aws_subnet" "data_subnets_c" {
   vpc_id = data.aws_vpc.shared.id
   filter {
-    name = "tag:Name"
+    name   = "tag:Name"
     values = ["${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-data-${data.aws_region.current.region}c"]
   }
 }
@@ -68,7 +68,7 @@ data "aws_subnet" "data_subnets_c" {
 data "aws_subnet" "private_subnets_a" {
   vpc_id = data.aws_vpc.shared.id
   filter {
-    name = "tag:Name"
+    name   = "tag:Name"
     values = ["${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private-${data.aws_region.current.region}a"]
   }
 }
@@ -76,7 +76,7 @@ data "aws_subnet" "private_subnets_a" {
 data "aws_subnet" "private_subnets_b" {
   vpc_id = data.aws_vpc.shared.id
   filter {
-    name = "tag:Name"
+    name   = "tag:Name"
     values = ["${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private-${data.aws_region.current.region}b"]
   }
 }
@@ -84,7 +84,7 @@ data "aws_subnet" "private_subnets_b" {
 data "aws_subnet" "private_subnets_c" {
   vpc_id = data.aws_vpc.shared.id
   filter {
-    name = "tag:Name"
+    name   = "tag:Name"
     values = ["${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private-${data.aws_region.current.region}c"]
   }
 }
@@ -92,7 +92,7 @@ data "aws_subnet" "private_subnets_c" {
 data "aws_subnet" "public_subnets_a" {
   vpc_id = data.aws_vpc.shared.id
   filter {
-    name = "tag:Name"
+    name   = "tag:Name"
     values = ["${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public-${data.aws_region.current.region}a"]
   }
 }
@@ -100,7 +100,7 @@ data "aws_subnet" "public_subnets_a" {
 data "aws_subnet" "public_subnets_b" {
   vpc_id = data.aws_vpc.shared.id
   filter {
-    name = "tag:Name"
+    name   = "tag:Name"
     values = ["${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public-${data.aws_region.current.region}b"]
   }
 }
@@ -108,7 +108,7 @@ data "aws_subnet" "public_subnets_b" {
 data "aws_subnet" "public_subnets_c" {
   vpc_id = data.aws_vpc.shared.id
   filter {
-    name = "tag:Name"
+    name   = "tag:Name"
     values = ["${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public-${data.aws_region.current.region}c"]
   }
 }

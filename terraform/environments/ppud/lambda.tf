@@ -166,7 +166,7 @@ resource "aws_lambda_function" "terraform_lambda_func_wam_waf_analysis_dev" {
   }
   layers = [
     "arn:aws:lambda:eu-west-2:${data.aws_ssm_parameter.klayers_account_dev[0].value}:layer:Klayers-p312-numpy:8",
-    "arn:aws:lambda:eu-west-2:${data.aws_ssm_parameter.klayers_account_dev[0].value}:layer:Klayers-p312-pillow:1",   
+    "arn:aws:lambda:eu-west-2:${data.aws_ssm_parameter.klayers_account_dev[0].value}:layer:Klayers-p312-pillow:1",
     aws_lambda_layer_version.lambda_layer_requests_dev[0].arn,
     aws_lambda_layer_version.lambda_layer_matplotlib_dev[0].arn
   ]
@@ -331,7 +331,7 @@ resource "aws_lambda_function" "terraform_lambda_func_send_cpu_notification_uat"
   # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing not required"
   count                          = local.is-preproduction == true ? 1 : 0
   description                    = "Function to send an email notification when triggered by high CPU utilisation on an EC2 instance."
-	s3_bucket                      = "moj-infrastructure-uat"
+  s3_bucket                      = "moj-infrastructure-uat"
   s3_key                         = "lambda/functions/send_cpu_notification_uat.zip"
   function_name                  = "send_cpu_notification_uat"
   role                           = aws_iam_role.lambda_role_invoke_ssm_uat[0].arn

@@ -563,8 +563,8 @@ resource "aws_cloudwatch_metric_alarm" "SOA_Benefit_Checker_Rollback_Error_Admin
 resource "aws_cloudwatch_event_rule" "guardduty" {
   name = "${local.application_name}-guardduty-findings"
   event_pattern = jsonencode({
-    "source": ["aws.guardduty"],
-    "detail-type": ["GuardDuty Finding"]
+    "source" : ["aws.guardduty"],
+    "detail-type" : ["GuardDuty Finding"]
   })
 }
 

@@ -8,7 +8,7 @@ resource "aws_wafv2_ip_set" "ebsapps_waf_ip_set" {
 
   addresses = [
     data.aws_vpc.shared.cidr_block,
-    local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_prod, 
+    local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_prod,
     local.application_data.accounts[local.environment].mojo_devices
   ]
 

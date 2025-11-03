@@ -21,8 +21,8 @@ resource "aws_sns_topic_subscription" "guardduty_alerts" {
 resource "aws_cloudwatch_event_rule" "guardduty" {
   name = "${local.application_name}-guardduty-findings"
   event_pattern = jsonencode({
-    "source": ["aws.guardduty"],
-    "detail-type": ["GuardDuty Finding"]
+    "source" : ["aws.guardduty"],
+    "detail-type" : ["GuardDuty Finding"]
   })
 }
 
