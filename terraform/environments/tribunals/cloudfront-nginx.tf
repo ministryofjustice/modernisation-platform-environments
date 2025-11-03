@@ -105,7 +105,7 @@ resource "aws_cloudfront_distribution" "tribunals_http_redirect" {
   logging_config {
     include_cookies = false
     bucket          = aws_s3_bucket.cf_logs.bucket_domain_name
-    prefix          = "http-redirect/"
+    prefix          = "cloudfront-redirect-logs-v2/"
   }
 
   restrictions {
@@ -138,35 +138,113 @@ output "http_redirect_distribution_domain" {
 # -------------------------------------------------
 # S3 Bucket for CloudFront Logs
 # -------------------------------------------------
-resource "aws_s3_bucket" "cf_logs" {
-  provider = aws.us-east-1
-  bucket   = "tribunals-http-redirect-logs-dev-${data.aws_caller_identity.current.account_id}"
+resource "aws_s3_bucket" "cf_redirect_logs" {
+  #checkov:skip=CKV2_AWS_62:"Event notifications not required for CloudFront logs bucket"
+  #checkov:skip=CKV_AWS_144:"Cross-region replication not required"
+  #checkov:skip=CKV_AWS_18:"Access logging not required for CloudFront logs bucket to avoid logging loop"
+  bucket   = "tribunals-redirect-logs-${local.environment}"
 }
 
-resource "aws_s3_bucket_versioning" "cf_logs" {
-  provider = aws.us-east-1
-  bucket   = aws_s3_bucket.cf_logs.id
+resource "aws_s3_bucket_versioning" "cf_redirect_bucket_versioning" {
+  bucket = aws_s3_bucket.cf_redirect_logs.id
   versioning_configuration {
     status = "Enabled"
   }
 }
 
-resource "aws_s3_bucket_server_side_encryption_configuration" "cf_logs" {
-  provider = aws.us-east-1
-  bucket   = aws_s3_bucket.cf_logs.id
+resource "aws_s3_bucket_ownership_controls" "cf_redirect_controls" {
+  #checkov:skip=CKV2_AWS_65:"ACLs are required for CloudFront logging to work"
+  bucket = aws_s3_bucket.cf_redirect_logs.id
   rule {
-    apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
-    }
+    object_ownership = "BucketOwnerPreferred"
   }
 }
 
-# Block public access
-resource "aws_s3_bucket_public_access_block" "cf_logs" {
-  provider                = aws.us-east-1
-  bucket                  = aws_s3_bucket.cf_logs.id
+resource "aws_s3_bucket_acl" "cf_redirect_acl" {
+  depends_on = [aws_s3_bucket_ownership_controls.cf_redirect_controls]
+  bucket     = aws_s3_bucket.cf_redirect_logs.id
+  acl        = "log-delivery-write"
+}
+
+resource "aws_s3_bucket_public_access_block" "cf_redirect_access_block" {
+  bucket = aws_s3_bucket.cf_redirect_logs.id
+
   block_public_acls       = true
   block_public_policy     = true
   ignore_public_acls      = true
   restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "cf_redirect_enc" {
+  bucket = aws_s3_bucket.cf_redirect_logs.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      kms_master_key_id = aws_kms_key.s3_encryption_key.arn
+      sse_algorithm     = "aws:kms"
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "cf_redirect_policy" {
+  bucket = aws_s3_bucket.cf_redirect_logs.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AllowCloudFrontLogDelivery"
+        Effect = "Allow"
+        Principal = {
+          Service = "delivery.logs.amazonaws.com"
+        }
+        Action   = "s3:PutObject"
+        Resource = "${aws_s3_bucket.cloudfront_logs.arn}/cloudfront-redirect-logs-v2//*"
+        Condition = {
+          StringEquals = {
+            "aws:SourceAccount" = data.aws_caller_identity.current.account_id
+            "aws:SourceArn"     = aws_cloudfront_distribution.tribunals_http_redirect.arn
+          }
+        }
+      },
+      {
+        Sid    = "AllowCloudFrontLogDeliveryGetBucketAcl"
+        Effect = "Allow"
+        Principal = {
+          Service = "delivery.logs.amazonaws.com"
+        }
+        Action   = "s3:GetBucketAcl"
+        Resource = aws_s3_bucket.cf_redirect_logs.arn
+      }
+    ]
+  })
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "cf_redirect_lifecycle" {
+  bucket = aws_s3_bucket.cf_redirect_logs.id
+
+  rule {
+    id     = "delete_old_logs"
+    status = "Enabled"
+
+    filter {
+      prefix = "cloudfront-redirect-logs-v2/"
+    }
+
+    expiration {
+      days = 90
+    }
+  }
+
+  rule {
+    id     = "abort-multipart"
+    status = "Enabled"
+
+    filter {
+      prefix = "" //Empty prefix means apply to all objects
+    }
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+    }
+  }
 }
