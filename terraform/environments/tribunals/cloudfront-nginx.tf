@@ -104,7 +104,7 @@ resource "aws_cloudfront_distribution" "tribunals_http_redirect" {
   # -------------------------------------------------
   logging_config {
     include_cookies = false
-    bucket          = aws_s3_bucket.cf_logs.bucket_domain_name
+    bucket          = aws_s3_bucket.cf_redirect_logs.bucket_domain_name
     prefix          = "cloudfront-redirect-logs-v2/"
   }
 
