@@ -6,7 +6,7 @@
 # -------------------------------------------------
 # 1. ACM Certificate (HTTP-only domains only)
 # -------------------------------------------------
-resource "aws_acm_certificate" "http_redirect_cert" {
+resource "aws_acm_certificate" "http_cloudfront_nginx" {
   provider          = aws.us-east-1
   domain_name       = local.is-production ? "ahmlr.gov.uk" : "dev.ahmlr.gov.uk"
   validation_method = "DNS"
@@ -33,7 +33,7 @@ They must create **CNAME** records in their Route 53 zone.
 EOF
 
   value = [
-    for dvo in aws_acm_certificate.http_redirect_cert.domain_validation_options : {
+    for dvo in aws_acm_certificate.http_cloudfront_nginx.domain_validation_options : {
       domain = dvo.domain_name
       name   = dvo.resource_record_name
       type   = dvo.resource_record_type
@@ -54,11 +54,11 @@ resource "aws_cloudfront_distribution" "tribunals_http_redirect" {
   http_version        = "http2"
 
   # Reuse the same domain list as aliases
-  aliases = aws_acm_certificate.http_redirect_cert.subject_alternative_names
+  aliases = aws_acm_certificate.http_cloudfront_nginx.subject_alternative_names
 
   # Use the **new dedicated certificate**
   viewer_certificate {
-    acm_certificate_arn      = aws_acm_certificate.http_redirect_cert.arn
+    acm_certificate_arn      = aws_acm_certificate.http_cloudfront_nginx.arn
     ssl_support_method       = "sni-only"
     minimum_protocol_version = "TLSv1.2_2021"
   }
@@ -112,7 +112,7 @@ resource "aws_cloudfront_distribution" "tribunals_http_redirect" {
 
   # Wait for cert to be issued before creating distribution
   depends_on = [
-    aws_acm_certificate.http_redirect_cert,
+    aws_acm_certificate.http_cloudfront_nginx,
     aws_lambda_function.cloudfront_redirect_lambda
   ]
 }
