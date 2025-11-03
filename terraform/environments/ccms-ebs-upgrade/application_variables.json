@@ -243,7 +243,7 @@
       "export_home_snapshot_id": "snap-0e18cf8981fe53d24",
       "home_snapshot_id": "",
       "ebs_home_conc_snapshot_id": "snap-03daf7fb1c0cc13fb",
-      "ebs_backup_prod_snapshot_id": "",
+      "ebs_backup_prod_snapshot_id": "snap-0b393dd3e191e6583",
       "ebs_type_ebsdb_backup": "gp3",
       "ebs_size_ebsconc_exhome": 100,
       "ebs_size_ebsconc_u01": 200,
