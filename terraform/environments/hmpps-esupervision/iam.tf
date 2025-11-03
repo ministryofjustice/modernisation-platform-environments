@@ -78,22 +78,22 @@ data "aws_iam_policy_document" "rekognition_logs_bucket_policy_document" {
   # allow the logging service to write to the logs bucket
   # see https://docs.aws.amazon.com/AmazonS3/latest/userguide/enable-server-access-logging.html#grant-log-delivery-permissions-general
   statement {
-    sid = "AllowLoggingServiceWrite"
-    actions = ["s3:PutObject"]
+    sid       = "AllowLoggingServiceWrite"
+    actions   = ["s3:PutObject"]
     resources = ["${aws_s3_bucket.rekognition_logs_bucket.arn}/${local.rekog_logs_prefix}*"]
     principals {
-      type = "Service"
+      type        = "Service"
       identifiers = ["logging.s3.amazonaws.com"]
     }
     condition {
       variable = "aws:SourceAccount"
       test     = "StringEquals"
-      values = [data.aws_caller_identity.current.account_id]
+      values   = [data.aws_caller_identity.current.account_id]
     }
     condition {
       variable = "aws:SourceArn"
-      test = "ArnLike"
-      values = [aws_s3_bucket.rekognition_bucket.arn]
+      test     = "ArnLike"
+      values   = [aws_s3_bucket.rekognition_bucket.arn]
     }
   }
 }

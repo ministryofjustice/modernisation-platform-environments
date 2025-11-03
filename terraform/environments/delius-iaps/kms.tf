@@ -5,7 +5,7 @@
 
 data "aws_kms_key" "hmpps_ebs_key" {
   # Look up the shared CMK in core-shared-services-production used to create AMIs
-  key_id = "arn:aws:kms:${data.aws_region.current.name}:${local.environment_management.account_ids["core-shared-services-production"]}:alias/ebs-hmpps"
+  key_id = "arn:aws:kms:${data.aws_region.current.region}:${local.environment_management.account_ids["core-shared-services-production"]}:alias/ebs-hmpps"
 }
 
 resource "aws_kms_grant" "image-builder-shared-hmpps-ebs-cmk-grant" {

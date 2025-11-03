@@ -538,8 +538,8 @@ locals {
   all_tags = merge(
     local.tags,
     {
-      dpr-name          = local.application_name
-      dpr-jira          = "DPR-108"
+      dpr-name       = local.application_name
+      dpr-jira       = "DPR-108"
       dpr-is-backend = true
     }
   )

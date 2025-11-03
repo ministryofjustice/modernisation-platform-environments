@@ -462,3 +462,23 @@ resource "aws_iam_role_policy_attachment" "ccms_ebs_ftp_get_secrets_value_attach
   role       = aws_iam_role.role_stsassume_oracle_base.name
   policy_arn = one(aws_iam_policy.ccms_ebs_ftp_get_secrets_value[*].arn)
 }
+
+data "aws_iam_policy_document" "guardduty_alerting_sns" {
+  version = "2012-10-17"
+  statement {
+    sid    = "EventsAllowPublishSnsTopic"
+    effect = "Allow"
+    actions = [
+      "sns:Publish",
+    ]
+    resources = [
+      aws_sns_topic.guardduty_alerts.arn
+    ]
+    principals {
+      type = "Service"
+      identifiers = [
+        "events.amazonaws.com",
+      ]
+    }
+  }
+}

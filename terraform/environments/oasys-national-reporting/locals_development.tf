@@ -33,7 +33,7 @@ locals {
 
     patch_manager = {
       patch_schedules = {
-        manual    = "cron(00 21 31 2 ? *)"  # 9pm 31 feb e.g. impossible date to allow for manual patching of otherwise enrolled instances
+        manual = "cron(00 21 31 2 ? *)" # 9pm 31 feb e.g. impossible date to allow for manual patching of otherwise enrolled instances
       }
       maintenance_window_duration = 2 # 4 for prod
       maintenance_window_cutoff   = 1 # 2 for prod
