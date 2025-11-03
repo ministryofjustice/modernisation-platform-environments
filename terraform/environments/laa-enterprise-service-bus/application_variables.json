@@ -28,7 +28,7 @@
       "example_var": "preproduction-data"
     },
     "production": {
-      "cwa_database_ip": ["10.205.15.64/26", "10.205.15.0/26"],
+      "cwa_database_ip": ["10.205.15.64/26", "10.205.15.0/26", "10.205.2.16/28"],
       "vpc_endpoint_sg": "sg-0e7c18081199d1cf1",
       "ccms_database_ip": "10.27.68.169/32",
       "s3_vpc_endpoint_prefix": "pl-7ca54015",
