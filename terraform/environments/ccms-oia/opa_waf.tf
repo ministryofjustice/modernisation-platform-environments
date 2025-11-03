@@ -36,7 +36,8 @@ resource "aws_wafv2_ip_set" "opahub_waf_ip_set_web_determinations" {
     local.application_data.accounts[local.environment].mp_nat_gateway_a,
     local.application_data.accounts[local.environment].mp_nat_gateway_b,
     local.application_data.accounts[local.environment].mp_nat_gateway_c,
-    "89.45.177.118/32" # Sahid
+    "89.45.177.118/32", # Sahid
+    "80.195.27.199/32"  # Krupal IP
   ]
 
   tags = merge(local.tags,

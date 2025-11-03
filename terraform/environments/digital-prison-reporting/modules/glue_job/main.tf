@@ -15,7 +15,7 @@ locals {
   }
 
   tags = var.tags
-  
+
 }
 
 resource "aws_glue_job" "glue_job" {

@@ -475,7 +475,7 @@ resource "aws_secretsmanager_secret" "dbt_secrets" {
 
   lifecycle {
     ignore_changes = [tags]
-  }  
+  }
 }
 
 # AWS Secrets Manager for Operational DB Credentials
