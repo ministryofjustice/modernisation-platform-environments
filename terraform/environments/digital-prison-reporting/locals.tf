@@ -41,6 +41,7 @@ locals {
   redshift_cluster_name  = "${local.application_data.accounts[local.environment].project_short_id}-redshift-${local.environment}"
 
   glue_job_common_log_level = local.application_data.accounts[local.environment].glue_job_common_log_level
+  glue_job_version          = local.application_data.accounts[local.environment].glue_job_version
 
   # Flag for whether jobs that access the operational datastore have this feature turned on or not
   enable_operational_datastore_job_access = local.application_data.accounts[local.environment].enable_operational_datastore_job_access
@@ -71,7 +72,7 @@ locals {
 
   # Glue Job parameters
   glue_placeholder_script_location = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/scripts/digital-prison-reporting-jobs-vLatest.scala"
-  glue_jobs_latest_jar_location    = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-vLatest-all.jar"
+  glue_jobs_latest_jar_location    = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-v1.0.125-dev.18+DHS-469-glue-v5-upgrade.5c5d3c5f-all.jar"
   glue_log_retention_in_days       = local.application_data.accounts[local.environment].glue_log_retention_in_days
 
   # Common Maintenance Job settings
