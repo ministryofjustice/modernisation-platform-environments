@@ -123,7 +123,7 @@ resource "aws_cloudfront_distribution" "tribunals_http_redirect" {
   depends_on = [
     aws_acm_certificate.http_cloudfront_nginx,
     aws_lambda_function.cloudfront_redirect_lambda,
-    aws_s3_bucket.cf_logs
+    aws_s3_bucket.cf_redirect_logs
   ]
 }
 
