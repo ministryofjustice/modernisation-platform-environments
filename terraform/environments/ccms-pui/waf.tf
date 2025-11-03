@@ -67,6 +67,186 @@ resource "aws_wafv2_web_acl" "pui_web_acl" {
     }
   }
 
+  rule {
+    name     = "CustomXSSBlockExceptSpecificUrisAndIps"
+    priority = 2
+    action {
+      allow {}
+    }
+    statement {
+      and_statement {
+        statements {
+          xss_match_statement {
+            field_to_match {
+              body {
+                oversize_handling = "NO_MATCH"
+              }
+            }
+            text_transformation {
+              priority = 0
+              type     = "URL_DECODE"
+            }
+          }
+        }
+        statements {
+          not_statement {
+            statement {
+              or_statement {
+                statements {
+                  byte_match_statement {
+                    search_string       = "/civil/evidenceUpload"
+                    field_to_match {
+                      uri_path {}
+                    }
+                    positional_constraint = "EXACTLY"
+                    text_transformation {
+                      priority = 0
+                      type     = "NONE"
+                    }
+                  }
+                }
+                statements {
+                  byte_match_statement {
+                    search_string       = "/civil/CCMS_PD03.form"
+                    field_to_match {
+                      uri_path {}
+                    }
+                    positional_constraint = "EXACTLY"
+                    text_transformation {
+                      priority = 0
+                      type     = "NONE"
+                    }
+                  }
+                }
+                statements {
+                  byte_match_statement {
+                    search_string       = "/civil/evidenceUpload.do"
+                    field_to_match {
+                      uri_path {}
+                    }
+                    positional_constraint = "EXACTLY"
+                    text_transformation {
+                      priority = 0
+                      type     = "NONE"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        statements {
+          not_statement {
+            statement {
+              ip_set_reference_statement {
+                arn = aws_wafv2_ip_set.pui_waf_ip_set.arn
+              }
+            }
+          }
+        }
+      }
+    }
+
+    visibility_config {
+      sampled_requests_enabled   = true
+      cloudwatch_metrics_enabled = true
+      metric_name                = "CustomXSSBlockExceptSpecificUrisAndIps"
+    }
+  }
+
+  rule {
+    name     = "AllowOversizedBodiesForExemptURIsAndIPs"
+    priority = 3
+    action {
+      allow {}
+    }
+    statement {
+      and_statement {
+        statements {
+          or_statement {
+            statements {
+              byte_match_statement {
+                search_string       = "/civil/evidenceUpload"
+                field_to_match {
+                  uri_path {}
+                }
+                positional_constraint = "EXACTLY"
+                text_transformations {
+                  priority = 0
+                  type     = "NONE"
+                }
+              }
+            }
+            statements {
+              byte_match_statement {
+                search_string       = "/civil/CCMS_PD03.form"
+                field_to_match {
+                  uri_path {}
+                }
+                positional_constraint = "EXACTLY"
+                text_transformations {
+                  priority = 0
+                  type     = "NONE"
+                }
+              }
+            }
+            statements {
+              byte_match_statement {
+                search_string       = "/civil/evidenceUpload.do"
+                field_to_match {
+                  uri_path {}
+                }
+                positional_constraint = "EXACTLY"
+                text_transformations {
+                  priority = 0
+                  type     = "NONE"
+                }
+              }
+            }
+          }
+        }
+        statements {
+          ip_set_reference_statement {
+            arn = aws_wafv2_ip_set.pui_waf_ip_set.arn
+          }
+        }
+      }
+    }
+    visibility_config {
+      sampled_requests_enabled   = true
+      cloudwatch_metrics_enabled = true
+      metric_name                = "AllowOversizedBodiesForExemptURIsAndIPs"
+    }
+  }
+
+  rule {
+    name     = "BlockOversizedRequestBodies"
+    priority = 4
+    action {
+      block {}
+    }
+    statement {
+      size_constraint_statement {
+        field_to_match {
+          body {
+            oversize_handling = "MATCH"
+          }
+        }
+        comparison_operator = "GT"
+        size                = 8192
+        text_transformation {
+          priority = 0
+          type     = "NONE"
+        }
+      }
+    }
+    visibility_config {
+      sampled_requests_enabled   = true
+      cloudwatch_metrics_enabled = true
+      metric_name                = "BlockOversizedRequestBodies"
+    }
+  }
+
   # Restrict access to trusted IPs only - Non-Prod environments only
   dynamic "rule" {
     for_each = !local.is-production ? [1] : [1] # Temprorarily enable for Prod as well - to be removed when Geo Match is live

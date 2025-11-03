@@ -92,6 +92,278 @@ resource "aws_wafv2_web_acl" "opahub_web_acl" {
     }
   }
 
+  rule {
+    name     = "CustomXSSBlockExceptSpecificUrisAndIps"
+    priority = 2
+    action {
+      block {}
+    }
+    statement {
+      and_statement {
+        statements {
+          xss_match_statement {
+            field_to_match {
+              body {
+                oversize_handling = "NO_MATCH"
+              }
+            }
+            text_transformation {
+              priority = 0
+              type     = "URL_DECODE"
+            }
+          }
+        }
+        statements {
+          not_statement {
+            statement {
+              or_statement {
+                statements {
+                  byte_match_statement {
+                    field_to_match {
+                      uri_path {}
+                    }
+                    positional_constraint = "EXACTLY"
+                    search_string         = "/opa/determinations-server/assess/soap/generic/12.2.1/BillingAssessment"
+                    text_transformation {
+                      priority = 0
+                      type     = "NONE"
+                    }
+                  }
+                }
+                statements {
+                  byte_match_statement {
+                    field_to_match {
+                      uri_path {}
+                    }
+                    positional_constraint = "EXACTLY"
+                    search_string         = "/opa/determinations-server/answer/soap/12.2.1/MeritsAssessment"
+                    text_transformation {
+                      priority = 0
+                      type     = "NONE"
+                    }
+                  }
+                }
+                statements {
+                  byte_match_statement {
+                    field_to_match {
+                      uri_path {}
+                    }
+                    positional_constraint = "EXACTLY"
+                    search_string         = "/opa/determinations-server/answer/soap/12.2.1/MeansAssessment"
+                    text_transformation {
+                      priority = 0
+                      type     = "NONE"
+                    }
+                  }
+                }
+                statements {
+                  byte_match_statement {
+                    field_to_match {
+                      uri_path {}
+                    }
+                    positional_constraint = "EXACTLY"
+                    search_string         = "/opa/determinations-server/answer/soap/12.2.1/BillingAssessment"
+                    text_transformation {
+                      priority = 0
+                      type     = "NONE"
+                    }
+                  }
+                }
+                statements {
+                  byte_match_statement {
+                    field_to_match {
+                      uri_path {}
+                    }
+                    positional_constraint = "EXACTLY"
+                    search_string         = "/opa/determinations-server/assess/soap/12.2.1/MeansAssessment"
+                    text_transformation {
+                      priority = 0
+                      type     = "NONE"
+                    }
+                  }
+                }
+                statements {
+                  byte_match_statement {
+                    field_to_match {
+                      uri_path {}
+                    }
+                    positional_constraint = "EXACTLY"
+                    search_string         = "/opa/determinations-server/assess/soap/12.2.1/MeritsAssessment"
+                    text_transformation {
+                      priority = 0
+                      type     = "NONE"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        statements {
+          not_statement {
+            statement {
+              ip_set_reference_statement {
+                arn = aws_wafv2_ip_set.opahub_waf_ip_set_web_determinations[0].arn
+              }
+            }
+          }
+        }
+      }
+    }
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "CustomXSSBlockExceptSpecificUrisAndIps"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  rule {
+    name     = "AllowOversizedBodiesForExemptURIsAndIPs"
+    priority = 3
+    action {
+      allow {}
+    }
+    statement {
+      and_statement {
+        statements {
+          size_constraint_statement {
+            comparison_operator = "GT"
+            size                = 8192
+            field_to_match {
+              body {
+                oversize_handling = "MATCH"
+              }
+            }
+            text_transformation {
+              priority = 0
+              type     = "NONE"
+            }
+          }
+        }
+        statements {
+          or_statement {
+            statements {
+              byte_match_statement {
+                search_string       = "/opa/determinations-server/assess/soap/generic/12.2.1/BillingAssessment"
+                field_to_match {
+                  uri_path {}
+                }
+                positional_constraint = "EXACTLY"
+                text_transformation {
+                  priority = 0
+                  type     = "NONE"
+                }
+              }
+            }
+            statements {
+              byte_match_statement {
+                search_string       = "/opa/determinations-server/answer/soap/12.2.1/MeritsAssessment"
+                field_to_match {
+                  uri_path {}
+                }
+                positional_constraint = "EXACTLY"
+                text_transformation {
+                  priority = 0
+                  type     = "NONE"
+                }
+              }
+            }
+            statements {
+              byte_match_statement {
+                search_string       = "/opa/determinations-server/answer/soap/12.2.1/MeansAssessment"
+                field_to_match {
+                  uri_path {}
+                }
+                positional_constraint = "EXACTLY"
+                text_transformation {
+                  priority = 0
+                  type     = "NONE"
+                }
+              }
+            }
+            statements {
+              byte_match_statement {
+                search_string       = "/opa/determinations-server/answer/soap/12.2.1/BillingAssessment"
+                field_to_match {
+                  uri_path {}
+                }
+                positional_constraint = "EXACTLY"
+                text_transformation {
+                  priority = 0
+                  type     = "NONE"
+                }
+              }
+            }
+            statements {
+              byte_match_statement {
+                search_string       = "/opa/determinations-server/assess/soap/generic/12.2.1/MeansAssessment"
+                field_to_match {
+                  uri_path {}
+                }
+                positional_constraint = "EXACTLY"
+                text_transformation {
+                  priority = 0
+                  type     = "NONE"
+                }
+              }
+            }
+            statements {
+              byte_match_statement {
+                search_string       = "/opa/determinations-server/assess/soap/generic/12.2.1/MeritsAssessment"
+                field_to_match {
+                  uri_path {}
+                }
+                positional_constraint = "EXACTLY"
+                text_transformation {
+                  priority = 0
+                  type     = "NONE"
+                }
+              }
+            }
+          }
+        }
+        statements {
+          ip_set_reference_statement {
+            arn = aws_wafv2_ip_set.opahub_waf_ip_set_web_determinations[0].arn
+          }
+        }
+      }
+    }
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "AllowOversizedBodiesForExemptURIsAndIPs"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  rule {
+    name     = "BlockOversizedRequestBodies"
+    priority = 4
+    action {
+      block {}
+    }
+    statement {
+      size_constraint_statement {
+        comparison_operator = "GT"
+        size                = 8192
+        field_to_match {
+          body {
+            oversize_handling = "MATCH"
+          }
+        }
+        text_transformation {
+          priority = 0
+          type     = "NONE"
+        }
+      }
+    }
+    visibility_config {
+      sampled_requests_enabled   = true
+      cloudwatch_metrics_enabled = true
+      metric_name                = "BlockOversizedRequestBodies"
+    }
+  }
+
   #### WHEN READY TO GO LIVE WITH WEB DETERMINATIONS, SWITCH TO GEO MATCH INSTEAD OF IP SET
 
   # Rule 2: /opa/web-determinations/* (Prod only)
