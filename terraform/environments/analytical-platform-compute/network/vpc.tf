@@ -5,7 +5,7 @@ module "vpc" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/vpc/aws"
-  version = "5.21.0"
+  version = "6.5.0"
 
   name                = local.our_vpc_name
   azs                 = slice(data.aws_availability_zones.available.names, 0, 3)
