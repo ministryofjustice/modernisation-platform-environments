@@ -34,7 +34,7 @@ data "aws_iam_policy_document" "lambda_ecs" {
       "ecs:DescribeServices",
       "ecs:ListServices"
     ]
-    resources = ["arn:aws:ecs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:service/*"]
+    resources = ["arn:aws:ecs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:service/*"]
   }
 }
 

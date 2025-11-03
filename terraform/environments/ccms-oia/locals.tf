@@ -3,10 +3,10 @@
 #######################################
 
 locals {
-  logging_bucket_name            = "${local.application_name}-${local.environment}-logging"
-  opa_app_name       = "ccms-opa"
-  connector_app_name = "ccms-connector"
-  adaptor_app_name   = "ccms-service-adaptor"
+  logging_bucket_name = "${local.application_name}-${local.environment}-logging"
+  opa_app_name        = "ccms-opa"
+  connector_app_name  = "ccms-connector"
+  adaptor_app_name    = "ccms-service-adaptor"
 
 
   # Subnet CIDR blocks

@@ -168,7 +168,7 @@ module "aurora_missing_report_submissions" {
       dpr-resource-group = "missing_report_submissions-DB"
       dpr-resource-type  = "RDS"
       dpr-jira           = "DPR2-2007"
-      project        = local.project
+      project            = local.project
       dpr-name           = "missing_report_submissions"
     }
   )

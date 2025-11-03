@@ -472,6 +472,10 @@ resource "aws_secretsmanager_secret" "dbt_secrets" {
       dpr-jira          = "DPR2-751"
     }
   )
+
+  lifecycle {
+    ignore_changes = [tags]
+  }
 }
 
 # AWS Secrets Manager for Operational DB Credentials
@@ -490,6 +494,10 @@ resource "aws_secretsmanager_secret" "operational_db_secret" {
 
   tags = {
     dpr-name = "${local.project}-rds-operational-db-secret"
+  }
+
+  lifecycle {
+    ignore_changes = [tags]
   }
 }
 
