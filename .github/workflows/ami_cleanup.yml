@@ -127,7 +127,30 @@ jobs:
           role-session-name: "cleanup-preview-${{ matrix.account_name }}"
           aws-region: eu-west-2
 
-      # ----- Force 10-minute test window for PREVIEW only -----
+      # --------- NEW: Diagnostics to confirm account/region + presence of resources ---------
+      - name: Diagnostics — identity & quick inventory
+        run: |
+          set -euo pipefail
+          echo "Matrix account name: ${{ matrix.account_name }}"
+          echo "Resolved account number: ${ACCOUNT_NUMBER}"
+          echo "==== AWS STS Caller Identity ===="
+          aws sts get-caller-identity
+          echo "==== AWS Region (from config/env) ===="
+          echo "aws configure get region => $(aws configure get region || true)"
+          echo "AWS_REGION=$AWS_REGION AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION"
+          echo "==== AMIs named 'cleanup-test*' (owners self) ===="
+          aws ec2 describe-images --owners self \
+            --filters Name=name,Values='cleanup-test*' \
+            --query "Images[].{Id:ImageId,Name:Name,When:CreationDate}" \
+            --output table || true
+          echo "==== Unattached EBS volumes (available) — top 50 ===="
+          aws ec2 describe-volumes \
+            --filters Name=status,Values=available \
+            --query "Volumes[0:50].[VolumeId,CreateTime,State,Tags[?Key=='Name']|[0].Value]" \
+            --output table || true
+      # --------------------------------------------------------------------------------------
+
+      # Force a 10-minute window for previews so Terraform test assets show up immediately
       - name: Set 10-minute test flags (preview)
         run: |
           echo "AMI_TEST_FLAGS=--test-mode --age-minutes 10" >> $GITHUB_ENV
@@ -237,6 +260,7 @@ jobs:
         fromJSON(github.event.inputs.confirm_delete) == true)
     strategy:
       matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
+      max-parallel: 1
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -270,6 +294,12 @@ jobs:
           scripts/ami_cleanup.sh -a "$app" -s ami_commands.sh $args delete
           TOTAL="$(grep -c '^aws ec2 deregister-image' ami_commands.sh || true)"
           echo "Total deregister-image commands generated (and executed): ${TOTAL}"
+          if [[ -s ami_commands.sh ]]; then
+            echo ""
+            echo "First 20 deregistration commands:"
+            grep '^aws ec2 deregister-image' ami_commands.sh | head -n 20
+            echo ""
+          fi
           [[ -f ami_candidates.csv ]] || touch ami_candidates.csv
           [[ -f ami_commands.sh ]] || touch ami_commands.sh
       - name: Upload AMI Live Artifacts
@@ -296,6 +326,7 @@ jobs:
         fromJSON(github.event.inputs.confirm_delete) == true)
     strategy:
       matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
+      max-parallel: 1
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -326,6 +357,14 @@ jobs:
           months="${EBS_MONTHS}"
           echo "[LIVE] Deleting unattached EBS volumes older than ${months} month(s)"
           scripts/ebs_cleanup.sh -m "$months" delete | tee ebs_delete_log.txt
+          DELETED_COUNT="$( (grep -Eo 'vol-[0-9a-f]+' ebs_delete_log.txt || true) | sort -u | wc -l | tr -d ' ' )"
+          echo "Total volumes processed for deletion: ${DELETED_COUNT}"
+          if [[ -s ebs_delete_log.txt ]]; then
+            echo ""
+            echo "First 20 volume IDs processed:"
+            (grep -Eo 'vol-[0-9a-f]+' ebs_delete_log.txt || true) | sort -u | head -n 20
+            echo ""
+          fi
           [[ -f ebs_delete_log.txt ]] || touch ebs_delete_log.txt
       - name: Upload EBS Live Artifacts
         if: always()
