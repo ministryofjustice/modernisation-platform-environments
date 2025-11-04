@@ -114,7 +114,7 @@
       "ccms_soa_url_ebsPrintInvoiceEndpoint": "https://ccms-soa-managed.laa-production.modernisation-platform.service.justice.gov.uk/soa-infra/services/default/PrintInvoice/printinvoice_client_ep",
       "ccms_soa_url_ebsGetInvoiceDetailsEndpoint": "https://ccms-soa-managed.laa-production.modernisation-platform.service.justice.gov.uk/soa-infra/services/default/GetInvoiceDetails/bpelgetinvoicedetails_client_ep",
       "ccms_soa_url_ebsUpdateUserEndpoint": "https://ccms-soa-managed.laa-production.modernisation-platform.service.justice.gov.uk/soa-infra/services/default/UpdateUser/UpdateUser_ep",
-      "opa12_assess_service_servlet": "http://ccms-connector.laa.service.justice.gov.uk/service-tds/puiAssessService",
+      "opa12_assess_service_servlet": "https://ccms-connector.laa.service.justice.gov.uk/service-tds/puiAssessService",
       "ccms_soa_url_opaBillingAssessmentEndpoint": "http://set-me.legalservices.gov.uk",
       "ccms_soa_url_opaPOAAssessmentEndpoint": "http://set-me.legalservices.gov.uk",
       "ccms_owd_rulebase_baseurl": "https://ccms-opa.laa.service.justice.gov.uk/opa/web-determinations",
