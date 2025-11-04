@@ -1,4 +1,5 @@
 resource "aws_security_group" "tariff_app_security_group" {
+  count       = local.environment != "production" ? 1 : 0
   name_prefix = "${local.application_name}-app-server-sg-"
   description = "Access to the app server"
   vpc_id      = data.aws_vpc.shared.id
@@ -67,6 +68,14 @@ resource "aws_security_group" "tariff_app_security_group" {
       "0.0.0.0/0"
     ]
 
+  }
+
+  ingress {
+    protocol    = "tcp"
+    from_port   = 8400
+    to_port     = 8403
+    cidr_blocks = [local.cidr_cica_ss_a, local.cidr_cica_ss_b]
+    description = "Allow Commvault inbound from Shared Services"
   }
 
 }
