@@ -118,7 +118,8 @@ build_creation_date_filter() {
 # ---------------------------
 collect_account_images() {
   local filters="" df
-  if (( test_mode == 1 && -n "${age_minutes:-}" )); then
+  # FIX: do not mix arithmetic and string tests in (( ... ))
+  if (( test_mode == 1 )) && [[ -n "${age_minutes:-}" ]]; then
     # In test mode with minutes, do not constrain by month at the AWS API; we'll filter client-side by minutes.
     filters=""
   else
