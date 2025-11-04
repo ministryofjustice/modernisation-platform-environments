@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
     inputs:
       application:
-        description: 'Application folder name (e.g. example)'
+        description: 'Application folder name (e.g. cooker)'
         required: true
         type: string
       environments:
@@ -37,10 +37,11 @@ on:
         required: true
         default: false
         type: boolean
+      # Optional minute-based testing toggles (pass-through)
       ami_test_mode:
         description: 'Enable minute-based test window for AMI script'
         required: false
-        default: true
+        default: false
         type: boolean
       ami_age_minutes:
         description: 'Minutes threshold for AMI test mode'
@@ -50,7 +51,7 @@ on:
       ebs_test_mode:
         description: 'Enable minute-based test window for EBS script'
         required: false
-        default: true
+        default: false
         type: boolean
       ebs_age_minutes:
         description: 'Minutes threshold for EBS test mode'
@@ -67,9 +68,9 @@ env:
   ENVIRONMENTS: ${{ github.event.inputs.environments || 'development' }}
   AMI_ARGS:     ${{ github.event.inputs.ami_cleanup_sh_args || '-c -m 3' }}
   EBS_MONTHS:   ${{ github.event.inputs.ebs_age_in_months || '1' }}
-  AMI_TEST_MODE:   ${{ github.event.inputs.ami_test_mode   || 'true' }}
+  AMI_TEST_MODE:   ${{ github.event.inputs.ami_test_mode   || 'false' }}
   AMI_AGE_MINUTES: ${{ github.event.inputs.ami_age_minutes || '10' }}
-  EBS_TEST_MODE:   ${{ github.event.inputs.ebs_test_mode   || 'true' }}
+  EBS_TEST_MODE:   ${{ github.event.inputs.ebs_test_mode   || 'false' }}
   EBS_AGE_MINUTES: ${{ github.event.inputs.ebs_age_minutes || '10' }}
 
 jobs:
@@ -88,7 +89,8 @@ jobs:
           IFS=', ' read -r -a envs <<< "$envs_str"
           echo '{"include":[' > matrix.json
           for env in "${envs[@]}"; do
-            echo "{\"account_name\":\"${app}-${env}\"}," >> matrix.json
+            acc="${app}-${env}"
+            echo "{\"account_name\":\"$acc\"}," >> matrix.json
           done
           sed -i '$ s/,$//' matrix.json
           echo ']}' >> matrix.json
@@ -107,7 +109,7 @@ jobs:
     name: Preview Deletions (Dry-Run)
     runs-on: ubuntu-latest
     needs: [build-matrix, fetch-secrets]
-    if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && fromJSON(github.event.inputs.confirm_delete) == false) }}
+    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && fromJSON(github.event.inputs.confirm_delete) == false)
     strategy:
       matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
       max-parallel: 1
@@ -129,12 +131,7 @@ jobs:
         run: |
           set -euo pipefail
           ACCOUNT_NAME="${{ matrix.account_name }}"
-          EM_JSON="${ENVIRONMENT_MANAGEMENT:-}"
-          if [[ -z "$EM_JSON" ]]; then
-            echo "ERROR: ENVIRONMENT_MANAGEMENT not present in env."
-            exit 1
-          fi
-          ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< "$EM_JSON")
+          ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< "$ENVIRONMENT_MANAGEMENT")
           echo "::add-mask::$ACCOUNT_NUMBER"
           echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
 
@@ -148,18 +145,21 @@ jobs:
       - name: Quick inventory (sanity)
         run: |
           set -euo pipefail
+          echo "Matrix account name: ${{ matrix.account_name }}"
+          echo "Resolved account number: ${ACCOUNT_NUMBER}"
           echo "==== AWS STS Caller Identity ===="
           aws sts get-caller-identity
+          echo "==== AWS Region ===="
           echo "AWS_REGION=$AWS_REGION AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION"
-          echo "==== AMIs 'cleanup-test*' (self) ===="
+          echo "==== AMIs named 'cleanup-test*' (owners self) ===="
           aws ec2 describe-images --owners self \
             --filters Name=name,Values='cleanup-test*' \
             --query "Images[].{Id:ImageId,Name:Name,When:CreationDate}" \
             --output table || true
-          echo "==== Unattached EBS volumes (available) — top 20 ===="
+          echo "==== Unattached EBS volumes (available) — top 50 ===="
           aws ec2 describe-volumes \
             --filters Name=status,Values=available \
-            --query "Volumes[0:20].[VolumeId,CreateTime,State,Tags[?Key=='Name']|[0].Value]" \
+            --query "Volumes[0:50].[VolumeId,CreateTime,State,Tags[?Key=='Name']|[0].Value]" \
             --output table || true
 
       - name: Set 10-minute test flags (preview only)
@@ -172,29 +172,35 @@ jobs:
           fi
 
       - name: AMI Preview (dry-run)
-        if: ${{ github.event_name == 'push' || github.event.inputs.cleanup_type == 'ami' || github.event.inputs.cleanup_type == 'both' }}
+        if: github.event_name == 'push' || github.event.inputs.cleanup_type == 'ami' || github.event.inputs.cleanup_type == 'both'
         id: ami_preview
         run: |
           set -euo pipefail
           app="${APPLICATION}"
           args="${AMI_ARGS}"
-          echo "[PREVIEW] Scanning AMIs (dry-run; no deletion)"
+          region="eu-west-2"
+
+          echo "[PREVIEW] Scanning AMIs in ${region} (dry-run; no deletion)"
           echo "AMI_ARGS: ${args}"
           echo "Effective AMI test flags: ${AMI_TEST_FLAGS:-<none>}"
-          scripts/ami_cleanup.sh -a "$app" -s ami_commands.sh $args ${AMI_TEST_FLAGS:-} -d delete
+          echo "----------------------------------------------------"
+
+          scripts/ami_cleanup.sh -a "$app" -s ami_commands.sh ${AMI_TEST_FLAGS:-} $args -d delete
+
           TOTAL="$(grep -c '^aws ec2 deregister-image' ami_commands.sh || true)"
           [[ -f ami_candidates.csv ]] || touch ami_candidates.csv
-          echo "Total deregister-image commands generated: ${TOTAL}"
+
           if [[ -s ami_candidates.csv ]]; then
-            echo "Top AMI candidates:"
+            echo "Top AMI candidates (ImageId,OwnerId,CreationDate,Public,Name):"
             head -n 20 ami_candidates.csv || true
           else
             echo "No AMIs found matching cleanup filters."
           fi
+
           echo "ami_count=${TOTAL}" >> "$GITHUB_OUTPUT"
 
       - name: Upload AMI Preview Artifacts
-        if: ${{ always() && (github.event_name == 'push' || github.event.inputs.cleanup_type == 'ami' || github.event.inputs.cleanup_type == 'both') }}
+        if: (github.event_name == 'push' || github.event.inputs.cleanup_type == 'ami' || github.event.inputs.cleanup_type == 'both') && always()
         uses: actions/upload-artifact@v4
         with:
           name: ami-preview-${{ matrix.account_name }}
@@ -204,26 +210,29 @@ jobs:
           if-no-files-found: warn
 
       - name: EBS Preview (dry-run)
-        if: ${{ github.event_name == 'push' || github.event.inputs.cleanup_type == 'ebs' || github.event.inputs.cleanup_type == 'both' }}
+        if: github.event_name == 'push' || github.event.inputs.cleanup_type == 'ebs' || github.event.inputs.cleanup_type == 'both'
         id: ebs_preview
         run: |
           set -euo pipefail
           months="${EBS_MONTHS}"
-          echo "[PREVIEW] Listing unattached EBS volumes older than ${months} month(s) (no deletion)"
+          echo "[PREVIEW] Listing unattached EBS volumes older than 1 month(s) (dry-run only; no deletion)"
           echo "Effective EBS test flags: ${EBS_TEST_FLAGS:-<none>}"
           scripts/ebs_cleanup.sh ${EBS_TEST_FLAGS:-} -m "$months" unattached | tee ebs_candidates.txt
           EBS_COUNT="$( (grep -Eo 'vol-[0-9a-f]+' ebs_candidates.txt || true) | sort -u | wc -l | tr -d ' ' )"
           echo "Total unattached volumes matching filter: ${EBS_COUNT}"
+
           if [[ -s ebs_candidates.txt ]]; then
-            echo "Top volume IDs:"
-            (grep -Eo 'vol-[0-9a-f]+' ebs_candidates.txt || true) | sort -u | head -n 20 || true
+            echo "Top EBS candidates (volume IDs):"
+            (grep -Eo 'vol-[0-9a-f]+' ebs_candidates.txt || true) | sort -u | head -n 20
           else
             echo "No unattached volumes found matching the filter."
           fi
+
           echo "ebs_count=${EBS_COUNT}" >> "$GITHUB_OUTPUT"
+          [[ -f ebs_candidates.txt ]] || touch ebs_candidates.txt
 
       - name: Upload EBS Preview Artifacts
-        if: ${{ always() && (github.event_name == 'push' || github.event.inputs.cleanup_type == 'ebs' || github.event.inputs.cleanup_type == 'both') }}
+        if: (github.event_name == 'push' || github.event.inputs.cleanup_type == 'ebs' || github.event.inputs.cleanup_type == 'both') && always()
         uses: actions/upload-artifact@v4
         with:
           name: ebs-preview-${{ matrix.account_name }}
@@ -263,12 +272,7 @@ jobs:
         run: |
           set -euo pipefail
           ACCOUNT_NAME="${{ matrix.account_name }}"
-          EM_JSON="${ENVIRONMENT_MANAGEMENT:-}"
-          if [[ -z "$EM_JSON" ]]; then
-            echo "ERROR: ENVIRONMENT_MANAGEMENT not present in env."
-            exit 1
-          fi
-          ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< "$EM_JSON")
+          ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< "$ENVIRONMENT_MANAGEMENT")
           echo "::add-mask::$ACCOUNT_NUMBER"
           echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
 
@@ -288,11 +292,9 @@ jobs:
           scripts/ami_cleanup.sh -a "$app" -s ami_commands.sh $args delete
           TOTAL="$(grep -c '^aws ec2 deregister-image' ami_commands.sh || true)"
           echo "Total deregister-image commands generated (and executed): ${TOTAL}"
-          if [[ -s ami_commands.sh && "${TOTAL}" -gt 0 ]]; then
+          if [[ -s ami_commands.sh ]]; then
             echo "First 20 deregistration commands:"
-            grep '^aws ec2 deregister-image' ami_commands.sh | head -n 20 || true
-          else
-            echo "[LIVE] No AMIs to deregister."
+            grep '^aws ec2 deregister-image' ami_commands.sh | head -n 20
           fi
           [[ -f ami_candidates.csv ]] || touch ami_candidates.csv
           [[ -f ami_commands.sh ]] || touch ami_commands.sh
@@ -340,12 +342,7 @@ jobs:
         run: |
           set -euo pipefail
           ACCOUNT_NAME="${{ matrix.account_name }}"
-          EM_JSON="${ENVIRONMENT_MANAGEMENT:-}"
-          if [[ -z "$EM_JSON" ]]; then
-            echo "ERROR: ENVIRONMENT_MANAGEMENT not present in env."
-            exit 1
-          fi
-          ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< "$EM_JSON")
+          ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< "$ENVIRONMENT_MANAGEMENT")
           echo "::add-mask::$ACCOUNT_NUMBER"
           echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
 
@@ -360,13 +357,14 @@ jobs:
         run: |
           set -euo pipefail
           months="${EBS_MONTHS}"
-          echo "[LIVE] Deleting unattached EBS volumes older than ${months} month(s)"
-          scripts/ebs_cleanup.sh -m "$months" delete | tee ebs_delete_log.txt
+          echo "[LIVE] Deleting unattached EBS volumes older than 1 month(s)"
+          # Tolerate 'no volumes found' non-zero exits from script
+          scripts/ebs_cleanup.sh -m "$months" delete | tee ebs_delete_log.txt || true
           DELETED_COUNT="$( (grep -Eo 'vol-[0-9a-f]+' ebs_delete_log.txt || true) | sort -u | wc -l | tr -d ' ' )"
           echo "Total volumes processed for deletion: ${DELETED_COUNT}"
           if [[ -s ebs_delete_log.txt && "${DELETED_COUNT}" -gt 0 ]]; then
             echo "First 20 volume IDs processed:"
-            (grep -Eo 'vol-[0-9a-f]+' ebs_delete_log.txt || true) | sort -u | head -n 20 || true
+            (grep -Eo 'vol-[0-9a-f]+' ebs_delete_log.txt || true) | sort -u | head -n 20
           else
             echo "[LIVE] No EBS volumes matched the deletion criteria."
           fi
