@@ -6,7 +6,7 @@ on:
     branches:
       - feature-11321-identifying-snapshots-to-be-deleted
 
-  # Keep manual dispatch available (optional)
+  # Optional manual run
   workflow_dispatch:
     inputs:
       application:
@@ -43,7 +43,6 @@ permissions:
   id-token: write
   contents: read
 
-# Defaults (can be overridden by commit-message tokens)
 env:
   APPLICATION:  ${{ github.event.inputs.application || 'example' }}
   ENVIRONMENTS: ${{ github.event.inputs.environments || 'development' }}
@@ -84,14 +83,13 @@ jobs:
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
 
   # ---------------------------------------
-  # PREVIEW (Dry-Run) — always on push,
-  # or manual dispatch with confirm_delete=false
+  # PREVIEW (Dry-Run)
   # ---------------------------------------
   preview:
     name: Preview Deletions (Dry-Run)
     runs-on: ubuntu-latest
     needs: [build-matrix, fetch-secrets]
-    if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && fromJSON(github.event.inputs.confirm_delete) == false) }}
+    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && fromJSON(github.event.inputs.confirm_delete) == false)
     strategy:
       matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
       max-parallel: 1
@@ -147,7 +145,7 @@ jobs:
           echo "EFF_EBS_MONTHS=${eff_ebs}" >> $GITHUB_ENV
 
       - name: AMI Preview (dry-run)
-        if: ${{ github.event_name == 'push' || github.event.inputs.cleanup_type == 'ami' || github.event.inputs.cleanup_type == 'both' }}
+        if: github.event_name == 'push' || github.event.inputs.cleanup_type == 'ami' || github.event.inputs.cleanup_type == 'both'
         id: ami_preview
         run: |
           set -euo pipefail
@@ -184,7 +182,7 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload AMI Preview Artifacts
-        if: ${{ (github.event_name == 'push' || github.event.inputs.cleanup_type == 'ami' || github.event.inputs.cleanup_type == 'both') && always() }}
+        if: github.event_name == 'push' || github.event.inputs.cleanup_type == 'ami' || github.event.inputs.cleanup_type == 'both'
         uses: actions/upload-artifact@v4
         with:
           name: ami-preview-${{ matrix.account_name }}
@@ -194,7 +192,7 @@ jobs:
           if-no-files-found: warn
 
       - name: EBS Preview (dry-run)
-        if: ${{ github.event_name == 'push' || github.event.inputs.cleanup_type == 'ebs' || github.event.inputs.cleanup_type == 'both') }}
+        if: github.event_name == 'push' || github.event.inputs.cleanup_type == 'ebs' || github.event.inputs.cleanup_type == 'both'
         id: ebs_preview
         run: |
           set -euo pipefail
@@ -222,7 +220,7 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload EBS Preview Artifacts
-        if: ${{ (github.event_name == 'push' || github.event.inputs.cleanup_type == 'ebs' || github.event.inputs.cleanup_type == 'both') && always() }}
+        if: github.event_name == 'push' || github.event.inputs.cleanup_type == 'ebs' || github.event.inputs.cleanup_type == 'both'
         uses: actions/upload-artifact@v4
         with:
           name: ebs-preview-${{ matrix.account_name }}
@@ -230,13 +228,7 @@ jobs:
           if-no-files-found: warn
 
   # ---------------------------------------
-  # LIVE (Deletion) — PUSH-ONLY via tokens
-  # Commit message tokens to trigger live:
-  #   [CLEANUP LIVE AMI]   -> AMI Delete (Live)
-  #   [CLEANUP LIVE EBS]   -> EBS Delete (Live)
-  #   [CLEANUP LIVE BOTH]  -> Both live jobs
-  #
-  # (Manual dispatch still supported with confirm_delete=true)
+  # LIVE (Deletion) — push tokens or manual
   # ---------------------------------------
   ami-delete:
     name: AMI Delete (Live)
@@ -319,7 +311,6 @@ jobs:
           [[ -f ami_commands.sh ]] || touch ami_commands.sh
 
       - name: Upload AMI Live Artifacts
-        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: ami-live-${{ matrix.account_name }}
@@ -407,7 +398,6 @@ jobs:
           [[ -f ebs_delete_log.txt ]] || touch ebs_delete_log.txt
 
       - name: Upload EBS Live Artifacts
-        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: ebs-live-${{ matrix.account_name }}
