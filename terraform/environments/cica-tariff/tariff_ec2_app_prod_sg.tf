@@ -82,8 +82,8 @@ resource "aws_security_group" "tariff_app_prod_security_group" {
 
   ingress {
     protocol  = "tcp"
-    from_port = 445
-    to_port   = 445
+    from_port = 2049
+    to_port   = 2049
     security_groups = [ aws_security_group.tariff_db_prod_security_group[0].id ]
     description = "Allow ingress from DB tier for spp_draft_letters mount"
   }  
