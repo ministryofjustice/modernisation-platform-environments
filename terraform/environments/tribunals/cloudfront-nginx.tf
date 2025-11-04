@@ -143,6 +143,7 @@ resource "aws_s3_bucket" "cf_redirect_logs" {
   #checkov:skip=CKV_AWS_144:"Cross-region replication not required"
   #checkov:skip=CKV_AWS_18:"Access logging not required for CloudFront logs bucket to avoid logging loop"
   bucket   = "tribunals-redirect-logs-${local.environment}"
+  acl = "log-delivery-write"
 }
 
 resource "aws_s3_bucket_versioning" "cf_redirect_bucket_versioning" {
