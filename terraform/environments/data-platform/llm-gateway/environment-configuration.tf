@@ -51,6 +51,10 @@ locals {
           }
         }
         bedrock = {
+          amazon-titan-embed-text-v2 = {
+            model_id = "amazon.titan-embed-text-v2:0"
+            region   = "eu-west-2"
+          }
           claude-haiku-4-5 = {
             model_id = "eu.anthropic.claude-haiku-4-5-20251001-v1:0"
             region   = "eu-west-2"
@@ -62,6 +66,22 @@ locals {
         }
       }
       llm_gateway_teams = {
+        central-digital = {
+          max_budget = "5000"
+          models = [
+            "amazon-titan-embed-text-v2",
+            "bedrock-claude-sonnet-4-5"
+          ]
+          keys = {
+            website-builder-helper = {
+              max_budget = "1000"
+              models = [
+                "amazon-titan-embed-text-v2",
+                "bedrock-claude-sonnet-4-5"
+              ]
+            }
+          }
+        }
         data-platform = {
           max_budget = "5000"
           models = [
@@ -85,6 +105,7 @@ locals {
           }
         }
         data-science = {
+          max_budget = "5000"
           models = [
             "bedrock-claude-haiku-4-5",
             "bedrock-claude-sonnet-4-5"
