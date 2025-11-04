@@ -37,10 +37,10 @@ resource "aws_wafv2_ip_set" "opahub_waf_ip_set_web_determinations" {
     local.application_data.accounts[local.environment].mp_nat_gateway_b,
     local.application_data.accounts[local.environment].mp_nat_gateway_c,
     "89.45.177.118/32", # Sahid
-    "80.195.27.199/32", # Krupal IP
     "35.179.83.235/32", # Secure Browser
     "13.43.42.69/32",    # Secure Browser
-    jsondecode(data.aws_secretsmanager_secret_version.ip_secrets.secret_string)["ip_address_ko"]
+    jsondecode(data.aws_secretsmanager_secret_version.ip_secrets.secret_string)["ip_address_ko"],
+    jsondecode(data.aws_secretsmanager_secret_version.ip_secrets.secret_string)["ip_address_kb"]
   ]
 
   tags = merge(local.tags,
