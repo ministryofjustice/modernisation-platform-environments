@@ -6,7 +6,7 @@ on:
     branches:
       - feature-11321-identifying-snapshots-to-be-deleted
 
-  # Keep manual dispatch available (but you can rely on push-only flow)
+  # Keep manual dispatch available (optional)
   workflow_dispatch:
     inputs:
       application:
@@ -43,7 +43,7 @@ permissions:
   id-token: write
   contents: read
 
-# Defaults (can be overridden by commit-message tokens at run-time)
+# Defaults (can be overridden by commit-message tokens)
 env:
   APPLICATION:  ${{ github.event.inputs.application || 'example' }}
   ENVIRONMENTS: ${{ github.event.inputs.environments || 'development' }}
@@ -110,10 +110,15 @@ jobs:
           PASSPHRASE: ${{ secrets.PASSPHRASE }}
 
       - name: Resolve AWS Account Number
+        env:
+          EM_JSON: ${{ needs.fetch-secrets.outputs.environment_management }}
         run: |
           set -euo pipefail
           ACCOUNT_NAME="${{ matrix.account_name }}"
-          ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< "$ENVIRONMENT_MANAGEMENT")
+          if [[ -z "${EM_JSON:-}" ]]; then
+            echo "ERROR: environment_management output is empty/unset"; exit 1
+          fi
+          ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< "$EM_JSON")
           echo "::add-mask::$ACCOUNT_NUMBER"
           echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
 
@@ -130,19 +135,14 @@ jobs:
           COMMIT_MSG: ${{ github.event.head_commit.message || '' }}
         run: |
           set -euo pipefail
-          # Defaults
           eff_ami="${AMI_ARGS}"
           eff_ebs="${EBS_MONTHS}"
-
-          # If commit message contains the test token, lower thresholds to 0
-          # Token: [CLEANUP TEST NOW]
           case "${COMMIT_MSG}" in
             *"[CLEANUP TEST NOW]"*)
               eff_ami="-m 0"
               eff_ebs="0"
               ;;
           esac
-
           echo "EFF_AMI_ARGS=${eff_ami}"   >> $GITHUB_ENV
           echo "EFF_EBS_MONTHS=${eff_ebs}" >> $GITHUB_ENV
 
@@ -178,7 +178,6 @@ jobs:
           echo "ami_count=${TOTAL}" >> "$GITHUB_OUTPUT"
           {
             echo "### AMI Preview — ${{ matrix.account_name }}"
-            echo ""
             echo "- Region: ${region}"
             echo "- Effective AMI args: ${args}"
             echo "- Total AMIs eligible for cleanup: ${TOTAL}"
@@ -195,7 +194,7 @@ jobs:
           if-no-files-found: warn
 
       - name: EBS Preview (dry-run)
-        if: ${{ github.event_name == 'push' || github.event.inputs.cleanup_type == 'ebs' || github.event.inputs.cleanup_type == 'both' }}
+        if: ${{ github.event_name == 'push' || github.event.inputs.cleanup_type == 'ebs' || github.event.inputs.cleanup_type == 'both') }}
         id: ebs_preview
         run: |
           set -euo pipefail
@@ -218,7 +217,6 @@ jobs:
           [[ -f ebs_candidates.txt ]] || touch ebs_candidates.txt
           {
             echo "### EBS Preview — ${{ matrix.account_name }}"
-            echo ""
             echo "- Effective EBS age (months): ${months}"
             echo "- Unattached volumes slated by age filter: ${EBS_COUNT}"
           } >> "$GITHUB_STEP_SUMMARY"
@@ -270,10 +268,15 @@ jobs:
           PASSPHRASE: ${{ secrets.PASSPHRASE }}
 
       - name: Resolve AWS Account Number
+        env:
+          EM_JSON: ${{ needs.fetch-secrets.outputs.environment_management }}
         run: |
           set -euo pipefail
           ACCOUNT_NAME="${{ matrix.account_name }}"
-          ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< "$ENVIRONMENT_MANAGEMENT")
+          if [[ -z "${EM_JSON:-}" ]]; then
+            echo "ERROR: environment_management output is empty/unset"; exit 1
+          fi
+          ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< "$EM_JSON")
           echo "::add-mask::$ACCOUNT_NUMBER"
           echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
 
@@ -355,10 +358,15 @@ jobs:
           PASSPHRASE: ${{ secrets.PASSPHRASE }}
 
       - name: Resolve AWS Account Number
+        env:
+          EM_JSON: ${{ needs.fetch-secrets.outputs.environment_management }}
         run: |
           set -euo pipefail
           ACCOUNT_NAME="${{ matrix.account_name }}"
-          ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< "$ENVIRONMENT_MANAGEMENT")
+          if [[ -z "${EM_JSON:-}" ]]; then
+            echo "ERROR: environment_management output is empty/unset"; exit 1
+          fi
+          ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< "$EM_JSON")
           echo "::add-mask::$ACCOUNT_NUMBER"
           echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
 
