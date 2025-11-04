@@ -492,6 +492,11 @@
       "to_port": 16509,
       "protocol": "UDP"
     },
+    "TCP_4317": {
+      "from_port": 4317,
+      "to_port": 4317,
+      "protocol": "TCP"
+    },
     "TCP_49152-65535": {
       "from_port": 49152,
       "to_port": 65535,
