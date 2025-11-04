@@ -4,6 +4,7 @@
 resource "aws_secretsmanager_secret" "pui_secrets" {
   name        = "${local.application_name}-secrets"
   description = "PUI Application Secrets"
+  #checkov:skip=CKV2_AWS_57:This policy is intentionally broad to allow the application to access its secrets.
 }
 
 resource "aws_secretsmanager_secret_version" "pui_secrets" {

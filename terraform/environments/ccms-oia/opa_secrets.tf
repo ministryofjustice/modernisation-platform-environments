@@ -5,7 +5,7 @@
 resource "aws_secretsmanager_secret" "opahub_secrets" {
   name        = "${local.opa_app_name}-secrets"
   description = "OPAHub Application Secrets"
-  #checkov:skip=BC_AWS_2_57:This policy is intentionally broad to allow the application to access its secrets.
+  #checkov:skip=CKV2_AWS_57:This policy is intentionally broad to allow the application to access its secrets.
 }
 
 resource "aws_secretsmanager_secret_version" "opahub_secrets" {

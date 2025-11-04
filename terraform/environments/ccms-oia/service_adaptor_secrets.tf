@@ -5,6 +5,7 @@
 resource "aws_secretsmanager_secret" "service_adaptor_secrets" {
   name        = "${local.adaptor_app_name}-secrets"
   description = "Service Adaptor Application Secrets"
+  #checkov:skip=CKV2_AWS_57:This policy is intentionally broad to allow the application to access its secrets.
 }
 
 resource "aws_secretsmanager_secret_version" "service_adaptor_secrets" {

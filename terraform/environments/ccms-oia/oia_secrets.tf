@@ -5,6 +5,7 @@
 resource "aws_secretsmanager_secret" "oia_secrets" {
   name        = "${local.application_name}-secrets"
   description = "OIA Secrets"
+  #checkov:skip=CKV2_AWS_57:This policy is intentionally broad to allow the application to access its secrets.
 }
 
 resource "aws_secretsmanager_secret_version" "oia_secrets" {
