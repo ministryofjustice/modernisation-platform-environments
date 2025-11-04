@@ -6,6 +6,10 @@ locals {
         application = "main-v1.79.0-stable"
         chart       = "0.1.807"
       }
+      litellm_organization_ids = {
+        /* These are not currently managed in code */
+        ministryofjustice = "ec09fd0e-617c-4703-8b48-0a722d9342d4"
+      }
       llm_gateway_hostname = "llm-gateway.development.data-platform.service.justice.gov.uk"
       llm_gateway_ingress_allowlist = [
         # Personal
@@ -67,6 +71,7 @@ locals {
       }
       llm_gateway_teams = {
         central-digital = {
+          organisation = "ministryofjustice"
           models = [
             "amazon-titan-embed-text-v2",
             "bedrock-claude-sonnet-4-5"
@@ -81,6 +86,7 @@ locals {
           }
         }
         data-platform = {
+          organisation = "ministryofjustice"
           models = [
             "azure-gpt-5",
             "azure-gpt-5-codex",
@@ -94,6 +100,7 @@ locals {
           }
         }
         data-science = {
+          organisation = "ministryofjustice"
           models = [
             "bedrock-claude-haiku-4-5",
             "bedrock-claude-sonnet-4-5"
@@ -104,6 +111,7 @@ locals {
     }
     test = {
       litellm_versions              = {}
+      litellm_organization_ids      = {}
       llm_gateway_hostname          = ""
       llm_gateway_ingress_allowlist = []
       llm_gateway_models            = {}
@@ -111,6 +119,7 @@ locals {
     }
     preproduction = {
       litellm_versions              = {}
+      litellm_organization_ids      = {}
       llm_gateway_hostname          = ""
       llm_gateway_ingress_allowlist = []
       llm_gateway_models            = {}
@@ -118,6 +127,7 @@ locals {
     }
     production = {
       litellm_versions              = {}
+      litellm_organization_ids      = {}
       llm_gateway_hostname          = ""
       llm_gateway_ingress_allowlist = []
       llm_gateway_models            = {}

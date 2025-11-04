@@ -1,8 +1,9 @@
 resource "litellm_team" "teams" {
   for_each = local.environment_configuration.llm_gateway_teams
 
-  team_alias = each.key
-  models     = each.value.models
+  organization_id = local.environment_configuration.litellm_organization_ids[each.value.organisation]
+  team_alias      = each.key
+  models          = each.value.models
 
   max_budget      = try(each.value.max_budget, 1000)
   budget_duration = try(each.value.budget_duration, "monthly")
