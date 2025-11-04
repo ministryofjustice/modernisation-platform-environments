@@ -28,5 +28,8 @@ resource "litellm_key" "keys" {
   max_budget      = try(each.value.max_budget, 100)
   budget_duration = try(each.value.budget_duration, "1mo")
 
+  rpm_limit = try(each.value.rpm_limit, 100)
+  tpm_limit = try(each.value.tpm_limit, 1000)
+
   depends_on = [helm_release.litellm]
 }

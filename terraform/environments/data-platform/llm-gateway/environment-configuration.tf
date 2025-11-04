@@ -73,13 +73,17 @@ locals {
         central-digital = {
           organisation = "ministryofjustice"
           models = [
-            "amazon-titan-embed-text-v2",
+            "bedrock-amazon-titan-embed-text-v2",
+            "bedrock-claude-haiku-4-5",
             "bedrock-claude-sonnet-4-5"
           ]
           keys = {
-            website-builder-helper = {
+            website-builder-assistant = {
+              rpm_limit = "200"
+              tpm_limit = "1000"
               models = [
-                "amazon-titan-embed-text-v2",
+                "bedrock-amazon-titan-embed-text-v2",
+                "bedrock-claude-haiku-4-5",
                 "bedrock-claude-sonnet-4-5"
               ]
             }
