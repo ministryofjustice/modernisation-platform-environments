@@ -33,6 +33,21 @@ locals {
       }
     }
 
+    cloudwatch_dashboards = {
+      "CloudWatch-Default" = {
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.lb,
+          local.cloudwatch_dashboard_widget_groups.all_ec2,
+          local.cloudwatch_dashboard_widget_groups.jump,
+          local.cloudwatch_dashboard_widget_groups.rdgateway,
+          local.cloudwatch_dashboard_widget_groups.rdservices,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ssm_command,
+        ]
+      }
+    }
+
     ec2_instances = {
 
       pd-jump2022-1 = merge(local.ec2_instances.jumpserver, {
