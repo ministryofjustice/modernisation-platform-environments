@@ -63,7 +63,7 @@ permissions:
   contents: read
 
 env:
-  APPLICATION:  ${{ github.event.inputs.application || 'example' }}
+  APPLICATION:  ${{ github.event.inputs.application || 'cooker' }}
   ENVIRONMENTS: ${{ github.event.inputs.environments || 'development' }}
   AMI_ARGS:     ${{ github.event.inputs.ami_cleanup_sh_args || '-c -m 3' }}
   EBS_MONTHS:   ${{ github.event.inputs.ebs_age_in_months || '1' }}
