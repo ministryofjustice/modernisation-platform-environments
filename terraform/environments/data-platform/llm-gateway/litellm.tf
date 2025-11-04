@@ -25,7 +25,7 @@ resource "litellm_key" "keys" {
   team_id         = litellm_team.teams[each.value.team_key].id
   models          = each.value.models
   max_budget      = try(each.value.max_budget, 100)
-  budget_duration = try(each.value.budget_duration, "monthly")
+  budget_duration = try(each.value.budget_duration, "1mo")
 
   depends_on = [helm_release.litellm]
 }

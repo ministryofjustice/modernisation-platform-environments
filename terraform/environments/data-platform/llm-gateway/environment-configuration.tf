@@ -91,16 +91,9 @@ locals {
             "bedrock-claude-sonnet-4-5"
           ]
           keys = {
-            jacobwoffenden = {
-              models = [
-                "azure-gpt-5",
-                "azure-gpt-5-codex",
-                "bedrock-claude-haiku-4-5",
-                "bedrock-claude-sonnet-4-5"
-              ]
-            }
             mlops-poc = {
-              models = ["bedrock-claude-sonnet-4-5"]
+              max_budget = "500"
+              models     = ["bedrock-claude-sonnet-4-5"]
             }
           }
         }
