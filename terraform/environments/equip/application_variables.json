@@ -981,6 +981,11 @@
       "to_port": 162,
       "protocol": "UDP"
     },
+    "TCP_4317": {
+      "from_port": 4317,
+      "to_port": 4317,
+      "protocol": "TCP"
+    },
     "ICMP_ALL": {
       "from_port": -1,
       "to_port": -1,
