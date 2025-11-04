@@ -67,14 +67,12 @@ locals {
       }
       llm_gateway_teams = {
         central-digital = {
-          max_budget = "5000"
           models = [
             "amazon-titan-embed-text-v2",
             "bedrock-claude-sonnet-4-5"
           ]
           keys = {
             website-builder-helper = {
-              max_budget = "1000"
               models = [
                 "amazon-titan-embed-text-v2",
                 "bedrock-claude-sonnet-4-5"
@@ -83,7 +81,6 @@ locals {
           }
         }
         data-platform = {
-          max_budget = "5000"
           models = [
             "azure-gpt-5",
             "azure-gpt-5-codex",
@@ -92,13 +89,11 @@ locals {
           ]
           keys = {
             mlops-poc = {
-              max_budget = "500"
-              models     = ["bedrock-claude-sonnet-4-5"]
+              models = ["bedrock-claude-sonnet-4-5"]
             }
           }
         }
         data-science = {
-          max_budget = "5000"
           models = [
             "bedrock-claude-haiku-4-5",
             "bedrock-claude-sonnet-4-5"
