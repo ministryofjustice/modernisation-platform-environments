@@ -82,7 +82,7 @@ resource "aws_cloudwatch_event_rule" "daily_schedule_send_cpu_graph_prod" {
   count               = local.is-production == true ? 1 : 0
   name                = "send-cpu-graph-daily-weekday-schedule"
   description         = "Trigger Lambda at 17:00 on weekdays"
-  schedule_expression = "cron(5 16 ? * MON-FRI *)"
+  schedule_expression = "cron(5 17 ? * MON-FRI *)"
 }
 
 resource "aws_cloudwatch_event_target" "trigger_lambda_target_send_cpu_graph_prod" {
@@ -393,7 +393,7 @@ resource "aws_cloudwatch_event_rule" "daily_schedule_ppud_elb_trt_graph_prod" {
   count               = local.is-production == true ? 1 : 0
   name                = "ppud-elb-trt-graph-daily-schedule"
   description         = "Trigger Lambda at 18:00 each Monday through Friday"
-  schedule_expression = "cron(0 17 ? * MON-FRI *)"
+  schedule_expression = "cron(0 18 ? * MON-FRI *)"
 }
 
 resource "aws_cloudwatch_event_target" "trigger_lambda_target_ppud_elb_trt_graph_prod" {
@@ -418,7 +418,7 @@ resource "aws_cloudwatch_event_rule" "daily_schedule_wam_elb_trt_graph_prod" {
   count               = local.is-production == true ? 1 : 0
   name                = "ppud-wam-trt-graph-daily-schedule"
   description         = "Trigger Lambda at 18:00 each Monday through Friday"
-  schedule_expression = "cron(0 17 ? * MON-FRI *)"
+  schedule_expression = "cron(0 18 ? * MON-FRI *)"
 }
 
 resource "aws_cloudwatch_event_target" "trigger_lambda_target_wam_elb_trt_graph_prod" {
