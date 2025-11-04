@@ -201,7 +201,7 @@ resource "aws_s3_bucket_policy" "cf_redirect_policy" {
           Service = "delivery.logs.amazonaws.com"
         }
         Action   = "s3:PutObject"
-        Resource = "${aws_s3_bucket.cloudfront_logs.arn}/cloudfront-redirect-logs-v2/*"
+        Resource = "${aws_s3_bucket.cf_redirect_logs.arn}/cloudfront-redirect-logs-v2/*"
         Condition = {
           StringEquals = {
             "aws:SourceAccount" = data.aws_caller_identity.current.account_id
