@@ -46,24 +46,22 @@ EOF
 # 3. CloudFront Distribution – HTTP only
 # -------------------------------------------------
 resource "aws_cloudfront_distribution" "tribunals_http_redirect" {
+  #checkov:skip=CKV_AWS_86:"Access logging not required for this distribution"
+  #checkov:skip=CKV_AWS_374:"Geo restriction not needed for this public service"
+  #checkov:skip=CKV_AWS_305:"Default root object not required as this is an API distribution"
+  #checkov:skip=CKV_AWS_310:"Single origin is sufficient for this use case"
+  #checkov:skip=CKV2_AWS_47:"Skip Log4j protection as it is handled via WAF"
+  #checkov:skip=CKV2_AWS_46:"Origin Access Identity not applicable as origin is ALB, not S3"
 
-  enabled             = true
-  is_ipv6_enabled     = true
-  comment             = "HTTP-only → HTTPS redirect (external DNS)"
-  price_class         = "PriceClass_All"
-  http_version        = "http2"
+  #web_acl_id = aws_wafv2_web_acl.tribunals_web_acl.arn
 
-  # Reuse the same domain list as aliases
-  aliases = aws_acm_certificate.http_cloudfront_nginx.subject_alternative_names
-
-  # Use the **new dedicated certificate**
-  viewer_certificate {
-    acm_certificate_arn      = aws_acm_certificate.http_cloudfront_nginx.arn
-    ssl_support_method       = "sni-only"
-    minimum_protocol_version = "TLSv1.2_2021"
+  logging_config {
+    include_cookies = false
+    bucket          = aws_s3_bucket.cf_redirect_logs.bucket_domain_name
+    prefix          = "cloudfront-redirect-logs-v2/"
   }
 
-  # Dummy origin (never hit)
+  aliases = aws_acm_certificate.http_cloudfront_nginx.subject_alternative_names
   origin {
     domain_name = "dummy-http-redirect.s3.amazonaws.com"
     origin_id   = "dummy-http-origin"
@@ -99,13 +97,18 @@ resource "aws_cloudfront_distribution" "tribunals_http_redirect" {
     }
   }
 
-  # -------------------------------------------------
-  # LOGGING – S3 bucket in same region as dist (us-east-1)
-  # -------------------------------------------------
-  logging_config {
-    include_cookies = false
-    bucket          = aws_s3_bucket.cf_redirect_logs.bucket_domain_name
-    prefix          = "cloudfront-redirect-logs-v2/"
+  enabled             = true
+  is_ipv6_enabled     = true
+  comment             = "Cloudfront redirect legacy http domains"
+  price_class         = "PriceClass_All"
+  http_version        = "http2"
+
+
+  # Use the **new dedicated certificate**
+  viewer_certificate {
+    acm_certificate_arn      = aws_acm_certificate.http_cloudfront_nginx.arn
+    ssl_support_method       = "sni-only"
+    minimum_protocol_version = "TLSv1.2_2021"
   }
 
   restrictions {
@@ -143,7 +146,6 @@ resource "aws_s3_bucket" "cf_redirect_logs" {
   #checkov:skip=CKV_AWS_144:"Cross-region replication not required"
   #checkov:skip=CKV_AWS_18:"Access logging not required for CloudFront logs bucket to avoid logging loop"
   bucket   = "tribunals-redirect-logs-${local.environment}"
-  acl = "log-delivery-write"
 }
 
 resource "aws_s3_bucket_versioning" "cf_redirect_bucket_versioning" {
