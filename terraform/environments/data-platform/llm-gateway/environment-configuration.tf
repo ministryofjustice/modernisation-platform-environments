@@ -94,10 +94,18 @@ locals {
           models = [
             "azure-gpt-5",
             "azure-gpt-5-codex",
+            "bedrock-amazon-titan-embed-text-v2",
             "bedrock-claude-haiku-4-5",
             "bedrock-claude-sonnet-4-5"
           ]
           keys = {
+            devel = {
+              models = [
+                "bedrock-amazon-titan-embed-text-v2",
+                "bedrock-claude-haiku-4-5",
+                "bedrock-claude-sonnet-4-5"
+              ]
+            }
             mlops-poc = {
               models = ["bedrock-claude-sonnet-4-5"]
             }
