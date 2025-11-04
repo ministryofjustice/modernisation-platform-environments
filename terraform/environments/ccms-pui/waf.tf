@@ -15,7 +15,8 @@ resource "aws_wafv2_ip_set" "pui_waf_ip_set" {
     "52.56.212.11/32",   # Temp AWS PROD Workspace
     "80.195.27.199/32",  # Krupal IP
     "35.179.83.235/32",  # Secure Browser
-    "13.43.42.69/32"     # Secure Browser
+    "13.43.42.69/32",     # Secure Browser
+    jsondecode(data.aws_secretsmanager_secret_version.ip_secrets.secret_string)["ip_address_ko"]
   ]
 
   tags = merge(
