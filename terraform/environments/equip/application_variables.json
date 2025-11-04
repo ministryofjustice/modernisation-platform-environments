@@ -688,6 +688,11 @@
       "to_port": 4119,
       "protocol": "TCP"
     },
+    "TCP_4317": {
+      "from_port": 4317,
+      "to_port": 4317,
+      "protocol": "TCP"
+    },
     "TCP_5721": {
       "from_port": 5721,
       "to_port": 5721,
