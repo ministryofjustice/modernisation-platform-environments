@@ -107,7 +107,11 @@ locals {
               ]
             }
             mlops-poc = {
-              models = ["bedrock-claude-sonnet-4-5"]
+              models = [
+                "bedrock-amazon-titan-embed-text-v2",
+                "bedrock-claude-haiku-4-5",
+                "bedrock-claude-sonnet-4-5"
+              ]
             }
           }
         }
