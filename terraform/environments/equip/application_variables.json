@@ -318,6 +318,11 @@
       "to_port": 3389,
       "protocol": "TCP"
     },
+    "TCP_4317": {
+      "from_port": 4317,
+      "to_port": 4317,
+      "protocol": "TCP"
+    },
     "TCP_8080": {
       "from_port": 8080,
       "to_port": 8080,
