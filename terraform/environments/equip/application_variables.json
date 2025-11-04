@@ -762,6 +762,11 @@
       "from_port": 25,
       "to_port": 25,
       "protocol": "TCP"
+    },
+    "TCP_4317": {
+      "from_port": 4317,
+      "to_port": 4317,
+      "protocol": "TCP"
     }
   },
   "spotfire_internal_rules": {
