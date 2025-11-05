@@ -29,6 +29,21 @@ locals {
       }
     }
 
+    cloudwatch_dashboards = {
+      "CloudWatch-Default" = {
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.lb,
+          local.cloudwatch_dashboard_widget_groups.all_ec2,
+          local.cloudwatch_dashboard_widget_groups.jump,
+          local.cloudwatch_dashboard_widget_groups.rdgateway,
+          local.cloudwatch_dashboard_widget_groups.rdservices,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ssm_command,
+        ]
+      }
+    }
+
     ec2_autoscaling_groups = {
       dev-win-2022 = merge(local.ec2_autoscaling_groups.base_windows, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.base_windows.autoscaling_group, {
@@ -187,7 +202,7 @@ locals {
 
     patch_manager = {
       patch_schedules = {
-        group1 = "cron(00 06 ? * WED *)" # 3am wed for prod for non-prod env's we have to work around the overnight shutdown  
+        group1 = "cron(00 06 ? * WED *)" # 3am wed for prod for non-prod env's we have to work around the overnight shutdown
         group2 = "cron(00 06 ? * THU *)" # 3am thu for prod
       }
       maintenance_window_duration = 2 # 4 for prod
