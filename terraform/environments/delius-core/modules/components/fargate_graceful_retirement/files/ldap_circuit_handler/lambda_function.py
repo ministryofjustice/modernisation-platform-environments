@@ -12,7 +12,7 @@ ENV = os.environ.get("ENVIRONMENT")
 # Use env to determine
 # - SSM circuit breaker path
 # - ECS cluster/service
-ssm_path = f"/{ENV}/ldap/circuit_breaker"
+ssm_path = f"/{ENV}/ldap/circuit-breaker"
 
 
 def lambda_handler(event, context):

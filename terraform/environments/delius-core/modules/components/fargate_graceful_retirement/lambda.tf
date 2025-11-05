@@ -29,7 +29,7 @@ data "aws_iam_policy_document" "lambda_ssm_policy_document" {
       "ssm:GetParameter",
       "ssm:GetParameters"
     ]
-    resources = ["arn:aws:ssm:eu-west-2:${data.aws_caller_identity.current.account_id}:parameter/${var.environment}/ldap/circuit-breaker"]
+    resources = ["arn:aws:ssm:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:parameter/${var.environment}/ldap/circuit-breaker"]
   }
 }
 
