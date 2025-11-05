@@ -458,12 +458,6 @@ resource "aws_cloudwatch_event_target" "trigger_lambda_target_wam_web_traffic_an
 ####################################################
 
 locals {
-  is-development   = local.environment == "development"
-  is-preproduction = local.environment == "preproduction"
-  is-production    = local.environment == "production"
-}
-
-locals {
   # EventBridge Scheduler configurations
   lambda_schedules = {
     securityhub_report = {
