@@ -98,7 +98,7 @@ resource "aws_lambda_function" "cloudfront_redirect_lambda" {
   filename         = local.is-production ? data.archive_file.lambda_zip.output_path : data.archive_file.lambda_zip_nonprod.output_path
   source_code_hash = sha256(
       "${local.is_production ? data.archive_file.lambda_zip.output_base64sha256 : data.archive_file.lambda_zip_nonprod.output_base64sha256}" +
-      null_resource.force_replication.triggers.cloudfront_arn
+      var.force_lambda_version
     )
   role             = aws_iam_role.lambda_edge_role.arn
   handler          = "cloudfront-redirect.handler"
@@ -114,15 +114,21 @@ resource "aws_lambda_function" "cloudfront_redirect_lambda" {
 
   lifecycle {
     create_before_destroy = true
+    replace_triggered_by  = [null_resource.force_lambda_republish]
   }
 
+}
+
+variable "force_lambda_version" {
+  description = "Increment to force new Lambda@Edge version"
+  type        = string
+  default     = "3"
 }
 
 # This dummy file forces a new version when CloudFront ARN changes
 resource "null_resource" "force_replication" {
   triggers = {
-    cloudfront_arn = aws_cloudfront_distribution.tribunals_http_redirect.arn
-    lambda_version = aws_lambda_function.cloudfront_redirect_lambda.version
+    version = var.force_lambda_version
   }
 }
 
