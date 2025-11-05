@@ -1,4 +1,3 @@
-/*
 resource "aws_security_group" "tariff_app_prod_security_group" {
   count       = local.environment == "production" ? 1 : 0
   name_prefix = "${local.application_name}-app-server-sg-${local.environment}"
@@ -89,7 +88,7 @@ resource "aws_security_group" "tariff_app_prod_security_group" {
     description = "Allow ingress from DB tier for spp_draft_letters mount"
   }  
 }
-*/
+
 
 module "tariff_app_prod_security_group" {
   source  = "terraform-aws-modules/security-group/aws"
