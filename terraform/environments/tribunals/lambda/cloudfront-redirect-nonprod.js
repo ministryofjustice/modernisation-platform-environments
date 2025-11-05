@@ -1,6 +1,8 @@
 exports.handler = (event, context, callback) => {
     try {
-        console.log('Event:', JSON.stringify(event, null, 2));
+        console.log('=== FUNCTION START ===');
+        console.log('Event type:', typeof event);
+        console.log('Event keys:', Object.keys(event));
 
         const request = event.Records[0].cf.request;
         const host = request.headers.host[0].value || '';

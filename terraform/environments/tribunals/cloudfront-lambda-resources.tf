@@ -108,6 +108,8 @@ resource "aws_lambda_function" "cloudfront_redirect_lambda" {
    Name        = "cloudfront_redirect_lambda"
    Environment = local.environment
   }
+
+  depends_on = [null_resource.force_lambda_republish]
 }
 
 # -------------------------------------------------
@@ -120,4 +122,12 @@ resource "aws_lambda_permission" "allow_http_cloudfront" {
   function_name = aws_lambda_function.cloudfront_redirect_lambda.function_name
   principal     = "edgelambda.amazonaws.com"
   source_arn    = aws_cloudfront_distribution.tribunals_http_redirect.arn
+}
+
+# Add this to force a new version AFTER CloudFront association
+resource "null_resource" "force_lambda_republish" {
+  triggers = {
+    cloudfront_arn = aws_cloudfront_distribution.tribunals_http_redirect.arn
+    code_hash      = local.is-production ? filebase64sha256("${path.module}/../lambda/cloudfront-redirect.zip") : filebase64sha256("${path.module}/../lambda/cloudfront-redirect-nonprod.zip")
+  }
 }
