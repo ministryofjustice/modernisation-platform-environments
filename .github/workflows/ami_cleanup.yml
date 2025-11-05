@@ -72,6 +72,9 @@ env:
   TEST_MODE:        ${{ github.event.inputs.test_mode || 'false' }}
   AGE_MINUTES:      ${{ github.event.inputs.age_minutes || '10' }}
   LIVE_TEST_MODE:   ${{ github.event.inputs.live_test_mode || 'false' }}
+  # Downstream infra role to assume *after* OIDC -> role/github-actions.
+  # Can be overridden per GitHub Environment (Repository settings → Environments → Variables).
+  ROLE_NAME:        ${{ vars.INFRA_ROLE_NAME || 'MemberInfrastructureAccess' }}
 
 jobs:
   build-matrix:
@@ -123,6 +126,12 @@ jobs:
       - name: Ensure scripts are executable
         run: chmod +x scripts/*.sh
 
+      - name: Ensure jq is available
+        run: |
+          if ! command -v jq >/dev/null 2>&1; then
+            sudo apt-get update -y && sudo apt-get install -y jq
+          fi
+
       - name: Decrypt Secrets (ENVIRONMENT_MANAGEMENT)
         uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@4eceb2a416a197e91dc557c2ef0b5dd9afe29e0c
         with:
@@ -145,11 +154,25 @@ jobs:
           role-session-name: "cleanup-preview-${{ matrix.account_name }}"
           aws-region: eu-west-2
 
+      - name: Assume downstream infra role (${{ env.ROLE_NAME }})
+        run: |
+          set -euo pipefail
+          echo "Chaining to role arn:aws:iam::${ACCOUNT_NUMBER}:role/${ROLE_NAME}"
+          CREDS_JSON="$(aws sts assume-role \
+            --role-arn "arn:aws:iam::${ACCOUNT_NUMBER}:role/${ROLE_NAME}" \
+            --role-session-name "preview-${{ matrix.account_name }}" \
+            --duration-seconds 3600 \
+            --output json)"
+          echo "AWS_ACCESS_KEY_ID=$(jq -r '.Credentials.AccessKeyId' <<<"$CREDS_JSON")" >> $GITHUB_ENV
+          echo "AWS_SECRET_ACCESS_KEY=$(jq -r '.Credentials.SecretAccessKey' <<<"$CREDS_JSON")" >> $GITHUB_ENV
+          echo "AWS_SESSION_TOKEN=$(jq -r '.Credentials.SessionToken' <<<"$CREDS_JSON")" >> $GITHUB_ENV
+
       - name: Quick inventory (sanity)
         run: |
           set -euo pipefail
           echo "Matrix account name: ${{ matrix.account_name }}"
           echo "Resolved account number: ${ACCOUNT_NUMBER}"
+          echo "Assumed downstream role: ${ROLE_NAME}"
           echo "==== AWS STS Caller Identity ===="
           aws sts get-caller-identity
           echo "==== AWS Region (from config/env) ===="
@@ -259,13 +282,18 @@ jobs:
     environment: ${{ matrix.account_name }}
     strategy:
       matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
-      max-parallel: 1
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
 
       - name: Ensure scripts are executable
         run: chmod +x scripts/*.sh
+
+      - name: Ensure jq is available
+        run: |
+          if ! command -v jq >/dev/null 2>&1; then
+            sudo apt-get update -y && sudo apt-get install -y jq
+          fi
 
       - name: Decrypt Secrets (ENVIRONMENT_MANAGEMENT)
         uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@4eceb2a416a197e91dc557c2ef0b5dd9afe29e0c
@@ -288,6 +316,19 @@ jobs:
           role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
           role-session-name: "ami-delete-${{ matrix.account_name }}"
           aws-region: eu-west-2
+
+      - name: Assume downstream infra role (${{ env.ROLE_NAME }})
+        run: |
+          set -euo pipefail
+          echo "Chaining to role arn:aws:iam::${ACCOUNT_NUMBER}:role/${ROLE_NAME}"
+          CREDS_JSON="$(aws sts assume-role \
+            --role-arn "arn:aws:iam::${ACCOUNT_NUMBER}:role/${ROLE_NAME}" \
+            --role-session-name "ami-live-${{ matrix.account_name }}" \
+            --duration-seconds 3600 \
+            --output json)"
+          echo "AWS_ACCESS_KEY_ID=$(jq -r '.Credentials.AccessKeyId' <<<"$CREDS_JSON")" >> $GITHUB_ENV
+          echo "AWS_SECRET_ACCESS_KEY=$(jq -r '.Credentials.SecretAccessKey' <<<"$CREDS_JSON")" >> $GITHUB_ENV
+          echo "AWS_SESSION_TOKEN=$(jq -r '.Credentials.SessionToken' <<<"$CREDS_JSON")" >> $GITHUB_ENV
 
       - name: Enable LIVE 10-minute test flags (when requested or on push)
         run: |
@@ -342,13 +383,18 @@ jobs:
     environment: ${{ matrix.account_name }}
     strategy:
       matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
-      max-parallel: 1
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
 
       - name: Ensure scripts are executable
         run: chmod +x scripts/*.sh
+
+      - name: Ensure jq is available
+        run: |
+          if ! command -v jq >/dev/null 2>&1; then
+            sudo apt-get update -y && sudo apt-get install -y jq
+          fi
 
       - name: Decrypt Secrets (ENVIRONMENT_MANAGEMENT)
         uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@4eceb2a416a197e91dc557c2ef0b5dd9afe29e0c
@@ -371,6 +417,19 @@ jobs:
           role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
           role-session-name: "ebs-delete-${{ matrix.account_name }}"
           aws-region: eu-west-2
+
+      - name: Assume downstream infra role (${{ env.ROLE_NAME }})
+        run: |
+          set -euo pipefail
+          echo "Chaining to role arn:aws:iam::${ACCOUNT_NUMBER}:role/${ROLE_NAME}"
+          CREDS_JSON="$(aws sts assume-role \
+            --role-arn "arn:aws:iam::${ACCOUNT_NUMBER}:role/${ROLE_NAME}" \
+            --role-session-name "ebs-live-${{ matrix.account_name }}" \
+            --duration-seconds 3600 \
+            --output json)"
+          echo "AWS_ACCESS_KEY_ID=$(jq -r '.Credentials.AccessKeyId' <<<"$CREDS_JSON")" >> $GITHUB_ENV
+          echo "AWS_SECRET_ACCESS_KEY=$(jq -r '.Credentials.SecretAccessKey' <<<"$CREDS_JSON")" >> $GITHUB_ENV
+          echo "AWS_SESSION_TOKEN=$(jq -r '.Credentials.SessionToken' <<<"$CREDS_JSON")" >> $GITHUB_ENV
 
       - name: Enable LIVE 10-minute test flags (when requested or on push)
         run: |
