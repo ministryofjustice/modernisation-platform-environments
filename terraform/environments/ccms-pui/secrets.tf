@@ -42,6 +42,15 @@ data "aws_secretsmanager_secret_version" "pui_secrets" {
   secret_id = aws_secretsmanager_secret.pui_secrets.id
 }
 
+# IP Secrets
+resource "aws_secretsmanager_secret" "ip_secrets" {
+  name        = "${local.application_name}-ip-secrets"
+  description = "IP Address List Secrets"
+}
+
+data "aws_secretsmanager_secret_version" "ip_secrets" {
+  secret_id = aws_secretsmanager_secret.ip_secrets.id
+}
 # # CCMS EBS Database Password
 # resource "aws_secretsmanager_secret" "spring_datasource_password" {
 #   name        = "spring_datasource_password"
