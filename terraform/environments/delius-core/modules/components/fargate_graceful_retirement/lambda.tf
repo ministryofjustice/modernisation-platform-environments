@@ -2,7 +2,7 @@ data "archive_file" "lambda_function_ecs_restart_payload" {
   type        = "zip"
   source_dir  = "${path.module}/files/ecs_restart"
   output_path = "${path.module}/files/ecs_restart.zip"
-  excludes    = ["ecs_restart.zip", "calculate_wait_time.zip"]
+  excludes    = ["ecs_restart.zip", "calculate_wait_time.zip", "ldap_circuit_handler.zip"]
 }
 
 resource "aws_iam_role" "lambda_execution_role" {
@@ -22,24 +22,21 @@ resource "aws_iam_role" "lambda_execution_role" {
   })
 }
 
-resource "aws_iam_role_policy" "lambda_ssm_policy" {
-  name = "${var.environment}_lambda_ssm_policy"
-  role = aws_iam_role.lambda_execution_role.id
-
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "ssm:PutParameter",
-          "ssm:GetParameter",
-          "ssm:GetParameters"
-        ]
-        Resource = "arn:aws:ssm:eu-west-2:${data.aws_caller_identity.current.account_id}:parameter/${var.environment}/ldap/circuit-breaker"
-      }
+data "aws_iam_policy_document" "lambda_ssm_policy_document" {
+  statement {
+    actions = [
+      "ssm:PutParameter",
+      "ssm:GetParameter",
+      "ssm:GetParameters"
     ]
-  })
+    resources = ["arn:aws:ssm:eu-west-2:${data.aws_caller_identity.current.account_id}:parameter/${var.environment}/ldap/circuit-breaker"]
+  }
+}
+
+resource "aws_iam_policy" "lambda_ssm_policy" {
+  name        = "${var.environment}_lambda_ssm_policy"
+  description = "IAM policy for Lambda to interact with SSM"
+  policy      = data.aws_iam_policy_document.lambda_ssm_policy_document.json
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_ssm" {
@@ -47,24 +44,20 @@ resource "aws_iam_role_policy_attachment" "lambda_ssm" {
   role       = aws_iam_role.lambda_execution_role.name
 }
 
-resource "aws_iam_role_policy" "lambda_elb_policy" {
-  name = "${var.environment}_lambda_elb_policy"
-  role = aws_iam_role.lambda_execution_role.id
-
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Effect = "Allow",
-        Action = [
-          "elasticloadbalancing:DescribeTargetHealth",
-          "elasticloadbalancing:RegisterTargets",
-          "elasticloadbalancing:DeregisterTargets"
-        ],
-        Resource = "*"
-      }
+data "aws_iam_policy_document" "lambda_elb_policy_document" {
+  statement {
+    actions = [
+      "elasticloadbalancing:DescribeTargetHealth",
+      "elasticloadbalancing:RegisterTargets",
+      "elasticloadbalancing:DeregisterTargets"
     ]
-  })
+    resources = ["*"]
+  }
+}
+resource "aws_iam_policy" "lambda_elb_policy" {
+  name        = "${var.environment}_lambda_elb_policy"
+  description = "IAM policy for Lambda to interact with ELB"
+  policy      = data.aws_iam_policy_document.lambda_elb_policy_document.json
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_elb" {
@@ -154,7 +147,7 @@ data "archive_file" "lambda_function_calculate_wait_time_payload" {
   type        = "zip"
   source_dir  = "${path.module}/files/calculate_wait_time"
   output_path = "${path.module}/files/calculate_wait_time.zip"
-  excludes    = ["calculate_wait_time.zip", "ecs_restart.zip"]
+  excludes    = ["calculate_wait_time.zip", "ecs_restart.zip", "ldap_circuit_handler.zip"]
 }
 
 data "archive_file" "lambda_function_ldap_circuit_handler_payload" {
