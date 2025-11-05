@@ -39,11 +39,11 @@ data "aws_iam_policy_document" "ssogen_kms_policy" {
 }
 
 
-resource "null_resource" "ec2_ssogen_change_detector" {
-  triggers = {
-    instance_id = aws_instance.ec2_ssogen.id
-  }
-}
+# resource "null_resource" "key_trigger" {
+#   triggers = {
+#     instance_id = aws_instance.ec2_ssogen.id
+#   }
+# }
 
 
 resource "aws_kms_key" "ssogen_kms" {
@@ -59,7 +59,6 @@ resource "tls_private_key" "ssogen" {
   count     = local.is_development ? 1 : 0
   algorithm = "RSA"
   rsa_bits  = 4096
-  depends_on = [null_resource.ec2_ssogen_change_detector]
 }
 
 resource "aws_key_pair" "ssogen" {
@@ -67,6 +66,11 @@ resource "aws_key_pair" "ssogen" {
   key_name   = "ssogen_key_name"
   public_key = tls_private_key.ssogen[0].public_key_openssh
   tags       = { Name = "ssogen-key", Environment = local.environment }
+
+  lifecycle {
+    ignore_changes = true
+  }
+
 }
 
 resource "aws_secretsmanager_secret" "ssogen_privkey" {
