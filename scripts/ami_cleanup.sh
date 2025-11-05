@@ -3,6 +3,7 @@
 # Usage examples:
 #   scripts/ami_cleanup.sh -a example -m 3 -c -d -s ami_commands.sh delete
 #   scripts/ami_cleanup.sh -a example -c --test-mode --age-minutes 10 -d delete
+#   scripts/ami_cleanup.sh -a example -c --delete-snapshots delete
 
 set -euo pipefail
 
@@ -24,6 +25,9 @@ aws_error_log="aws_error.log"
 test_mode=0
 age_minutes=""
 
+# Snapshot deletion toggle
+delete_snapshots=0
+
 # tmp files (deleted on exit)
 tmpdir="$(mktemp -d)"
 account_csv="$tmpdir/account.csv"         # ImageId,OwnerId,CreationDate,Public,Name
@@ -32,6 +36,15 @@ code_names="$tmpdir/code_names.txt"       # plain AMI names from code
 inuse_ids="$tmpdir/inuse_ids.set"         # ImageId set (from EC2)
 inuse_names="$tmpdir/inuse_names.set"     # Name set (from code intersect account)
 candidates_csv="$tmpdir/candidates.csv"   # final delete candidates
+cand_ids="$tmpdir/candidate_ids.set"      # candidate AMI ids (set)
+snap_candidates_csv="$tmpdir/snap_candidates.csv" # AMI,SNAPSHOT pairs (pre-check)
+snap_final_csv="$tmpdir/snap_final.csv"          # snapshots approved for delete
+
+# output files in CWD for artifacts
+out_ami_candidates="./ami_candidates.csv"
+out_ami_cmds="./ami_commands.sh"
+out_snap_candidates="./ami_snapshots.csv"
+out_snap_cmds="./snapshot_commands.sh"
 
 cleanup() {
   rm -rf "$tmpdir" || true
@@ -48,11 +61,12 @@ Options:
   -m <months>           Only consider AMIs older than this many months; empty/0 = no month filter
   -b                    Include AwsBackup images (default excludes them)
   -c                    Include images referenced in code (protect by name)
-  -d                    Dry-run (don't deregister)
+  -d                    Dry-run (don't deregister / delete)
   -s <file>             Output AWS deregister commands to this file (default: ami_delete_commands.sh)
   -x                    Exclude images in use on EC2 (testing switch; default includes EC2 use)
   --test-mode           Enable test mode (required when using --age-minutes)
   --age-minutes <N>     In test mode, consider AMIs older than N minutes (overrides month filter)
+  --delete-snapshots    After deregistering AMIs, also delete orphaned snapshots they used
 Actions:
   used      Print images in use (EC2 and/or code if -c)
   account   Print all account AMIs (after filters)
@@ -61,6 +75,7 @@ Actions:
 Examples:
   $0 -a example -m 3 -c -d -s ami_commands.sh delete
   $0 -a example -c --test-mode --age-minutes 10 -d delete
+  $0 -a example -c --delete-snapshots delete
 EOF
 }
 
@@ -118,9 +133,7 @@ build_creation_date_filter() {
 # ---------------------------
 collect_account_images() {
   local filters="" df
-  # FIX: do not mix arithmetic and string tests in (( ... ))
   if (( test_mode == 1 )) && [[ -n "${age_minutes:-}" ]]; then
-    # In test mode with minutes, do not constrain by month at the AWS API; we'll filter client-side by minutes.
     filters=""
   else
     df="$(build_creation_date_filter "${months}")"
@@ -228,10 +241,8 @@ collect_code_names() {
 # Set operations & test-mode time filter
 # ---------------------------
 within_minutes_cutoff() {
-  # Return 0 (true) if CreationDate <= now - age_minutes
   local creation_iso="$1"
   local cutoff_secs="$2"
-  # creation_iso like 2025-11-03T11:04:22.026Z or +00:00
   local created_epoch
   created_epoch="$("$date_cmd" -d "${creation_iso}" +%s 2>/dev/null || echo 0)"
   [[ "$created_epoch" -le "$cutoff_secs" ]]
@@ -258,10 +269,6 @@ compute_candidates() {
   fi
 
   awk -F',' -v ec2_ids="$inuse_ids" -v code_names="$inuse_names" -v cutoff_secs="$cutoff_secs" -v test_mode="$test_mode" -v datecmd="$date_cmd" '
-    function to_secs(iso,    cmd,cmdout) {
-      # We cannot run external date here portably; precomputed cutoff only.
-      return 0
-    }
     BEGIN {
       while ((getline line < ec2_ids) > 0) { gsub(/\r/,"",line); if (line!="") id[line]=1 }
       close(ec2_ids)
@@ -272,16 +279,10 @@ compute_candidates() {
       img=$1; created=$3; nm=$5
       if (img in id) next
       if (nm in name) next
-      if (test_mode==1 && cutoff_secs>0) {
-        # Defer time compare to shell (post-filter). Mark candidate for time check.
-        print $0
-      } else {
-        print $0
-      }
+      print $0
     }
   ' "$account_csv" | normalize_sort > "$candidates_csv"
 
-  # When in test mode with minutes, post-filter by CreationDate using cutoff_secs
   if (( test_mode == 1 )) && [[ "$cutoff_secs" -gt 0 ]]; then
     awk -F',' -v cutoff_secs="$cutoff_secs" -v dc="$date_cmd" '
       function to_epoch(iso,   cmd) {
@@ -297,6 +298,9 @@ compute_candidates() {
     ' "$candidates_csv" | normalize_sort > "${candidates_csv}.tmp"
     mv "${candidates_csv}.tmp" "$candidates_csv"
   fi
+
+  # Build a set of candidate AMI IDs for quick lookups in snapshot checks
+  cut -d',' -f1 "$candidates_csv" | normalize_sort > "$cand_ids"
 }
 
 emit_commands() {
@@ -326,17 +330,114 @@ emit_commands() {
 }
 
 # ---------------------------
+# Snapshot helpers (Optional)
+# ---------------------------
+
+# Fill snap_candidates_csv with AMI,SNAPSHOT pairs for candidate AMIs
+collect_snapshot_candidates() {
+  : > "$snap_candidates_csv"
+  [[ -s "$cand_ids" ]] || return 0
+  while read -r ami; do
+    [[ -z "$ami" ]] && continue
+    snaps="$(aws ec2 describe-images $profile \
+      --image-ids "$ami" \
+      --query 'Images[0].BlockDeviceMappings[].Ebs.SnapshotId' \
+      --output text 2>>"$aws_error_log" || true)"
+    if [[ -n "${snaps:-}" ]]; then
+      for s in $snaps; do
+        [[ "$s" =~ ^snap- ]] || continue
+        echo "${ami},${s}" >> "$snap_candidates_csv"
+      done
+    fi
+  done < "$cand_ids"
+  if [[ -s "$snap_candidates_csv" ]]; then
+    LC_ALL=C sort -u "$snap_candidates_csv" -o "$snap_candidates_csv"
+  fi
+}
+
+# Return 0 if snapshot has a retention/backup indicator
+snapshot_is_retained() {
+  local snap_id="$1"
+  local tags desc name
+  read -r tags desc name < <(aws ec2 describe-snapshots $profile \
+    --snapshot-ids "$snap_id" \
+    --query '[Snapshots[0].Tags, Snapshots[0].Description, Snapshots[0].Tags[?Key==`Name`]|[0].Value]' \
+    --output text 2>>"$aws_error_log" || echo "")
+  # Tag-based retention
+  if echo "$tags" | grep -Eiq '(^|[[:space:]])(Retain|Backup)[[:space:]]*=[[:space:]]*(true|yes|1)'; then
+    return 0
+  fi
+  # Name/desc indicates AwsBackup
+  if echo "$desc $name" | grep -qi 'AwsBackup'; then
+    return 0
+  fi
+  return 1
+}
+
+# Return 0 if snapshot is referenced by any other AMI not in the candidate set
+snapshot_referenced_elsewhere() {
+  local snap_id="$1"
+  local img_ids
+  img_ids="$(aws ec2 describe-images $profile \
+    --owners self \
+    --filters Name=block-device-mapping.snapshot-id,Values="$snap_id" \
+    --query 'Images[].ImageId' \
+    --output text 2>>"$aws_error_log" || true)"
+  [[ -z "$img_ids" ]] && return 1
+  # If any image id is NOT in cand_ids, then it's referenced elsewhere → return 0 (true)
+  while read -r img; do
+    [[ -z "$img" ]] && continue
+    if ! grep -qx "$img" "$cand_ids" 2>/dev/null; then
+      return 0
+    fi
+  done <<< "$img_ids"
+  return 1
+}
+
+# Build snapshot delete commands into out_snap_cmds and list into out_snap_candidates
+emit_snapshot_commands() {
+  : > "$out_snap_cmds"
+  chmod +x "$out_snap_cmds"
+  : > "$out_snap_candidates"
+
+  local count=0
+  if [[ -s "$snap_candidates_csv" ]]; then
+    while IFS=',' read -r ami snap; do
+      [[ -z "$snap" ]] && continue
+      # Skip retained
+      if snapshot_is_retained "$snap"; then
+        continue
+      fi
+      # Skip if referenced by other AMIs not being deleted
+      if snapshot_referenced_elsewhere "$snap"; then
+        continue
+      fi
+      echo "${ami},${snap}" >> "$out_snap_candidates"
+      echo "aws ec2 delete-snapshot --snapshot-id ${snap} $profile" >> "$out_snap_cmds"
+      ((count++))
+    done < "$snap_candidates_csv"
+  fi
+
+  {
+    echo ""
+    echo "# Summary: ${count} snapshot(s) slated for deletion"
+  } >> "$out_snap_cmds"
+
+  echo "$count"
+}
+
+# ---------------------------
 # Argument parsing
 # ---------------------------
 action=""
 parse_inputs() {
-  # support long opts by normalizing into positional array
   long_args=()
   while (( "$#" )); do
     case "$1" in
       --test-mode) test_mode=1; shift ;;
       --age-minutes) age_minutes="${2:-}"; shift 2 ;;
       --age-minutes=*) age_minutes="${1#*=}"; shift ;;
+      --delete-snapshots) delete_snapshots=1; shift ;;
       *) long_args+=("$1"); shift ;;
     esac
   done
@@ -416,11 +517,22 @@ main() {
       build_inuse_names_from_code
       compute_candidates
 
-      [[ -n "$aws_cmd_file" ]] || aws_cmd_file="ami_commands.sh"
+      [[ -n "$aws_cmd_file" ]] || aws_cmd_file="$out_ami_cmds"
       count="$(emit_commands "$aws_cmd_file")"
+      cp "$candidates_csv" "$out_ami_candidates" || :
+
+      # If snapshot deletion requested, pre-compute snapshot commands now (before AMI deregister).
+      snap_count=0
+      if (( delete_snapshots == 1 )); then
+        collect_snapshot_candidates
+        snap_count="$(emit_snapshot_commands)"
+      fi
 
       if [[ "$dryrun" -eq 1 ]]; then
         echo "[DRY RUN] Commands written to $aws_cmd_file"
+        if (( delete_snapshots == 1 )); then
+          echo "[DRY RUN] Snapshot delete commands written to $out_snap_cmds"
+        fi
       else
         if (( count > 0 )); then
           echo "[LIVE] Deregistering AMIs..."
@@ -428,8 +540,15 @@ main() {
         else
           echo "[LIVE] No AMIs to deregister."
         fi
+        if (( delete_snapshots == 1 )); then
+          if [[ -s "$out_snap_cmds" ]]; then
+            echo "[LIVE] Deleting orphaned snapshots used by deregistered AMIs..."
+            bash "$out_snap_cmds"
+          else
+            echo "[LIVE] No snapshots matched the deletion criteria."
+          fi
+        fi
       fi
-      cp "$candidates_csv" ./ami_candidates.csv || :
       return 0
       ;;
     *)

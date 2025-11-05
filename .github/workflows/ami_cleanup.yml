@@ -72,8 +72,6 @@ env:
   TEST_MODE:        ${{ github.event.inputs.test_mode || 'false' }}
   AGE_MINUTES:      ${{ github.event.inputs.age_minutes || '10' }}
   LIVE_TEST_MODE:   ${{ github.event.inputs.live_test_mode || 'false' }}
-  # Downstream infra role to assume *after* OIDC -> role/github-actions.
-  # Can be overridden per GitHub Environment (Repository settings → Environments → Variables).
   ROLE_NAME:        ${{ vars.INFRA_ROLE_NAME || 'MemberInfrastructureAccess' }}
 
 jobs:
@@ -209,7 +207,6 @@ jobs:
           echo "Effective AMI test flags: ${AMI_TEST_FLAGS:-<none>}"
           echo "----------------------------------------------------"
 
-          # tolerate zero candidates
           scripts/ami_cleanup.sh -a "$app" -s ami_commands.sh ${AMI_TEST_FLAGS:-} $args -d delete || true
 
           TOTAL="$(grep -c '^aws ec2 deregister-image' ami_commands.sh || true)"
@@ -282,6 +279,7 @@ jobs:
     environment: ${{ matrix.account_name }}
     strategy:
       matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
+      max-parallel: 1
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -339,14 +337,14 @@ jobs:
             echo "Live using default month-based window."
           fi
 
-      - name: Recompute & Delete AMIs (Live)
+      - name: Recompute & Delete AMIs (Live) + orphaned snapshots
         run: |
           set -euo pipefail
           app="${APPLICATION}"
           args="${AMI_ARGS}"
-          echo "[LIVE] Collecting candidates and deregistering (if any)"
+          echo "[LIVE] Collecting candidates and deregistering (if any), then deleting orphaned snapshots (if any)"
           echo "Effective AMI test flags: ${AMI_TEST_FLAGS:-<none>}"
-          scripts/ami_cleanup.sh -a "$app" -s ami_commands.sh ${AMI_TEST_FLAGS:-} $args delete || true
+          scripts/ami_cleanup.sh -a "$app" -s ami_commands.sh ${AMI_TEST_FLAGS:-} $args --delete-snapshots delete || true
           TOTAL="$(grep -c '^aws ec2 deregister-image' ami_commands.sh || true)"
           echo "Total deregister-image commands generated (and executed): ${TOTAL}"
           if [[ -s ami_commands.sh ]]; then
@@ -357,6 +355,8 @@ jobs:
           fi
           [[ -f ami_candidates.csv ]] || touch ami_candidates.csv
           [[ -f ami_commands.sh ]] || touch ami_commands.sh
+          [[ -f ami_snapshots.csv ]] || touch ami_snapshots.csv
+          [[ -f snapshot_commands.sh ]] || touch snapshot_commands.sh
 
       - name: Upload AMI Live Artifacts
         if: always()
@@ -366,6 +366,8 @@ jobs:
           path: |
             ami_candidates.csv
             ami_commands.sh
+            ami_snapshots.csv
+            snapshot_commands.sh
           if-no-files-found: warn
 
   ebs-delete:
@@ -383,6 +385,7 @@ jobs:
     environment: ${{ matrix.account_name }}
     strategy:
       matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
+      max-parallel: 1
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
