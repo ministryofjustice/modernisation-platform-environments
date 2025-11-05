@@ -143,6 +143,7 @@ resource "aws_sfn_state_machine" "ecs_restart_state_machine" {
             MaxAttempts : 30
           }
         ],
+        ResultPath : "$.WaitForTargetsHealthy",
         Next : "CloseCircuitBreaker"
       },
       # finally close circuit breaker
