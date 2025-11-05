@@ -166,13 +166,12 @@ jobs:
             --query "Volumes[0:50].[VolumeId,CreateTime,State,Tags[?Key=='Name']|[0].Value]" \
             --output table || true
 
+      # 👇 CHANGE: Always enable the 10-minute test window in PREVIEW
       - name: Set 10-minute test flags (preview only)
         run: |
-          # Enable via workflow_dispatch input or commit token [CLEANUP TEST NOW]
-          if [[ "${TEST_MODE}" == "true" || "${{ contains(github.event.head_commit.message || '', '[CLEANUP TEST NOW]') }}" == "true" ]]; then
-            echo "AMI_TEST_FLAGS=--test-mode --age-minutes ${AGE_MINUTES}" >> $GITHUB_ENV
-            echo "EBS_TEST_FLAGS=--test-mode --age-minutes ${AGE_MINUTES}" >> $GITHUB_ENV
-          fi
+          echo "AMI_TEST_FLAGS=--test-mode --age-minutes ${AGE_MINUTES}" >> $GITHUB_ENV
+          echo "EBS_TEST_FLAGS=--test-mode --age-minutes ${AGE_MINUTES}" >> $GITHUB_ENV
+          echo "Preview will use minute-based window: ${AGE_MINUTES} minute(s)"
 
       - name: AMI Preview (dry-run)
         if: ${{ github.event_name == 'push' || github.event.inputs.cleanup_type == 'ami' || github.event.inputs.cleanup_type == 'both' }}
