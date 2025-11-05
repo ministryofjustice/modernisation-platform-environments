@@ -33,3 +33,10 @@ module "vpc" {
 
   tags = local.tags
 }
+
+resource "aws_route" "laa_production_via_transit_gateway" {
+  for_each               = local.dedicated_private_rtb_ids
+  destination_cidr_block = "10.27.64.0/21"
+  route_table_id         = each.key
+  transit_gateway_id     = data.aws_ec2_transit_gateway.modernisation_platform[0].id
+}
