@@ -130,14 +130,14 @@ resource "aws_lambda_permission" "allow_http_cloudfront" {
 resource "null_resource" "force_lambda_republish" {
   triggers = {
     cloudfront_arn = aws_cloudfront_distribution.tribunals_http_redirect.arn
-    code_hash      = local.is-production ? filebase64sha256("${path.module}/../lambda/cloudfront-redirect.zip") : filebase64sha256("${path.module}/../lambda/cloudfront-redirect-nonprod.zip")
+    code_hash      = local.is-production ? filebase64sha256("lambda/cloudfront-redirect.zip") : filebase64sha256("lambda/cloudfront-redirect-nonprod.zip")
   }
 
   provisioner "local-exec" {
     command = <<EOT
       aws lambda update-function-code \
         --function-name CloudfrontRedirectLambda \
-        --zip-file fileb://${path.module}/../lambda/cloudfront-redirect-nonprod.zip \
+        --zip-file fileb://lambda/cloudfront-redirect-nonprod.zip \
         --publish \
         --region us-east-1
     EOT
