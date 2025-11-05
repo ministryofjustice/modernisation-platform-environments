@@ -138,10 +138,10 @@ jobs:
           echo "::add-mask::$ACCOUNT_NUMBER"
           echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
 
-      - name: Configure AWS Credentials (MemberInfrastructureAccess)
+      - name: Configure AWS Credentials (github-actions role)
         uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502
         with:
-          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/MemberInfrastructureAccess"
+          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
           role-session-name: "cleanup-preview-${{ matrix.account_name }}"
           aws-region: eu-west-2
 
@@ -186,6 +186,7 @@ jobs:
           echo "Effective AMI test flags: ${AMI_TEST_FLAGS:-<none>}"
           echo "----------------------------------------------------"
 
+          # tolerate zero candidates
           scripts/ami_cleanup.sh -a "$app" -s ami_commands.sh ${AMI_TEST_FLAGS:-} $args -d delete || true
 
           TOTAL="$(grep -c '^aws ec2 deregister-image' ami_commands.sh || true)"
@@ -255,6 +256,7 @@ jobs:
       (github.event_name == 'workflow_dispatch' &&
         (github.event.inputs.cleanup_type == 'ami' || github.event.inputs.cleanup_type == 'both') &&
         fromJSON(github.event.inputs.confirm_delete) == true)
+    environment: ${{ matrix.account_name }}
     strategy:
       matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
       max-parallel: 1
@@ -280,10 +282,10 @@ jobs:
           echo "::add-mask::$ACCOUNT_NUMBER"
           echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
 
-      - name: Configure AWS Credentials (MemberInfrastructureAccess)
+      - name: Configure AWS Credentials (github-actions role)
         uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502
         with:
-          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/MemberInfrastructureAccess"
+          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
           role-session-name: "ami-delete-${{ matrix.account_name }}"
           aws-region: eu-west-2
 
@@ -337,6 +339,7 @@ jobs:
       (github.event_name == 'workflow_dispatch' &&
         (github.event.inputs.cleanup_type == 'ebs' || github.event.inputs.cleanup_type == 'both') &&
         fromJSON(github.event.inputs.confirm_delete) == true)
+    environment: ${{ matrix.account_name }}
     strategy:
       matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
       max-parallel: 1
@@ -362,10 +365,10 @@ jobs:
           echo "::add-mask::$ACCOUNT_NUMBER"
           echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
 
-      - name: Configure AWS Credentials (MemberInfrastructureAccess)
+      - name: Configure AWS Credentials (github-actions role)
         uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502
         with:
-          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/MemberInfrastructureAccess"
+          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
           role-session-name: "ebs-delete-${{ matrix.account_name }}"
           aws-region: eu-west-2
 
