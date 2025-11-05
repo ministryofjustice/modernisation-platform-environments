@@ -45,7 +45,7 @@ resource "aws_kms_key_policy" "shared_kms_key_policy" {
         Sid    = "AllowAnalyticalPlatformIngestionService",
         Effect = "Allow",
         Principal = {
-          "AWS" : "arn:aws:iam::${local.environment_management.account_ids}:role/transfer"
+          "AWS" : "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-ingestion-production"]}:role/transfer"
         },
         Action = [
           "kms:GenerateDataKey",
