@@ -18,6 +18,7 @@ module "glue_compact_job" {
   name                          = local.compaction_job_name
   short_name                    = local.compaction_job_short_name
   command_type                  = "glueetl"
+  glue_version                  = local.glue_job_version
   description                   = "Runs compaction on tables in the specified zone path.\nArguments:\n--dpr.maintenance.root.path: (Required) Root path on which to run the job.\n--dpr.domain.name: (Optional) The domain tables to include in the compaction. Will run for all tables if not specified.\n--dpr.config.s3.bucket: (Optional) The bucket in which the domain tables configs are located"
   create_security_configuration = local.create_sec_conf
   job_language                  = "scala"
@@ -66,6 +67,7 @@ module "glue_retention_job" {
   name                          = local.retention_job_name
   short_name                    = local.retention_job_short_name
   command_type                  = "glueetl"
+  glue_version                  = local.glue_job_version
   description                   = "Runs the vacuum retention job on tables in the specified zone path.\nArguments:\n--dpr.maintenance.root.path: (Required) Root path on which to run the job.\n--dpr.domain.name: (Optional) The domain tables to include in the compaction. Will run for all tables if not specified.\n--dpr.config.s3.bucket: (Optional) The bucket in which the domain tables configs are located"
   create_security_configuration = local.create_sec_conf
   job_language                  = "scala"
