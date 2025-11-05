@@ -114,7 +114,6 @@ resource "aws_lambda_function" "cloudfront_redirect_lambda" {
 
   lifecycle {
     create_before_destroy = true
-    replace_triggered_by = [null_resource.force_replication]
   }
 
 }
