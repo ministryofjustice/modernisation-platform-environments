@@ -148,7 +148,7 @@ resource "aws_ecs_service" "ears_sars_api" {
   cluster         = aws_ecs_cluster.ears_sars_app.name
   launch_type     = "FARGATE"
   desired_count   = 1
-  task_definition = aws_ecs_task_definition.api.arn
+  task_definition = aws_ecs_task_definition.ears_sars_api.arn
 
   network_configuration {
     subnets         = data.aws_subnets.shared-private.ids
