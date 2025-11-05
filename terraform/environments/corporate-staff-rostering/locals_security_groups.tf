@@ -197,6 +197,13 @@ locals {
           protocol    = -1
           self        = true
         }
+        TCP_3389 = {
+          description = "Allow all ingress to self"
+          from_port   = 3389
+          to_port     = 3389
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.enduserclient
+        }
       }
     }
     database = {
