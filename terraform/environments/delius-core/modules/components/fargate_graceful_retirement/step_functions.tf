@@ -23,7 +23,7 @@ resource "aws_iam_policy" "step_function_policy" {
       {
         Effect   = "Allow"
         Action   = "lambda:InvokeFunction",
-        Resource = [aws_lambda_function.ecs_restart_handler.arn, aws_lambda_function.calculate_wait_time.arn]
+        Resource = [aws_lambda_function.ecs_restart_handler.arn, aws_lambda_function.calculate_wait_time.arn, aws_lambda_function.ldap_circuit_handler.arn]
       },
       {
         Effect   = "Allow"
