@@ -710,6 +710,7 @@ data "aws_iam_policy_document" "glue_catalog_readonly" {
   statement {
     effect = "Allow"
     actions = [
+      "glue:GetCatalog",
       "glue:GetTable",
       "glue:GetTables",
       "glue:GetTableVersions",
