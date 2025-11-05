@@ -109,7 +109,9 @@ resource "aws_lambda_function" "cloudfront_redirect_lambda" {
    Environment = local.environment
   }
 
-  depends_on = [null_resource.force_lambda_republish]
+  lifecycle {
+      ignore_changes = [filename, source_code_hash]
+    }
 }
 
 # -------------------------------------------------
@@ -129,5 +131,15 @@ resource "null_resource" "force_lambda_republish" {
   triggers = {
     cloudfront_arn = aws_cloudfront_distribution.tribunals_http_redirect.arn
     code_hash      = local.is-production ? filebase64sha256("${path.module}/../lambda/cloudfront-redirect.zip") : filebase64sha256("${path.module}/../lambda/cloudfront-redirect-nonprod.zip")
+  }
+
+  provisioner "local-exec" {
+    command = <<EOT
+      aws lambda update-function-code \
+        --function-name CloudfrontRedirectLambda \
+        --zip-file fileb://${path.module}/../lambda/cloudfront-redirect-nonprod.zip \
+        --publish \
+        --region us-east-1
+    EOT
   }
 }
