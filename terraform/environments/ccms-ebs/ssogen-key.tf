@@ -51,6 +51,10 @@ resource "tls_private_key" "ssogen" {
   count     = local.is_development ? 1 : 0
   algorithm = "RSA"
   rsa_bits  = 4096
+
+    lifecycle {
+    ignore_changes = true
+  }
 }
 
 resource "aws_key_pair" "ssogen" {
@@ -66,6 +70,7 @@ resource "aws_secretsmanager_secret" "ssogen_privkey" {
   kms_key_id              = aws_kms_key.ssogen_kms[0].arn
   recovery_window_in_days = 7
   tags                    = { Environment = local.environment, Purpose = "ec2-ssh" }
+
 }
 
 resource "aws_secretsmanager_secret_version" "ssogen_privkey_v1" {
