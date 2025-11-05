@@ -30,5 +30,5 @@ data "aws_iam_policy_document" "cloudwatch_log_group_key" {
 
 resource "aws_kms_key" "cloudwatch_log_group_key" {
   description = "KMS key for CloudWatch log group encryption"
-  policy = data.aws_iam_policy_document.cloudwatch_log_group_key
+  policy = data.aws_iam_policy_document.cloudwatch_log_group_key.json
 }
