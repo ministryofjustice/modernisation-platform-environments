@@ -125,12 +125,6 @@ variable "force_lambda_version" {
   default     = "3"
 }
 
-# This dummy file forces a new version when CloudFront ARN changes
-resource "null_resource" "force_replication" {
-  triggers = {
-    version = var.force_lambda_version
-  }
-}
 
 # -------------------------------------------------
 # 5. Allow ONLY the HTTP distribution to invoke
