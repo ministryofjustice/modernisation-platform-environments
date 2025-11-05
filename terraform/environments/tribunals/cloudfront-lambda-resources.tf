@@ -126,20 +126,26 @@ resource "aws_lambda_permission" "allow_http_cloudfront" {
   source_arn    = aws_cloudfront_distribution.tribunals_http_redirect.arn
 }
 
-# Add this to force a new version AFTER CloudFront association
 resource "null_resource" "force_lambda_republish" {
   triggers = {
+    # Re-run when CloudFront ARN changes (new distribution)
     cloudfront_arn = aws_cloudfront_distribution.tribunals_http_redirect.arn
-    code_hash      = local.is-production ? filebase64sha256("${path.module}/cloudfront-redirect.zip") : filebase64sha256("${path.module}/cloudfront-redirect-nonprod.zip")
+
+    # Re-run when code changes
+    code_hash = local.is_production ? data.archive_file.lambda_zip.output_base64sha256 : data.archive_file.lambda_zip_nonprod.output_base64sha256
   }
 
   provisioner "local-exec" {
     command = <<EOT
+      echo "Forcing Lambda@Edge republish..."
       aws lambda update-function-code \
         --function-name CloudfrontRedirectLambda \
-        --zip-file fileb://${path.module}/cloudfront-redirect-nonprod.zip \
+        --zip-file fileb://${local.is_production ? data.archive_file.lambda_zip.output_path : data.archive_file.lambda_zip_nonprod.output_path} \
         --publish \
         --region us-east-1
     EOT
   }
+
+  # Ensure CloudFront exists first
+  depends_on = [aws_cloudfront_distribution.tribunals_http_redirect]
 }
