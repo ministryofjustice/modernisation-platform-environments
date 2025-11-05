@@ -132,7 +132,7 @@ resource "null_resource" "force_lambda_republish" {
     cloudfront_arn = aws_cloudfront_distribution.tribunals_http_redirect.arn
 
     # Re-run when code changes
-    code_hash = local.is_production ? data.archive_file.lambda_zip.output_base64sha256 : data.archive_file.lambda_zip_nonprod.output_base64sha256
+    code_hash = local.is-production ? data.archive_file.lambda_zip.output_base64sha256 : data.archive_file.lambda_zip_nonprod.output_base64sha256
   }
 
   provisioner "local-exec" {
@@ -140,7 +140,7 @@ resource "null_resource" "force_lambda_republish" {
       echo "Forcing Lambda@Edge republish..."
       aws lambda update-function-code \
         --function-name CloudfrontRedirectLambda \
-        --zip-file fileb://${local.is_production ? data.archive_file.lambda_zip.output_path : data.archive_file.lambda_zip_nonprod.output_path} \
+        --zip-file fileb://${local.is-production ? data.archive_file.lambda_zip.output_path : data.archive_file.lambda_zip_nonprod.output_path} \
         --publish \
         --region us-east-1
     EOT
