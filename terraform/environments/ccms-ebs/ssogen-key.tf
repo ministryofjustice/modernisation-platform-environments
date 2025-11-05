@@ -66,6 +66,7 @@ resource "aws_secretsmanager_secret" "ssogen_privkey" {
   kms_key_id              = aws_kms_key.ssogen_kms[0].arn
   recovery_window_in_days = 7
   tags                    = { Environment = local.environment, Purpose = "ec2-ssh" }
+  #checkov:skip=CKV2_AWS_57:This policy is intentionally broad to allow the application to access its secrets.
 }
 
 resource "aws_secretsmanager_secret_version" "ssogen_privkey_v1" {

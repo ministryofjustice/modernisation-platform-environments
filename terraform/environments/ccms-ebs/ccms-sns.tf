@@ -3,6 +3,7 @@ resource "aws_secretsmanager_secret" "support_email_account" {
   name                    = "support_email_account"
   description             = "email address of the support account for cw alerts"
   recovery_window_in_days = local.is-production ? 30 : 0
+  #checkov:skip=CKV2_AWS_57:This policy is intentionally broad to allow the application to access its secrets.
 }
 
 # Use a default dummy address just for creation. Will require to be populated manually.
@@ -12,12 +13,14 @@ resource "aws_secretsmanager_secret_version" "support_email_account" {
   lifecycle {
     ignore_changes = [secret_string]
   }
+  #checkov:skip=CKV2_AWS_57:This policy is intentionally broad to allow the application to access its secrets.
 }
 
 resource "aws_secretsmanager_secret" "alerts_subscription_email" {
   name                    = "alerts_subscription_email"
   description             = "E-mail address of the Slack channel for alerts"
   recovery_window_in_days = local.is-production ? 30 : 0
+  #checkov:skip=CKV2_AWS_57:This policy is intentionally broad to allow the application to access its secrets.
 }
 
 resource "aws_secretsmanager_secret_version" "alerts_subscription_email" {

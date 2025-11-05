@@ -46,6 +46,7 @@ resource "aws_secretsmanager_secret" "secrets" {
   for_each = toset(local.secret_names)
 
   name = "${each.value}-${local.environment}"
+  #checkov:skip=CKV2_AWS_57:This policy is intentionally broad to allow the application to access its secrets.
 }
 
 

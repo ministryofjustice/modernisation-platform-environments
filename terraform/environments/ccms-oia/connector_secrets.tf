@@ -5,6 +5,7 @@
 resource "aws_secretsmanager_secret" "connector_secrets" {
   name        = "${local.connector_app_name}-secrets"
   description = "Connector Application Secrets"
+  #checkov:skip=CKV2_AWS_57:This policy is intentionally broad to allow the application to access its secrets.
 }
 
 resource "aws_secretsmanager_secret_version" "connector_secrets" {

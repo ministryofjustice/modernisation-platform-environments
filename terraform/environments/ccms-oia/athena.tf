@@ -1,3 +1,4 @@
+# Athena database for load balancer access logs
 resource "aws_athena_database" "lb-access-logs" {
   name   = "loadbalancer_access_logs"
   bucket = module.s3-bucket-logging.bucket.id

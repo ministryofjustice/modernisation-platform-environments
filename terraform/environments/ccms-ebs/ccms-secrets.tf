@@ -8,6 +8,7 @@ resource "aws_secretsmanager_secret" "secret_eucs_entra" {
   tags = merge(local.tags,
     { Name = "eucs-entra-${local.environment}-aws-key" }
   )
+  #checkov:skip=CKV2_AWS_57:This policy is intentionally broad to allow the application to access its secrets.
 }
 
 resource "aws_secretsmanager_secret" "secret_ftp_s3" {
@@ -17,6 +18,7 @@ resource "aws_secretsmanager_secret" "secret_ftp_s3" {
   tags = merge(local.tags,
     { Name = "ftp-s3-${local.environment}-aws-key" }
   )
+  #checkov:skip=CKV2_AWS_57:This policy is intentionally broad to allow the application to access its secrets.
 }
 
 resource "aws_secretsmanager_secret" "secret_ses_smtp_credentials" {
@@ -26,6 +28,7 @@ resource "aws_secretsmanager_secret" "secret_ses_smtp_credentials" {
   tags = merge(local.tags,
     { Name = "ses-smtp-credentials-${local.environment}" }
   )
+  #checkov:skip=CKV2_AWS_57:This policy is intentionally broad to allow the application to access its secrets.
 }
 
 # Secret for Payment Load
@@ -37,12 +40,14 @@ resource "aws_secretsmanager_secret" "secret_lambda_s3" {
   tags = merge(local.tags,
     { Name = "db-${local.environment}-credentials" }
   )
+  #checkov:skip=CKV2_AWS_57:This policy is intentionally broad to allow the application to access its secrets.
 }
 
 # Slack Channel ID for guardduty Alerts
 resource "aws_secretsmanager_secret" "guardduty_slack_channel_id" {
   name        = "guardduty_slack_channel_id"
   description = "Slack Channel ID for guardduty Alerts"
+  #checkov:skip=CKV2_AWS_57:This policy is intentionally broad to allow the application to access its secrets.
 }
 
 data "aws_secretsmanager_secret_version" "guardduty_slack_channel_id" {

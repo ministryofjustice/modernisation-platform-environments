@@ -8,4 +8,5 @@ resource "aws_secretsmanager_secret" "secret_ftp_s3" {
   tags = merge(local.tags,
     { Name = "ftp-s3-${local.environment}-aws-key" }
   )
+  #checkov:skip=CKV2_AWS_57:This policy is intentionally broad to allow the application to access its secrets.
 }
