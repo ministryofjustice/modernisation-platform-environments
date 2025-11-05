@@ -120,7 +120,7 @@ resource "aws_iam_role_policy_attachment" "ecs_task_role_policy_attach" {
 resource "aws_cloudwatch_log_group" "ecs" {
   name = "/aws/ecs/ears-sars-app/cluster"
   retention_in_days = 365
-  kms_key_id        = aws_kms_key.cloudwatch_log_group_key[0].arn
+  kms_key_id        = aws_kms_key.cloudwatch_log_group_key.arn
 }
 
 resource "aws_ecs_task_definition" "ears_sars_api" {
