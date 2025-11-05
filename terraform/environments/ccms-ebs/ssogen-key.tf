@@ -38,14 +38,6 @@ data "aws_iam_policy_document" "ssogen_kms_policy" {
   }
 }
 
-
-# resource "null_resource" "key_trigger" {
-#   triggers = {
-#     instance_id = aws_instance.ec2_ssogen.id
-#   }
-# }
-
-
 resource "aws_kms_key" "ssogen_kms" {
   count               = local.is_development ? 1 : 0
   description         = "KMS for SSH private keys in Secrets Manager"
