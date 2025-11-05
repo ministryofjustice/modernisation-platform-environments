@@ -37,7 +37,6 @@ module "glue_hive_table_creation_job" {
   spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-hive-table-creation-${local.env}/"
   # Placeholder Script Location
   script_location              = local.glue_placeholder_script_location
-  enable_continuous_log_filter = false
   project_id                   = local.project
   aws_kms_key                  = local.s3_kms_arn
 
@@ -104,7 +103,6 @@ module "glue_s3_file_transfer_job" {
   spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-s3-file-transfer-${local.env}/"
   # Placeholder Script Location
   script_location              = local.glue_placeholder_script_location
-  enable_continuous_log_filter = false
   project_id                   = local.project
   aws_kms_key                  = local.s3_kms_arn
 
@@ -164,7 +162,6 @@ module "glue_switch_prisons_hive_data_location_job" {
   spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-switch-prisons-data-source-${local.env}/"
   # Placeholder Script Location
   script_location              = local.glue_placeholder_script_location
-  enable_continuous_log_filter = false
   project_id                   = local.project
   aws_kms_key                  = local.s3_kms_arn
 
@@ -225,7 +222,6 @@ module "glue_s3_data_deletion_job" {
   spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-s3-data-deletion-${local.env}/"
   # Placeholder Script Location
   script_location              = local.glue_placeholder_script_location
-  enable_continuous_log_filter = false
   project_id                   = local.project
   aws_kms_key                  = local.s3_kms_arn
 
@@ -280,7 +276,6 @@ module "glue_stop_glue_instance_job" {
   spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-stop-glue-instance-${local.env}/"
   # Placeholder Script Location
   script_location              = local.glue_placeholder_script_location
-  enable_continuous_log_filter = false
   project_id                   = local.project
   aws_kms_key                  = local.s3_kms_arn
 
@@ -325,7 +320,6 @@ module "stop_dms_task_job" {
   spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-stop-dms-task-${local.env}/"
   # Placeholder Script Location
   script_location              = local.glue_placeholder_script_location
-  enable_continuous_log_filter = false
   project_id                   = local.project
   aws_kms_key                  = local.s3_kms_arn
 
@@ -370,7 +364,6 @@ module "set_cdc_dms_start_time_job" {
   spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-set-cdc-dms-start-time-${local.env}/"
   # Placeholder Script Location
   script_location              = local.glue_placeholder_script_location
-  enable_continuous_log_filter = false
   project_id                   = local.project
   aws_kms_key                  = local.s3_kms_arn
 
@@ -414,7 +407,6 @@ module "activate_glue_trigger_job" {
   spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-activate-glue-trigger-${local.env}/"
   # Placeholder Script Location
   script_location              = local.glue_placeholder_script_location
-  enable_continuous_log_filter = false
   project_id                   = local.project
   aws_kms_key                  = local.s3_kms_arn
 
@@ -1132,7 +1124,6 @@ module "generate_test_postgres_data" {
   spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-load-generator-job-${local.env}/"
   # Placeholder Script Location
   script_location              = local.glue_placeholder_script_location
-  enable_continuous_log_filter = false
   project_id                   = local.project
   aws_kms_key                  = local.s3_kms_arn
   connections                  = ["${local.project}-dps-test-db-connection"]

@@ -27,7 +27,6 @@ module "glue_compact_job" {
   spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.compaction_job_name}/"
   # Placeholder Script Location
   script_location              = local.glue_placeholder_script_location
-  enable_continuous_log_filter = false
   project_id                   = local.project
   aws_kms_key                  = local.s3_kms_arn
   execution_class              = "FLEX"
@@ -76,7 +75,6 @@ module "glue_retention_job" {
   spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.retention_job_name}/"
   # Placeholder Script Location
   script_location              = local.glue_placeholder_script_location
-  enable_continuous_log_filter = false
   project_id                   = local.project
   aws_kms_key                  = local.s3_kms_arn
   execution_class              = "FLEX"

@@ -14,7 +14,6 @@ module "glue_s3_data_reconciliation_job" {
   # Placeholder Script Location
   script_location              = "s3://${var.project_id}-artifact-store-${var.env}/build-artifacts/digital-prison-reporting-jobs/scripts/${var.script_file_version}"
   temp_dir                     = var.temp_dir
-  enable_continuous_log_filter = var.enable_continuous_log_filter
   project_id                   = var.project_id
   aws_kms_key                  = var.s3_kms_arn
   spark_event_logs             = var.spark_event_logs

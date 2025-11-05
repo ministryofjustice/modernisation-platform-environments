@@ -331,24 +331,6 @@ variable "enable_metrics" {
   description = "(Optional) Enables the collection of metrics for job profiling for job run."
 }
 
-variable "enable_continuous_cloudwatch_log" {
-  type        = bool
-  default     = false
-  description = "(Optional) Enables real-time continuous logging for AWS Glue jobs."
-}
-
-variable "enable_continuous_log_filter" {
-  type        = bool
-  default     = true
-  description = "(Optional) Specifies a standard filter or no filter when you create or edit a job enabled for continuous logging."
-}
-
-variable "continuous_log_stream_prefix" {
-  type        = string
-  default     = null
-  description = "(Optional) Specifies a custom CloudWatch log stream prefix for a job enabled for continuous logging."
-}
-
 variable "region" {
   type        = string
   description = "Current AWS Region."

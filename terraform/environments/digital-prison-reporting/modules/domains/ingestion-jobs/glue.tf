@@ -14,7 +14,6 @@ module "glue_reporting_hub_cdc_job" {
   temp_dir                      = var.glue_cdc_temp_dir
   spark_event_logs              = var.glue_cdc_spark_event_logs
   script_location               = "s3://${var.project_id}-artifact-store-${var.env}/build-artifacts/digital-prison-reporting-jobs/scripts/${var.script_version}"
-  enable_continuous_log_filter  = var.glue_cdc_enable_cont_log_filter
   project_id                    = var.project_id
   aws_kms_key                   = var.s3_kms_arn
   execution_class               = var.glue_cdc_execution_class
@@ -56,7 +55,6 @@ module "glue_reporting_hub_batch_job" {
   temp_dir                      = var.glue_batch_temp_dir
   spark_event_logs              = var.glue_batch_spark_event_logs
   script_location               = "s3://${var.project_id}-artifact-store-${var.env}/build-artifacts/digital-prison-reporting-jobs/scripts/${var.script_version}"
-  enable_continuous_log_filter  = var.glue_batch_enable_cont_log_filter
   project_id                    = var.project_id
   aws_kms_key                   = var.s3_kms_arn
   execution_class               = var.glue_batch_execution_class
@@ -96,7 +94,6 @@ module "unprocessed_raw_files_check_job" {
   temp_dir                      = var.glue_unprocessed_raw_files_check_temp_dir
   spark_event_logs              = var.glue_unprocessed_raw_files_check_spark_event_logs
   script_location               = "s3://${var.project_id}-artifact-store-${var.env}/build-artifacts/digital-prison-reporting-jobs/scripts/${var.script_version}"
-  enable_continuous_log_filter  = var.glue_unprocessed_raw_files_check_enable_cont_log_filter
   project_id                    = var.project_id
   aws_kms_key                   = var.s3_kms_arn
   execution_class               = var.glue_unprocessed_raw_files_check_execution_class
@@ -136,7 +133,6 @@ module "glue_archive_job" {
   temp_dir                      = var.glue_archive_temp_dir
   spark_event_logs              = var.glue_archive_spark_event_logs
   script_location               = "s3://${var.project_id}-artifact-store-${var.env}/build-artifacts/digital-prison-reporting-jobs/scripts/${var.script_version}"
-  enable_continuous_log_filter  = var.glue_archive_enable_cont_log_filter
   project_id                    = var.project_id
   aws_kms_key                   = var.s3_kms_arn
   execution_class               = var.glue_archive_execution_class
@@ -176,7 +172,6 @@ module "create_reload_diff_job" {
   spark_event_logs              = var.glue_create_reload_diff_job_spark_event_logs
   # Placeholder Script Location
   script_location              = "s3://${var.project_id}-artifact-store-${var.env}/build-artifacts/digital-prison-reporting-jobs/scripts/${var.script_version}"
-  enable_continuous_log_filter = var.glue_create_reload_diff_job_enable_cont_log_filter
   project_id                   = var.project_id
   aws_kms_key                  = var.s3_kms_arn
   execution_class              = var.glue_create_reload_diff_job_execution_class

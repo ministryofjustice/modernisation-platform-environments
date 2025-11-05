@@ -86,12 +86,6 @@ variable "glue_batch_script_location" {
   default     = ""
 }
 
-variable "glue_batch_enable_cont_log_filter" {
-  type        = bool
-  default     = false
-  description = "(Optional) Specifies a standard filter or no filter when you create or edit a job enabled for continuous logging."
-}
-
 variable "glue_batch_execution_class" {
   default     = "STANDARD"
   description = "Execution CLass Standard or FLex"
@@ -243,12 +237,6 @@ variable "glue_cdc_script_location" {
   default     = ""
 }
 
-variable "glue_cdc_enable_cont_log_filter" {
-  type        = bool
-  default     = false
-  description = "(Optional) Specifies a standard filter or no filter when you create or edit a job enabled for continuous logging."
-}
-
 variable "glue_cdc_execution_class" {
   default     = "STANDARD"
   description = "Execution CLass Standard or FLex"
@@ -395,12 +383,6 @@ variable "glue_unprocessed_raw_files_check_script_location" {
   default     = ""
 }
 
-variable "glue_unprocessed_raw_files_check_enable_cont_log_filter" {
-  type        = bool
-  default     = false
-  description = "(Optional) Specifies a standard filter or no filter when you create or edit a job enabled for continuous logging."
-}
-
 variable "glue_unprocessed_raw_files_check_execution_class" {
   default     = "STANDARD"
   description = "Execution CLass Standard or FLex"
@@ -541,12 +523,6 @@ variable "glue_archive_script_location" {
   default     = ""
 }
 
-variable "glue_archive_enable_cont_log_filter" {
-  type        = bool
-  default     = false
-  description = "(Optional) Specifies a standard filter or no filter when you create or edit a job enabled for continuous logging."
-}
-
 variable "glue_archive_execution_class" {
   default     = "STANDARD"
   description = "Execution CLass Standard or FLex"
@@ -656,12 +632,6 @@ variable "glue_create_reload_diff_job_temp_dir" {
   type        = string
   default     = null
   description = "(Optional) Specifies an Amazon S3 path to a bucket that can be used as a temporary directory for the job."
-}
-
-variable "glue_create_reload_diff_job_enable_cont_log_filter" {
-  type        = bool
-  default     = false
-  description = "(Optional) Specifies a standard filter or no filter when you create or edit a job enabled for continuous logging."
 }
 
 variable "glue_create_reload_diff_job_execution_class" {

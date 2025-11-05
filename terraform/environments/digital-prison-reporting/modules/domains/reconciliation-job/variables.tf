@@ -70,12 +70,6 @@ variable "spark_event_logs" {
   description = "(Optional) Specifies an Amazon S3 path to a bucket that can be used as a Spark Event Logs directory for the job."
 }
 
-variable "enable_continuous_log_filter" {
-  type        = bool
-  default     = false
-  description = "(Optional) Specifies a standard filter or no filter when you create or edit a job enabled for continuous logging."
-}
-
 variable "execution_class" {
   default     = "STANDARD"
   description = "Execution CLass STANDARD or FLEX"
