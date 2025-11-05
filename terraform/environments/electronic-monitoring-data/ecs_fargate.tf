@@ -15,7 +15,10 @@ resource "aws_ecs_cluster" "ears_sars_app" {
 
   configuration {
     execute_command_configuration {
-      logging = "DEFAULT"
+      log_configuration {
+        cloud_watch_encryption_enabled = true
+        cloud_watch_log_group_name     = aws_cloudwatch_log_group.ecs.name
+      }
     }
   }
 }
@@ -34,18 +37,6 @@ data "aws_iam_policy_document" "ecs_assume_policy" {
   }
 }
 
-data "aws_iam_policy_document" "ecs_execution_policy" {
-  statement{
-    effect  = "Allow"
-    actions = [
-        "ecs:*",
-        "elasticloadbalancing:*",
-        "cloudwatch:*",
-        "logs:*"
-    ]
-    resources = ["*"]
-  }
-}
 
 resource "aws_iam_role" "ecs_execution_role" {
   name               = "ears-sars-app-execution-role"
@@ -57,7 +48,7 @@ resource "aws_iam_policy" "ecs_execution_policy" {
 }
 resource "aws_iam_role_policy_attachment" "ecs_execution_role_policy_attach" {
   role       = aws_iam_role.ecs_execution_role.name
-  policy_arn = aws_iam_policy.ecs_execution_policy.arn
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
 # ---------------------------------------------------
@@ -65,11 +56,54 @@ resource "aws_iam_role_policy_attachment" "ecs_execution_role_policy_attach" {
 # ---------------------------------------------------
 
 data "aws_iam_policy_document" "ecs_task_policy" {
+  #checkov:skip=CKV_AWS_356 - only for list my buckets
+  #checkov:skip=CKV_AWS_111 - only for getting account aliases
   statement{
     effect  = "Allow"
     actions = [
-        "s3:*"
+        "s3:ListBucket",
     ]
+    resources = [module.s3-export-bucket.bucket.arn]
+  }
+  statement{
+    effect  = "Allow"
+    actions = [
+        "s3:PutObject",
+    ]
+    resources = ["${module.s3-export-bucket.bucket.arn}/*"]
+  }
+  statement {
+    sid    = "AthenaPermissionsForEARSARs"
+    effect = "Allow"
+    actions = [
+      "athena:StartQueryExecution",
+      "athena:GetQueryExecution",
+      "athena:GetQueryResults",
+      "athena:StopQueryExecution"
+    ]
+    resources = [
+      "arn:aws:athena:${data.aws_region.current.name}:${data.aws_caller_identity.current.id}:workgroup/${data.aws_caller_identity.current.id}-default",
+    ]
+  }
+  statement {
+    sid    = "GetDataAccessAndTagsForLakeFormationForEARSARs"
+    effect = "Allow"
+    actions = [
+      "lakeformation:GetDataAccess",
+      "lakeformation:GetResourceLFTags",
+    ]
+    resources = ["*"]
+  }
+  statement {
+    sid       = "ListAccountAliasForEARSARs"
+    effect    = "Allow"
+    actions   = ["iam:ListAccountAliases"]
+    resources = ["*"]
+  }
+  statement {
+    sid       = "ListAllBucketForEARSARs"
+    effect    = "Allow"
+    actions   = ["s3:ListAllMyBuckets", "s3:GetBucketLocation"]
     resources = ["*"]
   }
 }
@@ -89,6 +123,8 @@ resource "aws_iam_role_policy_attachment" "ecs_task_role_policy_attach" {
 
 resource "aws_cloudwatch_log_group" "ecs" {
   name = "/aws/ecs/ears-sars-app/cluster"
+  retention_in_days = 365
+  kms_key_id        = aws_kms_key.cloudwatch_log_group_key[0].arn
 }
 
 resource "aws_ecs_task_definition" "ears_sars_api" {
@@ -117,7 +153,8 @@ resource "aws_ecs_task_definition" "ears_sars_api" {
           awslogs-stream-prefix = "ears-sars-app"
           awslogs-region        = "eu-west-2"
         }
-      }
+      },
+    readonlyRootFilesystem = true
     }
   ])
 }
@@ -128,16 +165,19 @@ resource "aws_ecs_task_definition" "ears_sars_api" {
 
 resource "aws_security_group" "ecs_service" {
   name_prefix = "ears_sars_sg"
-  vpc_id      = data.aws_vpc.shared.id
+  description = "Allow ecs to connect to sharepoint"
 
-  # needs egress to connect to sharepoint
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+  vpc_id      = data.aws_vpc.shared.id
 }
+
+# uncomment when we have service now ip
+# resource "aws_security_group_egress_rule" "sharepoint_access" {
+#   security_group_id = aws_security_group.ecs_service.id
+#   cidr_ipv4   = # insert servicenow ipv4 here
+#   from_port   = 80
+#   ip_protocol = "tcp"
+#   to_port     = 80
+# }
 
 
 # ---------------------------------------------------
