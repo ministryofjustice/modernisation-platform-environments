@@ -30,6 +30,7 @@ data "aws_secretsmanager_secret_version" "oia_secrets" {
 resource "aws_secretsmanager_secret" "ip_secrets" {
   name        = "${local.application_name}-ip-secrets"
   description = "IP Address List Secrets"
+  #checkov:skip=CKV2_AWS_57:This policy is intentionally broad to allow the application to access its secrets.
 }
 
 data "aws_secretsmanager_secret_version" "ip_secrets" {
