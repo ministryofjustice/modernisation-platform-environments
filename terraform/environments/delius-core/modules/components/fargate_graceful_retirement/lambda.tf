@@ -42,6 +42,11 @@ resource "aws_iam_role_policy" "lambda_ssm_policy" {
   })
 }
 
+resource "aws_iam_role_policy_attachment" "lambda_ssm" {
+  policy_arn = aws_iam_policy.lambda_ssm_policy.arn
+  role       = aws_iam_role.lambda_execution_role.name
+}
+
 resource "aws_iam_role_policy" "lambda_elb_policy" {
   name = "${var.environment}_lambda_elb_policy"
   role = aws_iam_role.lambda_execution_role.id
@@ -62,18 +67,15 @@ resource "aws_iam_role_policy" "lambda_elb_policy" {
   })
 }
 
+resource "aws_iam_role_policy_attachment" "lambda_elb" {
+  policy_arn = aws_iam_policy.lambda_elb_policy.arn
+  role       = aws_iam_role.lambda_execution_role.name
+}
+
 resource "aws_iam_role_policy_attachment" "basic_execution" {
   role       = aws_iam_role.lambda_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
-
-
-# # Lambda Log Group
-# resource "aws_cloudwatch_log_group" "ecs_restart_handler" {
-#   # Environment-specific log group name
-#   name              = "/aws/lambda/${var.environment}_ecs_restart_handler"
-#   retention_in_days = 30
-# }
 
 data "aws_iam_policy_document" "lambda_ecs" {
   statement {
@@ -164,6 +166,7 @@ data "archive_file" "lambda_function_ldap_circuit_handler_payload" {
 
 resource "aws_lambda_function" "ldap_circuit_handler" {
   function_name = "${var.environment}_ldap_circuit_handler"
+  description   = "Lambda to control LDAP ciruit breaker feature"
   runtime       = "python3.12"
   handler       = "lambda_function.lambda_handler"
   role          = aws_iam_role.lambda_execution_role.arn
