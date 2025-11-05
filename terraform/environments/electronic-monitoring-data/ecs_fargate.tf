@@ -105,7 +105,7 @@ resource "aws_ecs_task_definition" "ears_sars_api" {
       command = ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
       portMappings = [
         {
-          containerPort = local.application_data.accounts[local.environment].container_port
+          containerPort = 80
           protocol      = "tcp"
         }
       ],
