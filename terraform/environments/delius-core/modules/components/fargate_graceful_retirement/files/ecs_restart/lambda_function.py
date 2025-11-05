@@ -5,11 +5,6 @@ import boto3
 
 ssm = boto3.client("ssm")
 ENV = os.environ.get("ENVIRONMENT")
-# Use env to determine
-# - SSM circuit breaker path
-# - ECS cluster/service
-# - Logging
-ssm_path = f"/{ENV}/ldap/circuit_breaker/state"
 
 def lambda_handler(event, context):
     print("Event received:", json.dumps(event))
@@ -53,8 +48,8 @@ def lambda_handler(event, context):
                     service=service_name,
                     forceNewDeployment=True,
                 )
-                if os.environ.get("DEBUG_LOGGING", False):
-                    print("[DEBUG] Update service response:", response)
+                # if os.environ.get("DEBUG_LOGGING", False):
+                #     print("[DEBUG] Update service response:", response)
             else:
                 print("No entity value found in the event")
 
@@ -67,18 +62,3 @@ def lambda_handler(event, context):
     except Exception as e:
         print("Error updating service:", e)
         return {"statusCode": 500, "body": json.dumps("Error updating service")}
-
-
-def open_circuit_breaker(param_name):
-    print(f"Opening circuit breaker {param_name}")
-    ssm.put_parameter(Name=param_name, Value="OPEN", Overwrite=True)
-
-
-def close_circuit_breaker(param_name):
-    print(f"Closing circuit breaker {param_name}")
-    ssm.put_parameter(Name=param_name, Value="CLOSED", Overwrite=True)
-
-
-def force_ecs_restart(cluster, service):
-    print(f"Forcing new deployment for {service}")
-    ecs.update_service(cluster=cluster, service=service, forceNewDeployment=True)

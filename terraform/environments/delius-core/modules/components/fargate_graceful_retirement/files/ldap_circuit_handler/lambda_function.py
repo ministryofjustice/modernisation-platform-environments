@@ -35,25 +35,26 @@ def lambda_handler(event, context):
         entity_value = entity.get("entityValue")
 
         if not entity_value:
-            print("No entity value found in the event.")
+            logger.info("No entity value found in the event.")
             continue
 
         if entity_value is not None:
             # Extract cluster name and service name from the entity value
             cluster_name = entity_value.split("|")[0]
             service_name = entity_value.split("|")[1]
-            print("Cluster name:", cluster_name)
-            print("Service name:", service_name)
+            logger.info("Cluster name:", cluster_name)
+            logger.info("Service name:", service_name)
 
-            # only do this for ldap and for ENV!
-            print(f"Only starting services: for {ENV}")
-
-            # Filter only services belonging to the current environment
+            # Filter ldap service belonging to the current environment only
             if ENV.lower() not in cluster_name.lower():
-                print(f"Skipping service {service_name} in cluster {cluster_name} (not {ENV})")
+                logger.info(f"Skipping service {service_name} in cluster {cluster_name} (not {ENV})")
                 continue
 
-            print(f"Updating service {service_name} in cluster {cluster_name} for ENV={ENV}")
+            # only do this for ldap and for ENV!
+            logger.info(f"Only starting LDAP services: for {ENV}")
+            if "ldap".lower() not in service_name.lower():
+                logger.info(f"Service {service_name} not LDAP, so skipping it!")
+                continue
 
             target_group_arn = os.environ.get("LDAP_NLB_ARN", None)
 
