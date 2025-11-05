@@ -452,3 +452,104 @@ resource "aws_cloudwatch_event_target" "trigger_lambda_target_wam_web_traffic_an
   target_id = "wam_web_traffic_analysis_prod"
   arn       = aws_lambda_function.terraform_lambda_func_wam_web_traffic_analysis_prod[0].arn
 }
+
+####################################################
+# EventBridge Scheduler (to invoke Lambda functions)
+####################################################
+
+locals {
+  # EventBridge Scheduler configurations
+  lambda_schedules = {
+    securityhub_report = {
+      environments = ["development", "preproduction"]
+      schedule     = "cron(0 6 ? * MON-FRI *)"
+      description  = "Trigger Lambda at 07:00 each Monday through Friday"
+      timezone     = "UTC"
+    }
+    send_cpu_graph = {
+      environments = ["production"]
+      schedule     = "cron(5 16 ? * MON-FRI *)"
+      description  = "Trigger Lambda at 17:00 on weekdays"
+      timezone     = "UTC"
+    }
+    ppud_elb_trt_calculate = {
+      environments = ["production"]
+      schedule     = "cron(0 2 1 * ? *)"
+      description  = "Trigger Lambda at 02:00 on the 1st day of every month"
+      timezone     = "UTC"
+    }
+  }
+
+  # Generate schedule map for current environment
+  current_schedules = {
+    for name, config in local.lambda_schedules :
+    name => config
+    if contains(config.environments, local.environment)
+  }
+}
+
+# IAM role for EventBridge Scheduler
+resource "aws_iam_role" "eventbridge_scheduler_role" {
+  name = "eventbridge-scheduler-role-${local.environment}"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "scheduler.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "eventbridge_scheduler_policy" {
+  name = "eventbridge-scheduler-policy-${local.environment}"
+  role = aws_iam_role.eventbridge_scheduler_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = "lambda:InvokeFunction"
+        Resource = [for arn in values(local.lambda_function_arns) : arn if arn != null]
+      }
+    ]
+  })
+}
+
+# Dynamic EventBridge Schedules
+resource "aws_scheduler_schedule" "lambda_schedules" {
+  for_each = local.current_schedules
+
+  name        = "${each.key}-schedule-${local.environment}"
+  description = each.value.description
+  state       = "ENABLED"
+
+  flexible_time_window {
+    mode = "OFF"
+  }
+
+  schedule_expression          = each.value.schedule
+  schedule_expression_timezone = each.value.timezone
+
+  target {
+    arn      = local.lambda_function_arns[each.key]
+    role_arn = aws_iam_role.eventbridge_scheduler_role.arn
+  }
+}
+
+# Lambda function ARN mapping
+locals {
+  lambda_function_arns = {
+    securityhub_report = local.is-development ? aws_lambda_function.terraform_lambda_func_securityhub_report_dev[0].arn : (
+      local.is-preproduction ? aws_lambda_function.terraform_lambda_func_securityhub_report_uat[0].arn : null
+    )
+    send_cpu_graph = local.is-production ? aws_lambda_function.terraform_lambda_func_send_cpu_graph_prod[0].arn : null
+    ppud_elb_trt_calculate = local.is-production ? aws_lambda_function.terraform_lambda_func_ppud_elb_trt_calculate_prod[0].arn : null
+  }
+}
