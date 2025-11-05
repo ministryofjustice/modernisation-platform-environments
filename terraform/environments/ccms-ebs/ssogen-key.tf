@@ -67,7 +67,6 @@ resource "aws_key_pair" "ssogen" {
   key_name   = "ssogen_key_name"
   public_key = tls_private_key.ssogen[0].public_key_openssh
   tags       = { Name = "ssogen-key", Environment = local.environment }
-  depends_on = [null_resource.ec2_ssogen_change_detector]
 }
 
 resource "aws_secretsmanager_secret" "ssogen_privkey" {
