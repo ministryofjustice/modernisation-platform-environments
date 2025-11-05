@@ -138,10 +138,10 @@ jobs:
           echo "::add-mask::$ACCOUNT_NUMBER"
           echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
 
-      - name: Configure AWS Credentials (github-actions role)
+      - name: Configure AWS Credentials (MemberInfrastructureAccess)
         uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502
         with:
-          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
+          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/MemberInfrastructureAccess"
           role-session-name: "cleanup-preview-${{ matrix.account_name }}"
           aws-region: eu-west-2
 
@@ -166,7 +166,6 @@ jobs:
             --query "Volumes[0:50].[VolumeId,CreateTime,State,Tags[?Key=='Name']|[0].Value]" \
             --output table || true
 
-      # Always enable the 10-minute test window in PREVIEW
       - name: Set 10-minute test flags (preview only)
         run: |
           echo "AMI_TEST_FLAGS=--test-mode --age-minutes ${AGE_MINUTES}" >> $GITHUB_ENV
@@ -281,17 +280,13 @@ jobs:
           echo "::add-mask::$ACCOUNT_NUMBER"
           echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
 
-      - name: Configure AWS Credentials (github-actions role)
+      - name: Configure AWS Credentials (MemberInfrastructureAccess)
         uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502
         with:
-          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
+          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/MemberInfrastructureAccess"
           role-session-name: "ami-delete-${{ matrix.account_name }}"
           aws-region: eu-west-2
 
-      # Enable minute-based window for LIVE when:
-      # - push-triggered (keeps live consistent with preview during dev),
-      # - OR manual run explicitly asks for it,
-      # - OR commit message includes [CLEANUP TEST NOW].
       - name: Enable LIVE 10-minute test flags (when requested or on push)
         run: |
           if [[ "${{ github.event_name }}" == "push" || "${LIVE_TEST_MODE}" == "true" || "${{ contains(github.event.head_commit.message || '', '[CLEANUP TEST NOW]') }}" == "true" ]]; then
@@ -367,14 +362,13 @@ jobs:
           echo "::add-mask::$ACCOUNT_NUMBER"
           echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
 
-      - name: Configure AWS Credentials (github-actions role)
+      - name: Configure AWS Credentials (MemberInfrastructureAccess)
         uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502
         with:
-          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
+          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/MemberInfrastructureAccess"
           role-session-name: "ebs-delete-${{ matrix.account_name }}"
           aws-region: eu-west-2
 
-      # Enable minute-based window for LIVE when push/manual test requested (same logic as AMI).
       - name: Enable LIVE 10-minute test flags (when requested or on push)
         run: |
           if [[ "${{ github.event_name }}" == "push" || "${LIVE_TEST_MODE}" == "true" || "${{ contains(github.event.head_commit.message || '', '[CLEANUP TEST NOW]') }}" == "true" ]]; then
