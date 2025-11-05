@@ -8,7 +8,7 @@ locals {
         ami_name                  = "base_rhel_8_5_2023-07*" # RHEL 8.8
         iam_resource_names_prefix = "ec2-bip"
         instance_profile_policies = [
-          "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+          # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore", # now included automatically by module
           "EC2Default",
           "EC2S3BucketWriteAndDeleteAccessPolicy",
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
@@ -57,7 +57,7 @@ locals {
         ami_name                  = "base_rhel_8_5_2023-07*" # RHEL 8.8
         iam_resource_names_prefix = "ec2-bip"
         instance_profile_policies = [
-          "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+          # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore", # now included automatically by module
           "EC2Default",
           "EC2S3BucketWriteAndDeleteAccessPolicy",
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
@@ -106,7 +106,7 @@ locals {
         ami_name                  = "base_rhel_8_5_2023-07*" # RHEL 8.8
         iam_resource_names_prefix = "ec2-web"
         instance_profile_policies = [
-          "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+          # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore", # now included automatically by module
           "EC2Default",
           "EC2S3BucketWriteAndDeleteAccessPolicy",
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
@@ -155,7 +155,7 @@ locals {
         ami_name                  = "base_rhel_8_5_2023-07*" # RHEL 8.8
         iam_resource_names_prefix = "ec2-web"
         instance_profile_policies = [
-          "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+          # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore", # now included automatically by module
           "EC2Default",
           "EC2S3BucketWriteAndDeleteAccessPolicy",
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
@@ -204,7 +204,7 @@ locals {
         ami_owner                 = "self"
         iam_resource_names_prefix = "ec2-database"
         instance_profile_policies = [
-          "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+          # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore", # now included automatically by module
           "EC2Db",
           "EC2S3BucketWriteAndDeleteAccessPolicy",
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"

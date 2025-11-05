@@ -34,9 +34,8 @@ resource "aws_instance" "citrix_adc_instance" {
   monitoring           = true
   ebs_optimized        = true
 
-  network_interface {
+  primary_network_interface {
     network_interface_id = aws_network_interface.adc_mgmt_interface.id
-    device_index         = 0
   }
 
   root_block_device {

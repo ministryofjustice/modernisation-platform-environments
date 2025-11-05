@@ -1,4 +1,8 @@
 locals {
+  logging_bucket_name             = "${local.application_name}-${local.environment}-logging"
+  lb_log_prefix_edrmsapp_internal = "edrmsapps-internal-lb"
+
+
   data_subnets_cidr_blocks = [
     data.aws_subnet.data_subnets_a.cidr_block,
     data.aws_subnet.data_subnets_b.cidr_block,

@@ -13,10 +13,11 @@ resource "aws_kms_key" "missing_report_submissions" {
   is_enabled          = true
 
   tags = merge(
-    local.tags,
+    local.all_tags,
     {
-      Name = "${local.application_name}-rds-kms"
-      Jira = "DPR2-2007"
+      dpr-name          = "${local.application_name}-rds-kms"
+      dpr-resource-type = "KMS Key"
+      dpr-jira          = "DPR2-2007"
     }
   )
 }
@@ -58,9 +59,9 @@ resource "aws_secretsmanager_secret" "missing_report_submissions" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "external/${local.project}-missing-report-submissions-source-secrets"
-      Resource_Type = "Secrets"
-      Jira          = "DPR2-2007"
+      dpr-name          = "external/${local.project}-missing-report-submissions-source-secrets"
+      dpr-resource-type = "Secrets"
+      dpr-jira          = "DPR2-2007"
     }
   )
 }
@@ -164,11 +165,11 @@ module "aurora_missing_report_submissions" {
   tags = merge(
     local.all_tags,
     {
-      Resource_Group = "missing_report_submissions-DB"
-      Resource_Type  = "RDS"
-      Jira           = "DPR2-2007"
-      project        = local.project
-      Name           = "missing_report_submissions"
+      dpr-resource-group = "missing_report_submissions-DB"
+      dpr-resource-type  = "RDS"
+      dpr-jira           = "DPR2-2007"
+      project            = local.project
+      dpr-name           = "missing_report_submissions"
     }
   )
 }

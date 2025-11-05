@@ -4,6 +4,7 @@ import os
 import boto3
 from botocore.exceptions import ClientError
 from datetime import datetime
+from collections import defaultdict
 import urllib.request
 
 # Setting up logging
@@ -75,6 +76,118 @@ def service_message(resources, env, event):
     return message
 
 
+def service_message_markup(resources, env, event):
+    '''
+    This logic will parse the service task event message
+    '''
+
+    def detect_environment_from_cluster(cluster_name):
+        cluster_name = cluster_name.lower()
+        if "-prod-" in cluster_name:
+            return "prod"
+        elif "-preprod-" in cluster_name:
+            return "preprod"
+        elif "stage" in cluster_name:
+            return "stage"
+        elif "dev" in cluster_name:
+            return "dev"
+        elif "poc" in cluster_name:
+            return "poc"
+        elif "test" in cluster_name:
+            return "test"
+        elif "training" in cluster_name:
+            return "training"
+        else:
+            return "unknown"
+
+
+    # Color & emoji mappings
+    env_colors = {
+        "prod": "#E01E5A",       # red
+        "preprod": "#E01E5A",    # red
+        "stage": "#ECB22E",      # yellow
+        "dev": "#2EB67D",        # green
+        "poc": "#36C5F0",        # blue
+        "test": "#000000",        # black
+        "training": "#F0AC36",   # orange
+        "unknown": "#AAAAAA"
+    }
+
+    env_labels = {
+        "prod": "🔴 *PROD*",
+        "preprod": "🔴 *PREPROD*",
+        "stage": "🟡 *STAGE*",
+        "dev": "🟢 *DEV*",
+        "poc": "🔵 *POC*",
+        "test": "⚫ *TEST*",
+        "training": "🟠 *TRAINING*",
+        "unknown": "*UNKNOWN*"
+    }
+
+    # Group services by environment
+    env_groups = defaultdict(list)
+    for service in resources:
+        cluster_name, svc_name = service.split("|")
+        env_name = detect_environment_from_cluster(cluster_name)
+        env_groups[env_name].append((cluster_name.strip(), svc_name.strip()))
+
+    attachments = []
+
+    for env_name, services in env_groups.items():
+        service_list = ""
+        for cluster, svc in services:
+            service_list += f"• Cluster: _{cluster}_    |   Service: _{svc}_\n"
+        service_list = service_list.rstrip("\n")
+
+        blocks = [
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": f"🚨 *AWS Fargate service tasks will be retired on* `{retirement_date(event['detail']['startTime'])}`"
+                }
+            },
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": f"*Environment:* {env_labels.get(env_name, env_name.upper())}"
+                }
+            },
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": f"There are *{len(services)} ECS services* affected. ECS will attempt to start replacement tasks after this date."
+                }
+            },
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": f"*Services:*\n{service_list}"
+                }
+            },
+            {
+                "type": "actions",
+                "elements": [
+                    {
+                        "type": "button",
+                        "text": {"type": "plain_text", "text": "Click here for details"},
+                        "url": f"https://phd.aws.amazon.com/phd/home?region=us-east-1#/event-log?eventID={event['detail']['eventArn']}"
+                    }
+                ]
+            }
+        ]
+
+        attachments.append({
+            "color": env_colors.get(env_name, "#AAAAAA"),
+            "blocks": blocks
+        })
+
+    return {"attachments": attachments}
+
+
 def lambda_handler(event, context):
     logging.info(json.dumps(event))
 
@@ -98,7 +211,7 @@ def lambda_handler(event, context):
     if ':' in resources[0]:
         message = standalone_task_message(resources, env, event)
     elif '|' in resources[0]:
-        message = service_message(resources, env, event)
+        message = service_message_markup(resources, env, event)
     else:
         raise 'Unable to parse affected tasks'
 
@@ -110,9 +223,10 @@ def lambda_handler(event, context):
 
     payload = json.dumps({
         'channel': slack_channel,
-        'text': message,
         'username': 'AWS Fargate Task Retirement',
-        'icon_emoji': ':warning:'
+        'icon_emoji': ':warning:',
+        # "attachments": message["attachments"],
+        **message
     }).encode('utf-8')
 
     req = urllib.request.Request(slack_url, data=payload, headers=headers)

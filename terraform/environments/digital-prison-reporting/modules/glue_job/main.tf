@@ -14,12 +14,8 @@ locals {
     "--enable-spark-ui"                  = var.enable_spark_ui
   }
 
-  tags = merge(
-    var.tags,
-    {
-      Dept = "Digital-Prison-Reporting"
-    }
-  )
+  tags = var.tags
+
 }
 
 resource "aws_glue_job" "glue_job" {

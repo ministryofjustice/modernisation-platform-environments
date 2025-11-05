@@ -38,6 +38,7 @@ locals {
         start          = "-PT6H"
         widget_groups = [
           module.baseline_presets.cloudwatch_dashboard_widget_groups.lb,
+          local.cloudwatch_dashboard_widget_groups.all_ec2,
           local.cloudwatch_dashboard_widget_groups.db,
           local.cloudwatch_dashboard_widget_groups.cms,
           local.cloudwatch_dashboard_widget_groups.app,
@@ -51,11 +52,12 @@ locals {
     ec2_instances = {
 
       ls-ncr-db-1-a = merge(local.ec2_instances.db, {
-        cloudwatch_metric_alarms = merge(
-          local.cloudwatch_metric_alarms.db,
-          local.cloudwatch_metric_alarms.db_connected,
-          local.cloudwatch_metric_alarms.db_backup,
-        )
+        cloudwatch_metric_alarms = {}
+        #cloudwatch_metric_alarms = merge(
+        #  local.cloudwatch_metric_alarms.db,
+        #  local.cloudwatch_metric_alarms.db_connected,
+        #  local.cloudwatch_metric_alarms.db_backup,
+        #)
         config = merge(local.ec2_instances.db.config, {
           availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.ec2_instances.db.config.instance_profile_policies, [
@@ -309,7 +311,7 @@ locals {
         }
         listeners = merge(local.lbs.private.listeners, {
           http-7777 = merge(local.lbs.private.listeners.http-7777, {
-            alarm_target_group_names = []
+            alarm_target_group_names = [] # don't enable as environments are powered up/down frequently
             rules = {
               web = {
                 priority = 200
@@ -364,7 +366,7 @@ locals {
         }
         listeners = merge(local.lbs.public.listeners, {
           https = merge(local.lbs.public.listeners.https, {
-            alarm_target_group_names = []
+            alarm_target_group_names = [] # don't enable as environments are powered up/down frequently
             rules = {
               webadmin = {
                 priority = 100

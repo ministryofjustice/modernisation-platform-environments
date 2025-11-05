@@ -38,6 +38,7 @@ locals {
         start          = "-PT6H"
         widget_groups = [
           module.baseline_presets.cloudwatch_dashboard_widget_groups.lb,
+          local.cloudwatch_dashboard_widget_groups.all_ec2,
           local.cloudwatch_dashboard_widget_groups.db,
           local.cloudwatch_dashboard_widget_groups.cms,
           local.cloudwatch_dashboard_widget_groups.app,
@@ -341,7 +342,9 @@ locals {
         }
         listeners = merge(local.lbs.private.listeners, {
           http-7777 = merge(local.lbs.private.listeners.http-7777, {
-            alarm_target_group_names = []
+            alarm_target_group_names = [
+              "private-pd-http-7777"
+            ]
             rules = {
               web = {
                 priority = 200
@@ -399,7 +402,10 @@ locals {
         }
         listeners = merge(local.lbs.public.listeners, {
           https = merge(local.lbs.public.listeners.https, {
-            alarm_target_group_names = []
+            alarm_target_group_names = [
+              "pd-http-7010",
+              "pd-http-7777",
+            ]
             rules = {
               webadmin = {
                 priority = 100

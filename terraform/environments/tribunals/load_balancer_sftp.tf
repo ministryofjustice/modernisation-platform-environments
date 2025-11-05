@@ -21,7 +21,9 @@ resource "aws_security_group" "tribunals_lb_sc_sftp" {
   description = "control access to the network load balancer for sftp"
   vpc_id      = data.aws_vpc.shared.id
   dynamic "ingress" {
-    for_each = var.sftp_services
+    for_each = {
+      for k, v in var.sftp_services : k => v if v.upload_enabled
+    }
     content {
       description = "allow all traffic on port ${ingress.value.sftp_port}"
       from_port   = ingress.value.sftp_port

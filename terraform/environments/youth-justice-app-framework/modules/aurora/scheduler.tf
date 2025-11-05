@@ -101,6 +101,7 @@ resource "aws_lambda_function" "start_aurora_lambda_function" {
   #checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
   #checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
   #checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
+  #checkov:skip=CKV_AWS_363: "fix before deprecation date"
   count            = var.create_sheduler ? 1 : 0
   function_name    = "start-aurora-cluster"
   description      = "Used for starting Aurora cluster"
@@ -159,6 +160,7 @@ resource "aws_lambda_function" "stop_aurora_lambda_function" {
   #checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
   #checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
   #checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
+  #checkov:skip=CKV_AWS_363: "fix at before deprecation date"
   count            = var.create_sheduler ? 1 : 0
   function_name    = "stop-aurora-cluster"
   description      = "Used for stopping Aurora cluster"

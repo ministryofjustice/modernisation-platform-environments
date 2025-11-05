@@ -29,6 +29,21 @@ locals {
       }
     }
 
+    cloudwatch_dashboards = {
+      "CloudWatch-Default" = {
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.lb,
+          local.cloudwatch_dashboard_widget_groups.all_ec2,
+          local.cloudwatch_dashboard_widget_groups.jump,
+          local.cloudwatch_dashboard_widget_groups.rdgateway,
+          local.cloudwatch_dashboard_widget_groups.rdservices,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ssm_command,
+        ]
+      }
+    }
+
     ec2_autoscaling_groups = {
       dev-win-2022 = merge(local.ec2_autoscaling_groups.base_windows, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.base_windows.autoscaling_group, {
@@ -82,12 +97,14 @@ locals {
           availability_zone = "eu-west-2a"
         })
         instance = merge(local.ec2_instances.jumpserver.instance, {
+          instance_type = "r6i.xlarge"
           tags = {
             patch-manager = "group2"
           }
         })
         tags = merge(local.ec2_instances.jumpserver.tags, {
-          domain-name = "azure.hmpp.root"
+          domain-name         = "azure.hmpp.root"
+          instance-scheduling = "skip-scheduling"
         })
       })
 
@@ -102,8 +119,9 @@ locals {
           }
         })
         tags = merge(local.ec2_instances.rdgw.tags, {
-          description = "Remote Desktop Gateway for azure.hmpp.root domain"
-          domain-name = "azure.hmpp.root"
+          description         = "Remote Desktop Gateway for azure.hmpp.root domain"
+          domain-name         = "azure.hmpp.root"
+          instance-scheduling = "skip-scheduling"
         })
       })
 
@@ -117,9 +135,10 @@ locals {
           }
         })
         tags = merge(local.ec2_instances.rds.tags, {
-          description  = "Remote Desktop Services for azure.hmpp.root domain"
-          domain-name  = "azure.hmpp.root"
-          service-user = "svc_rds"
+          description         = "Remote Desktop Services for azure.hmpp.root domain"
+          domain-name         = "azure.hmpp.root"
+          service-user        = "svc_rds"
+          instance-scheduling = "skip-scheduling"
         })
       })
     }
@@ -183,7 +202,7 @@ locals {
 
     patch_manager = {
       patch_schedules = {
-        group1 = "cron(00 06 ? * WED *)" # 3am wed for prod for non-prod env's we have to work around the overnight shutdown  
+        group1 = "cron(00 06 ? * WED *)" # 3am wed for prod for non-prod env's we have to work around the overnight shutdown
         group2 = "cron(00 06 ? * THU *)" # 3am thu for prod
       }
       maintenance_window_duration = 2 # 4 for prod

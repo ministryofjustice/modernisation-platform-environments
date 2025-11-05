@@ -35,8 +35,8 @@ module "dynamo_table_dpd" {
   tags = merge(
     local.all_tags,
     {
-      Name          = local.table_name
-      Resource_Type = "Dynamo Table"
+      dpr-name          = local.table_name
+      dpr-resource-type = "Dynamo Table"
     }
   )
 }

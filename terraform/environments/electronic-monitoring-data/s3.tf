@@ -2,7 +2,10 @@ locals {
   bucket_prefix = "emds-${local.environment_shorthand}"
 
   mdss_supplier_account_mapping = {
-    "production"    = null
+    "production"    = {
+      "account_number" = "660724989641"
+      "role_name"      = "oak-datatransfer-lambda-role"
+    }
     "preproduction" = null
     "test" = {
       "account_number" = "173142358744"
@@ -49,7 +52,8 @@ locals {
     { id = module.s3-glue-job-script-bucket.bucket.id, arn = module.s3-glue-job-script-bucket.bucket.arn },
     { id = module.s3-dms-target-store-bucket.bucket.id, arn = module.s3-dms-target-store-bucket.bucket.arn },
     { id = module.s3-create-a-derived-table-bucket.bucket.id, arn = module.s3-create-a-derived-table-bucket.bucket.arn },
-    { id = module.s3-raw-formatted-data-bucket.bucket.id, arn = module.s3-raw-formatted-data-bucket.bucket.arn }
+    { id = module.s3-raw-formatted-data-bucket.bucket.id, arn = module.s3-raw-formatted-data-bucket.bucket.arn },
+    { id = module.s3-lambda-store-bucket.bucket.id, arn = module.s3-lambda-store-bucket.bucket.arn }
   ]
 }
 
@@ -1334,3 +1338,55 @@ module "s3-lambda-store-bucket" {
 
   tags = local.tags
 }
+
+
+# -----------------------------
+# Generic Exports Bucket
+# -----------------------------
+
+module "s3-export-bucket" {
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
+
+  bucket_prefix      = "${local.bucket_prefix}-export-"
+  versioning_enabled = true
+
+  # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
+  ownership_controls = "BucketOwnerEnforced"
+  acl                = "private"
+
+  # Refer to the below section "Replication" before enabling replication
+  replication_enabled = false
+  # Below variable and providers configuration is only relevant if 'replication_enabled' is set to true
+  # replication_region                       = "eu-west-2"
+  providers = {
+    # Here we use the default provider Region for replication. Destination buckets can be within the same Region as the
+    # source bucket. On the other hand, if you need to enable cross-region replication, please contact the Modernisation
+    # Platform team to add a new provider for the additional Region.
+    # Leave this provider block in even if you are not using replication
+    aws.bucket-replication = aws
+  }
+
+  lifecycle_rule = [
+    {
+      id      = "main"
+      enabled = "Enabled"
+      prefix  = ""
+
+      tags = {
+        rule      = "log"
+        autoclean = "true"
+      }
+
+      expiration = {
+        days = 7
+      }
+
+      noncurrent_version_expiration = {
+        days = 14
+      }
+    }
+  ]
+
+  tags = local.tags
+}
+

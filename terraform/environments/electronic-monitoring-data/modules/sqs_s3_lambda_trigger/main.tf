@@ -2,7 +2,7 @@ locals {
   bucket_function_elements = split(trimprefix(var.bucket.id, var.bucket_prefix), "-")
   bucket_function          = join("-", slice(local.bucket_function_elements, 0, length(local.bucket_function_elements) - 1))
   queue_base_name          = substr("${local.bucket_function}-${var.lambda_function_name}", 0, 76)
-  sid_name                 = replace(local.queue_base_name, "-" ,"")
+  sid_name                 = replace(local.queue_base_name, "-", "")
 }
 
 data "aws_caller_identity" "current" {}
@@ -11,7 +11,7 @@ data "aws_caller_identity" "current" {}
 resource "aws_sqs_queue" "s3_event_queue" {
   name                       = local.queue_base_name
   visibility_timeout_seconds = 6 * 15 * 60 # 6 x longer than longest possible lambda
-  redrive_policy             = jsonencode({
+  redrive_policy = jsonencode({
     deadLetterTargetArn = aws_sqs_queue.s3_event_dlq.arn
     maxReceiveCount     = 5
   })
@@ -23,8 +23,8 @@ data "aws_iam_policy_document" "allow_s3_to_write" {
     sid    = "${local.sid_name}Permissions"
     effect = "Allow"
     principals {
-        type        = "Service"
-        identifiers = ["s3.amazonaws.com"]
+      type        = "Service"
+      identifiers = ["s3.amazonaws.com"]
     }
     actions = [
       "SQS:SendMessage"
@@ -61,6 +61,6 @@ resource "aws_lambda_event_source_mapping" "sqs_trigger" {
 }
 
 resource "aws_sqs_queue" "s3_event_dlq" {
-  name                              = "${local.queue_base_name}-dlq"
+  name                    = "${local.queue_base_name}-dlq"
   sqs_managed_sse_enabled = true
 }

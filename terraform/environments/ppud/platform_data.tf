@@ -127,11 +127,13 @@ data "aws_route53_zone" "network-services" {
 
 # Route 53 Zones for Certificate Domain Validation
 
+/*
 data "aws_route53_zone" "ppud" {
   provider     = aws.core-network-services
   name         = "ppud.justice.gov.uk."
   private_zone = false
 }
+*/
 
 # Shared KMS keys (per business unit)
 data "aws_kms_key" "general_shared" {

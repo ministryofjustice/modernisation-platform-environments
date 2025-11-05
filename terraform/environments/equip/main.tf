@@ -58,6 +58,10 @@ locals {
           )
         }
       ]
+      metadata_options = {
+        http_endpoint = "enabled"
+        http_tokens   = "required"
+      }
       tags = merge(local.tags,
         { Name = "${local.name}-COR-A-DC01"
         Role = "Domain Controller" }
@@ -79,6 +83,10 @@ locals {
           )
         }
       ]
+      metadata_options = {
+        http_endpoint = "enabled"
+        http_tokens   = "required"
+      }
       tags = merge(local.tags,
         { Name = "${local.name}-COR-A-DC02"
         Role = "Domain Controller" }
@@ -111,6 +119,10 @@ locals {
           )
         }
       ]
+      metadata_options = {
+        http_endpoint = "enabled"
+        http_tokens   = "required"
+      }
       tags = merge(local.tags,
         { Name = "${local.name}-COR-A-CTX01"
         Role = "Citrix Infrastructure" }
@@ -131,6 +143,10 @@ locals {
           )
         }
       ]
+      metadata_options = {
+        http_endpoint = "enabled"
+        http_tokens   = "required"
+      }
       tags = merge(local.tags,
         { Name = "${local.name}-COR-A-CTX02"
         Role = "Citrix Session Host" }
@@ -151,6 +167,10 @@ locals {
           )
         }
       ]
+      metadata_options = {
+        http_endpoint = "enabled"
+        http_tokens   = "required"
+      }
       tags = merge(local.tags,
         { Name = "${local.name}-COR-A-CTX03"
         Role = "Citrix Session Host" }
@@ -183,6 +203,10 @@ locals {
           )
         }
       ]
+      metadata_options = {
+        http_endpoint = "enabled"
+        http_tokens   = "required"
+      }
       tags = merge(local.tags,
         { Name = "${local.name}-COR-A-PXY01"
         Role = "Proxy Services" }
@@ -203,6 +227,10 @@ locals {
           )
         }
       ]
+      metadata_options = {
+        http_endpoint = "enabled"
+        http_tokens   = "required"
+      }
       tags = merge(local.tags,
         { Name = "${local.name}-COR-A-TST01"
         Role = "Test Server" }
@@ -211,6 +239,7 @@ locals {
   }
 }
 
+#trivy:ignore:AVD-AWS-0028: "IMDSv2 enforced at the aws_instance level instead of LT"
 module "win2016_multiple" {
   #  source = "git::https://github.com/rvadisala/ec2-instance?ref=tags/v2.0"
   source = "./ec2-instance-module"
@@ -232,6 +261,7 @@ module "win2016_multiple" {
   enable_volume_tags = false
   root_block_device  = lookup(each.value, "root_block_device", [])
   ebs_block_device   = lookup(each.value, "ebs_block_device", [])
+  metadata_options   = lookup(each.value, "metadata_options", null)
 
   tags = merge(each.value.tags, local.tags,
     { Environment = "development"
@@ -356,6 +386,10 @@ locals {
           )
         }
       ]
+      metadata_options = {
+        http_endpoint = "enabled"
+        http_tokens   = "required"
+      }
       tags = merge(local.tags,
         { Name = "${local.name}-COR-A-SF02"
         Role = "Spotfire Database Server" }
@@ -364,6 +398,7 @@ locals {
   }
 }
 
+#trivy:ignore:AVD-AWS-0028: "IMDSv2 enforced at the aws_instance level instead of LT"
 module "win2019_SQL_multiple" {
   source = "./ec2-instance-module"
 
@@ -385,6 +420,7 @@ module "win2019_SQL_multiple" {
   enable_volume_tags = false
   root_block_device  = lookup(each.value, "root_block_device", [])
   ebs_block_device   = lookup(each.value, "ebs_block_device", [])
+  metadata_options   = lookup(each.value, "metadata_options", null)
 
   tags = merge(each.value.tags, local.tags, {
     Environment = "development"
@@ -393,6 +429,8 @@ module "win2019_SQL_multiple" {
   )
 
 }
+
+################################################################################
 
 data "aws_ami" "windows_2022_std_ami" {
   owners      = ["amazon"]
@@ -406,7 +444,6 @@ data "aws_ami" "windows_2022_std_ami" {
     values = ["hvm"]
   }
 }
-
 
 locals {
   win2022_STD_instances = {
@@ -447,6 +484,10 @@ locals {
           )
         }
       ]
+      metadata_options = {
+        http_endpoint = "enabled"
+        http_tokens   = "required"
+      }
       tags = merge(local.tags,
         { Name = "${local.name}-COR-A-EQP04"
         Role = "Nimbus Application Services" }
@@ -489,6 +530,10 @@ locals {
           )
         }
       ]
+      metadata_options = {
+        http_endpoint = "enabled"
+        http_tokens   = "required"
+      }
       tags = merge(local.tags,
         { Name = "${local.name}-COR-A-EQP05"
         Role = "Nimbus Application Services" }
@@ -497,7 +542,7 @@ locals {
   }
 }
 
-
+#trivy:ignore:AVD-AWS-0028: "IMDSv2 enforced at the aws_instance level instead of LT"
 module "win2022_STD_multiple" {
   source = "./ec2-instance-module"
 
@@ -518,6 +563,7 @@ module "win2022_STD_multiple" {
   enable_volume_tags = false
   root_block_device  = lookup(each.value, "root_block_device", [])
   ebs_block_device   = lookup(each.value, "ebs_block_device", [])
+  metadata_options   = lookup(each.value, "metadata_options", null)
 
   tags = merge(each.value.tags, local.tags, {
     Environment = "development"
@@ -526,6 +572,231 @@ module "win2022_STD_multiple" {
   )
 }
 
+locals {
+  win2022_STD_Datacenter_instances = {
+    COR-A-DC03 = {
+      instance_type          = "t3a.xlarge"
+      subnet_id              = data.aws_subnet.private_subnets_a.id
+      vpc_security_group_ids = [aws_security_group.aws_domain_security_group.id]
+      root_block_device = [
+        {
+          encrypted   = true
+          volume_type = "gp3"
+          volume_size = 100
+          kms_key_id  = aws_kms_key.this.arn
+          tags = merge(local.tags,
+            { Name = "${local.name}-COR-A-DC03-root-block"
+            Role = "Domain Controller" }
+          )
+        }
+      ]
+      metadata_options = {
+        http_endpoint = "enabled"
+        http_tokens   = "required"
+      }
+      tags = merge(local.tags,
+        { Name = "${local.name}-COR-A-DC03"
+        Role = "Domain Controller" }
+      )
+    }
+    COR-A-DC04 = {
+      instance_type          = "t3a.xlarge"
+      subnet_id              = data.aws_subnet.private_subnets_b.id
+      vpc_security_group_ids = [aws_security_group.aws_domain_security_group.id]
+      root_block_device = [
+        {
+          encrypted   = true
+          volume_type = "gp3"
+          volume_size = 100
+          kms_key_id  = aws_kms_key.this.arn
+          tags = merge(local.tags,
+            { Name = "${local.name}-COR-A-DC04-root-block"
+            Role = "Domain Controller" }
+          )
+        }
+      ]
+      metadata_options = {
+        http_endpoint = "enabled"
+        http_tokens   = "required"
+      }
+      tags = merge(local.tags,
+        { Name = "${local.name}-COR-A-DC04"
+        Role = "Domain Controller" }
+      )
+    }
+    COR-A-TST02 = {
+      instance_type          = "t3a.xlarge"
+      subnet_id              = data.aws_subnet.private_subnets_a.id
+      vpc_security_group_ids = [aws_security_group.aws_equip_security_group.id, aws_security_group.aws_citrix_security_group.id, aws_security_group.all_internal_groups.id]
+      root_block_device = [
+        {
+          encrypted   = true
+          volume_type = "gp3"
+          volume_size = 100
+          kms_key_id  = aws_kms_key.this.arn
+          tags = merge(local.tags,
+            { Name = "${local.name}-COR-A-TST02-root-block" }
+          )
+        }
+      ]
+      metadata_options = {
+        http_endpoint = "enabled"
+        http_tokens   = "required"
+      }
+      tags = merge(local.tags,
+        { Name = "${local.name}-COR-A-TST02"
+        Role = "Test Server" }
+      )
+    }
+    COR-A-CTX04 = {
+      instance_type          = "t3a.xlarge"
+      subnet_id              = data.aws_subnet.private_subnets_a.id
+      vpc_security_group_ids = [aws_security_group.aws_citrix_security_group.id, aws_security_group.all_internal_groups.id]
+      root_block_device = [
+        {
+          encrypted   = true
+          volume_type = "gp3"
+          volume_size = 100
+          kms_key_id  = aws_kms_key.this.arn
+          tags = merge(local.tags,
+            { Name = "${local.name}-COR-A-CTX04-root-block" }
+          )
+        }
+      ]
+      ebs_block_device = [
+        {
+          device_name = "/dev/sdf"
+          volume_type = "gp3"
+          volume_size = 100
+          encrypted   = true
+          kms_key_id  = aws_kms_key.this.arn
+          tags = merge(local.tags,
+            { Name = "${local.name}-COR-A-CTX04-ebs-block" }
+          )
+        }
+      ]
+      metadata_options = {
+        http_endpoint = "enabled"
+        http_tokens   = "required"
+      }
+      tags = merge(local.tags,
+        { Name = "${local.name}-COR-A-CTX04"
+        Role = "Citrix Infrastructure" }
+      )
+    }
+    COR-A-CTX05 = {
+      instance_type          = "t3a.xlarge"
+      subnet_id              = data.aws_subnet.private_subnets_a.id
+      vpc_security_group_ids = [aws_security_group.aws_citrix_security_group.id, aws_security_group.all_internal_groups.id]
+      root_block_device = [
+        {
+          encrypted   = true
+          volume_type = "gp3"
+          volume_size = 100
+          kms_key_id  = aws_kms_key.this.arn
+          tags = merge(local.tags,
+            { Name = "${local.name}-COR-A-CTX05-root-block" }
+          )
+        }
+      ]
+      tags = merge(local.tags,
+        { Name = "${local.name}-COR-A-CTX05"
+        Role = "Citrix Session Host" }
+      )
+    }
+    COR-A-CTX06 = {
+      instance_type          = "t3a.xlarge"
+      subnet_id              = data.aws_subnet.private_subnets_a.id
+      vpc_security_group_ids = [aws_security_group.aws_citrix_security_group.id, aws_security_group.all_internal_groups.id]
+      root_block_device = [
+        {
+          encrypted   = true
+          volume_type = "gp3"
+          volume_size = 100
+          kms_key_id  = aws_kms_key.this.arn
+          tags = merge(local.tags,
+            { Name = "${local.name}-COR-A-CTX06-root-block" }
+          )
+        }
+      ]
+      metadata_options = {
+        http_endpoint = "enabled"
+        http_tokens   = "required"
+      }
+      tags = merge(local.tags,
+        { Name = "${local.name}-COR-A-CTX06"
+        Role = "Citrix Session Host" }
+      )
+    }
+    COR-A-PXY02 = {
+      instance_type          = "t3a.xlarge"
+      subnet_id              = data.aws_subnet.private_subnets_a.id
+      vpc_security_group_ids = [aws_security_group.aws_proxy_security_group.id, aws_security_group.all_internal_groups.id]
+      root_block_device = [
+        {
+          encrypted   = true
+          volume_type = "gp3"
+          volume_size = 100
+          kms_key_id  = aws_kms_key.this.arn
+          tags = merge(local.tags,
+            { Name = "${local.name}-COR-A-PXY02-root-block" }
+          )
+        }
+      ]
+      ebs_block_device = [
+        {
+          device_name = "/dev/sdf"
+          volume_type = "gp3"
+          volume_size = 500
+          encrypted   = true
+          kms_key_id  = aws_kms_key.this.arn
+          tags = merge(local.tags,
+            { Name = "${local.name}-COR-A-PXY02-ebs-block" }
+          )
+        }
+      ]
+      metadata_options = {
+        http_endpoint = "enabled"
+        http_tokens   = "required"
+      }
+      tags = merge(local.tags,
+        { Name = "${local.name}-COR-A-PXY02"
+        Role = "Proxy Services" }
+      )
+    }
+  }
+}
+
+#trivy:ignore:AVD-AWS-0028: "IMDSv2 enforced at the aws_instance level instead of LT"
+module "win2022_STD_Datacenter" {
+  source = "./ec2-instance-module"
+
+  for_each = local.win2022_STD_Datacenter_instances
+
+  name                   = "${local.name}-${each.key}"
+  ami                    = data.aws_ami.windows_2022_std_ami.id
+  instance_type          = each.value.instance_type
+  vpc_security_group_ids = each.value.vpc_security_group_ids
+  subnet_id              = each.value.subnet_id
+  monitoring             = true
+  ebs_optimized          = true
+  key_name               = aws_key_pair.windowskey.key_name
+  user_data              = data.template_file.windows-userdata.rendered
+  iam_instance_profile   = aws_iam_instance_profile.instance-profile-moj.name
+
+  enable_volume_tags = false
+  root_block_device  = lookup(each.value, "root_block_device", [])
+  ebs_block_device   = lookup(each.value, "ebs_block_device", [])
+  metadata_options   = lookup(each.value, "metadata_options", null)
+
+  tags = merge(each.value.tags, local.tags, {
+    Environment = "development"
+    terraform_managed = "true" },
+    { instance-scheduling = local.application_data.accounts[local.environment].instance-scheduling }
+  )
+}
+
+################################################################################
 
 locals {
   win2022_STD_powerBI_instances = {
@@ -555,8 +826,12 @@ locals {
             { Name = "${local.name}-COR-A-GW01-ebs-block-1" }
           )
         }
-
       ]
+      metadata_options = {
+        http_endpoint = "enabled"
+        http_tokens   = "required"
+      }
+
       tags = merge(local.tags,
         { Name = "${local.name}-COR-A-GW01"
         Role = "Nimbus PowerBI Services" }
@@ -565,7 +840,7 @@ locals {
   }
 }
 
-
+#trivy:ignore:AVD-AWS-0028: "IMDSv2 enforced at the aws_instance level instead of LT"
 module "PowerBI_server" {
   source = "./ec2-instance-module"
 
@@ -586,6 +861,147 @@ module "PowerBI_server" {
   enable_volume_tags = false
   root_block_device  = lookup(each.value, "root_block_device", [])
   ebs_block_device   = lookup(each.value, "ebs_block_device", [])
+  metadata_options   = lookup(each.value, "metadata_options", null)
+
+  tags = merge(each.value.tags, local.tags, {
+    Environment = "development"
+    terraform_managed = "true" },
+    { instance-scheduling = local.application_data.accounts[local.environment].instance-scheduling }
+  )
+}
+
+################################################################################
+
+data "aws_ami" "windows_2022_std_SQL22_ami" {
+  owners      = ["amazon"]
+  most_recent = true
+  filter {
+    name   = "name"
+    values = ["Windows_Server-2022-English-Full-SQL_2022_Standard*"]
+  }
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+}
+
+locals {
+  win2022_SQL_instances = {
+    COR-A-SQL01 = {
+      instance_type          = "t3a.xlarge"
+      subnet_id              = data.aws_subnet.private_subnets_a.id
+      vpc_security_group_ids = [aws_security_group.aws_spotfire_security_group.id, aws_security_group.all_internal_groups.id]
+      root_block_device = [
+        {
+          encrypted   = true
+          volume_type = "gp3"
+          volume_size = 150
+          kms_key_id  = aws_kms_key.this.arn
+          tags = merge(local.tags,
+            { Name = "${local.name}-COR-A-SQL01-root-block" }
+          )
+        }
+      ]
+      ebs_block_device = [
+        {
+          device_name = "/dev/sdf"
+          volume_type = "gp3"
+          volume_size = 500
+          encrypted   = true
+          kms_key_id  = aws_kms_key.this.arn
+          tags = merge(local.tags,
+            { Name = "${local.name}-COR-A-SQL01-ebs-block" }
+          )
+        }
+      ]
+      metadata_options = {
+        http_endpoint = "enabled"
+        http_tokens   = "required"
+      }
+
+      tags = merge(local.tags,
+        { Name = "${local.name}-COR-A-SQL01"
+        Role = "Spotfire Database Server" }
+      )
+    }
+    COR-A-SOC02 = {
+      instance_type          = "t3a.xlarge"
+      availability_zone      = "${local.region}a"
+      subnet_id              = data.aws_subnet.private_subnets_a.id
+      vpc_security_group_ids = [aws_security_group.aws_proxy_security_group.id, aws_security_group.all_internal_groups.id, aws_security_group.aws_soc_security_group.id]
+      monitoring             = true
+      ebs_optimized          = true
+      user_data              = data.template_file.windows-userdata.rendered
+      iam_instance_profile   = aws_iam_instance_profile.instance-profile-moj.name
+      key_name               = aws_key_pair.windowskey.key_name
+      root_block_device = [
+        {
+          encrypted   = true
+          volume_type = "gp3"
+          volume_size = 100
+          kms_key_id  = aws_kms_key.this.arn
+          tags = merge(local.tags,
+            { Name = "NPS-COR-A-SOC02-root-block" }
+          )
+        }
+      ]
+      ebs_block_device = [
+        {
+          device_name = "/dev/sdf"
+          volume_type = "gp3"
+          volume_size = 100
+          encrypted   = true
+          kms_key_id  = aws_kms_key.this.arn
+          tags = merge(local.tags,
+            { Name = "NPS-COR-A-SOC02-ebs-block1" }
+          )
+        },
+        {
+          device_name = "/dev/sdg"
+          volume_type = "gp3"
+          volume_size = 300
+          encrypted   = true
+          kms_key_id  = aws_kms_key.this.arn
+          tags = merge(local.tags,
+            { Name = "NPS-COR-A-SOC02-ebs-block2" }
+          )
+        }
+      ]
+      metadata_options = {
+        http_endpoint = "enabled"
+        http_tokens   = "required"
+      }
+
+      tags = merge(local.tags,
+        { Name = "NPS-COR-A-SOC01"
+        ROLE = "Security Operation Center Gateway" },
+        { instance-scheduling = local.application_data.accounts[local.environment].instance-scheduling }
+      )
+    }
+  }
+}
+
+#trivy:ignore:AVD-AWS-0028: "IMDSv2 enforced at the aws_instance level instead of LT"
+module "win2022_SQL_multiple" {
+  source = "./ec2-instance-module"
+
+  for_each = local.win2022_SQL_instances
+
+  name                   = "${local.name}-${each.key}"
+  ami                    = data.aws_ami.windows_2022_std_SQL22_ami.id
+  instance_type          = each.value.instance_type
+  vpc_security_group_ids = each.value.vpc_security_group_ids
+  subnet_id              = each.value.subnet_id
+  monitoring             = true
+  ebs_optimized          = true
+  key_name               = aws_key_pair.windowskey.key_name
+  user_data              = data.template_file.windows-userdata.rendered
+  iam_instance_profile   = aws_iam_instance_profile.instance-profile-moj.name
+
+  enable_volume_tags = false
+  root_block_device  = lookup(each.value, "root_block_device", [])
+  ebs_block_device   = lookup(each.value, "ebs_block_device", [])
+  metadata_options   = lookup(each.value, "metadata_options", null)
 
   tags = merge(each.value.tags, local.tags, {
     Environment = "development"

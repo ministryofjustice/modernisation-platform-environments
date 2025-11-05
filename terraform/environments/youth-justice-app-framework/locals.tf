@@ -9,8 +9,9 @@ locals {
   test_mode = local.application_data.accounts[local.environment].test_mode
 }
 
-## Locals for the YJB Data Scientist Team access ##
+## Locals for the report admin and YJB Data Scientist Team access ##
 locals {
+  reports_admin_role_name      = "reporting-operations"
   yjb_data_scientist_role_name = "data-scientist"
 }
 

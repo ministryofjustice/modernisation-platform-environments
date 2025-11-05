@@ -91,7 +91,7 @@ module "virus_scan_definition_upload" {
   function_name = "definition-upload"
   is_image      = true
   ecr_repo_name = "analytical-platform-ingestion-scan"
-  function_tag  = "0.1.3"
+  function_tag  = "0.2.0"
   role_name     = aws_iam_role.virus_scan_definition_upload.name
   role_arn      = aws_iam_role.virus_scan_definition_upload.arn
   memory_size   = 2048
@@ -118,19 +118,20 @@ resource "aws_lambda_permission" "virus_scan_definition_upload_allow_eventbridge
 #-----------------------------------------------------------------------------------
 
 module "virus_scan_file" {
-  source                  = "./modules/lambdas"
-  function_name           = "scan"
-  is_image                = true
-  ecr_repo_name           = "analytical-platform-ingestion-scan"
-  function_tag            = "0.2.0-rc3"
-  role_name               = aws_iam_role.virus_scan_file.name
-  role_arn                = aws_iam_role.virus_scan_file.arn
-  ephemeral_storage_size  = 10240
-  memory_size             = 2048
-  timeout                 = 900
-  security_group_ids      = [aws_security_group.lambda_generic.id]
-  subnet_ids              = data.aws_subnets.shared-public.ids
-  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  source                         = "./modules/lambdas"
+  function_name                  = "scan"
+  is_image                       = true
+  ecr_repo_name                  = "analytical-platform-ingestion-scan"
+  function_tag                   = "v0.2.0-rc4"
+  role_name                      = aws_iam_role.virus_scan_file.name
+  role_arn                       = aws_iam_role.virus_scan_file.arn
+  ephemeral_storage_size         = 10240
+  memory_size                    = 2048
+  timeout                        = 900
+  security_group_ids             = [aws_security_group.lambda_generic.id]
+  subnet_ids                     = data.aws_subnets.shared-public.ids
+  reserved_concurrent_executions = 1000
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
   environment_variables = {
     MODE                         = "scan",
     CLAMAV_DEFINITON_BUCKET_NAME = module.s3-clamav-definitions-bucket.bucket.id
@@ -145,35 +146,37 @@ module "virus_scan_file" {
 #-----------------------------------------------------------------------------------
 
 module "format_json_fms_data" {
-  source                  = "./modules/lambdas"
-  function_name           = "format_json_fms_data"
-  is_image                = true
-  role_name               = aws_iam_role.format_json_fms_data.name
-  role_arn                = aws_iam_role.format_json_fms_data.arn
-  memory_size             = 1024
-  timeout                 = 900
-  security_group_ids      = [aws_security_group.lambda_generic.id]
-  subnet_ids              = data.aws_subnets.shared-public.ids
-  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
-  production_dev          = local.is-production ? "prod" : "dev"
+  source                         = "./modules/lambdas"
+  function_name                  = "format_json_fms_data"
+  is_image                       = true
+  role_name                      = aws_iam_role.format_json_fms_data.name
+  role_arn                       = aws_iam_role.format_json_fms_data.arn
+  memory_size                    = 1024
+  timeout                        = 900
+  security_group_ids             = [aws_security_group.lambda_generic.id]
+  subnet_ids                     = data.aws_subnets.shared-public.ids
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev                 = local.is-production ? "prod" : "dev"
+  reserved_concurrent_executions = 1000
   environment_variables = {
     DESTINATION_BUCKET = module.s3-raw-formatted-data-bucket.bucket.id
   }
 }
 
 module "copy_mdss_data" {
-  source                  = "./modules/lambdas"
-  function_name           = "copy_mdss_data"
-  image_name              = "copy_data"
-  is_image                = true
-  role_name               = aws_iam_role.copy_mdss_data.name
-  role_arn                = aws_iam_role.copy_mdss_data.arn
-  memory_size             = 1024
-  timeout                 = 900
-  security_group_ids      = [aws_security_group.lambda_generic.id]
-  subnet_ids              = data.aws_subnets.shared-public.ids
-  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
-  production_dev          = local.is-production ? "prod" : "dev"
+  source                         = "./modules/lambdas"
+  function_name                  = "copy_mdss_data"
+  image_name                     = "copy_data"
+  is_image                       = true
+  role_name                      = aws_iam_role.copy_mdss_data.name
+  role_arn                       = aws_iam_role.copy_mdss_data.arn
+  memory_size                    = 1024
+  timeout                        = 900
+  security_group_ids             = [aws_security_group.lambda_generic.id]
+  subnet_ids                     = data.aws_subnets.shared-public.ids
+  reserved_concurrent_executions = 1000
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev                 = local.is-production ? "prod" : "dev"
   environment_variables = {
     DESTINATION_BUCKET = module.s3-raw-formatted-data-bucket.bucket.id
   }
@@ -264,39 +267,22 @@ module "dms_validation" {
 #-----------------------------------------------------------------------------------
 
 module "process_fms_metadata" {
-  source                  = "./modules/lambdas"
-  is_image                = true
-  function_name           = "process_fms_metadata"
-  role_name               = aws_iam_role.process_fms_metadata.name
-  role_arn                = aws_iam_role.process_fms_metadata.arn
-  handler                 = "process_fms_metadata.handler"
-  memory_size             = 10240
-  timeout                 = 900
-  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
-  production_dev          = local.is-production ? "prod" : "dev"
-  security_group_ids = [aws_security_group.lambda_generic.id]
-  subnet_ids         = data.aws_subnets.shared-public.ids
-}
-
-#-----------------------------------------------------------------------------------
-# FMS Fan Out
-#-----------------------------------------------------------------------------------
-
-module "fms_fan_out" {
-  source                  = "./modules/lambdas"
-  is_image                = true
-  function_name           = "fms_fan_out"
-  role_name               = aws_iam_role.fms_fan_out.name
-  role_arn                = aws_iam_role.fms_fan_out.arn
-  handler                 = "fms_fan_out.handler"
-  memory_size             = 10240
-  timeout                 = 900
-  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
-  production_dev          = local.is-production ? "prod" : "dev"
-  security_group_ids = [aws_security_group.lambda_generic.id]
-  subnet_ids         = data.aws_subnets.shared-public.ids
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "process_fms_metadata"
+  role_name                      = aws_iam_role.process_fms_metadata.name
+  role_arn                       = aws_iam_role.process_fms_metadata.arn
+  handler                        = "process_fms_metadata.handler"
+  memory_size                    = 10240
+  timeout                        = 900
+  reserved_concurrent_executions = 1000
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev                 = local.is-production ? "prod" : "dev"
+  security_group_ids             = [aws_security_group.lambda_generic.id]
+  subnet_ids                     = data.aws_subnets.shared-public.ids
   environment_variables = {
-    PROCESS_METADATA_LAMBDA = module.process_fms_metadata.lambda_function_name
-    PROCESS_DATA_LAMBDA     = module.format_json_fms_data.lambda_function_name
+    SQS_QUEUE_URL                = aws_sqs_queue.format_fms_json_event_queue.id
+    POWERTOOLS_METRICS_NAMESPACE = "FMSLiveFeed"
+    POWERTOOLS_SERVICE_NAME      = "process-fms-metadata-lambda"
   }
 }

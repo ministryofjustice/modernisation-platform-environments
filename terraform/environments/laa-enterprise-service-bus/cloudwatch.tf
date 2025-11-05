@@ -20,7 +20,7 @@ resource "aws_cloudwatch_metric_alarm" "lambda_failures" {
   evaluation_periods  = 1
   threshold           = 0
   comparison_operator = "GreaterThanThreshold"
-  treat_missing_data  = "notBreaching"
+  treat_missing_data  = "ignore"
 
   dimensions = {
     service     = each.value.servicename
@@ -28,6 +28,7 @@ resource "aws_cloudwatch_metric_alarm" "lambda_failures" {
   }
 
   alarm_actions = [aws_sns_topic.hub2_alerts.arn]
+  ok_actions    = [aws_sns_topic.hub2_alerts.arn]
 
   tags = merge(
     local.tags,

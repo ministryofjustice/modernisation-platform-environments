@@ -5,7 +5,7 @@
 #------------------------------------------------------------------------------
 
 resource "aws_security_group" "this" {
-  name        = "${var.supplier}-${var.user_name}-inbound-ips"
+  name_prefix = "${var.supplier}-${var.user_name}-inbound-ips"
   description = "Allowed IP addresses for ${var.user_name} on ${var.supplier} server"
   vpc_id      = var.vpc_id
 

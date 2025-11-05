@@ -46,6 +46,8 @@
       "multiphase_cleanup_lambda_version": "vLatest",
       "scheduled_s3_file_transfer_retention_period_amount": 0,
       "scheduled_s3_file_transfer_retention_period_unit": "days",
+      "scheduled_file_transfer_use_default_parallelism": "false",
+      "scheduled_file_transfer_parallelism": 128,
       "enable_domain_builder_rds": true,
       "domain_builder_rds_parameter_group": "default.postgres14",
       "enable_domain_builder_agent": true,
@@ -84,7 +86,9 @@
         "dps-personal-rela",
         "dps-organisations",
         "dps-allocations",
-        "dps-applications"
+        "dps-applications",
+        "dps-manage-pom",
+        "dps-san"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -187,6 +191,10 @@
             {
               "glue_database": "curated_prisons_history_dev_dbt",
               "glue_tables": ["*"]
+            },
+            {
+              "glue_database": "staged_prisons_history_dev_dbt",
+              "glue_tables": ["*"]
             }
           ]
         }
@@ -272,6 +280,8 @@
       "multiphase_cleanup_lambda_version": "vLatest",
       "scheduled_s3_file_transfer_retention_period_amount": 0,
       "scheduled_s3_file_transfer_retention_period_unit": "days",
+      "scheduled_file_transfer_use_default_parallelism": "false",
+      "scheduled_file_transfer_parallelism": 128,
       "enable_domain_builder_rds": true,
       "domain_builder_rds_parameter_group": "default.postgres14",
       "enable_domain_builder_agent": true,
@@ -308,7 +318,9 @@
         "dps-personal-rela",
         "dps-organisations",
         "dps-allocations",
-        "dps-applications"
+        "dps-applications",
+        "dps-manage-pom",
+        "dps-san"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -477,6 +489,8 @@
       "multiphase_cleanup_lambda_version": "vLatest",
       "scheduled_s3_file_transfer_retention_period_amount": 0,
       "scheduled_s3_file_transfer_retention_period_unit": "days",
+      "scheduled_file_transfer_use_default_parallelism": "false",
+      "scheduled_file_transfer_parallelism": 128,
       "enable_domain_builder_rds": true,
       "domain_builder_rds_parameter_group": "default.postgres14",
       "enable_domain_builder_agent": true,
@@ -515,7 +529,9 @@
         "dps-personal-rela",
         "dps-organisations",
         "dps-allocations",
-        "dps-applications"
+        "dps-applications",
+        "dps-manage-pom",
+        "dps-san"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -612,6 +628,10 @@
           "data_locations": ["dpr-structured-historical-preproduction"],
           "resource_shares": [
             {
+              "glue_database": "staged_prisons_history_preprod_dbt",
+              "glue_tables": ["*"]
+            },
+            {
               "glue_database": "curated_prisons_history_preprod_dbt",
               "glue_tables": ["*"]
             }
@@ -699,6 +719,8 @@
       "multiphase_cleanup_lambda_version": "vLatest",
       "scheduled_s3_file_transfer_retention_period_amount": 0,
       "scheduled_s3_file_transfer_retention_period_unit": "days",
+      "scheduled_file_transfer_use_default_parallelism": "false",
+      "scheduled_file_transfer_parallelism": 128,
       "enable_domain_builder_rds": true,
       "domain_builder_rds_parameter_group": "default.postgres15",
       "enable_domain_builder_agent": true,
@@ -735,7 +757,9 @@
         "dps-personal-rela",
         "dps-organisations",
         "dps-allocations",
-        "dps-applications"
+        "dps-applications",
+        "dps-manage-pom",
+        "dps-san"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -832,7 +856,15 @@
           "data_locations": ["dpr-structured-historical-production"],
           "resource_shares": [
             {
+              "glue_database": "staged_prisons_history",
+              "glue_tables": ["*"]
+            },
+            {
               "glue_database": "curated_prisons_history",
+              "glue_tables": ["*"]
+            },
+            {
+              "glue_database": "prison_derived",
               "glue_tables": ["*"]
             }
           ]
