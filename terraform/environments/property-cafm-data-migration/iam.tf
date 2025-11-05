@@ -27,9 +27,8 @@ data "aws_iam_policy_document" "sftp_access" {
       "transfer:List*",
       "transfer:SendWorkflowStepState"
     ]
-    resources = ["${aws_s3_bucket.LOG.arn}/*"]
-    # TODO: Uncomment below and remove line above
-    #resources = ["${module.aws_s3_landing.bucket.arn}/*"]
+
+    resources = ["${module.aws_s3_landing.bucket.arn}/*"]
   }
 }
 

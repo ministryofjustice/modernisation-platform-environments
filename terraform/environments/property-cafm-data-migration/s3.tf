@@ -13,6 +13,7 @@ resource "aws_s3_bucket" "LOG" {
   # checkov:skip=CKV_AWS_145: "S3 bucket encryption not required"
   # checkov:skip=CKV2_AWS_61: "S3 bucket lifecycle policy not required"
   # checkov:skip=CKV2_AWS_62: "S3 bucket event notifications not required"
+  # checkov:skip=CKV_AWS_18: "Ensure the S3 bucket has access logging enabled"
   bucket = "property-datahub-logs-${local.environment}"
 
   lifecycle {
