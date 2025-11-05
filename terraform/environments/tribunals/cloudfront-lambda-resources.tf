@@ -96,7 +96,10 @@ resource "aws_lambda_function" "cloudfront_redirect_lambda" {
   provider         = aws.us-east-1
   function_name    = "CloudfrontRedirectLambda"
   filename         = local.is-production ? data.archive_file.lambda_zip.output_path : data.archive_file.lambda_zip_nonprod.output_path
-  source_code_hash = local.is-production ? data.archive_file.lambda_zip.output_base64sha256 : data.archive_file.lambda_zip_nonprod.output_base64sha256
+  source_code_hash = sha256(
+      "${local.is_production ? data.archive_file.lambda_zip.output_base64sha256 : data.archive_file.lambda_zip_nonprod.output_base64sha256}" +
+      null_resource.force_replication.triggers.cloudfront_arn
+    )
   role             = aws_iam_role.lambda_edge_role.arn
   handler          = "cloudfront-redirect.handler"
   runtime          = "nodejs18.x"
@@ -110,8 +113,18 @@ resource "aws_lambda_function" "cloudfront_redirect_lambda" {
   }
 
   lifecycle {
-      ignore_changes = [filename, source_code_hash]
-    }
+    create_before_destroy = true
+    replace_triggered_by = [null_resource.force_replication]
+  }
+
+}
+
+# This dummy file forces a new version when CloudFront ARN changes
+resource "null_resource" "force_replication" {
+  triggers = {
+    cloudfront_arn = aws_cloudfront_distribution.tribunals_http_redirect.arn
+    lambda_version = aws_lambda_function.cloudfront_redirect_lambda.version
+  }
 }
 
 # -------------------------------------------------
@@ -124,28 +137,4 @@ resource "aws_lambda_permission" "allow_http_cloudfront" {
   function_name = aws_lambda_function.cloudfront_redirect_lambda.function_name
   principal     = "edgelambda.amazonaws.com"
   source_arn    = aws_cloudfront_distribution.tribunals_http_redirect.arn
-}
-
-resource "null_resource" "force_lambda_republish" {
-  triggers = {
-    # Re-run when CloudFront ARN changes (new distribution)
-    cloudfront_arn = aws_cloudfront_distribution.tribunals_http_redirect.arn
-
-    # Re-run when code changes
-    code_hash = local.is-production ? data.archive_file.lambda_zip.output_base64sha256 : data.archive_file.lambda_zip_nonprod.output_base64sha256
-  }
-
-  provisioner "local-exec" {
-    command = <<EOT
-      echo "Forcing Lambda@Edge republish..."
-      aws lambda update-function-code \
-        --function-name CloudfrontRedirectLambda \
-        --zip-file fileb://${local.is-production ? data.archive_file.lambda_zip.output_path : data.archive_file.lambda_zip_nonprod.output_path} \
-        --publish \
-        --region us-east-1
-    EOT
-  }
-
-  # Ensure CloudFront exists first
-  depends_on = [aws_cloudfront_distribution.tribunals_http_redirect]
 }
