@@ -24,11 +24,11 @@ module "waf" {
 
   additional_managed_rules = [
      {
-       name            = "Custom-Managed-Rule-Group"
+       name            = "custom-managed-rule-group"
        vendor_name     = "AWS"
        arn             = aws_wafv2_rule_group.wam_waf_acl.arn
        override_action = "none"   # respect the group's action (BLOCK). Use "count" to dry-run.
-       priority        = 9        # unique; runs before managed rules at 10..15
+       priority        = 3        # unique; runs before managed rules at 10..15
      }
    ]
 
@@ -42,12 +42,12 @@ module "waf" {
   }
 
   managed_rule_priorities = {
-    AWSManagedRulesAnonymousIpList       = 40
-    AWSManagedRulesKnownBadInputsRuleSet = 50
-    AWSManagedRulesCommonRuleSet         = 60
-    AWSManagedRulesSQLiRuleSet           = 70
-    AWSManagedRulesLinuxRuleSet          = 80
-    AWSManagedRulesBotControlRuleSet     = 90
+    AWSManagedRulesAnonymousIpList       = 10
+    AWSManagedRulesKnownBadInputsRuleSet = 11
+    AWSManagedRulesCommonRuleSet         = 12
+    AWSManagedRulesSQLiRuleSet           = 13
+    AWSManagedRulesLinuxRuleSet          = 14
+    AWSManagedRulesBotControlRuleSet     = 15
   }
 
   core_logging_account_id = local.environment_management.account_ids["core-logging-production"]
@@ -67,7 +67,7 @@ resource "aws_wafv2_rule_group" "wam_waf_acl" {
 
   rule {
     name     = "allow-ncsc-ip-list"
-    priority = 10
+    priority = 1
     action {
       allow {}
     }
@@ -85,7 +85,7 @@ resource "aws_wafv2_rule_group" "wam_waf_acl" {
 
   rule {
     name     = "allow-circle-ci-ip-list"
-    priority = 20
+    priority = 2
     action {
       allow {}
     }
