@@ -85,4 +85,8 @@ def check_target_health(target_group_arn, service_name, cluster_name):
     if all(s == "healthy" for s in states):
         return {"status": "healthy"}
     else:
-        raise Exception("TargetsNotReady")
+        raise TargetsNotReady("Targets are not healthy yet.")
+
+
+class TargetsNotReady(Exception):
+    pass

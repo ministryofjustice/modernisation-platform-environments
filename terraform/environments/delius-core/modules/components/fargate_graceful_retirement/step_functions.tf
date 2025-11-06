@@ -113,6 +113,7 @@ resource "aws_sfn_state_machine" "ecs_restart_state_machine" {
                   "originalEvent.$" : "$.originalEvent"
                 }
               },
+              "ResultPath" : "$.openCircuitBreaker", # merge original input and pass it as is
               Next : "RestartECSService"
             },
             # Restart ECS service (for every entity)
@@ -127,6 +128,7 @@ resource "aws_sfn_state_machine" "ecs_restart_state_machine" {
                   "originalEvent.$" : "$.originalEvent"
                 }
               },
+              "ResultPath" : "$.restartECSService", # merge original input and pass it as is
               Next : "PostRestartChoice"
             },
             # After restart, check again: if LDAP then wait for targets + close circuit breaker
@@ -150,8 +152,7 @@ resource "aws_sfn_state_machine" "ecs_restart_state_machine" {
                 # Pass the original event and also inject action="check_health"
                 "Payload" : {
                   "action" : "check_health",
-                  "detail.$" : "$.detail",
-                  "waitTimestamp.$" : "$.waitTimestamp"
+                  "waitTimestamp.$" : "$.waitTimestamp",
                   "entityValue.$" : "$.entityValue",
                   "originalEvent.$" : "$.originalEvent"
                 }
@@ -164,6 +165,7 @@ resource "aws_sfn_state_machine" "ecs_restart_state_machine" {
                   MaxAttempts : 30
                 }
               ],
+              "ResultPath" : "$.waitForTargetsHealthy", # merge original input and pass it as is
               Next : "CloseCircuitBreaker"
             },
             # finally close circuit breaker
@@ -175,12 +177,12 @@ resource "aws_sfn_state_machine" "ecs_restart_state_machine" {
                 # Pass the original event and also inject action="close"
                 "Payload" : {
                   "action" : "close",
-                  "detail.$" : "$.detail",
-                  "waitTimestamp.$" : "$.waitTimestamp"
+                  "waitTimestamp.$" : "$.waitTimestamp",
                   "entityValue.$" : "$.entityValue",
                   "originalEvent.$" : "$.originalEvent"
                 }
               },
+              ResultPath : "$.closeCircuitBreaker"
               Next : "EndStep"
             },
             # Iteration ends here
