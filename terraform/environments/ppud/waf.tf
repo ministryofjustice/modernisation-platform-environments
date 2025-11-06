@@ -11,7 +11,7 @@ locals {
 }
 
 module "waf" {
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-aws-waf/feature/adding-custom-rules"
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-aws-waf?ref=a36649a59b16ace27f30ebda7b244f75783635c9"
   web_acl_name             = "WAM-Waf-ACL"
   enable_ddos_protection   = true
   ddos_rate_limit          = 150
