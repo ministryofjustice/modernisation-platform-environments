@@ -51,8 +51,10 @@ resource "aws_vpc_security_group_egress_rule" "lambda_egress" {
 resource "aws_lambda_function" "lambda_function" {
   depends_on       = [aws_lambda_layer_version.lambda_layer]
   function_name    = "${local.application_name}-${local.environment}-payment-load"
-  filename         = "lambda/functionV2.zip"
-  source_code_hash = filebase64sha256("./lambda/functionV2.zip")
+  # filename         = "lambda/functionV2.zip"
+  s3_bucket        = aws_s3_bucket.ccms_ebs_shared.bucket
+  s3_key           = "lambda_delivery/functional_latest/functionV2.zip"
+  source_code_hash = filebase64sha256("lambda_delivery/functional_latest/functionV2.zip")
   handler          = "lambda_function.lambda_handler"
   runtime          = "python3.10"
   role             = aws_iam_role.lambda_execution_role.arn
