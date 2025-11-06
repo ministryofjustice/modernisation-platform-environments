@@ -335,6 +335,9 @@ jobs:
           export AWS_SECRET_ACCESS_KEY=$(jq -r '.Credentials.SecretAccessKey' <<< "$CREDS_JSON")
           export AWS_SESSION_TOKEN=$(jq -r '.Credentials.SessionToken'    <<< "$CREDS_JSON")
 
+          echo "==== AWS STS Caller Identity (LIVE AMI PLAN) ===="
+          aws sts get-caller-identity
+
           app="${APPLICATION}"
           args="${AMI_ARGS}"
 
@@ -366,11 +369,23 @@ jobs:
           export AWS_SECRET_ACCESS_KEY=$(jq -r '.Credentials.SecretAccessKey' <<< "$CREDS_JSON")
           export AWS_SESSION_TOKEN=$(jq -r '.Credentials.SessionToken'    <<< "$CREDS_JSON")
 
+          echo "==== AWS STS Caller Identity (LIVE AMI DELETE) ===="
+          aws sts get-caller-identity
+
           app="${APPLICATION}"
           args="${AMI_ARGS}"
           echo "[LIVE] Collecting candidates and deregistering (if any)"
           echo "Effective AMI test flags: ${AMI_TEST_FLAGS:-<none>}"
-          scripts/ami_cleanup.sh -a "$app" -s ami_commands.sh ${AMI_TEST_FLAGS:-} $args delete || true
+
+          # Generate candidate deregistration commands (same flags as preview)
+          scripts/ami_cleanup.sh -a "$app" -s ami_commands.sh ${AMI_TEST_FLAGS:-} $args -d delete || true
+
+          # Execute generated commands if any
+          if [[ -s ami_commands.sh ]]; then
+            echo "Executing generated AMI deregistration commands..."
+            bash ami_commands.sh || true
+          fi
+
           TOTAL="$(grep -c '^aws ec2 deregister-image' ami_commands.sh || true)"
           echo "Total deregister-image commands generated (and executed): ${TOTAL}"
           if [[ -s ami_commands.sh ]]; then
@@ -392,6 +407,9 @@ jobs:
           export AWS_ACCESS_KEY_ID=$(jq -r '.Credentials.AccessKeyId'     <<< "$CREDS_JSON")
           export AWS_SECRET_ACCESS_KEY=$(jq -r '.Credentials.SecretAccessKey' <<< "$CREDS_JSON")
           export AWS_SESSION_TOKEN=$(jq -r '.Credentials.SessionToken'    <<< "$CREDS_JSON")
+
+          echo "==== AWS STS Caller Identity (LIVE SNAPSHOT CLEANUP) ===="
+          aws sts get-caller-identity
 
           aws_try() {
             # aws_try <command...>
@@ -517,6 +535,9 @@ jobs:
           export AWS_ACCESS_KEY_ID=$(jq -r '.Credentials.AccessKeyId'     <<< "$CREDS_JSON")
           export AWS_SECRET_ACCESS_KEY=$(jq -r '.Credentials.SecretAccessKey' <<< "$CREDS_JSON")
           export AWS_SESSION_TOKEN=$(jq -r '.Credentials.SessionToken'    <<< "$CREDS_JSON")
+
+          echo "==== AWS STS Caller Identity (LIVE EBS DELETE) ===="
+          aws sts get-caller-identity
 
           months="${EBS_MONTHS}"
           echo "[LIVE] Deleting unattached EBS volumes older than ${months} month(s)"
