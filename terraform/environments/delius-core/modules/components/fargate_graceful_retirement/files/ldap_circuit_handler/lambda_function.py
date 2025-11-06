@@ -78,15 +78,45 @@ def close_circuit_breaker(ssm_path, service, cluster_name):
 
 
 def check_target_health(target_group_arn, service_name, cluster_name):
+
     print(f"Checking Target health for {service_name} in {cluster_name}")
     targets = elbv2.describe_target_health(TargetGroupArn=target_group_arn)
-    states = [t["TargetHealth"]["State"] for t in targets["TargetHealthDescriptions"]]
-    print(f"Target states: {states}")
-    if all(s == "healthy" for s in states):
-        return {"status": "healthy"}
-    else:
-        raise TargetsNotReady("Targets are not healthy yet.")
+    if not targets:
+        raise Exception("TargetsNotReady")
+    
+    healthy_targets = []
+    draining_targets = []
+
+    for t in targets["TargetHealthDescriptions"]:
+        state = t["TargetHealth"]["State"]
+        if state == "healthy":
+            healthy_targets.append(t)
+        elif state == "draining":
+            draining_targets.append(t)
+        else:
+            # Any other state (initial, unhealthy) counts as not ready
+            raise TargetsNotReady(f"Target {t['Target']['Id']} is in state {state}")
+
+    if draining_targets:
+        # Some old targets are still being deregistered
+        raise TargetsStillDraining(f"{len(draining_targets)} target(s) still draining")
+
+    if not healthy_targets:
+        # No healthy targets yet
+        raise TargetsNotReady("No healthy targets available yet")
+
+    # All targets healthy and no draining targets remain
+    print(f"All targets healthy. Draining targets: {len(draining_targets)}")
+    return {
+        "status": "success",
+        "healthyTargets": [t["Target"]["Id"] for t in healthy_targets],
+        "drainingTargets": [t["Target"]["Id"] for t in draining_targets]
+    }
 
 
 class TargetsNotReady(Exception):
+    pass
+
+
+class TargetsStillDraining(Exception):
     pass

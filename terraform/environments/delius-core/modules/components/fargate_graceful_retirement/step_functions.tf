@@ -159,7 +159,7 @@ resource "aws_sfn_state_machine" "ecs_restart_state_machine" {
               },
               Retry : [
                 {
-                  ErrorEquals : ["TargetsNotReady"],
+                  ErrorEquals : ["TargetsNotReady", "TargetsStillDraining"],
                   IntervalSeconds : 20,
                   BackoffRate : 1.2,
                   MaxAttempts : 30
