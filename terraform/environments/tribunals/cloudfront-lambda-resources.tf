@@ -70,7 +70,7 @@ resource "aws_lambda_function" "cloudfront_redirect_lambda" {
     "${local.is-production ? data.archive_file.lambda_zip.output_base64sha256 : data.archive_file.lambda_zip_nonprod.output_base64sha256}${var.force_lambda_version}"
   )
   role             = aws_iam_role.lambda_edge_role.arn
-  handler          = "cloudfront-redirect.handler"
+  handler          = local.is-production ? "cloudfront-redirect.handler" : "cloudfront-redirect-test.handler"
   runtime          = "nodejs18.x"
   publish          = true
   timeout          = 5
