@@ -105,6 +105,7 @@ resource "aws_lambda_permission" "allow_http_cloudfront" {
 }
 
 
+/*
 resource "aws_lambda_permission" "allow_replicator" {
   provider      = aws.us-east-1
   statement_id  = "AllowReplication-${aws_lambda_function.cloudfront_redirect_lambda.version}"
@@ -113,3 +114,4 @@ resource "aws_lambda_permission" "allow_replicator" {
   principal     = "replicator.lambda.amazonaws.com"
   qualifier     = aws_lambda_function.cloudfront_redirect_lambda.version
 }
+ */
