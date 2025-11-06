@@ -48,7 +48,7 @@ resource "aws_iam_role_policy" "lambda_edge_policy" {
           "lambda:AddPermission",
           "lambda:InvokeFunction"
         ]
-        Resource = "arn:aws:lambda:us-east-1:${data.aws_caller_identity.current.account_id}:function:CloudfrontRedirectLambda:*"
+        Resource = "arn:aws:lambda:us-east-1:${data.aws_caller_identity.current.account_id}:function:CloudfrontRedirectLambda"
       },
       {
         Effect = "Allow"
