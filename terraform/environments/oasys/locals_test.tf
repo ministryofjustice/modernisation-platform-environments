@@ -59,7 +59,7 @@ locals {
             "Ec2T1WebPolicy",
           ])
         })
-        instance = merge(local.ec2_instances.web.instance, {
+        instance = merge(local.ec2_autoscaling_groups.web.instance, {
           instance_type = "t3.small"
         })
         tags = merge(local.ec2_autoscaling_groups.web.tags, {
@@ -83,7 +83,7 @@ locals {
             "Ec2T2WebPolicy",
           ])
         })
-        instance = merge(local.ec2_instances.web.instance, {
+        instance = merge(local.ec2_autoscaling_groups.web.instance, {
           instance_type = "t3.small"
         })
         tags = merge(local.ec2_autoscaling_groups.web.tags, {
@@ -112,7 +112,7 @@ locals {
             "Ec2T2WebPolicy",
           ])
         })
-        instance = merge(local.ec2_instances.web.instance, {
+        instance = merge(local.ec2_autoscaling_groups.web.instance, {
           instance_type = "t3.small"
         })
         user_data_cloud_init = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init, {
