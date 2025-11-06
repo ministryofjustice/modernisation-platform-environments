@@ -1,7 +1,9 @@
 resource "aws_lakeformation_data_lake_settings" "lake_formation" {
-  admins = [
-    "arn:aws:iam::931816152367:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-developer_4606117482437e94",
-    "arn:aws:iam::931816152367:role/MemberInfrastructureAccess"
+  #admins = [
+  #  "arn:aws:iam::931816152367:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-developer_4606117482437e94"
+  #]
+  read_only_admins = [
+    "arn:aws:iam::931816152367:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-developer_4606117482437e94"
   ]
 
   parameters = {
@@ -47,7 +49,19 @@ module "lakeformation_database" {
   validate_location     = false
 }
 
+
+resource "aws_lakeformation_permissions" "export_processor_planetfm_raw" {
+  principal   = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/planetfm-database-export-processor"
+  permissions = ["ALL"]
+
+  database {
+    name = "planetfm-raw"
+  }
+}
+
 resource "aws_lakeformation_lf_tag" "domain_tag" {
   key    = "domain"
   values = ["property"]
+
+  depends_on = [aws_lakeformation_data_lake_settings.lake_formation]
 }
