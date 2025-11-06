@@ -94,15 +94,21 @@ variable "force_lambda_version" {
 }
 
 
-# -------------------------------------------------
-# 5. Allow ONLY the HTTP distribution to invoke
-# -------------------------------------------------
 resource "aws_lambda_permission" "allow_http_cloudfront" {
   provider      = aws.us-east-1
-  statement_id  = "AllowHttpCloudFrontExecution-${var.force_lambda_version}"
+  statement_id  = "AllowHttpCloudFrontExecution-${aws_lambda_function.cloudfront_redirect_lambda.version}"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.cloudfront_redirect_lambda.function_name
   principal     = "edgelambda.amazonaws.com"
   source_arn    = aws_cloudfront_distribution.tribunals_http_redirect.arn
-  qualifier     = var.force_lambda_version
+  qualifier     = aws_lambda_function.cloudfront_redirect_lambda.version
+}
+
+resource "aws_lambda_permission" "allow_replicator" {
+  provider      = aws.us-east-1
+  statement_id  = "AllowReplication-${aws_lambda_function.cloudfront_redirect_lambda.version}"
+  action        = "lambda:GetFunction"
+  function_name = aws_lambda_function.cloudfront_redirect_lambda.function_name
+  principal     = "replicator.lambda.amazonaws.com"
+  qualifier     = aws_lambda_function.cloudfront_redirect_lambda.version
 }
