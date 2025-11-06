@@ -25,7 +25,7 @@ module "s3" {
 
   log_bucket = "${local.environment_name}-${local.log_bucket}"
 
-  bucket_name = ["install-files", "application-memory-heap-dump"]
+  bucket_name = ["install-files", "application-memory-heap-dump", "tableau-server-install-files"]
 
   archive_bucket_name = ["s3-bucket-access-logging", "redshift-yjb-reporting", "tf-webops-config-service", "tableau-alb-logs", "yjaf-ext-external-logs",
     "yjaf-int-internal-logs", "cloudfront-logs", "cloudtrail-logs", "guardduty-to-fallanx-archive", "tableau-backups",
