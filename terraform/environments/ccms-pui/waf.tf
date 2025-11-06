@@ -17,7 +17,11 @@ resource "aws_wafv2_ip_set" "pui_waf_ip_set" {
       jsondecode(data.aws_secretsmanager_secret_version.ip_secrets.secret_string)["ip_address_ko"],
       jsondecode(data.aws_secretsmanager_secret_version.ip_secrets.secret_string)["ip_address_kb"]
     ],
-    local.environment == "development" ? [data.aws_vpc.shared.cidr_block] : [],
+    local.environment == "development" ? [
+      data.aws_subnet.private_subnets_a.cidr_block,
+      data.aws_subnet.private_subnets_b.cidr_block,
+      data.aws_subnet.private_subnets_c.cidr_block
+    ] : [],
     local.environment == "production" ? ["172.31.192.0/18"] : [] # Secure Browser VPC
   )
 
