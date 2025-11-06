@@ -241,7 +241,7 @@ jobs:
           if-no-files-found: warn
 
       - name: EBS Preview (dry-run)
-        if: ${{ github.event_name == 'push' || github.event.inputs.cleanup_type == 'ebs' || github.event.inputs.cleanup_type == 'both' }}
+        if: ${{ github.event_name == 'push' || github.event.inputs.cleanup_type == 'ebs' || github.event.inputs.cleanup_type == 'both') }}
         id: ebs_preview
         run: |
           set -euo pipefail
@@ -325,26 +325,16 @@ jobs:
           role-session-name: "ami-delete-${{ matrix.account_name }}"
           aws-region: eu-west-2
 
-      - name: Configure AWS Credentials (MemberInfrastructureAccess)
-        uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502
-        with:
-          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/MemberInfrastructureAccess"
-          role-session-name: "live-ami-${{ matrix.account_name }}"
-          aws-region: eu-west-2
-
-      - name: Enable LIVE 10-minute test flags (when requested or on push)
-        run: |
-          if [[ "${{ github.event_name }}" == "push" || "${LIVE_TEST_MODE}" == "true" || "${{ contains(github.event.head_commit.message || '', '[CLEANUP TEST NOW]') }}" == "true" ]]; then
-            echo "AMI_TEST_FLAGS=--test-mode --age-minutes ${AGE_MINUTES}" >> $GITHUB_ENV
-            echo "Live will use minute-based window: ${AGE_MINUTES} minute(s)"
-          else
-            echo "Live using default month-based window."
-          fi
-
       # 1) PLAN (dry run) to get candidate AMIs and capture snapshot mapping BEFORE deletion
       - name: Plan AMI deletion & capture snapshot mapping
         run: |
           set -euo pipefail
+          # Assume MemberInfrastructureAccess in this same shell (org pattern)
+          CREDS_JSON=$(aws sts assume-role --role-arn "arn:aws:iam::${ACCOUNT_NUMBER}:role/MemberInfrastructureAccess" --role-session-name "live-ami-plan-${{ matrix.account_name }}" --output json)
+          export AWS_ACCESS_KEY_ID=$(jq -r '.Credentials.AccessKeyId'     <<< "$CREDS_JSON")
+          export AWS_SECRET_ACCESS_KEY=$(jq -r '.Credentials.SecretAccessKey' <<< "$CREDS_JSON")
+          export AWS_SESSION_TOKEN=$(jq -r '.Credentials.SessionToken'    <<< "$CREDS_JSON")
+
           app="${APPLICATION}"
           args="${AMI_ARGS}"
 
@@ -366,30 +356,23 @@ jobs:
           fi
           [[ -f ami_candidates.csv ]] || touch ami_candidates.csv
 
-      # 2) DELETE AMIs (generate, fix flag, then execute)
+      # 2) DELETE AMIs
       - name: Recompute & Delete AMIs (Live)
         run: |
           set -euo pipefail
+          # Assume MemberInfrastructureAccess in this same shell (org pattern)
+          CREDS_JSON=$(aws sts assume-role --role-arn "arn:aws:iam::${ACCOUNT_NUMBER}:role/MemberInfrastructureAccess" --role-session-name "live-ami-delete-${{ matrix.account_name }}" --output json)
+          export AWS_ACCESS_KEY_ID=$(jq -r '.Credentials.AccessKeyId'     <<< "$CREDS_JSON")
+          export AWS_SECRET_ACCESS_KEY=$(jq -r '.Credentials.SecretAccessKey' <<< "$CREDS_JSON")
+          export AWS_SESSION_TOKEN=$(jq -r '.Credentials.SessionToken'    <<< "$CREDS_JSON")
+
           app="${APPLICATION}"
           args="${AMI_ARGS}"
           echo "[LIVE] Collecting candidates and deregistering (if any)"
           echo "Effective AMI test flags: ${AMI_TEST_FLAGS:-<none>}"
-
-          # Generate commands only
-          scripts/ami_cleanup.sh -a "$app" -s ami_commands.sh ${AMI_TEST_FLAGS:-} $args -d delete || true
-
-          # Fix deprecated/incorrect flag emitted by generator
-          if [[ -f ami_commands.sh ]]; then
-            sed -i 's/--delete-snapshots/--delete-associated-snapshots/g' ami_commands.sh || true
-          fi
-
-          # Execute the commands
-          if [[ -s ami_commands.sh ]]; then
-            bash ami_commands.sh || true
-          fi
-
+          scripts/ami_cleanup.sh -a "$app" -s ami_commands.sh ${AMI_TEST_FLAGS:-} $args delete || true
           TOTAL="$(grep -c '^aws ec2 deregister-image' ami_commands.sh || true)"
-          echo "Total deregister-image commands generated (executed via script): ${TOTAL}"
+          echo "Total deregister-image commands generated (and executed): ${TOTAL}"
           if [[ -s ami_commands.sh ]]; then
             echo "First 20 deregistration commands:"
             grep '^aws ec2 deregister-image' ami_commands.sh | head -n 20 || true
@@ -404,6 +387,11 @@ jobs:
         if: always()
         run: |
           set -euo pipefail
+          # Assume MemberInfrastructureAccess in this same shell (org pattern)
+          CREDS_JSON=$(aws sts assume-role --role-arn "arn:aws:iam::${ACCOUNT_NUMBER}:role/MemberInfrastructureAccess" --role-session-name "live-ami-snaps-${{ matrix.account_name }}" --output json)
+          export AWS_ACCESS_KEY_ID=$(jq -r '.Credentials.AccessKeyId'     <<< "$CREDS_JSON")
+          export AWS_SECRET_ACCESS_KEY=$(jq -r '.Credentials.SecretAccessKey' <<< "$CREDS_JSON")
+          export AWS_SESSION_TOKEN=$(jq -r '.Credentials.SessionToken'    <<< "$CREDS_JSON")
 
           aws_try() {
             # aws_try <command...>
@@ -521,25 +509,15 @@ jobs:
           role-session-name: "ebs-delete-${{ matrix.account_name }}"
           aws-region: eu-west-2
 
-      - name: Configure AWS Credentials (MemberInfrastructureAccess)
-        uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502
-        with:
-          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/MemberInfrastructureAccess"
-          role-session-name: "live-ebs-${{ matrix.account_name }}"
-          aws-region: eu-west-2
-
-      - name: Enable LIVE 10-minute test flags (when requested or on push)
-        run: |
-          if [[ "${{ github.event_name }}" == "push" || "${LIVE_TEST_MODE}" == "true" || "${{ contains(github.event.head_commit.message || '', '[CLEANUP TEST NOW]') }}" == "true" ]]; then
-            echo "EBS_TEST_FLAGS=--test-mode --age-minutes ${AGE_MINUTES}" >> $GITHUB_ENV
-            echo "Live will use minute-based window: ${AGE_MINUTES} minute(s)"
-          else
-            echo "Live using default month-based window."
-          fi
-
       - name: Delete EBS Volumes (Live)
         run: |
           set -euo pipefail
+          # Assume MemberInfrastructureAccess in this same shell (org pattern)
+          CREDS_JSON=$(aws sts assume-role --role-arn "arn:aws:iam::${ACCOUNT_NUMBER}:role/MemberInfrastructureAccess" --role-session-name "live-ebs-${{ matrix.account_name }}" --output json)
+          export AWS_ACCESS_KEY_ID=$(jq -r '.Credentials.AccessKeyId'     <<< "$CREDS_JSON")
+          export AWS_SECRET_ACCESS_KEY=$(jq -r '.Credentials.SecretAccessKey' <<< "$CREDS_JSON")
+          export AWS_SESSION_TOKEN=$(jq -r '.Credentials.SessionToken'    <<< "$CREDS_JSON")
+
           months="${EBS_MONTHS}"
           echo "[LIVE] Deleting unattached EBS volumes older than ${months} month(s)"
           echo "Effective EBS test flags: ${EBS_TEST_FLAGS:-<none>}"
