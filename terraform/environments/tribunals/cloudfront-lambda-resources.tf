@@ -55,8 +55,8 @@ data "archive_file" "lambda_zip" {
 
 data "archive_file" "lambda_zip_nonprod" {
   type        = "zip"
-  source_file = "lambda/cloudfront-redirect-test.js"
-  output_path = "lambda/cloudfront-redirect-test.zip"
+  source_file = "lambda/cloudfront-redirect-nonprod.js"
+  output_path = "lambda/cloudfront-redirect-nonprod.zip"
 }
 
 # -------------------------------------------------
@@ -70,7 +70,7 @@ resource "aws_lambda_function" "cloudfront_redirect_lambda" {
     "${local.is-production ? data.archive_file.lambda_zip.output_base64sha256 : data.archive_file.lambda_zip_nonprod.output_base64sha256}${var.force_lambda_version}"
   )
   role             = aws_iam_role.lambda_edge_role.arn
-  handler          = local.is-production ? "cloudfront-redirect.handler" : "cloudfront-redirect-test.handler"
+  handler          = local.is-production ? "cloudfront-redirect.handler" : "cloudfront-redirect-nonprod.handler"
   runtime          = "nodejs18.x"
   publish          = true
   timeout          = 5
@@ -90,7 +90,7 @@ resource "aws_lambda_function" "cloudfront_redirect_lambda" {
 variable "force_lambda_version" {
   description = "Increment to force new Lambda@Edge version"
   type        = string
-  default     = "6"
+  default     = "8"
 }
 
 
