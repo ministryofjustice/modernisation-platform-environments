@@ -70,15 +70,18 @@ resource "aws_security_group_rule" "patch_cwa_extract_egress_https_s3" {
   description       = "Outbound 443 to LAA VPC Endpoint SG"
 }
 
-# Lambda Functions for CWA Extract Step Function
+
+########################################################
+### Lambda Functions for CWA Extract Step Function ###
+########################################################
 resource "aws_lambda_function" "patch_cwa_extract_lambda" {
   count            = local.environment == "test" ? 1 : 0
   description      = "Connect to CWA DB and invoke cwa extract procedure."
   function_name    = "patch_cwa_extract_lambda"
   role             = aws_iam_role.patch_cwa_extract_lambda_role[0].arn
   handler          = "lambda_function.lambda_handler"
-  filename         = "lambda/cwa_extract_lambda/cwa_extract_package.zip"
-  source_code_hash = filebase64sha256("lambda/cwa_extract_lambda/cwa_extract_package.zip")
+  filename         = "lambda/cwa_extract_lambda/patch_cwa_extract_package.zip"
+  source_code_hash = filebase64sha256("lambda/cwa_extract_lambda/patch_cwa_extract_package.zip")
   timeout          = 900
   memory_size      = 128
   runtime          = "python3.10"
@@ -111,14 +114,17 @@ resource "aws_lambda_function" "patch_cwa_extract_lambda" {
   )
 }
 
+########################################################
+### Lambda Functions for Patch CWA File Transfer ###
+########################################################
 resource "aws_lambda_function" "patch_cwa_file_transfer_lambda" {
   count            = local.environment == "test" ? 1 : 0
   description      = "Connect to CWA DB, retrieve multiple json files of each extract and merge into single JSON file, uploads them to S3"
   function_name    = "patch_cwa_file_transfer_lambda"
   role             = aws_iam_role.patch_cwa_extract_lambda_role[0].arn
   handler          = "lambda_function.lambda_handler"
-  filename         = "lambda/cwa_file_transfer_lambda/cwa_file_transfer_package.zip"
-  source_code_hash = filebase64sha256("lambda/cwa_file_transfer_lambda/cwa_file_transfer_package.zip")
+  filename         = "lambda/cwa_file_transfer_lambda/patch_cwa_file_transfer_package.zip"
+  source_code_hash = filebase64sha256("lambda/cwa_file_transfer_lambda/patch_cwa_file_transfer_package.zip")
   timeout          = 900
   memory_size      = 128
   runtime          = "python3.10"
