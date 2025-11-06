@@ -22,13 +22,15 @@ module "waf" {
     aws.modernisation-platform = aws.modernisation-platform
   }
 
-  #additional_managed_rules = [
-  #   {
-  #     arn             = aws_wafv2_rule_group.wam_waf_acl.arn
-  #     override_action = "none"   # respect the group's action (BLOCK). Use "count" to dry-run.
-  #     priority        = 9        # unique; runs before managed rules at 10..15
-  #   }
-  # ]
+  additional_managed_rules = [
+     {
+       name            = "Custom-Managed-Rule-Group"
+       vendor_name     = "AWS"
+       arn             = aws_wafv2_rule_group.wam_waf_acl.arn
+       override_action = "none"   # respect the group's action (BLOCK). Use "count" to dry-run.
+       priority        = 9        # unique; runs before managed rules at 10..15
+     }
+   ]
 
   managed_rule_actions = {
     AWSManagedRulesKnownBadInputsRuleSet = false
