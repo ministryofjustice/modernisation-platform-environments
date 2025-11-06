@@ -288,7 +288,7 @@ jobs:
     environment: ${{ matrix.account_name }}
     strategy:
       matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
-    max-parallel: 1
+      max-parallel: 1
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
