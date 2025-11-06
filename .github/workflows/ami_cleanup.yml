@@ -230,7 +230,7 @@ jobs:
           echo "ami_count=${TOTAL}" >> "$GITHUB_OUTPUT"
 
       - name: Upload AMI Preview Artifacts
-        if: ${{ (github.event_name == 'push' || github.event.inputs.cleanup_type == 'ami' || github.event.inputs.cleanup_type == 'both') && always() }}
+        if: ${{ always() && (github.event_name == 'push' || github.event.inputs.cleanup_type == 'ami' || github.event.inputs.cleanup_type == 'both') }}
         uses: actions/upload-artifact@v4
         with:
           name: ami-preview-${{ matrix.account_name }}
@@ -241,7 +241,7 @@ jobs:
           if-no-files-found: warn
 
       - name: EBS Preview (dry-run)
-        if: ${{ github.event_name == 'push' || github.event.inputs.cleanup_type == 'ebs' || github.event.inputs.cleanup_type == 'both') }}
+        if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && (github.event.inputs.cleanup_type == 'ebs' || github.event.inputs.cleanup_type == 'both')) }}
         id: ebs_preview
         run: |
           set -euo pipefail
@@ -263,7 +263,7 @@ jobs:
           [[ -f ebs_candidates.txt ]] || touch ebs_candidates.txt
 
       - name: Upload EBS Preview Artifacts
-        if: ${{ (github.event_name == 'push' || github.event.inputs.cleanup_type == 'ebs' || github.event.inputs.cleanup_type == 'both') && always() }}
+        if: ${{ always() && (github.event_name == 'push' || github.event.inputs.cleanup_type == 'ebs' || github.event.inputs.cleanup_type == 'both') }}
         uses: actions/upload-artifact@v4
         with:
           name: ebs-preview-${{ matrix.account_name }}
