@@ -11,7 +11,8 @@ locals {
 }
 
 module "waf" {
-  source                   = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-aws-waf?ref=b9cf6f92b142e80845ae30252aee2f84f57a71a9"
+  source = "https://github.com/ministryofjustice/modernisation-platform-terraform-aws-waf/pull/14/files#diff-dc46acf24afd63ef8c556b77c126ccc6e578bc87e3aa09a931f33d9bf2532fbb"
+  web_acl_name             = "WAM-Waf-ACL"
   enable_ddos_protection   = true
   ddos_rate_limit          = 150
   block_non_uk_traffic     = true
