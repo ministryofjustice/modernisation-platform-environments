@@ -29,7 +29,6 @@ locals {
   s3_kms_arn             = aws_kms_key.s3.arn
   operational_db_kms_arn = aws_kms_key.operational_db.arn
   operational_db_kms_id  = aws_kms_key.operational_db.key_id
-  kinesis_kms_id         = data.aws_kms_key.kinesis_kms_key.key_id
   create_bucket          = local.application_data.accounts[local.environment].setup_buckets
   account_id             = data.aws_caller_identity.current.account_id
   account_region         = data.aws_region.current.name

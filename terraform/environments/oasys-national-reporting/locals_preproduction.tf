@@ -204,6 +204,11 @@ locals {
             }
           ))
         })
+        instance = merge(local.ec2_instances.windows_bip.instance, {
+          tags = merge(local.ec2_instances.windows_bip.tags, {
+            patch-manager = "weds1500"
+          })
+        })
         tags = merge(local.ec2_instances.windows_bip.tags, {
           oasys-national-reporting-environment = "pp"
           domain-name                          = "azure.hmpp.root"
