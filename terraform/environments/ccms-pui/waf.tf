@@ -7,16 +7,11 @@ resource "aws_wafv2_ip_set" "pui_waf_ip_set" {
   description        = "List of trusted IP Addresses allowing access via WAF"
 
   addresses = [
-    local.application_data.accounts[local.environment].lz_aws_workspace_public_nat_gateway_a,
-    local.application_data.accounts[local.environment].lz_aws_workspace_public_nat_gateway_b,
-    local.application_data.accounts[local.environment].lz_aws_workspace_public_nat_gateway_c,
-    "35.176.254.38/32",  # Temp AWS PROD Workspace
-    "35.177.173.197/32", # Temp AWS PROD Workspace
-    "52.56.212.11/32",   # Temp AWS PROD Workspace
-    "35.179.83.235/32",  # Secure Browser
-    "13.43.42.69/32",     # Secure Browser
-    jsondecode(data.aws_secretsmanager_secret_version.ip_secrets.secret_string)["ip_address_ko"],
-    jsondecode(data.aws_secretsmanager_secret_version.ip_secrets.secret_string)["ip_address_kb"]
+    local.application_data.accounts[local.environment].aws_workspace,
+    data.aws_subnet.private_subnets_a.cidr_block,
+    data.aws_subnet.private_subnets_b.cidr_block,
+    data.aws_subnet.private_subnets_c.cidr_block,
+    local.application_data.accounts[local.environment].sb_vpc
   ]
 
   tags = merge(

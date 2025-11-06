@@ -25,12 +25,12 @@ data "aws_secretsmanager_secret_version" "oia_secrets" {
   secret_id = aws_secretsmanager_secret.oia_secrets.id
 }
 
-# IP Secrets
-resource "aws_secretsmanager_secret" "ip_secrets" {
-  name        = "${local.application_name}-ip-secrets"
-  description = "IP Address List Secrets"
-}
+# # IP Secrets
+# resource "aws_secretsmanager_secret" "ip_secrets" {
+#   name        = "${local.application_name}-ip-secrets"
+#   description = "IP Address List Secrets"
+# }
 
-data "aws_secretsmanager_secret_version" "ip_secrets" {
-  secret_id = aws_secretsmanager_secret.ip_secrets.id
-}
+# data "aws_secretsmanager_secret_version" "ip_secrets" {
+#   secret_id = aws_secretsmanager_secret.ip_secrets.id
+# }

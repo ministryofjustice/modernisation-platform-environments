@@ -5,9 +5,9 @@
 resource "aws_lb" "opahub" {
   name               = "${local.opa_app_name}-lb"
   load_balancer_type = "application"
-  internal           = false
+  internal           = true
 
-  subnets = data.aws_subnets.shared-public.ids
+  subnets = data.aws_subnets.shared-private.ids
 
   security_groups = [aws_security_group.opahub_load_balancer.id]
   access_logs {
