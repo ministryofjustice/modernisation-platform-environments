@@ -16,9 +16,6 @@ module "analytical_platform_compute_cluster_data_secret" {
   tags = local.tags
 }
 
-
-}
-
 module "analytical_platform_airflow_github_app_secret" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
