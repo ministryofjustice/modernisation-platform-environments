@@ -12,7 +12,7 @@ resource "aws_wafv2_ip_set" "pui_waf_ip_set" {
       data.aws_subnet.private_subnets_a.cidr_block,
       data.aws_subnet.private_subnets_b.cidr_block,
       data.aws_subnet.private_subnets_c.cidr_block,
-      local.environment == "production" ? ["172.31.192.0/18"] : [] # Secure Browser VPC
+      local.application_data.accounts[local.environment].sb_vpc
   ], )
 
   tags = merge(
