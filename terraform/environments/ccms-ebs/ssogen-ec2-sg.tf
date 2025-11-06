@@ -262,7 +262,7 @@ resource "aws_security_group_rule" "eg_icmp_vpc_workspaces" {
 }
 
 #########################################
-SSOGEN Security Group Notes
+# SSOGEN Security Group Notes
 #########################################
 resource "aws_security_group_rule" "ing_4443_from_alb" {
   count             = local.is_development ? 1 : 0
