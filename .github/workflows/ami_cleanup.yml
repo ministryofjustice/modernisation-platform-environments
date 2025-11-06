@@ -377,8 +377,8 @@ jobs:
           echo "[LIVE] Collecting candidates and deregistering (if any)"
           echo "Effective AMI test flags: ${AMI_TEST_FLAGS:-<none>}"
 
-          # Generate candidate deregistration commands (same flags as preview)
-          scripts/ami_cleanup.sh -a "$app" -s ami_commands.sh ${AMI_TEST_FLAGS:-} $args -d delete || true
+          # Generate candidate deregistration commands (LIVE: no -d)
+          scripts/ami_cleanup.sh -a "$app" -s ami_commands.sh ${AMI_TEST_FLAGS:-} $args delete || true
 
           # Execute generated commands if any
           if [[ -s ami_commands.sh ]]; then
