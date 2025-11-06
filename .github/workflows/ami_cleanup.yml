@@ -288,7 +288,7 @@ jobs:
     environment: ${{ matrix.account_name }}
     strategy:
       matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
-      max-parallel: 1
+    max-parallel: 1
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -324,6 +324,15 @@ jobs:
           role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
           role-session-name: "ami-delete-${{ matrix.account_name }}"
           aws-region: eu-west-2
+
+      - name: Enable LIVE 10-minute test flags (when requested or on push)
+        run: |
+          if [[ "${{ github.event_name }}" == "push" || "${LIVE_TEST_MODE}" == "true" || "${{ contains(github.event.head_commit.message || '', '[CLEANUP TEST NOW]') }}" == "true" ]]; then
+            echo "AMI_TEST_FLAGS=--test-mode --age-minutes ${AGE_MINUTES}" >> $GITHUB_ENV
+            echo "Live will use minute-based window: ${AGE_MINUTES} minute(s)"
+          else
+            echo "Live using default month-based window."
+          fi
 
       # 1) PLAN (dry run) to get candidate AMIs and capture snapshot mapping BEFORE deletion
       - name: Plan AMI deletion & capture snapshot mapping
@@ -377,7 +386,7 @@ jobs:
           echo "[LIVE] Collecting candidates and deregistering (if any)"
           echo "Effective AMI test flags: ${AMI_TEST_FLAGS:-<none>}"
 
-          # Generate candidate deregistration commands (LIVE: no -d)
+          # Generate candidate deregistration commands (LIVE: may include test flags)
           scripts/ami_cleanup.sh -a "$app" -s ami_commands.sh ${AMI_TEST_FLAGS:-} $args delete || true
 
           # Execute generated commands if any
@@ -526,6 +535,15 @@ jobs:
           role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
           role-session-name: "ebs-delete-${{ matrix.account_name }}"
           aws-region: eu-west-2
+
+      - name: Enable LIVE 10-minute test flags (when requested or on push)
+        run: |
+          if [[ "${{ github.event_name }}" == "push" || "${LIVE_TEST_MODE}" == "true" || "${{ contains(github.event.head_commit.message || '', '[CLEANUP TEST NOW]') }}" == "true" ]]; then
+            echo "EBS_TEST_FLAGS=--test-mode --age-minutes ${AGE_MINUTES}" >> $GITHUB_ENV
+            echo "Live will use minute-based window: ${AGE_MINUTES} minute(s)"
+          else
+            echo "Live using default month-based window."
+          fi
 
       - name: Delete EBS Volumes (Live)
         run: |
