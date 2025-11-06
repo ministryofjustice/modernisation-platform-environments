@@ -1,6 +1,6 @@
 resource "null_resource" "execute_create_table_queries" {
   triggers = {
-    query_ids = join(",",["${aws_athena_named_query.main_table_pui.id}", "${aws_athena_named_query.http_requests_pui.id}"
+    query_ids = join(",", ["${aws_athena_named_query.main_table_pui.id}", "${aws_athena_named_query.http_requests_pui.id}"
     ])
   }
 

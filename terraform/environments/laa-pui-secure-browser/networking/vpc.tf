@@ -9,8 +9,8 @@ module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "5.21.0"
 
-  name            = local.vpc_name
-  azs             = ["eu-west-2a", "eu-west-2b"]
+  name            = "${local.vpc_name}-${local.environment}-secure-browser"
+  azs             = local.wssb_supported_az_names
   cidr            = local.environment_configuration.vpc_cidr
   public_subnets  = local.environment_configuration.vpc_public_subnets
   intra_subnets   = local.environment_configuration.vpc_intra_subnets
@@ -32,4 +32,11 @@ module "vpc" {
   flow_log_log_format                             = "$${version} $${account-id} $${interface-id} $${srcaddr} $${dstaddr} $${srcport} $${dstport} $${protocol} $${packets} $${bytes} $${start} $${end} $${action} $${log-status} $${vpc-id} $${subnet-id} $${instance-id} $${tcp-flags} $${type} $${pkt-srcaddr} $${pkt-dstaddr} $${region} $${az-id} $${sublocation-type} $${sublocation-id} $${pkt-src-aws-service} $${pkt-dst-aws-service} $${flow-direction} $${traffic-path}"
 
   tags = local.tags
+}
+
+resource "aws_route" "laa_production_via_transit_gateway" {
+  for_each               = local.dedicated_private_rtb_ids
+  destination_cidr_block = "10.27.64.0/21"
+  route_table_id         = each.key
+  transit_gateway_id     = data.aws_ec2_transit_gateway.modernisation_platform[0].id
 }

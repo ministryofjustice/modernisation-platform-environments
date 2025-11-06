@@ -29,7 +29,6 @@ locals {
   s3_kms_arn             = aws_kms_key.s3.arn
   operational_db_kms_arn = aws_kms_key.operational_db.arn
   operational_db_kms_id  = aws_kms_key.operational_db.key_id
-  kinesis_kms_id         = data.aws_kms_key.kinesis_kms_key.key_id
   create_bucket          = local.application_data.accounts[local.environment].setup_buckets
   account_id             = data.aws_caller_identity.current.account_id
   account_region         = data.aws_region.current.name
@@ -309,6 +308,8 @@ locals {
   # s3 transfer
   scheduled_s3_file_transfer_retention_period_amount = local.application_data.accounts[local.environment].scheduled_s3_file_transfer_retention_period_amount
   scheduled_s3_file_transfer_retention_period_unit   = local.application_data.accounts[local.environment].scheduled_s3_file_transfer_retention_period_unit
+  scheduled_file_transfer_use_default_parallelism    = local.application_data.accounts[local.environment].scheduled_file_transfer_use_default_parallelism
+  scheduled_file_transfer_parallelism                = local.application_data.accounts[local.environment].scheduled_file_transfer_parallelism
 
   # step function notification lambda
   step_function_notification_lambda_handler = "uk.gov.justice.digital.lambda.StepFunctionDMSNotificationLambda::handleRequest"
@@ -536,8 +537,8 @@ locals {
   all_tags = merge(
     local.tags,
     {
-      dpr-name          = local.application_name
-      dpr-jira          = "DPR-108"
+      dpr-name       = local.application_name
+      dpr-jira       = "DPR-108"
       dpr-is-backend = true
     }
   )

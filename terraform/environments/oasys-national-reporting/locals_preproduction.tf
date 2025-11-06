@@ -97,6 +97,9 @@ locals {
         instance = merge(local.ec2_instances.bods.instance, {
           instance_type           = "r6i.2xlarge"
           disable_api_termination = true
+          tags = merge(local.ec2_instances.bods.instance.tags, {
+            patch-manager = "weds1500"
+          })
         })
         tags = merge(local.ec2_instances.bods.tags, {
           oasys-national-reporting-environment = "pp"
@@ -127,6 +130,9 @@ locals {
         instance = merge(local.ec2_instances.bods.instance, {
           instance_type           = "r6i.2xlarge"
           disable_api_termination = false # swap to true once configured
+          tags = merge(local.ec2_instances.bods.instance.tags, {
+            patch-manager = "thurs1500"
+          })
         })
         tags = merge(local.ec2_instances.bods.tags, {
           oasys-national-reporting-environment = "pp"
@@ -197,6 +203,11 @@ locals {
               branch = "main"
             }
           ))
+        })
+        instance = merge(local.ec2_instances.windows_bip.instance, {
+          tags = merge(local.ec2_instances.windows_bip.tags, {
+            patch-manager = "weds1500"
+          })
         })
         tags = merge(local.ec2_instances.windows_bip.tags, {
           oasys-national-reporting-environment = "pp"
@@ -312,7 +323,9 @@ locals {
 
     patch_manager = {
       patch_schedules = {
-        manual = "cron(00 21 31 2 ? *)" # 9pm 31 feb e.g. impossible date to allow for manual patching of otherwise enrolled instances
+        weds1500  = "cron(00 15 ? * WED *)" # 3pm wed 
+        thurs1500 = "cron(00 15 ? * THU *)" # 3pm thu
+        # manual    = "cron(00 21 31 2 ? *)"  # 9pm 31 feb e.g. impossible date to allow for manual patching of otherwise enrolled instances
       }
       maintenance_window_duration = 2 # 4 for prod
       maintenance_window_cutoff   = 1 # 2 for prod
