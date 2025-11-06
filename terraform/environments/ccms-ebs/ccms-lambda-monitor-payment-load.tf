@@ -53,7 +53,9 @@ resource "aws_sns_topic_subscription" "payment_load_notofications_email" {
 }
 
 resource "aws_lambda_function" "lambda_payment_load_monitor" {
-  filename         = "./lambda/payment_load_monitor.zip"
+  # filename         = "./lambda/payment_load_monitor.zip"
+  s3_bucket        = local.application_data.accounts[local.environment].lambda_s3_bucket
+  s3_key           = "lambda_delivery/payment_load_monitor/payment_load_monitor.zip"
   source_code_hash = filebase64sha256("./lambda/payment_load_monitor.zip")
   function_name    = "${local.application_name}-${local.environment}-payment-load-monitor"
   role             = aws_iam_role.lambda_payment_load_monitor_role.arn

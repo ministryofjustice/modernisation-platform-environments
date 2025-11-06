@@ -1,16 +1,16 @@
 # Upload the Layer to S3
 
-resource "aws_s3_object" "lambda_layer_s3" {
-  bucket = aws_s3_bucket.lambda_payment_load.bucket
-  key    = "lambda/layerV2.zip"
-  source = "lambda/layerV2.zip"
-}
+# resource "aws_s3_object" "lambda_layer_s3" {
+#   bucket = aws_s3_bucket.lambda_payment_load.bucket
+#   key    = "lambda/layerV2.zip"
+#   source = "lambda/layerV2.zip"
+# }
 
 # Lambda Layer
 resource "aws_lambda_layer_version" "lambda_layer" {
   layer_name               = "${local.application_name}-${local.environment}-payment-load-layer"
   s3_bucket                = aws_s3_bucket.lambda_payment_load.bucket
-  s3_key                   = aws_s3_object.lambda_layer_s3.key
+  s3_key                   = "lamda_delivery/layer_latest/layerV2.zip"
   compatible_runtimes      = ["python3.10"]
   compatible_architectures = ["x86_64"]
   description              = "Lambda Layer for ${local.application_name} Payment Load"
