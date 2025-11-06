@@ -325,14 +325,12 @@ jobs:
           role-session-name: "ami-delete-${{ matrix.account_name }}"
           aws-region: eu-west-2
 
-      - name: Assume downstream infra role (MemberInfrastructureAccess)
-        run: |
-          set -euo pipefail
-          CREDS_JSON=$(aws sts assume-role --role-arn "arn:aws:iam::${ACCOUNT_NUMBER}:role/MemberInfrastructureAccess" --role-session-name "live-ami-${{ matrix.account_name }}" --output json)
-          export AWS_ACCESS_KEY_ID=$(jq -r '.Credentials.AccessKeyId'     <<< "$CREDS_JSON")
-          export AWS_SECRET_ACCESS_KEY=$(jq -r '.Credentials.SecretAccessKey' <<< "$CREDS_JSON")
-          export AWS_SESSION_TOKEN=$(jq -r '.Credentials.SessionToken'    <<< "$CREDS_JSON")
-          echo "Assumed downstream role: MemberInfrastructureAccess"
+      - name: Configure AWS Credentials (MemberInfrastructureAccess)
+        uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502
+        with:
+          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/MemberInfrastructureAccess"
+          role-session-name: "live-ami-${{ matrix.account_name }}"
+          aws-region: eu-west-2
 
       - name: Enable LIVE 10-minute test flags (when requested or on push)
         run: |
@@ -368,7 +366,7 @@ jobs:
           fi
           [[ -f ami_candidates.csv ]] || touch ami_candidates.csv
 
-      # 2) DELETE AMIs
+      # 2) DELETE AMIs (generate, fix flag, then execute)
       - name: Recompute & Delete AMIs (Live)
         run: |
           set -euo pipefail
@@ -376,9 +374,22 @@ jobs:
           args="${AMI_ARGS}"
           echo "[LIVE] Collecting candidates and deregistering (if any)"
           echo "Effective AMI test flags: ${AMI_TEST_FLAGS:-<none>}"
-          scripts/ami_cleanup.sh -a "$app" -s ami_commands.sh ${AMI_TEST_FLAGS:-} $args delete || true
+
+          # Generate commands only
+          scripts/ami_cleanup.sh -a "$app" -s ami_commands.sh ${AMI_TEST_FLAGS:-} $args -d delete || true
+
+          # Fix deprecated/incorrect flag emitted by generator
+          if [[ -f ami_commands.sh ]]; then
+            sed -i 's/--delete-snapshots/--delete-associated-snapshots/g' ami_commands.sh || true
+          fi
+
+          # Execute the commands
+          if [[ -s ami_commands.sh ]]; then
+            bash ami_commands.sh || true
+          fi
+
           TOTAL="$(grep -c '^aws ec2 deregister-image' ami_commands.sh || true)"
-          echo "Total deregister-image commands generated (and executed): ${TOTAL}"
+          echo "Total deregister-image commands generated (executed via script): ${TOTAL}"
           if [[ -s ami_commands.sh ]]; then
             echo "First 20 deregistration commands:"
             grep '^aws ec2 deregister-image' ami_commands.sh | head -n 20 || true
@@ -420,6 +431,7 @@ jobs:
           deleted=0
           while IFS=',' read -r AMI_ID SNAP_ID; do
             [[ -z "$SNAP_ID" ]] && continue
+            [[ "$SNAP_ID" =~ ^snap- ]] || continue
 
             # Fetch minimal details to decide retention
             read -r TAGS DESC NAME <<< "$(aws ec2 describe-snapshots \
@@ -509,14 +521,12 @@ jobs:
           role-session-name: "ebs-delete-${{ matrix.account_name }}"
           aws-region: eu-west-2
 
-      - name: Assume downstream infra role (MemberInfrastructureAccess)
-        run: |
-          set -euo pipefail
-          CREDS_JSON=$(aws sts assume-role --role-arn "arn:aws:iam::${ACCOUNT_NUMBER}:role/MemberInfrastructureAccess" --role-session-name "live-ebs-${{ matrix.account_name }}" --output json)
-          export AWS_ACCESS_KEY_ID=$(jq -r '.Credentials.AccessKeyId'     <<< "$CREDS_JSON")
-          export AWS_SECRET_ACCESS_KEY=$(jq -r '.Credentials.SecretAccessKey' <<< "$CREDS_JSON")
-          export AWS_SESSION_TOKEN=$(jq -r '.Credentials.SessionToken'    <<< "$CREDS_JSON")
-          echo "Assumed downstream role: MemberInfrastructureAccess"
+      - name: Configure AWS Credentials (MemberInfrastructureAccess)
+        uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502
+        with:
+          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/MemberInfrastructureAccess"
+          role-session-name: "live-ebs-${{ matrix.account_name }}"
+          aws-region: eu-west-2
 
       - name: Enable LIVE 10-minute test flags (when requested or on push)
         run: |
