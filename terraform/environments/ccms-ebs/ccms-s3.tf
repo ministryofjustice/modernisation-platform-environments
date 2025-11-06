@@ -71,29 +71,29 @@ module "s3-bucket" { #tfsec:ignore:aws-s3-enable-versioning
   )
 }
 
-resource "aws_s3_bucket_notification" "artefact_bucket_notification" {
-  bucket = module.s3-bucket.bucket.id
-  eventbridge = true
-  topic {
-    topic_arn     = aws_sns_topic.s3_topic.arn
-    events        = ["s3:ObjectCreated:*"]
-    filter_suffix = ".log"
-  }
-}
+# resource "aws_s3_bucket_notification" "artefact_bucket_notification" {
+#   bucket = module.s3-bucket.bucket.id
+#   eventbridge = true
+#   topic {
+#     topic_arn     = aws_sns_topic.s3_topic.arn
+#     events        = ["s3:ObjectCreated:*"]
+#     filter_suffix = ".log"
+#   }
+# }
 
-data "aws_iam_policy_document" "artefacts_s3_policy" {
-  statement {
-    principals {
-      type = "AWS"
-      identifiers = [
-        "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/developer",
-        "arn:aws:iam::${local.environment_management.account_ids["core-shared-services-production"]}:root"
-      ]
-    }
-    actions   = ["s3:GetObject"]
-    resources = ["arn:aws:s3:::${local.artefact_bucket_name}/*"]
-  }
-}
+# data "aws_iam_policy_document" "artefacts_s3_policy" {
+#   statement {
+#     principals {
+#       type = "AWS"
+#       identifiers = [
+#         "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/developer",
+#         "arn:aws:iam::${local.environment_management.account_ids["core-shared-services-production"]}:root"
+#       ]
+#     }
+#     actions   = ["s3:GetObject"]
+#     resources = ["arn:aws:s3:::${local.artefact_bucket_name}/*"]
+#   }
+# }
 
 # S3 Bucket - Logging
 module "s3-bucket-logging" {
