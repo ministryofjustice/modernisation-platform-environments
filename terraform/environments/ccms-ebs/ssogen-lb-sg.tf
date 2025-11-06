@@ -22,21 +22,11 @@ resource "aws_security_group_rule" "ingress_ssogen_internal_4443_workspaces" {
   type              = "ingress"
   description       = "Allow HTTPS (4443) from AWS Workspaces CIDR"
   protocol          = "tcp"
-  from_port         = 4443
-  to_port           = 4443
+  from_port         = 443
+  to_port           = 443
   cidr_blocks       = [local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_prod]
 }
 
-# Allow HTTPS (4443) from Mojo devices
-resource "aws_security_group_rule" "ingress_ssogen_internal_4443_mojo_devices" {
-  security_group_id = aws_security_group.sg_ssogen_internal_alb.id
-  type              = "ingress"
-  description       = "Allow HTTPS (4443) from Mojo device CIDRs"
-  protocol          = "tcp"
-  from_port         = 4443
-  to_port           = 4443
-  cidr_blocks       = [local.application_data.accounts[local.environment].mojo_devices]
-}
 
 #########################################
 # EGRESS RULES
