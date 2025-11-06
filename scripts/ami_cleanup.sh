@@ -6,7 +6,7 @@ set -euo pipefail
 # Finds unused AMIs you own, applies age gates (months or minute test-mode),
 # optionally excludes AMIs referenced in code (-c), writes:
 #   - ami_candidates.csv
-#   - ami_commands.sh (deregister commands with --delete-snapshots)
+#   - ami_commands.sh (deregister commands with --delete-associated-snapshots)
 #   - ami_snapshots.csv (ami_id,snapshot_id) for fallback deletes
 # If -d (dry-run) is set, commands are written but not executed.
 
@@ -37,7 +37,7 @@ Options:
 
 Notes:
 - Writes ami_candidates.csv and ami_snapshots.csv next to commands file.
-- Deregistration commands include --delete-snapshots.
+- Deregistration commands include --delete-associated-snapshots.
 EOF
 }
 
@@ -111,8 +111,6 @@ declare -A referenced_ids
 declare -A referenced_names
 
 if [[ "${EXCLUDE_CODE_REFS}" -eq 1 ]]; then
-  # Best-effort scan of terraform files for AMI IDs and names
-  # If APP_NAME is set, prefer paths that include the app name; otherwise scan repo.
   search_paths=(".")
   if [[ -n "${APP_NAME}" ]]; then
     if [[ -d "terraform/environments/${APP_NAME}" ]]; then
@@ -121,12 +119,10 @@ if [[ "${EXCLUDE_CODE_REFS}" -eq 1 ]]; then
   fi
 
   while IFS= read -r -d '' tf; do
-    # match ami = "ami-xxxxxxxxxxxxx"
     while read -r id; do
       [[ -n "$id" ]] && referenced_ids["$id"]=1
     done < <(grep -Eo 'ami\s*=\s*"(ami-[0-9a-f]+)"' "$tf" | sed -E 's/.*"(ami-[0-9a-f]+)".*/\1/' | sort -u)
 
-    # match ami_name = "some-name" (our convention from tests)
     while read -r nm; do
       [[ -n "$nm" ]] && referenced_names["$nm"]=1
     done < <(grep -Eo 'ami_name\s*=\s*"([^"]+)"' "$tf" | sed -E 's/.*"([^"]+)".*/\1/' | sort -u)
@@ -141,7 +137,6 @@ if [[ "${TEST_MODE}" -eq 1 ]]; then
   use_minutes_gate=1
   min_age_seconds=$(( AGE_MINUTES * 60 ))
 else
-  # months -> days ~30 * seconds
   min_age_seconds=$(( MONTHS * 30 * 24 * 3600 ))
 fi
 
@@ -179,31 +174,25 @@ for idx in $(seq 0 $((image_count-1))); do
   public="$(jq -r ".Images[${idx}].Public" <<< "${images_json}")"
   owner="$(jq -r ".Images[${idx}].OwnerId" <<< "${images_json}")"
 
-  # Age gate
   created_epoch="$(iso_to_epoch "${creation}")"
   age_sec=$(( now_epoch - created_epoch ))
   if [[ "${age_sec}" -lt "${min_age_seconds}" ]]; then
-    # too new
     continue
   fi
 
-  # Exclude referenced (by ID or by Name) if -c used
   if [[ "${EXCLUDE_CODE_REFS}" -eq 1 ]]; then
     if [[ -n "${referenced_ids[${ami_id}]:-}" || -n "${referenced_names[${name}]:-}" ]]; then
       continue
     fi
   fi
 
-  # Exclude if any instance currently uses it
   if is_ami_in_use "${ami_id}"; then
     continue
   fi
 
-  # Record row
   echo "${ami_id},${owner},${creation},${public},${name}" >> "${OUT_CSV}"
   candidates+=("${ami_id}")
 
-  # Map AMI -> snapshots (block device mappings)
   snaps="$(jq -r ".Images[${idx}].BlockDeviceMappings[]?.Ebs?.SnapshotId // empty" <<< "${images_json}" | sort -u || true)"
   if [[ -n "${snaps}" ]]; then
     while read -r s; do
@@ -214,7 +203,7 @@ for idx in $(seq 0 $((image_count-1))); do
 done
 
 # ------------------------
-# Generate deregister commands (with --delete-snapshots)
+# Generate deregister commands (with --delete-associated-snapshots)
 # ------------------------
 if [[ "${#candidates[@]}" -eq 0 ]]; then
   if [[ "${DRY_RUN}" -eq 1 ]]; then
@@ -226,12 +215,11 @@ if [[ "${#candidates[@]}" -eq 0 ]]; then
 fi
 
 for ami in "${candidates[@]}"; do
-  echo "aws ec2 deregister-image --image-id ${ami} --region ${REGION} --delete-snapshots" >> "${OUT_CMDS}"
+  echo "aws ec2 deregister-image --image-id ${ami} --region ${REGION} --delete-associated-snapshots" >> "${OUT_CMDS}"
 done
 
 if [[ "${DRY_RUN}" -eq 1 ]]; then
   echo "[DRY RUN] Commands written to ${OUT_CMDS}"
-  # Show a preview of top candidates
   echo "Top AMI candidates (ImageId,OwnerId,CreationDate,Public,Name):"
   head -n 20 "${OUT_CSV}" | tail -n +2 || true
   exit 0
@@ -252,7 +240,6 @@ done < "${OUT_CMDS}"
 
 echo "Total deregister-image commands generated (and executed): ${deleted}"
 
-# Print a preview of the commands for logs
 if [[ -s "${OUT_CMDS}" ]]; then
   echo "First 20 deregistration commands:"
   grep '^aws ec2 deregister-image' "${OUT_CMDS}" | head -n 20 || true
