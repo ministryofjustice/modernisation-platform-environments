@@ -163,6 +163,7 @@ resource "aws_lambda_function" "ldap_circuit_handler" {
   runtime       = "python3.12"
   handler       = "lambda_function.lambda_handler"
   role          = aws_iam_role.lambda_execution_role.arn
+  timeout       = 600
 
   environment {
     variables = merge(
