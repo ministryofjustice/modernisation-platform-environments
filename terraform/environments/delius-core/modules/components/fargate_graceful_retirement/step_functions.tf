@@ -121,7 +121,11 @@ resource "aws_sfn_state_machine" "ecs_restart_state_machine" {
               Resource : "arn:aws:states:::lambda:invoke",
               Parameters : {
                 "FunctionName" : aws_lambda_function.ecs_restart_handler.arn,
-                "Payload.$" : "$"
+                "Payload" : {
+                  "entityValue.$" : "$.entityValue",
+                  "waitTimestamp.$" : "$.waitTimestamp",
+                  "originalEvent.$" : "$.originalEvent"
+                }
               },
               Next : "PostRestartChoice"
             },
@@ -131,7 +135,7 @@ resource "aws_sfn_state_machine" "ecs_restart_state_machine" {
               Type : "Choice",
               Choices : [
                 {
-                  Variable : "$.detail.affectedEntities[0].entityValue",
+                  Variable : "$.entityValue",
                   StringMatches : "*-ldap",
                   Next : "WaitForTargetsHealthy"
                 }
@@ -148,6 +152,8 @@ resource "aws_sfn_state_machine" "ecs_restart_state_machine" {
                   "action" : "check_health",
                   "detail.$" : "$.detail",
                   "waitTimestamp.$" : "$.waitTimestamp"
+                  "entityValue.$" : "$.entityValue",
+                  "originalEvent.$" : "$.originalEvent"
                 }
               },
               Retry : [
@@ -171,6 +177,8 @@ resource "aws_sfn_state_machine" "ecs_restart_state_machine" {
                   "action" : "close",
                   "detail.$" : "$.detail",
                   "waitTimestamp.$" : "$.waitTimestamp"
+                  "entityValue.$" : "$.entityValue",
+                  "originalEvent.$" : "$.originalEvent"
                 }
               },
               Next : "EndStep"
