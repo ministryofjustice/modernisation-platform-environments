@@ -61,6 +61,9 @@ locals {
             "Ec2PreprodWebPolicy",
           ])
         })
+        instance = merge(local.ec2_instances.bip.instance, {
+          instance_type = "t3.small"
+        })
         tags = merge(local.ec2_autoscaling_groups.web.tags, {
           oracle-db-hostname = "db.pp.oasys.hmpps-preproduction.modernisation-platform.internal"
           oracle-db-sid      = "PPOASYS" # "OASPROD"

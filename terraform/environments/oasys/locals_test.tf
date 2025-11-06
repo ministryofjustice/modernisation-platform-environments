@@ -59,6 +59,9 @@ locals {
             "Ec2T1WebPolicy",
           ])
         })
+        instance = merge(local.ec2_instances.web.instance, {
+          instance_type = "t3.small"
+        })
         tags = merge(local.ec2_autoscaling_groups.web.tags, {
           description        = "t1 oasys web"
           oasys-environment  = "t1"
@@ -79,6 +82,9 @@ locals {
           instance_profile_policies = concat(local.ec2_autoscaling_groups.web.config.instance_profile_policies, [
             "Ec2T2WebPolicy",
           ])
+        })
+        instance = merge(local.ec2_instances.web.instance, {
+          instance_type = "t3.small"
         })
         tags = merge(local.ec2_autoscaling_groups.web.tags, {
           description        = "t2 oasys web"
@@ -106,6 +112,9 @@ locals {
             "Ec2T2WebPolicy",
           ])
         })
+        instance = merge(local.ec2_instances.web.instance, {
+          instance_type = "t3.small"
+        })
         user_data_cloud_init = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init, {
           args = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init.args, {
             branch = "main"
@@ -130,6 +139,7 @@ locals {
         })
         instance = merge(local.ec2_instances.bip.instance, {
           ami = "ami-0d206b8546ea2b68a" # to prevent instances being re-created due to recreated AMI
+          instance_type = "t3.medium"
         })
         user_data_cloud_init = merge(local.ec2_instances.bip.user_data_cloud_init, {
           args = merge(local.ec2_instances.bip.user_data_cloud_init.args, {
@@ -163,7 +173,7 @@ locals {
         }
         instance = merge(local.ec2_instances.db19c.instance, {
           disable_api_termination = true
-          instance_type           = "r6i.xlarge"
+          instance_type           = "r6i.large"
         })
         tags = merge(local.ec2_instances.db19c.tags, {
           bip-db-name         = "T1BIPINF"
@@ -183,6 +193,7 @@ locals {
         })
         instance = merge(local.ec2_instances.bip.instance, {
           ami = "ami-0d206b8546ea2b68a" # to prevent instances being re-created due to recreated AMI
+          instance_type           = "t3.medium"
         })
         user_data_cloud_init = merge(local.ec2_instances.bip.user_data_cloud_init, {
           args = merge(local.ec2_instances.bip.user_data_cloud_init.args, {
@@ -216,7 +227,7 @@ locals {
         }
         instance = merge(local.ec2_instances.db19c.instance, {
           disable_api_termination = true
-          instance_type           = "r6i.xlarge"
+          instance_type           = "r6i.large"
         })
         tags = merge(local.ec2_instances.db19c.tags, {
           bip-db-name         = "T2BIPINF"
@@ -243,7 +254,7 @@ locals {
         }
         instance = merge(local.ec2_instances.db11g.instance, {
           disable_api_termination = true
-          instance_type           = "r6i.xlarge"
+          instance_type           = "t3.medium"
         })
         tags = merge(local.ec2_instances.db11g.tags, {
           instance-scheduling = "skip-scheduling"
