@@ -48,7 +48,7 @@ resource "aws_iam_role_policy" "lambda_edge_policy" {
           "lambda:AddPermission",
           "lambda:InvokeFunction"
         ]
-        Resource = "arn:aws:lambda:us-east-1:${data.aws_caller_identity.current.account_id}:function:CloudfrontRedirectLambda"
+        Resource = "arn:aws:lambda:us-east-1:${data.aws_caller_identity.current.account_id}:function:CloudfrontRedirectLambda:*"
       },
       {
         Effect = "Allow"
@@ -134,4 +134,5 @@ resource "aws_lambda_permission" "allow_http_cloudfront" {
   function_name = aws_lambda_function.cloudfront_redirect_lambda.function_name
   principal     = "edgelambda.amazonaws.com"
   source_arn    = aws_cloudfront_distribution.tribunals_http_redirect.arn
+  qualifier     = aws_lambda_function.cloudfront_redirect_lambda.version
 }
