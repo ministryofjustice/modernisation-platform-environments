@@ -46,7 +46,7 @@ resource "aws_lb_target_group" "ssogen_internal_tg" {
 
 resource "aws_lb_listener" "ssogen_internal_listener" {
   load_balancer_arn = aws_lb.ssogen_alb.arn
-  port              = "4443"
+  port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
   certificate_arn   = aws_acm_certificate.external.arn
