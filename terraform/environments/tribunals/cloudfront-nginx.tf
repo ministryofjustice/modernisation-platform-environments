@@ -90,11 +90,11 @@ resource "aws_cloudfront_distribution" "tribunals_http_redirect" {
     max_ttl     = 0
 
     # Reuse existing Lambda@Edge
-    lambda_function_association {
-      event_type   = "viewer-request"
-      lambda_arn   = aws_lambda_function.cloudfront_redirect_lambda.qualified_arn
-      include_body = false
-    }
+    #lambda_function_association {
+     #event_type   = "viewer-request"
+      #lambda_arn   = aws_lambda_function.cloudfront_redirect_lambda.qualified_arn
+      #include_body = false
+    #}
   }
 
   enabled             = true
