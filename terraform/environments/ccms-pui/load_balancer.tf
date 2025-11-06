@@ -2,8 +2,9 @@
 
 resource "aws_lb" "pui" {
   name               = "${local.application_name}-lb"
+  internal           = true
   load_balancer_type = "application"
-  subnets            = data.aws_subnets.shared-public.ids
+  subnets            = data.aws_subnets.shared-private.ids
 
   security_groups = [aws_security_group.load_balancer.id]
 
