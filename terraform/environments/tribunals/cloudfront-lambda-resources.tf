@@ -85,8 +85,8 @@ data "archive_file" "lambda_zip" {
 
 data "archive_file" "lambda_zip_nonprod" {
   type        = "zip"
-  source_file = "lambda/cloudfront-redirect-nonprod.js"
-  output_path = "lambda/cloudfront-redirect-nonprod.zip"
+  source_file = "lambda/cloudfront-redirect-test.js"
+  output_path = "lambda/cloudfront-redirect-test.zip"
 }
 
 # -------------------------------------------------
@@ -120,7 +120,7 @@ resource "aws_lambda_function" "cloudfront_redirect_lambda" {
 variable "force_lambda_version" {
   description = "Increment to force new Lambda@Edge version"
   type        = string
-  default     = "3"
+  default     = "4"
 }
 
 
