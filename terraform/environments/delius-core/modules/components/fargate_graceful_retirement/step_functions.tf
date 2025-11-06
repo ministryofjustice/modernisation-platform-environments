@@ -85,7 +85,6 @@ resource "aws_sfn_state_machine" "ecs_restart_state_machine" {
           "originalEvent.$" : "$",
           "waitTimestamp.$" : "$.waitTimestamp"
         },
-        MaxConcurrency : 1,
         Iterator : {
           StartAt : "CheckIfLDAP",
           States : {

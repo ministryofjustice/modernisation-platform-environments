@@ -21,50 +21,46 @@ def lambda_handler(event, context):
     print(f"Action received as {action}")
     
     # Extract the affected entities from the event
-    affected_entities = event["detail"]["affectedEntities"]
+    entity_value = event.get("entityValue")
 
-    # Iterate over each affected entity
-    for entity in affected_entities:
-        # Get the entity value
-        entity_value = entity.get("entityValue")
+    if not entity_value:
+        print("No entity value found in the event.")
+        return
 
-        if not entity_value:
-            print("No entity value found in the event.")
-            continue
+    if entity_value is not None:
+        # Extract cluster name and service name from the entity value
+        cluster_name = entity_value.split("|")[0]
+        service_name = entity_value.split("|")[1]
+        print(f"Cluster name: {cluster_name}")
+        print(f"Service name: {service_name}")
 
-        if entity_value is not None:
-            # Extract cluster name and service name from the entity value
-            cluster_name = entity_value.split("|")[0]
-            service_name = entity_value.split("|")[1]
-            print(f"Cluster name: {cluster_name}")
-            print(f"Service name: {service_name}")
+        # This should ideally execute only for ldap services
+        # Filter ldap service belonging to the current environment only
+        if ENV.lower() not in cluster_name.lower():
+            print(f"Skipping cluster {cluster_name} (not {ENV})")
+            return
 
-            # Filter ldap service belonging to the current environment only
-            if ENV.lower() not in cluster_name.lower():
-                print(f"Skipping cluster {cluster_name} (not {ENV})")
-                continue
+        # only do this for ldap and for ENV!
+        print(f"Only starting LDAP services: for {ENV}")
+        if "ldap".lower() not in service_name.lower():
+            print(f"Service {service_name} not LDAP, so skipping it!")
+            return
 
-            # only do this for ldap and for ENV!
-            print(f"Only starting LDAP services: for {ENV}")
-            if "ldap".lower() not in service_name.lower():
-                print(f"Service {service_name} not LDAP, so skipping it!")
-                continue
+        target_group_arn = os.environ.get("LDAP_NLB_ARN", None)
 
-            target_group_arn = os.environ.get("LDAP_NLB_ARN", None)
+        print(f"Action={action}, Service={service_name}, Cluster={cluster_name}")
 
-            print(f"Action={action}, Service={service_name}, Cluster={cluster_name}")
+        if action == "open":
+            return open_circuit_breaker(ssm_path, service_name, cluster_name)
 
-            if action == "open":
-                return open_circuit_breaker(ssm_path, service_name, cluster_name)
+        elif action == "close":
+            return close_circuit_breaker(ssm_path, service_name, cluster_name)
 
-            elif action == "close":
-                return close_circuit_breaker(ssm_path, service_name, cluster_name)
+        elif action == "check_health":
+            return check_target_health(target_group_arn, service_name, cluster_name)
 
-            elif action == "check_health":
-                return check_target_health(target_group_arn, service_name, cluster_name)
-
-            else:
-                raise ValueError(f"Unknown action: {action}")
+        else:
+            raise ValueError(f"Unknown action: {action}")
 
 
 def open_circuit_breaker(ssm_path, service, cluster_name):
