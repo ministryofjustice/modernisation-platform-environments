@@ -386,14 +386,8 @@ jobs:
           echo "[LIVE] Collecting candidates and deregistering (if any)"
           echo "Effective AMI test flags: ${AMI_TEST_FLAGS:-<none>}"
 
-          # Generate candidate deregistration commands (LIVE: may include test flags)
+          # LIVE: generate + execute inside the script (do NOT re-run the commands)
           scripts/ami_cleanup.sh -a "$app" -s ami_commands.sh ${AMI_TEST_FLAGS:-} $args delete || true
-
-          # Execute generated commands if any
-          if [[ -s ami_commands.sh ]]; then
-            echo "Executing generated AMI deregistration commands..."
-            bash ami_commands.sh || true
-          fi
 
           TOTAL="$(grep -c '^aws ec2 deregister-image' ami_commands.sh || true)"
           echo "Total deregister-image commands generated (and executed): ${TOTAL}"
@@ -421,8 +415,6 @@ jobs:
           aws sts get-caller-identity
 
           aws_try() {
-            # aws_try <command...>
-            # Simple exponential backoff (max 5 attempts)
             local max=5 delay=2 attempt=1
             while true; do
               "$@" && return 0
@@ -447,6 +439,12 @@ jobs:
           while IFS=',' read -r AMI_ID SNAP_ID; do
             [[ -z "$SNAP_ID" ]] && continue
             [[ "$SNAP_ID" =~ ^snap- ]] || continue
+
+            # If snapshot no longer exists (because --delete-associated-snapshots already removed it), skip.
+            if ! aws ec2 describe-snapshots --snapshot-ids "$SNAP_ID" --query 'Snapshots[0].SnapshotId' --output text >/dev/null 2>&1; then
+              echo "Skip $SNAP_ID (already deleted)."
+              continue
+            fi
 
             # Fetch minimal details to decide retention
             read -r TAGS DESC NAME <<< "$(aws ec2 describe-snapshots \
