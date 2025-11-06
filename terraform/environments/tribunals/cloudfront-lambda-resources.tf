@@ -90,7 +90,7 @@ resource "aws_lambda_function" "cloudfront_redirect_lambda" {
 variable "force_lambda_version" {
   description = "Increment to force new Lambda@Edge version"
   type        = string
-  default     = "5"
+  default     = "6"
 }
 
 
