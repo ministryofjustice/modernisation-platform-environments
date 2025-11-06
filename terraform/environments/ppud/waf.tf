@@ -11,7 +11,8 @@ locals {
 }
 
 module "waf" {
-  source                   = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-aws-waf?ref=b9cf6f92b142e80845ae30252aee2f84f57a71a9"
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-aws-waf?ref=a36649a59b16ace27f30ebda7b244f75783635c9"
+  web_acl_name             = "WAM-Waf-ACL"
   enable_ddos_protection   = true
   ddos_rate_limit          = 150
   block_non_uk_traffic     = true
@@ -22,13 +23,15 @@ module "waf" {
     aws.modernisation-platform = aws.modernisation-platform
   }
 
-  #additional_managed_rules = [
-  #   {
-  #     arn             = aws_wafv2_rule_group.wam_waf_acl.arn
-  #     override_action = "none"   # respect the group's action (BLOCK). Use "count" to dry-run.
-  #     priority        = 9        # unique; runs before managed rules at 10..15
-  #   }
-  # ]
+  additional_managed_rules = [
+     {
+       name            = "custom-managed-rule-group"
+       vendor_name     = "AWS"
+       arn             = aws_wafv2_rule_group.wam_waf_acl.arn
+       override_action = "none"   # respect the group's action (BLOCK). Use "count" to dry-run.
+       priority        = 3        # unique; runs before managed rules at 10..15
+     }
+   ]
 
   managed_rule_actions = {
     AWSManagedRulesKnownBadInputsRuleSet = false
@@ -40,12 +43,12 @@ module "waf" {
   }
 
   managed_rule_priorities = {
-    AWSManagedRulesAnonymousIpList       = 40
-    AWSManagedRulesKnownBadInputsRuleSet = 50
-    AWSManagedRulesCommonRuleSet         = 60
-    AWSManagedRulesSQLiRuleSet           = 70
-    AWSManagedRulesLinuxRuleSet          = 80
-    AWSManagedRulesBotControlRuleSet     = 90
+    AWSManagedRulesAnonymousIpList       = 10
+    AWSManagedRulesKnownBadInputsRuleSet = 11
+    AWSManagedRulesCommonRuleSet         = 12
+    AWSManagedRulesSQLiRuleSet           = 13
+    AWSManagedRulesLinuxRuleSet          = 14
+    AWSManagedRulesBotControlRuleSet     = 15
   }
 
   core_logging_account_id = local.environment_management.account_ids["core-logging-production"]
@@ -65,7 +68,7 @@ resource "aws_wafv2_rule_group" "wam_waf_acl" {
 
   rule {
     name     = "allow-ncsc-ip-list"
-    priority = 10
+    priority = 1
     action {
       allow {}
     }
@@ -83,7 +86,7 @@ resource "aws_wafv2_rule_group" "wam_waf_acl" {
 
   rule {
     name     = "allow-circle-ci-ip-list"
-    priority = 20
+    priority = 2
     action {
       allow {}
     }
