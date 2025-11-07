@@ -286,38 +286,3 @@ resource "aws_route53_record" "ftp" {
   records  = [aws_instance.ec2_ftp.private_ip]
 }
 
-#########################################
-# SSOGEN Internal Load Balancer DNS Records
-#########################################
-
-# Non-prod SSOGEN ALB record
-resource "aws_route53_record" "ssogen_internal_alb" {
-  count    = local.is-production ? 0 : 1
-  provider = aws.core-vpc
-
-  zone_id = data.aws_route53_zone.external.zone_id
-  name    = "ccmsebs-sso"
-  type    = "A"
-
-  alias {
-    name                   = aws_lb.ssogen_alb.dns_name
-    zone_id                = aws_lb.ssogen_alb.zone_id
-    evaluate_target_health = true
-  }
-}
-
-# # Prod SSOGEN ALB record
-# resource "aws_route53_record" "prod_ssogen_internal_alb" {
-#   count    = local.is-production ? 1 : 0
-#   provider = aws.core-network-services
-
-#   zone_id = data.aws_route53_zone.prod-network-services.zone_id
-#   name    = "ssogen.ccms-ebs.service.justice.gov.uk"
-#   type    = "A"
-
-#   alias {
-#     name                   = aws_lb.ssogen_alb.dns_name
-#     zone_id                = aws_lb.ssogen_alb.zone_id
-#     evaluate_target_health = true
-#   }
-# }
