@@ -58,25 +58,25 @@ locals {
     development = {
       condition = local.is-development
       account_key = "ppud-development" # checkov:skip=CKV_SECRET_6: "Environment identifier, not a secret"
-      s3_buckets = {
-        infrastructure = aws_s3_bucket.moj-infrastructure-dev[0].id
-        log_files = aws_s3_bucket.moj-log-files-dev[0].id
+      s3_bucket_names = {
+        infrastructure = "moj-infrastructure-dev"
+        log_files = "moj-log-files-dev"
       }
     }
     preproduction = {
       condition = local.is-preproduction
       account_key = "ppud-preproduction" # checkov:skip=CKV_SECRET_6: "Environment identifier, not a secret"
-      s3_buckets = {
-        infrastructure = aws_s3_bucket.moj-infrastructure-uat[0].id
-        log_files = aws_s3_bucket.moj-log-files-uat[0].id
+      s3_bucket_names = {
+        infrastructure = "moj-infrastructure-uat"
+        log_files = "moj-log-files-uat"
       }
     }
     production = {
       condition = local.is-production
       account_key = "ppud-production" # checkov:skip=CKV_SECRET_6: "Environment identifier, not a secret"
-      s3_buckets = {
-        infrastructure = aws_s3_bucket.moj-infrastructure[0].id
-        log_files = aws_s3_bucket.moj-lambda-metrics-prod[0].id
+      s3_bucket_names = {
+        infrastructure = "moj-infrastructure"
+        log_files = "moj-lambda-metrics-prod"
       }
     }
   }
@@ -204,11 +204,11 @@ resource "aws_iam_policy" "lambda_policies_v2" {
       } : each.value.policy_name == "get_data_s3" ? {
         Effect = "Allow"
         Action = ["s3:GetObject", "s3:PutObject", "s3:DeleteObject", "s3:ListBucket"]
-        Resource = [each.value.env_config.s3_buckets.infrastructure, "${each.value.env_config.s3_buckets.infrastructure}/*"]
+        Resource = ["arn:aws:s3:::${each.value.env_config.s3_bucket_names.infrastructure}", "arn:aws:s3:::${each.value.env_config.s3_bucket_names.infrastructure}/*"]
       } : each.value.policy_name == "put_data_s3" ? {
         Effect = "Allow"
         Action = ["s3:PutObject", "s3:PutObjectAcl", "s3:ListBucket"]
-        Resource = [each.value.env_config.s3_buckets.log_files, "${each.value.env_config.s3_buckets.log_files}/*"]
+        Resource = ["arn:aws:s3:::${each.value.env_config.s3_bucket_names.log_files}", "arn:aws:s3:::${each.value.env_config.s3_bucket_names.log_files}/*"]
       } : each.value.policy_name == "get_klayers" ? {
         Effect = "Allow"
         Action = ["ssm:GetParameter"]
@@ -227,6 +227,8 @@ resource "aws_iam_policy" "lambda_policies_v2" {
 }
 
 #######################################################################
+# IAM Role Policy Attachments
+#####################################################################################################################################
 # IAM Role Policy Attachments
 #######################################################################
 
