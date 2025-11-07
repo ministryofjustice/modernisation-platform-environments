@@ -242,6 +242,9 @@ locals {
         })
         instance = merge(local.ec2_instances.db.instance, {
           disable_api_termination = true
+          tags = merge(local.ec2_instances.db.instance.tags, {
+            patch-manager = "manual"
+          })
         })
         tags = merge(local.ec2_instances.db.tags, {
           description         = "T1 NOMIS database"
