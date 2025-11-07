@@ -127,30 +127,30 @@ data "aws_elb_service_account" "default" {}
 # External CWA ELB
 ####################################
 
-resource "aws_lb" "external" {
-  name                       = "${upper(local.application_name_short)}-LoadBalancer"
-  internal                   = true
-  load_balancer_type         = "application"
-  security_groups            = [aws_security_group.external_lb.id]
-  subnets                    = [var.public_subnet_a_id, var.public_subnet_b_id, var.public_subnet_c_id]
-  enable_deletion_protection = local.lb_enable_deletion_protection
-  idle_timeout               = local.external_lb_idle_timeout
-  enable_http2               = false
-  # drop_invalid_header_fields = true
+# resource "aws_lb" "external" {
+#   name                       = "${upper(local.application_name_short)}-LoadBalancer"
+#   internal                   = true
+#   load_balancer_type         = "application"
+#   security_groups            = [aws_security_group.external_lb.id]
+#   subnets                    = [var.public_subnet_a_id, var.public_subnet_b_id, var.public_subnet_c_id]
+#   enable_deletion_protection = local.lb_enable_deletion_protection
+#   idle_timeout               = local.external_lb_idle_timeout
+#   enable_http2               = false
+#   # drop_invalid_header_fields = true
 
-  access_logs {
-    bucket  = local.lb_logs_bucket != "" ? local.lb_logs_bucket : module.elb-logs-s3[0].bucket.id
-    prefix  = "${local.application_name_short}-LoadBalancer"
-    enabled = true
-  }
+#   access_logs {
+#     bucket  = local.lb_logs_bucket != "" ? local.lb_logs_bucket : module.elb-logs-s3[0].bucket.id
+#     prefix  = "${local.application_name_short}-LoadBalancer"
+#     enabled = true
+#   }
 
-  tags = merge(
-    var.tags,
-    {
-      Name = "${local.application_name_short}-LoadBalancer"
-    },
-  )
-}
+#   tags = merge(
+#     var.tags,
+#     {
+#       Name = "${local.application_name_short}-LoadBalancer"
+#     },
+#   )
+# }
 
 resource "aws_lb_listener" "external" {
 
