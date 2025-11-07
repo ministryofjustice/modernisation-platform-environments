@@ -4,15 +4,25 @@ locals {
 }
 #tfsec:ignore:aws-ec2-enable-at-rest-encryption
 resource "aws_instance" "this" {
-  lifecycle { ignore_changes = [ebs_block_device] }
+  #checkov:skip=CKV_AWS_79: "Ensure Instance Metadata Service Version 1 is not enabled"
+  lifecycle { 
+    ignore_changes = [
+      ami,
+      ebs_block_device
+    ]
+ }
 
-  ami                  = var.ami
-  instance_type        = var.instance_type
-  cpu_core_count       = var.cpu_core_count
-  cpu_threads_per_core = var.cpu_threads_per_core
-  user_data            = var.user_data
-  user_data_base64     = var.user_data_base64
-  hibernation          = var.hibernation
+  ami           = var.ami
+  instance_type = var.instance_type
+
+  cpu_options {
+    core_count       = var.cpu_core_count
+    threads_per_core = var.cpu_threads_per_core
+  }
+
+  user_data        = var.user_data
+  user_data_base64 = var.user_data_base64
+  hibernation      = var.hibernation
 
   availability_zone      = var.availability_zone
   subnet_id              = var.subnet_id

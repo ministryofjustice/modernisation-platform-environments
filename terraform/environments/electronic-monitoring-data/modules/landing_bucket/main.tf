@@ -122,45 +122,45 @@ module "kms_key" {
 }
 
 #-----------------------------------------------------------------------------------
-# Process landing bucket files - lambda triggers
+# Process landing bucket files - lambda triggers via SQS
 #-----------------------------------------------------------------------------------
 
-resource "aws_lambda_permission" "allow_bucket" {
-  statement_id  = "AllowExecutionFromS3Bucket-${var.data_feed}-${var.order_type}"
-  action        = "lambda:InvokeFunction"
-  function_name = module.process_landing_bucket_files.lambda_function_arn
-  principal     = "s3.amazonaws.com"
-  source_arn    = module.this-bucket.bucket.arn
+module "s3_to_lambda" {
+  source               = "../sqs_s3_lambda_trigger"
+  bucket               = module.this-bucket.bucket
+  lambda_function_name = module.process_landing_bucket_files.lambda_function_name
+  bucket_prefix        = var.local_bucket_prefix
 }
 
-resource "aws_s3_bucket_notification" "bucket_notification" {
+
+resource "aws_s3_bucket_notification" "s3_notification_prefix_suffixes" {
   bucket = module.this-bucket.bucket.id
 
-  lambda_function {
-    lambda_function_arn = module.process_landing_bucket_files.lambda_function_arn
-    events              = ["s3:ObjectCreated:*"]
+  queue {
+    queue_arn = module.s3_to_lambda.sqs_queue.arn
+    events    = ["s3:ObjectCreated:*"]
   }
 
-  depends_on = [aws_lambda_permission.allow_bucket]
+  depends_on = [module.s3_to_lambda]
 }
-
 #-----------------------------------------------------------------------------------
 # Process landing bucket files - lambda
 #-----------------------------------------------------------------------------------
 
 module "process_landing_bucket_files" {
-  source                  = "../lambdas"
-  function_name           = "process_landing_bucket_files_${var.data_feed}_${var.order_type}"
-  image_name              = "process_landing_bucket_files"
-  is_image                = true
-  role_name               = aws_iam_role.process_landing_bucket_files.name
-  role_arn                = aws_iam_role.process_landing_bucket_files.arn
-  memory_size             = 1024
-  timeout                 = 900
-  core_shared_services_id = var.core_shared_services_id
-  production_dev          = var.production_dev
-  security_group_ids      = var.security_group_ids
-  subnet_ids              = var.subnet_ids
+  source                         = "../lambdas"
+  function_name                  = "process_landing_bucket_files_${var.data_feed}_${var.order_type}"
+  image_name                     = "process_landing_bucket_files"
+  is_image                       = true
+  role_name                      = aws_iam_role.process_landing_bucket_files.name
+  role_arn                       = aws_iam_role.process_landing_bucket_files.arn
+  memory_size                    = 1024
+  timeout                        = 900
+  core_shared_services_id        = var.core_shared_services_id
+  production_dev                 = var.production_dev
+  security_group_ids             = var.security_group_ids
+  subnet_ids                     = var.subnet_ids
+  reserved_concurrent_executions = 1000
   environment_variables = {
     DESTINATION_BUCKET = var.received_files_bucket_id
   }

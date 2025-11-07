@@ -32,6 +32,21 @@ locals {
       }
     }
 
+    cloudwatch_dashboards = {
+      "CloudWatch-Default" = {
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.lb,
+          local.cloudwatch_dashboard_widget_groups.all_ec2,
+          local.cloudwatch_dashboard_widget_groups.db,
+          local.cloudwatch_dashboard_widget_groups.cms,
+          local.cloudwatch_dashboard_widget_groups.web,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ssm_command,
+        ]
+      }
+    }
+
     ec2_instances = {
       t1-ncr-cms-1 = merge(local.ec2_instances.bip_cms, {
         config = merge(local.ec2_instances.bip_cms.config, {
@@ -170,7 +185,6 @@ locals {
             ]
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/sap/bip/t1/*",
-              "arn:aws:secretsmanager:*:*:secret:/sap/bods/t1/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T1/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/T1*/*",
             ]
@@ -207,7 +221,7 @@ locals {
         }
         listeners = merge(local.lbs.private.listeners, {
           http-7777 = merge(local.lbs.private.listeners.http-7777, {
-            alarm_target_group_names = []
+            alarm_target_group_names = [] # don't enable as environments are powered up/down frequently
             rules = {
               web = {
                 priority = 200
@@ -257,7 +271,7 @@ locals {
         }
         listeners = merge(local.lbs.public.listeners, {
           https = merge(local.lbs.public.listeners.https, {
-            alarm_target_group_names = []
+            alarm_target_group_names = [] # don't enable as environments are powered up/down frequently
             rules = {
               web = {
                 priority = 200
@@ -332,7 +346,6 @@ locals {
       "/oracle/database/T1BISYS"  = local.secretsmanager_secrets.db
       "/oracle/database/T1BIAUD"  = local.secretsmanager_secrets.db
       "/sap/bip/t1"               = local.secretsmanager_secrets.bip
-      "/sap/bods/t1"              = local.secretsmanager_secrets.bods
     }
   }
 }

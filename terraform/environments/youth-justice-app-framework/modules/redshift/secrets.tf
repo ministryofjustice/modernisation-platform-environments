@@ -61,3 +61,23 @@ resource "aws_secretsmanager_secret_version" "yjb_publish" {
     url      = "jdbc:redshift://${aws_redshiftserverless_workgroup.default.endpoint[0].address}:${aws_redshiftserverless_workgroup.default.endpoint[0].port}/yjb_returns;TCPKeepAlive=FALSE"
   })
 }
+
+resource "aws_secretsmanager_secret" "yjb_schedular" {
+  #checkov:skip=CKV2_AWS_57: [TODO] Consider adding rotation for the Redshift admin user password.
+
+  name        = "${var.project_name}/${var.environment}/yjb_schedular/redshift-serverless"
+  description = "Access to Redshift Serverless for Quicksite data sources"
+  kms_key_id  = var.kms_key_arn
+}
+
+resource "aws_secretsmanager_secret_version" "yjb_schedular" {
+  secret_id = aws_secretsmanager_secret.yjb_schedular.id
+  secret_string = jsonencode({
+    username = "yjb_schedular"
+    password = "changeme"
+    hostname = aws_redshiftserverless_workgroup.default.endpoint[0].address
+    port     = aws_redshiftserverless_workgroup.default.endpoint[0].port
+    database = "yjb_returns"
+    url      = "jdbc:redshift://${aws_redshiftserverless_workgroup.default.endpoint[0].address}:${aws_redshiftserverless_workgroup.default.endpoint[0].port}/yjb_returns;TCPKeepAlive=FALSE"
+  })
+}

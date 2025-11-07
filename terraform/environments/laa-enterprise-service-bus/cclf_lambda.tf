@@ -52,8 +52,7 @@ resource "aws_lambda_function" "cclf_provider_load" {
   runtime          = "python3.10"
 
   layers = [
-    aws_lambda_layer_version.lambda_layer_oracle_python.arn,
-    "arn:aws:lambda:eu-west-2:017000801446:layer:AWSLambdaPowertoolsPython:2"
+    aws_lambda_layer_version.lambda_layer_oracle_python.arn
   ]
 
   vpc_config {
@@ -66,8 +65,8 @@ resource "aws_lambda_function" "cclf_provider_load" {
     variables = {
       DB_SECRET_NAME         = aws_secretsmanager_secret.cclf_db_mp_credentials.name
       PROCEDURE_SECRET_NAME  = aws_secretsmanager_secret.cclf_procedures_config.name
-      LD_LIBRARY_PATH        = "/opt/instantclient_12_2_linux"
-      ORACLE_HOME            = "/opt/instantclient_12_2_linux"
+      LD_LIBRARY_PATH        = "/opt/instantclient_12_1"
+      ORACLE_HOME            = "/opt/instantclient_12_1"
       SERVICE_NAME           = "cclf-load-service"
       NAMESPACE              = "HUB20-CCLF-NS"
       ENVIRONMENT            = local.environment
@@ -81,10 +80,4 @@ resource "aws_lambda_function" "cclf_provider_load" {
     local.tags,
     { Name = "${local.application_name_short}-${local.environment}-cclf-provider-load" }
   )
-}
-
-resource "aws_lambda_event_source_mapping" "cclf_provider_q_trigger" {
-  event_source_arn = aws_sqs_queue.cclf_provider_q.arn
-  function_name    = aws_lambda_function.cclf_provider_load.arn
-  batch_size       = 1
 }

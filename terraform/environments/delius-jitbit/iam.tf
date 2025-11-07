@@ -135,7 +135,7 @@ resource "aws_iam_policy" "jitbit_secrets_reader" {
           "secretsmanager:ListSecrets",
           "secretsmanager:ListSecretVersionIds"
         ]
-        Resource = "arn:aws:secretsmanager:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:secret:${local.application_name}*"
+        Resource = "arn:aws:secretsmanager:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:secret:${local.application_name}*"
       }
     ]
   })

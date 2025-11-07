@@ -157,11 +157,11 @@ locals {
   }
 
   dis_config_dev = {
-    instance_count = 0
-    ami_name       = "delius_mis_windows_server_patch_2025-*"
+    instance_count = 1
+    ami_name       = "delius_mis_windows_server_patch_2025-10-01T13-00-02.504Z"
     ebs_volumes = {
       "/dev/sda1" = { label = "root", size = 100 }
-      "/dev/xvdf" = { label = "data", size = 300 }
+      "xvdd"      = { label = "data", size = 300 }
     }
 
     ebs_volumes_config = {
@@ -200,6 +200,13 @@ locals {
           backup = true
         }
       )
+    }
+    # Load balancer configuration for DIS
+    lb_target_config = {
+      endpoint             = "ndl-dis"
+      port                 = 8080
+      health_check_path    = "/BOE/CMC/"
+      health_check_matcher = "200,302,301"
     }
   }
   # automation test instance only - do not use
@@ -290,6 +297,13 @@ locals {
         { backup = true
         }
       )
+    }
+    # Load balancer configuration for DFI
+    lb_target_config = {
+      endpoint             = "ndl-dfi"
+      port                 = 8080
+      health_check_path    = "/DataServices/"
+      health_check_matcher = "200,302,301"
     }
   }
 

@@ -51,9 +51,9 @@ module "glue_hive_table_creation_job" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-hive-table-creation-${local.env}"
-      Resource_Type = "Glue Job"
-      Jira          = "DPR2-209"
+      dpr-name          = "${local.project}-hive-table-creation-${local.env}"
+      dpr-resource-type = "Glue Job"
+      dpr-jira          = "DPR2-209"
     }
   )
 
@@ -117,9 +117,9 @@ module "glue_s3_file_transfer_job" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-s3-file-transfer-${local.env}"
-      Resource_Type = "Glue Job"
-      Jira          = "DPR2-46"
+      dpr-name          = "${local.project}-s3-file-transfer-${local.env}"
+      dpr-resource-type = "Glue Job"
+      dpr-jira          = "DPR2-46"
     }
   )
 
@@ -133,6 +133,8 @@ module "glue_s3_file_transfer_job" {
     "--dpr.file.transfer.destination.bucket"      = module.s3_raw_archive_bucket.bucket_id
     "--dpr.file.transfer.retention.period.amount" = tostring(local.scheduled_s3_file_transfer_retention_period_amount)
     "--dpr.file.transfer.retention.period.unit"   = tostring(local.scheduled_s3_file_transfer_retention_period_unit)
+    "--dpr.file.transfer.use.default.parallelism" = tostring(local.scheduled_file_transfer_use_default_parallelism)
+    "--dpr.file.transfer.parallelism"             = tostring(local.scheduled_file_transfer_parallelism)
     "--dpr.file.transfer.delete.copied.files"     = true,
     "--dpr.allowed.s3.file.extensions"            = "*",
     "--dpr.log.level"                             = local.glue_job_common_log_level
@@ -174,9 +176,9 @@ module "glue_switch_prisons_hive_data_location_job" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-switch-prisons-data-source-${local.env}"
-      Resource_Type = "Glue Job"
-      Jira          = "DPR2-46"
+      dpr-name          = "${local.project}-switch-prisons-data-source-${local.env}"
+      dpr-resource-type = "Glue Job"
+      dpr-jira          = "DPR2-46"
     }
   )
 
@@ -234,9 +236,9 @@ module "glue_s3_data_deletion_job" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-s3-data-deletion-${local.env}"
-      Resource_Type = "Glue Job"
-      Jira          = "DPR2-46"
+      dpr-name          = "${local.project}-s3-data-deletion-${local.env}"
+      dpr-resource-type = "Glue Job"
+      dpr-jira          = "DPR2-46"
     }
   )
 
@@ -288,9 +290,9 @@ module "glue_stop_glue_instance_job" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-stop-glue-instance-${local.env}"
-      Resource_Type = "Glue Job"
-      Jira          = "DPR2-46"
+      dpr-name          = "${local.project}-stop-glue-instance-${local.env}"
+      dpr-resource-type = "Glue Job"
+      dpr-jira          = "DPR2-46"
     }
   )
 
@@ -332,9 +334,9 @@ module "stop_dms_task_job" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-stop-dms-task-${local.env}"
-      Resource_Type = "Glue Job"
-      Jira          = "DPR2-713"
+      dpr-name          = "${local.project}-stop-dms-task-${local.env}"
+      dpr-resource-type = "Glue Job"
+      dpr-jira          = "DPR2-713"
     }
   )
 
@@ -376,9 +378,9 @@ module "set_cdc_dms_start_time_job" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-set-cdc-dms-start-time-${local.env}"
-      Resource_Type = "Glue Job"
-      Jira          = "DPR2-1925"
+      dpr-name          = "${local.project}-set-cdc-dms-start-time-${local.env}"
+      dpr-resource-type = "Glue Job"
+      dpr-jira          = "DPR2-1925"
     }
   )
 
@@ -419,9 +421,9 @@ module "activate_glue_trigger_job" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-activate-glue-trigger-${local.env}"
-      Resource_Type = "Glue Job"
-      Jira          = "DPR2-713"
+      dpr-name          = "${local.project}-activate-glue-trigger-${local.env}"
+      dpr-resource-type = "Glue Job"
+      dpr-jira          = "DPR2-713"
     }
   )
 
@@ -442,9 +444,9 @@ module "glue_registry_avro" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-glue-registry-avro-${local.env}"
-      Resource_Type = "Glue Registry"
-      Jira          = "DPR-108"
+      dpr-name          = "${local.project}-glue-registry-avro-${local.env}"
+      dpr-resource-type = "Glue Registry"
+      dpr-jira          = "DPR-108"
     }
   )
 }
@@ -464,9 +466,9 @@ module "s3_glue_job_bucket" {
   tags = merge(
     local.all_tags,
     {
-      name          = "${local.project}-glue-jobs-${local.environment}"
-      Resource_Type = "S3 Bucket"
-      Jira          = "DPR-108"
+      dpr-name          = "${local.project}-glue-jobs-${local.environment}"
+      dpr-resource-type = "S3 Bucket"
+      dpr-jira          = "DPR-108"
     }
   )
 }
@@ -483,9 +485,9 @@ module "s3_raw_archive_bucket" {
   tags = merge(
     local.all_tags,
     {
-      name          = "${local.project}-raw-archive-${local.env}-s3"
-      Resource_Type = "S3 Bucket"
-      Jira          = "DPR2-209"
+      dpr-name          = "${local.project}-raw-archive-${local.env}"
+      dpr-resource-type = "S3 Bucket"
+      dpr-jira          = "DPR2-209"
     }
   )
 }
@@ -501,9 +503,9 @@ module "s3_raw_bucket" {
   tags = merge(
     local.all_tags,
     {
-      name          = "${local.project}-raw-zone-${local.env}"
-      Resource_Type = "S3 Bucket"
-      Jira          = "DPR-108"
+      dpr-name          = "${local.project}-raw-zone-${local.env}"
+      dpr-resource-type = "S3 Bucket"
+      dpr-jira          = "DPR-108"
     }
   )
 }
@@ -520,9 +522,9 @@ module "s3_structured_bucket" {
   tags = merge(
     local.all_tags,
     {
-      name          = "${local.project}-structured-zone-${local.env}"
-      Resource_Type = "S3 Bucket"
-      Jira          = "DPR-108"
+      dpr-name          = "${local.project}-structured-zone-${local.env}"
+      dpr-resource-type = "S3 Bucket"
+      dpr-jira          = "DPR-108"
     }
   )
 }
@@ -540,9 +542,9 @@ module "s3_curated_bucket" {
   tags = merge(
     local.all_tags,
     {
-      name          = "${local.project}-curated-zone-${local.env}"
-      Resource_Type = "S3 Bucket"
-      Jira          = "DPR-108"
+      dpr-name          = "${local.project}-curated-zone-${local.env}"
+      dpr-resource-type = "S3 Bucket"
+      dpr-jira          = "DPR-108"
     }
   )
 }
@@ -559,9 +561,9 @@ module "s3_temp_reload_bucket" {
   tags = merge(
     local.all_tags,
     {
-      name          = "${local.project}-temp-reload-${local.env}"
-      Resource_Type = "S3 Bucket",
-      Jira          = "DPR2-46"
+      dpr-name          = "${local.project}-temp-reload-${local.env}"
+      dpr-resource-type = "S3 Bucket",
+      dpr-jira          = "DPR2-46"
     }
   )
 }
@@ -578,9 +580,9 @@ module "s3_domain_bucket" {
   tags = merge(
     local.all_tags,
     {
-      name          = "${local.project}-domain-${local.env}"
-      Resource_Type = "S3 Bucket"
-      Jira          = "DPR-108"
+      dpr-name          = "${local.project}-domain-${local.env}"
+      dpr-resource-type = "S3 Bucket"
+      dpr-jira          = "DPR-108"
     }
   )
 }
@@ -599,9 +601,9 @@ module "s3_schema_registry_bucket" {
   tags = merge(
     local.all_tags,
     {
-      name          = "${local.project}-schema-registry-${local.env}"
-      Resource_Type = "S3 Bucket"
-      Jira          = "DPR2-245"
+      dpr-name          = "${local.project}-schema-registry-${local.env}"
+      dpr-resource-type = "S3 Bucket"
+      dpr-jira          = "DPR2-245"
     }
   )
 }
@@ -618,9 +620,9 @@ module "s3_domain_config_bucket" {
   tags = merge(
     local.all_tags,
     {
-      name          = "${local.project}-domain-config-${local.env}"
-      Resource_Type = "S3 Bucket"
-      Jira          = "DPR-108"
+      dpr-name          = "${local.project}-domain-config-${local.env}"
+      dpr-resource-type = "S3 Bucket"
+      dpr-jira          = "DPR-108"
     }
   )
 }
@@ -637,9 +639,9 @@ module "s3_violation_bucket" {
   tags = merge(
     local.all_tags,
     {
-      name          = "${local.project}-violation-${local.environment}"
-      Resource_Type = "S3 Bucket"
-      Jira          = "DPR-108"
+      dpr-name          = "${local.project}-violation-${local.environment}"
+      dpr-resource-type = "S3 Bucket"
+      dpr-jira          = "DPR-108"
     }
   )
 }
@@ -656,9 +658,9 @@ module "s3_landing_bucket" {
   tags = merge(
     local.all_tags,
     {
-      name          = "${local.project}-landing-zone-${local.environment}"
-      Resource_Type = "S3 Bucket"
-      Jira          = "DPR2-1499"
+      dpr-name          = "${local.project}-landing-zone-${local.environment}"
+      dpr-resource-type = "S3 Bucket"
+      dpr-jira          = "DPR2-1499"
     }
   )
 }
@@ -675,9 +677,9 @@ module "s3_landing_processing_bucket" {
   tags = merge(
     local.all_tags,
     {
-      name          = "${local.project}-landing-processing-zone-${local.environment}"
-      Resource_Type = "S3 Bucket"
-      Jira          = "DPR2-1499"
+      dpr-name          = "${local.project}-landing-processing-zone-${local.environment}"
+      dpr-resource-type = "S3 Bucket"
+      dpr-jira          = "DPR2-1499"
     }
   )
 }
@@ -694,9 +696,9 @@ module "s3_quarantine_bucket" {
   tags = merge(
     local.all_tags,
     {
-      name          = "${local.project}-quarantine-zone-${local.environment}"
-      Resource_Type = "S3 Bucket"
-      Jira          = "DPR2-1499"
+      dpr-name          = "${local.project}-quarantine-zone-${local.environment}"
+      dpr-resource-type = "S3 Bucket"
+      dpr-jira          = "DPR2-1499"
     }
   )
 }
@@ -722,9 +724,9 @@ module "s3_artifacts_store" {
   tags = merge(
     local.all_tags,
     {
-      name          = "${local.project}-artifact-store-${local.environment}"
-      Resource_Type = "S3 Bucket"
-      Jira          = "DPR-108"
+      dpr-name          = "${local.project}-artifact-store-${local.environment}"
+      dpr-resource-type = "S3 Bucket"
+      dpr-jira          = "DPR-108"
     }
   )
 }
@@ -755,9 +757,9 @@ module "s3_working_bucket" {
   tags = merge(
     local.all_tags,
     {
-      name          = "${local.project}-working-${local.environment}"
-      Resource_Type = "S3 Bucket"
-      Jira          = "DPR-108"
+      dpr-name          = "${local.project}-working-${local.environment}"
+      dpr-resource-type = "S3 Bucket"
+      dpr-jira          = "DPR-108"
     }
   )
 }
@@ -874,9 +876,10 @@ module "ec2_kinesis_agent" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-ec2-kinesis-agent-${local.env}"
-      Resource_Type = "EC2 Instance"
-      Jira          = "DPR-108"
+      Name              = "${local.project}-ec2-kinesis-agent-${local.env}"
+      dpr-name          = "${local.project}-ec2-kinesis-agent-${local.env}"
+      dpr-resource-type = "EC2 Instance"
+      dpr-jira          = "DPR-108"
     }
   )
 }
@@ -949,9 +952,9 @@ module "datamart" {
   tags = merge(
     local.all_tags,
     {
-      Name          = local.redshift_cluster_name
-      Resource_Type = "Redshift Cluster"
-      Jira          = "DPR-108"
+      dpr-name          = local.redshift_cluster_name
+      dpr-resource-type = "Redshift Cluster"
+      dpr-jira          = "DPR-108"
     }
   )
 }
@@ -1006,9 +1009,9 @@ module "dynamo_tab_domain_registry" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-domain-registry-${local.environment}"
-      Resource_Type = "Dynamo Table"
-      Jira          = "DPR-306"
+      dpr-name          = "${local.project}-domain-registry-${local.environment}"
+      dpr-resource-type = "Dynamo Table"
+      dpr-jira          = "DPR-306"
     }
   )
 }
@@ -1050,9 +1053,9 @@ module "dynamo_table_step_functions_token" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-step-functions-${local.environment}"
-      Resource_Type = "Dynamo Table"
-      Jira          = "DPR2-209"
+      dpr-name          = "${local.project}-step-functions-${local.environment}"
+      dpr-resource-type = "Dynamo Table"
+      dpr-jira          = "DPR2-209"
     }
   )
 }
@@ -1070,8 +1073,8 @@ module "s3_application_tf_state" {
   tags = merge(
     local.all_tags,
     {
-      name          = "${local.project}-terraform-state-${local.environment}"
-      Resource_Type = "S3 Bucket"
+      dpr-name          = "${local.project}-terraform-state-${local.environment}"
+      dpr-resource-type = "S3 Bucket"
     }
   )
 }
@@ -1098,8 +1101,8 @@ module "dynamo_tab_application_tf_state" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-terraform-state-${local.environment}"
-      Resource_Type = "Dynamo Table"
+      dpr-name          = "${local.project}-terraform-state-${local.environment}"
+      dpr-resource-type = "Dynamo Table"
     }
   )
 }
@@ -1136,9 +1139,9 @@ module "generate_test_postgres_data" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-load-generator-job-${local.env}"
-      Resource_Type = "Glue Job"
-      Jira          = "DPR2-1884"
+      dpr-name          = "${local.project}-load-generator-job-${local.env}"
+      dpr-resource-type = "Glue Job"
+      dpr-jira          = "DPR2-1884"
     }
   )
 
@@ -1171,9 +1174,9 @@ resource "aws_glue_trigger" "glue_postgres_data_generator_job_trigger" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-load-generator-trigger-${local.env}"
-      Resource_Type = "Glue Trigger"
-      Jira          = "DPR2-1884"
+      dpr-name          = "${local.project}-load-generator-trigger-${local.env}"
+      dpr-resource-type = "Glue Trigger"
+      dpr-jira          = "DPR2-1884"
     }
   )
 }

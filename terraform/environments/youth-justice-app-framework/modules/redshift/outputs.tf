@@ -17,3 +17,8 @@ output "quicksight_secret_arn" {
   description = "The secret created to hold the quicksight credentials."
   value       = aws_secretsmanager_secret.yjb_publish.arn
 }
+
+output "returns_secret_arn" {
+  description = "The secret created to hold the returns credentials."
+  value       = aws_secretsmanager_secret.returns.arn
+}

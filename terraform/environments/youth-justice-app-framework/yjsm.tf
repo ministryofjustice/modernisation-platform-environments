@@ -1,6 +1,25 @@
 
 # YJSM EC2 Instance
-
+locals {
+  yjsm_buckets = jsonencode([
+    "arn:aws:s3:::yjaf-${local.environment}-cms",
+    "arn:aws:s3:::yjaf-${local.environment}-yjsm",
+    "arn:aws:s3:::yjaf-${local.environment}-mis",
+    "arn:aws:s3:::yjaf-${local.environment}-bedunlock",
+    "arn:aws:s3:::yjaf-${local.environment}-yjsm-artefact",
+    "arn:aws:s3:::yjaf-${local.environment}-bands",
+    "arn:aws:s3:::yjaf-${local.environment}-cmm"
+  ])
+  yjsm_buckets_wildcarded = jsonencode([
+    "arn:aws:s3:::yjaf-${local.environment}-cms/*",
+    "arn:aws:s3:::yjaf-${local.environment}-yjsm/*",
+    "arn:aws:s3:::yjaf-${local.environment}-mis/*",
+    "arn:aws:s3:::yjaf-${local.environment}-bedunlock/*",
+    "arn:aws:s3:::yjaf-${local.environment}-bands/*",
+    "arn:aws:s3:::yjaf-${local.environment}-yjsm-artefact/*",
+    "arn:aws:s3:::yjaf-${local.environment}-cmm/*"
+  ])
+}
 
 module "yjsm" {
   source = "./modules/yjsm"
@@ -53,4 +72,30 @@ module "yjsm" {
   region       = data.aws_region.current.name
   account_id   = data.aws_caller_identity.current.account_id
   cluster_name = "yjaf-cluster"
+
+  yjsm_role_additional_policies_arns = [
+    aws_iam_policy.yjsm-s3-access.arn,
+    aws_iam_policy.yjsm-ses-access.arn
+  ]
+
+  yjsm_secrets_access_policy_secret_arns = jsonencode([
+    module.aurora.app_rotated_postgres_secret_arn,
+    aws_secretsmanager_secret.auto_admit_secret.arn
+  ])
+}
+
+
+resource "aws_iam_policy" "yjsm-s3-access" {
+  name        = "${local.project_name}-yjsm-s3-access"
+  description = "Policy for yjsm task role to access yjaf buckets"
+  policy = templatefile("${path.module}/iam_policies/s3_user_policy.json", {
+    dal_buckets            = local.yjsm_buckets
+    dal_buckets_wildcarded = local.yjsm_buckets_wildcarded
+  })
+}
+
+resource "aws_iam_policy" "yjsm-ses-access" {
+  name        = "${local.project_name}-yjsm-ses-access"
+  description = "Policy for yjsm task role to access SES"
+  policy      = file("${path.module}/iam_policies/ses_user_policy.json")
 }

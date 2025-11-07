@@ -10,10 +10,9 @@ resource "aws_sns_topic" "dpr-notification-topic" {
 
   name = var.sns_topic_name
 
-  tags = merge(
-    var.tags,
-    {
-      Resource_Type = "SNS Topic"
-    }
-  )
+  tags = var.tags
+
+  lifecycle {
+    ignore_changes = [tags]
+  }
 }

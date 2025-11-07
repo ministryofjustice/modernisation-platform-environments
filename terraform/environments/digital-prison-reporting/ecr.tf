@@ -15,9 +15,38 @@ resource "aws_ecr_repository" "file_transfer_in_clamav_scanner" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-hive-table-creation-${local.env}"
-      Resource_Type = "ECR repository"
-      Jira          = "DPR2-1499"
+      dpr-name          = "${local.project}-container-images/hmpps-dpr-landing-zone-antivirus-check"
+      dpr-resource-type = "ECR repository"
+      dpr-jira          = "DPR2-1499"
     }
   )
+}
+
+resource "aws_ecr_repository_policy" "file_transfer_in_clamav_scanner_policy" {
+  repository = aws_ecr_repository.file_transfer_in_clamav_scanner.name
+
+  policy = jsonencode({
+    Version = "2008-10-17"
+    Statement = [
+      {
+        Sid    = "LambdaECRImageRetrievalPolicy"
+        Effect = "Allow"
+        Principal = {
+          Service = ["lambda.amazonaws.com"]
+        }
+        Action = [
+          "ecr:BatchGetImage",
+          "ecr:DeleteRepositoryPolicy",
+          "ecr:GetDownloadUrlForLayer",
+          "ecr:GetRepositoryPolicy",
+          "ecr:SetRepositoryPolicy"
+        ]
+        Condition = {
+          StringLike = {
+            "aws:sourceArn" = "arn:aws:lambda:${local.account_region}:${local.account_id}:function:*"
+          }
+        }
+      }
+    ]
+  })
 }

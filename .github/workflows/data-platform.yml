@@ -1,42 +1,45 @@
 ---
 name: data-platform
+
 on:
   push:
     branches:
       - main
     paths:
-      - "terraform/environments/data-platform/**"
-      - ".github/workflows/data-platform.yml"
+      - 'terraform/environments/data-platform/**'
+      - '.github/workflows/data-platform.yml'
 
   pull_request:
     branches:
       - main
-    types: [opened, edited, reopened, synchronize]
     paths:
-      - "terraform/environments/data-platform/**"
-      - ".github/workflows/data-platform.yml"
+      - 'terraform/environments/data-platform/**'
+      - '.github/workflows/data-platform.yml'
 
   workflow_dispatch:
     inputs:
       action:
-        description: "Set either [deploy|destroy]."
-        default: "deploy"
+        description: 'Set either [deploy|destroy].'
+        default: 'deploy'
         required: true
-        type: string
+        type: choice
         options:
           - deploy
           - destroy
 
 permissions:
-  id-token: write # This is required for requesting the JWT
-  contents: read # This is required for actions/checkout
+  id-token: write  # Required for requesting the JWT
+  contents: read   # Required for actions/checkout
 
 jobs:
   strategy:
+    # This job generates a matrix of environments (and possibly components) by calling your reusable strategy workflow.
     uses: ./.github/workflows/reusable_terraform_components_strategy.yml
     if: inputs.action != 'destroy'
     with:
-      application: "${{ github.workflow }}"
+      # e.g. "data-platform.json" must exist in the Modernisation Platform repo
+      # so the strategy can load environment info from it.
+      application: "${{ github.workflow }}"  # Typically: "data-platform"
 
   terraform:
     needs: strategy
@@ -44,11 +47,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.strategy.outputs.matrix) }}
+    # Calls the plan/apply reusable workflow with each item in the matrix
     uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
     with:
+      # Pass along the "application" and "environment" from the matrix
       application: "${{ github.workflow }}"
       environment: "${{ matrix.target }}"
       action: "${{ matrix.action }}"
+      component: "${{ matrix.component }}"      # If your strategy workflow also outputs "matrix.component"
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
@@ -61,6 +67,7 @@ jobs:
       environment: "development"
       action: "plan_apply"
       plan_apply_tfargs: "-destroy"
+      # If you need component logic on destroy, pass it here as well, e.g. component: ...
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}

@@ -1,3 +1,8 @@
+variable "name" {
+  type        = string
+  description = "The name for the connector. Used in naming sub-resources."
+}
+
 variable "account_id" {
   type        = string
   description = "AWS Account ID"

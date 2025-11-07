@@ -43,7 +43,7 @@ module "esb" {
   ecs_service_internal_sg_id = module.ecs.ecs_service_internal_sg_id
   ecs_service_external_sg_id = module.ecs.ecs_service_external_sg_id
   alb_security_group_id      = module.internal_alb.alb_security_group_id
-  #Keep until prod images are done
-  tableau_sg_id = module.tableau.tableau_sg_id
+  mgmt_instance_sg_id        = module.ds.management_server_sg_id
+  tableau_sg_id              = module.tableau.tableau_sg_id
 
 }

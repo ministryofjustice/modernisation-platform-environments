@@ -29,10 +29,10 @@ module "multiphase_cleanup_lambda" {
   tags = merge(
     local.all_tags,
     {
-      Name           = local.lambda_multiphase_cleanup_name
-      Jira           = "DPR2-1909"
-      Resource_Group = "Front-End"
-      Resource_Type  = "lambda"
+      dpr-name           = local.lambda_multiphase_cleanup_name
+      dpr-jira           = "DPR2-1909"
+      dpr-resource-group = "Front-End"
+      dpr-resource-type  = "lambda"
     }
   )
 }

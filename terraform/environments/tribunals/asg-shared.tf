@@ -167,6 +167,10 @@ resource "aws_launch_template" "tribunals-all-lt" {
   instance_type          = "m5.4xlarge"
   update_default_version = true
 
+  lifecycle {
+    ignore_changes = [default_version, image_id]
+  }
+
   iam_instance_profile {
     name = aws_iam_instance_profile.ec2_instance_profile.name
   }
@@ -271,23 +275,16 @@ resource "aws_autoscaling_group" "tribunals-all-asg" {
   }
 }
 
+#trivy:ignore:AVD-AWS-0131: "Root block device enforced at LT"
+#trivy:ignore:AVD-AWS-0130: "IMDSv2 enforced at the LT"
 resource "aws_instance" "tribunals_backup" {
-  iam_instance_profile = aws_iam_instance_profile.ec2_instance_profile.name
+  #checkov:skip=CKV_AWS_135: "EBS optimized enforced at LT"
+  #checkov:skip=CKV_AWS_8: "EBS encryption enforced at LT"
+  #checkov:skip=CKV2_AWS_41: "IAM role is attached enforced at LT"
+  #checkov:skip=CKV_AWS_79: "IMDSv2 enforced at the LT"
   launch_template {
     id      = aws_launch_template.tribunals-backup-lt.id
     version = "$Latest"
-  }
-
-  ebs_optimized = true
-
-
-  metadata_options {
-    http_endpoint = "enabled"
-    http_tokens   = "required"
-  }
-
-  root_block_device {
-    encrypted = true
   }
 
   tags = {

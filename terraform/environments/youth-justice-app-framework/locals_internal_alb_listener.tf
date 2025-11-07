@@ -36,6 +36,20 @@ locals {
             }
           }]
         },
+        assets = {
+          priority = 3
+          actions = [
+            {
+              type             = "forward"
+              target_group_key = "assets-target-group-1"
+            }
+          ]
+          conditions = [{
+            path_pattern = {
+              values = ["/api/v1/assets*"]
+            }
+          }]
+        },
         yp = {
           priority = 4
           actions = [
@@ -570,6 +584,21 @@ locals {
             http_header = {
               http_header_name = "service-health"
               values           = ["transitions"]
+            }
+          }]
+        },
+        assets_health = {
+          priority = 42
+          actions = [
+            {
+              type             = "forward"
+              target_group_key = "assets-target-group-1"
+            }
+          ]
+          conditions = [{ #header condition for assets
+            http_header = {
+              http_header_name = "service-health"
+              values           = ["assets"]
             }
           }]
         }

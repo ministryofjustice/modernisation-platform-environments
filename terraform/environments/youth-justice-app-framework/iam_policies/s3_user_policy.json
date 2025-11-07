@@ -17,7 +17,7 @@
               "s3:DeleteObject",
               "s3:GetObjectAcl"
           ],
-          "Resource": ${dal_buckets}
+          "Resource": ${dal_buckets_wildcarded}
       }
   ]
 }

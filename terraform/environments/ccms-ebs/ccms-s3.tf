@@ -73,7 +73,7 @@ module "s3-bucket" { #tfsec:ignore:aws-s3-enable-versioning
 
 resource "aws_s3_bucket_notification" "artefact_bucket_notification" {
   bucket = module.s3-bucket.bucket.id
-
+  eventbridge = true
   topic {
     topic_arn     = aws_sns_topic.s3_topic.arn
     events        = ["s3:ObjectCreated:*"]
@@ -169,7 +169,7 @@ module "s3-bucket-logging" {
 
 resource "aws_s3_bucket_notification" "logging_bucket_notification" {
   bucket = module.s3-bucket-logging.bucket.id
-
+  eventbridge = true
   topic {
     topic_arn     = aws_sns_topic.s3_topic.arn
     events        = ["s3:ObjectCreated:*"]
@@ -276,7 +276,7 @@ module "s3-bucket-dbbackup" {
 
 resource "aws_s3_bucket_notification" "dbbackup_bucket_notification" {
   bucket = module.s3-bucket-dbbackup.bucket.id
-
+  eventbridge = true
   topic {
     topic_arn     = aws_sns_topic.s3_topic.arn
     events        = ["s3:ObjectCreated:*"]

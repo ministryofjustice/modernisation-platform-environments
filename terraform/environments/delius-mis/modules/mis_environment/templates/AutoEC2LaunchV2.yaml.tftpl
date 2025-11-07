@@ -9,6 +9,19 @@ tasks:
         # Wait for EBS volumes to be attached
         Write-Output "Waiting 30 seconds for EBS volumes to attach..."
         Start-Sleep -Seconds 30
+    - frequency: once
+      type: powershell
+      runAs: admin
+      content: |-
+        # AMI may have a D: drive attached for server 2022 disk image still so this needs removing
+        $volume = Get-WmiObject -Class Win32_Volume | Where-Object { $_.DriveLetter -eq "D:" }
+        if ($volume) { 
+          $volume.DriveLetter = $null 
+          $volume.Put() 
+          Write-Host "Drive D: unmount success" 
+        } else { 
+          Write-Host "Drive D: not found" 
+        }
 - task: initializeVolume
   inputs:
     initialize: devices

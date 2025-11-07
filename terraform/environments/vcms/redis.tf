@@ -33,7 +33,7 @@ resource "aws_elasticache_cluster" "redis" {
 }
 
 resource "aws_elasticache_subnet_group" "redis_subnet_group" {
-  name       = "vcms-redis-subnets"
+  name        = "vcms-redis-subnets"
   description = "Subnet group for VCMS Redis"
-  subnet_ids = local.account_config.private_subnet_ids
+  subnet_ids  = local.account_config.private_subnet_ids
 }
