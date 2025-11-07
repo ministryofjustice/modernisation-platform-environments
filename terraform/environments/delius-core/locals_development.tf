@@ -102,7 +102,7 @@ locals {
     }
 
     ldap = {
-      image_tag                 = "testing-18219655011-1"
+      image_tag                 = "cache-warming-19169476679-1"
       container_port            = 389
       slapd_log_level           = "stats"
       container_cpu             = 512
