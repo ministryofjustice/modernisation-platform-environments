@@ -21,7 +21,7 @@ resource "aws_vpc_security_group_ingress_rule" "ingress_ssogen_internal_4443_wor
   security_group_id = aws_security_group.sg_ssogen_internal_alb.id
   description       = "Allow HTTPS (4443) from AWS Workspaces CIDR"
   from_port         = 443
-  to_port           = 4443
+  to_port           = 443
   ip_protocol       = "tcp"
   cidr_ipv4         = local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_prod
 }
