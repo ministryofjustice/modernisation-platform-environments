@@ -129,7 +129,7 @@ data "aws_elb_service_account" "default" {}
 
 resource "aws_lb" "external" {
   name                       = "${upper(local.application_name_short)}-LoadBalancer"
-  # internal                   = false
+  internal                   = true
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.external_lb.id]
   subnets                    = [var.public_subnet_a_id, var.public_subnet_b_id, var.public_subnet_c_id]
