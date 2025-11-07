@@ -272,5 +272,5 @@ resource "aws_vpc_security_group_ingress_rule" "ing_4443_from_alb" {
   from_port                    = 4443
   to_port                      = 4443
   ip_protocol                  = "tcp"
-  referenced_security_group_id = aws_security_group.sg_ssogen_internal_alb.id
+  referenced_security_group_id = aws_security_group.sg_ssogen_internal_alb[count.index].id
 }
