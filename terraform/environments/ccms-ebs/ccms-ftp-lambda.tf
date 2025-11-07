@@ -158,66 +158,66 @@ module "bucket" { #tfsec:ignore:aws-s3-enable-versioning
 # }
 
 # Server access logging: send access logs to the environment logging bucket
-resource "aws_s3_bucket_logging" "buckets_access_logging" {
-  for_each = aws_s3_bucket.buckets
+# resource "aws_s3_bucket_logging" "buckets_access_logging" {
+#   for_each = aws_s3_bucket.buckets
 
-  bucket = each.value.id
+#   bucket = each.value.id
 
-  target_bucket = local.logging_bucket_name
-  target_prefix = "s3-access-logs/${each.key}/"
-}
+#   target_bucket = local.logging_bucket_name
+#   target_prefix = "s3-access-logs/${each.key}/"
+# }
 
-resource "aws_s3_bucket_server_side_encryption_configuration" "bucket_encryption" {
-  for_each = aws_s3_bucket.buckets
+# resource "aws_s3_bucket_server_side_encryption_configuration" "bucket_encryption" {
+#   for_each = aws_s3_bucket.buckets
 
-  bucket = each.value.id
+#   bucket = each.value.id
 
-  rule {
-    apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
-    }
-  }
-}
+#   rule {
+#     apply_server_side_encryption_by_default {
+#       sse_algorithm = "AES256"
+#     }
+#   }
+# }
 
-resource "aws_s3_bucket_versioning" "s3_versioning" {
-  for_each = aws_s3_bucket.buckets
-  bucket   = each.value.id
+# resource "aws_s3_bucket_versioning" "s3_versioning" {
+#   for_each = aws_s3_bucket.buckets
+#   bucket   = each.value.id
 
-  versioning_configuration {
-    status = "Enabled"
-  }
-}
+#   versioning_configuration {
+#     status = "Enabled"
+#   }
+# }
 
 # Lifecycle configuration: expire current objects and noncurrent versions after 30 days
-resource "aws_s3_bucket_lifecycle_configuration" "buckets_lifecycle" {
-  for_each = aws_s3_bucket.buckets
+# resource "aws_s3_bucket_lifecycle_configuration" "buckets_lifecycle" {
+#   for_each = aws_s3_bucket.buckets
 
-  bucket = each.value.id
+#   bucket = each.value.id
 
-  # One lifecycle rule per prefix
-  dynamic "rule" {
-    for_each = local.target_prefixes
-    content {
-      id     = "expire-${replace(each.value.id, "/", "-")}-${replace(rule.value, "/", "-")}-${local.expire_days}d"
-      status = "Enabled"
+#   # One lifecycle rule per prefix
+#   dynamic "rule" {
+#     for_each = local.target_prefixes
+#     content {
+#       id     = "expire-${replace(each.value.id, "/", "-")}-${replace(rule.value, "/", "-")}-${local.expire_days}d"
+#       status = "Enabled"
 
-      filter {
-        and {
-          prefix                   = rule.value
-          object_size_greater_than = 0
-        }
-      }
+#       filter {
+#         and {
+#           prefix                   = rule.value
+#           object_size_greater_than = 0
+#         }
+#       }
 
-      expiration {
-        days = local.expire_days
-      }
+#       expiration {
+#         days = local.expire_days
+#       }
 
-      noncurrent_version_expiration {
-        noncurrent_days = local.expire_days
-      }
-    }
-  }
-}
+#       noncurrent_version_expiration {
+#         noncurrent_days = local.expire_days
+#       }
+#     }
+#   }
+# }
 
 #--Dynamic blocks for transfer family policy in production only
 data "aws_iam_policy_document" "inbound_bucket_policy" {
@@ -238,8 +238,8 @@ data "aws_iam_policy_document" "inbound_bucket_policy" {
       ]
     }
     resources = [
-      aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].arn,
-      "${aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].arn}/*"
+      module.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket.arn,
+      "${module.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket.arn}/*"
     ]
   }
 
@@ -255,7 +255,8 @@ data "aws_iam_policy_document" "inbound_bucket_policy" {
         identifiers = [module.transfer_family[0].grant_iam_role_arn]
       }
       resources = [
-        aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].arn
+        module.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket.arn,
+        # aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].arn
       ]
     }
   }
@@ -289,14 +290,14 @@ data "aws_iam_policy_document" "inbound_bucket_policy" {
 }
 
 resource "aws_s3_bucket_policy" "inbound_bucket_policy" {
-  bucket = aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket
+  bucket = module.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket.arn
   policy = data.aws_iam_policy_document.inbound_bucket_policy.json
 }
 
 #--Cash office. Transfer family CORS. Production only
 resource "aws_s3_bucket_cors_configuration" "inbound_bucket_cors_policy" {
   count  = (local.is-preproduction || local.is-production) ? 1 : 0
-  bucket = aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket
+  bucket = module.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket.arn
   cors_rule {
     allowed_headers = ["*"]
     allowed_methods = ["GET", "PUT", "POST"]
@@ -319,7 +320,7 @@ resource "aws_s3_bucket_cors_configuration" "inbound_bucket_cors_policy" {
 }
 
 resource "aws_s3_bucket_policy" "outbound_bucket_policy" {
-  bucket = aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].bucket
+  bucket = module.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket.arn
 
   policy = jsonencode({
     "Version" : "2012-10-17",
@@ -341,7 +342,8 @@ resource "aws_s3_bucket_policy" "outbound_bucket_policy" {
           "s3:DeleteObject"
         ],
         "Resource" : [
-          aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].arn,
+          module.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket.arn,
+          # aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].arn,
           "${aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].arn}/*"
         ]
       }
@@ -351,13 +353,13 @@ resource "aws_s3_bucket_policy" "outbound_bucket_policy" {
 }
 
 resource "aws_s3_object" "ftp_lambda_layer" {
-  bucket = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
+  bucket = module.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket.arn
   key    = "lambda/ftp_lambda_layer.zip"
   source = "lambda/ftp_lambda_layer.zip"
 }
 
 resource "aws_s3_object" "ftp_client" {
-  bucket = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
+  bucket = module.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket.arn
   key    = "lambda/ftp-client-v3.1.zip"
   source = "lambda/ftp-client-v3.1.zip"
 }
@@ -371,11 +373,11 @@ module "allpay_ftp_lambda_outbound" {
   ftp_transfer_type        = "SFTP_UPLOAD"
   ftp_local_path           = "CCMS_PRD_Allpay/Outbound/"
   ftp_remote_path          = lower(local.environment) == "production" ? "/Inbound/" : "/home/${local.ftp_test_user_secret_value["USER"]}/laa-ccms-outbound-${local.environment}-mp/outbound-lambda-runs/"
-  ftp_bucket               = aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].bucket
+  ftp_bucket               =module.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket.arn
   env                      = local.environment
   secret_name              = "LAA-ftp-allpay-inbound-ccms-${local.environment}"
   secret_arn               = aws_secretsmanager_secret.secrets["LAA-ftp-allpay-inbound-ccms"].arn
-  s3_bucket_ftp            = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
+  s3_bucket_ftp            = module.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket.arn
   s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
   s3_object_ftp_client     = aws_s3_object.ftp_client.key
   #ftp_cron                     = "cron(0 10 * * ? *)"

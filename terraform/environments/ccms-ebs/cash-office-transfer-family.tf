@@ -22,7 +22,8 @@ module "transfer_family" {
   source                        = "./modules/transfer-family"
   aws_account_id                = data.aws_caller_identity.current.account_id
   app_name                      = local.application_name
-  bucket_name                   = aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket
+  bucket_name = module.bucket["laa-ccms-inbound-${local.environment}-mp"].bucket.id
+  # bucket_name                   = aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket
   aws_identity_centre_store_arn = local.application_data.accounts[local.environment].cash_office_idp_arn
 }
 
