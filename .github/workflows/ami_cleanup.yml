@@ -1,13 +1,9 @@
-# .github/workflows/ami_cleanup.yml
 name: Cloud Cleanup (AMI & EBS)
 
 on:
-  # Push previews on your feature branch
   push:
     branches:
       - feature-11321-identifying-snapshots-to-be-deleted
-
-  # Manual dispatch with <=10 inputs
   workflow_dispatch:
     inputs:
       application:
@@ -41,7 +37,6 @@ on:
         required: true
         default: false
         type: boolean
-      # CONSOLIDATED: one toggle + one minutes value for both AMI/EBS in preview
       test_mode:
         description: 'Enable 3-minute minute-based test window in PREVIEW'
         required: false
@@ -52,7 +47,6 @@ on:
         required: false
         default: "3"
         type: string
-      # LIVE switch to also apply the 3-minute window
       live_test_mode:
         description: 'Apply the same 3-minute window in LIVE deletions (testing only!)'
         required: false
@@ -63,7 +57,6 @@ permissions:
   id-token: write
   contents: read
 
-# Defaults (can be overridden by workflow_dispatch)
 env:
   APPLICATION:      ${{ github.event.inputs.application || 'cooker' }}
   ENVIRONMENTS:     ${{ github.event.inputs.environments || 'development' }}
@@ -105,9 +98,6 @@ jobs:
       MODERNISATION_PLATFORM_ACCOUNT_NUMBER: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
 
-  # -------------------------
-  # PREVIEW (Dry-Run)
-  # -------------------------
   preview:
     name: Preview Deletions (Dry-Run)
     runs-on: ubuntu-latest
@@ -203,10 +193,8 @@ jobs:
           echo "Effective AMI test flags: ${AMI_TEST_FLAGS:-<none>}"
           echo "----------------------------------------------------"
 
-          # DRY RUN: generate command list & candidates
           scripts/ami_cleanup.sh -a "$app" -s ami_commands.sh ${AMI_TEST_FLAGS:-} $args -d delete || true
 
-          # Capture AMI->snapshot map for visibility (no deletion in preview)
           > ami_snapshots.csv
           for AMI in $(grep -Eo 'ami-[0-9a-f]+' ami_commands.sh | sort -u); do
             SNAPS=$(aws ec2 describe-images --image-ids "$AMI" \
@@ -270,9 +258,6 @@ jobs:
           path: ebs_candidates.txt
           if-no-files-found: warn
 
-  # -------------------------
-  # LIVE (Deletion)
-  # -------------------------
   ami-delete:
     name: AMI Delete (Live)
     runs-on: ubuntu-latest
@@ -338,7 +323,6 @@ jobs:
       - name: Plan AMI deletion & capture snapshot mapping
         run: |
           set -euo pipefail
-          # Assume MemberInfrastructureAccess in this same shell (org pattern)
           CREDS_JSON=$(aws sts assume-role --role-arn "arn:aws:iam::${ACCOUNT_NUMBER}:role/MemberInfrastructureAccess" --role-session-name "live-ami-plan-${{ matrix.account_name }}" --output json)
           export AWS_ACCESS_KEY_ID=$(jq -r '.Credentials.AccessKeyId'     <<< "$CREDS_JSON")
           export AWS_SECRET_ACCESS_KEY=$(jq -r '.Credentials.SecretAccessKey' <<< "$CREDS_JSON")
@@ -350,10 +334,8 @@ jobs:
           app="${APPLICATION}"
           args="${AMI_ARGS}"
 
-          # Dry-run to generate ami_commands.sh without deleting
           scripts/ami_cleanup.sh -a "$app" -s ami_commands.sh ${AMI_TEST_FLAGS:-} $args -d delete || true
 
-          # Build CSV: ami_id,snapshot_id for all candidates
           > ami_snapshots.csv
           AMI_IDS=$(grep -Eo 'ami-[0-9a-f]+' ami_commands.sh | sort -u || true)
           if [[ -n "$AMI_IDS" ]]; then
@@ -368,11 +350,53 @@ jobs:
           fi
           [[ -f ami_candidates.csv ]] || touch ami_candidates.csv
 
+      # NEW: Guard — strip protected AMIs (AwsBackup or Retain/Backup tags) from the plan BEFORE deletion
+      - name: Guard protected AMIs from deletion
+        run: |
+          set -euo pipefail
+          # Match names that look like AwsBackup/Backup-prefixed images
+          PROTECTED_NAME_REGEX='^(AwsBackup|Backup)'
+          # Any tag key Retain or Backup with truthy value should protect
+          is_truthy_tag () {
+            jq -e '.[] | select((.Key|test("Retain|Backup"; "i")) and (.Value|test("^(true|yes|1)$"; "i")))' >/dev/null
+          }
+
+          touch ami_commands.sh
+          AMI_IDS="$(grep -Eo 'ami-[0-9a-f]+' ami_commands.sh | sort -u || true)"
+          [[ -n "$AMI_IDS" ]] || { echo "No AMIs in plan."; exit 0; }
+
+          > protected_amis.txt
+          for AMI in $AMI_IDS; do
+            NAME="$(aws ec2 describe-images --image-ids "$AMI" --query 'Images[0].Name' --output text 2>/dev/null || echo '')"
+            TAGS_JSON="$(aws ec2 describe-images --image-ids "$AMI" --query 'Images[0].Tags' --output json 2>/dev/null || echo '[]')"
+            if [[ "$NAME" =~ $PROTECTED_NAME_REGEX ]] || echo "$TAGS_JSON" | is_truthy_tag; then
+              echo "$AMI $NAME" >> protected_amis.txt
+            fi
+          done
+
+          if [[ -s protected_amis.txt ]]; then
+            echo "Protected AMIs detected; removing from plan:"
+            cat protected_amis.txt
+
+            # remove protected AMIs from ami_commands.sh
+            tmp_cmds="$(mktemp)"
+            grep -v -F -f <(cut -d' ' -f1 protected_amis.txt) ami_commands.sh > "$tmp_cmds" || true
+            mv "$tmp_cmds" ami_commands.sh
+
+            # also filter ami_candidates.csv if present
+            if [[ -f ami_candidates.csv ]]; then
+              tmp_cand="$(mktemp)"
+              grep -v -F -f <(cut -d' ' -f1 protected_amis.txt) ami_candidates.csv > "$tmp_cand" || true
+              mv "$tmp_cand" ami_candidates.csv
+            fi
+          else
+            echo "No protected AMIs matched."
+          fi
+
       # 2) DELETE AMIs
       - name: Recompute & Delete AMIs (Live)
         run: |
           set -euo pipefail
-          # Assume MemberInfrastructureAccess in this same shell (org pattern)
           CREDS_JSON=$(aws sts assume-role --role-arn "arn:aws:iam::${ACCOUNT_NUMBER}:role/MemberInfrastructureAccess" --role-session-name "live-ami-delete-${{ matrix.account_name }}" --output json)
           export AWS_ACCESS_KEY_ID=$(jq -r '.Credentials.AccessKeyId'     <<< "$CREDS_JSON")
           export AWS_SECRET_ACCESS_KEY=$(jq -r '.Credentials.SecretAccessKey' <<< "$CREDS_JSON")
@@ -386,7 +410,7 @@ jobs:
           echo "[LIVE] Collecting candidates and deregistering (if any)"
           echo "Effective AMI test flags: ${AMI_TEST_FLAGS:-<none>}"
 
-          # LIVE: generate + execute inside the script (do NOT re-run the commands)
+          # Execute deletion using the (now filtered) plan
           scripts/ami_cleanup.sh -a "$app" -s ami_commands.sh ${AMI_TEST_FLAGS:-} $args delete || true
 
           TOTAL="$(grep -c '^aws ec2 deregister-image' ami_commands.sh || true)"
@@ -405,7 +429,6 @@ jobs:
         if: always()
         run: |
           set -euo pipefail
-          # Assume MemberInfrastructureAccess in this same shell (org pattern)
           CREDS_JSON=$(aws sts assume-role --role-arn "arn:aws:iam::${ACCOUNT_NUMBER}:role/MemberInfrastructureAccess" --role-session-name "live-ami-snaps-${{ matrix.account_name }}" --output json)
           export AWS_ACCESS_KEY_ID=$(jq -r '.Credentials.AccessKeyId'     <<< "$CREDS_JSON")
           export AWS_SECRET_ACCESS_KEY=$(jq -r '.Credentials.SecretAccessKey' <<< "$CREDS_JSON")
@@ -439,31 +462,22 @@ jobs:
           while IFS=',' read -r AMI_ID SNAP_ID; do
             [[ -z "$SNAP_ID" ]] && continue
             [[ "$SNAP_ID" =~ ^snap- ]] || continue
-
-            # If snapshot no longer exists (because --delete-associated-snapshots already removed it), skip.
             if ! aws ec2 describe-snapshots --snapshot-ids "$SNAP_ID" --query 'Snapshots[0].SnapshotId' --output text >/dev/null 2>&1; then
               echo "Skip $SNAP_ID (already deleted)."
               continue
             fi
-
-            # Fetch minimal details to decide retention
             read -r TAGS DESC NAME <<< "$(aws ec2 describe-snapshots \
               --snapshot-ids "$SNAP_ID" \
               --query '[Snapshots[0].Tags, Snapshots[0].Description, Snapshots[0].Tags[?Key==`Name`]|[0].Value]' \
               --output text 2>/dev/null || true)"
-
-            # Skip if tags indicate retention (Retain/Backup=true/yes/1)
             if grep -Eiq '(^|[[:space:]])(Retain|Backup)[[:space:]]*=[[:space:]]*(true|yes|1)' <<< "${TAGS:-}"; then
               echo "Skip $SNAP_ID (retention tag)."
               continue
             fi
-
-            # Skip if name/description suggests AwsBackup
             if grep -qi 'AwsBackup' <<< "${DESC:-} ${NAME:-}"; then
               echo "Skip $SNAP_ID (AwsBackup)."
               continue
             fi
-
             echo "Deleting snapshot $SNAP_ID (from $AMI_ID)"
             aws_try aws ec2 delete-snapshot --snapshot-id "$SNAP_ID" || true
             deleted=$((deleted+1))
@@ -480,6 +494,7 @@ jobs:
             ami_candidates.csv
             ami_commands.sh
             ami_snapshots.csv
+            protected_amis.txt          # <-- NEW: show what was guarded
           if-no-files-found: warn
 
   ebs-delete:
@@ -546,7 +561,6 @@ jobs:
       - name: Delete EBS Volumes (Live)
         run: |
           set -euo pipefail
-          # Assume MemberInfrastructureAccess in this same shell (org pattern)
           CREDS_JSON=$(aws sts assume-role --role-arn "arn:aws:iam::${ACCOUNT_NUMBER}:role/MemberInfrastructureAccess" --role-session-name "live-ebs-${{ matrix.account_name }}" --output json)
           export AWS_ACCESS_KEY_ID=$(jq -r '.Credentials.AccessKeyId'     <<< "$CREDS_JSON")
           export AWS_SECRET_ACCESS_KEY=$(jq -r '.Credentials.SecretAccessKey' <<< "$CREDS_JSON")
