@@ -66,13 +66,11 @@ resource "aws_lambda_function" "cloudfront_redirect_lambda" {
   provider         = aws.us-east-1
   function_name    = "CloudfrontRedirectLambda"
   filename         = local.is-production ? data.archive_file.lambda_zip.output_path : data.archive_file.lambda_zip_nonprod.output_path
-  source_code_hash = sha256(
-    "${local.is-production ? data.archive_file.lambda_zip.output_base64sha256 : data.archive_file.lambda_zip_nonprod.output_base64sha256}${var.force_lambda_version}"
-  )
-  role             = aws_iam_role.lambda_edge_role.arn
+  source_code_hash = local.is-production ? data.archive_file.lambda_zip.output_base64sha256 : data.archive_file.lambda_zip_nonprod.output_base64sha256
   handler          = local.is-production ? "cloudfront-redirect.handler" : "cloudfront-redirect-nonprod.handler"
-  runtime          = "nodejs18.x"
-  publish          = true
+  role             = aws_iam_role.lambda_edge_role.arn
+  runtime          = "nodejs20.x"
+  publish          = false
   timeout          = 5
   memory_size      = 128
 
@@ -84,15 +82,16 @@ resource "aws_lambda_function" "cloudfront_redirect_lambda" {
   lifecycle {
     create_before_destroy = true
   }
-
 }
 
-variable "force_lambda_version" {
-  description = "Increment to force new Lambda@Edge version"
-  type        = string
-  default     = "8"
-}
+resource "aws_lambda_function_version" "cloudfront_redirect_version" {
+  function_name = aws_lambda_function.cloudfront_redirect_lambda.arn
+  description   = "Auto-published version for ${local.environment}"
 
+  lifecycle {
+    create_before_destroy = true
+  }
+}
 
 resource "aws_lambda_permission" "allow_http_cloudfront" {
   provider      = aws.us-east-1
@@ -100,11 +99,12 @@ resource "aws_lambda_permission" "allow_http_cloudfront" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.cloudfront_redirect_lambda.function_name
   principal     = "edgelambda.amazonaws.com"
-  source_arn    = "arn:aws:cloudfront::${data.aws_caller_identity.current.account_id}:distribution/E10QL40TQLZAGN"
+  # Only set source_arn if distribution exists
+  source_arn = local.matching_distribution_id != null ?
+    "arn:aws:cloudfront::${data.aws_caller_identity.current.account_id}:distribution/${local.matching_distribution_id}" :
+    null
   qualifier     = aws_lambda_function.cloudfront_redirect_lambda.version
 }
-
-
 
 resource "aws_lambda_permission" "allow_replicator" {
   provider      = aws.us-east-1

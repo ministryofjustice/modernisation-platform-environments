@@ -1,3 +1,8 @@
+variable "cloudfront_distribution_id" {
+  type        = string
+  description = "Existing CloudFront distribution ID to grant invoke permission to. Leave blank if none yet."
+  default     = ""
+}
 variable "services" {
   type = map(object({
     name_prefix = string

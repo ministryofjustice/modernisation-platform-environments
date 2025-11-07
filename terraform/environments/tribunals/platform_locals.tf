@@ -88,4 +88,11 @@ locals {
   cloudfront_nginx_nonprod_sans = []
 
 
+  # Find the first distribution whose comment matches the environment
+  matching_distribution_id = [
+    for d in data.aws_cloudfront_distributions.all.items :
+    d.id
+    if d.comment == "cloudfront-redirect-${local.environment}"
+  ][0]
+
 }

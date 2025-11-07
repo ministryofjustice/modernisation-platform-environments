@@ -99,7 +99,7 @@ resource "aws_cloudfront_distribution" "tribunals_http_redirect" {
 
   enabled             = true
   is_ipv6_enabled     = true
-  comment             = "Cloudfront redirect legacy http domains from old nginx"
+  comment             = "cloudfront-redirect-${local.environment}"
   price_class         = "PriceClass_All"
   http_version        = "http2"
 

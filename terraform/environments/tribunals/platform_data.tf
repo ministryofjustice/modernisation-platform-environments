@@ -173,3 +173,7 @@ data "aws_iam_session_context" "whoami" {
 data "http" "environments_file" {
   url = "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/${local.application_name}.json"
 }
+
+# Automatically populated by terraform with all distributions  in environment
+# Referenced in  platform_locals.tf
+data "aws_cloudfront_distributions" "all" {}
