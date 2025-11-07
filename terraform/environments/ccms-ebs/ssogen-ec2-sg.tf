@@ -262,15 +262,15 @@ resource "aws_security_group_rule" "eg_icmp_vpc_workspaces" {
 }
 
 #########################################
-# SSOGEN Security Group Notes
+# SSOGEN Security Group — Allow inbound 4443 from ALB
 #########################################
-resource "aws_security_group_rule" "ing_4443_from_alb" {
-  count             = local.is_development ? 1 : 0
-  type              = "ingress"
-  description       = "Allow outbound HTTPS"
-  security_group_id = aws_security_group.ssogen_sg[0].id
-  protocol          = "tcp"
-  from_port         = 4443
-  to_port           = 4443
-  source_security_group_id = aws_security_group.sg_ssogen_internal_alb.id
+
+resource "aws_vpc_security_group_ingress_rule" "ing_4443_from_alb" {
+  count                       = local.is_development ? 1 : 0
+  security_group_id            = aws_security_group.ssogen_sg[0].id
+  description                  = "Allow inbound HTTPS (4443) from SSOGEN internal ALB"
+  from_port                    = 4443
+  to_port                      = 4443
+  ip_protocol                  = "tcp"
+  referenced_security_group_id = aws_security_group.sg_ssogen_internal_alb.id
 }
