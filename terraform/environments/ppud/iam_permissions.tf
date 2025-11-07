@@ -1,4 +1,24 @@
 #######################################################################
+# Data Sources for S3 Buckets
+#######################################################################
+
+data "aws_s3_bucket" "infrastructure_buckets" {
+  for_each = {
+    for env_key, env_config in local.iam_environments : env_key => env_config.s3_bucket_names.infrastructure
+    if env_config.condition
+  }
+  bucket = each.value
+}
+
+data "aws_s3_bucket" "log_file_buckets" {
+  for_each = {
+    for env_key, env_config in local.iam_environments : env_key => env_config.s3_bucket_names.log_files
+    if env_config.condition
+  }
+  bucket = each.value
+}
+
+#######################################################################
 # Dynamic IAM Roles, Policies and Attachments for Lambda Functions
 #######################################################################
 
@@ -204,11 +224,11 @@ resource "aws_iam_policy" "lambda_policies_v2" {
       } : each.value.policy_name == "get_data_s3" ? {
         Effect = "Allow"
         Action = ["s3:GetObject", "s3:PutObject", "s3:DeleteObject", "s3:ListBucket"]
-        Resource = ["arn:aws:s3:::${each.value.env_config.s3_bucket_names.infrastructure}", "arn:aws:s3:::${each.value.env_config.s3_bucket_names.infrastructure}/*"]
+        Resource = [data.aws_s3_bucket.infrastructure_buckets[each.value.env_key].arn, "${data.aws_s3_bucket.infrastructure_buckets[each.value.env_key].arn}/*"]
       } : each.value.policy_name == "put_data_s3" ? {
         Effect = "Allow"
         Action = ["s3:PutObject", "s3:PutObjectAcl", "s3:ListBucket"]
-        Resource = ["arn:aws:s3:::${each.value.env_config.s3_bucket_names.log_files}", "arn:aws:s3:::${each.value.env_config.s3_bucket_names.log_files}/*"]
+        Resource = [data.aws_s3_bucket.log_file_buckets[each.value.env_key].arn, "${data.aws_s3_bucket.log_file_buckets[each.value.env_key].arn}/*"]
       } : each.value.policy_name == "get_klayers" ? {
         Effect = "Allow"
         Action = ["ssm:GetParameter"]
@@ -227,8 +247,6 @@ resource "aws_iam_policy" "lambda_policies_v2" {
 }
 
 #######################################################################
-# IAM Role Policy Attachments
-#####################################################################################################################################
 # IAM Role Policy Attachments
 #######################################################################
 
