@@ -81,7 +81,7 @@ resource "aws_iam_role_policy_attachment" "rotate_iam_keys" {
 module "secrets_manager" {
   #checkov:skip=CKV_TF_1: "Module registry does not support commit hashes for versions"
   source  = "terraform-aws-modules/secrets-manager/aws"
-  version = "1.3.0"
+  version = "2.0.1"
 
   name        = "iam-${aws_iam_user.supplier.name}"
   description = "IAM user access credentials for ${var.data_feed}-${var.order_type}"
