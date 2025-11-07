@@ -301,7 +301,7 @@ module "allpay_ftp_lambda_outbound" {
   env                      = local.environment
   secret_name              = "LAA-ftp-allpay-inbound-ccms-${local.environment}"
   secret_arn               = aws_secretsmanager_secret.secrets["LAA-ftp-allpay-inbound-ccms"].arn
-  s3_bucket_ftp            = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
+  s3_bucket_ftp            = aws_s3_bucket.ccms_ebs_shared.bucket
   # s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
   # s3_object_ftp_client     = aws_s3_object.ftp_client.key
   s3_object_ftp_clientlibs = "lambda_delivery/ftp_lambda_layer/ftp_lambda_layer.zip"
@@ -324,7 +324,7 @@ module "allpay_ftp_lambda_inbound" {
   env                      = local.environment
   secret_name              = "LAA-ftp-allpay-inbound-ccms-${local.environment}"
   secret_arn               = aws_secretsmanager_secret.secrets["LAA-ftp-allpay-inbound-ccms"].arn
-  s3_bucket_ftp            = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
+  s3_bucket_ftp            = aws_s3_bucket.ccms_ebs_shared.bucket
   # s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
   # s3_object_ftp_client     = aws_s3_object.ftp_client.key
   s3_object_ftp_clientlibs = "lambda_delivery/ftp_lambda_layer/ftp_lambda_layer.zip"
@@ -347,7 +347,7 @@ module "LAA-ftp-xerox-ccms-outbound" {
   env                      = local.environment
   secret_name              = "LAA-ftp-xerox-outbound-${local.environment}"
   secret_arn               = aws_secretsmanager_secret.secrets["LAA-ftp-xerox-outbound"].arn
-  s3_bucket_ftp            = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
+  s3_bucket_ftp            = aws_s3_bucket.ccms_ebs_shared.bucket
   # s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
   # s3_object_ftp_client     = aws_s3_object.ftp_client.key
   s3_object_ftp_clientlibs = "lambda_delivery/ftp_lambda_layer/ftp_lambda_layer.zip"
@@ -369,7 +369,7 @@ module "LAA-ftp-xerox-ccms-outbound-peterborough" {
   env                      = local.environment
   secret_name              = "LAA-ftp-xerox-outbound-${local.environment}"
   secret_arn               = aws_secretsmanager_secret.secrets["LAA-ftp-xerox-outbound"].arn
-  s3_bucket_ftp            = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
+  s3_bucket_ftp             = aws_s3_bucket.ccms_ebs_shared.bucket
   # s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
   # s3_object_ftp_client     = aws_s3_object.ftp_client.key
   s3_object_ftp_clientlibs = "lambda_delivery/ftp_lambda_layer/ftp_lambda_layer.zip"
@@ -391,7 +391,7 @@ module "LAA-ftp-eckoh-outbound-ccms" {
   env                      = local.environment
   secret_name              = "LAA-ftp-eckoh-inbound-ccms-${local.environment}"
   secret_arn               = aws_secretsmanager_secret.secrets["LAA-ftp-eckoh-inbound-ccms"].arn
-  s3_bucket_ftp            = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
+  s3_bucket_ftp            = aws_s3_bucket.ccms_ebs_shared.bucket
   # s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
   # s3_object_ftp_client     = aws_s3_object.ftp_client.key
   s3_object_ftp_clientlibs = "lambda_delivery/ftp_lambda_layer/ftp_lambda_layer.zip"
@@ -414,7 +414,7 @@ module "LAA-ftp-eckoh-inbound-ccms" {
   env                      = local.environment
   secret_name              = "LAA-ftp-eckoh-inbound-ccms-${local.environment}"
   secret_arn               = aws_secretsmanager_secret.secrets["LAA-ftp-eckoh-inbound-ccms"].arn
-  s3_bucket_ftp            = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
+  s3_bucket_ftp            = aws_s3_bucket.ccms_ebs_shared.bucket
   # s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
   # s3_object_ftp_client     = aws_s3_object.ftp_client.key
   s3_object_ftp_clientlibs = "lambda_delivery/ftp_lambda_layer/ftp_lambda_layer.zip"
@@ -436,7 +436,7 @@ module "LAA-ftp-rossendales-ccms-inbound" {
   env                      = local.environment
   secret_name              = "LAA-ftp-rossendales-ccms-inbound-${local.environment}"
   secret_arn               = aws_secretsmanager_secret.secrets["LAA-ftp-rossendales-ccms-inbound"].arn
-  s3_bucket_ftp            = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
+  s3_bucket_ftp            = aws_s3_bucket.ccms_ebs_shared.bucket
   # s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
   # s3_object_ftp_client     = aws_s3_object.ftp_client.key
   s3_object_ftp_clientlibs = "lambda_delivery/ftp_lambda_layer/ftp_lambda_layer.zip"
@@ -459,7 +459,7 @@ module "LAA-ftp-1stlocate-ccms-inbound" {
   env                      = local.environment
   secret_name              = "LAA-ftp-1stlocate-ccms-inbound-${local.environment}"
   secret_arn               = aws_secretsmanager_secret.secrets["LAA-ftp-1stlocate-ccms-inbound"].arn
-  s3_bucket_ftp            = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
+  s3_bucket_ftp            = aws_s3_bucket.ccms_ebs_shared.bucket
   # s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
   # s3_object_ftp_client     = aws_s3_object.ftp_client.key
   s3_object_ftp_clientlibs = "lambda_delivery/ftp_lambda_layer/ftp_lambda_layer.zip"

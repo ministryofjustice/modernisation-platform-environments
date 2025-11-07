@@ -9,7 +9,7 @@
 # Lambda Layer
 resource "aws_lambda_layer_version" "lambda_layer" {
   layer_name               = "${local.application_name}-${local.environment}-payment-load-layer"
-  s3_bucket                = aws_s3_bucket.lambda_payment_load.bucket
+  s3_bucket                =  aws_s3_bucket.ccms_ebs_shared.bucket
   s3_key                   = "lamda_delivery/layer_latest/layerV2.zip"
   compatible_runtimes      = ["python3.10"]
   compatible_architectures = ["x86_64"]
@@ -53,8 +53,8 @@ resource "aws_lambda_function" "lambda_function" {
   function_name    = "${local.application_name}-${local.environment}-payment-load"
   # filename         = "lambda/functionV2.zip"
   s3_bucket        = aws_s3_bucket.ccms_ebs_shared.bucket
-  s3_key           = "lambda_delivery/functional_latest/functionV2.zip"
-  source_code_hash = filebase64sha256("lambda_delivery/functional_latest/functionV2.zip")
+  s3_key           = "lambda_delivery/function_latest/functionV2.zip"
+  source_code_hash = filebase64sha256("lambda_delivery/function_latest/functionV2.zip")
   handler          = "lambda_function.lambda_handler"
   runtime          = "python3.10"
   role             = aws_iam_role.lambda_execution_role.arn

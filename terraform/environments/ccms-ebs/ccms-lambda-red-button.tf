@@ -67,7 +67,7 @@ resource "aws_iam_role_policy" "red_button_lambda_policy" {
 
 resource "aws_lambda_function" "red_button_trigger" {
   # filename         = "./lambda/red_button_trigger.zip"
-  s3_bucket        = local.application_data.accounts[local.environment].lambda_s3_bucket
+  s3_bucket        = aws_s3_bucket.ccms_ebs_shared.bucket
   s3_key           = "lambda_delivery/red_button_trigger/red_button_trigger.zip"
   function_name    = "${local.application_name}-${local.environment}-red-button-trigger"
   role             = aws_iam_role.red_button_lambda_role.arn

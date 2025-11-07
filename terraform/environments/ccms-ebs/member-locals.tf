@@ -9,7 +9,7 @@ locals {
   lb_log_prefix_ebsapp_internal  = "ebsapps-internal-lb"
   lb_log_prefix_webgate_internal = "webgate-internal-lb"
 
-  lambda_folder_name = ["lambda_delivery", "certificate_monitor", "ftp_lambda_layer", "ftp_client_latest", "functional_latest", "layer_latest", "payment_load_monitor", "red_button_trigger"]
+  lambda_folder_name = ["lambda_delivery", "certificate_monitor", "ftp_lambda_layer", "ftp_client_latest", "function_latest", "layer_latest", "payment_load_monitor", "red_button_trigger"]
   data_subnets = [
     data.aws_subnet.data_subnets_a.id,
     data.aws_subnet.data_subnets_b.id,
