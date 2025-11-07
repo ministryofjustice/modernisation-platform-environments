@@ -9,19 +9,16 @@ locals {
       condition    = local.is-development
       s3_bucket    = "moj-infrastructure-dev"
       account_key  = "ppud-development"
-      klayers_param = data.aws_ssm_parameter.klayers_account_dev[0].value
     }
     preproduction = {
       condition    = local.is-preproduction
       s3_bucket    = "moj-infrastructure-uat"
       account_key  = "ppud-preproduction"
-      klayers_param = null
     }
     production = {
       condition    = local.is-production
       s3_bucket    = "moj-infrastructure"
       account_key  = "ppud-production"
-      klayers_param = data.aws_ssm_parameter.klayers_account_prod[0].value
     }
   }
 
@@ -216,11 +213,11 @@ locals {
     log_retention_days            = 30
   }
 
-  # Layer ARNs
-  layer_arns = {
-    numpy      = "arn:aws:lambda:eu-west-2:${local.lambda_environments.production.klayers_param}:layer:Klayers-p312-numpy:8"
-    pillow     = "arn:aws:lambda:eu-west-2:${local.lambda_environments.production.klayers_param}:layer:Klayers-p312-pillow:1"
-  }
+  # Layer ARNs (commented out until klayers data source exists)
+  # layer_arns = {
+  #   numpy      = "arn:aws:lambda:eu-west-2:KLAYERS_ACCOUNT_ID:layer:Klayers-p312-numpy:8"
+  #   pillow     = "arn:aws:lambda:eu-west-2:KLAYERS_ACCOUNT_ID:layer:Klayers-p312-pillow:1"
+  # }
 }
 
 #######################################################################

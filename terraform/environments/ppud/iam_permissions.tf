@@ -164,145 +164,63 @@ resource "aws_iam_policy" "lambda_policies_v2" {
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
-      # SQS permissions
       each.value.policy_name == "send_message_to_sqs" ? {
         Effect = "Allow"
-        Action = [
-          "sqs:SendMessage",
-          "sqs:ChangeMessageVisibility", 
-          "sqs:DeleteMessage",
-          "sqs:GetQueueAttributes",
-          "sqs:GetQueueUrl",
-          "sqs:ListQueueTags",
-          "sqs:ReceiveMessage",
-          "sns:Publish"
-        ]
-        Resource = "arn:aws:sqs:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"
-      } :
-      # CloudWatch Logs permissions
-      each.value.policy_name == "send_logs_to_cloudwatch" ? {
+        Action = ["sqs:SendMessage", "sqs:ChangeMessageVisibility", "sqs:DeleteMessage", "sqs:GetQueueAttributes", "sqs:GetQueueUrl", "sqs:ListQueueTags", "sqs:ReceiveMessage", "sns:Publish"]
+        Resource = ["arn:aws:sqs:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"]
+      } : each.value.policy_name == "send_logs_to_cloudwatch" ? {
         Effect = "Allow"
-        Action = [
-          "logs:CreateLogGroup",
-          "logs:CreateLogStream", 
-          "logs:PutLogEvents"
-        ]
-        Resource = "arn:aws:logs:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"
-      } :
-      # CloudWatch metrics permissions
-      each.value.policy_name == "get_cloudwatch_metrics" ? {
+        Action = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"]
+        Resource = ["arn:aws:logs:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"]
+      } : each.value.policy_name == "get_cloudwatch_metrics" ? {
         Effect = "Allow"
         Action = ["cloudwatch:*"]
-        Resource = "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"
-      } :
-      # SES permissions
-      each.value.policy_name == "invoke_ses" ? {
+        Resource = ["arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"]
+      } : each.value.policy_name == "invoke_ses" ? {
         Effect = "Allow"
         Action = ["ses:*"]
-        Resource = [
-          "arn:aws:ses:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"
-        ]
-      } :
-      # SNS permissions
-      each.value.policy_name == "publish_to_sns" ? {
+        Resource = ["arn:aws:ses:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"]
+      } : each.value.policy_name == "publish_to_sns" ? {
         Effect = "Allow"
         Action = ["sns:Publish"]
-        Resource = "arn:aws:sns:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"
-      } :
-      # SSM PowerShell permissions
-      each.value.policy_name == "invoke_ssm_powershell" ? {
+        Resource = ["arn:aws:sns:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"]
+      } : each.value.policy_name == "invoke_ssm_powershell" ? {
         Effect = "Allow"
-        Action = [
-          "ssm:SendCommand",
-          "ssm:GetCommandInvocation"
-        ]
-        Resource = [
-          "arn:aws:ssm:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*",
-          "arn:aws:ssm:eu-west-2::document/AWS-RunPowerShellScript"
-        ]
-      } :
-      # SSM EC2 permissions
-      each.value.policy_name == "invoke_ssm_ec2_instances" ? {
+        Action = ["ssm:SendCommand", "ssm:GetCommandInvocation"]
+        Resource = ["arn:aws:ssm:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*", "arn:aws:ssm:eu-west-2::document/AWS-RunPowerShellScript"]
+      } : each.value.policy_name == "invoke_ssm_ec2_instances" ? {
         Effect = "Allow"
-        Action = [
-          "ec2:DescribeInstances",
-          "ssm:SendCommand",
-          "ssm:GetCommandInvocation"
-        ]
-        Resource = "arn:aws:ec2:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"
-      } :
-      # Lambda invoke permissions
-      each.value.policy_name == "lambda_invoke" ? {
+        Action = ["ec2:DescribeInstances", "ssm:SendCommand", "ssm:GetCommandInvocation"]
+        Resource = ["arn:aws:ec2:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"]
+      } : each.value.policy_name == "lambda_invoke" ? {
         Effect = "Allow"
-        Action = [
-          "lambda:InvokeAsync",
-          "lambda:InvokeFunction",
-          "ssm:SendCommand",
-          "ssm:GetCommandInvocation"
-        ]
-        Resource = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"
-      } :
-      # Security Hub permissions
-      each.value.policy_name == "get_securityhub_data" ? {
+        Action = ["lambda:InvokeAsync", "lambda:InvokeFunction", "ssm:SendCommand", "ssm:GetCommandInvocation"]
+        Resource = ["arn:aws:lambda:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"]
+      } : each.value.policy_name == "get_securityhub_data" ? {
         Effect = "Allow"
         Action = ["securityhub:*"]
-        Resource = "arn:aws:securityhub:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"
-      } :
-      # S3 get data permissions
-      each.value.policy_name == "get_data_s3" ? {
+        Resource = ["arn:aws:securityhub:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"]
+      } : each.value.policy_name == "get_data_s3" ? {
         Effect = "Allow"
-        Action = [
-          "s3:GetObject",
-          "s3:PutObject", 
-          "s3:DeleteObject",
-          "s3:ListBucket"
-        ]
-        Resource = [
-          each.value.env_config.s3_buckets.infrastructure,
-          "${each.value.env_config.s3_buckets.infrastructure}/*"
-        ]
-      } :
-      # S3 put data permissions
-      each.value.policy_name == "put_data_s3" ? {
+        Action = ["s3:GetObject", "s3:PutObject", "s3:DeleteObject", "s3:ListBucket"]
+        Resource = [each.value.env_config.s3_buckets.infrastructure, "${each.value.env_config.s3_buckets.infrastructure}/*"]
+      } : each.value.policy_name == "put_data_s3" ? {
         Effect = "Allow"
-        Action = [
-          "s3:PutObject",
-          "s3:PutObjectAcl",
-          "s3:ListBucket"
-        ]
-        Resource = [
-          each.value.env_config.s3_buckets.log_files,
-          "${each.value.env_config.s3_buckets.log_files}/*"
-        ]
-      } :
-      # KLayers SSM parameter permissions
-      each.value.policy_name == "get_klayers" ? {
+        Action = ["s3:PutObject", "s3:PutObjectAcl", "s3:ListBucket"]
+        Resource = [each.value.env_config.s3_buckets.log_files, "${each.value.env_config.s3_buckets.log_files}/*"]
+      } : each.value.policy_name == "get_klayers" ? {
         Effect = "Allow"
         Action = ["ssm:GetParameter"]
-        Resource = "arn:aws:ssm:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:parameter/klayers-account"
-      } :
-      # ELB metrics S3 permissions (production only)
-      each.value.policy_name == "get_elb_metrics" ? {
+        Resource = ["arn:aws:ssm:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:parameter/klayers-account"]
+      } : each.value.policy_name == "get_elb_metrics" ? {
         Effect = "Allow"
-        Action = [
-          "s3:GetObject",
-          "s3:PutObject",
-          "s3:ListBucket"
-        ]
-        Resource = [
-          "aws_s3_bucket.moj-lambda-metrics-prod[0].arn",
-          "${"aws_s3_bucket.moj-lambda-metrics-prod[0].arn"}/*"
-        ]
-      } :
-      # EC2 permissions for VPC Lambda functions
-      each.value.policy_name == "ec2_permissions" ? {
+        Action = ["s3:GetObject", "s3:PutObject", "s3:ListBucket"]
+        Resource = ["arn:aws:s3:::moj-lambda-metrics-prod", "arn:aws:s3:::moj-lambda-metrics-prod/*"]
+      } : {
         Effect = "Allow"
-        Action = [
-          "ec2:CreateNetworkInterface",
-          "ec2:DescribeNetworkInterface"
-        ]
-        Resource = "arn:aws:ec2:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"
-      } : null
+        Action = ["ec2:CreateNetworkInterface", "ec2:DescribeNetworkInterface"]
+        Resource = ["arn:aws:ec2:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"]
+      }
     ]
   })
 }
