@@ -475,6 +475,9 @@ jobs:
             exit 0
           fi
 
+          # NEW: short backoff to allow AMI/snapshot state to settle (eventual consistency)
+          sleep "${AMI_DELETE_BACKOFF_SECONDS:-15}"
+
           echo "[LIVE] Deleting snapshots referenced by deregistered AMIs (skipping retained/backups)..."
           deleted=0
           while IFS=',' read -r AMI_ID SNAP_ID; do
