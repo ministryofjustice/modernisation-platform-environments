@@ -245,7 +245,7 @@ resource "aws_lambda_function" "lambda_functions" {
   timeout                        = each.value.config.timeout
   reserved_concurrent_executions = local.lambda_defaults.reserved_concurrent_executions
   
-  depends_on = [aws_iam_role_policy_attachment.attach_lambda_policies_v2["${each.value.config.role_key}_${each.value.env}"]]
+
 
   dead_letter_config {
     target_arn = aws_sqs_queue.lambda_queue[each.value.env].arn
