@@ -43,18 +43,18 @@ on:
         type: boolean
       # CONSOLIDATED: one toggle + one minutes value for both AMI/EBS in preview
       test_mode:
-        description: 'Enable 10-minute minute-based test window in PREVIEW'
+        description: 'Enable 3-minute minute-based test window in PREVIEW'
         required: false
         default: false
         type: boolean
       age_minutes:
         description: 'Minutes threshold when test_mode is enabled'
         required: false
-        default: "10"
+        default: "3"
         type: string
-      # LIVE switch to also apply the 10-minute window
+      # LIVE switch to also apply the 3-minute window
       live_test_mode:
-        description: 'Apply the same 10-minute window in LIVE deletions (testing only!)'
+        description: 'Apply the same 3-minute window in LIVE deletions (testing only!)'
         required: false
         default: false
         type: boolean
@@ -70,7 +70,7 @@ env:
   AMI_ARGS:         ${{ github.event.inputs.ami_cleanup_sh_args || '-c -m 3' }}
   EBS_MONTHS:       ${{ github.event.inputs.ebs_age_in_months || '1' }}
   TEST_MODE:        ${{ github.event.inputs.test_mode || 'false' }}
-  AGE_MINUTES:      ${{ github.event.inputs.age_minutes || '10' }}
+  AGE_MINUTES:      ${{ github.event.inputs.age_minutes || '3' }}
   LIVE_TEST_MODE:   ${{ github.event.inputs.live_test_mode || 'false' }}
 
 jobs:
@@ -183,7 +183,7 @@ jobs:
             --query "Volumes[0:50].[VolumeId,CreateTime,State,Tags[?Key=='Name']|[0].Value]" \
             --output table || true
 
-      - name: Set 10-minute test flags (preview only)
+      - name: Set 3-minute test flags (preview only)
         run: |
           echo "AMI_TEST_FLAGS=--test-mode --age-minutes ${AGE_MINUTES}" >> $GITHUB_ENV
           echo "EBS_TEST_FLAGS=--test-mode --age-minutes ${AGE_MINUTES}" >> $GITHUB_ENV
@@ -325,7 +325,7 @@ jobs:
           role-session-name: "ami-delete-${{ matrix.account_name }}"
           aws-region: eu-west-2
 
-      - name: Enable LIVE 10-minute test flags (when requested or on push)
+      - name: Enable LIVE 3-minute test flags (when requested or on push)
         run: |
           if [[ "${{ github.event_name }}" == "push" || "${LIVE_TEST_MODE}" == "true" || "${{ contains(github.event.head_commit.message || '', '[CLEANUP TEST NOW]') }}" == "true" ]]; then
             echo "AMI_TEST_FLAGS=--test-mode --age-minutes ${AGE_MINUTES}" >> $GITHUB_ENV
@@ -534,7 +534,7 @@ jobs:
           role-session-name: "ebs-delete-${{ matrix.account_name }}"
           aws-region: eu-west-2
 
-      - name: Enable LIVE 10-minute test flags (when requested or on push)
+      - name: Enable LIVE 3-minute test flags (when requested or on push)
         run: |
           if [[ "${{ github.event_name }}" == "push" || "${LIVE_TEST_MODE}" == "true" || "${{ contains(github.event.head_commit.message || '', '[CLEANUP TEST NOW]') }}" == "true" ]]; then
             echo "EBS_TEST_FLAGS=--test-mode --age-minutes ${AGE_MINUTES}" >> $GITHUB_ENV

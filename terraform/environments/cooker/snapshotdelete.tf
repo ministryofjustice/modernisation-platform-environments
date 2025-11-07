@@ -91,10 +91,10 @@ resource "aws_ami_copy" "a1_unreferenced_unused_old" {
   tags              = local.common_tags
 }
 
-# WAIT: 10 minutes before creating the next AMIs (to establish age gap)
-resource "time_sleep" "ten_min_gap" {
+# WAIT: 3 minutes before creating the next AMIs (to establish age gap)
+resource "time_sleep" "three_min_gap" {
   depends_on      = [aws_ami_copy.a1_unreferenced_unused_old]
-  create_duration = "10m"
+  create_duration = "3m"
 }
 
 # Referenced in code (excluded when -c)
@@ -104,7 +104,7 @@ locals {
 }
 
 resource "aws_ami_copy" "a2_referenced_unused_old" {
-  depends_on        = [time_sleep.ten_min_gap]
+  depends_on        = [time_sleep.three_min_gap]
   name              = local.ami_name
   source_ami_id     = data.aws_ssm_parameter.al2023.value
   source_ami_region = var.region
@@ -114,7 +114,7 @@ resource "aws_ami_copy" "a2_referenced_unused_old" {
 
 # AwsBackup-named (excluded by default)
 resource "aws_ami_copy" "a3_backup_named_old" {
-  depends_on        = [time_sleep.ten_min_gap]
+  depends_on        = [time_sleep.three_min_gap]
   name              = "AwsBackup cleanup-test-backup-old"
   source_ami_id     = data.aws_ssm_parameter.al2023.value
   source_ami_region = var.region
@@ -124,7 +124,7 @@ resource "aws_ami_copy" "a3_backup_named_old" {
 
 # In-use AMI (launch instance => excluded by AMI cleanup)
 resource "aws_ami_copy" "a4_unreferenced_inuse_old" {
-  depends_on        = [time_sleep.ten_min_gap]
+  depends_on        = [time_sleep.three_min_gap]
   name              = "cleanup-test-unref-inuse-old"
   source_ami_id     = data.aws_ssm_parameter.al2023.value
   source_ami_region = var.region
@@ -161,15 +161,15 @@ resource "aws_ebs_volume" "v1_unattached_old" {
   tags              = merge(local.common_tags, { Name = "cleanup-test-unattached-old" })
 }
 
-# WAIT: 10 minutes before creating the next volumes (to establish age gap)
-resource "time_sleep" "ten_min_gap_vol" {
+# WAIT: 3 minutes before creating the next volumes (to establish age gap)
+resource "time_sleep" "three_min_gap_vol" {
   depends_on      = [aws_ebs_volume.v1_unattached_old]
-  create_duration = "10m"
+  create_duration = "3m"
 }
 
 # V2: Attached (excluded by EBS cleanup)
 resource "aws_ebs_volume" "v2_attached_old" {
-  depends_on        = [time_sleep.ten_min_gap_vol, aws_instance.inuse_tiny]
+  depends_on        = [time_sleep.three_min_gap_vol, aws_instance.inuse_tiny]
   availability_zone = var.az
   size              = 1
   type              = "gp3"
