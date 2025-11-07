@@ -155,7 +155,7 @@ jobs:
       - name: Quick inventory (sanity)
         run: |
           set -euo pipefail
-          echo "::group::▶️ Inventory"
+          echo "▶️ Inventory"
           echo "Account: ${{ matrix.account_name }} | Region: eu-west-2"
           aws sts get-caller-identity
           echo "==== AMIs named 'cleanup-test*' ===="
@@ -185,7 +185,7 @@ jobs:
           app="${APPLICATION}"
           args="${AMI_ARGS}"
 
-          echo "::group::🧪 AMI — PREVIEW"
+          echo "🧪 AMI — PREVIEW"
           scripts/ami_cleanup.sh -a "$app" -s ami_commands.sh ${AMI_TEST_FLAGS:-} $args -d delete || true
 
           # Build human-friendly CSVs
@@ -262,7 +262,7 @@ jobs:
           mkdir -p reports
           months="${EBS_MONTHS}"
 
-          echo "::group::🧪 EBS — PREVIEW"
+          echo "🧪 EBS — PREVIEW"
           : > reports/ebs_cleanup_report.csv
           echo "Volume ID,Age (months),Name,Status" >> reports/ebs_cleanup_report.csv
 
@@ -372,7 +372,7 @@ jobs:
           app="${APPLICATION}"
           args="${AMI_ARGS}"
 
-          echo "::group::🧾 AMI — PLAN (LIVE)"
+          echo "🧾 AMI — PLAN (LIVE)"
           scripts/ami_cleanup.sh -a "$app" -s ami_commands.sh ${AMI_TEST_FLAGS:-} $args -d delete || true
 
           : > reports/ami_snapshot_map.csv
@@ -434,7 +434,7 @@ jobs:
           export AWS_SECRET_ACCESS_KEY=$(jq -r '.Credentials.SecretAccessKey' <<< "$CREDS_JSON")
           export AWS_SESSION_TOKEN=$(jq -r '.Credentials.SessionToken'    <<< "$CREDS_JSON")
 
-          echo "::group::🗑️ AMI — LIVE DELETE"
+          echo "🗑️ AMI — LIVE DELETE"
           if [[ ! -s ami_commands.sh ]]; then
             echo "No AMI commands to execute after guard."
             echo "deleted=0" >> $GITHUB_OUTPUT
@@ -461,7 +461,7 @@ jobs:
           export AWS_SECRET_ACCESS_KEY=$(jq -r '.Credentials.SecretAccessKey' <<< "$CREDS_JSON")
           export AWS_SESSION_TOKEN=$(jq -r '.Credentials.SessionToken'    <<< "$CREDS_JSON")
 
-          echo "::group::🧹 Snapshots — Fallback"
+          echo "🧹 Snapshots — Fallback"
           aws_try() {
             local max=5 delay=2 attempt=1
             while true; do
@@ -626,7 +626,7 @@ jobs:
           : > reports/ebs_cleanup_report.csv
           echo "Volume ID,Age (months),Name,Status" >> reports/ebs_cleanup_report.csv
 
-          echo "::group::🗑️ EBS — LIVE DELETE"
+          echo "🗑️ EBS — LIVE DELETE"
           LOG=$(scripts/ebs_cleanup.sh ${EBS_TEST_FLAGS:-} -m "$EBS_MONTHS" delete || true)
           echo "$LOG"
           echo "$LOG" | while read -r line; do
