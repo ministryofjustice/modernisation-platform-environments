@@ -32,7 +32,7 @@ resource "helm_release" "actions_runner_mojas_airflow_create_a_pipeline" {
   /* https://github.com/ministryofjustice/analytical-platform-actions-runner */
   name       = "actions-runner-mojas-airflow-create-a-pipeline"
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
-  version    = "2.329.0-1"
+  version    = "2.329.0-2"
   chart      = "actions-runner"
   namespace  = kubernetes_namespace.actions_runners[0].metadata[0].name
   values = [
