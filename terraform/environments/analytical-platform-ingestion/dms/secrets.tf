@@ -5,7 +5,7 @@ module "cica_dms_tariff_database_credentials" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/secrets-manager/aws"
-  version = "1.3.1"
+  version = "2.0.1"
 
   name       = "ingestion/dms/tariff-credentials"
   kms_key_id = module.cica_dms_credentials_kms.key_arn
@@ -40,7 +40,7 @@ module "cica_dms_tempus_database_credentials" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/secrets-manager/aws"
-  version = "1.3.1"
+  version = "2.0.1"
 
   name       = "ingestion/dms/tempus-credentials"
   kms_key_id = module.cica_dms_credentials_kms.key_arn
