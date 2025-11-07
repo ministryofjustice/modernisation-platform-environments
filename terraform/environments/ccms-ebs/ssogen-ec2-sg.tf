@@ -17,7 +17,7 @@ resource "aws_security_group_rule" "ing_ssh_workspaces" {
   count             = local.is_development ? 1 : 0
   type              = "ingress"
   description       = "SSH from WorkSpaces subnets"
-  security_group_id = aws_security_group.ssogen_sg[0].id
+  security_group_id = aws_security_group.ssogen_sg[count.index].id
   protocol          = "tcp"
   from_port         = 22
   to_port           = 22
@@ -266,7 +266,7 @@ resource "aws_security_group_rule" "eg_icmp_vpc_workspaces" {
 #########################################
 
 resource "aws_vpc_security_group_ingress_rule" "ing_4443_from_alb" {
-  count                       = local.is_development ? 1 : 0
+  count                        = local.is_development ? 1 : 0
   security_group_id            = aws_security_group.ssogen_sg[0].id
   description                  = "Allow inbound HTTPS (4443) from SSOGEN internal ALB"
   from_port                    = 4443

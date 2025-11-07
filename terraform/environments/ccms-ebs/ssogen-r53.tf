@@ -4,7 +4,7 @@
 
 # Non-prod SSOGEN ALB record
 resource "aws_route53_record" "ssogen_internal_alb" {
-  count    = local.is-production ? 0 : 1
+  count    = local.is-development ? 1 : 0
   provider = aws.core-vpc
 
   zone_id = data.aws_route53_zone.external.zone_id
