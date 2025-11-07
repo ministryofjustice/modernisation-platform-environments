@@ -53,6 +53,7 @@ locals {
   }
 
   # Environment configurations
+  # checkov:skip=CKV_SECRET_6: "Account keys are environment identifiers, not secrets"
   iam_environments = {
     development = {
       condition = local.is-development

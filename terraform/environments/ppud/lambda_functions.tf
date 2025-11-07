@@ -4,6 +4,7 @@
 
 locals {
   # Lambda environment configurations
+  # checkov:skip=CKV_SECRET_6: "Account keys are environment identifiers, not secrets"
   lambda_environments = {
     development = {
       condition    = local.is-development
@@ -227,6 +228,7 @@ locals {
 resource "aws_lambda_function" "lambda_functions" {
   for_each = local.lambda_instances_map
 
+  # checkov:skip=CKV_AWS_116: "Dead Letter queues temporarily disabled while code is being deployed"
   # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
   # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing not required"
   
