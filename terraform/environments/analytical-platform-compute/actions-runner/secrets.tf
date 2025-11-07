@@ -5,7 +5,7 @@ module "actions_runners_token_apc_self_hosted_runners_secret" {
   count = terraform.workspace == "analytical-platform-compute-production" ? 1 : 0
 
   source  = "terraform-aws-modules/secrets-manager/aws"
-  version = "1.3.1"
+  version = "2.0.1"
 
   name        = "actions-runners/token/apc-self-hosted-runners"
   description = "moj-data-platform-robot: https://github.com/settings/personal-access-tokens/4282353"
@@ -29,7 +29,7 @@ module "actions_runners_token_moj_apc_self_hosted_runners_secret" {
   count = terraform.workspace == "analytical-platform-compute-production" ? 1 : 0
 
   source  = "terraform-aws-modules/secrets-manager/aws"
-  version = "1.3.1"
+  version = "2.0.1"
 
   name        = "actions-runners/token/moj-apc-self-hosted-runners"
   description = "moj-data-platform-robot: https://github.com/settings/personal-access-tokens/5605162"
@@ -54,7 +54,7 @@ module "actions_runners_github_app_apc_self_hosted_runners_secret" {
   count = terraform.workspace == "analytical-platform-compute-production" ? 1 : 0
 
   source  = "terraform-aws-modules/secrets-manager/aws"
-  version = "1.3.1"
+  version = "2.0.1"
 
   name        = "actions-runners/app/apc-self-hosted-runners"
   description = "https://github.com/organizations/moj-analytical-services/settings/apps/analytical-platform-runners"
