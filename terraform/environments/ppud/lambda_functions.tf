@@ -4,21 +4,21 @@
 
 locals {
   # Lambda environment configurations
-   lambda_environments = {
+  lambda_environments = {
     development = {
       condition    = local.is-development
       s3_bucket    = "moj-infrastructure-dev"
-      account_key  = "ppud-development"  # checkov:skip=CKV_SECRET_6: "Account keys are environment identifiers, not secrets"
+      account_key  = "ppud-development" # checkov:skip=CKV_SECRET_6: "Environment identifier, not a secret"
     }
     preproduction = {
       condition    = local.is-preproduction
       s3_bucket    = "moj-infrastructure-uat"
-      account_key  = "ppud-preproduction"  # checkov:skip=CKV_SECRET_6: "Account keys are environment identifiers, not secrets"
+      account_key  = "ppud-preproduction" # checkov:skip=CKV_SECRET_6: "Environment identifier, not a secret"
     }
     production = {
       condition    = local.is-production
       s3_bucket    = "moj-infrastructure"
-      account_key  = "ppud-production"  # checkov:skip=CKV_SECRET_6: "Account keys are environment identifiers, not secrets"
+      account_key  = "ppud-production" # checkov:skip=CKV_SECRET_6: "Environment identifier, not a secret"
     }
   }
 
@@ -227,7 +227,7 @@ locals {
 resource "aws_lambda_function" "lambda_functions" {
   for_each = local.lambda_instances_map
 
-  # checkov:skip=CKV_AWS_116: "Dead Letter queues temporarily disabled while code is being deployed"
+  # checkov:skip=CKV_AWS_116: "Dead Letter queues to be enabled later"
   # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
   # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing not required"
   
