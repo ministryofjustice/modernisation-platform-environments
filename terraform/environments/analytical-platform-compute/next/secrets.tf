@@ -5,7 +5,7 @@ module "azure_secrets" {
   count = terraform.workspace == "analytical-platform-compute-development" ? 1 : 0
 
   source  = "terraform-aws-modules/secrets-manager/aws"
-  version = "2.0.0"
+  version = "2.0.1"
 
   name       = "${local.component_name}/azure"
   kms_key_id = data.aws_kms_key.secrets_manager_common.arn
