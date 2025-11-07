@@ -123,19 +123,39 @@ resource "aws_iam_role" "lambda_role_v2" {
 # IAM Policies
 #######################################################################
 
-resource "aws_iam_policy" "lambda_policies_v2" {
-  for_each = {
+# Create unique policies per environment
+locals {
+  unique_policies = {
     for combo in flatten([
-      for role_key, role_instances in local.lambda_role_instances_map : [
-        for policy in role_instances.role_config.policies : {
-          key = "${policy}_${role_instances.env_key}"
-          policy_name = policy
-          env_key = role_instances.env_key
-          env_config = role_instances.env_config
-        }
+      for env_key, env_config in local.iam_environments : [
+        for policy_name in [
+          "send_message_to_sqs",
+          "send_logs_to_cloudwatch",
+          "get_cloudwatch_metrics",
+          "invoke_ses",
+          "publish_to_sns",
+          "invoke_ssm_powershell",
+          "invoke_ssm_ec2_instances",
+          "lambda_invoke",
+          "get_securityhub_data",
+          "get_data_s3",
+          "put_data_s3",
+          "get_klayers",
+          "get_elb_metrics",
+          "ec2_permissions"
+        ] : {
+          key = "${policy_name}_${env_key}"
+          policy_name = policy_name
+          env_key = env_key
+          env_config = env_config
+        } if env_config.condition
       ]
     ]) : combo.key => combo
   }
+}
+
+resource "aws_iam_policy" "lambda_policies_v2" {
+  for_each = local.unique_policies
 
   name = "aws_iam_policy_${each.value.policy_name}_${each.value.env_key}"
   path = "/"
@@ -302,7 +322,7 @@ resource "aws_iam_role_policy_attachment" "attach_lambda_policies_v2" {
             policy_key = "${policy}_${role_instance.env_key}"
           }
         ],
-        role_instance.env_key == "prod" ? [
+        role_instance.env_key == "production" ? [
           for policy in try(role_instance.role_config.prod_policies, []) : {
             key = "${role_key}_${policy}"
             role_key = role_key

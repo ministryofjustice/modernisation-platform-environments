@@ -218,10 +218,8 @@ locals {
 
   # Layer ARNs
   layer_arns = {
-    numpy      = "arn:aws:lambda:eu-west-2:${local.environments.prod.klayers_param}:layer:Klayers-p312-numpy:8"
-    pillow     = "arn:aws:lambda:eu-west-2:${local.environments.prod.klayers_param}:layer:Klayers-p312-pillow:1"
-    matplotlib = "aws_lambda_layer_version.lambda_layer_matplotlib_${env}[0].arn"
-    requests   = "aws_lambda_layer_version.lambda_layer_requests_${env}[0].arn"
+    numpy      = "arn:aws:lambda:eu-west-2:${local.lambda_environments.production.klayers_param}:layer:Klayers-p312-numpy:8"
+    pillow     = "arn:aws:lambda:eu-west-2:${local.lambda_environments.production.klayers_param}:layer:Klayers-p312-pillow:1"
   }
 }
 
@@ -247,33 +245,33 @@ resource "aws_lambda_function" "lambda_functions" {
   
 
 
-  dead_letter_config {
-    target_arn = aws_sqs_queue.lambda_queue[each.value.env].arn
-  }
+  # dead_letter_config {
+  #   target_arn = aws_sqs_queue.lambda_queue[each.value.env].arn
+  # }
 
   tracing_config {
     mode = local.lambda_defaults.tracing_mode
   }
 
   # Conditional layers
-  layers = try(each.value.config.layers, null) != null ? [
-    for layer in each.value.config.layers : 
-    contains(["matplotlib", "requests", "beautifulsoup", "xlsxwriter"], layer) ? 
-      aws_lambda_layer_version.lambda_layer["${layer}_${each.value.env}"].arn :
-      "arn:aws:lambda:eu-west-2:${each.value.env_config.klayers_param}:layer:Klayers-p312-${layer}:${layer == "numpy" ? "8" : "1"}"
-  ] : null
+  # layers = try(each.value.config.layers, null) != null ? [
+  #   for layer in each.value.config.layers : 
+  #   contains(["matplotlib", "requests", "beautifulsoup", "xlsxwriter"], layer) ? 
+  #     aws_lambda_layer_version.lambda_layer["${layer}_${each.value.env}"].arn :
+  #     "arn:aws:lambda:eu-west-2:${each.value.env_config.klayers_param}:layer:Klayers-p312-${layer}:${layer == "numpy" ? "8" : "1"}"
+  # ] : null
 
   # Conditional memory size
   memory_size = try(each.value.config.memory_size, null)
 
   # Conditional VPC configuration
-  dynamic "vpc_config" {
-    for_each = try(each.value.config.vpc_config[each.value.env], false) ? [1] : []
-    content {
-      subnet_ids         = [data.aws_subnet.private_subnets_b.id]
-      security_group_ids = [aws_security_group.PPUD-Mail-Server[0].id]
-    }
-  }
+  # dynamic "vpc_config" {
+  #   for_each = try(each.value.config.vpc_config[each.value.env], false) ? [1] : []
+  #   content {
+  #     subnet_ids         = [data.aws_subnet.private_subnets_b.id]
+  #     security_group_ids = [aws_security_group.PPUD-Mail-Server[0].id]
+  #   }
+  # }
 }
 
 #######################################################################
