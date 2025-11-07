@@ -42,6 +42,9 @@ locals {
         instance = merge(local.ec2_instances.bods.instance, {
           instance_type           = "r6i.2xlarge"
           disable_api_termination = true
+          tags = merge(local.ec2_instances.bods.instance.tags, {
+            patch-manager = "weds1500"
+          })
         })
         tags = merge(local.ec2_instances.bods.tags, {
           oasys-national-reporting-environment = "pd"
@@ -67,6 +70,9 @@ locals {
         instance = merge(local.ec2_instances.bods.instance, {
           instance_type           = "r6i.2xlarge"
           disable_api_termination = true
+          tags = merge(local.ec2_instances.bods.instance.tags, {
+            patch-manager = "thurs1500"
+          })
         })
         tags = merge(local.ec2_instances.bods.tags, {
           oasys-national-reporting-environment = "pd"
@@ -336,13 +342,15 @@ locals {
 
     patch_manager = {
       patch_schedules = {
-        manual = "cron(00 21 31 2 ? *)" # 9pm 31 feb e.g. impossible date to allow for manual patching of otherwise enrolled instances
+        group1 = "cron(00 06 ? * WED *)" # 6am wed for prod for non-prod env's we have to work around the overnight shutdown
+        group2 = "cron(00 06 ? * THU *)" # 6am thu for prod
+        manual = "cron(00 21 31 2 ? *)"  # 9pm 31 feb e.g. impossible date to allow for manual patching of otherwise enrolled instances
       }
       maintenance_window_duration = 2 # 4 for prod
       maintenance_window_cutoff   = 1 # 2 for prod
       patch_classifications = {
         REDHAT_ENTERPRISE_LINUX = ["Security", "Bugfix"] # Linux Options=(Security,Bugfix,Enhancement,Recommended,Newpackage)
-        WINDOWS = ["SecurityUpdates", "CriticalUpdates"]
+        WINDOWS                 = ["SecurityUpdates", "CriticalUpdates"]
       }
     }
 
