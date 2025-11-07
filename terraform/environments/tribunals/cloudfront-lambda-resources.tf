@@ -101,7 +101,7 @@ resource "aws_lambda_permission" "allow_http_cloudfront" {
   principal     = "edgelambda.amazonaws.com"
   # Only set source_arn if distribution exists
   source_arn = (
-    )local.matching_distribution_id != null ?
+    local.matching_distribution_id != null ?
     "arn:aws:cloudfront::${data.aws_caller_identity.current.account_id}:distribution/${local.matching_distribution_id}" :
     null
   )
