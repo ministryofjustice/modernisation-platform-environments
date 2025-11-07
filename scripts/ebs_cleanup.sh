@@ -69,35 +69,51 @@ if [[ -z "${action}" ]]; then
   usage; exit 1
 fi
 
+# ---------
+# Helper to format the age phrase for messages only (no logic change)
+# ---------
+age_phrase() {
+  if [[ "$test_mode" == "true" && -n "$age_minutes" && "$age_minutes" =~ ^[0-9]+$ && "$age_minutes" -gt 0 ]]; then
+    echo "${age_minutes} minute(s) (test mode)"
+  else
+    echo "${max_age_months} month(s)"
+  fi
+}
+
 check_action() {
-  message="Scanning for $action EBS volumes older than $max_age_months months in $region..."
+  local age_text
+  age_text="$(age_phrase)"
+
   case $action in
     all)
       filters=''
-      none_message="No volumes found older than $max_age_months months in $region"
+      message="Scanning for all EBS volumes older than $age_text in $region..."
+      none_message="No volumes found older than $age_text in $region"
       ;;
     attached)
       filters='--filters Name=status,Values=in-use'
-      none_message="No attached volumes found older than $max_age_months months in $region"
+      message="Scanning for attached EBS volumes older than $age_text in $region..."
+      none_message="No attached volumes found older than $age_text in $region"
       ;;
     unattached)
       filters='--filters Name=status,Values=available'
-      none_message="No unattached volumes found older than $max_age_months months in $region"
+      message="Scanning for unattached EBS volumes older than $age_text in $region..."
+      none_message="No unattached volumes found older than $age_text in $region"
       ;;
     delete)
       filters='--filters Name=status,Values=available'
       if [[ "$dryrun" == true ]]; then
-        message="Dryrun - Pretend deleting EBS volumes older than $max_age_months months in $region..."
+        message="Dryrun - Pretend deleting unattached EBS volumes older than $age_text in $region..."
       else
-        message="Deleting EBS volumes older than $max_age_months months in $region..."
+        message="Deleting unattached EBS volumes older than $age_text in $region..."
       fi
-      none_message="No unattached volumes found older than $max_age_months months in $region to delete"
+      none_message="No unattached volumes found older than $age_text in $region to delete"
       ;;
     *)
       action=unattached
       filters='--filters Name=status,Values=available'
-      message="Scanning for $action EBS volumes older than $max_age_months months in $region..."
-      none_message="No unattached volumes found older than $max_age_months months in $region"
+      message="Scanning for unattached EBS volumes older than $age_text in $region..."
+      none_message="No unattached volumes found older than $age_text in $region"
       ;;
   esac
 }

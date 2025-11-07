@@ -238,8 +238,6 @@ while IFS= read -r line; do
   deleted=$((deleted+1))
 done < "${OUT_CMDS}"
 
-echo "Total deregister-image commands generated (and executed): ${deleted}"
-
 if [[ -s "${OUT_CMDS}" ]]; then
   echo "First 20 deregistration commands:"
   grep '^aws ec2 deregister-image' "${OUT_CMDS}" | head -n 20 || true
