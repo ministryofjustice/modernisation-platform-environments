@@ -37,8 +37,9 @@ resource "aws_instance" "tariffdb" {
     "hostname" = "${local.application_name}-db-${each.key}",
   }), local.tags)
   # Set security group where Instance will be created. This will also determine VPC
+  # vpc_security_group_ids = [module.tariff_db_prod_security_group[0].security_group_id, aws_security_group.tariff_db_prod_security_group[*].id]
   vpc_security_group_ids = aws_security_group.tariff_db_prod_security_group[*].id
-  key_name               = aws_key_pair.key_pair_db[0].key_name
+  key_name = aws_key_pair.key_pair_db[0].key_name
 
   /*
   ebs_block_device {
