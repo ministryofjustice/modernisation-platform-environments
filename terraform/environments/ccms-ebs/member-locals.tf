@@ -45,7 +45,6 @@ locals {
 
   prod_sans = [
     format("ccmsebs.%s", local.prod_domain),
-    format("ccmsebs-sso.%s", local.prod_domain),
     format("ccms-ebs-db-nlb.%s", local.prod_domain)
   ]
 
