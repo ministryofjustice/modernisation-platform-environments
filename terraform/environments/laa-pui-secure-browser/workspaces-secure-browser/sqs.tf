@@ -13,7 +13,6 @@ module "sqs_s3_notifications" {
         "Service" : "s3.amazonaws.com"
       },
       "Action" : "sqs:SendMessage",
-      "Resource" : module.sqs_s3_notifications[0].queue_arn,
       "Condition" : {
         "ArnEquals" : {
           "aws:SourceArn" : module.s3_bucket_workspacesweb_session_logs[0].s3_bucket_arn
