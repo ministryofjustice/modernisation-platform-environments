@@ -350,13 +350,11 @@ jobs:
           fi
           [[ -f ami_candidates.csv ]] || touch ami_candidates.csv
 
-      # NEW: Guard — strip protected AMIs (AwsBackup or Retain/Backup tags) from the plan BEFORE deletion
+      # Guard — strip protected AMIs (AwsBackup or Retain/Backup tags) from the plan BEFORE deletion
       - name: Guard protected AMIs from deletion
         run: |
           set -euo pipefail
-          # Match names that look like AwsBackup/Backup-prefixed images
           PROTECTED_NAME_REGEX='^(AwsBackup|Backup)'
-          # Any tag key Retain or Backup with truthy value should protect
           is_truthy_tag () {
             jq -e '.[] | select((.Key|test("Retain|Backup"; "i")) and (.Value|test("^(true|yes|1)$"; "i")))' >/dev/null
           }
@@ -378,12 +376,10 @@ jobs:
             echo "Protected AMIs detected; removing from plan:"
             cat protected_amis.txt
 
-            # remove protected AMIs from ami_commands.sh
             tmp_cmds="$(mktemp)"
             grep -v -F -f <(cut -d' ' -f1 protected_amis.txt) ami_commands.sh > "$tmp_cmds" || true
             mv "$tmp_cmds" ami_commands.sh
 
-            # also filter ami_candidates.csv if present
             if [[ -f ami_candidates.csv ]]; then
               tmp_cand="$(mktemp)"
               grep -v -F -f <(cut -d' ' -f1 protected_amis.txt) ami_candidates.csv > "$tmp_cand" || true
@@ -393,8 +389,8 @@ jobs:
             echo "No protected AMIs matched."
           fi
 
-      # 2) DELETE AMIs
-      - name: Recompute & Delete AMIs (Live)
+      # 2) DELETE AMIs — execute the filtered plan instead of regenerating
+      - name: Delete AMIs from filtered plan (Live)
         run: |
           set -euo pipefail
           CREDS_JSON=$(aws sts assume-role --role-arn "arn:aws:iam::${ACCOUNT_NUMBER}:role/MemberInfrastructureAccess" --role-session-name "live-ami-delete-${{ matrix.account_name }}" --output json)
@@ -405,22 +401,22 @@ jobs:
           echo "==== AWS STS Caller Identity (LIVE AMI DELETE) ===="
           aws sts get-caller-identity
 
-          app="${APPLICATION}"
-          args="${AMI_ARGS}"
-          echo "[LIVE] Collecting candidates and deregistering (if any)"
-          echo "Effective AMI test flags: ${AMI_TEST_FLAGS:-<none>}"
+          if [[ ! -s ami_commands.sh ]]; then
+            echo "[LIVE] No AMI commands to execute after guard."
+            exit 0
+          fi
 
-          # Execute deletion using the (now filtered) plan
-          scripts/ami_cleanup.sh -a "$app" -s ami_commands.sh ${AMI_TEST_FLAGS:-} $args delete || true
+          echo "[LIVE] Executing filtered deregistration plan"
+          echo "Effective AMI test flags: ${AMI_TEST_FLAGS:-<none>}"
+          echo "----------------------------------------------------"
+          echo "First 20 deregistration commands to be executed:"
+          grep '^aws ec2 deregister-image' ami_commands.sh | head -n 20 || true
+
+          chmod +x ami_commands.sh
+          bash ami_commands.sh
 
           TOTAL="$(grep -c '^aws ec2 deregister-image' ami_commands.sh || true)"
-          echo "Total deregister-image commands generated (and executed): ${TOTAL}"
-          if [[ -s ami_commands.sh ]]; then
-            echo "First 20 deregistration commands:"
-            grep '^aws ec2 deregister-image' ami_commands.sh | head -n 20 || true
-          else
-            echo "[LIVE] No AMIs found matching the deletion criteria."
-          fi
+          echo "Total deregister-image commands executed: ${TOTAL}"
           [[ -f ami_candidates.csv ]] || touch ami_candidates.csv
           [[ -f ami_commands.sh ]] || touch ami_commands.sh
 
@@ -494,7 +490,7 @@ jobs:
             ami_candidates.csv
             ami_commands.sh
             ami_snapshots.csv
-            protected_amis.txt          # <-- NEW: show what was guarded
+            protected_amis.txt
           if-no-files-found: warn
 
   ebs-delete:
