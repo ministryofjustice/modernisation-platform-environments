@@ -25,7 +25,7 @@ module "datasync_dom1_secret" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/secrets-manager/aws"
-  version = "1.3.1"
+  version = "2.0.1"
 
   name       = "datasync/dom1"
   kms_key_id = module.datasync_credentials_kms.key_arn
@@ -44,7 +44,7 @@ module "datasync_include_paths_secret" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/secrets-manager/aws"
-  version = "1.3.1"
+  version = "2.0.1"
 
   name       = "datasync/include-paths"
   kms_key_id = module.secretsmanager_common_kms.key_arn
@@ -60,7 +60,7 @@ module "datasync_exclude_path_secret" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/secrets-manager/aws"
-  version = "1.3.1"
+  version = "2.0.1"
 
   name       = "datasync/exclude-paths"
   kms_key_id = module.secretsmanager_common_kms.key_arn
@@ -77,7 +77,7 @@ module "laa_data_analysis_bucket_list" {
   count = local.environment == "production" ? 1 : 0
 
   source  = "terraform-aws-modules/secrets-manager/aws"
-  version = "1.3.1"
+  version = "2.0.1"
 
   name       = "laa/bucket-list"
   kms_key_id = module.secretsmanager_common_kms.key_arn
@@ -94,7 +94,7 @@ module "laa_data_analysis_keys" {
   count = local.environment == "production" ? 1 : 0
 
   source  = "terraform-aws-modules/secrets-manager/aws"
-  version = "1.3.1"
+  version = "2.0.1"
 
   name       = "laa/keys"
   kms_key_id = module.secretsmanager_common_kms.key_arn
