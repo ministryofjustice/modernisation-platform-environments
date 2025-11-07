@@ -296,7 +296,7 @@ resource "aws_route53_record" "ssogen_internal_alb" {
   provider = aws.core-vpc
 
   zone_id = data.aws_route53_zone.external.zone_id
-  name    = "ssogen.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  name    = "ccmsebs-sso"
   type    = "A"
 
   alias {
