@@ -285,4 +285,3 @@ resource "aws_route53_record" "ftp" {
   ttl      = 300
   records  = [aws_instance.ec2_ftp.private_ip]
 }
-
