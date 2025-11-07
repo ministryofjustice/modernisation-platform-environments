@@ -62,8 +62,8 @@ resource "aws_lb_listener" "ssogen_internal_listener" {
 
 resource "aws_lb_target_group_attachment" "ssogen_internal" {
   count            = local.is_development ? local.application_data.accounts[local.environment].ssogen_no_instances : 0
-  target_group_arn = aws_lb_target_group.ssogen_internal_tg[count.index].arn
-  target_id        = aws_instance.ec2_ssogen[count.index].id
+  target_group_arn = aws_lb_target_group.ssogen_internal_tg[0].arn
+  target_id        = element(aws_instance.ec2_ssogen.*.id, count.index)
   port             = local.application_data.accounts[local.environment].tg_ssogen_apps_port
 }
 
