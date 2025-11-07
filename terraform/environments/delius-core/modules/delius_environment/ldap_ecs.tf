@@ -52,11 +52,12 @@ module "ldap_ecs" {
   account_config  = var.account_config
 
   container_health_check = {
-    command     = ["CMD-SHELL", "ldapsearch -x -H ldap://localhost:389 -b '' -s base '(objectclass=*)' namingContexts"]
-    interval    = 30
-    retries     = 3
-    startPeriod = 60
-    timeout     = 5
+    command  = ["CMD-SHELL", "test -f /tmp/ready"]
+    interval = 60 # seconds between checks
+    retries  = 5  # number of failed checks before marking as unhealthy
+    # grace period after container start before checks begin
+    startPeriod = var.delius_microservice_configs.ldap.health_check_start_period
+    timeout     = 5 # seconds before checks time out
   }
   account_info = var.account_info
 

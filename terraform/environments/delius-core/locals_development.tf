@@ -102,11 +102,12 @@ locals {
     }
 
     ldap = {
-      image_tag        = "testing-18219655011-1"
-      container_port   = 389
-      slapd_log_level  = "stats"
-      container_cpu    = 512
-      container_memory = 1024
+      image_tag                 = "testing-18219655011-1"
+      container_port            = 389
+      slapd_log_level           = "stats"
+      container_cpu             = 512
+      container_memory          = 1024
+      health_check_start_period = 30
     }
 
     sfs = {
