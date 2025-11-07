@@ -180,8 +180,12 @@ resource "aws_s3_bucket_versioning" "access_logs" {
 #####################################################################################
 ################# Logging for Lambda Files S3 bucket ###############################
 #####################################################################################
+
+
 resource "aws_s3_bucket_logging" "lambda_files" {
-  bucket = aws_s3_bucket.lambda_files.id
+  # Bucket is managed in a separate Terraform state. We can still apply logging by
+  # referencing the bucket name directly instead of a resource reference.
+  bucket = "${local.application_name_short}-${local.environment}-lambda-files"
 
   target_bucket = aws_s3_bucket.access_logs.id
   target_prefix = "log/"
