@@ -43,7 +43,7 @@ locals {
     }
     send_cpu_graph = {
       environments = ["production"]
-      schedule     = "cron(5 16 ? * MON-FRI *)"
+      schedule     = "cron(5 17 ? * MON-FRI *)"
       description  = "Trigger Lambda at 17:00 on weekdays"
       timezone     = "Europe/London"
     }
