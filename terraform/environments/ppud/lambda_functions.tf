@@ -4,22 +4,21 @@
 
 locals {
   # Lambda environment configurations
-  # checkov:skip=CKV_SECRET_6: "Account keys are environment identifiers, not secrets"
-  lambda_environments = {
+   lambda_environments = {
     development = {
       condition    = local.is-development
       s3_bucket    = "moj-infrastructure-dev"
-      account_key  = "ppud-development"
+      account_key  = "ppud-development"  # checkov:skip=CKV_SECRET_6: "Account keys are environment identifiers, not secrets"
     }
     preproduction = {
       condition    = local.is-preproduction
       s3_bucket    = "moj-infrastructure-uat"
-      account_key  = "ppud-preproduction"
+      account_key  = "ppud-preproduction"  # checkov:skip=CKV_SECRET_6: "Account keys are environment identifiers, not secrets"
     }
     production = {
       condition    = local.is-production
       s3_bucket    = "moj-infrastructure"
-      account_key  = "ppud-production"
+      account_key  = "ppud-production"  # checkov:skip=CKV_SECRET_6: "Account keys are environment identifiers, not secrets"
     }
   }
 

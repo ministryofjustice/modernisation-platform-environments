@@ -53,11 +53,10 @@ locals {
   }
 
   # Environment configurations
-  # checkov:skip=CKV_SECRET_6: "Account keys are environment identifiers, not secrets"
   iam_environments = {
     development = {
       condition = local.is-development
-      account_key = "ppud-development"
+      account_key = "ppud-development"   # checkov:skip=CKV_SECRET_6: "Account keys are environment identifiers, not secrets"
       s3_buckets = {
         infrastructure = "aws_s3_bucket.moj-infrastructure-dev[0].arn"
         log_files = "aws_s3_bucket.moj-log-files-dev[0].arn"
@@ -65,7 +64,7 @@ locals {
     }
     preproduction = {
       condition = local.is-preproduction
-      account_key = "ppud-preproduction"
+      account_key = "ppud-preproduction"  # checkov:skip=CKV_SECRET_6: "Account keys are environment identifiers, not secrets"
       s3_buckets = {
         infrastructure = "aws_s3_bucket.moj-infrastructure-uat[0].arn"
         log_files = "aws_s3_bucket.moj-log-files-uat[0].arn"
@@ -73,7 +72,7 @@ locals {
     }
     production = {
       condition = local.is-production
-      account_key = "ppud-production"
+      account_key = "ppud-production"  # checkov:skip=CKV_SECRET_6: "Account keys are environment identifiers, not secrets"
       s3_buckets = {
         infrastructure = "aws_s3_bucket.moj-infrastructure[0].arn"
         log_files = "aws_s3_bucket.moj-lambda-metrics-prod[0].arn"
