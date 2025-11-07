@@ -72,7 +72,7 @@ locals {
           ami_name          = "hmpps_windows_server_2019_release_2024-12-02T00-00-37.662Z"
           availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
-            "Ec2SecretPolicy",
+            "Ec2T2BodsPolicy",
           ])
         })
         instance = merge(local.ec2_instances.bods.instance, {
@@ -99,7 +99,7 @@ locals {
           ami_name          = "hmpps_windows_server_2019_release_2024-12-02T00-00-37.662Z"
           availability_zone = "eu-west-2b"
           instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
-            "Ec2SecretPolicy",
+            "Ec2T2BodsPolicy",
           ])
         })
         instance = merge(local.ec2_instances.bods.instance, {
@@ -125,7 +125,7 @@ locals {
         config = merge(local.ec2_instances.bip_cms.config, {
           availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.ec2_instances.bip_cms.config.instance_profile_policies, [
-            "Ec2SecretPolicy",
+            "Ec2T2ReportingPolicy",
           ])
         })
         instance = merge(local.ec2_instances.bip_cms.instance, {
@@ -146,7 +146,7 @@ locals {
         config = merge(local.ec2_instances.bip_web.config, {
           availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.ec2_instances.bip_web.config.instance_profile_policies, [
-            "Ec2SecretPolicy",
+            "Ec2T2ReportingPolicy",
           ])
         })
         instance = merge(local.ec2_instances.bip_web.instance, {
@@ -197,8 +197,8 @@ locals {
     }
 
     iam_policies = {
-      Ec2SecretPolicy = {
-        description = "Permissions required for secret value access by instances"
+      Ec2T2BodsPolicy = {
+        description = "Permissions required for T2 Bods EC2s"
         statements = [
           {
             effect = "Allow"
@@ -208,8 +208,39 @@ locals {
             ]
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/sap/bods/t2/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*",
+            ]
+          }
+        ]
+      }
+      Ec2T2ReportingPolicy = {
+        description = "Permissions required for T2 reporting EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
               "arn:aws:secretsmanager:*:*:secret:/sap/bip/t2/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*",
+            ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "elasticloadbalancing:Describe*",
+            ]
+            resources = ["*"]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "elasticloadbalancing:SetRulePriorities",
+            ]
+            resources = [
+              "arn:aws:elasticloadbalancing:*:*:listener-rule/app/public-lb/*",
             ]
           }
         ]
