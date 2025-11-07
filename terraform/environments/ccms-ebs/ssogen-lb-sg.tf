@@ -17,9 +17,9 @@ resource "aws_security_group" "sg_ssogen_internal_alb" {
 #########################################
 
 # Allow HTTPS from AWS Workspaces
-resource "aws_vpc_security_group_ingress_rule" "ingress_ssogen_internal_4443_workspaces" {
+resource "aws_vpc_security_group_ingress_rule" "ingress_ssogen_internal_443_workspaces" {
   security_group_id = aws_security_group.sg_ssogen_internal_alb.id
-  description       = "Allow HTTPS (4443) from AWS Workspaces CIDR"
+  description       = "Allow HTTPS (443) from AWS Workspaces CIDR"
   from_port         = 443
   to_port           = 443
   ip_protocol       = "tcp"
