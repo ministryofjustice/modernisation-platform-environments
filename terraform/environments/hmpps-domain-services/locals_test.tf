@@ -235,6 +235,7 @@ locals {
         "public-https-*-unhealthy-load-balancer-host",
         "*-instance-or-cloudwatch-agent-stopped",
       ]
+      end_time = "07:00"
     }
 
     route53_zones = {
