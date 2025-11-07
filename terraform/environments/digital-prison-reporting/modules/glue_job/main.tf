@@ -138,19 +138,6 @@ data "aws_iam_policy_document" "extra-policy-document" {
   }
   statement {
     actions = [
-      "kinesis:SubscribeToShard",
-      "kinesis:ListShards",
-      "kinesis:GetShardIterator",
-      "kinesis:GetRecords",
-      "kinesis:DescribeStream",
-      "kinesis:DescribeLimits",
-    ]
-    resources = [
-      "arn:aws:kinesis:${var.region}:${var.account}:stream/${var.project_id}-*"
-    ]
-  }
-  statement {
-    actions = [
       "secretsmanager:GetSecretValue",
       "secretsmanager:DescribeSecret",
     ]

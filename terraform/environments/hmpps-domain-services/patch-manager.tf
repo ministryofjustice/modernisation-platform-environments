@@ -6,7 +6,7 @@ module "patch_manager" {
   }
   daily_definition_update = true
   account_number          = local.environment_management.account_ids[terraform.workspace] # Required, Account number of current environment, (string)
-  application_name        = local.application_name                                        # Required, Name of application, (string) 
+  application_name        = local.application_name                                        # Required, Name of application, (string)
   environment             = local.environment
   approval_days = {
     development   = 0

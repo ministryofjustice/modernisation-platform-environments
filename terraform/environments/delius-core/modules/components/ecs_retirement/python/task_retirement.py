@@ -83,9 +83,9 @@ def service_message_markup(resources, env, event):
 
     def detect_environment_from_cluster(cluster_name):
         cluster_name = cluster_name.lower()
-        if "prod" in cluster_name:
+        if "-prod-" in cluster_name:
             return "prod"
-        elif "preprod" in cluster_name:
+        elif "-preprod-" in cluster_name:
             return "preprod"
         elif "stage" in cluster_name:
             return "stage"
@@ -93,6 +93,8 @@ def service_message_markup(resources, env, event):
             return "dev"
         elif "poc" in cluster_name:
             return "poc"
+        elif "test" in cluster_name:
+            return "test"
         elif "training" in cluster_name:
             return "training"
         else:
@@ -106,6 +108,7 @@ def service_message_markup(resources, env, event):
         "stage": "#ECB22E",      # yellow
         "dev": "#2EB67D",        # green
         "poc": "#36C5F0",        # blue
+        "test": "#000000",        # black
         "training": "#F0AC36",   # orange
         "unknown": "#AAAAAA"
     }
@@ -116,6 +119,7 @@ def service_message_markup(resources, env, event):
         "stage": "🟡 *STAGE*",
         "dev": "🟢 *DEV*",
         "poc": "🔵 *POC*",
+        "test": "⚫ *TEST*",
         "training": "🟠 *TRAINING*",
         "unknown": "*UNKNOWN*"
     }
