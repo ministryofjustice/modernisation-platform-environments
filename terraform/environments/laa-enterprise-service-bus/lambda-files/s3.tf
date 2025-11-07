@@ -32,15 +32,3 @@ resource "aws_s3_bucket_versioning" "lambda_files" {
     status = "Enabled"
   }
 }
-
-resource "aws_s3_bucket_logging" "lambda_files" {
-  bucket = aws_s3_bucket.lambda_files.id
-
-  target_bucket = aws_s3_bucket.access_logs.id
-  target_prefix = "log/"
-  target_object_key_format {
-    partitioned_prefix {
-      partition_date_source = "EventTime"
-    }
-  }
-}
