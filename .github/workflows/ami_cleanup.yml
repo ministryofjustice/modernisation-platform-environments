@@ -99,6 +99,9 @@ jobs:
       MODERNISATION_PLATFORM_ACCOUNT_NUMBER: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
 
+  # -------------------------
+  # PREVIEW (Dry-Run)
+  # -------------------------
   preview:
     name: Preview Deletions (Dry-Run)
     runs-on: ubuntu-latest
@@ -168,7 +171,6 @@ jobs:
             --filters Name=status,Values=available \
             --query "Volumes[0:50].[VolumeId,CreateTime,State,Tags[?Key=='Name']|[0].Value]" \
             --output table || true
-          echo "::endgroup::"
 
       - name: Set 3-minute test flags (preview only)
         run: |
@@ -188,7 +190,6 @@ jobs:
           echo "🧪 AMI — PREVIEW"
           scripts/ami_cleanup.sh -a "$app" -s ami_commands.sh ${AMI_TEST_FLAGS:-} $args -d delete || true
 
-          # Build human-friendly CSVs
           : > reports/ami_snapshot_map.csv
           echo "AMI ID,Snapshot ID,AMI Name,Creation Date,Status" >> reports/ami_snapshot_map.csv
           : > reports/protected_amis.csv
@@ -208,7 +209,7 @@ jobs:
               STATUS="Protected"
               PREVIEW_PROTECTED_COUNT=$((PREVIEW_PROTECTED_COUNT+1))
             else
-              STATUS="Would Delete"
+              STATUS="Planned"
               PREVIEW_DELETE_COUNT=$((PREVIEW_DELETE_COUNT+1))
             fi
 
@@ -223,20 +224,16 @@ jobs:
             fi
           done
 
-          # Human-friendly console
           echo "Account: ${{ matrix.account_name }} | Test window: ${AGE_MINUTES}m"
           echo "✅ Would delete: ${PREVIEW_DELETE_COUNT} | 🛡️ Protected: ${PREVIEW_PROTECTED_COUNT}"
-          echo "::endgroup::"
-
           echo "ami_count=${PREVIEW_DELETE_COUNT}" >> "$GITHUB_OUTPUT"
 
-          # Job summary
           {
             echo "### 🧪 AMI Preview — ${{ matrix.account_name }}"
             echo ""
             echo "| Status | Count |"
             echo "|---|---:|"
-            echo "| Would delete | ${PREVIEW_DELETE_COUNT} |"
+            echo "| Planned | ${PREVIEW_DELETE_COUNT} |"
             echo "| Protected | ${PREVIEW_PROTECTED_COUNT} |"
             echo ""
             echo "- Reports: \`reports/ami_snapshot_map.csv\`, \`reports/protected_amis.csv\`"
@@ -273,20 +270,19 @@ jobs:
               AGE=$(sed -nE 's/.* ([0-9]+\.[0-9]+) months old.*/\1/p' <<<"$line")
               [[ -z "$VOL" ]] && continue
               NAME=$(aws ec2 describe-volumes --volume-ids "$VOL" --query 'Volumes[0].Tags[?Key==`Name`]|[0].Value' --output text 2>/dev/null || echo "")
-              echo "$VOL,${AGE:-},${NAME:-},Would Delete" >> reports/ebs_cleanup_report.csv
+              echo "$VOL,${AGE:-},${NAME:-},Planned" >> reports/ebs_cleanup_report.csv
             done
           fi
 
           COUNT="$(tail -n +2 reports/ebs_cleanup_report.csv | wc -l | tr -d ' ')"
           echo "✅ Would delete EBS volumes: ${COUNT}"
-          echo "::endgroup::"
 
           {
             echo "### 🧪 EBS Preview — ${{ matrix.account_name }}"
             echo ""
             echo "| Status | Count |"
             echo "|---|---:|"
-            echo "| Would delete | ${COUNT} |"
+            echo "| Planned | ${COUNT} |"
             echo ""
             echo "- Report: \`reports/ebs_cleanup_report.csv\`"
           } >> "$GITHUB_STEP_SUMMARY"
@@ -299,6 +295,9 @@ jobs:
           path: reports/ebs_cleanup_report.csv
           if-no-files-found: warn
 
+  # -------------------------
+  # LIVE (Deletion)
+  # -------------------------
   ami-delete:
     name: AMI Delete (Live)
     runs-on: ubuntu-latest
@@ -360,6 +359,7 @@ jobs:
             echo "Live using default month-based window."
           fi
 
+      # 1) PLAN (build snapshot map with Planned status)
       - name: Plan AMI deletion & snapshot mapping (live)
         run: |
           set -euo pipefail
@@ -393,8 +393,8 @@ jobs:
               fi
             done
           fi
-          echo "::endgroup::"
 
+      # 2) GUARD protected — also mark Status=Protected in CSV
       - name: Guard protected AMIs from deletion (live)
         run: |
           set -euo pipefail
@@ -418,13 +418,21 @@ jobs:
           if [[ -s protected_amis.tmp ]]; then
             echo "Protected AMIs detected; removing from plan:"
             cat protected_amis.tmp
+
+            # Remove protected from command file
             tmp_cmds="$(mktemp)"
             grep -v -F -f <(cut -d' ' -f1 protected_amis.tmp) ami_commands.sh > "$tmp_cmds" || true
             mv "$tmp_cmds" ami_commands.sh
+
+            # Mark Status=Protected in the snapshot map CSV
+            cut -d' ' -f1 protected_amis.tmp > protected_amis_ids.tmp
+            awk -F',' 'NR==FNR{p[$1]=1; next} NR==1{print; next} {if(p[$1]){$5="Protected"}; print}' OFS=',' protected_amis_ids.tmp reports/ami_snapshot_map.csv > reports/ami_snapshot_map.csv.tmp
+            mv reports/ami_snapshot_map.csv.tmp reports/ami_snapshot_map.csv
           else
             echo "No protected AMIs matched."
           fi
 
+      # 3) DELETE AMIs — then mark Status=Deleted in CSV
       - name: Delete AMIs from filtered plan (Live) + friendly logs
         id: ami_live_delete
         run: |
@@ -438,7 +446,6 @@ jobs:
           if [[ ! -s ami_commands.sh ]]; then
             echo "No AMI commands to execute after guard."
             echo "deleted=0" >> $GITHUB_OUTPUT
-            echo "::endgroup::"
             exit 0
           fi
 
@@ -450,8 +457,16 @@ jobs:
           TOTAL="$(grep -c '^aws ec2 deregister-image' ami_commands.sh || true)"
           echo "✅ Deleted AMIs: ${TOTAL}"
           echo "deleted=${TOTAL}" >> $GITHUB_OUTPUT
-          echo "::endgroup::"
 
+          # Mark Status=Deleted for AMIs we attempted to deregister
+          AMI_DELETED_IDS="$(grep -Eo 'ami-[0-9a-f]+' ami_commands.sh | sort -u || true)"
+          if [[ -n "$AMI_DELETED_IDS" && -f reports/ami_snapshot_map.csv ]]; then
+            printf "%s\n" $AMI_DELETED_IDS > deleted_amis_ids.tmp
+            awk -F',' 'NR==FNR{d[$1]=1; next} NR==1{print; next} {if(d[$1]){$5="Deleted"}; print}' OFS=',' deleted_amis_ids.tmp reports/ami_snapshot_map.csv > reports/ami_snapshot_map.csv.tmp
+            mv reports/ami_snapshot_map.csv.tmp reports/ami_snapshot_map.csv
+          fi
+
+      # 4) Fallback snapshot cleanup (no status change here)
       - name: Delete orphaned snapshots (fallback) — friendly + backoff
         if: always()
         run: |
@@ -479,7 +494,6 @@ jobs:
 
           if [[ ! -s reports/ami_snapshot_map.csv ]]; then
             echo "No snapshot map; skipping."
-            echo "::endgroup::"
             exit 0
           fi
 
@@ -490,25 +504,21 @@ jobs:
             [[ "$AMI_ID" == "AMI ID" ]] && continue
             [[ -z "$SNAP_ID" || "$SNAP_ID" == " " ]] && continue
 
-            # Skip if AMI is protected
             if [[ -f protected_amis.tmp ]] && grep -q "^${AMI_ID}\b" protected_amis.tmp; then
               echo "🛡️ Skip $SNAP_ID (AMI ${AMI_ID} protected: ${AMI_NAME})"
               continue
             fi
 
-            # Skip if AMI still exists
             if aws ec2 describe-images --image-ids "$AMI_ID" --query 'Images[0].ImageId' --output text >/dev/null 2>&1; then
               echo "⏳ Skip $SNAP_ID (AMI ${AMI_ID} still exists)"
               continue
             fi
 
-            # Skip if snapshot already gone
             if ! aws ec2 describe-snapshots --snapshot-ids "$SNAP_ID" --query 'Snapshots[0].SnapshotId' --output text >/dev/null 2>&1; then
               echo "ℹ️ Skip $SNAP_ID (already deleted)"
               continue
             fi
 
-            # Retention tag/name/desc checks
             read -r TAGS DESC NAME <<< "$(aws ec2 describe-snapshots --snapshot-ids "$SNAP_ID" --query '[Snapshots[0].Tags, Snapshots[0].Description, Snapshots[0].Tags[?Key==`Name`]|[0].Value]' --output text 2>/dev/null || true)"
             if grep -Eiq '(^|[[:space:]])(Retain|Backup)[[:space:]]*=[[:space:]]*(true|yes|1)' <<< "${TAGS:-}"; then
               echo "🛡️ Skip $SNAP_ID (retention tag)"
@@ -525,7 +535,6 @@ jobs:
           done < reports/ami_snapshot_map.csv
 
           echo "Totals — snapshots deleted: ${deleted}"
-          echo "::endgroup::"
 
       - name: Upload AMI Live Artifacts (reports only)
         if: always()
@@ -639,7 +648,6 @@ jobs:
           COUNT="$(tail -n +2 reports/ebs_cleanup_report.csv | wc -l | tr -d ' ')"
           echo "✅ Deleted EBS volumes: ${COUNT}"
           echo "deleted=${COUNT}" >> $GITHUB_OUTPUT
-          echo "::endgroup::"
 
       - name: Upload EBS Live Artifacts (reports only)
         if: always()
