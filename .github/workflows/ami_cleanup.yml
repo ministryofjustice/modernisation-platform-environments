@@ -275,8 +275,8 @@ jobs:
 
           # Small aging buffer only when test mode minute-window is in use
           if [[ "${EBS_TEST_FLAGS:-}" == *"--test-mode"* ]]; then
-            echo "⏳ Test mode detected for EBS preview; sleeping 90s to pass minute threshold..."
-            sleep 90
+            echo "⏳ Test mode detected for EBS preview; sleeping ${AGE_MINUTES}m to pass minute threshold..."
+            sleep "${AGE_MINUTES}m"
           fi
 
           # Run plan and capture raw output for diagnostics (no logic change)
@@ -504,7 +504,7 @@ jobs:
           if [[ -n "$AMI_DELETED_IDS" ]]; then
             for AMI in $AMI_DELETED_IDS; do
               NAME="$(aws ec2 describe-images --image-ids "$AMI" --query 'Images[0].Name' --output text 2>/dev/null || echo '')"
-              WHEN="$(aws ec2 describe-images --image-ids "$AMI" --query 'Images[0].CreationDate' --output text 2>/dev/null | sed 's/\.[0-9]\+Z$/Z/')"
+              WHEN="$(aws ec2 describe-images --image-ids "$AMI" --query 'Images[0].CreationDate' --output text 2>/dev/null || echo '')"
               echo "${{ matrix.account_name }},eu-west-2,live,ami,ami,${AMI},,${NAME},${WHEN},,Deleted," >> reports/cleanup_report.csv
             done
           fi
@@ -606,9 +606,9 @@ jobs:
           echo "### 🚀 AMI Live — ${{ matrix.account_name }}" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "| Metric | Count |" >> "$GITHUB_STEP_SUMMARY"
-          echo "|---|---:|" >> "$GITHUB_STEP_SUMMARY"
+          echo "|---|---:|"
           echo "| AMIs deleted | ${DEL} |" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo ""
           echo "- Reports: \`reports/ami_snapshot_map.csv\`, \`reports/protected_amis.csv\`, \`reports/cleanup_report.csv\`" >> "$GITHUB_STEP_SUMMARY"
 
   ebs-delete:
@@ -729,9 +729,9 @@ jobs:
           set -euo pipefail
           DEL="${{ steps.ebs_live_delete.outputs.deleted || 0 }}"
           echo "### 🚀 EBS Live — ${{ matrix.account_name }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo ""
           echo "| Metric | Count |" >> "$GITHUB_STEP_SUMMARY"
-          echo "|---|---:|" >> "$GITHUB_STEP_SUMMARY"
+          echo "|---|---:|"
           echo "| Volumes deleted | ${DEL} |" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo ""
           echo "- Report: \`reports/ebs_cleanup_report.csv\`, \`reports/cleanup_report.csv\`" >> "$GITHUB_STEP_SUMMARY"
