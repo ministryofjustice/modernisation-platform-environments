@@ -273,6 +273,12 @@ jobs:
           : > reports/ebs_cleanup_report.csv
           echo "Volume ID,Age (months),Name,Status" >> reports/ebs_cleanup_report.csv
 
+          # Small aging buffer only when test mode minute-window is in use
+          if [[ "${EBS_TEST_FLAGS:-}" == *"--test-mode"* ]]; then
+            echo "⏳ Test mode detected for EBS preview; sleeping 90s to pass minute threshold..."
+            sleep 90
+          fi
+
           # Run plan and capture raw output for diagnostics (no logic change)
           CANDIDATES="$(scripts/ebs_cleanup.sh ${EBS_TEST_FLAGS:-} -m "$months" unattached || true)"
           printf "%s\n" "$CANDIDATES" > reports/ebs_candidates_preview.log
