@@ -221,7 +221,6 @@ jobs:
               PREVIEW_DELETE_COUNT=$((PREVIEW_DELETE_COUNT+1))
             fi
 
-            # snapshot map (existing behaviour)
             SNAPS=$(aws ec2 describe-images --image-ids "$AMI" --query "Images[0].BlockDeviceMappings[].Ebs.SnapshotId" --output text 2>/dev/null || true)
             if [[ -n "$SNAPS" ]]; then
               for S in $SNAPS; do
@@ -232,7 +231,6 @@ jobs:
               echo "$AMI,,${NAME},${WHEN:-},$STATUS" >> reports/ami_snapshot_map.csv
             fi
 
-            # unified report row (AMI)
             echo "${{ matrix.account_name }},eu-west-2,preview,ami,ami,${AMI},,${NAME},${WHEN},,${STATUS},${REASON}" >> reports/cleanup_report.csv
           done
 
@@ -275,13 +273,17 @@ jobs:
           : > reports/ebs_cleanup_report.csv
           echo "Volume ID,Age (months),Name,Status" >> reports/ebs_cleanup_report.csv
 
+          # Run plan and capture raw output for diagnostics (no logic change)
           CANDIDATES="$(scripts/ebs_cleanup.sh ${EBS_TEST_FLAGS:-} -m "$months" unattached || true)"
+          printf "%s\n" "$CANDIDATES" > reports/ebs_candidates_preview.log
+          echo "Raw candidate output (first 20 lines):"
+          printf "%s\n" "$CANDIDATES" | head -n 20 || true
+
           if [[ -n "$CANDIDATES" ]]; then
             echo "$CANDIDATES" | while read -r line; do
               VOL=$(sed -nE 's/.*(vol-[0-9a-f]+).*/\1/p' <<<"$line")
               AGE=$(sed -nE 's/.* ([0-9]+\.[0-9]+) months old.*/\1/p' <<<"$line")
               [[ -z "$VOL" ]] && continue
-              # fetch name and createtime (for unified report)
               NAME=$(aws ec2 describe-volumes --volume-ids "$VOL" --query 'Volumes[0].Tags[?Key==`Name`]|[0].Value' --output text 2>/dev/null || echo "")
               CREATED=$(aws ec2 describe-volumes --volume-ids "$VOL" --query 'Volumes[0].CreateTime' --output text 2>/dev/null || echo "")
               echo "$VOL,${AGE:-},${NAME:-},To be deleted" >> reports/ebs_cleanup_report.csv
@@ -299,7 +301,7 @@ jobs:
             echo "|---|---:|"
             echo "| To be deleted | ${COUNT} |"
             echo ""
-            echo "- Report: \`reports/ebs_cleanup_report.csv\`, \`reports/cleanup_report.csv\`"
+            echo "- Report: \`reports/ebs_cleanup_report.csv\`, \`reports/cleanup_report.csv\`, \`reports/ebs_candidates_preview.log\`"
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload EBS Preview Artifacts
@@ -307,7 +309,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ebs-preview-${{ matrix.account_name }}
-          path: reports/ebs_cleanup_report.csv
+          path: |
+            reports/ebs_cleanup_report.csv
+            reports/ebs_candidates_preview.log
           if-no-files-found: warn
 
       - name: Upload Unified Preview Artifact
@@ -388,7 +392,6 @@ jobs:
             echo "Live using default month-based window."
           fi
 
-      # 1) PLAN (build snapshot map with Planned status)
       - name: Plan AMI deletion & snapshot mapping (live)
         run: |
           set -euo pipefail
@@ -423,7 +426,6 @@ jobs:
             done
           fi
 
-      # 2) GUARD protected — also mark Status=Protected in CSV
       - name: Guard protected AMIs from deletion (live)
         run: |
           set -euo pipefail
@@ -442,7 +444,6 @@ jobs:
             if [[ "$NAME" =~ ^(AwsBackup|Backup) ]] || echo "$TAGS_JSON" | jq -e '.[] | select((.Key|test("Retain|Backup"; "i")) and (.Value|test("^(true|yes|1)$"; "i")))' >/dev/null; then
               echo "$AMI $NAME" >> protected_amis.tmp
               echo "$AMI,$NAME,Protected name/tag" >> reports/protected_amis.csv
-              # unified report row (Protected)
               echo "${{ matrix.account_name }},eu-west-2,live,ami,ami,${AMI},,${NAME},${WHEN},,Protected,Protected name/tag" >> reports/cleanup_report.csv
             fi
           done
@@ -451,12 +452,10 @@ jobs:
             echo "Protected AMIs detected; removing from plan:"
             cat protected_amis.tmp
 
-            # Remove protected from command file
             tmp_cmds="$(mktemp)"
             grep -v -F -f <(cut -d' ' -f1 protected_amis.tmp) ami_commands.sh > "$tmp_cmds" || true
             mv "$tmp_cmds" ami_commands.sh
 
-            # Mark Status=Protected in the snapshot map CSV
             cut -d' ' -f1 protected_amis.tmp > protected_amis_ids.tmp
             awk -F',' 'NR==FNR{p[$1]=1; next} NR==1{print; next} {if(p[$1]){$5="Protected"}; print}' OFS=',' protected_amis_ids.tmp reports/ami_snapshot_map.csv > reports/ami_snapshot_map.csv.tmp
             mv reports/ami_snapshot_map.csv.tmp reports/ami_snapshot_map.csv
@@ -464,7 +463,6 @@ jobs:
             echo "No protected AMIs matched."
           fi
 
-      # 3) DELETE AMIs — then mark Status=Deleted in CSV
       - name: Delete AMIs from filtered plan (Live) + friendly logs
         id: ami_live_delete
         run: |
@@ -490,7 +488,6 @@ jobs:
           echo "✅ Deleted AMIs: ${TOTAL}"
           echo "deleted=${TOTAL}" >> $GITHUB_OUTPUT
 
-          # Mark Status=Deleted for AMIs we attempted to deregister
           AMI_DELETED_IDS="$(grep -Eo 'ami-[0-9a-f]+' ami_commands.sh | sort -u || true)"
           if [[ -n "$AMI_DELETED_IDS" && -f reports/ami_snapshot_map.csv ]]; then
             printf "%s\n" $AMI_DELETED_IDS > deleted_amis_ids.tmp
@@ -498,7 +495,6 @@ jobs:
             mv reports/ami_snapshot_map.csv.tmp reports/ami_snapshot_map.csv
           fi
 
-          # unified report rows (Deleted AMIs)
           if [[ -n "$AMI_DELETED_IDS" ]]; then
             for AMI in $AMI_DELETED_IDS; do
               NAME="$(aws ec2 describe-images --image-ids "$AMI" --query 'Images[0].Name' --output text 2>/dev/null || echo '')"
@@ -507,7 +503,6 @@ jobs:
             done
           fi
 
-      # 4) Fallback snapshot cleanup (no status change here)
       - name: Delete orphaned snapshots (fallback) — friendly + backoff
         if: always()
         run: |
