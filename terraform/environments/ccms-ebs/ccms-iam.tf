@@ -327,14 +327,14 @@ data "aws_iam_policy_document" "ccms_ebs_shared_s3" {
       "s3:PutObject"
     ]
     resources = [
-      aws_s3_bucket.ccms_ebs_shared.arn,
-      "${aws_s3_bucket.ccms_ebs_shared.arn}/*"
+      module.ccms_ebs_shared.bucket.arn,
+      "${module.ccms_ebs_shared.arn}/*"
     ]
   }
 }
 
 resource "aws_iam_policy" "ccms_ebs_shared_s3" {
-  description = "Policy to allow operations in ${aws_s3_bucket.ccms_ebs_shared.id}"
+  description = "Policy to allow operations in ${module.bucket.ccms_ebs_shared.id}"
   name        = "ccms_ebs_shared_s3-${local.environment}"
   policy      = data.aws_iam_policy_document.ccms_ebs_shared_s3.json
 }
