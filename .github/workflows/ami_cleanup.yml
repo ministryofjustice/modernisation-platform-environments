@@ -381,12 +381,6 @@ jobs:
           role-session-name: "ami-delete-${{ matrix.account_name }}"
           aws-region: eu-west-2
 
-      - name: Init unified report (live)
-        run: |
-          mkdir -p reports
-          : > reports/cleanup_report.csv
-          echo "account,region,phase,cleanup_type,resource_type,resource_id,related_id,name,created_at,age_months,status,reason" >> reports/cleanup_report.csv
-
       - name: Enable LIVE 3-minute test flags (when requested or on push)
         run: |
           if [[ "${{ github.event_name }}" == "push" || "${LIVE_TEST_MODE}" == "true" || "${{ contains(github.event.head_commit.message || '', '[CLEANUP TEST NOW]') }}" == "true" ]]; then
@@ -448,7 +442,6 @@ jobs:
             if [[ "$NAME" =~ ^(AwsBackup|Backup) ]] || echo "$TAGS_JSON" | jq -e '.[] | select((.Key|test("Retain|Backup"; "i")) and (.Value|test("^(true|yes|1)$"; "i")))' >/dev/null; then
               echo "$AMI $NAME" >> protected_amis.tmp
               echo "$AMI,$NAME,Protected name/tag" >> reports/protected_amis.csv
-              echo "${{ matrix.account_name }},eu-west-2,live,ami,ami,${AMI},,${NAME},${WHEN},,Protected,Protected name/tag" >> reports/cleanup_report.csv
             fi
           done
 
@@ -499,14 +492,6 @@ jobs:
             mv reports/ami_snapshot_map.csv.tmp reports/ami_snapshot_map.csv
           fi
 
-          if [[ -n "$AMI_DELETED_IDS" ]]; then
-            for AMI in $AMI_DELETED_IDS; do
-              NAME="$(aws ec2 describe-images --image-ids "$AMI" --query 'Images[0].Name' --output text 2>/dev/null || echo '')"
-              WHEN="$(aws ec2 describe-images --image-ids "$AMI" --query 'Images[0].CreationDate' --output text 2>/dev/null || echo '')"
-              echo "${{ matrix.account_name }},eu-west-2,live,ami,ami,${AMI},,${NAME},${WHEN},,Deleted," >> reports/cleanup_report.csv
-            done
-          fi
-
       - name: Delete orphaned snapshots (fallback) — friendly + backoff
         if: always()
         run: |
@@ -532,7 +517,7 @@ jobs:
             done
           }
 
-          if [[ ! -s reports/ami_snapshot_map.csv ]]; then
+          if [[ ! -f reports/ami_snapshot_map.csv ]]; then
             echo "No snapshot map; skipping."
             exit 0
           fi
@@ -588,14 +573,6 @@ jobs:
             reports/protected_amis.csv
           if-no-files-found: warn
 
-      - name: Upload Unified Live AMI Artifact
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: cleanup-report-live-ami-${{ matrix.account_name }}
-          path: reports/cleanup_report.csv
-          if-no-files-found: warn
-
       - name: AMI Job Summary
         if: always()
         run: |
@@ -607,7 +584,7 @@ jobs:
           echo "|---|---:|"
           echo "| AMIs deleted | ${DEL} |" >> "$GITHUB_STEP_SUMMARY"
           echo ""
-          echo "- Reports: \`reports/ami_snapshot_map.csv\`, \`reports/protected_amis.csv\`, \`reports/cleanup_report.csv\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Reports: \`reports/ami_snapshot_map.csv\`, \`reports/protected_amis.csv\`" >> "$GITHUB_STEP_SUMMARY"
 
   ebs-delete:
     name: EBS Delete (Live)
@@ -661,12 +638,6 @@ jobs:
           role-session-name: "ebs-delete-${{ matrix.account_name }}"
           aws-region: eu-west-2
 
-      - name: Init unified report (live)
-        run: |
-          mkdir -p reports
-          : > reports/cleanup_report.csv
-          echo "account,region,phase,cleanup_type,resource_type,resource_id,related_id,name,created_at,age_months,status,reason" >> reports/cleanup_report.csv
-
       - name: Enable LIVE 3-minute test flags (when requested or on push)
         run: |
           if [[ "${{ github.event_name }}" == "push" || "${LIVE_TEST_MODE}" == "true" || "${{ contains(github.event.head_commit.message || '', '[CLEANUP TEST NOW]') }}" == "true" ]]; then
@@ -699,7 +670,6 @@ jobs:
             NAME=$(aws ec2 describe-volumes --volume-ids "$VOL" --query 'Volumes[0].Tags[?Key==`Name`]|[0].Value' --output text 2>/dev/null || echo "")
             CREATED=$(aws ec2 describe-volumes --volume-ids "$VOL" --query 'Volumes[0].CreateTime' --output text 2>/dev/null || echo "")
             echo "$VOL,${AGE:-},${NAME:-},Deleted" >> reports/ebs_cleanup_report.csv
-            echo "${{ matrix.account_name }},eu-west-2,live,ebs,volume,${VOL},,${NAME},${CREATED},${AGE},Deleted," >> reports/cleanup_report.csv
           done
           COUNT="$(tail -n +2 reports/ebs_cleanup_report.csv | wc -l | tr -d ' ')"
           echo "✅ Deleted EBS volumes: ${COUNT}"
@@ -713,14 +683,6 @@ jobs:
           path: reports/ebs_cleanup_report.csv
           if-no-files-found: warn
 
-      - name: Upload Unified Live EBS Artifact
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: cleanup-report-live-ebs-${{ matrix.account_name }}
-          path: reports/cleanup_report.csv
-          if-no-files-found: warn
-
       - name: EBS Job Summary
         if: always()
         run: |
@@ -732,4 +694,4 @@ jobs:
           echo "|---|---:|"
           echo "| Volumes deleted | ${DEL} |" >> "$GITHUB_STEP_SUMMARY"
           echo ""
-          echo "- Report: \`reports/ebs_cleanup_report.csv\`, \`reports/cleanup_report.csv\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Report: \`reports/ebs_cleanup_report.csv\`" >> "$GITHUB_STEP_SUMMARY"
