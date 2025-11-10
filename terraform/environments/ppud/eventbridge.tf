@@ -43,7 +43,7 @@ locals {
     }
     send_cpu_graph = {
       environments = ["production"]
-      schedule     = "cron(5 16 ? * MON-FRI *)"
+      schedule     = "cron(5 17 ? * MON-FRI *)"
       description  = "Trigger Lambda at 17:00 on weekdays"
       timezone     = "Europe/London"
     }
@@ -140,8 +140,8 @@ resource "aws_iam_role_policy" "eventbridge_scheduler_policy" {
     Version = "2012-10-17"
     Statement = [
       {
-        Effect = "Allow"
-        Action = "lambda:InvokeFunction"
+        Effect   = "Allow"
+        Action   = "lambda:InvokeFunction"
         Resource = [for arn in values(local.lambda_function_arns) : arn if arn != null]
       }
     ]
@@ -178,19 +178,19 @@ locals {
         local.is-production ? aws_lambda_function.terraform_lambda_func_securityhub_report_prod[0].arn : null
       )
     )
-    send_cpu_graph = local.is-production ? aws_lambda_function.terraform_lambda_func_send_cpu_graph_prod[0].arn : null
-    disable_cpu_alarms = local.is-production ? aws_lambda_function.terraform_lambda_disable_cpu_alarm_prod[0].arn : null
-    enable_cpu_alarms = local.is-production ? aws_lambda_function.terraform_lambda_enable_cpu_alarm_prod[0].arn : null
-    disk_info_report = local.is-production ? aws_lambda_function.terraform_lambda_func_disk_info_report_prod[0].arn : null
-    email_info_report = local.is-production ? aws_lambda_function.terraform_lambda_func_ppud_email_report_prod[0].arn : null
-    ppud_elb_get_trt_data = local.is-production ? aws_lambda_function.terraform_lambda_func_ppud_elb_trt_data_prod[0].arn : null
-    ppud_elb_calculate_trt_data = local.is-production ? aws_lambda_function.terraform_lambda_func_ppud_elb_trt_calculate_prod[0].arn : null
-    ppud_elb_get_uptime_data = local.is-production ? aws_lambda_function.terraform_lambda_func_ppud_elb_uptime_data_prod[0].arn : null
+    send_cpu_graph                 = local.is-production ? aws_lambda_function.terraform_lambda_func_send_cpu_graph_prod[0].arn : null
+    disable_cpu_alarms             = local.is-production ? aws_lambda_function.terraform_lambda_disable_cpu_alarm_prod[0].arn : null
+    enable_cpu_alarms              = local.is-production ? aws_lambda_function.terraform_lambda_enable_cpu_alarm_prod[0].arn : null
+    disk_info_report               = local.is-production ? aws_lambda_function.terraform_lambda_func_disk_info_report_prod[0].arn : null
+    email_info_report              = local.is-production ? aws_lambda_function.terraform_lambda_func_ppud_email_report_prod[0].arn : null
+    ppud_elb_get_trt_data          = local.is-production ? aws_lambda_function.terraform_lambda_func_ppud_elb_trt_data_prod[0].arn : null
+    ppud_elb_calculate_trt_data    = local.is-production ? aws_lambda_function.terraform_lambda_func_ppud_elb_trt_calculate_prod[0].arn : null
+    ppud_elb_get_uptime_data       = local.is-production ? aws_lambda_function.terraform_lambda_func_ppud_elb_uptime_data_prod[0].arn : null
     ppud_elb_calculate_uptime_data = local.is-production ? aws_lambda_function.terraform_lambda_func_ppud_elb_uptime_calculate_prod[0].arn : null
-    wam_web_traffic_analysis = local.is-production ? aws_lambda_function.terraform_lambda_func_wam_web_traffic_analysis_prod[0].arn : null
-    ppud_elb_daily_trt_graph = local.is-production ? aws_lambda_function.terraform_lambda_func_ppud_elb_trt_graph_prod[0].arn : null
-    wam_elb_daily_trt_graph = local.is-production ? aws_lambda_function.terraform_lambda_func_wam_elb_trt_graph_prod[0].arn : null
-#   ppud_elb_daily_connections_graph = local.is-production ? aws_lambda_function.terraform_lambda_func_ppud_elb_report_prod[0].arn : null
-#   wam_elb_daily_connections_graph = local.is-production ? aws_lambda_function.terraform_lambda_func_wam_elb_report_prod[0].arn : null
+    wam_web_traffic_analysis       = local.is-production ? aws_lambda_function.terraform_lambda_func_wam_web_traffic_analysis_prod[0].arn : null
+    ppud_elb_daily_trt_graph       = local.is-production ? aws_lambda_function.terraform_lambda_func_ppud_elb_trt_graph_prod[0].arn : null
+    wam_elb_daily_trt_graph        = local.is-production ? aws_lambda_function.terraform_lambda_func_wam_elb_trt_graph_prod[0].arn : null
+    #   ppud_elb_daily_connections_graph = local.is-production ? aws_lambda_function.terraform_lambda_func_ppud_elb_report_prod[0].arn : null
+    #   wam_elb_daily_connections_graph = local.is-production ? aws_lambda_function.terraform_lambda_func_wam_elb_report_prod[0].arn : null
   }
 }

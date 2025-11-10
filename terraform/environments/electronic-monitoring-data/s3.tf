@@ -2,7 +2,7 @@ locals {
   bucket_prefix = "emds-${local.environment_shorthand}"
 
   mdss_supplier_account_mapping = {
-    "production"    = {
+    "production" = {
       "account_number" = "660724989641"
       "role_name"      = "oak-datatransfer-lambda-role"
     }
