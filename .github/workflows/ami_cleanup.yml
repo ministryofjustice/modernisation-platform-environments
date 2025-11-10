@@ -695,3 +695,4 @@ jobs:
           echo "| Volumes deleted | ${DEL} |" >> "$GITHUB_STEP_SUMMARY"
           echo ""
           echo "- Report: \`reports/ebs_cleanup_report.csv\`" >> "$GITHUB_STEP_SUMMARY"
+          
