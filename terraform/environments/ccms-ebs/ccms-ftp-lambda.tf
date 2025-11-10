@@ -255,7 +255,7 @@ data "aws_iam_policy_document" "inbound_bucket_policy" {
         identifiers = [module.transfer_family[0].grant_iam_role_arn]
       }
       resources = [
-        module.bucket["laa-ccms-inbound-${local.environment}-mp"].buckets.arn,
+        module.bucket["laa-ccms-inbound-${local.environment}-mp"].bucket.arn,
         # aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].arn
       ]
     }
@@ -435,7 +435,7 @@ module "LAA-ftp-xerox-ccms-outbound-peterborough" {
   ftp_transfer_type        = "SFTP_UPLOAD"
   ftp_local_path           = "CCMS_PRD_DST/Outbound/Peterborough/"
   ftp_remote_path          = lower(local.environment) == "production" ? "/Production/outbound/PETER/" : "/home/${local.ftp_test_user_secret_value["USER"]}/laa-ccms-outbound-${local.environment}-mp/outbound-lambda-runs/"
-  ftp_bucket               = module.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket.id
+  ftp_bucket               = module.bucket["laa-ccms-inbound-${local.environment}-mp"].bucket.id
   env                      = local.environment
   secret_name              = "LAA-ftp-xerox-outbound-${local.environment}"
   secret_arn               = aws_secretsmanager_secret.secrets["LAA-ftp-xerox-outbound"].arn
@@ -455,7 +455,7 @@ module "LAA-ftp-eckoh-outbound-ccms" {
   ftp_transfer_type        = "SFTP_UPLOAD"
   ftp_local_path           = "CCMS_PRD_Eckoh/Outbound/"
   ftp_remote_path          = lower(local.environment) == "production" ? "/inbound/" : "/home/${local.ftp_test_user_secret_value["USER"]}/laa-ccms-outbound-${local.environment}-mp/outbound-lambda-runs/"
-  ftp_bucket               = module.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket.id
+  ftp_bucket               = module.bucket["laa-ccms-inbound-${local.environment}-mp"].bucket.id
   env                      = local.environment
   secret_name              = "LAA-ftp-eckoh-inbound-ccms-${local.environment}"
   secret_arn               = aws_secretsmanager_secret.secrets["LAA-ftp-eckoh-inbound-ccms"].arn
@@ -496,11 +496,11 @@ module "LAA-ftp-rossendales-ccms-inbound" {
   ftp_transfer_type        = "SFTP_DOWNLOAD"
   ftp_local_path           = "CCMS_PRD_Rossendales/Inbound/"
   ftp_remote_path          = lower(local.environment) == "production" ? "ccms/OutBound/" : "/home/${local.ftp_test_user_secret_value["USER"]}/laa-ccms-inbound-${local.environment}-mp/inbound-lambda-runs/"
-  ftp_bucket               = module.bucket["laa-ccms-inbound-${local.environment}-mp"].buckets.id
+  ftp_bucket               = module.bucket["laa-ccms-inbound-${local.environment}-mp"].bucket.id
   env                      = local.environment
   secret_name              = "LAA-ftp-rossendales-ccms-inbound-${local.environment}"
   secret_arn               = aws_secretsmanager_secret.secrets["LAA-ftp-rossendales-ccms-inbound"].arn
-  s3_bucket_ftp            = module.bucket["laa-ccms-inbound-${local.environment}-mp"].buckets.id
+  s3_bucket_ftp            = module.bucket["laa-ccms-inbound-${local.environment}-mp"].bucket.id
   s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
   s3_object_ftp_client     = aws_s3_object.ftp_client.key
   #ftp_cron                     = "cron(0 10 * * ? *)"
@@ -517,7 +517,7 @@ module "LAA-ftp-1stlocate-ccms-inbound" {
   ftp_local_path           = "CCMS_PRD_TDX_DECRYPTED/Inbound/"
   ftp_remote_path          = lower(local.environment) == "production" ? "/LAA_Direct/ToLAADirect/" : "/home/${local.ftp_test_user_secret_value["USER"]}/laa-ccms-inbound-${local.environment}-mp/inbound-lambda-runs/"
   ftp_port                 = "8022"
-  ftp_bucket               = module.bucket["laa-ccms-inbound-${local.environment}-mp"].buckets.id
+  ftp_bucket               = module.bucket["laa-ccms-inbound-${local.environment}-mp"].bucket.id
   env                      = local.environment
   secret_name              = "LAA-ftp-1stlocate-ccms-inbound-${local.environment}"
   secret_arn               = aws_secretsmanager_secret.secrets["LAA-ftp-1stlocate-ccms-inbound"].arn
