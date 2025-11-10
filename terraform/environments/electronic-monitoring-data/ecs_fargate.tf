@@ -137,8 +137,8 @@ resource "aws_ecs_task_definition" "ears_sars_api" {
   container_definitions = jsonencode([
     {
       name    = "ears-sars-app-api-container"
-      image   = ""
-      command = ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
+      image   = "v0.0.1"
+      command = ["uv run main.py"]
       portMappings = [
         {
           containerPort = 80
