@@ -24,6 +24,13 @@ data "aws_ssm_parameter" "klayers_account_dev" {
 }
 
 # Klayers Account ID - used by lambda layer ARNs - https://github.com/keithrozario/Klayers?tab=readme-ov-file
+data "aws_ssm_parameter" "klayers_account_uat" {
+  count           = local.is-preproduction == true ? 1 : 0
+  name            = "klayers-account"
+  with_decryption = true
+}
+
+# Klayers Account ID - used by lambda layer ARNs - https://github.com/keithrozario/Klayers?tab=readme-ov-file
 data "aws_ssm_parameter" "klayers_account_prod" {
   count           = local.is-production == true ? 1 : 0
   name            = "klayers-account"
