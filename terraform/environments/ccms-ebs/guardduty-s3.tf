@@ -128,7 +128,7 @@ resource "aws_guardduty_malware_protection_plan" "s3_scan_bucket6" {
     { Name = lower(format("s3-%s-%s-awsgaurdduty-mpp", "${local.application_name}", local.environment)) }
   )
 
-  depends_on = [module.bucket.red_button_data.bucket]
+  depends_on = [module.bucket.red_button_data]
 
 }
 
@@ -151,7 +151,7 @@ resource "aws_guardduty_malware_protection_plan" "s3_scan_bucket7" {
     { Name = lower(format("s3-%s-%s-awsgaurdduty-mpp", "${local.application_name}", local.environment)) }
   )
 
-  depends_on = [module.bucket.ccms_ebs_shared.bucket]
+  depends_on = [module.bucket.ccms_ebs_shared]
 }
 
 data "aws_iam_role" "guardduty_s3_scan" {
