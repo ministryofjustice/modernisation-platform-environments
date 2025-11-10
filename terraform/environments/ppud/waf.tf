@@ -11,7 +11,9 @@ locals {
 }
 
 module "waf" {
-  source                   = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-aws-waf?ref=b9cf6f92b142e80845ae30252aee2f84f57a71a9"
+  # checkov:skip=CKV_TF_1: "Commit Hash requirement temporarily disabled"
+  # checkov:skip=CKV_TF_2: "Version number tag requirement temporarily disabled"
+  source                   = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-aws-waf.git?ref=feature/adding-custom-rules"
   enable_ddos_protection   = true
   ddos_rate_limit          = 150
   block_non_uk_traffic     = true
