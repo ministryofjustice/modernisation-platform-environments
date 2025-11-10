@@ -334,7 +334,7 @@ data "aws_iam_policy_document" "ccms_ebs_shared_s3" {
 }
 
 resource "aws_iam_policy" "ccms_ebs_shared_s3" {
-  description = "Policy to allow operations in ${module.bucket.ccms_ebs_shared.id}"
+  description = "Policy to allow operations in ${module.bucket.ccms_ebs_shared.bucket.id}"
   name        = "ccms_ebs_shared_s3-${local.environment}"
   policy      = data.aws_iam_policy_document.ccms_ebs_shared_s3.json
 }

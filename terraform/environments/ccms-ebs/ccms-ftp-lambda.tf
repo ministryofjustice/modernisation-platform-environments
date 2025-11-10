@@ -290,7 +290,7 @@ data "aws_iam_policy_document" "inbound_bucket_policy" {
 }
 
 resource "aws_s3_bucket_policy" "inbound_bucket_policy" {
-  bucket = module.bucket["laa-ccms-inbound-${local.environment}-mp"].buckets.arn
+  bucket = module.bucket["laa-ccms-inbound-${local.environment}-mp"].bucket.arn
   policy = data.aws_iam_policy_document.inbound_bucket_policy.json
 }
 

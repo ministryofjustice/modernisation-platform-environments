@@ -57,8 +57,8 @@ resource "aws_iam_role_policy" "red_button_lambda_policy" {
           "s3:PutObject"
         ]
         Resource = [
-          module.red_button_data.arn,
-          "${module.red_button_data.arn}/*"
+          module.bucket.red_button_data.bucket.arn,
+          "${module.bucket.red_button_data.bucket.arn}/*"
         ]
       }
     ]
@@ -236,7 +236,7 @@ output "lambda_function_arn" {
 
 output "s3_bucket_name" {
   description = "Name of the S3 bucket for backups"
-  value       = modulebucket.red-button-data.bucket.id
+  value       = module.bucket.red-button-data.bucket.id
 }
 
 output "s3_bucket_arn" {
