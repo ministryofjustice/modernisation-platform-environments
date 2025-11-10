@@ -213,12 +213,6 @@ locals {
     log_retention_days            = 30
   }
 
-  klayers_account_ids = {
-    development   = data.aws_ssm_parameter.klayers_account_dev[0].value
-    preproduction = data.aws_ssm_parameter.klayers_account_uat[0].value
-    production    = data.aws_ssm_parameter.klayers_account_prod[0].value
-  }
-
   klayers_account_id = data.aws_ssm_parameter.klayers_account.value
 
   layer_arns = {
