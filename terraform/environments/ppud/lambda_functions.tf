@@ -9,19 +9,16 @@ locals {
       condition    = local.is-development
       s3_bucket    = "moj-infrastructure-dev"
       account_key  = "ppud-development" # checkov:skip=CKV_SECRET_6: "Environment identifier, not a secret"
-      dlq_arn      = aws_sqs_queue.lambda_queue_dev[0].arn
     }
     preproduction = {
       condition    = local.is-preproduction
       s3_bucket    = "moj-infrastructure-uat"
       account_key  = "ppud-preproduction" # checkov:skip=CKV_SECRET_6: "Environment identifier, not a secret"
-      dlq_arn      = aws_sqs_queue.lambda_queue_uat[0].arn
     }
     production = {
       condition    = local.is-production
       s3_bucket    = "moj-infrastructure"
       account_key  = "ppud-production" # checkov:skip=CKV_SECRET_6: "Environment identifier, not a secret"
-      dlq_arn      = aws_sqs_queue.lambda_queue_prod[0].arn
     }
   }
 
@@ -218,6 +215,9 @@ locals {
     log_retention_days            = 30
   }
 
+  # Dead letter SQS queue
+  dlq_arn = data.aws_sqs_queue.lambda_dead_letter_queue.arn
+
   # Lambda ARNs
   klayers_account_id = data.aws_ssm_parameter.klayers_account.value
 
@@ -249,9 +249,9 @@ resource "aws_lambda_function" "lambda_functions" {
   timeout                        = each.value.config.timeout
   reserved_concurrent_executions = local.lambda_defaults.reserved_concurrent_executions
   
-  # Lambda dead letter queues
+  # Lambda dead letter sqs queues
   dead_letter_config {
-    target_arn = local.lambda_environments[each.value.env].dlq_arn
+    target_arn = local.dlq_arn
   }
 
   tracing_config {
