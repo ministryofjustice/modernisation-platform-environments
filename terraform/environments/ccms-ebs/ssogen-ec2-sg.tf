@@ -104,21 +104,21 @@ resource "aws_security_group_rule" "ing_7777_workspaces_nat" {
 ############################################
 # INGRESS — OHS 4443
 ############################################
-resource "aws_security_group_rule" "ing_4443_workspaces_private" {
-  count             = local.is_development ? 1 : 0
-  type              = "ingress"
-  description       = "OHS 4443 from WorkSpaces subnets (private)"
-  security_group_id = aws_security_group.ssogen_sg[0].id
-  protocol          = "tcp"
-  from_port         = 4443
-  to_port           = 4443
-  cidr_blocks = [
-    data.aws_vpc.shared.cidr_block,
-    local.application_data.accounts[local.environment].lz_aws_subnet_env,
-    local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_subnet_env,
-    local.application_data.accounts[local.environment].lz_aws_workspace_prod_subnet_env,
-  ]
-}
+# resource "aws_security_group_rule" "ing_4443_workspaces_private" {
+#   count             = local.is_development ? 1 : 0
+#   type              = "ingress"
+#   description       = "OHS 4443 from WorkSpaces subnets (private)"
+#   security_group_id = aws_security_group.ssogen_sg[0].id
+#   protocol          = "tcp"
+#   from_port         = 4443
+#   to_port           = 4443
+#   cidr_blocks = [
+#     data.aws_vpc.shared.cidr_block,
+#     local.application_data.accounts[local.environment].lz_aws_subnet_env,
+#     local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_subnet_env,
+#     local.application_data.accounts[local.environment].lz_aws_workspace_prod_subnet_env,
+#   ]
+# }
 
 resource "aws_security_group_rule" "ing_4443_workspaces_nat" {
   count             = local.is_development ? 1 : 0
