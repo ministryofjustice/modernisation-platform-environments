@@ -175,5 +175,6 @@ data "http" "environments_file" {
 }
 
 data "aws_ssm_parameter" "cloudfront_distribution_id" {
-  name = "/${local.environment}/cloudfront-distribution-id"
+  count = var.lookup_cloudfront_distribution ? 1 : 0
+  name  = "/${local.environment}/cloudfront-distribution-id"
 }

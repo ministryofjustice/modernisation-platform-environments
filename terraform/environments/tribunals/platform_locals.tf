@@ -87,5 +87,6 @@ locals {
 
   cloudfront_nginx_nonprod_sans = []
 
-  cloudfront_distribution_id = try(data.aws_ssm_parameter.cloudfront_distribution_id.value, null)
+  cloudfront_distribution_id = var.lookup_cloudfront_distribution ? data.aws_ssm_parameter.cloudfront_distribution_id[0].value : null
+
 }
