@@ -383,7 +383,7 @@ data "aws_iam_policy_document" "snowflake_trust" {
     effect = "Allow"
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::${local.snowflake_principal_account_id}:root"]
+      identifiers = [local.snowflake_principal_account_id]
     }
     actions = ["sts:AssumeRole"]
     condition {
