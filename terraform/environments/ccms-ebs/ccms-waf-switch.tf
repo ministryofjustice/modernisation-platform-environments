@@ -130,7 +130,7 @@ resource "aws_lambda_permission" "waf_events_allow" {
 
 
 resource "aws_lambda_permission" "waf_events_block" {
-  statement_id  = "AllowEvents2130-${local.environment}"
+  statement_id  = "BlockEvents2130-${local.environment}"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.waf_toggle.arn
   principal     = "events.amazonaws.com"
