@@ -54,9 +54,18 @@ locals {
     "*.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   ]
 
+
+  # Apply 1-3 at a time from the pending array
+  # After each apply there will be a new CNAME entry which needs to get created by Tony Bishop
+  # in the Route53 which manages these domains. And he will update the main A/CNAME record with the domain name
+  # of the production cloudfront distribution
+  # "ahmlr.gov.uk" is listed as the primary domain of the viewer certificate for this cloudfront-nginx distribution
+  #
   cloudfront_nginx_sans = [
-    "asylum-support-tribunal.gov.uk",
-    "ahmlr.gov.uk",
+    "asylum-support-tribunal.gov.uk"
+  ]
+
+  pending_cloudfront_nginx_sans = [
     "appeals-service.gov.uk",
     "carestandardstribunal.gov.uk",
     "cicap.gov.uk",
@@ -85,7 +94,10 @@ locals {
     "yjbpublications.justice.gov.uk"
   ]
 
-  cloudfront_nginx_nonprod_sans = []
+  # This array should match the cloudfront_nginx_sans one above, but with  dev. prefix for each one
+  cloudfront_nginx_nonprod_sans = [
+    "dev.asylum-support-tribunal.gov.uk"
+  ]
 
   cloudfront_distribution_id = var.lookup_cloudfront_distribution ? data.aws_ssm_parameter.cloudfront_distribution_id[0].value : null
 
