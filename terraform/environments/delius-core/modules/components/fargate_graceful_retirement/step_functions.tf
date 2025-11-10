@@ -23,7 +23,7 @@ resource "aws_iam_policy" "step_function_policy" {
       {
         Effect   = "Allow"
         Action   = "lambda:InvokeFunction",
-        Resource = [aws_lambda_function.ecs_restart_handler.arn, aws_lambda_function.calculate_wait_time.arn]
+        Resource = [aws_lambda_function.ecs_restart_handler.arn, aws_lambda_function.calculate_wait_time.arn, aws_lambda_function.ldap_circuit_handler.arn]
       },
       {
         Effect   = "Allow"
@@ -65,20 +65,131 @@ resource "aws_sfn_state_machine" "ecs_restart_state_machine" {
           "restart_time" : var.restart_time
           "restart_day_of_the_week" : var.restart_day_of_the_week
         },
-        ResultPath : "$.waitTimestamp", # Store the result in $.waitTimestamp
+        ResultPath : "$.waitTimestamp", # merge original input event and output, store result in $.waitTimestamp
         Next : "WaitUntilRestartTime"
       },
       WaitUntilRestartTime : {
         Type : "Wait",
         TimestampPath : "$.waitTimestamp.timestamp", # Use the computed timestamp
-        Next : "InvokeLambdaFunction"
+        Next : "ProcessAffectedEntities"
       },
-      InvokeLambdaFunction : {
-        Type : "Task",
-        Resource : "arn:aws:states:::lambda:invoke",
+      # Process all entities (cluster and services)
+      ProcessAffectedEntities : {
+        Type : "Map",
+        ItemsPath : "$.detail.affectedEntities",
+        ResultPath : "$.entityResults",
         Parameters : {
-          "FunctionName" : aws_lambda_function.ecs_restart_handler.arn,
-          "Payload.$" : "$"
+          "entityValue.$" : "$$.Map.Item.Value.entityValue",
+          "status.$" : "$$.Map.Item.Value.status",
+          "lastUpdatedTime.$" : "$$.Map.Item.Value.lastUpdatedTime",
+          "originalEvent.$" : "$",
+          "waitTimestamp.$" : "$.waitTimestamp"
+        },
+        Iterator : {
+          StartAt : "CheckIfLDAP",
+          States : {
+            # Check if this entity is LDAP
+            CheckIfLDAP : {
+              Type : "Choice",
+              Choices : [
+                {
+                  Variable : "$.entityValue",
+                  StringMatches : "*-ldap",
+                  Next : "OpenCircuitBreaker"
+                }
+              ],
+              Default : "RestartECSService"
+            },
+            # Open circuit breaker if LDAP
+            OpenCircuitBreaker : {
+              Type : "Task",
+              Resource : "arn:aws:states:::lambda:invoke",
+              Parameters : {
+                "FunctionName" : aws_lambda_function.ldap_circuit_handler.arn,
+                "Payload" : {
+                  "action" : "open",
+                  "entityValue.$" : "$.entityValue",
+                  "waitTimestamp.$" : "$.waitTimestamp",
+                  "originalEvent.$" : "$.originalEvent"
+                }
+              },
+              "ResultPath" : "$.openCircuitBreaker", # merge original input and pass it as is
+              Next : "RestartECSService"
+            },
+            # Restart ECS service (for every entity)
+            RestartECSService : {
+              Type : "Task",
+              Resource : "arn:aws:states:::lambda:invoke",
+              Parameters : {
+                "FunctionName" : aws_lambda_function.ecs_restart_handler.arn,
+                "Payload" : {
+                  "entityValue.$" : "$.entityValue",
+                  "waitTimestamp.$" : "$.waitTimestamp",
+                  "originalEvent.$" : "$.originalEvent"
+                }
+              },
+              "ResultPath" : "$.restartECSService", # merge original input and pass it as is
+              Next : "PostRestartChoice"
+            },
+            # After restart, check again: if LDAP then wait for targets + close circuit breaker
+            # else just end the steps
+            PostRestartChoice : {
+              Type : "Choice",
+              Choices : [
+                {
+                  Variable : "$.entityValue",
+                  StringMatches : "*-ldap",
+                  Next : "WaitForTargetsHealthy"
+                }
+              ],
+              Default : "EndStep"
+            },
+            WaitForTargetsHealthy : {
+              Type : "Task",
+              Resource : "arn:aws:states:::lambda:invoke",
+              Parameters : {
+                "FunctionName" : aws_lambda_function.ldap_circuit_handler.arn,
+                # Pass the original event and also inject action="check_health"
+                "Payload" : {
+                  "action" : "check_health",
+                  "waitTimestamp.$" : "$.waitTimestamp",
+                  "entityValue.$" : "$.entityValue",
+                  "originalEvent.$" : "$.originalEvent"
+                }
+              },
+              Retry : [
+                {
+                  ErrorEquals : ["TargetsNotReady", "TargetsStillDraining"],
+                  IntervalSeconds : 20,
+                  BackoffRate : 1.2,
+                  MaxAttempts : 30
+                }
+              ],
+              "ResultPath" : "$.waitForTargetsHealthy", # merge original input and pass it as is
+              Next : "CloseCircuitBreaker"
+            },
+            # finally close circuit breaker
+            CloseCircuitBreaker : {
+              Type : "Task",
+              Resource : "arn:aws:states:::lambda:invoke",
+              Parameters : {
+                "FunctionName" : aws_lambda_function.ldap_circuit_handler.arn,
+                # Pass the original event and also inject action="close"
+                "Payload" : {
+                  "action" : "close",
+                  "waitTimestamp.$" : "$.waitTimestamp",
+                  "entityValue.$" : "$.entityValue",
+                  "originalEvent.$" : "$.originalEvent"
+                }
+              },
+              ResultPath : "$.closeCircuitBreaker"
+              Next : "EndStep"
+            },
+            # Iteration ends here
+            EndStep : {
+              Type : "Succeed"
+            }
+          }
         },
         End : true
       }

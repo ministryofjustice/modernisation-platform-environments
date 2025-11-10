@@ -72,7 +72,7 @@ module "s3-bucket" { #tfsec:ignore:aws-s3-enable-versioning
 }
 
 resource "aws_s3_bucket_notification" "artefact_bucket_notification" {
-  bucket = module.s3-bucket.bucket.id
+  bucket      = module.s3-bucket.bucket.id
   eventbridge = true
   topic {
     topic_arn     = aws_sns_topic.s3_topic.arn
@@ -168,7 +168,7 @@ module "s3-bucket-logging" {
 }
 
 resource "aws_s3_bucket_notification" "logging_bucket_notification" {
-  bucket = module.s3-bucket-logging.bucket.id
+  bucket      = module.s3-bucket-logging.bucket.id
   eventbridge = true
   topic {
     topic_arn     = aws_sns_topic.s3_topic.arn
@@ -275,7 +275,7 @@ module "s3-bucket-dbbackup" {
 }
 
 resource "aws_s3_bucket_notification" "dbbackup_bucket_notification" {
-  bucket = module.s3-bucket-dbbackup.bucket.id
+  bucket      = module.s3-bucket-dbbackup.bucket.id
   eventbridge = true
   topic {
     topic_arn     = aws_sns_topic.s3_topic.arn
@@ -302,6 +302,18 @@ data "aws_iam_policy_document" "dbbackup_s3_policy" {
 
 resource "aws_s3_bucket" "ccms_ebs_shared" {
   bucket = "${local.application_name}-${local.environment}-shared"
+}
+
+
+resource "aws_s3_object" "folder" {
+  bucket = aws_s3_bucket.ccms_ebs_shared.bucket
+  for_each = {
+    for index, name in local.lambda_folder_name :
+    name => index == 0 ? "${name}/" : "lambda_delivery/${name}/"
+  }
+
+  key = each.value
+
 }
 
 resource "aws_s3_bucket_public_access_block" "ccms_ebs_shared" {
