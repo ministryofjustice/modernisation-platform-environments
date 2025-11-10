@@ -1,19 +1,22 @@
 ########################################################
-# Data Sources for S3 Buckets
+# Lambda Layers and other dependencies for the functions
 ########################################################
+
+# Data Sources for S3 Buckets
 
 data "aws_s3_bucket" "layer_buckets" {
   for_each = {
-    development   = "moj-infrastructure-dev"
-    preproduction = "moj-infrastructure-uat"
-    production    = "moj-infrastructure"
+    for env, bucket_name in {
+      development   = "moj-infrastructure-dev"
+      preproduction = "moj-infrastructure-uat"
+      production    = "moj-infrastructure"
+    } : env => bucket_name
+    if env == local.environment
   }
   bucket = each.value
 }
 
-########################################################
-# Lambda Layers and other dependencies for the functions
-########################################################
+# Lambda Layers
 
 locals {
   lambda_layers = {
@@ -26,13 +29,9 @@ locals {
   }
 
   layer_env_buckets = {
-    development   = data.aws_s3_bucket.layer_buckets["development"].id
-    preproduction = data.aws_s3_bucket.layer_buckets["preproduction"].id
-    production    = data.aws_s3_bucket.layer_buckets["production"].id
+    for env in keys(data.aws_s3_bucket.layer_buckets) : env => data.aws_s3_bucket.layer_buckets[env].id
   }
-
   current_env = local.environment
-
   active_layers = local.current_env != null ? local.lambda_layers : {}
 }
 
