@@ -31,6 +31,7 @@ module "slack_alerts" {
       dpr-name = "${local.project}-slack-alerts-${local.environment}"
       dpr-jira = "DPR-569"
     }
+
   )
 
   depends_on = [module.notifications_sns, module.slack_alerts_url.secret_id]

@@ -1811,7 +1811,6 @@ resource "aws_iam_role_policy_attachment" "attach_iam_role_to_iam_policy_s3_buck
   policy_arn = aws_iam_policy.iam_policy_s3_bucket_moj_report_source_dev[0].arn
 }
 
-# new
 #########################################################
 # IAM Role & Policy for S3 Bucket Replication to DE - UAT
 #########################################################

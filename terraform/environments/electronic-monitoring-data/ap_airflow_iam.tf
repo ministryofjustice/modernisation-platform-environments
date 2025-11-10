@@ -238,6 +238,7 @@ module "load_cap_dw_database" {
   athena_dump_bucket   = module.s3-athena-bucket.bucket
   cadt_bucket          = module.s3-create-a-derived-table-bucket.bucket
   max_session_duration = 12 * 60 * 60
+  new_airflow          = true
 }
 
 module "load_emsys_mvp_database" {
@@ -682,7 +683,7 @@ module "load_buddi_database" {
 
   name               = "buddi"
   environment        = local.environment
-  database_name      = "buddi"
+  database_name      = "buddi_buddi"
   path_to_data       = "/buddi/buddi"
   source_data_bucket = module.s3-data-bucket.bucket
   secret_code        = jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]

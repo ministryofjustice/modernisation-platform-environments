@@ -54,7 +54,6 @@ resource "aws_route53_record" "external_validation_sandbox_subdomain_blue" {
   zone_id         = data.aws_route53_zone.external.zone_id
 }
 
-
 resource "aws_route53_record" "external_sandbox_green" {
   count = local.is-development ? 1 : 0
 

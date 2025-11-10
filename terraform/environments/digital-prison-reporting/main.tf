@@ -133,6 +133,8 @@ module "glue_s3_file_transfer_job" {
     "--dpr.file.transfer.destination.bucket"      = module.s3_raw_archive_bucket.bucket_id
     "--dpr.file.transfer.retention.period.amount" = tostring(local.scheduled_s3_file_transfer_retention_period_amount)
     "--dpr.file.transfer.retention.period.unit"   = tostring(local.scheduled_s3_file_transfer_retention_period_unit)
+    "--dpr.file.transfer.use.default.parallelism" = tostring(local.scheduled_file_transfer_use_default_parallelism)
+    "--dpr.file.transfer.parallelism"             = tostring(local.scheduled_file_transfer_parallelism)
     "--dpr.file.transfer.delete.copied.files"     = true,
     "--dpr.allowed.s3.file.extensions"            = "*",
     "--dpr.log.level"                             = local.glue_job_common_log_level
@@ -837,10 +839,10 @@ module "glue_reconciliation_database" {
 }
 
 # Ec2
-module "ec2_kinesis_agent" {
+module "ec2_bastion_host" {
   source                      = "./modules/ec2"
-  name                        = "${local.project}-ec2-kinesis-agent-${local.env}"
-  description                 = "EC2 instance for kinesis agent"
+  name                        = "${local.project}-ec2-bastion-host-${local.env}"
+  description                 = "EC2 bastion instance for accessing the private network"
   vpc                         = data.aws_vpc.shared.id
   cidr                        = [data.aws_vpc.shared.cidr_block]
   subnet_ids                  = data.aws_subnet.private_subnets_a.id
@@ -854,7 +856,7 @@ module "ec2_kinesis_agent" {
   monitoring                  = true
   ebs_size                    = 20
   ebs_encrypted               = true
-  scale_down                  = local.kinesis_agent_autoscale
+  scale_down                  = local.bastion_host_autoscale
   ebs_delete_on_termination   = false
   # s3_policy_arn               = aws_iam_policy.read_s3_read_access_policy.arn # TBC
   region  = local.account_region
@@ -874,8 +876,8 @@ module "ec2_kinesis_agent" {
   tags = merge(
     local.all_tags,
     {
-      Name              = "${local.project}-ec2-kinesis-agent-${local.env}"
-      dpr-name          = "${local.project}-ec2-kinesis-agent-${local.env}"
+      Name              = "${local.project}-ec2-bastion-host-${local.env}"
+      dpr-name          = "${local.project}-ec2-bastion-host-${local.env}"
       dpr-resource-type = "EC2 Instance"
       dpr-jira          = "DPR-108"
     }

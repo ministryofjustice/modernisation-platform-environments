@@ -15,7 +15,7 @@ locals {
   }
 
   tags = var.tags
-  
+
 }
 
 resource "aws_glue_job" "glue_job" {
@@ -134,19 +134,6 @@ data "aws_iam_policy_document" "extra-policy-document" {
     ]
     resources = [
       "arn:aws:dms:${var.region}:${var.account}:*:*"
-    ]
-  }
-  statement {
-    actions = [
-      "kinesis:SubscribeToShard",
-      "kinesis:ListShards",
-      "kinesis:GetShardIterator",
-      "kinesis:GetRecords",
-      "kinesis:DescribeStream",
-      "kinesis:DescribeLimits",
-    ]
-    resources = [
-      "arn:aws:kinesis:${var.region}:${var.account}:stream/${var.project_id}-*"
     ]
   }
   statement {

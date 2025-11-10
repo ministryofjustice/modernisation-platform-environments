@@ -18,13 +18,6 @@ bodmis_kubeconfig="/home/ssm-user/.kube/bodmis_config"
 
 # Setup Required Directories
 touch /tmp/hello-ec2
-mkdir -p /opt/kinesis/scripts
-
-# Add Kinesis Stream Directory where logs are delivered
-mkdir -p /opt/kinesis/kinesis-demo-stream
-#chown -R ssm-user:ssm-user /opt/kinesis/kinesis-demo-stream
-#chown -R ssm-user:ssm-user /opt/kinesis
-chmod -R 777 /opt/kinesis
 
 if grep ssm-user /etc/passwd &> /dev/null;
 then
@@ -46,9 +39,6 @@ echo "assumeyes=1" >> /etc/yum.conf
 # Update all packages
 sudo yum -y update
 
-# Setup YUM install Kinesis Agent
-sudo yum -y install aws-kinesis-agent wget unzip jq
-
 # Setup Oracle Client Tools
 sudo yum install https://yum.oracle.com/repo/OracleLinux/OL7/oracle/instantclient21/x86_64/getPackage/oracle-instantclient-basic-21.8.0.0.0-1.x86_64.rpm
 sudo yum install https://yum.oracle.com/repo/OracleLinux/OL7/oracle/instantclient21/x86_64/getPackage/oracle-instantclient-tools-21.8.0.0.0-1.x86_64.rpm
@@ -69,31 +59,6 @@ echo "Seup AWSCLI V2....."
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 unzip awscliv2.zip
 ./aws/install
-
-# Configure and Enable Kinesis Agent
-# /tmp/random.log*
-# Additional Configuration here, https://docs.aws.amazon.com/streams/latest/dev/writing-with-agents.html
-cat <<EOF >/etc/aws-kinesis/agent.json
-{
-    "cloudwatch.emitMetrics":true,
-    "kinesis.endpoint":"https://kinesis.eu-west-2.amazonaws.com",
-    "flows":[
-       {
-          "filePattern":"/opt/kinesis/kinesis-demo-stream/demo.log",
-          "kinesisStream":"dpr-kinesis-data-demo-development"
-       },
-       {
-          "filePattern":"/opt/kinesis/kinesis-demo-stream/test.log",
-          "kinesisStream":"dpr-kinesis-data-demo-development"
-       }, 
-       {
-          "filePattern": "/opt/kinesis/kinesis-demo-stream/firehose-stream.log",
-          "deliveryStream": "yourfirehosedeliverystream" 
-       }
-    ]
- }
-EOF
-chmod -R 777 /opt/kinesis
 
 # Configure MP -> NOMIS Connectivity, for Development Env Workaround
 if [ ${environment} = "development" ]; then
@@ -282,9 +247,6 @@ EOL
 
 fi
 
-# Start Stream at Start of the EC2 
-# sudo chkconfig aws-kinesis-agent on
-# sudo service aws-kinesis-agent start
 systemctl daemon-reload
 
 # NOMIS PF Service 
