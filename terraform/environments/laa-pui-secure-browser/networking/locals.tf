@@ -16,4 +16,6 @@ locals {
   wssb_supported_az_names = [
     for zid in local.wssb_supported_zone_ids : local.azid_to_name[zid]
   ]
+
+  dedicated_private_rtb_ids = local.environment == "production" ? toset(module.vpc[0].private_route_table_ids) : toset([])
 }

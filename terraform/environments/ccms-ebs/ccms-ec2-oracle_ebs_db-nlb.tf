@@ -48,4 +48,6 @@ resource "aws_lb_listener" "ebsdbnlb_listener" {
     target_group_arn = aws_lb_target_group.ebsdb_nlb.id
     type             = "forward"
   }
+
+  depends_on = [aws_acm_certificate_validation.external_nonprod, aws_acm_certificate_validation.external_prod ]
 }

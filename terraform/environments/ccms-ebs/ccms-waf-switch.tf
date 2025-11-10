@@ -81,7 +81,7 @@ resource "aws_lambda_function" "waf_toggle" {
 .card{max-width:600px;margin:auto;background:#12243a;padding:2rem;border-radius:10px;}
 </style></head><body><div class="card">
 <h1>Scheduled Maintenance</h1>
-<p>The service is unavailable from 19:00 to 07:00 UK time. Apologies for any inconvenience caused.</p>
+<p>The service is unavailable from 21:30 to 07:00 UK time. Apologies for any inconvenience caused.</p>
 </div></body></html>
 EOT
     }
@@ -130,7 +130,7 @@ resource "aws_lambda_permission" "waf_events_allow" {
 
 
 resource "aws_lambda_permission" "waf_events_block" {
-  statement_id  = "AllowEvents2130-${local.environment}"
+  statement_id  = "BlockEvents2130-${local.environment}"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.waf_toggle.arn
   principal     = "events.amazonaws.com"
