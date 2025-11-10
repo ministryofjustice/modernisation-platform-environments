@@ -65,14 +65,14 @@ locals {
     }
     */
     wam_waf_analysis = {
-      description = "Function to analyse WAM WAF ACL traffic and email a report."
-      handler     = "lambda_handler"
-      timeout     = 300
-      role_key    = "get_cloudwatch"
+      description  = "Function to analyse WAM WAF ACL traffic and email a report."
+      handler      = "lambda_handler"
+      timeout      = 300
+      role_key     = "get_cloudwatch"
       environments = ["development"]
-      layers = ["numpy", "pillow", "requests", "matplotlib"]
+      layers       = ["numpy", "pillow", "requests", "matplotlib"]
       permissions = [{
-        principal  = "cloudwatch.amazonaws.com"
+        principal         = "cloudwatch.amazonaws.com"
         source_arn_suffix = "*"
       }]
     }
@@ -197,11 +197,11 @@ locals {
   lambda_instances = flatten([
     for func_name, func_config in local.lambda_functions : [
       for env in func_config.environments : {
-        key         = "${func_name}_${env}"
-        func_name   = func_name
-        env         = env
-        config      = func_config
-        env_config  = local.lambda_environments[env]
+        key        = "${func_name}_${env}"
+        func_name  = func_name
+        env        = env
+        config     = func_config
+        env_config = local.lambda_environments[env]
       } if local.lambda_environments[env].condition
     ]
   ])
@@ -214,8 +214,8 @@ locals {
   lambda_defaults = {
     runtime                        = "python3.12"
     reserved_concurrent_executions = 5
-    tracing_mode                  = "Active"
-    log_retention_days            = 30
+    tracing_mode                   = "Active"
+    log_retention_days             = 30
   }
 
   # Lambda ARNs
@@ -238,7 +238,7 @@ resource "aws_lambda_function" "lambda_functions" {
   # checkov:skip=CKV_AWS_116: "Dead Letter queues to be enabled later"
   # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
   # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing not required"
-  
+
   description                    = each.value.config.description
   s3_bucket                      = each.value.env_config.s3_bucket
   s3_key                         = "lambda/functions/${each.value.func_name}_${each.value.env}.zip"
@@ -295,10 +295,10 @@ resource "aws_lambda_permission" "lambda_permissions" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.lambda_functions[each.key].function_name
   principal     = each.value.config.permissions[0].principal
-  
+
   source_arn = try(each.value.config.permissions[0].source_arn_resource, null) != null ? (
     "arn:aws:sns:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:${each.value.config.permissions[0].source_arn_resource}_${each.value.env}"
-  ) : (
+    ) : (
     "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:${each.value.config.permissions[0].source_arn_suffix}"
   )
 }
@@ -312,7 +312,7 @@ resource "aws_cloudwatch_log_group" "lambda_log_groups" {
 
   # checkov:skip=CKV_AWS_338: "Log group is only required for 30 days."
   # checkov:skip=CKV_AWS_158: "Log group does not require KMS encryption."
-  
+
   name              = "/aws/lambda/${each.value.func_name}_${each.value.env}"
   retention_in_days = local.lambda_defaults.log_retention_days
 }

@@ -26,12 +26,12 @@ locals {
 
   # Define Genesys roles (no literal prefixes; fetch from Secrets Manager)
   genesys_roles = {
-    role1 = { name = "r2s-genesys-cica-role",             prefix_key = "cica" }
-    role2 = { name = "r2s-genesys-opg-role",              prefix_key = "opg" }
-    role3 = { name = "r2s-genesys-laa-role",              prefix_key = "laa" }
-    role4 = { name = "r2s-genesys-hmpps-role",            prefix_key = "hmpps" }
+    role1 = { name = "r2s-genesys-cica-role", prefix_key = "cica" }
+    role2 = { name = "r2s-genesys-opg-role", prefix_key = "opg" }
+    role3 = { name = "r2s-genesys-laa-role", prefix_key = "laa" }
+    role4 = { name = "r2s-genesys-hmpps-role", prefix_key = "hmpps" }
     role5 = { name = "r2s-genesys-london-probation-role", prefix_key = "london-probation" }
-    role6 = { name = "r2s-genesys-nle-role",              prefix_key = "nle" }
+    role6 = { name = "r2s-genesys-nle-role", prefix_key = "nle" }
   }
 
   genesys_role_arns = [for r in aws_iam_role.genesys_role : r.arn]
@@ -121,14 +121,14 @@ data "aws_iam_policy_document" "r2s_tls_only" {
       values   = ["false"]
     }
   }
-    # Require SSE-KMS
+  # Require SSE-KMS
   statement {
     sid     = "AllowRolePutGetWithSSEKMS"
     effect  = "Allow"
     actions = ["s3:PutObject"]
-    principals { 
-     type = "AWS"
-     identifiers = local.genesys_role_arns
+    principals {
+      type        = "AWS"
+      identifiers = local.genesys_role_arns
     }
     resources = [
       aws_s3_bucket.r2s.arn,
@@ -160,8 +160,8 @@ resource "aws_s3_bucket_policy" "r2s" {
 # Key policy: full admin to account; S3 use gated by IAM policies
 data "aws_iam_policy_document" "r2s_kms_policy" {
   statement {
-    sid     = "EnableRootUserFullAccess"
-    effect  = "Allow"
+    sid    = "EnableRootUserFullAccess"
+    effect = "Allow"
     principals {
       type        = "AWS"
       identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
@@ -254,7 +254,7 @@ resource "aws_secretsmanager_secret" "snowflake_external_id" {
 
 # Genesys prefix secrets (all six) — single reader with for_each
 data "aws_secretsmanager_secret_version" "genesys_prefix" {
-  for_each = var.secrets_populated ? local.genesys_roles : {}
+  for_each  = var.secrets_populated ? local.genesys_roles : {}
   secret_id = aws_secretsmanager_secret.genesys_prefix[each.key].id
 }
 # Other 4 are not created with a for each
@@ -316,8 +316,8 @@ data "aws_iam_policy_document" "genesys_prefix" {
   for_each = local.genesys_ready ? local.genesys_roles : {}
 
   statement {
-    sid     = "BucketAccess"
-    effect  = "Allow"
+    sid    = "BucketAccess"
+    effect = "Allow"
     actions = [
       "s3:PutObject",
       "s3:GetEncryptionConfiguration",
@@ -345,7 +345,7 @@ data "aws_iam_policy_document" "genesys_prefix" {
     condition {
       test     = "StringLike"
       variable = "kms:EncryptionContext:aws:s3:arn"
-      values   = [
+      values = [
         "arn:aws:s3:::${local.bucket_name}/*"
       ]
     }
@@ -398,17 +398,17 @@ data "aws_iam_policy_document" "snowflake_trust" {
 # Snowflake policy: metadata-only prefix (can be created regardless)
 data "aws_iam_policy_document" "snowflake_policy_doc" {
   statement {
-    sid     = "ListBucketMetadataPrefix"
-    effect  = "Allow"
-    actions = ["s3:ListBucket"]
+    sid       = "ListBucketMetadataPrefix"
+    effect    = "Allow"
+    actions   = ["s3:ListBucket"]
     resources = [aws_s3_bucket.r2s.arn]
     condition {
       test     = "StringLike"
       variable = "s3:prefix"
-        values   = [
-          "${local.snowflake_prefix}",
-          "${local.snowflake_prefix}*"
-    ]
+      values = [
+        "${local.snowflake_prefix}",
+        "${local.snowflake_prefix}*"
+      ]
     }
   }
 
@@ -428,15 +428,15 @@ data "aws_iam_policy_document" "snowflake_policy_doc" {
   }
 
   statement {
-    sid     = "BucketMetadata"
-    effect  = "Allow"
+    sid    = "BucketMetadata"
+    effect = "Allow"
     actions = [
       "s3:GetBucketLocation",
       "s3:GetEncryptionConfiguration"
     ]
     resources = [aws_s3_bucket.r2s.arn]
   }
-    statement {
+  statement {
     sid    = "KmsUseForSnowflakePrefix"
     effect = "Allow"
     actions = [
@@ -450,7 +450,7 @@ data "aws_iam_policy_document" "snowflake_policy_doc" {
     condition {
       test     = "StringLike"
       variable = "kms:EncryptionContext:aws:s3:arn"
-      values   = [
+      values = [
         "arn:aws:s3:::${local.bucket_name}/${local.snowflake_prefix}*"
       ]
     }
@@ -474,7 +474,7 @@ resource "aws_iam_role" "snowflake_role" {
 }
 
 resource "aws_iam_role_policy_attachment" "snowflake_attach" {
-  for_each  = local.snowflake_ready ? { main = true } : {}
+  for_each   = local.snowflake_ready ? { main = true } : {}
   role       = aws_iam_role.snowflake_role["main"].name
   policy_arn = aws_iam_policy.snowflake_policy.arn
 }

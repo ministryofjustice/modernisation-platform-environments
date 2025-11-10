@@ -839,10 +839,10 @@ module "glue_reconciliation_database" {
 }
 
 # Ec2
-module "ec2_kinesis_agent" {
+module "ec2_bastion_host" {
   source                      = "./modules/ec2"
-  name                        = "${local.project}-ec2-kinesis-agent-${local.env}"
-  description                 = "EC2 instance for kinesis agent"
+  name                        = "${local.project}-ec2-bastion-host-${local.env}"
+  description                 = "EC2 bastion instance for accessing the private network"
   vpc                         = data.aws_vpc.shared.id
   cidr                        = [data.aws_vpc.shared.cidr_block]
   subnet_ids                  = data.aws_subnet.private_subnets_a.id
@@ -856,7 +856,7 @@ module "ec2_kinesis_agent" {
   monitoring                  = true
   ebs_size                    = 20
   ebs_encrypted               = true
-  scale_down                  = local.kinesis_agent_autoscale
+  scale_down                  = local.bastion_host_autoscale
   ebs_delete_on_termination   = false
   # s3_policy_arn               = aws_iam_policy.read_s3_read_access_policy.arn # TBC
   region  = local.account_region
@@ -876,8 +876,8 @@ module "ec2_kinesis_agent" {
   tags = merge(
     local.all_tags,
     {
-      Name              = "${local.project}-ec2-kinesis-agent-${local.env}"
-      dpr-name          = "${local.project}-ec2-kinesis-agent-${local.env}"
+      Name              = "${local.project}-ec2-bastion-host-${local.env}"
+      dpr-name          = "${local.project}-ec2-bastion-host-${local.env}"
       dpr-resource-type = "EC2 Instance"
       dpr-jira          = "DPR-108"
     }
