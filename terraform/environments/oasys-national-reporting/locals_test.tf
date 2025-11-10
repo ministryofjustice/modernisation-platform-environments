@@ -310,7 +310,7 @@ locals {
       maintenance_window_cutoff   = 1 # 2 for prod
       patch_classifications = {
         REDHAT_ENTERPRISE_LINUX = ["Security", "Bugfix"] # Linux Options=(Security,Bugfix,Enhancement,Recommended,Newpackage)
-        WINDOWS = ["SecurityUpdates", "CriticalUpdates"]
+        WINDOWS                 = ["SecurityUpdates", "CriticalUpdates"]
       }
     }
 
