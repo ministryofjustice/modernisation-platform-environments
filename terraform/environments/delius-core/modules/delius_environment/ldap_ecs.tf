@@ -52,16 +52,15 @@ module "ldap_ecs" {
   account_config  = var.account_config
 
   container_health_check = {
-    command  = ["CMD-SHELL", "test -f /tmp/ready"]
-    interval = 60 # seconds between checks
-    retries  = 5  # number of failed checks before marking as unhealthy
-    # grace period after container start before checks begin
-    startPeriod = var.delius_microservice_configs.ldap.health_check_start_period
-    timeout     = 5 # seconds before checks time out
+    command     = ["CMD-SHELL", "test -f /tmp/ready"]
+    interval    = 60                                                             # seconds between checks
+    retries     = 5                                                              # number of failed checks before marking as unhealthy
+    startPeriod = var.delius_microservice_configs.ldap.health_check_start_period # grace period after container start before checks begin
+    timeout     = 5                                                              # seconds before checks time out
   }
   account_info = var.account_info
 
-  ignore_changes_service_task_definition = true
+  ignore_changes_service_task_definition = false
 
   extra_task_exec_role_policies = {
     efs = data.aws_iam_policy_document.ldap_efs_access_policy

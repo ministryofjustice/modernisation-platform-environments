@@ -107,7 +107,7 @@ locals {
       slapd_log_level           = "stats"
       container_cpu             = 512
       container_memory          = 1024
-      health_check_start_period = 30
+      health_check_start_period = 60
     }
 
     sfs = {

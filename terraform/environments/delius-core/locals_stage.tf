@@ -106,11 +106,12 @@ locals {
     }
 
     ldap = {
-      image_tag        = "6.2.3-latest"
-      container_port   = 389
-      slapd_log_level  = "conns,config,stats,stats2"
-      container_cpu    = 8192
-      container_memory = 16384
+      image_tag                 = "6.2.3-latest"
+      container_port            = 389
+      slapd_log_level           = "conns,config,stats,stats2"
+      container_cpu             = 8192
+      container_memory          = 16384
+      health_check_start_period = 480
     }
 
     sfs = {
