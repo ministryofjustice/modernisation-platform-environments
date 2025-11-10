@@ -8,7 +8,7 @@ locals {
   app_url          = local.is-production ? local.prod_app_url : local.non_prod_app_url
   sandbox_app_url  = "${var.networking[0].application}-sandbox.${var.networking[0].business-unit}-${local.environment}.${local.domain}"
 
-  acm_subject_alternative_names = local.is-development ? [local.app_url, local.sandbox_app_url] : [local.app_url]
+  acm_subject_alternative_names = local.is-development ? [local.app_url, local.sandbox_app_url, "blue-${local.sandbox_app_url}", "green-${local.sandbox_app_url}"] : [local.app_url]
 
   app_port = local.application_data.accounts[local.environment].server_port
 
@@ -22,17 +22,23 @@ locals {
     }
   }
 
-  domain_name_main          = [for k, v in local.domain_types : v.name if k == local.domain]
-  domain_name_sub           = [for k, v in local.domain_types : v.name if k == local.app_url]
-  domain_name_sub_sandbox   = [for k, v in local.domain_types : v.name if k == local.sandbox_app_url]
-  domain_record_main        = [for k, v in local.domain_types : v.record if k == local.domain]
-  domain_record_sub         = [for k, v in local.domain_types : v.record if k == local.app_url]
-  domain_record_sub_sandbox = [for k, v in local.domain_types : v.record if k == local.sandbox_app_url]
-  domain_type_main          = [for k, v in local.domain_types : v.type if k == local.domain]
-  domain_type_sub           = [for k, v in local.domain_types : v.type if k == local.app_url]
-  domain_type_sub_sandbox   = [for k, v in local.domain_types : v.type if k == local.sandbox_app_url]
+  domain_name_main                = [for k, v in local.domain_types : v.name if k == local.domain]
+  domain_name_sub                 = [for k, v in local.domain_types : v.name if k == local.app_url]
+  domain_name_sub_sandbox         = [for k, v in local.domain_types : v.name if k == local.sandbox_app_url]
+  domain_name_sub_sandbox_blue    = [for k, v in local.domain_types : v.name if k == "blue-${local.sandbox_app_url}"]
+  domain_name_sub_sandbox_green   = [for k, v in local.domain_types : v.name if k == "green-${local.sandbox_app_url}"]
+  domain_record_main              = [for k, v in local.domain_types : v.record if k == local.domain]
+  domain_record_sub               = [for k, v in local.domain_types : v.record if k == local.app_url]
+  domain_record_sub_sandbox       = [for k, v in local.domain_types : v.record if k == local.sandbox_app_url]
+  domain_record_sub_sandbox_blue  = [for k, v in local.domain_types : v.record if k == "blue-${local.sandbox_app_url}"]
+  domain_record_sub_sandbox_green = [for k, v in local.domain_types : v.record if k == "green-${local.sandbox_app_url}"]
+  domain_type_main                = [for k, v in local.domain_types : v.type if k == local.domain]
+  domain_type_sub                 = [for k, v in local.domain_types : v.type if k == local.app_url]
+  domain_type_sub_sandbox         = [for k, v in local.domain_types : v.type if k == local.sandbox_app_url]
+  domain_type_sub_sandbox_blue    = [for k, v in local.domain_types : v.type if k == "blue-${local.sandbox_app_url}"]
+  domain_type_sub_sandbox_green   = [for k, v in local.domain_types : v.type if k == "green-${local.sandbox_app_url}"]
 
-  validation_record_fqdns = local.is-development ? [local.domain_name_main[0], local.domain_name_sub[0], local.domain_name_sub_sandbox[0]] : [local.domain_name_main[0], local.domain_name_sub[0]]
+  validation_record_fqdns = local.is-development ? [local.domain_name_main[0], local.domain_name_sub[0], local.domain_name_sub_sandbox[0], local.domain_name_sub_sandbox_blue[0], local.domain_name_sub_sandbox_green[0]] : [local.domain_name_main[0], local.domain_name_sub[0]]
 
   internal_security_group_cidrs = distinct(flatten([
     module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public,

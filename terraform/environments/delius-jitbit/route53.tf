@@ -86,19 +86,6 @@ resource "aws_route53_record" "external_validation_subdomain" {
   zone_id         = data.aws_route53_zone.external.zone_id
 }
 
-resource "aws_route53_record" "external_validation_subdomain_sandbox" {
-  count    = local.is-development ? 1 : 0
-  provider = aws.core-vpc
-
-  allow_overwrite = true
-  name            = local.domain_name_sub_sandbox[0]
-  records         = local.domain_record_sub_sandbox
-  ttl             = 60
-  type            = local.domain_type_sub_sandbox[0]
-  zone_id         = data.aws_route53_zone.external.zone_id
-}
-
-
 resource "aws_route53_record" "external_validation_subdomain_prod" {
   count    = local.is-production ? 1 : 0
   provider = aws.core-network-services
