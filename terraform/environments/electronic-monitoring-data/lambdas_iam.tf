@@ -279,50 +279,6 @@ resource "aws_iam_role" "rotate_iam_keys" {
 # Rotate encryption keys
 #-----------------------------------------------------------------------------------
 
-# My rubbish - Look at the policies in AWS on the internet for help with what the vars
-# are referencing
-
-data "aws_iam_policy_document" "rotate_encryption_key" {
-  statement {
-    sid    = "PermissionsForRotatingEncryptionkey"
-    effect = "Allow"
-    actions = [
-      "iam:DeleteAccessKey",
-      "iam:UpdateAccessKey",
-      "iam:ListAccessKeys",
-      "iam:CreateAccessKey"
-    ]
-    resources = [aws_iam_user.supplier.arn]
-  }
-  statement {
-    sid    = "UpdateSecretsPermissions"
-    effect = "Allow"
-    actions = [
-      "secretsmanager:GetSecretValue",
-      "secretsmanager:ListSecrets",
-      "secretsmanager:UpdateSecret",
-      "secretsmanager:UpdateSecretVersionStage",
-      "secretsmanager:ListSecretVersionIds",
-      "secretsmanager:PutSecretValue",
-      "secretsmanager:DescribeSecret",
-    ]
-    resources = [module.secrets_manager.secret_arn]
-  }
-}
-
-# second part of what Matt said
-resource "aws_iam_policy" "rotate_encryption_key" {
-  name        = "rotate-encryption-keys-lambda--policy"
-  description = "IAM policy for rotating encryption keys"
-  policy      = data.aws_iam_policy_document.rotate_encryption_key.json
-}
-
-resource "aws_iam_role_policy_attachment" "rotate_encryption_key" {
-  role       = var.rotation_lambda_role_name
-  policy_arn = aws_iam_policy.rotate_encryption_key.arn
-}
-
-# fine
 resource "aws_iam_role" "rotate_encryption_key" {
   name               = "rotate-encryption-key-lambda-role"
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
