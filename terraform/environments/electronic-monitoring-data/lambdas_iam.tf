@@ -276,7 +276,7 @@ resource "aws_iam_role" "rotate_iam_keys" {
 }
 
 #-----------------------------------------------------------------------------------
-# Rotate encryption keys
+# Rotate encryption key
 #-----------------------------------------------------------------------------------
 
 resource "aws_iam_role" "rotate_encryption_key" {
