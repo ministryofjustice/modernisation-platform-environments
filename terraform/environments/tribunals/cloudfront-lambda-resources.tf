@@ -84,15 +84,6 @@ resource "aws_lambda_function" "cloudfront_redirect_lambda" {
   }
 }
 
-resource "aws_lambda_function_version" "cloudfront_redirect_version" {
-  function_name = aws_lambda_function.cloudfront_redirect_lambda.arn
-  description   = "Auto-published version for ${local.environment}"
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
 resource "aws_lambda_permission" "allow_http_cloudfront" {
   provider      = aws.us-east-1
   statement_id  = "AllowHttpCloudFrontExecution-${aws_lambda_function.cloudfront_redirect_lambda.version}"
