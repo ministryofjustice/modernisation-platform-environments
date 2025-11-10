@@ -213,11 +213,12 @@ locals {
     log_retention_days             = 30
   }
 
-  # Layer ARNs (commented out until klayers data source exists)
-  # layer_arns = {
-  #   numpy      = "arn:aws:lambda:eu-west-2:KLAYERS_ACCOUNT_ID:layer:Klayers-p312-numpy:8"
-  #   pillow     = "arn:aws:lambda:eu-west-2:KLAYERS_ACCOUNT_ID:layer:Klayers-p312-pillow:1"
-  # }
+  klayers_account_id = data.aws_ssm_parameter.klayers_account.value
+
+  layer_arns = {
+    numpy  = "arn:aws:lambda:eu-west-2:${local.klayers_account_id}:layer:Klayers-p312-numpy:8"
+    pillow = "arn:aws:lambda:eu-west-2:${local.klayers_account_id}:layer:Klayers-p312-pillow:1"
+  }
 }
 
 #######################################################################
@@ -252,12 +253,14 @@ resource "aws_lambda_function" "lambda_functions" {
   }
 
   # Conditional layers
-  # layers = try(each.value.config.layers, null) != null ? [
-  #   for layer in each.value.config.layers : 
-  #   contains(["matplotlib", "requests", "beautifulsoup", "xlsxwriter"], layer) ? 
-  #     aws_lambda_layer_version.lambda_layer["${layer}_${each.value.env}"].arn :
-  #     "arn:aws:lambda:eu-west-2:${each.value.env_config.klayers_param}:layer:Klayers-p312-${layer}:${layer == "numpy" ? "8" : "1"}"
-  # ] : null
+  layers = try(each.value.config.layers, null) != null ? [
+    for layer in each.value.config.layers :
+    contains(keys(local.lambda_layers), layer) ?
+      aws_lambda_layer_version.lambda_layers[layer].arn :
+    contains(keys(local.layer_arns), layer) ?
+      local.layer_arns[layer] :
+    null
+  ] : null
 
   # Conditional memory size
   memory_size = try(each.value.config.memory_size, null)
