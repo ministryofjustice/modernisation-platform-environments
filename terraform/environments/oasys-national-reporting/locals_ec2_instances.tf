@@ -26,6 +26,7 @@ locals {
         vpc_security_group_ids  = ["bip-app", "ec2-linux"]
         tags = {
           backup-plan = "daily-and-weekly"
+          # patch-manager = "manual"
         }
       }
       user_data_cloud_init = {
@@ -74,6 +75,7 @@ locals {
         vpc_security_group_ids  = ["bip-web", "ec2-linux"]
         tags = {
           backup-plan = "daily-and-weekly"
+          # patch-manager = "manual"
         }
       }
       user_data_cloud_init = {
