@@ -132,6 +132,7 @@ locals {
         source_arn_suffix = "*"
       }]
     }
+    */
     ppud_elb_report = {
       description = "Function to retrieve, graph and email the utilisation of the PPUD ELB."
       handler     = "lambda_handler"
@@ -158,6 +159,7 @@ locals {
         source_arn_suffix = "*"
       }]
     }
+    /*
     disk_info_report = {
       description = "Function to retrieve, format and email a report on the disk utilisation of all Windows EC2 instances."
       handler     = "lambda_handler"
@@ -213,11 +215,17 @@ locals {
     log_retention_days             = 30
   }
 
-  # Layer ARNs (commented out until klayers data source exists)
-  # layer_arns = {
-  #   numpy      = "arn:aws:lambda:eu-west-2:KLAYERS_ACCOUNT_ID:layer:Klayers-p312-numpy:8"
-  #   pillow     = "arn:aws:lambda:eu-west-2:KLAYERS_ACCOUNT_ID:layer:Klayers-p312-pillow:1"
-  # }
+  # Dead letter SQS queue
+  dlq_arn = data.aws_sqs_queue.lambda_function_dead_letter_queue.arn
+
+  # Lambda ARNs
+  klayers_account_id = data.aws_ssm_parameter.klayers_account.value
+
+  layer_arns = {
+    numpy  = "arn:aws:lambda:eu-west-2:${local.klayers_account_id}:layer:Klayers-p312-numpy:8"
+    pillow = "arn:aws:lambda:eu-west-2:${local.klayers_account_id}:layer:Klayers-p312-pillow:1"
+  }
+
 }
 
 #######################################################################
@@ -240,36 +248,37 @@ resource "aws_lambda_function" "lambda_functions" {
   runtime                        = local.lambda_defaults.runtime
   timeout                        = each.value.config.timeout
   reserved_concurrent_executions = local.lambda_defaults.reserved_concurrent_executions
-
-
-
-  # dead_letter_config {
-  #   target_arn = aws_sqs_queue.lambda_queue[each.value.env].arn
-  # }
+  
+   # Lambda dead letter sqs queues
+   dead_letter_config {
+     target_arn = local.dlq_arn
+   }
 
   tracing_config {
     mode = local.lambda_defaults.tracing_mode
   }
 
   # Conditional layers
-  # layers = try(each.value.config.layers, null) != null ? [
-  #   for layer in each.value.config.layers : 
-  #   contains(["matplotlib", "requests", "beautifulsoup", "xlsxwriter"], layer) ? 
-  #     aws_lambda_layer_version.lambda_layer["${layer}_${each.value.env}"].arn :
-  #     "arn:aws:lambda:eu-west-2:${each.value.env_config.klayers_param}:layer:Klayers-p312-${layer}:${layer == "numpy" ? "8" : "1"}"
-  # ] : null
+  layers = try(each.value.config.layers, null) != null ? [
+    for layer in each.value.config.layers :
+    contains(keys(local.lambda_layers), layer) ?
+      aws_lambda_layer_version.lambda_layers[layer].arn :
+    contains(keys(local.layer_arns), layer) ?
+      local.layer_arns[layer] :
+    null
+  ] : null
 
   # Conditional memory size
   memory_size = try(each.value.config.memory_size, null)
 
   # Conditional VPC configuration
-  # dynamic "vpc_config" {
-  #   for_each = try(each.value.config.vpc_config[each.value.env], false) ? [1] : []
-  #   content {
-  #     subnet_ids         = [data.aws_subnet.private_subnets_b.id]
-  #     security_group_ids = [aws_security_group.PPUD-Mail-Server[0].id]
-  #   }
-  # }
+  dynamic "vpc_config" {
+    for_each = each.value.env == "production" ? [1] : []
+    content {
+      subnet_ids         = [data.aws_subnet.private_subnets_b.id]
+      security_group_ids = [aws_security_group.PPUD-Mail-Server[0].id]
+    }
+  }
 }
 
 #######################################################################
