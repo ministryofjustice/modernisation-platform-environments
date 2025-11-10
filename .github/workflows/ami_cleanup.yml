@@ -91,7 +91,6 @@ jobs:
           echo 'matrix<<EOF' >> $GITHUB_OUTPUT
           cat matrix.json >> $GITHUB_OUTPUT
           echo 'EOF' >> $GITHUB_OUTPUT
-
   fetch-secrets:
     name: Fetch ENV management secrets
     uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@4eceb2a416a197e91dc557c2ef0b5dd9afe29e0c
@@ -123,7 +122,6 @@ jobs:
             sudo apt-get update -y
             sudo apt-get install -y jq
           fi
-
       - name: Decrypt Secrets (ENVIRONMENT_MANAGEMENT)
         uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@4eceb2a416a197e91dc557c2ef0b5dd9afe29e0c
         with:
@@ -138,7 +136,6 @@ jobs:
           ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< "$ENVIRONMENT_MANAGEMENT")
           echo "::add-mask::$ACCOUNT_NUMBER"
           echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
-
       - name: Configure AWS Credentials (github-actions role)
         uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502
         with:
@@ -154,7 +151,6 @@ jobs:
           export AWS_SECRET_ACCESS_KEY=$(jq -r '.Credentials.SecretAccessKey' <<< "$CREDS_JSON")
           export AWS_SESSION_TOKEN=$(jq -r '.Credentials.SessionToken'    <<< "$CREDS_JSON")
           echo "Assumed downstream role: MemberInfrastructureAccess"
-
       - name: Quick inventory (sanity)
         run: |
           set -euo pipefail
@@ -171,19 +167,16 @@ jobs:
             --filters Name=status,Values=available \
             --query "Volumes[0:50].[VolumeId,CreateTime,State,Tags[?Key=='Name']|[0].Value]" \
             --output table || true
-
       - name: Set 3-minute test flags (preview only)
         run: |
           echo "AMI_TEST_FLAGS=--test-mode --age-minutes ${AGE_MINUTES}" >> $GITHUB_ENV
           echo "EBS_TEST_FLAGS=--test-mode --age-minutes ${AGE_MINUTES}" >> $GITHUB_ENV
           echo "Preview will use minute-based window: ${AGE_MINUTES} minute(s)"
-
       - name: Init unified report (preview)
         run: |
           mkdir -p reports
           : > reports/cleanup_report.csv
           echo "account,region,phase,cleanup_type,resource_type,resource_id,related_id,name,created_at,age_months,status,reason" >> reports/cleanup_report.csv
-
       - name: AMI Preview (dry-run) + Reports
         if: ${{ github.event_name == 'push' || github.event.inputs.cleanup_type == 'ami' || github.event.inputs.cleanup_type == 'both' }}
         id: ami_preview
@@ -192,26 +185,19 @@ jobs:
           mkdir -p reports
           app="${APPLICATION}"
           args="${AMI_ARGS}"
-
           echo "🧪 AMI — PREVIEW"
           scripts/ami_cleanup.sh -a "$app" -s ami_commands.sh ${AMI_TEST_FLAGS:-} $args -d delete || true
-
           : > reports/ami_snapshot_map.csv
           echo "AMI ID,Snapshot ID,AMI Name,Creation Date,Status" >> reports/ami_snapshot_map.csv
           : > reports/protected_amis.csv
           echo "AMI ID,AMI Name,Reason" >> reports/protected_amis.csv
-
           AMI_IDS="$(grep -Eo 'ami-[0-9a-f]+' ami_commands.sh | sort -u || true)"
           PREVIEW_DELETE_COUNT=0
           PREVIEW_PROTECTED_COUNT=0
-          PRINT_LIMIT=50
-          printed=0
-
           for AMI in $AMI_IDS; do
             NAME="$(aws ec2 describe-images --image-ids "$AMI" --query 'Images[0].Name' --output text 2>/dev/null || echo '')"
             WHEN="$(aws ec2 describe-images --image-ids "$AMI" --query 'Images[0].CreationDate' --output text 2>/dev/null | sed 's/\.[0-9]\+Z$/Z/')"
             TAGS_JSON="$(aws ec2 describe-images --image-ids "$AMI" --query 'Images[0].Tags' --output json 2>/dev/null || echo '[]')"
-
             STATUS="To be deleted"
             REASON=""
             if [[ "$NAME" =~ ^(AwsBackup|Backup) ]] || echo "$TAGS_JSON" | jq -e '.[] | select((.Key|test("Retain|Backup";"i")) and (.Value|test("^(true|yes|1)$";"i")))' >/dev/null; then
@@ -222,7 +208,6 @@ jobs:
             else
               PREVIEW_DELETE_COUNT=$((PREVIEW_DELETE_COUNT+1))
             fi
-
             SNAPS=$(aws ec2 describe-images --image-ids "$AMI" --query "Images[0].BlockDeviceMappings[].Ebs.SnapshotId" --output text 2>/dev/null || true)
             if [[ -n "$SNAPS" ]]; then
               for S in $SNAPS; do
@@ -232,48 +217,11 @@ jobs:
             else
               echo "$AMI,,${NAME},${WHEN:-},$STATUS" >> reports/ami_snapshot_map.csv
             fi
-
             echo "${{ matrix.account_name }},eu-west-2,preview,ami,ami,${AMI},,${NAME},${WHEN},,${STATUS},${REASON}" >> reports/cleanup_report.csv
-
-            if (( printed < PRINT_LIMIT )); then
-              read -r ARCH VIRT ROOTDEV PUBLIC OWNERID <<< "$(aws ec2 describe-images --image-ids "$AMI" --query 'Images[0].[Architecture,VirtualizationType,RootDeviceName,Public,OwnerId]' --output text 2>/dev/null || echo "","","","","")"
-              # Age in minutes (best-effort)
-              age_min=""
-              if command -v date >/dev/null 2>&1 && [[ -n "$WHEN" ]]; then
-                now_epoch=$(date -u +%s)
-                when_epoch=$(date -u -d "$WHEN" +%s 2>/dev/null || echo "")
-                if [[ -n "$when_epoch" ]]; then
-                  age_min=$(( (now_epoch - when_epoch) / 60 ))
-                fi
-              fi
-              snaps_short="$(printf '%s\n' $SNAPS | head -n 3 | paste -sd',' -)"
-              snaps_count="$(printf '%s\n' $SNAPS | sed '/^$/d' | wc -l | tr -d ' ')"
-              echo "[DRY RUN][AMI] ${AMI}"
-              echo "  Name=\"${NAME}\""
-              echo "  Created=${WHEN}${age_min:+  Age≈${age_min}m}"
-              echo "  Owner=${OWNERID:-self}  Public=${PUBLIC:-false}  Arch=${ARCH:-?}  Virt=${VIRT:-?}  Root=${ROOTDEV:-?}"
-              if [[ -n "$SNAPS" ]]; then
-                echo "  Snapshots=[$(echo "${snaps_short}")] (count=${snaps_count})"
-              else
-                echo "  Snapshots=[] (count=0)"
-              fi
-              # Tag indicators
-              retain_flag="$(echo "$TAGS_JSON" | jq -r '[.[] | select((.Key|test("Retain|Backup";"i")) and (.Value|test("^(true|yes|1)$";"i")))] | length' 2>/dev/null || echo 0)"
-              echo "  Tags: Retain/Backup=${retain_flag}"
-              echo "  Decision=$([[ "$STATUS" == "Protected" ]] && echo SKIP || echo DELETE)  Reason=${REASON:-Policy(match && threshold)}"
-              printed=$((printed+1))
-            fi
           done
-
-          if (( printed < PREVIEW_DELETE_COUNT + PREVIEW_PROTECTED_COUNT )); then
-            remaining=$(( PREVIEW_DELETE_COUNT + PREVIEW_PROTECTED_COUNT - printed ))
-            echo "… (+${remaining} more AMIs; see artifacts for full details)"
-          fi
-
           echo "Account: ${{ matrix.account_name }} | Test window: ${AGE_MINUTES}m"
           echo "✅ Would delete: ${PREVIEW_DELETE_COUNT} | 🛡️ Protected: ${PREVIEW_PROTECTED_COUNT}"
           echo "ami_count=${PREVIEW_DELETE_COUNT}" >> "$GITHUB_OUTPUT"
-
           {
             echo "### 🧪 AMI Preview — ${{ matrix.account_name }}"
             echo ""
@@ -282,6 +230,7 @@ jobs:
             echo "| To be deleted | ${PREVIEW_DELETE_COUNT} |"
             echo "| Protected | ${PREVIEW_PROTECTED_COUNT} |"
             echo ""
+            # Detailed lists from snapshot map (unique by AMI)
             echo "**AMI candidates (to be deleted)**"
             echo ""
             echo "| AMI ID | Name | Created |"
@@ -301,10 +250,7 @@ jobs:
             if [ "${protcount:-0}" -gt 20 ]; then echo ""; echo "_(+$((protcount-20)) more in artifact)_"; fi
             echo ""
             echo "- Reports: \`reports/ami_snapshot_map.csv\`, \`reports/protected_amis.csv\`, \`reports/cleanup_report.csv\`"
-            echo ""
-            echo "_Detailed per-AMI attributes are printed in the job log (first ${PRINT_LIMIT} items)._"
           } >> "$GITHUB_STEP_SUMMARY"
-
       - name: Upload AMI Preview Artifacts
         if: ${{ always() && (github.event_name == 'push' || github.event.inputs.cleanup_type == 'ami' || github.event.inputs.cleanup_type == 'both') }}
         uses: actions/upload-artifact@v4
@@ -324,24 +270,17 @@ jobs:
           set -euo pipefail
           mkdir -p reports
           months="${EBS_MONTHS}"
-
           echo "🧪 EBS — PREVIEW"
           : > reports/ebs_cleanup_report.csv
           echo "Volume ID,Age (months),Name,Status" >> reports/ebs_cleanup_report.csv
-
           if [[ "${EBS_TEST_FLAGS:-}" == *"--test-mode"* ]]; then
             echo "⏳ Test mode detected for EBS preview; sleeping ${AGE_MINUTES}m to pass minute threshold..."
             sleep "${AGE_MINUTES}m"
           fi
-
           CANDIDATES="$(scripts/ebs_cleanup.sh ${EBS_TEST_FLAGS:-} -m "$months" unattached || true)"
           printf "%s\n" "$CANDIDATES" > reports/ebs_candidates_preview.log
           echo "Raw candidate output (first 20 lines):"
           printf "%s\n" "$CANDIDATES" | head -n 20 || true
-
-          PRINT_LIMIT=50
-          printed=0
-
           if [[ -n "$CANDIDATES" ]]; then
             echo "$CANDIDATES" | while read -r line; do
               VOL=$(sed -nE 's/.*(vol-[0-9a-f]+).*/\1/p' <<<"$line")
@@ -351,48 +290,16 @@ jobs:
               CREATED=$(aws ec2 describe-volumes --volume-ids "$VOL" --query 'Volumes[0].CreateTime' --output text 2>/dev/null || echo "")
               echo "$VOL,${AGE:-},${NAME:-},To be deleted" >> reports/ebs_cleanup_report.csv
               echo "${{ matrix.account_name }},eu-west-2,preview,ebs,volume,${VOL},,${NAME},${CREATED},${AGE},To be deleted," >> reports/cleanup_report.csv
-
-              if (( printed < PRINT_LIMIT )); then
-                read -r SIZE TYPE IOPS THRU AZ ENC KMS MULTI ATTINST ATTTIME <<< "$(aws ec2 describe-volumes --volume-ids "$VOL" --query 'Volumes[0].[Size,VolumeType,Iops,Throughput,AvailabilityZone,Encrypted,KmsKeyId,MultiAttachEnabled,Attachments[0].InstanceId,Attachments[0].AttachTime]' --output text 2>/dev/null || echo "","","","","","","","","","")"
-                kms_short=""
-                if [[ -n "$KMS" && "$KMS" != "None" ]]; then
-                  kms_short="${KMS##*/}"
-                fi
-                # Age in minutes (best-effort)
-                age_min=""
-                if command -v date >/dev/null 2>&1 && [[ -n "$CREATED" ]]; then
-                  now_epoch=$(date -u +%s)
-                  created_epoch=$(date -u -d "$CREATED" +%s 2>/dev/null || echo "")
-                  if [[ -n "$created_epoch" ]]; then
-                    age_min=$(( (now_epoch - created_epoch) / 60 ))
-                  fi
-                fi
-                last_attach="never"
-                [[ -n "$ATTINST" && "$ATTINST" != "None" ]] && last_attach="${ATTINST}@${ATTTIME}"
-                echo "[DRY RUN][EBS] ${VOL}"
-                echo "  Name=\"${NAME:-}\""
-                echo "  Size=${SIZE:-?}GiB  Type=${TYPE:-?}  IOPS=${IOPS:-?}  Thru=${THRU:-?}  AZ=${AZ:-?}"
-                echo "  Encrypted=${ENC:-?}  KMS=${kms_short:--}"
-                echo "  Created=${CREATED:-} ${age_min:+ Age≈${age_min}m}  LastAttachment=${last_attach}  MultiAttach=${MULTI:-false}"
-                echo "  Decision=DELETE  Reason=unattached && age>${AGE_MINUTES}m (test-mode)"
-                printed=$((printed+1))
-              fi
             done
           fi
-
-          total_count="$(tail -n +2 reports/ebs_cleanup_report.csv | wc -l | tr -d ' ')"
-          if (( printed < total_count )); then
-            echo "… (+$((total_count - printed)) more volumes; see artifacts for full details)"
-          fi
-
-          echo "✅ Would delete EBS volumes: ${total_count}"
-
+          COUNT="$(tail -n +2 reports/ebs_cleanup_report.csv | wc -l | tr -d ' ')"
+          echo "✅ Would delete EBS volumes: ${COUNT}"
           {
             echo "### 🧪 EBS Preview — ${{ matrix.account_name }}"
             echo ""
             echo "| Status | Count |"
             echo "|---|---:|"
-            echo "| To be deleted | ${total_count} |"
+            echo "| To be deleted | ${COUNT} |"
             echo ""
             echo "**Unattached volumes (to be deleted)**"
             echo ""
@@ -401,13 +308,10 @@ jobs:
             tail -n +2 reports/ebs_cleanup_report.csv | head -n 20 | while IFS=',' read -r id age name status; do
               echo "| ${id} | ${age} | ${name} |"
             done
-            if [ "${total_count:-0}" -gt 20 ]; then echo ""; echo "_(+$((total_count-20)) more in artifact)_"; fi
+            if [ "${COUNT:-0}" -gt 20 ]; then echo ""; echo "_(+$((COUNT-20)) more in artifact)_"; fi
             echo ""
             echo "- Report: \`reports/ebs_cleanup_report.csv\`, \`reports/cleanup_report.csv\`, \`reports/ebs_candidates_preview.log\`"
-            echo ""
-            echo "_Detailed per-volume attributes are printed in the job log (first 50 items)._"
           } >> "$GITHUB_STEP_SUMMARY"
-
       - name: Upload EBS Preview Artifacts
         if: ${{ always() && (github.event_name == 'push' || github.event.inputs.cleanup_type == 'ebs' || github.event.inputs.cleanup_type == 'both') }}
         uses: actions/upload-artifact@v4
@@ -458,7 +362,6 @@ jobs:
             sudo apt-get update -y
             sudo apt-get install -y jq
           fi
-
       - name: Decrypt Secrets (ENVIRONMENT_MANAGEMENT)
         uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@4eceb2a416a197e91dc557c2ef0b5dd9afe29e0c
         with:
@@ -473,7 +376,6 @@ jobs:
           ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< "$ENVIRONMENT_MANAGEMENT")
           echo "::add-mask::$ACCOUNT_NUMBER"
           echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
-
       - name: Configure AWS Credentials (github-actions role)
         uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502
         with:
@@ -489,7 +391,6 @@ jobs:
           else
             echo "Live using default month-based window."
           fi
-
       - name: Plan AMI deletion & snapshot mapping (live)
         run: |
           set -euo pipefail
@@ -498,13 +399,10 @@ jobs:
           export AWS_ACCESS_KEY_ID=$(jq -r '.Credentials.AccessKeyId'     <<< "$CREDS_JSON")
           export AWS_SECRET_ACCESS_KEY=$(jq -r '.Credentials.SecretAccessKey' <<< "$CREDS_JSON")
           export AWS_SESSION_TOKEN=$(jq -r '.Credentials.SessionToken'    <<< "$CREDS_JSON")
-
           app="${APPLICATION}"
           args="${AMI_ARGS}"
-
           echo "🧾 AMI — PLAN (LIVE)"
           scripts/ami_cleanup.sh -a "$app" -s ami_commands.sh ${AMI_TEST_FLAGS:-} $args -d delete || true
-
           : > reports/ami_snapshot_map.csv
           echo "AMI ID,Snapshot ID,AMI Name,Creation Date,Status" >> reports/ami_snapshot_map.csv
           AMI_IDS=$(grep -Eo 'ami-[0-9a-f]+' ami_commands.sh | sort -u || true)
@@ -523,17 +421,14 @@ jobs:
               fi
             done
           fi
-
       - name: Guard protected AMIs from deletion (live)
         run: |
           set -euo pipefail
           : > reports/protected_amis.csv
           echo "AMI ID,AMI Name,Reason" >> reports/protected_amis.csv
-
           touch ami_commands.sh
           AMI_IDS="$(grep -Eo 'ami-[0-9a-f]+' ami_commands.sh | sort -u || true)"
           [[ -n "$AMI_IDS" ]] || { echo "No AMIs in plan."; exit 0; }
-
           > protected_amis.tmp
           for AMI in $AMI_IDS; do
             NAME="$(aws ec2 describe-images --image-ids "$AMI" --query 'Images[0].Name' --output text 2>/dev/null || echo '')"
@@ -544,22 +439,18 @@ jobs:
               echo "$AMI,$NAME,Protected name/tag" >> reports/protected_amis.csv
             fi
           done
-
           if [[ -s protected_amis.tmp ]]; then
             echo "Protected AMIs detected; removing from plan:"
             cat protected_amis.tmp
-
             tmp_cmds="$(mktemp)"
             grep -v -F -f <(cut -d' ' -f1 protected_amis.tmp) ami_commands.sh > "$tmp_cmds" || true
             mv "$tmp_cmds" ami_commands.sh
-
             cut -d' ' -f1 protected_amis.tmp > protected_amis_ids.tmp
             awk -F',' 'NR==FNR{p[$1]=1; next} NR==1{print; next} {if(p[$1]){$5="Protected"}; print}' OFS=',' protected_amis_ids.tmp reports/ami_snapshot_map.csv > reports/ami_snapshot_map.csv.tmp
             mv reports/ami_snapshot_map.csv.tmp reports/ami_snapshot_map.csv
           else
             echo "No protected AMIs matched."
           fi
-
       - name: Delete AMIs from filtered plan (Live) + friendly logs
         id: ami_live_delete
         run: |
@@ -568,30 +459,25 @@ jobs:
           export AWS_ACCESS_KEY_ID=$(jq -r '.Credentials.AccessKeyId'     <<< "$CREDS_JSON")
           export AWS_SECRET_ACCESS_KEY=$(jq -r '.Credentials.SecretAccessKey' <<< "$CREDS_JSON")
           export AWS_SESSION_TOKEN=$(jq -r '.Credentials.SessionToken'    <<< "$CREDS_JSON")
-
           echo "🗑️ AMI — LIVE DELETE"
           if [[ ! -s ami_commands.sh ]]; then
             echo "No AMI commands to execute after guard."
             echo "deleted=0" >> $GITHUB_OUTPUT
             exit 0
           fi
-
           echo "First 20 deregistration commands:"
           grep '^aws ec2 deregister-image' ami_commands.sh | head -n 20 || true
           chmod +x ami_commands.sh
           bash ami_commands.sh
-
           TOTAL="$(grep -c '^aws ec2 deregister-image' ami_commands.sh || true)"
           echo "✅ Deleted AMIs: ${TOTAL}"
           echo "deleted=${TOTAL}" >> $GITHUB_OUTPUT
-
           AMI_DELETED_IDS="$(grep -Eo 'ami-[0-9a-f]+' ami_commands.sh | sort -u || true)"
           if [[ -n "$AMI_DELETED_IDS" && -f reports/ami_snapshot_map.csv ]]; then
             printf "%s\n" $AMI_DELETED_IDS > deleted_amis_ids.tmp
             awk -F',' 'NR==FNR{d[$1]=1; next} NR==1{print; next} {if(d[$1]){$5="Deleted"}; print}' OFS=',' deleted_amis_ids.tmp reports/ami_snapshot_map.csv > reports/ami_snapshot_map.csv.tmp
             mv reports/ami_snapshot_map.csv.tmp reports/ami_snapshot_map.csv
           fi
-
           if [[ -n "$AMI_DELETED_IDS" ]]; then
             for AMI in $AMI_DELETED_IDS; do
               NAME="$(aws ec2 describe-images --image-ids "$AMI" --query 'Images[0].Name' --output text 2>/dev/null || echo '')"
@@ -599,7 +485,6 @@ jobs:
               echo "${{ matrix.account_name }},eu-west-2,live,ami,ami,${AMI},,${NAME},${WHEN},,Deleted," >> reports/cleanup_report.csv
             done
           fi
-
       - name: Delete orphaned snapshots (fallback) — friendly + backoff
         if: always()
         run: |
@@ -608,7 +493,6 @@ jobs:
           export AWS_ACCESS_KEY_ID=$(jq -r '.Credentials.AccessKeyId'     <<< "$CREDS_JSON")
           export AWS_SECRET_ACCESS_KEY=$(jq -r '.Credentials.SecretAccessKey' <<< "$CREDS_JSON")
           export AWS_SESSION_TOKEN=$(jq -r '.Credentials.SessionToken'    <<< "$CREDS_JSON")
-
           echo "🧹 Snapshots — Fallback"
           aws_try() {
             local max=5 delay=2 attempt=1
@@ -624,34 +508,27 @@ jobs:
               attempt=$((attempt+1))
             done
           }
-
           if [[ ! -f reports/ami_snapshot_map.csv ]]; then
             echo "No snapshot map; skipping."
             exit 0
           fi
-
           sleep "${AMI_DELETE_BACKOFF_SECONDS:-15}"
-
           deleted=0
           while IFS=',' read -r AMI_ID SNAP_ID AMI_NAME WHEN STATUS; do
             [[ "$AMI_ID" == "AMI ID" ]] && continue
             [[ -z "$SNAP_ID" || "$SNAP_ID" == " " ]] && continue
-
             if [[ -f protected_amis.tmp ]] && grep -q "^${AMI_ID}\b" protected_amis.tmp; then
               echo "🛡️ Skip $SNAP_ID (AMI ${AMI_ID} protected: ${AMI_NAME})"
               continue
             fi
-
             if aws ec2 describe-images --image-ids "$AMI_ID" --query 'Images[0].ImageId' --output text >/dev/null 2>&1; then
               echo "⏳ Skip $SNAP_ID (AMI ${AMI_ID} still exists)"
               continue
             fi
-
             if ! aws ec2 describe-snapshots --snapshot-ids "$SNAP_ID" --query 'Snapshots[0].SnapshotId' --output text >/dev/null 2>&1; then
               echo "ℹ️ Skip $SNAP_ID (already deleted)"
               continue
             fi
-
             read -r TAGS DESC NAME <<< "$(aws ec2 describe-snapshots --snapshot-ids "$SNAP_ID" --query '[Snapshots[0].Tags, Snapshots[0].Description, Snapshots[0].Tags[?Key==`Name`]|[0].Value]' --output text 2>/dev/null || true)"
             if grep -Eiq '(^|[[:space:]])(Retain|Backup)[[:space:]]*=[[:space:]]*(true|yes|1)' <<< "${TAGS:-}"; then
               echo "🛡️ Skip $SNAP_ID (retention tag)"
@@ -661,14 +538,11 @@ jobs:
               echo "🛡️ Skip $SNAP_ID (AwsBackup)"
               continue
             fi
-
             echo "✅ Deleting snapshot $SNAP_ID (from $AMI_ID — ${AMI_NAME})"
             aws_try aws ec2 delete-snapshot --snapshot-id "$SNAP_ID" || true
             deleted=$((deleted+1))
           done < reports/ami_snapshot_map.csv
-
           echo "Totals — snapshots deleted: ${deleted}"
-
       - name: Upload AMI Live Artifacts (reports only)
         if: always()
         uses: actions/upload-artifact@v4
@@ -692,6 +566,7 @@ jobs:
           echo "|---|---:|" >> "$GITHUB_STEP_SUMMARY"
           echo "| AMIs deleted | ${DEL} |" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
+          # Deleted AMIs (from snapshot map status = Deleted, unique by AMI)
           echo "**Deleted AMIs**" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "| AMI ID | Name | Created |" >> "$GITHUB_STEP_SUMMARY"
@@ -715,7 +590,6 @@ jobs:
           fi
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "- Reports: \`reports/ami_snapshot_map.csv\`, \`reports/protected_amis.csv\`" >> "$GITHUB_STEP_SUMMARY"
-
   ebs-delete:
     name: EBS Delete (Live)
     runs-on: ubuntu-latest
@@ -745,7 +619,6 @@ jobs:
             sudo apt-get update -y
             sudo apt-get install -y jq
           fi
-
       - name: Decrypt Secrets (ENVIRONMENT_MANAGEMENT)
         uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@4eceb2a416a197e91dc557c2ef0b5dd9afe29e0c
         with:
@@ -760,7 +633,6 @@ jobs:
           ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< "$ENVIRONMENT_MANAGEMENT")
           echo "::add-mask::$ACCOUNT_NUMBER"
           echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
-
       - name: Configure AWS Credentials (github-actions role)
         uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502
         with:
@@ -776,7 +648,6 @@ jobs:
           else
             echo "Live using default month-based window."
           fi
-
       - name: Delete EBS Volumes (Live) + Report
         id: ebs_live_delete
         run: |
@@ -786,10 +657,8 @@ jobs:
           export AWS_ACCESS_KEY_ID=$(jq -r '.Credentials.AccessKeyId'     <<< "$CREDS_JSON")
           export AWS_SECRET_ACCESS_KEY=$(jq -r '.Credentials.SecretAccessKey' <<< "$CREDS_JSON")
           export AWS_SESSION_TOKEN=$(jq -r '.Credentials.SessionToken'    <<< "$CREDS_JSON")
-
           : > reports/ebs_cleanup_report.csv
           echo "Volume ID,Age (months),Name,Status" >> reports/ebs_cleanup_report.csv
-
           echo "🗑️ EBS — LIVE DELETE"
           LOG=$(scripts/ebs_cleanup.sh ${EBS_TEST_FLAGS:-} -m "$EBS_MONTHS" delete || true)
           echo "$LOG"
@@ -804,7 +673,6 @@ jobs:
           COUNT="$(tail -n +2 reports/ebs_cleanup_report.csv | wc -l | tr -d ' ')"
           echo "✅ Deleted EBS volumes: ${COUNT}"
           echo "deleted=${COUNT}" >> $GITHUB_OUTPUT
-
       - name: Upload EBS Live Artifacts (reports only)
         if: always()
         uses: actions/upload-artifact@v4
@@ -827,7 +695,7 @@ jobs:
           echo "**Deleted volumes**" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "| Volume ID | Age (months) | Name |" >> "$GITHUB_STEP_SUMMARY"
-          echo "|---|---:|---|"
+          echo "|---|---:|---|" >> "$GITHUB_STEP_SUMMARY"
           if [[ -f reports/ebs_cleanup_report.csv ]]; then
             tail -n +2 reports/ebs_cleanup_report.csv | head -n 20 | while IFS=',' read -r id age name status; do
               echo "| ${id} | ${age} | ${name} |" >> "$GITHUB_STEP_SUMMARY"
