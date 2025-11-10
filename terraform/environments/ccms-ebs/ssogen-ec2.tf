@@ -6,7 +6,7 @@ resource "aws_instance" "ec2_ssogen" {
   count = local.is_development ? local.application_data.accounts[local.environment].ssogen_no_instances : 0
 
   instance_type               = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ssogen
-  ami                         = local.application_data.accounts[local.environment].ssogen_ami_id
+  ami                         = local.application_data.accounts[local.environment]["ssogen_ami_id-${count.index + 1}"]
   key_name                    = aws_key_pair.ssogen[0].key_name
   vpc_security_group_ids      = [aws_security_group.ssogen_sg[0].id]
   subnet_id                   = local.private_subnets[count.index]
@@ -16,7 +16,9 @@ resource "aws_instance" "ec2_ssogen" {
   iam_instance_profile        = aws_iam_instance_profile.ssogen_instance_profile[0].name
 
   lifecycle {
-    create_before_destroy = true
+    ignore_changes = [
+      user_data
+    ]
   }
 
   root_block_device {
