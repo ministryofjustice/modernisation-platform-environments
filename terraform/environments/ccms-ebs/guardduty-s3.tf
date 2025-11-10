@@ -69,7 +69,7 @@ resource "aws_guardduty_malware_protection_plan" "s3_scan_bucket4" {
 
   protected_resource {
     s3_bucket {
-      bucket_name = module.lambda_payment_load.id
+      bucket_name = module.lambda_payment_load
     }
   }
 

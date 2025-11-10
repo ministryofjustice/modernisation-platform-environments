@@ -238,8 +238,8 @@ data "aws_iam_policy_document" "inbound_bucket_policy" {
       ]
     }
     resources = [
-      module.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket.arn,
-      "${module.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket.arn}/*"
+      module.bucket["laa-ccms-inbound-${local.environment}-mp"].bucket.arn,
+      "${module.bucket["laa-ccms-inbound-${local.environment}-mp"].bucket.arn}/*"
     ]
   }
 
@@ -320,7 +320,7 @@ resource "aws_s3_bucket_cors_configuration" "inbound_bucket_cors_policy" {
 }
 
 resource "aws_s3_bucket_policy" "outbound_bucket_policy" {
-  bucket = module.bucket["laa-ccms-inbound-${local.environment}-mp"].buckets.arn
+  bucket = module.bucket["laa-ccms-inbound-${local.environment}-mp"].bucket.arn
 
   policy = jsonencode({
     "Version" : "2012-10-17",
@@ -342,7 +342,7 @@ resource "aws_s3_bucket_policy" "outbound_bucket_policy" {
           "s3:DeleteObject"
         ],
         "Resource" : [
-          module.bucket["laa-ccms-inbound-${local.environment}-mp"].buckets.arn,
+          module.bucket["laa-ccms-inbound-${local.environment}-mp"].bucket.arn,
           # aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].arn,
           "${module.bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].arn}/*"
         ]
@@ -353,13 +353,13 @@ resource "aws_s3_bucket_policy" "outbound_bucket_policy" {
 }
 
 resource "aws_s3_object" "ftp_lambda_layer" {
-  bucket = module.bucket["laa-ccms-inbound-${local.environment}-mp"].buckets.arn
+  bucket = module.bucket["laa-ccms-inbound-${local.environment}-mp"].bucket.arn
   key    = "lambda/ftp_lambda_layer.zip"
   source = "lambda/ftp_lambda_layer.zip"
 }
 
 resource "aws_s3_object" "ftp_client" {
-  bucket = module.bucket["laa-ccms-inbound-${local.environment}-mp"].buckets.arn
+  bucket = module.bucket["laa-ccms-inbound-${local.environment}-mp"].bucket.arn
   key    = "lambda/ftp-client-v3.1.zip"
   source = "lambda/ftp-client-v3.1.zip"
 }
@@ -373,11 +373,11 @@ module "allpay_ftp_lambda_outbound" {
   ftp_transfer_type        = "SFTP_UPLOAD"
   ftp_local_path           = "CCMS_PRD_Allpay/Outbound/"
   ftp_remote_path          = lower(local.environment) == "production" ? "/Inbound/" : "/home/${local.ftp_test_user_secret_value["USER"]}/laa-ccms-outbound-${local.environment}-mp/outbound-lambda-runs/"
-  ftp_bucket               =module.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket.id
+  ftp_bucket               =module.bucket["laa-ccms-inbound-${local.environment}-mp"].bucket.id
   env                      = local.environment
   secret_name              = "LAA-ftp-allpay-inbound-ccms-${local.environment}"
   secret_arn               = aws_secretsmanager_secret.secrets["LAA-ftp-allpay-inbound-ccms"].arn
-  s3_bucket_ftp            = module.bucket["laa-ccms-inbound-${local.environment}-mp"].buckets.id
+  s3_bucket_ftp            = module.bucket["laa-ccms-inbound-${local.environment}-mp"].bucket.id
   s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
   s3_object_ftp_client     = aws_s3_object.ftp_client.key
   #ftp_cron                     = "cron(0 10 * * ? *)"
@@ -394,11 +394,11 @@ module "allpay_ftp_lambda_inbound" {
   ftp_transfer_type        = "SFTP_DOWNLOAD"
   ftp_local_path           = "CCMS_PRD_Allpay/Inbound/"
   ftp_remote_path          = lower(local.environment) == "production" ? "/Outbound/" : "/home/${local.ftp_test_user_secret_value["USER"]}/laa-ccms-inbound-${local.environment}-mp/inbound-lambda-runs/"
-  ftp_bucket               = module.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket.id
+  ftp_bucket               = module.bucket["laa-ccms-inbound-${local.environment}-mp"].bucket.id
   env                      = local.environment
   secret_name              = "LAA-ftp-allpay-inbound-ccms-${local.environment}"
   secret_arn               = aws_secretsmanager_secret.secrets["LAA-ftp-allpay-inbound-ccms"].arn
-  s3_bucket_ftp            = module.bucket["laa-ccms-inbound-${local.environment}-mp"].buckets.id
+  s3_bucket_ftp            = module.bucket["laa-ccms-inbound-${local.environment}-mp"].bucket.id
   s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
   s3_object_ftp_client     = aws_s3_object.ftp_client.key
   #ftp_cron                     = "cron(0 10 * * ? *)"
@@ -415,11 +415,11 @@ module "LAA-ftp-xerox-ccms-outbound" {
   ftp_local_path           = "CCMS_PRD_DST/Outbound/"
   ftp_remote_path          = lower(local.environment) == "production" ? "/Production/outbound/CCMS/" : "/home/${local.ftp_test_user_secret_value["USER"]}/laa-ccms-outbound-${local.environment}-mp/outbound-lambda-runs/"
   ftp_file_types           = "zip"
-  ftp_bucket               = module.bucket["laa-ccms-inbound-${local.environment}-mp"].buckets.id
+  ftp_bucket               = module.bucket["laa-ccms-inbound-${local.environment}-mp"].bucket.id
   env                      = local.environment
   secret_name              = "LAA-ftp-xerox-outbound-${local.environment}"
   secret_arn               = aws_secretsmanager_secret.secrets["LAA-ftp-xerox-outbound"].arn
-  s3_bucket_ftp            = module.bucket["laa-ccms-inbound-${local.environment}-mp"].buckets.id
+  s3_bucket_ftp            = module.bucket["laa-ccms-inbound-${local.environment}-mp"].bucket.id
   s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
   s3_object_ftp_client     = aws_s3_object.ftp_client.key
   #ftp_cron                     = "cron(0 10 * * ? *)"
@@ -439,7 +439,7 @@ module "LAA-ftp-xerox-ccms-outbound-peterborough" {
   env                      = local.environment
   secret_name              = "LAA-ftp-xerox-outbound-${local.environment}"
   secret_arn               = aws_secretsmanager_secret.secrets["LAA-ftp-xerox-outbound"].arn
-  s3_bucket_ftp            = module.bucket["laa-ccms-inbound-${local.environment}-mp"].buckets.id
+  s3_bucket_ftp            = module.bucket["laa-ccms-inbound-${local.environment}-mp"].bucket.id
   s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
   s3_object_ftp_client     = aws_s3_object.ftp_client.key
   #ftp_cron                     = "cron(0 10 * * ? *)"
@@ -459,7 +459,7 @@ module "LAA-ftp-eckoh-outbound-ccms" {
   env                      = local.environment
   secret_name              = "LAA-ftp-eckoh-inbound-ccms-${local.environment}"
   secret_arn               = aws_secretsmanager_secret.secrets["LAA-ftp-eckoh-inbound-ccms"].arn
-  s3_bucket_ftp            = module.bucket["laa-ccms-inbound-${local.environment}-mp"].buckets.id
+  s3_bucket_ftp            = module.bucket["laa-ccms-inbound-${local.environment}-mp"].bucket.id
   s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
   s3_object_ftp_client     = aws_s3_object.ftp_client.key
   #ftp_cron                     = "cron(0 10 * * ? *)"
@@ -476,11 +476,11 @@ module "LAA-ftp-eckoh-inbound-ccms" {
   ftp_transfer_type        = "SFTP_DOWNLOAD"
   ftp_local_path           = "CCMS_PRD_Eckoh/Inbound/"
   ftp_remote_path          = lower(local.environment) == "production" ? "/outbound/" : "/home/${local.ftp_test_user_secret_value["USER"]}/laa-ccms-inbound-${local.environment}-mp/inbound-lambda-runs/"
-  ftp_bucket               = module.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket.id
+  ftp_bucket               = module.bucket["laa-ccms-inbound-${local.environment}-mp"].bucket.id
   env                      = local.environment
   secret_name              = "LAA-ftp-eckoh-inbound-ccms-${local.environment}"
   secret_arn               = aws_secretsmanager_secret.secrets["LAA-ftp-eckoh-inbound-ccms"].arn
-  s3_bucket_ftp            = module.bucket["laa-ccms-inbound-${local.environment}-mp"].buckets.id
+  s3_bucket_ftp            = module.bucket["laa-ccms-inbound-${local.environment}-mp"].bucket.id
   s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
   s3_object_ftp_client     = aws_s3_object.ftp_client.key
   #ftp_cron                     = "cron(0 10 * * ? *)"
@@ -521,7 +521,7 @@ module "LAA-ftp-1stlocate-ccms-inbound" {
   env                      = local.environment
   secret_name              = "LAA-ftp-1stlocate-ccms-inbound-${local.environment}"
   secret_arn               = aws_secretsmanager_secret.secrets["LAA-ftp-1stlocate-ccms-inbound"].arn
-  s3_bucket_ftp            = module.bucket["laa-ccms-inbound-${local.environment}-mp"].buckets.id
+  s3_bucket_ftp            = module.bucket["laa-ccms-inbound-${local.environment}-mp"].bucket.id
   s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
   s3_object_ftp_client     = aws_s3_object.ftp_client.key
   #ftp_cron                     = "cron(0 10 * * ? *)"
