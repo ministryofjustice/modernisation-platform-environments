@@ -48,8 +48,9 @@ resource "aws_lambda_function" "patch_ccms_provider_load" {
   function_name    = "patch_ccms_provider_load_function"
   role             = aws_iam_role.patch_ccms_provider_load_role[0].arn
   handler          = "lambda_function.lambda_handler"
-  filename         = "lambda/provider_load_lambda/provider_load_package.zip"
-  source_code_hash = filebase64sha256("lambda/provider_load_lambda/provider_load_package.zip")
+  s3_bucket         = data.aws_s3_object.provider_load_zip.bucket
+  s3_key            = data.aws_s3_object.provider_load_zip.key
+  s3_object_version = data.aws_s3_object.provider_load_zip.version_id
   timeout          = 100
   memory_size      = 128
   runtime          = "python3.10"

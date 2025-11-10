@@ -84,8 +84,8 @@ resource "aws_lambda_function" "ccms_provider_load" {
       LOG_LEVEL              = "DEBUG"
       PURGE_LAMBDA_TIMESTAMP = aws_ssm_parameter.ccms_provider_load_timestamp.name
       TNS_ADMIN              = "/tmp/wallet_dir"
-      WALLET_BUCKET          = aws_s3_bucket.wallet_files.bucket
-      WALLET_OBJ             = "CCMS/wallet_dir.zip"
+      WALLET_BUCKET          = data.aws_s3_bucket.lambda_files.bucket
+      WALLET_OBJ             = "wallet_files/CCMS/wallet_dir.zip"
     }
   }
 

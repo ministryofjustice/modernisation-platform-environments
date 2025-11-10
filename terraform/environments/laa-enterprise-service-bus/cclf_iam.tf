@@ -50,7 +50,7 @@ resource "aws_iam_policy" "cclf_provider_load_policy" {
         Action = [
           "s3:GetObject"
         ],
-        Resource = "arn:aws:s3:::${local.application_name_short}-${local.environment}-lambda-files/layers_files/*"
+        Resource = "arn:aws:s3:::${local.application_name_short}-${local.environment}-lambda-files/*"
       },
       {
         Effect = "Allow"

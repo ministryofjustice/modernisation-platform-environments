@@ -61,6 +61,13 @@ resource "aws_iam_policy" "purge_lambda_policy" {
           aws_ssm_parameter.maat_provider_load_timestamp.arn
         ]
       },
+      {
+        Effect = "Allow",
+        Action = [
+          "s3:GetObject"
+        ],
+        Resource = "arn:aws:s3:::${local.application_name_short}-${local.environment}-lambda-files/*"
+      }
     ]
   })
 }
