@@ -79,6 +79,7 @@ def close_circuit_breaker(ssm_path, service, cluster_name):
 
 def check_target_health(target_group_arn, service_name, cluster_name):
 
+    time.sleep(6) # starting checks after some delays
     print(f"Checking Target health for {service_name} in {cluster_name}")
     targets = elbv2.describe_target_health(TargetGroupArn=target_group_arn)
     if not targets:
