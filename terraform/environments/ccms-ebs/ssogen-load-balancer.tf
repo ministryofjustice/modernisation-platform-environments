@@ -31,7 +31,7 @@ resource "aws_lb_target_group" "ssogen_internal_tg" {
   health_check {
     enabled             = true
     path                = "/"
-    protocol            = "HTTP"
+    protocol            = "HTTPS"
     matcher             = "200"
     interval            = 30
     timeout             = 5
