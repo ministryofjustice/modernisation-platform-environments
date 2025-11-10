@@ -216,7 +216,7 @@ locals {
   }
 
   # Dead letter SQS queue
-  dlq_arn = data.aws_sqs_queue.lambda_dead_letter_queue.arn
+  dlq_arn = data.aws_sqs_queue.lambda_function_dead_letter_queue.arn
 
   # Lambda ARNs
   klayers_account_id = data.aws_ssm_parameter.klayers_account.value
