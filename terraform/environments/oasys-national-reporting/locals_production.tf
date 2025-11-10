@@ -36,12 +36,15 @@ locals {
           ami_name          = "hmpps_windows_server_2019_release_2025-01-02T00-00-37.501Z"
           availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
-            "Ec2SecretPolicy",
+            "Ec2PDBodsPolicy",
           ])
         })
         instance = merge(local.ec2_instances.bods.instance, {
           instance_type           = "r6i.2xlarge"
           disable_api_termination = true
+          tags = merge(local.ec2_instances.bods.instance.tags, {
+            patch-manager = "weds1500"
+          })
         })
         tags = merge(local.ec2_instances.bods.tags, {
           oasys-national-reporting-environment = "pd"
@@ -61,12 +64,15 @@ locals {
           ami_name          = "hmpps_windows_server_2019_release_2025-01-02T00-00-37.501Z"
           availability_zone = "eu-west-2b"
           instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
-            "Ec2SecretPolicy",
+            "Ec2PDBodsPolicy",
           ])
         })
         instance = merge(local.ec2_instances.bods.instance, {
           instance_type           = "r6i.2xlarge"
           disable_api_termination = true
+          tags = merge(local.ec2_instances.bods.instance.tags, {
+            patch-manager = "thurs1500"
+          })
         })
         tags = merge(local.ec2_instances.bods.tags, {
           oasys-national-reporting-environment = "pd"
@@ -85,7 +91,7 @@ locals {
         config = merge(local.ec2_instances.bip_cms.config, {
           availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.ec2_instances.bip_cms.config.instance_profile_policies, [
-            "Ec2SecretPolicy",
+            "Ec2PDReportingPolicy",
           ])
         })
         instance = merge(local.ec2_instances.bip_cms.instance, {
@@ -105,7 +111,7 @@ locals {
         config = merge(local.ec2_instances.bip_cms.config, {
           availability_zone = "eu-west-2b"
           instance_profile_policies = concat(local.ec2_instances.bip_cms.config.instance_profile_policies, [
-            "Ec2SecretPolicy",
+            "Ec2PDReportingPolicy",
           ])
         })
         instance = merge(local.ec2_instances.bip_cms.instance, {
@@ -125,7 +131,7 @@ locals {
         config = merge(local.ec2_instances.bip_web.config, {
           availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.ec2_instances.bip_web.config.instance_profile_policies, [
-            "Ec2SecretPolicy",
+            "Ec2PDReportingPolicy",
           ])
         })
         instance = merge(local.ec2_instances.bip_web.instance, {
@@ -145,7 +151,7 @@ locals {
         config = merge(local.ec2_instances.bip_web.config, {
           availability_zone = "eu-west-2b"
           instance_profile_policies = concat(local.ec2_instances.bip_web.config.instance_profile_policies, [
-            "Ec2SecretPolicy",
+            "Ec2PDReportingPolicy",
           ])
         })
         instance = merge(local.ec2_instances.bip_web.instance, {
@@ -231,8 +237,8 @@ locals {
     }
 
     iam_policies = {
-      Ec2SecretPolicy = {
-        description = "Permissions required for secret value access by instances"
+      Ec2PDBodsPolicy = {
+        description = "Permissions required for PD Bods EC2s"
         statements = [
           {
             effect = "Allow"
@@ -242,8 +248,39 @@ locals {
             ]
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/sap/bods/pd/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*",
+            ]
+          }
+        ]
+      }
+      Ec2PDReportingPolicy = {
+        description = "Permissions required for PD reporting EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
               "arn:aws:secretsmanager:*:*:secret:/sap/bip/pd/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*",
+            ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "elasticloadbalancing:Describe*",
+            ]
+            resources = ["*"]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "elasticloadbalancing:SetRulePriorities",
+            ]
+            resources = [
+              "arn:aws:elasticloadbalancing:*:*:listener-rule/app/public-lb/*",
             ]
           }
         ]
@@ -305,13 +342,15 @@ locals {
 
     patch_manager = {
       patch_schedules = {
-        manual = "cron(00 21 31 2 ? *)" # 9pm 31 feb e.g. impossible date to allow for manual patching of otherwise enrolled instances
+        weds1500  = "cron(00 15 ? * WED *)" # 3pm wed 
+        thurs1500 = "cron(00 15 ? * THU *)" # 3pm thu
+        manual    = "cron(00 21 31 2 ? *)"  # 9pm 31 feb e.g. impossible date to allow for manual patching of otherwise enrolled instances
       }
       maintenance_window_duration = 2 # 4 for prod
       maintenance_window_cutoff   = 1 # 2 for prod
       patch_classifications = {
-        # REDHAT_ENTERPRISE_LINUX = ["Security", "Bugfix"] # Linux Options=(Security,Bugfix,Enhancement,Recommended,Newpackage)
-        WINDOWS = ["SecurityUpdates", "CriticalUpdates"]
+        REDHAT_ENTERPRISE_LINUX = ["Security", "Bugfix"] # Linux Options=(Security,Bugfix,Enhancement,Recommended,Newpackage)
+        WINDOWS                 = ["SecurityUpdates", "CriticalUpdates"]
       }
     }
 
@@ -322,7 +361,6 @@ locals {
           { name = "production", ttl = "86400", zone_name = "production.reporting.oasys.service.justice.gov.uk" }
         ]
         records = [
-          { name = "development", type = "NS", ttl = "86400", records = ["ns-1298.awsdns-34.org", "ns-1591.awsdns-06.co.uk", "ns-317.awsdns-39.com", "ns-531.awsdns-02.net"] },
           { name = "test", type = "NS", ttl = "86000", records = ["ns-1440.awsdns-52.org", "ns-1823.awsdns-35.co.uk", "ns-43.awsdns-05.com", "ns-893.awsdns-47.net"] },
           { name = "preproduction", type = "NS", ttl = "86400", records = ["ns-1161.awsdns-17.org", "ns-2014.awsdns-59.co.uk", "ns-487.awsdns-60.com", "ns-919.awsdns-50.net"] },
         ]
