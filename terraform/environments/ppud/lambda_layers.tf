@@ -13,14 +13,12 @@ locals {
   }
 
   layer_env_buckets = {
-    dev  = aws_s3_bucket.moj-infrastructure-dev[0].id
-    uat  = aws_s3_bucket.moj-infrastructure-uat[0].id
-    prod = aws_s3_bucket.moj-infrastructure[0].id
+    development    = aws_s3_bucket.moj-infrastructure-dev[0].id
+    preproduction  = aws_s3_bucket.moj-infrastructure-uat[0].id
+    production     = aws_s3_bucket.moj-infrastructure[0].id
   }
 
-  current_env = local.is-development ? "dev" :
-                local.is-preproduction ? "uat" :
-                local.is-production ? "prod" : null
+  current_env = local.environment
 
   active_layers = local.current_env != null ? local.lambda_layers : {}
 }
@@ -28,7 +26,7 @@ locals {
 resource "aws_lambda_layer_version" "lambda_layers" {
   for_each = local.active_layers
 
-  layer_name          = each.key
+  layer_name          = "${each.key}_layer_${local.current_env}"
   description         = "${each.key} layer for python 3.12"
   s3_bucket           = local.layer_env_buckets[local.current_env]
   s3_key              = "lambda/layers/${each.value}"
