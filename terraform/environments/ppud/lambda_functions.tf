@@ -9,19 +9,19 @@ locals {
       condition    = local.is-development
       s3_bucket    = "moj-infrastructure-dev"
       account_key  = "ppud-development" # checkov:skip=CKV_SECRET_6: "Environment identifier, not a secret"
-      dlq_arn      = aws_sqs_queue.lambda_queue_dev.arn
+      dlq_arn      = aws_sqs_queue.lambda_queue_dev[0].arn
     }
     preproduction = {
       condition    = local.is-preproduction
       s3_bucket    = "moj-infrastructure-uat"
       account_key  = "ppud-preproduction" # checkov:skip=CKV_SECRET_6: "Environment identifier, not a secret"
-      dlq_arn      = aws_sqs_queue.lambda_queue_uat.arn
+      dlq_arn      = aws_sqs_queue.lambda_queue_uat[0].arn
     }
     production = {
       condition    = local.is-production
       s3_bucket    = "moj-infrastructure"
       account_key  = "ppud-production" # checkov:skip=CKV_SECRET_6: "Environment identifier, not a secret"
-      dlq_arn      = aws_sqs_queue.lambda_queue_prod.arn
+      dlq_arn      = aws_sqs_queue.lambda_queue_prod[0].arn
     }
   }
 
