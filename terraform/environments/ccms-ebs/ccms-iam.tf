@@ -328,7 +328,7 @@ data "aws_iam_policy_document" "ccms_ebs_shared_s3" {
     ]
     resources = [
       module.ccms_ebs_shared.bucket.arn,
-      "${module.ccms_ebs_shared.arn}/*"
+      "${module.bucket.ccms_ebs_shared.bucket.arn}/*"
     ]
   }
 }

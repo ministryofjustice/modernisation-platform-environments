@@ -69,7 +69,7 @@ resource "aws_guardduty_malware_protection_plan" "s3_scan_bucket4" {
 
   protected_resource {
     s3_bucket {
-      bucket_name = module.lambda_payment_load
+      bucket_name = module.bucket.lambda_payment_load.bucket.id
     }
   }
 
@@ -114,7 +114,7 @@ resource "aws_guardduty_malware_protection_plan" "s3_scan_bucket6" {
 
   protected_resource {
     s3_bucket {
-      bucket_name = module.red_button_data.id
+      bucket_name = module.bucket.red_button_data.bucket.id
     }
   }
 
@@ -128,7 +128,7 @@ resource "aws_guardduty_malware_protection_plan" "s3_scan_bucket6" {
     { Name = lower(format("s3-%s-%s-awsgaurdduty-mpp", "${local.application_name}", local.environment)) }
   )
 
-  depends_on = [module.red_button_data]
+  depends_on = [module.bucket.red_button_data.bucket.id]
 
 }
 
@@ -137,7 +137,7 @@ resource "aws_guardduty_malware_protection_plan" "s3_scan_bucket7" {
 
   protected_resource {
     s3_bucket {
-      bucket_name = module.ccms_ebs_shared.id
+      bucket_name = module.bucket.ccms_ebs_shared.bucket.id
     }
   }
 

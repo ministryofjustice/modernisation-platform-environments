@@ -95,7 +95,7 @@ resource "aws_lambda_permission" "allow_bucket" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.lambda_function.arn
   principal     = "s3.amazonaws.com"
-  source_arn    = module.lambda_payment_load.arn
+  source_arn    = module.bucket.lambda_payment_load.bucket.arn
 }
 
 # resource "aws_s3_bucket_notification" "lambda_trigger" {
