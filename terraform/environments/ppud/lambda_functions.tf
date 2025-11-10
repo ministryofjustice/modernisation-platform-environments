@@ -132,6 +132,7 @@ locals {
         source_arn_suffix = "*"
       }]
     }
+    */
     ppud_elb_report = {
       description = "Function to retrieve, graph and email the utilisation of the PPUD ELB."
       handler     = "lambda_handler"
@@ -158,6 +159,7 @@ locals {
         source_arn_suffix = "*"
       }]
     }
+    /*
     disk_info_report = {
       description = "Function to retrieve, format and email a report on the disk utilisation of all Windows EC2 instances."
       handler     = "lambda_handler"
@@ -213,12 +215,21 @@ locals {
     log_retention_days            = 30
   }
 
+  # Lambda ARNs
   klayers_account_id = data.aws_ssm_parameter.klayers_account.value
 
   layer_arns = {
     numpy  = "arn:aws:lambda:eu-west-2:${local.klayers_account_id}:layer:Klayers-p312-numpy:8"
     pillow = "arn:aws:lambda:eu-west-2:${local.klayers_account_id}:layer:Klayers-p312-pillow:1"
   }
+
+  # Lambda dead letter queue ARNs  
+  lambda_dlq_arns = {
+    development   = aws_sqs_queue.lambda_queue_dev.arn
+    preproduction = aws_sqs_queue.lambda_queue_uat.arn
+    production    = aws_sqs_queue.lambda_queue_prod.arn
+  }
+
 }
 
 #######################################################################
@@ -242,11 +253,13 @@ resource "aws_lambda_function" "lambda_functions" {
   timeout                        = each.value.config.timeout
   reserved_concurrent_executions = local.lambda_defaults.reserved_concurrent_executions
   
-
-
-  # dead_letter_config {
-  #   target_arn = aws_sqs_queue.lambda_queue[each.value.env].arn
-  # }
+  # Lambda dead letter queues
+  dynamic "dead_letter_config" {
+    for_each = try(local.lambda_dlq_arns[each.value.env], null) != null ? [1] : []
+    content {
+      target_arn = local.lambda_dlq_arns[each.value.env]
+    }
+  }
 
   tracing_config {
     mode = local.lambda_defaults.tracing_mode
