@@ -66,6 +66,7 @@ env:
   TEST_MODE:        ${{ github.event.inputs.test_mode || 'false' }}
   AGE_MINUTES:      ${{ github.event.inputs.age_minutes || '3' }}
   LIVE_TEST_MODE:   ${{ github.event.inputs.live_test_mode || 'false' }}
+  AMI_DELETE_BACKOFF_SECONDS: "300"
 
 jobs:
   build-matrix:
