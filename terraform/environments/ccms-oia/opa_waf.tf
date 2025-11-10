@@ -7,10 +7,10 @@ resource "aws_wafv2_ip_set" "opahub_waf_ip_set" {
   description        = "List of trusted IP Addresses allowing access via WAF"
 
   addresses = [
-      local.application_data.accounts[local.environment].aws_workspace,
-      data.aws_subnet.private_subnets_a.cidr_block,
-      data.aws_subnet.private_subnets_b.cidr_block,
-      data.aws_subnet.private_subnets_c.cidr_block,
+    local.application_data.accounts[local.environment].aws_workspace,
+    data.aws_subnet.private_subnets_a.cidr_block,
+    data.aws_subnet.private_subnets_b.cidr_block,
+    data.aws_subnet.private_subnets_c.cidr_block,
   ]
 
   tags = merge(local.tags,
