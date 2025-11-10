@@ -69,7 +69,7 @@ resource "aws_guardduty_malware_protection_plan" "s3_scan_bucket4" {
 
   protected_resource {
     s3_bucket {
-      bucket_name = aws_s3_bucket.lambda_payment_load.id
+      bucket_name = module.bucket.lambda_payment_load.bucket.id
     }
   }
 
@@ -83,11 +83,11 @@ resource "aws_guardduty_malware_protection_plan" "s3_scan_bucket4" {
     { Name = lower(format("s3-%s-%s-awsgaurdduty-mpp", "${local.application_name}", local.environment)) }
   )
 
-  depends_on = [aws_s3_bucket.lambda_payment_load]
+  depends_on = [module.lambda_payment_load]
 }
 
 resource "aws_guardduty_malware_protection_plan" "s3_scan_bucket5" {
-  for_each = aws_s3_bucket.buckets
+  for_each = module.bucket.bucket
   role     = data.aws_iam_role.guardduty_s3_scan.arn
 
   protected_resource {
@@ -106,7 +106,7 @@ resource "aws_guardduty_malware_protection_plan" "s3_scan_bucket5" {
     { Name = lower(format("s3-%s-%s-awsgaurdduty-mpp", "${local.application_name}", local.environment)) }
   )
 
-  depends_on = [aws_s3_bucket.buckets]
+  depends_on = [module.bucket]
 }
 
 resource "aws_guardduty_malware_protection_plan" "s3_scan_bucket6" {
@@ -114,7 +114,7 @@ resource "aws_guardduty_malware_protection_plan" "s3_scan_bucket6" {
 
   protected_resource {
     s3_bucket {
-      bucket_name = aws_s3_bucket.red_button_data.id
+      bucket_name = module.bucket.red_button_data.bucket.id
     }
   }
 
@@ -128,7 +128,7 @@ resource "aws_guardduty_malware_protection_plan" "s3_scan_bucket6" {
     { Name = lower(format("s3-%s-%s-awsgaurdduty-mpp", "${local.application_name}", local.environment)) }
   )
 
-  depends_on = [aws_s3_bucket.red_button_data]
+  depends_on = [module.bucket.red_button_data]
 
 }
 
@@ -137,7 +137,7 @@ resource "aws_guardduty_malware_protection_plan" "s3_scan_bucket7" {
 
   protected_resource {
     s3_bucket {
-      bucket_name = aws_s3_bucket.ccms_ebs_shared.id
+      bucket_name = module.bucket.ccms_ebs_shared.bucket.id
     }
   }
 
@@ -151,7 +151,7 @@ resource "aws_guardduty_malware_protection_plan" "s3_scan_bucket7" {
     { Name = lower(format("s3-%s-%s-awsgaurdduty-mpp", "${local.application_name}", local.environment)) }
   )
 
-  depends_on = [aws_s3_bucket.ccms_ebs_shared]
+  depends_on = [module.bucket.ccms_ebs_shared]
 }
 
 data "aws_iam_role" "guardduty_s3_scan" {

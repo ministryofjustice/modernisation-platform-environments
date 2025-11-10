@@ -63,87 +63,161 @@ locals {
   ftp_test_user_secret_value = jsondecode(data.aws_secretsmanager_secret_version.ftp_test_user_secret_value.secret_string)
 }
 
-resource "aws_s3_bucket" "buckets" {
+module "bucket" { #tfsec:ignore:aws-s3-enable-versioning
+  # v8.2.0 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/52a40b0dd18aaef0d7c5565d93cc8997aad79636
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0dd18aaef0d7c5565d93cc8997aad79636"
   for_each = toset(local.bucket_names)
 
-  bucket = each.value
 
-  tags = merge(
+  bucket_name = each.value
+  sse_algorithm      = "AES256"
+  custom_kms_key     = ""
+  #  bucket_prefix      = "s3-bucket-example"
+  versioning_enabled = true
+  bucket_policy      = [data.aws_iam_policy_document.artefacts_s3_policy.json]
+
+  log_bucket = local.logging_bucket_name
+  log_prefix = "s3access/${each.value}"
+
+  # Refer to the below section "Replication" before enabling replication
+  replication_enabled = false
+  # Below three variables and providers configuration are only relevant if 'replication_enabled' is set to true
+  replication_region = "eu-west-2"
+  # replication_role_arn                     = module.s3-bucket-replication-role.role.arn
+  providers = {
+    # Here we use the default provider Region for replication. Destination buckets can be within the same Region as the
+    # source bucket. On the other hand, if you need to enable cross-region replication, please contact the Modernisation
+    # Platform team to add a new provider for the additional Region.
+    aws.bucket-replication = aws
+  }
+
+  lifecycle_rule = [
     {
-      Name        = each.value
-      Environment = local.environment
-    },
-    {
-      "business-unit"          = "LAA",
-      "infrastructure-support" = "laa-role-sre@digital.justice.gov.uk",
-      "source-code"            = "https://github.com/ministryofjustice/modernisation-platform-environments"
+      id      = "main"
+      enabled = "Enabled"
+      prefix  = ""
+
+      tags = {
+        rule      = "log"
+        autoclean = "true"
+      }
+
+      transition = [
+        {
+          days          = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_current_standard
+          storage_class = "STANDARD_IA"
+          }, {
+          days          = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_current_glacier
+          storage_class = "GLACIER"
+        }
+      ]
+
+      expiration = {
+        days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_current
+      }
+
+      noncurrent_version_transition = [
+        {
+          days          = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_noncurrent_standard
+          storage_class = "STANDARD_IA"
+          }, {
+          days          = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_noncurrent_glacier
+          storage_class = "GLACIER"
+        }
+      ]
+
+      noncurrent_version_expiration = {
+        days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_noncurrent
+      }
+
+      abort_incomplete_multipart_upload_days = local.application_data.accounts[local.environment].s3_lifecycle_days_abort_incomplete_multipart_upload_days
     }
-  )
+  ]
 
-  # server access logging is configured via aws_s3_bucket_logging resource below
+  tags = merge(local.tags,
+    { Name = lower(format("s3-bucket-%s-%s", local.application_name, local.environment)) }
+  )
 }
+
+# resource "aws_s3_bucket" "buckets" {
+#   for_each = toset(local.bucket_names)
+
+#   bucket = each.value
+
+#   tags = merge(
+#     {
+#       Name        = each.value
+#       Environment = local.environment
+#     },
+#     {
+#       "business-unit"          = "LAA",
+#       "infrastructure-support" = "laa-role-sre@digital.justice.gov.uk",
+#       "source-code"            = "https://github.com/ministryofjustice/modernisation-platform-environments"
+#     }
+#   )
+# }
 
 # Server access logging: send access logs to the environment logging bucket
-resource "aws_s3_bucket_logging" "buckets_access_logging" {
-  for_each = aws_s3_bucket.buckets
+# resource "aws_s3_bucket_logging" "buckets_access_logging" {
+#   for_each = aws_s3_bucket.buckets
 
-  bucket = each.value.id
+#   bucket = each.value.id
 
-  target_bucket = local.logging_bucket_name
-  target_prefix = "s3-access-logs/${each.key}/"
-}
+#   target_bucket = local.logging_bucket_name
+#   target_prefix = "s3-access-logs/${each.key}/"
+# }
 
-resource "aws_s3_bucket_server_side_encryption_configuration" "bucket_encryption" {
-  for_each = aws_s3_bucket.buckets
+# resource "aws_s3_bucket_server_side_encryption_configuration" "bucket_encryption" {
+#   for_each = aws_s3_bucket.buckets
 
-  bucket = each.value.id
+#   bucket = each.value.id
 
-  rule {
-    apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
-    }
-  }
-}
+#   rule {
+#     apply_server_side_encryption_by_default {
+#       sse_algorithm = "AES256"
+#     }
+#   }
+# }
 
-resource "aws_s3_bucket_versioning" "s3_versioning" {
-  for_each = aws_s3_bucket.buckets
-  bucket   = each.value.id
+# resource "aws_s3_bucket_versioning" "s3_versioning" {
+#   for_each = aws_s3_bucket.buckets
+#   bucket   = each.value.id
 
-  versioning_configuration {
-    status = "Enabled"
-  }
-}
+#   versioning_configuration {
+#     status = "Enabled"
+#   }
+# }
 
 # Lifecycle configuration: expire current objects and noncurrent versions after 30 days
-resource "aws_s3_bucket_lifecycle_configuration" "buckets_lifecycle" {
-  for_each = aws_s3_bucket.buckets
+# resource "aws_s3_bucket_lifecycle_configuration" "buckets_lifecycle" {
+#   for_each = aws_s3_bucket.buckets
 
-  bucket = each.value.id
+#   bucket = each.value.id
 
-  # One lifecycle rule per prefix
-  dynamic "rule" {
-    for_each = local.target_prefixes
-    content {
-      id     = "expire-${replace(each.value.id, "/", "-")}-${replace(rule.value, "/", "-")}-${local.expire_days}d"
-      status = "Enabled"
+#   # One lifecycle rule per prefix
+#   dynamic "rule" {
+#     for_each = local.target_prefixes
+#     content {
+#       id     = "expire-${replace(each.value.id, "/", "-")}-${replace(rule.value, "/", "-")}-${local.expire_days}d"
+#       status = "Enabled"
 
-      filter {
-        and {
-          prefix                   = rule.value
-          object_size_greater_than = 0
-        }
-      }
+#       filter {
+#         and {
+#           prefix                   = rule.value
+#           object_size_greater_than = 0
+#         }
+#       }
 
-      expiration {
-        days = local.expire_days
-      }
+#       expiration {
+#         days = local.expire_days
+#       }
 
-      noncurrent_version_expiration {
-        noncurrent_days = local.expire_days
-      }
-    }
-  }
-}
+#       noncurrent_version_expiration {
+#         noncurrent_days = local.expire_days
+#       }
+#     }
+#   }
+# }
 
 #--Dynamic blocks for transfer family policy in production only
 data "aws_iam_policy_document" "inbound_bucket_policy" {
@@ -164,8 +238,8 @@ data "aws_iam_policy_document" "inbound_bucket_policy" {
       ]
     }
     resources = [
-      aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].arn,
-      "${aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].arn}/*"
+      module.bucket["laa-ccms-inbound-${local.environment}-mp"].bucket.arn,
+      "${module.bucket["laa-ccms-inbound-${local.environment}-mp"].bucket.arn}/*"
     ]
   }
 
@@ -181,7 +255,8 @@ data "aws_iam_policy_document" "inbound_bucket_policy" {
         identifiers = [module.transfer_family[0].grant_iam_role_arn]
       }
       resources = [
-        aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].arn
+        module.bucket["laa-ccms-inbound-${local.environment}-mp"].bucket.arn,
+        # aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].arn
       ]
     }
   }
@@ -208,21 +283,21 @@ data "aws_iam_policy_document" "inbound_bucket_policy" {
         identifiers = [module.transfer_family[0].grant_iam_role_arn]
       }
       resources = [
-        "${aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].arn}/*"
+        "${module.bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].arn}/*"
       ]
     }
   }
 }
 
 resource "aws_s3_bucket_policy" "inbound_bucket_policy" {
-  bucket = aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket
+  bucket = module.bucket["laa-ccms-inbound-${local.environment}-mp"].bucket.arn
   policy = data.aws_iam_policy_document.inbound_bucket_policy.json
 }
 
 #--Cash office. Transfer family CORS. Production only
 resource "aws_s3_bucket_cors_configuration" "inbound_bucket_cors_policy" {
   count  = (local.is-preproduction || local.is-production) ? 1 : 0
-  bucket = aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket
+  bucket = module.bucket["laa-ccms-inbound-${local.environment}-mp"].bucket.arn
   cors_rule {
     allowed_headers = ["*"]
     allowed_methods = ["GET", "PUT", "POST"]
@@ -245,7 +320,7 @@ resource "aws_s3_bucket_cors_configuration" "inbound_bucket_cors_policy" {
 }
 
 resource "aws_s3_bucket_policy" "outbound_bucket_policy" {
-  bucket = aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].bucket
+  bucket = module.bucket["laa-ccms-inbound-${local.environment}-mp"].bucket.arn
 
   policy = jsonencode({
     "Version" : "2012-10-17",
@@ -267,8 +342,9 @@ resource "aws_s3_bucket_policy" "outbound_bucket_policy" {
           "s3:DeleteObject"
         ],
         "Resource" : [
-          aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].arn,
-          "${aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].arn}/*"
+          module.bucket["laa-ccms-inbound-${local.environment}-mp"].bucket.arn,
+          # aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].arn,
+          "${module.bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].arn}/*"
         ]
       }
     ]
@@ -277,13 +353,13 @@ resource "aws_s3_bucket_policy" "outbound_bucket_policy" {
 }
 
 resource "aws_s3_object" "ftp_lambda_layer" {
-  bucket = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
+  bucket = module.bucket["laa-ccms-inbound-${local.environment}-mp"].bucket.arn
   key    = "lambda/ftp_lambda_layer.zip"
   source = "lambda/ftp_lambda_layer.zip"
 }
 
 resource "aws_s3_object" "ftp_client" {
-  bucket = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
+  bucket = module.bucket["laa-ccms-inbound-${local.environment}-mp"].bucket.arn
   key    = "lambda/ftp-client-v3.1.zip"
   source = "lambda/ftp-client-v3.1.zip"
 }
@@ -297,11 +373,11 @@ module "allpay_ftp_lambda_outbound" {
   ftp_transfer_type        = "SFTP_UPLOAD"
   ftp_local_path           = "CCMS_PRD_Allpay/Outbound/"
   ftp_remote_path          = lower(local.environment) == "production" ? "/Inbound/" : "/home/${local.ftp_test_user_secret_value["USER"]}/laa-ccms-outbound-${local.environment}-mp/outbound-lambda-runs/"
-  ftp_bucket               = aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].bucket
+  ftp_bucket               =module.bucket["laa-ccms-inbound-${local.environment}-mp"].bucket.id
   env                      = local.environment
   secret_name              = "LAA-ftp-allpay-inbound-ccms-${local.environment}"
   secret_arn               = aws_secretsmanager_secret.secrets["LAA-ftp-allpay-inbound-ccms"].arn
-  s3_bucket_ftp            = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
+  s3_bucket_ftp            = module.bucket["laa-ccms-inbound-${local.environment}-mp"].bucket.id
   s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
   s3_object_ftp_client     = aws_s3_object.ftp_client.key
   #ftp_cron                     = "cron(0 10 * * ? *)"
@@ -318,11 +394,11 @@ module "allpay_ftp_lambda_inbound" {
   ftp_transfer_type        = "SFTP_DOWNLOAD"
   ftp_local_path           = "CCMS_PRD_Allpay/Inbound/"
   ftp_remote_path          = lower(local.environment) == "production" ? "/Outbound/" : "/home/${local.ftp_test_user_secret_value["USER"]}/laa-ccms-inbound-${local.environment}-mp/inbound-lambda-runs/"
-  ftp_bucket               = aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket
+  ftp_bucket               = module.bucket["laa-ccms-inbound-${local.environment}-mp"].bucket.id
   env                      = local.environment
   secret_name              = "LAA-ftp-allpay-inbound-ccms-${local.environment}"
   secret_arn               = aws_secretsmanager_secret.secrets["LAA-ftp-allpay-inbound-ccms"].arn
-  s3_bucket_ftp            = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
+  s3_bucket_ftp            = module.bucket["laa-ccms-inbound-${local.environment}-mp"].bucket.id
   s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
   s3_object_ftp_client     = aws_s3_object.ftp_client.key
   #ftp_cron                     = "cron(0 10 * * ? *)"
@@ -339,11 +415,11 @@ module "LAA-ftp-xerox-ccms-outbound" {
   ftp_local_path           = "CCMS_PRD_DST/Outbound/"
   ftp_remote_path          = lower(local.environment) == "production" ? "/Production/outbound/CCMS/" : "/home/${local.ftp_test_user_secret_value["USER"]}/laa-ccms-outbound-${local.environment}-mp/outbound-lambda-runs/"
   ftp_file_types           = "zip"
-  ftp_bucket               = aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].bucket
+  ftp_bucket               = module.bucket["laa-ccms-inbound-${local.environment}-mp"].bucket.id
   env                      = local.environment
   secret_name              = "LAA-ftp-xerox-outbound-${local.environment}"
   secret_arn               = aws_secretsmanager_secret.secrets["LAA-ftp-xerox-outbound"].arn
-  s3_bucket_ftp            = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
+  s3_bucket_ftp            = module.bucket["laa-ccms-inbound-${local.environment}-mp"].bucket.id
   s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
   s3_object_ftp_client     = aws_s3_object.ftp_client.key
   #ftp_cron                     = "cron(0 10 * * ? *)"
@@ -359,11 +435,11 @@ module "LAA-ftp-xerox-ccms-outbound-peterborough" {
   ftp_transfer_type        = "SFTP_UPLOAD"
   ftp_local_path           = "CCMS_PRD_DST/Outbound/Peterborough/"
   ftp_remote_path          = lower(local.environment) == "production" ? "/Production/outbound/PETER/" : "/home/${local.ftp_test_user_secret_value["USER"]}/laa-ccms-outbound-${local.environment}-mp/outbound-lambda-runs/"
-  ftp_bucket               = aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].bucket
+  ftp_bucket               = module.bucket["laa-ccms-inbound-${local.environment}-mp"].bucket.id
   env                      = local.environment
   secret_name              = "LAA-ftp-xerox-outbound-${local.environment}"
   secret_arn               = aws_secretsmanager_secret.secrets["LAA-ftp-xerox-outbound"].arn
-  s3_bucket_ftp            = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
+  s3_bucket_ftp            = module.bucket["laa-ccms-inbound-${local.environment}-mp"].bucket.id
   s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
   s3_object_ftp_client     = aws_s3_object.ftp_client.key
   #ftp_cron                     = "cron(0 10 * * ? *)"
@@ -379,11 +455,11 @@ module "LAA-ftp-eckoh-outbound-ccms" {
   ftp_transfer_type        = "SFTP_UPLOAD"
   ftp_local_path           = "CCMS_PRD_Eckoh/Outbound/"
   ftp_remote_path          = lower(local.environment) == "production" ? "/inbound/" : "/home/${local.ftp_test_user_secret_value["USER"]}/laa-ccms-outbound-${local.environment}-mp/outbound-lambda-runs/"
-  ftp_bucket               = aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].bucket
+  ftp_bucket               = module.bucket["laa-ccms-inbound-${local.environment}-mp"].bucket.id
   env                      = local.environment
   secret_name              = "LAA-ftp-eckoh-inbound-ccms-${local.environment}"
   secret_arn               = aws_secretsmanager_secret.secrets["LAA-ftp-eckoh-inbound-ccms"].arn
-  s3_bucket_ftp            = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
+  s3_bucket_ftp            = module.bucket["laa-ccms-inbound-${local.environment}-mp"].bucket.id
   s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
   s3_object_ftp_client     = aws_s3_object.ftp_client.key
   #ftp_cron                     = "cron(0 10 * * ? *)"
@@ -400,11 +476,11 @@ module "LAA-ftp-eckoh-inbound-ccms" {
   ftp_transfer_type        = "SFTP_DOWNLOAD"
   ftp_local_path           = "CCMS_PRD_Eckoh/Inbound/"
   ftp_remote_path          = lower(local.environment) == "production" ? "/outbound/" : "/home/${local.ftp_test_user_secret_value["USER"]}/laa-ccms-inbound-${local.environment}-mp/inbound-lambda-runs/"
-  ftp_bucket               = aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket
+  ftp_bucket               = module.bucket["laa-ccms-inbound-${local.environment}-mp"].bucket.id
   env                      = local.environment
   secret_name              = "LAA-ftp-eckoh-inbound-ccms-${local.environment}"
   secret_arn               = aws_secretsmanager_secret.secrets["LAA-ftp-eckoh-inbound-ccms"].arn
-  s3_bucket_ftp            = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
+  s3_bucket_ftp            = module.bucket["laa-ccms-inbound-${local.environment}-mp"].bucket.id
   s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
   s3_object_ftp_client     = aws_s3_object.ftp_client.key
   #ftp_cron                     = "cron(0 10 * * ? *)"
@@ -420,11 +496,11 @@ module "LAA-ftp-rossendales-ccms-inbound" {
   ftp_transfer_type        = "SFTP_DOWNLOAD"
   ftp_local_path           = "CCMS_PRD_Rossendales/Inbound/"
   ftp_remote_path          = lower(local.environment) == "production" ? "ccms/OutBound/" : "/home/${local.ftp_test_user_secret_value["USER"]}/laa-ccms-inbound-${local.environment}-mp/inbound-lambda-runs/"
-  ftp_bucket               = aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket
+  ftp_bucket               = module.bucket["laa-ccms-inbound-${local.environment}-mp"].bucket.id
   env                      = local.environment
   secret_name              = "LAA-ftp-rossendales-ccms-inbound-${local.environment}"
   secret_arn               = aws_secretsmanager_secret.secrets["LAA-ftp-rossendales-ccms-inbound"].arn
-  s3_bucket_ftp            = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
+  s3_bucket_ftp            = module.bucket["laa-ccms-inbound-${local.environment}-mp"].bucket.id
   s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
   s3_object_ftp_client     = aws_s3_object.ftp_client.key
   #ftp_cron                     = "cron(0 10 * * ? *)"
@@ -441,11 +517,11 @@ module "LAA-ftp-1stlocate-ccms-inbound" {
   ftp_local_path           = "CCMS_PRD_TDX_DECRYPTED/Inbound/"
   ftp_remote_path          = lower(local.environment) == "production" ? "/LAA_Direct/ToLAADirect/" : "/home/${local.ftp_test_user_secret_value["USER"]}/laa-ccms-inbound-${local.environment}-mp/inbound-lambda-runs/"
   ftp_port                 = "8022"
-  ftp_bucket               = aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket
+  ftp_bucket               = module.bucket["laa-ccms-inbound-${local.environment}-mp"].bucket.id
   env                      = local.environment
   secret_name              = "LAA-ftp-1stlocate-ccms-inbound-${local.environment}"
   secret_arn               = aws_secretsmanager_secret.secrets["LAA-ftp-1stlocate-ccms-inbound"].arn
-  s3_bucket_ftp            = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
+  s3_bucket_ftp            = module.bucket["laa-ccms-inbound-${local.environment}-mp"].bucket.id
   s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
   s3_object_ftp_client     = aws_s3_object.ftp_client.key
   #ftp_cron                     = "cron(0 10 * * ? *)"

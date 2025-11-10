@@ -57,8 +57,8 @@ resource "aws_iam_role_policy" "red_button_lambda_policy" {
           "s3:PutObject"
         ]
         Resource = [
-          aws_s3_bucket.red_button_data.arn,
-          "${aws_s3_bucket.red_button_data.arn}/*"
+          module.bucket.red_button_data.bucket.arn,
+          "${module.bucket.red_button_data.bucket.arn}/*"
         ]
       }
     ]
@@ -76,7 +76,7 @@ resource "aws_lambda_function" "red_button_trigger" {
 
   environment {
     variables = {
-      S3_BUCKET_REDBUTTON = aws_s3_bucket.red_button_data.id
+      S3_BUCKET_REDBUTTON = module.bucket.red-button-data.bucket.id
       BOOM                = local.application_data.accounts[local.environment].red_button_lambda_boom
       DEBUG               = local.application_data.accounts[local.environment].red_button_lambda_debug
     }
@@ -87,35 +87,133 @@ resource "aws_lambda_function" "red_button_trigger" {
   })
 }
 
-resource "aws_s3_bucket" "red_button_data" {
-  bucket = "${local.application_name}-${local.environment}-red-button-data"
-}
+module "red-button-data" { #tfsec:ignore:aws-s3-enable-versioning
+  # v8.2.0 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/52a40b0dd18aaef0d7c5565d93cc8997aad79636
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0dd18aaef0d7c5565d93cc8997aad79636"
 
-resource "aws_s3_bucket_public_access_block" "red_button_data" {
-  bucket                  = aws_s3_bucket.red_button_data.id
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
-}
+  bucket_name = "${local.application_name}-${local.environment}-red-button-data"
+  sse_algorithm      = "AES256"
+  custom_kms_key     = ""
+  #  bucket_prefix      = "s3-bucket-example"
+  versioning_enabled = true
+  bucket_policy      = [data.aws_iam_policy_document.artefacts_s3_policy.json]
 
-resource "aws_s3_bucket_versioning" "red_button_data" {
-  bucket = aws_s3_bucket.red_button_data.id
+  log_bucket = local.logging_bucket_name
+  log_prefix = "s3access/${local.application_name}-${local.environment}-red-button-data"
 
-  versioning_configuration {
-    status = "Enabled"
+  # Refer to the below section "Replication" before enabling replication
+  replication_enabled = false
+  # Below three variables and providers configuration are only relevant if 'replication_enabled' is set to true
+  replication_region = "eu-west-2"
+  # replication_role_arn                     = module.s3-bucket-replication-role.role.arn
+  providers = {
+    # Here we use the default provider Region for replication. Destination buckets can be within the same Region as the
+    # source bucket. On the other hand, if you need to enable cross-region replication, please contact the Modernisation
+    # Platform team to add a new provider for the additional Region.
+    aws.bucket-replication = aws
   }
-}
 
-resource "aws_s3_bucket_server_side_encryption_configuration" "red_button_data" {
-  bucket = aws_s3_bucket.red_button_data.id
+  lifecycle_rule = [
+    {
+      id      = "main"
+      enabled = "Enabled"
+      prefix  = ""
 
-  rule {
-    apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
+      tags = {
+        rule      = "log"
+        autoclean = "true"
+      }
+
+      transition = [
+        {
+          days          = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_current_standard
+          storage_class = "STANDARD_IA"
+          }, {
+          days          = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_current_glacier
+          storage_class = "GLACIER"
+        }
+      ]
+
+      expiration = {
+        days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_current
+      }
+
+      noncurrent_version_transition = [
+        {
+          days          = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_noncurrent_standard
+          storage_class = "STANDARD_IA"
+          }, {
+          days          = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_noncurrent_glacier
+          storage_class = "GLACIER"
+        }
+      ]
+
+      noncurrent_version_expiration = {
+        days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_noncurrent
+      }
+
+      abort_incomplete_multipart_upload_days = local.application_data.accounts[local.environment].s3_lifecycle_days_abort_incomplete_multipart_upload_days
     }
+  ]
+
+  tags = merge(local.tags,
+    { Name = lower(format("s3-bucket-%s-%s", local.application_name, local.environment)) }
+  )
+}
+resource "aws_s3_bucket_notification" "artefact_bucket_notification" {
+  bucket = module.s3-bucket.bucket.id
+  eventbridge = true
+  topic {
+    topic_arn     = aws_sns_topic.s3_topic.arn
+    events        = ["s3:ObjectCreated:*"]
+    filter_suffix = ".log"
   }
 }
+
+data "aws_iam_policy_document" "artefacts_s3_policy" {
+  statement {
+    principals {
+      type = "AWS"
+      identifiers = [
+        "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/developer",
+        "arn:aws:iam::${local.environment_management.account_ids["core-shared-services-production"]}:root"
+      ]
+    }
+    actions   = ["s3:GetObject"]
+    resources = ["arn:aws:s3:::${local.artefact_bucket_name}/*"]
+  }
+}
+
+
+# resource "aws_s3_bucket" "red_button_data" {
+#   bucket = "${local.application_name}-${local.environment}-red-button-data"
+# }
+
+# resource "aws_s3_bucket_public_access_block" "red_button_data" {
+#   bucket                  = aws_s3_bucket.red_button_data.id
+#   block_public_acls       = true
+#   block_public_policy     = true
+#   ignore_public_acls      = true
+#   restrict_public_buckets = true
+# }
+
+# resource "aws_s3_bucket_versioning" "red_button_data" {
+#   bucket = aws_s3_bucket.red_button_data.id
+
+#   versioning_configuration {
+#     status = "Enabled"
+#   }
+# }
+
+# resource "aws_s3_bucket_server_side_encryption_configuration" "red_button_data" {
+#   bucket = aws_s3_bucket.red_button_data.id
+
+#   rule {
+#     apply_server_side_encryption_by_default {
+#       sse_algorithm = "AES256"
+#     }
+#   }
+# }
 
 resource "aws_cloudwatch_log_group" "red_button_logs" {
   name              = "/aws/lambda/${aws_lambda_function.red_button_trigger.function_name}"
@@ -138,12 +236,12 @@ output "lambda_function_arn" {
 
 output "s3_bucket_name" {
   description = "Name of the S3 bucket for backups"
-  value       = aws_s3_bucket.red_button_data.id
+  value       = module.bucket.red-button-data.bucket.id
 }
 
 output "s3_bucket_arn" {
   description = "ARN of the S3 bucket for backups"
-  value       = aws_s3_bucket.red_button_data.arn
+  value       = module.bucket.red-button-data.bucket.arn
 }
 
 output "iam_role_arn" {
