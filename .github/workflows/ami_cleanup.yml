@@ -2,9 +2,6 @@
 name: Cloud Cleanup (AMI & EBS)
 
 on:
-  push:
-    branches:
-      - feature-11321-identifying-snapshots-to-be-deleted
   workflow_dispatch:
 
     inputs:
@@ -67,7 +64,6 @@ env:
   TEST_MODE:        ${{ github.event.inputs.test_mode || 'false' }}
   AGE_MINUTES:      ${{ github.event.inputs.age_minutes || '3' }}
   LIVE_TEST_MODE:   ${{ github.event.inputs.live_test_mode || 'false' }}
-  AMI_DELETE_BACKOFF_SECONDS: "300"
 
 jobs:
   build-matrix:
@@ -446,7 +442,7 @@ jobs:
           else
             echo "No protected AMIs matched."
           fi
-      - name: Delete AMIs from filtered plan (Live) + friendly logs
+      - name: Delete AMIs from filtered plan (Live)
         id: ami_live_delete
         run: |
           set -euo pipefail
@@ -480,7 +476,7 @@ jobs:
               echo "${{ matrix.account_name }},eu-west-2,live,ami,ami,${AMI},,${NAME},${WHEN},,Deleted," >> reports/cleanup_report.csv
             done
           fi
-      - name: Delete orphaned snapshots (fallback) — friendly + backoff
+      - name: Delete orphaned snapshots (fallback)
         if: always()
         run: |
           set -euo pipefail
