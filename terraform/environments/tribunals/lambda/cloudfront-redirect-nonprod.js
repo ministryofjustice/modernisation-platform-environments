@@ -14,7 +14,29 @@ exports.handler = (event, context, callback) => {
         var redirectMap = {
             'dev.ahmlr.gov.uk': {
                 defaultRedirect: 'https://www.gov.uk/apply-land-registration-tribunal/overview',
-                pathRedirects: [],
+                pathRedirects: [
+                    {
+                        paths: ['/public', '/Admin', '/Judgments'],
+                        target: 'https://landregistrationdivision.decisions.tribunals.gov.uk',
+                        exactMatch: false
+                    }
+                ],
+                aliases: []
+            },
+            'dev.asylum-support-tribunal.gov.uk': {
+                defaultRedirect: 'https://www.gov.uk/courts-tribunals/first-tier-tribunal-asylum-support',
+                pathRedirects: [
+                    {
+                        paths: ['/Public', '/admin', '/Judgments', '/decisions.htm'],
+                        target: 'https://asylumsupport.decisions.tribunals.gov.uk',
+                        exactMatch: false
+                    },
+                    {
+                        paths: ['.*\\.(css|js|png|ico|gif|jpg|jpeg)$'],
+                        target: 'https://administrativeappeals.decisions.tribunals.gov.uk',
+                        exactMatch: false
+                    }
+                ],
                 aliases: []
             },
         };
