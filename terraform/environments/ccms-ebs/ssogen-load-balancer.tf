@@ -58,6 +58,8 @@ resource "aws_lb_listener" "ssogen_internal_listener" {
     type             = "forward"
     target_group_arn = aws_lb_target_group.ssogen_internal_tg[count.index].arn
   }
+
+  depends_on = [ aws_acm_certificate_validation.external_nonprod ]
 }
 
 resource "aws_lb_target_group_attachment" "ssogen_internal" {
