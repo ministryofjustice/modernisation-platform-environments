@@ -37,6 +37,12 @@ data "aws_ssm_parameter" "klayers_account_prod" {
   with_decryption = true
 }
 
+# Klayers Account ID - used by lambda layer ARNs - https://github.com/keithrozario/Klayers?tab=readme-ov-file
+data "aws_ssm_parameter" "klayers_account" {
+  name            = "klayers_account"
+  with_decryption = true
+}
+
 # This ID is the elb-account-id for eu-west-2 obtained from https://docs.aws.amazon.com/elasticloadbalancing/latest/application/enable-access-logging.html
 data "aws_ssm_parameter" "elb-account-eu-west-2-dev" {
   count           = local.is-development == true ? 1 : 0

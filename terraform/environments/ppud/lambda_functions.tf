@@ -219,16 +219,12 @@ locals {
     production    = data.aws_ssm_parameter.klayers_account_prod[0].value
   }
 
-  layer_arns = {
-    numpy  = "arn:aws:lambda:eu-west-2:${local.klayers_account_ids[local.environment]}:layer:Klayers-p312-numpy:8"
-    pillow = "arn:aws:lambda:eu-west-2:${local.klayers_account_ids[local.environment]}:layer:Klayers-p312-pillow:1"
-  }
+  klayers_account_id = data.aws_ssm_parameter.klayers_account.value
 
-  # Layer ARNs (commented out until klayers data source exists)
-  # layer_arns = {
-  #   numpy      = "arn:aws:lambda:eu-west-2:KLAYERS_ACCOUNT_ID:layer:Klayers-p312-numpy:8"
-  #   pillow     = "arn:aws:lambda:eu-west-2:KLAYERS_ACCOUNT_ID:layer:Klayers-p312-pillow:1"
-  # }
+  layer_arns = {
+    numpy  = "arn:aws:lambda:eu-west-2:${local.klayers_account_id}:layer:Klayers-p312-numpy:8"
+    pillow = "arn:aws:lambda:eu-west-2:${local.klayers_account_id}:layer:Klayers-p312-pillow:1"
+  }
 }
 
 #######################################################################
