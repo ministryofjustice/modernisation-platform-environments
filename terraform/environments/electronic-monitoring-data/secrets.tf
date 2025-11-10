@@ -68,4 +68,3 @@ module "secrets_manager" {
     schedule_expression = "cron(0 10 ? FEB,MAY,AUG,NOV TUE#1 *)"
   }
 }
-
