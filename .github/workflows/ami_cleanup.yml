@@ -2,7 +2,11 @@
 name: Cloud Cleanup (AMI & EBS)
 
 on:
+  push:
+    branches:
+      - feature-11321-identifying-snapshots-to-be-deleted
   workflow_dispatch:
+
     inputs:
       application:
         description: 'Application folder name (e.g. cooker)'
@@ -336,13 +340,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build-matrix, fetch-secrets, preview]
     if: >
-      (github.event_name == 'push' && (
-        contains(github.event.head_commit.message, '[CLEANUP LIVE AMI]') ||
-        contains(github.event.head_commit.message, '[CLEANUP LIVE BOTH]')
-      )) ||
-      (github.event_name == 'workflow_dispatch' &&
-        (github.event.inputs.cleanup_type == 'ami' || github.event.inputs.cleanup_type == 'both') &&
-        fromJSON(github.event.inputs.confirm_delete) == true)
     environment: ${{ matrix.account_name }}
     strategy:
       matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
@@ -589,13 +586,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build-matrix, fetch-secrets, preview]
     if: >
-      (github.event_name == 'push' && (
-        contains(github.event.head_commit.message, '[CLEANUP LIVE EBS]') ||
-        contains(github.event.head_commit.message, '[CLEANUP LIVE BOTH]')
-      )) ||
-      (github.event_name == 'workflow_dispatch' &&
-        (github.event.inputs.cleanup_type == 'ebs' || github.event.inputs.cleanup_type == 'both') &&
-        fromJSON(github.event.inputs.confirm_delete) == true)
     environment: ${{ matrix.account_name }}
     strategy:
       matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
