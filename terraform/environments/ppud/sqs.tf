@@ -2,9 +2,9 @@
 # SQS Lambda Queues and Dead Letter Queues
 ##########################################
 
-# data "aws_sqs_queue" "lambda_dead_letter_queue" {
-#   name = "lambda_dead_letter_queue"
-# }
+data "aws_sqs_queue" "lambda_function_dead_letter_queue" {
+  name = "lambda_function_dead_letter_queue"
+}
 
 resource "aws_sqs_queue" "lambda_function_queue" {
   # checkov:skip=CKV_AWS_27: "SQS queue encryption is not required as no sensitive data is processed through it"

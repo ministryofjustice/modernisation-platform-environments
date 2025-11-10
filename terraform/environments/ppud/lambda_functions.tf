@@ -216,7 +216,7 @@ locals {
   }
 
   # Dead letter SQS queue
- # dlq_arn = data.aws_sqs_queue.lambda_dead_letter_queue.arn
+  dlq_arn = data.aws_sqs_queue.lambda_dead_letter_queue.arn
 
   # Lambda ARNs
   klayers_account_id = data.aws_ssm_parameter.klayers_account.value
@@ -249,10 +249,10 @@ resource "aws_lambda_function" "lambda_functions" {
   timeout                        = each.value.config.timeout
   reserved_concurrent_executions = local.lambda_defaults.reserved_concurrent_executions
   
-  # Lambda dead letter sqs queues
-  # dead_letter_config {
-  #   target_arn = local.dlq_arn
-  # }
+   # Lambda dead letter sqs queues
+   dead_letter_config {
+     target_arn = local.dlq_arn
+   }
 
   tracing_config {
     mode = local.lambda_defaults.tracing_mode
