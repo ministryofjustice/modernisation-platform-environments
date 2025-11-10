@@ -7,6 +7,6 @@ resource "aws_ssm_parameter" "cortex_account_id" {
   description    = "Account ID for Palo Alto Cortex XSIAM cross-account role."
   name           = "cortex_account_id"
   type           = "String"
-  insecure_value = "006742885340"
+  insecure_value = "Placeholder"
   tags           = local.tags
 }

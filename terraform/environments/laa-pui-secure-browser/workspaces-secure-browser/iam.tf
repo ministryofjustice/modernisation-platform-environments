@@ -15,12 +15,12 @@ module "cortex_xsiam_role" {
       actions = ["sts:AssumeRole"]
       principals = [{
         type        = "AWS"
-        identifiers = ["arn:aws:iam::${aws_ssm_parameter.cortex_account_id.insecure_value}:root"]
+        identifiers = ["arn:aws:iam::${aws_ssm_parameter.cortex_account_id[0].insecure_value}:root"]
       }]
       condition = [{
         test     = "StringEquals"
         variable = "sts:ExternalId"
-        values   = [sensitive(random_uuid.cortex[0].result)]
+        values   = [sensitive(random_uuid.cortex.result)]
       }]
     }
   }
