@@ -2,6 +2,39 @@
 # Lambda Layers and other dependencies for the functions
 ########################################################
 
+locals {
+  lambda_layers = {
+    matplotlib    = "matplotlib_layer.zip"
+    boto3         = "boto3_layer.zip"
+    pandas        = "pandas_layer.zip"
+    xlsxwriter    = "xlsxwriter_layer.zip"
+    requests      = "requests_layer.zip"
+    beautifulsoup = "beautifulsoup_layer.zip"
+  }
+
+  layer_env_buckets = {
+    dev  = aws_s3_bucket.moj-infrastructure-dev[0].id
+    uat  = aws_s3_bucket.moj-infrastructure-uat[0].id
+    prod = aws_s3_bucket.moj-infrastructure[0].id
+  }
+
+  current_env = local.is-development ? "dev" :
+                local.is-preproduction ? "uat" :
+                local.is-production ? "prod" : null
+
+  active_layers = local.current_env != null ? local.lambda_layers : {}
+}
+
+resource "aws_lambda_layer_version" "lambda_layers" {
+  for_each = local.active_layers
+
+  layer_name          = each.key
+  description         = "${each.key} layer for python 3.12"
+  s3_bucket           = local.layer_env_buckets[local.current_env]
+  s3_key              = "lambda/layers/${each.value}"
+  compatible_runtimes = ["python3.12"]
+}
+
 ############## Development Environment ##################
 
 # Lambda Layer for Matplotlib
