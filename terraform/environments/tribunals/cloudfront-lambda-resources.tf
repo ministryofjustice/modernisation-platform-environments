@@ -102,7 +102,7 @@ resource "aws_lambda_permission" "allow_http_cloudfront" {
   # Only set source_arn if distribution exists
   source_arn = (
     local.matching_distribution_id != null ?
-    "arn:aws:cloudfront::${data.aws_caller_identity.current.account_id}:distribution/${local.matching_distribution_id}" :
+    "arn:aws:cloudfront::${data.aws_caller_identity.current.account_id}:distribution/${local.cloudfront_distribution_id}" :
     null
   )
   qualifier     = aws_lambda_function.cloudfront_redirect_lambda.version

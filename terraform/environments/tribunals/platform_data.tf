@@ -174,6 +174,6 @@ data "http" "environments_file" {
   url = "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/${local.application_name}.json"
 }
 
-# Automatically populated by terraform with all distributions  in environment
-# Referenced in  platform_locals.tf
-data "aws_cloudfront_distributions" "all" {}
+data "aws_ssm_parameter" "cloudfront_distribution_id" {
+  name = "/${var.environment}/cloudfront-distribution-id"
+}

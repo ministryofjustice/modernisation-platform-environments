@@ -253,3 +253,9 @@ resource "aws_s3_bucket_lifecycle_configuration" "cf_redirect_lifecycle" {
     }
   }
 }
+
+resource "aws_ssm_parameter" "cloudfront_distribution_id" {
+  name  = "/${var.environment}/cloudfront-distribution-id"
+  type  = "String"
+  value = aws_cloudfront_distribution.redirect.id
+}
