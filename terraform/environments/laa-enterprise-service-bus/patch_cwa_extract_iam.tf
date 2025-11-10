@@ -53,13 +53,6 @@ resource "aws_iam_policy" "patch_cwa_extract_lambda_policy" {
         Resource = "arn:aws:s3:::${local.application_name_short}-${local.environment}-lambda-files/*"
       },
       {
-        Effect = "Allow",
-        Action = [
-          "s3:GetObject"
-        ],
-        Resource = "${aws_s3_bucket.wallet_files.arn}/*"
-      },
-      {
         Effect = "Allow"
         Action = [
           "secretsmanager:GetSecretValue"
