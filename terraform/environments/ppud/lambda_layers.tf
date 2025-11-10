@@ -1,4 +1,17 @@
 ########################################################
+# Data Sources for S3 Buckets
+########################################################
+
+data "aws_s3_bucket" "layer_buckets" {
+  for_each = {
+    development   = "moj-infrastructure-dev"
+    preproduction = "moj-infrastructure-uat"
+    production    = "moj-infrastructure"
+  }
+  bucket = each.value
+}
+
+########################################################
 # Lambda Layers and other dependencies for the functions
 ########################################################
 
@@ -13,9 +26,9 @@ locals {
   }
 
   layer_env_buckets = {
-    development    = aws_s3_bucket.moj-infrastructure-dev[0].id
-    preproduction  = aws_s3_bucket.moj-infrastructure-uat[0].id
-    production     = aws_s3_bucket.moj-infrastructure[0].id
+    development   = data.aws_s3_bucket.layer_buckets["development"].id
+    preproduction = data.aws_s3_bucket.layer_buckets["preproduction"].id
+    production    = data.aws_s3_bucket.layer_buckets["production"].id
   }
 
   current_env = local.environment
