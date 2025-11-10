@@ -129,13 +129,13 @@ resource "aws_lambda_permission" "waf_events_allow" {
 }
 
 
-# resource "aws_lambda_permission" "waf_events_block" {
-#   statement_id  = "AllowEvents2130-${local.environment}"
-#   action        = "lambda:InvokeFunction"
-#   function_name = aws_lambda_function.waf_toggle.arn
-#   principal     = "events.amazonaws.com"
-#   source_arn    = aws_cloudwatch_event_rule.waf_block_2130_uk.arn
-# }
+resource "aws_lambda_permission" "waf_events_block" {
+  statement_id  = "AllowEvents2130-${local.environment}"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.waf_toggle.arn
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.waf_block_2130_uk.arn
+}
 
 // Outputs
 output "waf_web_acl_name" {
