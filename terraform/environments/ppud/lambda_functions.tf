@@ -6,19 +6,19 @@ locals {
   # Lambda environment configurations
   lambda_environments = {
     development = {
-      condition    = local.is-development
-      s3_bucket    = "moj-infrastructure-dev"
-      account_key  = "ppud-development" # checkov:skip=CKV_SECRET_6: "Environment identifier, not a secret"
+      condition   = local.is-development
+      s3_bucket   = "moj-infrastructure-dev"
+      account_key = "ppud-development" # checkov:skip=CKV_SECRET_6: "Environment identifier, not a secret"
     }
     preproduction = {
-      condition    = local.is-preproduction
-      s3_bucket    = "moj-infrastructure-uat"
-      account_key  = "ppud-preproduction" # checkov:skip=CKV_SECRET_6: "Environment identifier, not a secret"
+      condition   = local.is-preproduction
+      s3_bucket   = "moj-infrastructure-uat"
+      account_key = "ppud-preproduction" # checkov:skip=CKV_SECRET_6: "Environment identifier, not a secret"
     }
     production = {
-      condition    = local.is-production
-      s3_bucket    = "moj-infrastructure"
-      account_key  = "ppud-production" # checkov:skip=CKV_SECRET_6: "Environment identifier, not a secret"
+      condition   = local.is-production
+      s3_bucket   = "moj-infrastructure"
+      account_key = "ppud-production" # checkov:skip=CKV_SECRET_6: "Environment identifier, not a secret"
     }
   }
 
@@ -62,14 +62,14 @@ locals {
     }
     */
     wam_waf_analysis = {
-      description = "Function to analyse WAM WAF ACL traffic and email a report."
-      handler     = "lambda_handler"
-      timeout     = 300
-      role_key    = "get_cloudwatch"
+      description  = "Function to analyse WAM WAF ACL traffic and email a report."
+      handler      = "lambda_handler"
+      timeout      = 300
+      role_key     = "get_cloudwatch"
       environments = ["development"]
-      layers = ["numpy", "pillow", "requests", "matplotlib"]
+      layers       = ["numpy", "pillow", "requests", "matplotlib"]
       permissions = [{
-        principal  = "cloudwatch.amazonaws.com"
+        principal         = "cloudwatch.amazonaws.com"
         source_arn_suffix = "*"
       }]
     }
@@ -132,6 +132,7 @@ locals {
         source_arn_suffix = "*"
       }]
     }
+    */
     ppud_elb_report = {
       description = "Function to retrieve, graph and email the utilisation of the PPUD ELB."
       handler     = "lambda_handler"
@@ -158,6 +159,7 @@ locals {
         source_arn_suffix = "*"
       }]
     }
+    /*
     disk_info_report = {
       description = "Function to retrieve, format and email a report on the disk utilisation of all Windows EC2 instances."
       handler     = "lambda_handler"
@@ -192,11 +194,11 @@ locals {
   lambda_instances = flatten([
     for func_name, func_config in local.lambda_functions : [
       for env in func_config.environments : {
-        key         = "${func_name}_${env}"
-        func_name   = func_name
-        env         = env
-        config      = func_config
-        env_config  = local.lambda_environments[env]
+        key        = "${func_name}_${env}"
+        func_name  = func_name
+        env        = env
+        config     = func_config
+        env_config = local.lambda_environments[env]
       } if local.lambda_environments[env].condition
     ]
   ])
@@ -209,15 +211,21 @@ locals {
   lambda_defaults = {
     runtime                        = "python3.12"
     reserved_concurrent_executions = 5
-    tracing_mode                  = "Active"
-    log_retention_days            = 30
+    tracing_mode                   = "Active"
+    log_retention_days             = 30
   }
 
-  # Layer ARNs (commented out until klayers data source exists)
-  # layer_arns = {
-  #   numpy      = "arn:aws:lambda:eu-west-2:KLAYERS_ACCOUNT_ID:layer:Klayers-p312-numpy:8"
-  #   pillow     = "arn:aws:lambda:eu-west-2:KLAYERS_ACCOUNT_ID:layer:Klayers-p312-pillow:1"
-  # }
+  # Dead letter SQS queue
+ # dlq_arn = data.aws_sqs_queue.lambda_dead_letter_queue.arn
+
+  # Lambda ARNs
+  klayers_account_id = data.aws_ssm_parameter.klayers_account.value
+
+  layer_arns = {
+    numpy  = "arn:aws:lambda:eu-west-2:${local.klayers_account_id}:layer:Klayers-p312-numpy:8"
+    pillow = "arn:aws:lambda:eu-west-2:${local.klayers_account_id}:layer:Klayers-p312-pillow:1"
+  }
+
 }
 
 #######################################################################
@@ -230,7 +238,7 @@ resource "aws_lambda_function" "lambda_functions" {
   # checkov:skip=CKV_AWS_116: "Dead Letter queues to be enabled later"
   # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
   # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing not required"
-  
+
   description                    = each.value.config.description
   s3_bucket                      = each.value.env_config.s3_bucket
   s3_key                         = "lambda/functions/${each.value.func_name}_${each.value.env}.zip"
@@ -241,10 +249,9 @@ resource "aws_lambda_function" "lambda_functions" {
   timeout                        = each.value.config.timeout
   reserved_concurrent_executions = local.lambda_defaults.reserved_concurrent_executions
   
-
-
+  # Lambda dead letter sqs queues
   # dead_letter_config {
-  #   target_arn = aws_sqs_queue.lambda_queue[each.value.env].arn
+  #   target_arn = local.dlq_arn
   # }
 
   tracing_config {
@@ -252,24 +259,26 @@ resource "aws_lambda_function" "lambda_functions" {
   }
 
   # Conditional layers
-  # layers = try(each.value.config.layers, null) != null ? [
-  #   for layer in each.value.config.layers : 
-  #   contains(["matplotlib", "requests", "beautifulsoup", "xlsxwriter"], layer) ? 
-  #     aws_lambda_layer_version.lambda_layer["${layer}_${each.value.env}"].arn :
-  #     "arn:aws:lambda:eu-west-2:${each.value.env_config.klayers_param}:layer:Klayers-p312-${layer}:${layer == "numpy" ? "8" : "1"}"
-  # ] : null
+  layers = try(each.value.config.layers, null) != null ? [
+    for layer in each.value.config.layers :
+    contains(keys(local.lambda_layers), layer) ?
+      aws_lambda_layer_version.lambda_layers[layer].arn :
+    contains(keys(local.layer_arns), layer) ?
+      local.layer_arns[layer] :
+    null
+  ] : null
 
   # Conditional memory size
   memory_size = try(each.value.config.memory_size, null)
 
   # Conditional VPC configuration
-  # dynamic "vpc_config" {
-  #   for_each = try(each.value.config.vpc_config[each.value.env], false) ? [1] : []
-  #   content {
-  #     subnet_ids         = [data.aws_subnet.private_subnets_b.id]
-  #     security_group_ids = [aws_security_group.PPUD-Mail-Server[0].id]
-  #   }
-  # }
+  dynamic "vpc_config" {
+    for_each = each.value.env == "production" ? [1] : []
+    content {
+      subnet_ids         = [data.aws_subnet.private_subnets_b.id]
+      security_group_ids = [aws_security_group.PPUD-Mail-Server[0].id]
+    }
+  }
 }
 
 #######################################################################
@@ -286,10 +295,10 @@ resource "aws_lambda_permission" "lambda_permissions" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.lambda_functions[each.key].function_name
   principal     = each.value.config.permissions[0].principal
-  
+
   source_arn = try(each.value.config.permissions[0].source_arn_resource, null) != null ? (
     "arn:aws:sns:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:${each.value.config.permissions[0].source_arn_resource}_${each.value.env}"
-  ) : (
+    ) : (
     "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:${each.value.config.permissions[0].source_arn_suffix}"
   )
 }
@@ -303,7 +312,7 @@ resource "aws_cloudwatch_log_group" "lambda_log_groups" {
 
   # checkov:skip=CKV_AWS_338: "Log group is only required for 30 days."
   # checkov:skip=CKV_AWS_158: "Log group does not require KMS encryption."
-  
+
   name              = "/aws/lambda/${each.value.func_name}_${each.value.env}"
   retention_in_days = local.lambda_defaults.log_retention_days
 }
