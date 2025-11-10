@@ -204,6 +204,8 @@ jobs:
           AMI_IDS="$(grep -Eo 'ami-[0-9a-f]+' ami_commands.sh | sort -u || true)"
           PREVIEW_DELETE_COUNT=0
           PREVIEW_PROTECTED_COUNT=0
+          PRINT_LIMIT=50
+          printed=0
 
           for AMI in $AMI_IDS; do
             NAME="$(aws ec2 describe-images --image-ids "$AMI" --query 'Images[0].Name' --output text 2>/dev/null || echo '')"
@@ -232,7 +234,41 @@ jobs:
             fi
 
             echo "${{ matrix.account_name }},eu-west-2,preview,ami,ami,${AMI},,${NAME},${WHEN},,${STATUS},${REASON}" >> reports/cleanup_report.csv
+
+            if (( printed < PRINT_LIMIT )); then
+              read -r ARCH VIRT ROOTDEV PUBLIC OWNERID <<< "$(aws ec2 describe-images --image-ids "$AMI" --query 'Images[0].[Architecture,VirtualizationType,RootDeviceName,Public,OwnerId]' --output text 2>/dev/null || echo "","","","","")"
+              # Age in minutes (best-effort)
+              age_min=""
+              if command -v date >/dev/null 2>&1 && [[ -n "$WHEN" ]]; then
+                now_epoch=$(date -u +%s)
+                when_epoch=$(date -u -d "$WHEN" +%s 2>/dev/null || echo "")
+                if [[ -n "$when_epoch" ]]; then
+                  age_min=$(( (now_epoch - when_epoch) / 60 ))
+                fi
+              fi
+              snaps_short="$(printf '%s\n' $SNAPS | head -n 3 | paste -sd',' -)"
+              snaps_count="$(printf '%s\n' $SNAPS | sed '/^$/d' | wc -l | tr -d ' ')"
+              echo "[DRY RUN][AMI] ${AMI}"
+              echo "  Name=\"${NAME}\""
+              echo "  Created=${WHEN}${age_min:+  Age≈${age_min}m}"
+              echo "  Owner=${OWNERID:-self}  Public=${PUBLIC:-false}  Arch=${ARCH:-?}  Virt=${VIRT:-?}  Root=${ROOTDEV:-?}"
+              if [[ -n "$SNAPS" ]]; then
+                echo "  Snapshots=[$(echo "${snaps_short}")] (count=${snaps_count})"
+              else
+                echo "  Snapshots=[] (count=0)"
+              fi
+              # Tag indicators
+              retain_flag="$(echo "$TAGS_JSON" | jq -r '[.[] | select((.Key|test("Retain|Backup";"i")) and (.Value|test("^(true|yes|1)$";"i")))] | length' 2>/dev/null || echo 0)"
+              echo "  Tags: Retain/Backup=${retain_flag}"
+              echo "  Decision=$([[ "$STATUS" == "Protected" ]] && echo SKIP || echo DELETE)  Reason=${REASON:-Policy(match && threshold)}"
+              printed=$((printed+1))
+            fi
           done
+
+          if (( printed < PREVIEW_DELETE_COUNT + PREVIEW_PROTECTED_COUNT )); then
+            remaining=$(( PREVIEW_DELETE_COUNT + PREVIEW_PROTECTED_COUNT - printed ))
+            echo "… (+${remaining} more AMIs; see artifacts for full details)"
+          fi
 
           echo "Account: ${{ matrix.account_name }} | Test window: ${AGE_MINUTES}m"
           echo "✅ Would delete: ${PREVIEW_DELETE_COUNT} | 🛡️ Protected: ${PREVIEW_PROTECTED_COUNT}"
@@ -246,7 +282,6 @@ jobs:
             echo "| To be deleted | ${PREVIEW_DELETE_COUNT} |"
             echo "| Protected | ${PREVIEW_PROTECTED_COUNT} |"
             echo ""
-            # Detailed lists from snapshot map (unique by AMI)
             echo "**AMI candidates (to be deleted)**"
             echo ""
             echo "| AMI ID | Name | Created |"
@@ -266,6 +301,8 @@ jobs:
             if [ "${protcount:-0}" -gt 20 ]; then echo ""; echo "_(+$((protcount-20)) more in artifact)_"; fi
             echo ""
             echo "- Reports: \`reports/ami_snapshot_map.csv\`, \`reports/protected_amis.csv\`, \`reports/cleanup_report.csv\`"
+            echo ""
+            echo "_Detailed per-AMI attributes are printed in the job log (first ${PRINT_LIMIT} items)._"
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload AMI Preview Artifacts
@@ -302,6 +339,9 @@ jobs:
           echo "Raw candidate output (first 20 lines):"
           printf "%s\n" "$CANDIDATES" | head -n 20 || true
 
+          PRINT_LIMIT=50
+          printed=0
+
           if [[ -n "$CANDIDATES" ]]; then
             echo "$CANDIDATES" | while read -r line; do
               VOL=$(sed -nE 's/.*(vol-[0-9a-f]+).*/\1/p' <<<"$line")
@@ -311,18 +351,48 @@ jobs:
               CREATED=$(aws ec2 describe-volumes --volume-ids "$VOL" --query 'Volumes[0].CreateTime' --output text 2>/dev/null || echo "")
               echo "$VOL,${AGE:-},${NAME:-},To be deleted" >> reports/ebs_cleanup_report.csv
               echo "${{ matrix.account_name }},eu-west-2,preview,ebs,volume,${VOL},,${NAME},${CREATED},${AGE},To be deleted," >> reports/cleanup_report.csv
+
+              if (( printed < PRINT_LIMIT )); then
+                read -r SIZE TYPE IOPS THRU AZ ENC KMS MULTI ATTINST ATTTIME <<< "$(aws ec2 describe-volumes --volume-ids "$VOL" --query 'Volumes[0].[Size,VolumeType,Iops,Throughput,AvailabilityZone,Encrypted,KmsKeyId,MultiAttachEnabled,Attachments[0].InstanceId,Attachments[0].AttachTime]' --output text 2>/dev/null || echo "","","","","","","","","","")"
+                kms_short=""
+                if [[ -n "$KMS" && "$KMS" != "None" ]]; then
+                  kms_short="${KMS##*/}"
+                fi
+                # Age in minutes (best-effort)
+                age_min=""
+                if command -v date >/dev/null 2>&1 && [[ -n "$CREATED" ]]; then
+                  now_epoch=$(date -u +%s)
+                  created_epoch=$(date -u -d "$CREATED" +%s 2>/dev/null || echo "")
+                  if [[ -n "$created_epoch" ]]; then
+                    age_min=$(( (now_epoch - created_epoch) / 60 ))
+                  fi
+                fi
+                last_attach="never"
+                [[ -n "$ATTINST" && "$ATTINST" != "None" ]] && last_attach="${ATTINST}@${ATTTIME}"
+                echo "[DRY RUN][EBS] ${VOL}"
+                echo "  Name=\"${NAME:-}\""
+                echo "  Size=${SIZE:-?}GiB  Type=${TYPE:-?}  IOPS=${IOPS:-?}  Thru=${THRU:-?}  AZ=${AZ:-?}"
+                echo "  Encrypted=${ENC:-?}  KMS=${kms_short:--}"
+                echo "  Created=${CREATED:-} ${age_min:+ Age≈${age_min}m}  LastAttachment=${last_attach}  MultiAttach=${MULTI:-false}"
+                echo "  Decision=DELETE  Reason=unattached && age>${AGE_MINUTES}m (test-mode)"
+                printed=$((printed+1))
+              fi
             done
           fi
 
-          COUNT="$(tail -n +2 reports/ebs_cleanup_report.csv | wc -l | tr -d ' ')"
-          echo "✅ Would delete EBS volumes: ${COUNT}"
+          total_count="$(tail -n +2 reports/ebs_cleanup_report.csv | wc -l | tr -d ' ')"
+          if (( printed < total_count )); then
+            echo "… (+$((total_count - printed)) more volumes; see artifacts for full details)"
+          fi
+
+          echo "✅ Would delete EBS volumes: ${total_count}"
 
           {
             echo "### 🧪 EBS Preview — ${{ matrix.account_name }}"
             echo ""
             echo "| Status | Count |"
             echo "|---|---:|"
-            echo "| To be deleted | ${COUNT} |"
+            echo "| To be deleted | ${total_count} |"
             echo ""
             echo "**Unattached volumes (to be deleted)**"
             echo ""
@@ -331,9 +401,11 @@ jobs:
             tail -n +2 reports/ebs_cleanup_report.csv | head -n 20 | while IFS=',' read -r id age name status; do
               echo "| ${id} | ${age} | ${name} |"
             done
-            if [ "${COUNT:-0}" -gt 20 ]; then echo ""; echo "_(+$((COUNT-20)) more in artifact)_"; fi
+            if [ "${total_count:-0}" -gt 20 ]; then echo ""; echo "_(+$((total_count-20)) more in artifact)_"; fi
             echo ""
             echo "- Report: \`reports/ebs_cleanup_report.csv\`, \`reports/cleanup_report.csv\`, \`reports/ebs_candidates_preview.log\`"
+            echo ""
+            echo "_Detailed per-volume attributes are printed in the job log (first 50 items)._"
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload EBS Preview Artifacts
@@ -620,7 +692,6 @@ jobs:
           echo "|---|---:|" >> "$GITHUB_STEP_SUMMARY"
           echo "| AMIs deleted | ${DEL} |" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
-          # Deleted AMIs (from snapshot map status = Deleted, unique by AMI)
           echo "**Deleted AMIs**" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "| AMI ID | Name | Created |" >> "$GITHUB_STEP_SUMMARY"
@@ -756,7 +827,7 @@ jobs:
           echo "**Deleted volumes**" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "| Volume ID | Age (months) | Name |" >> "$GITHUB_STEP_SUMMARY"
-          echo "|---|---:|---|" >> "$GITHUB_STEP_SUMMARY"
+          echo "|---|---:|---|"
           if [[ -f reports/ebs_cleanup_report.csv ]]; then
             tail -n +2 reports/ebs_cleanup_report.csv | head -n 20 | while IFS=',' read -r id age name status; do
               echo "| ${id} | ${age} | ${name} |" >> "$GITHUB_STEP_SUMMARY"
@@ -765,4 +836,3 @@ jobs:
           fi
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "- Report: \`reports/ebs_cleanup_report.csv\`" >> "$GITHUB_STEP_SUMMARY"
-    
