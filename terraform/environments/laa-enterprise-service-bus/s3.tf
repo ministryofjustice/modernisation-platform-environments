@@ -10,12 +10,7 @@ resource "aws_s3_bucket" "lambda_layer_dependencies" {
   )
 }
 
-resource "aws_s3_object" "lambda_layer_zip" {
-  bucket      = aws_s3_bucket.lambda_layer_dependencies.bucket
-  key         = "cwa_extract_lambda/lambda_dependencies.zip"
-  source      = "layers/lambda_dependencies.zip"
-  source_hash = filemd5("layers/lambda_dependencies.zip")
-}
+// Moved to lambda_layer.tf uploading into the lambda-files bucket under layers_files/
 
 # resource "aws_s3_object" "oracledb_lambda_layer_zip" {
 #   count       = local.environment == "test" ? 1 : 0

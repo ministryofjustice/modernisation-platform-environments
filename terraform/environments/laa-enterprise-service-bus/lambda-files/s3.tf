@@ -32,3 +32,28 @@ resource "aws_s3_bucket_versioning" "lambda_files" {
     status = "Enabled"
   }
 }
+
+#####################################################################################
+###### Placeholder prefix objects (console-visible 'folders') ######################
+#####################################################################################
+
+# Creating zero-byte objects with trailing slashes makes the prefixes appear as folders
+# in the S3 console. They are optional; actual usage of keys like lambda_files/xyz.zip
+# also implicitly creates the prefix. Remove if not needed.
+resource "aws_s3_object" "prefix_lambda_files" {
+  bucket  = aws_s3_bucket.lambda_files.id
+  key     = "lambda_files/"
+  content = ""
+}
+
+resource "aws_s3_object" "prefix_layers_files" {
+  bucket  = aws_s3_bucket.lambda_files.id
+  key     = "layers_files/"
+  content = ""
+}
+
+resource "aws_s3_object" "prefix_wallet_files" {
+  bucket  = aws_s3_bucket.lambda_files.id
+  key     = "wallet_files/"
+  content = ""
+}
