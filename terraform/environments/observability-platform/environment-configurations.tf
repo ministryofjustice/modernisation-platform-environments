@@ -340,8 +340,8 @@ locals {
           }
         },
         "data-engineering" = {
-            "identity_centre_team" = "data-engineering",
-            "aws_accounts" = {
+          "identity_centre_team" = "data-engineering",
+          "aws_accounts" = {
             "analytical-platform-data-engineering-sandboxa" = {
               cloudwatch_enabled              = true
               prometheus_push_enabled         = false
