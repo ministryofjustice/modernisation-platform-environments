@@ -11,7 +11,7 @@ locals {
   lb_log_prefix_ssogen_internal  = "ssogen-internal-lb"
 
 
-  lambda_folder_name = ["lambda_delivery", "ftp_lambda_layer", "layer_latest"]
+  lambda_folder_name = ["lambda_delivery", "ftp_lambda_layer", "payment_lambda_layer"]
   data_subnets = [
     data.aws_subnet.data_subnets_a.id,
     data.aws_subnet.data_subnets_b.id,
