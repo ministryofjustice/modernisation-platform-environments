@@ -66,11 +66,13 @@ resource "aws_iam_role_policy" "red_button_lambda_policy" {
 }
 
 resource "aws_lambda_function" "red_button_trigger" {
-  filename         = "./lambda/red_button_trigger.zip"
+  # filename         = "./lambda/red_button_trigger.zip"
+  s3_bucket        = aws_s3_bucket.ccms_ebs_shared.bucket
+  s3_key           = "lambda_delivery/red_button_trigger/red_button_trigger.zip"
   function_name    = "${local.application_name}-${local.environment}-red-button-trigger"
   role             = aws_iam_role.red_button_lambda_role.arn
   handler          = "lambda_function.lambda_handler"
-  source_code_hash = filebase64sha256("./lambda/red_button_trigger.zip")
+  source_code_hash = filebase64sha256("lambda_delivery/red_button_trigger/red_button_trigger.zip")
   runtime          = "python3.13"
   timeout          = 300
 
