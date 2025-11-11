@@ -106,6 +106,13 @@ locals {
                 "bedrock-claude-sonnet-4-5"
               ]
             }
+            fmd-poc = {
+              models = [
+                "azure-gpt-5",
+                "bedrock-claude-haiku-4-5",
+                "bedrock-claude-sonnet-4-5"
+              ]
+            }
             mlops-poc = {
               models = [
                 "bedrock-amazon-titan-embed-text-v2",
