@@ -20,6 +20,7 @@ main() {
       aws autoscaling complete-lifecycle-action --lifecycle-action-result "ABANDON" --instance-id "$instance_id" --lifecycle-hook-name "$name-ready-hook" --auto-scaling-group-name "$name" --region "$region" || true
     fi
   fi
+  
 }
 
 echo "post-ec2provision.sh start" | logger -p local3.info -t user-data

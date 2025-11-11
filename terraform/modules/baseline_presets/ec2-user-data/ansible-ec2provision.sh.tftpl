@@ -138,6 +138,7 @@ run_ansible() {
   rm -rf $ansible_dir/python-venv
   rm -rf $ansible_dir/modernisation-platform-configuration-management
   rmdir $ansible_dir
+  
 }
 
 echo "ansible-ec2provision.sh start" | logger -p local3.info -t user-data

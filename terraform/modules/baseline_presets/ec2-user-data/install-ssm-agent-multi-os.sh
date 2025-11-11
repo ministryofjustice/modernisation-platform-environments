@@ -22,21 +22,21 @@ install_ssm_agent_rhel() {
 
     # Install SSM Agent based on architecture and OS version
     if [[ "$ARCH" == "aarch64" ]]; then
-    # For ARM64 architecture
-    echo "Installing ARM64 version of the SSM Agent."
-    if [[ "$OS_VERSION" -eq 7 ]]; then
-        sudo yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_arm64/amazon-ssm-agent.rpm
+        # For ARM64 architecture
+        echo "Installing ARM64 version of the SSM Agent."
+        if [[ "$OS_VERSION" -eq 7 ]]; then
+            sudo yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_arm64/amazon-ssm-agent.rpm
+        else
+            sudo dnf install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_arm64/amazon-ssm-agent.rpm
+        fi
     else
-        sudo dnf install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_arm64/amazon-ssm-agent.rpm
-    fi
-    else
-    # For AMD64 architecture (including x86_64)
-    echo "Installing AMD64 version of the SSM Agent."
-    if [[ "$OS_VERSION" -eq 7 ]]; then
-        sudo yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
-    else
-        sudo dnf install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
-    fi
+        # For AMD64 architecture (including x86_64)
+        echo "Installing AMD64 version of the SSM Agent."
+        if [[ "$OS_VERSION" -eq 7 ]]; then
+            sudo yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
+        else
+            sudo dnf install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
+        fi
     fi
 }
 
