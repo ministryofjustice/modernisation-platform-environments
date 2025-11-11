@@ -24,10 +24,8 @@ locals {
 
   # Lambda function configurations
   lambda_functions = {
-    /*
     terminate_cpu_process = {
       description = "Function to terminate an application process due to high CPU utilisation on an EC2 instance."
-      handler     = "lambda_handler"
       timeout     = 300
       role_key    = "invoke_ssm"
       environments = ["development", "preproduction", "production"]
@@ -38,7 +36,6 @@ locals {
     }
     send_cpu_notification = {
       description = "Function to send an email notification when triggered by high CPU utilisation on an EC2 instance."
-      handler     = "lambda_handler"
       timeout     = 300
       role_key    = "invoke_ssm"
       environments = ["development", "preproduction", "production"]
@@ -49,7 +46,6 @@ locals {
     }
     send_cpu_graph = {
       description = "Function to retrieve, graph and email CPU utilisation on an EC2 instance."
-      handler     = "lambda_handler"
       timeout     = 300
       role_key    = "get_cloudwatch"
       environments = ["development", "production"]
@@ -60,10 +56,8 @@ locals {
         source_arn_suffix = "*"
       }]
     }
-    */
     wam_waf_analysis = {
       description  = "Function to analyse WAM WAF ACL traffic and email a report."
-      handler      = "lambda_handler"
       timeout      = 300
       role_key     = "get_cloudwatch"
       environments = ["development"]
@@ -73,10 +67,8 @@ locals {
         source_arn_suffix = "*"
       }]
     }
-    /*
     securityhub_report = {
       description = "Function to email a summary of critical CVEs found in AWS Security Hub."
-      handler     = "lambda_handler"
       timeout     = 300
       role_key    = "get_securityhub_data"
       environments = ["development", "preproduction", "production"]
@@ -88,7 +80,6 @@ locals {
     }
     ses_logging = {
       description = "Function to allow logging of outgoing emails via SES."
-      handler     = "lambda_handler"
       timeout     = 300
       role_key    = "get_ses_logging"
       environments = ["development", "preproduction"]
@@ -99,7 +90,6 @@ locals {
     }
     disable_cpu_alarm = {
       description = "Function to disable Cloudwatch CPU alerts."
-      handler     = "lambda_handler"
       timeout     = 300
       role_key    = "get_cloudwatch"
       environments = ["production"]
@@ -110,7 +100,6 @@ locals {
     }
     enable_cpu_alarm = {
       description = "Function to enable Cloudwatch CPU alerts."
-      handler     = "lambda_handler"
       timeout     = 300
       role_key    = "get_cloudwatch"
       environments = ["production"]
@@ -121,7 +110,6 @@ locals {
     }
     ppud_email_report = {
       description = "Function to analyse, graph and email the email usage on the smtp mail relays."
-      handler     = "lambda_handler"
       timeout     = 300
       role_key    = "get_cloudwatch"
       environments = ["production"]
@@ -132,10 +120,8 @@ locals {
         source_arn_suffix = "*"
       }]
     }
-    */
     ppud_elb_report = {
       description = "Function to retrieve, graph and email the utilisation of the PPUD ELB."
-      handler     = "lambda_handler"
       timeout     = 300
       role_key    = "get_cloudwatch"
       environments = ["production"]
@@ -148,7 +134,6 @@ locals {
     }
     wam_elb_report = {
       description = "Function to retrieve, graph and email the utilisation of the WAM ELB."
-      handler     = "lambda_handler"
       timeout     = 300
       role_key    = "get_cloudwatch"
       environments = ["production"]
@@ -159,10 +144,8 @@ locals {
         source_arn_suffix = "*"
       }]
     }
-    /*
     disk_info_report = {
       description = "Function to retrieve, format and email a report on the disk utilisation of all Windows EC2 instances."
-      handler     = "lambda_handler"
       timeout     = 300
       role_key    = "get_cloudwatch"
       environments = ["production"]
@@ -175,7 +158,6 @@ locals {
     }
     wam_web_traffic_analysis = {
       description = "Function to analyse IIS logs from S3, format the data and output a report in Excel to S3."
-      handler     = "lambda_handler"
       timeout     = 900
       memory_size = 1024
       role_key    = "get_cloudwatch"
@@ -187,7 +169,6 @@ locals {
         source_arn_suffix = "*"
       }]
     }
-    */
   }
 
   # Flatten lambda functions with environments
@@ -210,6 +191,7 @@ locals {
   # Common lambda configuration
   lambda_defaults = {
     runtime                        = "python3.12"
+    handler                        = "lambda_handler"
     reserved_concurrent_executions = 5
     tracing_mode                   = "Active"
     log_retention_days             = 30
@@ -229,7 +211,7 @@ locals {
 }
 
 #######################################################################
-# Lambda Functions
+# Lambda Function Resource Statement
 #######################################################################
 
 resource "aws_lambda_function" "lambda_functions" {
@@ -244,7 +226,7 @@ resource "aws_lambda_function" "lambda_functions" {
   s3_key                         = "lambda/functions/${each.value.func_name}_${each.value.env}.zip"
   function_name                  = "${each.value.func_name}_${each.value.env}"
   role                           = aws_iam_role.lambda_role_v2["${each.value.config.role_key}_${each.value.env}"].arn
-  handler                        = "${each.value.func_name}_${each.value.env}.${each.value.config.handler}"
+  handler                        = local.lambda_defaults.handler
   runtime                        = local.lambda_defaults.runtime
   timeout                        = each.value.config.timeout
   reserved_concurrent_executions = local.lambda_defaults.reserved_concurrent_executions
