@@ -6,11 +6,16 @@
 #   source = "lambda/layerV2.zip"
 # }
 
+data "aws_s3_object" "payment_lambda_layer_zip" {
+  bucket = aws_s3_bucket.ccms_ebs_shared.bucket
+  key    = "lambda_delivery/payment_lambda_layer/layerV2.zip"
+}
+
 # Lambda Layer
 resource "aws_lambda_layer_version" "lambda_layer" {
   layer_name               = "${local.application_name}-${local.environment}-payment-load-layer"
   s3_bucket                =  aws_s3_bucket.ccms_ebs_shared.bucket
-  s3_key                   = "lambda_delivery/payment_lambda_layer/layerV2.zip"
+  s3_key                   = data.aws_s3_object.payment_lambda_layer_zip.key
   compatible_runtimes      = ["python3.10"]
   compatible_architectures = ["x86_64"]
   description              = "Lambda Layer for ${local.application_name} Payment Load"
