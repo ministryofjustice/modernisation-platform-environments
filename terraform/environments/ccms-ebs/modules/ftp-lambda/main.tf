@@ -53,7 +53,9 @@ resource "aws_iam_policy" "ftp_policy" {
         Effect = "Allow",
         Resource = [
           "arn:aws:s3:::${var.ftp_bucket}",
-          "arn:aws:s3:::${var.ftp_bucket}/*"
+          "arn:aws:s3:::${var.ftp_bucket}/*",
+          "arn:aws:s3:::${var.s3_bucket_ftp}",
+          "arn:aws:s3:::${var.s3_bucket_ftp}/*"
         ]
       },
       {
@@ -96,7 +98,7 @@ resource "aws_lambda_function" "ftp_lambda" {
   memory_size   = var.lambda_memory # Sets memory defaults to 4gb
   layers        = [aws_lambda_layer_version.ftp_layer.arn]
 
-  s3_bucket = var.s3_bucket_ftp
+  s3_bucket = var.ftp_bucket
   s3_key    = var.s3_object_ftp_client
 
   ephemeral_storage {
