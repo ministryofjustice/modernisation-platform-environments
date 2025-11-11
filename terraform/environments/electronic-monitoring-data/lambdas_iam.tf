@@ -708,16 +708,16 @@ resource "aws_iam_role_policy_attachment" "load_dms_output_lambda_policy_attachm
   policy_arn = aws_iam_policy.load_dms_output_lambda_role_policy.arn
 }
 
-module "share_dbs_with_roles" {
-  source                  = "../lakeformation_database_share"
+module "share_dbs_with_dms_lambda_role" {
+  source                  = "./modules/lakeformation_database_share"
   dbs_to_grant            = toset(local.historic_source_dbs)
   data_bucket_lf_resource = var.data_bucket_lf_resource
   role_arn                = module.ap_database_sharing.iam_role.arn
   db_exists               = true
 }
 
-module "share_stg_db_with_roles" {
-  source                  = "../lakeformation_database_share"
+module "share_stg_dbs_with_dms_lambda_role" {
+  source                  = "./modules/lakeformation_database_share"
   dbs_to_grant            = toset([for db in local.historic_source_dbs : "${db}_staging"])
   data_bucket_lf_resource = var.data_bucket_lf_resource
   role_arn                = module.ap_database_sharing.iam_role.arn
