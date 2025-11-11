@@ -89,6 +89,25 @@ resource "aws_lambda_function" "red_button_trigger" {
 
 resource "aws_s3_bucket" "red_button_data" {
   bucket = "${local.application_name}-${local.environment}-red-button-data"
+  tags = merge(
+    {
+      Name        = "${local.application_name}-${local.environment}-red-button-data"
+      Environment = local.environment
+    },
+    {
+      "business-unit"          = "LAA",
+      "infrastructure-support" = "laa-role-sre@digital.justice.gov.uk",
+      "source-code"            = "https://github.com/ministryofjustice/modernisation-platform-environments"
+    }
+  )
+}
+
+resource "aws_s3_bucket_logging" "red_button_access_logging" {
+
+  bucket = aws_s3_bucket.red_button_data.id
+
+  target_bucket = local.logging_bucket_name
+  target_prefix = "s3-access-logs/${local.application_name}-${local.environment}-red-button-data/"
 }
 
 resource "aws_s3_bucket_public_access_block" "red_button_data" {
@@ -117,12 +136,48 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "red_button_data" 
   }
 }
 
-resource "aws_cloudwatch_log_group" "red_button_logs" {
-  name              = "/aws/lambda/${aws_lambda_function.red_button_trigger.function_name}"
-  retention_in_days = 14
-  tags = merge(local.tags, {
-    Name = "${local.application_name}-${local.environment}-red-button-trigger"
-  })
+# resource "aws_cloudwatch_log_group" "red_button_logs" {
+#   name              = "/aws/lambda/${aws_lambda_function.red_button_trigger.function_name}"
+#   retention_in_days = 14
+#   tags = merge(local.tags, {
+#     Name = "${local.application_name}-${local.environment}-red-button-trigger"
+#   })
+# }
+
+resource "aws_s3_bucket_lifecycle_configuration" "buckets_lifecycle" {
+
+  bucket = aws_s3_bucket.red_button_data.id
+
+  # One lifecycle rule per prefix
+  rule {
+    id = "expire-${aws_s3_bucket.red_button_data.id}-${local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_current
+    }}d"
+    status = "Enabled"
+
+
+    expiration {
+      days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_current
+    }
+
+    noncurrent_version_transition {
+      noncurrent_days = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_noncurrent_standard
+      storage_class   = "STANDARD_IA"
+    }
+
+    noncurrent_version_transition {
+      noncurrent_days = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_noncurrent_glacier
+      storage_class   = "GLACIER"
+    }
+    noncurrent_version_expiration {
+      noncurrent_days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_noncurrent
+    }
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = local.application_data.accounts[local.environment].s3_lifecycle_days_abort_incomplete_multipart_upload_days
+    }
+
+  }
+
 }
 
 # Outputs
