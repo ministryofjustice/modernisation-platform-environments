@@ -196,7 +196,7 @@ resource "aws_ebs_volume" "v1_unattached_old" {
   tags              = merge(local.common_tags, { Name = "cleanup-test-unattached-old" })
 }
 
-# Age gap to separate “old” (V1) from later resources (V2, V3, V4).
+# Age gap to separate “old” (V1) from later resources (V2, V3)
 resource "time_sleep" "three_min_gap_vol" {
   depends_on      = [aws_ebs_volume.v1_unattached_old]
   create_duration = "3m"
@@ -225,25 +225,4 @@ resource "aws_ebs_volume" "v3_unattached_new" {
   size              = 1
   type              = "gp3"
   tags              = merge(local.common_tags, { Name = "cleanup-test-unattached-new" })
-}
-
-# V4: Unattached OLD volume that we snapshot → creates a snapshot referenced
-# by an *unattached* volume. This lets the AMI/Snapshot fallback logic
-# demonstrate behavior with non-AMI snapshots too (although AMI-mapped
-# snapshots are the primary target of the fallback).
-resource "aws_ebs_volume" "v4_unattached_for_snapshot" {
-  availability_zone = var.az
-  size              = 1
-  type              = "gp3"
-  tags              = merge(local.common_tags, { Name = "cleanup-test-unattached-old-from-snapshot" })
-}
-
-# Snapshot created from V4. This snapshot is NOT from an AMI; it’s here
-# to make snapshot listings interesting during testing. The workflow’s snapshot
-# fallback focuses on AMI-mapped snapshots (from the AMI map). This one is
-# generally left alone unless you add specific cleanup for standalone snapshots.
-resource "aws_ebs_snapshot" "snap_v4" {
-  volume_id   = aws_ebs_volume.v4_unattached_for_snapshot.id
-  description = "cleanup-test snapshot"
-  tags        = merge(local.common_tags, { Name = "cleanup-test-snapshot" })
 }
