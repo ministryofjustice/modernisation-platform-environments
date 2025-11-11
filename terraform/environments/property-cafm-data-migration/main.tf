@@ -1,5 +1,5 @@
 module "csv_export" {
-  source = "github.com/ministryofjustice/terraform-csv-to-parquet-athena?ref=9e21355a103cce0fbe3089c3e71a5b8d47927374"
+  source = "github.com/ministryofjustice/terraform-csv-to-parquet-athena?ref=0e258f4b5554e7d67069ca5d88138948a4357e66"
   providers = {
     aws.bucket-replication = aws
   }
@@ -17,7 +17,7 @@ module "csv_export" {
 }
 
 module "rds_export" {
-  source = "github.com/ministryofjustice/terraform-rds-export?ref=d29a0bb55e940c728c6d05c66cdaeb76b8e8ca7e"
+  source = "github.com/ministryofjustice/terraform-rds-export?ref=e48992e9a69c95bd3ccf2b8affbbd8d7b53ddeb4"
   providers = {
     aws.bucket-replication = aws
   }
