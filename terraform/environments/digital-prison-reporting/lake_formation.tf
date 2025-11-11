@@ -7,6 +7,8 @@ locals {
   ))
 }
 
+
+
 resource "aws_lakeformation_data_lake_settings" "lake_formation" {
   admins = flatten([
     [for share in
