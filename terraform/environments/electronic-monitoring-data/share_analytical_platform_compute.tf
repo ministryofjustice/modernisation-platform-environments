@@ -35,6 +35,7 @@ locals {
     "capita_alcohol_monitoring",
     "capita_blob_storage",
     "g4s_cap_dw",
+    "g4s_atrium_unstructured",
     "g4s_emsys_mvp",
     "g4s_emsys_tpims",
     "scram_alcohol_monitoring",
