@@ -116,7 +116,7 @@ resource "aws_ami_copy" "a1_unreferenced_unused_old" {
 # so resources created BEFORE this sleep are “older” than those created AFTER.
 resource "time_sleep" "three_min_gap" {
   depends_on      = [aws_ami_copy.a1_unreferenced_unused_old]
-  create_duration = "0s"
+  create_duration = "3m"
 }
 
 # This AMI is *referenced in code* via locals.ami_name (see locals just below).
@@ -199,7 +199,7 @@ resource "aws_ebs_volume" "v1_unattached_old" {
 # Age gap to separate “old” (V1) from later resources (V2, V3)
 resource "time_sleep" "three_min_gap_vol" {
   depends_on      = [aws_ebs_volume.v1_unattached_old]
-  create_duration = "0s"
+  create_duration = "3m"
 }
 
 # V2: ATTACHED volume → Excluded by EBS cleaner.
