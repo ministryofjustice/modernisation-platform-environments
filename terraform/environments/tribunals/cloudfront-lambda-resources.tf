@@ -70,7 +70,7 @@ resource "aws_lambda_function" "cloudfront_redirect_lambda" {
   handler          = local.is-production ? "cloudfront-redirect.handler" : "cloudfront-redirect-nonprod.handler"
   role             = aws_iam_role.lambda_edge_role.arn
   runtime          = "nodejs20.x"
-  publish          = false
+  publish          = true
   timeout          = 5
   memory_size      = 128
 
