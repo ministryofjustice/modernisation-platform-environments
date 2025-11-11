@@ -69,10 +69,10 @@ resource "aws_s3_bucket_notification" "s3_bucket_workspacesweb_session_logs" {
   count  = local.create_resources ? 1 : 0
   bucket = module.s3_bucket_workspacesweb_session_logs[0].s3_bucket_id
   queue {
-    id            = module.sqs_s3_notifications[0].queue_name
+    id            = "workspaces-web-logs"
     queue_arn     = module.sqs_s3_notifications[0].queue_arn
     events        = ["s3:ObjectCreated:*"]
-    filter_prefix = "workspaces-web-logs/*"
+    filter_prefix = "workspaces-web-logs/"
   }
 }
 
