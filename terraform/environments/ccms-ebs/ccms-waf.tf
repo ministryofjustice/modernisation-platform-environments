@@ -83,7 +83,70 @@ resource "aws_wafv2_web_acl" "ebs_web_acl" {
     metric_name                = "ebs_waf_metrics"
     sampled_requests_enabled   = true
   }
+
+
+# New rule for custom response page
+  rule {
+    name     = "lambda-block-rule"
+    priority = 2
+    action {
+      block {
+        custom_response {
+          response_code              = 403
+          custom_response_body_key   = "CUSTOM_ERROR_PAGE"
+        }
+      }
+    }
+
+    statement {
+      managed_rule_group_statement {
+        name        = "AWSManagedRulesCommonRuleSet"
+        vendor_name = "AWS"
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "lambdaBlockRule"
+      sampled_requests_enabled   = true
+    }
+  }
+  custom_response_body {
+    content_type = "TEXT_HTML"
+    key = "CUSTOM_ERROR_PAGE"
+    content      = <<EOF
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><title>Maintenance</title>
+<style>body{font-family:sans-serif;background:#0b1a2b;color:#fff;text-align:center;padding:4rem;}
+.card{max-width:600px;margin:auto;background:#12243a;padding:2rem;border-radius:10px;}
+.card{max-width:600px;margin:auto;background:#12243a;padding:2rem;border-radius:10px;}
+</style></head><body><div class="card">
+<h1>Scheduled Maintenance</h1>
+<p>The service is unavailable from 21:30 to 07:00 UK time. Apologies for any inconvenience caused.</p>
+</div></body></html>
+EOF
+  }
 }
+
+
+# resource "aws_wafv2_web_acl_custom_response_body" "waf_block_custom_error_page" {
+#   name         = "CUSTOM_ERROR_PAGE"
+#   resource_arn = aws_wafv2_web_acl.ebs_web_acl.arn
+
+#   custom_response_body {
+#     content_type = "TEXT_HTML"
+#     content      = <<EOF
+# <!doctype html><html lang="en"><head>
+# <meta charset="utf-8"><title>Maintenance</title>
+# <style>body{font-family:sans-serif;background:#0b1a2b;color:#fff;text-align:center;padding:4rem;}
+# .card{max-width:600px;margin:auto;background:#12243a;padding:2rem;border-radius:10px;}
+# </style></head><body><div class="card">
+# <h1>Scheduled Maintenance</h1>
+# <p>The service is unavailable from 21:30 to 07:00 UK time. Apologies for any inconvenience caused.</p>
+# </div></body></html>
+# EOF
+#   }
+# }
 
 resource "aws_cloudwatch_log_group" "ebs_waf_logs" {
   name              = "aws-waf-logs-ebs/ebs-waf-logs"
