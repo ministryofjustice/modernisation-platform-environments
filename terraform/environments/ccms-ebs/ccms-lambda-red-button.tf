@@ -144,7 +144,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "red_button_data" 
 #   })
 # }
 
-resource "aws_s3_bucket_lifecycle_configuration" "buckets_lifecycle" {
+resource "aws_s3_bucket_lifecycle_configuration" "red_button_data_lifecycle" {
 
   bucket = aws_s3_bucket.red_button_data.id
 
