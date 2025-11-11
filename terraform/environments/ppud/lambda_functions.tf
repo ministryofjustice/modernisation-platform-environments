@@ -239,7 +239,6 @@ locals {
   # Common lambda configuration
   lambda_defaults = {
     runtime                        = "python3.12"
-    handler                        = "lambda_handler"
     timeout                        = 300
     reserved_concurrent_executions = 5
     tracing_mode                   = "Active"
@@ -275,7 +274,7 @@ resource "aws_lambda_function" "lambda_functions" {
   s3_key                         = "lambda/functions/${each.value.func_name}_${each.value.env}.zip"
   function_name                  = "${each.value.func_name}_${each.value.env}"
   role                           = aws_iam_role.lambda_role_v2["${each.value.config.role_key}_${each.value.env}"].arn
-  handler                        = local.lambda_defaults.handler
+  handler                        = "${each.value.func_name}.lambda_handler"
   runtime                        = local.lambda_defaults.runtime
   timeout                        = try(each.value.config.timeout, local.lambda_defaults.timeout)
   reserved_concurrent_executions = local.lambda_defaults.reserved_concurrent_executions
