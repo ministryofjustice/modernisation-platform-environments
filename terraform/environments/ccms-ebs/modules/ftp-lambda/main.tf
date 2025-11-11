@@ -55,7 +55,9 @@ resource "aws_iam_policy" "ftp_policy" {
           "arn:aws:s3:::${var.ftp_bucket}",
           "arn:aws:s3:::${var.ftp_bucket}/*",
           "arn:aws:s3:::${var.s3_bucket_ftp}",
-          "arn:aws:s3:::${var.s3_bucket_ftp}/*"
+          "arn:aws:s3:::${var.s3_bucket_ftp}/*",
+          "arn:aws:s3:::${var.s3_bucket_layer_ftp}",
+          "arn:aws:s3:::${var.s3_bucket_layer_ftp}/*"
         ]
       },
       {
@@ -83,7 +85,7 @@ resource "aws_iam_role_policy_attachment" "ftp_lambda_policy_attach" {
 resource "aws_lambda_layer_version" "ftp_layer" {
   layer_name               = "ftpclientlayer"
   compatible_runtimes      = ["python3.13"]
-  s3_bucket                = var.s3_bucket_ftp
+  s3_bucket                = var.s3_bucket_layer_ftp
   s3_key                   = var.s3_object_ftp_clientlibs
   compatible_architectures = ["x86_64"]
   description              = "Lambda Layer for ccms ebs ftp lambda contains pycurl and other dependencies"
@@ -98,7 +100,7 @@ resource "aws_lambda_function" "ftp_lambda" {
   memory_size   = var.lambda_memory # Sets memory defaults to 4gb
   layers        = [aws_lambda_layer_version.ftp_layer.arn]
 
-  s3_bucket = var.ftp_bucket
+  s3_bucket = var.s3_bucket_ftp
   s3_key    = var.s3_object_ftp_client
 
   ephemeral_storage {
