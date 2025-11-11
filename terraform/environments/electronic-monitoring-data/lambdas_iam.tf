@@ -698,7 +698,7 @@ resource "aws_iam_role" "load_dms_output" {
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
 }
 
-resource "aws_iam_policy" load_dms_output_lambda_role_policy" {
+resource "aws_iam_policy" "load_dms_output_lambda_role_policy" {
   name   = "load_dms_output_lambda_policy"
   policy = data.aws_iam_policy_document.load_dms_output_lambda_role_policy_document.json
 }
