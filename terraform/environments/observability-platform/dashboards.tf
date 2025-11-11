@@ -25,4 +25,8 @@ resource "grafana_dashboard" "all" {
 # Set the OP Landing Page as the default home dashboard for the organization
 resource "grafana_organization_preferences" "org" {
   home_dashboard_uid = grafana_dashboard.all["op-landing-page.json"].dashboard_id
+
+  depends_on = [
+    grafana_dashboard.all
+  ]
 }
