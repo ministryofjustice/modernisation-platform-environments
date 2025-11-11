@@ -89,18 +89,18 @@ resource "aws_lambda_function" "red_button_trigger" {
 
 resource "aws_s3_bucket" "red_button_data" {
   bucket = "${local.application_name}-${local.environment}-red-button-data"
-  tags = merge(
-    {
-      Name        = "${local.application_name}-${local.environment}-red-button-data"
-      Environment = local.environment
-    },
-    {
-      "business-unit"          = "LAA",
-      "infrastructure-support" = "laa-role-sre@digital.justice.gov.uk",
-      "source-code"            = "https://github.com/ministryofjustice/modernisation-platform-environments"
-    }
-  )
-}
+#   tags = merge(
+#     {
+#       Name        = "${local.application_name}-${local.environment}-red-button-data"
+#       Environment = local.environment
+#     },
+#     {
+#       "business-unit"          = "LAA",
+#       "infrastructure-support" = "laa-role-sre@digital.justice.gov.uk",
+#       "source-code"            = "https://github.com/ministryofjustice/modernisation-platform-environments"
+#     }
+#   )
+# }
 
 resource "aws_s3_bucket_logging" "red_button_access_logging" {
 
@@ -136,13 +136,13 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "red_button_data" 
   }
 }
 
-# resource "aws_cloudwatch_log_group" "red_button_logs" {
-#   name              = "/aws/lambda/${aws_lambda_function.red_button_trigger.function_name}"
-#   retention_in_days = 14
-#   tags = merge(local.tags, {
-#     Name = "${local.application_name}-${local.environment}-red-button-trigger"
-#   })
-# }
+resource "aws_cloudwatch_log_group" "red_button_logs" {
+  name              = "/aws/lambda/${aws_lambda_function.red_button_trigger.function_name}"
+  retention_in_days = 14
+  tags = merge(local.tags, {
+    Name = "${local.application_name}-${local.environment}-red-button-trigger"
+  })
+}
 
 resource "aws_s3_bucket_lifecycle_configuration" "red_button_data_lifecycle" {
 
@@ -151,7 +151,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "red_button_data_lifecycle" {
   # One lifecycle rule per prefix
   rule {
     id = "expire-${aws_s3_bucket.red_button_data.id}-${local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_current
-    }}d"
+    }d"
     status = "Enabled"
 
 
