@@ -27,7 +27,7 @@ env:
   AMI_ARGS:      "-c -m 3"    # keep month-based AMI threshold (3)
   EBS_MONTHS:    "1"          # keep month-based EBS threshold (1)
   AGE_MINUTES:   "3"          # preview-only minute window
-  LIVE_TEST_MODE: "false"     # live uses month gates (as before)
+  LIVE_TEST_MODE: "true"     # live uses month gates (as before)
 
 jobs:
   build-matrix:
