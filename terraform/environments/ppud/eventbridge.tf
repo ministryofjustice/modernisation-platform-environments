@@ -178,7 +178,7 @@ locals {
         local.is-production ? aws_lambda_function.terraform_lambda_func_securityhub_report_prod[0].arn : null
       )
     )
-    send_cpu_graph                 = local.is-production ? aws_lambda_function.terraform_lambda_func_send_cpu_graph_prod[0].arn : null
+    send_cpu_graph                 = local.is-production ? aws_lambda_function.lambda_functions["send_cpu_graph_production"].arn : null
     disable_cpu_alarms             = local.is-production ? aws_lambda_function.terraform_lambda_disable_cpu_alarm_prod[0].arn : null
     enable_cpu_alarms              = local.is-production ? aws_lambda_function.terraform_lambda_enable_cpu_alarm_prod[0].arn : null
     disk_info_report               = local.is-production ? aws_lambda_function.terraform_lambda_func_disk_info_report_prod[0].arn : null
@@ -188,8 +188,8 @@ locals {
     ppud_elb_get_uptime_data       = local.is-production ? aws_lambda_function.terraform_lambda_func_ppud_elb_uptime_data_prod[0].arn : null
     ppud_elb_calculate_uptime_data = local.is-production ? aws_lambda_function.terraform_lambda_func_ppud_elb_uptime_calculate_prod[0].arn : null
     wam_web_traffic_analysis       = local.is-production ? aws_lambda_function.terraform_lambda_func_wam_web_traffic_analysis_prod[0].arn : null
-    ppud_elb_daily_trt_graph       = local.is-production ? aws_lambda_function.terraform_lambda_func_ppud_elb_trt_graph_prod[0].arn : null
-    wam_elb_daily_trt_graph        = local.is-production ? aws_lambda_function.terraform_lambda_func_wam_elb_trt_graph_prod[0].arn : null
+    ppud_elb_daily_trt_graph       = local.is-production ? aws_lambda_function.lambda_functions["ppud_elb_graph_trt_data_production"].arn : null
+    wam_elb_daily_trt_graph        = local.is-production ? aws_lambda_function.lambda_functions["wam_elb_graph_trt_data_production"].arn : null
     #   ppud_elb_daily_connections_graph = local.is-production ? aws_lambda_function.terraform_lambda_func_ppud_elb_report_prod[0].arn : null
     #   wam_elb_daily_connections_graph = local.is-production ? aws_lambda_function.terraform_lambda_func_wam_elb_report_prod[0].arn : null
   }
