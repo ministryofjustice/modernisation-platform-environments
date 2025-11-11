@@ -14,8 +14,6 @@ resource "aws_lambda_layer_version" "lambda_layer" {
   compatible_runtimes      = ["python3.10"]
   compatible_architectures = ["x86_64"]
   description              = "Lambda Layer for ${local.application_name} Payment Load"
-
-  depends_on = [aws_s3_object.lambda_layer_s3]
 }
 
 # SG for Lambda
