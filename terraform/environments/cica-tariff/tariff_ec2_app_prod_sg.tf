@@ -206,26 +206,26 @@ module "tariff_app_prod_security_group" {
 
   ingress_with_source_security_group_id = [
     {
-      rule = "nfs-tcp"
+      rule                     = "nfs-tcp"
       source_security_group_id = aws_security_group.tariff_db_prod_security_group[0].id
       description              = "Allow NFS 2049tcp ingress from DB tier for spp_draft_letters mount"
     },
     {
-      from_port = 111
-      to_port   = 111
-      protocol  = "tcp"
+      from_port                = 111
+      to_port                  = 111
+      protocol                 = "tcp"
       source_security_group_id = aws_security_group.tariff_db_prod_security_group[0].id
       description              = "Allow  NFS 111tcp ingress from DB tier for spp_draft_letters mount"
     },
     {
-      rule = "nfs-tcp"
+      rule                     = "nfs-tcp"
       source_security_group_id = module.tariff_db_prod_security_group[0].security_group_id
       description              = "Allow NFS 2049tcp ingress from DB tier for spp_draft_letters mount"
     },
     {
-      from_port = 111
-      to_port   = 111
-      protocol  = "tcp"
+      from_port                = 111
+      to_port                  = 111
+      protocol                 = "tcp"
       source_security_group_id = module.tariff_db_prod_security_group[0].security_group_id
       description              = "Allow  NFS 111tcp ingress from DB tier for spp_draft_letters mount"
     }
