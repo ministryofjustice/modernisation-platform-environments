@@ -337,8 +337,9 @@ locals {
               xray_enabled                    = false
               athena_enabled                  = false
             }
-          },
-          "data-engineering" = {
+          }
+        },
+        "data-engineering" = {
             "identity_centre_team" = "data-engineering",
             "aws_accounts" = {
             "analytical-platform-data-engineering-sandboxa" = {
