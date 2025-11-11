@@ -23,7 +23,7 @@ resource "aws_instance" "oem_app" {
     env_fqdn = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
     hostname = "laa-oem-app"
   }))
-  vpc_security_group_ids = [aws_security_group.oem_app_security_group_1.id, aws_security_group.oem_app_security_group_2.id]
+  vpc_security_group_ids = [aws_security_group.oem_app_security_group.id]
 
   root_block_device {
     delete_on_termination = true
