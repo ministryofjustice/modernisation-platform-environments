@@ -100,7 +100,7 @@ resource "aws_security_group" "cleanup_test_sg" {
 # ----- AMIs you own (copies) -----
 
 # a1_unreferenced_unused_old
-# Expected: DELETE when the workflow runs (eligible candidate)
+# Expected: DELETE when the workflow runs
 # Why: Owned, old enough (see the sleep below), not in use, not referenced in code,
 #      not protected by “AwsBackup” name or retention tags.
 resource "aws_ami_copy" "a1_unreferenced_unused_old" {
@@ -116,7 +116,7 @@ resource "aws_ami_copy" "a1_unreferenced_unused_old" {
 # so resources created BEFORE this sleep are “older” than those created AFTER.
 resource "time_sleep" "three_min_gap" {
   depends_on      = [aws_ami_copy.a1_unreferenced_unused_old]
-  create_duration = "3m"
+  create_duration = "0s"
 }
 
 # This AMI is *referenced in code* via locals.ami_name (see locals just below).
@@ -126,7 +126,7 @@ locals {
   ami_name = "cleanup-test-ref-unused-old"
 }
 
-# a2_referenced_unused_old
+# a2_referenced_unused_old (Its not launched or attached)
 # Expected: KEEP (excluded when -c is passed to the cleaner)
 # Why: The name is referenced in code (locals.ami_name), so -c filters it out.
 resource "aws_ami_copy" "a2_referenced_unused_old" {
@@ -199,7 +199,7 @@ resource "aws_ebs_volume" "v1_unattached_old" {
 # Age gap to separate “old” (V1) from later resources (V2, V3)
 resource "time_sleep" "three_min_gap_vol" {
   depends_on      = [aws_ebs_volume.v1_unattached_old]
-  create_duration = "3m"
+  create_duration = "0s"
 }
 
 # V2: ATTACHED volume → Excluded by EBS cleaner.
