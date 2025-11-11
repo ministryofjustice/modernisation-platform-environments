@@ -1,11 +1,12 @@
 module "sqs_s3_notifications" {
-  count = local.create_resources ? 1 : 0
-
   source = "terraform-aws-modules/sqs/aws"
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
-  version             = "5.1.0"
+  version = "5.1.0"
+
+  count               = local.create_resources ? 1 : 0
   create_queue_policy = true
   name                = local.component_name
+
   queue_policy_statements = {
     s3 = {
       sid     = "AllowS3SendMessage"
@@ -13,7 +14,7 @@ module "sqs_s3_notifications" {
       principals = [
         { type = "Service", identifiers = ["s3.amazonaws.com"] }
       ]
-      conditions = [
+      condition = [
         {
           test     = "ArnLike"
           variable = "aws:SourceArn"
@@ -27,5 +28,4 @@ module "sqs_s3_notifications" {
       ]
     }
   }
-
 }
