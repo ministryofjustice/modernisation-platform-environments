@@ -26,7 +26,6 @@ locals {
   lambda_functions = {
     terminate_cpu_process = {
       description = "Function to terminate an application process due to high CPU utilisation on an EC2 instance."
-      timeout     = 300
       role_key    = "invoke_ssm"
       environments = ["development", "preproduction", "production"]
       permissions = [{
@@ -36,7 +35,6 @@ locals {
     }
     send_cpu_notification = {
       description = "Function to send an email notification when triggered by high CPU utilisation on an EC2 instance."
-      timeout     = 300
       role_key    = "invoke_ssm"
       environments = ["development", "preproduction", "production"]
       permissions = [{
@@ -46,7 +44,6 @@ locals {
     }
     send_cpu_graph = {
       description = "Function to retrieve, graph and email CPU utilisation on an EC2 instance."
-      timeout     = 300
       role_key    = "get_cloudwatch"
       environments = ["development", "production"]
       layers = ["numpy", "pillow", "matplotlib"]
@@ -58,7 +55,6 @@ locals {
     }
     wam_waf_analysis = {
       description  = "Function to analyse WAM WAF ACL traffic and email a report."
-      timeout      = 300
       role_key     = "get_cloudwatch"
       environments = ["development"]
       layers       = ["numpy", "pillow", "requests", "matplotlib"]
@@ -69,7 +65,6 @@ locals {
     }
     securityhub_report = {
       description = "Function to email a summary of critical CVEs found in AWS Security Hub."
-      timeout     = 300
       role_key    = "get_securityhub_data"
       environments = ["development", "preproduction", "production"]
       vpc_config = { production = true }
@@ -80,7 +75,6 @@ locals {
     }
     ses_logging = {
       description = "Function to allow logging of outgoing emails via SES."
-      timeout     = 300
       role_key    = "get_ses_logging"
       environments = ["development", "preproduction"]
       permissions = [{
@@ -90,7 +84,6 @@ locals {
     }
     disable_cpu_alarm = {
       description = "Function to disable Cloudwatch CPU alerts."
-      timeout     = 300
       role_key    = "get_cloudwatch"
       environments = ["production"]
       permissions = [{
@@ -100,7 +93,6 @@ locals {
     }
     enable_cpu_alarm = {
       description = "Function to enable Cloudwatch CPU alerts."
-      timeout     = 300
       role_key    = "get_cloudwatch"
       environments = ["production"]
       permissions = [{
@@ -110,7 +102,6 @@ locals {
     }
     ppud_email_report = {
       description = "Function to analyse, graph and email the email usage on the smtp mail relays."
-      timeout     = 300
       role_key    = "get_cloudwatch"
       environments = ["production"]
       layers = ["numpy", "pillow", "matplotlib"]
@@ -120,9 +111,8 @@ locals {
         source_arn_suffix = "*"
       }]
     }
-    ppud_elb_report = {
+    ppud_elb_count_report = {
       description = "Function to retrieve, graph and email the utilisation of the PPUD ELB."
-      timeout     = 300
       role_key    = "get_cloudwatch"
       environments = ["production"]
       layers = ["numpy", "pillow", "matplotlib"]
@@ -132,12 +122,71 @@ locals {
         source_arn_suffix = "*"
       }]
     }
-    wam_elb_report = {
+    wam_elb_count_report = {
       description = "Function to retrieve, graph and email the utilisation of the WAM ELB."
-      timeout     = 300
       role_key    = "get_cloudwatch"
       environments = ["production"]
       layers = ["numpy", "pillow", "matplotlib"]
+      vpc_config = { production = true }
+      permissions = [{
+        principal  = "cloudwatch.amazonaws.com"
+        source_arn_suffix = "*"
+      }]
+    }
+    ppud_elb_get_trt_data = {
+      description = "Function to retrieve PPUD ELB target response time data from Cloudwatch and send it to S3."
+      role_key    = "get_elb_metrics"
+      environments = ["production"]
+      vpc_config = { production = true }
+      permissions = [{
+        principal  = "cloudwatch.amazonaws.com"
+        source_arn_suffix = "*"
+      }]
+    }
+    ppud_elb_calculate_trt_data = {
+      description = "Function to retrieve PPUD ELB target response time data from S3, calculate the monthly average target response time and email a report to end users."
+      role_key    = "get_elb_metrics"
+      environments = ["production"]
+      vpc_config = { production = true }
+      permissions = [{
+        principal  = "cloudwatch.amazonaws.com"
+        source_arn_suffix = "*"
+      }]
+    }
+    ppud_elb_graph_trt_data = {
+      description = "Function to retrieve PPUD ELB daily target response time data from Cloudwatch, graph it and email it to end users."
+      role_key    = "get_cloudwatch"
+      environments = ["production"]
+      vpc_config = { production = true }
+      permissions = [{
+        principal  = "cloudwatch.amazonaws.com"
+        source_arn_suffix = "*"
+      }]
+    }
+    wam_elb_graph_trt_data = {
+      description = "Function to retrieve WAM ELB daily target response time data from Cloudwatch, graph it and email it to end users."
+      role_key    = "get_cloudwatch"
+      environments = ["production"]
+      vpc_config = { production = true }
+      permissions = [{
+        principal  = "cloudwatch.amazonaws.com"
+        source_arn_suffix = "*"
+      }]
+    }
+    ppud_elb_get_uptime_data = {
+      description = "Function to retrieve PPUD ELB uptime data from Cloudwatch and send it to S3."
+      role_key    = "get_elb_metrics"
+      environments = ["production"]
+      vpc_config = { production = true }
+      permissions = [{
+        principal  = "cloudwatch.amazonaws.com"
+        source_arn_suffix = "*"
+      }]
+    }
+    ppud_elb_calculate_uptime_data = {
+      description = "Function to retrieve PPUD ELB uptime data from S3, calculate the monthly average uptime and email a report to end users."
+      role_key    = "get_elb_metrics"
+      environments = ["production"]
       vpc_config = { production = true }
       permissions = [{
         principal  = "cloudwatch.amazonaws.com"
@@ -146,7 +195,6 @@ locals {
     }
     disk_info_report = {
       description = "Function to retrieve, format and email a report on the disk utilisation of all Windows EC2 instances."
-      timeout     = 300
       role_key    = "get_cloudwatch"
       environments = ["production"]
       layers = ["numpy", "pillow", "matplotlib"]
@@ -192,6 +240,7 @@ locals {
   lambda_defaults = {
     runtime                        = "python3.12"
     handler                        = "lambda_handler"
+    timeout                        = 300
     reserved_concurrent_executions = 5
     tracing_mode                   = "Active"
     log_retention_days             = 30
@@ -228,8 +277,9 @@ resource "aws_lambda_function" "lambda_functions" {
   role                           = aws_iam_role.lambda_role_v2["${each.value.config.role_key}_${each.value.env}"].arn
   handler                        = local.lambda_defaults.handler
   runtime                        = local.lambda_defaults.runtime
-  timeout                        = each.value.config.timeout
+  timeout                        = try(each.value.config.timeout, local.lambda_defaults.timeout)
   reserved_concurrent_executions = local.lambda_defaults.reserved_concurrent_executions
+  memory_size                    = try(each.value.config.memory_size, null)
   
    # Lambda dead letter sqs queues
    dead_letter_config {
@@ -249,9 +299,6 @@ resource "aws_lambda_function" "lambda_functions" {
       local.layer_arns[layer] :
     null
   ] : null
-
-  # Conditional memory size
-  memory_size = try(each.value.config.memory_size, null)
 
   # Conditional VPC configuration
   dynamic "vpc_config" {

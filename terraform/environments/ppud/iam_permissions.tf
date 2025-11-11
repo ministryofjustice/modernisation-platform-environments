@@ -69,6 +69,18 @@ locals {
         "put_data_s3"
       ]
     }
+    get_elb_metrics = {
+      description = "Lambda Function Role for retrieving ELB metrics from S3"
+      policies = [
+        "send_message_to_sqs",
+        "send_logs_to_cloudwatch",
+        "get_cloudwatch_metrics"
+      ]
+      prod_policies = [
+        "get_elb_metrics"
+      ]
+      managed_policies = ["arn:aws:iam::aws:policy/CloudWatchFullAccessV2"]
+    }
   }
 
   # Environment configurations
