@@ -62,7 +62,14 @@ locals {
   # "ahmlr.gov.uk" is listed as the primary domain of the viewer certificate for this cloudfront-nginx distribution
   #
   cloudfront_nginx_sans = [
+    "ahmlr.gov.uk",
     "asylum-support-tribunal.gov.uk"
+  ]
+
+  # This array should match the cloudfront_nginx_sans one above, but with  dev. prefix for each one
+  cloudfront_nginx_nonprod_sans = [
+    "dev.ahmlr.gov.uk",
+    "dev.asylum-support-tribunal.gov.uk"
   ]
 
   pending_cloudfront_nginx_sans = [
@@ -94,10 +101,6 @@ locals {
     "yjbpublications.justice.gov.uk"
   ]
 
-  # This array should match the cloudfront_nginx_sans one above, but with  dev. prefix for each one
-  cloudfront_nginx_nonprod_sans = [
-    "dev.asylum-support-tribunal.gov.uk"
-  ]
 
   cloudfront_distribution_id = var.lookup_cloudfront_distribution ? data.aws_ssm_parameter.cloudfront_distribution_id[0].value : null
 

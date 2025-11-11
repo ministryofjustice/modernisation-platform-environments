@@ -61,7 +61,8 @@ resource "aws_cloudfront_distribution" "tribunals_http_redirect" {
     prefix          = "cloudfront-redirect-logs-v2/"
   }
 
-  aliases = aws_acm_certificate.http_cloudfront_nginx.subject_alternative_names
+  aliases = local.is-production ? local.cloudfront_nginx_sans : local.cloudfront_nginx_nonprod_sans
+
   origin {
     domain_name = "dummy-http-redirect.s3.amazonaws.com"
     origin_id   = "dummy-http-origin"
