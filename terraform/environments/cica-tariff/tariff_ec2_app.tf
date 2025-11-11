@@ -81,7 +81,8 @@ resource "aws_instance" "tariff_app" {
   tags = merge(tomap({
     "Name"     = lower(format("ec2-%s-%s-app", local.application_name, local.environment)),
     "hostname" = "${local.application_name}-app",
-  }), local.tags)
+    }), local.tags, local.environment != "production" ? tomap({ backup = true }) : tomap({})
+  )
 
   lifecycle {
     ignore_changes = [ami, user_data]
@@ -96,8 +97,8 @@ resource "aws_ebs_volume" "tariff_app_storage" {
   tags = merge(tomap({
     "Name"               = "${local.application_name}-app-root",
     "volume-attach-host" = "app",
-    "volume-mount-path"  = "/"
-  }), local.tags)
+    "volume-mount-path"  = "/",
+  }), local.tags, local.environment != "production" ? tomap({ backup = true }) : tomap({}))
 }
 
 resource "aws_volume_attachment" "tariff_app_storage_attachment" {
