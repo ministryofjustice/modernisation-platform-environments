@@ -714,6 +714,7 @@ module "share_dbs_with_dms_lambda_role" {
   data_bucket_lf_resource = var.data_bucket_lf_resource
   role_arn                = module.ap_database_sharing.iam_role.arn
   db_exists               = true
+  de_role_arn             = null
 }
 
 module "share_stg_dbs_with_dms_lambda_role" {
@@ -722,4 +723,5 @@ module "share_stg_dbs_with_dms_lambda_role" {
   data_bucket_lf_resource = var.data_bucket_lf_resource
   role_arn                = module.ap_database_sharing.iam_role.arn
   db_exists               = true
+  de_role_arn             = null
 }
