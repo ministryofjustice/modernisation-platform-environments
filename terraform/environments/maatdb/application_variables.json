@@ -154,7 +154,7 @@
       "port": "1521",
       "allocated_storage": 600,
       "engine": "oracle-se2",
-      "engine_version": "19.0.0.0.ru-2025-07.rur-2025-07.r1",
+      "engine_version": "19.0.0.0.ru-2025-04.rur-2025-04.r1",
       "hub20_sec_group_id": "sg-07369f468604d33c6",
       "hub20_s3_bucket": "hub20-production-cwa-extract-data",
       "instance_class": "db.m5.xlarge",
