@@ -635,6 +635,16 @@ data "aws_iam_policy_document" "load_dms_output_lambda_role_policy_document" {
     ]
   }
   statement {
+    sid    = "S3ListingPermissions"
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket",
+    ]
+    resources = [
+      module.s3-create-a-derived-table-bucket.bucket.arn
+    ]
+  }
+  statement {
     sid    = "AthenaPermissionsForLoadData"
     effect = "Allow"
     actions = [
