@@ -299,9 +299,12 @@ data "aws_iam_policy_document" "dbbackup_s3_policy" {
     resources = ["${module.s3-bucket-dbbackup.bucket.arn}/*"]
   }
 }
-
+#For shared bucket lifecycle rule is not needed as it host lambda application source code
 resource "aws_s3_bucket" "ccms_ebs_shared" {
   bucket = "${local.application_name}-${local.environment}-shared"
+  tags = merge(local.tags,
+    { Name = lower(format("s3-bucket-%s-%s", local.application_name, local.environment)) }
+  )
 }
 
 
@@ -332,10 +335,15 @@ resource "aws_s3_bucket_versioning" "ccms_ebs_shared" {
   }
 }
 
+
+
 # S3 Bucket for Payment Load
 
 resource "aws_s3_bucket" "lambda_payment_load" {
   bucket = "${local.application_name}-${local.environment}-payment-load"
+  tags = merge(local.tags,
+    { Name = lower(format("s3-bucket-%s-%s", local.application_name, local.environment)) }
+  )
 }
 
 resource "aws_s3_bucket_public_access_block" "lambda_payment_load" {
@@ -352,6 +360,42 @@ resource "aws_s3_bucket_versioning" "lambda_payment_load" {
   versioning_configuration {
     status = "Enabled"
   }
+}
+
+# Lifecycle configuration: expire current objects and noncurrent versions after 30 days
+resource "aws_s3_bucket_lifecycle_configuration" "lambda_payment_load_lifecycle" {
+
+  bucket = aws_s3_bucket.lambda_payment_load.id
+
+  # One lifecycle rule per prefix
+  rule {
+    id = "expire-${aws_s3_bucket.lambda_payment_load.id}-${local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_current
+    }d"
+    status = "Enabled"
+
+    expiration {
+      days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_current
+    }
+
+    noncurrent_version_transition {
+      noncurrent_days = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_noncurrent_standard
+      storage_class   = "STANDARD_IA"
+    }
+
+    noncurrent_version_transition {
+      noncurrent_days = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_noncurrent_glacier
+      storage_class   = "GLACIER"
+    }
+    noncurrent_version_expiration {
+      noncurrent_days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_noncurrent
+    }
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = local.application_data.accounts[local.environment].s3_lifecycle_days_abort_incomplete_multipart_upload_days
+    }
+
+  }
+
 }
 
 # Development
