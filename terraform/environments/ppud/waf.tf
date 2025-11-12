@@ -14,7 +14,7 @@ module "waf" {
   # checkov:skip=CKV_TF_1: "Commit Hash requirement temporarily disabled"
   # checkov:skip=CKV_TF_2: "Version number tag requirement temporarily disabled"
   source                   = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-aws-waf?ref=c0875272407dd5094287c021201b36f250be3806"
-  effective_web_acl_name   = "wam-waf-acl"
+  web_acl_name             = "wam-acl"
   enable_ddos_protection   = true
   ddos_rate_limit          = 150
   block_non_uk_traffic     = true
