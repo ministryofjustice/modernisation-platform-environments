@@ -16,6 +16,7 @@ resource "aws_db_instance" "pra_db" {
   allow_major_version_upgrade = true
   ca_cert_identifier          = "rds-ca-rsa2048-g1"
   apply_immediately           = true
+  maintenance_window          = "thu:04:00-thu:04:30"
 }
 
 resource "aws_db_subnet_group" "dbsubnetgroup" {
@@ -72,7 +73,8 @@ resource "aws_db_instance" "pra_db_dev" {
   publicly_accessible         = true
   vpc_security_group_ids      = [aws_security_group.postgresql_db_sc_dev[0].id]
   db_subnet_group_name        = aws_db_subnet_group.dbsubnetgroup.name
-  allow_major_version_upgrade = true
+  allow_major_version_upgrade = false
+  auto_minor_version_upgrade  = true
 }
 
 resource "aws_security_group" "postgresql_db_sc_dev" {
