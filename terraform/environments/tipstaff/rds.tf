@@ -13,7 +13,8 @@ resource "aws_db_instance" "tipstaff_db" {
   publicly_accessible         = false
   vpc_security_group_ids      = [aws_security_group.postgresql_db_sc[0].id]
   db_subnet_group_name        = aws_db_subnet_group.dbsubnetgroup.name
-  allow_major_version_upgrade = true
+  allow_major_version_upgrade = false
+  auto_minor_version_upgrade  = true
   ca_cert_identifier          = "rds-ca-rsa2048-g1"
   apply_immediately           = true
 }

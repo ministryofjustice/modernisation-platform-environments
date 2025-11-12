@@ -387,7 +387,7 @@ module "load_tasking_database" {
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
   de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
 
-  name               = "tasking"
+  name               = "g4s_tasking"
   environment        = local.environment
   database_name      = "g4s-tasking"
   path_to_data       = "/g4s_tasking"
@@ -396,6 +396,7 @@ module "load_tasking_database" {
   oidc_arn           = aws_iam_openid_connect_provider.analytical_platform_compute.arn
   athena_dump_bucket = module.s3-athena-bucket.bucket
   cadt_bucket        = module.s3-create-a-derived-table-bucket.bucket
+  new_airflow        = true
 }
 
 module "load_telephony_database" {
@@ -692,3 +693,4 @@ module "load_buddi_database" {
   cadt_bucket        = module.s3-create-a-derived-table-bucket.bucket
   new_airflow        = true
 }
+
