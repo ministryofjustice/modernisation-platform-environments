@@ -300,8 +300,8 @@ module "load_dms_output" {
   handler                        = "load_dms_output.handler"
   memory_size                    = 10240
   timeout                        = 900
-  reserved_concurrent_executions = 1000
-  ephemeral_storage_size         = 1024
+  reserved_concurrent_executions = 100
+  ephemeral_storage_size         = 10240
   core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
   production_dev                 = local.is-production ? "prod" : "dev"
   security_group_ids             = [aws_security_group.lambda_generic.id]
