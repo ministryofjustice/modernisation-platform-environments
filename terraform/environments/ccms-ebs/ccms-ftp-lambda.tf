@@ -135,7 +135,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "buckets_lifecycle" {
   dynamic "rule" {
     for_each = local.target_prefixes
     content {
-      id     = "expire-${replace(each.value.id, "/", "-")}-${replace(rule.value, "/", "-")}-${local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_current}d"
+      id     = "expire-${replace(each.value.id, "/", "-")}-${replace(rule.value, "/", "-")}${local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_current}d"
       status = "Enabled"
 
       filter {
