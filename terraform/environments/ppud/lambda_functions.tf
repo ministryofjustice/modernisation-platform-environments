@@ -286,7 +286,8 @@ locals {
 
 resource "aws_lambda_function" "lambda_functions" {
   for_each = local.lambda_instances_map
-
+  
+  # checkov:skip=CKV_AWS_173: "Encryption is not required as no sensitive data is processed through it"
   # checkov:skip=CKV_AWS_116: "Dead Letter queues to be enabled later"
   # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
   # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing not required"
