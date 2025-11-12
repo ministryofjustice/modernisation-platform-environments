@@ -46,14 +46,18 @@ EOF
 # 3. CloudFront Distribution – HTTP only
 # -------------------------------------------------
 resource "aws_cloudfront_distribution" "tribunals_http_redirect" {
+  #checkov:skip=CKV_AWS_34: This distribution intentionally allows HTTP; Lambda@Edge handles all HTTP→HTTPS redirects for legacy domains.
+  #checkov:skip=CKV_AWS_68: This distribution must accept HTTP for legacy domain redirects via Lambda@Edge.
   #checkov:skip=CKV_AWS_86:"Access logging not required for this distribution"
   #checkov:skip=CKV_AWS_374:"Geo restriction not needed for this public service"
   #checkov:skip=CKV_AWS_305:"Default root object not required as this is an API distribution"
   #checkov:skip=CKV_AWS_310:"Single origin is sufficient for this use case"
+  #checkov:skip=CKV2_AWS_32: Distribution is only used for HTTP->HTTPS redirects via Lambda@Edge; no content is served.
+  #checkov:skip=CKV2_AWS_34: "AWS SSM Parameter should be Encrypted"
   #checkov:skip=CKV2_AWS_47:"Skip Log4j protection as it is handled via WAF"
   #checkov:skip=CKV2_AWS_46:"Origin Access Identity not applicable as origin is ALB, not S3"
 
-  #web_acl_id = aws_wafv2_web_acl.tribunals_web_acl.arn
+  web_acl_id = aws_wafv2_web_acl.tribunals_web_acl.arn
 
   logging_config {
     include_cookies = false
@@ -74,7 +78,7 @@ resource "aws_cloudfront_distribution" "tribunals_http_redirect" {
 
   default_cache_behavior {
     target_origin_id       = "dummy-http-origin"
-    viewer_protocol_policy = "allow-all"
+    viewer_protocol_policy = "allow-all" # Required: Lambda@Edge redirects HTTP to HTTPS targets
 
     allowed_methods = ["GET", "HEAD", "OPTIONS"]
     cached_methods  = ["GET", "HEAD"]

@@ -63,6 +63,11 @@ data "archive_file" "lambda_zip_nonprod" {
 # 4. Lambda@Edge Function
 # -------------------------------------------------
 resource "aws_lambda_function" "cloudfront_redirect_lambda" {
+  # checkov:skip=CKV_AWS_50: X-Ray tracing is not supported for Lambda@Edge functions.
+  # checkov:skip=CKV_AWS_115: Reserved concurrency cannot be configured for Lambda@Edge functions.
+  # checkov:skip=CKV_AWS_116: Lambda@Edge is invoked synchronously by CloudFront and cannot use a DLQ.
+  # checkov:skip=CKV_AWS_117: Lambda@Edge cannot be deployed inside a VPC.
+  # checkov:skip=CKV_AWS_272: Code signing is not supported for Lambda@Edge functions.
   provider         = aws.us-east-1
   function_name    = "CloudfrontRedirectLambda"
   filename         = local.is-production ? data.archive_file.lambda_zip.output_path : data.archive_file.lambda_zip_nonprod.output_path
@@ -100,6 +105,7 @@ resource "aws_lambda_permission" "allow_http_cloudfront" {
 }
 
 resource "aws_lambda_permission" "allow_replicator" {
+  # checkov:skip=CKV_AWS_50: Lambda@Edge requires broad replicator permission
   provider      = aws.us-east-1
   statement_id  = "AllowReplication-${aws_lambda_function.cloudfront_redirect_lambda.version}"
   action        = "lambda:GetFunction"
