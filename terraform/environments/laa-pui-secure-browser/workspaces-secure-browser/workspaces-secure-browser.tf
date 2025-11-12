@@ -46,7 +46,7 @@ resource "aws_workspacesweb_user_settings" "main" {
 
   # Required settings
   copy_allowed     = "Enabled"
-  download_allowed = "Disabled"
+  download_allowed = "Enabled"
   paste_allowed    = "Enabled"
   print_allowed    = "Disabled"
   upload_allowed   = "Enabled"
@@ -82,7 +82,7 @@ resource "aws_workspacesweb_user_settings" "sso" {
 
   # Required settings - same as main
   copy_allowed     = "Enabled"
-  download_allowed = "Disabled"
+  download_allowed = "Enabled"
   paste_allowed    = "Enabled"
   print_allowed    = "Disabled"
   upload_allowed   = "Enabled"
@@ -226,12 +226,35 @@ resource "aws_workspacesweb_browser_settings" "main" {
           local.oia_url,
           local.laa_sign_in_url,
           local.legal_aid_services_url,
-          "chrome://new-tab-page",
           "mysignins.microsoft.com",
           "go.microsoft.com",
           "portal.manage.microsoft.com",
-          "login.live.com"
+          "login.live.com",
+          "google-exention-bucket.s3.eu-west-2.amazonaws.com",
+          "chrome://print/",
+          "chrome-untrusted://print/",
+          "chrome://new-tab-page"
         ]
+      }
+      "AlwaysOpenPdfExternally" = {
+        "value" = false
+      }
+      "DisablePrintPreview" = {
+        "value" = false
+      }
+      "DownloadRestrictions" = {
+        "value" = 0
+      }
+      "ExtensionSettings" = {
+        "value" = {
+          "mhjfbmdgcfjbbpaeojofohoefgiehjai" = {
+            "installation_mode" = "allowed"
+          }
+          "pgmgimgbioofngenfkfkldhkfcnaepgn" = {
+            "installation_mode" = "force_installed"
+            "update_url"        = "https://google-exention-bucket.s3.eu-west-2.amazonaws.com/update.xml"
+          }
+        }
       }
       "AllowDeletingBrowserHistory" = {
         "value" = false
@@ -249,7 +272,7 @@ resource "aws_workspacesweb_browser_settings" "main" {
         "value" = false
       }
       "PrintingEnabled" = {
-        "value" = false
+        "value" = true
       }
       "SafeBrowsingProtectionLevel" = {
         "value" = 1
