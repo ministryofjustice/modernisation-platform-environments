@@ -104,8 +104,9 @@ resource "aws_lambda_permission" "allow_http_cloudfront" {
   qualifier     = aws_lambda_function.cloudfront_redirect_lambda.version
 }
 
+#Lambda@Edge replicator permission cannot have source_arn; intentional
+#tfsec:ignore:AVD-AWS-0067
 resource "aws_lambda_permission" "allow_replicator" {
-  # tfsec:ignore:AVD-AWS-0067 Lambda@Edge replicator permission cannot have source_arn; intentional
   provider      = aws.us-east-1
   statement_id  = "AllowReplication-${aws_lambda_function.cloudfront_redirect_lambda.version}"
   action        = "lambda:GetFunction"
