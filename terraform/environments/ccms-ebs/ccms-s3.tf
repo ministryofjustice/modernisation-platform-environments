@@ -392,10 +392,13 @@ resource "aws_s3_bucket_lifecycle_configuration" "lambda_payment_load_lifecycle"
 
   # One lifecycle rule per prefix
   rule {
-    id = "expire-${aws_s3_bucket.lambda_payment_load.id}-${local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_current
-    }d"
+    id = "expire-${aws_s3_bucket.lambda_payment_load.id}-${local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_current}d"
     status = "Enabled"
 
+    filter {
+      prefix = ""
+    }
+    
     expiration {
       days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_current
     }

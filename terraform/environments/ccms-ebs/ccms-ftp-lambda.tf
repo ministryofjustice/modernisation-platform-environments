@@ -139,10 +139,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "buckets_lifecycle" {
       status = "Enabled"
 
       filter {
-        and {
-          prefix                   = rule.value
-          object_size_greater_than = 0
-        }
+        prefix = ""
       }
 
       expiration {
