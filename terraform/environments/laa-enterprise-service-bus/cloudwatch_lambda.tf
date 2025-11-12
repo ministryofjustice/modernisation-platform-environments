@@ -44,8 +44,9 @@ resource "aws_lambda_function" "cloudwatch_log_alert" {
   handler          = "lambda_function.lambda_handler"
   runtime          = "python3.10"
   role             = aws_iam_role.cloudwatch_log_alert_role.arn
-  filename         = "lambda/cloudwatch_log_alert/cloudwatch_log_alert.zip"
-  source_code_hash = filebase64sha256("lambda/cloudwatch_log_alert/cloudwatch_log_alert.zip")
+  s3_bucket        = data.aws_s3_object.cloudwatch_log_alert_zip.bucket
+  s3_key           = data.aws_s3_object.cloudwatch_log_alert_zip.key
+  s3_object_version = data.aws_s3_object.cloudwatch_log_alert_zip.version_id
   timeout          = 60
 
   environment {
@@ -179,6 +180,13 @@ resource "aws_iam_policy" "cloudwatch_log_alert_policy" {
         Resource = [
           aws_secretsmanager_secret.slack_alert_channel_webhook.arn
         ]
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "s3:GetObject"
+        ],
+        Resource = "arn:aws:s3:::${local.application_name_short}-${local.environment}-lambda-files/*"
       }
     ]
   })
