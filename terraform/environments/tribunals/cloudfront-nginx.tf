@@ -46,7 +46,7 @@ EOF
 # 3. CloudFront Distribution – HTTP only
 # -------------------------------------------------
 resource "aws_cloudfront_distribution" "tribunals_http_redirect" {
-  #tfsec:ignore:AWS0012 Distribution intentionally allows HTTP; Lambda@Edge handles redirects
+  #tfsec:ignore:AVD-AWS-0012 Distribution intentionally allows HTTP; Lambda@Edge handles redirects
   #checkov:skip=CKV_AWS_34: This distribution intentionally allows HTTP; Lambda@Edge handles all HTTP→HTTPS redirects for legacy domains.
   #checkov:skip=CKV_AWS_86:"Access logging not required for this distribution"
   #checkov:skip=CKV_AWS_374:"Geo restriction not needed for this public service"
