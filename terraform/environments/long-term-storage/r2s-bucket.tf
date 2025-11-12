@@ -455,6 +455,21 @@ data "aws_iam_policy_document" "snowflake_policy_doc" {
       ]
     }
   }
+  statement {
+    sid    = "SnowflakeS3Integration"
+    effect = "Allow"
+    actions = [
+      "s3:DeleteObject",
+      "s3:GetObject",
+      "s3:ListBucket",
+      "s3:PutObject"
+    ]
+    resources = [
+      "arn:aws:s3:::${local.bucket_name}/${local.genesys_prefix.role6}/*",
+      "arn:aws:s3:::${local.bucket_name}"
+    ]
+  }
+
 
 }
 
