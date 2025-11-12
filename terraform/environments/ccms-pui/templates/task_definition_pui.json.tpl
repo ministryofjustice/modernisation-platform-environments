@@ -146,6 +146,10 @@
         "value": "${ccms_pui_av_host}"
       },
       {
+        "name": "JAVA_TOOL_OPTIONS",
+        "value": "-XX:MetaspaceSize=128M -XX:MaxMetaspaceSize=512M"
+      },
+      {
         "name": "CCMS_PUI_AV_SOCKETTIMEOUT",
         "value": "${ccms_pui_av_socketTimeout}"
       },
