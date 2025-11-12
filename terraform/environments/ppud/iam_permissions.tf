@@ -88,7 +88,7 @@ locals {
         "send_logs_to_cloudwatch",
         "publish_to_sns",
         "get_cloudwatch_metrics",
-        "get_certificate_expiration"
+        "get_certificate_expiry"
       ]
     }
   }
