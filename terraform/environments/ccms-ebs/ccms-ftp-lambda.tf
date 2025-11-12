@@ -67,18 +67,21 @@ resource "aws_s3_bucket" "buckets" {
   for_each = toset(local.bucket_names)
 
   bucket = each.value
-
-  tags = merge(
-    {
-      Name        = each.value
-      Environment = local.environment
-    },
-    {
-      "business-unit"          = "LAA",
-      "infrastructure-support" = "laa-role-sre@digital.justice.gov.uk",
-      "source-code"            = "https://github.com/ministryofjustice/modernisation-platform-environments"
-    }
+  tags = merge(local.tags,
+    { Name = lower(format("s3-bucket-%s-%s", local.application_name, local.environment)) }
   )
+
+  # tags = merge(
+  #   {
+  #     Name        = each.value
+  #     Environment = local.environment
+  #   },
+  #   {
+  #     "business-unit"          = "LAA",
+  #     "infrastructure-support" = "laa-role-sre@digital.justice.gov.uk",
+  #     "source-code"            = "https://github.com/ministryofjustice/modernisation-platform-environments"
+  #   }
+  # )
 
   # server access logging is configured via aws_s3_bucket_logging resource below
 }
@@ -91,6 +94,14 @@ resource "aws_s3_bucket_logging" "buckets_access_logging" {
 
   target_bucket = local.logging_bucket_name
   target_prefix = "s3-access-logs/${each.key}/"
+}
+resource "aws_s3_bucket_public_access_block" "bucket_public_access" {
+  for_each                = aws_s3_bucket.buckets
+  bucket                  = each.value.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "bucket_encryption" {
@@ -135,12 +146,26 @@ resource "aws_s3_bucket_lifecycle_configuration" "buckets_lifecycle" {
       }
 
       expiration {
-        days = local.expire_days
+        days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_current
       }
 
-      noncurrent_version_expiration {
-        noncurrent_days = local.expire_days
+      noncurrent_version_transition {
+        noncurrent_days = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_noncurrent_standard
+        storage_class   = "STANDARD_IA"
       }
+
+      noncurrent_version_transition {
+        noncurrent_days = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_noncurrent_glacier
+        storage_class   = "GLACIER"
+      }
+      noncurrent_version_expiration {
+        noncurrent_days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_noncurrent
+      }
+
+      abort_incomplete_multipart_upload {
+        days_after_initiation = local.application_data.accounts[local.environment].s3_lifecycle_days_abort_incomplete_multipart_upload_days
+      }
+
     }
   }
 }
