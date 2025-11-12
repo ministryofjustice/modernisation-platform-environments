@@ -305,17 +305,17 @@ resource "aws_s3_bucket" "ccms_ebs_shared" {
   # tags = merge(local.tags,
   #   { Name = lower(format("s3-bucket-%s-%s", local.application_name, local.environment)) }
   # )
-  # tags = merge(
-  #   {
-  #     Name        = "${local.application_name}-${local.environment}-shared"
-  #     Environment = local.environment
-  #   },
-  #   {
-  #     "business-unit"          = "LAA",
-  #     "infrastructure-support" = "laa-role-sre@digital.justice.gov.uk",
-  #     "source-code"            = "https://github.com/ministryofjustice/modernisation-platform-environments"
-  #   }
-  # )
+  tags = merge(
+    {
+      Name        = "${local.application_name}-${local.environment}-shared"
+      Environment = local.environment
+    },
+    {
+      "business-unit"          = "LAA",
+      "infrastructure-support" = "laa-role-sre@digital.justice.gov.uk",
+      "source-code"            = "https://github.com/ministryofjustice/modernisation-platform-environments"
+    }
+  )
 
 }
 
