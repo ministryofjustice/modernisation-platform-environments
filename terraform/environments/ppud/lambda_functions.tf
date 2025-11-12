@@ -27,7 +27,7 @@ locals {
     /*
     check_certificate_expiration = {
       description  = "Function to check certificate expiration date and send a reminder for any under 30 days."
-      role_key     = "get_certificate_expiration"
+      role_key     = "get_certificate_expiry"
       environments = ["development", "preproduction", "production"]
       runtime      = "python3.13"
       permissions  = [{
