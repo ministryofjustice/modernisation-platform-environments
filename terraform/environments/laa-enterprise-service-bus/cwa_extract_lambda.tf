@@ -80,7 +80,7 @@ resource "aws_lambda_function" "cwa_extract_lambda" {
       NAMESPACE         = "HUB20-CWA-NS"
       ENVIRONMENT       = local.environment
       LOG_LEVEL         = "DEBUG"
-      TNS_ADMIN         = "tmp/wallet_dir"
+      TNS_ADMIN         = "/tmp/wallet_dir"
       WALLET_BUCKET     = data.aws_s3_bucket.lambda_files.bucket
       WALLET_OBJ        = "wallet_files/CWA/wallet_dir.zip"
     }
@@ -125,7 +125,7 @@ resource "aws_lambda_function" "cwa_file_transfer_lambda" {
       NAMESPACE         = "HUB20-CWA-NS"
       ENVIRONMENT       = local.environment
       LOG_LEVEL         = "DEBUG"
-      TNS_ADMIN         = "tmp/wallet_dir"
+      TNS_ADMIN         = "/tmp/wallet_dir"
       WALLET_BUCKET     = data.aws_s3_bucket.lambda_files.bucket
       WALLET_OBJ        = "wallet_files/CWA/wallet_dir.zip"
     }
