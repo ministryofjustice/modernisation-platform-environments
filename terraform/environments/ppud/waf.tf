@@ -29,7 +29,7 @@ module "waf" {
      {
        arn             = aws_wafv2_rule_group.wam_waf_acl.arn
        override_action = "none"   # respect the group's action (BLOCK). Use "count" to dry-run.
-       priority        = 3        # unique; runs before managed rules at 10..15
+       priority        = 4        # unique; runs before managed rules at 10..15
      }
    ]
 
