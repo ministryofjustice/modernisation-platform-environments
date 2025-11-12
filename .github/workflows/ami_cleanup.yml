@@ -20,14 +20,12 @@ permissions:
   contents: read
 
 env:
-  # Inputs (with safe fallbacks)
   APPLICATION:   ${{ github.event.inputs.application || 'cooker' }}
   ENVIRONMENTS:  ${{ github.event.inputs.environments || 'development' }}
-  # Baked-in defaults (unchanged logic)
-  AMI_ARGS:      "-c -m 3"    # keep month-based AMI threshold (3)
-  EBS_MONTHS:    "1"          # keep month-based EBS threshold (1)
-  AGE_MINUTES:   "60"          # preview-only minute window
-  LIVE_TEST_MODE: "true"     # live uses month gates (as before)
+  AMI_ARGS:      "-c -m 3"    # month-based AMI threshold for live runs
+  EBS_MONTHS:    "3"          # month-based EBS threshold for live runs
+  AGE_MINUTES:   "60m"        # age of resources in minutes when testing preview/live
+  LIVE_TEST_MODE: "true"      # false uses month gates and true uses the minute-based threshold
 
 jobs:
   build-matrix:
@@ -62,7 +60,7 @@ jobs:
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
 
   # -------------------------
-  # PREVIEW (Dry-Run) — always on manual run
+  # PREVIEW (Dry-Run)
   # -------------------------
   preview:
     name: Preview Deletions (Dry-Run)
