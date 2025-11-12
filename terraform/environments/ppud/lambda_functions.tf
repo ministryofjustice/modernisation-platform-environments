@@ -24,7 +24,6 @@ locals {
 
   # Lambda function configurations
   lambda_functions = {
-    /*
     check_certificate_expiration = {
       description  = "Function to check certificate expiration date and send a reminder for any under 30 days."
       role_key     = "get_certificate_expiry"
@@ -34,14 +33,17 @@ locals {
         principal  = "lambda.alarms.cloudwatch.amazonaws.com"
         source_arn_suffix = "alarm:*"
       }]
-    environment {
-      variables = {
-        EXPIRY_DAYS   = "30",
-        SNS_TOPIC_ARN = "arn:aws:sns:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:ppud-dev-cw-alerts" # needs updating to env specific ARNs
+      environment = {
+        variables = {
+          EXPIRY_DAYS   = "30"
+          SNS_TOPIC_ARN = {
+            development   = "arn:aws:sns:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:ppud-dev-cw-alerts"
+            preproduction = "arn:aws:sns:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:ppud-uat-cw-alerts"
+            production    = "arn:aws:sns:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:ppud-prod-cw-alerts"
+          }
         }
-      }
+       }
     }
-    */
     terminate_cpu_process = {
       description  = "Function to terminate an application process due to high CPU utilisation on an EC2 instance."
       role_key     = "invoke_ssm"
@@ -325,6 +327,19 @@ resource "aws_lambda_function" "lambda_functions" {
     content {
       subnet_ids         = [data.aws_subnet.private_subnets_b.id]
       security_group_ids = [aws_security_group.PPUD-Mail-Server[0].id]
+    }
+  }
+
+  # Dynamic environment variables
+  dynamic "environment" {
+    for_each = try(each.value.config.environment, null) != null ? [each.value.config.environment] : []
+    content {
+      variables = merge(
+        environment.value.variables,
+        {
+          SNS_TOPIC_ARN = environment.value.variables.SNS_TOPIC_ARN[each.value.env]
+        }
+      )
     }
   }
 
