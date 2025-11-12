@@ -42,7 +42,7 @@ locals {
     "g4s_atrium",
     "g4s_centurion",
     "g4s_fep",
-  ] : []
+  ] : local.is-development ? ["test"] : []
 
   prod_dbs_to_grant = local.is-production ? [
     "am_stg",
