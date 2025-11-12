@@ -67,21 +67,21 @@ resource "aws_s3_bucket" "buckets" {
   for_each = toset(local.bucket_names)
 
   bucket = each.value
-  tags = merge(local.tags,
-    { Name = lower(format("s3-bucket-%s-%s", local.application_name, local.environment)) }
-  )
-
-  # tags = merge(
-  #   {
-  #     Name        = each.value
-  #     Environment = local.environment
-  #   },
-  #   {
-  #     "business-unit"          = "LAA",
-  #     "infrastructure-support" = "laa-role-sre@digital.justice.gov.uk",
-  #     "source-code"            = "https://github.com/ministryofjustice/modernisation-platform-environments"
-  #   }
+  # tags = merge(local.tags,
+  #   { Name = lower(format("s3-bucket-%s-%s", local.application_name, local.environment)) }
   # )
+
+  tags = merge(
+    {
+      Name        = each.value
+      Environment = local.environment
+    },
+    {
+      "business-unit"          = "LAA",
+      "infrastructure-support" = "laa-role-sre@digital.justice.gov.uk",
+      "source-code"            = "https://github.com/ministryofjustice/modernisation-platform-environments"
+    }
+  )
 
   # server access logging is configured via aws_s3_bucket_logging resource below
 }
