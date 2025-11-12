@@ -3,7 +3,7 @@
 #####################################################################################
 
 resource "aws_s3_bucket" "lambda_files" {
-  bucket = "${local.application_name_short}-${local.environment}-lambda-files"
+  bucket = "${local.application_name_short}-${local.environment}-lambda-files-change"
 
   tags = merge(
     local.tags,
