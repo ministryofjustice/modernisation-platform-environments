@@ -112,3 +112,25 @@ resource "aws_cloudwatch_metric_alarm" "oia_rds_freeable_memory_low" {
 
   tags = local.tags
 }
+
+# Alarm for RDS IOPS Burst Balance
+resource "aws_cloudwatch_metric_alarm" "oia_rds_burst_balance_low" {
+  alarm_name          = "${local.application_name}-${local.environment}-rds-burst-balance-low"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = "5"
+  metric_name         = "EBSIOBalance%"
+  namespace           = "AWS/RDS"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = 20 # ~20%
+  dimensions = {
+    DBInstanceIdentifier = aws_db_instance.opahub_db.id
+  }
+  alarm_description = "Alarm when EBS IO credit balance drops below 20% for RDS instance"
+
+  treat_missing_data = "notBreaching"
+  alarm_actions             = [aws_sns_topic.cloudwatch_alerts.arn]
+  ok_actions                = [aws_sns_topic.cloudwatch_alerts.arn]
+
+  tags = local.tags
+}
