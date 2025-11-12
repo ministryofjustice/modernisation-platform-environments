@@ -33,8 +33,8 @@ env:
   ENVIRONMENTS:  ${{ github.event.inputs.environments || 'development' }}
   AMI_ARGS:      "-c -m 3"    # month-based AMI threshold for live runs
   EBS_MONTHS:    "3"          # month-based EBS threshold for live runs
-  AGE_MINUTES:   "3"          # age of resources in minutes when testing
-  LIVE_TEST_MODE: "true"     # false uses month gates and true uses the minute-based threshold for testing
+  AGE_MINUTES:   "3"          # age of resources in minutes when testing preview/live
+  LIVE_TEST_MODE: "true"     # false uses month gates and true uses the minute-based threshold
 
 jobs:
   build-matrix:
@@ -203,11 +203,7 @@ jobs:
             fi
             echo "${{ matrix.account_name }},eu-west-2,preview,ami,ami,${AMI},,${NAME},${WHEN},,${STATUS},${REASON}" >> reports/cleanup_report.csv
           done
-          if [[ "${LIVE_TEST_MODE}" == "true" ]]; then
-            echo "Account: ${{ matrix.account_name }} | Test window: ${AGE_MINUTES}m"
-          else
-            echo "Account: ${{ matrix.account_name }} | Using month-based thresholds (AMI: ${AMI_ARGS}, EBS: ${EBS_MONTHS} months)"
-          fi
+          echo "Account: ${{ matrix.account_name }} | Test window: ${AGE_MINUTES}m"
           echo "✅ Would delete: ${PREVIEW_DELETE_COUNT} | 🛡️ Protected: ${PREVIEW_PROTECTED_COUNT}"
           echo "ami_count=${PREVIEW_DELETE_COUNT}" >> "$GITHUB_OUTPUT"
           {
@@ -261,7 +257,6 @@ jobs:
           echo "🧪 EBS — PREVIEW"
           : > reports/ebs_cleanup_report.csv
           echo "Volume ID,Age (months),Name,Status" >> reports/ebs_cleanup_report.csv
-          # Removed preview sleep to avoid 3-minute delay; still using --age-minutes via EBS_TEST_FLAGS
           CANDIDATES="$(scripts/ebs_cleanup.sh ${EBS_TEST_FLAGS:-} -m "$months" unattached || true)"
           printf "%s\n" "$CANDIDATES" > reports/ebs_candidates_preview.log
           echo "Raw candidate output (first 20 lines):"
@@ -290,9 +285,9 @@ jobs:
             echo ""
             echo "| Volume ID | Age (months) | Name |"
             echo "|---|---:|---|"
-            tail -n +2 reports/ebs_cleanup_report.csv | head -n 20 | while IFS=',' read -r id age name status; do
-              echo "| ${id} | ${age} | ${name} |"
-            done
+            # Robust rendering: strip CR and allow commas inside Name by rebuilding Name from fields 3..NF-1
+            tail -n +2 reports/ebs_cleanup_report.csv | head -n 20 | \
+            awk 'BEGIN{FS=","} {sub(/\r$/,""); id=$1; age=$2; name=$3; if(NF>4){for(i=4;i<NF;i++){name=name","$i}}; printf("| %s | %s | %s |\n", id, age, name)}'
             if [ "${COUNT:-0}" -gt 20 ]; then echo ""; echo "_(+$((COUNT-20)) more in artifact)_"; fi
             echo ""
             echo "- Report: \`reports/ebs_cleanup_report.csv\`, \`reports/cleanup_report.csv\`, \`reports/ebs_candidates_preview.log\`"
@@ -560,6 +555,13 @@ jobs:
             awk -F',' 'NR>1 && $5=="Deleted" && !seen[$1]++ {printf("| %s | %s | %s |\n",$1,$3,$4)}' reports/ami_snapshot_map.csv | head -n 20 >> "$GITHUB_STEP_SUMMARY" || true
             delcount=$(awk -F',' 'NR>1 && $5=="Deleted" && !seen[$1]++ {c++} END{print c+0}' reports/ami_snapshot_map.csv)
             if [ "${delcount:-0}" -gt 20 ]; then echo "" >> "$GITHUB_STEP_SUMMARY"; echo "_(+$((delcount-20)) more in artifact)_" >> "$GITHUB_STEP_SUMMARY"; fi
+            # --- Minimal debug: show first lines of the snapshot map to verify statuses ---
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "<details><summary>Debug: first lines of \`reports/ami_snapshot_map.csv\`</summary>" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            head -n 6 reports/ami_snapshot_map.csv >> "$GITHUB_STEP_SUMMARY" || true
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "</details>" >> "$GITHUB_STEP_SUMMARY"
           fi
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "**Protected AMIs (skipped)**" >> "$GITHUB_STEP_SUMMARY"
@@ -684,11 +686,11 @@ jobs:
           echo "**Deleted volumes**" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "| Volume ID | Age (months) | Name |" >> "$GITHUB_STEP_SUMMARY"
-          echo "|---|---:|---|"
+          echo "|---|---:|---|" >> "$GITHUB_STEP_SUMMARY"
           if [[ -f reports/ebs_cleanup_report.csv ]]; then
-            tail -n +2 reports/ebs_cleanup_report.csv | head -n 20 | while IFS=',' read -r id age name status; do
-              echo "| ${id} | ${age} | ${name} |" >> "$GITHUB_STEP_SUMMARY"
-            done
+            # Robust rendering: strip CR and allow commas inside Name by rebuilding Name from fields 3..NF-1
+            tail -n +2 reports/ebs_cleanup_report.csv | head -n 20 | \
+            awk 'BEGIN{FS=","} {sub(/\r$/,""); id=$1; age=$2; name=$3; if(NF>4){for(i=4;i<NF;i++){name=name","$i}}; printf("| %s | %s | %s |\n", id, age, name)}' >> "$GITHUB_STEP_SUMMARY"
             if [ "${DEL:-0}" -gt 20 ]; then echo "" >> "$GITHUB_STEP_SUMMARY"; echo "_(+$((DEL-20)) more in artifact)_" >> "$GITHUB_STEP_SUMMARY"; fi
           fi
           echo "" >> "$GITHUB_STEP_SUMMARY"

@@ -111,11 +111,11 @@ resource "aws_ami_copy" "a1_unreferenced_unused_old" {
 }
 
 # Wait 3 minutes to establish an age gap for “old enough” vs “new”.
-# In CI test-mode, the YAML passes a minute-based threshold (e.g., 3m),
+# In CI test-mode, the YAML passes a minute-based threshold (e.g., 0s),
 # so resources created BEFORE this sleep are “older” than those created AFTER.
 resource "time_sleep" "three_min_gap" {
   depends_on      = [aws_ami_copy.a1_unreferenced_unused_old]
-  create_duration = "3m"
+  create_duration = "0s"
 }
 
 # This AMI is *referenced in code* via locals.ami_name (see locals just below).
@@ -198,7 +198,7 @@ resource "aws_ebs_volume" "v1_unattached_old" {
 # Age gap to separate “old” (V1) from later resources (V2, V3)
 resource "time_sleep" "three_min_gap_vol" {
   depends_on      = [aws_ebs_volume.v1_unattached_old]
-  create_duration = "3m"
+  create_duration = "0s"
 }
 
 # V2: ATTACHED volume → Excluded by EBS cleaner.
