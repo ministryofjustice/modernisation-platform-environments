@@ -9,6 +9,7 @@ locals {
       litellm_organization_ids = {
         /* These are not currently managed in code */
         ministryofjustice = "ec09fd0e-617c-4703-8b48-0a722d9342d4"
+        hmcts             = "1b5825da-a911-49f2-aa3a-eba2d9b0dcb9"
       }
       llm_gateway_hostname = "llm-gateway.development.data-platform.service.justice.gov.uk"
       llm_gateway_ingress_allowlist = [
@@ -45,6 +46,10 @@ locals {
       ]
       llm_gateway_models = {
         azure = {
+          gpt-4o = {
+            model_id    = "gpt-4o"
+            api_version = "2024-12-01-preview"
+          }
           gpt-5 = {
             model_id    = "gpt-5"
             api_version = "2024-12-01-preview"
@@ -125,10 +130,19 @@ locals {
         data-science = {
           organisation = "ministryofjustice"
           models = [
+            "azure-gpt-4o",
+            "azure-gpt-5",
             "bedrock-claude-haiku-4-5",
             "bedrock-claude-sonnet-4-5"
           ]
-          keys = {}
+          keys = {
+            consult-poc = {
+              models = [
+                "azure-gpt-4o",
+                "azure-gpt-5"
+              ]
+            }
+          }
         }
       }
     }
