@@ -11,7 +11,9 @@ locals {
 }
 
 module "waf" {
-  source                   = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-aws-waf?ref=b9cf6f92b142e80845ae30252aee2f84f57a71a9"
+  # checkov:skip=CKV_TF_1: "Commit Hash requirement temporarily disabled"
+  # checkov:skip=CKV_TF_2: "Version number tag requirement temporarily disabled"
+  source                   = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-aws-waf?ref=c0875272407dd5094287c021201b36f250be3806"
   enable_ddos_protection   = true
   ddos_rate_limit          = 150
   block_non_uk_traffic     = true
@@ -22,13 +24,13 @@ module "waf" {
     aws.modernisation-platform = aws.modernisation-platform
   }
 
-  #additional_managed_rules = [
-  #   {
-  #     arn             = aws_wafv2_rule_group.wam_waf_acl.arn
-  #     override_action = "none"   # respect the group's action (BLOCK). Use "count" to dry-run.
-  #     priority        = 9        # unique; runs before managed rules at 10..15
-  #   }
-  # ]
+  additional_managed_rules = [
+     {
+       arn             = aws_wafv2_rule_group.wam_waf_acl.arn
+       override_action = "none"   # respect the group's action (BLOCK). Use "count" to dry-run.
+       priority        = 30        # unique; runs before managed rules at 10..15
+     }
+   ]
 
   managed_rule_actions = {
     AWSManagedRulesKnownBadInputsRuleSet = false

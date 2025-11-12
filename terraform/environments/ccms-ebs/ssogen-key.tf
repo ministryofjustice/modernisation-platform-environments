@@ -60,7 +60,7 @@ resource "aws_key_pair" "ssogen" {
   tags       = { Name = "ssogen-key", Environment = local.environment }
 
   lifecycle {
-    ignore_changes = [ public_key ]
+    ignore_changes = [public_key]
   }
 
 }
@@ -89,6 +89,6 @@ resource "aws_secretsmanager_secret_version" "ssogen_privkey_v1" {
   })
 
   lifecycle {
-    ignore_changes = [ secret_string ]
+    ignore_changes = [secret_string]
   }
 }
