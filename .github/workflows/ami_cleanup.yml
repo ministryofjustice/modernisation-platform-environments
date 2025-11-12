@@ -14,6 +14,15 @@ on:
         required: true
         type: string
         default: development
+      cleanup_type:
+        description: 'What to clean'
+        required: true
+        type: choice
+        default: both
+        options:
+          - both
+          - ami
+          - ebs
 
 permissions:
   id-token: write
@@ -24,7 +33,7 @@ env:
   ENVIRONMENTS:  ${{ github.event.inputs.environments || 'development' }}
   AMI_ARGS:      "-c -m 3"    # month-based AMI threshold for live runs
   EBS_MONTHS:    "3"          # month-based EBS threshold for live runs
-  AGE_MINUTES:   "3"        # age of resources in minutes when testing preview/live
+  AGE_MINUTES:   "3"          # age of resources in minutes when testing preview/live
   LIVE_TEST_MODE: "true"      # false uses month gates and true uses the minute-based threshold
 
 jobs:
@@ -152,6 +161,7 @@ jobs:
           echo "account,region,phase,cleanup_type,resource_type,resource_id,related_id,name,created_at,age_months,status,reason" >> reports/cleanup_report.csv
 
       - name: AMI Preview (dry-run) + Reports
+        if: ${{ github.event.inputs.cleanup_type == 'ami' || github.event.inputs.cleanup_type == 'both' }}
         id: ami_preview
         run: |
           set -euo pipefail
@@ -225,7 +235,6 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload AMI Preview Artifacts
-      
         if: ${{ always() && (github.event_name == 'push' || github.event.inputs.cleanup_type == 'ami' || github.event.inputs.cleanup_type == 'both') }}
         uses: actions/upload-artifact@v5
         with:
@@ -238,6 +247,7 @@ jobs:
           if-no-files-found: warn
 
       - name: EBS Preview (dry-run) + Report
+        if: ${{ github.event.inputs.cleanup_type == 'ebs' || github.event.inputs.cleanup_type == 'both' }}
         id: ebs_preview
         run: |
           set -euo pipefail
@@ -284,7 +294,6 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload EBS Preview Artifacts
-
         if: ${{ always() && (github.event_name == 'push' || github.event.inputs.cleanup_type == 'ebs' || github.event.inputs.cleanup_type == 'both') }}
         uses: actions/upload-artifact@v5
         with:
@@ -309,7 +318,7 @@ jobs:
     name: AMI Delete (Live)
     runs-on: ubuntu-latest
     needs: [build-matrix, fetch-secrets, preview]
-    if: ${{ always() }}
+    if: ${{ (github.event.inputs.cleanup_type == 'ami' || github.event.inputs.cleanup_type == 'both') && always() }}
     environment: ${{ matrix.account_name }}
     strategy:
       matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
@@ -566,7 +575,7 @@ jobs:
     name: EBS Delete (Live)
     runs-on: ubuntu-latest
     needs: [build-matrix, fetch-secrets, preview]
-    if: ${{ always() }}
+    if: ${{ (github.event.inputs.cleanup_type == 'ebs' || github.event.inputs.cleanup_type == 'both') && always() }}
     environment: ${{ matrix.account_name }}
     strategy:
       matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
