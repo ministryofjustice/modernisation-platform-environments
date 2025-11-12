@@ -39,11 +39,21 @@ module "cortex_xsiam_role" {
       ]
       resources = [module.sqs_s3_notifications[0].queue_arn]
     }
-
     S3GetLogs = {
-      effect    = "Allow"
-      actions   = ["s3:GetObject"]
-      resources = [module.s3_bucket_workspacesweb_session_logs[0].s3_bucket_arn]
+      effect = "Allow"
+      actions = [
+        "s3:GetObject",
+        "s3:GetObjectVersion"
+      ]
+      resources = ["${module.s3_bucket_workspacesweb_session_logs[0].s3_bucket_arn}/*"]
+    }
+    KMSUseKey = {
+      effect = "Allow"
+      actions = [
+        "kms:Decrypt",
+        "kms:DescribeKey"
+      ]
+      resources = [aws_kms_key.workspacesweb_session_logs[0].arn]
     }
   }
 

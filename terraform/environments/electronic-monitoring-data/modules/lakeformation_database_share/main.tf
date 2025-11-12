@@ -60,6 +60,7 @@ resource "aws_lakeformation_permissions" "grant_cadt_tables_new" {
 }
 
 resource "aws_lakeformation_permissions" "s3_bucket_permissions_de" {
+  count = var.de_role_arn != null ? 1 : 0
   principal = var.de_role_arn
 
   permissions = ["DATA_LOCATION_ACCESS"]
@@ -71,7 +72,7 @@ resource "aws_lakeformation_permissions" "s3_bucket_permissions_de" {
 
 
 resource "aws_lakeformation_permissions" "grant_cadt_databases_de_existing" {
-  for_each                      = var.db_exists ? { for db in var.dbs_to_grant : db => db } : {}
+  for_each                      = var.db_exists && (var.de_role_arn != null) ? { for db in var.dbs_to_grant : db => db } : {}
   principal                     = var.de_role_arn
   permissions                   = ["ALL"]
   permissions_with_grant_option = ["ALL"]
@@ -91,7 +92,7 @@ resource "aws_lakeformation_permissions" "grant_cadt_databases_de_new" {
 }
 
 resource "aws_lakeformation_permissions" "grant_cadt_tables_de_existing" {
-  for_each                      = var.db_exists ? { for db in var.dbs_to_grant : db => db } : {}
+  for_each                      = var.db_exists && (var.de_role_arn != null) ? { for db in var.dbs_to_grant : db => db } : {}
   principal                     = var.de_role_arn
   permissions                   = ["ALL"]
   permissions_with_grant_option = ["ALL"]

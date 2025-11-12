@@ -139,3 +139,26 @@ resource "aws_lambda_event_source_mapping" "sqs_trigger" {
     maximum_concurrency = 1000
   }
 }
+
+
+# ----------------------------------------------
+# Load DMS data sqs queue
+# ----------------------------------------------
+
+module "load_dms_output_event_queue" {
+  source               = "./modules/sqs_s3_lambda_trigger"
+  bucket               = module.s3-dms-target-store-bucket.bucket
+  lambda_function_name = module.load_dms_output.lambda_function_name
+  bucket_prefix        = local.bucket_prefix
+}
+
+resource "aws_s3_bucket_notification" "load_dms_output_event" {
+  bucket = module.s3-dms-target-store-bucket.bucket.id
+
+  queue {
+    queue_arn = module.load_dms_output_event_queue.sqs_queue.arn
+    events    = ["s3:ObjectCreated:*"]
+  }
+
+  depends_on = [module.load_dms_output_event_queue]
+}
