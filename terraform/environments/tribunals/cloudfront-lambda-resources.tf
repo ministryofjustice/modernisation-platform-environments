@@ -105,7 +105,7 @@ resource "aws_lambda_permission" "allow_http_cloudfront" {
 }
 
 resource "aws_lambda_permission" "allow_replicator" {
-  # checkov:skip=CKV_AWS_50: Lambda@Edge requires broad replicator permission
+  # tfsec:ignore:AWS0067 Lambda@Edge replicator permission cannot have source_arn; intentional
   provider      = aws.us-east-1
   statement_id  = "AllowReplication-${aws_lambda_function.cloudfront_redirect_lambda.version}"
   action        = "lambda:GetFunction"

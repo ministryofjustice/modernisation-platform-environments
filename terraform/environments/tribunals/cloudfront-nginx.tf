@@ -46,14 +46,13 @@ EOF
 # 3. CloudFront Distribution – HTTP only
 # -------------------------------------------------
 resource "aws_cloudfront_distribution" "tribunals_http_redirect" {
+  #tfsec:ignore:AWS0012 Distribution intentionally allows HTTP; Lambda@Edge handles redirects
   #checkov:skip=CKV_AWS_34: This distribution intentionally allows HTTP; Lambda@Edge handles all HTTP→HTTPS redirects for legacy domains.
-  #checkov:skip=CKV_AWS_68: This distribution must accept HTTP for legacy domain redirects via Lambda@Edge.
   #checkov:skip=CKV_AWS_86:"Access logging not required for this distribution"
   #checkov:skip=CKV_AWS_374:"Geo restriction not needed for this public service"
   #checkov:skip=CKV_AWS_305:"Default root object not required as this is an API distribution"
   #checkov:skip=CKV_AWS_310:"Single origin is sufficient for this use case"
   #checkov:skip=CKV2_AWS_32: Distribution is only used for HTTP->HTTPS redirects via Lambda@Edge; no content is served.
-  #checkov:skip=CKV2_AWS_34: "AWS SSM Parameter should be Encrypted"
   #checkov:skip=CKV2_AWS_47:"Skip Log4j protection as it is handled via WAF"
   #checkov:skip=CKV2_AWS_46:"Origin Access Identity not applicable as origin is ALB, not S3"
 
@@ -260,6 +259,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "cf_redirect_lifecycle" {
 }
 
 resource "aws_ssm_parameter" "cloudfront_distribution_id" {
+  #checkov:skip=CKV2_AWS_34: "AWS SSM Parameter should be Encrypted"
   name  = "/${local.environment}/cloudfront-distribution-id"
   type  = "String"
   value = aws_cloudfront_distribution.tribunals_http_redirect.id
