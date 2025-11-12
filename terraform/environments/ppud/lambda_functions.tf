@@ -331,7 +331,6 @@ resource "aws_lambda_function" "lambda_functions" {
   # Tags
   tags = {
     Function       = each.value.func_name
-    Purpose        = each.value.config.description
     Environment    = each.value.env
   }
 }
