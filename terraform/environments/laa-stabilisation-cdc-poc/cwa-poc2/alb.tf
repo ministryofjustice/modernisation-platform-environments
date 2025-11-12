@@ -127,99 +127,99 @@ data "aws_elb_service_account" "default" {}
 # External CWA ELB
 ####################################
 
-resource "aws_lb" "external" {
-  name                       = "${upper(local.application_name_short)}-LoadBalancer"
-  internal                   = false
-  load_balancer_type         = "application"
-  security_groups            = [aws_security_group.external_lb.id]
-  subnets                    = [var.public_subnet_a_id, var.public_subnet_b_id, var.public_subnet_c_id]
-  enable_deletion_protection = local.lb_enable_deletion_protection
-  idle_timeout               = local.external_lb_idle_timeout
-  enable_http2               = false
-  # drop_invalid_header_fields = true
+# resource "aws_lb" "external" {
+#   name                       = "${upper(local.application_name_short)}-LoadBalancer"
+#   internal                   = false
+#   load_balancer_type         = "application"
+#   security_groups            = [aws_security_group.external_lb.id]
+#   subnets                    = [var.public_subnet_a_id, var.public_subnet_b_id, var.public_subnet_c_id]
+#   enable_deletion_protection = local.lb_enable_deletion_protection
+#   idle_timeout               = local.external_lb_idle_timeout
+#   enable_http2               = false
+#   # drop_invalid_header_fields = true
 
-  access_logs {
-    bucket  = local.lb_logs_bucket != "" ? local.lb_logs_bucket : module.elb-logs-s3[0].bucket.id
-    prefix  = "${local.application_name_short}-LoadBalancer"
-    enabled = true
-  }
+#   access_logs {
+#     bucket  = local.lb_logs_bucket != "" ? local.lb_logs_bucket : module.elb-logs-s3[0].bucket.id
+#     prefix  = "${local.application_name_short}-LoadBalancer"
+#     enabled = true
+#   }
 
-  tags = merge(
-    var.tags,
-    {
-      Name = "${local.application_name_short}-LoadBalancer"
-    },
-  )
-}
+#   tags = merge(
+#     var.tags,
+#     {
+#       Name = "${local.application_name_short}-LoadBalancer"
+#     },
+#   )
+# }
 
-resource "aws_lb_listener" "external" {
+# resource "aws_lb_listener" "external" {
 
-  load_balancer_arn = aws_lb.external.arn
-  port              = 443
-  protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
-  certificate_arn   = aws_acm_certificate_validation.load_balancer.certificate_arn
+#   load_balancer_arn = aws_lb.external.arn
+#   port              = 443
+#   protocol          = "HTTPS"
+#   ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+#   certificate_arn   = aws_acm_certificate_validation.load_balancer.certificate_arn
 
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.external.arn
-  }
+#   default_action {
+#     type             = "forward"
+#     target_group_arn = aws_lb_target_group.external.arn
+#   }
 
-  tags = var.tags
+#   tags = var.tags
 
-}
+# }
 
-resource "aws_lb_listener_rule" "external" {
-  listener_arn = aws_lb_listener.external.arn
-  priority     = 100
+# resource "aws_lb_listener_rule" "external" {
+#   listener_arn = aws_lb_listener.external.arn
+#   priority     = 100
 
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.external.arn
-  }
+#   action {
+#     type             = "forward"
+#     target_group_arn = aws_lb_target_group.external.arn
+#   }
 
-  condition {
-    path_pattern {
-      values = ["/"]
-    }
-  }
-}
+#   condition {
+#     path_pattern {
+#       values = ["/"]
+#     }
+#   }
+# }
 
-resource "aws_lb_target_group" "external" {
-  name                          = "${local.application_name_short}-TargetGroup"
-  port                          = 8050
-  protocol                      = "HTTP"
-  vpc_id                        = var.shared_vpc_id
-  deregistration_delay          = 10
-  load_balancing_algorithm_type = "least_outstanding_requests"
-  health_check {
-    interval            = 15
-    path                = "/OA_HTML/AppsLocalLogin.jsp"
-    protocol            = "HTTP"
-    timeout             = 5
-    healthy_threshold   = 2
-    unhealthy_threshold = 3
-  }
-  stickiness {
-    enabled = true
-    type    = "lb_cookie"
+# resource "aws_lb_target_group" "external" {
+#   name                          = "${local.application_name_short}-TargetGroup"
+#   port                          = 8050
+#   protocol                      = "HTTP"
+#   vpc_id                        = var.shared_vpc_id
+#   deregistration_delay          = 10
+#   load_balancing_algorithm_type = "least_outstanding_requests"
+#   health_check {
+#     interval            = 15
+#     path                = "/OA_HTML/AppsLocalLogin.jsp"
+#     protocol            = "HTTP"
+#     timeout             = 5
+#     healthy_threshold   = 2
+#     unhealthy_threshold = 3
+#   }
+#   stickiness {
+#     enabled = true
+#     type    = "lb_cookie"
 
-  }
+#   }
 
-  tags = merge(
-    var.tags,
-    {
-      Name = "${local.application_name_short}-TargetGroup"
-    },
-  )
+#   tags = merge(
+#     var.tags,
+#     {
+#       Name = "${local.application_name_short}-TargetGroup"
+#     },
+#   )
 
-}
+# }
 
-resource "aws_lb_target_group_attachment" "external" {
-  target_group_arn = aws_lb_target_group.external.arn
-  target_id        = aws_instance.app1.id
-  port             = 8050
-}
+# resource "aws_lb_target_group_attachment" "external" {
+#   target_group_arn = aws_lb_target_group.external.arn
+#   target_id        = aws_instance.app1.id
+#   port             = 8050
+# }
 
 # resource "aws_lb_target_group_attachment" "external2" {
 #   count            = contains(["development", "testing"], local.environment) ? 0 : 1
@@ -233,22 +233,22 @@ resource "aws_lb_target_group_attachment" "external" {
 # External CWA ELB Security Group
 ############################################
 
-resource "aws_security_group" "external_lb" {
-  name        = "${local.application_name_short}-external-lb-security-group"
-  description = "${local.application_name_short} ALB Security Group"
-  vpc_id      = var.shared_vpc_id
-}
+# resource "aws_security_group" "external_lb" {
+#   name        = "${local.application_name_short}-external-lb-security-group"
+#   description = "${local.application_name_short} ALB Security Group"
+#   vpc_id      = var.shared_vpc_id
+# }
 
-resource "aws_vpc_security_group_ingress_rule" "external_lb_inbound" {
-  security_group_id = aws_security_group.external_lb.id
-  cidr_ipv4         = "0.0.0.0/0"
-  from_port         = 443
-  ip_protocol       = "tcp"
-  to_port           = 443
-}
+# resource "aws_vpc_security_group_ingress_rule" "external_lb_inbound" {
+#   security_group_id = aws_security_group.external_lb.id
+#   cidr_ipv4         = "0.0.0.0/0"
+#   from_port         = 443
+#   ip_protocol       = "tcp"
+#   to_port           = 443
+# }
 
-resource "aws_vpc_security_group_egress_rule" "external_lb_outbound" {
-  security_group_id = aws_security_group.external_lb.id
-  cidr_ipv4         = "0.0.0.0/0"
-  ip_protocol       = "-1"
-}
+# resource "aws_vpc_security_group_egress_rule" "external_lb_outbound" {
+#   security_group_id = aws_security_group.external_lb.id
+#   cidr_ipv4         = "0.0.0.0/0"
+#   ip_protocol       = "-1"
+# }
