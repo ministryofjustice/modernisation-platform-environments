@@ -33,8 +33,8 @@ env:
   ENVIRONMENTS:  ${{ github.event.inputs.environments || 'development' }}
   AMI_ARGS:      "-c -m 3"    # month-based AMI threshold for live runs
   EBS_MONTHS:    "3"          # month-based EBS threshold for live runs
-  AGE_MINUTES:   "3"          # age of resources in minutes when testing preview/live
-  LIVE_TEST_MODE: "true"      # false uses month gates and true uses the minute-based threshold
+  AGE_MINUTES:   "3"          # age of resources in minutes when testing
+  LIVE_TEST_MODE: "false"     # false uses month gates and true uses the minute-based threshold for testing
 
 jobs:
   build-matrix:
@@ -148,7 +148,8 @@ jobs:
             --query "Volumes[0:50].[VolumeId,CreateTime,State,Tags[?Key=='Name']|[0].Value]" \
             --output table || true
 
-      - name: Set 3-minute test flags (preview only)
+      - name: Set minute test flags (preview only)
+        if: env.LIVE_TEST_MODE == 'true'
         run: |
           echo "AMI_TEST_FLAGS=--test-mode --age-minutes ${AGE_MINUTES}" >> $GITHUB_ENV
           echo "EBS_TEST_FLAGS=--test-mode --age-minutes ${AGE_MINUTES}" >> $GITHUB_ENV
@@ -202,7 +203,11 @@ jobs:
             fi
             echo "${{ matrix.account_name }},eu-west-2,preview,ami,ami,${AMI},,${NAME},${WHEN},,${STATUS},${REASON}" >> reports/cleanup_report.csv
           done
-          echo "Account: ${{ matrix.account_name }} | Test window: ${AGE_MINUTES}m"
+          if [[ "${LIVE_TEST_MODE}" == "true" ]]; then
+            echo "Account: ${{ matrix.account_name }} | Test window: ${AGE_MINUTES}m"
+          else
+            echo "Account: ${{ matrix.account_name }} | Using month-based thresholds (AMI: ${AMI_ARGS}, EBS: ${EBS_MONTHS} months)"
+          fi
           echo "✅ Would delete: ${PREVIEW_DELETE_COUNT} | 🛡️ Protected: ${PREVIEW_PROTECTED_COUNT}"
           echo "ami_count=${PREVIEW_DELETE_COUNT}" >> "$GITHUB_OUTPUT"
           {
@@ -679,7 +684,7 @@ jobs:
           echo "**Deleted volumes**" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "| Volume ID | Age (months) | Name |" >> "$GITHUB_STEP_SUMMARY"
-          echo "|---|---:|---|" >> "$GITHUB_STEP_SUMMARY"
+          echo "|---|---:|---|"
           if [[ -f reports/ebs_cleanup_report.csv ]]; then
             tail -n +2 reports/ebs_cleanup_report.csv | head -n 20 | while IFS=',' read -r id age name status; do
               echo "| ${id} | ${age} | ${name} |" >> "$GITHUB_STEP_SUMMARY"
