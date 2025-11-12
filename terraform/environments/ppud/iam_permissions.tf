@@ -81,6 +81,16 @@ locals {
       ]
       managed_policies = ["arn:aws:iam::aws:policy/CloudWatchFullAccessV2"]
     }
+    get_certificate_expiry = {
+      description = "Lambda Function Role for retrieving certificate expiration"
+      policies = [
+        "send_message_to_sqs",
+        "send_logs_to_cloudwatch",
+        "publish_to_sns",
+        "get_cloudwatch_metrics",
+        "get_certificate_expiry"
+      ]
+    }
   }
 
   # Environment configurations
@@ -174,7 +184,8 @@ locals {
           "put_data_s3",
           "get_klayers",
           "get_elb_metrics",
-          "ec2_permissions"
+          "ec2_permissions",
+          "get_certificate_expiry"
           ] : {
           key         = "${policy_name}_${env_key}"
           policy_name = policy_name
@@ -252,6 +263,10 @@ resource "aws_iam_policy" "lambda_policies_v2" {
         Effect   = "Allow"
         Action   = ["ec2:CreateNetworkInterface", "ec2:DescribeNetworkInterface"]
         Resource = ["arn:aws:ec2:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"]
+        } : each.value.policy_name == "get_certificate_expiry" ? {
+        Effect   = "Allow"
+        Action   = ["acm:DescribeCertificate", "acm:GetCertificate", "acm:ListCertificates", "acm:ListTagsForCertificate"]
+        Resource = ["arn:aws:acm:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:certificate/*"]
         } : {
         Effect   = "Deny" # Fallback deny for any unexpected policy names
         Action   = ["*"]
