@@ -139,7 +139,10 @@ resource "aws_s3_bucket_lifecycle_configuration" "buckets_lifecycle" {
       status = "Enabled"
 
       filter {
-        prefix = ""
+        and {
+          prefix                   = rule.value
+          object_size_greater_than = 0
+        }
       }
 
       expiration {
@@ -157,10 +160,6 @@ resource "aws_s3_bucket_lifecycle_configuration" "buckets_lifecycle" {
       }
       noncurrent_version_expiration {
         noncurrent_days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_noncurrent
-      }
-
-      abort_incomplete_multipart_upload {
-        days_after_initiation = local.application_data.accounts[local.environment].s3_lifecycle_days_abort_incomplete_multipart_upload_days
       }
 
     }
