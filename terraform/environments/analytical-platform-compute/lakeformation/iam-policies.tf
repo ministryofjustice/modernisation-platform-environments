@@ -19,6 +19,7 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
       "lakeformation:ListPermissions",
       "lakeformation:DescribeResource",
       "lakeformation:GetDataAccess",
+      "lakeformation:DeleteLFTagExpression"
     ]
     resources = ["arn:aws:lakeformation:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:catalog:${data.aws_caller_identity.current.account_id}"]
   }
