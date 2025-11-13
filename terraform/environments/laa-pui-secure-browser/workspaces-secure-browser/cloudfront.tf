@@ -17,21 +17,20 @@ resource "aws_cloudfront_function" "redirect_to_auth" {
       var request = event.request;
       var qs = request.querystring || {};
       
-      // Generate random code_verifier using Math.random (sufficient for PKCE plain method)
-      function generateCodeVerifier() {
-        var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
+      // Generate random state for CSRF protection
+      function generateState() {
+        var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
         var result = '';
-        for (var i = 0; i < 128; i++) {
+        for (var i = 0; i < 32; i++) {
           result += chars.charAt(Math.floor(Math.random() * chars.length));
         }
         return result;
       }
       
-      var codeVerifier = generateCodeVerifier();
+      var state = generateState();
       
       // Build Azure Entra ID authorization URL
-      // Note: Using code_challenge_method=plain because CloudFront Functions have limited crypto support
-      // The Lambda function will validate the code_verifier matches
+      // Using authorization code flow with client_secret (PKCE not needed for confidential clients)
       var authorize = "https://login.microsoftonline.com/${local.azure_config.tenant_id}/oauth2/v2.0/authorize";
       var redirectUri = "${aws_apigatewayv2_api.callback[0].api_endpoint}/callback";
       var params = [];
@@ -40,9 +39,7 @@ resource "aws_cloudfront_function" "redirect_to_auth" {
       params.push("response_type=code");
       params.push("redirect_uri=" + encodeURIComponent(redirectUri));
       params.push("scope=" + encodeURIComponent("openid profile email"));
-      params.push("code_challenge=" + codeVerifier);
-      params.push("code_challenge_method=plain");
-      params.push("state=" + Math.random().toString(36).substring(2));
+      params.push("state=" + state);
       
       // Pass through login_hint if present
       if (qs.login_hint && qs.login_hint.value) {
@@ -61,12 +58,6 @@ resource "aws_cloudfront_function" "redirect_to_auth" {
         statusDescription: "Found",
         headers: {
           "location": { "value": redirectUrl }
-        },
-        cookies: {
-          "code_verifier": {
-            "value": codeVerifier,
-            "attributes": "Secure; HttpOnly; SameSite=Lax; Max-Age=600; Path=/"
-          }
         }
       };
       

@@ -1,12 +1,11 @@
 """
-OAuth callback handler with PKCE flow.
+OAuth callback handler for Azure Entra ID.
 Exchanges authorization code for tokens and validates JWT.
 """
 import json
 import os
 import urllib.parse
 import urllib.request
-import base64
 from typing import Dict, Any
 import jwt
 from jwt import PyJWKClient
@@ -14,7 +13,7 @@ from jwt import PyJWKClient
 
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     """
-    Lambda handler for OAuth PKCE callback.
+    Lambda handler for OAuth callback.
     Exchanges auth code for tokens, validates JWT, and redirects to portal.
     """
     print(f"Event: {json.dumps(event)}")
@@ -38,22 +37,6 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'body': '<html><body><h1>Bad Request</h1><p>No authorization code received</p></body></html>'
         }
     
-    # Extract code_verifier from cookie
-    cookies = event.get('headers', {}).get('cookie', '')
-    code_verifier = None
-    for cookie in cookies.split(';'):
-        cookie = cookie.strip()
-        if cookie.startswith('code_verifier='):
-            code_verifier = cookie.split('=', 1)[1]
-            break
-    
-    if not code_verifier:
-        return {
-            'statusCode': 400,
-            'headers': {'Content-Type': 'text/html'},
-            'body': '<html><body><h1>Bad Request</h1><p>PKCE verification failed - no code verifier</p></body></html>'
-        }
-    
     # Exchange authorization code for tokens
     tenant_id = os.environ['AZURE_TENANT_ID']
     client_id = os.environ['AZURE_CLIENT_ID']
@@ -66,8 +49,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         'client_secret': client_secret,
         'code': code,
         'redirect_uri': redirect_uri,
-        'grant_type': 'authorization_code',
-        'code_verifier': code_verifier
+        'grant_type': 'authorization_code'
     }
     
     try:
@@ -100,14 +82,13 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         
         print(f"Authenticated user: {decoded_token.get('preferred_username')}")
         
-        # Clear the code_verifier cookie and redirect to portal
+        # Redirect to portal
         portal_url = os.environ['PORTAL_URL']
         
         return {
             'statusCode': 302,
             'headers': {
                 'Location': portal_url,
-                'Set-Cookie': 'code_verifier=; Max-Age=0; Path=/; Secure; HttpOnly',
                 'Content-Type': 'text/html'
             },
             'body': ''
