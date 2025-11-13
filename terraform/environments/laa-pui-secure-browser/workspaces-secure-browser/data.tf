@@ -3,6 +3,19 @@ data "aws_availability_zones" "available" {
   state = "available"
 }
 
+# Read Azure Entra ID configuration from Secrets Manager
+data "aws_secretsmanager_secret" "azure_entra_config" {
+  name = "azure-entra-workspaces-web-config"
+}
+
+data "aws_secretsmanager_secret_version" "azure_entra_config" {
+  secret_id = data.aws_secretsmanager_secret.azure_entra_config.id
+}
+
+locals {
+  azure_config = jsondecode(data.aws_secretsmanager_secret_version.azure_entra_config.secret_string)
+}
+
 # Look up the new VPC in production (created by networking component)
 data "aws_vpc" "secure_browser" {
   count = local.environment == "production" ? 1 : 0
