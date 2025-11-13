@@ -11,8 +11,8 @@ module "azure_entra_config_secret" {
   name        = "azure-entra-workspaces-web-config"
   description = "Azure Entra ID configuration for WorkSpaces Web authentication"
 
-  # Use general shared KMS key for encryption
-  kms_key_id = data.aws_kms_key.general_shared.id
+  # Use default AWS managed encryption (aws/secretsmanager)
+  # kms_key_id not specified - uses AWS managed key
 
   secret_string = jsonencode({
     tenant_id     = "00000000-0000-0000-0000-000000000000"
