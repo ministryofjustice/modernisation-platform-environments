@@ -2,6 +2,8 @@
 
 # Azure Entra ID configuration for WorkSpaces Web authentication
 module "azure_entra_config_secret" {
+  count = local.create_resources ? 1 : 0
+
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/secrets-manager/aws"
   version = "~> 1.0"
