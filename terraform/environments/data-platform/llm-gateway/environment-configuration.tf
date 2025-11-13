@@ -89,31 +89,31 @@ locals {
       llm_gateway_teams = {
         hmcts-claude-code = {
           organisation = "hmcts"
-          models       = ["claude-sonnet-4-5"]
+          models       = ["bedrock-claude-sonnet-4-5"]
           keys = {
             chris-o = {
-              models = ["claude-sonnet-4-5"]
+              models = ["bedrock-claude-sonnet-4-5"]
             }
             junaid-i = {
-              models = ["claude-sonnet-4-5"]
+              models = ["bedrock-claude-sonnet-4-5"]
             }
             kian-k = {
-              models = ["claude-sonnet-4-5"]
+              models = ["bedrock-claude-sonnet-4-5"]
             }
             natasha-a = {
-              models = ["claude-sonnet-4-5"]
+              models = ["bedrock-claude-sonnet-4-5"]
             }
             alex-b = {
-              models = ["claude-sonnet-4-5"]
+              models = ["bedrock-claude-sonnet-4-5"]
             }
             ashwini-v = {
-              models = ["claude-sonnet-4-5"]
+              models = ["bedrock-claude-sonnet-4-5"]
             }
             mel-c = {
-              models = ["claude-sonnet-4-5"]
+              models = ["bedrock-claude-sonnet-4-5"]
             }
             linus-n = {
-              models = ["claude-sonnet-4-5"]
+              models = ["bedrock-claude-sonnet-4-5"]
             }
           }
         }
