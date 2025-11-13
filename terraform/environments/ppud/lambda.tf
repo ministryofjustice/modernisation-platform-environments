@@ -2,6 +2,9 @@
 # Lambda Functions, Permissions Statement and Zipped Archive Statements
 #######################################################################
 
+# Old Lambda functions to be decommissioned
+
+/*
 #########################
 # Development Environment
 #########################
@@ -231,6 +234,7 @@ resource "aws_cloudwatch_log_group" "lambda_securityhub_report_dev_log_group" {
   name              = "/aws/lambda/securityhub_report_dev"
   retention_in_days = 30
 }
+*/
 
 #######################################
 # Lambda Function for SES Logging - DEV
@@ -275,6 +279,7 @@ resource "aws_cloudwatch_log_group" "lambda_ses_logging_dev_log_group" {
   retention_in_days = 30
 }
 
+/*
 ###########################
 # Preproduction Environment
 ###########################
@@ -407,6 +412,7 @@ resource "aws_cloudwatch_log_group" "lambda_security_hub_report_uat_log_group" {
   name              = "/aws/lambda/securityhub_report_uat"
   retention_in_days = 30
 }
+*/
 
 #######################################
 # Lambda Function for SES Logging - UAT
@@ -451,6 +457,7 @@ resource "aws_cloudwatch_log_group" "lambda_ses_logging_uat_log_group" {
   retention_in_days = 30
 }
 
+/*
 ########################
 # Production Environment
 ########################
@@ -719,7 +726,6 @@ resource "aws_cloudwatch_log_group" "lambda_ppud_email_report_prod_log_group" {
   retention_in_days = 30
 }
 
-/*
 ###################################################
 # Lambda Function to graph PPUD ELB Requests - PROD
 ###################################################
@@ -825,7 +831,6 @@ resource "aws_cloudwatch_log_group" "lambda_wam_elb_report_prod_log_group" {
   name              = "/aws/lambda/wam_elb_report_prod"
   retention_in_days = 30
 }
-*/
 
 #################################################
 # Lambda Function to send Disk Info Report - PROD
@@ -1279,3 +1284,4 @@ resource "aws_cloudwatch_log_group" "lambda_wam_web_traffic_analysis_prod_log_gr
   name              = "/aws/lambda/wam_web_traffic_analysis_prod"
   retention_in_days = 30
 }
+*/

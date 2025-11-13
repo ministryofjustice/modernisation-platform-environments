@@ -45,6 +45,9 @@ resource "aws_lambda_layer_version" "lambda_layers" {
   compatible_runtimes = ["python3.12"]
 }
 
+# Old Lambda Layers below to be decomissioned
+
+/*
 ############## Development Environment ##################
 
 # Lambda Layer for Matplotlib
@@ -160,3 +163,4 @@ resource "aws_lambda_layer_version" "lambda_layer_requests_prod" {
   s3_key              = "lambda/layers/requests-layer.zip"
   compatible_runtimes = ["python3.12"]
 }
+*/

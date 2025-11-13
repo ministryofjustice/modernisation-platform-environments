@@ -1,12 +1,58 @@
-################################################
-# Eventbridge Rules (to invoke Lambda functions)
-################################################
-
-# TBA
-
 ##############################################################
-# EventBridge Scheduler Schedules (to invoke Lambda functions)
+# Eventbridge Rules and Schedules (to invoke Lambda functions)
 ##############################################################
+
+####################
+# Eventbridge Rules 
+####################
+
+# Lambda instances for check_certificate_expiration
+locals {
+  certificate_expiration_envs = {
+    for k, v in local.lambda_instances_map :
+    k => v
+    if startswith(k, "check_certificate_expiration")
+  }
+}
+
+# EventBridge Rules for Certificate Expiration
+resource "aws_cloudwatch_event_rule" "certificate_approaching_expiration" {
+  for_each    = local.certificate_expiration_envs
+  name        = "Certificate-Approaching-Expiration-${each.value.env}"
+  description = "PPUD certificate is approaching expiration"
+  event_pattern = <<EOF
+{
+  "source": [ "aws.acm"],
+  "detail-type": ["ACM Certificate Approaching Expiration"]
+}
+EOF
+  tags = {
+    Function    = each.value.func_name
+    Environment = each.value.env
+  }
+}
+
+# EventBridge Targets for Lambda
+resource "aws_cloudwatch_event_target" "trigger_lambda_certificate_approaching_expiration" {
+  for_each  = local.certificate_expiration_envs
+  rule      = aws_cloudwatch_event_rule.certificate_approaching_expiration[each.key].name
+  target_id = "certificate_approaching_expiration_${each.value.env}"
+  arn       = aws_lambda_function.lambda_functions[each.key].arn
+}
+
+# Lambda Permission for EventBridge
+resource "aws_lambda_permission" "allow_cloudwatch_certificate_approaching_expiration" {
+  for_each      = local.certificate_expiration_envs
+  statement_id  = "AllowExecutionFromEventBridge-${each.value.env}"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.lambda_functions[each.key].function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.certificate_approaching_expiration[each.key].arn
+}
+
+#################################
+# EventBridge Scheduler Schedules 
+#################################
 
 locals {
   # EventBridge Scheduler configurations
