@@ -50,7 +50,6 @@ locals {
         "ec2_permissions"
       ]
       managed_policies = ["arn:aws:iam::aws:policy/CloudWatchFullAccessV2"]
-      vpc_policies     = ["arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"]
     }
     get_securityhub_data = {
       description = "Lambda Function Role for retrieving security hub data"
@@ -68,6 +67,28 @@ locals {
         "send_logs_to_cloudwatch",
         "publish_to_sns",
         "put_data_s3"
+      ]
+    }
+    get_elb_metrics = {
+      description = "Lambda Function Role for retrieving ELB metrics from S3"
+      policies = [
+        "send_message_to_sqs",
+        "send_logs_to_cloudwatch",
+        "get_cloudwatch_metrics"
+      ]
+      prod_policies = [
+        "get_elb_metrics"
+      ]
+      managed_policies = ["arn:aws:iam::aws:policy/CloudWatchFullAccessV2"]
+    }
+    get_certificate_expiry = {
+      description = "Lambda Function Role for retrieving certificate expiration"
+      policies = [
+        "send_message_to_sqs",
+        "send_logs_to_cloudwatch",
+        "publish_to_sns",
+        "get_cloudwatch_metrics",
+        "get_certificate_expiry"
       ]
     }
   }
@@ -163,7 +184,8 @@ locals {
           "put_data_s3",
           "get_klayers",
           "get_elb_metrics",
-          "ec2_permissions"
+          "ec2_permissions",
+          "get_certificate_expiry"
           ] : {
           key         = "${policy_name}_${env_key}"
           policy_name = policy_name
@@ -237,10 +259,18 @@ resource "aws_iam_policy" "lambda_policies_v2" {
         Effect   = "Allow"
         Action   = ["s3:GetObject", "s3:PutObject", "s3:ListBucket"]
         Resource = ["arn:aws:s3:::moj-lambda-metrics-prod", "arn:aws:s3:::moj-lambda-metrics-prod/*"]
-        } : {
+        } : each.value.policy_name == "ec2_permissions" ? {
         Effect   = "Allow"
         Action   = ["ec2:CreateNetworkInterface", "ec2:DescribeNetworkInterface"]
         Resource = ["arn:aws:ec2:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"]
+        } : each.value.policy_name == "get_certificate_expiry" ? {
+        Effect   = "Allow"
+        Action   = ["acm:DescribeCertificate", "acm:GetCertificate", "acm:ListCertificates", "acm:ListTagsForCertificate"]
+        Resource = ["arn:aws:acm:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:certificate/*"]
+        } : {
+        Effect   = "Deny" # Fallback deny for any unexpected policy names
+        Action   = ["*"]
+        Resource = ["*"]
       }
     ]
   })
@@ -297,17 +327,10 @@ resource "aws_iam_role_policy_attachment" "attach_managed_policies_v2" {
 # VPC policy attachments (production only)
 resource "aws_iam_role_policy_attachment" "attach_vpc_policies_v2" {
   for_each = {
-    for combo in flatten([
-      for role_key, role_instance in local.lambda_role_instances_map : [
-        for policy in try(role_instance.role_config.vpc_policies, []) : {
-          key        = "${role_key}_vpc_${replace(policy, "/[^a-zA-Z0-9]/", "_")}"
-          role_key   = role_key
-          policy_arn = policy
-        } if role_instance.env_key == "production"
-      ]
-    ]) : combo.key => combo
+    for role_key, role_instance in local.lambda_role_instances_map : role_key => role_instance
+    if role_instance.env_key == "production"
   }
 
-  role       = aws_iam_role.lambda_role_v2[each.value.role_key].name
-  policy_arn = each.value.policy_arn
+  role       = aws_iam_role.lambda_role_v2[each.key].name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
 }

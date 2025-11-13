@@ -1,12 +1,58 @@
-################################################
-# Eventbridge Rules (to invoke Lambda functions)
-################################################
-
-# TBA
-
 ##############################################################
-# EventBridge Scheduler Schedules (to invoke Lambda functions)
+# Eventbridge Rules and Schedules (to invoke Lambda functions)
 ##############################################################
+
+####################
+# Eventbridge Rules 
+####################
+
+# Lambda instances for check_certificate_expiration
+locals {
+  certificate_expiration_envs = {
+    for k, v in local.lambda_instances_map :
+    k => v
+    if startswith(k, "check_certificate_expiration")
+  }
+}
+
+# EventBridge Rules for Certificate Expiration
+resource "aws_cloudwatch_event_rule" "certificate_approaching_expiration" {
+  for_each    = local.certificate_expiration_envs
+  name        = "Certificate-Approaching-Expiration-${each.value.env}"
+  description = "PPUD certificate is approaching expiration"
+  event_pattern = <<EOF
+{
+  "source": [ "aws.acm"],
+  "detail-type": ["ACM Certificate Approaching Expiration"]
+}
+EOF
+  tags = {
+    Function    = each.value.func_name
+    Environment = each.value.env
+  }
+}
+
+# EventBridge Targets for Lambda
+resource "aws_cloudwatch_event_target" "trigger_lambda_certificate_approaching_expiration" {
+  for_each  = local.certificate_expiration_envs
+  rule      = aws_cloudwatch_event_rule.certificate_approaching_expiration[each.key].name
+  target_id = "certificate_approaching_expiration_${each.value.env}"
+  arn       = aws_lambda_function.lambda_functions[each.key].arn
+}
+
+# Lambda Permission for EventBridge
+resource "aws_lambda_permission" "allow_cloudwatch_certificate_approaching_expiration" {
+  for_each      = local.certificate_expiration_envs
+  statement_id  = "AllowExecutionFromEventBridge-${each.value.env}"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.lambda_functions[each.key].function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.certificate_approaching_expiration[each.key].arn
+}
+
+#################################
+# EventBridge Scheduler Schedules 
+#################################
 
 locals {
   # EventBridge Scheduler configurations
@@ -26,7 +72,7 @@ locals {
     enable_cpu_alarms = {
       environments = ["production"]
       schedule     = "cron(0 9 ? * MON *)"
-      description  = "Trigger Lambda at 09:00 every Monday"
+      description  = "Trigger Lambda at 10:00 every Monday"
       timezone     = "Europe/London"
     }
     disk_info_report = {
@@ -173,24 +219,28 @@ resource "aws_scheduler_schedule" "lambda_schedules" {
 # Lambda function ARN mapping
 locals {
   lambda_function_arns = {
-    securityhub_report = local.is-development ? aws_lambda_function.terraform_lambda_func_securityhub_report_dev[0].arn : (
-      local.is-preproduction ? aws_lambda_function.terraform_lambda_func_securityhub_report_uat[0].arn : (
-        local.is-production ? aws_lambda_function.terraform_lambda_func_securityhub_report_prod[0].arn : null
-      )
-    )
-    send_cpu_graph                 = local.is-production ? aws_lambda_function.terraform_lambda_func_send_cpu_graph_prod[0].arn : null
-    disable_cpu_alarms             = local.is-production ? aws_lambda_function.terraform_lambda_disable_cpu_alarm_prod[0].arn : null
-    enable_cpu_alarms              = local.is-production ? aws_lambda_function.terraform_lambda_enable_cpu_alarm_prod[0].arn : null
-    disk_info_report               = local.is-production ? aws_lambda_function.terraform_lambda_func_disk_info_report_prod[0].arn : null
-    email_info_report              = local.is-production ? aws_lambda_function.terraform_lambda_func_ppud_email_report_prod[0].arn : null
-    ppud_elb_get_trt_data          = local.is-production ? aws_lambda_function.terraform_lambda_func_ppud_elb_trt_data_prod[0].arn : null
-    ppud_elb_calculate_trt_data    = local.is-production ? aws_lambda_function.terraform_lambda_func_ppud_elb_trt_calculate_prod[0].arn : null
-    ppud_elb_get_uptime_data       = local.is-production ? aws_lambda_function.terraform_lambda_func_ppud_elb_uptime_data_prod[0].arn : null
-    ppud_elb_calculate_uptime_data = local.is-production ? aws_lambda_function.terraform_lambda_func_ppud_elb_uptime_calculate_prod[0].arn : null
-    wam_web_traffic_analysis       = local.is-production ? aws_lambda_function.terraform_lambda_func_wam_web_traffic_analysis_prod[0].arn : null
-    ppud_elb_daily_trt_graph       = local.is-production ? aws_lambda_function.terraform_lambda_func_ppud_elb_trt_graph_prod[0].arn : null
-    wam_elb_daily_trt_graph        = local.is-production ? aws_lambda_function.terraform_lambda_func_wam_elb_trt_graph_prod[0].arn : null
-    #   ppud_elb_daily_connections_graph = local.is-production ? aws_lambda_function.terraform_lambda_func_ppud_elb_report_prod[0].arn : null
-    #   wam_elb_daily_connections_graph = local.is-production ? aws_lambda_function.terraform_lambda_func_wam_elb_report_prod[0].arn : null
+    securityhub_report = local.is-development ? aws_lambda_function.lambda_functions["securityhub_report_development"].arn : (
+      local.is-preproduction ? aws_lambda_function.lambda_functions["securityhub_report_preproduction"].arn : (
+        local.is-production ? aws_lambda_function.lambda_functions["securityhub_report_production"].arn : null
+    ))
+#    wam_waf_analysis = local.is-development ? aws_lambda_function.lambda_functions["wam_waf_analysis_development"].arn : (
+#      local.is-preproduction ? aws_lambda_function.lambda_functions["wam_waf_analysis_preproduction"].arn : (
+#        local.is-production ? aws_lambda_function.lambda_functions["wam_waf_analysis_production"].arn : null
+#    ))
+    wam_waf_analysis               = local.is-development ? aws_lambda_function.lambda_functions["wam_waf_analysis_development"].arn : null # Remove this once all environments are enabled
+    send_cpu_graph                 = local.is-production ? aws_lambda_function.lambda_functions["send_cpu_graph_production"].arn : null
+    disable_cpu_alarms             = local.is-production ? aws_lambda_function.lambda_functions["disable_cpu_alarm_production"].arn : null
+    enable_cpu_alarms              = local.is-production ? aws_lambda_function.lambda_functions["enable_cpu_alarm_production"].arn : null
+    disk_info_report               = local.is-production ? aws_lambda_function.lambda_functions["disk_info_report_production"].arn : null
+    email_info_report              = local.is-production ? aws_lambda_function.lambda_functions["ppud_email_report_production"].arn : null
+    ppud_elb_get_trt_data          = local.is-production ? aws_lambda_function.lambda_functions["ppud_elb_get_trt_data_production"].arn : null
+    ppud_elb_calculate_trt_data    = local.is-production ? aws_lambda_function.lambda_functions["ppud_elb_calculate_trt_data_production"].arn : null
+    ppud_elb_get_uptime_data       = local.is-production ? aws_lambda_function.lambda_functions["ppud_elb_get_uptime_data_production"].arn : null
+    ppud_elb_calculate_uptime_data = local.is-production ? aws_lambda_function.lambda_functions["ppud_elb_calculate_uptime_data_production"].arn : null
+    wam_web_traffic_analysis       = local.is-production ? aws_lambda_function.lambda_functions["wam_web_traffic_analysis_production"].arn : null
+    ppud_elb_daily_trt_graph       = local.is-production ? aws_lambda_function.lambda_functions["ppud_elb_graph_trt_data_production"].arn : null
+    wam_elb_daily_trt_graph        = local.is-production ? aws_lambda_function.lambda_functions["wam_elb_graph_trt_data_production"].arn : null
+    # ppud_elb_daily_connections_graph = local.is-production ? aws_lambda_function.lambda_functions["ppud_elb_count_report_production"].arn : null
+    # wam_elb_daily_connections_graph = local.is-production ? aws_lambda_function.lambda_functions["wam_elb_count_report_production"].arn : null
   }
 }

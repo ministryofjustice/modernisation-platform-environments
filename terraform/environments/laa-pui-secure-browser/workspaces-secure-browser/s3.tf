@@ -72,7 +72,7 @@ resource "aws_s3_bucket_notification" "s3_bucket_workspacesweb_session_logs" {
     id            = "workspaces-web-logs"
     queue_arn     = module.sqs_s3_notifications[0].queue_arn
     events        = ["s3:ObjectCreated:*"]
-    filter_suffix = "workspaces-web-logs/*"
+    filter_prefix = "workspaces-web-logs/"
   }
 }
 
