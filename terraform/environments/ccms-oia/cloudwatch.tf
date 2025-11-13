@@ -130,48 +130,6 @@ resource "aws_cloudwatch_metric_alarm" "container_adaptor_count" {
   tags = local.tags
 }
 
-# Alarm for ECS CPU Utilization
-resource "aws_cloudwatch_metric_alarm" "ecs_cpu_high" {
-  alarm_name          = "${local.application_name}-${local.environment}-cluster-cpu-high"
-  comparison_operator = "GreaterThanThreshold"
-  evaluation_periods  = 3
-  metric_name         = "CPUUtilization"
-  namespace           = "AWS/ECS"
-  period              = 60
-  statistic           = "Average"
-  threshold           = 80
-  dimensions = {
-    ClusterName = aws_ecs_cluster.main.name
-  }
-  alarm_description  = "The average CPU Utilization for OIA ECS cluster is above 80% for 3 consecutive periods. Runbook: https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
-  treat_missing_data = "notBreaching"
-  alarm_actions      = [aws_sns_topic.cloudwatch_alerts.arn]
-  ok_actions         = [aws_sns_topic.cloudwatch_alerts.arn]
-
-  tags = local.tags
-}
-
-# Alarm for ECS Memory Utilization
-resource "aws_cloudwatch_metric_alarm" "ecs_memory_high" {
-  alarm_name          = "${local.application_name}-${local.environment}-cluster-memory-high"
-  comparison_operator = "GreaterThanThreshold"
-  evaluation_periods  = 3
-  metric_name         = "MemoryUtilization"
-  namespace           = "AWS/ECS"
-  period              = 60
-  statistic           = "Average"
-  threshold           = 80
-  dimensions = {
-    ClusterName = aws_ecs_cluster.main.name
-  }
-  alarm_description  = "The average Memory Utilization for OIA ECS cluster is above 80% for 3 consecutive periods. Runbook: https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
-  treat_missing_data = "notBreaching"
-  alarm_actions      = [aws_sns_topic.cloudwatch_alerts.arn]
-  ok_actions         = [aws_sns_topic.cloudwatch_alerts.arn]
-
-  tags = local.tags
-}
-
 # Underlying EC2 Instance Status Check Failure
 resource "aws_cloudwatch_metric_alarm" "Status_Check_Failure" {
   alarm_name          = "${local.application_name}-${local.environment}-status-check-failure"
