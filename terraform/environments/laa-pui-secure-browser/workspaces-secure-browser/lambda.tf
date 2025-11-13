@@ -13,7 +13,7 @@ resource "null_resource" "lambda_dependencies" {
   provisioner "local-exec" {
     command = <<-EOT
       mkdir -p ${path.module}/.terraform/lambda_layer/python
-      pip3 install -r ${path.module}/lambda/callback/requirements.txt -t ${path.module}/.terraform/lambda_layer/python --upgrade
+      pip3 install -r ${path.module}/lambda/callback/requirements.txt -t ${path.module}/.terraform/lambda_layer/python --upgrade --platform manylinux2014_x86_64 --only-binary=:all:
     EOT
   }
 }
