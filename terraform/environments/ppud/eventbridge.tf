@@ -38,10 +38,6 @@ resource "aws_cloudwatch_event_target" "trigger_lambda_certificate_approaching_e
   rule      = aws_cloudwatch_event_rule.certificate_approaching_expiration[each.key].name
   target_id = "certificate_approaching_expiration_${each.value.env}"
   arn       = aws_lambda_function.lambda_functions[each.key].arn
-  tags = {
-    Function    = each.value.func_name
-    Environment = each.value.env
-  }
 }
 
 # Lambda Permission for EventBridge
