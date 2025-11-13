@@ -38,7 +38,7 @@ resource "aws_cloudwatch_event_target" "trigger_lambda_certificate_approaching_e
   for_each  = local.certificate_expiration_envs
   rule      = aws_cloudwatch_event_rule.certificate_approaching_expiration[each.key].name
   target_id = "certificate_approaching_expiration_${each.key}"
-  arn       = aws_lambda_function[each.value.lambda_key].arn
+  arn       = aws_lambda_function.lambda_functions[each.value.lambda_key].arn
 }
 
 # Lambda Permission for EventBridge
@@ -46,7 +46,7 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_certificate_approaching_ex
   for_each      = local.certificate_expiration_envs
   statement_id  = "AllowExecutionFromEventBridge-${each.key}"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function[each.value.lambda_key].function_name
+  function_name = aws_lambda_function.lambda_functions[each.value.lambda_key].function_name
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.certificate_approaching_expiration[each.key].arn
 }
