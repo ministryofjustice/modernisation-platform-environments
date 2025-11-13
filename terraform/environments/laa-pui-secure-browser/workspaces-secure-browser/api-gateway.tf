@@ -8,8 +8,8 @@ resource "aws_apigatewayv2_api" "callback" {
   protocol_type = "HTTP"
 
   cors_configuration {
-    allow_origins = ["https://${aws_cloudfront_distribution.waiting_room[0].domain_name}"]
-    allow_methods = ["GET"]
+    allow_origins = ["https://login.microsoftonline.com"]
+    allow_methods = ["GET", "POST", "OPTIONS"]
     allow_headers = ["*"]
     max_age       = 300
   }
