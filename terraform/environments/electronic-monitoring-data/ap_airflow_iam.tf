@@ -391,7 +391,7 @@ module "load_tasking_database" {
   environment        = local.environment
   database_name      = "g4s-tasking"
   path_to_data       = "/g4s_tasking_second_dump"
-  source_data_bucket = module.s3-data-bucket.bucket
+  source_data_bucket = module.s3-dms-target-store-bucket.bucket
   secret_code        = jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]
   oidc_arn           = aws_iam_openid_connect_provider.analytical_platform_compute.arn
   athena_dump_bucket = module.s3-athena-bucket.bucket
