@@ -31,7 +31,7 @@ resource "aws_apigatewayv2_route" "callback" {
   route_key          = "GET /callback"
   target             = "integrations/${aws_apigatewayv2_integration.callback_lambda[0].id}"
   authorization_type = "NONE"
-  
+
   lifecycle {
     create_before_destroy = false
   }

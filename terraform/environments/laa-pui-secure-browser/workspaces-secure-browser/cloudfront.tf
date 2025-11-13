@@ -17,19 +17,20 @@ resource "aws_cloudfront_function" "redirect_to_auth" {
       var request = event.request;
       var qs = request.querystring || {};
       
-      // Generate random code_verifier (base64url encoded random string)
+      // Generate random code_verifier using Math.random (sufficient for PKCE plain method)
       function generateCodeVerifier() {
-        var array = new Uint8Array(32);
-        crypto.getRandomValues(array);
-        var str = String.fromCharCode.apply(null, array);
-        var base64 = btoa(str);
-        return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+        var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
+        var result = '';
+        for (var i = 0; i < 128; i++) {
+          result += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return result;
       }
       
       var codeVerifier = generateCodeVerifier();
       
       // Build Azure Entra ID authorization URL
-      // Note: Using code_challenge_method=plain because CloudFront Functions don't support async SHA-256
+      // Note: Using code_challenge_method=plain because CloudFront Functions have limited crypto support
       // The Lambda function will validate the code_verifier matches
       var authorize = "https://login.microsoftonline.com/${local.azure_config.tenant_id}/oauth2/v2.0/authorize";
       var redirectUri = "${aws_apigatewayv2_api.callback[0].api_endpoint}/callback";
@@ -59,9 +60,12 @@ resource "aws_cloudfront_function" "redirect_to_auth" {
         statusCode: 302,
         statusDescription: "Found",
         headers: {
-          "location": { "value": redirectUrl },
-          "set-cookie": { 
-            "value": "code_verifier=" + codeVerifier + "; Secure; HttpOnly; SameSite=Lax; Max-Age=600; Path=/"
+          "location": { "value": redirectUrl }
+        },
+        cookies: {
+          "code_verifier": {
+            "value": codeVerifier,
+            "attributes": "Secure; HttpOnly; SameSite=Lax; Max-Age=600; Path=/"
           }
         }
       };
