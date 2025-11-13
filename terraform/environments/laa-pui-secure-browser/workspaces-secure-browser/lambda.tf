@@ -2,37 +2,13 @@
 # Lambda callback handler
 ####################
 
-# Build Lambda layer with dependencies
-resource "null_resource" "lambda_dependencies" {
-  count = local.create_resources ? 1 : 0
-
-  triggers = {
-    requirements = filemd5("${path.module}/lambda/callback/requirements.txt")
-  }
-
-  provisioner "local-exec" {
-    command = <<-EOT
-      mkdir -p ${path.module}/.terraform/lambda_layer/python
-      pip3 install -r ${path.module}/lambda/callback/requirements.txt -t ${path.module}/.terraform/lambda_layer/python --upgrade --platform manylinux2014_x86_64 --only-binary=:all:
-    EOT
-  }
-}
-
-data "archive_file" "lambda_layer_zip" {
-  count      = local.create_resources ? 1 : 0
-  depends_on = [null_resource.lambda_dependencies]
-
-  type        = "zip"
-  source_dir  = "${path.module}/.terraform/lambda_layer"
-  output_path = "${path.module}/.terraform/lambda_layer.zip"
-}
-
+# Lambda layer with PyJWT and cryptography dependencies (pre-built)
 resource "aws_lambda_layer_version" "dependencies" {
   count = local.create_resources ? 1 : 0
 
   layer_name          = "${local.application_name}-callback-dependencies-${local.environment}"
-  filename            = data.archive_file.lambda_layer_zip[0].output_path
-  source_code_hash    = data.archive_file.lambda_layer_zip[0].output_base64sha256
+  filename            = "${path.module}/lambda/lambda_layer.zip"
+  source_code_hash    = filebase64sha256("${path.module}/lambda/lambda_layer.zip")
   compatible_runtimes = ["python3.11"]
 
   description = "PyJWT and cryptography for OAuth callback handler"
