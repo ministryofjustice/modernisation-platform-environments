@@ -24,7 +24,7 @@
       "db_deletion_protection": "true",
       "db_delete_automated_backups": "false",
       "db_skip_final_snapshot": "true",
-      "db_snapshot_identifier": "rds:delius-jitbit-development-database-2024-03-01-06-19",
+      "db_snapshot_identifier": "rds:delius-jitbit-sandbox-database-2025-10-24-05-11",
       "ses_log_retention_days": "7"
     },
     "development": {
@@ -51,7 +51,7 @@
       "db_deletion_protection": "true",
       "db_delete_automated_backups": "false",
       "db_skip_final_snapshot": "true",
-      "db_snapshot_identifier": "cr-jitbit-dev-db-snapshot-for-testing-migration-to-mp-copy",
+      "db_snapshot_identifier": "rds:delius-jitbit-development-database-2025-10-24-05-14",
       "ses_log_retention_days": "7"
     },
     "test": {
