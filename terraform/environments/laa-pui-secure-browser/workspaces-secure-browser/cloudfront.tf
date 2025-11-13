@@ -17,47 +17,30 @@ resource "aws_cloudfront_function" "redirect_to_auth" {
       var request = event.request;
       var qs = request.querystring || {};
       
-      // Generate PKCE code_verifier and code_challenge
+      // Generate random code_verifier (base64url encoded random string)
       function generateCodeVerifier() {
         var array = new Uint8Array(32);
         crypto.getRandomValues(array);
-        var verifier = base64URLEncode(array);
-        return verifier;
-      }
-      
-      function base64URLEncode(buffer) {
-        var str = String.fromCharCode.apply(null, buffer);
+        var str = String.fromCharCode.apply(null, array);
         var base64 = btoa(str);
         return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
       }
       
-      async function sha256(plain) {
-        var encoder = new TextEncoder();
-        var data = encoder.encode(plain);
-        var hashBuffer = await crypto.subtle.digest('SHA-256', data);
-        return new Uint8Array(hashBuffer);
-      }
-      
-      async function generateCodeChallenge(verifier) {
-        var hashed = await sha256(verifier);
-        return base64URLEncode(hashed);
-      }
-      
       var codeVerifier = generateCodeVerifier();
-      var codeChallenge = await generateCodeChallenge(codeVerifier);
       
-      // Build Azure Entra ID authorization URL with PKCE
+      // Build Azure Entra ID authorization URL
+      // Note: Using code_challenge_method=plain because CloudFront Functions don't support async SHA-256
+      // The Lambda function will validate the code_verifier matches
       var authorize = "https://login.microsoftonline.com/${local.azure_config.tenant_id}/oauth2/v2.0/authorize";
       var redirectUri = "${aws_apigatewayv2_api.callback[0].api_endpoint}/callback";
-      var redirectUri = "https://" + cloudfrontDomain + "/callback.html";
       var params = [];
       
       params.push("client_id=${local.azure_config.client_id}");
       params.push("response_type=code");
       params.push("redirect_uri=" + encodeURIComponent(redirectUri));
       params.push("scope=" + encodeURIComponent("openid profile email"));
-      params.push("code_challenge=" + codeChallenge);
-      params.push("code_challenge_method=S256");
+      params.push("code_challenge=" + codeVerifier);
+      params.push("code_challenge_method=plain");
       params.push("state=" + Math.random().toString(36).substring(2));
       
       // Pass through login_hint if present
