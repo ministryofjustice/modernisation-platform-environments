@@ -227,22 +227,3 @@ HTML
     }
   )
 }
-
-# OAuth callback page - extracts token from fragment and calls API Gateway
-resource "aws_s3_object" "callback" {
-  count = local.create_resources ? 1 : 0
-
-  bucket       = aws_s3_bucket.waiting_room[0].id
-  key          = "callback.html"
-  content_type = "text/html"
-  content = templatefile("${path.module}/s3-content/callback.html", {
-    LAMBDA_URL = aws_lambda_function_url.callback[0].function_url
-  })
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "oauth-callback-page"
-    }
-  )
-}
