@@ -43,7 +43,7 @@ resource "aws_scheduler_schedule" "maat_load_schedule" {
     mode = "OFF"
   }
 
-  schedule_expression = "cron(0 7-19 ? * * *)"
+  schedule_expression = local.environment == "production" ? "cron(0/15 7-19 ? * * *)" : "cron(0 7-19 ? * * *)"
 
   target {
     arn      = aws_lambda_function.maat_provider_load.arn
@@ -60,7 +60,7 @@ resource "aws_scheduler_schedule" "ccr_load_schedule" {
     mode = "OFF"
   }
 
-  schedule_expression = "cron(0 7-19 ? * * *)"
+  schedule_expression = local.environment == "production" ? "cron(0/15 7-19 ? * * *)" : "cron(0 7-19 ? * * *)"
 
   target {
     arn      = aws_lambda_function.ccr_provider_load.arn
@@ -77,7 +77,7 @@ resource "aws_scheduler_schedule" "cclf_load_schedule" {
     mode = "OFF"
   }
 
-  schedule_expression = "cron(0 7-19 ? * * *)"
+  schedule_expression = local.environment == "production" ? "cron(0/15 7-19 ? * * *)" : "cron(0 7-19 ? * * *)"
 
   target {
     arn      = aws_lambda_function.cclf_provider_load.arn
@@ -87,7 +87,7 @@ resource "aws_scheduler_schedule" "cclf_load_schedule" {
 
 # Purge Schedule
 resource "aws_scheduler_schedule" "purge_schedule" {
-  count      = local.environment == "development" ? 1 : 0
+  count      = local.environment == "development" || local.environment == "production" ? 1 : 0
   name       = "purge-schedule"
   group_name = "default"
 

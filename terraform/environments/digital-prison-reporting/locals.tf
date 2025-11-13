@@ -15,8 +15,8 @@ locals {
 
   other_log_retention_in_days = local.application_data.accounts[local.environment].other_log_retention_in_days
 
-  # Kinesis Agent
-  kinesis_agent_autoscale = local.application_data.accounts[local.environment].kinesis_agent_autoscale
+  # Bastion Host
+  bastion_host_autoscale = local.application_data.accounts[local.environment].bastion_host_autoscale
 
   # glue_db                       = local.application_data.accounts[local.environment].glue_db_name
   # glue_db_data_domain           = local.application_data.accounts[local.environment].glue_db_data_domain
@@ -29,7 +29,6 @@ locals {
   s3_kms_arn             = aws_kms_key.s3.arn
   operational_db_kms_arn = aws_kms_key.operational_db.arn
   operational_db_kms_id  = aws_kms_key.operational_db.key_id
-  kinesis_kms_id         = data.aws_kms_key.kinesis_kms_key.key_id
   create_bucket          = local.application_data.accounts[local.environment].setup_buckets
   account_id             = data.aws_caller_identity.current.account_id
   account_region         = data.aws_region.current.name
@@ -46,7 +45,6 @@ locals {
   # Flag for whether jobs that access the operational datastore have this feature turned on or not
   enable_operational_datastore_job_access = local.application_data.accounts[local.environment].enable_operational_datastore_job_access
 
-  kinesis_endpoint      = "https://kinesis.eu-west-2.amazonaws.com"
   cloud_platform_cidr   = "172.20.0.0/16"
   enable_dpr_cloudtrail = local.application_data.accounts[local.environment].enable_cloud_trail
   generic_lambda        = "${local.project}-generic-lambda"
@@ -309,6 +307,8 @@ locals {
   # s3 transfer
   scheduled_s3_file_transfer_retention_period_amount = local.application_data.accounts[local.environment].scheduled_s3_file_transfer_retention_period_amount
   scheduled_s3_file_transfer_retention_period_unit   = local.application_data.accounts[local.environment].scheduled_s3_file_transfer_retention_period_unit
+  scheduled_file_transfer_use_default_parallelism    = local.application_data.accounts[local.environment].scheduled_file_transfer_use_default_parallelism
+  scheduled_file_transfer_parallelism                = local.application_data.accounts[local.environment].scheduled_file_transfer_parallelism
 
   # step function notification lambda
   step_function_notification_lambda_handler = "uk.gov.justice.digital.lambda.StepFunctionDMSNotificationLambda::handleRequest"
@@ -384,7 +384,7 @@ locals {
     # We need to duplicate the username with 'user' and 'username' keys
     user     = "placeholder"
     username = "placeholder"
-    endpoint = "0.0.0.0" # In dev this is always manually set to the static_private_ip of the ec2_kinesis_agent acting as a tunnel to NOMIS
+    endpoint = "0.0.0.0" # In dev this is always manually set to the static_private_ip of the ec2_bastion_host acting as a tunnel to NOMIS
     port     = "1521"
   }
 
@@ -394,7 +394,7 @@ locals {
     password = "placeholder"
     user     = "placeholder"
     username = "placeholder"
-    endpoint = "0.0.0.0" # In dev this is always manually set to the static_private_ip of the ec2_kinesis_agent acting as a tunnel to NOMIS
+    endpoint = "0.0.0.0" # In dev this is always manually set to the static_private_ip of the ec2_bastion_host acting as a tunnel to NOMIS
     port     = "1522"
   }
 
@@ -536,8 +536,9 @@ locals {
   all_tags = merge(
     local.tags,
     {
-      Name = local.application_name
-      Jira = "DPR-108"
+      dpr-name       = local.application_name
+      dpr-jira       = "DPR-108"
+      dpr-is-backend = true
     }
   )
 
@@ -559,7 +560,7 @@ locals {
   create_postgres_load_generator_job = local.application_data.accounts[local.environment].create_postgres_load_generator_job
 
   # Probation Discovery
-  probation_discovery_windows_ami_id = "ami-0ba9276d1fb25ed77"
+  probation_discovery_windows_ami_id = "ami-03c8cd9ad2f2d6256"
   enable_probation_discovery_node    = local.application_data.accounts[local.environment].enable_probation_discovery_node
 
   dpr_windows_rdp_credentials_placeholder = {

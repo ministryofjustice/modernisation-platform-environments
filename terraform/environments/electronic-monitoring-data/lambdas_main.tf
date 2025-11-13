@@ -286,3 +286,30 @@ module "process_fms_metadata" {
     POWERTOOLS_SERVICE_NAME      = "process-fms-metadata-lambda"
   }
 }
+
+#-----------------------------------------------------------------------------------
+# dlt load dms output
+#-----------------------------------------------------------------------------------
+
+module "load_dms_output" {
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "load_dms_output"
+  role_name                      = aws_iam_role.load_dms_output.name
+  role_arn                       = aws_iam_role.load_dms_output.arn
+  handler                        = "load_dms_output.handler"
+  memory_size                    = 10240
+  timeout                        = 900
+  reserved_concurrent_executions = 100
+  ephemeral_storage_size         = 10240
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev                 = local.is-production ? "prod" : "dev"
+  security_group_ids             = [aws_security_group.lambda_generic.id]
+  subnet_ids                     = data.aws_subnets.shared-public.ids
+  environment_variables = {
+    ATHENA_QUERY_BUCKET = module.s3-athena-bucket.bucket.id
+    ACCOUNT_NUMBER      = data.aws_caller_identity.current.account_id
+    STAGING_BUCKET      = module.s3-create-a-derived-table-bucket.bucket.id
+  }
+}
+

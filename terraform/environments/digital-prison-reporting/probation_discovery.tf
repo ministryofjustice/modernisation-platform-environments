@@ -35,10 +35,11 @@ module "probation_discovery_windows_node" {
   tags = merge(
     local.all_tags,
     {
-      Name           = "${local.project}-probation-discovery-${local.env}"
-      Resource_Type  = "EC2 Instance"
-      Resource_Group = "probation-discovery"
-      Jira           = "DPR2-1980"
+      Name               = "${local.project}-probation-discovery-${local.env}"
+      dpr-name           = "${local.project}-probation-discovery-${local.env}"
+      dpr-resource-type  = "EC2 Instance"
+      dpr-resource-group = "probation-discovery"
+      dpr-jira           = "DPR2-1980"
     }
   )
 

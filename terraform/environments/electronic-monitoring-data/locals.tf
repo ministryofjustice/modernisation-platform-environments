@@ -61,11 +61,19 @@ locals {
   g4s_ssh_keys = [
     "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBASfeWlH+6RtmQuIS6McjG6OpT2pwPwt9hGsQKOzF+uV4B0PoQBSGD8QGyf2CqanTH8i1WoLBhMEgGKlMu5ZvGal2fxfB1C9i5MjxAETwh0a9xMiotJxUhvfhFGSTNLugw== ecdsa-key-20250501",
     "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBDke7ZBtezNpJgO3x1ZdTQ0br4GJJCi3wfaiyD3rhRpGSZrQ9lKMbO/iSLQLL2/MOOnsTCzlpJGh/o8nRd4SXPT9/mOMrImF2ojJ5RS4IKtgajfnfJiCnBei8bXW5WZHTA== ecdsa-key-20250516",
+    "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBK85G9UwgU1KKgsYXfTWDsT4MqGSmjku1XGpH1EqmSuXLk5lmwFsgoLqqsROq2oEw2Yrr3uLyNVY2Dl6Pfm+dkdljfbPtqku+AkRSkhDo4K7bIwhWPh7HImcalxhde6BUA== ecdsa-key-20240208",
+    "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBEXJdSFcodesKVvDRdJYySLZ7RSmkHDadklPTi1M4GId09+9hD9VoCbLWJsDbbDtXEkts63oNOIBcF8w1KfkC1O0N7VPumJ6VkklXNBrhDPJu3JvENZW/bX2JDPC+/gYdg== ecdsa-key-20241125",
+    "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBJ11LVR2KRfiTbziv7Xkr7RfDCI502InqqBlAKxDiQQgEeGkRJQNI11e/uSQTZCgaj/F4AXadBvaJ0buH478q1+FBZ8pl7EkZlxeRky3vBu0hPFNN6+9D8Q//uGpEKSu+w== ecdsa-key-20241125",
+    "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBGa8I/XEQt/HkWvjEXip9Ob0xgsUb47dyAoJ3htuc/pp0oxf2xpYk1YkdzQt8jo8b6effc2e5mf6MdEdMo6t/ck9TnER5IOs/BeurNTnlzq2JW6RDLBmhrB5yyfcYf9nyA== ecdsa-key-20241125",
   ]
 
   g4s_cidr_ipv4s = [
     "34.89.82.32/32",
     "194.72.72.74/32",
+    "18.135.195.129/32",
+    "18.130.124.178/32",
+    "18.171.111.175/32",
+    "35.178.248.3/32",
   ]
   g4s_cidr_ipv6s = []
 

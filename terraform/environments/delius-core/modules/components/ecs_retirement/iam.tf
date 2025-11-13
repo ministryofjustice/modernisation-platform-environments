@@ -32,13 +32,13 @@ data "aws_iam_policy_document" "lambda_policy_document" {
   statement {
     sid       = "Parameters"
     effect    = "Allow"
-    resources = ["arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter/deliusawsalerts/slack-token"]
+    resources = ["arn:aws:ssm:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:parameter/deliusawsalerts/slack-token"]
     actions   = ["ssm:GetParameter"]
   }
   statement {
     sid       = "ParameterDecryption"
     effect    = "Allow"
-    resources = ["arn:aws:kms:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:alias/aws/ssm"]
+    resources = ["arn:aws:kms:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:alias/aws/ssm"]
     actions   = ["kms:Decrypt"]
   }
 }

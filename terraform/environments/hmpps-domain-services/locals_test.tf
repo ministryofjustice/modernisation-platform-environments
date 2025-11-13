@@ -30,6 +30,21 @@ locals {
       }
     }
 
+    cloudwatch_dashboards = {
+      "CloudWatch-Default" = {
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.lb,
+          local.cloudwatch_dashboard_widget_groups.all_ec2,
+          local.cloudwatch_dashboard_widget_groups.jump,
+          local.cloudwatch_dashboard_widget_groups.rdgateway,
+          local.cloudwatch_dashboard_widget_groups.rdservices,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ssm_command,
+        ]
+      }
+    }
+
     ec2_autoscaling_groups = {
       test-rhel85 = merge(local.ec2_autoscaling_groups.base_linux, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.base_linux.autoscaling_group, {
@@ -203,15 +218,15 @@ locals {
 
     patch_manager = {
       patch_schedules = {
-        group1 = "cron(00 06 ? * WED *)" # 6am wed for prod for non-prod env's we have to work around the overnight shutdown  
+        group1 = "cron(00 06 ? * WED *)" # 6am wed for prod for non-prod env's we have to work around the overnight shutdown
         group2 = "cron(00 06 ? * THU *)" # 6am thu for prod
         manual = "cron(00 21 31 2 ? *)"  # 9pm 31 feb e.g. impossible date to allow for manual patching of otherwise enrolled instances
       }
       maintenance_window_duration = 2 # 4 for prod
       maintenance_window_cutoff   = 1 # 2 for prod
       patch_classifications = {
-        REDHAT_ENTERPRISE_LINUX = ["Security", "Bugfix"] # Linux Options=(Security,Bugfix,Enhancement,Recommended,Newpackage)
-        WINDOWS                 = ["SecurityUpdates", "CriticalUpdates"]
+        REDHAT_ENTERPRISE_LINUX = ["Security", "Bugfix"]                 # Linux Options=Security,Bugfix,Enhancement,Recommended,Newpackage
+        WINDOWS                 = ["SecurityUpdates", "CriticalUpdates"] # Windows Options=CriticalUpdates,SecurityUpdates,DefinitionUpdates,Drivers,FeaturePacks,ServicePacks,Tools,UpdateRollups,Updates,Upgrades
       }
     }
 
@@ -220,6 +235,7 @@ locals {
         "public-https-*-unhealthy-load-balancer-host",
         "*-instance-or-cloudwatch-agent-stopped",
       ]
+      end_time = "07:00"
     }
 
     route53_zones = {

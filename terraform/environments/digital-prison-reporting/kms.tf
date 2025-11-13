@@ -12,10 +12,11 @@ resource "aws_kms_key" "s3" {
 
 
   tags = merge(
-    local.tags,
+    local.all_tags,
     {
-      Name = "${local.application_name}-s3-kms"
-      Jira = "DPR2-XXXX"
+      dpr-name          = "${local.application_name}-s3-kms"
+      dpr-resource-type = "KMS Key"
+      dpr-jira          = "DPR2-XXXX"
     }
   )
 }
@@ -52,49 +53,6 @@ resource "aws_kms_alias" "kms-alias" {
   target_key_id = aws_kms_key.s3.arn
 }
 
-### KINESIS KMS
-resource "aws_kms_key" "kinesis-kms-key" {
-  #checkov:skip=CKV_AWS_33
-  #checkov:skip=CKV_AWS_227
-  #checkov:skip=CKV_AWS_7
-
-  description         = "Encryption key for kinesis data stream"
-  enable_key_rotation = true
-  key_usage           = "ENCRYPT_DECRYPT"
-  policy              = data.aws_iam_policy_document.kinesis-kms.json
-  is_enabled          = true
-
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "${local.application_name}-kinesis-kms"
-      Jira = "DPR2-XXXX"
-    }
-  )
-}
-
-data "aws_iam_policy_document" "kinesis-kms" {
-  statement {
-    #checkov:skip=CKV_AWS_111
-    #checkov:skip=CKV_AWS_109
-    #checkov:skip=CKV_AWS_356: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
-    effect    = "Allow"
-    actions   = ["kms:*"]
-    resources = ["*"]
-
-    principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
-    }
-  }
-}
-
-resource "aws_kms_alias" "kinesis-kms-alias" {
-  name          = "alias/${local.project}-kinesis-kms"
-  target_key_id = aws_kms_key.kinesis-kms-key.arn
-}
-
 ### Redshift KMS
 resource "aws_kms_key" "redshift-kms-key" {
   #checkov:skip=CKV_AWS_33
@@ -107,10 +65,11 @@ resource "aws_kms_key" "redshift-kms-key" {
   is_enabled          = true
 
   tags = merge(
-    local.tags,
+    local.all_tags,
     {
-      Name = "${local.application_name}-redshift-kms"
-      Jira = "DPR2-XXXX"
+      dpr-name          = "${local.application_name}-redshift-kms"
+      dpr-resource-type = "KMS Key"
+      dpr-jira          = "DPR2-XXXX"
     }
   )
 }
@@ -155,10 +114,11 @@ resource "aws_kms_key" "rds" {
   is_enabled          = true
 
   tags = merge(
-    local.tags,
+    local.all_tags,
     {
-      Name = "${local.application_name}-rds-kms"
-      Jira = "DPR2-XXXX"
+      dpr-name          = "${local.application_name}-rds-kms"
+      dpr-resource-type = "KMS Key"
+      dpr-jira          = "DPR2-XXXX"
     }
   )
 }
@@ -205,10 +165,11 @@ resource "aws_kms_key" "operational_db" {
 
 
   tags = merge(
-    local.tags,
+    local.all_tags,
     {
-      Name = "${local.project}-operational-db-key"
-      Jira = "DPR2-XXXX"
+      dpr-name          = "${local.project}-operational-db-key"
+      dpr-resource-type = "KMS Key"
+      dpr-jira          = "DPR2-XXXX"
     }
   )
 }
@@ -227,10 +188,11 @@ resource "aws_kms_key" "cloudtrail" {
 
 
   tags = merge(
-    local.tags,
+    local.all_tags,
     {
-      Name = "${local.application_name}-cloudtrail-kms"
-      Jira = "DPR2-XXXX"
+      dpr-name          = "${local.application_name}-cloudtrail-kms"
+      dpr-resource-type = "KMS Key"
+      dpr-jira          = "DPR2-XXXX"
     }
   )
 }

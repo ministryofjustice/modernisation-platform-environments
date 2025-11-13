@@ -45,8 +45,9 @@ resource "aws_lambda_function" "purge_lambda" {
   function_name    = "purge_lambda_function"
   role             = aws_iam_role.purge_lambda_role.arn
   handler          = "lambda_function.lambda_handler"
-  filename         = "lambda/purge_lambda/purge_lambda_package.zip"
-  source_code_hash = filebase64sha256("lambda/purge_lambda/purge_lambda_package.zip")
+  s3_bucket         = data.aws_s3_object.purge_lambda_zip.bucket
+  s3_key            = data.aws_s3_object.purge_lambda_zip.key
+  s3_object_version = data.aws_s3_object.purge_lambda_zip.version_id
   timeout          = 100
   memory_size      = 128
   runtime          = "python3.10"

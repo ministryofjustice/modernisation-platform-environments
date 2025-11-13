@@ -58,8 +58,21 @@ module "dms_second_task" {
 
   for_each = toset(local.is-production ? [
     "capita_alcohol_monitoring",
-    "g4s_emsys_mvp",
+    "civica_orca",
     "g4s_atrium",
+    "g4s_atv",
+    "g4s_cap_dw",
+    "g4s_centurion",
+    "g4s_emsys_mvp",
+    "g4s_emsys_tpims",
+    "g4s_fep",
+    "g4s_integrity",
+    "g4s_integrity_customdb",
+    "g4s_lcm_archive_local_full",
+    "g4s_rf_hours",
+    "g4s_subject_history",
+    "g4s_tasking",
+    "g4s_telephony"
   ] : local.is-development ? ["test"] : [])
 
   database_name      = each.key
