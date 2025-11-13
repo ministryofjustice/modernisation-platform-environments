@@ -11,7 +11,6 @@ resource "aws_ssm_parameter" "cortex_account_id" {
   tags           = local.tags
 }
 
-
 # Azure Entra ID configuration for CloudFront authentication
 resource "aws_ssm_parameter" "entra_tenant_id" {
   #checkov:skip=CKV2_AWS_34: "Tenant ID is not sensitive"

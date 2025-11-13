@@ -16,13 +16,7 @@ resource "aws_cloudfront_function" "redirect_to_auth" {
     function handler(event) {
       var request = event.request;
       var qs = request.querystring || {};
-      var loginHint = "";
       
-      // Extract login_hint from query string if present
-      if (qs.login_hint && qs.login_hint.value) {
-        loginHint = qs.login_hint.value;
-      }
-
       // Build Azure Entra ID authorization URL
       var authorize = "https://login.microsoftonline.com/${local.azure_config.tenant_id}/oauth2/v2.0/authorize";
       var redirectUri = "${aws_apigatewayv2_api.callback[0].api_endpoint}/callback";
@@ -35,8 +29,15 @@ resource "aws_cloudfront_function" "redirect_to_auth" {
       params.push("scope=" + encodeURIComponent("openid profile email"));
       params.push("nonce=" + Math.random().toString(36).substring(2));
       
-      if (loginHint) {
-        params.push("login_hint=" + encodeURIComponent(loginHint));
+      // Pass through login_hint if present
+      if (qs.login_hint && qs.login_hint.value) {
+        var loginHint = qs.login_hint.value;
+        // Check if already encoded by looking for % character
+        // If not encoded, encode it; otherwise use as-is
+        if (loginHint.indexOf('%') === -1) {
+          loginHint = encodeURIComponent(loginHint);
+        }
+        params.push("login_hint=" + loginHint);
       }
       
       var redirectUrl = authorize + "?" + params.join("&");
