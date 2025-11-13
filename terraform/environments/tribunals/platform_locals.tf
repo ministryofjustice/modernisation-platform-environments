@@ -66,11 +66,21 @@ locals {
     "asylum-support-tribunal.gov.uk"
   ]
 
-  # This array should match the cloudfront_nginx_sans one above, but with  dev. prefix for each one
-  cloudfront_nginx_nonprod_sans = [
-    "dev.ahmlr.gov.uk",
-    "dev.asylum-support-tribunal.gov.uk"
+  # This array is dynamically built from the above production sans, but prefixes each one with the environment name
+  prefixed_domains = [
+    for d in local.cloudfront_nginx_sans : "${local.environment}.${d}"
   ]
+
+  # This map will either contain the prod, dev or preprod SANS during the plan/apply stage
+  # This map is used to assign the aliases for the certificate and the distribution below.
+  cloudfront_sans_map = {
+    production     = local.base_domains
+    development    = local.prefixed_domains
+    preproduction  = local.prefixed_domains
+  }
+
+  # Final SANs to apply to cert or distribution
+  cloudfront_nginx_sans = lookup(local.cloudfront_sans_map, local.environment, [])
 
   pending_cloudfront_nginx_sans = [
     "appeals-service.gov.uk",
