@@ -99,7 +99,7 @@ locals {
       environments = ["development", "preproduction"]
       permissions  = [{
         principal  = "sns.amazonaws.com"
-        source_arn_resource = "ses_logging_${each.value.env}"
+        source_arn_resource = "ses_logging"
       }]
     }
     disable_cpu_alarm = {
