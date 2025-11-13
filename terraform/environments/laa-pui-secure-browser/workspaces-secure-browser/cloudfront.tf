@@ -17,23 +17,52 @@ resource "aws_cloudfront_function" "redirect_to_auth" {
       var request = event.request;
       var qs = request.querystring || {};
       
-      // Build Azure Entra ID authorization URL
+      // Generate PKCE code_verifier and code_challenge
+      function generateCodeVerifier() {
+        var array = new Uint8Array(32);
+        crypto.getRandomValues(array);
+        var verifier = base64URLEncode(array);
+        return verifier;
+      }
+      
+      function base64URLEncode(buffer) {
+        var str = String.fromCharCode.apply(null, buffer);
+        var base64 = btoa(str);
+        return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+      }
+      
+      async function sha256(plain) {
+        var encoder = new TextEncoder();
+        var data = encoder.encode(plain);
+        var hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        return new Uint8Array(hashBuffer);
+      }
+      
+      async function generateCodeChallenge(verifier) {
+        var hashed = await sha256(verifier);
+        return base64URLEncode(hashed);
+      }
+      
+      var codeVerifier = generateCodeVerifier();
+      var codeChallenge = await generateCodeChallenge(codeVerifier);
+      
+      // Build Azure Entra ID authorization URL with PKCE
       var authorize = "https://login.microsoftonline.com/${local.azure_config.tenant_id}/oauth2/v2.0/authorize";
       var redirectUri = "${aws_apigatewayv2_api.callback[0].api_endpoint}/callback";
+      var redirectUri = "https://" + cloudfrontDomain + "/callback.html";
       var params = [];
       
       params.push("client_id=${local.azure_config.client_id}");
-      params.push("response_type=id_token");
-      params.push("response_mode=fragment");
+      params.push("response_type=code");
       params.push("redirect_uri=" + encodeURIComponent(redirectUri));
       params.push("scope=" + encodeURIComponent("openid profile email"));
-      params.push("nonce=" + Math.random().toString(36).substring(2));
+      params.push("code_challenge=" + codeChallenge);
+      params.push("code_challenge_method=S256");
+      params.push("state=" + Math.random().toString(36).substring(2));
       
       // Pass through login_hint if present
       if (qs.login_hint && qs.login_hint.value) {
         var loginHint = qs.login_hint.value;
-        // Check if already encoded by looking for % character
-        // If not encoded, encode it; otherwise use as-is
         if (loginHint.indexOf('%') === -1) {
           loginHint = encodeURIComponent(loginHint);
         }
@@ -42,12 +71,15 @@ resource "aws_cloudfront_function" "redirect_to_auth" {
       
       var redirectUrl = authorize + "?" + params.join("&");
 
-      // Return redirect response
+      // Store code_verifier in httpOnly cookie
       var response = {
         statusCode: 302,
         statusDescription: "Found",
         headers: {
-          "location": { "value": redirectUrl }
+          "location": { "value": redirectUrl },
+          "set-cookie": { 
+            "value": "code_verifier=" + codeVerifier + "; Secure; HttpOnly; SameSite=Lax; Max-Age=600; Path=/"
+          }
         }
       };
       

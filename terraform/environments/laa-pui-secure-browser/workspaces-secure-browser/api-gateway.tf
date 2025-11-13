@@ -15,21 +15,6 @@ resource "aws_apigatewayv2_api" "callback" {
   )
 }
 
-# JWT Authorizer for API Gateway
-resource "aws_apigatewayv2_authorizer" "jwt" {
-  count = local.create_resources ? 1 : 0
-
-  api_id           = aws_apigatewayv2_api.callback[0].id
-  authorizer_type  = "JWT"
-  identity_sources = ["$request.header.Authorization"]
-  name             = "entra-jwt-authorizer"
-
-  jwt_configuration {
-    audience = [local.azure_config.client_id]
-    issuer   = "https://login.microsoftonline.com/${local.azure_config.tenant_id}/v2.0"
-  }
-}
-
 resource "aws_apigatewayv2_integration" "callback_lambda" {
   count = local.create_resources ? 1 : 0
 
@@ -45,8 +30,7 @@ resource "aws_apigatewayv2_route" "callback" {
   api_id             = aws_apigatewayv2_api.callback[0].id
   route_key          = "GET /callback"
   target             = "integrations/${aws_apigatewayv2_integration.callback_lambda[0].id}"
-  authorization_type = "JWT"
-  authorizer_id      = aws_apigatewayv2_authorizer.jwt[0].id
+  authorization_type = "NONE"
 }
 
 resource "aws_apigatewayv2_stage" "callback_default" {

@@ -1,1 +1,3 @@
-# No external dependencies required - using Python standard library only
+PyJWT[crypto]==2.8.0
+cryptography==41.0.7
+

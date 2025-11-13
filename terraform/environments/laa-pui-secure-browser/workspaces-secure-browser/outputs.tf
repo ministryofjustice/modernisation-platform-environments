@@ -12,13 +12,13 @@ output "cloudfront_waiting_room_url" {
   value       = local.create_resources ? "https://${aws_cloudfront_distribution.waiting_room[0].domain_name}" : null
 }
 
-output "api_gateway_callback_endpoint" {
+output "api_gateway_callback_url" {
   description = "API Gateway endpoint for OAuth callback"
-  value       = local.create_resources ? aws_apigatewayv2_api.callback[0].api_endpoint : null
+  value       = local.create_resources ? "${aws_apigatewayv2_api.callback[0].api_endpoint}/callback" : null
 }
 
-output "callback_url" {
-  description = "Full callback URL (register this in Azure Entra ID app)"
+output "callback_url_for_azure" {
+  description = "Callback URL to register in Azure Entra ID app (API Gateway endpoint)"
   value       = local.create_resources ? "${aws_apigatewayv2_api.callback[0].api_endpoint}/callback" : null
 }
 
