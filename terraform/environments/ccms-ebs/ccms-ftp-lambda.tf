@@ -68,15 +68,9 @@ resource "aws_s3_bucket" "buckets" {
 
   bucket = each.value
 
-  tags = merge(
+   tags = merge(local.tags,
     {
       Name        = each.value
-      Environment = local.environment
-    },
-    {
-      "business-unit"          = "LAA",
-      "infrastructure-support" = "laa-role-sre@digital.justice.gov.uk",
-      "source-code"            = "https://github.com/ministryofjustice/modernisation-platform-environments"
     }
   )
 

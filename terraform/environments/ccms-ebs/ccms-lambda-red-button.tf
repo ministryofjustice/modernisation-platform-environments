@@ -90,15 +90,9 @@ resource "aws_lambda_function" "red_button_trigger" {
 resource "aws_s3_bucket" "red_button_data" {
   bucket = "${local.application_name}-${local.environment}-red-button-data"
  
-  tags = merge(
+  tags = merge(local.tags,
     {
       Name        = "${local.application_name}-${local.environment}-red-button-data"
-      Environment = local.environment
-    },
-    {
-      "business-unit"          = "LAA",
-      "infrastructure-support" = "laa-role-sre@digital.justice.gov.uk",
-      "source-code"            = "https://github.com/ministryofjustice/modernisation-platform-environments"
     }
   )
 }
