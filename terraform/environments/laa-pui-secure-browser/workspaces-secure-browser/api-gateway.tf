@@ -7,13 +7,6 @@ resource "aws_apigatewayv2_api" "callback" {
   name          = "${local.application_name}-callback-api-${local.environment}"
   protocol_type = "HTTP"
 
-  cors_configuration {
-    allow_origins = ["https://login.microsoftonline.com"]
-    allow_methods = ["GET", "POST", "OPTIONS"]
-    allow_headers = ["*"]
-    max_age       = 300
-  }
-
   tags = merge(
     local.tags,
     {
