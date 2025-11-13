@@ -1,21 +1,13 @@
-# Upload the Layer to S3
-
-resource "aws_s3_object" "lambda_layer_s3" {
-  bucket = aws_s3_bucket.lambda_payment_load.bucket
-  key    = "lambda/layerV2.zip"
-  source = "lambda/layerV2.zip"
-}
+#Layer is manually uploaded to S3 bucket "ccms-ebs-shared" at path "lambda_delivery/payment_lambda_layer/layerV2.zip"
 
 # Lambda Layer
 resource "aws_lambda_layer_version" "lambda_layer" {
   layer_name               = "${local.application_name}-${local.environment}-payment-load-layer"
-  s3_bucket                = aws_s3_bucket.lambda_payment_load.bucket
-  s3_key                   = aws_s3_object.lambda_layer_s3.key
+  s3_key                   = "lambda_delivery/payment_lambda_layer/layerV2.zip"
+  s3_bucket                =  aws_s3_bucket.ccms_ebs_shared.bucket
   compatible_runtimes      = ["python3.10"]
   compatible_architectures = ["x86_64"]
   description              = "Lambda Layer for ${local.application_name} Payment Load"
-
-  depends_on = [aws_s3_object.lambda_layer_s3]
 }
 
 # SG for Lambda

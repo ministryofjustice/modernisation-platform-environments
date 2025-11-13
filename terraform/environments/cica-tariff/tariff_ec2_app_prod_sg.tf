@@ -98,6 +98,14 @@ resource "aws_security_group" "tariff_app_prod_security_group" {
     description     = "Allow NFS 111tcp ingress from DB tier for spp_draft_letters mount"
   }
 
+  ingress {
+    protocol  = "udp"
+    from_port = 111
+    to_port   = 111
+    # security_groups = [module.tariff_db_prod_security_group[0].security_group_id, aws_security_group.tariff_db_prod_security_group[0].id]
+    security_groups = [aws_security_group.tariff_db_prod_security_group[0].id]
+    description     = "Allow NFS 111udp ingress from DB tier for spp_draft_letters mount"
+  }
 }
 
 
@@ -220,6 +228,15 @@ module "tariff_app_prod_security_group" {
       protocol                 = "tcp"
       source_security_group_id = module.tariff_db_prod_security_group[0].security_group_id
       description              = "Allow  NFS 111tcp ingress from DB tier for spp_draft_letters mount"
+    }
+,
+    {
+      from_port = 111
+      to_port   = 111
+      protocol  = "udp"
+      # source_security_group_id = module.tariff_db_prod_security_group[0].security_group_id,aws_security_group.tariff_db_prod_security_group[0].id
+      source_security_group_id = aws_security_group.tariff_db_prod_security_group[0].id
+      description              = "Allow  NFS 111udp ingress from DB tier for spp_draft_letters mount"
     }
   ]
 }

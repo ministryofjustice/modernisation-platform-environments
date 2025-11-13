@@ -25,11 +25,22 @@ data "aws_iam_policy_document" "kms_key_policy" {
     ]
     resources = ["*"]
   }
-}
 
-moved {
-  from = aws_kms_key.workspacesweb_session_logs
-  to   = aws_kms_key.workspacesweb_session_logs[0]
+  dynamic "statement" {
+    for_each = local.create_resources ? [1] : []
+    content {
+      sid = "AllowCortexXSIAMRoleUseKey"
+      principals {
+        type        = "AWS"
+        identifiers = [module.cortex_xsiam_role[0].arn]
+      }
+      actions = [
+        "kms:Decrypt",
+        "kms:DescribeKey"
+      ]
+      resources = ["*"]
+    }
+  }
 }
 
 resource "aws_kms_key" "workspacesweb_session_logs" {
@@ -44,11 +55,6 @@ resource "aws_kms_key" "workspacesweb_session_logs" {
       Name = "workspacesweb-session-logs-key"
     }
   )
-}
-
-moved {
-  from = aws_kms_alias.workspacesweb_session_logs
-  to   = aws_kms_alias.workspacesweb_session_logs[0]
 }
 
 resource "aws_kms_alias" "workspacesweb_session_logs" {
