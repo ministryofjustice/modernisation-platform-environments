@@ -1,8 +1,8 @@
 {
   "accounts": {
     "development": {
-      "ec2_oem_ami_id_app": "ami-05c1d7b2770fe7bc0",
-      "ec2_oem_ami_id_db": "ami-02a203da06f8e6bf8",
+      "ec2_oem_ami_id_app": "ami-061d717bf569e59fc",
+      "ec2_oem_ami_id_db": "ami-07d6d3f7f5579a302",
       "ec2_oem_ami_id_wl": "",
       "ec2_oem_instance_type_app": "m5.xlarge",
       "ec2_oem_instance_type_db": "c5.2xlarge",
@@ -12,7 +12,14 @@
       "ec2_oem_key_name_wl": "",
       "ec2_zone": "eu-west-2a",
       "env_in_fqdn": "dev",
-      "key_name": "oem-ec2-key-development"
+      "key_name": "oem-ec2-key-development",
+      "snapshot_id_app_opt_oem_app": "snap-0286772093d5db371",
+      "snapshot_id_app_opt_oem_inst": "snap-08ae66755c84e088c",
+      "snapshot_id_db_opt_oem_app": "snap-047f37f3037ed28c3",
+      "snapshot_id_db_opt_oem_inst": "snap-0694378db7ed2efbe",
+      "snapshot_id_db_opt_oem_dbf": "snap-0efae2a764b9cfa26",
+      "snapshot_id_db_opt_oem_redo": "snap-0bbd8052d65ba388f",
+      "snapshot_id_db_opt_oem_arch": "snap-0e41eb82143d24103"
     },
     "test": {
       "ec2_oem_ami_id_app": "ami-00a433d5bdf0bd23b",
@@ -26,7 +33,14 @@
       "ec2_oem_key_name_wl": "oem-ec2-key-wl-test",
       "ec2_zone": "eu-west-2a",
       "env_in_fqdn": "test",
-      "key_name": "oem-ec2-key-test"
+      "key_name": "oem-ec2-key-test",
+      "snapshot_id_app_opt_oem_app": "",
+      "snapshot_id_app_opt_oem_inst": "",
+      "snapshot_id_db_opt_oem_app": "",
+      "snapshot_id_db_opt_oem_inst": "",
+      "snapshot_id_db_opt_oem_dbf": "",
+      "snapshot_id_db_opt_oem_redo": "",
+      "snapshot_id_db_opt_oem_arch": ""
     },
     "preproduction": {
       "ec2_oem_ami_id_app": "ami-0dc9e412061b87365",
@@ -40,7 +54,14 @@
       "ec2_oem_key_name_wl": "oem-ec2-key-wl-preproduction",
       "ec2_zone": "eu-west-2a",
       "env_in_fqdn": "preprod",
-      "key_name": "oem-ec2-key-preproduction"
+      "key_name": "oem-ec2-key-preproduction",
+      "snapshot_id_app_opt_oem_app": "",
+      "snapshot_id_app_opt_oem_inst": "",
+      "snapshot_id_db_opt_oem_app": "",
+      "snapshot_id_db_opt_oem_inst": "",
+      "snapshot_id_db_opt_oem_dbf": "",
+      "snapshot_id_db_opt_oem_redo": "",
+      "snapshot_id_db_opt_oem_arch": ""
     },
     "production": {
       "ec2_oem_ami_id_app": "ami-0dc9e412061b87365",
@@ -53,9 +74,15 @@
       "ec2_oem_key_name_db": "oem-ec2-key-db-production",
       "ec2_oem_key_name_wl": "",
       "ec2_zone": "eu-west-2a",
-      "ec2_zone": "eu-west-2a",
       "env_in_fqdn": "prod",
-      "key_name": "oem-ec2-key-production"
+      "key_name": "oem-ec2-key-production",
+      "snapshot_id_app_opt_oem_app": "",
+      "snapshot_id_app_opt_oem_inst": "",
+      "snapshot_id_db_opt_oem_app": "",
+      "snapshot_id_db_opt_oem_inst": "",
+      "snapshot_id_db_opt_oem_dbf": "",
+      "snapshot_id_db_opt_oem_redo": "",
+      "snapshot_id_db_opt_oem_arch": ""
     }
   }
 }

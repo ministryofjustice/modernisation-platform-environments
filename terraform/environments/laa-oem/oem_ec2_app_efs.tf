@@ -11,11 +11,9 @@ resource "aws_efs_file_system" "oem_app_efs" {
 }
 
 resource "aws_efs_mount_target" "oem_app_efs" {
-  file_system_id = aws_efs_file_system.oem_app_efs.id
-  subnet_id      = data.aws_subnet.data_subnets_a.id
-# security_groups = [
-#   aws_security_group.oem_app_efs_sg.id
-# ]
+  file_system_id  = aws_efs_file_system.oem_app_efs.id
+  subnet_id       = data.aws_subnet.data_subnets_a.id
+  security_groups = [aws_security_group.oem_app_efs_sg.id]
 }
 
 #resource "aws_security_group" "oem_app_efs_sg" {

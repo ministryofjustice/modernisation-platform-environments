@@ -24,7 +24,7 @@ resource "aws_instance" "oem_wl" {
     env_fqdn = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
     hostname = "laa-oem-wl"
   }))
-# vpc_security_group_ids = [aws_security_group.oem_wl_security_group_1[count.index].id]
+  # vpc_security_group_ids = [aws_security_group.oem_wl_security_group_1[count.index].id]
 
   root_block_device {
     delete_on_termination = true
