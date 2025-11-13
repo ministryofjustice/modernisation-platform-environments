@@ -159,10 +159,6 @@ resource "aws_workspacesweb_browser_settings" "main" {
           {
             "name" = "OIA Hub"
             "url"  = "https://${local.oia_url}"
-          },
-          {
-            "name" = "LAA Sign In"
-            "url"  = "https://${local.laa_sign_in_url}/"
           }
         ]
       }
@@ -233,7 +229,14 @@ resource "aws_workspacesweb_browser_settings" "main" {
           "google-exention-bucket.s3.eu-west-2.amazonaws.com",
           "chrome://print/",
           "chrome-untrusted://print/",
-          "chrome://new-tab-page"
+          "chrome://new-tab-page",
+          "legalaidlearning.justice.gov.uk",
+          "assets.publishing.service.gov.uk",
+          "www.gov.uk",
+          "www.justice.gov.uk",
+          "justice.gov.uk",
+          "legalservices.gov.uk",
+          "lsconline.legalservices.gov.uk"
         ]
       }
       "AlwaysOpenPdfExternally" = {
