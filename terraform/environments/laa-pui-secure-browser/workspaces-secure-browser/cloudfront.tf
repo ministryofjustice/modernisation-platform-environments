@@ -126,7 +126,7 @@ resource "aws_cloudfront_distribution" "waiting_room" {
 
   # API Gateway origin for callback handling
   origin {
-    domain_name = aws_apigatewayv2_api.callback[0].api_endpoint # e.g. abcd1234.execute-api.eu-west-2.amazonaws.com
+    domain_name = replace(aws_apigatewayv2_api.callback[0].api_endpoint, "https://", "")
     origin_id   = "api-gateway-origin"
 
     custom_origin_config {
