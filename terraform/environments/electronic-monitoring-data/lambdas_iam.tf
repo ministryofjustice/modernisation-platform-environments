@@ -276,6 +276,15 @@ resource "aws_iam_role" "rotate_iam_keys" {
 }
 
 #-----------------------------------------------------------------------------------
+# Rotate encryption key
+#-----------------------------------------------------------------------------------
+
+resource "aws_iam_role" "rotate_encryption_key" {
+  name               = "rotate-encryption-key-lambda-role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+#-----------------------------------------------------------------------------------
 # Virus scanning - definition upload
 #-----------------------------------------------------------------------------------
 
