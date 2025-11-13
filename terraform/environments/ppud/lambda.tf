@@ -2,6 +2,9 @@
 # Lambda Functions, Permissions Statement and Zipped Archive Statements
 #######################################################################
 
+# Old Lambda functions to be decommissioned
+
+/*
 #########################
 # Development Environment
 #########################
@@ -719,7 +722,6 @@ resource "aws_cloudwatch_log_group" "lambda_ppud_email_report_prod_log_group" {
   retention_in_days = 30
 }
 
-/*
 ###################################################
 # Lambda Function to graph PPUD ELB Requests - PROD
 ###################################################
@@ -825,7 +827,6 @@ resource "aws_cloudwatch_log_group" "lambda_wam_elb_report_prod_log_group" {
   name              = "/aws/lambda/wam_elb_report_prod"
   retention_in_days = 30
 }
-*/
 
 #################################################
 # Lambda Function to send Disk Info Report - PROD
@@ -1279,3 +1280,4 @@ resource "aws_cloudwatch_log_group" "lambda_wam_web_traffic_analysis_prod_log_gr
   name              = "/aws/lambda/wam_web_traffic_analysis_prod"
   retention_in_days = 30
 }
+*/
