@@ -20,7 +20,7 @@ variable "script_file_version" {
 
 variable "glue_version" {
   type        = string
-  default     = "4.0"
+  default     = "5.0"
   description = "(Optional) The version of glue to use."
 }
 
