@@ -72,6 +72,18 @@ locals {
             model_id = "eu.anthropic.claude-sonnet-4-5-20250929-v1:0"
             region   = "eu-west-2"
           }
+          meta-llama3-8b-instruct = {
+            model_id = "meta.llama3-8b-instruct-v1:0"
+            region   = "eu-west-2"
+          }
+          meta-llama3-70b-instruct = {
+            model_id = "meta.llama3-70b-instruct-v1:0"
+            region   = "eu-west-2"
+          }
+          qwen-qwen3-coder-30b-a3b = {
+            model_id = "qwen.qwen3-coder-30b-a3b-v1:0"
+            region   = "eu-west-2"
+          }
         }
       }
       llm_gateway_teams = {
