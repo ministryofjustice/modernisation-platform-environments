@@ -89,9 +89,7 @@ resource "aws_lambda_function" "red_button_trigger" {
 
 resource "aws_s3_bucket" "red_button_data" {
   bucket = "${local.application_name}-${local.environment}-red-button-data"
-  # tags = merge(local.tags,
-  #   { Name = lower(format("s3-bucket-%s-%s", local.application_name, local.environment)) }
-  # )
+ 
   tags = merge(
     {
       Name        = "${local.application_name}-${local.environment}-red-button-data"

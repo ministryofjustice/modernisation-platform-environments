@@ -302,9 +302,7 @@ data "aws_iam_policy_document" "dbbackup_s3_policy" {
 #For shared bucket lifecycle rule is not needed as it host lambda application source code
 resource "aws_s3_bucket" "ccms_ebs_shared" {
   bucket = "${local.application_name}-${local.environment}-shared"
-  # tags = merge(local.tags,
-  #   { Name = lower(format("s3-bucket-%s-%s", local.application_name, local.environment)) }
-  # )
+  
   tags = merge(
     {
       Name        = "${local.application_name}-${local.environment}-shared"
@@ -353,9 +351,7 @@ resource "aws_s3_bucket_versioning" "ccms_ebs_shared" {
 
 resource "aws_s3_bucket" "lambda_payment_load" {
   bucket = "${local.application_name}-${local.environment}-payment-load"
-  # tags = merge(local.tags,
-  #   { Name = lower(format("s3-bucket-%s-%s", local.application_name, local.environment)) }
-  # )
+  
   tags = merge(
     {
       Name        = "${local.application_name}-${local.environment}-payment-load"

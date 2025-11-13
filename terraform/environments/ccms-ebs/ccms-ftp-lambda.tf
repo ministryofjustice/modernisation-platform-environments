@@ -35,9 +35,9 @@ locals {
 
   is_production = local.environment == "production"
 
-  # Days and ID label based on environment
-  expire_days = local.is_production ? 90 : 60
-  expire_id   = local.is_production ? "expire-90-days" : "expire-60-day"
+  # # Days and ID label based on environment
+  # expire_days = local.is_production ? 90 : 60
+  # expire_id   = local.is_production ? "expire-90-days" : "expire-60-day"
 
 }
 
@@ -67,9 +67,6 @@ resource "aws_s3_bucket" "buckets" {
   for_each = toset(local.bucket_names)
 
   bucket = each.value
-  # tags = merge(local.tags,
-  #   { Name = lower(format("s3-bucket-%s-%s", local.application_name, local.environment)) }
-  # )
 
   tags = merge(
     {
