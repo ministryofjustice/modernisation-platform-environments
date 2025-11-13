@@ -89,31 +89,58 @@ locals {
       llm_gateway_teams = {
         hmcts-claude-code = {
           organisation = "hmcts"
-          models       = ["bedrock-claude-sonnet-4-5"]
+          models = [
+            "bedrock-claude-haiku-4-5",
+            "bedrock-claude-sonnet-4-5"
+          ]
           keys = {
             chris-o = {
-              models = ["bedrock-claude-sonnet-4-5"]
+              models = [
+                "bedrock-claude-haiku-4-5",
+                "bedrock-claude-sonnet-4-5"
+              ]
             }
             junaid-i = {
-              models = ["bedrock-claude-sonnet-4-5"]
+              models = [
+                "bedrock-claude-haiku-4-5",
+                "bedrock-claude-sonnet-4-5"
+              ]
             }
             kian-k = {
-              models = ["bedrock-claude-sonnet-4-5"]
+              models = [
+                "bedrock-claude-haiku-4-5",
+                "bedrock-claude-sonnet-4-5"
+              ]
             }
             natasha-a = {
-              models = ["bedrock-claude-sonnet-4-5"]
+              models = [
+                "bedrock-claude-haiku-4-5",
+                "bedrock-claude-sonnet-4-5"
+              ]
             }
             alex-b = {
-              models = ["bedrock-claude-sonnet-4-5"]
+              models = [
+                "bedrock-claude-haiku-4-5",
+                "bedrock-claude-sonnet-4-5"
+              ]
             }
             ashwini-v = {
-              models = ["bedrock-claude-sonnet-4-5"]
+              models = [
+                "bedrock-claude-haiku-4-5",
+                "bedrock-claude-sonnet-4-5"
+              ]
             }
             mel-c = {
-              models = ["bedrock-claude-sonnet-4-5"]
+              models = [
+                "bedrock-claude-haiku-4-5",
+                "bedrock-claude-sonnet-4-5"
+              ]
             }
             linus-n = {
-              models = ["bedrock-claude-sonnet-4-5"]
+              models = [
+                "bedrock-claude-haiku-4-5",
+                "bedrock-claude-sonnet-4-5"
+              ]
             }
           }
         }
