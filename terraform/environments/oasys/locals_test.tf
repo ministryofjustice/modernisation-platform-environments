@@ -139,7 +139,7 @@ locals {
         })
         instance = merge(local.ec2_instances.bip.instance, {
           ami = "ami-0d206b8546ea2b68a" # to prevent instances being re-created due to recreated AMI
-          # instance_type = "t3.medium"
+          instance_type = "t3.medium"
         })
         user_data_cloud_init = merge(local.ec2_instances.bip.user_data_cloud_init, {
           args = merge(local.ec2_instances.bip.user_data_cloud_init.args, {
