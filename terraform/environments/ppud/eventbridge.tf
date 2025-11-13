@@ -6,24 +6,19 @@
 # Eventbridge Rules 
 ####################
 
+# Lambda instances for check_certificate_expiration
 locals {
   certificate_expiration_envs = {
-    development = {
-      lambda_key = "check_certificate_expiration_development"
-    }
-    preproduction = {
-      lambda_key = "check_certificate_expiration_preproduction"
-    }
-    production = {
-      lambda_key = "check_certificate_expiration_production"
-    }
+    for k, v in local.lambda_instances_map :
+    k => v
+    if startswith(k, "check_certificate_expiration")
   }
 }
 
-# EventBridge Rule for Certificate Expiration
+# EventBridge Rules for Certificate Expiration
 resource "aws_cloudwatch_event_rule" "certificate_approaching_expiration" {
   for_each    = local.certificate_expiration_envs
-  name        = "Certificate-Approaching-Expiration-${each.key}"
+  name        = "Certificate-Approaching-Expiration-${each.value.env}"
   description = "PPUD certificate is approaching expiration"
   event_pattern = <<EOF
 {
@@ -31,22 +26,30 @@ resource "aws_cloudwatch_event_rule" "certificate_approaching_expiration" {
   "detail-type": ["ACM Certificate Approaching Expiration"]
 }
 EOF
+  tags = {
+    Function    = each.value.func_name
+    Environment = each.value.env
+  }
 }
 
-# EventBridge Target for Lambda
+# EventBridge Targets for Lambda
 resource "aws_cloudwatch_event_target" "trigger_lambda_certificate_approaching_expiration" {
   for_each  = local.certificate_expiration_envs
   rule      = aws_cloudwatch_event_rule.certificate_approaching_expiration[each.key].name
-  target_id = "certificate_approaching_expiration_${each.key}"
-  arn       = aws_lambda_function.lambda_functions[each.value.lambda_key].arn
+  target_id = "certificate_approaching_expiration_${each.value.env}"
+  arn       = aws_lambda_function.lambda_functions[each.key].arn
+  tags = {
+    Function    = each.value.func_name
+    Environment = each.value.env
+  }
 }
 
 # Lambda Permission for EventBridge
-resource "aws_lambda_permission" "allow_cloudwatch_to_certificate_approaching_expiration" {
+resource "aws_lambda_permission" "allow_cloudwatch_certificate_approaching_expiration" {
   for_each      = local.certificate_expiration_envs
-  statement_id  = "AllowExecutionFromEventBridge-${each.key}"
+  statement_id  = "AllowExecutionFromEventBridge-${each.value.env}"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.lambda_functions[each.value.lambda_key].function_name
+  function_name = aws_lambda_function.lambda_functions[each.key].function_name
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.certificate_approaching_expiration[each.key].arn
 }
