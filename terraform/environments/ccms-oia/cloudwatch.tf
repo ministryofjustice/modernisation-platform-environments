@@ -86,7 +86,7 @@ resource "aws_cloudwatch_metric_alarm" "container_connector_count" {
 }
 
 # Alarm for ECS Container Count for OpaHub Service
-resource "aws_cloudwatch_metric_alarm" "container_count" {
+resource "aws_cloudwatch_metric_alarm" "container_opahub_count" {
   alarm_name          = "${local.application_name}-${local.environment}-opahub-container-count-low"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = 1
@@ -108,7 +108,7 @@ resource "aws_cloudwatch_metric_alarm" "container_count" {
   tags = local.tags
 }
 # Alarm for ECS Container Count for Adaptor Service
-resource "aws_cloudwatch_metric_alarm" "container_count" {
+resource "aws_cloudwatch_metric_alarm" "container_adaptor_count" {
   alarm_name          = "${local.application_name}-${local.environment}-adaptor-container-count-low"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = 1
