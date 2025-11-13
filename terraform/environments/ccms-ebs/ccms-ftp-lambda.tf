@@ -64,9 +64,9 @@ resource "aws_s3_bucket" "buckets" {
 
   bucket = each.value
 
-   tags = merge(local.tags,
+  tags = merge(local.tags,
     {
-      Name        = each.value
+      Name = each.value
     }
   )
 

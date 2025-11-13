@@ -302,10 +302,10 @@ data "aws_iam_policy_document" "dbbackup_s3_policy" {
 #For shared bucket lifecycle rule is not needed as it host lambda application source code
 resource "aws_s3_bucket" "ccms_ebs_shared" {
   bucket = "${local.application_name}-${local.environment}-shared"
-  
+
   tags = merge(local.tags,
     {
-      Name        = "${local.application_name}-${local.environment}-shared"
+      Name = "${local.application_name}-${local.environment}-shared"
     }
   )
 
@@ -345,12 +345,12 @@ resource "aws_s3_bucket_versioning" "ccms_ebs_shared" {
 
 resource "aws_s3_bucket" "lambda_payment_load" {
   bucket = "${local.application_name}-${local.environment}-payment-load"
-  
+
   tags = merge(local.tags,
     {
-      Name        = "${local.application_name}-${local.environment}-payment-load"
+      Name = "${local.application_name}-${local.environment}-payment-load"
     }
-  ) 
+  )
 }
 
 resource "aws_s3_bucket_public_access_block" "lambda_payment_load" {
@@ -376,13 +376,13 @@ resource "aws_s3_bucket_lifecycle_configuration" "lambda_payment_load_lifecycle"
 
   # One lifecycle rule per prefix
   rule {
-    id = "expire-${aws_s3_bucket.lambda_payment_load.id}-${local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_current}d"
+    id     = "expire-${aws_s3_bucket.lambda_payment_load.id}-${local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_current}d"
     status = "Enabled"
 
     filter {
       prefix = ""
     }
-    
+
     expiration {
       days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_current
     }
