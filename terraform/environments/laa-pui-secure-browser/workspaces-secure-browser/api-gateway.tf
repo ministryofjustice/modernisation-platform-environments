@@ -37,6 +37,15 @@ resource "aws_apigatewayv2_route" "callback" {
   }
 }
 
+resource "aws_apigatewayv2_route" "auth" {
+  count = local.create_resources ? 1 : 0
+
+  api_id             = aws_apigatewayv2_api.callback[0].id
+  route_key          = "GET /auth"
+  target             = "integrations/${aws_apigatewayv2_integration.callback_lambda[0].id}"
+  authorization_type = "NONE"
+}
+
 resource "aws_apigatewayv2_stage" "callback_default" {
   count = local.create_resources ? 1 : 0
 
