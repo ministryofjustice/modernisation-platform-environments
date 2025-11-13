@@ -1,7 +1,117 @@
 #######################################
 # CloudWatch Alarms for OIA
 #######################################
+# Alarm for ALB 5xx Errors
+resource "aws_cloudwatch_metric_alarm" "alb_connector_5xx" {
+  alarm_name          = "${local.application_name}-${local.environment}-connector-5xx-errors"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 3
+  metric_name         = "HTTPCode_ELB_5XX_Count"
+  namespace           = "AWS/ApplicationELB"
+  period              = 60
+  statistic           = "Sum"
+  threshold           = 10
+  alarm_description   = "Alarm when the number of 5xx errors from the connector ALB exceeds 10 in a 3 minute period"
+  dimensions = {
+    LoadBalancer = aws_lb.connector.name
+  }
 
+  treat_missing_data = "notBreaching"
+  alarm_actions             = [aws_sns_topic.cloudwatch_alerts.arn]
+  ok_actions                = [aws_sns_topic.cloudwatch_alerts.arn]
+
+  tags = local.tags
+}
+
+resource "aws_cloudwatch_metric_alarm" "alb_opahub_5xx" {
+  alarm_name          = "${local.application_name}-${local.environment}-opa-5xx-errors"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 3
+  metric_name         = "HTTPCode_ELB_5XX_Count"
+  namespace           = "AWS/ApplicationELB"
+  period              = 60
+  statistic           = "Sum"
+  threshold           = 10
+  alarm_description   = "Alarm when the number of 5xx errors from the connector ALB exceeds 10 in a 3 minute period"
+  dimensions = {
+    LoadBalancer = aws_lb.opahub.name
+  }
+
+  treat_missing_data = "notBreaching"
+  alarm_actions             = [aws_sns_topic.cloudwatch_alerts.arn]
+  ok_actions                = [aws_sns_topic.cloudwatch_alerts.arn]
+
+  tags = local.tags
+}
+
+resource "aws_cloudwatch_metric_alarm" "alb_adaptor_5xx" {
+  alarm_name          = "${local.application_name}-${local.environment}-adaptor-5xx-errors"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 3
+  metric_name         = "HTTPCode_ELB_5XX_Count"
+  namespace           = "AWS/ApplicationELB"
+  period              = 60
+  statistic           = "Sum"
+  threshold           = 10
+  alarm_description   = "Alarm when the number of 5xx errors from the connector ALB exceeds 10 in a 3 minute period"
+  dimensions = {
+    LoadBalancer = aws_lb.adaptor.name
+  }
+
+  treat_missing_data = "notBreaching"
+  alarm_actions             = [aws_sns_topic.cloudwatch_alerts.arn]
+  ok_actions                = [aws_sns_topic.cloudwatch_alerts.arn]
+
+  tags = local.tags
+}
+
+# Alarm for ECS Container Count for Connector Service
+resource "aws_cloudwatch_metric_alarm" "container_connector_count" {
+  alarm_name          = "${local.application_name}-${local.environment}-container-count-low"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = 1
+  metric_name         = "RunningTaskCount"
+  namespace           = "ECS/ContainerInsights"
+  period              = 60
+  statistic           = "Average"
+  threshold           = local.application_data.accounts[local.environment].connector_app_count
+  dimensions = {
+    ClusterName = aws_ecs_cluster.main.name
+    ServiceName = aws_ecs_service.ecs_connector_service.name
+  }
+  alarm_description = "The number of OIA ECS tasks is less than ${local.application_data.accounts[local.environment].opa_app_count}. Runbook: https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
+
+  treat_missing_data = "breaching"
+  alarm_actions             = [aws_sns_topic.cloudwatch_alerts.arn]
+  ok_actions                = [aws_sns_topic.cloudwatch_alerts.arn]
+  insufficient_data_actions = []
+
+  tags = local.tags
+}
+
+# Alarm for ECS Container Count for OpaHub Service
+resource "aws_cloudwatch_metric_alarm" "container_count" {
+  alarm_name          = "${local.application_name}-${local.environment}-container-count-low"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = 1
+  metric_name         = "RunningTaskCount"
+  namespace           = "ECS/ContainerInsights"
+  period              = 60
+  statistic           = "Average"
+  threshold           = local.application_data.accounts[local.environment].opa_app_count
+  dimensions = {
+    ClusterName = aws_ecs_cluster.main.name
+    ServiceName = aws_ecs_service.ecs_adaptor_service.name
+  }
+  alarm_description = "The number of OIA ECS tasks is less than ${local.application_data.accounts[local.environment].opa_app_count}. Runbook: https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
+
+  treat_missing_data = "breaching"
+  alarm_actions             = [aws_sns_topic.cloudwatch_alerts.arn]
+  ok_actions                = [aws_sns_topic.cloudwatch_alerts.arn]
+  insufficient_data_actions = []
+
+  tags = local.tags
+}
 # Alarm for ECS Container Count
 resource "aws_cloudwatch_metric_alarm" "container_count" {
   alarm_name          = "${local.application_name}-${local.environment}-container-count-low"
@@ -14,12 +124,57 @@ resource "aws_cloudwatch_metric_alarm" "container_count" {
   threshold           = local.application_data.accounts[local.environment].opa_app_count
   dimensions = {
     ClusterName = aws_ecs_cluster.main.name
+    ServiceName = aws_ecs_service.ecs_connector_servicee.name
   }
   alarm_description = "The number of OIA ECS tasks is less than ${local.application_data.accounts[local.environment].opa_app_count}. Runbook: https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
 
   treat_missing_data = "breaching"
   alarm_actions             = [aws_sns_topic.cloudwatch_alerts.arn]
   ok_actions                = [aws_sns_topic.cloudwatch_alerts.arn]
+  insufficient_data_actions = []
+
+  tags = local.tags
+}
+
+# Alarm for ECS CPU Utilization
+resource "aws_cloudwatch_metric_alarm" "ecs_cpu_high" {
+  alarm_name          = "${local.application_name}-${local.environment}-cpu-high"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 3
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/ECS"
+  period              = 60
+  statistic           = "Average"
+  threshold           = 80
+  dimensions = {
+    ClusterName = aws_ecs_cluster.main.name
+  }
+  alarm_description = "The average CPU Utilization for OIA ECS cluster is above 80% for 3 consecutive periods. Runbook: https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
+  treat_missing_data = "notBreaching"
+  alarm_actions      = [aws_sns_topic.cloudwatch_alerts.arn]
+  ok_actions         = [aws_sns_topic.cloudwatch_alerts.arn]
+  insufficient_data_actions = []
+
+  tags = local.tags
+}
+
+# Alarm for ECS Memory Utilization
+resource "aws_cloudwatch_metric_alarm" "ecs_memory_high" {
+  alarm_name          = "${local.application_name}-${local.environment}-memory-high"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 3
+  metric_name         = "MemortUtilization"
+  namespace           = "AWS/ECS"
+  period              = 60
+  statistic           = "Average"
+  threshold           = 80
+  dimensions = {
+    ClusterName = aws_ecs_cluster.main.name
+  }
+  alarm_description = "The average Memory Utilization for OIA ECS cluster is above 80% for 3 consecutive periods. Runbook: https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
+  treat_missing_data = "notBreaching"
+  alarm_actions      = [aws_sns_topic.cloudwatch_alerts.arn]
+  ok_actions         = [aws_sns_topic.cloudwatch_alerts.arn]
   insufficient_data_actions = []
 
   tags = local.tags
