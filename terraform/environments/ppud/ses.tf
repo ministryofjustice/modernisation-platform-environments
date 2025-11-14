@@ -96,3 +96,39 @@ resource "aws_ses_domain_mail_from" "ppud" {
   domain           = aws_ses_domain_identity.ppud[0].domain
   mail_from_domain = "noreply.${aws_ses_domain_identity.ppud[0].domain}"
 }
+
+output "ses_dns_records" {
+  value = {
+    for env, identity in aws_ses_domain_identity.ppud :
+    env => {
+      verification_txt = {
+        name  = "_amazonses.${identity.domain}"
+        type  = "TXT"
+        value = identity.verification_token
+      }
+      dkim_cnames = [
+        for token in aws_ses_domain_dkim.Domain-DKIM[env].dkim_tokens :
+        {
+          name  = "${token}._domainkey.${identity.domain}"
+          type  = "CNAME"
+          value = "${token}.dkim.amazonses.com"
+        }
+      ]
+      mail_from_mx = {
+        name  = aws_ses_domain_mail_from.ppud[env].mail_from_domain
+        type  = "MX"
+        value = "10 feedback-smtp.eu-west-2.amazonses.com"
+      }
+      spf_txt = {
+        name  = identity.domain
+        type  = "TXT"
+        value = "v=spf1 include:amazonses.com ~all"
+      }
+      dmarc_txt = {
+        name  = "_dmarc.${identity.domain}"
+        type  = "TXT"
+        value = "v=DMARC1; p=none; rua=mailto:dmarc-reports@${identity.domain}; adkim=s; aspf=s"
+      }
+    }
+  }
+}
