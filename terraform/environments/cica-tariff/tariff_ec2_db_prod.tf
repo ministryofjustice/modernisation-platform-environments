@@ -28,7 +28,7 @@ resource "aws_instance" "tariffdb" {
     volume_size = 20
     encrypted   = true
     tags = merge(tomap({
-      "Name" = "TariffDB-${each.value.instance_key}-volume-${each.value.volume_data.device_name}",
+      Name = "TariffDB-${each.key}",
       }), local.tags
     )
   }
