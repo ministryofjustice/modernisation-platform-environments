@@ -236,7 +236,8 @@ resource "aws_workspacesweb_browser_settings" "main" {
           "www.justice.gov.uk",
           "justice.gov.uk",
           "legalservices.gov.uk",
-          "lsconline.legalservices.gov.uk"
+          "lsconline.legalservices.gov.uk",
+          "www.smartsurvey.co.uk"
         ]
       }
       "AlwaysOpenPdfExternally" = {
