@@ -27,15 +27,15 @@ resource "aws_route53_record" "app1" {
 }
 
 # Note that this app2 referes to Application Server 2, not CM
-resource "aws_route53_record" "app2" {
-  count    = contains(["development", "testing"], local.environment) ? 0 : 1
-  provider = aws.core-vpc
-  zone_id  = var.route53_zone_external_id
-  name     = "${local.appserver2_hostname}.${var.route53_zone_external}"
-  type     = "A"
-  ttl      = 900
-  records  = [aws_instance.app2[0].private_ip]
-}
+# resource "aws_route53_record" "app2" {
+#   count    = contains(["development", "testing"], local.environment) ? 0 : 1
+#   provider = aws.core-vpc
+#   zone_id  = var.route53_zone_external_id
+#   name     = "${local.appserver2_hostname}.${var.route53_zone_external}"
+#   type     = "A"
+#   ttl      = 900
+#   records  = [aws_instance.app2[0].private_ip]
+# }
 
 # Domain A record for ALB
 # resource "aws_route53_record" "external" {

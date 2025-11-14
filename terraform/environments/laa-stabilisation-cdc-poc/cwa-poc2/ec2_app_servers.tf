@@ -212,40 +212,40 @@ resource "aws_instance" "app1" {
 
 }
 
-resource "aws_instance" "app2" {
-  count                       = contains(["development2", "testing"], local.environment) ? 0 : 1
-  ami                         = var.application_data.accounts[local.environment].cwa_poc2_app_ami_id
-  availability_zone           = "eu-west-2a"
-  instance_type               = var.application_data.accounts[local.environment].cwa_poc2_app_instance_type
-  monitoring                  = true
-  vpc_security_group_ids      = [aws_security_group.cwa_poc2_app.id]
-  subnet_id                   = var.private_subnet_a_id
-  iam_instance_profile        = aws_iam_instance_profile.cwa_poc2.id
-  key_name                    = aws_key_pair.cwa.key_name
-  user_data_base64            = base64encode(local.app_userdata)
-  user_data_replace_on_change = false
-  metadata_options {
-    http_tokens = "optional"
-  }
+# resource "aws_instance" "app2" {
+#   count                       = contains(["development2", "testing"], local.environment) ? 0 : 1
+#   ami                         = var.application_data.accounts[local.environment].cwa_poc2_app_ami_id
+#   availability_zone           = "eu-west-2a"
+#   instance_type               = var.application_data.accounts[local.environment].cwa_poc2_app_instance_type
+#   monitoring                  = true
+#   vpc_security_group_ids      = [aws_security_group.cwa_poc2_app.id]
+#   subnet_id                   = var.private_subnet_a_id
+#   iam_instance_profile        = aws_iam_instance_profile.cwa_poc2.id
+#   key_name                    = aws_key_pair.cwa.key_name
+#   user_data_base64            = base64encode(local.app_userdata)
+#   user_data_replace_on_change = false
+#   metadata_options {
+#     http_tokens = "optional"
+#   }
 
-  root_block_device {
-    tags = merge(
-      { "instance-scheduling" = "skip-scheduling" },
-      var.tags,
-      { "Name" = "${local.application_name_short}-app2-root" }
-    )
-  }
+#   root_block_device {
+#     tags = merge(
+#       { "instance-scheduling" = "skip-scheduling" },
+#       var.tags,
+#       { "Name" = "${local.application_name_short}-app2-root" }
+#     )
+#   }
 
-  tags = merge(
-    { "instance-scheduling" = "skip-scheduling" },
-    var.tags,
-    { "Name" = "${upper(local.application_name_short)} App Instance 2" },
-    local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-hourly-35-day-retention" = "yes" }
-  )
+#   tags = merge(
+#     { "instance-scheduling" = "skip-scheduling" },
+#     var.tags,
+#     { "Name" = "${upper(local.application_name_short)} App Instance 2" },
+#     local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-hourly-35-day-retention" = "yes" }
+#   )
 
-  depends_on = [time_sleep.wait_app_userdata_scripts] # This resource creation will be delayed to ensure object exists in the bucket
+#   depends_on = [time_sleep.wait_app_userdata_scripts] # This resource creation will be delayed to ensure object exists in the bucket
 
-}
+# }
 
 #################################
 # app Security Group Rules
