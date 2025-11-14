@@ -1,14 +1,16 @@
-#resource "aws_lb" "oem_app" {
-#  name               = "lb-${local.application_name}-app"
-#  load_balancer_type = "application"
-#  internal           = false
-## security_groups    = [aws_security_group.load_balancer_security_group.id]
-#  subnets            = data.aws_subnets.shared-public.ids
-#
-#  tags = local.tags
-#}
+resource "aws_lb" "oem_app" {
+  count = 0
+  name               = "lb-${local.application_name}-app"
+  load_balancer_type = "application"
+  internal           = false
+  security_groups    = [aws_security_group.load_balancer_security_group.id]
+  subnets            = data.aws_subnets.shared-public.ids
+
+  tags = local.tags
+}
 
 resource "aws_lb_listener" "oem_app" {
+  count = 0
   load_balancer_arn = aws_lb.oem_app.id
   port              = 443
   protocol          = "HTTPS"
@@ -23,6 +25,7 @@ resource "aws_lb_listener" "oem_app" {
 }
 
 resource "aws_lb_listener" "oem_app_3872" {
+  count = 0
   load_balancer_arn = aws_lb.oem_app.id
   port              = 3872
   protocol          = "HTTPS"
@@ -37,6 +40,7 @@ resource "aws_lb_listener" "oem_app_3872" {
 }
 
 resource "aws_lb_listener" "oem_app_4903" {
+  count = 0
   load_balancer_arn = aws_lb.oem_app.id
   port              = 4903
   protocol          = "HTTPS"
@@ -51,6 +55,7 @@ resource "aws_lb_listener" "oem_app_4903" {
 }
 
 resource "aws_lb_listener" "oem_app_7102" {
+  count = 0
   load_balancer_arn = aws_lb.oem_app.id
   port              = 7102
   protocol          = "HTTPS"
@@ -65,6 +70,7 @@ resource "aws_lb_listener" "oem_app_7102" {
 }
 
 resource "aws_lb_listener" "oem_app_7803" {
+  count = 0
   load_balancer_arn = aws_lb.oem_app.id
   port              = 7803
   protocol          = "HTTPS"
@@ -79,6 +85,7 @@ resource "aws_lb_listener" "oem_app_7803" {
 }
 
 resource "aws_lb_target_group" "oem_app" {
+  count = 0
   name        = "tg-${local.application_name}-app-8000"
   port        = 8000
   protocol    = "HTTP"
@@ -103,6 +110,7 @@ resource "aws_lb_target_group" "oem_app" {
 }
 
 resource "aws_lb_target_group" "oem_app_3872" {
+  count = 0
   name        = "tg-${local.application_name}-app-3872"
   port        = 3872
   protocol    = "HTTPS"
@@ -127,6 +135,7 @@ resource "aws_lb_target_group" "oem_app_3872" {
 }
 
 resource "aws_lb_target_group" "oem_app_4903" {
+  count = 0
   name        = "tg-${local.application_name}-app-4903"
   port        = 4903
   protocol    = "HTTPS"
@@ -151,6 +160,7 @@ resource "aws_lb_target_group" "oem_app_4903" {
 }
 
 resource "aws_lb_target_group" "oem_app_7102" {
+  count = 0
   name        = "tg-${local.application_name}-app-7102"
   port        = 7102
   protocol    = "HTTPS"
@@ -175,6 +185,7 @@ resource "aws_lb_target_group" "oem_app_7102" {
 }
 
 resource "aws_lb_target_group" "oem_app_7803" {
+  count = 0
   name        = "tg-${local.application_name}-app-7803"
   port        = 7803
   protocol    = "HTTPS"
@@ -199,30 +210,35 @@ resource "aws_lb_target_group" "oem_app_7803" {
 }
 
 resource "aws_lb_target_group_attachment" "oem_app" {
+  count = 0
   target_group_arn = aws_lb_target_group.oem_app.arn
   target_id        = aws_instance.oem_app.id
   port             = 8000
 }
 
 resource "aws_lb_target_group_attachment" "oem_app_3872" {
+  count = 0
   target_group_arn = aws_lb_target_group.oem_app_3872.arn
   target_id        = aws_instance.oem_app.id
   port             = 3872
 }
 
 resource "aws_lb_target_group_attachment" "oem_app_4903" {
+  count = 0
   target_group_arn = aws_lb_target_group.oem_app_4903.arn
   target_id        = aws_instance.oem_app.id
   port             = 4903
 }
 
 resource "aws_lb_target_group_attachment" "oem_app_7102" {
+  count = 0
   target_group_arn = aws_lb_target_group.oem_app_7102.arn
   target_id        = aws_instance.oem_app.id
   port             = 7102
 }
 
 resource "aws_lb_target_group_attachment" "oem_app_7803" {
+  count = 0
   target_group_arn = aws_lb_target_group.oem_app_7803.arn
   target_id        = aws_instance.oem_app.id
   port             = 7803

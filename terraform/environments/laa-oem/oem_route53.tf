@@ -1,4 +1,5 @@
 resource "aws_route53_record" "route53_record_app_lb" {
+  count = 0
   provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.external.zone_id
   name     = "oem-ext.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
@@ -12,6 +13,7 @@ resource "aws_route53_record" "route53_record_app_lb" {
 }
 
 resource "aws_route53_record" "route53_record_app_lb_internal" {
+  count = 0
   provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.external.zone_id
   name     = "oem.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
@@ -25,6 +27,7 @@ resource "aws_route53_record" "route53_record_app_lb_internal" {
 }
 
 resource "aws_route53_record" "route53_record_app" {
+  count = 0
   provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.external.zone_id
   name     = "${var.networking[0].application}-app.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
@@ -34,6 +37,7 @@ resource "aws_route53_record" "route53_record_app" {
 }
 
 resource "aws_route53_record" "route53_record_db" {
+  count = 0
   provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.external.zone_id
   name     = "${var.networking[0].application}-db.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
