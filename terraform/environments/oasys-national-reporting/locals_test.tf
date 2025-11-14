@@ -1,5 +1,10 @@
 locals {
 
+  lb_maintenance_message_test = {
+    maintenance_title   = "OASys National Reporting Environment Not Started"
+    maintenance_message = "OASys National Reporting T2 is rarely used so is started on demand. Please contact <a href=\"https://moj.enterprise.slack.com/archives/C6D94J81E\">#ask-digital-studio-ops</a> slack channel if you need the environment starting."
+  }
+
   baseline_presets_test = {
     options = {
       sns_topics = {
@@ -290,6 +295,25 @@ locals {
                   host_header = {
                     values = [
                       "t2.test.reporting.oasys.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              maintenance = {
+                priority = 999
+                actions = [{
+                  type = "fixed-response"
+                  fixed_response = {
+                    content_type = "text/html"
+                    message_body = templatefile("templates/maintenance.html.tftpl", local.lb_maintenance_message_test)
+                    status_code  = "200"
+                  }
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t2.test.reporting.oasys.service.justice.gov.uk",
+                      "maintenance-int.test.reporting.oasys.service.justice.gov.uk",
                     ]
                   }
                 }]
