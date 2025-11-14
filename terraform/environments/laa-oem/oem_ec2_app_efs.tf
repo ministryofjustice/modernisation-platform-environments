@@ -18,7 +18,7 @@ resource "aws_efs_mount_target" "oem_app_efs" {
   ]
 }
 
-resource "aws_efs_backup_policy" "policy" {
+resource "aws_efs_backup_policy" "oem_app_efs_backup" {
   file_system_id = aws_efs_file_system.oem_app_efs.id
 
   backup_policy {
