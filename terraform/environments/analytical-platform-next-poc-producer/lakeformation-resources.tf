@@ -1,4 +1,9 @@
-resource "aws_lakeformation_resource" "mojap_next_poc_data_s3" {
-  arn                     = module.mojap_next_poc_data_s3_bucket.s3_bucket_arn
-  use_service_linked_role = true
+resource "aws_glue_catalog_database" "database_resource_links" {
+  name = "example_from_governance"
+
+  target_database {
+    catalog_id    = local.hub_account_id
+    database_name = "example_database"
+    region        = "eu-west-2"
+  }
 }

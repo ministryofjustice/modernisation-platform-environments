@@ -2,13 +2,13 @@ module "lakeformation_tags" {
   source = "../../modules/analytical-platform-next/lakeformation/tag-ontology"
 }
 
-resource "aws_lakeformation_resource_lf_tags" "main_shared_tbl" {
-  table {
-    database_name = aws_glue_catalog_database.main.name
-    name          = aws_glue_catalog_table.main_shared_tbl.name
+resource "aws_lakeformation_resource_lf_tag" "test" {
+  database {
+    name = aws_glue_catalog_database.example.name
   }
+
   lf_tag {
-    key   = "access"
-    value = "yes"
+    key   = aws_lakeformation_lf_tag.example.key
+    value = "stowe"
   }
 }
