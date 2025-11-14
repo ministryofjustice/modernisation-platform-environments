@@ -71,9 +71,7 @@ resource "aws_lambda_function" "cloudfront_redirect_lambda" {
   provider         = aws.us-east-1
   function_name    = "CloudfrontRedirectLambda"
   filename         = local.is-production ? data.archive_file.lambda_zip.output_path : data.archive_file.lambda_zip_nonprod.output_path
-  source_code_hash = local.is-production ? filebase64sha256(data.archive_file.lambda_zip.source_file) :
-                                           filebase64sha256(data.archive_file.lambda_zip_nonprod.source_file)
-
+  source_code_hash = local.is-production ? filebase64sha256(data.archive_file.lambda_zip.source_file) : filebase64sha256(data.archive_file.lambda_zip_nonprod.source_file)
   handler          = local.is-production ? "cloudfront-redirect.handler" : "cloudfront-redirect-nonprod.handler"
   role             = aws_iam_role.lambda_edge_role.arn
   runtime          = "nodejs20.x"
