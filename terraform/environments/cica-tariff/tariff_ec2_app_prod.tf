@@ -62,13 +62,13 @@ resource "aws_instance" "tariff_app_2" {
     volume_size           = 30
     snapshot_id           = local.snapshot_id_xvdi
   }
-  */
 
   volume_tags = merge(tomap({
     "Name"               = "${local.application_name}-app2-root",
     "volume-attach-host" = "app2",
     "volume-mount-path"  = "/"
   }), local.tags)
+  */
 
   tags = merge(tomap({
     "Name"     = lower(format("ec2-%s-%s-app2", local.application_name, local.environment)),
