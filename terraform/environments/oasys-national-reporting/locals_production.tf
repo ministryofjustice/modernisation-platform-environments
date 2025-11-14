@@ -1,5 +1,10 @@
 locals {
 
+  lb_maintenance_message_production = {
+    maintenance_title   = "OASys National Reporting Maintenance Window"
+    maintenance_message = "OASys National Reporting is currently unavailable due to planned maintenance. Please try again later."
+  }
+
   baseline_presets_production = {
     options = {
       sns_topics = {
@@ -325,6 +330,24 @@ locals {
                 actions = [{
                   type              = "forward"
                   target_group_name = "pd-onr-web-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "reporting.oasys.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              maintenance = {
+                priority = 999
+                actions = [{
+                  type = "fixed-response"
+                  fixed_response = {
+                    content_type = "text/html"
+                    message_body = templatefile("templates/maintenance.html.tftpl", local.lb_maintenance_message_production)
+                    status_code  = "200"
+                  }
                 }]
                 conditions = [{
                   host_header = {
