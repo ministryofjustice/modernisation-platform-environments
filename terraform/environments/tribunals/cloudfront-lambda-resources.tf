@@ -76,7 +76,7 @@ resource "aws_lambda_function" "cloudfront_redirect_lambda" {
   role             = aws_iam_role.lambda_edge_role.arn
   runtime          = "nodejs20.x"
   publish          = true
-  timeout          = 5
+  timeout          = 6
   memory_size      = 128
 
   tags = {
