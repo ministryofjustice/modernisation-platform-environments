@@ -12,16 +12,6 @@ resource "aws_ssm_parameter" "maat_app_bc_client_user_id" {
   }
 }
 
-resource "aws_ssm_parameter" "maat_app_orch_oauth_scope" {
-  name  = "/maat/APP_ORCH_OAUTH_SCOPE"
-  type  = "SecureString"
-  value = "replace in console"
-  lifecycle {
-    ignore_changes = [
-      value,
-    ]
-  }
-}
 
 resource "aws_ssm_parameter" "maat_app_google_analytics_tag_id" {
   name  = "/maat/APP_MAAT_GOOGLE_ANALYTICS_4_TAG_ID"
@@ -67,16 +57,7 @@ resource "aws_ssm_parameter" "maat_app_caa_client_secret" {
   }
 }
 
-resource "aws_ssm_parameter" "maat_app_orch_client_secret" {
-  name  = "/maat/APP_ORCH_CLIENT_SECRET"
-  type  = "SecureString"
-  value = "replace in console"
-  lifecycle {
-    ignore_changes = [
-      value,
-    ]
-  }
-}
+
 
 resource "aws_ssm_parameter" "maat_app_caa_client_id" {
   name  = "/maat/APP_CAA_CLIENT_ID"
@@ -89,16 +70,7 @@ resource "aws_ssm_parameter" "maat_app_caa_client_id" {
   }
 }
 
-resource "aws_ssm_parameter" "maat_app_orch_client_id" {
-  name  = "/maat/APP_ORCH_CLIENT_ID"
-  type  = "SecureString"
-  value = "replace in console"
-  lifecycle {
-    ignore_changes = [
-      value,
-    ]
-  }
-}
+
 
 resource "aws_ssm_parameter" "maat_app_db_user_id" {
   name  = "/maat/APP_DB_USERID"
@@ -111,16 +83,7 @@ resource "aws_ssm_parameter" "maat_app_db_user_id" {
   }
 }
 
-resource "aws_ssm_parameter" "maat_app_orch_endpoint" {
-  name  = "/maat/APP_ORCH_ENDPOINT"
-  type  = "SecureString"
-  value = "replace in console"
-  lifecycle {
-    ignore_changes = [
-      value,
-    ]
-  }
-}
+
 
 resource "aws_ssm_parameter" "maat_app_caa_endpoint" {
   name  = "/maat/APP_CAA_ENDPOINT"
