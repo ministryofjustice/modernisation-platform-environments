@@ -26,27 +26,44 @@ resource "aws_route53_record" "app1" {
   records  = [aws_instance.app1.private_ip]
 }
 
-# # Note that this app2 referes to Application Server 2, not CM
-# resource "aws_route53_record" "app2" {
-#   count    = contains(["development", "testing"], local.environment) ? 0 : 1
-#   provider = aws.core-vpc
-#   zone_id  = var.route53_zone_external_id
-#   name     = "${local.appserver2_hostname}.${var.route53_zone_external}"
-#   type     = "A"
-#   ttl      = 900
-#   records  = [aws_instance.app2[0].private_ip]
-# }
-
-# Domain A record for ALB
-resource "aws_route53_record" "external" {
+# Note that this app2 referes to Application Server 2, not CM
+resource "aws_route53_record" "app2" {
+  count    = contains(["development", "testing"], local.environment) ? 0 : 1
   provider = aws.core-vpc
   zone_id  = var.route53_zone_external_id
-  name     = "${local.application_name_short}.${var.route53_zone_external}" # cwa.dev.legalservices.gov.uk
+  name     = "${local.appserver2_hostname}.${var.route53_zone_external}"
+  type     = "A"
+  ttl      = 900
+  records  = [aws_instance.app2[0].private_ip]
+}
+
+# Domain A record for ALB
+# resource "aws_route53_record" "external" {
+#   provider = aws.core-vpc
+#   zone_id  = var.route53_zone_external_id
+#   name     = "${local.application_name_short}.${var.route53_zone_external}" # cwa.dev.legalservices.gov.uk
+#   type     = "A"
+
+#   alias {
+#     name                   = aws_lb.external.dns_name
+#     zone_id                = aws_lb.external.zone_id
+#     evaluate_target_health = true
+#   }
+# }
+
+####################################
+# Internal ALB DNS Record
+####################################
+
+resource "aws_route53_record" "internal" {
+  provider = aws.core-vpc
+  zone_id  = var.route53_zone_external_id
+  name     = "portal-poc.laa-development.modernisation-platform.service.justice.gov.uk"
   type     = "A"
 
   alias {
-    name                   = aws_lb.external.dns_name
-    zone_id                = aws_lb.external.zone_id
+    name                   = aws_lb.internal.dns_name
+    zone_id                = aws_lb.internal.zone_id
     evaluate_target_health = true
   }
 }
