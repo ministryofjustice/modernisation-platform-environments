@@ -1,6 +1,6 @@
 exports.handler = (event, context, callback) => {
     try {
-        console.log('=== FUNCTION START ===');
+        console.log('=== NONPROD FUNCTION START ===');
         console.log('Event type:', typeof event);
         console.log('Event keys:', Object.keys(event));
 
