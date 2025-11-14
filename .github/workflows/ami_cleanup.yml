@@ -214,15 +214,15 @@ jobs:
             echo "| To be deleted | ${PREVIEW_DELETE_COUNT} |"
             echo "| Protected | ${PREVIEW_PROTECTED_COUNT} |"
             echo ""
-            echo "*AMI candidates (to be deleted)*"
+            echo "**AMI candidates (to be deleted)**"
             echo ""
             echo "| AMI ID | Name | Created |"
             echo "|---|---|---|"
             awk -F',' 'NR>1 && $5=="To be deleted" && !seen[$1]++ {printf("| %s | %s | %s |\n",$1,$3,$4)}' reports/ami_snapshot_map.csv | head -n 20
             totdel=$(awk -F',' 'NR>1 && $5=="To be deleted" && !seen[$1]++ {c++} END{print c+0}' reports/ami_snapshot_map.csv)
-            if [ "${totdel:-0}" -gt 20 ]; then echo ""; echo "(+$((totdel-20)) more in artifact)"; fi
+            if [ "${totdel:-0}" -gt 20 ]; then echo ""; echo "_(+$((totdel-20)) more in artifact)_"; fi
             echo ""
-            echo "*Protected AMIs (skipped)*"
+            echo "**Protected AMIs (skipped)**"
             echo ""
             echo "| AMI ID | Name | Reason |"
             echo "|---|---|---|"
@@ -230,9 +230,9 @@ jobs:
               echo "| ${id} | ${name} | ${reason} |"
             done
             protcount=$(tail -n +2 reports/protected_amis.csv | wc -l | tr -d ' ')
-            if [ "${protcount:-0}" -gt 20 ]; then echo ""; echo "(+$((protcount-20)) more in artifact)"; fi
+            if [ "${protcount:-0}" -gt 20 ]; then echo ""; echo "_(+$((protcount-20)) more in artifact)_"; fi
             echo ""
-            echo "- Reports: \⁠ reports/ami_snapshot_map.csv\ ⁠, \⁠ reports/protected_amis.csv\ ⁠, \⁠ reports/cleanup_report.csv\ ⁠"
+            echo "- Reports: \`reports/ami_snapshot_map.csv\`, \`reports/protected_amis.csv\`, \`reports/cleanup_report.csv\`"
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload AMI Preview Artifacts
@@ -263,10 +263,10 @@ jobs:
           printf "%s\n" "$CANDIDATES" | head -n 20 || true
           if [[ -n "$CANDIDATES" ]]; then
             echo "$CANDIDATES" | while read -r line; do
-              VOL=$(sed -nE 's/.(vol-[0-9a-f]+)./\1/p' <<<"$line")
+              VOL=$(sed -nE 's/.*(vol-[0-9a-f]+).*/\1/p' <<<"$line")
               AGE=$(sed -nE 's/.* ([0-9]+\.[0-9]+) months old.*/\1/p' <<<"$line")
               [[ -z "$VOL" ]] && continue
-              NAME=$(aws ec2 describe-volumes --volume-ids "$VOL" --query 'Volumes[0].Tags[?Key==⁠ Name ⁠]|[0].Value' --output text 2>/dev/null || echo "")
+              NAME=$(aws ec2 describe-volumes --volume-ids "$VOL" --query 'Volumes[0].Tags[?Key==`Name`]|[0].Value' --output text 2>/dev/null || echo "")
               CREATED=$(aws ec2 describe-volumes --volume-ids "$VOL" --query 'Volumes[0].CreateTime' --output text 2>/dev/null || echo "")
               echo "$VOL,${AGE:-},${NAME:-},To be deleted" >> reports/ebs_cleanup_report.csv
               echo "${{ matrix.account_name }},eu-west-2,preview,ebs,volume,${VOL},,${NAME},${CREATED},${AGE},To be deleted," >> reports/cleanup_report.csv
@@ -281,16 +281,16 @@ jobs:
             echo "|---|---:|"
             echo "| To be deleted | ${COUNT} |"
             echo ""
-            echo "*Unattached volumes (to be deleted)*"
+            echo "**Unattached volumes (to be deleted)**"
             echo ""
             echo "| Volume ID | Age (months) | Name |"
             echo "|---|---:|---|"
             tail -n +2 reports/ebs_cleanup_report.csv | head -n 20 | while IFS=',' read -r id age name status; do
               echo "| ${id} | ${age} | ${name} |"
             done
-            if [ "${COUNT:-0}" -gt 20 ]; then echo ""; echo "(+$((COUNT-20)) more in artifact)"; fi
+            if [ "${COUNT:-0}" -gt 20 ]; then echo ""; echo "_(+$((COUNT-20)) more in artifact)_"; fi
             echo ""
-            echo "- Report: \⁠ reports/ebs_cleanup_report.csv\ ⁠, \⁠ reports/cleanup_report.csv\ ⁠, \⁠ reports/ebs_candidates_preview.log\ ⁠"
+            echo "- Report: \`reports/ebs_cleanup_report.csv\`, \`reports/cleanup_report.csv\`, \`reports/ebs_candidates_preview.log\`"
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload EBS Preview Artifacts
@@ -512,8 +512,8 @@ jobs:
             if ! aws ec2 describe-snapshots --snapshot-ids "$SNAP_ID" --query 'Snapshots[0].SnapshotId' --output text >/dev/null 2>&1; then
               continue
             fi
-            read -r TAGS DESC NAME <<< "$(aws ec2 describe-snapshots --snapshot-ids "$SNAP_ID" --query '[Snapshots[0].Tags, Snapshots[0].Description, Snapshots[0].Tags[?Key==⁠ Name ⁠]|[0].Value]' --output text 2>/dev/null || true)"
-            if grep -Eiq '(^|[[:space:]])(Retain|Backup)[[:space:]]=[[:space:]](true|yes|1)' <<< "${TAGS:-}"; then
+            read -r TAGS DESC NAME <<< "$(aws ec2 describe-snapshots --snapshot-ids "$SNAP_ID" --query '[Snapshots[0].Tags, Snapshots[0].Description, Snapshots[0].Tags[?Key==`Name`]|[0].Value]' --output text 2>/dev/null || true)"
+            if grep -Eiq '(^|[[:space:]])(Retain|Backup)[[:space:]]*=[[:space:]]*(true|yes|1)' <<< "${TAGS:-}"; then
               continue
             fi
             if grep -qi 'AwsBackup' <<< "${DESC:-} ${NAME:-}"; then
@@ -547,17 +547,17 @@ jobs:
           echo "|---|---:|" >> "$GITHUB_STEP_SUMMARY"
           echo "| AMIs deleted | ${DEL} |" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "*Deleted AMIs*" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Deleted AMIs**" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "| AMI ID | Name | Created |" >> "$GITHUB_STEP_SUMMARY"
           echo "|---|---|---|" >> "$GITHUB_STEP_SUMMARY"
           if [[ -f reports/ami_snapshot_map.csv ]]; then
             awk -F',' 'NR>1 && $5=="Deleted" && !seen[$1]++ {printf("| %s | %s | %s |\n",$1,$3,$4)}' reports/ami_snapshot_map.csv | head -n 20 >> "$GITHUB_STEP_SUMMARY" || true
             delcount=$(awk -F',' 'NR>1 && $5=="Deleted" && !seen[$1]++ {c++} END{print c+0}' reports/ami_snapshot_map.csv)
-            if [ "${delcount:-0}" -gt 20 ]; then echo "" >> "$GITHUB_STEP_SUMMARY"; echo "(+$((delcount-20)) more in artifact)" >> "$GITHUB_STEP_SUMMARY"; fi
+            if [ "${delcount:-0}" -gt 20 ]; then echo "" >> "$GITHUB_STEP_SUMMARY"; echo "_(+$((delcount-20)) more in artifact)_" >> "$GITHUB_STEP_SUMMARY"; fi
           fi
           echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "*Protected AMIs (skipped)*" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Protected AMIs (skipped)**" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "| AMI ID | Name | Reason |" >> "$GITHUB_STEP_SUMMARY"
           echo "|---|---|---|" >> "$GITHUB_STEP_SUMMARY"
@@ -566,10 +566,10 @@ jobs:
               echo "| ${id} | ${name} | ${reason} |" >> "$GITHUB_STEP_SUMMARY"
             done
             protcount=$(tail -n +2 reports/protected_amis.csv | wc -l | tr -d ' ')
-            if [ "${protcount:-0}" -gt 20 ]; then echo "" >> "$GITHUB_STEP_SUMMARY"; echo "(+$((protcount-20)) more in artifact)" >> "$GITHUB_STEP_SUMMARY"; fi
+            if [ "${protcount:-0}" -gt 20 ]; then echo "" >> "$GITHUB_STEP_SUMMARY"; echo "_(+$((protcount-20)) more in artifact)_" >> "$GITHUB_STEP_SUMMARY"; fi
           fi
           echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Reports: \⁠ reports/ami_snapshot_map.csv\ ⁠, \⁠ reports/protected_amis.csv\ ⁠" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Reports: \`reports/ami_snapshot_map.csv\`, \`reports/protected_amis.csv\`" >> "$GITHUB_STEP_SUMMARY"
 
   ebs-delete:
     name: EBS Delete (Live)
@@ -646,10 +646,10 @@ jobs:
           LOG=$(scripts/ebs_cleanup.sh ${EBS_TEST_FLAGS:-} -m "$EBS_MONTHS" delete || true)
           echo "$LOG"
           echo "$LOG" | while read -r line; do
-            VOL=$(sed -nE 's/.(vol-[0-9a-f]+)./\1/p' <<<"$line")
+            VOL=$(sed -nE 's/.*(vol-[0-9a-f]+).*/\1/p' <<<"$line")
             AGE=$(sed -nE 's/.* ([0-9]+\.[0-9]+) months old.*/\1/p' <<<"$line")
             [[ -z "$VOL" ]] && continue
-            NAME=$(aws ec2 describe-volumes --volume-ids "$VOL" --query 'Volumes[0].Tags[?Key==⁠ Name ⁠]|[0].Value' --output text 2>/dev/null || echo "")
+            NAME=$(aws ec2 describe-volumes --volume-ids "$VOL" --query 'Volumes[0].Tags[?Key==`Name`]|[0].Value' --output text 2>/dev/null || echo "")
             CREATED=$(aws ec2 describe-volumes --volume-ids "$VOL" --query 'Volumes[0].CreateTime' --output text 2>/dev/null || echo "")
             echo "$VOL,${AGE:-},${NAME:-},Deleted" >> reports/ebs_cleanup_report.csv
           done
@@ -676,7 +676,7 @@ jobs:
           echo "|---|---:|" >> "$GITHUB_STEP_SUMMARY"
           echo "| Volumes deleted | ${DEL} |" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "*Deleted volumes*" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Deleted volumes**" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "| Volume ID | Age (months) | Name |" >> "$GITHUB_STEP_SUMMARY"
           echo "|---|---:|---|" >> "$GITHUB_STEP_SUMMARY"
@@ -684,7 +684,7 @@ jobs:
             tail -n +2 reports/ebs_cleanup_report.csv | head -n 20 | while IFS=',' read -r id age name status; do
               echo "| ${id} | ${age} | ${name} |" >> "$GITHUB_STEP_SUMMARY"
             done
-            if [ "${DEL:-0}" -gt 20 ]; then echo "" >> "$GITHUB_STEP_SUMMARY"; echo "(+$((DEL-20)) more in artifact)" >> "$GITHUB_STEP_SUMMARY"; fi
+            if [ "${DEL:-0}" -gt 20 ]; then echo "" >> "$GITHUB_STEP_SUMMARY"; echo "_(+$((DEL-20)) more in artifact)_" >> "$GITHUB_STEP_SUMMARY"; fi
           fi
           echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Report: \⁠ reports/ebs_cleanup_report.csv\ ⁠" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Report: \`reports/ebs_cleanup_report.csv\`" >> "$GITHUB_STEP_SUMMARY"
