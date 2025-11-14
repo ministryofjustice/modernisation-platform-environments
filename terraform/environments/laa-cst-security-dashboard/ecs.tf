@@ -478,7 +478,7 @@ module "pagerduty_core_alerts_non_prod" {
   depends_on = [
     aws_sns_topic.cst_utilisation_alarm
   ]
-  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v3.0.0"
   sns_topics                = [aws_sns_topic.cst_utilisation_alarm[0].name]
   pagerduty_integration_key = local.pagerduty_integration_keys["cst_non_prod_alarms"]
 }
@@ -489,7 +489,7 @@ module "pagerduty_core_alerts_prod" {
   depends_on = [
     aws_sns_topic.cst_utilisation_alarm
   ]
-  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v3.0.0"
   sns_topics                = [aws_sns_topic.cst_utilisation_alarm[0].name]
   pagerduty_integration_key = local.pagerduty_integration_keys["cst_prod_alarms"]
 }
