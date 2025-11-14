@@ -4,67 +4,12 @@ exports.handler = (event, context, callback) => {
     const uri = request.uri || '/';
 
     var redirectMap = {
-        'siac.tribunals.gov.uk': {
-            defaultRedirect: 'https://www.gov.uk/guidance/appeal-to-the-special-immigration-appeals-commission',
+        'ahmlr.gov.uk': {
+            defaultRedirect: 'https://www.gov.uk/apply-land-registration-tribunal/overview',
             pathRedirects: [
                 {
-                    paths: ['/outcomes2007onwards.htm'],
-                    target: 'https://siac.decisions.tribunals.gov.uk',
-                    exactMatch: true
-                }
-            ],
-            aliases: []
-        },
-        'fhsaa.tribunals.gov.uk': {
-            defaultRedirect: 'https://www.gov.uk/guidance/appeal-to-the-primary-health-lists-tribunal',
-            pathRedirects: [
-                {
-                    paths: ['/decisions.htm'],
-                    target: 'https://phl.decisions.tribunals.gov.uk',
-                    exactMatch: true
-                }
-            ],
-            aliases: []
-        },
-        'estateagentappeals.tribunals.gov.uk': {
-            defaultRedirect: 'https://www.gov.uk/guidance/estate-agents-appeal-against-a-ban-or-warning-order',
-            pathRedirects: [
-                {
-                    paths: ['/decisions.htm'],
-                    target: 'https://estateagentappeals.decisions.tribunals.gov.uk',
-                    exactMatch: true
-                }
-            ],
-            aliases: []
-        },
-        'consumercreditappeals.tribunals.gov.uk': {
-            defaultRedirect: 'https://www.gov.uk/courts-tribunals/upper-tribunal-tax-and-chancery-chamber',
-            pathRedirects: [
-                {
-                    paths: ['/decisions.htm'],
-                    target: 'https://consumercreditappeals.decisions.tribunals.gov.uk',
-                    exactMatch: true
-                }
-            ],
-            aliases: []
-        },
-        'charity.tribunals.gov.uk': {
-            defaultRedirect: 'https://www.gov.uk/guidance/appeal-against-a-charity-commission-decision-about-your-charity',
-            pathRedirects: [
-                {
-                    paths: ['/decisions.htm'],
-                    target: 'https://charity.decisions.tribunals.gov.uk',
-                    exactMatch: true
-                }
-            ],
-            aliases: []
-        },
-        'adjudicationpanel.tribunals.gov.uk': {
-            defaultRedirect: 'https://www.gov.uk/government/organisations/hm-courts-and-tribunals-service',
-            pathRedirects: [
-                {
-                    paths: ['/Public', '/Admin', '/Decisions', '/Judgments'],
-                    target: 'https://localgovernmentstandards.decisions.tribunals.gov.uk',
+                    paths: ['/public', '/Admin', '/Judgments'],
+                    target: 'https://landregistrationdivision.decisions.tribunals.gov.uk',
                     exactMatch: false
                 }
             ],
@@ -81,28 +26,6 @@ exports.handler = (event, context, callback) => {
                 {
                     paths: ['.*\\.(css|js|png|ico|gif|jpg|jpeg)$'],
                     target: 'https://administrativeappeals.decisions.tribunals.gov.uk',
-                    exactMatch: false
-                }
-            ],
-            aliases: []
-        },
-        'ahmlr.gov.uk': {
-            defaultRedirect: 'https://www.gov.uk/apply-land-registration-tribunal/overview',
-            pathRedirects: [
-                {
-                    paths: ['/public', '/Admin', '/Judgments'],
-                    target: 'https://landregistrationdivision.decisions.tribunals.gov.uk',
-                    exactMatch: false
-                }
-            ],
-            aliases: []
-        },
-        'dev.ahmlr.gov.uk': {
-            defaultRedirect: 'https://www.gov.uk/apply-land-registration-tribunal/overview',
-            pathRedirects: [
-                {
-                    paths: ['/public', '/Admin', '/Judgments'],
-                    target: 'https://landregistrationdivision.decisions.tribunals.gov.uk',
                     exactMatch: false
                 }
             ],
