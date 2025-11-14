@@ -1,3 +1,0 @@
- skip-check:
-  # Failed
-  - AVD-AWS-0096 # "No encryption required as it does not contain sensitive information"
