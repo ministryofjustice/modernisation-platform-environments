@@ -263,7 +263,7 @@ resource "aws_lb" "internal" {
   internal           = true
   load_balancer_type = "application"
   security_groups    = [aws_security_group.internal_lb.id]
-  subnets            = [var.private_subnet_a_id]
+  subnets            = [var.private_subnet_a_id, var.private_subnet_b_id, var.private_subnet_c_id]
 
   enable_deletion_protection = true
   idle_timeout               = 60

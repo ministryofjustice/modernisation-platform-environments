@@ -55,7 +55,7 @@ resource "aws_route53_record" "app1" {
 # Internal ALB DNS Record
 ####################################
 
-resource "aws_route53_record" "internal" {
+resource "aws_route53_record" "external" {
   provider = aws.core-vpc
   zone_id  = var.route53_zone_external_id
   name     = "portal-poc.laa-development.modernisation-platform.service.justice.gov.uk"

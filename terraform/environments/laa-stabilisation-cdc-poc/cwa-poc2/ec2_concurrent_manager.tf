@@ -132,8 +132,8 @@ echo "Updating CWA_cwa-app2.xml"
 su - applmgr -c "cp /CWA/app/appl/admin/CWA_cwa-app2.xml /CWA/app/appl/admin/CWA_cwa-app2.xml.tf_backup"
 sed -i 's/aws.${var.application_data.accounts[local.environment].old_domain_name}/${var.route53_zone_external}/g' /CWA/app/appl/admin/CWA_cwa-app2.xml
 sed -i 's/${var.application_data.accounts[local.environment].old_domain_name}/${var.route53_zone_external}/g' /CWA/app/appl/admin/CWA_cwa-app2.xml
-sed -i 's/cwa.${var.application_data.accounts[local.environment].old_domain_name}/${resource.aws_route53_record.internal.name}/g' /CWA/app/appl/admin/CWA_cwa-app2.xml
-sed -i 's/db_admin@legalservices.gov.uk/db_admin@$${resource.aws_route53_record.external.name}/g' /CWA/app/appl/admin/CWA_cwa-app2.xml
+sed -i 's/cwa.${var.application_data.accounts[local.environment].old_domain_name}/${resource.aws_route53_record.external.name}/g' /CWA/app/appl/admin/CWA_cwa-app2.xml
+sed -i 's/db_admin@legalservices.gov.uk/db_admin@${resource.aws_route53_record.external.name}/g' /CWA/app/appl/admin/CWA_cwa-app2.xml
 
 EOF
 
