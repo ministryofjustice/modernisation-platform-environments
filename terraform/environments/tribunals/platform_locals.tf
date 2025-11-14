@@ -61,16 +61,26 @@ locals {
   # of the production cloudfront distribution
   # "ahmlr.gov.uk" is listed as the primary domain of the viewer certificate for this cloudfront-nginx distribution
   #
-  cloudfront_nginx_sans = [
+  cloudfront_nginx_prod_sans = [
     "ahmlr.gov.uk",
     "asylum-support-tribunal.gov.uk"
   ]
 
-  # This array should match the cloudfront_nginx_sans one above, but with  dev. prefix for each one
+  # This array is dynamically built from the above production sans, but prefixes each one with the environment name
   cloudfront_nginx_nonprod_sans = [
-    "dev.ahmlr.gov.uk",
-    "dev.asylum-support-tribunal.gov.uk"
+    for d in local.cloudfront_nginx_prod_sans : "${local.environment}.${d}"
   ]
+
+  # This map will either contain the prod, dev or preprod SANS during the plan/apply stage
+  # This map is used to assign the aliases for the certificate and the distribution below.
+  cloudfront_sans_map = {
+    production     = local.cloudfront_nginx_prod_sans
+    development    = local.cloudfront_nginx_nonprod_sans
+    preproduction  = local.cloudfront_nginx_nonprod_sans
+  }
+
+  # Final SANs to apply to cert or distribution. Pull the entry from the above map dependent on environment
+  cloudfront_nginx_sans = lookup(local.cloudfront_sans_map, local.environment, [])
 
   pending_cloudfront_nginx_sans = [
     "appeals-service.gov.uk",

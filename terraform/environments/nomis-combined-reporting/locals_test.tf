@@ -224,7 +224,7 @@ locals {
             alarm_target_group_names = [] # don't enable as environments are powered up/down frequently
             rules = {
               web = {
-                priority = 200
+                priority = 1200 # change priority to 200 if the environment is powered on during day
                 actions = [{
                   type              = "forward"
                   target_group_name = "private-t1-http-7777"
@@ -274,7 +274,7 @@ locals {
             alarm_target_group_names = [] # don't enable as environments are powered up/down frequently
             rules = {
               web = {
-                priority = 200
+                priority = 1200 # change priority to 200 if the environment is powered on during day
                 actions = [{
                   type              = "forward"
                   target_group_name = "t1-http-7777"
