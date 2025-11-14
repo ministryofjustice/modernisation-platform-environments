@@ -18,6 +18,7 @@ module "glue_compact_job" {
   name                          = local.compaction_job_name
   short_name                    = local.compaction_job_short_name
   command_type                  = "glueetl"
+  glue_version                  = local.glue_job_version
   description                   = "Runs compaction on tables in the specified zone path.\nArguments:\n--dpr.maintenance.root.path: (Required) Root path on which to run the job.\n--dpr.domain.name: (Optional) The domain tables to include in the compaction. Will run for all tables if not specified.\n--dpr.config.s3.bucket: (Optional) The bucket in which the domain tables configs are located"
   create_security_configuration = local.create_sec_conf
   job_language                  = "scala"
@@ -26,7 +27,6 @@ module "glue_compact_job" {
   spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.compaction_job_name}/"
   # Placeholder Script Location
   script_location              = local.glue_placeholder_script_location
-  enable_continuous_log_filter = false
   project_id                   = local.project
   aws_kms_key                  = local.s3_kms_arn
   execution_class              = "FLEX"
@@ -66,6 +66,7 @@ module "glue_retention_job" {
   name                          = local.retention_job_name
   short_name                    = local.retention_job_short_name
   command_type                  = "glueetl"
+  glue_version                  = local.glue_job_version
   description                   = "Runs the vacuum retention job on tables in the specified zone path.\nArguments:\n--dpr.maintenance.root.path: (Required) Root path on which to run the job.\n--dpr.domain.name: (Optional) The domain tables to include in the compaction. Will run for all tables if not specified.\n--dpr.config.s3.bucket: (Optional) The bucket in which the domain tables configs are located"
   create_security_configuration = local.create_sec_conf
   job_language                  = "scala"
@@ -74,7 +75,6 @@ module "glue_retention_job" {
   spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.retention_job_name}/"
   # Placeholder Script Location
   script_location              = local.glue_placeholder_script_location
-  enable_continuous_log_filter = false
   project_id                   = local.project
   aws_kms_key                  = local.s3_kms_arn
   execution_class              = "FLEX"
