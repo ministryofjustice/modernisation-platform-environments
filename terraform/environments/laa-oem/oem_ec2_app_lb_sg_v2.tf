@@ -1,13 +1,14 @@
-#resource "aws_security_group" "load_balancer_security_group" {
-#  name_prefix = "${local.application_name}-load-balancer-sg-"
-#  description = "Access to the EBS App server"
-#  vpc_id      = data.aws_vpc.shared.id
-#
-#  tags = merge(tomap(
-#    { "Name" = "${local.application_name}-app-lb-sg" }
-#  ), local.tags)
-#}
-#
+resource "aws_security_group" "load_balancer_security_group" {
+  count = 0
+  name_prefix = "${local.application_name}-load-balancer-sg-"
+  description = "Access to the EBS App server"
+  vpc_id      = data.aws_vpc.shared.id
+
+  tags = merge(tomap(
+    { "Name" = "${local.application_name}-app-lb-sg" }
+  ), local.tags)
+}
+
 ## Egress Rules for load_balancer_security_group
 #resource "aws_vpc_security_group_egress_rule" "lb_sg_egress_all_0_0_cidr" {
 #  security_group_id = aws_security_group.load_balancer_security_group.id
