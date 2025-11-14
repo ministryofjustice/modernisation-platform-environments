@@ -286,7 +286,7 @@ locals {
                 }]
               }
               t2-onr-web-http-7777 = {
-                priority = 200
+                priority = 1200 # change priority to 200 if the environment is powered on during day
                 actions = [{
                   type              = "forward"
                   target_group_name = "t2-onr-web-http-7777"
