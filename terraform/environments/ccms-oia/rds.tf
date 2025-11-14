@@ -18,7 +18,7 @@ resource "aws_db_subnet_group" "opahub_db_subnets" {
 resource "aws_db_instance" "opahub_db" {
   identifier          = "${local.opa_app_name}-db"
   engine              = "mysql"
-  engine_version      = "8.0.42"
+  engine_version      = local.application_data.accounts[local.environment].db_instance_version
   instance_class      = local.application_data.accounts[local.environment].db_instance_type
   allocated_storage   = local.application_data.accounts[local.environment].db_storage_gb
   storage_type        = "gp3"
