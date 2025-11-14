@@ -5,12 +5,8 @@ locals {
     "--TempDir"                          = var.temp_dir
     "--checkpoint.location"              = var.checkpoint_dir
     "--spark-event-logs-path"            = var.spark_event_logs
-    "--continuous-log-logGroup"          = try(aws_cloudwatch_log_group.job[0].name, "null")
-    "--enable-continuous-cloudwatch-log" = "false"
     "--enable-glue-datacatalog"          = "true"
     "--enable-job-insights"              = "true"
-    "--continuous-log-logStreamPrefix"   = var.continuous_log_stream_prefix
-    "--enable-continuous-log-filter"     = var.enable_continuous_log_filter
     "--enable-spark-ui"                  = var.enable_spark_ui
   }
 
@@ -237,16 +233,6 @@ resource "aws_cloudwatch_log_group" "sec_config_output" {
   tags              = var.tags
 }
 
-
-resource "aws_cloudwatch_log_group" "continuous_log" {
-  #checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS, Skipping for Timebeing in view of Cost Savings”
-
-  count = var.create_job ? 1 : 0
-
-  name              = "/aws-glue/jobs/${var.name}-${var.short_name}-sec-config"
-  retention_in_days = var.log_group_retention_in_days
-  tags              = var.tags
-}
 
 resource "aws_glue_security_configuration" "sec_cfg" {
   #checkov:skip=CKV_AWS_99: "Ensure Glue Security Configuration Encryption is enabled. TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/DPR2-1083"
