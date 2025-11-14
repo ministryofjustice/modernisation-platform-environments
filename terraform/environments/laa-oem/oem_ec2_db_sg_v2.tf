@@ -1,13 +1,13 @@
-resource "aws_security_group" "oem_db_security_group" {
-  name_prefix = "${local.application_name}-db-server-sg-"
-  description = "controls access to the ebs app server"
-  vpc_id      = data.aws_vpc.shared.id
-
-  tags = merge(tomap(
-    { "Name" = "${local.application_name}-db-server-sg-1" }
-  ), local.tags)
-}
-
+#resource "aws_security_group" "oem_db_security_group" {
+#  name_prefix = "${local.application_name}-db-server-sg-"
+#  description = "controls access to the ebs app server"
+#  vpc_id      = data.aws_vpc.shared.id
+#
+#  tags = merge(tomap(
+#    { "Name" = "${local.application_name}-db-server-sg-1" }
+#  ), local.tags)
+#}
+#
 ## Egress Rules for oem_db_security_group
 #resource "aws_vpc_security_group_egress_rule" "oem_db_sg_egress_all_0_0_cidr" {
 #  security_group_id = aws_security_group.oem_db_security_group.id

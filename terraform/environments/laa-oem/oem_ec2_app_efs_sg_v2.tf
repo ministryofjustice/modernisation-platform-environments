@@ -1,17 +1,17 @@
-resource "aws_security_group" "oem_app_efs_sg" {
-  name_prefix = "${local.application_name}-app-efs-sg-"
-  description = "Allow inbound access from instances"
-  vpc_id      = data.aws_vpc.shared.id
-
-  tags = merge(tomap(
-    { "Name" = "${local.application_name}-app-efs-sg" }
-  ), local.tags)
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
+#resource "aws_security_group" "oem_app_efs_sg" {
+#  name_prefix = "${local.application_name}-app-efs-sg-"
+#  description = "Allow inbound access from instances"
+#  vpc_id      = data.aws_vpc.shared.id
+#
+#  tags = merge(tomap(
+#    { "Name" = "${local.application_name}-app-efs-sg" }
+#  ), local.tags)
+#
+#  lifecycle {
+#    create_before_destroy = true
+#  }
+#}
+#
 #resource "aws_vpc_security_group_egress_rule" "oem_app_efs_sg_egress_all_0_0_cidr" {
 #  security_group_id = aws_security_group.oem_app_efs_sg.id
 #  description       = "Allow all outbound traffic"
