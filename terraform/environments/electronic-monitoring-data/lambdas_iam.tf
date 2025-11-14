@@ -285,6 +285,16 @@ resource "aws_iam_role" "rotate_encryption_key" {
 }
 
 #-----------------------------------------------------------------------------------
+# Generate encrypted txt
+#-----------------------------------------------------------------------------------
+
+resource "aws_iam_role" "generate_encrypted_txt" {
+  name               = "generate_encrypted_txt-lambda-role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+
+#-----------------------------------------------------------------------------------
 # Virus scanning - definition upload
 #-----------------------------------------------------------------------------------
 
