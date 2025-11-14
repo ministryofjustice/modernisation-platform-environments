@@ -36,13 +36,7 @@ resource "aws_security_group" "postgresql_db_sc" {
     description     = "Allows ECS service to access RDS"
     security_groups = [aws_security_group.ecs_service.id]
   }
-  ingress {
-    from_port   = 5432
-    to_port     = 5432
-    protocol    = "tcp"
-    description = "Allows Github Actions to access RDS"
-    cidr_blocks = ["${jsondecode(data.http.myip.response_body)["ip"]}/32"]
-  }
+
   ingress {
     protocol    = "tcp"
     description = "Allow PSQL traffic from bastion"
@@ -52,6 +46,7 @@ resource "aws_security_group" "postgresql_db_sc" {
       module.bastion_linux.bastion_security_group
     ]
   }
+
   egress {
     description = "allow all outbound traffic"
     from_port   = 0
@@ -85,7 +80,6 @@ resource "aws_security_group" "postgresql_db_sc_dev" {
   name        = "postgres_security_group_dev"
   description = "control access to the database"
   vpc_id      = data.aws_vpc.shared.id
-
   ingress {
     from_port       = 5432
     to_port         = 5432
@@ -100,6 +94,7 @@ resource "aws_security_group" "postgresql_db_sc_dev" {
     description = "Allows Github Actions to access RDS"
     cidr_blocks = ["${jsondecode(data.http.myip.response_body)["ip"]}/32"]
   }
+
   ingress {
     protocol    = "tcp"
     description = "Allow PSQL traffic from bastion"
@@ -116,10 +111,7 @@ resource "aws_security_group" "postgresql_db_sc_dev" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
-}
 
-data "http" "myip" {
-  url = "http://ipinfo.io/json"
 }
 
 // Sets up empty database for Development environment
@@ -133,10 +125,10 @@ resource "null_resource" "setup_dev_db" {
     command     = "chmod +x ./setup-dev-db.sh; ./setup-dev-db.sh"
 
     environment = {
-      DB_HOSTNAME      = aws_db_instance.cst_db_dev[0].address
-      DB_NAME          = aws_db_instance.cst_db_dev[0].db_name
-      cst_DB_USERNAME = aws_db_instance.cst_db_dev[0].username
-      cst_DB_PASSWORD = random_password.password.result
+      DB_HOSTNAME     = aws_db_instance.cst_db_dev[0].address
+      DB_NAME         = aws_db_instance.cst_db_dev[0].db_name
+      CST_DB_USERNAME = aws_db_instance.cst_db_dev[0].username
+      CST_DB_PASSWORD = random_password.password.result
     }
   }
   triggers = {

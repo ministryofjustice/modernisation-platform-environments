@@ -23,14 +23,14 @@ resource "aws_ecs_task_definition" "cst_task_definition" {
   network_mode             = "awsvpc"
   execution_role_arn       = aws_iam_role.app_execution.arn
   task_role_arn            = aws_iam_role.app_task.arn
-  cpu                      = 1024
-  memory                   = 2048
+  cpu                      = 2048
+  memory                   = 4096
   container_definitions = jsonencode([
     {
       name                   = "cst-container"
       image                  = "${aws_ecr_repository.cst_ecr_repo.repository_url}:latest"
-      cpu                    = 1024
-      memory                 = 2048
+      cpu                    = 2048
+      memory                 = 4096
       essential              = true
       ReadonlyRootFilesystem = true
       logConfiguration = {
@@ -98,14 +98,14 @@ resource "aws_ecs_task_definition" "cst_task_definition_dev" {
   network_mode             = "awsvpc"
   execution_role_arn       = aws_iam_role.app_execution.arn
   task_role_arn            = aws_iam_role.app_task.arn
-  cpu                      = 1024
-  memory                   = 2048
+  cpu                      = 2048
+  memory                   = 4096
   container_definitions = jsonencode([
     {
       name                   = "cst-container"
       image                  = "${aws_ecr_repository.cst_ecr_repo.repository_url}:latest"
-      cpu                    = 1024
-      memory                 = 2048
+      cpu                    = 2048
+      memory                 = 4096
       essential              = true
       ReadonlyRootFilesystem = true
       logConfiguration = {
@@ -169,7 +169,6 @@ resource "aws_ecs_service" "cst_ecs_service" {
   depends_on = [
     aws_lb_listener.cst_lb
   ]
-
   count                             = local.is-development ? 0 : 1
   name                              = var.networking[0].application
   cluster                           = aws_ecs_cluster.cst_cluster.id
@@ -200,7 +199,6 @@ resource "aws_ecs_service" "cst_ecs_service_dev" {
   depends_on = [
     aws_lb_listener.cst_lb
   ]
-
   count                             = local.is-development ? 1 : 0
   name                              = var.networking[0].application
   cluster                           = aws_ecs_cluster.cst_cluster.id
@@ -359,7 +357,6 @@ resource "aws_ecr_repository" "cst_ecr_repo" {
 resource "aws_cloudwatch_event_rule" "ecs_events" {
   name        = "ecs-events"
   description = "Capture all ECS events"
-
   event_pattern = jsonencode({
     "source" : ["aws.ecs"],
     "detail" : {
@@ -367,7 +364,6 @@ resource "aws_cloudwatch_event_rule" "ecs_events" {
     }
   })
 }
-
 # AWS EventBridge target
 resource "aws_cloudwatch_event_target" "logs" {
   depends_on = [aws_cloudwatch_log_group.deployment_logs]
