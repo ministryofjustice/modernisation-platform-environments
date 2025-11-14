@@ -9,10 +9,11 @@
 # -------------------------------------------------
 resource "aws_acm_certificate" "http_cloudfront_nginx" {
   provider          = aws.us-east-1
-  domain_name       = local.is-production ? "ahmlr.gov.uk" : "dev.ahmlr.gov.uk"
+  domain_name       = local.is-production ? "ahmlr.gov.uk" : "${local.environment}.ahmlr.gov.uk"
   validation_method = "DNS"
 
-  subject_alternative_names = local.is-production ? local.cloudfront_nginx_sans : local.cloudfront_nginx_nonprod_sans
+  # SANS are dynamically calculated in platform_locals dependent on environment
+  subject_alternative_names = local.cloudfront_nginx_sans
 
   tags = {
     Name        = "tribunals-http-redirect-cert"
@@ -65,7 +66,8 @@ resource "aws_cloudfront_distribution" "tribunals_http_redirect" {
     prefix          = "cloudfront-redirect-logs-v2/"
   }
 
-  aliases = local.is-production ? local.cloudfront_nginx_sans : local.cloudfront_nginx_nonprod_sans
+  # Aliases are dynamically calculated in platform_locals dependent on environment
+  aliases = local.cloudfront_nginx_sans
 
   origin {
     domain_name = "dummy-http-redirect.s3.amazonaws.com"
