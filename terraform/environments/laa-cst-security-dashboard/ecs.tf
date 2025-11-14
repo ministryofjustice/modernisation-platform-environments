@@ -167,7 +167,7 @@ resource "aws_ecs_task_definition" "cst_task_definition_dev" {
 
 resource "aws_ecs_service" "cst_ecs_service" {
   depends_on = [
-    aws_lb_listener.cst_cluster
+    aws_lb_listener.cst_lb
   ]
   count                             = local.is-development ? 0 : 1
   name                              = var.networking[0].application
@@ -197,7 +197,7 @@ resource "aws_ecs_service" "cst_ecs_service" {
 
 resource "aws_ecs_service" "cst_ecs_service_dev" {
   depends_on = [
-    aws_lb_listener.cst_cluster
+    aws_lb_listener.cst_lb
   ]
   count                             = local.is-development ? 1 : 0
   name                              = var.networking[0].application
@@ -337,7 +337,7 @@ resource "aws_security_group" "ecs_service" {
     to_port         = 80
     protocol        = "tcp"
     description     = "Allow traffic on port 80 from load balancer"
-    security_groups = [aws_security_group.cst_cluster_sc.id]
+    security_groups = [aws_security_group.cst_lb_sc.id]
   }
 
   egress {
@@ -441,7 +441,7 @@ resource "aws_cloudwatch_metric_alarm" "ddos_attack_external" {
   treat_missing_data  = "notBreaching"
   alarm_actions       = [aws_sns_topic.ddos_alarm[0].arn]
   dimensions = {
-    ResourceArn = aws_lb.cst_cluster.arn
+    ResourceArn = aws_lb.cst_lb.arn
   }
 }
 
