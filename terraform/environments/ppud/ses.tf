@@ -96,3 +96,36 @@ resource "aws_ses_domain_mail_from" "ppud" {
   domain           = aws_ses_domain_identity.ppud[0].domain
   mail_from_domain = "noreply.${aws_ses_domain_identity.ppud[0].domain}"
 }
+
+output "ses_dns_records" {
+  value = {
+    verification_txt = {
+      name  = "_amazonses.${aws_ses_domain_identity.ppud[0].domain}"
+      type  = "TXT"
+      value = aws_ses_domain_identity.ppud[0].verification_token
+    }
+    dkim_cnames = [
+      for token in aws_ses_domain_dkim.Domain-DKIM[0].dkim_tokens :
+      {
+        name  = "${token}._domainkey.${aws_ses_domain_identity.ppud[0].domain}"
+        type  = "CNAME"
+        value = "${token}.dkim.amazonses.com"
+      }
+    ]
+    mail_from_mx = {
+      name  = aws_ses_domain_mail_from.ppud[0].mail_from_domain
+      type  = "MX"
+      value = "10 feedback-smtp.eu-west-2.amazonses.com"
+    }
+    spf_txt = {
+      name  = aws_ses_domain_identity.ppud[0].domain
+      type  = "TXT"
+      value = "v=spf1 include:amazonses.com ~all"
+    }
+    dmarc_txt = {
+      name  = "_dmarc.${aws_ses_domain_identity.ppud[0].domain}"
+      type  = "TXT"
+      value = "v=DMARC1; p=none; rua=mailto:dmarc-reports@${aws_ses_domain_identity.ppud[0].domain}; adkim=s; aspf=s"
+    }
+  }
+}
