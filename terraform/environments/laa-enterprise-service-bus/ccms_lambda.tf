@@ -17,8 +17,8 @@ resource "aws_security_group" "ccms_provider_load" {
 
 resource "aws_security_group_rule" "ccms_provider_load_egress_oracle" {
   type              = "egress"
-  from_port         = local.environment == "development" ? 1521 : local.environment == "test" ? 1522 : 0
-  to_port           = local.environment == "development" ? 1521 : local.environment == "test" ? 1522 : 0
+  from_port         = local.environment == "test" ? 1521 : 1522
+  to_port           = local.environment == "test" ? 1521 : 1522
   protocol          = "tcp"
   cidr_blocks       = [local.application_data.accounts[local.environment].ccms_database_ip]
   security_group_id = aws_security_group.ccms_provider_load.id
@@ -35,6 +35,16 @@ resource "aws_security_group_rule" "ccms_provider_load_egress_https" {
   description              = "Outbound 443 to LAA VPC Endpoint SG"
 }
 
+resource "aws_security_group_rule" "ccms_provider_load_egress_https_s3" {
+  type              = "egress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  prefix_list_ids   = [local.application_data.accounts[local.environment].s3_vpc_endpoint_prefix]
+  security_group_id = aws_security_group.ccms_provider_load.id
+  description       = "Outbound 443 to LAA VPC Endpoint SG"
+}
+
 ######################################
 ### Lambda Resources
 ######################################
@@ -45,15 +55,15 @@ resource "aws_lambda_function" "ccms_provider_load" {
   function_name    = "ccms_provider_load_function"
   role             = aws_iam_role.ccms_provider_load_role.arn
   handler          = "lambda_function.lambda_handler"
-  filename         = "lambda/provider_load_lambda/provider_load_package.zip"
-  source_code_hash = filebase64sha256("lambda/provider_load_lambda/provider_load_package.zip")
+  s3_bucket        = data.aws_s3_object.provider_load_zip.bucket
+  s3_key           = data.aws_s3_object.provider_load_zip.key
+  s3_object_version = data.aws_s3_object.provider_load_zip.version_id
   timeout          = 100
   memory_size      = 128
   runtime          = "python3.10"
 
   layers = [
-    aws_lambda_layer_version.lambda_layer_oracle_python.arn,
-    "arn:aws:lambda:eu-west-2:017000801446:layer:AWSLambdaPowertoolsPython:2"
+    aws_lambda_layer_version.lambda_layer_oracle_python.arn
   ]
 
   vpc_config {
@@ -66,13 +76,16 @@ resource "aws_lambda_function" "ccms_provider_load" {
     variables = {
       DB_SECRET_NAME         = aws_secretsmanager_secret.ccms_db_mp_credentials.name
       PROCEDURE_SECRET_NAME  = aws_secretsmanager_secret.ccms_procedures_config.name
-      LD_LIBRARY_PATH        = "/opt/instantclient_12_2_linux"
-      ORACLE_HOME            = "/opt/instantclient_12_2_linux"
+      LD_LIBRARY_PATH        = "/opt/instantclient_12_1"
+      ORACLE_HOME            = "/opt/instantclient_12_1"
       SERVICE_NAME           = "ccms-load-service"
       NAMESPACE              = "HUB20-CCMS-NS"
       ENVIRONMENT            = local.environment
       LOG_LEVEL              = "DEBUG"
       PURGE_LAMBDA_TIMESTAMP = aws_ssm_parameter.ccms_provider_load_timestamp.name
+      TNS_ADMIN              = "/tmp/wallet_dir"
+      WALLET_BUCKET          = data.aws_s3_bucket.lambda_files.bucket
+      WALLET_OBJ             = "wallet_files/CCMS/wallet_dir.zip"
     }
   }
 
@@ -80,10 +93,4 @@ resource "aws_lambda_function" "ccms_provider_load" {
     local.tags,
     { Name = "${local.application_name_short}-${local.environment}-ccms-provider-load" }
   )
-}
-
-resource "aws_lambda_event_source_mapping" "ccms_banks_q_trigger" {
-  event_source_arn = aws_sqs_queue.ccms_banks_q.arn
-  function_name    = aws_lambda_function.ccms_provider_load.arn
-  batch_size       = 1
 }

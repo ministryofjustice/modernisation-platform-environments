@@ -2,7 +2,7 @@
 module "vpc" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
-  source = "github.com/terraform-aws-modules/terraform-aws-vpc?ref=a0307d4" # v6.0.1
+  source          = "github.com/terraform-aws-modules/terraform-aws-vpc?ref=a0307d4" # v6.0.1
   name            = "${local.application_name}-${local.environment}"
   azs             = local.availability_zones
   cidr            = local.application_data.accounts[local.environment].vpc_cidr

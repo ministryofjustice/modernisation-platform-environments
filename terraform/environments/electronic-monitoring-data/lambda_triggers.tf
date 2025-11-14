@@ -1,88 +1,164 @@
-# ---------------------------------------
-# Data bucket notification triggers
-# ---------------------------------------
-resource "aws_s3_bucket_notification" "historic_data_store" {
-  depends_on = [aws_lambda_permission.historic, aws_lambda_permission.live_serco_fms]
-  bucket     = module.s3-data-bucket.bucket.id
+module "calculate_checksum_sqs" {
+  source               = "./modules/sqs_s3_lambda_trigger"
+  bucket               = module.s3-data-bucket.bucket
+  lambda_function_name = module.calculate_checksum.lambda_function_name
+  bucket_prefix        = local.bucket_prefix
+}
 
-  lambda_function {
-    lambda_function_arn = module.calculate_checksum.lambda_function_arn
-    events = [
-      "s3:ObjectCreated:*"
-    ]
-    filter_suffix = ".bak"
-  }
-  lambda_function {
-    lambda_function_arn = module.calculate_checksum.lambda_function_arn
-    events = [
-      "s3:ObjectCreated:*",
-    ]
+resource "aws_s3_bucket_notification" "data_bucket_triggers" {
+  bucket = module.s3-data-bucket.bucket.id
+  queue {
+    queue_arn     = module.calculate_checksum_sqs.sqs_queue.arn
+    events        = ["s3:ObjectCreated:*"]
     filter_suffix = ".zip"
   }
-  lambda_function {
-    lambda_function_arn = module.calculate_checksum.lambda_function_arn
-    events = [
-      "s3:ObjectCreated:*",
-    ]
+  queue {
+    queue_arn     = module.calculate_checksum_sqs.sqs_queue.arn
+    events        = ["s3:ObjectCreated:*"]
+    filter_suffix = ".bak"
+  }
+  queue {
+    queue_arn     = module.calculate_checksum_sqs.sqs_queue.arn
+    events        = ["s3:ObjectCreated:*"]
     filter_suffix = ".bacpac"
   }
-  lambda_function {
-    lambda_function_arn = module.calculate_checksum.lambda_function_arn
-    events = [
-      "s3:ObjectCreated:*",
-    ]
+  queue {
+    queue_arn     = module.calculate_checksum_sqs.sqs_queue.arn
+    events        = ["s3:ObjectCreated:*"]
+    filter_suffix = ".csv"
+  }
+  queue {
+    queue_arn     = module.calculate_checksum_sqs.sqs_queue.arn
+    events        = ["s3:ObjectCreated:*"]
     filter_suffix = ".7z"
   }
-  lambda_function {
-    lambda_function_arn = module.format_json_fms_data.lambda_function_arn
-    events = [
-      "s3:ObjectCreated:*",
-    ]
-    filter_suffix = ".JSON"
-    filter_prefix = "serco/fms/"
-  }
-  lambda_function {
-    lambda_function_arn = module.copy_mdss_data.lambda_function_arn
-    events = [
-      "s3:ObjectCreated:*",
-    ]
+  queue {
+    queue_arn     = module.copy_mdss_data_sqs.sqs_queue.arn
+    events        = ["s3:ObjectCreated:*"]
     filter_suffix = ".jsonl"
-    filter_prefix = "allied/mdss/"
+    filter_prefix = "allied/mdss"
+  }
+  queue {
+    queue_arn     = module.process_fms_metadata_sqs.sqs_queue.arn
+    events        = ["s3:ObjectCreated:*"]
+    filter_suffix = ".JSON"
+    filter_prefix = "serco/fms"
   }
 }
 
-# ---------------------------------------
-# mdss data jsonl lambda trigger
-# ---------------------------------------
-
-resource "aws_lambda_permission" "live_allied_mdss" {
-  statement_id  = "LiveSercoFMSLambdaAllowExecutionFromS3Bucket"
-  action        = "lambda:InvokeFunction"
-  function_name = module.copy_mdss_data.lambda_function_name
-  principal     = "s3.amazonaws.com"
-  source_arn    = module.s3-data-bucket.bucket.arn
+module "process_fms_metadata_sqs" {
+  source               = "./modules/sqs_s3_lambda_trigger"
+  bucket               = module.s3-data-bucket.bucket
+  lambda_function_name = module.process_fms_metadata.lambda_function_name
+  bucket_prefix        = local.bucket_prefix
 }
 
-# ---------------------------------------
-# fms data JSON lambda trigger
-# ---------------------------------------
-
-resource "aws_lambda_permission" "live_serco_fms" {
-  statement_id  = "LiveSercoFMSLambdaAllowExecutionFromS3Bucket"
-  action        = "lambda:InvokeFunction"
-  function_name = module.format_json_fms_data.lambda_function_name
-  principal     = "s3.amazonaws.com"
-  source_arn    = module.s3-data-bucket.bucket.arn
+module "copy_mdss_data_sqs" {
+  source               = "./modules/sqs_s3_lambda_trigger"
+  bucket               = module.s3-data-bucket.bucket
+  lambda_function_name = module.copy_mdss_data.lambda_function_name
+  bucket_prefix        = local.bucket_prefix
 }
 
-# ---------------------------------------
-# historic data checksum trigger
-# ---------------------------------------
+module "virus_scan_file_sqs" {
+  source               = "./modules/sqs_s3_lambda_trigger"
+  bucket               = module.s3-received-files-bucket.bucket
+  lambda_function_name = module.virus_scan_file.lambda_function_name
+  bucket_prefix        = local.bucket_prefix
+}
 
-resource "aws_lambda_permission" "historic" {
-  statement_id  = "ChecksumLambdaAllowExecutionFromHistoricData"
-  action        = "lambda:InvokeFunction"
-  function_name = module.calculate_checksum.lambda_function_name
-  principal     = "s3.amazonaws.com"
-  source_arn    = module.s3-data-bucket.bucket.arn
+resource "aws_s3_bucket_notification" "virus_scan_file" {
+  bucket = module.s3-received-files-bucket.bucket.id
+
+  queue {
+    queue_arn = module.virus_scan_file_sqs.sqs_queue.arn
+    events    = ["s3:ObjectCreated:*"]
+  }
+
+  depends_on = [module.virus_scan_file_sqs]
+}
+
+
+# ----------------------------------------------
+# Format Json data sqs queue
+# ----------------------------------------------
+
+resource "aws_sqs_queue" "format_fms_json_event_queue" {
+  name                       = "format-fms-json-queue"
+  visibility_timeout_seconds = 6 * 15 * 60 # 6 x longer than longest possible lambda
+  redrive_policy = jsonencode({
+    deadLetterTargetArn = aws_sqs_queue.format_fms_json_event_dlq.arn
+    maxReceiveCount     = 5
+  })
+  sqs_managed_sse_enabled = true
+}
+
+resource "aws_sqs_queue" "format_fms_json_event_dlq" {
+  name                    = "format-fms-json-dlq"
+  sqs_managed_sse_enabled = true
+}
+
+data "aws_iam_policy_document" "allow_lambda_to_write" {
+  statement {
+    sid    = "FormatFMSJsonPermissions"
+    effect = "Allow"
+    principals {
+      type        = "Service"
+      identifiers = ["lambda.amazonaws.com"]
+    }
+    actions = [
+      "SQS:SendMessage"
+    ]
+    resources = [
+      aws_sqs_queue.format_fms_json_event_queue.arn
+    ]
+    condition {
+      test     = "ArnLike"
+      variable = "aws:SourceArn"
+      values   = [module.process_fms_metadata.lambda_function_arn]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceAccount"
+      values   = [data.aws_caller_identity.current.account_id]
+    }
+  }
+}
+
+resource "aws_sqs_queue_policy" "allow_lambda_to_write" {
+  queue_url = aws_sqs_queue.format_fms_json_event_queue.id
+  policy    = data.aws_iam_policy_document.allow_lambda_to_write.json
+}
+
+
+resource "aws_lambda_event_source_mapping" "sqs_trigger" {
+  event_source_arn = aws_sqs_queue.format_fms_json_event_queue.arn
+  function_name    = module.format_json_fms_data.lambda_function_name
+  batch_size       = 10
+  scaling_config {
+    maximum_concurrency = 1000
+  }
+}
+
+
+# ----------------------------------------------
+# Load DMS data sqs queue
+# ----------------------------------------------
+
+module "load_dms_output_event_queue" {
+  source               = "./modules/sqs_s3_lambda_trigger"
+  bucket               = module.s3-dms-target-store-bucket.bucket
+  lambda_function_name = module.load_dms_output.lambda_function_name
+  bucket_prefix        = local.bucket_prefix
+}
+
+resource "aws_s3_bucket_notification" "load_dms_output_event" {
+  bucket = module.s3-dms-target-store-bucket.bucket.id
+
+  queue {
+    queue_arn = module.load_dms_output_event_queue.sqs_queue.arn
+    events    = ["s3:ObjectCreated:*"]
+  }
+
+  depends_on = [module.load_dms_output_event_queue]
 }

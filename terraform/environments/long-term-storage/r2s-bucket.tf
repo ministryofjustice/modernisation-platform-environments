@@ -1,0 +1,495 @@
+############################################################
+# Inputs 
+############################################################
+
+variable "secrets_populated" {
+  description = "Flip to true only after you've populated all Secrets Manager values. If rebuilding it will need to be false first"
+  type        = bool
+  default     = true
+}
+
+############################################################
+# Locals for this bucket setup
+############################################################
+
+locals {
+  # Ensure global uniqueness to avoid BucketAlreadyExists
+  bucket_name = "r2s-resources-${data.aws_caller_identity.current.account_id}-${data.aws_region.current.name}"
+
+  # Read base secrets only when populated; stay null otherwise (prevents eval errors)
+  genesys_aws_account_id         = var.secrets_populated ? try(nonsensitive(data.aws_secretsmanager_secret_version.genesys_account_id[0].secret_string), null) : null
+  genesys_external_id            = var.secrets_populated ? try(nonsensitive(data.aws_secretsmanager_secret_version.genesys_external_id[0].secret_string), null) : null
+  snowflake_principal_account_id = var.secrets_populated ? try(nonsensitive(data.aws_secretsmanager_secret_version.snowflake_principal_account_id[0].secret_string), null) : null
+  snowflake_external_id          = var.secrets_populated ? try(nonsensitive(data.aws_secretsmanager_secret_version.snowflake_external_id[0].secret_string), null) : null
+
+  snowflake_prefix = "metadata/"
+
+  # Define Genesys roles (no literal prefixes; fetch from Secrets Manager)
+  genesys_roles = {
+    role1 = { name = "r2s-genesys-cica-role", prefix_key = "cica" }
+    role2 = { name = "r2s-genesys-opg-role", prefix_key = "opg" }
+    role3 = { name = "r2s-genesys-laa-role", prefix_key = "laa" }
+    role4 = { name = "r2s-genesys-hmpps-role", prefix_key = "hmpps" }
+    role5 = { name = "r2s-genesys-london-probation-role", prefix_key = "london-probation" }
+    role6 = { name = "r2s-genesys-nle-role", prefix_key = "nle" }
+  }
+
+  genesys_role_arns = [for r in aws_iam_role.genesys_role : r.arn]
+
+  # Map role key -> full secret name "<prefix>_ou"
+  genesys_prefix_secret_name = {
+    for k, v in local.genesys_roles :
+    k => "r2s/genesys/prefixes/${v.prefix_key}_ou"
+  }
+
+  # Build a map role -> normalized prefix (trailing slash); null if not populated
+  genesys_prefix = {
+    for k in keys(local.genesys_roles) :
+    k => (
+      var.secrets_populated
+      ? trimsuffix(try(nonsensitive(data.aws_secretsmanager_secret_version.genesys_prefix[k].secret_string), ""), "/")
+      : null
+    )
+  }
+
+  # Simple, predictable gates: depend ONLY on the toggle
+  genesys_ready   = var.secrets_populated
+  snowflake_ready = var.secrets_populated
+}
+
+############################################################
+# S3 bucket + hardening
+############################################################
+
+resource "aws_s3_bucket" "r2s" {
+  # checkov:skip=CKV_AWS_145: "S3 bucket is not public facing
+  # checkov:skip=CKV_AWS_18:"Access logging not required"
+  # checkov:skip=CKV2_AWS_62:"Event notifications not required for this bucket"
+  # checkov:skip=CKV_AWS_21:Versioning not needed
+  # checkov:skip=CKV_AWS_144:"Cross-region replication not required"
+  # checkov:skip=CKV2_AWS_65:"ACLs are required by design"
+  # checkov:skip=CKV2_AWS_61:"Lifecycle configuration not specified"
+  bucket = local.bucket_name
+  tags   = local.tags
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "r2s" {
+  bucket = aws_s3_bucket.r2s.id
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm     = "aws:kms"
+      kms_master_key_id = aws_kms_key.r2s_s3.arn
+    }
+    bucket_key_enabled = true
+  }
+}
+
+
+resource "aws_s3_bucket_public_access_block" "r2s" {
+  bucket                  = aws_s3_bucket.r2s.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_ownership_controls" "r2s" {
+  # checkov:skip=CKV2_AWS_65:"ACLs are required by design"
+  bucket = aws_s3_bucket.r2s.id
+  rule {
+    object_ownership = "BucketOwnerPreferred"
+  }
+}
+
+# Deny insecure (non-TLS) access
+data "aws_iam_policy_document" "r2s_tls_only" {
+  statement {
+    sid     = "DenyInsecureTransport"
+    effect  = "Deny"
+    actions = ["s3:*"]
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+    resources = [
+      aws_s3_bucket.r2s.arn,
+      "${aws_s3_bucket.r2s.arn}/*"
+    ]
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = ["false"]
+    }
+  }
+  # Require SSE-KMS
+  statement {
+    sid     = "AllowRolePutGetWithSSEKMS"
+    effect  = "Allow"
+    actions = ["s3:PutObject"]
+    principals {
+      type        = "AWS"
+      identifiers = local.genesys_role_arns
+    }
+    resources = [
+      aws_s3_bucket.r2s.arn,
+      "${aws_s3_bucket.r2s.arn}/*"
+    ]
+    condition {
+      test     = "StringEquals"
+      variable = "s3:x-amz-server-side-encryption"
+      values   = ["aws:kms"]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "s3:x-amz-server-side-encryption-aws-kms-key-id"
+      values   = [aws_kms_key.r2s_s3.arn]
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "r2s" {
+  bucket = aws_s3_bucket.r2s.id
+  policy = data.aws_iam_policy_document.r2s_tls_only.json
+}
+
+
+############################################################
+# KMS for S3 bucket encryption
+############################################################
+
+# Key policy: full admin to account; S3 use gated by IAM policies
+data "aws_iam_policy_document" "r2s_kms_policy" {
+  statement {
+    sid    = "EnableRootUserFullAccess"
+    effect = "Allow"
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+    }
+    actions   = ["kms:*"]
+    resources = ["*"]
+  }
+
+  # Allow Role From Account To Use Key
+  statement {
+    sid    = "AllowRoleFromAccountToUseKey"
+    effect = "Allow"
+    principals {
+      type        = "AWS"
+      identifiers = local.genesys_role_arns
+    }
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:DescribeKey"
+    ]
+    resources = ["*"]
+  }
+}
+
+
+resource "aws_kms_key" "r2s_s3" {
+  description             = "KMS key for server-side encryption of ${local.bucket_name}"
+  enable_key_rotation     = true
+  policy                  = data.aws_iam_policy_document.r2s_kms_policy.json
+  deletion_window_in_days = 30
+  tags                    = local.tags
+}
+
+resource "aws_kms_alias" "r2s_s3" {
+  name          = "alias/r2s-s3"
+  target_key_id = aws_kms_key.r2s_s3.key_id
+}
+
+
+############################################################
+# Secrets Manager: create empty secrets (populate in console)
+############################################################
+
+# Create 6 empty secrets for the prefixes (<prefix>_ou)
+resource "aws_secretsmanager_secret" "genesys_prefix" {
+  # checkov:skip=CKV_AWS_149
+  # checkov:skip=CKV2_AWS_57
+  for_each    = local.genesys_roles
+  name        = local.genesys_prefix_secret_name[each.key]
+  description = "S3 prefix (folder) for ${each.value.name}. Example value: '${each.value.prefix_key}/'"
+  tags        = local.tags
+}
+
+resource "aws_secretsmanager_secret" "genesys_account_id" {
+  # checkov:skip=CKV_AWS_149
+  # checkov:skip=CKV2_AWS_57
+  name        = "r2s/genesys/aws_account_id"
+  description = "Genesys Cloud AWS Account ID (populate manually)."
+  tags        = local.tags
+}
+
+resource "aws_secretsmanager_secret" "genesys_external_id" {
+  # checkov:skip=CKV_AWS_149
+  # checkov:skip=CKV2_AWS_57
+  name        = "r2s/genesys/external_id"
+  description = "Genesys Cloud Org ID used as ExternalId (populate manually)."
+  tags        = local.tags
+}
+
+resource "aws_secretsmanager_secret" "snowflake_principal_account_id" {
+  # checkov:skip=CKV_AWS_149
+  # checkov:skip=CKV2_AWS_57
+  name        = "r2s/snowflake/principal_account_id"
+  description = "Snowflake AWS Account ID (populate manually)."
+  tags        = local.tags
+}
+
+resource "aws_secretsmanager_secret" "snowflake_external_id" {
+  # checkov:skip=CKV_AWS_149
+  # checkov:skip=CKV2_AWS_57
+  name        = "r2s/snowflake/external_id"
+  description = "Snowflake External ID (populate manually)."
+  tags        = local.tags
+}
+
+# --- Read the latest secret values (only when flagged as populated) ---
+
+# Genesys prefix secrets (all six) — single reader with for_each
+data "aws_secretsmanager_secret_version" "genesys_prefix" {
+  for_each  = var.secrets_populated ? local.genesys_roles : {}
+  secret_id = aws_secretsmanager_secret.genesys_prefix[each.key].id
+}
+# Other 4 are not created with a for each
+data "aws_secretsmanager_secret_version" "genesys_account_id" {
+  count     = var.secrets_populated ? 1 : 0
+  secret_id = aws_secretsmanager_secret.genesys_account_id.id
+}
+
+data "aws_secretsmanager_secret_version" "genesys_external_id" {
+  count     = var.secrets_populated ? 1 : 0
+  secret_id = aws_secretsmanager_secret.genesys_external_id.id
+}
+
+data "aws_secretsmanager_secret_version" "snowflake_principal_account_id" {
+  count     = var.secrets_populated ? 1 : 0
+  secret_id = aws_secretsmanager_secret.snowflake_principal_account_id.id
+}
+
+data "aws_secretsmanager_secret_version" "snowflake_external_id" {
+  count     = var.secrets_populated ? 1 : 0
+  secret_id = aws_secretsmanager_secret.snowflake_external_id.id
+}
+
+############################################################
+# IAM: Genesys trust + 6 roles + per-prefix policies
+############################################################
+
+# Trust policy for Genesys (only rendered when populated)
+data "aws_iam_policy_document" "genesys_trust" {
+  for_each = var.secrets_populated ? local.genesys_roles : {}
+
+  statement {
+    effect = "Allow"
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${local.genesys_aws_account_id}:root"]
+    }
+    actions = ["sts:AssumeRole"]
+    condition {
+      test     = "StringEquals"
+      variable = "sts:ExternalId"
+      values   = [local.genesys_prefix[each.key]]
+    }
+  }
+}
+
+# Create 6 roles 
+resource "aws_iam_role" "genesys_role" {
+  for_each = local.genesys_ready ? local.genesys_roles : {}
+
+  name               = each.value.name
+  assume_role_policy = data.aws_iam_policy_document.genesys_trust[each.key].json
+  description        = "Role assumed by Genesys Cloud export module to upload recordings to ${local.bucket_name} in ${local.genesys_prefix[each.key]}"
+  tags               = local.tags
+}
+
+# S3 policy document restricted to its own prefix + KMS usage
+data "aws_iam_policy_document" "genesys_prefix" {
+  for_each = local.genesys_ready ? local.genesys_roles : {}
+
+  statement {
+    sid    = "BucketAccess"
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:GetEncryptionConfiguration",
+      "s3:PutBucketAcl",
+      "s3:GetBucketLocation"
+    ]
+    resources = [
+      aws_s3_bucket.r2s.arn,
+      "arn:aws:s3:::${local.bucket_name}/*"
+    ]
+  }
+
+  statement {
+    sid    = "KmsUseForBucketObjects"
+    effect = "Allow"
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:DescribeKey"
+    ]
+    resources = [aws_kms_key.r2s_s3.arn]
+
+    condition {
+      test     = "StringLike"
+      variable = "kms:EncryptionContext:aws:s3:arn"
+      values = [
+        "arn:aws:s3:::${local.bucket_name}/*"
+      ]
+    }
+  }
+}
+
+
+# Managed policy per role
+resource "aws_iam_policy" "genesys_prefix" {
+  for_each = data.aws_iam_policy_document.genesys_prefix
+
+  name        = "r2s-genesys-${local.genesys_roles[each.key].prefix_key}-policy"
+  description = "Restrict ${local.genesys_roles[each.key].name} to s3://${local.bucket_name}/${local.genesys_prefix[each.key]}"
+  policy      = each.value.json
+  tags        = local.tags
+}
+
+# Attach the restricted policy to the matching role
+resource "aws_iam_role_policy_attachment" "genesys_prefix_attach" {
+  for_each = local.genesys_ready ? local.genesys_roles : {}
+
+  role       = aws_iam_role.genesys_role[each.key].name
+  policy_arn = aws_iam_policy.genesys_prefix[each.key].arn
+}
+
+############################################################
+# IAM: Snowflake trust + policy (metadata-only) + role
+############################################################
+
+# Trust policy for Snowflake (only rendered when populated)
+data "aws_iam_policy_document" "snowflake_trust" {
+  count = var.secrets_populated ? 1 : 0
+
+  statement {
+    effect = "Allow"
+    principals {
+      type        = "AWS"
+      identifiers = [local.snowflake_principal_account_id]
+    }
+    actions = ["sts:AssumeRole"]
+    condition {
+      test     = "StringEquals"
+      variable = "sts:ExternalId"
+      values   = [local.snowflake_external_id]
+    }
+  }
+}
+
+
+# Snowflake policy: metadata-only prefix (can be created regardless)
+data "aws_iam_policy_document" "snowflake_policy_doc" {
+  statement {
+    sid       = "ListBucketMetadataPrefix"
+    effect    = "Allow"
+    actions   = ["s3:ListBucket"]
+    resources = [aws_s3_bucket.r2s.arn]
+    condition {
+      test     = "StringLike"
+      variable = "s3:prefix"
+      values = [
+        "${local.snowflake_prefix}",
+        "${local.snowflake_prefix}*"
+      ]
+    }
+  }
+
+  statement {
+    sid    = "ObjectAccessInMetadataPrefix"
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:GetObject",
+      "s3:GetObjectVersion",
+      "s3:DeleteObject",
+      "s3:PutObjectAcl"
+    ]
+    resources = [
+      "arn:aws:s3:::${local.bucket_name}/${local.snowflake_prefix}*"
+    ]
+  }
+
+  statement {
+    sid    = "BucketMetadata"
+    effect = "Allow"
+    actions = [
+      "s3:GetBucketLocation",
+      "s3:GetEncryptionConfiguration"
+    ]
+    resources = [aws_s3_bucket.r2s.arn]
+  }
+  statement {
+    sid    = "KmsUseForSnowflakePrefix"
+    effect = "Allow"
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:DescribeKey"
+    ]
+    resources = [aws_kms_key.r2s_s3.arn]
+    condition {
+      test     = "StringLike"
+      variable = "kms:EncryptionContext:aws:s3:arn"
+      values = [
+        "arn:aws:s3:::${local.bucket_name}/${local.snowflake_prefix}*"
+      ]
+    }
+  }
+  statement {
+    sid    = "SnowflakeS3Integration"
+    effect = "Allow"
+    actions = [
+      "s3:DeleteObject",
+      "s3:GetObject",
+      "s3:ListBucket",
+      "s3:PutObject"
+    ]
+    resources = [
+      "arn:aws:s3:::${local.bucket_name}/${local.genesys_prefix.role6}/*",
+      "arn:aws:s3:::${local.bucket_name}"
+    ]
+  }
+
+
+}
+
+resource "aws_iam_policy" "snowflake_policy" {
+  name        = "r2s-snowflake-metadata-only"
+  description = "Allow Snowflake to access metadata objects only in s3://${local.bucket_name}/${local.snowflake_prefix}"
+  policy      = data.aws_iam_policy_document.snowflake_policy_doc.json
+  tags        = local.tags
+}
+
+resource "aws_iam_role" "snowflake_role" {
+  for_each           = local.snowflake_ready ? { main = true } : {}
+  name               = "r2s-snowflake-role"
+  assume_role_policy = one(data.aws_iam_policy_document.snowflake_trust[*].json)
+  description        = "Role for Snowflake to process metadata in ${local.bucket_name} (no access to recordings)."
+  tags               = local.tags
+}
+
+resource "aws_iam_role_policy_attachment" "snowflake_attach" {
+  for_each   = local.snowflake_ready ? { main = true } : {}
+  role       = aws_iam_role.snowflake_role["main"].name
+  policy_arn = aws_iam_policy.snowflake_policy.arn
+}

@@ -1,0 +1,116 @@
+---
+image:
+  repository: ${imageRepository}
+  tag: ${imageTag}
+
+serviceAccount:
+  name: ${serviceAccountName}
+
+db:
+  deployStandalone: false
+  useExisting: true
+  url: postgresql://$(DATABASE_USERNAME):$(DATABASE_PASSWORD)@$(DATABASE_HOST)/$(DATABASE_NAME)
+  database: ${databaseName}
+  secret:
+    name: ${databaseSecret}
+    usernameKey: ${databaseUserNameKey}
+    passwordKey: ${databasePasswordKey}
+    endpointKey: ${databaseEndpointKey}
+  
+masterkeySecretName: ${masterkeySecretName}
+masterkeySecretKey: ${masterkeySecretKey}
+
+environmentSecrets:
+%{ for secret in environmentSecrets ~}
+  - ${secret}
+%{ endfor ~}
+
+proxyConfigMap:
+  create: true
+proxy_config:
+  general_settings:
+    litellm_license: os.environ/LITELLM_LICENSE
+    master_key: os.environ/PROXY_MASTER_KEY
+    proxy_admin_email: "Jacob.Woffenden@justice.gov.uk"
+    ui_access_mode: "admin_only"
+  litellm_settings:
+    cache: false # disabling caching as per conversation with i.AI https://mojdt.slack.com/archives/C09M9BQS8LR/p1762181030355169
+    cache_params:
+      type: redis
+      host: os.environ/primary_endpoint_address
+      port: 6379
+      password: os.environ/auth_token
+    callbacks: ["prometheus"]
+    success_callback: ["prometheus"]
+    failure_callback: ["prometheus"]
+    prometheus_initialize_budget_metrics: true
+    service_callback: ["prometheus_system"]
+    default_internal_user_params:
+      user_role: internal_user_viewer
+      max_budget: 20
+      budget_duration: 30d
+      models: []
+    default_team_params:
+      max_budget: 100
+      budget_duration: 30d
+      models: []
+  router_settings:
+    routing_strategy: simple-shuffle
+    redis_host: os.environ/primary_endpoint_address
+    redis_port: 6379
+    redis_password: os.environ/auth_token
+      
+  model_list:
+%{ for key, profile in azureModels ~}
+    - model_name: azure-${key}
+      litellm_params:
+        model: azure/${profile.model_id}
+        api_base: os.environ/JUSTICEAI_AZURE_OPENAI_API_BASE
+        api_key: os.environ/JUSTICEAI_AZURE_OPENAI_API_KEY
+        api_version: ${profile.api_version}
+%{ endfor ~}
+%{ for key, profile in bedrockModels ~}
+    - model_name: bedrock-${key}
+      litellm_params:
+        model: bedrock/${profile.model_id}
+        aws_role_name: ${iamRole}
+        aws_region_name: ${profile.region}
+%{ endfor ~}
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: false
+  runAsNonRoot: true
+  runAsUser: 65534
+  seccompProfile:
+    type: RuntimeDefault
+
+ingress:
+  enabled: false
+  className: default
+  annotations:
+    external-dns.alpha.kubernetes.io/set-identifier: "${ingressIdentifier}-${namespace}-${ingressColour}"
+    external-dns.alpha.kubernetes.io/aws-weight: "100"
+    external-dns.alpha.kubernetes.io/hostname: "${ingressHostname}"
+    nginx.ingress.kubernetes.io/whitelist-source-range: ${join(",", ingressAllowList)}
+  hosts:
+    - host: ${ingressHostname}
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls:
+   - secretName: ${ingressTlsSecretName}
+     hosts:
+       - ${ingressHostname}
+
+envVars: {
+    LITELLM_MODE: "PRODUCTION",
+    PROXY_BASE_URL: "https://${ingressHostname}",
+    REDIS_SSL: "True",
+    DOCS_TITLE: "Data Platform LLM Gateway",
+    DOCS_DESCRIPTION: "This is experimental, uptime is not guaranteed.",
+    DOCS_FILTERED: "True"
+}

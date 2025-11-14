@@ -50,7 +50,7 @@ resource "aws_iam_policy" "ccr_provider_load_policy" {
         Action = [
           "s3:GetObject"
         ],
-        Resource = "${aws_s3_bucket.lambda_layer_dependencies.arn}/*"
+        Resource = "arn:aws:s3:::${local.application_name_short}-${local.environment}-lambda-files/*"
       },
       {
         Effect = "Allow"
@@ -72,6 +72,16 @@ resource "aws_iam_policy" "ccr_provider_load_policy" {
         Resource = aws_sqs_queue.ccr_provider_q.arn
       },
       {
+        Effect = "Allow"
+        Action = [
+          "sqs:SendMessage",
+          "sqs:ReceiveMessage",
+          "sqs:DeleteMessage",
+          "sqs:GetQueueAttributes"
+        ]
+        Resource = aws_sqs_queue.ccr_provider_dlq.arn
+      },
+      {
         Effect = "Allow",
         Action = [
           "ssm:GetParameter",
@@ -81,8 +91,8 @@ resource "aws_iam_policy" "ccr_provider_load_policy" {
         Resource = aws_ssm_parameter.ccr_provider_load_timestamp.arn
       },
       {
-        Effect   = "Allow"
-        Action   = [
+        Effect = "Allow"
+        Action = [
           "sns:Publish"
         ]
         Resource = aws_sns_topic.hub2_alerts.arn

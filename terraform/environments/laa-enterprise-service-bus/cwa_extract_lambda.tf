@@ -17,10 +17,10 @@ resource "aws_security_group" "cwa_extract_new" {
 
 resource "aws_security_group_rule" "cwa_extract_egress_oracle_new" {
   type              = "egress"
-  from_port         = 1571
-  to_port           = 1571
+  from_port         = local.environment == "production" ? 2484 : 1571
+  to_port           = local.environment == "production" ? 2484 : 1571
   protocol          = "tcp"
-  cidr_blocks       = [local.application_data.accounts[local.environment].cwa_database_ip]
+  cidr_blocks       = local.application_data.accounts[local.environment].cwa_database_ip
   security_group_id = aws_security_group.cwa_extract_new.id
   description       = "Outbound 1571 Access to CWA DB"
 }
@@ -54,15 +54,15 @@ resource "aws_lambda_function" "cwa_extract_lambda" {
   function_name    = "cwa_extract_lambda"
   role             = aws_iam_role.cwa_extract_lambda_role.arn
   handler          = "lambda_function.lambda_handler"
-  filename         = "lambda/cwa_extract_lambda/cwa_extract_package.zip"
-  source_code_hash = filebase64sha256("lambda/cwa_extract_lambda/cwa_extract_package.zip")
-  timeout          = 300
+  s3_bucket        = data.aws_s3_object.cwa_extract_zip.bucket
+  s3_key           = data.aws_s3_object.cwa_extract_zip.key
+  s3_object_version = data.aws_s3_object.cwa_extract_zip.version_id
+  timeout          = 900
   memory_size      = 128
   runtime          = "python3.10"
 
   layers = [
-    aws_lambda_layer_version.lambda_layer_oracle_python.arn,
-    "arn:aws:lambda:eu-west-2:017000801446:layer:AWSLambdaPowertoolsPython:2"
+    aws_lambda_layer_version.lambda_layer_oracle_python.arn
   ]
 
   vpc_config {
@@ -74,12 +74,15 @@ resource "aws_lambda_function" "cwa_extract_lambda" {
     variables = {
       PROCEDURES_CONFIG = aws_secretsmanager_secret.cwa_procedures_config.name
       DB_SECRET_NAME    = aws_secretsmanager_secret.cwa_db_secret.name
-      LD_LIBRARY_PATH   = "/opt/instantclient_12_2_linux"
-      ORACLE_HOME       = "/opt/instantclient_12_2_linux"
+      LD_LIBRARY_PATH   = "/opt/instantclient_12_1"
+      ORACLE_HOME       = "/opt/instantclient_12_1"
       SERVICE_NAME      = "cwa-extract-service"
       NAMESPACE         = "HUB20-CWA-NS"
       ENVIRONMENT       = local.environment
       LOG_LEVEL         = "DEBUG"
+      TNS_ADMIN         = "/tmp/wallet_dir"
+      WALLET_BUCKET     = data.aws_s3_bucket.lambda_files.bucket
+      WALLET_OBJ        = "wallet_files/CWA/wallet_dir.zip"
     }
   }
 
@@ -95,15 +98,15 @@ resource "aws_lambda_function" "cwa_file_transfer_lambda" {
   function_name    = "cwa_file_transfer_lambda"
   role             = aws_iam_role.cwa_extract_lambda_role.arn
   handler          = "lambda_function.lambda_handler"
-  filename         = "lambda/cwa_file_transfer_lambda/cwa_file_transfer_package.zip"
-  source_code_hash = filebase64sha256("lambda/cwa_file_transfer_lambda/cwa_file_transfer_package.zip")
-  timeout          = 300
+  s3_bucket        = data.aws_s3_object.cwa_file_transfer_zip.bucket
+  s3_key           = data.aws_s3_object.cwa_file_transfer_zip.key
+  s3_object_version = data.aws_s3_object.cwa_file_transfer_zip.version_id
+  timeout          = 900
   memory_size      = 128
   runtime          = "python3.10"
 
   layers = [
-    aws_lambda_layer_version.lambda_layer_oracle_python.arn,
-    "arn:aws:lambda:eu-west-2:017000801446:layer:AWSLambdaPowertoolsPython:2"
+    aws_lambda_layer_version.lambda_layer_oracle_python.arn
   ]
 
   vpc_config {
@@ -116,12 +119,15 @@ resource "aws_lambda_function" "cwa_file_transfer_lambda" {
       TABLE_NAME_SECRET = aws_secretsmanager_secret.cwa_table_name_secret.name
       TARGET_BUCKET     = aws_s3_bucket.data.bucket
       DB_SECRET_NAME    = aws_secretsmanager_secret.cwa_db_secret.name
-      LD_LIBRARY_PATH   = "/opt/instantclient_12_2_linux"
-      ORACLE_HOME       = "/opt/instantclient_12_2_linux"
+      LD_LIBRARY_PATH   = "/opt/instantclient_12_1"
+      ORACLE_HOME       = "/opt/instantclient_12_1"
       SERVICE_NAME      = "cwa-file-transfer-service"
       NAMESPACE         = "HUB20-CWA-NS"
       ENVIRONMENT       = local.environment
       LOG_LEVEL         = "DEBUG"
+      TNS_ADMIN         = "/tmp/wallet_dir"
+      WALLET_BUCKET     = data.aws_s3_bucket.lambda_files.bucket
+      WALLET_OBJ        = "wallet_files/CWA/wallet_dir.zip"
     }
   }
 
@@ -137,8 +143,9 @@ resource "aws_lambda_function" "cwa_sns_lambda" {
   function_name    = "cwa_sns_lambda"
   role             = aws_iam_role.cwa_extract_lambda_role.arn
   handler          = "lambda_function.lambda_handler"
-  filename         = "lambda/cwa_sns_lambda/cwa_sns_lambda.zip"
-  source_code_hash = filebase64sha256("lambda/cwa_sns_lambda/cwa_sns_lambda.zip")
+  s3_bucket        = data.aws_s3_object.cwa_sns_zip.bucket
+  s3_key           = data.aws_s3_object.cwa_sns_zip.key
+  s3_object_version = data.aws_s3_object.cwa_sns_zip.version_id
   timeout          = 300
   memory_size      = 128
   runtime          = "python3.10"

@@ -1017,6 +1017,7 @@ locals {
     "send_logs_to_cloudwatch" = aws_iam_policy.iam_policy_lambda_send_logs_cloudwatch_prod[0].arn
     "get_cloudwatch_metrics"  = aws_iam_policy.iam_policy_lambda_get_cloudwatch_metrics_prod[0].arn
     "get_data_s3"             = aws_iam_policy.iam_policy_lambda_get_s3_data_prod[0].arn
+    "get_elb_metrics"         = aws_iam_policy.iam_policy_lambda_get_s3_elb_metrics_prod[0].arn
     "get_klayers"             = aws_iam_policy.iam_policy_lambda_get_ssm_parameter_klayers_prod[0].arn
     "ec2_permissions"         = aws_iam_policy.iam_policy_lambda_ec2_permissions_prod[0].arn
   } : {}
@@ -1810,7 +1811,6 @@ resource "aws_iam_role_policy_attachment" "attach_iam_role_to_iam_policy_s3_buck
   policy_arn = aws_iam_policy.iam_policy_s3_bucket_moj_report_source_dev[0].arn
 }
 
-# new
 #########################################################
 # IAM Role & Policy for S3 Bucket Replication to DE - UAT
 #########################################################

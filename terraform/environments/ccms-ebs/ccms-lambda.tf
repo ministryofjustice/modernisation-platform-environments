@@ -1,21 +1,13 @@
-# Upload the Layer to S3
-
-resource "aws_s3_object" "lambda_layer_s3" {
-  bucket = aws_s3_bucket.lambda_payment_load.bucket
-  key    = "lambda/layerV2.zip"
-  source = "lambda/layerV2.zip"
-}
+#Layer is manually uploaded to S3 bucket "ccms-ebs-shared" at path "lambda_delivery/payment_lambda_layer/layerV2.zip"
 
 # Lambda Layer
 resource "aws_lambda_layer_version" "lambda_layer" {
   layer_name               = "${local.application_name}-${local.environment}-payment-load-layer"
-  s3_bucket                = aws_s3_bucket.lambda_payment_load.bucket
-  s3_key                   = aws_s3_object.lambda_layer_s3.key
+  s3_key                   = "lambda_delivery/payment_lambda_layer/layerV2.zip"
+  s3_bucket                =  aws_s3_bucket.ccms_ebs_shared.bucket
   compatible_runtimes      = ["python3.10"]
   compatible_architectures = ["x86_64"]
   description              = "Lambda Layer for ${local.application_name} Payment Load"
-
-  depends_on = [aws_s3_object.lambda_layer_s3]
 }
 
 # SG for Lambda
@@ -23,7 +15,7 @@ resource "aws_security_group" "lambda_security_group" {
   name        = "${local.application_name}-${local.environment}-lambda-sg"
   description = "SG traffic control for Payment Load Lambda"
   vpc_id      = data.aws_vpc.shared.id
-  
+
   tags = merge(local.tags,
     { Name = "${local.application_name}-${local.environment}-lambda-sg" }
   )
@@ -32,19 +24,19 @@ resource "aws_security_group" "lambda_security_group" {
 # hashicorp recommened Ingress rule of lambda_security_group
 resource "aws_vpc_security_group_ingress_rule" "lambda_ingress" {
   security_group_id = aws_security_group.lambda_security_group.id
-  description = "Allow FTP lambda inbound traffic"
-  cidr_ipv4   = data.aws_vpc.shared.cidr_block
-  from_port   = 1521
-  ip_protocol = "tcp"
-  to_port     = 1522
+  description       = "Allow FTP lambda inbound traffic"
+  cidr_ipv4         = data.aws_vpc.shared.cidr_block
+  from_port         = 1521
+  ip_protocol       = "tcp"
+  to_port           = 1522
 }
 
 # hashicorp recommened egress rule of lambda_security_group
 resource "aws_vpc_security_group_egress_rule" "lambda_egress" {
   security_group_id = aws_security_group.lambda_security_group.id
-  description = "Allow FTP lambdaall outbound traffic"
-  cidr_ipv4   = "0.0.0.0/0"
-  ip_protocol = "-1"
+  description       = "Allow FTP lambdaall outbound traffic"
+  cidr_ipv4         = "0.0.0.0/0"
+  ip_protocol       = "-1"
 }
 
 # Lambda Function

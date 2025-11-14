@@ -1,36 +1,3 @@
-# Updated module
-module "capita" {
-  source = "./modules/landing_zone/"
-  count  = local.is-production ? 1 : 0
-
-  supplier = "capita"
-
-  user_accounts = [
-    # Accounts for each system to be migrated.
-    # local.sftp_account_capita_specials_mailbox,
-    local.sftp_account_capita_alcohol_monitoring,
-    local.sftp_account_capita_blob_storage,
-    local.sftp_account_capita_forms_and_subject_id,
-
-    # Test account for supplier.
-    # local.sftp_account_capita_test,
-
-    # Developer access.
-    local.sftp_account_dev,
-  ]
-
-  data_store_bucket = module.s3-data-bucket.bucket
-
-  account_id = data.aws_caller_identity.current.account_id
-
-  vpc_id     = data.aws_vpc.shared.id
-  subnet_ids = [data.aws_subnet.public_subnets_b.id]
-  providers = {
-    aws = aws
-  }
-  local_tags = local.tags
-}
-
 module "buddi" {
   source = "./modules/landing_zone/"
   count  = local.is-production ? 1 : 0
@@ -60,60 +27,34 @@ module "buddi" {
   local_tags = local.tags
 }
 
-# module "scram" {
-#   source = "./modules/landing_zone/"
-#   count  = local.is-production ? 1 : 0
+module "civica" {
+  source = "./modules/landing_zone/"
+  count  = local.is-production ? 1 : 0
 
-#   supplier = "scram"
+  supplier = "civica"
 
-#   user_accounts = [
-#     # Developer access.
-#     # local.sftp_account_dev,
+  user_accounts = [
+    # Developer access.
+    local.sftp_account_dev,
 
-#     # Test account for supplier.
-#     # local.sftp_account_scram_am,
-#   ]
+    # Test account for supplier.
+    # local.sftp_account_civica_test,
 
-#   data_store_bucket = module.s3-data-bucket.bucket
+    # Accounts for each system to be migrated.
+    local.sftp_account_civica_orca,
+  ]
 
-#   account_id = data.aws_caller_identity.current.account_id
+  data_store_bucket = module.s3-data-bucket.bucket
 
-#   vpc_id     = data.aws_vpc.shared.id
-#   subnet_ids = [data.aws_subnet.public_subnets_b.id]
-#   providers = {
-#     aws = aws
-#   }
-#   local_tags = local.tags
-# }
+  account_id = data.aws_caller_identity.current.account_id
 
-#module "civica" {
-#  source = "./modules/landing_zone/"
-#  count = local.is-production ? 1 : 0
-#
-#  supplier = "civica"
-#
-#  user_accounts = [
-#    # Developer access.
-#    # local.sftp_account_dev,
-#
-#    # Test account for supplier.
-#    # local.sftp_account_civica_test,
-#
-#    # Accounts for each system to be migrated.
-#    # local.sftp_account_civica_orca,
-#  ]
-#
-#  data_store_bucket = module.s3-data-bucket.bucket
-#
-#  account_id = data.aws_caller_identity.current.account_id
-#
-#  vpc_id     = data.aws_vpc.shared.id
-#  subnet_ids = [data.aws_subnet.public_subnets_b.id]
-#  providers = {
-#    aws = aws
-#  }
-#  local_tags = local.tags
-#}
+  vpc_id     = data.aws_vpc.shared.id
+  subnet_ids = [data.aws_subnet.public_subnets_b.id]
+  providers = {
+    aws = aws
+  }
+  local_tags = local.tags
+}
 
 module "g4s" {
   source = "./modules/landing_zone/"
@@ -126,24 +67,24 @@ module "g4s" {
     # local.sftp_account_dev,
 
     # Test account for supplier.
-    local.sftp_account_g4s_test,
+    # local.sftp_account_g4s_test,
 
     # Accounts for each system to be migrated.
-    local.sftp_account_g4s_atrium,
+    # local.sftp_account_g4s_atrium,
     local.sftp_account_g4s_atrium_unstructured,
     # local.sftp_account_g4s_cap_dw,
     # local.sftp_account_g4s_integrity,
-    # local.sftp_account_g4s_telephony,
-    # local.sftp_account_g4s_fep,
-    # local.sftp_account_g4s_tasking,
-    # local.sftp_account_g4s_subject_history,
-    # local.sftp_account_g4s_atv,
-    local.sftp_account_g4s_emsys_mvp,
-    # local.sftp_account_g4s_emsys_tpims,
-    local.sftp_account_g4s_x_drive,
-    # local.sftp_account_g4s_lcm_archive,
-    # local.sftp_account_g4s_lcm,
-    local.sftp_account_g4s_gps,
+    local.sftp_account_g4s_telephony,
+    local.sftp_account_g4s_fep,
+    local.sftp_account_g4s_tasking,
+    local.sftp_account_g4s_subject_history,
+    local.sftp_account_g4s_atv,
+    # local.sftp_account_g4s_emsys_mvp,
+    local.sftp_account_g4s_emsys_tpims,
+    # local.sftp_account_g4s_x_drive,
+    local.sftp_account_g4s_lcm_archive,
+    local.sftp_account_g4s_lcm,
+    # local.sftp_account_g4s_gps,
     # local.sftp_account_g4s_centurion,
   ]
 

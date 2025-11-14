@@ -52,10 +52,10 @@ module "dpr_rds_parameter_group" {
   tags = merge(
     local.all_tags,
     {
-      Resource_Group = "RDS"
-      Jira           = "DPR2-2072"
-      Resource_Type  = "RDS Parameter Group"
-      Name           = local.dpr_rds_parameter_group_name
+      dpr-resource-group = "RDS"
+      dpr-jira           = "DPR2-2072"
+      dpr-resource-type  = "RDS Parameter Group"
+      dpr-name           = local.dpr_rds_parameter_group_name
     }
   )
 }
@@ -92,10 +92,10 @@ module "dpr_rds_db" {
   tags = merge(
     local.all_tags,
     {
-      Resource_Group = "RDS"
-      Jira           = "DPR2-2072"
-      Resource_Type  = "RDS Instance"
-      Name           = local.dpr_rds_name
+      dpr-resource-group = "RDS"
+      dpr-jira           = "DPR2-2072"
+      dpr-resource-type  = "RDS Instance"
+      dpr-name           = local.dpr_rds_name
     }
   )
 

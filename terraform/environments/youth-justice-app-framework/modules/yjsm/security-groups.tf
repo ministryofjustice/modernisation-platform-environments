@@ -124,7 +124,7 @@ resource "aws_security_group_rule" "yjsm_to_ecsint_rule" {
   description              = "YJSM to ECSint communication"
 }
 
-#TEMP RULE FOR FIXING AMI KEEP UNTIL DONE IN PROD
+# Access from Tableau to YJSM 
 resource "aws_security_group_rule" "tableau_to_yjsm_ssh" {
   type                     = "ingress"
   from_port                = 22
@@ -132,7 +132,18 @@ resource "aws_security_group_rule" "tableau_to_yjsm_ssh" {
   protocol                 = "tcp"
   security_group_id        = aws_security_group.yjsm_service.id
   source_security_group_id = var.tableau_sg_id
-  description              = "tableau to yjsm ssh temp"
+  description              = "tableau to yjsm ssh"
+}
+
+# SSH from Management server to YJSM
+resource "aws_security_group_rule" "mgmt_ssh_to_yjsm" {
+  type                     = "ingress"
+  from_port                = 22
+  to_port                  = 22
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.yjsm_service.id
+  source_security_group_id = var.management_server_sg_id
+  description              = "mgmt ssh to yjsm"
 }
 
 # ECS to ASSETS SUBNETS

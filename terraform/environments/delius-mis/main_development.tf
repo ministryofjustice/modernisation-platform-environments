@@ -46,5 +46,7 @@ module "environment_dev" {
 
   pagerduty_integration_key = local.pagerduty_integration_key
 
+  create_backup_role = true
+
   tags = local.tags
 }

@@ -112,6 +112,7 @@ module "athena_federated_query_connector_oracle" {
   #checkov:skip=CKV_AWS_60:Ensure IAM role allows only specific services or principals to assume it
   #checkov:skip=CKV_AWS_274:Disallow IAM roles, users, and groups from using the AWS AdministratorAccess policy  
 
+  name                                  = "${local.project}-athena-federated-query-oracle"
   connector_jar_bucket_key              = "third-party/athena-connectors/athena-oracle-2022.47.1.jar"
   connector_jar_bucket_name             = module.s3_artifacts_store.bucket_id
   spill_bucket_name                     = module.s3_working_bucket.bucket_id
@@ -159,7 +160,7 @@ resource "aws_athena_data_catalog" "bodmis_catalog" {
 
 # Adds an Athena data source / catalog for OASys
 resource "aws_athena_data_catalog" "oasys_catalog" {
-  count = local.is_dev_or_test ? 1 : 0
+  count = local.is-test ? 1 : 0
 
   name        = "oasys"
   description = "OASys Athena data catalog"
@@ -172,7 +173,7 @@ resource "aws_athena_data_catalog" "oasys_catalog" {
 
 # Adds an Athena data source / catalog for ONR
 resource "aws_athena_data_catalog" "onr_catalog" {
-  count = local.is_dev_or_test ? 1 : 0
+  count = local.is-test ? 1 : 0
 
   name        = "onr"
   description = "ONR Athena data catalog"
@@ -185,7 +186,7 @@ resource "aws_athena_data_catalog" "onr_catalog" {
 
 # Adds an Athena data source / catalog for nDelius
 resource "aws_athena_data_catalog" "ndelius_catalog" {
-  count = local.is_dev_or_test ? 1 : 0
+  count = local.is-test ? 1 : 0
 
   name        = "ndelius"
   description = "nDelius Athena data catalog"

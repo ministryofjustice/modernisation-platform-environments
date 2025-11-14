@@ -78,6 +78,7 @@ resource "aws_ebs_volume" "export_home" {
   lifecycle {
     ignore_changes = [kms_key_id]
   }
+  snapshot_id       = length(local.application_data.accounts[local.environment].export_home_snapshot_id) > 0 ? local.application_data.accounts[local.environment].export_home_snapshot_id : null
   availability_zone = "eu-west-2a"
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_exhome
   type              = "io2"
@@ -100,6 +101,7 @@ resource "aws_ebs_volume" "u01" {
   lifecycle {
     ignore_changes = [kms_key_id]
   }
+  snapshot_id       = length(local.application_data.accounts[local.environment].u01_snapshot_id) > 0 ? local.application_data.accounts[local.environment].u01_snapshot_id : null
   availability_zone = "eu-west-2a"
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_u01
   type              = "io2"

@@ -44,16 +44,16 @@ resource "aws_lambda_function" "ccr_provider_load" {
   description      = "Connects to CCR DB and invokes the Load procedure to load the provider data."
   function_name    = "ccr_provider_load_function"
   role             = aws_iam_role.ccr_provider_load_role.arn
-  handler          = "lambda_function.lambda_handler"
-  filename         = "lambda/provider_load_lambda/provider_load_package.zip"
-  source_code_hash = filebase64sha256("lambda/provider_load_lambda/provider_load_package.zip")
+  handler           = "lambda_function.lambda_handler"
+  s3_bucket         = data.aws_s3_object.provider_load_zip.bucket
+  s3_key            = data.aws_s3_object.provider_load_zip.key
+  s3_object_version = data.aws_s3_object.provider_load_zip.version_id
   timeout          = 100
   memory_size      = 128
   runtime          = "python3.10"
 
   layers = [
-    aws_lambda_layer_version.lambda_layer_oracle_python.arn,
-    "arn:aws:lambda:eu-west-2:017000801446:layer:AWSLambdaPowertoolsPython:2"
+    aws_lambda_layer_version.lambda_layer_oracle_python.arn
   ]
 
   vpc_config {
@@ -66,8 +66,8 @@ resource "aws_lambda_function" "ccr_provider_load" {
     variables = {
       DB_SECRET_NAME         = aws_secretsmanager_secret.ccr_db_mp_credentials.name
       PROCEDURE_SECRET_NAME  = aws_secretsmanager_secret.ccr_procedures_config.name
-      LD_LIBRARY_PATH        = "/opt/instantclient_12_2_linux"
-      ORACLE_HOME            = "/opt/instantclient_12_2_linux"
+      LD_LIBRARY_PATH        = "/opt/instantclient_12_1"
+      ORACLE_HOME            = "/opt/instantclient_12_1"
       SERVICE_NAME           = "ccr-load-service"
       NAMESPACE              = "HUB20-CCR-NS"
       ENVIRONMENT            = local.environment
@@ -81,10 +81,4 @@ resource "aws_lambda_function" "ccr_provider_load" {
     local.tags,
     { Name = "${local.application_name_short}-${local.environment}-ccr-provider-load" }
   )
-}
-
-resource "aws_lambda_event_source_mapping" "ccr_provider_q_trigger" {
-  event_source_arn = aws_sqs_queue.ccr_provider_q.arn
-  function_name    = aws_lambda_function.ccr_provider_load.arn
-  batch_size       = 1
 }

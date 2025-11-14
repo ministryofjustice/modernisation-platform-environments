@@ -155,6 +155,22 @@ resource "aws_security_group" "internal_sg" {
   }
 
   ingress {
+    from_port   = 9114
+    to_port     = 9114
+    protocol    = "tcp"
+    cidr_blocks = ["10.27.144.0/24"]
+    description = "Pre-Prod YJSM to CUG Junipers port 9114"
+  }
+
+  ingress {
+    from_port   = 9114
+    to_port     = 9114
+    protocol    = "tcp"
+    cidr_blocks = ["10.27.152.0/24"]
+    description = "Prod YJSM to CUG Junipers port 9114"
+  }
+
+  ingress {
     from_port   = 8080
     to_port     = 8090
     protocol    = "tcp"
@@ -370,28 +386,6 @@ resource "aws_instance" "juniper_kms" {
   })
 }
 
-#  EC2 Instance (Juniper Syslog Server)
-resource "aws_instance" "juniper_syslog" {
-  ami                    = data.aws_ami.amazon_linux_2.id # Use data source instead of hardcoded AMI
-  instance_type          = "t3.medium"
-  key_name               = "Juniper_KeyPair" # Replace with your SSH key name
-  iam_instance_profile   = aws_iam_instance_profile.yjb_juniper_instance_profile.name
-  subnet_id              = aws_subnet.vsrx_subnets["Juniper Management & KMS"].id
-  private_ip             = "10.100.50.50"
-  vpc_security_group_ids = [aws_security_group.internal_sg.id]
-
-  user_data = file("${path.module}/scripts/cloudwatch-syslog-userdata.sh")
-
-  lifecycle {
-    ignore_changes = [ami]
-  }
-
-  tags = merge(local.tags, {
-    Name          = "Juniper Syslog Server"
-    "Patch Group" = "Linux2"
-  })
-}
-
 # EC2 Instance (Juniper Management Server)
 resource "aws_instance" "juniper_management" {
   ami                  = data.aws_ami.windows_server.id # Use data source instead of hardcoded AMI
@@ -414,6 +408,21 @@ resource "aws_instance" "juniper_management" {
     Name          = "Juniper Management Server"
     "Patch Group" = "Windows"
   })
+}
+
+resource "aws_ebs_volume" "data_volume" {
+  availability_zone = aws_instance.juniper_management.availability_zone
+  size              = 80
+  type              = "gp3"
+  encrypted         = true
+  tags              = local.tags
+}
+
+resource "aws_volume_attachment" "data_attach" {
+  device_name  = "/dev/sdf"
+  volume_id    = aws_ebs_volume.data_volume.id
+  instance_id  = aws_instance.juniper_management.id
+  force_detach = true
 }
 
 # Add data sources for AMIs

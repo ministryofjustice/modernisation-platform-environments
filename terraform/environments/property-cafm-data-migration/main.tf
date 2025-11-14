@@ -1,13 +1,14 @@
 module "csv_export" {
-  source = "github.com/ministryofjustice/terraform-csv-to-parquet-athena?ref=9e21355a103cce0fbe3089c3e71a5b8d47927374"
+  source = "github.com/ministryofjustice/terraform-csv-to-parquet-athena?ref=0e258f4b5554e7d67069ca5d88138948a4357e66"
   providers = {
     aws.bucket-replication = aws
   }
+
   region_replication = "eu-west-2"
-  kms_key_arn = aws_kms_key.shared_kms_key.arn
-  name = "concept"
-  load_mode = "overwrite"
-  environment = local.environment_shorthand
+  kms_key_arn        = aws_kms_key.shared_kms_key.arn
+  name               = "concept"
+  load_mode          = "overwrite"
+  environment        = local.environment_shorthand
   tags = {
     business-unit = "Property"
     application   = "cafm"
@@ -17,15 +18,21 @@ module "csv_export" {
 }
 
 module "rds_export" {
-  source = "github.com/ministryofjustice/terraform-rds-export?ref=c3c0a7fb772268e54f1958cc881c566c28e63e50"
+  source = "github.com/ministryofjustice/terraform-rds-export?ref=e48992e9a69c95bd3ccf2b8affbbd8d7b53ddeb4"
+  providers = {
+    aws                    = aws
+  }
 
-  kms_key_arn           = aws_kms_key.shared_kms_key.arn
-  name                  = "planetfm"
-  database_refresh_mode = "full"
-
-  vpc_id                = module.vpc.vpc_id
-  database_subnet_ids   = module.vpc.private_subnets
-  master_user_secret_id = aws_secretsmanager_secret.db_master_user_secret.arn
+  kms_key_arn              = aws_kms_key.shared_kms_key.arn
+  name                     = "planetfm"
+  db_name                  = "planetfm_${local.environment_shorthand}"
+  database_refresh_mode    = "full"
+  output_parquet_file_size = 200
+  max_concurrency          = 5
+  environment              = local.environment_shorthand
+  vpc_id                   = module.vpc.vpc_id
+  database_subnet_ids      = module.vpc.private_subnets
+  master_user_secret_id    = aws_secretsmanager_secret.db_master_user_secret.arn
 
   tags = {
     business-unit = "Property"

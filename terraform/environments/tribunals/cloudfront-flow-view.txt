@@ -1,0 +1,48 @@
+┌─────────────────────────────┐
+│  Local Lambda ZIP / Code    │
+│  (data.archive_file.lambda) │
+└──────────────┬──────────────┘
+               │  1. ZIP / code changes
+               ▼
+┌─────────────────────────────┐
+│ aws_lambda_function          │
+│ - source_code_hash detected  │
+│ - publish = false            │
+│ - lifecycle create_before_destroy
+└──────────────┬──────────────┘
+               │  2. Terraform updates Lambda function
+               ▼
+┌─────────────────────────────┐
+│ aws_lambda_function_version │
+│ - Monitors Lambda ARN        │
+│ - Creates new immutable      │
+│   version if Lambda changed  │
+│ - Lifecycle ensures old      │
+│   version is retained        │
+└──────────────┬──────────────┘
+               │  3. New Lambda version ARN available
+               ▼
+┌─────────────────────────────┐
+│ aws_lambda_permission        │
+│ - Optional source_arn set    │
+│   via matching CloudFront    │
+│ - Grants CloudFront or       │
+│   replicator permission      │
+└──────────────┬──────────────┘
+               │  4. Permission ready
+               ▼
+┌─────────────────────────────┐
+│ aws_cloudfront_distribution │
+│ - DefaultCacheBehavior       │
+│   references Lambda version  │
+│   ARN from aws_lambda_function_version
+│ - Lifecycle / depends_on ensures
+│   permission exists before association
+└──────────────┬──────────────┘
+               │  5. CloudFront now invokes Lambda
+               ▼
+┌─────────────────────────────┐
+│ Lambda@Edge executes on      │
+│ viewer-request events        │
+│ CloudFront caches and logs   │
+└─────────────────────────────┘

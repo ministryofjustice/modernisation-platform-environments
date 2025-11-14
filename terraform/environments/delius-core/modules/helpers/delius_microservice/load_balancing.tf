@@ -179,7 +179,7 @@ resource "aws_route53_record" "services_nlb_r53_record" {
 resource "aws_vpc_security_group_ingress_rule" "nlb_custom_rules" {
   for_each                     = { for index, rule in var.nlb_ingress_security_group_ids : index => rule }
   security_group_id            = aws_security_group.delius_microservices_service_nlb.id
-  description                  = "custom rule"
+  description                  = lookup(each.value, "description", "custom rule")
   from_port                    = each.value.port
   to_port                      = each.value.port
   ip_protocol                  = each.value.ip_protocol
@@ -190,7 +190,7 @@ resource "aws_vpc_security_group_ingress_rule" "nlb_custom_rules" {
 resource "aws_vpc_security_group_egress_rule" "nlb_custom_rules" {
   for_each                     = { for index, rule in var.nlb_egress_security_group_ids : index => rule }
   security_group_id            = aws_security_group.delius_microservices_service_nlb.id
-  description                  = "custom rule"
+  description                  = lookup(each.value, "description", "custom rule")
   from_port                    = each.value.port
   to_port                      = each.value.port
   ip_protocol                  = each.value.ip_protocol

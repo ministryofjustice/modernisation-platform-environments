@@ -34,7 +34,7 @@ locals {
     properties = {
       view    = "timeSeries"
       stacked = false
-      region  = data.aws_region.current.name
+      region  = data.aws_region.current.region
       title   = "EC2 CPU Utilization"
       period  = local.cloudwatch_period
       metrics = [
@@ -53,7 +53,7 @@ locals {
     properties = {
       view    = "timeSeries"
       stacked = false
-      region  = data.aws_region.current.name
+      region  = data.aws_region.current.region
       title   = "EC2 Memory Utilization"
       period  = local.cloudwatch_period
       metrics = [
@@ -72,7 +72,7 @@ locals {
     properties = {
       view    = "timeSeries"
       stacked = false
-      region  = data.aws_region.current.name
+      region  = data.aws_region.current.region
       title   = "EC2 Disk Utilization"
       period  = local.cloudwatch_period
       metrics = [
@@ -91,7 +91,7 @@ locals {
     properties = {
       view    = "timeSeries"
       stacked = false
-      region  = data.aws_region.current.name
+      region  = data.aws_region.current.region
       title   = "Error Log"
       period  = local.cloudwatch_period
       query   = "SOURCE '/iaps/ndinterface/daysummary.log' | fields @timestamp, @message\n| sort @timestamp desc\n| filter @message like /ERROR/\n| stats count() by bin(1m)"
@@ -107,7 +107,7 @@ locals {
     properties = {
       view    = "timeSeries"
       stacked = false
-      region  = data.aws_region.current.name
+      region  = data.aws_region.current.region
       title   = "RDS CPU Utilization"
       period  = local.cloudwatch_period
       metrics = [
@@ -127,7 +127,7 @@ locals {
     properties = {
       view    = "timeSeries"
       stacked = false
-      region  = data.aws_region.current.name
+      region  = data.aws_region.current.region
       title   = "RDS Connections"
       period  = local.cloudwatch_period
       metrics = [
@@ -145,7 +145,7 @@ locals {
     properties = {
       view    = "timeSeries"
       stacked = false
-      region  = data.aws_region.current.name
+      region  = data.aws_region.current.region
       title   = "RDS Memory Utilization"
       period  = local.cloudwatch_period
       metrics = [
@@ -163,7 +163,7 @@ locals {
     properties = {
       view    = "timeSeries"
       stacked = false
-      region  = data.aws_region.current.name
+      region  = data.aws_region.current.region
       title   = "RDS Storage Utilization"
       period  = local.cloudwatch_period
       metrics = [
@@ -181,7 +181,7 @@ locals {
     properties = {
       view    = "timeSeries"
       stacked = false
-      region  = data.aws_region.current.name
+      region  = data.aws_region.current.region
       title   = "RDS Read Utilization"
       period  = local.cloudwatch_period
       metrics = [
@@ -201,7 +201,7 @@ locals {
     properties = {
       view    = "timeSeries"
       stacked = false
-      region  = data.aws_region.current.name
+      region  = data.aws_region.current.region
       title   = "RDS Write Utilization"
       period  = local.cloudwatch_period
       metrics = [
@@ -221,7 +221,7 @@ locals {
     properties = {
       view    = "timeSeries"
       stacked = false
-      region  = data.aws_region.current.name
+      region  = data.aws_region.current.region
       title   = "RDS Network Utilization"
       period  = local.cloudwatch_period
       metrics = [
@@ -240,7 +240,7 @@ locals {
     properties = {
       view    = "timeSeries"
       stacked = false
-      region  = data.aws_region.current.name
+      region  = data.aws_region.current.region
       title   = "RDS CPU Credit Utilization"
       period  = local.cloudwatch_period
       metrics = [
@@ -259,7 +259,7 @@ locals {
     properties = {
       view    = "timeSeries"
       stacked = false
-      region  = data.aws_region.current.name
+      region  = data.aws_region.current.region
       title   = "System Event Log"
       period  = local.cloudwatch_period
       query   = "SOURCE '/iaps/system-events' | fields @timestamp, @message\n| sort @timestamp desc\n| stats count() by bin(1m)"
@@ -275,7 +275,7 @@ locals {
     properties = {
       view    = "timeSeries"
       stacked = false
-      region  = data.aws_region.current.name
+      region  = data.aws_region.current.region
       title   = "Total Log Events"
       period  = local.cloudwatch_period
       metrics = [

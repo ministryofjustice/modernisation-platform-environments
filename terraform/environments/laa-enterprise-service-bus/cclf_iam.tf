@@ -50,7 +50,7 @@ resource "aws_iam_policy" "cclf_provider_load_policy" {
         Action = [
           "s3:GetObject"
         ],
-        Resource = "${aws_s3_bucket.lambda_layer_dependencies.arn}/*"
+        Resource = "arn:aws:s3:::${local.application_name_short}-${local.environment}-lambda-files/*"
       },
       {
         Effect = "Allow"
@@ -70,6 +70,16 @@ resource "aws_iam_policy" "cclf_provider_load_policy" {
           "sqs:GetQueueAttributes"
         ],
         Resource = aws_sqs_queue.cclf_provider_q.arn
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "sqs:SendMessage",
+          "sqs:ReceiveMessage",
+          "sqs:DeleteMessage",
+          "sqs:GetQueueAttributes"
+        ]
+        Resource = aws_sqs_queue.cclf_provider_dlq.arn
       },
       {
         Effect = "Allow",

@@ -30,7 +30,7 @@ resource "aws_cloudwatch_metric_alarm" "edrms_UnHealthy_Hosts" {
   comparison_operator = "GreaterThanThreshold"
   metric_name         = "UnHealthyHostCount"
   statistic           = "Average"
-  namespace           = "AWS/NetworkELB"
+  namespace           = "AWS/ApplicationELB"
   period              = "60"
   evaluation_periods  = "5"
   threshold           = "0"
@@ -107,6 +107,25 @@ resource "aws_cloudwatch_metric_alarm" "TDS_RDS_Free_Storage_Space_Over_Threshol
     DBInstanceIdentifier = aws_db_instance.tds_db.id
   }
 
+  alarm_actions = [aws_sns_topic.cloudwatch_slack.arn]
+  ok_actions    = [aws_sns_topic.cloudwatch_slack.arn]
+
+  tags = local.tags
+}
+
+# EDMRS App Exception Alarm
+resource "aws_cloudwatch_metric_alarm" "edrms_app_exception_alarm" {
+  alarm_name          = "${local.application_data.accounts[local.environment].app_name}-edrms-exception-alarm"
+  alarm_description   = "${local.environment} |Alarm for edrms app exception."
+  comparison_operator = "GreaterThanThreshold"
+  metric_name         = aws_cloudwatch_log_metric_filter.edrms_exception_thread.id
+  statistic           = "Average"
+  namespace           = "CCMS-EDRMS-APP"
+  period              = "300"
+  evaluation_periods  = "1"
+  threshold           = "5"
+  datapoints_to_alarm = "1"
+  treat_missing_data  = "notBreaching"
   alarm_actions = [aws_sns_topic.cloudwatch_slack.arn]
   ok_actions    = [aws_sns_topic.cloudwatch_slack.arn]
 

@@ -1,3 +1,9 @@
+variable "lookup_cloudfront_distribution" {
+  type        = bool
+  description = "Set to true after the CloudFront distribution has been created and stored in SSM"
+  default     = false
+}
+
 variable "services" {
   type = map(object({
     name_prefix = string
@@ -187,55 +193,65 @@ variable "web_app_services" {
 
 variable "sftp_services" {
   type = map(object({
-    name_prefix = string
-    module_key  = string
-    sftp_port   = number
+    name_prefix    = string
+    module_key     = string
+    sftp_port      = number
+    upload_enabled = bool
   }))
   default = {
     "charity_tribunal_decisions" = {
-      name_prefix = "charitytribunal"
-      module_key  = "charity_tribunal_decisions"
-      sftp_port   = 10022
+      name_prefix    = "charitytribunal"
+      module_key     = "charity_tribunal_decisions"
+      sftp_port      = 10022
+      upload_enabled = true
     },
     "claims_management_decisions" = {
-      name_prefix = "claimsmanagement"
-      module_key  = "claims_management_decisions"
-      sftp_port   = 10023
+      name_prefix    = "claimsmanagement"
+      module_key     = "claims_management_decisions"
+      sftp_port      = 10023
+      upload_enabled = true
     },
     "consumer_credit_appeals" = {
-      name_prefix = "consumercreditappeals"
-      module_key  = "consumer_credit_appeals"
-      sftp_port   = 10024
+      name_prefix    = "consumercreditappeals"
+      module_key     = "consumer_credit_appeals"
+      sftp_port      = 10024
+      upload_enabled = true
     },
     "estate_agent_appeals" = {
-      name_prefix = "estateagentappeals"
-      module_key  = "estate_agent_appeals"
-      sftp_port   = 10025
+      name_prefix    = "estateagentappeals"
+      module_key     = "estate_agent_appeals"
+      sftp_port      = 10025
+      upload_enabled = true
     },
     "primary_health_lists" = {
-      name_prefix = "primaryhealthlists"
-      module_key  = "primary_health_lists"
-      sftp_port   = 10026
+      name_prefix    = "primaryhealthlists"
+      module_key     = "primary_health_lists"
+      sftp_port      = 10026
+      upload_enabled = false
     },
     "siac" = {
-      name_prefix = "siac"
-      module_key  = "siac"
-      sftp_port   = 10027
+      name_prefix    = "siac"
+      module_key     = "siac"
+      sftp_port      = 10027
+      upload_enabled = true
     },
     "tax_chancery_decisions" = {
-      name_prefix = "taxchancerydecisions"
-      module_key  = "tax_chancery_decisions"
-      sftp_port   = 10029
+      name_prefix    = "taxchancerydecisions"
+      module_key     = "tax_chancery_decisions"
+      sftp_port      = 10029
+      upload_enabled = true
     },
     "tax_tribunal_decisions" = {
-      name_prefix = "taxtribunaldecisions"
-      module_key  = "tax_tribunal_decisions"
-      sftp_port   = 10030
+      name_prefix    = "taxtribunaldecisions"
+      module_key     = "tax_tribunal_decisions"
+      sftp_port      = 10030
+      upload_enabled = true
     },
     "ftp_admin_appeals" = {
-      name_prefix = "adminappealsreports"
-      module_key  = "ftp_admin_appeals"
-      sftp_port   = 10031
+      name_prefix    = "adminappealsreports"
+      module_key     = "ftp_admin_appeals"
+      sftp_port      = 10031
+      upload_enabled = true
     }
   }
 }

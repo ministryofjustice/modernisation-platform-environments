@@ -3,11 +3,12 @@ locals {
   ec2_instances = {
 
     bip_app = {
+      cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_app_nonprod
       config = {
         ami_name                  = "base_rhel_8_5_2023-07*" # RHEL 8.8
         iam_resource_names_prefix = "ec2-bip"
         instance_profile_policies = [
-          "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+          # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore", # now included automatically by module
           "EC2Default",
           "EC2S3BucketWriteAndDeleteAccessPolicy",
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
@@ -51,11 +52,12 @@ locals {
     }
 
     bip_cms = {
+      cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_app_nonprod
       config = {
         ami_name                  = "base_rhel_8_5_2023-07*" # RHEL 8.8
         iam_resource_names_prefix = "ec2-bip"
         instance_profile_policies = [
-          "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+          # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore", # now included automatically by module
           "EC2Default",
           "EC2S3BucketWriteAndDeleteAccessPolicy",
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
@@ -99,11 +101,12 @@ locals {
     }
 
     bip_webadmin = {
+      cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_web_nonprod
       config = {
         ami_name                  = "base_rhel_8_5_2023-07*" # RHEL 8.8
         iam_resource_names_prefix = "ec2-web"
         instance_profile_policies = [
-          "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+          # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore", # now included automatically by module
           "EC2Default",
           "EC2S3BucketWriteAndDeleteAccessPolicy",
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
@@ -147,11 +150,12 @@ locals {
     }
 
     bip_web = {
+      cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.bip_web_nonprod
       config = {
         ami_name                  = "base_rhel_8_5_2023-07*" # RHEL 8.8
         iam_resource_names_prefix = "ec2-web"
         instance_profile_policies = [
-          "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+          # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore", # now included automatically by module
           "EC2Default",
           "EC2S3BucketWriteAndDeleteAccessPolicy",
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
@@ -194,12 +198,13 @@ locals {
     }
 
     db = {
+      cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.db
       config = {
         ami_name                  = "hmpps_ol_8_5_oracledb_19c_release_2023-08-08T13-49-56.195Z"
         ami_owner                 = "self"
         iam_resource_names_prefix = "ec2-database"
         instance_profile_policies = [
-          "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+          # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore", # now included automatically by module
           "EC2Db",
           "EC2S3BucketWriteAndDeleteAccessPolicy",
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"

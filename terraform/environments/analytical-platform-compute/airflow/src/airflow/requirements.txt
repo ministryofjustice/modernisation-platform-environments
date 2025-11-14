@@ -2,4 +2,4 @@
 apache-airflow-providers-cncf-kubernetes==9.0.1
 apache-airflow-providers-slack==8.9.1
 kubernetes==30.1.0
-dag-factory==0.22.0
+dag-factory==1.0.0

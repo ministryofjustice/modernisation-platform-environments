@@ -111,8 +111,8 @@ data "aws_iam_policy_document" "ci_assume_role" {
 }
 
 locals {
-  iaps_rds_snapshot_arn_pattern_prod    = "arn:aws:rds:${data.aws_region.current.name}:${local.environment_management.account_ids["delius-iaps-production"]}:snapshot:*iaps-*"
-  iaps_rds_snapshot_arn_pattern_preprod = "arn:aws:rds:${data.aws_region.current.name}:${local.environment_management.account_ids["delius-iaps-preproduction"]}:snapshot:*iaps-*"
+  iaps_rds_snapshot_arn_pattern_prod    = "arn:aws:rds:${data.aws_region.current.region}:${local.environment_management.account_ids["delius-iaps-production"]}:snapshot:*iaps-*"
+  iaps_rds_snapshot_arn_pattern_preprod = "arn:aws:rds:${data.aws_region.current.region}:${local.environment_management.account_ids["delius-iaps-preproduction"]}:snapshot:*iaps-*"
 }
 
 # checkov:skip=CKV_AWS_111: "policy exception"

@@ -1,1 +1,6 @@
-#### This file can be used to store data specific to the member account ####
+# PROD DNS Zones
+data "aws_route53_zone" "laa" {
+  provider     = aws.core-network-services
+  name         = "laa.service.justice.gov.uk"
+  private_zone = false
+}

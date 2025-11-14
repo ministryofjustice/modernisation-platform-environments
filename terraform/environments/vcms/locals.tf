@@ -31,15 +31,15 @@ locals {
   }
 
   app_config = {
-    container_port = 80
-    container_cpu = "512"
-    task_memory = "1024"
-    desired_count = 1
-    deployment_maximum_percent = 100
+    container_port                     = 80
+    container_cpu                      = "512"
+    task_memory                        = "1024"
+    desired_count                      = 1
+    deployment_maximum_percent         = 100
     deployment_minimum_healthy_percent = 0
-    health_check_grace_period_seconds = 60
+    health_check_grace_period_seconds  = 60
   }
-  
+
   bastion_config = {}
   image_tag      = "initial-16447252449-1"
   image_uri      = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/vcms:${local.image_tag}"
@@ -66,11 +66,11 @@ locals {
   ]))
   ipv6_cidr_blocks = []
 
-   domain_types = { for dvo in aws_acm_certificate.external.domain_validation_options : dvo.domain_name => {
-   name   = dvo.resource_record_name
-   record = dvo.resource_record_value
-   type   = dvo.resource_record_type
-   }
+  domain_types = { for dvo in aws_acm_certificate.external.domain_validation_options : dvo.domain_name => {
+    name   = dvo.resource_record_name
+    record = dvo.resource_record_value
+    type   = dvo.resource_record_type
+    }
   }
 
   domain                  = local.is-production ? "vcms.probation.service.justice.gov.uk" : "modernisation-platform.service.justice.gov.uk"
