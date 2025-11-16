@@ -98,4 +98,303 @@ resource "aws_secretsmanager_secret_version" "maat_app_orch_client_secret" {
   }
 }
 
+resource "aws_secretsmanager_secret" "maat_app_bc_client_user_id" {
+  name = "maat/APP_BC_CLIENT_USER_ID"
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "application-env-secret-${upper(local.application_name)}"
+    }
+  )
+}
+
+resource "aws_secretsmanager_secret_version" "maat_app_bc_client_user_id" {
+  secret_id     = aws_secretsmanager_secret.maat_app_bc_client_user_id.id
+  secret_string = "replace in console"
+
+  lifecycle {
+    ignore_changes = [secret_string]
+  }
+}
+
+resource "aws_secretsmanager_secret" "maat_app_google_analytics_tag_id" {
+  name = "maat/APP_MAAT_GOOGLE_ANALYTICS_4_TAG_ID"
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "application-env-secret-${upper(local.application_name)}"
+    }
+  )
+}
+
+resource "aws_secretsmanager_secret_version" "maat_app_google_analytics_tag_id" {
+  secret_id     = aws_secretsmanager_secret.maat_app_google_analytics_tag_id.id
+  secret_string = "replace in console"
+
+  lifecycle {
+    ignore_changes = [secret_string]
+  }
+}
+
+resource "aws_secretsmanager_secret" "maat_app_bc_client_orig_id" {
+  name = "maat/APP_BC_CLIENT_ORIG_ID"
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "application-env-secret-${upper(local.application_name)}"
+    }
+  )
+}
+
+resource "aws_secretsmanager_secret_version" "maat_app_bc_client_orig_id" {
+  secret_id     = aws_secretsmanager_secret.maat_app_bc_client_orig_id.id
+  secret_string = "replace in console"
+
+  lifecycle {
+    ignore_changes = [secret_string]
+  }
+}
+
+resource "aws_secretsmanager_secret" "maat_app_db_password" {
+  name = "maat/APP_DB_PASSWORD"
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "application-env-secret-${upper(local.application_name)}"
+    }
+  )
+}
+
+resource "aws_secretsmanager_secret_version" "maat_app_db_password" {
+  secret_id     = aws_secretsmanager_secret.maat_app_db_password.id
+  secret_string = "replace in console"
+
+  lifecycle {
+    ignore_changes = [secret_string]
+  }
+}
+
+resource "aws_secretsmanager_secret" "maat_app_caa_client_secret" {
+  name = "maat/APP_CAA_CLIENT_SECRET"
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "application-env-secret-${upper(local.application_name)}"
+    }
+  )
+}
+
+resource "aws_secretsmanager_secret_version" "maat_app_caa_client_secret" {
+  secret_id     = aws_secretsmanager_secret.maat_app_caa_client_secret.id
+  secret_string = "replace in console"
+
+  lifecycle {
+    ignore_changes = [secret_string]
+  }
+}
+
+resource "aws_secretsmanager_secret" "maat_app_caa_client_id" {
+  name = "maat/APP_CAA_CLIENT_ID"
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "application-env-secret-${upper(local.application_name)}"
+    }
+  )
+}
+
+resource "aws_secretsmanager_secret_version" "maat_app_caa_client_id" {
+  secret_id     = aws_secretsmanager_secret.maat_app_caa_client_id.id
+  secret_string = "replace in console"
+
+  lifecycle {
+    ignore_changes = [secret_string]
+  }
+}
+
+resource "aws_secretsmanager_secret" "maat_app_db_user_id" {
+  name = "maat/APP_DB_USERID"
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "application-env-secret-${upper(local.application_name)}"
+    }
+  )
+}
+
+resource "aws_secretsmanager_secret_version" "maat_app_db_user_id" {
+  secret_id     = aws_secretsmanager_secret.maat_app_db_user_id.id
+  secret_string = "replace in console"
+
+  lifecycle {
+    ignore_changes = [secret_string]
+  }
+}
+
+resource "aws_secretsmanager_secret" "maat_app_caa_endpoint" {
+  name = "maat/APP_CAA_ENDPOINT"
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "application-env-secret-${upper(local.application_name)}"
+    }
+  )
+}
+
+resource "aws_secretsmanager_secret_version" "maat_app_caa_endpoint" {
+  secret_id     = aws_secretsmanager_secret.maat_app_caa_endpoint.id
+  secret_string = "replace in console"
+
+  lifecycle {
+    ignore_changes = [secret_string]
+  }
+}
+
+resource "aws_secretsmanager_secret" "maat_app_bc_service_name" {
+  name = "maat/APP_BC_SERVICE_NAME"
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "application-env-secret-${upper(local.application_name)}"
+    }
+  )
+}
+
+resource "aws_secretsmanager_secret_version" "maat_app_bc_service_name" {
+  secret_id     = aws_secretsmanager_secret.maat_app_bc_service_name.id
+  secret_string = "replace in console"
+
+  lifecycle {
+    ignore_changes = [secret_string]
+  }
+}
+
+resource "aws_secretsmanager_secret" "maat_app_ats_client_secret" {
+  name = "maat/APP_ATS_CLIENT_SECRET"
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "application-env-secret-${upper(local.application_name)}"
+    }
+  )
+}
+
+resource "aws_secretsmanager_secret_version" "maat_app_ats_client_secret" {
+  secret_id     = aws_secretsmanager_secret.maat_app_ats_client_secret.id
+  secret_string = "replace in console"
+
+  lifecycle {
+    ignore_changes = [secret_string]
+  }
+}
+
+resource "aws_secretsmanager_secret" "maat_app_ats_client_id" {
+  name = "maat/APP_ATS_CLIENT_ID"
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "application-env-secret-${upper(local.application_name)}"
+    }
+  )
+}
+
+resource "aws_secretsmanager_secret_version" "maat_app_ats_client_id" {
+  secret_id     = aws_secretsmanager_secret.maat_app_ats_client_id.id
+  secret_string = "replace in console"
+
+  lifecycle {
+    ignore_changes = [secret_string]
+  }
+}
+
+resource "aws_secretsmanager_secret" "maat_app_ats_oauth_scope" {
+  name = "maat/APP_ATS_OAUTH_SCOPE"
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "application-env-secret-${upper(local.application_name)}"
+    }
+  )
+}
+
+resource "aws_secretsmanager_secret_version" "maat_app_ats_oauth_scope" {
+  secret_id     = aws_secretsmanager_secret.maat_app_ats_oauth_scope.id
+  secret_string = "replace in console"
+
+  lifecycle {
+    ignore_changes = [secret_string]
+  }
+}
+
+resource "aws_secretsmanager_secret" "maat_app_master_password" {
+  name = "maat/APP_MASTER_PASSWORD"
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "application-env-secret-${upper(local.application_name)}"
+    }
+  )
+}
+
+resource "aws_secretsmanager_secret_version" "maat_app_master_password" {
+  secret_id     = aws_secretsmanager_secret.maat_app_master_password.id
+  secret_string = "replace in console"
+
+  lifecycle {
+    ignore_changes = [secret_string]
+  }
+}
+
+resource "aws_secretsmanager_secret" "maat_app_salt" {
+  name = "maat/APP_SALT"
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "application-env-secret-${upper(local.application_name)}"
+    }
+  )
+}
+
+resource "aws_secretsmanager_secret_version" "maat_app_salt" {
+  secret_id     = aws_secretsmanager_secret.maat_app_salt.id
+  secret_string = "replace in console"
+
+  lifecycle {
+    ignore_changes = [secret_string]
+  }
+}
+
+resource "aws_secretsmanager_secret" "maat_app_derivation_iterations" {
+  name = "maat/APP_DERIVATION_ITERATIONS"
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "application-env-secret-${upper(local.application_name)}"
+    }
+  )
+}
+
+resource "aws_secretsmanager_secret_version" "maat_app_derivation_iterations" {
+  secret_id     = aws_secretsmanager_secret.maat_app_derivation_iterations.id
+  secret_string = "replace in console"
+
+  lifecycle {
+    ignore_changes = [secret_string]
+  }
+}
 
