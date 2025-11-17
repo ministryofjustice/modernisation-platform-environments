@@ -55,20 +55,105 @@ locals {
   ]
 
 
-  # Apply 1-3 at a time from the pending array
   # After each apply there will be a new CNAME entry which needs to get created by Tony Bishop
   # in the Route53 which manages these domains. And he will update the main A/CNAME record with the domain name
   # of the production cloudfront distribution
   # "ahmlr.gov.uk" is listed as the primary domain of the viewer certificate for this cloudfront-nginx distribution
   #
-  cloudfront_nginx_prod_sans = [
-    "ahmlr.gov.uk",
-    "asylum-support-tribunal.gov.uk"
-  ]
+cloudfront_nginx_prod_sans = [
+  {
+    domain    = "ahmlr.gov.uk"
+    prod_only = true
+  },
+  {
+    domain    = "asylum-support-tribunal.gov.uk"
+    prod_only = true
+  },
+  {
+    domain    = "appeals-service.gov.uk"
+    prod_only = false
+  },
+  {
+    domain    = "carestandardstribunal.gov.uk"
+    prod_only = false
+  },
+  {
+    domain    = "cicap.gov.uk"
+    prod_only = false
+  },
+  {
+    domain    = "civilappeals.gov.uk"
+    prod_only = false
+  },
+  {
+    domain    = "cjit.gov.uk"
+    prod_only = false
+  },
+  {
+    domain    = "cjs.gov.uk"
+    prod_only = false
+  },
+  {
+    domain    = "cjsonline.gov.uk"
+    prod_only = false
+  },
+  {
+    domain    = "complaints.judicialconduct.gov.uk"
+    prod_only = false
+  },
+  {
+    domain    = "courtfunds.gov.uk"
+    prod_only = false
+  },
+  {
+    domain    = "criminal-justice-system.gov.uk"
+    prod_only = false
+  },
+  {
+    domain    = "dugganinquest.independent.gov.uk"
+    prod_only = false
+  },
+  {
+    domain    = "employmentappeals.gov.uk"
+    prod_only = false
+  },
+  {
+    domain    = "financeandtaxtribunals.gov.uk"
+    prod_only = false
+  },
+  {
+    domain    = "hillsboroughinquests.independent.gov.uk"
+    prod_only = false
+  },
+  {
+    domain    = "immigrationservicestribunal.gov.uk"
+    prod_only = false
+  },
+  {
+    domain    = "informationtribunal.gov.uk"
+    prod_only = false
+  },
+  {
+    domain    = "judicialombudsman.gov.uk"
+    prod_only = false
+  },
+  {
+    domain    = "landstribunal.gov.uk"
+    prod_only = false
+  },
+  {
+    domain    = "osscsc.gov.uk"
+    prod_only = false
+  },
+  {
+    domain    = "paroleboard.gov.uk"
+    prod_only = false
+  }
 
   # This array is dynamically built from the above production sans, but prefixes each one with the environment name
   cloudfront_nginx_nonprod_sans = [
-    for d in local.cloudfront_nginx_prod_sans : "${local.environment}.${d}"
+    for d in local.cloudfront_nginx_prod_sans : "${local.environment}.${d.domain}"
+    if !d.prod_only
   ]
 
   # This map will either contain the prod, dev or preprod SANS during the plan/apply stage
@@ -82,33 +167,11 @@ locals {
   # Final SANs to apply to cert or distribution. Pull the entry from the above map dependent on environment
   cloudfront_nginx_sans = lookup(local.cloudfront_sans_map, local.environment, [])
 
+  #TODO Check these 3 domains with Tony Bishop. They seem to be delegated to alternate NS or a static ip address
   pending_cloudfront_nginx_sans = [
-    "appeals-service.gov.uk",
-    "carestandardstribunal.gov.uk",
-    "cicap.gov.uk",
-    "civilappeals.gov.uk",
-    "cjit.gov.uk",
-    "cjs.gov.uk",
-    "cjsonline.gov.uk",
-    "complaints.judicialconduct.gov.uk",
     "courtfines.justice.gov.uk",
-    "courtfunds.gov.uk",
-    "criminal-justice-system.gov.uk",
-    "dugganinquest.independent.gov.uk",
-    "employmentappeals.gov.uk",
-    "financeandtaxtribunals.gov.uk",
-    "hillsboroughinquests.independent.gov.uk",
-    "immigrationservicestribunal.gov.uk",
-    "informationtribunal.gov.uk",
-    "judicialombudsman.gov.uk",
-    "landstribunal.gov.uk",
     "obr.co.uk",
-    "osscsc.gov.uk",
-    "paroleboard.gov.uk",
     "sendmoneytoaprisoner.justice.gov.uk",
-    "transporttribunal.gov.uk",
-    "victiminformationservice.org.uk",
-    "yjbpublications.justice.gov.uk"
   ]
 
 
