@@ -2,7 +2,7 @@
   "accounts": {
     "development": {
       "db_name": "cst_db_dev",
-      "identifier": "dcst-db-dev",
+      "identifier": "cst-db-dev",
       "db_username": "dbadmin",
       "allocated_storage": "20",
       "storage_type": "gp2",
