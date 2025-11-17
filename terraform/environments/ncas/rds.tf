@@ -10,7 +10,7 @@ resource "aws_db_instance" "ncas_db" {
   password                    = random_password.password.result
   skip_final_snapshot         = true
   publicly_accessible         = local.is-development ? true : false
-  vpc_security_group_ids      = [aws_security_group.postgresql_db_sc[0].id]
+  vpc_security_group_ids      = [aws_security_group.postgresql_db_sc.id]
   db_subnet_group_name        = aws_db_subnet_group.dbsubnetgroup.name
   allow_major_version_upgrade = true
   ca_cert_identifier          = "rds-ca-rsa2048-g1"
@@ -69,16 +69,16 @@ data "http" "myip" {
 resource "null_resource" "setup_dev_db" {
   count = local.is-development ? 1 : 0
 
-  depends_on = [aws_db_instance.ncas_db[0]]
+  depends_on = [aws_db_instance.ncas_db]
 
   provisioner "local-exec" {
     interpreter = ["bash", "-c"]
     command     = "chmod +x ./setup-dev-db.sh; ./setup-dev-db.sh"
 
     environment = {
-      DB_HOSTNAME      = aws_db_instance.ncas_db[0].address
-      DB_NAME          = aws_db_instance.ncas_db[0].db_name
-      NCAS_DB_USERNAME = aws_db_instance.ncas_db[0].username
+      DB_HOSTNAME      = aws_db_instance.ncas_db.address
+      DB_NAME          = aws_db_instance.ncas_db.db_name
+      NCAS_DB_USERNAME = aws_db_instance.ncas_db.username
       NCAS_DB_PASSWORD = random_password.password.result
     }
   }
