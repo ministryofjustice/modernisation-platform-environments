@@ -2,6 +2,72 @@
 # SNS Topics, Subscriptions, Policies and Policy Documents
 ##########################################################
 
+#########################################
+# SNS Resources for SES Logging
+#########################################
+
+locals {
+  sns_environments = {
+    development = {
+      condition = local.is-development
+    }
+    preproduction = {
+      condition = local.is-preproduction
+    }
+  }
+
+  sns_instances = {
+    for env_key, env_config in local.sns_environments : env_key => env_config
+    if env_config.condition
+  }
+}
+
+resource "aws_sns_topic" "ses_logging" {
+  # checkov:skip=CKV_AWS_26: "SNS topic encryption is not required as no sensitive data is processed through it"
+  for_each = local.sns_instances
+  name     = "ses_logging_${each.key}"
+}
+
+resource "aws_sns_topic_subscription" "ses_logging_subscription" {
+  for_each  = local.sns_instances
+  topic_arn = aws_sns_topic.ses_logging[each.key].arn
+  protocol  = "lambda"
+  endpoint  = aws_lambda_function.lambda_functions["ses_logging_${each.key}"].arn
+}
+
+resource "aws_sns_topic_policy" "ses_logging_topic_policy" {
+  for_each = local.sns_instances
+  arn      = aws_sns_topic.ses_logging[each.key].arn
+  policy   = data.aws_iam_policy_document.ses_logging_topic_policy_document[each.key].json
+}
+
+data "aws_iam_policy_document" "ses_logging_topic_policy_document" {
+  for_each  = local.sns_instances
+  policy_id = "ses_logging_${each.key}_sns_topic_policy_document"
+
+  statement {
+    sid    = "AllowSESPublish"
+    effect = "Allow"
+    principals {
+      type        = "Service"
+      identifiers = ["ses.amazonaws.com"]
+    }
+    actions = [
+      "SNS:Publish"
+    ]
+    condition {
+      test     = "StringEquals"
+      variable = "AWS:SourceOwner"
+      values = [
+        data.aws_caller_identity.current.account_id
+      ]
+    }
+    resources = [
+      aws_sns_topic.ses_logging[each.key].arn
+    ]
+  }
+}
+
 #########################
 # Development Environment
 #########################
@@ -112,6 +178,7 @@ data "aws_iam_policy_document" "sns_topic_policy_s3_notifications_dev" {
     ]
   }
 }
+
 
 
 ##################################################################
@@ -289,7 +356,8 @@ resource "aws_sns_topic_subscription" "ses_logging_subscription_uat" {
   count     = local.is-preproduction == true ? 1 : 0
   topic_arn = aws_sns_topic.ses_logging_uat[0].arn
   protocol  = "lambda"
-  endpoint  = aws_lambda_function.terraform_lambda_func_ses_logging_uat[0].arn
+  # endpoint  = aws_lambda_function.terraform_lambda_func_ses_logging_uat[0].arn
+  endpoint = aws_lambda_function.lambda_functions["ses_logging_preproduction"].arn
 }
 
 resource "aws_sns_topic_policy" "ses_logging_uat_topic_policy" {

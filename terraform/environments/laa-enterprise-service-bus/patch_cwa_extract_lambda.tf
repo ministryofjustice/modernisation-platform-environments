@@ -72,16 +72,17 @@ resource "aws_security_group_rule" "patch_cwa_extract_egress_https_s3" {
 
 # Lambda Functions for CWA Extract Step Function
 resource "aws_lambda_function" "patch_cwa_extract_lambda" {
-  count            = local.environment == "test" ? 1 : 0
-  description      = "Connect to CWA DB and invoke cwa extract procedure."
-  function_name    = "patch_cwa_extract_lambda"
-  role             = aws_iam_role.patch_cwa_extract_lambda_role[0].arn
-  handler          = "lambda_function.lambda_handler"
-  filename         = "lambda/cwa_extract_lambda/cwa_extract_package.zip"
-  source_code_hash = filebase64sha256("lambda/cwa_extract_lambda/cwa_extract_package.zip")
-  timeout          = 900
-  memory_size      = 128
-  runtime          = "python3.10"
+  count             = local.environment == "test" ? 1 : 0
+  description       = "Connect to CWA DB and invoke cwa extract procedure."
+  function_name     = "patch_cwa_extract_lambda"
+  role              = aws_iam_role.patch_cwa_extract_lambda_role[0].arn
+  handler           = "lambda_function.lambda_handler"
+  s3_bucket         = data.aws_s3_object.cwa_extract_zip.bucket
+  s3_key            = data.aws_s3_object.cwa_extract_zip.key
+  s3_object_version = data.aws_s3_object.cwa_extract_zip.version_id
+  timeout           = 900
+  memory_size       = 128
+  runtime           = "python3.10"
 
   layers = [
     aws_lambda_layer_version.lambda_layer_oracle_python.arn,
@@ -100,8 +101,11 @@ resource "aws_lambda_function" "patch_cwa_extract_lambda" {
       ORACLE_HOME       = "/opt/instantclient_12_1"
       SERVICE_NAME      = "cwa-extract-service"
       NAMESPACE         = "HUB20-CWA-NS"
-      ENVIRONMENT       = local.environment
+      ENVIRONMENT       = "patch"
       LOG_LEVEL         = "DEBUG"
+      TNS_ADMIN         = "/tmp/wallet_dir"
+      WALLET_BUCKET     = data.aws_s3_bucket.lambda_files.bucket
+      WALLET_OBJ        = "wallet_files/CWA/wallet_dir.zip"
     }
   }
 
@@ -112,16 +116,17 @@ resource "aws_lambda_function" "patch_cwa_extract_lambda" {
 }
 
 resource "aws_lambda_function" "patch_cwa_file_transfer_lambda" {
-  count            = local.environment == "test" ? 1 : 0
-  description      = "Connect to CWA DB, retrieve multiple json files of each extract and merge into single JSON file, uploads them to S3"
-  function_name    = "patch_cwa_file_transfer_lambda"
-  role             = aws_iam_role.patch_cwa_extract_lambda_role[0].arn
-  handler          = "lambda_function.lambda_handler"
-  filename         = "lambda/cwa_file_transfer_lambda/cwa_file_transfer_package.zip"
-  source_code_hash = filebase64sha256("lambda/cwa_file_transfer_lambda/cwa_file_transfer_package.zip")
-  timeout          = 900
-  memory_size      = 128
-  runtime          = "python3.10"
+  count             = local.environment == "test" ? 1 : 0
+  description       = "Connect to CWA DB, retrieve multiple json files of each extract and merge into single JSON file, uploads them to S3"
+  function_name     = "patch_cwa_file_transfer_lambda"
+  role              = aws_iam_role.patch_cwa_extract_lambda_role[0].arn
+  handler           = "lambda_function.lambda_handler"
+  s3_bucket         = data.aws_s3_object.cwa_file_transfer_zip.bucket
+  s3_key            = data.aws_s3_object.cwa_file_transfer_zip.key
+  s3_object_version = data.aws_s3_object.cwa_file_transfer_zip.version_id
+  timeout           = 900
+  memory_size       = 128
+  runtime           = "python3.10"
 
   layers = [
     aws_lambda_layer_version.lambda_layer_oracle_python.arn
@@ -141,8 +146,11 @@ resource "aws_lambda_function" "patch_cwa_file_transfer_lambda" {
       ORACLE_HOME       = "/opt/instantclient_12_1"
       SERVICE_NAME      = "cwa-file-transfer-service"
       NAMESPACE         = "HUB20-CWA-NS"
-      ENVIRONMENT       = local.environment
+      ENVIRONMENT       = "patch"
       LOG_LEVEL         = "DEBUG"
+      TNS_ADMIN         = "/tmp/wallet_dir"
+      WALLET_BUCKET     = data.aws_s3_bucket.lambda_files.bucket
+      WALLET_OBJ        = "wallet_files/CWA/wallet_dir.zip"
     }
   }
 
@@ -153,16 +161,17 @@ resource "aws_lambda_function" "patch_cwa_file_transfer_lambda" {
 }
 
 resource "aws_lambda_function" "patch_cwa_sns_lambda" {
-  count            = local.environment == "test" ? 1 : 0
-  description      = "Send SNS message with timestamp for downstream provider load services to extract files"
-  function_name    = "patch_cwa_sns_lambda"
-  role             = aws_iam_role.patch_cwa_extract_lambda_role[0].arn
-  handler          = "lambda_function.lambda_handler"
-  filename         = "lambda/cwa_sns_lambda/cwa_sns_lambda.zip"
-  source_code_hash = filebase64sha256("lambda/cwa_sns_lambda/cwa_sns_lambda.zip")
-  timeout          = 300
-  memory_size      = 128
-  runtime          = "python3.10"
+  count             = local.environment == "test" ? 1 : 0
+  description       = "Send SNS message with timestamp for downstream provider load services to extract files"
+  function_name     = "patch_cwa_sns_lambda"
+  role              = aws_iam_role.patch_cwa_extract_lambda_role[0].arn
+  handler           = "lambda_function.lambda_handler"
+  s3_bucket         = data.aws_s3_object.cwa_sns_zip.bucket
+  s3_key            = data.aws_s3_object.cwa_sns_zip.key
+  s3_object_version = data.aws_s3_object.cwa_sns_zip.version_id
+  timeout           = 300
+  memory_size       = 128
+  runtime           = "python3.10"
 
   layers = [
     "arn:aws:lambda:eu-west-2:017000801446:layer:AWSLambdaPowertoolsPython:2"
@@ -179,7 +188,7 @@ resource "aws_lambda_function" "patch_cwa_sns_lambda" {
       PROVIDER_BANKS_TOPIC = aws_sns_topic.patch_provider_banks[0].arn
       SERVICE_NAME         = "cwa-sns-service"
       NAMESPACE            = "HUB20-CWA-NS"
-      ENVIRONMENT          = local.environment
+      ENVIRONMENT          = "patch"
       LOG_LEVEL            = "DEBUG"
     }
   }

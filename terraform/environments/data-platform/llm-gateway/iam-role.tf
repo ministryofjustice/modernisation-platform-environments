@@ -19,17 +19,14 @@ module "iam_role" {
   create_inline_policy = true
 
   inline_policy_permissions = {
-    # BedrockInferenceProfileAccess = {
-    #   effect = "Allow"
-    #   actions = [
-    #     "bedrock:Converse",
-    #     "bedrock:ConverseStream",
-    #     "bedrock:InvokeModel",
-    #     "bedrock:InvokeModelWithBidirectionalStream",
-    #     "bedrock:InvokeModelWithResponseStream"
-    #   ]
-    #   resources = [for profile in aws_bedrock_inference_profile.main : profile.arn]
-    # }
+    AwsMarketplaceAccess = {
+      effect = "Allow"
+      actions = [
+        "aws-marketplace:Subscribe",
+        "aws-marketplace:ViewSubscriptions"
+      ]
+      resources = ["*"]
+    }
     BedrockInferenceProfileAccess = {
       effect    = "Allow"
       actions   = ["bedrock:InvokeModel*"]

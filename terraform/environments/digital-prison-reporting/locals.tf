@@ -41,6 +41,7 @@ locals {
   redshift_cluster_name  = "${local.application_data.accounts[local.environment].project_short_id}-redshift-${local.environment}"
 
   glue_job_common_log_level = local.application_data.accounts[local.environment].glue_job_common_log_level
+  glue_job_version          = local.application_data.accounts[local.environment].glue_job_version
 
   # Flag for whether jobs that access the operational datastore have this feature turned on or not
   enable_operational_datastore_job_access = local.application_data.accounts[local.environment].enable_operational_datastore_job_access

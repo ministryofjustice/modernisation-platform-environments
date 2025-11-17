@@ -14,6 +14,7 @@ module "waf" {
   # checkov:skip=CKV_TF_1: "Commit Hash requirement temporarily disabled"
   # checkov:skip=CKV_TF_2: "Version number tag requirement temporarily disabled"
   source                   = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-aws-waf?ref=c0875272407dd5094287c021201b36f250be3806"
+  web_acl_name             = "wam-acl"
   enable_ddos_protection   = true
   ddos_rate_limit          = 150
   block_non_uk_traffic     = true
@@ -25,12 +26,12 @@ module "waf" {
   }
 
   additional_managed_rules = [
-     {
-       arn             = aws_wafv2_rule_group.wam_waf_acl.arn
-       override_action = "none"   # respect the group's action (BLOCK). Use "count" to dry-run.
-       priority        = 30        # unique; runs before managed rules at 10..15
-     }
-   ]
+    {
+      arn             = aws_wafv2_rule_group.wam_waf_acl.arn
+      override_action = "none" # respect the group's action (BLOCK). Use "count" to dry-run.
+      priority        = 4      # unique; runs before managed rules at 10..15
+    }
+  ]
 
   managed_rule_actions = {
     AWSManagedRulesKnownBadInputsRuleSet = false
@@ -42,12 +43,12 @@ module "waf" {
   }
 
   managed_rule_priorities = {
-    AWSManagedRulesAnonymousIpList       = 40
-    AWSManagedRulesKnownBadInputsRuleSet = 50
-    AWSManagedRulesCommonRuleSet         = 60
-    AWSManagedRulesSQLiRuleSet           = 70
-    AWSManagedRulesLinuxRuleSet          = 80
-    AWSManagedRulesBotControlRuleSet     = 90
+    AWSManagedRulesAnonymousIpList       = 10
+    AWSManagedRulesKnownBadInputsRuleSet = 11
+    AWSManagedRulesCommonRuleSet         = 12
+    AWSManagedRulesSQLiRuleSet           = 13
+    AWSManagedRulesLinuxRuleSet          = 14
+    AWSManagedRulesBotControlRuleSet     = 15
   }
 
   core_logging_account_id = local.environment_management.account_ids["core-logging-production"]
