@@ -134,7 +134,7 @@ resource "null_resource" "setup_db" {
       DB_HOSTNAME          = aws_db_instance.cst_db_dev[0].address
       DB_NAME              = aws_db_instance.cst_db_dev[0].db_name
       cst_DB_USERNAME = aws_db_instance.cst_db_dev[0].username
-      cst_DB_PASSWORD = random_password.cst_db_dev.result
+      CST_DB_PASSWORD = random_password.cst_db_dev.result
     }
   }
   triggers = {
