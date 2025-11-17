@@ -48,7 +48,7 @@ locals {
     ec2_autoscaling_groups = {
       t1-oasys-web-a = merge(local.ec2_autoscaling_groups.web, {
         autoscaling_schedules = {
-          scale_up   = { recurrence = "0 5 * * Mon-Fri" }
+          scale_up   = { recurrence = "0 5 * * Mon-Fri", , desired_capacity = 0 } ####
           scale_down = { recurrence = "0 19 * * Mon-Fri", desired_capacity = 0 }
         }
         config = merge(local.ec2_autoscaling_groups.web.config, {
@@ -72,7 +72,7 @@ locals {
 
       t2-oasys-web-a = merge(local.ec2_autoscaling_groups.web, {
         autoscaling_schedules = {
-          scale_up   = { recurrence = "0 5 * * Mon-Fri" }
+          scale_up   = { recurrence = "0 5 * * Mon-Fri", desired_capacity = 0 } ###ß
           scale_down = { recurrence = "0 19 * * Mon-Fri", desired_capacity = 0 }
         }
         config = merge(local.ec2_autoscaling_groups.web.config, {
@@ -98,7 +98,7 @@ locals {
         # For SAN project (OASYS replacement) requested by Howard Smith
         # Autoscaling disabled as initially server will be configured manually
         autoscaling_group = merge(local.ec2_autoscaling_groups.web.autoscaling_group, {
-          desired_capacity = 1 # setting to 0 leaves in a stopped state because of the warm_pool config below
+          desired_capacity = 0 # setting to 0 leaves in a stopped state because of the warm_pool config below ####
           warm_pool = {
             min_size          = 0
             reuse_on_scale_in = true
@@ -173,7 +173,8 @@ locals {
         }
         instance = merge(local.ec2_instances.db19c.instance, {
           disable_api_termination = true
-          instance_type           = "r6i.large"
+          instance_type           = "r6i.xlarge"
+          #instance_type           = "r6i.large"
         })
         tags = merge(local.ec2_instances.db19c.tags, {
           bip-db-name         = "T1BIPINF"
@@ -227,7 +228,8 @@ locals {
         }
         instance = merge(local.ec2_instances.db19c.instance, {
           disable_api_termination = true
-          instance_type           = "r6i.large"
+          #instance_type           = "r6i.large"
+          instance_type           = "r6i.xlarge"
         })
         tags = merge(local.ec2_instances.db19c.tags, {
           bip-db-name         = "T2BIPINF"
@@ -254,7 +256,8 @@ locals {
         }
         instance = merge(local.ec2_instances.db11g.instance, {
           disable_api_termination = true
-          instance_type           = "r6i.xlarge" # "t3.medium"
+          instance_type           = "r6i.xlarge"
+          #instance_type           = "r6i.large"
         })
         tags = merge(local.ec2_instances.db11g.tags, {
           instance-scheduling = "skip-scheduling"
