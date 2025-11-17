@@ -26,7 +26,7 @@ resource "aws_iam_role_policy" "lambda_policy" {
       {
         Effect = "Allow"
         Action = [
-          "logs:GetLogEvents"
+          "logs:GetQueryResults","logs:GetLogRecord"
         ]
         Resource =  "arn:aws:logs:*:*:*"
       },
@@ -35,7 +35,7 @@ resource "aws_iam_role_policy" "lambda_policy" {
         Action = [
           "sns:Publish"
         ]
-        Resource = aws_sns_topic.cloudwatch_slack.arn
+        Resource = [ aws_sns_topic.cloudwatch_slack.arn ]
       }
     ]
   })
