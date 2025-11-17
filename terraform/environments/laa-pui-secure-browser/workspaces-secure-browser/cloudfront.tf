@@ -159,7 +159,6 @@ resource "aws_cloudfront_distribution" "waiting_room" {
       cookies {
         forward = "all"
       }
-      headers = ["Host"]
     }
 
     viewer_protocol_policy = "redirect-to-https"
