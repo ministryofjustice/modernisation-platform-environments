@@ -1,32 +1,36 @@
-locals {
-  public_key_data = jsondecode(file("./bastion_linux.json"))
-}
-
 module "bastion_linux" {
+  #checkov:skip=CKV_TF_1:Ensure Terraform module sources use a commit hash; skip as this is MoJ Repo
+
+  count = var.bastion_linux.public_key_data != null ? 1 : 0
+
   source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=v5.0.0"
 
   providers = {
     aws.share-host   = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
     aws.share-tenant = aws          # The default provider (unaliased, `aws`) is the tenant
   }
-  # s3 - used for logs and user ssh public keys
-  bucket_name = "bastion-${local.application_name}"
-  # public keys
-  public_key_data = local.public_key_data.keys[local.environment]
-  # logs
-  log_auto_clean       = "Enabled"
-  log_standard_ia_days = 30  # days before moving to IA storage
-  log_glacier_days     = 60  # days before moving to Glacier
-  log_expiry_days      = 180 # days before log expiration
-  # bastion
-  allow_ssh_commands = false
-  app_name           = var.networking[0].application
-  business_unit      = local.vpc_name
-  subnet_set         = local.subnet_set
-  environment        = local.environment
-  region             = "eu-west-2"
 
-  # Tags
-  tags_common = local.tags
-  tags_prefix = terraform.workspace
+  # s3 - used for logs and user ssh public keys
+  bucket_name = var.bastion_linux.bucket_name
+
+  # public keys
+  public_key_data = var.bastion_linux.public_key_data
+
+  # logs
+  log_auto_clean       = var.bastion_linux.log_auto_clean
+  log_standard_ia_days = var.bastion_linux.log_standard_ia_days
+  log_glacier_days     = var.bastion_linux.log_glacier_days
+  log_expiry_days      = var.bastion_linux.log_expiry_days
+
+  # bastion
+  allow_ssh_commands = var.bastion_linux.allow_ssh_commands
+
+  app_name                = var.environment.application_name
+  business_unit           = var.environment.business_unit
+  subnet_set              = var.environment.subnet_set
+  environment             = var.environment.environment
+  region                  = var.environment.region
+  extra_user_data_content = var.bastion_linux.extra_user_data_content
+  tags_common             = merge(local.tags, var.bastion_linux.tags)
+  tags_prefix             = terraform.workspace
 }
