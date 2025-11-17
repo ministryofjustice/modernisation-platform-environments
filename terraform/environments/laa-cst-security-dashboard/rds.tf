@@ -13,7 +13,8 @@ resource "aws_db_instance" "cst_db" {
   publicly_accessible         = false
   vpc_security_group_ids      = [aws_security_group.postgresql_db_sc[0].id]
   db_subnet_group_name        = aws_db_subnet_group.dbsubnetgroup.name
-  allow_major_version_upgrade = true
+  allow_major_version_upgrade = false
+  auto_minor_version_upgrade  = true
   ca_cert_identifier          = "rds-ca-rsa2048-g1"
   apply_immediately           = true
 }
@@ -28,7 +29,6 @@ resource "aws_security_group" "postgresql_db_sc" {
   name        = "postgres_security_group"
   description = "control access to the database"
   vpc_id      = data.aws_vpc.shared.id
-
   ingress {
     from_port       = 5432
     to_port         = 5432
@@ -36,7 +36,13 @@ resource "aws_security_group" "postgresql_db_sc" {
     description     = "Allows ECS service to access RDS"
     security_groups = [aws_security_group.ecs_service.id]
   }
-
+  ingress {
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    description = "Allows Github Actions to access RDS"
+    cidr_blocks = ["${jsondecode(data.http.myip.response_body)["ip"]}/32"]
+  }
   ingress {
     protocol    = "tcp"
     description = "Allow PSQL traffic from bastion"
@@ -46,7 +52,6 @@ resource "aws_security_group" "postgresql_db_sc" {
       module.bastion_linux.bastion_security_group
     ]
   }
-
   egress {
     description = "allow all outbound traffic"
     from_port   = 0
@@ -94,7 +99,6 @@ resource "aws_security_group" "postgresql_db_sc_dev" {
     description = "Allows Github Actions to access RDS"
     cidr_blocks = ["${jsondecode(data.http.myip.response_body)["ip"]}/32"]
   }
-
   ingress {
     protocol    = "tcp"
     description = "Allow PSQL traffic from bastion"
@@ -111,11 +115,13 @@ resource "aws_security_group" "postgresql_db_sc_dev" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
 }
 
-// Sets up empty database for Development environment
-resource "null_resource" "setup_dev_db" {
+data "http" "myip" {
+  url = "http://ipinfo.io/json"
+}
+
+resource "null_resource" "setup_db" {
   count = local.is-development ? 1 : 0
 
   depends_on = [aws_db_instance.cst_db_dev[0]]
@@ -125,10 +131,10 @@ resource "null_resource" "setup_dev_db" {
     command     = "chmod +x ./setup-dev-db.sh; ./setup-dev-db.sh"
 
     environment = {
-      DB_HOSTNAME     = aws_db_instance.cst_db_dev[0].address
-      DB_NAME         = aws_db_instance.cst_db_dev[0].db_name
-      CST_DB_USERNAME = aws_db_instance.cst_db_dev[0].username
-      CST_DB_PASSWORD = random_password.password.result
+      DB_HOSTNAME          = aws_db_instance.cst_db_dev[0].address
+      DB_NAME              = aws_db_instance.cst_db_dev[0].db_name
+      cst_DB_USERNAME = aws_db_instance.cst_db_dev[0].username
+      cst_DB_PASSWORD = random_password.password.result
     }
   }
   triggers = {
