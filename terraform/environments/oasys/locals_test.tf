@@ -47,9 +47,6 @@ locals {
 
     ec2_autoscaling_groups = {
       t1-oasys-web-a = merge(local.ec2_autoscaling_groups.web, {
-        autoscaling_group = merge(local.ec2_autoscaling_groups.web.autoscaling_group, {
-          desired_capacity    = 0
-        })
         autoscaling_schedules = {
           scale_up   = { recurrence = "0 5 * * Mon-Fri", desired_capacity = 0 } ####
           scale_down = { recurrence = "0 19 * * Mon-Fri", desired_capacity = 0 }
@@ -74,9 +71,6 @@ locals {
       })
 
       t2-oasys-web-a = merge(local.ec2_autoscaling_groups.web, {
-        autoscaling_group = merge(local.ec2_autoscaling_groups.web.autoscaling_group, {
-          desired_capacity    = 0
-        })
         autoscaling_schedules = {
           scale_up   = { recurrence = "0 5 * * Mon-Fri", desired_capacity = 0 } ###ß
           scale_down = { recurrence = "0 19 * * Mon-Fri", desired_capacity = 0 }
@@ -104,7 +98,7 @@ locals {
         # For SAN project (OASYS replacement) requested by Howard Smith
         # Autoscaling disabled as initially server will be configured manually
         autoscaling_group = merge(local.ec2_autoscaling_groups.web.autoscaling_group, {
-          desired_capacity = 0 # setting to 0 leaves in a stopped state because of the warm_pool config below ####
+          desired_capacity = 1 # setting to 0 leaves in a stopped state because of the warm_pool config below ####
           warm_pool = {
             min_size          = 0
             reuse_on_scale_in = true
@@ -244,7 +238,7 @@ locals {
         })
       })
 
-      t2-onr-db-a = merge(local.ec2_instances.db11g, {
+      t2-onr-db-a = merge(local.ec2_instances.db11g, { # needs the terraform aws provider/user-data fix + resize
         config = merge(local.ec2_instances.db11g.config, {
           availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.ec2_instances.db11g.config.instance_profile_policies, [
