@@ -196,7 +196,8 @@ locals {
           ])
         })
         instance = merge(local.ec2_autoscaling_groups.web.instance, {
-          instance_type           = "t3.small"
+          instance_type           = "t3.medium"
+          #instance_type           = "t3.small"
         })
         tags = merge(local.ec2_autoscaling_groups.web.tags, {
           description        = "${local.environment} practice oasys web"
@@ -214,7 +215,8 @@ locals {
           ])
         })
         instance = merge(local.ec2_autoscaling_groups.web.instance, {
-          instance_type           = "t3.small"
+          instance_type           = "t3.medium"
+          #instance_type           = "t3.small"
         })
         tags = merge(local.ec2_autoscaling_groups.web.tags, {
           description        = "${local.environment} training oasys web"
