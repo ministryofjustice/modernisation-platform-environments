@@ -76,9 +76,9 @@ resource "null_resource" "setup_dev_db" {
     command     = "chmod +x ./setup-dev-db.sh; ./setup-dev-db.sh"
 
     environment = {
-      DB_HOSTNAME      = aws_db_instance.ncas_db_dev[0].address
-      DB_NAME          = aws_db_instance.ncas_db_dev[0].db_name
-      NCAS_DB_USERNAME = aws_db_instance.ncas_db_dev[0].username
+      DB_HOSTNAME      = aws_db_instance.ncas_db[0].address
+      DB_NAME          = aws_db_instance.ncas_db[0].db_name
+      NCAS_DB_USERNAME = aws_db_instance.ncas_db[0].username
       NCAS_DB_PASSWORD = random_password.password.result
     }
   }
