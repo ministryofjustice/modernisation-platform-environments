@@ -148,7 +148,22 @@ cloudfront_nginx_prod_sans = [
   {
     domain    = "paroleboard.gov.uk"
     prod_only = false
+  },
+  {
+    domain    = "transporttribunal.gov.uk"
+    prod_only = false
+  },
+  {
+    domain    = "victiminformationservice.org.uk"
+    prod_only = false
+  },
+  {
+    domain    = "yjbpublications.justice.gov.uk"
+    prod_only = false
   }
+]
+
+
 
   # This array is dynamically built from the above production sans, but prefixes each one with the environment name
   cloudfront_nginx_nonprod_sans = [
