@@ -43,6 +43,7 @@ locals {
     "g4s_centurion",
     "g4s_fep",
     "g4s_tasking",
+    "buddi_buddi",
   ] : local.is-development ? ["test"] : []
 
   prod_dbs_to_grant = local.is-production ? [
