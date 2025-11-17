@@ -13,101 +13,99 @@ resource "aws_cloudfront_function" "redirect_to_auth" {
   comment = "Redirect users to Azure Entra ID for authentication"
 
   code = <<-EOT
-    function handler(event) {
-      var request = event.request;
-      var qs = request.querystring || {};
+function handler(event) {
+  var request = event.request;
+  var qs = request.querystring || {};
 
-      // -- helpers ---------------------------------------------------------
-      // generate n random bytes using Math.random (CF runtime provides a better RNG than browser Math.random)
-      function randomBytes(n) {
-        var arr = new Array(n);
-        for (var i = 0; i < n; i++) {
-          arr[i] = Math.floor(Math.random() * 256);
-        }
-        return new Uint8Array(arr);
-      }
-
-      // base64url encode a Uint8Array
-      function base64UrlFromBytes(bytes) {
-        // Buffer is available in CF Functions runtime
-        var b64 = Buffer.from(bytes).toString('base64');
-        return b64.replace(/\\+/g, '-').replace(/\\//g, '_').replace(/=+$/, '');
-      }
-
-      // compute SHA256 and return base64url
-      var crypto = require('crypto');
-      function sha256Base64Url(inputStr) {
-        var hash = crypto.createHash('sha256').update(inputStr, 'utf8').digest('base64');
-        return hash.replace(/\\+/g, '-').replace(/\\//g, '_').replace(/=+$/, '');
-      }
-
-      // -- PKCE + state generation ----------------------------------------
-      // code_verifier: use 32 random bytes -> base64url (RFC recommends between 43-128 chars; 32 bytes -> ~43 chars)
-      var verifierBytes = randomBytes(32);
-      var code_verifier = base64UrlFromBytes(verifierBytes);
-
-      // code_challenge = BASE64URL( SHA256( ASCII(code_verifier) ) )
-      var code_challenge = sha256Base64Url(code_verifier);
-
-      // state: 16 bytes
-      var stateBytes = randomBytes(16);
-      var state = base64UrlFromBytes(stateBytes);
-
-      // -- build authorize URL --------------------------------------------
-      var authorize = "https://login.microsoftonline.com/${local.azure_config.tenant_id}/oauth2/v2.0/authorize";
-
-      // Use the existing CloudFront distribution domain as the redirect_uri
-      // (assumes aws_cloudfront_distribution.waiting_room already exists in state)
-      var cfDomain = "https://dummy.cloudfront.net"; // Placeholder until TF interpolation works
-      var redirectUri = "https://" + cfDomain + "/callback";
-
-      var params = [];
-      params.push("client_id=${local.azure_config.client_id}");
-      params.push("response_type=code");
-      params.push("redirect_uri=" + encodeURIComponent(redirectUri));
-      params.push("scope=" + encodeURIComponent("openid profile email offline_access"));
-      params.push("state=" + encodeURIComponent(state));
-      params.push("code_challenge=" + encodeURIComponent(code_challenge));
-      params.push("code_challenge_method=S256");
-
-      // pass through login_hint if present
-      if (qs.login_hint && qs.login_hint.value) {
-        var loginHint = qs.login_hint.value;
-        if (loginHint.indexOf('%') === -1) loginHint = encodeURIComponent(loginHint);
-        params.push("login_hint=" + loginHint);
-      }
-
-      var redirectUrl = authorize + "?" + params.join("&");
-
-      // -- cookies --------------------------------------------------------
-      // Short TTL; for testing on CloudFront domain do NOT set Domain= (host-only cookie)
-      var maxAge = 300; // seconds
-      var cookieAttrs = "; Path=/; Secure; HttpOnly; SameSite=None; Max-Age=" + maxAge;
-
-      var pkceCookie = "pkce_ver=" + encodeURIComponent(code_verifier) + cookieAttrs;
-      var stateCookie = "oauth_state=" + encodeURIComponent(state) + cookieAttrs;
-
-      // Return 302 with cookies set (CloudFront Functions supports cookies in response)
-      var response = {
-        statusCode: 302,
-        statusDescription: "Found",
-        headers: {
-          "location": { "value": redirectUrl },
-          "cache-control": { "value": "no-store, no-cache" }
-        },
-        cookies: {
-          "pkce_ver": { "value": pkceCookie },
-          "oauth_state": { "value": stateCookie }
-        }
-      };
-
-      return response;
+  // -- helpers ---------------------------------------------------------
+  function randomBytes(n) {
+    var arr = new Array(n);
+    for (var i = 0; i < n; i++) {
+      arr[i] = Math.floor(Math.random() * 256);
     }
-  EOT
+    return new Uint8Array(arr);
+  }
+
+  function base64UrlFromBytes(bytes) {
+    var b64 = Buffer.from(bytes).toString('base64');
+    // remove padding
+    while (b64.length && b64.charAt(b64.length - 1) === '=') {
+      b64 = b64.slice(0, -1);
+    }
+    // replace + and / without using regex
+    return b64.split('+').join('-').split('/').join('_');
+  }
+
+  // compute SHA256 and return base64url
+  var crypto = require('crypto');
+  function sha256Base64Url(inputStr) {
+    var hash = crypto.createHash('sha256').update(inputStr, 'utf8').digest('base64');
+    while (hash.length && hash.charAt(hash.length - 1) === '=') {
+      hash = hash.slice(0, -1);
+    }
+    return hash.split('+').join('-').split('/').join('_');
+  }
+
+  // -- PKCE + state generation ----------------------------------------
+  var verifierBytes = randomBytes(32);
+  var code_verifier = base64UrlFromBytes(verifierBytes);
+
+  var code_challenge = sha256Base64Url(code_verifier);
+
+  var stateBytes = randomBytes(16);
+  var state = base64UrlFromBytes(stateBytes);
+
+  // -- build authorize URL --------------------------------------------
+  var authorize = "https://login.microsoftonline.com/${local.azure_config.tenant_id}/oauth2/v2.0/authorize";
+
+  // Use the existing CloudFront distribution domain as the redirect_uri
+  // (assumes aws_cloudfront_distribution.waiting_room already exists in state)
+  var cfDomain = "${aws_cloudfront_distribution.waiting_room[0].domain_name}";
+  var redirectUri = "https://" + cfDomain + "/callback";
+
+  var params = [];
+  params.push("client_id=${local.azure_config.client_id}");
+  params.push("response_type=code");
+  params.push("redirect_uri=" + encodeURIComponent(redirectUri));
+  params.push("scope=" + encodeURIComponent("openid profile email offline_access"));
+  params.push("state=" + encodeURIComponent(state));
+  params.push("code_challenge=" + encodeURIComponent(code_challenge));
+  params.push("code_challenge_method=S256");
+
+  if (qs.login_hint && qs.login_hint.value) {
+    var loginHint = qs.login_hint.value;
+    if (loginHint.indexOf('%') === -1) loginHint = encodeURIComponent(loginHint);
+    params.push("login_hint=" + loginHint);
+  }
+
+  var redirectUrl = authorize + "?" + params.join("&");
+
+  // -- cookies --------------------------------------------------------
+  var maxAge = 300; // seconds
+  var cookieAttrs = "; Path=/; Secure; HttpOnly; SameSite=None; Max-Age=" + maxAge;
+
+  var pkceCookie = "pkce_ver=" + encodeURIComponent(code_verifier) + cookieAttrs;
+  var stateCookie = "oauth_state=" + encodeURIComponent(state) + cookieAttrs;
+
+  var response = {
+    statusCode: 302,
+    statusDescription: "Found",
+    headers: {
+      "location": { "value": redirectUrl },
+      "cache-control": { "value": "no-store, no-cache" }
+    },
+    cookies: {
+      "pkce_ver": { "value": pkceCookie },
+      "oauth_state": { "value": stateCookie }
+    }
+  };
+
+  return response;
+}
+EOT
 
   publish = true
 }
-
 ####################
 # CloudFront distribution
 ####################
