@@ -126,8 +126,8 @@ resource "aws_cloudwatch_metric_alarm" "edrms_app_exception_alarm" {
   threshold           = "5"
   datapoints_to_alarm = "1"
   treat_missing_data  = "notBreaching"
-  alarm_actions = [aws_sns_topic.cloudwatch_slack.arn]
-  ok_actions    = [aws_sns_topic.cloudwatch_slack.arn]
+  alarm_actions       = [aws_sns_topic.cloudwatch_slack.arn]
+  ok_actions          = [aws_sns_topic.cloudwatch_slack.arn]
 
   tags = local.tags
 }

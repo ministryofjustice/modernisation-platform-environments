@@ -1,13 +1,13 @@
 locals {
   default_arguments = {
-    "--job-language"                     = var.job_language
-    "--job-bookmark-option"              = var.bookmark_options[var.bookmark]
-    "--TempDir"                          = var.temp_dir
-    "--checkpoint.location"              = var.checkpoint_dir
-    "--spark-event-logs-path"            = var.spark_event_logs
-    "--enable-glue-datacatalog"          = "true"
-    "--enable-job-insights"              = "true"
-    "--enable-spark-ui"                  = var.enable_spark_ui
+    "--job-language"            = var.job_language
+    "--job-bookmark-option"     = var.bookmark_options[var.bookmark]
+    "--TempDir"                 = var.temp_dir
+    "--checkpoint.location"     = var.checkpoint_dir
+    "--spark-event-logs-path"   = var.spark_event_logs
+    "--enable-glue-datacatalog" = "true"
+    "--enable-job-insights"     = "true"
+    "--enable-spark-ui"         = var.enable_spark_ui
   }
 
   tags = var.tags

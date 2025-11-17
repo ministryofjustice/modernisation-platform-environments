@@ -74,9 +74,9 @@ locals {
   # This map will either contain the prod, dev or preprod SANS during the plan/apply stage
   # This map is used to assign the aliases for the certificate and the distribution below.
   cloudfront_sans_map = {
-    production     = local.cloudfront_nginx_prod_sans
-    development    = local.cloudfront_nginx_nonprod_sans
-    preproduction  = local.cloudfront_nginx_nonprod_sans
+    production    = local.cloudfront_nginx_prod_sans
+    development   = local.cloudfront_nginx_nonprod_sans
+    preproduction = local.cloudfront_nginx_nonprod_sans
   }
 
   # Final SANs to apply to cert or distribution. Pull the entry from the above map dependent on environment

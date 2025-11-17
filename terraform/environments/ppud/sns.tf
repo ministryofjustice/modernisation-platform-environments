@@ -356,8 +356,8 @@ resource "aws_sns_topic_subscription" "ses_logging_subscription_uat" {
   count     = local.is-preproduction == true ? 1 : 0
   topic_arn = aws_sns_topic.ses_logging_uat[0].arn
   protocol  = "lambda"
-# endpoint  = aws_lambda_function.terraform_lambda_func_ses_logging_uat[0].arn
-  endpoint  = aws_lambda_function.lambda_functions["ses_logging_preproduction"].arn
+  # endpoint  = aws_lambda_function.terraform_lambda_func_ses_logging_uat[0].arn
+  endpoint = aws_lambda_function.lambda_functions["ses_logging_preproduction"].arn
 }
 
 resource "aws_sns_topic_policy" "ses_logging_uat_topic_policy" {
