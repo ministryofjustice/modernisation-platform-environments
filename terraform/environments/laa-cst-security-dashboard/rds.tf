@@ -8,7 +8,7 @@ resource "aws_db_instance" "cst_db" {
   engine_version              = local.application_data.accounts[local.environment].engine_version
   instance_class              = local.application_data.accounts[local.environment].instance_class
   username                    = local.application_data.accounts[local.environment].db_username
-  password                    = random_password.cst_db.result
+  password                    = random_password.cst_db[0]
   skip_final_snapshot         = true
   publicly_accessible         = false
   vpc_security_group_ids      = [aws_security_group.postgresql_db_sc[0].id]
@@ -72,7 +72,7 @@ resource "aws_db_instance" "cst_db_dev" {
   engine_version              = local.application_data.accounts[local.environment].engine_version
   instance_class              = local.application_data.accounts[local.environment].instance_class
   username                    = local.application_data.accounts[local.environment].db_username
-  password                    = random_password.cst_db_dev.result
+  password                    = random_password.cst_db_dev[0]
   skip_final_snapshot         = true
   publicly_accessible         = true
   vpc_security_group_ids      = [aws_security_group.postgresql_db_sc_dev[0].id]
@@ -134,7 +134,7 @@ resource "null_resource" "setup_db" {
       DB_HOSTNAME          = aws_db_instance.cst_db_dev[0].address
       DB_NAME              = aws_db_instance.cst_db_dev[0].db_name
       cst_DB_USERNAME = aws_db_instance.cst_db_dev[0].username
-      cst_DB_PASSWORD = random_password.cst_db_dev.result
+      cst_DB_PASSWORD = random_password.cst_db_dev[0]
     }
   }
   triggers = {
