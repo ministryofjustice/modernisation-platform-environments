@@ -42,7 +42,7 @@
       },
       {
         "name": "APP_ORCH_OAUTH_SCOPE",
-        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_ORCH_OAUTH_SCOPE"
+        "valueFrom": "arn:aws:secretsmanager:${env_account_region}:${env_account_id}:secret:maat/APP_ORCH_OAUTH_SCOPE"
       },
       {
         "name": "APP_MAAT_GOOGLE_TAG_MANAGER_ID",
@@ -62,7 +62,7 @@
       },
       {
         "name": "APP_ORCH_CLIENT_SECRET",
-        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_ORCH_CLIENT_SECRET"
+        "valueFrom": "arn:aws:secretsmanager:${env_account_region}:${env_account_id}:secret:maat/APP_ORCH_CLIENT_SECRET"
       },
       {
         "name": "APP_CAA_CLIENT_ID",
@@ -70,7 +70,7 @@
       },
       {
         "name": "APP_ORCH_CLIENT_ID",
-        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_ORCH_CLIENT_ID"
+        "valueFrom": "arn:aws:secretsmanager:${env_account_region}:${env_account_id}:secret:maat/APP_ORCH_CLIENT_ID"
       },
       {
         "name": "APP_DB_USERID",
@@ -78,7 +78,7 @@
       },
       {
         "name": "APP_ORCH_ENDPOINT",
-        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_ORCH_ENDPOINT"
+        "valueFrom": "arn:aws:secretsmanager:${env_account_region}:${env_account_id}:secret:maat/APP_ORCH_ENDPOINT"
       },
       {
         "name": "APP_CAA_ENDPOINT",
