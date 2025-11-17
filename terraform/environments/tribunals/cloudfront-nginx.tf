@@ -104,11 +104,11 @@ resource "aws_cloudfront_distribution" "tribunals_http_redirect" {
     }
   }
 
-  enabled             = true
-  is_ipv6_enabled     = true
-  comment             = "cloudfront-redirect-${local.environment}"
-  price_class         = "PriceClass_All"
-  http_version        = "http2"
+  enabled         = true
+  is_ipv6_enabled = true
+  comment         = "cloudfront-redirect-${local.environment}"
+  price_class     = "PriceClass_All"
+  http_version    = "http2"
 
 
   # Use the **new dedicated certificate**
@@ -154,7 +154,7 @@ resource "aws_s3_bucket" "cf_redirect_logs" {
   #checkov:skip=CKV2_AWS_62:"Event notifications not required for CloudFront logs bucket"
   #checkov:skip=CKV_AWS_144:"Cross-region replication not required"
   #checkov:skip=CKV_AWS_18:"Access logging not required for CloudFront logs bucket to avoid logging loop"
-  bucket   = "tribunals-redirect-logs-${local.environment}"
+  bucket = "tribunals-redirect-logs-${local.environment}"
 }
 
 resource "aws_s3_bucket_versioning" "cf_redirect_bucket_versioning" {

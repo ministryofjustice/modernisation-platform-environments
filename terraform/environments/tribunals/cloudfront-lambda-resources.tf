@@ -80,8 +80,8 @@ resource "aws_lambda_function" "cloudfront_redirect_lambda" {
   memory_size      = 128
 
   tags = {
-   Name        = "cloudfront_redirect_lambda"
-   Environment = local.environment
+    Name        = "cloudfront_redirect_lambda"
+    Environment = local.environment
   }
 
   lifecycle {
@@ -101,7 +101,7 @@ resource "aws_lambda_permission" "allow_http_cloudfront" {
     "arn:aws:cloudfront::${data.aws_caller_identity.current.account_id}:distribution/${local.cloudfront_distribution_id}" :
     null
   )
-  qualifier     = aws_lambda_function.cloudfront_redirect_lambda.version
+  qualifier = aws_lambda_function.cloudfront_redirect_lambda.version
 }
 
 #Lambda@Edge replicator permission cannot have source_arn; intentional
