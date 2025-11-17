@@ -60,7 +60,7 @@ resource "aws_lakeformation_permissions" "grant_cadt_tables_new" {
 }
 
 resource "aws_lakeformation_permissions" "s3_bucket_permissions_de" {
-  count = var.de_role_arn != null ? 1 : 0
+  count     = var.de_role_arn != null ? 1 : 0
   principal = var.de_role_arn
 
   permissions = ["DATA_LOCATION_ACCESS"]
