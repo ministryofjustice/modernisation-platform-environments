@@ -24,7 +24,6 @@ resource "aws_db_subnet_group" "dbsubnetgroup" {
 }
 
 resource "aws_security_group" "postgresql_db_sc" {
-  count       = local.is-development ? 0 : 1
   name        = "postgres_security_group"
   description = "control access to the database"
   vpc_id      = data.aws_vpc.shared.id
