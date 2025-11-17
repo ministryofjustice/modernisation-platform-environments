@@ -1,5 +1,4 @@
 resource "aws_db_instance" "ncas_db" {
-  count                       = local.is-development ? 0 : 1
   allocated_storage           = local.application_data.accounts[local.environment].allocated_storage
   db_name                     = local.application_data.accounts[local.environment].db_name
   storage_type                = local.application_data.accounts[local.environment].storage_type
@@ -10,7 +9,7 @@ resource "aws_db_instance" "ncas_db" {
   username                    = local.application_data.accounts[local.environment].db_username
   password                    = random_password.password.result
   skip_final_snapshot         = true
-  publicly_accessible         = false
+  publicly_accessible         = local.is-development ? true : false
   vpc_security_group_ids      = [aws_security_group.postgresql_db_sc[0].id]
   db_subnet_group_name        = aws_db_subnet_group.dbsubnetgroup.name
   allow_major_version_upgrade = true
@@ -62,63 +61,6 @@ resource "aws_security_group" "postgresql_db_sc" {
   }
 }
 
-// DB setup for the development environment (set to publicly accessible to allow GitHub Actions access):
-resource "aws_db_instance" "ncas_db_dev" {
-  count                       = local.is-development ? 1 : 0
-  allocated_storage           = local.application_data.accounts[local.environment].allocated_storage
-  db_name                     = local.application_data.accounts[local.environment].db_name
-  storage_type                = local.application_data.accounts[local.environment].storage_type
-  engine                      = local.application_data.accounts[local.environment].engine
-  identifier                  = local.application_data.accounts[local.environment].identifier
-  engine_version              = local.application_data.accounts[local.environment].engine_version
-  instance_class              = local.application_data.accounts[local.environment].instance_class
-  username                    = local.application_data.accounts[local.environment].db_username
-  password                    = random_password.password.result
-  skip_final_snapshot         = true
-  publicly_accessible         = true
-  vpc_security_group_ids      = [aws_security_group.postgresql_db_sc_dev[0].id]
-  db_subnet_group_name        = aws_db_subnet_group.dbsubnetgroup.name
-  allow_major_version_upgrade = true
-}
-
-resource "aws_security_group" "postgresql_db_sc_dev" {
-  count       = local.is-development ? 1 : 0
-  name        = "postgres_security_group_dev"
-  description = "control access to the database"
-  vpc_id      = data.aws_vpc.shared.id
-
-  ingress {
-    from_port       = 5432
-    to_port         = 5432
-    protocol        = "tcp"
-    description     = "Allows ECS service to access RDS"
-    security_groups = [aws_security_group.ecs_service.id]
-  }
-  ingress {
-    from_port   = 5432
-    to_port     = 5432
-    protocol    = "tcp"
-    description = "Allows Github Actions to access RDS"
-    cidr_blocks = ["${jsondecode(data.http.myip.response_body)["ip"]}/32"]
-  }
-  ingress {
-    protocol    = "tcp"
-    description = "Allow PSQL traffic from bastion"
-    from_port   = 5432
-    to_port     = 5432
-    security_groups = [
-      module.bastion_linux.bastion_security_group
-    ]
-  }
-  egress {
-    description = "allow all outbound traffic"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
 data "http" "myip" {
   url = "http://ipinfo.io/json"
 }
@@ -127,7 +69,7 @@ data "http" "myip" {
 resource "null_resource" "setup_dev_db" {
   count = local.is-development ? 1 : 0
 
-  depends_on = [aws_db_instance.ncas_db_dev[0]]
+  depends_on = [aws_db_instance.ncas_db[0]]
 
   provisioner "local-exec" {
     interpreter = ["bash", "-c"]
