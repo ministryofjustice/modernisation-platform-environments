@@ -89,8 +89,7 @@ resource "aws_ecs_task_definition" "cst_task_definition" {
     }
   ])
   runtime_platform {
-    operating_system_family = "WINDOWS_SERVER_2019_CORE"
-    cpu_architecture        = "X86_64"
+    operating_system_family = "UBUNTU"
   }
 }
 
