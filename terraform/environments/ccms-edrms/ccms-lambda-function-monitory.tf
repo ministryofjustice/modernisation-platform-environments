@@ -46,7 +46,7 @@ resource "aws_lambda_function" "edrms_docs_exception_monitor" {
   filename         = "./lambda/edrms_docs_exception.zip"
   source_code_hash = filebase64sha256("./lambda/edrms_docs_exception.zip")
   function_name    = "${local.application_name}-${local.environment}-edrms-docs-exception-monitor"
-  role             = aws_iam_role.lambda_edrms_docs_exception_monitor_role.arn
+  role             = aws_iam_role.lambda_edrms_docs_exception_role.arn
   handler          = "lambda_function.lambda_handler"
   runtime          = "python3.13"
   timeout          = 30
