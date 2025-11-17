@@ -76,10 +76,6 @@ resource "aws_ecs_task_definition" "cst_task_definition" {
         {
           name  = "supportTeam"
           value = "${local.application_data.accounts[local.environment].support_team}"
-        },
-        {
-          name  = "ida:ClientId"
-          value = "${local.application_data.accounts[local.environment].client_id}"
         }
       ]
     }
@@ -147,18 +143,10 @@ resource "aws_ecs_task_definition" "cst_task_definition_dev" {
         {
           name  = "supportTeam"
           value = "${local.application_data.accounts[local.environment].support_team}"
-        },
-        {
-          name  = "ida:ClientId"
-          value = "${local.application_data.accounts[local.environment].client_id}"
         }
       ]
     }
   ])
-  runtime_platform {
-    operating_system_family = "WINDOWS_SERVER_2019_CORE"
-    cpu_architecture        = "X86_64"
-  }
 }
 
 resource "aws_ecs_service" "cst_ecs_service" {
