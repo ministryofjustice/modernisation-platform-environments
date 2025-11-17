@@ -61,6 +61,10 @@ locals {
             "Ec2PreprodWebPolicy",
           ])
         })
+        instance = merge(local.ec2_instances.bip.instance, {
+          #instance_type = "t3.small"
+          instance_type = "t3.medium"
+        })
         tags = merge(local.ec2_autoscaling_groups.web.tags, {
           oracle-db-hostname = "db.pp.oasys.hmpps-preproduction.modernisation-platform.internal"
           oracle-db-sid      = "PPOASYS" # "OASPROD"
@@ -79,6 +83,7 @@ locals {
         })
         instance = merge(local.ec2_instances.bip.instance, {
           ami = "ami-0d206b8546ea2b68a" # to prevent instances being re-created due to recreated AMI
+          instance_type = "t3.xlarge" #### remove to change to "t3.large"
         })
         tags = merge(local.ec2_instances.bip.tags, {
           bip-db-hostname     = "pp-oasys-db-a"
