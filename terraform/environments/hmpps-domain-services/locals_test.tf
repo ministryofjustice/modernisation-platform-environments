@@ -138,7 +138,8 @@ locals {
           }
         })
         tags = merge(local.ec2_instances.jumpserver.tags, {
-          domain-name = "azure.noms.root"
+          domain-name         = "azure.noms.root"
+          instance-scheduling = "skip-scheduling"
         })
       })
 
