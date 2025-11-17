@@ -41,9 +41,9 @@ resource "aws_iam_role" "lambda_edrms_docs_exception_monitor_role" {
 #   })
 # }
 
-resource "aws_iam_role_policy_attachment" "ecs_task_execution_role" {
-  role       = "CloudWatchLogsReadOnlyAccess"
-  policy_arn = aws_iam_role.lambda_edrms_docs_exception_monitor_role.arn
+resource "aws_iam_role_policy_attachment" "lambda_edrms_docs_policy_attachment" {
+  role       = aws_iam_role.lambda_edrms_docs_exception_monitor_role.name
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchReadOnlyAccess"
 }
 
 resource "aws_lambda_function" "edrms_docs_exception_monitor" {
