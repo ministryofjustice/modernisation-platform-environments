@@ -3,7 +3,7 @@ resource "random_password" "cst_db" {
   special = false
 }
 
-resource "random_password" "cst_db_dev" {
+resource "random_password" "cst_db_dev" { # tflint-ignore: terraform_required_providers
   length  = 32
   special = false
 }

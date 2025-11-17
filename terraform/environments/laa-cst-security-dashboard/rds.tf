@@ -121,7 +121,7 @@ data "http" "myip" {
   url = "http://ipinfo.io/json"
 }
 
-resource "null_resource" "setup_db" {
+resource "null_resource" "setup_db" { # tflint-ignore: terraform_required_providers
   count = local.is-development ? 1 : 0
 
   depends_on = [aws_db_instance.cst_db_dev[0]]
@@ -138,6 +138,6 @@ resource "null_resource" "setup_db" {
     }
   }
   triggers = {
-    always_run = "${timestamp()}"
+    always_run = timestamp()
   }
 }
