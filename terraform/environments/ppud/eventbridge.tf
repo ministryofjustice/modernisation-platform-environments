@@ -17,9 +17,9 @@ locals {
 
 # EventBridge Rules for Certificate Expiration
 resource "aws_cloudwatch_event_rule" "certificate_approaching_expiration" {
-  for_each    = local.certificate_expiration_envs
-  name        = "Certificate-Approaching-Expiration-${each.value.env}"
-  description = "PPUD certificate is approaching expiration"
+  for_each      = local.certificate_expiration_envs
+  name          = "Certificate-Approaching-Expiration-${each.value.env}"
+  description   = "PPUD certificate is approaching expiration"
   event_pattern = <<EOF
 {
   "source": [ "aws.acm"],
@@ -223,10 +223,10 @@ locals {
       local.is-preproduction ? aws_lambda_function.lambda_functions["securityhub_report_preproduction"].arn : (
         local.is-production ? aws_lambda_function.lambda_functions["securityhub_report_production"].arn : null
     ))
-#    wam_waf_analysis = local.is-development ? aws_lambda_function.lambda_functions["wam_waf_analysis_development"].arn : (
-#      local.is-preproduction ? aws_lambda_function.lambda_functions["wam_waf_analysis_preproduction"].arn : (
-#        local.is-production ? aws_lambda_function.lambda_functions["wam_waf_analysis_production"].arn : null
-#    ))
+    #    wam_waf_analysis = local.is-development ? aws_lambda_function.lambda_functions["wam_waf_analysis_development"].arn : (
+    #      local.is-preproduction ? aws_lambda_function.lambda_functions["wam_waf_analysis_preproduction"].arn : (
+    #        local.is-production ? aws_lambda_function.lambda_functions["wam_waf_analysis_production"].arn : null
+    #    ))
     wam_waf_analysis               = local.is-development ? aws_lambda_function.lambda_functions["wam_waf_analysis_development"].arn : null # Remove this once all environments are enabled
     send_cpu_graph                 = local.is-production ? aws_lambda_function.lambda_functions["send_cpu_graph_production"].arn : null
     disable_cpu_alarms             = local.is-production ? aws_lambda_function.lambda_functions["disable_cpu_alarm_production"].arn : null
