@@ -28,7 +28,7 @@ resource "aws_iam_role_policy" "lambda_policy" {
         Action = [
           "logs:GetLogEvents"
         ]
-        Resource = "*"
+        Resource =  "arn:aws:logs:*:*:*"
       },
       {
         Effect = "Allow"
@@ -80,4 +80,6 @@ resource "aws_cloudwatch_log_subscription_filter" "edrms_docs_exception_filter" 
   log_group_name  = aws_cloudwatch_log_group.log_group_edrms.name
   filter_pattern  = "\"EdrmsDocumentException\""
   destination_arn = aws_lambda_function.edrms_docs_exception_monitor.arn
+
+  depends_on = [ aws_lambda_permission.allow_cloudwatch_invoke ]
 }
