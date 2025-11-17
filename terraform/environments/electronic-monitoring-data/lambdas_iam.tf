@@ -753,7 +753,7 @@ data "aws_iam_policy_document" "load_mdss_lambda_role_policy_document" {
       "s3:DeleteObject",
     ]
     resources = [
-      "${module.s3-create-a-derived-table-bucket.bucket.arn}/staging/allied_mdss_pipeline/*",
+      "${module.s3-create-a-derived-table-bucket.bucket.arn}/staging/allied_mdss${local.db_suffix}_pipeline/*",
       "${module.s3-athena-bucket.bucket.arn}/output/*",
     ]
   }
@@ -765,7 +765,7 @@ data "aws_iam_policy_document" "load_mdss_lambda_role_policy_document" {
       "s3:GetObject",
     ]
     resources = [
-      "${module.s3-raw-formatted-data-bucket.bucket.arn}/*"
+      "${module.s3-raw-formatted-data-bucket.bucket.arn}/allied/mdss/*"
     ]
   }
   statement {
