@@ -860,3 +860,9 @@ module "share_db_with_mdss_lambda_role" {
   db_exists               = true
   de_role_arn             = null
 }
+
+resource "aws_lakeformation_permissions" "add_create_db" {
+  permissions      = ["CREATE_DATABASE", "DROP"]
+  principal        = aws_iam_role.load_mdss.arn
+  catalog_resource = true
+}
