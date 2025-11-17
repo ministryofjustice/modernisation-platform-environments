@@ -170,9 +170,6 @@ resource "aws_ecs_task_definition" "cst_task_definition_dev" {
 }
 
 resource "aws_ecs_service" "cst_ecs_service" {
-  depends_on = [
-    aws_lb_listener.cst_lb
-  ]
   count                             = local.is-development ? 0 : 1
   name                              = var.networking[0].application
   cluster                           = aws_ecs_cluster.cst_cluster.id
@@ -194,9 +191,6 @@ resource "aws_ecs_service" "cst_ecs_service" {
 }
 
 resource "aws_ecs_service" "cst_ecs_service_dev" {
-  depends_on = [
-    aws_lb_listener.cst_lb
-  ]
   count                             = local.is-development ? 1 : 0
   name                              = var.networking[0].application
   cluster                           = aws_ecs_cluster.cst_cluster.id
