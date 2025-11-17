@@ -23,7 +23,7 @@ resource "aws_instance" "oem_app" {
     env_fqdn = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
     hostname = "laa-oem-app"
   }))
-  vpc_security_group_ids = [aws_security_group.oem_app_security_group_1.id, aws_security_group.oem_app_security_group_2.id]
+  vpc_security_group_ids = [aws_security_group.oem_app_security_group.id]
 
   root_block_device {
     delete_on_termination = true
@@ -81,12 +81,12 @@ resource "aws_volume_attachment" "oem_app_volume_swap" {
 }
 
 resource "aws_ebs_volume" "oem_app_volume_opt_oem_app" {
+  snapshot_id       = length(local.application_data.accounts[local.environment].snapshot_id_app_opt_oem_app) > 0 ? local.application_data.accounts[local.environment].snapshot_id_app_opt_oem_app : null
   availability_zone = local.application_data.accounts[local.environment].ec2_zone
   encrypted         = true
   iops              = 3000
   kms_key_id        = data.aws_kms_key.ebs_shared.arn
   size              = 50
-  snapshot_id       = data.aws_ebs_snapshot.oem_app_volume_opt_oem_app.id
   type              = "gp3"
   depends_on        = [resource.aws_instance.oem_app]
 
@@ -112,12 +112,12 @@ resource "aws_volume_attachment" "oem_app_volume_opt_oem_app" {
 }
 
 resource "aws_ebs_volume" "oem_app_volume_opt_oem_inst" {
+  snapshot_id       = length(local.application_data.accounts[local.environment].snapshot_id_app_opt_oem_inst) > 0 ? local.application_data.accounts[local.environment].snapshot_id_app_opt_oem_inst : null
   availability_zone = local.application_data.accounts[local.environment].ec2_zone
   encrypted         = true
   iops              = 3000
   kms_key_id        = data.aws_kms_key.ebs_shared.arn
   size              = 50
-  snapshot_id       = data.aws_ebs_snapshot.oem_app_volume_opt_oem_inst.id
   type              = "gp3"
   depends_on        = [resource.aws_instance.oem_app]
 
