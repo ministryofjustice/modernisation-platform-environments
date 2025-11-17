@@ -94,7 +94,7 @@ resource "aws_ecs_service" "ncas_ecs_service" {
     aws_lb_listener.ncas_lb
   ]
 
-  name                              = var.networking.application
+  name                              = var.networking[0].application
   cluster                           = aws_ecs_cluster.ncas_cluster.id
   task_definition                   = aws_ecs_task_definition.ncas_task_definition.arn
   launch_type                       = "FARGATE"
