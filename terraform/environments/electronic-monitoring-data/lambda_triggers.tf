@@ -162,3 +162,27 @@ resource "aws_s3_bucket_notification" "load_dms_output_event" {
 
   depends_on = [module.load_dms_output_event_queue]
 }
+
+
+# ----------------------------------------------
+# Load MDSS data sqs queue
+# ----------------------------------------------
+
+module "load_mdss_event_queue" {
+  source               = "./modules/sqs_s3_lambda_trigger"
+  bucket               = module.s3-raw-formatted-data-bucket.bucket
+  lambda_function_name = module.load_mdss_lambda.lambda_function_name
+  bucket_prefix        = local.bucket_prefix
+}
+
+resource "aws_s3_bucket_notification" "load_dms_output_event" {
+  bucket = module.s3-raw-formatted-data-bucket.bucket.id
+
+  queue {
+    queue_arn = module.load_mdss_event_queue.sqs_queue.arn
+    events    = ["s3:ObjectCreated:*"]
+  }
+
+  depends_on = [module.load_mdss_event_queue]
+}
+
