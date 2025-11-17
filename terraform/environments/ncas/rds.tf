@@ -16,6 +16,7 @@ resource "aws_db_instance" "ncas_db" {
   allow_major_version_upgrade = true
   ca_cert_identifier          = "rds-ca-rsa2048-g1"
   apply_immediately           = true
+  maintenance_window          = "tue:20:20-tue:20:50"
 }
 
 resource "aws_db_subnet_group" "dbsubnetgroup" {
