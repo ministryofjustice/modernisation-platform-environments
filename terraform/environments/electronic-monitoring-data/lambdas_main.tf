@@ -322,8 +322,8 @@ module "load_mdss_lambda" {
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "load_mdss"
-  role_name                      = aws_iam_role.load_dms_output.name
-  role_arn                       = aws_iam_role.load_dms_output.arn
+  role_name                      = aws_iam_role.load_mdss.name
+  role_arn                       = aws_iam_role.load_mdss.arn
   handler                        = "load_mdss.handler"
   memory_size                    = 10240
   timeout                        = 900
