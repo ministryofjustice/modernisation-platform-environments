@@ -47,6 +47,9 @@ locals {
 
     ec2_autoscaling_groups = {
       t1-oasys-web-a = merge(local.ec2_autoscaling_groups.web, {
+        autoscaling_group = merge(local.ec2_autoscaling_groups.web.autoscaling_group, {
+          desired_capacity    = 0
+        }
         autoscaling_schedules = {
           scale_up   = { recurrence = "0 5 * * Mon-Fri", desired_capacity = 0 } ####
           scale_down = { recurrence = "0 19 * * Mon-Fri", desired_capacity = 0 }
@@ -71,6 +74,9 @@ locals {
       })
 
       t2-oasys-web-a = merge(local.ec2_autoscaling_groups.web, {
+        autoscaling_group = merge(local.ec2_autoscaling_groups.web.autoscaling_group, {
+          desired_capacity    = 0
+        }
         autoscaling_schedules = {
           scale_up   = { recurrence = "0 5 * * Mon-Fri", desired_capacity = 0 } ###ß
           scale_down = { recurrence = "0 19 * * Mon-Fri", desired_capacity = 0 }
