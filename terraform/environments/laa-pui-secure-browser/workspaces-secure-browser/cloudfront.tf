@@ -60,7 +60,7 @@ function handler(event) {
 
   // Use the existing CloudFront distribution domain as the redirect_uri
   // (assumes aws_cloudfront_distribution.waiting_room already exists in state)
-  var cfDomain = "${aws_cloudfront_distribution.waiting_room[0].domain_name}";
+  var cfDomain = "dummy.cloudfront.net";
   var redirectUri = "https://" + cfDomain + "/callback";
 
   var params = [];
