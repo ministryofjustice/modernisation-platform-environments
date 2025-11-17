@@ -173,8 +173,7 @@ locals {
         }
         instance = merge(local.ec2_instances.db19c.instance, {
           disable_api_termination = true
-          instance_type           = "r6i.xlarge"
-          #instance_type           = "r6i.large"
+          instance_type           = "r6i.large"
         })
         tags = merge(local.ec2_instances.db19c.tags, {
           bip-db-name         = "T1BIPINF"
@@ -228,8 +227,7 @@ locals {
         }
         instance = merge(local.ec2_instances.db19c.instance, {
           disable_api_termination = true
-          #instance_type           = "r6i.large"
-          instance_type           = "r6i.xlarge"
+          instance_type           = "r6i.large"
         })
         tags = merge(local.ec2_instances.db19c.tags, {
           bip-db-name         = "T2BIPINF"
