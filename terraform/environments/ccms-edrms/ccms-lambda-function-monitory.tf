@@ -16,29 +16,34 @@ resource "aws_iam_role" "lambda_edrms_docs_exception_monitor_role" {
   })
 }
 
-resource "aws_iam_role_policy" "lambda_policy" {
-  name = "${local.application_name}-${local.environment}-edrms_docs_exception_monitor_policy"
-  role = aws_iam_role.lambda_edrms_docs_exception_monitor_role.id
+# resource "aws_iam_role_policy" "lambda_policy" {
+#   name = "${local.application_name}-${local.environment}-edrms_docs_exception_monitor_policy"
+#   role = aws_iam_role.lambda_edrms_docs_exception_monitor_role.id
 
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "logs:GetQueryResults","logs:GetLogRecord"
-        ]
-        Resource =  "arn:aws:logs:*:*:*"
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "sns:Publish"
-        ]
-        Resource = [ aws_sns_topic.cloudwatch_slack.arn ]
-      }
-    ]
-  })
+#   policy = jsonencode({
+#     Version = "2012-10-17"
+#     Statement = [
+#       {
+#         Effect = "Allow"
+#         Action = [
+#           "logs:GetLogEvents","logs:GetLogRecord"
+#         ]
+#         Resource =  "arn:aws:logs:*:*:*"
+#       },
+#       {
+#         Effect = "Allow"
+#         Action = [
+#           "sns:Publish"
+#         ]
+#         Resource = [ aws_sns_topic.cloudwatch_slack.arn ]
+#       }
+#     ]
+#   })
+# }
+
+resource "aws_iam_role_policy_attachment" "ecs_task_execution_role" {
+  role       = "CloudWatchLogsReadOnlyAccess"
+  policy_arn = aws_iam_role.lambda_edrms_docs_exception_monitor_role.arn
 }
 
 resource "aws_lambda_function" "edrms_docs_exception_monitor" {
