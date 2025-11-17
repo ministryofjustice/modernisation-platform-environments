@@ -37,11 +37,6 @@ resource "aws_iam_role_policy" "lambda_edrms_docs_exception_policy" {
   })
 }
 
-# resource "aws_iam_role_policy_attachment" "lambda_edrms_docs_policy_attachment" {
-#   role       = aws_iam_role.lambda_edrms_docs_exception_role.name
-#   policy_arn = aws_iam_role_policy.lambda_edrms_docs_exception_policy.arn
-# }
-
 resource "aws_lambda_function" "edrms_docs_exception_monitor" {
   filename         = "./lambda/edrms_docs_exception.zip"
   source_code_hash = filebase64sha256("./lambda/edrms_docs_exception.zip")
