@@ -154,9 +154,12 @@ resource "aws_cloudfront_distribution" "waiting_room" {
     # Forward cookies & querystrings so Lambda can read pkce_ver and oauth_state
     forwarded_values {
       query_string = true
+
       cookies {
         forward = "all"
       }
+
+      headers = []
     }
 
     viewer_protocol_policy = "redirect-to-https"
@@ -168,6 +171,7 @@ resource "aws_cloudfront_distribution" "waiting_room" {
 
     compress = false
   }
+
 
   default_cache_behavior {
     allowed_methods        = ["GET", "HEAD"]
