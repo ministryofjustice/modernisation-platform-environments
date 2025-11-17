@@ -25,8 +25,8 @@ resource "aws_iam_role_policy" "lambda_edrms_docs_exception_policy" {
     Statement = [
       {
         Effect   = "Allow"
-        Action   = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"]
-        Resource = "arn:aws:logs:*:*:*"
+        Action   = ["logs:CreateLogStream", "logs:PutLogEvents"]
+        Resource = [ "arn:aws:logs:$${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:${aws_cloudwatch_log_group.log_group_edrms.arn}:*"]
       },
       {
         Effect   = "Allow"
