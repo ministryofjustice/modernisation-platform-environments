@@ -1,6 +1,6 @@
 resource "aws_security_group" "oem_db_security_group" {
   name_prefix = "${local.application_name}-db-server-sg-"
-  description = "controls access to the ebs app server"
+  description = "Controls access to the ebs app server"
   vpc_id      = data.aws_vpc.shared.id
 
   tags = merge(tomap(
