@@ -1,5 +1,5 @@
-resource "aws_iam_role" "lambda_edrms_docs_exception_monitor_role" {
-  name = "${local.application_name}-${local.environment}-edrms_docs_exception_monitor_role"
+resource "aws_iam_role" "lambda_edrms_docs_exception_role" {
+  name = "${local.application_name}-${local.environment}-edrms_docs_exception_role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -12,39 +12,35 @@ resource "aws_iam_role" "lambda_edrms_docs_exception_monitor_role" {
     }]
   })
   tags = merge(local.tags, {
-    Name = "${local.application_name}-${local.environment}-edrms-docs-exception-monitor"
+    Name = "${local.application_name}-${local.environment}-edrms-docs-exception-role"
   })
 }
 
-# resource "aws_iam_role_policy" "lambda_policy" {
-#   name = "${local.application_name}-${local.environment}-edrms_docs_exception_monitor_policy"
-#   role = aws_iam_role.lambda_edrms_docs_exception_monitor_role.id
+resource "aws_iam_role_policy" "lambda_edrms_docs_exception_policy" {
+  name = "${local.application_name}-${local.environment}-edrms-docs-exception_policy"
+  role = aws_iam_role.lambda_edrms_docs_exception_role.id
 
-#   policy = jsonencode({
-#     Version = "2012-10-17"
-#     Statement = [
-#       {
-#         Effect = "Allow"
-#         Action = [
-#           "logs:GetLogEvents","logs:GetLogRecord"
-#         ]
-#         Resource =  "arn:aws:logs:*:*:*"
-#       },
-#       {
-#         Effect = "Allow"
-#         Action = [
-#           "sns:Publish"
-#         ]
-#         Resource = [ aws_sns_topic.cloudwatch_slack.arn ]
-#       }
-#     ]
-#   })
-# }
-
-resource "aws_iam_role_policy_attachment" "lambda_edrms_docs_policy_attachment" {
-  role       = aws_iam_role.lambda_edrms_docs_exception_monitor_role.name
-  policy_arn = "arn:aws:iam::aws:policy/CloudWatchReadOnlyAccess"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"]
+        Resource = "arn:aws:logs:*:*:*"
+      },
+      {
+        Effect   = "Allow"
+        Action   = ["sns:Publish"]
+        Resource = [aws_sns_topic.cloudwatch_slack.arn]
+      }
+    ]
+  })
 }
+
+# resource "aws_iam_role_policy_attachment" "lambda_edrms_docs_policy_attachment" {
+#   role       = aws_iam_role.lambda_edrms_docs_exception_role.name
+#   policy_arn = aws_iam_role_policy.lambda_edrms_docs_exception_policy.arn
+# }
 
 resource "aws_lambda_function" "edrms_docs_exception_monitor" {
   filename         = "./lambda/edrms_docs_exception.zip"
