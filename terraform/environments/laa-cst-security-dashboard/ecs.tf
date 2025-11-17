@@ -88,9 +88,6 @@ resource "aws_ecs_task_definition" "cst_task_definition" {
       ]
     }
   ])
-  runtime_platform {
-    operating_system_family = "UBUNTU"
-  }
 }
 
 //ECS task definition for the development environment:
