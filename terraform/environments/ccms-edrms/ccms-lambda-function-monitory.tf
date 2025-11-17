@@ -54,7 +54,7 @@ resource "aws_lambda_function" "edrms_docs_exception_monitor" {
   environment {
     variables = {
       LOG_GROUP_NAME      = aws_cloudwatch_log_group.log_group_edrms.name
-      SNS_TOPIC_ARN       = aws_sns_topic.certificate_expiration_alerts.arn
+      SNS_TOPIC_ARN       = aws_sns_topic.cloudwatch_slack.arn
     }
   }
 
