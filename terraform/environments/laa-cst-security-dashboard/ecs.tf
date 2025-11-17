@@ -316,6 +316,36 @@ resource "aws_iam_role_policy" "app_task" {
   EOF
 }
 
+resource "aws_security_group" "cst_ecs_sc" {
+  name        = "ecs security group"
+  description = "control access to the ecs"
+  vpc_id      = data.aws_vpc.shared.id
+
+  ingress {
+    description = "allow access on HTTPS for the Global Protect VPN"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["35.176.93.186/32"]
+  }
+
+  egress {
+    description = "allow all outbound traffic for port 80"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    description = "allow all outbound traffic for port 443"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 resource "aws_security_group" "ecs_service" {
   name_prefix = "ecs-service-sg-"
   vpc_id      = data.aws_vpc.shared.id
@@ -325,7 +355,7 @@ resource "aws_security_group" "ecs_service" {
     to_port         = 80
     protocol        = "tcp"
     description     = "Allow traffic on port 80 from load balancer"
-    security_groups = [aws_security_group.cst_lb_sc.id]
+    security_groups = [aws_security_group.cst_ecs_sc.id]
   }
 
   egress {
