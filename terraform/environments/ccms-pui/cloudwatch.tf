@@ -34,6 +34,7 @@ resource "aws_cloudwatch_metric_alarm" "container_pui_count" {
   threshold           = local.application_data.accounts[local.environment].pui_app_count
   dimensions = {
     ClusterName = aws_ecs_cluster.main.name
+    ServiceName = aws_ecs_service.pui.name
   }
   alarm_description         = "The number of PUI ECS tasks is less than ${local.application_data.accounts[local.environment].pui_app_count}. Runbook: https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
   treat_missing_data        = "breaching"
@@ -87,23 +88,27 @@ resource "aws_cloudwatch_metric_alarm" "Status_Check_Failure" {
 }
 
 # Underlying waf Instance Status Check Failure
-resource "aws_cloudwatch_metric_alarm" "Status_Check_Failure" {
-  alarm_name          = "${local.application_name}-${local.environment}-status-check-failure"
-  alarm_description   = "A pui cluster EC2 instance has failed a status check, Runbook - https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
+resource "aws_cloudwatch_metric_alarm" "waf_high_blocked_requests" {
+  alarm_name        = "${local.application_name}-${local.environment}-waf-high-blocked-requests"
+  alarm_description = "High number of requests blocked by WAF. Potential attack."
+
   comparison_operator = "GreaterThanThreshold"
-  metric_name         = "StatusCheckFailed"
-  statistic           = "Average"
-  namespace           = "AWS/EC2"
-  period              = "60"
-  evaluation_periods  = "5"
-  threshold           = "1"
+  metric_name         = "BlockedRequests"
+  namespace           = "AWS/WAFV2"
+  statistic           = "Sum"
+  period              = 60
+  evaluation_periods  = 5
+  threshold           = 50                   # tune for your workload
   treat_missing_data  = "notBreaching"
+
   dimensions = {
     WebACL = aws_wafv2_web_acl.pui_web_acl.name
-    Scope  = "REGIONAL"
+    Scope = "REGIONAL"
   }
+
   alarm_actions = [aws_sns_topic.cloudwatch_alerts.arn]
   ok_actions    = [aws_sns_topic.cloudwatch_alerts.arn]
 
   tags = local.tags
 }
+
