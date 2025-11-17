@@ -175,12 +175,14 @@ module "load_mdss_event_queue" {
   bucket_prefix        = local.bucket_prefix
 }
 
-resource "aws_s3_bucket_notification" "load_dms_output_event" {
+resource "aws_s3_bucket_notification" "load_mdss_event" {
   bucket = module.s3-raw-formatted-data-bucket.bucket.id
 
   queue {
-    queue_arn = module.load_mdss_event_queue.sqs_queue.arn
-    events    = ["s3:ObjectCreated:*"]
+    queue_arn     = module.load_mdss_event_queue.sqs_queue.arn
+    events        = ["s3:ObjectCreated:*"]
+    filter_prefix = "allied/mdss"
+
   }
 
   depends_on = [module.load_mdss_event_queue]
