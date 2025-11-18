@@ -7,6 +7,36 @@ data "aws_db_subnet_group" "cst_database" {
   name = "${local.application_name}-${local.environment}"
 }
 
+resource "aws_security_group" "cst_rds_sc" {
+  name        = "ecs security group"
+  description = "control access to the rds"
+  vpc_id      = data.aws_vpc.shared.id
+
+  ingress {
+    description = "allow access on HTTPS for the Global Protect VPN"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["35.176.93.186/32"]
+  }
+
+  egress {
+    description = "allow all outbound traffic for port 80"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    description = "allow all outbound traffic for port 443"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 resource "aws_db_instance" "cst_db" {
   identifier              = "cst-postgres-db"
   allocated_storage       = 20
@@ -20,7 +50,7 @@ resource "aws_db_instance" "cst_db" {
   skip_final_snapshot     = true
   deletion_protection     = true
   backup_retention_period = 1
-  vpc_security_group_ids  = [aws_security_group.cst_ecs_sc.id]
+  vpc_security_group_ids  = [aws_security_group.cst_rds_sc.id]
   apply_immediately       = true
 
   tags = {
