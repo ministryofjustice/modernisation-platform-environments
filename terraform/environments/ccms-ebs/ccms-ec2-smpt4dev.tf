@@ -1,5 +1,5 @@
 #Create AWS IAM Role Profile for EC2
-resource "aws_iam_role" "ec2_ssm_role" {
+resource "aws_iam_role" "smtp4dev_ec2_ssm_role" {
   name = "smtp4dev-role"
 
   assume_role_policy = jsonencode({
@@ -17,15 +17,15 @@ resource "aws_iam_role" "ec2_ssm_role" {
 }
 
 # Attach AmazonSSMManagedInstanceCore policy to the role
-resource "aws_iam_role_policy_attachment" "ssm_core_attach" {
-  role       = aws_iam_role.ec2_ssm_role.name
+resource "aws_iam_role_policy_attachment" "smtp4dev_ssm_core_attach" {
+  role       = aws_iam_role.smtp4dev_ec2_ssm_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
 # Instance Profile for SMTP4dev EC2 to use the role
-resource "aws_iam_instance_profile" "ec2_ssm_profile" {
+resource "aws_iam_instance_profile" "smtp4dev_ec2_ssm_profile" {
   name = "smtp4dev-instance-profile"
-  role = aws_iam_role.ec2_ssm_role.name
+  role = aws_iam_role.smtp4dev_ec2_ssm_role.name
 }
 
 # Build smtp4dev EC2 
@@ -38,7 +38,7 @@ resource "aws_instance" "smtp4dev_mock_server" {
   monitoring                  = true
   ebs_optimized               = false
   associate_public_ip_address = false
-  iam_instance_profile        = aws_iam_instance_profile.ec2_ssm_profile.name
+  iam_instance_profile        = aws_iam_instance_profile.smtp4dev_ec2_ssm_profile.name
 
  #place holder for user data changes
   user_data_replace_on_change = false
