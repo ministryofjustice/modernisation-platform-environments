@@ -492,6 +492,15 @@ resource "aws_iam_policy" "maat_ecs_policy_access_params" {
         ]
       },
       {
+        "Effect": "Allow",
+        "Action": [
+          "secretsmanager:GetSecretValue"
+        ],
+        "Resource": [
+          "arn:aws:ssm:${local.env_account_region}:${local.env_account_id}:secret/maat/*"
+        ]
+      },
+      {
         Effect = "Allow"
         Action = [
           "ecr:GetAuthorizationToken",
