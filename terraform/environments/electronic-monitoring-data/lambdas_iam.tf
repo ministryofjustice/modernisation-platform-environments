@@ -743,6 +743,7 @@ module "share_stg_dbs_with_dms_lambda_role" {
 #-----------------------------------------------------------------------------------
 
 data "aws_iam_policy_document" "load_mdss_lambda_role_policy_document" {
+  count = local.is-development ? 0 : 1
   statement {
     sid    = "S3Permissions"
     effect = "Allow"
@@ -755,6 +756,7 @@ data "aws_iam_policy_document" "load_mdss_lambda_role_policy_document" {
     resources = [
       "${module.s3-create-a-derived-table-bucket.bucket.arn}/staging/allied_mdss${local.db_suffix}_pipeline/*",
       "${module.s3-athena-bucket.bucket.arn}/output/*",
+      "${module.s3-athena-bucket.bucket.arn}/*",
     ]
   }
   statement {
@@ -838,21 +840,25 @@ data "aws_iam_policy_document" "load_mdss_lambda_role_policy_document" {
 }
 
 resource "aws_iam_role" "load_mdss" {
+  count = local.is-development ? 0 : 1
   name               = "load_mdss_lambda_role"
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
 }
 
 resource "aws_iam_policy" "load_mdss_lambda_role_policy" {
+  count = local.is-development ? 0 : 1
   name   = "load_mdss_lambda_policy"
   policy = data.aws_iam_policy_document.load_mdss_lambda_role_policy_document.json
 }
 
 resource "aws_iam_role_policy_attachment" "load_mdss_output_lambda_policy_attachment" {
+  count = local.is-development ? 0 : 1
   role       = aws_iam_role.load_mdss.name
   policy_arn = aws_iam_policy.load_mdss_lambda_role_policy.arn
 }
 
 module "share_db_with_mdss_lambda_role" {
+  count = local.is-development ? 0 : 1
   source                  = "./modules/lakeformation_database_share"
   dbs_to_grant            = toset(["allied_mdss${local.db_suffix}"])
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
@@ -862,6 +868,7 @@ module "share_db_with_mdss_lambda_role" {
 }
 
 resource "aws_lakeformation_permissions" "add_create_db" {
+  count = local.is-development ? 0 : 1
   permissions      = ["CREATE_DATABASE", "DROP"]
   principal        = aws_iam_role.load_mdss.arn
   catalog_resource = true
