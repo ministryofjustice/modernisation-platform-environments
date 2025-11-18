@@ -508,58 +508,58 @@ resource "aws_iam_policy" "ecs_task_execution_ssm_policy" {
     {
       "Effect": "Allow",
       "Action": [
-        "ssm:GetParameters"
+        "secretsmanager:GetSecretValue"
       ],
-      "Resource": ["arn:aws:ssm:${var.region}:${var.account_number}:parameter/${var.maatdb_password_secret_name}"]
+      "Resource": ["arn:aws:secretsmanager:${var.region}:${var.account_number}:secret:mlra/${var.maatdb_password_secret_name}"]
     },
     {
       "Effect": "Allow",
       "Action": [
-        "ssm:GetParameters"
+        "secretsmanager:GetSecretValue"
       ],
-      "Resource": ["arn:aws:ssm:${var.region}:${var.account_number}:parameter/${var.gtm_id_secret_name}"]
+      "Resource": ["arn:aws:secretsmanager:${var.region}:${var.account_number}:secret:mlra/${var.gtm_id_secret_name}"]
     },
     {
       "Effect": "Allow",
       "Action": [
-        "ssm:GetParameters"
+        "secretsmanager:GetSecretValue"
       ],
-      "Resource": ["arn:aws:ssm:${var.region}:${var.account_number}:parameter/${var.infox_client_secret}"]
+      "Resource": ["arn:aws:secretsmanager:${var.region}:${var.account_number}:secret:mlra/${var.infox_client_secret}"]
     },
     {
       "Effect": "Allow",
       "Action": [
-        "ssm:GetParameters"
+        "secretsmanager:GetSecretValue"
       ],
-      "Resource": ["arn:aws:ssm:${var.region}:${var.account_number}:parameter/${var.maat_api_client_id_name}"]
+      "Resource": ["arn:aws:secretsmanager:${var.region}:${var.account_number}:secret:mlra/${var.maat_api_client_id_name}"]
     },
     {
       "Effect": "Allow",
       "Action": [
-        "ssm:GetParameters"
+        "secretsmanager:GetSecretValue"
       ],
-      "Resource": ["arn:aws:ssm:${var.region}:${var.account_number}:parameter/${var.maat_api_client_secret_name}"]
+      "Resource": ["arn:aws:secretsmanager:${var.region}:${var.account_number}:secret:mlra/${var.maat_api_client_secret_name}"]
     },
     {
       "Effect": "Allow",
       "Action": [
-        "ssm:GetParameters"
+        "secretsmanager:GetSecretValue"
       ],
-      "Resource": ["arn:aws:ssm:${var.region}:${var.account_number}:parameter/${var.app_master_password_name}"]
+      "Resource": ["arn:aws:secretsmanager:${var.region}:${var.account_number}:secret:mlra/${var.app_master_password_name}"]
     },
     {
       "Effect": "Allow",
       "Action": [
-        "ssm:GetParameters"
+        "secretsmanager:GetSecretValue"
       ],
-      "Resource": ["arn:aws:ssm:${var.region}:${var.account_number}:parameter/${var.app_salt_name}"]
+      "Resource": ["arn:aws:secretsmanager:${var.region}:${var.account_number}:secret:mlra/${var.app_salt_name}"]
     },
     {
       "Effect": "Allow",
       "Action": [
-        "ssm:GetParameters"
+        "secretsmanager:GetSecretValue"
       ],
-      "Resource": ["arn:aws:ssm:${var.region}:${var.account_number}:parameter/${var.app_derivation_iterations_name}"]
+      "Resource": ["arn:aws:secretsmanager:${var.region}:${var.account_number}:secret:mlra/${var.app_derivation_iterations_name}"]
     }
   ]
 }
