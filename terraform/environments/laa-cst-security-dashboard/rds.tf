@@ -1,143 +1,47 @@
-resource "aws_db_instance" "cst_db" {
-  count                       = local.is-development ? 0 : 1
-  allocated_storage           = local.application_data.accounts[local.environment].allocated_storage
-  db_name                     = local.application_data.accounts[local.environment].db_name
-  storage_type                = local.application_data.accounts[local.environment].storage_type
-  engine                      = local.application_data.accounts[local.environment].engine
-  identifier                  = local.application_data.accounts[local.environment].identifier
-  engine_version              = local.application_data.accounts[local.environment].engine_version
-  instance_class              = local.application_data.accounts[local.environment].instance_class
-  username                    = local.application_data.accounts[local.environment].db_username
-  password                    = random_password.cst_db.result
-  skip_final_snapshot         = true
-  publicly_accessible         = false
-  vpc_security_group_ids      = [aws_security_group.postgresql_db_sc[0].id]
-  db_subnet_group_name        = aws_db_subnet_group.dbsubnetgroup.name
-  allow_major_version_upgrade = false
-  auto_minor_version_upgrade  = true
-  ca_cert_identifier          = "rds-ca-rsa2048-g1"
-  apply_immediately           = true
+provider "aws" {
+  region = "eu-west-2"
 }
 
-resource "aws_db_subnet_group" "dbsubnetgroup" {
-  name       = "dbsubnetgroup"
-  subnet_ids = data.aws_subnets.shared-public.ids
+resource "random_password" "cst_db" {
+  length  = 32
+  special = false
 }
 
-resource "aws_security_group" "postgresql_db_sc" {
-  count       = local.is-development ? 0 : 1
-  name        = "postgres_security_group"
-  description = "control access to the database"
-  vpc_id      = data.aws_vpc.shared.id
-  ingress {
-    from_port       = 5432
-    to_port         = 5432
-    protocol        = "tcp"
-    description     = "Allows ECS service to access RDS"
-    security_groups = [aws_security_group.ecs_service.id]
-  }
-  ingress {
-    from_port   = 5432
-    to_port     = 5432
-    protocol    = "tcp"
-    description = "Allows Github Actions to access RDS"
-    cidr_blocks = ["${jsondecode(data.http.myip.response_body)["ip"]}/32"]
-  }
-  ingress {
-    protocol    = "tcp"
-    description = "Allow PSQL traffic from bastion"
-    from_port   = 5432
-    to_port     = 5432
-    security_groups = [
-      module.bastion_linux.bastion_security_group
-    ]
-  }
-  egress {
-    description = "allow all outbound traffic"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+resource "aws_db_subnet_group" "default" {
+  name       = "rds-subnet-group"
+  subnet_ids = ["subnet-xxxxxxxx", "subnet-yyyyyyyy"] # Replace with your subnet IDs
+}
+
+resource "aws_db_instance" "postgres_latest" {
+  identifier              = "cst-postgres-db"
+  allocated_storage       = 20
+  db_subnet_group_name    = aws_db_subnet_group.default.name
+  instance_class          = "db.t3.micro"
+  engine                  = "postgres"
+  engine_version          = "16"
+  username                = "postgresadmin"
+  password                = random_password.cst_db.result
+  publicly_accessible     = false
+  skip_final_snapshot     = true
+  deletion_protection     = true
+  backup_retention_period = 1
+  vpc_security_group_ids  = [aws_security_group.cst_ecs_sc.id]
+  apply_immediately       = true
+
+  tags = {
+    Name = "PostgresLatest"
   }
 }
 
-// DB setup for the development environment (set to publicly accessible to allow GitHub Actions access):
-resource "aws_db_instance" "cst_db_dev" {
-  count                       = local.is-development ? 1 : 0
-  allocated_storage           = local.application_data.accounts[local.environment].allocated_storage
-  db_name                     = local.application_data.accounts[local.environment].db_name
-  storage_type                = local.application_data.accounts[local.environment].storage_type
-  engine                      = local.application_data.accounts[local.environment].engine
-  identifier                  = local.application_data.accounts[local.environment].identifier
-  engine_version              = local.application_data.accounts[local.environment].engine_version
-  instance_class              = local.application_data.accounts[local.environment].instance_class
-  username                    = local.application_data.accounts[local.environment].db_username
-  password                    = random_password.cst_db_dev.result
-  skip_final_snapshot         = true
-  publicly_accessible         = true
-  vpc_security_group_ids      = [aws_security_group.postgresql_db_sc_dev[0].id]
-  db_subnet_group_name        = aws_db_subnet_group.dbsubnetgroup.name
-  allow_major_version_upgrade = true
+output "rds_endpoint" {
+  value = aws_db_instance.postgres_latest.endpoint
 }
 
-resource "aws_security_group" "postgresql_db_sc_dev" {
-  count       = local.is-development ? 1 : 0
-  name        = "postgres_security_group_dev"
-  description = "control access to the database"
-  vpc_id      = data.aws_vpc.shared.id
-  ingress {
-    from_port       = 5432
-    to_port         = 5432
-    protocol        = "tcp"
-    description     = "Allows ECS service to access RDS"
-    security_groups = [aws_security_group.ecs_service.id]
-  }
-  ingress {
-    from_port   = 5432
-    to_port     = 5432
-    protocol    = "tcp"
-    description = "Allows Github Actions to access RDS"
-    cidr_blocks = ["${jsondecode(data.http.myip.response_body)["ip"]}/32"]
-  }
-  ingress {
-    protocol    = "tcp"
-    description = "Allow PSQL traffic from bastion"
-    from_port   = 5432
-    to_port     = 5432
-    security_groups = [
-      module.bastion_linux.bastion_security_group
-    ]
-  }
-  egress {
-    description = "allow all outbound traffic"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+output "rds_master_username" {
+  value = aws_db_instance.postgres_latest.username
 }
 
-data "http" "myip" {
-  url = "http://ipinfo.io/json"
-}
-
-resource "null_resource" "setup_db" { # tflint-ignore: terraform_required_providers
-  count = local.is-development ? 1 : 0
-
-  depends_on = [aws_db_instance.cst_db_dev[0]]
-
-  provisioner "local-exec" {
-    interpreter = ["bash", "-c"]
-    command     = "chmod +x ./setup-dev-db.sh; ./setup-dev-db.sh"
-
-    environment = {
-      DB_HOSTNAME          = aws_db_instance.cst_db_dev[0].address
-      DB_NAME              = aws_db_instance.cst_db_dev[0].db_name
-      cst_DB_USERNAME = aws_db_instance.cst_db_dev[0].username
-      CST_DB_PASSWORD = random_password.cst_db_dev.result
-    }
-  }
-  triggers = {
-    always_run = timestamp()
-  }
+output "rds_master_password" {
+  value = random_password.cst_db.result
+  sensitive = true
 }
