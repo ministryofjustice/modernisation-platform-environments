@@ -198,7 +198,7 @@ resource "aws_sesv2_configuration_set" "ses_events_configuration_set" {
   configuration_set_name = "ses-events-configuration-set-${each.key}"
 
   delivery_options {
-    tls_policy = "Optional"
+    tls_policy = "OPTIONAL"
   }
 
   tags = {
@@ -220,7 +220,7 @@ resource "aws_sesv2_configuration_set_event_destination" "ses_delivery_events" {
   
   event_destination {
     enabled          = true
-    matching_event_types = ["send"]  # "delivery", "bounce", "complaint" options also available
+    matching_event_types = ["SEND"]  # "DELIVERY", "BOUNCE", "COMPLAINT" options also available
 
     sns_destination {
       topic_arn = aws_sns_topic.ses_logging[each.key].arn
