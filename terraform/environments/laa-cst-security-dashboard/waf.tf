@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "eu-west-2"
-}
-
 resource "aws_wafv2_web_acl" "core_rule_set_acl" {
   name        = "core-rule-set-web-acl"
   description = "AWS WAF ACL using the AWS Managed Core Rule Set"
