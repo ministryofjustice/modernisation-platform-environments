@@ -70,6 +70,7 @@ locals {
     "staged_scram_alcohol_monitoring",
     "g4s_atrium_curated",
     "g4s_centurion_curated",
+    "g4s_tasking_curated",
     "curated_fep",
     "g4s_lcm_archive_curated",
   ] : []
