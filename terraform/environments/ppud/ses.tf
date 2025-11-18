@@ -170,6 +170,8 @@ resource "aws_sesv2_email_identity" "ppud_domain" {
     next_signing_key_length = "RSA_2048_BIT"
   }
   
+  configuration_set_name = "ses-events-configuration-set-${each.key}"
+  
   tags = {
     IdentityName = local.application_data.accounts[local.environment].SES_domain
     Environment  = each.key
@@ -224,41 +226,6 @@ resource "aws_sesv2_configuration_set_event_destination" "ses_delivery_events" {
 
     sns_destination {
       topic_arn = aws_sns_topic.ses_logging[each.key].arn
-    }
-  }
-}
-
-#######################################################################
-# Outputs for DNS records (for domain verification)
-#######################################################################
-
-output "ses_verification_records" {
-  value = {
-    for env, identity in aws_sesv2_email_identity.ppud_domain :
-    env => {
-      dkim_cnames = [
-        for token in identity.dkim_signing_attributes[0].tokens :
-        {
-          name  = "${token}._domainkey.${identity.email_identity}"
-          type  = "CNAME"
-          value = "${token}.dkim.amazonses.com"
-        }
-      ]
-      mail_from_mx = {
-        name  = "noreply.${identity.email_identity}"
-        type  = "MX"
-        value = "10 feedback-smtp.eu-west-2.amazonses.com"
-      }
-      spf_txt = {
-        name  = identity.email_identity
-        type  = "TXT"
-        value = "v=spf1 include:amazonses.com ~all"
-      }
-      dmarc_txt = {
-        name  = "_dmarc.${identity.email_identity}"
-        type  = "TXT"
-        value = "v=DMARC1; p=none;"
-      }
     }
   }
 }
