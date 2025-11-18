@@ -84,8 +84,8 @@ function handler(event) {
   var maxAge = 300; // seconds
   var cookieAttrs = "; Path=/; Secure; HttpOnly; SameSite=None; Max-Age=" + maxAge;
 
-  var pkceCookie = "pkce_ver=" + encodeURIComponent(code_verifier) + cookieAttrs;
-  var stateCookie = "oauth_state=" + encodeURIComponent(state) + cookieAttrs;
+  var pkceCookie = encodeURIComponent(code_verifier) + cookieAttrs;
+  var stateCookie = encodeURIComponent(state) + cookieAttrs;
 
   var response = {
     statusCode: 302,
