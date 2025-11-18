@@ -66,7 +66,6 @@ resource "aws_instance" "smtp4dev_mock_server" {
 
   tags = merge(local.tags,
     { Name = lower(format("ec2-%s-%s-mailrelay", local.application_name, local.environment)) },
-    { instance-role = local.application_data.accounts[local.environment].smtp4dev_instance_role },
     { instance-scheduling = "skip-auto-start" },
     { backup = "true" }
   )
