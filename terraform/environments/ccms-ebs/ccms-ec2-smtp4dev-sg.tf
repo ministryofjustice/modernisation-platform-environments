@@ -38,6 +38,6 @@ resource "aws_security_group" "smtp4dev_mock_server_sg" {
   }
 
   tags = {
-    Name = "smtp4dev_mock_server_sg"
+    Name = "ccms-ec2-smtp4dev-sg"
   }
 }
