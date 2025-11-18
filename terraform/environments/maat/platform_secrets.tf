@@ -92,6 +92,7 @@ resource "aws_secretsmanager_secret" "maat_app_orch_client_secret" {
 
 resource "aws_secretsmanager_secret_version" "maat_app_orch_client_secret" {
   secret_id     = aws_secretsmanager_secret.maat_app_orch_client_secret.id
+  secret_string = "replace in console"
 
   lifecycle {
     ignore_changes = [secret_string]
