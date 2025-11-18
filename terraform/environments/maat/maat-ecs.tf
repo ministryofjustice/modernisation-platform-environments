@@ -497,7 +497,8 @@ resource "aws_iam_policy" "maat_ecs_policy_access_params" {
           "secretsmanager:GetSecretValue"
         ],
         "Resource": [
-          "arn:aws:ssm:${local.env_account_region}:${local.env_account_id}:secret/maat/*"
+          "arn:aws:secretsmanager:${local.env_account_region}:${local.env_account_id}:secret:maat/*"
+
         ]
       },
       {
