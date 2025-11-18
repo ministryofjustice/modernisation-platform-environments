@@ -13,6 +13,7 @@ done
  
 # Run your container
  sudo docker run -d --name smtp4dev-mock-email-container \
+   --restart always \
    -p 80:80 -p 2525:25 -p 110:110 \
    -v /path/on/host:/app/Data \
    -e Smtp4Dev__MessageRetentionOptions__MaxAge=30 \
