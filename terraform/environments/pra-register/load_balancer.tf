@@ -231,6 +231,7 @@ resource "aws_security_group" "lb_sc_pingdom_2" {
   }
 }
 
+#trivy:ignore:AVD-AWS-0053: this needs to be public
 resource "aws_lb" "pra_lb" {
   name                       = "pra-load-balancer"
   load_balancer_type         = "application"
@@ -238,6 +239,7 @@ resource "aws_lb" "pra_lb" {
   subnets                    = data.aws_subnets.shared-public.ids
   enable_deletion_protection = false
   internal                   = false
+  drop_invalid_header_fields = true
   depends_on                 = [aws_security_group.pra_lb_sc, aws_security_group.lb_sc_pingdom, aws_security_group.lb_sc_pingdom_2]
 }
 

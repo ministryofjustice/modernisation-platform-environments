@@ -244,6 +244,10 @@ resource "aws_security_group" "ecs_service" {
 resource "aws_ecr_repository" "pra_ecr_repo" {
   name         = "pra-ecr-repo"
   force_delete = true
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
 }
 
 # AWS EventBridge rule

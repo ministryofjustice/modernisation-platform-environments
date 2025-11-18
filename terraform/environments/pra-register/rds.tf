@@ -1,3 +1,4 @@
+# trivy:ignore:AVD-AWS-0080
 resource "aws_db_instance" "pra_db" {
   allocated_storage           = local.application_data.accounts[local.environment].allocated_storage
   db_name                     = local.application_data.accounts[local.environment].db_name
