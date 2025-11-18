@@ -9,7 +9,7 @@
 ####################### IAM Roles and Attachments #######################
 
 # Lambda role and attachment for invoking SSM & powershell on EC2 instances
-
+/*
 resource "aws_iam_role" "lambda_role_invoke_ssm_dev" {
   count              = local.is-development == true ? 1 : 0
   name               = "PPUD_Lambda_Function_Role_Invoke_SSM_Dev"
@@ -1481,7 +1481,7 @@ resource "aws_iam_policy" "iam_policy_lambda_ec2_permissions_prod" {
     ]
   })
 }
-
+*/
 ##############################################
 # EC2 Roles, Policies, Attachment and Profiles
 ##############################################
