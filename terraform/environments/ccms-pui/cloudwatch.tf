@@ -58,7 +58,7 @@ resource "aws_cloudwatch_metric_alarm" "Status_Check_Failure" {
   threshold           = "1"
   treat_missing_data  = "notBreaching"
   dimensions = {
-    AutoScalingGroupName = aws_autoscaling_group.cluster_scaling_group.name
+    AutoScalingGroupName = aws_autoscaling_group.cluster-scaling-group.name
   }
   alarm_actions = [aws_sns_topic.cloudwatch_alerts.arn]
   ok_actions    = [aws_sns_topic.cloudwatch_alerts.arn]
