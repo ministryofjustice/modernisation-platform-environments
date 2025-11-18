@@ -117,7 +117,7 @@ locals {
         })
       })
 
-      pp-onr-db-a = merge(local.ec2_instances.db11g, {
+      pp-onr-db-a = merge(local.ec2_instances.db11g, { # need to do the user_data/aws provider fix later
         config = merge(local.ec2_instances.db11g.config, {
           availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.ec2_instances.db11g.config.instance_profile_policies, [

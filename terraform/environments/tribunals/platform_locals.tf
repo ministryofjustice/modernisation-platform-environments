@@ -55,50 +55,141 @@ locals {
   ]
 
 
-  # Apply 1-3 at a time from the pending array
   # After each apply there will be a new CNAME entry which needs to get created by Tony Bishop
   # in the Route53 which manages these domains. And he will update the main A/CNAME record with the domain name
   # of the production cloudfront distribution
   # "ahmlr.gov.uk" is listed as the primary domain of the viewer certificate for this cloudfront-nginx distribution
   #
-  cloudfront_nginx_sans = [
-    "ahmlr.gov.uk",
-    "asylum-support-tribunal.gov.uk"
+cloudfront_nginx_prod_sans = [
+  {
+    domain    = "ahmlr.gov.uk"
+    prod_only = false
+  },
+  {
+    domain    = "asylum-support-tribunal.gov.uk"
+    prod_only = false
+  },
+  {
+    domain    = "appeals-service.gov.uk"
+    prod_only = true
+  },
+  {
+    domain    = "carestandardstribunal.gov.uk"
+    prod_only = true
+  },
+  {
+    domain    = "cicap.gov.uk"
+    prod_only = true
+  },
+  {
+    domain    = "civilappeals.gov.uk"
+    prod_only = true
+  },
+  {
+    domain    = "cjit.gov.uk"
+    prod_only = true
+  },
+  {
+    domain    = "cjs.gov.uk"
+    prod_only = true
+  },
+  {
+    domain    = "cjsonline.gov.uk"
+    prod_only = true
+  },
+  {
+    domain    = "complaints.judicialconduct.gov.uk"
+    prod_only = true
+  },
+  {
+    domain    = "courtfunds.gov.uk"
+    prod_only = true
+  },
+  {
+    domain    = "criminal-justice-system.gov.uk"
+    prod_only = true
+  },
+  {
+    domain    = "dugganinquest.independent.gov.uk"
+    prod_only = true
+  },
+  {
+    domain    = "employmentappeals.gov.uk"
+    prod_only = true
+  },
+  {
+    domain    = "financeandtaxtribunals.gov.uk"
+    prod_only = true
+  },
+  {
+    domain    = "hillsboroughinquests.independent.gov.uk"
+    prod_only = true
+  },
+  {
+    domain    = "immigrationservicestribunal.gov.uk"
+    prod_only = true
+  },
+  {
+    domain    = "informationtribunal.gov.uk"
+    prod_only = true
+  },
+  {
+    domain    = "judicialombudsman.gov.uk"
+    prod_only = true
+  },
+  {
+    domain    = "landstribunal.gov.uk"
+    prod_only = true
+  },
+  {
+    domain    = "osscsc.gov.uk"
+    prod_only = true
+  },
+  {
+    domain    = "paroleboard.gov.uk"
+    prod_only = true
+  },
+  {
+    domain    = "transporttribunal.gov.uk"
+    prod_only = true
+  },
+  {
+    domain    = "victiminformationservice.org.uk"
+    prod_only = true
+  },
+  {
+    domain    = "yjbpublications.justice.gov.uk"
+    prod_only = true
+  }
+]
+
+  # Build an array list from the above list of objects (needed for the sans_map)
+  cloudfront_nginx_prod_sans_list = [
+    for d in local.cloudfront_nginx_prod_sans : d.domain
   ]
 
-  # This array should match the cloudfront_nginx_sans one above, but with  dev. prefix for each one
+  # This array is dynamically built from the above production sans, but prefixes each one with the environment name
   cloudfront_nginx_nonprod_sans = [
-    "dev.ahmlr.gov.uk",
-    "dev.asylum-support-tribunal.gov.uk"
+    for d in local.cloudfront_nginx_prod_sans : "${local.environment}.${d.domain}"
+    if !d.prod_only
   ]
 
+  # This map will either contain the prod, dev or preprod SANS during the plan/apply stage
+  # This map is used to assign the aliases for the certificate and the distribution below.
+  cloudfront_sans_map = {
+    production    = local.cloudfront_nginx_prod_sans_list
+    development   = local.cloudfront_nginx_nonprod_sans
+    preproduction = local.cloudfront_nginx_nonprod_sans
+  }
+
+  # Final SANs to apply to cert or distribution. Pull the entry from the above map dependent on environment
+  cloudfront_nginx_sans = lookup(local.cloudfront_sans_map, local.environment, [])
+
+  #TODO Check these 3 domains with Tony Bishop. They seem to be delegated to alternate NS or a static ip address
   pending_cloudfront_nginx_sans = [
-    "appeals-service.gov.uk",
-    "carestandardstribunal.gov.uk",
-    "cicap.gov.uk",
-    "civilappeals.gov.uk",
-    "cjit.gov.uk",
-    "cjs.gov.uk",
-    "cjsonline.gov.uk",
-    "complaints.judicialconduct.gov.uk",
     "courtfines.justice.gov.uk",
-    "courtfunds.gov.uk",
-    "criminal-justice-system.gov.uk",
-    "dugganinquest.independent.gov.uk",
-    "employmentappeals.gov.uk",
-    "financeandtaxtribunals.gov.uk",
-    "hillsboroughinquests.independent.gov.uk",
-    "immigrationservicestribunal.gov.uk",
-    "informationtribunal.gov.uk",
-    "judicialombudsman.gov.uk",
-    "landstribunal.gov.uk",
     "obr.co.uk",
-    "osscsc.gov.uk",
-    "paroleboard.gov.uk",
     "sendmoneytoaprisoner.justice.gov.uk",
-    "transporttribunal.gov.uk",
-    "victiminformationservice.org.uk",
-    "yjbpublications.justice.gov.uk"
   ]
 
 

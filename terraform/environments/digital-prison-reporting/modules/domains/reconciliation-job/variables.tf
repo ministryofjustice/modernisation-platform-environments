@@ -18,6 +18,12 @@ variable "script_file_version" {
   description = "The filename of the glue script, including version"
 }
 
+variable "glue_version" {
+  type        = string
+  default     = "5.0"
+  description = "(Optional) The version of glue to use."
+}
+
 variable "create_job" {
   description = "Enable Reconciliation Job, True or False"
   type        = bool
@@ -62,12 +68,6 @@ variable "spark_event_logs" {
   type        = string
   default     = null
   description = "(Optional) Specifies an Amazon S3 path to a bucket that can be used as a Spark Event Logs directory for the job."
-}
-
-variable "enable_continuous_log_filter" {
-  type        = bool
-  default     = false
-  description = "(Optional) Specifies a standard filter or no filter when you create or edit a job enabled for continuous logging."
 }
 
 variable "execution_class" {

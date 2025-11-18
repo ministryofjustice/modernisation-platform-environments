@@ -17,7 +17,7 @@ resource "helm_release" "litellm" {
         imageRepository      = "ghcr.io/berriai/litellm-non_root"
         imageTag             = local.environment_configuration.litellm_versions.application
         serviceAccountName   = data.kubernetes_secret.irsa[0].data["serviceaccount"]
-        ingressHostname      = "llm-gateway.development.data-platform.service.justice.gov.uk"
+        ingressHostname      = local.environment_configuration.llm_gateway_hostname
         ingressTlsSecretName = "llms-gateway-tls" # what an annoying typo on my part
         ingressAllowList     = local.environment_configuration.llm_gateway_ingress_allowlist
 
@@ -42,7 +42,8 @@ resource "helm_release" "litellm" {
         iamRole = module.iam_role[0].arn
 
         # LiteLLM Models
-        bedrockInferenceProfiles = local.environment_configuration.bedrock_inference_profiles
+        azureModels   = local.environment_configuration.llm_gateway_models.azure
+        bedrockModels = local.environment_configuration.llm_gateway_models.bedrock
       }
     )
   ]

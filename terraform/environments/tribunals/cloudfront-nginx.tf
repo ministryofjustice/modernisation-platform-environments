@@ -1,6 +1,7 @@
 ###############################
 #  SECOND CLOUDFRONT – HTTP-only to replace nginx server in old DSD AWS account
 #  DNS records managed by
+#  Force redeploy to preprod 14/11/25
 ###############################
 
 # -------------------------------------------------
@@ -8,10 +9,11 @@
 # -------------------------------------------------
 resource "aws_acm_certificate" "http_cloudfront_nginx" {
   provider          = aws.us-east-1
-  domain_name       = local.is-production ? "ahmlr.gov.uk" : "dev.ahmlr.gov.uk"
+  domain_name       = local.is-production ? "ahmlr.gov.uk" : "${local.environment}.ahmlr.gov.uk"
   validation_method = "DNS"
 
-  subject_alternative_names = local.is-production ? local.cloudfront_nginx_sans : local.cloudfront_nginx_nonprod_sans
+  # SANS are dynamically calculated in platform_locals dependent on environment
+  subject_alternative_names = local.cloudfront_nginx_sans
 
   tags = {
     Name        = "tribunals-http-redirect-cert"
@@ -64,7 +66,8 @@ resource "aws_cloudfront_distribution" "tribunals_http_redirect" {
     prefix          = "cloudfront-redirect-logs-v2/"
   }
 
-  aliases = local.is-production ? local.cloudfront_nginx_sans : local.cloudfront_nginx_nonprod_sans
+  # Aliases are dynamically calculated in platform_locals dependent on environment
+  aliases = local.cloudfront_nginx_sans
 
   origin {
     domain_name = "dummy-http-redirect.s3.amazonaws.com"
@@ -101,11 +104,11 @@ resource "aws_cloudfront_distribution" "tribunals_http_redirect" {
     }
   }
 
-  enabled             = true
-  is_ipv6_enabled     = true
-  comment             = "cloudfront-redirect-${local.environment}"
-  price_class         = "PriceClass_All"
-  http_version        = "http2"
+  enabled         = true
+  is_ipv6_enabled = true
+  comment         = "cloudfront-redirect-${local.environment}"
+  price_class     = "PriceClass_All"
+  http_version    = "http2"
 
 
   # Use the **new dedicated certificate**
@@ -151,7 +154,7 @@ resource "aws_s3_bucket" "cf_redirect_logs" {
   #checkov:skip=CKV2_AWS_62:"Event notifications not required for CloudFront logs bucket"
   #checkov:skip=CKV_AWS_144:"Cross-region replication not required"
   #checkov:skip=CKV_AWS_18:"Access logging not required for CloudFront logs bucket to avoid logging loop"
-  bucket   = "tribunals-redirect-logs-${local.environment}"
+  bucket = "tribunals-redirect-logs-${local.environment}"
 }
 
 resource "aws_s3_bucket_versioning" "cf_redirect_bucket_versioning" {
