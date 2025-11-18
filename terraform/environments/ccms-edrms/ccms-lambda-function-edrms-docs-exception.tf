@@ -40,7 +40,7 @@ resource "aws_iam_role_policy" "lambda_edrms_docs_exception_policy" {
           "logs:CreateLogStream",
           "logs:PutLogEvents"
         ]
-        Resource = "arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:function:${aws_lambda_function.edrms_docs_exception_monitor.name}"
+        Resource = "arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:function:${aws_lambda_function.edrms_docs_exception_monitor.function_name}"
       }
     ]
   })
