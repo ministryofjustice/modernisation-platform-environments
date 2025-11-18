@@ -31,12 +31,12 @@ resource "aws_cloudwatch_metric_alarm" "container_pui_count" {
   namespace           = "ECS/ContainerInsights"
   period              = 60
   statistic           = "Average"
-  threshold           = local.application_data.accounts[local.environment].pui_app_count
+  threshold           = local.application_data.accounts[local.environment].app_count
   dimensions = {
     ClusterName = aws_ecs_cluster.main.name
     ServiceName = aws_ecs_service.pui.name
   }
-  alarm_description         = "The number of PUI ECS tasks is less than ${local.application_data.accounts[local.environment].pui_app_count}. Runbook: https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
+  alarm_description         = "The number of PUI ECS tasks is less than ${local.application_data.accounts[local.environment].app_count}. Runbook: https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
   treat_missing_data        = "breaching"
   alarm_actions             = [aws_sns_topic.cloudwatch_alerts.arn]
   ok_actions                = [aws_sns_topic.cloudwatch_alerts.arn]
@@ -47,7 +47,7 @@ resource "aws_cloudwatch_metric_alarm" "container_pui_count" {
 
 # Underlying EC2 Instance Status Check Failure
 resource "aws_cloudwatch_metric_alarm" "Status_Check_Failure" {
-  alarm_name          = "${local.application_name}-${local.environment}-status-check-failure"
+  alarm_name          = "${local.application_name}-${local.environment}-ec2-status-check-failure"
   alarm_description   = "A pui cluster EC2 instance has failed a status check, Runbook - https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
   comparison_operator = "GreaterThanThreshold"
   metric_name         = "StatusCheckFailed"
@@ -68,8 +68,8 @@ resource "aws_cloudwatch_metric_alarm" "Status_Check_Failure" {
 
 # Underlying clamav-ec2 Instance Status Check Failure
 resource "aws_cloudwatch_metric_alarm" "Status_Check_Failure_Clamav" {
-  alarm_name          = "${local.application_name}-${local.environment}-status-check-failure"
-  alarm_description   = "A pui cluster EC2 instance has failed a status check, Runbook - https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
+  alarm_name          = "${local.application_name}-${local.environment}-clamav-status-check-failure"
+  alarm_description   = "A pui cluster clamav-ec2 instance has failed a status check, Runbook - https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
   comparison_operator = "GreaterThanThreshold"
   metric_name         = "StatusCheckFailed"
   statistic           = "Average"
