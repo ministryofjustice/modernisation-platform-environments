@@ -285,3 +285,14 @@ resource "aws_route53_record" "ftp" {
   ttl      = 300
   records  = [aws_instance.ec2_ftp.private_ip]
 }
+
+# Route53 record for SMTP4Dev EC2 instance
+resource "aws_route53_record" "route53_record_smtp4dev" {
+  count    = local.is-development ? 1 : 0
+  provider = aws.core-vpc
+  zone_id  = data.aws_route53_zone.inner.zone_id
+  name     = "smtp4dev.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.internal"
+  type     = "A"
+  ttl      = "300"
+  records  = [aws_instance.smtp4dev_mock_server.private_ip]
+}
