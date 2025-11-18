@@ -117,14 +117,13 @@ resource "aws_cloudwatch_metric_alarm" "TDS_RDS_Free_Storage_Space_Over_Threshol
 resource "aws_cloudwatch_metric_alarm" "edrms_app_exception_alarm" {
   alarm_name          = "${local.application_data.accounts[local.environment].app_name}-edrms-exception-alarm"
   alarm_description   = "${local.environment} |Alarm on exception of EdrmsDocumentException."
-  comparison_operator = "GreaterThanThreshold"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
   metric_name         = aws_cloudwatch_log_metric_filter.edrms_exception_thread.id
-  statistic           = "Average"
+  statistic           = "Sum"
   namespace           = aws_cloudwatch_log_metric_filter.edrms_exception_thread.metric_transformation[0].namespace
   period              = "300"
   evaluation_periods  = "1"
   threshold           = "1"
-  datapoints_to_alarm = "1"
   treat_missing_data  = "notBreaching"
   alarm_actions       = [aws_sns_topic.cloudwatch_slack.arn]
   ok_actions          = [aws_sns_topic.cloudwatch_slack.arn]

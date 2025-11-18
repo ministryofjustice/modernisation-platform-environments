@@ -32,6 +32,15 @@ resource "aws_iam_role_policy" "lambda_edrms_docs_exception_policy" {
         Effect   = "Allow"
         Action   = ["sns:Publish"]
         Resource = [aws_sns_topic.cloudwatch_slack.arn]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ]
+        Resource = "arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:function:${aws_lambda_function.edrms_docs_exception_monitor.name}"
       }
     ]
   })
