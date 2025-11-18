@@ -69,7 +69,7 @@ resource "aws_cloudwatch_metric_alarm" "Status_Check_Failure" {
 # Underlying clamav-ec2 Instance Status Check Failure
 resource "aws_cloudwatch_metric_alarm" "Status_Check_Failure_Clamav" {
   alarm_name          = "${local.application_name}-${local.environment}-clamav-status-check-failure"
-  alarm_description   = "A pui cluster clamav-ec2 instance has failed a status check, Runbook - https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
+  alarm_description   = "A pui clamav-ec2 instance has failed a status check, Runbook - https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
   comparison_operator = "GreaterThanThreshold"
   metric_name         = "StatusCheckFailed"
   statistic           = "Average"
