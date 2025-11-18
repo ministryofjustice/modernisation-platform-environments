@@ -135,6 +135,12 @@ locals {
       description  = "Trigger Lambda at 18:00 each Monday through Friday"
       timezone     = "Europe/London"
     }
+    wam_waf_analysis = {
+      environments = ["development"]
+      schedule     = "cron(15 7 ? * MON *)"
+      description  = "Trigger Lambda at 07:15 each Monday"
+      timezone     = "Europe/London"
+    }
     /*
     ppud_elb_daily_connections_graph = {
       environments = ["production"]
