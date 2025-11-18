@@ -18,6 +18,7 @@ locals {
     "intermediate_mdss",
     "datamart",
     "derived",
+    "testing", # delete this one
     "test_results",
     "serco_servicenow_deduped",
     "serco_servicenow_curated",
