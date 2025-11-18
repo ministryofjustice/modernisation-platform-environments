@@ -103,27 +103,6 @@ resource "aws_ecs_service" "cst_ecs_service" {
   }
 }
 
-resource "aws_ecs_service" "cst_ecs_service_dev" {
-  count                             = local.is-development ? 1 : 0
-  name                              = var.networking[0].application
-  cluster                           = aws_ecs_cluster.cst_cluster.id
-  task_definition                   = aws_ecs_task_definition.cst_task_definition_dev[0].arn
-  launch_type                       = "FARGATE"
-  enable_execute_command            = true
-  desired_count                     = 2
-  health_check_grace_period_seconds = 180
-
-  network_configuration {
-    subnets          = data.aws_subnets.shared-private.ids
-    security_groups  = [aws_security_group.ecs_service.id]
-    assign_public_ip = false
-  }
-
-  deployment_controller {
-    type = "ECS"
-  }
-}
-
 resource "aws_iam_role" "app_execution" {
   name = "execution-${var.networking[0].application}"
 
