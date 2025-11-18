@@ -46,6 +46,26 @@ resource "aws_sns_topic" "cloudwatch_alerts" {
 EOF
 }
 
+data "aws_iam_policy_document" "cloudwatch_alerting_sns" {
+  version = "2012-10-17"
+  statement {
+    sid    = "EventsAllowPublishSnsTopic"
+    effect = "Allow"
+    actions = [
+      "sns:Publish",
+    ]
+    resources = [
+      aws_sns_topic.cloudwatch_alerts.arn
+    ]
+    principals {
+      type = "Service"
+      identifiers = [
+        "events.amazonaws.com",
+      ]
+    }
+  }
+}
+
 
 
 resource "aws_sns_topic_policy" "alert_default" {
@@ -58,3 +78,4 @@ resource "aws_sns_topic_subscription" "cloudwatch_alerts" {
   protocol  = "https"
   endpoint  = "https://global.sns-api.chatbot.amazonaws.com"
 }
+
