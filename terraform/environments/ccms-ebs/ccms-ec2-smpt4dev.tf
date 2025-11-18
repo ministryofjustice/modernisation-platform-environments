@@ -32,7 +32,7 @@ resource "aws_iam_instance_profile" "ec2_ssm_profile" {
 resource "aws_instance" "smtp4dev_mock_server" {
   instance_type          = "t3.medium"
   ami                    = "ami-07eb36e50da2fcccd"
-  vpc_security_group_ids = [aws_security_group.ccms-ec2-smtp4dev-sg.id]
+  vpc_security_group_ids = [aws_security_group.smtp4dev_mock_server_sg.id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
   #subnet_id                   = data.aws_subnet.data_subnets_a.id
   monitoring                  = true

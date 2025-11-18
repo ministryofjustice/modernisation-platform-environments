@@ -1,5 +1,5 @@
 resource "aws_security_group" "smtp4dev_mock_server_sg" {
-  name        = "ccms-ec2-smtp4dev-sg"
+  name        = "smtp4dev_mock_server_sg"
   description = "Security group for smtp4dev mock server"
   vpc_id      = data.aws_vpc.shared.id
 
@@ -38,6 +38,6 @@ resource "aws_security_group" "smtp4dev_mock_server_sg" {
   }
 
   tags = {
-    Name = "ccms-ec2-smtp4dev-sg"
+    Name = "smtp4dev_mock_server_sg"
   }
 }
