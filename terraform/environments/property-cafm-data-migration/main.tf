@@ -1,5 +1,5 @@
 module "csv_export" {
-  source = "github.com/ministryofjustice/terraform-csv-to-parquet-athena?ref=519f9ee248ec2a7df10ebfc03f401ba15c833c8a"
+  source = "github.com/ministryofjustice/terraform-csv-to-parquet-athena?ref=86a98b4a548f02aad19d38e0f8b2909b59dc47fb"
   providers = {
     aws.bucket-replication = aws
   }
@@ -8,6 +8,7 @@ module "csv_export" {
   kms_key_arn        = aws_kms_key.shared_kms_key.arn
   name               = "concept"
   load_mode          = "overwrite"
+  lambda_memory_size = 10240
   environment        = local.environment_shorthand
   tags = {
     business-unit = "Property"
