@@ -7,9 +7,8 @@ resource "random_password" "cst_db" {
   special = false
 }
 
-resource "aws_db_subnet_group" "default" {
-  name       = "rds-subnet-group"
-  subnet_ids = ["subnet-xxxxxxxx", "subnet-yyyyyyyy"] # Replace with your subnet IDs
+data "aws_db_subnet_group" "cst_database" {
+  name = "${local.application_name}-${local.environment}"
 }
 
 resource "aws_db_instance" "postgres_latest" {
