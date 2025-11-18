@@ -41,7 +41,7 @@ locals {
   }
 
   bastion_config = {}
-  image_tag      = "initial-16447252449-1"
+  image_tag      = "tm-1408-5-11-25-19105338240-1"
   image_uri      = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/vcms:${local.image_tag}"
   app_port       = 80
   internal_security_group_cidrs = distinct(flatten([
