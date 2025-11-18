@@ -170,8 +170,8 @@ resource "aws_sesv2_email_identity" "ppud_domain" {
     next_signing_key_length = "RSA_2048_BIT"
   }
   
-  configuration_set_name = aws_sesv2_configuration_set.ses_events_configuration_set[each.key].configuration_set_name
-
+  configuration_set_name = "ses-events-configuration-set-${each.key}"
+  
   tags = {
     IdentityName = local.application_data.accounts[local.environment].SES_domain
     Environment  = each.key
