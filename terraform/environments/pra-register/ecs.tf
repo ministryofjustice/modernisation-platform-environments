@@ -375,7 +375,7 @@ module "pagerduty_core_alerts_non_prod" {
   depends_on = [
     aws_sns_topic.pra_utilisation_alarm
   ]
-  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=0179859e6fafc567843cd55c0b05d325d5012dc4" #v2.0.0
   sns_topics                = [aws_sns_topic.pra_utilisation_alarm[0].name]
   pagerduty_integration_key = local.pagerduty_integration_keys["pra_non_prod_alarms"]
 }
@@ -386,7 +386,7 @@ module "pagerduty_core_alerts_prod" {
   depends_on = [
     aws_sns_topic.pra_utilisation_alarm
   ]
-  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=0179859e6fafc567843cd55c0b05d325d5012dc4" #v2.0.0
   sns_topics                = [aws_sns_topic.pra_utilisation_alarm[0].name]
   pagerduty_integration_key = local.pagerduty_integration_keys["pra_prod_alarms"]
 }
