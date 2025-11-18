@@ -412,7 +412,6 @@ resource "aws_cloudwatch_log_group" "lambda_security_hub_report_uat_log_group" {
   name              = "/aws/lambda/securityhub_report_uat"
   retention_in_days = 30
 }
-*/
 
 #######################################
 # Lambda Function for SES Logging - UAT
@@ -457,7 +456,6 @@ resource "aws_cloudwatch_log_group" "lambda_ses_logging_uat_log_group" {
   retention_in_days = 30
 }
 
-/*
 ########################
 # Production Environment
 ########################
