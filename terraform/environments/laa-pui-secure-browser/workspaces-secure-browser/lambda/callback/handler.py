@@ -2,9 +2,7 @@
 Lambda OAuth callback (Azure) — robust, debug-friendly drop-in.
 
 Environment variables required:
-  - AZURE_TENANT_ID
-  - AZURE_CLIENT_ID
-  - AZURE_CLIENT_SECRET  (optional; include only if using confidential client)
+  - AZURE_SECRET_ARN     (ARN of Secrets Manager secret containing tenant_id, client_id, client_secret)
   - CALLBACK_URL         (the redirect_uri used in the authorize flow)
   - PORTAL_URL           (where to redirect after successful auth)
 """
@@ -15,8 +13,12 @@ import urllib.request
 from typing import Dict, Any
 from http import cookies as http_cookies
 import hmac
+import boto3
 import jwt
 from jwt import PyJWKClient
+
+# Initialize Secrets Manager client
+secrets_client = boto3.client('secretsmanager')
 
 def parse_cookies_from_event(event: Dict[str, Any]) -> Dict[str, str]:
     """
@@ -80,11 +82,35 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'body': '<html><body><h1>Bad Request</h1><p>No authorization code received</p></body></html>'
             }
 
-        tenant_id = os.environ['AZURE_TENANT_ID']
-        client_id = os.environ['AZURE_CLIENT_ID']
-        client_secret = os.environ.get('AZURE_CLIENT_SECRET')
         redirect_uri = os.environ['CALLBACK_URL']
         portal_url = os.environ['PORTAL_URL']
+        
+        # Retrieve all Azure config from Secrets Manager
+        secret_arn = os.environ['AZURE_SECRET_ARN']
+        try:
+            secret_response = secrets_client.get_secret_value(SecretId=secret_arn)
+            secret_data = json.loads(secret_response['SecretString'])
+            tenant_id = secret_data.get('tenant_id')
+            client_id = secret_data.get('client_id')
+            client_secret = secret_data.get('client_secret')
+            
+            print(f"DEBUG Azure Tenant ID: {tenant_id}")
+            print(f"DEBUG Azure Client ID: {client_id}")
+            
+            if not tenant_id or not client_id or not client_secret:
+                print("ERROR: Missing required fields in Azure secret")
+                return {
+                    'statusCode': 500,
+                    'headers': {'Content-Type': 'text/html'},
+                    'body': '<html><body><h1>Configuration Error</h1><p>Invalid secret format</p></body></html>'
+                }
+        except Exception as e:
+            print(f"Failed to retrieve secret from Secrets Manager: {e}")
+            return {
+                'statusCode': 500,
+                'headers': {'Content-Type': 'text/html'},
+                'body': '<html><body><h1>Configuration Error</h1><p>Unable to retrieve credentials</p></body></html>'
+            }
 
         expected_state = cookies_dict.get('oauth_state')
         code_verifier = cookies_dict.get('pkce_ver')

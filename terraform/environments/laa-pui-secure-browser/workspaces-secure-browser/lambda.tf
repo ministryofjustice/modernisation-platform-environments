@@ -82,11 +82,9 @@ resource "aws_lambda_function" "callback" {
 
   environment {
     variables = {
-      PORTAL_URL          = "https://${aws_workspacesweb_portal.external["external_1"].portal_endpoint}"
-      AZURE_TENANT_ID     = local.azure_config.tenant_id
-      AZURE_CLIENT_ID     = local.azure_config.client_id
-      AZURE_CLIENT_SECRET = local.azure_config.client_secret
-      CALLBACK_URL        = "${aws_apigatewayv2_api.callback[0].api_endpoint}/callback"
+      PORTAL_URL       = "https://${aws_workspacesweb_portal.external["external_1"].portal_endpoint}"
+      AZURE_SECRET_ARN = data.aws_secretsmanager_secret.azure_entra_config[0].arn
+      CALLBACK_URL     = "${aws_apigatewayv2_api.callback[0].api_endpoint}/callback"
     }
   }
 
