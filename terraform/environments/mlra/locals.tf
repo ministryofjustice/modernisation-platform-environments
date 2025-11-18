@@ -39,14 +39,14 @@ locals {
     maat_api_oauth_scope      = local.application_data.accounts[local.environment].maat_api_oauth_scope
     maat_api_oauth_url        = local.application_data.accounts[local.environment].maat_api_oauth_url
     sentry_env                = local.environment
-    db_secret_arn             = "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:parameter/${local.maatdb_password_secret_name}"
-    google_tag_manager_id     = "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:parameter/${local.gtm_id_secret_name}"
-    infox_client_secret       = "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:parameter/${local.infox_client_secret_name}"
-    maat_api_client_id        = "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:parameter/${local.maat_api_client_id_name}"
-    maat_api_client_secret    = "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:parameter/${local.maat_api_client_secret_name}"
-    app_master_password       = "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:parameter/${local.app_master_password_name}"
-    app_salt                  = "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:parameter/${local.app_salt_name}"
-    app_derivation_iterations = "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:parameter/${local.app_derivation_iterations_name}"
+    db_secret_arn             = "arn:aws:secretsmanager:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:secret:mlra/${local.maatdb_password_secret_name}"
+    google_tag_manager_id     = "arn:aws:secretsmanager:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:secret:mlra/${local.gtm_id_secret_name}"
+    infox_client_secret       = "arn:aws:secretsmanager:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:secret:mlra/${local.infox_client_secret_name}"
+    maat_api_client_id        = "arn:aws:secretsmanager:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:secret:mlra/${local.maat_api_client_id_name}"
+    maat_api_client_secret    = "arn:aws:secretsmanager:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:secret:mlra/${local.maat_api_client_secret_name}"
+    app_master_password       = "arn:aws:secretsmanager:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:secret:mlra/${local.app_master_password_name}"
+    app_salt                  = "arn:aws:secretsmanager:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:secret:mlra/${local.app_salt_name}"
+    app_derivation_iterations = "arn:aws:secretsmanager:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:secret:mlra/${local.app_derivation_iterations_name}"
   })
   ecs_target_capacity = 100
 
