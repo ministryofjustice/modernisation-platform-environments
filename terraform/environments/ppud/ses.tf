@@ -236,11 +236,6 @@ output "ses_verification_records" {
   value = {
     for env, identity in aws_sesv2_email_identity.ppud_domain :
     env => {
-      verification_txt = {
-        name  = "_amazonses.${identity.email_identity}"
-        type  = "TXT"
-        value = identity.verification_token
-      }
       dkim_cnames = [
         for token in identity.dkim_signing_attributes[0].tokens :
         {
@@ -253,7 +248,7 @@ output "ses_verification_records" {
         name  = "noreply.${identity.email_identity}"
         type  = "MX"
         value = "10 feedback-smtp.eu-west-2.amazonses.com"
-      }    
+      }
       spf_txt = {
         name  = identity.email_identity
         type  = "TXT"
