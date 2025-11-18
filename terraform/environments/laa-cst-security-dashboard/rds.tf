@@ -7,10 +7,10 @@ data "aws_db_subnet_group" "cst_database" {
   name = "${local.application_name}-${local.environment}"
 }
 
-resource "aws_db_instance" "postgres_latest" {
+resource "aws_db_instance" "cst_db" {
   identifier              = "cst-postgres-db"
   allocated_storage       = 20
-  db_subnet_group_name    = aws_db_subnet_group.default.name
+  db_subnet_group_name    = data.aws_db_subnet_group.cst_database.name
   instance_class          = "db.t3.micro"
   engine                  = "postgres"
   engine_version          = "16"
@@ -29,11 +29,11 @@ resource "aws_db_instance" "postgres_latest" {
 }
 
 output "rds_endpoint" {
-  value = aws_db_instance.postgres_latest.endpoint
+  value = aws_db_instance.cst_db.endpoint
 }
 
 output "rds_master_username" {
-  value = aws_db_instance.postgres_latest.username
+  value = aws_db_instance.cst_db.username
 }
 
 output "rds_master_password" {

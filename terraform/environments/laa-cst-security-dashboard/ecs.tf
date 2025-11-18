@@ -51,7 +51,7 @@ resource "aws_ecs_task_definition" "cst_task_definition" {
       environment = [
         {
           name  = "RDS_HOSTNAME"
-          value = aws_db_instance.cst_db[0].address
+          value = aws_db_instance.cst_db.address
         },
         {
           name  = "RDS_PORT"
@@ -59,15 +59,15 @@ resource "aws_ecs_task_definition" "cst_task_definition" {
         },
         {
           name  = "RDS_USERNAME"
-          value = aws_db_instance.cst_db[0].username
+          value = aws_db_instance.cst_db.username
         },
         {
           name  = "RDS_PASSWORD"
-          value = aws_db_instance.cst_db[0].password
+          value = aws_db_instance.cst_db.password
         },
         {
-          name  = "DB_NAME"
-          value = aws_db_instance.cst_db[0].db_name
+          name  = "DB_ENDPOINT"
+          value = aws_db_instance.cst_db.endpoint
         },
         {
           name  = "supportEmail"
@@ -118,7 +118,7 @@ resource "aws_ecs_task_definition" "cst_task_definition_dev" {
       environment = [
         {
           name  = "RDS_HOSTNAME"
-          value = aws_db_instance.cst_db_dev[0].address
+          value = aws_db_instance.cst_db.address
         },
         {
           name  = "RDS_PORT"
@@ -126,11 +126,11 @@ resource "aws_ecs_task_definition" "cst_task_definition_dev" {
         },
         {
           name  = "RDS_USERNAME"
-          value = aws_db_instance.cst_db_dev[0].username
+          value = aws_db_instance.cst_db.username
         },
         {
           name  = "RDS_PASSWORD"
-          value = aws_db_instance.cst_db_dev[0].password
+          value = aws_db_instance.cst_db.password
         },
         {
           name  = "DB_NAME"
