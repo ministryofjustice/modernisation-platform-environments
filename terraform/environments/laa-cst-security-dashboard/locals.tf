@@ -1,3 +1,1 @@
-locals {
-  db_subnet_group_name = "${local.application_name}-${local.environment}"
-}
+#### This file can be used to store locals specific to the member account ####
