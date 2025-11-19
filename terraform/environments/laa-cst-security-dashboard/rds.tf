@@ -36,7 +36,7 @@ resource "aws_security_group" "cst_rds_sc" {
 resource "aws_db_instance" "cst_db" {
   identifier              = "cst-postgres-db"
   allocated_storage       = 20
-  db_subnet_group_name    = locals.db_subnet_group_name
+  db_subnet_group_name    = data.aws_db_subnet_group.main.name
   instance_class          = "db.t3.micro"
   engine                  = "postgres"
   engine_version          = "16"
