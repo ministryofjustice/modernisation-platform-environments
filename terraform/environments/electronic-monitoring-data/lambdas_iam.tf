@@ -848,13 +848,13 @@ resource "aws_iam_role" "load_mdss" {
 resource "aws_iam_policy" "load_mdss_lambda_role_policy" {
   count = local.is-development ? 0 : 1
   name   = "load_mdss_lambda_policy"
-  policy = data.aws_iam_policy_document.load_mdss_lambda_role_policy_document.json
+  policy = data.aws_iam_policy_document.load_mdss_lambda_role_policy_document[0].json
 }
 
 resource "aws_iam_role_policy_attachment" "load_mdss_output_lambda_policy_attachment" {
   count = local.is-development ? 0 : 1
-  role       = aws_iam_role.load_mdss.name
-  policy_arn = aws_iam_policy.load_mdss_lambda_role_policy.arn
+  role       = aws_iam_role.load_mdss[0].name
+  policy_arn = aws_iam_policy.load_mdss_lambda_role_policy[0].arn
 }
 
 module "share_db_with_mdss_lambda_role" {
@@ -862,7 +862,7 @@ module "share_db_with_mdss_lambda_role" {
   source                  = "./modules/lakeformation_database_share"
   dbs_to_grant            = toset(["allied_mdss${local.db_suffix}"])
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
-  role_arn                = aws_iam_role.load_mdss.arn
+  role_arn                = aws_iam_role.load_mdss[0].arn
   db_exists               = true
   de_role_arn             = null
 }
@@ -870,6 +870,6 @@ module "share_db_with_mdss_lambda_role" {
 resource "aws_lakeformation_permissions" "add_create_db" {
   count = local.is-development ? 0 : 1
   permissions      = ["CREATE_DATABASE", "DROP"]
-  principal        = aws_iam_role.load_mdss.arn
+  principal        = aws_iam_role.load_mdss[0].arn
   catalog_resource = true
 }
