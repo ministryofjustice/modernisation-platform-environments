@@ -23,10 +23,10 @@ resource "aws_sns_topic" "cloudwatch_slack" {
 EOF
 }
 
-resource "aws_sns_topic_policy" "cloudwatch_slack" {
-  arn    = aws_sns_topic.cloudwatch_slack.arn
-  policy = data.aws_iam_policy_document.cloudwatch_alerting_sns.json
-}
+# resource "aws_sns_topic_policy" "cloudwatch_slack" {
+#   arn    = aws_sns_topic.cloudwatch_slack.arn
+#   policy = data.aws_iam_policy_document.cloudwatch_alerting_sns.json
+# }
 
 resource "aws_sns_topic_subscription" "cloudwatch_alerts" {
   topic_arn = aws_sns_topic.cloudwatch_slack.arn
