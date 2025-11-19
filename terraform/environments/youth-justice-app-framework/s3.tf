@@ -36,16 +36,6 @@ module "s3" {
   "historical-infrastructure", "historical-apps"]
 
 
-  cors_policy_map = {
-    "cms" = {
-      allowed_headers = ["*"]
-      allowed_methods = ["GET"]
-      allowed_origins = ["https://yjaf.yjbservices.yjb.gov.uk"]
-      expose_headers  = []
-      # max_age_seconds can be omitted if not needed
-    }
-  }
-
   allow_replication = local.application_data.accounts[local.environment].allow_s3_replication
   s3_source_account = local.application_data.accounts[local.environment].source_account
 
@@ -154,3 +144,13 @@ module "s3-certs" {
 }
 
 
+resource "aws_s3_bucket_cors_configuration" "cms" {
+  bucket = module.s3.aws_s3_bucket_id["cms"]  # only cms
+
+  cors_rule {
+    allowed_headers = ["*"]
+    allowed_methods = ["GET"]
+    allowed_origins = ["https://yjaf.yjbservices.yjb.gov.uk"]
+    expose_headers  = []
+  }
+}

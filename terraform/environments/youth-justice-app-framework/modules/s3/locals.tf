@@ -8,6 +8,4 @@ locals {
 
   bucket_name_allow_replication = concat(local.archive_bucket_name, local.transfer_bucket_name)
   bucket_name_all               = concat(local.bucket_name, local.bucket_name_allow_replication)
-
-  cors_buckets = [for b in var.bucket_name : b if contains(keys(var.cors_policy_map), b)]
 }

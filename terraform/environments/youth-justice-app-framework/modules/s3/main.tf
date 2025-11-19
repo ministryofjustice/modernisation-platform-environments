@@ -142,18 +142,3 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "bucket" {
     prevent_destroy = false
   }
 }
-
-
-resource "aws_s3_bucket_cors_configuration" "this" {
-  for_each = { for b in local.cors_buckets : b => var.cors_policy_map[b] }
-
-  bucket = aws_s3_bucket.this[each.key].id
-
-  cors_rule {
-    allowed_headers = each.value.allowed_headers
-    allowed_methods = each.value.allowed_methods
-    allowed_origins = each.value.allowed_origins
-    expose_headers  = lookup(each.value, "expose_headers", null)
-    max_age_seconds = lookup(each.value, "max_age_seconds", null)
-  }
-}
