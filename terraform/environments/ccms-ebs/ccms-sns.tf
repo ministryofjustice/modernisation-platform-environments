@@ -45,6 +45,7 @@ resource "aws_sns_topic" "cw_alerts" {
     }
   }
 }
+EOF
 }
 
 
