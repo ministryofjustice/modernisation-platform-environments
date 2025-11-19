@@ -25,7 +25,6 @@ resource "aws_secretsmanager_secret" "maatdb_password_secret_name" {
     local.tags,
     {
       Name = "application-env-secret-${upper(local.application_name)}"
-      rotation_reason = "rotation_not_required_static_application_env"
     }
   )
 }
@@ -48,7 +47,6 @@ resource "aws_secretsmanager_secret" "app_master_password_name" {
     local.tags,
     {
       Name = "application-env-secret-${upper(local.application_name)}"
-      rotation_reason = "rotation_not_required_static_application_env"
     }
   )
 }
@@ -71,7 +69,6 @@ resource "aws_secretsmanager_secret" "app_salt_name" {
     local.tags,
     {
       Name = "application-env-secret-${upper(local.application_name)}"
-      rotation_reason = "rotation_not_required_static_application_env"
     }
   )
 }
@@ -94,7 +91,6 @@ resource "aws_secretsmanager_secret" "app_derivation_iterations_name" {
     local.tags,
     {
       Name = "application-env-secret-${upper(local.application_name)}"
-      rotation_reason = "rotation_not_required_static_application_env"
     }
   )
 }
@@ -117,7 +113,6 @@ resource "aws_secretsmanager_secret" "gtm_id_secret_name" {
     local.tags,
     {
       Name = "application-env-secret-${upper(local.application_name)}"
-      rotation_reason = "rotation_not_required_static_application_env"
     }
   )
 }
@@ -140,7 +135,6 @@ resource "aws_secretsmanager_secret" "infox_client_secret_name" {
     local.tags,
     {
       Name = "application-env-secret-${upper(local.application_name)}"
-      rotation_reason = "rotation_not_required_static_application_env"
     }
   )
 }
@@ -163,7 +157,6 @@ resource "aws_secretsmanager_secret" "maat_api_client_id_name" {
     local.tags,
     {
       Name = "application-env-secret-${upper(local.application_name)}"
-      rotation_reason = "rotation_not_required_static_application_env"
     }
   )
 }
@@ -186,7 +179,6 @@ resource "aws_secretsmanager_secret" "maat_api_client_secret_name" {
     local.tags,
     {
       Name = "application-env-secret-${upper(local.application_name)}"
-      rotation_reason = "rotation_not_required_static_application_env"
     }
   )
 }
