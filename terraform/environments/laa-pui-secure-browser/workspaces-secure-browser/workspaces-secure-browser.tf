@@ -27,11 +27,6 @@ resource "aws_workspacesweb_network_settings" "main" {
 }
 
 ### WORKSPACES WEB PORTALS
-moved {
-  from = aws_workspacesweb_portal.main
-  to   = aws_workspacesweb_portal.external["external_1"]
-}
-
 resource "aws_workspacesweb_portal" "external" {
   for_each = local.create_resources ? local.portals : {}
 
@@ -329,11 +324,6 @@ resource "aws_workspacesweb_session_logger" "main" {
 
 ### NETWORK SETTINGS ASSOCIATIONS
 
-moved {
-  from = aws_workspacesweb_network_settings_association.main
-  to   = aws_workspacesweb_network_settings_association.external["external_1"]
-}
-
 resource "aws_workspacesweb_network_settings_association" "external" {
   for_each = local.create_resources ? local.portals : {}
 
@@ -342,11 +332,6 @@ resource "aws_workspacesweb_network_settings_association" "external" {
 }
 
 ### USER SETTINGS ASSOCIATIONS
-
-moved {
-  from = aws_workspacesweb_user_settings_association.main
-  to   = aws_workspacesweb_user_settings_association.external_1
-}
 
 # External_1 uses SSO user settings with cookie synchronization
 resource "aws_workspacesweb_user_settings_association" "external_1" {
@@ -366,11 +351,6 @@ resource "aws_workspacesweb_user_settings_association" "external_2" {
 
 ### BROWSER SETTINGS ASSOCIATIONS
 
-moved {
-  from = aws_workspacesweb_browser_settings_association.main
-  to   = aws_workspacesweb_browser_settings_association.external["external_1"]
-}
-
 resource "aws_workspacesweb_browser_settings_association" "external" {
   for_each = local.create_resources ? local.portals : {}
 
@@ -379,11 +359,6 @@ resource "aws_workspacesweb_browser_settings_association" "external" {
 }
 
 ### SESSION LOGGER ASSOCIATIONS
-
-moved {
-  from = aws_workspacesweb_session_logger_association.main
-  to   = aws_workspacesweb_session_logger_association.external["external_1"]
-}
 
 resource "aws_workspacesweb_session_logger_association" "external" {
   for_each = local.create_resources ? local.portals : {}
