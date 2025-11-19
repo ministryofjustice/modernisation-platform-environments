@@ -49,6 +49,48 @@ resource "aws_kms_key" "rds_performance_insights" {
 EOF
 }
 
+resource "aws_db_parameter_group" "cst_pg_log" {
+  name        = "${local.application_name}-pg-log-params"
+  family      = "postgres16"
+  description = "Custom parameter group enabling postgres query logging"
+
+  parameter {
+    name         = "log_statement"
+    value        = "all"
+    apply_method = "pending-reboot"
+  }
+
+  parameter {
+    name         = "log_min_duration_statement"
+    value        = "0"
+    apply_method = "pending-reboot"
+  }
+
+  parameter {
+    name         = "log_connections"
+    value        = "1"
+    apply_method = "pending-reboot"
+  }
+
+  parameter {
+    name         = "log_disconnections"
+    value        = "1"
+    apply_method = "pending-reboot"
+  }
+
+  parameter {
+    name         = "log_lock_waits"
+    value        = "1"
+    apply_method = "pending-reboot"
+  }
+
+  parameter {
+    name         = "log_checkpoints"
+    value        = "1"
+    apply_method = "pending-reboot"
+  }
+}
+
 resource "aws_db_instance" "cst_db" {
   identifier                    = "cst-postgres-db"
   allocated_storage             = 20
@@ -64,10 +106,11 @@ resource "aws_db_instance" "cst_db" {
   backup_retention_period      = 1
   vpc_security_group_ids       = [aws_security_group.cst_rds_sc.id]
   apply_immediately            = true
+
   auto_minor_version_upgrade   = true
   multi_az                    = true
   monitoring_interval         = 60
-  monitoring_role_arn         = aws_iam_role.rds_monitoring_role.arn
+  monitoring_role_arn         = aws_iam_role.rds_monitoring_role.arn  # Create this role with required permissions
   performance_insights_enabled = true
   performance_insights_kms_key_id = aws_kms_key.rds_performance_insights.arn
   iam_database_authentication_enabled = true
@@ -80,7 +123,7 @@ resource "aws_db_instance" "cst_db" {
     "audit"
   ]
 
-  parameter_group_name = "default.postgres16"
+  parameter_group_name = aws_db_parameter_group.cst_pg_log.name
 
   tags = {
     Name = "PostgresLatest"
