@@ -53,8 +53,9 @@ module "vpc_endpoints" {
       )
     }
     athena = {
-      service      = "athena"
-      service_type = "Interface"
+      service             = "athena"
+      private_dns_enabled = true
+      service_type        = "Interface"
       tags = merge(
         local.tags,
         { Name = format("%s-athena-api-vpc-endpoint", local.application_name) }
