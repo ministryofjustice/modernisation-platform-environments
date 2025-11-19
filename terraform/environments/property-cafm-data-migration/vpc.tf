@@ -52,6 +52,14 @@ module "vpc_endpoints" {
         { Name = format("%s-s3-vpc-endpoint", local.application_name) }
       )
     }
+    athena = {
+      service      = "athena"
+      service_type = "Interface"
+      tags = merge(
+        local.tags,
+        { Name = format("%s-athena-api-vpc-endpoint", local.application_name) }
+      )
+    }
   }
 }
 
