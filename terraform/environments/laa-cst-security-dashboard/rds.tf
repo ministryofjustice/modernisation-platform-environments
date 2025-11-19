@@ -20,41 +20,62 @@ resource "aws_security_group" "cst_rds_sc" {
 resource "aws_db_subnet_group" "cst_database" {
   name       = "${local.application_name}-tds-subnet-group"
   subnet_ids = data.aws_subnets.shared-data.ids
+
+  tags = {
+    Name = "${local.application_name}-tds-subnet-group"
+  }
+}
+
+resource "aws_kms_key" "rds_performance_insights" {
+  description         = "KMS key to encrypt RDS Performance Insights"
+  enable_key_rotation = true
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Id": "key-default-1",
+  "Statement": [
+    {
+      "Sid": "Allow RDS Use",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "rds.amazonaws.com"
+      },
+      "Action": ["kms:CreateGrant","kms:Decrypt","kms:Encrypt","kms:ReEncrypt*","kms:GenerateDataKey*","kms:DescribeKey"],
+      "Resource": "*"
+    }
+  ]
+}
+EOF
 }
 
 resource "aws_db_instance" "cst_db" {
   identifier                    = "cst-postgres-db"
   allocated_storage             = 20
   instance_class                = "db.t3.micro"
-  engine                        = "postgres"
-  engine_version                = "16"
+  engine                       = "postgres"
+  engine_version               = "16"
   db_subnet_group_name          = aws_db_subnet_group.cst_database.name
-  username                      = "postgresadmin"
-  password                      = random_password.cst_db.result
-  publicly_accessible           = false
-  skip_final_snapshot           = true
-  deletion_protection           = true
-  backup_retention_period       = 1
-  vpc_security_group_ids        = [aws_security_group.cst_rds_sc.id]
-  apply_immediately             = true
-
-  ## FIXES for checkov and PrismaCloud:
-  auto_minor_version_upgrade    = true        # CKV_AWS_226
-
-  multi_az                     = true        # CKV_AWS_157
-
-  monitoring_interval          = 60          # CKV_AWS_118
-
-  performance_insights_enabled = true        # CKV_AWS_353
-
-  iam_database_authentication_enabled = true # CKV_AWS_161
-
-  storage_encrypted            = true        # CKV_AWS_16
-
-  copy_tags_to_snapshot        = true        # CKV2_AWS_60
+  username                     = "postgresadmin"
+  password                     = random_password.cst_db.result
+  publicly_accessible          = false
+  skip_final_snapshot          = true
+  deletion_protection          = true
+  backup_retention_period      = 1
+  vpc_security_group_ids       = [aws_security_group.cst_rds_sc.id]
+  apply_immediately            = true
+  auto_minor_version_upgrade   = true
+  multi_az                    = true
+  monitoring_interval         = 60
+  monitoring_role_arn         = aws_iam_role.rds_monitoring_role.arn
+  performance_insights_enabled = true
+  performance_insights_kms_key_id = aws_kms_key.rds_performance_insights.arn
+  iam_database_authentication_enabled = true
+  storage_encrypted           = true
+  copy_tags_to_snapshot       = true
 
   enabled_cloudwatch_logs_exports = [
-    "postgresql",               # CKV_AWS_129: PostgreSQL logs
+    "postgresql",
     "upgrade",
     "audit"
   ]
@@ -75,6 +96,6 @@ output "rds_master_username" {
 }
 
 output "rds_master_password" {
-  value = random_password.cst_db.result
+  value     = random_password.cst_db.result
   sensitive = true
 }
