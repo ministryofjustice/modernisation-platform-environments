@@ -144,15 +144,8 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "bucket" {
 }
 
 
-resource "aws_s3_bucket" "cors" {
-  for_each = toset(var.bucket_name)
-
-  bucket = each.value
-  tags   = var.tags
-}
-
-resource "aws_s3_bucket_cors_configuration" "cors" {
-  for_each = { for b, cors in var.cors_policy_map : b => cors if contains(var.bucket_name, b) }
+resource "aws_s3_bucket_cors_configuration" "this" {
+  for_each = { for b in local.cors_buckets : b => var.cors_policy_map[b] }
 
   bucket = aws_s3_bucket.this[each.key].id
 
