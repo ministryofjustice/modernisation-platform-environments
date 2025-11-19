@@ -293,6 +293,6 @@ resource "aws_route53_record" "route53_record_smtp4dev" {
   zone_id  = data.aws_route53_zone.inner.zone_id
   name     = "smtp4dev.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.internal"
   type     = "A"
-  ttl      = "300"
+  ttl      = 300
   records  = [aws_instance.smtp4dev_mock_server.private_ip]
 }
