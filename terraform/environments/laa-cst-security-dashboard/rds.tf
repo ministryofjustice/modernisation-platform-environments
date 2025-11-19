@@ -4,7 +4,14 @@ resource "random_password" "cst_db" {
 }
 
 data "aws_db_subnet_group" "cst_database" {
-  name = "${local.application_name}-${local.environment}"
+  name       = "${local.application_name}-db-subnet-group"
+  subnet_ids = sort(data.aws_subnets.shared-data.ids)
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-db-subnet-group"
+    }
+  )
 }
 
 resource "aws_security_group" "cst_rds_sc" {
@@ -40,7 +47,7 @@ resource "aws_security_group" "cst_rds_sc" {
 resource "aws_db_instance" "cst_db" {
   identifier              = "cst-postgres-db"
   allocated_storage       = 20
-  db_subnet_group_name    = data.aws_db_subnet_group.cst_database.name
+  db_subnet_group_name    = aws_db_subnet_group.cst_database.name
   instance_class          = "db.t3.micro"
   engine                  = "postgres"
   engine_version          = "16"
