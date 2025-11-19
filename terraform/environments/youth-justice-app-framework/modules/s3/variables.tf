@@ -86,3 +86,9 @@ variable "s3_source_account" {
   description = "Source account from whch s3 buckets may be replicated."
   default     = null
 }
+
+variable "cors_policy_map" {
+  description = "Map of bucket name => CORS policy"
+  type        = map(any)
+  default     = {}
+}

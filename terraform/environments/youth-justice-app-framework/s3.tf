@@ -35,6 +35,17 @@ module "s3" {
   transfer_bucket_name = ["bands", "bedunlock", "cmm", "cms", "incident", "mis", "reporting", "yjsm-artefact", "yjsm", "transfer",
   "historical-infrastructure", "historical-apps"]
 
+
+  cors_policy_map = {
+    "cms" = {
+      allowed_headers = ["*"]
+      allowed_methods = ["GET"]
+      allowed_origins = ["https://yjaf.yjbservices.yjb.gov.uk"]
+      expose_headers  = []
+      # max_age_seconds can be omitted if not needed
+    }
+  }
+
   allow_replication = local.application_data.accounts[local.environment].allow_s3_replication
   s3_source_account = local.application_data.accounts[local.environment].source_account
 
