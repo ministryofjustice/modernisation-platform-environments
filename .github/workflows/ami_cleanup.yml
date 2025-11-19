@@ -184,7 +184,7 @@ jobs:
             TAGS_JSON="$(aws ec2 describe-images --image-ids "$AMI" --query 'Images[0].Tags' --output json 2>/dev/null || echo '[]')"
             STATUS="To be deleted"
             REASON=""
-            if [[ "$NAME" =~ ^(AwsBackup|Backup) ]] || echo "$TAGS_JSON" | jq -e '.[] | select((.Key|test("Retain|Backup";"i")) and (.Value|test("^(true|yes|1)$";"i")))' >/dev/null; then
+            if echo "$NAME" | grep -qi 'backup' || echo "$TAGS_JSON" | jq -e '.[] | select((.Key|test("Retain|Backup";"i")) and (.Value|test("^(true|yes|1)$";"i")))' >/dev/null; then
               echo "$AMI,$NAME,Protected name/tag" >> reports/protected_amis.csv
               STATUS="Protected"
               REASON="Protected name/tag"
@@ -418,7 +418,7 @@ jobs:
             NAME="$(aws ec2 describe-images --image-ids "$AMI" --query 'Images[0].Name' --output text 2>/dev/null || echo '')"
             WHEN="$(aws ec2 describe-images --image-ids "$AMI" --query 'Images[0].CreationDate' --output text 2>/dev/null | sed 's/\.[0-9]\+Z$/Z/')"
             TAGS_JSON="$(aws ec2 describe-images --image-ids "$AMI" --query 'Images[0].Tags' --output json 2>/dev/null || echo '[]')"
-            if [[ "$NAME" =~ ^(AwsBackup|Backup) ]] || echo "$TAGS_JSON" | jq -e '.[] | select((.Key|test("Retain|Backup"; "i")) and (.Value|test("^(true|yes|1)$"; "i")))' >/dev/null; then
+            if echo "$NAME" | grep -qi 'backup' || echo "$TAGS_JSON" | jq -e '.[] | select((.Key|test("Retain|Backup"; "i")) and (.Value|test("^(true|yes|1)$"; "i")))' >/dev/null; then
               echo "$AMI $NAME" >> protected_amis.tmp
               echo "$AMI,$NAME,Protected name/tag" >> reports/protected_amis.csv
             fi
@@ -478,7 +478,7 @@ jobs:
           CREDS_JSON=$(aws sts assume-role --role-arn "arn:aws:iam::${ACCOUNT_NUMBER}:role/MemberInfrastructureAccess" --role-session-name "live-ami-snaps-${{ matrix.account_name }}" --output json)
           export AWS_ACCESS_KEY_ID=$(jq -r '.Credentials.AccessKeyId' <<< "$CREDS_JSON")
           export AWS_SECRET_ACCESS_KEY=$(jq -r '.Credentials.SecretAccessKey' <<< "$CREDS_JSON")
-          export AWS_SESSION_TOKEN=$(jq -r '.Credentials.SessionToken' <<< "$CREDS_JSON")
+          export AWS_SESSION_TOKEN=$(jq -r '.Credentials.SessionToken'    <<< "$CREDS_JSON")
           echo "🧹 Snapshots — Fallback"
           aws_try() {
             local max=5 delay=2 attempt=1
@@ -516,7 +516,7 @@ jobs:
             if grep -Eiq '(^|[[:space:]])(Retain|Backup)[[:space:]]*=[[:space:]]*(true|yes|1)' <<< "${TAGS:-}"; then
               continue
             fi
-            if grep -qi 'AwsBackup' <<< "${DESC:-} ${NAME:-}"; then
+            if grep -qi 'backup' <<< "${DESC:-} ${NAME:-}"; then
               continue
             fi
             aws_try aws ec2 delete-snapshot --snapshot-id "$SNAP_ID" || true
@@ -544,7 +544,7 @@ jobs:
           echo "### 🚀 AMI Live — ${{ matrix.account_name }}" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "| Metric | Count |" >> "$GITHUB_STEP_SUMMARY"
-          echo "|---|---:|" >> "$GITHUB_STEP_SUMMARY"
+          echo "|---|---:|"
           echo "| AMIs deleted | ${DEL} |" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "**Deleted AMIs**" >> "$GITHUB_STEP_SUMMARY"
@@ -673,7 +673,7 @@ jobs:
           echo "### 🚀 EBS Live — ${{ matrix.account_name }}" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "| Metric | Count |" >> "$GITHUB_STEP_SUMMARY"
-          echo "|---|---:|" >> "$GITHUB_STEP_SUMMARY"
+          echo "|---|---:|"
           echo "| Volumes deleted | ${DEL} |" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "**Deleted volumes**" >> "$GITHUB_STEP_SUMMARY"
