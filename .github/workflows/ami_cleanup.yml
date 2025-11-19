@@ -32,9 +32,9 @@ env:
   APPLICATION:   ${{ github.event.inputs.application || 'cooker' }}
   ENVIRONMENTS:  ${{ github.event.inputs.environments || 'development' }}
   AMI_ARGS:      "-c -m 3"    # month-based AMI threshold for live runs
-  EBS_MONTHS:    "3"          # month-based EBS threshold for live runs
+  EBS_MONTHS:    "1"          # month-based EBS threshold for live runs
   AGE_MINUTES:   "3"          # age of resources in minutes when testing preview/live
-  LIVE_TEST_MODE: "true"     # false uses month gates and true uses the minute-based threshold
+  LIVE_TEST_MODE: "false"     # false uses month gates and true uses the minute-based threshold
 
 jobs:
   build-matrix:
