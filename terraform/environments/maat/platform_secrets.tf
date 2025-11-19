@@ -23,6 +23,7 @@ resource "aws_secretsmanager_secret" "maat_app_orch_client_id" {
     local.tags,
     {
       Name = "application-env-secret-${upper(local.application_name)}"
+      rotation_reason = "rotation_not_required_static_application_env"
     }
   )
 }
@@ -44,6 +45,7 @@ resource "aws_secretsmanager_secret" "maat_app_orch_endpoint" {
     local.tags,
     {
       Name = "application-env-secret-${upper(local.application_name)}"
+      rotation_reason = "rotation_not_required_static_application_env"
     }
   )
 }
@@ -65,6 +67,7 @@ resource "aws_secretsmanager_secret" "maat_app_orch_oauth_scope" {
     local.tags,
     {
       Name = "application-env-secret-${upper(local.application_name)}"
+      rotation_reason = "rotation_not_required_static_application_env"
     }
   )
 }
@@ -86,6 +89,7 @@ resource "aws_secretsmanager_secret" "maat_app_orch_client_secret" {
     local.tags,
     {
       Name = "application-env-secret-${upper(local.application_name)}"
+      rotation_reason = "rotation_not_required_static_application_env"
     }
   )
 }
@@ -106,6 +110,7 @@ resource "aws_secretsmanager_secret" "maat_app_bc_client_user_id" {
     local.tags,
     {
       Name = "application-env-secret-${upper(local.application_name)}"
+      rotation_reason = "rotation_not_required_static_application_env"
     }
   )
 }
@@ -126,6 +131,7 @@ resource "aws_secretsmanager_secret" "maat_app_google_analytics_tag_id" {
     local.tags,
     {
       Name = "application-env-secret-${upper(local.application_name)}"
+      rotation_reason = "rotation_not_required_static_application_env"
     }
   )
 }
@@ -146,6 +152,7 @@ resource "aws_secretsmanager_secret" "maat_app_bc_client_orig_id" {
     local.tags,
     {
       Name = "application-env-secret-${upper(local.application_name)}"
+      rotation_reason = "rotation_not_required_static_application_env"
     }
   )
 }
@@ -166,6 +173,7 @@ resource "aws_secretsmanager_secret" "maat_app_db_password" {
     local.tags,
     {
       Name = "application-env-secret-${upper(local.application_name)}"
+      rotation_reason = "rotation_not_required_static_application_env"
     }
   )
 }
@@ -186,6 +194,7 @@ resource "aws_secretsmanager_secret" "maat_app_caa_client_secret" {
     local.tags,
     {
       Name = "application-env-secret-${upper(local.application_name)}"
+      rotation_reason = "rotation_not_required_static_application_env"
     }
   )
 }
@@ -206,6 +215,7 @@ resource "aws_secretsmanager_secret" "maat_app_caa_client_id" {
     local.tags,
     {
       Name = "application-env-secret-${upper(local.application_name)}"
+      rotation_reason = "rotation_not_required_static_application_env"
     }
   )
 }
@@ -226,6 +236,7 @@ resource "aws_secretsmanager_secret" "maat_app_db_user_id" {
     local.tags,
     {
       Name = "application-env-secret-${upper(local.application_name)}"
+      rotation_reason = "rotation_not_required_static_application_env"
     }
   )
 }
@@ -246,6 +257,7 @@ resource "aws_secretsmanager_secret" "maat_app_caa_endpoint" {
     local.tags,
     {
       Name = "application-env-secret-${upper(local.application_name)}"
+      rotation_reason = "rotation_not_required_static_application_env"
     }
   )
 }
@@ -266,6 +278,7 @@ resource "aws_secretsmanager_secret" "maat_app_bc_service_name" {
     local.tags,
     {
       Name = "application-env-secret-${upper(local.application_name)}"
+      rotation_reason = "rotation_not_required_static_application_env"
     }
   )
 }
@@ -286,6 +299,7 @@ resource "aws_secretsmanager_secret" "maat_app_ats_client_secret" {
     local.tags,
     {
       Name = "application-env-secret-${upper(local.application_name)}"
+      rotation_reason = "rotation_not_required_static_application_env"
     }
   )
 }
@@ -306,6 +320,7 @@ resource "aws_secretsmanager_secret" "maat_app_ats_client_id" {
     local.tags,
     {
       Name = "application-env-secret-${upper(local.application_name)}"
+      rotation_reason = "rotation_not_required_static_application_env"
     }
   )
 }
@@ -326,6 +341,7 @@ resource "aws_secretsmanager_secret" "maat_app_ats_oauth_scope" {
     local.tags,
     {
       Name = "application-env-secret-${upper(local.application_name)}"
+      rotation_reason = "rotation_not_required_static_application_env"
     }
   )
 }
@@ -346,6 +362,7 @@ resource "aws_secretsmanager_secret" "maat_app_master_password" {
     local.tags,
     {
       Name = "application-env-secret-${upper(local.application_name)}"
+      rotation_reason = "rotation_not_required_static_application_env"
     }
   )
 }
@@ -366,6 +383,7 @@ resource "aws_secretsmanager_secret" "maat_app_salt" {
     local.tags,
     {
       Name = "application-env-secret-${upper(local.application_name)}"
+      rotation_reason = "rotation_not_required_static_application_env"
     }
   )
 }
@@ -386,6 +404,7 @@ resource "aws_secretsmanager_secret" "maat_app_derivation_iterations" {
     local.tags,
     {
       Name = "application-env-secret-${upper(local.application_name)}"
+      rotation_reason = "rotation_not_required_static_application_env"
     }
   )
 }
