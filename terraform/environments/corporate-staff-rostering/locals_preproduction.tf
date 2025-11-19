@@ -57,7 +57,7 @@ locals {
             width           = 8
             height          = 8
             add_ebs_widgets = { iops = true, throughput = true }
-            search_filter   = { ec2_tag = [{ tag_name = "Name", tag_value = "pd-csr-db-a" }] }
+            search_filter   = { ec2_tag = [{ tag_name = "Name", tag_value = "pp-csr-db-a" }] }
             widgets         = []
           }
         ]
