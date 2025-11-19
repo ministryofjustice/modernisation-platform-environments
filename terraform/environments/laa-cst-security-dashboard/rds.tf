@@ -15,22 +15,6 @@ resource "aws_security_group" "cst_rds_sc" {
     protocol    = "tcp"
     cidr_blocks = ["35.176.93.186/32"]
   }
-
-  egress {
-    description = "allow all outbound traffic for port 80"
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    description = "allow all outbound traffic for port 443"
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
 }
 
 resource "aws_db_instance" "cst_db" {
