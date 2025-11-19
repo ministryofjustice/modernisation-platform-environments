@@ -1,10 +1,10 @@
 resource "aws_security_group" "load_balancer_security_group" {
-  name_prefix = "${local.application_name}-load-balancer-sg-"
+  name_prefix = "${local.application_name}-lb-pub-sg-"
   description = "Access to the EBS App server"
   vpc_id      = data.aws_vpc.shared.id
 
   tags = merge(tomap(
-    { "Name" = "${local.application_name}-app-lb-sg" }
+    { "Name" = "${local.application_name}-app-lb-pub-sg" }
   ), local.tags)
 }
 
