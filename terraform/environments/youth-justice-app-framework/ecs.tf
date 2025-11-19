@@ -97,6 +97,7 @@ module "ecs" {
     aws_secretsmanager_secret.google_api.arn,
     aws_secretsmanager_secret.ordnance_survey_api.arn,
     aws_secretsmanager_secret.yjaf_credentials.arn,
+    aws_secretsmanager_secret.jwt_secret.arn,
     module.redshift.returns_secret_arn,
     module.datadog.datadog_api_key_secret_arn,
     module.datadog.datadog_api_key_plain_secret_arn
