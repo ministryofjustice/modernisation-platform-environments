@@ -23,6 +23,11 @@ on:
           - both
           - ami
           - ebs
+      account_names_override:
+        description: 'Optional comma-separated list of explicit account_names (e.g. cooker-development,other-account-key). If set, overrides application/environments mapping.'
+        required: false
+        type: string
+        default: ''
 
 permissions:
   id-token: write
@@ -47,16 +52,35 @@ jobs:
         id: strategy
         run: |
           set -euo pipefail
+
           app="${APPLICATION}"
           envs_str="${ENVIRONMENTS}"
-          IFS=', ' read -r -a envs <<< "$envs_str"
+          override="${{ github.event.inputs.account_names_override || '' }}"
+
           echo '{"include":[' > matrix.json
-          for env in "${envs[@]}"; do
-            acc="${app}-${env}"
-            echo "{\"account_name\":\"$acc\"}," >> matrix.json
-          done
+
+          if [[ -n "${override// }" ]]; then
+            # Use explicit account_names override if provided
+            IFS=', ' read -r -a accounts <<< "$override"
+            for acc in "${accounts[@]}"; do
+              [[ -z "${acc// }" ]] && continue
+              acc_trimmed="$(echo "$acc" | xargs)"
+              echo "{\"account_name\":\"$acc_trimmed\"}," >> matrix.json
+            done
+          else
+            # Default behaviour: derive account_name from application + environments
+            IFS=', ' read -r -a envs <<< "$envs_str"
+            for env in "${envs[@]}"; do
+              [[ -z "${env// }" ]] && continue
+              env_trimmed="$(echo "$env" | xargs)"
+              acc="${app}-${env_trimmed}"
+              echo "{\"account_name\":\"$acc\"}," >> matrix.json
+            done
+          fi
+
           sed -i '$ s/,$//' matrix.json
           echo ']}' >> matrix.json
+
           echo 'matrix<<EOF' >> $GITHUB_OUTPUT
           cat matrix.json >> $GITHUB_OUTPUT
           echo 'EOF' >> $GITHUB_OUTPUT
@@ -478,7 +502,7 @@ jobs:
           CREDS_JSON=$(aws sts assume-role --role-arn "arn:aws:iam::${ACCOUNT_NUMBER}:role/MemberInfrastructureAccess" --role-session-name "live-ami-snaps-${{ matrix.account_name }}" --output json)
           export AWS_ACCESS_KEY_ID=$(jq -r '.Credentials.AccessKeyId' <<< "$CREDS_JSON")
           export AWS_SECRET_ACCESS_KEY=$(jq -r '.Credentials.SecretAccessKey' <<< "$CREDS_JSON")
-          export AWS_SESSION_TOKEN=$(jq -r '.Credentials.SessionToken' <<< "$CREDS_JSON")
+          export AWS_SESSION_TOKEN=$(jq -r '.Credentials.SessionToken'    <<< "$CREDS_JSON")
           echo "🧹 Snapshots — Fallback"
           aws_try() {
             local max=5 delay=2 attempt=1
