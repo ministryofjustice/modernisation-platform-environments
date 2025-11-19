@@ -6,12 +6,12 @@
 
 # resource "aws_security_group" "oem_wl_security_group_1" {
 #   count       = length(local.application_data.accounts[local.environment].ec2_oem_ami_id_wl) > 0 ? 1 : 0
-#   name_prefix = "${local.application_name}-wl-server-sg-1-"
+#   name_prefix = "${local.application_name}-wl-server-sg-"
 #   description = "Access to the Weblogic server"
 #   vpc_id      = data.aws_vpc.shared.id
 
 #   tags = merge(tomap(
-#     { "Name" = "${local.application_name}-wl-server-sg-1" }
+#     { "Name" = "${local.application_name}-wl-server-sg" }
 #   ), local.tags)
 
 #   egress {

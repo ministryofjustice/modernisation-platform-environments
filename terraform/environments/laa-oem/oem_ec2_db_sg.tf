@@ -4,7 +4,7 @@ resource "aws_security_group" "oem_db_security_group" {
   vpc_id      = data.aws_vpc.shared.id
 
   tags = merge(tomap(
-    { "Name" = "${local.application_name}-db-server-sg-1" }
+    { "Name" = "${local.application_name}-db-server-sg" }
   ), local.tags)
 }
 
