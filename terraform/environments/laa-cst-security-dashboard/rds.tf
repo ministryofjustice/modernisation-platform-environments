@@ -21,7 +21,7 @@ resource "aws_db_instance" "cst_db" {
   skip_final_snapshot     = true
   deletion_protection     = true
   backup_retention_period = 1
-  vpc_security_group_ids  = [aws_security_group.cst_rds_sc.id]
+  vpc_security_group_ids  = [aws_security_group.cst_rds_sc.vpc_id]
   apply_immediately       = true
 
   tags = {
