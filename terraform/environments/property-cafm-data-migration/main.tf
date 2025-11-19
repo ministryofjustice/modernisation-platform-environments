@@ -25,7 +25,7 @@ module "rds_export" {
 
   kms_key_arn              = aws_kms_key.shared_kms_key.arn
   name                     = "planetfm"
-  db_name                  = "planetfm_${local.environment_shorthand}"
+  db_name                  = "planetfm"
   database_refresh_mode    = "full"
   output_parquet_file_size = 200
   max_concurrency          = 5
