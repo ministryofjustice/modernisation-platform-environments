@@ -727,16 +727,6 @@ module "share_dbs_with_dms_lambda_role" {
   de_role_arn             = null
 }
 
-module "share_stg_dbs_with_dms_lambda_role" {
-  source                  = "./modules/lakeformation_database_share"
-  dbs_to_grant            = toset([for db in local.historic_source_dbs : "${db}_staging"])
-  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
-  role_arn                = aws_iam_role.load_dms_output.arn
-  db_exists               = true
-  de_role_arn             = null
-}
-
-
 
 #-----------------------------------------------------------------------------------
 # Load MDSS Data IAM Role
