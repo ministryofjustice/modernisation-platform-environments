@@ -111,7 +111,7 @@ locals {
       slapd_log_level           = "conns,config,stats,stats2"
       container_cpu             = 16384
       container_memory          = 32768
-      health_check_start_period = 480
+      health_check_start_period = 300
     }
 
     sfs = {
