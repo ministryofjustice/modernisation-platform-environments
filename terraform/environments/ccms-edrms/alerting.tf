@@ -9,7 +9,7 @@ module "guardduty_chatbot" {
 
 module "cloudwatch_chatbot" {
   source           = "github.com/ministryofjustice/modernisation-platform-terraform-aws-chatbot?ref=0ec33c7bfde5649af3c23d0834ea85c849edf3ac" # v3.0.0"
-  slack_channel_id = data.aws_secretsmanager_secret_version.cloudwatch_slack_channel_id.secret_string
+  slack_channel_id = data.aws_secretsmanager_secret_version.slack_channel_id.secret_string
   sns_topic_arns   = [aws_sns_topic.cloudwatch_slack.arn]
   tags             = local.tags #--This doesn't seem to pass to anything in the module but is a mandatory var. Consider submitting a PR to the module. AW
   application_name = local.application_data.accounts[local.environment].app_name
