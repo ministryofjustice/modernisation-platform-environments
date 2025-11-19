@@ -22,8 +22,8 @@
       "snapshot_id_db_opt_oem_arch": "snap-0e41eb82143d24103"
     },
     "test": {
-      "ec2_oem_ami_id_app": "ami-00a433d5bdf0bd23b",
-      "ec2_oem_ami_id_db": "ami-0383b69679d229ff9",
+      "ec2_oem_ami_id_app": "ami-076a3ec996e3e63e0",
+      "ec2_oem_ami_id_db": "ami-0048220e126b83bf3",
       "ec2_oem_ami_id_wl": "",
       "ec2_oem_instance_type_app": "m5.xlarge",
       "ec2_oem_instance_type_db": "c5.2xlarge",
@@ -34,13 +34,13 @@
       "ec2_zone": "eu-west-2a",
       "env_in_fqdn": "test",
       "key_name": "oem-ec2-key-test",
-      "snapshot_id_app_opt_oem_app": "",
-      "snapshot_id_app_opt_oem_inst": "",
-      "snapshot_id_db_opt_oem_app": "",
-      "snapshot_id_db_opt_oem_inst": "",
-      "snapshot_id_db_opt_oem_dbf": "",
-      "snapshot_id_db_opt_oem_redo": "",
-      "snapshot_id_db_opt_oem_arch": ""
+      "snapshot_id_app_opt_oem_app": "snap-0542b2a0edfae1f98",
+      "snapshot_id_app_opt_oem_inst": "snap-0ea8edbaefd79a43f",
+      "snapshot_id_db_opt_oem_app": "snap-062d946f0f6024b8e",
+      "snapshot_id_db_opt_oem_inst": "snap-0d5e3cedd0a4dd471",
+      "snapshot_id_db_opt_oem_dbf": "snap-0dc2a068cd2040237",
+      "snapshot_id_db_opt_oem_redo": "snap-06d832ab1f8ceec7b",
+      "snapshot_id_db_opt_oem_arch": "snap-0b5065f16978b9833"
     },
     "preproduction": {
       "ec2_oem_ami_id_app": "ami-0dc9e412061b87365",
