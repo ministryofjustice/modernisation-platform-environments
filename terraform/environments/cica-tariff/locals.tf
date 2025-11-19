@@ -198,7 +198,7 @@ locals {
     },
     {
       device_name = "xvdi"
-      size        = 30
+      size        = local.environment == "production" ? 100 : 30
     }
   ]
 }

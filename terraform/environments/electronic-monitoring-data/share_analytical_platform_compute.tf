@@ -18,7 +18,6 @@ locals {
     "intermediate_mdss",
     "datamart",
     "derived",
-    "testing", # delete this one
     "test_results",
     "serco_servicenow_deduped",
     "serco_servicenow_curated",
@@ -43,6 +42,8 @@ locals {
     "g4s_centurion",
     "g4s_fep",
     "g4s_tasking",
+    "buddi_buddi",
+    "g4s_lcm_archive",
   ] : local.is-development ? ["test"] : []
 
   prod_dbs_to_grant = local.is-production ? [
@@ -68,7 +69,9 @@ locals {
     "staged_scram_alcohol_monitoring",
     "g4s_atrium_curated",
     "g4s_centurion_curated",
+    "g4s_tasking_curated",
     "curated_fep",
+    "g4s_lcm_archive_curated",
   ] : []
   dev_dbs_to_grant       = local.is-production ? [for db in local.prod_dbs_to_grant : "${db}_historic_dev_dbt"] : []
   dbt_dbs_to_grant       = [for db in local.dbt_dbs : "${db}${local.dbt_suffix}"]

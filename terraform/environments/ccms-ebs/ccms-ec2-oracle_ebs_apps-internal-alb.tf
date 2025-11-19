@@ -49,7 +49,7 @@ resource "aws_lb_listener" "ebsapps_internal_listener" {
     target_group_arn = aws_lb_target_group.ebsapp_internal_tg.id
   }
 
-  depends_on = [aws_acm_certificate_validation.external_nonprod, aws_acm_certificate_validation.external_prod ]
+  depends_on = [aws_acm_certificate_validation.external_nonprod, aws_acm_certificate_validation.external_prod]
 }
 
 

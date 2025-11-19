@@ -31,7 +31,7 @@ resource "aws_cloudwatch_log_group" "rds_listener" {
 # Log filter for edrms exception
 resource "aws_cloudwatch_log_metric_filter" "edrms_exception_thread" {
   name           = "EDRMSExceptionThread"
-  pattern        = "\"Problem occured calling Indexing service\""
+  pattern        = "\"EdrmsDocumentException\""
   log_group_name = aws_cloudwatch_log_group.log_group_edrms.name
 
   metric_transformation {

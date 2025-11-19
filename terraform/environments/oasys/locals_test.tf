@@ -59,6 +59,9 @@ locals {
             "Ec2T1WebPolicy",
           ])
         })
+        instance = merge(local.ec2_autoscaling_groups.web.instance, {
+          instance_type = "t3.small"
+        })
         tags = merge(local.ec2_autoscaling_groups.web.tags, {
           description        = "t1 oasys web"
           oasys-environment  = "t1"
@@ -80,6 +83,9 @@ locals {
             "Ec2T2WebPolicy",
           ])
         })
+        instance = merge(local.ec2_autoscaling_groups.web.instance, {
+          instance_type = "t3.small"
+        })
         tags = merge(local.ec2_autoscaling_groups.web.tags, {
           description        = "t2 oasys web"
           oasys-environment  = "t2"
@@ -92,7 +98,7 @@ locals {
         # For SAN project (OASYS replacement) requested by Howard Smith
         # Autoscaling disabled as initially server will be configured manually
         autoscaling_group = merge(local.ec2_autoscaling_groups.web.autoscaling_group, {
-          desired_capacity = 1 # setting to 0 leaves in a stopped state because of the warm_pool config below
+          desired_capacity = 1 # setting to 0 leaves in a stopped state because of the warm_pool config below ####
           warm_pool = {
             min_size          = 0
             reuse_on_scale_in = true
@@ -105,6 +111,9 @@ locals {
           instance_profile_policies = concat(local.ec2_autoscaling_groups.web.config.instance_profile_policies, [
             "Ec2T2WebPolicy",
           ])
+        })
+        instance = merge(local.ec2_autoscaling_groups.web.instance, {
+          instance_type = "t3.small"
         })
         user_data_cloud_init = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init, {
           args = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init.args, {
@@ -130,6 +139,7 @@ locals {
         })
         instance = merge(local.ec2_instances.bip.instance, {
           ami = "ami-0d206b8546ea2b68a" # to prevent instances being re-created due to recreated AMI
+          instance_type = "t3.medium"
         })
         user_data_cloud_init = merge(local.ec2_instances.bip.user_data_cloud_init, {
           args = merge(local.ec2_instances.bip.user_data_cloud_init.args, {
@@ -163,7 +173,7 @@ locals {
         }
         instance = merge(local.ec2_instances.db19c.instance, {
           disable_api_termination = true
-          instance_type           = "r6i.xlarge"
+          instance_type           = "r6i.large"
         })
         tags = merge(local.ec2_instances.db19c.tags, {
           bip-db-name         = "T1BIPINF"
@@ -183,6 +193,7 @@ locals {
         })
         instance = merge(local.ec2_instances.bip.instance, {
           ami = "ami-0d206b8546ea2b68a" # to prevent instances being re-created due to recreated AMI
+          instance_type           = "t3.medium"
         })
         user_data_cloud_init = merge(local.ec2_instances.bip.user_data_cloud_init, {
           args = merge(local.ec2_instances.bip.user_data_cloud_init.args, {
@@ -216,7 +227,7 @@ locals {
         }
         instance = merge(local.ec2_instances.db19c.instance, {
           disable_api_termination = true
-          instance_type           = "r6i.xlarge"
+          instance_type           = "r6i.large"
         })
         tags = merge(local.ec2_instances.db19c.tags, {
           bip-db-name         = "T2BIPINF"
@@ -227,7 +238,7 @@ locals {
         })
       })
 
-      t2-onr-db-a = merge(local.ec2_instances.db11g, {
+      t2-onr-db-a = merge(local.ec2_instances.db11g, { # needs the terraform aws provider/user-data fix + resize
         config = merge(local.ec2_instances.db11g.config, {
           availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.ec2_instances.db11g.config.instance_profile_policies, [
@@ -244,6 +255,7 @@ locals {
         instance = merge(local.ec2_instances.db11g.instance, {
           disable_api_termination = true
           instance_type           = "r6i.xlarge"
+          #instance_type           = "r6i.large"
         })
         tags = merge(local.ec2_instances.db11g.tags, {
           instance-scheduling = "skip-scheduling"
@@ -352,7 +364,6 @@ locals {
 
     # options for LBs https://docs.google.com/presentation/d/1RpXpfNY_hw7FjoMw0sdMAdQOF7kZqLUY6qVVtLNavWI/edit?usp=sharing
     lbs = {
-
       public = merge(local.lbs.public, {
         listeners = merge(local.lbs.public.listeners, {
           https = merge(local.lbs.public.listeners.https, {

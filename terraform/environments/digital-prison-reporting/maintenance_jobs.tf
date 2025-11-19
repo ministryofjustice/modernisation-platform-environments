@@ -26,16 +26,16 @@ module "glue_compact_job" {
   checkpoint_dir                = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.compaction_job_name}/"
   spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.compaction_job_name}/"
   # Placeholder Script Location
-  script_location              = local.glue_placeholder_script_location
-  project_id                   = local.project
-  aws_kms_key                  = local.s3_kms_arn
-  execution_class              = "FLEX"
-  worker_type                  = local.compact_job_worker_type
-  number_of_workers            = local.compact_job_num_workers
-  max_concurrent               = 64
-  region                       = local.account_region
-  account                      = local.account_id
-  log_group_retention_in_days  = local.glue_log_retention_in_days
+  script_location             = local.glue_placeholder_script_location
+  project_id                  = local.project
+  aws_kms_key                 = local.s3_kms_arn
+  execution_class             = "FLEX"
+  worker_type                 = local.compact_job_worker_type
+  number_of_workers           = local.compact_job_num_workers
+  max_concurrent              = 64
+  region                      = local.account_region
+  account                     = local.account_id
+  log_group_retention_in_days = local.glue_log_retention_in_days
 
   tags = merge(
     local.all_tags,
@@ -74,16 +74,16 @@ module "glue_retention_job" {
   checkpoint_dir                = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.retention_job_name}/"
   spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.retention_job_name}/"
   # Placeholder Script Location
-  script_location              = local.glue_placeholder_script_location
-  project_id                   = local.project
-  aws_kms_key                  = local.s3_kms_arn
-  execution_class              = "FLEX"
-  worker_type                  = local.retention_job_worker_type
-  number_of_workers            = local.retention_job_num_workers
-  max_concurrent               = 64
-  region                       = local.account_region
-  account                      = local.account_id
-  log_group_retention_in_days  = local.glue_log_retention_in_days
+  script_location             = local.glue_placeholder_script_location
+  project_id                  = local.project
+  aws_kms_key                 = local.s3_kms_arn
+  execution_class             = "FLEX"
+  worker_type                 = local.retention_job_worker_type
+  number_of_workers           = local.retention_job_num_workers
+  max_concurrent              = 64
+  region                      = local.account_region
+  account                     = local.account_id
+  log_group_retention_in_days = local.glue_log_retention_in_days
 
   tags = merge(
     local.all_tags,

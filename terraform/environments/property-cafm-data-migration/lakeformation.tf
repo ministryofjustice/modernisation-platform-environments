@@ -6,8 +6,9 @@ data "aws_iam_roles" "modernisation_platform" {
 
 resource "aws_lakeformation_data_lake_settings" "lake_formation" {
   admins = [
-    one(data.aws_iam_roles.modernisation_platform.arns),
-    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/MemberInfrastructureAccess"
+    #one(data.aws_iam_roles.modernisation_platform.arns),
+    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/MemberInfrastructureAccess",
+    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/lakeformation-share-role"
   ]
 
   parameters = {
