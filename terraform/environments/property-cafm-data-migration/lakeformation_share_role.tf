@@ -20,3 +20,17 @@ resource "aws_iam_role_policy_attachment" "analytical_platform_share_policy_atta
   role       = aws_iam_role.analytical_platform_share_role.name
   policy_arn = "arn:aws:iam::aws:policy/AWSLakeFormationCrossAccountManager"
 }
+
+data "aws_iam_policy_document" "lakeformation_share_permissions_policy" {
+  statement {
+    effect  = "Allow"
+    actions = ["iam:GetRole"]
+    resources = ["arn:aws:iam::*:role/lakeformation-share-role"]
+  }
+}
+
+resource "aws_iam_role_policy" "lakeformation_share_permissions_policy" {
+  name   = "lakeformation-share-permissions-policy"
+  role   = aws_iam_role.analytical_platform_share_role.id
+  policy = data.aws_iam_policy_document.lakeformation_share_permissions_policy.json
+}
