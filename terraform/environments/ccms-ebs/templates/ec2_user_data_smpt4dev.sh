@@ -12,7 +12,7 @@ until sudo docker info >/dev/null 2>&1; do
 done
  
 # Run your container
- sudo docker run -d --name smtp4dev-mock-email-container \
+ sudo docker run -d --name smtp4dev-mockserver-container \
    --restart always \
    -p 80:80 -p 2525:25 -p 110:110 \
    -v /path/on/host:/app/Data \
