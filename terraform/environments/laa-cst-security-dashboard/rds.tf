@@ -7,6 +7,14 @@ resource "aws_security_group" "cst_rds_sc" {
   name        = "ecs security group"
   description = "control access to the rds"
   vpc_id      = data.aws_vpc.shared.id
+
+  ingress {
+    description = "allow access on HTTPS for the Global Protect VPN"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["35.176.93.186/32"]
+  }
 }
 
 resource "aws_db_instance" "cst_db" {
@@ -21,7 +29,7 @@ resource "aws_db_instance" "cst_db" {
   skip_final_snapshot     = true
   deletion_protection     = true
   backup_retention_period = 1
-  vpc_security_group_ids  = [aws_security_group.cst_rds_sc.vpc_id]
+  vpc_security_group_ids  = [aws_security_group.cst_rds_sc.id]
   apply_immediately       = true
 
   tags = {
