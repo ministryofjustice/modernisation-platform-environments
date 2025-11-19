@@ -17,12 +17,18 @@ resource "aws_security_group" "cst_rds_sc" {
   }
 }
 
+resource "aws_db_subnet_group" "cst_database" {
+  name       = "${local.application_name}-tds-subnet-group"
+  subnet_ids = data.aws_subnets.shared-data.ids
+}
+
 resource "aws_db_instance" "cst_db" {
   identifier              = "cst-postgres-db"
   allocated_storage       = 20
   instance_class          = "db.t3.micro"
   engine                  = "postgres"
   engine_version          = "16"
+  db_subnet_group_name    = aws_db_subnet_group.cst_database.name
   username                = "postgresadmin"
   password                = random_password.cst_db.result
   publicly_accessible     = false
