@@ -475,4 +475,4 @@ resource "aws_vpc_security_group_ingress_rule" "oem_app_sg_ingress_tcp_9851_9851
 #  tags = {
 #    Name = "Oracle EM additional port from LB"
 #  }
-}
+#}
