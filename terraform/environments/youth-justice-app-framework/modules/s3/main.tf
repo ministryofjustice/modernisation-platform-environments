@@ -142,3 +142,25 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "bucket" {
     prevent_destroy = false
   }
 }
+
+
+resource "aws_s3_bucket" "cors" {
+  for_each = toset(var.bucket_name)
+
+  bucket = each.value
+  tags   = var.tags
+}
+
+resource "aws_s3_bucket_cors_configuration" "cors" {
+  for_each = { for b, cors in var.cors_policy_map : b => cors if contains(var.bucket_name, b) }
+
+  bucket = aws_s3_bucket.this[each.key].id
+
+  cors_rule {
+    allowed_headers = each.value.allowed_headers
+    allowed_methods = each.value.allowed_methods
+    allowed_origins = each.value.allowed_origins
+    expose_headers  = lookup(each.value, "expose_headers", null)
+    max_age_seconds = lookup(each.value, "max_age_seconds", null)
+  }
+}
