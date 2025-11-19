@@ -169,22 +169,26 @@ resource "aws_s3_bucket_notification" "load_dms_output_event" {
 # ----------------------------------------------
 
 module "load_mdss_event_queue" {
+  count = local.is-development ? 0 : 1
+
   source               = "./modules/sqs_s3_lambda_trigger"
   bucket               = module.s3-raw-formatted-data-bucket.bucket
-  lambda_function_name = module.load_mdss_lambda.lambda_function_name
+  lambda_function_name = module.load_mdss_lambda[0].lambda_function_name
   bucket_prefix        = local.bucket_prefix
 }
 
 resource "aws_s3_bucket_notification" "load_mdss_event" {
+  count = local.is-development ? 0 : 1
+
   bucket = module.s3-raw-formatted-data-bucket.bucket.id
 
   queue {
-    queue_arn     = module.load_mdss_event_queue.sqs_queue.arn
+    queue_arn     = module.load_mdss_event_queue[0].sqs_queue.arn
     events        = ["s3:ObjectCreated:*"]
     filter_prefix = "allied/mdss"
 
   }
 
-  depends_on = [module.load_mdss_event_queue]
+  depends_on = [module.load_mdss_event_queue[0]]
 }
 
