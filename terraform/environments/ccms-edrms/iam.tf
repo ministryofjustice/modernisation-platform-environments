@@ -195,8 +195,6 @@ resource "aws_iam_role_policy_attachment" "s3_policy_cortex_deps" {
   policy_arn = aws_iam_policy.s3_policy_cortex_deps[0].arn
 }
 
-
-
 data "aws_iam_policy_document" "guardduty_alerting_sns" {
   version = "2012-10-17"
   statement {
@@ -207,6 +205,26 @@ data "aws_iam_policy_document" "guardduty_alerting_sns" {
     ]
     resources = [
       aws_sns_topic.guardduty_alerts.arn
+    ]
+    principals {
+      type = "Service"
+      identifiers = [
+        "events.amazonaws.com",
+      ]
+    }
+  }
+}
+
+data "aws_iam_policy_document" "cloudwatch_alerting_sns" {
+  version = "2012-10-17"
+  statement {
+    sid    = "EventsAllowPublishSnsTopic"
+    effect = "Allow"
+    actions = [
+      "sns:Publish",
+    ]
+    resources = [
+      aws_sns_topic.cloudwatch_slack.arn
     ]
     principals {
       type = "Service"
