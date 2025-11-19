@@ -94,7 +94,7 @@ resource "aws_ami_copy" "a1_unreferenced_unused_old" {
 # WAIT: 3 minutes before creating the next AMIs (to establish age gap)
 resource "time_sleep" "three_min_gap" {
   depends_on      = [aws_ami_copy.a1_unreferenced_unused_old]
-  create_duration = "3m"
+  create_duration = "0s"
 }
 
 # Referenced in code (excluded when -c)
@@ -164,7 +164,7 @@ resource "aws_ebs_volume" "v1_unattached_old" {
 # WAIT: 3 minutes before creating the next volumes (to establish age gap)
 resource "time_sleep" "three_min_gap_vol" {
   depends_on      = [aws_ebs_volume.v1_unattached_old]
-  create_duration = "3m"
+  create_duration = "0s"
 }
 
 # V2: Attached (excluded by EBS cleanup)
