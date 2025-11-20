@@ -165,6 +165,7 @@ locals {
       })
 
       donotuse-rdgw-1-a = merge(local.ec2_instances.rdgw, {
+        cloudwatch_metric_alarms = {}
         config = merge(local.ec2_instances.rdgw.config, {
           availability_zone = "eu-west-2a"
           user_data_raw     = null
@@ -183,6 +184,7 @@ locals {
       })
 
       donotuse-jump2022-1 = merge(local.ec2_instances.jumpserver, {
+        cloudwatch_metric_alarms = {}
         config = merge(local.ec2_instances.jumpserver.config, {
           ami_name          = "hmpps_windows_server_2022_release_2025-01-02T00-00-40.487Z"
           availability_zone = "eu-west-2a"
@@ -202,6 +204,7 @@ locals {
       })
 
       donotuse-rds-1-a = merge(local.ec2_instances.rds, {
+        cloudwatch_metric_alarms = {}
         config = merge(local.ec2_instances.rds.config, {
           ami_name          = "hmpps_windows_server_2022_release_2025-04-02T00-00-40.543Z"
           availability_zone = "eu-west-2a"
