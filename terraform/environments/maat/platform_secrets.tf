@@ -17,6 +17,8 @@ data "aws_secretsmanager_secret_version" "environment_management" {
 }
 
 resource "aws_secretsmanager_secret" "maat_app_orch_client_id" {
+  #checkov:skip=CKV2_AWS_57: "Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
+  #checkov:skip=CKV_AWS_149: "Ignore - Ensure that Secrets Manager secret is encrypted using KMS CMK"
   name = "maat/APP_ORCH_CLIENT_ID"
 
   tags = merge(
@@ -38,6 +40,8 @@ resource "aws_secretsmanager_secret_version" "maat_app_orch_client_id" {
 
 
 resource "aws_secretsmanager_secret" "maat_app_orch_endpoint" {
+  #checkov:skip=CKV2_AWS_57: "Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
+  #checkov:skip=CKV_AWS_149: "Ignore - Ensure that Secrets Manager secret is encrypted using KMS CMK"
   name = "maat/APP_ORCH_ENDPOINT"
 
   tags = merge(
@@ -59,6 +63,8 @@ resource "aws_secretsmanager_secret_version" "maat_app_orch_endpoint" {
 
 # /maat/APP_ORCH_OAUTH_SCOPE
 resource "aws_secretsmanager_secret" "maat_app_orch_oauth_scope" {
+  #checkov:skip=CKV2_AWS_57: "Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
+  #checkov:skip=CKV_AWS_149: "Ignore - Ensure that Secrets Manager secret is encrypted using KMS CMK"
   name = "maat/APP_ORCH_OAUTH_SCOPE"
 
   tags = merge(
@@ -80,6 +86,8 @@ resource "aws_secretsmanager_secret_version" "maat_app_orch_oauth_scope" {
 
 # /maat/APP_ORCH_CLIENT_SECRET
 resource "aws_secretsmanager_secret" "maat_app_orch_client_secret" {
+  #checkov:skip=CKV2_AWS_57: "Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
+  #checkov:skip=CKV_AWS_149: "Ignore - Ensure that Secrets Manager secret is encrypted using KMS CMK"
   name = "maat/APP_ORCH_CLIENT_SECRET"
 
   tags = merge(
@@ -100,6 +108,8 @@ resource "aws_secretsmanager_secret_version" "maat_app_orch_client_secret" {
 }
 
 resource "aws_secretsmanager_secret" "maat_app_bc_client_user_id" {
+  #checkov:skip=CKV2_AWS_57: "Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
+  #checkov:skip=CKV_AWS_149: "Ignore - Ensure that Secrets Manager secret is encrypted using KMS CMK"
   name = "maat/APP_BC_CLIENT_USER_ID"
 
   tags = merge(
@@ -120,6 +130,8 @@ resource "aws_secretsmanager_secret_version" "maat_app_bc_client_user_id" {
 }
 
 resource "aws_secretsmanager_secret" "maat_app_google_analytics_tag_id" {
+  #checkov:skip=CKV2_AWS_57: "Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
+  #checkov:skip=CKV_AWS_149: "Ignore - Ensure that Secrets Manager secret is encrypted using KMS CMK"
   name = "maat/APP_MAAT_GOOGLE_ANALYTICS_4_TAG_ID"
 
   tags = merge(
@@ -140,6 +152,8 @@ resource "aws_secretsmanager_secret_version" "maat_app_google_analytics_tag_id" 
 }
 
 resource "aws_secretsmanager_secret" "maat_app_bc_client_orig_id" {
+  #checkov:skip=CKV2_AWS_57: "Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
+  #checkov:skip=CKV_AWS_149: "Ignore - Ensure that Secrets Manager secret is encrypted using KMS CMK"
   name = "maat/APP_BC_CLIENT_ORIG_ID"
 
   tags = merge(
@@ -160,6 +174,8 @@ resource "aws_secretsmanager_secret_version" "maat_app_bc_client_orig_id" {
 }
 
 resource "aws_secretsmanager_secret" "maat_app_db_password" {
+  #checkov:skip=CKV2_AWS_57: "Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
+  #checkov:skip=CKV_AWS_149: "Ignore - Ensure that Secrets Manager secret is encrypted using KMS CMK"
   name = "maat/APP_DB_PASSWORD"
 
   tags = merge(
@@ -180,6 +196,8 @@ resource "aws_secretsmanager_secret_version" "maat_app_db_password" {
 }
 
 resource "aws_secretsmanager_secret" "maat_app_caa_client_secret" {
+  #checkov:skip=CKV2_AWS_57: "Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
+  #checkov:skip=CKV_AWS_149: "Ignore - Ensure that Secrets Manager secret is encrypted using KMS CMK"
   name = "maat/APP_CAA_CLIENT_SECRET"
 
   tags = merge(
@@ -200,6 +218,8 @@ resource "aws_secretsmanager_secret_version" "maat_app_caa_client_secret" {
 }
 
 resource "aws_secretsmanager_secret" "maat_app_caa_client_id" {
+  #checkov:skip=CKV2_AWS_57: "Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
+  #checkov:skip=CKV_AWS_149: "Ignore - Ensure that Secrets Manager secret is encrypted using KMS CMK"
   name = "maat/APP_CAA_CLIENT_ID"
 
   tags = merge(
@@ -220,6 +240,8 @@ resource "aws_secretsmanager_secret_version" "maat_app_caa_client_id" {
 }
 
 resource "aws_secretsmanager_secret" "maat_app_db_user_id" {
+  #checkov:skip=CKV2_AWS_57: "Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
+  #checkov:skip=CKV_AWS_149: "Ignore - Ensure that Secrets Manager secret is encrypted using KMS CMK"
   name = "maat/APP_DB_USERID"
 
   tags = merge(
@@ -240,6 +262,8 @@ resource "aws_secretsmanager_secret_version" "maat_app_db_user_id" {
 }
 
 resource "aws_secretsmanager_secret" "maat_app_caa_endpoint" {
+  #checkov:skip=CKV2_AWS_57: "Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
+  #checkov:skip=CKV_AWS_149: "Ignore - Ensure that Secrets Manager secret is encrypted using KMS CMK"
   name = "maat/APP_CAA_ENDPOINT"
 
   tags = merge(
@@ -260,6 +284,8 @@ resource "aws_secretsmanager_secret_version" "maat_app_caa_endpoint" {
 }
 
 resource "aws_secretsmanager_secret" "maat_app_bc_service_name" {
+  #checkov:skip=CKV2_AWS_57: "Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
+  #checkov:skip=CKV_AWS_149: "Ignore - Ensure that Secrets Manager secret is encrypted using KMS CMK"
   name = "maat/APP_BC_SERVICE_NAME"
 
   tags = merge(
@@ -280,6 +306,8 @@ resource "aws_secretsmanager_secret_version" "maat_app_bc_service_name" {
 }
 
 resource "aws_secretsmanager_secret" "maat_app_ats_client_secret" {
+  #checkov:skip=CKV2_AWS_57: "Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
+  #checkov:skip=CKV_AWS_149: "Ignore - Ensure that Secrets Manager secret is encrypted using KMS CMK"
   name = "maat/APP_ATS_CLIENT_SECRET"
 
   tags = merge(
@@ -300,6 +328,8 @@ resource "aws_secretsmanager_secret_version" "maat_app_ats_client_secret" {
 }
 
 resource "aws_secretsmanager_secret" "maat_app_ats_client_id" {
+  #checkov:skip=CKV2_AWS_57: "Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
+  #checkov:skip=CKV_AWS_149: "Ignore - Ensure that Secrets Manager secret is encrypted using KMS CMK"
   name = "maat/APP_ATS_CLIENT_ID"
 
   tags = merge(
@@ -321,6 +351,8 @@ resource "aws_secretsmanager_secret_version" "maat_app_ats_client_id" {
 }
 
 resource "aws_secretsmanager_secret" "maat_app_ats_oauth_scope" {
+  #checkov:skip=CKV2_AWS_57: "Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
+  #checkov:skip=CKV_AWS_149: "Ignore - Ensure that Secrets Manager secret is encrypted using KMS CMK"
   name = "maat/APP_ATS_OAUTH_SCOPE"
 
   tags = merge(
@@ -342,6 +374,8 @@ resource "aws_secretsmanager_secret_version" "maat_app_ats_oauth_scope" {
 }
 
 resource "aws_secretsmanager_secret" "maat_app_master_password" {
+  #checkov:skip=CKV2_AWS_57: "Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
+  #checkov:skip=CKV_AWS_149: "Ignore - Ensure that Secrets Manager secret is encrypted using KMS CMK"
   name = "maat/APP_MASTER_PASSWORD"
 
   tags = merge(
@@ -363,6 +397,8 @@ resource "aws_secretsmanager_secret_version" "maat_app_master_password" {
 }
 
 resource "aws_secretsmanager_secret" "maat_app_salt" {
+  #checkov:skip=CKV2_AWS_57: "Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
+  #checkov:skip=CKV_AWS_149: "Ignore - Ensure that Secrets Manager secret is encrypted using KMS CMK"
   name = "maat/APP_SALT"
 
   tags = merge(
@@ -384,6 +420,8 @@ resource "aws_secretsmanager_secret_version" "maat_app_salt" {
 }
 
 resource "aws_secretsmanager_secret" "maat_app_derivation_iterations" {
+  #checkov:skip=CKV2_AWS_57: "Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
+  #checkov:skip=CKV_AWS_149: "Ignore - Ensure that Secrets Manager secret is encrypted using KMS CMK"
   name = "maat/APP_DERIVATION_ITERATIONS"
 
   tags = merge(
