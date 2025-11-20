@@ -294,5 +294,5 @@ resource "aws_route53_record" "route53_record_smtp4dev" {
   name     = "smtp4dev.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type     = "A"
   ttl      = 300
-  records  = [aws_instance.smtp4dev_mock_server.private_ip]
+  records  = [aws_instance.smtp4dev_mock_server[count.index].private_ip]
 }
