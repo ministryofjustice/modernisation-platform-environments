@@ -131,7 +131,7 @@ module "pagerduty_core_alerts" {
   depends_on = [
     aws_sns_topic.lambda_failure, aws_sns_topic.land_bucket_count
   ]
-  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=d88bd90"
   sns_topics                = [for key, value in local.sns_names_map : value]
   pagerduty_integration_key = local.pagerduty_integration_keys["electronic_monitoring_data_alarms"]
 }
