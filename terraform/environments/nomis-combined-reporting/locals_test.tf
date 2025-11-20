@@ -1,8 +1,8 @@
 locals {
 
   lb_maintenance_message_test = {
-    maintenance_title   = "Prison-NOMIS Reporting T1 Maintenance Window"
-    maintenance_message = "Prison-NOMIS Reporting T1 is currently unavailable due to planned maintenance or out-of-hours shutdown (7pm-7am). Please contact <a href=\"https://moj.enterprise.slack.com/archives/C6D94J81E\">#ask-digital-studio-ops</a> slack channel if environment is unexpectedly down."
+    maintenance_title   = "Prison-NOMIS Reporting Environment Not Started"
+    maintenance_message = "Prison-NOMIS Reporting T1 is rarely used so is started on demand. Please contact <a href=\"https://moj.enterprise.slack.com/archives/C6D94J81E\">#ask-digital-studio-ops</a> slack channel if you need the environment starting."
   }
 
   baseline_presets_test = {

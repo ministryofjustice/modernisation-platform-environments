@@ -98,7 +98,7 @@
       "IdpSamlMockEnabled": "false",
       "entra_custom_user_id_claim": "https://justice.org.uk/claims/USERNAME",
       "is_silas_enabled": "true",
-      "ccms_pui_feedback_url": "https://ccms-opa.laa.service.justice.gov.uk/opa/web-determinations/startsession/FeedbackForm",
+      "ccms_pui_feedback_url": "https://www.smartsurvey.co.uk/s/44VCIL/",
       "ccms_pui_owd_return_url": "https://ccms-pui.laa.service.justice.gov.uk/civil",
       "ccms_soa_url_ebsClientEndpoint": "https://ccms-soa-managed.laa-production.modernisation-platform.service.justice.gov.uk/soa-infra/services/default/ClientServices/ClientServices_ep",
       "ccms_soa_url_ebsCaseEndpoint": "https://ccms-soa-managed.laa-production.modernisation-platform.service.justice.gov.uk/soa-infra/services/default/CaseServices/CaseServices_ep",
