@@ -48,6 +48,13 @@ resource "aws_instance" "smtp4dev_mock_server" {
     environment               = "${local.environment}"
   }))
 
+  lifecycle {
+    ignore_changes = [     
+      user_data,
+      user_data_replace_on_change
+    ]
+  }
+
   tags = merge(local.tags,
     { Name = lower(format("ec2-%s-%s-smtp4dev", local.application_name, local.environment)) },
     { instance-scheduling = "skip-auto-start" },
