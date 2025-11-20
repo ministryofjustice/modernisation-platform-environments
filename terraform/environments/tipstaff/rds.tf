@@ -1,3 +1,4 @@
+# trivy:ignore:AVD-AWS-0080: RDS encryption encrytion will put DB out of service
 resource "aws_db_instance" "tipstaff_db" {
   allocated_storage           = local.application_data.accounts[local.environment].allocated_storage
   db_name                     = local.application_data.accounts[local.environment].db_name

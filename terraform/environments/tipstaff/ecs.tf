@@ -244,6 +244,9 @@ resource "aws_security_group" "ecs_service" {
 resource "aws_ecr_repository" "tipstaff_ecr_repo" {
   name         = "tipstaff-ecr-repo"
   force_delete = true
+  image_scanning_configuration {
+    scan_on_push = true
+  }
 }
 
 # AWS EventBridge rule

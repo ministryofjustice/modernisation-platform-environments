@@ -257,6 +257,7 @@ resource "aws_security_group" "tipstaff_lb_sc_pingdom_2" {
   }
 }
 
+#trivy:ignore:AVD-AWS-0053: this needs to be public
 resource "aws_lb" "tipstaff_lb" {
   name                       = "tipstaff-load-balancer"
   load_balancer_type         = "application"
@@ -264,6 +265,7 @@ resource "aws_lb" "tipstaff_lb" {
   subnets                    = data.aws_subnets.shared-public.ids
   enable_deletion_protection = false
   internal                   = false
+  drop_invalid_header_fields = true
   depends_on                 = [aws_security_group.tipstaff_lb_sc]
 }
 
