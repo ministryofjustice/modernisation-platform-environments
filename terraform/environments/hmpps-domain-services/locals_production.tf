@@ -252,6 +252,7 @@ locals {
         ]
 
         lb_alias_records = [
+          { name = "maintenance", type = "A", lbs_map_key = "public" },
           { name = "rdgateway1", type = "A", lbs_map_key = "public" },
           { name = "rdweb1", type = "A", lbs_map_key = "public" },
         ]

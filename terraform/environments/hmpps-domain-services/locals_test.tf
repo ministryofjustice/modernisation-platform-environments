@@ -330,6 +330,7 @@ locals {
     route53_zones = {
       "test.hmpps-domain.service.justice.gov.uk" = {
         lb_alias_records = [
+          { name = "maintenance", type = "A", lbs_map_key = "public" },
           { name = "rdgateway1", type = "A", lbs_map_key = "public" },
           { name = "rdweb1", type = "A", lbs_map_key = "public" },
         ]
