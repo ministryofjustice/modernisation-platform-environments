@@ -17,7 +17,7 @@ module "transfer_server_iam_policy" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.58.0"
+  version = "6.2.3"
 
   name_prefix = "transfer-server"
 
@@ -69,7 +69,7 @@ module "datasync_iam_policy" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.58.0"
+  version = "6.2.3"
 
   name_prefix = "datasync"
 
@@ -135,7 +135,7 @@ module "datasync_replication_iam_policy" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.58.0"
+  version = "6.2.3"
 
   name_prefix = "datasync-replication"
 
@@ -201,7 +201,7 @@ module "datasync_opg_replication_iam_policy" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.58.0"
+  version = "6.2.3"
 
   name_prefix = "datasync-opg-ingress-${local.environment}-replication"
 
@@ -348,7 +348,7 @@ module "guard_duty_s3_malware_protection_iam_policy" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.58.0"
+  version = "6.2.3"
 
   name_prefix = "guard-duty-s3-malware-protection-${local.environment}-scan"
 
@@ -446,7 +446,7 @@ module "laa_data_analysis_iam_policy" {
   count = local.environment == "production" ? 1 : 0
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.58.0"
+  version = "6.2.3"
 
   name_prefix = "laa-data-analysis"
 
@@ -531,7 +531,7 @@ module "laa_data_analysis_replication_iam_policy" {
   count = local.environment == "production" ? 1 : 0
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.58.0"
+  version = "6.2.3"
 
   name_prefix = "laa-data-analysis-${local.environment}-replication"
 
