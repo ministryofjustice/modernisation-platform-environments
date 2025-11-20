@@ -239,6 +239,16 @@ locals {
         source_arn_suffix = "*"
       }]
     }
+    sync_ssm_to_waf = {
+      description  = "Function to synchronize ssm parameter store with WAF ip sets."
+      role_key     = "sync_ssm_to_waf"
+      environments = ["development", "preproduction", "production"]
+      vpc_config   = { production = true }
+      permissions = [{
+        principal         = "events.amazonaws.com"
+        source_arn_suffix = "*"
+      }]
+    }
   }
 
   # Flatten lambda functions with environments
