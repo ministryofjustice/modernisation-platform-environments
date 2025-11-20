@@ -3,9 +3,7 @@
 #########################################################
 
 locals {
-  associated_load_balancers_arns = local.environment == "development" ? [aws_lb.WAM-ALB.arn] : (
-    local.environment == "preproduction" ? [aws_lb.WAM-ALB-UAT.arn] : []
-  )
+  associated_load_balancers_arns = local.environment != "production" ? [aws_lb.WAM-ALB.arn] : []
 }
 
 module "waf" {
