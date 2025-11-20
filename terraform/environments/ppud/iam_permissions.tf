@@ -280,7 +280,7 @@ resource "aws_iam_policy" "lambda_policies_v2" {
         Resource = ["arn:aws:ssm:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"]
         } : each.value.policy_name == "update_waf_ipset" ? {
         Effect   = "Allow"
-        Action   = ["wafv2:GetIPSet", "wafv2:UpdateIPSet"]
+        Action   = ["wafv2:GetIPSet", "wafv2:ListIPSets", "wafv2:UpdateIPSet"]
         Resource = ["arn:aws:wafv2:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"]
         } : each.value.policy_name == "get_certificate_expiry" ? {
         Effect   = "Allow"
