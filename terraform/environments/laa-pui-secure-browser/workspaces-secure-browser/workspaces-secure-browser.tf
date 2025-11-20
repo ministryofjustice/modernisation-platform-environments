@@ -231,8 +231,7 @@ resource "aws_workspacesweb_browser_settings" "main" {
           "portal.manage.microsoft.com",
           "provisioningapi.microsoftonline.com",
           "www.gov.uk",
-          "www.justice.gov.uk",
-          "www.smartsurvey.co.uk"
+          "www.justice.gov.uk"
         ]
       }
       "AlwaysOpenPdfExternally" = {
