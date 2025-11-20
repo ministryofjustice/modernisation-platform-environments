@@ -7,7 +7,7 @@ module "workspacesweb_security_group" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/security-group/aws"
-  version = "5.3.0"
+  version = "~> 5.2"
 
   name   = "workspacesweb"
   vpc_id = local.vpc_id
@@ -236,7 +236,8 @@ resource "aws_workspacesweb_browser_settings" "main" {
           "www.justice.gov.uk",
           "justice.gov.uk",
           "legalservices.gov.uk",
-          "lsconline.legalservices.gov.uk"
+          "lsconline.legalservices.gov.uk",
+          "www.smartsurvey.co.uk"
         ]
       }
       "AlwaysOpenPdfExternally" = {
