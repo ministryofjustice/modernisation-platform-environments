@@ -74,7 +74,7 @@ module "lakeformation_registration_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
-  version = "6.2.1"
+  version = "5.60.0"
 
   name            = "lakeformation-registration"
   use_name_prefix = "false"
