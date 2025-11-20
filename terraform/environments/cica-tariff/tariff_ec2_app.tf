@@ -35,7 +35,7 @@ resource "aws_instance" "tariff_app" {
       "Name"               = "${local.application_name}-app-root",
       "volume-attach-host" = "app",
       "volume-mount-path"  = "/",
-    }), local.tags, local.environment != "production" ? tomap({ backup = true }) : tomap({}))
+    }), local.tags, local.environment != "production" ? tomap({ "backup" = "true" }) : tomap({}))
   }
   /*
   ebs_block_device {
@@ -86,7 +86,7 @@ resource "aws_instance" "tariff_app" {
   tags = merge(tomap({
     "Name"     = lower(format("ec2-%s-%s-app", local.application_name, local.environment)),
     "hostname" = "${local.application_name}-app",
-    }), local.tags, local.environment != "production" ? tomap({ backup = true }) : tomap({})
+    }), local.tags, local.environment != "production" ? tomap({ "backup" = "true" }) : tomap({})
   )
 
   lifecycle {
@@ -103,7 +103,7 @@ resource "aws_ebs_volume" "tariff_app_storage" {
     "Name"               = "${local.application_name}-app-root",
     "volume-attach-host" = "app",
     "volume-mount-path"  = "/",
-  }), local.tags, local.environment != "production" ? tomap({ backup = true }) : tomap({}))
+  }), local.tags, local.environment != "production" ? tomap({ "backup" = "true" }) : tomap({}))
 }
 
 resource "aws_volume_attachment" "tariff_app_storage_attachment" {
