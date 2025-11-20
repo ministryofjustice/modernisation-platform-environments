@@ -1,3 +1,21 @@
+variable "environment" {
+  type    = string
+  default = "development" # can be dev, test, preprod, prod
+}
+
+locals {
+  cidr_map = {
+    development    = "10.200.0.0/20"
+    test    = "10.200.16.0/20"
+    preproduction = "10.200.16.0/20"
+    production    = "10.200.16.0/20"
+  }
+
+  is_non_prod = var.environment != "production"
+}
+
+
+
 resource "aws_security_group" "smtp4dev_mock_server_sg" {
   count    = local.is-production ? 0 : 1
   name        = "smtp4dev_mock_server_sg"
@@ -17,7 +35,8 @@ resource "aws_vpc_security_group_ingress_rule" "smtp4dev_workspace_80_ingress_ru
   ip_protocol = "tcp"
   from_port   = 80
   to_port     = 80
-  cidr_ipv4 = "10.200.0.0/20"
+ # cidr_ipv4 = "10.200.0.0/20"
+  cidr_ipv4   = local.cidr_map[var.environment]
 
 }
 
