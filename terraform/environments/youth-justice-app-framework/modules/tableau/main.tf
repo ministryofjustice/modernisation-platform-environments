@@ -55,7 +55,7 @@ module "tableau-alb" {
   # checkov:skip=CKV_TF_1
 
   source  = "terraform-aws-modules/alb/aws"
-  version = "9.13.0"
+  version = "10.2.0"
 
   name    = var.alb_name
   vpc_id  = var.vpc_id
