@@ -50,39 +50,39 @@ resource "aws_ecs_task_definition" "tipstaff_task_definition" {
       environment = [
         {
           name  = "RDS_HOSTNAME"
-          value = "${aws_db_instance.tipstaff_db.address}"
+          value = aws_db_instance.tipstaff_db.address
         },
         {
           name  = "RDS_PORT"
-          value = "${local.application_data.accounts[local.environment].rds_port}"
+          value = local.application_data.accounts[local.environment].rds_port
         },
         {
           name  = "RDS_USERNAME"
-          value = "${aws_db_instance.tipstaff_db.username}"
+          value = aws_db_instance.tipstaff_db.username
         },
         {
           name  = "RDS_PASSWORD"
-          value = "${aws_db_instance.tipstaff_db.password}"
+          value = aws_db_instance.tipstaff_db.password
         },
         {
           name  = "DB_NAME"
-          value = "${aws_db_instance.tipstaff_db.db_name}"
+          value = aws_db_instance.tipstaff_db.db_name
         },
         {
           name  = "supportEmail"
-          value = "${local.application_data.accounts[local.environment].support_email}"
+          value = local.application_data.accounts[local.environment].support_email
         },
         {
           name  = "supportTeam"
-          value = "${local.application_data.accounts[local.environment].support_team}"
+          value = local.application_data.accounts[local.environment].support_team
         },
         {
           name  = "CurServer"
-          value = "${local.application_data.accounts[local.environment].curserver}"
+          value = local.application_data.accounts[local.environment].curserver
         },
         {
           name  = "ida:ClientId"
-          value = "${local.application_data.accounts[local.environment].client_id}"
+          value = local.application_data.accounts[local.environment].client_id
         }
       ]
     }

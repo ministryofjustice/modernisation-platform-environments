@@ -81,6 +81,6 @@ resource "null_resource" "setup_db" {
     }
   }
   triggers = {
-    always_run = "${timestamp()}"
+    always_run = timestamp()
   }
 }
