@@ -29,7 +29,7 @@ resource "aws_vpc_security_group_ingress_rule" "smtp4dev_ccmsebs_2525_ingress_ru
   ip_protocol = "tcp"
   from_port   = 2525
   to_port     = 2525
-  cidr_ipv4 = data.aws_subnet.data_subnets_a.id
+  cidr_ipv4 = data.aws_subnet.data_subnets_a.cidr_block
 }
 
 resource "aws_vpc_security_group_ingress_rule" "smtp4dev_ccmsebs_110_ingress_rule" {
@@ -40,7 +40,7 @@ resource "aws_vpc_security_group_ingress_rule" "smtp4dev_ccmsebs_110_ingress_rul
   ip_protocol = "tcp"
   from_port   = 110
   to_port     = 110
-  cidr_ipv4 = data.aws_subnet.data_subnets_a.id
+  cidr_ipv4 = data.aws_subnet.data_subnets_a.cidr_block
 }
 
 
