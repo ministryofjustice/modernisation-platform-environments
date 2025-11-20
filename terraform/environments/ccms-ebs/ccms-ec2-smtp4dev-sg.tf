@@ -1,15 +1,7 @@
- locals {
-    cidr_map = {
-    development    = "10.200.0.0/20"
-    test    = "10.200.0.0/20"
-    preproduction = "10.200.16.0/20"
-    production    = "10.200.16.0/20"
-   }
- }
-resource "aws_security_group" "smtp4dev_mock_server_sg" {
-  count    = local.is-production ? 0 : 1
-  name        = "smtp4dev_mock_server_sg"
-  description = "Security group for smtp4dev mock server"
+ resource "aws_security_group" "smtp4dev_mock_server_sg" {
+ count    = local.is-production ? 0 : 1
+ name        = "smtp4dev_mock_server_sg"
+ description = "Security group for smtp4dev mock server"
   vpc_id      = data.aws_vpc.shared.id
 
   tags = merge(local.tags,
@@ -24,8 +16,7 @@ resource "aws_vpc_security_group_ingress_rule" "smtp4dev_workspace_80_ingress_ru
    ip_protocol = "tcp"
    from_port   = 80
     to_port     = 80
-   cidr_ipv4   = local.cidr_map[local.environment]
-
+   cidr_ipv4   = local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_prod
 }
 
 resource "aws_vpc_security_group_ingress_rule" "smtp4dev_ccmsebs_2525_ingress_rule" {
