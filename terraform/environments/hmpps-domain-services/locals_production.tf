@@ -1,5 +1,10 @@
 locals {
 
+  lb_maintenance_message_production = {
+    maintenance_title   = "Remote Desktop Environment Maintenance Window"
+    maintenance_message = "Remote Desktop Environment is currently unavailable due to planned maintenance. Please try again later"
+  }
+
   baseline_presets_production = {
     options = {
       sns_topics = {
@@ -189,6 +194,26 @@ locals {
                   host_header = {
                     values = [
                       "rdweb1.hmpps-domain.service.justice.gov.uk",
+                      "cafmtx.planetfm.service.justice.gov.uk",
+                      "cafmtx.az.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              maintenance = {
+                priority = 999
+                actions = [{
+                  type = "fixed-response"
+                  fixed_response = {
+                    content_type = "text/html"
+                    message_body = templatefile("templates/maintenance.html.tftpl", local.lb_maintenance_message_production)
+                    status_code  = "200"
+                  }
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "maintenance.hmpps-domain.service.justice.gov.uk",
                       "cafmtx.planetfm.service.justice.gov.uk",
                       "cafmtx.az.justice.gov.uk",
                     ]

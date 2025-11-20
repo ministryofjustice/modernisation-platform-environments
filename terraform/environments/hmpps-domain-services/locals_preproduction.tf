@@ -1,5 +1,10 @@
 locals {
 
+  lb_maintenance_message_test = {
+    maintenance_title   = "Remote Desktop Environment Not Started"
+    maintenance_message = "Please contact <a href=\"https://moj.enterprise.slack.com/archives/C6D94J81E\">#ask-digital-studio-ops</a> slack channel if environment is unexpectedly down"
+  }
+
   baseline_presets_preproduction = {
     options = {
       sns_topics = {
@@ -191,6 +196,26 @@ locals {
                 conditions = [{
                   host_header = {
                     values = [
+                      "rdweb1.preproduction.hmpps-domain.service.justice.gov.uk",
+                      "cafmtx.pp.planetfm.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              maintenance = {
+                priority = 999
+                actions = [{
+                  type = "fixed-response"
+                  fixed_response = {
+                    content_type = "text/html"
+                    message_body = templatefile("templates/maintenance.html.tftpl", local.lb_maintenance_message_preproduction)
+                    status_code  = "200"
+                  }
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "maintenance.preproduction.hmpps-domain.service.justice.gov.uk",
                       "rdweb1.preproduction.hmpps-domain.service.justice.gov.uk",
                       "cafmtx.pp.planetfm.service.justice.gov.uk",
                     ]
