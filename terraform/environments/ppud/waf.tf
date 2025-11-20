@@ -2,12 +2,14 @@
 # Web Application Firewall ACL, IP Sets & WAF Rule Groups
 #########################################################
 
-#########################
-# Development Environment
-#########################
-
 locals {
-  associated_load_balancers_arns = local.environment == "development" ? [aws_lb.WAM-ALB.arn] : []
+  lb_arns_by_env = {
+    development    = [aws_lb.WAM-ALB.arn]
+    preproduction  = [aws_lb.WAM-ALB-UAT.arn]
+  # production     = [aws_lb.WAM-ALB-PROD.arn] # to be deployed in January 2026
+  }
+
+  associated_load_balancers_arns = lookup(local.lb_arns_by_env, local.environment, [])
 }
 
 module "waf" {
