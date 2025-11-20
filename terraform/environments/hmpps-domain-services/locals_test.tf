@@ -168,65 +168,6 @@ locals {
           service-user             = "svc_rds"
         })
       })
-
-      donotuse-rdgw-1-a = merge(local.ec2_instances.rdgw, {
-        cloudwatch_metric_alarms = {}
-        config = merge(local.ec2_instances.rdgw.config, {
-          availability_zone = "eu-west-2a"
-          user_data_raw     = null
-        })
-        instance = merge(local.ec2_instances.rdgw.instance, {
-          tags = {
-            patch-manager = "group1"
-          }
-        })
-        tags = merge(local.ec2_instances.rdgw.tags, {
-          description              = "Remote Desktop Gateway for azure.noms.root domain"
-          domain-name              = "azure.noms.root"
-          gha-jumpserver-startstop = "test2"
-          instance-scheduling      = "skip-scheduling"
-        })
-      })
-
-      donotuse-jump2022-1 = merge(local.ec2_instances.jumpserver, {
-        cloudwatch_metric_alarms = {}
-        config = merge(local.ec2_instances.jumpserver.config, {
-          ami_name          = "hmpps_windows_server_2022_release_2025-01-02T00-00-40.487Z"
-          availability_zone = "eu-west-2a"
-          user_data_raw     = null
-        })
-        instance = merge(local.ec2_instances.jumpserver.instance, {
-          instance_type = "r6i.large"
-          tags = {
-            patch-manager = "group2"
-          }
-        })
-        tags = merge(local.ec2_instances.jumpserver.tags, {
-          domain-name              = "azure.noms.root"
-          gha-jumpserver-startstop = "test2"
-          instance-scheduling      = "skip-scheduling"
-        })
-      })
-
-      donotuse-rds-1-a = merge(local.ec2_instances.rds, {
-        cloudwatch_metric_alarms = {}
-        config = merge(local.ec2_instances.rds.config, {
-          ami_name          = "hmpps_windows_server_2022_release_2025-04-02T00-00-40.543Z"
-          availability_zone = "eu-west-2a"
-          user_data_raw     = null
-        })
-        instance = merge(local.ec2_instances.rds.instance, {
-          tags = {
-            patch-manager = "group2"
-          }
-        })
-        tags = merge(local.ec2_instances.rds.tags, {
-          domain-name              = "azure.noms.root"
-          gha-jumpserver-startstop = "test2"
-          instance-scheduling      = "skip-scheduling"
-          service-user             = "svc_rds"
-        })
-      })
     }
 
     lbs = {
