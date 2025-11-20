@@ -7,11 +7,13 @@ resource "aws_ecs_cluster" "tipstaff_cluster" {
 }
 
 resource "aws_cloudwatch_log_group" "deployment_logs" {
+  # checkov:skip=CKV_AWS_158: "CloudWatch log group is not public facing, does not contain any sensitive information and does not need encryption"
   name              = "/aws/events/deploymentLogs"
   retention_in_days = "7"
 }
 
 resource "aws_cloudwatch_log_group" "ecs_logs" {
+  # checkov:skip=CKV_AWS_158: "CloudWatch log group is not public facing, does not contain any sensitive information and does not need encryption"
   name              = "tipstaff-ecs"
   retention_in_days = "7"
 }
@@ -222,6 +224,7 @@ resource "aws_iam_role_policy" "app_task" {
 }
 
 resource "aws_security_group" "ecs_service" {
+  #checkov:skip=CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
   name_prefix = "ecs-service-sg-"
   vpc_id      = data.aws_vpc.shared.id
 
@@ -376,7 +379,7 @@ module "pagerduty_core_alerts_non_prod" {
   depends_on = [
     aws_sns_topic.tipstaff_utilisation_alarm
   ]
-  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=0179859e6fafc567843cd55c0b05d325d5012dc4"
   sns_topics                = [aws_sns_topic.tipstaff_utilisation_alarm[0].name]
   pagerduty_integration_key = local.pagerduty_integration_keys["tipstaff_non_prod_alarms"]
 }
@@ -387,7 +390,7 @@ module "pagerduty_core_alerts_prod" {
   depends_on = [
     aws_sns_topic.tipstaff_utilisation_alarm
   ]
-  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=0179859e6fafc567843cd55c0b05d325d5012dc4"
   sns_topics                = [aws_sns_topic.tipstaff_utilisation_alarm[0].name]
   pagerduty_integration_key = local.pagerduty_integration_keys["tipstaff_prod_alarms"]
 }
