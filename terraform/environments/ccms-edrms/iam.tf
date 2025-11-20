@@ -229,7 +229,7 @@ data "aws_iam_policy_document" "cloudwatch_alerting_sns" {
     principals {
       type = "Service"
       identifiers = [
-        "cloudwatch.amazonaws.com", "lambda.amazonaws.com"
+        "cloudwatch.amazonaws.com"
       ]
     }
   }
