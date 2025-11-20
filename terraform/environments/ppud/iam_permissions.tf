@@ -94,6 +94,8 @@ locals {
     sync_ssm_to_waf = {
       description = "Lambda Function Role for syncing SSM parameter stores to WAF ip sets"
       policies = [
+        "send_message_to_sqs",
+        "send_logs_to_cloudwatch",
         "get_ssm_parameter",
         "update_waf_ipset"
       ]
@@ -279,7 +281,7 @@ resource "aws_iam_policy" "lambda_policies_v2" {
         } : each.value.policy_name == "update_waf_ipset" ? {
         Effect   = "Allow"
         Action   = ["wafv2:GetIPSet", "wafv2:UpdateIPSet"]
-        Resource = ["arn:aws:ssm:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"]
+        Resource = ["arn:aws:wafv2:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"]
         } : each.value.policy_name == "get_certificate_expiry" ? {
         Effect   = "Allow"
         Action   = ["acm:DescribeCertificate", "acm:GetCertificate", "acm:ListCertificates", "acm:ListTagsForCertificate"]
