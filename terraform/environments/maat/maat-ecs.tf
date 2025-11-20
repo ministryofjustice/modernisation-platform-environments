@@ -122,12 +122,13 @@ data "aws_ssm_parameter" "ecs_optimized_ami" {
 # if the AMI is used elsewhere it can be obtained here
 output "ami_id" {
   value     = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"]
-  sensitive = true
+  sensitive = truesecr
 }
 
 ##### EC2 launch config/template -----
 
 resource "aws_launch_template" "maat_ec2_launch_template" {
+  #checkov:skip=AVD-AWS-0130: "Ignore - Launch template does not require IMDS access to require a token"
   name_prefix   = "${local.application_name}-ec2-launch-template"
   image_id      = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"]
   instance_type = local.application_data.accounts[local.environment].instance_type
