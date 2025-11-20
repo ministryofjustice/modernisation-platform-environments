@@ -74,7 +74,7 @@ module "lakeformation_registration_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
-  version = "5.60.0"
+  version = "6.2.1"
 
   name            = "lakeformation-registration"
   use_name_prefix = "false"
@@ -103,12 +103,12 @@ module "lakeformation_registration_iam_role" {
     S3BucketAccess = {
       effect    = "Allow"
       actions   = ["s3:ListBucket"]
-      resources = [module.s3-create-a-derived-table.bucket.arn]
+      resources = [module.s3-create-a-derived-table-bucket.bucket.arn]
     }
     S3ObjectAccess = {
       effect    = "Allow"
       actions   = ["s3:DeleteObject", "s3:GetObject", "s3:PutObject"]
-      resources = ["${module.s3-create-a-derived-table.bucket.arn}/*"]
+      resources = ["${module.s3-create-a-derived-table-bucket.bucket.arn}/*"]
     }
   }
 }
