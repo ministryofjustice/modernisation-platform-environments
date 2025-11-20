@@ -1,5 +1,5 @@
 module "csv_export" {
-  source = "github.com/ministryofjustice/terraform-csv-to-parquet-athena?ref=0e258f4b5554e7d67069ca5d88138948a4357e66"
+  source = "github.com/ministryofjustice/terraform-csv-to-parquet-athena?ref=519f9ee248ec2a7df10ebfc03f401ba15c833c8a"
   providers = {
     aws.bucket-replication = aws
   }
@@ -25,7 +25,7 @@ module "rds_export" {
 
   kms_key_arn              = aws_kms_key.shared_kms_key.arn
   name                     = "planetfm"
-  db_name                  = "planetfm_${local.environment_shorthand}"
+  db_name                  = "planetfm"
   database_refresh_mode    = "full"
   output_parquet_file_size = 200
   max_concurrency          = 5

@@ -27,7 +27,8 @@ resource "aws_secretsmanager_secret_version" "pui_secrets" {
     ccms_soa_soapHeaderUserPassword  = "",
     ccms_soa_soapHeaderUserName      = "",
     opa_security_password            = "",
-    guardduty_slack_channel_id       = ""
+    guardduty_slack_channel_id       = "",
+    cloudwatch_slack_channel_id      = ""
   })
 
   lifecycle {
