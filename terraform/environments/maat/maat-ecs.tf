@@ -128,6 +128,7 @@ output "ami_id" {
 ##### EC2 launch config/template -----
 
 resource "aws_launch_template" "maat_ec2_launch_template" {
+  #checkov:skip=AVD-AWS-0130: "Ignore - Launch template does not require IMDS access to require a token"
   name_prefix   = "${local.application_name}-ec2-launch-template"
   image_id      = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"]
   instance_type = local.application_data.accounts[local.environment].instance_type
@@ -489,6 +490,16 @@ resource "aws_iam_policy" "maat_ecs_policy_access_params" {
         Action = "ssm:GetParameters"
         Resource = [
           "arn:aws:ssm:${local.env_account_region}:${local.env_account_id}:parameter/maat/*"
+        ]
+      },
+      {
+        "Effect": "Allow",
+        "Action": [
+          "secretsmanager:GetSecretValue"
+        ],
+        "Resource": [
+          "arn:aws:secretsmanager:${local.env_account_region}:${local.env_account_id}:secret:maat/*"
+
         ]
       },
       {
