@@ -122,7 +122,7 @@ data "aws_ssm_parameter" "ecs_optimized_ami" {
 # if the AMI is used elsewhere it can be obtained here
 output "ami_id" {
   value     = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"]
-  sensitive = truesecr
+  sensitive = true
 }
 
 ##### EC2 launch config/template -----
