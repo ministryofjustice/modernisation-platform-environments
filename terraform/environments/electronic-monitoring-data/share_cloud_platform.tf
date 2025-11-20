@@ -100,6 +100,7 @@ variable "cloud-platform-crime-matching-iam-dev" {
 
 resource "aws_lakeformation_resource" "data_bucket" {
   arn = module.s3-create-a-derived-table-bucket.bucket.arn
+  role_arn = module.lakeformation_registration_iam_role.arn
 }
 
 
