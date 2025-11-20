@@ -1,5 +1,5 @@
 module "csv_export" {
-  source = "github.com/ministryofjustice/terraform-csv-to-parquet-athena?ref=519f9ee248ec2a7df10ebfc03f401ba15c833c8a"
+  source = "github.com/ministryofjustice/terraform-csv-to-parquet-athena?ref=b466df0b8345f4f338510f3804eec17bd64c4320"
   providers = {
     aws.bucket-replication = aws
   }
