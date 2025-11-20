@@ -8,7 +8,7 @@ tmp/
 **/node_modules
 **/package-lock.json
 **/*-draft.*
-
+terraform/environments/ccms-edrms/lambda/lambda_function.py
 ##########################
 ## IntelliJ
 ##########################

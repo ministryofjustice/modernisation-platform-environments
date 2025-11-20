@@ -28,3 +28,9 @@ resource "aws_secretsmanager_secret" "guardduty_slack_channel_id" {
 data "aws_secretsmanager_secret_version" "guardduty_slack_channel_id" {
   secret_id = aws_secretsmanager_secret.guardduty_slack_channel_id.id
 }
+
+# Slack Channel Webhook Secret for EDRMS Docs Exception
+resource "aws_secretsmanager_secret" "slack_channel_webhook" {
+  name        = "slack_channel_webhook"
+  description = "Slack Channel Webhook for EDRMS Docs Exception Alerts"
+}
