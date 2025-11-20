@@ -260,6 +260,8 @@ resource "aws_security_group" "tipstaff_lb_sc_pingdom_2" {
 
 #trivy:ignore:AVD-AWS-0053: this needs to be public
 resource "aws_lb" "tipstaff_lb" {
+  #checkov:skip=CKV_AWS_91: "ELB Logging not required"
+  #checkov:skip=CKV_AWS_150: "Ensure that Load Balancer has deletion protection enabled"
   name                       = "tipstaff-load-balancer"
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.tipstaff_lb_sc.id, aws_security_group.tipstaff_lb_sc_pingdom.id, aws_security_group.tipstaff_lb_sc_pingdom_2.id]

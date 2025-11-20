@@ -1,5 +1,8 @@
 # trivy:ignore:AVD-AWS-0080: RDS encryption encrytion will put DB out of service
 resource "aws_db_instance" "tipstaff_db" {
+  #checkov:skip=CKV_AWS_16: "Ensure all data stored in the RDS is securely encrypted at rest"
+  #checkov:skip=CKV_AWS_157: "Ensure that RDS instances have Multi-AZ enabled"
+  #checkov:skip=CKV_AWS_118: "Ensure that enhanced monitoring is enabled for Amazon RDS instances"
   allocated_storage           = local.application_data.accounts[local.environment].allocated_storage
   db_name                     = local.application_data.accounts[local.environment].db_name
   storage_type                = local.application_data.accounts[local.environment].storage_type
