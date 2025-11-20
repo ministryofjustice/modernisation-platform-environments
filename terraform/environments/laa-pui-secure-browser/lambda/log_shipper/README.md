@@ -1,5 +1,5 @@
 # Firewall Log Shipper
-AWS Lambda function that reads firewall logs written to S3 (gzip or plain text, one JSON event per line, e.g., AWS Network Firewall EVE JSON) and ships them to CloudWatch Logs.
+AWS Lambda function that reads logs written to S3 (gzip or plain text, one JSON event per line, e.g., AWS Network Firewall EVE JSON) and ships them to CloudWatch Logs.
 
 ## Concept of operation
 - **Trigger sources:** Handles direct **S3 ObjectCreated** events, or events delivered via **SQS** (raw S3 event in `body`) and **SNS→SQS** (S3 event wrapped in `Message`).
@@ -23,7 +23,7 @@ AWS Lambda function that reads firewall logs written to S3 (gzip or plain text, 
 - `MAX_FUTURE_MS` (default **2 hours**)
 
 ## Requirements
-- **Python:** 3.11 (AWS Lambda runtime recommended)  
+- **Python:** 3.12 (AWS Lambda runtime recommended)  
 - **AWS permissions (minimum):**
   - `logs:CreateLogStream` (for the target log group)
   - `logs:DescribeLogStreams`
@@ -34,7 +34,7 @@ AWS Lambda function that reads firewall logs written to S3 (gzip or plain text, 
 
 ## Installation / use
 1. **Create/choose** a CloudWatch Logs **log group** and set `LOG_GROUP_NAME` on the Lambda.
-2. **Deploy** the Lambda (runtime Python 3.11). Attach an IAM role with the permissions above.
+2. **Deploy** the Lambda (runtime Python 3.12). Attach an IAM role with the permissions above.
 3. **Configure triggers:**
    - **Direct S3:** Add an ObjectCreated notification on the bucket/prefix.
    - **SQS:** Point S3 (or SNS) to an SQS queue; subscribe the Lambda to the queue.
