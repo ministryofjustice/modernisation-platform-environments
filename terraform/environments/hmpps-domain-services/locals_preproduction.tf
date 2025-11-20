@@ -1,6 +1,6 @@
 locals {
 
-  lb_maintenance_message_test = {
+  lb_maintenance_message_preproduction = {
     maintenance_title   = "Remote Desktop Environment Not Started"
     maintenance_message = "Please contact <a href=\"https://moj.enterprise.slack.com/archives/C6D94J81E\">#ask-digital-studio-ops</a> slack channel if environment is unexpectedly down"
   }
