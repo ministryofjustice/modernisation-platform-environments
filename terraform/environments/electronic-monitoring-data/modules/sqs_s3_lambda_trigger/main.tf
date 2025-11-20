@@ -55,7 +55,7 @@ resource "aws_lambda_event_source_mapping" "sqs_trigger" {
   function_name    = var.lambda_function_name
   batch_size       = 1
   scaling_config {
-    maximum_concurrency = 10
+    maximum_concurrency = var.maximum_concurrency
   }
 }
 
