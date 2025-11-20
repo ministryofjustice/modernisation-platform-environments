@@ -1,18 +1,20 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
+
 # Install Docker
 sudo su
 sudo yum -y install docker
 sudo service docker start
  
 # Wait for Docker to be ready
-until sudo docker info >/dev/null 2>&1; do
+until docker info >/dev/null 2>&1; do
    echo "Waiting for Docker to start..."
    sleep 2
 done
  
 # Run your container
- sudo docker run -d --name smtp4dev-mockserver-container \
+ docker run -d --name smtp4dev-mockserver-container \
    --restart always \
    -p 80:80 -p 2525:25 -p 110:110 \
    -v /path/on/host:/app/Data \
