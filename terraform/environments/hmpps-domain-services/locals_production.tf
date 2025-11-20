@@ -65,7 +65,8 @@ locals {
           }
         })
         tags = merge(local.ec2_instances.jumpserver.tags, {
-          domain-name = "azure.hmpp.root"
+          domain-name              = "azure.hmpp.root"
+          gha-jumpserver-startstop = "production"
         })
       })
 
@@ -79,9 +80,10 @@ locals {
           }
         })
         tags = merge(local.ec2_instances.rdgw.tags, {
-          description      = "Remote Desktop Gateway for azure.hmpp.root domain"
-          domain-name      = "azure.hmpp.root"
-          update-ssm-agent = "patchgroup1"
+          description              = "Remote Desktop Gateway for azure.hmpp.root domain"
+          domain-name              = "azure.hmpp.root"
+          gha-jumpserver-startstop = "production"
+          update-ssm-agent         = "patchgroup1"
         })
       })
 
@@ -95,9 +97,10 @@ locals {
           }
         })
         tags = merge(local.ec2_instances.rdgw.tags, {
-          description      = "Remote Desktop Gateway for azure.hmpp.root domain"
-          domain-name      = "azure.hmpp.root"
-          update-ssm-agent = "patchgroup2"
+          description              = "Remote Desktop Gateway for azure.hmpp.root domain"
+          domain-name              = "azure.hmpp.root"
+          gha-jumpserver-startstop = "production"
+          update-ssm-agent         = "patchgroup2"
         })
       })
 
@@ -112,9 +115,10 @@ locals {
           }
         })
         tags = merge(local.ec2_instances.rds.tags, {
-          description  = "Remote Desktop Services for azure.hmpp.root domain"
-          domain-name  = "azure.hmpp.root"
-          service-user = "svc_rds"
+          description              = "Remote Desktop Services for azure.hmpp.root domain"
+          domain-name              = "azure.hmpp.root"
+          gha-jumpserver-startstop = "production"
+          service-user             = "svc_rds"
         })
       })
     }
