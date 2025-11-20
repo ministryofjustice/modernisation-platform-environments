@@ -237,6 +237,7 @@ resource "aws_security_group" "lb_sc_pingdom_2" {
 resource "aws_lb" "wardship_lb" {
   #checkov:skip=CKV_AWS_91: "ELB Logging not required"
   #checkov:skip=CKV_AWS_150: "Ensure that Load Balancer has deletion protection enabled"
+  #checkov:skip=CKV2_AWS_76: "WAF attached already includes AWSManagedRulesKnownBadInputsRuleSet in waf.tf"
   name                       = "wardship-load-balancer"
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.wardship_lb_sc.id, aws_security_group.lb_sc_pingdom.id, aws_security_group.lb_sc_pingdom_2.id]
@@ -275,7 +276,6 @@ resource "aws_lb_target_group" "wardship_target_group" {
 resource "aws_lb_listener" "wardship_lb" {
   #checkov:skip=CKV_AWS_2: "Ensure ALB protocol is HTTPS" - false alert
   #checkov:skip=CKV_AWS_103: "LB using higher version of TLS" - higher than alert
-  #checkov:skip=CKV2_AWS_76: "WAF attached already includes AWSManagedRulesKnownBadInputsRuleSet in waf.tf"
   depends_on = [
     aws_acm_certificate.external
   ]
