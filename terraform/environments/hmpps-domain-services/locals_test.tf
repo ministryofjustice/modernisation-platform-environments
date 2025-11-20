@@ -121,8 +121,9 @@ locals {
           }
         })
         tags = merge(local.ec2_instances.rdgw.tags, {
-          description = "Remote Desktop Gateway for azure.noms.root domain"
-          domain-name = "azure.noms.root"
+          description         = "Remote Desktop Gateway for azure.noms.root domain"
+          domain-name         = "azure.noms.root"
+          instance-scheduling = "skip-scheduling"
         })
       })
 
@@ -154,8 +155,9 @@ locals {
           }
         })
         tags = merge(local.ec2_instances.rds.tags, {
-          domain-name  = "azure.noms.root"
-          service-user = "svc_rds"
+          domain-name         = "azure.noms.root"
+          instance-scheduling = "skip-scheduling"
+          service-user        = "svc_rds"
         })
       })
     }
