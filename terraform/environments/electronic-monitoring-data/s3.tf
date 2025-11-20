@@ -1133,6 +1133,40 @@ module "s3-dms-target-store-bucket" {
 }
 
 
+# Lake Formation Policy
+data "aws_iam_policy_document" "lakeformation_cadet_bucket_policy" {
+  statement {
+    sid    = "AllowLakeFormation"
+    effect = "Allow"
+    actions = [
+      "s3:DeleteObject",
+      "s3:GetObject",
+      "s3:PutObject"
+    ]
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${local.env_account_id}:role/aws-service-role/lakeformation.amazonaws.com/AWSServiceRoleForLakeFormationDataAccess"]
+    }
+    resources = [
+      "${module.s3-create-a-derived-table-bucket.bucket.arn}/*"
+    ]
+  }
+  statement {
+    sid = "AllowLakeFormationList"
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket"
+    ]
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${local.env_account_id}:role/aws-service-role/lakeformation.amazonaws.com/AWSServiceRoleForLakeFormationDataAccess"]
+    }
+    resources = [
+      module.s3-create-a-derived-table-bucket.bucket.arn
+    ]
+  }
+}
+
 module "s3-create-a-derived-table-bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
 
@@ -1153,6 +1187,10 @@ module "s3-create-a-derived-table-bucket" {
     # Leave this provider block in even if you are not using replication
     aws.bucket-replication = aws
   }
+  bucket_policy = [
+    data.aws_iam_policy_document.lakeformation_cadet_bucket_policy.json
+  ]
+
 
   lifecycle_rule = [
     {
