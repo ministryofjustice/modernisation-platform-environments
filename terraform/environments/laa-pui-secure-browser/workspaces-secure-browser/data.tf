@@ -3,6 +3,12 @@ data "aws_availability_zones" "available" {
   state = "available"
 }
 
+# Look up subnet details for CIDR blocks (used in security group rules)
+data "aws_subnet" "secure_browser_subnets" {
+  for_each = local.create_resources ? toset(local.subnet_ids) : toset([])
+  id       = each.value
+}
+
 # Look up the new VPC in production (created by networking component)
 data "aws_vpc" "secure_browser" {
   count = local.environment == "production" ? 1 : 0
