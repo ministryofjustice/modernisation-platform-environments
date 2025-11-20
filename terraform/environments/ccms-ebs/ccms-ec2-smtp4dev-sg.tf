@@ -6,7 +6,7 @@ variable "environment" {
 locals {
   cidr_map = {
     development    = "10.200.0.0/20"
-    test    = "10.200.16.0/20"
+    test    = "10.200.0.0/20"
     preproduction = "10.200.16.0/20"
     production    = "10.200.16.0/20"
   }
@@ -29,14 +29,12 @@ resource "aws_security_group" "smtp4dev_mock_server_sg" {
 
 resource "aws_vpc_security_group_ingress_rule" "smtp4dev_workspace_80_ingress_rule" {
   count    = local.is-production ? 0 : 1
-  security_group_id = aws_security_group.smtp4dev_mock_server_sg[count.index].id
-
-  description = "This rule is used for AWS Workspace vm"
-  ip_protocol = "tcp"
-  from_port   = 80
-  to_port     = 80
- # cidr_ipv4 = "10.200.0.0/20"
-  cidr_ipv4   = local.cidr_map[var.environment]
+   security_group_id = aws_security_group.smtp4dev_mock_server_sg[count.index].id
+   description = "This rule is used for AWS Workspace vm"
+   ip_protocol = "tcp"
+   from_port   = 80
+    to_port     = 80
+   cidr_ipv4   = local.cidr_map[var.environment]
 
 }
 
