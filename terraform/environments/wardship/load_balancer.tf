@@ -275,6 +275,7 @@ resource "aws_lb_target_group" "wardship_target_group" {
 resource "aws_lb_listener" "wardship_lb" {
   #checkov:skip=CKV_AWS_2: "Ensure ALB protocol is HTTPS" - false alert
   #checkov:skip=CKV_AWS_103: "LB using higher version of TLS" - higher than alert
+  #checkov:skip=CKV2_AWS_76: "WAF attached already includes AWSManagedRulesKnownBadInputsRuleSet in waf.tf"
   depends_on = [
     aws_acm_certificate.external
   ]
