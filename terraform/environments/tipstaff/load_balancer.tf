@@ -21,6 +21,7 @@ resource "aws_security_group" "tipstaff_lb_sc" {
 
   // Allow user IP addresses
   ingress {
+    description = "allow access on HTTPS for user IP addresses"
     from_port = 443
     to_port   = 443
     protocol  = "tcp"
@@ -56,8 +57,8 @@ resource "aws_security_group" "tipstaff_lb_sc" {
     ]
   }
 
-  // Replacement DOM1 allow list from Jaz Chan 11/6/24
   ingress {
+    description = "Replacement DOM1 allow list from Jaz Chan 11/6/24"
     from_port = 443
     to_port   = 443
     protocol  = "tcp"
@@ -78,8 +79,8 @@ resource "aws_security_group" "tipstaff_lb_sc" {
     ]
   }
 
-  // Allow all IP addresses provided by the users
   ingress {
+    description = "Allowed IP addresses provided by the users"
     from_port = 443
     to_port   = 443
     protocol  = "tcp"
