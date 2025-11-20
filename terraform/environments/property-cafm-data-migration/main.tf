@@ -4,11 +4,12 @@ module "csv_export" {
     aws.bucket-replication = aws
   }
 
-  region_replication = "eu-west-2"
   kms_key_arn        = aws_kms_key.shared_kms_key.arn
   name               = "concept"
   load_mode          = "overwrite"
   environment        = local.environment_shorthand
+  table_naming       = "split_at_last_underscore"
+
   tags = {
     business-unit = "Property"
     application   = "cafm"
