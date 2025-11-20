@@ -9,7 +9,7 @@ terraform {
 }
 
 module "this-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9f"
 
   bucket_prefix      = "${var.local_bucket_prefix}-export-${var.export_destination}-"
   versioning_enabled = false
