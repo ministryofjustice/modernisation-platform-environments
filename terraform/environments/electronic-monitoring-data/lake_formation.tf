@@ -110,5 +110,16 @@ module "lakeformation_registration_iam_role" {
       actions   = ["s3:DeleteObject", "s3:GetObject", "s3:PutObject"]
       resources = ["${module.s3-create-a-derived-table-bucket.bucket.arn}/*"]
     }
+    KMSKeyAccess = {
+      effect = "Allow"
+      actions = [
+        "kms:Encrypt",
+        "kms:Decrypt",
+        "kms:ReEncrypt*",
+        "kms:GenerateDataKey*",
+        "kms:DescribeKey"
+      ]
+      resources = ["arn:aws:kms:eu-west-2:${local.env_account_id}:key/alias/aws/s3"]
+    }
   }
 }
