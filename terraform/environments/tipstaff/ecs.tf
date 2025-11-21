@@ -161,12 +161,39 @@ resource "aws_iam_role_policy" "app_execution" {
     "Statement": [
       {
            "Action": [
-              "ecr:*",
-              "logs:*",
-              "secretsmanager:GetSecretValue"
+               "logs:CreateLogStream",
+               "logs:PutLogEvents"
            ],
-           "Resource": "*",
+           "Resource": [
+               "${aws_cloudwatch_log_group.deployment_logs.arn}",
+               "${aws_cloudwatch_log_group.deployment_logs.arn}:*",
+               "${aws_cloudwatch_log_group.ecs_logs.arn}",
+                "${aws_cloudwatch_log_group.ecs_logs.arn}:*"
+           ],
            "Effect": "Allow"
+      },
+      {
+            "Action": [
+              "ecr:GetAuthorizationToken"
+            ],
+            "Resource": "*",
+            "Effect": "Allow"
+      },
+      {
+            "Action": [
+              "ecr:BatchCheckLayerAvailability",
+              "ecr:GetDownloadUrlForLayer",
+              "ecr:BatchGetImage"
+            ],
+            "Resource": "arn:aws:ecr:eu-west-2:${local.environment_management.account_ids[terraform.workspace]}:repository/${aws_ecr_repository.tipstaff_ecr_repo.name}",
+            "Effect": "Allow"
+      },
+      {
+          "Action": [
+               "secretsmanager:GetSecretValue"
+           ],
+          "Resource": "arn:aws:secretsmanager:*:${local.environment_management.account_ids[terraform.workspace]}:secret:${aws_secretsmanager_secret.rds_db_credentials.arn}",
+          "Effect": "Allow"
       }
     ]
   }
