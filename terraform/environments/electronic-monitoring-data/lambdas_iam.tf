@@ -276,15 +276,6 @@ resource "aws_iam_role" "rotate_iam_keys" {
 }
 
 #-----------------------------------------------------------------------------------
-# Get MDSS DLQ info
-#-----------------------------------------------------------------------------------
-
-resource "aws_iam_role" "get_mdss_dlq_info" {
-  name               = "rotate-iam-keys-lambda-role"
-  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
-}
-
-#-----------------------------------------------------------------------------------
 # Clean after MDSS load
 #-----------------------------------------------------------------------------------
 

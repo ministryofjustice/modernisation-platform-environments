@@ -183,19 +183,6 @@ module "copy_mdss_data" {
 }
 
 #-----------------------------------------------------------------------------------
-# Get MDSS DLQ info
-#-----------------------------------------------------------------------------------
-
-module "get_mdss_dlq_info" {
-    source = "./modules/lambdas"
-    function_name = "get_mdss_dlq_info"
-    is_image = true
-    role_name = aws_iam_role.lambda_function_name.name
-    role_arn = aws_iam_role.lambda_function_name.arn
-    ecr_repo_name = module.ecr_lambdas_repo.repository_name
-}
-
-#-----------------------------------------------------------------------------------
 # Clean after MDSS load
 #-----------------------------------------------------------------------------------
 
