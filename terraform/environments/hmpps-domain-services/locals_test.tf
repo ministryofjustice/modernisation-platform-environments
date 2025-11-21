@@ -248,8 +248,8 @@ locals {
 
     patch_manager = {
       patch_schedules = {
-        group1 = "cron(00 06 ? * WED *)" # 6am wed for prod for non-prod env's we have to work around the overnight shutdown
-        group2 = "cron(00 06 ? * THU *)" # 6am thu for prod
+        group1 = "cron(50 06 ? * WED *)" # 6:50am wed to work around the overnight shutdown
+        group2 = "cron(50 06 ? * THU *)" # 6:50am thu, see patch-manager.tf for approval_days config
         manual = "cron(00 21 31 2 ? *)"  # 9pm 31 feb e.g. impossible date to allow for manual patching of otherwise enrolled instances
       }
       maintenance_window_duration = 2 # 4 for prod
