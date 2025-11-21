@@ -280,7 +280,7 @@ resource "aws_iam_role" "rotate_iam_keys" {
 #-----------------------------------------------------------------------------------
 
 resource "aws_iam_role" "clean_after_mdss_load" {
-  name               = "rotate-iam-keys-lambda-role"
+  name               = "clean_after_mdss_load-lambda-role"
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
 }
 
