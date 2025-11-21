@@ -63,7 +63,7 @@ jobs:
 
   fetch-secrets:
     name: Fetch ENV management secrets
-    uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@4eceb2a416a197e91dc557c2ef0b5dd9afe29e0c
+    uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@4eceb2a416a197e91dc557c2ef0b5dd9afe29e0c # v3.4.6
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_NUMBER: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
@@ -81,7 +81,7 @@ jobs:
       max-parallel: 1
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
 
       - name: Ensure scripts are executable
         run: chmod +x scripts/*.sh
@@ -94,7 +94,7 @@ jobs:
           fi
 
       - name: Decrypt Secrets (ENVIRONMENT_MANAGEMENT)
-        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@4eceb2a416a197e91dc557c2ef0b5dd9afe29e0c
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@4eceb2a416a197e91dc557c2ef0b5dd9afe29e0c # v3.4.6
         with:
           environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
           github_ci_user_environments_repo_pat: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}
@@ -116,7 +116,7 @@ jobs:
           echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
 
       - name: Configure AWS Credentials (github-actions role)
-        uses: aws-actions/configure-aws-credentials@00943011d9042930efac3dcd3a170e4273319bc8
+        uses: aws-actions/configure-aws-credentials@00943011d9042930efac3dcd3a170e4273319bc8 # v5.1.0
         with:
           role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
           role-session-name: "cleanup-preview-${{ matrix.account_name }}"
@@ -237,7 +237,7 @@ jobs:
 
       - name: Upload AMI Preview Artifacts
         if: ${{ always() && (github.event_name == 'push' || github.event.inputs.cleanup_type == 'ami' || github.event.inputs.cleanup_type == 'both') }}
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
           name: ami-preview-${{ matrix.account_name }}
           path: |
@@ -295,7 +295,7 @@ jobs:
 
       - name: Upload EBS Preview Artifacts
         if: ${{ always() && (github.event_name == 'push' || github.event.inputs.cleanup_type == 'ebs' || github.event.inputs.cleanup_type == 'both') }}
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
           name: ebs-preview-${{ matrix.account_name }}
           path: |
@@ -305,7 +305,7 @@ jobs:
 
       - name: Upload Unified Preview Artifact
         if: always()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
           name: cleanup-report-preview-${{ matrix.account_name }}
           path: reports/cleanup_report.csv
@@ -325,7 +325,7 @@ jobs:
       max-parallel: 1
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
 
       - name: Ensure scripts are executable
         run: chmod +x scripts/*.sh
@@ -338,7 +338,7 @@ jobs:
           fi
 
       - name: Decrypt Secrets (ENVIRONMENT_MANAGEMENT)
-        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@4eceb2a416a197e91dc557c2ef0b5dd9afe29e0c
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@4eceb2a416a197e91dc557c2ef0b5dd9afe29e0c # v3.4.6
         with:
           environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
           github_ci_user_environments_repo_pat: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}
@@ -353,7 +353,7 @@ jobs:
           echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
 
       - name: Configure AWS Credentials (github-actions role)
-        uses: aws-actions/configure-aws-credentials@00943011d9042930efac3dcd3a170e4273319bc8
+        uses: aws-actions/configure-aws-credentials@00943011d9042930efac3dcd3a170e4273319bc8 # v5.1.0
         with:
           role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
           role-session-name: "ami-delete-${{ matrix.account_name }}"
@@ -526,7 +526,7 @@ jobs:
 
       - name: Upload AMI Live Artifacts (reports only)
         if: always()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
           name: ami-live-${{ matrix.account_name }}
           path: |
@@ -582,7 +582,7 @@ jobs:
       max-parallel: 1
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
 
       - name: Ensure scripts are executable
         run: chmod +x scripts/*.sh
@@ -595,7 +595,7 @@ jobs:
           fi
 
       - name: Decrypt Secrets (ENVIRONMENT_MANAGEMENT)
-        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@4eceb2a416a197e91dc557c2ef0b5dd9afe29e0c
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@4eceb2a416a197e91dc557c2ef0b5dd9afe29e0c # v3.4.6
         with:
           environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
           github_ci_user_environments_repo_pat: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}
@@ -610,7 +610,7 @@ jobs:
           echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
 
       - name: Configure AWS Credentials (github-actions role)
-        uses: aws-actions/configure-aws-credentials@00943011d9042930efac3dcd3a170e4273319bc8
+        uses: aws-actions/configure-aws-credentials@00943011d9042930efac3dcd3a170e4273319bc8 # v5.1.0
         with:
           role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
           role-session-name: "ebs-delete-${{ matrix.account_name }}"
@@ -659,7 +659,7 @@ jobs:
 
       - name: Upload EBS Live Artifacts (reports only)
         if: always()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
           name: ebs-live-${{ matrix.account_name }}
           path: reports/ebs_cleanup_report.csv

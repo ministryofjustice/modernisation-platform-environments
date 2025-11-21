@@ -380,7 +380,7 @@ resource "aws_vpc_security_group_ingress_rule" "app_db_2" {
 resource "aws_vpc_security_group_ingress_rule" "app_alb" {
   security_group_id            = aws_security_group.cwa_poc2_app.id
   description                  = "Access from CWA ALB"
-  referenced_security_group_id = aws_security_group.external_lb.id
+  referenced_security_group_id = aws_security_group.internal_lb.id
   from_port                    = 8050
   ip_protocol                  = "tcp"
   to_port                      = 8050

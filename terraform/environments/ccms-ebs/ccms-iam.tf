@@ -482,3 +482,23 @@ data "aws_iam_policy_document" "guardduty_alerting_sns" {
     }
   }
 }
+
+data "aws_iam_policy_document" "cw_alerting_sns" {
+  version = "2012-10-17"
+  statement {
+    sid    = "EventsAllowPublishSnsTopic"
+    effect = "Allow"
+    actions = [
+      "sns:Publish",
+    ]
+    resources = [
+      aws_sns_topic.cw_alerts.arn
+    ]
+    principals {
+      type = "Service"
+      identifiers = [
+        "cloudwatch.amazonaws.com",
+      ]
+    }
+  }
+}

@@ -55,11 +55,12 @@ resource "aws_lambda_event_source_mapping" "sqs_trigger" {
   function_name    = var.lambda_function_name
   batch_size       = 1
   scaling_config {
-    maximum_concurrency = 10
+    maximum_concurrency = var.maximum_concurrency
   }
 }
 
 resource "aws_sqs_queue" "s3_event_dlq" {
-  name                    = "${local.queue_base_name}-dlq"
-  sqs_managed_sse_enabled = true
+  name                      = "${local.queue_base_name}-dlq"
+  sqs_managed_sse_enabled   = true
+  message_retention_seconds = 1209600
 }

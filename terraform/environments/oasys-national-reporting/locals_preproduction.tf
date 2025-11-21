@@ -36,6 +36,21 @@ locals {
       }
     }
 
+    cloudwatch_dashboards = {
+      "CloudWatch-Default" = {
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.lb,
+          local.cloudwatch_dashboard_widget_groups.all_ec2,
+          local.cloudwatch_dashboard_widget_groups.cms,
+          local.cloudwatch_dashboard_widget_groups.web,
+          local.cloudwatch_dashboard_widget_groups.bods,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ssm_command,
+        ]
+      }
+    }
+
     efs = {
       pp-onr-sap-share = {
         access_points = {

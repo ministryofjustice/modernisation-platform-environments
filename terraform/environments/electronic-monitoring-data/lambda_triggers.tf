@@ -175,6 +175,7 @@ module "load_mdss_event_queue" {
   bucket               = module.s3-raw-formatted-data-bucket.bucket
   lambda_function_name = module.load_mdss_lambda[0].lambda_function_name
   bucket_prefix        = local.bucket_prefix
+  maximum_concurrency  = 100
 }
 
 resource "aws_s3_bucket_notification" "load_mdss_event" {

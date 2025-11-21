@@ -39,6 +39,16 @@ resource "aws_secretsmanager_secret" "secret_lambda_s3" {
   )
 }
 
+# Slack Channel ID for cw Alerts
+resource "aws_secretsmanager_secret" "cw_slack_channel_id" {
+  name        = "cw_slack_channel_id"
+  description = "Slack Channel ID for cw Alerts"
+}
+
+data "aws_secretsmanager_secret_version" "cw_slack_channel_id" {
+  secret_id = aws_secretsmanager_secret.cw_slack_channel_id.id
+}
+
 # Slack Channel ID for guardduty Alerts
 resource "aws_secretsmanager_secret" "guardduty_slack_channel_id" {
   name        = "guardduty_slack_channel_id"
