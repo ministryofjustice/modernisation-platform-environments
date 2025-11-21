@@ -60,7 +60,7 @@ resource "aws_iam_role_policy" "lambda_edrms_docs_exception_policy" {
 
 # Lambda Layer
 resource "aws_lambda_layer_version" "lambda_layer" {
-  filename                 = "lambda/ftp_lambda_layer.zip"
+  filename                 = "lambda/layerV1.zip"
   layer_name               = "${local.application_name}-${local.environment}-edrms-docs-exception-layer"
   # s3_key                   = "lambda_delivery/${local.application_name}-${local.environment}-edrms-docs-exception-layer/layerV1.zip"
   # s3_bucket                = module.s3-bucket-logging.bucket.id
