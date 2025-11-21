@@ -62,23 +62,23 @@ module "gha_moj_ap_airflow_iam_role" {
   tags = local.tags
 }
 
-module "create_airflow_token_iam_role" {
+  # module "create_airflow_token_iam_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
-  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.59.0"
+  # source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
+  # version = "5.59.0"
 
-  trusted_role_arns = [
-    "arn:aws:iam::${local.datahub_environments_share[0]}:airflow_trigger_lambda_role",
-  ]
+  # trusted_role_arns = [
+  #   "arn:aws:iam::${local.datahub_environments_share[0]}:airflow_trigger_lambda_role",
+  # ]
 
-  create_role = true
-  role_name   = "data-factory-create-airflow-token"
+  # create_role = true
+  # role_name   = "data-factory-create-airflow-token"
 
-  custom_role_policy_arns = [
-    module.create_airflow_token_iam_policy.arn
-  ]
+  # custom_role_policy_arns = [
+  #   module.create_airflow_token_iam_policy.arn
+  # ]
 
-  tags = local.tags
-}
+  # tags = local.tags
+  #}
