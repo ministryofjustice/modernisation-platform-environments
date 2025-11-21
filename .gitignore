@@ -31,7 +31,7 @@ megalinter-reports
 
 datasync_password_updater.zip
 
-*.zip
+# *.zip
 *.tar
 *.gz
 *.tgz

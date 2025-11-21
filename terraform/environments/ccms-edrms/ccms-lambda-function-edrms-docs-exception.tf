@@ -49,12 +49,24 @@ resource "aws_iam_role_policy" "lambda_edrms_docs_exception_policy" {
   })
 }
 
+# Lambda Layer
+resource "aws_lambda_layer_version" "lambda_layer" {
+  filename                 = "lambda/layerV1.zip"
+  layer_name               = "${local.application_name}-${local.environment}-edrms-docs-exception-layer"
+  s3_key                   = "lambda_delivery/${local.application_name}-${local.environment}-edrms-docs-exception-layer/layerV1.zip"
+  s3_bucket                = module.s3-bucket-logging.bucket.id
+  compatible_runtimes      = ["python3.13"]
+  compatible_architectures = ["x86_64"]
+  description              = "Lambda Layer for ${local.application_name} Edrms Docs Exception"
+}
+
 resource "aws_lambda_function" "edrms_docs_exception_monitor" {
   filename         = "./lambda/edrms_docs_exception.zip"
   source_code_hash = filebase64sha256("./lambda/edrms_docs_exception.zip")
   function_name    = "${local.application_name}-${local.environment}-edrms-docs-exception-monitor"
   role             = aws_iam_role.lambda_edrms_docs_exception_role.arn
   handler          = "lambda_function.lambda_handler"
+  layers           = [aws_lambda_layer_version.lambda_layer.arn]
   runtime          = "python3.13"
   timeout          = 30
   publish          = true
