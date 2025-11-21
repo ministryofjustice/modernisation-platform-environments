@@ -53,8 +53,8 @@ resource "aws_iam_role_policy" "lambda_edrms_docs_exception_policy" {
 resource "aws_lambda_layer_version" "lambda_layer" {
   filename                 = "lambda/layerV1.zip"
   layer_name               = "${local.application_name}-${local.environment}-edrms-docs-exception-layer"
-  s3_key                   = "lambda_delivery/${local.application_name}-${local.environment}-edrms-docs-exception-layer/layerV1.zip"
-  s3_bucket                = module.s3-bucket-logging.bucket.id
+  # s3_key                   = "lambda_delivery/${local.application_name}-${local.environment}-edrms-docs-exception-layer/layerV1.zip"
+  # s3_bucket                = module.s3-bucket-logging.bucket.id
   compatible_runtimes      = ["python3.13"]
   compatible_architectures = ["x86_64"]
   description              = "Lambda Layer for ${local.application_name} Edrms Docs Exception"
