@@ -158,3 +158,20 @@ resource "aws_secretsmanager_secret_version" "db_password" {
   secret_id     = aws_secretsmanager_secret.db_password.id
   secret_string = random_password.random_password.result
 }
+
+#tfsec:ignore:AWS095
+resource "aws_secretsmanager_secret" "teams_webhook_prison" {
+  #checkov:skip=CKV_AWS_149
+  name = "teams_webhook_prison"
+  tags = merge(
+    local.tags,
+    {
+      Name = "teams_webhook_prison"
+    },
+  )
+}
+
+resource "aws_secretsmanager_secret_version" "teams_webhook_prison" {
+  secret_id     = aws_secretsmanager_secret.teams_webhook_prison.id
+  secret_string = random_password.random_password.result
+}
