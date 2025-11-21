@@ -1,5 +1,5 @@
---constraint "https://raw.githubusercontent.com/apache/airflow/constraints-2.10.3/constraints-3.11.txt"
-apache-airflow-providers-cncf-kubernetes==9.0.1
-apache-airflow-providers-slack==8.9.1
-kubernetes==30.1.0
-dag-factory==1.0.0
+--constraint "https://raw.githubusercontent.com/apache/airflow/constraints-3.0.6/constraints-3.12.txt"
+apache-airflow-providers-cncf-kubernetes==10.7.0
+apache-airflow-providers-slack==9.1.4
+kubernetes==32.0.1
+dag-factory==1.0.1

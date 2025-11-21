@@ -71,5 +71,7 @@ resource "aws_mwaa_environment" "main" {
     }
   }
 
+  worker_replacement_strategy = local.environment_configuration.airflow_worker_replacement_strategy
+
   tags = local.tags
 }
