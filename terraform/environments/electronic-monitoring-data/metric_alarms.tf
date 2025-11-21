@@ -135,3 +135,43 @@ module "pagerduty_core_alerts" {
   sns_topics                = [for key, value in local.sns_names_map : value]
   pagerduty_integration_key = local.pagerduty_integration_keys["electronic_monitoring_data_alarms"]
 }
+
+#-----------------------------------------------------------------------------------
+# LOAD-MDSS DQL
+#-----------------------------------------------------------------------------------
+
+# are the names - and _ in the correct places?
+resource "aws_sns_topic" "load_mdss_dlq" {
+  name                      = "load-mdss-dlq"
+  kms_master_key_id         = aws_kms_key.metric_alarms.arn # this is stolen
+  display_name              = "Load MDSS DLQ Alarm"
+}
+
+resource "aws_cloudwatch_metric_alarm" "load_mdss_dlq_alarm" {
+  alarm_name                = "load-mdss-dlq-alarm"
+  comparison_operator       = "GreaterThanOrEqualToThreshold"
+  evaluation_periods        = 1
+  metric_name               = "ApproximateNumberOfMessagesVisible"
+  namespace                 = "AWS/SQS"
+  period                    = 300
+  statistic                 = "Sum"
+  threshold                 = 10
+  alarm_description         = "Alarm for excessive messages recieved to load-mdss DLQ."
+
+  dimensions = {
+    QueueName = "load_mdss-dlq"
+  }
+
+  alarm_actions = [
+    aws_sns_topic.load_mdss_dlq_topic.arn
+    ]
+
+  ok_actions = [
+    aws_sns_topic.load_mdss_dlq_topic.arn
+  ]
+}
+
+resource "aws_sns_topic_subscription", "load_mdss_dlq_alarm_subscription" {
+    topic_arn               = aws_sns_topic.load_mdss_dlq.arn
+    protocol                = "" # is an env var the best place to put this
+}
