@@ -44,7 +44,7 @@ module "sqs_lambda_consumer" {
       actions    = ["sqs:SendMessage"]
       principals = [{ type = "Service", identifiers = ["sns.amazonaws.com"] }]
       conditions = [
-        { test = "ArnEquals", variable = "aws:SourceArn", values = [module.s3_workspacesweb_session_logs_sns_topic.topic_arn] },
+        { test = "ArnEquals", variable = "aws:SourceArn", values = [module.s3_workspacesweb_session_logs_sns_topic[0].topic_arn] },
         { test = "StringEquals", variable = "aws:SourceAccount", values = [data.aws_caller_identity.current.account_id] }
       ]
     }

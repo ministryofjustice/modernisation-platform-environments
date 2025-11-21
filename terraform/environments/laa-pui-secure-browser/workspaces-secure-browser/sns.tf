@@ -1,4 +1,5 @@
 module "s3_workspacesweb_session_logs_sns_topic" {
+  count   = local.create_resources ? 1 : 0
   source  = "terraform-aws-modules/sns/aws"
   version = "6.2.0"
 

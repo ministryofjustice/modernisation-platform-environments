@@ -72,7 +72,7 @@ resource "aws_s3_bucket_notification" "s3_bucket_workspacesweb_session_logs" {
   topic {
     events        = ["s3:ObjectCreated:*"]
     filter_prefix = "workspaces-web-logs/"
-    topic_arn     = module.s3_workspacesweb_session_logs_sns_topic.topic_arn
+    topic_arn     = module.s3_workspacesweb_session_logs_sns_topic[0].topic_arn
   }
 }
 

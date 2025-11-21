@@ -41,6 +41,26 @@ data "aws_iam_policy_document" "kms_key_policy" {
       resources = ["*"]
     }
   }
+
+  dynamic "statement" {
+    for_each = local.create_resources ? [1] : []
+    content {
+      sid = "AllowCloudWatchUseKey"
+      principals {
+        type        = "Service"
+        identifiers = ["logs.${data.aws_region.current.region}.amazonaws.com"]
+      }
+      actions = [
+        "kms:Encrypt",
+        "kms:Decrypt",
+        "kms:ReEncrypt*",
+        "kms:GenerateDataKey*",
+        "kms:Describe*",
+        "kms:CreateGrant"
+      ]
+      resources = ["*"]
+    }
+  }
 }
 
 resource "aws_kms_key" "workspacesweb_session_logs" {
