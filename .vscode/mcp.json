@@ -1,0 +1,45 @@
+{
+  "inputs": [
+    {
+      "type": "promptString",
+      "id": "aws-profile",
+      "description": "AWS Profile",
+      "password": true
+    }
+  ],
+  "servers": {
+    "awslabs.billing-cost-management-mcp-server": {
+      "command": "uvx",
+      "args": ["awslabs.billing-cost-management-mcp-server@latest"],
+      "env": {
+        "AWS_PROFILE": "${input:aws-profile}",
+        "AWS_REGION": "eu-west-2"
+      }
+    },
+    "awslabs.terraform-mcp-server": {
+      "command": "uvx",
+      "args": ["awslabs.terraform-mcp-server@latest"],
+      "env": {
+        "AWS_PROFILE": "${input:aws-profile}",
+        "AWS_REGION": "eu-west-2"
+      }
+    },
+    "awslabs.well-architected-security-mcp-server": {
+      "command": "uvx",
+      "args": ["awslabs.well-architected-security-mcp-server@latest"],
+      "env": {
+        "AWS_PROFILE": "${input:aws-profile}",
+        "AWS_REGION": "eu-west-2"
+      }
+    },
+    "terraform": {
+      "command": "docker",
+      "args": [
+        "run",
+        "--interactive",
+        "--rm",
+        "docker.io/hashicorp/terraform-mcp-server:latest"
+      ]
+    }
+  }
+}
