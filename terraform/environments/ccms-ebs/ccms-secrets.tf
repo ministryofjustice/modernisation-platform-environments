@@ -52,7 +52,7 @@ data "aws_secretsmanager_secret_version" "cw_slack_channel_id" {
 # Slack Channel ID for guardduty Alerts
 resource "aws_secretsmanager_secret" "guardduty_slack_channel_id" {
   name        = "guardduty_slack_channel_id"
-  description = "Slack Channel ID for guarduty Alerts"
+  description = "Slack Channel ID for guardduty Alerts"
 }
 
 data "aws_secretsmanager_secret_version" "guardduty_slack_channel_id" {
