@@ -88,7 +88,7 @@ resource "aws_lambda_function" "edrms_docs_exception_monitor" {
     variables = {
       LOG_GROUP_NAME      = aws_cloudwatch_log_group.log_group_edrms.name
       SNS_TOPIC_ARN       = aws_sns_topic.cloudwatch_slack.arn
-      SECRET_NAME         = aws_secretsmanager_secret.slack_channel_webhook.name
+      SECRET_NAME         = aws_secretsmanager_secret.edrms_docs_exception_secrets.name
     }
   }
 
