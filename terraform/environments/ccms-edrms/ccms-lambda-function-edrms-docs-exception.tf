@@ -44,6 +44,15 @@ resource "aws_iam_role_policy" "lambda_edrms_docs_exception_policy" {
           "logs:FilterLogEvents"
         ]
         Resource = "${aws_cloudwatch_log_group.log_group_edrms.arn}:*"
+      },
+      {
+        Action : [
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:DescribeSecret",
+          "secretsmanager:ListSecretVersionIds"
+        ],
+        Effect   = "Allow",
+        Resource = [aws_secretsmanager_secret.slack_channel_webhook.arn]
       }
     ]
   })
@@ -51,7 +60,7 @@ resource "aws_iam_role_policy" "lambda_edrms_docs_exception_policy" {
 
 # Lambda Layer
 resource "aws_lambda_layer_version" "lambda_layer" {
-  filename                 = "lambda/layerV1.zip"
+  filename                 = "lambda/ftp_lambda_layer.zip"
   layer_name               = "${local.application_name}-${local.environment}-edrms-docs-exception-layer"
   # s3_key                   = "lambda_delivery/${local.application_name}-${local.environment}-edrms-docs-exception-layer/layerV1.zip"
   # s3_bucket                = module.s3-bucket-logging.bucket.id
@@ -70,7 +79,11 @@ resource "aws_lambda_function" "edrms_docs_exception_monitor" {
   runtime          = "python3.13"
   timeout          = 30
   publish          = true
+  memory_size      = 4096 # Sets memory defaults to 4gb
 
+  ephemeral_storage {
+    size  = 1024 # Sets ephemeral storage defaults to 1GB (/tmp space)
+  }
   environment {
     variables = {
       LOG_GROUP_NAME      = aws_cloudwatch_log_group.log_group_edrms.name
