@@ -90,7 +90,7 @@ resource "aws_ecs_task_definition" "tipstaff_task_definition" {
     }
   ])
   runtime_platform {
-    operating_system_family = "WINDOWS_SERVER_2019_CORE"
+    operating_system_family = "WINDOWS_SERVER_2022_CORE"
     cpu_architecture        = "X86_64"
   }
 }
