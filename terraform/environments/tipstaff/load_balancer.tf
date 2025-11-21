@@ -117,8 +117,8 @@ resource "aws_security_group" "tipstaff_lb_sc_pingdom" {
   description = "control Pingdom access to the load balancer"
   vpc_id      = data.aws_vpc.shared.id
 
-  // Allow all European Pingdom IP addresses
   ingress {
+    description = "allow all European Pingdom IP addresses"
     from_port = 443
     to_port   = 443
     protocol  = "tcp"
@@ -190,8 +190,8 @@ resource "aws_security_group" "tipstaff_lb_sc_pingdom_2" {
   description = "control Pingdom access to the load balancer"
   vpc_id      = data.aws_vpc.shared.id
 
-  // Allow all European Pingdom IP addresses
   ingress {
+    description = "allow all European Pingdom IP addresses - group 2"
     from_port = 443
     to_port   = 443
     protocol  = "tcp"
@@ -285,18 +285,19 @@ resource "aws_lb_target_group" "tipstaff_target_group" {
   }
 
   health_check {
-    healthy_threshold   = "3"
-    interval            = "30"
+    healthy_threshold   = 3
+    interval            = 30
     protocol            = "HTTP"
     port                = "80"
-    unhealthy_threshold = "5"
+    unhealthy_threshold = 5
     matcher             = "200-302"
-    timeout             = "10"
+    timeout             = 10
   }
 
 }
 
 resource "aws_lb_listener" "tipstaff_lb" {
+  #checkov:skip=CKV_AWS_2: "Ensure ALB protocol is HTTPS" - false alert
   depends_on = [
     aws_acm_certificate.external
   ]

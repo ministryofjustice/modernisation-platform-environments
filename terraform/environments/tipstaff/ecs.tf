@@ -267,6 +267,7 @@ resource "aws_security_group" "ecs_service" {
   }
 
   egress {
+    description = "allow all outbound traffic"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
@@ -275,6 +276,8 @@ resource "aws_security_group" "ecs_service" {
 }
 
 resource "aws_ecr_repository" "tipstaff_ecr_repo" {
+  #checkov:skip=CKV_AWS_51: "Ensure ECR Image Tags are immutable"
+    #checkov:skip=CKV_AWS_136:"Using default AWS encryption for ECR which is sufficient for our needs"
   name         = "tipstaff-ecr-repo"
   force_delete = true
   image_scanning_configuration {
@@ -377,11 +380,13 @@ resource "aws_cloudwatch_metric_alarm" "ddos_attack_external" {
 }
 
 resource "aws_sns_topic" "ddos_alarm" {
+  # checkov:skip=CKV_AWS_26: SNS encryption not required for this use case
   count = local.is-development ? 0 : 1
   name  = "tipstaff_ddos_alarm"
 }
 
 resource "aws_sns_topic" "tipstaff_utilisation_alarm" {
+  # checkov:skip=CKV_AWS_26: SNS encryption not required for this use case
   count = local.is-development ? 0 : 1
   name  = "tipstaff_utilisation_alarm"
 }
