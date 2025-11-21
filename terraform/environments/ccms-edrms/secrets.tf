@@ -30,7 +30,20 @@ data "aws_secretsmanager_secret_version" "guardduty_slack_channel_id" {
 }
 
 # Slack Channel Webhook Secret for EDRMS Docs Exception
-resource "aws_secretsmanager_secret" "slack_channel_webhook" {
-  name        = "slack_channel_webhook"
-  description = "Slack Channel Webhook for EDRMS Docs Exception Alerts"
+resource "aws_secretsmanager_secret" "edrms_docs_exception_secrets" {
+  name        = "${local.application_name}-docs-exception-secrets"
+  description = "EDRMS Docs Exception Secret"
+}
+
+resource "aws_secretsmanager_secret_version" "edrms_docs_exception_secrets" {
+  secret_id = aws_secretsmanager_secret.edrms_docs_exception_secrets.id
+  secret_string = jsonencode({
+    "slack_channel_webhook"  = ""
+  })
+
+  lifecycle {
+    ignore_changes = [
+      secret_string
+    ]
+  }
 }
