@@ -52,7 +52,7 @@ resource "aws_iam_role_policy" "lambda_edrms_docs_exception_policy" {
           "secretsmanager:ListSecretVersionIds"
         ],
         Effect   = "Allow",
-        Resource = [aws_secretsmanager_secret.slack_channel_webhook.arn]
+        Resource = [aws_secretsmanager_secret.edrms_docs_exception_secrets.arn]
       }
     ]
   })
