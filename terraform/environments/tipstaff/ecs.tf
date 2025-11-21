@@ -256,13 +256,14 @@ resource "aws_iam_role_policy" "app_task" {
 resource "aws_security_group" "ecs_service" {
   #checkov:skip=CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
   name_prefix = "ecs-service-sg-"
+  description = "control access to the ECS service"
   vpc_id      = data.aws_vpc.shared.id
 
   ingress {
+    description     = "Allow traffic on port 80 from load balancer"
     from_port       = 80
     to_port         = 80
     protocol        = "tcp"
-    description     = "Allow traffic on port 80 from load balancer"
     security_groups = [aws_security_group.tipstaff_lb_sc.id]
   }
 

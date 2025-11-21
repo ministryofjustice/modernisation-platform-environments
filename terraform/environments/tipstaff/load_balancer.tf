@@ -285,10 +285,11 @@ resource "aws_lb_target_group" "tipstaff_target_group" {
   }
 
   health_check {
+    enabled             = true
     healthy_threshold   = 3
     interval            = 30
     protocol            = "HTTP"
-    port                = "80"
+    port                = 80
     unhealthy_threshold = 5
     matcher             = "200-302"
     timeout             = 10

@@ -6,24 +6,26 @@ resource "aws_db_instance" "tipstaff_db" {
     #checkov:skip=CKV_AWS_293: "Ensure that AWS database instances have deletion protection enabled"
 
   #checkov:skip=CKV_AWS_353: "Ensure that RDS instances have performance insights enabled"
-  allocated_storage           = local.application_data.accounts[local.environment].allocated_storage
-  db_name                     = local.application_data.accounts[local.environment].db_name
-  storage_type                = local.application_data.accounts[local.environment].storage_type
-  engine                      = local.application_data.accounts[local.environment].engine
-  identifier                  = local.application_data.accounts[local.environment].identifier
-  engine_version              = local.application_data.accounts[local.environment].engine_version
-  instance_class              = local.application_data.accounts[local.environment].instance_class
-  username                    = local.application_data.accounts[local.environment].db_username
-  password                    = random_password.password.result
-  skip_final_snapshot         = true
-  publicly_accessible         = local.is-development ? true : false
-  vpc_security_group_ids      = [aws_security_group.postgresql_db_sc.id]
-  db_subnet_group_name        = aws_db_subnet_group.dbsubnetgroup.name
-  allow_major_version_upgrade = false
-  auto_minor_version_upgrade  = true
-  ca_cert_identifier          = "rds-ca-rsa2048-g1"
-  apply_immediately           = true
-  maintenance_window          = local.is-production ? null : "tue:20:20-tue:20:50"
+  allocated_storage               = local.application_data.accounts[local.environment].allocated_storage
+  db_name                         = local.application_data.accounts[local.environment].db_name
+  storage_type                    = local.application_data.accounts[local.environment].storage_type
+  engine                          = local.application_data.accounts[local.environment].engine
+  identifier                      = local.application_data.accounts[local.environment].identifier
+  engine_version                  = local.application_data.accounts[local.environment].engine_version
+  instance_class                  = local.application_data.accounts[local.environment].instance_class
+  username                        = local.application_data.accounts[local.environment].db_username
+  password                        = random_password.password.result
+  skip_final_snapshot             = true
+  publicly_accessible             = local.is-development ? true : false
+  vpc_security_group_ids          = [aws_security_group.postgresql_db_sc.id]
+  db_subnet_group_name            = aws_db_subnet_group.dbsubnetgroup.name
+  allow_major_version_upgrade     = false
+  auto_minor_version_upgrade      = true
+  ca_cert_identifier              = "rds-ca-rsa2048-g1"
+  apply_immediately               = true
+  copy_tags_to_snapshot           = true
+  maintenance_window              = local.is-production ? null : "tue:20:20-tue:20:50"
+  enabled_cloudwatch_logs_exports = ["postgresql", "upgrade", "error"]
 }
 
 resource "aws_db_subnet_group" "dbsubnetgroup" {
@@ -32,6 +34,7 @@ resource "aws_db_subnet_group" "dbsubnetgroup" {
 }
 
 resource "aws_security_group" "postgresql_db_sc" {
+  #checkov:skip=CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
   name        = "postgres_security_group"
   description = "control access to the database"
   vpc_id      = data.aws_vpc.shared.id
