@@ -140,8 +140,9 @@ resource "aws_cloudwatch_dashboard" "workspacesweb_active_sessions" {
 }
 
 resource "aws_cloudwatch_log_group" "workspacesweb_session_logs" {
+  depends_on        = [aws_kms_key.workspacesweb_session_logs[0]]
   count             = local.create_resources ? 1 : 0
-  kms_key_id        = aws_kms_key.workspacesweb_session_logs[0].id
-  name_prefix       = "laa-workspacesweb-session-logs-"
+  kms_key_id        = aws_kms_key.workspacesweb_session_logs[0].arn
+  name_prefix       = "/lambda/laa-workspacesweb-session-logs-"
   retention_in_days = 14
 }
