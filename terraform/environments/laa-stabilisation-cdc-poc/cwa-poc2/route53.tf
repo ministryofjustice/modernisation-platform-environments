@@ -58,7 +58,7 @@ resource "aws_route53_record" "app1" {
 resource "aws_route53_record" "external" {
   provider = aws.core-vpc
   zone_id  = var.route53_zone_external_id
-  name     = "portal-poc.laa-development.modernisation-platform.service.justice.gov.uk"
+  name     = "${local.application_name_short}.${var.route53_zone_external}"
   type     = "A"
 
   alias {
