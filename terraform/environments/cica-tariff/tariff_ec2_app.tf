@@ -25,7 +25,8 @@ resource "aws_instance" "tariff_app" {
             sudo systemctl start amazon-ssm-agent
             EOF
   # vpc_security_group_ids      = local.environment == "production" ? [module.tariff_app_prod_security_group[0].security_group_id, aws_security_group.tariff_app_prod_security_group[0].id] : [module.tariff_app_security_group[0].security_group_id, aws_security_group.tariff_app_security_group[0].id]
-  vpc_security_group_ids = local.environment == "production" ? [aws_security_group.tariff_app_prod_security_group[0].id] : [aws_security_group.tariff_app_security_group[0].id]
+  vpc_security_group_ids      = local.environment == "production" ? [aws_security_group.tariff_app_prod_security_group[0].id] : [module.tariff_app_security_group[0].security_group_id, aws_security_group.tariff_app_security_group[0].id]
+  # vpc_security_group_ids = local.environment == "production" ? [aws_security_group.tariff_app_prod_security_group[0].id] : [aws_security_group.tariff_app_security_group[0].id]
 
   root_block_device {
     delete_on_termination = true
