@@ -151,6 +151,8 @@ EOF
   )
 }
 
+# This is the role ECS uses to manage the task
+# needed by the ECS agent / Fargate to Pull container images from ECR, Write logs, Fetch secrets
 resource "aws_iam_role_policy" "app_execution" {
   name = "execution-${var.networking[0].application}"
   role = aws_iam_role.app_execution.id
@@ -227,6 +229,8 @@ EOF
   )
 }
 
+# This is the role the application inside the container assumes at runtime
+# Just logging for AWSLogger/NLog
 resource "aws_iam_role_policy" "app_task" {
   name = "task-${var.networking[0].application}"
   role = aws_iam_role.app_task.id
@@ -236,14 +240,13 @@ resource "aws_iam_role_policy" "app_task" {
    "Version": "2012-10-17",
    "Statement": [
      {
-       "Effect": "Allow",
         "Action": [
-          "logs:*",
-          "ecr:*",
-          "iam:*",
-          "ec2:*"
+          "logs:CreateLogStream",
+          "logs:PutLogEvents",
+          "logs:DescribeLogGroups"
         ],
-       "Resource": "*"
+        "Resource": "arn:aws:logs:*:${local.environment_management.account_ids[terraform.workspace]}:*",
+        "Effect": "Allow"
      }
    ]
   }
