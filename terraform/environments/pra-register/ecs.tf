@@ -50,35 +50,35 @@ resource "aws_ecs_task_definition" "pra_task_definition" {
       environment = [
         {
           name  = "RDS_HOSTNAME"
-          value = "${aws_db_instance.pra_db.address}"
+          value = aws_db_instance.pra_db.address
         },
         {
           name  = "RDS_PORT"
-          value = "${local.application_data.accounts[local.environment].rds_port}"
+          value = local.application_data.accounts[local.environment].rds_port
         },
         {
           name  = "RDS_USERNAME"
-          value = "${aws_db_instance.pra_db.username}"
+          value = aws_db_instance.pra_db.username
         },
         {
           name  = "RDS_PASSWORD"
-          value = "${random_password.password.result}"
+          value = random_password.password.result
         },
         {
           name  = "DB_NAME"
-          value = "${aws_db_instance.pra_db.db_name}"
+          value = aws_db_instance.pra_db.db_name
         },
         {
           name  = "supportEmail"
-          value = "${local.application_data.accounts[local.environment].support_email}"
+          value = local.application_data.accounts[local.environment].support_email
         },
         {
           name  = "supportTeam"
-          value = "${local.application_data.accounts[local.environment].support_team}"
+          value = local.application_data.accounts[local.environment].support_team
         },
         {
           name  = "ida:ClientId"
-          value = "${local.application_data.accounts[local.environment].client_id}"
+          value = local.application_data.accounts[local.environment].client_id
         }
       ]
     }
@@ -244,6 +244,10 @@ resource "aws_security_group" "ecs_service" {
 resource "aws_ecr_repository" "pra_ecr_repo" {
   name         = "pra-ecr-repo"
   force_delete = true
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
 }
 
 # AWS EventBridge rule
@@ -371,7 +375,7 @@ module "pagerduty_core_alerts_non_prod" {
   depends_on = [
     aws_sns_topic.pra_utilisation_alarm
   ]
-  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=0179859e6fafc567843cd55c0b05d325d5012dc4" #v2.0.0
   sns_topics                = [aws_sns_topic.pra_utilisation_alarm[0].name]
   pagerduty_integration_key = local.pagerduty_integration_keys["pra_non_prod_alarms"]
 }
@@ -382,7 +386,7 @@ module "pagerduty_core_alerts_prod" {
   depends_on = [
     aws_sns_topic.pra_utilisation_alarm
   ]
-  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=0179859e6fafc567843cd55c0b05d325d5012dc4" #v2.0.0
   sns_topics                = [aws_sns_topic.pra_utilisation_alarm[0].name]
   pagerduty_integration_key = local.pagerduty_integration_keys["pra_prod_alarms"]
 }
