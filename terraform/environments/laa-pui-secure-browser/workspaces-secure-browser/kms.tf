@@ -41,6 +41,33 @@ data "aws_iam_policy_document" "kms_key_policy" {
       resources = ["*"]
     }
   }
+
+  # Derived from https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/encrypt-log-data-kms.html
+  dynamic "statement" {
+    for_each = local.create_resources ? [1] : []
+    content {
+      sid = "AllowCloudWatchUseKey"
+      principals {
+        type        = "Service"
+        identifiers = ["logs.${data.aws_region.current.region}.amazonaws.com"]
+      }
+      actions = [
+        "kms:Encrypt",
+        "kms:Decrypt",
+        "kms:ReEncrypt*",
+        "kms:GenerateDataKey*",
+        "kms:Describe*"
+      ]
+      resources = ["*"]
+      condition {
+        test     = "ArnEquals"
+        variable = "kms:EncryptionContext:aws:logs:arn"
+        values = [
+          "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:*"
+        ]
+      }
+    }
+  }
 }
 
 resource "aws_kms_key" "workspacesweb_session_logs" {

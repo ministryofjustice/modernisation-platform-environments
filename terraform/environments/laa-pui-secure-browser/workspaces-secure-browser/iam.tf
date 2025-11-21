@@ -37,7 +37,7 @@ module "cortex_xsiam_role" {
         "sqs:GetQueueUrl",
         "sqs:ListQueues",
       ]
-      resources = [module.sqs_s3_notifications[0].queue_arn]
+      resources = [module.sqs_xsiam_notifications[0].queue_arn]
     }
     S3GetLogs = {
       effect = "Allow"
