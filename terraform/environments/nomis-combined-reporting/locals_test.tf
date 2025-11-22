@@ -93,7 +93,7 @@ locals {
         tags = merge(local.ec2_instances.db.tags, {
           description                          = "T1 NCR DATABASE"
           nomis-combined-reporting-environment = "t1"
-          oracle-sids                          = "T1BIPSYS T1BIPAUD T1BISYS T1BIAUD"
+          oracle-sids                          = "T1BISYS T1BIAUD"
           instance-scheduling                  = "skip-scheduling"
         })
       })
