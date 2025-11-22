@@ -276,6 +276,15 @@ resource "aws_iam_role" "rotate_iam_keys" {
 }
 
 #-----------------------------------------------------------------------------------
+# Clean after MDSS load
+#-----------------------------------------------------------------------------------
+
+resource "aws_iam_role" "clean_after_mdss_load" {
+  name               = "clean_after_mdss_load-lambda-role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+#-----------------------------------------------------------------------------------
 # Virus scanning - definition upload
 #-----------------------------------------------------------------------------------
 
