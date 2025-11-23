@@ -120,9 +120,9 @@ module "s3-bucket-shared" {
   # v9.0.0 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/9facf9fc8f8b8e3f93ffbda822028534b9a75399
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9fc8f8b8e3f93ffbda822028534b9a75399"
 
-  bucket_name        =  "${local.application_name}-${local.environment}-shared"
+  bucket_name        = "${local.application_name}-${local.environment}-shared"
   versioning_enabled = true
-  bucket_policy      = ""
+  bucket_policy      = []
   sse_algorithm      = "AES256"
   custom_kms_key     = ""
 
@@ -142,7 +142,7 @@ module "s3-bucket-shared" {
   }
 
   lifecycle_rule = []
-    
+
 
   tags = merge(local.tags,
     { Name = "${local.application_name}-${local.environment}-shared" }

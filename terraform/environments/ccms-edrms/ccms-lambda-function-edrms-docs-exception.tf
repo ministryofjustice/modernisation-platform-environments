@@ -63,7 +63,7 @@ resource "aws_lambda_layer_version" "lambda_layer" {
   # filename                 = "lambda/layerV1.zip"
   layer_name               = "${local.application_name}-${local.environment}-edrms-docs-exception-layer"
   s3_key                   = "lambda_delivery/${local.application_name}-docs-exception-layer/layerV1.zip"
-  s3_bucket                = module.s3-bucket-sharedbucket.id
+  s3_bucket                = module.s3-bucket-shared.bucket.id
   compatible_runtimes      = ["python3.13"]
   compatible_architectures = ["x86_64"]
   description              = "Lambda Layer for ${local.application_name} Edrms Docs Exception"
@@ -82,13 +82,13 @@ resource "aws_lambda_function" "edrms_docs_exception_monitor" {
   memory_size      = 4096 # Sets memory defaults to 4gb
 
   ephemeral_storage {
-    size  = 1024 # Sets ephemeral storage defaults to 1GB (/tmp space)
+    size = 1024 # Sets ephemeral storage defaults to 1GB (/tmp space)
   }
   environment {
     variables = {
-      LOG_GROUP_NAME      = aws_cloudwatch_log_group.log_group_edrms.name
-      SNS_TOPIC_ARN       = aws_sns_topic.cloudwatch_slack.arn
-      SECRET_NAME         = aws_secretsmanager_secret.edrms_docs_exception_secrets.name
+      LOG_GROUP_NAME = aws_cloudwatch_log_group.log_group_edrms.name
+      SNS_TOPIC_ARN  = aws_sns_topic.cloudwatch_slack.arn
+      SECRET_NAME    = aws_secretsmanager_secret.edrms_docs_exception_secrets.name
     }
   }
 
@@ -115,5 +115,5 @@ resource "aws_cloudwatch_log_subscription_filter" "edrms_docs_exception_filter" 
   filter_pattern  = "\"EdrmsDocumentException\""
   destination_arn = aws_lambda_function.edrms_docs_exception_monitor.arn
 
-  depends_on = [ aws_lambda_permission.allow_cloudwatch_invoke ]
+  depends_on = [aws_lambda_permission.allow_cloudwatch_invoke]
 }
