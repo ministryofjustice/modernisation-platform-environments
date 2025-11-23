@@ -114,3 +114,37 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
     ]
   })
 }
+
+# S3 Bucket - Logging
+module "s3-bucket-shared" {
+  # v9.0.0 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/9facf9fc8f8b8e3f93ffbda822028534b9a75399
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9fc8f8b8e3f93ffbda822028534b9a75399"
+
+  bucket_name        =  "${local.application_name}-${local.environment}-shared"
+  versioning_enabled = true
+  bucket_policy      = ""
+  sse_algorithm      = "AES256"
+  custom_kms_key     = ""
+
+  log_bucket = local.logging_bucket_name
+  log_prefix = "s3access/${local.application_name}-${local.environment}-shared"
+
+  # Refer to the below section "Replication" before enabling replication
+  replication_enabled = false
+  # Below three variables and providers configuration are only relevant if 'replication_enabled' is set to true
+  replication_region = "eu-west-2"
+  # replication_role_arn                     = module.s3-bucket-replication-role.role.arn
+  providers = {
+    # Here we use the default provider Region for replication. Destination buckets can be within the same Region as the
+    # source bucket. On the other hand, if you need to enable cross-region replication, please contact the Modernisation
+    # Platform team to add a new provider for the additional Region.
+    aws.bucket-replication = aws
+  }
+
+  lifecycle_rule = []
+    
+
+  tags = merge(local.tags,
+    { Name = "${local.application_name}-${local.environment}-shared" }
+  )
+}
