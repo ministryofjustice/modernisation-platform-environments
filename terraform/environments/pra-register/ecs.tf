@@ -96,7 +96,7 @@ resource "aws_ecs_service" "pra_ecs_service" {
     aws_lb_listener.pra_lb,
     aws_security_group.ecs_service
   ]
-  name                              = var.networking[0].application
+  name                              = "${var.networking[0].application}-win2022"
   cluster                           = aws_ecs_cluster.pra_cluster.id
   task_definition                   = aws_ecs_task_definition.pra_task_definition.arn
   launch_type                       = "FARGATE"
