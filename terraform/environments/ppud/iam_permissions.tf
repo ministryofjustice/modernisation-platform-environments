@@ -46,7 +46,6 @@ locals {
         "get_klayers"
       ]
       prod_policies = [
-        "get_elb_metrics",
         "ec2_permissions"
       ]
       managed_policies = ["arn:aws:iam::aws:policy/CloudWatchFullAccessV2"]
@@ -74,10 +73,8 @@ locals {
       policies = [
         "send_message_to_sqs",
         "send_logs_to_cloudwatch",
+        "get_data_s3",
         "get_cloudwatch_metrics"
-      ]
-      prod_policies = [
-        "get_elb_metrics"
       ]
       managed_policies = ["arn:aws:iam::aws:policy/CloudWatchFullAccessV2"]
     }
@@ -89,6 +86,15 @@ locals {
         "publish_to_sns",
         "get_cloudwatch_metrics",
         "get_certificate_expiry"
+      ]
+    }
+    sync_ssm_to_waf = {
+      description = "Lambda Function Role for syncing SSM parameter stores to WAF ip sets"
+      policies = [
+        "send_message_to_sqs",
+        "send_logs_to_cloudwatch",
+        "get_ssm_parameter",
+        "update_waf_ipset"
       ]
     }
   }
@@ -183,9 +189,10 @@ locals {
           "get_data_s3",
           "put_data_s3",
           "get_klayers",
-          "get_elb_metrics",
           "ec2_permissions",
-          "get_certificate_expiry"
+          "get_certificate_expiry",
+          "get_ssm_parameter",
+          "update_waf_ipset"
           ] : {
           key         = "${policy_name}_${env_key}"
           policy_name = policy_name
@@ -255,14 +262,18 @@ resource "aws_iam_policy" "lambda_policies_v2" {
         Effect   = "Allow"
         Action   = ["ssm:GetParameter"]
         Resource = ["arn:aws:ssm:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:parameter/klayers-account"]
-        } : each.value.policy_name == "get_elb_metrics" ? {
-        Effect   = "Allow"
-        Action   = ["s3:GetObject", "s3:PutObject", "s3:ListBucket"]
-        Resource = ["arn:aws:s3:::moj-lambda-metrics-prod", "arn:aws:s3:::moj-lambda-metrics-prod/*"]
         } : each.value.policy_name == "ec2_permissions" ? {
         Effect   = "Allow"
         Action   = ["ec2:CreateNetworkInterface", "ec2:DescribeNetworkInterface"]
         Resource = ["arn:aws:ec2:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"]
+        } : each.value.policy_name == "get_ssm_parameter" ? {
+        Effect   = "Allow"
+        Action   = ["ssm:GetParameter"]
+        Resource = ["arn:aws:ssm:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"]
+        } : each.value.policy_name == "update_waf_ipset" ? {
+        Effect   = "Allow"
+        Action   = ["wafv2:GetIPSet", "wafv2:ListIPSets", "wafv2:UpdateIPSet"]
+        Resource = ["arn:aws:wafv2:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"]
         } : each.value.policy_name == "get_certificate_expiry" ? {
         Effect   = "Allow"
         Action   = ["acm:DescribeCertificate", "acm:GetCertificate", "acm:ListCertificates", "acm:ListTagsForCertificate"]

@@ -31,6 +31,11 @@ resource "aws_instance" "tariff_app" {
     delete_on_termination = true
     encrypted             = true
     volume_size           = 20
+    tags = merge(tomap({
+      "Name"               = "${local.application_name}-app-root",
+      "volume-attach-host" = "app",
+      "volume-mount-path"  = "/",
+    }), local.tags, local.environment != "production" ? tomap({ backup = true }) : tomap({}))
   }
   /*
   ebs_block_device {
@@ -70,13 +75,13 @@ resource "aws_instance" "tariff_app" {
     volume_size           = 30
     snapshot_id           = local.snapshot_id_xvdi
   }
-  */
 
   volume_tags = merge(tomap({
     "Name"               = "${local.application_name}-app-root",
     "volume-attach-host" = "app",
     "volume-mount-path"  = "/"
   }), local.tags)
+  */
 
   tags = merge(tomap({
     "Name"     = lower(format("ec2-%s-%s-app", local.application_name, local.environment)),

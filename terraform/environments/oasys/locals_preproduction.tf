@@ -54,9 +54,6 @@ locals {
           scale_up   = { recurrence = "0 5 * * Mon-Fri" }
           scale_down = { recurrence = "0 19 * * Mon-Fri", desired_capacity = 0 }
         }
-        autoscaling_group = merge(local.ec2_autoscaling_groups.web.autoscaling_group, {
-          desired_capacity = 0
-        })
         config = merge(local.ec2_autoscaling_groups.web.config, {
           ami_name                  = "oasys_webserver_release_*"
           iam_resource_names_prefix = "ec2-web-pp"
