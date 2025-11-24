@@ -208,7 +208,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu" {
   for_each            = toset(data.aws_instances.windows_tagged_instances.ids)
   alarm_name          = "CPU-Utilisation-High-${each.key}" # name of the alarm
   comparison_operator = "GreaterThanOrEqualToThreshold"    # threshold to trigger the alarm state
-  period              = "60"                               # period in seconds over which the specified statistic is applied
+  period              = "300"                               # period in seconds over which the specified statistic is applied
   threshold           = "90"                               # threshold for the alarm - see comparison_operator for usage
   evaluation_periods  = "3"                                # how many periods over which to evaluate the alarm
   datapoints_to_alarm = "2"                                # how many datapoints must be breaching the threshold to trigger the alarm
@@ -838,7 +838,6 @@ resource "aws_cloudwatch_metric_alarm" "emailsender_check_rgvw022" {
 ############################
 
 # Create a data source to fetch the tags of each instance
-
 data "aws_instances" "windows_tagged_instances_uat" {
   filter {
     name   = "tag:patch_group"
@@ -847,9 +846,22 @@ data "aws_instances" "windows_tagged_instances_uat" {
 }
 
 # Data source for ImageId and InstanceType for each instance
-
 data "aws_instance" "windows_instance_details_uat" {
   for_each    = toset(data.aws_instances.windows_tagged_instances_uat.ids)
+  instance_id = each.value
+}
+
+# Create a data source to fetch the tags of each instance
+data "aws_instances" "cpu_alarm_tagged_instances_uat" {
+  filter {
+    name   = "tag:cpu_alarm"
+    values = ["true"]
+  }
+}
+
+# Data source for individual instance details to access tags
+data "aws_instance" "cpu_alarm_instance_details_uat" {
+  for_each    = toset(data.aws_instances.cpu_alarm_tagged_instances_uat.ids)
   instance_id = each.value
 }
 
@@ -906,6 +918,33 @@ resource "aws_cloudwatch_metric_alarm" "malware_event_alarms_preprod" {
   dimensions = {
     Instance  = each.value.instance_id
     EventName = each.value.metric_name
+  }
+}
+
+# High CPU Utilization Alarm
+
+resource "aws_cloudwatch_metric_alarm" "cpu_uat_alarms" {
+  for_each            = toset(data.aws_instances.cpu_alarm_tagged_instances_uat.ids)
+  alarm_name          = "CPU-Utilisation-High-${each.key}"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  period              = 300
+  threshold           = 90
+  evaluation_periods  = 3
+  datapoints_to_alarm = 2
+  metric_name         = "CPUUtilization"
+  treat_missing_data  = "notBreaching"
+  namespace           = "AWS/EC2"
+  statistic           = "Average"
+  alarm_description   = "Monitors EC2 CPU utilisation"
+
+  alarm_actions = concat(
+    [aws_sns_topic.cw_uat_alerts[0].arn],
+    lookup(data.aws_instance.cpu_alarm_instance_details_uat[each.key].tags, "cpu_lambda_trigger", "false") == "true" && local.is-preproduction ?
+    ["arn:aws:lambda:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:function:terminate_cpu_process_preproduction"] : []
+  )
+
+  dimensions = {
+    InstanceId = each.key
   }
 }
 
