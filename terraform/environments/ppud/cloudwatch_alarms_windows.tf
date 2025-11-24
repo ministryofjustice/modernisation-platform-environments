@@ -846,6 +846,15 @@ data "aws_instances" "windows_tagged_instances_uat" {
   }
 }
 
+# Create a data source to fetch the tags of each instance
+
+data "aws_instances" "cpu_alarm_tagged_instances_uat" {
+  filter {
+    name   = "tag:cpu_alarm"
+    values = ["true"]
+  }
+}
+
 # Data source for ImageId and InstanceType for each instance
 
 data "aws_instance" "windows_instance_details_uat" {
@@ -906,6 +915,36 @@ resource "aws_cloudwatch_metric_alarm" "malware_event_alarms_preprod" {
   dimensions = {
     Instance  = each.value.instance_id
     EventName = each.value.metric_name
+  }
+}
+
+# High CPU Utilization Alarm
+
+resource "aws_cloudwatch_metric_alarm" "cpu_uat_alarms" {
+  for_each            = toset(data.aws_instances.cpu_alarm_tagged_instances_uat.ids)
+  alarm_name          = "CPU-Utilisation-High-${each.key}"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  period              = 60
+  threshold           = 90
+  evaluation_periods  = 3
+  datapoints_to_alarm = 2
+  metric_name         = "CPUUtilization"
+  treat_missing_data  = "notBreaching"
+  namespace           = "AWS/EC2"
+  statistic           = "Average"
+  alarm_description   = "Monitors EC2 CPU utilisation"
+
+  alarm_actions = concat(
+    [aws_sns_topic.cw_uat_alerts[0].arn],
+    contains(
+      data.aws_instances.cpu_alarm_tagged_instances_uat.tags[each.key],
+      "cpu_lambda_trigger"
+    ) && data.aws_instances.cpu_alarm_tagged_instances_uat.tags[each.key]["cpu_lambda_trigger"] == "true" && local.is-preproduction ?
+    [aws_lambda_function.terminate_cpu_process_preproduction.arn] : []
+  )
+
+  dimensions = {
+    InstanceId = each.key
   }
 }
 
