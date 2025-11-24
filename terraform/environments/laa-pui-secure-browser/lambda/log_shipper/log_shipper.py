@@ -25,6 +25,8 @@ def handler(event, context):
         key = unquote_plus(rec["s3"]["object"]["key"])
         stream_name = key[-512:]  # ensure <= 512 chars
 
+        print(f"Processing S3 object: s3://{bucket}/{key}")
+
         # 1) Read the object (gz or plain)
         obj = s3.get_object(Bucket=bucket, Key=key)
         body = obj["Body"]
@@ -41,18 +43,18 @@ def handler(event, context):
             if ts_ms is None:
                 continue  # skip lines without a usable timestamp
 
-            # Respect CloudWatch Logs time bounds
             if ts_ms < (now_ms - MAX_AGE_MS) or ts_ms > (now_ms + MAX_FUTURE_MS):
                 continue
 
             events.append({"timestamp": ts_ms, "message": line})
 
         if not events:
+            print(f"No valid events found in s3://{bucket}/{key}")
             continue
 
         events.sort(key=lambda e: e["timestamp"])
 
-        # 2) Ensure stream exists (no log group creation here—keep it minimal)
+        # 2) Ensure stream exists
         try:
             logs.create_log_stream(logGroupName=LOG_GROUP, logStreamName=stream_name)
         except logs.exceptions.ResourceAlreadyExistsException:
@@ -75,10 +77,9 @@ def handler(event, context):
                 seq = resp.get("nextSequenceToken")
                 i += len(batch)
             except logs.exceptions.InvalidSequenceTokenException:
-                seq = _get_upload_seq_token(LOG_GROUP, stream_name)  # refresh once
+                seq = _get_upload_seq_token(LOG_GROUP, stream_name)
 
     return {"status": "ok"}
-
 
 def _iter_s3_records(event):
     """
@@ -93,7 +94,6 @@ def _iter_s3_records(event):
             yield rec
             continue
 
-        # Likely SQS → body is JSON
         body = rec.get("body")
         if not body:
             continue
@@ -102,7 +102,6 @@ def _iter_s3_records(event):
         except Exception:
             continue
 
-        # SNS-wrapped? (Message is a JSON string of the original S3 event)
         if isinstance(outer, dict) and "Message" in outer and isinstance(outer["Message"], str):
             try:
                 inner = json.loads(outer["Message"])
@@ -129,13 +128,13 @@ def _iter_lines(body, gz: bool):
 
 
 def _extract_ts_ms(line: str):
-    """Return event time in epoch milliseconds from Network Firewall EVE JSON."""
+    """Return event time in epoch milliseconds from JSON log lines."""
     try:
         obj = json.loads(line)
     except json.JSONDecodeError:
         return None
 
-    # Prefer epoch seconds in top-level event_timestamp (often a string)
+    # 1) Prefer epoch seconds in top-level event_timestamp (often a string)
     et = obj.get("event_timestamp")
     if et is not None:
         try:
@@ -143,20 +142,25 @@ def _extract_ts_ms(line: str):
         except (TypeError, ValueError):
             pass
 
-    # Fallback to ISO8601 inside event.timestamp, e.g. 2025-09-29T17:20:03.799527+0000 or ...Z
-    ts = (obj.get("event") or {}).get("timestamp")
+    # 2) Fallback to ISO8601 timestamp:
+    #    - first, event.timestamp (existing behaviour)
+    #    - then, top-level "time" (your current jsonlines schema)
+    ts = (obj.get("event") or {}).get("timestamp") or obj.get("time")
+
     if ts:
         # Normalize 'Z' to '+0000' so strptime yields an aware datetime
         if ts.endswith("Z"):
             ts = ts[:-1] + "+0000"
+
+        # Support both fractional and non-fractional seconds
         for fmt in ("%Y-%m-%dT%H:%M:%S.%f%z", "%Y-%m-%dT%H:%M:%S%z"):
             try:
                 dt = datetime.datetime.strptime(ts, fmt)
                 return int(dt.timestamp() * 1000)
             except ValueError:
                 continue
-    return None
 
+    return None
 
 def _get_upload_seq_token(log_group, stream_name):
     """Return current uploadSequenceToken (or None) for the stream."""
