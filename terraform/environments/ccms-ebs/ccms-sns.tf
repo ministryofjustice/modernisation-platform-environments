@@ -48,16 +48,11 @@ resource "aws_sns_topic" "cw_alerts" {
 EOF
 }
 
-# resource "aws_sns_topic_policy" "sns_policy" {
-#   arn    = aws_sns_topic.cw_alerts.arn
-#   policy = data.aws_iam_policy_document.sns_topic_policy_ec2cw.json
-# }
-
-resource "aws_sns_topic_subscription" "cw_subscription" {
-  topic_arn = aws_sns_topic.cw_alerts.arn
-  protocol  = "email"
-  endpoint  = aws_secretsmanager_secret_version.alerts_subscription_email.secret_string
+resource "aws_sns_topic_policy" "sns_policy" {
+  arn    = aws_sns_topic.cw_alerts.arn
+  policy = data.aws_iam_policy_document.sns_topic_policy_ec2cw.json
 }
+
 
 resource "aws_sns_topic" "s3_topic" {
   name   = "s3-event-notification-topic"
@@ -71,6 +66,12 @@ resource "aws_sns_topic" "s3_topic" {
 
 resource "aws_sns_topic_subscription" "s3_subscription" {
   topic_arn = aws_sns_topic.s3_topic.arn
+  protocol  = "email"
+  endpoint  = aws_secretsmanager_secret_version.alerts_subscription_email.secret_string
+}
+
+resource "aws_sns_topic_subscription" "cw_subscription" {
+  topic_arn = aws_sns_topic.cw_alerts.arn
   protocol  = "https"
   endpoint  = "https://global.sns-api.chatbot.amazonaws.com"
 }
