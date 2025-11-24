@@ -27,10 +27,10 @@ resource "aws_instance" "tariffdb" {
   root_block_device {
     volume_size = 20
     encrypted   = true
-    tags = {
-      Name = "TariffDB-${each.key}"
-    }
-
+    tags = merge(tomap({
+      Name = "TariffDB-${each.key}",
+      }), local.tags
+    )
   }
   tags = merge(tomap({
     "Name"     = lower(format("ec2-%s-%s-db-${each.key}", local.application_name, local.environment)),

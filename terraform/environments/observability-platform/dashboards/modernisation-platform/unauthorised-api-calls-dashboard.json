@@ -39,9 +39,7 @@
   "options": {
     "reduceOptions": {
       "values": false,
-      "calcs": [
-        "lastNotNull"
-      ],
+      "calcs": ["lastNotNull"],
       "fields": ""
     },
     "orientation": "auto",
@@ -82,10 +80,7 @@
       "id": "reduce",
       "options": {
         "labelsToFields": false,
-        "reducers": [
-          "max",
-          "sum"
-        ]
+        "reducers": ["max", "sum"]
       }
     }
   ],
