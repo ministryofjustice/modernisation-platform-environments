@@ -61,30 +61,47 @@
 
 # The policies below are not used. Saved for reference.
 
-# data "aws_iam_policy_document" "sns_topic_policy_ec2cw" {
-#   policy_id = "SnsTopicId"
-#   statement {
-#     sid = "statement1"
-#     principals {
-#       type        = "AWS"
-#       identifiers = ["*"]
-#     }
-#     effect = "Allow"
-#     actions = [
-#       "SNS:GetTopicAttributes",
-#       "SNS:SetTopicAttributes",
-#       "SNS:AddPermission",
-#       "SNS:DeleteTopic",
-#       "SNS:Subscribe",
-#       "SNS:ListSubscriptionsByTopic",
-#       "SNS:Publish",
-#       "SNS:Receive"
-#     ]
-#     resources = [
-#       aws_sns_topic.cw_alerts.arn
-#     ]
-#   }
-# }
+data "aws_iam_policy_document" "sns_topic_policy_ec2cw" {
+  version = "2012-10-17"
+  statement {
+    sid    = "EventsAllowPublishSnsTopic"
+    effect = "Allow"
+    actions = [
+      "sns:Publish",
+    ]
+    resources = [
+      aws_sns_topic.guardduty_alerts.arn
+    ]
+    principals {
+      type = "Service"
+      identifiers = [
+        "events.amazonaws.com",
+      ]
+    }
+  }
+  # policy_id = "SnsTopicId"
+  # statement {
+  #   sid = "statement1"
+  #   principals {
+  #     type        = "AWS"
+  #     identifiers = ["*"]
+  #   }
+  #   effect = "Allow"
+  #   actions = [
+  #     "SNS:GetTopicAttributes",
+  #     "SNS:SetTopicAttributes",
+  #     "SNS:AddPermission",
+  #     "SNS:DeleteTopic",
+  #     "SNS:Subscribe",
+  #     "SNS:ListSubscriptionsByTopic",
+  #     "SNS:Publish",
+  #     "SNS:Receive"
+  #   ]
+  #   resources = [
+  #     aws_sns_topic.cw_alerts.arn
+  #   ]
+  # }
+}
 
 # data "aws_iam_policy_document" "sns_topic_policy_s3" {
 #   policy_id = "SnsTopicId"
