@@ -123,7 +123,7 @@ locals {
       account_key = "ppud-production" # checkov:skip=CKV_SECRET_6: "Environment identifier, not a secret"
       s3_bucket_names = {
         infrastructure = "moj-infrastructure"
-        log_files      = "moj-lambda-metrics-prod"
+        log_files      = "moj-log-files-prod"
       }
     }
   }
