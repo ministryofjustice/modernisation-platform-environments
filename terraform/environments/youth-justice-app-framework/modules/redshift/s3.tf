@@ -70,7 +70,8 @@ resource "aws_s3_bucket_policy" "default" {
         "s3:DeleteObject"
       ],
       "Resource": [
-        "arn:aws:s3:::${local.yjb_bucket_id}/${local.yjb_s3_folder_landing}/*"
+        "arn:aws:s3:::${local.yjb_bucket_id}/${local.yjb_s3_folder_landing}/*",
+        "arn:aws:s3:::${local.yjb_bucket_id}/${local.yjb_s3_folder_moj_ap}/*"
       ]
     }
  	]
