@@ -183,7 +183,7 @@ resource "aws_iam_role_policy" "app_execution" {
               "ecr:GetDownloadUrlForLayer",
               "ecr:BatchGetImage"
             ],
-            "Resource": "arn:aws:ecr:eu-west-2:${local.environment_management.account_ids[terraform.workspace]}:repository/${aws_ecr_repository.tipstaff_ecr_repo.name}",
+            "Resource": "arn:aws:ecr:eu-west-2:${local.environment_management.account_ids[terraform.workspace]}:repository/${aws_ecr_repository.pra_ecr_repo.name}",
             "Effect": "Allow"
       },
       {
