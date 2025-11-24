@@ -2,7 +2,7 @@ locals {
 
   lb_maintenance_message_preproduction = {
     maintenance_title   = "Prison-NOMIS Environment Not Started"
-    maintenance_message = "Lsast weblogic is rarely used so is started on demand. Preprod is available during working hours 7am-7pm. Please contact <a href=\"https://moj.enterprise.slack.com/archives/C6D94J81E\">#ask-digital-studio-ops</a> slack channel if environment is unexpecedly down. See <a href=\"https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4978343956\">confluence</a> for more details"
+    maintenance_message = "Preprod is available during working hours 7am-7pm. Please contact <a href=\"https://moj.enterprise.slack.com/archives/C6D94J81E\">#ask-digital-studio-ops</a> slack channel if environment is unexpectedly down. See <a href=\"https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4978343956\">confluence</a> for more details"
   }
 
   baseline_presets_preproduction = {
