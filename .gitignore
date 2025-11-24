@@ -8,7 +8,7 @@ tmp/
 **/node_modules
 **/package-lock.json
 **/*-draft.*
-terraform/environments/ccms-edrms/lambda/lambda_function.py
+
 ##########################
 ## IntelliJ
 ##########################
@@ -26,16 +26,12 @@ out/
 
 terraform/modules/**/*.zip
 terraform/environments/youth-justice-app-framework/modules/quicksight/assets/run_time
-terraform/environments/ccms-edrms/lambda/lambda_function.py
+
 megalinter-reports
 
 datasync_password_updater.zip
 
-
-=======
-**/python/*
-
-# *.zip
+*.zip
 *.tar
 *.gz
 *.tgz
