@@ -148,3 +148,15 @@ module "s3-bucket-shared" {
     { Name = "${local.application_name}-${local.environment}-shared" }
   )
 }
+
+resource "aws_s3_object" "folder" {
+  bucket = module.s3-bucket-shared.bucket.id
+  
+  for_each = {
+    for index, name in local.lambda_folder_name :
+    name => index == 0 ? "${name}/" : "lambda_delivery/${name}/"
+  }
+
+  key = each.value
+
+}
