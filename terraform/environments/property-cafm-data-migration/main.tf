@@ -1,14 +1,15 @@
 module "csv_export" {
-  source = "github.com/ministryofjustice/terraform-csv-to-parquet-athena?ref=519f9ee248ec2a7df10ebfc03f401ba15c833c8a"
+  source = "github.com/ministryofjustice/terraform-csv-to-parquet-athena?ref=035e25d8bf1fb63b1c096c6e771ed54deee47d7f"
   providers = {
     aws.bucket-replication = aws
   }
 
-  region_replication = "eu-west-2"
-  kms_key_arn        = aws_kms_key.shared_kms_key.arn
-  name               = "concept"
-  load_mode          = "overwrite"
-  environment        = local.environment_shorthand
+  kms_key_arn  = aws_kms_key.shared_kms_key.arn
+  name         = "concept"
+  load_mode    = "overwrite"
+  environment  = local.environment_shorthand
+  table_naming = "split_at_last_underscore"
+
   tags = {
     business-unit = "Property"
     application   = "cafm"
@@ -18,7 +19,7 @@ module "csv_export" {
 }
 
 module "rds_export" {
-  source = "github.com/ministryofjustice/terraform-rds-export?ref=e48992e9a69c95bd3ccf2b8affbbd8d7b53ddeb4"
+  source = "github.com/ministryofjustice/terraform-rds-export?ref=808729e36971f82c07f266315fc544e91690b182"
   providers = {
     aws = aws
   }

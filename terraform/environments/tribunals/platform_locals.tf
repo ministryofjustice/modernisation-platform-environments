@@ -60,108 +60,108 @@ locals {
   # of the production cloudfront distribution
   # "ahmlr.gov.uk" is listed as the primary domain of the viewer certificate for this cloudfront-nginx distribution
   #
-cloudfront_nginx_prod_sans = [
-  {
-    domain    = "ahmlr.gov.uk"
-    prod_only = false
-  },
-  {
-    domain    = "asylum-support-tribunal.gov.uk"
-    prod_only = false
-  },
-  {
-    domain    = "appeals-service.gov.uk"
-    prod_only = true
-  },
-  {
-    domain    = "carestandardstribunal.gov.uk"
-    prod_only = true
-  },
-  {
-    domain    = "cicap.gov.uk"
-    prod_only = true
-  },
-  {
-    domain    = "civilappeals.gov.uk"
-    prod_only = true
-  },
-  {
-    domain    = "cjit.gov.uk"
-    prod_only = true
-  },
-  {
-    domain    = "cjs.gov.uk"
-    prod_only = true
-  },
-  {
-    domain    = "cjsonline.gov.uk"
-    prod_only = true
-  },
-  {
-    domain    = "complaints.judicialconduct.gov.uk"
-    prod_only = true
-  },
-  {
-    domain    = "courtfunds.gov.uk"
-    prod_only = true
-  },
-  {
-    domain    = "criminal-justice-system.gov.uk"
-    prod_only = true
-  },
-  {
-    domain    = "dugganinquest.independent.gov.uk"
-    prod_only = true
-  },
-  {
-    domain    = "employmentappeals.gov.uk"
-    prod_only = true
-  },
-  {
-    domain    = "financeandtaxtribunals.gov.uk"
-    prod_only = true
-  },
-  {
-    domain    = "hillsboroughinquests.independent.gov.uk"
-    prod_only = true
-  },
-  {
-    domain    = "immigrationservicestribunal.gov.uk"
-    prod_only = true
-  },
-  {
-    domain    = "informationtribunal.gov.uk"
-    prod_only = true
-  },
-  {
-    domain    = "judicialombudsman.gov.uk"
-    prod_only = true
-  },
-  {
-    domain    = "landstribunal.gov.uk"
-    prod_only = true
-  },
-  {
-    domain    = "osscsc.gov.uk"
-    prod_only = true
-  },
-  {
-    domain    = "paroleboard.gov.uk"
-    prod_only = true
-  },
-  {
-    domain    = "transporttribunal.gov.uk"
-    prod_only = true
-  },
-  {
-    domain    = "victiminformationservice.org.uk"
-    prod_only = true
-  },
-  {
-    domain    = "yjbpublications.justice.gov.uk"
-    prod_only = true
-  }
-]
+  cloudfront_nginx_prod_sans = [
+    {
+      domain    = "ahmlr.gov.uk"
+      prod_only = false
+    },
+    {
+      domain    = "asylum-support-tribunal.gov.uk"
+      prod_only = false
+    },
+    {
+      domain    = "appeals-service.gov.uk"
+      prod_only = true
+    },
+    {
+      domain    = "carestandardstribunal.gov.uk"
+      prod_only = true
+    },
+    {
+      domain    = "cicap.gov.uk"
+      prod_only = true
+    },
+    {
+      domain    = "civilappeals.gov.uk"
+      prod_only = true
+    },
+    {
+      domain    = "cjit.gov.uk"
+      prod_only = true
+    },
+    {
+      domain    = "cjs.gov.uk"
+      prod_only = true
+    },
+    {
+      domain    = "cjsonline.gov.uk"
+      prod_only = true
+    },
+    {
+      domain    = "complaints.judicialconduct.gov.uk"
+      prod_only = true
+    },
+    {
+      domain    = "courtfunds.gov.uk"
+      prod_only = true
+    },
+    {
+      domain    = "criminal-justice-system.gov.uk"
+      prod_only = true
+    },
+    {
+      domain    = "dugganinquest.independent.gov.uk"
+      prod_only = true
+    },
+    {
+      domain    = "employmentappeals.gov.uk"
+      prod_only = true
+    },
+    {
+      domain    = "financeandtaxtribunals.gov.uk"
+      prod_only = true
+    },
+    {
+      domain    = "hillsboroughinquests.independent.gov.uk"
+      prod_only = true
+    },
+    {
+      domain    = "immigrationservicestribunal.gov.uk"
+      prod_only = true
+    },
+    {
+      domain    = "informationtribunal.gov.uk"
+      prod_only = true
+    },
+    {
+      domain    = "judicialombudsman.gov.uk"
+      prod_only = true
+    },
+    {
+      domain    = "landstribunal.gov.uk"
+      prod_only = true
+    },
+    {
+      domain    = "osscsc.gov.uk"
+      prod_only = true
+    },
+    {
+      domain    = "paroleboard.gov.uk"
+      prod_only = true
+    },
+    {
+      domain    = "transporttribunal.gov.uk"
+      prod_only = true
+    },
+    {
+      domain    = "victiminformationservice.org.uk"
+      prod_only = true
+    },
+    {
+      domain    = "yjbpublications.justice.gov.uk"
+      prod_only = true
+    }
+  ]
 
   # Build an array list from the above list of objects (needed for the sans_map)
   cloudfront_nginx_prod_sans_list = [

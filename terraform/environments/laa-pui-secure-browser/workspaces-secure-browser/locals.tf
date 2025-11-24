@@ -10,6 +10,14 @@ locals {
     "external_2" = "laa-workspaces-web-external-2"
   }
 
+  portal_ids = local.create_resources ? {
+    for key, value in local.portals :
+    key => trimsuffix(
+      aws_workspacesweb_portal.external[key].portal_endpoint,
+      ".workspaces-web.com"
+    )
+  } : {}
+
   # Map zone IDs to AZ names
   wssb_supported_zone_ids = ["euw2-az1", "euw2-az2"]
 
