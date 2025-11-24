@@ -162,7 +162,7 @@ resource "aws_s3_bucket_policy" "shared_bucket_policy" {
           AWS = "*"
         },
         Action   = "s3:*",
-        Resource = ["${module.s3-bucket-logging.bucket.arn}/*", "${module.s3-bucket-logging.bucket.arn}"],
+        Resource = ["${module.s3-bucket-shared.bucket.arn}/*", "${module.s3-bucket-shared.bucket.arn}"],
         Condition = {
           NumericLessThan = {
             "s3:TlsVersion" = "1.2"
