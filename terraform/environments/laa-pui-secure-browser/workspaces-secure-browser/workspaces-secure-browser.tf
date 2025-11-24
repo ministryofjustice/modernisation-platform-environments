@@ -310,7 +310,7 @@ resource "aws_workspacesweb_session_logger" "main" {
       bucket_owner     = data.aws_caller_identity.current.account_id
       folder_structure = "NestedByDate"
       key_prefix       = "workspaces-web-logs/"
-      log_file_format  = "JSONLines"
+      log_file_format  = "Json"
     }
   }
 
