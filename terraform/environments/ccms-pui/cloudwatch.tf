@@ -98,12 +98,12 @@ resource "aws_cloudwatch_metric_alarm" "waf_high_blocked_requests" {
   statistic           = "Sum"
   period              = 60
   evaluation_periods  = 5
-  threshold           = 50                   # tune for your workload
+  threshold           = 50 # tune for your workload
   treat_missing_data  = "notBreaching"
 
   dimensions = {
     WebACL = aws_wafv2_web_acl.pui_web_acl.name
-    Scope = "REGIONAL"
+    Scope  = "REGIONAL"
   }
 
   alarm_actions = [aws_sns_topic.cloudwatch_alerts.arn]

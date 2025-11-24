@@ -196,7 +196,7 @@ locals {
           ])
         })
         instance = merge(local.ec2_autoscaling_groups.web.instance, {
-          instance_type           = "t3.medium"
+          instance_type = "t3.medium"
           #instance_type           = "t3.small"
         })
         tags = merge(local.ec2_autoscaling_groups.web.tags, {
@@ -215,7 +215,7 @@ locals {
           ])
         })
         instance = merge(local.ec2_autoscaling_groups.web.instance, {
-          instance_type           = "t3.medium"
+          instance_type = "t3.medium"
           #instance_type           = "t3.small"
         })
         tags = merge(local.ec2_autoscaling_groups.web.tags, {
@@ -236,8 +236,8 @@ locals {
           ])
         })
         instance = merge(local.ec2_instances.bip.instance, {
-          ami = "ami-0d206b8546ea2b68a" # to prevent instances being re-created due to recreated AMI
-          instance_type = "t3.xlarge" # OVERSIZED
+          ami           = "ami-0d206b8546ea2b68a" # to prevent instances being re-created due to recreated AMI
+          instance_type = "t3.xlarge"             # OVERSIZED
         })
         tags = merge(local.ec2_instances.bip.tags, {
           bip-db-name       = "PDBIPINF"

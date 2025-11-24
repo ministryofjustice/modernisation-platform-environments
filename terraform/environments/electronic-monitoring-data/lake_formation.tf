@@ -87,12 +87,12 @@ module "lakeformation_registration_iam_role" {
       ]
       principals = [
         {
-        type        = "Service"
-        identifiers = ["lakeformation.amazonaws.com"]
+          type        = "Service"
+          identifiers = ["lakeformation.amazonaws.com"]
         },
         {
-        type        = "Service"
-        identifiers = ["glue.amazonaws.com"]
+          type        = "Service"
+          identifiers = ["glue.amazonaws.com"]
         },
       ]
     }

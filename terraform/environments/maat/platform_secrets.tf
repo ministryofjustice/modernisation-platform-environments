@@ -335,7 +335,7 @@ resource "aws_secretsmanager_secret" "maat_app_ats_client_id" {
   tags = merge(
     local.tags,
     {
-      Name = "application-env-secret-${upper(local.application_name)}"
+      Name            = "application-env-secret-${upper(local.application_name)}"
       rotation_reason = "rotation_not_required_static_application_env"
     }
   )
@@ -358,7 +358,7 @@ resource "aws_secretsmanager_secret" "maat_app_ats_oauth_scope" {
   tags = merge(
     local.tags,
     {
-      Name = "application-env-secret-${upper(local.application_name)}"
+      Name            = "application-env-secret-${upper(local.application_name)}"
       rotation_reason = "rotation_not_required_static_application_env"
     }
   )
@@ -381,7 +381,7 @@ resource "aws_secretsmanager_secret" "maat_app_master_password" {
   tags = merge(
     local.tags,
     {
-      Name = "application-env-secret-${upper(local.application_name)}"
+      Name            = "application-env-secret-${upper(local.application_name)}"
       rotation_reason = "rotation_not_required_static_application_env"
     }
   )
@@ -404,7 +404,7 @@ resource "aws_secretsmanager_secret" "maat_app_salt" {
   tags = merge(
     local.tags,
     {
-      Name = "application-env-secret-${upper(local.application_name)}"
+      Name            = "application-env-secret-${upper(local.application_name)}"
       rotation_reason = "rotation_not_required_static_application_env"
     }
   )
@@ -427,7 +427,7 @@ resource "aws_secretsmanager_secret" "maat_app_derivation_iterations" {
   tags = merge(
     local.tags,
     {
-      Name = "application-env-secret-${upper(local.application_name)}"
+      Name            = "application-env-secret-${upper(local.application_name)}"
       rotation_reason = "rotation_not_required_static_application_env"
     }
   )
