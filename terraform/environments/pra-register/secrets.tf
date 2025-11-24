@@ -9,6 +9,8 @@ resource "random_password" "password" {
 
 // Secrets for the pra database on the modernisation platform
 resource "aws_secretsmanager_secret" "rds_db_credentials" {
+  #checkov:skip=CKV2_AWS_57:Automatic rotation is not required for this secret
+  #checkov:skip=CKV_AWS_149: "Ensure that Secrets Manager secret is encrypted using KMS CMK"
   name                    = "rds-password"
   recovery_window_in_days = 0
 }

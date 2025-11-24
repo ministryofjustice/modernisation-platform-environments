@@ -234,7 +234,9 @@ resource "aws_security_group" "lb_sc_pingdom_2" {
 #trivy:ignore:AVD-AWS-0053: this needs to be public
 resource "aws_lb" "pra_lb" {
   #checkov:skip=CKV_AWS_91: "ELB Logging not required"
+  #checkov:skip=CKV2_AWS_76: "WAF attached already includes AWSManagedRulesKnownBadInputsRuleSet in waf.tf"
   #checkov:skip=CKV_AWS_150: "Ensure that Load Balancer has deletion protection enabled"
+
   name                       = "pra-load-balancer"
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.pra_lb_sc.id, aws_security_group.lb_sc_pingdom.id, aws_security_group.lb_sc_pingdom_2.id]
