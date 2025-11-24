@@ -70,7 +70,7 @@ data "aws_iam_policy_document" "sns_topic_policy_ec2cw" {
       "sns:Publish",
     ]
     resources = [
-      aws_sns_topic.guardduty_alerts.arn
+      aws_sns_topic.cw_alerts.arn
     ]
     principals {
       type = "Service"
