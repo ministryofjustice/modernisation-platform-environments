@@ -25,7 +25,7 @@ resource "aws_db_instance" "tipstaff_db" {
   apply_immediately               = true
   copy_tags_to_snapshot           = true
   maintenance_window              = local.is-production ? null : "tue:20:20-tue:20:50"
-  enabled_cloudwatch_logs_exports = ["postgresql", "upgrade", "error"]
+  enabled_cloudwatch_logs_exports = ["postgresql", "upgrade"]
 }
 
 resource "aws_db_subnet_group" "dbsubnetgroup" {
