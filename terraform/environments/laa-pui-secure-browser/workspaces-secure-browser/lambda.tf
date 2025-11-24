@@ -4,11 +4,12 @@ module "lambda_s3_log_processor" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "~> 8.0"
 
-  function_name = "s3-log-processor"
-  handler       = "log_shipper.handler"
-  runtime       = "python3.12"
-  timeout       = 900
-  memory_size   = 512
+  cloudwatch_logs_retention_in_days = 14
+  function_name                     = "s3-log-processor"
+  handler                           = "log_shipper.handler"
+  memory_size                       = 512
+  runtime                           = "python3.12"
+  timeout                           = 900
 
   create_role              = true
   attach_policies          = true
