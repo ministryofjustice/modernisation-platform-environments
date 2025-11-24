@@ -14,7 +14,7 @@ permissions:
 
 jobs:
     fetch-secrets:
-            uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@4eceb2a416a197e91dc557c2ef0b5dd9afe29e0c # v3.4.6
+            uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@7b8dd97eb5b596a88206805943771ea7ffcde235 # v3.4.8
             secrets:
                 MODERNISATION_PLATFORM_ACCOUNT_NUMBER: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
                 PASSPHRASE: ${{ secrets.PASSPHRASE }}
