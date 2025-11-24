@@ -36,7 +36,7 @@ resource "aws_route53_record" "external_validation_prod" {
 
 #Route53 DNS record for cart validation (dev only)
 resource "aws_route53_record" "external_validation_dev" {
-  count = (!local.is-production && locla.environment == "development") ? 1 : 0
+  count = (!local.is-production && local.environment == "development") ? 1 : 0
   provider = aws.core-network-services
   allow_overwrite = true
 
