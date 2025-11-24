@@ -62,6 +62,7 @@ locals {
     "staged_alcohol_monitoring",
     "preprocessed_cap_dw",
     "staged_cap_dw",
+    "curated_emsys_mvp",
     "preprocessed_emsys_mvp",
     "staged_emsys_mvp",
     "preprocessed_emsys_tpims",
