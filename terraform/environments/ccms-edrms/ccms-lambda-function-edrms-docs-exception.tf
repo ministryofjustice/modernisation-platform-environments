@@ -24,11 +24,6 @@ resource "aws_iam_role_policy" "lambda_edrms_docs_exception_policy" {
     Version = "2012-10-17"
     Statement = [
       {
-        Effect   = "Allow"
-        Action   = ["sns:Publish"]
-        Resource = [aws_sns_topic.cloudwatch_slack.arn]
-      },
-      {
         Effect = "Allow"
         Action = [
           "logs:CreateLogGroup",
