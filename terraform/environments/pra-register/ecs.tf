@@ -7,11 +7,13 @@ resource "aws_ecs_cluster" "pra_cluster" {
 }
 
 resource "aws_cloudwatch_log_group" "deployment_logs" {
+  #checkov:skip=CKV_AWS_158:"Using default AWS encryption for CloudWatch logs which is sufficient for our needs"
   name              = "/aws/events/deploymentLogs"
   retention_in_days = "7"
 }
 
 resource "aws_cloudwatch_log_group" "ecs_logs" {
+  #checkov:skip=CKV_AWS_158:"Using default AWS encryption for CloudWatch logs which is sufficient for our needs"
   name              = "pra-ecs"
   retention_in_days = "7"
 }
