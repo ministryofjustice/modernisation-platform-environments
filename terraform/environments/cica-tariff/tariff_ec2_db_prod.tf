@@ -25,7 +25,7 @@ resource "aws_instance" "tariffdb" {
   # private_ip           = var.private_ip
   iam_instance_profile = aws_iam_instance_profile.tariff_instance_profile.name
   root_block_device {
-    volume_size = 20
+    volume_size = 30
     encrypted   = true
     tags = merge(tomap({
       Name = "TariffDB-${each.key}",
