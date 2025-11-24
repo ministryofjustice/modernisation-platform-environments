@@ -32,6 +32,14 @@ data "aws_identitystore_group" "all_identity_centre_teams" {
   }
 }
 
-data "aws_secretsmanager_secret_version" "github_token" {
-  secret_id = aws_secretsmanager_secret.github_token.id
+data "aws_secretsmanager_secret_version" "github_app_id" {
+  secret_id = aws_secretsmanager_secret.github_app_id.id
+}
+
+data "aws_secretsmanager_secret_version" "github_app_installation_id" {
+  secret_id = aws_secretsmanager_secret.github_app_installation_id.id
+}
+
+data "aws_secretsmanager_secret_version" "github_app_private_key" {
+  secret_id = aws_secretsmanager_secret.github_app_private_key.id
 }

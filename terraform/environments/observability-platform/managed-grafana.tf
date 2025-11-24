@@ -126,6 +126,8 @@ resource "grafana_data_source" "github" {
     owner = "ministryofjustice"
   })
   secure_json_data_encoded = jsonencode({
-    accessToken = data.aws_secretsmanager_secret_version.github_token.secret_string
+    appId          = data.aws_secretsmanager_secret_version.github_app_id.secret_string
+    installationId = data.aws_secretsmanager_secret_version.github_app_installation_id.secret_string
+    privateKey     = data.aws_secretsmanager_secret_version.github_app_private_key.secret_string
   })
 }
