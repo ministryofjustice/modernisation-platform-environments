@@ -838,7 +838,6 @@ resource "aws_cloudwatch_metric_alarm" "emailsender_check_rgvw022" {
 ############################
 
 # Create a data source to fetch the tags of each instance
-
 data "aws_instances" "windows_tagged_instances_uat" {
   filter {
     name   = "tag:patch_group"
@@ -846,8 +845,13 @@ data "aws_instances" "windows_tagged_instances_uat" {
   }
 }
 
-# Create a data source to fetch the tags of each instance
+# Data source for ImageId and InstanceType for each instance
+data "aws_instance" "windows_instance_details_uat" {
+  for_each    = toset(data.aws_instances.windows_tagged_instances_uat.ids)
+  instance_id = each.value
+}
 
+# Create a data source to fetch the tags of each instance
 data "aws_instances" "cpu_alarm_tagged_instances_uat" {
   filter {
     name   = "tag:cpu_alarm"
@@ -855,10 +859,9 @@ data "aws_instances" "cpu_alarm_tagged_instances_uat" {
   }
 }
 
-# Data source for ImageId and InstanceType for each instance
-
-data "aws_instance" "windows_instance_details_uat" {
-  for_each    = toset(data.aws_instances.windows_tagged_instances_uat.ids)
+# Data source for individual instance details to access tags
+data "aws_instance" "cpu_alarm_instance_details_uat" {
+  for_each    = toset(data.aws_instances.cpu_alarm_tagged_instances_uat.ids)
   instance_id = each.value
 }
 
@@ -936,11 +939,8 @@ resource "aws_cloudwatch_metric_alarm" "cpu_uat_alarms" {
 
   alarm_actions = concat(
     [aws_sns_topic.cw_uat_alerts[0].arn],
-    contains(
-      data.aws_instances.cpu_alarm_tagged_instances_uat.tags[each.key],
-      "cpu_lambda_trigger"
-    ) && data.aws_instances.cpu_alarm_tagged_instances_uat.tags[each.key]["cpu_lambda_trigger"] == "true" && local.is-preproduction ?
-    [aws_lambda_function.terminate_cpu_process_preproduction.arn] : []
+    lookup(data.aws_instance.cpu_alarm_instance_details_uat[each.key].tags, "cpu_lambda_trigger", "false") == "true" && local.is-preproduction ?
+    ["arn:aws:lambda:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:function:terminate_cpu_process_preproduction"] : []
   )
 
   dimensions = {
