@@ -32,7 +32,7 @@ jobs:
                     echo "VPN_ID=$vpn_id" >> $GITHUB_ENV
                     
               - name: Checkout repository
-                uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+                uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
 
               - name: Decrypt Secrets
                 uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@7b8dd97eb5b596a88206805943771ea7ffcde235 # v3.4.8
@@ -85,7 +85,7 @@ jobs:
                     echo "VPN_ID=$vpn_id" >> $GITHUB_ENV
 
               - name: Checkout repository
-                uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+                uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
 
               - name: Decrypt Secrets
                 uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@7b8dd97eb5b596a88206805943771ea7ffcde235 # v3.4.8
