@@ -151,6 +151,8 @@ module "s3-bucket-shared" {
         rule      = "log"
         autoclean = "true"
       }
+
+      abort_incomplete_multipart_upload_days = local.application_data.accounts[local.environment].s3_lifecycle_days_abort_incomplete_multipart_upload_days
     }
   ]
 
