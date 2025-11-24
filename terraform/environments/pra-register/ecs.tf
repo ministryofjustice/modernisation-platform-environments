@@ -86,14 +86,15 @@ resource "aws_ecs_task_definition" "pra_task_definition" {
     }
   ])
   runtime_platform {
-    operating_system_family = "WINDOWS_SERVER_2019_CORE"
+    operating_system_family = "WINDOWS_SERVER_2022_CORE"
     cpu_architecture        = "X86_64"
   }
 }
 
 resource "aws_ecs_service" "pra_ecs_service" {
   depends_on = [
-    aws_lb_listener.pra_lb
+    aws_lb_listener.pra_lb,
+    aws_security_group.ecs_service
   ]
   name                              = var.networking[0].application
   cluster                           = aws_ecs_cluster.pra_cluster.id
@@ -102,6 +103,7 @@ resource "aws_ecs_service" "pra_ecs_service" {
   enable_execute_command            = true
   desired_count                     = 2
   health_check_grace_period_seconds = 180
+  force_new_deployment              = true
 
   network_configuration {
     subnets          = data.aws_subnets.shared-private.ids
@@ -117,6 +119,10 @@ resource "aws_ecs_service" "pra_ecs_service" {
 
   deployment_controller {
     type = "ECS"
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 }
 
