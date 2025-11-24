@@ -100,7 +100,7 @@ resource "aws_ecs_service" "tipstaff_ecs_service" {
     aws_lb_listener.tipstaff_lb,
     aws_security_group.ecs_service
   ]
-  name                              = var.networking[0].application
+  name                              = "${var.networking[0].application}-win2022"
   cluster                           = aws_ecs_cluster.tipstaff_cluster.id
   task_definition                   = aws_ecs_task_definition.tipstaff_task_definition.arn
   launch_type                       = "FARGATE"
@@ -123,6 +123,10 @@ resource "aws_ecs_service" "tipstaff_ecs_service" {
 
   deployment_controller {
     type = "ECS"
+  }
+  
+  lifecycle {
+    create_before_destroy = true
   }
 }
 
