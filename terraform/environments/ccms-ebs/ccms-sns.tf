@@ -26,7 +26,7 @@ resource "aws_secretsmanager_secret_version" "alerts_subscription_email" {
 }
 
 resource "aws_sns_topic" "cw_alerts" {
-  name = "ccms-ebs-ec2-alerts"
+  name            = "ccms-ebs-ec2-alerts"
   delivery_policy = <<EOF
 {
   "http": {

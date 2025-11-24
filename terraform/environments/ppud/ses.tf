@@ -169,9 +169,9 @@ resource "aws_sesv2_email_identity" "ppud_domain" {
   dkim_signing_attributes {
     next_signing_key_length = "RSA_2048_BIT"
   }
-  
+
   configuration_set_name = "ses-events-configuration-set-${each.key}"
-  
+
   tags = {
     IdentityName = local.application_data.accounts[local.environment].SES_domain
     Environment  = each.key
@@ -196,7 +196,7 @@ resource "aws_sesv2_email_identity_mail_from_attributes" "ppud_mail_from" {
 
 resource "aws_sesv2_configuration_set" "ses_events_configuration_set" {
   for_each = local.ses_instances
-  
+
   configuration_set_name = "ses-events-configuration-set-${each.key}"
 
   delivery_options {
@@ -204,9 +204,9 @@ resource "aws_sesv2_configuration_set" "ses_events_configuration_set" {
   }
 
   tags = {
-    IdentityName  = aws_sesv2_email_identity.ppud_domain[each.key].email_identity
-    Environment   = each.key
-    Service       = "SESv2"
+    IdentityName = aws_sesv2_email_identity.ppud_domain[each.key].email_identity
+    Environment  = each.key
+    Service      = "SESv2"
   }
 }
 
@@ -219,10 +219,10 @@ resource "aws_sesv2_configuration_set_event_destination" "ses_delivery_events" {
 
   configuration_set_name = aws_sesv2_configuration_set.ses_events_configuration_set[each.key].configuration_set_name
   event_destination_name = "ses-delivery-events-${each.key}"
-  
+
   event_destination {
-    enabled          = true
-    matching_event_types = ["SEND"]  # "DELIVERY", "BOUNCE", "COMPLAINT" options also available
+    enabled              = true
+    matching_event_types = ["SEND"] # "DELIVERY", "BOUNCE", "COMPLAINT" options also available
 
     sns_destination {
       topic_arn = aws_sns_topic.ses_logging[each.key].arn
