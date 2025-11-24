@@ -64,9 +64,9 @@ locals {
 }
 
 resource "aws_cloudwatch_event_rule" "sync_ssm_to_waf" {
-  for_each    = local.sync_ssm_to_waf_envs
-  name        = "SSM-Parameter-Sync-to-IP-Set-${each.value.env}"
-  description = "Triggers Lambda when SSM parameters change"
+  for_each      = local.sync_ssm_to_waf_envs
+  name          = "SSM-Parameter-Sync-to-IP-Set-${each.value.env}"
+  description   = "Triggers Lambda when SSM parameters change"
   event_pattern = <<EOF
 {
   "source": ["aws.ssm"],
@@ -280,9 +280,9 @@ locals {
         local.is-production ? aws_lambda_function.lambda_functions["securityhub_report_production"].arn : null
     ))
     sync_ssm__to_waf = local.is-development ? aws_lambda_function.lambda_functions["sync_ssm_to_waf_development"].arn : (
-       local.is-preproduction ? aws_lambda_function.lambda_functions["sync_ssm_to_waf_preproduction"].arn : (
-         local.is-production ? aws_lambda_function.lambda_functions["sync_ssm_to_waf_production"].arn : null
-        ))
+      local.is-preproduction ? aws_lambda_function.lambda_functions["sync_ssm_to_waf_preproduction"].arn : (
+        local.is-production ? aws_lambda_function.lambda_functions["sync_ssm_to_waf_production"].arn : null
+    ))
     #    wam_waf_analysis = local.is-development ? aws_lambda_function.lambda_functions["wam_waf_analysis_development"].arn : (
     #      local.is-preproduction ? aws_lambda_function.lambda_functions["wam_waf_analysis_preproduction"].arn : (
     #        local.is-production ? aws_lambda_function.lambda_functions["wam_waf_analysis_production"].arn : null
