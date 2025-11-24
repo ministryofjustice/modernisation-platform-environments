@@ -124,6 +124,10 @@ resource "aws_ecs_service" "tipstaff_ecs_service" {
   deployment_controller {
     type = "ECS"
   }
+  
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_iam_role" "app_execution" {
