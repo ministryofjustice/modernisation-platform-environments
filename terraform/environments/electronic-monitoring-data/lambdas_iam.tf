@@ -727,11 +727,139 @@ module "share_dbs_with_dms_lambda_role" {
   de_role_arn             = null
 }
 
-module "share_stg_dbs_with_dms_lambda_role" {
+
+#-----------------------------------------------------------------------------------
+# Load MDSS Data IAM Role
+#-----------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "load_mdss_lambda_role_policy_document" {
+  count = local.is-development ? 0 : 1
+  statement {
+    sid    = "S3Permissions"
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:GetObjectAttributes",
+      "s3:GetObject",
+      "s3:DeleteObject",
+    ]
+    resources = [
+      "${module.s3-create-a-derived-table-bucket.bucket.arn}/staging/allied_mdss${local.db_suffix}_pipeline/*",
+      "${module.s3-athena-bucket.bucket.arn}/output/*",
+      "${module.s3-athena-bucket.bucket.arn}/*",
+    ]
+  }
+  statement {
+    sid    = "S3GetPermissions"
+    effect = "Allow"
+    actions = [
+      "s3:GetObjectAttributes",
+      "s3:GetObject",
+    ]
+    resources = [
+      "${module.s3-raw-formatted-data-bucket.bucket.arn}/allied/mdss/*"
+    ]
+  }
+  statement {
+    sid    = "S3ListingPermissions"
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket",
+    ]
+    resources = [
+      module.s3-create-a-derived-table-bucket.bucket.arn
+    ]
+  }
+  statement {
+    sid    = "AthenaPermissionsForLoadData"
+    effect = "Allow"
+    actions = [
+      "athena:StartQueryExecution",
+      "athena:GetQueryExecution",
+      "athena:GetQueryResults",
+      "athena:StopQueryExecution"
+    ]
+    resources = [
+      "arn:aws:athena:${data.aws_region.current.name}:${data.aws_caller_identity.current.id}:workgroup/${data.aws_caller_identity.current.id}-default",
+    ]
+  }
+  statement {
+    sid    = "GluePermissionsForLoad"
+    effect = "Allow"
+    actions = [
+      "glue:GetTable",
+      "glue:GetDatabase",
+      "glue:GetDatabases",
+      "glue:CreateTable",
+      "glue:DeleteTable",
+      "glue:CreateDatabase",
+      "glue:DeleteDatabase",
+      "glue:UpdateTable",
+      "glue:GetPartition",
+      "glue:GetPartitions",
+      "glue:GetCatalog"
+    ]
+    resources = [
+      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:catalog",
+      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:database/*",
+      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/*/*",
+      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:userDefinedFunction/*/*",
+    ]
+  }
+  statement {
+    sid    = "GetDataAccessAndTagsForLakeFormation"
+    effect = "Allow"
+    actions = [
+      "lakeformation:GetDataAccess",
+      "lakeformation:GetResourceLFTags",
+    ]
+    resources = ["*"]
+  }
+  statement {
+    sid       = "ListAccountAlias"
+    effect    = "Allow"
+    actions   = ["iam:ListAccountAliases"]
+    resources = ["*"]
+  }
+  statement {
+    sid       = "ListAllBucket"
+    effect    = "Allow"
+    actions   = ["s3:ListAllMyBuckets", "s3:GetBucketLocation"]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_role" "load_mdss" {
+  count              = local.is-development ? 0 : 1
+  name               = "load_mdss_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_policy" "load_mdss_lambda_role_policy" {
+  count  = local.is-development ? 0 : 1
+  name   = "load_mdss_lambda_policy"
+  policy = data.aws_iam_policy_document.load_mdss_lambda_role_policy_document[0].json
+}
+
+resource "aws_iam_role_policy_attachment" "load_mdss_output_lambda_policy_attachment" {
+  count      = local.is-development ? 0 : 1
+  role       = aws_iam_role.load_mdss[0].name
+  policy_arn = aws_iam_policy.load_mdss_lambda_role_policy[0].arn
+}
+
+module "share_db_with_mdss_lambda_role" {
+  count                   = local.is-development ? 0 : 1
   source                  = "./modules/lakeformation_database_share"
-  dbs_to_grant            = toset([for db in local.historic_source_dbs : "${db}_staging"])
+  dbs_to_grant            = toset(["allied_mdss${local.db_suffix}"])
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
-  role_arn                = aws_iam_role.load_dms_output.arn
+  role_arn                = aws_iam_role.load_mdss[0].arn
   db_exists               = true
   de_role_arn             = null
+}
+
+resource "aws_lakeformation_permissions" "add_create_db" {
+  count            = local.is-development ? 0 : 1
+  permissions      = ["CREATE_DATABASE", "DROP"]
+  principal        = aws_iam_role.load_mdss[0].arn
+  catalog_resource = true
 }
