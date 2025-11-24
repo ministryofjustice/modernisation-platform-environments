@@ -239,7 +239,7 @@ resource "aws_cloudwatch_log_group" "lambda_securityhub_report_dev_log_group" {
 #######################################
 # Lambda Function for SES Logging - DEV
 #######################################
-
+/*
 resource "aws_lambda_function" "terraform_lambda_func_ses_logging_dev" {
   # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
   # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing temporarily disabled for maintenance purposes"
@@ -278,7 +278,7 @@ resource "aws_cloudwatch_log_group" "lambda_ses_logging_dev_log_group" {
   name              = "/aws/lambda/ses_logging_dev"
   retention_in_days = 30
 }
-
+*/
 /*
 ###########################
 # Preproduction Environment
@@ -412,7 +412,6 @@ resource "aws_cloudwatch_log_group" "lambda_security_hub_report_uat_log_group" {
   name              = "/aws/lambda/securityhub_report_uat"
   retention_in_days = 30
 }
-*/
 
 #######################################
 # Lambda Function for SES Logging - UAT
@@ -457,7 +456,6 @@ resource "aws_cloudwatch_log_group" "lambda_ses_logging_uat_log_group" {
   retention_in_days = 30
 }
 
-/*
 ########################
 # Production Environment
 ########################

@@ -27,19 +27,19 @@ resource "aws_instance" "tariffdb" {
   root_block_device {
     volume_size = 20
     encrypted   = true
-    tags = {
-      Name = "TariffDB-${each.key}"
-    }
-
+    tags = merge(tomap({
+      Name = "TariffDB-${each.key}",
+      }), local.tags
+    )
   }
   tags = merge(tomap({
     "Name"     = lower(format("ec2-%s-%s-db-${each.key}", local.application_name, local.environment)),
     "hostname" = "${local.application_name}-db-${each.key}",
   }), local.tags)
   # Set security group where Instance will be created. This will also determine VPC
-  # vpc_security_group_ids = [module.tariff_db_prod_security_group[0].security_group_id, aws_security_group.tariff_db_prod_security_group[*].id]
-  vpc_security_group_ids = aws_security_group.tariff_db_prod_security_group[*].id
-  key_name               = aws_key_pair.key_pair_db[0].key_name
+  vpc_security_group_ids = [module.tariff_db_prod_security_group[0].security_group_id, aws_security_group.tariff_db_prod_security_group[0].id]
+  # vpc_security_group_ids = aws_security_group.tariff_db_prod_security_group[*].id
+  key_name = aws_key_pair.key_pair_db[0].key_name
 
   /*
   ebs_block_device {

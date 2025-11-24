@@ -50,7 +50,7 @@ resource "aws_iam_role_policy" "snapshot_lambda_inline" {
 #Create ZIP archive and lambda
 data "archive_file" "lambda_zip" {
   type             = "zip"
-  source_file      = "lambda/index.py"
+  source_file      = "lambda/root_snapshot_to_ami.py"
   output_file_mode = "0666"
   output_path      = "lambda/lambda_function.zip"
 }
@@ -61,13 +61,12 @@ resource "aws_lambda_function" "root_snapshot_to_ami" {
   # checkov:skip=CKV_AWS_117: "Lambda is not environment specific"
   # checkov:skip=CKV_AWS_116: "DLQ not required"
   # checkov:skip=CKV_AWS_272: "Ensure AWS Lambda function is configured to validate code-signing"
-  # checkov:skip=CKV_AWS_363: "Ensure Lambda Runtime is not deprecated"
   filename                       = "lambda/lambda_function.zip"
   function_name                  = "root_snapshot_to_ami"
   role                           = aws_iam_role.snapshot_lambda.arn
-  handler                        = "index.lambda_handler"
+  handler                        = "root_snapshot_to_ami.lambda_handler"
   source_code_hash               = data.archive_file.lambda_zip.output_base64sha256
-  runtime                        = "python3.8"
+  runtime                        = "python3.12"
   timeout                        = "120"
   reserved_concurrent_executions = 1
 }
@@ -198,5 +197,3 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_delete_ami_lambda" {
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.every_day_0230.arn
 }
-
-

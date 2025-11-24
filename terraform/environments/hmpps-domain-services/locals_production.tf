@@ -1,5 +1,10 @@
 locals {
 
+  lb_maintenance_message_production = {
+    maintenance_title   = "Remote Desktop Environment Maintenance Window"
+    maintenance_message = "Remote Desktop Environment is currently unavailable due to planned maintenance. Please try again later"
+  }
+
   baseline_presets_production = {
     options = {
       sns_topics = {
@@ -65,7 +70,8 @@ locals {
           }
         })
         tags = merge(local.ec2_instances.jumpserver.tags, {
-          domain-name = "azure.hmpp.root"
+          domain-name              = "azure.hmpp.root"
+          gha-jumpserver-startstop = "production"
         })
       })
 
@@ -79,9 +85,10 @@ locals {
           }
         })
         tags = merge(local.ec2_instances.rdgw.tags, {
-          description      = "Remote Desktop Gateway for azure.hmpp.root domain"
-          domain-name      = "azure.hmpp.root"
-          update-ssm-agent = "patchgroup1"
+          description              = "Remote Desktop Gateway for azure.hmpp.root domain"
+          domain-name              = "azure.hmpp.root"
+          gha-jumpserver-startstop = "production"
+          update-ssm-agent         = "patchgroup1"
         })
       })
 
@@ -95,9 +102,10 @@ locals {
           }
         })
         tags = merge(local.ec2_instances.rdgw.tags, {
-          description      = "Remote Desktop Gateway for azure.hmpp.root domain"
-          domain-name      = "azure.hmpp.root"
-          update-ssm-agent = "patchgroup2"
+          description              = "Remote Desktop Gateway for azure.hmpp.root domain"
+          domain-name              = "azure.hmpp.root"
+          gha-jumpserver-startstop = "production"
+          update-ssm-agent         = "patchgroup2"
         })
       })
 
@@ -112,9 +120,10 @@ locals {
           }
         })
         tags = merge(local.ec2_instances.rds.tags, {
-          description  = "Remote Desktop Services for azure.hmpp.root domain"
-          domain-name  = "azure.hmpp.root"
-          service-user = "svc_rds"
+          description              = "Remote Desktop Services for azure.hmpp.root domain"
+          domain-name              = "azure.hmpp.root"
+          gha-jumpserver-startstop = "production"
+          service-user             = "svc_rds"
         })
       })
     }
@@ -191,6 +200,27 @@ locals {
                   }
                 }]
               }
+              maintenance = {
+                priority = 999
+                actions = [{
+                  type = "fixed-response"
+                  fixed_response = {
+                    content_type = "text/html"
+                    message_body = templatefile("templates/maintenance.html.tftpl", local.lb_maintenance_message_production)
+                    status_code  = "200"
+                  }
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "maintenance.hmpps-domain.service.justice.gov.uk",
+                      "rdweb1.hmpps-domain.service.justice.gov.uk",
+                      "cafmtx.planetfm.service.justice.gov.uk",
+                      "cafmtx.az.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
             }
           })
         })
@@ -222,6 +252,7 @@ locals {
         ]
 
         lb_alias_records = [
+          { name = "maintenance", type = "A", lbs_map_key = "public" },
           { name = "rdgateway1", type = "A", lbs_map_key = "public" },
           { name = "rdweb1", type = "A", lbs_map_key = "public" },
         ]

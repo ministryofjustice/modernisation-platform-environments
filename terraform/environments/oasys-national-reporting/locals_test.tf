@@ -1,5 +1,10 @@
 locals {
 
+  lb_maintenance_message_test = {
+    maintenance_title   = "OASys National Reporting Environment Not Started"
+    maintenance_message = "OASys National Reporting T2 is rarely used so is started on demand. Please contact <a href=\"https://moj.enterprise.slack.com/archives/C6D94J81E\">#ask-digital-studio-ops</a> slack channel if you need the environment starting."
+  }
+
   baseline_presets_test = {
     options = {
       sns_topics = {
@@ -26,6 +31,21 @@ locals {
         tags = {
           description = "Wildcard certificate for the test environment"
         }
+      }
+    }
+
+    cloudwatch_dashboards = {
+      "CloudWatch-Default" = {
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.lb,
+          local.cloudwatch_dashboard_widget_groups.all_ec2,
+          local.cloudwatch_dashboard_widget_groups.cms,
+          local.cloudwatch_dashboard_widget_groups.web,
+          local.cloudwatch_dashboard_widget_groups.bods,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ssm_command,
+        ]
       }
     }
 
@@ -281,7 +301,7 @@ locals {
                 }]
               }
               t2-onr-web-http-7777 = {
-                priority = 200
+                priority = 1200 # change priority to 200 if the environment is powered on during day
                 actions = [{
                   type              = "forward"
                   target_group_name = "t2-onr-web-http-7777"
@@ -290,6 +310,25 @@ locals {
                   host_header = {
                     values = [
                       "t2.test.reporting.oasys.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              maintenance = {
+                priority = 999
+                actions = [{
+                  type = "fixed-response"
+                  fixed_response = {
+                    content_type = "text/html"
+                    message_body = templatefile("templates/maintenance.html.tftpl", local.lb_maintenance_message_test)
+                    status_code  = "200"
+                  }
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t2.test.reporting.oasys.service.justice.gov.uk",
+                      "maintenance-int.test.reporting.oasys.service.justice.gov.uk",
                     ]
                   }
                 }]

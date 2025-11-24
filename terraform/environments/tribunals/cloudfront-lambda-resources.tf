@@ -71,7 +71,7 @@ resource "aws_lambda_function" "cloudfront_redirect_lambda" {
   provider         = aws.us-east-1
   function_name    = "CloudfrontRedirectLambda"
   filename         = local.is-production ? data.archive_file.lambda_zip.output_path : data.archive_file.lambda_zip_nonprod.output_path
-  source_code_hash = local.is-production ? data.archive_file.lambda_zip.output_base64sha256 : data.archive_file.lambda_zip_nonprod.output_base64sha256
+  source_code_hash = local.is-production ? filebase64sha256(data.archive_file.lambda_zip.source_file) : filebase64sha256(data.archive_file.lambda_zip_nonprod.source_file)
   handler          = local.is-production ? "cloudfront-redirect.handler" : "cloudfront-redirect-nonprod.handler"
   role             = aws_iam_role.lambda_edge_role.arn
   runtime          = "nodejs20.x"
@@ -80,8 +80,8 @@ resource "aws_lambda_function" "cloudfront_redirect_lambda" {
   memory_size      = 128
 
   tags = {
-   Name        = "cloudfront_redirect_lambda"
-   Environment = local.environment
+    Name        = "cloudfront_redirect_lambda"
+    Environment = local.environment
   }
 
   lifecycle {
@@ -101,7 +101,7 @@ resource "aws_lambda_permission" "allow_http_cloudfront" {
     "arn:aws:cloudfront::${data.aws_caller_identity.current.account_id}:distribution/${local.cloudfront_distribution_id}" :
     null
   )
-  qualifier     = aws_lambda_function.cloudfront_redirect_lambda.version
+  qualifier = aws_lambda_function.cloudfront_redirect_lambda.version
 }
 
 #Lambda@Edge replicator permission cannot have source_arn; intentional

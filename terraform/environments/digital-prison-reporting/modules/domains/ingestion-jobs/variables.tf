@@ -15,6 +15,12 @@ variable "glue_batch_arguments" {
   default = {}
 }
 
+variable "glue_batch_glue_version" {
+  type        = string
+  default     = "5.0"
+  description = "(Optional) The version of glue to use."
+}
+
 variable "setup_batch_job" {
   description = "Enable Batch Job, True or False"
   type        = bool
@@ -78,12 +84,6 @@ variable "glue_batch_script_location" {
   type        = string
   description = "(Optional) Specifies the S3 path to a script that executes a job."
   default     = ""
-}
-
-variable "glue_batch_enable_cont_log_filter" {
-  type        = bool
-  default     = false
-  description = "(Optional) Specifies a standard filter or no filter when you create or edit a job enabled for continuous logging."
 }
 
 variable "glue_batch_execution_class" {
@@ -178,6 +178,13 @@ variable "glue_cdc_job_short_name" {
   type        = string
 }
 
+variable "glue_cdc_glue_version" {
+  type        = string
+  default     = "5.0"
+  description = "(Optional) The version of glue to use."
+}
+
+
 variable "glue_cdc_description" {
   description = "Job Description"
   default     = ""
@@ -228,12 +235,6 @@ variable "glue_cdc_script_location" {
   type        = string
   description = "(Optional) Specifies the S3 path to a script that executes a job."
   default     = ""
-}
-
-variable "glue_cdc_enable_cont_log_filter" {
-  type        = bool
-  default     = false
-  description = "(Optional) Specifies a standard filter or no filter when you create or edit a job enabled for continuous logging."
 }
 
 variable "glue_cdc_execution_class" {
@@ -324,6 +325,12 @@ variable "glue_unprocessed_raw_files_check_job_short_name" {
   type        = string
 }
 
+variable "glue_unprocessed_raw_files_check_job_glue_version" {
+  type        = string
+  default     = "5.0"
+  description = "(Optional) The version of glue to use."
+}
+
 variable "glue_unprocessed_raw_files_check_description" {
   description = "Job Description"
   default     = ""
@@ -374,12 +381,6 @@ variable "glue_unprocessed_raw_files_check_script_location" {
   type        = string
   description = "(Optional) Specifies the S3 path to a script that executes a job."
   default     = ""
-}
-
-variable "glue_unprocessed_raw_files_check_enable_cont_log_filter" {
-  type        = bool
-  default     = false
-  description = "(Optional) Specifies a standard filter or no filter when you create or edit a job enabled for continuous logging."
 }
 
 variable "glue_unprocessed_raw_files_check_execution_class" {
@@ -464,6 +465,12 @@ variable "glue_archive_job_short_name" {
   type        = string
 }
 
+variable "glue_archive_job_glue_version" {
+  type        = string
+  default     = "5.0"
+  description = "(Optional) The version of glue to use."
+}
+
 variable "glue_archive_description" {
   description = "Job Description"
   default     = ""
@@ -514,12 +521,6 @@ variable "glue_archive_script_location" {
   type        = string
   description = "(Optional) Specifies the S3 path to a script that executes a job."
   default     = ""
-}
-
-variable "glue_archive_enable_cont_log_filter" {
-  type        = bool
-  default     = false
-  description = "(Optional) Specifies a standard filter or no filter when you create or edit a job enabled for continuous logging."
 }
 
 variable "glue_archive_execution_class" {
@@ -598,6 +599,12 @@ variable "glue_create_reload_diff_job_short_name" {
   type        = string
 }
 
+variable "glue_create_reload_diff_job_glue_version" {
+  type        = string
+  default     = "5.0"
+  description = "(Optional) The version of glue to use."
+}
+
 variable "glue_create_reload_diff_job_description" {
   description = "Job Description"
   default     = ""
@@ -625,12 +632,6 @@ variable "glue_create_reload_diff_job_temp_dir" {
   type        = string
   default     = null
   description = "(Optional) Specifies an Amazon S3 path to a bucket that can be used as a temporary directory for the job."
-}
-
-variable "glue_create_reload_diff_job_enable_cont_log_filter" {
-  type        = bool
-  default     = false
-  description = "(Optional) Specifies a standard filter or no filter when you create or edit a job enabled for continuous logging."
 }
 
 variable "glue_create_reload_diff_job_execution_class" {

@@ -1,5 +1,10 @@
 locals {
 
+  lb_maintenance_message_preproduction = {
+    maintenance_title   = "Remote Desktop Environment Not Started"
+    maintenance_message = "Please contact <a href=\"https://moj.enterprise.slack.com/archives/C6D94J81E\">#ask-digital-studio-ops</a> slack channel if environment is unexpectedly down"
+  }
+
   baseline_presets_preproduction = {
     options = {
       sns_topics = {
@@ -103,8 +108,9 @@ locals {
           }
         })
         tags = merge(local.ec2_instances.jumpserver.tags, {
-          domain-name         = "azure.hmpp.root"
-          instance-scheduling = "skip-scheduling"
+          domain-name              = "azure.hmpp.root"
+          gha-jumpserver-startstop = "preproduction"
+          instance-scheduling      = "skip-scheduling"
         })
       })
 
@@ -119,9 +125,10 @@ locals {
           }
         })
         tags = merge(local.ec2_instances.rdgw.tags, {
-          description         = "Remote Desktop Gateway for azure.hmpp.root domain"
-          domain-name         = "azure.hmpp.root"
-          instance-scheduling = "skip-scheduling"
+          description              = "Remote Desktop Gateway for azure.hmpp.root domain"
+          domain-name              = "azure.hmpp.root"
+          gha-jumpserver-startstop = "preproduction"
+          instance-scheduling      = "skip-scheduling"
         })
       })
 
@@ -135,10 +142,11 @@ locals {
           }
         })
         tags = merge(local.ec2_instances.rds.tags, {
-          description         = "Remote Desktop Services for azure.hmpp.root domain"
-          domain-name         = "azure.hmpp.root"
-          service-user        = "svc_rds"
-          instance-scheduling = "skip-scheduling"
+          description              = "Remote Desktop Services for azure.hmpp.root domain"
+          domain-name              = "azure.hmpp.root"
+          gha-jumpserver-startstop = "preproduction"
+          service-user             = "svc_rds"
+          instance-scheduling      = "skip-scheduling"
         })
       })
     }
@@ -194,6 +202,26 @@ locals {
                   }
                 }]
               }
+              maintenance = {
+                priority = 999
+                actions = [{
+                  type = "fixed-response"
+                  fixed_response = {
+                    content_type = "text/html"
+                    message_body = templatefile("templates/maintenance.html.tftpl", local.lb_maintenance_message_preproduction)
+                    status_code  = "200"
+                  }
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "maintenance.preproduction.hmpps-domain.service.justice.gov.uk",
+                      "rdweb1.preproduction.hmpps-domain.service.justice.gov.uk",
+                      "cafmtx.pp.planetfm.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
             }
           })
         })
@@ -202,8 +230,8 @@ locals {
 
     patch_manager = {
       patch_schedules = {
-        group1 = "cron(00 06 ? * WED *)" # 3am wed for prod for non-prod env's we have to work around the overnight shutdown
-        group2 = "cron(00 06 ? * THU *)" # 3am thu for prod
+        group1 = "cron(50 06 ? * WED *)" # 6:50am wed to work around the overnight shutdown
+        group2 = "cron(50 06 ? * THU *)" # 6:50am thu, see patch-manager.tf for approval_days config
       }
       maintenance_window_duration = 2 # 4 for prod
       maintenance_window_cutoff   = 1 # 2 for prod
@@ -224,6 +252,7 @@ locals {
     route53_zones = {
       "preproduction.hmpps-domain.service.justice.gov.uk" = {
         lb_alias_records = [
+          { name = "maintenance", type = "A", lbs_map_key = "public" },
           { name = "rdgateway1", type = "A", lbs_map_key = "public" },
           { name = "rdweb1", type = "A", lbs_map_key = "public" },
         ]
