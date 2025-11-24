@@ -1,6 +1,6 @@
 # ACM Public Certificate
 resource "aws_acm_certificate" "external" {
-  domain_name               = local.is-production ? "correspondence-handling-and-processing.service.justice.gov.uk" : "modernisation-platform.service.justice.gov.uk"
+  domain_name               = local.is-production ? "correspondence-handling-and-processing.service.justice.gov.uk" : "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   validation_method         = "DNS"
   subject_alternative_names = local.is-production ? ["correspondence-handling-and-processing.service.justice.gov.uk"] : ["${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
 
@@ -35,14 +35,14 @@ resource "aws_route53_record" "external_validation_prod" {
 # Route53 DNS records for certificate validation subdomain (non-prod)
 resource "aws_route53_record" "external_validation_subdomain" {
   count    = local.is-production ? 0 : 1
-  provider = aws.core-vpc
+  provider = aws.core-network-services
 
   allow_overwrite = true
-  name            = local.domain_name_sub[0]
-  records         = local.domain_record_sub
+  name            = tolist(aws_acm_certificate.external.domain_validation_options)[0].resource_record_name
+  type            = tolist(aws_acm_certificate.external.domain_validation_options)[0].resource_record_type
+  records         = [tolist(aws_acm_certificate.external.domain_validation_options)[0].resource_record_value]
   ttl             = 60
-  type            = local.domain_type_sub[0]
-  zone_id         = data.aws_route53_zone.external.zone_id
+  zone_id         = data.aws_route53_zone.application_zone.zone_id
 }
 
 # Production Route53 DNS record 
@@ -63,8 +63,8 @@ resource "aws_route53_record" "external_prod" {
 # Non-prod Route53 DNS record 
 resource "aws_route53_record" "external_nonprod" {
   count           = local.is-production ? 0 : 1
-  provider        = aws.core-vpc
-  zone_id         = data.aws_route53_zone.external.zone_id
+  provider        = aws.core-network-services
+  zone_id         = data.aws_route53_zone.application_zone.zone_id
   name            = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type            = "A"
   allow_overwrite = true
