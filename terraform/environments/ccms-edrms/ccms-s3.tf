@@ -122,7 +122,7 @@ module "s3-bucket-shared" {
 
   bucket_name        = "${local.application_name}-${local.environment}-shared"
   versioning_enabled = true
-  bucket_policy      = []
+  bucket_policy      = [aws_s3_bucket_policy.shared_bucket_policy.policy]
   sse_algorithm      = "AES256"
   custom_kms_key     = ""
 
@@ -147,6 +147,30 @@ module "s3-bucket-shared" {
   tags = merge(local.tags,
     { Name = "${local.application_name}-${local.environment}-shared" }
   )
+}
+
+resource "aws_s3_bucket_policy" "shared_bucket_policy" {
+  bucket = module.s3-bucket-shared.bucket.id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Sid    = "EnforceTLSv12orHigher",
+        Effect = "Deny",
+        Principal = {
+          AWS = "*"
+        },
+        Action   = "s3:*",
+        Resource = ["${module.s3-bucket-logging.bucket.arn}/*", "${module.s3-bucket-logging.bucket.arn}"],
+        Condition = {
+          NumericLessThan = {
+            "s3:TlsVersion" = "1.2"
+          }
+        }
+      }
+    ]
+  })
 }
 
 resource "aws_s3_object" "folder" {
