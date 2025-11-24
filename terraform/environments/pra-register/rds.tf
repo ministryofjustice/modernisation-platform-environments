@@ -47,7 +47,7 @@ resource "aws_security_group" "postgresql_db_sc" {
     ]
   }
 
-    dynamic "ingress" {
+  dynamic "ingress" {
     for_each = local.is-development ? [1] : []
     content {
       from_port   = 5432

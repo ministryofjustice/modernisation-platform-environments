@@ -319,7 +319,7 @@ module "load_dms_output" {
 #-----------------------------------------------------------------------------------
 
 module "load_mdss_lambda" {
-  count = local.is-development ? 0 : 1
+  count                          = local.is-development ? 0 : 1
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "load_mdss"
