@@ -19,7 +19,7 @@ variable "bucket_prefix" {
 
 variable "maximum_concurrency" {
   description = "maximum concurrency to lambda"
-  type = number
-  default = 10
-  nullable = true
+  type        = number
+  default     = 10
+  nullable    = true
 }

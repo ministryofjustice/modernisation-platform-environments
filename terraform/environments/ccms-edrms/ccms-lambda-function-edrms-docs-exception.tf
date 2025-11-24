@@ -26,7 +26,7 @@ resource "aws_iam_role_policy" "lambda_edrms_docs_exception_policy" {
       {
         Effect   = "Allow"
         Action   = ["logs:CreateLogStream", "logs:PutLogEvents"]
-        Resource = [ "arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:${aws_cloudwatch_log_group.log_group_edrms.arn}:*"]
+        Resource = ["arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:${aws_cloudwatch_log_group.log_group_edrms.arn}:*"]
       },
       {
         Effect   = "Allow"
@@ -49,8 +49,8 @@ resource "aws_lambda_function" "edrms_docs_exception_monitor" {
 
   environment {
     variables = {
-      LOG_GROUP_NAME      = aws_cloudwatch_log_group.log_group_edrms.name
-      SNS_TOPIC_ARN       = aws_sns_topic.cloudwatch_slack.arn
+      LOG_GROUP_NAME = aws_cloudwatch_log_group.log_group_edrms.name
+      SNS_TOPIC_ARN  = aws_sns_topic.cloudwatch_slack.arn
     }
   }
 
@@ -77,5 +77,5 @@ resource "aws_cloudwatch_log_subscription_filter" "edrms_docs_exception_filter" 
   filter_pattern  = "\"EdrmsDocumentException\""
   destination_arn = aws_lambda_function.edrms_docs_exception_monitor.arn
 
-  depends_on = [ aws_lambda_permission.allow_cloudwatch_invoke ]
+  depends_on = [aws_lambda_permission.allow_cloudwatch_invoke]
 }
