@@ -97,7 +97,8 @@ resource "aws_ecs_task_definition" "tipstaff_task_definition" {
 
 resource "aws_ecs_service" "tipstaff_ecs_service" {
   depends_on = [
-    aws_lb_listener.tipstaff_lb
+    aws_lb_listener.tipstaff_lb,
+    aws_security_group.ecs_service
   ]
   name                              = var.networking[0].application
   cluster                           = aws_ecs_cluster.tipstaff_cluster.id
@@ -106,6 +107,7 @@ resource "aws_ecs_service" "tipstaff_ecs_service" {
   enable_execute_command            = true
   desired_count                     = 2
   health_check_grace_period_seconds = 180
+  force_new_deployment              = true
 
   network_configuration {
     subnets          = data.aws_subnets.shared-private.ids
@@ -258,6 +260,10 @@ resource "aws_security_group" "ecs_service" {
   name_prefix = "ecs-service-sg-"
   description = "control access to the ECS service"
   vpc_id      = data.aws_vpc.shared.id
+
+  lifecycle {
+    create_before_destroy = true
+  }
 
   ingress {
     description     = "Allow traffic on port 80 from load balancer"
