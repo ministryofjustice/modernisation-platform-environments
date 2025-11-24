@@ -14,9 +14,9 @@ locals {
     data.aws_subnet.private_subnets_b.cidr_block,
     data.aws_subnet.private_subnets_c.cidr_block
   ]
-  
+
   lambda_folder_name = ["lambda_delivery", "ccms-edrms-docs-exception-layer"]
-  cert_opts    = aws_acm_certificate.external.domain_validation_options
-  cert_arn     = aws_acm_certificate.external.arn
-  cert_zone_id = data.aws_route53_zone.external.zone_id
+  cert_opts          = aws_acm_certificate.external.domain_validation_options
+  cert_arn           = aws_acm_certificate.external.arn
+  cert_zone_id       = data.aws_route53_zone.external.zone_id
 }
