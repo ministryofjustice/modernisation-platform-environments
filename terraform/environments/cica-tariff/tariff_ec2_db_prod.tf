@@ -25,7 +25,7 @@ resource "aws_instance" "tariffdb" {
   # private_ip           = var.private_ip
   iam_instance_profile = aws_iam_instance_profile.tariff_instance_profile.name
   root_block_device {
-    volume_size = 20
+    volume_size = 30
     encrypted   = true
     tags = merge(tomap({
       Name = "TariffDB-${each.key}",
@@ -168,4 +168,24 @@ resource "aws_ami_from_instance" "tariffdb_b_bkp" {
   tags = {
     Name = "CDI-272-TariffDB-A-Backup"
   }
+}
+
+# rescue instance
+resource "aws_instance" "tariffdbrescue" {
+  count                = local.environment == "production" ? 1 : 0
+  ami                  = "ami-03f3a22c5f8f5ef58"
+  instance_type        = "t3.small"
+  subnet_id            = "subnet-02cd9ee24bdc797e4"
+  iam_instance_profile = aws_iam_instance_profile.tariff_instance_profile.name
+  root_block_device {
+    volume_size = 8
+    encrypted   = true
+    tags = {
+      Name = "TariffDB-Rescue",
+    }
+  }
+  tags = {
+    Name = "TariffDB-Rescue"
+  }
+  vpc_security_group_ids = [aws_security_group.tariff_db_prod_security_group[0].id]
 }
