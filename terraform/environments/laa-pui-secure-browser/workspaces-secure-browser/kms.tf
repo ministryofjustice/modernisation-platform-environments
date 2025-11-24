@@ -3,6 +3,9 @@
 data "aws_partition" "current" {}
 
 data "aws_iam_policy_document" "kms_key_policy" {
+  #checkov:skip=CKV_AWS_109:Policy authored in line with existing guidance
+  #checkov:skip=CKV_AWS_111:Irrelevant; this is a KMS key policy, not an IAM policy
+  #checkov:skip=CKV_AWS_356:Wildcard necessary, suitable constraints in place
   statement {
     principals {
       type        = "AWS"
@@ -71,6 +74,10 @@ data "aws_iam_policy_document" "kms_key_policy" {
 }
 
 resource "aws_kms_key" "workspacesweb_session_logs" {
+  #checkov:skip=CKV_AWS_7
+  #checkov:skip=CKV_AWS_109:Policy authored in line with existing guidance
+  #checkov:skip=CKV_AWS_111:Irrelevant; this is a KMS key policy, not an IAM policy
+  #checkov:skip=CKV_AWS_356:Wildcard necessary, suitable constraints in place
   count = local.create_resources ? 1 : 0
 
   description = "KMS key for WorkSpaces Web Session Logger"

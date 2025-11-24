@@ -1,5 +1,6 @@
 # trivy:ignore:AVD-AWS-0066
 module "lambda_s3_log_processor" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   count   = local.create_resources ? 1 : 0
   source  = "terraform-aws-modules/lambda/aws"
   version = "~> 8.0"
