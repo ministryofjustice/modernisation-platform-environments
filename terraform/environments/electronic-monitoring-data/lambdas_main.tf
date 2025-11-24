@@ -187,12 +187,22 @@ module "copy_mdss_data" {
 #-----------------------------------------------------------------------------------
 
 module "clean_after_mdss_load" {
-    source = "./modules/lambdas"
-    function_name = "clean_after_mdss_load"
-    is_image = true
-    role_name = aws_iam_role.lambda_function_name.name
-    role_arn = aws_iam_role.lambda_function_name.arn
-    ecr_repo_name = module.ecr_lambdas_repo.repository_name
+  source                      = "./modules/lambdas"
+  function_name               = "clean_after_mdss_load"
+  image_name                  = "clean_after_mdss_load"
+  is_image                    = true
+  role_name                   = aws_iam_role.clean_after_mdss_load.name
+  role_arn                    = aws_iam_role.clean_after_mdss_load.arn
+  ecr_repo_name               = module.ecr_lambdas_repo.repository_name
+  memory_size             = 10240
+  timeout                 = 900
+  environment_variables = {
+    CATALOG_ID = local.is-production ? "" : "", # add account id
+    LAMBDA_ROLE_ARN = aws_iam_role.clean_after_mdss_load.arn
+    }
+  security_group_ids          = [aws_security_group.lambda_generic.id]
+  subnet_ids                  = data.aws_subnets.shared-public.ids
+
 }
 
 #-----------------------------------------------------------------------------------

@@ -276,15 +276,6 @@ resource "aws_iam_role" "rotate_iam_keys" {
 }
 
 #-----------------------------------------------------------------------------------
-# Clean after MDSS load
-#-----------------------------------------------------------------------------------
-
-resource "aws_iam_role" "clean_after_mdss_load" {
-  name               = "clean_after_mdss_load-lambda-role"
-  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
-}
-
-#-----------------------------------------------------------------------------------
 # Virus scanning - definition upload
 #-----------------------------------------------------------------------------------
 
@@ -736,7 +727,6 @@ module "share_dbs_with_dms_lambda_role" {
   de_role_arn             = null
 }
 
-
 #-----------------------------------------------------------------------------------
 # Load MDSS Data IAM Role
 #-----------------------------------------------------------------------------------
@@ -870,5 +860,68 @@ resource "aws_lakeformation_permissions" "add_create_db" {
   count = local.is-development ? 0 : 1
   permissions      = ["CREATE_DATABASE", "DROP"]
   principal        = aws_iam_role.load_mdss[0].arn
+  catalog_resource = true
+}
+
+#-----------------------------------------------------------------------------------
+# Clean after MDSS load
+#-----------------------------------------------------------------------------------
+
+resource "aws_iam_role" "clean_after_mdss_load" {
+  name               = "clean_after_mdss_load-lambda-role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+data "aws_iam_policy_document" "clean_after_mdss_load_lambda_role_policy_document" {
+  count = local.is-development ? 0 : 1
+  statement {
+    sid    = "GluePermissionsForDeletion"
+    effect = "Allow"
+    actions = [
+      "glue:GetTable",
+      "glue:GetDatabase",
+      "glue:GetDatabases",
+      "glue:DeleteTable",
+      "glue:DeleteDatabase",
+      "glue:GetCatalog"
+    ]
+    resources = [
+      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:catalog",
+      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:database/*",
+      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/*/*",
+      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:userDefinedFunction/*/*",
+    ]
+  }
+  statement {
+    sid    = "LakeFormationPermissionsForDeletion"
+    effect = "Allow"
+    actions = ["lakeformation:GrantPermissions"]
+    resources = ["*"]
+  }
+  # ?
+  statement {
+    sid       = "ListAccountAlias"
+    effect    = "Allow"
+    actions   = ["iam:ListAccountAliases"]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_policy" "clean_after_mdss_load_lambda_role_policy" {
+  count = local.is-development ? 0 : 1
+  name   = "clean_after_mdss_load_lambda_policy"
+  policy = data.aws_iam_policy_document.clean_after_mdss_load_lambda_role_policy_document[0].json
+}
+
+resource "aws_iam_role_policy_attachment" "clean_after_mdss_load_output_lambda_policy_attachment" {
+  count = local.is-development ? 0 : 1
+  role       = aws_iam_role.clean_after_mdss_load[0].name
+  policy_arn = aws_iam_policy.clean_after_mdss_load_lambda_role_policy[0].arn
+}
+
+resource "aws_lakeformation_permissions" "add_create_db" {
+  count = local.is-development ? 0 : 1
+  permissions      = ["DELETE", "DROP"]
+  principal        = aws_iam_role.clean_after_mdss_load[0].arn
   catalog_resource = true
 }
