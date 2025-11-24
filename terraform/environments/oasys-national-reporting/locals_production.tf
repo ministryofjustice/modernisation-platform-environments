@@ -1,8 +1,10 @@
 locals {
 
   lb_maintenance_message_production = {
-    maintenance_title   = "OASys National Reporting Maintenance Window"
-    maintenance_message = "OASys National Reporting is currently unavailable due to planned maintenance. Please try again later."
+    maintenance_title   = "OASys National Reporting Environment Not Started"
+    maintenance_message = "OASys National Reporting Production environment is powered down until we are ready for final configuration. Please contact <a href=\"https://moj.enterprise.slack.com/archives/C6D94J81E\">#ask-digital-studio-ops</a> slack channel if you need the environment starting."
+    # maintenance_title   = "OASys National Reporting Maintenance Window"
+    # maintenance_message = "OASys National Reporting is currently unavailable due to planned maintenance. Please try again later."
   }
 
   baseline_presets_production = {
@@ -32,6 +34,21 @@ locals {
         tags = {
           description = "Wildcard certificate for the ${local.environment} environment"
         }
+      }
+    }
+
+    cloudwatch_dashboards = {
+      "CloudWatch-Default" = {
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.lb,
+          local.cloudwatch_dashboard_widget_groups.all_ec2,
+          local.cloudwatch_dashboard_widget_groups.cms,
+          local.cloudwatch_dashboard_widget_groups.web,
+          local.cloudwatch_dashboard_widget_groups.bods,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ssm_command,
+        ]
       }
     }
 
@@ -326,7 +343,7 @@ locals {
                 }]
               }
               pd-onr-web-http-7777 = {
-                priority = 200
+                priority = 1200 # change priority to 200 when environment is powered on during day
                 actions = [{
                   type              = "forward"
                   target_group_name = "pd-onr-web-http-7777"

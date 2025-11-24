@@ -156,6 +156,24 @@ locals {
           nomis-environment = "qa11g"
         })
       })
+
+      # TM-1718: EC2 ASG needed for testing purposes
+      TM-1718 = merge(local.ec2_autoscaling_groups.web12, {
+        autoscaling_schedules = {}
+        config = merge(local.ec2_autoscaling_groups.web12.config, {
+          instance_profile_policies = concat(local.ec2_instances.db.config.instance_profile_policies, [
+            "Ec2Qa11GWeblogicPolicy",
+          ])
+        })
+        user_data_cloud_init = merge(local.ec2_autoscaling_groups.web12.user_data_cloud_init, {
+          args = merge(local.ec2_autoscaling_groups.web12.user_data_cloud_init.args, {
+            branch = "TM-1718"
+          })
+        })
+        tags = merge(local.ec2_autoscaling_groups.web12.tags, {
+          nomis-environment = "qa11g"
+        })
+      })
     }
 
     ec2_instances = {

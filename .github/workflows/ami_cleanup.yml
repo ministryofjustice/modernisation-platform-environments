@@ -3,7 +3,6 @@ name: Cloud Cleanup (AMI & EBS)
 
 on:
   workflow_dispatch:
-
     inputs:
       application:
         description: 'Application folder name (e.g. cooker)'
@@ -16,54 +15,26 @@ on:
         type: string
         default: development
       cleanup_type:
-        description: 'Which cleanup to run (ami, ebs, both)'
+        description: 'What to clean'
         required: true
-        default: 'both'
         type: choice
-        options: [ami, ebs, both]
-      ami_cleanup_sh_args:
-        description: 'Arguments passed to ami_cleanup.sh'
-        required: false
-        default: "-c -m 3"
-        type: string
-      ebs_age_in_months:
-        description: 'Delete unattached EBS volumes older than this many months'
-        required: false
-        default: "1"
-        type: string
-      confirm_delete:
-        description: 'true = perform deletion; false = preview only'
-        required: true
-        default: false
-        type: boolean
-      test_mode:
-        description: 'Enable 3-minute minute-based test window in PREVIEW'
-        required: false
-        default: false
-        type: boolean
-      age_minutes:
-        description: 'Minutes threshold when test_mode is enabled'
-        required: false
-        default: "3"
-        type: string
-      live_test_mode:
-        description: 'Apply the same 3-minute window in LIVE deletions (testing only!)'
-        required: false
-        default: false
-        type: boolean
+        default: both
+        options:
+          - both
+          - ami
+          - ebs
 
 permissions:
   id-token: write
   contents: read
 
 env:
-  APPLICATION:      ${{ github.event.inputs.application || 'cooker' }}
-  ENVIRONMENTS:     ${{ github.event.inputs.environments || 'development' }}
-  AMI_ARGS:         ${{ github.event.inputs.ami_cleanup_sh_args || '-c -m 3' }}
-  EBS_MONTHS:       ${{ github.event.inputs.ebs_age_in_months || '1' }}
-  TEST_MODE:        ${{ github.event.inputs.test_mode || 'false' }}
-  AGE_MINUTES:      ${{ github.event.inputs.age_minutes || '3' }}
-  LIVE_TEST_MODE:   ${{ github.event.inputs.live_test_mode || 'false' }}
+  APPLICATION:   ${{ github.event.inputs.application || 'cooker' }}
+  ENVIRONMENTS:  ${{ github.event.inputs.environments || 'development' }}
+  AMI_ARGS:      "-c -m 3"    # month-based AMI threshold for live runs
+  EBS_MONTHS:    "1"          # month-based EBS threshold for live runs
+  AGE_MINUTES:   "3"          # age of resources in minutes when testing preview/live
+  LIVE_TEST_MODE: "false"     # false uses month gates and true uses the minute-based threshold
 
 jobs:
   build-matrix:
@@ -89,9 +60,10 @@ jobs:
           echo 'matrix<<EOF' >> $GITHUB_OUTPUT
           cat matrix.json >> $GITHUB_OUTPUT
           echo 'EOF' >> $GITHUB_OUTPUT
+
   fetch-secrets:
     name: Fetch ENV management secrets
-    uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@4eceb2a416a197e91dc557c2ef0b5dd9afe29e0c
+    uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@7b8dd97eb5b596a88206805943771ea7ffcde235 # v3.4.8
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_NUMBER: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
@@ -103,13 +75,13 @@ jobs:
     name: Preview Deletions (Dry-Run)
     runs-on: ubuntu-latest
     needs: [build-matrix, fetch-secrets]
-    if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && fromJSON(github.event.inputs.confirm_delete) == false) }}
+    if: ${{ github.event_name == 'workflow_dispatch' }}
     strategy:
       matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
       max-parallel: 1
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
 
       - name: Ensure scripts are executable
         run: chmod +x scripts/*.sh
@@ -120,8 +92,9 @@ jobs:
             sudo apt-get update -y
             sudo apt-get install -y jq
           fi
+
       - name: Decrypt Secrets (ENVIRONMENT_MANAGEMENT)
-        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@4eceb2a416a197e91dc557c2ef0b5dd9afe29e0c
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@7b8dd97eb5b596a88206805943771ea7ffcde235 # v3.4.8
         with:
           environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
           github_ci_user_environments_repo_pat: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}
@@ -131,11 +104,19 @@ jobs:
         run: |
           set -euo pipefail
           ACCOUNT_NAME="${{ matrix.account_name }}"
-          ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< "$ENVIRONMENT_MANAGEMENT")
+          ACCOUNT_NUMBER="$(jq -r --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name] // empty' <<< "$ENVIRONMENT_MANAGEMENT")"
+
+          if [[ -z "${ACCOUNT_NUMBER}" ]]; then
+            echo "::error title=Account mapping not found::No account_ids entry for '${ACCOUNT_NAME}'. Available keys:"
+            jq -r '.account_ids | keys[]' <<< "$ENVIRONMENT_MANAGEMENT" | sed 's/^/- /'
+            exit 1
+          fi
+
           echo "::add-mask::$ACCOUNT_NUMBER"
           echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
+
       - name: Configure AWS Credentials (github-actions role)
-        uses: aws-actions/configure-aws-credentials@00943011d9042930efac3dcd3a170e4273319bc8
+        uses: aws-actions/configure-aws-credentials@00943011d9042930efac3dcd3a170e4273319bc8 # v5.1.0
         with:
           role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
           role-session-name: "cleanup-preview-${{ matrix.account_name }}"
@@ -149,6 +130,7 @@ jobs:
           export AWS_SECRET_ACCESS_KEY=$(jq -r '.Credentials.SecretAccessKey' <<< "$CREDS_JSON")
           export AWS_SESSION_TOKEN=$(jq -r '.Credentials.SessionToken'    <<< "$CREDS_JSON")
           echo "Assumed downstream role: MemberInfrastructureAccess"
+
       - name: Quick inventory (sanity)
         run: |
           set -euo pipefail
@@ -165,18 +147,22 @@ jobs:
             --filters Name=status,Values=available \
             --query "Volumes[0:50].[VolumeId,CreateTime,State,Tags[?Key=='Name']|[0].Value]" \
             --output table || true
-      - name: Set 3-minute test flags (preview only)
+
+      - name: Set minute test flags (preview only)
+        if: env.LIVE_TEST_MODE == 'true'
         run: |
           echo "AMI_TEST_FLAGS=--test-mode --age-minutes ${AGE_MINUTES}" >> $GITHUB_ENV
           echo "EBS_TEST_FLAGS=--test-mode --age-minutes ${AGE_MINUTES}" >> $GITHUB_ENV
           echo "Preview will use minute-based window: ${AGE_MINUTES} minute(s)"
+
       - name: Init unified report (preview)
         run: |
           mkdir -p reports
           : > reports/cleanup_report.csv
           echo "account,region,phase,cleanup_type,resource_type,resource_id,related_id,name,created_at,age_months,status,reason" >> reports/cleanup_report.csv
+
       - name: AMI Preview (dry-run) + Reports
-        if: ${{ github.event_name == 'push' || github.event.inputs.cleanup_type == 'ami' || github.event.inputs.cleanup_type == 'both' }}
+        if: ${{ github.event.inputs.cleanup_type == 'ami' || github.event.inputs.cleanup_type == 'both' }}
         id: ami_preview
         run: |
           set -euo pipefail
@@ -198,7 +184,7 @@ jobs:
             TAGS_JSON="$(aws ec2 describe-images --image-ids "$AMI" --query 'Images[0].Tags' --output json 2>/dev/null || echo '[]')"
             STATUS="To be deleted"
             REASON=""
-            if [[ "$NAME" =~ ^(AwsBackup|Backup) ]] || echo "$TAGS_JSON" | jq -e '.[] | select((.Key|test("Retain|Backup";"i")) and (.Value|test("^(true|yes|1)$";"i")))' >/dev/null; then
+            if echo "$NAME" | grep -qi 'backup' || echo "$TAGS_JSON" | jq -e '.[] | select((.Key|test("Retain|Backup";"i")) and (.Value|test("^(true|yes|1)$";"i")))' >/dev/null; then
               echo "$AMI,$NAME,Protected name/tag" >> reports/protected_amis.csv
               STATUS="Protected"
               REASON="Protected name/tag"
@@ -228,7 +214,6 @@ jobs:
             echo "| To be deleted | ${PREVIEW_DELETE_COUNT} |"
             echo "| Protected | ${PREVIEW_PROTECTED_COUNT} |"
             echo ""
-            # Detailed lists from snapshot map (unique by AMI)
             echo "**AMI candidates (to be deleted)**"
             echo ""
             echo "| AMI ID | Name | Created |"
@@ -249,9 +234,10 @@ jobs:
             echo ""
             echo "- Reports: \`reports/ami_snapshot_map.csv\`, \`reports/protected_amis.csv\`, \`reports/cleanup_report.csv\`"
           } >> "$GITHUB_STEP_SUMMARY"
+
       - name: Upload AMI Preview Artifacts
         if: ${{ always() && (github.event_name == 'push' || github.event.inputs.cleanup_type == 'ami' || github.event.inputs.cleanup_type == 'both') }}
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
           name: ami-preview-${{ matrix.account_name }}
           path: |
@@ -262,7 +248,7 @@ jobs:
           if-no-files-found: warn
 
       - name: EBS Preview (dry-run) + Report
-        if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && (github.event.inputs.cleanup_type == 'ebs' || github.event.inputs.cleanup_type == 'both')) }}
+        if: ${{ github.event.inputs.cleanup_type == 'ebs' || github.event.inputs.cleanup_type == 'both' }}
         id: ebs_preview
         run: |
           set -euo pipefail
@@ -271,10 +257,6 @@ jobs:
           echo "🧪 EBS — PREVIEW"
           : > reports/ebs_cleanup_report.csv
           echo "Volume ID,Age (months),Name,Status" >> reports/ebs_cleanup_report.csv
-          if [[ "${EBS_TEST_FLAGS:-}" == *"--test-mode"* ]]; then
-            echo "⏳ Test mode detected for EBS preview; sleeping ${AGE_MINUTES}m to pass minute threshold..."
-            sleep "${AGE_MINUTES}m"
-          fi
           CANDIDATES="$(scripts/ebs_cleanup.sh ${EBS_TEST_FLAGS:-} -m "$months" unattached || true)"
           printf "%s\n" "$CANDIDATES" > reports/ebs_candidates_preview.log
           echo "Raw candidate output (first 20 lines):"
@@ -310,9 +292,10 @@ jobs:
             echo ""
             echo "- Report: \`reports/ebs_cleanup_report.csv\`, \`reports/cleanup_report.csv\`, \`reports/ebs_candidates_preview.log\`"
           } >> "$GITHUB_STEP_SUMMARY"
+
       - name: Upload EBS Preview Artifacts
         if: ${{ always() && (github.event_name == 'push' || github.event.inputs.cleanup_type == 'ebs' || github.event.inputs.cleanup_type == 'both') }}
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
           name: ebs-preview-${{ matrix.account_name }}
           path: |
@@ -322,27 +305,27 @@ jobs:
 
       - name: Upload Unified Preview Artifact
         if: always()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
           name: cleanup-report-preview-${{ matrix.account_name }}
           path: reports/cleanup_report.csv
           if-no-files-found: warn
 
   # -------------------------
-  # LIVE (Deletion)
+  # LIVE (Deletion) — always runs after preview on manual trigger
   # -------------------------
   ami-delete:
     name: AMI Delete (Live)
     runs-on: ubuntu-latest
     needs: [build-matrix, fetch-secrets, preview]
-    if: >
+    if: ${{ (github.event.inputs.cleanup_type == 'ami' || github.event.inputs.cleanup_type == 'both') && always() }}
     environment: ${{ matrix.account_name }}
     strategy:
       matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
       max-parallel: 1
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
 
       - name: Ensure scripts are executable
         run: chmod +x scripts/*.sh
@@ -353,8 +336,9 @@ jobs:
             sudo apt-get update -y
             sudo apt-get install -y jq
           fi
+
       - name: Decrypt Secrets (ENVIRONMENT_MANAGEMENT)
-        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@4eceb2a416a197e91dc557c2ef0b5dd9afe29e0c
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@7b8dd97eb5b596a88206805943771ea7ffcde235 # v3.4.8
         with:
           environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
           github_ci_user_environments_repo_pat: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}
@@ -367,21 +351,29 @@ jobs:
           ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< "$ENVIRONMENT_MANAGEMENT")
           echo "::add-mask::$ACCOUNT_NUMBER"
           echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
+
       - name: Configure AWS Credentials (github-actions role)
-        uses: aws-actions/configure-aws-credentials@00943011d9042930efac3dcd3a170e4273319bc8
+        uses: aws-actions/configure-aws-credentials@00943011d9042930efac3dcd3a170e4273319bc8 # v5.1.0
         with:
           role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
           role-session-name: "ami-delete-${{ matrix.account_name }}"
           aws-region: eu-west-2
 
-      - name: Enable LIVE 3-minute test flags (when requested or on push)
+      - name: Enable minute-based LIVE test window (optional)
+        if: env.LIVE_TEST_MODE == 'true'
         run: |
-          if [[ "${{ github.event_name }}" == "push" || "${LIVE_TEST_MODE}" == "true" || "${{ contains(github.event.head_commit.message || '', '[CLEANUP TEST NOW]') }}" == "true" ]]; then
-            echo "AMI_TEST_FLAGS=--test-mode --age-minutes ${AGE_MINUTES}" >> $GITHUB_ENV
-            echo "Live will use minute-based window: ${AGE_MINUTES} minute(s)"
+          echo "AMI_TEST_FLAGS=--test-mode --age-minutes ${AGE_MINUTES}" >> $GITHUB_ENV
+          echo "EBS_TEST_FLAGS=--test-mode --age-minutes ${AGE_MINUTES}" >> $GITHUB_ENV
+          echo "LIVE_TEST_MODE=true → minute-based window enabled (${AGE_MINUTES}m)."
+
+      - name: Live window note
+        run: |
+          if [[ "${LIVE_TEST_MODE}" == "true" ]]; then
+            echo "Live AMI deletion is in TEST MODE: using ${AGE_MINUTES}m window."
           else
-            echo "Live using default month-based window."
+            echo "Live AMI deletion uses month-based thresholds (no minute window)."
           fi
+
       - name: Plan AMI deletion & snapshot mapping (live)
         run: |
           set -euo pipefail
@@ -412,6 +404,7 @@ jobs:
               fi
             done
           fi
+
       - name: Guard protected AMIs from deletion (live)
         run: |
           set -euo pipefail
@@ -425,7 +418,7 @@ jobs:
             NAME="$(aws ec2 describe-images --image-ids "$AMI" --query 'Images[0].Name' --output text 2>/dev/null || echo '')"
             WHEN="$(aws ec2 describe-images --image-ids "$AMI" --query 'Images[0].CreationDate' --output text 2>/dev/null | sed 's/\.[0-9]\+Z$/Z/')"
             TAGS_JSON="$(aws ec2 describe-images --image-ids "$AMI" --query 'Images[0].Tags' --output json 2>/dev/null || echo '[]')"
-            if [[ "$NAME" =~ ^(AwsBackup|Backup) ]] || echo "$TAGS_JSON" | jq -e '.[] | select((.Key|test("Retain|Backup"; "i")) and (.Value|test("^(true|yes|1)$"; "i")))' >/dev/null; then
+            if echo "$NAME" | grep -qi 'backup' || echo "$TAGS_JSON" | jq -e '.[] | select((.Key|test("Retain|Backup"; "i")) and (.Value|test("^(true|yes|1)$"; "i")))' >/dev/null; then
               echo "$AMI $NAME" >> protected_amis.tmp
               echo "$AMI,$NAME,Protected name/tag" >> reports/protected_amis.csv
             fi
@@ -442,6 +435,7 @@ jobs:
           else
             echo "No protected AMIs matched."
           fi
+
       - name: Delete AMIs from filtered plan (Live)
         id: ami_live_delete
         run: |
@@ -476,6 +470,7 @@ jobs:
               echo "${{ matrix.account_name }},eu-west-2,live,ami,ami,${AMI},,${NAME},${WHEN},,Deleted," >> reports/cleanup_report.csv
             done
           fi
+
       - name: Delete orphaned snapshots (fallback)
         if: always()
         run: |
@@ -483,7 +478,7 @@ jobs:
           CREDS_JSON=$(aws sts assume-role --role-arn "arn:aws:iam::${ACCOUNT_NUMBER}:role/MemberInfrastructureAccess" --role-session-name "live-ami-snaps-${{ matrix.account_name }}" --output json)
           export AWS_ACCESS_KEY_ID=$(jq -r '.Credentials.AccessKeyId' <<< "$CREDS_JSON")
           export AWS_SECRET_ACCESS_KEY=$(jq -r '.Credentials.SecretAccessKey' <<< "$CREDS_JSON")
-          export AWS_SESSION_TOKEN=$(jq -r '.Credentials.SessionToken' <<< "$CREDS_JSON")
+          export AWS_SESSION_TOKEN=$(jq -r '.Credentials.SessionToken'    <<< "$CREDS_JSON")
           echo "🧹 Snapshots — Fallback"
           aws_try() {
             local max=5 delay=2 attempt=1
@@ -521,7 +516,7 @@ jobs:
             if grep -Eiq '(^|[[:space:]])(Retain|Backup)[[:space:]]*=[[:space:]]*(true|yes|1)' <<< "${TAGS:-}"; then
               continue
             fi
-            if grep -qi 'AwsBackup' <<< "${DESC:-} ${NAME:-}"; then
+            if grep -qi 'backup' <<< "${DESC:-} ${NAME:-}"; then
               continue
             fi
             aws_try aws ec2 delete-snapshot --snapshot-id "$SNAP_ID" || true
@@ -529,10 +524,9 @@ jobs:
           done < reports/ami_snapshot_map.csv
           echo "Totals — snapshots deleted: ${deleted}"
 
-
       - name: Upload AMI Live Artifacts (reports only)
         if: always()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
           name: ami-live-${{ matrix.account_name }}
           path: |
@@ -550,10 +544,9 @@ jobs:
           echo "### 🚀 AMI Live — ${{ matrix.account_name }}" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "| Metric | Count |" >> "$GITHUB_STEP_SUMMARY"
-          echo "|---|---:|" >> "$GITHUB_STEP_SUMMARY"
+          echo "|---|---:|"
           echo "| AMIs deleted | ${DEL} |" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
-          # Deleted AMIs (from snapshot map status = Deleted, unique by AMI)
           echo "**Deleted AMIs**" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "| AMI ID | Name | Created |" >> "$GITHUB_STEP_SUMMARY"
@@ -577,18 +570,19 @@ jobs:
           fi
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "- Reports: \`reports/ami_snapshot_map.csv\`, \`reports/protected_amis.csv\`" >> "$GITHUB_STEP_SUMMARY"
+
   ebs-delete:
     name: EBS Delete (Live)
     runs-on: ubuntu-latest
     needs: [build-matrix, fetch-secrets, preview]
-    if: >
+    if: ${{ (github.event.inputs.cleanup_type == 'ebs' || github.event.inputs.cleanup_type == 'both') && always() }}
     environment: ${{ matrix.account_name }}
     strategy:
       matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
       max-parallel: 1
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
 
       - name: Ensure scripts are executable
         run: chmod +x scripts/*.sh
@@ -599,8 +593,9 @@ jobs:
             sudo apt-get update -y
             sudo apt-get install -y jq
           fi
+
       - name: Decrypt Secrets (ENVIRONMENT_MANAGEMENT)
-        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@4eceb2a416a197e91dc557c2ef0b5dd9afe29e0c
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@7b8dd97eb5b596a88206805943771ea7ffcde235 # v3.4.8
         with:
           environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
           github_ci_user_environments_repo_pat: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}
@@ -613,21 +608,29 @@ jobs:
           ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< "$ENVIRONMENT_MANAGEMENT")
           echo "::add-mask::$ACCOUNT_NUMBER"
           echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
+
       - name: Configure AWS Credentials (github-actions role)
-        uses: aws-actions/configure-aws-credentials@00943011d9042930efac3dcd3a170e4273319bc8
+        uses: aws-actions/configure-aws-credentials@00943011d9042930efac3dcd3a170e4273319bc8 # v5.1.0
         with:
           role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
           role-session-name: "ebs-delete-${{ matrix.account_name }}"
           aws-region: eu-west-2
 
-      - name: Enable LIVE 3-minute test flags (when requested or on push)
+      - name: Enable minute-based LIVE test window (optional)
+        if: env.LIVE_TEST_MODE == 'true'
         run: |
-          if [[ "${{ github.event_name }}" == "push" || "${LIVE_TEST_MODE}" == "true" || "${{ contains(github.event.head_commit.message || '', '[CLEANUP TEST NOW]') }}" == "true" ]]; then
-            echo "EBS_TEST_FLAGS=--test-mode --age-minutes ${AGE_MINUTES}" >> $GITHUB_ENV
-            echo "Live will use minute-based window: ${AGE_MINUTES} minute(s)"
+          echo "AMI_TEST_FLAGS=--test-mode --age-minutes ${AGE_MINUTES}" >> $GITHUB_ENV
+          echo "EBS_TEST_FLAGS=--test-mode --age-minutes ${AGE_MINUTES}" >> $GITHUB_ENV
+          echo "LIVE_TEST_MODE=true → minute-based window enabled (${AGE_MINUTES}m)."
+
+      - name: Live window note
+        run: |
+          if [[ "${LIVE_TEST_MODE}" == "true" ]]; then
+            echo "Live EBS deletion is in TEST MODE: using ${AGE_MINUTES}m window."
           else
-            echo "Live using default month-based window."
+            echo "Live EBS deletion uses month-based thresholds (no minute window)."
           fi
+
       - name: Delete EBS Volumes (Live) + Report
         id: ebs_live_delete
         run: |
@@ -653,9 +656,10 @@ jobs:
           COUNT="$(tail -n +2 reports/ebs_cleanup_report.csv | wc -l | tr -d ' ')"
           echo "✅ Deleted EBS volumes: ${COUNT}"
           echo "deleted=${COUNT}" >> $GITHUB_OUTPUT
+
       - name: Upload EBS Live Artifacts (reports only)
         if: always()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
           name: ebs-live-${{ matrix.account_name }}
           path: reports/ebs_cleanup_report.csv
@@ -669,7 +673,7 @@ jobs:
           echo "### 🚀 EBS Live — ${{ matrix.account_name }}" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "| Metric | Count |" >> "$GITHUB_STEP_SUMMARY"
-          echo "|---|---:|" >> "$GITHUB_STEP_SUMMARY"
+          echo "|---|---:|"
           echo "| Volumes deleted | ${DEL} |" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "**Deleted volumes**" >> "$GITHUB_STEP_SUMMARY"

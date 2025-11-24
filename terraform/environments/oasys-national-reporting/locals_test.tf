@@ -34,6 +34,21 @@ locals {
       }
     }
 
+    cloudwatch_dashboards = {
+      "CloudWatch-Default" = {
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.lb,
+          local.cloudwatch_dashboard_widget_groups.all_ec2,
+          local.cloudwatch_dashboard_widget_groups.cms,
+          local.cloudwatch_dashboard_widget_groups.web,
+          local.cloudwatch_dashboard_widget_groups.bods,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ssm_command,
+        ]
+      }
+    }
+
     efs = {
       t2-onr-sap-share = {
         access_points = {
@@ -286,7 +301,7 @@ locals {
                 }]
               }
               t2-onr-web-http-7777 = {
-                priority = 200
+                priority = 1200 # change priority to 200 if the environment is powered on during day
                 actions = [{
                   type              = "forward"
                   target_group_name = "t2-onr-web-http-7777"

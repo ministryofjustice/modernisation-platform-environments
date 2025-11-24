@@ -49,5 +49,5 @@ resource "aws_lb_listener" "ebsdbnlb_listener" {
     type             = "forward"
   }
 
-  depends_on = [aws_acm_certificate_validation.external_nonprod, aws_acm_certificate_validation.external_prod ]
+  depends_on = [aws_acm_certificate_validation.external_nonprod, aws_acm_certificate_validation.external_prod]
 }

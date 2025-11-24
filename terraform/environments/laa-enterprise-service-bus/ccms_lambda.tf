@@ -51,16 +51,16 @@ resource "aws_security_group_rule" "ccms_provider_load_egress_https_s3" {
 
 resource "aws_lambda_function" "ccms_provider_load" {
 
-  description      = "Connect to CCMS DB"
-  function_name    = "ccms_provider_load_function"
-  role             = aws_iam_role.ccms_provider_load_role.arn
-  handler          = "lambda_function.lambda_handler"
-  s3_bucket        = data.aws_s3_object.provider_load_zip.bucket
-  s3_key           = data.aws_s3_object.provider_load_zip.key
+  description       = "Connect to CCMS DB"
+  function_name     = "ccms_provider_load_function"
+  role              = aws_iam_role.ccms_provider_load_role.arn
+  handler           = "lambda_function.lambda_handler"
+  s3_bucket         = data.aws_s3_object.provider_load_zip.bucket
+  s3_key            = data.aws_s3_object.provider_load_zip.key
   s3_object_version = data.aws_s3_object.provider_load_zip.version_id
-  timeout          = 100
-  memory_size      = 128
-  runtime          = "python3.10"
+  timeout           = 100
+  memory_size       = 128
+  runtime           = "python3.10"
 
   layers = [
     aws_lambda_layer_version.lambda_layer_oracle_python.arn

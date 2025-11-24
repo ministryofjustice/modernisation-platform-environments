@@ -39,15 +39,15 @@ resource "aws_security_group_rule" "cloudwatch_log_alert_https_to_internet" {
 ### Lambda Function
 ######################################
 resource "aws_lambda_function" "cloudwatch_log_alert" {
-  description      = "Lambda function to send CloudWatch log alerts to Slack."
-  function_name    = "cloudwatch_log_alert"
-  handler          = "lambda_function.lambda_handler"
-  runtime          = "python3.10"
-  role             = aws_iam_role.cloudwatch_log_alert_role.arn
-  s3_bucket        = data.aws_s3_object.cloudwatch_log_alert_zip.bucket
-  s3_key           = data.aws_s3_object.cloudwatch_log_alert_zip.key
+  description       = "Lambda function to send CloudWatch log alerts to Slack."
+  function_name     = "cloudwatch_log_alert"
+  handler           = "lambda_function.lambda_handler"
+  runtime           = "python3.10"
+  role              = aws_iam_role.cloudwatch_log_alert_role.arn
+  s3_bucket         = data.aws_s3_object.cloudwatch_log_alert_zip.bucket
+  s3_key            = data.aws_s3_object.cloudwatch_log_alert_zip.key
   s3_object_version = data.aws_s3_object.cloudwatch_log_alert_zip.version_id
-  timeout          = 60
+  timeout           = 60
 
   environment {
     variables = {

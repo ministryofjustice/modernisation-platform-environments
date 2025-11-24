@@ -12,11 +12,11 @@ module "glue_s3_data_reconciliation_job" {
   create_security_configuration = var.create_sec_conf
   job_language                  = "scala"
   # Placeholder Script Location
-  script_location              = "s3://${var.project_id}-artifact-store-${var.env}/build-artifacts/digital-prison-reporting-jobs/scripts/${var.script_file_version}"
-  temp_dir                     = var.temp_dir
-  project_id                   = var.project_id
-  aws_kms_key                  = var.s3_kms_arn
-  spark_event_logs             = var.spark_event_logs
+  script_location  = "s3://${var.project_id}-artifact-store-${var.env}/build-artifacts/digital-prison-reporting-jobs/scripts/${var.script_file_version}"
+  temp_dir         = var.temp_dir
+  project_id       = var.project_id
+  aws_kms_key      = var.s3_kms_arn
+  spark_event_logs = var.spark_event_logs
 
   execution_class             = var.execution_class
   worker_type                 = var.worker_type

@@ -31,7 +31,7 @@ locals {
   layer_env_buckets = {
     for env in keys(data.aws_s3_bucket.layer_buckets) : env => data.aws_s3_bucket.layer_buckets[env].id
   }
-  current_env = local.environment
+  current_env   = local.environment
   active_layers = local.current_env != null ? local.lambda_layers : {}
 }
 

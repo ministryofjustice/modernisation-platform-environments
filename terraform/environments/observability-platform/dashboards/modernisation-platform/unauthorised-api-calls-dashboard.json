@@ -1,0 +1,89 @@
+{
+  "datasource": {
+    "type": "cloudwatch",
+    "uid": "${datasource}"
+  },
+  "fieldConfig": {
+    "defaults": {
+      "mappings": [],
+      "thresholds": {
+        "mode": "absolute",
+        "steps": [
+          {
+            "color": "green",
+            "value": null
+          },
+          {
+            "color": "dark-yellow",
+            "value": 20
+          },
+          {
+            "color": "dark-red",
+            "value": 30
+          }
+        ]
+      },
+      "color": {
+        "mode": "thresholds"
+      }
+    },
+    "overrides": []
+  },
+  "gridPos": {
+    "h": 12,
+    "w": 14,
+    "x": 0,
+    "y": 0
+  },
+  "id": 1,
+  "options": {
+    "reduceOptions": {
+      "values": false,
+      "calcs": ["lastNotNull"],
+      "fields": ""
+    },
+    "orientation": "auto",
+    "showThresholdLabels": false,
+    "showThresholdMarkers": false,
+    "sizing": "auto",
+    "minVizWidth": 75,
+    "minVizHeight": 75
+  },
+  "pluginVersion": "10.4.1",
+  "targets": [
+    {
+      "datasource": {
+        "type": "cloudwatch",
+        "uid": "${datasource}"
+      },
+      "dimensions": {},
+      "expression": "",
+      "id": "",
+      "label": "",
+      "logGroups": [],
+      "matchExact": true,
+      "metricEditorMode": 0,
+      "metricName": "$metric_name",
+      "metricQueryType": 0,
+      "namespace": "LogMetrics",
+      "period": "",
+      "queryMode": "Metrics",
+      "refId": "A",
+      "region": "eu-west-2",
+      "sqlExpression": "",
+      "statistic": "Sum"
+    }
+  ],
+  "title": "${metric_name}",
+  "transformations": [
+    {
+      "id": "reduce",
+      "options": {
+        "labelsToFields": false,
+        "reducers": ["max", "sum"]
+      }
+    }
+  ],
+  "transparent": true,
+  "type": "gauge"
+}
