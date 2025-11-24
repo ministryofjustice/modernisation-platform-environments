@@ -141,8 +141,18 @@ module "s3-bucket-shared" {
     aws.bucket-replication = aws
   }
 
-  lifecycle_rule = []
+  lifecycle_rule = [
+    {
+      id      = "main"
+      enabled = "Enabled"
+      prefix  = ""
 
+      tags = {
+        rule      = "log"
+        autoclean = "true"
+      }
+    }
+  ]
 
   tags = merge(local.tags,
     { Name = "${local.application_name}-${local.environment}-shared" }
@@ -166,23 +176,6 @@ resource "aws_s3_bucket_policy" "shared_bucket_policy" {
         Condition = {
           NumericLessThan = {
             "s3:TlsVersion" = "1.2"
-          }
-        }
-      },
-      {
-        Sid    = "AllowLambdaToReadObjects",
-        Effect = "Allow",
-        Principal = {
-          Service = [
-            "lambda.amazonaws.com"
-          ]
-        },
-        Action   = ["s3:GetObject"],
-        Resource = "${module.s3-bucket-shared.bucket.arn}/*",
-        Condition = {
-          StringEquals = {
-            "s3:x-amz-acl"      = "bucket-owner-full-control",
-            "aws:SourceAccount" = data.aws_caller_identity.current.account_id
           }
         }
       }
