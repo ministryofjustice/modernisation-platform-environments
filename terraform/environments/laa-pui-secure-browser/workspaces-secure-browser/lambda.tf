@@ -34,7 +34,7 @@ module "lambda_s3_log_processor" {
     s3_read = {
       effect    = "Allow"
       actions   = ["s3:GetObject"]
-      resources = ["${module.s3_bucket_workspacesweb_session_logs[0].s3_bucket_arn}/firewall/AWSLogs/*"]
+      resources = ["${module.s3_bucket_workspacesweb_session_logs[0].s3_bucket_arn}/workspaces-web-logs/*"]
     }
   }
 
