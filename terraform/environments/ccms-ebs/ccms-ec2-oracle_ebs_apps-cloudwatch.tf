@@ -20,7 +20,6 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsapps_temp" {
     InstanceType = aws_instance.ec2_ebsapps[count.index].instance_type
     InstanceId   = aws_instance.ec2_ebsapps[count.index].id
     fstype       = "ext4"
-    # device       = "nvme2n1" # "/dev/sdc"
   }
 }
 
@@ -46,7 +45,6 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsapps_home" {
     InstanceType = aws_instance.ec2_ebsapps[count.index].instance_type
     InstanceId   = aws_instance.ec2_ebsapps[count.index].id
     fstype       = "ext4"
-    # device       = "nvme6n1" # "/dev/sdd"
   }
 }
 
@@ -72,7 +70,6 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsapps_export_home" {
     InstanceType = aws_instance.ec2_ebsapps[count.index].instance_type
     InstanceId   = aws_instance.ec2_ebsapps[count.index].id
     fstype       = "ext4"
-    # device       = "nvme1n1" # "/dev/sdh"
   }
 }
 
@@ -98,7 +95,6 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsapps_u01" {
     InstanceType = aws_instance.ec2_ebsapps[count.index].instance_type
     InstanceId   = aws_instance.ec2_ebsapps[count.index].id
     fstype       = "ext4"
-    # device       = "nvme3n1" # "/dev/sdi"
   }
 }
 
@@ -124,7 +120,6 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsapps_u03" {
     InstanceType = aws_instance.ec2_ebsapps[count.index].instance_type
     InstanceId   = aws_instance.ec2_ebsapps[count.index].id
     fstype       = "ext4"
-    # device       = "nvme5n1" # "/dev/sdj"
   }
 }
 
@@ -150,7 +145,6 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsapps_stage" {
     InstanceType = aws_instance.ec2_ebsapps[count.index].instance_type
     InstanceId   = aws_instance.ec2_ebsapps[count.index].id
     fstype       = "ext4"
-    # device       = "nvme8n1" # "/dev/sdk"
   }
 }
 
@@ -176,6 +170,5 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsapps_backup_prod" {
     InstanceType = aws_instance.ec2_ebsapps[count.index].instance_type
     InstanceId   = aws_instance.ec2_ebsapps[count.index].id
     fstype       = "ext4"
-    # device       = "nvme9n1" # "/dev/sdk"
   }
 }
