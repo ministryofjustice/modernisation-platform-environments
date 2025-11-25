@@ -138,3 +138,12 @@ resource "aws_cloudwatch_dashboard" "workspacesweb_active_sessions" {
     ]
   })
 }
+
+resource "aws_cloudwatch_log_group" "workspacesweb_session_logs" {
+  #checkov:skip=CKV_AWS_338:Long-term storage provided through S3 / XSIAM ingestion
+  depends_on        = [aws_kms_key.workspacesweb_session_logs[0]]
+  count             = local.create_resources ? 1 : 0
+  kms_key_id        = aws_kms_key.workspacesweb_session_logs[0].arn
+  name_prefix       = "/lambda/laa-workspacesweb-session-logs-"
+  retention_in_days = 14
+}

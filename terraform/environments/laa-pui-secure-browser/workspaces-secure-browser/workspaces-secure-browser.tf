@@ -48,8 +48,8 @@ resource "aws_workspacesweb_user_settings" "main" {
 
   # Optional settings
   deep_link_allowed                  = "Enabled"
-  disconnect_timeout_in_minutes      = 60
-  idle_disconnect_timeout_in_minutes = 15
+  disconnect_timeout_in_minutes      = 30
+  idle_disconnect_timeout_in_minutes = 10
 
   toolbar_configuration {
     toolbar_type = "Docked"
