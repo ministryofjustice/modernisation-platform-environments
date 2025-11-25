@@ -870,6 +870,10 @@
             {
               "glue_database": "prison_derived",
               "glue_tables": ["*"]
+            },
+            {
+              "glue_database": "prison_datamarts",
+              "glue_tables": ["*"]
             }
           ]
         }
