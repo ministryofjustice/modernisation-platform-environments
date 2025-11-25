@@ -17,7 +17,7 @@ resource "aws_secretsmanager_secret" "rds_db_credentials" {
 
 resource "aws_secretsmanager_secret_version" "rds_credentials" {
   secret_id     = aws_secretsmanager_secret.rds_db_credentials.id
-  secret_string = jsonencode({ "NCAS_DB_PASSWORD" : "${random_password.password.result}" })
+  secret_string = jsonencode({ "NCAS_DB_PASSWORD" : random_password.password.result })
 }
 
 data "aws_secretsmanager_secret" "get_ncas_db_secrets" {
