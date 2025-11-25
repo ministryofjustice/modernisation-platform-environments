@@ -26,7 +26,7 @@ resource "aws_db_instance" "cst_db" {
   identifier              = "cst-postgres-db"
   allocated_storage       = 20
   monitoring_interval     = 5
-  monitoring_role_arn     = aws_iam_role.rds_enhanced_monitoring[0].arn
+  monitoring_role_arn     = aws_iam_role.rds_monitoring_role[0].arn
   instance_class          = "db.t3.micro"
   engine                  = "postgres"
   engine_version          = "16"
@@ -77,7 +77,7 @@ data "aws_iam_policy_document" "rds_monitoring_role" {
 }
 
 resource "aws_iam_role_policy_attachment" "rds_monitoring_attach" {
-  role       = aws_iam_role.rds_monitoring_role.name
+  role       = aws_iam_role.rds_monitoring_role[0].name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonRDSEnhancedMonitoringRole"
 }
 
