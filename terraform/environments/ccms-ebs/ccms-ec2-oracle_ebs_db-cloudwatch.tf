@@ -19,7 +19,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_ccms_ebs_redoa" {
     InstanceType = aws_instance.ec2_oracle_ebs.instance_type
     InstanceId   = aws_instance.ec2_oracle_ebs.id
     fstype       = "ext4"
-    device       = "nvme2n1"
+    # device       = "nvme2n1"
   }
 }
 
@@ -69,7 +69,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_ccms_ebs_arch" {
     InstanceType = aws_instance.ec2_oracle_ebs.instance_type
     InstanceId   = aws_instance.ec2_oracle_ebs.id
     fstype       = "ext4"
-    device       = "nvme4n1"
+    # device       = "nvme4n1"
   }
 }
 
@@ -94,7 +94,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_backup" {
     InstanceType = aws_instance.ec2_oracle_ebs.instance_type
     InstanceId   = aws_instance.ec2_oracle_ebs.id
     fstype       = "ext4"
-    device       = "nvme5n1"
+    # device       = "nvme5n1"
   }
 }
 
@@ -119,7 +119,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_temp" {
     InstanceType = aws_instance.ec2_oracle_ebs.instance_type
     InstanceId   = aws_instance.ec2_oracle_ebs.id
     fstype       = "ext4"
-    device       = "nvme6n1" # "/dev/sdc"
+    # device       = "nvme6n1" # "/dev/sdc"
   }
 }
 
@@ -144,7 +144,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_ccms_ebs_diag" {
     InstanceType = aws_instance.ec2_oracle_ebs.instance_type
     InstanceId   = aws_instance.ec2_oracle_ebs.id
     fstype       = "ext4"
-    device       = "nvme7n1"
+    # device       = "nvme7n1"
   }
 }
 
@@ -169,7 +169,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_ccms_ebs_redob" {
     InstanceType = aws_instance.ec2_oracle_ebs.instance_type
     InstanceId   = aws_instance.ec2_oracle_ebs.id
     fstype       = "ext4"
-    device       = "nvme8n1"
+    # device       = "nvme8n1"
   }
 }
 
@@ -194,7 +194,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_home" {
     InstanceType = aws_instance.ec2_oracle_ebs.instance_type
     InstanceId   = aws_instance.ec2_oracle_ebs.id
     fstype       = "ext4"
-    device       = "nvme9n1"
+    # device       = "nvme9n1"
   }
 }
 
@@ -219,7 +219,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_backup_prod" {
     InstanceType = aws_instance.ec2_oracle_ebs.instance_type
     InstanceId   = aws_instance.ec2_oracle_ebs.id
     fstype       = "ext4"
-    device       = "nvme10n1"
+    # device       = "nvme10n1"
   }
 }
 
@@ -244,7 +244,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_u01" {
     InstanceType = aws_instance.ec2_oracle_ebs.instance_type
     InstanceId   = aws_instance.ec2_oracle_ebs.id
     fstype       = "ext4"
-    device       = "nvme11n1"
+    # device       = "nvme11n1"
   }
 }
 
@@ -269,7 +269,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_export_home" {
     InstanceType = aws_instance.ec2_oracle_ebs.instance_type
     InstanceId   = aws_instance.ec2_oracle_ebs.id
     fstype       = "ext4"
-    device       = "nvme12n1"
+    # device       = "nvme12n1"
   }
 }
 
@@ -294,6 +294,6 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_ccms_ebs_techst" {
     InstanceType = aws_instance.ec2_oracle_ebs.instance_type
     InstanceId   = aws_instance.ec2_oracle_ebs.id
     fstype       = "ext4"
-    device       = "nvme13n1"
+    # device       = "nvme13n1"
   }
 }
