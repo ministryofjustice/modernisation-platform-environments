@@ -26,6 +26,7 @@ resource "aws_db_instance" "cst_db" {
   identifier              = "cst-postgres-db"
   allocated_storage       = 20
   monitoring_interval     = 5
+  monitoring_role_arn     = aws_iam_role.rds_enhanced_monitoring[0].arn
   instance_class          = "db.t3.micro"
   engine                  = "postgres"
   engine_version          = "16"
@@ -47,10 +48,15 @@ resource "aws_db_instance" "cst_db" {
   copy_tags_to_snapshot   = true
   performance_insights_kms_key_id = var.performance_insights_kms_key_id
   parameter_group_name        = aws_db_parameter_group.cst_db.name
-
   tags = {
     Name = "PostgresLatest"
   }
+}
+
+resource "aws_iam_role" "rds_enhanced_monitoring" {
+  assume_role_policy = data.aws_iam_policy_document.rds_enhanced_monitoring[0].json
+  count              = 1
+  name_prefix        = "rds-enhanced-monitoring"
 }
 
 resource "aws_db_parameter_group" "cst_db" {
