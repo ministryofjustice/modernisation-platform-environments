@@ -87,6 +87,24 @@ locals {
         }
       }
       llm_gateway_teams = {
+        analytics-engineering = {
+          organisation = "ministryofjustice"
+          models = [
+            "azure-gpt-5",
+            "bedrock-claude-haiku-4-5",
+            "bedrock-claude-sonnet-4-5"
+          ]
+          keys = {
+            /* For Ben Waterfield */
+            probation = {
+              models = [
+                "azure-gpt-5",
+                "bedrock-claude-haiku-4-5",
+                "bedrock-claude-sonnet-4-5"
+              ]
+            }
+          }
+        }
         hmcts-claude-code = {
           organisation = "hmcts"
           max_budget   = 10000
