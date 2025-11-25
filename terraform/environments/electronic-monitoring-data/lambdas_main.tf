@@ -328,7 +328,7 @@ module "load_mdss_lambda" {
   handler                        = "load_mdss.handler"
   memory_size                    = 10240
   timeout                        = 900
-  reserved_concurrent_executions = 0
+  reserved_concurrent_executions = 500
   ephemeral_storage_size         = 10240
   core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
   production_dev                 = local.is-production ? "prod" : "dev"
@@ -356,7 +356,7 @@ module "load_fms_lambda" {
   handler                        = "load_fms.handler"
   memory_size                    = 10240
   timeout                        = 900
-  reserved_concurrent_executions = 1000
+  reserved_concurrent_executions = 500
   ephemeral_storage_size         = 10240
   core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
   production_dev                 = local.is-production ? "prod" : "dev"
