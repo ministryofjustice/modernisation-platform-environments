@@ -54,7 +54,7 @@ resource "aws_s3_bucket_policy" "default" {
         "AWS": "${var.data_science_role}"
       },
       "Action": [
-        "s3:PutObject"
+        "s3:PutObject",
         "s3:DeleteObject"
       ],
       "Resource": [
