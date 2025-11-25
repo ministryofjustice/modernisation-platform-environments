@@ -25,6 +25,7 @@ resource "aws_db_subnet_group" "cst_database" {
 resource "aws_db_instance" "cst_db" {
   identifier              = "cst-postgres-db"
   allocated_storage       = 20
+  monitoring_interval     = 5
   instance_class          = "db.t3.micro"
   engine                  = "postgres"
   engine_version          = "16"
@@ -37,9 +38,30 @@ resource "aws_db_instance" "cst_db" {
   backup_retention_period = 1
   vpc_security_group_ids  = [aws_security_group.cst_rds_sc.id]
   apply_immediately       = true
-
+  auto_minor_version_upgrade = true
+  multi_az                = true
+  performance_insights_enabled = true
+  iam_database_authentication_enabled = true
+  storage_encrypted       = true
+  enabled_cloudwatch_logs_exports = ["general", "error", "slowquery"]
+  copy_tags_to_snapshot   = true
   tags = {
     Name = "PostgresLatest"
+  }
+}
+
+resource "aws_db_parameter_group" "cst_db" {
+  name = "cst-postgres-db"
+  family      = "postgres16"
+
+  parameter {
+    name="log_statement"
+    value="all"
+  }
+
+  parameter {
+    name="log_min_duration_statement"
+    value="1"
   }
 }
 
