@@ -169,7 +169,7 @@ resource "aws_ami_from_instance" "tariffdb_b_bkp" {
     Name = "CDI-272-TariffDB-A-Backup"
   }
 }
-
+/*
 # rescue instance
 resource "aws_instance" "tariffdbrescue" {
   count                = local.environment == "production" ? 1 : 0
@@ -189,3 +189,4 @@ resource "aws_instance" "tariffdbrescue" {
   }
   vpc_security_group_ids = [aws_security_group.tariff_db_prod_security_group[0].id]
 }
+*/

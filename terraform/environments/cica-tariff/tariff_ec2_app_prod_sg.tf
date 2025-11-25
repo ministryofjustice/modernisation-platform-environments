@@ -106,7 +106,7 @@ resource "aws_security_group" "tariff_app_prod_security_group" {
 }
 
 
-/*module "tariff_app_prod_security_group" {
+module "tariff_app_prod_security_group" {
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-security-group.git?ref=3cf4e1a48a4649179e8ea27308daf0b551cb0bfa"
   # version = "5.3.1"
   count       = local.environment == "production" ? 1 : 0
@@ -222,4 +222,4 @@ resource "aws_security_group" "tariff_app_prod_security_group" {
       description              = "Allow  NFS 111udp ingress from DB tier for spp_draft_letters mount"
     }
   ]
-}*/
+}
