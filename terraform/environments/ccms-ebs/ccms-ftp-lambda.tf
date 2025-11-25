@@ -63,7 +63,7 @@ resource "aws_s3_bucket" "buckets" {
   for_each = toset(local.bucket_names)
 
   bucket = each.value
-
+  
   tags = merge(local.tags,
     {
       Name = each.value
@@ -109,6 +109,60 @@ resource "aws_s3_bucket_versioning" "s3_versioning" {
 
   versioning_configuration {
     status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "inbound_bucket_lifecycle_delete_noncurrent_versions" {
+
+  bucket = aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].id
+
+  rule {
+    id     = "delete-noncurrent-versions-after-5-days"
+    status = "Enabled"
+ 
+    # No filter → applies to whole bucket
+    filter {}
+ 
+    noncurrent_version_expiration {
+      noncurrent_days = 5
+      newer_noncurrent_versions = 0  # delete all noncurrent versions
+    }
+  }
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "outbound_bucket_lifecycle_delete_noncurrent_versions" {
+
+  bucket = aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].id
+
+  rule {
+    id     = "delete-noncurrent-versions-after-5-days"
+    status = "Enabled"
+ 
+    # No filter → applies to whole bucket
+    filter {}
+ 
+    noncurrent_version_expiration {
+      noncurrent_days = 5
+      newer_noncurrent_versions = 0  # delete all noncurrent versions
+    }
+  }
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "ftp_lambda_bucket_lifecycle_delete_noncurrent_versions" {
+
+  bucket = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].id
+
+  rule {
+    id     = "delete-noncurrent-versions-after-5-days"
+    status = "Enabled"
+ 
+    # No filter → applies to whole bucket
+    filter {}
+ 
+    noncurrent_version_expiration {
+      noncurrent_days = 5
+      newer_noncurrent_versions = 0  # delete all noncurrent versions
+    }
   }
 }
 
