@@ -65,6 +65,11 @@ resource "aws_db_parameter_group" "cst_db" {
     name="log_min_duration_statement"
     value="1"
   }
+
+  parameter {
+    name  = "rds.force_ssl"
+    value = "1"
+  }
 }
 
 output "rds_endpoint" {
