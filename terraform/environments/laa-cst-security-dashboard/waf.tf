@@ -3,12 +3,16 @@
 resource "aws_wafv2_web_acl" "basic" {
   name        = "basic-waf"
   scope       = "REGIONAL"
-  default_action { block {} }
+  default_action { 
+    block {} 
+  }
 
   rule {
     name     = "AWSManagedRulesCommonRuleSet"
     priority = 1
-    override_action { count {} }
+    override_action { 
+        count {} 
+    }
     statement {
       managed_rule_group_statement {
         name        = "AWSManagedRulesCommonRuleSet"
