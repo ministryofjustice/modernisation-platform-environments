@@ -48,7 +48,7 @@ resource "aws_route53_record" "external_validation_dev" {
   allow_overwrite = true
 
   # If this is the base MP domain, use the parent zone; otherwise use the app zone
-  zone_id = each.key == "modernisation-platform.service.justice.gov.uk" ? data.aws_route53_zone.modernisation_platform.zone_id : data.aws_route53_zone.application_zone.zone_id
+  zone_id = data.aws_route53_zone.modernisation_platform.zone_id
 
   name    = each.value.name
   type    = each.value.type
