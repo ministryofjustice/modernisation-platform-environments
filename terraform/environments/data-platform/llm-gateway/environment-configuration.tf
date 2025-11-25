@@ -3,8 +3,8 @@ locals {
   environment_configurations = {
     development = {
       litellm_versions = {
-        application = "main-v1.79.1-stable"
-        chart       = "0.1.812"
+        application = "main-v1.80.0-stable.1"
+        chart       = "0.1.823"
       }
       litellm_organization_ids = {
         /* These are not currently managed in code */
@@ -89,7 +89,7 @@ locals {
       llm_gateway_teams = {
         hmcts-claude-code = {
           organisation = "hmcts"
-          max_budget = 10000
+          max_budget   = 10000
           models = [
             "bedrock-claude-haiku-4-5",
             "bedrock-claude-sonnet-4-5"
