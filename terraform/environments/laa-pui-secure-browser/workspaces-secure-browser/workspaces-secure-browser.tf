@@ -198,6 +198,7 @@ resource "aws_workspacesweb_browser_settings" "main" {
           "assets.publishing.service.gov.uk",
           "autologon.microsoftazuread-sso.com",
           "becws.microsoftonline.com",
+          "ccms-pui.laa.service.justice.gov.uk",
           "ccs.login.microsoftonline.com",
           "chrome-untrusted://print/",
           "chrome://new-tab-page",
