@@ -20,12 +20,15 @@ locals {
       ]
 
       /* Image Versions */
-      scan_image_version     = "0.2.0"
-      transfer_image_version = "0.0.22"
-      notify_image_version   = "0.0.23"
+      scan_image_version     = "0.2.1"
+      transfer_image_version = "0.0.23"
+      notify_image_version   = "0.0.24"
 
       /* Target Buckets */
-      target_buckets              = ["mojap-land-dev"]
+      target_buckets = [
+        "mojap-land-dev",
+        "cloud-platform-40748c2df4b92e2dfd779a02841187ec"
+      ]
       datasync_target_buckets     = ["mojap-land-dev"]
       datasync_opg_target_buckets = ["mojap-data-production-datasync-opg-ingress-development"]
 
@@ -38,8 +41,8 @@ locals {
       transfer_server_hostname = "sftp.development.ingestion.analytical-platform.service.justice.gov.uk"
       transfer_server_sftp_users = {
         "analytical-platform" = {
-          ssh_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC082exhcUBZ2Wrzm9zjm+CtMuIUzWjWPBgXs5ezC5XEgPGqovGZ4UMOPz+7Wd/KJY5isa7IbU/ZFtq5PwCILrwI+yHsEaT93qI2pI82Xby7qCvNoCaMVDBb08pd1VBfyN3gEmxPmWeejyD6kEHiksksE3wpT/zAuUQ7LFZRzUm3rKs6THalP5CCV7aAXCxAKh+P7ObXKCvyWgjJ0fm3trOcsZxG2PS1AoBfcYgv8gyQwJLEDLZFFugMAydrkwUVHwRqWnh//Xj9AWzwGcGk3zoItLOdhF4tAkNsF0eIPtq6sq+jT7NiTG2sAAvFzjYKtK1KMzLTW4UEXQJ2vsPemPgrrqJtMzMWLdcstNiIYpbBBKdNlSWCZNwQfse9U0BnM4NQ6b3epsbuVYPec2P6tZHUzbWL3+1A2rECnzY2KFAYappLeeEioia3uD2om7CEmFNMMFFiXkt45urVUEYQ1WJrO3UqQknEJvGefNzWfi0UBAdmeB1I/OQGnryqYd1P3k="
-          cidr_blocks = ["51.179.205.105/32"]
+          ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC082exhcUBZ2Wrzm9zjm+CtMuIUzWjWPBgXs5ezC5XEgPGqovGZ4UMOPz+7Wd/KJY5isa7IbU/ZFtq5PwCILrwI+yHsEaT93qI2pI82Xby7qCvNoCaMVDBb08pd1VBfyN3gEmxPmWeejyD6kEHiksksE3wpT/zAuUQ7LFZRzUm3rKs6THalP5CCV7aAXCxAKh+P7ObXKCvyWgjJ0fm3trOcsZxG2PS1AoBfcYgv8gyQwJLEDLZFFugMAydrkwUVHwRqWnh//Xj9AWzwGcGk3zoItLOdhF4tAkNsF0eIPtq6sq+jT7NiTG2sAAvFzjYKtK1KMzLTW4UEXQJ2vsPemPgrrqJtMzMWLdcstNiIYpbBBKdNlSWCZNwQfse9U0BnM4NQ6b3epsbuVYPec2P6tZHUzbWL3+1A2rECnzY2KFAYappLeeEioia3uD2om7CEmFNMMFFiXkt45urVUEYQ1WJrO3UqQknEJvGefNzWfi0UBAdmeB1I/OQGnryqYd1P3k="
+          cidr_blocks = ["51.179.204.79/32"]
         }
         "opg-restore-ocr" = {
           ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCWz7ue/saomMAKrVgo6FifjpGQfl7B4fs2s/MJa2jhpBVWXk9tquGDXp1/Yfk4C7FIneGKfh8fWHz9FPS+u6h3a9hMW8d/5onNuSr9S6T2mN7ydZQzGez5qyG2vNFLyip3ls6mQjIpXSo2aow7+3Y2lbDe8UamiYNVgvvWB+hVl5RJjcaReDDbi0xwdjGjep0LcvgAyKa8evmcEbFVkrLhWyc30xn1+OesqPWSpoIb/IlBDFxCqR46GW/zlOldEIatONhXWgvJ6dS5T1YmHsE4U0Py3BV8O5zvc+XRYjr/3w9LOwmTHS1xbzlhNBjO1o6O9hSBsowBjsWLL5aNWcdBH0DiWfIWkoq9Fy8VEAa/T5v7GCaKvDs9pGBpjQSQsWyKXbwP0Z2RGyU2CSGVzMM6gzrjaxanOK9QbLOqCpTSSIYWfokt+MNrHcQU+9mBTjq20URF7RW6tsM8GvzGRNk0hlkX3ueq86uLpQzRctGBTjN74qBba0WbauIcSl4OIrc+NEwjaFTmuIs0NIG5aoAop8WHOC8cxFAST2XjMF30eEh6/W9Gh0uPor4L5tUqJ/JuI2wcfYLuk1KLDcOUVin79QficX93zbaTPNXWW052ct50B0KnCmZyvQORwOH8gBFgkFe5MO/bqevG9Xpof/QvpCLKEON/fBAW4bEdIIv5qw=="
@@ -81,15 +84,16 @@ locals {
       ]
 
       /* Image Versions */
-      scan_image_version     = "0.2.0"
-      transfer_image_version = "0.0.22"
-      notify_image_version   = "0.0.23"
+      scan_image_version     = "0.2.1"
+      transfer_image_version = "0.0.23"
+      notify_image_version   = "0.0.24"
 
       /* Target Buckets */
       target_buckets = [
         "mojap-land",
         "mojap-data-production-shared-services-client-team-gov-29148",
-        "cloud-platform-40748c2df4b92e2dfd779a02841187ec"
+        "cloud-platform-623c2bd763adf52b51a0c0cee5c1ec72",
+        "property-datahub-landing-production"
       ]
       datasync_target_buckets     = ["mojap-land"]
       datasync_opg_target_buckets = ["mojap-data-production-datasync-opg-ingress-production"]
@@ -100,7 +104,8 @@ locals {
 
       /* Target KMS */
       target_kms_keys = [
-        "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["analytical-platform-data-production"]}:key/62503ba6-316e-473d-ae4b-042f8420dd07" # s3/mojap-data-production-shared-services-client-team-gov-29148
+        "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["analytical-platform-data-production"]}:key/62503ba6-316e-473d-ae4b-042f8420dd07", # s3/mojap-data-production-shared-services-client-team-gov-29148
+        "arn:aws:kms:eu-west-2:437720536440:key/d4cd0acf-5b4f-461f-ba01-886f814afec5"                                                                        # s3/property-datahub-landing-production
       ]
       mojap_land_kms_key                  = "arn:aws:kms:eu-west-1:${local.environment_management.account_ids["analytical-platform-data-production"]}:key/2855ac30-4e14-482e-85ca-53258e01f64c"
       datasync_opg_target_bucket_kms      = "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["analytical-platform-data-production"]}:key/96eb04fe-8393-402c-b1f9-71fcece99e75"
@@ -114,8 +119,8 @@ locals {
           cidr_blocks = ["185.157.224.141/32", "185.157.225.141/32"]
         }
         "maat-xhibit" = {
-          ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCuB8p8OaxeX3sILMVUQcD48XBPuVLzddUixUUbYLS1WPiEUz7XcUkozeuhulIy9CzqA9yyAa2uPWhQr3KL2bKpXo8UIJr+3n51mjJp9V+LO65kMN5ewQHzx9phpZba5UOth1aEwn4vAFQwm2q6/ydNrJtRQeaI0DT4njaf0MC9FM/nu25IvUbl2dzUn2MX7/WuMouzcYXTeiLUIMvgRoAw4pjnCmU2AuPTokC7OynFh++SiHRUw6OwNKxqORv3du7qlfcGDWx+oAHbUVOnSaTrUssUuEXPFS5ytwWEp6GpzfZpNvD7Kj7gw/7ntpdTckh+d5INJHu+2L74Ytj2RPLNoHEB9t1ptEI2d2SeKpHqPSak2uQzk4aHV2SJs4IO0omTWKHojtSxo5gxAl4B58UjdzmFn0yNr3rJbKnn2w1H7viaM/0vWRgZrtgo07pd2uJePObaUE9jf1re+woasVWJAy3v9dZszVBcJ62NK/QU3cGfUncBw2OnnDURm7z1YVAj8mrReOkZWFA7nJ4/Gzh5pR8wNhnSLsDFqsQefaQiHBi2vZzDRqaUu03eWvd8BmomWC5joT7qqY8Qv+X5boO9CI0hX9FcoJJMXJwckoVAZGuZKgOwOL4y1Y7hpCO1U5ex9mbyMy5D5r/FNf7B85d/qCxcGwesIzI1b0QRupKxDw=="
-          cidr_blocks = ["20.49.168.141/32", "20.49.168.17/32", "51.11.124.149/32", "51.11.124.158/32"]
+          ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCv0uvBvf9oxSRIDImfzK7PlLAbgZ6U6vNSGuP7/7WoyGr43kBi7IrRQHq3KTxZ5s9ps9WbF2WSftiV45I8TzYh6Wk9sO2E7KuJnweie6Ls8qbldYWIo7rnZAKCu6P3aE8RzH8oM95+R8u4nBKa1L51it/CxLh2XeBCxJHik4ofeMUku+1pxWHrS+t4/Nch3TAKbjMZ4qiskQFUrrrfov3iH85xpupGD0c0UgPvdM2TFYbgclL9J+T8Vay2DO00Fcq69GTG1NZrptUy4JFIjPqPl1LrfNq4v/TVx5JK7cOc75Q0PBks53BHirzUavnPi1hUrwjLnzEfC8/nMeMWDxXLMOdebQcGbWQ3TtKwytj5wJ/LVXBLwG+nIS+p5mkeJugeu2R3v4wcKImXra1o0efNYSlzloHEA6Pv7uwBXYnA4b/M35x8Acta0rgoInbsrPlooHMPEH6jmjvc5BdR6eaB2sILLUdwF70JUmxNUtFMGku+D7+9xXnPExnRZAzugFSANYBcn1G9y25POD7DlLE6LRUvaka7iuaqLHLuM8nmUpZBfRpbLIo0R10xMztrWkHFVniyKvGW6NQwXxG7sm3U69T+NF9fmknkAxHAJezRoEPnr8RMzaY/JTI/AwAoqyIF3FUI2Mjr3q6oKT4kXXO4qdwftmF6G8lMA9366xQpjw=="
+          cidr_blocks = ["20.50.108.242/32", "20.50.109.148/32", "51.11.124.205/32", "51.11.124.216/32"]
         }
         "opg-restore-ocr" = {
           ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCWz7ue/saomMAKrVgo6FifjpGQfl7B4fs2s/MJa2jhpBVWXk9tquGDXp1/Yfk4C7FIneGKfh8fWHz9FPS+u6h3a9hMW8d/5onNuSr9S6T2mN7ydZQzGez5qyG2vNFLyip3ls6mQjIpXSo2aow7+3Y2lbDe8UamiYNVgvvWB+hVl5RJjcaReDDbi0xwdjGjep0LcvgAyKa8evmcEbFVkrLhWyc30xn1+OesqPWSpoIb/IlBDFxCqR46GW/zlOldEIatONhXWgvJ6dS5T1YmHsE4U0Py3BV8O5zvc+XRYjr/3w9LOwmTHS1xbzlhNBjO1o6O9hSBsowBjsWLL5aNWcdBH0DiWfIWkoq9Fy8VEAa/T5v7GCaKvDs9pGBpjQSQsWyKXbwP0Z2RGyU2CSGVzMM6gzrjaxanOK9QbLOqCpTSSIYWfokt+MNrHcQU+9mBTjq20URF7RW6tsM8GvzGRNk0hlkX3ueq86uLpQzRctGBTjN74qBba0WbauIcSl4OIrc+NEwjaFTmuIs0NIG5aoAop8WHOC8cxFAST2XjMF30eEh6/W9Gh0uPor4L5tUqJ/JuI2wcfYLuk1KLDcOUVin79QficX93zbaTPNXWW052ct50B0KnCmZyvQORwOH8gBFgkFe5MO/bqevG9Xpof/QvpCLKEON/fBAW4bEdIIv5qw=="
@@ -126,8 +131,12 @@ locals {
           cidr_blocks = ["51.140.183.67/32"]
         }
         "sscl-epm" = {
-          ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAgEAwR+f0bWWgM4c14HUgk5gFhy8vu2Jv3y7sOiUa0trgEt4ZVOqs2yueRoEtOj3aQF9dHzYkGmZ6ElaUZtg5z/6p7yzNfjZ/eYcDo7Wkz8rclhvUu/Qz2rR9z2KzYVsCW2eeY6EwS4GbddXc+5bb76ETCCRWuXIKbsEcMGEFuixdo70JDuvxm4jEaqNIC6pswTTOzcP1a8mZp89z7ahZGS1p71owjUsUUOxl+bu4mZ5PdAOc27Hlqiaguc8ytKIiQAWImRxg1OSKs3Ux3CA2ze74K2PWCTiEubT29fZIwkF7tSckhQsnItV+ix9+rcv4Nt8gnWSknNYubxoxi9eT2Somq6LbwaY+MShliHlm9XMnxerqqCruSHk0AZZPhE8QCO8lboMIFOBxlEuG6tgZV4Uob2BAMaEhHFDrFG4MAAKR5vO3dPVR4ANjRsJzb96cOZVb+oLprTfY6JkjyJM3PhdAgZtUVbshdTDizHTbyNqu0LU4DTcY5JtPn1wm5LR2PoLudKwxxb2CUNAaZS1TklOcy7RinPuVg49Rg2HQS+7wyIK9KrFrkNNwARPW4y5FgQv5dov+KAiAm7+xwcga5Fksp25khDuzStMSrE2J3ZOyN0c7TzXiQb7sFleGN10vVmOuzLWIWjUvkRGthBRwLiOC54AHcXXm6SP92GX0XYQTb8="
+          ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAgEAxpUtdJvUtfsqGm0+haTq9Jjx8TSaEtESUXaefwBRXrAx6o53ZgbMM7Eq083ziBGriVh0lBsCjvU9XJg4HP68MLm0dOgZd1jooEL3jufn8AijIIUKF9pftdkMBd2fq2r7TO+XWsrYvs6SFryDj/h9jViWapUhTUk36GALYlk1JOMI4Kh/bkC/cj4cNjFZG5+F4+WgI67J4I3/ItOjNDAsTfVHBhK86w3rcy3n3CynGqfLzCEt0aGdBuDk+gntHBoLpMkTjKmG/nMwNqpeR7WlFUu/GyWhSc6Q1yljBVjNSVt7ktfd2fFZz/FWvAMJ/uIJhZaP0ARS+Wk0dbXYpgIxEjtIUxSJLjlkNfTbETgjzcJS27GPAc8DDHkFpNS/uYQ7PEYJjakbtgzHflS7eeUvWfQjCL/Ie2EHlAi853iKOeb74scdJhm6gl1YM6Q1a+ZhSF+7bSeScnxhwoqrJrvOI0LuvDA/zrlWFUUI0Wudip1mEyECCt7KCUz6pUT1W3sgJ1wBi84VxZM+emhU7MR7hd8avslrRdsUDQgVBjfpb0NToSnAbbtY6Y/8wI6r8/1nmXZ1YuNzmgumk3+0nF9YAiSXvjMK5ioxv+BHsuoFU40LaH0xL0sNe01U5scoK8vYsI0KhjnscsRMV9pUScgVxh3WMm8DKbjytl0lPqyO1dk="
           cidr_blocks = ["51.140.104.41/32"]
+        }
+        "property-concept" = {
+          ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDisbHrQRFCaa5oHvma0V2fFw8sesdhr4Nl17SbFlIlOaM495bJVlVpm3XgojSndPCcn9JvAX6QiWM2DewBuxP9gfD6ZC7HoHonFvECMkxDPV4t6NoiY8FTSiDE7myIGHztiiLKN56poos7x5uPpcstOfmxj7MbVRfWV4snK08unm9pZcemrRBkcs46q8kxxqGHOSfWWQ2Zc0hUnQXQIinzsLEp72NJRDb4nCpS2aIz5mhL2rIqdj5cK1IXUJHD9j6KmA1gMFB5L+oS8geEgLbEOvrfVOCkxe0OdUu4tUETC1ogO+oMBLXB2jnf9nFHkaspBYpot8PfZLxS4rSLUBA1K/UvlWKsfX1HHxCoAHApAA0MU0tmJwGuFSd5jiwOmrwhmu2bIT8eiD1qGtkaStGr12x08hEpL5rZ8xZ9tNTYjCfW7fkbS1YAA6+ZQHprwxIXB+5vRSqO+lMtjQM0v4OwT4cSszMCfqyuNfO6tYuqk28Ht+xe37kLWDV07kyp4oR+YTGcM3+cWnz6NOPsDmqiahXWPwU15NvFjPKdoX45Bc4swsz1UERRUxnZhBF3I72RJEGg1MMkHZFhIHV0mk8hXeWuaozU5299wXbRg3NB9fb2uf3bjgjReqbfkvspms8/ieGDfKDtB4KFQY2ACVfo8NLAkh7Kh0SqaV40NjcOww=="
+          cidr_blocks = ["213.143.153.95/32"]
         }
       }
       transfer_server_sftp_users_with_egress = {
@@ -144,7 +153,7 @@ locals {
           # Without it, it cannot plan
           egress_bucket         = try(module.shared_services_client_team_gov_29148_egress_bucket[0].s3_bucket_id, null)
           egress_bucket_kms_key = try(module.shared_services_client_team_gov_29148_egress_kms[0].key_arn, null)
-        },
+        }
       }
 
       /* DataSync */

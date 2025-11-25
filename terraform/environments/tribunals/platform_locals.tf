@@ -54,4 +54,145 @@ locals {
     "*.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   ]
 
+
+  # After each apply there will be a new CNAME entry which needs to get created by Tony Bishop
+  # in the Route53 which manages these domains. And he will update the main A/CNAME record with the domain name
+  # of the production cloudfront distribution
+  # "ahmlr.gov.uk" is listed as the primary domain of the viewer certificate for this cloudfront-nginx distribution
+  #
+  cloudfront_nginx_prod_sans = [
+    {
+      domain    = "ahmlr.gov.uk"
+      prod_only = false
+    },
+    {
+      domain    = "asylum-support-tribunal.gov.uk"
+      prod_only = false
+    },
+    {
+      domain    = "appeals-service.gov.uk"
+      prod_only = true
+    },
+    {
+      domain    = "carestandardstribunal.gov.uk"
+      prod_only = true
+    },
+    {
+      domain    = "cicap.gov.uk"
+      prod_only = true
+    },
+    {
+      domain    = "civilappeals.gov.uk"
+      prod_only = true
+    },
+    {
+      domain    = "cjit.gov.uk"
+      prod_only = true
+    },
+    {
+      domain    = "cjs.gov.uk"
+      prod_only = true
+    },
+    {
+      domain    = "cjsonline.gov.uk"
+      prod_only = true
+    },
+    {
+      domain    = "complaints.judicialconduct.gov.uk"
+      prod_only = true
+    },
+    {
+      domain    = "courtfunds.gov.uk"
+      prod_only = true
+    },
+    {
+      domain    = "criminal-justice-system.gov.uk"
+      prod_only = true
+    },
+    {
+      domain    = "dugganinquest.independent.gov.uk"
+      prod_only = true
+    },
+    {
+      domain    = "employmentappeals.gov.uk"
+      prod_only = true
+    },
+    {
+      domain    = "financeandtaxtribunals.gov.uk"
+      prod_only = true
+    },
+    {
+      domain    = "hillsboroughinquests.independent.gov.uk"
+      prod_only = true
+    },
+    {
+      domain    = "immigrationservicestribunal.gov.uk"
+      prod_only = true
+    },
+    {
+      domain    = "informationtribunal.gov.uk"
+      prod_only = true
+    },
+    {
+      domain    = "judicialombudsman.gov.uk"
+      prod_only = true
+    },
+    {
+      domain    = "landstribunal.gov.uk"
+      prod_only = true
+    },
+    {
+      domain    = "osscsc.gov.uk"
+      prod_only = true
+    },
+    {
+      domain    = "paroleboard.gov.uk"
+      prod_only = true
+    },
+    {
+      domain    = "transporttribunal.gov.uk"
+      prod_only = true
+    },
+    {
+      domain    = "victiminformationservice.org.uk"
+      prod_only = true
+    },
+    {
+      domain    = "yjbpublications.justice.gov.uk"
+      prod_only = true
+    }
+  ]
+
+  # Build an array list from the above list of objects (needed for the sans_map)
+  cloudfront_nginx_prod_sans_list = [
+    for d in local.cloudfront_nginx_prod_sans : d.domain
+  ]
+
+  # This array is dynamically built from the above production sans, but prefixes each one with the environment name
+  cloudfront_nginx_nonprod_sans = [
+    for d in local.cloudfront_nginx_prod_sans : "${local.environment}.${d.domain}"
+    if !d.prod_only
+  ]
+
+  # This map will either contain the prod, dev or preprod SANS during the plan/apply stage
+  # This map is used to assign the aliases for the certificate and the distribution below.
+  cloudfront_sans_map = {
+    production    = local.cloudfront_nginx_prod_sans_list
+    development   = local.cloudfront_nginx_nonprod_sans
+    preproduction = local.cloudfront_nginx_nonprod_sans
+  }
+
+  # Final SANs to apply to cert or distribution. Pull the entry from the above map dependent on environment
+  cloudfront_nginx_sans = lookup(local.cloudfront_sans_map, local.environment, [])
+
+  #TODO Check these 3 domains with Tony Bishop. They seem to be delegated to alternate NS or a static ip address
+  pending_cloudfront_nginx_sans = [
+    "courtfines.justice.gov.uk",
+    "obr.co.uk",
+    "sendmoneytoaprisoner.justice.gov.uk",
+  ]
+
+
+  cloudfront_distribution_id = var.lookup_cloudfront_distribution ? data.aws_ssm_parameter.cloudfront_distribution_id[0].value : null
+
 }

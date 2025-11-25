@@ -2,6 +2,9 @@
 # Lambda Functions, Permissions Statement and Zipped Archive Statements
 #######################################################################
 
+# Old Lambda functions to be decommissioned
+
+/*
 #########################
 # Development Environment
 #########################
@@ -14,6 +17,7 @@ resource "aws_lambda_function" "terraform_lambda_func_terminate_cpu_process_dev"
   # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
   # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing not required"
   count                          = local.is-development == true ? 1 : 0
+  description                    = "Function to terminate an application process due to high CPU utilisation on an EC2 instance."
   s3_bucket                      = "moj-infrastructure-dev"
   s3_key                         = "lambda/functions/terminate_cpu_process_dev.zip"
   function_name                  = "terminate_cpu_process_dev"
@@ -56,6 +60,7 @@ resource "aws_lambda_function" "terraform_lambda_func_send_cpu_notification_dev"
   # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
   # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing not required"
   count                          = local.is-development == true ? 1 : 0
+  description                    = "Function to send an email notification when triggered by high CPU utilisation on an EC2 instance."
   s3_bucket                      = "moj-infrastructure-dev"
   s3_key                         = "lambda/functions/send_cpu_notification_dev.zip"
   function_name                  = "send_cpu_notification_dev"
@@ -98,6 +103,7 @@ resource "aws_lambda_function" "terraform_lambda_func_send_cpu_graph_dev" {
   # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
   # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing temporarily disabled for maintenance purposes"
   count                          = local.is-development == true ? 1 : 0
+  description                    = "Function to retrieve, graph and email CPU utilisation on an EC2 instance."
   s3_bucket                      = "moj-infrastructure-dev"
   s3_key                         = "lambda/functions/send_cpu_graph_dev.zip"
   function_name                  = "send_cpu_graph_dev"
@@ -137,6 +143,55 @@ resource "aws_cloudwatch_log_group" "lambda_send_cpu_graph_dev_log_group" {
   retention_in_days = 30
 }
 
+##################################################
+# Lambda Function to analyse WAF ACL traffic - DEV
+##################################################
+
+resource "aws_lambda_function" "terraform_lambda_func_wam_waf_analysis_dev" {
+  # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
+  # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing temporarily disabled for maintenance purposes"
+  count                          = local.is-development == true ? 1 : 0
+  description                    = "Function to analyse WAM WAF ACL traffic and email a report."
+  s3_bucket                      = "moj-infrastructure-dev"
+  s3_key                         = "lambda/functions/wam_waf_analysis_dev.zip"
+  function_name                  = "wam_waf_analysis_dev"
+  role                           = aws_iam_role.lambda_role_get_cloudwatch_dev[0].arn
+  handler                        = "wam_waf_analysis_dev.lambda_handler"
+  runtime                        = "python3.12"
+  timeout                        = 300
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policies_get_cloudwatch_dev]
+  reserved_concurrent_executions = 5
+  dead_letter_config {
+    target_arn = aws_sqs_queue.lambda_queue_dev[0].arn
+  }
+  tracing_config {
+    mode = "Active"
+  }
+  layers = [
+    "arn:aws:lambda:eu-west-2:${data.aws_ssm_parameter.klayers_account_dev[0].value}:layer:Klayers-p312-numpy:8",
+    "arn:aws:lambda:eu-west-2:${data.aws_ssm_parameter.klayers_account_dev[0].value}:layer:Klayers-p312-pillow:1",
+    aws_lambda_layer_version.lambda_layer_requests_dev[0].arn,
+    aws_lambda_layer_version.lambda_layer_matplotlib_dev[0].arn
+  ]
+}
+
+resource "aws_lambda_permission" "allow_lambda_to_query_cloudwatch_wam_waf_analysis_dev" {
+  count         = local.is-development == true ? 1 : 0
+  statement_id  = "AllowAccesstoCloudWatch"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.terraform_lambda_func_wam_waf_analysis_dev[0].function_name
+  principal     = "cloudwatch.amazonaws.com"
+  source_arn    = "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
+}
+
+resource "aws_cloudwatch_log_group" "lambda_wam_waf_analysis_dev_log_group" {
+  # checkov:skip=CKV_AWS_338: "Log group is only required for 30 days."
+  # checkov:skip=CKV_AWS_158: "Log group does not require KMS encryption."
+  count             = local.is-development == true ? 1 : 0
+  name              = "/aws/lambda/wam_waf_analysis_dev"
+  retention_in_days = 30
+}
+
 ###############################################
 # Lambda Function for Security Hub Report - DEV
 ###############################################
@@ -145,6 +200,7 @@ resource "aws_lambda_function" "terraform_lambda_func_securityhub_report_dev" {
   # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
   # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing temporarily disabled for maintenance purposes"
   count                          = local.is-development == true ? 1 : 0
+  description                    = "Function to email a summary of critical CVEs found in AWS Security Hub."
   s3_bucket                      = "moj-infrastructure-dev"
   s3_key                         = "lambda/functions/securityhub_report_dev.zip"
   function_name                  = "securityhub_report_dev"
@@ -178,15 +234,17 @@ resource "aws_cloudwatch_log_group" "lambda_securityhub_report_dev_log_group" {
   name              = "/aws/lambda/securityhub_report_dev"
   retention_in_days = 30
 }
+*/
 
 #######################################
 # Lambda Function for SES Logging - DEV
 #######################################
-
+/*
 resource "aws_lambda_function" "terraform_lambda_func_ses_logging_dev" {
   # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
   # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing temporarily disabled for maintenance purposes"
   count                          = local.is-development == true ? 1 : 0
+  description                    = "Function to allow logging of outgoing emails via SES."
   s3_bucket                      = "moj-infrastructure-dev"
   s3_key                         = "lambda/functions/ses_logging_dev.zip"
   function_name                  = "ses_logging_dev"
@@ -220,7 +278,8 @@ resource "aws_cloudwatch_log_group" "lambda_ses_logging_dev_log_group" {
   name              = "/aws/lambda/ses_logging_dev"
   retention_in_days = 30
 }
-
+*/
+/*
 ###########################
 # Preproduction Environment
 ###########################
@@ -233,6 +292,7 @@ resource "aws_lambda_function" "terraform_lambda_func_terminate_cpu_process_uat"
   # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
   # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing not required"
   count                          = local.is-preproduction == true ? 1 : 0
+  description                    = "Function to terminate an application process due to high CPU utilisation on an EC2 instance."
   s3_bucket                      = "moj-infrastructure-uat"
   s3_key                         = "lambda/functions/terminate_cpu_process_uat.zip"
   function_name                  = "terminate_cpu_process_uat"
@@ -275,6 +335,7 @@ resource "aws_lambda_function" "terraform_lambda_func_send_cpu_notification_uat"
   # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
   # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing not required"
   count                          = local.is-preproduction == true ? 1 : 0
+  description                    = "Function to send an email notification when triggered by high CPU utilisation on an EC2 instance."
   s3_bucket                      = "moj-infrastructure-uat"
   s3_key                         = "lambda/functions/send_cpu_notification_uat.zip"
   function_name                  = "send_cpu_notification_uat"
@@ -317,6 +378,7 @@ resource "aws_lambda_function" "terraform_lambda_func_securityhub_report_uat" {
   # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
   # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing temporarily disabled for maintenance purposes"
   count                          = local.is-preproduction == true ? 1 : 0
+  description                    = "Function to email a summary of critical CVEs found in AWS Security Hub."
   s3_bucket                      = "moj-infrastructure-uat"
   s3_key                         = "lambda/functions/securityhub_report_uat.zip"
   function_name                  = "securityhub_report_uat"
@@ -359,6 +421,7 @@ resource "aws_lambda_function" "terraform_lambda_func_ses_logging_uat" {
   # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
   # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing temporarily disabled for maintenance purposes"
   count                          = local.is-preproduction == true ? 1 : 0
+  description                    = "Function to allow logging of outgoing emails via SES."
   s3_bucket                      = "moj-infrastructure-uat"
   s3_key                         = "lambda/functions/ses_logging_uat.zip"
   function_name                  = "ses_logging_uat"
@@ -407,6 +470,7 @@ resource "aws_lambda_function" "terraform_lambda_disable_cpu_alarm_prod" {
   # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
   # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing not required"
   count                          = local.is-production == true ? 1 : 0
+  description                    = "Function to disable Cloudwatch CPU alerts."
   s3_bucket                      = "moj-infrastructure"
   s3_key                         = "lambda/functions/disable_cpu_alarm_prod.zip"
   function_name                  = "disable_cpu_alarm_prod"
@@ -441,6 +505,7 @@ resource "aws_lambda_function" "terraform_lambda_enable_cpu_alarm_prod" {
   # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
   # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing not required"
   count                          = local.is-production == true ? 1 : 0
+  description                    = "Function to enable Cloudwatch CPU alerts."
   s3_bucket                      = "moj-infrastructure"
   s3_key                         = "lambda/functions/enable_cpu_alarm_prod.zip"
   function_name                  = "enable_cpu_alarm_prod"
@@ -473,6 +538,7 @@ resource "aws_lambda_function" "terraform_lambda_func_terminate_cpu_process_prod
   # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
   # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing not required"
   count                          = local.is-production == true ? 1 : 0
+  description                    = "Function to terminate an application process due to high CPU utilisation on an EC2 instance."
   s3_bucket                      = "moj-infrastructure"
   s3_key                         = "lambda/functions/terminate_cpu_process_prod.zip"
   function_name                  = "terminate_cpu_process_prod"
@@ -515,6 +581,7 @@ resource "aws_lambda_function" "terraform_lambda_func_send_cpu_notification_prod
   # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
   # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing not required"
   count                          = local.is-production == true ? 1 : 0
+  description                    = "Function to send an email notification when triggered by high CPU utilisation on an EC2 instance."
   s3_bucket                      = "moj-infrastructure"
   s3_key                         = "lambda/functions/send_cpu_notification_prod.zip"
   function_name                  = "send_cpu_notification_prod"
@@ -558,6 +625,7 @@ resource "aws_lambda_function" "terraform_lambda_func_send_cpu_graph_prod" {
   # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing temporarily disabled for maintenance purposes"
   # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing not required"
   count                          = local.is-production == true ? 1 : 0
+  description                    = "Function to retrieve, graph and email CPU utilisation on an EC2 instance."
   s3_bucket                      = "moj-infrastructure"
   s3_key                         = "lambda/functions/send_cpu_graph_prod.zip"
   function_name                  = "send_cpu_graph_prod"
@@ -611,6 +679,7 @@ resource "aws_lambda_function" "terraform_lambda_func_ppud_email_report_prod" {
   # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing temporarily disabled for maintenance purposes"
   # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing not required"
   count                          = local.is-production == true ? 1 : 0
+  description                    = "Function to analyse, graph and email the email usage on the smtp mail relays."
   s3_bucket                      = "moj-infrastructure"
   s3_key                         = "lambda/functions/ppud_email_report_prod.zip"
   function_name                  = "ppud_email_report_prod"
@@ -663,6 +732,7 @@ resource "aws_lambda_function" "terraform_lambda_func_ppud_elb_report_prod" {
   # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing temporarily disabled for maintenance purposes"
   # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing not required"
   count                          = local.is-production == true ? 1 : 0
+  description                    = "Function to retrieve, graph and email the utilisation of the PPUD ELB."
   s3_bucket                      = "moj-infrastructure"
   s3_key                         = "lambda/functions/ppud_elb_report_prod.zip"
   function_name                  = "ppud_elb_report_prod"
@@ -715,6 +785,7 @@ resource "aws_lambda_function" "terraform_lambda_func_wam_elb_report_prod" {
   # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing temporarily disabled for maintenance purposes"
   # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing not required"
   count                          = local.is-production == true ? 1 : 0
+  description                    = "Function to retrieve, graph and email the utilisation of the WAM ELB."
   s3_bucket                      = "moj-infrastructure"
   s3_key                         = "lambda/functions/wam_elb_report_prod.zip"
   function_name                  = "wam_elb_report_prod"
@@ -767,6 +838,7 @@ resource "aws_lambda_function" "terraform_lambda_func_disk_info_report_prod" {
   # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing temporarily disabled for maintenance purposes"
   # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing not required"
   count                          = local.is-production == true ? 1 : 0
+  description                    = "Function to retrieve, format and email a report on the disk utilisation of all Windows EC2 instances."
   s3_bucket                      = "moj-infrastructure"
   s3_key                         = "lambda/functions/disk_info_report_prod.zip"
   function_name                  = "disk_info_report_prod"
@@ -820,6 +892,7 @@ resource "aws_lambda_function" "terraform_lambda_func_securityhub_report_prod" {
   # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing temporarily disabled for maintenance purposes"
   # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing not required"
   count                          = local.is-production == true ? 1 : 0
+  description                    = "Function to email a summary of critical CVEs found in AWS Security Hub."
   s3_bucket                      = "moj-infrastructure"
   s3_key                         = "lambda/functions/securityhub_report_prod.zip"
   function_name                  = "securityhub_report_prod"
@@ -867,6 +940,7 @@ resource "aws_lambda_function" "terraform_lambda_func_ppud_elb_trt_data_prod" {
   # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing temporarily disabled for maintenance purposes"
   # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing not required"
   count                          = local.is-production == true ? 1 : 0
+  description                    = "Function to retrieve PPUD ELB target response time data from Cloudwatch and send it to S3."
   s3_bucket                      = "moj-infrastructure"
   s3_key                         = "lambda/functions/ppud_elb_trt_data_prod.zip"
   function_name                  = "ppud_elb_trt_data_prod"
@@ -914,6 +988,7 @@ resource "aws_lambda_function" "terraform_lambda_func_ppud_elb_trt_calculate_pro
   # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing temporarily disabled for maintenance purposes"
   # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing not required"
   count                          = local.is-production == true ? 1 : 0
+  description                    = "Function to retrieve PPUD ELB target response time data from S3, calculate the monthly average target response time and email a report to end users."
   s3_bucket                      = "moj-infrastructure"
   s3_key                         = "lambda/functions/ppud_elb_trt_calculate_prod.zip"
   function_name                  = "ppud_elb_trt_calculate_prod"
@@ -961,6 +1036,7 @@ resource "aws_lambda_function" "terraform_lambda_func_ppud_elb_uptime_data_prod"
   # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing temporarily disabled for maintenance purposes"
   # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing not required"
   count                          = local.is-production == true ? 1 : 0
+  description                    = "Function to retrieve PPUD ELB uptime data from Cloudwatch and send it to S3."
   s3_bucket                      = "moj-infrastructure"
   s3_key                         = "lambda/functions/ppud_elb_uptime_data_prod.zip"
   function_name                  = "ppud_elb_uptime_data_prod"
@@ -1008,6 +1084,7 @@ resource "aws_lambda_function" "terraform_lambda_func_ppud_elb_uptime_calculate_
   # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing temporarily disabled for maintenance purposes"
   # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing not required"
   count                          = local.is-production == true ? 1 : 0
+  description                    = "Function to retrieve PPUD ELB uptime data from S3, calculate the monthly average uptime and email a report to end users."
   s3_bucket                      = "moj-infrastructure"
   s3_key                         = "lambda/functions/ppud_elb_uptime_calculate_prod.zip"
   function_name                  = "ppud_elb_uptime_calculate_prod"
@@ -1055,6 +1132,7 @@ resource "aws_lambda_function" "terraform_lambda_func_ppud_elb_trt_graph_prod" {
   # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing temporarily disabled for maintenance purposes"
   # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing not required"
   count                          = local.is-production == true ? 1 : 0
+  description                    = "Function to retrieve PPUD ELB daily target response time data from Cloudwatch, graph it and email it to end users."
   s3_bucket                      = "moj-infrastructure"
   s3_key                         = "lambda/functions/ppud_elb_trt_graph_prod.zip"
   function_name                  = "ppud_elb_trt_graph_prod"
@@ -1107,6 +1185,7 @@ resource "aws_lambda_function" "terraform_lambda_func_wam_elb_trt_graph_prod" {
   # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing temporarily disabled for maintenance purposes"
   # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing not required"
   count                          = local.is-production == true ? 1 : 0
+  description                    = "Function to retrieve WAM ELB daily target response time data from Cloudwatch, graph it and email it to end users."
   s3_bucket                      = "moj-infrastructure"
   s3_key                         = "lambda/functions/wam_elb_trt_graph_prod.zip"
   function_name                  = "wam_elb_trt_graph_prod"
@@ -1158,6 +1237,7 @@ resource "aws_cloudwatch_log_group" "lambda_wam_elb_trt_graph_prod_log_group" {
 resource "aws_lambda_function" "terraform_lambda_func_wam_web_traffic_analysis_prod" {
   # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing not required"
   count                          = local.is-production == true ? 1 : 0
+  description                    = "Function to analyse IIS logs from S3, format the data and output a report in Excel to S3."
   s3_bucket                      = "moj-infrastructure"
   s3_key                         = "lambda/functions/wam_web_traffic_analysis_prod.zip"
   function_name                  = "wam_web_traffic_analysis_prod"
@@ -1202,3 +1282,4 @@ resource "aws_cloudwatch_log_group" "lambda_wam_web_traffic_analysis_prod_log_gr
   name              = "/aws/lambda/wam_web_traffic_analysis_prod"
   retention_in_days = 30
 }
+*/

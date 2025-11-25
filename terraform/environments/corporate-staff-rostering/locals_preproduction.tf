@@ -19,10 +19,199 @@ locals {
         start          = "-PT6H"
         widget_groups = [
           module.baseline_presets.cloudwatch_dashboard_widget_groups.network_lb,
+          local.cloudwatch_dashboard_widget_groups.all_ec2,
           local.cloudwatch_dashboard_widget_groups.db,
           local.cloudwatch_dashboard_widget_groups.app,
           local.cloudwatch_dashboard_widget_groups.web,
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ssm_command,
+        ]
+      }
+      "pp-csr-db-a" = {
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          {
+            width         = 8
+            height        = 8
+            search_filter = { ec2_tag = [{ tag_name = "Name", tag_value = "pp-csr-db-a" }] }
+            widgets = [
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.cpu-utilization-high,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.network-in-bandwidth,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.network-out-bandwidth,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.instance-status-check-failed,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.system-status-check-failed,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.attached-ebs-status-check-failed,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.free-disk-space-low,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.high-memory-usage,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.cpu-iowait-high,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_instance_cwagent_linux.free-disk-space-low,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_service_status_os.service-status-error-os-layer,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_service_status_app.service-status-error-app-layer,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_oracle_db_connected.oracle-db-disconnected,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_oracle_db_backup.oracle-db-rman-backup-error,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_oracle_db_backup.oracle-db-rman-backup-did-not-run,
+            ]
+          },
+          {
+            header_markdown = "## EBS PERFORMANCE"
+            width           = 8
+            height          = 8
+            add_ebs_widgets = { iops = true, throughput = true }
+            search_filter   = { ec2_tag = [{ tag_name = "Name", tag_value = "pp-csr-db-a" }] }
+            widgets         = []
+          }
+        ]
+      }
+      "Training-AB" = {
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          merge(module.baseline_presets.cloudwatch_dashboard_widget_groups.network_lb, {
+            search_filter_dimension = {
+              name   = "LoadBalancer"
+              values = ["net/trainab-lb/57b605d35d621314"]
+            }
+          }),
+          merge(local.cloudwatch_dashboard_widget_groups.all_windows_ec2, {
+            search_filter = {
+              ec2_tag = [
+                { tag_name = "Name", tag_value = "pp-csr-a-15-a" },
+                { tag_name = "Name", tag_value = "pp-csr-a-16-b" },
+                { tag_name = "Name", tag_value = "pp-csr-w-3-a" },
+                { tag_name = "Name", tag_value = "pp-csr-w-4-b" },
+              ]
+            }
+          }),
+          merge(local.cloudwatch_dashboard_widget_groups.app, {
+            header_markdown = "## EC2 APP pp-csr-a-15-a"
+            search_filter   = { ec2_tag = [{ tag_name = "Name", tag_value = "pp-csr-a-15-a" }, ] }
+          }),
+          merge(local.cloudwatch_dashboard_widget_groups.app, {
+            header_markdown = "## EC2 APP pp-csr-a-16-b"
+            search_filter   = { ec2_tag = [{ tag_name = "Name", tag_value = "pp-csr-a-16-b" }, ] }
+          }),
+          merge(local.cloudwatch_dashboard_widget_groups.web, {
+            header_markdown = "## EC2 WEB pp-csr-w-3-a"
+            search_filter   = { ec2_tag = [{ tag_name = "Name", tag_value = "pp-csr-w-3-a" }, ] }
+          }),
+          merge(local.cloudwatch_dashboard_widget_groups.web, {
+            header_markdown = "## EC2 WEB pp-csr-w-4-b"
+            search_filter   = { ec2_tag = [{ tag_name = "Name", tag_value = "pp-csr-w-4-b" }, ] }
+          }),
+        ]
+      }
+      "Region-12" = {
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          merge(module.baseline_presets.cloudwatch_dashboard_widget_groups.network_lb, {
+            search_filter_dimension = {
+              name   = "LoadBalancer"
+              values = ["net/r12-lb/21254f32e3141a72"]
+            }
+          }),
+          merge(local.cloudwatch_dashboard_widget_groups.all_windows_ec2, {
+            search_filter = {
+              ec2_tag = [
+                { tag_name = "Name", tag_value = "pp-csr-a-13-a" },
+                { tag_name = "Name", tag_value = "pp-csr-a-14-b" },
+                { tag_name = "Name", tag_value = "pp-csr-w-1-a" },
+                { tag_name = "Name", tag_value = "pp-csr-w-2-b" },
+              ]
+            }
+          }),
+          merge(local.cloudwatch_dashboard_widget_groups.app, {
+            header_markdown = "## EC2 APP pp-csr-a-13-a"
+            search_filter   = { ec2_tag = [{ tag_name = "Name", tag_value = "pp-csr-a-13-a" }, ] }
+          }),
+          merge(local.cloudwatch_dashboard_widget_groups.app, {
+            header_markdown = "## EC2 APP pp-csr-a-14-b"
+            search_filter   = { ec2_tag = [{ tag_name = "Name", tag_value = "pp-csr-a-14-b" }, ] }
+          }),
+          merge(local.cloudwatch_dashboard_widget_groups.web, {
+            header_markdown = "## EC2 WEB pp-csr-w-1-a"
+            search_filter   = { ec2_tag = [{ tag_name = "Name", tag_value = "pp-csr-w-1-a" }, ] }
+          }),
+          merge(local.cloudwatch_dashboard_widget_groups.web, {
+            header_markdown = "## EC2 WEB pp-csr-w-2-b"
+            search_filter   = { ec2_tag = [{ tag_name = "Name", tag_value = "pp-csr-w-2-b" }, ] }
+          }),
+        ]
+      }
+      "Region-34" = {
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          merge(module.baseline_presets.cloudwatch_dashboard_widget_groups.network_lb, {
+            search_filter_dimension = {
+              name   = "LoadBalancer"
+              values = ["net/r34-lb/68e6dd59c2be8191"]
+            }
+          }),
+          merge(local.cloudwatch_dashboard_widget_groups.all_windows_ec2, {
+            search_filter = {
+              ec2_tag = [
+                { tag_name = "Name", tag_value = "pp-csr-a-17-a" },
+                { tag_name = "Name", tag_value = "pp-csr-a-18-b" },
+                { tag_name = "Name", tag_value = "pp-csr-w-5-a" },
+                { tag_name = "Name", tag_value = "pp-csr-w-6-b" },
+              ]
+            }
+          }),
+          merge(local.cloudwatch_dashboard_widget_groups.app, {
+            header_markdown = "## EC2 APP pp-csr-a-17-a"
+            search_filter   = { ec2_tag = [{ tag_name = "Name", tag_value = "pp-csr-a-17-a" }, ] }
+          }),
+          merge(local.cloudwatch_dashboard_widget_groups.app, {
+            header_markdown = "## EC2 APP pp-csr-a-18-b"
+            search_filter   = { ec2_tag = [{ tag_name = "Name", tag_value = "pp-csr-a-18-b" }, ] }
+          }),
+          merge(local.cloudwatch_dashboard_widget_groups.web, {
+            header_markdown = "## EC2 WEB pp-csr-w-5-a"
+            search_filter   = { ec2_tag = [{ tag_name = "Name", tag_value = "pp-csr-w-5-a" }, ] }
+          }),
+          merge(local.cloudwatch_dashboard_widget_groups.web, {
+            header_markdown = "## EC2 WEB pp-csr-w-6-b"
+            search_filter   = { ec2_tag = [{ tag_name = "Name", tag_value = "pp-csr-w-6-b" }, ] }
+          }),
+        ]
+      }
+      "Region-56" = {
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          merge(module.baseline_presets.cloudwatch_dashboard_widget_groups.network_lb, {
+            search_filter_dimension = {
+              name   = "LoadBalancer"
+              values = ["net/r56-lb/03592fb6b2d16269"]
+            }
+          }),
+          merge(local.cloudwatch_dashboard_widget_groups.all_windows_ec2, {
+            search_filter = {
+              ec2_tag = [
+                { tag_name = "Name", tag_value = "pp-csr-a-2-b" },
+                { tag_name = "Name", tag_value = "pp-csr-a-3-a" },
+                { tag_name = "Name", tag_value = "pp-csr-w-7-a" },
+                { tag_name = "Name", tag_value = "pp-csr-w-8-b" },
+              ]
+            }
+          }),
+          merge(local.cloudwatch_dashboard_widget_groups.app, {
+            header_markdown = "## EC2 APP pp-csr-a-2-b"
+            search_filter   = { ec2_tag = [{ tag_name = "Name", tag_value = "pp-csr-a-2-b" }, ] }
+          }),
+          merge(local.cloudwatch_dashboard_widget_groups.app, {
+            header_markdown = "## EC2 APP pp-csr-a-3-a"
+            search_filter   = { ec2_tag = [{ tag_name = "Name", tag_value = "pp-csr-a-3-a" }, ] }
+          }),
+          merge(local.cloudwatch_dashboard_widget_groups.web, {
+            header_markdown = "## EC2 WEB pp-csr-w-7-a"
+            search_filter   = { ec2_tag = [{ tag_name = "Name", tag_value = "pp-csr-w-7-a" }, ] }
+          }),
+          merge(local.cloudwatch_dashboard_widget_groups.web, {
+            header_markdown = "## EC2 WEB pp-csr-w-8-b"
+            search_filter   = { ec2_tag = [{ tag_name = "Name", tag_value = "pp-csr-w-8-b" }, ] }
+          }),
         ]
       }
     }
@@ -68,7 +257,8 @@ locals {
           "/dev/sdb"  = { type = "gp3", size = 56 }
         }
         instance = merge(local.ec2_instances.app.instance, {
-          instance_type = "m5.2xlarge"
+          # instance_type = "m5.2xlarge" # TM-1672
+          instance_type = "r7i.xlarge"
         })
         tags = merge(local.ec2_instances.app.tags, {
           ami                 = "pp-csr-a-13-a"
@@ -90,7 +280,8 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 56 }
         }
         instance = merge(local.ec2_instances.app.instance, {
-          instance_type = "m5.2xlarge"
+          # instance_type = "m5.2xlarge" # TM-1672
+          instance_type = "r7i.xlarge"
         })
         tags = merge(local.ec2_instances.app.tags, {
           ami                 = "pp-csr-a-14-b"
@@ -112,7 +303,8 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 128 }
         }
         instance = merge(local.ec2_instances.app.instance, {
-          instance_type = "m5.2xlarge"
+          # instance_type = "m5.2xlarge" # TM-1672
+          instance_type = "r7i.xlarge"
         })
         tags = merge(local.ec2_instances.app.tags, {
           ami                 = "pp-csr-a-17-a"
@@ -134,7 +326,8 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 128 }
         }
         instance = merge(local.ec2_instances.app.instance, {
-          instance_type = "m5.2xlarge"
+          # instance_type = "m5.2xlarge" # TM-1672
+          instance_type = "r7i.xlarge"
         })
         tags = merge(local.ec2_instances.app.tags, {
           ami                 = "pp-csr-a-18-b"
@@ -154,7 +347,8 @@ locals {
           "/dev/sdb"  = { type = "gp3", size = 56 }
         }
         instance = merge(local.ec2_instances.app.instance, {
-          instance_type = "m5.2xlarge"
+          # instance_type = "m5.2xlarge" # TM-1672
+          instance_type = "r7i.xlarge"
         })
         tags = merge(local.ec2_instances.app.tags, {
           ami                 = "pp-csr-a-2-b"
@@ -174,7 +368,8 @@ locals {
           "/dev/sdb"  = { type = "gp3", size = 56 }
         }
         instance = merge(local.ec2_instances.app.instance, {
-          instance_type = "m5.2xlarge"
+          # instance_type = "m5.2xlarge" # TM-1672
+          instance_type = "r7i.xlarge"
         })
         tags = merge(local.ec2_instances.app.tags, {
           ami                 = "pp-csr-a-3-a"
@@ -240,7 +435,8 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 129 }
         }
         instance = merge(local.ec2_instances.web.instance, {
-          instance_type = "m5.2xlarge"
+          # instance_type = "m5.2xlarge" # TM-1672
+          instance_type = "r7i.large"
         })
         tags = merge(local.ec2_instances.web.tags, {
           ami                 = "PPCWW00001"
@@ -262,7 +458,8 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 129 }
         }
         instance = merge(local.ec2_instances.web.instance, {
-          instance_type = "m5.2xlarge"
+          # instance_type = "m5.2xlarge" # TM-1672
+          instance_type = "r7i.large"
         })
         tags = merge(local.ec2_instances.web.tags, {
           ami                 = "pp-csr-w-2-b"
@@ -283,7 +480,8 @@ locals {
           "/dev/sdc"  = { type = "gp3", size = 129 }
         }
         instance = merge(local.ec2_instances.web.instance, {
-          instance_type = "m5.2xlarge"
+          # instance_type = "m5.2xlarge" # TM-1672
+          instance_type = "r7i.large"
         })
         tags = merge(local.ec2_instances.web.tags, {
           ami                 = "PPCWW00005"
@@ -305,7 +503,8 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 129 }
         }
         instance = merge(local.ec2_instances.web.instance, {
-          instance_type = "m5.2xlarge"
+          # instance_type = "m5.2xlarge" # TM-1672
+          instance_type = "r7i.large"
         })
         tags = merge(local.ec2_instances.web.tags, {
           ami                 = "pp-csr-w-6-b"
@@ -325,7 +524,8 @@ locals {
           "/dev/sdb"  = { type = "gp3", size = 56 }
         }
         instance = merge(local.ec2_instances.web.instance, {
-          instance_type = "m5.2xlarge"
+          # instance_type = "m5.2xlarge" # TM-1672
+          instance_type = "r7i.large"
         })
         tags = merge(local.ec2_instances.web.tags, {
           ami                 = "pp-csr-w-8-b" # rebuilt using pp-csr-w-8-b AMI
@@ -345,7 +545,8 @@ locals {
           "/dev/sdb"  = { type = "gp3", size = 56 }
         }
         instance = merge(local.ec2_instances.web.instance, {
-          instance_type = "m5.2xlarge"
+          # instance_type = "m5.2xlarge" # TM-1672
+          instance_type = "r7i.large"
         })
         tags = merge(local.ec2_instances.web.tags, {
           ami                 = "pp-csr-w-8-b"

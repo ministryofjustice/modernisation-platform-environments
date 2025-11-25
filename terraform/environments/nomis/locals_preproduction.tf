@@ -2,7 +2,7 @@ locals {
 
   lb_maintenance_message_preproduction = {
     maintenance_title   = "Prison-NOMIS Environment Not Started"
-    maintenance_message = "Lsast weblogic is rarely used so is started on demand. Preprod is available during working hours 7am-7pm. Please contact <a href=\"https://moj.enterprise.slack.com/archives/C6D94J81E\">#ask-digital-studio-ops</a> slack channel if environment is unexpecedly down. See <a href=\"https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4978343956\">confluence</a> for more details"
+    maintenance_message = "Preprod is available during working hours 7am-7pm. Please contact <a href=\"https://moj.enterprise.slack.com/archives/C6D94J81E\">#ask-digital-studio-ops</a> slack channel if environment is unexpectedly down. See <a href=\"https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4978343956\">confluence</a> for more details"
   }
 
   baseline_presets_preproduction = {
@@ -105,7 +105,7 @@ locals {
         })
       })
 
-      # NOT-ACTIVE (green deployment) - for testing Combined Reporting
+      # NOT-ACTIVE (green deployment)
       preprod-nomis-web-b = merge(local.ec2_autoscaling_groups.web, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.web.autoscaling_group, {
           desired_capacity = 0
@@ -137,11 +137,10 @@ locals {
           })
         })
         tags = merge(local.ec2_autoscaling_groups.web.tags, {
-          nomis-environment     = "preprod"
-          oracle-db-hostname-a  = "ppnomis-a.preproduction.nomis.service.justice.gov.uk"
-          oracle-db-hostname-b  = "ppnomis-b.preproduction.nomis.service.justice.gov.uk"
-          oracle-db-name        = "PPCNOM"
-          reporting-environment = "aws"
+          nomis-environment    = "preprod"
+          oracle-db-hostname-a = "ppnomis-a.preproduction.nomis.service.justice.gov.uk"
+          oracle-db-hostname-b = "ppnomis-b.preproduction.nomis.service.justice.gov.uk"
+          oracle-db-name       = "PPCNOM"
         })
       })
 

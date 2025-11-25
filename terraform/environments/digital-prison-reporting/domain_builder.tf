@@ -17,10 +17,10 @@ module "domain_builder_api_key" {
   tags = merge(
     local.all_tags,
     {
-      Resource_Group = "domain-builder"
-      Jira           = "DPR-604"
-      Resource_Type  = "Secret"
-      Name           = "${local.project}-domain-api-key-${local.environment}"
+      dpr-resource-group = "domain-builder"
+      dpr-jira           = "DPR-604"
+      dpr-resource-type  = "Secret"
+      dpr-name           = "${local.project}-domain-api-key-${local.environment}"
     }
   )
 }
@@ -63,10 +63,10 @@ module "domain_builder_backend_Lambda" {
   tags = merge(
     local.all_tags,
     {
-      Resource_Group = "domain-builder"
-      Jira           = "DPR-407"
-      Resource_Type  = "lambda"
-      Name           = local.lambda_dbuilder_name
+      dpr-resource-group = "domain-builder"
+      dpr-jira           = "DPR-407"
+      dpr-resource-type  = "lambda"
+      dpr-name           = local.lambda_dbuilder_name
     }
   )
 
@@ -94,10 +94,10 @@ module "domain_builder_backend_db" {
   tags = merge(
     local.all_tags,
     {
-      Resource_Group = "domain-builder"
-      Jira           = "DPR-407"
-      Resource_Type  = "lambda"
-      Name           = local.rds_dbuilder_name
+      dpr-resource-group = "domain-builder"
+      dpr-jira           = "DPR-407"
+      dpr-resource-type  = "lambda"
+      dpr-name           = local.rds_dbuilder_name
     }
   )
 }
@@ -138,10 +138,10 @@ module "domain_builder_cli_agent" {
   tags = merge(
     local.all_tags,
     {
-      Name           = "${local.project}-domain-builder-agent-${local.env}"
-      Resource_Type  = "EC2 Instance"
-      Resource_Group = "domain-builder"
-      Jira           = "DPR2-XXXX"
+      dpr-name           = "${local.project}-domain-builder-agent-${local.env}"
+      dpr-resource-type  = "EC2 Instance"
+      dpr-resource-group = "domain-builder"
+      dpr-jira           = "DPR2-XXXX"
     }
   )
 
@@ -184,10 +184,10 @@ module "domain_builder_flyway_Lambda" {
   tags = merge(
     local.all_tags,
     {
-      Name           = local.flyway_dbuilder_name
-      Jira           = "DPR-584"
-      Resource_Group = "domain-builder"
-      Resource_Type  = "lambda"
+      dpr-name           = local.flyway_dbuilder_name
+      dpr-jira           = "DPR-584"
+      dpr-resource-group = "domain-builder"
+      dpr-resource-type  = "lambda"
     }
   )
 
@@ -206,9 +206,9 @@ module "domain_builder_gw_vpclink" {
   tags = merge(
     local.all_tags,
     {
-      Resource_Group = "domain-builder"
-      Jira           = "DPR-583"
-      Resource_Type  = "vpc_endpoint"
+      dpr-resource-group = "domain-builder"
+      dpr-jira           = "DPR-583"
+      dpr-resource-type  = "vpc_endpoint"
     }
   )
 }
@@ -229,10 +229,10 @@ module "domain_builder_api_gateway" {
   tags = merge(
     local.all_tags,
     {
-      Name           = "${local.serverless_gw_dbuilder_name}-gw-${local.env}"
-      Resource_Group = "domain-builder"
-      Jira           = "DPR-583"
-      Resource_Type  = "apigateway"
+      dpr-name           = "${local.serverless_gw_dbuilder_name}-gw-${local.env}"
+      dpr-resource-group = "domain-builder"
+      dpr-jira           = "DPR-583"
+      dpr-resource-type  = "apigateway"
     }
   )
 }

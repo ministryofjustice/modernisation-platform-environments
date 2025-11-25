@@ -20,10 +20,125 @@ locals {
         start          = "-PT6H"
         widget_groups = [
           module.baseline_presets.cloudwatch_dashboard_widget_groups.network_lb,
+          local.cloudwatch_dashboard_widget_groups.all_ec2,
           local.cloudwatch_dashboard_widget_groups.db,
           local.cloudwatch_dashboard_widget_groups.app,
           local.cloudwatch_dashboard_widget_groups.web,
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ssm_command,
+        ]
+      }
+      "Region-12" = {
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          merge(module.baseline_presets.cloudwatch_dashboard_widget_groups.network_lb, {
+            search_filter_dimension = {
+              name   = "LoadBalancer"
+              values = ["net/r12-lb/e752b3ad72a3982b"]
+            }
+          }),
+          merge(local.cloudwatch_dashboard_widget_groups.all_windows_ec2, {
+            search_filter = {
+              ec2_tag = [
+                { tag_name = "Name", tag_value = "pd-csr-a-7-a" },
+                { tag_name = "Name", tag_value = "pd-csr-a-8-b" },
+                { tag_name = "Name", tag_value = "pd-csr-w-1-a" },
+                { tag_name = "Name", tag_value = "pd-csr-w-2-b" },
+              ]
+            }
+          }),
+          merge(local.cloudwatch_dashboard_widget_groups.app, {
+            header_markdown = "## EC2 APP pd-csr-a-7-a"
+            search_filter   = { ec2_tag = [{ tag_name = "Name", tag_value = "pd-csr-a-7-a" }, ] }
+          }),
+          merge(local.cloudwatch_dashboard_widget_groups.app, {
+            header_markdown = "## EC2 APP pd-csr-a-8-b"
+            search_filter   = { ec2_tag = [{ tag_name = "Name", tag_value = "pd-csr-a-8-b" }, ] }
+          }),
+          merge(local.cloudwatch_dashboard_widget_groups.web, {
+            header_markdown = "## EC2 WEB pd-csr-w-1-a"
+            search_filter   = { ec2_tag = [{ tag_name = "Name", tag_value = "pd-csr-w-1-a" }, ] }
+          }),
+          merge(local.cloudwatch_dashboard_widget_groups.web, {
+            header_markdown = "## EC2 WEB pd-csr-w-2-b"
+            search_filter   = { ec2_tag = [{ tag_name = "Name", tag_value = "pd-csr-w-2-b" }, ] }
+          }),
+        ]
+      }
+      "Region-34" = {
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          merge(module.baseline_presets.cloudwatch_dashboard_widget_groups.network_lb, {
+            search_filter_dimension = {
+              name   = "LoadBalancer"
+              values = ["net/r34-lb/eaf7c5256cfab30f"]
+            }
+          }),
+          merge(local.cloudwatch_dashboard_widget_groups.all_windows_ec2, {
+            search_filter = {
+              ec2_tag = [
+                { tag_name = "Name", tag_value = "pd-csr-a-9-a" },
+                { tag_name = "Name", tag_value = "pd-csr-a-10-b" },
+                { tag_name = "Name", tag_value = "pd-csr-w-3-a" },
+                { tag_name = "Name", tag_value = "pd-csr-w-4-b" },
+              ]
+            }
+          }),
+          merge(local.cloudwatch_dashboard_widget_groups.app, {
+            header_markdown = "## EC2 APP pd-csr-a-9-a"
+            search_filter   = { ec2_tag = [{ tag_name = "Name", tag_value = "pd-csr-a-9-a" }, ] }
+          }),
+          merge(local.cloudwatch_dashboard_widget_groups.app, {
+            header_markdown = "## EC2 APP pd-csr-a-10-b"
+            search_filter   = { ec2_tag = [{ tag_name = "Name", tag_value = "pd-csr-a-10-b" }, ] }
+          }),
+          merge(local.cloudwatch_dashboard_widget_groups.web, {
+            header_markdown = "## EC2 WEB pd-csr-w-3-a"
+            search_filter   = { ec2_tag = [{ tag_name = "Name", tag_value = "pd-csr-w-3-a" }, ] }
+          }),
+          merge(local.cloudwatch_dashboard_widget_groups.web, {
+            header_markdown = "## EC2 WEB pd-csr-w-4-b"
+            search_filter   = { ec2_tag = [{ tag_name = "Name", tag_value = "pd-csr-w-4-b" }, ] }
+          }),
+        ]
+      }
+      "Region-56" = {
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          merge(module.baseline_presets.cloudwatch_dashboard_widget_groups.network_lb, {
+            search_filter_dimension = {
+              name   = "LoadBalancer"
+              values = ["net/r56-lb/4ed053adbc21b30a"]
+            }
+          }),
+          merge(local.cloudwatch_dashboard_widget_groups.all_windows_ec2, {
+            search_filter = {
+              ec2_tag = [
+                { tag_name = "Name", tag_value = "pd-csr-a-11-a" },
+                { tag_name = "Name", tag_value = "pd-csr-a-12-b" },
+                { tag_name = "Name", tag_value = "pd-csr-w-5-a" },
+                { tag_name = "Name", tag_value = "pd-csr-w-6-b" },
+              ]
+            }
+          }),
+          merge(local.cloudwatch_dashboard_widget_groups.app, {
+            header_markdown = "## EC2 APP pd-csr-a-11-a"
+            search_filter   = { ec2_tag = [{ tag_name = "Name", tag_value = "pd-csr-a-11-a" }, ] }
+          }),
+          merge(local.cloudwatch_dashboard_widget_groups.app, {
+            header_markdown = "## EC2 APP pd-csr-a-12-b"
+            search_filter   = { ec2_tag = [{ tag_name = "Name", tag_value = "pd-csr-a-12-b" }, ] }
+          }),
+          merge(local.cloudwatch_dashboard_widget_groups.web, {
+            header_markdown = "## EC2 WEB pd-csr-w-5-a"
+            search_filter   = { ec2_tag = [{ tag_name = "Name", tag_value = "pd-csr-w-5-a" }, ] }
+          }),
+          merge(local.cloudwatch_dashboard_widget_groups.web, {
+            header_markdown = "## EC2 WEB pd-csr-w-6-b"
+            search_filter   = { ec2_tag = [{ tag_name = "Name", tag_value = "pd-csr-w-6-b" }, ] }
+          }),
         ]
       }
       "pd-csr-db-a" = {

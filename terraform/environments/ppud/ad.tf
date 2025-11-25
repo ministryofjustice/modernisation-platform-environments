@@ -51,11 +51,11 @@ resource "aws_ssm_document" "api_ad_join_domain" {
 # Associate Policy to Development Instance
 resource "aws_ssm_association" "ad_join_domain_association_dev" {
   count      = local.is-development == true ? 1 : 0
-  depends_on = [aws_instance.s609693lo6vw109, aws_instance.s609693lo6vw105, aws_instance.s609693lo6vw104, aws_instance.s609693lo6vw100, aws_instance.s609693lo6vw101, aws_instance.s609693lo6vw103, aws_instance.s609693lo6vw106, aws_instance.s609693lo6vw107, aws_instance.PPUDWEBSERVER2, aws_instance.s609693lo6vw102, aws_instance.s609693lo6vw108, aws_instance.s609693lo6vw110, aws_instance.s609693lo6vw111, aws_instance.s609693lo6vw112, aws_instance.s609693lo6vw113]
+  depends_on = [aws_instance.s609693lo6vw109, aws_instance.s609693lo6vw105, aws_instance.s609693lo6vw104, aws_instance.s609693lo6vw100, aws_instance.s609693lo6vw101, aws_instance.s609693lo6vw103, aws_instance.s609693lo6vw106, aws_instance.s609693lo6vw107, aws_instance.PPUDWEBSERVER2, aws_instance.s609693lo6vw102, aws_instance.s609693lo6vw108, aws_instance.s609693lo6vw110, aws_instance.s609693lo6vw111, aws_instance.s609693lo6vw112, aws_instance.s609693lo6vw113, aws_instance.s609693lo6vw114]
   name       = aws_ssm_document.api_ad_join_domain.name
   targets {
     key    = "InstanceIds"
-    values = [aws_instance.s609693lo6vw109[0].id, aws_instance.s609693lo6vw105[0].id, aws_instance.s609693lo6vw104[0].id, aws_instance.s609693lo6vw100[0].id, aws_instance.s609693lo6vw101[0].id, aws_instance.s609693lo6vw103[0].id, aws_instance.s609693lo6vw106[0].id, aws_instance.s609693lo6vw107[0].id, aws_instance.PPUDWEBSERVER2[0].id, aws_instance.s609693lo6vw102[0].id, aws_instance.s609693lo6vw108[0].id, aws_instance.s609693lo6vw110[0].id, aws_instance.s609693lo6vw111[0].id, aws_instance.s609693lo6vw112[0].id, aws_instance.s609693lo6vw113[0].id]
+    values = [aws_instance.s609693lo6vw109[0].id, aws_instance.s609693lo6vw105[0].id, aws_instance.s609693lo6vw104[0].id, aws_instance.s609693lo6vw100[0].id, aws_instance.s609693lo6vw101[0].id, aws_instance.s609693lo6vw103[0].id, aws_instance.s609693lo6vw106[0].id, aws_instance.s609693lo6vw107[0].id, aws_instance.PPUDWEBSERVER2[0].id, aws_instance.s609693lo6vw102[0].id, aws_instance.s609693lo6vw108[0].id, aws_instance.s609693lo6vw110[0].id, aws_instance.s609693lo6vw111[0].id, aws_instance.s609693lo6vw112[0].id, aws_instance.s609693lo6vw113[0].id, aws_instance.s609693lo6vw114[0].id]
   }
 }
 

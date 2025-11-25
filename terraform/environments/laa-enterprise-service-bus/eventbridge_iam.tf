@@ -70,7 +70,8 @@ resource "aws_iam_policy" "scheduler_invoke_lambda" {
         aws_lambda_function.ccms_provider_load.arn,
         aws_lambda_function.maat_provider_load.arn,
         aws_lambda_function.ccr_provider_load.arn,
-        aws_lambda_function.cclf_provider_load.arn
+        aws_lambda_function.cclf_provider_load.arn,
+        aws_lambda_function.purge_lambda.arn
       ]
     }]
   })

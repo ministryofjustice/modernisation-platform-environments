@@ -141,10 +141,13 @@ data "aws_iam_policy_document" "analytical_platform_github_actions" {
     resources = [module.secrets_manager_common_kms.key_arn]
   }
   statement {
-    sid       = "AllowSecretsManager"
-    effect    = "Allow"
-    actions   = ["secretsmanager:GetSecretValue"]
-    resources = [module.analytical_platform_compute_cluster_data_secret.secret_arn]
+    sid     = "AllowSecretsManager"
+    effect  = "Allow"
+    actions = ["secretsmanager:GetSecretValue"]
+    resources = [
+      module.analytical_platform_compute_cluster_data_secret.secret_arn,
+      module.airflow_github_app_secret.secret_arn
+    ]
   }
   statement {
     sid     = "AllowEKS"
@@ -197,6 +200,7 @@ data "aws_iam_policy_document" "data_engineering_datalake_access_github_actions"
       "arn:aws:iam::${local.environment_management.account_ids["digital-prison-reporting-test"]}:role/analytical-platform-data-production-share-role",
       "arn:aws:iam::${local.environment_management.account_ids["digital-prison-reporting-preproduction"]}:role/analytical-platform-data-production-share-role",
       "arn:aws:iam::${local.environment_management.account_ids["digital-prison-reporting-production"]}:role/analytical-platform-data-production-share-role",
+      "arn:aws:iam::${local.environment_management.account_ids["property-cafm-data-migration-development"]}:role/lakeformation-share-role",
     ]
   }
 }

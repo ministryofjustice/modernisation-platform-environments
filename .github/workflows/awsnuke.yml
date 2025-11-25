@@ -33,7 +33,7 @@ defaults:
 jobs:
 
   fetch-secrets:
-    uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@3f9fb1af00462c69c806640652ddf41292963615 # v3.2.5
+    uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@7b8dd97eb5b596a88206805943771ea7ffcde235 # v3.4.8
     permissions:
       id-token: write
       contents: read
@@ -48,7 +48,7 @@ jobs:
       account_blocklist_str: ${{ steps.set-blocklist-string.outputs.account_blocklist_str }}
     steps:
       - name: Decrypt Secrets
-        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@3f9fb1af00462c69c806640652ddf41292963615 # v3.2.5
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@7b8dd97eb5b596a88206805943771ea7ffcde235 # v3.4.8
         with:
           environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
           nuke_account_ids: ${{ needs.fetch-secrets.outputs.nuke_account_ids }} 
@@ -84,10 +84,10 @@ jobs:
     needs: [setup-prerequisites, fetch-secrets]
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
       
       - name: Decrypt Secrets
-        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@3f9fb1af00462c69c806640652ddf41292963615 # v3.2.5
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@7b8dd97eb5b596a88206805943771ea7ffcde235 # v3.4.8
         with:
           environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
           slack_webhook_url: ${{ needs.fetch-secrets.outputs.slack_webhook_url }}
@@ -99,7 +99,7 @@ jobs:
           echo "::add-mask::$ACCOUNT_NUMBER"
           echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
       - name: configure aws credentials
-        uses: aws-actions/configure-aws-credentials@a03048d87541d1d9fcf2ecf528a4a65ba9bd7838 # v5.0.0
+        uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5.1.1
         with:
           role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
           role-session-name: githubactionsrolesession
@@ -206,10 +206,10 @@ jobs:
     needs: [setup-prerequisites, fetch-secrets]
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
 
       - name: Decrypt Secrets
-        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@3f9fb1af00462c69c806640652ddf41292963615 # v3.2.5
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@7b8dd97eb5b596a88206805943771ea7ffcde235 # v3.4.8
         with:
           environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
           slack_webhook_url: ${{ needs.fetch-secrets.outputs.slack_webhook_url }}

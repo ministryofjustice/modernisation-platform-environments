@@ -1,0 +1,125 @@
+name: Check for Binary and Archive Files
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  check-binary-archive-files:
+    name: Check for Binary and Archive Files
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+        with:
+          fetch-depth: 0
+
+
+      - name: Check for binary and archive files
+        id: check_files
+        run: |
+          # List of binary or archive file extensions
+          BINARY_ARCHIVE_EXTS="zip tar gz tgz bz2 7z rar exe bin dll iso img"
+          
+          # Get the list of files changed in this PR
+          git fetch origin ${{ github.base_ref }}
+          CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
+          
+          # Array to store results
+          BINARY_ARCHIVE_FILES=()
+          
+          echo "Checking for binary or archive file types..."
+          
+          for file in $CHANGED_FILES; do
+            if [ -f "$file" ]; then
+              FILE_SIZE_BYTES=$(stat -c "%s" "$file")
+              FILE_SIZE_KB=$((FILE_SIZE_BYTES / 1024))
+              EXT="${file##*.}"
+              for ba in $BINARY_ARCHIVE_EXTS; do
+                if [ "$EXT" = "$ba" ]; then
+                  SIZE_MB=$(echo "scale=2; $FILE_SIZE_KB / 1024" | bc)
+                  BINARY_ARCHIVE_FILES+=("- \`$file\` (Extension: .$ba, Size: ${SIZE_MB}MB)")
+                fi
+              done
+            fi
+          done
+          
+          # Create warning message
+          WARNING_MESSAGE=""
+          
+          if [ ${#BINARY_ARCHIVE_FILES[@]} -gt 0 ]; then
+            WARNING_MESSAGE+="## ⚠️ Binary or Archive Files Detected\n\n"
+            WARNING_MESSAGE+="The following files match binary or archive extensions:\n\n"
+            for item in "${BINARY_ARCHIVE_FILES[@]}"; do
+              WARNING_MESSAGE+="$item\n"
+            done
+            WARNING_MESSAGE+="\n---\nThe Modernisation Platform Team urge you to consider storing these files outside of this git repository for the following reasons:\n"
+            WARNING_MESSAGE+="- These file types are often large, which can bloat the repository and slow down cloning and fetching for all users.\n"
+            WARNING_MESSAGE+="- Storing such files in git goes against best practices; they are better managed in object storage (e.g. S3 or artifact repositories).\n"
+            WARNING_MESSAGE+="- Binary and archive files cannot be efficiently diffed or merged, making code review and collaboration difficult.\n"
+            
+          fi
+          
+          # Save to file for PR comment
+          if [ -n "$WARNING_MESSAGE" ]; then
+            echo -e "$WARNING_MESSAGE" > warning_message.txt
+            echo "has_warnings=true" >> $GITHUB_OUTPUT
+          else
+            echo "✅ No binary or archive file types detected."
+            echo "has_warnings=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Comment on PR
+        if: steps.check_files.outputs.has_warnings == 'true'
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const warningMessage = fs.readFileSync('warning_message.txt', 'utf8');
+            
+            // Find existing comment
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            
+            // Use a hidden marker for reliable comment updates
+            const marker = '<!-- binary-archive-check -->';
+            const botComment = comments.find(comment => 
+              comment.user.type === 'Bot' && 
+              comment.body.includes(marker)
+            );
+            
+            const commentBody = warningMessage + '\n\n' + marker + '\n---\n*If you believe these files are necessary, please contact the [Modernisation Platform Team](https://moj.enterprise.slack.com/archives/C01A7QK5VM1) for a review.*';
+            
+            if (botComment) {
+              // Update existing comment
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: commentBody
+              });
+            } else {
+              // Create new comment
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: commentBody
+              });
+            }
+      - name: Warning summary and fail if large files detected
+        if: steps.check_files.outputs.has_warnings == 'true'
+        run: |
+          echo "⚠️ Binary or archive file types detected in this PR. Please review the PR comment for details."
+          cat warning_message.txt
+          echo "❌ Binary or archive file types detected. Failing the workflow."
+          exit 1

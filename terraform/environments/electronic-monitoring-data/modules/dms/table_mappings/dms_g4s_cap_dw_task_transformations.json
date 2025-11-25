@@ -1,0 +1,46 @@
+{
+  "rules": [
+    {
+      "rule-type": "selection",
+      "rule-id": "1",
+      "rule-name": "SelectD_Comments",
+      "object-locator": {
+        "schema-name": "dbo",
+        "table-name": "D_Comments"
+      },
+      "rule-action": "include",
+      "filters": [],
+      "parallel-load": null,
+      "isAutoSegmentationChecked": false
+    },
+    {
+      "rule-type": "transformation",
+      "rule-id": "2",
+      "rule-name": "RemoveOriginalComments",
+      "rule-target": "column",
+      "object-locator": {
+        "schema-name": "dbo",
+        "table-name": "D_Comments",
+        "column-name": "Comments"
+      },
+      "rule-action": "remove-column"
+    },
+    {
+      "rule-type": "transformation",
+      "rule-id": "3",
+      "rule-name": "AddTransformedComments",
+      "rule-target": "column",
+      "object-locator": {
+        "schema-name": "dbo",
+        "table-name": "D_Comments"
+      },
+      "rule-action": "add-column",
+      "value": "Comments",
+      "expression": "trim(replace(replace($Comments, '\\x81', ''), '\\x8D', ''))",
+      "data-type": {
+        "type": "string",
+        "length": 4200
+      }
+    }
+  ]
+}

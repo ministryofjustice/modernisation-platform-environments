@@ -213,6 +213,8 @@ resource "aws_security_group_rule" "WAM-Portal-egress-2" {
   security_group_id = aws_security_group.WAM-Portal.id
 }
 
+# Foundation Server Portal Group
+
 resource "aws_security_group" "SCR-Team-Foundation-Server" {
   count       = local.is-development == true ? 1 : 0
   vpc_id      = data.aws_vpc.shared.id
@@ -290,6 +292,8 @@ resource "aws_security_group_rule" "SCR-Team-Foundation-Server-Egress-2" {
   security_group_id = aws_security_group.SCR-Team-Foundation-Server[0].id
 }
 
+# Developer Servers Standard Group
+
 resource "aws_security_group" "Dev-Servers-Standard" {
   count       = local.is-development == true ? 1 : 0
   vpc_id      = data.aws_vpc.shared.id
@@ -299,8 +303,17 @@ resource "aws_security_group" "Dev-Servers-Standard" {
   tags = {
     Name = "${var.networking[0].business-unit}-${local.environment}"
   }
+}
 
-  ingress = []
+resource "aws_security_group_rule" "Dev-Servers-Ingress" {
+  description       = "Rule to allow port 3389 traffic inbound"
+  count             = local.is-development == true ? 1 : 0
+  type              = "ingress"
+  from_port         = 3389
+  to_port           = 3389
+  protocol          = "tcp"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+  security_group_id = aws_security_group.Dev-Servers-Standard[0].id
 }
 
 resource "aws_security_group_rule" "Dev-Servers-Standard-Egress" {

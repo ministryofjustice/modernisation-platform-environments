@@ -3,10 +3,7 @@
   "Statement": [
     {
       "Effect": "Allow",
-      "Action": [
-        "ses:SendEmail",
-        "ses:SendRawEmail"
-      ],
+      "Action": ["ses:SendEmail", "ses:SendRawEmail"],
       "Resource": "*"
     }
   ]

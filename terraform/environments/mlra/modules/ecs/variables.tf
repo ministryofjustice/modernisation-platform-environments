@@ -161,27 +161,27 @@ variable "account_number" {
 
 variable "maatdb_password_secret_name" {
   type        = string
-  description = "Parameter store secret name containing the MAATDB database password"
+  description = "Secrets Manager secret name containing the MAATDB database password"
 }
 
 variable "app_master_password_name" {
   type        = string
-  description = "Parameter store secret name containing the master password"
+  description = "Secrets Manager secret name containing the master password"
 }
 
 variable "app_salt_name" {
   type        = string
-  description = "Parameter store secret name containing the salt"
+  description = "Secrets Manager secret name containing the salt"
 }
 
 variable "app_derivation_iterations_name" {
   type        = string
-  description = "Parameter store secret name containing the derivation iterations"
+  description = "Secrets Manager secret name containing the derivation iterations"
 }
 
 variable "gtm_id_secret_name" {
   type        = string
-  description = "Parameter store secret name containing the Google Tag Manager Id"
+  description = "Secrets Manager secret name containing the Google Tag Manager Id"
 }
 
 variable "infox_client_secret" {
@@ -211,10 +211,10 @@ variable "alb_security_group_id" {
 
 variable "maat_api_client_id_name" {
   type        = string
-  description = "Parameter store secret name containing the MAAT API Client ID"
+  description = "Secrets Manager secret name containing the MAAT API Client ID"
 }
 
 variable "maat_api_client_secret_name" {
   type        = string
-  description = "Parameter store secret name containing the MAAT API Client Secret"
+  description = "Secrets Manager secret name containing the MAAT API Client Secret"
 }

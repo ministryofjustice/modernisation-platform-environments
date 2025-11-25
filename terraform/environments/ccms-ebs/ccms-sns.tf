@@ -26,20 +26,33 @@ resource "aws_secretsmanager_secret_version" "alerts_subscription_email" {
 }
 
 resource "aws_sns_topic" "cw_alerts" {
-  name = "ccms-ebs-ec2-alerts"
-  #kms_master_key_id = "alias/aws/sns"
+  name            = "ccms-ebs-ec2-alerts"
+  delivery_policy = <<EOF
+{
+  "http": {
+    "defaultHealthyRetryPolicy": {
+      "minDelayTarget": 20,
+      "maxDelayTarget": 20,
+      "numRetries": 3,
+      "numMaxDelayRetries": 0,
+      "numNoDelayRetries": 0,
+      "numMinDelayRetries": 0,
+      "backoffFunction": "linear"
+    },
+    "disableSubscriptionOverrides": false,
+    "defaultRequestPolicy": {
+      "headerContentType": "text/plain; charset=UTF-8"
+    }
+  }
+}
+EOF
 }
 
-# resource "aws_sns_topic_policy" "sns_policy" {
-#   arn    = aws_sns_topic.cw_alerts.arn
-#   policy = data.aws_iam_policy_document.sns_topic_policy_ec2cw.json
-# }
-
-resource "aws_sns_topic_subscription" "cw_subscription" {
-  topic_arn = aws_sns_topic.cw_alerts.arn
-  protocol  = "email"
-  endpoint  = aws_secretsmanager_secret_version.alerts_subscription_email.secret_string
+resource "aws_sns_topic_policy" "sns_policy" {
+  arn    = aws_sns_topic.cw_alerts.arn
+  policy = data.aws_iam_policy_document.sns_topic_policy_ec2cw.json
 }
+
 
 resource "aws_sns_topic" "s3_topic" {
   name   = "s3-event-notification-topic"
@@ -57,6 +70,12 @@ resource "aws_sns_topic_subscription" "s3_subscription" {
   endpoint  = aws_secretsmanager_secret_version.alerts_subscription_email.secret_string
 }
 
+resource "aws_sns_topic_subscription" "cw_subscription" {
+  topic_arn = aws_sns_topic.cw_alerts.arn
+  protocol  = "https"
+  endpoint  = "https://global.sns-api.chatbot.amazonaws.com"
+}
+
 resource "aws_sns_topic" "ddos_alarm" {
   name = format("%s_ddos_alarm", local.application_name)
   #kms_master_key_id = "alias/aws/sns"
@@ -71,4 +90,28 @@ resource "aws_sns_topic_subscription" "ddos_subscription" {
   topic_arn = aws_sns_topic.ddos_alarm.arn
   protocol  = "email"
   endpoint  = aws_secretsmanager_secret_version.alerts_subscription_email.secret_string
+}
+
+#--Altering SNS
+resource "aws_sns_topic" "guardduty_alerts" {
+  name            = "${local.application_name}-guardduty-alerts"
+  delivery_policy = <<EOF
+{
+  "http": {
+    "defaultHealthyRetryPolicy": {
+      "minDelayTarget": 20,
+      "maxDelayTarget": 20,
+      "numRetries": 3,
+      "numMaxDelayRetries": 0,
+      "numNoDelayRetries": 0,
+      "numMinDelayRetries": 0,
+      "backoffFunction": "linear"
+    },
+    "disableSubscriptionOverrides": false,
+    "defaultRequestPolicy": {
+      "headerContentType": "text/plain; charset=UTF-8"
+    }
+  }
+}
+EOF
 }

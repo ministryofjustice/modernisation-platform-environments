@@ -24,7 +24,6 @@ locals {
         subnet_name                   = "data"
 
         instance_profile_policies = [
-          "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
           "Ec2OracleEnterpriseManagerPolicy",
           "EC2Db",
           "EC2S3BucketWriteAndDeleteAccessPolicy",

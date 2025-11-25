@@ -7,17 +7,18 @@ resource "aws_ecs_cluster" "pra_cluster" {
 }
 
 resource "aws_cloudwatch_log_group" "deployment_logs" {
+  #checkov:skip=CKV_AWS_158:"Using default AWS encryption for CloudWatch logs which is sufficient for our needs"
   name              = "/aws/events/deploymentLogs"
   retention_in_days = "7"
 }
 
 resource "aws_cloudwatch_log_group" "ecs_logs" {
+  #checkov:skip=CKV_AWS_158:"Using default AWS encryption for CloudWatch logs which is sufficient for our needs"
   name              = "pra-ecs"
   retention_in_days = "7"
 }
 
 resource "aws_ecs_task_definition" "pra_task_definition" {
-  count                    = local.is-development ? 0 : 1
   family                   = "praFamily"
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
@@ -51,132 +52,58 @@ resource "aws_ecs_task_definition" "pra_task_definition" {
       environment = [
         {
           name  = "RDS_HOSTNAME"
-          value = "${aws_db_instance.pra_db[0].address}"
+          value = aws_db_instance.pra_db.address
         },
         {
           name  = "RDS_PORT"
-          value = "${local.application_data.accounts[local.environment].rds_port}"
+          value = local.application_data.accounts[local.environment].rds_port
         },
         {
           name  = "RDS_USERNAME"
-          value = "${aws_db_instance.pra_db[0].username}"
+          value = aws_db_instance.pra_db.username
         },
         {
           name  = "RDS_PASSWORD"
-          value = "${aws_db_instance.pra_db[0].password}"
+          value = random_password.password.result
         },
         {
           name  = "DB_NAME"
-          value = "${aws_db_instance.pra_db[0].db_name}"
+          value = aws_db_instance.pra_db.db_name
         },
         {
           name  = "supportEmail"
-          value = "${local.application_data.accounts[local.environment].support_email}"
+          value = local.application_data.accounts[local.environment].support_email
         },
         {
           name  = "supportTeam"
-          value = "${local.application_data.accounts[local.environment].support_team}"
+          value = local.application_data.accounts[local.environment].support_team
         },
         {
           name  = "ida:ClientId"
-          value = "${local.application_data.accounts[local.environment].client_id}"
+          value = local.application_data.accounts[local.environment].client_id
         }
       ]
     }
   ])
   runtime_platform {
-    operating_system_family = "WINDOWS_SERVER_2019_CORE"
-    cpu_architecture        = "X86_64"
-  }
-}
-
-//ECS task definition for the development environment:
-resource "aws_ecs_task_definition" "pra_task_definition_dev" {
-  count                    = local.is-development ? 1 : 0
-  family                   = "praFamily"
-  requires_compatibilities = ["FARGATE"]
-  network_mode             = "awsvpc"
-  execution_role_arn       = aws_iam_role.app_execution.arn
-  task_role_arn            = aws_iam_role.app_task.arn
-  cpu                      = 2048
-  memory                   = 4096
-  container_definitions = jsonencode([
-    {
-      name                   = "pra-container"
-      image                  = "${aws_ecr_repository.pra_ecr_repo.repository_url}:latest"
-      cpu                    = 2048
-      memory                 = 4096
-      essential              = true
-      ReadonlyRootFilesystem = true
-      logConfiguration = {
-        logDriver = "awslogs",
-        options = {
-          "awslogs-group"         = aws_cloudwatch_log_group.ecs_logs.name,
-          "awslogs-region"        = "eu-west-2",
-          "awslogs-stream-prefix" = "pra-app"
-        }
-      },
-      portMappings = [
-        {
-          containerPort = 80
-          protocol      = "tcp"
-          hostPort      = 80
-        }
-      ]
-      environment = [
-        {
-          name  = "RDS_HOSTNAME"
-          value = "${aws_db_instance.pra_db_dev[0].address}"
-        },
-        {
-          name  = "RDS_PORT"
-          value = "${local.application_data.accounts[local.environment].rds_port}"
-        },
-        {
-          name  = "RDS_USERNAME"
-          value = "${aws_db_instance.pra_db_dev[0].username}"
-        },
-        {
-          name  = "RDS_PASSWORD"
-          value = "${aws_db_instance.pra_db_dev[0].password}"
-        },
-        {
-          name  = "DB_NAME"
-          value = "${aws_db_instance.pra_db_dev[0].db_name}"
-        },
-        {
-          name  = "supportEmail"
-          value = "${local.application_data.accounts[local.environment].support_email}"
-        },
-        {
-          name  = "supportTeam"
-          value = "${local.application_data.accounts[local.environment].support_team}"
-        },
-        {
-          name  = "ida:ClientId"
-          value = "${local.application_data.accounts[local.environment].client_id}"
-        }
-      ]
-    }
-  ])
-  runtime_platform {
-    operating_system_family = "WINDOWS_SERVER_2019_CORE"
+    operating_system_family = "WINDOWS_SERVER_2022_CORE"
     cpu_architecture        = "X86_64"
   }
 }
 
 resource "aws_ecs_service" "pra_ecs_service" {
   depends_on = [
-    aws_lb_listener.pra_lb
+    aws_lb_listener.pra_lb,
+    aws_security_group.ecs_service
   ]
-  count                             = local.is-development ? 0 : 1
-  name                              = var.networking[0].application
+  name                              = "${var.networking[0].application}-win2022"
   cluster                           = aws_ecs_cluster.pra_cluster.id
-  task_definition                   = aws_ecs_task_definition.pra_task_definition[0].arn
+  task_definition                   = aws_ecs_task_definition.pra_task_definition.arn
   launch_type                       = "FARGATE"
   enable_execute_command            = true
   desired_count                     = 2
   health_check_grace_period_seconds = 180
+  force_new_deployment              = true
 
   network_configuration {
     subnets          = data.aws_subnets.shared-private.ids
@@ -193,35 +120,9 @@ resource "aws_ecs_service" "pra_ecs_service" {
   deployment_controller {
     type = "ECS"
   }
-}
 
-resource "aws_ecs_service" "pra_ecs_service_dev" {
-  depends_on = [
-    aws_lb_listener.pra_lb
-  ]
-  count                             = local.is-development ? 1 : 0
-  name                              = var.networking[0].application
-  cluster                           = aws_ecs_cluster.pra_cluster.id
-  task_definition                   = aws_ecs_task_definition.pra_task_definition_dev[0].arn
-  launch_type                       = "FARGATE"
-  enable_execute_command            = true
-  desired_count                     = 2
-  health_check_grace_period_seconds = 180
-
-  network_configuration {
-    subnets          = data.aws_subnets.shared-private.ids
-    security_groups  = [aws_security_group.ecs_service.id]
-    assign_public_ip = false
-  }
-
-  load_balancer {
-    target_group_arn = aws_lb_target_group.pra_target_group.arn
-    container_name   = "pra-container"
-    container_port   = 80
-  }
-
-  deployment_controller {
-    type = "ECS"
+  lifecycle {
+    create_before_destroy = true
   }
 }
 
@@ -252,6 +153,8 @@ EOF
   )
 }
 
+# This is the role ECS uses to manage the task
+# needed by the ECS agent / Fargate to Pull container images from ECR, Write logs, fetch secrets
 resource "aws_iam_role_policy" "app_execution" {
   name = "execution-${var.networking[0].application}"
   role = aws_iam_role.app_execution.id
@@ -262,15 +165,39 @@ resource "aws_iam_role_policy" "app_execution" {
     "Statement": [
       {
            "Action": [
-              "ecr:*",
-              "logs:CreateLogGroup",
-              "logs:CreateLogStream",
-              "logs:PutLogEvents",
-              "logs:DescribeLogStreams",
-              "secretsmanager:GetSecretValue"
+               "logs:CreateLogStream",
+               "logs:PutLogEvents"
            ],
-           "Resource": "*",
+           "Resource": [
+               "${aws_cloudwatch_log_group.deployment_logs.arn}",
+               "${aws_cloudwatch_log_group.deployment_logs.arn}:*",
+               "${aws_cloudwatch_log_group.ecs_logs.arn}",
+                "${aws_cloudwatch_log_group.ecs_logs.arn}:*"
+           ],
            "Effect": "Allow"
+      },
+      {
+            "Action": [
+              "ecr:GetAuthorizationToken"
+            ],
+            "Resource": "*",
+            "Effect": "Allow"
+      },
+      {
+            "Action": [
+              "ecr:BatchCheckLayerAvailability",
+              "ecr:GetDownloadUrlForLayer",
+              "ecr:BatchGetImage"
+            ],
+            "Resource": "arn:aws:ecr:eu-west-2:${local.environment_management.account_ids[terraform.workspace]}:repository/${aws_ecr_repository.pra_ecr_repo.name}",
+            "Effect": "Allow"
+      },
+      {
+          "Action": [
+               "secretsmanager:GetSecretValue"
+           ],
+          "Resource": "arn:aws:secretsmanager:*:${local.environment_management.account_ids[terraform.workspace]}:secret:${aws_secretsmanager_secret.rds_db_credentials.arn}",
+          "Effect": "Allow"
       }
     ]
   }
@@ -304,6 +231,8 @@ EOF
   )
 }
 
+# This is the role the application inside the container assumes at runtime
+# Just logging for AWSLogger/NLog
 resource "aws_iam_role_policy" "app_task" {
   name = "task-${var.networking[0].application}"
   role = aws_iam_role.app_task.id
@@ -313,15 +242,13 @@ resource "aws_iam_role_policy" "app_task" {
    "Version": "2012-10-17",
    "Statement": [
      {
-       "Effect": "Allow",
         "Action": [
           "logs:CreateLogStream",
           "logs:PutLogEvents",
-          "ecr:*",
-          "iam:*",
-          "ec2:*"
+          "logs:DescribeLogGroups"
         ],
-       "Resource": "*"
+        "Resource": "arn:aws:logs:*:${local.environment_management.account_ids[terraform.workspace]}:*",
+        "Effect": "Allow"
      }
    ]
   }
@@ -329,8 +256,14 @@ resource "aws_iam_role_policy" "app_task" {
 }
 
 resource "aws_security_group" "ecs_service" {
+  #checkov:skip=CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
   name_prefix = "ecs-service-sg-"
+  description = "control access to the ECS service"
   vpc_id      = data.aws_vpc.shared.id
+
+  lifecycle {
+    create_before_destroy = true
+  }
 
   ingress {
     from_port       = 80
@@ -341,6 +274,7 @@ resource "aws_security_group" "ecs_service" {
   }
 
   egress {
+    description = "allow all outbound traffic"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
@@ -349,8 +283,14 @@ resource "aws_security_group" "ecs_service" {
 }
 
 resource "aws_ecr_repository" "pra_ecr_repo" {
+  #checkov:skip=CKV_AWS_51: "Ensure ECR Image Tags are immutable"
+  #checkov:skip=CKV_AWS_136:"Using default AWS encryption for ECR which is sufficient for our needs"
   name         = "pra-ecr-repo"
   force_delete = true
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
 }
 
 # AWS EventBridge rule
@@ -446,11 +386,13 @@ resource "aws_cloudwatch_metric_alarm" "ddos_attack_external" {
 }
 
 resource "aws_sns_topic" "ddos_alarm" {
+  # checkov:skip=CKV_AWS_26: SNS encryption not required for this use case
   count = local.is-development ? 0 : 1
   name  = "pra_ddos_alarm"
 }
 
 resource "aws_sns_topic" "pra_utilisation_alarm" {
+  # checkov:skip=CKV_AWS_26: SNS encryption not required for this use case
   count = local.is-development ? 0 : 1
   name  = "pra_utilisation_alarm"
 }
@@ -478,7 +420,7 @@ module "pagerduty_core_alerts_non_prod" {
   depends_on = [
     aws_sns_topic.pra_utilisation_alarm
   ]
-  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=0179859e6fafc567843cd55c0b05d325d5012dc4" #v2.0.0
   sns_topics                = [aws_sns_topic.pra_utilisation_alarm[0].name]
   pagerduty_integration_key = local.pagerduty_integration_keys["pra_non_prod_alarms"]
 }
@@ -489,7 +431,7 @@ module "pagerduty_core_alerts_prod" {
   depends_on = [
     aws_sns_topic.pra_utilisation_alarm
   ]
-  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=0179859e6fafc567843cd55c0b05d325d5012dc4" #v2.0.0
   sns_topics                = [aws_sns_topic.pra_utilisation_alarm[0].name]
   pagerduty_integration_key = local.pagerduty_integration_keys["pra_prod_alarms"]
 }

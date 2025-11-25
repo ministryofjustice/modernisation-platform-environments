@@ -195,6 +195,10 @@ locals {
             "Ec2PtcWebPolicy",
           ])
         })
+        instance = merge(local.ec2_autoscaling_groups.web.instance, {
+          instance_type = "t3.medium"
+          #instance_type           = "t3.small"
+        })
         tags = merge(local.ec2_autoscaling_groups.web.tags, {
           description        = "${local.environment} practice oasys web"
           oasys-environment  = "ptc"
@@ -209,6 +213,10 @@ locals {
           instance_profile_policies = concat(local.ec2_autoscaling_groups.web.config.instance_profile_policies, [
             "Ec2TrnWebPolicy",
           ])
+        })
+        instance = merge(local.ec2_autoscaling_groups.web.instance, {
+          instance_type = "t3.medium"
+          #instance_type           = "t3.small"
         })
         tags = merge(local.ec2_autoscaling_groups.web.tags, {
           description        = "${local.environment} training oasys web"
@@ -226,6 +234,10 @@ locals {
           instance_profile_policies = concat(local.ec2_instances.bip.config.instance_profile_policies, [
             "Ec2ProdBipPolicy",
           ])
+        })
+        instance = merge(local.ec2_instances.bip.instance, {
+          ami           = "ami-0d206b8546ea2b68a" # to prevent instances being re-created due to recreated AMI
+          instance_type = "t3.xlarge"             # OVERSIZED
         })
         tags = merge(local.ec2_instances.bip.tags, {
           bip-db-name       = "PDBIPINF"
@@ -363,9 +375,10 @@ locals {
             "Ec2TrnBipPolicy",
           ])
         })
-        instance = merge(local.ec2_instances.db19c.instance, {
-          disable_api_termination = true
-          instance_type           = "r6i.4xlarge"
+        instance = merge(local.ec2_instances.bip.instance, {
+          ami                          = "ami-0d206b8546ea2b68a" # to prevent instances being re-created due to recreated AMI
+          instance_type                = "r6i.4xlarge"           # this is massively over provisioned FIXME
+          metadata_options_http_tokens = "optional"              # accidentally set, remove this line when resizing
         })
         tags = merge(local.ec2_instances.bip.tags, {
           bip-db-hostname   = "ptctrn-oasys-db-a"

@@ -10,8 +10,12 @@ locals {
   cidr_cica_ss_b        = "10.10.110.0/24"
   cidr_cica_dev_a       = "10.11.10.0/24"
   cidr_cica_dev_b       = "10.11.110.0/24"
+  cidr_cica_dev_c       = "10.11.20.0/24"
+  cidr_cica_dev_d       = "10.11.120.0/24"
   cidr_cica_uat_a       = "10.12.10.0/24"
   cidr_cica_uat_b       = "10.12.110.0/24"
+  cidr_cica_uat_c       = "10.12.20.0/24"
+  cidr_cica_uat_d       = "10.12.120.0/24"
   cidr_cica_onprem_uat  = "192.168.4.0/24"
   cidr_cica_onprem_prod = "10.2.30.0/24"
   cidr_cica_ras         = "10.9.14.0/23"
@@ -19,6 +23,8 @@ locals {
   cidr_cica_ras_nat     = "10.7.14.224/28"
   cidr_cica_prod_a      = "10.13.10.0/24"
   cidr_cica_prod_b      = "10.13.110.0/24"
+  cidr_cica_prod_c      = "10.13.20.0/24"
+  cidr_cica_prod_d      = "10.13.120.0/24"
 
   #get snapshot IDs for each volume. Required to stop instance replacement on apply
   block_device_mapping_xvde = {
@@ -120,5 +126,80 @@ locals {
   } : {}
   snapshot_id_xvdn_db = local.environment == "production" ? local.block_device_mapping_xvdn_db[9].ebs.snapshot_id : ""
 
+  env_to_cica_map = {
+    "development" = ["dev"]
+    "test"        = ["uat"]
+    "production"  = ["uat", "prod"]
+  }
+  target_prefix = local.env_to_cica_map[local.environment]
+
+  cica_s3_resource = [
+    for prefix in local.target_prefix : "arn:aws:s3:::${prefix}storagebucket"
+  ]
+
+  tariffdb_volume_layout = [
+    {
+      device_name = "xvde"
+      size        = 100
+    },
+    {
+      device_name = "xvdf"
+      size        = 2000
+    },
+    {
+      device_name = "xvdg"
+      size        = 100
+    },
+    {
+      device_name = "xvdh"
+      size        = 16
+    },
+    {
+      device_name = "xvdi"
+      size        = 30
+    },
+    {
+      device_name = "xvdj"
+      size        = 8
+    },
+    {
+      device_name = "xvdk"
+      size        = 1
+    },
+    {
+      device_name = "xvdl"
+      size        = 200
+    },
+    {
+      device_name = "xvdm"
+      size        = 500
+    },
+    {
+      device_name = "xvdn"
+      size        = 500
+    }
+  ]
+  tariffapp_volume_layout = [
+    {
+      device_name = "xvde"
+      size        = 100
+    },
+    {
+      device_name = "xvdf"
+      size        = 100
+    },
+    {
+      device_name = "xvdg"
+      size        = 100
+    },
+    {
+      device_name = "xvdh"
+      size        = 16
+    },
+    {
+      device_name = "xvdi"
+      size        = local.environment == "production" ? 100 : 30
+    }
+  ]
 }
 #

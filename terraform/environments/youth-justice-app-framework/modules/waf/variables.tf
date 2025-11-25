@@ -75,3 +75,20 @@ variable "region" {
   type        = string
   default     = "eu-west-2"
 }
+
+variable "kms_key_arn" {
+  type        = string
+  description = "KMS Key ARN to encrypt CloudWatch log groups"
+}
+
+variable "kms_key_id" {
+  type        = string
+  description = "KMS Key ID to encrypt CloudWatch log groups"
+  default     = null
+}
+
+
+#variable "multi_region_replica" {
+#  type        = string
+#  description = "KMS Key ARN for CloudFront WAF logs in us-east-1"
+#}

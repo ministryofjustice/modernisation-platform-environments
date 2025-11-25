@@ -50,6 +50,9 @@ resource "aws_s3_bucket_lifecycle_configuration" "PPUD" {
   rule {
     id     = "tf-s3-lifecycle"
     status = "Enabled"
+    filter {
+      prefix = ""
+    }
     abort_incomplete_multipart_upload {
       days_after_initiation = 7
     }
@@ -57,7 +60,6 @@ resource "aws_s3_bucket_lifecycle_configuration" "PPUD" {
       noncurrent_days = 30
       storage_class   = "STANDARD_IA"
     }
-
     transition {
       days          = 60
       storage_class = "STANDARD_IA"
@@ -160,11 +162,11 @@ resource "aws_s3_bucket_lifecycle_configuration" "MoJ-Health-Check-Reports" {
   rule {
     id     = "Remove-Old-SSM-Health-Check-Reports"
     status = "Enabled"
-    abort_incomplete_multipart_upload {
-      days_after_initiation = 7
-    }
     filter {
       prefix = "ssm_output/"
+    }
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
     }
     noncurrent_version_transition {
       noncurrent_days = 90
@@ -243,8 +245,21 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-infrastructure" {
   count  = local.is-production == true ? 1 : 0
   bucket = aws_s3_bucket.moj-infrastructure[0].id
   rule {
-    id     = "remove-old-moj-infrastructure"
+    id     = "remove-old-lambda-output"
     status = "Enabled"
+    filter {
+      prefix = "lambda/output/"
+    }
+    expiration {
+      days = 60
+    }
+  }
+  rule {
+    id     = "abort-incomplete-uploads"
+    status = "Enabled"
+    filter {
+      prefix = ""
+    }
     abort_incomplete_multipart_upload {
       days_after_initiation = 7
     }
@@ -337,148 +352,6 @@ resource "aws_s3_bucket_policy" "moj-infrastructure" {
   })
 }
 
-# S3 Bucket for PPUD Lambda Metrics (from EC and Cloudwatch)
-
-resource "aws_s3_bucket" "moj-lambda-metrics-prod" {
-  # checkov:skip=CKV_AWS_145: "S3 bucket is not public facing, does not contain any sensitive information and does not need encryption"
-  # checkov:skip=CKV_AWS_62: "S3 bucket event notification is not required"
-  # checkov:skip=CKV2_AWS_62: "S3 bucket event notification is not required"
-  # checkov:skip=CKV_AWS_144: "PPUD has a UK Sovereignty requirement so cross region replication is prohibited"
-  # checkov:skip=CKV_AWS_18: "S3 bucket logging is not required"
-  count  = local.is-production == true ? 1 : 0
-  bucket = "moj-lambda-metrics-prod"
-  tags = merge(
-    local.tags,
-    {
-      Name = "${local.application_name}-moj-lambda-metrics-prod"
-    }
-  )
-}
-
-resource "aws_s3_bucket_versioning" "moj-lambda-metrics-prod" {
-  count  = local.is-production == true ? 1 : 0
-  bucket = aws_s3_bucket.moj-lambda-metrics-prod[0].id
-  versioning_configuration {
-    status = "Enabled"
-  }
-}
-
-resource "aws_s3_bucket_logging" "moj-lambda-metrics-prod" {
-  count         = local.is-production == true ? 1 : 0
-  bucket        = aws_s3_bucket.moj-lambda-metrics-prod[0].id
-  target_bucket = aws_s3_bucket.moj-log-files-prod[0].id
-  target_prefix = "s3-logs/moj-lambda-metrics-prod-logs/"
-}
-
-resource "aws_s3_bucket_public_access_block" "moj-lambda-metrics-prod" {
-  count                   = local.is-production == true ? 1 : 0
-  bucket                  = aws_s3_bucket.moj-lambda-metrics-prod[0].id
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
-}
-
-resource "aws_s3_bucket_lifecycle_configuration" "moj-lambda-metrics-prod" {
-  # checkov:skip=CKV_AWS_300: "S3 bucket has a set period for aborting failed uploads, this is a false positive finding"
-  count  = local.is-production == true ? 1 : 0
-  bucket = aws_s3_bucket.moj-lambda-metrics-prod[0].id
-  rule {
-    id     = "remove-old-moj-lambda-metrics-prod"
-    status = "Enabled"
-    abort_incomplete_multipart_upload {
-      days_after_initiation = 3
-    }
-    expiration {
-      days = 45
-    }
-  }
-}
-
-resource "aws_s3_bucket_policy" "moj-lambda-metrics-prod" {
-  count  = local.is-production == true ? 1 : 0
-  bucket = aws_s3_bucket.moj-lambda-metrics-prod[0].id
-
-  policy = jsonencode({
-
-    "Version" : "2012-10-17",
-    "Statement" : [
-      {
-        "Sid" : "RequireSSLRequests",
-        "Effect" : "Deny",
-        "Principal" : "*",
-        "Action" : "s3:*",
-        "Resource" : [
-          aws_s3_bucket.moj-lambda-metrics-prod[0].arn,
-          "${aws_s3_bucket.moj-lambda-metrics-prod[0].arn}/*"
-        ],
-        "Condition" : {
-          "Bool" : {
-            "aws:SecureTransport" : "false"
-          }
-        }
-      },
-      {
-        "Action" : [
-          "s3:GetBucketAcl",
-          "s3:DeleteObject",
-          "s3:GetObject",
-          "s3:PutObject",
-          "s3:ListBucket"
-        ],
-        "Effect" : "Allow",
-        "Resource" : [
-          aws_s3_bucket.moj-lambda-metrics-prod[0].arn,
-          "${aws_s3_bucket.moj-lambda-metrics-prod[0].arn}/*"
-        ],
-        "Principal" : {
-          "AWS" : [
-            "arn:aws:iam::${local.environment_management.account_ids["ppud-production"]}:role/ec2-iam-role",
-          ]
-        }
-      },
-      {
-        "Action" : [
-          "s3:PutBucketNotification",
-          "s3:GetBucketNotification",
-          "s3:GetBucketAcl",
-          "s3:DeleteObject",
-          "s3:GetObject",
-          "s3:PutObject",
-          "s3:ListBucket"
-        ],
-        "Effect" : "Allow",
-        "Resource" : [
-          aws_s3_bucket.moj-lambda-metrics-prod[0].arn,
-          "${aws_s3_bucket.moj-lambda-metrics-prod[0].arn}/*"
-        ],
-        "Principal" : {
-          Service = "logging.s3.amazonaws.com"
-        }
-      },
-      {
-        "Action" : [
-          "s3:PutBucketNotification",
-          "s3:GetBucketNotification",
-          "s3:GetBucketAcl",
-          "s3:DeleteObject",
-          "s3:GetObject",
-          "s3:PutObject",
-          "s3:ListBucket"
-        ],
-        "Effect" : "Allow",
-        "Resource" : [
-          aws_s3_bucket.moj-lambda-metrics-prod[0].arn,
-          "${aws_s3_bucket.moj-lambda-metrics-prod[0].arn}/*"
-        ],
-        "Principal" : {
-          Service = "sns.amazonaws.com"
-        }
-      }
-    ]
-  })
-}
-
 # S3 Bucket for PPUD Database Replication to MoJ Cloud Platform
 
 resource "aws_s3_bucket" "moj-database-source-prod" {
@@ -528,11 +401,31 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-database-source-prod" {
   rule {
     id     = "delete-moj-database-source-prod"
     status = "Enabled"
+    filter {
+      prefix = ""
+    }
     abort_incomplete_multipart_upload {
       days_after_initiation = 3
     }
     expiration {
       days = 6
+    }
+  }
+}
+
+resource "aws_s3_bucket_replication_configuration" "moj-database-source-prod-replication" {
+  count = local.is-production == true ? 1 : 0
+  # Must have bucket versioning enabled first
+  depends_on = [aws_s3_bucket_versioning.moj-database-source-prod]
+  role       = aws_iam_role.iam_role_s3_bucket_moj_database_source_prod[0].arn
+  bucket     = aws_s3_bucket.moj-database-source-prod[0].id
+
+  rule {
+    id     = "ppud-report-replication-rule-prod"
+    status = "Enabled"
+    destination {
+      bucket        = "arn:aws:s3:::mojap-data-engineering-production-ppud-prod"
+      storage_class = "STANDARD"
     }
   }
 }
@@ -669,6 +562,9 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-report-source-prod" {
   rule {
     id     = "delete-moj-report-source-prod"
     status = "Enabled"
+    filter {
+      prefix = ""
+    }
     abort_incomplete_multipart_upload {
       days_after_initiation = 3
     }
@@ -841,6 +737,9 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-log-files-prod" {
   rule {
     id     = "Move-to-IA-then-delete-moj-log-files-prod"
     status = "Enabled"
+    filter {
+      prefix = ""
+    }
     abort_incomplete_multipart_upload {
       days_after_initiation = 7
     }
@@ -1044,6 +943,9 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-log-files-uat" {
   rule {
     id     = "Move-to-IA-then-delete-moj-log-files-uat"
     status = "Enabled"
+    filter {
+      prefix = ""
+    }
     abort_incomplete_multipart_upload {
       days_after_initiation = 7
     }
@@ -1056,7 +958,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-log-files-uat" {
       storage_class = "STANDARD_IA"
     }
     expiration {
-      days = 60
+      days = 180
     }
   }
 }
@@ -1229,6 +1131,9 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-database-source-uat" {
   rule {
     id     = "delete-moj-database-source-uat"
     status = "Enabled"
+    filter {
+      prefix = ""
+    }
     abort_incomplete_multipart_upload {
       days_after_initiation = 3
     }
@@ -1387,6 +1292,9 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-report-source-uat" {
   rule {
     id     = "delete-moj-report-source-uat"
     status = "Enabled"
+    filter {
+      prefix = ""
+    }
     abort_incomplete_multipart_upload {
       days_after_initiation = 3
     }
@@ -1395,7 +1303,6 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-report-source-uat" {
     }
   }
 }
-
 
 resource "aws_s3_bucket_replication_configuration" "moj-report-source-uat-replication" {
   count = local.is-preproduction == true ? 1 : 0
@@ -1566,6 +1473,9 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-log-files-dev" {
   rule {
     id     = "Move-to-IA-then-delete-moj-log-files-dev"
     status = "Enabled"
+    filter {
+      prefix = ""
+    }
     abort_incomplete_multipart_upload {
       days_after_initiation = 7
     }
@@ -1578,7 +1488,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-log-files-dev" {
       storage_class = "STANDARD_IA"
     }
     expiration {
-      days = 60
+      days = 180
     }
   }
 }
@@ -1705,153 +1615,6 @@ resource "aws_s3_bucket_policy" "moj-log-files-dev" {
   })
 }
 
-# S3 Bucket for Lambda Layers for Development
-
-resource "aws_s3_bucket" "moj-lambda-layers-dev" {
-  # checkov:skip=CKV_AWS_145: "S3 bucket is not public facing, does not contain any sensitive information and does not need encryption"
-  # checkov:skip=CKV_AWS_62: "S3 bucket event notification is not required"
-  # checkov:skip=CKV2_AWS_62: "S3 bucket event notification is not required"
-  # checkov:skip=CKV_AWS_144: "PPUD has a UK Sovereignty requirement so cross region replication is prohibited"
-  # checkov:skip=CKV_AWS_18: "S3 bucket logging is not required"
-  count  = local.is-development == true ? 1 : 0
-  bucket = "moj-lambda-layers-dev"
-  tags = merge(
-    local.tags,
-    {
-      Name = "${local.application_name}-moj-lambda-layers-dev"
-    }
-  )
-}
-
-resource "aws_s3_bucket_versioning" "moj-lambda-layers-dev" {
-  count  = local.is-development == true ? 1 : 0
-  bucket = aws_s3_bucket.moj-lambda-layers-dev[0].id
-  versioning_configuration {
-    status = "Enabled"
-  }
-}
-
-resource "aws_s3_bucket_logging" "moj-lambda-layers-dev" {
-  count         = local.is-development == true ? 1 : 0
-  bucket        = aws_s3_bucket.moj-lambda-layers-dev[0].id
-  target_bucket = aws_s3_bucket.moj-log-files-dev[0].id
-  target_prefix = "s3-logs/moj-lambda-layers-dev-logs/"
-}
-
-resource "aws_s3_bucket_public_access_block" "moj-lambda-layers-dev" {
-  count                   = local.is-development == true ? 1 : 0
-  bucket                  = aws_s3_bucket.moj-lambda-layers-dev[0].id
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
-}
-
-resource "aws_s3_bucket_lifecycle_configuration" "moj-lambda-layers-dev" {
-  # checkov:skip=CKV_AWS_300: "S3 bucket has a set period for aborting failed uploads, this is a false positive finding"
-  count  = local.is-development == true ? 1 : 0
-  bucket = aws_s3_bucket.moj-lambda-layers-dev[0].id
-  rule {
-    id     = "Move-to-IA-then-delete-moj-lambda-layers-dev"
-    status = "Enabled"
-    abort_incomplete_multipart_upload {
-      days_after_initiation = 7
-    }
-    noncurrent_version_transition {
-      noncurrent_days = 30
-      storage_class   = "STANDARD_IA"
-    }
-    transition {
-      days          = 30
-      storage_class = "STANDARD_IA"
-    }
-  }
-}
-
-resource "aws_s3_bucket_policy" "moj-lambda-layers-dev" {
-  count  = local.is-development == true ? 1 : 0
-  bucket = aws_s3_bucket.moj-lambda-layers-dev[0].id
-
-  policy = jsonencode({
-
-    "Version" : "2012-10-17",
-    "Statement" : [
-      {
-        "Sid" : "RequireSSLRequests",
-        "Effect" : "Deny",
-        "Principal" : "*",
-        "Action" : "s3:*",
-        "Resource" : [
-          aws_s3_bucket.moj-lambda-layers-dev[0].arn,
-          "${aws_s3_bucket.moj-lambda-layers-dev[0].arn}/*"
-        ],
-        "Condition" : {
-          "Bool" : {
-            "aws:SecureTransport" : "false"
-          }
-        }
-      },
-      {
-        "Action" : [
-          "s3:PutBucketNotification",
-          "s3:GetBucketNotification",
-          "s3:GetBucketAcl",
-          "s3:DeleteObject",
-          "s3:GetObject",
-          "s3:PutObject",
-          "s3:ListBucket"
-        ],
-        "Effect" : "Allow",
-        "Resource" : [
-          aws_s3_bucket.moj-lambda-layers-dev[0].arn,
-          "${aws_s3_bucket.moj-lambda-layers-dev[0].arn}/*"
-        ],
-        "Principal" : {
-          Service = "logging.s3.amazonaws.com"
-        }
-      },
-      {
-        "Action" : [
-          "s3:PutBucketNotification",
-          "s3:GetBucketNotification",
-          "s3:GetBucketAcl",
-          "s3:DeleteObject",
-          "s3:GetObject",
-          "s3:PutObject",
-          "s3:ListBucket"
-        ],
-        "Effect" : "Allow",
-        "Resource" : [
-          aws_s3_bucket.moj-lambda-layers-dev[0].arn,
-          "${aws_s3_bucket.moj-lambda-layers-dev[0].arn}/*"
-        ],
-        "Principal" : {
-          Service = "sns.amazonaws.com"
-        }
-      },
-      {
-        "Action" : [
-          "s3:GetBucketAcl",
-          "s3:DeleteObject",
-          "s3:GetObject",
-          "s3:PutObject",
-          "s3:ListBucket"
-        ],
-        "Effect" : "Allow",
-        "Resource" : [
-          aws_s3_bucket.moj-lambda-layers-dev[0].arn,
-          "${aws_s3_bucket.moj-lambda-layers-dev[0].arn}/*"
-        ],
-        "Principal" : {
-          "AWS" : [
-            "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/ec2-iam-role"
-          ]
-        }
-      }
-    ]
-  })
-}
-
 # S3 Bucket for Database Replication to Data Engineering for Development
 
 resource "aws_s3_bucket" "moj-database-source-dev" {
@@ -1900,6 +1663,9 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-database-source-dev" {
   rule {
     id     = "delete-moj-database-source-dev"
     status = "Enabled"
+    filter {
+      prefix = ""
+    }
     abort_incomplete_multipart_upload {
       days_after_initiation = 3
     }
@@ -2058,6 +1824,9 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-report-source-dev" {
   rule {
     id     = "delete-moj-report-source-dev"
     status = "Enabled"
+    filter {
+      prefix = ""
+    }
     abort_incomplete_multipart_upload {
       days_after_initiation = 3
     }
@@ -2066,7 +1835,6 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-report-source-dev" {
     }
   }
 }
-
 
 resource "aws_s3_bucket_replication_configuration" "moj-report-source-dev-replication" {
   count = local.is-development == true ? 1 : 0
@@ -2218,6 +1986,9 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-infrastructure-dev" {
   rule {
     id     = "remove-old-moj-infrastructure-dev"
     status = "Enabled"
+    filter {
+      prefix = ""
+    }
     abort_incomplete_multipart_upload {
       days_after_initiation = 7
     }
@@ -2359,6 +2130,9 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-infrastructure-uat" {
   rule {
     id     = "remove-old-moj-infrastructure-uat"
     status = "Enabled"
+    filter {
+      prefix = ""
+    }
     abort_incomplete_multipart_upload {
       days_after_initiation = 7
     }

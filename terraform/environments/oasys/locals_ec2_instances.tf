@@ -8,7 +8,7 @@ locals {
         ami_name                  = "oasys_bip_release_2023-12-02*"
         iam_resource_names_prefix = "ec2"
         instance_profile_policies = [
-          "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+          # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore", # now included automatically by module
           "EC2Default",
           "EC2S3BucketWriteAndDeleteAccessPolicy",
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"
@@ -17,7 +17,7 @@ locals {
       }
       instance = {
         disable_api_termination = false
-        instance_type           = "t3.xlarge"
+        instance_type           = "t3.large" # if too small, move to r6i.large RAM constrained, not CPU
         key_name                = "ec2-user"
         vpc_security_group_ids  = ["bip", "ec2-linux"]
         tags = {
@@ -52,11 +52,11 @@ locals {
         local.cloudwatch_metric_alarms.db_backup
       )
       config = {
-        # Uses base ami as Nomis DB ami not available in oasys env. 
+        # Uses base ami as Nomis DB ami not available in oasys env.
         ami_name                  = "base_rhel_7_9_2024-01-01T00-00-06.493Z"
         iam_resource_names_prefix = "ec2-database"
         instance_profile_policies = [
-          "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+          # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore", # now included automatically by module
           "EC2Db",
           "EC2S3BucketWriteAndDeleteAccessPolicy",
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"
@@ -117,7 +117,7 @@ locals {
         ami_owner                 = "self"
         iam_resource_names_prefix = "ec2-database"
         instance_profile_policies = [
-          "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+          # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore", # now included automatically by module
           "EC2Db",
           "EC2S3BucketWriteAndDeleteAccessPolicy",
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"

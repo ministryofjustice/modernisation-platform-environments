@@ -1,7 +1,7 @@
 module "cloud_platform_live_namespace_secret" {
   count = terraform.workspace == "data-platform-development" ? 1 : 0
 
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=f7fef2d8f63f1595c3e2b0ee14a6810dc7bdb9af" # v2.0.0
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=82029345dea22bc49989a6f46c5d8d8e555b84c9" # v2.0.1
 
   name = "cloud-platform/live/${local.component_name}"
 
@@ -15,7 +15,7 @@ module "cloud_platform_live_namespace_secret" {
 module "litellm_license_secret" {
   count = terraform.workspace == "data-platform-development" ? 1 : 0
 
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=f7fef2d8f63f1595c3e2b0ee14a6810dc7bdb9af" # v2.0.0
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=82029345dea22bc49989a6f46c5d8d8e555b84c9" # v2.0.1
 
   name = "litellm/license"
 
@@ -26,7 +26,7 @@ module "litellm_license_secret" {
 module "litellm_entra_id_secret" {
   count = terraform.workspace == "data-platform-development" ? 1 : 0
 
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=f7fef2d8f63f1595c3e2b0ee14a6810dc7bdb9af" # v2.0.0
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=82029345dea22bc49989a6f46c5d8d8e555b84c9" # v2.0.1
 
   name = "litellm/entra-id"
 
@@ -38,3 +38,29 @@ module "litellm_entra_id_secret" {
   })
   ignore_secret_changes = true
 }
+
+module "justiceai_azure_openai_secret" {
+  count = terraform.workspace == "data-platform-development" ? 1 : 0
+
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=82029345dea22bc49989a6f46c5d8d8e555b84c9" # v2.0.1
+
+  name = "justice-ai/azure-openai"
+
+  secret_string = jsonencode({
+    api_base = "CHANGEME"
+    api_key  = "CHANGEME"
+
+  })
+  ignore_secret_changes = true
+}
+
+module "litellm_keys_secret" {
+  for_each = terraform.workspace == "data-platform-development" ? litellm_key.keys : {}
+
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=82029345dea22bc49989a6f46c5d8d8e555b84c9" # v2.0.1
+
+  name = "litellm/keys/${each.value.key_alias}"
+
+  secret_string = each.value.id
+}
+

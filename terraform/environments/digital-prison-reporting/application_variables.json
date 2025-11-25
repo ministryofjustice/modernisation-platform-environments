@@ -14,6 +14,7 @@
       "athena_federated_query_lambda_concurrent_executions": 20,
       "glue_job_name": "glue-job-ingester",
       "glue_job_common_log_level": "INFO",
+      "glue_job_version": "5.0",
       "maintenance_job_retry_max_attempts": 10,
       "maintenance_job_retry_min_wait_millis": 1000,
       "maintenance_job_retry_max_wait_millis": 20000,
@@ -30,7 +31,7 @@
       "setup_s3_buckets": true,
       "create_glue_connections": true,
       "enable_operational_datastore_job_access": true,
-      "kinesis_agent_autoscale": false,
+      "bastion_host_autoscale": false,
       "ec2_instance_type": "t3.small",
       "ami_image_id": "ami-00cc4c3fee6bb6c22",
       "setup_redshift": true,
@@ -46,9 +47,11 @@
       "multiphase_cleanup_lambda_version": "vLatest",
       "scheduled_s3_file_transfer_retention_period_amount": 0,
       "scheduled_s3_file_transfer_retention_period_unit": "days",
+      "scheduled_file_transfer_use_default_parallelism": "false",
+      "scheduled_file_transfer_parallelism": 128,
       "enable_domain_builder_rds": true,
       "domain_builder_rds_parameter_group": "default.postgres14",
-      "enable_domain_builder_agent": true,
+      "enable_domain_builder_agent": false,
       "enable_cloud_trail": false,
       "include_dbuilder_gw_vpclink": false,
       "enable_dbuilder_serverless_gw": true,
@@ -85,7 +88,8 @@
         "dps-organisations",
         "dps-allocations",
         "dps-applications",
-        "dps-manage-pom"
+        "dps-manage-pom",
+        "dps-san"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -245,6 +249,7 @@
       "athena_federated_query_lambda_concurrent_executions": 20,
       "glue_job_name": "glue-job-ingester",
       "glue_job_common_log_level": "INFO",
+      "glue_job_version": "5.0",
       "maintenance_job_retry_max_attempts": 10,
       "maintenance_job_retry_min_wait_millis": 1000,
       "maintenance_job_retry_max_wait_millis": 20000,
@@ -261,7 +266,7 @@
       "setup_s3_buckets": true,
       "create_glue_connections": true,
       "enable_operational_datastore_job_access": true,
-      "kinesis_agent_autoscale": true,
+      "bastion_host_autoscale": true,
       "ec2_instance_type": "t3.small",
       "ami_image_id": "ami-00cc4c3fee6bb6c22",
       "setup_redshift": true,
@@ -277,9 +282,11 @@
       "multiphase_cleanup_lambda_version": "vLatest",
       "scheduled_s3_file_transfer_retention_period_amount": 0,
       "scheduled_s3_file_transfer_retention_period_unit": "days",
+      "scheduled_file_transfer_use_default_parallelism": "false",
+      "scheduled_file_transfer_parallelism": 128,
       "enable_domain_builder_rds": true,
       "domain_builder_rds_parameter_group": "default.postgres14",
-      "enable_domain_builder_agent": true,
+      "enable_domain_builder_agent": false,
       "enable_cloud_trail": false,
       "include_dbuilder_gw_vpclink": false,
       "enable_dbuilder_serverless_gw": true,
@@ -314,7 +321,8 @@
         "dps-organisations",
         "dps-allocations",
         "dps-applications",
-        "dps-manage-pom"
+        "dps-manage-pom",
+        "dps-san"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -451,6 +459,7 @@
       "athena_federated_query_lambda_concurrent_executions": 20,
       "glue_job_name": "glue-job-ingester",
       "glue_job_common_log_level": "INFO",
+      "glue_job_version": "5.0",
       "maintenance_job_retry_max_attempts": 10,
       "maintenance_job_retry_min_wait_millis": 1000,
       "maintenance_job_retry_max_wait_millis": 20000,
@@ -467,7 +476,7 @@
       "setup_s3_buckets": true,
       "create_glue_connections": true,
       "enable_operational_datastore_job_access": true,
-      "kinesis_agent_autoscale": true,
+      "bastion_host_autoscale": true,
       "ec2_instance_type": "t3.small",
       "ami_image_id": "ami-00cc4c3fee6bb6c22",
       "setup_redshift": true,
@@ -483,9 +492,11 @@
       "multiphase_cleanup_lambda_version": "vLatest",
       "scheduled_s3_file_transfer_retention_period_amount": 0,
       "scheduled_s3_file_transfer_retention_period_unit": "days",
+      "scheduled_file_transfer_use_default_parallelism": "false",
+      "scheduled_file_transfer_parallelism": 128,
       "enable_domain_builder_rds": true,
       "domain_builder_rds_parameter_group": "default.postgres14",
-      "enable_domain_builder_agent": true,
+      "enable_domain_builder_agent": false,
       "enable_cloud_trail": false,
       "include_dbuilder_gw_vpclink": false,
       "enable_dbuilder_serverless_gw": true,
@@ -522,7 +533,8 @@
         "dps-organisations",
         "dps-allocations",
         "dps-applications",
-        "dps-manage-pom"
+        "dps-manage-pom",
+        "dps-san"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -678,6 +690,7 @@
       "athena_federated_query_lambda_concurrent_executions": 20,
       "glue_job_name": "glue-job-ingester",
       "glue_job_common_log_level": "INFO",
+      "glue_job_version": "5.0",
       "maintenance_job_retry_max_attempts": 10,
       "maintenance_job_retry_min_wait_millis": 1000,
       "maintenance_job_retry_max_wait_millis": 20000,
@@ -694,7 +707,7 @@
       "setup_s3_buckets": true,
       "create_glue_connections": true,
       "enable_operational_datastore_job_access": false,
-      "kinesis_agent_autoscale": true,
+      "bastion_host_autoscale": true,
       "ec2_instance_type": "t3.small",
       "ami_image_id": "ami-00cc4c3fee6bb6c22",
       "setup_redshift": true,
@@ -710,9 +723,11 @@
       "multiphase_cleanup_lambda_version": "vLatest",
       "scheduled_s3_file_transfer_retention_period_amount": 0,
       "scheduled_s3_file_transfer_retention_period_unit": "days",
+      "scheduled_file_transfer_use_default_parallelism": "false",
+      "scheduled_file_transfer_parallelism": 128,
       "enable_domain_builder_rds": true,
       "domain_builder_rds_parameter_group": "default.postgres15",
-      "enable_domain_builder_agent": true,
+      "enable_domain_builder_agent": false,
       "enable_cloud_trail": false,
       "include_dbuilder_gw_vpclink": false,
       "enable_dbuilder_serverless_gw": true,
@@ -747,7 +762,8 @@
         "dps-organisations",
         "dps-allocations",
         "dps-applications",
-        "dps-manage-pom"
+        "dps-manage-pom",
+        "dps-san"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -849,6 +865,10 @@
             },
             {
               "glue_database": "curated_prisons_history",
+              "glue_tables": ["*"]
+            },
+            {
+              "glue_database": "prison_derived",
               "glue_tables": ["*"]
             }
           ]

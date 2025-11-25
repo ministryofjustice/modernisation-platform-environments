@@ -64,12 +64,12 @@ resource "aws_iam_role" "dataapi_cross_role" {
   force_detach_policies = true
 
   tags = merge(
-    local.tags,
+    local.all_tags,
     {
-      Name           = "${local.project}-data-api-cross-account-role"
-      Resource_Type  = "iam"
-      Jira           = "DPR2-751"
-      Resource_Group = "Front-End"
+      dpr-name           = "${local.project}-data-api-cross-account-role"
+      dpr-resource-type  = "iam"
+      dpr-jira           = "DPR2-751"
+      dpr-resource-group = "Front-End"
     }
   )
 }
@@ -126,6 +126,12 @@ resource "aws_iam_role_policy_attachment" "glue_catalog_readonly" {
 resource "aws_iam_role_policy_attachment" "lake_formation_data_access" {
   role       = aws_iam_role.dataapi_cross_role.name
   policy_arn = aws_iam_policy.lake_formation_data_access.arn
+}
+
+# Lake formation list permissions
+resource "aws_iam_role_policy_attachment" "lake_formation_permissions_management" {
+  role       = aws_iam_role.dataapi_cross_role.name
+  policy_arn = aws_iam_policy.lake_formation_permissions_management.arn
 }
 
 # Lake Formation Tag Management Attachement

@@ -162,6 +162,24 @@ locals {
       }
     }
     ec2_instance_cwagent_windows = {
+      cpu-core-utilization-high = {
+        type            = "metric"
+        alarm_threshold = local.cloudwatch_metric_alarms.ec2_cwagent_windows.free-disk-space-low.threshold
+        expression      = "SORT(SEARCH('{CWAgent,InstanceId,instance,objectname} MetricName=\"PROCESSOR_TIME\"','Maximum'),MAX,DESC)"
+        properties = {
+          view    = "timeSeries"
+          stacked = false
+          region  = "eu-west-2"
+          title   = "EC2 Instance Windows cpu-core-utilization-high"
+          stat    = "Maximum"
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "%"
+            }
+          }
+        }
+      }
       free-disk-space-low = {
         type            = "metric"
         alarm_threshold = local.cloudwatch_metric_alarms.ec2_cwagent_windows.free-disk-space-low.threshold

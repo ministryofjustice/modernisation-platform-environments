@@ -362,7 +362,7 @@ resource "aws_security_group" "ses_sec_group" {
 #RDS role to access HUB 2.0 S3 Bucket
 resource "aws_iam_role" "rds_s3_access" {
   count = trimspace(var.hub20_s3_bucket) != "" ? 1 : 0
-  name = "rds-hub20-s3-access"
+  name  = "rds-hub20-s3-access"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",

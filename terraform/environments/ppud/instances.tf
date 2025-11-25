@@ -385,6 +385,31 @@ resource "aws_instance" "s609693lo6vw113" {
   }
 }
 
+# Development Server
+
+resource "aws_instance" "s609693lo6vw114" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
+  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
+  count                  = local.is-development == true ? 1 : 0
+  ami                    = "ami-05ca5ec6d38b0945b"
+  instance_type          = "m5.xlarge"
+  source_dest_check      = false
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.Dev-Servers-Standard[0].id]
+  subnet_id              = data.aws_subnet.private_subnets_c.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
+  tags = {
+    Name        = "s609693lo6vw114"
+    patch_group = "dev_win_patch"
+    backup      = true
+  }
+}
+
 #################################
 # Pre-Production (UAT Instances) 
 #################################
@@ -411,6 +436,7 @@ resource "aws_instance" "s618358rgvw023" {
     Name        = "s618358rgvw023"
     patch_group = "uat_win_patch"
     backup      = true
+    cpu_alarm   = true
   }
 }
 
@@ -436,6 +462,8 @@ resource "aws_instance" "s618358rgvw024" {
     Name        = "s618358rgvw024"
     patch_group = "uat_win_patch"
     backup      = true
+    cpu_alarm   = true
+    cpu_lambda_trigger = true
   }
 }
 

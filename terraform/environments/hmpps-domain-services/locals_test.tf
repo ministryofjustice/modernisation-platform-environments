@@ -1,5 +1,10 @@
 locals {
 
+  lb_maintenance_message_test = {
+    maintenance_title   = "Remote Desktop Environment Not Started"
+    maintenance_message = "This environment is available during working hours 7am-10pm Please contact <a href=\"https://moj.enterprise.slack.com/archives/C6D94J81E\">#ask-digital-studio-ops</a> slack channel if environment is unexpectedly down"
+  }
+
   baseline_presets_test = {
     options = {
       sns_topics = {
@@ -27,6 +32,21 @@ locals {
         tags = {
           description = "wildcard cert for hmpps domain load balancer"
         }
+      }
+    }
+
+    cloudwatch_dashboards = {
+      "CloudWatch-Default" = {
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.lb,
+          local.cloudwatch_dashboard_widget_groups.all_ec2,
+          local.cloudwatch_dashboard_widget_groups.jump,
+          local.cloudwatch_dashboard_widget_groups.rdgateway,
+          local.cloudwatch_dashboard_widget_groups.rdservices,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ssm_command,
+        ]
       }
     }
 
@@ -106,8 +126,10 @@ locals {
           }
         })
         tags = merge(local.ec2_instances.rdgw.tags, {
-          description = "Remote Desktop Gateway for azure.noms.root domain"
-          domain-name = "azure.noms.root"
+          description              = "Remote Desktop Gateway for azure.noms.root domain"
+          domain-name              = "azure.noms.root"
+          gha-jumpserver-startstop = "test"
+          instance-scheduling      = "skip-scheduling"
         })
       })
 
@@ -117,12 +139,15 @@ locals {
           availability_zone = "eu-west-2a"
         })
         instance = merge(local.ec2_instances.jumpserver.instance, {
+          instance_type = "r6i.large"
           tags = {
             patch-manager = "group2"
           }
         })
         tags = merge(local.ec2_instances.jumpserver.tags, {
-          domain-name = "azure.noms.root"
+          domain-name              = "azure.noms.root"
+          gha-jumpserver-startstop = "test"
+          instance-scheduling      = "skip-scheduling"
         })
       })
 
@@ -137,8 +162,10 @@ locals {
           }
         })
         tags = merge(local.ec2_instances.rds.tags, {
-          domain-name  = "azure.noms.root"
-          service-user = "svc_rds"
+          domain-name              = "azure.noms.root"
+          gha-jumpserver-startstop = "test"
+          instance-scheduling      = "skip-scheduling"
+          service-user             = "svc_rds"
         })
       })
     }
@@ -194,6 +221,25 @@ locals {
                   }
                 }]
               }
+              maintenance = {
+                priority = 999
+                actions = [{
+                  type = "fixed-response"
+                  fixed_response = {
+                    content_type = "text/html"
+                    message_body = templatefile("templates/maintenance.html.tftpl", local.lb_maintenance_message_test)
+                    status_code  = "200"
+                  }
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "maintenance.test.hmpps-domain.service.justice.gov.uk",
+                      "rdweb1.test.hmpps-domain.service.justice.gov.uk"
+                    ]
+                  }
+                }]
+              }
             }
           })
         })
@@ -202,15 +248,15 @@ locals {
 
     patch_manager = {
       patch_schedules = {
-        group1 = "cron(00 06 ? * WED *)" # 6am wed for prod for non-prod env's we have to work around the overnight shutdown  
-        group2 = "cron(00 06 ? * THU *)" # 6am thu for prod
+        group1 = "cron(50 06 ? * WED *)" # 6:50am wed to work around the overnight shutdown
+        group2 = "cron(50 06 ? * THU *)" # 6:50am thu, see patch-manager.tf for approval_days config
         manual = "cron(00 21 31 2 ? *)"  # 9pm 31 feb e.g. impossible date to allow for manual patching of otherwise enrolled instances
       }
       maintenance_window_duration = 2 # 4 for prod
       maintenance_window_cutoff   = 1 # 2 for prod
       patch_classifications = {
-        REDHAT_ENTERPRISE_LINUX = ["Security", "Bugfix"] # Linux Options=(Security,Bugfix,Enhancement,Recommended,Newpackage)
-        WINDOWS                 = ["SecurityUpdates", "CriticalUpdates"]
+        REDHAT_ENTERPRISE_LINUX = ["Security", "Bugfix"]                 # Linux Options=Security,Bugfix,Enhancement,Recommended,Newpackage
+        WINDOWS                 = ["SecurityUpdates", "CriticalUpdates"] # Windows Options=CriticalUpdates,SecurityUpdates,DefinitionUpdates,Drivers,FeaturePacks,ServicePacks,Tools,UpdateRollups,Updates,Upgrades
       }
     }
 
@@ -219,11 +265,13 @@ locals {
         "public-https-*-unhealthy-load-balancer-host",
         "*-instance-or-cloudwatch-agent-stopped",
       ]
+      end_time = "07:00"
     }
 
     route53_zones = {
       "test.hmpps-domain.service.justice.gov.uk" = {
         lb_alias_records = [
+          { name = "maintenance", type = "A", lbs_map_key = "public" },
           { name = "rdgateway1", type = "A", lbs_map_key = "public" },
           { name = "rdweb1", type = "A", lbs_map_key = "public" },
         ]

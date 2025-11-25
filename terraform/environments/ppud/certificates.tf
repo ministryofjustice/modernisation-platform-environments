@@ -14,8 +14,9 @@
 
 locals {
   preprod_domains = local.is-preproduction ? {
-    "uat"    = "uat.ppud.justice.gov.uk"
-    "wamuat" = "wamuat.ppud.justice.gov.uk"
+    "uat"      = "uat.ppud.justice.gov.uk"
+    "wamuat"   = "wamuat.ppud.justice.gov.uk"
+    "training" = "training.ppud.justice.gov.uk"
   } : {}
 }
 
