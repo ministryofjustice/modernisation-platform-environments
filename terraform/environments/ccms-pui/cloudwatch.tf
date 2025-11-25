@@ -122,7 +122,7 @@ resource "aws_cloudwatch_metric_alarm" "alb_healthyhosts" {
   statistic           = "Average"
   threshold           = local.application_data.accounts[local.environment].app_count
   alarm_description   = "Number of healthy nodes in Target Group"
-  actions_enabled     = "true"
+  actions_enabled     = true
   alarm_actions       = [aws_sns_topic.cloudwatch_alerts.arn]
   ok_actions          = [aws_sns_topic.cloudwatch_alerts.arn]
   dimensions = {
