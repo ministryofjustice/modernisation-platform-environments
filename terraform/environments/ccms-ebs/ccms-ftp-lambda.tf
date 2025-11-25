@@ -152,43 +152,6 @@ resource "aws_s3_bucket_lifecycle_configuration" "inbound_bucket_lifecycle_archi
   }
 }
 
-
-
-  # One lifecycle rule per prefix
-  # dynamic "rule" {
-  #   for_each = local.target_prefixes
-  #   content {
-  #     id     = "expire-${replace(each.value.id, "/", "-")}-${replace(rule.value, "/", "-")}${local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_current}d"
-  #     status = "Enabled"
-
-  #     filter {
-  #       and {
-  #         prefix                   = rule.value
-  #         object_size_greater_than = 0
-  #       }
-  #     }
-
-  #     expiration {
-  #       days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_current
-  #     }
-
-  #     noncurrent_version_transition {
-  #       noncurrent_days = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_noncurrent_standard
-  #       storage_class   = "STANDARD_IA"
-  #     }
-
-  #     noncurrent_version_transition {
-  #       noncurrent_days = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_noncurrent_glacier
-  #       storage_class   = "GLACIER"
-  #     }
-  #     noncurrent_version_expiration {
-  #       noncurrent_days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_noncurrent
-  #     }
-
-  #   }
-  # }
-}
-
 #--Dynamic blocks for transfer family policy in production only
 data "aws_iam_policy_document" "inbound_bucket_policy" {
   statement {
