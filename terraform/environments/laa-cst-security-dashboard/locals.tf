@@ -1,1 +1,7 @@
-#### This file can be used to store locals specific to the member account ####
+#######################################
+# Locals
+#######################################
+
+locals {
+  cst_app_name        = "cst-dashboard"
+}
