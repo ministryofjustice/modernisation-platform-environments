@@ -165,50 +165,50 @@ resource "aws_s3_bucket_lifecycle_configuration" "ftp_lambda_bucket_lifecycle_de
 
 
 # Lifecycle configuration: expire current objects and noncurrent versions after 30 days
-resource "aws_s3_bucket_lifecycle_configuration" "inbound_bucket_lifecycle" {
+# resource "aws_s3_bucket_lifecycle_configuration" "inbound_bucket_lifecycle" {
 
-  bucket = aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].id
+#   bucket = aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].id
   
-  rule {
-    id     = "delete-RBS-BACKUP-folder-file-after-5-days"
-    status = "Enabled"
+#   rule {
+#     id     = "delete-RBS-BACKUP-folder-file-after-5-days"
+#     status = "Enabled"
  
-    # No filter → applies to whole bucket
-    filter {
-      prefix = "CCMS_PRD_RBS/Inbound/BACKUP/"
-    }
+#     # No filter → applies to whole bucket
+#     filter {
+#       prefix = "CCMS_PRD_RBS/Inbound/BACKUP/"
+#     }
  
-    expiration {
-      days = 5   # delete objects 5 days after creation
-    }
-  }
+#     expiration {
+#       days = 5   # delete objects 5 days after creation
+#     }
+#   }
 
-  rule {
-    id     = "delete-archive-folder-file-after-5-days"
-    status = "Enabled"
+#   rule {
+#     id     = "delete-archive-folder-file-after-5-days"
+#     status = "Enabled"
  
-    # No filter → applies to whole bucket
-    filter {
-      prefix = "archive/"
-    }
+#     # No filter → applies to whole bucket
+#     filter {
+#       prefix = "archive/"
+#     }
  
-    expiration {
-      days = 5   # delete objects 5 days after creation
-    }
-  }
+#     expiration {
+#       days = 5   # delete objects 5 days after creation
+#     }
+#   }
 
-  rule {
-    id     = "delete-noncurrent-versions-after-5-days"
-    status = "Enabled"
+#   rule {
+#     id     = "delete-noncurrent-versions-after-5-days"
+#     status = "Enabled"
  
-    # No filter → applies to whole bucket
-    filter {}
+#     # No filter → applies to whole bucket
+#     filter {}
  
-    noncurrent_version_expiration {
-      noncurrent_days = 5
-    }
-  }
-}
+#     noncurrent_version_expiration {
+#       noncurrent_days = 5
+#     }
+#   }
+# }
 
 # resource "aws_s3_bucket_lifecycle_configuration" "inbound_bucket_lifecycle_archive_folder" {
 
