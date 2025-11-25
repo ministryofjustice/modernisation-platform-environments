@@ -87,6 +87,72 @@ locals {
         }
       }
       llm_gateway_teams = {
+        hmcts-claude-code = {
+          organisation = "hmcts"
+          max_budget = 10000
+          models = [
+            "bedrock-claude-haiku-4-5",
+            "bedrock-claude-sonnet-4-5"
+          ]
+          keys = {
+            chris-o = {
+              max_budget = 500
+              models = [
+                "bedrock-claude-haiku-4-5",
+                "bedrock-claude-sonnet-4-5"
+              ]
+            }
+            junaid-i = {
+              max_budget = 500
+              models = [
+                "bedrock-claude-haiku-4-5",
+                "bedrock-claude-sonnet-4-5"
+              ]
+            }
+            kian-k = {
+              max_budget = 500
+              models = [
+                "bedrock-claude-haiku-4-5",
+                "bedrock-claude-sonnet-4-5"
+              ]
+            }
+            natasha-a = {
+              max_budget = 500
+              models = [
+                "bedrock-claude-haiku-4-5",
+                "bedrock-claude-sonnet-4-5"
+              ]
+            }
+            alex-b = {
+              max_budget = 500
+              models = [
+                "bedrock-claude-haiku-4-5",
+                "bedrock-claude-sonnet-4-5"
+              ]
+            }
+            ashwini-v = {
+              max_budget = 500
+              models = [
+                "bedrock-claude-haiku-4-5",
+                "bedrock-claude-sonnet-4-5"
+              ]
+            }
+            mel-c = {
+              max_budget = 500
+              models = [
+                "bedrock-claude-haiku-4-5",
+                "bedrock-claude-sonnet-4-5"
+              ]
+            }
+            linus-n = {
+              max_budget = 500
+              models = [
+                "bedrock-claude-haiku-4-5",
+                "bedrock-claude-sonnet-4-5"
+              ]
+            }
+          }
+        }
         central-digital = {
           organisation = "ministryofjustice"
           models = [
