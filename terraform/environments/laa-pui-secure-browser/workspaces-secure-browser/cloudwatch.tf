@@ -3,7 +3,6 @@ resource "aws_cloudwatch_dashboard" "workspacesweb_active_sessions" {
   dashboard_name = "workspacesweb-active-sessions"
 
   dashboard_body = jsonencode({
-    # Make each widget obey its own period (don’t auto-scale with time range)
     periodOverride = "inherit"
 
     widgets = [
@@ -78,7 +77,7 @@ resource "aws_cloudwatch_dashboard" "workspacesweb_active_sessions" {
           "title"    = "WorkSpaces Web Active Sessions — last hour",
           "view"     = "singleValue",
           "stacked"  = false,
-          "start"    = "-PT1H"
+          "start"    = "-PT1H",
           "region"   = "eu-west-2",
           "timezone" = "+0000",
           "period"   = 3600,
@@ -97,7 +96,7 @@ resource "aws_cloudwatch_dashboard" "workspacesweb_active_sessions" {
         "type" = "metric",
         "x"    = 0, "y" = 12, "width" = 18, "height" = 6,
         "properties" = {
-          "title"    = "WorkSpaces Web Successful Sessions — per hour",
+          "title"    = "WorkSpaces Web Unique Users — per hour",
           "view"     = "timeSeries",
           "stacked"  = false,
           "region"   = "eu-west-2",
@@ -107,8 +106,8 @@ resource "aws_cloudwatch_dashboard" "workspacesweb_active_sessions" {
             [
               {
                 "id"         = "q1",
-                "label"      = "SessionSuccess (sum)",
-                "expression" = "SELECT SUM(SessionSuccess) FROM SCHEMA(\"AWS/WorkSpacesWeb\", PortalId) WHERE PortalId = '${local.portal_ids.external_1}'"
+                "label"      = "Unique users (COUNT DisplayLatency)",
+                "expression" = "SELECT COUNT(DisplayLatency) FROM SCHEMA(\"AWS/WorkSpacesWeb\", PortalId, UserName) WHERE PortalId = '${local.portal_ids.external_1}'"
               }
             ]
           ]
@@ -118,7 +117,7 @@ resource "aws_cloudwatch_dashboard" "workspacesweb_active_sessions" {
         "type" = "metric",
         "x"    = 18, "y" = 12, "width" = 6, "height" = 6,
         "properties" = {
-          "title"    = "WorkSpaces Web Successful Sessions — last 24 hours",
+          "title"    = "WorkSpaces Web Unique Users — last 24 hours",
           "view"     = "singleValue",
           "stacked"  = false,
           "start"    = "-PT24H",
@@ -129,8 +128,8 @@ resource "aws_cloudwatch_dashboard" "workspacesweb_active_sessions" {
             [
               {
                 "id"         = "q1",
-                "label"      = "SessionSuccess (sum)",
-                "expression" = "SELECT SUM(SessionSuccess) FROM SCHEMA(\"AWS/WorkSpacesWeb\", PortalId) WHERE PortalId = '${local.portal_ids.external_1}'"
+                "label"      = "Unique users (COUNT DisplayLatency)",
+                "expression" = "SELECT COUNT(DisplayLatency) FROM SCHEMA(\"AWS/WorkSpacesWeb\", PortalId, UserName) WHERE PortalId = '${local.portal_ids.external_1}'"
               }
             ]
           ]
