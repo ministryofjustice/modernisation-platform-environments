@@ -39,6 +39,11 @@ resource "aws_wafv2_web_acl" "basic" {
         vendor_name = "AWS"
       }
     }
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "BadInputRuleSet"
+      sampled_requests_enabled   = true
+    }
   }
 
   visibility_config {
@@ -48,7 +53,18 @@ resource "aws_wafv2_web_acl" "basic" {
   }
 }
 
+# WAF Logging to CloudWatch
+resource "aws_cloudwatch_log_group" "basic_waf_logs" {
+  name              = "aws-waf-logs-${local.cst_app_name}"
+  retention_in_days = 180
+
+  tags = merge(local.tags,
+    { Name = lower(format("%s-waf-logs", local.cst_app_name)) }
+  )
+}
+
+
 resource "aws_wafv2_web_acl_logging_configuration" "basic_waf_logging" {
   log_destination_configs = [aws_cloudwatch_log_group.basic_waf_logs.arn]
-  resource_arn            = aws_wafv2_web_acl.basic_web_acl.arn
+  resource_arn            = aws_wafv2_web_acl.basic.arn
 }
