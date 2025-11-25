@@ -65,6 +65,7 @@ module "virus_scan_file_sqs" {
   bucket               = module.s3-received-files-bucket.bucket
   lambda_function_name = module.virus_scan_file.lambda_function_name
   bucket_prefix        = local.bucket_prefix
+  maximum_concurrency  = 1000
 }
 
 resource "aws_s3_bucket_notification" "virus_scan_file" {
