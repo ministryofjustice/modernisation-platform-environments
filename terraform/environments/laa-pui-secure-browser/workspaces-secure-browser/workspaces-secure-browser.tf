@@ -84,8 +84,8 @@ resource "aws_workspacesweb_user_settings" "sso" {
 
   # Optional settings - same as main
   deep_link_allowed                  = "Enabled"
-  disconnect_timeout_in_minutes      = 60
-  idle_disconnect_timeout_in_minutes = 15
+  disconnect_timeout_in_minutes      = 30
+  idle_disconnect_timeout_in_minutes = 10
 
   # Enable SSO extension and define which cookies to sync -- DISABLED PENDING SEC REVIEW
   # cookie_synchronization_configuration {
