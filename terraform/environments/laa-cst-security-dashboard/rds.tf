@@ -59,6 +59,23 @@ resource "aws_iam_role" "rds_enhanced_monitoring" {
   name_prefix        = "rds-enhanced-monitoring"
 }
 
+data "aws_iam_policy_document" "rds_enhanced_monitoring" {
+  count = 1
+
+  statement {
+    actions = [
+      "sts:AssumeRole",
+    ]
+
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["monitoring.rds.amazonaws.com"]
+    }
+  }
+}
+
 resource "aws_db_parameter_group" "cst_db" {
   name = "cst-postgres-db"
   family      = "postgres16"
