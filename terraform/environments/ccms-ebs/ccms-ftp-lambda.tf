@@ -119,7 +119,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "inbound_bucket_lifecycle_RBS_B
   bucket = aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].id
   
   rule {
-    id     = "${bucket}-delete-RBS-BACKUP-folder-file-after-5-days"
+    id     = "delete-RBS-BACKUP-folder-file-after-5-days"
     status = "Enabled"
  
     # No filter → applies to whole bucket
@@ -138,7 +138,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "inbound_bucket_lifecycle_archi
   bucket = aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].id
   
   rule {
-    id     = "${bucket}-delete-archive-folder-file-after-5-days"
+    id     = "delete-archive-folder-file-after-5-days"
     status = "Enabled"
  
     # No filter → applies to whole bucket
