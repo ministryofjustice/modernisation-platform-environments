@@ -34,7 +34,7 @@ resource "aws_db_instance" "cst_db" {
   password                = random_password.cst_db.result
   publicly_accessible     = false
   skip_final_snapshot     = true
-  deletion_protection     = true
+  deletion_protection     = false
   backup_retention_period = 1
   vpc_security_group_ids  = [aws_security_group.cst_rds_sc.id]
   apply_immediately       = true
@@ -47,6 +47,7 @@ resource "aws_db_instance" "cst_db" {
   copy_tags_to_snapshot   = true
   performance_insights_kms_key_id = var.performance_insights_kms_key_id
   parameter_group_name        = aws_db_parameter_group.cst_db.name
+
   tags = {
     Name = "PostgresLatest"
   }
