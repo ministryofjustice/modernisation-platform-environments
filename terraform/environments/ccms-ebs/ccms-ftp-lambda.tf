@@ -124,8 +124,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "inbound_bucket_lifecycle_delet
     filter {}
  
     noncurrent_version_expiration {
-      noncurrent_days = 5
-      newer_noncurrent_versions = 0  # delete all noncurrent versions
+      days = 5
     }
   }
 }
@@ -142,8 +141,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "outbound_bucket_lifecycle_dele
     filter {}
  
     noncurrent_version_expiration {
-      noncurrent_days = 5
-      newer_noncurrent_versions = 0  # delete all noncurrent versions
+      days = 5
     }
   }
 }
@@ -160,8 +158,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "ftp_lambda_bucket_lifecycle_de
     filter {}
  
     noncurrent_version_expiration {
-      noncurrent_days = 5
-      newer_noncurrent_versions = 0  # delete all noncurrent versions
+      days = 5
     }
   }
 }
