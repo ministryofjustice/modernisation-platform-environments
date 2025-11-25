@@ -996,7 +996,7 @@ module "share_db_with_fms_lambda_role" {
   de_role_arn             = null
 }
 
-resource "aws_lakeformation_permissions" "add_create_db" {
+resource "aws_lakeformation_permissions" "fms_add_create_db" {
   count            = local.is-development ? 0 : 1
   permissions      = ["CREATE_DATABASE", "DROP"]
   principal        = aws_iam_role.load_fms[0].arn
