@@ -165,7 +165,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "ftp_lambda_bucket_lifecycle_de
 
 
 # Lifecycle configuration: expire current objects and noncurrent versions after 30 days
-resource "aws_s3_bucket_lifecycle_configuration" "inbound_bucket_lifecycle_RBS_BACKUP_folder" {
+resource "aws_s3_bucket_lifecycle_configuration" "inbound_bucket_lifecycle" {
 
   bucket = aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].id
   
@@ -182,12 +182,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "inbound_bucket_lifecycle_RBS_B
       days = 5   # delete objects 5 days after creation
     }
   }
-}
 
-resource "aws_s3_bucket_lifecycle_configuration" "inbound_bucket_lifecycle_archive_folder" {
-
-  bucket = aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].id
-  
   rule {
     id     = "delete-archive-folder-file-after-5-days"
     status = "Enabled"
@@ -202,6 +197,25 @@ resource "aws_s3_bucket_lifecycle_configuration" "inbound_bucket_lifecycle_archi
     }
   }
 }
+
+# resource "aws_s3_bucket_lifecycle_configuration" "inbound_bucket_lifecycle_archive_folder" {
+
+#   bucket = aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].id
+  
+#   rule {
+#     id     = "delete-archive-folder-file-after-5-days"
+#     status = "Enabled"
+ 
+#     # No filter → applies to whole bucket
+#     filter {
+#       prefix = "archive/"
+#     }
+ 
+#     expiration {
+#       days = 5   # delete objects 5 days after creation
+#     }
+#   }
+# }
 
 #--Dynamic blocks for transfer family policy in production only
 data "aws_iam_policy_document" "inbound_bucket_policy" {
