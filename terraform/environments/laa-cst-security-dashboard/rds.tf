@@ -44,7 +44,7 @@ resource "aws_db_instance" "cst_db" {
   performance_insights_enabled = true
   iam_database_authentication_enabled = true
   storage_encrypted       = true
-  enabled_cloudwatch_logs_exports = ["general", "error", "slowquery"]
+  enabled_cloudwatch_logs_exports = ["postgresql", "upgrade"]
   copy_tags_to_snapshot   = true
   performance_insights_kms_key_id = var.performance_insights_kms_key_id
   parameter_group_name        = aws_db_parameter_group.cst_db.name
