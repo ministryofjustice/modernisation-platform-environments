@@ -165,7 +165,7 @@ resource "aws_s3_bucket_notification" "load_dms_output_event" {
 
 
 # ----------------------------------------------
-# Load MDSS data sqs queue
+# Load data sqs queue
 # ----------------------------------------------
 
 module "load_mdss_event_queue" {
@@ -174,6 +174,16 @@ module "load_mdss_event_queue" {
   source               = "./modules/sqs_s3_lambda_trigger"
   bucket               = module.s3-raw-formatted-data-bucket.bucket
   lambda_function_name = module.load_mdss_lambda[0].lambda_function_name
+  bucket_prefix        = local.bucket_prefix
+  maximum_concurrency  = 100
+}
+
+module "load_fms_event_queue" {
+  count = local.is-development ? 0 : 1
+
+  source               = "./modules/sqs_s3_lambda_trigger"
+  bucket               = module.s3-raw-formatted-data-bucket.bucket
+  lambda_function_name = module.load_fms_lambda[0].lambda_function_name
   bucket_prefix        = local.bucket_prefix
   maximum_concurrency  = 100
 }
@@ -187,9 +197,12 @@ resource "aws_s3_bucket_notification" "load_mdss_event" {
     queue_arn     = module.load_mdss_event_queue[0].sqs_queue.arn
     events        = ["s3:ObjectCreated:*"]
     filter_prefix = "allied/mdss"
-
+  }
+  queue {
+    queue_arn     = module.load_fms_event_queue[0].sqs_queue.arn
+    events        = ["s3:ObjectCreated:*"]
+    filter_prefix = "serco/fms"
   }
 
-  depends_on = [module.load_mdss_event_queue[0]]
+  depends_on = [module.load_mdss_event_queue[0], module.load_fms_event_queue[0]]
 }
-
