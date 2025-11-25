@@ -112,22 +112,22 @@ resource "aws_s3_bucket_versioning" "s3_versioning" {
   }
 }
 
-resource "aws_s3_bucket_lifecycle_configuration" "inbound_bucket_lifecycle_delete_noncurrent_versions" {
+# resource "aws_s3_bucket_lifecycle_configuration" "inbound_bucket_lifecycle_delete_noncurrent_versions" {
 
-  bucket = aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].id
+#   bucket = aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].id
 
-  rule {
-    id     = "delete-noncurrent-versions-after-5-days"
-    status = "Enabled"
+#   rule {
+#     id     = "delete-noncurrent-versions-after-5-days"
+#     status = "Enabled"
  
-    # No filter → applies to whole bucket
-    filter {}
+#     # No filter → applies to whole bucket
+#     filter {}
  
-    noncurrent_version_expiration {
-      noncurrent_days = 5
-    }
-  }
-}
+#     noncurrent_version_expiration {
+#       noncurrent_days = 5
+#     }
+#   }
+# }
 
 resource "aws_s3_bucket_lifecycle_configuration" "outbound_bucket_lifecycle_delete_noncurrent_versions" {
 
@@ -194,6 +194,18 @@ resource "aws_s3_bucket_lifecycle_configuration" "inbound_bucket_lifecycle" {
  
     expiration {
       days = 5   # delete objects 5 days after creation
+    }
+  }
+
+  rule {
+    id     = "delete-noncurrent-versions-after-5-days"
+    status = "Enabled"
+ 
+    # No filter → applies to whole bucket
+    filter {}
+ 
+    noncurrent_version_expiration {
+      noncurrent_days = 5
     }
   }
 }
