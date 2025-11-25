@@ -20,7 +20,6 @@
 #     InstanceType = aws_instance.ec2_accessgate[count.index].instance_type
 #     InstanceId   = aws_instance.ec2_accessgate[count.index].id
 #     fstype       = "ext4"
-#     device       = "nvme4n1" # "/dev/sdc"
 #   }
 # }
 
@@ -46,7 +45,6 @@
 #     InstanceType = aws_instance.ec2_accessgate[count.index].instance_type
 #     InstanceId   = aws_instance.ec2_accessgate[count.index].id
 #     fstype       = "ext4"
-#     device       = "nvme2n1" # "/dev/sdd"
 #   }
 # }
 
@@ -72,6 +70,5 @@
 #     InstanceType = aws_instance.ec2_accessgate[count.index].instance_type
 #     InstanceId   = aws_instance.ec2_accessgate[count.index].id
 #     fstype       = "ext4"
-#     device       = "nvme3n1" # "/dev/sdh"
 #   }
 # }
