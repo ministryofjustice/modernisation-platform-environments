@@ -208,7 +208,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu" {
   for_each            = toset(data.aws_instances.windows_tagged_instances.ids)
   alarm_name          = "CPU-Utilisation-High-${each.key}" # name of the alarm
   comparison_operator = "GreaterThanOrEqualToThreshold"    # threshold to trigger the alarm state
-  period              = "60"                               # period in seconds over which the specified statistic is applied
+  period              = "300"                               # period in seconds over which the specified statistic is applied
   threshold           = "90"                               # threshold for the alarm - see comparison_operator for usage
   evaluation_periods  = "3"                                # how many periods over which to evaluate the alarm
   datapoints_to_alarm = "2"                                # how many datapoints must be breaching the threshold to trigger the alarm
@@ -927,7 +927,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu_uat_alarms" {
   for_each            = toset(data.aws_instances.cpu_alarm_tagged_instances_uat.ids)
   alarm_name          = "CPU-Utilisation-High-${each.key}"
   comparison_operator = "GreaterThanOrEqualToThreshold"
-  period              = 60
+  period              = 300
   threshold           = 90
   evaluation_periods  = 3
   datapoints_to_alarm = 2
