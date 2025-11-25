@@ -53,13 +53,13 @@ resource "aws_db_instance" "cst_db" {
   }
 }
 
-resource "aws_iam_role" "rds_enhanced_monitoring" {
-  assume_role_policy = data.aws_iam_policy_document.rds_enhanced_monitoring[0].json
+resource "aws_iam_role" "rds_monitoring_role" {
+  assume_role_policy = data.aws_iam_policy_document.rds_monitoring_role[0].json
   count              = 1
-  name_prefix        = "rds-enhanced-monitoring"
+  name_prefix        = "rds-monitoring-role"
 }
 
-data "aws_iam_policy_document" "rds_enhanced_monitoring" {
+data "aws_iam_policy_document" "rds_monitoring_role" {
   count = 1
 
   statement {
@@ -74,6 +74,11 @@ data "aws_iam_policy_document" "rds_enhanced_monitoring" {
       identifiers = ["monitoring.rds.amazonaws.com"]
     }
   }
+}
+
+resource "aws_iam_role_policy_attachment" "rds_monitoring_attach" {
+  role       = aws_iam_role.rds_monitoring_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonRDSEnhancedMonitoringRole"
 }
 
 resource "aws_db_parameter_group" "cst_db" {
