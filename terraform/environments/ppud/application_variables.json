@@ -13,7 +13,8 @@
       "maintenance_window_task_name": "DEV-Instance-Patch",
       "pre_healthcheck_Priority": 1,
       "post_healthcheck_Priority": 20,
-      "ssm_health_check_reports_s3": "moj-log-files-dev"
+      "ssm_health_check_reports_s3": "moj-log-files-dev",
+      "cloudwatch_sns_topic_arn": "arn:aws:sns:eu-west-2:${data.aws_caller_identity.current.account_id}:cw_dev_alerts"
     },
 
     "test": {
@@ -34,7 +35,8 @@
       "maintenance_window_task_name": "UAT-Instance-Patch",
       "pre_healthcheck_Priority": 1,
       "post_healthcheck_Priority": 20,
-      "ssm_health_check_reports_s3": "moj-log-files-uat"
+      "ssm_health_check_reports_s3": "moj-log-files-uat",
+      "cloudwatch_sns_topic_arn": "arn:aws:sns:eu-west-2:${data.aws_caller_identity.current.account_id}:cw_uat_alerts"
     },
     "production": {
       "directory_service_name": "PPUD.PROD",
@@ -57,7 +59,8 @@
       "maintenance_lin_window_task_name": "Prod-Instance-Patch",
       "pre_healthcheck_Priority": 1,
       "post_healthcheck_Priority": 20,
-      "ssm_health_check_reports_s3": "moj-log-files-prod"
+      "ssm_health_check_reports_s3": "moj-log-files-prod",
+      "cloudwatch_sns_topic_arn": "arn:aws:sns:eu-west-2:${data.aws_caller_identity.current.account_id}:cw_alerts"
     }
   }
 }
