@@ -36,7 +36,7 @@
       "pre_healthcheck_Priority": 1,
       "post_healthcheck_Priority": 20,
       "ssm_health_check_reports_s3": "moj-log-files-uat",
-      "cloudwatch_sns_topic_name": "ppud-cw-uat-alerts"
+      "cloudwatch_sns_topic_name": "ppud-uat-cw-alerts"
     },
     "production": {
       "directory_service_name": "PPUD.PROD",
