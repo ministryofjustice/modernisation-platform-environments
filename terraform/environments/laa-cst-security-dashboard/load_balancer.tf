@@ -1,4 +1,14 @@
-# PUI Load Balancer Configuration
+# CST Load Balancer Configuration
+
+resource "aws_security_group" "load_balancer" {
+  name_prefix = "${local.application_name}-load-balancer-sg"
+  description = "Controls access to ${local.application_name} lb"
+  vpc_id      = data.aws_vpc.shared.id
+
+  tags = merge(local.tags,
+    { Name = lower(format("%s-%s-lb-sg", local.application_name, local.environment)) }
+  )
+}
 
 resource "aws_lb" "cst" {
   name               = "${local.application_name}-lb"
