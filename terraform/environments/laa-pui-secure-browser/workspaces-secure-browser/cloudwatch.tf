@@ -93,48 +93,30 @@ resource "aws_cloudwatch_dashboard" "workspacesweb_active_sessions" {
         }
       },
       {
-        "type" = "metric",
-        "x"    = 0, "y" = 12, "width" = 18, "height" = 6,
+        "type"   = "logQuery",
+        "x"      = 0,
+        "y"      = 12,
+        "width"  = 12,
+        "height" = 6,
         "properties" = {
-          "title"    = "WorkSpaces Web Unique Users — per hour",
-          "view"     = "timeSeries",
-          "stacked"  = false,
+          "title"    = "Distinct WorkSpaces Web usernames — last 5 minutes",
           "region"   = "eu-west-2",
-          "timezone" = "+0000",
-          "period"   = 3600,
-          "metrics" = [
-            [
-              {
-                "id"         = "q1",
-                "label"      = "Unique users (COUNT DisplayLatency)",
-                "expression" = "SELECT COUNT(DisplayLatency) FROM SCHEMA(\"AWS/WorkSpacesWeb\", PortalId, UserName) WHERE PortalId = '${local.portal_ids.external_1}'"
-              }
-            ]
-          ]
-        }
-      },
-      {
-        "type" = "metric",
-        "x"    = 18, "y" = 12, "width" = 6, "height" = 6,
-        "properties" = {
-          "title"    = "WorkSpaces Web Unique Users — last 24 hours",
           "view"     = "singleValue",
-          "stacked"  = false,
-          "start"    = "-PT24H",
-          "region"   = "eu-west-2",
           "timezone" = "+0000",
-          "period"   = 86400,
-          "metrics" = [
-            [
-              {
-                "id"         = "q1",
-                "label"      = "Unique users (COUNT DisplayLatency)",
-                "expression" = "SELECT COUNT(DisplayLatency) FROM SCHEMA(\"AWS/WorkSpacesWeb\", PortalId, UserName) WHERE PortalId = '${local.portal_ids.external_1}'"
-              }
-            ]
-          ]
+          "logGroupNames" = [
+            "/lambda/laa-workspacesweb-session-logs-20251125223414321800000003"
+            # or better:
+            # aws_cloudwatch_log_group.workspacesweb_session_logs[0].name
+          ],
+          # Multi-line Logs Insights query using a heredoc
+          "query" = <<-QUERY
+fields @timestamp, session_detail.username
+| filter ispresent(session_detail.username)
+| stats count_distinct(session_detail.username) as unique_usernames
+QUERY
         }
       },
+
     ]
   })
 }
