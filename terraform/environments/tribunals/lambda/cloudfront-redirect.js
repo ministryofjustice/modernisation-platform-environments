@@ -92,7 +92,7 @@ exports.handler = (event, context, callback) => {
                 aliases: []
             },
             'complaints.judicialconduct.gov.uk': {
-                defaultRedirect: 'https://www.complaints.judicialconduct.gov.uk$request_uri',
+                defaultRedirect: 'http://www.complaints.judicialconduct.gov.uk$request_uri',
                 pathRedirects: [],
                 aliases: []
             },

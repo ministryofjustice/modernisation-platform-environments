@@ -2,16 +2,6 @@
 # SSM Patch Management Groups, Baselines, Maintenance Windows and Maintenance Window Tasks
 ##########################################################################################
 
-# Pre and Post Health Check Report S3 Bucket
-
-locals {
-  health_check_s3_buckets = {
-    development   = "moj-log-file-dev"
-    preproduction = "moj-log-file-uat"
-    production    = "moj-log-file-prod"
-  }
-}
-
 # SSM Patch Groups - All Environments
 
 resource "aws_ssm_patch_group" "win_patch_group" {
