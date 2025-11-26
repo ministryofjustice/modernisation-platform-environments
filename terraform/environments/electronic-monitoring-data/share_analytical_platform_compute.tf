@@ -62,6 +62,7 @@ locals {
     "staged_alcohol_monitoring",
     "preprocessed_cap_dw",
     "staged_cap_dw",
+    "curated_emsys_mvp",
     "preprocessed_emsys_mvp",
     "staged_emsys_mvp",
     "preprocessed_emsys_tpims",
@@ -71,6 +72,7 @@ locals {
     "g4s_atrium_curated",
     "g4s_centurion_curated",
     "g4s_tasking_curated",
+    "g4s_integrity_curated",
     "curated_fep",
     "g4s_lcm_archive_curated",
   ] : []

@@ -25,7 +25,7 @@ resource "aws_instance" "tariff_app" {
             sudo systemctl start amazon-ssm-agent
             EOF
   vpc_security_group_ids      = local.environment == "production" ? [module.tariff_app_prod_security_group[0].security_group_id, aws_security_group.tariff_app_prod_security_group[0].id] : [module.tariff_app_security_group[0].security_group_id, aws_security_group.tariff_app_security_group[0].id]
-  # vpc_security_group_ids = local.environment == "production" ? [aws_security_group.tariff_app_prod_security_group[0].id] : [aws_security_group.tariff_app_security_group[0].id]
+  # vpc_security_group_ids      = local.environment == "production" ? [aws_security_group.tariff_app_prod_security_group[0].id] : [aws_security_group.tariff_app_security_group[0].id]
 
   root_block_device {
     delete_on_termination = true
@@ -35,7 +35,7 @@ resource "aws_instance" "tariff_app" {
       "Name"               = "${local.application_name}-app-root",
       "volume-attach-host" = "app",
       "volume-mount-path"  = "/",
-    }), local.tags, local.environment != "production" ? tomap({ backup = true }) : tomap({}))
+    }), local.tags, local.environment != "production" ? tomap({ "backup" = "true" }) : tomap({}))
   }
   /*
   ebs_block_device {
@@ -86,7 +86,7 @@ resource "aws_instance" "tariff_app" {
   tags = merge(tomap({
     "Name"     = lower(format("ec2-%s-%s-app", local.application_name, local.environment)),
     "hostname" = "${local.application_name}-app",
-    }), local.tags, local.environment != "production" ? tomap({ backup = true }) : tomap({})
+    }), local.tags, local.environment != "production" ? tomap({ "backup" = "true" }) : tomap({})
   )
 
   lifecycle {
@@ -103,7 +103,7 @@ resource "aws_ebs_volume" "tariff_app_storage" {
     "Name"               = "${local.application_name}-app-root",
     "volume-attach-host" = "app",
     "volume-mount-path"  = "/",
-  }), local.tags, local.environment != "production" ? tomap({ backup = true }) : tomap({}))
+  }), local.tags, local.environment != "production" ? tomap({ "backup" = "true" }) : tomap({}))
 }
 
 resource "aws_volume_attachment" "tariff_app_storage_attachment" {

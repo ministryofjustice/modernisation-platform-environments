@@ -65,6 +65,7 @@ module "virus_scan_file_sqs" {
   bucket               = module.s3-received-files-bucket.bucket
   lambda_function_name = module.virus_scan_file.lambda_function_name
   bucket_prefix        = local.bucket_prefix
+  maximum_concurrency  = 1000
 }
 
 resource "aws_s3_bucket_notification" "virus_scan_file" {
@@ -165,7 +166,7 @@ resource "aws_s3_bucket_notification" "load_dms_output_event" {
 
 
 # ----------------------------------------------
-# Load MDSS data sqs queue
+# Load data sqs queue
 # ----------------------------------------------
 
 module "load_mdss_event_queue" {
@@ -175,6 +176,17 @@ module "load_mdss_event_queue" {
   bucket               = module.s3-raw-formatted-data-bucket.bucket
   lambda_function_name = module.load_mdss_lambda[0].lambda_function_name
   bucket_prefix        = local.bucket_prefix
+  maximum_concurrency  = 100
+}
+
+module "load_fms_event_queue" {
+  count = local.is-development ? 0 : 1
+
+  source               = "./modules/sqs_s3_lambda_trigger"
+  bucket               = module.s3-raw-formatted-data-bucket.bucket
+  lambda_function_name = module.load_fms_lambda[0].lambda_function_name
+  bucket_prefix        = local.bucket_prefix
+  maximum_concurrency  = 100
 }
 
 resource "aws_s3_bucket_notification" "load_mdss_event" {
@@ -186,19 +198,12 @@ resource "aws_s3_bucket_notification" "load_mdss_event" {
     queue_arn     = module.load_mdss_event_queue[0].sqs_queue.arn
     events        = ["s3:ObjectCreated:*"]
     filter_prefix = "allied/mdss"
-
+  }
+  queue {
+    queue_arn     = module.load_fms_event_queue[0].sqs_queue.arn
+    events        = ["s3:ObjectCreated:*"]
+    filter_prefix = "serco/fms"
   }
 
-  depends_on = [module.load_mdss_event_queue[0]]
-}
-
-# ----------------------------------------------
-# Clean up MDSS load queue
-# ----------------------------------------------
-
-resource "aws_sqs_queue" "clean_mdss_load_queue" {
-  name = "clean_mdss_load_queue"
-  visibility_timeout_seconds = 30
-  message_retention_seconds = 432000 # 5 days
-
+  depends_on = [module.load_mdss_event_queue[0], module.load_fms_event_queue[0]]
 }

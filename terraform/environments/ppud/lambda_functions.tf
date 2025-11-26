@@ -76,7 +76,7 @@ locals {
     wam_waf_analysis = {
       description  = "Function to analyse WAM WAF ACL traffic and email a report."
       role_key     = "get_cloudwatch"
-      environments = ["development"]
+      environments = ["development", "preproduction", "production"]
       layers       = ["numpy", "pillow", "requests", "matplotlib"]
       permissions = [{
         principal         = "cloudwatch.amazonaws.com"
