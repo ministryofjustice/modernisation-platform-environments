@@ -1,8 +1,0 @@
-#######################################
-# Locals
-#######################################
-
-locals {
-  cst_app_name        = "cst-dashboard"
-  environment         = "prod"
-}
