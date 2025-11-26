@@ -68,3 +68,15 @@ resource "aws_lb_listener" "cst" {
     type             = "forward"
   }
 }
+
+# Certificate
+
+resource "aws_acm_certificate" "external" {
+  validation_method         = "DNS"
+  domain_name               = local.primary_domain
+  subject_alternative_names = local.subject_alternative_names
+
+  tags = merge(local.tags,
+    { Environment = local.environment }
+  )
+}
