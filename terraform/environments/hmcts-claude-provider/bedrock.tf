@@ -16,8 +16,10 @@ resource "aws_iam_policy" "bedrock_claude_policy" {
           "bedrock:List*"
         ],
         Resource = [
+          "arn:aws:bedrock:eu-*::foundation-model/anthropic.claude-opus-4-5-20251101-v1:0",
           "arn:aws:bedrock:eu-*::foundation-model/anthropic.claude-sonnet-4-5-20250929-v1:0",
           "arn:aws:bedrock:eu-*::foundation-model/anthropic.claude-sonnet-4-20250514-v1:0",
+          "arn:aws:bedrock:eu-*::foundation-model/anthropic.claude-haiku-4-5-20251001-v1:0",
           "arn:aws:bedrock:us-*::foundation-model/anthropic.claude-3-5-haiku-20241022-v1:0",
           "arn:aws:bedrock:eu-*::foundation-model/anthropic.claude-3-5-haiku-20241022-v1:0",
           "arn:aws:bedrock:eu-*::foundation-model/anthropic.claude-3-haiku-20240307-v1:0",

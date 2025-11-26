@@ -54,8 +54,10 @@ source ~/.bashrc  # or source ~/.zshrc
 
 Use the system-defined EU inference profiles for cross-region load balancing:
 
+- **Claude Opus 4.5**: `eu.anthropic.claude-opus-4-5-20251101-v1:0`
 - **Claude Sonnet 4.5**: `eu.anthropic.claude-sonnet-4-5-20250929-v1:0` (recommended)
 - **Claude Sonnet 4**: `eu.anthropic.claude-sonnet-4-20250514-v1:0`
+- **Claude Haiku 4.5**: `eu.anthropic.claude-haiku-4-5-20251001-v1:0`
 
 These inference profiles route requests across multiple EU regions (eu-west-1, eu-central-1, eu-north-1, eu-west-3, etc.) for optimal availability.
 
