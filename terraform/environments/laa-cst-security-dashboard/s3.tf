@@ -5,14 +5,14 @@ module "s3-bucket-logging" {
   # v9.0.0 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/9facf9fc8f8b8e3f93ffbda822028534b9a75399
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9fc8f8b8e3f93ffbda822028534b9a75399"
 
-  bucket_name        = "${local.application_name}-${local.environment}-logging"
+  bucket_name        = "${local.cst_app_name}-${local.environment}-logging"
   versioning_enabled = true
   bucket_policy      = [aws_s3_bucket_policy.lb_access_logs.policy]
   sse_algorithm      = "AES256"
   custom_kms_key     = ""
 
-  log_bucket = "${local.application_name}-${local.environment}-logging"
-  log_prefix = "s3access/${local.application_name}-${local.environment}-logging"
+  log_bucket = "${local.cst_app_name}-${local.environment}-logging"
+  log_prefix = "s3access/${local.cst_app_name}-${local.environment}-logging"
 
   # Refer to the below section "Replication" before enabling replication
   replication_enabled = false
@@ -70,7 +70,7 @@ module "s3-bucket-logging" {
   ]
 
   tags = merge(local.tags,
-    { Name = lower(format("%s-%s-logging", local.application_name, local.environment)) }
+    { Name = lower(format("%s-%s-logging", local.cst_app_name, local.environment)) }
   )
 }
 
