@@ -4,7 +4,7 @@ module "s3_workspacesweb_session_logs_sns_topic" {
   source  = "terraform-aws-modules/sns/aws"
   version = "6.2.0"
 
-  name = "s3-firewall-log-notifications"
+  name = "s3-workspaces-log-notifications"
   subscriptions = {
     cortex = {
       protocol = "sqs"
