@@ -27,11 +27,6 @@ resource "aws_lb" "cst" {
     enabled = true
   }
 
-  health_check {
-    port     = "443"
-    protocol = "HTTPS"
-  }
-
   tags = merge(local.tags,
     { Name = lower(format("%s-%s-lb", local.application_name, local.environment)) }
   )
@@ -51,6 +46,11 @@ resource "aws_lb_target_group" "cst_target_group" {
     type            = "lb_cookie"
     cookie_duration = 7200
     enabled         = true
+  }
+
+  health_check {
+    port     = "443"
+    protocol = "HTTPS"
   }
 
   tags = merge(local.tags,
