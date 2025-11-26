@@ -40,18 +40,18 @@ module "tariff_db_prod_security_group" {
     },
     {
       rule = "oracle-db-tcp"
-      cidr_blocks = join(",", [
-        data.aws_vpc.shared.cidr_block,
-        local.cidr_cica_ss_a,
-        local.cidr_cica_ss_b,
-        local.cidr_cica_ras,
-        local.cidr_cica_lan,
-        local.cidr_cica_ras_nat,
-        local.cidr_cica_prod_a,
-        local.cidr_cica_prod_b,
-        local.cidr_cica_prod_c,
-        local.cidr_cica_prod_d
-      ])
+        cidr_blocks = join(",", concat([
+          data.aws_vpc.shared.cidr_block,
+          local.cidr_cica_ss_a,
+          local.cidr_cica_ss_b,
+          local.cidr_cica_ras,
+          local.cidr_cica_lan,
+          local.cidr_cica_ras_nat,
+          local.cidr_cica_prod_a,
+          local.cidr_cica_prod_b,
+          local.cidr_cica_prod_c,
+          local.cidr_cica_prod_d
+        ], local.cidr_analytics))
     },
     {
       from_port = 7001

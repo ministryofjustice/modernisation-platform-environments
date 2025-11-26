@@ -42,7 +42,7 @@ module "tariff_app_security_group" {
     },
     {
       rule = "oracle-db-tcp"
-      cidr_blocks = join(",", [
+      cidr_blocks = join(",", concat([
         data.aws_vpc.shared.cidr_block,
         local.cidr_cica_ss_a,
         local.cidr_cica_ss_b,
@@ -55,7 +55,7 @@ module "tariff_app_security_group" {
         local.cidr_cica_dev_c,
         local.cidr_cica_dev_d,
         local.cidr_cica_ras_nat
-      ])
+      ], local.cidr_analytics))
     },
     {
       from_port = 7001
