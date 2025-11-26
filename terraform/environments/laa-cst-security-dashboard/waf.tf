@@ -1,7 +1,7 @@
 # modules/waf.tf
 
-resource "aws_wafv2_web_acl" "basic" {
-  name        = "basic-waf"
+resource "aws_wafv2_web_acl" "cst_waf" {
+  name        = "cst-waf"
   scope       = "REGIONAL"
   default_action { 
     block {} 
@@ -48,13 +48,13 @@ resource "aws_wafv2_web_acl" "basic" {
 
   visibility_config {
     cloudwatch_metrics_enabled = true
-    metric_name                = "basicWaf"
+    metric_name                = "cstWaf"
     sampled_requests_enabled   = true
   }
 }
 
 # WAF Logging to CloudWatch
-resource "aws_cloudwatch_log_group" "basic_waf_logs" {
+resource "aws_cloudwatch_log_group" "cst_waf_logs" {
   name              = "aws-waf-logs-${local.application_name}"
   retention_in_days = 365
   kms_key_id = var.kms_key_id
@@ -64,8 +64,7 @@ resource "aws_cloudwatch_log_group" "basic_waf_logs" {
   )
 }
 
-
-resource "aws_wafv2_web_acl_logging_configuration" "basic_waf_logging" {
-  log_destination_configs = [aws_cloudwatch_log_group.basic_waf_logs.arn]
-  resource_arn            = aws_wafv2_web_acl.basic.arn
+resource "aws_wafv2_web_acl_logging_configuration" "cst_waf_logging" {
+  log_destination_configs = [aws_cloudwatch_log_group.cst_waf_logs.arn]
+  resource_arn            = aws_wafv2_web_acl.cst_waf.arn
 }
