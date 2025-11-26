@@ -826,10 +826,17 @@ data "aws_iam_policy_document" "load_mdss_lambda_role_policy_document" {
     actions   = ["s3:ListAllMyBuckets", "s3:GetBucketLocation"]
     resources = ["*"]
   }
+  # MDSS cleanup queue
   statement {
-    sid       = "AllowSQSSendMessage"
+    sid       = "AllowMdssCleanupQueueAccess"
     effect    = "Allow"
-    actions   = "sqs:SendMessage"
+    actions   = [
+      "sqs:SendMessage",
+      "sqs:ReceiveMessage",
+      "sqs:DeleteMessage",
+      "sqs:GetQueueAttributes",
+      "sqs:GetQueueUrl",
+    ]
     resources = [aws_sqs_queue.clean_mdss_load_queue.arn]
   }
 }
@@ -1002,98 +1009,5 @@ resource "aws_lakeformation_permissions" "fms_add_create_db" {
   count            = local.is-development ? 0 : 1
   permissions      = ["CREATE_DATABASE", "DROP"]
   principal        = aws_iam_role.load_fms[0].arn
-  catalog_resource = true
-}
-
-#-----------------------------------------------------------------------------------
-# Clean after MDSS load
-#-----------------------------------------------------------------------------------
-
-resource "aws_iam_role" "clean_after_mdss_load" {
-  name               = "clean_after_mdss_load-lambda-role"
-  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
-}
-
-data "aws_iam_policy_document" "clean_after_mdss_load_lambda_role_policy_document" {
-  count = local.is-development ? 0 : 1
-  # s3 permissions
-   statement {
-    sid    = "S3Permissions"
-    effect = "Allow"
-    actions = [
-      "s3:DeleteObject",
-      "s3:DeleteObjectVersion",
-      "s3:ListBucket",
-      "s3express:CreateSession"
-    ]
-    resources = [
-      "${module.s3-create-a-derived-table-bucket.bucket.arn}/staging/allied_mdss${local.db_suffix}_pipeline/*",
-      "${module.s3-athena-bucket.bucket.arn}/output/*",
-      "${module.s3-athena-bucket.bucket.arn}/*",
-    ]
-  }
-  # glue permissions
-  statement {
-    sid    = "GluePermissionsForDeletion"
-    effect = "Allow"
-    actions = [
-      "glue:GetTable",
-      "glue:GetTables",
-      "glue:GetDatabase",
-      "glue:GetDatabases",
-      "glue:DeleteTable",
-      "glue:DeleteDatabase",
-      "glue:GetCatalog"
-    ]
-    resources = [
-      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:catalog",
-      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:database/*",
-      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/*/*",
-      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:userDefinedFunction/*/*",
-    ]
-  }
-  statement {
-    sid    = "LakeFormationPermissionsForDeletion"
-    effect = "Allow"
-    actions = ["lakeformation:GrantPermissions"]
-    resources = ["*"]
-  }
-  # ?
-  statement {
-    sid       = "ListAccountAlias"
-    effect    = "Allow"
-    actions   = ["iam:ListAccountAliases"]
-    resources = ["*"]
-  }
-  # allow triggering from queue
-  statement {
-    sid       = "AllowTriggeringFromQueue"
-    effect    = "Allow"
-    actions   = [
-      "sqs:RecieveMessage",
-      "sqs:DeleteMessage",
-      "sqs:GetQueueAttributes",
-      "sqs:GetQueueUrl"
-    ]
-    resources = [aws_sqs_queue.clean_mdss_load_queue.arn]
-  }
-}
-
-resource "aws_iam_policy" "clean_after_mdss_load_lambda_role_policy" {
-  count = local.is-development ? 0 : 1
-  name   = "clean_after_mdss_load_lambda_policy"
-  policy = data.aws_iam_policy_document.clean_after_mdss_load_lambda_role_policy_document[0].json
-}
-
-resource "aws_iam_role_policy_attachment" "clean_after_mdss_load_output_lambda_policy_attachment" {
-  count = local.is-development ? 0 : 1
-  role       = aws_iam_role.clean_after_mdss_load[0].name
-  policy_arn = aws_iam_policy.clean_after_mdss_load_lambda_role_policy[0].arn
-}
-
-resource "aws_lakeformation_permissions" "add_delete_db" {
-  count = local.is-development ? 0 : 1
-  permissions      = ["DELETE", "DROP"]
-  principal        = aws_iam_role.clean_after_mdss_load[0].arn
   catalog_resource = true
 }
