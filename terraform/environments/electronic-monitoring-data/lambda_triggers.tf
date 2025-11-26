@@ -216,3 +216,12 @@ resource "aws_sqs_queue" "clean_mdss_load_queue" {
   visibility_timeout_seconds = 30
   message_retention_seconds = 432000 # 5 days
 }
+
+resource "aws_lambda_event_source_mapping" "trigger_cleanup" {
+  event_source_arn = aws_sqs_queue.clean_mdss_load_queue.arn
+  function_name    = module.clean_after_mdss_load.lambda_function_name
+  batch_size       = 10
+  scaling_config {
+    maximum_concurrency = 1000
+  }
+}
