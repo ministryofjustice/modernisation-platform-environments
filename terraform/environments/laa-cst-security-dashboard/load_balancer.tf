@@ -18,10 +18,18 @@ resource "aws_lb" "cst" {
 
   security_groups = [aws_security_group.load_balancer.id]
 
+  drop_invalid_header_fields = true
+  enable_deletion_protection = true
+
   access_logs {
     bucket  = module.s3-bucket-logging.bucket.id
     prefix  = "${local.application_name}-lb"
     enabled = true
+  }
+
+  health_check {
+    port     = "443"
+    protocol = "HTTPS"
   }
 
   tags = merge(local.tags,
@@ -77,7 +85,9 @@ resource "aws_acm_certificate" "external" {
   subject_alternative_names = [
     format("%s.%s", local.application_name, "laa.service.justice.gov.uk")
   ]
-
+  lifecycle {
+    create_before_destroy = true
+  }
   tags = merge(local.tags,
     { Environment = "prod" }
   )
