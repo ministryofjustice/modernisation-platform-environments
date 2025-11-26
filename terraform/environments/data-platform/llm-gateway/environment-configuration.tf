@@ -72,6 +72,18 @@ locals {
             model_id = "eu.anthropic.claude-sonnet-4-5-20250929-v1:0"
             region   = "eu-west-2"
           }
+          cohere-embed-english-v3 = {
+            model_id = "cohere.embed-english-v3"
+            region   = "eu-west-2"
+          }
+          cohere-embed-multilingual-v3 = {
+            model_id = "cohere.embed-multilingual-v3"
+            region   = "eu-west-2"
+          }
+          cohere-embed-v4 = {
+            model_id = "cohere.embed-v4:0"
+            region   = "eu-west-2"
+          }
           meta-llama3-8b-instruct = {
             model_id = "meta.llama3-8b-instruct-v1:0"
             region   = "eu-west-2"
@@ -220,7 +232,10 @@ locals {
             "azure-gpt-4o",
             "azure-gpt-5",
             "bedrock-claude-haiku-4-5",
-            "bedrock-claude-sonnet-4-5"
+            "bedrock-claude-sonnet-4-5",
+            "bedrock-cohere-embed-english-v3",
+            "bedrock-cohere-embed-multilingual-v3",
+            "bedrock-cohere-embed-v4",
           ]
           keys = {
             /* For Nikki Rayner */
@@ -232,7 +247,11 @@ locals {
             }
             /* For William Martin (https://github.com/ministryofjustice/data-platform-support/issues/1504) */
             vcit-x-tmc-dev = {
-              models = ["bedrock-claude-sonnet-4-5"]
+              models = [
+                "bedrock-claude-sonnet-4-5",
+                "bedrock-cohere-embed-english-v3",
+                "bedrock-cohere-embed-multilingual-v3"
+              ]
             }
           }
         }
