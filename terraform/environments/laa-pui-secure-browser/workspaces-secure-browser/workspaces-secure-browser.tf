@@ -191,6 +191,7 @@ resource "aws_workspacesweb_browser_settings" "main" {
           "[*.]msftidentity.com",
           "[*.]msidentity.com",
           "[*.]phonefactor.net",
+          "[*.]accessmycloudpc.com",
           "account.activedirectory.windowsazure.com",
           "accounts.accesscontrol.windows.net",
           "adminwebservice.microsoftonline.com",
@@ -231,6 +232,7 @@ resource "aws_workspacesweb_browser_settings" "main" {
           "passwordreset.microsoftonline.com",
           "portal.manage.microsoft.com",
           "provisioningapi.microsoftonline.com",
+          "sso.godaddy.com",
           "www.gov.uk",
           "www.justice.gov.uk",
           "www.smartsurvey.co.uk"
