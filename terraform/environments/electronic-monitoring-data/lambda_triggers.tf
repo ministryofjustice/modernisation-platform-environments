@@ -235,3 +235,18 @@ resource "aws_lambda_event_source_mapping" "trigger_cleanup" {
     maximum_concurrency = 1000
   }
 }
+# ----------------------------------------------
+# MDSS cleanup SQS to Lambda trigger - this might need to be corrected
+# ----------------------------------------------
+
+resource "aws_lambda_event_source_mapping" "mdss_cleanup_sqs_trigger" {
+  count            = local.is-development ? 0 : 1
+  event_source_arn = aws_sqs_queue.mdss_cleanup_event_queue.arn
+  function_name    = module.clean_after_mdss_load[0].lambda_function_name
+
+  batch_size = 10
+
+  scaling_config {
+    maximum_concurrency = 50
+  }
+}
