@@ -75,7 +75,7 @@ resource "aws_acm_certificate" "external" {
   validation_method         = "DNS"
   domain_name               = "laa.service.justice.gov.uk"
   subject_alternative_names = [
-    format("%s.%s", local.cst_app_name, "laa.service.justice.gov.uk")
+    format("%s.%s", local.application_name, "laa.service.justice.gov.uk")
   ]
 
   tags = merge(local.tags,

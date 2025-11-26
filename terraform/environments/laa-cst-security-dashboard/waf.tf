@@ -55,12 +55,12 @@ resource "aws_wafv2_web_acl" "basic" {
 
 # WAF Logging to CloudWatch
 resource "aws_cloudwatch_log_group" "basic_waf_logs" {
-  name              = "aws-waf-logs-${local.cst_app_name}"
+  name              = "aws-waf-logs-${local.application_name}"
   retention_in_days = 365
   kms_key_id = var.kms_key_id
 
   tags = merge(local.tags,
-    { Name = lower(format("%s-waf-logs", local.cst_app_name)) }
+    { Name = lower(format("%s-waf-logs", local.application_name)) }
   )
 }
 
