@@ -94,9 +94,9 @@ resource "aws_cloudwatch_dashboard" "workspacesweb_active_sessions" {
       },
       # Distinct usernames - last 5 minutes
       {
-        "type" = "logQuery",
-        "x"    = 0,
-        "y"    = 12,
+        "type"   = "logQuery",
+        "x"      = 0,
+        "y"      = 12,
         "width"  = 6,
         "height" = 6,
         "properties" = {
@@ -105,8 +105,8 @@ resource "aws_cloudwatch_dashboard" "workspacesweb_active_sessions" {
           "view"          = "singleValue",
           "timezone"      = "+0000",
           "start"         = "-PT5M",
-          "logGroupNames" = [ aws_cloudwatch_log_group.workspacesweb_session_logs[0].name ],
-          "query" = <<-QUERY
+          "logGroupNames" = [aws_cloudwatch_log_group.workspacesweb_session_logs[0].name],
+          "query"         = <<-QUERY
 fields @timestamp, session_detail.username
 | filter ispresent(session_detail.username)
 | stats count_distinct(session_detail.username) as unique_usernames
@@ -115,9 +115,9 @@ QUERY
       },
       # Distinct usernames - last hour
       {
-        "type" = "logQuery",
-        "x"    = 6,
-        "y"    = 12,
+        "type"   = "logQuery",
+        "x"      = 6,
+        "y"      = 12,
         "width"  = 6,
         "height" = 6,
         "properties" = {
@@ -126,8 +126,8 @@ QUERY
           "view"          = "singleValue",
           "timezone"      = "+0000",
           "start"         = "-PT1H",
-          "logGroupNames" = [ aws_cloudwatch_log_group.workspacesweb_session_logs[0].name ],
-          "query" = <<-QUERY
+          "logGroupNames" = [aws_cloudwatch_log_group.workspacesweb_session_logs[0].name],
+          "query"         = <<-QUERY
 fields @timestamp, session_detail.username
 | filter ispresent(session_detail.username)
 | stats count_distinct(session_detail.username) as unique_usernames
@@ -136,9 +136,9 @@ QUERY
       },
       # Distinct usernames - last 6 hours
       {
-        "type" = "logQuery",
-        "x"    = 12,
-        "y"    = 12,
+        "type"   = "logQuery",
+        "x"      = 12,
+        "y"      = 12,
         "width"  = 6,
         "height" = 6,
         "properties" = {
@@ -147,8 +147,8 @@ QUERY
           "view"          = "singleValue",
           "timezone"      = "+0000",
           "start"         = "-PT6H",
-          "logGroupNames" = [ aws_cloudwatch_log_group.workspacesweb_session_logs[0].name ],
-          "query" = <<-QUERY
+          "logGroupNames" = [aws_cloudwatch_log_group.workspacesweb_session_logs[0].name],
+          "query"         = <<-QUERY
 fields @timestamp, session_detail.username
 | filter ispresent(session_detail.username)
 | stats count_distinct(session_detail.username) as unique_usernames
@@ -157,9 +157,9 @@ QUERY
       },
       # Distinct usernames - last 24 hours
       {
-        "type" = "logQuery",
-        "x"    = 18,
-        "y"    = 12,
+        "type"   = "logQuery",
+        "x"      = 18,
+        "y"      = 12,
         "width"  = 6,
         "height" = 6,
         "properties" = {
@@ -168,8 +168,8 @@ QUERY
           "view"          = "singleValue",
           "timezone"      = "+0000",
           "start"         = "-PT24H",
-          "logGroupNames" = [ aws_cloudwatch_log_group.workspacesweb_session_logs[0].name ],
-          "query" = <<-QUERY
+          "logGroupNames" = [aws_cloudwatch_log_group.workspacesweb_session_logs[0].name],
+          "query"         = <<-QUERY
 fields @timestamp, session_detail.username
 | filter ispresent(session_detail.username)
 | stats count_distinct(session_detail.username) as unique_usernames
