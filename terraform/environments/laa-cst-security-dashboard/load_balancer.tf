@@ -73,10 +73,12 @@ resource "aws_lb_listener" "cst" {
 
 resource "aws_acm_certificate" "external" {
   validation_method         = "DNS"
-  domain_name               = local.primary_domain
-  subject_alternative_names = local.subject_alternative_names
+  domain_name               = "laa.service.justice.gov.uk"
+  subject_alternative_names = [
+    format("%s.%s", local.cst_app_name, "laa.service.justice.gov.uk")
+  ]
 
   tags = merge(local.tags,
-    { Environment = local.environment }
+    { Environment = "prod" }
   )
 }
