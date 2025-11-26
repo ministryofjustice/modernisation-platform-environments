@@ -142,9 +142,8 @@ resource "aws_lambda_event_source_mapping" "sqs_trigger" {
 }
 
 
-# ----------------------------------------------
-# Load DMS data sqs queue
-# ----------------------------------------------
+
+
 
 module "load_dms_output_event_queue" {
   source               = "./modules/sqs_s3_lambda_trigger"
@@ -206,4 +205,14 @@ resource "aws_s3_bucket_notification" "load_mdss_event" {
   }
 
   depends_on = [module.load_mdss_event_queue[0], module.load_fms_event_queue[0]]
+}
+
+# ----------------------------------------------
+# Clean up MDSS load queue
+# ----------------------------------------------
+
+resource "aws_sqs_queue" "clean_mdss_load_queue" {
+  name = "clean_mdss_load_queue"
+  visibility_timeout_seconds = 30
+  message_retention_seconds = 432000 # 5 days
 }
