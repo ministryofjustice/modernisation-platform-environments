@@ -49,7 +49,6 @@ resource "aws_lb_target_group" "cst_target_group" {
   }
 
   health_check {
-    name = "target-group-1"
     port = 80
     protocol = "HTTP"
   }
