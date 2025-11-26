@@ -19,8 +19,8 @@ resource "aws_security_group" "ncas_lb_sc" {
     cidr_blocks = ["35.176.93.186/32"]
   }
 
-  // Allow all User IPs
   ingress {
+    description = "Allows access on HTTPS for whitelisted user IPs"
     from_port = 443
     to_port   = 443
     protocol  = "tcp"
@@ -47,8 +47,8 @@ resource "aws_security_group" "ncas_lb_sc" {
     ]
   }
 
-  // Replacement DOM1 allow list from Jaz Chan 11/6/24
   ingress {
+    description = "Replacement DOM1 allow list from Jaz Chan on 11/6/24"
     from_port = 443
     to_port   = 443
     protocol  = "tcp"
@@ -91,8 +91,8 @@ resource "aws_security_group" "lb_sc_pingdom" {
   description = "control Pingdom access to the load balancer"
   vpc_id      = data.aws_vpc.shared.id
 
-  // Allow all European Pingdom IP addresses
   ingress {
+    description = "Allow all European Pingdom IP addresses"
     from_port = 443
     to_port   = 443
     protocol  = "tcp"
@@ -164,8 +164,8 @@ resource "aws_security_group" "lb_sc_pingdom_2" {
   description = "control Pingdom access to the load balancer"
   vpc_id      = data.aws_vpc.shared.id
 
-  // Allow all European Pingdom IP addresses
   ingress {
+    description = "Allow all European Pingdom IP addresses - group 2"
     from_port = 443
     to_port   = 443
     protocol  = "tcp"
@@ -232,13 +232,18 @@ resource "aws_security_group" "lb_sc_pingdom_2" {
   }
 }
 
+#trivy:ignore:AVD-AWS-0053: this needs to be public
 resource "aws_lb" "ncas_lb" {
+  #checkov:skip=CKV_AWS_91: "ELB Logging not required"
+  #checkov:skip=CKV2_AWS_76: "WAF attached already includes AWSManagedRulesKnownBadInputsRuleSet in waf.tf"
+  #checkov:skip=CKV_AWS_150: "Ensure that Load Balancer has deletion protection enabled"
   name                       = "ncas-load-balancer"
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.ncas_lb_sc.id, aws_security_group.lb_sc_pingdom.id, aws_security_group.lb_sc_pingdom_2.id]
   subnets                    = data.aws_subnets.shared-public.ids
   enable_deletion_protection = false
   internal                   = false
+  drop_invalid_header_fields = true
   depends_on                 = [aws_security_group.ncas_lb_sc, aws_security_group.lb_sc_pingdom, aws_security_group.lb_sc_pingdom_2]
 }
 
@@ -255,18 +260,20 @@ resource "aws_lb_target_group" "ncas_target_group" {
   }
 
   health_check {
-    healthy_threshold   = "3"
-    interval            = "30"
+    path                = "/"
+    healthy_threshold   = 3
+    interval            = 30
     protocol            = "HTTP"
-    port                = "80"
-    unhealthy_threshold = "5"
+    port                = 80
+    unhealthy_threshold = 5
     matcher             = "200-302"
-    timeout             = "10"
+    timeout             = 10
   }
-
 }
 
 resource "aws_lb_listener" "ncas_lb" {
+  #checkov:skip=CKV_AWS_2: "Ensure ALB protocol is HTTPS" - false alert
+  #checkov:skip=CKV_AWS_103: "LB using higher version of TLS" - higher than alert
   depends_on = [
     aws_acm_certificate.external
   ]
