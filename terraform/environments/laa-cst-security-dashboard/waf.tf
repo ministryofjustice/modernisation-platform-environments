@@ -4,8 +4,8 @@ module "waf" {
   enable_pagerduty_integration = true
   enable_ddos_protection = true
   ddos_rate_limit        = 5000
-  block_non_uk_traffic   = false
-  associated_resource_arns = [aws_lb.waf_lb.arn]
+  block_non_uk_traffic   = true
+  associated_resource_arns = [aws_lb.cst.arn]
   managed_rule_actions = {
     AWSManagedRulesKnownBadInputsRuleSet = true
     AWSManagedRulesCommonRuleSet         = true
@@ -19,9 +19,6 @@ module "waf" {
 
   application_name = local.application_name        
   tags             = local.tags
-}
-
-
 
   additional_managed_rules = [
   {
@@ -35,8 +32,4 @@ module "waf" {
     override_action = "count"
   }
 ]
-
-  application_name = local.application_name        
-  tags             = local.tags
-
 }
