@@ -16,6 +16,7 @@ data "aws_iam_roles" "mod_plat_roles" {
   path_prefix = "/aws-reserved/sso.amazonaws.com/"
 }
 
+
 resource "aws_lakeformation_data_lake_settings" "settings" {
   admins = flatten(
     [
@@ -23,7 +24,6 @@ resource "aws_lakeformation_data_lake_settings" "settings" {
       data.aws_iam_role.github_actions_role.arn,
       data.aws_iam_session_context.current.issuer_arn,
       [for share in local.analytical_platform_share : aws_iam_role.analytical_platform_share_role[share.target_account_name].arn],
-      data.aws_iam_role.clean_after_mdss_load.arn
     ]
   )
   parameters = {
