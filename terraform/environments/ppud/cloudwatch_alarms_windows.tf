@@ -287,7 +287,7 @@ resource "aws_cloudwatch_metric_alarm" "Windows_IIS_check" {
 }
 
 # CloudWatch Alarms for Malware Events (Signature Update Failed, State Detected, Scan Failed, Engine Update Failed, Engine Out of Date & Behavior Detected)
-
+/*
 locals {
   malware_alarm_metadata_prod = local.is-production ? {
     MalwareScanFailed       = "Scan Failed"
@@ -337,7 +337,7 @@ resource "aws_cloudwatch_metric_alarm" "malware_event_alarms_prod" {
     EventName = each.value.metric_name
   }
 }
-
+*/
 # Service Status Alarms
 
 # IIS Admin Service
@@ -868,7 +868,7 @@ data "aws_instance" "cpu_alarm_instance_details_uat" {
 #################################
 # CloudWatch Alarms Preproduction
 #################################
-
+/*
 # CloudWatch Alarms for Malware Events (Signature Update Failed, State Detected, Scan Failed, Engine Update Failed, Engine Out of Date & Behavior Detected)
 
 locals {
@@ -920,7 +920,7 @@ resource "aws_cloudwatch_metric_alarm" "malware_event_alarms_preprod" {
     EventName = each.value.metric_name
   }
 }
-
+*/
 # High CPU Utilization Alarm
 
 resource "aws_cloudwatch_metric_alarm" "cpu_uat_alarms" {
@@ -967,7 +967,7 @@ data "aws_instance" "windows_instance_details_dev" {
   for_each    = toset(data.aws_instances.windows_tagged_instances_dev.ids)
   instance_id = each.value
 }
-
+/*
 ###############################
 # CloudWatch Alarms Development
 ###############################
@@ -1017,6 +1017,79 @@ resource "aws_cloudwatch_metric_alarm" "malware_event_alarms_dev" {
   treat_missing_data  = "notBreaching"
   alarm_description   = "Monitors for Windows Defender malware event: ${each.value.description}"
   alarm_actions       = [aws_sns_topic.cw_dev_alerts[0].arn]
+
+  dimensions = {
+    Instance  = each.value.instance_id
+    EventName = each.value.metric_name
+  }
+}
+*/
+
+# CloudWatch Alarms for Malware Events (Signature Update Failed, State Detected, Scan Failed, Engine Update Failed, Engine Out of Date & Behavior Detected)
+
+locals {
+  malware_alarm_metadata = {
+    MalwareScanFailed       = "Scan Failed"
+    MalwareBehaviorDetected = "Behavior Detected"
+    MalwareStateDetected    = "State Detected"
+    MalwareSignatureFailed  = "Signature Failed"
+    MalwareEngineFailed     = "Engine Failed"
+    MalwareEngineOutofDate  = "Engine Out of Date"
+  }
+
+  malware_alarm_environments = {
+    production = {
+      enabled      = local.is-production
+      instances    = data.aws_instances.windows_tagged_instances.ids
+      sns_topic    = aws_sns_topic.cw_alerts[0].arn
+    }
+    preproduction = {
+      enabled      = local.is-preproduction
+      instances    = data.aws_instances.windows_tagged_instances_uat.ids
+      sns_topic    = aws_sns_topic.cw_uat_alerts[0].arn
+    }
+    development = {
+      enabled      = local.is-development
+      instances    = data.aws_instances.windows_tagged_instances_dev.ids
+      sns_topic    = aws_sns_topic.cw_dev_alerts[0].arn
+    }
+  }
+
+  malware_alarm_matrix = tomap({
+    for pair in flatten([
+      for env_name, env_config in local.malware_alarm_environments : [
+        for instance_id in env_config.instances : [
+          for metric_name, description in local.malware_alarm_metadata : {
+            key = "${env_name}-${instance_id}-${metric_name}"
+            value = {
+              env_name    = env_name
+              instance_id = instance_id
+              metric_name = metric_name
+              description = description
+              sns_topic   = env_config.sns_topic
+            }
+          } if env_config.enabled
+        ] if env_config.enabled
+      ]
+    ]) : pair.key => pair.value
+  })
+}
+
+resource "aws_cloudwatch_metric_alarm" "malware_event_alarms" {
+  for_each = local.malware_alarm_matrix
+
+  alarm_name          = "Malware-Event-${each.value.metric_name}-${each.value.instance_id}"
+  comparison_operator = "GreaterThanThreshold"
+  period              = 60
+  threshold           = 0
+  evaluation_periods  = 1
+  datapoints_to_alarm = 1
+  metric_name         = each.value.metric_name
+  namespace           = "WindowsDefender"
+  statistic           = "Sum"
+  treat_missing_data  = "notBreaching"
+  alarm_description   = "Monitors for Windows Defender malware event: ${each.value.description}"
+  alarm_actions       = [each.value.sns_topic]
 
   dimensions = {
     Instance  = each.value.instance_id

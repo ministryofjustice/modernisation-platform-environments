@@ -222,6 +222,7 @@ resource "aws_cloudwatch_log_metric_filter" "EmailSender-False" {
   }
 }
 
+/*
 # Windows Defender Event Metric Filters
 
 locals {
@@ -320,6 +321,66 @@ resource "aws_cloudwatch_log_metric_filter" "malware_metrics_development" {
 
   metric_transformation {
     name      = each.key
+    namespace = "WindowsDefender"
+    value     = "1"
+    dimensions = {
+      Instance  = "$Instance"
+      EventName = "$EventName"
+    }
+  }
+}
+*/
+
+ #Windows Defender Event Metric Filters
+
+locals {
+  malware_metrics = {
+    MalwareScanStarted      = 1000
+    MalwareScanFinished     = 1001
+    MalwareScanStopped      = 1002
+    MalwareScanFailed       = 1005
+    MalwareBehaviorDetected = 1015
+    MalwareStateDetected    = 1116
+    MalwareSignatureFailed  = 2001
+    MalwareEngineFailed     = 2003
+    MalwareEngineOutofDate  = 2005
+  }
+
+  malware_environments = {
+    production    = { enabled = local.is-production, log_group = "Windows-Defender-Logs" }
+    preproduction = { enabled = local.is-preproduction, log_group = "Windows-Defender-Logs-Preproduction" }
+    development   = { enabled = local.is-development, log_group = "Windows-Defender-Logs-Development" }
+  }
+
+  malware_filter_matrix = flatten([
+    for env_name, env_config in local.malware_environments : [
+      for metric_name, event_id in local.malware_metrics : {
+        key           = "${env_name}-${metric_name}"
+        env_name      = env_name
+        metric_name   = metric_name
+        event_id      = event_id
+        log_group_ref = env_config.log_group
+        enabled       = env_config.enabled
+      } if env_config.enabled
+    ]
+  ])
+}
+
+resource "aws_cloudwatch_log_metric_filter" "malware_metrics" {
+  for_each = {
+    for item in local.malware_filter_matrix : item.key => item
+  }
+
+  name = each.value.metric_name
+  log_group_name = (
+    each.value.env_name == "production" ? aws_cloudwatch_log_group.Windows-Defender-Logs[0].name :
+    each.value.env_name == "preproduction" ? aws_cloudwatch_log_group.Windows-Defender-Logs-Preproduction[0].name :
+    aws_cloudwatch_log_group.Windows-Defender-Logs-Development[0].name
+  )
+  pattern = "[date, time, Instance, EventName, status=${each.value.event_id}]"
+
+  metric_transformation {
+    name      = each.value.metric_name
     namespace = "WindowsDefender"
     value     = "1"
     dimensions = {
