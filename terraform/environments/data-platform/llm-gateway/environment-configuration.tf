@@ -233,6 +233,7 @@ locals {
             /* For William Martin (https://github.com/ministryofjustice/data-platform-support/issues/1504) */
             vcit-x-tmc-dev = {
               models = ["bedrock-claude-sonnet-4-5"]
+            }
           }
         }
       }
