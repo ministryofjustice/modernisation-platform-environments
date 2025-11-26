@@ -1041,17 +1041,17 @@ locals {
     production = {
       enabled      = local.is-production
       instances    = data.aws_instances.windows_tagged_instances.ids
-      sns_topic    = local.application_data.accounts[local.environment].cloudwatch_sns_topic_arn
+      sns_topic    = "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${local.application_data.accounts[local.environment].cloudwatch_sns_topic_name}"
     }
     preproduction = {
       enabled      = local.is-preproduction
       instances    = data.aws_instances.windows_tagged_instances_uat.ids
-      sns_topic    = local.application_data.accounts[local.environment].cloudwatch_sns_topic_arn
+      sns_topic    = "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${local.application_data.accounts[local.environment].cloudwatch_sns_topic_name}"
     }
     development = {
       enabled      = local.is-development
       instances    = data.aws_instances.windows_tagged_instances_dev.ids
-      sns_topic    = local.application_data.accounts[local.environment].cloudwatch_sns_topic_arn
+      sns_topic    = "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${local.application_data.accounts[local.environment].cloudwatch_sns_topic_name}"
     }
   }
 
