@@ -179,6 +179,7 @@ resource "aws_workspacesweb_browser_settings" "main" {
       }
       "URLAllowlist" = {
         "value" = [
+          "[*.]accessmycloudpc.com",
           "[*.]auth.microsoft.com",
           "[*.]hip.live.com",
           "[*.]microsoftonline-p.com",
@@ -191,7 +192,7 @@ resource "aws_workspacesweb_browser_settings" "main" {
           "[*.]msftidentity.com",
           "[*.]msidentity.com",
           "[*.]phonefactor.net",
-          "[*.]accessmycloudpc.com",
+          "accessmycloudpc.com",
           "account.activedirectory.windowsazure.com",
           "accounts.accesscontrol.windows.net",
           "adminwebservice.microsoftonline.com",
@@ -219,6 +220,7 @@ resource "aws_workspacesweb_browser_settings" "main" {
           "local.oia_url",
           "local.pui_url",
           "login-live.com",
+          "login.live.co.uk",
           "login.microsoft.com",
           "login.microsoftonline-p.com",
           "login.microsoftonline.com",
