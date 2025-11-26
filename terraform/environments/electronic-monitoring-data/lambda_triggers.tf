@@ -215,6 +215,7 @@ resource "aws_sqs_queue" "clean_mdss_load_queue" {
   name = "clean_mdss_load_queue"
   visibility_timeout_seconds = 30
   message_retention_seconds = 432000 # 5 days
+  sqs_managed_sse_enabled = true
 }
 
 resource "aws_lambda_event_source_mapping" "trigger_cleanup" {

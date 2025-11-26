@@ -1038,6 +1038,7 @@ data "aws_iam_policy_document" "clean_after_mdss_load_lambda_role_policy_documen
     effect = "Allow"
     actions = [
       "glue:GetTable",
+      "glue:GetTables"
       "glue:GetDatabase",
       "glue:GetDatabases",
       "glue:DeleteTable",
