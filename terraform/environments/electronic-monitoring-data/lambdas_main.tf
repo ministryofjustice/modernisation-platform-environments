@@ -187,20 +187,26 @@ module "copy_mdss_data" {
 #-----------------------------------------------------------------------------------
 
 module "clean_after_mdss_load" {
+  count                          = local.is-development ? 0 : 1
   source                         = "./modules/lambdas"
-  function_name                  = "clean_after_mdss_load"
-  image_name                     = "clean_after_mdss_load"
   is_image                       = true
-  role_name                      = aws_iam_role.clean_after_mdss_load.name
-  role_arn                       = aws_iam_role.clean_after_mdss_load.arn
-  memory_size                    = 10240
+  function_name                  = "clean_after_mdss_load"
+  role_name                      = aws_iam_role.load_mdss[0].name
+  role_arn                       = aws_iam_role.load_mdss[0].arn
+  handler                        = "clean_after_mdss_load.handler"
+  memory_size                    = 2048
   timeout                        = 900
-  environment_variables = {
-    CATALOG_ID      = data.aws_caller_identity.current.account_id
-    LAMBDA_ROLE_ARN = aws_iam_role.clean_after_mdss_load.arn
-  }
+  reserved_concurrent_executions = 100
+  ephemeral_storage_size         = 10240
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev                 = local.is-production ? "prod" : "dev"
   security_group_ids             = [aws_security_group.lambda_generic.id]
   subnet_ids                     = data.aws_subnets.shared-public.ids
+
+  environment_variables = {
+    CATALOG_ID      = data.aws_caller_identity.current.account_id
+    LAMBDA_ROLE_ARN = aws_iam_role.load_mdss[0].arn
+  }
 }
 
 #-----------------------------------------------------------------------------------
