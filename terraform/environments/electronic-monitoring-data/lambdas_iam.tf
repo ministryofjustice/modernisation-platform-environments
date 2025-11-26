@@ -826,6 +826,12 @@ data "aws_iam_policy_document" "load_mdss_lambda_role_policy_document" {
     actions   = ["s3:ListAllMyBuckets", "s3:GetBucketLocation"]
     resources = ["*"]
   }
+  statement {
+    sid       = "AllowSQSSendMessage"
+    effect    = "Allow"
+    actions   = "sqs:SendMessage"
+    resources = [aws_sqs_queue.clean_mdss_load_queue.arn]
+  }
 }
 
 resource "aws_iam_role" "load_mdss" {
@@ -874,6 +880,23 @@ resource "aws_iam_role" "clean_after_mdss_load" {
 
 data "aws_iam_policy_document" "clean_after_mdss_load_lambda_role_policy_document" {
   count = local.is-development ? 0 : 1
+  # s3 permissions
+   statement {
+    sid    = "S3Permissions"
+    effect = "Allow"
+    actions = [
+      "s3:DeleteObject",
+      "s3:DeleteObjectVersion",
+      "s3:ListBucket",
+      "s3express:CreateSession"
+    ]
+    resources = [
+      "${module.s3-create-a-derived-table-bucket.bucket.arn}/staging/allied_mdss${local.db_suffix}_pipeline/*",
+      "${module.s3-athena-bucket.bucket.arn}/output/*",
+      "${module.s3-athena-bucket.bucket.arn}/*",
+    ]
+  }
+  # glue permissions
   statement {
     sid    = "GluePermissionsForDeletion"
     effect = "Allow"
@@ -905,6 +928,18 @@ data "aws_iam_policy_document" "clean_after_mdss_load_lambda_role_policy_documen
     actions   = ["iam:ListAccountAliases"]
     resources = ["*"]
   }
+  # allow triggering from queue
+  statement {
+    sid       = "AllowTriggeringFromQueue"
+    effect    = "Allow"
+    actions   = [
+      "sqs:RecieveMessage",
+      "sqs:DeleteMessage",
+      "sqs:GetQueueAttributes",
+      "sqs:GetQueueUrl"
+    ]
+    resources = [aws_sqs_queue.clean_mdss_load_queue.arn]
+  }
 }
 
 resource "aws_iam_policy" "clean_after_mdss_load_lambda_role_policy" {
@@ -919,7 +954,7 @@ resource "aws_iam_role_policy_attachment" "clean_after_mdss_load_output_lambda_p
   policy_arn = aws_iam_policy.clean_after_mdss_load_lambda_role_policy[0].arn
 }
 
-resource "aws_lakeformation_permissions" "add_create_db" {
+resource "aws_lakeformation_permissions" "add_delete_db" {
   count = local.is-development ? 0 : 1
   permissions      = ["DELETE", "DROP"]
   principal        = aws_iam_role.clean_after_mdss_load[0].arn

@@ -197,7 +197,7 @@ module "clean_after_mdss_load" {
   memory_size             = 10240
   timeout                 = 900
   environment_variables = {
-    CATALOG_ID = local.is-production ? "" : "", # add account id
+    CATALOG_ID = local.is-production ? "" : "", 
     LAMBDA_ROLE_ARN = aws_iam_role.clean_after_mdss_load.arn
     }
   security_group_ids          = [aws_security_group.lambda_generic.id]
