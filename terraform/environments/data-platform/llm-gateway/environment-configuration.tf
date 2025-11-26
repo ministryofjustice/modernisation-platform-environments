@@ -80,10 +80,6 @@ locals {
             model_id = "cohere.embed-multilingual-v3"
             region   = "eu-west-2"
           }
-          cohere-embed-v4 = {
-            model_id = "cohere.embed-v4:0"
-            region   = "eu-west-2"
-          }
           meta-llama3-8b-instruct = {
             model_id = "meta.llama3-8b-instruct-v1:0"
             region   = "eu-west-2"
@@ -234,8 +230,7 @@ locals {
             "bedrock-claude-haiku-4-5",
             "bedrock-claude-sonnet-4-5",
             "bedrock-cohere-embed-english-v3",
-            "bedrock-cohere-embed-multilingual-v3",
-            "bedrock-cohere-embed-v4",
+            "bedrock-cohere-embed-multilingual-v3"
           ]
           keys = {
             /* For Nikki Rayner */
