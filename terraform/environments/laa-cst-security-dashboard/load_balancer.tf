@@ -49,8 +49,9 @@ resource "aws_lb_target_group" "cst_target_group" {
   }
 
   health_check {
-    port     = "443"
-    protocol = "HTTPS"
+    name = "target-group-1"
+    port = 80
+    protocol = "HTTP"
   }
 
   tags = merge(local.tags,
