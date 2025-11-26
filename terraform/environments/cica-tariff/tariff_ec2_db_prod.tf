@@ -37,84 +37,8 @@ resource "aws_instance" "tariffdb" {
     "hostname" = "${local.application_name}-db-${each.key}",
   }), local.tags)
   # Set security group where Instance will be created. This will also determine VPC
-  vpc_security_group_ids = [module.tariff_db_prod_security_group[0].security_group_id, aws_security_group.tariff_db_prod_security_group[0].id]
-  # vpc_security_group_ids = aws_security_group.tariff_db_prod_security_group[*].id
+  vpc_security_group_ids = [module.tariff_db_prod_security_group[0].security_group_id]
   key_name = aws_key_pair.key_pair_db[0].key_name
-
-  /*
-  ebs_block_device {
-    device_name           = "xvde"
-    delete_on_termination = true
-    encrypted             = true
-    volume_size           = 100
-    snapshot_id           = local.snapshot_id_xvde_db
-
-  }
-  ebs_block_device {
-    device_name           = "xvdf"
-    delete_on_termination = true
-    encrypted             = true
-    volume_size           = 2000
-    snapshot_id           = local.snapshot_id_xvdf_db
-  }
-  ebs_block_device {
-    device_name           = "xvdg"
-    delete_on_termination = true
-    encrypted             = true
-    volume_size           = 100
-    snapshot_id           = local.snapshot_id_xvdg_db
-  }
-
-  ebs_block_device {
-    device_name           = "xvdh"
-    delete_on_termination = true
-    encrypted             = true
-    volume_size           = 16
-    snapshot_id           = local.snapshot_id_xvdh_db
-  }
-  ebs_block_device {
-    device_name           = "xvdi"
-    delete_on_termination = true
-    encrypted             = true
-    volume_size           = 30
-    snapshot_id           = local.snapshot_id_xvdi_db
-  }
-  ebs_block_device {
-    device_name           = "xvdj"
-    delete_on_termination = true
-    encrypted             = true
-    volume_size           = 8
-    snapshot_id           = local.snapshot_id_xvdj_db
-  }
-  ebs_block_device {
-    device_name           = "xvdk"
-    delete_on_termination = true
-    encrypted             = true
-    volume_size           = 1
-    snapshot_id           = local.snapshot_id_xvdk_db
-  }
-  ebs_block_device {
-    device_name           = "xvdl"
-    delete_on_termination = true
-    encrypted             = true
-    volume_size           = 200
-    snapshot_id           = local.snapshot_id_xvdl_db
-  }
-  ebs_block_device {
-    device_name           = "xvdm"
-    delete_on_termination = true
-    encrypted             = true
-    volume_size           = 500
-    snapshot_id           = local.snapshot_id_xvdm_db
-  }
-  ebs_block_device {
-    device_name           = "xvdn"
-    delete_on_termination = true
-    encrypted             = true
-    volume_size           = 500
-    snapshot_id           = local.snapshot_id_xvdn_db
-  }
-*/
 }
 # CDI-274 refactoring ebs_block_device > aws_ebs_volume
 data "aws_subnet" "subnet_az" {

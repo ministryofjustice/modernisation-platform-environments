@@ -1,4 +1,4 @@
-# Firewall Log Shipper
+# Log Shipper
 AWS Lambda function that reads logs written to S3 (gzip or plain text, one JSON event per line, e.g., AWS Network Firewall EVE JSON) and ships them to CloudWatch Logs.
 
 ## Concept of operation
@@ -53,6 +53,7 @@ N/A. The function consumes AWS event payloads. Configuration is via environment 
 
 ## Operational scenarios
 - **Network Firewall centralised logging:** Ship EVE JSON from S3 to CloudWatch for dashboards, Insights queries, and alarms.
+- **Workspaces Secure Browser session logging:** Ship JSONLines from S3 to CloudWatch for dashboards, Insight queries.
 - **Backfill/redrive:** Push historical object keys to an SQS queue; the Lambda will process in batches.
 - **Large files:** The function streams and batches; adjust memory/timeout and `CHUNK_SIZE` if needed.
 
