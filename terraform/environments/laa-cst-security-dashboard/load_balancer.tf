@@ -7,7 +7,6 @@ module "lb_access_logs_enabled" {
     aws.bucket-replication = aws
   }
   vpc_all = "${local.vpc_name}-${local.environment}"
-  existing_bucket_name       = ${local.application_name}-${local.environment}-logging
   force_destroy_bucket       = true # enables destruction of logging bucket
   application_name           = local.application_name
   public_subnets             = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
