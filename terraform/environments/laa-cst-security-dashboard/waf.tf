@@ -19,9 +19,6 @@ module "waf" {
 
   application_name = local.application_name
   tags             = local.tags
-}
-
-
 
   additional_managed_rules = [
   {
