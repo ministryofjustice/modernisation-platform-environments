@@ -4,7 +4,7 @@ resource "aws_dms_endpoint" "dms_user_target_endpoint_db" {
   #checkov:skip=CKV_AWS_296
   count                       = try(var.dms_config.user_target_endpoint.write_database, null) == null ? 0 : 1
   database_name               = var.dms_config.user_target_endpoint.write_database
-  endpoint_id                 = "CHANGED_${var.env_name}-user-data-to-${lower(var.dms_config.user_target_endpoint.write_database)}"
+  endpoint_id                 = "CHANGED-${var.env_name}-user-data-to-${lower(var.dms_config.user_target_endpoint.write_database)}"
   endpoint_type               = "target"
   engine_name                 = "oracle"
   username                    = local.dms_audit_username
