@@ -3,7 +3,7 @@ module "ecr_access_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-github-oidc-role"
-  version = "5.60.0"
+  version = "5.59.0"
 
   name = "ecr-access"
 
@@ -24,7 +24,7 @@ module "analytical_platform_github_actions_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-github-oidc-role"
-  version = "5.60.0"
+  version = "5.59.0"
 
   name = "analytical-platform-github-actions"
 
@@ -42,7 +42,7 @@ module "analytical_platform_terraform_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.60.0"
+  version = "5.59.0"
 
   create_role = true
 
@@ -61,7 +61,7 @@ module "data_engineering_datalake_access_github_actions_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-github-oidc-role"
-  version = "5.60.0"
+  version = "5.59.0"
 
   name = "data-engineering-datalake-access-github-actions"
 
@@ -79,7 +79,7 @@ module "data_engineering_datalake_access_terraform_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.60.0"
+  version = "5.59.0"
 
   create_role = true
 
