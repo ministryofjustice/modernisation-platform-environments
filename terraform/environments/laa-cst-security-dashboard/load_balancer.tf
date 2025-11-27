@@ -29,9 +29,10 @@ resource "aws_lb_target_group" "target_group_module" {
   target_type          = "instance"
   deregistration_delay = 30
 
-  stickiness {
-    type = "lb_cookie"
-  }
+stickiness {
+  type = "lb_cookie"
+
+}
   #checkov:skip=CKV_AWS_261: "health_check defined below, but not picked up"
   health_check {
     healthy_threshold   = "5"
