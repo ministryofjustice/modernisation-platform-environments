@@ -215,11 +215,11 @@ resource "aws_workspacesweb_browser_settings" "main" {
           "justice.gov.uk",
           "legalaidlearning.justice.gov.uk",
           "legalservices.gov.uk",
-          "local.laa_sign_in_url",
-          "local.legal_aid_services_url",
-          "local.oia_url",
-          "local.pui_url",
-          "login-live.com",
+          "${local.laa_sign_in_url}",
+          "${local.legal_aid_services_url}",
+          "${local.oia_url}",
+          "${local.pui_url}",
+          "login.live.com",
           "login.live.co.uk",
           "login.microsoft.com",
           "login.microsoftonline-p.com",
@@ -237,7 +237,8 @@ resource "aws_workspacesweb_browser_settings" "main" {
           "sso.godaddy.com",
           "www.gov.uk",
           "www.justice.gov.uk",
-          "www.smartsurvey.co.uk"
+          "www.smartsurvey.co.uk",
+          "*.accessmycloudpc.com"
         ]
       }
       "AlwaysOpenPdfExternally" = {
