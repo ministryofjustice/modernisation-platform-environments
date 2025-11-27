@@ -20,7 +20,7 @@ out/
 .idea_modules/
 
 .tfsec/
-lambda_function.py
+
 # vim
 **/*.swp
 
