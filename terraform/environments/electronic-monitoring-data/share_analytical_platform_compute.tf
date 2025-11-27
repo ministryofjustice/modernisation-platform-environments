@@ -49,6 +49,7 @@ locals {
 
   prod_dbs_to_grant = local.is-production ? [
     "am_stg",
+    "buddi_stg",
     "cap_dw_stg",
     "emd_historic_int",
     "historic_api_mart",
@@ -72,6 +73,7 @@ locals {
     "g4s_atrium_curated",
     "g4s_centurion_curated",
     "g4s_tasking_curated",
+    "g4s_integrity_curated",
     "curated_fep",
     "g4s_lcm_archive_curated",
   ] : []

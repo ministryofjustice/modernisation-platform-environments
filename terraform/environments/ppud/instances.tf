@@ -302,7 +302,7 @@ resource "aws_instance" "s609693lo6vw110" {
   tags = {
     Name        = "s609693lo6vw110"
     patch_group = "dev_win_patch"
-    e_volume    = "yes"
+    lse_server  = "true"
     backup      = true
   }
 }
@@ -436,6 +436,7 @@ resource "aws_instance" "s618358rgvw023" {
     Name        = "s618358rgvw023"
     patch_group = "uat_win_patch"
     backup      = true
+    cpu_alarm   = true
   }
 }
 
@@ -461,6 +462,8 @@ resource "aws_instance" "s618358rgvw024" {
     Name        = "s618358rgvw024"
     patch_group = "uat_win_patch"
     backup      = true
+    cpu_alarm   = true
+    cpu_lambda_trigger = true
   }
 }
 

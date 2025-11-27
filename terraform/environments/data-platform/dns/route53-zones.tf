@@ -1,7 +1,6 @@
 module "zone" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-route53.git//modules/zones?ref=f56825af8cb08bec2478e2f62b678e51986c1531" # v5.0.0
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-route53.git?ref=6c5c0587f16701e8050d14d20b39d823534eec9a" # v6.1.1
 
-  zones = {
-    (local.environment_configuration.route53_zone_name) = {}
-  }
+  name    = local.environment_configuration.route53_zone_name
+  records = local.environment_configuration.route53_records
 }

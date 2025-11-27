@@ -238,3 +238,60 @@ resource "aws_cloudwatch_metric_alarm" "oia_rds_burst_balance_low" {
 
   tags = local.tags
 }
+
+resource "aws_cloudwatch_metric_alarm" "connector_alb_healthyhosts" {
+  alarm_name          = "${local.application_name}-${local.environment}-connector-alb-targets-group"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = 1
+  metric_name         = "HealthyHostCount"
+  namespace           = "AWS/ApplicationELB"
+  period              = 240
+  statistic           = "Average"
+  threshold           = local.application_data.accounts[local.environment].connector_app_count
+  alarm_description   = "Number of healthy nodes in Target Group"
+  actions_enabled     = true
+  alarm_actions       = [aws_sns_topic.cloudwatch_alerts.arn]
+  ok_actions          = [aws_sns_topic.cloudwatch_alerts.arn]
+  dimensions = {
+    TargetGroup  = aws_lb_target_group.connector_target_group.arn_suffix
+    LoadBalancer = aws_lb.connector.arn_suffix
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "opa_alb_healthyhosts" {
+  alarm_name          = "${local.application_name}-${local.environment}-opa-alb-targets-group"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = 1
+  metric_name         = "HealthyHostCount"
+  namespace           = "AWS/ApplicationELB"
+  period              = 240
+  statistic           = "Average"
+  threshold           = local.application_data.accounts[local.environment].opa_app_count
+  alarm_description   = "Number of healthy nodes in Target Group"
+  actions_enabled     = true
+  alarm_actions       = [aws_sns_topic.cloudwatch_alerts.arn]
+  ok_actions          = [aws_sns_topic.cloudwatch_alerts.arn]
+  dimensions = {
+    TargetGroup  = aws_lb_target_group.opahub_target_group.arn_suffix
+    LoadBalancer = aws_lb.opahub.arn_suffix
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "adaptor_alb_healthyhosts" {
+  alarm_name          = "${local.application_name}-${local.environment}-adaptor-alb-targets-group"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = 1
+  metric_name         = "HealthyHostCount"
+  namespace           = "AWS/ApplicationELB"
+  period              = 240
+  statistic           = "Average"
+  threshold           = local.application_data.accounts[local.environment].adaptor_app_count
+  alarm_description   = "Number of healthy nodes in Target Group"
+  actions_enabled     = true
+  alarm_actions       = [aws_sns_topic.cloudwatch_alerts.arn]
+  ok_actions          = [aws_sns_topic.cloudwatch_alerts.arn]
+  dimensions = {
+    TargetGroup  = aws_lb_target_group.adaptor_target_group.arn_suffix
+    LoadBalancer = aws_lb.adaptor.arn_suffix
+  }
+}
