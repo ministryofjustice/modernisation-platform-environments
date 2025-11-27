@@ -110,7 +110,7 @@
       "mp_nat_gateway_a": "13.43.9.198/32",
       "mp_nat_gateway_b": "13.42.163.245/32",
       "mp_nat_gateway_c": "18.132.208.127/32",
-      "create_database": "false",
+      "create_database": "true",
       "connector_ecr_repo": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/ccms-connector",
       "connector_container_version": "0.0.10-test",
       "connector_server_port": "8080",
