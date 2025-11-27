@@ -1,0 +1,5417 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 131,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "aeghwx1vituyof"
+      },
+      "description": "All environment configurations across the Modernisation Platform - use the search/filter boxes to find specific environments",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "align": "left",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": true,
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Slack Channel"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "title": "Open Slack",
+                    "url": "https://mojdt.slack.com/archives/${__value.text}"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 24,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "enablePagination": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": false,
+            "displayName": "Application"
+          }
+        ]
+      },
+      "pluginVersion": "10.4.1",
+      "targets": [
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "A",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/analytical-platform.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "B",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/analytical-platform-common.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "C",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/analytical-platform-compute.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "D",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/analytical-platform-data.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "E",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/analytical-platform-data-engineering.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "F",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/analytical-platform-ingestion.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "G",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/analytical-platform-landing.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "H",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/analytical-platform-management.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "I",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/analytical-platform-next-poc-hub.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "J",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/analytical-platform-next-poc-producer.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "K",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/apex.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "L",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/bichard7.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "M",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/ccms-ebs.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "N",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/ccms-ebs-upgrade.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "O",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/ccms-edrms.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "P",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/ccms-oia.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "Q",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/ccms-pui.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "R",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/ccms-pui-internal.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "S",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/cdpt-chaps.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "T",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/cdpt-ifs.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "U",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/cica-copilot.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "V",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/cica-data-extraction.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "W",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/cica-sandbox.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "X",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/cica-tariff.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "Y",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/cloud-platform-live.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "Z",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/cloud-platform-non-live.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "AA",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/coat.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "AB",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/contract-work-administration.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "AC",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/cooker.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "AD",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/core-logging.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "AE",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/core-network-services.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "AF",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/core-sandbox.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "AG",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/core-security.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "AH",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/core-shared-services.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "AI",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/core-vpc.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "AJ",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/corporate-staff-rostering.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "AK",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/dacp.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "AL",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/data-platform.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "AM",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/delius-alfresco.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "AN",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/delius-core.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "AO",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/delius-core-training.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "AP",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/delius-iaps.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "AQ",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/delius-jitbit.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "AR",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/delius-mis.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "AS",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/digital-prison-reporting.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "AT",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/electronic-monitoring-data.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "AU",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/equip.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "AV",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/example.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "AW",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/genesys-call-centre-data.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "AX",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/hmcts-claude-provider.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "AY",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/hmpps-domain-services.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "AZ",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/hmpps-esupervision.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "BA",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/hmpps-oem.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "BB",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/justice-digital-document-hub.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "BC",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/laa-ccms-soa.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "BD",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/laa-cst-security-dashboard.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "BE",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/laa-enterprise-service-bus.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "BF",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/laa-mail-relay.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "BG",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/laa-oem.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "BH",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/laa-pui-secure-browser.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "BI",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/laa-stabilisation-cdc-poc.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "BJ",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/long-term-storage.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "BK",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/maat.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "BL",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/maatdb.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "BM",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/mlra.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "BN",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/moj-network-operations-centre.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "BO",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/mojfin.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "BP",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/ncas.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "BQ",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/nomis.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "BR",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/nomis-combined-reporting.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "BS",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/nomis-data-hub.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "BT",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/oas.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "BU",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/oasys.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "BV",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/oasys-national-reporting.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "BW",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/observability-platform.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "BX",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/operations-engineering.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "BY",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/opg-lpa-data-store.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "BZ",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/panda-cyber-appsec-lab.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "CA",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/performance-hub.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "CB",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/planetfm.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "CC",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/portal.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "CD",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/ppud.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "CE",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/pra-register.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "CF",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/property-cafm-data-migration.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "CG",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/refer-monitor.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "CH",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/sprinkler.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "CI",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/testing.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "CJ",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/tipstaff.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "CK",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/tribunals.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "CL",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/vcms.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "CM",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/wardship.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "CN",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/xhibit-portal.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "CO",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/youth-justice-app-framework.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "tags.application",
+              "text": "Source",
+              "type": "string"
+            },
+            {
+              "selector": "account-type",
+              "text": "Account Type",
+              "type": "string"
+            },
+            {
+              "selector": "tags.business-unit",
+              "text": "Business Unit",
+              "type": "string"
+            },
+            {
+              "selector": "tags.owner",
+              "text": "Owner",
+              "type": "string"
+            },
+            {
+              "selector": "tags.infrastructure-support",
+              "text": "Support Contact",
+              "type": "string"
+            },
+            {
+              "selector": "tags.slack-channel",
+              "text": "Slack Channel",
+              "type": "string"
+            },
+            {
+              "selector": "tags.critical-national-infrastructure",
+              "text": "CNI",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "aeghwx1vituyof"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "CP",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/youth-justice-networking.json",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        }
+      ],
+      "title": "All Modernisation Platform Environments",
+      "titleSize": "h3",
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "indexByName": {
+              "Source": 0,
+              "Account Type": 1,
+              "Business Unit": 2,
+              "Owner": 3,
+              "Support Contact": 4,
+              "Slack Channel": 5,
+              "CNI": 6
+            },
+            "renameByName": {
+              "Source": "Application"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    }
+  ],
+  "refresh": "",
+  "schemaVersion": 39,
+  "tags": [
+    "modernisation-platform",
+    "environments",
+    "overview"
+  ],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "Modernisation Platform - All Environments Overview",
+  "uid": "mp-all-envs",
+  "version": 4,
+  "weekStart": ""
+}
