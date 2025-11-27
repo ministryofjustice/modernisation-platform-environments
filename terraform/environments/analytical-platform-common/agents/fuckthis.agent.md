@@ -91,7 +91,7 @@ After updating the module versions, commit the changes with a message like:
 Create a PR with:
 - **Title**: `chore(terraform): update module versions in {environment}`
 - **Labels**: Add the `terraform` label to the PR
-- **Body**: Include a markdown table with hyperlinked versions:
+- **Body**: Include a markdown table with hyperlinked versions (for example):
 
 ```markdown
 ## Terraform Module Updates
@@ -112,9 +112,14 @@ If any major versions were skipped, explain:
 ```
 
 ### 10. Push Changes
+Before committing, create and checkout a new branch with a timestamped name:
+```bash
+git checkout -b agentic-maintenance/update-$(date +%Y%m%d-%H%M)
+```
+
 After committing, push the changes to the remote branch:
 ```bash
-git push origin <branch-name>
+git push origin agentic-maintenance/update-YYYYMMDD-HHMM
 ```
 
 ### 11. Report Summary
