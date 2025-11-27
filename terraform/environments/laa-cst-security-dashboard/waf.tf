@@ -1,24 +1,27 @@
 
 module "waf" {
-  source                 = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-aws-waf?ref=a96a97c0cc64c14f1ee66b272e31101cce5aee61"
+  source                   = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-aws-waf"
   enable_pagerduty_integration = true
   enable_ddos_protection = true
   ddos_rate_limit        = 5000
-  block_non_uk_traffic   = true
-  associated_resource_arns = [aws_lb.cst.arn]
+  block_non_uk_traffic   = false
+  associated_resource_arns = [aws_lb.waf_lb.arn]
   managed_rule_actions = {
-    AWSManagedRulesKnownBadInputsRuleSet = true
-    AWSManagedRulesCommonRuleSet         = true
-    AWSManagedRulesSQLiRuleSet           = true
+    AWSManagedRulesKnownBadInputsRuleSet = false
+    AWSManagedRulesCommonRuleSet         = false
+    AWSManagedRulesSQLiRuleSet           = false
     AWSManagedRulesLinuxRuleSet          = false
     AWSManagedRulesAnonymousIpList       = false
     AWSManagedRulesBotControlRuleSet     = false
   }
-  
+
   core_logging_account_id = local.environment_management.account_ids["core-logging-production"]
 
-  application_name = local.application_name        
+  application_name = local.application_name
   tags             = local.tags
+}
+
+
 
   additional_managed_rules = [
   {
@@ -32,4 +35,8 @@ module "waf" {
     override_action = "count"
   }
 ]
+
+  application_name = local.application_name
+  tags             = local.tags
+
 }
