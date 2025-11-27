@@ -3,7 +3,6 @@ resource "aws_cloudwatch_dashboard" "workspacesweb_active_sessions" {
   dashboard_name = "workspacesweb-active-sessions"
 
   dashboard_body = jsonencode({
-    # Make each widget obey its own period (don’t auto-scale with time range)
     periodOverride = "inherit"
 
     widgets = [
@@ -78,7 +77,7 @@ resource "aws_cloudwatch_dashboard" "workspacesweb_active_sessions" {
           "title"    = "WorkSpaces Web Active Sessions — last hour",
           "view"     = "singleValue",
           "stacked"  = false,
-          "start"    = "-PT1H"
+          "start"    = "-PT1H",
           "region"   = "eu-west-2",
           "timezone" = "+0000",
           "period"   = 3600,
@@ -93,49 +92,100 @@ resource "aws_cloudwatch_dashboard" "workspacesweb_active_sessions" {
           ]
         }
       },
+      # Distinct usernames - last 5 minutes
       {
-        "type" = "metric",
-        "x"    = 0, "y" = 12, "width" = 18, "height" = 6,
+        "type"   = "logQuery",
+        "x"      = 0,
+        "y"      = 12,
+        "width"  = 6,
+        "height" = 6,
         "properties" = {
-          "title"    = "WorkSpaces Web Successful Sessions — per hour",
-          "view"     = "timeSeries",
-          "stacked"  = false,
-          "region"   = "eu-west-2",
-          "timezone" = "+0000",
-          "period"   = 3600,
-          "metrics" = [
-            [
-              {
-                "id"         = "q1",
-                "label"      = "SessionSuccess (sum)",
-                "expression" = "SELECT SUM(SessionSuccess) FROM SCHEMA(\"AWS/WorkSpacesWeb\", PortalId) WHERE PortalId = '${local.portal_ids.external_1}'"
-              }
-            ]
-          ]
+          "title"         = "Distinct users — last 5 minutes",
+          "region"        = "eu-west-2",
+          "view"          = "singleValue",
+          "timezone"      = "+0000",
+          "start"         = "-PT5M",
+          "logGroupNames" = [aws_cloudwatch_log_group.workspacesweb_session_logs[0].name],
+          "query"         = <<-QUERY
+fields @timestamp, session_detail.username
+| filter ispresent(session_detail.username)
+| stats count_distinct(session_detail.username) as unique_usernames
+QUERY
         }
       },
+      # Distinct usernames - last hour
       {
-        "type" = "metric",
-        "x"    = 18, "y" = 12, "width" = 6, "height" = 6,
+        "type"   = "logQuery",
+        "x"      = 6,
+        "y"      = 12,
+        "width"  = 6,
+        "height" = 6,
         "properties" = {
-          "title"    = "WorkSpaces Web Successful Sessions — last 24 hours",
-          "view"     = "singleValue",
-          "stacked"  = false,
-          "start"    = "-PT24H",
-          "region"   = "eu-west-2",
-          "timezone" = "+0000",
-          "period"   = 86400,
-          "metrics" = [
-            [
-              {
-                "id"         = "q1",
-                "label"      = "SessionSuccess (sum)",
-                "expression" = "SELECT SUM(SessionSuccess) FROM SCHEMA(\"AWS/WorkSpacesWeb\", PortalId) WHERE PortalId = '${local.portal_ids.external_1}'"
-              }
-            ]
-          ]
+          "title"         = "Distinct users — last hour",
+          "region"        = "eu-west-2",
+          "view"          = "singleValue",
+          "timezone"      = "+0000",
+          "start"         = "-PT1H",
+          "logGroupNames" = [aws_cloudwatch_log_group.workspacesweb_session_logs[0].name],
+          "query"         = <<-QUERY
+fields @timestamp, session_detail.username
+| filter ispresent(session_detail.username)
+| stats count_distinct(session_detail.username) as unique_usernames
+QUERY
         }
       },
+      # Distinct usernames - last 6 hours
+      {
+        "type"   = "logQuery",
+        "x"      = 12,
+        "y"      = 12,
+        "width"  = 6,
+        "height" = 6,
+        "properties" = {
+          "title"         = "Distinct users — last 6 hours",
+          "region"        = "eu-west-2",
+          "view"          = "singleValue",
+          "timezone"      = "+0000",
+          "start"         = "-PT6H",
+          "logGroupNames" = [aws_cloudwatch_log_group.workspacesweb_session_logs[0].name],
+          "query"         = <<-QUERY
+fields @timestamp, session_detail.username
+| filter ispresent(session_detail.username)
+| stats count_distinct(session_detail.username) as unique_usernames
+QUERY
+        }
+      },
+      # Distinct usernames - last 24 hours
+      {
+        "type"   = "logQuery",
+        "x"      = 18,
+        "y"      = 12,
+        "width"  = 6,
+        "height" = 6,
+        "properties" = {
+          "title"         = "Distinct users — last 24 hours",
+          "region"        = "eu-west-2",
+          "view"          = "singleValue",
+          "timezone"      = "+0000",
+          "start"         = "-PT24H",
+          "logGroupNames" = [aws_cloudwatch_log_group.workspacesweb_session_logs[0].name],
+          "query"         = <<-QUERY
+fields @timestamp, session_detail.username
+| filter ispresent(session_detail.username)
+| stats count_distinct(session_detail.username) as unique_usernames
+QUERY
+        }
+      },
+
     ]
   })
+}
+
+resource "aws_cloudwatch_log_group" "workspacesweb_session_logs" {
+  #checkov:skip=CKV_AWS_338:Long-term storage provided through S3 / XSIAM ingestion
+  depends_on        = [aws_kms_key.workspacesweb_session_logs[0]]
+  count             = local.create_resources ? 1 : 0
+  kms_key_id        = aws_kms_key.workspacesweb_session_logs[0].arn
+  name_prefix       = "/lambda/laa-workspacesweb-session-logs-"
+  retention_in_days = 14
 }
