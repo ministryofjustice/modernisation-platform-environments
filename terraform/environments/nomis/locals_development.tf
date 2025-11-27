@@ -157,8 +157,7 @@ locals {
         })
       })
 
-      # TM-1718: EC2 ASG needed for testing purposes
-      TM-1718 = merge(local.ec2_autoscaling_groups.web12, {
+      dev-nomis-weblogic-12 = merge(local.ec2_autoscaling_groups.web12, {
         autoscaling_schedules = {}
         config = merge(local.ec2_autoscaling_groups.web12.config, {
           instance_profile_policies = concat(local.ec2_instances.db.config.instance_profile_policies, [
