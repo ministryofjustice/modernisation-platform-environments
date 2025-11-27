@@ -1,100 +1,44 @@
 # CST Load Balancer Configuration
 
-resource "aws_security_group" "load_balancer" {
-  name_prefix = "${local.application_name}-load-balancer-sg"
-  description = "Controls access to ${local.application_name} lb"
-  vpc_id      = data.aws_vpc.shared.id
-
-  tags = merge(local.tags,
-    { Name = lower(format("%s-%s-lb-sg", local.application_name, local.environment)) }
-  )
-}
-
-resource "aws_lb" "cst" {
-  name               = "${local.application_name}-lb"
-  internal           = true
-  load_balancer_type = "application"
-  subnets            = data.aws_subnets.shared-private.ids
-
-  security_groups = [aws_security_group.load_balancer.id]
-
-  drop_invalid_header_fields = true
-  enable_deletion_protection = true
-
-  access_logs {
-    bucket  = module.s3-bucket-logging.bucket.id
-    prefix  = "${local.application_name}-lb"
-    enabled = true
+# Load balancer build using the module
+module "lb_access_logs_enabled" {
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer?ref=6f59e1ce47df66bc63ee9720b7c58993d1ee64ee" #v4.0.0
+  providers = {
+    aws.bucket-replication = aws
   }
-
-  tags = merge(local.tags,
-    { Name = lower(format("%s-%s-lb", local.application_name, local.environment)) }
-  )
-
-  depends_on = [module.s3-bucket-logging]
+  vpc_all = "${local.vpc_name}-${local.environment}"
+  existing_bucket_name       = ${local.application_name}-${local.environment}-logging
+  force_destroy_bucket       = true # enables destruction of logging bucket
+  application_name           = local.application_name
+  public_subnets             = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
+  loadbalancer_ingress_rules = local.loadbalancer_ingress_rules
+  loadbalancer_egress_rules  = local.loadbalancer_egress_rules
+  account_number             = local.environment_management.account_ids[terraform.workspace]
+  region                     = "eu-west-2"
+  enable_deletion_protection = false
+  idle_timeout               = 60
+  tags                       = {}
 }
 
-resource "aws_lb_target_group" "cst_target_group" {
-  name                 = "${local.application_name}-tg"
-  port                 = local.application_data.accounts[local.environment].cst_server_port
+# Create the target group
+resource "aws_lb_target_group" "target_group_module" {
+  name                 = "${local.application_name}-tg-mlb-${local.environment}"
+  port                 = local.application_data.accounts[local.environment].server_port
   protocol             = "HTTP"
   vpc_id               = data.aws_vpc.shared.id
-  target_type          = "ip"
+  target_type          = "instance"
   deregistration_delay = 30
 
   stickiness {
-    type            = "lb_cookie"
-    cookie_duration = 7200
-    enabled         = true
+    type = "lb_cookie"
   }
-
+  #checkov:skip=CKV_AWS_261: "health_check defined below, but not picked up"
   health_check {
-    port                = 80
+    healthy_threshold   = "5"
+    interval            = "120"
     protocol            = "HTTP"
-    path                = "/"
-    interval            = 30
-    timeout             = 5
-    healthy_threshold   = 5
-    unhealthy_threshold = 2
-    matcher             = "200-399"
+    unhealthy_threshold = "2"
+    matcher             = "200-499"
+    timeout             = "5"
   }
-
-  tags = merge(local.tags,
-    { Name = lower(format("%s-%s-tg", local.application_name, local.environment)) }
-  )
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
-# Redirect all traffic from the lb to the target group
-resource "aws_lb_listener" "cst" {
-  load_balancer_arn = aws_lb.cst.id
-  port              = 443
-  protocol          = "HTTPS"
-
-  ssl_policy      = "ELBSecurityPolicy-TLS13-1-2-2021-06"
-  certificate_arn = aws_acm_certificate.external.arn
-
-  default_action {
-    target_group_arn = aws_lb_target_group.cst_target_group.id
-    type             = "forward"
-  }
-}
-
-# Certificate
-
-resource "aws_acm_certificate" "external" {
-  validation_method         = "DNS"
-  domain_name               = "laa.service.justice.gov.uk"
-  subject_alternative_names = [
-    format("%s.%s", local.application_name, "laa.service.justice.gov.uk")
-  ]
-  lifecycle {
-    create_before_destroy = true
-  }
-  tags = merge(local.tags,
-    { Environment = "prod" }
-  )
 }
