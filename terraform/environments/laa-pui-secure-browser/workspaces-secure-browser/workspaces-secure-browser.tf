@@ -179,6 +179,7 @@ resource "aws_workspacesweb_browser_settings" "main" {
       }
       "URLAllowlist" = {
         "value" = [
+          "[*.]accessmycloudpc.com",
           "[*.]auth.microsoft.com",
           "[*.]hip.live.com",
           "[*.]microsoftonline-p.com",
@@ -191,6 +192,7 @@ resource "aws_workspacesweb_browser_settings" "main" {
           "[*.]msftidentity.com",
           "[*.]msidentity.com",
           "[*.]phonefactor.net",
+          "accessmycloudpc.com",
           "account.activedirectory.windowsazure.com",
           "accounts.accesscontrol.windows.net",
           "adminwebservice.microsoftonline.com",
@@ -212,11 +214,11 @@ resource "aws_workspacesweb_browser_settings" "main" {
           "justice.gov.uk",
           "legalaidlearning.justice.gov.uk",
           "legalservices.gov.uk",
-          "local.laa_sign_in_url",
-          "local.legal_aid_services_url",
-          "local.oia_url",
-          "local.pui_url",
-          "login-live.com",
+          "${local.laa_sign_in_url}",
+          "${local.legal_aid_services_url}",
+          "${local.oia_url}",
+          "${local.pui_url}",
+          "login.live.com",
           "login.microsoft.com",
           "login.microsoftonline-p.com",
           "login.microsoftonline.com",
@@ -232,7 +234,8 @@ resource "aws_workspacesweb_browser_settings" "main" {
           "provisioningapi.microsoftonline.com",
           "www.gov.uk",
           "www.justice.gov.uk",
-          "www.smartsurvey.co.uk"
+          "www.smartsurvey.co.uk",
+          "*.accessmycloudpc.com"
         ]
       }
       "AlwaysOpenPdfExternally" = {
