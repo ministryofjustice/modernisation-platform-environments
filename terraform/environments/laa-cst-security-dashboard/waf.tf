@@ -32,8 +32,4 @@ module "waf" {
     override_action = "count"
   }
 ]
-
-  application_name = local.application_name
-  tags             = local.tags
-
 }
