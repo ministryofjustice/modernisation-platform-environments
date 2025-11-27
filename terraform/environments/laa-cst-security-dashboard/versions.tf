@@ -17,5 +17,5 @@ terraform {
       source  = "hashicorp/null"
     }
   }
-  required_version = "~> 1.10"
+  required_version = "~> 1.0"
 }
