@@ -6,14 +6,15 @@
       "WAM_ALB": "WAM-ALB-DEV",
       "patch_group": "dev_win_patch",
       "patch_maintenance_window_name": "dev_patch_maintenance_window",
-      "patch_maintenance_schedule_cron": "cron(0 18 ? * 3#3 *)",
+      "patch_maintenance_schedule_cron": "cron(0 19 ? * 3#3 *)",
       "patch_maintenance_window_duration": 3,
       "maintenance_window_target_name": "development_maintenance_window_target",
       "maintenance_window_target_description": "This is the dev patch maintenance window target",
       "maintenance_window_task_name": "DEV-Instance-Patch",
       "pre_healthcheck_Priority": 1,
       "post_healthcheck_Priority": 20,
-      "ssm_health_check_reports_s3": "moj-health-check-reports-dev"
+      "ssm_health_check_reports_s3": "moj-log-files-dev",
+      "cloudwatch_sns_topic_name": "ppud-dev-cw-alerts"
     },
 
     "test": {
@@ -27,14 +28,15 @@
       "PPUD_Target": "PPUD",
       "patch_group": "uat_win_patch",
       "patch_maintenance_window_name": "uat_patch_maintenance_window",
-      "patch_maintenance_schedule_cron": "cron(0 18 ? * 3#3 *)",
+      "patch_maintenance_schedule_cron": "cron(0 19 ? * 3#3 *)",
       "patch_maintenance_window_duration": 3,
       "maintenance_window_target_name": "uat_patch_maintenance_window_target",
       "maintenance_window_target_description": "This is the uat patch maintenance window target",
       "maintenance_window_task_name": "UAT-Instance-Patch",
       "pre_healthcheck_Priority": 1,
       "post_healthcheck_Priority": 20,
-      "ssm_health_check_reports_s3": "moj-health-check-reports-uat"
+      "ssm_health_check_reports_s3": "moj-log-files-uat",
+      "cloudwatch_sns_topic_name": "ppud-uat-cw-alerts"
     },
     "production": {
       "directory_service_name": "PPUD.PROD",
@@ -57,7 +59,8 @@
       "maintenance_lin_window_task_name": "Prod-Instance-Patch",
       "pre_healthcheck_Priority": 1,
       "post_healthcheck_Priority": 20,
-      "ssm_health_check_reports_s3": "moj-health-check-reports-prod"
+      "ssm_health_check_reports_s3": "moj-log-files-prod",
+      "cloudwatch_sns_topic_name": "ppud-prod-cw-alerts"
     }
   }
 }

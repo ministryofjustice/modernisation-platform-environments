@@ -7,11 +7,13 @@ resource "aws_ecs_cluster" "ncas_cluster" {
 }
 
 resource "aws_cloudwatch_log_group" "deployment_logs" {
+  # checkov:skip=CKV_AWS_158: "CloudWatch log group is not public facing, does not contain any sensitive information and does not need encryption"
   name              = "/aws/events/deploymentLogs"
   retention_in_days = "7"
 }
 
 resource "aws_cloudwatch_log_group" "ecs_logs" {
+  # checkov:skip=CKV_AWS_158: "CloudWatch log group is not public facing, does not contain any sensitive information and does not need encryption"
   name              = "ncas-ecs"
   retention_in_days = "7"
 }
@@ -50,41 +52,41 @@ resource "aws_ecs_task_definition" "ncas_task_definition" {
       environment = [
         {
           name  = "RDS_HOSTNAME"
-          value = "${aws_db_instance.ncas_db.address}"
+          value = aws_db_instance.ncas_db.address
         },
         {
           name  = "RDS_PORT"
-          value = "${local.application_data.accounts[local.environment].rds_port}"
+          value = local.application_data.accounts[local.environment].rds_port
         },
         {
           name  = "RDS_USERNAME"
-          value = "${aws_db_instance.ncas_db.username}"
+          value = aws_db_instance.ncas_db.username
         },
         {
           name  = "RDS_PASSWORD"
-          value = "${aws_db_instance.ncas_db.password}"
+          value = aws_db_instance.ncas_db.password
         },
         {
           name  = "DB_NAME"
-          value = "${aws_db_instance.ncas_db.db_name}"
+          value = aws_db_instance.ncas_db.db_name
         },
         {
           name  = "supportEmail"
-          value = "${local.application_data.accounts[local.environment].support_email}"
+          value = local.application_data.accounts[local.environment].support_email
         },
         {
           name  = "supportTeam"
-          value = "${local.application_data.accounts[local.environment].support_team}"
+          value = local.application_data.accounts[local.environment].support_team
         },
         {
           name  = "ida:ClientId"
-          value = "${local.application_data.accounts[local.environment].client_id}"
+          value = local.application_data.accounts[local.environment].client_id
         }
       ]
     }
   ])
   runtime_platform {
-    operating_system_family = "WINDOWS_SERVER_2019_CORE"
+    operating_system_family = "WINDOWS_SERVER_2022_CORE"
     cpu_architecture        = "X86_64"
   }
 }
@@ -94,13 +96,14 @@ resource "aws_ecs_service" "ncas_ecs_service" {
     aws_lb_listener.ncas_lb
   ]
 
-  name                              = var.networking[0].application
+  name                              = "${var.networking[0].application}-win2022"
   cluster                           = aws_ecs_cluster.ncas_cluster.id
   task_definition                   = aws_ecs_task_definition.ncas_task_definition.arn
   launch_type                       = "FARGATE"
   enable_execute_command            = true
   desired_count                     = 2
   health_check_grace_period_seconds = 180
+  force_new_deployment              = true
 
   network_configuration {
     subnets          = data.aws_subnets.shared-private.ids
@@ -116,6 +119,10 @@ resource "aws_ecs_service" "ncas_ecs_service" {
 
   deployment_controller {
     type = "ECS"
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 }
 
@@ -156,15 +163,39 @@ resource "aws_iam_role_policy" "app_execution" {
     "Statement": [
       {
            "Action": [
-              "ecr:*",
-              "logs:CreateLogGroup",
-              "logs:CreateLogStream",
-              "logs:PutLogEvents",
-              "logs:DescribeLogStreams",
-              "secretsmanager:GetSecretValue"
+               "logs:CreateLogStream",
+               "logs:PutLogEvents"
            ],
-           "Resource": "*",
+           "Resource": [
+               "${aws_cloudwatch_log_group.deployment_logs.arn}",
+               "${aws_cloudwatch_log_group.deployment_logs.arn}:*",
+               "${aws_cloudwatch_log_group.ecs_logs.arn}",
+                "${aws_cloudwatch_log_group.ecs_logs.arn}:*"
+           ],
            "Effect": "Allow"
+      },
+      {
+            "Action": [
+              "ecr:GetAuthorizationToken"
+            ],
+            "Resource": "*",
+            "Effect": "Allow"
+      },
+      {
+            "Action": [
+              "ecr:BatchCheckLayerAvailability",
+              "ecr:GetDownloadUrlForLayer",
+              "ecr:BatchGetImage"
+            ],
+            "Resource": "arn:aws:ecr:eu-west-2:${local.environment_management.account_ids[terraform.workspace]}:repository/${aws_ecr_repository.ncas_ecr_repo.name}",
+            "Effect": "Allow"
+      },
+      {
+          "Action": [
+               "secretsmanager:GetSecretValue"
+           ],
+          "Resource": "arn:aws:secretsmanager:*:${local.environment_management.account_ids[terraform.workspace]}:secret:${aws_secretsmanager_secret.rds_db_credentials.arn}",
+          "Effect": "Allow"
       }
     ]
   }
@@ -207,15 +238,13 @@ resource "aws_iam_role_policy" "app_task" {
    "Version": "2012-10-17",
    "Statement": [
      {
-       "Effect": "Allow",
         "Action": [
           "logs:CreateLogStream",
           "logs:PutLogEvents",
-          "ecr:*",
-          "iam:*",
-          "ec2:*"
+          "logs:DescribeLogGroups"
         ],
-       "Resource": "*"
+        "Resource": "arn:aws:logs:*:${local.environment_management.account_ids[terraform.workspace]}:*",
+        "Effect": "Allow"
      }
    ]
   }
@@ -223,7 +252,9 @@ resource "aws_iam_role_policy" "app_task" {
 }
 
 resource "aws_security_group" "ecs_service" {
+  #checkov:skip=CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
   name_prefix = "ecs-service-sg-"
+  description = "control access to the ECS service"
   vpc_id      = data.aws_vpc.shared.id
 
   ingress {
@@ -235,6 +266,7 @@ resource "aws_security_group" "ecs_service" {
   }
 
   egress {
+    description = "allow all outbound traffic"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
@@ -243,8 +275,14 @@ resource "aws_security_group" "ecs_service" {
 }
 
 resource "aws_ecr_repository" "ncas_ecr_repo" {
+  #checkov:skip=CKV_AWS_51: "Ensure ECR Image Tags are immutable"
+  #checkov:skip=CKV_AWS_136:"Using default AWS encryption for ECR which is sufficient for our needs"
   name         = "ncas-ecr-repo"
   force_delete = true
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
 }
 
 # AWS EventBridge rule
@@ -342,11 +380,13 @@ resource "aws_cloudwatch_metric_alarm" "ddos_attack_external" {
 }
 
 resource "aws_sns_topic" "ddos_alarm" {
+  # checkov:skip=CKV_AWS_26: SNS encryption not required for this use case
   count = local.is-development ? 0 : 1
   name  = "ncas_ddos_alarm"
 }
 
 resource "aws_sns_topic" "ncas_utilisation_alarm" {
+  # checkov:skip=CKV_AWS_26: SNS encryption not required for this use case
   count = local.is-development ? 0 : 1
   name  = "ncas_utilisation_alarm"
 }
@@ -374,7 +414,7 @@ module "pagerduty_core_alerts_non_prod" {
   depends_on = [
     aws_sns_topic.ncas_utilisation_alarm
   ]
-  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=0179859e6fafc567843cd55c0b05d325d5012dc4" #v2.0.0
   sns_topics                = [aws_sns_topic.ncas_utilisation_alarm[0].name]
   pagerduty_integration_key = local.pagerduty_integration_keys["ncas_non_prod_alarms"]
 }
@@ -385,7 +425,7 @@ module "pagerduty_core_alerts_prod" {
   depends_on = [
     aws_sns_topic.ncas_utilisation_alarm
   ]
-  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=0179859e6fafc567843cd55c0b05d325d5012dc4" #v2.0.0
   sns_topics                = [aws_sns_topic.ncas_utilisation_alarm[0].name]
   pagerduty_integration_key = local.pagerduty_integration_keys["ncas_prod_alarms"]
 }

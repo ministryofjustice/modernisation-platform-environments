@@ -76,7 +76,7 @@ locals {
     wam_waf_analysis = {
       description  = "Function to analyse WAM WAF ACL traffic and email a report."
       role_key     = "get_cloudwatch"
-      environments = ["development"]
+      environments = ["development", "preproduction", "production"]
       layers       = ["numpy", "pillow", "requests", "matplotlib"]
       permissions = [{
         principal         = "cloudwatch.amazonaws.com"
@@ -236,6 +236,16 @@ locals {
       vpc_config   = { production = true }
       permissions = [{
         principal         = "cloudwatch.amazonaws.com"
+        source_arn_suffix = "*"
+      }]
+    }
+    sync_ssm_to_waf = {
+      description  = "Function to synchronize ssm parameter store with WAF ip sets."
+      role_key     = "sync_ssm_to_waf"
+      environments = ["development", "preproduction", "production"]
+      vpc_config   = { production = true }
+      permissions = [{
+        principal         = "events.amazonaws.com"
         source_arn_suffix = "*"
       }]
     }

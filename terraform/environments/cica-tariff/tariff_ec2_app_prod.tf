@@ -16,60 +16,19 @@ resource "aws_instance" "tariff_app_2" {
             sudo systemctl enable amazon-ssm-agent
             sudo systemctl start amazon-ssm-agent
             EOF
-  vpc_security_group_ids      = [module.tariff_app_prod_security_group[0].security_group_id, aws_security_group.tariff_app_prod_security_group[0].id]
-  # vpc_security_group_ids = [aws_security_group.tariff_app_prod_security_group[0].id]
+  vpc_security_group_ids      = [module.tariff_app_prod_security_group[0].security_group_id]
 
   root_block_device {
     delete_on_termination = true
     encrypted             = true
     volume_size           = 20
+    tags = merge(tomap({
+      "Name"               = "${local.application_name}-app2-root",
+      "volume-attach-host" = "app2",
+      "volume-mount-path"  = "/"
+      }), local.tags
+    )
   }
-  /*
-  ebs_block_device {
-    device_name           = "xvde"
-    delete_on_termination = true
-    encrypted             = true
-    volume_size           = 100
-    snapshot_id           = local.snapshot_id_xvde
-
-  }
-  ebs_block_device {
-    device_name           = "xvdf"
-    delete_on_termination = true
-    encrypted             = true
-    volume_size           = 100
-    snapshot_id           = local.snapshot_id_xvdf
-  }
-  ebs_block_device {
-    device_name           = "xvdg"
-    delete_on_termination = true
-    encrypted             = true
-    volume_size           = 100
-    snapshot_id           = local.snapshot_id_xvdg
-  }
-
-  ebs_block_device {
-    device_name           = "xvdh"
-    delete_on_termination = true
-    encrypted             = true
-    volume_size           = 16
-    snapshot_id           = local.snapshot_id_xvdh
-  }
-  ebs_block_device {
-    device_name           = "xvdi"
-    delete_on_termination = true
-    encrypted             = true
-    volume_size           = 30
-    snapshot_id           = local.snapshot_id_xvdi
-  }
-  */
-
-  volume_tags = merge(tomap({
-    "Name"               = "${local.application_name}-app2-root",
-    "volume-attach-host" = "app2",
-    "volume-mount-path"  = "/"
-  }), local.tags)
-
   tags = merge(tomap({
     "Name"     = lower(format("ec2-%s-%s-app2", local.application_name, local.environment)),
     "hostname" = "${local.application_name}-app2",
@@ -89,7 +48,8 @@ resource "aws_ebs_volume" "tariff_app2_storage" {
     "Name"               = "${local.application_name}-app2-root",
     "volume-attach-host" = "app2",
     "volume-mount-path"  = "/"
-  }), local.tags)
+    }), local.tags
+  )
 }
 
 resource "aws_volume_attachment" "tariff_app2_storage_attachment" {
