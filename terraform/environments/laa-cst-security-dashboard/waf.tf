@@ -1,6 +1,10 @@
 
 module "waf" {
   source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-aws-waf?ref=a96a97c0cc64c14f1ee66b272e31101cce5aee61" # v2.0.0
+  providers = {
+    aws                        = aws
+    aws.modernisation-platform = aws.modernisation-platform
+  }
   enable_pagerduty_integration = true
   enable_ddos_protection       = true
   ddos_rate_limit              = 5000
