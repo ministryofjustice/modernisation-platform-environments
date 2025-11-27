@@ -181,6 +181,7 @@ resource "aws_workspacesweb_browser_settings" "main" {
         "value" = [
           "[*.]accessmycloudpc.com",
           "[*.]auth.microsoft.com",
+          "[*.]authpoint.deu.cloud.watchguard.com",
           "[*.]hip.live.com",
           "[*.]microsoftonline-p.com",
           "[*.]microsoftonline.com",
