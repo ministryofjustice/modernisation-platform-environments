@@ -125,7 +125,9 @@ resource "aws_wafv2_web_acl_association" "web_acl_association_my_lb" {
 module "s3-bucket-lb" {
   #tfsec:ignore:aws-s3-enable-versioning
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=568694e50e03630d99cb569eafa06a0b879a1239" #v7.1.0
-
+  providers = {
+    aws.bucket-replication = aws
+  }
   bucket_prefix      = "s3-bucket-example-lb"
   versioning_enabled = false
   bucket_policy      = [data.aws_iam_policy_document.bucket_policy_lb.json]
