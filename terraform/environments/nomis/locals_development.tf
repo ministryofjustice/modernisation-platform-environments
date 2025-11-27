@@ -166,7 +166,7 @@ locals {
         })
         user_data_cloud_init = merge(local.ec2_autoscaling_groups.web12.user_data_cloud_init, {
           args = merge(local.ec2_autoscaling_groups.web12.user_data_cloud_init.args, {
-            branch = "TM-1718"
+            branch = "TM-1759"
           })
         })
         tags = merge(local.ec2_autoscaling_groups.web12.tags, {
