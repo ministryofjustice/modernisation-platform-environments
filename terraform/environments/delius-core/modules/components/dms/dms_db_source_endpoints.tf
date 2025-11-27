@@ -15,6 +15,8 @@ resource "aws_dms_endpoint" "dms_audit_source_endpoint_db" {
   password                    = join(",", [jsondecode(data.aws_secretsmanager_secret_version.delius_core_application_passwords.secret_string)[local.dms_audit_username], jsondecode(data.aws_secretsmanager_secret_version.delius_core_application_passwords.secret_string)[local.dms_audit_username]])
   server_name                 = join(".", [var.oracle_db_server_names[var.dms_config.audit_source_endpoint.read_host], var.account_config.route53_inner_zone.name])
   port                        = local.db_port
+  # We use NNE instead of SSL
+  ssl_mode                    = "none"
   extra_connection_attributes = "ArchivedLogDestId=1;AdditionalArchivedLogDestId=32;asm_server=${join(".", [var.oracle_db_server_names[var.dms_config.audit_source_endpoint.read_host], var.account_config.route53_inner_zone.name])}:${local.db_port}/+ASM;asm_user=${local.dms_audit_username};UseBFile=true;UseLogminerReader=false;"
 }
 
