@@ -13,7 +13,7 @@ resource "aws_dms_endpoint" "dms_user_target_endpoint_db" {
   port                        = local.db_port
   # We use NNE instead of SSL
   ssl_mode                    = "none"
-  extra_connection_attributes = "UseDirectPathFullLoad=false;ArchivedLogDestId=1;AdditionalArchivedLogDestId=32;asm_server=${join(".", [var.oracle_db_server_names["primarydb"], var.account_config.route53_inner_zone.name])}:${local.db_port}/+ASM;asm_user=${local.dms_audit_username};UseBFile=true;UseLogminerReader=false;"
+  extra_connection_attributes = ""
 }
 
 # In repository environments the end point for audit (AUDITED_INTERACTION, BUSINESS_INTERACTION) is the Delius primary database.
@@ -30,5 +30,5 @@ resource "aws_dms_endpoint" "dms_audit_target_endpoint_db" {
   port                        = local.db_port
   # We use NNE instead of SSL
   ssl_mode                    = "none"
-  extra_connection_attributes = "UseDirectPathFullLoad=false;ArchivedLogDestId=1;AdditionalArchivedLogDestId=32;asm_server=${join(".", [var.oracle_db_server_names["primarydb"], var.account_config.route53_inner_zone.name])}:${local.db_port}/+ASM;asm_user=${local.dms_audit_username};UseBFile=true;UseLogminerReader=false;"
+  extra_connection_attributes = ""
 }
