@@ -319,7 +319,7 @@ module "load_dms_output" {
 #-----------------------------------------------------------------------------------
 
 module "load_mdss_lambda" {
-  count = local.is-development ? 0 : 1
+  count                          = local.is-development ? 0 : 1
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "load_mdss"
@@ -332,6 +332,34 @@ module "load_mdss_lambda" {
   ephemeral_storage_size         = 10240
   core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
   production_dev                 = local.is-production ? "prod" : "dev"
+  security_group_ids             = [aws_security_group.lambda_generic.id]
+  subnet_ids                     = data.aws_subnets.shared-public.ids
+  environment_variables = {
+    ATHENA_QUERY_BUCKET = module.s3-athena-bucket.bucket.id
+    ACCOUNT_NUMBER      = data.aws_caller_identity.current.account_id
+    STAGING_BUCKET      = module.s3-create-a-derived-table-bucket.bucket.id
+    ENVIRONMENT_NAME    = local.environment_shorthand
+  }
+}
+
+#-----------------------------------------------------------------------------------
+# dlt load fms
+#-----------------------------------------------------------------------------------
+
+module "load_fms_lambda" {
+  count                          = local.is-development ? 0 : 1
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "load_fms"
+  role_name                      = aws_iam_role.load_fms[0].name
+  role_arn                       = aws_iam_role.load_fms[0].arn
+  handler                        = "load_fms.handler"
+  memory_size                    = 10240
+  timeout                        = 900
+  reserved_concurrent_executions = 500
+  ephemeral_storage_size         = 10240
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
   security_group_ids             = [aws_security_group.lambda_generic.id]
   subnet_ids                     = data.aws_subnets.shared-public.ids
   environment_variables = {

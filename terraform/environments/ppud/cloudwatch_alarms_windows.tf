@@ -208,7 +208,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu" {
   for_each            = toset(data.aws_instances.windows_tagged_instances.ids)
   alarm_name          = "CPU-Utilisation-High-${each.key}" # name of the alarm
   comparison_operator = "GreaterThanOrEqualToThreshold"    # threshold to trigger the alarm state
-  period              = "60"                               # period in seconds over which the specified statistic is applied
+  period              = "300"                               # period in seconds over which the specified statistic is applied
   threshold           = "90"                               # threshold for the alarm - see comparison_operator for usage
   evaluation_periods  = "3"                                # how many periods over which to evaluate the alarm
   datapoints_to_alarm = "2"                                # how many datapoints must be breaching the threshold to trigger the alarm
@@ -287,7 +287,7 @@ resource "aws_cloudwatch_metric_alarm" "Windows_IIS_check" {
 }
 
 # CloudWatch Alarms for Malware Events (Signature Update Failed, State Detected, Scan Failed, Engine Update Failed, Engine Out of Date & Behavior Detected)
-
+/*
 locals {
   malware_alarm_metadata_prod = local.is-production ? {
     MalwareScanFailed       = "Scan Failed"
@@ -337,7 +337,7 @@ resource "aws_cloudwatch_metric_alarm" "malware_event_alarms_prod" {
     EventName = each.value.metric_name
   }
 }
-
+*/
 # Service Status Alarms
 
 # IIS Admin Service
@@ -838,7 +838,6 @@ resource "aws_cloudwatch_metric_alarm" "emailsender_check_rgvw022" {
 ############################
 
 # Create a data source to fetch the tags of each instance
-
 data "aws_instances" "windows_tagged_instances_uat" {
   filter {
     name   = "tag:patch_group"
@@ -847,9 +846,22 @@ data "aws_instances" "windows_tagged_instances_uat" {
 }
 
 # Data source for ImageId and InstanceType for each instance
-
 data "aws_instance" "windows_instance_details_uat" {
   for_each    = toset(data.aws_instances.windows_tagged_instances_uat.ids)
+  instance_id = each.value
+}
+
+# Create a data source to fetch the tags of each instance
+data "aws_instances" "cpu_alarm_tagged_instances_uat" {
+  filter {
+    name   = "tag:cpu_alarm"
+    values = ["true"]
+  }
+}
+
+# Data source for individual instance details to access tags
+data "aws_instance" "cpu_alarm_instance_details_uat" {
+  for_each    = toset(data.aws_instances.cpu_alarm_tagged_instances_uat.ids)
   instance_id = each.value
 }
 
@@ -858,7 +870,7 @@ data "aws_instance" "windows_instance_details_uat" {
 #################################
 
 # CloudWatch Alarms for Malware Events (Signature Update Failed, State Detected, Scan Failed, Engine Update Failed, Engine Out of Date & Behavior Detected)
-
+/*
 locals {
   malware_alarm_metadata_preprod = local.is-preproduction ? {
     MalwareScanFailed       = "Scan Failed"
@@ -908,6 +920,33 @@ resource "aws_cloudwatch_metric_alarm" "malware_event_alarms_preprod" {
     EventName = each.value.metric_name
   }
 }
+*/
+# High CPU Utilization Alarm
+
+resource "aws_cloudwatch_metric_alarm" "cpu_uat_alarms" {
+  for_each            = toset(data.aws_instances.cpu_alarm_tagged_instances_uat.ids)
+  alarm_name          = "CPU-Utilisation-High-${each.key}"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  period              = 300
+  threshold           = 90
+  evaluation_periods  = 3
+  datapoints_to_alarm = 2
+  metric_name         = "CPUUtilization"
+  treat_missing_data  = "notBreaching"
+  namespace           = "AWS/EC2"
+  statistic           = "Average"
+  alarm_description   = "Monitors EC2 CPU utilisation"
+
+  alarm_actions = concat(
+    [aws_sns_topic.cw_uat_alerts[0].arn],
+    lookup(data.aws_instance.cpu_alarm_instance_details_uat[each.key].tags, "cpu_lambda_trigger", "false") == "true" && local.is-preproduction ?
+    ["arn:aws:lambda:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:function:terminate_cpu_process_preproduction"] : []
+  )
+
+  dimensions = {
+    InstanceId = each.key
+  }
+}
 
 ##########################
 # Data Sources Development
@@ -932,7 +971,7 @@ data "aws_instance" "windows_instance_details_dev" {
 ###############################
 # CloudWatch Alarms Development
 ###############################
-
+/*
 # CloudWatch Alarms for Malware Events (Signature Update Failed, State Detected, Scan Failed, Engine Update Failed, Engine Out of Date & Behavior Detected)
 
 locals {
@@ -978,6 +1017,79 @@ resource "aws_cloudwatch_metric_alarm" "malware_event_alarms_dev" {
   treat_missing_data  = "notBreaching"
   alarm_description   = "Monitors for Windows Defender malware event: ${each.value.description}"
   alarm_actions       = [aws_sns_topic.cw_dev_alerts[0].arn]
+
+  dimensions = {
+    Instance  = each.value.instance_id
+    EventName = each.value.metric_name
+  }
+}
+*/
+
+# CloudWatch Alarms for Malware Events (Signature Update Failed, State Detected, Scan Failed, Engine Update Failed, Engine Out of Date & Behavior Detected)
+
+locals {
+  malware_alarm_metadata = {
+    MalwareScanFailed       = "Scan Failed"
+    MalwareBehaviorDetected = "Behavior Detected"
+    MalwareStateDetected    = "State Detected"
+    MalwareSignatureFailed  = "Signature Failed"
+    MalwareEngineFailed     = "Engine Failed"
+    MalwareEngineOutofDate  = "Engine Out of Date"
+  }
+
+  malware_alarm_environments = {
+    production = {
+      enabled      = local.is-production
+      instances    = data.aws_instances.windows_tagged_instances.ids
+      sns_topic    = "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${local.application_data.accounts[local.environment].cloudwatch_sns_topic_name}"
+    }
+    preproduction = {
+      enabled      = local.is-preproduction
+      instances    = data.aws_instances.windows_tagged_instances_uat.ids
+      sns_topic    = "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${local.application_data.accounts[local.environment].cloudwatch_sns_topic_name}"
+    }
+    development = {
+      enabled      = local.is-development
+      instances    = data.aws_instances.windows_tagged_instances_dev.ids
+      sns_topic    = "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${local.application_data.accounts[local.environment].cloudwatch_sns_topic_name}"
+    }
+  }
+
+  malware_alarm_matrix = tomap({
+    for pair in flatten([
+      for env_name, env_config in local.malware_alarm_environments : [
+        for instance_id in env_config.instances : [
+          for metric_name, description in local.malware_alarm_metadata : {
+            key = "${env_name}-${instance_id}-${metric_name}"
+            value = {
+              env_name    = env_name
+              instance_id = instance_id
+              metric_name = metric_name
+              description = description
+              sns_topic   = env_config.sns_topic
+            }
+          } if env_config.enabled
+        ] if env_config.enabled
+      ]
+    ]) : pair.key => pair.value
+  })
+}
+
+resource "aws_cloudwatch_metric_alarm" "malware_event_alarms" {
+  for_each = local.malware_alarm_matrix
+
+  alarm_name          = "Malware-Event-${each.value.metric_name}-${each.value.instance_id}"
+  comparison_operator = "GreaterThanThreshold"
+  period              = 60
+  threshold           = 0
+  evaluation_periods  = 1
+  datapoints_to_alarm = 1
+  metric_name         = each.value.metric_name
+  namespace           = "WindowsDefender"
+  statistic           = "Sum"
+  treat_missing_data  = "notBreaching"
+  alarm_description   = "Monitors for Windows Defender malware event: ${each.value.description}"
+  alarm_actions       = [each.value.sns_topic]
 
   dimensions = {
     Instance  = each.value.instance_id

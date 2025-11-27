@@ -25,6 +25,8 @@
 /terraform/environments/cica-data-extraction @ministryofjustice/cica-mp-tariff @ministryofjustice/modernisation-platform
 /terraform/environments/cica-sandbox @ministryofjustice/cica-review-case-documents @ministryofjustice/modernisation-platform
 /terraform/environments/cica-tariff @ministryofjustice/cica-mp-tariff @ministryofjustice/modernisation-platform
+/terraform/environments/cloud-platform-live @ministryofjustice/cloud-platform-engineers @ministryofjustice/modernisation-platform
+/terraform/environments/cloud-platform-non-live @ministryofjustice/cloud-platform-engineers @ministryofjustice/modernisation-platform
 /terraform/environments/coat @ministryofjustice/cloud-optimisation-and-accountability @ministryofjustice/modernisation-platform
 /terraform/environments/contract-work-administration @ministryofjustice/laa-aws-infrastructure @ministryofjustice/laa-cwa-developer @ministryofjustice/laa-pcuam @ministryofjustice/modernisation-platform
 /terraform/environments/cooker @ministryofjustice/modernisation-platform @ministryofjustice/tvm-purple-team @ministryofjustice/modernisation-platform
@@ -52,7 +54,7 @@
 /terraform/environments/laa-enterprise-service-bus @ministryofjustice/hub20-validation @ministryofjustice/laa-aws-infrastructure @ministryofjustice/v1-hub20-developers @ministryofjustice/modernisation-platform
 /terraform/environments/laa-mail-relay @ministryofjustice/laa-aws-infrastructure @ministryofjustice/modernisation-platform
 /terraform/environments/laa-oem @ministryofjustice/laa-ccms-migration-team @ministryofjustice/modernisation-platform
-/terraform/environments/laa-pui-secure-browser @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
+/terraform/environments/laa-pui-secure-browser @ministryofjustice/ecp-admin @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
 /terraform/environments/laa-pui-secure-browser/networking @ministryofjustice/ecp-admin @ministryofjustice/modernisation-platform
 /terraform/environments/laa-pui-secure-browser/workspaces-secure-browser @ministryofjustice/ecp-admin @ministryofjustice/modernisation-platform
 /terraform/environments/laa-stabilisation-cdc-poc @ministryofjustice/laa-stabilisation-cdc @ministryofjustice/v1-hub20-developers @ministryofjustice/modernisation-platform

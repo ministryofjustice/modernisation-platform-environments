@@ -48,8 +48,8 @@ resource "aws_workspacesweb_user_settings" "main" {
 
   # Optional settings
   deep_link_allowed                  = "Enabled"
-  disconnect_timeout_in_minutes      = 60
-  idle_disconnect_timeout_in_minutes = 15
+  disconnect_timeout_in_minutes      = 30
+  idle_disconnect_timeout_in_minutes = 10
 
   toolbar_configuration {
     toolbar_type = "Docked"
@@ -84,8 +84,8 @@ resource "aws_workspacesweb_user_settings" "sso" {
 
   # Optional settings - same as main
   deep_link_allowed                  = "Enabled"
-  disconnect_timeout_in_minutes      = 60
-  idle_disconnect_timeout_in_minutes = 15
+  disconnect_timeout_in_minutes      = 30
+  idle_disconnect_timeout_in_minutes = 10
 
   # Enable SSO extension and define which cookies to sync -- DISABLED PENDING SEC REVIEW
   # cookie_synchronization_configuration {
@@ -200,6 +200,7 @@ resource "aws_workspacesweb_browser_settings" "main" {
           "assets.publishing.service.gov.uk",
           "autologon.microsoftazuread-sso.com",
           "becws.microsoftonline.com",
+          "ccms-pui.laa.service.justice.gov.uk",
           "ccs.login.microsoftonline.com",
           "chrome-untrusted://print/",
           "chrome://new-tab-page",
@@ -219,6 +220,7 @@ resource "aws_workspacesweb_browser_settings" "main" {
           "${local.oia_url}",
           "${local.pui_url}",
           "login.live.com",
+          "login.live.co.uk",
           "login.microsoft.com",
           "login.microsoftonline-p.com",
           "login.microsoftonline.com",
@@ -232,6 +234,7 @@ resource "aws_workspacesweb_browser_settings" "main" {
           "passwordreset.microsoftonline.com",
           "portal.manage.microsoft.com",
           "provisioningapi.microsoftonline.com",
+          "sso.godaddy.com",
           "www.gov.uk",
           "www.justice.gov.uk",
           "www.smartsurvey.co.uk",

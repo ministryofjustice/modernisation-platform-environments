@@ -179,58 +179,6 @@ data "aws_iam_policy_document" "sns_topic_policy_s3_notifications_dev" {
   }
 }
 
-
-
-##################################################################
-# SNS topic, subscription, policy & document for SES Logging - DEV
-##################################################################
-/*
-resource "aws_sns_topic" "ses_logging_dev" {
-  # checkov:skip=CKV_AWS_26: "SNS topic encryption is not required as no sensitive data is processed through it"
-  count = local.is-development == true ? 1 : 0
-  name  = "ppud-ses-logging-dev"
-}
-
-resource "aws_sns_topic_subscription" "ses_logging_subscription_dev" {
-  count     = local.is-development == true ? 1 : 0
-  topic_arn = aws_sns_topic.ses_logging_dev[0].arn
-  protocol  = "lambda"
-  endpoint  = aws_lambda_function.terraform_lambda_func_ses_logging_dev[0].arn
-}
-
-resource "aws_sns_topic_policy" "ses_logging_dev_topic_policy" {
-  count  = local.is-development == true ? 1 : 0
-  arn    = aws_sns_topic.ses_logging_dev[0].arn
-  policy = data.aws_iam_policy_document.ses_logging_dev_topic_policy_document[0].json
-}
-
-data "aws_iam_policy_document" "ses_logging_dev_topic_policy_document" {
-  count     = local.is-development == true ? 1 : 0
-  policy_id = "ses_logging_dev_sns_topic_policy_document"
-
-  statement {
-    sid    = "AllowSESPublish"
-    effect = "Allow"
-    principals {
-      type        = "Service"
-      identifiers = ["ses.amazonaws.com"]
-    }
-    actions = [
-      "SNS:Publish"
-    ]
-    condition {
-      test     = "StringEquals"
-      variable = "AWS:SourceOwner"
-      values = [
-        data.aws_caller_identity.current.account_id
-      ]
-    }
-    resources = [
-      aws_sns_topic.ses_logging_dev[0].arn
-    ]
-  }
-}
-*/
 ###########################
 # Preproduction Environment
 ###########################
@@ -342,57 +290,6 @@ data "aws_iam_policy_document" "sns_topic_policy_s3_notifications_uat" {
   }
 }
 
-##################################################################
-# SNS topic, subscription, policy & document for SES Logging - UAT
-##################################################################
-/*
-resource "aws_sns_topic" "ses_logging_uat" {
-  # checkov:skip=CKV_AWS_26: "SNS topic encryption is not required as no sensitive data is processed through it"
-  count = local.is-preproduction == true ? 1 : 0
-  name  = "ppud-ses-logging-uat"
-}
-
-resource "aws_sns_topic_subscription" "ses_logging_subscription_uat" {
-  count     = local.is-preproduction == true ? 1 : 0
-  topic_arn = aws_sns_topic.ses_logging_uat[0].arn
-  protocol  = "lambda"
-  # endpoint  = aws_lambda_function.terraform_lambda_func_ses_logging_uat[0].arn
-  endpoint = aws_lambda_function.lambda_functions["ses_logging_preproduction"].arn
-}
-
-resource "aws_sns_topic_policy" "ses_logging_uat_topic_policy" {
-  count  = local.is-preproduction == true ? 1 : 0
-  arn    = aws_sns_topic.ses_logging_uat[0].arn
-  policy = data.aws_iam_policy_document.ses_logging_uat_topic_policy_document[0].json
-}
-
-data "aws_iam_policy_document" "ses_logging_uat_topic_policy_document" {
-  count     = local.is-preproduction == true ? 1 : 0
-  policy_id = "ses_logging_uat_sns_topic_policy_document"
-
-  statement {
-    sid    = "AllowSESPublish"
-    effect = "Allow"
-    principals {
-      type        = "Service"
-      identifiers = ["ses.amazonaws.com"]
-    }
-    actions = [
-      "SNS:Publish"
-    ]
-    condition {
-      test     = "StringEquals"
-      variable = "AWS:SourceOwner"
-      values = [
-        data.aws_caller_identity.current.account_id
-      ]
-    }
-    resources = [
-      aws_sns_topic.ses_logging_uat[0].arn
-    ]
-  }
-}
-*/
 ########################
 # Production Environment
 ########################
