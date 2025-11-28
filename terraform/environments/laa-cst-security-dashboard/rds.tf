@@ -35,7 +35,7 @@ resource "aws_db_instance" "cst_db" {
   password                = random_password.cst_db.result
   publicly_accessible     = false
   skip_final_snapshot     = true
-  deletion_protection     = false
+  enable_deletion_protection = false
   backup_retention_period = 1
   vpc_security_group_ids  = [aws_security_group.cst_rds_sc.id]
   apply_immediately       = true
