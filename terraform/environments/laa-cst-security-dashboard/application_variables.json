@@ -30,5 +30,17 @@
       "s3_lifecycle_days_transition_noncurrent_standard": 90,
       "certificate_expiry_days": 45
     }
+  },
+  "cst_ec2_sg_rules": {
+    "TCP_80": {
+      "from_port": 80,
+      "to_port": 80,
+      "protocol": "TCP"
+    },
+    "TCP_443": {
+      "from_port": 443,
+      "to_port": 443,
+      "protocol": "TCP"
+    }
   }
 }

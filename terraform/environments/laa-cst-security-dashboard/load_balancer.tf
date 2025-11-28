@@ -9,7 +9,7 @@ resource "aws_security_group" "cst_load_balancer_sg" {
   # Set up the ingress and egress parts of the security group
 }
 resource "aws_security_group_rule" "ingress_traffic_lb" {
-  for_each          = local.application_data.example_ec2_sg_rules
+  for_each          = local.application_data.cst_ec2_sg_rules
   description       = format("Traffic for %s %d", each.value.protocol, each.value.from_port)
   from_port         = each.value.from_port
   protocol          = each.value.protocol
@@ -19,7 +19,7 @@ resource "aws_security_group_rule" "ingress_traffic_lb" {
   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
 }
 resource "aws_security_group_rule" "egress_traffic_lb" {
-  for_each                 = local.application_data.example_ec2_sg_rules
+  for_each                 = local.application_data.cst_ec2_sg_rules
   description              = format("Outbound traffic for %s %d", each.value.protocol, each.value.from_port)
   from_port                = each.value.from_port
   protocol                 = each.value.protocol
