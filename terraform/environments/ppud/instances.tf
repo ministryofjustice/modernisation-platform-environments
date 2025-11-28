@@ -590,9 +590,12 @@ resource "aws_instance" "s618358rgvw019" {
   }
 
   tags = {
-    Name          = "s618358rgvw019"
-    patch_group   = "prod_win_patch"
-    is-production = true
+    Name             = "s618358rgvw019"
+    patch_group      = "prod_win_patch"
+    is-production    = true
+    iisadmin_service = "true"
+    wwwpub_service   = "true"
+    ppudlive_service = "true"
   }
 }
 
@@ -740,9 +743,10 @@ resource "aws_instance" "s618358rgvw204" {
   }
 
   tags = {
-    Name          = "s618358rgvw204"
-    patch_group   = "prod_win_patch"
-    is-production = true
+    Name           = "s618358rgvw204"
+    patch_group    = "prod_win_patch"
+    is-production  = true
+    wwwpub_service = "true"
   }
 }
 
@@ -765,9 +769,10 @@ resource "aws_instance" "s618358rgvw205" {
   }
 
   tags = {
-    Name          = "s618358rgvw205"
-    patch_group   = "prod_win_patch"
-    is-production = true
+    Name           = "s618358rgvw205"
+    patch_group    = "prod_win_patch"
+    is-production  = true
+    wwwpub_service = "true"
   }
 }
 
