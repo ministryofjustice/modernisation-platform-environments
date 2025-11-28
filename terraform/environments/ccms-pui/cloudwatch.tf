@@ -112,3 +112,21 @@ resource "aws_cloudwatch_metric_alarm" "waf_high_blocked_requests" {
   tags = local.tags
 }
 
+resource "aws_cloudwatch_metric_alarm" "alb_healthyhosts" {
+  alarm_name          = "${local.application_name}-${local.environment}-alb-targets-group"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = 1
+  metric_name         = "HealthyHostCount"
+  namespace           = "AWS/ApplicationELB"
+  period              = 240
+  statistic           = "Average"
+  threshold           = local.application_data.accounts[local.environment].app_count
+  alarm_description   = "Number of healthy nodes in Target Group"
+  actions_enabled     = true
+  alarm_actions       = [aws_sns_topic.cloudwatch_alerts.arn]
+  ok_actions          = [aws_sns_topic.cloudwatch_alerts.arn]
+  dimensions = {
+    TargetGroup  = aws_lb_target_group.pui_target_group.arn_suffix
+    LoadBalancer = aws_lb.pui.arn_suffix
+  }
+}
