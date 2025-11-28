@@ -114,6 +114,8 @@ resource "aws_lambda_function" "cloudwatch_sns" {
   tags = merge(local.tags, {
     Name = "${local.application_name}-${local.environment}-cloudwatch_alarm_slack_integration"
   })
+
+  depends_on = [null_resource.zip_file]
 }
 
 # resource "aws_cloudwatch_event_rule" "acm_events" {
