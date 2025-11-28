@@ -376,9 +376,9 @@ locals {
           ])
         })
         instance = merge(local.ec2_instances.bip.instance, {
-          ami                          = "ami-0d206b8546ea2b68a" # to prevent instances being re-created due to recreated AMI
-          instance_type                = "r6i.4xlarge"           # this is massively over provisioned FIXME
-          metadata_options_http_tokens = "optional"              # accidentally set, remove this line when resizing
+          disable_api_termination = true
+          instance_type           = "m7i.large"
+          ami                     = "ami-0d206b8546ea2b68a" # to prevent instances being re-created due to recreated AMI
         })
         tags = merge(local.ec2_instances.bip.tags, {
           bip-db-hostname   = "ptctrn-oasys-db-a"
