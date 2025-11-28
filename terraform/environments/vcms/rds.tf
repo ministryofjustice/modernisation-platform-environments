@@ -15,6 +15,11 @@ resource "aws_db_instance" "mariadb" {
   db_subnet_group_name   = aws_db_subnet_group.mariadb.name
   vpc_security_group_ids = [aws_security_group.mariadb.id]
   skip_final_snapshot    = true
+
+  tags = merge(
+    local.tags,
+    { "backup" = local.db_config.backup }
+  )
 }
 
 resource "random_id" "db_password" {
