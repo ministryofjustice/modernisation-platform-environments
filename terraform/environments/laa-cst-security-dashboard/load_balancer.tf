@@ -115,5 +115,5 @@ resource "aws_route53_record" "example" {
 # # Association code for WAFv2 to the LB
 resource "aws_wafv2_web_acl_association" "web_acl_association_my_lb" {
   resource_arn = aws_lb.external.arn
-  web_acl_arn  = aws_wafv2_web_acl.external.arn
+  web_acl_arn  = module.waf.web_acl_arn
 }
