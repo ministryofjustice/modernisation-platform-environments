@@ -27,7 +27,7 @@ resource "aws_vpc_security_group_egress_rule" "db_ec2_instance_rman" {
   security_group_id = aws_security_group.db_ec2.id
   cidr_ipv4         = var.environment_config.legacy_engineering_vpc_cidr
   from_port         = local.db_port
-  to_port           = local.db_tcps_port
+  to_port           = local.db_port
   ip_protocol       = "tcp"
   description       = "Allow communication out on port 1521 to legacy rman"
   tags = merge(var.tags,
@@ -39,7 +39,7 @@ resource "aws_vpc_security_group_ingress_rule" "db_ec2_instance_rman" {
   security_group_id = aws_security_group.db_ec2.id
   cidr_ipv4         = var.environment_config.legacy_engineering_vpc_cidr
   from_port         = local.db_port
-  to_port           = local.db_tcps_port
+  to_port           = local.db_port
   ip_protocol       = "tcp"
   description       = "Allow communication in on port 1521 from legacy rman"
   tags = merge(var.tags,
@@ -53,7 +53,7 @@ resource "aws_vpc_security_group_egress_rule" "db_ec2_instance_legacy_oracle" {
   security_group_id = aws_security_group.db_ec2.id
   cidr_ipv4         = each.key
   from_port         = local.db_port
-  to_port           = local.db_tcps_port
+  to_port           = local.db_port
   ip_protocol       = "tcp"
   description       = "Allow communication out on port 1521 to legacy"
   tags = merge(var.tags,
@@ -67,7 +67,7 @@ resource "aws_vpc_security_group_ingress_rule" "db_ec2_instance_legacy_oracle" {
   security_group_id = aws_security_group.db_ec2.id
   cidr_ipv4         = each.key
   from_port         = local.db_port
-  to_port           = local.db_tcps_port
+  to_port           = local.db_port
   ip_protocol       = "tcp"
   description       = "Allow communication in on port 1521 from legacy"
   tags = merge(var.tags,
@@ -81,7 +81,7 @@ resource "aws_vpc_security_group_egress_rule" "asg_ec2_instance_legacy_oracle" {
   security_group_id = aws_security_group.db_ec2.id
   cidr_ipv4         = each.key
   from_port         = local.db_port
-  to_port           = local.db_tcps_port
+  to_port           = local.db_port
   ip_protocol       = "tcp"
   description       = "Allow communication out on port 1521 to legacy"
   tags = merge(var.tags,
@@ -95,7 +95,7 @@ resource "aws_vpc_security_group_ingress_rule" "asg_ec2_instance_legacy_oracle" 
   security_group_id = aws_security_group.db_ec2.id
   cidr_ipv4         = each.key
   from_port         = local.db_port
-  to_port           = local.db_tcps_port
+  to_port           = local.db_port
   ip_protocol       = "tcp"
   description       = "Allow communication in on port 1521 from legacy"
   tags = merge(var.tags,
@@ -107,7 +107,7 @@ resource "aws_vpc_security_group_ingress_rule" "cp_oracle" {
   security_group_id = aws_security_group.db_ec2.id
   cidr_ipv4         = var.account_info.cp_cidr
   from_port         = local.db_port
-  to_port           = local.db_tcps_port
+  to_port           = local.db_port
   ip_protocol       = "tcp"
   description       = "Allow communication in on port 1521 from CP"
   tags = merge(var.tags,
@@ -119,7 +119,7 @@ resource "aws_vpc_security_group_egress_rule" "db_inter_conn" {
   security_group_id            = aws_security_group.db_ec2.id
   description                  = "Allow communication between delius db instances"
   from_port                    = local.db_port
-  to_port                      = local.db_tcps_port
+  to_port                      = local.db_port
   ip_protocol                  = "tcp"
   referenced_security_group_id = aws_security_group.db_ec2.id
 }
@@ -128,21 +128,10 @@ resource "aws_vpc_security_group_ingress_rule" "db_inter_conn" {
   security_group_id            = aws_security_group.db_ec2.id
   description                  = "Allow communication between delius db instances"
   from_port                    = local.db_port
-  to_port                      = local.db_tcps_port
+  to_port                      = local.db_port
   ip_protocol                  = "tcp"
   referenced_security_group_id = aws_security_group.db_ec2.id
 }
-
-# Access covered by: resource "aws_vpc_security_group_ingress_rule" "delius_db_oem_db"
-# resource "aws_vpc_security_group_ingress_rule" "delius_db_security_group_ingress_bastion" {
-#   security_group_id            = aws_security_group.db_ec2.id
-#   description                  = "bastion to testing db"
-#   from_port                    = local.db_port
-#   to_port                      = local.db_tcps_port
-#   ip_protocol                  = "tcp"
-#   # referenced_security_group_id = var.bastion_sg_id # # Temporarily removed to recreate bastion SG
-#   cidr_ipv4                    = var.account_config.shared_vpc_cidr
-# }
 
 resource "aws_vpc_security_group_ingress_rule" "delius_db_security_group_ssh_ingress_bastion" {
   #checkov:skip=CKV_AWS_24
@@ -159,7 +148,7 @@ resource "aws_vpc_security_group_ingress_rule" "delius_db_oem_db" {
   #checkov:skip=CKV_AWS_23
   ip_protocol       = "tcp"
   from_port         = local.db_port
-  to_port           = local.db_tcps_port
+  to_port           = local.db_port
   cidr_ipv4         = var.account_config.shared_vpc_cidr
   security_group_id = aws_security_group.db_ec2.id
 }
@@ -167,7 +156,7 @@ resource "aws_vpc_security_group_ingress_rule" "delius_db_oem_db" {
 resource "aws_vpc_security_group_egress_rule" "delius_db_rman_db" {
   ip_protocol       = "tcp"
   from_port         = local.db_port
-  to_port           = local.db_tcps_port
+  to_port           = local.db_port
   cidr_ipv4         = var.account_config.shared_vpc_cidr
   security_group_id = aws_security_group.db_ec2.id
   description       = "Allow communication out on port 1521 to rman"
