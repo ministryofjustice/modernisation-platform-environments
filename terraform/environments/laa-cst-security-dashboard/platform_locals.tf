@@ -1,6 +1,6 @@
 locals {
 
-  application_name = "laa-cst-security-dashboard"
+  application_name = "laa-cst-dashboard"
 
   environment_management = jsondecode(data.aws_secretsmanager_secret_version.environment_management.secret_string)
 
