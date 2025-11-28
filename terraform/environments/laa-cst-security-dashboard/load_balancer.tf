@@ -4,6 +4,7 @@ resource "aws_security_group" "cst_load_balancer_sg" {
   name        = "cst-lb-sg"
   description = "controls access to load balancer"
   vpc_id      = data.aws_vpc.shared.id
+  enable_deletion_protection = false
   tags        = { Name = lower(format("lb-sg-%s-%s-", local.application_name, local.environment)) }
 
   # Set up the ingress and egress parts of the security group
@@ -46,7 +47,7 @@ resource "aws_lb" "external" {
 
   access_logs {
     bucket  = module.s3-bucket-logging.bucket.id
-    prefix  = "test-lb"
+    prefix  = "cst-lb"
     enabled = true
   }
 
