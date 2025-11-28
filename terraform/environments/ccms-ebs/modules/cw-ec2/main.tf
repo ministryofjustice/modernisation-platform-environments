@@ -93,7 +93,6 @@ resource "aws_cloudwatch_metric_alarm" "disk_used" {
     ImageId      = var.imageId
     InstanceType = var.instanceType
     path         = "/"
-    device       = var.rootDevice
     fstype       = var.fileSystem
   }
 }

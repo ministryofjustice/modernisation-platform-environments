@@ -32,6 +32,7 @@
 /terraform/environments/cooker @ministryofjustice/modernisation-platform @ministryofjustice/tvm-purple-team @ministryofjustice/modernisation-platform
 /terraform/environments/corporate-staff-rostering @ministryofjustice/azure-aws-sso-csr-migration @ministryofjustice/azure-aws-sso-digital-studio-operations @ministryofjustice/csr-application-support @ministryofjustice/hosting-migrations @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
 /terraform/environments/dacp @ministryofjustice/dts-legacy @ministryofjustice/modernisation-platform
+/terraform/environments/data-platform-governance @ministryofjustice/data-platform-engineering @ministryofjustice/modernisation-platform
 /terraform/environments/data-platform @ministryofjustice/data-platform-engineering @ministryofjustice/modernisation-platform
 /terraform/environments/delius-alfresco @ministryofjustice/hosting-migrations @ministryofjustice/modernisation-platform
 /terraform/environments/delius-core-training @ministryofjustice/hmpps-migration @ministryofjustice/hosting-migrations @ministryofjustice/modernisation-platform

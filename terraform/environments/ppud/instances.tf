@@ -590,9 +590,13 @@ resource "aws_instance" "s618358rgvw019" {
   }
 
   tags = {
-    Name          = "s618358rgvw019"
-    patch_group   = "prod_win_patch"
-    is-production = true
+    Name             = "s618358rgvw019"
+    patch_group      = "prod_win_patch"
+    is-production    = true
+    iisadmin_service = "true"
+    wwwpub_service   = "true"
+    ppudlive_service = "true"
+    port25_check     = "true"
   }
 }
 
@@ -615,9 +619,13 @@ resource "aws_instance" "s618358rgvw020" {
   }
 
   tags = {
-    Name          = "s618358rgvw020"
-    patch_group   = "prod_win_patch"
-    is-production = true
+    Name             = "s618358rgvw020"
+    patch_group      = "prod_win_patch"
+    is-production    = true
+    iisadmin_service = "true"
+    wwwpub_service   = "true"
+    ppudlive_service = "true"
+    port25_check     = "true"
   }
 }
 
@@ -640,9 +648,13 @@ resource "aws_instance" "s618358rgvw021" {
   }
 
   tags = {
-    Name          = "s618358rgvw021"
-    patch_group   = "prod_win_patch"
-    is-production = true
+    Name              = "s618358rgvw021"
+    patch_group       = "prod_win_patch"
+    is-production     = true
+    sqlserver_service = "true"
+    sqlwriter_service = "true"
+    sqlagent_service  = "true"
+    sqlserver_backup  = "true"
   }
 }
 
@@ -665,9 +677,15 @@ resource "aws_instance" "s618358rgvw022" {
   }
 
   tags = {
-    Name          = "s618358rgvw022"
-    patch_group   = "prod_win_patch"
-    is-production = true
+    Name                = "s618358rgvw022"
+    patch_group         = "prod_win_patch"
+    is-production       = true
+    wwwpub_service      = "true"
+    ppudlive_service    = "true"
+    ppudcrawler_service = "true"
+    spooler_service     = "true"
+    port25_check        = "true"
+    emailsender_check   = "true"
   }
 }
 
@@ -690,9 +708,10 @@ resource "aws_instance" "s618358rgsw025p" {
   }
 
   tags = {
-    Name        = "s618358rgsw025"
-    patch_group = "prod_win_patch"
-    backup      = true
+    Name           = "s618358rgsw025"
+    patch_group    = "prod_win_patch"
+    backup         = true
+    wwwpub_service = "true"
   }
 }
 
@@ -715,9 +734,11 @@ resource "aws_instance" "s618358rgvw027" {
   }
 
   tags = {
-    Name          = "s618358rgvw027"
-    patch_group   = "prod_win_patch"
-    is-production = true
+    Name           = "s618358rgvw027"
+    patch_group    = "prod_win_patch"
+    is-production  = true
+    wwwpub_service = "true"
+    port25_check   = "true"
   }
 }
 
@@ -740,9 +761,10 @@ resource "aws_instance" "s618358rgvw204" {
   }
 
   tags = {
-    Name          = "s618358rgvw204"
-    patch_group   = "prod_win_patch"
-    is-production = true
+    Name           = "s618358rgvw204"
+    patch_group    = "prod_win_patch"
+    is-production  = true
+    wwwpub_service = "true"
   }
 }
 
@@ -765,9 +787,10 @@ resource "aws_instance" "s618358rgvw205" {
   }
 
   tags = {
-    Name          = "s618358rgvw205"
-    patch_group   = "prod_win_patch"
-    is-production = true
+    Name           = "s618358rgvw205"
+    patch_group    = "prod_win_patch"
+    is-production  = true
+    wwwpub_service = "true"
   }
 }
 

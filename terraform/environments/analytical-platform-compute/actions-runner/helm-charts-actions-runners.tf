@@ -347,6 +347,30 @@ resource "helm_release" "actions_runner_mojas_create_a_derived_table_property_de
   ]
 }
 
+resource "helm_release" "actions_runner_mojas_create_a_derived_table_property_prod" {
+  count = terraform.workspace == "analytical-platform-compute-production" ? 1 : 0
+
+  /* https://github.com/ministryofjustice/analytical-platform-actions-runner */
+  name       = "actions-runner-mojas-cadt-property-prod"
+  repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
+  version    = "2.330.0"
+  chart      = "actions-runner"
+  namespace  = kubernetes_namespace.actions_runners[0].metadata[0].name
+  values = [
+    templatefile(
+      "${path.module}/src/helm/values/actions-runners/create-a-derived-table/values.yml.tftpl",
+      {
+        github_app_application_id  = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_github_app_apc_self_hosted_runners_secret[0].secret_string)["app_id"]
+        github_app_installation_id = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_github_app_apc_self_hosted_runners_secret[0].secret_string)["installation_id"]
+        github_organisation        = "moj-analytical-services"
+        github_repository          = "create-a-derived-table"
+        github_runner_labels       = "property-prod"
+        eks_role_arn               = "arn:aws:iam::${local.environment_management.account_ids["property-cafm-data-migration-production"]}:role/create-a-derived-table"
+      }
+    )
+  ]
+}
+
 /* data-catalogue */
 
 resource "helm_release" "actions_runner_moj_data_catalogue" {
