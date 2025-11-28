@@ -44,7 +44,7 @@ resource "aws_lb" "external" {
   security_groups = [aws_security_group.cst_load_balancer_sg.id]
 
   access_logs {
-    bucket  = module.s3-bucket-lb.bucket.id
+    bucket  = module.s3-bucket-logging.bucket.id
     prefix  = "test-lb"
     enabled = true
   }
