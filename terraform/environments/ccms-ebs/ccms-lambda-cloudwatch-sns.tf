@@ -26,29 +26,20 @@ resource "aws_iam_role_policy" "lambda_cloudwatch_sns_policy" {
       {
         Effect = "Allow"
         Action = [
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:DescribeSecret",
+          "secretsmanager:ListSecretVersionIds"
+        ]
+        Resource = [aws_secretsmanager_secret.ebs_cw_alerts_secrets.arn]
+      },
+      {
+        Effect = "Allow"
+        Action = [
           "logs:CreateLogGroup",
           "logs:CreateLogStream",
           "logs:PutLogEvents"
         ]
         Resource = "arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${aws_lambda_function.cloudwatch_sns.function_name}:*"
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "securityhub:BatchImportFindings",
-          "securityhub:BatchUpdateFindings",
-          "securityhub:DescribeHub"
-        ]
-        Resource = "*"
-      },
-      {
-        Action : [
-          "secretsmanager:GetSecretValue",
-          "secretsmanager:DescribeSecret",
-          "secretsmanager:ListSecretVersionIds"
-        ],
-        Effect   = "Allow",
-        Resource = [aws_secretsmanager_secret.ebs_cw_alerts_secrets.arn]
       }
     ]
   })
@@ -91,15 +82,15 @@ resource "null_resource" "zip_file" {
 
 
 resource "aws_lambda_function" "cloudwatch_sns" {
-  filename         = "${path.module}/lambda/cloudwatch_alarm_slack_integration.zip"
+  filename = "${path.module}/lambda/cloudwatch_alarm_slack_integration.zip"
   # source_code_hash = filebase64sha256("${path.module}/lambda/cloudwatch_alarm_slack_integration.zip")
-  function_name    = "${local.application_name}-${local.environment}-cloudwatch-alarm-slack-integration"
-  role             = aws_iam_role.lambda_cloudwatch_sns_role.arn
-  handler          = "lambda_function.lambda_handler"
-  layers           = [aws_lambda_layer_version.lambda_cloudwatch_sns_layer.arn]
-  runtime          = "python3.13"
-  timeout          = 30
-  publish          = true
+  function_name = "${local.application_name}-${local.environment}-cloudwatch-alarm-slack-integration"
+  role          = aws_iam_role.lambda_cloudwatch_sns_role.arn
+  handler       = "lambda_function.lambda_handler"
+  layers        = [aws_lambda_layer_version.lambda_cloudwatch_sns_layer.arn]
+  runtime       = "python3.13"
+  timeout       = 30
+  publish       = true
 
   environment {
     variables = {
