@@ -11,9 +11,9 @@ module "waf" {
   block_non_uk_traffic         = false
   associated_resource_arns     = []
   managed_rule_actions = {
-    AWSManagedRulesKnownBadInputsRuleSet = false
-    AWSManagedRulesCommonRuleSet         = false
-    AWSManagedRulesSQLiRuleSet           = false
+    AWSManagedRulesKnownBadInputsRuleSet = true
+    AWSManagedRulesCommonRuleSet         = true
+    AWSManagedRulesSQLiRuleSet           = true
     AWSManagedRulesLinuxRuleSet          = false
     AWSManagedRulesAnonymousIpList       = false
     AWSManagedRulesBotControlRuleSet     = false
