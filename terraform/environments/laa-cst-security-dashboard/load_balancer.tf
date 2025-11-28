@@ -35,6 +35,7 @@ resource "aws_lb" "external" {
   name               = "${local.application_name}-loadbalancer"
   load_balancer_type = "application"
   subnets            = data.aws_subnets.shared-public.ids
+  #checkov:skip=CKV2_AWS_76:"WAFv2 WebACL with Log4j protection managed externally via separate module"
   #checkov:skip=CKV_AWS_150:Short-lived example environment, hence no need for deletion protection
   enable_deletion_protection = false
   # allow 60*4 seconds before 504 gateway timeout for long-running DB operations
