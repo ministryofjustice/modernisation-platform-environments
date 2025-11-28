@@ -134,7 +134,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_ccms_ebs_diag" {
   period              = local.application_data.cloudwatch_ec2.disk.period
   threshold           = local.application_data.cloudwatch_ec2.disk.threshold
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
-
+  ok_actions          = [aws_sns_topic.cw_alerts.arn]
   dimensions = {
     ImageId      = aws_instance.ec2_oracle_ebs.ami
     path         = "/CCMS/EBS/diag"
@@ -158,7 +158,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_ccms_ebs_redob" {
   period              = local.application_data.cloudwatch_ec2.disk.period
   threshold           = local.application_data.cloudwatch_ec2.disk.threshold
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
-
+  ok_actions          = [aws_sns_topic.cw_alerts.arn]
   dimensions = {
     ImageId      = aws_instance.ec2_oracle_ebs.ami
     path         = "/CCMS/EBS/redoB"
@@ -182,6 +182,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_home" {
   period              = local.application_data.cloudwatch_ec2.disk.period
   threshold           = local.application_data.cloudwatch_ec2.disk.threshold
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
+  ok_actions          = [aws_sns_topic.cw_alerts.arn]
 
   dimensions = {
     ImageId      = aws_instance.ec2_oracle_ebs.ami
@@ -206,7 +207,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_home" {
 #   period              = local.application_data.cloudwatch_ec2.disk.period
 #   threshold           = local.application_data.cloudwatch_ec2.disk.threshold
 #   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
-
+#   ok_actions          = [aws_sns_topic.cw_alerts.arn]
 #   dimensions = {
 #     ImageId      = aws_instance.ec2_oracle_ebs.ami
 #     path         = "/backup_prod"
@@ -230,7 +231,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_u01" {
   period              = local.application_data.cloudwatch_ec2.disk.period
   threshold           = local.application_data.cloudwatch_ec2.disk.threshold
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
-
+  ok_actions          = [aws_sns_topic.cw_alerts.arn]
   dimensions = {
     ImageId      = aws_instance.ec2_oracle_ebs.ami
     path         = "/u01"
@@ -254,7 +255,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_export_home" {
   period              = local.application_data.cloudwatch_ec2.disk.period
   threshold           = local.application_data.cloudwatch_ec2.disk.threshold
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
-
+  ok_actions          = [aws_sns_topic.cw_alerts.arn]
   dimensions = {
     ImageId      = aws_instance.ec2_oracle_ebs.ami
     path         = "/export/home"
@@ -278,7 +279,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_ccms_ebs_techst" {
   period              = local.application_data.cloudwatch_ec2.disk.period
   threshold           = local.application_data.cloudwatch_ec2.disk.threshold
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
-
+  ok_actions          = [aws_sns_topic.cw_alerts.arn]
   dimensions = {
     ImageId      = aws_instance.ec2_oracle_ebs.ami
     path         = "/CCMS/EBS/techst"
