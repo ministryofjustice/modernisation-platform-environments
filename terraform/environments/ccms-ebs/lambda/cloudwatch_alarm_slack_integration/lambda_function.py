@@ -278,7 +278,21 @@ def lambda_handler(event, context):
         notification_service = NotificationService(
             config.slack_channel_webhook, context.function_name
         )
-        
+        result = f"CloudWatchAlarm:\n{slack_message}\n"
+        notification_service.send_notification(
+                    "CloudWatch Alarm Notification",
+                    result, is_error=True
+                )
+        # Prepare response
+        response = {
+            "statusCode": 200,
+            "body": {
+                "message": f"Successfully completed publishing notifications for EdrmsDocumentException logs"
+            },
+        }
+
+        logger.info(f"Lambda execution completed successfully: {response}")
+        return response
     # except json.JSONDecodeError:
     #     alarm_details = {}
     except Exception as e:

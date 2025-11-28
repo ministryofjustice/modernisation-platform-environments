@@ -78,9 +78,21 @@ resource "aws_lambda_layer_version" "lambda_layer" {
   description              = "Lambda Layer for ${local.application_name} CloudWatch SNS Alarm Integration"
 }
 
+
+resource "null_resource" "zip_file" {
+  provisioner "local-exec" {
+    command = "zip -j ${path.module}/lambda/cloudwatch_alarm_slack_integration.zip ${path.module}/lambda/cloudwatch_alarm_slack_integration/lambda_function.py"
+  }
+
+  triggers = {
+    always_run = timestamp() # Forces re-run when you apply
+  }
+}
+
+
 resource "aws_lambda_function" "cloudwatch_sns" {
-  filename         = "./lambda/cloudwatch_alarm_slack_integration.zip"
-  source_code_hash = filebase64sha256("./lambda/cloudwatch_alarm_slack_integration.zip")
+  filename         = "${path.module}/lambda/cloudwatch_alarm_slack_integration.zip"
+  source_code_hash = filebase64sha256("${path.module}/lambda/cloudwatch_alarm_slack_integration.zip")
   function_name    = "${local.application_name}-${local.environment}-cloudwatch_alarm_slack_integration"
   role             = aws_iam_role.lambda_cloudwatch_sns_role.arn
   handler          = "lambda_function.lambda_handler"
