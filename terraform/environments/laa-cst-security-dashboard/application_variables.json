@@ -3,7 +3,7 @@
     "development": {
       "short_env": "dev",
       "dns": "laa-development",
-      "cst_server_port": "8080",
+      "server_port": "8080",
       "ses_domain_identity": "dev.legalservices.gov.uk",
       "instance-scheduling": "skip-scheduling",
       "s3_lifecycle_days_abort_incomplete_multipart_upload_days": 6,
@@ -18,7 +18,7 @@
     "production": {
       "short_env": "prod",
       "dns": "laa-production",
-      "cst_server_port": "8080",
+      "server_port": "8080",
       "ses_domain_identity": "laa.legalservices.gov.uk",
       "instance-scheduling": "skip-scheduling",
       "s3_lifecycle_days_abort_incomplete_multipart_upload_days": 6,
