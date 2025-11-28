@@ -341,7 +341,7 @@ resource "aws_cloudwatch_metric_alarm" "malware_event_alarms_prod" {
 # Service Status Alarms
 
 # IIS Admin Service
-
+/*
 resource "aws_cloudwatch_metric_alarm" "service_status_iisadmin_rgvw019" {
   count               = local.is-production == true ? 1 : 0
   alarm_name          = "Service-Status-IISAdmin-i-0dba6054c0f5f7a11"
@@ -831,6 +831,161 @@ resource "aws_cloudwatch_metric_alarm" "emailsender_check_rgvw022" {
     Instance    = "i-029d2b17679dab982"
     EmailSender = "EmailSender"
   }
+}
+*/
+
+############################################################################
+# CloudWatch Service, Port25 Check and EmailSender Check Alarms [Production]
+############################################################################
+
+# Data source to get all EC2 instances
+data "aws_instances" "all_instances" {
+  instance_state_names = ["running", "stopped"]
+}
+
+# Get instance details for each instance
+data "aws_instance" "instance_details" {
+  for_each    = toset(data.aws_instances.all_instances.ids)
+  instance_id = each.value
+}
+
+# Create a map of instances with their tags for alarm creation
+locals {
+  # Filter instances that have monitoring tags and are in production
+  instances_with_alarms = {
+    for id, instance in data.aws_instance.instance_details :
+    id => instance if lookup(instance.tags, "is-production", "false") == "true"
+  }
+
+  # Define alarm configurations
+  alarm_configs = {
+    iisadmin_service = {
+      metric_name   = "IsRunning"
+      namespace     = "ServiceStatus"
+      service_name  = "IISADMIN"
+      description   = "IIS Admin service"
+      period        = "60"
+    }
+    wwwpub_service = {
+      metric_name   = "IsRunning"
+      namespace     = "ServiceStatus"
+      service_name  = "W3SVC"
+      description   = "World Wide Web Publishing service"
+      period        = "60"
+    }
+    ppudlive_service = {
+      metric_name   = "IsRunning"
+      namespace     = "ServiceStatus"
+      service_name  = "PPUDAutomatedProcessesLIVE"
+      description   = "PPUD live service"
+      period        = "60"
+    }
+    ppudcrawler_service = {
+      metric_name   = "IsRunning"
+      namespace     = "ServiceStatus"
+      service_name  = "PPUDPDFCrawlerP4Live"
+      description   = "PPUD crawler service"
+      period        = "60"
+    }
+    spooler_service = {
+      metric_name   = "IsRunning"
+      namespace     = "ServiceStatus"
+      service_name  = "Spooler"
+      description   = "Printer Spooler service"
+      period        = "60"
+    }
+    sqlserver_service = {
+      metric_name   = "IsRunning"
+      namespace     = "ServiceStatus"
+      service_name  = "MSSQLSERVER"
+      description   = "SQL Server service"
+      period        = "60"
+    }
+    sqlwriter_service = {
+      metric_name   = "IsRunning"
+      namespace     = "ServiceStatus"
+      service_name  = "SQLWriter"
+      description   = "SQL Server VSS Writer service"
+      period        = "60"
+    }
+    sqlagent_service = {
+      metric_name   = "IsRunning"
+      namespace     = "ServiceStatus"
+      service_name  = "SQLServerAgent(MSSQLSERVER)"
+      description   = "SQL Server Agent service"
+      period        = "60"
+    }
+    sqlserver_backup = {
+      metric_name   = "SQLBackupStatus"
+      namespace     = "SQLBackup"
+      service_name  = ""
+      description   = "SQL Server backup status"
+      period        = "60"
+    }
+    port25_check = {
+      metric_name   = "PortStatus"
+      namespace     = "Port"
+      service_name  = "Port25"
+      description   = "Port 25 status check to internal mail relay (rgsl200)"
+      period        = "60"
+    }
+    emailsender_check = {
+      metric_name   = "EmailSenderStatus"
+      namespace     = "EmailSender"
+      service_name  = "EmailSender"
+      description   = "Email sender stale log files"
+      period        = "3600"
+    }
+  }
+
+  # Create alarm instances based on tags
+  alarm_instances = flatten([
+    for instance_id, instance in local.instances_with_alarms : [
+      for tag_key, config in local.alarm_configs : {
+        instance_id   = instance_id
+        instance_name = lookup(instance.tags, "Name", instance_id)
+        tag_key       = tag_key
+        config        = config
+      } if lookup(instance.tags, tag_key, "false") == "true"
+    ]
+  ])
+}
+
+# Create CloudWatch alarms dynamically
+resource "aws_cloudwatch_metric_alarm" "service_alarms" {
+  for_each = {
+    for alarm in local.alarm_instances :
+    "${alarm.tag_key}_${alarm.instance_id}" => alarm
+  }
+
+  count               = local.is-production == true ? 1 : 0
+  alarm_name          = "${title(replace(each.value.tag_key, "_", "-"))}-${each.value.instance_id}"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = "1"
+  datapoints_to_alarm = "1"
+  metric_name         = each.value.config.metric_name
+  namespace           = each.value.config.namespace
+  period              = each.value.config.period
+  statistic           = "Average"
+  threshold           = "1"
+  treat_missing_data  = "notBreaching"
+  alarm_description   = "This metric monitors the ${each.value.config.description}. If the metric falls to 0 [not running] then the alarm will trigger."
+  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
+
+  dimensions = merge(
+    {
+      Instance = each.value.instance_id
+    },
+    each.value.config.service_name != "" ? {
+      Service = each.value.config.service_name
+    } : {},
+    each.value.tag_key == "port25_check" ? {
+      Port = "Port25"
+    } : {},
+    each.value.tag_key == "emailsender_check" ? {
+      EmailSender = "EmailSender"
+    } : {}
+  )
 }
 
 ############################
