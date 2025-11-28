@@ -860,6 +860,7 @@ locals {
   # Define alarm configurations
   alarm_configs = {
     iisadmin_service = {
+      alarm_name    = "Service-Status-IISAdmin"
       metric_name   = "IsRunning"
       namespace     = "ServiceStatus"
       service_name  = "IISADMIN"
@@ -867,6 +868,7 @@ locals {
       period        = "60"
     }
     wwwpub_service = {
+      alarm_name    = "Service-Status-WWW-Publishing"
       metric_name   = "IsRunning"
       namespace     = "ServiceStatus"
       service_name  = "W3SVC"
@@ -874,6 +876,7 @@ locals {
       period        = "60"
     }
     ppudlive_service = {
+      alarm_name    = "Service-Status-PPUD-Live"
       metric_name   = "IsRunning"
       namespace     = "ServiceStatus"
       service_name  = "PPUDAutomatedProcessesLIVE"
@@ -881,6 +884,7 @@ locals {
       period        = "60"
     }
     ppudcrawler_service = {
+      alarm_name    = "Service-Status-PPUD-Crawler"
       metric_name   = "IsRunning"
       namespace     = "ServiceStatus"
       service_name  = "PPUDPDFCrawlerP4Live"
@@ -888,6 +892,7 @@ locals {
       period        = "60"
     }
     spooler_service = {
+      alarm_name    = "Service-Status-Printer-Spooler"
       metric_name   = "IsRunning"
       namespace     = "ServiceStatus"
       service_name  = "Spooler"
@@ -895,6 +900,7 @@ locals {
       period        = "60"
     }
     sqlserver_service = {
+      alarm_name    = "Service-Status-SQL-Server"
       metric_name   = "IsRunning"
       namespace     = "ServiceStatus"
       service_name  = "MSSQLSERVER"
@@ -902,6 +908,7 @@ locals {
       period        = "60"
     }
     sqlwriter_service = {
+      alarm_name    = "Service-Status-SQL-Server-Writer"
       metric_name   = "IsRunning"
       namespace     = "ServiceStatus"
       service_name  = "SQLWriter"
@@ -909,6 +916,7 @@ locals {
       period        = "60"
     }
     sqlagent_service = {
+      alarm_name    = "Service-Status-SQL-Server-Agent"
       metric_name   = "IsRunning"
       namespace     = "ServiceStatus"
       service_name  = "SQLServerAgent(MSSQLSERVER)"
@@ -916,6 +924,7 @@ locals {
       period        = "60"
     }
     sqlserver_backup = {
+      alarm_name    = "Service-Status-SQL-Server-Backup-Status"
       metric_name   = "SQLBackupStatus"
       namespace     = "SQLBackup"
       service_name  = ""
@@ -923,6 +932,7 @@ locals {
       period        = "60"
     }
     port25_check = {
+      alarm_name    = "Port-25-Status-Check"
       metric_name   = "PortStatus"
       namespace     = "Port"
       service_name  = "Port25"
@@ -930,6 +940,7 @@ locals {
       period        = "60"
     }
     emailsender_check = {
+      alarm_name    = "Email-Sender-Check"
       metric_name   = "EmailSenderStatus"
       namespace     = "EmailSender"
       service_name  = "EmailSender"
@@ -957,7 +968,7 @@ resource "aws_cloudwatch_metric_alarm" "service_alarms" {
     for alarm in local.alarm_instances :
     "${alarm.tag_key}_${alarm.instance_id}" => alarm
   } : {}
-  alarm_name          = "${title(replace(each.value.tag_key, "_", "-"))}-${each.value.instance_id}"
+  alarm_name          = "${each.value.config.alarm_name}-${each.value.instance_id}"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = "1"
   datapoints_to_alarm = "1"

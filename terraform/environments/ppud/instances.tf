@@ -734,11 +734,12 @@ resource "aws_instance" "s618358rgvw027" {
   }
 
   tags = {
-    Name           = "s618358rgvw027"
-    patch_group    = "prod_win_patch"
-    is-production  = true
-    wwwpub_service = "true"
-    port25_check   = "true"
+    Name            = "s618358rgvw027"
+    patch_group     = "prod_win_patch"
+    is-production   = true
+    wwwpub_service  = "true"
+    spooler_service = "true"
+    port25_check    = "true"
   }
 }
 
@@ -814,9 +815,11 @@ resource "aws_instance" "s266316rgsl200" {
   }
 
   tags = {
-    Name          = "s266316rgsl200"
-    is-production = true
-    patch_group   = "prod_lin_patch"
+    Name           = "s266316rgsl200"
+    is-production  = true
+    patch_group    = "prod_lin_patch"
+    docker_service = "true"
+    archive_volume = "true"
   }
 }
 
@@ -840,9 +843,10 @@ resource "aws_instance" "s265903rgsl400-non-cjsm" {
   }
 
   tags = {
-    Name          = "s265903rgsl400-non-cjsm"
-    is-production = true
-    patch_group   = "prod_lin_patch"
+    Name           = "s265903rgsl400-non-cjsm"
+    is-production  = true
+    patch_group    = "prod_lin_patch"
+    docker_service = "true"
   }
 }
 
@@ -866,9 +870,10 @@ resource "aws_instance" "s265903rgsl401-cjsm" {
   }
 
   tags = {
-    Name          = "s265903rgsl401-cjsm"
-    is-production = true
-    patch_group   = "prod_lin_patch"
+    Name           = "s265903rgsl401-cjsm"
+    is-production  = true
+    patch_group    = "prod_lin_patch"
+    docker_service = "true"
   }
 }
 
