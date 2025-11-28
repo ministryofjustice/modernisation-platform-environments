@@ -953,12 +953,10 @@ locals {
 
 # Create CloudWatch alarms dynamically
 resource "aws_cloudwatch_metric_alarm" "service_alarms" {
-  for_each = {
+  for_each = local.is-production ? {
     for alarm in local.alarm_instances :
     "${alarm.tag_key}_${alarm.instance_id}" => alarm
-  }
-
-  count               = local.is-production == true ? 1 : 0
+  } : {}
   alarm_name          = "${title(replace(each.value.tag_key, "_", "-"))}-${each.value.instance_id}"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = "1"
