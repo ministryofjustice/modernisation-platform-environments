@@ -1,16 +1,48 @@
 {
   "accounts": {
     "development": {
-      "example_var": "dev-data"
-    },
-    "test": {
-      "example_var": "test-data"
-    },
-    "preproduction": {
-      "example_var": "preproduction-data"
+      "short_env": "dev",
+      "dns": "laa-development",
+      "server_port": "8080",
+      "ses_domain_identity": "dev.legalservices.gov.uk",
+      "instance-scheduling": "skip-scheduling",
+      "lb_listener_protocol": "HTTP",
+      "s3_lifecycle_days_abort_incomplete_multipart_upload_days": 6,
+      "s3_lifecycle_days_expiration_current": 730,
+      "s3_lifecycle_days_expiration_noncurrent": 730,
+      "s3_lifecycle_days_transition_current_glacier": 365,
+      "s3_lifecycle_days_transition_current_standard": 90,
+      "s3_lifecycle_days_transition_noncurrent_glacier": 365,
+      "s3_lifecycle_days_transition_noncurrent_standard": 90,
+      "certificate_expiry_days": 45
     },
     "production": {
-      "example_var": "production-data"
+      "short_env": "prod",
+      "dns": "laa-production",
+      "server_port": "8080",
+      "ses_domain_identity": "laa.legalservices.gov.uk",
+      "instance-scheduling": "skip-scheduling",
+      "lb_listener_protocol": "HTTP",
+      "s3_lifecycle_days_abort_incomplete_multipart_upload_days": 6,
+      "s3_lifecycle_days_expiration_current": 730,
+      "s3_lifecycle_days_expiration_noncurrent": 730,
+      "s3_lifecycle_days_transition_current_glacier": 365,
+      "s3_lifecycle_days_transition_current_standard": 90,
+      "s3_lifecycle_days_transition_noncurrent_glacier": 365,
+      "s3_lifecycle_days_transition_noncurrent_standard": 90,
+      "certificate_expiry_days": 45
+    }
+  },
+  "cst_ec2_sg_rules": {
+    "TCP_80": {
+      "from_port": 80,
+      "to_port": 80,
+      "protocol": "TCP"
+    },
+    "TCP_443": {
+      "from_port": 443,
+      "to_port": 443,
+      "protocol": "TCP"
     }
   }
 }
