@@ -109,6 +109,13 @@ resource "aws_lambda_function" "cloudwatch_sns" {
   depends_on = [null_resource.zip_file]
 }
 
+resource "aws_lambda_permission" "allow_sns_invoke" {
+  statement_id  = "AllowExecutionFromSNS"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.cloudwatch_sns.function_name
+  principal     = "sns.amazonaws.com"
+  source_arn    = aws_sns_topic.cw_alerts.arn
+}
 # resource "aws_cloudwatch_event_rule" "acm_events" {
 #   name        = "${local.application_name}-${local.environment}-acm-certificate-events"
 #   description = "Capture ACM certificate events"
