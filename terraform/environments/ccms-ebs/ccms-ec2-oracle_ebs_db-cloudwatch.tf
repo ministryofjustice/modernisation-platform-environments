@@ -12,6 +12,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_ccms_ebs_redoa" {
   period              = local.application_data.cloudwatch_ec2.disk.period
   threshold           = local.application_data.cloudwatch_ec2.disk.threshold
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
+  ok_actions          = [aws_sns_topic.cw_alerts.arn]
 
   dimensions = {
     ImageId      = aws_instance.ec2_oracle_ebs.ami
@@ -36,6 +37,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_ccms_ebs_redoa" {
 #  period              = local.application_data.cloudwatch_ec2.disk.period
 #  threshold           = local.application_data.cloudwatch_ec2.disk.threshold_dbf
 #  alarm_actions       = [aws_sns_topic.cw_alerts.arn]
+#  ok_actions          = [aws_sns_topic.cw_alerts.arn]
 #
 #  dimensions = {
 #    ImageId      = aws_instance.ec2_oracle_ebs.ami
@@ -60,7 +62,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_ccms_ebs_arch" {
   period              = local.application_data.cloudwatch_ec2.disk.period
   threshold           = local.application_data.cloudwatch_ec2.disk.threshold
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
-
+  ok_actions          = [aws_sns_topic.cw_alerts.arn]
   dimensions = {
     ImageId      = aws_instance.ec2_oracle_ebs.ami
     path         = "/CCMS/EBS/arch"
@@ -84,7 +86,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_backup" {
   period              = local.application_data.cloudwatch_ec2.disk.period
   threshold           = local.application_data.cloudwatch_ec2.disk.threshold
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
-
+  ok_actions          = [aws_sns_topic.cw_alerts.arn]
   dimensions = {
     ImageId      = aws_instance.ec2_oracle_ebs.ami
     path         = "/backup"
@@ -108,7 +110,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_temp" {
   period              = local.application_data.cloudwatch_ec2.disk.period
   threshold           = local.application_data.cloudwatch_ec2.disk.threshold
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
-
+  ok_actions          = [aws_sns_topic.cw_alerts.arn]
   dimensions = {
     ImageId      = aws_instance.ec2_oracle_ebs.ami
     path         = "/temp"
