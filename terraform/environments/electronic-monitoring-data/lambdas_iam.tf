@@ -727,7 +727,6 @@ module "share_dbs_with_dms_lambda_role" {
   de_role_arn             = null
 }
 
-
 #-----------------------------------------------------------------------------------
 # Load MDSS Data IAM Role
 #-----------------------------------------------------------------------------------
@@ -742,6 +741,7 @@ data "aws_iam_policy_document" "load_mdss_lambda_role_policy_document" {
       "s3:GetObjectAttributes",
       "s3:GetObject",
       "s3:DeleteObject",
+      "s3:DeleteObjects",
     ]
     resources = [
       "${module.s3-create-a-derived-table-bucket.bucket.arn}/staging/allied_mdss${local.db_suffix}_pipeline/*",
@@ -788,6 +788,7 @@ data "aws_iam_policy_document" "load_mdss_lambda_role_policy_document" {
     effect = "Allow"
     actions = [
       "glue:GetTable",
+      "glue:GetTables",
       "glue:GetDatabase",
       "glue:GetDatabases",
       "glue:CreateTable",
@@ -827,6 +828,19 @@ data "aws_iam_policy_document" "load_mdss_lambda_role_policy_document" {
     actions   = ["s3:ListAllMyBuckets", "s3:GetBucketLocation"]
     resources = ["*"]
   }
+  # MDSS cleanup queue
+  statement {
+    sid       = "AllowMdssCleanupQueueAccess"
+    effect    = "Allow"
+    actions   = [
+      "sqs:SendMessage",
+      "sqs:ReceiveMessage",
+      "sqs:DeleteMessage",
+      "sqs:GetQueueAttributes",
+      "sqs:GetQueueUrl",
+    ]
+    resources = [aws_sqs_queue.clean_mdss_load_queue.arn]
+  }
 }
 
 resource "aws_iam_role" "load_mdss" {
@@ -863,9 +877,6 @@ resource "aws_lakeformation_permissions" "add_create_db" {
   principal        = aws_iam_role.load_mdss[0].arn
   catalog_resource = true
 }
-
-
-
 
 #-----------------------------------------------------------------------------------
 # Load FMS Data IAM Role

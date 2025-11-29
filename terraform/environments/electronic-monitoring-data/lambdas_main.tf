@@ -183,6 +183,33 @@ module "copy_mdss_data" {
 }
 
 #-----------------------------------------------------------------------------------
+# Clean after MDSS load
+#-----------------------------------------------------------------------------------
+
+module "clean_after_mdss_load" {
+  count                          = local.is-development ? 0 : 1
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "clean_after_mdss_load"
+  role_name                      = aws_iam_role.load_mdss[0].name
+  role_arn                       = aws_iam_role.load_mdss[0].arn
+  handler                        = "clean_after_mdss_load.handler"
+  memory_size                    = 2048
+  timeout                        = 900
+  reserved_concurrent_executions = 100
+  ephemeral_storage_size         = 10240
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+  security_group_ids             = [aws_security_group.lambda_generic.id]
+  subnet_ids                     = data.aws_subnets.shared-public.ids
+
+  environment_variables = {
+    CATALOG_ID      = data.aws_caller_identity.current.account_id
+    LAMBDA_ROLE_ARN = aws_iam_role.load_mdss[0].arn
+  }
+}
+
+#-----------------------------------------------------------------------------------
 # Calculate checksum
 #-----------------------------------------------------------------------------------
 
@@ -331,7 +358,7 @@ module "load_mdss_lambda" {
   reserved_concurrent_executions = 500
   ephemeral_storage_size         = 10240
   core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
-  production_dev                 = local.is-production ? "prod" : "dev"
+  production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
   security_group_ids             = [aws_security_group.lambda_generic.id]
   subnet_ids                     = data.aws_subnets.shared-public.ids
   environment_variables = {
