@@ -2,6 +2,8 @@
 import json
 import os
 import logging
+import io
+import time
 import tracemalloc
 import urllib.request
 from dataclasses import dataclass
@@ -14,6 +16,16 @@ from mypy_boto3_secretsmanager import SecretsManagerClient
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
+
+@dataclass
+class Config:
+    """Configuration settings for the Lambda function."""    
+
+    @classmethod
+    def from_env(cls) -> "Config":
+        """Create configuration from environment variables."""
+        return cls()
+
 
 class ConfigValidator:
     """Validator class for configuration validation."""
@@ -158,7 +170,7 @@ class NotificationService:
                         "color": color,
                         "title": f"{emoji} [{self.function_name}] {title}",
                         "text": message,
-                        "footer": "EDRMS Document Exception Lambda",
+                        "footer": "CloudWatch Alarm via SNS/Lambda",
                         "ts": int(time.time()),
                     }
                 ]
@@ -218,8 +230,6 @@ def lambda_handler(event, context):
 
     notification_service: Optional[NotificationService] = None
 
-    slack_webhook_url = os.environ['SLACK_WEBHOOK_URL']
-
     # SNS message comes in event['Records'][0]['Sns']
     sns_message = event['Records'][0]['Sns']
     subject = sns_message.get('Subject', 'CloudWatch Alarm')
@@ -228,6 +238,9 @@ def lambda_handler(event, context):
     # Parse the inner JSON message
     try:
         alarm_details = json.loads(message_str)
+        env_config = {
+            # Mandatory environment variables
+        }
         # Get secret name from environment or event
         secret_name = os.environ.get("SECRET_NAME", event.get("secret_name"))
         if not secret_name:
