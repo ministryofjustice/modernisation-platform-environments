@@ -76,7 +76,7 @@ resource "null_resource" "zip_file" {
   }
 
   triggers = {
-    always_run = timestamp() # Forces re-run when you apply
+    file_hash = filesha256("${path.module}/lambda/cloudwatch_alarm_slack_integration/lambda_function.py")
   }
 }
 
@@ -107,6 +107,8 @@ resource "aws_lambda_function" "cloudwatch_sns" {
   })
 
   depends_on = [null_resource.zip_file]
+
+  
 }
 
 resource "aws_lambda_permission" "allow_sns_invoke" {
