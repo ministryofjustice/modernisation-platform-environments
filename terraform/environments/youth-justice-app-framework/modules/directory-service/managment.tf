@@ -293,7 +293,7 @@ resource "aws_instance" "ad_instance" {
   count = var.ad_management_instance_count
 
   ami                         = data.aws_ami.windows_2022.id
-  instance_type               = "M6i.xlarge"
+  instance_type               = "m6i.xlarge"
   iam_instance_profile        = aws_iam_instance_profile.ad_instance_profile.name
   key_name                    = module.key_pair.key_pair_name
   subnet_id                   = var.private_subnet_ids[count.index % length(var.private_subnet_ids)] # 1st in Subnet a, then b, c, a, etc
