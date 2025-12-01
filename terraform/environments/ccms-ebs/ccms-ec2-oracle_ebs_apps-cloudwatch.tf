@@ -13,6 +13,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsapps_temp" {
   period              = local.application_data.cloudwatch_ec2.disk.period
   threshold           = local.application_data.cloudwatch_ec2.disk.threshold
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
+  ok_actions          = [aws_sns_topic.cw_alerts.arn]
 
   dimensions = {
     ImageId      = aws_instance.ec2_ebsapps[count.index].ami
@@ -38,6 +39,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsapps_home" {
   period              = local.application_data.cloudwatch_ec2.disk.period
   threshold           = local.application_data.cloudwatch_ec2.disk.threshold
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
+  ok_actions          = [aws_sns_topic.cw_alerts.arn]
 
   dimensions = {
     ImageId      = aws_instance.ec2_ebsapps[count.index].ami
@@ -63,6 +65,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsapps_export_home" {
   period              = local.application_data.cloudwatch_ec2.disk.period
   threshold           = local.application_data.cloudwatch_ec2.disk.threshold
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
+  ok_actions          = [aws_sns_topic.cw_alerts.arn]
 
   dimensions = {
     ImageId      = aws_instance.ec2_ebsapps[count.index].ami
@@ -88,6 +91,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsapps_u01" {
   period              = local.application_data.cloudwatch_ec2.disk.period
   threshold           = local.application_data.cloudwatch_ec2.disk.threshold
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
+  ok_actions          = [aws_sns_topic.cw_alerts.arn]
 
   dimensions = {
     ImageId      = aws_instance.ec2_ebsapps[count.index].ami
@@ -113,7 +117,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsapps_u03" {
   period              = local.application_data.cloudwatch_ec2.disk.period
   threshold           = local.application_data.cloudwatch_ec2.disk.threshold
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
-
+  ok_actions          = [aws_sns_topic.cw_alerts.arn]
   dimensions = {
     ImageId      = aws_instance.ec2_ebsapps[count.index].ami
     path         = "/u03"
@@ -138,7 +142,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsapps_stage" {
   period              = local.application_data.cloudwatch_ec2.disk.period
   threshold           = local.application_data.cloudwatch_ec2.disk.threshold
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
-
+  ok_actions          = [aws_sns_topic.cw_alerts.arn]
   dimensions = {
     ImageId      = aws_instance.ec2_ebsapps[count.index].ami
     path         = "/stage"
@@ -163,7 +167,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsapps_stage" {
 #   period              = local.application_data.cloudwatch_ec2.disk.period
 #   threshold           = local.application_data.cloudwatch_ec2.disk.threshold
 #   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
-
+#   ok_actions          = [aws_sns_topic.cw_alerts.arn]
 #   dimensions = {
 #     ImageId      = aws_instance.ec2_ebsapps[count.index].ami
 #     path         = "/backup_prod"

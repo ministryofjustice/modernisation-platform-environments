@@ -13,6 +13,7 @@
 #   period              = local.application_data.cloudwatch_ec2.disk.period
 #   threshold           = local.application_data.cloudwatch_ec2.disk.threshold
 #   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
+#   ok_actions       = [aws_sns_topic.cw_alerts.arn]
 
 #   dimensions = {
 #     ImageId      = aws_instance.ec2_accessgate[count.index].ami # local.application_data.accounts[local.environment].accessgate_ami_id-1
@@ -38,6 +39,7 @@
 #   period              = local.application_data.cloudwatch_ec2.disk.period
 #   threshold           = local.application_data.cloudwatch_ec2.disk.threshold
 #   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
+#   ok_actions          = [aws_sns_topic.cw_alerts.arn]
 
 #   dimensions = {
 #     ImageId      = aws_instance.ec2_accessgate[count.index].ami # local.application_data.accounts[local.environment].accessgate_ami_id-1
@@ -63,6 +65,7 @@
 #   period              = local.application_data.cloudwatch_ec2.disk.period
 #   threshold           = local.application_data.cloudwatch_ec2.disk.threshold
 #   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
+#   ok_actions          = [aws_sns_topic.cw_alerts.arn]
 
 #   dimensions = {
 #     ImageId      = aws_instance.ec2_accessgate[count.index].ami # local.application_data.accounts[local.environment].accessgate_ami_id-1

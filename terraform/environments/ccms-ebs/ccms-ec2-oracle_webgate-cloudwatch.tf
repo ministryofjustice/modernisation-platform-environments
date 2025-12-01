@@ -13,7 +13,7 @@
 #   period              = local.application_data.cloudwatch_ec2.disk.period
 #   threshold           = local.application_data.cloudwatch_ec2.disk.threshold
 #   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
-
+#   ok_actions          = [aws_sns_topic.cw_alerts.arn]
 #   dimensions = {
 #     ImageId      = aws_instance.ec2_webgate[count.index].ami # local.application_data.accounts[local.environment].webgate_ami_id-1
 #     path         = "/temp"
@@ -38,7 +38,7 @@
 #   period              = local.application_data.cloudwatch_ec2.disk.period
 #   threshold           = local.application_data.cloudwatch_ec2.disk.threshold
 #   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
-
+#   ok_actions          = [aws_sns_topic.cw_alerts.arn]
 #   dimensions = {
 #     ImageId      = aws_instance.ec2_webgate[count.index].ami # local.application_data.accounts[local.environment].webgate_ami_id-1
 #     path         = "/home"
@@ -63,7 +63,7 @@
 #   period              = local.application_data.cloudwatch_ec2.disk.period
 #   threshold           = local.application_data.cloudwatch_ec2.disk.threshold
 #   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
-
+#.  ok_actions          = [aws_sns_topic.cw_alerts.arn]
 #   dimensions = {
 #     ImageId      = aws_instance.ec2_webgate[count.index].ami # local.application_data.accounts[local.environment].webgate_ami_id-1
 #     path         = "/CCMS"

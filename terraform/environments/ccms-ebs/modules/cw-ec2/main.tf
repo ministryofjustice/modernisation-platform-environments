@@ -18,6 +18,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu_utilization" {
   period              = var.cpu_period
   threshold           = var.cpu_threshold
   alarm_actions       = [local.topic]
+  ok_actions          = [local.topic]
   dimensions = {
     InstanceId   = var.instanceId
     ImageId      = var.imageId
@@ -40,6 +41,7 @@ resource "aws_cloudwatch_metric_alarm" "low_available_memory" {
   period              = var.mem_period
   threshold           = var.mem_threshold
   alarm_actions       = [var.topic]
+  ok_actions          = [var.topic]
   dimensions = {
     InstanceId   = var.instanceId
     ImageId      = var.imageId
@@ -62,6 +64,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free" {
   period              = var.disk_period
   threshold           = var.disk_threshold
   alarm_actions       = [var.topic]
+   ok_actions         = [var.topic]
   dimensions = {
     InstanceId   = var.instanceId
     ImageId      = var.imageId
@@ -88,6 +91,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_used" {
   period              = var.disk_period
   threshold           = var.disk_threshold
   alarm_actions       = [var.topic]
+  ok_actions          = [var.topic]
   dimensions = {
     InstanceId   = var.instanceId
     ImageId      = var.imageId
@@ -113,6 +117,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu_usage_iowait" {
   period              = var.period
   threshold           = var.threshold
   alarm_actions       = [var.topic]
+  ok_actions          = [var.topic]
   dimensions = {
     InstanceId   = var.instanceId
     ImageId      = var.imageId
@@ -140,6 +145,7 @@ resource "aws_cloudwatch_metric_alarm" "instance_health_check" {
   period             = var.insthc_period
   threshold          = var.insthc_threshold
   alarm_actions      = [var.topic]
+  ok_actions         = [var.topic]
   dimensions = {
     InstanceId = var.instanceId
   }
@@ -159,6 +165,7 @@ resource "aws_cloudwatch_metric_alarm" "system_health_check" {
   period             = var.syshc_period
   threshold          = var.syshc_threshold
   alarm_actions      = [var.topic]
+  ok_actions         = [var.topic]
   dimensions = {
     InstanceId = var.instanceId
   }
@@ -180,4 +187,5 @@ resource "aws_cloudwatch_metric_alarm" "ec2_stop_alarm" {
 
   alarm_description = "This alarm will trigger when the EC2 instance stops."
   alarm_actions     = [var.topic]
+  ok_actions        = [var.topic]
 }
