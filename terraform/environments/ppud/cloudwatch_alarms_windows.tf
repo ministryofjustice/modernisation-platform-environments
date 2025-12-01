@@ -863,7 +863,7 @@ locals {
       alarm_name    = "Service-Status-IISAdmin"
       metric_name   = "IsRunning"
       namespace     = "ServiceStatus"
-      service_name  = "IISADMIN"
+      service_name  = "IISAdminService"
       description   = "IIS Admin service"
       period        = "60"
     }
@@ -871,7 +871,7 @@ locals {
       alarm_name    = "Service-Status-WWW-Publishing"
       metric_name   = "IsRunning"
       namespace     = "ServiceStatus"
-      service_name  = "W3SVC"
+      service_name  = "WorldWideWebPublishingService"
       description   = "World Wide Web Publishing service"
       period        = "60"
     }
@@ -895,7 +895,7 @@ locals {
       alarm_name    = "Service-Status-Printer-Spooler"
       metric_name   = "IsRunning"
       namespace     = "ServiceStatus"
-      service_name  = "Spooler"
+      service_name  = "PrintSpooler"
       description   = "Printer Spooler service"
       period        = "60"
     }
@@ -903,7 +903,7 @@ locals {
       alarm_name    = "Service-Status-SQL-Server"
       metric_name   = "IsRunning"
       namespace     = "ServiceStatus"
-      service_name  = "MSSQLSERVER"
+      service_name  = "SQLServer(MSSQLSERVER)"
       description   = "SQL Server service"
       period        = "60"
     }
@@ -911,7 +911,7 @@ locals {
       alarm_name    = "Service-Status-SQL-Server-Writer"
       metric_name   = "IsRunning"
       namespace     = "ServiceStatus"
-      service_name  = "SQLWriter"
+      service_name  = "SQLServerVSSWriter"
       description   = "SQL Server VSS Writer service"
       period        = "60"
     }
@@ -935,7 +935,7 @@ locals {
       alarm_name    = "Port-25-Status-Check"
       metric_name   = "PortStatus"
       namespace     = "Port"
-      service_name  = "Port25"
+      service_name  = ""
       description   = "Port 25 status check to internal mail relay (rgsl200)"
       period        = "60"
     }
@@ -943,7 +943,7 @@ locals {
       alarm_name    = "Email-Sender-Check"
       metric_name   = "EmailSenderStatus"
       namespace     = "EmailSender"
-      service_name  = "EmailSender"
+      service_name  = ""
       description   = "Email sender stale log files"
       period        = "3600"
     }
