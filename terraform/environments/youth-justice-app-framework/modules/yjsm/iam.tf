@@ -68,14 +68,20 @@ resource "aws_iam_policy" "ecs_task_inspection" {
         Action = [
           "ecs:ListTasks"
         ],
-        Resource = "arn:aws:ecs:${var.region}:${var.account_id}:cluster/${var.cluster_name}"
+        Resource = [
+          "arn:aws:ecs:${var.region}:${var.account_id}:cluster/${var.cluster_name}",
+          "arn:aws:ecs:${var.region}:${var.account_id}:container-instance/${var.cluster_name}/*"
+        ]
       },
       {
         Effect = "Allow",
         Action = [
           "ecs:DescribeTasks"
         ],
-        Resource = "arn:aws:ecs:${var.region}:${var.account_id}:task/${var.cluster_name}/*"
+        Resource = [
+          "arn:aws:ecs:${var.region}:${var.account_id}:task/${var.cluster_name}/*",
+          "arn:aws:ecs:${var.region}:${var.account_id}:container-instance/${var.cluster_name}/*"
+        ]
       }
     ]
   })
