@@ -34,7 +34,7 @@ resource "aws_wafv2_web_acl" "tipstaff_web_acl" {
     }
   }
 
-    rule {
+  rule {
     name     = "AWSManagedRulesKnownBadInputsRuleSet"
     priority = 2
 

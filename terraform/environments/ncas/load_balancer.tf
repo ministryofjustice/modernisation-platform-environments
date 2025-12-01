@@ -21,9 +21,9 @@ resource "aws_security_group" "ncas_lb_sc" {
 
   ingress {
     description = "Allows access on HTTPS for whitelisted user IPs"
-    from_port = 443
-    to_port   = 443
-    protocol  = "tcp"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
     cidr_blocks = [
       "194.33.196.0/25",
       "201.33.21.5/32",
@@ -49,9 +49,9 @@ resource "aws_security_group" "ncas_lb_sc" {
 
   ingress {
     description = "Replacement DOM1 allow list from Jaz Chan on 11/6/24"
-    from_port = 443
-    to_port   = 443
-    protocol  = "tcp"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
     cidr_blocks = [
       "20.26.11.71/32",
       "20.26.11.108/32",
@@ -93,9 +93,9 @@ resource "aws_security_group" "lb_sc_pingdom" {
 
   ingress {
     description = "Allow all European Pingdom IP addresses"
-    from_port = 443
-    to_port   = 443
-    protocol  = "tcp"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
     cidr_blocks = [
       "94.75.211.73/32",
       "94.75.211.74/32",
@@ -166,9 +166,9 @@ resource "aws_security_group" "lb_sc_pingdom_2" {
 
   ingress {
     description = "Allow all European Pingdom IP addresses - group 2"
-    from_port = 443
-    to_port   = 443
-    protocol  = "tcp"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
     cidr_blocks = [
       "5.172.196.188/32",
       "13.232.220.164/32",

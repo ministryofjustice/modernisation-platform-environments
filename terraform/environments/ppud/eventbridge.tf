@@ -145,7 +145,7 @@ locals {
     }
     ppud_elb_get_trt_data = {
       environments = ["production"]
-      schedule     = "cron(0 0 ? * * *)" 
+      schedule     = "cron(0 0 ? * * *)"
       description  = "Trigger Lambda at 00:00 every day"
       timezone     = "Europe/London"
     }
@@ -157,7 +157,7 @@ locals {
     }
     ppud_elb_get_uptime_data = {
       environments = ["production"]
-      schedule     = "cron(0 0 ? * * *)" 
+      schedule     = "cron(0 0 ? * * *)"
       description  = "Trigger Lambda at 00:00 every day"
       timezone     = "Europe/London"
     }

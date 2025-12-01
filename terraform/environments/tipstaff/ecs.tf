@@ -124,7 +124,7 @@ resource "aws_ecs_service" "tipstaff_ecs_service" {
   deployment_controller {
     type = "ECS"
   }
-  
+
   lifecycle {
     create_before_destroy = true
   }
@@ -288,7 +288,7 @@ resource "aws_security_group" "ecs_service" {
 
 resource "aws_ecr_repository" "tipstaff_ecr_repo" {
   #checkov:skip=CKV_AWS_51: "Ensure ECR Image Tags are immutable"
-    #checkov:skip=CKV_AWS_136:"Using default AWS encryption for ECR which is sufficient for our needs"
+  #checkov:skip=CKV_AWS_136:"Using default AWS encryption for ECR which is sufficient for our needs"
   name         = "tipstaff-ecr-repo"
   force_delete = true
   image_scanning_configuration {

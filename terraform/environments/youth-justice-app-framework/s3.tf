@@ -145,7 +145,7 @@ module "s3-certs" {
 
 
 resource "aws_s3_bucket_cors_configuration" "cms" {
-  bucket = module.s3.aws_s3_bucket_id["cms"].id  # only cms
+  bucket = module.s3.aws_s3_bucket_id["cms"].id # only cms
 
   cors_rule {
     allowed_headers = ["*"]
