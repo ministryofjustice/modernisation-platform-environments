@@ -131,7 +131,7 @@ locals {
         ebs_volumes = {
           "/dev/sdb" = { label = "app", size = 100 } # /u01
           "/dev/sdc" = { label = "app", size = 500 } # /u02
-          "/dev/sde" = { label = "data", size = 2000, iops = 6000, throughput = 750 }
+          "/dev/sde" = { label = "data", size = 2000, iops = 3000, throughput = 750 }
           "/dev/sdj" = { label = "flash", size = 600, iops = 3000, throughput = 125 }
           "/dev/sds" = { label = "swap", size = 2 }
         }
