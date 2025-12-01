@@ -208,7 +208,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu_utilization" {
   for_each            = toset(data.aws_instances.windows_tagged_instances.ids)
   alarm_name          = "CPU-Utilisation-High-${each.key}" # name of the alarm
   comparison_operator = "GreaterThanOrEqualToThreshold"    # threshold to trigger the alarm state
-  period              = "300"                               # period in seconds over which the specified statistic is applied
+  period              = "300"                              # period in seconds over which the specified statistic is applied
   threshold           = "90"                               # threshold for the alarm - see comparison_operator for usage
   evaluation_periods  = "3"                                # how many periods over which to evaluate the alarm
   datapoints_to_alarm = "2"                                # how many datapoints must be breaching the threshold to trigger the alarm
@@ -312,92 +312,92 @@ locals {
   # Define alarm configurations
   alarm_configs = {
     iisadmin_service = {
-      alarm_name    = "Service-Status-IISAdmin"
-      metric_name   = "IsRunning"
-      namespace     = "ServiceStatus"
-      service_name  = "IISAdminService"
-      description   = "IIS Admin service"
-      period        = "60"
+      alarm_name   = "Service-Status-IISAdmin"
+      metric_name  = "IsRunning"
+      namespace    = "ServiceStatus"
+      service_name = "IISAdminService"
+      description  = "IIS Admin service"
+      period       = "60"
     }
     wwwpub_service = {
-      alarm_name    = "Service-Status-WWW-Publishing"
-      metric_name   = "IsRunning"
-      namespace     = "ServiceStatus"
-      service_name  = "WorldWideWebPublishingService"
-      description   = "World Wide Web Publishing service"
-      period        = "60"
+      alarm_name   = "Service-Status-WWW-Publishing"
+      metric_name  = "IsRunning"
+      namespace    = "ServiceStatus"
+      service_name = "WorldWideWebPublishingService"
+      description  = "World Wide Web Publishing service"
+      period       = "60"
     }
     ppudlive_service = {
-      alarm_name    = "Service-Status-PPUD-Live"
-      metric_name   = "IsRunning"
-      namespace     = "ServiceStatus"
-      service_name  = "PPUDAutomatedProcessesLIVE"
-      description   = "PPUD live service"
-      period        = "60"
+      alarm_name   = "Service-Status-PPUD-Live"
+      metric_name  = "IsRunning"
+      namespace    = "ServiceStatus"
+      service_name = "PPUDAutomatedProcessesLIVE"
+      description  = "PPUD live service"
+      period       = "60"
     }
     ppudcrawler_service = {
-      alarm_name    = "Service-Status-PPUD-Crawler"
-      metric_name   = "IsRunning"
-      namespace     = "ServiceStatus"
-      service_name  = "PPUDPDFCrawlerP4Live"
-      description   = "PPUD crawler service"
-      period        = "60"
+      alarm_name   = "Service-Status-PPUD-Crawler"
+      metric_name  = "IsRunning"
+      namespace    = "ServiceStatus"
+      service_name = "PPUDPDFCrawlerP4Live"
+      description  = "PPUD crawler service"
+      period       = "60"
     }
     spooler_service = {
-      alarm_name    = "Service-Status-Printer-Spooler"
-      metric_name   = "IsRunning"
-      namespace     = "ServiceStatus"
-      service_name  = "PrintSpooler"
-      description   = "Printer Spooler service"
-      period        = "60"
+      alarm_name   = "Service-Status-Printer-Spooler"
+      metric_name  = "IsRunning"
+      namespace    = "ServiceStatus"
+      service_name = "PrintSpooler"
+      description  = "Printer Spooler service"
+      period       = "60"
     }
     sqlserver_service = {
-      alarm_name    = "Service-Status-SQL-Server"
-      metric_name   = "IsRunning"
-      namespace     = "ServiceStatus"
-      service_name  = "SQLServer(MSSQLSERVER)"
-      description   = "SQL Server service"
-      period        = "60"
+      alarm_name   = "Service-Status-SQL-Server"
+      metric_name  = "IsRunning"
+      namespace    = "ServiceStatus"
+      service_name = "SQLServer(MSSQLSERVER)"
+      description  = "SQL Server service"
+      period       = "60"
     }
     sqlwriter_service = {
-      alarm_name    = "Service-Status-SQL-Server-Writer"
-      metric_name   = "IsRunning"
-      namespace     = "ServiceStatus"
-      service_name  = "SQLServerVSSWriter"
-      description   = "SQL Server VSS Writer service"
-      period        = "60"
+      alarm_name   = "Service-Status-SQL-Server-Writer"
+      metric_name  = "IsRunning"
+      namespace    = "ServiceStatus"
+      service_name = "SQLServerVSSWriter"
+      description  = "SQL Server VSS Writer service"
+      period       = "60"
     }
     sqlagent_service = {
-      alarm_name    = "Service-Status-SQL-Server-Agent"
-      metric_name   = "IsRunning"
-      namespace     = "ServiceStatus"
-      service_name  = "SQLServerAgent(MSSQLSERVER)"
-      description   = "SQL Server Agent service"
-      period        = "60"
+      alarm_name   = "Service-Status-SQL-Server-Agent"
+      metric_name  = "IsRunning"
+      namespace    = "ServiceStatus"
+      service_name = "SQLServerAgent(MSSQLSERVER)"
+      description  = "SQL Server Agent service"
+      period       = "60"
     }
     sqlserver_backup = {
-      alarm_name    = "Service-Status-SQL-Server-Backup-Status"
-      metric_name   = "SQLBackupStatus"
-      namespace     = "SQLBackup"
-      service_name  = ""
-      description   = "SQL Server backup status"
-      period        = "60"
+      alarm_name   = "Service-Status-SQL-Server-Backup-Status"
+      metric_name  = "SQLBackupStatus"
+      namespace    = "SQLBackup"
+      service_name = ""
+      description  = "SQL Server backup status"
+      period       = "60"
     }
     port25_check = {
-      alarm_name    = "Port-25-Status-Check"
-      metric_name   = "PortStatus"
-      namespace     = "Port"
-      service_name  = ""
-      description   = "Port 25 status check to internal mail relay (rgsl200)"
-      period        = "60"
+      alarm_name   = "Port-25-Status-Check"
+      metric_name  = "PortStatus"
+      namespace    = "Port"
+      service_name = ""
+      description  = "Port 25 status check to internal mail relay (rgsl200)"
+      period       = "60"
     }
     emailsender_check = {
-      alarm_name    = "Email-Sender-Check"
-      metric_name   = "EmailSenderStatus"
-      namespace     = "EmailSender"
-      service_name  = ""
-      description   = "Email sender stale log files"
-      period        = "3600"
+      alarm_name   = "Email-Sender-Check"
+      metric_name  = "EmailSenderStatus"
+      namespace    = "EmailSender"
+      service_name = ""
+      description  = "Email sender stale log files"
+      period       = "3600"
     }
   }
 
@@ -550,19 +550,19 @@ locals {
 
   malware_alarm_environments = {
     production = {
-      enabled      = local.is-production
-      instances    = data.aws_instances.windows_tagged_instances.ids
-      sns_topic    = "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${local.application_data.accounts[local.environment].cloudwatch_sns_topic_name}"
+      enabled   = local.is-production
+      instances = data.aws_instances.windows_tagged_instances.ids
+      sns_topic = "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${local.application_data.accounts[local.environment].cloudwatch_sns_topic_name}"
     }
     preproduction = {
-      enabled      = local.is-preproduction
-      instances    = data.aws_instances.windows_tagged_instances_uat.ids
-      sns_topic    = "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${local.application_data.accounts[local.environment].cloudwatch_sns_topic_name}"
+      enabled   = local.is-preproduction
+      instances = data.aws_instances.windows_tagged_instances_uat.ids
+      sns_topic = "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${local.application_data.accounts[local.environment].cloudwatch_sns_topic_name}"
     }
     development = {
-      enabled      = local.is-development
-      instances    = data.aws_instances.windows_tagged_instances_dev.ids
-      sns_topic    = "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${local.application_data.accounts[local.environment].cloudwatch_sns_topic_name}"
+      enabled   = local.is-development
+      instances = data.aws_instances.windows_tagged_instances_dev.ids
+      sns_topic = "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${local.application_data.accounts[local.environment].cloudwatch_sns_topic_name}"
     }
   }
 

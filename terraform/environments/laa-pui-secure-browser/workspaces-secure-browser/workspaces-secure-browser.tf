@@ -209,6 +209,7 @@ resource "aws_workspacesweb_browser_settings" "main" {
           "clientconfig.microsoftonline-p.net",
           "companymanager.microsoftonline.com",
           "device.login.microsoftonline.com",
+          "login-f3.dpscloud.com",
           "enterpriseregistration.windows.net",
           "go.microsoft.com",
           "google-exention-bucket.s3.eu-west-2.amazonaws.com",

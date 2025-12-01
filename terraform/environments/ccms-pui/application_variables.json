@@ -136,9 +136,7 @@
       "s3_lifecycle_days_transition_noncurrent_standard": 90,
       "logging_level_com_ezgov_roof_view_vim_control_BundleAwareText": "error"
     },
-    "preproduction": {
-
-    },
+    "preproduction": {},
     "production": {
       "app_name": "ccms-pui",
       "aws_region": "eu-west-2",
