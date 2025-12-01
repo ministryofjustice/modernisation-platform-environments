@@ -145,7 +145,7 @@ locals {
     }
     ppud_elb_get_trt_data = {
       environments = ["production"]
-      schedule     = "cron(0 0 ? * * *)" # check IIS log timings
+      schedule     = "cron(0 0 ? * * *)" 
       description  = "Trigger Lambda at 00:00 every day"
       timezone     = "Europe/London"
     }
@@ -157,7 +157,7 @@ locals {
     }
     ppud_elb_get_uptime_data = {
       environments = ["production"]
-      schedule     = "cron(0 0 ? * * *)" # check IIS log timings
+      schedule     = "cron(0 0 ? * * *)" 
       description  = "Trigger Lambda at 00:00 every day"
       timezone     = "Europe/London"
     }
@@ -186,7 +186,7 @@ locals {
       timezone     = "Europe/London"
     }
     wam_waf_analysis = {
-      environments = ["development"]
+      environments = ["development", "preproduction"]
       schedule     = "cron(15 7 ? * MON *)"
       description  = "Trigger Lambda at 07:15 each Monday"
       timezone     = "Europe/London"
