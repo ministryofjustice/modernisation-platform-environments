@@ -42,26 +42,26 @@ def _isoformat_github(dt: datetime.datetime) -> str:
 def _fetch_all_runs(owner: str, repo: str, start_iso: str, end_iso: str):
     """
     Fetch workflow runs from GitHub Actions API for the given time range.
-    Filters for workflows that COMPLETED (updated_at) in the time range.
-    Only returns workflows from the main branch.
-    Handles pagination.
+    Returns ALL workflows created in the last 6 hours from the main branch.
+    Client-side filters for workflows that were created OR updated in the 15-minute slot.
     """
     all_runs = []
     page = 1
+    max_pages = 10
     
-    # Calculate a wider search window - workflows that could have completed in our slot
-    # might have started earlier, so we look back further
+    # Look back 6 hours from slot start
     start_dt = datetime.datetime.strptime(start_iso, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=datetime.timezone.utc)
-    # Look back 24 hours to catch long-running workflows
-    search_start_dt = start_dt - datetime.timedelta(hours=24)
+    search_start_dt = start_dt - datetime.timedelta(hours=6)
     search_start_iso = _isoformat_github(search_start_dt)
     
-    while True:
+    print(f"Searching for workflows created since {search_start_iso}")
+    print(f"Filtering for activity in slot: {start_iso} to {end_iso}")
+    
+    while page <= max_pages:
         url = f"{GITHUB_API_URL}/repos/{owner}/{repo}/actions/runs"
         params = {
-            "status": "completed",  # Only get completed workflows
-            "branch": "main",  # Only workflows from main branch
-            "created": f">={search_start_iso}",  # Workflows that started in last 24 hours
+            "branch": "main",
+            "created": f">={search_start_iso}",  # All workflows created in last 6 hours
             "per_page": "100",
             "page": str(page)
         }
@@ -85,24 +85,22 @@ def _fetch_all_runs(owner: str, repo: str, start_iso: str, end_iso: str):
                 runs = data.get("workflow_runs", [])
                 
                 if not runs:
+                    print("No more runs returned from API")
                     break
                 
-                # Filter runs that completed ONLY in our 15-minute time slot
-                filtered_runs = []
+                # Return ALL workflows - no filtering
+                # They will all be written to CloudWatch logs
+                all_runs.extend(runs)
+                
                 for run in runs:
-                    updated_at = run.get("updated_at")
-                    if updated_at:
-                        # Only include if completion time (updated_at) falls within our slot
-                        if start_iso <= updated_at < end_iso:
-                            filtered_runs.append(run)
+                    print(f"  Run {run.get('id')}: created={run.get('created_at')}, updated={run.get('updated_at')}, status={run.get('status')}, conclusion={run.get('conclusion')}")
                 
-                all_runs.extend(filtered_runs)
-                print(f"Page {page}: Found {len(runs)} runs, {len(filtered_runs)} completed in slot {start_iso} to {end_iso}")
+                print(f"Page {page}: Found {len(runs)} runs")
                 
-                # If we got fewer than 100, we've reached the last page
                 if len(runs) < 100:
+                    print("Reached last page")
                     break
-                    
+                
                 page += 1
                 
         except error.HTTPError as e:
@@ -116,17 +114,17 @@ def _fetch_all_runs(owner: str, repo: str, start_iso: str, end_iso: str):
             print(f"GitHub URL error: {e.reason}")
             break
         except Exception as e:
-            print(f"Unexpected error fetching GitHub data: {str(e)}")
+            print(f"Unexpected error: {str(e)}")
             break
     
-    print(f"Total workflow runs completed in slot {start_iso} to {end_iso}: {len(all_runs)}")
+    print(f"Total runs found: {len(all_runs)}")
     return all_runs
 
 
 def _write_runs_to_cw_logs(context, slot_start_iso, slot_end_iso, runs):
     """
     Writes one log event per workflow run into the dedicated log group.
-    Logs are structured as key-value pairs for better querying in CloudWatch Logs Insights.
+    Logs are structured as JSON for automatic parsing in CloudWatch Logs Insights.
     """
     log_group_name = WORKFLOW_RUN_LOG_GROUP
     log_stream_name = context.aws_request_id  # unique per invocation
@@ -144,7 +142,7 @@ def _write_runs_to_cw_logs(context, slot_start_iso, slot_end_iso, runs):
     now_ms = int(datetime.datetime.now(datetime.timezone.utc).timestamp() * 1000)
     events = []
 
-    # One event per workflow run - flatten to root level
+    # One event per workflow run - format as JSON
     for r in runs:
         log_event = {
             "type": "WORKFLOW_RUN",
@@ -169,12 +167,15 @@ def _write_runs_to_cw_logs(context, slot_start_iso, slot_end_iso, runs):
             else None,
             "html_url": r.get("html_url"),
         }
-        # Format as space-separated key=value pairs
-        run_msg = " ".join([f"{k}={json.dumps(v)}" for k, v in log_event.items() if v is not None])
+        
+        # Remove None values
+        log_event = {k: v for k, v in log_event.items() if v is not None}
+        
+        # CHANGED: Format as JSON instead of key=value pairs
         events.append(
             {
                 "timestamp": now_ms,
-                "message": run_msg,
+                "message": json.dumps(log_event),  # JSON format
             }
         )
         now_ms += 1
@@ -185,7 +186,6 @@ def _write_runs_to_cw_logs(context, slot_start_iso, slot_end_iso, runs):
         logStreamName=log_stream_name,
         logEvents=events,
     )
-
 
 def lambda_handler(event, context):
     now_utc = datetime.datetime.now(datetime.timezone.utc)
