@@ -74,11 +74,7 @@ resource "aws_lambda_function" "edrms_docs_exception_monitor" {
   runtime          = "python3.13"
   timeout          = 30
   publish          = true
-  memory_size      = 4096 # Sets memory defaults to 4gb
 
-  ephemeral_storage {
-    size = 1024 # Sets ephemeral storage defaults to 1GB (/tmp space)
-  }
   environment {
     variables = {
       LOG_GROUP_NAME = aws_cloudwatch_log_group.log_group_edrms.name

@@ -1,14 +1,14 @@
 # ACM Public Certificate
 data "aws_route53_zone" "modernisation_platform" {
-  provider = aws.core-network-services
-  name = "modernisation-platform.service.justice.gov.uk"
+  provider     = aws.core-network-services
+  name         = "modernisation-platform.service.justice.gov.uk"
   private_zone = false
 }
 
 resource "aws_acm_certificate" "external" {
-  domain_name               = local.is-production ? "correspondence-handling-and-processing.service.justice.gov.uk" : "modernisation-platform.service.justice.gov.uk"
-  
-  validation_method         = "DNS"
+  domain_name = local.is-production ? "correspondence-handling-and-processing.service.justice.gov.uk" : "modernisation-platform.service.justice.gov.uk"
+
+  validation_method = "DNS"
 
   subject_alternative_names = local.is-production ? ["correspondence-handling-and-processing.service.justice.gov.uk"] : ["${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
 
@@ -22,7 +22,7 @@ resource "aws_acm_certificate" "external" {
 }
 
 resource "aws_acm_certificate_validation" "external" {
-  certificate_arn         = aws_acm_certificate.external.arn
+  certificate_arn = aws_acm_certificate.external.arn
 
   validation_record_fqdns = local.is-production ? [aws_route53_record.external_validation_prod[0].fqdn] : values(aws_route53_record.external_validation_dev)[*].fqdn
 }
@@ -43,8 +43,8 @@ resource "aws_route53_record" "external_validation_prod" {
 #dev NS validation records for all cert domains
 resource "aws_route53_record" "external_validation_dev" {
   # Only create these in non-prod dev; otherwise empty map = no resources
-  for_each = (!local.is-production && local.environment == "development") ? local.domain_types : {}
-  provider = aws.core-network-services
+  for_each        = (!local.is-production && local.environment == "development") ? local.domain_types : {}
+  provider        = aws.core-network-services
   allow_overwrite = true
 
   # If this is the base MP domain, use the parent zone; otherwise use the app zone

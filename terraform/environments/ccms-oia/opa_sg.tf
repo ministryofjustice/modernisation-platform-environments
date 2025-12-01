@@ -13,7 +13,7 @@ resource "aws_security_group" "opahub_load_balancer" {
 # # Temp only for first install - to be removed after
 # resource "aws_vpc_security_group_ingress_rule" "alb_ingress_7001_all" {
 #   security_group_id = aws_security_group.opahub_load_balancer.id
-#   cidr_ipv4         = "0.0.0.0/0"
+#   cidr_ipv4         = local.application_data.accounts[local.environment].aws_workspace
 #   ip_protocol       = "tcp"
 #   from_port         = 7001
 #   to_port           = 7001

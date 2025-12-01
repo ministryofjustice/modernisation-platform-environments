@@ -63,7 +63,7 @@ resource "aws_s3_bucket" "buckets" {
   for_each = toset(local.bucket_names)
 
   bucket = each.value
-  
+
   tags = merge(local.tags,
     {
       Name = each.value
@@ -120,10 +120,10 @@ resource "aws_s3_bucket_lifecycle_configuration" "outbound_bucket_lifecycle_dele
   rule {
     id     = "delete-noncurrent-versions-after-5-days"
     status = "Enabled"
- 
+
     # No filter → applies to whole bucket
     filter {}
- 
+
     noncurrent_version_expiration {
       noncurrent_days = 5
     }
@@ -137,10 +137,10 @@ resource "aws_s3_bucket_lifecycle_configuration" "ftp_lambda_bucket_lifecycle_de
   rule {
     id     = "delete-noncurrent-versions-after-5-days"
     status = "Enabled"
- 
+
     # No filter → applies to whole bucket
     filter {}
- 
+
     noncurrent_version_expiration {
       noncurrent_days = 5
     }
@@ -152,42 +152,42 @@ resource "aws_s3_bucket_lifecycle_configuration" "ftp_lambda_bucket_lifecycle_de
 resource "aws_s3_bucket_lifecycle_configuration" "inbound_bucket_lifecycle" {
 
   bucket = aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].id
-  
+
   rule {
     id     = "delete-RBS-BACKUP-folder-file-after-5-days"
     status = "Enabled"
- 
-    
+
+
     filter {
       prefix = "CCMS_PRD_RBS/Inbound/BACKUP/"
     }
- 
+
     expiration {
-      days = 5   # delete objects 5 days after creation
+      days = 5 # delete objects 5 days after creation
     }
   }
 
   rule {
     id     = "delete-archive-folder-file-after-5-days"
     status = "Enabled"
- 
+
     # No filter → applies to whole bucket
     filter {
       prefix = "archive/"
     }
- 
+
     expiration {
-      days = 5   # delete objects 5 days after creation
+      days = 5 # delete objects 5 days after creation
     }
   }
 
   rule {
     id     = "delete-noncurrent-versions-after-5-days"
     status = "Enabled"
- 
+
     # No filter → applies to whole bucket
     filter {}
- 
+
     noncurrent_version_expiration {
       noncurrent_days = 5
     }
