@@ -145,7 +145,7 @@ locals {
     }
     ppud_elb_get_trt_data = {
       environments = ["production"]
-      schedule     = "cron(0 0 ? * * *)" # check IIS log timings
+      schedule     = "cron(0 0 ? * * *)"
       description  = "Trigger Lambda at 00:00 every day"
       timezone     = "Europe/London"
     }
@@ -157,7 +157,7 @@ locals {
     }
     ppud_elb_get_uptime_data = {
       environments = ["production"]
-      schedule     = "cron(0 0 ? * * *)" # check IIS log timings
+      schedule     = "cron(0 0 ? * * *)"
       description  = "Trigger Lambda at 00:00 every day"
       timezone     = "Europe/London"
     }
@@ -186,7 +186,7 @@ locals {
       timezone     = "Europe/London"
     }
     wam_waf_analysis = {
-      environments = ["development"]
+      environments = ["development", "preproduction"]
       schedule     = "cron(15 7 ? * MON *)"
       description  = "Trigger Lambda at 07:15 each Monday"
       timezone     = "Europe/London"
@@ -283,11 +283,13 @@ locals {
       local.is-preproduction ? aws_lambda_function.lambda_functions["sync_ssm_to_waf_preproduction"].arn : (
         local.is-production ? aws_lambda_function.lambda_functions["sync_ssm_to_waf_production"].arn : null
     ))
-    #    wam_waf_analysis = local.is-development ? aws_lambda_function.lambda_functions["wam_waf_analysis_development"].arn : (
-    #      local.is-preproduction ? aws_lambda_function.lambda_functions["wam_waf_analysis_preproduction"].arn : (
-    #        local.is-production ? aws_lambda_function.lambda_functions["wam_waf_analysis_production"].arn : null
-    #    ))
-    wam_waf_analysis               = local.is-development ? aws_lambda_function.lambda_functions["wam_waf_analysis_development"].arn : null # Remove this once all environments are enabled
+    wam_waf_analysis = local.is-development ? aws_lambda_function.lambda_functions["wam_waf_analysis_development"].arn : (
+      local.is-preproduction ? aws_lambda_function.lambda_functions["wam_waf_analysis_preproduction"].arn : null
+    )
+    #wam_waf_analysis = local.is-development ? aws_lambda_function.lambda_functions["wam_waf_analysis_development"].arn : (
+    #  local.is-preproduction ? aws_lambda_function.lambda_functions["wam_waf_analysis_preproduction"].arn : (
+    #    local.is-production ? aws_lambda_function.lambda_functions["wam_waf_analysis_production"].arn : null
+    #))
     send_cpu_graph                 = local.is-production ? aws_lambda_function.lambda_functions["send_cpu_graph_production"].arn : null
     disable_cpu_alarms             = local.is-production ? aws_lambda_function.lambda_functions["disable_cpu_alarm_production"].arn : null
     enable_cpu_alarms              = local.is-production ? aws_lambda_function.lambda_functions["enable_cpu_alarm_production"].arn : null

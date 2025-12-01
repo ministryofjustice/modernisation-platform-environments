@@ -65,7 +65,7 @@ resource "grafana_dashboard" "templated" {
     "${path.module}/dashboards/${each.key}",
     {
       # From path: dashboards/<team>/<file>.json.tftpl (or "global" for top-level)
-      team_name   = coalesce(each.value.team, "global")
+      team_name = coalesce(each.value.team, "global")
 
       # From platform_locals.tf (derived from terraform.workspace, e.g. "development"/"production")
       environment = local.environment
