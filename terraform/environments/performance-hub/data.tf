@@ -30,5 +30,6 @@ data "template_file" "task_definition" {
     ap_import_secret_access_key = aws_secretsmanager_secret_version.ap_import_secret_access_key.arn
     ap_export_access_key_id     = aws_secretsmanager_secret_version.ap_export_access_key_id.arn
     ap_export_secret_access_key = aws_secretsmanager_secret_version.ap_export_secret_access_key.arn
+    teams_webhook_prison        = aws_secretsmanager_secret_version.teams_webhook_prison.arn
   }
 }

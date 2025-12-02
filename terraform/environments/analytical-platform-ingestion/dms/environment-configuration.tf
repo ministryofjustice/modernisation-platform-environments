@@ -1,4 +1,4 @@
-  locals {
+locals {
   environment_configuration = local.environment_configurations[local.environment]
   environment_configurations = {
     development = {
@@ -10,7 +10,7 @@
       tempus_cidr                   = "10.12.16.0/21"
 
       /* CICA Source databases */
-      source_database_sid = "oradev8"
+      source_database_sid = "ORADEV8"
       /* analytical-plafrom-ingestion-production resources */
       ap_data_glue_catalog_role = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/mojap-data-production-dms-ingress-development"
     }
@@ -23,7 +23,7 @@
       tempus_cidr                   = "10.13.20.0/24"
 
       /* CICA Source databases */
-      source_database_sid = "live.cica.gov.uk"
+      source_database_sid = "live.eu-west-2.compute.internal"
       /* analytical-plafrom-ingestion-production resources */
       ap_data_glue_catalog_role = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/mojap-data-production-dms-ingress-production"
     }
