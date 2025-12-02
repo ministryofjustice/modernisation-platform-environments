@@ -168,7 +168,7 @@ class NotificationService:
         dimensions = alarmdetails.get('Trigger', {}).get('Dimensions', [])
         alarmdescription = alarmdetails.get('AlarmDescription','Alarm Description')
         # Format dimensions nicely
-        dim_text = ', '.join([f"{d['name']}={d['value']}" for d in dimensions])
+        dim_text = '\n'.join([f"{d['name']} = {d['value']}" for d in dimensions])
         try:
             # Prepare the Slack message with formatting
             emoji = ":broken_heart:" if is_error else ":white_check_mark:"
@@ -221,7 +221,7 @@ class NotificationService:
                     },
                     {
                        "type": "section",
-                       "text": {"type": "mrkdwn", "text": f"*Resource Details:* {dim_text}"}  
+                       "text": {"type": "mrkdwn", "text": f"*Resource Details:*\n {dim_text}"}  
                     }     
                 ]
             }
