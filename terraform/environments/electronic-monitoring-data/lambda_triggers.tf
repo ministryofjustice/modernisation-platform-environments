@@ -219,7 +219,7 @@ resource "aws_sqs_queue" "clean_mdss_load_dlq" {
 resource "aws_sqs_queue" "clean_mdss_load_queue" {
   name                       = "clean-mdss-load-queue"
   visibility_timeout_seconds = 15 * 60
-  message_retention_seconds  = 432000 # 5 days
+  message_retention_seconds  = 1209600 # 14 days
   redrive_policy = jsonencode({
     deadLetterTargetArn = aws_sqs_queue.clean_mdss_load_dlq.arn
     maxReceiveCount     = 5
@@ -239,6 +239,6 @@ resource "aws_lambda_event_source_mapping" "mdss_cleanup_sqs_trigger" {
   batch_size = 10
 
   scaling_config {
-    maximum_concurrency = 50
+    maximum_concurrency = 0
   }
 }
