@@ -44,6 +44,7 @@ locals {
     "g4s_integrity",
     "g4s_lcm_archive",
     "g4s_tasking",
+    "intermediate_tasking",
     "scram_alcohol_monitoring",
     "g4s_lcm",
   ] : local.is-development ? ["test"] : []
