@@ -90,26 +90,8 @@ data "archive_file" "github_workflow_poller_lambda" {
   output_path = "${path.module}/lambda/github_workflow_data_poller/lambda.zip"
 }
 
-# Create a signing profile (or reference existing one)
-resource "aws_signer_signing_profile" "lambda" {
-  platform_id = "AWSLambda-SHA384-ECDSA"
-  name_prefix = "lambda_signing_"
-}
-
-# Create code signing configuration
-resource "aws_lambda_code_signing_config" "this" {
-  allowed_publishers {
-    signing_profile_version_arns = [
-      aws_signer_signing_profile.lambda.arn
-    ]
-  }
-  policies {
-    untrusted_artifact_on_deployment = "Enforce"  # or "Warn"
-  }
-  description = "Code signing config for Lambda"
-}
-
 resource "aws_lambda_function" "github_workflow_data_poller" {
+  #checkov:skip=CKV_AWS_272: Does not require code signing.
   #checkov:skip=CKV_AWS_173: Does not have sensitive environment variables.
   #checkov:skip=CKV_AWS_50: No x-ray tracing needed.
   #checkov:skip=CKV_AWS_116: Dead Letter Queue not needed.
@@ -123,7 +105,6 @@ resource "aws_lambda_function" "github_workflow_data_poller" {
   runtime                 = "python3.12"
   timeout                 = 300
   description             = "Polls GitHub Actions workflow data and writes to CloudWatch Logs"
-  code_signing_config_arn         = aws_lambda_code_signing_config.this.arn
   reserved_concurrent_executions  = 10
 
   environment {
