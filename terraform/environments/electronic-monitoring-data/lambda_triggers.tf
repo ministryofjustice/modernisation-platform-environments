@@ -239,6 +239,6 @@ resource "aws_lambda_event_source_mapping" "mdss_cleanup_sqs_trigger" {
   batch_size = 10
 
   scaling_config {
-    maximum_concurrency = 500
+    maximum_concurrency = 100
   }
 }
