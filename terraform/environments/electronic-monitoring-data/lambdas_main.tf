@@ -366,7 +366,7 @@ module "load_mdss_lambda" {
     ACCOUNT_NUMBER      = data.aws_caller_identity.current.account_id
     STAGING_BUCKET      = module.s3-create-a-derived-table-bucket.bucket.id
     ENVIRONMENT_NAME    = local.environment_shorthand
-    MDSS_CLEANUP_QUEUE_URL  = aws_sqs_queue.clean_mdss_load_dlq.id
+    MDSS_CLEANUP_QUEUE_URL  = aws_sqs_queue.clean_mdss_load_queue.id
   }
 }
 
