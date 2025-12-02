@@ -59,6 +59,7 @@ resource "aws_lambda_function" "lambda_function" {
       LD_LIBRARY_PATH = "/opt/instantclient_12_2_linux"
       S3_BUCKET_NAME  = aws_s3_bucket.lambda_payment_load.bucket
       SECRET_NAME     = aws_secretsmanager_secret.secret_lambda_s3.name
+      SECRET_NAME_WEBHOOK        = aws_secretsmanager_secret.ebs_cw_alerts_secrets.name
     }
   }
 
