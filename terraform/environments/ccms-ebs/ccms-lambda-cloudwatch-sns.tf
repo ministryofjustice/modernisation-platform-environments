@@ -79,13 +79,13 @@ data "archive_file" "lambda_zip" {
 resource "aws_lambda_function" "cloudwatch_sns" {
   filename         = data.archive_file.lambda_zip.output_path
   source_code_hash = data.archive_file.lambda_zip.output_base64sha256
-  function_name = "${local.application_name}-${local.environment}-cloudwatch-alarm-slack-integration"
-  role          = aws_iam_role.lambda_cloudwatch_sns_role.arn
-  handler       = "lambda_function.lambda_handler"
-  layers        = [aws_lambda_layer_version.lambda_cloudwatch_sns_layer.arn]
-  runtime       = "python3.13"
-  timeout       = 30
-  publish       = true
+  function_name    = "${local.application_name}-${local.environment}-cloudwatch-alarm-slack-integration"
+  role             = aws_iam_role.lambda_cloudwatch_sns_role.arn
+  handler          = "lambda_function.lambda_handler"
+  layers           = [aws_lambda_layer_version.lambda_cloudwatch_sns_layer.arn]
+  runtime          = "python3.13"
+  timeout          = 30
+  publish          = true
 
   environment {
     variables = {
