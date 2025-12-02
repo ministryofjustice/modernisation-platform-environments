@@ -8,7 +8,7 @@ import tracemalloc
 import urllib.request
 from dataclasses import dataclass
 from typing import Any, Dict, Optional, Union, cast
-
+from datetime import datetime
 import boto3
 import pycurl
 from botocore.exceptions import ClientError
@@ -154,25 +154,75 @@ class NotificationService:
         logger.info("Slack notifications configured")
 
     def send_notification(
-        self, title: str, message: str, is_error: bool = False
+        self, title: str, alarmdetails: str, timestamp: str, is_error: bool = False
     ) -> bool:
         """Send a notification to Slack using the webhook."""
         curl = pycurl.Curl()
-
+        logger.info("alarmdetailsinside:\n" + json.dumps(alarmdetails, indent=2))
+        alarm_name = alarmdetails.get('AlarmName', 'Unknown Alarm')
+        region = alarmdetails.get('Region', '')
+        alarm_state = alarmdetails.get('NewStateValue','')
+        reason = alarmdetails.get('NewStateReason', '')
+        namespace = alarmdetails.get('Trigger', {}).get('Namespace', '')
+        metric_name = alarmdetails.get('Trigger', {}).get('MetricName', '')
+        dimensions = alarmdetails.get('Trigger', {}).get('Dimensions', [])
+        alarmdescription = alarmdetails.get('AlarmDescription','Alarm Description')
+        # Format dimensions nicely
+        dim_text = ', '.join([f"{d['name']}={d['value']}" for d in dimensions])
         try:
             # Prepare the Slack message with formatting
             emoji = ":broken_heart:" if is_error else ":white_check_mark:"
             color = "danger" if is_error else "good"
+            title = f"{emoji} | {title} | {alarm_name} | {region}"
 
             payload = {
-                "attachments": [
+                "blocks": [
                     {
-                        "color": color,
-                        "title": f"{emoji} [{self.function_name}] {title}",
-                        "text": message,
-                        "footer": "CloudWatch Alarm via SNS/Lambda",
-                        "ts": int(time.time()),
-                    }
+                        "type": "header",
+                        "text": {"type": "plain_text", "text": f"{alarm_state} - {alarm_name}"}
+                    },
+                    {
+                        "type": "section",
+                        "text": {"type": "mrkdwn", "text": f"*{title}*"}
+
+                    },
+                    {
+                        "type": "divider"
+                    },
+                    {
+                        "type": "section",
+                        "text": {"type": "mrkdwn", "text": f"*Reason:* {reason}"}
+                    },
+                    {
+                        "type": "section",
+                        "fields": [
+                            {
+                            "type": "mrkdwn",
+                            "text": f"*Namespace:* {namespace}"
+                            },
+                            {
+                            "type": "mrkdwn",
+                            "text": f"*Metric:* {metric_name}"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "section",
+                        "fields": [
+                            {
+                            "type": "mrkdwn",
+                            "text": f"*Timestamp:* {timestamp}"
+                            },
+                            {
+                            "type": "mrkdwn",
+                            "text": f"*Alarm Description:* {alarmdescription}"
+                            }
+                        ]
+                    },
+                    {
+                       "type": "section",
+                       "text": {"type": "mrkdwn", "text": f"*Resource Details:* {dim_text}"}  
+                    }     
                 ]
             }
 
@@ -225,16 +275,18 @@ def lambda_handler(event, context):
         Response dictionary with status and results
     """
     tracemalloc.start()
-    logger.info("Starting Notification to Slack for edrms document exceptions")
+    logger.info("Starting Notification to Slack for CloudWatch Alarm via SNS Topic")
     slack_channel_webhook: str
 
     notification_service: Optional[NotificationService] = None
 
     # SNS message comes in event['Records'][0]['Sns']
     sns_message = event['Records'][0]['Sns']
-    subject = sns_message.get('Subject', 'CloudWatch Alarm')
     message_str = sns_message.get('Message', '{}')
-
+    timestamp_str = sns_message.get('Timestamp')
+    if timestamp_str:
+        dt = datetime.strptime(timestamp_str, "%Y-%m-%dT%H:%M:%S.%fZ")
+        formatted = dt.strftime("%a, %d %b %Y %H:%M:%S UTC")
     # Parse the inner JSON message
     try:
         alarm_details = json.loads(message_str)
@@ -266,41 +318,28 @@ def lambda_handler(event, context):
         config = parse_config_from_env_and_secrets(env_config, secrets_data)
 
          # Extract useful fields
-        alarm_name = alarm_details.get('AlarmName', 'Unknown Alarm')
-        new_state = alarm_details.get('NewStateValue', 'Unknown')
-        reason = alarm_details.get('NewStateReason', '')
-        region = alarm_details.get('Region', '')
-        metric_name = alarm_details.get('Trigger', {}).get('MetricName', '')
-        dimensions = alarm_details.get('Trigger', {}).get('Dimensions', [])
 
-        # Format dimensions nicely
-        dim_text = ', '.join([f"{d['name']}={d['value']}" for d in dimensions])
+        new_state = alarm_details.get('NewStateValue','')
 
-        # Build Slack message
-        slack_message = {
-            "text": f"*{subject}*\n"
-                    f"Alarm: `{alarm_name}`\n"
-                    f"State: `{new_state}`\n"
-                    f"Region: `{region}`\n"
-                    f"Metric: `{metric_name}`\n"
-                    f"Dimensions: `{dim_text}`\n"
-                    f"Reason: {reason}"
-        }
+        is_error=False
+        if new_state == "ALARM":
+            is_error=True
 
         # Initialize services
         notification_service = NotificationService(
             config.slack_channel_webhook, context.function_name
         )
-        result = f"CloudWatchAlarm:\n{slack_message}\n"
+        # result = f"{slack_message}\n"
         notification_service.send_notification(
-                    "CloudWatch Alarm Notification",
-                    result, is_error=True
+                    "CloudWatch Alarm Notification", 
+                    alarm_details,
+                    formatted, is_error
                 )
         # Prepare response
         response = {
             "statusCode": 200,
             "body": {
-                "message": f"Successfully completed publishing notifications for EdrmsDocumentException logs"
+                "message": f"Successfully completed publishing notifications for CloudWatch Alarm"
             },
         }
 
@@ -327,20 +366,3 @@ def lambda_handler(event, context):
         current, peak = tracemalloc.get_traced_memory()
         logger.info(f"Current memory usage: {current / 1024 / 1024:.2f} MB; Peak: {peak / 1024 / 1024:.2f} MB")
         tracemalloc.stop()
-        
-
-
-    # Send to Slack
-    # req = urllib.request.Request(
-    #     slack_webhook_url,
-    #     data=json.dumps(slack_message).encode('utf-8'),
-    #     headers={'Content-Type': 'application/json'}
-    # )
-
-    # try:
-    #     with urllib.request.urlopen(req) as response:
-    #         print(f"Slack response: {response.read().decode('utf-8')}")
-    # except Exception as e:
-    #     print(f"Error sending to Slack: {e}")
-
-    # return {"status": "done"}
