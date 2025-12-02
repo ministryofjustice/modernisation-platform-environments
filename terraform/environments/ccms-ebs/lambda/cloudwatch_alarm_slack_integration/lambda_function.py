@@ -1,3 +1,8 @@
+"""
+AWS Lambda function to pull CloudWatch Alarm from SNS Topic and
+publish into Slack.
+"""
+
 
 import json
 import os
