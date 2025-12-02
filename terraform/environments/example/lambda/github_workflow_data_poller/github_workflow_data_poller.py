@@ -105,7 +105,7 @@ def _write_runs_to_cw_logs(context, runs):
     Logs are structured as JSON for automatic parsing in CloudWatch Logs Insights.
     """
     log_group_name = WORKFLOW_RUN_LOG_GROUP
-    log_stream_name = context.aws_request_id  # unique per invocation
+    log_stream_name = context.aws_request_id
 
     # Create log stream if it doesn't exist yet
     try:
@@ -116,11 +116,9 @@ def _write_runs_to_cw_logs(context, runs):
         if e.response["Error"]["Code"] != "ResourceAlreadyExistsException":
             raise
 
-    # Build log events
     now_ms = int(datetime.datetime.now(datetime.timezone.utc).timestamp() * 1000)
     events = []
 
-    # One event per workflow run - format as JSON
     for r in runs:
         log_event = {
             "type": "WORKFLOW_RUN",
@@ -144,10 +142,8 @@ def _write_runs_to_cw_logs(context, runs):
             "html_url": r.get("html_url"),
         }
         
-        # Remove None values
         log_event = {k: v for k, v in log_event.items() if v is not None}
         
-        # Format as JSON
         events.append(
             {
                 "timestamp": now_ms,
@@ -156,7 +152,6 @@ def _write_runs_to_cw_logs(context, runs):
         )
         now_ms += 1
 
-    # Single PutLogEvents call
     logs_client.put_log_events(
         logGroupName=log_group_name,
         logStreamName=log_stream_name,

@@ -3,13 +3,12 @@ locals {
     enabled             = true
     github_owner        = "ministryofjustice"
     github_repo         = "modernisation-platform"
-    lookback_hours      = 1  # Configurable lookback window
-    schedule_expression = "cron(0/15 * * * ? *)"  # Every 15 minutes
+    lookback_hours      = 2
+    schedule_expression = "cron(0/15 * * * ? *)"
     log_retention_days  = 90
   }
 }
 
-# CloudWatch Log Group for workflow data
 resource "aws_cloudwatch_log_group" "github_workflow_data" {
   count             = local.github_workflow_poller.enabled ? 1 : 0
   name              = "modernisation-platform-workflow-data"
@@ -23,7 +22,6 @@ resource "aws_cloudwatch_log_group" "github_workflow_data" {
   )
 }
 
-# CloudWatch Log Group for Lambda function logs
 resource "aws_cloudwatch_log_group" "github_workflow_poller_lambda" {
   count             = local.github_workflow_poller.enabled ? 1 : 0
   name              = "/aws/lambda/github-workflow-data-poller"
@@ -37,7 +35,6 @@ resource "aws_cloudwatch_log_group" "github_workflow_poller_lambda" {
   )
 }
 
-# IAM role for Lambda
 resource "aws_iam_role" "github_workflow_poller_lambda" {
   count = local.github_workflow_poller.enabled ? 1 : 0
   name  = "github-workflow-data-poller-lambda"
@@ -58,7 +55,6 @@ resource "aws_iam_role" "github_workflow_poller_lambda" {
   tags = local.tags
 }
 
-# IAM policy for Lambda to write to CloudWatch Logs
 resource "aws_iam_role_policy" "github_workflow_poller_lambda" {
   count = local.github_workflow_poller.enabled ? 1 : 0
   name  = "github-workflow-data-poller-lambda-policy"
@@ -83,7 +79,6 @@ resource "aws_iam_role_policy" "github_workflow_poller_lambda" {
   })
 }
 
-# Archive the Lambda source code
 data "archive_file" "github_workflow_poller_lambda" {
   count       = local.github_workflow_poller.enabled ? 1 : 0
   type        = "zip"
@@ -91,7 +86,6 @@ data "archive_file" "github_workflow_poller_lambda" {
   output_path = "${path.module}/lambda/github_workflow_data_poller/lambda.zip"
 }
 
-# Lambda function
 resource "aws_lambda_function" "github_workflow_data_poller" {
   count            = local.github_workflow_poller.enabled ? 1 : 0
   filename         = data.archive_file.github_workflow_poller_lambda[0].output_path
@@ -126,7 +120,6 @@ resource "aws_lambda_function" "github_workflow_data_poller" {
   )
 }
 
-# EventBridge rule to trigger Lambda
 resource "aws_cloudwatch_event_rule" "github_workflow_poller" {
   count               = local.github_workflow_poller.enabled ? 1 : 0
   name                = "github-workflow-data-poller"
