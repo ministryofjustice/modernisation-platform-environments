@@ -79,6 +79,103 @@ resource "aws_cloudwatch_metric_alarm" "low_disk_space_D_volume" {
 # Low Disk Alarms for all Windows instances with E, F, G and H Volumes
 # Used for RGVW021, RGVW022, RGSW025 & RGVW027
 
+# Data source to get all EC2 instances
+data "aws_instances" "disk_instances" {
+  instance_state_names = ["running", "stopped"]
+}
+
+# Get instance details for each instance
+data "aws_instance" "disk_instance_details" {
+  for_each    = toset(data.aws_instances.disk_instances.ids)
+  instance_id = each.value
+}
+
+locals {
+  # Filter instances that have volume tags and are in production
+  instances_with_volumes = {
+    for id, instance in data.aws_instance.disk_instance_details :
+    id => instance if lookup(instance.tags, "is-production", "false") == "true"
+  }
+
+  # Define volume thresholds per instance based on current configuration
+  volume_thresholds = {
+    # Database Server (rgvw021)
+    "ami-05ddec53aa481cbc3" = {
+      "E:" = 5
+      "F:" = 5
+      "G:" = 5
+    }
+    # Primary Doc Server (rgvw022)
+    "ami-02f8251c8cdf2464f" = {
+      "E:" = 0.5
+      "F:" = 0.5
+      "G:" = 0.5
+    }
+    # WAM Data Access Server (rgsw025)
+    "ami-0b8f6843db88aa8a6" = {
+      "E:" = 5
+    }
+    # Secondary Doc Server (rgvw027)
+    "ami-0e203fec985af6465" = {
+      "E:" = 1
+      "F:" = 2
+      "H:" = 1
+    }
+  }
+
+  # Create volume alarm instances based on tags and AMI
+  volume_alarm_instances = flatten([
+    for instance_id, instance in local.instances_with_volumes : [
+      for volume_tag in ["e_volume", "f_volume", "g_volume", "h_volume"] : {
+        instance_id   = instance_id
+        instance_name = lookup(instance.tags, "Name", instance_id)
+        ami_id        = instance.ami
+        instance_type = instance.instance_type
+        volume_letter = upper(substr(volume_tag, 0, 1))
+        volume_tag    = volume_tag
+        threshold     = lookup(
+          lookup(local.volume_thresholds, instance.ami, {}),
+          "${upper(substr(volume_tag, 0, 1))}:",
+          1 # default threshold
+        )
+      } if lookup(instance.tags, volume_tag, "false") == "true"
+    ]
+  ])
+}
+
+# Create CloudWatch disk space alarms dynamically
+resource "aws_cloudwatch_metric_alarm" "low_disk_space_EFGH_volumes" {
+  for_each = local.is-production ? {
+    for alarm in local.volume_alarm_instances :
+    "${alarm.volume_tag}_${alarm.instance_id}" => alarm
+  } : {}
+
+  alarm_name          = "Low-Disk-Space-${each.value.volume_letter}:-Volume-${each.value.instance_id}"
+  comparison_operator = "LessThanOrEqualToThreshold"
+  evaluation_periods  = "5"
+  datapoints_to_alarm = "5"
+  metric_name         = "LogicalDisk % Free Space"
+  namespace           = "CWAgent"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = each.value.threshold
+  treat_missing_data  = "notBreaching"
+  alarm_description   = "This metric monitors free disk space on ${each.value.volume_letter}: of ${each.value.instance_id}. Alarm triggers below ${each.value.threshold}% for 5 minutes."
+  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
+
+  dimensions = {
+    InstanceId   = each.value.instance_id
+    instance     = "${each.value.volume_letter}:"
+    ImageId      = each.value.ami_id
+    InstanceType = each.value.instance_type
+    objectname   = "LogicalDisk"
+  }
+}
+
+/*
+# Low Disk Alarms for all Windows instances with E, F, G and H Volumes
+# Used for RGVW021, RGVW022, RGSW025 & RGVW027
+
 locals {
   volume_alert_config = local.is-production ? {
     "i-00413756d2dfcf6d2" = {
@@ -159,7 +256,7 @@ resource "aws_cloudwatch_metric_alarm" "low_disk_space_EFGH_volume" {
     objectname   = "LogicalDisk"
   }
 }
-
+*/
 # Low Available Memory Alarm
 
 resource "aws_cloudwatch_metric_alarm" "Memory_percentage_Committed_Bytes_In_Use" {
