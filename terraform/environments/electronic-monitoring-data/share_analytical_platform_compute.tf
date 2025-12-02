@@ -16,6 +16,7 @@ locals {
     "staging_mdss",
     "intermediate_fms",
     "intermediate_mdss",
+    "intermediate_tasking",
     "datamart",
     "derived",
     "test_results",
@@ -44,6 +45,7 @@ locals {
     "g4s_integrity",
     "g4s_lcm_archive",
     "g4s_tasking",
+    "intermediate_tasking",
     "scram_alcohol_monitoring",
     "g4s_lcm",
   ] : local.is-development ? ["test"] : []
