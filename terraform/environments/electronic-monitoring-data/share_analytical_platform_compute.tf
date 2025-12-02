@@ -16,7 +16,6 @@ locals {
     "staging_mdss",
     "intermediate_fms",
     "intermediate_mdss",
-    "intermediate_tasking",
     "datamart",
     "derived",
     "test_results",
