@@ -70,12 +70,6 @@ resource "aws_sns_topic_subscription" "s3_subscription" {
   endpoint  = aws_secretsmanager_secret_version.alerts_subscription_email.secret_string
 }
 
-resource "aws_sns_topic_subscription" "cw_subscription" {
-  topic_arn = aws_sns_topic.cw_alerts.arn
-  protocol  = "https"
-  endpoint  = "https://global.sns-api.chatbot.amazonaws.com"
-}
-
 resource "aws_sns_topic" "ddos_alarm" {
   name = format("%s_ddos_alarm", local.application_name)
   #kms_master_key_id = "alias/aws/sns"

@@ -655,6 +655,9 @@ resource "aws_instance" "s618358rgvw021" {
     sqlwriter_service = "true"
     sqlagent_service  = "true"
     sqlserver_backup  = "true"
+    e_volume          = "true"
+    f_volume          = "true"
+    g_volume          = "true"
   }
 }
 
@@ -686,6 +689,9 @@ resource "aws_instance" "s618358rgvw022" {
     spooler_service     = "true"
     port25_check        = "true"
     emailsender_check   = "true"
+    e_volume            = "true"
+    f_volume            = "true"
+    g_volume            = "true"
   }
 }
 
@@ -712,6 +718,7 @@ resource "aws_instance" "s618358rgsw025p" {
     patch_group    = "prod_win_patch"
     backup         = true
     wwwpub_service = "true"
+    e_volume       = "true"
   }
 }
 
@@ -740,6 +747,10 @@ resource "aws_instance" "s618358rgvw027" {
     wwwpub_service  = "true"
     spooler_service = "true"
     port25_check    = "true"
+    e_volume        = "true"
+    f_volume        = "true"
+    g_volume        = "true"
+    h_volume        = "true"
   }
 }
 
