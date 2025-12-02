@@ -20,8 +20,8 @@
       "domain_name": "modernisation-platform.service.justice.gov.uk",
       "ecs_memory": 4096,
       "ecs_cpu": 2048,
-      "bury_court_id": 52,
-      "bury_post_2015_send_code": 157
+      "bury_court_id": "52",
+      "bury_post_2015_send_code": "157"
     },
     "preproduction": {
       "db_name": "dacp_db_pre_prod",
@@ -43,8 +43,8 @@
       "domain_name": "modernisation-platform.service.justice.gov.uk",
       "ecs_memory": 8192,
       "ecs_cpu": 2048,
-      "bury_court_id": 52,
-      "bury_post_2015_send_code": 157
+      "bury_court_id": "52",
+      "bury_post_2015_send_code": "157"
     },
     "production": {
       "db_name": "dacp_db_prod",
@@ -66,8 +66,8 @@
       "domain_name": "divorce-section-search.service.justice.gov.uk",
       "ecs_memory": 8192,
       "ecs_cpu": 2048,
-      "bury_court_id": 52,
-      "bury_post_2015_send_code": 157
+      "bury_court_id": "52",
+      "bury_post_2015_send_code": "157"
     }
   }
 }
