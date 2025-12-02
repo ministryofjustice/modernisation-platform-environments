@@ -10,6 +10,8 @@ locals {
 }
 
 resource "aws_cloudwatch_log_group" "github_workflow_data" {
+  #checkov:skip=CKV_AWS_338: Logs can be retained for less than 1 year.
+  #checkov:skip=CKV_AWS_158: Log does not contain sensitive data.
   count             = local.github_workflow_poller.enabled ? 1 : 0
   name              = "modernisation-platform-workflow-data"
   retention_in_days = local.github_workflow_poller.log_retention_days
@@ -23,6 +25,8 @@ resource "aws_cloudwatch_log_group" "github_workflow_data" {
 }
 
 resource "aws_cloudwatch_log_group" "github_workflow_poller_lambda" {
+  #checkov:skip=CKV_AWS_338: Logs can be retained for less than 1 year.
+  #checkov:skip=CKV_AWS_158: Log does not contain sensitive data.
   count             = local.github_workflow_poller.enabled ? 1 : 0
   name              = "/aws/lambda/github-workflow-data-poller"
   retention_in_days = local.github_workflow_poller.log_retention_days
@@ -86,16 +90,41 @@ data "archive_file" "github_workflow_poller_lambda" {
   output_path = "${path.module}/lambda/github_workflow_data_poller/lambda.zip"
 }
 
+# Create a signing profile (or reference existing one)
+resource "aws_signer_signing_profile" "lambda" {
+  platform_id = "AWSLambda-SHA384-ECDSA"
+  name_prefix = "lambda_signing_"
+}
+
+# Create code signing configuration
+resource "aws_lambda_code_signing_config" "this" {
+  allowed_publishers {
+    signing_profile_version_arns = [
+      aws_signer_signing_profile.lambda.arn
+    ]
+  }
+  policies {
+    untrusted_artifact_on_deployment = "Enforce"  # or "Warn"
+  }
+  description = "Code signing config for Lambda"
+}
+
 resource "aws_lambda_function" "github_workflow_data_poller" {
-  count            = local.github_workflow_poller.enabled ? 1 : 0
-  filename         = data.archive_file.github_workflow_poller_lambda[0].output_path
-  function_name    = "github-workflow-data-poller"
-  role             = aws_iam_role.github_workflow_poller_lambda[0].arn
-  handler          = "github_workflow_data_poller.lambda_handler"
-  source_code_hash = data.archive_file.github_workflow_poller_lambda[0].output_base64sha256
-  runtime          = "python3.12"
-  timeout          = 300
-  description      = "Polls GitHub Actions workflow data and writes to CloudWatch Logs"
+  #checkov:skip=CKV_AWS_173: Does not have sensitive environment variables.
+  #checkov:skip=CKV_AWS_50: No x-ray tracing needed.
+  #checkov:skip=CKV_AWS_116: Dead Letter Queue not needed.
+  #checkov:skip=CKV_AWS_117: Lambda not deployed in a VPC.
+  count                   = local.github_workflow_poller.enabled ? 1 : 0
+  filename                = data.archive_file.github_workflow_poller_lambda[0].output_path
+  function_name           = "github-workflow-data-poller"
+  role                    = aws_iam_role.github_workflow_poller_lambda[0].arn
+  handler                 = "github_workflow_data_poller.lambda_handler"
+  source_code_hash        = data.archive_file.github_workflow_poller_lambda[0].output_base64sha256
+  runtime                 = "python3.12"
+  timeout                 = 300
+  description             = "Polls GitHub Actions workflow data and writes to CloudWatch Logs"
+  code_signing_config_arn         = aws_lambda_code_signing_config.this.arn
+  reserved_concurrent_executions  = 10
 
   environment {
     variables = {
