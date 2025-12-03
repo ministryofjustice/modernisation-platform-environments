@@ -191,8 +191,8 @@ module "clean_after_mdss_load" {
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "clean_after_mdss_load"
-  role_name                      = aws_iam_role.load_mdss[0].name
-  role_arn                       = aws_iam_role.load_mdss[0].arn
+  role_name                      = aws_iam_role.clean_after_mdss_load[0].name
+  role_arn                       = aws_iam_role.clean_after_mdss_load[0].arn
   handler                        = "clean_after_mdss_load.handler"
   memory_size                    = 2048
   timeout                        = 900
@@ -205,7 +205,7 @@ module "clean_after_mdss_load" {
 
   environment_variables = {
     CATALOG_ID      = data.aws_caller_identity.current.account_id
-    LAMBDA_ROLE_ARN = aws_iam_role.load_mdss[0].arn
+    LAMBDA_ROLE_ARN = aws_iam_role.clean_after_mdss_load[0].arn
   }
 }
 

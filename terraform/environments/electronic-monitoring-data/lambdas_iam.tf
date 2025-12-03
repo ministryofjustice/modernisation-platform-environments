@@ -1013,3 +1013,73 @@ resource "aws_lakeformation_permissions" "fms_add_create_db" {
   principal        = aws_iam_role.load_fms[0].arn
   catalog_resource = true
 }
+
+#-----------------------------------------------------------------------------------
+# Clean after MDSS load IAM Role
+#-----------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "clean_after_mdss_load_lambda_role_policy_document" {
+  count = local.is-development ? 0 : 1
+
+  statement {
+    sid    = "GluePermissionsForCleanup"
+    effect = "Allow"
+    actions = [
+      "glue:GetTables",
+      "glue:GetTable",
+      "glue:GetDatabase",
+      "glue:DeleteTable",
+      "glue:DeleteDatabase",
+    ]
+    resources = [
+      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:catalog",
+      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:database/*",
+      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/*/*",
+    ]
+  }
+
+  statement {
+    sid    = "S3PermissionsForCleanup"
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket",
+      "s3:DeleteObject",
+      "s3:DeleteObjectVersion",
+      "s3:GetBucketLocation",
+    ]
+    resources = [
+      module.s3-create-a-derived-table-bucket.bucket.arn,
+      "${module.s3-create-a-derived-table-bucket.bucket.arn}/*",
+    ]
+  }
+
+  statement {
+    sid    = "LakeFormationGrantRevoke"
+    effect = "Allow"
+    actions = [
+      "lakeformation:GrantPermissions",
+      "lakeformation:RevokePermissions",
+      "lakeformation:ListPermissions",
+      "lakeformation:GetDataAccess",
+    ]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_role" "clean_after_mdss_load" {
+  count              = local.is-development ? 0 : 1
+  name               = "clean_after_mdss_load_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_policy" "clean_after_mdss_load_lambda_role_policy" {
+  count  = local.is-development ? 0 : 1
+  name   = "clean_after_mdss_load_lambda_policy"
+  policy = data.aws_iam_policy_document.clean_after_mdss_load_lambda_role_policy_document[0].json
+}
+
+resource "aws_iam_role_policy_attachment" "clean_after_mdss_load_lambda_policy_attachment" {
+  count      = local.is-development ? 0 : 1
+  role       = aws_iam_role.clean_after_mdss_load[0].name
+  policy_arn = aws_iam_policy.clean_after_mdss_load_lambda_role_policy[0].arn
+}
