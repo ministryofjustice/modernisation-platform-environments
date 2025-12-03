@@ -60,7 +60,8 @@ resource "aws_iam_policy" "ecs_quicksight_policy" {
       {
         Effect = "Allow"
         Action = [
-          "quicksight:DescribeUser"
+          "quicksight:DescribeUser",
+          "quicksight:GetDashboardEmbedUrl"
         ]
         Resource = "arn:aws:quicksight:eu-west-2:${var.aws_account_id}:user/default/*"
       }
