@@ -68,6 +68,11 @@ resource "aws_iam_policy" "quicksight_policy" {
   })
 }
 
+resource "aws_iam_role_policy_attachment" "ecs_quicksight_policy" {
+  role       = aws_iam_role.ecs_task_role.name
+  policy_arn = aws_iam_policy.ecs_quicksight_policy.arn
+}
+
 
 
 resource "aws_iam_role_policy_attachment" "ecs_exec_task_role_policy" {
