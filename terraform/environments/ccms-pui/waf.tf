@@ -27,13 +27,17 @@ resource "aws_wafv2_web_acl" "pui_web_acl" {
   description = "AWS WAF Web ACL for PUI Application Load Balancer"
 
   default_action {
-    block {
-      custom_response {
-        custom_response_body_key = "maintenance-response"
-        response_code            = 503
-      }
-    }
+    block {}
   }
+
+  # default_action {
+  #   block {
+  #     custom_response {
+  #       custom_response_body_key = "maintenance-response"
+  #       response_code            = 503
+  #     }
+  #   }
+  # }
 
 #   custom_response_body {
 #     key          = "maintenance-response"
