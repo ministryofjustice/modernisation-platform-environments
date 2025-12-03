@@ -74,7 +74,7 @@ resource "aws_lambda_function" "waf_toggle" {
       RULE_NAME    = var.rule_name
 
       # Custom response body - when provided Lambda will register this body on the WebACL
-      CUSTOM_BODY_NAME = "maintenance-response"
+      CUSTOM_BODY_NAME = "maintenance_html"
       CUSTOM_BODY_HTML = <<EOT
     <!doctype html><html lang="en"><head>
     <meta charset="utf-8"><title>Maintenance</title>
@@ -99,7 +99,7 @@ resource "aws_cloudwatch_event_rule" "waf_allow_0700_uk" {
 
 resource "aws_cloudwatch_event_rule" "waf_block_1900_uk" {
   name                = "waf-block-1900-${local.environment}"
-  schedule_expression = "cron(30 21 ? * MON-SUN *)"
+  schedule_expression = "cron(00 23 ? * MON-SUN *)"
   description         = "Set WAF rule to BLOCK at 19:00 UK daily"
 }
 
