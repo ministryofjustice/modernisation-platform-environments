@@ -467,7 +467,7 @@ resource "aws_instance" "s618358rgvw024" {
   }
 }
 
-# WAM Sata Access Server
+# WAM Data Access Server
 
 resource "aws_instance" "s618358rgsw025" {
   # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
@@ -716,6 +716,7 @@ resource "aws_instance" "s618358rgsw025p" {
   tags = {
     Name           = "s618358rgsw025"
     patch_group    = "prod_win_patch"
+    is-production  = true
     backup         = true
     wwwpub_service = "true"
     e_volume       = "true"
