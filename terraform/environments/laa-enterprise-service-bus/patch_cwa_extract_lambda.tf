@@ -54,7 +54,7 @@ resource "aws_security_group_rule" "patch_cwa_extract_egress_safe01" {
   from_port         = 2484
   to_port           = 2484
   protocol          = "tcp"
-  cidr_blocks       = ["10.205.14.0/26", "10.205.14.0/26"] # CWA ECP SAFE01 Loadbalancer subnets
+  cidr_blocks       = ["10.205.14.0/26", "10.205.14.64/26"] # CWA ECP SAFE01 Loadbalancer subnets
   security_group_id = aws_security_group.patch_cwa_extract_sg[0].id
   description       = "CWA Prod - Safe01 DB"
 }
