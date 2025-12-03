@@ -84,6 +84,13 @@ resource "aws_iam_role_policy" "datasync_password_updater_policy" {
           "datasync:DescribeLocationFsxWindows"
         ]
         Resource = aws_datasync_location_fsx_windows_file_system.dfi_fsx_destination[0].arn
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "fsx:DescribeFileSystems",
+        ]
+        Resource = "arn:aws:fsx:*:*:*"
       }
     ]
   })
