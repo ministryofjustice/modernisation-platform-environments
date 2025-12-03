@@ -98,7 +98,7 @@ resource "aws_cloudwatch_event_rule" "waf_allow_0700_uk" {
 
 resource "aws_cloudwatch_event_rule" "waf_block_1900_uk" {
   name                = "waf-block-1900-${local.environment}"
-  schedule_expression = "cron(00 19 ? * MON-SUN *)"
+  schedule_expression = "cron(00 18 ? * MON-SUN *)"
   description         = "Set WAF rule to BLOCK at 19:00 UK daily"
 }
 
@@ -129,7 +129,7 @@ resource "aws_lambda_permission" "waf_events_allow" {
 
 
 resource "aws_lambda_permission" "waf_events_block" {
-  statement_id  = "BlockEvents2130-${local.environment}"
+  statement_id  = "BlockEvents1900-${local.environment}"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.waf_toggle.arn
   principal     = "events.amazonaws.com"
