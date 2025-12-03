@@ -75,7 +75,7 @@ resource "aws_lambda_function" "root_snapshot_to_ami" {
   tags = merge(
     local.tags,
     {
-      Name = "${aws_lambda_function.root_snapshot_to_ami.function_name}-${local.application_name}"
+      Name = "root_snapshot_to_ami-${local.application_name}"
     }
   )
 }
