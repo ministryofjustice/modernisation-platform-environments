@@ -38,7 +38,6 @@ data "aws_acm_certificate" "PPUD_Training_ALB" {
   statuses    = ["ISSUED"]
 }
 
-
 # ACM certificate for PPUD PROD ALB
 data "aws_acm_certificate" "PPUD_PROD_ALB" {
   count    = local.is-production == true ? 1 : 0
