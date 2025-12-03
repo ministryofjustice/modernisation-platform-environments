@@ -78,6 +78,7 @@ locals {
     "curated_fep",
     "g4s_lcm_archive_curated",
     "g4s_lcm_curated",
+    "intermediate_tasking",
   ] : []
   dev_dbs_to_grant       = local.is-production ? [for db in local.prod_dbs_to_grant : "${db}_historic_dev_dbt"] : []
   dbt_dbs_to_grant       = [for db in local.dbt_dbs : "${db}${local.dbt_suffix}"]
