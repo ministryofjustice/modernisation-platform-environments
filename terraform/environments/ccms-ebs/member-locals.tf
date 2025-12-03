@@ -12,6 +12,12 @@ locals {
 
 
   lambda_folder_name = ["lambda_delivery", "ftp_lambda_layer", "payment_lambda_layer", "cloudwatch_sns_layer"]
+
+  lambda_source_hashes = [
+    for f in fileset("./lambda/cloudwatch_alarm_slack_integration", "**") :
+    sha256(file("${path.module}/lambda/cloudwatch_alarm_slack_integration/${f}"))
+  ]
+
   data_subnets = [
     data.aws_subnet.data_subnets_a.id,
     data.aws_subnet.data_subnets_b.id,

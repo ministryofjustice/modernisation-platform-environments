@@ -45,20 +45,16 @@ resource "aws_iam_role_policy" "lambda_cloudwatch_sns_policy" {
   })
 }
 
-# resource "aws_sns_topic" "certificate_expiration_alerts" {
-#   name = "${local.application_name}-${local.environment}-acm-certificate-alerts"
-#   tags = merge(local.tags, {
-#     Name = "${local.application_name}-${local.environment}-certificate-monitor"
-#   })
-# }
-
 resource "aws_sns_topic_subscription" "lambda_cloudwatch_sns" {
   topic_arn = aws_sns_topic.cw_alerts.arn
   protocol  = "lambda"
   endpoint  = aws_lambda_function.cloudwatch_sns.arn
 }
 
-# Lambda Layer
+# Lambda Layer -> requirements.txt for layer function has been generated following process in the link but it is same as 
+# what has been used for edrms docs exception, also requirements.txt has been added. The zip file for layered function
+# have been added in s3 bucket manually. https://dsdmoj.atlassian.net/wiki/spaces/LDD/pages/5975606239/Build+Layered+Function+for+Lambda
+
 resource "aws_lambda_layer_version" "lambda_cloudwatch_sns_layer" {
   # filename                 = "lambda/layerV1.zip"
   layer_name               = "${local.application_name}-${local.environment}-cloudwatch-sns-layer"
@@ -72,13 +68,13 @@ resource "aws_lambda_layer_version" "lambda_cloudwatch_sns_layer" {
 
 data "archive_file" "lambda_zip" {
   type        = "zip"
-  source_file = "${path.module}/lambda/cloudwatch_alarm_slack_integration/lambda_function.py"
+  source_dir = "${path.module}/lambda/cloudwatch_alarm_slack_integration"
   output_path = "${path.module}/lambda/cloudwatch_alarm_slack_integration.zip"
 }
 
 resource "aws_lambda_function" "cloudwatch_sns" {
   filename         = data.archive_file.lambda_zip.output_path
-  source_code_hash = data.archive_file.lambda_zip.output_base64sha256
+  source_code_hash = base64sha256(join("", local.lambda_source_hashes))
   function_name    = "${local.application_name}-${local.environment}-cloudwatch-alarm-slack-integration"
   role             = aws_iam_role.lambda_cloudwatch_sns_role.arn
   handler          = "lambda_function.lambda_handler"
