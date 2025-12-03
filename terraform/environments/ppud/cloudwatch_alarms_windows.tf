@@ -150,7 +150,7 @@ resource "aws_cloudwatch_metric_alarm" "low_disk_space_EFGH_volumes" {
     "${alarm.volume_tag}_${alarm.instance_id}" => alarm
   } : {}
 
-  alarm_name          = "Low-Disk-Space-${each.value.volume_letter}:-Volume-${each.value.instance_id}"
+  alarm_name          = "Low-Disk-Space-${each.value.volume_letter}-Volume-${each.value.instance_id}"
   comparison_operator = "LessThanOrEqualToThreshold"
   evaluation_periods  = "5"
   datapoints_to_alarm = "5"
@@ -172,91 +172,6 @@ resource "aws_cloudwatch_metric_alarm" "low_disk_space_EFGH_volumes" {
   }
 }
 
-/*
-# Low Disk Alarms for all Windows instances with E, F, G and H Volumes
-# Used for RGVW021, RGVW022, RGSW025 & RGVW027
-
-locals {
-  volume_alert_config = local.is-production ? {
-    "i-00413756d2dfcf6d2" = {
-      volumes = {
-        "E:" = 5
-      },
-      ImageId      = "ami-0b8f6843db88aa8a6",
-      InstanceType = "c5.4xlarge"
-    },
-    "i-080498c4c9d25e6bd" = {
-      volumes = {
-        "E:" = 5,
-        "F:" = 5,
-        "G:" = 5
-      },
-      ImageId      = "ami-05ddec53aa481cbc3",
-      InstanceType = "m5.2xlarge"
-    },
-    "i-029d2b17679dab982" = {
-      volumes = {
-        "E:" = 0.5,
-        "F:" = 0.5,
-        "G:" = 0.5
-      },
-      ImageId      = "ami-02f8251c8cdf2464f",
-      InstanceType = "m5.xlarge"
-    },
-    "i-00cbccc46d25e77c6" = {
-      volumes = {
-        "E:" = 1,
-        "F:" = 2,
-        "H:" = 1
-      },
-      ImageId      = "ami-0e203fec985af6465",
-      InstanceType = "m5.xlarge"
-    }
-  } : {}
-}
-
-locals {
-  volume_alarm_matrix = flatten([
-    for instance_id, config in local.volume_alert_config : [
-      for volume_letter, threshold in config.volumes : {
-        key           = "${instance_id}-${volume_letter}"
-        instance_id   = instance_id
-        volume_letter = volume_letter
-        threshold     = threshold
-        ImageId       = config.ImageId
-        InstanceType  = config.InstanceType
-      }
-    ]
-  ])
-  volume_alarm_map = {
-    for item in local.volume_alarm_matrix :
-    item.key => item
-  }
-}
-
-resource "aws_cloudwatch_metric_alarm" "low_disk_space_EFGH_volume" {
-  for_each            = local.is-production ? local.volume_alarm_map : {}
-  alarm_name          = "Low-Disk-Space-${each.value.volume_letter}-Volume-${each.value.instance_id}"
-  comparison_operator = "LessThanOrEqualToThreshold"
-  evaluation_periods  = "5"
-  datapoints_to_alarm = "5"
-  metric_name         = "LogicalDisk % Free Space"
-  namespace           = "CWAgent"
-  period              = "60"
-  statistic           = "Average"
-  threshold           = each.value.threshold
-  treat_missing_data  = "notBreaching"
-  alarm_description   = "This metric monitors free disk space on ${each.value.volume_letter} of ${each.value.instance_id}. Alarm triggers below ${each.value.threshold}% for 5 minutes."
-  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
-  dimensions = {
-    InstanceId   = each.value.instance_id
-    instance     = each.value.volume_letter
-    ImageId      = each.value.ImageId
-    InstanceType = each.value.InstanceType
-    objectname   = "LogicalDisk"
-  }
-}
-*/
 # Low Available Memory Alarm
 
 resource "aws_cloudwatch_metric_alarm" "Memory_percentage_Committed_Bytes_In_Use" {
