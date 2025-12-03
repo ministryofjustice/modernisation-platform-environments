@@ -67,6 +67,7 @@ resource "aws_lambda_function" "root_snapshot_to_ami" {
   handler                        = "root_snapshot_to_ami.lambda_handler"
   source_code_hash               = data.archive_file.lambda_zip.output_base64sha256
   runtime                        = "python3.12"
+  memory_size                    = "512"
   timeout                        = "120"
   reserved_concurrent_executions = 1
 }
