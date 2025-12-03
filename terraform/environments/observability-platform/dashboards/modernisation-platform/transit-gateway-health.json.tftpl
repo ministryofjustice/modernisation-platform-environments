@@ -35,7 +35,7 @@
         "type": "query",
         "label": "AWS Region",
         "datasource": "core-network-services-production-cloudwatch",
-        "query": "Regions",
+        "query": "regions()",
         "refresh": 1,
         "includeAll": false,
         "multi": false,
@@ -50,7 +50,7 @@
         "type": "query",
         "label": "Transit Gateway",
         "datasource": "core-network-services-production-cloudwatch",
-        "query": "dimension_values($region, AWS/TransitGateway, BytesIn, TransitGateway)",
+        "query": "dimension_values(eu-west-2, AWS/TransitGateway, BytesIn, TransitGateway)",
         "refresh": 1,
         "includeAll": false,
         "multi": false
@@ -60,7 +60,7 @@
         "type": "query",
         "label": "Transit Gateway Attachment",
         "datasource": "core-network-services-production-cloudwatch",
-        "query": "dimension_values($region, AWS/TransitGateway, BytesIn, TransitGatewayAttachment, {\"TransitGateway\": \"$tgw_id\"})",
+        "query": "dimension_values(eu-west-2, AWS/TransitGateway, BytesIn, TransitGatewayAttachment, {\"TransitGateway\": \"$tgw_id\"})",
         "refresh": 1,
         "includeAll": true,
         "allValue": "*",
@@ -73,7 +73,7 @@
       "id": 1,
       "type": "stat",
       "title": "Overall TGW Drop %",
-      "description": "Dropped bytes (blackhole + no route) as % of total bytes for selected Transit Gateway",
+      "description": "Dropped bytes (blackhole + no route) as % of total bytes for each Transit Gateway",
       "datasource": "core-network-services-production-cloudwatch",
       "gridPos": {
         "h": 6,
@@ -111,47 +111,63 @@
       "targets": [
         {
           "refId": "A",
-          "region": "$region",
+          "queryMode": "Metrics",
+          "metricQueryType": 0,
+          "metricEditorMode": 0,
+          "region": "default",
           "namespace": "AWS/TransitGateway",
           "metricName": "BytesDropCountBlackhole",
           "statistic": "Sum",
           "dimensions": {
-            "TransitGateway": "$tgw_id"
+            "TransitGateway": "*"
           },
-          "period": "60"
+          "period": "",
+          "matchExact": true
         },
         {
           "refId": "B",
-          "region": "$region",
+          "queryMode": "Metrics",
+          "metricQueryType": 0,
+          "metricEditorMode": 0,
+          "region": "default",
           "namespace": "AWS/TransitGateway",
           "metricName": "BytesDropCountNoRoute",
           "statistic": "Sum",
           "dimensions": {
-            "TransitGateway": "$tgw_id"
+            "TransitGateway": "*"
           },
-          "period": "60"
+          "period": "",
+          "matchExact": true
         },
         {
           "refId": "C",
-          "region": "$region",
+          "queryMode": "Metrics",
+          "metricQueryType": 0,
+          "metricEditorMode": 0,
+          "region": "default",
           "namespace": "AWS/TransitGateway",
           "metricName": "BytesIn",
           "statistic": "Sum",
           "dimensions": {
-            "TransitGateway": "$tgw_id"
+            "TransitGateway": "*"
           },
-          "period": "60"
+          "period": "",
+          "matchExact": true
         },
         {
           "refId": "D",
-          "region": "$region",
+          "queryMode": "Metrics",
+          "metricQueryType": 0,
+          "metricEditorMode": 0,
+          "region": "default",
           "namespace": "AWS/TransitGateway",
           "metricName": "BytesOut",
           "statistic": "Sum",
           "dimensions": {
-            "TransitGateway": "$tgw_id"
+            "TransitGateway": "*"
           },
-          "period": "60"
+          "period": "",
+          "matchExact": true
         },
         {
           "refId": "E",
@@ -163,7 +179,7 @@
       "id": 2,
       "type": "timeseries",
       "title": "TGW Drop % Over Time",
-      "description": "Trend of dropped bytes as % of total bytes for the selected Transit Gateway",
+      "description": "Trend of dropped bytes as % of total bytes for each Transit Gateway",
       "datasource": "core-network-services-production-cloudwatch",
       "gridPos": {
         "h": 6,
@@ -199,47 +215,63 @@
       "targets": [
         {
           "refId": "A",
-          "region": "$region",
+          "queryMode": "Metrics",
+          "metricQueryType": 0,
+          "metricEditorMode": 0,
+          "region": "default",
           "namespace": "AWS/TransitGateway",
           "metricName": "BytesDropCountBlackhole",
           "statistic": "Sum",
           "dimensions": {
-            "TransitGateway": "$tgw_id"
+            "TransitGateway": "*"
           },
-          "period": "60"
+          "period": "",
+          "matchExact": true
         },
         {
           "refId": "B",
-          "region": "$region",
+          "queryMode": "Metrics",
+          "metricQueryType": 0,
+          "metricEditorMode": 0,
+          "region": "default",
           "namespace": "AWS/TransitGateway",
           "metricName": "BytesDropCountNoRoute",
           "statistic": "Sum",
           "dimensions": {
-            "TransitGateway": "$tgw_id"
+            "TransitGateway": "*"
           },
-          "period": "60"
+          "period": "",
+          "matchExact": true
         },
         {
           "refId": "C",
-          "region": "$region",
+          "queryMode": "Metrics",
+          "metricQueryType": 0,
+          "metricEditorMode": 0,
+          "region": "default",
           "namespace": "AWS/TransitGateway",
           "metricName": "BytesIn",
           "statistic": "Sum",
           "dimensions": {
-            "TransitGateway": "$tgw_id"
+            "TransitGateway": "*"
           },
-          "period": "60"
+          "period": "",
+          "matchExact": true
         },
         {
           "refId": "D",
-          "region": "$region",
+          "queryMode": "Metrics",
+          "metricQueryType": 0,
+          "metricEditorMode": 0,
+          "region": "default",
           "namespace": "AWS/TransitGateway",
           "metricName": "BytesOut",
           "statistic": "Sum",
           "dimensions": {
-            "TransitGateway": "$tgw_id"
+            "TransitGateway": "*"
           },
-          "period": "60"
+          "period": "",
+          "matchExact": true
         },
         {
           "refId": "E",
@@ -279,7 +311,10 @@
       "targets": [
         {
           "refId": "A",
-          "region": "$region",
+          "queryMode": "Metrics",
+          "metricQueryType": 0,
+          "metricEditorMode": 0,
+          "region": "eu-west-2",
           "namespace": "AWS/TransitGateway",
           "metricName": "BytesDropCountBlackhole",
           "statistic": "Sum",
@@ -288,11 +323,15 @@
             "TransitGatewayAttachment": "$tgw_attachment"
           },
           "period": "300",
+          "matchExact": false,
           "hide": true
         },
         {
           "refId": "B",
-          "region": "$region",
+          "queryMode": "Metrics",
+          "metricQueryType": 0,
+          "metricEditorMode": 0,
+          "region": "eu-west-2",
           "namespace": "AWS/TransitGateway",
           "metricName": "BytesDropCountNoRoute",
           "statistic": "Sum",
@@ -301,6 +340,7 @@
             "TransitGatewayAttachment": "$tgw_attachment"
           },
           "period": "300",
+          "matchExact": false,
           "hide": true
         },
         {
