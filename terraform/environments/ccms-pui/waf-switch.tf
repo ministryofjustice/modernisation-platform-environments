@@ -60,8 +60,8 @@ resource "aws_iam_role_policy" "waf_lambda_policy" {
 resource "aws_lambda_function" "waf_toggle" {
   function_name    = "waf-toggle-${local.environment}"
   role             = aws_iam_role.waf_lambda_role.arn
-  filename         = data.archive_file.waf_toggle_zip.output_path
-  source_code_hash = data.archive_file.waf_toggle_zip.output_base64sha256
+  filename         = data.archive_file.pui_waf_toggle_zip.output_path
+  source_code_hash = data.archive_file.pui_waf_toggle_zip.output_base64sha256
   handler          = "waf_lambda_function.lambda_handler"
   runtime          = "python3.11"
   timeout          = 30
