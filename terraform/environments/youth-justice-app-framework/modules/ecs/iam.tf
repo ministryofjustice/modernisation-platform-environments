@@ -50,7 +50,7 @@ resource "aws_iam_role_policy_attachment" "ecs_task_role_policy" {
 }
 
 
-resource "aws_iam_policy" "quicksight_policy" {
+resource "aws_iam_policy" "ecs_quicksight_policy" {
   name        = "${var.cluster_name}-ecs-quicksight-access"
   description = "Allows ECS tasks to access QuickSight"
 
