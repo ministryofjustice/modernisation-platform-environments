@@ -80,7 +80,7 @@ locals {
     "g4s_lcm_curated",
   ] : []
 
-   deployed_prod_dbs = local.is-production ? [
+  deployed_prod_dbs = local.is-production ? [
     "intermediate_tasking",
     "intermediate_tasking_historic_dev_dbt",
   ] : []
@@ -90,7 +90,7 @@ locals {
   dbs_to_grant           = toset(flatten([local.prod_dbs_to_grant, local.dev_dbs_to_grant, local.dbt_dbs_to_grant]))
 
 
-  existing_dbs_to_grant  = toset(flatten([local.live_feed_dbs_to_grant, local.historic_source_dbs, deployed_prod_dbs]))
+  existing_dbs_to_grant = toset(flatten([local.live_feed_dbs_to_grant, local.historic_source_dbs, local.deployed_prod_dbs]))
 }
 
 # Source Analytics DBT Secrets
