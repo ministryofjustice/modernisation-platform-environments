@@ -211,8 +211,8 @@ resource "aws_vpc_security_group_ingress_rule" "ap_db_oracle" {
   for_each = try({ for env, cidr in local.ap_env_cidrs : env => cidr if env == var.env_name }, {})
 
   ip_protocol       = "tcp"
-  from_port         = 1521
-  to_port           = 1522
+  from_port         = local.db_port
+  to_port           = local.db_port
   cidr_ipv4         = each.value
   security_group_id = aws_security_group.db_ec2.id
   description       = "Allow communication in on port 1521,1522 from AP ${each.key}"
