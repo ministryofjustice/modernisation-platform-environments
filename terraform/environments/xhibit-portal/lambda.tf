@@ -56,7 +56,6 @@ data "archive_file" "lambda_zip" {
 }
 
 resource "aws_lambda_function" "root_snapshot_to_ami" {
-  # checkov:skip=CKV_AWS_117: "Lambda is not environment specific"
   # checkov:skip=CKV_AWS_116: "DLQ not required"
   # checkov:skip=CKV_AWS_272: "Ensure AWS Lambda function is configured to validate code-signing"
   filename                       = "lambda/lambda_function.zip"
@@ -72,6 +71,13 @@ resource "aws_lambda_function" "root_snapshot_to_ami" {
   tracing_config {
     mode = "Active"
   }
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "${aws_lambda_function.root_snapshot_to_ami.function_name}-${local.application_name}"
+    }
+  )
 }
 
 resource "aws_cloudwatch_event_rule" "every_day_0130" {
