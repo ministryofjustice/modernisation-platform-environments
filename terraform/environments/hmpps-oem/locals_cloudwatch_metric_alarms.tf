@@ -8,9 +8,6 @@ locals {
     }
 
     test = {
-      # az-noms-dev-test-environments
-      offloc-stage = ["stage.offloc.service.justice.gov.uk", true, "azure-fixngo-pagerduty"]
-
       # hmpps-domain-services
       rdgateway = ["rdgateway1.test.hmpps-domain.service.justice.gov.uk", true, "hmpps-domain-services-pagerduty"]
       rdweb     = ["rdweb1.test.hmpps-domain.service.justice.gov.uk", true, "hmpps-domain-services-pagerduty"]
