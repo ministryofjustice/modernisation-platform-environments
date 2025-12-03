@@ -82,6 +82,7 @@ locals {
   ] : []
 
    deployed_prod_dbs = local.is-production ? [
+    "buddi_buddi_historic_dev_dbt",  # buddi seed
     "intermediate_tasking",
     "intermediate_tasking_historic_dev_dbt",
   ] : []
