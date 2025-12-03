@@ -26,33 +26,33 @@ resource "aws_wafv2_web_acl" "pui_web_acl" {
   scope       = "REGIONAL"
   description = "AWS WAF Web ACL for PUI Application Load Balancer"
 
-  default_action {
-    block {}
-  }
-
   # default_action {
-  #   block {
-  #     custom_response {
-  #       custom_response_body_key = "maintenance-response"
-  #       response_code            = 503
-  #     }
-  #   }
+  #   block {}
   # }
 
-#   custom_response_body {
-#     key          = "maintenance-response"
-#     content      = <<EOT
-# <!doctype html><html lang="en"><head>
-# <meta charset="utf-8"><title>Maintenance</title>
-# <style>body{font-family:sans-serif;background:#0b1a2b;color:#fff;text-align:center;padding:4rem;}
-# .card{max-width:600px;margin:auto;background:#12243a;padding:2rem;border-radius:10px;}
-# </style></head><body><div class="card">
-# <h1>Scheduled Maintenance</h1>
-# <p>The service is unavailable from 19:00 to 07:00 UK time. Apologies for any inconvenience caused.</p>
-# </div></body></html>
-# EOT
-#     content_type = "TEXT_HTML"
-#   }
+  default_action {
+    block {
+      custom_response {
+        custom_response_body_key = "maintenance-response"
+        response_code            = 503
+      }
+    }
+  }
+
+  custom_response_body {
+    key          = "maintenance-response"
+    content      = <<EOT
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><title>Maintenance</title>
+<style>body{font-family:sans-serif;background:#0b1a2b;color:#fff;text-align:center;padding:4rem;}
+.card{max-width:600px;margin:auto;background:#12243a;padding:2rem;border-radius:10px;}
+</style></head><body><div class="card">
+<h1>Scheduled Maintenance</h1>
+<p>The service is unavailable from 19:00 to 07:00 UK time. Apologies for any inconvenience caused.</p>
+</div></body></html>
+EOT
+    content_type = "TEXT_HTML"
+  }
 
   rule {
     name     = "AWS-AWSManagedRulesCommonRuleSet"
