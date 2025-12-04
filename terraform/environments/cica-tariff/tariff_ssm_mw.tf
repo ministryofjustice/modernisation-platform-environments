@@ -84,8 +84,8 @@ resource "aws_ssm_maintenance_window_task" "create_image_task" {
   task_arn         = "AWS-CreateImage"
   priority         = 1
   service_role_arn = aws_iam_role.mw_execution_role[0].arn
-  max_concurrency  = "1"
-  max_errors       = "1"
+  # max_concurrency  = "1"
+  # max_errors       = "1"
   task_invocation_parameters {
     automation_parameters {
       document_version = "$LATEST"
