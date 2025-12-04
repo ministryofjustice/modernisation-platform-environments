@@ -122,7 +122,7 @@ resource "aws_glue_catalog_database" "cadt_databases" {
 
   name = each.value
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
     ignore_changes = [
       description,
       location_uri,
