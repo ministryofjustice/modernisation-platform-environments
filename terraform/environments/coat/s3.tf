@@ -400,6 +400,11 @@ resource "aws_s3_object" "pod_waste_reports" {
   acl    = "private"
 }
 
+moved {
+  from = module.cur_v2_hourly_enriched
+  to   = module.cur_v2_hourly_enriched[0]
+}
+
 module "cur_v2_hourly_enriched" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
