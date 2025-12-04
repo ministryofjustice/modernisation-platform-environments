@@ -246,7 +246,7 @@ module "cur_v2_hourly_enriched_replication_policy" {
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
   version = "5.60.0"
-  name    = "${module.cur_v2_hourly_enriched_replication_role.iam_role_name}-policy"
+  name    = "${module.cur_v2_hourly_enriched_replication_role[0].iam_role_name}-policy"
 
   policy = data.aws_iam_policy_document.cur_v2_hourly_enriched_replication.json
 }

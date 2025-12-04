@@ -442,7 +442,7 @@ module "cur_v2_hourly_enriched" {
   ]
 
   replication_configuration = {
-    role = module.cur_v2_hourly_enriched_replication_role.iam_role_arn
+    role = module.cur_v2_hourly_enriched_replication_role[0].iam_role_arn
 
     rules = [
       {
