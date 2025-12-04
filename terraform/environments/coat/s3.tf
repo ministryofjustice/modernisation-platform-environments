@@ -403,6 +403,10 @@ resource "aws_s3_object" "pod_waste_reports" {
 module "cur_v2_hourly_enriched" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
+  depends_on = [
+    module.cur_v2_hourly_enriched_replication_role
+  ]
+
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "4.3.0"
 
@@ -440,6 +444,7 @@ module "cur_v2_hourly_enriched" {
 
   replication_configuration = local.is-development ? {} : {
     role = module.cur_v2_hourly_enriched_replication_role.iam_role_arn
+
     rules = [
       {
         id       = "replicate-cur-v2-reports-enriched"
