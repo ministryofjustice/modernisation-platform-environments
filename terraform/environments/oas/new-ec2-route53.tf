@@ -1,7 +1,7 @@
 ######################################
 ### EC2 ROUTE53 RECORD
 ######################################
-resource "aws_route53_record" "oas-app" {
+resource "aws_route53_record" "oas-app_new" {
   count    = local.environment == "preproduction" ? 1 : 0
   provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.external.zone_id
