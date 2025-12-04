@@ -41,10 +41,16 @@
       "example_var": "test-data"
     },
     "preproduction": {
+      "ec2amiid": "ami-0a2128d7b4dd8a56c",
+      "orahomesize": "200",
+      "orahome_snapshot": "snap-0bf30e49cb9bc2421",
+      "stageesize": "150",
+      "stage_snapshot": "snap-09d54ad454edbd1cf",
       "allocated_storage": "50",
       "engine": "oracle-ee",
       "engine_version": "19.0.0.0.ru-2021-10.rur-2021-10.r1",
       "instance_class": "db.t3.medium",
+      "ec2instancetype": "r5a.large",
       "allow_major_version_upgrade": true,
       "auto_minor_version_upgrade": false,
       "storage_type": "gp2",
