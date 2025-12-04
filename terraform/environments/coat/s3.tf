@@ -577,6 +577,7 @@ data "aws_iam_policy_document" "coat_cur_v2_hourly_enriched_prod_bucket_policy" 
       identifiers = ["bcm-data-exports.amazonaws.com"]
     }
   }
+
   statement {
     sid    = "S3ListGetObject"
     effect = "Allow"
@@ -590,6 +591,7 @@ data "aws_iam_policy_document" "coat_cur_v2_hourly_enriched_prod_bucket_policy" 
       identifiers = ["bcm-data-exports.amazonaws.com"]
     }
   }
+
   statement {
     sid    = "S3ReplicateObject"
     effect = "Allow"
@@ -608,6 +610,7 @@ data "aws_iam_policy_document" "coat_cur_v2_hourly_enriched_prod_bucket_policy" 
       identifiers = ["arn:aws:iam::${local.environment_management.aws_organizations_root_account_id}:role/moj-cur-reports-v2-hourly-replication-role"]
     }
   }
+
   statement {
     sid    = "S3CrossAccountRoleAccess"
     effect = "Allow"
@@ -626,6 +629,7 @@ data "aws_iam_policy_document" "coat_cur_v2_hourly_enriched_prod_bucket_policy" 
       identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/moj-coat-${local.environment}-cur-reports-cross-role"]
     }
   }
+  
   statement {
     sid    = "AthenaAccess"
     effect = "Allow"
@@ -655,6 +659,25 @@ data "aws_iam_policy_document" "coat_cur_v2_hourly_enriched_prod_bucket_policy" 
       test     = "StringEquals"
       variable = "aws:SourceAccount"
       values   = [data.aws_caller_identity.current.account_id]
+    }
+  }
+
+  statement {
+    sid    = "AllowS3SyncAPDP"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:ListBucket",
+      "s3:GetObjectTagging"
+    ]
+    resources = [
+      "arn:aws:s3:::cur_v2_hourly_enriched",
+      "arn:aws:s3:::cur_v2_hourly_enriched/*"
+    ]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::593291632749:root"]
     }
   }
 }
