@@ -404,7 +404,7 @@ module "cur_v2_hourly_enriched" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   # No simple way to restirct the replication configuration to prod, so don't create bucket in dev
-  count = local.is_development ? 0 : 1
+  count = local.is-development ? 0 : 1
 
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "4.3.0"
