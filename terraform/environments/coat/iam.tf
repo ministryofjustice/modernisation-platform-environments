@@ -167,7 +167,7 @@ module "cur_v2_hourly_enriched_replication_role" {
     "s3.amazonaws.com"
   ]
 
-  custom_role_policy_arns = [module.cur_v2_hourly_enriched_replication_policy.arn]
+  custom_role_policy_arns = [module.cur_v2_hourly_enriched_replication_policy[0].arn]
 }
 
 data "aws_iam_policy_document" "cur_v2_hourly_enriched_replication" {
