@@ -117,8 +117,8 @@ After updating the module versions, commit the changes with a message like:
 ### 9. Create Pull Request
 
 Create a PR with:
-- **Title**: `chore(terraform): update module versions in {environment}`
-- **Labels**: Add the `terraform` label to the PR
+- **Title**: ":copilot: chore(terraform): update module versions in `{environment}`"
+- **Labels**: Add the `terraform` and `copilot` label to the PR
 - **Body**: Include a markdown table with hyperlinked versions (for example):
 
 ```markdown
