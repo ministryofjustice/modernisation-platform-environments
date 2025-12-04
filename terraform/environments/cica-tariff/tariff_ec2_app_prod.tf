@@ -58,3 +58,30 @@ resource "aws_volume_attachment" "tariff_app2_storage_attachment" {
   volume_id   = aws_ebs_volume.tariff_app2_storage[each.key].id
   instance_id = aws_instance.tariff_app_2[0].id
 }
+
+#Clone of Production App server - first instance
+/* OFF UNTIL AMI CREATED DURING SSM MAINTENANCE WINDOW
+resource "aws_instance" "tariff_app_prod_clone" {
+  count = local.environment == "production" ? 1 : 0
+  ami   = aws_ami_from_instance.tariff_app_prod_ami[0].id
+  #Ignore changes to most recent ami from data filter, as this would destroy existing instance.
+  lifecycle {
+    ignore_changes = [ami, user_data]
+  }
+  associate_public_ip_address = false
+  ebs_optimized               = true
+
+  iam_instance_profile   = aws_iam_instance_profile.tariff_instance_profile.name
+  instance_type          = "m5.2xlarge"
+  key_name               = aws_key_pair.key_pair_app.key_name
+  monitoring             = true
+  subnet_id              = data.aws_subnet.private_subnets_a.id
+  vpc_security_group_ids = local.environment == "production" ? [module.tariff_app_prod_security_group[0].security_group_id] : [module.tariff_app_security_group[0].security_group_id]
+
+  tags = merge(tomap({
+    "Name"     = lower(format("ec2-%s-%s-app-clone", local.application_name, local.environment)),
+    "hostname" = "${local.application_name}-app-clone",
+    }), local.tags, local.environment != "production" ? tomap({ "backup" = "true" }) : tomap({})
+  )
+}
+*/
