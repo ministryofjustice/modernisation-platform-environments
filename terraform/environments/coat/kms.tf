@@ -12,6 +12,8 @@ module "coat_github_repos_s3_kms" {
   enable_default_policy = true
 
   deletion_window_in_days = 7
+
+  tags = local.tags
 }
 
 module "cur_s3_kms" {
