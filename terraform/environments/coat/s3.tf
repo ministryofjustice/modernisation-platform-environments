@@ -438,7 +438,7 @@ module "cur_v2_hourly_enriched" {
     }
   ]
 
-  replication_configuration = {
+  replication_configuration = local.is-development ? null : {
     role = module.cur_v2_hourly_enriched_replication_role.iam_role_arn
     rules = [
       {
