@@ -88,6 +88,10 @@
         "AWS_REGION": "eu-west-2"
       }
     },
+    "github": {
+      "type": "http",
+      "url": "https://api.githubcopilot.com/mcp/"
+    },
     "hashicorp.terraform-mcp-server": {
       "command": "docker",
       "args": [

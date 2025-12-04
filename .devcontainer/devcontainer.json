@@ -3,11 +3,12 @@
   "image": "ghcr.io/ministryofjustice/devcontainer-base:latest",
   "features": {
     "ghcr.io/devcontainers/features/docker-in-docker:": {},
-    "ghcr.io/ministryofjustice/devcontainer-feature/astral:1": {},
-    "ghcr.io/ministryofjustice/devcontainer-feature/aws:1": {},
+    "ghcr.io/devcontainers/features/github-cli:": {},
+    "ghcr.io/ministryofjustice/devcontainer-feature/astral:": {},
+    "ghcr.io/ministryofjustice/devcontainer-feature/aws:": {},
     "ghcr.io/ministryofjustice/devcontainer-feature/kubernetes:": {},
-    "ghcr.io/ministryofjustice/devcontainer-feature/static-analysis:1": {},
-    "ghcr.io/ministryofjustice/devcontainer-feature/terraform:1": {}
+    "ghcr.io/ministryofjustice/devcontainer-feature/static-analysis:": {},
+    "ghcr.io/ministryofjustice/devcontainer-feature/terraform:": {}
   },
   "postCreateCommand": "bash .devcontainer/post-create.sh",
   "customizations": {

@@ -7,7 +7,7 @@ This document covers the set up of MCP servers for use within [GitHub Copilot Ch
 > [!WARNING]
 > This documentation is experimental and is subject to any guidance published under [ministryofjustice/.github](https://github.com/ministryofjustice/.github/blob/main/docs/github-copilot-guidance.md).
 
-1. Authenticate
+1. Authenticate with AWS
 
    > This command may take several minutes to complete if you have access to a lot of AWS accounts.
 
@@ -20,6 +20,14 @@ This document covers the set up of MCP servers for use within [GitHub Copilot Ch
    ```bash
    aws-sso setup profiles --force
    ```
+
+1. Authenticate with GitHub
+
+    > If you're using a GitHub Codespace, you can skip this step.
+
+    ```bash
+    gh auth login --git-protocol ssh --skip-ssh-key --web
+    ```
 
 1. Start an MCP server
    - Open Extensions (Cmd/Ctrl + Shift + X).
@@ -41,4 +49,5 @@ This document covers the set up of MCP servers for use within [GitHub Copilot Ch
 | `awslabs.aws-pricing-mcp-server`               | https://awslabs.github.io/mcp/servers/aws-pricing-mcp-server               |
 | `awslabs.terraform-mcp-server`                 | https://awslabs.github.io/mcp/servers/terraform-mcp-server                 |
 | `awslabs.well-architected-security-mcp-server` | https://awslabs.github.io/mcp/servers/well-architected-security-mcp-server |
+| `github`                                       | https://github.com/github/github-mcp-server                                |
 | `hashicorp.terraform-mcp-server`               | https://developer.hashicorp.com/terraform/mcp-server                       |
