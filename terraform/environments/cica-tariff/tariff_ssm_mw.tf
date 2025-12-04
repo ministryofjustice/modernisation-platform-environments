@@ -1,6 +1,7 @@
 # SSM Maintenance Window (MW) IAM Role & Policy
 resource "aws_iam_role" "mw_execution_role" {
-  name = "ssm-maintenance-window-ami-role"
+  count = local.environment == "development" ? 1 : local.environment == "production" ? 1 : 0
+  name  = "ssm-maintenance-window-ami-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -17,6 +18,7 @@ resource "aws_iam_role" "mw_execution_role" {
 }
 
 resource "aws_iam_policy" "mw_execution_policy" {
+  count       = local.environment == "development" ? 1 : local.environment == "production" ? 1 : 0
   name        = "ssm-maintenance-window-ami-policy"
   description = "Allows SSM MW to run automation and create AMIs"
 
@@ -51,12 +53,14 @@ resource "aws_iam_policy" "mw_execution_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "mw_attach" {
-  role       = aws_iam_role.mw_execution_role.name
-  policy_arn = aws_iam_policy.mw_execution_policy.arn
+  count      = local.environment == "development" ? 1 : local.environment == "production" ? 1 : 0
+  role       = aws_iam_role.mw_execution_role[0].name
+  policy_arn = aws_iam_policy.mw_execution_policy[0].arn
 }
 
 # SSM Maintenance Window
 resource "aws_ssm_maintenance_window" "snapshot_window" {
+  count                      = local.environment == "development" ? 1 : local.environment == "production" ? 1 : 0
   name                       = "tariff-app-one-time-ami-creation"
   schedule                   = "at(${local.mw_date_time})"
   duration                   = 1
@@ -66,7 +70,8 @@ resource "aws_ssm_maintenance_window" "snapshot_window" {
 
 # Target registration
 resource "aws_ssm_maintenance_window_target" "target_instance" {
-  window_id     = aws_ssm_maintenance_window.snapshot_window.id
+  count         = local.environment == "development" ? 1 : local.environment == "production" ? 1 : 0
+  window_id     = aws_ssm_maintenance_window.snapshot_window[0].id
   name          = "target-instance-for-ami"
   description   = "Targeting specific instance ID"
   resource_type = "INSTANCE"
@@ -79,16 +84,17 @@ resource "aws_ssm_maintenance_window_target" "target_instance" {
 
 # Task registration
 resource "aws_ssm_maintenance_window_task" "create_image_task" {
-  window_id        = aws_ssm_maintenance_window.snapshot_window.id
+  count            = local.environment == "development" ? 1 : local.environment == "production" ? 1 : 0
+  window_id        = aws_ssm_maintenance_window.snapshot_window[0].id
   name             = "create-ami-task"
   description      = "Creates an AMI of the target instance"
   task_type        = "AUTOMATION"
   task_arn         = "AWS-CreateImage"
   priority         = 1
-  service_role_arn = aws_iam_role.mw_execution_role.arn
+  service_role_arn = aws_iam_role.mw_execution_role[0].arn
   targets {
     key    = "WindowTargetIds"
-    values = [aws_ssm_maintenance_window_target.target_instance.id]
+    values = [aws_ssm_maintenance_window_target.target_instance[0].id]
   }
   task_invocation_parameters {
     automation_parameters {
