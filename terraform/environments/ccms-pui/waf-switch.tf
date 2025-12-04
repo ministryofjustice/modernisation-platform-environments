@@ -71,17 +71,17 @@ resource "aws_lambda_function" "waf_toggle" {
       WEB_ACL_NAME = data.aws_wafv2_web_acl.waf_web_acl.name
       WEB_ACL_ID   = data.aws_wafv2_web_acl.waf_web_acl.id
       RULE_NAME    = var.rule_name
-#       CUSTOM_BODY_NAME = "maintenance_html"
-#       CUSTOM_BODY_HTML = <<EOT
-# <!doctype html><html lang="en"><head>
-# <meta charset="utf-8"><title>Maintenance</title>
-# <style>body{font-family:sans-serif;background:#0b1a2b;color:#fff;text-align:center;padding:4rem;}
-# .card{max-width:600px;margin:auto;background:#12243a;padding:2rem;border-radius:10px;}
-# </style></head><body><div class="card">
-# <h1>Scheduled Maintenance</h1>
-# <p>The service is unavailable from 21:30 to 07:00 UK time. Apologies for any inconvenience caused.</p>
-# </div></body></html>
-# EOT
+      CUSTOM_BODY_NAME = "maintenance_html"
+      CUSTOM_BODY_HTML = <<EOT
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><title>Maintenance</title>
+<style>body{font-family:sans-serif;background:#0b1a2b;color:#fff;text-align:center;padding:4rem;}
+.card{max-width:600px;margin:auto;background:#12243a;padding:2rem;border-radius:10px;}
+</style></head><body><div class="card">
+<h1>Scheduled Maintenance</h1>
+<p>The service is unavailable from 21:30 to 07:00 UK time. Apologies for any inconvenience caused.</p>
+</div></body></html>
+EOT
     }
   }
 }
@@ -96,7 +96,7 @@ resource "aws_cloudwatch_event_rule" "waf_allow_0700_uk" {
 
 resource "aws_cloudwatch_event_rule" "waf_block_1900_uk" {
   name                = "waf-block-1900-${local.environment}"
-  schedule_expression = "cron(15 14 ? * MON-SUN *)"
+  schedule_expression = "cron(30 14 ? * MON-SUN *)"
   description         = "Set WAF rule to BLOCK at 19:00 UK daily"
 }
 
