@@ -63,7 +63,7 @@ resource "aws_lambda_function" "waf_toggle" {
   filename         = data.archive_file.waf_toggle_zip.output_path
   source_code_hash = data.archive_file.waf_toggle_zip.output_base64sha256
   handler          = "waf_lambda_function.lambda_handler"
-  runtime          = "python3.11"
+  runtime          = "python3.13"
   timeout          = 30
   environment {
     variables = {
@@ -170,26 +170,26 @@ output "waf_lambda_function_name" {
   value       = aws_lambda_function.waf_toggle.function_name
 }
 
-output "waf_allow_rule_arn" {
-  description = "CloudWatch event rule ARN for allow schedule"
-  value       = aws_cloudwatch_event_rule.waf_allow_0700_uk.arn
-}
+# output "waf_allow_rule_arn" {
+#   description = "CloudWatch event rule ARN for allow schedule"
+#   value       = aws_cloudwatch_event_rule.waf_allow_0700_uk.arn
+# }
 
-output "waf_allow_rule_name" {
-  description = "CloudWatch event rule name for allow schedule"
-  value       = aws_cloudwatch_event_rule.waf_allow_0700_uk.name
-}
+# output "waf_allow_rule_name" {
+#   description = "CloudWatch event rule name for allow schedule"
+#   value       = aws_cloudwatch_event_rule.waf_allow_0700_uk.name
+# }
 
-output "waf_block_rule_arn" {
-  description = "CloudWatch event rule ARN for block schedule"
-  value       = aws_cloudwatch_event_rule.waf_block_2130_uk.arn
-}
+# output "waf_block_rule_arn" {
+#   description = "CloudWatch event rule ARN for block schedule"
+#   value       = aws_cloudwatch_event_rule.waf_block_2130_uk.arn
+# }
 
-output "waf_block_rule_name" {
-  description = "CloudWatch event rule name for block schedule"
-  value       = aws_cloudwatch_event_rule.waf_block_2130_uk.name
-}
+# output "waf_block_rule_name" {
+#   description = "CloudWatch event rule name for block schedule"
+#   value       = aws_cloudwatch_event_rule.waf_block_2130_uk.name
+# }
 
-output "waf_web_acl_full" {
-  value = data.aws_wafv2_web_acl.waf_web_acl
-}
+# output "waf_web_acl_full" {
+#   value = data.aws_wafv2_web_acl.waf_web_acl
+# }

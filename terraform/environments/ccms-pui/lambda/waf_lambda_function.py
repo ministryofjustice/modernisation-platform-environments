@@ -1,3 +1,5 @@
+#The functional code of this lambda function is for the AWS Lambda that toggles WAF rules
+
 import os
 import json
 import boto3
