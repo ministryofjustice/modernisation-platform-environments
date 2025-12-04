@@ -47,6 +47,12 @@ resource "aws_iam_policy" "mw_execution_policy" {
           "ec2:DeregisterImage"
         ]
         Resource = "*"
+      },
+      {
+        "Sid": "AllowPassRoleForAutomation",
+        "Effect": "Allow",
+        "Action": "iam:PassRole",
+        "Resource": "${aws_iam_role.mw_execution_role[0].arn}"
       }
     ]
   })
