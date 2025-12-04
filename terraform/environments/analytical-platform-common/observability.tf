@@ -11,7 +11,7 @@ module "observability_platform_tenant" {
 }
 
 module "analytical_platform_observability" {
-  source = "github.com/ministryofjustice/terraform-aws-analytical-platform-observability?ref=81b051e4ab8c19442a091599ad9ed21e9a610661" # 3.0.0
+  source = "github.com/ministryofjustice/terraform-aws-analytical-platform-observability?ref=4b9c9013bff6035e8e3b77a00d124e62bbb4de56" # 4.2.0
 
   enable_aws_xray_read_only_access = true
 
