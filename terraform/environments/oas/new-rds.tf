@@ -152,7 +152,7 @@ resource "aws_db_instance" "oas_rds_instance" {
 
   # Network configuration
   db_subnet_group_name   = aws_db_subnet_group.appdbsubnetgroup_new[0].name
-  vpc_security_group_ids = [aws_security_group.laalz-secgroup.id, aws_security_group.vpc-secgroup.id]
+  vpc_security_group_ids = [aws_security_group.rds_sg[0].id]
   availability_zone      = local.application_data.accounts[local.environment].availability_zone
   multi_az               = local.application_data.accounts[local.environment].multi_az
 
