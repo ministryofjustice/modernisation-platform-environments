@@ -103,7 +103,7 @@ resource "aws_ssm_maintenance_window_task" "create_image_task" {
       document_version = "$LATEST"
       parameter {
         name   = "InstanceId"
-        values = ["{{ RESOURCE_ID }}"]
+        values = [local.mw_ami_target_id]
       }
       # Optional: NO REBOOT!!
       parameter {
