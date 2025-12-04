@@ -148,10 +148,6 @@ resource "aws_iam_role_policy_attachment" "greenpixie_role_policy_attachment" {
 # CUR Enriched Replication Role  #
 ##########################################
 
-output "cur_v2_hourly_enriched_replication_role_arn" {
-  value = module.cur_v2_hourly_enriched_replication_role.iam_role_arn
-}
-
 module "cur_v2_hourly_enriched_replication_role" {
   #checkov:skip=CKV_TF_1:Module is from Terraform registry
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
