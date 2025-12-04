@@ -104,7 +104,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -160,7 +160,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -216,7 +216,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -272,7 +272,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -328,7 +328,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -384,7 +384,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -440,7 +440,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -496,7 +496,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -552,7 +552,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -608,7 +608,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -664,7 +664,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -720,7 +720,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -776,7 +776,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -832,7 +832,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -888,7 +888,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -944,7 +944,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -1000,7 +1000,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -1056,7 +1056,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -1112,7 +1112,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -1168,7 +1168,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -1224,7 +1224,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -1280,7 +1280,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -1336,7 +1336,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -1392,7 +1392,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -1448,7 +1448,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -1504,7 +1504,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -1560,7 +1560,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -1616,7 +1616,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -1672,7 +1672,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -1728,7 +1728,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -1784,7 +1784,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -1840,7 +1840,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -1896,7 +1896,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -1952,7 +1952,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -2008,7 +2008,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -2064,7 +2064,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -2120,7 +2120,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -2176,7 +2176,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -2232,7 +2232,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -2288,7 +2288,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -2344,7 +2344,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -2400,7 +2400,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -2456,7 +2456,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -2512,7 +2512,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -2568,7 +2568,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -2624,7 +2624,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -2680,7 +2680,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -2736,7 +2736,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -2792,7 +2792,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -2848,7 +2848,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -2904,7 +2904,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -2960,7 +2960,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -3016,7 +3016,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -3072,7 +3072,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -3128,7 +3128,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -3184,7 +3184,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -3240,7 +3240,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -3296,7 +3296,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -3352,7 +3352,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -3408,7 +3408,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -3464,7 +3464,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -3520,7 +3520,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -3576,7 +3576,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -3632,7 +3632,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -3688,7 +3688,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -3744,7 +3744,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -3800,7 +3800,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -3856,7 +3856,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -3912,7 +3912,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -3968,7 +3968,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -4024,7 +4024,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -4080,7 +4080,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -4136,7 +4136,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -4192,7 +4192,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -4248,7 +4248,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -4304,7 +4304,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -4360,7 +4360,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -4416,7 +4416,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -4472,7 +4472,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -4528,7 +4528,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -4584,7 +4584,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -4640,7 +4640,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -4696,7 +4696,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -4752,7 +4752,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -4808,7 +4808,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -4864,7 +4864,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -4920,7 +4920,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -4976,7 +4976,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -5032,7 +5032,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -5088,7 +5088,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -5144,7 +5144,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -5200,7 +5200,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -5256,7 +5256,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -5312,7 +5312,7 @@
           "columns": [
             {
               "selector": "tags.application",
-              "text": "Source",
+              "text": "Application",
               "type": "string"
             },
             {
@@ -5377,7 +5377,7 @@
           "options": {
             "excludeByName": {},
             "indexByName": {
-              "Source": 0,
+              "Application": 0,
               "Account Type": 1,
               "Business Unit": 2,
               "Owner": 3,
@@ -5385,9 +5385,7 @@
               "Slack Channel": 5,
               "CNI": 6
             },
-            "renameByName": {
-              "Source": "Application"
-            }
+            "renameByName": {}
           }
         }
       ],
