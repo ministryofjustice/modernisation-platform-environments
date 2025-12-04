@@ -49,10 +49,10 @@ resource "aws_iam_policy" "mw_execution_policy" {
         Resource = "*"
       },
       {
-        "Sid": "AllowPassRoleForAutomation",
-        "Effect": "Allow",
-        "Action": "iam:PassRole",
-        "Resource": "${aws_iam_role.mw_execution_role[0].arn}"
+        "Sid" : "AllowPassRoleForAutomation",
+        "Effect" : "Allow",
+        "Action" : "iam:PassRole",
+        "Resource" : "${aws_iam_role.mw_execution_role[0].arn}"
       }
     ]
   })
@@ -74,20 +74,6 @@ resource "aws_ssm_maintenance_window" "snapshot_window" {
   allow_unassociated_targets = true
 }
 
-# # Target registration
-# resource "aws_ssm_maintenance_window_target" "target_instance" {
-#   count         = local.environment == "development" ? 1 : local.environment == "production" ? 1 : 0
-#   window_id     = aws_ssm_maintenance_window.snapshot_window[0].id
-#   name          = "target-instance-for-ami"
-#   description   = "Targeting specific instance ID"
-#   resource_type = "INSTANCE"
-#   targets {
-#     key    = "InstanceIds"
-#     values = [local.mw_ami_target_id]
-#   }
-# }
-
-
 # Task registration
 resource "aws_ssm_maintenance_window_task" "create_image_task" {
   count            = local.environment == "development" ? 1 : local.environment == "production" ? 1 : 0
@@ -100,10 +86,6 @@ resource "aws_ssm_maintenance_window_task" "create_image_task" {
   service_role_arn = aws_iam_role.mw_execution_role[0].arn
   max_concurrency  = "1"
   max_errors       = "1"
-  # targets {
-  #   key    = "WindowTargetIds"
-  #   values = [aws_ssm_maintenance_window_target.target_instance[0].id]
-  # }
   task_invocation_parameters {
     automation_parameters {
       document_version = "$LATEST"
@@ -111,15 +93,11 @@ resource "aws_ssm_maintenance_window_task" "create_image_task" {
         name   = "InstanceId"
         values = [local.mw_ami_target_id]
       }
-      # Optional: NO REBOOT!!
+      # REBOOT set for PRODUCTION!
       parameter {
         name   = "NoReboot"
-        values = ["true"]
+        values = [local.environment == "production" ? "false" : "true"]
       }
-      # parameter {
-      #   name   = "Description"
-      #   values = ["Created via Terraform SSM Maintenance Window"]
-      # }
       parameter {
         name   = "AutomationAssumeRole"
         values = [aws_iam_role.mw_execution_role[0].arn]
