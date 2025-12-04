@@ -152,6 +152,8 @@ module "cur_v2_hourly_enriched_replication_role" {
   #checkov:skip=CKV_TF_1:Module is from Terraform registry
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
+  count = local.is-development ? 0 : 1
+
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
   version = "5.60.0"
 
@@ -176,8 +178,9 @@ data "aws_iam_policy_document" "cur_v2_hourly_enriched_replication" {
       "s3:GetReplicationConfiguration",
       "s3:ListBucket"
     ]
-    resources = [module.cur_v2_hourly_enriched.s3_bucket_arn]
+    resources = [module.cur_v2_hourly_enriched[0].s3_bucket_arn]
   }
+
   statement {
     sid    = "SourceBucketObjectPermissions"
     effect = "Allow"
@@ -190,8 +193,9 @@ data "aws_iam_policy_document" "cur_v2_hourly_enriched_replication" {
       "s3:GetObjectVersionTagging",
       "s3:ObjectOwnerOverrideToBucketOwner",
     ]
-    resources = ["${module.cur_v2_hourly_enriched.s3_bucket_arn}/*"]
+    resources = ["${module.cur_v2_hourly_enriched[0].s3_bucket_arn}/*"]
   }
+
   statement {
     sid    = "DestinationBucketPermissions"
     effect = "Allow"
@@ -210,6 +214,7 @@ data "aws_iam_policy_document" "cur_v2_hourly_enriched_replication" {
       "arn:aws:s3:::mojap-data-production-coat-cur-reports-v2-hourly-enriched/*"
     ]
   }
+
   statement {
     sid    = "SourceBucketKMSKey"
     effect = "Allow"
@@ -219,6 +224,7 @@ data "aws_iam_policy_document" "cur_v2_hourly_enriched_replication" {
     ]
     resources = [module.cur_s3_kms.key_arn]
   }
+
   statement {
     sid    = "DestinationBucketKMSKey"
     effect = "Allow"
@@ -235,6 +241,8 @@ data "aws_iam_policy_document" "cur_v2_hourly_enriched_replication" {
 module "cur_v2_hourly_enriched_replication_policy" {
   #checkov:skip=CKV_TF_1:Module is from Terraform registry
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  count = local.is-development ? 0 : 1
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
   version = "5.60.0"
