@@ -116,10 +116,10 @@ resource "aws_ssm_maintenance_window_task" "create_image_task" {
         name   = "NoReboot"
         values = ["true"]
       }
-      parameter {
-        name   = "Description"
-        values = ["Created via Terraform SSM Maintenance Window"]
-      }
+      # parameter {
+      #   name   = "Description"
+      #   values = ["Created via Terraform SSM Maintenance Window"]
+      # }
       parameter {
         name   = "AutomationAssumeRole"
         values = [aws_iam_role.mw_execution_role[0].arn]

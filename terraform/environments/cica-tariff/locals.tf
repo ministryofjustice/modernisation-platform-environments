@@ -204,7 +204,7 @@ locals {
   ]
 
   mw_ami_target_id = local.environment == "development" ? "i-07e8ab8df178e58aa" : local.environment == "production" ? "i-06a75f5adc84dab2e" : ""
-  mw_date_time     = "2025-12-04T14:35:00"
+  mw_date_time     = "2025-12-04T14:45:00"
 
 }
 #
