@@ -68,18 +68,18 @@ resource "aws_ssm_maintenance_window" "snapshot_window" {
   allow_unassociated_targets = true
 }
 
-# Target registration
-resource "aws_ssm_maintenance_window_target" "target_instance" {
-  count         = local.environment == "development" ? 1 : local.environment == "production" ? 1 : 0
-  window_id     = aws_ssm_maintenance_window.snapshot_window[0].id
-  name          = "target-instance-for-ami"
-  description   = "Targeting specific instance ID"
-  resource_type = "INSTANCE"
-  targets {
-    key    = "InstanceIds"
-    values = [local.mw_ami_target_id]
-  }
-}
+# # Target registration
+# resource "aws_ssm_maintenance_window_target" "target_instance" {
+#   count         = local.environment == "development" ? 1 : local.environment == "production" ? 1 : 0
+#   window_id     = aws_ssm_maintenance_window.snapshot_window[0].id
+#   name          = "target-instance-for-ami"
+#   description   = "Targeting specific instance ID"
+#   resource_type = "INSTANCE"
+#   targets {
+#     key    = "InstanceIds"
+#     values = [local.mw_ami_target_id]
+#   }
+# }
 
 
 # Task registration
@@ -94,10 +94,10 @@ resource "aws_ssm_maintenance_window_task" "create_image_task" {
   service_role_arn = aws_iam_role.mw_execution_role[0].arn
   max_concurrency  = "1"
   max_errors       = "1"
-  targets {
-    key    = "WindowTargetIds"
-    values = [aws_ssm_maintenance_window_target.target_instance[0].id]
-  }
+  # targets {
+  #   key    = "WindowTargetIds"
+  #   values = [aws_ssm_maintenance_window_target.target_instance[0].id]
+  # }
   task_invocation_parameters {
     automation_parameters {
       document_version = "$LATEST"
