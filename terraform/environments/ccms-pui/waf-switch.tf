@@ -79,7 +79,7 @@ resource "aws_lambda_function" "waf_toggle" {
 .card{max-width:600px;margin:auto;background:#12243a;padding:2rem;border-radius:10px;}
 </style></head><body><div class="card">
 <h1>Scheduled Maintenance</h1>
-<p>The service is unavailable from 19:00 to 07:00 UK time. Apologies for any inconvenience caused.</p>
+<p>The service is unavailable from 21:30 to 07:00 UK time. Apologies for any inconvenience caused.</p>
 </div></body></html>
 EOT
     }
@@ -96,7 +96,7 @@ resource "aws_cloudwatch_event_rule" "waf_allow_0700_uk" {
 
 resource "aws_cloudwatch_event_rule" "waf_block_1900_uk" {
   name                = "waf-block-1900-${local.environment}"
-  schedule_expression = "cron(30 11 ? * MON-SUN *)"
+  schedule_expression = "cron(30 12 ? * MON-SUN *)"
   description         = "Set WAF rule to BLOCK at 19:00 UK daily"
 }
 
