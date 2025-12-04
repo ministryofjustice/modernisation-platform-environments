@@ -242,8 +242,7 @@ resource "aws_workspacesweb_browser_settings" "main" {
           "www.justice.gov.uk",
           "www.smartsurvey.co.uk",
           "*.accessmycloudpc.com",
-          "myworkspace.leighday.co.uk",
-          "sso.secure.server.net"
+          "myworkspace.leighday.co.uk"
         ]
       }
       "AlwaysOpenPdfExternally" = {
