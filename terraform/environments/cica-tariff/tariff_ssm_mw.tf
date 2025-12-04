@@ -92,6 +92,8 @@ resource "aws_ssm_maintenance_window_task" "create_image_task" {
   task_arn         = "AWS-CreateImage"
   priority         = 1
   service_role_arn = aws_iam_role.mw_execution_role[0].arn
+  max_concurrency  = "1"
+  max_errors       = "1"
   targets {
     key    = "WindowTargetIds"
     values = [aws_ssm_maintenance_window_target.target_instance[0].id]
