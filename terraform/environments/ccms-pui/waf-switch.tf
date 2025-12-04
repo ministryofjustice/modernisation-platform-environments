@@ -13,8 +13,8 @@ variable "rule_name" {
 
 data "archive_file" "waf_toggle_zip" {
   type        = "zip"
-  source_file = "${path.module}/lambda/pui_waf_lambda_function.py"
-  output_path = "${path.module}/lambda/pui_waf_lambda_function.zip"
+  source_file = "${path.module}/lambda/waf_lambda_function.py"
+  output_path = "${path.module}/lambda/waf_lambda_function.zip"
 }
 
 # Pull an existing WAF Rule Group and rules using a dynamic name.
@@ -71,7 +71,7 @@ resource "aws_lambda_function" "waf_toggle" {
       WEB_ACL_NAME = data.aws_wafv2_web_acl.waf_web_acl.name
       WEB_ACL_ID   = data.aws_wafv2_web_acl.waf_web_acl.id
       RULE_NAME    = var.rule_name
-      CUSTOM_BODY_NAME = "maintenance-response"
+      CUSTOM_BODY_NAME = "maintenance_html"
       CUSTOM_BODY_HTML = <<EOT
 <!doctype html><html lang="en"><head>
 <meta charset="utf-8"><title>Maintenance</title>
@@ -96,7 +96,7 @@ resource "aws_cloudwatch_event_rule" "waf_allow_0700_uk" {
 
 resource "aws_cloudwatch_event_rule" "waf_block_1900_uk" {
   name                = "waf-block-1900-${local.environment}"
-  schedule_expression = "cron(20 00 ? * MON-SUN *)"
+  schedule_expression = "cron(20 01 ? * MON-SUN *)"
   description         = "Set WAF rule to BLOCK at 19:00 UK daily"
 }
 
