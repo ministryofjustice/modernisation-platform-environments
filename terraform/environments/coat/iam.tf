@@ -144,3 +144,101 @@ resource "aws_iam_role_policy_attachment" "greenpixie_role_policy_attachment" {
   policy_arn = aws_iam_policy.s3_greenpixie_read_source_write_dest_policy.arn
 }
 
+##########################################
+# CUR Enriched Replication Role  #
+##########################################
+
+module "cur_v2_hourly_enriched_replication_role" {
+  #checkov:skip=CKV_TF_1:Module is from Terraform registry
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
+  version = "5.60.0"
+
+  create_role = true
+
+  role_name         = "moj-cur-v2-hourly-enriched-replication-role"
+  role_requires_mfa = false
+
+  trusted_role_services = [
+    "batchoperations.s3.amazonaws.com",
+    "s3.amazonaws.com"
+  ]
+
+  custom_role_policy_arns = [module.cur_v2_hourly_enriched_replication_policy.arn]
+}
+
+data "aws_iam_policy_document" "cur_v2_hourly_enriched_replication" {
+  statement {
+    sid    = "SourceBucketPermissions"
+    effect = "Allow"
+    actions = [
+      "s3:GetReplicationConfiguration",
+      "s3:ListBucket"
+    ]
+    resources = [module.cur_v2_hourly_enriched.s3_bucket_arn]
+  }
+  statement {
+    sid    = "SourceBucketObjectPermissions"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:GetObjectAcl",
+      "s3:GetObjectTagging",
+      "s3:GetObjectVersionAcl",
+      "s3:GetObjectVersionForReplication",
+      "s3:GetObjectVersionTagging",
+      "s3:ObjectOwnerOverrideToBucketOwner",
+    ]
+    resources = ["${module.cur_v2_hourly_enriched.s3_bucket_arn.s3_bucket_arn}/*"]
+  }
+  statement {
+    sid    = "DestinationBucketPermissions"
+    effect = "Allow"
+    actions = [
+      "s3:GetObjectVersionTagging",
+      "s3:ObjectOwnerOverrideToBucketOwner",
+      "s3:PutObject",
+      "s3:PutObjectAcl",
+      "s3:PutObjectTagging",
+      "s3:ReplicateDelete",
+      "s3:ReplicateObject",
+      "s3:ReplicateTags"
+    ]
+    resources = [
+      "arn:aws:s3:::mojap-data-production-coat-cur-reports-v2-hourly-enriched",
+      "arn:aws:s3:::mojap-data-production-coat-cur-reports-v2-hourly-enriched/*"
+    ]
+  }
+  statement {
+    sid    = "SourceBucketKMSKey"
+    effect = "Allow"
+    actions = [
+      "kms:Decrypt",
+      "kms:GenerateDataKey"
+    ]
+    resources = [module.cur_s3_kms.key_arn]
+  }
+  statement {
+    sid    = "DestinationBucketKMSKey"
+    effect = "Allow"
+    actions = [
+      "kms:Encrypt",
+      "kms:GenerateDataKey"
+    ]
+    resources = [
+      "arn:aws:kms:eu-west-1:593291632749:key/0409ddbc-b6a2-46c4-a613-6145f6a16215"
+    ]
+  }
+}
+
+module "cur_v2_hourly_enriched_replication_policy" {
+  #checkov:skip=CKV_TF_1:Module is from Terraform registry
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
+  version = "5.60.0"
+  name    = "${module.cur_v2_hourly_enriched_replication_role.iam_role_name}-policy"
+
+  policy = data.aws_iam_policy_document.cur_v2_hourly_enriched_replication.json
+}
