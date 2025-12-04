@@ -97,7 +97,12 @@ EOT
       priority = 2
 
       action {
-        allow {}
+        block {
+          custom_response {
+            custom_response_body_key = "maintenance-response"
+            response_code            = 503
+          }
+        }
       }
 
       statement {
