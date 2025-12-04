@@ -403,6 +403,9 @@ resource "aws_s3_object" "pod_waste_reports" {
 module "cur_v2_hourly_enriched" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
+  # No simple way to restirct the replication configuration to prod, so don't create bucket in dev
+  count = local.is_development ? 0 : 1
+
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "4.3.0"
 
@@ -438,10 +441,7 @@ module "cur_v2_hourly_enriched" {
     }
   ]
 
-  replication_configuration = local.is-development ? {
-    role  = ""
-    rules = []
-  } : {
+  replication_configuration = {
     role = module.cur_v2_hourly_enriched_replication_role.iam_role_arn
 
     rules = [
