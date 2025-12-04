@@ -60,13 +60,7 @@ resource "aws_volume_attachment" "tariff_app2_storage_attachment" {
 }
 
 #Clone of Production App server - first instance
-resource "aws_ami_from_instance" "tariff_app_prod_ami" {
-  count                   = local.environment == "production" ? 1 : 0
-  name                    = "ec2-cica-tariff-production-app-clone"
-  source_instance_id      = "i-06a75f5adc84dab2e"
-  snapshot_without_reboot = true
-}
-/* OFF UNTIL AMI ABOVE CREATED
+/* OFF UNTIL AMI CREATED DURING SSM MAINTENANCE WINDOW
 resource "aws_instance" "tariff_app_prod_clone" {
   count = local.environment == "production" ? 1 : 0
   ami   = aws_ami_from_instance.tariff_app_prod_ami[0].id
