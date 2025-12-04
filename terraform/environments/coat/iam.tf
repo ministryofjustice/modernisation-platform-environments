@@ -190,7 +190,7 @@ data "aws_iam_policy_document" "cur_v2_hourly_enriched_replication" {
       "s3:GetObjectVersionTagging",
       "s3:ObjectOwnerOverrideToBucketOwner",
     ]
-    resources = ["${module.cur_v2_hourly_enriched.s3_bucket_arn.s3_bucket_arn}/*"]
+    resources = ["${module.cur_v2_hourly_enriched.s3_bucket_arn}/*"]
   }
   statement {
     sid    = "DestinationBucketPermissions"
