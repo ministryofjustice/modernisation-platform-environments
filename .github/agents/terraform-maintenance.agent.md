@@ -172,7 +172,7 @@ Provide a summary of all modules updated, including:
 5. Notify user of any breaking changes found.
 6. Update `.tf` files with safe versions.
 7. Commit changes with appropriate messages.
-8. Create PR with `terraform` label and hyperlinked version table.
+8. Create PR with `terraform` and `copilot` labels and hyperlinked version table.
 9. Push changes to remote.
 10. Summarize updates made.
 
