@@ -2,6 +2,7 @@
   "name": "modernisation-platform-environments",
   "image": "ghcr.io/ministryofjustice/devcontainer-base:latest",
   "features": {
+    "ghcr.io/devcontainers/features/github-cli:1": {},
     "ghcr.io/ministryofjustice/devcontainer-feature/aws:1": {},
     "ghcr.io/ministryofjustice/devcontainer-feature/kubernetes:": {},
     "ghcr.io/ministryofjustice/devcontainer-feature/static-analysis:1": {},
