@@ -259,7 +259,7 @@
       "soa_db_log_retention_days": "0",
       "soa_db_deploy_to_multi_azs": "false",
       "soa_db_instance_type": "db.t3.large",
-      "soa_db_storage_gb": "100",
+      "soa_db_storage_gb": "500",
       "soa_db_deletion_protection": "false",
       "inbound_s3_bucket_name": "laa-ccms-inbound-production-mp",
       "outbound_s3_bucket_name": "laa-ccms-outbound-production-mp",

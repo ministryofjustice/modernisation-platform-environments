@@ -326,9 +326,9 @@ def lambda_handler(event, context):
 
         new_state = alarm_details.get('NewStateValue','')
 
-        is_error=False
-        if new_state == "ALARM":
-            is_error=True
+        is_error=True
+        if new_state == "OK":
+            is_error=False
 
         # Initialize services
         notification_service = NotificationService(
