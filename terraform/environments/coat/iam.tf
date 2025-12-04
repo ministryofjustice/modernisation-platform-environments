@@ -171,6 +171,8 @@ module "cur_v2_hourly_enriched_replication_role" {
 }
 
 data "aws_iam_policy_document" "cur_v2_hourly_enriched_replication" {
+  count = local.is-development ? 0 : 1
+
   statement {
     sid    = "SourceBucketPermissions"
     effect = "Allow"
@@ -248,5 +250,5 @@ module "cur_v2_hourly_enriched_replication_policy" {
   version = "5.60.0"
   name    = "${module.cur_v2_hourly_enriched_replication_role[0].iam_role_name}-policy"
 
-  policy = data.aws_iam_policy_document.cur_v2_hourly_enriched_replication.json
+  policy = data.aws_iam_policy_document.cur_v2_hourly_enriched_replication[0].json
 }
