@@ -2,6 +2,7 @@
 # Also includes secrets manager storage for the randomised password that is (TO BE DONE) cycled periodically.
 
 module "rds" {
+  count = local.environment == "development" ? 1 : 0
   source = "./modules/rds"
 
   application_name            = local.application_name
@@ -38,21 +39,24 @@ module "rds" {
 }
 
 resource "aws_route53_record" "oas-rds" {
+  count    = local.environment == "development" ? 1 : 0
   provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.external.zone_id
   name     = "rds.${local.application_name}.${data.aws_route53_zone.external.name}"
   type     = "CNAME"
   ttl      = 60
-  records  = [module.rds.rds_endpoint]
+  records  = [module.rds[0].rds_endpoint]
 }
 
 resource "aws_route53_record" "oas-rds-old" {
+  count    = local.environment == "development" ? 1 : 0
   provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.external.zone_id
   name     = "rds-old.${local.application_name}.${data.aws_route53_zone.external.name}"
   type     = "CNAME"
   ttl      = 60
-  records  = [module.rds.rds_endpoint_with_snapshot]
+  records  = [module.rds[0].rds_endpoint_with_snapshot]
 }
+
 
 
