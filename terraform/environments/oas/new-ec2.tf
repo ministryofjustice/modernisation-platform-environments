@@ -2,19 +2,19 @@
 ### EC2 INSTANCE
 ######################################
 resource "aws_instance" "oas_app_instance_new" {
-  count                       = local.environment == "preproduction" ? 1 : 0
+  count = local.environment == "preproduction" ? 1 : 0
 
-  ami                         = local.application_data.accounts[local.environment].ec2amiid
+  ami = local.application_data.accounts[local.environment].ec2amiid
   # associate_public_ip_address = false
-  availability_zone           = "eu-west-2a"
-  ebs_optimized               = true
-  instance_type               = local.application_data.accounts[local.environment].ec2instancetype
-  vpc_security_group_ids      = [aws_security_group.ec2.id]
-  monitoring = true
-  subnet_id                   = data.aws_subnet.private_subnets_a.id
-  iam_instance_profile        = aws_iam_instance_profile.ec2_instance_profile_new[0].id
-#  user_data_replace_on_change = true
-#  user_data                   = base64encode(data.local_file.userdata.content)
+  availability_zone      = "eu-west-2a"
+  ebs_optimized          = true
+  instance_type          = local.application_data.accounts[local.environment].ec2instancetype
+  vpc_security_group_ids = [aws_security_group.ec2.id]
+  monitoring             = true
+  subnet_id              = data.aws_subnet.private_subnets_a.id
+  iam_instance_profile   = aws_iam_instance_profile.ec2_instance_profile_new[0].id
+  #  user_data_replace_on_change = true
+  #  user_data                   = base64encode(data.local_file.userdata.content)
 
   root_block_device {
     delete_on_termination = false
@@ -66,7 +66,7 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "ec2_instance_role_attachment_new" {
-  count = local.environment == "preproduction" ? 1 : 0
+  count      = local.environment == "preproduction" ? 1 : 0
   role       = aws_iam_role.ec2_instance_role_new[0].name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
