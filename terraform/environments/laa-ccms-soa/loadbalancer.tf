@@ -34,7 +34,7 @@ resource "aws_lb_target_group" "admin" {
 
     enabled             = true
     interval            = 30
-    path                = "/soa-infra/services/default/GetReferenceData/getreferencedata_ep?wsdl"  
+    path                = "/weblogic/ready"  
     port                = local.application_data.accounts[local.environment].admin_server_port
     protocol            = "HTTP"
     timeout             = 5
@@ -108,10 +108,16 @@ resource "aws_lb_target_group" "managed" {
   target_type = "ip"
 
   health_check {
-    healthy_threshold   = "3"
-    interval            = "30"
-    protocol            = "TCP"
-    unhealthy_threshold = "3"
+
+    enabled             = true
+    interval            = 30
+    path                = "/soa-infra/services/default/GetReferenceData/getreferencedata_ep?wsdl"  
+    port                = local.application_data.accounts[local.environment].managed_server_port
+    protocol            = "HTTP"
+    timeout             = 5
+    healthy_threshold   = 3
+    unhealthy_threshold = 3
+    matcher             = "200" 
   }
 }
 
