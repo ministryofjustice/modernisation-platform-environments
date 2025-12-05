@@ -25,7 +25,7 @@ resource "aws_db_instance" "dacp_db" {
   ca_cert_identifier              = "rds-ca-rsa2048-g1"
   apply_immediately               = true
   copy_tags_to_snapshot           = true
-  db_parameter_group_name         = local.is_production ? "default.postgres14" : aws_db_parameter_group.dacp_analyse.name
+  parameter_group_name            = local.is_production ? "default.postgres14" : aws_db_parameter_group.dacp_analyse.name
   enabled_cloudwatch_logs_exports = ["postgresql", "upgrade"]
 }
 
