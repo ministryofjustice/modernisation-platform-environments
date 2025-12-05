@@ -22,11 +22,13 @@ locals {
   }
 
   bcs_config_dev = {
-    instance_count = 0
-    ami_name       = "delius_mis_windows_server_patch_2024-02-07T11-03-13.202Z"
+    instance_count = 1
+    ami_name       = "base_rhel_8_5_2023-07-01T00-00-47.469Z"
+    ami_owner      = local.environment_management.account_ids["core-shared-services-production"]
     ebs_volumes = {
       "/dev/sda1" = { label = "root", size = 150 }
-      "/dev/xvdf" = { label = "data", size = 300 }
+      "/dev/sdb"  = { label = "data", size = 100 }
+      "/dev/sdc"  = { label = "data", size = 100 }
     }
 
     ebs_volumes_config = {
