@@ -51,6 +51,7 @@
     env:
       ACCOUNT_NAME: "${{ inputs.application }}-${{ inputs.environment }}"
       WORKSPACE_NAME: "${{ inputs.application }}-${{ inputs.environment }}"
+      SKIP_PLAN_EVALUATOR: '["cloud-platform-live-development", "cloud-platform-live-test", "cloud-platform-non-live-development", "cloud-platform-non-live-test"]'
     concurrency:
       group: ${{ inputs.application }}-${{ inputs.environment }}-${{ inputs.component }}
     jobs:
@@ -165,7 +166,7 @@
               (( exitcode == 1 )) && exit 1 || exit 0
 
           - name: Evaluate Terraform Plan
-            if: github.event_name == 'pull_request' && steps.plan.outputs.exitcode == '2'
+            if: github.event_name == 'pull_request' && steps.plan.outputs.exitcode == '2' && !contains(fromJSON(env.SKIP_PLAN_EVALUATOR), env.WORKSPACE_NAME)
             id: evaluate_terraform_plan
             working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
             shell: bash
