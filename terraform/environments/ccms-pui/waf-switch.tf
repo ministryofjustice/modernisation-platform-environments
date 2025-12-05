@@ -98,7 +98,7 @@ body {
 <body>
 <div class="card">
   <h1>Service Offline</h1>
-  <p><strong>CCMS is available between 07:00 to 21:30 UK time.</strong></p>
+  <p><strong>CCMS is available from 07:00 to 21:30 UK time.</strong></p>
 </div>
 </body>
 </html>
@@ -117,7 +117,7 @@ resource "aws_cloudwatch_event_rule" "waf_allow_0700_uk" {
 
 resource "aws_cloudwatch_event_rule" "waf_block_2130_uk" {
   name                = "waf-block-2130-${local.environment}"
-  schedule_expression = "cron(10 12 ? * MON-SUN *)"
+  schedule_expression = "cron(30 12 ? * MON-SUN *)"
   description         = "Set WAF rule to BLOCK at 21:30 UK daily"
 }
 
