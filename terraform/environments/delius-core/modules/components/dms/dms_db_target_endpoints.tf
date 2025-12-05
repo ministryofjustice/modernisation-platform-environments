@@ -14,6 +14,12 @@ resource "aws_dms_endpoint" "dms_user_target_endpoint_db" {
   # We use NNE instead of SSL
   ssl_mode                    = "none"
   extra_connection_attributes = "UseDirectPathFullLoad=false"
+
+  lifecycle {
+    ignore_changes = [
+            password    
+          ]  
+  }
 }
 
 # In repository environments the end point for audit (AUDITED_INTERACTION, BUSINESS_INTERACTION) is the Delius primary database.
@@ -31,4 +37,10 @@ resource "aws_dms_endpoint" "dms_audit_target_endpoint_db" {
   # We use NNE instead of SSL
   ssl_mode                    = "none"
   extra_connection_attributes = "UseDirectPathFullLoad=false"
+
+  lifecycle {
+    ignore_changes = [
+            password    
+          ]  
+  }
 }

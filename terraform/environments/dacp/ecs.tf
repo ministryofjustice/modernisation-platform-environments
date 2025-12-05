@@ -82,6 +82,14 @@ resource "aws_ecs_task_definition" "dacp_task_definition" {
         {
           name  = "ida:ClientId"
           value = local.application_data.accounts[local.environment].client_id
+        },
+        {
+          name  = "BURY_COURT_ID"
+          value = local.application_data.accounts[local.environment].bury_court_id
+        },
+        {
+          name  = "BURY_POST_2015_SEND_CODE"
+          value = local.application_data.accounts[local.environment].bury_post_2015_send_code
         }
       ]
     }
@@ -157,6 +165,14 @@ resource "aws_ecs_task_definition" "dacp_task_definition_dev" {
         {
           name  = "ida:ClientId"
           value = local.application_data.accounts[local.environment].client_id
+        },
+        {
+          name  = "BURY_COURT_ID"
+          value = local.application_data.accounts[local.environment].bury_court_id
+        },
+        {
+          name  = "BURY_POST_2015_SEND_CODE"
+          value = local.application_data.accounts[local.environment].bury_post_2015_send_code
         }
       ]
     }

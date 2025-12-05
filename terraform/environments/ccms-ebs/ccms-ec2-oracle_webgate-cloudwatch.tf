@@ -6,7 +6,7 @@
 #   metric_name               = "disk_used_percent"
 #   namespace                 = "CWAgent"
 #   statistic                 = "Average"
-#   insufficient_data_actions = []
+#   insufficient_data_actions = [aws_sns_topic.cw_alerts.arn]
 
 #   evaluation_periods  = local.application_data.cloudwatch_ec2.disk.eval_periods
 #   datapoints_to_alarm = local.application_data.cloudwatch_ec2.disk.eval_periods
@@ -31,7 +31,7 @@
 #   metric_name               = "disk_used_percent"
 #   namespace                 = "CWAgent"
 #   statistic                 = "Average"
-#   insufficient_data_actions = []
+#   insufficient_data_actions = [aws_sns_topic.cw_alerts.arn]
 
 #   evaluation_periods  = local.application_data.cloudwatch_ec2.disk.eval_periods
 #   datapoints_to_alarm = local.application_data.cloudwatch_ec2.disk.eval_periods
@@ -56,7 +56,7 @@
 #   metric_name               = "disk_used_percent"
 #   namespace                 = "CWAgent"
 #   statistic                 = "Average"
-#   insufficient_data_actions = []
+#   insufficient_data_actions = [aws_sns_topic.cw_alerts.arn]
 
 #   evaluation_periods  = local.application_data.cloudwatch_ec2.disk.eval_periods
 #   datapoints_to_alarm = local.application_data.cloudwatch_ec2.disk.eval_periods

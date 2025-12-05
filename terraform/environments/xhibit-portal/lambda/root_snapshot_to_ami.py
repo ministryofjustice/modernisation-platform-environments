@@ -58,4 +58,4 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> None:
                     VirtualizationType="hvm",
                 )
 
-                print(f"AMI created: {image_response.get('ImageId')}")
+                print(f"AMI created: {image_response}")

@@ -10,12 +10,7 @@ module "csv_export" {
   environment  = local.environment_shorthand
   table_naming = "split_at_last_underscore"
 
-  tags = {
-    business-unit = "Property"
-    application   = "cafm"
-    is-production = "false"
-    owner         = "shanmugapriya.basker@justice.gov.uk"
-  }
+  tags = local.tags
 }
 
 module "rds_export" {
@@ -35,12 +30,7 @@ module "rds_export" {
   database_subnet_ids      = module.vpc.private_subnets
   master_user_secret_id    = aws_secretsmanager_secret.db_master_user_secret.arn
 
-  tags = {
-    business-unit = "Property"
-    application   = local.application_name
-    is-production = "false"
-    owner         = "shanmugapriya.basker@justice.gov.uk"
-  }
+  tags = local.tags
 }
 
 resource "aws_secretsmanager_secret" "db_master_user_secret" {
