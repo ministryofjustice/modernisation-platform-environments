@@ -44,6 +44,12 @@ resource "aws_s3_bucket_notification" "data_bucket_triggers" {
     filter_suffix = ".JSON"
     filter_prefix = "serco/fms"
   }
+  queue {
+    queue_arn     = module.load_historic_csv.sqs_queue.arn
+    events        = ["s3:ObjectCreated:*"]
+    filter_suffix = ".csv"
+    filter_prefix = "g4s/lcm"
+  }
 }
 
 module "process_fms_metadata_sqs" {
@@ -66,6 +72,13 @@ module "virus_scan_file_sqs" {
   lambda_function_name = module.virus_scan_file.lambda_function_name
   bucket_prefix        = local.bucket_prefix
   maximum_concurrency  = 1000
+}
+
+module "load_historic_csv" {
+  source               = "./modules/sqs_s3_lambda_trigger"
+  bucket               = module.s3-data-bucket.bucket
+  lambda_function_name = module.load_historic_csv.lambda_function_name
+  bucket_prefix        = local.bucket_prefix
 }
 
 resource "aws_s3_bucket_notification" "virus_scan_file" {
