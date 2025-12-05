@@ -446,47 +446,47 @@ module "cur_v2_hourly_enriched" {
     }
   ]
 
-  replication_configuration = {
-    role = module.cur_v2_hourly_enriched_replication_role[0].iam_role_arn
+  # replication_configuration = {
+  #   role = module.cur_v2_hourly_enriched_replication_role[0].iam_role_arn
 
-    rules = [
-      {
-        id       = "replicate-cur-v2-reports-enriched"
-        status   = "Enabled"
-        priority = 1
-        filter = {
-          prefix = ""
-        }
-        delete_marker_replication = true
+  #   rules = [
+  #     {
+  #       id       = "replicate-cur-v2-reports-enriched"
+  #       status   = "Enabled"
+  #       priority = 1
+  #       filter = {
+  #         prefix = ""
+  #       }
+  #       delete_marker_replication = true
 
-        source_selection_criteria = {
-          sse_kms_encrypted_objects = {
-            enabled = true
-          }
-        }
+  #       source_selection_criteria = {
+  #         sse_kms_encrypted_objects = {
+  #           enabled = true
+  #         }
+  #       }
 
-        destination = {
-          account_id    = "593291632749"
-          bucket        = "arn:aws:s3:::mojap-data-production-coat-cur-reports-v2-hourly-enriched"
-          storage_class = "STANDARD"
-          access_control_translation = {
-            owner = "Destination"
-          }
-          encryption_configuration = {
-            replica_kms_key_id = "arn:aws:kms:eu-west-1:593291632749:key/0409ddbc-b6a2-46c4-a613-6145f6a16215"
-          }
-          metrics = {
-            status  = "Enabled"
-            minutes = 15
-          }
-          replication_time = {
-            status  = "Enabled"
-            minutes = 15
-          }
-        }
-      }
-    ]
-  }
+  #       destination = {
+  #         account_id    = "593291632749"
+  #         bucket        = "arn:aws:s3:::mojap-data-production-coat-cur-reports-v2-hourly-enriched"
+  #         storage_class = "STANDARD"
+  #         access_control_translation = {
+  #           owner = "Destination"
+  #         }
+  #         encryption_configuration = {
+  #           replica_kms_key_id = "arn:aws:kms:eu-west-1:593291632749:key/0409ddbc-b6a2-46c4-a613-6145f6a16215"
+  #         }
+  #         metrics = {
+  #           status  = "Enabled"
+  #           minutes = 15
+  #         }
+  #         replication_time = {
+  #           status  = "Enabled"
+  #           minutes = 15
+  #         }
+  #       }
+  #     }
+  #   ]
+  # }
 }
 
 data "aws_iam_policy_document" "coat_cur_v2_hourly_enriched_dev_bucket_policy" {
