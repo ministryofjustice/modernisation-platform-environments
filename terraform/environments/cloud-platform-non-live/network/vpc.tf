@@ -17,9 +17,14 @@ module "vpc" {
     cidrsubnet(lookup(local.cp_vpc_cidr, terraform.workspace), 6, 2)
   ]
 
+  manage_default_network_acl    = false
+  manage_default_route_table    = false
+  manage_default_security_group = false
+
+  public_dedicated_network_acl = true //Creates a dedicated network ACL and attaches to the public subnets
+
   enable_nat_gateway = true
   one_nat_gateway_per_az = true
-  enable_dns_hostnames = true
   create_multiple_public_route_tables = true
 
   tags = merge({
