@@ -26,6 +26,7 @@ data "aws_iam_policy_document" "ec2_automation" {
   statement {
     sid = "EC2AutomationPermissions"
     actions = [
+      "ec2:DescribeInstances",
       "ec2:DescribeTags",
       "s3:GetObject",
       "s3:ListBucket",
