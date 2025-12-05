@@ -61,13 +61,25 @@ resource "aws_iam_policy" "ecs_quicksight_policy" {
         Effect = "Allow"
         Action = [
           "quicksight:DescribeUser",
+          "quicksight:GetAuthCode",
           "quicksight:GetDashboardEmbedUrl",
+          "quicksight:DescribeDashboard",
           "quicksight:ListDashboards",
-          "quicksight:DescribeDashboard"
+          "quicksight:ListUsers",
+          "quicksight:DescribeDashboardPermissions",
+          "quicksight:DescribeGroup",
+          "quicksight:CreateGroup",
+          "quicksight:ListGroups",
+          "quicksight:ListGroupMemberships",
+          "quicksight:CreateGroupMembership",
+          "quicksight:RegisterUser",
+          "quicksight:ListUserGroups"
         ]
         Resource = [
           "arn:aws:quicksight:eu-west-2:${var.aws_account_id}:user/default/*",
-          "arn:aws:quicksight:eu-west-2:${var.aws_account_id}:dashboard/*"
+          "arn:aws:quicksight:eu-west-2:${var.aws_account_id}:dashboard/*",
+          "arn:aws:quicksight:eu-west-2:${var.aws_account_id}:group/default/*",
+          "arn:aws:quicksight:eu-west-2:${var.aws_account_id}:user/default/quicksight-admin-access/*"
         ]
       }
     ]
