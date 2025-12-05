@@ -235,7 +235,7 @@ data "aws_iam_policy_document" "cur_v2_hourly_enriched_replication" {
       "kms:GenerateDataKey"
     ]
     resources = [
-      "arn:aws:kms:eu-west-1:593291632749:key/0409ddbc-b6a2-46c4-a613-6145f6a16215"
+      "arn:aws:kms:eu-west-1:593291632749:key/0d21d1cf-b9da-43f3-999b-da7f0d376bfd"
     ]
   }
 }
