@@ -209,7 +209,6 @@ resource "aws_workspacesweb_browser_settings" "main" {
           "clientconfig.microsoftonline-p.net",
           "companymanager.microsoftonline.com",
           "device.login.microsoftonline.com",
-          "login-f3.dpscloud.com",
           "enterpriseregistration.windows.net",
           "go.microsoft.com",
           "google-exention-bucket.s3.eu-west-2.amazonaws.com",
@@ -226,8 +225,9 @@ resource "aws_workspacesweb_browser_settings" "main" {
           "login.microsoft.com",
           "login.microsoftonline-p.com",
           "login.microsoftonline.com",
-          "login-us.microsoftonline.com",
           "login.windows.net",
+          "login-f3.dpscloud.com",
+          "login-us.microsoftonline.com",
           "logincert.microsoftonline.com",
           "loginex.microsoftonline.com",
           "lsconline.legalservices.gov.uk",
@@ -237,10 +237,12 @@ resource "aws_workspacesweb_browser_settings" "main" {
           "portal.manage.microsoft.com",
           "provisioningapi.microsoftonline.com",
           "sso.godaddy.com",
+          "sso.secureserver.net",
           "www.gov.uk",
           "www.justice.gov.uk",
           "www.smartsurvey.co.uk",
-          "*.accessmycloudpc.com"
+          "*.accessmycloudpc.com",
+          "myworkspace.leighday.co.uk"
         ]
       }
       "AlwaysOpenPdfExternally" = {
