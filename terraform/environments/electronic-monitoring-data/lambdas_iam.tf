@@ -1029,7 +1029,7 @@ data "aws_iam_policy_document" "load_historic_csv_lambda_role_policy_document" {
       "s3:GetObject",
     ]
     resources = [
-      "${module.s3-ådata-bucket.bucket.arn}å/*"
+      "${module.s3-data-bucket.bucket.arn}å/*"
     ]
   }
   statement {
