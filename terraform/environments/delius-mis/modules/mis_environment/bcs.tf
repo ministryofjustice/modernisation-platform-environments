@@ -39,7 +39,9 @@ module "bcs_instance" {
   iam_resource_names_prefix = "${var.env_name}-bcs-${count.index + 1}"
   instance_profile_policies = [
     # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore", added by module
-    aws_iam_policy.secrets_manager.arn
+    aws_iam_policy.secrets_manager.arn,
+    aws_iam_policy.business_unit_kms_key_access[0].arn,
+    aws_iam_policy.ec2_automation.arn,
   ]
 
   user_data_cloud_init = {
