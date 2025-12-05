@@ -114,6 +114,25 @@ resource "aws_cloudwatch_log_metric_filter" "soa_custom_checks_error_managed" {
   }
 }
 
+#--Managed
+resource "aws_cloudwatch_log_group" "log_group_managed" {
+  name              = "${local.application_data.accounts[local.environment].app_name}-managed-ecs"
+  retention_in_days = local.application_data.accounts[local.environment].managed_log_retention_days
+}
+
+resource "aws_cloudwatch_log_subscription_filter" "ccms_soa_edn_quiesced_filter" {
+  name            = "${local.application_name}-${local.environment}-ccms-soa-edn-quiesced-filter"
+  log_group_name  = aws_cloudwatch_log_group.log_group_managed.name
+  filter_pattern  = "\"EDN is quiesced\""
+  destination_arn = aws_lambda_function.ccms_soa_edn_quiesced_monitor.arn
+
+  depends_on = [
+    aws_lambda_permission.allow_cloudwatch_invoke_ccms_soa_edn_quiesced
+  ]
+}
+
+
+
 #--RDS (SOA DB)
 resource "aws_cloudwatch_log_group" "rds_alert" {
   name              = "/aws/rds/instance/oracle-db/alert"
