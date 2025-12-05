@@ -30,6 +30,7 @@ module "cur_s3_kms" {
 
   key_statements = [
     {
+      sid = "AllowReplicationRole"
       actions = [
         "kms:Encrypt*",
         "kms:Decrypt*",
