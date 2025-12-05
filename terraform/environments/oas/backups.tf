@@ -1,4 +1,6 @@
 resource "aws_backup_vault" "default_oas" {
+  count = local.environment == "development" ? 1 : 0
+
   name = "${local.application_name}-backup-vault"
   tags = merge(
     local.tags,
@@ -8,12 +10,13 @@ resource "aws_backup_vault" "default_oas" {
 
 # Non production backups
 resource "aws_backup_plan" "non_production_oas" {
+  count = local.environment == "development" ? 1 : 0
 
   name = "${local.application_name}-backup-daily-retain-7-days"
 
   rule {
     rule_name         = "${local.application_name}-backup-daily-retain-7-days"
-    target_vault_name = aws_backup_vault.default_oas.name
+    target_vault_name = aws_backup_vault.default_oas[0].name
 
     # Backup every day at 12:00am
     schedule = "cron(0 0 * * ? *)"
@@ -43,9 +46,11 @@ resource "aws_backup_plan" "non_production_oas" {
 }
 
 resource "aws_backup_selection" "non_production_oas" {
+  count = local.environment == "development" ? 1 : 0
+
   name         = "${local.application_name}-non-production-backup"
   iam_role_arn = local.application_data.accounts[local.environment].iam_role_arn
-  plan_id      = aws_backup_plan.non_production_oas.id
+  plan_id      = aws_backup_plan.non_production_oas[0].id
   resources    = ["*"]
 
   condition {
