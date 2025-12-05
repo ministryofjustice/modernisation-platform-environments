@@ -24,6 +24,7 @@ resource "aws_lakeformation_data_lake_settings" "settings" {
       data.aws_iam_role.github_actions_role.arn,
       data.aws_iam_session_context.current.issuer_arn,
       [for share in local.analytical_platform_share : aws_iam_role.analytical_platform_share_role[share.target_account_name].arn],
+      local.is-development ? [] : [aws_iam_role.clean_after_mdss_load[0].arn]
     ]
   )
   parameters = {
