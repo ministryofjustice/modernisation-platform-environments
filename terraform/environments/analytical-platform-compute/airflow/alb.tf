@@ -4,7 +4,7 @@ module "mwaa_alb" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/alb/aws"
-  version = "9.17.0"
+  version = "10.2.0"
 
   name    = "mwaa"
   vpc_id  = data.aws_vpc.apc_vpc.id
