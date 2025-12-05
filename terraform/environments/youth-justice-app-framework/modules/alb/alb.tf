@@ -3,7 +3,7 @@
 module "alb" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/alb/aws"
-  version = "9.9.0"
+  version = "10.2.0"
 
   name               = "${var.alb_name}-${local.alb_suffix}"
   internal           = var.internal
