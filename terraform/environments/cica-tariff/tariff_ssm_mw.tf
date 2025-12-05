@@ -96,7 +96,7 @@ resource "aws_ssm_maintenance_window_task" "create_image_task" {
       # REBOOT DISABLED!
       parameter {
         name   = "NoReboot"
-        values = [ "true" ]
+        values = ["true"]
       }
       parameter {
         name   = "AutomationAssumeRole"
