@@ -73,14 +73,36 @@ resource "aws_lambda_function" "waf_toggle" {
       RULE_NAME    = var.rule_name
       CUSTOM_BODY_NAME = "maintenance_html"
       CUSTOM_BODY_HTML = <<EOT
-<!doctype html><html lang="en"><head>
-<meta charset="utf-8"><title>Maintenance</title>
-<style>body{font-family:sans-serif;background:#0b1a2b;color:#fff;text-align:center;padding:4rem;}
-.card{max-width:600px;margin:auto;background:#12243a;padding:2rem;border-radius:10px;}
-</style></head><body><div class="card">
-<h1>Scheduled Maintenance</h1>
-<p>The service is unavailable from 21:30 to 07:00 UK time. Apologies for any inconvenience caused.</p>
-</div></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Maintenance</title>
+<style>
+body {
+  font-family: sans-serif;
+  background: #0b1a2b;
+  color: #fff;
+  text-align: center;
+  padding: 4rem;
+}
+.card {
+  max-width: 600px;
+  margin: auto;
+  background: #12243a;
+  padding: 2rem;
+  border-radius: 10px;
+}
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>Service Offline</h1>
+  <p><strong>CCMS is available between 07:00 to 21:30 UK time.</strong></p>
+  <p>Apologies for any inconvenience caused.</p>
+</div>
+</body>
+</html>
 EOT
     }
   }
