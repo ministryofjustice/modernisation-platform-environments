@@ -680,8 +680,8 @@ data "aws_iam_policy_document" "coat_cur_v2_hourly_enriched_prod_bucket_policy" 
       "s3:GetObjectTagging"
     ]
     resources = [
-      "arn:aws:s3:::cur_v2_hourly_enriched",
-      "arn:aws:s3:::cur_v2_hourly_enriched/*"
+      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly-enriched",
+      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly-enriched/*"
     ]
 
     principals {
