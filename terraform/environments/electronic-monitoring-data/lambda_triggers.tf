@@ -74,7 +74,7 @@ module "virus_scan_file_sqs" {
   maximum_concurrency  = 1000
 }
 
-module "load_historic_csv" {
+module "load_historic_csv_sqs" {
   source               = "./modules/sqs_s3_lambda_trigger"
   bucket               = module.s3-data-bucket.bucket
   lambda_function_name = module.load_historic_csv.lambda_function_name
