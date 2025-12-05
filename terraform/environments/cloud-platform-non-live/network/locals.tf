@@ -2,7 +2,7 @@ locals {
   /* VPC */
   cp_vpc_name = "${local.application_name}-${local.environment}"
   cp_vpc_cidr = {
-    cloud-platform-non-live-testing = "10.1.0.0/16"
+    cloud-platform-non-live-test = "10.1.0.0/16"
     cloud-platform-non-live-development = "10.2.0.0/16"
     cloud-platform-non-live-preproduction = "10.3.0.0/16"
     cloud-platform-non-live-production = "10.4.0.0/16"
