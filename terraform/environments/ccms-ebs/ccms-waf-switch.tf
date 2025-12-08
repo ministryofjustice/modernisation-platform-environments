@@ -8,7 +8,7 @@ variable "scope" {
 }
 
 variable "rule_name" {
-  default = "ebs-trusted-rule"
+  default = "ebs-trusted-rule-ip-set"
 }
 
 data "archive_file" "waf_toggle_zip" {
@@ -99,7 +99,7 @@ resource "aws_cloudwatch_event_rule" "waf_allow_0700_uk" {
 
 resource "aws_cloudwatch_event_rule" "waf_block_2130_uk" {
   name                = "waf-block-2130-${local.environment}"
-  schedule_expression = "cron(30 18 ? * MON-SUN *)"
+  schedule_expression = "cron(00 19 ? * MON-SUN *)"
   description         = "Set WAF rule to BLOCK at 21:30 UK daily"
 }
 
