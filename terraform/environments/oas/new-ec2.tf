@@ -2,9 +2,9 @@
 ### EC2 INSTANCE
 ######################################
 resource "aws_instance" "oas_app_instance_new" {
-  count                       = local.environment == "preproduction" ? 1 : 0
+  count = local.environment == "preproduction" ? 1 : 0
 
-  ami                         = local.application_data.accounts[local.environment].ec2amiid
+  ami = local.application_data.accounts[local.environment].ec2amiid
   # associate_public_ip_address = false
   availability_zone           = "eu-west-2a"
   ebs_optimized               = true
@@ -66,7 +66,7 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "ec2_instance_role_attachment_new" {
-  count = local.environment == "preproduction" ? 1 : 0
+  count      = local.environment == "preproduction" ? 1 : 0
   role       = aws_iam_role.ec2_instance_role_new[0].name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
