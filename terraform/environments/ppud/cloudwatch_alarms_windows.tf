@@ -133,7 +133,7 @@ locals {
         instance_type = instance.instance_type
         volume_letter = upper(substr(volume_tag, 0, 1))
         volume_tag    = volume_tag
-        threshold     = lookup(
+        threshold = lookup(
           lookup(local.volume_thresholds, instance.ami, {}),
           "${upper(substr(volume_tag, 0, 1))}:",
           1 # default threshold
