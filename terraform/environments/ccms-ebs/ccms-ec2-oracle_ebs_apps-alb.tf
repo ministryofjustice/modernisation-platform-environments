@@ -21,7 +21,7 @@ resource "aws_lb" "ebsapps_lb" {
 }
 
 resource "aws_lb_listener" "ebsapps_listener" {
-  count = local.is-development ? 0 : 1
+  count = local.is-development? 0 : 1
 
   load_balancer_arn = aws_lb.ebsapps_lb[count.index].arn
   port              = "443"
@@ -30,8 +30,13 @@ resource "aws_lb_listener" "ebsapps_listener" {
   certificate_arn   = data.aws_acm_certificate.gandi_cert.arn
 
   default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.ebsapp_tg[count.index].id
+    type = "fixed-response"
+
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "This service has moved to the new address. Please update your bookmark to ${local.application_data.accounts[local.environment].ebs_new_url}"
+      status_code  = "410"
+    }
   }
 }
 
