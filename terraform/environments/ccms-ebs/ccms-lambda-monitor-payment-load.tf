@@ -60,7 +60,7 @@ resource "aws_lambda_layer_version" "lambda_payment_load_monitor_layer" {
   # filename                 = "lambda/layerV1.zip"
   layer_name               = "${local.application_name}-${local.environment}-payment-load-monitor-layer"
   s3_key                   = "lambda_delivery/payment-load-monitor-layer/layerV1.zip"
-  s3_bucket                = module.s3-bucket-shared.bucket.id
+  s3_bucket                = aws_s3_bucket.ccms_ebs_shared.bucket
   compatible_runtimes      = ["python3.13"]
   compatible_architectures = ["x86_64"]
   description              = "Lambda Layer for ${local.application_name} EBS Payment Load Monitor"
