@@ -20,7 +20,7 @@ module "quicksight_vpc_connection_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.59.0"
+  version = "6.2.3"
 
   name_prefix = "quicksight-vpc-connection"
 
@@ -57,7 +57,7 @@ module "find_moj_data_quicksight_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.59.0"
+  version = "6.2.3"
 
   name_prefix = "find-moj-data-quicksight-policy-"
 

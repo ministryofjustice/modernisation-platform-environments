@@ -3,7 +3,7 @@ module "quicksight_vpc_connection_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.59.0"
+  version = "6.2.3"
 
   create_role       = true
   role_name_prefix  = "quicksight-vpc-connection"
@@ -21,7 +21,7 @@ module "find_moj_data_quicksight_sa_assumable_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.59.0"
+  version = "6.2.3"
 
   allow_self_assume_role = false
   trusted_role_arns = [
