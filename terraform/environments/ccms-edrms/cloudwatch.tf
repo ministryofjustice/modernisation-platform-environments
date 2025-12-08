@@ -94,7 +94,7 @@ resource "aws_cloudwatch_metric_alarm" "tds_rds_cpu_over_threshold" {
 # TDS RDS Free Storage Space Alarm
 resource "aws_cloudwatch_metric_alarm" "TDS_RDS_Free_Storage_Space_Over_Threshold" {
   alarm_name          = "${local.application_name}-tds-rds-FreeStorageSpace-low-threshold"
-  alarm_description   = "TDS RDS Free storage space is below 30, Runbook - https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
+  alarm_description   = "TDS RDS Free storage space is below 20, Runbook - https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
   comparison_operator = "LessThanThreshold"
   metric_name         = "FreeStorageSpace"
   statistic           = "Average"
@@ -102,7 +102,7 @@ resource "aws_cloudwatch_metric_alarm" "TDS_RDS_Free_Storage_Space_Over_Threshol
   period              = "60"
   evaluation_periods  = "5"
   threshold           = local.application_data.accounts[local.environment].tds_db_storage_gb * 0.2 * 1024 * 1024 * 1024
-  treat_missing_data  = "notBreaching"
+  treat_missing_data  = "Breaching"
   dimensions = {
     DBInstanceIdentifier = aws_db_instance.tds_db.identifier
   }
