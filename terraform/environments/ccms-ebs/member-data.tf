@@ -79,7 +79,7 @@ data "aws_iam_policy_document" "sns_topic_policy_ec2cw" {
       ]
     }
   }
-  
+
 }
 
 # data "aws_iam_policy_document" "sns_topic_policy_s3" {

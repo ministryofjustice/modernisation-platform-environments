@@ -11,13 +11,14 @@ resource "aws_cloudwatch_metric_alarm" "cpu_utilization" {
   metric_name               = "CPUUtilization"
   namespace                 = "AWS/EC2"
   statistic                 = "Average"
-  insufficient_data_actions = []
+  insufficient_data_actions = [local.topic]
 
   evaluation_periods  = var.cpu_eval_periods
   datapoints_to_alarm = var.cpu_datapoints
   period              = var.cpu_period
   threshold           = var.cpu_threshold
   alarm_actions       = [local.topic]
+  ok_actions          = [local.topic]
   dimensions = {
     InstanceId   = var.instanceId
     ImageId      = var.imageId
@@ -33,13 +34,14 @@ resource "aws_cloudwatch_metric_alarm" "low_available_memory" {
   metric_name               = "mem_available_percent"
   namespace                 = "CWAgent"
   statistic                 = "Average"
-  insufficient_data_actions = []
+  insufficient_data_actions = [var.topic]
 
   evaluation_periods  = var.mem_eval_periods
   datapoints_to_alarm = var.mem_datapoints
   period              = var.mem_period
   threshold           = var.mem_threshold
   alarm_actions       = [var.topic]
+  ok_actions          = [var.topic]
   dimensions = {
     InstanceId   = var.instanceId
     ImageId      = var.imageId
@@ -55,13 +57,14 @@ resource "aws_cloudwatch_metric_alarm" "disk_free" {
   metric_name               = "disk_free"
   namespace                 = "CWAgent"
   statistic                 = "Average"
-  insufficient_data_actions = []
+  insufficient_data_actions = [var.topic]
 
   evaluation_periods  = var.disk_eval_periods
   datapoints_to_alarm = var.disk_datapoints
   period              = var.disk_period
   threshold           = var.disk_threshold
   alarm_actions       = [var.topic]
+   ok_actions         = [var.topic]
   dimensions = {
     InstanceId   = var.instanceId
     ImageId      = var.imageId
@@ -81,19 +84,19 @@ resource "aws_cloudwatch_metric_alarm" "disk_used" {
   metric_name               = "disk_used_percent"
   namespace                 = "CWAgent"
   statistic                 = "Average"
-  insufficient_data_actions = []
+  insufficient_data_actions = [var.topic]
 
   evaluation_periods  = var.disk_eval_periods
   datapoints_to_alarm = var.disk_datapoints
   period              = var.disk_period
   threshold           = var.disk_threshold
   alarm_actions       = [var.topic]
+  ok_actions          = [var.topic]
   dimensions = {
     InstanceId   = var.instanceId
     ImageId      = var.imageId
     InstanceType = var.instanceType
     path         = "/"
-    device       = var.rootDevice
     fstype       = var.fileSystem
   }
 }
@@ -107,13 +110,14 @@ resource "aws_cloudwatch_metric_alarm" "cpu_usage_iowait" {
   metric_name               = "cpu_usage_iowait"
   namespace                 = "CWAgent"
   statistic                 = "Average"
-  insufficient_data_actions = []
+  insufficient_data_actions = [var.topic]
 
   evaluation_periods  = var.eval_periods
   datapoints_to_alarm = var.eval_periods
   period              = var.period
   threshold           = var.threshold
   alarm_actions       = [var.topic]
+  ok_actions          = [var.topic]
   dimensions = {
     InstanceId   = var.instanceId
     ImageId      = var.imageId
@@ -135,12 +139,13 @@ resource "aws_cloudwatch_metric_alarm" "instance_health_check" {
   metric_name               = "StatusCheckFailed_Instance"
   namespace                 = "AWS/EC2"
   statistic                 = "Average"
-  insufficient_data_actions = []
+  insufficient_data_actions = [var.topic]
 
   evaluation_periods = var.insthc_eval_periods
   period             = var.insthc_period
   threshold          = var.insthc_threshold
   alarm_actions      = [var.topic]
+  ok_actions         = [var.topic]
   dimensions = {
     InstanceId = var.instanceId
   }
@@ -154,12 +159,13 @@ resource "aws_cloudwatch_metric_alarm" "system_health_check" {
   metric_name               = "StatusCheckFailed_System"
   namespace                 = "AWS/EC2"
   statistic                 = "Average"
-  insufficient_data_actions = []
+  insufficient_data_actions = [var.topic]
 
   evaluation_periods = var.syshc_eval_periods
   period             = var.syshc_period
   threshold          = var.syshc_threshold
   alarm_actions      = [var.topic]
+  ok_actions         = [var.topic]
   dimensions = {
     InstanceId = var.instanceId
   }
@@ -181,4 +187,5 @@ resource "aws_cloudwatch_metric_alarm" "ec2_stop_alarm" {
 
   alarm_description = "This alarm will trigger when the EC2 instance stops."
   alarm_actions     = [var.topic]
+  ok_actions        = [var.topic]
 }

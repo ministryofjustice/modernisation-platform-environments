@@ -125,7 +125,7 @@
       "tds_db_user": "admin",
       "tds_db_deploy_to_multi_azs": "false",
       "tds_db_instance_type": "db.t3.small",
-      "tds_db_storage_gb": "50",
+      "tds_db_storage_gb": "200",
       "tds_db_deletion_protection": "false",
       "s3_lifecycle_days_abort_incomplete_multipart_upload_days": 6,
       "s3_lifecycle_days_expiration_current": 730,

@@ -55,10 +55,8 @@ data "archive_file" "lambda_zip" {
   output_path      = "lambda/lambda_function.zip"
 }
 
-# tfsec:ignore:aws-lambda-enable-tracing
 resource "aws_lambda_function" "root_snapshot_to_ami" {
-  # checkov:skip=CKV_AWS_50: "X-ray tracing is not required"
-  # checkov:skip=CKV_AWS_117: "Lambda is not environment specific"
+  # checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"
   # checkov:skip=CKV_AWS_116: "DLQ not required"
   # checkov:skip=CKV_AWS_272: "Ensure AWS Lambda function is configured to validate code-signing"
   filename                       = "lambda/lambda_function.zip"
@@ -67,8 +65,20 @@ resource "aws_lambda_function" "root_snapshot_to_ami" {
   handler                        = "root_snapshot_to_ami.lambda_handler"
   source_code_hash               = data.archive_file.lambda_zip.output_base64sha256
   runtime                        = "python3.12"
+  memory_size                    = "512"
   timeout                        = "120"
   reserved_concurrent_executions = 1
+
+  tracing_config {
+    mode = "Active"
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "root_snapshot_to_ami-${local.application_name}"
+    }
+  )
 }
 
 resource "aws_cloudwatch_event_rule" "every_day_0130" {
