@@ -32,12 +32,12 @@ resource "aws_db_instance" "dacp_db" {
 # 1. Create a custom parameter group
 resource "aws_db_parameter_group" "dacp_analyse" {
   name        = "custom-postgres-parameters"
-  family      = "postgres14"   # match your RDS engine version
+  family      = "postgres14" # match your RDS engine version
   description = "Custom parameter group for slow query logging"
 
   parameter {
     name  = "log_min_duration_statement"
-    value = "5000"   # log queries longer than 5 seconds
+    value = "5000" # log queries longer than 5 seconds
   }
 
   parameter {

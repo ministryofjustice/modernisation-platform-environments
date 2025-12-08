@@ -99,7 +99,7 @@ data "aws_security_group" "core_vpc_protected" {
   }
 }
 resource "aws_security_group_rule" "temp_ssm_only_egress" {
-  count       = local.environment == "production" ? 1 : 0
+  count             = local.environment == "production" ? 1 : 0
   security_group_id = aws_security_group.temp_ssm_only[0].id
 
   description              = "${local.application_name}-app-clone_egress_to_interface_endpoints"
