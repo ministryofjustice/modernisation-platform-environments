@@ -51,7 +51,7 @@ module "policy" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.58.0"
+  version = "6.2.3"
 
   name_prefix = "transfer-user-${var.name}"
 
@@ -62,7 +62,7 @@ module "role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.58.0"
+  version = "6.2.3"
 
   create_role = true
 
