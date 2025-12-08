@@ -21,6 +21,10 @@ resource "aws_sns_topic" "cloudwatch_alerts" {
   }
 }
 EOF
+  kms_master_key_id = "alias/aws/sns"
+  tags = merge(local.tags, 
+    { Name = "cloudwatch-slack-alerts" }
+  )
 }
 
 data "aws_iam_policy_document" "cloudwatch_alerting_sns" {

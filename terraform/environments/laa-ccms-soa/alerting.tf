@@ -57,6 +57,10 @@ resource "aws_sns_topic" "alerts" {
   }
 }
 EOF
+  kms_master_key_id = "alias/aws/sns"
+  tags = merge(local.tags, 
+    { Name = "${local.application_data.accounts[local.environment].app_name}-alerts" }
+  )
 }
 
 resource "aws_sns_topic_policy" "default" {
@@ -91,6 +95,7 @@ resource "aws_sns_topic" "guardduty_alerts" {
   }
 }
 EOF
+  kms_master_key_id = "alias/aws/sns"
 }
 
 resource "aws_sns_topic_policy" "guarduty_default" {
