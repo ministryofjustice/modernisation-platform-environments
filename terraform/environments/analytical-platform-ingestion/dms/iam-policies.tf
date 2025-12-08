@@ -56,7 +56,7 @@ module "production_replication_cica_dms_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.54.1"
+  version = "6.2.3"
 
   name_prefix = "cica-dms-ingress-replication"
 
@@ -77,7 +77,7 @@ module "tariff_eventbridge_dms_full_load_task_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.54.1"
+  version = "6.2.3"
 
   name_prefix = "tariff-cica-dms-eventbridge-full-load-task"
 
@@ -98,7 +98,7 @@ module "tempus_eventbridge_dms_full_load_task_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.54.1"
+  version = "6.2.3"
 
   name_prefix = "tempus-cica-dms-eventbridge-full-load-task"
 
