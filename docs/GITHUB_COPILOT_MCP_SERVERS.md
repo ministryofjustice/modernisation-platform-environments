@@ -2,6 +2,20 @@
 
 This document covers the set up of MCP servers for use within [GitHub Copilot Chat](https://docs.github.com/en/copilot/how-tos/provide-context/use-mcp/extend-copilot-chat-with-mcp)
 
+## Prerequisites
+
+> If you're using the dev container in this repository, you can skip this section
+
+- [Visual Studio Code](https://code.visualstudio.com/)
+
+- [GitHub Copilot Chat](https://marketplace.visualstudio.com/items?itemName=GitHub.copilot-chat) extension
+
+- [AWS SSO CLI](https://github.com/synfinatic/aws-sso-cli)
+
+  - You can find a ready-to-go configuration file at [ministryofjustice/.devcontainer](https://github.com/ministryofjustice/.devcontainer/blob/main/features/src/aws/src/home/vscode/.aws-sso/config.yaml)
+
+- [GitHub CLI](https://cli.github.com/)
+
 ## Authenticate and Start
 
 > [!WARNING]
