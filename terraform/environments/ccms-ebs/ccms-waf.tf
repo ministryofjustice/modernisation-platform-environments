@@ -44,6 +44,9 @@ resource "aws_wafv2_ip_set" "ebs_waf_ip_set" {
   )
 }
 
+########################################################################################################################
+# PLEASE IGNORE THE FOLLOWING REOURCE TERRAFORM PLAN CUSTOM MANAGED HTML PAGE DELETION AS IT IS HANDLED VIA THE LAMBDA #
+########################################################################################################################
 resource "aws_wafv2_web_acl" "ebs_web_acl" {
   name        = "ebs_waf"
   scope       = "REGIONAL"
@@ -87,7 +90,9 @@ resource "aws_wafv2_web_acl" "ebs_web_acl" {
   lifecycle {
     ignore_changes = [ 
       default_action,
-      rule
+      rule,
+      custom_response_body,
+      description,
      ]
   }
 }
