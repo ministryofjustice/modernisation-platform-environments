@@ -75,7 +75,7 @@ resource "aws_lambda_function" "lambda_payment_load_monitor" {
   handler          = "lambda_function.lambda_handler"
   runtime          = "python3.13"
   timeout          = 30
-  publish          = truelambda_delivery/payment-load-monitor-layer/layerV1.ziplambda_delivery/payment-load-monitor-layer/layerV1.zip
+  publish          = true
 
   environment {
     variables = {
