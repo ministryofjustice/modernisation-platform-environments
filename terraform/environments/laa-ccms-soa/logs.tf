@@ -123,9 +123,10 @@ resource "aws_cloudwatch_log_subscription_filter" "ccms_soa_edn_quiesced_filter"
   destination_arn = aws_lambda_function.ccms_soa_edn_quiesced_monitor.arn
 
   depends_on = [
-    aws_lambda_permission.allow_cloudwatch_invoke_ccms_soa_edn_quiesced
+    aws_lambda_permission.allow_cloudwatch_invoke_ccms_soa_quiesced
   ]
 }
+
 
 
 
