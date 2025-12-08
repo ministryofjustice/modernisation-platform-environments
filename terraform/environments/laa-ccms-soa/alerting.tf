@@ -393,7 +393,7 @@ resource "aws_cloudwatch_metric_alarm" "Admin_UnHealthy_Hosts" {
   statistic           = "Average"
   namespace           = "AWS/NetworkELB"
   period              = "60"
-  evaluation_periods  = "15"
+  evaluation_periods  = "3"
   threshold           = "0"
   treat_missing_data  = "notBreaching"
   dimensions = {
@@ -413,7 +413,7 @@ resource "aws_cloudwatch_metric_alarm" "Managed_UnHealthy_Hosts" {
   statistic           = "Average"
   namespace           = "AWS/NetworkELB"
   period              = "60"
-  evaluation_periods  = "15"
+  evaluation_periods  = "3"
   threshold           = "0"
   treat_missing_data  = "notBreaching"
   dimensions = {
