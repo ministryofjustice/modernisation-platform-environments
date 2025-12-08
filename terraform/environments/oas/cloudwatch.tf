@@ -17,7 +17,7 @@ locals {
       threshold           = "90"
       treat_missing_data  = "breaching"
       dimensions = {
-        InstanceId = aws_instance.oas_app_instance[0].id
+        InstanceId = aws_instance.oas_app_instance_new[0].id
       }
 
     },
@@ -34,7 +34,7 @@ locals {
       treat_missing_data  = "breaching"
       dimensions = {
         ImageId      = local.application_data.accounts[local.environment].ec2amiid
-        InstanceId   = aws_instance.oas_app_instance[0].id
+        InstanceId   = aws_instance.oas_app_instance_new[0].id
         InstanceType = "db.t3.small"
       }
 
@@ -52,7 +52,7 @@ locals {
       treat_missing_data  = "breaching"
       dimensions = {
         ImageId    = local.application_data.accounts[local.environment].ec2amiid
-        InstanceId = aws_instance.oas_app_instance[0].id
+        InstanceId = aws_instance.oas_app_instance_new[0].id
         path       = "/oracle/software"
         fstype     = "ext4"
       }
@@ -71,7 +71,7 @@ locals {
       treat_missing_data  = "breaching"
       dimensions = {
         ImageId    = local.application_data.accounts[local.environment].ec2amiid
-        InstanceId = aws_instance.oas_app_instance[0].id
+        InstanceId = aws_instance.oas_app_instance_new[0].id
         path       = "/"
         fstype     = "xfs"
       }
