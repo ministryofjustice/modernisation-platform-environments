@@ -52,7 +52,7 @@ data "aws_secretsmanager_secret_version" "guardduty_slack_channel_id" {
 # Slack Channel Webhook Secret for Cloudwatch Alerts via Lambda
 resource "aws_secretsmanager_secret" "ebs_cw_alerts_secrets" {
   name        = "${local.application_name}-cw-alerts-secrets"
-  description = "CCMS CloudWatch Alerts Secret"
+  description = "CCMS-EBS CloudWatch Alerts Secret"
 }
 
 resource "aws_secretsmanager_secret_version" "ebs_cw_alerts_secrets" {
