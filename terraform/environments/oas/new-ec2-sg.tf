@@ -2,7 +2,7 @@
 ### EC2 SG
 ######################################
 resource "aws_security_group" "ec2_sg" {
-  count       = local.environment == "preproduction" ? 1 : 0
+  count = local.environment == "preproduction" ? 1 : 0
 
   name        = "${local.application_name}-${local.environment}-ec2-security-group"
   description = "EC2 Security Group"
@@ -214,13 +214,13 @@ resource "aws_security_group_rule" "ingress_http_lz_3443" {
 resource "aws_security_group_rule" "ingress_ssh_from_bastion" {
   count = local.environment == "preproduction" ? 1 : 0
 
-  type                    = "ingress"
-  security_group_id       = aws_security_group.ec2_sg[0].id
-  from_port               = 22
-  to_port                 = 22
-  protocol                = "tcp"
+  type                     = "ingress"
+  security_group_id        = aws_security_group.ec2_sg[0].id
+  from_port                = 22
+  to_port                  = 22
+  protocol                 = "tcp"
   source_security_group_id = module.bastion_linux.bastion_security_group
-  description             = "SSH from the Bastion"
+  description              = "SSH from the Bastion"
 }
 
 ######################################
