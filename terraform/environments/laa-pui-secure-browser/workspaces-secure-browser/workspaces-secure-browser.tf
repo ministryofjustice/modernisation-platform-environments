@@ -196,6 +196,7 @@ resource "aws_workspacesweb_browser_settings" "main" {
           "accessmycloudpc.com",
           "account.activedirectory.windowsazure.com",
           "accounts.accesscontrol.windows.net",
+          "adfs.gasolicitors.com",
           "adminwebservice.microsoftonline.com",
           "api.passwordreset.microsoftonline.com",
           "assets.publishing.service.gov.uk",
