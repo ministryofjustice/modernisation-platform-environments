@@ -34,7 +34,7 @@
       "managed_container_version": "0.0.1",
       "managed_wl_mem_args": "-Xms8192m -Xmx12288m -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:InitiatingHeapOccupancyPercent=35 -XX:G1HeapRegionSize=16M -XX:MinMetaspaceFreeRatio=50 -XX:MaxMetaspaceFreeRatio=80 -XX:+AlwaysPreTouch",
       "managed_hostname": "ccms-soa-managed",
-      "efs_performance_mode": "generalPurpose",,
+      "efs_performance_mode": "generalPurpose",
       "logging_cloudwatch_rds_write_iops_threshold": "300",
       "logging_cloudwatch_rds_read_iops_threshold": "300",
       "s3_lifecycle_days_abort_incomplete_multipart_upload_days": 6,
