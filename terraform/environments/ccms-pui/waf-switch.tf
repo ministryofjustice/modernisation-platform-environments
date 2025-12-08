@@ -67,10 +67,10 @@ resource "aws_lambda_function" "waf_toggle" {
   timeout          = 30
   environment {
     variables = {
-      SCOPE        = var.scope
-      WEB_ACL_NAME = data.aws_wafv2_web_acl.waf_web_acl.name
-      WEB_ACL_ID   = data.aws_wafv2_web_acl.waf_web_acl.id
-      RULE_NAME    = var.rule_name
+      SCOPE            = var.scope
+      WEB_ACL_NAME     = data.aws_wafv2_web_acl.waf_web_acl.name
+      WEB_ACL_ID       = data.aws_wafv2_web_acl.waf_web_acl.id
+      RULE_NAME        = var.rule_name
       CUSTOM_BODY_NAME = "maintenance_html"
       CUSTOM_BODY_HTML = <<EOT
 <!doctype html>

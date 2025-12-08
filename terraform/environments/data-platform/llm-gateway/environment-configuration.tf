@@ -3,8 +3,8 @@ locals {
   environment_configurations = {
     development = {
       litellm_versions = {
-        application = "main-v1.80.0-stable.1"
-        chart       = "0.1.823"
+        application = "main-v1.80.5-stable"
+        chart       = "0.1.826"
       }
       litellm_organization_ids = {
         /* These are not currently managed in code */
