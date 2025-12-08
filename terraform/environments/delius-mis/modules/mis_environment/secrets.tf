@@ -16,3 +16,17 @@ resource "aws_secretsmanager_secret" "ad_password" {
 
   tags = var.tags
 }
+
+resource "aws_secretsmanager_secret" "boe_config" {
+  name       = "${var.app_name}-${var.env_name}-sap-boe-config"
+  kms_key_id = var.account_config.kms_keys["general_shared"]
+
+  tags = var.tags
+}
+
+resource "aws_secretsmanager_secret" "boe_passwords" {
+  name       = "${var.app_name}-${var.env_name}-sap-boe-passwords"
+  kms_key_id = var.account_config.kms_keys["general_shared"]
+
+  tags = var.tags
+}
