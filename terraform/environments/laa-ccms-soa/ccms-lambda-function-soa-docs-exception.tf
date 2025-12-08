@@ -43,17 +43,18 @@ resource "aws_iam_role_policy" "lambda_ccms_soa_quiesced_policy" {
         Resource = "${aws_cloudwatch_log_group.log_group_managed.arn}:*"
       },
       {
-        Action : [
+        Action: [
           "secretsmanager:GetSecretValue",
           "secretsmanager:DescribeSecret",
           "secretsmanager:ListSecretVersionIds"
-        ]
-        Effect   = "Allow"
-        Resource = [aws_secretsmanager_secret.ccms_soa_quiesced_secrets.arn]
+        ],
+        Effect: "Allow",
+        Resource: [aws_secretsmanager_secret.ccms_soa_quiesced_secrets.arn]
       }
     ]
   })
 }
+
 
 # Lambda Layer
 resource "aws_lambda_layer_version" "lambda_layer_ccms_soa_edn_quiesced" {
@@ -80,10 +81,10 @@ resource "aws_lambda_function" "ccms_soa_edn_quiesced_monitor" {
   environment {
     variables = {
       LOG_GROUP_NAME = aws_cloudwatch_log_group.log_group_managed.name
-      SNS_TOPIC_ARN  = aws_sns_topic.cloudwatch_slack.arn
       SECRET_NAME    = aws_secretsmanager_secret.ccms_soa_quiesced_secrets.name
     }
   }
+
 
   tracing_config {
     mode = "Active"
