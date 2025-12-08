@@ -1,4 +1,6 @@
 data "aws_vpc" "selected" {
+  count = contains(local.enabled_workspaces, terraform.workspace) ? 1 : 0
+  
   filter {
     name   = "tag:Name"
     values = ["${local.application_name}-${local.environment}"]
@@ -6,9 +8,11 @@ data "aws_vpc" "selected" {
 }
 
 data "aws_subnets" "eks_private" {
+  count = contains(local.enabled_workspaces, terraform.workspace) ? 1 : 0
+  
   filter {
     name   = "vpc-id"
-    values = [data.aws_vpc.selected.id]
+    values = [data.aws_vpc.selected[0].id]
   }
   filter {
     name   = "tag:Name"
@@ -17,9 +21,11 @@ data "aws_subnets" "eks_private" {
 }
 
 data "aws_subnets" "eks_public" {
+  count = contains(local.enabled_workspaces, terraform.workspace) ? 1 : 0
+  
   filter {
     name   = "vpc-id"
-    values = [data.aws_vpc.selected.id]
+    values = [data.aws_vpc.selected[0].id]
   }
   filter {
     name   = "tag:Name"
@@ -35,8 +41,8 @@ module "eks" {
 
   name               = local.environment
   kubernetes_version = "1.34"
-  vpc_id             = data.aws_vpc.selected.id
-  subnet_ids         = data.aws_subnets.eks_private.ids
+  vpc_id             = data.aws_vpc.selected[0].id
+  subnet_ids         = data.aws_subnets.eks_private[0].ids
   enable_irsa        = true
 
 
