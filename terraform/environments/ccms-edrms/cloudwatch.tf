@@ -101,10 +101,10 @@ resource "aws_cloudwatch_metric_alarm" "TDS_RDS_Free_Storage_Space_Over_Threshol
   namespace           = "AWS/RDS"
   period              = "60"
   evaluation_periods  = "5"
-  threshold           = "30"
+  threshold           = local.application_data.accounts[local.environment].tds_db_storage_gb * 0.2 * 1024 * 1024 * 1024
   treat_missing_data  = "notBreaching"
   dimensions = {
-    DBInstanceIdentifier = aws_db_instance.tds_db.id
+    DBInstanceIdentifier = aws_db_instance.tds_db.identifier
   }
 
   alarm_actions = [aws_sns_topic.cloudwatch_slack.arn]
