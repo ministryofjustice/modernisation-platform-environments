@@ -638,7 +638,7 @@ data "aws_iam_policy_document" "coat_cur_v2_hourly_enriched_prod_bucket_policy" 
       identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/moj-coat-${local.environment}-cur-reports-cross-role"]
     }
   }
-  
+
   statement {
     sid    = "AthenaAccess"
     effect = "Allow"
