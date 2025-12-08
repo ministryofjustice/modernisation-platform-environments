@@ -234,6 +234,7 @@ resource "aws_workspacesweb_browser_settings" "main" {
           "loginex.microsoftonline.com",
           "lsconline.legalservices.gov.uk",
           "mysignins.microsoft.com",
+          "myworkspace.leighday.co.uk",
           "nexus.microsoftonline-p.com",
           "passwordreset.microsoftonline.com",
           "portal.manage.microsoft.com",

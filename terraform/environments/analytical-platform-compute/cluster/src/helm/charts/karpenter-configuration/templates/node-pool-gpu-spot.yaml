@@ -7,6 +7,9 @@ spec:
   disruption:
     consolidationPolicy: WhenEmpty
     consolidateAfter: 5m
+  limits:
+    cpu: 132
+    memory: 528Gi
   template:
     metadata:
       labels:
