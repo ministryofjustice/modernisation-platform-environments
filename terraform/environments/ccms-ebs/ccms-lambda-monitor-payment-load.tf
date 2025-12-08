@@ -1,4 +1,3 @@
-# CloudWatch -> filter -> event -> Lambda -> SNS Topic -> Slack
 
 resource "aws_iam_role" "lambda_payment_load_monitor_role" {
   name = "${local.application_name}-${local.environment}-payment_load_monitor_role"
@@ -31,9 +30,13 @@ resource "aws_iam_role_policy" "lambda_payment_load_monitor_policy" {
         Resource = "arn:aws:logs:*:*:*"
       },
       {
-        Effect   = "Allow"
-        Action   = ["sns:Publish"]
-        Resource = [aws_sns_topic.payment_load_notifications.arn]
+        Action : [
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:DescribeSecret",
+          "secretsmanager:ListSecretVersionIds"
+        ],
+        Effect   = "Allow",
+        Resource = [aws_secretsmanager_secret.ebs_cw_alerts_secrets.arn]
       }
     ]
   })
@@ -46,10 +49,21 @@ resource "aws_sns_topic" "payment_load_notifications" {
   })
 }
 
-resource "aws_sns_topic_subscription" "payment_load_notofications_email" {
-  topic_arn = aws_sns_topic.payment_load_notifications.arn
-  protocol  = "email"
-  endpoint  = local.application_data.accounts[local.environment].payment_load_monitor_email
+# resource "aws_sns_topic_subscription" "payment_load_notofications_email" {
+#   topic_arn = aws_sns_topic.payment_load_notifications.arn
+#   protocol  = "email"
+#   endpoint  = local.application_data.accounts[local.environment].payment_load_monitor_email
+# }
+
+# Lambda Layer
+resource "aws_lambda_layer_version" "lambda_layer" {
+  # filename                 = "lambda/layerV1.zip"
+  layer_name               = "${local.application_name}-${local.environment}-payment-load-monitor-layer"
+  s3_key                   = "lambda_delivery/payment-load-monitor-layer/layerV1.zip"
+  s3_bucket                = module.s3-bucket-shared.bucket.id
+  compatible_runtimes      = ["python3.13"]
+  compatible_architectures = ["x86_64"]
+  description              = "Lambda Layer for ${local.application_name} EBS Payment Load Monitor"
 }
 
 resource "aws_lambda_function" "lambda_payment_load_monitor" {
@@ -57,14 +71,15 @@ resource "aws_lambda_function" "lambda_payment_load_monitor" {
   source_code_hash = filebase64sha256("./lambda/payment_load_monitor.zip")
   function_name    = "${local.application_name}-${local.environment}-payment-load-monitor"
   role             = aws_iam_role.lambda_payment_load_monitor_role.arn
+  layers           = [aws_lambda_layer_version.lambda_layer.arn]
   handler          = "lambda_function.lambda_handler"
   runtime          = "python3.13"
   timeout          = 30
-  publish          = true
+  publish          = truelambda_delivery/payment-load-monitor-layer/layerV1.ziplambda_delivery/payment-load-monitor-layer/layerV1.zip
 
   environment {
     variables = {
-      SNS_TOPIC_ARN = aws_sns_topic.payment_load_notifications.arn
+      SECRET_NAME = aws_secretsmanager_secret.ebs_cw_alerts_secrets.name
     }
   }
 
@@ -93,12 +108,12 @@ resource "aws_lambda_permission" "allow_cloudwatch_logs_invoke" {
   source_arn    = "arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${local.application_name}-${local.environment}-payment-load:*"
 }
 
-output "sns_topic_arn_payment_load_monitor" {
-  description = "ARN of the SNS topic for Payment Load monitor"
-  value       = aws_sns_topic.payment_load_notifications.arn
-}
+# output "sns_topic_arn_payment_load_monitor" {
+#   description = "ARN of the SNS topic for Payment Load monitor"
+#   value       = aws_sns_topic.payment_load_notifications.arn
+# }
 
-output "lambda_function_arn_lambda_payment_load_monitor" {
-  description = "ARN of the Payment Load monitor Lambda function"
-  value       = aws_lambda_function.lambda_payment_load_monitor.arn
-}
+# output "lambda_function_arn_lambda_payment_load_monitor" {
+#   description = "ARN of the Payment Load monitor Lambda function"
+#   value       = aws_lambda_function.lambda_payment_load_monitor.arn
+# }
