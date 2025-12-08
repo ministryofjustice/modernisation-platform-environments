@@ -56,7 +56,7 @@ resource "aws_sns_topic" "payment_load_notifications" {
 # }
 
 # Lambda Layer
-resource "aws_lambda_layer_version" "lambda_layer" {
+resource "aws_lambda_layer_version" "lambda_payment_load_monitor_layer" {
   # filename                 = "lambda/layerV1.zip"
   layer_name               = "${local.application_name}-${local.environment}-payment-load-monitor-layer"
   s3_key                   = "lambda_delivery/payment-load-monitor-layer/layerV1.zip"
@@ -71,7 +71,7 @@ resource "aws_lambda_function" "lambda_payment_load_monitor" {
   source_code_hash = filebase64sha256("./lambda/payment_load_monitor.zip")
   function_name    = "${local.application_name}-${local.environment}-payment-load-monitor"
   role             = aws_iam_role.lambda_payment_load_monitor_role.arn
-  layers           = [aws_lambda_layer_version.lambda_layer.arn]
+  layers           = [aws_lambda_layer_version.lambda_payment_load_monitor_layer.arn]
   handler          = "lambda_function.lambda_handler"
   runtime          = "python3.13"
   timeout          = 30
