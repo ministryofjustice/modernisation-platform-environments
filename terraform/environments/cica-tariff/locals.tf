@@ -25,6 +25,7 @@ locals {
   cidr_cica_prod_b      = "10.13.110.0/24"
   cidr_cica_prod_c      = "10.13.20.0/24"
   cidr_cica_prod_d      = "10.13.120.0/24"
+  cidr_analytics        = local.environment == "development" ? ["10.26.128.19/32"] : local.environment == "production" ? ["10.27.128.28/32"] : [] # Request from Harish on behalf of Siva, connection from Analytics Platform
 
   #get snapshot IDs for each volume. Required to stop instance replacement on apply
   block_device_mapping_xvde = {
@@ -198,8 +199,12 @@ locals {
     },
     {
       device_name = "xvdi"
-      size        = 30
+      size        = local.environment == "production" ? 100 : 30
     }
   ]
+
+  mw_ami_target_id = local.environment == "development" ? "i-07e8ab8df178e58aa" : local.environment == "production" ? "i-06a75f5adc84dab2e" : ""
+  mw_date_time     = "2025-12-05T03:10:00"
+
 }
 #

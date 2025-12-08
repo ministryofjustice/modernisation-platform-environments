@@ -18,7 +18,6 @@ locals {
     "intermediate_mdss",
     "datamart",
     "derived",
-    "testing", # delete this one
     "test_results",
     "serco_servicenow_deduped",
     "serco_servicenow_curated",
@@ -32,21 +31,26 @@ locals {
     "serco_servicenow",
   ]
   historic_source_dbs = local.is-production ? [
+    "buddi_buddi",
     "capita_alcohol_monitoring",
     "capita_blob_storage",
-    "g4s_cap_dw",
+    "g4s_atrium",
     "g4s_atrium_unstructured",
+    "g4s_cap_dw",
+    "g4s_centurion",
     "g4s_emsys_mvp",
     "g4s_emsys_tpims",
-    "scram_alcohol_monitoring",
-    "g4s_atrium",
-    "g4s_centurion",
     "g4s_fep",
+    "g4s_integrity",
+    "g4s_lcm_archive",
     "g4s_tasking",
+    "scram_alcohol_monitoring",
+    "g4s_lcm",
   ] : local.is-development ? ["test"] : []
 
   prod_dbs_to_grant = local.is-production ? [
     "am_stg",
+    "buddi_stg",
     "cap_dw_stg",
     "emd_historic_int",
     "historic_api_mart",
@@ -60,6 +64,7 @@ locals {
     "staged_alcohol_monitoring",
     "preprocessed_cap_dw",
     "staged_cap_dw",
+    "curated_emsys_mvp",
     "preprocessed_emsys_mvp",
     "staged_emsys_mvp",
     "preprocessed_emsys_tpims",
@@ -68,13 +73,21 @@ locals {
     "staged_scram_alcohol_monitoring",
     "g4s_atrium_curated",
     "g4s_centurion_curated",
+    "g4s_tasking_curated",
+    "g4s_integrity_curated",
     "curated_fep",
+    "g4s_lcm_archive_curated",
+    "g4s_lcm_curated",
+    "intermediate_tasking",
   ] : []
+
   dev_dbs_to_grant       = local.is-production ? [for db in local.prod_dbs_to_grant : "${db}_historic_dev_dbt"] : []
   dbt_dbs_to_grant       = [for db in local.dbt_dbs : "${db}${local.dbt_suffix}"]
   live_feed_dbs_to_grant = [for db in local.live_feeds_dbs : "${db}${local.db_suffix}"]
   dbs_to_grant           = toset(flatten([local.prod_dbs_to_grant, local.dev_dbs_to_grant, local.dbt_dbs_to_grant]))
-  existing_dbs_to_grant  = toset(flatten([local.live_feed_dbs_to_grant, local.historic_source_dbs]))
+
+
+  existing_dbs_to_grant = toset(flatten([local.live_feed_dbs_to_grant, local.historic_source_dbs]))
 }
 
 # Source Analytics DBT Secrets

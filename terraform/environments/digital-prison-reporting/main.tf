@@ -29,16 +29,16 @@ module "glue_hive_table_creation_job" {
   name                          = "${local.project}-hive-table-creation-${local.env}"
   short_name                    = "${local.project}-hive-table-creation"
   command_type                  = "glueetl"
+  glue_version                  = local.glue_job_version
   description                   = "Creates Hive tables for schemas in the registry.\nArguments:\n--dpr.config.key: (Optional) config key e.g. prisoner"
   create_security_configuration = local.create_sec_conf
   job_language                  = "scala"
   temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-hive-table-creation-${local.env}/"
   spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-hive-table-creation-${local.env}/"
   # Placeholder Script Location
-  script_location              = local.glue_placeholder_script_location
-  enable_continuous_log_filter = false
-  project_id                   = local.project
-  aws_kms_key                  = local.s3_kms_arn
+  script_location = local.glue_placeholder_script_location
+  project_id      = local.project
+  aws_kms_key     = local.s3_kms_arn
 
   execution_class             = "STANDARD"
   worker_type                 = "G.1X"
@@ -95,16 +95,16 @@ module "glue_s3_file_transfer_job" {
   name                          = "${local.project}-s3-file-transfer-job-${local.env}"
   short_name                    = "${local.project}-s3-file-transfer-job"
   command_type                  = "glueetl"
+  glue_version                  = local.glue_job_version
   description                   = "Transfers s3 data from one bucket to another.\nArguments:\n--dpr.config.key: (Optional) config key e.g prisoner, when provided, the job will only transfer data belonging to specified config otherwise all data will be transferred"
   create_security_configuration = local.create_sec_conf
   job_language                  = "scala"
   temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-s3-file-transfer-${local.env}/"
   spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-s3-file-transfer-${local.env}/"
   # Placeholder Script Location
-  script_location              = local.glue_placeholder_script_location
-  enable_continuous_log_filter = false
-  project_id                   = local.project
-  aws_kms_key                  = local.s3_kms_arn
+  script_location = local.glue_placeholder_script_location
+  project_id      = local.project
+  aws_kms_key     = local.s3_kms_arn
 
   execution_class             = "STANDARD"
   worker_type                 = "G.1X"
@@ -154,16 +154,16 @@ module "glue_switch_prisons_hive_data_location_job" {
   name                          = "${local.project}-switch-prisons-data-source-${local.env}"
   short_name                    = "${local.project}-switch-prisons-data-source"
   command_type                  = "glueetl"
+  glue_version                  = local.glue_job_version
   description                   = "Switch Prisons Hive tables data location.\nArguments:\n--dpr.config.key: (Required) config key e.g. prisoner\n--dpr.prisons.data.switch.target.s3.path: (Required) s3 path to point the prisons data to e.g. s3://dpr-curated-zone-<env>"
   create_security_configuration = local.create_sec_conf
   job_language                  = "scala"
   temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-switch-prisons-data-source-${local.env}/"
   spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-switch-prisons-data-source-${local.env}/"
   # Placeholder Script Location
-  script_location              = local.glue_placeholder_script_location
-  enable_continuous_log_filter = false
-  project_id                   = local.project
-  aws_kms_key                  = local.s3_kms_arn
+  script_location = local.glue_placeholder_script_location
+  project_id      = local.project
+  aws_kms_key     = local.s3_kms_arn
 
   execution_class             = "STANDARD"
   worker_type                 = "G.1X"
@@ -214,16 +214,16 @@ module "glue_s3_data_deletion_job" {
   name                          = "${local.project}-s3-data-deletion-job-${local.env}"
   short_name                    = "${local.project}-s3-data-deletion-job"
   command_type                  = "glueetl"
+  glue_version                  = local.glue_job_version
   description                   = "Deletes s3 data belonging to a configured domain from specified bucket.\nArguments:\n--dpr.config.key: (Required) config key e.g. prisoner\n--dpr.file.deletion.buckets: (Required) comma separated set of s3 buckets from which to delete data from e.g dpr-raw-zone-<env>,dpr-structured-zone-<env>"
   create_security_configuration = local.create_sec_conf
   job_language                  = "scala"
   temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-s3-data-deletion-${local.env}/"
   spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-s3-data-deletion-${local.env}/"
   # Placeholder Script Location
-  script_location              = local.glue_placeholder_script_location
-  enable_continuous_log_filter = false
-  project_id                   = local.project
-  aws_kms_key                  = local.s3_kms_arn
+  script_location = local.glue_placeholder_script_location
+  project_id      = local.project
+  aws_kms_key     = local.s3_kms_arn
 
   execution_class             = "STANDARD"
   worker_type                 = "G.1X"
@@ -268,16 +268,16 @@ module "glue_stop_glue_instance_job" {
   name                          = "${local.project}-stop-glue-instance-job-${local.env}"
   short_name                    = "${local.project}-stop-glue-instance-job"
   command_type                  = "glueetl"
+  glue_version                  = local.glue_job_version
   description                   = "Stops a running Glue job instance.\nArguments:\n--dpr.stop.glue.instance.job.name: (Required) name of the glue job whose running instance is to be stopped"
   create_security_configuration = local.create_sec_conf
   job_language                  = "scala"
   temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-stop-glue-instance-${local.env}/"
   spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-stop-glue-instance-${local.env}/"
   # Placeholder Script Location
-  script_location              = local.glue_placeholder_script_location
-  enable_continuous_log_filter = false
-  project_id                   = local.project
-  aws_kms_key                  = local.s3_kms_arn
+  script_location = local.glue_placeholder_script_location
+  project_id      = local.project
+  aws_kms_key     = local.s3_kms_arn
 
   execution_class             = "STANDARD"
   worker_type                 = "G.1X"
@@ -312,16 +312,16 @@ module "stop_dms_task_job" {
   name                          = "${local.project}-stop-dms-task-job-${local.env}"
   short_name                    = "${local.project}-stop-dms-task-job"
   command_type                  = "glueetl"
+  glue_version                  = local.glue_job_version
   description                   = "Stops a running DMS replication task.\nArguments:\n--dpr.dms.replication.task.id: (Required) ID of the DMS replication task which is to be stopped"
   create_security_configuration = local.create_sec_conf
   job_language                  = "scala"
   temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-stop-dms-task-${local.env}/"
   spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-stop-dms-task-${local.env}/"
   # Placeholder Script Location
-  script_location              = local.glue_placeholder_script_location
-  enable_continuous_log_filter = false
-  project_id                   = local.project
-  aws_kms_key                  = local.s3_kms_arn
+  script_location = local.glue_placeholder_script_location
+  project_id      = local.project
+  aws_kms_key     = local.s3_kms_arn
 
   execution_class             = "STANDARD"
   worker_type                 = "G.1X"
@@ -356,16 +356,16 @@ module "set_cdc_dms_start_time_job" {
   name                          = "${local.project}-set-cdc-dms-start-time-job-${local.env}"
   short_name                    = "${local.project}-set-cdc-dms-start-time-job"
   command_type                  = "glueetl"
+  glue_version                  = local.glue_job_version
   description                   = "Sets the start time of a CDC DMS Task associated with a given Full-Load task.\nArguments:\n--dpr.dms.replication.task.id: (Required) Id of the Full-Load DMS task from which the start time of the CDC task will be obtained\n--dpr.cdc.dms.replication.task.id: (Required) Id of the CDC DMS task for which the start time is to be updated"
   create_security_configuration = local.create_sec_conf
   job_language                  = "scala"
   temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-set-cdc-dms-start-time-${local.env}/"
   spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-set-cdc-dms-start-time-${local.env}/"
   # Placeholder Script Location
-  script_location              = local.glue_placeholder_script_location
-  enable_continuous_log_filter = false
-  project_id                   = local.project
-  aws_kms_key                  = local.s3_kms_arn
+  script_location = local.glue_placeholder_script_location
+  project_id      = local.project
+  aws_kms_key     = local.s3_kms_arn
 
   execution_class             = "STANDARD"
   worker_type                 = "G.1X"
@@ -399,16 +399,16 @@ module "activate_glue_trigger_job" {
   name                          = "${local.project}-activate-glue-trigger-job-${local.env}"
   short_name                    = "${local.project}-activate-glue-trigger-job"
   command_type                  = "glueetl"
+  glue_version                  = local.glue_job_version
   description                   = "Activates/Deactivates a Glue trigger.\nArguments:\n--dpr.glue.trigger.name: (Required) Name of the Glue trigger to be activated/deactivated\n--dpr.glue.trigger.activate: (Required) when true, activates the trigger"
   create_security_configuration = local.create_sec_conf
   job_language                  = "scala"
   temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-activate-glue-trigger-${local.env}/"
   spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-activate-glue-trigger-${local.env}/"
   # Placeholder Script Location
-  script_location              = local.glue_placeholder_script_location
-  enable_continuous_log_filter = false
-  project_id                   = local.project
-  aws_kms_key                  = local.s3_kms_arn
+  script_location = local.glue_placeholder_script_location
+  project_id      = local.project
+  aws_kms_key     = local.s3_kms_arn
 
   execution_class             = "STANDARD"
   worker_type                 = "G.1X"
@@ -1116,17 +1116,17 @@ module "generate_test_postgres_data" {
   name                          = "${local.project}-load-generator-job-${local.env}"
   short_name                    = "${local.project}-load-generator-job"
   command_type                  = "glueetl"
+  glue_version                  = local.glue_job_version
   description                   = "Inserts a given number of records to postgres database.\nArguments:\n--dpr.test.database.secret.id: (Required) The Id of the secret to connect to the Postgres database\n--dpr.test.data.batch.size: (Optional) Total number of records to insert per batch\n--dpr.test.data.parallelism: (Optional) Total number of parallel batches\n--dpr.test.data.inter.batch.delay.millis: (Optional) Amount of milliseconds to wait between batches\n--dpr.test.data.run.duration.millis: (Optional) Total run duration of data generation in milliseconds"
   create_security_configuration = local.create_sec_conf
   job_language                  = "scala"
   temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-load-generator-job-${local.env}/"
   spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-load-generator-job-${local.env}/"
   # Placeholder Script Location
-  script_location              = local.glue_placeholder_script_location
-  enable_continuous_log_filter = false
-  project_id                   = local.project
-  aws_kms_key                  = local.s3_kms_arn
-  connections                  = ["${local.project}-dps-test-db-connection"]
+  script_location = local.glue_placeholder_script_location
+  project_id      = local.project
+  aws_kms_key     = local.s3_kms_arn
+  connections     = ["${local.project}-dps-test-db-connection"]
 
   execution_class             = "STANDARD"
   worker_type                 = "G.1X"

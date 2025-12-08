@@ -1,7 +1,15 @@
 # ACM Public Certificate
+data "aws_route53_zone" "modernisation_platform" {
+  provider     = aws.core-network-services
+  name         = "modernisation-platform.service.justice.gov.uk"
+  private_zone = false
+}
+
 resource "aws_acm_certificate" "external" {
-  domain_name               = local.is-production ? "correspondence-handling-and-processing.service.justice.gov.uk" : "modernisation-platform.service.justice.gov.uk"
-  validation_method         = "DNS"
+  domain_name = local.is-production ? "correspondence-handling-and-processing.service.justice.gov.uk" : "modernisation-platform.service.justice.gov.uk"
+
+  validation_method = "DNS"
+
   subject_alternative_names = local.is-production ? ["correspondence-handling-and-processing.service.justice.gov.uk"] : ["${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
 
   tags = {
@@ -14,8 +22,9 @@ resource "aws_acm_certificate" "external" {
 }
 
 resource "aws_acm_certificate_validation" "external" {
-  certificate_arn         = aws_acm_certificate.external.arn
-  validation_record_fqdns = local.is-production ? [aws_route53_record.external_validation_prod[0].fqdn] : [local.domain_name_main[0], local.domain_name_sub[0]]
+  certificate_arn = aws_acm_certificate.external.arn
+
+  validation_record_fqdns = local.is-production ? [aws_route53_record.external_validation_prod[0].fqdn] : values(aws_route53_record.external_validation_dev)[*].fqdn
 }
 
 # Route53 DNS records for certificate validation (prod)
@@ -31,19 +40,52 @@ resource "aws_route53_record" "external_validation_prod" {
   zone_id         = data.aws_route53_zone.application_zone.zone_id
 }
 
-
-# Route53 DNS records for certificate validation subdomain (non-prod)
-resource "aws_route53_record" "external_validation_subdomain" {
-  count    = local.is-production ? 0 : 1
-  provider = aws.core-vpc
-
+#dev NS validation records for all cert domains
+resource "aws_route53_record" "external_validation_dev" {
+  # Only create these in non-prod dev; otherwise empty map = no resources
+  for_each        = (!local.is-production && local.environment == "development") ? local.domain_types : {}
+  provider        = aws.core-network-services
   allow_overwrite = true
-  name            = local.domain_name_sub[0]
-  records         = local.domain_record_sub
-  ttl             = 60
-  type            = local.domain_type_sub[0]
-  zone_id         = data.aws_route53_zone.external.zone_id
+
+  # If this is the base MP domain, use the parent zone; otherwise use the app zone
+  zone_id = data.aws_route53_zone.modernisation_platform.zone_id
+
+  name    = each.value.name
+  type    = each.value.type
+  ttl     = 60
+  records = [each.value.record]
+
 }
+
+
+#Route53 DNS record for cart validation (dev only)
+# resource "aws_route53_record" "external_validation_dev_parent" {
+#   count = (!local.is-production && local.environment == "development" && contains(keys(local.domain_types), "modernisation-platform.service.justice.gov.uk")) ? 1 : 0
+#   provider = aws.core-network-services
+#   zone_id = data.aws_route53_zone.modernisation_platform.zone_id
+
+#   allow_overwrite = true
+
+#   name    = local.domain_types["modernisation-platform.service.justice.gov.uk"].name
+#   type    = local.domain_types["modernisation-platform.service.justice.gov.uk"].type
+#   ttl     = 60
+#   records = [local.domain_types["modernisation-platform.service.justice.gov.uk"].record]
+# }
+
+#Route53 DNS record for cart validation (dev only)
+# resource "aws_route53_record" "external_validation_dev_app" {
+#   count = (!local.is-production && local.environment == "development" && contains(keys(local.domain_types), "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk")) ? 1 : 0
+#   provider = aws.core-network-services
+#   zone_id = data.aws_route53_zone.application_zone.zone_id
+
+#   allow_overwrite = true
+
+#   name    = local.domain_types["${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"].name
+#   type    = local.domain_types["${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"].type
+#   ttl     = 60
+#   records = [local.domain_types["${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"].record]
+# }
+
 
 # Production Route53 DNS record 
 resource "aws_route53_record" "external_prod" {
@@ -60,73 +102,21 @@ resource "aws_route53_record" "external_prod" {
   }
 }
 
-# Non-prod Route53 DNS record 
-resource "aws_route53_record" "external_nonprod" {
-  count           = local.is-production ? 0 : 1
-  provider        = aws.core-vpc
-  zone_id         = data.aws_route53_zone.external.zone_id
-  name            = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-  type            = "A"
-  allow_overwrite = true
-
-  alias {
-    name                   = module.lb_access_logs_enabled.load_balancer.dns_name
-    zone_id                = module.lb_access_logs_enabled.load_balancer.zone_id
-    evaluate_target_health = true
-  }
-}
 
 
+# Non-prod Route53 DNS record (dev only)
+# Disabled for now – DNS managed elsewhere, avoids AccessDenied
+#resource "aws_route53_record" "external_nonprod" {
+#  count           = 0 #(!local.is-production && local.environment == "development") ? 1 : 0
+#  provider        = aws.core-network-services
+#  zone_id         = data.aws_route53_zone.application_zone.zone_id
+#  name            = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+#  type            = "A"
+#  allow_overwrite = true
 
-
-# PRODUCTION DNS CONFIGURATION
-
-# ACM Public Certificate
-# resource "aws_acm_certificate" "external_prod" {
-#   count = local.is-production ? 1 : 0
-
-#   domain_name       = "correspondence-handling-and-processing.service.justice.gov.uk"
-#   validation_method = "DNS"
-#   lifecycle {
-#     create_before_destroy = true
-#   }
-# }
-
-# resource "aws_acm_certificate_validation" "external_prod" {
-#   count = local.is-production ? 1 : 0
-
-#   certificate_arn         = aws_acm_certificate.external_prod[0].arn
-#   validation_record_fqdns = [aws_route53_record.external_validation_prod[0].fqdn]
-#   timeouts {
-#     create = "10m"
-#   }
-# }
-
-# Route53 DNS record for certificate validation
-# resource "aws_route53_record" "external_validation_prod" {
-#   count    = local.is-production ? 1 : 0
-#   provider = aws.core-network-services
-
-#   allow_overwrite = true
-#   name            = tolist(aws_acm_certificate.external_prod[0].domain_validation_options)[0].resource_record_name
-#   records         = [tolist(aws_acm_certificate.external_prod[0].domain_validation_options)[0].resource_record_value]
-#   type            = tolist(aws_acm_certificate.external_prod[0].domain_validation_options)[0].resource_record_type
-#   zone_id         = data.aws_route53_zone.application_zone.zone_id
-#   ttl             = 60
-# }
-
-# Route53 DNS record for directing traffic to the service
-# resource "aws_route53_record" "external_prod" {
-#   count    = local.is-production ? 1 : 0
-#   provider = aws.core-network-services
-
-#   zone_id = data.aws_route53_zone.application_zone.zone_id
-#   name    = "correspondence-handling-and-processing.service.justice.gov.uk"
-#   type    = "A"
-
-#   alias {
-#     name                   = module.lb_access_logs_enabled.load_balancer.dns_name
-#     zone_id                = module.lb_access_logs_enabled.load_balancer.zone_id
-#     evaluate_target_health = true
-#   }
-# }
+#  alias {
+#    name                   = module.lb_access_logs_enabled.load_balancer.dns_name
+#    zone_id                = module.lb_access_logs_enabled.load_balancer.zone_id
+#    evaluate_target_health = true
+#  }
+#}

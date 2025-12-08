@@ -528,15 +528,15 @@ resource "aws_volume_attachment" "dbf2_att" {
 
 # Capacity Reservation for the EC2 instance in PROD
 resource "aws_ec2_capacity_reservation" "ebsdb_reservation" {
-  count              = local.is-production ? 1 : 0
-  instance_type      = "x2iedn.32xlarge"
-  availability_zone  = "eu-west-2a"
-  instance_platform  = "Linux/UNIX"
-  instance_count     = 1
-  ebs_optimized      = true
-  ephemeral_storage  = false
-  tenancy            = "default"
-  end_date_type      = "unlimited"
+  count             = local.is-production ? 1 : 0
+  instance_type     = "x2iedn.32xlarge"
+  availability_zone = "eu-west-2a"
+  instance_platform = "Linux/UNIX"
+  instance_count    = 1
+  ebs_optimized     = true
+  ephemeral_storage = false
+  tenancy           = "default"
+  end_date_type     = "unlimited"
 
   tags = merge(local.tags,
     { Name = lower(format("%s-capacity-reservation", local.application_name)) }

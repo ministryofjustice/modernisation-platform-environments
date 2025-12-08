@@ -152,8 +152,8 @@ locals {
             }
           }
         },
-        "ccms-ebs" = {
-          "identity_centre_team" = "laa-ccms-migration-team",
+        "ccms" = {
+          "identity_centre_team" = "ccms-monitoring",
           "aws_accounts" = {
             "ccms-ebs-development" = {
               cloudwatch_enabled              = true
@@ -360,6 +360,7 @@ locals {
         },
         "digital-prison-reporting" = {
           "identity_centre_team" = "hmpps-digital-prison-reporting",
+          "slack_channels"       = ["dpr-alerts-dev"],
           "aws_accounts" = {
             "digital-prison-reporting-development" = {
               cloudwatch_enabled              = true

@@ -5,13 +5,14 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_ccms_ebs_redoa" {
   metric_name               = "disk_used_percent"
   namespace                 = "CWAgent"
   statistic                 = "Average"
-  insufficient_data_actions = []
+  insufficient_data_actions = [aws_sns_topic.cw_alerts.arn]
 
   evaluation_periods  = local.application_data.cloudwatch_ec2.disk.eval_periods
   datapoints_to_alarm = local.application_data.cloudwatch_ec2.disk.eval_periods
   period              = local.application_data.cloudwatch_ec2.disk.period
   threshold           = local.application_data.cloudwatch_ec2.disk.threshold
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
+  ok_actions          = [aws_sns_topic.cw_alerts.arn]
 
   dimensions = {
     ImageId      = aws_instance.ec2_oracle_ebs.ami
@@ -19,7 +20,6 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_ccms_ebs_redoa" {
     InstanceType = aws_instance.ec2_oracle_ebs.instance_type
     InstanceId   = aws_instance.ec2_oracle_ebs.id
     fstype       = "ext4"
-    device       = "nvme2n1"
   }
 }
 
@@ -30,13 +30,14 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_ccms_ebs_redoa" {
 #  metric_name               = "disk_used_percent"
 #  namespace                 = "CWAgent"
 #  statistic                 = "Average"
-#  insufficient_data_actions = []
+#  insufficient_data_actions = [aws_sns_topic.cw_alerts.arn]
 #
 #  evaluation_periods  = local.application_data.cloudwatch_ec2.disk.eval_periods
 #  datapoints_to_alarm = local.application_data.cloudwatch_ec2.disk.eval_periods
 #  period              = local.application_data.cloudwatch_ec2.disk.period
 #  threshold           = local.application_data.cloudwatch_ec2.disk.threshold_dbf
 #  alarm_actions       = [aws_sns_topic.cw_alerts.arn]
+#  ok_actions          = [aws_sns_topic.cw_alerts.arn]
 #
 #  dimensions = {
 #    ImageId      = aws_instance.ec2_oracle_ebs.ami
@@ -44,7 +45,6 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_ccms_ebs_redoa" {
 #    InstanceType = aws_instance.ec2_oracle_ebs.instance_type
 #    InstanceId   = aws_instance.ec2_oracle_ebs.id
 #    fstype       = "ext4"
-#    device       = "nvme3n1" # local.application_data.accounts[local.environment].dbf_device
 #  }
 #}
 
@@ -55,21 +55,20 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_ccms_ebs_arch" {
   metric_name               = "disk_used_percent"
   namespace                 = "CWAgent"
   statistic                 = "Average"
-  insufficient_data_actions = []
+  insufficient_data_actions = [aws_sns_topic.cw_alerts.arn]
 
   evaluation_periods  = local.application_data.cloudwatch_ec2.disk.eval_periods
   datapoints_to_alarm = local.application_data.cloudwatch_ec2.disk.eval_periods
   period              = local.application_data.cloudwatch_ec2.disk.period
   threshold           = local.application_data.cloudwatch_ec2.disk.threshold
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
-
+  ok_actions          = [aws_sns_topic.cw_alerts.arn]
   dimensions = {
     ImageId      = aws_instance.ec2_oracle_ebs.ami
     path         = "/CCMS/EBS/arch"
     InstanceType = aws_instance.ec2_oracle_ebs.instance_type
     InstanceId   = aws_instance.ec2_oracle_ebs.id
     fstype       = "ext4"
-    device       = "nvme4n1"
   }
 }
 
@@ -80,21 +79,20 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_backup" {
   metric_name               = "disk_used_percent"
   namespace                 = "CWAgent"
   statistic                 = "Average"
-  insufficient_data_actions = []
+  insufficient_data_actions = [aws_sns_topic.cw_alerts.arn]
 
   evaluation_periods  = local.application_data.cloudwatch_ec2.disk.eval_periods
   datapoints_to_alarm = local.application_data.cloudwatch_ec2.disk.eval_periods
   period              = local.application_data.cloudwatch_ec2.disk.period
   threshold           = local.application_data.cloudwatch_ec2.disk.threshold
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
-
+  ok_actions          = [aws_sns_topic.cw_alerts.arn]
   dimensions = {
     ImageId      = aws_instance.ec2_oracle_ebs.ami
     path         = "/backup"
     InstanceType = aws_instance.ec2_oracle_ebs.instance_type
     InstanceId   = aws_instance.ec2_oracle_ebs.id
     fstype       = "ext4"
-    device       = "nvme5n1"
   }
 }
 
@@ -105,21 +103,20 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_temp" {
   metric_name               = "disk_used_percent"
   namespace                 = "CWAgent"
   statistic                 = "Average"
-  insufficient_data_actions = []
+  insufficient_data_actions = [aws_sns_topic.cw_alerts.arn]
 
   evaluation_periods  = local.application_data.cloudwatch_ec2.disk.eval_periods
   datapoints_to_alarm = local.application_data.cloudwatch_ec2.disk.eval_periods
   period              = local.application_data.cloudwatch_ec2.disk.period
   threshold           = local.application_data.cloudwatch_ec2.disk.threshold
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
-
+  ok_actions          = [aws_sns_topic.cw_alerts.arn]
   dimensions = {
     ImageId      = aws_instance.ec2_oracle_ebs.ami
     path         = "/temp"
     InstanceType = aws_instance.ec2_oracle_ebs.instance_type
     InstanceId   = aws_instance.ec2_oracle_ebs.id
     fstype       = "ext4"
-    device       = "nvme6n1" # "/dev/sdc"
   }
 }
 
@@ -130,21 +127,20 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_ccms_ebs_diag" {
   metric_name               = "disk_used_percent"
   namespace                 = "CWAgent"
   statistic                 = "Average"
-  insufficient_data_actions = []
+  insufficient_data_actions = [aws_sns_topic.cw_alerts.arn]
 
   evaluation_periods  = local.application_data.cloudwatch_ec2.disk.eval_periods
   datapoints_to_alarm = local.application_data.cloudwatch_ec2.disk.eval_periods
   period              = local.application_data.cloudwatch_ec2.disk.period
   threshold           = local.application_data.cloudwatch_ec2.disk.threshold
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
-
+  ok_actions          = [aws_sns_topic.cw_alerts.arn]
   dimensions = {
     ImageId      = aws_instance.ec2_oracle_ebs.ami
     path         = "/CCMS/EBS/diag"
     InstanceType = aws_instance.ec2_oracle_ebs.instance_type
     InstanceId   = aws_instance.ec2_oracle_ebs.id
     fstype       = "ext4"
-    device       = "nvme7n1"
   }
 }
 
@@ -155,21 +151,20 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_ccms_ebs_redob" {
   metric_name               = "disk_used_percent"
   namespace                 = "CWAgent"
   statistic                 = "Average"
-  insufficient_data_actions = []
+  insufficient_data_actions = [aws_sns_topic.cw_alerts.arn]
 
   evaluation_periods  = local.application_data.cloudwatch_ec2.disk.eval_periods
   datapoints_to_alarm = local.application_data.cloudwatch_ec2.disk.eval_periods
   period              = local.application_data.cloudwatch_ec2.disk.period
   threshold           = local.application_data.cloudwatch_ec2.disk.threshold
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
-
+  ok_actions          = [aws_sns_topic.cw_alerts.arn]
   dimensions = {
     ImageId      = aws_instance.ec2_oracle_ebs.ami
     path         = "/CCMS/EBS/redoB"
     InstanceType = aws_instance.ec2_oracle_ebs.instance_type
     InstanceId   = aws_instance.ec2_oracle_ebs.id
     fstype       = "ext4"
-    device       = "nvme8n1"
   }
 }
 
@@ -180,13 +175,14 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_home" {
   metric_name               = "disk_used_percent"
   namespace                 = "CWAgent"
   statistic                 = "Average"
-  insufficient_data_actions = []
+  insufficient_data_actions = [aws_sns_topic.cw_alerts.arn]
 
   evaluation_periods  = local.application_data.cloudwatch_ec2.disk.eval_periods
   datapoints_to_alarm = local.application_data.cloudwatch_ec2.disk.eval_periods
   period              = local.application_data.cloudwatch_ec2.disk.period
   threshold           = local.application_data.cloudwatch_ec2.disk.threshold
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
+  ok_actions          = [aws_sns_topic.cw_alerts.arn]
 
   dimensions = {
     ImageId      = aws_instance.ec2_oracle_ebs.ami
@@ -194,34 +190,32 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_home" {
     InstanceType = aws_instance.ec2_oracle_ebs.instance_type
     InstanceId   = aws_instance.ec2_oracle_ebs.id
     fstype       = "ext4"
-    device       = "nvme9n1"
   }
 }
 
-resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_backup_prod" {
-  alarm_name                = "${local.application_data.accounts[local.environment].short_env}-ebs_db-disk_free-backup_prod"
-  alarm_description         = "This metric monitors the amount of free disk space on /backup_prod mount. If the amount of free disk space on root falls below 20% for 2 minutes, the alarm will trigger"
-  comparison_operator       = "GreaterThanOrEqualToThreshold"
-  metric_name               = "disk_used_percent"
-  namespace                 = "CWAgent"
-  statistic                 = "Average"
-  insufficient_data_actions = []
+# resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_backup_prod" {
+#   alarm_name                = "${local.application_data.accounts[local.environment].short_env}-ebs_db-disk_free-backup_prod"
+#   alarm_description         = "This metric monitors the amount of free disk space on /backup_prod mount. If the amount of free disk space on root falls below 20% for 2 minutes, the alarm will trigger"
+#   comparison_operator       = "GreaterThanOrEqualToThreshold"
+#   metric_name               = "disk_used_percent"
+#   namespace                 = "CWAgent"
+#   statistic                 = "Average"
+#   insufficient_data_actions = [aws_sns_topic.cw_alerts.arn]
 
-  evaluation_periods  = local.application_data.cloudwatch_ec2.disk.eval_periods
-  datapoints_to_alarm = local.application_data.cloudwatch_ec2.disk.eval_periods
-  period              = local.application_data.cloudwatch_ec2.disk.period
-  threshold           = local.application_data.cloudwatch_ec2.disk.threshold
-  alarm_actions       = [aws_sns_topic.cw_alerts.arn]
-
-  dimensions = {
-    ImageId      = aws_instance.ec2_oracle_ebs.ami
-    path         = "/backup_prod"
-    InstanceType = aws_instance.ec2_oracle_ebs.instance_type
-    InstanceId   = aws_instance.ec2_oracle_ebs.id
-    fstype       = "ext4"
-    device       = "nvme10n1"
-  }
-}
+#   evaluation_periods  = local.application_data.cloudwatch_ec2.disk.eval_periods
+#   datapoints_to_alarm = local.application_data.cloudwatch_ec2.disk.eval_periods
+#   period              = local.application_data.cloudwatch_ec2.disk.period
+#   threshold           = local.application_data.cloudwatch_ec2.disk.threshold
+#   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
+#   ok_actions          = [aws_sns_topic.cw_alerts.arn]
+#   dimensions = {
+#     ImageId      = aws_instance.ec2_oracle_ebs.ami
+#     path         = "/backup_prod"
+#     InstanceType = aws_instance.ec2_oracle_ebs.instance_type
+#     InstanceId   = aws_instance.ec2_oracle_ebs.id
+#     fstype       = "ext4"
+#   }
+# }
 
 resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_u01" {
   alarm_name                = "${local.application_data.accounts[local.environment].short_env}-ebs_db-disk_free-u01"
@@ -230,21 +224,20 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_u01" {
   metric_name               = "disk_used_percent"
   namespace                 = "CWAgent"
   statistic                 = "Average"
-  insufficient_data_actions = []
+  insufficient_data_actions = [aws_sns_topic.cw_alerts.arn]
 
   evaluation_periods  = local.application_data.cloudwatch_ec2.disk.eval_periods
   datapoints_to_alarm = local.application_data.cloudwatch_ec2.disk.eval_periods
   period              = local.application_data.cloudwatch_ec2.disk.period
   threshold           = local.application_data.cloudwatch_ec2.disk.threshold
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
-
+  ok_actions          = [aws_sns_topic.cw_alerts.arn]
   dimensions = {
     ImageId      = aws_instance.ec2_oracle_ebs.ami
     path         = "/u01"
     InstanceType = aws_instance.ec2_oracle_ebs.instance_type
     InstanceId   = aws_instance.ec2_oracle_ebs.id
     fstype       = "ext4"
-    device       = "nvme11n1"
   }
 }
 
@@ -255,21 +248,20 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_export_home" {
   metric_name               = "disk_used_percent"
   namespace                 = "CWAgent"
   statistic                 = "Average"
-  insufficient_data_actions = []
+  insufficient_data_actions = [aws_sns_topic.cw_alerts.arn]
 
   evaluation_periods  = local.application_data.cloudwatch_ec2.disk.eval_periods
   datapoints_to_alarm = local.application_data.cloudwatch_ec2.disk.eval_periods
   period              = local.application_data.cloudwatch_ec2.disk.period
   threshold           = local.application_data.cloudwatch_ec2.disk.threshold
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
-
+  ok_actions          = [aws_sns_topic.cw_alerts.arn]
   dimensions = {
     ImageId      = aws_instance.ec2_oracle_ebs.ami
     path         = "/export/home"
     InstanceType = aws_instance.ec2_oracle_ebs.instance_type
     InstanceId   = aws_instance.ec2_oracle_ebs.id
     fstype       = "ext4"
-    device       = "nvme12n1"
   }
 }
 
@@ -280,20 +272,19 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ebsdb_ccms_ebs_techst" {
   metric_name               = "disk_used_percent"
   namespace                 = "CWAgent"
   statistic                 = "Average"
-  insufficient_data_actions = []
+  insufficient_data_actions = [aws_sns_topic.cw_alerts.arn]
 
   evaluation_periods  = local.application_data.cloudwatch_ec2.disk.eval_periods
   datapoints_to_alarm = local.application_data.cloudwatch_ec2.disk.eval_periods
   period              = local.application_data.cloudwatch_ec2.disk.period
   threshold           = local.application_data.cloudwatch_ec2.disk.threshold
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
-
+  ok_actions          = [aws_sns_topic.cw_alerts.arn]
   dimensions = {
     ImageId      = aws_instance.ec2_oracle_ebs.ami
     path         = "/CCMS/EBS/techst"
     InstanceType = aws_instance.ec2_oracle_ebs.instance_type
     InstanceId   = aws_instance.ec2_oracle_ebs.id
     fstype       = "ext4"
-    device       = "nvme13n1"
   }
 }

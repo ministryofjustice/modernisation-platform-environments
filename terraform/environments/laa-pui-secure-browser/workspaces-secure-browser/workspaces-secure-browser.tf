@@ -27,11 +27,6 @@ resource "aws_workspacesweb_network_settings" "main" {
 }
 
 ### WORKSPACES WEB PORTALS
-moved {
-  from = aws_workspacesweb_portal.main
-  to   = aws_workspacesweb_portal.external["external_1"]
-}
-
 resource "aws_workspacesweb_portal" "external" {
   for_each = local.create_resources ? local.portals : {}
 
@@ -53,8 +48,8 @@ resource "aws_workspacesweb_user_settings" "main" {
 
   # Optional settings
   deep_link_allowed                  = "Enabled"
-  disconnect_timeout_in_minutes      = 60
-  idle_disconnect_timeout_in_minutes = 15
+  disconnect_timeout_in_minutes      = 30
+  idle_disconnect_timeout_in_minutes = 10
 
   toolbar_configuration {
     toolbar_type = "Docked"
@@ -89,8 +84,8 @@ resource "aws_workspacesweb_user_settings" "sso" {
 
   # Optional settings - same as main
   deep_link_allowed                  = "Enabled"
-  disconnect_timeout_in_minutes      = 60
-  idle_disconnect_timeout_in_minutes = 15
+  disconnect_timeout_in_minutes      = 30
+  idle_disconnect_timeout_in_minutes = 10
 
   # Enable SSO extension and define which cookies to sync -- DISABLED PENDING SEC REVIEW
   # cookie_synchronization_configuration {
@@ -184,30 +179,9 @@ resource "aws_workspacesweb_browser_settings" "main" {
       }
       "URLAllowlist" = {
         "value" = [
+          "[*.]accessmycloudpc.com",
           "[*.]auth.microsoft.com",
-          "[*.]msftidentity.com",
-          "[*.]msidentity.com",
-          "account.activedirectory.windowsazure.com",
-          "accounts.accesscontrol.windows.net",
-          "adminwebservice.microsoftonline.com",
-          "api.passwordreset.microsoftonline.com",
-          "autologon.microsoftazuread-sso.com",
-          "becws.microsoftonline.com",
-          "ccs.login.microsoftonline.com",
-          "clientconfig.microsoftonline-p.net",
-          "companymanager.microsoftonline.com",
-          "device.login.microsoftonline.com",
-          "graph.windows.net",
-          "login-us.microsoftonline.com",
-          "login.microsoft.com",
-          "login.microsoftonline-p.com",
-          "login.microsoftonline.com",
-          "login.windows.net",
-          "logincert.microsoftonline.com",
-          "loginex.microsoftonline.com",
-          "nexus.microsoftonline-p.com",
-          "passwordreset.microsoftonline.com",
-          "provisioningapi.microsoftonline.com",
+          "[*.]authpoint.deu.cloud.watchguard.com",
           "[*.]hip.live.com",
           "[*.]microsoftonline-p.com",
           "[*.]microsoftonline.com",
@@ -216,27 +190,62 @@ resource "aws_workspacesweb_browser_settings" "main" {
           "[*.]msecnd.net",
           "[*.]msftauth.net",
           "[*.]msftauthimages.net",
+          "[*.]msftidentity.com",
+          "[*.]msidentity.com",
           "[*.]phonefactor.net",
-          "enterpriseregistration.windows.net",
-          local.pui_url,
-          local.oia_url,
-          local.laa_sign_in_url,
-          local.legal_aid_services_url,
-          "mysignins.microsoft.com",
-          "go.microsoft.com",
-          "portal.manage.microsoft.com",
-          "login.live.com",
-          "google-exention-bucket.s3.eu-west-2.amazonaws.com",
-          "chrome://print/",
+          "accessmycloudpc.com",
+          "account.activedirectory.windowsazure.com",
+          "accounts.accesscontrol.windows.net",
+          "adminwebservice.microsoftonline.com",
+          "api.passwordreset.microsoftonline.com",
+          "assets.publishing.service.gov.uk",
+          "authpoint.watchguard.com",
+          "autologon.microsoftazuread-sso.com",
+          "becws.microsoftonline.com",
+          "ccms-pui.laa.service.justice.gov.uk",
+          "ccs.login.microsoftonline.com",
           "chrome-untrusted://print/",
           "chrome://new-tab-page",
+          "chrome://print/",
+          "clientconfig.microsoftonline-p.net",
+          "companymanager.microsoftonline.com",
+          "deu.cloud.watchguard.com",
+          "device.login.microsoftonline.com",
+          "enterpriseregistration.windows.net",
+          "go.microsoft.com",
+          "google-exention-bucket.s3.eu-west-2.amazonaws.com",
+          "graph.windows.net",
+          "justice.gov.uk",
           "legalaidlearning.justice.gov.uk",
-          "assets.publishing.service.gov.uk",
+          "legalservices.gov.uk",
+          local.laa_sign_in_url,
+          local.legal_aid_services_url,
+          local.oia_url,
+          local.pui_url,
+          "login.live.com",
+          "login.live.co.uk",
+          "login.microsoft.com",
+          "login.microsoftonline-p.com",
+          "login.microsoftonline.com",
+          "login.windows.net",
+          "login-f3.dpscloud.com",
+          "login-us.microsoftonline.com",
+          "logincert.microsoftonline.com",
+          "loginex.microsoftonline.com",
+          "lsconline.legalservices.gov.uk",
+          "mysignins.microsoft.com",
+          "myworkspace.leighday.co.uk",
+          "nexus.microsoftonline-p.com",
+          "passwordreset.microsoftonline.com",
+          "portal.manage.microsoft.com",
+          "provisioningapi.microsoftonline.com",
+          "sso.godaddy.com",
+          "sso.secureserver.net",
           "www.gov.uk",
           "www.justice.gov.uk",
-          "justice.gov.uk",
-          "legalservices.gov.uk",
-          "lsconline.legalservices.gov.uk"
+          "www.smartsurvey.co.uk",
+          "*.accessmycloudpc.com",
+          "myworkspace.leighday.co.uk"
         ]
       }
       "AlwaysOpenPdfExternally" = {
@@ -329,11 +338,6 @@ resource "aws_workspacesweb_session_logger" "main" {
 
 ### NETWORK SETTINGS ASSOCIATIONS
 
-moved {
-  from = aws_workspacesweb_network_settings_association.main
-  to   = aws_workspacesweb_network_settings_association.external["external_1"]
-}
-
 resource "aws_workspacesweb_network_settings_association" "external" {
   for_each = local.create_resources ? local.portals : {}
 
@@ -342,11 +346,6 @@ resource "aws_workspacesweb_network_settings_association" "external" {
 }
 
 ### USER SETTINGS ASSOCIATIONS
-
-moved {
-  from = aws_workspacesweb_user_settings_association.main
-  to   = aws_workspacesweb_user_settings_association.external_1
-}
 
 # External_1 uses SSO user settings with cookie synchronization
 resource "aws_workspacesweb_user_settings_association" "external_1" {
@@ -366,11 +365,6 @@ resource "aws_workspacesweb_user_settings_association" "external_2" {
 
 ### BROWSER SETTINGS ASSOCIATIONS
 
-moved {
-  from = aws_workspacesweb_browser_settings_association.main
-  to   = aws_workspacesweb_browser_settings_association.external["external_1"]
-}
-
 resource "aws_workspacesweb_browser_settings_association" "external" {
   for_each = local.create_resources ? local.portals : {}
 
@@ -379,11 +373,6 @@ resource "aws_workspacesweb_browser_settings_association" "external" {
 }
 
 ### SESSION LOGGER ASSOCIATIONS
-
-moved {
-  from = aws_workspacesweb_session_logger_association.main
-  to   = aws_workspacesweb_session_logger_association.external["external_1"]
-}
 
 resource "aws_workspacesweb_session_logger_association" "external" {
   for_each = local.create_resources ? local.portals : {}

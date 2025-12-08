@@ -224,7 +224,7 @@
       "soa_db_log_retention_days": "0",
       "soa_db_deploy_to_multi_azs": "false",
       "soa_db_instance_type": "db.t3.large",
-      "soa_db_storage_gb": "100",
+      "soa_db_storage_gb": "500",
       "soa_db_deletion_protection": "false",
       "soa_db_minor_version_upgrade_allowed": "true",
       "soa_db_version": "19.0.0.0.ru-2025-04.rur-2025-04.r1",

@@ -29,27 +29,27 @@ locals {
       role_key     = "get_certificate_expiry"
       environments = ["development", "preproduction", "production"]
       runtime      = "python3.13"
-      permissions  = [{
-        principal  = "lambda.alarms.cloudwatch.amazonaws.com"
+      permissions = [{
+        principal         = "lambda.alarms.cloudwatch.amazonaws.com"
         source_arn_suffix = "alarm:*"
       }]
       environment = {
         variables = {
-          EXPIRY_DAYS   = "30"
+          EXPIRY_DAYS = "30"
           SNS_TOPIC_ARN = {
             development   = "arn:aws:sns:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:ppud-dev-cw-alerts"
             preproduction = "arn:aws:sns:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:ppud-uat-cw-alerts"
             production    = "arn:aws:sns:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:ppud-prod-cw-alerts"
           }
         }
-       }
+      }
     }
     terminate_cpu_process = {
       description  = "Function to terminate an application process due to high CPU utilisation on an EC2 instance."
       role_key     = "invoke_ssm"
       environments = ["development", "preproduction", "production"]
-      permissions  = [{
-        principal  = "lambda.alarms.cloudwatch.amazonaws.com"
+      permissions = [{
+        principal         = "lambda.alarms.cloudwatch.amazonaws.com"
         source_arn_suffix = "alarm:*"
       }]
     }
@@ -57,8 +57,8 @@ locals {
       description  = "Function to send an email notification when triggered by high CPU utilisation on an EC2 instance."
       role_key     = "invoke_ssm"
       environments = ["development", "preproduction", "production"]
-      permissions  = [{
-        principal  = "lambda.alarms.cloudwatch.amazonaws.com"
+      permissions = [{
+        principal         = "lambda.alarms.cloudwatch.amazonaws.com"
         source_arn_suffix = "alarm:*"
       }]
     }
@@ -68,18 +68,18 @@ locals {
       environments = ["development", "production"]
       layers       = ["numpy", "pillow", "matplotlib"]
       vpc_config   = { prod = true }
-      permissions  = [{
-        principal  = "cloudwatch.amazonaws.com"
+      permissions = [{
+        principal         = "cloudwatch.amazonaws.com"
         source_arn_suffix = "*"
       }]
     }
     wam_waf_analysis = {
       description  = "Function to analyse WAM WAF ACL traffic and email a report."
       role_key     = "get_cloudwatch"
-      environments = ["development"]
+      environments = ["development", "preproduction", "production"]
       layers       = ["numpy", "pillow", "requests", "matplotlib"]
-      permissions  = [{
-        principal  = "cloudwatch.amazonaws.com"
+      permissions = [{
+        principal         = "cloudwatch.amazonaws.com"
         source_arn_suffix = "*"
       }]
     }
@@ -88,8 +88,8 @@ locals {
       role_key     = "get_securityhub_data"
       environments = ["development", "preproduction", "production"]
       vpc_config   = { production = true }
-      permissions  = [{
-        principal  = "securityhub.amazonaws.com"
+      permissions = [{
+        principal         = "securityhub.amazonaws.com"
         source_arn_suffix = "*"
       }]
     }
@@ -97,8 +97,8 @@ locals {
       description  = "Function to allow logging of outgoing emails via SES."
       role_key     = "get_ses_logging"
       environments = ["development", "preproduction"]
-      permissions  = [{
-        principal  = "sns.amazonaws.com"
+      permissions = [{
+        principal           = "sns.amazonaws.com"
         source_arn_resource = "ses_logging"
       }]
     }
@@ -106,8 +106,8 @@ locals {
       description  = "Function to disable Cloudwatch CPU alerts."
       role_key     = "get_cloudwatch"
       environments = ["production"]
-      permissions  = [{
-        principal  = "cloudwatch.amazonaws.com"
+      permissions = [{
+        principal         = "cloudwatch.amazonaws.com"
         source_arn_suffix = "*"
       }]
     }
@@ -115,8 +115,8 @@ locals {
       description  = "Function to enable Cloudwatch CPU alerts."
       role_key     = "get_cloudwatch"
       environments = ["production"]
-      permissions  = [{
-        principal  = "cloudwatch.amazonaws.com"
+      permissions = [{
+        principal         = "cloudwatch.amazonaws.com"
         source_arn_suffix = "*"
       }]
     }
@@ -126,8 +126,8 @@ locals {
       environments = ["production"]
       layers       = ["numpy", "pillow", "matplotlib"]
       vpc_config   = { production = true }
-      permissions  = [{
-        principal  = "cloudwatch.amazonaws.com"
+      permissions = [{
+        principal         = "cloudwatch.amazonaws.com"
         source_arn_suffix = "*"
       }]
     }
@@ -137,8 +137,8 @@ locals {
       environments = ["production"]
       layers       = ["numpy", "pillow", "matplotlib"]
       vpc_config   = { production = true }
-      permissions  = [{
-        principal  = "cloudwatch.amazonaws.com"
+      permissions = [{
+        principal         = "cloudwatch.amazonaws.com"
         source_arn_suffix = "*"
       }]
     }
@@ -148,8 +148,8 @@ locals {
       environments = ["production"]
       layers       = ["numpy", "pillow", "matplotlib"]
       vpc_config   = { production = true }
-      permissions  = [{
-        principal  = "cloudwatch.amazonaws.com"
+      permissions = [{
+        principal         = "cloudwatch.amazonaws.com"
         source_arn_suffix = "*"
       }]
     }
@@ -158,8 +158,8 @@ locals {
       role_key     = "get_elb_metrics"
       environments = ["production"]
       vpc_config   = { production = true }
-      permissions  = [{
-        principal  = "cloudwatch.amazonaws.com"
+      permissions = [{
+        principal         = "cloudwatch.amazonaws.com"
         source_arn_suffix = "*"
       }]
     }
@@ -168,8 +168,8 @@ locals {
       role_key     = "get_elb_metrics"
       environments = ["production"]
       vpc_config   = { production = true }
-      permissions  = [{
-        principal  = "cloudwatch.amazonaws.com"
+      permissions = [{
+        principal         = "cloudwatch.amazonaws.com"
         source_arn_suffix = "*"
       }]
     }
@@ -179,8 +179,8 @@ locals {
       environments = ["production"]
       layers       = ["numpy", "pillow", "matplotlib"]
       vpc_config   = { production = true }
-      permissions  = [{
-        principal  = "cloudwatch.amazonaws.com"
+      permissions = [{
+        principal         = "cloudwatch.amazonaws.com"
         source_arn_suffix = "*"
       }]
     }
@@ -190,8 +190,8 @@ locals {
       environments = ["production"]
       layers       = ["numpy", "pillow", "matplotlib"]
       vpc_config   = { production = true }
-      permissions  = [{
-        principal  = "cloudwatch.amazonaws.com"
+      permissions = [{
+        principal         = "cloudwatch.amazonaws.com"
         source_arn_suffix = "*"
       }]
     }
@@ -200,8 +200,8 @@ locals {
       role_key     = "get_elb_metrics"
       environments = ["production"]
       vpc_config   = { production = true }
-      permissions  = [{
-        principal  = "cloudwatch.amazonaws.com"
+      permissions = [{
+        principal         = "cloudwatch.amazonaws.com"
         source_arn_suffix = "*"
       }]
     }
@@ -210,8 +210,8 @@ locals {
       role_key     = "get_elb_metrics"
       environments = ["production"]
       vpc_config   = { production = true }
-      permissions  = [{
-        principal  = "cloudwatch.amazonaws.com"
+      permissions = [{
+        principal         = "cloudwatch.amazonaws.com"
         source_arn_suffix = "*"
       }]
     }
@@ -221,8 +221,8 @@ locals {
       environments = ["production"]
       layers       = ["numpy", "pillow", "matplotlib"]
       vpc_config   = { production = true }
-      permissions  = [{
-        principal  = "cloudwatch.amazonaws.com"
+      permissions = [{
+        principal         = "cloudwatch.amazonaws.com"
         source_arn_suffix = "*"
       }]
     }
@@ -234,8 +234,18 @@ locals {
       environments = ["production"]
       layers       = ["beautifulsoup", "xlsxwriter", "requests"]
       vpc_config   = { production = true }
-      permissions  = [{
-        principal  = "cloudwatch.amazonaws.com"
+      permissions = [{
+        principal         = "cloudwatch.amazonaws.com"
+        source_arn_suffix = "*"
+      }]
+    }
+    sync_ssm_to_waf = {
+      description  = "Function to synchronize ssm parameter store with WAF ip sets."
+      role_key     = "sync_ssm_to_waf"
+      environments = ["development", "preproduction", "production"]
+      vpc_config   = { production = true }
+      permissions = [{
+        principal         = "events.amazonaws.com"
         source_arn_suffix = "*"
       }]
     }
@@ -286,7 +296,7 @@ locals {
 
 resource "aws_lambda_function" "lambda_functions" {
   for_each = local.lambda_instances_map
-  
+
   # checkov:skip=CKV_AWS_173: "Encryption is not required as no sensitive data is processed through it"
   # checkov:skip=CKV_AWS_116: "Dead Letter queues to be enabled later"
   # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
@@ -302,11 +312,11 @@ resource "aws_lambda_function" "lambda_functions" {
   timeout                        = try(each.value.config.timeout, local.lambda_defaults.timeout)
   reserved_concurrent_executions = local.lambda_defaults.reserved_concurrent_executions
   memory_size                    = try(each.value.config.memory_size, null)
-  
-   # Lambda dead letter sqs queues
-   dead_letter_config {
-     target_arn = local.dlq_arn
-   }
+
+  # Lambda dead letter sqs queues
+  dead_letter_config {
+    target_arn = local.dlq_arn
+  }
 
   tracing_config {
     mode = local.lambda_defaults.tracing_mode
@@ -316,9 +326,9 @@ resource "aws_lambda_function" "lambda_functions" {
   layers = try(each.value.config.layers, null) != null ? [
     for layer in each.value.config.layers :
     contains(keys(local.lambda_layers), layer) ?
-      aws_lambda_layer_version.lambda_layers[layer].arn :
+    aws_lambda_layer_version.lambda_layers[layer].arn :
     contains(keys(local.layer_arns), layer) ?
-      local.layer_arns[layer] :
+    local.layer_arns[layer] :
     null
   ] : null
 
@@ -346,8 +356,8 @@ resource "aws_lambda_function" "lambda_functions" {
 
   # Tags
   tags = {
-    Function       = each.value.func_name
-    Environment    = each.value.env
+    Function    = each.value.func_name
+    Environment = each.value.env
   }
 }
 
