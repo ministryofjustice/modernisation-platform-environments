@@ -5,7 +5,7 @@ resource "aws_autoscaling_group" "cluster-scaling-group-managed" {
   name                = "${local.application_data.accounts[local.environment].app_name}-auto-scaling-group-managed"
   vpc_zone_identifier = data.aws_subnets.shared-private.ids
   desired_capacity    = local.application_data.accounts[local.environment].managed_ec2_desired_capacity
-  max_size            = 4
+  max_size            = 7
   min_size            = 1
 
   launch_template {
