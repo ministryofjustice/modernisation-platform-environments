@@ -2,7 +2,7 @@ locals {
   appnameenv                     = "${local.application_name}-${local.environment}"
   sns_topic_name                 = "${local.appnameenv}-alerting-topic"
   dashboard_name                 = "${local.appnameenv}-Appication-Dashboard"
-  pagerduty_integration_keys     = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys[0].secret_string)
+  pagerduty_integration_keys     = try(jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys[0].secret_string), {})
   pagerduty_integration_key_name = local.application_data.accounts[local.environment].pagerduty_integration_key_name
   cloudwatch_metric_alarms = {
     ec2_cpu_utilisation_too_high = {
@@ -17,7 +17,7 @@ locals {
       threshold           = "90"
       treat_missing_data  = "breaching"
       dimensions = {
-        InstanceId = aws_instance.oas_app_instance[0].id
+        InstanceId = try(aws_instance.oas_app_instance[0].id, "")
       }
 
     },
@@ -34,7 +34,7 @@ locals {
       treat_missing_data  = "breaching"
       dimensions = {
         ImageId      = local.application_data.accounts[local.environment].ec2amiid
-        InstanceId   = aws_instance.oas_app_instance[0].id
+        InstanceId   = try(aws_instance.oas_app_instance[0].id, "")
         InstanceType = "db.t3.small"
       }
 
@@ -52,7 +52,7 @@ locals {
       treat_missing_data  = "breaching"
       dimensions = {
         ImageId    = local.application_data.accounts[local.environment].ec2amiid
-        InstanceId = aws_instance.oas_app_instance[0].id
+        InstanceId = try(aws_instance.oas_app_instance[0].id, "")
         path       = "/oracle/software"
         fstype     = "ext4"
       }
@@ -71,7 +71,7 @@ locals {
       treat_missing_data  = "breaching"
       dimensions = {
         ImageId    = local.application_data.accounts[local.environment].ec2amiid
-        InstanceId = aws_instance.oas_app_instance[0].id
+        InstanceId = try(aws_instance.oas_app_instance[0].id, "")
         path       = "/"
         fstype     = "xfs"
       }
