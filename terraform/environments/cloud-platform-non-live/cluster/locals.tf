@@ -4,30 +4,48 @@ locals {
   # desired_capacity change is a manual step after initial cluster creation (when no cluster-autoscaler)
   # https://github.com/terraform-aws-modules/terraform-aws-eks/issues/835
   node_groups_count = {
-    cloud-platform-non-live-development = "1"
+    cloud-platform-non-live-development  = "1"
+    cloud-platform-non-live-test         = "1"
+    cloud-platform-non-live-preproduction = "1"
+    cloud-platform-non-live-production   = "1"
   }
 
   # Default node group minimum capacity
   default_ng_min_count = {
-    cloud-platform-non-live-development = "1"
+    cloud-platform-non-live-development  = "1"
+    cloud-platform-non-live-test         = "1"
+    cloud-platform-non-live-preproduction = "1"
+    cloud-platform-non-live-production   = "1"
   }
 
   # Monitoring node group desired capacity
   default_mon_desired_count = {
-    cloud-platform-non-live-development = "1"
+    cloud-platform-non-live-development  = "1"
+    cloud-platform-non-live-test         = "1"
+    cloud-platform-non-live-preproduction = "1"
+    cloud-platform-non-live-production   = "1"
   }
 
   # Monitoring node group minimum capacity
   default_mon_min_count = {
-    cloud-platform-non-live-development = "1"
+    cloud-platform-non-live-development  = "1"
+    cloud-platform-non-live-test         = "1"
+    cloud-platform-non-live-preproduction = "1"
+    cloud-platform-non-live-production   = "1"
   }
 
   node_size = {
-    cloud-platform-non-live-development = ["r6i.2xlarge", "r6i.xlarge", "r5.2xlarge"]
+    cloud-platform-non-live-development  = ["r6i.2xlarge", "r6i.xlarge", "r5.2xlarge"]
+    cloud-platform-non-live-test         = ["r6i.2xlarge", "r6i.xlarge", "r5.2xlarge"]
+    cloud-platform-non-live-preproduction = ["r6i.2xlarge", "r6i.xlarge", "r5.2xlarge"]
+    cloud-platform-non-live-production   = ["r6i.2xlarge", "r6i.xlarge", "r5.2xlarge"]
   }
 
   monitoring_node_size = {
-    cloud-platform-non-live-development = ["r7i.12xlarge", "r6i.12xlarge", "r7i.16xlarge", "r6i.16xlarge"]
+    cloud-platform-non-live-development  = ["r7i.12xlarge", "r6i.12xlarge", "r7i.16xlarge", "r6i.16xlarge"]
+    cloud-platform-non-live-test         = ["r7i.12xlarge", "r6i.12xlarge", "r7i.16xlarge", "r6i.16xlarge"]
+    cloud-platform-non-live-preproduction = ["r7i.12xlarge", "r6i.12xlarge", "r7i.16xlarge", "r6i.16xlarge"]
+    cloud-platform-non-live-production   = ["r7i.12xlarge", "r6i.12xlarge", "r7i.16xlarge", "r6i.16xlarge"]
 
   }
 
@@ -50,7 +68,7 @@ locals {
       }
     }
 
-    subnet_ids = data.aws_subnets.eks_private.ids
+    subnet_ids = try(data.aws_subnets.eks_private[0].ids, [])
     name       = "${local.environment}-def-ng"
 
     create_security_group  = false
@@ -88,7 +106,7 @@ locals {
       }
     }
 
-    subnet_ids = data.aws_subnets.eks_private.ids
+    subnet_ids = try(data.aws_subnets.eks_private[0].ids, [])
     name       = "${local.environment}-mon-ng"
 
     create_security_group  = false
@@ -115,10 +133,8 @@ locals {
     }
   }
 
-  eks_managed_node_groups = merge(
-    {
-      default_ng    = local.default_ng,
-      monitoring_ng = local.monitoring_ng
-    }
-  )
+  eks_managed_node_groups = {
+    default_ng    = local.default_ng
+    monitoring_ng = local.monitoring_ng
+  }
 }
