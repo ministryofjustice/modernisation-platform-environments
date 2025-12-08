@@ -21,7 +21,7 @@ module "iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.52.2"
+  version = "6.2.3"
 
   name_prefix = "${var.name}-prometheus"
 
@@ -33,7 +33,7 @@ module "iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.52.2"
+  version = "6.2.3"
 
   create_role             = true
   role_name               = "${var.name}-prometheus"
