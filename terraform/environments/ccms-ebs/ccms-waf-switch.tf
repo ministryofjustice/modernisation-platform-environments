@@ -8,7 +8,7 @@ variable "scope" {
 }
 
 variable "rule_name" {
-  default = "ebs-trusted-rule"
+  default = "ebs-trusted-rule-ip-set"
 }
 
 data "archive_file" "waf_toggle_zip" {
@@ -19,7 +19,7 @@ data "archive_file" "waf_toggle_zip" {
 
 # Pull an existing WAF Rule Group and rules using a dynamic name.
 data "aws_wafv2_web_acl" "waf_web_acl" {
-  name  = "ebs_waf"
+  name  = "ebs_internal_waf"
   scope = "REGIONAL"
 }
 
@@ -45,7 +45,7 @@ resource "aws_iam_role_policy" "waf_lambda_policy" {
     Version = "2012-10-17",
     Statement = [
       { Effect = "Allow",
-        Action = ["wafv2:GetWebACL", "wafv2:UpdateWebACL"],
+        Action = ["wafv2:GetWebACLForResource", "wafv2:AssociateWebACL", "wafv2:DisassociateWebACL"],
       Resource = "*" },
       { Effect = "Allow",
         Action = ["wafv2:GetRuleGroup"],
@@ -71,19 +71,22 @@ resource "aws_lambda_function" "waf_toggle" {
       WEB_ACL_NAME = data.aws_wafv2_web_acl.waf_web_acl.name
       WEB_ACL_ID   = data.aws_wafv2_web_acl.waf_web_acl.id
       RULE_NAME    = var.rule_name
+      RESOURCE_ARN           = aws_lb.ebsapps_internal_alb.arn
+      NORMAL_WEB_ACL_ARN     = data.aws_wafv2_web_acl.waf_web_acl.arn
+      MAINTENANCE_WEB_ACL_ARN = data.aws_wafv2_web_acl.ebs_web_acl_maintenance.arn
 
-      # New variables for custom body injection
-      CUSTOM_BODY_NAME = "maintenance_html"
-      CUSTOM_BODY_HTML = <<EOT
-<!doctype html><html lang="en"><head>
-<meta charset="utf-8"><title>Maintenance</title>
-<style>body{font-family:sans-serif;background:#0b1a2b;color:#fff;text-align:center;padding:4rem;}
-.card{max-width:600px;margin:auto;background:#12243a;padding:2rem;border-radius:10px;}
-</style></head><body><div class="card">
-<h1>Scheduled Maintenance</h1>
-<p>The service is unavailable from 21:30 to 07:00 UK time. Apologies for any inconvenience caused.</p>
-</div></body></html>
-EOT
+#       # New variables for custom body injection
+#       CUSTOM_BODY_NAME = "maintenance_html"
+#       CUSTOM_BODY_HTML = <<EOT
+# <!doctype html><html lang="en"><head>
+# <meta charset="utf-8"><title>Maintenance</title>
+# <style>body{font-family:sans-serif;background:#0b1a2b;color:#fff;text-align:center;padding:4rem;}
+# .card{max-width:600px;margin:auto;background:#12243a;padding:2rem;border-radius:10px;}
+# </style></head><body><div class="card">
+# <h1>Scheduled Maintenance</h1>
+# <p>The service is unavailable from 21:30 to 07:00 UK time. Apologies for any inconvenience caused.</p>
+# </div></body></html>
+# EOT
     }
   }
 }

@@ -85,6 +85,99 @@ resource "aws_wafv2_web_acl" "ebs_web_acl" {
   }
 }
 
+# The following resource is for WAF Custom HTML response only. The Lambda function handles the enabling and disabling of this resource.
+resource "aws_wafv2_web_acl" "ebs_web_acl_maintenance" {
+  name        = "ebs_waf_maintenance"
+  scope       = "REGIONAL"
+  description = "AWS WAF rule for mainteance custom page"
+
+  default_action {
+    block {}
+  }
+
+  rule {
+    name = "ebs-trusted-rule"
+
+    priority = 1
+    action {
+      allow {}
+    }
+
+    statement {
+      ip_set_reference_statement {
+        arn = aws_wafv2_ip_set.ebs_waf_ip_set.arn
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "ebs_waf_metrics"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  # Maintenance rule - blocks everyone with custom HTML
+  rule {
+    name     = "maintenance-window"
+    priority = 10
+
+    action {
+      block {
+        custom_response {
+          custom_response_body_key = "maintenance_html"
+          response_code            = 503
+        }
+      }
+    }
+
+    statement {
+      byte_match_statement {
+        search_string = "/"
+        field_to_match {
+          uri_path {}
+        }
+        positional_constraint = "STARTS_WITH"
+        text_transformation {
+          priority = 0
+          type     = "NONE"
+        }
+      }
+    }
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "ebs_waf_maintenance_metrics"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  # INLINE HTML FOR CUSTOM RESPONSE BODY
+  custom_response_body {
+    key          = "maintenance_html"
+    content_type = "TEXT_HTML"
+    content      = <<-EOT
+      <!doctype html><html lang="en"><head>
+      <meta charset="utf-8"><title>Maintenance</title>
+      <style>
+        body{font-family:sans-serif;background:#0b1a2b;color:#fff;text-align:center;padding:4rem;}
+        .card{max-width:600px;margin:auto;background:#12243a;padding:2rem;border-radius:10px;}
+      </style></head><body><div class="card">
+      <h1>Scheduled Maintenance</h1>
+      <p>The service is unavailable from 21:30 to 07:00 UK time. Apologies for any inconvenience caused.</p>
+      </div></body></html>
+    EOT
+  }
+
+  tags = merge(local.tags,
+    { Name = lower(format("lb-%s-%s-ebsapp-web-acl", local.application_name, local.environment)) }
+  )
+
+  visibility_config {
+    cloudwatch_metrics_enabled = true
+    metric_name                = "ebs_waf_metrics"
+    sampled_requests_enabled   = true
+  }
+}
+
 resource "aws_cloudwatch_log_group" "ebs_waf_logs" {
   name              = "aws-waf-logs-ebs/ebs-waf-logs"
   retention_in_days = 30
