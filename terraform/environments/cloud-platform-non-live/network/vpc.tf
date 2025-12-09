@@ -1,5 +1,4 @@
 module "vpc" {
-  count = contains(local.enabled_workspaces, terraform.workspace) ? 1 : 0
   version = "6.5.1"  
   source = "terraform-aws-modules/vpc/aws"
 

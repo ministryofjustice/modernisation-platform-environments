@@ -1,6 +1,4 @@
-locals {
-  enabled_workspaces = ["cloud-platform-non-live-development"]
-    
+locals {  
   /* VPC */
   cp_vpc_name = "${local.application_name}-${local.environment}"
   cp_vpc_cidr = {
