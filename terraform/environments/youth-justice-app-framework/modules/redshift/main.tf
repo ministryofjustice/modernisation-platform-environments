@@ -26,8 +26,6 @@ resource "aws_redshiftserverless_workgroup" "default" {
 
   namespace_name            = aws_redshiftserverless_namespace.default.id
   workgroup_name            = aws_redshiftserverless_namespace.default.id
-  base_capacity             = 32  # Minimum compute always allocated
-  max_capacity              = 512 # Maximum compute allowed for scaling
 
   # Price-performance scaling configuration
   price_performance_target {
