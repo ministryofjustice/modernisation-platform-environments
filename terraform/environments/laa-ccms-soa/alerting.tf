@@ -162,7 +162,7 @@ resource "aws_cloudwatch_metric_alarm" "RDS_Disk_Queue_Depth_Over_Threshold" {
 
 resource "aws_cloudwatch_metric_alarm" "RDS_Free_Storage_Space_Over_Threshold" {
   alarm_name          = "${local.application_data.accounts[local.environment].app_name}-RDS-FreeStorageSpace-low-threshold-alarm"
-  alarm_description   = "${local.environment} | ${local.aws_account_id} | RDS Free storage space is below 35% for over 15 minutes"
+  alarm_description   = "${local.environment} | ${local.aws_account_id} | RDS Free storage space is below 35% for over 3 minutes"
   comparison_operator = "LessThanThreshold"
   metric_name         = "FreeStorageSpace"
   statistic           = "Average"
