@@ -33,9 +33,3 @@ spec:
         - key: karpenter.k8s.aws/instance-family
           operator: In
           values: ["g5", "g6"]
-        - key: karpenter.k8s.aws/instance-cpu
-          operator: Lt
-          values: ["132"]
-        - key: karpenter.k8s.aws/instance-memory
-          operator: Lt
-          values: ["528"]
