@@ -59,30 +59,14 @@ resource "aws_iam_role_policy" "lambda_ccms_soa_quiesced_policy" {
 # Lambda Layer Packaging
 ############################
 
-data "archive_file" "ccms_soa_edn_quiesced_layer_zip" {
-  type        = "zip"
-  source_dir  = "${path.module}/lambda/ccms-soa-edn-quiesced/python"
-  output_path = "${path.module}/lambda/ccms-soa-edn-quiesced-layer.zip"
-}
-
-resource "aws_s3_object" "ccms_soa_edn_quiesced_layer_zip" {
-  bucket = module.s3-bucket-shared.bucket.id
-  key    = "lambda_delivery/ccms-soa-edn-quiesced-layer/layerV1.zip"
-  source = data.archive_file.ccms_soa_edn_quiesced_layer_zip.output_path
-  etag   = filemd5(data.archive_file.ccms_soa_edn_quiesced_layer_zip.output_path)
-}
 
 resource "aws_lambda_layer_version" "lambda_layer_ccms_soa_edn_quiesced" {
   layer_name               = "${local.application_name}-${local.environment}-ccms-soa-edn-quiesced-layer"
-  s3_key                   = aws_s3_object.ccms_soa_edn_quiesced_layer_zip.key
+  s3_key                   = "lambda_delivery/${local.application_name}-edn-quiesced/layerV1.zip"
   s3_bucket                = module.s3-bucket-shared.bucket.id
   compatible_runtimes      = ["python3.13"]
   compatible_architectures = ["x86_64"]
   description              = "Layer for CCMS SOA EDN Quiesced notifications"
-
-  depends_on = [
-    aws_s3_object.ccms_soa_edn_quiesced_layer_zip
-  ]
 }
 
 ############################
