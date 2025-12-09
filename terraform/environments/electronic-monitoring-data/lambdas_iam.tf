@@ -1120,7 +1120,6 @@ module "share_db_with_historic_csv_lambda_role_policy_lambda_role" {
   dbs_to_grant            = toset(["g4s_lcm${local.db_suffix}"])
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
   role_arn                = aws_iam_role.load_historic_csv.arn
-  db_exists               = true
   de_role_arn             = null
 }
 
