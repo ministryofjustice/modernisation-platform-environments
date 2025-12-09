@@ -61,7 +61,7 @@ resource "aws_iam_role_policy" "lambda_ccms_soa_quiesced_policy" {
 
 
 resource "aws_lambda_layer_version" "lambda_layer_ccms_soa_edn_quiesced" {
-  layer_name               = "${local.application_name}-${local.environment}-ccms-soa-edn-quiesced-layer"
+  layer_name               = "${local.application_name}-edn-quiesced-layer"
   s3_key                   = "lambda_delivery/${local.application_name}-edn-quiesced-layer/layerV1.zip"
   s3_bucket                = module.s3-bucket-shared.bucket.id
   compatible_runtimes      = ["python3.13"]
