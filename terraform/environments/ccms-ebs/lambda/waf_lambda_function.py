@@ -143,7 +143,6 @@ def get_current_web_acl_arn() -> str | None:
     """Return the ARN of the ACL currently associated with the resource, or None."""
     try:
         resp = waf.get_web_acl_for_resource(
-            Scope=SCOPE,
             ResourceArn=RESOURCE_ARN,
         )
         web_acl = resp.get("WebACL")
@@ -175,7 +174,7 @@ def disassociate_web_acl():
 
 def lambda_handler(event, context):
     """
-    Expected event format (unchanged from your current design):
+    Expected event format:
 
       { "mode": "BLOCK" }   -> maintenance mode (maintenance ACL)
       { "mode": "ALLOW" }   -> normal mode      (normal ACL)
@@ -206,7 +205,6 @@ def lambda_handler(event, context):
             "currentAclArn": current_acl_arn,
         }
 
-    # You can either disassociate first or let associate overwrite – associate already overwrites.
     try:
         associate_web_acl(target_acl_arn)
         print(f"Switched to {logical_mode} mode using WebACL: {target_acl_arn}")
