@@ -114,8 +114,6 @@ resource "aws_cloudwatch_log_metric_filter" "soa_custom_checks_error_managed" {
   }
 }
 
-
-
 resource "aws_cloudwatch_log_subscription_filter" "ccms_soa_edn_quiesced_filter" {
   name            = "${local.application_name}-${local.environment}-edn-quiesced-filter"
   log_group_name  = aws_cloudwatch_log_group.log_group_managed.name
@@ -126,9 +124,6 @@ resource "aws_cloudwatch_log_subscription_filter" "ccms_soa_edn_quiesced_filter"
     aws_lambda_permission.allow_cloudwatch_invoke_ccms_soa_quiesced
   ]
 }
-
-
-
 
 #--RDS (SOA DB)
 resource "aws_cloudwatch_log_group" "rds_alert" {

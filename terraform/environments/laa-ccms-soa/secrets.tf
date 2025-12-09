@@ -1,7 +1,7 @@
 resource "aws_secretsmanager_secret" "soa_password" {
   name        = "ccms/soa/password"
-  description = "SOA Weblogic EM Console for user weblogic and RDS Database Password for SOAPDB admin" #--The same password shared between the SOA DB
-}                                                                                                      #  and weblogic. Don't like that. Revisit. AW
+  description = "SOA Weblogic EM Console for user weblogic and RDS Database Password for SOAPDB admin"
+}
 
 data "aws_secretsmanager_secret_version" "soa_password" {
   secret_id = aws_secretsmanager_secret.soa_password.id
@@ -49,6 +49,7 @@ resource "aws_secretsmanager_secret" "trust_store_password" {
 data "aws_secretsmanager_secret_version" "trust_store_password" {
   secret_id = aws_secretsmanager_secret.trust_store_password.id
 }
+
 # Slack Channel ID for Alerts
 resource "aws_secretsmanager_secret" "slack_channel_id" {
   name        = "guardduty_slack_channel_id"
