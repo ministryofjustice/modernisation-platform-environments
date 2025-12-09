@@ -96,7 +96,7 @@ resource "aws_wafv2_web_acl" "waf_web_acl_maintenance" {
   }
 
   rule {
-    name = "ebs-trusted-rule"
+    name = "ebs-trusted-rule-ip-set"
 
     priority = 1
     action {
