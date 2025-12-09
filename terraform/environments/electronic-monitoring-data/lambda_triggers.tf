@@ -7,31 +7,31 @@ module "calculate_checksum_sqs" {
 
 resource "aws_s3_bucket_notification" "data_bucket_triggers" {
   bucket = module.s3-data-bucket.bucket.id
-  queue {
-    queue_arn     = module.calculate_checksum_sqs.sqs_queue.arn
-    events        = ["s3:ObjectCreated:*"]
-    filter_suffix = ".zip"
-  }
-  queue {
-    queue_arn     = module.calculate_checksum_sqs.sqs_queue.arn
-    events        = ["s3:ObjectCreated:*"]
-    filter_suffix = ".bak"
-  }
-  queue {
-    queue_arn     = module.calculate_checksum_sqs.sqs_queue.arn
-    events        = ["s3:ObjectCreated:*"]
-    filter_suffix = ".bacpac"
-  }
-  queue {
-    queue_arn     = module.calculate_checksum_sqs.sqs_queue.arn
-    events        = ["s3:ObjectCreated:*"]
-    filter_suffix = ".csv"
-  }
-  queue {
-    queue_arn     = module.calculate_checksum_sqs.sqs_queue.arn
-    events        = ["s3:ObjectCreated:*"]
-    filter_suffix = ".7z"
-  }
+  # queue {
+  #   queue_arn     = module.calculate_checksum_sqs.sqs_queue.arn
+  #   events        = ["s3:ObjectCreated:*"]
+  #   filter_suffix = ".zip"
+  # }
+  # queue {
+  #   queue_arn     = module.calculate_checksum_sqs.sqs_queue.arn
+  #   events        = ["s3:ObjectCreated:*"]
+  #   filter_suffix = ".bak"
+  # }
+  # queue {
+  #   queue_arn     = module.calculate_checksum_sqs.sqs_queue.arn
+  #   events        = ["s3:ObjectCreated:*"]
+  #   filter_suffix = ".bacpac"
+  # }
+  # queue {
+  #   queue_arn     = module.calculate_checksum_sqs.sqs_queue.arn
+  #   events        = ["s3:ObjectCreated:*"]
+  #   filter_suffix = ".csv"
+  # }
+  # queue {
+  #   queue_arn     = module.calculate_checksum_sqs.sqs_queue.arn
+  #   events        = ["s3:ObjectCreated:*"]
+  #   filter_suffix = ".7z"
+  # }
   queue {
     queue_arn     = module.copy_mdss_data_sqs.sqs_queue.arn
     events        = ["s3:ObjectCreated:*"]
