@@ -126,6 +126,7 @@ resource "aws_cloudwatch_event_rule" "auto_tag_eni" {
   "detail-type": ["AWS API Call via CloudTrail"],
   "detail": {
     "eventName": ["CreateNetworkInterface"]
+  }
 }
 EOF
   tags = {
