@@ -63,11 +63,8 @@
       "username": "sysdba",
       "license_model": "bring-your-own-license",
       "deletion_protection": "false",
-      "lz_vpc_cidr": "10.202.0.0/20",
-      "managementcidr": "10.200.0.0/20",
-      "inbound_cidr_lz": "10.202.0.0/20",
-      "outbound_access_cidr": "0.0.0.0/0",
-      "pagerduty_integration_key_name": "laa_oas_nonprod_alarms"
+      "pagerduty_integration_key_name": "laa_oas_nonprod_alarms",
+      "s3_vpc_endpoint_prefix": "pl-7ca54015"
     },
     "production": {
       "example_var": "production-data",
