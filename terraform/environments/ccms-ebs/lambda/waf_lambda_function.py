@@ -129,6 +129,7 @@ import boto3
 from botocore.exceptions import ClientError
 
 # Environment variables
+# (SCOPE is no longer needed for these specific APIs, but you can leave it)
 SCOPE = os.environ.get("SCOPE", "REGIONAL").upper()
 
 RESOURCE_ARN = os.environ["RESOURCE_ARN"]               # ALB ARN
@@ -157,7 +158,6 @@ def associate_web_acl(web_acl_arn: str):
     """Associate the given WebACL with the resource."""
     print(f"Associating WebACL '{web_acl_arn}' with resource '{RESOURCE_ARN}'")
     waf.associate_web_acl(
-        Scope=SCOPE,
         WebACLArn=web_acl_arn,
         ResourceArn=RESOURCE_ARN,
     )
@@ -167,7 +167,6 @@ def disassociate_web_acl():
     """Disassociate any WebACL from the resource."""
     print(f"Disassociating any WebACL from resource '{RESOURCE_ARN}'")
     waf.disassociate_web_acl(
-        Scope=SCOPE,
         ResourceArn=RESOURCE_ARN,
     )
 
