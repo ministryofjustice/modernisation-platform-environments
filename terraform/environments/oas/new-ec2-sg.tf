@@ -59,6 +59,8 @@ resource "aws_security_group_rule" "egress_oas_db_1521" {
 }
 
 resource "aws_security_group_rule" "egress_https_s3" {
+  count = local.environment == "preproduction" ? 1 : 0
+  
   type              = "egress"
   security_group_id = aws_security_group.ec2_sg[0].id
   from_port         = 443
