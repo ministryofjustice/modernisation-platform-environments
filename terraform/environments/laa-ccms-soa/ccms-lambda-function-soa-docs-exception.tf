@@ -68,7 +68,7 @@ resource "aws_lambda_layer_version" "lambda_layer_ccms_soa_edn_quiesced" {
 # Lambda Function
 resource "aws_lambda_function" "ccms_soa_edn_quiesced_monitor" {
   filename         = data.archive_file.ccms_soa_quiesced_zip.output_path
-  source_code_hash = data.archive_file.ccms_soa_quiesced_zip.output_base64sha256
+  source_code_hash = base64sha256(join("", local.lambda_source_hashes))
   function_name    = "${local.application_name}-${local.environment}-ccms-soa-edn-quiesced-monitor"
   role             = aws_iam_role.lambda_ccms_soa_quiesced_role.arn
   handler          = "lambda_function.lambda_handler"
