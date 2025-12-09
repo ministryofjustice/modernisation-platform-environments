@@ -21,6 +21,10 @@ locals {
         vpc_cni                           = "v1.20.5-eksbuild.1"
       }
 
+      helm_chart_version = {
+        karpenter = "1.8.2"
+      }
+
       /* Data Engineering Airflow */
       data_engineering_airflow_execution_role_arn = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/airflow-dev-execution-role"
 
@@ -46,6 +50,10 @@ locals {
         vpc_cni                           = "v1.20.1-eksbuild.1"
       }
 
+      helm_chart_version = {
+        karpenter = "1.5.0"
+      }
+
       /* Data Engineering Airflow */
       data_engineering_airflow_execution_role_arn = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/airflow-dev-execution-role"
 
@@ -69,6 +77,10 @@ locals {
         aws_guardduty_agent               = "v1.10.0-eksbuild.2"
         aws_ebs_csi_driver                = "v1.47.0-eksbuild.1"
         vpc_cni                           = "v1.20.1-eksbuild.1"
+      }
+
+      helm_chart_version = {
+        karpenter = "1.5.0"
       }
 
       /* Data Engineering Airflow */
