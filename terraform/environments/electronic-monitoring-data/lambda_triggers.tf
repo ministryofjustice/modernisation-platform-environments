@@ -47,7 +47,7 @@ resource "aws_s3_bucket_notification" "data_bucket_triggers" {
   dynamic "queue" {
     for_each = toset([module.load_historic_csv_sqs])
     content {
-      queue_arn     = each.value.sqs_queue.arn
+      queue_arn     = each.key.sqs_queue.arn
       events        = ["s3:ObjectCreated:*"]
       filter_suffix = ".csv"
       filter_prefix = "g4s/lcm"
