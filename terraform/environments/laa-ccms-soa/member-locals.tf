@@ -15,9 +15,8 @@ locals {
   lb_log_prefix_soa_admin   = "${local.application_data.accounts[local.environment].app_name}-admin-lb"
   lb_log_prefix_soa_managed = "${local.application_data.accounts[local.environment].app_name}-managed-lb"
 
-  lambda_folder_name = [
-    "lambda_delivery",
-    "ccms-soa-edn-quiesced-layer"
-  ]
+lambda_folder_name = [
+  "lambda_delivery",
+  "${local.application_name}-ccms-soa-edn-quiesced-layer"
+]
 
-}
