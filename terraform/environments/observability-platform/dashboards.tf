@@ -15,22 +15,47 @@ locals {
   # All templated dashboard files (ending in .json.tftpl)
   dashboard_template_files = fileset("${path.module}/dashboards", "**/*.json.tftpl")
 
-  # Map JSON file -> team (or null if top-level)
-  # e.g. "observability-platform/demo.json" -> team = "observability-platform"
-  #      "op-landing-page.json"             -> team = null
-  dashboard_json_by_file = {
+  # Teams that actually have a folder in this environment
+  existing_teams = keys(module.tenant_configuration)
+
+  # Raw mapping: JSON file -> team (or null if top-level)
+  raw_dashboard_json_by_file = {
     for f in local.dashboard_json_files :
+    f => {
+      # e.g. "core-network-services/tgw-health.json" -> team = "core-network-services"
+      #      "op-landing-page.json"                 -> team = null
+      team = length(split("/", f)) > 1 ? split("/", f)[0] : null
+    }
+  }
+
+  # Filtered JSON dashboards:
+  # - keep top-level dashboards (team == null)
+  # - keep team dashboards only if that team exists in module.tenant_configuration
+  dashboard_json_by_file = {
+    for f, cfg in local.raw_dashboard_json_by_file :
+    f => cfg
+    if (
+      cfg.team == null
+      || contains(local.existing_teams, cfg.team)
+    )
+  }
+
+  # Raw mapping: template file -> team (or null if top-level)
+  raw_dashboard_template_by_file = {
+    for f in local.dashboard_template_files :
     f => {
       team = length(split("/", f)) > 1 ? split("/", f)[0] : null
     }
   }
 
-  # Map template file -> team (or null if top-level)
+  # Filtered template dashboards (same rules as JSON)
   dashboard_template_by_file = {
-    for f in local.dashboard_template_files :
-    f => {
-      team = length(split("/", f)) > 1 ? split("/", f)[0] : null
-    }
+    for f, cfg in local.raw_dashboard_template_by_file :
+    f => cfg
+    if (
+      cfg.team == null
+      || contains(local.existing_teams, cfg.team)
+    )
   }
 }
 
