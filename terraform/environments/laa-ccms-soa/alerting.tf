@@ -167,10 +167,10 @@ resource "aws_cloudwatch_metric_alarm" "RDS_Free_Storage_Space_Over_Threshold" {
   metric_name         = "FreeStorageSpace"
   statistic           = "Average"
   namespace           = "AWS/RDS"
-  period              = "300"
+  period              = "60"
   evaluation_periods  = "3"
   datapoints_to_alarm = "3"
-  threshold           = local.application_data.accounts[local.environment].logging_cloudwatch_rds_free_storage_threshold_gb
+  threshold           = local.application_data.accounts[local.environment].soa_db_storage_gb * 0.35 * 1024 * 1024 * 1024
   treat_missing_data  = "breaching"
   dimensions = {
     DBInstanceIdentifier = aws_db_instance.soa_db.identifier
