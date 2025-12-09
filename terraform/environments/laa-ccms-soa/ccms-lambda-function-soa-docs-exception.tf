@@ -73,7 +73,6 @@ resource "aws_lambda_function" "ccms_soa_edn_quiesced_monitor" {
   function_name    = "${local.application_name}-${local.environment}-edn-quiesced-monitor"
   role             = aws_iam_role.lambda_ccms_soa_quiesced_role.arn
   handler          = "lambda_function.lambda_handler"
-  layers           = [aws_lambda_layer_version.lambda_layer_ccms_soa_edn_quiesced.arn]
   runtime          = "python3.13"
   timeout          = 30
   publish          = true
@@ -93,6 +92,7 @@ resource "aws_lambda_function" "ccms_soa_edn_quiesced_monitor" {
     Name = "${local.application_name}-${local.environment}-edn-quiesced-monitor"
   })
 }
+
 
 # Permission for CloudWatch Logs to invoke Lambda
 resource "aws_lambda_permission" "allow_cloudwatch_invoke_ccms_soa_quiesced" {
