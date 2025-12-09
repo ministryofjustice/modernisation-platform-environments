@@ -1,3 +1,22 @@
+"""
+Lambda Function: CCMS SOA EDN Quiesced Monitor
+------------------------------------------------
+This Lambda is triggered by a CloudWatch Logs Subscription Filter
+whenever SOA logs contain a quiescing alert message such as:
+
+    "QUIESCING this server due to upper mark DB allocated threshold..."
+
+It sends a critical notification to Slack including:
+- The triggering log line
+- Timestamp and log stream source
+- Nearby supporting log lines for context
+
+Purpose:
+- Provide real-time alerting to Support team when EDN becomes quiesced
+  due to DB capacity thresholds being breached in SOA Managed servers.
+"""
+
+
 import io
 import os
 import base64
