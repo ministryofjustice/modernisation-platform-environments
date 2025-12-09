@@ -1,11 +1,21 @@
 ######################################
+### EC2 INSTANCE Userdata File
+######################################
+data "template_file" "userdata_new" {
+  template = file("${path.module}/files/new-userdata.sh")
+  
+  vars = {
+    dns_zone_name = data.aws_route53_zone.external.name
+  }
+}
+
+######################################
 ### EC2 INSTANCE
 ######################################
 resource "aws_instance" "oas_app_instance_new" {
   count = local.environment == "preproduction" ? 1 : 0
 
   ami = local.application_data.accounts[local.environment].ec2amiid
-  # associate_public_ip_address = false
   availability_zone           = "eu-west-2a"
   ebs_optimized               = true
   instance_type               = local.application_data.accounts[local.environment].ec2instancetype
@@ -13,8 +23,8 @@ resource "aws_instance" "oas_app_instance_new" {
   monitoring                  = true
   subnet_id                   = data.aws_subnet.private_subnets_a.id
   iam_instance_profile        = aws_iam_instance_profile.ec2_instance_profile_new[0].id
-#  user_data_replace_on_change = true
-#  user_data                   = base64encode(data.local_file.userdata.content)
+  user_data_replace_on_change = true
+  user_data                   = base64encode(data.template_file.userdata_new.rendered)
 
   root_block_device {
     delete_on_termination = false
