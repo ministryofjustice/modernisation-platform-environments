@@ -45,7 +45,7 @@ resource "aws_iam_role_policy" "waf_lambda_policy" {
     Version = "2012-10-17",
     Statement = [
       { Effect = "Allow",
-        Action = ["wafv2:GetWebACLForResource", "wafv2:AssociateWebACL", "wafv2:DisassociateWebACL"],
+        Action = ["wafv2:GetWebACLForResource", "wafv2:AssociateWebACL", "wafv2:DisassociateWebACL", "elasticloadbalancing:SetWebACL", "elasticloadbalancing:GetWebACL"],
       Resource = "*" },
       { Effect = "Allow",
         Action = ["wafv2:GetRuleGroup"],
@@ -102,7 +102,7 @@ resource "aws_cloudwatch_event_rule" "waf_allow_0700_uk" {
 
 resource "aws_cloudwatch_event_rule" "waf_block_2130_uk" {
   name                = "waf-block-2130-${local.environment}"
-  schedule_expression = "cron(00 22 ? * MON-SUN *)"
+  schedule_expression = "cron(00 00 ? * MON-SUN *)"
   description         = "Set WAF rule to BLOCK at 21:30 UK daily"
 }
 
