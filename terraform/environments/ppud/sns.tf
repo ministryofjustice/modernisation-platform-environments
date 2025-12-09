@@ -321,15 +321,14 @@ resource "aws_sns_topic_subscription" "cw_subscription" {
 */
 
 locals {
-  topic_arns = local.is-production == true ? [
-    aws_sns_topic.cw_alerts[0].arn,
-    aws_sns_topic.cw_std_and_sms_alerts[0].arn,
-  ] : []
+  topic_map = local.is-production == true ? {
+    cw_alerts             = aws_sns_topic.cw_alerts[0].arn
+    cw_std_and_sms_alerts = aws_sns_topic.cw_std_and_sms_alerts[0].arn
+  } : {}
 }
 
 resource "aws_sns_topic_subscription" "cw_subscription" {
-  # One subscription per topic
-  for_each  = toset(local.topic_arns)
+  for_each  = local.topic_map
   topic_arn = each.value
   protocol  = "email"
   endpoint  = "PPUDAlerts@colt.net"
