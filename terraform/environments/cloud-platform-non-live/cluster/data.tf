@@ -32,3 +32,9 @@ data "aws_subnets" "eks_public" {
     values = ["cloud-platform-non-live-*-public-*"]
   }
 }
+
+data "aws_iam_roles" "platform_engineer_admin_sso_role" {
+  count = contains(local.enabled_workspaces, terraform.workspace) ? 1 : 0
+  name_regex  = "AWSReservedSSO_platform-engineer-admin_.*"
+  path_prefix = "/aws-reserved/sso.amazonaws.com/"
+}
