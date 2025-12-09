@@ -1,6 +1,6 @@
 # IAM Role for CCMS-SOA Quiesced Monitor Lambda
 resource "aws_iam_role" "lambda_ccms_soa_quiesced_role" {
-  name = "${local.application_name}-${local.environment}-ccms-soa-quiesced-role"
+  name = "${local.application_name}-${local.environment}-quiesced-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -14,12 +14,12 @@ resource "aws_iam_role" "lambda_ccms_soa_quiesced_role" {
   })
 
   tags = merge(local.tags, {
-    Name = "${local.application_name}-${local.environment}-ccms-soa-quiesced-role"
+    Name = "${local.application_name}-${local.environment}-quiesced-role"
   })
 }
 
 resource "aws_iam_role_policy" "lambda_ccms_soa_quiesced_policy" {
-  name = "${local.application_name}-${local.environment}-ccms-soa-quiesced-policy"
+  name = "${local.application_name}-${local.environment}-quiesced-policy"
   role = aws_iam_role.lambda_ccms_soa_quiesced_role.id
 
   policy = jsonencode({
@@ -57,8 +57,8 @@ resource "aws_iam_role_policy" "lambda_ccms_soa_quiesced_policy" {
 
 # Lambda Layer
 resource "aws_lambda_layer_version" "lambda_layer_ccms_soa_edn_quiesced" {
-  layer_name               = "${local.application_name}-${local.environment}-ccms-soa-edn-quiesced-layer"
-  s3_key                   = "lambda_delivery/${local.application_name}-ccms-soa-edn-quiesced-layer/layerV1.zip"
+  layer_name               = "${local.application_name}-${local.environment}-edn-quiesced-layer"
+  s3_key                   = "lambda_delivery/${local.application_name}-edn-quiesced-layer/layerV1.zip"
   s3_bucket                = module.s3-bucket-shared.bucket.id
   compatible_runtimes      = ["python3.13"]
   compatible_architectures = ["x86_64"]
@@ -70,7 +70,7 @@ resource "aws_lambda_layer_version" "lambda_layer_ccms_soa_edn_quiesced" {
 resource "aws_lambda_function" "ccms_soa_edn_quiesced_monitor" {
   filename         = data.archive_file.ccms_soa_quiesced_zip.output_path
   source_code_hash = base64sha256(join("", local.lambda_source_hashes))
-  function_name    = "${local.application_name}-${local.environment}-ccms-soa-edn-quiesced-monitor"
+  function_name    = "${local.application_name}-${local.environment}-edn-quiesced-monitor"
   role             = aws_iam_role.lambda_ccms_soa_quiesced_role.arn
   handler          = "lambda_function.lambda_handler"
   layers           = [aws_lambda_layer_version.lambda_layer_ccms_soa_edn_quiesced.arn]
@@ -90,7 +90,7 @@ resource "aws_lambda_function" "ccms_soa_edn_quiesced_monitor" {
   }
 
   tags = merge(local.tags, {
-    Name = "${local.application_name}-${local.environment}-ccms-soa-edn-quiesced-monitor"
+    Name = "${local.application_name}-${local.environment}-edn-quiesced-monitor"
   })
 }
 

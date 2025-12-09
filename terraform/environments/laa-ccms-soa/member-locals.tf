@@ -19,7 +19,7 @@ locals {
   # Folders created on S3 for Lambda artifacts
   lambda_folder_name = [
     "lambda_delivery",
-    "${local.application_name}-ccms-soa-edn-quiesced-layer"
+    "${local.application_name}-edn-quiesced-layer"
   ]
 
   # Detect change in Lambda code to force new publish
