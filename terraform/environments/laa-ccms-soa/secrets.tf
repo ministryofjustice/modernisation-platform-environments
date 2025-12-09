@@ -59,23 +59,29 @@ data "aws_secretsmanager_secret_version" "slack_channel_id" {
   secret_id = aws_secretsmanager_secret.slack_channel_id.id
 }
 
-###############################################################################
-# Slack Webhook Secret for CCMS SOA EDN Quiesced Lambda Alerts
-###############################################################################
+##########################################################
+# Slack Webhook Secret for CCMS SOA EDN Quiesced Alerts
+##########################################################
 resource "aws_secretsmanager_secret" "ccms_soa_quiesced_secrets" {
-  name        = "${local.application_name}/${local.environment}/ccms-soa-quiesced-webhook"
-  description = "Slack webhook secret for CCMS SOA EDN Quiesced Lambda Alerts"
+  name        = "${local.application_name}-cw-alerts-secrets"
+  description = "Slack Webhook Secret for CCMS SOA EDN Quiesced Lambda Alerts"
 
   tags = merge(local.tags, {
-    Name = "${local.application_name}-${local.environment}-ccms-soa-quiesced-secrets"
+    Name = "${local.application_name}-cw-alerts-secrets"
   })
 }
 
 resource "aws_secretsmanager_secret_version" "ccms_soa_quiesced_secrets_version" {
   secret_id = aws_secretsmanager_secret.ccms_soa_quiesced_secrets.id
 
-  # Placeholder — must update via AWS Console after deploy
   secret_string = jsonencode({
-    slack_channel_webhook = "REPLACE_WITH_SLACK_WEBHOOK_AFTER_DEPLOY"
+    slack_channel_webhook = ""
   })
+
+  lifecycle {
+    ignore_changes = [
+      secret_string
+    ]
+  }
 }
+
