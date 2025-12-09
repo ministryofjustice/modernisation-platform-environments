@@ -23,7 +23,7 @@ import logging
 import tracemalloc
 import time
 from dataclasses import dataclass
-from typing import Any, Dict, Optional, Union, cast
+from typing import Any, Dict, Union, cast
 
 import boto3
 import urllib3
@@ -51,13 +51,6 @@ class ConfigValidator:
         value = secrets_data.get(key)
         if not value or not isinstance(value, str):
             raise ValueError(f"{key} must be a non-empty string")
-        return value
-
-    @staticmethod
-    def get_mandatory_env(env_data: Dict, key: str) -> str:
-        value = env_data.get(key)
-        if not value:
-            raise ValueError(f"{key} environment variable is required")
         return value
 
 

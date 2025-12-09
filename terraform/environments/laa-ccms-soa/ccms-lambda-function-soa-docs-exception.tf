@@ -55,20 +55,54 @@ resource "aws_iam_role_policy" "lambda_ccms_soa_quiesced_policy" {
   })
 }
 
+############################
+# Lambda Layer Packaging
+############################
+
+# Zip the layer contents from local folder:
+#   lambda/<application_name>-edn-quiesced-layer/python/...
+data "archive_file" "ccms_soa_edn_quiesced_layer_zip" {
+  type        = "zip"
+  source_dir  = "${path.module}/lambda/${local.application_name}-edn-quiesced-layer"
+  output_path = "${path.module}/lambda/${local.application_name}-edn-quiesced-layer.zip"
+}
+
+# Upload layer ZIP to S3 where Lambda Layer expects it
+resource "aws_s3_object" "ccms_soa_edn_quiesced_layer_zip" {
+  bucket = module.s3-bucket-shared.bucket.id
+  key    = "lambda_delivery/${local.application_name}-edn-quiesced-layer/layerV1.zip"
+  source = data.archive_file.ccms_soa_edn_quiesced_layer_zip.output_path
+  etag   = filemd5(data.archive_file.ccms_soa_edn_quiesced_layer_zip.output_path)
+}
+
 # Lambda Layer
 resource "aws_lambda_layer_version" "lambda_layer_ccms_soa_edn_quiesced" {
   layer_name               = "${local.application_name}-${local.environment}-edn-quiesced-layer"
-  s3_key                   = "lambda_delivery/${local.application_name}-edn-quiesced-layer/layerV1.zip"
+  s3_key                   = aws_s3_object.ccms_soa_edn_quiesced_layer_zip.key
   s3_bucket                = module.s3-bucket-shared.bucket.id
   compatible_runtimes      = ["python3.13"]
   compatible_architectures = ["x86_64"]
   description              = "Layer for CCMS SOA EDN Quiesced notifications"
+
+  depends_on = [
+    aws_s3_object.ccms_soa_edn_quiesced_layer_zip
+  ]
 }
 
-# Lambda Function
+############################
+# Lambda Function Packaging
+############################
+
 # Ensures Lambda redeploys if any file inside ccms-soa-edn-quiesced changes
+data "archive_file" "ccms_soa_quiesced_zip" {
+  type        = "zip"
+  source_dir  = "${path.module}/lambda/ccms-soa-edn-quiesced"
+  output_path = "${path.module}/lambda/ccms_soa_quiesced.zip"
+}
+
 resource "aws_lambda_function" "ccms_soa_edn_quiesced_monitor" {
   filename         = data.archive_file.ccms_soa_quiesced_zip.output_path
+  # Use local.lambda_source_hashes so any file change forces new publish
   source_code_hash = base64sha256(join("", local.lambda_source_hashes))
   function_name    = "${local.application_name}-${local.environment}-edn-quiesced-monitor"
   role             = aws_iam_role.lambda_ccms_soa_quiesced_role.arn
@@ -76,6 +110,7 @@ resource "aws_lambda_function" "ccms_soa_edn_quiesced_monitor" {
   runtime          = "python3.13"
   timeout          = 30
   publish          = true
+  layers           = [aws_lambda_layer_version.lambda_layer_ccms_soa_edn_quiesced.arn]
 
   environment {
     variables = {
@@ -93,7 +128,6 @@ resource "aws_lambda_function" "ccms_soa_edn_quiesced_monitor" {
   })
 }
 
-
 # Permission for CloudWatch Logs to invoke Lambda
 resource "aws_lambda_permission" "allow_cloudwatch_invoke_ccms_soa_quiesced" {
   statement_id  = "AllowExecutionFromCloudWatchCCMSSOAQuiesced"
@@ -101,10 +135,4 @@ resource "aws_lambda_permission" "allow_cloudwatch_invoke_ccms_soa_quiesced" {
   function_name = aws_lambda_function.ccms_soa_edn_quiesced_monitor.function_name
   principal     = "logs.amazonaws.com"
   source_arn    = "${aws_cloudwatch_log_group.log_group_managed.arn}:*"
-}
-
-data "archive_file" "ccms_soa_quiesced_zip" {
-  type        = "zip"
-  source_dir  = "${path.module}/lambda/ccms-soa-edn-quiesced"
-  output_path = "${path.module}/lambda/ccms_soa_quiesced.zip"
 }
