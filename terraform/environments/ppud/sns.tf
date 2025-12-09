@@ -304,6 +304,13 @@ resource "aws_sns_topic" "cw_alerts" {
   name  = "ppud-prod-cw-alerts"
 }
 
+resource "aws_sns_topic" "cw_std_and_sms_alerts" {
+  # checkov:skip=CKV_AWS_26: "SNS topic encryption is not required as no sensitive data is processed through it"
+  count = local.is-production == true ? 1 : 0
+  name  = "ppud-prod-cw-std-and-sms-alerts"
+}
+
+/*
 resource "aws_sns_topic_subscription" "cw_subscription" {
   count     = local.is-production == true ? 1 : 0
   topic_arn = aws_sns_topic.cw_alerts[0].arn
@@ -311,39 +318,54 @@ resource "aws_sns_topic_subscription" "cw_subscription" {
   endpoint  = "PPUDAlerts@colt.net"
   #  endpoint  = aws_secretsmanager_secret_version.support_email_account[0].secret_string
 }
+*/
+
+locals {
+  topic_arns = local.is-production == true ? [
+    aws_sns_topic.cw_alerts[0].arn,
+    aws_sns_topic.cw_std_and_sms_alerts[0].arn,
+  ] : []
+}
+
+resource "aws_sns_topic_subscription" "cw_subscription" {
+  # One subscription per topic
+  for_each  = toset(local.topic_arns)
+  topic_arn = each.value
+  protocol  = "email"
+  endpoint  = "PPUDAlerts@colt.net"
+}
 
 # SNS topic subscriptions to be implemented temporarily over the Christmas period or during other periods of low staffing.
 
-/*
-resource "aws_sns_topic_subscription" "cw_sms_subscription" {
+resource "aws_sns_topic_subscription" "cw_sms_subscription1" {
   count     = local.is-production == true ? 1 : 0
-  topic_arn = aws_sns_topic.cw_alerts[0].arn
+  topic_arn = aws_sns_topic.cw_std_and_sms_alerts[0].arn
   protocol  = "sms"
   endpoint  = "+447903642202" # Nick Buckingham
 }
-
-resource "aws_sns_topic_subscription" "cw_sms_subscription1" {
+/*
+resource "aws_sns_topic_subscription" "cw_sms_subscription2" {
   count     = local.is-production == true ? 1 : 0
   topic_arn = aws_sns_topic.cw_alerts[0].arn
   protocol  = "sms"
   endpoint  = "+447879063551" # Gabriella Browning
 }
 
-resource "aws_sns_topic_subscription" "cw_sms_subscription2" {
+resource "aws_sns_topic_subscription" "cw_sms_subscription3" {
   count     = local.is-production == true ? 1 : 0
   topic_arn = aws_sns_topic.cw_alerts[0].arn
   protocol  = "sms"
   endpoint  = "+447584337970" # David Savage (work)
 }
 
-resource "aws_sns_topic_subscription" "cw_sms_subscription3" {
+resource "aws_sns_topic_subscription" "cw_sms_subscription4" {
   count     = local.is-production == true ? 1 : 0
   topic_arn = aws_sns_topic.cw_alerts[0].arn
   protocol  = "sms"
   endpoint  = "+447884053737" # David Savage (personal)
 }
 
-resource "aws_sns_topic_subscription" "cw_sms_subscription4" {
+resource "aws_sns_topic_subscription" "cw_sms_subscription5" {
   count     = local.is-production == true ? 1 : 0
   topic_arn = aws_sns_topic.cw_alerts[0].arn
   protocol  = "sms"
