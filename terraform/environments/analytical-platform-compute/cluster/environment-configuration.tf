@@ -10,7 +10,7 @@ locals {
       eks_cluster_version = "1.34"
       eks_node_version    = "1.51.0-47438798"
       eks_cluster_addon_versions = {
-        kube_proxy                        = "v1.33.5-eksbuild.2"
+        kube_proxy                        = "v1.34.1-eksbuild.2"
         aws_efs_csi_driver                = "v2.1.15-eksbuild.1"
         aws_network_flow_monitoring_agent = "v1.1.1-eksbuild.1"
         eks_node_monitoring_agent         = "v1.4.2-eksbuild.1"
