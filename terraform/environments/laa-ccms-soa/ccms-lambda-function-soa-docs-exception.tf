@@ -80,7 +80,7 @@ resource "aws_lambda_function" "ccms_soa_edn_quiesced_monitor" {
   environment {
     variables = {
       LOG_GROUP_NAME = aws_cloudwatch_log_group.log_group_managed.name
-      SECRET_NAME    = aws_secretsmanager_secret.ccms_soa_quiesced_secrets.name
+      SECRET_NAME y   = aws_secretsmanager_secret.ccms_soa_quiesced_secrets.name
     }
   }
 
