@@ -35,33 +35,23 @@ locals {
     # }
   }
   bcs_config_dev = {
-    instance_count = 0
+    instance_count = 1
     ami_name       = "base_rhel_8_5_2023-07-01T00-00-47.469Z"
     ami_owner      = local.environment_management.account_ids["core-shared-services-production"]
+    ansible_branch = "TM-1748/ndmis/rebuild-bip-as-linux"
     ebs_volumes = {
-      "/dev/sda1" = { label = "root", size = 150 }
-      "/dev/sdb"  = { label = "data", size = 100 }
-      "/dev/sdc"  = { label = "data", size = 100 }
+      "/dev/sda1" = { label = "root", size = 150, type = "gp3" }
+      "/dev/sdb"  = { label = "data", size = 100, type = "gp3" }
+      "/dev/sdc"  = { label = "data", size = 100, type = "gp3" }
+      "/dev/sds"  = { label = "swap", size = 8, type = "gp3" }
     }
-
-    ebs_volumes_config = {
-      data = {
-        iops       = 3000
-        throughput = 125
-        type       = "gp3"
-      }
-      root = {
-        iops       = 3000
-        throughput = 125
-        type       = "gp3"
-      }
-    }
+    ebs_volumes_config = {}
 
     instance_config = {
       associate_public_ip_address  = false
       disable_api_termination      = false
       disable_api_stop             = false
-      instance_type                = "t3.xlarge"
+      instance_type                = "m6i.xlarge"
       metadata_endpoint_enabled    = "enabled"
       key_name                     = null
       metadata_options_http_tokens = "required"

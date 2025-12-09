@@ -62,7 +62,7 @@ module "bcs_instance" {
 
   user_data_cloud_init = {
     args = {
-      branch       = "main"
+      branch       = var.bcs_config.ansible_branch
       ansible_args = "--tags ec2provision"
     }
     scripts = [ # paths are relative to templates/ dir
