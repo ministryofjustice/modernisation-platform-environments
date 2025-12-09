@@ -72,8 +72,8 @@ resource "aws_lambda_function" "waf_toggle" {
       # WEB_ACL_ID   = data.aws_wafv2_web_acl.waf_web_acl.id
       # RULE_NAME    = var.rule_name
       RESOURCE_ARN           = aws_lb.ebsapps_internal_alb.arn
-      NORMAL_WEB_ACL_ARN     = data.aws_wafv2_web_acl.waf_web_acl.arn
-      MAINTENANCE_WEB_ACL_ARN = data.aws_wafv2_web_acl.waf_web_acl_maintenance.arn
+      NORMAL_WEB_ACL_ARN     = aws_wafv2_web_acl.waf_web_acl.arn
+      MAINTENANCE_WEB_ACL_ARN = aws_wafv2_web_acl.waf_web_acl_maintenance.arn
 
 #       # New variables for custom body injection
 #       CUSTOM_BODY_NAME = "maintenance_html"
