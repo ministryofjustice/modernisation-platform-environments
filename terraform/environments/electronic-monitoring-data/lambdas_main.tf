@@ -375,12 +375,11 @@ module "load_fms_lambda" {
 #-----------------------------------------------------------------------------------
 
 module "load_historic_csv" {
-  count                          = local.is-development ? 0 : 1
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "load_historic_csv"
-  role_name                      = aws_iam_role.load_historic_csv[0].name
-  role_arn                       = aws_iam_role.load_historic_csv[0].arn
+  role_name                      = aws_iam_role.load_historic_csv.name
+  role_arn                       = aws_iam_role.load_historic_csv.arn
   handler                        = "load_historic_csv.handler"
   memory_size                    = 10240
   timeout                        = 900

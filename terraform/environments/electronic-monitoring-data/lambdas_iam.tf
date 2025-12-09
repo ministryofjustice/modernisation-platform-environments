@@ -1005,7 +1005,6 @@ resource "aws_lakeformation_permissions" "fms_add_create_db" {
 #-----------------------------------------------------------------------------------
 
 data "aws_iam_policy_document" "load_historic_csv_lambda_role_policy_document" {
-  count = local.is-development ? 0 : 1
   statement {
     sid    = "S3Permissions"
     effect = "Allow"
@@ -1102,37 +1101,32 @@ data "aws_iam_policy_document" "load_historic_csv_lambda_role_policy_document" {
 }
 
 resource "aws_iam_role" "load_historic_csv" {
-  count              = local.is-development ? 0 : 1
   name               = "load_historic_csv_lambda_role"
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
 }
 
 resource "aws_iam_policy" "load_historic_csv_lambda_role_policy" {
-  count  = local.is-development ? 0 : 1
   name   = "load_historic_csv_lambda_policy"
-  policy = data.aws_iam_policy_document.load_historic_csv_lambda_role_policy_document[0].json
+  policy = data.aws_iam_policy_document.load_historic_csv_lambda_role_policy_document.json
 }
 
 resource "aws_iam_role_policy_attachment" "load_historic_csv_output_lambda_policy_attachment" {
-  count      = local.is-development ? 0 : 1
-  role       = aws_iam_role.load_historic_csv[0].name
-  policy_arn = aws_iam_policy.load_historic_csv_lambda_role_policy[0].arn
+  role       = aws_iam_role.load_historic_csv.name
+  policy_arn = aws_iam_policy.load_historic_csv_lambda_role_policy.arn
 }
 
 module "share_db_with_historic_csv_lambda_role_policy_lambda_role" {
-  count                   = local.is-development ? 0 : 1
   source                  = "./modules/lakeformation_database_share"
   dbs_to_grant            = toset(["g4s_lcm${local.db_suffix}"])
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
-  role_arn                = aws_iam_role.load_historic_csv[0].arn
+  role_arn                = aws_iam_role.load_historic_csv.arn
   db_exists               = true
   de_role_arn             = null
 }
 
 resource "aws_lakeformation_permissions" "historic_csv_add_create_db" {
-  count            = local.is-development ? 0 : 1
   permissions      = ["CREATE_DATABASE", "DROP"]
-  principal        = aws_iam_role.load_historic_csv[0].arn
+  principal        = aws_iam_role.load_historic_csv.arn
   catalog_resource = true
 }
 
