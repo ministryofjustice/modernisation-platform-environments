@@ -86,7 +86,7 @@ resource "aws_wafv2_web_acl" "ebs_web_acl" {
 }
 
 # The following resource is for WAF Custom HTML response only. The Lambda function handles the enabling and disabling of this resource.
-resource "aws_wafv2_web_acl" "ebs_web_acl_maintenance" {
+resource "aws_wafv2_web_acl" "waf_web_acl_maintenance" {
   name        = "ebs_waf_maintenance"
   scope       = "REGIONAL"
   description = "AWS WAF rule for mainteance custom page"
