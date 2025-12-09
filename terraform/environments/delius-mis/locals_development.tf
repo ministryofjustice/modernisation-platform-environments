@@ -35,7 +35,7 @@ locals {
     # }
   }
   bcs_config_dev = {
-    instance_count = 1
+    instance_count = 0
     ami_name       = "base_rhel_8_5_2023-07-01T00-00-47.469Z"
     ami_owner      = local.environment_management.account_ids["core-shared-services-production"]
     ebs_volumes = {
