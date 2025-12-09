@@ -243,7 +243,15 @@ locals {
       description  = "Function to synchronize ssm parameter store with WAF ip sets."
       role_key     = "sync_ssm_to_waf"
       environments = ["development", "preproduction", "production"]
-      vpc_config   = { production = true }
+      permissions = [{
+        principal         = "events.amazonaws.com"
+        source_arn_suffix = "*"
+      }]
+    }
+    auto_tag_eni = {
+      description  = "Function to auto tag all elastic network interfaces."
+      role_key     = "auto_tag_eni"
+      environments = ["development", "preproduction", "production"]
       permissions = [{
         principal         = "events.amazonaws.com"
         source_arn_suffix = "*"

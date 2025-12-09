@@ -6,6 +6,10 @@
 # Eventbridge Rules 
 ####################
 
+#####################################################
+# Eventbridge Rule to check for Expiring Certificates
+#####################################################
+
 # Lambda instances for check_certificate_expiration
 locals {
   certificate_expiration_envs = {
@@ -98,6 +102,53 @@ resource "aws_lambda_permission" "allow_cloudwatch_sync_ssm_to_waf" {
   function_name = aws_lambda_function.lambda_functions[each.key].function_name
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.sync_ssm_to_waf[each.key].arn
+}
+
+#############################################################
+# Eventbridge Rule to Auto Tag all Elastic Network Interfaces
+#############################################################
+
+locals {
+  auto_tag_eni_envs = {
+    for k, v in local.lambda_instances_map :
+    k => v
+    if startswith(k, "auto_tag_eni")
+  }
+}
+
+resource "aws_cloudwatch_event_rule" "auto_tag_eni" {
+  for_each      = local.auto_tag_eni_envs
+  name          = "Auto-Tag-ENI-${each.value.env}"
+  description   = "Tags all ENIs as they are created"
+  event_pattern = <<EOF
+{
+  "source": ["aws.ec2"],
+  "detail-type": ["AWS API Call via CloudTrail"],
+  "detail": {
+    "eventName": ["CreateNetworkInterface"]
+  }
+}
+EOF
+  tags = {
+    Function    = each.value.func_name
+    Environment = each.value.env
+  }
+}
+
+resource "aws_cloudwatch_event_target" "trigger_lambda_auto_tag_eni" {
+  for_each  = local.auto_tag_eni_envs
+  rule      = aws_cloudwatch_event_rule.auto_tag_eni[each.key].name
+  target_id = "auto_tag_eni_${each.value.env}"
+  arn       = aws_lambda_function.lambda_functions[each.key].arn
+}
+
+resource "aws_lambda_permission" "allow_cloudwatch_auto_tag_eni" {
+  for_each      = local.auto_tag_eni_envs
+  statement_id  = "AllowExecutionFromEventBridge-${each.value.env}"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.lambda_functions[each.key].function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.auto_tag_eni[each.key].arn
 }
 
 #################################
