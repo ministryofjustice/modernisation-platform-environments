@@ -24,9 +24,16 @@ resource "aws_redshiftserverless_namespace" "default" {
 resource "aws_redshiftserverless_workgroup" "default" {
   depends_on = [aws_redshiftserverless_namespace.default]
 
-  namespace_name = aws_redshiftserverless_namespace.default.id
-  workgroup_name = aws_redshiftserverless_namespace.default.id
-  # base_capacity  = var.redshift_serverless_base_capacity
+  namespace_name            = aws_redshiftserverless_namespace.default.id
+  workgroup_name            = aws_redshiftserverless_namespace.default.id
+  base_capacity             = 32  # Minimum compute always allocated
+  max_capacity              = 512 # Maximum compute allowed for scaling
+
+  # Price-performance scaling configuration
+  price_performance_target {
+    enabled = true      
+    level   = 50        # Valid values are 1 (LOW_COST), 25 (ECONOMICAL), 50 (BALANCED)(Recommended), 75 (RESOURCEFUL), and 100 (HIGH_PERFORMANCE).
+  }
 
   security_group_ids = [module.redshift_sg.security_group_id]
   subnet_ids         = var.database_subnets
