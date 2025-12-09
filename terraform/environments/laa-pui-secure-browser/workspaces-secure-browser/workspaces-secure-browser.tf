@@ -196,9 +196,11 @@ resource "aws_workspacesweb_browser_settings" "main" {
           "accessmycloudpc.com",
           "account.activedirectory.windowsazure.com",
           "accounts.accesscontrol.windows.net",
+          "adfs.gasolicitors.com",
           "adminwebservice.microsoftonline.com",
           "api.passwordreset.microsoftonline.com",
           "assets.publishing.service.gov.uk",
+          "authpoint.watchguard.com",
           "autologon.microsoftazuread-sso.com",
           "becws.microsoftonline.com",
           "ccms-pui.laa.service.justice.gov.uk",
@@ -208,6 +210,7 @@ resource "aws_workspacesweb_browser_settings" "main" {
           "chrome://print/",
           "clientconfig.microsoftonline-p.net",
           "companymanager.microsoftonline.com",
+          "deu.cloud.watchguard.com",
           "device.login.microsoftonline.com",
           "enterpriseregistration.windows.net",
           "go.microsoft.com",
@@ -232,6 +235,7 @@ resource "aws_workspacesweb_browser_settings" "main" {
           "loginex.microsoftonline.com",
           "lsconline.legalservices.gov.uk",
           "mysignins.microsoft.com",
+          "myworkspace.leighday.co.uk",
           "nexus.microsoftonline-p.com",
           "passwordreset.microsoftonline.com",
           "portal.manage.microsoft.com",
@@ -241,7 +245,8 @@ resource "aws_workspacesweb_browser_settings" "main" {
           "www.gov.uk",
           "www.justice.gov.uk",
           "www.smartsurvey.co.uk",
-          "*.accessmycloudpc.com"
+          "*.accessmycloudpc.com",
+          "myworkspace.leighday.co.uk"
         ]
       }
       "AlwaysOpenPdfExternally" = {
