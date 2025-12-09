@@ -67,8 +67,8 @@ resource "aws_lambda_layer_version" "lambda_layer_ccms_soa_edn_quiesced" {
 
 # Lambda Function
 resource "aws_lambda_function" "ccms_soa_edn_quiesced_monitor" {
-  filename         = "./lambda/ccms_soa_quiesced.zip"
-  source_code_hash = filebase64sha256("./lambda/ccms_soa_quiesced.zip")
+  filename         = data.archive_file.ccms_soa_quiesced_zip.output_path
+  source_code_hash = data.archive_file.ccms_soa_quiesced_zip.output_base64sha256
   function_name    = "${local.application_name}-${local.environment}-ccms-soa-edn-quiesced-monitor"
   role             = aws_iam_role.lambda_ccms_soa_quiesced_role.arn
   handler          = "lambda_function.lambda_handler"
@@ -100,4 +100,10 @@ resource "aws_lambda_permission" "allow_cloudwatch_invoke_ccms_soa_quiesced" {
   function_name = aws_lambda_function.ccms_soa_edn_quiesced_monitor.function_name
   principal     = "logs.amazonaws.com"
   source_arn    = "${aws_cloudwatch_log_group.log_group_managed.arn}:*"
+}
+
+data "archive_file" "ccms_soa_quiesced_zip" {
+  type        = "zip"
+  source_dir  = "${path.module}/lambda/ccms-soa-edn-quiesced"
+  output_path = "${path.module}/lambda/ccms_soa_quiesced.zip"
 }
