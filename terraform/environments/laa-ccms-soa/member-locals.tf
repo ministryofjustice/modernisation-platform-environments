@@ -17,7 +17,12 @@ locals {
 
 lambda_folder_name = [
   "lambda_delivery",
-  "${local.application_name}-ccms-soa-edn-quiesced-layer"
+  "${local.application_name}-edn-quiesced-layer"
+]
+
+lambda_source_hashes = [
+  for f in fileset("./lambda/${local.application_name}-edn-quiesced-layer", "**") :
+  sha256(file("${path.module}/lambda/${local.application_name}-edn-quiesced-layer/${f}"))
 ]
 
 }
