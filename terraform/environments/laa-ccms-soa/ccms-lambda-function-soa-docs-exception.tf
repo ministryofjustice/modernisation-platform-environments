@@ -66,6 +66,7 @@ resource "aws_lambda_layer_version" "lambda_layer_ccms_soa_edn_quiesced" {
 }
 
 # Lambda Function
+# Ensures Lambda redeploys if any file inside ccms-soa-edn-quiesced changes
 resource "aws_lambda_function" "ccms_soa_edn_quiesced_monitor" {
   filename         = data.archive_file.ccms_soa_quiesced_zip.output_path
   source_code_hash = base64sha256(join("", local.lambda_source_hashes))
