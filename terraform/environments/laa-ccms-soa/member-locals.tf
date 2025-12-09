@@ -20,3 +20,4 @@ lambda_folder_name = [
   "${local.application_name}-ccms-soa-edn-quiesced-layer"
 ]
 
+}
