@@ -62,6 +62,12 @@ locals {
       "54.228.16.0/26",    # eu-west-1 Region
       "107.23.255.0/26",   # us-east-1 Region
       "54.243.31.192/26"   # us-east-1 Region
+    ],
+    [
+      # Civica secure development environment
+      "4.234.27.250/32",
+      "213.143.143.69/32",
+      "213.143.146.149/32"
     ]
   ]))
   ipv6_cidr_blocks = []
