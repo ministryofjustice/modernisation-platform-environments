@@ -1,4 +1,6 @@
+##########################################################
 # IAM Role for CCMS-SOA Quiesced Monitor Lambda
+##########################################################
 resource "aws_iam_role" "lambda_ccms_soa_quiesced_role" {
   name = "${local.application_name}-${local.environment}-quiesced-role"
 
@@ -55,14 +57,23 @@ resource "aws_iam_role_policy" "lambda_ccms_soa_quiesced_policy" {
   })
 }
 
-############################
+##########################################################
 # Lambda Layer Packaging
 #
-# IMPORTANT: Upload your layer zip file before apply:
-#   s3://<app>-<env>-shared/lambda_delivery/<app>-edn-quiesced-layer/layerV1.zip
+# NOTES:
+# • Layer is built from dependencies defined in:
+#     lambda/ccms-soa-edn-quiesced/python/requirements.txt
 #
-# Otherwise, Terraform will fail with "NoSuchKey"
-############################
+# • Runtime dependencies built for Python 3.13
+#
+# • Documentation:
+#     https://dsdmoj.atlassian.net/wiki/spaces/LDD/pages/5975606239/Build+Layered+Function+for+Lambda
+#
+# • IMPORTANT — Upload the ZIP to S3 BEFORE terraform apply:
+#     s3://<app>-<env>-shared/lambda_delivery/<app>-edn-quiesced-layer/layerV1.zip
+#
+# Otherwise Terraform will error: "S3 Error Code: NoSuchKey"
+##########################################################
 resource "aws_lambda_layer_version" "lambda_layer_ccms_soa_edn_quiesced" {
   layer_name               = "${local.application_name}-edn-quiesced-layer"
   s3_key                   = "lambda_delivery/${local.application_name}-edn-quiesced-layer/layerV1.zip"
@@ -72,18 +83,21 @@ resource "aws_lambda_layer_version" "lambda_layer_ccms_soa_edn_quiesced" {
   description              = "Layer for CCMS SOA EDN Quiesced notifications"
 }
 
-############################
-# Lambda Function Packaging
-############################
+##########################################################
+# Lambda ZIP Packaging
+##########################################################
 data "archive_file" "ccms_soa_quiesced_zip" {
   type        = "zip"
   source_dir  = "${path.module}/lambda/ccms-soa-edn-quiesced"
   output_path = "${path.module}/lambda/ccms_soa_quiesced.zip"
 }
 
+##########################################################
+# Lambda Function - EDN Quiesced Monitor
+##########################################################
 resource "aws_lambda_function" "ccms_soa_edn_quiesced_monitor" {
   filename         = data.archive_file.ccms_soa_quiesced_zip.output_path
-  source_code_hash = base64sha256(join("", local.lambda_source_hashes))
+  source_code_hash = filebase64sha256(data.archive_file.ccms_soa_quiesced_zip.output_path)
   function_name    = "${local.application_name}-${local.environment}-edn-quiesced-monitor"
   role             = aws_iam_role.lambda_ccms_soa_quiesced_role.arn
   handler          = "lambda_function.lambda_handler"
@@ -108,6 +122,9 @@ resource "aws_lambda_function" "ccms_soa_edn_quiesced_monitor" {
   })
 }
 
+##########################################################
+# Allow CloudWatch Logs to Trigger Lambda
+##########################################################
 resource "aws_lambda_permission" "allow_cloudwatch_invoke_ccms_soa_edn_quiesced" {
   statement_id  = "AllowExecutionFromCloudWatchCCMSSOAQuiesced"
   action        = "lambda:InvokeFunction"
