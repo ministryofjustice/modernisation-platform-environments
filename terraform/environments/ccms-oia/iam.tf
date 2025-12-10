@@ -198,8 +198,7 @@ data "aws_iam_policy_document" "guardduty_alerting_sns" {
     sid    = "EventsAllowPublishSnsTopic"
     effect = "Allow"
     actions = [
-      "sns:Publish",
-      "sns:EncryptPublish"
+      "sns:Publish"
     ]
     resources = [
       aws_sns_topic.guardduty_alerts.arn
