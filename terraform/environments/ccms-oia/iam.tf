@@ -195,24 +195,6 @@ resource "aws_iam_role_policy_attachment" "s3_policy_cortex_deps" {
 data "aws_iam_policy_document" "guardduty_alerting_sns" {
   version = "2012-10-17"
   statement {
-    sid    = "AllowSNSUseKey"
-    effect = "Allow"
-    principals {
-      type = "Service"
-      identifiers = [
-        "cloudwatch.amazonaws.com"
-      ]
-    }
-    actions = [
-      "kms:GenerateDataKey*",
-      "kms:Decrypt"
-    ]
-    resources = [
-      "*"
-    ]
-  }
-
-  statement {
     sid    = "EventsAllowPublishSnsTopic"
     effect = "Allow"
     actions = [
@@ -234,24 +216,6 @@ data "aws_iam_policy_document" "guardduty_alerting_sns" {
 data "aws_iam_policy_document" "cloudwatch_alerting_sns" {
   version = "2012-10-17"
   statement {
-    sid    = "AllowSNSUseKey"
-    effect = "Allow"
-    principals {
-      type = "Service"
-      identifiers = [
-        "cloudwatch.amazonaws.com"
-      ]
-    }
-    actions = [
-      "kms:GenerateDataKey*",
-      "kms:Decrypt"
-    ]
-    resources = [
-      "*"
-    ]
-  }
-
-  statement {
     sid    = "EventsAllowPublishSnsTopic"
     effect = "Allow"
     actions = [
@@ -268,4 +232,34 @@ data "aws_iam_policy_document" "cloudwatch_alerting_sns" {
     }
 
   }
+}
+
+data "aws_iam_policy_document" "cloudwatch_sns_encryption" {
+  version = "2012-10-17"
+  statement {
+    sid    = "AllowSNSUseKey"
+    effect = "Allow"
+    principals {
+      type = "Service"
+      identifiers = [
+        "cloudwatch.amazonaws.com"
+      ]
+    }
+    actions = [
+      "kms:GenerateDataKey*",
+      "kms:Decrypt"
+    ]
+    resources = [
+      "*"
+    ]
+  }
+}
+
+data "aws_kms_key" "sns_alerts_key" {
+  key_id = "alias/aws/sns"
+}
+
+resource "aws_kms_key_policy" "sns_alerts_key_policy" {
+  key_id = data.aws_kms_key.sns_alerts_key.key_id
+  policy = data.aws_iam_policy_document.cloudwatch_sns_encryption.json
 }
