@@ -1,4 +1,43 @@
 ######################################
+### SSH KEY PAIR GENERATION
+######################################
+resource "tls_private_key" "ec2_ssh_key" {
+  count     = contains(["test", "preproduction"], local.environment) ? 1 : 0
+  algorithm = "ED25519"
+}
+
+resource "aws_key_pair" "ec2_key_pair" {
+  count      = contains(["test", "preproduction"], local.environment) ? 1 : 0
+  key_name   = "${local.application_name}-${local.environment}-key"
+  public_key = tls_private_key.ec2_ssh_key[0].public_key_openssh
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-${local.environment}-key" }
+  )
+}
+
+resource "aws_secretsmanager_secret" "ec2_ssh_private_key" {
+  count       = contains(["test", "preproduction"], local.environment) ? 1 : 0
+  name        = "${local.application_name}-${local.environment}/ec2-ssh-private-key"
+  description = "Private SSH key for ${local.application_name} EC2 instance"
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-${local.environment}-ssh-private-key" }
+  )
+}
+
+resource "aws_secretsmanager_secret_version" "ec2_ssh_private_key_version" {
+  count     = contains(["test", "preproduction"], local.environment) ? 1 : 0
+  secret_id = aws_secretsmanager_secret.ec2_ssh_private_key[0].id
+  secret_string = jsonencode({
+    private_key = tls_private_key.ec2_ssh_key[0].private_key_openssh
+    public_key  = tls_private_key.ec2_ssh_key[0].public_key_openssh
+  })
+}
+
+######################################
 ### EC2 INSTANCE Userdata File
 ######################################
 locals {
@@ -19,6 +58,7 @@ resource "aws_instance" "oas_app_instance_new" {
   availability_zone           = "eu-west-2a"
   ebs_optimized               = true
   instance_type               = local.application_data.accounts[local.environment].ec2instancetype
+  key_name                    = aws_key_pair.ec2_key_pair[0].key_name
   vpc_security_group_ids      = [aws_security_group.ec2_sg[0].id]
   monitoring                  = true
   subnet_id                   = data.aws_subnet.private_subnets_a.id
