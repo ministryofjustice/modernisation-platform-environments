@@ -28,8 +28,8 @@
 # }
 
 resource "aws_sns_topic" "cloudwatch_alerts" {
-  name            = "cloudwatch-slack-alerts"
-  delivery_policy = <<EOF
+  name              = "cloudwatch-slack-alerts"
+  delivery_policy   = <<EOF
 {
   "http": {
     "defaultHealthyRetryPolicy": {
@@ -49,7 +49,7 @@ resource "aws_sns_topic" "cloudwatch_alerts" {
 }
 EOF
   kms_master_key_id = "alias/aws/sns"
-  tags = merge(local.tags, 
+  tags = merge(local.tags,
     { Name = "cloudwatch-slack-alerts" }
   )
 }
@@ -68,8 +68,8 @@ resource "aws_sns_topic_subscription" "cloudwatch_alerts" {
 }
 
 resource "aws_sns_topic" "guardduty_alerts" {
-  name            = "${local.application_name}-guardduty-alerts"
-  delivery_policy = <<EOF
+  name              = "${local.application_name}-guardduty-alerts"
+  delivery_policy   = <<EOF
 {
   "http": {
     "defaultHealthyRetryPolicy": {

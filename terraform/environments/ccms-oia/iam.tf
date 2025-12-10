@@ -208,8 +208,8 @@ data "aws_iam_policy_document" "guardduty_alerting_sns" {
       "kms:Decrypt"
     ]
     resources = [
-        "arn:aws:kms:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:key/*",
-        aws_sns_topic.cloudwatch_alerts.arn
+      "arn:aws:kms:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:key/*",
+      aws_sns_topic.cloudwatch_alerts.arn
     ]
   }
 
@@ -235,10 +235,10 @@ data "aws_iam_policy_document" "guardduty_alerting_sns" {
 data "aws_iam_policy_document" "cloudwatch_alerting_sns" {
   version = "2012-10-17"
   statement {
-     sid    = "AllowSNSUseKey"
-     effect = "Allow"
-     principals {
-       type = "Service"
+    sid    = "AllowSNSUseKey"
+    effect = "Allow"
+    principals {
+      type = "Service"
       identifiers = [
         "cloudwatch.amazonaws.com"
       ]
