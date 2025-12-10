@@ -64,7 +64,7 @@ data "aws_secretsmanager_secret_version" "slack_channel_id" {
 # Slack Webhook Secret for CCMS SOA EDN Quiesced Alerts
 ##########################################################
 resource "aws_secretsmanager_secret" "ccms_soa_quiesced_secrets" {
-  name = "${local.application_name}-${local.environment}-edn-quiesced-alerts"
+  name = "${local.application_name}-edn-quiesced-alerts"
   description = "Slack Webhook Secret for CCMS SOA EDN Quiesced Lambda Alerts"
 
   tags = merge(local.tags, {
