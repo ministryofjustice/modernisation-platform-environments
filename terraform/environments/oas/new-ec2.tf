@@ -13,7 +13,7 @@ locals {
 ### EC2 INSTANCE
 ######################################
 resource "aws_instance" "oas_app_instance_new" {
-  count = local.environment == "preproduction" ? 1 : 0
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
 
   ami = local.application_data.accounts[local.environment].ec2amiid
   availability_zone           = "eu-west-2a"
@@ -49,14 +49,14 @@ resource "aws_instance" "oas_app_instance_new" {
 ### EC2 IAM ROLE AND PROFILE
 ######################################
 resource "aws_iam_instance_profile" "ec2_instance_profile_new" {
-  count = local.environment == "preproduction" ? 1 : 0
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
 
   name = "${local.application_name}-ec2-profile"
   role = aws_iam_role.ec2_instance_role_new[0].name
 }
 
 resource "aws_iam_role" "ec2_instance_role_new" {
-  count = local.environment == "preproduction" ? 1 : 0
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
 
   name               = "${local.application_name}-role"
   assume_role_policy = <<EOF
@@ -76,13 +76,13 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "ec2_instance_role_attachment_new" {
-  count      = local.environment == "preproduction" ? 1 : 0
+  count      = contains(["test", "preproduction"], local.environment) ? 1 : 0
   role       = aws_iam_role.ec2_instance_role_new[0].name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
 resource "aws_iam_role_policy" "ec2_instance_policy_new" {
-  count = local.environment == "preproduction" ? 1 : 0
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
   #tfsec:ignore:aws-iam-no-policy-wildcards
   name = "${local.application_name}-ec2-policy"
   role = aws_iam_role.ec2_instance_role_new[0].name
