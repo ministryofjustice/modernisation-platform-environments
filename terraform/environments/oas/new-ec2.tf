@@ -79,6 +79,11 @@ resource "aws_instance" "oas_app_instance_new" {
   user_data_replace_on_change = true
   user_data                   = base64encode(local.userdata_new)
 
+  network_interface {
+    device_index         = 0
+    network_interface_id = aws_network_interface.oas_eni_new[0].id
+  }
+
   root_block_device {
     delete_on_termination = false
     encrypted             = true 
@@ -96,12 +101,5 @@ resource "aws_instance" "oas_app_instance_new" {
     { "instance-scheduling" = "skip-scheduling" },
     { "snapshot-with-daily-7-day-retention" = "yes" }
   )
-}
-
-resource "aws_network_interface_attachment" "oas_eni_attachment" {
-  count                = contains(["test", "preproduction"], local.environment) ? 1 : 0
-  instance_id          = aws_instance.oas_app_instance_new[0].id
-  network_interface_id = aws_network_interface.oas_eni_new[0].id
-  device_index         = 0
 }
 
