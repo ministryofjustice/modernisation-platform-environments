@@ -35,6 +35,11 @@ variable "bws_config" {
   type = any
 }
 
+variable "boe_efs_config" {
+  type    = any
+  default = null
+}
+
 variable "dis_config" {
   description = "Configuration for DIS instances"
   type = object({
