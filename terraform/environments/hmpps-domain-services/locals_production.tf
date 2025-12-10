@@ -262,6 +262,7 @@ locals {
     secretsmanager_secrets = {
       "/microsoft/AD/azure.hmpp.root" = local.secretsmanager_secrets.domain
       "/GFSL"                         = local.secretsmanager_secrets.gfsl
+      "/DSO"                          = local.secretsmanager_secrets.dso
     }
   }
 }
