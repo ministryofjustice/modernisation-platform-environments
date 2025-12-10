@@ -46,7 +46,23 @@ resource "aws_wafv2_web_acl" "ebsapps_internal_web_acl" {
       sampled_requests_enabled   = true
     }
   }
-
+  
+  # Custom maintenance response attached to this WAF
+  custom_response_body {
+    key          = "maintenance_html"
+    content_type = "TEXT_HTML"
+    content      = <<EOF
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><title>Maintenance</title>
+<style>body{font-family:sans-serif;background:#0b1a2b;color:#fff;text-align:center;padding:4rem;}
+.card{max-width:600px;margin:auto;background:#12243a;padding:2rem;border-radius:10px;}
+</style></head><body><div class="card">
+<h1>Scheduled Maintenance</h1>
+<p>The service is unavailable from 21:30 to 07:00 UK time. Apologies for any inconvenience caused.</p>
+</div></body></html>
+EOF
+  }
+  
   tags = merge(local.tags,
     { Name = lower(format("ebsapp-internal-web-acl")) }
   )
