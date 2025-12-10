@@ -15,22 +15,44 @@ locals {
   # All templated dashboard files (ending in .json.tftpl)
   dashboard_template_files = fileset("${path.module}/dashboards", "**/*.json.tftpl")
 
-  # Map JSON file -> team (or null if top-level)
+  # Raw mapping: JSON file -> team (or null if top-level)
   # e.g. "observability-platform/demo.json" -> team = "observability-platform"
   #      "op-landing-page.json"             -> team = null
-  dashboard_json_by_file = {
+  raw_dashboard_json_by_file = {
     for f in local.dashboard_json_files :
     f => {
       team = length(split("/", f)) > 1 ? split("/", f)[0] : null
     }
   }
 
-  # Map template file -> team (or null if top-level)
-  dashboard_template_by_file = {
+  # Filtered JSON dashboards:
+  # - keep top-level dashboards (team == null)
+  # - keep team dashboards only if that team exists in module.tenant_configuration
+  dashboard_json_by_file = {
+    for f, cfg in local.raw_dashboard_json_by_file :
+    f => cfg
+    if (
+      cfg.team == null
+      || can(module.tenant_configuration[cfg.team])
+    )
+  }
+
+  # Raw mapping: template file -> team (or null if top-level)
+  raw_dashboard_template_by_file = {
     for f in local.dashboard_template_files :
     f => {
       team = length(split("/", f)) > 1 ? split("/", f)[0] : null
     }
+  }
+
+  # Filtered template dashboards (same rules as JSON)
+  dashboard_template_by_file = {
+    for f, cfg in local.raw_dashboard_template_by_file :
+    f => cfg
+    if (
+      cfg.team == null
+      || can(module.tenant_configuration[cfg.team])
+    )
   }
 }
 
@@ -71,7 +93,7 @@ resource "grafana_dashboard" "templated" {
       environment = local.environment
 
       # UID: must be <= 40 chars, so we shorten team + name and add a short hash.
-      # Format: tmpl-<team8>-<name12>-<hash6>  (5 + 1 + 8 + 1 + 12 + 1 + 6 = 34 chars max)
+      # Format: tmpl-<team8>-<name12>-<hash6>
       dashboard_uid = format(
         "tmpl-%s-%s-%s",
         substr(coalesce(each.value.team, "global"), 0, 8),

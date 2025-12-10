@@ -2,7 +2,7 @@
 ### EC2 SG
 ######################################
 resource "aws_security_group" "ec2_sg" {
-  count = local.environment == "preproduction" ? 1 : 0
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
 
   name        = "${local.application_name}-${local.environment}-ec2-security-group"
   description = "EC2 Security Group"
@@ -20,7 +20,7 @@ resource "aws_security_group" "ec2_sg" {
 ### EC2 INGRESS RULES
 ######################################
 resource "aws_security_group_rule" "ingress_oas_db_1521" {
-  count = local.environment == "preproduction" ? 1 : 0
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
 
   type                     = "ingress"
   security_group_id        = aws_security_group.ec2_sg[0].id
@@ -32,7 +32,7 @@ resource "aws_security_group_rule" "ingress_oas_db_1521" {
 }
 
 resource "aws_security_group_rule" "ingress_ssh_from_bastion" {
-  count = local.environment == "preproduction" ? 1 : 0
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
 
   type                     = "ingress"
   security_group_id        = aws_security_group.ec2_sg[0].id
@@ -47,7 +47,7 @@ resource "aws_security_group_rule" "ingress_ssh_from_bastion" {
 ### EC2 EGRESS RULES
 ######################################
 resource "aws_security_group_rule" "egress_oas_db_1521" {
-  count = local.environment == "preproduction" ? 1 : 0
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
 
   type                     = "egress"
   security_group_id        = aws_security_group.ec2_sg[0].id
@@ -59,7 +59,7 @@ resource "aws_security_group_rule" "egress_oas_db_1521" {
 }
 
 resource "aws_security_group_rule" "egress_https_s3" {
-  count = local.environment == "preproduction" ? 1 : 0
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
   
   type              = "egress"
   security_group_id = aws_security_group.ec2_sg[0].id
