@@ -57,9 +57,12 @@ resource "aws_iam_role_policy" "lambda_ccms_soa_quiesced_policy" {
 
 ############################
 # Lambda Layer Packaging
+#
+# IMPORTANT: Upload your layer zip file before apply:
+#   s3://<app>-<env>-shared/lambda_delivery/<app>-edn-quiesced-layer/layerV1.zip
+#
+# Otherwise, Terraform will fail with "NoSuchKey"
 ############################
-
-
 resource "aws_lambda_layer_version" "lambda_layer_ccms_soa_edn_quiesced" {
   layer_name               = "${local.application_name}-edn-quiesced-layer"
   s3_key                   = "lambda_delivery/${local.application_name}-edn-quiesced-layer/layerV1.zip"
@@ -72,7 +75,6 @@ resource "aws_lambda_layer_version" "lambda_layer_ccms_soa_edn_quiesced" {
 ############################
 # Lambda Function Packaging
 ############################
-
 data "archive_file" "ccms_soa_quiesced_zip" {
   type        = "zip"
   source_dir  = "${path.module}/lambda/ccms-soa-edn-quiesced"
