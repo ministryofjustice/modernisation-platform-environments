@@ -96,7 +96,7 @@ data "aws_iam_policy_document" "load_json_table_s3_policy_document" {
       "athena:StopQueryExecution"
     ]
     resources = [
-      "arn:aws:athena:${data.aws_region.current.name}:${local.env_account_id}:*/*"
+      "arn:aws:athena:${data.aws_region.current.region}:${local.env_account_id}:*/*"
     ]
   }
   statement {
@@ -113,10 +113,10 @@ data "aws_iam_policy_document" "load_json_table_s3_policy_document" {
       "glue:UpdateTable"
     ]
     resources = [
-      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:catalog",
-      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:schema/*",
-      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/*/*",
-      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/*"
+      "arn:aws:glue:${data.aws_region.current.region}:${local.env_account_id}:catalog",
+      "arn:aws:glue:${data.aws_region.current.region}:${local.env_account_id}:schema/*",
+      "arn:aws:glue:${data.aws_region.current.region}:${local.env_account_id}:table/*/*",
+      "arn:aws:glue:${data.aws_region.current.region}:${local.env_account_id}:database/*"
     ]
   }
   statement {
@@ -654,7 +654,7 @@ data "aws_iam_policy_document" "load_dms_output_lambda_role_policy_document" {
       "athena:StopQueryExecution"
     ]
     resources = [
-      "arn:aws:athena:${data.aws_region.current.name}:${data.aws_caller_identity.current.id}:workgroup/${data.aws_caller_identity.current.id}-default",
+      "arn:aws:athena:${data.aws_region.current.region}:${data.aws_caller_identity.current.id}:workgroup/${data.aws_caller_identity.current.id}-default",
     ]
   }
   statement {
@@ -674,10 +674,10 @@ data "aws_iam_policy_document" "load_dms_output_lambda_role_policy_document" {
       "glue:GetCatalog"
     ]
     resources = [
-      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:catalog",
-      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:database/*",
-      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/*/*",
-      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:userDefinedFunction/*/*",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:catalog",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:database/*",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/*/*",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:userDefinedFunction/*/*",
     ]
   }
   statement {
@@ -780,7 +780,7 @@ data "aws_iam_policy_document" "load_mdss_lambda_role_policy_document" {
       "athena:StopQueryExecution"
     ]
     resources = [
-      "arn:aws:athena:${data.aws_region.current.name}:${data.aws_caller_identity.current.id}:workgroup/${data.aws_caller_identity.current.id}-default",
+      "arn:aws:athena:${data.aws_region.current.region}:${data.aws_caller_identity.current.id}:workgroup/${data.aws_caller_identity.current.id}-default",
     ]
   }
   statement {
@@ -801,10 +801,10 @@ data "aws_iam_policy_document" "load_mdss_lambda_role_policy_document" {
       "glue:GetCatalog"
     ]
     resources = [
-      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:catalog",
-      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:database/*",
-      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/*/*",
-      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:userDefinedFunction/*/*",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:catalog",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:database/*",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/*/*",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:userDefinedFunction/*/*",
     ]
   }
   statement {
@@ -930,7 +930,7 @@ data "aws_iam_policy_document" "load_fms_lambda_role_policy_document" {
       "athena:StopQueryExecution"
     ]
     resources = [
-      "arn:aws:athena:${data.aws_region.current.name}:${data.aws_caller_identity.current.id}:workgroup/${data.aws_caller_identity.current.id}-default",
+      "arn:aws:athena:${data.aws_region.current.region}:${data.aws_caller_identity.current.id}:workgroup/${data.aws_caller_identity.current.id}-default",
     ]
   }
   statement {
@@ -950,10 +950,10 @@ data "aws_iam_policy_document" "load_fms_lambda_role_policy_document" {
       "glue:GetCatalog"
     ]
     resources = [
-      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:catalog",
-      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:database/*",
-      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/*/*",
-      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:userDefinedFunction/*/*",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:catalog",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:database/*",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/*/*",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:userDefinedFunction/*/*",
     ]
   }
   statement {
@@ -1032,10 +1032,10 @@ data "aws_iam_policy_document" "clean_after_mdss_load_lambda_role_policy_documen
       "glue:DeleteDatabase",
     ]
     resources = [
-      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:catalog",
-      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:database/*",
-      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/*/*",
-      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:userDefinedFunction/*/*",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:catalog",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:database/*",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/*/*",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:userDefinedFunction/*/*",
     ]
   }
 
