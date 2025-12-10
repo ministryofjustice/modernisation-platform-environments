@@ -233,32 +233,38 @@ data "aws_iam_policy_document" "cloudwatch_alerting_sns" {
   }
 }
 
-# data "aws_iam_policy_document" "cloudwatch_sns_encryption" {
-#   version = "2012-10-17"
-#   statement {
-#     sid    = "AllowSNSUseKey"
-#     effect = "Allow"
-#     principals {
-#       type = "Service"
-#       identifiers = [
-#         "cloudwatch.amazonaws.com"
-#       ]
-#     }
-#     actions = [
-#       "kms:GenerateDataKey*",
-#       "kms:Decrypt"
-#     ]
-#     resources = [
-#       "*"
-#     ]
-#   }
-# }
+resource "aws_kms_key" "cloudwatch_sns_alerts_key" {
+  description             = "KMS Key for CloudWatch SNS Alerts Encryption"
+  deletion_window_in_days = 30
 
-# data "aws_kms_key" "sns_alerts_key" {
-#   key_id = "alias/aws/sns"
-# }
+  tags = merge(local.tags,
+    { Name = lower(format("%s-%s-cloudwatch-sns-alerts-kms-key", local.application_name, local.environment)) }
+  )
+}
 
-# resource "aws_kms_key_policy" "sns_alerts_key_policy" {
-#   key_id = data.aws_kms_key.sns_alerts_key.key_id
-#   policy = data.aws_iam_policy_document.cloudwatch_sns_encryption.json
-# }
+resource "aws_kms_key_policy" "sns_alerts_key_policy" {
+  key_id = data.aws_kms_key.sns_alerts_key.key_id
+  policy = data.aws_iam_policy_document.cloudwatch_sns_encryption.json
+}
+
+data "aws_iam_policy_document" "cloudwatch_sns_encryption" {
+  version = "2012-10-17"
+  statement {
+    sid    = "AllowCloudWatchSNSUseOfTheKey"
+    effect = "Allow"
+    principals {
+      type = "Service"
+      identifiers = [
+        "cloudwatch.amazonaws.com",
+        "event.amazonaws.com"
+      ]
+    }
+    actions = [
+      "kms:GenerateDataKey*",
+      "kms:Decrypt"
+    ]
+    resources = [
+      "*"
+    ]
+  }
+}
