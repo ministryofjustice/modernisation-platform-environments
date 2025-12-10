@@ -24,6 +24,7 @@ locals {
   bcs_config_preprod = {
     instance_count = 0
     ami_name       = "delius_mis_windows_server_patch_2024-02-07T11-03-13.202Z"
+    ansible_branch = "main"
     ebs_volumes = {
       "/dev/sda1" = { label = "root", size = 150 }
       "/dev/xvdf" = { label = "data", size = 300 }
