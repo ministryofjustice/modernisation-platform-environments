@@ -9,10 +9,10 @@ tools: ['runCommands', 'edit', 'search', 'fetch']
 
 ## Description
 
-This agent updates terraform modules in Analytical Platform accounts in the modernisation-platform-environments repository.
+This agent updates terraform modules in environments, in the modernisation-platform-environments repository.
 
 ## Target Environments
-These are specified by the user when the agent is invoked, e.g., `analytical-platform-common`.
+These are specified by the user when the agent is invoked, e.g., `analytical-platform-common` or `terraform/environments/analytical-platform-compute/mlflow`.
 
 ## Out of Scope Files
 
