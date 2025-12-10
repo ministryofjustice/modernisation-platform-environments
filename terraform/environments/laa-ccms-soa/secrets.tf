@@ -68,7 +68,7 @@ resource "aws_secretsmanager_secret" "ccms_soa_quiesced_secrets" {
   description = "Slack Webhook Secret for CCMS SOA EDN Quiesced Lambda Alerts"
 
   tags = merge(local.tags, {
-    Name = "${local.application_name}-cw-alerts-secrets"
+    Name = "${local.application_name}-edn-quiesced-alert"
   })
 }
 
