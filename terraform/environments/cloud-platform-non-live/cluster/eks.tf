@@ -13,6 +13,7 @@ module "eks" {
   endpoint_private_access = true
   endpoint_public_access  = true
 
+  enable_cluster_creator_admin_permissions = true
 
   cloudwatch_log_group_retention_in_days = 30
 
@@ -21,15 +22,15 @@ module "eks" {
   addons = {
     coredns = {
       enabled = true
-      version = "v1.12.4-eksbuild.1"
+      addon_version = "v1.12.4-eksbuild.1"
     }
     kube-proxy = {
       enabled = true
-      version = "v1.34.1-eksbuild.2"
+      addon_version = "v1.34.1-eksbuild.2"
     }
     vpc-cni = {
       enabled = true
-      version = "v1.20.4-eksbuild.1"
+      addon_version = "v1.20.4-eksbuild.1"
     }
   }
 
