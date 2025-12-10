@@ -11,23 +11,6 @@ resource "aws_security_group" "importmachine" {
   name        = "importmachine-${local.application_name}"
   vpc_id      = local.vpc_id
 
-  ingress {
-    description     = "SSH from Bastion"
-    from_port       = 0
-    to_port         = "3389"
-    protocol        = "TCP"
-    security_groups = [module.bastion_linux.bastion_security_group]
-  }
-
-  ingress {
-    description      = "from all"
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
-  }
-
   egress {
     description      = "allow all"
     from_port        = 0
@@ -36,6 +19,48 @@ resource "aws_security_group" "importmachine" {
     cidr_blocks      = ["0.0.0.0/0"]
     ipv6_cidr_blocks = ["::/0"]
   }
+
+ # Ingress Rules
+
+  # RDP from Bastion
+  ingress {
+    description     = "RDP from Bastion"
+    from_port       = 3389
+    to_port         = 3389
+    protocol        = "tcp"
+    security_groups = [module.bastion_linux.bastion_security_group]
+  }
+
+  # HTTP and HTTPS from LB (LB does TLS termination)
+  ingress {
+    description     = "HTTP from LB"
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
+    security_groups = [aws_security_group.prtg_lb.id]
+  }
+
+  ingress {
+    description     = "HTTPS from LB"
+    from_port       = 443
+    to_port         = 443
+    protocol        = "tcp"
+    security_groups = [aws_security_group.prtg_lb.id]
+  }
+
+  # Monitoring traffic (all protocols) restricted to environment CIDRs
+  ingress {
+    description      = "Monitoring traffic from environment CIDRs"
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = local.environment_cidrs
+  }
+
+  tags = merge(
+    local.tags,
+    { Name = "${local.application_name}-${local.environment}-importmachine-security-group" }
+  )
 
 }
 
