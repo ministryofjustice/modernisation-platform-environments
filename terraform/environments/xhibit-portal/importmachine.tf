@@ -1,12 +1,4 @@
-# trivy:ignore:AVD-AWS-0107 (HIGH): Security group rule allows unrestricted ingress from any IP address.
 resource "aws_security_group" "importmachine" {
-
-  # checkov:skip=CKV_AWS_24: "Ensure no security groups allow ingress from 0.0.0.0:0 to port 22"
-  # checkov:skip=CKV_AWS_260: "Ensure no security groups allow ingress from 0.0.0.0:0 to port 80"
-  # checkov:skip=CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
-  # checkov:skip=CKV_AWS_25: "Ensure no security groups allow ingress from 0.0.0.0:0 to port 3389"
-  # checkov:skip=CKV_AWS_277: "Ensure no security groups allow ingress from 0.0.0.0:0 to port -1"
-
   description = "Configure importmachine access - ingress should be only from Bastion"
   name        = "importmachine-${local.application_name}"
   vpc_id      = local.vpc_id
