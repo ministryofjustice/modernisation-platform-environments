@@ -197,7 +197,7 @@ locals {
     }
     check_elb_trt_alarm = {
       environments = ["production"]
-      schedule     = "cron(0/60 * ? * * *)"
+      schedule     = "cron(0 * ? * * *)"
       description  = "Trigger Lambda every hour"
       timezone     = "Europe/London"
     }

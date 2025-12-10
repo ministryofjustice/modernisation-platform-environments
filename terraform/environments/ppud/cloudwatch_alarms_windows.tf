@@ -564,8 +564,7 @@ locals {
     production = {
       enabled   = local.is-production
       instances = data.aws_instances.windows_tagged_instances.ids
-      sns_topic = "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${local.application_data.accounts[local.environment].cloudwatch_sns_topic_name}"
-      # sns_topic = "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${local.application_data.accounts[local.environment].cloudwatch_sns_std_and_sms_topic_name}"
+      sns_topic = "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${lookup(local.application_data.accounts[local.environment], "cloudwatch_sns_std_and_sms_topic_name", local.application_data.accounts[local.environment].cloudwatch_sns_topic_name)}"
     }
     preproduction = {
       enabled   = local.is-preproduction
