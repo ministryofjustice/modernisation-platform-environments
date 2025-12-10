@@ -104,53 +104,6 @@ resource "aws_lambda_permission" "allow_cloudwatch_sync_ssm_to_waf" {
   source_arn    = aws_cloudwatch_event_rule.sync_ssm_to_waf[each.key].arn
 }
 
-#############################################################
-# Eventbridge Rule to Auto Tag all Elastic Network Interfaces
-#############################################################
-
-locals {
-  auto_tag_eni_envs = {
-    for k, v in local.lambda_instances_map :
-    k => v
-    if startswith(k, "auto_tag_eni")
-  }
-}
-
-resource "aws_cloudwatch_event_rule" "auto_tag_eni" {
-  for_each      = local.auto_tag_eni_envs
-  name          = "Auto-Tag-ENI-${each.value.env}"
-  description   = "Tags all ENIs as they are created"
-  event_pattern = <<EOF
-{
-  "source": ["aws.ec2"],
-  "detail-type": ["AWS API Call via CloudTrail"],
-  "detail": {
-    "eventName": ["CreateNetworkInterface"]
-  }
-}
-EOF
-  tags = {
-    Function    = each.value.func_name
-    Environment = each.value.env
-  }
-}
-
-resource "aws_cloudwatch_event_target" "trigger_lambda_auto_tag_eni" {
-  for_each  = local.auto_tag_eni_envs
-  rule      = aws_cloudwatch_event_rule.auto_tag_eni[each.key].name
-  target_id = "auto_tag_eni_${each.value.env}"
-  arn       = aws_lambda_function.lambda_functions[each.key].arn
-}
-
-resource "aws_lambda_permission" "allow_cloudwatch_auto_tag_eni" {
-  for_each      = local.auto_tag_eni_envs
-  statement_id  = "AllowExecutionFromEventBridge-${each.value.env}"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.lambda_functions[each.key].function_name
-  principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.auto_tag_eni[each.key].arn
-}
-
 #################################
 # EventBridge Scheduler Schedules 
 #################################
@@ -240,6 +193,12 @@ locals {
       environments = ["development", "preproduction"]
       schedule     = "cron(15 7 ? * MON *)"
       description  = "Trigger Lambda at 07:15 each Monday"
+      timezone     = "Europe/London"
+    }
+    check_elb_trt_alarm = {
+      environments = ["production"]
+      schedule     = "cron(0 * ? * * *)"
+      description  = "Trigger Lambda every hour"
       timezone     = "Europe/London"
     }
     /*
@@ -341,6 +300,7 @@ locals {
     #  local.is-preproduction ? aws_lambda_function.lambda_functions["wam_waf_analysis_preproduction"].arn : (
     #    local.is-production ? aws_lambda_function.lambda_functions["wam_waf_analysis_production"].arn : null
     #))
+    check_elb_trt_alarm            = local.is-production ? aws_lambda_function.lambda_functions["check_elb_trt_alarm_production"].arn : null
     send_cpu_graph                 = local.is-production ? aws_lambda_function.lambda_functions["send_cpu_graph_production"].arn : null
     disable_cpu_alarms             = local.is-production ? aws_lambda_function.lambda_functions["disable_cpu_alarm_production"].arn : null
     enable_cpu_alarms              = local.is-production ? aws_lambda_function.lambda_functions["enable_cpu_alarm_production"].arn : null
