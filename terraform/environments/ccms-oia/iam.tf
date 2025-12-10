@@ -254,11 +254,11 @@ data "aws_iam_policy_document" "cloudwatch_sns_encryption" {
   }
 }
 
-data "aws_kms_key" "sns_alerts_key" {
-  key_id = "alias/aws/sns"
-}
+# data "aws_kms_key" "sns_alerts_key" {
+#   key_id = "alias/aws/sns"
+# }
 
-resource "aws_kms_key_policy" "sns_alerts_key_policy" {
-  key_id = data.aws_kms_key.sns_alerts_key.key_id
-  policy = data.aws_iam_policy_document.cloudwatch_sns_encryption.json
-}
+# resource "aws_kms_key_policy" "sns_alerts_key_policy" {
+#   key_id = data.aws_kms_key.sns_alerts_key.key_id
+#   policy = data.aws_iam_policy_document.cloudwatch_sns_encryption.json
+# }
