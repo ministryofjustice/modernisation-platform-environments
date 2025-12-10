@@ -95,7 +95,7 @@ resource "aws_lambda_function" "waf_toggle" {
 // EventBridge scheduled rules to trigger Lambda
 resource "aws_cloudwatch_event_rule" "waf_allow_0700_uk" {
   name                = "waf-allow-0700-${local.environment}"
-  schedule_expression = "cron(00 07 ? * MON-SUN *)"
+  schedule_expression = "cron(20 00 ? * MON-SUN *)"
   description         = "Set WAF rule to ALLOW at 07:00 UK daily"
 }
 
