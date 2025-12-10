@@ -11,15 +11,6 @@ resource "aws_security_group" "importmachine" {
   name        = "importmachine-${local.application_name}"
   vpc_id      = local.vpc_id
 
-  egress {
-    description      = "allow all"
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
-  }
-
  # Ingress Rules
 
   # RDP from Bastion
@@ -51,6 +42,26 @@ resource "aws_security_group" "importmachine" {
   # Monitoring traffic (all protocols) restricted to environment CIDRs
   ingress {
     description      = "Monitoring traffic from environment CIDRs"
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = local.environment_cidrs
+  }
+
+ # Egress Rules
+
+  # HTTPS for updates, licence activation, external monitoring
+  egress {
+    description = "Allow HTTPS for updates and external monitoring"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"] # Required for Internet access
+  }
+
+  # Monitoring traffic (all protocols) restricted to environment CIDRs
+  egress {
+    description      = "Monitoring traffic to environment CIDRs"
     from_port        = 0
     to_port          = 0
     protocol         = "-1"
