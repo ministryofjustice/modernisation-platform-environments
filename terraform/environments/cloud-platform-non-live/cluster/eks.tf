@@ -50,5 +50,10 @@ module "eks" {
     
   }
 
+  //temporary timeouts for EKS creation
+  timeouts = {
+    create = "15m"
+  }
+
   tags = local.tags
 }

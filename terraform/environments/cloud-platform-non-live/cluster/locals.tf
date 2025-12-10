@@ -35,17 +35,17 @@ locals {
   }
 
   node_size = {
-    cloud-platform-non-live-development  = ["r6i.2xlarge", "r6i.xlarge", "r5.2xlarge"]
-    cloud-platform-non-live-test         = ["r6i.2xlarge", "r6i.xlarge", "r5.2xlarge"]
-    cloud-platform-non-live-preproduction = ["r6i.2xlarge", "r6i.xlarge", "r5.2xlarge"]
-    cloud-platform-non-live-production   = ["r6i.2xlarge", "r6i.xlarge", "r5.2xlarge"]
+    cloud-platform-non-live-development  = ["r6i.large", "r6i.xlarge", "r5.large"]
+    cloud-platform-non-live-test         = ["r6i.large", "r6i.xlarge", "r5.large"]
+    cloud-platform-non-live-preproduction = ["r6i.large", "r6i.xlarge", "r5.large"]
+    cloud-platform-non-live-production   = ["r6i.large", "r6i.xlarge", "r5.large"]
   }
 
   monitoring_node_size = {
-    cloud-platform-non-live-development  = ["r7i.12xlarge", "r6i.12xlarge", "r7i.16xlarge", "r6i.16xlarge"]
-    cloud-platform-non-live-test         = ["r7i.12xlarge", "r6i.12xlarge", "r7i.16xlarge", "r6i.16xlarge"]
-    cloud-platform-non-live-preproduction = ["r7i.12xlarge", "r6i.12xlarge", "r7i.16xlarge", "r6i.16xlarge"]
-    cloud-platform-non-live-production   = ["r7i.12xlarge", "r6i.12xlarge", "r7i.16xlarge", "r6i.16xlarge"]
+    cloud-platform-non-live-development  = ["r7i.large", "r6i.12xlarge", "r7i.16xlarge", "r6i.16xlarge"]
+    cloud-platform-non-live-test         = ["r7i.large", "r6i.12xlarge", "r7i.16xlarge", "r6i.16xlarge"]
+    cloud-platform-non-live-preproduction = ["r7i.large", "r6i.12xlarge", "r7i.16xlarge", "r6i.16xlarge"]
+    cloud-platform-non-live-production   = ["r7i.large", "r6i.12xlarge", "r7i.16xlarge", "r6i.16xlarge"]
 
   }
 
