@@ -3,7 +3,7 @@ module "managed_prometheus" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/managed-service-prometheus/aws"
-  version = "3.0.0"
+  version = "3.1.1"
 
   workspace_alias = local.amp_workspace_alias
   kms_key_arn     = module.managed_prometheus_kms.key_arn
