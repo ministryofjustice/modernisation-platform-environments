@@ -17,6 +17,11 @@ locals {
     for f in fileset("./lambda/cloudwatch_alarm_slack_integration", "**") :
     sha256(file("${path.module}/lambda/cloudwatch_alarm_slack_integration/${f}"))
   ]
+  
+  lambda_payment_source_hashes = [
+    for f in fileset("./lambda/payment_load_monitor", "**") :
+    sha256(file("${path.module}/lambda/payment_load_monitor/${f}"))
+  ]
 
   data_subnets = [
     data.aws_subnet.data_subnets_a.id,
