@@ -2,9 +2,11 @@
 ### EC2 INSTANCE Userdata File
 ######################################
 locals {
-  userdata_new = templatefile("${path.module}/files/new-userdata.sh", {
-    dns_zone_name = data.aws_route53_zone.external.name
-  })
+  userdata_new = replace(
+    file("${path.module}/files/new-userdata.sh"),
+    "$${dns_zone_name}",
+    data.aws_route53_zone.external.name
+  )
 }
 
 ######################################

@@ -9,7 +9,7 @@ sudo yum -y install nvme-cli
 
 hostnamectl set-hostname oas
 
-sed -i '2s/.*/search ${dns_zone_name} eu-west-2.compute.internal/' /etc/resolv.conf
+sed -i '2s/.*/search $${dns_zone_name} eu-west-2.compute.internal/' /etc/resolv.conf
 
 yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
 systemctl start amazon-ssm-agent
