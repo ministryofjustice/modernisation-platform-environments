@@ -1,7 +1,7 @@
 resource "aws_secretsmanager_secret" "soa_password" {
   name        = "ccms/soa/password"
-  description = "SOA Weblogic EM Console for user weblogic and RDS Database Password for SOAPDB admin"
-}
+  description = "SOA Weblogic EM Console for user weblogic and RDS Database Password for SOAPDB admin" #--The same password shared between the SOA DB
+}                                                                                                      #  and weblogic. Don't like that. Revisit. AW
 
 data "aws_secretsmanager_secret_version" "soa_password" {
   secret_id = aws_secretsmanager_secret.soa_password.id
