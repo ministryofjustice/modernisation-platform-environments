@@ -200,11 +200,11 @@ data "aws_iam_policy_document" "guardduty_alerting_sns" {
     principals {
       type = "Service"
     identifiers = [
-      "sns.amazonaws.com"
+        "cloudwatch.amazonaws.com"
     ]
   }
   actions = [
-    "kms:GenerateDataKey",
+    "kms:GenerateDataKey*",
     "kms:Decrypt"
   ]
   resources = [
@@ -239,11 +239,11 @@ data "aws_iam_policy_document" "cloudwatch_alerting_sns" {
      principals {
        type = "Service"
       identifiers = [
-        "sns.amazonaws.com"
+        "cloudwatch.amazonaws.com"
       ]
     }
     actions = [
-      "kms:GenerateDataKey",
+      "kms:GenerateDataKey*",
       "kms:Decrypt"
     ]
     resources = [
