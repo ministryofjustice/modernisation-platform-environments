@@ -49,26 +49,39 @@ locals {
 }
 
 ######################################
+### EC2 Network Interface (ENI)
+######################################
+resource "aws_network_interface" "oas_eni_new" {
+  count     = contains(["test", "preproduction"], local.environment) ? 1 : 0
+  subnet_id       = data.aws_subnet.private_subnets_a.id
+  private_ips     = [local.application_data.accounts[local.environment].ec2_private_ip]
+  security_groups = [aws_security_group.ec2_sg[0].id]
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-eni" }
+  )
+}
+
+######################################
 ### EC2 INSTANCE
 ######################################
 resource "aws_instance" "oas_app_instance_new" {
   count = contains(["test", "preproduction"], local.environment) ? 1 : 0
 
-  ami = local.application_data.accounts[local.environment].ec2amiid
+  ami                         = local.application_data.accounts[local.environment].ec2amiid
   availability_zone           = "eu-west-2a"
   ebs_optimized               = true
   instance_type               = local.application_data.accounts[local.environment].ec2instancetype
   key_name                    = aws_key_pair.ec2_key_pair[0].key_name
-  vpc_security_group_ids      = [aws_security_group.ec2_sg[0].id]
   monitoring                  = true
-  subnet_id                   = data.aws_subnet.private_subnets_a.id
   iam_instance_profile        = aws_iam_instance_profile.ec2_instance_profile_new[0].id
   user_data_replace_on_change = true
   user_data                   = base64encode(local.userdata_new)
 
   root_block_device {
     delete_on_termination = false
-    encrypted             = true # TODO Confirm if encrypted volumes can work for OAS, as it looks like in MP they must be encrypted
+    encrypted             = true 
     volume_size           = 40
     volume_type           = "gp2"
     tags = merge(
@@ -77,7 +90,7 @@ resource "aws_instance" "oas_app_instance_new" {
     )
   }
 
-  tags = merge(
+ tags = merge(
     local.tags,
     { "Name" = "${local.application_name} Apps Server" },
     { "instance-scheduling" = "skip-scheduling" },
@@ -85,14 +98,16 @@ resource "aws_instance" "oas_app_instance_new" {
   )
 }
 
+resource "aws_network_interface_attachment" "oas_eni_attachment" {
+  count                = contains(["test", "preproduction"], local.environment) ? 1 : 0
+  instance_id          = aws_instance.oas_app_instance_new[0].id
+  network_interface_id = aws_network_interface.oas_eni_new[0].id
+  device_index         = 0
+}
+
 ######################################
 ### EC2 IAM ROLE AND PROFILE
 ######################################
-resource "aws_iam_instance_profile" "ec2_instance_profile_new" {
-  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
-
-  name = "${local.application_name}-ec2-profile"
-  role = aws_iam_role.ec2_instance_role_new[0].name
 }
 
 resource "aws_iam_role" "ec2_instance_role_new" {
