@@ -233,26 +233,26 @@ data "aws_iam_policy_document" "cloudwatch_alerting_sns" {
   }
 }
 
-data "aws_iam_policy_document" "cloudwatch_sns_encryption" {
-  version = "2012-10-17"
-  statement {
-    sid    = "AllowSNSUseKey"
-    effect = "Allow"
-    principals {
-      type = "Service"
-      identifiers = [
-        "cloudwatch.amazonaws.com"
-      ]
-    }
-    actions = [
-      "kms:GenerateDataKey*",
-      "kms:Decrypt"
-    ]
-    resources = [
-      "*"
-    ]
-  }
-}
+# data "aws_iam_policy_document" "cloudwatch_sns_encryption" {
+#   version = "2012-10-17"
+#   statement {
+#     sid    = "AllowSNSUseKey"
+#     effect = "Allow"
+#     principals {
+#       type = "Service"
+#       identifiers = [
+#         "cloudwatch.amazonaws.com"
+#       ]
+#     }
+#     actions = [
+#       "kms:GenerateDataKey*",
+#       "kms:Decrypt"
+#     ]
+#     resources = [
+#       "*"
+#     ]
+#   }
+# }
 
 # data "aws_kms_key" "sns_alerts_key" {
 #   key_id = "alias/aws/sns"

@@ -48,7 +48,7 @@ resource "aws_sns_topic" "cloudwatch_alerts" {
   }
 }
 EOF
-  kms_master_key_id = "alias/config-sns-key"
+  kms_master_key_id = "alias/securityhub-alarms_key"
   tags = merge(local.tags,
     { Name = "cloudwatch-slack-alerts" }
   )
@@ -88,7 +88,7 @@ resource "aws_sns_topic" "guardduty_alerts" {
   }
 }
 EOF
-  kms_master_key_id = "alias/config-sns-key"
+  kms_master_key_id = "alias/securityhub-alarms_key"
 }
 
 resource "aws_sns_topic_policy" "guarduty_default" {
