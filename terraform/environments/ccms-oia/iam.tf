@@ -243,7 +243,7 @@ resource "aws_kms_key" "cloudwatch_sns_alerts_key" {
 }
 
 resource "aws_kms_key_policy" "sns_alerts_key_policy" {
-  key_id = data.aws_kms_key.sns_alerts_key.key_id
+  key_id = aws_kms_key.cloudwatch_sns_alerts_key.id
   policy = data.aws_iam_policy_document.cloudwatch_sns_encryption.json
 }
 
