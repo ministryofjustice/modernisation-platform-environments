@@ -73,7 +73,7 @@ resource "aws_wafv2_web_acl_logging_configuration" "ebs_internal_waf_logging" {
 }
 
 # Associate WAF with Internal ALB for EBS Apps
-resource "aws_wafv2_web_acl_association" "ebs_internal_waf_association" {
-  resource_arn = aws_lb.ebsapps_internal_alb.arn
-  web_acl_arn  = aws_wafv2_web_acl.ebsapps_internal_web_acl.arn
-}
+# resource "aws_wafv2_web_acl_association" "ebs_internal_waf_association" {
+#   resource_arn = aws_lb.ebsapps_internal_alb.arn
+#   web_acl_arn  = aws_wafv2_web_acl.ebsapps_internal_web_acl.arn
+# }
