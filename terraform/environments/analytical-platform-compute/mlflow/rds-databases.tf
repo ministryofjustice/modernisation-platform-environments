@@ -3,7 +3,7 @@ module "mlflow_auth_rds" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/rds/aws"
-  version = "6.12.0"
+  version = "6.13.1"
 
   identifier = "mlflow-auth"
 
@@ -73,7 +73,7 @@ module "mlflow_rds" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/rds/aws"
-  version = "6.12.0"
+  version = "6.13.1"
 
   identifier = "mlflow"
 
