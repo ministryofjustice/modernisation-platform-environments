@@ -106,7 +106,7 @@ resource "aws_lambda_function" "ccms_soa_edn_quiesced_monitor" {
   })
 }
 
-resource "aws_lambda_permission" "allow_cloudwatch_invoke_ccms_soa_quiesced" {
+resource "aws_lambda_permission" "allow_cloudwatch_invoke_ccms_soa_edn_quiesced" {
   statement_id  = "AllowExecutionFromCloudWatchCCMSSOAQuiesced"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.ccms_soa_edn_quiesced_monitor.function_name
