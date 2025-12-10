@@ -60,7 +60,8 @@
       "pre_healthcheck_Priority": 1,
       "post_healthcheck_Priority": 20,
       "ssm_health_check_reports_s3": "moj-log-files-prod",
-      "cloudwatch_sns_topic_name": "ppud-prod-cw-alerts"
+      "cloudwatch_sns_topic_name": "ppud-prod-cw-alerts",
+      "cloudwatch_sns_std_and_sms_topic_name": "ppud-prod-cw-std-and-sms-alerts"
     }
   }
 }

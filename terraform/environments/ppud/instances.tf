@@ -658,6 +658,7 @@ resource "aws_instance" "s618358rgvw021" {
     e_volume          = "true"
     f_volume          = "true"
     g_volume          = "true"
+    port25_check      = "true"
   }
 }
 
