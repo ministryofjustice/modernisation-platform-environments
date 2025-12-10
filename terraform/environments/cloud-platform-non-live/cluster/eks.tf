@@ -28,7 +28,6 @@ module "eks" {
     }
     vpc-cni = {
       addon_version = "v1.20.4-eksbuild.1"
-      service_account_role_arn = module.aws_vpc_cni_pod_identity.iam_role_arn
     }
 
     eks-pod-identity-agent = {
