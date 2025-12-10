@@ -10,3 +10,5 @@ module "observability_platform_tenant" {
 
   tags = local.tags
 }
+
+
