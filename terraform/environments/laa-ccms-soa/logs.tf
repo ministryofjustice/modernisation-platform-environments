@@ -125,6 +125,7 @@ resource "aws_cloudwatch_log_subscription_filter" "ccms_soa_edn_quiesced_filter"
   ]
 }
 
+
 #--RDS (SOA DB)
 resource "aws_cloudwatch_log_group" "rds_alert" {
   name              = "/aws/rds/instance/oracle-db/alert"
