@@ -65,7 +65,7 @@ locals {
 
       /* EKS */
       eks_sso_access_role = "modernisation-platform-developer"
-      eks_cluster_version = "1.33"
+      eks_cluster_version = "1.34"
       eks_node_version    = "1.44.0-244cd3a5"
       eks_cluster_addon_versions = {
         kube_proxy                        = "v1.33.3-eksbuild.4"
@@ -80,7 +80,7 @@ locals {
       }
 
       helm_chart_version = {
-        karpenter = "1.5.0"
+        karpenter = "1.8.2"
       }
 
       /* Data Engineering Airflow */
