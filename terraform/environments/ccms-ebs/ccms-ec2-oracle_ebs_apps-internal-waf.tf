@@ -48,6 +48,33 @@ resource "aws_wafv2_web_acl" "ebsapps_internal_web_acl" {
     }
   }
   
+  # Rule 2: Dynamic maintenance rule (TOGGLE via Lambda)
+  rule {
+    name     = "maintenance-block-rule"  # ← Unique name for Lambda to target
+    priority = 2                         # ← Must be > 1 (evaluated AFTER trusted IPs)
+    action {
+      allow {}  # ← Initial state; Lambda will toggle to Block during maintenance
+    }
+    statement {
+      byte_match_statement {
+        search_string = "/"
+        field_to_match {
+          uri_path {}
+        }
+        positional_constraint = "STARTS_WITH"
+        text_transformation {
+          priority = 0
+          type     = "NONE"
+        }
+      }
+    }
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "maintenanceBlockRule"
+      sampled_requests_enabled   = true
+    }
+  }
+
   # Custom maintenance response attached to this WAF
   custom_response_body {
     key          = "maintenance_html"
