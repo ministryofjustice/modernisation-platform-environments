@@ -51,7 +51,7 @@ locals {
       }
 
       helm_chart_version = {
-        karpenter = "1.5.0"
+        karpenter = "1.8.2"
       }
 
       /* Data Engineering Airflow */
