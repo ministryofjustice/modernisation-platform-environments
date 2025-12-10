@@ -199,6 +199,7 @@ data "aws_iam_policy_document" "guardduty_alerting_sns" {
     effect = "Allow"
     actions = [
       "sns:Publish",
+      "sns:EncryptPublish"
     ]
     resources = [
       aws_sns_topic.guardduty_alerts.arn
@@ -219,6 +220,7 @@ data "aws_iam_policy_document" "cloudwatch_alerting_sns" {
     effect = "Allow"
     actions = [
       "sns:Publish",
+      "sns:EncryptPublish"
     ]
     resources = [
       aws_sns_topic.cloudwatch_alerts.arn
