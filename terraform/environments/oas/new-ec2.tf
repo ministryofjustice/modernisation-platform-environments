@@ -1,12 +1,10 @@
 ######################################
 ### EC2 INSTANCE Userdata File
 ######################################
-data "template_file" "userdata_new" {
-  template = file("${path.module}/files/new-userdata.sh")
-  
-  vars = {
+locals {
+  userdata_new = templatefile("${path.module}/files/new-userdata.sh", {
     dns_zone_name = data.aws_route53_zone.external.name
-  }
+  })
 }
 
 ######################################
@@ -24,7 +22,7 @@ resource "aws_instance" "oas_app_instance_new" {
   subnet_id                   = data.aws_subnet.private_subnets_a.id
   iam_instance_profile        = aws_iam_instance_profile.ec2_instance_profile_new[0].id
   user_data_replace_on_change = true
-  user_data                   = base64encode(data.template_file.userdata_new.rendered)
+  user_data                   = base64encode(local.userdata_new)
 
   root_block_device {
     delete_on_termination = false
