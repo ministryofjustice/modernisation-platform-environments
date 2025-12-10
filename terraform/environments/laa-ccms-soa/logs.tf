@@ -114,8 +114,10 @@ resource "aws_cloudwatch_log_metric_filter" "soa_custom_checks_error_managed" {
   }
 }
 
+
+
 resource "aws_cloudwatch_log_subscription_filter" "ccms_soa_edn_quiesced_filter" {
-  name            = "${local.application_name}-${local.environment}-edn-quiesced-filter"
+  name            = "${local.application_name}-${local.environment}-ccms-soa-edn-quiesced-filter"
   log_group_name  = aws_cloudwatch_log_group.log_group_managed.name
   filter_pattern  = "\"QUIESCING this server due to upper mark DB allocated threshold\""
   destination_arn = aws_lambda_function.ccms_soa_edn_quiesced_monitor.arn
@@ -123,7 +125,6 @@ resource "aws_cloudwatch_log_subscription_filter" "ccms_soa_edn_quiesced_filter"
   depends_on = [
     aws_lambda_permission.allow_cloudwatch_invoke_ccms_soa_edn_quiesced
   ]
-
 }
 
 
