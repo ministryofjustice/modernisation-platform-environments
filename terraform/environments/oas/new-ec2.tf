@@ -108,8 +108,6 @@ resource "aws_network_interface_attachment" "oas_eni_attachment" {
 ######################################
 ### EC2 IAM ROLE AND PROFILE
 ######################################
-}
-
 resource "aws_iam_role" "ec2_instance_role_new" {
   count = contains(["test", "preproduction"], local.environment) ? 1 : 0
 
