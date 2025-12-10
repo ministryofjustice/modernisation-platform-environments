@@ -32,6 +32,12 @@ module "eks" {
       enabled = true
       addon_version = "v1.20.4-eksbuild.1"
     }
+
+    eks-pod-identity-agent = {
+      enabled = true
+      addon_version = "v1.3.10-eksbuild.1"
+      service_account = module.aws_vpc_cni_pod_identity.iam_role_arn
+    }
   }
 
   authentication_mode = "API_AND_CONFIG_MAP"
