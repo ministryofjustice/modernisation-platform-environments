@@ -864,9 +864,6 @@ resource "aws_lakeformation_permissions" "add_create_db" {
   catalog_resource = true
 }
 
-
-
-
 #-----------------------------------------------------------------------------------
 # Load FMS Data IAM Role
 #-----------------------------------------------------------------------------------
@@ -1002,3 +999,134 @@ resource "aws_lakeformation_permissions" "fms_add_create_db" {
   principal        = aws_iam_role.load_fms[0].arn
   catalog_resource = true
 }
+
+#-----------------------------------------------------------------------------------
+# Load csv Data IAM Role
+#-----------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "load_historic_csv_lambda_role_policy_document" {
+  statement {
+    sid    = "S3Permissions"
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:GetObjectAttributes",
+      "s3:GetObject",
+      "s3:DeleteObject",
+    ]
+    resources = [
+      "${module.s3-create-a-derived-table-bucket.bucket.arn}/staging/*",
+      "${module.s3-athena-bucket.bucket.arn}/output/*",
+      "${module.s3-athena-bucket.bucket.arn}/*",
+    ]
+  }
+  statement {
+    sid    = "S3GetPermissions"
+    effect = "Allow"
+    actions = [
+      "s3:GetObjectAttributes",
+      "s3:GetObject",
+    ]
+    resources = [
+      "${module.s3-data-bucket.bucket.arn}å/*"
+    ]
+  }
+  statement {
+    sid    = "S3ListingPermissions"
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket",
+    ]
+    resources = [
+      module.s3-create-a-derived-table-bucket.bucket.arn
+    ]
+  }
+  statement {
+    sid    = "AthenaPermissionsForLoadData"
+    effect = "Allow"
+    actions = [
+      "athena:StartQueryExecution",
+      "athena:GetQueryExecution",
+      "athena:GetQueryResults",
+      "athena:StopQueryExecution"
+    ]
+    resources = [
+      "arn:aws:athena:${data.aws_region.current.name}:${data.aws_caller_identity.current.id}:workgroup/${data.aws_caller_identity.current.id}-default",
+    ]
+  }
+  statement {
+    sid    = "GluePermissionsForLoad"
+    effect = "Allow"
+    actions = [
+      "glue:GetTable",
+      "glue:GetDatabase",
+      "glue:GetDatabases",
+      "glue:CreateTable",
+      "glue:DeleteTable",
+      "glue:CreateDatabase",
+      "glue:DeleteDatabase",
+      "glue:UpdateTable",
+      "glue:GetPartition",
+      "glue:GetPartitions",
+      "glue:GetCatalog"
+    ]
+    resources = [
+      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:catalog",
+      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:database/*",
+      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/*/*",
+      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:userDefinedFunction/*/*",
+    ]
+  }
+  statement {
+    sid    = "GetDataAccessAndTagsForLakeFormation"
+    effect = "Allow"
+    actions = [
+      "lakeformation:GetDataAccess",
+      "lakeformation:GetResourceLFTags",
+    ]
+    resources = ["*"]
+  }
+  statement {
+    sid       = "ListAccountAlias"
+    effect    = "Allow"
+    actions   = ["iam:ListAccountAliases"]
+    resources = ["*"]
+  }
+  statement {
+    sid       = "ListAllBucket"
+    effect    = "Allow"
+    actions   = ["s3:ListAllMyBuckets", "s3:GetBucketLocation"]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_role" "load_historic_csv" {
+  name               = "load_historic_csv_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_policy" "load_historic_csv_lambda_role_policy" {
+  name   = "load_historic_csv_lambda_policy"
+  policy = data.aws_iam_policy_document.load_historic_csv_lambda_role_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "load_historic_csv_output_lambda_policy_attachment" {
+  role       = aws_iam_role.load_historic_csv.name
+  policy_arn = aws_iam_policy.load_historic_csv_lambda_role_policy.arn
+}
+
+module "share_db_with_historic_csv_lambda_role_policy_lambda_role" {
+  source                  = "./modules/lakeformation_database_share"
+  dbs_to_grant            = toset(["g4s_lcm${local.db_suffix}"])
+  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+  role_arn                = aws_iam_role.load_historic_csv.arn
+  db_exists               = true ? local.is-production : false
+  de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
+}
+
+resource "aws_lakeformation_permissions" "historic_csv_add_create_db" {
+  permissions      = ["CREATE_DATABASE", "DROP"]
+  principal        = aws_iam_role.load_historic_csv.arn
+  catalog_resource = true
+}
+
