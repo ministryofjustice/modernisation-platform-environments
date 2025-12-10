@@ -208,7 +208,7 @@ data "aws_iam_policy_document" "guardduty_alerting_sns" {
     "kms:Decrypt"
   ]
   resources = [
-      "arn:aws:kms:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:alias/aws/sns"
+      "arn:aws:kms:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:key/*"
       ]
   }
 
@@ -247,7 +247,7 @@ data "aws_iam_policy_document" "cloudwatch_alerting_sns" {
       "kms:Decrypt"
     ]
     resources = [
-      "arn:aws:kms:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:alias/aws/sns"
+      "arn:aws:kms:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:key/*"
       ]
     }
 
