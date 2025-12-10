@@ -10,6 +10,9 @@ module "eks" {
   subnet_ids         = data.aws_subnets.eks_private[0].ids
   enable_irsa        = true
 
+  endpoint_private_access = true
+  endpoint_public_access  = true
+
 
   cloudwatch_log_group_retention_in_days = 30
 
