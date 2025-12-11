@@ -60,3 +60,9 @@ resource "aws_sqs_queue" "emds_alerts_dlq" {
   visibility_timeout_seconds = 60
   message_retention_seconds  = 1209600
 }
+
+resource "aws_sns_topic_subscription" "emds_alerts_clean_mdss_dlq" {
+  topic_arn = aws_sns_topic.emds_alerts.arn
+  protocol  = "sqs"
+  endpoint  = aws_sqs_queue.clean_mdss_load_dlq.arn
+}
