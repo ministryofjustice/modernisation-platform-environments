@@ -4,6 +4,22 @@ resource "aws_security_group" "bps" {
   vpc_id      = var.account_info.vpc_id
 }
 
+resource "aws_security_group_rule" "bps_egress" {
+  for_each = {
+    all-to-efs = { source_security_group_id = aws_security_group.boe_efs.id }
+  }
+
+  description              = each.key
+  protocol                 = lookup(each.value, "protocol", "-1")
+  from_port                = lookup(each.value, "port", lookup(each.value, "from_port", 0))
+  to_port                  = lookup(each.value, "port", lookup(each.value, "to_port", 0))
+  self                     = lookup(each.value, "self", null)
+  source_security_group_id = lookup(each.value, "source_security_group_id", null)
+
+  security_group_id = resource.aws_security_group.bps.id
+  type              = "egress"
+}
+
 module "bps_instance" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v4.1.0"
 
