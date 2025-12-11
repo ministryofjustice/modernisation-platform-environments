@@ -132,7 +132,7 @@ def lambda_handler(event, context):
     web_acl_name = os.environ["WEB_ACL_NAME"]
     web_acl_id = os.environ["WEB_ACL_ID"]
     scope = os.environ["SCOPE"]
-    target_rule_name = "ebs-trusted-rule-ip-set"  # ← This rule is defined in Terraform
+    target_rule_name = "maintenance-block-rule"  # ← This rule is defined in Terraform
 
     # Get current WebACL
     resp = waf.get_web_acl(Name=web_acl_name, Scope=scope, Id=web_acl_id)
