@@ -23,8 +23,8 @@ locals {
         instance_types = ["r6i.large"]
 
         block_device_mappings = {
-          xvdb = {
-            device_name = "/dev/xvdb"
+          xvda = {
+            device_name = "/dev/xvda"
             ebs = {
               volume_size           = 200
               volume_type           = "gp3"
@@ -51,8 +51,8 @@ locals {
         instance_types = ["r6i.large"]
 
         block_device_mappings = {
-          xvdb = {
-            device_name = "/dev/xvdb"
+          xvda = {
+            device_name = "/dev/xvda"
             ebs = {
               volume_size           = 140
               volume_type           = "gp3"
