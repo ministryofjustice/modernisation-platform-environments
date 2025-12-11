@@ -4,6 +4,8 @@ data "aws_sqs_queue" "load_mdss_dlq" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "load_mdss_dlq_alarm" {
+  count = local.is-development ? 0 : 1
+
   alarm_name          = "load_mdss_dlq_has_messages"
   alarm_description   = "Triggered when Load MDSS DLQ contains messages"
   comparison_operator = "GreaterThanThreshold"
@@ -17,7 +19,7 @@ resource "aws_cloudwatch_metric_alarm" "load_mdss_dlq_alarm" {
   statistic   = "Sum"
 
   dimensions = {
-    QueueName = data.aws_sqs_queue.load_mdss_dlq.name
+    QueueName = data.aws_sqs_queue.load_mdss_dlq[0].name
   }
 
   alarm_actions = [
