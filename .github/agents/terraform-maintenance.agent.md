@@ -133,7 +133,7 @@ Create a PR with:
 | ---------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- | ---------------------------------- |
 | [terraform-aws-modules/s3-bucket/aws](https://registry.terraform.io/modules/terraform-aws-modules/s3-bucket/aws) | [5.2.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/releases/tag/v5.2.0) | [5.9.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/releases/tag/v5.9.0) |                                    |
 | [terraform-aws-modules/iam/aws](https://registry.terraform.io/modules/terraform-aws-modules/iam/aws)             | [5.59.0](https://github.com/terraform-aws-modules/terraform-aws-iam/releases/tag/v5.59.0)     | [5.60.0](https://github.com/terraform-aws-modules/terraform-aws-iam/releases/tag/v5.60.0)     | ⚠️ v6.x skipped - breaking changes |
-
+| [terraform-aws-modules/ecr/aws](https://registry.terraform.io/modules/terraform-aws-modules/ecr/aws)             | [2.4.0](https://github.com/terraform-aws-modules/terraform-aws-ecr/releases/tag/v2.4.0)       | [3.1.0](https://github.com/terraform-aws-modules/terraform-aws-ecr/releases/tag/v3.1.0)       | ℹ️ Major version bump (see below)  |
 ### Skipped Updates
 
 - **module-name**: Reason for skipping (e.g., breaking changes in v6.0)
@@ -144,6 +144,11 @@ If any major versions were skipped, explain:
 - What breaking changes exist
 - Link to the upgrade guide
 - What would be required to migrate
+
+### Major Version Bumps Applied
+
+If any major versions were applied, explain why it was deemed safe:
+- **terraform-aws-modules/ecr/aws v3.x**: Only breaking change is AWS provider v6.0 minimum requirement (already satisfied by this environment)
 ```
 
 ### 10. Push Changes
