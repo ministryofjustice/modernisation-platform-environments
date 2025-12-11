@@ -52,7 +52,8 @@ module "ldap_ecs" {
   account_config  = var.account_config
 
   container_health_check = {
-    command     = ["CMD-SHELL", "test -f /tmp/ready"]
+    command = ["CMD-SHELL",
+    "if [ -f /tmp/ready ]; then exit 0; else exit 1; fi"]
     interval    = 60                                                             # seconds between checks
     retries     = 6                                                              # number of failed checks before marking as unhealthy
     startPeriod = var.delius_microservice_configs.ldap.health_check_start_period # grace period after container start before checks begin
