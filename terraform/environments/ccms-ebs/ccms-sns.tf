@@ -46,6 +46,7 @@ resource "aws_sns_topic" "cw_alerts" {
   }
 }
 EOF
+  kms_master_key_id = "alias/aws/sns"
 }
 
 resource "aws_sns_topic_policy" "sns_policy" {
@@ -108,4 +109,5 @@ resource "aws_sns_topic" "guardduty_alerts" {
   }
 }
 EOF
+  kms_master_key_id = "alias/aws/sns"
 }
