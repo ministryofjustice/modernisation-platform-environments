@@ -248,12 +248,12 @@ locals {
         source_arn_suffix = "*"
       }]
     }
-    auto_tag_eni = {
-      description  = "Function to auto tag all elastic network interfaces."
-      role_key     = "auto_tag_eni"
-      environments = ["development", "preproduction", "production"]
+    check_elb_trt_alarm = {
+      description  = "Function to check alarm state of High-Target-Response-Time-WAM-ELB alarm and generate subsequent alerts."
+      role_key     = "check_elb_trt_alarm"
+      environments = ["production"]
       permissions = [{
-        principal         = "events.amazonaws.com"
+        principal         = "cloudwatch.amazonaws.com"
         source_arn_suffix = "*"
       }]
     }

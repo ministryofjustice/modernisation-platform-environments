@@ -33,6 +33,16 @@ resource "aws_security_group_rule" "ingress_traffic_ebsalb_internal_443_mojo_dev
   cidr_blocks       = [local.application_data.accounts[local.environment].mojo_devices]
 }
 
+resource "aws_security_group_rule" "ingress_traffic_ebsalb_internal_443_dom1_devices" {
+  security_group_id = aws_security_group.sg_ebsapps_internal_alb.id
+  type              = "ingress"
+  description       = "HTTPS from Dom1 Devices"
+  protocol          = "TCP"
+  from_port         = 443
+  to_port           = 443
+  cidr_blocks       = [local.application_data.accounts[local.environment].dom1_devices]
+}
+
 # EGRESS Rules
 
 ### All
