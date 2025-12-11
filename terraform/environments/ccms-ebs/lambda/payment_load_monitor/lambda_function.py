@@ -14,7 +14,7 @@ from mypy_boto3_secretsmanager import SecretsManagerClient
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-MAX_MESSAGE_SIZE: int = 256 * 1024  # 256KB
+MAX_MESSAGE_SIZE: int = 256 * 1024
 SENSITIVE_KEYS: set = {"password", "secret", "authorization", "access_key"}
 
 CREDENTIAL_LINE = "Found credentials in environment variables."
@@ -56,13 +56,12 @@ class NotificationService:
             emoji = ":broken_heart:" if is_error else ":white_check_mark:"
             color = "danger" if is_error else "good"
 
-        
             payload = {
                 "attachments": [
                     {
                         "color": color,
                         "title": f"{emoji} [{self.function_name}] {title}",
-                        "text": " \n \n" + message,  
+                        "text": "\n\n" + message,   # two blank lines before content
                         "footer": "CCMS EBS Lambda",
                         "ts": int(time.time()),
                     }
@@ -76,6 +75,7 @@ class NotificationService:
             curl.setopt(pycurl.TIMEOUT, 10)
             curl.perform()
             return True
+
         finally:
             curl.close()
 
@@ -103,10 +103,14 @@ def lambda_handler(event: Dict[str, Any], context: Optional[Any]) -> Dict[str, A
         if not combined_logs:
             return {"statusCode": 200, "body": {"message": "No log events to process"}}
 
-        
+        # Build final message
         final_message = f"Details:\n{CREDENTIAL_LINE}\n{combined_logs}"
 
-        
+        # 🚨 Only send Slack when the upload is fully completed
+        if "finish_upload_file" not in combined_logs:
+            return {"statusCode": 200, "body": {"message": "Waiting for final log batch"}}
+
+        # Dedupe based on full-message hash
         msg_hash = hashlib.sha256(final_message.encode("utf-8")).hexdigest()
         hash_file = "/tmp/last_notification_hash"
 
@@ -118,6 +122,7 @@ def lambda_handler(event: Dict[str, Any], context: Optional[Any]) -> Dict[str, A
         with open(hash_file, "w") as f:
             f.write(msg_hash)
 
+        # Slack title
         status_emoji = ":broken_heart:" if is_error else ":tada:"
         status_text = "Payment load lambda fail" if is_error else "Payment load lambda successful"
         title = f"{status_emoji} {status_text}"
