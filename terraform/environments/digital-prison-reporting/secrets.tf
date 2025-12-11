@@ -248,6 +248,8 @@ resource "aws_secretsmanager_secret" "redshift" {
       dpr-resource-type = "Secrets"
       dpr-jira          = "DPR-XXXX"
       dpr-service       = "redshift"
+      # Tag required to make the secret available in Redshift Query Editor v2
+      Redshift          = "redshift"
     }
   )
 }
