@@ -1,12 +1,4 @@
 ##################################################################################################################
-# Import existing RDS instance into Terraform state
-##################################################################################################################
-import {
-  to = aws_db_instance.oas_rds_instance[0]
-  id = "oas-test"
-}
-
-##################################################################################################################
 # Random Secret for the DB Password to be used for installation of OAS only
 # The password is generated once and persists across Terraform runs unless the RDS instance is recreated
 # The lifecycle ignore_changes prevents accidental password regeneration
@@ -76,6 +68,10 @@ resource "aws_db_subnet_group" "appdbsubnetgroup_new" {
       Keep = "true"
     }
   )
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 
@@ -105,6 +101,10 @@ resource "aws_db_parameter_group" "appdbparametergroup19_new" {
       Name = "${local.application_name}-${local.environment}-parametergroup"
     }
   )
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 
@@ -130,6 +130,10 @@ resource "aws_db_option_group" "appdboptiongroup19_new" {
       Keep = "true"
     }
   )
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 
@@ -188,6 +192,14 @@ resource "aws_db_instance" "oas_rds_instance" {
     local.tags,
     { Name = "${local.application_name}-${local.environment}-database" }
   )
+
+  lifecycle {
+    prevent_destroy = true
+    ignore_changes = [
+      password,
+      final_snapshot_identifier
+    ]
+  }
 
   timeouts {
     create = "60m"
