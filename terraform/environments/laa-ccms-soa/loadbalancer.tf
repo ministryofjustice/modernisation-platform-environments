@@ -100,20 +100,20 @@ resource "aws_lb" "managed" {
   depends_on = [module.s3-bucket-logging]
 }
 
-# resource "aws_lb_target_group" "managed" {
-#   name        = "${local.application_data.accounts[local.environment].app_name}-managed-target-group"
-#   port        = local.application_data.accounts[local.environment].managed_server_port
-#   protocol    = "TCP"
-#   vpc_id      = data.aws_vpc.shared.id
-#   target_type = "ip"
+resource "aws_lb_target_group" "managed" {
+  name        = "${local.application_data.accounts[local.environment].app_name}-managed-target-group"
+  port        = local.application_data.accounts[local.environment].managed_server_port
+  protocol    = "TCP"
+  vpc_id      = data.aws_vpc.shared.id
+  target_type = "ip"
 
-#   health_check {
-#     healthy_threshold   = "3"
-#     interval            = "30"
-#     protocol            = "TCP"
-#     unhealthy_threshold = "3"
-#   }
-# }
+  health_check {
+    healthy_threshold   = "3"
+    interval            = "30"
+    protocol            = "TCP"
+    unhealthy_threshold = "3"
+  }
+}
 
 resource "aws_lb_listener" "managed80" {
   load_balancer_arn = aws_lb.managed.id
