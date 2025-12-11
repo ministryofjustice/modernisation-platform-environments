@@ -1,4 +1,12 @@
 ##################################################################################################################
+# Import existing RDS instance into Terraform state
+##################################################################################################################
+import {
+  to = aws_db_instance.oas_rds_instance[0]
+  id = "oas-test"
+}
+
+##################################################################################################################
 # Random Secret for the DB Password to be used for installation of OAS only
 # The password is generated once and persists across Terraform runs unless the RDS instance is recreated
 # The lifecycle ignore_changes prevents accidental password regeneration
