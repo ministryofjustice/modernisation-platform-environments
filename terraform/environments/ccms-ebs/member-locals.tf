@@ -11,11 +11,16 @@ locals {
   lb_log_prefix_ssogen_internal  = "ssogen-internal-lb"
 
 
-  lambda_folder_name = ["lambda_delivery", "ftp_lambda_layer", "payment_lambda_layer", "cloudwatch_sns_layer"]
+  lambda_folder_name = ["lambda_delivery", "ftp_lambda_layer", "payment_lambda_layer", "cloudwatch_sns_layer", "payment_load_monitor_layer"]
 
   lambda_source_hashes = [
     for f in fileset("./lambda/cloudwatch_alarm_slack_integration", "**") :
     sha256(file("${path.module}/lambda/cloudwatch_alarm_slack_integration/${f}"))
+  ]
+  
+  lambda_payment_source_hashes = [
+    for f in fileset("./lambda/payment_load_monitor", "**") :
+    sha256(file("${path.module}/lambda/payment_load_monitor/${f}"))
   ]
 
   data_subnets = [
