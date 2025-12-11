@@ -55,9 +55,11 @@ module "eks" {
     #   version = local.environment_configuration.eks_cluster_addon_versions.kube_proxy
     }
     vpc-cni = {
+        before_compute = true
     #   version = local.environment_configuration.eks_cluster_addon_versions.vpc_cni
     }
     eks-pod-identity-agent = {
+        before_compute = true
     #   version = local.environment_configuration.eks_cluster_addon_versions.eks_pod_identity_agent
     }
   }
