@@ -1,5 +1,6 @@
 data "aws_sqs_queue" "load_mdss_dlq" {
-  name = "load_mdss-dlq"
+  count = local.is-development ? 0 : 1
+  name  = "load_mdss-dlq"
 }
 
 resource "aws_cloudwatch_metric_alarm" "load_mdss_dlq_alarm" {
