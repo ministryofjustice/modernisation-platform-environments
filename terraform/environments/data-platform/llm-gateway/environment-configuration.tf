@@ -3,8 +3,8 @@ locals {
   environment_configurations = {
     development = {
       litellm_versions = {
-        application = "main-v1.80.0-stable.1"
-        chart       = "0.1.823"
+        application = "main-v1.80.5-stable"
+        chart       = "0.1.826"
       }
       litellm_organization_ids = {
         /* These are not currently managed in code */
@@ -67,6 +67,14 @@ locals {
           claude-haiku-4-5 = {
             model_id = "eu.anthropic.claude-haiku-4-5-20251001-v1:0"
             region   = "eu-west-2"
+          }
+          claude-opus-4-5 = {
+            model_id = "global.anthropic.claude-opus-4-5-20251101-v1:0"
+            region   = "eu-west-2"
+          }
+          claude-sonnet-4 = {
+            model_id = "eu.anthropic.claude-sonnet-4-20250514-v1:0"
+            region   = "eu-west-1"
           }
           claude-sonnet-4-5 = {
             model_id = "eu.anthropic.claude-sonnet-4-5-20250929-v1:0"
@@ -247,6 +255,15 @@ locals {
                 "bedrock-cohere-embed-english-v3",
                 "bedrock-cohere-embed-multilingual-v3"
               ]
+            }
+          }
+        }
+        digital-prisons-service = {
+          organisation = "ministryofjustice"
+          models       = ["bedrock-claude-sonnet-4"]
+          keys = {
+            ims = {
+              models = ["bedrock-claude-sonnet-4"]
             }
           }
         }

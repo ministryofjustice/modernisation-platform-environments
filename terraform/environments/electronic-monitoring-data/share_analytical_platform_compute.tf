@@ -44,7 +44,6 @@ locals {
     "g4s_integrity",
     "g4s_lcm_archive",
     "g4s_tasking",
-    "intermediate_tasking",
     "scram_alcohol_monitoring",
     "g4s_lcm",
   ] : local.is-development ? ["test"] : []
@@ -79,12 +78,16 @@ locals {
     "curated_fep",
     "g4s_lcm_archive_curated",
     "g4s_lcm_curated",
+    "intermediate_tasking",
   ] : []
+
   dev_dbs_to_grant       = local.is-production ? [for db in local.prod_dbs_to_grant : "${db}_historic_dev_dbt"] : []
   dbt_dbs_to_grant       = [for db in local.dbt_dbs : "${db}${local.dbt_suffix}"]
   live_feed_dbs_to_grant = [for db in local.live_feeds_dbs : "${db}${local.db_suffix}"]
   dbs_to_grant           = toset(flatten([local.prod_dbs_to_grant, local.dev_dbs_to_grant, local.dbt_dbs_to_grant]))
-  existing_dbs_to_grant  = toset(flatten([local.live_feed_dbs_to_grant, local.historic_source_dbs]))
+
+
+  existing_dbs_to_grant = toset(flatten([local.live_feed_dbs_to_grant, local.historic_source_dbs]))
 }
 
 # Source Analytics DBT Secrets

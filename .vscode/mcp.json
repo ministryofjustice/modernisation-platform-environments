@@ -1,0 +1,105 @@
+{
+  "inputs": [
+    {
+      "type": "promptString",
+      "id": "aws-profile",
+      "description": "AWS Profile",
+      "password": false
+    }
+  ],
+  "servers": {
+    "awslabs.aws-diagram-mcp-server": {
+      "command": "uvx",
+      "args": ["awslabs.aws-diagram-mcp-server@latest"],
+      "env": {
+        "AWS_PROFILE": "${input:aws-profile}",
+        "AWS_REGION": "eu-west-2"
+      }
+    },
+    "awslabs.billing-cost-management-mcp-server": {
+      "command": "uvx",
+      "args": ["awslabs.billing-cost-management-mcp-server@latest"],
+      "env": {
+        "AWS_PROFILE": "${input:aws-profile}",
+        "AWS_REGION": "eu-west-2"
+      }
+    },
+    "awslabs.cloudtrail-mcp-server": {
+      "command": "uvx",
+      "args": ["awslabs.cloudtrail-mcp-server@latest"],
+      "env": {
+        "AWS_PROFILE": "${input:aws-profile}",
+        "AWS_REGION": "eu-west-2"
+      }
+    },
+    "awslabs.cloudwatch-mcp-server": {
+      "command": "uvx",
+      "args": ["awslabs.cloudwatch-mcp-server@latest"],
+      "env": {
+        "AWS_PROFILE": "${input:aws-profile}",
+        "AWS_REGION": "eu-west-2"
+      }
+    },
+    "awslabs.cost-explorer-mcp-server": {
+      "command": "uvx",
+      "args": ["awslabs.cost-explorer-mcp-server@latest"],
+      "env": {
+        "AWS_PROFILE": "${input:aws-profile}",
+        "AWS_REGION": "eu-west-2"
+      }
+    },
+    "awslabs.eks-mcp-server": {
+      "command": "uvx",
+      "args": ["awslabs.eks-mcp-server@latest"],
+      "env": {
+        "AWS_PROFILE": "${input:aws-profile}",
+        "AWS_REGION": "eu-west-2"
+      }
+    },
+    "awslabs.iam-mcp-server": {
+      "command": "uvx",
+      "args": ["awslabs.iam-mcp-server@latest"],
+      "env": {
+        "AWS_PROFILE": "${input:aws-profile}",
+        "AWS_REGION": "eu-west-2"
+      }
+    },
+    "awslabs.aws-pricing-mcp-server": {
+      "command": "uvx",
+      "args": ["awslabs.aws-pricing-mcp-server@latest"],
+      "env": {
+        "AWS_PROFILE": "${input:aws-profile}",
+        "AWS_REGION": "eu-west-2"
+      }
+    },
+    "awslabs.terraform-mcp-server": {
+      "command": "uvx",
+      "args": ["awslabs.terraform-mcp-server@latest"],
+      "env": {
+        "AWS_PROFILE": "${input:aws-profile}",
+        "AWS_REGION": "eu-west-2"
+      }
+    },
+    "awslabs.well-architected-security-mcp-server": {
+      "command": "uvx",
+      "args": ["awslabs.well-architected-security-mcp-server@latest"],
+      "env": {
+        "AWS_PROFILE": "${input:aws-profile}",
+        "AWS_REGION": "eu-west-2"
+      }
+    },
+    "github": {
+      "type": "http",
+      "url": "https://api.githubcopilot.com/mcp/"
+    },
+    "hashicorp.terraform-mcp-server": {
+      "command": "docker",
+      "args": [
+        "run",
+        "--interactive",
+        "--rm",
+        "docker.io/hashicorp/terraform-mcp-server:latest"
+      ]
+    }
+  }
+}

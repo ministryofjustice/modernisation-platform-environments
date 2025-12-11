@@ -26,6 +26,8 @@ module "environment_dev" {
 
   bastion_config = local.bastion_config_dev
 
+  boe_efs_config = local.boe_efs_config_dev
+
   bcs_config  = local.bcs_config_dev
   bps_config  = local.bps_config_dev
   bws_config  = local.bws_config_dev

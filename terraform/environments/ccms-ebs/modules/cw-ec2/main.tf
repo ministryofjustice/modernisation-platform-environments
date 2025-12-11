@@ -11,7 +11,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu_utilization" {
   metric_name               = "CPUUtilization"
   namespace                 = "AWS/EC2"
   statistic                 = "Average"
-  insufficient_data_actions = []
+  insufficient_data_actions = [local.topic]
 
   evaluation_periods  = var.cpu_eval_periods
   datapoints_to_alarm = var.cpu_datapoints
@@ -34,7 +34,7 @@ resource "aws_cloudwatch_metric_alarm" "low_available_memory" {
   metric_name               = "mem_available_percent"
   namespace                 = "CWAgent"
   statistic                 = "Average"
-  insufficient_data_actions = []
+  insufficient_data_actions = [var.topic]
 
   evaluation_periods  = var.mem_eval_periods
   datapoints_to_alarm = var.mem_datapoints
@@ -57,7 +57,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free" {
   metric_name               = "disk_free"
   namespace                 = "CWAgent"
   statistic                 = "Average"
-  insufficient_data_actions = []
+  insufficient_data_actions = [var.topic]
 
   evaluation_periods  = var.disk_eval_periods
   datapoints_to_alarm = var.disk_datapoints
@@ -84,7 +84,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_used" {
   metric_name               = "disk_used_percent"
   namespace                 = "CWAgent"
   statistic                 = "Average"
-  insufficient_data_actions = []
+  insufficient_data_actions = [var.topic]
 
   evaluation_periods  = var.disk_eval_periods
   datapoints_to_alarm = var.disk_datapoints
@@ -110,7 +110,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu_usage_iowait" {
   metric_name               = "cpu_usage_iowait"
   namespace                 = "CWAgent"
   statistic                 = "Average"
-  insufficient_data_actions = []
+  insufficient_data_actions = [var.topic]
 
   evaluation_periods  = var.eval_periods
   datapoints_to_alarm = var.eval_periods
@@ -139,7 +139,7 @@ resource "aws_cloudwatch_metric_alarm" "instance_health_check" {
   metric_name               = "StatusCheckFailed_Instance"
   namespace                 = "AWS/EC2"
   statistic                 = "Average"
-  insufficient_data_actions = []
+  insufficient_data_actions = [var.topic]
 
   evaluation_periods = var.insthc_eval_periods
   period             = var.insthc_period
@@ -159,7 +159,7 @@ resource "aws_cloudwatch_metric_alarm" "system_health_check" {
   metric_name               = "StatusCheckFailed_System"
   namespace                 = "AWS/EC2"
   statistic                 = "Average"
-  insufficient_data_actions = []
+  insufficient_data_actions = [var.topic]
 
   evaluation_periods = var.syshc_eval_periods
   period             = var.syshc_period

@@ -1,9 +1,17 @@
 {
   "keys": {
     "development": {
-      "vladimir": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJ3DUNjSOe4NHpbJFMCn7AAmM39vrtNQ0BsoB0ttziBI vladimirs.kovalovs@L0854"
+      "vladimir": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJ3DUNjSOe4NHpbJFMCn7AAmM39vrtNQ0BsoB0ttziBI vladimirs.kovalovs@L0854",
+      "mohamed": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPrUyMHkr8LOsnUQ+1USJKQ70YKVL+Xf9Jv+fl5XjWS5 mohamed.nasr@justice.gov.uk"
     },
-    "preproduction": {},
+    "test": {
+      "vladimir": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJ3DUNjSOe4NHpbJFMCn7AAmM39vrtNQ0BsoB0ttziBI vladimirs.kovalovs@L0854",
+      "mohamed": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPrUyMHkr8LOsnUQ+1USJKQ70YKVL+Xf9Jv+fl5XjWS5 mohamed.nasr@justice.gov.uk"
+    },
+    "preproduction": {
+      "vladimir": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJ3DUNjSOe4NHpbJFMCn7AAmM39vrtNQ0BsoB0ttziBI vladimirs.kovalovs@L0854",
+      "mohamed": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPrUyMHkr8LOsnUQ+1USJKQ70YKVL+Xf9Jv+fl5XjWS5 mohamed.nasr@justice.gov.uk"
+    },
     "production": {}
   }
 }
