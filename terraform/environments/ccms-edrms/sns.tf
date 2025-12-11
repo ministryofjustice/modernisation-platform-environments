@@ -21,6 +21,10 @@ resource "aws_sns_topic" "cloudwatch_slack" {
   }
 }
 EOF
+  kms_master_key_id = "alias/aws/sns"
+  tags = merge(local.tags, 
+  { Name = "cloudwatch-slack-alerts" }
+  )
 }
 
 resource "aws_sns_topic_policy" "cloudwatch_slack" {
@@ -56,6 +60,7 @@ resource "aws_sns_topic" "guardduty_alerts" {
   }
 }
 EOF
+  kms_master_key_id = "alias/aws/sns"
 }
 
 resource "aws_sns_topic_policy" "guardduty_default" {
