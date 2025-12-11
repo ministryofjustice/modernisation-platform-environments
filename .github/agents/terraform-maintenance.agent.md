@@ -100,6 +100,11 @@ Compare the extracted current version with the latest version obtained from the 
    - Clearly explain to the user why the major version was skipped
    - Example: "⚠️ Skipping terraform-aws-modules/iam/aws v6.x due to breaking changes (submodule restructuring). Updating to latest 5.x (5.60.0) instead."
 
+4. If a major version bump is safe to apply (e.g., only provider version requirements change):
+   - Proceed with the update
+   - **Always call out major version bumps in the PR description** with the reason it was deemed safe
+   - Example: "ℹ️ Major version bump - v3.x only requires AWS provider v6.0 (already satisfied)"
+
 ### 7. Update Module Versions
 
 If a newer version is available and safe to apply:
