@@ -38,6 +38,10 @@ resource "aws_sns_topic" "guardduty_alerts" {
   }
 }
 EOF
+  kms_master_key_id = aws_kms_key.cloudwatch_sns_alerts_key.id
+  tags = merge(local.tags, 
+    { Name = "${local.application_data.accounts[local.environment].app_name}-guardduty-alerts" }
+  )
 }
 
 resource "aws_sns_topic_policy" "guarduty_default" {
