@@ -100,6 +100,11 @@ Compare the extracted current version with the latest version obtained from the 
    - Clearly explain to the user why the major version was skipped
    - Example: "⚠️ Skipping terraform-aws-modules/iam/aws v6.x due to breaking changes (submodule restructuring). Updating to latest 5.x (5.60.0) instead."
 
+4. If a major version bump is safe to apply (e.g., only provider version requirements change):
+   - Proceed with the update
+   - **Always call out major version bumps in the PR description** with the reason it was deemed safe
+   - Example: "ℹ️ Major version bump - v3.x only requires AWS provider v6.0 (already satisfied)"
+
 ### 7. Update Module Versions
 
 If a newer version is available and safe to apply:
@@ -128,6 +133,7 @@ Create a PR with:
 | ---------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- | ---------------------------------- |
 | [terraform-aws-modules/s3-bucket/aws](https://registry.terraform.io/modules/terraform-aws-modules/s3-bucket/aws) | [5.2.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/releases/tag/v5.2.0) | [5.9.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/releases/tag/v5.9.0) |                                    |
 | [terraform-aws-modules/iam/aws](https://registry.terraform.io/modules/terraform-aws-modules/iam/aws)             | [5.59.0](https://github.com/terraform-aws-modules/terraform-aws-iam/releases/tag/v5.59.0)     | [5.60.0](https://github.com/terraform-aws-modules/terraform-aws-iam/releases/tag/v5.60.0)     | ⚠️ v6.x skipped - breaking changes |
+| [terraform-aws-modules/ecr/aws](https://registry.terraform.io/modules/terraform-aws-modules/ecr/aws)             | [2.4.0](https://github.com/terraform-aws-modules/terraform-aws-ecr/releases/tag/v2.4.0)       | [3.1.0](https://github.com/terraform-aws-modules/terraform-aws-ecr/releases/tag/v3.1.0)       | ℹ️ Major version bump (see below)  |
 
 ### Skipped Updates
 
@@ -139,6 +145,11 @@ If any major versions were skipped, explain:
 - What breaking changes exist
 - Link to the upgrade guide
 - What would be required to migrate
+
+### Major Version Bumps Applied
+
+If any major versions were applied, explain why it was deemed safe:
+- **terraform-aws-modules/ecr/aws v3.x**: Only breaking change is AWS provider v6.0 minimum requirement (already satisfied by this environment)
 ```
 
 ### 10. Push Changes
