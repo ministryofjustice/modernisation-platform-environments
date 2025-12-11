@@ -360,7 +360,7 @@ locals {
         },
         "digital-prison-reporting" = {
           "identity_centre_team" = "hmpps-digital-prison-reporting",
-          "slack_channels"       = ["dpr-alerts-dev"],
+          "slack_channels"       = ["dpr-alerts-dev", "dpr-alerts-preprod", "dpr-alerts-prod", "dpr-alerts-test"],
           "aws_accounts" = {
             "digital-prison-reporting-development" = {
               cloudwatch_enabled              = true
