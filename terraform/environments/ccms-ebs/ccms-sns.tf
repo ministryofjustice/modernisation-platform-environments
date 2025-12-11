@@ -46,7 +46,10 @@ resource "aws_sns_topic" "cw_alerts" {
   }
 }
 EOF
-  kms_master_key_id = "alias/aws/sns"
+  kms_master_key_id = aws_kms_key.cloudwatch_sns_alerts_key.id
+  tags = merge(local.tags, 
+    { Name = "${local.application_name}-ec2-alerts" }
+  )
 }
 
 resource "aws_sns_topic_policy" "sns_policy" {
@@ -109,5 +112,8 @@ resource "aws_sns_topic" "guardduty_alerts" {
   }
 }
 EOF
-  kms_master_key_id = "alias/aws/sns"
+  kms_master_key_id = aws_kms_key.cloudwatch_sns_alerts_key.id
+  tags = merge(local.tags, 
+    { Name = "${local.application_name}-guardduty-alerts" }
+  )
 }
