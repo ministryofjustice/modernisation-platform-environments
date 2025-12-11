@@ -71,7 +71,7 @@ locals {
     subnet_ids = try(data.aws_subnets.eks_private[0].ids, [])
     name       = "${local.environment}-def-ng"
 
-    create_security_group  = false
+    create_security_group  = true
     create_launch_template = true
 
     iam_role_additional_policies = {
@@ -110,7 +110,7 @@ locals {
     subnet_ids = try(data.aws_subnets.eks_private[0].ids, [])
     name       = "${local.environment}-mon-ng"
 
-    create_security_group  = false
+    create_security_group  = true
     create_launch_template = true
 
     iam_role_additional_policies = {
