@@ -1,3 +1,7 @@
+#This Lambda function processes CloudWatch log events from the payment upload Lambda.
+#It extracts, cleans, and formats the logs—removing duplicates and sensitive data.
+#Then it sends a single success or failure notification to Slack when the upload finishes.
+
 import base64
 import gzip
 import json
@@ -53,7 +57,7 @@ class NotificationService:
     def send_notification(self, title: str, message: str, is_error: bool = False) -> bool:
         curl = pycurl.Curl()
         try:
-            emoji = ":broken_heart:" if is_error else ":white_check_mark:"
+            emoji = ":broken_heart:" if is_error else ":tada:"
             color = "danger" if is_error else "good"
 
             payload = {
@@ -61,7 +65,7 @@ class NotificationService:
                     {
                         "color": color,
                         "title": f"{emoji} [{self.function_name}] {title}",
-                        "text": "\n\n" + message,   # two blank lines before content
+                        "text": "\n\n" + message,  
                         "footer": "CCMS EBS Lambda",
                         "ts": int(time.time()),
                     }
@@ -106,7 +110,7 @@ def lambda_handler(event: Dict[str, Any], context: Optional[Any]) -> Dict[str, A
         # Build final message
         final_message = f"Details:\n{CREDENTIAL_LINE}\n{combined_logs}"
 
-        # 🚨 Only send Slack when the upload is fully completed
+        # Only send Slack when the upload is fully completed
         if "finish_upload_file" not in combined_logs:
             return {"statusCode": 200, "body": {"message": "Waiting for final log batch"}}
 
@@ -122,10 +126,8 @@ def lambda_handler(event: Dict[str, Any], context: Optional[Any]) -> Dict[str, A
         with open(hash_file, "w") as f:
             f.write(msg_hash)
 
-        # Slack title
-        status_emoji = ":broken_heart:" if is_error else ":tada:"
         status_text = "Payment load lambda fail" if is_error else "Payment load lambda successful"
-        title = f"{status_emoji} {status_text}"
+        title = status_text
 
         notification_service.send_notification(title, final_message, is_error)
 
