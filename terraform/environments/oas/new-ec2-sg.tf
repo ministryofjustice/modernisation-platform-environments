@@ -167,7 +167,7 @@ resource "aws_security_group_rule" "egress_https_s3" {
   description       = "Outbound 443 to LAA VPC Endpoint SG"
 }
 
-resource "aws_security_group_rule" "ingress_admin_vpc" {
+resource "aws_security_group_rule" "egress_admin_vpc" {
   count             = contains(["test", "preproduction"], local.environment) ? 1 : 0
 
   type              = "egress"
@@ -179,7 +179,7 @@ resource "aws_security_group_rule" "ingress_admin_vpc" {
   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
 }
 
-resource "aws_security_group_rule" "ingress_admin_workspace" {
+resource "aws_security_group_rule" "egress_admin_workspace" {
   count             = contains(["test", "preproduction"], local.environment) ? 1 : 0
 
   type              = "egress"
@@ -191,7 +191,7 @@ resource "aws_security_group_rule" "ingress_admin_workspace" {
   cidr_blocks       = [local.application_data.accounts[local.environment].managementcidr]
 }
 
-resource "aws_security_group_rule" "ingress_managed_9502_vpc" {
+resource "aws_security_group_rule" "egress_managed_9502_vpc" {
   count             = contains(["test", "preproduction"], local.environment) ? 1 : 0
 
   type              = "egress"
@@ -203,7 +203,7 @@ resource "aws_security_group_rule" "ingress_managed_9502_vpc" {
   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
 }
 
-resource "aws_security_group_rule" "ingress_managed_9502_workspace" {
+resource "aws_security_group_rule" "egress_managed_9502_workspace" {
   count             = contains(["test", "preproduction"], local.environment) ? 1 : 0
 
   type              = "egress"
@@ -215,7 +215,7 @@ resource "aws_security_group_rule" "ingress_managed_9502_workspace" {
   cidr_blocks       = [local.application_data.accounts[local.environment].managementcidr]
 }
 
-resource "aws_security_group_rule" "ingress_managed_9505_vpc" {
+resource "aws_security_group_rule" "egress_managed_9505_vpc" {
   count             = contains(["test", "preproduction"], local.environment) ? 1 : 0
 
   type              = "egress"
@@ -227,7 +227,7 @@ resource "aws_security_group_rule" "ingress_managed_9505_vpc" {
   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
 }
 
-resource "aws_security_group_rule" "ingress_managed_9505_workspace" {
+resource "aws_security_group_rule" "egress_managed_9505_workspace" {
   count             = contains(["test", "preproduction"], local.environment) ? 1 : 0
 
   type              = "egress"
@@ -240,7 +240,7 @@ resource "aws_security_group_rule" "ingress_managed_9505_workspace" {
 }
 
 
-resource "aws_security_group_rule" "ingress_managed_9514_vpc" {
+resource "aws_security_group_rule" "egress_managed_9514_vpc" {
   count             = contains(["test", "preproduction"], local.environment) ? 1 : 0
 
   type              = "egress"
@@ -252,7 +252,7 @@ resource "aws_security_group_rule" "ingress_managed_9514_vpc" {
   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
 }
 
-resource "aws_security_group_rule" "ingress_managed_9514_workspace" {
+resource "aws_security_group_rule" "egress_managed_9514_workspace" {
   count             = contains(["test", "preproduction"], local.environment) ? 1 : 0
 
   type              = "egress"
