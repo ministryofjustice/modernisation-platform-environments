@@ -18,9 +18,6 @@ resource "aws_wafv2_ip_set" "ebsapps_waf_ip_set" {
   )
 }
 
-########################################################################################################################
-# PLEASE IGNORE THE FOLLOWING REOURCE TERRAFORM PLAN CUSTOM MANAGED HTML PAGE DELETION AS IT IS HANDLED VIA THE LAMBDA #
-########################################################################################################################
 resource "aws_wafv2_web_acl" "ebsapps_internal_web_acl" {
   name        = "ebs_internal_waf"
   scope       = "REGIONAL"
