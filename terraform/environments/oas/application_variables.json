@@ -62,7 +62,8 @@
       "license_model": "bring-your-own-license",
       "deletion_protection": "false",
       "pagerduty_integration_key_name": "laa_oas_nonprod_alarms",
-      "s3_vpc_endpoint_prefix": "pl-7ca54015"
+      "s3_vpc_endpoint_prefix": "pl-7ca54015",
+      "ec2_private_ip": "10.26.96.179"
     },
     "preproduction": {
       "ec2amiid": "ami-0a2128d7b4dd8a56c",
@@ -88,7 +89,8 @@
       "license_model": "bring-your-own-license",
       "deletion_protection": "false",
       "pagerduty_integration_key_name": "laa_oas_nonprod_alarms",
-      "s3_vpc_endpoint_prefix": "pl-7ca54015"
+      "s3_vpc_endpoint_prefix": "pl-7ca54015",
+      "ec2_private_ip": "10.27.72.27"
     },
     "production": {
       "example_var": "production-data",
