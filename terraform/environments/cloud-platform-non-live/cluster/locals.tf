@@ -55,8 +55,8 @@ locals {
     min_size     = lookup(local.default_ng_min_count, terraform.workspace)
 
     block_device_mappings = {
-      xvda = {
-        device_name = "/dev/xvda"
+      xvdb = {
+        device_name = "/dev/xvdb"
         ebs = {
           volume_size           = 200
           volume_type           = "gp3"
@@ -94,8 +94,8 @@ locals {
     max_size     = 6
     min_size     = lookup(local.mon_ng_min_count, terraform.workspace)
     block_device_mappings = {
-      xvda = {
-        device_name = "/dev/xvda"
+      xvdb = {
+        device_name = "/dev/xvdb"
         ebs = {
           volume_size           = 140
           volume_type           = "gp3"
