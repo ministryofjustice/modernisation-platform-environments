@@ -68,10 +68,6 @@ resource "aws_db_subnet_group" "appdbsubnetgroup_new" {
       Keep = "true"
     }
   )
-
-  lifecycle {
-    prevent_destroy = true
-  }
 }
 
 
@@ -101,10 +97,6 @@ resource "aws_db_parameter_group" "appdbparametergroup19_new" {
       Name = "${local.application_name}-${local.environment}-parametergroup"
     }
   )
-
-  lifecycle {
-    prevent_destroy = true
-  }
 }
 
 
@@ -130,10 +122,6 @@ resource "aws_db_option_group" "appdboptiongroup19_new" {
       Keep = "true"
     }
   )
-
-  lifecycle {
-    prevent_destroy = true
-  }
 }
 
 
@@ -192,14 +180,6 @@ resource "aws_db_instance" "oas_rds_instance" {
     local.tags,
     { Name = "${local.application_name}-${local.environment}-database" }
   )
-
-  lifecycle {
-    prevent_destroy = true
-    ignore_changes = [
-      password,
-      final_snapshot_identifier
-    ]
-  }
 
   timeouts {
     create = "60m"
