@@ -3,7 +3,7 @@ module "airflow_connections_slack_api_default_secret" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/secrets-manager/aws"
-  version = "1.3.1"
+  version = "2.0.1"
 
   name        = "airflow/connections/slack_api_default"
   description = "https://api.slack.com/apps/A06NU3WMDSS/"
