@@ -8,11 +8,11 @@ Triggered by a CloudWatch Logs Subscription Filter when SOA logs contain:
 This Lambda sends a critical notification to Slack including:
 - Triggering log event and timestamp
 - Log stream source
-- Nearby contextual log lines for investigation
+- Nearby contextual log lines (before & after event)
 
 Purpose:
-- Notify support teams in real-time when EDN begins quiescing
-  due to SOA DB space breaching capacity thresholds in Managed servers.
+- Notify support teams in real-time when EDN begins quiescing due to
+  SOA DB space reaching critical thresholds in Managed servers.
 """
 
 import os
@@ -37,6 +37,9 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 
+# ---------------------------------------------------------------------------
+# CONFIG VALIDATION HELPERS
+# ---------------------------------------------------------------------------
 class ConfigValidator:
     @staticmethod
     def validate_mandatory_fields(config_dict: Dict[str, Any], field_name: str) -> None:
@@ -46,14 +49,10 @@ class ConfigValidator:
                 f"Missing required {field_name} fields: {', '.join(missing_fields)}"
             )
 
-    @staticmethod
-    def get_mandatory_secret(secrets_data: Dict, key: str) -> str:
-        value = secrets_data.get(key)
-        if not value or not isinstance(value, str):
-            raise ValueError(f"{key} must be a non-empty string")
-        return value
 
-
+# ---------------------------------------------------------------------------
+# CONFIG DATA CLASS
+# ---------------------------------------------------------------------------
 @dataclass
 class ValidateConfig:
     slack_channel_webhook: str
@@ -66,6 +65,9 @@ class ValidateConfig:
         logger.info("Configuration validated")
 
 
+# ---------------------------------------------------------------------------
+# SLACK NOTIFICATION SERVICE
+# ---------------------------------------------------------------------------
 class NotificationService:
     def __init__(self, webhook_url: str, function_name: str):
         self.webhook_url = webhook_url
@@ -76,7 +78,7 @@ class NotificationService:
             payload = json.dumps({
                 "attachments": [
                     {
-                        "color": "danger",
+                        "color": "danger" if is_error else "good",
                         "title": f":rotating_light: [{self.function_name}] {title}",
                         "text": message,
                         "footer": "CCMS SOA EDN Quiesced Lambda",
@@ -85,15 +87,15 @@ class NotificationService:
                 ]
             })
 
-            response = http.request(
+            resp = http.request(
                 "POST",
                 self.webhook_url,
                 body=payload,
                 headers={"Content-Type": "application/json"}
             )
 
-            if response.status >= 400:
-                raise Exception(f"Slack webhook returned error {response.status}")
+            if resp.status >= 400:
+                raise Exception(f"Slack webhook error {resp.status}")
 
             return True
 
@@ -102,6 +104,9 @@ class NotificationService:
             return False
 
 
+# ---------------------------------------------------------------------------
+# SECRETS MANAGER FETCHER
+# ---------------------------------------------------------------------------
 class SecretsManager:
     def __init__(self):
         self.client = cast(SecretsManagerClient, boto3.client("secretsmanager"))
@@ -111,6 +116,9 @@ class SecretsManager:
         return json.loads(response["SecretString"])
 
 
+# ---------------------------------------------------------------------------
+# MAIN HANDLER
+# ---------------------------------------------------------------------------
 def lambda_handler(event, context):
     tracemalloc.start()
     logger.info("CCMS SOA EDN Quiesced Monitoring Lambda started")
@@ -121,6 +129,7 @@ def lambda_handler(event, context):
         LOG_GROUP_NAME = os.environ["LOG_GROUP_NAME"]
         secret_name = os.environ["SECRET_NAME"]
 
+        # Load Slack webhook secret
         secrets_data = SecretsManager().get_credentials(secret_name)
         config = ValidateConfig(
             slack_channel_webhook=secrets_data["slack_channel_webhook"],
@@ -131,45 +140,58 @@ def lambda_handler(event, context):
             config.slack_channel_webhook, context.function_name
         )
 
-        compressed_payload = base64.b64decode(event["awslogs"]["data"])
-        payload = json.loads(gzip.decompress(compressed_payload))
+        # Decode CloudWatch Logs event
+        compressed = base64.b64decode(event["awslogs"]["data"])
+        payload = json.loads(gzip.decompress(compressed))
         log_stream_name = payload["logStream"]
 
         for log_event in payload["logEvents"]:
             message = log_event["message"]
             timestamp = log_event["timestamp"]
 
+            # -------------------------------------------------------------------
+            # FETCH NEARBY LOGS (before & after event)
+            # -------------------------------------------------------------------
+            window_ms = 30000  # 30 seconds around the triggering event
+
             response = logs_client.get_log_events(
                 logGroupName=config.LOG_GROUP_NAME,
                 logStreamName=log_stream_name,
-                startTime=timestamp,
-                limit=5
+                startTime=timestamp - window_ms,
+                endTime=timestamp + window_ms,
+                limit=20
             )
 
-            nearby_logs = "\n".join([e["message"] for e in response["events"]])
+            nearby_logs = "\n".join(e["message"] for e in response["events"])
 
-            result = (
+            # -------------------------------------------------------------------
+            # BUILD MESSAGE
+            # -------------------------------------------------------------------
+            formatted_message = (
                 "*DB Quiescing Detected in CCMS SOA*\n\n"
                 f"*Log stream*: `{log_stream_name}`\n"
                 f"*Timestamp*: `{timestamp}`\n"
-                f"*Message Triggered*: \n```{message}```\n\n"
+                f"*Message Triggered*:\n```{message}```\n\n"
                 "*Nearby logs:*\n```" + nearby_logs + "```"
             )
 
+            # Send notification to Slack
             notification_service.send_notification(
                 "EDN Quiescing Due to DB Threshold",
-                result,
-                is_error=True,
+                formatted_message,
+                is_error=True
             )
 
         return {"statusCode": 200}
 
     except Exception as e:
         logger.error(f"Lambda execution failed: {e}", exc_info=True)
+
         if notification_service:
             notification_service.send_notification(
                 "Lambda Execution Failure", str(e), True
             )
+
         return {"statusCode": 500, "error": str(e)}
 
     finally:
