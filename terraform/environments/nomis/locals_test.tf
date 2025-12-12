@@ -599,7 +599,7 @@ locals {
         listeners = merge(local.lbs.private.listeners, {
           https = merge(local.lbs.private.listeners.https, {
             alarm_target_group_names  = [] # don't enable as environments are powered up/down frequently
-            certificate_names_or_arns = ["nomis_wildcard_cert_v2"]
+            certificate_names_or_arns = ["nomis_wildcard_cert_v3"]
 
             # /home/oracle/admin/scripts/lb_maintenance_mode.sh script on
             # weblogic servers can alter priorities to enable maintenance message
@@ -629,7 +629,6 @@ locals {
                     values = [
                       "t1-nomis-web-b.test.nomis.service.justice.gov.uk",
                       "c-t1.test.nomis.service.justice.gov.uk",
-                      "t1-cn.hmpp-azdt.justice.gov.uk",
                     ]
                   }
                 }]
@@ -659,7 +658,6 @@ locals {
                     values = [
                       "t2-nomis-web-b.test.nomis.service.justice.gov.uk",
                       "c-t2.test.nomis.service.justice.gov.uk",
-                      "t2-cn.hmpp-azdt.justice.gov.uk",
                     ]
                   }
                 }]
@@ -689,8 +687,6 @@ locals {
                     values = [
                       "t3-nomis-web-b.test.nomis.service.justice.gov.uk",
                       "c-t3.test.nomis.service.justice.gov.uk",
-                      "t3-cn.hmpp-azdt.justice.gov.uk",
-                      "t3-cn-ha.hmpp-azdt.justice.gov.uk",
                     ]
                   }
                 }]
@@ -712,7 +708,6 @@ locals {
                       "c-t1.test.nomis.service.justice.gov.uk",
                       "c-t2.test.nomis.service.justice.gov.uk",
                       "c-t3.test.nomis.service.justice.gov.uk",
-                      "t3-cn-ha.hmpp-azdt.justice.gov.uk",
                     ]
                   }
                 }]
