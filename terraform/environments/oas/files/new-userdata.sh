@@ -43,7 +43,6 @@ for M in "${!MOUNTS[@]}"; do
     if [[ -n ${N} ]]; then
         FS_DIR="${L}"
         if ! mountpoint -q "${FS_DIR}"; then
-            mkfs.ext4 "${M}"
             mkdir -p "${FS_DIR}"
             echo "${M} ${FS_DIR} ext4 defaults 0 0" >> "${EFSTAB}"
             mount "${M}" "${FS_DIR}"
