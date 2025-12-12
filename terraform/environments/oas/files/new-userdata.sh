@@ -17,6 +17,19 @@ systemctl enable amazon-ssm-agent
 systemctl stop firewalld
 systemctl disable firewalld
 
+# Install NVMe tools FIRST before attempting to use them
+curl -s https://raw.githubusercontent.com/aws/amazon-ec2-utils/master/ebsnvme-id > /sbin/ebsnvme-id
+curl -s https://raw.githubusercontent.com/aws/amazon-ec2-utils/master/ec2nvme-nsid > /sbin/ec2nvme-nsid
+sed -i '/^import argparse/i from __future__ import print_function' /sbin/ebsnvme-id
+chmod +x /sbin/ebsnvme-id
+chmod +x /sbin/ec2nvme-nsid
+
+curl -s https://raw.githubusercontent.com/aws/amazon-ec2-utils/master/70-ec2-nvme-devices.rules > /etc/udev/rules.d/70-ec2-nvme-devices.rules
+udevadm control --reload-rules && udevadm trigger && udevadm settle
+
+# Wait for udev to settle
+sleep 5
+
 declare -A MOUNTS=(
     [/dev/sdb]="/oracle/software"
     [/dev/sdc]="/stage"
@@ -24,19 +37,22 @@ declare -A MOUNTS=(
 
 EFSTAB="/etc/fstab"
 
-# Assuming ebsnvme-id is a custom script to map NVMe device to EBS volume
+# Map NVMe devices to EBS volume names
 declare -A NVMES=()
 for n in /dev/nvme*n1; do
-    D=$(ebsnvme-id "${n}" | grep -v 'Volume ID')
-    if [[ -n ${D} ]]; then
-        if [[ ${D} =~ /dev ]]; then
-            NVMES[${D}]=${n}
-        else
-            NVMES[/dev/${D}]=${n}
+    if [[ -b "${n}" ]]; then
+        D=$(ebsnvme-id "${n}" 2>/dev/null | grep -v 'Volume ID')
+        if [[ -n ${D} ]]; then
+            if [[ ${D} =~ /dev ]]; then
+                NVMES[${D}]=${n}
+            else
+                NVMES[/dev/${D}]=${n}
+            fi
         fi
     fi
 done
 
+# Mount the volumes
 for M in "${!MOUNTS[@]}"; do
     L=${MOUNTS[${M}]}
     N=${NVMES[${M}]}
@@ -44,8 +60,11 @@ for M in "${!MOUNTS[@]}"; do
         FS_DIR="${L}"
         if ! mountpoint -q "${FS_DIR}"; then
             mkdir -p "${FS_DIR}"
-            echo "${M} ${FS_DIR} ext4 defaults 0 0" >> "${EFSTAB}"
-            mount "${M}" "${FS_DIR}"
+            # Add to fstab using the NVMe device name
+            if ! grep -q "${N}" "${EFSTAB}"; then
+                echo "${N} ${FS_DIR} ext4 defaults,nofail 0 2" >> "${EFSTAB}"
+            fi
+            mount "${N}" "${FS_DIR}"
         else
             echo "${FS_DIR} is already mounted:"
             mount | grep "${FS_DIR}"
@@ -53,12 +72,11 @@ for M in "${!MOUNTS[@]}"; do
     fi
 done
 
-mount -a
-
-chown oracle:dba /oracle/software
-chown oracle:dba /stage
-chmod -R 777 /stage
-chmod -R 777 /oracle/software
+# Set ownership and permissions
+chown oracle:dba /oracle/software 2>/dev/null || true
+chown oracle:dba /stage 2>/dev/null || true
+chmod -R 777 /stage 2>/dev/null || true
+chmod -R 777 /oracle/software 2>/dev/null || true
 dd if=/dev/zero of=/root/myswapfile bs=1M count=1024
 chmod 600 /root/myswapfile
 mkswap /root/myswapfile
@@ -95,27 +113,5 @@ ntp_config(){
     esac
 }
 
-# Retrieve instance ID and store it in a file
-aws_instance_id=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
-echo -n "${aws_instance_id}" > /tmp/instance_id.txt
-
-# Read instance ID from the file
-INSTANCE_ID=$(cat /tmp/instance_id.txt)
-
-enable_ebs_udev(){
-    curl -s https://raw.githubusercontent.com/aws/amazon-ec2-utils/master/ebsnvme-id > /sbin/ebsnvme-id
-    curl -s https://raw.githubusercontent.com/aws/amazon-ec2-utils/master/ec2nvme-nsid > /sbin/ec2nvme-nsid
-    sed -i '/^import argparse/i from __future__ import print_function' /sbin/ebsnvme-id
-    chmod +x /sbin/ebsnvme-id
-    chmod +x /sbin/ec2nvme-nsid
-
-    curl -s https://raw.githubusercontent.com/aws/amazon-ec2-utils/master/70-ec2-nvme-devices.rules > /etc/udev/rules.d/70-ec2-nvme-devices.rules
-
-    udevadm control --reload-rules && udevadm trigger && udevadm settle
-}
-
-# Call the functions
-get_nvme_device
-mount_volumes
+# Configure NTP
 ntp_config
-enable_ebs_udev
