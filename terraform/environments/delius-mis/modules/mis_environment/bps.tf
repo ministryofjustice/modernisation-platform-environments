@@ -17,7 +17,7 @@ resource "aws_security_group_rule" "bps_ingress" {
   source_security_group_id = lookup(each.value, "source_security_group_id", null)
 
   security_group_id = resource.aws_security_group.bcs.id
-  type              = "egress"
+  type              = "ingress"
 }
 
 resource "aws_security_group_rule" "bps_egress" {
