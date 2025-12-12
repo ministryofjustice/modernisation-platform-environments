@@ -17,7 +17,7 @@ resource "aws_security_group_rule" "bps_ingress" {
   self                     = lookup(each.value, "self", null)
   source_security_group_id = lookup(each.value, "source_security_group_id", null)
 
-  security_group_id = resource.aws_security_group.bcs.id
+  security_group_id = resource.aws_security_group.bps.id
   type              = "ingress"
 }
 
