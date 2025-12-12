@@ -60,9 +60,7 @@ module "eks" {
         before_compute = true
     #   addon_version = local.environment_configuration.eks_cluster_addon_versions.eks_pod_identity_agent
     }
-    aws-guardduty-agent = {
-    #   addon_version = local.environment_configuration.eks_cluster_addon_versions.aws_guardduty_agent
-    }
+    
   }
 
   authentication_mode = "API_AND_CONFIG_MAP"
