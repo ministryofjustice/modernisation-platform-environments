@@ -71,7 +71,7 @@ resource "aws_iam_role_policy" "lambda_policy" {
           "kms:GenerateDataKey*",
           "kms:Decrypt"
         ]
-        Resource = [aws_sns_topic.certificate_expiration_alerts.arn]
+        Resource = [aws_kms_key.cloudwatch_sns_alerts_key.arn]
       }
     ]
   })
