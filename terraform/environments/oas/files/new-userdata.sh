@@ -17,66 +17,42 @@ systemctl enable amazon-ssm-agent
 systemctl stop firewalld
 systemctl disable firewalld
 
-# Install NVMe tools FIRST before attempting to use them
-curl -s https://raw.githubusercontent.com/aws/amazon-ec2-utils/master/ebsnvme-id > /sbin/ebsnvme-id
-curl -s https://raw.githubusercontent.com/aws/amazon-ec2-utils/master/ec2nvme-nsid > /sbin/ec2nvme-nsid
-sed -i '/^import argparse/i from __future__ import print_function' /sbin/ebsnvme-id
-chmod +x /sbin/ebsnvme-id
-chmod +x /sbin/ec2nvme-nsid
+# Wait for EBS volumes to be available
+sleep 10
 
-curl -s https://raw.githubusercontent.com/aws/amazon-ec2-utils/master/70-ec2-nvme-devices.rules > /etc/udev/rules.d/70-ec2-nvme-devices.rules
-udevadm control --reload-rules && udevadm trigger && udevadm settle
+# Mount EBS volumes
+# nvme0n1 is the root volume
+# nvme1n1 should be /dev/sdb (oracle software)
+# nvme2n1 should be /dev/sdc (stage)
 
-# Wait for udev to settle
-sleep 5
+mkdir -p /oracle/software
+mkdir -p /stage
 
-declare -A MOUNTS=(
-    [/dev/sdb]="/oracle/software"
-    [/dev/sdc]="/stage"
-)
+# Check if volumes are already in fstab to avoid duplicates
+if ! grep -q "/oracle/software" /etc/fstab; then
+    echo "/dev/nvme1n1 /oracle/software ext4 defaults,nofail 0 2" >> /etc/fstab
+fi
 
-EFSTAB="/etc/fstab"
+if ! grep -q "/stage" /etc/fstab; then
+    echo "/dev/nvme2n1 /stage ext4 defaults,nofail 0 2" >> /etc/fstab
+fi
 
-# Map NVMe devices to EBS volume names
-declare -A NVMES=()
-for n in /dev/nvme*n1; do
-    if [[ -b "${n}" ]]; then
-        D=$(ebsnvme-id "${n}" 2>/dev/null | grep -v 'Volume ID')
-        if [[ -n ${D} ]]; then
-            if [[ ${D} =~ /dev ]]; then
-                NVMES[${D}]=${n}
-            else
-                NVMES[/dev/${D}]=${n}
-            fi
-        fi
-    fi
-done
+# Mount all filesystems from fstab
+mount -a
 
-# Mount the volumes
-for M in "${!MOUNTS[@]}"; do
-    L=${MOUNTS[${M}]}
-    N=${NVMES[${M}]}
-    if [[ -n ${N} ]]; then
-        FS_DIR="${L}"
-        if ! mountpoint -q "${FS_DIR}"; then
-            mkdir -p "${FS_DIR}"
-            # Add to fstab using the NVMe device name
-            if ! grep -q "${N}" "${EFSTAB}"; then
-                echo "${N} ${FS_DIR} ext4 defaults,nofail 0 2" >> "${EFSTAB}"
-            fi
-            mount "${N}" "${FS_DIR}"
-        else
-            echo "${FS_DIR} is already mounted:"
-            mount | grep "${FS_DIR}"
-        fi
-    fi
-done
+# Verify mounts
+df -h | grep -E "oracle|stage" || echo "WARNING: Volumes not mounted"
 
-# Set ownership and permissions
-chown oracle:dba /oracle/software 2>/dev/null || true
-chown oracle:dba /stage 2>/dev/null || true
-chmod -R 777 /stage 2>/dev/null || true
-chmod -R 777 /oracle/software 2>/dev/null || true
+# Set ownership and permissions if volumes are mounted
+if mountpoint -q /oracle/software; then
+    chown oracle:dba /oracle/software 2>/dev/null || true
+    chmod -R 777 /oracle/software 2>/dev/null || true
+fi
+
+if mountpoint -q /stage; then
+    chown oracle:dba /stage 2>/dev/null || true
+    chmod -R 777 /stage 2>/dev/null || true
+fi
 dd if=/dev/zero of=/root/myswapfile bs=1M count=1024
 chmod 600 /root/myswapfile
 mkswap /root/myswapfile
