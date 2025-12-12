@@ -46,28 +46,57 @@ mkdir -p /oracle/software
 mkdir -p /stage
 
 # Mount EBS volumes
-# nvme0n1 is the root volume
-# nvme1n1 should be the first attached EBS volume (oracle software)
-# nvme2n1 should be the second attached EBS volume (stage)
+# Use lsblk to identify volumes by size
+# 200GB volume = /oracle/software (oracle home)
+# 150GB volume = /stage
 
-echo "Attempting to mount /dev/nvme1n1 to /oracle/software"
-if [ -b /dev/nvme1n1 ]; then
-    if ! grep -q "/oracle/software" /etc/fstab; then
-        echo "/dev/nvme1n1 /oracle/software ext4 defaults,nofail 0 2" >> /etc/fstab
+echo "Detecting volume sizes..."
+lsblk -b -n -o NAME,SIZE,TYPE | grep disk
+
+# Find the 200GB volume (approximately 200*1024^3 = 214748364800 bytes)
+# And 150GB volume (approximately 150*1024^3 = 161061273600 bytes)
+ORACLE_SOFTWARE=""
+STAGE=""
+
+for dev in /dev/nvme*n1; do
+    if [ "$dev" == "/dev/nvme0n1" ]; then
+        continue  # Skip root volume
     fi
-    mount /dev/nvme1n1 /oracle/software && echo "Successfully mounted /oracle/software" || echo "Failed to mount /oracle/software"
+    
+    size=$(lsblk -b -n -d -o SIZE "$dev")
+    echo "Device $dev has size $size bytes"
+    
+    # Check if size is approximately 200GB (between 190GB and 210GB)
+    if [ "$size" -gt 204010946560 ] && [ "$size" -lt 225485783040 ]; then
+        ORACLE_SOFTWARE="$dev"
+        echo "Found 200GB volume for /oracle/software: $dev"
+    # Check if size is approximately 150GB (between 140GB and 160GB)
+    elif [ "$size" -gt 150323855360 ] && [ "$size" -lt 171798691840 ]; then
+        STAGE="$dev"
+        echo "Found 150GB volume for /stage: $dev"
+    fi
+done
+
+# Mount oracle software volume (200GB)
+if [ -n "$ORACLE_SOFTWARE" ]; then
+    echo "Mounting $ORACLE_SOFTWARE to /oracle/software"
+    if ! grep -q "/oracle/software" /etc/fstab; then
+        echo "$ORACLE_SOFTWARE /oracle/software ext4 defaults,nofail 0 2" >> /etc/fstab
+    fi
+    mount "$ORACLE_SOFTWARE" /oracle/software && echo "Successfully mounted /oracle/software" || echo "Failed to mount /oracle/software"
 else
-    echo "ERROR: /dev/nvme1n1 not found"
+    echo "ERROR: 200GB volume not found"
 fi
 
-echo "Attempting to mount /dev/nvme2n1 to /stage"
-if [ -b /dev/nvme2n1 ]; then
+# Mount stage volume (150GB)
+if [ -n "$STAGE" ]; then
+    echo "Mounting $STAGE to /stage"
     if ! grep -q "/stage" /etc/fstab; then
-        echo "/dev/nvme2n1 /stage ext4 defaults,nofail 0 2" >> /etc/fstab
+        echo "$STAGE /stage ext4 defaults,nofail 0 2" >> /etc/fstab
     fi
-    mount /dev/nvme2n1 /stage && echo "Successfully mounted /stage" || echo "Failed to mount /stage"
+    mount "$STAGE" /stage && echo "Successfully mounted /stage" || echo "Failed to mount /stage"
 else
-    echo "ERROR: /dev/nvme2n1 not found"
+    echo "ERROR: 150GB volume not found"
 fi
 
 # Verify mounts
