@@ -167,6 +167,30 @@ resource "aws_security_group_rule" "egress_https_s3" {
   description       = "Outbound 443 to LAA VPC Endpoint SG"
 }
 
+resource "aws_security_group_rule" "egress_http_internet" {
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+  
+  type              = "egress"
+  security_group_id = aws_security_group.ec2_sg[0].id
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  description       = "Outbound HTTP for yum repositories"
+}
+
+resource "aws_security_group_rule" "egress_https_internet" {
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+  
+  type              = "egress"
+  security_group_id = aws_security_group.ec2_sg[0].id
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  description       = "Outbound HTTPS for yum repositories and SSM"
+}
+
 resource "aws_security_group_rule" "egress_admin_vpc" {
   count             = contains(["test", "preproduction"], local.environment) ? 1 : 0
 
