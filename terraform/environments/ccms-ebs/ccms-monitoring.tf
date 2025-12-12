@@ -1,7 +1,7 @@
 # DDoS Alarm
 
 resource "aws_cloudwatch_metric_alarm" "ddos_attack_external_ebsapps_alb" {
-  count               = local.is-development ? 0 : 1
+  count               = local.is-development ? 1 : 0
   alarm_name          = "DDoSDetectedEBSALB"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = "3"
