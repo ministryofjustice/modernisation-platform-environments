@@ -84,11 +84,6 @@ resource "aws_instance" "oas_app_instance_new" {
     network_interface_id = aws_network_interface.oas_eni_new[0].id
   }
 
-  depends_on = [
-    aws_volume_attachment.oas_EC2ServerVolume01_new,
-    aws_volume_attachment.oas_EC2ServerVolume02_new
-  ]
-
   root_block_device {
     delete_on_termination = false
     encrypted             = true 
