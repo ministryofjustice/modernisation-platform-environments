@@ -160,11 +160,23 @@ ntp_config
 # Install required packages (moved to end to not block critical mount operations)
 echo "Installing required packages..."
 cd /tmp
+
+# Disable deltarpm and prestodelta to avoid 404 errors and timeouts
+sed -i 's/^deltarpm=.*/deltarpm=0/' /etc/yum.conf
+if ! grep -q "^deltarpm=" /etc/yum.conf; then
+    echo "deltarpm=0" >> /etc/yum.conf
+fi
+
+# Disable prestodelta in EPEL repo
+if [ -f /etc/yum.repos.d/epel.repo ]; then
+    sed -i '/^\[epel\]/a deltarpm=0' /etc/yum.repos.d/epel.repo
+fi
+
+yum clean all
 yum -y install sshpass
 yum -y install jq
 yum -y install xorg-x11-xauth
 yum -y install xclock xterm
-yum -y install nvme-cli
 
 # Install and configure SSM agent and firewall
 yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
