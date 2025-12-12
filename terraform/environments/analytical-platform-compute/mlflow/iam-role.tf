@@ -3,7 +3,7 @@ module "mlflow_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "5.59.0"
+  version = "6.2.3"
 
   role_name_prefix = "mlflow"
 
