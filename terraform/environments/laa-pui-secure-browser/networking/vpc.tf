@@ -7,7 +7,7 @@ module "vpc" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/vpc/aws"
-  version = "5.21.0"
+  version = "6.5.1"
 
   name            = "${local.vpc_name}-${local.environment}-secure-browser"
   azs             = local.wssb_supported_az_names
