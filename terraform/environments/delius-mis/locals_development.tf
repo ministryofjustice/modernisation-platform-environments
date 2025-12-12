@@ -35,10 +35,10 @@ locals {
     # }
   }
   bcs_config_dev = {
-    instance_count = 1
+    instance_count = 0
     ami_name       = "base_rhel_8_5_2023-07-01T00-00-47.469Z"
     ami_owner      = local.environment_management.account_ids["core-shared-services-production"]
-    ansible_branch = "TM-1748/ndmis/rebuild-bip-as-linux"
+    ansible_branch = "TM-1748/ndmis/rebuild-bip-as-linux-v2"
     ebs_volumes = {
       "/dev/sda1" = { label = "root", size = 150, type = "gp3" }
       "/dev/sdb"  = { label = "data", size = 100, type = "gp3" }
@@ -57,12 +57,6 @@ locals {
       metadata_options_http_tokens = "required"
       monitoring                   = true
       ebs_block_device_inline      = true
-
-      private_dns_name_options = {
-        enable_resource_name_dns_aaaa_record = false
-        enable_resource_name_dns_a_record    = true
-        hostname_type                        = "resource-name"
-      }
 
       tags = merge(
         local.tags,
@@ -103,12 +97,6 @@ locals {
       monitoring                   = true
       ebs_block_device_inline      = true
 
-      private_dns_name_options = {
-        enable_resource_name_dns_aaaa_record = false
-        enable_resource_name_dns_a_record    = true
-        hostname_type                        = "resource-name"
-      }
-
       tags = merge(
         local.tags,
         { backup = true }
@@ -147,12 +135,6 @@ locals {
       metadata_options_http_tokens = "required"
       monitoring                   = true
       ebs_block_device_inline      = true
-
-      private_dns_name_options = {
-        enable_resource_name_dns_aaaa_record = false
-        enable_resource_name_dns_a_record    = true
-        hostname_type                        = "resource-name"
-      }
 
       tags = merge(
         local.tags,
