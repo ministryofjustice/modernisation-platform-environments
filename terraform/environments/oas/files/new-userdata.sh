@@ -1,21 +1,16 @@
 #!/bin/bash
+set -x  # Enable debug mode
+exec > >(tee /var/log/userdata.log)
+exec 2>&1
 
-cd /tmp
-yum -y install sshpass
-yum -y install jq
-sudo yum -y install xorg-x11-xauth
-sudo yum -y install xclock xterm
-sudo yum -y install nvme-cli
+# Create marker file to prove userdata started
+echo "Userdata started at $(date)" > /tmp/userdata_started
 
+# Set hostname (quick operation)
 hostnamectl set-hostname oas
 
+# Update DNS resolv.conf (quick operation)
 sed -i '2s/.*/search $${dns_zone_name} eu-west-2.compute.internal/' /etc/resolv.conf
-
-yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
-systemctl start amazon-ssm-agent
-systemctl enable amazon-ssm-agent
-systemctl stop firewalld
-systemctl disable firewalld
 
 # Function to wait for EBS volumes to be attached
 wait_for_volumes() {
@@ -91,12 +86,15 @@ if mountpoint -q /stage; then
     chown oracle:dba /stage 2>/dev/null || echo "oracle user not found, skipping chown"
     chmod 777 /stage
 fi
+
+# Configure swap file
 dd if=/dev/zero of=/root/myswapfile bs=1M count=1024
 chmod 600 /root/myswapfile
 mkswap /root/myswapfile
 swapon /root/myswapfile
 echo "/root/myswapfile swap swap defaults 0 0" >> /etc/fstab
 
+# Function to configure NTP based on RHEL version
 ntp_config(){
     local RHEL=$(cat /etc/redhat-release | cut -d. -f1 | awk '{print $NF}')
     local SOURCE=169.254.169.123
@@ -129,3 +127,21 @@ ntp_config(){
 
 # Configure NTP
 ntp_config
+
+# Install required packages (moved to end to not block critical mount operations)
+echo "Installing required packages..."
+cd /tmp
+yum -y install sshpass
+yum -y install jq
+yum -y install xorg-x11-xauth
+yum -y install xclock xterm
+yum -y install nvme-cli
+
+# Install and configure SSM agent and firewall
+yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
+systemctl start amazon-ssm-agent
+systemctl enable amazon-ssm-agent
+systemctl stop firewalld
+systemctl disable firewalld
+
+echo "Userdata script completed at $(date)"
