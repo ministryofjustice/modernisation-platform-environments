@@ -1,7 +1,7 @@
 # DDoS Alarm
 
 resource "aws_cloudwatch_metric_alarm" "ddos_attack_external_ebsapps_alb" {
-  count               = local.is-development ? 1 : 0
+
   alarm_name          = "DDoSDetectedEBSALB"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = "3"
@@ -15,28 +15,28 @@ resource "aws_cloudwatch_metric_alarm" "ddos_attack_external_ebsapps_alb" {
   alarm_actions       = [aws_sns_topic.ddos_alarm.arn]
   ok_actions          = [aws_sns_topic.ddos_alarm.arn]
   dimensions = {
-    ResourceArn = aws_lb.ebsapps_lb[0].arn
+    ResourceArn = aws_lb.ebsapps_internal_alb.arn
   }
 }
 
-resource "aws_cloudwatch_metric_alarm" "ddos_attack_external_ebsapps_nlb" {
-  count               = local.is-development ? 0 : 1
-  alarm_name          = "DDoSDetectedEBSNLB"
-  comparison_operator = "GreaterThanThreshold"
-  evaluation_periods  = "3"
-  metric_name         = "DDoSDetected"
-  namespace           = "AWS/DDoSProtection"
-  period              = "60"
-  statistic           = "Average"
-  threshold           = "0"
-  alarm_description   = "Triggers when AWS Shield Advanced detects a DDoS attack"
-  treat_missing_data  = "notBreaching"
-  alarm_actions       = [aws_sns_topic.ddos_alarm.arn]
-  ok_actions          = [aws_sns_topic.ddos_alarm.arn]
-  dimensions = {
-    ResourceArn = aws_lb.ebsapps_nlb[0].arn
-  }
-}
+# resource "aws_cloudwatch_metric_alarm" "ddos_attack_external_ebsapps_nlb" {
+#   count               = local.is-development ? 0 : 1
+#   alarm_name          = "DDoSDetectedEBSNLB"
+#   comparison_operator = "GreaterThanThreshold"
+#   evaluation_periods  = "3"
+#   metric_name         = "DDoSDetected"
+#   namespace           = "AWS/DDoSProtection"
+#   period              = "60"
+#   statistic           = "Average"
+#   threshold           = "0"
+#   alarm_description   = "Triggers when AWS Shield Advanced detects a DDoS attack"
+#   treat_missing_data  = "notBreaching"
+#   alarm_actions       = [aws_sns_topic.ddos_alarm.arn]
+#   ok_actions          = [aws_sns_topic.ddos_alarm.arn]
+#   dimensions = {
+#     ResourceArn = aws_lb.ebsapps_nlb[0].arn
+#   }
+# }
 
 # resource "aws_cloudwatch_metric_alarm" "ddos_attack_external_webgate_alb" {
 #   alarm_name          = "DDoSDetectedWebGateALB"
