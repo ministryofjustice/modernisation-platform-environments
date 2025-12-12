@@ -26,6 +26,14 @@ module "vpc" {
   enable_nat_gateway = true
   one_nat_gateway_per_az = true
   create_multiple_public_route_tables = true
+  
+  public_subnet_tags = {
+    SubnetType = "Public"
+  }
+
+  private_subnet_tags = {
+    SubnetType = "Private"
+  }
 
   tags = merge({
     Terraform = "true"
