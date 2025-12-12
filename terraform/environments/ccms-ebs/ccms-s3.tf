@@ -93,6 +93,17 @@ data "aws_iam_policy_document" "artefacts_s3_policy" {
     actions   = ["s3:GetObject"]
     resources = ["arn:aws:s3:::${local.artefact_bucket_name}/*"]
   }
+  statement {
+    principals {
+      type = "Service"
+      identifiers = ["s3.amazonaws.com"]
+    }
+    actions = [
+          "kms:GenerateDataKey*",
+          "kms:Decrypt"
+        ]
+    resources = [aws_sns_topic.s3_topic.arn]
+  }
 }
 
 # S3 Bucket - Logging
@@ -200,6 +211,17 @@ data "aws_iam_policy_document" "logging_s3_policy" {
       values   = ["${data.aws_caller_identity.current.account_id}"]
     }
   }
+  statement {
+    principals {
+      type = "Service"
+      identifiers = ["s3.amazonaws.com"]
+    }
+    actions = [
+          "kms:GenerateDataKey*",
+          "kms:Decrypt"
+        ]
+    resources = [aws_sns_topic.s3_topic.arn]
+  }
 }
 
 # S3 Bucket - R-sync
@@ -297,6 +319,17 @@ data "aws_iam_policy_document" "dbbackup_s3_policy" {
       "s3:PutObject"
     ]
     resources = ["${module.s3-bucket-dbbackup.bucket.arn}/*"]
+  }
+  statement {
+    principals {
+      type = "Service"
+      identifiers = ["s3.amazonaws.com"]
+    }
+    actions = [
+          "kms:GenerateDataKey*",
+          "kms:Decrypt"
+        ]
+    resources = [aws_sns_topic.s3_topic.arn]
   }
 }
 #For shared bucket lifecycle rule is not needed as it host lambda application source code
