@@ -7,6 +7,7 @@ resource "aws_security_group" "bps" {
 resource "aws_security_group_rule" "bps_ingress" {
   for_each = {
     all-from-bcs = { source_security_group_id = aws_security_group.bcs.id }
+    all-from-bws = { source_security_group_id = aws_security_group.bws.id }
   }
 
   description              = each.key
