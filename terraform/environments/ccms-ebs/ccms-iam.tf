@@ -512,7 +512,8 @@ data "aws_iam_policy_document" "cloudwatch_sns_encryption" {
       type = "Service"
       identifiers = [
         "cloudwatch.amazonaws.com",
-        "events.amazonaws.com"
+        "events.amazonaws.com",
+        "lambda.amazonaws.com"
       ]
     }
     actions = [
