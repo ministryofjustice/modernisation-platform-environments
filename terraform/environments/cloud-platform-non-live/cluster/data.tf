@@ -12,21 +12,30 @@ data "aws_subnets" "eks_private" {
     name   = "vpc-id"
     values = [data.aws_vpc.selected.id]
   }
-  filter {
-    name   = "tag:Name"
-    values = ["cloud-platform-non-live-*-private-*"]
+  tags = {
+    SubnetType = "EKS-Private"
   }
 }
 
-data "aws_subnets" "eks_public" {
+data "aws_subnets" "private" {
 
   filter {
     name   = "vpc-id"
     values = [data.aws_vpc.selected.id]
   }
+  tags = {
+    SubnetType = "Private"
+  }
+}
+
+data "aws_subnets" "public" {
+
   filter {
-    name   = "tag:Name"
-    values = ["cloud-platform-non-live-*-public-*"]
+    name   = "vpc-id"
+    values = [data.aws_vpc.selected.id]
+  }
+  tags = {
+    SubnetType = "Public"
   }
 }
 
