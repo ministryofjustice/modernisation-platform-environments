@@ -8,10 +8,8 @@ from typing import Any, Dict, Literal
 
 import boto3
 from botocore.exceptions import ClientError, BotoCoreError
-from typing import cast
-from mypy_boto3_wafv2.type_defs import RuleActionOutputTypeDef
-
-
+# from typing import cast
+# from mypy_boto3_wafv2.type_defs import RuleActionOutputTypeDef
 
 # ---------------------------------------------------------------------------
 # Logging setup
@@ -81,24 +79,21 @@ WafMode = Literal["BLOCK", "ALLOW"]
 # Helpers
 # ---------------------------------------------------------------------------
 
-def _desired_action(mode: WafMode) -> RuleActionOutputTypeDef:
+def _desired_action(mode: WafMode) -> Dict[str, Any]:
     """Return WAF Action structure for direct rules."""
     if mode == "BLOCK":
         if CUSTOM_BODY_HTML.strip():
-            return cast(
-                RuleActionOutputTypeDef,
-                {
-                    "Block": {
-                        "CustomResponse": {
-                            "ResponseCode": 503,
-                            "CustomResponseBodyKey": CUSTOM_BODY_NAME,
-                        }
+            return {
+                "Block": {
+                    "CustomResponse": {
+                        "ResponseCode": 503,
+                        "CustomResponseBodyKey": CUSTOM_BODY_NAME,
                     }
                 }
-            )
-        return cast(RuleActionOutputTypeDef, {"Block": {}})
+            }
+        return {"Block": {}}
     if mode == "ALLOW":
-        return cast(RuleActionOutputTypeDef, {"Allow": {}})
+        return {"Allow": {}}
 
     # Should not be reachable if we validate mode correctly
     raise ValueError(f"Unsupported mode: {mode}")
