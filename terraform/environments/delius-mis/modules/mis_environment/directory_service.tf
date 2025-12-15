@@ -83,6 +83,26 @@ resource "aws_directory_service_log_subscription" "active_directory" {
 }
 
 ###
+# Administration EC2 instance
+# - Creation of instance is click-ops but we can manage the SG in code
+###
+
+resource "aws_security_group" "mis_ad_management" {
+  name        = "${var.env_name}-ad-management"
+  description = "Security Group for Directory Service Management Instance"
+  vpc_id      = var.account_info.vpc_id
+}
+
+resource "aws_vpc_security_group_engress_rule" "mis_ad_management" {
+  # equivalent of AmazonSSMDirectoryServiceSecurityGroup default rule
+  cidr_ipv4         = "0.0.0.0/0"
+  description       = "Allow all egress"
+  ip_protocol       = -1
+  security_group_id = aws_security_group.mis_ad_management.id
+  tags              = var.tags
+}
+
+###
 # Route 53 Resolver setup
 ###
 
