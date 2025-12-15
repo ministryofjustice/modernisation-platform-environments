@@ -26,8 +26,8 @@ resource "aws_secretsmanager_secret_version" "alerts_subscription_email" {
 }
 
 resource "aws_sns_topic" "cw_alerts" {
-  name            = "ccms-ebs-ec2-alerts"
-  delivery_policy = <<EOF
+  name              = "ccms-ebs-ec2-alerts"
+  delivery_policy   = <<EOF
 {
   "http": {
     "defaultHealthyRetryPolicy": {
@@ -47,7 +47,7 @@ resource "aws_sns_topic" "cw_alerts" {
 }
 EOF
   kms_master_key_id = aws_kms_key.cloudwatch_sns_alerts_key.id
-  tags = merge(local.tags, 
+  tags = merge(local.tags,
     { Name = "${local.application_name}-ec2-alerts" }
   )
 }
@@ -92,8 +92,8 @@ resource "aws_sns_topic_subscription" "ddos_subscription" {
 
 #--Altering SNS
 resource "aws_sns_topic" "guardduty_alerts" {
-  name            = "${local.application_name}-guardduty-alerts"
-  delivery_policy = <<EOF
+  name              = "${local.application_name}-guardduty-alerts"
+  delivery_policy   = <<EOF
 {
   "http": {
     "defaultHealthyRetryPolicy": {
@@ -113,7 +113,7 @@ resource "aws_sns_topic" "guardduty_alerts" {
 }
 EOF
   kms_master_key_id = aws_kms_key.cloudwatch_sns_alerts_key.id
-  tags = merge(local.tags, 
+  tags = merge(local.tags,
     { Name = "${local.application_name}-guardduty-alerts" }
   )
 }

@@ -52,7 +52,7 @@ locals {
 ### EC2 Network Interface (ENI)
 ######################################
 resource "aws_network_interface" "oas_eni_new" {
-  count     = contains(["test", "preproduction"], local.environment) ? 1 : 0
+  count           = contains(["test", "preproduction"], local.environment) ? 1 : 0
   subnet_id       = data.aws_subnet.private_subnets_a.id
   private_ips     = [local.application_data.accounts[local.environment].ec2_private_ip]
   security_groups = [aws_security_group.ec2_sg[0].id]
@@ -86,7 +86,7 @@ resource "aws_instance" "oas_app_instance_new" {
 
   root_block_device {
     delete_on_termination = false
-    encrypted             = true 
+    encrypted             = true
     volume_size           = 40
     volume_type           = "gp2"
     tags = merge(

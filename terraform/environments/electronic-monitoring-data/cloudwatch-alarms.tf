@@ -35,10 +35,10 @@ resource "aws_cloudwatch_metric_alarm" "clean_mdss_dlq_alarm" {
   threshold           = 0
   treat_missing_data  = "notBreaching"
 
-  metric_name   = "ApproximateNumberOfMessagesVisible"
-  namespace     = "AWS/SQS"
-  period        = 60
-  statistic     = "Sum"
+  metric_name = "ApproximateNumberOfMessagesVisible"
+  namespace   = "AWS/SQS"
+  period      = 60
+  statistic   = "Sum"
 
   dimensions = {
     QueueName = aws_sqs_queue.clean_mdss_load_dlq.name

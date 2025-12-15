@@ -53,15 +53,15 @@ This document covers the set up of MCP servers for use within [GitHub Copilot Ch
 
 | Server                                         | Documentation                                                              |
 | ---------------------------------------------- | -------------------------------------------------------------------------- |
-| `awslabs.aws-diagram-mcp-server`               | https://awslabs.github.io/mcp/servers/aws-diagram-mcp-server               |
-| `awslabs.billing-cost-management-mcp-server`   | https://awslabs.github.io/mcp/servers/billing-cost-management-mcp-server   |
-| `awslabs.cloudtrail-mcp-server`                | https://awslabs.github.io/mcp/servers/cloudtrail-mcp-server                |
-| `awslabs.cloudwatch-mcp-server`                | https://awslabs.github.io/mcp/servers/cloudwatch-mcp-server                |
-| `awslabs.cost-explorer-mcp-server`             | https://awslabs.github.io/mcp/servers/cost-explorer-mcp-server             |
-| `awslabs.eks-mcp-server`                       | https://awslabs.github.io/mcp/servers/eks-mcp-server                       |
-| `awslabs.iam-mcp-server`                       | https://awslabs.github.io/mcp/servers/iam-mcp-server                       |
-| `awslabs.aws-pricing-mcp-server`               | https://awslabs.github.io/mcp/servers/aws-pricing-mcp-server               |
-| `awslabs.terraform-mcp-server`                 | https://awslabs.github.io/mcp/servers/terraform-mcp-server                 |
-| `awslabs.well-architected-security-mcp-server` | https://awslabs.github.io/mcp/servers/well-architected-security-mcp-server |
-| `github`                                       | https://github.com/github/github-mcp-server                                |
-| `hashicorp.terraform-mcp-server`               | https://developer.hashicorp.com/terraform/mcp-server                       |
+| `awslabs.aws-diagram-mcp-server`               | <https://awslabs.github.io/mcp/servers/aws-diagram-mcp-server>               |
+| `awslabs.billing-cost-management-mcp-server`   | <https://awslabs.github.io/mcp/servers/billing-cost-management-mcp-server>   |
+| `awslabs.cloudtrail-mcp-server`                | <https://awslabs.github.io/mcp/servers/cloudtrail-mcp-server>                |
+| `awslabs.cloudwatch-mcp-server`                | <https://awslabs.github.io/mcp/servers/cloudwatch-mcp-server>                |
+| `awslabs.cost-explorer-mcp-server`             | <https://awslabs.github.io/mcp/servers/cost-explorer-mcp-server>             |
+| `awslabs.eks-mcp-server`                       | <https://awslabs.github.io/mcp/servers/eks-mcp-server>                       |
+| `awslabs.iam-mcp-server`                       | <https://awslabs.github.io/mcp/servers/iam-mcp-server>                       |
+| `awslabs.aws-pricing-mcp-server`               | <https://awslabs.github.io/mcp/servers/aws-pricing-mcp-server>               |
+| `awslabs.terraform-mcp-server`                 | <https://awslabs.github.io/mcp/servers/terraform-mcp-server>                 |
+| `awslabs.well-architected-security-mcp-server` | <https://awslabs.github.io/mcp/servers/well-architected-security-mcp-server> |
+| `github`                                       | <https://github.com/github/github-mcp-server>                                |
+| `hashicorp.terraform-mcp-server`               | <https://developer.hashicorp.com/terraform/mcp-server>                       |

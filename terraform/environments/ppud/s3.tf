@@ -1384,11 +1384,11 @@ resource "aws_s3_bucket_public_access_block" "moj-log-files-dev" {
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "moj-log-files-dev" {
-  count         = local.is-development == true ? 1 : 0
-  bucket        = aws_s3_bucket.moj-log-files-dev[0].id
+  count  = local.is-development == true ? 1 : 0
+  bucket = aws_s3_bucket.moj-log-files-dev[0].id
   rule {
     apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256" 
+      sse_algorithm = "AES256"
     }
   }
 }

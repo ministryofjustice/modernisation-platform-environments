@@ -1,8 +1,8 @@
 # SNS Topic for Slack Alerts
 
 resource "aws_sns_topic" "cloudwatch_slack" {
-  name            = "cloudwatch-slack-alerts"
-  delivery_policy = <<EOF
+  name              = "cloudwatch-slack-alerts"
+  delivery_policy   = <<EOF
 {
   "http": {
     "defaultHealthyRetryPolicy": {
@@ -22,8 +22,8 @@ resource "aws_sns_topic" "cloudwatch_slack" {
 }
 EOF
   kms_master_key_id = aws_kms_key.cloudwatch_sns_alerts_key.id
-  tags = merge(local.tags, 
-  { Name = "cloudwatch-slack-alerts" }
+  tags = merge(local.tags,
+    { Name = "cloudwatch-slack-alerts" }
   )
 }
 
@@ -40,8 +40,8 @@ resource "aws_sns_topic_subscription" "cloudwatch_alerts" {
 
 #--Altering SNS
 resource "aws_sns_topic" "guardduty_alerts" {
-  name            = "${local.application_data.accounts[local.environment].app_name}-guardduty-alerts"
-  delivery_policy = <<EOF
+  name              = "${local.application_data.accounts[local.environment].app_name}-guardduty-alerts"
+  delivery_policy   = <<EOF
 {
   "http": {
     "defaultHealthyRetryPolicy": {
@@ -61,7 +61,7 @@ resource "aws_sns_topic" "guardduty_alerts" {
 }
 EOF
   kms_master_key_id = aws_kms_key.cloudwatch_sns_alerts_key.id
-  tags = merge(local.tags, 
+  tags = merge(local.tags,
     { Name = "cloudwatch-slack-alerts" }
   )
 }

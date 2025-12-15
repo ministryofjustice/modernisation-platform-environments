@@ -15,14 +15,14 @@ resource "aws_network_interface" "oas_eni" {
 }
 
 resource "aws_instance" "oas_app_instance" {
-  count                       = local.environment == "development" ? 1 : 0
-  ami                         = local.application_data.accounts[local.environment].ec2amiid
+  count = local.environment == "development" ? 1 : 0
+  ami   = local.application_data.accounts[local.environment].ec2amiid
   # associate_public_ip_address = false
-  availability_zone           = "eu-west-2a"
-  ebs_optimized               = true
-  instance_type               = local.application_data.accounts[local.environment].ec2instancetype
+  availability_zone = "eu-west-2a"
+  ebs_optimized     = true
+  instance_type     = local.application_data.accounts[local.environment].ec2instancetype
   # vpc_security_group_ids      = [aws_security_group.ec2.id]
-  monitoring                   = true
+  monitoring = true
   # subnet_id                   = data.aws_subnet.private_subnets_a.id
   iam_instance_profile        = aws_iam_instance_profile.ec2_instance_profile[0].id
   user_data_replace_on_change = true
@@ -53,7 +53,7 @@ resource "aws_instance" "oas_app_instance" {
 }
 
 resource "aws_security_group" "ec2" {
-  count       = local.environment == "development" ? 1 : 0
+  count = local.environment == "development" ? 1 : 0
 
   name        = local.application_name
   description = "OAS DB Server Security Group"
