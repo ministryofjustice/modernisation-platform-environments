@@ -120,7 +120,7 @@ resource "aws_lambda_permission" "allow_sns_invoke" {
   source_arn    = aws_sns_topic.alerts.arn
 }
 
-resource "aws_lambda_permission" "allow_sns_invoke" {
+resource "aws_lambda_permission" "allow_sns_invoke_guardduty" {
   statement_id  = "AllowExecutionFromGuardDutySNS"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.cloudwatch_sns.function_name
