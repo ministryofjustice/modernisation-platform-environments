@@ -40,7 +40,16 @@ resource "aws_iam_role_policy" "lambda_cloudwatch_sns_policy" {
           "logs:PutLogEvents"
         ]
         Resource = "arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${aws_lambda_function.cloudwatch_sns.function_name}:*"
+      },
+        {
+        Effect = "Allow"
+        Action = [
+          "kms:GenerateDataKey*",
+          "kms:Decrypt"
+        ]
+        Resource = [aws_kms_key.cloudwatch_sns_alerts_key.arn]
       }
+      
     ]
   })
 }
@@ -106,6 +115,14 @@ resource "aws_lambda_function" "cloudwatch_sns" {
 
 resource "aws_lambda_permission" "allow_sns_invoke" {
   statement_id  = "AllowExecutionFromSNS"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.cloudwatch_sns.function_name
+  principal     = "sns.amazonaws.com"
+  source_arn    = aws_sns_topic.cloudwatch_alerts.arn
+}
+
+resource "aws_lambda_permission" "allow_sns_invoke_guardduty" {
+  statement_id  = "AllowExecutionFromGuardDutySNS"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.cloudwatch_sns.function_name
   principal     = "sns.amazonaws.com"
