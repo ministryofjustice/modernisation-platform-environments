@@ -234,3 +234,57 @@ data "aws_iam_policy_document" "cloudwatch_alerting_sns" {
     }
   }
 }
+
+resource "aws_kms_key" "cloudwatch_sns_alerts_key" {
+  description             = "KMS Key for CloudWatch SNS Alerts Encryption"
+  deletion_window_in_days = 30
+
+  tags = merge(local.tags,
+    { Name = lower(format("%s-%s-cloudwatch-sns-alerts-kms-key", local.application_name, local.environment)) }
+  )
+}
+
+resource "aws_kms_alias" "alias" {
+  name          = "alias/cloudwatch-sns-alerts-key"
+  target_key_id = aws_kms_key.cloudwatch_sns_alerts_key.id
+}
+
+resource "aws_kms_key_policy" "sns_alerts_key_policy" {
+  key_id = aws_kms_key.cloudwatch_sns_alerts_key.id
+  policy = data.aws_iam_policy_document.cloudwatch_sns_encryption.json
+}
+
+data "aws_iam_policy_document" "cloudwatch_sns_encryption" {
+  version = "2012-10-17"
+  statement {
+    sid    = "AllowCloudWatchSNSUseOfTheKey"
+    effect = "Allow"
+    principals {
+      type = "Service"
+      identifiers = [
+        "cloudwatch.amazonaws.com",
+        "events.amazonaws.com"
+      ]
+    }
+    actions = [
+      "kms:GenerateDataKey*",
+      "kms:Decrypt"
+    ]
+    resources = [
+      "*"
+    ]
+  }
+
+  # Allow account root full access (required!)
+  statement {
+    sid    = "AllowAccountAdmins"
+    effect = "Allow"
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+    }
+    actions   = ["kms:*"]
+    resources = ["*"]
+  }
+
+}

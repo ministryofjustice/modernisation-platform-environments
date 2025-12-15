@@ -6,7 +6,7 @@
       "WAM_ALB": "WAM-ALB-DEV",
       "patch_group": "dev_win_patch",
       "patch_maintenance_window_name": "dev_patch_maintenance_window",
-      "patch_maintenance_schedule_cron": "cron(0 19 ? * 5#2 *)",
+      "patch_maintenance_schedule_cron": "cron(0 19 ? * 6#2 *)",
       "patch_maintenance_window_duration": 3,
       "maintenance_window_target_name": "development_maintenance_window_target",
       "maintenance_window_target_description": "This is the dev patch maintenance window target",
@@ -28,7 +28,7 @@
       "PPUD_Target": "PPUD",
       "patch_group": "uat_win_patch",
       "patch_maintenance_window_name": "uat_patch_maintenance_window",
-      "patch_maintenance_schedule_cron": "cron(0 19 ? * 5#2 *)",
+      "patch_maintenance_schedule_cron": "cron(0 19 ? * 6#2 *)",
       "patch_maintenance_window_duration": 3,
       "maintenance_window_target_name": "uat_patch_maintenance_window_target",
       "maintenance_window_target_description": "This is the uat patch maintenance window target",
@@ -60,7 +60,8 @@
       "pre_healthcheck_Priority": 1,
       "post_healthcheck_Priority": 20,
       "ssm_health_check_reports_s3": "moj-log-files-prod",
-      "cloudwatch_sns_topic_name": "ppud-prod-cw-alerts"
+      "cloudwatch_sns_topic_name": "ppud-prod-cw-alerts",
+      "cloudwatch_sns_std_and_sms_topic_name": "ppud-prod-cw-std-and-sms-alerts"
     }
   }
 }

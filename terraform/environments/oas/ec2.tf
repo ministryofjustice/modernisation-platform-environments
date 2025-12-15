@@ -3,9 +3,10 @@ data "local_file" "userdata" {
 }
 
 resource "aws_network_interface" "oas_eni" {
+  count           = local.environment == "development" ? 1 : 0
   subnet_id       = data.aws_subnet.private_subnets_a.id
   private_ips     = ["10.26.56.108"]
-  security_groups = [aws_security_group.ec2.id]
+  security_groups = [aws_security_group.ec2[0].id]
 
   tags = merge(
     local.tags,
@@ -14,7 +15,8 @@ resource "aws_network_interface" "oas_eni" {
 }
 
 resource "aws_instance" "oas_app_instance" {
-  ami = local.application_data.accounts[local.environment].ec2amiid
+  count = local.environment == "development" ? 1 : 0
+  ami   = local.application_data.accounts[local.environment].ec2amiid
   # associate_public_ip_address = false
   availability_zone = "eu-west-2a"
   ebs_optimized     = true
@@ -22,14 +24,12 @@ resource "aws_instance" "oas_app_instance" {
   # vpc_security_group_ids      = [aws_security_group.ec2.id]
   monitoring = true
   # subnet_id                   = data.aws_subnet.private_subnets_a.id
-  iam_instance_profile        = aws_iam_instance_profile.ec2_instance_profile.id
+  iam_instance_profile        = aws_iam_instance_profile.ec2_instance_profile[0].id
   user_data_replace_on_change = true
   user_data                   = base64encode(data.local_file.userdata.content)
 
-
-
   network_interface {
-    network_interface_id = aws_network_interface.oas_eni.id
+    network_interface_id = aws_network_interface.oas_eni[0].id
     device_index         = 0
   }
 
@@ -53,6 +53,8 @@ resource "aws_instance" "oas_app_instance" {
 }
 
 resource "aws_security_group" "ec2" {
+  count = local.environment == "development" ? 1 : 0
+
   name        = local.application_name
   description = "OAS DB Server Security Group"
   vpc_id      = data.aws_vpc.shared.id
@@ -285,11 +287,15 @@ resource "aws_security_group" "ec2" {
 }
 
 resource "aws_iam_instance_profile" "ec2_instance_profile" {
+  count = local.environment == "development" ? 1 : 0
+
   name = "${local.application_name}-ec2-profile"
-  role = aws_iam_role.ec2_instance_role.name
+  role = aws_iam_role.ec2_instance_role[0].name
 }
 
 resource "aws_iam_role" "ec2_instance_role" {
+  count = local.environment == "development" ? 1 : 0
+
   name               = "${local.application_name}-role"
   assume_role_policy = <<EOF
 {
@@ -308,17 +314,19 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "ec2_instance_role_attachment" {
-  role       = aws_iam_role.ec2_instance_role.name
+  count = local.environment == "development" ? 1 : 0
+
+  role       = aws_iam_role.ec2_instance_role[0].name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
 resource "aws_iam_role_policy" "ec2_instance_policy" {
+  count = local.environment == "development" ? 1 : 0
+
   #tfsec:ignore:aws-iam-no-policy-wildcards
   name = "${local.application_name}-ec2-policy"
-  role = aws_iam_role.ec2_instance_role.id
+  role = aws_iam_role.ec2_instance_role[0].id
 
-  # Terraform's "jsonencode" function converts a
-  # Terraform expression result to valid JSON syntax.
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -355,6 +363,7 @@ resource "aws_iam_role_policy" "ec2_instance_policy" {
 }
 
 resource "aws_ebs_volume" "EC2ServerVolumeORAHOME" {
+  count             = local.environment == "development" ? 1 : 0
   availability_zone = "eu-west-2a"
   size              = local.application_data.accounts[local.environment].orahomesize
   type              = "gp3"
@@ -373,12 +382,14 @@ resource "aws_ebs_volume" "EC2ServerVolumeORAHOME" {
 }
 
 resource "aws_volume_attachment" "oas_EC2ServerVolume01" {
+  count       = local.environment == "development" ? 1 : 0
   device_name = "/dev/sdb"
-  volume_id   = aws_ebs_volume.EC2ServerVolumeORAHOME.id
-  instance_id = aws_instance.oas_app_instance.id
+  volume_id   = aws_ebs_volume.EC2ServerVolumeORAHOME[0].id
+  instance_id = aws_instance.oas_app_instance[0].id
 }
 
 resource "aws_ebs_volume" "EC2ServerVolumeSTAGE" {
+  count             = local.environment == "development" ? 1 : 0
   availability_zone = "eu-west-2a"
   size              = local.application_data.accounts[local.environment].stageesize
   type              = "gp3"
@@ -397,16 +408,18 @@ resource "aws_ebs_volume" "EC2ServerVolumeSTAGE" {
 }
 
 resource "aws_volume_attachment" "oas_EC2ServerVolume02" {
+  count       = local.environment == "development" ? 1 : 0
   device_name = "/dev/sdc"
-  volume_id   = aws_ebs_volume.EC2ServerVolumeSTAGE.id
-  instance_id = aws_instance.oas_app_instance.id
+  volume_id   = aws_ebs_volume.EC2ServerVolumeSTAGE[0].id
+  instance_id = aws_instance.oas_app_instance[0].id
 }
 
 resource "aws_route53_record" "oas-app" {
+  count    = local.environment == "development" ? 1 : 0
   provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.external.zone_id
   name     = "${local.application_name}.${data.aws_route53_zone.external.name}"
   type     = "A"
   ttl      = 900
-  records  = [aws_instance.oas_app_instance.private_ip]
+  records  = [aws_instance.oas_app_instance[0].private_ip]
 }

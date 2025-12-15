@@ -64,6 +64,14 @@ resource "aws_iam_role_policy" "lambda_policy" {
           "sns:Publish"
         ]
         Resource = [aws_sns_topic.certificate_expiration_alerts.arn]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "kms:GenerateDataKey*",
+          "kms:Decrypt"
+        ]
+        Resource = [aws_kms_key.cloudwatch_sns_alerts_key.arn]
       }
     ]
   })
@@ -71,6 +79,8 @@ resource "aws_iam_role_policy" "lambda_policy" {
 
 resource "aws_sns_topic" "certificate_expiration_alerts" {
   name = "${local.application_name}-${local.environment}-acm-certificate-alerts"
+  kms_master_key_id = aws_kms_key.cloudwatch_sns_alerts_key.id
+
   tags = merge(local.tags, {
     Name = "${local.application_name}-${local.environment}-certificate-monitor"
   })

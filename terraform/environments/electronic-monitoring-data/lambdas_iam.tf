@@ -96,7 +96,7 @@ data "aws_iam_policy_document" "load_json_table_s3_policy_document" {
       "athena:StopQueryExecution"
     ]
     resources = [
-      "arn:aws:athena:${data.aws_region.current.name}:${local.env_account_id}:*/*"
+      "arn:aws:athena:${data.aws_region.current.region}:${local.env_account_id}:*/*"
     ]
   }
   statement {
@@ -113,10 +113,10 @@ data "aws_iam_policy_document" "load_json_table_s3_policy_document" {
       "glue:UpdateTable"
     ]
     resources = [
-      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:catalog",
-      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:schema/*",
-      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/*/*",
-      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/*"
+      "arn:aws:glue:${data.aws_region.current.region}:${local.env_account_id}:catalog",
+      "arn:aws:glue:${data.aws_region.current.region}:${local.env_account_id}:schema/*",
+      "arn:aws:glue:${data.aws_region.current.region}:${local.env_account_id}:table/*/*",
+      "arn:aws:glue:${data.aws_region.current.region}:${local.env_account_id}:database/*"
     ]
   }
   statement {
@@ -267,7 +267,7 @@ resource "aws_iam_role_policy_attachment" "unzipped_presigned_url_s3_policy_poli
 }
 
 #-----------------------------------------------------------------------------------
-# Rotate IAM keys
+# Rotate IAM keys
 #-----------------------------------------------------------------------------------
 
 resource "aws_iam_role" "rotate_iam_keys" {
@@ -654,7 +654,7 @@ data "aws_iam_policy_document" "load_dms_output_lambda_role_policy_document" {
       "athena:StopQueryExecution"
     ]
     resources = [
-      "arn:aws:athena:${data.aws_region.current.name}:${data.aws_caller_identity.current.id}:workgroup/${data.aws_caller_identity.current.id}-default",
+      "arn:aws:athena:${data.aws_region.current.region}:${data.aws_caller_identity.current.id}:workgroup/${data.aws_caller_identity.current.id}-default",
     ]
   }
   statement {
@@ -674,10 +674,10 @@ data "aws_iam_policy_document" "load_dms_output_lambda_role_policy_document" {
       "glue:GetCatalog"
     ]
     resources = [
-      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:catalog",
-      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:database/*",
-      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/*/*",
-      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:userDefinedFunction/*/*",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:catalog",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:database/*",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/*/*",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:userDefinedFunction/*/*",
     ]
   }
   statement {
@@ -727,7 +727,6 @@ module "share_dbs_with_dms_lambda_role" {
   de_role_arn             = null
 }
 
-
 #-----------------------------------------------------------------------------------
 # Load MDSS Data IAM Role
 #-----------------------------------------------------------------------------------
@@ -742,6 +741,7 @@ data "aws_iam_policy_document" "load_mdss_lambda_role_policy_document" {
       "s3:GetObjectAttributes",
       "s3:GetObject",
       "s3:DeleteObject",
+      "s3:DeleteObjects",
     ]
     resources = [
       "${module.s3-create-a-derived-table-bucket.bucket.arn}/staging/allied_mdss${local.db_suffix}_pipeline/*",
@@ -780,7 +780,7 @@ data "aws_iam_policy_document" "load_mdss_lambda_role_policy_document" {
       "athena:StopQueryExecution"
     ]
     resources = [
-      "arn:aws:athena:${data.aws_region.current.name}:${data.aws_caller_identity.current.id}:workgroup/${data.aws_caller_identity.current.id}-default",
+      "arn:aws:athena:${data.aws_region.current.region}:${data.aws_caller_identity.current.id}:workgroup/${data.aws_caller_identity.current.id}-default",
     ]
   }
   statement {
@@ -788,6 +788,7 @@ data "aws_iam_policy_document" "load_mdss_lambda_role_policy_document" {
     effect = "Allow"
     actions = [
       "glue:GetTable",
+      "glue:GetTables",
       "glue:GetDatabase",
       "glue:GetDatabases",
       "glue:CreateTable",
@@ -800,10 +801,10 @@ data "aws_iam_policy_document" "load_mdss_lambda_role_policy_document" {
       "glue:GetCatalog"
     ]
     resources = [
-      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:catalog",
-      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:database/*",
-      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/*/*",
-      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:userDefinedFunction/*/*",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:catalog",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:database/*",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/*/*",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:userDefinedFunction/*/*",
     ]
   }
   statement {
@@ -826,6 +827,19 @@ data "aws_iam_policy_document" "load_mdss_lambda_role_policy_document" {
     effect    = "Allow"
     actions   = ["s3:ListAllMyBuckets", "s3:GetBucketLocation"]
     resources = ["*"]
+  }
+  # MDSS cleanup queue
+  statement {
+    sid    = "AllowMdssCleanupQueueAccess"
+    effect = "Allow"
+    actions = [
+      "sqs:SendMessage",
+      "sqs:ReceiveMessage",
+      "sqs:DeleteMessage",
+      "sqs:GetQueueAttributes",
+      "sqs:GetQueueUrl",
+    ]
+    resources = [aws_sqs_queue.clean_mdss_load_queue.arn]
   }
 }
 
@@ -863,9 +877,6 @@ resource "aws_lakeformation_permissions" "add_create_db" {
   principal        = aws_iam_role.load_mdss[0].arn
   catalog_resource = true
 }
-
-
-
 
 #-----------------------------------------------------------------------------------
 # Load FMS Data IAM Role
@@ -919,7 +930,7 @@ data "aws_iam_policy_document" "load_fms_lambda_role_policy_document" {
       "athena:StopQueryExecution"
     ]
     resources = [
-      "arn:aws:athena:${data.aws_region.current.name}:${data.aws_caller_identity.current.id}:workgroup/${data.aws_caller_identity.current.id}-default",
+      "arn:aws:athena:${data.aws_region.current.region}:${data.aws_caller_identity.current.id}:workgroup/${data.aws_caller_identity.current.id}-default",
     ]
   }
   statement {
@@ -939,10 +950,10 @@ data "aws_iam_policy_document" "load_fms_lambda_role_policy_document" {
       "glue:GetCatalog"
     ]
     resources = [
-      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:catalog",
-      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:database/*",
-      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/*/*",
-      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:userDefinedFunction/*/*",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:catalog",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:database/*",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/*/*",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:userDefinedFunction/*/*",
     ]
   }
   statement {
@@ -1001,4 +1012,205 @@ resource "aws_lakeformation_permissions" "fms_add_create_db" {
   permissions      = ["CREATE_DATABASE", "DROP"]
   principal        = aws_iam_role.load_fms[0].arn
   catalog_resource = true
+}
+
+#-----------------------------------------------------------------------------------
+# Load csv Data IAM Role
+#-----------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "load_historic_csv_lambda_role_policy_document" {
+  statement {
+    sid    = "S3Permissions"
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:GetObjectAttributes",
+      "s3:GetObject",
+      "s3:DeleteObject",
+    ]
+    resources = [
+      "${module.s3-create-a-derived-table-bucket.bucket.arn}/staging/*",
+      "${module.s3-athena-bucket.bucket.arn}/output/*",
+      "${module.s3-athena-bucket.bucket.arn}/*",
+    ]
+  }
+  statement {
+    sid    = "S3GetPermissions"
+    effect = "Allow"
+    actions = [
+      "s3:GetObjectAttributes",
+      "s3:GetObject",
+    ]
+    resources = [
+      "${module.s3-data-bucket.bucket.arn}/*"
+    ]
+  }
+  statement {
+    sid    = "S3ListingPermissions"
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket",
+    ]
+    resources = [
+      module.s3-create-a-derived-table-bucket.bucket.arn
+    ]
+  }
+  statement {
+    sid    = "AthenaPermissionsForLoadData"
+    effect = "Allow"
+    actions = [
+      "athena:StartQueryExecution",
+      "athena:GetQueryExecution",
+      "athena:GetQueryResults",
+      "athena:StopQueryExecution"
+    ]
+    resources = [
+      "arn:aws:athena:${data.aws_region.current.region}:${data.aws_caller_identity.current.id}:workgroup/${data.aws_caller_identity.current.id}-default",
+    ]
+  }
+  statement {
+    sid    = "GluePermissionsForLoad"
+    effect = "Allow"
+    actions = [
+      "glue:GetTable",
+      "glue:GetDatabase",
+      "glue:GetDatabases",
+      "glue:CreateTable",
+      "glue:DeleteTable",
+      "glue:CreateDatabase",
+      "glue:DeleteDatabase",
+      "glue:UpdateTable",
+      "glue:GetPartition",
+      "glue:GetPartitions",
+      "glue:GetCatalog"
+    ]
+    resources = [
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:catalog",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:database/*",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/*/*",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:userDefinedFunction/*/*",
+    ]
+  }
+  statement {
+    sid    = "GetDataAccessAndTagsForLakeFormation"
+    effect = "Allow"
+    actions = [
+      "lakeformation:GetDataAccess",
+      "lakeformation:GetResourceLFTags",
+    ]
+    resources = ["*"]
+  }
+  statement {
+    sid       = "ListAccountAlias"
+    effect    = "Allow"
+    actions   = ["iam:ListAccountAliases"]
+    resources = ["*"]
+  }
+  statement {
+    sid       = "ListAllBucket"
+    effect    = "Allow"
+    actions   = ["s3:ListAllMyBuckets", "s3:GetBucketLocation"]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_role" "load_historic_csv" {
+  name               = "load_historic_csv_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_policy" "load_historic_csv_lambda_role_policy" {
+  name   = "load_historic_csv_lambda_policy"
+  policy = data.aws_iam_policy_document.load_historic_csv_lambda_role_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "load_historic_csv_output_lambda_policy_attachment" {
+  role       = aws_iam_role.load_historic_csv.name
+  policy_arn = aws_iam_policy.load_historic_csv_lambda_role_policy.arn
+}
+
+module "share_db_with_historic_csv_lambda_role_policy_lambda_role" {
+  source                  = "./modules/lakeformation_database_share"
+  dbs_to_grant            = toset(["g4s_lcm${local.db_suffix}"])
+  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+  role_arn                = aws_iam_role.load_historic_csv.arn
+  db_exists               = true ? local.is-production : false
+  de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
+}
+
+resource "aws_lakeformation_permissions" "historic_csv_add_create_db" {
+  permissions      = ["CREATE_DATABASE", "DROP"]
+  principal        = aws_iam_role.load_historic_csv.arn
+  catalog_resource = true
+}
+
+#-----------------------------------------------------------------------------------
+# Clean after MDSS load IAM Role
+#-----------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "clean_after_mdss_load_lambda_role_policy_document" {
+  count = local.is-development ? 0 : 1
+
+  statement {
+    sid    = "GluePermissionsForCleanup"
+    effect = "Allow"
+    actions = [
+      "glue:GetTables",
+      "glue:GetTable",
+      "glue:GetDatabase",
+      "glue:DeleteTable",
+      "glue:DeleteDatabase",
+    ]
+    resources = [
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:catalog",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:database/*",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/*/*",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:userDefinedFunction/*/*",
+    ]
+  }
+
+  statement {
+    sid    = "S3PermissionsForCleanup"
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket",
+      "s3:DeleteObject",
+      "s3:DeleteObjectVersion",
+      "s3:GetBucketLocation",
+    ]
+    resources = [
+      module.s3-create-a-derived-table-bucket.bucket.arn,
+      "${module.s3-create-a-derived-table-bucket.bucket.arn}/*",
+    ]
+  }
+
+  statement {
+    sid    = "LakeFormationGrantRevoke"
+    effect = "Allow"
+    actions = [
+      "lakeformation:GrantPermissions",
+      "lakeformation:RevokePermissions",
+      "lakeformation:ListPermissions",
+      "lakeformation:GetDataAccess",
+    ]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_role" "clean_after_mdss_load" {
+  count              = local.is-development ? 0 : 1
+  name               = "clean_after_mdss_load_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_policy" "clean_after_mdss_load_lambda_role_policy" {
+  count  = local.is-development ? 0 : 1
+  name   = "clean_after_mdss_load_lambda_policy"
+  policy = data.aws_iam_policy_document.clean_after_mdss_load_lambda_role_policy_document[0].json
+}
+
+resource "aws_iam_role_policy_attachment" "clean_after_mdss_load_lambda_policy_attachment" {
+  count      = local.is-development ? 0 : 1
+  role       = aws_iam_role.clean_after_mdss_load[0].name
+  policy_arn = aws_iam_policy.clean_after_mdss_load_lambda_role_policy[0].arn
 }

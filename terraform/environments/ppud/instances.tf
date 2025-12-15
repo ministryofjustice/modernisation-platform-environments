@@ -467,7 +467,7 @@ resource "aws_instance" "s618358rgvw024" {
   }
 }
 
-# WAM Sata Access Server
+# WAM Data Access Server
 
 resource "aws_instance" "s618358rgsw025" {
   # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
@@ -655,6 +655,10 @@ resource "aws_instance" "s618358rgvw021" {
     sqlwriter_service = "true"
     sqlagent_service  = "true"
     sqlserver_backup  = "true"
+    e_volume          = "true"
+    f_volume          = "true"
+    g_volume          = "true"
+    port25_check      = "true"
   }
 }
 
@@ -686,6 +690,9 @@ resource "aws_instance" "s618358rgvw022" {
     spooler_service     = "true"
     port25_check        = "true"
     emailsender_check   = "true"
+    e_volume            = "true"
+    f_volume            = "true"
+    g_volume            = "true"
   }
 }
 
@@ -710,8 +717,10 @@ resource "aws_instance" "s618358rgsw025p" {
   tags = {
     Name           = "s618358rgsw025"
     patch_group    = "prod_win_patch"
+    is-production  = true
     backup         = true
     wwwpub_service = "true"
+    e_volume       = "true"
   }
 }
 
@@ -740,6 +749,10 @@ resource "aws_instance" "s618358rgvw027" {
     wwwpub_service  = "true"
     spooler_service = "true"
     port25_check    = "true"
+    e_volume        = "true"
+    f_volume        = "true"
+    g_volume        = "true"
+    h_volume        = "true"
   }
 }
 

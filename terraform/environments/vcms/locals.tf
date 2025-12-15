@@ -41,7 +41,7 @@ locals {
   }
 
   bastion_config = {}
-  image_tag      = "initial-16447252449-1"
+  image_tag      = "tm-1408-composer-19577361514-1"
   image_uri      = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/vcms:${local.image_tag}"
   app_port       = 80
   internal_security_group_cidrs = distinct(flatten([
@@ -62,6 +62,12 @@ locals {
       "54.228.16.0/26",    # eu-west-1 Region
       "107.23.255.0/26",   # us-east-1 Region
       "54.243.31.192/26"   # us-east-1 Region
+    ],
+    [
+      # Civica secure development environment
+      "4.234.27.250/32",
+      "213.143.143.69/32",
+      "213.143.146.149/32"
     ]
   ]))
   ipv6_cidr_blocks = []
@@ -84,6 +90,8 @@ locals {
 
   app_url                       = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.${local.domain}"
   acm_subject_alternative_names = [local.app_url]
+
+  db_snapshot_identifier = "rds-vcmsdev-db-backup-2025-09-26-14-04-mpcp"
 
 }
 

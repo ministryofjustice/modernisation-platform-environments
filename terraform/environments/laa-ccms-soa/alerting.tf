@@ -37,8 +37,8 @@ module "guardduty_chatbot_prod" {
 
 #--Altering SNS
 resource "aws_sns_topic" "alerts" {
-  name            = "${local.application_data.accounts[local.environment].app_name}-alerts"
-  delivery_policy = <<EOF
+  name              = "${local.application_data.accounts[local.environment].app_name}-alerts"
+  delivery_policy   = <<EOF
 {
   "http": {
     "defaultHealthyRetryPolicy": {
@@ -57,6 +57,10 @@ resource "aws_sns_topic" "alerts" {
   }
 }
 EOF
+  kms_master_key_id = aws_kms_key.cloudwatch_sns_alerts_key.id
+  tags = merge(local.tags,
+    { Name = "${local.application_data.accounts[local.environment].app_name}-alerts" }
+  )
 }
 
 resource "aws_sns_topic_policy" "default" {
@@ -71,8 +75,8 @@ resource "aws_sns_topic_subscription" "alerts" {
 }
 
 resource "aws_sns_topic" "guardduty_alerts" {
-  name            = "${local.application_data.accounts[local.environment].app_name}-guardduty-alerts"
-  delivery_policy = <<EOF
+  name              = "${local.application_data.accounts[local.environment].app_name}-guardduty-alerts"
+  delivery_policy   = <<EOF
 {
   "http": {
     "defaultHealthyRetryPolicy": {
@@ -91,6 +95,10 @@ resource "aws_sns_topic" "guardduty_alerts" {
   }
 }
 EOF
+  kms_master_key_id = aws_kms_key.cloudwatch_sns_alerts_key.id
+  tags = merge(local.tags,
+    { Name = "${local.application_data.accounts[local.environment].app_name}-guardduty-alerts" }
+  )
 }
 
 resource "aws_sns_topic_policy" "guarduty_default" {
@@ -162,15 +170,15 @@ resource "aws_cloudwatch_metric_alarm" "RDS_Disk_Queue_Depth_Over_Threshold" {
 
 resource "aws_cloudwatch_metric_alarm" "RDS_Free_Storage_Space_Over_Threshold" {
   alarm_name          = "${local.application_data.accounts[local.environment].app_name}-RDS-FreeStorageSpace-low-threshold-alarm"
-  alarm_description   = "${local.environment} | ${local.aws_account_id} | RDS Free storage space is below 50 for over 15 minutes"
+  alarm_description   = "${local.environment} | ${local.aws_account_id} | RDS Free storage space is below 35% for over 3 minutes"
   comparison_operator = "LessThanThreshold"
   metric_name         = "FreeStorageSpace"
   statistic           = "Average"
   namespace           = "AWS/RDS"
-  period              = "300"
+  period              = "60"
   evaluation_periods  = "3"
   datapoints_to_alarm = "3"
-  threshold           = local.application_data.accounts[local.environment].logging_cloudwatch_rds_free_storage_threshold_gb
+  threshold           = local.application_data.accounts[local.environment].soa_db_storage_gb * 0.35 * 1024 * 1024 * 1024
   treat_missing_data  = "breaching"
   dimensions = {
     DBInstanceIdentifier = aws_db_instance.soa_db.identifier
@@ -393,7 +401,7 @@ resource "aws_cloudwatch_metric_alarm" "Admin_UnHealthy_Hosts" {
   statistic           = "Average"
   namespace           = "AWS/NetworkELB"
   period              = "60"
-  evaluation_periods  = "15"
+  evaluation_periods  = "3"
   threshold           = "0"
   treat_missing_data  = "notBreaching"
   dimensions = {
@@ -413,7 +421,7 @@ resource "aws_cloudwatch_metric_alarm" "Managed_UnHealthy_Hosts" {
   statistic           = "Average"
   namespace           = "AWS/NetworkELB"
   period              = "60"
-  evaluation_periods  = "15"
+  evaluation_periods  = "3"
   threshold           = "0"
   treat_missing_data  = "notBreaching"
   dimensions = {
