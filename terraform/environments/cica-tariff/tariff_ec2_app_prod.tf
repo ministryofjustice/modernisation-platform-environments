@@ -70,11 +70,11 @@ resource "aws_instance" "tariff_app_prod_clone" {
   associate_public_ip_address = false
   ebs_optimized               = true
 
-  iam_instance_profile = aws_iam_instance_profile.tariff_instance_profile.name
-  instance_type        = "m5.2xlarge"
-  key_name             = aws_key_pair.key_pair_app.key_name
-  monitoring           = true
-  subnet_id            = data.aws_subnet.private_subnets_a.id
+  iam_instance_profile   = aws_iam_instance_profile.tariff_instance_profile.name
+  instance_type          = "m5.2xlarge"
+  key_name               = aws_key_pair.key_pair_app.key_name
+  monitoring             = true
+  subnet_id              = data.aws_subnet.private_subnets_a.id
   vpc_security_group_ids = [module.tariff_app_prod_security_group[0].security_group_id]
   #vpc_security_group_ids = [aws_security_group.temp_ssm_only[0].id] # TEMPORARY ASSIGNMENT
 

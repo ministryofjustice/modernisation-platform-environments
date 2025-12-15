@@ -3,7 +3,7 @@ resource "aws_security_group" "importmachine" {
   name        = "importmachine-${local.application_name}"
   vpc_id      = local.vpc_id
 
- # Ingress Rules
+  # Ingress Rules
 
   # RDP from Bastion
   ingress {
@@ -33,14 +33,14 @@ resource "aws_security_group" "importmachine" {
 
   # Monitoring traffic (all protocols) restricted to environment CIDRs
   ingress {
-    description      = "Monitoring traffic from environment CIDRs"
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
-    cidr_blocks      = local.environment_cidrs
+    description = "Monitoring traffic from environment CIDRs"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = local.environment_cidrs
   }
 
- # Egress Rules
+  # Egress Rules
 
   # HTTPS for updates, licence activation, external monitoring
   egress {
@@ -53,11 +53,11 @@ resource "aws_security_group" "importmachine" {
 
   # Monitoring traffic (all protocols) restricted to environment CIDRs
   egress {
-    description      = "Monitoring traffic to environment CIDRs"
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
-    cidr_blocks      = local.environment_cidrs
+    description = "Monitoring traffic to environment CIDRs"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = local.environment_cidrs
   }
 
   tags = merge(
