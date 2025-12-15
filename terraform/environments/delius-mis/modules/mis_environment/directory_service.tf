@@ -93,7 +93,7 @@ resource "aws_security_group" "mis_ad_management" {
   vpc_id      = var.account_info.vpc_id
 }
 
-resource "aws_vpc_security_group_engress_rule" "mis_ad_management" {
+resource "aws_vpc_security_group_egress_rule" "mis_ad_management" {
   # equivalent of AmazonSSMDirectoryServiceSecurityGroup default rule
   cidr_ipv4         = "0.0.0.0/0"
   description       = "Allow all egress"
