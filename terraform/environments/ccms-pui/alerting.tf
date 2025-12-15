@@ -18,8 +18,8 @@ module "cloudwatch_chatbot" {
 
 #--Altering SNS
 resource "aws_sns_topic" "guardduty_alerts" {
-  name            = "${local.application_data.accounts[local.environment].app_name}-guardduty-alerts"
-  delivery_policy = <<EOF
+  name              = "${local.application_data.accounts[local.environment].app_name}-guardduty-alerts"
+  delivery_policy   = <<EOF
 {
   "http": {
     "defaultHealthyRetryPolicy": {
@@ -39,7 +39,7 @@ resource "aws_sns_topic" "guardduty_alerts" {
 }
 EOF
   kms_master_key_id = aws_kms_key.cloudwatch_sns_alerts_key.id
-  tags = merge(local.tags, 
+  tags = merge(local.tags,
     { Name = "${local.application_data.accounts[local.environment].app_name}-guardduty-alerts" }
   )
 }
