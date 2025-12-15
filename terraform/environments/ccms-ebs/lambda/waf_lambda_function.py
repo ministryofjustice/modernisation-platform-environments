@@ -1,16 +1,13 @@
 # This AWS Lambda function toggles a WAF rule between BLOCK and ALLOW modes,
 # Display a custom HTML response body when blocking requests and remove it for Allow mode.
-# This code uses structured logging and robust error handling for production readiness by using mypy-boto3 types.
-
 import os
 import json
 import copy
 import logging
-from typing import Any, Dict, Literal, cast
+from typing import Any, Dict, Literal
 
 import boto3
 from botocore.exceptions import ClientError, BotoCoreError
-from mypy_boto3_wafv2.type_defs import RuleActionOutputTypeDef
 
 # ---------------------------------------------------------------------------
 # Logging setup
@@ -43,31 +40,24 @@ WEB_ACL_ID: str = _get_required_env("WEB_ACL_ID")
 RULE_NAME: str = _get_required_env("RULE_NAME")
 
 # Optional env vars with defaults
-AWS_REGION_DEFAULT: str = os.environ.get("AWS_REGION", "eu-west-2")
-
-ScopeLiteral = Literal["REGIONAL", "CLOUDFRONT"]
-
-_raw_scope = os.environ.get("SCOPE", "REGIONAL").upper()
-if _raw_scope not in ("REGIONAL", "CLOUDFRONT"):
-    msg = f"Unsupported SCOPE '{_raw_scope}'. Must be 'REGIONAL' or 'CLOUDFRONT'."
-    logger.error(msg)
-    raise ValueError(msg)
-
-SCOPE: ScopeLiteral = cast(ScopeLiteral, _raw_scope)
-
+SCOPE: str = os.environ.get("SCOPE", "REGIONAL").upper()
 CUSTOM_BODY_NAME: str = os.environ.get("CUSTOM_BODY_NAME", "maintenance_html")
 CUSTOM_BODY_HTML: str = os.environ.get("CUSTOM_BODY_HTML", "")
 
+if SCOPE not in ("REGIONAL", "CLOUDFRONT"):
+    msg = f"Unsupported SCOPE '{SCOPE}'. Must be 'REGIONAL' or 'CLOUDFRONT'."
+    logger.error(msg)
+    raise ValueError(msg)
+
 # Set region (CloudFront uses us-east-1)
 if SCOPE == "CLOUDFRONT":
-    region: str = "us-east-1"
+    region = "us-east-1"
 else:
-    region_env = os.environ.get("AWS_REGION")
-    if region_env is None:
+    region = os.environ.get("AWS_REGION")
+    if not region:
         msg = "AWS_REGION environment variable is required for REGIONAL scope."
         logger.error(msg)
         raise ValueError(msg)
-    region = region_env
 
 waf = boto3.client("wafv2", region_name=region)
 
@@ -78,7 +68,7 @@ WafMode = Literal["BLOCK", "ALLOW"]
 # Helpers
 # ---------------------------------------------------------------------------
 
-def _desired_action(mode: WafMode) -> RuleActionOutputTypeDef:
+def _desired_action(mode: WafMode) -> Dict[str, Any]:
     """Return WAF Action structure for direct rules."""
     if mode == "BLOCK":
         if CUSTOM_BODY_HTML.strip():
@@ -128,7 +118,7 @@ def _parse_mode(event: Any) -> WafMode:
         )
         return "BLOCK"
 
-    return cast(WafMode, mode_upper)
+    return mode_upper  # type: ignore[return-value]
 
 
 # ---------------------------------------------------------------------------
