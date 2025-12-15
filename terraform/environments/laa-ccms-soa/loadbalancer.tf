@@ -107,12 +107,7 @@ resource "aws_lb_target_group" "managed" {
   vpc_id      = data.aws_vpc.shared.id
   target_type = "ip"
 
-  health_check {
-    healthy_threshold   = "3"
-    interval            = "30"
-    protocol            = "TCP"
-    unhealthy_threshold = "3"
-  }
+
 }
 
 resource "aws_lb_listener" "managed80" {
