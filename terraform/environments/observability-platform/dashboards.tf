@@ -31,7 +31,7 @@ locals {
   dashboard_json_by_file = {
     for f, cfg in local.raw_dashboard_json_by_file :
     f => cfg
-    if (
+    if(
       cfg.team == null
       || can(module.tenant_configuration[cfg.team])
     )
@@ -49,7 +49,7 @@ locals {
   dashboard_template_by_file = {
     for f, cfg in local.raw_dashboard_template_by_file :
     f => cfg
-    if (
+    if(
       cfg.team == null
       || can(module.tenant_configuration[cfg.team])
     )

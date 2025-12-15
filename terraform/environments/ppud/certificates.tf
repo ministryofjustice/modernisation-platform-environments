@@ -82,8 +82,8 @@ resource "aws_acm_certificate_validation" "preprod_certificate_validation" {
 
 locals {
   prod_domains = local.is-production ? {
-    "ppudprod"  = "ppud.justice.gov.uk"
-    "wamprod"   = "wam.ppud.justice.gov.uk"
+    "ppudprod" = "ppud.justice.gov.uk"
+    "wamprod"  = "wam.ppud.justice.gov.uk"
   } : {}
 }
 

@@ -28,7 +28,7 @@ locals {
         tags = {
           description = "wildcard cert for nomis test domains"
         }
-      }      
+      }
     }
 
     cloudwatch_dashboards = {
