@@ -8,6 +8,10 @@ from typing import Any, Dict, Literal
 
 import boto3
 from botocore.exceptions import ClientError, BotoCoreError
+from typing import cast
+from mypy_boto3_wafv2.type_defs import RuleActionOutputTypeDef
+
+
 
 # ---------------------------------------------------------------------------
 # Logging setup
@@ -22,42 +26,51 @@ logger.setLevel(logging.INFO)
 # ---------------------------------------------------------------------------
 # Environment / configuration
 # ---------------------------------------------------------------------------
+# ScopeType = Literal["REGIONAL", "CLOUDFRONT"]
+# SCOPE: ScopeType = _raw_scope  # type: ignore[assignment]
 
+# _raw_scope: str = os.environ.get("SCOPE", "REGIONAL").upper()
+# if _raw_scope not in ("REGIONAL", "CLOUDFRONT"):
+#     msg = f"Unsupported SCOPE '{_raw_scope}'. Must be 'REGIONAL' or 'CLOUDFRONT'."
+#     logger.error(msg)
+#     raise ValueError(msg)
 
 def _get_required_env(name: str) -> str:
     """Return a required environment variable or raise a clear error."""
     value = os.environ.get(name)
-    if not value:
+    # if not value:
+    if value is None or value == "":
         msg = f"Environment variable '{name}' is required but not set."
         logger.error(msg)
         raise ValueError(msg)
     return value
 
-
 # Required env vars
 WEB_ACL_NAME: str = _get_required_env("WEB_ACL_NAME")
 WEB_ACL_ID: str = _get_required_env("WEB_ACL_ID")
 RULE_NAME: str = _get_required_env("RULE_NAME")
+region: str = os.environ.get("AWS_REGION") or os.environ.get("AWS_DEFAULT_REGION") or "eu-west-2"
 
 # Optional env vars with defaults
-SCOPE: str = os.environ.get("SCOPE", "REGIONAL").upper()
+# SCOPE: str = os.environ.get("SCOPE", "REGIONAL").upper()
 CUSTOM_BODY_NAME: str = os.environ.get("CUSTOM_BODY_NAME", "maintenance_html")
 CUSTOM_BODY_HTML: str = os.environ.get("CUSTOM_BODY_HTML", "")
 
-if SCOPE not in ("REGIONAL", "CLOUDFRONT"):
-    msg = f"Unsupported SCOPE '{SCOPE}'. Must be 'REGIONAL' or 'CLOUDFRONT'."
-    logger.error(msg)
-    raise ValueError(msg)
+
+# if SCOPE not in ("REGIONAL", "CLOUDFRONT"):
+#     msg = f"Unsupported SCOPE '{SCOPE}'. Must be 'REGIONAL' or 'CLOUDFRONT'."
+#     logger.error(msg)
+#     raise ValueError(msg)
 
 # Set region (CloudFront uses us-east-1)
-if SCOPE == "CLOUDFRONT":
-    region = "us-east-1"
-else:
-    region = os.environ.get("AWS_REGION")
-    if not region:
-        msg = "AWS_REGION environment variable is required for REGIONAL scope."
-        logger.error(msg)
-        raise ValueError(msg)
+# if SCOPE == "CLOUDFRONT":
+#     region = "us-east-1"
+# else:
+#     region = os.environ.get("AWS_REGION")
+#     if not region:
+#         msg = "AWS_REGION environment variable is required for REGIONAL scope."
+#         logger.error(msg)
+#         raise ValueError(msg)
 
 waf = boto3.client("wafv2", region_name=region)
 
@@ -68,22 +81,24 @@ WafMode = Literal["BLOCK", "ALLOW"]
 # Helpers
 # ---------------------------------------------------------------------------
 
-def _desired_action(mode: WafMode) -> Dict[str, Any]:
+def _desired_action(mode: WafMode) -> RuleActionOutputTypeDef:
     """Return WAF Action structure for direct rules."""
     if mode == "BLOCK":
         if CUSTOM_BODY_HTML.strip():
-            return {
-                "Block": {
-                    "CustomResponse": {
-                        "ResponseCode": 503,
-                        "CustomResponseBodyKey": CUSTOM_BODY_NAME,
+            return cast(
+                RuleActionOutputTypeDef,
+                {
+                    "Block": {
+                        "CustomResponse": {
+                            "ResponseCode": 503,
+                            "CustomResponseBodyKey": CUSTOM_BODY_NAME,
+                        }
                     }
                 }
-            }
-        return {"Block": {}}
-
+            )
+        return cast(RuleActionOutputTypeDef, {"Block": {}})
     if mode == "ALLOW":
-        return {"Allow": {}}
+        return cast(RuleActionOutputTypeDef, {"Allow": {}})
 
     # Should not be reachable if we validate mode correctly
     raise ValueError(f"Unsupported mode: {mode}")
@@ -134,18 +149,19 @@ def lambda_handler(event: Any, context: Any) -> Dict[str, Any]:
         RULE_NAME,
         WEB_ACL_NAME,
         WEB_ACL_ID,
-        SCOPE,
+        # SCOPE,
     )
 
     # Get current Web ACL
     try:
-        resp = waf.get_web_acl(Name=WEB_ACL_NAME, Scope=SCOPE, Id=WEB_ACL_ID)
+        # resp = waf.get_web_acl(Name=WEB_ACL_NAME, Scope=SCOPE, Id=WEB_ACL_ID)
+        resp = waf.get_web_acl(Name=WEB_ACL_NAME, Id=WEB_ACL_ID)
     except (ClientError, BotoCoreError) as e:
         logger.exception(
             "Failed to get WebACL '%s' (ID=%s, scope=%s): %s",
             WEB_ACL_NAME,
             WEB_ACL_ID,
-            SCOPE,
+            # SCOPE,
             e,
         )
         return {
@@ -228,7 +244,7 @@ def lambda_handler(event: Any, context: Any) -> Dict[str, Any]:
                 }
 
             if current_action != desired_action:
-                rr["Action"] = desired_action
+                rr["Action"] = desired_action 
                 changed = True
                 logger.info("Updating Action for rule '%s' to: %s", RULE_NAME, desired_action)
 
@@ -283,7 +299,7 @@ def lambda_handler(event: Any, context: Any) -> Dict[str, Any]:
     # Build update body
     updated_web_acl: Dict[str, Any] = {
         "Name": WEB_ACL_NAME,
-        "Scope": SCOPE,
+        # "Scope": SCOPE,
         "Id": WEB_ACL_ID,
         "LockToken": lock_token,
         "DefaultAction": web_acl.get("DefaultAction", {}),
@@ -304,7 +320,7 @@ def lambda_handler(event: Any, context: Any) -> Dict[str, Any]:
         "Updating WebACL '%s' (ID=%s, scope=%s) to mode: %s",
         WEB_ACL_NAME,
         WEB_ACL_ID,
-        SCOPE,
+        # SCOPE,
         mode,
     )
 
