@@ -179,7 +179,7 @@ module "s3-bucket-shared" {
   sse_algorithm      = "AES256"
   custom_kms_key     = ""
 
-  log_bucket = local.logging_bucket_name
+  log_bucket = module.s3-bucket-logging.bucket.name
   log_prefix = "s3access/${local.application_name}-${local.environment}-shared"
 
   # Refer to the below section "Replication" before enabling replication
