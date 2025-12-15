@@ -371,6 +371,12 @@ resource "aws_sns_topic_subscription" "cw_sms_subscription5" {
   endpoint  = "+447887576466" # Kofi Owusu-nimoh
 }
 
+resource "aws_sns_topic_subscription" "cw_sms_subscription6" {
+  count     = local.is-production == true ? 1 : 0
+  topic_arn = aws_sns_topic.cw_std_and_sms_alerts[0].arn
+  protocol  = "sms"
+  endpoint  = "+447527931469" # Pankaj Pant
+}
 
 resource "aws_sns_topic_policy" "cw_prod_topic_policy" {
   count  = local.is-production == true ? 1 : 0
