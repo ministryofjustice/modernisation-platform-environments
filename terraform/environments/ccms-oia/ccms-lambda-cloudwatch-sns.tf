@@ -30,7 +30,7 @@ resource "aws_iam_role_policy" "lambda_cloudwatch_sns_policy" {
           "secretsmanager:DescribeSecret",
           "secretsmanager:ListSecretVersionIds"
         ]
-        Resource = [aws_secretsmanager_secret.ebs_cw_alerts_secrets.arn]
+        Resource = [aws_secretsmanager_secret.oia_secrets.arn]
       },
       {
         Effect = "Allow"
@@ -46,7 +46,7 @@ resource "aws_iam_role_policy" "lambda_cloudwatch_sns_policy" {
 }
 
 resource "aws_sns_topic_subscription" "lambda_cloudwatch_sns" {
-  topic_arn = aws_sns_topic.cw_alerts.arn
+  topic_arn = aws_sns_topic.cloudwatch_alerts.arn
   protocol  = "lambda"
   endpoint  = aws_lambda_function.cloudwatch_sns.arn
 }
@@ -109,5 +109,5 @@ resource "aws_lambda_permission" "allow_sns_invoke" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.cloudwatch_sns.function_name
   principal     = "sns.amazonaws.com"
-  source_arn    = aws_sns_topic.cw_alerts.arn
+  source_arn    = aws_sns_topic.cloudwatch_alerts.arn
 }
