@@ -113,7 +113,7 @@ resource "aws_lambda_function" "cloudwatch_sns" {
 }
 
 resource "aws_lambda_permission" "allow_sns_invoke_guardduty" {
-  statement_id  = "AllowExecutionFromSNS"
+  statement_id  = "AllowExecutionFromGuardDutySNS"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.cloudwatch_sns.function_name
   principal     = "sns.amazonaws.com"
@@ -121,7 +121,7 @@ resource "aws_lambda_permission" "allow_sns_invoke_guardduty" {
 }
 
 resource "aws_lambda_permission" "allow_sns_invoke_cloudwatch" {
-  statement_id  = "AllowExecutionFromSNS"
+  statement_id  = "AllowExecutionFromCloudWatchSNS"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.cloudwatch_sns.function_name
   principal     = "sns.amazonaws.com"
