@@ -30,7 +30,7 @@ resource "aws_iam_role_policy" "lambda_cloudwatch_sns_policy" {
           "secretsmanager:DescribeSecret",
           "secretsmanager:ListSecretVersionIds"
         ]
-        Resource = [aws_secretsmanager_secret.ebs_cw_alerts_secrets.arn]
+        Resource = [aws_secretsmanager_secret.pui_secrets.arn]
       },
       {
         Effect = "Allow"
@@ -73,7 +73,7 @@ resource "aws_lambda_layer_version" "lambda_cloudwatch_sns_layer" {
   # filename                 = "lambda/layerV1.zip"
   layer_name               = "${local.application_name}-${local.environment}-cloudwatch-sns-layer"
   s3_key                   = "lambda_delivery/cloudwatch_sns_layer/layerV1.zip"
-  s3_bucket                = aws_s3_bucket.ccms_ebs_shared.bucket
+  s3_bucket                = module.s3-bucket-shared.bucket.id
   compatible_runtimes      = ["python3.13"]
   compatible_architectures = ["x86_64"]
   description              = "Lambda Layer for ${local.application_name} CloudWatch SNS Alarm Integration"
@@ -99,7 +99,7 @@ resource "aws_lambda_function" "cloudwatch_sns" {
 
   environment {
     variables = {
-      SECRET_NAME = aws_secretsmanager_secret.ebs_cw_alerts_secrets.name
+      SECRET_NAME = aws_secretsmanager_secret.pui_secrets.name
     }
   }
 
