@@ -51,7 +51,7 @@ resource "aws_sns_topic_subscription" "lambda_cloudwatch_sns" {
   endpoint  = aws_lambda_function.cloudwatch_sns.arn
 }
 
-resource "aws_sns_topic_subscription" "lambda_cloudwatch_sns" {
+resource "aws_sns_topic_subscription" "cloudwatch_sns_lambda" {
   topic_arn = aws_sns_topic.cw_alerts.arn
   protocol  = "lambda"
   endpoint  = aws_lambda_function.cloudwatch_sns.arn
