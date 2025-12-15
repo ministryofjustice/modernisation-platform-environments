@@ -91,7 +91,7 @@ resource "aws_lambda_function" "cloudwatch_sns" {
 
   environment {
     variables = {
-      SECRET_NAME = aws_secretsmanager_secret.ebs_cw_alerts_secrets.name
+      SECRET_NAME = aws_secretsmanager_secret.oia_secrets.name
     }
   }
 

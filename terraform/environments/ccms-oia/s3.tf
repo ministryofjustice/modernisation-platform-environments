@@ -165,21 +165,79 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
   })
 }
 
-#For shared bucket lifecycle rule is not needed as it host lambda application source code
-resource "aws_s3_bucket" "ccms_oia_shared" {
-  bucket = "${local.application_name}-${local.environment}-shared"
+# S3 Bucket - Logging
+module "s3-bucket-shared" {
+  # v9.0.0 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/9facf9fc8f8b8e3f93ffbda822028534b9a75399
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9fc8f8b8e3f93ffbda822028534b9a75399"
+
+  bucket_name        = "${local.application_name}-${local.environment}-shared"
+  versioning_enabled = true
+  bucket_policy      = [aws_s3_bucket_policy.shared_bucket_policy.policy]
+  sse_algorithm      = "AES256"
+  custom_kms_key     = ""
+
+  log_bucket = local.logging_bucket_name
+  log_prefix = "s3access/${local.application_name}-${local.environment}-shared"
+
+  # Refer to the below section "Replication" before enabling replication
+  replication_enabled = false
+  # Below three variables and providers configuration are only relevant if 'replication_enabled' is set to true
+  replication_region = "eu-west-2"
+  # replication_role_arn                     = module.s3-bucket-replication-role.role.arn
+  providers = {
+    # Here we use the default provider Region for replication. Destination buckets can be within the same Region as the
+    # source bucket. On the other hand, if you need to enable cross-region replication, please contact the Modernisation
+    # Platform team to add a new provider for the additional Region.
+    aws.bucket-replication = aws
+  }
+
+  lifecycle_rule = [
+    {
+      id      = "main"
+      enabled = "Enabled"
+      prefix  = ""
+
+      tags = {
+        rule      = "log"
+        autoclean = "true"
+      }
+
+      abort_incomplete_multipart_upload_days = local.application_data.accounts[local.environment].s3_lifecycle_days_abort_incomplete_multipart_upload_days
+    }
+  ]
 
   tags = merge(local.tags,
-    {
-      Name = "${local.application_name}-${local.environment}-shared"
-    }
+    { Name = "${local.application_name}-${local.environment}-shared" }
   )
-
 }
 
+resource "aws_s3_bucket_policy" "shared_bucket_policy" {
+  bucket = module.s3-bucket-shared.bucket.id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Sid    = "EnforceTLSv12orHigher",
+        Effect = "Deny",
+        Principal = {
+          AWS = "*"
+        },
+        Action   = "s3:*",
+        Resource = ["${module.s3-bucket-shared.bucket.arn}/*", "${module.s3-bucket-shared.bucket.arn}"],
+        Condition = {
+          NumericLessThan = {
+            "s3:TlsVersion" = "1.2"
+          }
+        }
+      }
+    ]
+  })
+}
 
 resource "aws_s3_object" "folder" {
-  bucket = aws_s3_bucket.ccms_oia_shared.bucket
+  bucket = module.s3-bucket-shared.bucket.id
+
   for_each = {
     for index, name in local.lambda_folder_name :
     name => index == 0 ? "${name}/" : "lambda_delivery/${name}/"
@@ -187,20 +245,4 @@ resource "aws_s3_object" "folder" {
 
   key = each.value
 
-}
-
-resource "aws_s3_bucket_public_access_block" "ccms_oia_shared" {
-  bucket                  = aws_s3_bucket.ccms_oia_shared.id
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
-}
-
-resource "aws_s3_bucket_versioning" "ccms_oia_shared" {
-  bucket = aws_s3_bucket.ccms_oia_shared.id
-
-  versioning_configuration {
-    status = "Enabled"
-  }
 }
