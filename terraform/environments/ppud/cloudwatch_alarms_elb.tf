@@ -44,5 +44,5 @@ resource "aws_cloudwatch_metric_alarm" "high_target_response_time_wam_alb_p95" {
     LoadBalancer     = "app/WAM-ALB-PROD/bfc963544454bdde"
     AvailabilityZone = "eu-west-2a"
   }
-   alarm_description = "This metric monitors the target response time of the WAM load balancer. If the target response time averages over 2 seconds for 3 of the last 5 minutes, the alarm will trigger."
+  alarm_description = "This metric monitors the target response time of the WAM load balancer. If the target response time averages over 2 seconds for 3 of the last 5 minutes, the alarm will trigger."
 }
