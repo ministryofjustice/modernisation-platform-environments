@@ -94,7 +94,7 @@ jobs:
           fi
 
       - name: Decrypt Secrets (ENVIRONMENT_MANAGEMENT)
-        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@491ad26d90d9b5d9692a6de4300a17bd3da5e81b # v3.5.1
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@0c879ebf9183dd7e47d3fe9c961afa3271843b8b # v3.6.0
         with:
           environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
           github_ci_user_environments_repo_pat: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}
@@ -237,7 +237,7 @@ jobs:
 
       - name: Upload AMI Preview Artifacts
         if: ${{ always() && (github.event_name == 'push' || github.event.inputs.cleanup_type == 'ami' || github.event.inputs.cleanup_type == 'both') }}
-        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: ami-preview-${{ matrix.account_name }}
           path: |
@@ -295,7 +295,7 @@ jobs:
 
       - name: Upload EBS Preview Artifacts
         if: ${{ always() && (github.event_name == 'push' || github.event.inputs.cleanup_type == 'ebs' || github.event.inputs.cleanup_type == 'both') }}
-        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: ebs-preview-${{ matrix.account_name }}
           path: |
@@ -305,7 +305,7 @@ jobs:
 
       - name: Upload Unified Preview Artifact
         if: always()
-        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: cleanup-report-preview-${{ matrix.account_name }}
           path: reports/cleanup_report.csv
@@ -338,7 +338,7 @@ jobs:
           fi
 
       - name: Decrypt Secrets (ENVIRONMENT_MANAGEMENT)
-        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@491ad26d90d9b5d9692a6de4300a17bd3da5e81b # v3.5.1
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@0c879ebf9183dd7e47d3fe9c961afa3271843b8b # v3.6.0
         with:
           environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
           github_ci_user_environments_repo_pat: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}
@@ -526,7 +526,7 @@ jobs:
 
       - name: Upload AMI Live Artifacts (reports only)
         if: always()
-        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: ami-live-${{ matrix.account_name }}
           path: |
@@ -595,7 +595,7 @@ jobs:
           fi
 
       - name: Decrypt Secrets (ENVIRONMENT_MANAGEMENT)
-        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@491ad26d90d9b5d9692a6de4300a17bd3da5e81b # v3.5.1
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@0c879ebf9183dd7e47d3fe9c961afa3271843b8b # v3.6.0
         with:
           environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
           github_ci_user_environments_repo_pat: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}
@@ -659,7 +659,7 @@ jobs:
 
       - name: Upload EBS Live Artifacts (reports only)
         if: always()
-        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: ebs-live-${{ matrix.account_name }}
           path: reports/ebs_cleanup_report.csv

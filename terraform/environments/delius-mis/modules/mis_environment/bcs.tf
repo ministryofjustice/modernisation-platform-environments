@@ -4,9 +4,27 @@ resource "aws_security_group" "bcs" {
   vpc_id      = var.account_info.vpc_id
 }
 
+resource "aws_security_group_rule" "bcs_ingress" {
+  for_each = {
+    all-from-bps = { source_security_group_id = aws_security_group.bps.id }
+    all-from-bws = { source_security_group_id = aws_security_group.bws.id }
+  }
+
+  description              = each.key
+  protocol                 = lookup(each.value, "protocol", "-1")
+  from_port                = lookup(each.value, "port", lookup(each.value, "from_port", 0))
+  to_port                  = lookup(each.value, "port", lookup(each.value, "to_port", 0))
+  self                     = lookup(each.value, "self", null)
+  source_security_group_id = lookup(each.value, "source_security_group_id", null)
+
+  security_group_id = resource.aws_security_group.bcs.id
+  type              = "ingress"
+}
+
 resource "aws_security_group_rule" "bcs_egress" {
   for_each = {
     all-to-efs = { source_security_group_id = aws_security_group.boe_efs.id }
+    all-to-bps = { source_security_group_id = aws_security_group.bps.id }
   }
 
   description              = each.key
