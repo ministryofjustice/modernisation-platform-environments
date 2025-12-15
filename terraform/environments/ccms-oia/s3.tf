@@ -166,7 +166,7 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
 }
 
 #For shared bucket lifecycle rule is not needed as it host lambda application source code
-resource "aws_s3_bucket" "ccms_ebs_shared" {
+resource "aws_s3_bucket" "ccms_oia_shared" {
   bucket = "${local.application_name}-${local.environment}-shared"
 
   tags = merge(local.tags,
@@ -179,7 +179,7 @@ resource "aws_s3_bucket" "ccms_ebs_shared" {
 
 
 resource "aws_s3_object" "folder" {
-  bucket = aws_s3_bucket.ccms_ebs_shared.bucket
+  bucket = aws_s3_bucket.ccms_oia_shared.bucket
   for_each = {
     for index, name in local.lambda_folder_name :
     name => index == 0 ? "${name}/" : "lambda_delivery/${name}/"
@@ -189,16 +189,16 @@ resource "aws_s3_object" "folder" {
 
 }
 
-resource "aws_s3_bucket_public_access_block" "ccms_ebs_shared" {
-  bucket                  = aws_s3_bucket.ccms_ebs_shared.id
+resource "aws_s3_bucket_public_access_block" "ccms_oia_shared" {
+  bucket                  = aws_s3_bucket.ccms_oia_shared.id
   block_public_acls       = true
   block_public_policy     = true
   ignore_public_acls      = true
   restrict_public_buckets = true
 }
 
-resource "aws_s3_bucket_versioning" "ccms_ebs_shared" {
-  bucket = aws_s3_bucket.ccms_ebs_shared.id
+resource "aws_s3_bucket_versioning" "ccms_oia_shared" {
+  bucket = aws_s3_bucket.ccms_oia_shared.id
 
   versioning_configuration {
     status = "Enabled"
