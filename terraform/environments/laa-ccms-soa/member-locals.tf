@@ -11,8 +11,8 @@ locals {
     data.aws_subnet.private_subnets_c.cidr_block
   ]
 
-  aws_account_id      = data.aws_caller_identity.current.account_id
-  logging_bucket_name = "${local.application_data.accounts[local.environment].app_name}-${local.environment}-logging"
+  aws_account_id            = data.aws_caller_identity.current.account_id
+  logging_bucket_name       = "${local.application_data.accounts[local.environment].app_name}-${local.environment}-logging"
   lb_log_prefix_soa_admin   = "${local.application_data.accounts[local.environment].app_name}-admin-lb"
   lb_log_prefix_soa_managed = "${local.application_data.accounts[local.environment].app_name}-managed-lb"
 

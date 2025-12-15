@@ -1,8 +1,8 @@
 # SNS Topic for Slack Alerts
 
 resource "aws_sns_topic" "cloudwatch_alerts" {
-  name            = "cloudwatch-slack-alerts"
-  delivery_policy = <<EOF
+  name              = "cloudwatch-slack-alerts"
+  delivery_policy   = <<EOF
 {
   "http": {
     "defaultHealthyRetryPolicy": {
@@ -22,7 +22,7 @@ resource "aws_sns_topic" "cloudwatch_alerts" {
 }
 EOF
   kms_master_key_id = aws_kms_key.cloudwatch_sns_alerts_key.id
-  tags = merge(local.tags, 
+  tags = merge(local.tags,
     { Name = "cloudwatch-slack-alerts" }
   )
 }
