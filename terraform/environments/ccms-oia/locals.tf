@@ -27,6 +27,9 @@ locals {
     sha256(file("${path.module}/lambda/cloudwatch_alarm_slack_integration/${f}"))
   ]
 
+    lambda_folder_name = ["lambda_delivery", "cloudwatch_sns_layer"]
+
+
 
   # Certificate configuration based on environment
   nonprod_domain = format("%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment)

@@ -51,8 +51,8 @@ resource "aws_sns_topic_subscription" "lambda_cloudwatch_sns" {
   endpoint  = aws_lambda_function.cloudwatch_sns.arn
 }
 
-resource "aws_sns_topic_subscription" "cloudwatch_sns_lambda" {
-  topic_arn = aws_sns_topic.cw_alerts.arn
+resource "aws_sns_topic_subscription" "lambda_enventbridge_sns" {
+  topic_arn = aws_sns_topic.guardduty_alerts.arn
   protocol  = "lambda"
   endpoint  = aws_lambda_function.cloudwatch_sns.arn
 }
@@ -65,7 +65,7 @@ resource "aws_lambda_layer_version" "lambda_cloudwatch_sns_layer" {
   # filename                 = "lambda/layerV1.zip"
   layer_name               = "${local.application_name}-${local.environment}-cloudwatch-sns-layer"
   s3_key                   = "lambda_delivery/cloudwatch_sns_layer/layerV1.zip"
-  s3_bucket                = aws_s3_bucket.ccms_ebs_shared.bucket
+  s3_bucket                = aws_s3_bucket.ccms_oia_shared.bucket
   compatible_runtimes      = ["python3.13"]
   compatible_architectures = ["x86_64"]
   description              = "Lambda Layer for ${local.application_name} CloudWatch SNS Alarm Integration"
