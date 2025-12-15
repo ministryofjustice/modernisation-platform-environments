@@ -181,6 +181,14 @@ resource "aws_db_instance" "oas_rds_instance" {
     { Name = "${local.application_name}-${local.environment}-database" }
   )
 
+  lifecycle {
+    ignore_changes = [
+      db_name,
+      password,
+      final_snapshot_identifier
+    ]
+  }
+
   timeouts {
     create = "60m"
     delete = "2h"

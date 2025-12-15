@@ -362,11 +362,11 @@ module "load_mdss_lambda" {
   security_group_ids             = [aws_security_group.lambda_generic.id]
   subnet_ids                     = data.aws_subnets.shared-public.ids
   environment_variables = {
-    ATHENA_QUERY_BUCKET = module.s3-athena-bucket.bucket.id
-    ACCOUNT_NUMBER      = data.aws_caller_identity.current.account_id
-    STAGING_BUCKET      = module.s3-create-a-derived-table-bucket.bucket.id
-    ENVIRONMENT_NAME    = local.environment_shorthand
-    MDSS_CLEANUP_QUEUE_URL  = aws_sqs_queue.clean_mdss_load_queue.id
+    ATHENA_QUERY_BUCKET    = module.s3-athena-bucket.bucket.id
+    ACCOUNT_NUMBER         = data.aws_caller_identity.current.account_id
+    STAGING_BUCKET         = module.s3-create-a-derived-table-bucket.bucket.id
+    ENVIRONMENT_NAME       = local.environment_shorthand
+    MDSS_CLEANUP_QUEUE_URL = aws_sqs_queue.clean_mdss_load_queue.id
   }
 }
 
