@@ -17,7 +17,7 @@ resource "aws_guardduty_malware_protection_plan" "s3_scan_bucket1" {
     { Name = lower(format("s3-%s-%s-awsgaurdduty-mpp", "${local.application_data.accounts[local.environment].app_name}", local.environment)) }
   )
 
-  depends_on = [module.s3-bucket-logging]
+  depends_on = [module.s3-bucket-shared]
 }
 
 resource "aws_guardduty_malware_protection_plan" "s3_scan_bucket2" {
