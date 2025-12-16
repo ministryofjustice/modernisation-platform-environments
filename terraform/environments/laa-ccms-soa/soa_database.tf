@@ -29,7 +29,7 @@ option {
   option_name = "OEM_AGENT"
 
   vpc_security_group_memberships = [
-    aws_security_group.soa_db.id
+    "${aws_security_group.soa_db.id}"
   ]
 
   option_settings {
@@ -47,7 +47,6 @@ option {
     value = "4903"
   }
 }
-
 
   lifecycle {
     create_before_destroy = true
