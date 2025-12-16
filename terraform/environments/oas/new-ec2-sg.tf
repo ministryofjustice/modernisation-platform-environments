@@ -43,6 +43,18 @@ resource "aws_security_group_rule" "ingress_ssh_from_bastion" {
   description              = "SSH from the Bastion"
 }
 
+resource "aws_security_group_rule" "ingress_ssh_from_workspaces" {
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+
+  type                     = "ingress"
+  security_group_id        = aws_security_group.ec2_sg[0].id
+  from_port                = 22
+  to_port                  = 22
+  protocol                 = "tcp"
+  cidr_blocks              = local.application_data.accounts[local.environment].managementcidr
+  description              = "SSH from Workspaces"
+}
+
 resource "aws_security_group_rule" "ingress_admin_vpc" {
   count = contains(["test", "preproduction"], local.environment) ? 1 : 0
 
