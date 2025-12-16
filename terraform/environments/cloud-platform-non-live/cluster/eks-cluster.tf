@@ -62,6 +62,9 @@ module "eks" {
     }
     aws-guardduty-agent = {
     }
+
+    aws-ebs-csi-driver = {  
+    }
     
   }
 
