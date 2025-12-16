@@ -19,23 +19,9 @@ locals {
   baseline_test = {
 
     acm_certificates = {
-      # remote_desktop_wildcard_cert = {
-      #   cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
-      #   domain_name                         = "modernisation-platform.service.justice.gov.uk"
-      #   external_validation_records_created = true
-      #   subject_alternate_names = [
-      #     "*.hmpps-domain-services.hmpps-test.modernisation-platform.service.justice.gov.uk",
-      #     "*.test.hmpps-domain.service.justice.gov.uk",
-      #     "hmppgw1.justice.gov.uk",
-      #     "*.hmppgw1.justice.gov.uk",
-      #   ]
-      #   tags = {
-      #     description = "wildcard cert for hmpps domain load balancer"
-      #   }
-      # }
       remote_desktop_wildcard_cert_v2 = {
         cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
-        domain_name                         = "*.test.hmpps-domain.service.justice.gov.uk" # was "modernisation-platform.service.justice.gov.uk" # nomis ref: "*.test.nomis.service.justice.gov.uk" usage: rdgateway1.test.hmpps-domain.service.justice.gov.uk
+        domain_name                         = "*.test.hmpps-domain.service.justice.gov.uk"
         subject_alternate_names = [
           "*.hmpps-domain-services.hmpps-test.modernisation-platform.service.justice.gov.uk",
         ]
