@@ -131,7 +131,7 @@ locals {
     instance_count    = 1
     ami_name          = "delius_mis_windows_server_patch_2025-10-01T13-00-02.504Z"
     computer_name     = "NDMIS-DEV-DIS" # 15 char limit
-    powershell_branch = "main"
+    powershell_branch = "TM-1799/delius/add-domaininfo-to-powershell"
 
     ebs_volumes = {
       "/dev/sda1" = { label = "root", size = 100 }
