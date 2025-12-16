@@ -157,8 +157,8 @@ locals {
   }
 
   dis_config_stage = {
-    instance_count = 0
-    ami_name       = "delius_mis_windows_server_patch_2024-02-07T11-03-13.202Z"
+    instance_count = 1
+    ami_name       = "delius_mis_windows_server_patch_2025-10-01T13-00-02.504Z"
     ebs_volumes = {
       "/dev/sda1" = { label = "root", size = 100 }
       "/dev/xvdf" = { label = "data", size = 300 }
