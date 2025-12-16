@@ -1,6 +1,63 @@
 resource "aws_sns_topic" "emds_alerts" {
   name              = "emds-alerts"
-  kms_master_key_id = "alias/aws/sns"
+  kms_master_key_id = aws_kms_key.emds_alerts.arn
+}
+
+resource "aws_kms_key" "emds_alerts" {
+  description         = "KMS key for EMDS SNS alerts"
+  enable_key_rotation = true
+  policy              = data.aws_iam_policy_document.emds_alerts_kms.json
+}
+
+data "aws_iam_policy_document" "emds_alerts_kms" {
+
+  # Root full admin of the key
+  statement {
+    sid       = "AllowAccountRootFullAccess"
+    effect    = "Allow"
+    actions   = ["kms:*"]
+    resources = ["*"]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+    }
+  }
+
+  # Allow SNS to use the key
+  statement {
+    sid       = "AllowSNSUseOfKey"
+    effect    = "Allow"
+    resources = ["*"]
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:DescribeKey"
+    ]
+
+    principals {
+      type        = "Service"
+      identifiers = ["sns.amazonaws.com"]
+    }
+  }
+
+  # Allow CloudWatch Alarms to use the key
+  statement {
+    sid       = "AllowCloudWatchUseOfKey"
+    effect    = "Allow"
+    resources = ["*"]
+    actions = [
+      "kms:Decrypt",
+      "kms:GenerateDataKey"
+    ]
+
+    principals {
+      type        = "Service"
+      identifiers = ["cloudwatch.amazonaws.com"]
+    }
+  }
 }
 
 data "aws_iam_policy_document" "emds_alerts_topic_policy" {
