@@ -1,4 +1,4 @@
-resource "aws_guardduty_malware_protection_plan" "s3_scan_bucket1" {
+resource "aws_guardduty_malware_protection_plan" "s3_log_scan_bucket1" {
   role = data.aws_iam_role.guardduty_s3_scan.arn
 
   protected_resource {
