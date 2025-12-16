@@ -96,8 +96,8 @@ resource "aws_sns_topic_policy" "guarduty_default" {
   policy = data.aws_iam_policy_document.guardduty_alerting_sns.json
 }
 
-resource "aws_sns_topic_subscription" "guardduty_alerts" {
-  topic_arn = aws_sns_topic.guardduty_alerts.arn
-  protocol  = "https"
-  endpoint  = "https://global.sns-api.chatbot.amazonaws.com"
-}
+# resource "aws_sns_topic_subscription" "guardduty_alerts" {
+#   topic_arn = aws_sns_topic.guardduty_alerts.arn
+#   protocol  = "https"
+#   endpoint  = "https://global.sns-api.chatbot.amazonaws.com"
+# }
