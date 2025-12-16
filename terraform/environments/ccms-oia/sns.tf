@@ -61,11 +61,11 @@ resource "aws_sns_topic_policy" "alert_default" {
   policy = data.aws_iam_policy_document.cloudwatch_alerting_sns.json
 }
 
-resource "aws_sns_topic_subscription" "cloudwatch_alerts" {
-  topic_arn = aws_sns_topic.cloudwatch_alerts.arn
-  protocol  = "https"
-  endpoint  = "https://global.sns-api.chatbot.amazonaws.com"
-}
+# resource "aws_sns_topic_subscription" "cloudwatch_alerts" {
+#   topic_arn = aws_sns_topic.cloudwatch_alerts.arn
+#   protocol  = "https"
+#   endpoint  = "https://global.sns-api.chatbot.amazonaws.com"
+# }
 
 resource "aws_sns_topic" "guardduty_alerts" {
   name              = "${local.application_name}-guardduty-alerts"

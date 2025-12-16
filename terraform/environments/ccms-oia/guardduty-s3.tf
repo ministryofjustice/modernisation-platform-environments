@@ -3,7 +3,7 @@ resource "aws_guardduty_malware_protection_plan" "s3_scan_bucket1" {
 
   protected_resource {
     s3_bucket {
-      bucket_name = module.s3-bucket-logging.bucket.id
+      bucket_name = module.s3-bucket-shared.bucket.id
     }
   }
 
