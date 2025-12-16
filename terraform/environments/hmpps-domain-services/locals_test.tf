@@ -33,6 +33,16 @@ locals {
           description = "wildcard cert for hmpps domain load balancer"
         }
       }
+      remote_desktop_wildcard_cert_v2 = {
+        cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
+        domain_name                         = "*.test.hmpps-domain.service.justice.gov.uk" # was "modernisation-platform.service.justice.gov.uk" # nomis ref: "*.test.nomis.service.justice.gov.uk" usage: rdgateway1.test.hmpps-domain.service.justice.gov.uk
+        subject_alternate_names = [
+          "*.hmpps-domain-services.hmpps-test.modernisation-platform.service.justice.gov.uk",
+        ]
+        tags = {
+          description = "wildcard cert for hmpps domain load balancer"
+        }
+      }      
     }
 
     cloudwatch_dashboards = {
@@ -256,7 +266,7 @@ locals {
       maintenance_window_cutoff   = 1 # 2 for prod
       patch_classifications = {
         REDHAT_ENTERPRISE_LINUX = ["Security", "Bugfix"]                 # Linux Options=Security,Bugfix,Enhancement,Recommended,Newpackage
-        WINDOWS                 = ["SecurityUpdates", "CriticalUpdates"] # Windows Options=CriticalUpdates,SecurityUpdates,DefinitionUpdates,Drivers,FeaturePacks,ServicePacks,Tools,UpdateRollups,Updates,Upgrades
+        WINDOWS                 = ["SecurityUpdates", "CriticalUpdates", "UpdateRollups"] # Windows Options=CriticalUpdates,SecurityUpdates,DefinitionUpdates,Drivers,FeaturePacks,ServicePacks,Tools,UpdateRollups,Updates,Upgrades
       }
     }
 
