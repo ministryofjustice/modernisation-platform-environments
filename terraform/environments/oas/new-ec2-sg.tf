@@ -51,7 +51,7 @@ resource "aws_security_group_rule" "ingress_ssh_from_workspaces" {
   from_port                = 22
   to_port                  = 22
   protocol                 = "tcp"
-  cidr_blocks              = local.application_data.accounts[local.environment].managementcidr
+  cidr_blocks              = [local.application_data.accounts[local.environment].managementcidr]
   description              = "SSH from Workspaces"
 }
 
