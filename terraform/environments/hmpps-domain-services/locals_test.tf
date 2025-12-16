@@ -200,7 +200,7 @@ locals {
               "test-rdgw-1-http",
               "test-rds-1-https",
             ]
-            certificate_names_or_arns = ["remote_desktop_wildcard_cert"]
+            certificate_names_or_arns = ["remote_desktop_wildcard_cert_v2"]
             rules = {
               test-rdgw-1-http = {
                 priority = 100
@@ -212,7 +212,6 @@ locals {
                   host_header = {
                     values = [
                       "rdgateway1.test.hmpps-domain.service.justice.gov.uk",
-                      "hmppgw1.justice.gov.uk",
                     ]
                   }
                 }]
