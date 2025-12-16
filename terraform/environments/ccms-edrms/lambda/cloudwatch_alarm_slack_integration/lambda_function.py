@@ -1,6 +1,6 @@
 """
 AWS Lambda function to pull CloudWatch Alarm from SNS Topic and
-publish into Slack.
+publish into Slack. This will also publish guardduty findings into another slack channel.
 """
 
 
@@ -82,12 +82,14 @@ class ValidateConfig:
 
     # Mandatory fields (no default values)
     slack_channel_webhook: str
+    slack_channel_webhook_guardduty: str
 
     def __post_init__(self):
         """Validate configuration after initialization."""
         # Validate using the ConfigValidator
         config_dict = {
             "slack_channel_webhook": self.slack_channel_webhook,
+            "slack_channel_webhook_guardduty": self.slack_channel_webhook_guardduty,
         }
 
         ConfigValidator.validate_mandatory_fields(config_dict, "configuration")
@@ -141,6 +143,7 @@ def parse_config_from_env_and_secrets(
     config = ValidateConfig(
         # Connection settings from mixed sources
         slack_channel_webhook=ConfigValidator.get_mandatory_secret(secrets_data, "slack_channel_webhook"),
+        slack_channel_webhook_guardduty=ConfigValidator.get_mandatory_secret(secrets_data, "slack_channel_webhook_guardduty"),
 
     )
 
@@ -280,94 +283,107 @@ def lambda_handler(event, context):
         Response dictionary with status and results
     """
     tracemalloc.start()
-    logger.info("Starting Notification to Slack for CloudWatch Alarm via SNS Topic")
-    slack_channel_webhook: str
 
     notification_service: Optional[NotificationService] = None
 
     # SNS message comes in event['Records'][0]['Sns']
     sns_message = event['Records'][0]['Sns']
-    message_str = sns_message.get('Message', '{}')
-    timestamp_str = sns_message.get('Timestamp')
-    if timestamp_str:
-        dt = datetime.strptime(timestamp_str, "%Y-%m-%dT%H:%M:%S.%fZ")
-        formatted = dt.strftime("%a, %d %b %Y %H:%M:%S UTC")
-    # Parse the inner JSON message
-    try:
-        alarm_details = json.loads(message_str)
-        env_config = {
-            # Mandatory environment variables
-        }
-        # Get secret name from environment or event
-        secret_name = os.environ.get("SECRET_NAME", event.get("secret_name"))
-        if not secret_name:
-            raise ValueError("SECRET_NAME not found in environment or event")
-        if not isinstance(secret_name, str):
-            raise ValueError(
-                f"SECRET_NAME must be a string, got: {type(secret_name).__name__}"
-            )
-                # Retrieve sensitive credentials from Secrets Manager
-        logger.info("Retrieving credentials from AWS Secrets Manager")
-        secrets_manager = SecretsManager()
-        secrets_data = secrets_manager.get_credentials(secret_name)
 
-        # Validate that required credentials are present
-        # Always require USER, HOST, and SLACK_WEBHOOK
+    source = sns_message.get('source')
+
+    if source == "aws.guardduty":
+        logger.info("GuardDuty finding detected in SNS message")
+        logger.info("Starting Notification to Slack for GuardDuty Alarm via SNS Topic")
+        slack_channel_webhook_guardduty: str
+        timestamp_str = sns_message.get('time')
+        if timestamp_str:
+            dt = datetime.strptime(timestamp_str, "%Y-%m-%dT%H:%M:%S.%fZ")
+            formatted = dt.strftime("%a, %d %b %Y %H:%M:%S UTC")
+        required_secrets = ["slack_channel_webhook_guardduty"]
+    else:
+        logger.info("CloudWatch Alarm detected in SNS message")
+        logger.info("Starting Notification to Slack for CloudWatch Alarm via SNS Topic")
+        slack_channel_webhook: str
+        message_str = sns_message.get('Message', '{}')
+        timestamp_str = sns_message.get('Timestamp')
+        if timestamp_str:
+            dt = datetime.strptime(timestamp_str, "%Y-%m-%dT%H:%M:%S.%fZ")
+            formatted = dt.strftime("%a, %d %b %Y %H:%M:%S UTC")
         required_secrets = ["slack_channel_webhook"]
-        missing_secrets = [key for key in required_secrets if key not in secrets_data]
-        if missing_secrets:
-            raise ValueError(f"Missing required secrets: {', '.join(missing_secrets)}")
-
-        # Parse combined configuration
-        logger.info("Parsing configuration from environment and secrets")
-        config = parse_config_from_env_and_secrets(env_config, secrets_data)
-
-         # Extract useful fields
-
-        new_state = alarm_details.get('NewStateValue','')
-
-        is_error=True
-        if new_state == "OK":
-            is_error=False
-
-        # Initialize services
-        notification_service = NotificationService(
-            config.slack_channel_webhook, context.function_name
-        )
-        # result = f"{slack_message}\n"
-        notification_service.send_notification(
-                    "CloudWatch Alarm Notification", 
-                    alarm_details,
-                    formatted, is_error
+        # Parse the inner JSON message
+        try:
+            alarm_details = json.loads(message_str)
+            env_config = {
+                # Mandatory environment variables
+            }
+            # Get secret name from environment or event
+            secret_name = os.environ.get("SECRET_NAME", event.get("secret_name"))
+            if not secret_name:
+                raise ValueError("SECRET_NAME not found in environment or event")
+            if not isinstance(secret_name, str):
+                raise ValueError(
+                    f"SECRET_NAME must be a string, got: {type(secret_name).__name__}"
                 )
-        # Prepare response
-        response = {
-            "statusCode": 200,
-            "body": {
-                "message": f"Successfully completed publishing notifications for CloudWatch Alarm"
-            },
-        }
+                    # Retrieve sensitive credentials from Secrets Manager
+            logger.info("Retrieving credentials from AWS Secrets Manager")
+            secrets_manager = SecretsManager()
+            secrets_data = secrets_manager.get_credentials(secret_name)
 
-        logger.info(f"Lambda execution completed successfully: {response}")
-        return response
-    # except json.JSONDecodeError:
-    #     alarm_details = {}
-    except Exception as e:
-        error_msg = f"Lambda execution failed:\n{str(e)}"
-        logger.error(error_msg, exc_info=True)
+            # Validate that required credentials are present
+            # Always require USER, HOST, and SLACK_WEBHOOK
 
-        # Send error notification if notification service is available
-        if notification_service is not None:
-            try:
-                notification_service.send_notification(
-                    "Lambda Execution Failed", error_msg, is_error=True
-                )
-            except Exception as notification_error:
-                logger.error(f"Failed to send error notification: {notification_error}")
+            missing_secrets = [key for key in required_secrets if key not in secrets_data]
+            if missing_secrets:
+                raise ValueError(f"Missing required secrets: {', '.join(missing_secrets)}")
 
-        # Return error response
-        return {"statusCode": 500, "body": {"error": error_msg}}
-    finally:
-        current, peak = tracemalloc.get_traced_memory()
-        logger.info(f"Current memory usage: {current / 1024 / 1024:.2f} MB; Peak: {peak / 1024 / 1024:.2f} MB")
-        tracemalloc.stop()
+            # Parse combined configuration
+            logger.info("Parsing configuration from environment and secrets")
+            config = parse_config_from_env_and_secrets(env_config, secrets_data)
+
+            # Extract useful fields
+
+            new_state = alarm_details.get('NewStateValue','')
+
+            is_error=True
+            if new_state == "OK":
+                is_error=False
+
+            # Initialize services
+            notification_service = NotificationService(
+                config.slack_channel_webhook, context.function_name
+            )
+            # result = f"{slack_message}\n"
+            notification_service.send_notification(
+                        "CloudWatch Alarm Notification", 
+                        alarm_details,
+                        formatted, is_error
+                    )
+            # Prepare response
+            response = {
+                "statusCode": 200,
+                "body": {
+                    "message": f"Successfully completed publishing notifications for CloudWatch Alarm"
+                },
+            }
+
+            logger.info(f"Lambda execution completed successfully: {response}")
+            return response
+        except Exception as e:
+            error_msg = f"Lambda execution failed:\n{str(e)}"
+            logger.error(error_msg, exc_info=True)
+
+            # Send error notification if notification service is available
+            if notification_service is not None:
+                try:
+                    notification_service.send_notification(
+                        "Lambda Execution Failed", error_msg, is_error=True
+                    )
+                except Exception as notification_error:
+                    logger.error(f"Failed to send error notification: {notification_error}")
+
+            # Return error response
+            return {"statusCode": 500, "body": {"error": error_msg}}
+        finally:
+            current, peak = tracemalloc.get_traced_memory()
+            logger.info(f"Current memory usage: {current / 1024 / 1024:.2f} MB; Peak: {peak / 1024 / 1024:.2f} MB")
+            tracemalloc.stop()
