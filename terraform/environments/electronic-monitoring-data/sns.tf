@@ -1,6 +1,5 @@
 resource "aws_sns_topic" "emds_alerts" {
   name              = "emds-alerts"
-  kms_master_key_id = "alias/aws/sns"
 }
 
 data "aws_iam_policy_document" "emds_alerts_topic_policy" {
