@@ -58,18 +58,11 @@ module "dis_instance" {
     aws_iam_policy.ec2_automation.arn
   ]
 
-  user_data_raw = base64encode(
-    templatefile(
-      "${path.module}/templates/AutoEC2LaunchV2.yaml.tftpl",
-      {
-        #ad_username_secret_name = aws_secretsmanager_secret.ad_username.name
-        ad_password_secret_name = aws_secretsmanager_secret.ad_admin_password.name
-        ad_domain_name          = var.environment_config.ad_domain_name
-        ad_ip_list              = aws_directory_service_directory.mis_ad.dns_ip_addresses
-        branch                  = var.dis_config.branch
-      }
-    )
-  )
+  user_data_raw = base64encode(templatefile(
+    "${path.module}/templates/user-data-pwsh.yaml.tftpl", {
+      branch = var.dis_config.branch
+    }
+  ))
 
   business_unit     = var.account_info.business_unit
   environment       = var.account_info.mp_environment
@@ -81,7 +74,7 @@ module "dis_instance" {
     var.tags,
     {
       domain-name = var.environment_config.ad_domain_name
-      server-type = "MISDis"
+      server-type = "DeliusMisDis"
     }
   )
 
