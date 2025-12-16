@@ -148,7 +148,7 @@ resource "aws_lakeformation_permissions" "data_location_access_working" {
 
 # Grant QuickSight user permissions using LF tags
 resource "aws_lakeformation_permissions" "quicksight_user_lf_tag_permissions" {
-  principal   = "arn:aws:quicksight:eu-west-2:992382429243:user/default/andrew.craik@justice.gov.uk"
+  principal   = "arn:aws:iam::684969100054:role/fake-cadet-runner-not-working"
   permissions = ["DESCRIBE", "SELECT"]
 
   lf_tag_policy {
