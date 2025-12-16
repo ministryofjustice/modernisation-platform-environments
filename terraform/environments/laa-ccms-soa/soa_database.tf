@@ -25,24 +25,29 @@ resource "aws_db_option_group" "soa_oracle_19" {
   # -----------------------------
   # Added Option: OEM_AGENT
   # -----------------------------
-  option {
-    option_name = "OEM_AGENT"
+option {
+  option_name = "OEM_AGENT"
 
-    option_settings {
-      name  = "OMS_HOST"
-      value = "laa-oem-app.laa-development.modernisation-platform.service.justice.gov.uk"
-    }
+  vpc_security_group_memberships = [
+    aws_security_group.soa_db.id
+  ]
 
-    option_settings {
-      name  = "AGENT_PORT"
-      value = "3872"
-    }
-
-    option_settings {
-      name  = "EM_UPLOAD_PORT"
-      value = "4903"
-    }
+  option_settings {
+    name  = "OMS_HOST"
+    value = "laa-oem-app.laa-development.modernisation-platform.service.justice.gov.uk"
   }
+
+  option_settings {
+    name  = "AGENT_PORT"
+    value = "3872"
+  }
+
+  option_settings {
+    name  = "EM_UPLOAD_PORT"
+    value = "4903"
+  }
+}
+
 
   lifecycle {
     create_before_destroy = true
