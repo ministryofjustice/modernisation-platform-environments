@@ -46,7 +46,6 @@ locals {
     "g4s_tasking",
     "scram_alcohol_monitoring",
     "g4s_lcm",
-    "curated_emsys_tpims",
   ] : local.is-development ? ["test"] : []
 
   prod_dbs_to_grant = local.is-production ? [
@@ -80,6 +79,7 @@ locals {
     "g4s_lcm_archive_curated",
     "g4s_lcm_curated",
     "intermediate_tasking",
+    "curated_emsys_tpims",
   ] : []
 
   dev_dbs_to_grant       = local.is-production ? [for db in local.prod_dbs_to_grant : "${db}_historic_dev_dbt"] : []
