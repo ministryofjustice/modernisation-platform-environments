@@ -58,11 +58,11 @@ module "dis_instance" {
     aws_iam_policy.ec2_automation.arn
   ]
 
-  user_data_raw = base64encode(templatefile(
+  user_data = templatefile(
     "${path.module}/templates/user-data-pwsh.yaml.tftpl", {
-      branch = var.dis_config.branch
+      branch = var.dis_config.powershell_branch
     }
-  ))
+  )
 
   business_unit     = var.account_info.business_unit
   environment       = var.account_info.mp_environment
@@ -73,8 +73,9 @@ module "dis_instance" {
   tags = merge(
     var.tags,
     {
-      domain-name = var.environment_config.ad_domain_name
-      server-type = "DeliusMisDis"
+      computer-name = "${var.dis_config.computer_name}-${count.index + 1}"
+      domain-name   = var.environment_config.ad_domain_name
+      server-type   = "DeliusMisDis"
     }
   )
 

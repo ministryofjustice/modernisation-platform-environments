@@ -157,8 +157,11 @@ locals {
   }
 
   dis_config_stage = {
-    instance_count = 1
-    ami_name       = "delius_mis_windows_server_patch_2025-10-01T13-00-02.504Z"
+    instance_count    = 1
+    ami_name          = "delius_mis_windows_server_patch_2025-10-01T13-00-02.504Z"
+    computer_name     = "NDMIS-STG-DIS" # 15 char limit
+    powershell_branch = "main"
+
     ebs_volumes = {
       "/dev/sda1" = { label = "root", size = 100 }
       "/dev/xvdf" = { label = "data", size = 300 }

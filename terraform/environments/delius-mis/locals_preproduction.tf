@@ -158,8 +158,11 @@ locals {
   }
 
   dis_config_preprod = {
-    instance_count = 0
-    ami_name       = "delius_mis_windows_server_patch_2024-02-07T11-03-13.202Z"
+    instance_count    = 0
+    ami_name          = "delius_mis_windows_server_patch_2024-02-07T11-03-13.202Z"
+    computer_name     = "NDMIS-PP-DIS" # 15 char limit
+    powershell_branch = "main"
+
     ebs_volumes = {
       "/dev/sda1" = { label = "root", size = 100 }
       "/dev/xvdf" = { label = "data", size = 300 }
