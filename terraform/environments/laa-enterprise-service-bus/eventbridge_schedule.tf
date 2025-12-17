@@ -60,6 +60,7 @@ resource "aws_scheduler_schedule" "ccr_load_schedule" {
   }
 
   schedule_expression = local.environment == "production" ? "cron(45 10 * * ? *)" : "cron(0 7-19 ? * * *)"
+  state = "DISABLED"
 
   target {
     arn      = aws_lambda_function.ccr_provider_load.arn
@@ -77,6 +78,7 @@ resource "aws_scheduler_schedule" "cclf_load_schedule" {
   }
 
   schedule_expression = local.environment == "production" ? "cron(45 10 * * ? *)" : "cron(0 7-19 ? * * *)"
+  state = "DISABLED"
 
   target {
     arn      = aws_lambda_function.cclf_provider_load.arn
