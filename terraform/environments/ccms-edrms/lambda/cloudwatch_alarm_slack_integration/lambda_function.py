@@ -422,13 +422,6 @@ def lambda_handler(event, context):
         secrets_manager = SecretsManager()
         secrets_data = secrets_manager.get_credentials(secret_name)
 
-        # Validate that required credentials are present
-        # Always require USER, HOST, and SLACK_WEBHOOK
-
-        missing_secrets = [key for key in required_secrets if key not in secrets_data]
-        if missing_secrets:
-            raise ValueError(f"Missing required secrets: {', '.join(missing_secrets)}")
-
         # Parse combined configuration
         logger.info("Parsing configuration from environment and secrets")
         config = parse_config_from_env_and_secrets(env_config, secrets_data)
@@ -443,6 +436,12 @@ def lambda_handler(event, context):
                 dt = datetime.strptime(timestamp_str, "%Y-%m-%dT%H:%M:%S.%fZ")
                 formatted = dt.strftime("%a, %d %b %Y %H:%M:%S UTC")
             required_secrets = ["slack_channel_webhook_guardduty"]
+            # Validate that required credentials are present
+            # Always require USER, HOST, and SLACK_WEBHOOK
+
+            missing_secrets = [key for key in required_secrets if key not in secrets_data]
+            if missing_secrets:
+                raise ValueError(f"Missing required secrets: {', '.join(missing_secrets)}")
             channelconfig=config.slack_channel_webhook_guardduty
             alarmnotifiction="GuardDuty Finding Notification"
             type="GuardDuty"
@@ -455,6 +454,12 @@ def lambda_handler(event, context):
                 dt = datetime.strptime(timestamp_str, "%Y-%m-%dT%H:%M:%S.%fZ")
                 formatted = dt.strftime("%a, %d %b %Y %H:%M:%S UTC")
             required_secrets = ["slack_channel_webhook"]
+            # Validate that required credentials are present
+            # Always require USER, HOST, and SLACK_WEBHOOK
+
+            missing_secrets = [key for key in required_secrets if key not in secrets_data]
+            if missing_secrets:
+                raise ValueError(f"Missing required secrets: {', '.join(missing_secrets)}")
             channelconfig=config.slack_channel_webhook
             alarmnotifiction="CloudWatch Alarm Notification"
             type="CloudWatch Alarm"
