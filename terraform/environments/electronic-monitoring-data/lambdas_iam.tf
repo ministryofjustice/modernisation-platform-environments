@@ -1130,3 +1130,117 @@ resource "aws_lakeformation_permissions" "historic_csv_add_create_db" {
   catalog_resource = true
 }
 
+
+
+#-----------------------------------------------------------------------------------
+# Historical Data Cut Back (Prod Role)
+#-----------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "historic_data_cutback_iam_role_policy_document" {
+  statement {
+    sid    = "S3Permissions"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:GetBucketLocation",
+      "s3:ListBucket",
+      "s3:PutObject",
+    ]
+
+    resources = [
+      "${module.s3-dms-target-store-bucket.bucket.arn}/*",
+      module.s3-dms-target-store-bucket.bucket.arn,
+    ]
+  }
+  statement {
+    sid    = "AssumeCrossAccountRole"
+    effect = "Allow"
+    actions = [
+      "sts:AssumeRole",
+    ]
+
+    resources = [
+      aws_iam_role.pre_prod_historic_data_cutback_iam_role[0].arn
+    ]
+  }
+}
+
+resource "aws_iam_role" "historic_data_cutback_iam_role" {
+  count              = local.is-production || local.is-development ? 1 : 0
+  name               = "historic_data_cutback_iam_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_policy" "historic_data_cutback_iam_role_policy" {
+  count  = local.is-production || local.is-development ? 1 : 0
+  name   = "historic_data_cutback_iam_policy"
+  policy = data.aws_iam_policy_document.historic_data_cutback_iam_role_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "historic_data_cutback_iam_role_policy_attachment" {
+  count      = local.is-production || local.is-development ? 1 : 0
+  role       = aws_iam_role.historic_data_cutback_iam_role[0].name
+  policy_arn = aws_iam_policy.historic_data_cutback_iam_role_policy[0].arn
+}
+
+
+#-----------------------------------------------------------------------------------
+# Historical Data Cut Back (PreProd Role)
+#-----------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "pre_prod_historic_data_cutback_iam_role_policy_document" {
+  statement {
+    sid    = "S3Permissions"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:GetBucketLocation",
+      "s3:ListBucket",
+      "s3:PutObject",
+    ]
+
+    resources = [
+      "${module.s3-dms-target-store-bucket.bucket.arn}/*",
+      module.s3-dms-target-store-bucket.bucket.arn,
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "pre_prod_historic_data_trust_policy" {
+  statement {
+    sid    = "AllowSpecificRolesToAssume"
+    effect = "Allow"
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "AWS"
+      identifiers = [
+        aws_iam_role.historic_data_cutback_iam_role[0].arn,
+      ]
+    }
+  }
+}
+
+resource "aws_iam_role" "pre_prod_historic_data_cutback_iam_role" {
+  count              = local.is-preproduction? 1 : 0
+  name               = "historic_data_cutback_iam_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_policy" "pre_prod_historic_data_cutback_iam_role_policy" {
+  count  = local.is-preproduction? 1 : 0
+  name   = "historic_data_cutback_iam_policy"
+  policy = data.aws_iam_policy_document.pre_prod_historic_data_cutback_iam_role_policy_document
+}
+
+resource "aws_iam_role_policy_attachment" "pre_prod_historic_data_cutback_iam_role_policy_attachment" {
+  count      = local.is-preproduction? 1 : 0
+  role       = aws_iam_role.pre_prod_historic_data_cutback_iam_role[0].name
+  policy_arn = aws_iam_policy.pre_prod_historic_data_cutback_iam_role_policy[0].arn
+}
+
+resource "aws_iam_role_policy_attachment" "pre_prod_historic_data_cutback_iam_role_trust_policy" {
+  count      = local.is-preproduction? 1 : 0
+  role       = aws_iam_role.pre_prod_historic_data_cutback_iam_role[0].name
+  policy_arn = aws_iam_policy.pre_prod_historic_data_trust_policy[0].arn
+}

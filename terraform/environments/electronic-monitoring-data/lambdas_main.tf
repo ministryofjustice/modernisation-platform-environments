@@ -396,3 +396,25 @@ module "load_historic_csv" {
     ENVIRONMENT_NAME    = local.environment_shorthand
   }
 }
+
+
+
+#-----------------------------------------------------------------------------------
+# BackFill Data
+#-----------------------------------------------------------------------------------
+module "historic_data_cutback" {
+  source                  = "./modules/lambdas"
+  is_image                = true
+  function_name           = "historic_data_cutback"
+  role_name               = aws_iam_role.dms_validation_lambda_role[0].name
+  role_arn                = aws_iam_role.dms_validation_lambda_role[0].arn
+  handler                 = "historic_data_cutback.handler"
+  memory_size             = 1024
+  timeout                 = 900
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : "dev"
+
+  environment_variables = {
+    SOURCE_BUCKET = module.s3-dms-target-store-bucket.bucket.id
+  }
+}
