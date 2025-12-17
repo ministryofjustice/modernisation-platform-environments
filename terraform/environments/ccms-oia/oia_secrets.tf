@@ -12,7 +12,8 @@ resource "aws_secretsmanager_secret_version" "oia_secrets" {
   secret_string = jsonencode({
     "guardduty_slack_channel_id"  = "",
     "cloudwatch_slack_channel_id" = "",
-    "slack_channel_webhook" = ""
+    "slack_channel_webhook" = "",
+    "slack_channel_webhook_guardduty" = ""
   })
 
   lifecycle {
