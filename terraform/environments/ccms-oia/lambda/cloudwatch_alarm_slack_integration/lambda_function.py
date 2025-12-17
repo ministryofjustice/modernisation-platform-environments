@@ -245,35 +245,7 @@ class NotificationService:
                     }
                 ]
             }
-            # json_payload = json.dumps(payload)
-            # try:
-            #     # Configure curl for HTTP POST with JSON
-            #     curl.setopt(pycurl.URL, self.webhook_url)
-            #     curl.setopt(pycurl.POST, 1)
-            #     curl.setopt(pycurl.POSTFIELDS, json_payload)
-            #     curl.setopt(pycurl.HTTPHEADER, ["Content-Type: application/json"])
-            #     curl.setopt(pycurl.TIMEOUT, 10)
-
-            #     # Buffer for response (though Slack webhook responses are minimal)
-            #     response_buffer = io.BytesIO()
-            #     curl.setopt(pycurl.WRITEDATA, response_buffer)
-
-            #     # Send the notification
-            #     curl.perform()
-
-            #     # Check HTTP status code
-            #     http_code = curl.getinfo(pycurl.RESPONSE_CODE)
-            #     if http_code >= 400:
-            #         raise Exception(f"HTTP error {http_code}")
-
-            #     logger.info(f"Slack notification sent successfully: {title}")
-            #     return True
-
-            # except Exception as e:
-            #     logger.error(f"Failed to send Slack notification: {e}")
-            #     return False
-            # finally:
-            #     curl.close()
+            
         elif type == "CloudWatch Alarm":
 
             alarm_name = alarmdetails.get('AlarmName', 'Unknown Alarm')
