@@ -22,9 +22,6 @@ resource "aws_db_option_group" "soa_oracle_19" {
     version     = "1.0"
   }
 
-  # -----------------------------
-  # Added Option: OEM_AGENT
-  # -----------------------------
 option {
   option_name = "OEM_AGENT"
 
@@ -45,6 +42,16 @@ option {
   option_settings {
     name  = "EM_UPLOAD_PORT"
     value = "4903"
+  }
+
+  option_settings {
+    name  = "AGENT_REGISTRATION_USERNAME"
+    value = jsondecode(data.aws_secretsmanager_secret_version.oem_agent_credentials.secret_string).username
+  }
+
+  option_settings {
+    name  = "AGENT_REGISTRATION_PASSWORD"
+    value = jsondecode(data.aws_secretsmanager_secret_version.oem_agent_credentials.secret_string).password
   }
 }
 
