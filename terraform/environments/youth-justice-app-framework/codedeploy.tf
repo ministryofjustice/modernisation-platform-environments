@@ -13,6 +13,7 @@ module "codedeploy" {
     { "bu" = "internal" },
     { "case" = "internal" },
     { "cmm" = "internal" },
+    { "connectivity" = "internal" },
     { "conversions" = "internal" },
     { "dal" = "internal" },
     { "documents" = "internal" },
