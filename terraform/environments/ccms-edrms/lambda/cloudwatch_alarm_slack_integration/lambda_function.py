@@ -402,7 +402,8 @@ def lambda_handler(event, context):
     sns_message = event['Records'][0]['Sns']
 
     source = sns_message.get('source')
-
+    message_str = sns_message.get('Message', '{}')
+    
     try:
         alarm_details = json.loads(message_str)
         env_config = {
