@@ -30,12 +30,15 @@ module "environment_stage" {
   bps_config = local.bps_config_stage
   bws_config = local.bws_config_stage
   dis_config = local.dis_config_stage
+  dfi_config = local.dfi_config_stage
 
   dsd_db_config = local.dsd_db_config_stage
   boe_db_config = local.boe_db_config_stage
   mis_db_config = local.mis_db_config_stage
 
-  fsx_config = local.fsx_config_stage
+  fsx_config               = local.fsx_config_stage
+  dfi_report_bucket_config = local.dfi_report_bucket_config_stage
+  lb_config                = local.lb_config_stage
 
   domain_join_ports = local.domain_join_ports
 
@@ -75,12 +78,16 @@ module "environment_preproduction" {
   bps_config = local.bps_config_preprod
   bws_config = local.bws_config_preprod
   dis_config = local.dis_config_preprod
+  dfi_config = local.dfi_config_preprod
 
   dsd_db_config = local.dsd_db_config_preprod
   boe_db_config = local.boe_db_config_preprod
   mis_db_config = local.mis_db_config_preprod
 
-  fsx_config = local.fsx_config_preprod
+  fsx_config               = local.fsx_config_preprod
+  dfi_report_bucket_config = local.dfi_report_bucket_config_preprod
+  lb_config                = local.lb_config_preprod
+
 
   domain_join_ports = local.domain_join_ports
 

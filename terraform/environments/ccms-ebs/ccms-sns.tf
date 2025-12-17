@@ -26,8 +26,8 @@ resource "aws_secretsmanager_secret_version" "alerts_subscription_email" {
 }
 
 resource "aws_sns_topic" "cw_alerts" {
-  name            = "ccms-ebs-ec2-alerts"
-  delivery_policy = <<EOF
+  name              = "ccms-ebs-ec2-alerts"
+  delivery_policy   = <<EOF
 {
   "http": {
     "defaultHealthyRetryPolicy": {
@@ -46,6 +46,10 @@ resource "aws_sns_topic" "cw_alerts" {
   }
 }
 EOF
+  kms_master_key_id = aws_kms_key.cloudwatch_sns_alerts_key.id
+  tags = merge(local.tags,
+    { Name = "${local.application_name}-ec2-alerts" }
+  )
 }
 
 resource "aws_sns_topic_policy" "sns_policy" {
@@ -57,6 +61,10 @@ resource "aws_sns_topic_policy" "sns_policy" {
 resource "aws_sns_topic" "s3_topic" {
   name   = "s3-event-notification-topic"
   policy = data.aws_iam_policy_document.s3_topic_policy.json
+  kms_master_key_id = aws_kms_key.cloudwatch_sns_alerts_key.id
+  tags = merge(local.tags, 
+    { Name = "s3-event-notification-topic" }
+  )
 }
 
 # resource "aws_sns_topic_policy" "s3_policy" {
@@ -72,7 +80,10 @@ resource "aws_sns_topic_subscription" "s3_subscription" {
 
 resource "aws_sns_topic" "ddos_alarm" {
   name = format("%s_ddos_alarm", local.application_name)
-  #kms_master_key_id = "alias/aws/sns"
+  kms_master_key_id = aws_kms_key.cloudwatch_sns_alerts_key.id
+  tags = merge(local.tags, 
+    { Name = format("%s_ddos_alarm", local.application_name) }
+  )
 }
 
 # resource "aws_sns_topic_policy" "ddos_policy" {
@@ -88,8 +99,8 @@ resource "aws_sns_topic_subscription" "ddos_subscription" {
 
 #--Altering SNS
 resource "aws_sns_topic" "guardduty_alerts" {
-  name            = "${local.application_name}-guardduty-alerts"
-  delivery_policy = <<EOF
+  name              = "${local.application_name}-guardduty-alerts"
+  delivery_policy   = <<EOF
 {
   "http": {
     "defaultHealthyRetryPolicy": {
@@ -108,4 +119,8 @@ resource "aws_sns_topic" "guardduty_alerts" {
   }
 }
 EOF
+  kms_master_key_id = aws_kms_key.cloudwatch_sns_alerts_key.id
+  tags = merge(local.tags,
+    { Name = "${local.application_name}-guardduty-alerts" }
+  )
 }

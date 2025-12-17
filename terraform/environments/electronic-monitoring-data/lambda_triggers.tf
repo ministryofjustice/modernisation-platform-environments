@@ -7,31 +7,31 @@ module "calculate_checksum_sqs" {
 
 resource "aws_s3_bucket_notification" "data_bucket_triggers" {
   bucket = module.s3-data-bucket.bucket.id
-  queue {
-    queue_arn     = module.calculate_checksum_sqs.sqs_queue.arn
-    events        = ["s3:ObjectCreated:*"]
-    filter_suffix = ".zip"
-  }
-  queue {
-    queue_arn     = module.calculate_checksum_sqs.sqs_queue.arn
-    events        = ["s3:ObjectCreated:*"]
-    filter_suffix = ".bak"
-  }
-  queue {
-    queue_arn     = module.calculate_checksum_sqs.sqs_queue.arn
-    events        = ["s3:ObjectCreated:*"]
-    filter_suffix = ".bacpac"
-  }
-  queue {
-    queue_arn     = module.calculate_checksum_sqs.sqs_queue.arn
-    events        = ["s3:ObjectCreated:*"]
-    filter_suffix = ".csv"
-  }
-  queue {
-    queue_arn     = module.calculate_checksum_sqs.sqs_queue.arn
-    events        = ["s3:ObjectCreated:*"]
-    filter_suffix = ".7z"
-  }
+  # queue {
+  #   queue_arn     = module.calculate_checksum_sqs.sqs_queue.arn
+  #   events        = ["s3:ObjectCreated:*"]
+  #   filter_suffix = ".zip"
+  # }
+  # queue {
+  #   queue_arn     = module.calculate_checksum_sqs.sqs_queue.arn
+  #   events        = ["s3:ObjectCreated:*"]
+  #   filter_suffix = ".bak"
+  # }
+  # queue {
+  #   queue_arn     = module.calculate_checksum_sqs.sqs_queue.arn
+  #   events        = ["s3:ObjectCreated:*"]
+  #   filter_suffix = ".bacpac"
+  # }
+  # queue {
+  #   queue_arn     = module.calculate_checksum_sqs.sqs_queue.arn
+  #   events        = ["s3:ObjectCreated:*"]
+  #   filter_suffix = ".csv"
+  # }
+  # queue {
+  #   queue_arn     = module.calculate_checksum_sqs.sqs_queue.arn
+  #   events        = ["s3:ObjectCreated:*"]
+  #   filter_suffix = ".7z"
+  # }
   queue {
     queue_arn     = module.copy_mdss_data_sqs.sqs_queue.arn
     events        = ["s3:ObjectCreated:*"]
@@ -43,6 +43,12 @@ resource "aws_s3_bucket_notification" "data_bucket_triggers" {
     events        = ["s3:ObjectCreated:*"]
     filter_suffix = ".JSON"
     filter_prefix = "serco/fms"
+  }
+  queue {
+    queue_arn     = module.load_historic_csv_sqs.sqs_queue.arn
+    events        = ["s3:ObjectCreated:*"]
+    filter_suffix = ".csv"
+    filter_prefix = "g4s/lcm"
   }
 }
 
@@ -66,6 +72,13 @@ module "virus_scan_file_sqs" {
   lambda_function_name = module.virus_scan_file.lambda_function_name
   bucket_prefix        = local.bucket_prefix
   maximum_concurrency  = 1000
+}
+
+module "load_historic_csv_sqs" {
+  source               = "./modules/sqs_s3_lambda_trigger"
+  bucket               = module.s3-data-bucket.bucket
+  lambda_function_name = module.load_historic_csv.lambda_function_name
+  bucket_prefix        = local.bucket_prefix
 }
 
 resource "aws_s3_bucket_notification" "virus_scan_file" {
@@ -142,9 +155,8 @@ resource "aws_lambda_event_source_mapping" "sqs_trigger" {
 }
 
 
-# ----------------------------------------------
-# Load DMS data sqs queue
-# ----------------------------------------------
+
+
 
 module "load_dms_output_event_queue" {
   source               = "./modules/sqs_s3_lambda_trigger"
@@ -206,4 +218,40 @@ resource "aws_s3_bucket_notification" "load_mdss_event" {
   }
 
   depends_on = [module.load_mdss_event_queue[0], module.load_fms_event_queue[0]]
+}
+
+# ----------------------------------------------
+# Clean up MDSS load queue
+# ----------------------------------------------
+
+resource "aws_sqs_queue" "clean_mdss_load_dlq" {
+  name                    = "clean-mdss-load-dlq"
+  sqs_managed_sse_enabled = true
+}
+
+resource "aws_sqs_queue" "clean_mdss_load_queue" {
+  name                       = "clean-mdss-load-queue"
+  visibility_timeout_seconds = 15 * 60
+  message_retention_seconds  = 1209600 # 14 days
+  redrive_policy = jsonencode({
+    deadLetterTargetArn = aws_sqs_queue.clean_mdss_load_dlq.arn
+    maxReceiveCount     = 5
+  })
+  sqs_managed_sse_enabled = true
+}
+
+# ----------------------------------------------
+# MDSS cleanup SQS to Lambda trigger
+# ----------------------------------------------
+
+resource "aws_lambda_event_source_mapping" "mdss_cleanup_sqs_trigger" {
+  count            = local.is-development ? 0 : 1
+  event_source_arn = aws_sqs_queue.clean_mdss_load_queue.arn
+  function_name    = module.clean_after_mdss_load[0].lambda_function_name
+
+  batch_size = 10
+
+  scaling_config {
+    maximum_concurrency = 100
+  }
 }

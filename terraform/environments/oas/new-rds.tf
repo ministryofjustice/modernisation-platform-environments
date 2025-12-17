@@ -6,7 +6,7 @@
 ##################################################################################################################
 
 resource "random_password" "rds_password_new" {
-  count   = local.environment == "preproduction" ? 1 : 0
+  count   = contains(["test", "preproduction"], local.environment) ? 1 : 0
   length  = 16
   special = false
 
@@ -24,7 +24,7 @@ resource "random_password" "rds_password_new" {
 
 
 resource "aws_secretsmanager_secret" "rds_password_secret_new" {
-  count       = local.environment == "preproduction" ? 1 : 0
+  count       = contains(["test", "preproduction"], local.environment) ? 1 : 0
   name        = "${local.application_name}/app/db-master-password"
   description = "This secret has a dynamically generated password."
   tags = merge(
@@ -35,7 +35,7 @@ resource "aws_secretsmanager_secret" "rds_password_secret_new" {
 
 
 resource "aws_secretsmanager_secret_version" "rds_password_secret_version_new" {
-  count     = local.environment == "preproduction" ? 1 : 0
+  count     = contains(["test", "preproduction"], local.environment) ? 1 : 0
   secret_id = aws_secretsmanager_secret.rds_password_secret_new[0].id
   secret_string = jsonencode(
     {
@@ -56,7 +56,7 @@ resource "aws_secretsmanager_secret_version" "rds_password_secret_version_new" {
 ### RDS Subnet Group
 ##################################################################################################################
 resource "aws_db_subnet_group" "appdbsubnetgroup_new" {
-  count = local.environment == "preproduction" ? 1 : 0
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
 
   name       = "appdbsubnetgroup"
   subnet_ids = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
@@ -75,7 +75,7 @@ resource "aws_db_subnet_group" "appdbsubnetgroup_new" {
 ### RDS Parameter Group
 ##################################################################################################################
 resource "aws_db_parameter_group" "appdbparametergroup19_new" {
-  count = local.environment == "preproduction" ? 1 : 0
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
 
   name        = "appdbparametergroup19"
   family      = "oracle-ee-19"
@@ -104,7 +104,7 @@ resource "aws_db_parameter_group" "appdbparametergroup19_new" {
 ### RDS Option Group
 ##################################################################################################################
 resource "aws_db_option_group" "appdboptiongroup19_new" {
-  count = local.environment == "preproduction" ? 1 : 0
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
 
   name                     = "appdboptiongroup19"
   option_group_description = "${local.application_name}-${local.environment}-optiongroup"
@@ -129,11 +129,11 @@ resource "aws_db_option_group" "appdboptiongroup19_new" {
 ### OAS RDS INSTANCE - Preproduction only for now, will we extended to prod later and then to all env's 
 ##################################################################################################################
 resource "aws_db_instance" "oas_rds_instance" {
-  count = local.environment == "preproduction" ? 1 : 0
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
 
   # Instance identification
   identifier     = "${local.application_name}-${local.environment}"
-  db_name        = "${local.application_name}-${local.environment}"
+  db_name        = local.application_name
   engine         = local.application_data.accounts[local.environment].engine
   engine_version = local.application_data.accounts[local.environment].engine_version
   instance_class = local.application_data.accounts[local.environment].instance_class
@@ -180,6 +180,14 @@ resource "aws_db_instance" "oas_rds_instance" {
     local.tags,
     { Name = "${local.application_name}-${local.environment}-database" }
   )
+
+  lifecycle {
+    ignore_changes = [
+      db_name,
+      password,
+      final_snapshot_identifier
+    ]
+  }
 
   timeouts {
     create = "60m"

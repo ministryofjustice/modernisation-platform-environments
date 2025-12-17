@@ -21,7 +21,7 @@ resource "aws_lb" "ebsapps_lb" {
 }
 
 resource "aws_lb_listener" "ebsapps_listener" {
-  count = local.is-development? 0 : 1
+  count = local.is-development ? 0 : 1
 
   load_balancer_arn = aws_lb.ebsapps_lb[count.index].arn
   port              = "443"
