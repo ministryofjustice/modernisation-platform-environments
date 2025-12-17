@@ -397,7 +397,8 @@ def lambda_handler(event, context):
     tracemalloc.start()
 
     notification_service = None
-
+    slack_channel_webhook: str
+    slack_channel_webhook_guardduty: str
     # SNS message comes in event['Records'][0]['Sns']
     sns_message = event['Records'][0]['Sns']
 
@@ -420,11 +421,13 @@ def lambda_handler(event, context):
                 # Retrieve sensitive credentials from Secrets Manager
         logger.info("Retrieving credentials from AWS Secrets Manager")
         secrets_manager = SecretsManager()
+        logger.info("this is fine")
         secrets_data = secrets_manager.get_credentials(secret_name)
-        required_secrets = ["slack_channel_webhook","slack_channel_webhook_guardduty"]
+        logger.info("is this fine?")
+        logger.info("secrets: {secrets_data}")
         # Validate that required credentials are present
-        # Always require USER, HOST, and SLACK_WEBHOOK
-
+        # Always require SLACK_WEBHOOK for CloudWatch and GuardDuty
+        required_secrets = ["slack_channel_webhook", "slack_channel_webhook_guardduty"]
         missing_secrets = [key for key in required_secrets if key not in secrets_data]
         if missing_secrets:
             raise ValueError(f"Missing required secrets: {', '.join(missing_secrets)}")
