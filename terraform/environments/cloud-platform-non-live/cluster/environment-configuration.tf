@@ -113,12 +113,12 @@ locals {
               delete_on_termination = true
             }
           }
+        }
 
-          labels = {
-            Terraform                                  = "true"
-            "cloud-platform.justice.gov.uk/default-ng" = "true"
-            Cluster                                    = local.environment
-          }
+        labels = {
+          Terraform                                  = "true"
+          "cloud-platform.justice.gov.uk/default-ng" = "true"
+          Cluster                                    = local.environment
         }
       }
 

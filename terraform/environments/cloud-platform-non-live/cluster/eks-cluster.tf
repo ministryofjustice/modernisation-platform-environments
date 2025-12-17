@@ -47,25 +47,25 @@ module "eks" {
 
   addons = {
     coredns = {
-    #   addon_version = local.environment_configuration.eks_cluster_addon_versions.coredns
+      #   addon_version = local.environment_configuration.eks_cluster_addon_versions.coredns
     }
     kube-proxy = {
-    #   addon_version = local.environment_configuration.eks_cluster_addon_versions.kube_proxy
+      #   addon_version = local.environment_configuration.eks_cluster_addon_versions.kube_proxy
     }
     vpc-cni = {
-        before_compute = true
-    #   addon_version = local.environment_configuration.eks_cluster_addon_versions.vpc_cni
+      before_compute = true
+      #   addon_version = local.environment_configuration.eks_cluster_addon_versions.vpc_cni
     }
     eks-pod-identity-agent = {
-        before_compute = true
-    #   addon_version = local.environment_configuration.eks_cluster_addon_versions.eks_pod_identity_agent
+      before_compute = true
+      #   addon_version = local.environment_configuration.eks_cluster_addon_versions.eks_pod_identity_agent
     }
     aws-guardduty-agent = {
     }
 
-    aws-ebs-csi-driver = {  
+    aws-ebs-csi-driver = {
     }
-    
+
   }
 
   authentication_mode = "API_AND_CONFIG_MAP"
