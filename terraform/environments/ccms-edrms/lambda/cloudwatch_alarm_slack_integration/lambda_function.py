@@ -162,24 +162,132 @@ class NotificationService:
         logger.info("Slack notifications configured")
 
     def send_notification(
-        self, title: str, jsonalarmdetails: str, timestamp: str, is_error: bool = False
+        self, title: str, jsonalarmdetails: str, timestamp: str, type: str, is_error: bool = False
     ) -> bool:
         """Send a notification to Slack using the webhook."""
         curl = pycurl.Curl()
         logger.info("alarmdetailsinside:\n" + json.dumps(jsonalarmdetails, indent=2))
         alarmdetails = json.loads(jsonalarmdetails)
-        alarm_name = alarmdetails.get('AlarmName', 'Unknown Alarm')
-        region = alarmdetails.get('Region', '')
-        alarm_state = alarmdetails.get('NewStateValue','')
-        reason = alarmdetails.get('NewStateReason', '')
-        namespace = alarmdetails.get('Trigger', {}).get('Namespace', '')
-        metric_name = alarmdetails.get('Trigger', {}).get('MetricName', '')
-        dimensions = alarmdetails.get('Trigger', {}).get('Dimensions', [])
-        alarmdescription = alarmdetails.get('AlarmDescription','Alarm Description')
-        # Format dimensions nicely
-        dim_text = '\n'.join([f"{d['name']} = {d['value']}" for d in dimensions])
-        try:
-            # Prepare the Slack message with formatting
+        if type == "GuardDuty":
+            severity = alarmdetails.get('detail', {}).get('severity', 'Unknown Severity')
+            if severity < 4.0:
+                emoji = ":large_blue_circle:" 
+                strseverity = "Low"
+            elif severity < 7.0:
+                emoji = ":large_orange_circle:"  
+                strseverity = "Medium"
+            elif severity < 9.0:
+                emoji = ":small_red_triangle:"  
+                strseverity = "High"
+            else:
+                emoji = ":broken_heart:"  
+                strseverity = "Critical"
+
+            color = "danger" if is_error else "good"
+            finding_type = alarmdetails.get('detail', {}).get('type', 'Unknown Finding')
+            region = alarmdetails.get('detail', {}).get('region', 'Unknown Region')
+            account_id = alarmdetails.get('detail', {}).get('accountId', 'Unknown Account')
+            header = f"{emoji} | GuardDuty Finding | {region} | Account: {account_id}"
+            title = alarmdetails.get('detail', {}).get('title', 'No Title Provided')
+            threatcount = alarmdetails.get('detail', {}).get('service', {}).get('count', 'N/A')
+            firstseennofmt = alarmdetails.get('detail', {}).get('service', {}).get('eventFirstSeen', 'N/A')
+            lastseennofmt = alarmdetails.get('detail', {}).get('service', {}).get('eventLastSeen', 'N/A')
+
+            if firstseennofmt != 'N/A':
+                dt_first = datetime.strptime(firstseennofmt, "%Y-%m-%dT%H:%M:%S.%fZ")
+                firstseen = dt_first.strftime("%a, %d %b %Y %H:%M:%S UTC")
+            if lastseennofmt != 'N/A':
+                dt_last = datetime.strptime(lastseennofmt, "%Y-%m-%dT%H:%M:%S.%fZ")
+                lastseen = dt_last.strftime("%a, %d %b %Y %H:%M:%S UTC")
+
+             # Prepare the Slack message with formatting
+            payload = {
+                "blocks": [
+                    {
+                        "type": "header",
+                        "text": {"type": "plain_text", "text": f"{header}"}
+                    },
+                    {
+                        "type": "Section",
+                        "text": {"type": "plain_text", "text": f"Finding type - {finding_type}"}
+                    },
+                    {
+                        "type": "section",
+                        "text": {"type": "mrkdwn", "text": f"*{title}*"}
+                    },
+                    {
+                        "type": "divider"
+                    },
+                    {
+                        "type": "section",
+                        "fields": [
+                            {
+                            "type": "mrkdwn",
+                            "text": f"*FirstSeen:* {firstseen}"
+                            },
+                            {
+                            "type": "mrkdwn",
+                            "text": f"*LastSeen:* {lastseen}"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "section",
+                        "fields": [
+                            {
+                            "type": "mrkdwn",
+                            "text": f"*Severity:* {strseverity}"
+                            },
+                            {
+                            "type": "mrkdwn",
+                            "text": f"*Threat Count:* {threatcount}"
+                            }
+                        ]
+                    }
+                ]
+            }
+            # json_payload = json.dumps(payload)
+            # try:
+            #     # Configure curl for HTTP POST with JSON
+            #     curl.setopt(pycurl.URL, self.webhook_url)
+            #     curl.setopt(pycurl.POST, 1)
+            #     curl.setopt(pycurl.POSTFIELDS, json_payload)
+            #     curl.setopt(pycurl.HTTPHEADER, ["Content-Type: application/json"])
+            #     curl.setopt(pycurl.TIMEOUT, 10)
+
+            #     # Buffer for response (though Slack webhook responses are minimal)
+            #     response_buffer = io.BytesIO()
+            #     curl.setopt(pycurl.WRITEDATA, response_buffer)
+
+            #     # Send the notification
+            #     curl.perform()
+
+            #     # Check HTTP status code
+            #     http_code = curl.getinfo(pycurl.RESPONSE_CODE)
+            #     if http_code >= 400:
+            #         raise Exception(f"HTTP error {http_code}")
+
+            #     logger.info(f"Slack notification sent successfully: {title}")
+            #     return True
+
+            # except Exception as e:
+            #     logger.error(f"Failed to send Slack notification: {e}")
+            #     return False
+            # finally:
+            #     curl.close()
+        elif type == "CloudWatch Alarm":
+
+            alarm_name = alarmdetails.get('AlarmName', 'Unknown Alarm')
+            region = alarmdetails.get('Region', '')
+            alarm_state = alarmdetails.get('NewStateValue','')
+            reason = alarmdetails.get('NewStateReason', '')
+            namespace = alarmdetails.get('Trigger', {}).get('Namespace', '')
+            metric_name = alarmdetails.get('Trigger', {}).get('MetricName', '')
+            dimensions = alarmdetails.get('Trigger', {}).get('Dimensions', [])
+            alarmdescription = alarmdetails.get('AlarmDescription','Alarm Description')
+            # Format dimensions nicely
+            dim_text = '\n'.join([f"{d['name']} = {d['value']}" for d in dimensions])
+             # Prepare the Slack message with formatting
             emoji = ":broken_heart:" if is_error else ":white_check_mark:"
             color = "danger" if is_error else "good"
             title = f"{emoji} | {title} | {alarm_name} | {region}"
@@ -235,6 +343,9 @@ class NotificationService:
                 ]
             }
 
+        try:
+
+
             # Convert payload to JSON
             json_payload = json.dumps(payload)
 
@@ -285,14 +396,12 @@ def lambda_handler(event, context):
     """
     tracemalloc.start()
 
-    notification_service: Optional[NotificationService] = None
+    notification_service = None
 
     # SNS message comes in event['Records'][0]['Sns']
     sns_message = event['Records'][0]['Sns']
 
     source = sns_message.get('source')
-
-
 
     try:
         alarm_details = json.loads(message_str)
@@ -335,6 +444,7 @@ def lambda_handler(event, context):
             required_secrets = ["slack_channel_webhook_guardduty"]
             channelconfig=config.slack_channel_webhook_guardduty
             alarmnotifiction="GuardDuty Finding Notification"
+            type="GuardDuty"
         else:
             logger.info("CloudWatch Alarm detected in SNS message")
             logger.info("Starting Notification to Slack for CloudWatch Alarm via SNS Topic")
@@ -347,6 +457,7 @@ def lambda_handler(event, context):
             required_secrets = ["slack_channel_webhook"]
             channelconfig=config.slack_channel_webhook
             alarmnotifiction="CloudWatch Alarm Notification"
+            type="CloudWatch Alarm"
 
 
             # Extract useful fields
@@ -365,7 +476,7 @@ def lambda_handler(event, context):
             notification_service.send_notification(
                         alarmnotifiction, 
                         alarm_details,
-                        formatted, is_error
+                        formatted, type, is_error
                     )
         # Prepare response
         response = {
