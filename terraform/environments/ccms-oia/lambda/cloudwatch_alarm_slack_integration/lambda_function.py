@@ -207,7 +207,7 @@ class NotificationService:
                         "text": {"type": "plain_text", "text": f"{header}"}
                     },
                     {
-                        "type": "Section",
+                        "type": "section",
                         "text": {"type": "plain_text", "text": f"Finding type - {finding_type}"}
                     },
                     {
