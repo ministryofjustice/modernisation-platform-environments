@@ -4,7 +4,7 @@ resource "helm_release" "kyverno" {
   name       = "kyverno"
   repository = "https://kyverno.github.io/kyverno"
   chart      = "kyverno"
-  version    = "3.4.3"
+  version    = local.environment_configuration.helm_chart_version.kyverno
   namespace  = kubernetes_namespace.kyverno.metadata[0].name
   values = [
     templatefile(
@@ -26,7 +26,7 @@ resource "helm_release" "aws_cloudwatch_metrics" {
   name       = "aws-cloudwatch-metrics"
   repository = "https://aws.github.io/eks-charts"
   chart      = "aws-cloudwatch-metrics"
-  version    = "0.0.11"
+  version    = local.environment_configuration.helm_chart_version.aws_cloudwatch_metrics
   namespace  = kubernetes_namespace.aws_observability.metadata[0].name
   values = [
     templatefile(
@@ -45,7 +45,7 @@ resource "helm_release" "aws_for_fluent_bit" {
   name       = "aws-for-fluent-bit"
   repository = "https://aws.github.io/eks-charts"
   chart      = "aws-for-fluent-bit"
-  version    = "0.1.35"
+  version    = local.environment_configuration.helm_chart_version.aws_for_fluent_bit
   namespace  = kubernetes_namespace.aws_observability.metadata[0].name
   values = [
     templatefile(
@@ -71,7 +71,7 @@ resource "helm_release" "amazon_prometheus_proxy" {
   name       = "amazon-prometheus-proxy"
   repository = "https://prometheus-community.github.io/helm-charts"
   chart      = "kube-prometheus-stack"
-  version    = "75.3.5"
+  version    = local.environment_configuration.helm_chart_version.kube_prometheus_stack
   namespace  = kubernetes_namespace.aws_observability.metadata[0].name
   values = [
     templatefile(
@@ -96,7 +96,7 @@ resource "helm_release" "cluster_autoscaler" {
   name       = "cluster-autoscaler"
   repository = "https://kubernetes.github.io/autoscaler"
   chart      = "cluster-autoscaler"
-  version    = "9.46.6"
+  version    = local.environment_configuration.helm_chart_version.cluster_autoscaler
   namespace  = kubernetes_namespace.cluster_autoscaler.metadata[0].name
 
   values = [
@@ -188,7 +188,7 @@ resource "helm_release" "external_dns" {
   name       = "external-dns"
   repository = "https://kubernetes-sigs.github.io/external-dns"
   chart      = "external-dns"
-  version    = "1.17.0"
+  version    = local.environment_configuration.helm_chart_version.external_dns
   namespace  = kubernetes_namespace.external_dns.metadata[0].name
   values = [
     templatefile(
@@ -209,7 +209,7 @@ resource "helm_release" "cert_manager" {
   name       = "cert-manager"
   repository = "https://charts.jetstack.io"
   chart      = "cert-manager"
-  version    = "v1.18.1"
+  version    = local.environment_configuration.helm_chart_version.cert_manager
   namespace  = kubernetes_namespace.cert_manager.metadata[0].name
   values = [
     templatefile(
@@ -262,7 +262,7 @@ resource "helm_release" "ingress_nginx" {
   name       = "ingress-nginx"
   repository = "https://kubernetes.github.io/ingress-nginx"
   chart      = "ingress-nginx"
-  version    = "4.12.3"
+  version    = local.environment_configuration.helm_chart_version.ingress_nginx
   namespace  = kubernetes_namespace.ingress_nginx.metadata[0].name
   values = [
     templatefile(
@@ -283,7 +283,7 @@ resource "helm_release" "external_secrets" {
   name       = "external-secrets"
   repository = "https://charts.external-secrets.io"
   chart      = "external-secrets"
-  version    = "0.18.0"
+  version    = local.environment_configuration.helm_chart_version.external_secrets
   namespace  = kubernetes_namespace.external_secrets.metadata[0].name
   values = [
     templatefile(
@@ -310,7 +310,7 @@ resource "helm_release" "keda" {
   name       = "keda"
   repository = "https://kedacore.github.io/charts"
   chart      = "keda"
-  version    = "2.17.2"
+  version    = local.environment_configuration.helm_chart_version.keda
   namespace  = kubernetes_namespace.keda.metadata[0].name
   values = [
     templatefile(
@@ -322,10 +322,11 @@ resource "helm_release" "keda" {
 
 /* Velero */
 resource "helm_release" "velero" {
+  /* https://artifacthub.io/packages/helm/vmware-tanzu/velero */
   name       = "velero"
   repository = "https://vmware-tanzu.github.io/helm-charts"
   chart      = "velero"
-  version    = "10.0.10"
+  version    = local.environment_configuration.helm_chart_version.velero
   namespace  = kubernetes_namespace.velero.metadata[0].name
   values = [
     templatefile(
