@@ -403,7 +403,7 @@ def lambda_handler(event, context):
 
     source = sns_message.get('source')
     message_str = sns_message.get('Message', '{}')
-    
+
     try:
         alarm_details = json.loads(message_str)
         env_config = {
@@ -450,7 +450,6 @@ def lambda_handler(event, context):
             logger.info("CloudWatch Alarm detected in SNS message")
             logger.info("Starting Notification to Slack for CloudWatch Alarm via SNS Topic")
             # slack_channel_webhook: str
-            message_str = sns_message.get('Message', '{}')
             timestamp_str = sns_message.get('Timestamp')
             if timestamp_str:
                 dt = datetime.strptime(timestamp_str, "%Y-%m-%dT%H:%M:%S.%fZ")
