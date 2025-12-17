@@ -22,7 +22,18 @@ locals {
       }
 
       helm_chart_version = {
-        karpenter = "1.8.2"
+        aws_cloudwatch_metrics = "0.0.11"
+        aws_for_fluent_bit     = "0.1.35"
+        cert_manager           = "v1.18.1"
+        cluster_autoscaler     = "9.46.6"
+        external_dns           = "1.17.0"
+        external_secrets       = "0.18.0"
+        ingress_nginx          = "4.12.3"
+        karpenter              = "1.8.2"
+        keda                   = "2.17.2"
+        kube_prometheus_stack  = "75.3.5"
+        kyverno                = "3.4.3"
+        velero                 = "10.0.10"
       }
 
       /* Data Engineering Airflow */
@@ -51,7 +62,18 @@ locals {
       }
 
       helm_chart_version = {
-        karpenter = "1.8.2"
+        aws_cloudwatch_metrics = "0.0.11"
+        aws_for_fluent_bit     = "0.1.35"
+        cert_manager           = "v1.18.1"
+        cluster_autoscaler     = "9.46.6"
+        external_dns           = "1.17.0"
+        external_secrets       = "0.18.0"
+        ingress_nginx          = "4.12.3"
+        karpenter              = "1.8.2"
+        keda                   = "2.17.2"
+        kube_prometheus_stack  = "75.3.5"
+        kyverno                = "3.4.3"
+        velero                 = "10.0.10"
       }
 
       /* Data Engineering Airflow */
@@ -80,7 +102,18 @@ locals {
       }
 
       helm_chart_version = {
-        karpenter = "1.8.2"
+        aws_cloudwatch_metrics = "0.0.11"
+        aws_for_fluent_bit     = "0.1.35"
+        cert_manager           = "v1.18.1"
+        cluster_autoscaler     = "9.46.6"
+        external_dns           = "1.17.0"
+        external_secrets       = "0.18.0"
+        ingress_nginx          = "4.12.3"
+        karpenter              = "1.8.2"
+        keda                   = "2.17.2"
+        kube_prometheus_stack  = "75.3.5"
+        kyverno                = "3.4.3"
+        velero                 = "10.0.10"
       }
 
       /* Data Engineering Airflow */

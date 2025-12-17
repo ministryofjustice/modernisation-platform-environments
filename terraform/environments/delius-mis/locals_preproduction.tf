@@ -158,8 +158,11 @@ locals {
   }
 
   dis_config_preprod = {
-    instance_count = 0
-    ami_name       = "delius_mis_windows_server_patch_2024-02-07T11-03-13.202Z"
+    instance_count    = 0
+    ami_name          = "delius_mis_windows_server_patch_2024-02-07T11-03-13.202Z"
+    computer_name     = "NDMIS-PP-DIS" # 15 char limit
+    powershell_branch = "main"
+
     ebs_volumes = {
       "/dev/sda1" = { label = "root", size = 100 }
       "/dev/xvdf" = { label = "data", size = 300 }
@@ -202,6 +205,57 @@ locals {
     }
   }
 
+  # new DFI instance config to differentiate from DIS
+  dfi_config_preprod = {
+    instance_count = 0
+    ami_name       = "delius_mis_windows_server_patch_2025-07-09T12-56-15.901Z"
+    ebs_volumes = {
+      "/dev/sda1" = { label = "root", size = 150 } # root volume
+      "xvdd"      = { label = "data", size = 300 } # D:\ App drive
+    }
+    ebs_volumes_config = {
+      data = {
+        iops       = 3000
+        throughput = 125
+        type       = "gp3"
+      }
+      root = {
+        iops       = 3000
+        throughput = 125
+        type       = "gp3"
+      }
+    }
+    instance_config = {
+      associate_public_ip_address  = false
+      disable_api_termination      = false
+      disable_api_stop             = false
+      instance_type                = "t2.xlarge" # see TM-1305
+      metadata_endpoint_enabled    = "enabled"
+      key_name                     = null
+      metadata_options_http_tokens = "required"
+      monitoring                   = false
+      ebs_block_device_inline      = true
+
+      private_dns_name_options = {
+        enable_resource_name_dns_aaaa_record = false
+        enable_resource_name_dns_a_record    = true
+        hostname_type                        = "resource-name"
+      }
+
+      tags = merge(
+        local.tags,
+        { backup = true
+        }
+      )
+    }
+    # Load balancer configuration for DFI
+    lb_target_config = {
+      endpoint             = "ndl-dfi"
+      port                 = 8080
+      health_check_path    = "/DataServices/"
+      health_check_matcher = "200,302,301"
+    }
+  }
 
   # BOE DB config
   boe_db_config_preprod = {
@@ -348,4 +402,8 @@ locals {
     storage_capacity     = 200
     throughtput_capacity = 16
   }
+
+  dfi_report_bucket_config_preprod = null
+
+  lb_config_preprod = null
 }

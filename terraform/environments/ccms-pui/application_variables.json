@@ -5,7 +5,7 @@
       "aws_region": "eu-west-2",
       "ami_image_id": "ami-0d6d764bbe794b8ca",
       "app_image": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/ccms-pui",
-      "container_version": "0.0.27-dev",
+      "container_version": "0.0.28-dev",
       "ec2_instance_type": "m5.xlarge",
       "ec2_desired_capacity": "1",
       "ec2_max_capacity": "2",

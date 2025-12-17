@@ -453,7 +453,7 @@
       "ebs_size_ebsdb_redoA": 100,
       "ebs_size_ebsdb_redoB": 50,
       "ebs_size_ebsdb_techst": 50,
-      "ebs_size_ebsdb_backup": 8000,
+      "ebs_size_ebsdb_backup": 9000,
       "ebs_size_ebsdb_diag": 50,
       "ebs_iops_ebsdb_swap2": 3000,
       "ebs_size_ebsdb_swap2": 16,

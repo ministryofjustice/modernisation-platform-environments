@@ -45,10 +45,11 @@ variable "dis_config" {
   type = object({
     instance_count           = number
     ami_name                 = string
+    computer_name            = string
     ebs_volumes              = any
     ebs_volumes_config       = any
     instance_config          = any
-    branch                   = optional(string, "main")
+    powershell_branch        = optional(string, "main")
     cloudwatch_metric_alarms = optional(any, null)
   })
   default = null

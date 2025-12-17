@@ -421,14 +421,16 @@ resource "aws_lb_target_group" "dis" {
 
 # HTTP Listener (port 80) - default action forwards to DFI (if exists), otherwise DIS
 resource "aws_lb_listener" "mis_http" {
-  count             = var.lb_config != null ? 1 : 0
+  count = (var.lb_config != null && local.dfi_enabled && length(aws_lb_target_group.dfi) > 0) || (
+  !local.dfi_enabled && length(aws_lb_target_group.dis) > 0) ? 1 : 0
+
   load_balancer_arn = aws_lb.mis[0].arn
   port              = "80"
   protocol          = "HTTP"
 
   default_action {
     type             = "forward"
-    target_group_arn = local.dfi_enabled ? aws_lb_target_group.dfi[0].arn : aws_lb_target_group.dis[0].arn
+    target_group_arn = local.dfi_enabled ? try(aws_lb_target_group.dfi[0].arn, null) : try(aws_lb_target_group.dis[0].arn, null)
   }
 
   tags = local.tags
@@ -436,7 +438,9 @@ resource "aws_lb_listener" "mis_http" {
 
 # HTTPS Listener (port 443) - default action forwards to DFI (if exists), otherwise DIS
 resource "aws_lb_listener" "mis_https" {
-  count             = var.lb_config != null ? 1 : 0
+  count = (var.lb_config != null && local.dfi_enabled && length(aws_lb_target_group.dfi) > 0) || (
+  !local.dfi_enabled && length(aws_lb_target_group.dis) > 0) ? 1 : 0
+
   load_balancer_arn = aws_lb.mis[0].arn
   port              = "443"
   protocol          = "HTTPS"
@@ -445,7 +449,7 @@ resource "aws_lb_listener" "mis_https" {
 
   default_action {
     type             = "forward"
-    target_group_arn = local.dfi_enabled ? aws_lb_target_group.dfi[0].arn : aws_lb_target_group.dis[0].arn
+    target_group_arn = local.dfi_enabled ? try(aws_lb_target_group.dfi[0].arn, null) : try(aws_lb_target_group.dis[0].arn, null)
   }
 
   # Explicit dependency to ensure certificate is fully validated before listener creation

@@ -19,20 +19,16 @@ locals {
   baseline_test = {
 
     acm_certificates = {
-      remote_desktop_wildcard_cert = {
+      remote_desktop_wildcard_cert_v2 = {
         cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
-        domain_name                         = "modernisation-platform.service.justice.gov.uk"
-        external_validation_records_created = true
+        domain_name                         = "*.test.hmpps-domain.service.justice.gov.uk"
         subject_alternate_names = [
           "*.hmpps-domain-services.hmpps-test.modernisation-platform.service.justice.gov.uk",
-          "*.test.hmpps-domain.service.justice.gov.uk",
-          "hmppgw1.justice.gov.uk",
-          "*.hmppgw1.justice.gov.uk",
         ]
         tags = {
           description = "wildcard cert for hmpps domain load balancer"
         }
-      }
+      }      
     }
 
     cloudwatch_dashboards = {
@@ -190,7 +186,7 @@ locals {
               "test-rdgw-1-http",
               "test-rds-1-https",
             ]
-            certificate_names_or_arns = ["remote_desktop_wildcard_cert"]
+            certificate_names_or_arns = ["remote_desktop_wildcard_cert_v2"]
             rules = {
               test-rdgw-1-http = {
                 priority = 100
@@ -202,7 +198,6 @@ locals {
                   host_header = {
                     values = [
                       "rdgateway1.test.hmpps-domain.service.justice.gov.uk",
-                      "hmppgw1.justice.gov.uk",
                     ]
                   }
                 }]
@@ -256,7 +251,7 @@ locals {
       maintenance_window_cutoff   = 1 # 2 for prod
       patch_classifications = {
         REDHAT_ENTERPRISE_LINUX = ["Security", "Bugfix"]                 # Linux Options=Security,Bugfix,Enhancement,Recommended,Newpackage
-        WINDOWS                 = ["SecurityUpdates", "CriticalUpdates"] # Windows Options=CriticalUpdates,SecurityUpdates,DefinitionUpdates,Drivers,FeaturePacks,ServicePacks,Tools,UpdateRollups,Updates,Upgrades
+        WINDOWS                 = ["SecurityUpdates", "CriticalUpdates", "UpdateRollups"] # Windows Options=CriticalUpdates,SecurityUpdates,DefinitionUpdates,Drivers,FeaturePacks,ServicePacks,Tools,UpdateRollups,Updates,Upgrades
       }
     }
 

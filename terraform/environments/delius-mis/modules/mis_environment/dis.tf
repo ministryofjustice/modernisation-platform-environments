@@ -25,7 +25,7 @@ data "aws_security_group" "mis_db" {
 }
 
 module "dis_instance" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v4.1.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v4.2.0"
 
   # allow environment not to have this var set and still work
   count = var.dis_config != null ? var.dis_config.instance_count : 0
@@ -58,17 +58,10 @@ module "dis_instance" {
     aws_iam_policy.ec2_automation.arn
   ]
 
-  user_data_raw = base64encode(
-    templatefile(
-      "${path.module}/templates/AutoEC2LaunchV2.yaml.tftpl",
-      {
-        #ad_username_secret_name = aws_secretsmanager_secret.ad_username.name
-        ad_password_secret_name = aws_secretsmanager_secret.ad_admin_password.name
-        ad_domain_name          = var.environment_config.ad_domain_name
-        ad_ip_list              = aws_directory_service_directory.mis_ad.dns_ip_addresses
-        branch                  = var.dis_config.branch
-      }
-    )
+  user_data = templatefile(
+    "${path.module}/templates/user-data-pwsh.yaml.tftpl", {
+      branch = var.dis_config.powershell_branch
+    }
   )
 
   business_unit     = var.account_info.business_unit
@@ -80,8 +73,9 @@ module "dis_instance" {
   tags = merge(
     var.tags,
     {
-      domain-name = var.environment_config.ad_domain_name
-      server-type = "MISDis"
+      computer-name = "${var.dis_config.computer_name}-${count.index + 1}"
+      domain-name   = var.environment_config.ad_domain_name
+      server-type   = "DeliusMisDis"
     }
   )
 
