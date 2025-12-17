@@ -369,3 +369,24 @@ resource "aws_vpc_security_group_egress_rule" "efs-security-group-egress" {
   ip_protocol       = "-1"
   cidr_ipv4         = "0.0.0.0/0"
 }
+
+# OEM OMS → SOA RDS (Port 1521)
+resource "aws_vpc_security_group_ingress_rule" "soa_db_oem_oms_ingress" {
+  security_group_id = aws_security_group.soa_db.id
+  description       = "OEM OMS to SOA RDS on 1521"
+  ip_protocol       = "TCP"
+  from_port         = 1521
+  to_port           = 1521
+  cidr_ipv4         = "10.26.60.231/32"
+}
+
+# OEM DB → SOA RDS (Port 1521)
+resource "aws_vpc_security_group_ingress_rule" "soa_db_oem_db_ingress" {
+  security_group_id = aws_security_group.soa_db.id
+  description       = "OEM DB to SOA RDS on 1521"
+  ip_protocol       = "TCP"
+  from_port         = 1521
+  to_port           = 1521
+  cidr_ipv4         = "10.26.60.169/32"
+}
+
