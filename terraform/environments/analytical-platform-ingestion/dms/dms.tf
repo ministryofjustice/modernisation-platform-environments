@@ -26,7 +26,7 @@ locals {
 }
 
 module "cica_dms_tariff_dms_implementation" {
-
+  # Oracle DMS source
   source      = "../modules/dms"
   vpc_id      = data.aws_vpc.connected_vpc.id
   environment = local.environment
