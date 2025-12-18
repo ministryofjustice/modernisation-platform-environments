@@ -139,5 +139,6 @@ resource "aws_appautoscaling_scheduled_action" "ccms_opa_scale_up_06" {
   }
 
   # Avoid ConcurrentUpdateException when both schedules are created together
-  depends_on = [aws_appautoscaling_scheduled_action.ccms_opa_scale_down_  depends_on = [aws_appautoscaling_scheduled_action.ccms_opa_scale_down_21]
+  depends_on = [aws_appautoscaling_scheduled_action.ccms_opa_scale_down_21]
+}
 
