@@ -24,16 +24,16 @@ locals {
       helm_chart_version = {
         aws_cloudwatch_metrics = "0.0.11"
         aws_for_fluent_bit     = "0.1.35"
-        cert_manager           = "v1.18.1"
-        cluster_autoscaler     = "9.46.6"
-        external_dns           = "1.17.0"
-        external_secrets       = "0.18.0"
-        ingress_nginx          = "4.12.3"
-        karpenter              = "1.8.2"
-        keda                   = "2.17.2"
-        kube_prometheus_stack  = "75.3.5"
-        kyverno                = "3.4.3"
-        velero                 = "10.0.10"
+        cert_manager           = "v1.19.2"
+        cluster_autoscaler     = "9.54.0"
+        external_dns           = "1.19.0"
+        external_secrets       = "1.1.1"
+        ingress_nginx          = "4.14.1"
+        karpenter              = "1.8.3"
+        keda                   = "2.18.2"
+        kube_prometheus_stack  = "80.4.2"
+        kyverno                = "3.6.1"
+        velero                 = "11.2.0"
       }
 
       /* Data Engineering Airflow */
