@@ -199,7 +199,7 @@ data "aws_iam_policy_document" "coat_cur_v2_hourly_prod_bucket_policy" {
     ]
     resources = [
       "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/athena-results/*",
-      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/ctas/fct-daily-cost/*"
+      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/ctas/fct-daily-cost/*",
       "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/moj-cost-and-usage-reports/*",
       "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly",
       "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/*"
