@@ -1,3 +1,6 @@
+# -----------------------------
+# DB Subnet Group
+# -----------------------------
 resource "aws_db_subnet_group" "soa" {
   name_prefix = "main"
   subnet_ids  = data.aws_subnets.shared-data.ids
@@ -7,67 +10,68 @@ resource "aws_db_subnet_group" "soa" {
   }
 }
 
+# -----------------------------
+# DB Option Group
+# -----------------------------
 resource "aws_db_option_group" "soa_oracle_19" {
   name_prefix          = "soa-db-option-group"
   engine_name          = "oracle-ee"
   major_engine_version = "19"
 
+  # JVM Option
   option {
     option_name = "JVM"
   }
 
+  # S3 Integration Option
   option {
     option_name = "S3_INTEGRATION"
     port        = 0
     version     = "1.0"
   }
 
-  # -----------------------------
-  # OEM Agent Option (Updated)
-  # -----------------------------
+  # ---------------------------------------------------
+  # OEM Agent Option (Final Working Version)
+  # ---------------------------------------------------
   option {
     option_name = "OEM_AGENT"
+    port        = 3872   # REQUIRED – OEM agent listener port
 
     vpc_security_group_memberships = [
-      "${aws_security_group.soa_db.id}"
+      aws_security_group.soa_db.id
     ]
 
+    # Required settings (as per AWS console)
     option_settings {
       name  = "OMS_HOST"
       value = "laa-oem-app.laa-development.modernisation-platform.service.justice.gov.uk"
     }
 
     option_settings {
-      name  = "AGENT_PORT"
-      value = "3872"
-    }
-
-    option_settings {
-      name  = "EM_UPLOAD_PORT"
+      name  = "OMS_PORT"
       value = "4903"
-    }
-
-    option_settings {
-      name  = "AGENT_REGISTRATION_USERNAME"
-      value = jsondecode(data.aws_secretsmanager_secret_version.oem_agent_credentials.secret_string).username
     }
 
     option_settings {
       name  = "AGENT_REGISTRATION_PASSWORD"
       value = jsondecode(data.aws_secretsmanager_secret_version.oem_agent_credentials.secret_string).password
     }
-
-    option_settings {
-      name  = "AGENT_PASSWORD"
-      value = jsondecode(data.aws_secretsmanager_secret_version.oem_agent_credentials.secret_string).password
-    }
   }
 
   lifecycle {
     create_before_destroy = true
+
+    # Prevent TF from overwriting AWS-managed OEM settings
+    ignore_changes = [
+      option[*].option_settings,
+      option[*].port
+    ]
   }
 }
 
+# -----------------------------
+# RDS Instance
+# -----------------------------
 resource "aws_db_instance" "soa_db" {
   identifier                          = "soa-db"
   allocated_storage                   = local.application_data.accounts[local.environment].soa_db_storage_gb
@@ -95,8 +99,9 @@ resource "aws_db_instance" "soa_db" {
   backup_window           = "03:00-06:00"
   character_set_name      = "AL32UTF8"
   deletion_protection     = local.application_data.accounts[local.environment].soa_db_deletion_protection
-  db_subnet_group_name    = aws_db_subnet_group.soa.id
-  option_group_name       = aws_db_option_group.soa_oracle_19.id
+
+  db_subnet_group_name = aws_db_subnet_group.soa.id
+  option_group_name    = aws_db_option_group.soa_oracle_19.id
 
   tags = merge(
     local.tags,
