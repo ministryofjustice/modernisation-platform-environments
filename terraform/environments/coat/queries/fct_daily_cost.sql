@@ -5,7 +5,6 @@ with (
   partitioned_by = ARRAY['billing_period']
 )
 as select
-  billing_period,
   line_item_usage_account_name as account_name,
   product_region_code,
   cost_category['environment'] as environment,
@@ -18,7 +17,9 @@ as select
   product['product_name'] as product_name,
   date(line_item_usage_start_date) as usage_date,
 
-  sum(line_item_net_unblended_cost) as sum_net_unblended_cost
+  sum(line_item_net_unblended_cost) as sum_net_unblended_cost,
+
+  billing_period,
 from data
 where billing_period >= date_format(date_add('month', -1, current_date), '%Y-%m')
 group by
