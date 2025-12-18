@@ -23,7 +23,10 @@ module "bastion_linux" {
   log_expiry_days      = 180 # days before log expiration
   # bastion
   allow_ssh_commands = false
-  autoscaling_cron   = {} # Disable auto-scaling schedule
+  autoscaling_cron = {
+    down = "59 4 * * *" # Scale down at 04:59
+    up   = "1 5 * * *"  # Scale up at 05:01 (minimal 2-minute downtime window)
+  }
 
   app_name      = var.networking[0].application
   business_unit = local.vpc_name
