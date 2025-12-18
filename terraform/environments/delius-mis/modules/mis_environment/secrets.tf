@@ -36,7 +36,7 @@ resource "aws_secretsmanager_secret" "boe_passwords" {
 }
 
 resource "aws_secretsmanager_secret" "dis_config" {
-  name = "${var.app_name}-${var.env_name}-sap-dfi-config"
+  name = "${var.app_name}-${var.env_name}-sap-dis-config"
 
   description = "Config secrets for SAP BODS DIS ETL system"
   kms_key_id  = var.account_config.kms_keys["general_shared"]
@@ -45,7 +45,7 @@ resource "aws_secretsmanager_secret" "dis_config" {
 }
 
 resource "aws_secretsmanager_secret" "dis_passwords" {
-  name = "${var.app_name}-${var.env_name}-sap-dfi-passwords"
+  name = "${var.app_name}-${var.env_name}-sap-dis-passwords"
 
   description = "Passwords for SAP BODS DIS ETL system"
   kms_key_id  = var.account_config.kms_keys["general_shared"]
