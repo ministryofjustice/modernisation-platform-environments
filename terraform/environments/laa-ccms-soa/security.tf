@@ -152,7 +152,7 @@ resource "aws_security_group_rule" "alb_managed_workspace_ingress_443" {
 
 resource "aws_security_group_rule" "alb_managed_ingress_8001" {
   security_group_id = aws_security_group.alb_managed.id
-  type              = "Ingress"
+  type              = "ingress"
   description       = "Managed Weblogic - Internal Subnets"
   protocol          = "TCP"
   from_port         = 8001
@@ -166,7 +166,7 @@ resource "aws_security_group_rule" "alb_managed_ingress_8001" {
 
 resource "aws_security_group_rule" "alb_managed_ingress_cp80" {
   security_group_id = aws_security_group.alb_managed.id
-  type              = "Ingress"
+  type              = "ingress"
   description       = "Managed HTTP - Cloud Platform"
   protocol          = "TCP"
   from_port         = 80
@@ -176,7 +176,7 @@ resource "aws_security_group_rule" "alb_managed_ingress_cp80" {
 
 resource "aws_security_group_rule" "alb_managed_ingress_cp443" {
   security_group_id = aws_security_group.alb_managed.id
-  type              = "Ingress"
+  type              = "ingress"
   description       = "Managed HTTPS - Cloud Platform"
   protocol          = "TCP"
   from_port         = 443
@@ -186,7 +186,7 @@ resource "aws_security_group_rule" "alb_managed_ingress_cp443" {
 
 resource "aws_security_group_rule" "alb_managed_ingress_cp8001" {
   security_group_id = aws_security_group.alb_managed.id
-  type              = "Ingress"
+  type              = "ingress"
   description       = "Managed Weblogic - Cloud Platform"
   protocol          = "TCP"
   from_port         = 8001
