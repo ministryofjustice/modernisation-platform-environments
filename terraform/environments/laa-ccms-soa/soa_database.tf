@@ -63,9 +63,9 @@ resource "aws_db_option_group" "soa_oracle_19" {
   #   }
   # }
 
-  # lifecycle {
-  #   create_before_destroy = true
-  # }
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_db_instance" "soa_db" {
