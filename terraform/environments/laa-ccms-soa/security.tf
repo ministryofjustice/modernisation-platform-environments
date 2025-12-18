@@ -301,7 +301,7 @@ resource "aws_security_group_rule" "soa_db_egress_all" {
 
 #--Database TDS
 resource "aws_security_group" "tds_db" {
-  name_prefix = "ccms-soa-tds-allow-db"
+  name        = "ccms-soa-tds-allow-db"
   description = "Allow DB inbound traffic"
   vpc_id      = data.aws_vpc.shared.id
 }
@@ -348,7 +348,7 @@ resource "aws_security_group_rule" "tds_db_egress_all" {
 
 #--EFS
 resource "aws_security_group" "efs-security-group" {
-  name        = "${local.application_name}-efs-security-group"
+  name_prefix = "${local.application_name}-efs-security-group"
   description = "allow inbound access from container instances"
   vpc_id      = data.aws_vpc.shared.id
 }
