@@ -18,6 +18,7 @@ import boto3
 import pycurl
 from botocore.exceptions import ClientError
 from mypy_boto3_secretsmanager import SecretsManagerClient
+from dateutil import parser
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -40,7 +41,8 @@ class ConfigValidator:
         """Validate that all mandatory fields are present and non-empty."""
         # Always mandatory fields
         mandatory_fields = {
-            "slack_channel_webhook": config_dict.get("slack_channel_webhook")
+            "slack_channel_webhook": config_dict.get("slack_channel_webhook"),
+            "slack_channel_webhook_guardduty": config_dict.get("slack_channel_webhook_guardduty")
         }
         missing_fields = [name for name, value in mandatory_fields.items() if not value]
         if missing_fields:
@@ -162,12 +164,12 @@ class NotificationService:
         logger.info("Slack notifications configured")
 
     def send_notification(
-        self, title: str, jsonalarmdetails: str, timestamp: str, type: str, is_error: bool = False
+        self, title: str, alarmdetails: str, timestamp: str, type: str, is_error: bool = False
     ) -> bool:
         """Send a notification to Slack using the webhook."""
         curl = pycurl.Curl()
-        logger.info("alarmdetailsinside:\n" + json.dumps(jsonalarmdetails, indent=2))
-        alarmdetails = json.loads(jsonalarmdetails)
+        logger.info("alarmdetailsinside:\n" + json.dumps(alarmdetails, indent=2))
+        # alarmdetails = json.loads(jsonalarmdetails)
         if type == "GuardDuty":
             severity = alarmdetails.get('detail', {}).get('severity', 'Unknown Severity')
             if severity < 4.0:
@@ -208,7 +210,7 @@ class NotificationService:
                         "text": {"type": "plain_text", "text": f"{header}"}
                     },
                     {
-                        "type": "Section",
+                        "type": "section",
                         "text": {"type": "plain_text", "text": f"Finding type - {finding_type}"}
                     },
                     {
@@ -246,37 +248,7 @@ class NotificationService:
                     }
                 ]
             }
-            # json_payload = json.dumps(payload)
-            # try:
-            #     # Configure curl for HTTP POST with JSON
-            #     curl.setopt(pycurl.URL, self.webhook_url)
-            #     curl.setopt(pycurl.POST, 1)
-            #     curl.setopt(pycurl.POSTFIELDS, json_payload)
-            #     curl.setopt(pycurl.HTTPHEADER, ["Content-Type: application/json"])
-            #     curl.setopt(pycurl.TIMEOUT, 10)
-
-            #     # Buffer for response (though Slack webhook responses are minimal)
-            #     response_buffer = io.BytesIO()
-            #     curl.setopt(pycurl.WRITEDATA, response_buffer)
-
-            #     # Send the notification
-            #     curl.perform()
-
-            #     # Check HTTP status code
-            #     http_code = curl.getinfo(pycurl.RESPONSE_CODE)
-            #     if http_code >= 400:
-            #         raise Exception(f"HTTP error {http_code}")
-
-            #     logger.info(f"Slack notification sent successfully: {title}")
-            #     return True
-
-            # except Exception as e:
-            #     logger.error(f"Failed to send Slack notification: {e}")
-            #     return False
-            # finally:
-            #     curl.close()
         elif type == "CloudWatch Alarm":
-
             alarm_name = alarmdetails.get('AlarmName', 'Unknown Alarm')
             region = alarmdetails.get('Region', '')
             alarm_state = alarmdetails.get('NewStateValue','')
@@ -348,7 +320,7 @@ class NotificationService:
 
             # Convert payload to JSON
             json_payload = json.dumps(payload)
-
+            logger.info(f"Prepared Slack payload: {json_payload}")
             # Configure curl for HTTP POST with JSON
             curl.setopt(pycurl.URL, self.webhook_url)
             curl.setopt(pycurl.POST, 1)
@@ -397,16 +369,15 @@ def lambda_handler(event, context):
     tracemalloc.start()
 
     notification_service = None
-    slack_channel_webhook: str
-    slack_channel_webhook_guardduty: str
     # SNS message comes in event['Records'][0]['Sns']
     sns_message = event['Records'][0]['Sns']
-
-    source = sns_message.get('source')
     message_str = sns_message.get('Message', '{}')
 
     try:
         alarm_details = json.loads(message_str)
+        logger.info("alarm_details:" + json.dumps(alarm_details, indent=2))
+        source = alarm_details.get('source', 'aws.cloudwatch')
+        logger.info("source:" + str(source))
         env_config = {
             # Mandatory environment variables
         }
@@ -421,10 +392,8 @@ def lambda_handler(event, context):
                 # Retrieve sensitive credentials from Secrets Manager
         logger.info("Retrieving credentials from AWS Secrets Manager")
         secrets_manager = SecretsManager()
-        logger.info("this is fine")
         secrets_data = secrets_manager.get_credentials(secret_name)
-        logger.info("is this fine?")
-        logger.info("secrets: {secrets_data}")
+
         # Validate that required credentials are present
         # Always require SLACK_WEBHOOK for CloudWatch and GuardDuty
         required_secrets = ["slack_channel_webhook", "slack_channel_webhook_guardduty"]
@@ -440,9 +409,9 @@ def lambda_handler(event, context):
             logger.info("GuardDuty finding detected in SNS message")
             logger.info("Starting Notification to Slack for GuardDuty Alarm via SNS Topic")
             # slack_channel_webhook_guardduty: str
-            timestamp_str = sns_message.get('time')
+            timestamp_str = alarm_details.get('time')
             if timestamp_str:
-                dt = datetime.strptime(timestamp_str, "%Y-%m-%dT%H:%M:%S.%fZ")
+                dt = datetime.strptime(timestamp_str, "%Y-%m-%dT%H:%M:%SZ")
                 formatted = dt.strftime("%a, %d %b %Y %H:%M:%S UTC")
 
             channelconfig=config.slack_channel_webhook_guardduty
@@ -469,16 +438,16 @@ def lambda_handler(event, context):
             if new_state == "OK":
                 is_error=False
 
-            # Initialize services
-            notification_service = NotificationService(
-                channelconfig, context.function_name
-            )
-            # result = f"{slack_message}\n"
-            notification_service.send_notification(
-                        alarmnotifiction, 
-                        alarm_details,
-                        formatted, type, is_error
-                    )
+        # Initialize services
+        notification_service = NotificationService(
+            channelconfig, context.function_name
+        )
+        # result = f"{slack_message}\n"
+        notification_service.send_notification(
+                    alarmnotifiction, 
+                    alarm_details,
+                    formatted, type, is_error
+                )
         # Prepare response
         response = {
             "statusCode": 200,
@@ -497,7 +466,7 @@ def lambda_handler(event, context):
         if notification_service is not None:
             try:
                 notification_service.send_notification(
-                    "Lambda Execution Failed", error_msg, is_error=True
+                    "Lambda Execution Failed", error_msg, formatted, type, is_error=True
                 )
             except Exception as notification_error:
                 logger.error(f"Failed to send error notification: {notification_error}")
