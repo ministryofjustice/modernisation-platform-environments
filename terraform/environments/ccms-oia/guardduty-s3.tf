@@ -20,8 +20,6 @@ resource "aws_guardduty_malware_protection_plan" "s3_scan_bucket1" {
   depends_on = [module.s3-bucket-logging]
 }
 
-
-
 resource "aws_guardduty_malware_protection_plan" "s3_scan_bucket2" {
   role = data.aws_iam_role.guardduty_s3_scan.arn
 
