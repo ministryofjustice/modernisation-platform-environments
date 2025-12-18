@@ -67,7 +67,7 @@ locals {
       role_key     = "get_cloudwatch"
       environments = ["development", "production"]
       layers       = ["numpy", "pillow", "matplotlib"]
-      vpc_config   = { prod = true }
+      vpc_config   = { production = true }
       permissions = [{
         principal         = "cloudwatch.amazonaws.com"
         source_arn_suffix = "*"
