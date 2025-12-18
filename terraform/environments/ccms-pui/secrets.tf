@@ -29,7 +29,8 @@ resource "aws_secretsmanager_secret_version" "pui_secrets" {
     opa_security_password            = "",
     guardduty_slack_channel_id       = "",
     cloudwatch_slack_channel_id      = "",
-    slack_channel_webhook            = ""
+    slack_channel_webhook            = "",
+    slack_channel_webhook_guardduty  = ""
   })
 
   lifecycle {
