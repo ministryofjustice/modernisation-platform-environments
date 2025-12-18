@@ -63,7 +63,7 @@ resource "aws_s3_bucket_replication_configuration" "prod_to_preprod_replication"
   count = local.is-development || local.is-production ? 1 : 0
 
   role   = aws_iam_role.replication_role[0].arn
-  bucket = module.s3-dms-target-store-bucket.bucket.arn
+  bucket = module.s3-dms-target-store-bucket.bucket.id
 
 
   dynamic "rule" {
