@@ -22,50 +22,50 @@ resource "aws_db_option_group" "soa_oracle_19" {
     version     = "1.0"
   }
 
-  #######################################
-  # OEM Agent Option (Added)
-  #######################################
-  option {
-    option_name = "OEM_AGENT"
+  # #######################################
+  # # OEM Agent Option (Added)
+  # #######################################
+  # option {
+  #   option_name = "OEM_AGENT"
 
-    vpc_security_group_memberships = [
-      aws_security_group.soa_db.id
-    ]
+  #   vpc_security_group_memberships = [
+  #     aws_security_group.soa_db.id
+  #   ]
 
-    option_settings {
-      name  = "OMS_HOST"
-      value = "laa-oem-app.laa-development.modernisation-platform.service.justice.gov.uk"
-    }
+  #   option_settings {
+  #     name  = "OMS_HOST"
+  #     value = "laa-oem-app.laa-development.modernisation-platform.service.justice.gov.uk"
+  #   }
 
-    option_settings {
-      name  = "AGENT_PORT"
-      value = "3872"
-    }
+  #   option_settings {
+  #     name  = "AGENT_PORT"
+  #     value = "3872"
+  #   }
 
-    option_settings {
-      name  = "EM_UPLOAD_PORT"
-      value = "4903"
-    }
+  #   option_settings {
+  #     name  = "EM_UPLOAD_PORT"
+  #     value = "4903"
+  #   }
 
-    option_settings {
-      name  = "AGENT_REGISTRATION_USERNAME"
-      value = jsondecode(data.aws_secretsmanager_secret_version.oem_agent_credentials.secret_string).username
-    }
+  #   option_settings {
+  #     name  = "AGENT_REGISTRATION_USERNAME"
+  #     value = jsondecode(data.aws_secretsmanager_secret_version.oem_agent_credentials.secret_string).username
+  #   }
 
-    option_settings {
-      name  = "AGENT_REGISTRATION_PASSWORD"
-      value = jsondecode(data.aws_secretsmanager_secret_version.oem_agent_credentials.secret_string).password
-    }
+  #   option_settings {
+  #     name  = "AGENT_REGISTRATION_PASSWORD"
+  #     value = jsondecode(data.aws_secretsmanager_secret_version.oem_agent_credentials.secret_string).password
+  #   }
 
-    option_settings {
-      name  = "AGENT_PASSWORD"
-      value = jsondecode(data.aws_secretsmanager_secret_version.oem_agent_credentials.secret_string).password
-    }
-  }
+  #   option_settings {
+  #     name  = "AGENT_PASSWORD"
+  #     value = jsondecode(data.aws_secretsmanager_secret_version.oem_agent_credentials.secret_string).password
+  #   }
+  # }
 
-  lifecycle {
-    create_before_destroy = true
-  }
+  # lifecycle {
+  #   create_before_destroy = true
+  # }
 }
 
 resource "aws_db_instance" "soa_db" {
