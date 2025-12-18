@@ -19,7 +19,7 @@ as select
 
   sum(line_item_net_unblended_cost) as sum_net_unblended_cost,
 
-  billing_period,
+  billing_period
 from data
 where billing_period >= date_format(date_add('month', -1, current_date), '%Y-%m')
 group by
