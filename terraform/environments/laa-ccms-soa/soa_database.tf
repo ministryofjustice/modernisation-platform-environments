@@ -23,7 +23,7 @@ resource "aws_db_option_group" "soa_oracle_19" {
   }
 
   # -----------------------------
-  # OEM Agent Option
+  # OEM Agent Option (Terraform-managed registration fields only)
   # -----------------------------
   option {
     option_name = "OEM_AGENT"
@@ -66,7 +66,7 @@ resource "aws_db_option_group" "soa_oracle_19" {
   lifecycle {
     create_before_destroy = true
 
-    # Prevent Terraform from overwriting OEM settings applied in AWS console
+    # Prevent Terraform from overwriting manual OEM settings in AWS Console
     ignore_changes = [
       option
     ]
@@ -103,8 +103,8 @@ resource "aws_db_instance" "soa_db" {
   character_set_name      = "AL32UTF8"
   deletion_protection     = local.application_data.accounts[local.environment].soa_db_deletion_protection
 
-  db_subnet_group_name    = aws_db_subnet_group.soa.id
-  option_group_name       = aws_db_option_group.soa_oracle_19.id
+  db_subnet_group_name = aws_db_subnet_group.soa.id
+  option_group_name    = aws_db_option_group.soa_oracle_19.id
 
   tags = merge(
     local.tags,
