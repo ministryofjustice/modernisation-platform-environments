@@ -1131,7 +1131,7 @@ resource "aws_iam_role_policy_attachment" "load_historic_csv_output_lambda_polic
 
 module "share_db_with_historic_csv_lambda_role_policy_lambda_role" {
   source                  = "./modules/lakeformation_database_share"
-  dbs_to_grant            = toset(["g4s_lcm${local.db_suffix}"])
+  dbs_to_grant            = toset(["g4s_lcm${local.db_suffix}", "scram_alcohol_monitoring${local.db_suffix}"])
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
   role_arn                = aws_iam_role.load_historic_csv.arn
   db_exists               = true ? local.is-production : false

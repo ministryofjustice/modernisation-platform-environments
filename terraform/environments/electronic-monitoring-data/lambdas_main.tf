@@ -422,5 +422,6 @@ module "load_historic_csv" {
     ACCOUNT_NUMBER      = data.aws_caller_identity.current.account_id
     STAGING_BUCKET      = module.s3-create-a-derived-table-bucket.bucket.id
     ENVIRONMENT_NAME    = local.environment_shorthand
+    DB_SUFFIX           = local.db_suffix
   }
 }
