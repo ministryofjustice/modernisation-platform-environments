@@ -301,7 +301,7 @@ resource "aws_security_group_rule" "soa_db_egress_all" {
 
 #--Database TDS
 resource "aws_security_group" "tds_db" {
-  name        = "ccms-soa-tds-allow-db"
+  name_prefix = "ccms-soa-tds-allow-db"
   description = "Allow DB inbound traffic"
   vpc_id      = data.aws_vpc.shared.id
 }
