@@ -45,7 +45,7 @@ resource "aws_secretsmanager_secret" "dis_config" {
 }
 
 resource "aws_secretsmanager_secret" "dis_passwords" {
-  name = "${var.app_name}-${var.env_name}-sap-dfi-password"
+  name = "${var.app_name}-${var.env_name}-sap-dfi-passwords"
 
   description = "Passwords for SAP BODS DIS ETL system"
   kms_key_id  = var.account_config.kms_keys["general_shared"]
