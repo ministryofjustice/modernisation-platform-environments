@@ -178,7 +178,7 @@ resource "aws_lambda_permission" "waf_events_block" {
   source_arn    = aws_cloudwatch_event_rule.waf_block_2130_uk.arn
 }
 
-# Allow events to invoke the Lambda for Bank Holidays
+# Block events to invoke the Lambda for Bank Holidays
 resource "aws_lambda_permission" "allow_eventbridge_block_dec25" {
   statement_id  = "AllowEventBridgeBlockDec25-${local.environment}"
   action        = "lambda:InvokeFunction"
