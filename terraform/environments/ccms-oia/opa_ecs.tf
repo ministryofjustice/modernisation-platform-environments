@@ -66,6 +66,12 @@ resource "aws_ecs_service" "opahub" {
   desired_count   = local.application_data.accounts[local.environment].opa_app_count
   launch_type     = "EC2"
 
+  # Ignore autoscaling changes to desired_count  
+  
+  lifecycle {    
+  ignore_changes = [desired_count] 
+  }
+
   health_check_grace_period_seconds = 120
 
   ordered_placement_strategy {
@@ -85,3 +91,53 @@ resource "aws_ecs_service" "opahub" {
     aws_autoscaling_group.cluster_scaling_group
   ]
 }
+
+# Register ECS service as a scalable target (DEV only)
+resource "aws_appautoscaling_target" "ccms_opa_desiredcount" {
+  count              = local.environment == "development" ? 1 : 0
+  service_namespace  = "ecs"
+  scalable_dimension = "ecs:service:DesiredCount"
+
+  # IMPORTANT: use names, not ARNs
+  resource_id        = "service/${local.application_name}-cluster/${local.opa_app_name}"
+
+  min_capacity = 0
+  max_capacity = 10
+}
+
+# Scale DOWN to 0 at 21:00, Mon–Fri
+resource "aws_appautoscaling_scheduled_action" "ccms_opa_scale_down_21" {
+  count              = local.environment == "development" ? 1 : 0
+  name               = "${local.opa_app_name}-dev-scale-down-21"
+  service_namespace  = "ecs"
+  resource_id        = aws_appautoscaling_target.ccms_opa_desiredcount[0].resource_id
+  scalable_dimension = aws_appautoscaling_target.ccms_opa_desiredcount[0].scalable_dimension
+
+  schedule = "cron(0 21 ? * MON-FRI *)"
+  timezone = "Europe/London"
+
+  scalable_target_action {
+    min_capacity = 0
+    max_capacity = 0
+  }
+}
+
+# Scale UP to 1 at 06:00, Mon–Fri
+resource "aws_appautoscaling_scheduled_action" "ccms_opa_scale_up_06" {
+  count              = local.environment == "development" ? 1 : 0
+  name               = "${local.opa_app_name}-dev-scale-up-06"
+  service_namespace  = "ecs"
+  resource_id        = aws_appautoscaling_target.ccms_opa_desiredcount[0].resource_id
+  scalable_dimension = aws_appautoscaling_target.ccms_opa_desiredcount[0].scalable_dimension
+
+  schedule = "cron(0 6 ? * MON-FRI *)"
+  timezone = "Europe/London"
+
+  scalable_target_action {
+    min_capacity = 1
+    max_capacity = 1
+  }
+
+  # Avoid ConcurrentUpdateException when both schedules are created together
+  depends_on = [aws_appautoscaling_scheduled_action.ccms_opa_scale_down_  depends_on = [aws_appautoscaling_scheduled_action.ccms_opa_scale_down_21]
+
