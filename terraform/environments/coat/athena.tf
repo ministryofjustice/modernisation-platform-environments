@@ -116,3 +116,35 @@ resource "aws_glue_crawler" "cur_v2_crawler" {
 
   schedule = "cron(0 7 * * ? *)"
 }
+
+# Create derived table for ChatBot PoC
+resource "aws_athena_named_query" "fct_daily_cost" {
+  name     = "fct-daily-cost"
+  database = aws_glue_catalog_database.cur_v2_database.name
+  query = templatefile(
+    "${path.module}/queries/fct_daily_cost.sql",
+    {
+      bucket = "coat-${local.environment}-cur-v2-hourly"
+    }
+  )
+}
+
+resource "null_resource" "execute_create_table_query" {
+  count = local.is-development ? 0 : 1
+
+  triggers = {
+    query_ids = aws_athena_named_query.fct_daily_cost.id
+  }
+
+  provisioner "local-exec" {
+    command = <<EOF
+aws athena start-query-execution \
+  --query-string "$(aws athena get-named-query --named-query-id ${aws_athena_named_query.fct_daily_cost.id} --query 'NamedQuery.QueryString' --output text)" \
+  --work-group ${aws_athena_workgroup.coat_cur_report.name} \
+  --query-execution-context Database=${aws_glue_catalog_database.cur_v2_database.name} \
+  --region ${data.aws_region.current.name}
+EOF
+  }
+
+  depends_on = [aws_athena_named_query.fct_daily_cost]
+}
