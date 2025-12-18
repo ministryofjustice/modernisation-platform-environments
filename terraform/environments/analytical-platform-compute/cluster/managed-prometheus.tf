@@ -11,6 +11,10 @@ module "managed_prometheus" {
     log_group_arn = "${module.managed_prometheus_log_group.cloudwatch_log_group_arn}:*"
   }
 
+  # Workaround for https://github.com/terraform-aws-modules/terraform-aws-managed-service-prometheus/issues/33
+  # Setting retention_period_in_days prevents "Empty workspace configuration" API error
+  retention_period_in_days = 150
+
   tags = local.tags
 }
 
