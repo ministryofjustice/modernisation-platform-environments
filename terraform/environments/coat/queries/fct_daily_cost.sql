@@ -1,5 +1,10 @@
-create table fct_daily_cost as
-select
+create table fct_daily_cost 
+with (
+  external_location = 's3://${bucket}/ctas/fct-daily-cost/',
+  format = 'PARQUET',
+  partitioned_by = ARRAY['billing_period']
+)
+as select
   billing_period,
   line_item_usage_account_name as account_name,
   product_region_code,
