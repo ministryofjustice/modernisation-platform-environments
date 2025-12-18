@@ -50,9 +50,7 @@ data "aws_iam_policy_document" "historic_data_cutback_policy_document" {
   statement {
     effect  = "Allow"
     actions = ["lambda:InvokeFunction"]
-    resources = [
-      module.historic_data_cutback[0].lambda_function_arn,
-    module.historic_data_cutback[0].lambda_function_arn]
+    resources = module.historic_data_cutback[0].lambda_function_arn
   }
 }
 

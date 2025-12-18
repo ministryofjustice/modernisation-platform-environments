@@ -431,6 +431,7 @@ module "load_historic_csv" {
 # BackFill Data
 #-----------------------------------------------------------------------------------
 module "historic_data_cutback" {
+  count = local.is-development || local.is-production ? 1 : 0
   source                  = "./modules/lambdas"
   is_image                = true
   function_name           = "historic_data_cutback"

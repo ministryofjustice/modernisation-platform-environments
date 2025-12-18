@@ -1288,9 +1288,6 @@ data "aws_iam_policy_document" "pre_prod_historic_data_cutback_iam_role_policy_d
       module.s3-dms-target-store-bucket.bucket.arn,
     ]
   }
-}
-
-data "aws_iam_policy_document" "pre_prod_historic_data_trust_policy" {
   statement {
     sid    = "AllowSpecificRolesToAssume"
     effect = "Allow"
@@ -1317,14 +1314,9 @@ resource "aws_iam_policy" "pre_prod_historic_data_cutback_iam_role_policy" {
   policy = data.aws_iam_policy_document.pre_prod_historic_data_cutback_iam_role_policy_document
 }
 
-resource "aws_iam_role_policy_attachment" "pre_prod_historic_data_cutback_iam_role_policy_attachment" {
-  count      = local.is-preproduction? 1 : 0
-  role       = aws_iam_role.pre_prod_historic_data_cutback_iam_role[0].name
-  policy_arn = aws_iam_policy.pre_prod_historic_data_cutback_iam_role_policy[0].arn
-}
+# resource "aws_iam_role_policy_attachment" "pre_prod_historic_data_cutback_iam_role_policy_attachment" {
+#   count      = local.is-preproduction? 1 : 0
+#   role       = aws_iam_role.pre_prod_historic_data_cutback_iam_role[0].name
+#   policy_arn = aws_iam_policy.pre_prod_historic_data_cutback_iam_role_policy[0].arn
+# }
 
-resource "aws_iam_role_policy_attachment" "pre_prod_historic_data_cutback_iam_role_trust_policy" {
-  count      = local.is-preproduction? 1 : 0
-  role       = aws_iam_role.pre_prod_historic_data_cutback_iam_role[0].name
-  policy_arn = aws_iam_policy.pre_prod_historic_data_trust_policy[0].arn
-}
