@@ -11,7 +11,9 @@ data "aws_iam_policy_document" "secrets_manager" {
       "arn:aws:secretsmanager:*:*:secret:${var.app_name}-${var.env_name}-oracle-dsd-db-application-passwords-*",
       "arn:aws:secretsmanager:*:*:secret:${var.app_name}-${var.env_name}-oracle-boe-db-application-passwords-*",
       "arn:aws:secretsmanager:*:*:secret:${var.app_name}-${var.env_name}-sap-boe-config-*",
-      "arn:aws:secretsmanager:*:*:secret:${var.app_name}-${var.env_name}-sap-boe-passwords-*"
+      "arn:aws:secretsmanager:*:*:secret:${var.app_name}-${var.env_name}-sap-boe-passwords-*",
+      "arn:aws:secretsmanager:*:*:secret:${var.app_name}-${var.env_name}-sap-dis-config-*",
+      "arn:aws:secretsmanager:*:*:secret:${var.app_name}-${var.env_name}-sap-dis-passwords-*"
     ]
   }
 
@@ -21,9 +23,11 @@ data "aws_iam_policy_document" "secrets_manager" {
       "secretsmanager:PutSecretValue"
     ]
     resources = [
-      # secrets are directly updated by ansible code
+      # secrets are directly updated by ansible/powershell code
       "arn:aws:secretsmanager:*:*:secret:${var.app_name}-${var.env_name}-sap-boe-config-*",
-      "arn:aws:secretsmanager:*:*:secret:${var.app_name}-${var.env_name}-sap-boe-passwords-*"
+      "arn:aws:secretsmanager:*:*:secret:${var.app_name}-${var.env_name}-sap-boe-passwords-*",
+      "arn:aws:secretsmanager:*:*:secret:${var.app_name}-${var.env_name}-sap-dis-config-*",
+      "arn:aws:secretsmanager:*:*:secret:${var.app_name}-${var.env_name}-sap-dis-passwords-*"
     ]
   }
 }
