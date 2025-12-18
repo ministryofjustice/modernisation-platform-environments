@@ -16,32 +16,34 @@ module "eks" {
   cloudwatch_log_group_retention_in_days = 30
 
   eks_managed_node_groups = {
-    default_ng = {
-      ami_type               = local.environment_configuration.ami_type
-      desired_size           = local.environment_configuration.default_ng.desired_capacity
-      max_size               = local.environment_configuration.default_ng.max_size
-      min_size               = local.environment_configuration.default_ng.min_size
-      instance_types         = local.environment_configuration.default_ng.instance_types
-      block_device_mappings  = local.environment_configuration.default_ng.block_device_mappings
-      subnet_ids             = data.aws_subnets.eks_private.ids
-      name                   = "${local.environment}-def-ng"
-      create_security_group  = true
-      create_launch_template = true
-      labels                 = local.environment_configuration.default_ng.labels
-    }
-    monitoring_ng = {
-      ami_type               = local.environment_configuration.ami_type
-      desired_size           = local.environment_configuration.monitoring_ng.desired_capacity
-      max_size               = local.environment_configuration.monitoring_ng.max_size
-      min_size               = local.environment_configuration.monitoring_ng.min_size
-      instance_types         = local.environment_configuration.monitoring_ng.instance_types
-      block_device_mappings  = local.environment_configuration.monitoring_ng.block_device_mappings
-      subnet_ids             = data.aws_subnets.eks_private.ids
-      name                   = "${local.environment}-mon-ng"
-      create_security_group  = true
-      create_launch_template = true
-      taints                 = local.environment_configuration.monitoring_ng.taints
-      labels                 = local.environment_configuration.monitoring_ng.labels
+    karpenter = {
+      default_ng = {
+        ami_type               = local.environment_configuration.ami_type
+        desired_size           = local.environment_configuration.default_ng.desired_capacity
+        max_size               = local.environment_configuration.default_ng.max_size
+        min_size               = local.environment_configuration.default_ng.min_size
+        instance_types         = local.environment_configuration.default_ng.instance_types
+        block_device_mappings  = local.environment_configuration.default_ng.block_device_mappings
+        subnet_ids             = data.aws_subnets.eks_private.ids
+        name                   = "${local.environment}-def-ng"
+        create_security_group  = true
+        create_launch_template = true
+        labels                 = local.environment_configuration.default_ng.labels
+      }
+      monitoring_ng = {
+        ami_type               = local.environment_configuration.ami_type
+        desired_size           = local.environment_configuration.monitoring_ng.desired_capacity
+        max_size               = local.environment_configuration.monitoring_ng.max_size
+        min_size               = local.environment_configuration.monitoring_ng.min_size
+        instance_types         = local.environment_configuration.monitoring_ng.instance_types
+        block_device_mappings  = local.environment_configuration.monitoring_ng.block_device_mappings
+        subnet_ids             = data.aws_subnets.eks_private.ids
+        name                   = "${local.environment}-mon-ng"
+        create_security_group  = true
+        create_launch_template = true
+        taints                 = local.environment_configuration.monitoring_ng.taints
+        labels                 = local.environment_configuration.monitoring_ng.labels
+      }
     }
   }
 
