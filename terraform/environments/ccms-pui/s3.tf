@@ -237,3 +237,15 @@ resource "aws_s3_bucket_policy" "shared_bucket_policy" {
     ]
   })
 }
+
+resource "aws_s3_object" "folder" {
+  bucket = module.s3-bucket-shared.bucket.id
+
+  for_each = {
+    for index, name in local.lambda_folder_name :
+    name => index == 0 ? "${name}/" : "lambda_delivery/${name}/"
+  }
+
+  key = each.value
+
+}
