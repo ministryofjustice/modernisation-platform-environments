@@ -105,11 +105,11 @@ module "ecs_service_datadog_agent" {
         },
         {
           "name" : "DD_TAGS",
-          "value" : "project:yjaf env:preproduction moj:true"
+          "value" : "project:yjaf env:${local.environment} moj:true"
         },
         {
           "name" : "DD_DOGSTATSD_TAGS",
-          "value" : "preproduction"
+          "value" : "${local.environment}"
         },
         {
           "name" : "DD_APM_NON_LOCAL_TRAFFIC",
