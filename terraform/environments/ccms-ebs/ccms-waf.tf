@@ -83,6 +83,7 @@ resource "aws_wafv2_web_acl" "ebs_web_acl" {
     metric_name                = "ebs_waf_metrics"
     sampled_requests_enabled   = true
   }
+ 
 }
 
 resource "aws_cloudwatch_log_group" "ebs_waf_logs" {

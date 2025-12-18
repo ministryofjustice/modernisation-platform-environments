@@ -202,6 +202,7 @@ resource "aws_workspacesweb_browser_settings" "main" {
           "assets.publishing.service.gov.uk",
           "authpoint.watchguard.com",
           "autologon.microsoftazuread-sso.com",
+          "bannerjones-p2techltd.my.passly.eu",
           "becws.microsoftonline.com",
           "ccms-pui.laa.service.justice.gov.uk",
           "ccs.login.microsoftonline.com",
@@ -244,9 +245,7 @@ resource "aws_workspacesweb_browser_settings" "main" {
           "sso.secureserver.net",
           "www.gov.uk",
           "www.justice.gov.uk",
-          "www.smartsurvey.co.uk",
-          "*.accessmycloudpc.com",
-          "myworkspace.leighday.co.uk"
+          "www.smartsurvey.co.uk"
         ]
       }
       "AlwaysOpenPdfExternally" = {

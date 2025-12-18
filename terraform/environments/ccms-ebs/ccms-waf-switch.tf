@@ -8,7 +8,7 @@ variable "scope" {
 }
 
 variable "rule_name" {
-  default = "ebs-trusted-rule"
+  default = "ebs-trusted-rule-ip-set"
 }
 
 data "archive_file" "waf_toggle_zip" {
@@ -19,7 +19,7 @@ data "archive_file" "waf_toggle_zip" {
 
 # Pull an existing WAF Rule Group and rules using a dynamic name.
 data "aws_wafv2_web_acl" "waf_web_acl" {
-  name  = "ebs_waf"
+  name  = "ebs_internal_waf"
   scope = "REGIONAL"
 }
 

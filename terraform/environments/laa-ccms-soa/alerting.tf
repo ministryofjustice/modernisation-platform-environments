@@ -37,8 +37,8 @@ module "guardduty_chatbot_prod" {
 
 #--Altering SNS
 resource "aws_sns_topic" "alerts" {
-  name            = "${local.application_data.accounts[local.environment].app_name}-alerts"
-  delivery_policy = <<EOF
+  name              = "${local.application_data.accounts[local.environment].app_name}-alerts"
+  delivery_policy   = <<EOF
 {
   "http": {
     "defaultHealthyRetryPolicy": {
@@ -58,7 +58,7 @@ resource "aws_sns_topic" "alerts" {
 }
 EOF
   kms_master_key_id = aws_kms_key.cloudwatch_sns_alerts_key.id
-  tags = merge(local.tags, 
+  tags = merge(local.tags,
     { Name = "${local.application_data.accounts[local.environment].app_name}-alerts" }
   )
 }
@@ -75,8 +75,8 @@ resource "aws_sns_topic_subscription" "alerts" {
 }
 
 resource "aws_sns_topic" "guardduty_alerts" {
-  name            = "${local.application_data.accounts[local.environment].app_name}-guardduty-alerts"
-  delivery_policy = <<EOF
+  name              = "${local.application_data.accounts[local.environment].app_name}-guardduty-alerts"
+  delivery_policy   = <<EOF
 {
   "http": {
     "defaultHealthyRetryPolicy": {
@@ -96,7 +96,7 @@ resource "aws_sns_topic" "guardduty_alerts" {
 }
 EOF
   kms_master_key_id = aws_kms_key.cloudwatch_sns_alerts_key.id
-  tags = merge(local.tags, 
+  tags = merge(local.tags,
     { Name = "${local.application_data.accounts[local.environment].app_name}-guardduty-alerts" }
   )
 }
@@ -139,9 +139,10 @@ resource "aws_cloudwatch_metric_alarm" "RDS_CPU_over_threshold" {
   metric_name         = "CPUUtilization"
   statistic           = "Average"
   namespace           = "AWS/RDS"
-  period              = "300"
-  evaluation_periods  = "3"
-  threshold           = "75"
+  period              = 60
+  evaluation_periods  = 5
+  datapoints_to_alarm = 5
+  threshold           = 75
   treat_missing_data  = "breaching"
   dimensions = {
     DBInstanceIdentifier = aws_db_instance.soa_db.identifier
@@ -189,14 +190,15 @@ resource "aws_cloudwatch_metric_alarm" "RDS_Free_Storage_Space_Over_Threshold" {
 
 resource "aws_cloudwatch_metric_alarm" "RDS_Burst_Balance_Threshold" {
   alarm_name          = "${local.application_data.accounts[local.environment].app_name}-RDS-BurstBalance-low-threshold-alarm"
-  alarm_description   = "${local.environment} | ${local.aws_account_id} | RDS Burst balance is below 1 for over 15 minutes"
+  alarm_description   = "${local.environment} | ${local.aws_account_id} | RDS Burst balance is below 10% for over 15 minutes"
   comparison_operator = "LessThanOrEqualToThreshold"
   metric_name         = "BurstBalance"
   statistic           = "Sum"
   namespace           = "AWS/RDS"
-  period              = "300"
-  evaluation_periods  = "3"
-  threshold           = "1"
+  period              = 60
+  evaluation_periods  = 5
+  datapoints_to_alarm = 5
+  threshold           = 10
   treat_missing_data  = "breaching"
   dimensions = {
     DBInstanceIdentifier = aws_db_instance.soa_db.identifier
@@ -212,9 +214,9 @@ resource "aws_cloudwatch_metric_alarm" "RDS_Write_IOPS_Threshold" {
   metric_name         = "WriteIOPS"
   statistic           = "Average"
   namespace           = "AWS/RDS"
-  period              = "300"
-  datapoints_to_alarm = "3"
-  evaluation_periods  = "3"
+  period              = 300
+  datapoints_to_alarm = 3
+  evaluation_periods  = 3
   threshold           = local.application_data.accounts[local.environment].logging_cloudwatch_rds_write_iops_threshold
   treat_missing_data  = "breaching"
   dimensions = {
@@ -283,14 +285,14 @@ resource "aws_cloudwatch_metric_alarm" "Admin_Ecs_Memory_Over_Threshold" {
 
 resource "aws_cloudwatch_metric_alarm" "managed_service_cpu_high" {
   alarm_name          = "${local.application_data.accounts[local.environment].app_name}-managed-cpu-utilization-high"
-  alarm_description   = "${local.environment} | ${local.aws_account_id} | SOA Managed ECS average CPU usage is above 85% for over 5 minutes"
+  alarm_description   = "${local.environment} | ${local.aws_account_id} | SOA Managed ECS average CPU usage is above 75% for over 5 minutes"
   comparison_operator = "GreaterThanOrEqualToThreshold"
-  evaluation_periods  = "5"
+  evaluation_periods  = 5
   metric_name         = "CPUUtilization"
   namespace           = "AWS/ECS"
-  period              = "60"
+  period              = 60
   statistic           = "Average"
-  threshold           = "85"
+  threshold           = 75
   dimensions = {
     ClusterName = aws_ecs_cluster.main.name
     ServiceName = aws_ecs_service.managed.name

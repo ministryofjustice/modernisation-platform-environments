@@ -1,122 +1,204 @@
+# This AWS Lambda function toggles a WAF rule between BLOCK and ALLOW modes,
+# Display a custom HTML response body when blocking requests and remove it for Allow mode.
 import os
-import json
-import boto3
 import copy
-from botocore.exceptions import ClientError
+import logging
+from typing import Any, Dict, Literal, TYPE_CHECKING, cast
 
-# Get environment variables
-SCOPE = os.environ.get("SCOPE", "REGIONAL")
-WEB_ACL_NAME = os.environ["WEB_ACL_NAME"]
-WEB_ACL_ID = os.environ["WEB_ACL_ID"]
-RULE_NAME = os.environ["RULE_NAME"]
-CUSTOM_BODY_NAME = os.environ.get("CUSTOM_BODY_NAME", "maintenance_html")
-CUSTOM_BODY_HTML = os.environ.get("CUSTOM_BODY_HTML", "")
+import boto3
+from botocore.exceptions import ClientError, BotoCoreError
+
+# --- mypy-only imports (DO NOT run in Lambda runtime) ---
+if TYPE_CHECKING:
+    from mypy_boto3_wafv2.type_defs import RuleActionOutputTypeDef
+    RuleActionType = RuleActionOutputTypeDef
+else:
+    RuleActionType = Dict[str, Any]
+
+# ---------------------------------------------------------------------------
+# Logging setup
+# ---------------------------------------------------------------------------
+
+logger = logging.getLogger(__name__)
+if not logger.handlers:
+    logging.basicConfig(level=logging.INFO)
+logger.setLevel(logging.INFO)
+
+# ---------------------------------------------------------------------------
+# Env helpers
+# ---------------------------------------------------------------------------
+
+def _get_required_env(name: str) -> str:
+    value = os.environ.get(name)
+    if not value:
+        raise ValueError(f"Environment variable '{name}' is required but not set.")
+    return value
+
+# ---------------------------------------------------------------------------
+# Configuration
+# ---------------------------------------------------------------------------
+
+WEB_ACL_NAME: str = _get_required_env("WEB_ACL_NAME")
+WEB_ACL_ID: str = _get_required_env("WEB_ACL_ID")
+RULE_NAME: str = _get_required_env("RULE_NAME")
+
+ScopeLiteral = Literal["REGIONAL", "CLOUDFRONT"]
+_raw_scope = os.environ.get("SCOPE", "REGIONAL").upper()
+if _raw_scope not in ("REGIONAL", "CLOUDFRONT"):
+    raise ValueError(f"Unsupported SCOPE '{_raw_scope}'. Must be 'REGIONAL' or 'CLOUDFRONT'.")
+SCOPE: ScopeLiteral = cast(ScopeLiteral, _raw_scope)
+
+CUSTOM_BODY_NAME: str = os.environ.get("CUSTOM_BODY_NAME", "maintenance_html")
+CUSTOM_BODY_HTML: str = os.environ.get("CUSTOM_BODY_HTML", "")
 
 # Set region (CloudFront uses us-east-1)
-region = "us-east-1" if SCOPE.upper() == "CLOUDFRONT" else os.environ.get("AWS_REGION")
+if SCOPE == "CLOUDFRONT":
+    region: str = "us-east-1"
+else:
+    region_env = os.environ.get("AWS_REGION")
+    if region_env is None:
+        raise ValueError("AWS_REGION environment variable is required for REGIONAL scope.")
+    region = region_env
+
 waf = boto3.client("wafv2", region_name=region)
 
-def _desired_action(mode: str):
+WafMode = Literal["BLOCK", "ALLOW"]
+
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+
+def _desired_action(mode: WafMode) -> RuleActionType:
     """Return WAF Action structure for direct rules."""
-    mode = mode.upper()
     if mode == "BLOCK":
-        # If we have custom body, use CustomResponse
         if CUSTOM_BODY_HTML.strip():
             return {
                 "Block": {
                     "CustomResponse": {
                         "ResponseCode": 503,
-                        "CustomResponseBodyKey": CUSTOM_BODY_NAME
+                        "CustomResponseBodyKey": CUSTOM_BODY_NAME,
                     }
                 }
             }
-        else:
-            return {"Block": {}}
-    elif mode == "ALLOW":
+        return {"Block": {}}
+
+    if mode == "ALLOW":
         return {"Allow": {}}
-    else:
-        raise ValueError(f"Unsupported mode: {mode}")
 
-def lambda_handler(event, context):
-    mode = (event or {}).get("mode", "BLOCK").upper()
-    print(f"➡️ Requested mode for rule '{RULE_NAME}' in WebACL '{WEB_ACL_NAME}': {mode}")
+    raise ValueError(f"Unsupported mode: {mode}")
 
+def _parse_mode(event: Any) -> WafMode:
+    if not isinstance(event, dict):
+        return "BLOCK"
+    raw_mode = event.get("mode", "BLOCK")
+    if not isinstance(raw_mode, str):
+        return "BLOCK"
+    mode_upper = raw_mode.upper()
+    if mode_upper not in ("BLOCK", "ALLOW"):
+        return "BLOCK"
+    return cast(WafMode, mode_upper)
+
+# ---------------------------------------------------------------------------
+# Lambda handler
+# ---------------------------------------------------------------------------
+
+def lambda_handler(event: Any, context: Any) -> Dict[str, Any]:
+    mode: WafMode = _parse_mode(event)
+
+    logger.info(
+        "Requested mode '%s' for rule '%s' in WebACL '%s' (ID=%s, scope=%s)",
+        mode, RULE_NAME, WEB_ACL_NAME, WEB_ACL_ID, SCOPE
+    )
+
+    # Get current Web ACL
     try:
-        # Get current Web ACL
         resp = waf.get_web_acl(Name=WEB_ACL_NAME, Scope=SCOPE, Id=WEB_ACL_ID)
-    except ClientError as e:
-        print(f"Failed to get WebACL: {e}")
-        raise
+    except (ClientError, BotoCoreError) as e:
+        logger.exception("Failed to get WebACL: %s", e)
+        return {"ok": False, "updated": False, "mode": mode, "error": str(e)}
 
-    lock_token = resp["LockToken"]
-    web_acl = resp["WebACL"]
+    lock_token = resp.get("LockToken")
+    web_acl = resp.get("WebACL")
+    if not lock_token or not web_acl:
+        return {"ok": False, "updated": False, "mode": mode, "error": "Missing LockToken or WebACL"}
+
     rules = web_acl.get("Rules", [])
-    custom_response_bodies = web_acl.get("CustomResponseBodies", {}).copy()  # Preserve existing
+    if not isinstance(rules, list):
+        return {"ok": False, "updated": False, "mode": mode, "error": "Rules is not a list"}
 
-    found = changed = False
+    custom_response_bodies = web_acl.get("CustomResponseBodies") or {}
+    if not isinstance(custom_response_bodies, dict):
+        custom_response_bodies = {}
+
+    found = False
+    changed = False
     new_rules = []
 
     for r in rules:
-        if r["Name"] == RULE_NAME:
-            found = True
-            rr = copy.deepcopy(r)  # Deep copy to avoid mutation
-
-            if "Action" not in r:
-                raise RuntimeError(
-                    f"Rule '{RULE_NAME}' does not have 'Action'. "
-                    "This Lambda only supports direct rules with Action (Allow/Block)."
-                )
-
-            desired_action = _desired_action(mode)
-            current_action = r.get("Action", {})
-
-            if current_action != desired_action:
-                rr["Action"] = desired_action
-                changed = True
-                print(f"Updating Action to: {desired_action}")
-
-                # If switching to BLOCK with custom response, ensure body is registered
-                if mode == "BLOCK" and CUSTOM_BODY_HTML.strip():
-                    custom_response_bodies[CUSTOM_BODY_NAME] = {
-                        "Content": CUSTOM_BODY_HTML,
-                        "ContentType": "TEXT_HTML"
-                    }
-                    print(f"Registered custom response body: {CUSTOM_BODY_NAME}")
-            else:
-                print("Action already set — no change needed.")
-
-            new_rules.append(rr)
-
-        else:
-            # Keep other rules unchanged
+        if not isinstance(r, dict) or "Name" not in r:
             new_rules.append(r)
+            continue
+
+        if r["Name"] != RULE_NAME:
+            new_rules.append(r)
+            continue
+
+        found = True
+        rr = copy.deepcopy(r)
+
+        if "Action" not in r:
+            return {"ok": False, "updated": False, "mode": mode, "error": f"Rule '{RULE_NAME}' has no Action"}
+
+        current_action = r.get("Action", {})
+        desired_action = _desired_action(mode)
+
+        if current_action != desired_action:
+            rr["Action"] = desired_action
+            changed = True
+            logger.info("Updating Action for rule '%s' to: %s", RULE_NAME, desired_action)
+
+            # When BLOCK: ensure the custom response body is present
+            if mode == "BLOCK" and CUSTOM_BODY_HTML.strip():
+                custom_response_bodies[CUSTOM_BODY_NAME] = {
+                    "Content": CUSTOM_BODY_HTML,
+                    "ContentType": "TEXT_HTML",
+                }
+
+            # When ALLOW: remove custom body to avoid Terraform drift
+            elif mode == "ALLOW":
+                if CUSTOM_BODY_NAME in custom_response_bodies:
+                    del custom_response_bodies[CUSTOM_BODY_NAME]
+
+        new_rules.append(rr)
 
     if not found:
-        raise RuntimeError(f" Rule '{RULE_NAME}' not found in WebACL '{WEB_ACL_NAME}'")
+        return {"ok": False, "updated": False, "mode": mode, "error": f"Rule '{RULE_NAME}' not found"}
 
     if not changed:
-        print("No changes needed.")
+        logger.info("No changes needed.")
         return {"ok": True, "updated": False, "mode": mode}
 
-    # Update Web ACL
-    updated_web_acl = {
+    updated_web_acl: Dict[str, Any] = {
         "Name": WEB_ACL_NAME,
         "Scope": SCOPE,
         "Id": WEB_ACL_ID,
         "LockToken": lock_token,
-        "DefaultAction": web_acl["DefaultAction"],
+        "DefaultAction": web_acl.get("DefaultAction", {}),
         "Description": web_acl.get("Description", ""),
-        "VisibilityConfig": web_acl["VisibilityConfig"],
+        "VisibilityConfig": web_acl.get("VisibilityConfig", {}),
         "Rules": new_rules,
-        "CustomResponseBodies": custom_response_bodies  # Critical: preserve or update custom bodies
     }
-    # print(f"Attempting to update WebACL: {updated_web_acl}...")
-    print(f"Updating WebACL '{WEB_ACL_NAME}' (ID: {WEB_ACL_ID}) in scope {SCOPE} to mode: {mode}")
-    try:
-        update_resp = waf.update_web_acl(**updated_web_acl)
-        print("WebACL updated successfully.")
-        return {"ok": True, "updated": True, "mode": mode, "lockToken": lock_token}
 
-    except ClientError as e:
-        print(f"Failed to update WebACL: {e}")
-        raise
+    # Only include CustomResponseBodies if non-empty
+    if custom_response_bodies:
+        updated_web_acl["CustomResponseBodies"] = custom_response_bodies
+    else:
+        logger.info("CustomResponseBodies empty — omitting field.")
+
+    try:
+        waf.update_web_acl(**updated_web_acl)
+        logger.info("WebACL updated successfully.")
+        return {"ok": True, "updated": True, "mode": mode}
+    except (ClientError, BotoCoreError) as e:
+        logger.exception("Failed to update WebACL: %s", e)
+        return {"ok": False, "updated": False, "mode": mode, "error": str(e)}

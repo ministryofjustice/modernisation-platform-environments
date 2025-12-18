@@ -41,9 +41,9 @@
       "example_var": "test-data",
       "ec2amiid": "ami-0a2128d7b4dd8a56c",
       "orahomesize": "200",
-      "orahome_snapshot": "snap-0bf30e49cb9bc2421",
+      "orahome_snapshot": "snap-0685fb3a76969ad0b",
       "stageesize": "150",
-      "stage_snapshot": "snap-09d54ad454edbd1cf",
+      "stage_snapshot": "snap-0859b31fc100812e0",
       "allocated_storage": "50",
       "engine": "oracle-ee",
       "engine_version": "19.0.0.0.ru-2021-10.rur-2021-10.r1",
@@ -63,14 +63,15 @@
       "deletion_protection": "false",
       "pagerduty_integration_key_name": "laa_oas_nonprod_alarms",
       "s3_vpc_endpoint_prefix": "pl-7ca54015",
-      "ec2_private_ip": "10.26.96.179"
+      "ec2_private_ip": "10.26.96.179",
+      "managementcidr": "10.200.0.0/20"
     },
     "preproduction": {
       "ec2amiid": "ami-0a2128d7b4dd8a56c",
       "orahomesize": "200",
-      "orahome_snapshot": "snap-0bf30e49cb9bc2421",
+      "orahome_snapshot": "snap-0685fb3a76969ad0b",
       "stageesize": "150",
-      "stage_snapshot": "snap-09d54ad454edbd1cf",
+      "stage_snapshot": "snap-0859b31fc100812e0",
       "allocated_storage": "50",
       "engine": "oracle-ee",
       "engine_version": "19.0.0.0.ru-2021-10.rur-2021-10.r1",
@@ -90,7 +91,8 @@
       "deletion_protection": "false",
       "pagerduty_integration_key_name": "laa_oas_nonprod_alarms",
       "s3_vpc_endpoint_prefix": "pl-7ca54015",
-      "ec2_private_ip": "10.27.72.27"
+      "ec2_private_ip": "10.27.72.27",
+      "managementcidr": "10.200.16.0/20"
     },
     "production": {
       "example_var": "production-data",
