@@ -124,9 +124,9 @@ resource "aws_athena_named_query" "fct_daily_cost" {
   query    = file("${path.module}/queries/fct_daily_cost.sql")
 }
 
-resource "null_resource" "execute_create_table_queries" {
+resource "null_resource" "execute_create_table_query" {
   count = local.is-development ? 0 : 1
-  
+
   triggers = {
     query_ids = "${aws_athena_named_query.fct_daily_cost.id}"
   }
