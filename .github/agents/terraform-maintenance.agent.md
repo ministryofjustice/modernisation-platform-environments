@@ -147,7 +147,9 @@ If any major versions were skipped, explain:
 
 ### Major Version Bumps Applied
 
-If any major versions were applied, explain why it was deemed safe:
+If any major versions were applied, explain why it was deemed safe e.g.:
+
+```markdown
 - **terraform-aws-modules/ecr/aws v3.x**: Only breaking change is AWS provider v6.0 minimum requirement (already satisfied by this environment)
 ```
 
