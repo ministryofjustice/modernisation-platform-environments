@@ -50,6 +50,12 @@ resource "aws_s3_bucket_notification" "data_bucket_triggers" {
     filter_suffix = ".csv"
     filter_prefix = "g4s/lcm"
   }
+  queue {
+    queue_arn     = module.load_historic_csv_sqs.sqs_queue.arn
+    events        = ["s3:ObjectCreated:*"]
+    filter_suffix = ".csv"
+    filter_prefix = "scram/alcohol_monitoring"
+  }
 }
 
 module "process_fms_metadata_sqs" {

@@ -1129,12 +1129,21 @@ resource "aws_iam_role_policy_attachment" "load_historic_csv_output_lambda_polic
   policy_arn = aws_iam_policy.load_historic_csv_lambda_role_policy.arn
 }
 
-module "share_db_with_historic_csv_lambda_role_policy_lambda_role" {
+module "share_lcm_db_with_historic_csv_lambda_role_policy_lambda_role" {
   source                  = "./modules/lakeformation_database_share"
   dbs_to_grant            = toset(["g4s_lcm${local.db_suffix}"])
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
   role_arn                = aws_iam_role.load_historic_csv.arn
   db_exists               = true ? local.is-production : false
+  de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
+}
+
+module "share_scram_db_with_historic_csv_lambda_role_policy_lambda_role" {
+  source                  = "./modules/lakeformation_database_share"
+  dbs_to_grant            = toset(["scram_alcohol_monitoring${local.db_suffix}"])
+  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+  role_arn                = aws_iam_role.load_historic_csv.arn
+  db_exists               = true
   de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
 }
 
