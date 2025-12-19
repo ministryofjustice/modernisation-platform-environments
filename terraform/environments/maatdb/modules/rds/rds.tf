@@ -121,7 +121,7 @@ resource "aws_secretsmanager_secret_version" "rds_password_secret_version" {
 }
 
 # From Vincent's PR
-# TODO Rotation of secret which requires Lambda function created and permissions granted to Lambda to rotate. 
+# TODO Rotation of secret which requires Lambda function created and permissions granted to Lambda to rotate.
 #
 # resource "aws_secretsmanager_secret_rotation" "rds_password-rotation" {
 #   secret_id           = aws_secretsmanager_secret.rds_password_secret.id
@@ -141,7 +141,8 @@ locals {
     aws_security_group.bastion_sec_group.id,
     aws_security_group.vpc_sec_group.id,
     aws_security_group.mlra_ecs_sec_group.id,
-    aws_security_group.ses_sec_group.id
+    aws_security_group.ses_sec_group.id,
+    aws_security_group.mojfin_sec_group.id
   ])
 }
 
@@ -358,6 +359,33 @@ resource "aws_security_group" "ses_sec_group" {
     Name = "${var.application_name}-${var.environment}-ses-sec-group"
   }
 }
+
+resource "aws_security_group" "mojfin_sec_group" {
+  name = "mojfin-sec-group"
+  description = "Access from Mojfin"
+  vpc_id      = var.vpc_shared_id
+
+  ingress {
+    description     = "Sql Net on 1521"
+    from_port       = 1521
+    to_port         = 1521
+    protocol        = "tcp"
+    security_groups = [var.mojfin_sec_group_id]
+  }
+
+  egress {
+    description     = "Sql Net on 1521"
+    from_port       = 1521
+    to_port         = 1521
+    protocol        = "tcp"
+    security_groups = [var.mojfin_sec_group_id]
+  }
+
+  tags = {
+    Name = "${var.application_name}-${var.environment}-mojfin-sec-group"
+  }
+}
+
 
 #RDS role to access HUB 2.0 S3 Bucket
 resource "aws_iam_role" "rds_s3_access" {

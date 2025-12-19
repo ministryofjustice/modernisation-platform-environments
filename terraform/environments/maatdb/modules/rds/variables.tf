@@ -175,6 +175,11 @@ variable "bastion_security_group_id" {
   description = "bastion security group id"
 }
 
+  variable "mojfin_sec_group_id" {
+    type        = string
+    description = "Mojfin security group id"
+  }
+
 variable "kms_key_arn" {
   type        = string
   description = "kms key arn"
