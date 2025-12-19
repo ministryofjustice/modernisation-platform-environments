@@ -141,8 +141,7 @@ locals {
     aws_security_group.bastion_sec_group.id,
     aws_security_group.vpc_sec_group.id,
     aws_security_group.mlra_ecs_sec_group.id,
-    aws_security_group.ses_sec_group.id,
-    aws_security_group.mojfin_sec_group.id
+    aws_security_group.ses_mojfin_sec_group.id
   ])
 }
 
@@ -341,10 +340,10 @@ resource "aws_security_group" "bastion_sec_group" {
 # Outbound to Port 587 for SES SMTP Endpoint Access
 
 # tflint-ignore: terraform_required_providers
-resource "aws_security_group" "ses_sec_group" {
+resource "aws_security_group" "ses_mojfin_sec_group" {
   #checkov:skip=CKV2_AWS_5:"Not applicable"
-  name        = "ses-sec-group"
-  description = "SES Outbound Access"
+  name        = "ses-mojfin-sec-group"
+  description = "SES Outbound Access, Mojfin 1521 Access"
   vpc_id      = var.vpc_shared_id
 
   egress {
@@ -354,16 +353,6 @@ resource "aws_security_group" "ses_sec_group" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
-  tags = {
-    Name = "${var.application_name}-${var.environment}-ses-sec-group"
-  }
-}
-
-resource "aws_security_group" "mojfin_sec_group" {
-  name = "mojfin-sec-group"
-  description = "Access from Mojfin"
-  vpc_id      = var.vpc_shared_id
 
   ingress {
     description     = "Sql Net on 1521"
@@ -382,10 +371,9 @@ resource "aws_security_group" "mojfin_sec_group" {
   }
 
   tags = {
-    Name = "${var.application_name}-${var.environment}-mojfin-sec-group"
+    Name = "${var.application_name}-${var.environment}-ses-sec-group"
   }
 }
-
 
 #RDS role to access HUB 2.0 S3 Bucket
 resource "aws_iam_role" "rds_s3_access" {
