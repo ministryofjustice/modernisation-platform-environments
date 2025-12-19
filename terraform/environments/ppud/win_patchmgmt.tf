@@ -47,8 +47,8 @@ resource "aws_ssm_patch_baseline" "windows_os_apps_baseline" {
 # SSM Maintenance Windows - All Environments
 # Configuration for each environment is in the application_variables.json file
 
-# Development : Third Tuesday of the month at 17:00 UTC / 18:00 BST
-# UAT:          Third Tuesday of the month at 17:00 UTC / 18:00 BST
+# Development : Third Tuesday of the month at 18:00 UTC / 19:00 BST
+# UAT:          Third Tuesday of the month at 18:00 UTC / 19:00 BST
 # Production:   Fourth Tuesday of the month at 19:00 UTC / 20:00 BST
 
 resource "aws_ssm_maintenance_window" "patch_maintenance_window" {
@@ -123,8 +123,8 @@ resource "aws_ssm_maintenance_window_task" "pre_healthcheck_maintenance_window_t
 
   task_invocation_parameters {
     run_command_parameters {
-      output_s3_bucket     = aws_s3_bucket.MoJ-Health-Check-Reports.id
-      output_s3_key_prefix = "health-check-reports/"
+      output_s3_bucket     = local.application_data.accounts[local.environment].ssm_health_check_reports_s3
+      output_s3_key_prefix = "health-check-reports/windows/"
       timeout_seconds      = 600
     }
   }
@@ -150,8 +150,8 @@ resource "aws_ssm_maintenance_window_task" "post_healthcheck_maintenance_window_
 
   task_invocation_parameters {
     run_command_parameters {
-      output_s3_bucket     = aws_s3_bucket.MoJ-Health-Check-Reports.id
-      output_s3_key_prefix = "health-check-reports/"
+      output_s3_bucket     = local.application_data.accounts[local.environment].ssm_health_check_reports_s3
+      output_s3_key_prefix = "health-check-reports/windows/"
       timeout_seconds      = 600
     }
   }

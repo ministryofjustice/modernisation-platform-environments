@@ -24,6 +24,7 @@ resource "aws_lakeformation_data_lake_settings" "settings" {
       data.aws_iam_role.github_actions_role.arn,
       data.aws_iam_session_context.current.issuer_arn,
       [for share in local.analytical_platform_share : aws_iam_role.analytical_platform_share_role[share.target_account_name].arn],
+      local.is-development ? [] : [aws_iam_role.clean_after_mdss_load[0].arn]
     ]
   )
   parameters = {
@@ -61,4 +62,65 @@ resource "aws_lakeformation_permissions" "sensitive_grant" {
     values = aws_lakeformation_lf_tag.sensitive_tag.values
   }
 
+}
+
+
+# ------------------------------------------------------------------------
+# Lake Formation - admin permissions
+# https://user-guide.modernisation-platform.service.justice.gov.uk/runbooks/adding-admin-data-lake-formation-permissions.html
+# ------------------------------------------------------------------------
+
+module "lakeformation_registration_iam_role" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role"
+  version = "6.2.1"
+
+  name            = "lakeformation-registration"
+  use_name_prefix = "false"
+
+  trust_policy_permissions = {
+    TrustRoleAndServiceToAssume = {
+      actions = [
+        "sts:AssumeRole",
+        "sts:SetContext"
+      ]
+      principals = [
+        {
+          type        = "Service"
+          identifiers = ["lakeformation.amazonaws.com"]
+        },
+        {
+          type        = "Service"
+          identifiers = ["glue.amazonaws.com"]
+        },
+      ]
+    }
+  }
+
+  create_inline_policy = true
+  inline_policy_permissions = {
+    S3BucketAccess = {
+      effect    = "Allow"
+      actions   = ["s3:ListBucket"]
+      resources = [module.s3-create-a-derived-table-bucket.bucket.arn]
+    }
+    S3ObjectAccess = {
+      effect    = "Allow"
+      actions   = ["s3:DeleteObject", "s3:GetObject", "s3:PutObject"]
+      resources = ["${module.s3-create-a-derived-table-bucket.bucket.arn}/*"]
+    }
+    KMSKeyAccess = {
+      effect = "Allow"
+      actions = [
+        "kms:Encrypt",
+        "kms:Decrypt",
+        "kms:ReEncrypt*",
+        "kms:GenerateDataKey*",
+        "kms:DescribeKey"
+      ]
+      resources = ["arn:aws:kms:eu-west-2:${local.env_account_id}:key/alias/aws/s3"]
+    }
+  }
 }

@@ -24,17 +24,44 @@ resource "aws_iam_role_policy" "lambda_edrms_docs_exception_policy" {
     Version = "2012-10-17"
     Statement = [
       {
-        Effect   = "Allow"
-        Action   = ["logs:CreateLogStream", "logs:PutLogEvents"]
-        Resource = [ "arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:${aws_cloudwatch_log_group.log_group_edrms.arn}:*"]
+        Effect = "Allow"
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ]
+        Resource = "arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${aws_lambda_function.edrms_docs_exception_monitor.function_name}:*"
       },
       {
-        Effect   = "Allow"
-        Action   = ["sns:Publish"]
-        Resource = [aws_sns_topic.cloudwatch_slack.arn]
+        Effect = "Allow"
+        Action = [
+          "logs:GetLogEvents",
+          "logs:FilterLogEvents"
+        ]
+        Resource = "${aws_cloudwatch_log_group.log_group_edrms.arn}:*"
+      },
+      {
+        Action : [
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:DescribeSecret",
+          "secretsmanager:ListSecretVersionIds"
+        ],
+        Effect   = "Allow",
+        Resource = [aws_secretsmanager_secret.edrms_docs_exception_secrets.arn]
       }
     ]
   })
+}
+
+# Lambda Layer
+resource "aws_lambda_layer_version" "lambda_layer" {
+  # filename                 = "lambda/layerV1.zip"
+  layer_name               = "${local.application_name}-${local.environment}-edrms-docs-exception-layer"
+  s3_key                   = "lambda_delivery/${local.application_name}-docs-exception-layer/layerV1.zip"
+  s3_bucket                = module.s3-bucket-shared.bucket.id
+  compatible_runtimes      = ["python3.13"]
+  compatible_architectures = ["x86_64"]
+  description              = "Lambda Layer for ${local.application_name} Edrms Docs Exception"
 }
 
 resource "aws_lambda_function" "edrms_docs_exception_monitor" {
@@ -43,14 +70,16 @@ resource "aws_lambda_function" "edrms_docs_exception_monitor" {
   function_name    = "${local.application_name}-${local.environment}-edrms-docs-exception-monitor"
   role             = aws_iam_role.lambda_edrms_docs_exception_role.arn
   handler          = "lambda_function.lambda_handler"
+  layers           = [aws_lambda_layer_version.lambda_layer.arn]
   runtime          = "python3.13"
   timeout          = 30
   publish          = true
 
   environment {
     variables = {
-      LOG_GROUP_NAME      = aws_cloudwatch_log_group.log_group_edrms.name
-      SNS_TOPIC_ARN       = aws_sns_topic.cloudwatch_slack.arn
+      LOG_GROUP_NAME = aws_cloudwatch_log_group.log_group_edrms.name
+      SNS_TOPIC_ARN  = aws_sns_topic.cloudwatch_slack.arn
+      SECRET_NAME    = aws_secretsmanager_secret.edrms_docs_exception_secrets.name
     }
   }
 
@@ -77,5 +106,5 @@ resource "aws_cloudwatch_log_subscription_filter" "edrms_docs_exception_filter" 
   filter_pattern  = "\"EdrmsDocumentException\""
   destination_arn = aws_lambda_function.edrms_docs_exception_monitor.arn
 
-  depends_on = [ aws_lambda_permission.allow_cloudwatch_invoke ]
+  depends_on = [aws_lambda_permission.allow_cloudwatch_invoke]
 }

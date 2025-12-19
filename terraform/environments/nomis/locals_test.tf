@@ -2,7 +2,7 @@ locals {
 
   lb_maintenance_message_test = {
     maintenance_title   = "Prison-NOMIS Environment Not Started"
-    maintenance_message = "T1 and T2 are rarely used so are started on demand. T3 is available during working hours 7am-7pm. Please contact <a href=\"https://moj.enterprise.slack.com/archives/C6D94J81E\">#ask-digital-studio-ops</a> slack channel if environment is unexpecedly down. See <a href=\"https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4978343956\">confluence</a> for more details"
+    maintenance_message = "T1 and T2 are rarely used so are started on demand. T3 is available during working hours 7am-7pm. Please contact <a href=\"https://moj.enterprise.slack.com/archives/C6D94J81E\">#ask-digital-studio-ops</a> slack channel if environment is unexpectedly down. See <a href=\"https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4978343956\">confluence</a> for more details"
   }
 
   baseline_presets_test = {
@@ -19,13 +19,11 @@ locals {
   baseline_test = {
 
     acm_certificates = {
-      nomis_wildcard_cert_v2 = {
-        cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
-        domain_name                         = "*.test.nomis.service.justice.gov.uk"
-        external_validation_records_created = true
+      nomis_wildcard_cert_v3 = {
+        cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms.acm
+        domain_name              = "*.test.nomis.service.justice.gov.uk"
         subject_alternate_names = [
           "*.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk",
-          "*.hmpp-azdt.justice.gov.uk",
         ]
         tags = {
           description = "wildcard cert for nomis test domains"
@@ -292,7 +290,7 @@ locals {
         })
         ebs_volume_config = merge(local.ec2_instances.db19c.ebs_volume_config, {
           data  = { total_size = 500 }
-          flash = { total_size = 50 }
+          flash = { total_size = 150 }
         })
         instance = merge(local.ec2_instances.db19c.instance, {
           disable_api_termination = false
@@ -324,7 +322,7 @@ locals {
         })
         ebs_volume_config = merge(local.ec2_instances.db19c.ebs_volume_config, {
           data  = { total_size = 500 }
-          flash = { total_size = 50 }
+          flash = { total_size = 150 }
         })
         instance = merge(local.ec2_instances.db19c.instance, {
           disable_api_termination = false
@@ -589,7 +587,7 @@ locals {
         listeners = merge(local.lbs.private.listeners, {
           https = merge(local.lbs.private.listeners.https, {
             alarm_target_group_names  = [] # don't enable as environments are powered up/down frequently
-            certificate_names_or_arns = ["nomis_wildcard_cert_v2"]
+            certificate_names_or_arns = ["nomis_wildcard_cert_v3"]
 
             # /home/oracle/admin/scripts/lb_maintenance_mode.sh script on
             # weblogic servers can alter priorities to enable maintenance message
@@ -619,7 +617,6 @@ locals {
                     values = [
                       "t1-nomis-web-b.test.nomis.service.justice.gov.uk",
                       "c-t1.test.nomis.service.justice.gov.uk",
-                      "t1-cn.hmpp-azdt.justice.gov.uk",
                     ]
                   }
                 }]
@@ -649,7 +646,6 @@ locals {
                     values = [
                       "t2-nomis-web-b.test.nomis.service.justice.gov.uk",
                       "c-t2.test.nomis.service.justice.gov.uk",
-                      "t2-cn.hmpp-azdt.justice.gov.uk",
                     ]
                   }
                 }]
@@ -679,8 +675,6 @@ locals {
                     values = [
                       "t3-nomis-web-b.test.nomis.service.justice.gov.uk",
                       "c-t3.test.nomis.service.justice.gov.uk",
-                      "t3-cn.hmpp-azdt.justice.gov.uk",
-                      "t3-cn-ha.hmpp-azdt.justice.gov.uk",
                     ]
                   }
                 }]
@@ -702,7 +696,6 @@ locals {
                       "c-t1.test.nomis.service.justice.gov.uk",
                       "c-t2.test.nomis.service.justice.gov.uk",
                       "c-t3.test.nomis.service.justice.gov.uk",
-                      "t3-cn-ha.hmpp-azdt.justice.gov.uk",
                     ]
                   }
                 }]

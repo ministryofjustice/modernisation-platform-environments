@@ -32,7 +32,7 @@ env:
   APPLICATION:   ${{ github.event.inputs.application || 'cooker' }}
   ENVIRONMENTS:  ${{ github.event.inputs.environments || 'development' }}
   AMI_ARGS:      "-c -m 3"    # month-based AMI threshold for live runs
-  EBS_MONTHS:    "3"          # month-based EBS threshold for live runs
+  EBS_MONTHS:    "1"          # month-based EBS threshold for live runs
   AGE_MINUTES:   "3"          # age of resources in minutes when testing preview/live
   LIVE_TEST_MODE: "false"     # false uses month gates and true uses the minute-based threshold
 
@@ -63,7 +63,7 @@ jobs:
 
   fetch-secrets:
     name: Fetch ENV management secrets
-    uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@4eceb2a416a197e91dc557c2ef0b5dd9afe29e0c
+    uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@0c879ebf9183dd7e47d3fe9c961afa3271843b8b # v3.6.0
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_NUMBER: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
@@ -81,7 +81,7 @@ jobs:
       max-parallel: 1
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
 
       - name: Ensure scripts are executable
         run: chmod +x scripts/*.sh
@@ -94,7 +94,7 @@ jobs:
           fi
 
       - name: Decrypt Secrets (ENVIRONMENT_MANAGEMENT)
-        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@4eceb2a416a197e91dc557c2ef0b5dd9afe29e0c
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@0c879ebf9183dd7e47d3fe9c961afa3271843b8b # v3.6.0
         with:
           environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
           github_ci_user_environments_repo_pat: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}
@@ -116,7 +116,7 @@ jobs:
           echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
 
       - name: Configure AWS Credentials (github-actions role)
-        uses: aws-actions/configure-aws-credentials@00943011d9042930efac3dcd3a170e4273319bc8
+        uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5.1.1
         with:
           role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
           role-session-name: "cleanup-preview-${{ matrix.account_name }}"
@@ -184,7 +184,7 @@ jobs:
             TAGS_JSON="$(aws ec2 describe-images --image-ids "$AMI" --query 'Images[0].Tags' --output json 2>/dev/null || echo '[]')"
             STATUS="To be deleted"
             REASON=""
-            if [[ "$NAME" =~ ^(AwsBackup|Backup) ]] || echo "$TAGS_JSON" | jq -e '.[] | select((.Key|test("Retain|Backup";"i")) and (.Value|test("^(true|yes|1)$";"i")))' >/dev/null; then
+            if echo "$NAME" | grep -qi 'backup' || echo "$TAGS_JSON" | jq -e '.[] | select((.Key|test("Retain|Backup";"i")) and (.Value|test("^(true|yes|1)$";"i")))' >/dev/null; then
               echo "$AMI,$NAME,Protected name/tag" >> reports/protected_amis.csv
               STATUS="Protected"
               REASON="Protected name/tag"
@@ -237,7 +237,7 @@ jobs:
 
       - name: Upload AMI Preview Artifacts
         if: ${{ always() && (github.event_name == 'push' || github.event.inputs.cleanup_type == 'ami' || github.event.inputs.cleanup_type == 'both') }}
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: ami-preview-${{ matrix.account_name }}
           path: |
@@ -295,7 +295,7 @@ jobs:
 
       - name: Upload EBS Preview Artifacts
         if: ${{ always() && (github.event_name == 'push' || github.event.inputs.cleanup_type == 'ebs' || github.event.inputs.cleanup_type == 'both') }}
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: ebs-preview-${{ matrix.account_name }}
           path: |
@@ -305,7 +305,7 @@ jobs:
 
       - name: Upload Unified Preview Artifact
         if: always()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: cleanup-report-preview-${{ matrix.account_name }}
           path: reports/cleanup_report.csv
@@ -325,7 +325,7 @@ jobs:
       max-parallel: 1
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
 
       - name: Ensure scripts are executable
         run: chmod +x scripts/*.sh
@@ -338,7 +338,7 @@ jobs:
           fi
 
       - name: Decrypt Secrets (ENVIRONMENT_MANAGEMENT)
-        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@4eceb2a416a197e91dc557c2ef0b5dd9afe29e0c
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@0c879ebf9183dd7e47d3fe9c961afa3271843b8b # v3.6.0
         with:
           environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
           github_ci_user_environments_repo_pat: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}
@@ -353,7 +353,7 @@ jobs:
           echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
 
       - name: Configure AWS Credentials (github-actions role)
-        uses: aws-actions/configure-aws-credentials@00943011d9042930efac3dcd3a170e4273319bc8
+        uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5.1.1
         with:
           role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
           role-session-name: "ami-delete-${{ matrix.account_name }}"
@@ -418,7 +418,7 @@ jobs:
             NAME="$(aws ec2 describe-images --image-ids "$AMI" --query 'Images[0].Name' --output text 2>/dev/null || echo '')"
             WHEN="$(aws ec2 describe-images --image-ids "$AMI" --query 'Images[0].CreationDate' --output text 2>/dev/null | sed 's/\.[0-9]\+Z$/Z/')"
             TAGS_JSON="$(aws ec2 describe-images --image-ids "$AMI" --query 'Images[0].Tags' --output json 2>/dev/null || echo '[]')"
-            if [[ "$NAME" =~ ^(AwsBackup|Backup) ]] || echo "$TAGS_JSON" | jq -e '.[] | select((.Key|test("Retain|Backup"; "i")) and (.Value|test("^(true|yes|1)$"; "i")))' >/dev/null; then
+            if echo "$NAME" | grep -qi 'backup' || echo "$TAGS_JSON" | jq -e '.[] | select((.Key|test("Retain|Backup"; "i")) and (.Value|test("^(true|yes|1)$"; "i")))' >/dev/null; then
               echo "$AMI $NAME" >> protected_amis.tmp
               echo "$AMI,$NAME,Protected name/tag" >> reports/protected_amis.csv
             fi
@@ -478,7 +478,7 @@ jobs:
           CREDS_JSON=$(aws sts assume-role --role-arn "arn:aws:iam::${ACCOUNT_NUMBER}:role/MemberInfrastructureAccess" --role-session-name "live-ami-snaps-${{ matrix.account_name }}" --output json)
           export AWS_ACCESS_KEY_ID=$(jq -r '.Credentials.AccessKeyId' <<< "$CREDS_JSON")
           export AWS_SECRET_ACCESS_KEY=$(jq -r '.Credentials.SecretAccessKey' <<< "$CREDS_JSON")
-          export AWS_SESSION_TOKEN=$(jq -r '.Credentials.SessionToken' <<< "$CREDS_JSON")
+          export AWS_SESSION_TOKEN=$(jq -r '.Credentials.SessionToken'    <<< "$CREDS_JSON")
           echo "🧹 Snapshots — Fallback"
           aws_try() {
             local max=5 delay=2 attempt=1
@@ -516,7 +516,7 @@ jobs:
             if grep -Eiq '(^|[[:space:]])(Retain|Backup)[[:space:]]*=[[:space:]]*(true|yes|1)' <<< "${TAGS:-}"; then
               continue
             fi
-            if grep -qi 'AwsBackup' <<< "${DESC:-} ${NAME:-}"; then
+            if grep -qi 'backup' <<< "${DESC:-} ${NAME:-}"; then
               continue
             fi
             aws_try aws ec2 delete-snapshot --snapshot-id "$SNAP_ID" || true
@@ -526,7 +526,7 @@ jobs:
 
       - name: Upload AMI Live Artifacts (reports only)
         if: always()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: ami-live-${{ matrix.account_name }}
           path: |
@@ -544,7 +544,7 @@ jobs:
           echo "### 🚀 AMI Live — ${{ matrix.account_name }}" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "| Metric | Count |" >> "$GITHUB_STEP_SUMMARY"
-          echo "|---|---:|" >> "$GITHUB_STEP_SUMMARY"
+          echo "|---|---:|"
           echo "| AMIs deleted | ${DEL} |" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "**Deleted AMIs**" >> "$GITHUB_STEP_SUMMARY"
@@ -582,7 +582,7 @@ jobs:
       max-parallel: 1
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
 
       - name: Ensure scripts are executable
         run: chmod +x scripts/*.sh
@@ -595,7 +595,7 @@ jobs:
           fi
 
       - name: Decrypt Secrets (ENVIRONMENT_MANAGEMENT)
-        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@4eceb2a416a197e91dc557c2ef0b5dd9afe29e0c
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@0c879ebf9183dd7e47d3fe9c961afa3271843b8b # v3.6.0
         with:
           environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
           github_ci_user_environments_repo_pat: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}
@@ -610,7 +610,7 @@ jobs:
           echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
 
       - name: Configure AWS Credentials (github-actions role)
-        uses: aws-actions/configure-aws-credentials@00943011d9042930efac3dcd3a170e4273319bc8
+        uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5.1.1
         with:
           role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
           role-session-name: "ebs-delete-${{ matrix.account_name }}"
@@ -659,7 +659,7 @@ jobs:
 
       - name: Upload EBS Live Artifacts (reports only)
         if: always()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: ebs-live-${{ matrix.account_name }}
           path: reports/ebs_cleanup_report.csv
@@ -673,7 +673,7 @@ jobs:
           echo "### 🚀 EBS Live — ${{ matrix.account_name }}" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "| Metric | Count |" >> "$GITHUB_STEP_SUMMARY"
-          echo "|---|---:|" >> "$GITHUB_STEP_SUMMARY"
+          echo "|---|---:|"
           echo "| Volumes deleted | ${DEL} |" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "**Deleted volumes**" >> "$GITHUB_STEP_SUMMARY"

@@ -138,7 +138,7 @@ locals {
           ])
         })
         instance = merge(local.ec2_instances.bip.instance, {
-          ami = "ami-0d206b8546ea2b68a" # to prevent instances being re-created due to recreated AMI
+          ami           = "ami-0d206b8546ea2b68a" # to prevent instances being re-created due to recreated AMI
           instance_type = "t3.medium"
         })
         user_data_cloud_init = merge(local.ec2_instances.bip.user_data_cloud_init, {
@@ -167,13 +167,13 @@ locals {
           "/dev/sdb" = { label = "app", size = 200 } # /u01
           "/dev/sdc" = { label = "app", size = 500 } # /u02
           "/dev/sde" = { label = "data", size = 500 }
-          "/dev/sdf" = { label = "data", size = 50 }
+          "/dev/sdf" = { label = "data", size = 50, iops = 3000, throughput = 125 }
           "/dev/sdj" = { label = "flash", size = 50 }
           "/dev/sds" = { label = "swap", size = 2 }
         }
         instance = merge(local.ec2_instances.db19c.instance, {
           disable_api_termination = true
-          instance_type           = "r6i.large"
+          instance_type           = "r6i.xlarge"
         })
         tags = merge(local.ec2_instances.db19c.tags, {
           bip-db-name         = "T1BIPINF"
@@ -192,8 +192,8 @@ locals {
           ])
         })
         instance = merge(local.ec2_instances.bip.instance, {
-          ami = "ami-0d206b8546ea2b68a" # to prevent instances being re-created due to recreated AMI
-          instance_type           = "t3.medium"
+          ami           = "ami-0d206b8546ea2b68a" # to prevent instances being re-created due to recreated AMI
+          instance_type = "t3.medium"
         })
         user_data_cloud_init = merge(local.ec2_instances.bip.user_data_cloud_init, {
           args = merge(local.ec2_instances.bip.user_data_cloud_init.args, {
@@ -221,13 +221,13 @@ locals {
           "/dev/sdb" = { label = "app", size = 200 } # /u01
           "/dev/sdc" = { label = "app", size = 500 } # /u02
           "/dev/sde" = { label = "data", size = 500 }
-          "/dev/sdf" = { label = "data", size = 500 }
+          "/dev/sdf" = { label = "data", size = 500, iops = 3000, throughput = 150 }
           "/dev/sdj" = { label = "flash", size = 200 }
           "/dev/sds" = { label = "swap", size = 4 }
         }
         instance = merge(local.ec2_instances.db19c.instance, {
           disable_api_termination = true
-          instance_type           = "r6i.large"
+          instance_type           = "r6i.xlarge"
         })
         tags = merge(local.ec2_instances.db19c.tags, {
           bip-db-name         = "T2BIPINF"
@@ -248,8 +248,8 @@ locals {
         ebs_volumes = {
           "/dev/sdb" = { label = "app", size = 100 } # /u01
           "/dev/sdc" = { label = "app", size = 500 } # /u02
-          "/dev/sde" = { label = "data", size = 2000 }
-          "/dev/sdj" = { label = "flash", size = 600 }
+          "/dev/sde" = { label = "data", size = 2000, iops = 3000, throughput = 125 }
+          "/dev/sdj" = { label = "flash", size = 600, iops = 3000, throughput = 125 }
           "/dev/sds" = { label = "swap", size = 2 }
         }
         instance = merge(local.ec2_instances.db11g.instance, {

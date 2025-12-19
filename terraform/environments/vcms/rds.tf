@@ -4,6 +4,7 @@ locals {
 }
 
 resource "aws_db_instance" "mariadb" {
+  snapshot_identifier    = local.db_snapshot_identifier
   allocated_storage      = 200
   db_name                = local.db_name
   engine                 = "mariadb"

@@ -6,6 +6,10 @@
 # Eventbridge Rules 
 ####################
 
+#####################################################
+# Eventbridge Rule to check for Expiring Certificates
+#####################################################
+
 # Lambda instances for check_certificate_expiration
 locals {
   certificate_expiration_envs = {
@@ -48,6 +52,56 @@ resource "aws_lambda_permission" "allow_cloudwatch_certificate_approaching_expir
   function_name = aws_lambda_function.lambda_functions[each.key].function_name
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.certificate_approaching_expiration[each.key].arn
+}
+
+######################################################
+# Eventbridge Rule to check for SSM Parameter Updates
+######################################################
+
+# Lambda instances for ssm parameter syncing to waf
+locals {
+  sync_ssm_to_waf_envs = {
+    for k, v in local.lambda_instances_map :
+    k => v
+    if startswith(k, "sync_ssm_to_waf")
+  }
+}
+
+resource "aws_cloudwatch_event_rule" "sync_ssm_to_waf" {
+  for_each      = local.sync_ssm_to_waf_envs
+  name          = "SSM-Parameter-Sync-to-IP-Set-${each.value.env}"
+  description   = "Triggers Lambda when SSM parameters change"
+  event_pattern = <<EOF
+{
+  "source": ["aws.ssm"],
+  "detail-type": ["Parameter Store Change"],
+  "detail": {
+    "name": ["/waf/ip_block_list", "circle_ci_waf_ip_set", "ncsc_waf_ip_set"]
+  }
+}
+EOF
+  tags = {
+    Function    = each.value.func_name
+    Environment = each.value.env
+  }
+}
+
+# EventBridge Targets for Lambda
+resource "aws_cloudwatch_event_target" "trigger_lambda_sync_ssm_to_waf" {
+  for_each  = local.sync_ssm_to_waf_envs
+  rule      = aws_cloudwatch_event_rule.sync_ssm_to_waf[each.key].name
+  target_id = "sync_to_ssm_waf_${each.value.env}"
+  arn       = aws_lambda_function.lambda_functions[each.key].arn
+}
+
+# Lambda Permission for EventBridge
+resource "aws_lambda_permission" "allow_cloudwatch_sync_ssm_to_waf" {
+  for_each      = local.sync_ssm_to_waf_envs
+  statement_id  = "AllowExecutionFromEventBridge-${each.value.env}"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.lambda_functions[each.key].function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.sync_ssm_to_waf[each.key].arn
 }
 
 #################################
@@ -95,7 +149,7 @@ locals {
     }
     ppud_elb_get_trt_data = {
       environments = ["production"]
-      schedule     = "cron(0 0 ? * * *)" # check IIS log timings
+      schedule     = "cron(0 0 ? * * *)"
       description  = "Trigger Lambda at 00:00 every day"
       timezone     = "Europe/London"
     }
@@ -107,7 +161,7 @@ locals {
     }
     ppud_elb_get_uptime_data = {
       environments = ["production"]
-      schedule     = "cron(0 0 ? * * *)" # check IIS log timings
+      schedule     = "cron(0 0 ? * * *)"
       description  = "Trigger Lambda at 00:00 every day"
       timezone     = "Europe/London"
     }
@@ -136,9 +190,15 @@ locals {
       timezone     = "Europe/London"
     }
     wam_waf_analysis = {
-      environments = ["development"]
+      environments = ["development", "preproduction"]
       schedule     = "cron(15 7 ? * MON *)"
       description  = "Trigger Lambda at 07:15 each Monday"
+      timezone     = "Europe/London"
+    }
+    check_elb_trt_alarm = {
+      environments = ["production"]
+      schedule     = "cron(0 * ? * * *)"
+      description  = "Trigger Lambda every hour"
       timezone     = "Europe/London"
     }
     /*
@@ -229,11 +289,18 @@ locals {
       local.is-preproduction ? aws_lambda_function.lambda_functions["securityhub_report_preproduction"].arn : (
         local.is-production ? aws_lambda_function.lambda_functions["securityhub_report_production"].arn : null
     ))
-    #    wam_waf_analysis = local.is-development ? aws_lambda_function.lambda_functions["wam_waf_analysis_development"].arn : (
-    #      local.is-preproduction ? aws_lambda_function.lambda_functions["wam_waf_analysis_preproduction"].arn : (
-    #        local.is-production ? aws_lambda_function.lambda_functions["wam_waf_analysis_production"].arn : null
-    #    ))
-    wam_waf_analysis               = local.is-development ? aws_lambda_function.lambda_functions["wam_waf_analysis_development"].arn : null # Remove this once all environments are enabled
+    sync_ssm__to_waf = local.is-development ? aws_lambda_function.lambda_functions["sync_ssm_to_waf_development"].arn : (
+      local.is-preproduction ? aws_lambda_function.lambda_functions["sync_ssm_to_waf_preproduction"].arn : (
+        local.is-production ? aws_lambda_function.lambda_functions["sync_ssm_to_waf_production"].arn : null
+    ))
+    wam_waf_analysis = local.is-development ? aws_lambda_function.lambda_functions["wam_waf_analysis_development"].arn : (
+      local.is-preproduction ? aws_lambda_function.lambda_functions["wam_waf_analysis_preproduction"].arn : null
+    )
+    #wam_waf_analysis = local.is-development ? aws_lambda_function.lambda_functions["wam_waf_analysis_development"].arn : (
+    #  local.is-preproduction ? aws_lambda_function.lambda_functions["wam_waf_analysis_preproduction"].arn : (
+    #    local.is-production ? aws_lambda_function.lambda_functions["wam_waf_analysis_production"].arn : null
+    #))
+    check_elb_trt_alarm            = local.is-production ? aws_lambda_function.lambda_functions["check_elb_trt_alarm_production"].arn : null
     send_cpu_graph                 = local.is-production ? aws_lambda_function.lambda_functions["send_cpu_graph_production"].arn : null
     disable_cpu_alarms             = local.is-production ? aws_lambda_function.lambda_functions["disable_cpu_alarm_production"].arn : null
     enable_cpu_alarms              = local.is-production ? aws_lambda_function.lambda_functions["enable_cpu_alarm_production"].arn : null

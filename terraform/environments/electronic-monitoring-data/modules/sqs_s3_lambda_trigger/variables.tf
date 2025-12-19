@@ -15,3 +15,11 @@ variable "bucket_prefix" {
   description = "The predefined local.bucket_prefix"
   type        = string
 }
+
+
+variable "maximum_concurrency" {
+  description = "maximum concurrency to lambda"
+  type        = number
+  default     = 10
+  nullable    = true
+}

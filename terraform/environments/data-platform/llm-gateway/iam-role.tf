@@ -1,7 +1,7 @@
 module "iam_role" {
   count = terraform.workspace == "data-platform-development" ? 1 : 0
 
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role?ref=dc7a9f3bed20aaaba05d151b0789745070424b3a" # v6.2.1
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role?ref=7279fc444aed7e36c60438b46972e1611e48984c" # v6.2.3
 
   name            = local.component_name
   use_name_prefix = false

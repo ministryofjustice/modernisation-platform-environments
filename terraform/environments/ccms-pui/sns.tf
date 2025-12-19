@@ -1,8 +1,8 @@
 # SNS Topic for Slack Alerts
 
 resource "aws_sns_topic" "cloudwatch_alerts" {
-  name            = "cloudwatch-slack-alerts"
-  delivery_policy = <<EOF
+  name              = "cloudwatch-slack-alerts"
+  delivery_policy   = <<EOF
 {
   "http": {
     "defaultHealthyRetryPolicy": {
@@ -21,6 +21,10 @@ resource "aws_sns_topic" "cloudwatch_alerts" {
   }
 }
 EOF
+  kms_master_key_id = aws_kms_key.cloudwatch_sns_alerts_key.id
+  tags = merge(local.tags,
+    { Name = "cloudwatch-slack-alerts" }
+  )
 }
 
 data "aws_iam_policy_document" "cloudwatch_alerting_sns" {
@@ -37,22 +41,13 @@ data "aws_iam_policy_document" "cloudwatch_alerting_sns" {
     principals {
       type = "Service"
       identifiers = [
-        "events.amazonaws.com",
+        "cloudwatch.amazonaws.com",
       ]
     }
   }
 }
 
-
-
 resource "aws_sns_topic_policy" "alert_default" {
   arn    = aws_sns_topic.cloudwatch_alerts.arn
   policy = data.aws_iam_policy_document.cloudwatch_alerting_sns.json
 }
-
-resource "aws_sns_topic_subscription" "cloudwatch_alerts" {
-  topic_arn = aws_sns_topic.cloudwatch_alerts.arn
-  protocol  = "https"
-  endpoint  = "https://global.sns-api.chatbot.amazonaws.com"
-}
-

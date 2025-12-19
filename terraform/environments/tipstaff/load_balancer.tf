@@ -21,9 +21,10 @@ resource "aws_security_group" "tipstaff_lb_sc" {
 
   // Allow user IP addresses
   ingress {
-    from_port = 443
-    to_port   = 443
-    protocol  = "tcp"
+    description = "allow access on HTTPS for user IP addresses"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
     cidr_blocks = [
       "178.248.34.44/32",
       "194.33.192.0/25",
@@ -56,11 +57,11 @@ resource "aws_security_group" "tipstaff_lb_sc" {
     ]
   }
 
-  // Replacement DOM1 allow list from Jaz Chan 11/6/24
   ingress {
-    from_port = 443
-    to_port   = 443
-    protocol  = "tcp"
+    description = "Replacement DOM1 allow list from Jaz Chan 11/6/24"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
     cidr_blocks = [
       "20.26.11.71/32",
       "20.26.11.108/32",
@@ -78,11 +79,11 @@ resource "aws_security_group" "tipstaff_lb_sc" {
     ]
   }
 
-  // Allow all IP addresses provided by the users
   ingress {
-    from_port = 443
-    to_port   = 443
-    protocol  = "tcp"
+    description = "Allowed IP addresses provided by the users"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
     cidr_blocks = [
       "194.33.196.47/32",
       "194.33.192.6/32",
@@ -116,11 +117,11 @@ resource "aws_security_group" "tipstaff_lb_sc_pingdom" {
   description = "control Pingdom access to the load balancer"
   vpc_id      = data.aws_vpc.shared.id
 
-  // Allow all European Pingdom IP addresses
   ingress {
-    from_port = 443
-    to_port   = 443
-    protocol  = "tcp"
+    description = "allow all European Pingdom IP addresses"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
     cidr_blocks = [
       "94.75.211.73/32",
       "94.75.211.74/32",
@@ -189,11 +190,11 @@ resource "aws_security_group" "tipstaff_lb_sc_pingdom_2" {
   description = "control Pingdom access to the load balancer"
   vpc_id      = data.aws_vpc.shared.id
 
-  // Allow all European Pingdom IP addresses
   ingress {
-    from_port = 443
-    to_port   = 443
-    protocol  = "tcp"
+    description = "allow all European Pingdom IP addresses - group 2"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
     cidr_blocks = [
       "5.172.196.188/32",
       "13.232.220.164/32",
@@ -257,17 +258,23 @@ resource "aws_security_group" "tipstaff_lb_sc_pingdom_2" {
   }
 }
 
+#trivy:ignore:AVD-AWS-0053: this needs to be public
 resource "aws_lb" "tipstaff_lb" {
+  #checkov:skip=CKV_AWS_91: "ELB Logging not required"
+  #checkov:skip=CKV_AWS_150: "Ensure that Load Balancer has deletion protection enabled"
+  #checkov:skip=CKV2_AWS_76: "WAFv2 WebACL already associated via aws_wafv2_web_acl_association"
   name                       = "tipstaff-load-balancer"
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.tipstaff_lb_sc.id, aws_security_group.tipstaff_lb_sc_pingdom.id, aws_security_group.tipstaff_lb_sc_pingdom_2.id]
   subnets                    = data.aws_subnets.shared-public.ids
   enable_deletion_protection = false
   internal                   = false
+  drop_invalid_header_fields = true
   depends_on                 = [aws_security_group.tipstaff_lb_sc]
 }
 
 resource "aws_lb_target_group" "tipstaff_target_group" {
+  #checkov:skip=CKV_AWS_261 "Health check clearly defined"
   name                 = "tipstaff-target-group"
   port                 = 80
   protocol             = "HTTP"
@@ -280,22 +287,25 @@ resource "aws_lb_target_group" "tipstaff_target_group" {
   }
 
   health_check {
-    healthy_threshold   = "3"
-    interval            = "30"
+    enabled             = true
+    healthy_threshold   = 3
+    interval            = 30
     protocol            = "HTTP"
-    port                = "80"
-    unhealthy_threshold = "5"
+    port                = 80
+    unhealthy_threshold = 5
     matcher             = "200-302"
-    timeout             = "10"
+    timeout             = 10
   }
 
 }
 
 resource "aws_lb_listener" "tipstaff_lb" {
+  #checkov:skip=CKV_AWS_2: "Ensure ALB protocol is HTTPS" - false alert
+  #checkov:skip=CKV_AWS_103: "LB using higher version of TLS" - higher than alert
   depends_on = [
     aws_acm_certificate.external
   ]
-  certificate_arn   = local.is-production ? aws_acm_certificate.external.arn : aws_acm_certificate.external.arn
+  certificate_arn   = aws_acm_certificate.external.arn
   load_balancer_arn = aws_lb.tipstaff_lb.arn
   port              = local.application_data.accounts[local.environment].server_port_2
   protocol          = local.application_data.accounts[local.environment].lb_listener_protocol_2

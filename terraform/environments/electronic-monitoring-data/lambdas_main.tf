@@ -183,6 +183,33 @@ module "copy_mdss_data" {
 }
 
 #-----------------------------------------------------------------------------------
+# Clean after MDSS load
+#-----------------------------------------------------------------------------------
+
+module "clean_after_mdss_load" {
+  count                          = local.is-development ? 0 : 1
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "clean_after_mdss_load"
+  role_name                      = aws_iam_role.clean_after_mdss_load[0].name
+  role_arn                       = aws_iam_role.clean_after_mdss_load[0].arn
+  handler                        = "clean_after_mdss_load.handler"
+  memory_size                    = 2048
+  timeout                        = 900
+  reserved_concurrent_executions = 100
+  ephemeral_storage_size         = 10240
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+  security_group_ids             = [aws_security_group.lambda_generic.id]
+  subnet_ids                     = data.aws_subnets.shared-public.ids
+
+  environment_variables = {
+    CATALOG_ID      = data.aws_caller_identity.current.account_id
+    LAMBDA_ROLE_ARN = aws_iam_role.clean_after_mdss_load[0].arn
+  }
+}
+
+#-----------------------------------------------------------------------------------
 # Calculate checksum
 #-----------------------------------------------------------------------------------
 
@@ -313,3 +340,88 @@ module "load_dms_output" {
   }
 }
 
+
+#-----------------------------------------------------------------------------------
+# dlt load mdss
+#-----------------------------------------------------------------------------------
+
+module "load_mdss_lambda" {
+  count                          = local.is-development ? 0 : 1
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "load_mdss"
+  role_name                      = aws_iam_role.load_mdss[0].name
+  role_arn                       = aws_iam_role.load_mdss[0].arn
+  handler                        = "load_mdss.handler"
+  memory_size                    = 10240
+  timeout                        = 900
+  reserved_concurrent_executions = 500
+  ephemeral_storage_size         = 10240
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+  security_group_ids             = [aws_security_group.lambda_generic.id]
+  subnet_ids                     = data.aws_subnets.shared-public.ids
+  environment_variables = {
+    ATHENA_QUERY_BUCKET    = module.s3-athena-bucket.bucket.id
+    ACCOUNT_NUMBER         = data.aws_caller_identity.current.account_id
+    STAGING_BUCKET         = module.s3-create-a-derived-table-bucket.bucket.id
+    ENVIRONMENT_NAME       = local.environment_shorthand
+    MDSS_CLEANUP_QUEUE_URL = aws_sqs_queue.clean_mdss_load_queue.id
+  }
+}
+
+#-----------------------------------------------------------------------------------
+# dlt load fms
+#-----------------------------------------------------------------------------------
+
+module "load_fms_lambda" {
+  count                          = local.is-development ? 0 : 1
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "load_fms"
+  role_name                      = aws_iam_role.load_fms[0].name
+  role_arn                       = aws_iam_role.load_fms[0].arn
+  handler                        = "load_fms.handler"
+  memory_size                    = 10240
+  timeout                        = 900
+  reserved_concurrent_executions = 500
+  ephemeral_storage_size         = 10240
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+  security_group_ids             = [aws_security_group.lambda_generic.id]
+  subnet_ids                     = data.aws_subnets.shared-public.ids
+  environment_variables = {
+    ATHENA_QUERY_BUCKET = module.s3-athena-bucket.bucket.id
+    ACCOUNT_NUMBER      = data.aws_caller_identity.current.account_id
+    STAGING_BUCKET      = module.s3-create-a-derived-table-bucket.bucket.id
+    ENVIRONMENT_NAME    = local.environment_shorthand
+  }
+}
+
+#-----------------------------------------------------------------------------------
+# dlt load csv
+#-----------------------------------------------------------------------------------
+
+module "load_historic_csv" {
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "load_historic_csv"
+  role_name                      = aws_iam_role.load_historic_csv.name
+  role_arn                       = aws_iam_role.load_historic_csv.arn
+  handler                        = "load_historic_csv.handler"
+  memory_size                    = 10240
+  timeout                        = 900
+  reserved_concurrent_executions = 500
+  ephemeral_storage_size         = 10240
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+  security_group_ids             = [aws_security_group.lambda_generic.id]
+  subnet_ids                     = data.aws_subnets.shared-public.ids
+  environment_variables = {
+    ATHENA_QUERY_BUCKET = module.s3-athena-bucket.bucket.id
+    ACCOUNT_NUMBER      = data.aws_caller_identity.current.account_id
+    STAGING_BUCKET      = module.s3-create-a-derived-table-bucket.bucket.id
+    ENVIRONMENT_NAME    = local.environment_shorthand
+    DB_SUFFIX           = local.db_suffix
+  }
+}
