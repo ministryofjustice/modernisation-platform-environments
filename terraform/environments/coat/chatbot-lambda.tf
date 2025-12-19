@@ -79,7 +79,7 @@ data "aws_iam_policy_document" "rag_lambda_function_role" {
             "logs:PutLogEvents"
         ]
 
-        resources = ["arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${aws_lambda_function.rag_lambda.function_name}:*"]
+        resources = ["arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/RAGLambdaFunction:*"]
     }
 
     statement {
