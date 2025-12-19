@@ -1,28 +1,5 @@
 # Lambda
 
-resource "null_resource" "build_lambda_zip" {
-
-  triggers = {
-    script_hash = filesha256("${path.module}/lambdas/rag-lambda/rag-lambda.py")
-  }
-
-  provisioner "local-exec" {
-    command = <<-EOT
-      cd ${path.module}/lambdas/rag-lambda
-	    
-	    pip3 install  -r requirements.txt -t .
-	    
-      zip -r rag-lambda.zip .
-    EOT
-  }
-}
-
-data "archive_file" "rag_lambda" {
-  type        = "zip"
-  source_dir  = "${path.module}/lambdas/rag-lambda/"
-  output_path = "${path.module}/lambdas/rag-lambda.zip"
-}
-
 resource "aws_lambda_function" "rag_lambda" {
   #checkov:skip=CKV_AWS_173:No sensitive information stored in Lambda environment variables
   #checkov:skip=CKV_AWS_117:This Lambda doesn't need VPC
@@ -48,8 +25,29 @@ resource "aws_lambda_function" "rag_lambda" {
   }
 
   tags = local.tags
+}
 
-  depends_on = [null_resource.build_lambda_zip]
+data "archive_file" "rag_lambda" {
+  type        = "zip"
+  source_dir  = "${path.module}/lambdas/rag-lambda/"
+  output_path = "${path.module}/lambdas/rag-lambda.zip"
+}
+
+resource "null_resource" "build_lambda_zip" {
+
+  triggers = {
+    script_hash = filesha256("${path.module}/lambdas/rag-lambda/rag-lambda.py")
+  }
+
+  provisioner "local-exec" {
+    command = <<-EOT
+      cd ${path.module}/lambdas/rag-lambda
+	    
+	    pip3 install  -r requirements.txt -t .
+	    
+      zip -r rag-lambda.zip .
+    EOT
+  }
 }
 
 # Logs
