@@ -49,7 +49,7 @@ resource "aws_instance" "tableau" {
   }
 
 }
-
+#trivy:ignore:AVD-AWS-0052 - needs testing in non-prod first
 #trivy:ignore:AVD-AWS-0053
 module "tableau-alb" {
   # checkov:skip=CKV_TF_1

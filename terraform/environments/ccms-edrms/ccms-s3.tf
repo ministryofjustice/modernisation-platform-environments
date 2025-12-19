@@ -115,7 +115,7 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
   })
 }
 
-# S3 Bucket - Logging
+# S3 Bucket - Shared
 module "s3-bucket-shared" {
   # v9.0.0 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/9facf9fc8f8b8e3f93ffbda822028534b9a75399
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9fc8f8b8e3f93ffbda822028534b9a75399"
@@ -151,6 +151,8 @@ module "s3-bucket-shared" {
         rule      = "log"
         autoclean = "true"
       }
+
+      abort_incomplete_multipart_upload_days = local.application_data.accounts[local.environment].s3_lifecycle_days_abort_incomplete_multipart_upload_days
     }
   ]
 

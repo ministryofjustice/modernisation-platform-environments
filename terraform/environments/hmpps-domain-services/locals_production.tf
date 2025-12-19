@@ -237,7 +237,7 @@ locals {
       maintenance_window_cutoff   = 2
       patch_classifications = {
         # REDHAT_ENTERPRISE_LINUX = ["Security", "Bugfix"] # Linux Options=(Security,Bugfix,Enhancement,Recommended,Newpackage)
-        WINDOWS = ["SecurityUpdates", "CriticalUpdates"]
+        WINDOWS = ["SecurityUpdates", "CriticalUpdates", "UpdateRollups"] # Windows Options=CriticalUpdates,SecurityUpdates,DefinitionUpdates,Drivers,FeaturePacks,ServicePacks,Tools,UpdateRollups,Updates,Upgrades
       }
     }
 
@@ -262,6 +262,7 @@ locals {
     secretsmanager_secrets = {
       "/microsoft/AD/azure.hmpp.root" = local.secretsmanager_secrets.domain
       "/GFSL"                         = local.secretsmanager_secrets.gfsl
+      "/DSO"                          = local.secretsmanager_secrets.dso
     }
   }
 }

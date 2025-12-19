@@ -1,5 +1,5 @@
 module "csv_export" {
-  source = "github.com/ministryofjustice/terraform-csv-to-parquet-athena?ref=b466df0b8345f4f338510f3804eec17bd64c4320"
+  source = "github.com/ministryofjustice/terraform-csv-to-parquet-athena?ref=035e25d8bf1fb63b1c096c6e771ed54deee47d7f"
   providers = {
     aws.bucket-replication = aws
   }
@@ -10,16 +10,11 @@ module "csv_export" {
   environment  = local.environment_shorthand
   table_naming = "split_at_last_underscore"
 
-  tags = {
-    business-unit = "Property"
-    application   = "cafm"
-    is-production = "false"
-    owner         = "shanmugapriya.basker@justice.gov.uk"
-  }
+  tags = local.tags
 }
 
 module "rds_export" {
-  source = "github.com/ministryofjustice/terraform-rds-export?ref=808729e36971f82c07f266315fc544e91690b182"
+  source = "github.com/ministryofjustice/terraform-rds-export?ref=3732d27b3bed9a9b6ac23691b03591455bc3555b"
   providers = {
     aws = aws
   }
@@ -35,12 +30,7 @@ module "rds_export" {
   database_subnet_ids      = module.vpc.private_subnets
   master_user_secret_id    = aws_secretsmanager_secret.db_master_user_secret.arn
 
-  tags = {
-    business-unit = "Property"
-    application   = local.application_name
-    is-production = "false"
-    owner         = "shanmugapriya.basker@justice.gov.uk"
-  }
+  tags = local.tags
 }
 
 resource "aws_secretsmanager_secret" "db_master_user_secret" {

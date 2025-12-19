@@ -38,7 +38,8 @@ resource "aws_secretsmanager_secret" "edrms_docs_exception_secrets" {
 resource "aws_secretsmanager_secret_version" "edrms_docs_exception_secrets" {
   secret_id = aws_secretsmanager_secret.edrms_docs_exception_secrets.id
   secret_string = jsonencode({
-    "slack_channel_webhook" = ""
+    "slack_channel_webhook"           = ""
+    "slack_channel_webhook_guardduty" = ""
   })
 
   lifecycle {

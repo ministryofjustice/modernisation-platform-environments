@@ -16,3 +16,39 @@ resource "aws_secretsmanager_secret" "ad_password" {
 
   tags = var.tags
 }
+
+resource "aws_secretsmanager_secret" "boe_config" {
+  name = "${var.app_name}-${var.env_name}-sap-boe-config"
+
+  description = "Config secrets for SAP BIP reporting system"
+  kms_key_id  = var.account_config.kms_keys["general_shared"]
+
+  tags = var.tags
+}
+
+resource "aws_secretsmanager_secret" "boe_passwords" {
+  name = "${var.app_name}-${var.env_name}-sap-boe-passwords"
+
+  description = "Passwords for SAP BIP reporting system"
+  kms_key_id  = var.account_config.kms_keys["general_shared"]
+
+  tags = var.tags
+}
+
+resource "aws_secretsmanager_secret" "dis_config" {
+  name = "${var.app_name}-${var.env_name}-sap-dis-config"
+
+  description = "Config secrets for SAP BODS DIS ETL system"
+  kms_key_id  = var.account_config.kms_keys["general_shared"]
+
+  tags = var.tags
+}
+
+resource "aws_secretsmanager_secret" "dis_passwords" {
+  name = "${var.app_name}-${var.env_name}-sap-dis-passwords"
+
+  description = "Passwords for SAP BODS DIS ETL system"
+  kms_key_id  = var.account_config.kms_keys["general_shared"]
+
+  tags = var.tags
+}

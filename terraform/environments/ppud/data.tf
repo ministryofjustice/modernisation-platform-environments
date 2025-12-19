@@ -38,17 +38,18 @@ data "aws_acm_certificate" "PPUD_Training_ALB" {
   statuses    = ["ISSUED"]
 }
 
-
 # ACM certificate for PPUD PROD ALB
 data "aws_acm_certificate" "PPUD_PROD_ALB" {
-  count    = local.is-production == true ? 1 : 0
-  domain   = "www.ppud.justice.gov.uk"
-  statuses = ["ISSUED"]
+  count       = local.is-production == true ? 1 : 0
+  domain      = "www.ppud.justice.gov.uk"
+  most_recent = true
+  statuses    = ["ISSUED"]
 }
 
 # ACM certificate for WAM PROD ALB
 data "aws_acm_certificate" "WAM_PROD_ALB" {
-  count    = local.is-production == true ? 1 : 0
-  domain   = "wam.ppud.justice.gov.uk"
-  statuses = ["ISSUED"]
+  count       = local.is-production == true ? 1 : 0
+  domain      = "wam.ppud.justice.gov.uk"
+  most_recent = true
+  statuses    = ["ISSUED"]
 }

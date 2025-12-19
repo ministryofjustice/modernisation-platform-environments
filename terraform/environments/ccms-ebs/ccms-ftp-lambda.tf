@@ -112,46 +112,88 @@ resource "aws_s3_bucket_versioning" "s3_versioning" {
   }
 }
 
-# Lifecycle configuration: expire current objects and noncurrent versions after 30 days
-resource "aws_s3_bucket_lifecycle_configuration" "buckets_lifecycle" {
-  for_each = aws_s3_bucket.buckets
 
-  bucket = each.value.id
+resource "aws_s3_bucket_lifecycle_configuration" "outbound_bucket_lifecycle_delete_noncurrent_versions" {
 
-  # One lifecycle rule per prefix
-  dynamic "rule" {
-    for_each = local.target_prefixes
-    content {
-      id     = "expire-${replace(each.value.id, "/", "-")}-${replace(rule.value, "/", "-")}${local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_current}d"
-      status = "Enabled"
+  bucket = aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].id
 
-      filter {
-        and {
-          prefix                   = rule.value
-          object_size_greater_than = 0
-        }
-      }
+  rule {
+    id     = "delete-noncurrent-versions-after-5-days"
+    status = "Enabled"
 
-      expiration {
-        days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_current
-      }
+    # No filter → applies to whole bucket
+    filter {}
 
-      noncurrent_version_transition {
-        noncurrent_days = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_noncurrent_standard
-        storage_class   = "STANDARD_IA"
-      }
-
-      noncurrent_version_transition {
-        noncurrent_days = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_noncurrent_glacier
-        storage_class   = "GLACIER"
-      }
-      noncurrent_version_expiration {
-        noncurrent_days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_noncurrent
-      }
-
+    noncurrent_version_expiration {
+      noncurrent_days = 5
     }
   }
 }
+
+resource "aws_s3_bucket_lifecycle_configuration" "ftp_lambda_bucket_lifecycle_delete_noncurrent_versions" {
+
+  bucket = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].id
+
+  rule {
+    id     = "delete-noncurrent-versions-after-5-days"
+    status = "Enabled"
+
+    # No filter → applies to whole bucket
+    filter {}
+
+    noncurrent_version_expiration {
+      noncurrent_days = 5
+    }
+  }
+}
+
+
+# Lifecycle configuration: expire current objects and noncurrent versions after 30 days
+resource "aws_s3_bucket_lifecycle_configuration" "inbound_bucket_lifecycle" {
+
+  bucket = aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].id
+
+  rule {
+    id     = "delete-RBS-BACKUP-folder-file-after-5-days"
+    status = "Enabled"
+
+
+    filter {
+      prefix = "CCMS_PRD_RBS/Inbound/BACKUP/"
+    }
+
+    expiration {
+      days = 5 # delete objects 5 days after creation
+    }
+  }
+
+  rule {
+    id     = "delete-archive-folder-file-after-5-days"
+    status = "Enabled"
+
+    # No filter → applies to whole bucket
+    filter {
+      prefix = "archive/"
+    }
+
+    expiration {
+      days = 5 # delete objects 5 days after creation
+    }
+  }
+
+  rule {
+    id     = "delete-noncurrent-versions-after-5-days"
+    status = "Enabled"
+
+    # No filter → applies to whole bucket
+    filter {}
+
+    noncurrent_version_expiration {
+      noncurrent_days = 5
+    }
+  }
+}
+
 
 #--Dynamic blocks for transfer family policy in production only
 data "aws_iam_policy_document" "inbound_bucket_policy" {
@@ -159,10 +201,13 @@ data "aws_iam_policy_document" "inbound_bucket_policy" {
     sid    = "Access_for_ccms-ebs_and_soa"
     effect = "Allow"
     actions = [
-      "s3:PutObject",
-      "s3:GetObject",
       "s3:ListBucket",
-      "s3:DeleteObject"
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:DeleteObject",
+      "s3:GetObjectTagging",
+      "s3:PutObjectTagging"
+
     ]
     principals {
       type = "AWS"
@@ -269,10 +314,12 @@ resource "aws_s3_bucket_policy" "outbound_bucket_policy" {
           ]
         },
         "Action" : [
-          "s3:PutObject",
-          "s3:GetObject",
           "s3:ListBucket",
-          "s3:DeleteObject"
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject",
+          "s3:GetObjectTagging",
+          "s3:PutObjectTagging"
         ],
         "Resource" : [
           aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].arn,

@@ -6,9 +6,28 @@ data "aws_iam_policy_document" "secrets_manager" {
     ]
     resources = [
       aws_secretsmanager_secret.ad_admin_password.arn,
-      "arn:aws:secretsmanager:*:*:secret:NDMIS_DFI_SERVICEACCOUNTS_DEV-*",
-      "arn:aws:secretsmanager:*:*:secret:delius-mis-dev-oracle-mis-db-application-passwords-*",
-      "arn:aws:secretsmanager:*:*:secret:delius-mis-dev-oracle-dsd-db-application-passwords-*"
+      "arn:aws:secretsmanager:*:*:secret:NDMIS_DFI_SERVICEACCOUNTS_${upper(var.env_name)}-*",
+      "arn:aws:secretsmanager:*:*:secret:${var.app_name}-${var.env_name}-oracle-mis-db-application-passwords-*",
+      "arn:aws:secretsmanager:*:*:secret:${var.app_name}-${var.env_name}-oracle-dsd-db-application-passwords-*",
+      "arn:aws:secretsmanager:*:*:secret:${var.app_name}-${var.env_name}-oracle-boe-db-application-passwords-*",
+      "arn:aws:secretsmanager:*:*:secret:${var.app_name}-${var.env_name}-sap-boe-config-*",
+      "arn:aws:secretsmanager:*:*:secret:${var.app_name}-${var.env_name}-sap-boe-passwords-*",
+      "arn:aws:secretsmanager:*:*:secret:${var.app_name}-${var.env_name}-sap-dis-config-*",
+      "arn:aws:secretsmanager:*:*:secret:${var.app_name}-${var.env_name}-sap-dis-passwords-*"
+    ]
+  }
+
+  statement {
+    sid = "SecretPermissionsPut"
+    actions = [
+      "secretsmanager:PutSecretValue"
+    ]
+    resources = [
+      # secrets are directly updated by ansible/powershell code
+      "arn:aws:secretsmanager:*:*:secret:${var.app_name}-${var.env_name}-sap-boe-config-*",
+      "arn:aws:secretsmanager:*:*:secret:${var.app_name}-${var.env_name}-sap-boe-passwords-*",
+      "arn:aws:secretsmanager:*:*:secret:${var.app_name}-${var.env_name}-sap-dis-config-*",
+      "arn:aws:secretsmanager:*:*:secret:${var.app_name}-${var.env_name}-sap-dis-passwords-*"
     ]
   }
 }
@@ -26,6 +45,7 @@ data "aws_iam_policy_document" "ec2_automation" {
   statement {
     sid = "EC2AutomationPermissions"
     actions = [
+      "ec2:DescribeInstances",
       "ec2:DescribeTags",
       "s3:GetObject",
       "s3:ListBucket",

@@ -16,8 +16,7 @@ resource "aws_instance" "tariff_app_2" {
             sudo systemctl enable amazon-ssm-agent
             sudo systemctl start amazon-ssm-agent
             EOF
-  vpc_security_group_ids      = [module.tariff_app_prod_security_group[0].security_group_id, aws_security_group.tariff_app_prod_security_group[0].id]
-  # vpc_security_group_ids = [aws_security_group.tariff_app_prod_security_group[0].id]
+  vpc_security_group_ids      = [module.tariff_app_prod_security_group[0].security_group_id]
 
   root_block_device {
     delete_on_termination = true
@@ -30,52 +29,6 @@ resource "aws_instance" "tariff_app_2" {
       }), local.tags
     )
   }
-  /*
-  ebs_block_device {
-    device_name           = "xvde"
-    delete_on_termination = true
-    encrypted             = true
-    volume_size           = 100
-    snapshot_id           = local.snapshot_id_xvde
-
-  }
-  ebs_block_device {
-    device_name           = "xvdf"
-    delete_on_termination = true
-    encrypted             = true
-    volume_size           = 100
-    snapshot_id           = local.snapshot_id_xvdf
-  }
-  ebs_block_device {
-    device_name           = "xvdg"
-    delete_on_termination = true
-    encrypted             = true
-    volume_size           = 100
-    snapshot_id           = local.snapshot_id_xvdg
-  }
-
-  ebs_block_device {
-    device_name           = "xvdh"
-    delete_on_termination = true
-    encrypted             = true
-    volume_size           = 16
-    snapshot_id           = local.snapshot_id_xvdh
-  }
-  ebs_block_device {
-    device_name           = "xvdi"
-    delete_on_termination = true
-    encrypted             = true
-    volume_size           = 30
-    snapshot_id           = local.snapshot_id_xvdi
-  }
-
-  volume_tags = merge(tomap({
-    "Name"               = "${local.application_name}-app2-root",
-    "volume-attach-host" = "app2",
-    "volume-mount-path"  = "/"
-  }), local.tags)
-  */
-
   tags = merge(tomap({
     "Name"     = lower(format("ec2-%s-%s-app2", local.application_name, local.environment)),
     "hostname" = "${local.application_name}-app2",
@@ -105,3 +58,56 @@ resource "aws_volume_attachment" "tariff_app2_storage_attachment" {
   volume_id   = aws_ebs_volume.tariff_app2_storage[each.key].id
   instance_id = aws_instance.tariff_app_2[0].id
 }
+
+#Clone of Production App server - first instance
+resource "aws_instance" "tariff_app_prod_clone" {
+  count = local.environment == "production" ? 1 : 0
+  ami   = "ami-0b5dc70688de7c8f8"
+  #Ignore changes to most recent ami from data filter, as this would destroy existing instance.
+  lifecycle {
+    ignore_changes = [ami, user_data]
+  }
+  associate_public_ip_address = false
+  ebs_optimized               = true
+
+  iam_instance_profile   = aws_iam_instance_profile.tariff_instance_profile.name
+  instance_type          = "m5.2xlarge"
+  key_name               = aws_key_pair.key_pair_app.key_name
+  monitoring             = true
+  subnet_id              = data.aws_subnet.private_subnets_a.id
+  vpc_security_group_ids = [module.tariff_app_prod_security_group[0].security_group_id]
+  #vpc_security_group_ids = [aws_security_group.temp_ssm_only[0].id] # TEMPORARY ASSIGNMENT
+
+  tags = merge(tomap({
+    "Name"     = lower(format("ec2-%s-%s-app-clone", local.application_name, local.environment)),
+    "hostname" = "${local.application_name}-app-clone",
+    }), local.tags, local.environment != "production" ? tomap({ "backup" = "true" }) : tomap({})
+  )
+}
+/*
+#Temporary SG to restrict access to/from Clone above during configuration phase
+resource "aws_security_group" "temp_ssm_only" {
+  count       = local.environment == "production" ? 1 : 0
+  name        = "temp-ssm-only"
+  description = "Allow only SSM traffic - temporary rule during Tariff App clone intial config"
+  vpc_id      = data.aws_vpc.shared.id
+}
+data "aws_security_group" "core_vpc_protected" {
+  provider = aws.core-vpc
+
+  tags = {
+    Name = "${local.vpc_name}-${local.environment}-int-endpoint"
+  }
+}
+resource "aws_security_group_rule" "temp_ssm_only_egress" {
+  count             = local.environment == "production" ? 1 : 0
+  security_group_id = aws_security_group.temp_ssm_only[0].id
+
+  description              = "${local.application_name}-app-clone_egress_to_interface_endpoints"
+  type                     = "egress"
+  from_port                = "443"
+  to_port                  = "443"
+  protocol                 = "TCP"
+  source_security_group_id = data.aws_security_group.core_vpc_protected.id
+}
+*/

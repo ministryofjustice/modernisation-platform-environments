@@ -129,75 +129,6 @@ resource "aws_s3_bucket_policy" "PPUD" {
   })
 }
 
-# S3 Bucket for Patch Manager / SSM Health Check Reports
-
-#tfsec:ignore:AWS0088 "S3 bucket is not public facing, does not contain any sensitive information and does not need encryption."
-#tfsec:ignore:AVD-AWS-0088
-#tfsec:ignore:AVD-AWS-0132
-resource "aws_s3_bucket" "MoJ-Health-Check-Reports" {
-  # checkov:skip=CKV_AWS_145: "S3 bucket is not public facing, does not contain any sensitive information and does not need encryption"
-  # checkov:skip=CKV_AWS_62: "S3 bucket event notification is not required"
-  # checkov:skip=CKV2_AWS_62: "S3 bucket event notification is not required"
-  # checkov:skip=CKV_AWS_144: "PPUD has a UK Sovereignty requirement so cross region replication is prohibited"
-  # checkov:skip=CKV_AWS_18: "S3 bucket logging is not required"
-  bucket = local.application_data.accounts[local.environment].ssm_health_check_reports_s3
-  tags = merge(
-    local.tags,
-    {
-      Name = "${local.application_name}-moj-health-check-reports"
-    }
-  )
-}
-
-resource "aws_s3_bucket_versioning" "MoJ-Health-Check-Reports" {
-  bucket = aws_s3_bucket.MoJ-Health-Check-Reports.id
-  versioning_configuration {
-    status = "Enabled"
-  }
-}
-
-resource "aws_s3_bucket_lifecycle_configuration" "MoJ-Health-Check-Reports" {
-  # checkov:skip=CKV_AWS_300: "S3 bucket has a set period for aborting failed uploads, this is a false positive finding"
-  bucket = aws_s3_bucket.MoJ-Health-Check-Reports.id
-  rule {
-    id     = "Remove-Old-SSM-Health-Check-Reports"
-    status = "Enabled"
-    filter {
-      prefix = "ssm_output/"
-    }
-    abort_incomplete_multipart_upload {
-      days_after_initiation = 7
-    }
-    noncurrent_version_transition {
-      noncurrent_days = 90
-      storage_class   = "STANDARD_IA"
-    }
-    transition {
-      days          = 90
-      storage_class = "STANDARD_IA"
-    }
-    expiration {
-      days = 183
-    }
-  }
-}
-
-/*
-resource "aws_s3_bucket_logging" "MoJ-Health-Check-Reports" {
-  bucket = aws_s3_bucket.MoJ-Health-Check-Reports.id
-  target_bucket = aws_s3_bucket.moj-log-files-prod[0].id
-  target_prefix = "s3-logs/moj-health-check-reports-logs/"
-}
-*/
-
-resource "aws_s3_bucket_public_access_block" "MoJ-Health-Check-Reports" {
-  bucket                  = aws_s3_bucket.MoJ-Health-Check-Reports.id
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
-}
-
 # S3 Bucket for PPUD Infrastructure
 
 resource "aws_s3_bucket" "moj-infrastructure" {
@@ -1450,6 +1381,16 @@ resource "aws_s3_bucket_public_access_block" "moj-log-files-dev" {
   block_public_policy     = true
   ignore_public_acls      = true
   restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "moj-log-files-dev" {
+  count  = local.is-development == true ? 1 : 0
+  bucket = aws_s3_bucket.moj-log-files-dev[0].id
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
 }
 
 # S3 bucket notification is turned off as it isn't required. It can be re-enabled in future if required.

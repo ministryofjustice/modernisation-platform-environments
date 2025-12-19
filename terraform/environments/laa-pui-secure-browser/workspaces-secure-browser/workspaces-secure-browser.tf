@@ -48,8 +48,8 @@ resource "aws_workspacesweb_user_settings" "main" {
 
   # Optional settings
   deep_link_allowed                  = "Enabled"
-  disconnect_timeout_in_minutes      = 60
-  idle_disconnect_timeout_in_minutes = 15
+  disconnect_timeout_in_minutes      = 30
+  idle_disconnect_timeout_in_minutes = 10
 
   toolbar_configuration {
     toolbar_type = "Docked"
@@ -84,8 +84,8 @@ resource "aws_workspacesweb_user_settings" "sso" {
 
   # Optional settings - same as main
   deep_link_allowed                  = "Enabled"
-  disconnect_timeout_in_minutes      = 60
-  idle_disconnect_timeout_in_minutes = 15
+  disconnect_timeout_in_minutes      = 30
+  idle_disconnect_timeout_in_minutes = 10
 
   # Enable SSO extension and define which cookies to sync -- DISABLED PENDING SEC REVIEW
   # cookie_synchronization_configuration {
@@ -179,7 +179,9 @@ resource "aws_workspacesweb_browser_settings" "main" {
       }
       "URLAllowlist" = {
         "value" = [
+          "[*.]accessmycloudpc.com",
           "[*.]auth.microsoft.com",
+          "[*.]authpoint.deu.cloud.watchguard.com",
           "[*.]hip.live.com",
           "[*.]microsoftonline-p.com",
           "[*.]microsoftonline.com",
@@ -191,19 +193,25 @@ resource "aws_workspacesweb_browser_settings" "main" {
           "[*.]msftidentity.com",
           "[*.]msidentity.com",
           "[*.]phonefactor.net",
+          "accessmycloudpc.com",
           "account.activedirectory.windowsazure.com",
           "accounts.accesscontrol.windows.net",
+          "adfs.gasolicitors.com",
           "adminwebservice.microsoftonline.com",
           "api.passwordreset.microsoftonline.com",
           "assets.publishing.service.gov.uk",
+          "authpoint.watchguard.com",
           "autologon.microsoftazuread-sso.com",
+          "bannerjones-p2techltd.my.passly.eu",
           "becws.microsoftonline.com",
+          "ccms-pui.laa.service.justice.gov.uk",
           "ccs.login.microsoftonline.com",
           "chrome-untrusted://print/",
           "chrome://new-tab-page",
           "chrome://print/",
           "clientconfig.microsoftonline-p.net",
           "companymanager.microsoftonline.com",
+          "deu.cloud.watchguard.com",
           "device.login.microsoftonline.com",
           "enterpriseregistration.windows.net",
           "go.microsoft.com",
@@ -212,24 +220,29 @@ resource "aws_workspacesweb_browser_settings" "main" {
           "justice.gov.uk",
           "legalaidlearning.justice.gov.uk",
           "legalservices.gov.uk",
-          "local.laa_sign_in_url",
-          "local.legal_aid_services_url",
-          "local.oia_url",
-          "local.pui_url",
-          "login-live.com",
+          local.laa_sign_in_url,
+          local.legal_aid_services_url,
+          local.oia_url,
+          local.pui_url,
+          "login.live.com",
+          "login.live.co.uk",
           "login.microsoft.com",
           "login.microsoftonline-p.com",
           "login.microsoftonline.com",
-          "login-us.microsoftonline.com",
           "login.windows.net",
+          "login-f3.dpscloud.com",
+          "login-us.microsoftonline.com",
           "logincert.microsoftonline.com",
           "loginex.microsoftonline.com",
           "lsconline.legalservices.gov.uk",
           "mysignins.microsoft.com",
+          "myworkspace.leighday.co.uk",
           "nexus.microsoftonline-p.com",
           "passwordreset.microsoftonline.com",
           "portal.manage.microsoft.com",
           "provisioningapi.microsoftonline.com",
+          "sso.godaddy.com",
+          "sso.secureserver.net",
           "www.gov.uk",
           "www.justice.gov.uk",
           "www.smartsurvey.co.uk"

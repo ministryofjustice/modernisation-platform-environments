@@ -1,23 +1,105 @@
-# Find all JSON files in the dashboards folder (including subfolders)
-locals {
-  # Get all dashboard files recursively
-  all_dashboard_files = fileset("${path.module}/dashboards", "**/*.json")
+########################################
+# dashboards.tf
+# - Folders are owned by module.tenant_configuration
+# - This file only:
+#     - discovers dashboard files under ./dashboards
+#     - assigns them to the right folder
+#     - renders templates
+# - Works in both development & production (local.environment)
+########################################
 
-  # Parse each file path to determine team/folder assignment
-  dashboard_config = {
-    for file in local.all_dashboard_files : file => {
-      # Extract team name from path (e.g., "team-name/dashboard.json" -> "team-name")
-      team_name = length(split("/", file)) > 1 ? split("/", file)[0] : null
-      # Get the folder ID if this dashboard belongs to a team
-      folder_id = length(split("/", file)) > 1 ? module.tenant_configuration[split("/", file)[0]].folder_id : null
+locals {
+  # All plain JSON dashboard files, recursively under dashboards/
+  dashboard_json_files = fileset("${path.module}/dashboards", "**/*.json")
+
+  # All templated dashboard files (ending in .json.tftpl)
+  dashboard_template_files = fileset("${path.module}/dashboards", "**/*.json.tftpl")
+
+  # Raw mapping: JSON file -> team (or null if top-level)
+  # e.g. "observability-platform/demo.json" -> team = "observability-platform"
+  #      "op-landing-page.json"             -> team = null
+  raw_dashboard_json_by_file = {
+    for f in local.dashboard_json_files :
+    f => {
+      team = length(split("/", f)) > 1 ? split("/", f)[0] : null
     }
+  }
+
+  # Filtered JSON dashboards:
+  # - keep top-level dashboards (team == null)
+  # - keep team dashboards only if that team exists in module.tenant_configuration
+  dashboard_json_by_file = {
+    for f, cfg in local.raw_dashboard_json_by_file :
+    f => cfg
+    if(
+      cfg.team == null
+      || can(module.tenant_configuration[cfg.team])
+    )
+  }
+
+  # Raw mapping: template file -> team (or null if top-level)
+  raw_dashboard_template_by_file = {
+    for f in local.dashboard_template_files :
+    f => {
+      team = length(split("/", f)) > 1 ? split("/", f)[0] : null
+    }
+  }
+
+  # Filtered template dashboards (same rules as JSON)
+  dashboard_template_by_file = {
+    for f, cfg in local.raw_dashboard_template_by_file :
+    f => cfg
+    if(
+      cfg.team == null
+      || can(module.tenant_configuration[cfg.team])
+    )
   }
 }
 
-# Create a grafana_dashboard for each JSON file
-resource "grafana_dashboard" "all" {
-  for_each = local.all_dashboard_files
+########################################
+# Dashboards from plain JSON files
+########################################
 
-  config_json = file("${path.module}/dashboards/${each.value}")
-  folder      = local.dashboard_config[each.value].folder_id
+resource "grafana_dashboard" "json" {
+  for_each = local.dashboard_json_by_file
+
+  # Read the JSON file from the repo
+  config_json = file("${path.module}/dashboards/${each.key}")
+
+  # Folder:
+  # - If file lives under "<team>/...", use that team's folder_id from module.tenant_configuration.
+  # - If top-level, put it in Grafana "General" (folder = null).
+  folder = each.value.team != null ? module.tenant_configuration[each.value.team].folder_id : null
+}
+
+########################################
+# Dashboards from template files (.json.tftpl)
+########################################
+
+resource "grafana_dashboard" "templated" {
+  for_each = local.dashboard_template_by_file
+
+  # Same folder logic as above
+  folder = each.value.team != null ? module.tenant_configuration[each.value.team].folder_id : null
+
+  # Render the .json.tftpl into final JSON
+  config_json = templatefile(
+    "${path.module}/dashboards/${each.key}",
+    {
+      # From path: dashboards/<team>/<file>.json.tftpl (or "global" for top-level)
+      team_name = coalesce(each.value.team, "global")
+
+      # From platform_locals.tf (derived from terraform.workspace, e.g. "development"/"production")
+      environment = local.environment
+
+      # UID: must be <= 40 chars, so we shorten team + name and add a short hash.
+      # Format: tmpl-<team8>-<name12>-<hash6>
+      dashboard_uid = format(
+        "tmpl-%s-%s-%s",
+        substr(coalesce(each.value.team, "global"), 0, 8),
+        substr(element(split(".", basename(each.key)), 0), 0, 12),
+        substr(md5(each.key), 0, 6)
+      )
+    }
+  )
 }

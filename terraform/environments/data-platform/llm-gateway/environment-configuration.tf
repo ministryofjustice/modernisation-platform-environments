@@ -3,8 +3,8 @@ locals {
   environment_configurations = {
     development = {
       litellm_versions = {
-        application = "main-v1.79.1-stable"
-        chart       = "0.1.812"
+        application = "main-v1.80.8-stable.1"
+        chart       = "0.1.832"
       }
       litellm_organization_ids = {
         /* These are not currently managed in code */
@@ -68,8 +68,24 @@ locals {
             model_id = "eu.anthropic.claude-haiku-4-5-20251001-v1:0"
             region   = "eu-west-2"
           }
+          claude-opus-4-5 = {
+            model_id = "global.anthropic.claude-opus-4-5-20251101-v1:0"
+            region   = "eu-west-2"
+          }
+          claude-sonnet-4 = {
+            model_id = "eu.anthropic.claude-sonnet-4-20250514-v1:0"
+            region   = "eu-west-1"
+          }
           claude-sonnet-4-5 = {
             model_id = "eu.anthropic.claude-sonnet-4-5-20250929-v1:0"
+            region   = "eu-west-2"
+          }
+          cohere-embed-english-v3 = {
+            model_id = "cohere.embed-english-v3"
+            region   = "eu-west-2"
+          }
+          cohere-embed-multilingual-v3 = {
+            model_id = "cohere.embed-multilingual-v3"
             region   = "eu-west-2"
           }
           meta-llama3-8b-instruct = {
@@ -87,6 +103,90 @@ locals {
         }
       }
       llm_gateway_teams = {
+        analytics-engineering = {
+          organisation = "ministryofjustice"
+          models = [
+            "azure-gpt-5",
+            "bedrock-claude-haiku-4-5",
+            "bedrock-claude-sonnet-4-5"
+          ]
+          keys = {
+            /* For Ben Waterfield */
+            probation = {
+              models = [
+                "azure-gpt-5",
+                "bedrock-claude-haiku-4-5",
+                "bedrock-claude-sonnet-4-5"
+              ]
+            }
+          }
+        }
+        hmcts-claude-code = {
+          organisation = "hmcts"
+          max_budget   = 10000
+          models = [
+            "bedrock-claude-haiku-4-5",
+            "bedrock-claude-sonnet-4-5"
+          ]
+          keys = {
+            chris-o = {
+              max_budget = 500
+              models = [
+                "bedrock-claude-haiku-4-5",
+                "bedrock-claude-sonnet-4-5"
+              ]
+            }
+            junaid-i = {
+              max_budget = 500
+              models = [
+                "bedrock-claude-haiku-4-5",
+                "bedrock-claude-sonnet-4-5"
+              ]
+            }
+            kian-k = {
+              max_budget = 500
+              models = [
+                "bedrock-claude-haiku-4-5",
+                "bedrock-claude-sonnet-4-5"
+              ]
+            }
+            natasha-a = {
+              max_budget = 500
+              models = [
+                "bedrock-claude-haiku-4-5",
+                "bedrock-claude-sonnet-4-5"
+              ]
+            }
+            alex-b = {
+              max_budget = 500
+              models = [
+                "bedrock-claude-haiku-4-5",
+                "bedrock-claude-sonnet-4-5"
+              ]
+            }
+            ashwini-v = {
+              max_budget = 500
+              models = [
+                "bedrock-claude-haiku-4-5",
+                "bedrock-claude-sonnet-4-5"
+              ]
+            }
+            mel-c = {
+              max_budget = 500
+              models = [
+                "bedrock-claude-haiku-4-5",
+                "bedrock-claude-sonnet-4-5"
+              ]
+            }
+            linus-n = {
+              max_budget = 500
+              models = [
+                "bedrock-claude-haiku-4-5",
+                "bedrock-claude-sonnet-4-5"
+              ]
+            }
+          }
+        }
         central-digital = {
           organisation = "ministryofjustice"
           models = [
@@ -96,13 +196,20 @@ locals {
           ]
           keys = {
             website-builder-assistant = {
-              rpm_limit = "200"
-              tpm_limit = "1000"
               models = [
                 "bedrock-amazon-titan-embed-text-v2",
                 "bedrock-claude-haiku-4-5",
                 "bedrock-claude-sonnet-4-5"
               ]
+            }
+          }
+        }
+        coat = {
+          organisation = "ministryofjustice"
+          models       = ["bedrock-claude-sonnet-4-5"]
+          keys = {
+            chatbot-poc = {
+              models = ["bedrock-claude-sonnet-4-5"]
             }
           }
         }
@@ -138,14 +245,34 @@ locals {
             "azure-gpt-4o",
             "azure-gpt-5",
             "bedrock-claude-haiku-4-5",
-            "bedrock-claude-sonnet-4-5"
+            "bedrock-claude-sonnet-4-5",
+            "bedrock-cohere-embed-english-v3",
+            "bedrock-cohere-embed-multilingual-v3"
           ]
           keys = {
+            /* For Nikki Rayner */
             consult-poc = {
               models = [
                 "azure-gpt-4o",
                 "azure-gpt-5"
               ]
+            }
+            /* For William Martin (https://github.com/ministryofjustice/data-platform-support/issues/1504) */
+            vcit-x-tmc-dev = {
+              models = [
+                "bedrock-claude-sonnet-4-5",
+                "bedrock-cohere-embed-english-v3",
+                "bedrock-cohere-embed-multilingual-v3"
+              ]
+            }
+          }
+        }
+        digital-prisons-service = {
+          organisation = "ministryofjustice"
+          models       = ["bedrock-claude-sonnet-4"]
+          keys = {
+            ims = {
+              models = ["bedrock-claude-sonnet-4"]
             }
           }
         }
