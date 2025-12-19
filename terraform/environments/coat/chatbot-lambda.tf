@@ -11,10 +11,14 @@ resource "null_resource" "build_lambda_zip" {
       cd ${path.module}/lambdas/rag-lambda
 	    
 	    pip3 install  -r requirements.txt -t .
-	    
-      zip -r rag-lambda.zip .
     EOT
   }
+}
+
+data "archive_file" "rag_lambda" {
+  type        = "zip"
+  source_dir  = "${path.module}/lambdas/rag-lambda/"
+  output_path = "${path.module}/lambdas/rag-lambda.zip"
 }
 
 resource "aws_lambda_function" "rag_lambda" {
@@ -33,7 +37,7 @@ resource "aws_lambda_function" "rag_lambda" {
   handler          = "rag-lambda.lambda_handler"
   package_type     = "Zip"
   filename         = "${path.module}/lambdas/rag-lambda/rag-lambda.zip"
-  source_code_hash = filebase64sha256("${path.module}/lambdas/rag-lambda/rag-lambda.zip")
+  source_code_hash = data.archive_file.rag_lambda.output_base64sha256
 
   reserved_concurrent_executions = 10
 
@@ -42,8 +46,6 @@ resource "aws_lambda_function" "rag_lambda" {
   }
 
   tags = local.tags
-
-  depends_on = [null_resource.build_lambda_zip]
 }
 
 # Logs
