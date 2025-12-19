@@ -44,12 +44,6 @@ resource "null_resource" "build_lambda_zip" {
   }
 }
 
-data "archive_file" "rag_lambda" {
-  type        = "zip"
-  source_dir  = "${path.module}/lambdas/rag-lambda/"
-  output_path = "${path.module}/lambdas/rag-lambda.zip"
-}
-
 # Logs
 
 resource "aws_cloudwatch_log_group" "rag_lambda_log_group" {
@@ -159,6 +153,6 @@ data "aws_iam_policy_document" "rag_lambda_function_role" {
 
 resource "aws_secretsmanager_secret" "llm_gateway_key" {
   count = local.is-development ? 0 : 1
-  
+
   name = "llm_gateway_key"
 }
