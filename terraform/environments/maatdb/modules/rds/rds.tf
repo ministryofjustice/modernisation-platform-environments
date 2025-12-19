@@ -141,7 +141,7 @@ locals {
     aws_security_group.bastion_sec_group.id,
     aws_security_group.vpc_sec_group.id,
     aws_security_group.mlra_ecs_sec_group.id,
-    aws_security_group.ses_mojfin_sec_group.id
+    aws_security_group.ses_sec_group.id
   ])
 }
 
@@ -340,7 +340,7 @@ resource "aws_security_group" "bastion_sec_group" {
 # Outbound to Port 587 for SES SMTP Endpoint Access
 
 # tflint-ignore: terraform_required_providers
-resource "aws_security_group" "ses_mojfin_sec_group" {
+resource "aws_security_group" "ses_sec_group" {
   #checkov:skip=CKV2_AWS_5:"Not applicable"
   name        = "ses-mojfin-sec-group"
   description = "SES Outbound Access, Mojfin 1521 Access"
@@ -438,6 +438,3 @@ resource "aws_db_instance_role_association" "rds_s3_role_association" {
 output "db_instance_id" {
   value = aws_db_instance.appdb1.id
 }
-
-
-
