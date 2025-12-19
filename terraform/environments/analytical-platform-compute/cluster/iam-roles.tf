@@ -2,10 +2,12 @@ module "ebs_csi_driver_iam_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
-  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "5.60.0"
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts"
+  version = "6.2.3"
 
-  role_name_prefix      = "ebs-csi-driver"
+  name            = "ebs-csi-driver20240520140611190100000004"
+  use_name_prefix = false
+
   attach_ebs_csi_policy = true
 
   oidc_providers = {
@@ -22,10 +24,12 @@ module "efs_csi_driver_iam_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
-  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "5.60.0"
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts"
+  version = "6.2.3"
 
-  role_name_prefix      = "efs-csi-driver"
+  name            = "efs-csi-driver20240520140611186600000003"
+  use_name_prefix = false
+
   attach_efs_csi_policy = true
 
   oidc_providers = {
@@ -42,12 +46,13 @@ module "aws_cloudwatch_network_flow_monitor_iam_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
-  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "5.60.0"
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts"
+  version = "6.2.3"
 
-  role_name_prefix = "aws-cloudwatch-network-flow-monitor"
+  name            = "aws-cloudwatch-network-flow-monitor20250620095157752500000001"
+  use_name_prefix = false
 
-  role_policy_arns = {
+  policies = {
     CloudWatchNetworkFlowMonitorAgentPublishPolicy = "arn:aws:iam::aws:policy/CloudWatchNetworkFlowMonitorAgentPublishPolicy"
   }
 
@@ -65,10 +70,11 @@ module "cluster_autoscaler_iam_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
-  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "5.60.0"
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts"
+  version = "6.2.3"
 
-  role_name_prefix = "cluster-autoscaler"
+  name            = "cluster-autoscaler20240523131251670100000002"
+  use_name_prefix = false
 
   attach_cluster_autoscaler_policy = true
   cluster_autoscaler_cluster_names = [module.eks.cluster_name]
@@ -87,10 +93,12 @@ module "external_dns_iam_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
-  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "5.60.0"
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts"
+  version = "6.2.3"
 
-  role_name_prefix              = "external-dns"
+  name            = "external-dns20240523161605343400000002"
+  use_name_prefix = false
+
   attach_external_dns_policy    = true
   external_dns_hosted_zone_arns = [data.aws_route53_zone.route53_zone_zone.arn]
 
@@ -109,10 +117,12 @@ module "cert_manager_iam_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
-  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "5.60.0"
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts"
+  version = "6.2.3"
 
-  role_name_prefix              = "cert-manager"
+  name            = "cert-manager20240530111145557700000002"
+  use_name_prefix = false
+
   attach_cert_manager_policy    = true
   cert_manager_hosted_zone_arns = [data.aws_route53_zone.route53_zone_zone.arn]
 
@@ -130,10 +140,12 @@ module "external_secrets_iam_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
-  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "5.60.0"
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts"
+  version = "6.2.3"
 
-  role_name_prefix               = "external-secrets"
+  name            = "external-secrets20240617152100265400000001"
+  use_name_prefix = false
+
   attach_external_secrets_policy = true
   external_secrets_kms_key_arns  = [module.common_secrets_manager_kms.key_arn]
 
@@ -151,12 +163,13 @@ module "aws_for_fluent_bit_iam_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
-  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "5.60.0"
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts"
+  version = "6.2.3"
 
-  role_name_prefix = "aws-for-fluent-bit"
+  name            = "aws-for-fluent-bit20240520192238843200000001"
+  use_name_prefix = false
 
-  role_policy_arns = {
+  policies = {
     CloudWatchAgentServerPolicy   = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
     EKSClusterLogsKMSAccessPolicy = module.eks_cluster_logs_kms_access_iam_policy.arn
   }
@@ -175,12 +188,13 @@ module "amazon_prometheus_proxy_iam_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
-  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "5.60.0"
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts"
+  version = "6.2.3"
 
-  role_name_prefix = "amazon-prometheus-proxy"
+  name            = "amazon-prometheus-proxy20240521075058834300000002"
+  use_name_prefix = false
 
-  role_policy_arns = {
+  policies = {
     AmazonManagedPrometheusProxy = module.amazon_prometheus_proxy_iam_policy.arn
   }
 
@@ -198,10 +212,12 @@ module "vpc_cni_iam_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
-  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "5.60.0"
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts"
+  version = "6.2.3"
 
-  role_name_prefix      = "vpc-cni"
+  name            = "vpc-cni20240514140203981600000001"
+  use_name_prefix = false
+
   attach_vpc_cni_policy = true
   vpc_cni_enable_ipv4   = true
 
@@ -219,14 +235,16 @@ module "velero_iam_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
-  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "5.60.0"
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts"
+  version = "6.2.3"
 
-  role_name_prefix      = "velero"
+  name            = "velero20250821090213811600000002"
+  use_name_prefix = false
+
   attach_velero_policy  = true
   velero_s3_bucket_arns = [module.velero_s3_bucket.s3_bucket_arn]
 
-  role_policy_arns = {
+  policies = {
     VeleroKMSAccessPolicy = module.velero_kms_iam_policy.arn
   }
 
