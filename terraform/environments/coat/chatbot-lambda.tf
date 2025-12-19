@@ -53,7 +53,7 @@ resource "aws_iam_role" "rag_lambda_role" {
     policy = data.aws_iam_policy_document.rag_lambda_function_role.json
   }
 
-  tags = var.tags
+  tags = local.tags
 }
 
 data "aws_iam_policy_document" "rag_lambda_function_assume_role" {
