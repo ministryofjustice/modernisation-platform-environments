@@ -261,7 +261,24 @@ resource "aws_security_group" "vpc_sec_group" {
     to_port     = 443
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
+  }
 
+  # Allow traffic from Mojfin.
+  # Added here because of limit of 5 SGs per vpc_security_group_ids.
+  ingress {
+    description     = "Sql Net on 1521"
+    from_port       = 1521
+    to_port         = 1521
+    protocol        = "tcp"
+    security_groups = [var.mojfin_sec_group_id]
+  }
+
+  egress {
+    description     = "Sql Net on 1521"
+    from_port       = 1521
+    to_port         = 1521
+    protocol        = "tcp"
+    security_groups = [var.mojfin_sec_group_id]
   }
 
   tags = {
@@ -352,22 +369,6 @@ resource "aws_security_group" "ses_sec_group" {
     to_port     = 587
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    description     = "Sql Net on 1521"
-    from_port       = 1521
-    to_port         = 1521
-    protocol        = "tcp"
-    security_groups = [var.mojfin_sec_group_id]
-  }
-
-  egress {
-    description     = "Sql Net on 1521"
-    from_port       = 1521
-    to_port         = 1521
-    protocol        = "tcp"
-    security_groups = [var.mojfin_sec_group_id]
   }
 
   tags = {
