@@ -1,0 +1,30 @@
+import os, json
+from openai import OpenAI
+
+class LLMService:
+    def __init__(self) -> None:
+        self.client = OpenAI(
+            base_url="https://llm-gateway.development.data-platform.service.justice.gov.uk",
+            api_key=os.environ.get('LLM_GATEWAY_API_KEY')
+        )
+
+
+    def request_model_response(self, prompt):
+
+        response = self.client.chat.completions.create(
+            model="bedrock-claude-sonnet-4-5",
+            messages = [
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ]
+        )
+
+        result = response.model_dump_json(indent=3)
+
+        result_json = json.loads(result)
+
+        message_content = result_json.get('choices', [])[0].get('message', {}).get('content', "")
+
+        return message_content

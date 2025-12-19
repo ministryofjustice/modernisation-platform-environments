@@ -37,6 +37,8 @@ resource "null_resource" "build_lambda_zip" {
     command = <<-EOT
       cd ${path.module}/lambdas/rag-lambda
 
+      pip3 install -r requirements.txt
+
       zip -r rag-lambda.zip .
     EOT
   }
@@ -155,14 +157,5 @@ data "aws_iam_policy_document" "rag_lambda_function_role" {
         resources = [
         "arn:aws:bedrock:*::foundation-model/*"
         ]
-    }
-
-    statement {
-      effect = "Allow"
-      actions = [
-        "aws-marketplace:Subscribe",
-        "aws-marketplace:ViewSubscriptions"
-      ]
-      resources = ["*"]
     }
 }

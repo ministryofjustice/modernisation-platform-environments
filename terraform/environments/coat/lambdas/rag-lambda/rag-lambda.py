@@ -1,10 +1,10 @@
-from services.bedrock_service import BedrockService
+from services.llm_service import LLMService
 
 def lambda_handler(event, context): 
-    bedrock_service = BedrockService()
+    llm_service = LLMService()
 
-    prompt = "Please respond to this request with 'Hello this is Bedrock'."
+    prompt = "Please respond to this request with 'Hello this is Claude'."
 
-    response = bedrock_service.request_model_response_from_bedrock(prompt, "claude")
+    response = llm_service.request_model_response(prompt)
 
     print(response)
