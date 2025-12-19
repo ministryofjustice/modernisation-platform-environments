@@ -214,7 +214,7 @@ data "aws_iam_policy_document" "dataapi_cross_assume" {
     }
     condition {
       test     = "StringEquals"
-      values   = ["system:serviceaccount:mwaa:electronic-monitoring-data-store-cadet"]
+      values   = ["system:serviceaccount:mwaa:emds-cadet", "system:serviceaccount:mwaa:emds-historic-dev"]
       variable = "oidc.eks.eu-west-2.amazonaws.com/id/${jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]}:sub"
     }
     condition {
