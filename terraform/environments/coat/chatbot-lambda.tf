@@ -3,7 +3,7 @@
 resource "null_resource" "build_lambda_zip" {
 
   triggers = {
-    script_hash = filebase64sha256("${path.module}/lambdas/rag-lambda/rag-lambda.py")
+    script_hash = filesha256("${path.module}/lambdas/rag-lambda/rag-lambda.py")
   }
 
   provisioner "local-exec" {
@@ -33,7 +33,7 @@ resource "aws_lambda_function" "rag_lambda" {
   handler          = "rag-lambda.lambda_handler"
   package_type     = "Zip"
   filename         = "${path.module}/lambdas/rag-lambda/rag-lambda.zip"
-  source_code_hash = filesha256("${path.module}/lambdas/rag-lambda/rag-lambda.zip")
+  source_code_hash = filebase64sha256("${path.module}/lambdas/rag-lambda/rag-lambda.zip")
 
   reserved_concurrent_executions = 10
 
