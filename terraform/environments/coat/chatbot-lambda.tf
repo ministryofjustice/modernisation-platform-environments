@@ -156,4 +156,13 @@ data "aws_iam_policy_document" "rag_lambda_function_role" {
         "arn:aws:bedrock:*::foundation-model/*"
         ]
     }
+
+    statement {
+      effect = "Allow"
+      actions = [
+        "aws-marketplace:Subscribe",
+        "aws-marketplace:ViewSubscriptions"
+      ]
+      resources = ["*"]
+    }
 }
