@@ -8,7 +8,7 @@ def lambda_handler(event, context):
 
     llm_service = LLMService(api_key)
 
-    prompt = "Please respond to this request with 'Hello this is Claude'"
+    prompt = "Please respond to this request with 'Hello this is Claude'.."
 
     response = llm_service.request_model_response(prompt)
 
