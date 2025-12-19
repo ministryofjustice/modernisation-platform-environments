@@ -27,12 +27,6 @@ resource "aws_lambda_function" "rag_lambda" {
   tags = local.tags
 }
 
-data "archive_file" "rag_lambda" {
-  type        = "zip"
-  source_dir  = "${path.module}/lambdas/rag-lambda/"
-  output_path = "${path.module}/lambdas/rag-lambda.zip"
-}
-
 resource "null_resource" "build_lambda_zip" {
 
   triggers = {
@@ -48,6 +42,12 @@ resource "null_resource" "build_lambda_zip" {
       zip -r rag-lambda.zip .
     EOT
   }
+}
+
+data "archive_file" "rag_lambda" {
+  type        = "zip"
+  source_dir  = "${path.module}/lambdas/rag-lambda/"
+  output_path = "${path.module}/lambdas/rag-lambda.zip"
 }
 
 # Logs
