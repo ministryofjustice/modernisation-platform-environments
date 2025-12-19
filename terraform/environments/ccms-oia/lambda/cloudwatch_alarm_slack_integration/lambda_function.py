@@ -163,7 +163,7 @@ class NotificationService:
         logger.info("Slack notifications configured")
 
     def send_notification(
-        self, title: str, alarmdetails: str, timestamp: str, type: str, is_error: bool = False
+        self, title: str, alarmdetails: dict, timestamp: str, type: str, is_error: bool = False
     ) -> bool:
         """Send a notification to Slack using the webhook."""
         curl = pycurl.Curl()
