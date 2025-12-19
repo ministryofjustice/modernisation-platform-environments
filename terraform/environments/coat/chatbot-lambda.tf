@@ -48,6 +48,8 @@ resource "aws_lambda_function" "rag_lambda" {
   }
 
   tags = local.tags
+
+  depends_on = [null_resource.build_lambda_zip]
 }
 
 # Logs
