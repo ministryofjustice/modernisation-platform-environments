@@ -1,11 +1,11 @@
-import os, json
+import json
 from openai import OpenAI
 
 class LLMService:
-    def __init__(self) -> None:
+    def __init__(self, api_key) -> None:
         self.client = OpenAI(
             base_url="https://llm-gateway.development.data-platform.service.justice.gov.uk",
-            api_key=os.environ.get('LLM_GATEWAY_API_KEY')
+            api_key=api_key
         )
 
 

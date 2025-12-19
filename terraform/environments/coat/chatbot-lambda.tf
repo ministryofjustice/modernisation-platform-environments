@@ -146,16 +146,11 @@ data "aws_iam_policy_document" "rag_lambda_function_role" {
     }
 
     statement {
-        sid    = "AllowInvokeBedrockModels"
+        sid    = "AllowSecretsManager"
         effect = "Allow"
 
-        actions = [
-            "bedrock:InvokeModel",
-            "bedrock:InvokeModelWithResponseStream"
-        ]
+        actions = ["secretsmanager:GetSecretValue"]
 
-        resources = [
-        "arn:aws:bedrock:*::foundation-model/*"
-        ]
+        resources = ["arn:aws:secretsmanager:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:secret:llm_gateway_key"]
     }
 }
