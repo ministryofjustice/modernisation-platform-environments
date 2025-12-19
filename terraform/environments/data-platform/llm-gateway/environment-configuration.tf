@@ -204,6 +204,15 @@ locals {
             }
           }
         }
+        coat = {
+          organisation = "ministryofjustice"
+          models       = ["bedrock-claude-sonnet-4-5"]
+          keys = {
+            chatbot-poc = {
+              models = ["bedrock-claude-sonnet-4-5"]
+            }
+          }
+        }
         data-platform = {
           organisation = "ministryofjustice"
           models = [
