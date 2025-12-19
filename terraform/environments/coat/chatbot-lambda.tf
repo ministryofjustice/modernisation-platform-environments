@@ -158,5 +158,7 @@ data "aws_iam_policy_document" "rag_lambda_function_role" {
 # Secrets
 
 resource "aws_secretsmanager_secret" "llm_gateway_key" {
+  count = local.is-development ? 0 : 1
+  
   name = "llm_gateway_key"
 }
