@@ -33,7 +33,7 @@ resource "aws_lambda_function" "rag_lambda" {
   handler          = "rag-lambda.lambda_handler"
   package_type     = "Zip"
   filename         = "${path.module}/lambdas/rag-lambda/rag-lambda.zip"
-  source_code_hash = data.archive_file.rag_lambda.output_base64sha256
+  source_code_hash = filesha256("${path.module}/lambdas/rag-lambda/rag-lambda.zip")
 
   reserved_concurrent_executions = 10
 
