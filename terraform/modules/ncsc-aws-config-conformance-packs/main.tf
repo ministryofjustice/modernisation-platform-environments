@@ -14,7 +14,7 @@ data "http" "aws_config_conformance_packs" {
   url      = each.value.source
 }
 
-resource "aws_config_conformance_pack" "main" {
+resource "aws_config_conformance_pack" "this" {
   for_each = local.aws_config_conformance_packs
 
   name          = each.key
