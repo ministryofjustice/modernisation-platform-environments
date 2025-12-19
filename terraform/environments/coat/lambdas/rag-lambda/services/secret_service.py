@@ -9,6 +9,6 @@ class SecretService:
 
         response = self.client.get_secret_value(SecretId=secret_name)
 
-        secret = json.loads(response)
-
+        secret = response.get("SecretString", "")
+        
         return secret
