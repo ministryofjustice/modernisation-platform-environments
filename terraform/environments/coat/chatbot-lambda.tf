@@ -156,3 +156,9 @@ data "aws_iam_policy_document" "rag_lambda_function_role" {
         resources = ["arn:aws:secretsmanager:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:secret:llm_gateway_key"]
     }
 }
+
+# Secrets
+
+resource "aws_secretsmanager_secret" "llm_gateway_key" {
+  name = "llm_gateway_key"
+}
