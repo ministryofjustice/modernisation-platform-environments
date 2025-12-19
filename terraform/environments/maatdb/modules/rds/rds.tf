@@ -343,7 +343,7 @@ resource "aws_security_group" "bastion_sec_group" {
 resource "aws_security_group" "ses_sec_group" {
   #checkov:skip=CKV2_AWS_5:"Not applicable"
   name        = "ses-sec-group"
-  description = "SES Outbound Access, Mojfin 1521 Access"
+  description = "SES Outbound Access"
   vpc_id      = var.vpc_shared_id
 
   egress {
