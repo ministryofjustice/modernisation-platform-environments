@@ -20,7 +20,7 @@ resource "null_resource" "build_lambda_zip" {
 data "archive_file" "rag_lambda" {
   type        = "zip"
   source_dir  = "${path.module}/lambdas/rag-lambda/"
-  output_path = "${path.module}/lambdas/rag-lambda.zip"
+  output_path = "${path.module}/lambdas/rag-lambda/rag-lambda.zip"
 }
 
 resource "aws_lambda_function" "rag_lambda" {
