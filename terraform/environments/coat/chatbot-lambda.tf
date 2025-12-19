@@ -3,7 +3,7 @@
 resource "null_resource" "build_lambda_zip" {
 
   triggers = {
-    script_hash = filesha256("${path.module}/lambdas/rag-lambda/rag-lambda.py")
+    script_hash = filebase64sha256("${path.module}/lambdas/rag-lambda/rag-lambda.py")
   }
 
   provisioner "local-exec" {
