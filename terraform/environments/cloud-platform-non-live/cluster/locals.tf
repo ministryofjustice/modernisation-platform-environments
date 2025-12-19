@@ -1,5 +1,5 @@
 locals {
   /* worksapce specific configurations */
-  enabled_workspaces        = ["test", "development", "preproduction", "production"]
+  enabled_workspaces        = []
   environment_configuration = local.environment_configurations[local.environment]
 }
