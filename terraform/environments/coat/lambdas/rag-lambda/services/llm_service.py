@@ -28,3 +28,11 @@ class LLMService:
         message_content = result_json.get('choices', [])[0].get('message', {}).get('content', "")
 
         return message_content
+    
+
+    def test_llm_service(self):
+        prompt = "Please respond to this request with 'Hello this is Claude'.."
+
+        llm_response = self.request_model_response(prompt)
+
+        print(f"Test LLM Service: {llm_response}")

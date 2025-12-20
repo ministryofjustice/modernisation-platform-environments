@@ -1,15 +1,20 @@
 from services.llm_service import LLMService
 from services.secret_service import SecretService
+from services.athena_service import AthenaService
+
 
 def lambda_handler(event, context): 
     secret_service = SecretService()
+    athena_service = AthenaService("cur_v2_database")
 
     api_key = secret_service.get_secret("llm_gateway_key")
 
     llm_service = LLMService(api_key)
 
-    prompt = "Please respond to this request with 'Hello this is Claude'.."
+    llm_service.test_llm_service()
 
-    response = llm_service.request_model_response(prompt)
+    athena_service.test_athena_service()
 
-    print(response)
+
+if __name__ == "__main__":
+    lambda_handler("", "")
