@@ -114,6 +114,8 @@ data "aws_iam_policy_document" "rag_lambda_function_role" {
         resources = [
             "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/",
             "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/*",
+            "arn:aws:s3:::coat-development-athena-output-clickops/",
+            "arn:aws:s3:::coat-development-athena-output-clickops/*"
         ]
     }
 
