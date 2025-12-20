@@ -8,7 +8,7 @@ class AthenaService:
 
         self.database = database
         self.workgroup = "primary"
-        self.output_location = "s3://coat-development-athena-output-clickops/"
+        self.output_location = "s3://coat-development-athena-output-clickops/Unsaved"
 
 
     def start_query(self, query):
