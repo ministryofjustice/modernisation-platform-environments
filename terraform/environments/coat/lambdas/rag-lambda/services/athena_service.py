@@ -1,6 +1,5 @@
 import time
 import boto3
-from typing import List, Dict, Optional
 
 
 class AthenaService:
@@ -20,19 +19,19 @@ class AthenaService:
             WorkGroup=self.workgroup
         )
 
-        return response["QueryExecutionId"]
+        return response.get("QueryExecutionId", "")
 
 
     def wait_for_query(self, query_execution_id):
         while True:
             response = self.client.get_query_execution(QueryExecutionId=query_execution_id)
 
-            state = response["QueryExecution"]["Status"]["State"]
+            state = response.get("QueryExecution", {}).get("Status", {}).get("State", "")
 
             if state == "SUCCEEDED":
                 return
             elif state in ("FAILED", "CANCELLED"):
-                reason = response["QueryExecution"]["Status"]["StateChangeReason"]
+                reason = response.get("QueryExecution", {}).get("Status", {}).get("StateChangeReason", "")
 
                 raise RuntimeError(f"Athena query {state}: {reason}")
 
@@ -52,10 +51,12 @@ class AthenaService:
 
         for page in pages:
             if columns == []:
-                columns = [column["Name"] for column in page["ResultSet"]["ResultSetMetadata"]["ColumnInfo"]]
+                columns = [
+                    column.get("Name", "") for column in page.get("ResultSet", {}).get("ResultSetMetadata", {}).get("ColumnInfo", [])
+                ]
 
-            for row in page["ResultSet"]["Rows"]:
-                values = [ field.get("VarCharValue", "") for field in row["Data"]]
+            for row in page.get("ResultSet", {}).get("Rows", []):
+                values = [field.get("VarCharValue", "") for field in row.get("Data", [])]
 
                 key_values = dict(zip(columns, values))
 
