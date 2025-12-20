@@ -108,7 +108,8 @@ data "aws_iam_policy_document" "rag_lambda_function_role" {
         actions = [
             "s3:GetObject",
             "s3:PutObject",
-            "s3:ListBucket"
+            "s3:ListBucket",
+            "s3:GetBucketLocation"
         ]
 
         resources = [

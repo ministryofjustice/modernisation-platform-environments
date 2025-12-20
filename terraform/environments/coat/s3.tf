@@ -225,7 +225,8 @@ data "aws_iam_policy_document" "coat_cur_v2_hourly_prod_bucket_policy" {
     actions = [
       "s3:GetObject",
       "s3:PutObject",
-      "s3:ListBucket"
+      "s3:ListBucket",
+      "s3:GetBucketLocation"
     ]
 
     resources = [
