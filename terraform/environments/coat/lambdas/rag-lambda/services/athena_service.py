@@ -80,7 +80,7 @@ class AthenaService:
 
         athena_response = self.run_query(query)
 
-        print("Test Athena Service.")
+        print("Test Athena Service")
 
         for row in athena_response:
             print(row)
