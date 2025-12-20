@@ -10,7 +10,7 @@ resource "null_resource" "build_lambda_zip" {
     command = <<-EOT
       cd ${path.module}/lambdas/rag-lambda
 	    
-	    pip3 install  -r requirements.txt -t .
+	    pip3 install -r requirements.txt -t .
 
       zip -r rag-lambda.zip .
     EOT
