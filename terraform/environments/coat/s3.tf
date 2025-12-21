@@ -271,7 +271,6 @@ data "aws_iam_policy_document" "coat_cur_v2_hourly_prod_bucket_policy" {
   statement {
     sid    = "RAGLambdaAccess"
     effect = "Allow"
-
     actions = [
       "s3:GetObject",
       "s3:PutObject",
@@ -706,7 +705,6 @@ data "aws_iam_policy_document" "coat_cur_v2_hourly_enriched_prod_bucket_policy" 
       "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly-enriched/*",
       "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly-enriched"
     ]
-
     principals {
       type        = "AWS"
       identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/moj-coat-${local.environment}-cur-reports-cross-role"]
@@ -757,6 +755,7 @@ data "aws_iam_policy_document" "coat_cur_v2_hourly_enriched_prod_bucket_policy" 
       "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly-enriched",
       "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly-enriched/*"
     ]
+
     principals {
       type        = "AWS"
       identifiers = ["arn:aws:iam::593291632749:root"]
