@@ -1,3 +1,15 @@
+locals {
+  glue_s3_targets = {
+    development = [
+      "s3://coat-${local.environment}-cur-v2-hourly/moj-cost-and-usage-reports/MOJ-CUR-V2-HOURLY/data/"
+    ]
+    production = [
+      "s3://coat-${local.environment}-cur-v2-hourly/moj-cost-and-usage-reports/MOJ-CUR-V2-HOURLY/data/",
+      "s3://coat-${local.environment}-cur-v2-hourly-enriched/"
+    ]
+  }
+}
+
 resource "aws_athena_workgroup" "coat_cur_report" {
   name = "coat_cur_report"
 
@@ -94,12 +106,11 @@ resource "aws_glue_crawler" "cur_v2_crawler" {
   database_name = aws_glue_catalog_database.cur_v2_database.name
   role          = aws_iam_role.glue_cur_role.arn
 
-  s3_target {
-    path = "s3://coat-${local.environment}-cur-v2-hourly/moj-cost-and-usage-reports/MOJ-CUR-V2-HOURLY/data/"
-  }
-
-  s3_target {
-    path = "s3://coat-${local.environment}-cur-v2-hourly-enriched/"
+  dynamic "s3_target" {
+    for_each = local.glue_s3_targets[local.environment]
+    content {
+      path = s3_target.value
+    }
   }
 
   configuration = jsonencode({
