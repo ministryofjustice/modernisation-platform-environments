@@ -69,7 +69,21 @@ module "cur_s3_kms" {
           identifiers = ["glue.amazonaws.com"]
         }
       ]
-    }
+    },
+    {
+    sid    = "RAGLambdaAccess"
+    effect = "Allow"
+    actions = [
+      "kms:Decrypt*"
+    ]
+    resources = ["*"]
+    principals = [
+      {
+        type        = "AWS"
+        identifiers = [aws_iam_role.rag_lambda_role.arn]
+      }
+    ]
+   }
   ]
 
   tags = local.tags
