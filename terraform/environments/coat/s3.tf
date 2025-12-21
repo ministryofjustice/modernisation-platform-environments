@@ -516,76 +516,116 @@ data "aws_iam_policy_document" "coat_cur_v2_hourly_enriched_dev_bucket_policy" {
   statement {
     sid    = "S3PutObject"
     effect = "Allow"
+
     actions = [
       "s3:PutObject"
     ]
+
     resources = [
       "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly-enriched/*",
       "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly-enriched"
     ]
+
     principals {
       type        = "Service"
       identifiers = ["bcm-data-exports.amazonaws.com"]
     }
   }
+
   statement {
     sid    = "S3ListGetObject"
     effect = "Allow"
+
     actions = [
       "s3:ListBucket",
       "s3:GetBucketLocation"
     ]
+
     resources = ["arn:aws:s3:::coat-${local.environment}-cur-v2-hourly-enriched"]
+
     principals {
       type        = "Service"
       identifiers = ["bcm-data-exports.amazonaws.com"]
     }
   }
+
   statement {
     sid    = "S3ReplicateObject"
     effect = "Allow"
+
     actions = [
       "s3:ReplicateObject",
       "s3:ReplicateDelete",
       "s3:GetBucketVersioning",
       "s3:PutBucketVersioning"
     ]
+
     resources = [
       "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly-enriched/*",
       "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly-enriched"
     ]
+
     principals {
       type        = "AWS"
       identifiers = ["arn:aws:iam::${local.environment_management.aws_organizations_root_account_id}:role/moj-cur-reports-v2-hourly-replication-role"]
     }
   }
+
   statement {
-    sid    = "S3CrossAccountRoleAccess"
+    sid    = "S3SyncCOATProdDev"
     effect = "Allow"
+
     actions = [
       "s3:GetObject",
       "s3:ListBucket",
       "s3:PutObject"
     ]
+
     resources = [
       "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly-enriched/*",
       "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly-enriched"
     ]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::279191903737:root"]
+    }
+  }
+
+  statement {
+    sid    = "S3CrossAccountRoleAccess"
+    effect = "Allow"
+
+    actions = [
+      "s3:GetObject",
+      "s3:ListBucket",
+      "s3:PutObject"
+    ]
+
+    resources = [
+      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly-enriched/*",
+      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly-enriched"
+    ]
+
     principals {
       type        = "AWS"
       identifiers = ["arn:aws:iam::${local.coat_prod_account_id}:role/moj-coat-${local.prod_environment}-cur-reports-cross-role"]
     }
   }
+
   statement {
     sid    = "AthenaAccess"
     effect = "Allow"
+
     actions = [
       "s3:GetObject",
       "s3:PutObject"
     ]
+
     resources = [
       "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly-enriched/athena-results/*"
     ]
+
     principals {
       type        = "Service"
       identifiers = ["athena.amazonaws.com"]
@@ -597,13 +637,16 @@ data "aws_iam_policy_document" "coat_cur_v2_hourly_enriched_prod_bucket_policy" 
   statement {
     sid    = "S3PutObject"
     effect = "Allow"
+
     actions = [
       "s3:PutObject"
     ]
+
     resources = [
       "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly-enriched/*",
       "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly-enriched"
     ]
+
     principals {
       type        = "Service"
       identifiers = ["bcm-data-exports.amazonaws.com"]
@@ -613,10 +656,12 @@ data "aws_iam_policy_document" "coat_cur_v2_hourly_enriched_prod_bucket_policy" 
   statement {
     sid    = "S3ListGetObject"
     effect = "Allow"
+
     actions = [
       "s3:ListBucket",
       "s3:GetBucketLocation"
     ]
+
     resources = ["arn:aws:s3:::coat-${local.environment}-cur-v2-hourly-enriched"]
     principals {
       type        = "Service"
@@ -627,16 +672,19 @@ data "aws_iam_policy_document" "coat_cur_v2_hourly_enriched_prod_bucket_policy" 
   statement {
     sid    = "S3ReplicateObject"
     effect = "Allow"
+
     actions = [
       "s3:ReplicateObject",
       "s3:ReplicateDelete",
       "s3:GetBucketVersioning",
       "s3:PutBucketVersioning"
     ]
+
     resources = [
       "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly-enriched/*",
       "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly-enriched"
     ]
+
     principals {
       type        = "AWS"
       identifiers = ["arn:aws:iam::${local.environment_management.aws_organizations_root_account_id}:role/moj-cur-reports-v2-hourly-replication-role"]
@@ -646,16 +694,19 @@ data "aws_iam_policy_document" "coat_cur_v2_hourly_enriched_prod_bucket_policy" 
   statement {
     sid    = "S3CrossAccountRoleAccess"
     effect = "Allow"
+
     actions = [
       "s3:GetObject",
       "s3:ListBucket",
       "s3:PutObject",
       "s3:PutObjectAcl"
     ]
+
     resources = [
       "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly-enriched/*",
       "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly-enriched"
     ]
+
     principals {
       type        = "AWS"
       identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/moj-coat-${local.environment}-cur-reports-cross-role"]
@@ -665,6 +716,7 @@ data "aws_iam_policy_document" "coat_cur_v2_hourly_enriched_prod_bucket_policy" 
   statement {
     sid    = "AthenaAccess"
     effect = "Allow"
+
     actions = [
       "s3:GetObject",
       "s3:PutObject",
@@ -674,19 +726,23 @@ data "aws_iam_policy_document" "coat_cur_v2_hourly_enriched_prod_bucket_policy" 
       "s3:ListMultipartUploadParts",
       "s3:AbortMultipartUpload"
     ]
+
     resources = [
       "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly-enriched/athena-results/*",
       "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly-enriched/moj-cost-and-usage-reports/*",
       "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly-enriched",
       "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly-enriched/*"
     ]
+
     principals {
       type = "Service"
+
       identifiers = [
         "athena.amazonaws.com",
         "glue.amazonaws.com"
       ]
     }
+
     condition {
       test     = "StringEquals"
       variable = "aws:SourceAccount"
@@ -697,11 +753,13 @@ data "aws_iam_policy_document" "coat_cur_v2_hourly_enriched_prod_bucket_policy" 
   statement {
     sid    = "AllowS3SyncAPDP"
     effect = "Allow"
+
     actions = [
       "s3:GetObject",
       "s3:ListBucket",
       "s3:GetObjectTagging"
     ]
+
     resources = [
       "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly-enriched",
       "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly-enriched/*"
