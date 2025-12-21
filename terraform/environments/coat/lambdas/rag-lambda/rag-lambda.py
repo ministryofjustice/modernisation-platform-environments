@@ -4,7 +4,7 @@ from services.athena_service import AthenaService
 
 
 def lambda_handler(event, context): 
-    print("Executing Lambda Handler")
+    print("Executing Lambda Handler.")
     
     secret_service = SecretService()
     athena_service = AthenaService("cur_v2_database")
