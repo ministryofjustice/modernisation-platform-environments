@@ -118,6 +118,23 @@ data "aws_iam_policy_document" "coat_cur_v2_hourly_dev_bucket_policy" {
       identifiers = ["athena.amazonaws.com"]
     }
   }
+  statement {
+    sid    = "S3SyncCOATProdDev"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:ListBucket",
+      "s3:PutObject"
+    ]
+    resources = [
+      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly-enriched/*",
+      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly-enriched"
+    ]
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::279191903737:root"]
+    }
+  }
 }
 
 data "aws_iam_policy_document" "coat_cur_v2_hourly_prod_bucket_policy" {
@@ -568,27 +585,6 @@ data "aws_iam_policy_document" "coat_cur_v2_hourly_enriched_dev_bucket_policy" {
     principals {
       type        = "AWS"
       identifiers = ["arn:aws:iam::${local.environment_management.aws_organizations_root_account_id}:role/moj-cur-reports-v2-hourly-replication-role"]
-    }
-  }
-
-  statement {
-    sid    = "S3SyncCOATProdDev"
-    effect = "Allow"
-
-    actions = [
-      "s3:GetObject",
-      "s3:ListBucket",
-      "s3:PutObject"
-    ]
-
-    resources = [
-      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly-enriched/*",
-      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly-enriched"
-    ]
-
-    principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::279191903737:root"]
     }
   }
 
