@@ -21,7 +21,7 @@ as select
 
   billing_period
 from data
-where billing_period >= date_format(date_add('month', -1, current_date), '%Y-%m')
+where billing_period >= date_format(date_add('month', -2, current_date), '%Y-%m')
 group by
   billing_period,
   line_item_usage_account_name,

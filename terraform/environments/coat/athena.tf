@@ -90,8 +90,6 @@ resource "aws_iam_role_policy_attachment" "glue_service_role_attachment" {
 resource "aws_glue_crawler" "cur_v2_crawler" {
   #checkov:skip=CKV_AWS_195: "Ensure Glue component has a security configuration associated"
 
-  count = local.is-development ? 0 : 1
-
   name          = "cur_v2_crawler"
   database_name = aws_glue_catalog_database.cur_v2_database.name
   role          = aws_iam_role.glue_cur_role.arn
@@ -129,8 +127,6 @@ resource "aws_athena_named_query" "fct_daily_cost" {
 }
 
 resource "null_resource" "execute_create_table_query" {
-  count = local.is-development ? 0 : 1
-
   triggers = {
     query_ids = aws_athena_named_query.fct_daily_cost.id
     script_hash = filesha256("${path.module}/queries/fct_daily_cost.sql")
