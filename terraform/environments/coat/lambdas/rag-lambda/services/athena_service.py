@@ -74,7 +74,7 @@ class AthenaService:
 
 
     def test_athena_service(self):
-        table = "fct_daily_cost_truncated"
+        table = "fct_daily_cost"
 
         query = f"SELECT * FROM {table} LIMIT 10;"
 
