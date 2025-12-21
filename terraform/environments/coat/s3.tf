@@ -127,8 +127,8 @@ data "aws_iam_policy_document" "coat_cur_v2_hourly_dev_bucket_policy" {
       "s3:PutObject"
     ]
     resources = [
-      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly-enriched/*",
-      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly-enriched"
+      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/*",
+      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly"
     ]
     principals {
       type        = "AWS"
