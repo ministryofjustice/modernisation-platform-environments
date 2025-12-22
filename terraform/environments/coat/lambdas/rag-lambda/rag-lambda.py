@@ -36,7 +36,7 @@ def lambda_handler(event, context):
 
 if __name__ == "__main__":
     response = lambda_handler({"user_question": '''
-How much was spent on coat-development last month?
+How much did LAA spend last month?
 '''}, "")
     
     print(response)

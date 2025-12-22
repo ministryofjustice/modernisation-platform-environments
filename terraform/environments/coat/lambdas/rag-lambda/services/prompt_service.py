@@ -58,6 +58,7 @@ generate a SQL statement, which will be run against the Athena table, to answer 
         self.add_rule(rules, "- If the question is not relevant to the data model, respond with 'Please ask a relevant question.'.")
         self.add_rule(rules, "- Fuzzy match separators in string values.")
         self.add_rule(rules, "- Cloud Platform is the name of a team in the organisation.")
+        self.add_rule(rules, "- You are not allowed to create, modify, or drop tables.")
 
         self.prompt += self.create_new_prompt_section(section_title, "\n".join(rules))
 
