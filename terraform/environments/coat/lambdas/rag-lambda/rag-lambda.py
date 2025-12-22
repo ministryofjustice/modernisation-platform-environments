@@ -1,17 +1,8 @@
-import json
 from services.llm_service import LLMService
 from services.secret_service import SecretService
 from services.athena_service import AthenaService
 from services.prompt_service import PromptService
-
-
-def construct_response(query, data):
-    return json.dumps(
-        {
-            "query": query,
-            "data": data
-        }
-    )
+from response import construct_error, construct_response
 
 
 def lambda_handler(event, context): 
@@ -30,9 +21,12 @@ def lambda_handler(event, context):
 
     prompt = prompt_service.build_prompt(model, user_question)
 
-    query = llm_service.request_model_response(prompt)
-    
-    query_result= athena_service.run_query(query)
+    try:
+        query = llm_service.request_model_response(prompt)
+
+        query_result= athena_service.run_query(query)
+    except Exception as err:
+        return construct_error(err)
 
     response = construct_response(query, query_result)
 
@@ -41,7 +35,7 @@ def lambda_handler(event, context):
 
 if __name__ == "__main__":
     response = lambda_handler({"user_question": '''
-What was the cost of the uga-duba account for each day in the last month?
+How much was spent on coat-development last month?
 '''}, "")
     
     print(response)
