@@ -41,7 +41,7 @@ def lambda_handler(event, context):
 
 if __name__ == "__main__":
     response = lambda_handler({"user_question": '''
-What was the cost of athena in analytical-platform-data-production account yesterday?
+What was the cost of the uga-duba account for each day in the last month?
 '''}, "")
     
     print(response)
