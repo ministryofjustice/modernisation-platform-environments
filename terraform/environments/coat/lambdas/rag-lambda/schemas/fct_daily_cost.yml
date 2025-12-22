@@ -45,28 +45,18 @@
     - name: tag_application
       data_type: string
       description: The application tag associated with the resource.
-      values:
-        - null
     - name: tag_namespace
       data_type: string
       description: The namespace tag associated with the resource.
-      values:
-        - null
     - name: tag_environment
       data_type: string
       description: The environment tag associated with the resource.
-      values:
-        - null
     - name: tag_service_area
       data_type: string
       description: The service area tag associated with the resource.
-      values:
-        - null
     - name: tag_owner
       data_type: string
       description: The owner tag associated with the resource.
-      values:
-        - null
     - name: product_name
       data_type: string
       description: The name of the AWS product or service incurring the costs.
