@@ -17,7 +17,7 @@ as select
   product['product_name'] as product_name,
   date(line_item_usage_start_date) as usage_date,
 
-  sum(line_item_net_unblended_cost) as sum_net_unblended_cost,
+  sum(line_item_net_unblended_cost) as daily_cost,
 
   billing_period
 from data

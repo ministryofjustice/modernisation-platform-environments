@@ -13,15 +13,14 @@ def lambda_handler(event, context):
 
     user_question = event.get("user_question", "No question was submitted")
     model = "fct_daily_cost"
-    query = f"SELECT * FROM {model} LIMIT 10;"
 
     api_key = secret_service.get_secret("llm_gateway_key")
 
     llm_service = LLMService(api_key)
 
-    prompt_service.test_prompt_service(model, user_question)
+    prompt = prompt_service.build_prompt(model, user_question)
 
-    llm_service.test_llm_service()
+    query = llm_service.request_model_response(prompt).strip("```sql")
 
     athena_service.test_athena_service(query)
 

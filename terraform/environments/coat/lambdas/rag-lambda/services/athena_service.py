@@ -66,6 +66,8 @@ class AthenaService:
 
 
     def run_query(self, query):
+        print(f"Running Athena query: {query}")
+        
         query_execution_id = self.start_query(query)
 
         self.wait_for_query(query_execution_id)

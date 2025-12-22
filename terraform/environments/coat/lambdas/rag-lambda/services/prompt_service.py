@@ -61,6 +61,8 @@ generate an SQL statement, which will be run against the Athena table, to answer
 
 
     def build_prompt(self, model, question):
+        print("Building prompt.")
+
         self.add_main_task()
 
         self.add_user_question(question)
@@ -69,10 +71,7 @@ generate an SQL statement, which will be run against the Athena table, to answer
 
         self.add_rules()
 
-        return self.prompt
-    
-    def test_prompt_service(self, model, user_question):
-        prompt = self.build_prompt(model, user_question)
+        print(self.prompt)
 
-        print("Generated Prompt:")
-        print(prompt)
+        return self.prompt
+

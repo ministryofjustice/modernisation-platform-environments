@@ -9,8 +9,14 @@ class LLMService:
         )
 
 
-    def request_model_response(self, prompt):
+    def clean_sql_response(self, response):
+        if response.startswith("```sql") and response.endswith("```"):
+            return response[len("```sql"): -len("```")].strip()
 
+
+    def request_model_response(self, prompt):
+        print("Requesting model response.")
+        
         response = self.client.chat.completions.create(
             model="bedrock-claude-sonnet-4-5",
             messages = [
@@ -27,7 +33,12 @@ class LLMService:
 
         message_content = result_json.get('choices', [])[0].get('message', {}).get('content', "")
 
-        return message_content
+        sql_statement = self.clean_sql_response(message_content)
+
+        print("Generated query:")
+        print(sql_statement)
+
+        return sql_statement
     
 
     def test_llm_service(self):
