@@ -24,7 +24,7 @@ class PromptService:
 
     def add_main_task(self):
         main_task = '''Given the user question, and the table schema below, 
-generate an SQL statement, which will be run against the Athena table, to answer the question.'''
+generate a SQL statement, which will be run against the Athena table, to answer the question.'''
 
         section_title = "Task:"
 

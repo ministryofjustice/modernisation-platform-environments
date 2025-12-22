@@ -1,7 +1,17 @@
+import json
+
 from services.llm_service import LLMService
 from services.secret_service import SecretService
 from services.athena_service import AthenaService
 from services.prompt_service import PromptService
+
+def construct_response(query, data):
+    return json.dumps(
+        {
+            "query": query,
+            "data": data
+        }
+    )
 
 
 def lambda_handler(event, context): 
@@ -22,10 +32,16 @@ def lambda_handler(event, context):
 
     query = llm_service.request_model_response(prompt)
     
-    athena_service.run_query(query)
+    query_result= athena_service.run_query(query)
+
+    response = construct_response(query, query_result)
+
+    return response
 
 
 if __name__ == "__main__":
-    lambda_handler({"user_question": '''
-What was the cost for each aws service during each day of November for all cloud platform accounts?
+    response = lambda_handler({"user_question": '''
+What was the cost of athena in analytical-platform-data-production account yesterday?
 '''}, "")
+    
+    print(response)

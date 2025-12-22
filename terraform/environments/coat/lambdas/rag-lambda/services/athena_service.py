@@ -56,7 +56,7 @@ class AthenaService:
                 ]
 
             for row in page.get("ResultSet", {}).get("Rows", []):
-                values = [field.get("VarCharValue", "") for field in row.get("Data", [])]
+                values = [field.get("VarCharValue", 0) for field in row.get("Data", [])]
 
                 key_values = dict(zip(columns, values))
 
