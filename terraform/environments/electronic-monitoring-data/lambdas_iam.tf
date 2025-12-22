@@ -1143,7 +1143,7 @@ module "share_scram_db_with_historic_csv_lambda_role_policy_lambda_role" {
   dbs_to_grant            = toset(["scram_alcohol_monitoring${local.db_suffix}"])
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
   role_arn                = aws_iam_role.load_historic_csv.arn
-  db_exists               = local.is-development ? local.is-preproduction ? false : true
+  db_exists               = local.is-development ? (local.is-preproduction ? false : true) : true
   de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
 }
 
