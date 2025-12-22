@@ -23,34 +23,34 @@ data "archive_file" "rag_lambda" {
   output_path = "${path.module}/lambdas/rag-lambda/rag-lambda.zip"
 }
 
-resource "aws_lambda_function" "rag_lambda" {
-  #checkov:skip=CKV_AWS_173:No sensitive information stored in Lambda environment variables
-  #checkov:skip=CKV_AWS_117:This Lambda doesn't need VPC
-  #checkov:skip=CKV_AWS_116:Queue it self has DLQ so Lambda fail should redrive to DLQ
-  #checkov:skip=CKV_AWS_272:Doesn't need code signing
+# resource "aws_lambda_function" "rag_lambda" {
+#   #checkov:skip=CKV_AWS_173:No sensitive information stored in Lambda environment variables
+#   #checkov:skip=CKV_AWS_117:This Lambda doesn't need VPC
+#   #checkov:skip=CKV_AWS_116:Queue it self has DLQ so Lambda fail should redrive to DLQ
+#   #checkov:skip=CKV_AWS_272:Doesn't need code signing
   
-  function_name = "RAGLambdaFunction"
-  description   = "Recieve NL request from user, use Bedrock to create SQL from NL, and use query to extract data from Athena"
+#   function_name = "RAGLambdaFunction"
+#   description   = "Recieve NL request from user, use Bedrock to create SQL from NL, and use query to extract data from Athena"
 
-  role    = aws_iam_role.rag_lambda_role.arn
-  runtime = "python3.12"
-  timeout = 30 
+#   role    = aws_iam_role.rag_lambda_role.arn
+#   runtime = "python3.12"
+#   timeout = 30 
 
-  handler          = "rag-lambda.lambda_handler"
-  package_type     = "Zip"
-  filename         = "${path.module}/lambdas/rag-lambda/rag-lambda.zip"
-  source_code_hash = data.archive_file.rag_lambda.output_base64sha256
+#   handler          = "rag-lambda.lambda_handler"
+#   package_type     = "Zip"
+#   filename         = "${path.module}/lambdas/rag-lambda/rag-lambda.zip"
+#   source_code_hash = data.archive_file.rag_lambda.output_base64sha256
 
-  reserved_concurrent_executions = 10
+#   reserved_concurrent_executions = 10
 
-  tracing_config {
-    mode = "PassThrough"
-  }
+#   tracing_config {
+#     mode = "PassThrough"
+#   }
 
-  tags = local.tags
+#   tags = local.tags
 
-  depends_on = [null_resource.build_lambda_zip]
-}
+#   depends_on = [null_resource.build_lambda_zip]
+# }
 
 # Logs
 
