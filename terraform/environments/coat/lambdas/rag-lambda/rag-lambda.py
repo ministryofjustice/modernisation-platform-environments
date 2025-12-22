@@ -22,7 +22,7 @@ def lambda_handler(event, context):
 
     query = llm_service.request_model_response(prompt)
 
-    athena_service.test_athena_service(query)
+    athena_service.run_query(query)
 
 
 if __name__ == "__main__":

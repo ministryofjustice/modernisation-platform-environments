@@ -72,14 +72,11 @@ class AthenaService:
 
         self.wait_for_query(query_execution_id)
         
-        return self.get_results(query_execution_id)
+        athena_response = self.get_results(query_execution_id)
 
-
-    def test_athena_service(self, query):
-        athena_response = self.run_query(query)
-
-        print("Test Athena Service")
-
+        print("Query result:")
+        
         for row in athena_response:
             print(row)
 
+        return athena_response
