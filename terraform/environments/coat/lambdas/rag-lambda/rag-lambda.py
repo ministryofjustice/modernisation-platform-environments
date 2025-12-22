@@ -1,9 +1,9 @@
 import json
-
 from services.llm_service import LLMService
 from services.secret_service import SecretService
 from services.athena_service import AthenaService
 from services.prompt_service import PromptService
+
 
 def construct_response(query, data):
     return json.dumps(
