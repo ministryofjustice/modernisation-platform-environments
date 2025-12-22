@@ -44,3 +44,5 @@ datasync_password_updater.zip
 *.dll
 *.iso
 *.img
+
+__pycache__
