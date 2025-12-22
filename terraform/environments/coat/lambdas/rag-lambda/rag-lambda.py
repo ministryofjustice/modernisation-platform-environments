@@ -26,4 +26,4 @@ def lambda_handler(event, context):
 
 
 if __name__ == "__main__":
-    lambda_handler({"user_question": "How much did OPG spend in the month of November?"}, "")
+    lambda_handler({"user_question": "How much was spent in August on non production infrastructure in Platforms?"}, "")
