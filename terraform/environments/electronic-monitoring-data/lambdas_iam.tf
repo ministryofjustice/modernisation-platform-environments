@@ -727,6 +727,14 @@ module "share_dbs_with_dms_lambda_role" {
   de_role_arn             = null
 }
 
+resource "aws_lakeformation_permissions" "dms_add_create_db" {
+  count            = local.is-development ? 0 : 1
+  permissions      = ["CREATE_DATABASE", "DROP"]
+  principal        = aws_iam_role.load_dms_output.arn
+  catalog_resource = true
+}
+
+
 #-----------------------------------------------------------------------------------
 # Load MDSS Data IAM Role
 #-----------------------------------------------------------------------------------
@@ -1143,7 +1151,7 @@ module "share_scram_db_with_historic_csv_lambda_role_policy_lambda_role" {
   dbs_to_grant            = toset(["scram_alcohol_monitoring${local.db_suffix}"])
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
   role_arn                = aws_iam_role.load_historic_csv.arn
-  db_exists               = local.is-development ? false : true
+  db_exists               = local.is-development ? false : local.is-preproduction ? false : true
   de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
 }
 
