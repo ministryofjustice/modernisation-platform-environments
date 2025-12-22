@@ -26,4 +26,6 @@ def lambda_handler(event, context):
 
 
 if __name__ == "__main__":
-    lambda_handler({"user_question": "How much was spent in August on non production infrastructure in Platforms?"}, "")
+    lambda_handler({"user_question": '''
+What was the daily cost during the 3 month period July - September of all analytical platform accounts and the find moj data namespaces?
+'''}, "")
