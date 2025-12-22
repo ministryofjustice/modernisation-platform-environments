@@ -37,5 +37,8 @@ resource "litellm_key" "keys" {
   tpm_limit             = each.value.tpm_limit
   max_parallel_requests = each.value.max_parallel_requests
 
-  depends_on = [helm_release.litellm]
+  depends_on = [
+    helm_release.litellm,
+    litellm_team.teams
+  ]
 }
