@@ -20,7 +20,7 @@ def lambda_handler(event, context):
 
     prompt = prompt_service.build_prompt(model, user_question)
 
-    query = llm_service.request_model_response(prompt).strip("```sql")
+    query = llm_service.request_model_response(prompt)
 
     athena_service.test_athena_service(query)
 
