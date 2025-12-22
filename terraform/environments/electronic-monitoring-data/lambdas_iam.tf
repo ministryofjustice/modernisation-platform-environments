@@ -727,6 +727,14 @@ module "share_dbs_with_dms_lambda_role" {
   de_role_arn             = null
 }
 
+resource "aws_lakeformation_permissions" "dms_add_create_db" {
+  count            = local.is-development ? 0 : 1
+  permissions      = ["CREATE_DATABASE", "DROP"]
+  principal        = aws_iam_role.load_dms_output.arn
+  catalog_resource = true
+}
+
+
 #-----------------------------------------------------------------------------------
 # Load MDSS Data IAM Role
 #-----------------------------------------------------------------------------------
