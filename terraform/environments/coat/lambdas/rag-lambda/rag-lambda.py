@@ -2,7 +2,8 @@ from services.llm_service import LLMService
 from services.secret_service import SecretService
 from services.athena_service import AthenaService
 from services.prompt_service import PromptService
-from response import construct_error, construct_response
+from lib.response import construct_error, construct_response
+from lib.validators import validate_user_question
 
 
 def lambda_handler(event, context): 
@@ -12,7 +13,7 @@ def lambda_handler(event, context):
     athena_service = AthenaService("cur_v2_database")
     prompt_service = PromptService()
 
-    user_question = event.get("user_question", "No question was submitted")
+    user_question = validate_user_question(event.get("user_question", "No question was submitted"))
     model = "fct_daily_cost"
 
     api_key = secret_service.get_secret("llm_gateway_key")
