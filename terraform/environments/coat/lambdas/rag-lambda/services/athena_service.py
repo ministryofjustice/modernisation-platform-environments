@@ -73,14 +73,11 @@ class AthenaService:
         return self.get_results(query_execution_id)
 
 
-    def test_athena_service(self):
-        table = "fct_daily_cost"
-
-        query = f"SELECT * FROM {table} LIMIT 10;"
-
+    def test_athena_service(self, query):
         athena_response = self.run_query(query)
 
         print("Test Athena Service")
 
         for row in athena_response:
             print(row)
+

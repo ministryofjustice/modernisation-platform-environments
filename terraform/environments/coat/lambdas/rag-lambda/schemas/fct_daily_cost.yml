@@ -1,0 +1,78 @@
+- name: fct_daily_cost
+  description: >
+    This time series model aggregates AWS Cost and Usage Report (CUR) data
+    for each day to provide a view of daily net unblended costs
+    categorized by various dimensions such as billing periods,
+    accounts, regions, products, applications, business_units and tags.
+  columns:
+    - name: billing_period
+      data_type: string
+      description: The month for which the AWS charges apply. Formated as YYYY-MM.
+      values:
+        - 2025-07
+        - 2025-08
+        - 2025-09
+        - 2025-10
+        - 2025-11
+        - 2025-12
+    - name: account_name
+      data_type: string
+      description: The name of the AWS account incurring the costs.
+    - name: product_region_code
+      data_type: string
+      description: The AWS region where the resources are located.
+    - name: environment
+      data_type: string
+      description: Indicates if the resource is tagged as production. From cost allocation tags.
+      values:
+        - Non Production
+        - Production
+        - No is-production Tag
+    - name: business_unit
+      data_type: string
+      description: The business unit categorization from cost allocation tags.
+      values:
+        - Central Digital
+        - Platforms
+        - HMCTS
+        - Uncategorised Business Unit
+        - OPG
+        - HMPPS
+        - CICA
+        - LAA
+        - Technology Services
+        - YJB
+    - name: tag_application
+      data_type: string
+      description: The application tag associated with the resource.
+      values:
+        - null
+    - name: tag_namespace
+      data_type: string
+      description: The namespace tag associated with the resource.
+      values:
+        - null
+    - name: tag_environment
+      data_type: string
+      description: The environment tag associated with the resource.
+      values:
+        - null
+    - name: tag_service_area
+      data_type: string
+      description: The service area tag associated with the resource.
+      values:
+        - null
+    - name: tag_owner
+      data_type: string
+      description: The owner tag associated with the resource.
+      values:
+        - null
+    - name: product_name
+      data_type: string
+      description: The name of the AWS product or service incurring the costs.
+    - name: usage_date
+      data_type: date
+      description: The start date for the line item in UTC. The format is YYYY-MM-DD
+    - name: daily_cost
+      data_type: decimal
+      description: The total net unblended cost for each day aggregated by specified dimensions.
