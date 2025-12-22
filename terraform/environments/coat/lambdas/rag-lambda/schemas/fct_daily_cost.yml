@@ -20,6 +20,7 @@
       description: The name of the AWS account incurring the costs.
       example_values: 
         - coat-production
+        - analytical-platform-data-production
     - name: product_region_code
       data_type: string
       description: The AWS region where the resources are located.
@@ -54,6 +55,7 @@
       description: The namespace tag associated with the resource.
       example_values: 
         - formbuilder-platform-live-production
+        - laa-hmrc-interface-uat
     - name: tag_environment
       data_type: string
       description: The environment tag associated with the resource.

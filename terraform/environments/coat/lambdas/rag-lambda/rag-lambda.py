@@ -21,11 +21,11 @@ def lambda_handler(event, context):
     prompt = prompt_service.build_prompt(model, user_question)
 
     query = llm_service.request_model_response(prompt)
-
+    
     athena_service.run_query(query)
 
 
 if __name__ == "__main__":
     lambda_handler({"user_question": '''
-What was the daily cost during the 3 month period July - September of all analytical platform accounts and the find moj data namespaces?
+What was the cost for each aws service during each day of November for all cloud platform accounts?
 '''}, "")

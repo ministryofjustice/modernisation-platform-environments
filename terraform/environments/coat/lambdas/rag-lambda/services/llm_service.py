@@ -33,6 +33,9 @@ class LLMService:
 
         message_content = result_json.get('choices', [])[0].get('message', {}).get('content', "")
 
+        if message_content == "Please ask a relevant question.":
+            raise Exception(message_content)
+
         sql_statement = self.clean_sql_response(message_content)
 
         print("Generated query:")
