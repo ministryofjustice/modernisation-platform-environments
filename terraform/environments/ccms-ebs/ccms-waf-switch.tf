@@ -116,7 +116,7 @@ resource "aws_cloudwatch_event_rule" "waf_block_dec26" {
   name                = "waf-block-dec26-${local.environment}"
   schedule_expression = "cron(01 07 26 12 ? 2025)"
   description         = "Set WAF rule to BLOCK on 26th Dec Bank Holiday"
-} 
+}
 
 # Block for 1 Jan
 resource "aws_cloudwatch_event_rule" "waf_block_jan01" {
@@ -125,7 +125,7 @@ resource "aws_cloudwatch_event_rule" "waf_block_jan01" {
   description         = "Set WAF rule to BLOCK on Jan 1 (start)"
 }
 
-resource "aws_cloudwatch_event_target" "waf_allow_target" { 
+resource "aws_cloudwatch_event_target" "waf_allow_target" {
   rule      = aws_cloudwatch_event_rule.waf_allow_0700_uk.name
   target_id = "AllowWAF"
   arn       = aws_lambda_function.waf_toggle.arn

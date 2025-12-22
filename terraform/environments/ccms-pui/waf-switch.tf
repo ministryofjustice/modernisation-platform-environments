@@ -134,7 +134,7 @@ resource "aws_cloudwatch_event_rule" "waf_block_dec26" {
   name                = "waf-block-dec26-${local.environment}"
   schedule_expression = "cron(01 07 26 12 ? 2025)"
   description         = "Set WAF rule to BLOCK on 26th Dec Bank Holiday"
-} 
+}
 
 # Block for 1 Jan
 resource "aws_cloudwatch_event_rule" "waf_block_jan01" {
