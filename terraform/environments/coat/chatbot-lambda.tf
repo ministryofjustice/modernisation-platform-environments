@@ -54,10 +54,10 @@ data "archive_file" "rag_lambda" {
 
 # Logs
 
-resource "aws_cloudwatch_log_group" "rag_lambda_log_group" {
-  name              = "/aws/lambda/${aws_lambda_function.rag_lambda.function_name}"
-  retention_in_days = 120
-}
+# resource "aws_cloudwatch_log_group" "rag_lambda_log_group" {
+#   name              = "/aws/lambda/${aws_lambda_function.rag_lambda.function_name}"
+#   retention_in_days = 120
+# }
 
 # IAM role
 
