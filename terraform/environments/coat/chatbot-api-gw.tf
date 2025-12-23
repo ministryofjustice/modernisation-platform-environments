@@ -114,7 +114,7 @@ resource "aws_api_gateway_deployment" "chatbot_api_deployment" {
 
   depends_on = [
     aws_api_gateway_method.send_request_post,
-    aws_api_gateway_integration.send_request_post_integration
+    aws_api_gateway_integration.send_request_post_integration,
     aws_api_gateway_method.send_request_options.id,
     aws_api_gateway_integration.send_request_options_integration.id,
     aws_api_gateway_method_response.send_request_options_method_response.id,
