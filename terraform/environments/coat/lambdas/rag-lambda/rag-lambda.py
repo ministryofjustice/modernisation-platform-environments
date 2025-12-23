@@ -7,6 +7,9 @@ from lib.validators import validate_user_question
 
 
 def lambda_handler(event, context): 
+    print("Request Payload:")
+    print(event)
+    
     print("Executing Lambda Handler.")
     
     secret_service = SecretService()
