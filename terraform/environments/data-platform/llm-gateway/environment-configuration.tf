@@ -276,6 +276,22 @@ locals {
             }
           }
         }
+        hmpps-digital = {
+          organisation = "ministryofjustice"
+          models = [
+            "all-proxy-models"
+          ]
+          keys = {
+            /* For Richard Adams */
+            prisoner-app = {
+              models = [
+                "azure-gpt-5",
+                "bedrock-claude-haiku-4-5",
+                "bedrock-claude-sonnet-4-5"
+              ]
+            }
+          }
+        }
       }
     }
     test = {
