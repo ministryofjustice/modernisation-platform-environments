@@ -169,6 +169,7 @@ resource "aws_api_gateway_usage_plan" "chatbot_api_usage_plan" {
 
   throttle_settings {
     rate_limit = 5
+    burst_limit = 5
   }
 }
 
