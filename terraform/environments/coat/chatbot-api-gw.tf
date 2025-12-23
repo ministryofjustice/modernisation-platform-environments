@@ -28,11 +28,12 @@ resource "aws_api_gateway_method" "send_request_post" {
 }
 
 resource "aws_api_gateway_integration" "send_request_post_integration" {
+  http_method = aws_api_gateway_method.send_request_post.http_method
   resource_id = aws_api_gateway_resource.send_request.id
   rest_api_id = aws_api_gateway_rest_api.chatbot_api.id
   type = "AWS_PROXY"
   uri = aws_lambda_function.rag_lambda.invoke_arn
-  http_method   = "POST"
+  integration_http_method  = "POST"
 }
 
 # OPTIONS method for CORS
@@ -51,8 +52,9 @@ resource "aws_api_gateway_method" "send_request_options" {
 resource "aws_api_gateway_integration" "send_request_options_integration" {
   rest_api_id             = aws_api_gateway_rest_api.chatbot_api.id
   resource_id             = aws_api_gateway_resource.send_request.id
+  http_method             = aws_api_gateway_method.send_request_options.http_method
   type                    = "MOCK"
-  http_method             = "OPTIONS"
+  integration_http_method = "OPTIONS"
 
   request_templates       = {
     "application/json" = "{\"statusCode\": 200}"
