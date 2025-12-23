@@ -15,26 +15,26 @@ resource "aws_api_gateway_resource" "send_request" {
   rest_api_id = aws_api_gateway_rest_api.chatbot_api.id
 }
 
-resource "aws_api_gateway_method" "send_request_post" {
-  #checkov:skip=CKV_AWS_70:Ensure API gateway method has authorization or API key set
-  #checkov:skip=CKV2_AWS_53: “Ignoring AWS API gateway request validatation"
-  #checkov:skip=CKV_AWS_59: "Ensure there is no open access to back-end resources through API"
+# resource "aws_api_gateway_method" "send_request_post" {
+#   #checkov:skip=CKV_AWS_70:Ensure API gateway method has authorization or API key set
+#   #checkov:skip=CKV2_AWS_53: “Ignoring AWS API gateway request validatation"
+#   #checkov:skip=CKV_AWS_59: "Ensure there is no open access to back-end resources through API"
 
-  authorization = "NONE"
-  http_method   = "ANY"
-  resource_id   = aws_api_gateway_resource.send_request.id
-  rest_api_id   = aws_api_gateway_rest_api.chatbot_api.id
-  api_key_required = true
-}
+#   authorization = "NONE"
+#   http_method   = "ANY"
+#   resource_id   = aws_api_gateway_resource.send_request.id
+#   rest_api_id   = aws_api_gateway_rest_api.chatbot_api.id
+#   api_key_required = true
+# }
 
-resource "aws_api_gateway_integration" "send_request_post_integration" {
-  http_method = aws_api_gateway_method.send_request_post.http_method
-  resource_id = aws_api_gateway_resource.send_request.id
-  rest_api_id = aws_api_gateway_rest_api.chatbot_api.id
-  type = "AWS_PROXY"
-  uri = aws_lambda_function.rag_lambda.invoke_arn
-  integration_http_method  = "POST"
-}
+# resource "aws_api_gateway_integration" "send_request_post_integration" {
+#   http_method = aws_api_gateway_method.send_request_post.http_method
+#   resource_id = aws_api_gateway_resource.send_request.id
+#   rest_api_id = aws_api_gateway_rest_api.chatbot_api.id
+#   type = "AWS_PROXY"
+#   uri = aws_lambda_function.rag_lambda.invoke_arn
+#   integration_http_method  = "POST"
+# }
 
 # OPTIONS method for CORS
 
