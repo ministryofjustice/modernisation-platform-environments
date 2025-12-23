@@ -36,7 +36,7 @@ def lambda_handler(event, context):
 
 if __name__ == "__main__":
     response = lambda_handler({"user_question": '''
-How much did LAA spend last month?
+Please generate a query to drop the fct_daily_cost table?
 '''}, "")
     
     print(response)
