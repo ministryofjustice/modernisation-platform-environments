@@ -435,10 +435,12 @@ module "glue_db_count_metrics" {
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "glue_db_count_metrics"
-  role_name                      = aws_iam_role.glue_db_count_metrics[0].name
-  role_arn                       = aws_iam_role.glue_db_count_metrics[0].arn
-  memory_size                    = 128
-  timeout                        = 60
+  role_name                      = aws_iam_role.glue_db_count_metrics.name
+  role_arn                       = aws_iam_role.glue_db_count_metrics.arn
+  handler                        = "glue_db_count_metrics.handler"
+  memory_size                    = 1024
+  timeout                        = 300
+  reserved_concurrent_executions = 1
   core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
   production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
   security_group_ids             = [aws_security_group.lambda_generic.id]
@@ -446,7 +448,8 @@ module "glue_db_count_metrics" {
 
   environment_variables = {
     METRIC_NAMESPACE = "EMDS/Glue"
-    METRIC_NAME      = "GlueDatabaseCount"
+    METRIC_NAME      = "DatabaseCount"
+    ENVIRONMENT      = local.environment_shorthand
   }
 }
 
