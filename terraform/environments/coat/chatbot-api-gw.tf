@@ -32,7 +32,7 @@ resource "aws_api_gateway_integration" "send_request_post_integration" {
   resource_id = aws_api_gateway_resource.send_request.id
   rest_api_id = aws_api_gateway_rest_api.chatbot_api.id
   type = "AWS_PROXY"
-  uri = aws_lambda_function.rag_lambda.lambda_invoke_arn
+  uri = aws_lambda_function.rag_lambda.invoke_arn
 }
 
 # OPTIONS method for CORS
@@ -138,7 +138,7 @@ resource "aws_lambda_permission" "chatbot_api_lambda_permission" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.rag_lambda.function_name
   principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_api_gateway_rest_api.chatbot_api.rest_api_execution_arn}/*/*"
+  source_arn    = "${aws_api_gateway_rest_api.chatbot_api.execution_arn}/*/*"
 }
 
 # API key and usage plan
