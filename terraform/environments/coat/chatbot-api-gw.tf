@@ -21,7 +21,7 @@ resource "aws_api_gateway_method" "send_request_post" {
   #checkov:skip=CKV_AWS_59: "Ensure there is no open access to back-end resources through API"
 
   authorization = "NONE"
-  http_method   = "ANY"
+  http_method   = "POST"
   resource_id   = aws_api_gateway_resource.send_request.id
   rest_api_id   = aws_api_gateway_rest_api.chatbot_api.id
   api_key_required = true
@@ -44,7 +44,7 @@ resource "aws_api_gateway_method" "send_request_options" {
   #checkov:skip=CKV_AWS_59: "Ensure there is no open access to back-end resources through API"
 
   authorization = "NONE"
-  http_method   = "ANY"
+  http_method   = "OPTIONS"
   resource_id   = aws_api_gateway_resource.send_request.id
   rest_api_id   = aws_api_gateway_rest_api.chatbot_api.id
 }
