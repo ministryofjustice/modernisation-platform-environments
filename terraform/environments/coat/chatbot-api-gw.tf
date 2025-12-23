@@ -76,10 +76,6 @@ resource "aws_api_gateway_method_response" "send_request_options_method_response
   response_models = {
     "application/json" = "Empty"
   }
-
-  depends_on = [
-    aws_api_gateway_integration.send_request_options_integration
-  ]
 }
 
 resource "aws_api_gateway_integration_response" "send_request_options_integration_response" {
@@ -97,6 +93,10 @@ resource "aws_api_gateway_integration_response" "send_request_options_integratio
   response_templates = {
     "application/json" = ""
   }
+
+  depends_on = [
+    aws_api_gateway_integration.send_request_options_integration
+  ]
 }
 
 resource "aws_api_gateway_deployment" "chatbot_api_deployment" {
