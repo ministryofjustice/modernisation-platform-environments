@@ -1233,56 +1233,36 @@ resource "aws_iam_role_policy_attachment" "clean_after_mdss_load_lambda_policy_a
 }
 
 #-----------------------------------------------------------------------------------
-# Glue DB count metrics Lambda IAM Role
+# Glue DB Count Metrics IAM Role
 #-----------------------------------------------------------------------------------
 
 resource "aws_iam_role" "glue_db_count_metrics" {
-  count              = local.is-development ? 0 : 1
-  name               = "glue_db_count_metrics_lambda_role"
+  name               = "glue_db_count_metrics"
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
 }
 
 data "aws_iam_policy_document" "glue_db_count_metrics_policy_document" {
-  count = local.is-development ? 0 : 1
-
   statement {
-    sid    = "AllowCloudWatchLogs"
-    effect = "Allow"
-    actions = [
-      "logs:CreateLogGroup",
-      "logs:CreateLogStream",
-      "logs:PutLogEvents",
-    ]
-    resources = ["*"]
-  }
-
-  statement {
-    sid    = "AllowGlueGetDatabases"
+    sid    = "GlueGetDatabases"
     effect = "Allow"
     actions = [
       "glue:GetDatabases",
+      "glue:GetDatabase",
     ]
-    resources = ["*"]
-  }
-
-  statement {
-    sid    = "AllowPutMetricData"
-    effect = "Allow"
-    actions = [
-      "cloudwatch:PutMetricData",
+    resources = [
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:catalog",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:database/*",
     ]
-    resources = ["*"]
   }
 }
 
 resource "aws_iam_policy" "glue_db_count_metrics" {
-  count  = local.is-development ? 0 : 1
-  name   = "glue_db_count_metrics_lambda_policy"
-  policy = data.aws_iam_policy_document.glue_db_count_metrics_policy_document[0].json
+  name        = "glue-db-count-metrics-policy"
+  description = "Policy for Lambda to count Glue databases and publish a CloudWatch metric via EMF"
+  policy      = data.aws_iam_policy_document.glue_db_count_metrics_policy_document.json
 }
 
-resource "aws_iam_role_policy_attachment" "glue_db_count_metrics" {
-  count      = local.is-development ? 0 : 1
-  role       = aws_iam_role.glue_db_count_metrics[0].name
-  policy_arn = aws_iam_policy.glue_db_count_metrics[0].arn
+resource "aws_iam_role_policy_attachment" "glue_db_count_metrics_policy_attachment" {
+  role       = aws_iam_role.glue_db_count_metrics.name
+  policy_arn = aws_iam_policy.glue_db_count_metrics.arn
 }
