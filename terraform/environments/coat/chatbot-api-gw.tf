@@ -123,7 +123,7 @@ resource "aws_api_gateway_deployment" "chatbot_api_deployment" {
 }
 
 resource "aws_api_gateway_stage" "chatbot_api_stage" {
-  deployment_id = aws_api_gateway_deployment.chatbot_api.id
+  deployment_id = aws_api_gateway_deployment.chatbot_api_deployment.id
   rest_api_id   = aws_api_gateway_rest_api.chatbot_api.id
   stage_name    = local.environment
 }
@@ -136,15 +136,15 @@ resource "aws_lambda_permission" "chatbot_api_lambda_permission" {
 
   statement_id  = "AllowExecutionFromAPIGateway"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.rag_lambda.name
+  function_name = aws_lambda_function.rag_lambda.function_name
   principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_api_gateway_rest_api.chatbot_api.execution_arn}/*/*"
+  source_arn    = "${aws_api_gateway_rest_api.chatbot_api.rest_api_execution_arn}/*/*"
 }
 
 # API key and usage plan
 
 resource "aws_api_gateway_api_key" "chatbot_api_key" {
-  id = "cj6abnufs3"
+  name = "chatbot-development-api-key"
 }
 
 resource "aws_api_gateway_usage_plan" "chatbot_api_usage_plan" {
