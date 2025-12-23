@@ -11,7 +11,7 @@ def lambda_handler(event, context):
     print("Request Payload:")
     print(event)
     
-    print("Executing Lambda Handler.")
+    print("Executing Lambda Handler..")
 
     request_body = parse_request_body(event)
     
