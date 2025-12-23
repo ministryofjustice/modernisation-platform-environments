@@ -15,26 +15,26 @@ resource "aws_api_gateway_resource" "send_request" {
   rest_api_id = aws_api_gateway_rest_api.chatbot_api.id
 }
 
-# resource "aws_api_gateway_method" "send_request_post" {
-#   #checkov:skip=CKV_AWS_70:Ensure API gateway method has authorization or API key set
-#   #checkov:skip=CKV2_AWS_53: “Ignoring AWS API gateway request validatation"
-#   #checkov:skip=CKV_AWS_59: "Ensure there is no open access to back-end resources through API"
+resource "aws_api_gateway_method" "send_request_post" {
+  #checkov:skip=CKV_AWS_70:Ensure API gateway method has authorization or API key set
+  #checkov:skip=CKV2_AWS_53: “Ignoring AWS API gateway request validatation"
+  #checkov:skip=CKV_AWS_59: "Ensure there is no open access to back-end resources through API"
 
-#   authorization = "NONE"
-#   http_method   = "ANY"
-#   resource_id   = aws_api_gateway_resource.send_request.id
-#   rest_api_id   = aws_api_gateway_rest_api.chatbot_api.id
-#   api_key_required = true
-# }
+  authorization = "NONE"
+  http_method   = "ANY"
+  resource_id   = aws_api_gateway_resource.send_request.id
+  rest_api_id   = aws_api_gateway_rest_api.chatbot_api.id
+  api_key_required = true
+}
 
-# resource "aws_api_gateway_integration" "send_request_post_integration" {
-#   http_method = aws_api_gateway_method.send_request_post.http_method
-#   resource_id = aws_api_gateway_resource.send_request.id
-#   rest_api_id = aws_api_gateway_rest_api.chatbot_api.id
-#   type = "AWS_PROXY"
-#   uri = aws_lambda_function.rag_lambda.invoke_arn
-#   integration_http_method  = "POST"
-# }
+resource "aws_api_gateway_integration" "send_request_post_integration" {
+  http_method = aws_api_gateway_method.send_request_post.http_method
+  resource_id = aws_api_gateway_resource.send_request.id
+  rest_api_id = aws_api_gateway_rest_api.chatbot_api.id
+  type = "AWS_PROXY"
+  uri = aws_lambda_function.rag_lambda.invoke_arn
+  integration_http_method  = "POST"
+}
 
 # OPTIONS method for CORS
 
@@ -95,41 +95,41 @@ resource "aws_api_gateway_integration_response" "send_request_options_integratio
   }
 }
 
-# resource "aws_api_gateway_deployment" "chatbot_api_deployment" {
-#   rest_api_id = aws_api_gateway_rest_api.chatbot_api.id
+resource "aws_api_gateway_deployment" "chatbot_api_deployment" {
+  rest_api_id = aws_api_gateway_rest_api.chatbot_api.id
 
-#   triggers = {
-#     redeployment = sha1(jsonencode([
-#         aws_api_gateway_resource.send_request.id,
-#         aws_api_gateway_method.send_request_post.id,
-#         aws_api_gateway_integration.send_request_post_integration.id,
-#         aws_api_gateway_method.send_request_options.id,
-#         aws_api_gateway_integration.send_request_options_integration.id,
-#         aws_api_gateway_method_response.send_request_options_method_response.id,
-#         aws_api_gateway_integration_response.send_request_options_integration_response.id
-#     ]))
-#   }
+  triggers = {
+    redeployment = sha1(jsonencode([
+        aws_api_gateway_resource.send_request.id,
+        aws_api_gateway_method.send_request_post.id,
+        aws_api_gateway_integration.send_request_post_integration.id,
+        aws_api_gateway_method.send_request_options.id,
+        aws_api_gateway_integration.send_request_options_integration.id,
+        aws_api_gateway_method_response.send_request_options_method_response.id,
+        aws_api_gateway_integration_response.send_request_options_integration_response.id
+    ]))
+  }
 
-#   lifecycle {
-#     create_before_destroy = true
-#   }
+  lifecycle {
+    create_before_destroy = true
+  }
 
-#   depends_on = [
-#     aws_api_gateway_rest_api.chatbot_api,
-#     aws_api_gateway_method.send_request_post,
-#     aws_api_gateway_integration.send_request_post_integration,
-#     aws_api_gateway_method.send_request_options,
-#     aws_api_gateway_integration.send_request_options_integration,
-#     aws_api_gateway_method_response.send_request_options_method_response,
-#     aws_api_gateway_integration_response.send_request_options_integration_response
-#   ]
-# }
+  depends_on = [
+    aws_api_gateway_rest_api.chatbot_api,
+    aws_api_gateway_method.send_request_post,
+    aws_api_gateway_integration.send_request_post_integration,
+    aws_api_gateway_method.send_request_options,
+    aws_api_gateway_integration.send_request_options_integration,
+    aws_api_gateway_method_response.send_request_options_method_response,
+    aws_api_gateway_integration_response.send_request_options_integration_response
+  ]
+}
 
-# resource "aws_api_gateway_stage" "chatbot_api_stage" {
-#   deployment_id = aws_api_gateway_deployment.chatbot_api_deployment.id
-#   rest_api_id   = aws_api_gateway_rest_api.chatbot_api.id
-#   stage_name    = local.environment
-# }
+resource "aws_api_gateway_stage" "chatbot_api_stage" {
+  deployment_id = aws_api_gateway_deployment.chatbot_api_deployment.id
+  rest_api_id   = aws_api_gateway_rest_api.chatbot_api.id
+  stage_name    = local.environment
+}
 
 # Permissions
 
@@ -150,26 +150,26 @@ resource "aws_api_gateway_api_key" "chatbot_api_key" {
   name = "chatbot-development-api-key"
 }
 
-# resource "aws_api_gateway_usage_plan" "chatbot_api_usage_plan" {
-#   name = "chatbot-${local.environment}-api-plan"
+resource "aws_api_gateway_usage_plan" "chatbot_api_usage_plan" {
+  name = "chatbot-${local.environment}-api-plan"
 
-#   api_stages {
-#     api_id = aws_api_gateway_rest_api.chatbot_api.id
-#     stage  = aws_api_gateway_stage.chatbot_api_stage.stage_name
-#   }
+  api_stages {
+    api_id = aws_api_gateway_rest_api.chatbot_api.id
+    stage  = aws_api_gateway_stage.chatbot_api_stage.stage_name
+  }
 
-#   quota_settings {
-#     limit  = 100
-#     period = "DAY"
-#   }
+  quota_settings {
+    limit  = 100
+    period = "DAY"
+  }
 
-#   throttle_settings {
-#     rate_limit = 5
-#   }
-# }
+  throttle_settings {
+    rate_limit = 5
+  }
+}
 
-# resource "aws_api_gateway_usage_plan_key" "chatbot_api_key_plan_association" {
-#   key_id        = aws_api_gateway_api_key.chatbot_api_key.id
-#   key_type      = "API_KEY"
-#   usage_plan_id = aws_api_gateway_usage_plan.chatbot_api_usage_plan.id
-# }
+resource "aws_api_gateway_usage_plan_key" "chatbot_api_key_plan_association" {
+  key_id        = aws_api_gateway_api_key.chatbot_api_key.id
+  key_type      = "API_KEY"
+  usage_plan_id = aws_api_gateway_usage_plan.chatbot_api_usage_plan.id
+}
