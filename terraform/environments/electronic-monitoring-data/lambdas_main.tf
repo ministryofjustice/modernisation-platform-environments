@@ -449,7 +449,7 @@ module "glue_db_count_metrics" {
 
   environment_variables = {
     METRIC_NAMESPACE = "EMDS/Glue"
-    METRIC_NAME      = "DatabaseCount"
+    METRIC_NAME      = "GlueDatabaseCount"
     ENVIRONMENT      = local.environment_shorthand
   }
 }
