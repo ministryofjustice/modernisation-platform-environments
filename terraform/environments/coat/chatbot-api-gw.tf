@@ -107,6 +107,9 @@ resource "aws_api_gateway_deployment" "chatbot_api_deployment" {
         aws_api_gateway_resource.send_request.id,
         aws_api_gateway_method.send_request_post.id,
         aws_api_gateway_integration.send_request_post_integration.id,
+        aws_api_gateway_method.send_request_options.id,
+        aws_api_gateway_method_response.send_request_options_method_response.id,
+        aws_api_gateway_integration_response.send_request_options_integration_response.id
     ]))
   }
 
