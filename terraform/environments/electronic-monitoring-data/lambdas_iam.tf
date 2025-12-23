@@ -1231,3 +1231,58 @@ resource "aws_iam_role_policy_attachment" "clean_after_mdss_load_lambda_policy_a
   role       = aws_iam_role.clean_after_mdss_load[0].name
   policy_arn = aws_iam_policy.clean_after_mdss_load_lambda_role_policy[0].arn
 }
+
+#-----------------------------------------------------------------------------------
+# Glue DB count metrics Lambda IAM Role
+#-----------------------------------------------------------------------------------
+
+resource "aws_iam_role" "glue_db_count_metrics" {
+  count              = local.is-development ? 0 : 1
+  name               = "glue_db_count_metrics_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+data "aws_iam_policy_document" "glue_db_count_metrics_policy_document" {
+  count = local.is-development ? 0 : 1
+
+  statement {
+    sid    = "AllowCloudWatchLogs"
+    effect = "Allow"
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "AllowGlueGetDatabases"
+    effect = "Allow"
+    actions = [
+      "glue:GetDatabases",
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "AllowPutMetricData"
+    effect = "Allow"
+    actions = [
+      "cloudwatch:PutMetricData",
+    ]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_policy" "glue_db_count_metrics" {
+  count  = local.is-development ? 0 : 1
+  name   = "glue_db_count_metrics_lambda_policy"
+  policy = data.aws_iam_policy_document.glue_db_count_metrics_policy_document[0].json
+}
+
+resource "aws_iam_role_policy_attachment" "glue_db_count_metrics" {
+  count      = local.is-development ? 0 : 1
+  role       = aws_iam_role.glue_db_count_metrics[0].name
+  policy_arn = aws_iam_policy.glue_db_count_metrics[0].arn
+}

@@ -48,3 +48,27 @@ resource "aws_cloudwatch_metric_alarm" "clean_mdss_dlq_alarm" {
     aws_sns_topic.emds_alerts.arn
   ]
 }
+
+resource "aws_cloudwatch_metric_alarm" "glue_database_count_high" {
+  count = local.is-development ? 0 : 1
+
+  alarm_name          = "glue_database_count_high"
+  alarm_description   = "Triggered when Glue database count is above 8000 (approaching 10k limit)"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  threshold           = 8000
+  treat_missing_data  = "notBreaching"
+
+  metric_name = "GlueDatabaseCount"
+  namespace   = "EMDS/Glue"
+  period      = 300
+  statistic   = "Maximum"
+
+  dimensions = {
+    Environment = local.environment_shorthand
+  }
+
+  alarm_actions = [
+    aws_sns_topic.emds_alerts.arn
+  ]
+}

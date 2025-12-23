@@ -425,3 +425,53 @@ module "load_historic_csv" {
     DB_SUFFIX           = local.db_suffix
   }
 }
+
+#-----------------------------------------------------------------------------------
+# Glue DB count metrics Lambda (publishes CloudWatch metric)
+#-----------------------------------------------------------------------------------
+
+module "glue_db_count_metrics" {
+  count                          = local.is-development ? 0 : 1
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "glue_db_count_metrics"
+  role_name                      = aws_iam_role.glue_db_count_metrics[0].name
+  role_arn                       = aws_iam_role.glue_db_count_metrics[0].arn
+  memory_size                    = 128
+  timeout                        = 60
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+  security_group_ids             = [aws_security_group.lambda_generic.id]
+  subnet_ids                     = data.aws_subnets.shared-public.ids
+
+  environment_variables = {
+    METRIC_NAMESPACE = "EMDS/Glue"
+    METRIC_NAME      = "GlueDatabaseCount"
+  }
+}
+
+#-----------------------------------------------------------------------------------
+# Schedule Glue DB count metrics Lambda
+#-----------------------------------------------------------------------------------
+
+resource "aws_cloudwatch_event_rule" "glue_db_count_metrics_schedule" {
+  count               = local.is-development ? 0 : 1
+  name                = "glue_db_count_metrics_schedule"
+  description         = "Runs glue_db_count_metrics on a schedule to publish Glue database count"
+  schedule_expression = "rate(5 minutes)"
+}
+
+resource "aws_cloudwatch_event_target" "glue_db_count_metrics_target" {
+  count = local.is-development ? 0 : 1
+  rule  = aws_cloudwatch_event_rule.glue_db_count_metrics_schedule[0].name
+  arn   = module.glue_db_count_metrics[0].lambda_function_arn
+}
+
+resource "aws_lambda_permission" "glue_db_count_metrics_allow_eventbridge" {
+  count         = local.is-development ? 0 : 1
+  statement_id  = "AllowExecutionFromEventBridgeGlueDbCount"
+  action        = "lambda:InvokeFunction"
+  function_name = module.glue_db_count_metrics[0].lambda_function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.glue_db_count_metrics_schedule[0].arn
+}
