@@ -1,8 +1,9 @@
 locals {
   lambda_path = "lambdas"
-  env_name    = local.is-production ? "prod" : "dev"
+  env_name    = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
   db_name     = local.is-production ? "g4s_cap_dw" : "test"
 }
+
 
 #-----------------------------------------------------------------------------------
 # S3 lambda function to perform zip file structure extraction into json for Athena
