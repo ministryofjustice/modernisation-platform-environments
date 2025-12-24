@@ -72,3 +72,26 @@ resource "aws_cloudwatch_metric_alarm" "glue_database_count_high" {
     aws_sns_topic.emds_alerts.arn
   ]
 }
+
+#maybe disable this for now
+resource "aws_cloudwatch_metric_alarm" "load_mdss_lambda_errors" {
+  count = local.is-development ? 0 : 1
+
+  alarm_name          = "load_mdss_lambda_errors"
+  alarm_description   = "Triggered when load_mdss lambda reports any errors"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  threshold           = 0
+  treat_missing_data  = "notBreaching"
+
+  metric_name = "Errors"
+  namespace   = "AWS/Lambda"
+  period      = 60
+  statistic   = "Sum"
+
+  dimensions = {
+    FunctionName = "load_mdss"
+  }
+
+  alarm_actions = [aws_sns_topic.emds_alerts.arn]
+}
