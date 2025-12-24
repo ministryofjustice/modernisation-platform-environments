@@ -27,14 +27,14 @@ resource "aws_api_gateway_method" "send_request_post" {
   api_key_required = true
 }
 
-resource "aws_api_gateway_integration" "send_request_post_integration" {
-  http_method = aws_api_gateway_method.send_request_post.http_method
-  resource_id = aws_api_gateway_resource.send_request.id
-  rest_api_id = aws_api_gateway_rest_api.chatbot_api.id
-  type = "AWS_PROXY"
-  uri = aws_lambda_function.rag_lambda.invoke_arn
-  integration_http_method  = "POST"
-}
+# resource "aws_api_gateway_integration" "send_request_post_integration" {
+#   http_method = aws_api_gateway_method.send_request_post.http_method
+#   resource_id = aws_api_gateway_resource.send_request.id
+#   rest_api_id = aws_api_gateway_rest_api.chatbot_api.id
+#   type = "AWS_PROXY"
+#   uri = aws_lambda_function.rag_lambda.invoke_arn
+#   integration_http_method  = "POST"
+# }
 
 # OPTIONS method for CORS
 
