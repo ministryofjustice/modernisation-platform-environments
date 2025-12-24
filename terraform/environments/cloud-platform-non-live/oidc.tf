@@ -7,8 +7,9 @@ module "github_actions_development_cluster_oidc_role" {
   github_repositories = ["ministryofjustice/cloud-platform-github-workflows"]
   role_name           = "github-actions-development-cluster"
   policy_jsons        = [data.aws_iam_policy_document.github_actions_development_cluster_oidc_policy.json]
-  subject_claim       = "workflow:development-cluster-deploy.yml"
-  tags                = merge({ "Name" = "GitHub Actions Development Cluster Role" }, local.tags)
+  subject_claim       = "*"
+  #   subject_claim       = "workflow:development-cluster-deploy.yml"
+  tags = merge({ "Name" = "GitHub Actions Development Cluster Role" }, local.tags)
 }
 
 data "aws_iam_policy_document" "github_actions_development_cluster_oidc_policy" {
@@ -106,7 +107,8 @@ data "aws_iam_policy_document" "github_actions_development_cluster_oidc_policy" 
       "ec2:RevokeSecurityGroupEgress",
       "ec2:CreateTags",
       "ec2:DeleteTags",
-      "ec2:Describe*"
+      "ec2:Describe*",
+      "ec2:ModifyVpcAttribute"
     ]
     resources = ["*"]
   }
@@ -167,8 +169,8 @@ data "aws_iam_policy_document" "github_actions_development_cluster_oidc_policy" 
       "s3:DeleteObject"
     ]
     resources = [
-    module.development-cluster-state-bucket[0].bucket.arn,
-    "${module.development-cluster-state-bucket[0].bucket.arn}/*"
+      module.development-cluster-state-bucket[0].bucket.arn,
+      "${module.development-cluster-state-bucket[0].bucket.arn}/*"
     ]
   }
 
@@ -182,5 +184,22 @@ data "aws_iam_policy_document" "github_actions_development_cluster_oidc_policy" 
       "kms:GenerateDataKey"
     ]
     resources = [aws_kms_key.development_cluster_s3_state_bucket[0].arn]
+  }
+  statement {
+    sid    = "AllowOIDCToAssumeRoles"
+    effect = "Allow"
+    resources = [
+      format("arn:aws:iam::%s:role/modify-dns-records", local.environment_management.account_ids["core-network-services-production"]),
+      format("arn:aws:iam::%s:role/modernisation-account-limited-read-member-access", local.environment_management.modernisation_platform_account_id),
+      format("arn:aws:iam::%s:role/ModernisationPlatformSSOReadOnly", local.environment_management.aws_organizations_root_account_id),
+      # the following are required as cooker have development accounts but are in the sandbox vpc
+      local.application_name == "cooker" ? format("arn:aws:iam::%s:role/member-delegation-house-sandbox", local.environment_management.account_ids["core-vpc-sandbox"]) : format("arn:aws:iam::%s:role/modernisation-account-limited-read-member-access", local.environment_management.modernisation_platform_account_id)
+    ]
+    condition {
+      test     = "StringEquals"
+      variable = "aws:PrincipalOrgID"
+      values   = [data.aws_organizations_organization.root_account.id]
+    }
+    actions = ["sts:AssumeRole"]
   }
 }
