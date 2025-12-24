@@ -479,3 +479,56 @@ resource "aws_lambda_permission" "glue_db_count_metrics_allow_eventbridge" {
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.glue_db_count_metrics_schedule[0].arn
 }
+
+#-----------------------------------------------------------------------------------
+# MDSS daily failure digest (08:00 Europe/London)
+#-----------------------------------------------------------------------------------
+
+module "mdss_daily_failure_digest" {
+  count                          = local.is-development ? 0 : 1
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "mdss_daily_failure_digest"
+  role_name                      = aws_iam_role.mdss_daily_failure_digest[0].name
+  role_arn                       = aws_iam_role.mdss_daily_failure_digest[0].arn
+  handler                        = "mdss_daily_failure_digest.handler"
+  memory_size                    = 512
+  timeout                        = 60
+  reserved_concurrent_executions = 1
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+  security_group_ids             = [aws_security_group.lambda_generic.id]
+  subnet_ids                     = data.aws_subnets.shared-public.ids
+
+  environment_variables = {
+    SNS_TOPIC_ARN = aws_sns_topic.emds_alerts.arn
+    ENVIRONMENT   = local.environment_shorthand
+    NAMESPACE     = "EMDS/MDSS"
+    # 24h lookback by default; can tune later
+    LOOKBACK_HOURS = "24"
+  }
+}
+
+resource "aws_cloudwatch_event_rule" "mdss_daily_failure_digest_schedule" {
+  count               = local.is-development ? 0 : 1
+  name                = "mdss_daily_failure_digest_schedule"
+  description         = "Runs mdss_daily_failure_digest daily at 08:00 Europe/London"
+  schedule_expression = "cron(0 8 * * ? *)"
+  schedule_expression_timezone = "Europe/London"
+}
+
+resource "aws_cloudwatch_event_target" "mdss_daily_failure_digest_target" {
+  count = local.is-development ? 0 : 1
+  rule  = aws_cloudwatch_event_rule.mdss_daily_failure_digest_schedule[0].name
+  arn   = module.mdss_daily_failure_digest[0].lambda_function_arn
+}
+
+resource "aws_lambda_permission" "mdss_daily_failure_digest_allow_eventbridge" {
+  count         = local.is-development ? 0 : 1
+  statement_id  = "AllowExecutionFromEventBridgeMdssDailyDigest"
+  action        = "lambda:InvokeFunction"
+  function_name = module.mdss_daily_failure_digest[0].lambda_function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.mdss_daily_failure_digest_schedule[0].arn
+}
+

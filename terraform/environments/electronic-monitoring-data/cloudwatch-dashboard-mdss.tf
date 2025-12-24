@@ -18,8 +18,8 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
           stat   = "Sum"
           period = 60
           metrics = [
-            ["AWS/SQS", "ApproximateNumberOfMessagesVisible", "QueueName", "load_mdss"],
-            [".", "ApproximateNumberOfMessagesNotVisible", ".", "load_mdss"]
+            ["AWS/SQS", "ApproximateNumberOfMessagesVisible", "QueueName", local.is-development ? "load_mdss" : data.aws_sqs_queue.load_mdss[0].name],
+            [".", "ApproximateNumberOfMessagesNotVisible", ".", local.is-development ? "load_mdss" : data.aws_sqs_queue.load_mdss[0].name]
           ]
         }
       },
@@ -35,7 +35,7 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
           stat   = "Sum"
           period = 60
           metrics = [
-            ["AWS/SQS", "ApproximateNumberOfMessagesVisible", "QueueName", "load_mdss-dlq"]
+            ["AWS/SQS", "ApproximateNumberOfMessagesVisible", "QueueName", local.is-development ? "load_mdss-dlq" : data.aws_sqs_queue.load_mdss_dlq[0].name]
           ]
         }
       },
@@ -87,12 +87,13 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
         width  = 24,
         height = 8,
         properties = {
-          title  = "Latest load_mdss errors (fast view)"
+          title  = "FATAL: load_mdss failures (pipeline aborts / terminal errors)"
           region = "eu-west-2"
           view   = "table"
           query  = <<-EOT
             SOURCE '/aws/lambda/load_mdss'
-            | filter @message like /\\[ERROR\\]|TYPE_MISMATCH|Exception|Traceback|Terminal exception/
+            | filter @message like /\\[ERROR\\]|Pipeline execution failed|LoadClientJobFailed|DatabaseTerminalException|Terminal exception|Traceback|Task timed out/
+            | filter @message not like /"level":"WARNING"|\\[WARNING\\]/
             | fields @timestamp, @message
             | sort @timestamp desc
             | limit 200
@@ -103,6 +104,26 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
         type   = "log",
         x      = 0,
         y      = 20,
+        width  = 24,
+        height = 6,
+        properties = {
+          title  = "WARNINGS: load_mdss (non-fatal signals)"
+          region = "eu-west-2"
+          view   = "table"
+          query  = <<-EOT
+            SOURCE '/aws/lambda/load_mdss'
+            | filter @message like /"level":"WARNING"|\\[WARNING\\]/
+            | fields @timestamp, @message
+            | sort @timestamp desc
+            | limit 200
+          EOT
+        }
+      },
+
+      {
+        type   = "log",
+        x      = 0,
+        y      = 26,
         width  = 12,
         height = 6,
         properties = {
@@ -111,8 +132,8 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
           view   = "table"
           query  = <<-EOT
             SOURCE '/aws/lambda/load_mdss'
-            | filter @message like /\\[ERROR\\]|Terminal exception|TYPE_MISMATCH|LoadClientJobFailed|DatabaseTerminalException/
-            | parse @message /(?<err>TYPE_MISMATCH|AccessDenied|EntityNotFoundException|OperationalError|DatabaseTerminalException|LoadClientJobFailed|ValidationError|TimeoutError)/
+            | filter @message like /\\[ERROR\\]|Pipeline execution failed|Terminal exception|TYPE_MISMATCH|LoadClientJobFailed|DatabaseTerminalException|Traceback|Task timed out/
+            | parse @message /(?<err>TYPE_MISMATCH|AccessDenied|EntityNotFoundException|OperationalError|DatabaseTerminalException|LoadClientJobFailed|ValidationError|TimeoutError|Task timed out)/
             | stats count() as n by err
             | sort n desc
           EOT
@@ -121,7 +142,7 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
       {
         type   = "log",
         x      = 12,
-        y      = 20,
+        y      = 26,
         width  = 12,
         height = 6,
         properties = {
@@ -132,20 +153,17 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
             SOURCE '/aws/lambda/load_mdss'
             | filter @message like /Terminal exception in job|Job for/
             | parse @message /job (?<job>[^\\s]+)/
-            | parse job /(?<table>[^\\.]+)\\./
-            | stats count() as failures by table
+            | parse job /(?<tbl>[^\\.]+)\\./
+            | stats count() as failures by tbl
             | sort failures desc
           EOT
         }
       },
 
-      # --------------------------
-      # Failing files widget (tries to extract S3 path + job/table)
-      # --------------------------
       {
         type   = "log",
         x      = 0,
-        y      = 26,
+        y      = 32,
         width  = 24,
         height = 6,
         properties = {
@@ -154,11 +172,11 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
           view   = "table"
           query  = <<-EOT
             SOURCE '/aws/lambda/load_mdss'
-            | filter @message like /Terminal exception|LoadClientJobFailed|TYPE_MISMATCH|\\[ERROR\\] Exception/
+            | filter @message like /Terminal exception|LoadClientJobFailed|TYPE_MISMATCH|\\[ERROR\\] Exception|Pipeline execution failed/
             | parse @message /job (?<job>[^\\s]+)/
-            | parse job /(?<table>[^\\.]+)\\./
+            | parse job /(?<tbl>[^\\.]+)\\./
             | parse @message /s3:\\/\\/(?<s3path>[^\\s'"]+)/
-            | fields @timestamp, table, job, s3path, @message
+            | fields @timestamp, tbl, job, s3path, @message
             | sort @timestamp desc
             | limit 200
           EOT

@@ -1,7 +1,13 @@
 data "aws_sqs_queue" "load_mdss_dlq" {
   count = local.is-development ? 0 : 1
-  name  = "load_mdss-dlq"
+  name  = "-load_mdss-dlq"
 }
+
+data "aws_sqs_queue" "load_mdss" {
+  count = local.is-development ? 0 : 1
+  name  = "-load_mdss"
+}
+
 
 resource "aws_cloudwatch_metric_alarm" "load_mdss_dlq_alarm" {
   count = local.is-development ? 0 : 1
@@ -73,25 +79,16 @@ resource "aws_cloudwatch_metric_alarm" "glue_database_count_high" {
   ]
 }
 
-#maybe disable this for now
-resource "aws_cloudwatch_metric_alarm" "load_mdss_lambda_errors" {
-  count = local.is-development ? 0 : 1
+resource "aws_cloudwatch_log_metric_filter" "mdss_fatal_failures" {
+  name           = "mdss-fatal-failures"
+  log_group_name = "/aws/lambda/load_mdss"
 
-  alarm_name          = "load_mdss_lambda_errors"
-  alarm_description   = "Triggered when load_mdss lambda reports any errors"
-  comparison_operator = "GreaterThanThreshold"
-  evaluation_periods  = 1
-  threshold           = 0
-  treat_missing_data  = "notBreaching"
+  # Matches typical fatal patterns (exclude warnings)
+  pattern = "{ ($.level = \"ERROR\") || ($.message = \"*Pipeline execution failed*\") || ($.message = \"*LoadClientJobFailed*\") || ($.message = \"*DatabaseTerminalException*\") || ($.message = \"*Terminal exception*\") }"
 
-  metric_name = "Errors"
-  namespace   = "AWS/Lambda"
-  period      = 60
-  statistic   = "Sum"
-
-  dimensions = {
-    FunctionName = "load_mdss"
+  metric_transformation {
+    name      = "FatalFailures"
+    namespace = "EMDS/MDSS"
+    value     = "1"
   }
-
-  alarm_actions = [aws_sns_topic.emds_alerts.arn]
 }
