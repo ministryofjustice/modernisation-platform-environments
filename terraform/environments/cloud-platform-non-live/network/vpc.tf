@@ -3,18 +3,18 @@ module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
 
   name = local.cp_vpc_name
-  cidr = lookup(local.cp_vpc_cidr, terraform.workspace)
+  cidr = lookup(local.cp_vpc_cidr, local.cluster_environment)
   azs  = slice(data.aws_availability_zones.available.names, 0, 3)
   private_subnets = [
-    cidrsubnet(lookup(local.cp_vpc_cidr, terraform.workspace), 3, 1),
-    cidrsubnet(lookup(local.cp_vpc_cidr, terraform.workspace), 3, 2),
-    cidrsubnet(lookup(local.cp_vpc_cidr, terraform.workspace), 3, 3)
+    cidrsubnet(lookup(local.cp_vpc_cidr, local.cluster_environment), 3, 1),
+    cidrsubnet(lookup(local.cp_vpc_cidr, local.cluster_environment), 3, 2),
+    cidrsubnet(lookup(local.cp_vpc_cidr, local.cluster_environment), 3, 3)
   ]
 
   public_subnets = [
-    cidrsubnet(lookup(local.cp_vpc_cidr, terraform.workspace), 6, 0),
-    cidrsubnet(lookup(local.cp_vpc_cidr, terraform.workspace), 6, 1),
-    cidrsubnet(lookup(local.cp_vpc_cidr, terraform.workspace), 6, 2)
+    cidrsubnet(lookup(local.cp_vpc_cidr, local.cluster_environment), 6, 0),
+    cidrsubnet(lookup(local.cp_vpc_cidr, local.cluster_environment), 6, 1),
+    cidrsubnet(lookup(local.cp_vpc_cidr, local.cluster_environment), 6, 2)
   ]
 
   manage_default_network_acl    = false
