@@ -39,7 +39,8 @@ for folder in "${FOLDERS[@]}"; do
         if [ "$folder" = "network" ] && [ -f "${TMP_DIR}/network/platform_backend.tf" ]; then
             echo "Updating network/platform_backend.tf with cluster-specific values..."
             sed -i.bak "s/bucket *= *\".*\"/bucket               = \"development-clusters-terraform-state20251223114024319400000001\"/" "${TMP_DIR}/network/platform_backend.tf"
-            sed -i.bak "s|workspace_key_prefix = .*|workspace_key_prefix = \"${CLUSTER_NAME}\"|" "${TMP_DIR}/network/platform_backend.tf"
+            sed -i.bak "s|key *= *\".*\"|key                  = \"${CLUSTER_NAME}/terraform.tfstate\"|" "${TMP_DIR}/network/platform_backend.tf"
+            sed -i.bak "/workspace_key_prefix/d" "${TMP_DIR}/network/platform_backend.tf"
             rm -f "${TMP_DIR}/network/platform_backend.tf.bak"
         fi
     else
