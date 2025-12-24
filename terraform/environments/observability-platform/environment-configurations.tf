@@ -480,7 +480,7 @@ locals {
               athena_config = {
                 primary = {
                   database  = "cur_v2_database"
-                  workgroup = "coat_cur_report"
+                  workgroup = "coat_grafana_athena_wg"
                 }
               }
             }
