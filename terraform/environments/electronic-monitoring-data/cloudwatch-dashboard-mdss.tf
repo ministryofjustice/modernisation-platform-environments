@@ -18,8 +18,8 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
           stat   = "Sum"
           period = 60
           metrics = [
-            ["AWS/SQS", "ApproximateNumberOfMessagesVisible", "QueueName", local.is-development ? "load_mdss" : data.aws_sqs_queue.load_mdss[0].name],
-            [".", "ApproximateNumberOfMessagesNotVisible", ".", local.is-development ? "load_mdss" : data.aws_sqs_queue.load_mdss[0].name]
+            ["AWS/SQS", "ApproximateNumberOfMessagesVisible", "QueueName", "load_mdss"],
+            [".", "ApproximateNumberOfMessagesNotVisible", ".", "load_mdss"]
           ]
         }
       },
@@ -35,7 +35,7 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
           stat   = "Sum"
           period = 60
           metrics = [
-            ["AWS/SQS", "ApproximateNumberOfMessagesVisible", "QueueName", local.is-development ? "load_mdss-dlq" : data.aws_sqs_queue.load_mdss_dlq[0].name]
+            ["AWS/SQS", "ApproximateNumberOfMessagesVisible", "QueueName", "load_mdss-dlq"]
           ]
         }
       },
@@ -80,6 +80,8 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
       # --------------------------
       # Logs Insights widgets
       # --------------------------
+
+      # Fatal failures only
       {
         type   = "log",
         x      = 0,
@@ -100,6 +102,8 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
           EOT
         }
       },
+
+      # Warnings only
       {
         type   = "log",
         x      = 0,
@@ -112,7 +116,7 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
           view   = "table"
           query  = <<-EOT
             SOURCE '/aws/lambda/load_mdss'
-            | filter @message like /"level":"WARNING"|\\[WARNING\\]/
+            | filter @message like /"level":"WARNING"|\\[WARNING\\]|Seen non json serializable/
             | fields @timestamp, @message
             | sort @timestamp desc
             | limit 200
