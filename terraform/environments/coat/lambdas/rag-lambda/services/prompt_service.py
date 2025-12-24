@@ -59,6 +59,7 @@ generate a SQL statement, which will be run against the Athena table, to answer 
         self.add_rule(rules, "- Fuzzy match separators in string values.")
         self.add_rule(rules, "- Cloud Platform is the name of a team in the organisation.")
         self.add_rule(rules, "- You are not allowed to create, modify, or drop tables.")
+        self.add_rule(rules, "- Report cost in dollars ($), rounded to 2 decimal places.")
 
         self.prompt += self.create_new_prompt_section(section_title, "\n".join(rules))
 
