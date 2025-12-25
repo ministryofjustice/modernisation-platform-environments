@@ -3,7 +3,7 @@ module "airflow_requirements_object" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws//modules/object"
-  version = "5.2.0"
+  version = "5.8.2"
 
   bucket        = module.mwaa_bucket.s3_bucket_id
   key           = "requirements.txt"
@@ -19,7 +19,7 @@ module "airflow_kube_config_object" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws//modules/object"
-  version = "5.2.0"
+  version = "5.8.2"
 
   bucket = module.mwaa_bucket.s3_bucket_id
   key    = "dags/.kube/config"
@@ -38,7 +38,7 @@ module "airflow_plugins_object" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws//modules/object"
-  version = "5.2.0"
+  version = "5.8.2"
 
   bucket        = module.mwaa_bucket.s3_bucket_id
   key           = "plugins.zip"
