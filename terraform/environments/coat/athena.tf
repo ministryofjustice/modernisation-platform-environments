@@ -2,8 +2,8 @@ resource "aws_athena_workgroup" "coat_cur_report" {
   name = "coat_cur_report"
 
   configuration {
-    output_location = "s3://coat-${local.environment}-cur-v2-hourly/athena-results/"
     result_configuration {
+      output_location = "s3://coat-${local.environment}-cur-v2-hourly/athena-results/"
       encryption_configuration {
         encryption_option = "SSE_S3"
       }
