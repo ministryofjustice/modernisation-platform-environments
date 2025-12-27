@@ -15,6 +15,24 @@ resource "aws_athena_workgroup" "coat_cur_report" {
 
   configuration {
     result_configuration {
+      output_location = "s3://coat-${local.environment}-cur-v2-hourly/athena-results/"
+      encryption_configuration {
+        encryption_option = "SSE_S3"
+      }
+    }
+
+    enforce_workgroup_configuration    = true
+    publish_cloudwatch_metrics_enabled = true
+  }
+
+  tags = local.tags
+}
+
+resource "aws_athena_workgroup" "ctas_athena_workgroup" {
+  name = "coat_cur_report"
+
+  configuration {
+    result_configuration {
       encryption_configuration {
         encryption_option = "SSE_S3"
       }
@@ -151,7 +169,7 @@ export AWS_SECRET_ACCESS_KEY=$(echo $CREDS | jq -r '.Credentials.SecretAccessKey
 export AWS_SESSION_TOKEN=$(echo $CREDS | jq -r '.Credentials.SessionToken')
 aws athena start-query-execution \
   --query-string "$(aws athena get-named-query --named-query-id ${aws_athena_named_query.fct_daily_cost.id} --query 'NamedQuery.QueryString' --output text)" \
-  --work-group ${aws_athena_workgroup.coat_cur_report.name} \
+  --work-group ${aws_athena_workgroup.ctas_athena_workgroup.name} \
   --result-configuration OutputLocation=s3://coat-${local.environment}-cur-v2-hourly/ctas/fct-daily-cost/ \
   --query-execution-context Database=${aws_glue_catalog_database.cur_v2_database.name} \
   --region ${data.aws_region.current.name}
