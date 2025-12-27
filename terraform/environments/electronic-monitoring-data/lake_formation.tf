@@ -16,7 +16,6 @@ data "aws_iam_roles" "mod_plat_roles" {
   path_prefix = "/aws-reserved/sso.amazonaws.com/"
 }
 
-
 resource "aws_lakeformation_data_lake_settings" "settings" {
   admins = flatten(
     [
@@ -24,12 +23,29 @@ resource "aws_lakeformation_data_lake_settings" "settings" {
       data.aws_iam_role.github_actions_role.arn,
       data.aws_iam_session_context.current.issuer_arn,
       [for share in local.analytical_platform_share : aws_iam_role.analytical_platform_share_role[share.target_account_name].arn],
-      local.is-development ? [] : [aws_iam_role.clean_after_mdss_load[0].arn]
+      local.is-development ? [] : [
+        aws_iam_role.clean_after_mdss_load[0].arn
+      ]
     ]
   )
+
   parameters = {
     "CROSS_ACCOUNT_VERSION" = "4"
   }
+}
+
+# ------------------------------------------------------------------------
+# Lake Formation for glue_db_count_metrics
+# The Lambda only needs to read catalog metadata to count databases.
+# --------------------------------------------------------------------------
+
+resource "aws_lakeformation_permissions" "glue_db_count_metrics_catalog_describe" {
+  count = local.is-development ? 0 : 1
+
+  principal   = aws_iam_role.glue_db_count_metrics.arn
+  permissions = ["DESCRIBE"]
+
+  catalog_resource = true
 }
 
 resource "aws_lakeformation_lf_tag" "domain_tag" {
@@ -50,7 +66,6 @@ resource "aws_lakeformation_permissions" "domain_grant" {
     key    = aws_lakeformation_lf_tag.domain_tag.key
     values = aws_lakeformation_lf_tag.domain_tag.values
   }
-
 }
 
 resource "aws_lakeformation_permissions" "sensitive_grant" {
@@ -61,9 +76,7 @@ resource "aws_lakeformation_permissions" "sensitive_grant" {
     key    = aws_lakeformation_lf_tag.sensitive_tag.key
     values = aws_lakeformation_lf_tag.sensitive_tag.values
   }
-
 }
-
 
 # ------------------------------------------------------------------------
 # Lake Formation - admin permissions
