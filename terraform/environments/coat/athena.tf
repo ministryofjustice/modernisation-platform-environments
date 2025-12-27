@@ -29,7 +29,7 @@ resource "aws_athena_workgroup" "coat_cur_report" {
 }
 
 resource "aws_athena_workgroup" "ctas_athena_workgroup" {
-  name = "coat_cur_report"
+  name = "ctas_athena_workgroup"
 
   configuration {
     result_configuration {
