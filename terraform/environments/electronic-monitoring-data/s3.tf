@@ -401,46 +401,7 @@ module "s3-dms-premigrate-assess-bucket" {
     aws.bucket-replication = aws
   }
 
-  lifecycle_rule = [
-    {
-      id      = "main"
-      enabled = "Enabled"
-      prefix  = ""
-
-      tags = {
-        rule      = "log"
-        autoclean = "true"
-      }
-
-      transition = [
-        {
-          days          = 60
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = 90
-          storage_class = "GLACIER"
-        }
-      ]
-
-      expiration = {
-        days = 120
-      }
-
-      noncurrent_version_transition = [
-        {
-          days          = 30
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = 90
-          storage_class = "GLACIER"
-        }
-      ]
-
-      noncurrent_version_expiration = {
-        days = 365
-      }
-    }
-  ]
+  lifecycle_rule = []
 
   tags = local.tags
 }
@@ -471,46 +432,8 @@ module "s3-json-directory-structure-bucket" {
     aws.bucket-replication = aws
   }
 
-  lifecycle_rule = [
-    {
-      id      = "main"
-      enabled = "Enabled"
-      prefix  = ""
+  lifecycle_rule = []
 
-      tags = {
-        rule      = "log"
-        autoclean = "true"
-      }
-
-      transition = [
-        {
-          days          = 365
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = 730
-          storage_class = "GLACIER"
-        }
-      ]
-
-      expiration = {
-        days = 2190
-      }
-
-      noncurrent_version_transition = [
-        {
-          days          = 365
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = 730
-          storage_class = "GLACIER"
-        }
-      ]
-
-      noncurrent_version_expiration = {
-        days = 2190
-      }
-    }
-  ]
 
   tags = local.tags
 }
@@ -947,46 +870,8 @@ module "s3-dms-data-validation-bucket" {
     aws.bucket-replication = aws
   }
 
-  lifecycle_rule = [
-    {
-      id      = "main"
-      enabled = "Enabled"
-      prefix  = ""
+  lifecycle_rule = []
 
-      tags = {
-        rule      = "log"
-        autoclean = "true"
-      }
-
-      transition = [
-        {
-          days          = 60
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = 90
-          storage_class = "GLACIER"
-        }
-      ]
-
-      expiration = {
-        days = 120
-      }
-
-      noncurrent_version_transition = [
-        {
-          days          = 30
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = 90
-          storage_class = "GLACIER"
-        }
-      ]
-
-      noncurrent_version_expiration = {
-        days = 365
-      }
-    }
-  ]
 
   tags = local.tags
 }
@@ -1017,46 +902,7 @@ module "s3-glue-job-script-bucket" {
     aws.bucket-replication = aws
   }
 
-  lifecycle_rule = [
-    {
-      id      = "main"
-      enabled = "Enabled"
-      prefix  = ""
-
-      tags = {
-        rule      = "log"
-        autoclean = "true"
-      }
-
-      transition = [
-        {
-          days          = 60
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = 90
-          storage_class = "GLACIER"
-        }
-      ]
-
-      expiration = {
-        days = 120
-      }
-
-      noncurrent_version_transition = [
-        {
-          days          = 30
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = 90
-          storage_class = "GLACIER"
-        }
-      ]
-
-      noncurrent_version_expiration = {
-        days = 365
-      }
-    }
-  ]
+  lifecycle_rule = []
 
   tags = local.tags
 }
@@ -1295,46 +1141,7 @@ module "s3-lambda-store-bucket" {
     aws.bucket-replication = aws
   }
 
-  lifecycle_rule = [
-    {
-      id      = "main"
-      enabled = "Enabled"
-      prefix  = ""
-
-      tags = {
-        rule      = "log"
-        autoclean = "true"
-      }
-
-      transition = [
-        {
-          days          = 60
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = 90
-          storage_class = "GLACIER"
-        }
-      ]
-
-      expiration = {
-        days = 120
-      }
-
-      noncurrent_version_transition = [
-        {
-          days          = 30
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = 90
-          storage_class = "GLACIER"
-        }
-      ]
-
-      noncurrent_version_expiration = {
-        days = 365
-      }
-    }
-  ]
+  lifecycle_rule = []
 
   tags = local.tags
 }

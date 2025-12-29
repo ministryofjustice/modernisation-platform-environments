@@ -41,26 +41,7 @@ module "landing-bucket" {
     aws.bucket-replication = aws
   }
   versioning_enabled = false
-  lifecycle_rule = [
-    {
-      id      = "main"
-      enabled = "Enabled"
-      prefix  = ""
-
-      tags = {
-        rule      = "log"
-        autoclean = "true"
-      }
-
-      expiration = {
-        days = 14
-      }
-
-      noncurrent_version_expiration = {
-        days = 21
-      }
-    }
-  ]
+  lifecycle_rule = []
 
   tags = merge(var.local_tags, { resource-type = "landing-bucket" })
 
