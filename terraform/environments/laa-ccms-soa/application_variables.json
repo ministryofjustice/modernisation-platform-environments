@@ -219,7 +219,7 @@
       "alerting_slack_channel_id": "C0945N08MPX",
       "alerting_log_retention_days": "0",
       "admin_xxsoa_ds_username": "XXSOA",
-      "admin_ebs_ds_url": "jdbc:oracle:thin:@tcps://ccms-ebs-db-nlb.ccms-ebs.service.justice.gov.uk:443/EBSPROD",
+      "admin_ebs_ds_url": "jdbc:oracle:thin:@ccms-ebs-db.laa-production.modernisation-platform.service.justice.gov.uk:1521:EBSPROD",
       "admin_ebs_ds_username": "apps",
       "admin_ebssms_ds_url": "jdbc:oracle:thin:@tcps://cwa-prod-db.aws.prd.legalservices.gov.uk:2484/CWA",
       "admin_hostname": "ccms-soa-admin",
