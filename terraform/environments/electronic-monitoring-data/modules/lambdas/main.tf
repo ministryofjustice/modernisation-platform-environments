@@ -182,4 +182,11 @@ resource "aws_lambda_function" "this" {
   }
   reserved_concurrent_executions = var.reserved_concurrent_executions
 
+  lifecycle {
+    ignore_changes = [
+      image_uri,
+      last_modified,
+    ]
+  }
+
 }
