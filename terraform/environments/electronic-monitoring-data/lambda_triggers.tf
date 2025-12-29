@@ -235,7 +235,7 @@ resource "aws_sqs_queue" "clean_mdss_load_dlq" {
   sqs_managed_sse_enabled = true
 }
 
-resource "aws_sqs_queue" "clean_mdss_load_queue" {
+resource "aws_sqs_queue" "clean_dlt_load_queue" {
   name                       = "clean-mdss-load-queue"
   visibility_timeout_seconds = 15 * 60
   message_retention_seconds  = 1209600 # 14 days
@@ -252,7 +252,7 @@ resource "aws_sqs_queue" "clean_mdss_load_queue" {
 
 resource "aws_lambda_event_source_mapping" "mdss_cleanup_sqs_trigger" {
   count            = local.is-development ? 0 : 1
-  event_source_arn = aws_sqs_queue.clean_mdss_load_queue.arn
+  event_source_arn = aws_sqs_queue.clean_dlt_load_queue.arn
   function_name    = module.clean_after_dlt_load[0].lambda_function_name
 
   batch_size = 10

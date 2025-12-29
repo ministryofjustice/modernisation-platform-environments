@@ -836,9 +836,8 @@ data "aws_iam_policy_document" "load_mdss_lambda_role_policy_document" {
     actions   = ["s3:ListAllMyBuckets", "s3:GetBucketLocation"]
     resources = ["*"]
   }
-  # MDSS cleanup queue
   statement {
-    sid    = "AllowMdssCleanupQueueAccess"
+    sid    = "AllowCleanupQueueAccess"
     effect = "Allow"
     actions = [
       "sqs:SendMessage",
@@ -847,7 +846,7 @@ data "aws_iam_policy_document" "load_mdss_lambda_role_policy_document" {
       "sqs:GetQueueAttributes",
       "sqs:GetQueueUrl",
     ]
-    resources = [aws_sqs_queue.clean_mdss_load_queue.arn]
+    resources = [aws_sqs_queue.clean_dlt_load_queue.arn]
   }
 }
 
@@ -984,6 +983,18 @@ data "aws_iam_policy_document" "load_fms_lambda_role_policy_document" {
     effect    = "Allow"
     actions   = ["s3:ListAllMyBuckets", "s3:GetBucketLocation"]
     resources = ["*"]
+  }
+  statement {
+    sid    = "AllowCleanupQueueAccess"
+    effect = "Allow"
+    actions = [
+      "sqs:SendMessage",
+      "sqs:ReceiveMessage",
+      "sqs:DeleteMessage",
+      "sqs:GetQueueAttributes",
+      "sqs:GetQueueUrl",
+    ]
+    resources = [aws_sqs_queue.clean_dlt_load_queue.arn]
   }
 }
 
