@@ -17,8 +17,6 @@ locals {
     "serco_fms",
     "serco_fms_curated",
     "serco_fms_deduped",
-    "serco_servicenow_curated",
-    "serco_servicenow_deduped",
     "staged_fms",
     "staged_mdss",
     "staging_fms",
@@ -28,7 +26,6 @@ locals {
   live_feeds_dbs = [
     "allied_mdss",
     "serco_fms",
-    "serco_servicenow",
   ]
   historic_source_dbs = local.is-production ? [
     "buddi_buddi",
