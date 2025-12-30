@@ -362,6 +362,7 @@ module "load_mdss_lambda" {
   production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
   security_group_ids             = [aws_security_group.lambda_generic.id]
   subnet_ids                     = data.aws_subnets.shared-public.ids
+  cloudwatch_retention_days      = 7
   environment_variables = {
     ATHENA_QUERY_BUCKET    = module.s3-athena-bucket.bucket.id
     ACCOUNT_NUMBER         = data.aws_caller_identity.current.account_id
@@ -391,6 +392,7 @@ module "load_fms_lambda" {
   production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
   security_group_ids             = [aws_security_group.lambda_generic.id]
   subnet_ids                     = data.aws_subnets.shared-public.ids
+  cloudwatch_retention_days      = 7
   environment_variables = {
     ATHENA_QUERY_BUCKET = module.s3-athena-bucket.bucket.id
     ACCOUNT_NUMBER      = data.aws_caller_identity.current.account_id
