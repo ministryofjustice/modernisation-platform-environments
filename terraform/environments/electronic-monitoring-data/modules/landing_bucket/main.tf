@@ -30,33 +30,7 @@ module "this-bucket" {
     aws.bucket-replication = aws
   }
 
-  lifecycle_rule = [
-    {
-      id      = "main"
-      enabled = "Enabled"
-      prefix  = ""
-
-      tags = {
-        rule      = "log"
-        autoclean = "true"
-      }
-
-      expiration = {
-        days = 30
-      }
-
-      noncurrent_version_transition = [
-        {
-          days          = 30
-          storage_class = "GLACIER"
-        }
-      ]
-
-      noncurrent_version_expiration = {
-        days = 90
-      }
-    }
-  ]
+  lifecycle_rule = []
 
   # Optionally add cross account access to bucket policy.
   bucket_policy_v2 = var.cross_account_access_role != null ? [
