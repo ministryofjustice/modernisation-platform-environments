@@ -2,7 +2,7 @@ module "log_bucket" {
   # checkov:skip=CKV_TF_1
 
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "4.1.2"
+  version = "5.8.2"
 
   bucket = "${var.project_name}-${var.environment}-${local.alb_access_logs_bucket_name_suffix}"
   acl    = "log-delivery-write"
