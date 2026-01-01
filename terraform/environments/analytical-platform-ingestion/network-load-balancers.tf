@@ -2,7 +2,7 @@ module "datasync_activation_nlb" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/alb/aws"
-  version = "9.17.0"
+  version = "10.2.0"
 
   name = "datasync-activation"
 
