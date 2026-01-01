@@ -7,7 +7,7 @@ data "aws_availability_zones" "available" {}
 module "ecs_cluster" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/ecs/aws//modules/cluster"
-  version = "5.11.2"
+  version = "6.9.0"
 
   cluster_name = var.cluster_name
 
