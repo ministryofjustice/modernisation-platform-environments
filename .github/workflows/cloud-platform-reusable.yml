@@ -1,0 +1,64 @@
+---
+name: cloud-platform-reusable
+on:
+  workflow_call:
+    inputs:
+      application:
+        type: string
+        required: true
+        description: "Name of the application, e.g. nomis"
+      environment:
+        type: string
+        required: true
+        description: "Name of the environment, e.g. development"
+      action:
+        type: string
+        required: false
+        description: "Set to plan or plan_apply"
+        default: plan
+    secrets:
+      MODERNISATION_PLATFORM_ACCOUNT_ID:
+        required: true
+      PASSPHRASE:
+        required: true
+
+permissions:
+  id-token: write  # This is required for requesting the JWT
+  contents: read  # This is required for actions/checkout
+
+jobs:
+
+  root-terraform:
+    uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
+    with:
+      application: ${{ inputs.application }}
+      environment: ${{ inputs.environment }}
+      action: ${{ inputs.action }}
+      component: "root"     # If your strategy workflow also outputs "matrix.component"
+    secrets:
+      MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
+      PASSPHRASE: ${{ secrets.PASSPHRASE }}
+
+  network-terraform:
+    needs: root-terraform
+    uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
+    with:
+      application: ${{ inputs.application }}
+      environment: ${{ inputs.environment }}
+      action: ${{ inputs.action }}
+      component: "network"     # If your strategy workflow also outputs "matrix.component"
+    secrets:
+      MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
+      PASSPHRASE: ${{ secrets.PASSPHRASE }}
+
+  cluster-terraform:
+    needs: network-terraform
+    uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
+    with:
+      application: ${{ inputs.application }}
+      environment: ${{ inputs.environment }}
+      action: ${{ inputs.action }}
+      component: "cluster"     # If your strategy workflow also outputs "matrix.component"
+    secrets:
+      MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
+      PASSPHRASE: ${{ secrets.PASSPHRASE }}
