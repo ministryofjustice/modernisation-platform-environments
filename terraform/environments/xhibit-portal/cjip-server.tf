@@ -35,7 +35,7 @@ resource "aws_instance" "cjip-server" {
       # Prevent changes to encryption from destroying existing EC2s - can delete once encryption complete
     ]
     # Temporary enable
-    prevent_destroy = false
+    prevent_destroy = true
   }
 
   tags = merge(
