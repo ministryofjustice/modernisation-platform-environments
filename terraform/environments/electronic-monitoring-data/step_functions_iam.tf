@@ -45,18 +45,18 @@ resource "aws_iam_policy" "dms_validation_step_function_policy" {
 # Data Cut Back
 # ------------------------------------------
 
-data "aws_iam_policy_document" "historic_data_cutback_policy_document" {
+data "aws_iam_policy_document" "data_cutback_policy_document" {
   count = local.is-development || local.is-production ? 1 : 0
   statement {
     effect  = "Allow"
     actions = ["lambda:InvokeFunction"]
-    resources = module.historic_data_cutback[0].lambda_function_arn
+    resources = module.data_cutback[0].lambda_function_arn
   }
 }
 
-resource "aws_iam_policy" "historic_data_cutback_step_function_policy" {
+resource "aws_iam_policy" "data_cutback_step_function_policy" {
   count = local.is-development || local.is-production ? 1 : 0
 
   name   = "dms_validation_step_function_role"
-  policy = data.aws_iam_policy_document.historic_data_cutback_policy_document[0].json
+  policy = data.aws_iam_policy_document.data_cutback_policy_document[0].json
 }
