@@ -6,6 +6,7 @@ resource "aws_security_group" "bws" {
 
 resource "aws_security_group_rule" "bws_ingress" {
   for_each = {
+    all-from-alb = { source_security_group_id = aws_security_group.mis_alb.id }
   }
 
   description              = each.key
