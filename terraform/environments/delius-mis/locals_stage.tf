@@ -202,6 +202,12 @@ locals {
         { backup = true }
       )
     }
+    lb_target_config = {
+      endpoint             = "ndl-dis"
+      port                 = 8080
+      health_check_path    = "/BOE/CMC/"
+      health_check_matcher = "200,302,301"
+    }
   }
 
   # new DFI instance config to differentiate from DIS
@@ -451,5 +457,7 @@ locals {
 
   dfi_report_bucket_config_stage = null
 
-  lb_config_stage = null
+  lb_config_stage = {
+    bucket_policy_enabled = true
+  }
 }
