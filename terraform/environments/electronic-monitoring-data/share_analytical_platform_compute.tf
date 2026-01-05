@@ -49,7 +49,6 @@ locals {
     "am_stg",
     "buddi_stg",
     "buddi_buddi",
-    "buddi_buddi_prod",
     "cap_dw_stg",
     "curated_emsys_mvp",
     "curated_emsys_tpims",
