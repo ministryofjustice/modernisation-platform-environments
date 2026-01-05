@@ -3,8 +3,8 @@ locals {
   environment_configurations = {
     development = {
       litellm_versions = {
-        application = "main-v1.80.8-stable"
-        chart       = "0.1.831"
+        application = "main-v1.80.8-stable.1"
+        chart       = "0.1.832"
       }
       litellm_organization_ids = {
         /* These are not currently managed in code */
@@ -204,6 +204,15 @@ locals {
             }
           }
         }
+        coat = {
+          organisation = "ministryofjustice"
+          models       = ["bedrock-claude-sonnet-4-5"]
+          keys = {
+            chatbot-poc = {
+              models = ["bedrock-claude-sonnet-4-5"]
+            }
+          }
+        }
         data-platform = {
           organisation = "ministryofjustice"
           models = [
@@ -264,6 +273,22 @@ locals {
           keys = {
             ims = {
               models = ["bedrock-claude-sonnet-4"]
+            }
+          }
+        }
+        hmpps-digital = {
+          organisation = "ministryofjustice"
+          models = [
+            "all-proxy-models"
+          ]
+          keys = {
+            /* For Richard Adams */
+            prisoner-app = {
+              models = [
+                "azure-gpt-5",
+                "bedrock-claude-haiku-4-5",
+                "bedrock-claude-sonnet-4-5"
+              ]
             }
           }
         }
