@@ -836,9 +836,8 @@ data "aws_iam_policy_document" "load_mdss_lambda_role_policy_document" {
     actions   = ["s3:ListAllMyBuckets", "s3:GetBucketLocation"]
     resources = ["*"]
   }
-  # MDSS cleanup queue
   statement {
-    sid    = "AllowMdssCleanupQueueAccess"
+    sid    = "AllowCleanupQueueAccess"
     effect = "Allow"
     actions = [
       "sqs:SendMessage",
@@ -847,7 +846,7 @@ data "aws_iam_policy_document" "load_mdss_lambda_role_policy_document" {
       "sqs:GetQueueAttributes",
       "sqs:GetQueueUrl",
     ]
-    resources = [aws_sqs_queue.clean_mdss_load_queue.arn]
+    resources = [aws_sqs_queue.clean_dlt_load_queue.arn]
   }
 }
 
@@ -984,6 +983,18 @@ data "aws_iam_policy_document" "load_fms_lambda_role_policy_document" {
     effect    = "Allow"
     actions   = ["s3:ListAllMyBuckets", "s3:GetBucketLocation"]
     resources = ["*"]
+  }
+  statement {
+    sid    = "AllowCleanupQueueAccess"
+    effect = "Allow"
+    actions = [
+      "sqs:SendMessage",
+      "sqs:ReceiveMessage",
+      "sqs:DeleteMessage",
+      "sqs:GetQueueAttributes",
+      "sqs:GetQueueUrl",
+    ]
+    resources = [aws_sqs_queue.clean_dlt_load_queue.arn]
   }
 }
 
@@ -1165,7 +1176,7 @@ resource "aws_lakeformation_permissions" "historic_csv_add_create_db" {
 # Clean after MDSS load IAM Role
 #-----------------------------------------------------------------------------------
 
-data "aws_iam_policy_document" "clean_after_mdss_load_lambda_role_policy_document" {
+data "aws_iam_policy_document" "clean_after_dlt_load_lambda_role_policy_document" {
   count = local.is-development ? 0 : 1
 
   statement {
@@ -1214,22 +1225,22 @@ data "aws_iam_policy_document" "clean_after_mdss_load_lambda_role_policy_documen
   }
 }
 
-resource "aws_iam_role" "clean_after_mdss_load" {
+resource "aws_iam_role" "clean_after_dlt_load" {
   count              = local.is-development ? 0 : 1
-  name               = "clean_after_mdss_load_lambda_role"
+  name               = "clean_after_dlt_load_lambda_role"
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
 }
 
-resource "aws_iam_policy" "clean_after_mdss_load_lambda_role_policy" {
+resource "aws_iam_policy" "clean_after_dlt_load_lambda_role_policy" {
   count  = local.is-development ? 0 : 1
-  name   = "clean_after_mdss_load_lambda_policy"
-  policy = data.aws_iam_policy_document.clean_after_mdss_load_lambda_role_policy_document[0].json
+  name   = "clean_after_dlt_load_lambda_policy"
+  policy = data.aws_iam_policy_document.clean_after_dlt_load_lambda_role_policy_document[0].json
 }
 
-resource "aws_iam_role_policy_attachment" "clean_after_mdss_load_lambda_policy_attachment" {
+resource "aws_iam_role_policy_attachment" "clean_after_dlt_load_lambda_policy_attachment" {
   count      = local.is-development ? 0 : 1
-  role       = aws_iam_role.clean_after_mdss_load[0].name
-  policy_arn = aws_iam_policy.clean_after_mdss_load_lambda_role_policy[0].arn
+  role       = aws_iam_role.clean_after_dlt_load[0].name
+  policy_arn = aws_iam_policy.clean_after_dlt_load_lambda_role_policy[0].arn
 }
 
 #-----------------------------------------------------------------------------------
