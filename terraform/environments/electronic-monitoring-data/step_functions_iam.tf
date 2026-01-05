@@ -50,7 +50,7 @@ data "aws_iam_policy_document" "data_cutback_policy_document" {
   statement {
     effect  = "Allow"
     actions = ["lambda:InvokeFunction"]
-    resources = module.data_cutback[0].lambda_function_arn
+    resources = [module.data_cutback[0].lambda_function_arn]
   }
 }
 
