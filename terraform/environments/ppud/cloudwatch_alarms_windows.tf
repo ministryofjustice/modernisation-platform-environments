@@ -250,7 +250,7 @@ resource "aws_cloudwatch_metric_alarm" "instance_health_check" {
   threshold           = "1"
   treat_missing_data  = "notBreaching"
   alarm_description   = "Instance status checks monitor the software and network configuration of your individual instance. When an instance status check fails, you typically must address the problem yourself: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/monitoring-system-instance-status-check.html"
-  alarm_actions       = [aws_sns_topic.cw_std_and_sms_alerts[0].arn]
+  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
     InstanceId = each.key
   }
@@ -271,7 +271,7 @@ resource "aws_cloudwatch_metric_alarm" "system_health_check" {
   threshold           = "1"
   treat_missing_data  = "notBreaching"
   alarm_description   = "System status checks monitor the AWS systems on which your instance runs. These checks detect underlying problems with your instance that require AWS involvement to repair: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/monitoring-system-instance-status-check.html"
-  alarm_actions       = [aws_sns_topic.cw_std_and_sms_alerts[0].arn]
+  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
     InstanceId = each.key
   }
@@ -443,7 +443,7 @@ resource "aws_cloudwatch_metric_alarm" "service_alarms" {
   threshold           = "1"
   treat_missing_data  = "notBreaching"
   alarm_description   = "This metric monitors the ${each.value.config.description}. If the metric falls to 0 [not running] then the alarm will trigger."
-  alarm_actions       = [aws_sns_topic.cw_std_and_sms_alerts[0].arn]
+  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
 
   dimensions = merge(
     {
@@ -564,7 +564,7 @@ locals {
     production = {
       enabled   = local.is-production
       instances = data.aws_instances.windows_tagged_instances.ids
-      sns_topic = "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${lookup(local.application_data.accounts[local.environment], "cloudwatch_sns_std_and_sms_topic_name", local.application_data.accounts[local.environment].cloudwatch_sns_topic_name)}"
+      sns_topic = "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${lookup(local.application_data.accounts[local.environment], "cloudwatch_sns_topic_name", local.application_data.accounts[local.environment].cloudwatch_sns_topic_name)}"
     }
     preproduction = {
       enabled   = local.is-preproduction
