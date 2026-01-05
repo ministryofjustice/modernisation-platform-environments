@@ -4,6 +4,15 @@ resource "aws_security_group" "dfi" {
   vpc_id      = var.account_info.vpc_id
 }
 
+resource "aws_vpc_security_group_ingress_rule" "dfi_from_alb" {
+  description                  = "MIS ALB to DIS on port 8080"
+  security_group_id            = aws_security_group.dfi.id
+  referenced_security_group_id = aws_security_group.mis_alb.id
+  ip_protocol                  = "tcp"
+  from_port                    = 8080
+  to_port                      = 8080
+}
+
 resource "aws_vpc_security_group_egress_rule" "dfi_oracle_db" {
   description                  = "Oracle DB connection to DSD database"
   security_group_id            = aws_security_group.dfi.id
