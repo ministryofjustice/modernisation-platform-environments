@@ -43,7 +43,7 @@ module "data_cutback_step_function" {
   count = local.is-development || local.is-production ? 1 : 0
 
   source       = "./modules/step_function"
-  name         = "historic_data_cutback"
+  name         = "data_cutback"
   iam_policies = tomap({ "data_cutback_step_function_policy" = aws_iam_policy.data_cutback_step_function_policy[0] })
   variable_dictionary = tomap(
     {
