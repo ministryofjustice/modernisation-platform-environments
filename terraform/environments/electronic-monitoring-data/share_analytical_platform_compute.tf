@@ -48,6 +48,7 @@ locals {
   prod_dbs_to_grant = local.is-production ? [
     "am_stg",
     "buddi_stg",
+    "buddi_buddi",
     "cap_dw_stg",
     "curated_emsys_mvp",
     "curated_emsys_tpims",
