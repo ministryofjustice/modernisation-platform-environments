@@ -339,7 +339,7 @@ locals {
               target_group_key = "yp-target-group-2"
             }
           ]
-          conditions = [{ #header condition for dal
+          conditions = [{ #header condition for yp
             http_header = {
               http_header_name = "service-health"
               values           = ["yp"]
@@ -354,7 +354,7 @@ locals {
               target_group_key = "auth-target-group-2"
             }
           ]
-          conditions = [{ #header condition for dal
+          conditions = [{ #header condition for auth
             http_header = {
               http_header_name = "service-health"
               values           = ["auth"]
@@ -369,7 +369,7 @@ locals {
               target_group_key = "bands-target-group-2"
             }
           ]
-          conditions = [{ #header condition for dal
+          conditions = [{ #header condition for bands
             http_header = {
               http_header_name = "service-health"
               values           = ["bands"]
@@ -384,7 +384,7 @@ locals {
               target_group_key = "bu-target-group-2"
             }
           ]
-          conditions = [{ #header condition for dal
+          conditions = [{ #header condition for bu
             http_header = {
               http_header_name = "service-health"
               values           = ["bu"]
@@ -399,7 +399,7 @@ locals {
               target_group_key = "case-target-group-2"
             }
           ]
-          conditions = [{ #header condition for dal
+          conditions = [{ #header condition for case
             http_header = {
               http_header_name = "service-health"
               values           = ["case"]
@@ -414,7 +414,7 @@ locals {
               target_group_key = "cmm-target-group-2"
             }
           ]
-          conditions = [{ #header condition for dal
+          conditions = [{ #header condition for cmm
             http_header = {
               http_header_name = "service-health"
               values           = ["cmm"]
@@ -429,7 +429,7 @@ locals {
               target_group_key = "conversions-target-group-2"
             }
           ]
-          conditions = [{ #header condition for dal
+          conditions = [{ #header condition for conversions
             http_header = {
               http_header_name = "service-health"
               values           = ["conversions"]
@@ -444,7 +444,7 @@ locals {
               target_group_key = "documents-target-group-2"
             }
           ]
-          conditions = [{ #header condition for dal
+          conditions = [{ #header condition for documents
             http_header = {
               http_header_name = "service-health"
               values           = ["documents"]
@@ -459,7 +459,7 @@ locals {
               target_group_key = "gateway-internal-target-group-1"
             }
           ]
-          conditions = [{ #header condition for dal
+          conditions = [{ #header condition for gateway-internal
             http_header = {
               http_header_name = "service-health"
               values           = ["gateway-internal"]
@@ -474,7 +474,7 @@ locals {
               target_group_key = "placements-target-group-2"
             }
           ]
-          conditions = [{ #header condition for dal
+          conditions = [{ #header condition for placements
             http_header = {
               http_header_name = "service-health"
               values           = ["placements"]
@@ -489,7 +489,7 @@ locals {
               target_group_key = "refdata-target-group-2"
             }
           ]
-          conditions = [{ #header condition for dal
+          conditions = [{ #header condition for  refdata
             http_header = {
               http_header_name = "service-health"
               values           = ["refdata"]
@@ -504,7 +504,7 @@ locals {
               target_group_key = "returns-target-group-1"
             }
           ]
-          conditions = [{ #header condition for dal
+          conditions = [{ #header condition for returns
             http_header = {
               http_header_name = "service-health"
               values           = ["returns"]
@@ -519,7 +519,7 @@ locals {
               target_group_key = "serious-incidents-target-group-2"
             }
           ]
-          conditions = [{ #header condition for dal
+          conditions = [{ #header condition for serious-incidents
             http_header = {
               http_header_name = "service-health"
               values           = ["serious-incidents"]
@@ -534,7 +534,7 @@ locals {
               target_group_key = "transfers-target-group-2"
             }
           ]
-          conditions = [{ #header condition for dal
+          conditions = [{ #header condition for transfers
             http_header = {
               http_header_name = "service-health"
               values           = ["transfers"]
@@ -549,7 +549,7 @@ locals {
               target_group_key = "views-target-group-2"
             }
           ]
-          conditions = [{ #header condition for dal
+          conditions = [{ #header condition for views
             http_header = {
               http_header_name = "service-health"
               values           = ["views"]
@@ -564,7 +564,7 @@ locals {
               target_group_key = "workflow-target-group-2"
             }
           ]
-          conditions = [{ #header condition for dal
+          conditions = [{ #header condition for workflow
             http_header = {
               http_header_name = "service-health"
               values           = ["workflow"]
@@ -579,7 +579,7 @@ locals {
               target_group_key = "sentences-target-group-2"
             }
           ]
-          conditions = [{ #header condition for dal
+          conditions = [{ #header condition for sentences
             http_header = {
               http_header_name = "service-health"
               values           = ["sentences"]
@@ -594,7 +594,7 @@ locals {
               target_group_key = "transitions-target-group-2"
             }
           ]
-          conditions = [{ #header condition for dal
+          conditions = [{ #header condition for transitions
             http_header = {
               http_header_name = "service-health"
               values           = ["transitions"]

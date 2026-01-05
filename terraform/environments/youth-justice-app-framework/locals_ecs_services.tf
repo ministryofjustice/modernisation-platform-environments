@@ -549,7 +549,7 @@ locals {
     },
     connectivity = {
       name                              = "connectivity"
-      image                             = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/youth-justice-app-framework:connectivity-preprod"
+      image                             = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/youth-justice-app-framework:workflow-preprod"
       task_cpu                          = 1024
       task_memory                       = 3584
       health_check_grace_period_seconds = 420
