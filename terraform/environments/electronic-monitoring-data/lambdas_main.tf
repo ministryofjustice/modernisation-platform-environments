@@ -364,11 +364,11 @@ module "load_mdss_lambda" {
   subnet_ids                     = data.aws_subnets.shared-public.ids
   cloudwatch_retention_days      = 7
   environment_variables = {
-    ATHENA_QUERY_BUCKET    = module.s3-athena-bucket.bucket.id
-    ACCOUNT_NUMBER         = data.aws_caller_identity.current.account_id
-    STAGING_BUCKET         = module.s3-create-a-derived-table-bucket.bucket.id
-    ENVIRONMENT_NAME       = local.environment_shorthand
-    CLEANUP_QUEUE_URL = aws_sqs_queue.clean_dlt_load_queue.id
+    ATHENA_QUERY_BUCKET = module.s3-athena-bucket.bucket.id
+    ACCOUNT_NUMBER      = data.aws_caller_identity.current.account_id
+    STAGING_BUCKET      = module.s3-create-a-derived-table-bucket.bucket.id
+    ENVIRONMENT_NAME    = local.environment_shorthand
+    CLEANUP_QUEUE_URL   = aws_sqs_queue.clean_dlt_load_queue.id
   }
 }
 
@@ -398,7 +398,7 @@ module "load_fms_lambda" {
     ACCOUNT_NUMBER      = data.aws_caller_identity.current.account_id
     STAGING_BUCKET      = module.s3-create-a-derived-table-bucket.bucket.id
     ENVIRONMENT_NAME    = local.environment_shorthand
-    CLEANUP_QUEUE_URL = aws_sqs_queue.clean_dlt_load_queue.id
+    CLEANUP_QUEUE_URL   = aws_sqs_queue.clean_dlt_load_queue.id
   }
 }
 
