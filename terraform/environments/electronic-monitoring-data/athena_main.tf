@@ -69,7 +69,7 @@ resource "aws_athena_workgroup" "cadt" {
 }
 
 resource "aws_athena_workgroup" "cadt-historic-dev" {
-  count = local.is-production ? 1 : 0
+  count       = local.is-production ? 1 : 0
   name        = "create-a-derived-table-historic-dev"
   description = "An Athena workgroup for cadt historic dev, dumps to: ${module.s3-athena-bucket.bucket.id}"
   state       = "ENABLED"

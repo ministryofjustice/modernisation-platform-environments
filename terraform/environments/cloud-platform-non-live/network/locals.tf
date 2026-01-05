@@ -1,7 +1,7 @@
 locals {
   /* VPC */
   # below are replaced for dev clusters
-  cluster_environment = terraform.workspace # replaced with "development_cluster"
+  cluster_environment = terraform.workspace                              # replaced with "development_cluster"
   cp_vpc_name         = "${local.application_name}-${local.environment}" # replaced with "cp-date-time"
   # end replacements
   cp_vpc_cidr = {
