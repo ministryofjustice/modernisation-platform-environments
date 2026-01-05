@@ -621,7 +621,7 @@ locals {
           actions = [
             {
               type             = "forward"
-              target_group_key = "connectivity-target-group-2"
+              target_group_key = "connectivity-target-group-1"
             }
           ]
           conditions = [{ #header condition for connectivity
