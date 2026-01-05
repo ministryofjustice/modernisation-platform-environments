@@ -74,8 +74,9 @@ resource "aws_cloudwatch_metric_alarm" "glue_database_count_high" {
 }
 
 resource "aws_cloudwatch_log_metric_filter" "mdss_fatal_failures" {
+  count          = local.is-development ? 0 : 1
   name           = "mdss-fatal-failures"
-  log_group_name = "/aws/lambda/load_mdss"
+  log_group_name = aws_cloudwatch_log_group.load_mdss.name
 
   # Matches typical fatal patterns (exclude warnings)
   pattern = "{ ($.level = \"ERROR\") || ($.message = \"*Pipeline execution failed*\") || ($.message = \"*LoadClientJobFailed*\") || ($.message = \"*DatabaseTerminalException*\") || ($.message = \"*Terminal exception*\") }"

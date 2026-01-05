@@ -1,3 +1,5 @@
+# terraform/environments/electronic-monitoring-data/cloudwatch-dashboard-mdss.tf
+
 resource "aws_cloudwatch_dashboard" "mdss_ops" {
   dashboard_name = "mdss-ops-${local.environment_shorthand}"
 
@@ -13,7 +15,7 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
         width  = 12,
         height = 6,
         properties = {
-          title  = "SQS: load_mdss queue backlog"
+          title  = "SQS: S3 events waiting for load_mdss"
           region = "eu-west-2"
           stat   = "Sum"
           period = 60
@@ -30,7 +32,7 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
         width  = 12,
         height = 6,
         properties = {
-          title  = "SQS: load_mdss DLQ backlog"
+          title  = "SQS DLQ: S3 events that failed load_mdss"
           region = "eu-west-2"
           stat   = "Sum"
           period = 60
@@ -124,6 +126,7 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
         }
       },
 
+      #Errors by type (last 6h): updated parsing so "err" doesn't end up blank
       {
         type   = "log",
         x      = 0,
@@ -136,13 +139,16 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
           view   = "table"
           query  = <<-EOT
             SOURCE '/aws/lambda/load_mdss'
-            | filter @message like /\\[ERROR\\]|Pipeline execution failed|Terminal exception|TYPE_MISMATCH|LoadClientJobFailed|DatabaseTerminalException|Traceback|Task timed out/
-            | parse @message /(?<err>TYPE_MISMATCH|AccessDenied|EntityNotFoundException|OperationalError|DatabaseTerminalException|LoadClientJobFailed|ValidationError|TimeoutError|Task timed out)/
-            | stats count() as n by err
+            | filter @message like /DLT_FATAL|\\[ERROR\\]|Pipeline execution failed|Terminal exception|TYPE_MISMATCH|LoadClientJobFailed|DatabaseTerminalException|Traceback|Task timed out|AccessDenied/
+            | parse @message /error_type=(?<err>[A-Z_]+)/
+            | parse @message /(?<fallback>TYPE_MISMATCH|AccessDenied|EntityNotFoundException|OperationalError|DatabaseTerminalException|LoadClientJobFailed|ValidationError|TimeoutError|Task timed out)/
+            | stats count() as n by coalesce(err, fallback, "UNKNOWN")
             | sort n desc
           EOT
         }
       },
+
+      #Errors by table: updated parsing to work with either "table=" tokens or an S3 key path
       {
         type   = "log",
         x      = 12,
@@ -155,15 +161,16 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
           view   = "table"
           query  = <<-EOT
             SOURCE '/aws/lambda/load_mdss'
-            | filter @message like /Terminal exception in job|Job for/
-            | parse @message /job (?<job>[^\\s]+)/
-            | parse job /(?<tbl>[^\\.]+)\\./
-            | stats count() as failures by tbl
+            | filter @message like /DLT_FATAL|Terminal exception|LoadClientJobFailed|Pipeline execution failed|TYPE_MISMATCH/
+            | parse @message /table=(?<tbl>[a-zA-Z0-9_\\-]+)/
+            | parse @message /\\/mdss\\/(?<tbl2>[a-zA-Z0-9_\\-]+)\\//
+            | stats count() as failures by coalesce(tbl, tbl2, "UNKNOWN")
             | sort failures desc
           EOT
         }
       },
 
+      # Failing files - updated parsing to pull bucket/key/s3path/table when present
       {
         type   = "log",
         x      = 0,
@@ -176,11 +183,12 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
           view   = "table"
           query  = <<-EOT
             SOURCE '/aws/lambda/load_mdss'
-            | filter @message like /Terminal exception|LoadClientJobFailed|TYPE_MISMATCH|\\[ERROR\\] Exception|Pipeline execution failed/
-            | parse @message /job (?<job>[^\\s]+)/
-            | parse job /(?<tbl>[^\\.]+)\\./
-            | parse @message /s3:\\/\\/(?<s3path>[^\\s'"]+)/
-            | fields @timestamp, tbl, job, s3path, @message
+            | filter @message like /DLT_FATAL|Terminal exception|LoadClientJobFailed|TYPE_MISMATCH|Pipeline execution failed|JSON parse error|\\[ERROR\\]/
+            | parse @message /bucket=(?<bucket>[^\\s]+)/
+            | parse @message /key=(?<key>[^\\s]+)/
+            | parse @message /s3path=(?<s3path>s3:\\/\\/[^\\s]+)/
+            | parse @message /table=(?<tbl>[a-zA-Z0-9_\\-]+)/
+            | fields @timestamp, tbl, bucket, key, s3path, @message
             | sort @timestamp desc
             | limit 200
           EOT
