@@ -42,7 +42,7 @@ resource "aws_iam_policy" "dms_validation_step_function_policy" {
 
 
 # ------------------------------------------
-# Historic Data Cut Back
+# Data Cut Back
 # ------------------------------------------
 
 data "aws_iam_policy_document" "historic_data_cutback_policy_document" {

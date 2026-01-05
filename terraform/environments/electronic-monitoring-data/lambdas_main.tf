@@ -430,14 +430,14 @@ module "load_historic_csv" {
 #-----------------------------------------------------------------------------------
 # BackFill Data
 #-----------------------------------------------------------------------------------
-module "historic_data_cutback" {
+module "data_cutback" {
   count = local.is-development || local.is-production ? 1 : 0
   source                  = "./modules/lambdas"
   is_image                = true
-  function_name           = "historic_data_cutback"
+  function_name           = "data_cutback"
   role_name               = aws_iam_role.dms_validation_lambda_role[0].name
   role_arn                = aws_iam_role.dms_validation_lambda_role[0].arn
-  handler                 = "historic_data_cutback.handler"
+  handler                 = "data_cutback.handler"
   memory_size             = 1024
   timeout                 = 900
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]

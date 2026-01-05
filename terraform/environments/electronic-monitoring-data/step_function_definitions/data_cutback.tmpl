@@ -1,0 +1,14 @@
+{
+  "StartAt": "DataCutBack",
+  "States": {
+    "DataCutBack": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "OutputPath": "$.Payload",
+      "Parameters": {
+        "Payload.$": "$",
+        "FunctionName": "${data_cutback}"
+      }
+    }
+  }
+}
