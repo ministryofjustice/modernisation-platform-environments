@@ -105,6 +105,25 @@ resource "aws_security_group" "mis_alb_infrastructure" {
   )
 }
 
+resource "aws_vpc_security_group_egress_rule" "mis_alb_egress" {
+  for_each = {
+    http8080-to-bws = { referenced_security_group_id = aws_security_group.bws.id, ip_protocol = "tcp", port = 8080 }
+    http8080-to-dis = { referenced_security_group_id = aws_security_group.dis.id, ip_protocol = "tcp", port = 8080 }
+    http8080-to-dfi = { referenced_security_group_id = aws_security_group.dfi.id, ip_protocol = "tcp", port = 8080 }
+  }
+
+  description       = each.key
+  security_group_id = resource.aws_security_group.mis_alb.id
+
+  cidr_ipv4                    = lookup(each.value, "cidr_ipv4", null)
+  ip_protocol                  = lookup(each.value, "ip_protocol", "-1")
+  from_port                    = lookup(each.value, "port", lookup(each.value, "from_port", null))
+  to_port                      = lookup(each.value, "port", lookup(each.value, "to_port", null))
+  referenced_security_group_id = lookup(each.value, "referenced_security_group_id", null)
+
+  tags = local.tags
+}
+
 # HTTP rules for staff access
 resource "aws_vpc_security_group_ingress_rule" "mis_alb_http_staff" {
   for_each          = var.lb_config != null && length(local.internal_security_group_cidrs_staff) > 0 ? toset(local.internal_security_group_cidrs_staff) : []
