@@ -92,10 +92,16 @@ variable "cloud-platform-iam-prod" {
   default     = "arn:aws:iam::754256621582:role/cloud-platform-irsa-7a81f92a48491ef0-live"
 }
 
-variable "cloud-platform-crime-matching-iam-dev" {
+variable "cloud-platform-crime-matching-api-iam-dev" {
   type        = string
   description = "IAM role that the crime matching API in Cloud Platform will use to connect to this role."
   default     = "arn:aws:iam::754256621582:role/cloud-platform-irsa-6e3937460af175fd-live"
+}
+
+variable "cloud-platform-crime-matching-algorithm-iam-dev" {
+  type        = string
+  description = "IAM role that the crime matching algorithm in Cloud Platform will use to connect to this role."
+  default     = "arn:aws:iam::754256621582:role/cloud-platform-irsa-65e2e0ef1e64c470-live"
 }
 
 resource "aws_lakeformation_resource" "data_bucket" {
@@ -132,7 +138,10 @@ module "acquisitive_crime_assumable_role" {
 
   trusted_role_arns = flatten([
     data.aws_iam_roles.mod_plat_roles.arns,
-    [var.cloud-platform-crime-matching-iam-dev],
+    [
+      var.cloud-platform-crime-matching-api-iam-dev,
+      var.cloud-platform-crime-matching-algorithm-iam-dev,
+    ],
   ])
 
   create_role       = true
@@ -211,21 +220,21 @@ resource "aws_lakeformation_permissions" "ac_allied_tables" {
   }
 }
 
-resource "aws_lakeformation_permissions" "ac_servicenow_db" {
+resource "aws_lakeformation_permissions" "ac_fms_db" {
   count       = local.is-test ? 1 : 0
   principal   = module.acquisitive_crime_assumable_role[0].iam_role_arn
   permissions = ["DESCRIBE"]
   database {
-    name = "serco_servicenow_${local.environment_shorthand}"
+    name = "serco_fms_${local.environment_shorthand}"
   }
 }
 
-resource "aws_lakeformation_permissions" "ac_servicenow_tables" {
+resource "aws_lakeformation_permissions" "ac_fms_tables" {
   count       = local.is-test ? 1 : 0
   principal   = module.acquisitive_crime_assumable_role[0].iam_role_arn
   permissions = ["SELECT", "DESCRIBE"]
   table {
-    database_name = "serco_servicenow_${local.environment_shorthand}"
+    database_name = "serco_fms_${local.environment_shorthand}"
     wildcard      = true
   }
 }

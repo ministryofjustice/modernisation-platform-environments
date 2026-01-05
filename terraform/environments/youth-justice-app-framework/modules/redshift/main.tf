@@ -26,7 +26,12 @@ resource "aws_redshiftserverless_workgroup" "default" {
 
   namespace_name = aws_redshiftserverless_namespace.default.id
   workgroup_name = aws_redshiftserverless_namespace.default.id
-  # base_capacity  = var.redshift_serverless_base_capacity
+
+  # Price-performance scaling configuration
+  price_performance_target {
+    enabled = true
+    level   = 75 # Valid values are 1 (LOW_COST), 25 (ECONOMICAL), 50 (BALANCED)(Recommended), 75 (RESOURCEFUL), and 100 (HIGH_PERFORMANCE).
+  }
 
   security_group_ids = [module.redshift_sg.security_group_id]
   subnet_ids         = var.database_subnets

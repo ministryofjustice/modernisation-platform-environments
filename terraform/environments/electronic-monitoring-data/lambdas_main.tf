@@ -1,8 +1,9 @@
 locals {
   lambda_path = "lambdas"
-  env_name    = local.is-production ? "prod" : "dev"
+  env_name    = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
   db_name     = local.is-production ? "g4s_cap_dw" : "test"
 }
+
 
 #-----------------------------------------------------------------------------------
 # S3 lambda function to perform zip file structure extraction into json for Athena
@@ -186,14 +187,14 @@ module "copy_mdss_data" {
 # Clean after MDSS load
 #-----------------------------------------------------------------------------------
 
-module "clean_after_mdss_load" {
+module "clean_after_dlt_load" {
   count                          = local.is-development ? 0 : 1
   source                         = "./modules/lambdas"
   is_image                       = true
-  function_name                  = "clean_after_mdss_load"
-  role_name                      = aws_iam_role.clean_after_mdss_load[0].name
-  role_arn                       = aws_iam_role.clean_after_mdss_load[0].arn
-  handler                        = "clean_after_mdss_load.handler"
+  function_name                  = "clean_after_dlt_load"
+  role_name                      = aws_iam_role.clean_after_dlt_load[0].name
+  role_arn                       = aws_iam_role.clean_after_dlt_load[0].arn
+  handler                        = "clean_after_dlt_load.handler"
   memory_size                    = 2048
   timeout                        = 900
   reserved_concurrent_executions = 100
@@ -205,7 +206,7 @@ module "clean_after_mdss_load" {
 
   environment_variables = {
     CATALOG_ID      = data.aws_caller_identity.current.account_id
-    LAMBDA_ROLE_ARN = aws_iam_role.clean_after_mdss_load[0].arn
+    LAMBDA_ROLE_ARN = aws_iam_role.clean_after_dlt_load[0].arn
   }
 }
 
@@ -361,12 +362,13 @@ module "load_mdss_lambda" {
   production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
   security_group_ids             = [aws_security_group.lambda_generic.id]
   subnet_ids                     = data.aws_subnets.shared-public.ids
+  cloudwatch_retention_days      = 7
   environment_variables = {
-    ATHENA_QUERY_BUCKET    = module.s3-athena-bucket.bucket.id
-    ACCOUNT_NUMBER         = data.aws_caller_identity.current.account_id
-    STAGING_BUCKET         = module.s3-create-a-derived-table-bucket.bucket.id
-    ENVIRONMENT_NAME       = local.environment_shorthand
-    MDSS_CLEANUP_QUEUE_URL = aws_sqs_queue.clean_mdss_load_queue.id
+    ATHENA_QUERY_BUCKET = module.s3-athena-bucket.bucket.id
+    ACCOUNT_NUMBER      = data.aws_caller_identity.current.account_id
+    STAGING_BUCKET      = module.s3-create-a-derived-table-bucket.bucket.id
+    ENVIRONMENT_NAME    = local.environment_shorthand
+    CLEANUP_QUEUE_URL   = aws_sqs_queue.clean_dlt_load_queue.id
   }
 }
 
@@ -390,11 +392,13 @@ module "load_fms_lambda" {
   production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
   security_group_ids             = [aws_security_group.lambda_generic.id]
   subnet_ids                     = data.aws_subnets.shared-public.ids
+  cloudwatch_retention_days      = 7
   environment_variables = {
     ATHENA_QUERY_BUCKET = module.s3-athena-bucket.bucket.id
     ACCOUNT_NUMBER      = data.aws_caller_identity.current.account_id
     STAGING_BUCKET      = module.s3-create-a-derived-table-bucket.bucket.id
     ENVIRONMENT_NAME    = local.environment_shorthand
+    CLEANUP_QUEUE_URL   = aws_sqs_queue.clean_dlt_load_queue.id
   }
 }
 
@@ -422,5 +426,59 @@ module "load_historic_csv" {
     ACCOUNT_NUMBER      = data.aws_caller_identity.current.account_id
     STAGING_BUCKET      = module.s3-create-a-derived-table-bucket.bucket.id
     ENVIRONMENT_NAME    = local.environment_shorthand
+    DB_SUFFIX           = local.db_suffix
   }
+}
+
+#-----------------------------------------------------------------------------------
+# Glue DB count metrics Lambda (publishes CloudWatch metric)
+#-----------------------------------------------------------------------------------
+
+module "glue_db_count_metrics" {
+  count                          = local.is-development ? 0 : 1
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "glue_db_count_metrics"
+  role_name                      = aws_iam_role.glue_db_count_metrics.name
+  role_arn                       = aws_iam_role.glue_db_count_metrics.arn
+  handler                        = "glue_db_count_metrics.handler"
+  memory_size                    = 1024
+  timeout                        = 300
+  reserved_concurrent_executions = 1
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev                 = local.env_name
+  security_group_ids             = [aws_security_group.lambda_generic.id]
+  subnet_ids                     = data.aws_subnets.shared-public.ids
+
+  environment_variables = {
+    METRIC_NAMESPACE = "EMDS/Glue"
+    METRIC_NAME      = "GlueDatabaseCount"
+    ENVIRONMENT      = local.environment_shorthand
+  }
+}
+
+#-----------------------------------------------------------------------------------
+# Schedule Glue DB count metrics Lambda
+#-----------------------------------------------------------------------------------
+
+resource "aws_cloudwatch_event_rule" "glue_db_count_metrics_schedule" {
+  count               = local.is-development ? 0 : 1
+  name                = "glue_db_count_metrics_schedule"
+  description         = "Runs glue_db_count_metrics on a schedule to publish Glue database count"
+  schedule_expression = "rate(5 minutes)"
+}
+
+resource "aws_cloudwatch_event_target" "glue_db_count_metrics_target" {
+  count = local.is-development ? 0 : 1
+  rule  = aws_cloudwatch_event_rule.glue_db_count_metrics_schedule[0].name
+  arn   = module.glue_db_count_metrics[0].lambda_function_arn
+}
+
+resource "aws_lambda_permission" "glue_db_count_metrics_allow_eventbridge" {
+  count         = local.is-development ? 0 : 1
+  statement_id  = "AllowExecutionFromEventBridgeGlueDbCount"
+  action        = "lambda:InvokeFunction"
+  function_name = module.glue_db_count_metrics[0].lambda_function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.glue_db_count_metrics_schedule[0].arn
 }
