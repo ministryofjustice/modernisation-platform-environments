@@ -6,7 +6,7 @@
       "WAM_ALB": "WAM-ALB-DEV",
       "patch_group": "dev_win_patch",
       "patch_maintenance_window_name": "dev_patch_maintenance_window",
-      "patch_maintenance_schedule_cron": "cron(0 19 ? * 6#2 *)",
+      "patch_maintenance_schedule_cron": "cron(0 19 ? * 3#3 *)",
       "patch_maintenance_window_duration": 3,
       "maintenance_window_target_name": "development_maintenance_window_target",
       "maintenance_window_target_description": "This is the dev patch maintenance window target",
