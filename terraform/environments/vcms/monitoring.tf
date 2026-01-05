@@ -30,7 +30,7 @@ resource "aws_cloudwatch_metric_alarm" "vcms_cpu_over_threshold" {
 
   dimensions = {
     ClusterName = local.cluster_name
-    ServiceName = local.cluster_name
+    ServiceName = "vcms-${local.environment}"
   }
 
   tags = merge(
@@ -58,7 +58,7 @@ resource "aws_cloudwatch_metric_alarm" "vcms_memory_over_threshold" {
 
   dimensions = {
     ClusterName = local.cluster_name
-    ServiceName = local.cluster_name
+    ServiceName = "vcms-${local.environment}"
   }
 
   tags = merge(
