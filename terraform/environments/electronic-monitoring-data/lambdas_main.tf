@@ -493,8 +493,8 @@ module "data_cutback" {
   source                  = "./modules/lambdas"
   is_image                = true
   function_name           = "data_cutback"
-  role_name               = aws_iam_role.dms_validation_lambda_role[0].name
-  role_arn                = aws_iam_role.dms_validation_lambda_role[0].arn
+  role_name               = aws_iam_role.data_cutback_iam_role[0].name
+  role_arn                = aws_iam_role.data_cutback_iam_role[0].arn
   handler                 = "data_cutback.handler"
   memory_size             = 1024
   timeout                 = 900
