@@ -172,7 +172,7 @@ locals {
           ]
           conditions = [{
             path_pattern = {
-              values = ["/api/v1/connectivity*"]
+              values = ["/api/v1/connectivity*, /api/v1/cjse/*"]
             }
           }]
         },
