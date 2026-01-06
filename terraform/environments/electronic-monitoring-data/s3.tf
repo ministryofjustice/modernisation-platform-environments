@@ -724,15 +724,16 @@ module "s3-mdss-ho-landing-bucket" {
   data_feed  = "mdss"
   order_type = "ho"
 
-  core_shared_services_id   = local.environment_management.account_ids["core-shared-services-production"]
+  core_shared_services_id      = local.environment_management.account_ids["core-shared-services-production"]
   cross_account_id             = local.is-development ? local.environment_management.account_ids["electronic-monitoring-data-test"] : local.is-preproduction ?  local.environment_management.account_ids["electronic-monitoring-data-production"] : null
-  external_account_access_role = local.mdss_supplier_account_mapping[local.environment]  local_bucket_prefix       = local.bucket_prefix
-  local_tags                = local.tags
-  logging_bucket            = module.s3-logging-bucket
-  production_dev            = local.is-production ? "prod" : "dev"
-  received_files_bucket_id  = module.s3-received-files-bucket.bucket.id
-  security_group_ids        = [aws_security_group.lambda_generic.id]
-  subnet_ids                = data.aws_subnets.shared-public.ids
+  external_account_access_role = local.mdss_supplier_account_mapping[local.environment]
+  local_bucket_prefix          = local.bucket_prefix
+  local_tags                   = local.tags
+  logging_bucket               = module.s3-logging-bucket
+  production_dev               = local.is-production ? "prod" : "dev"
+  received_files_bucket_id     = module.s3-received-files-bucket.bucket.id
+  security_group_ids           = [aws_security_group.lambda_generic.id]
+  subnet_ids                   = data.aws_subnets.shared-public.ids
 
   providers = {
     aws = aws
@@ -745,15 +746,16 @@ module "s3-mdss-specials-landing-bucket" {
   data_feed  = "mdss"
   order_type = "specials"
 
-  core_shared_services_id   = local.environment_management.account_ids["core-shared-services-production"]
+  core_shared_services_id      = local.environment_management.account_ids["core-shared-services-production"]
   cross_account_id             = local.is-development ? local.environment_management.account_ids["electronic-monitoring-data-test"] : local.is-preproduction ?  local.environment_management.account_ids["electronic-monitoring-data-production"] : null
-  external_account_access_role = local.mdss_supplier_account_mapping[local.environment]  local_bucket_prefix       = local.bucket_prefix
-  local_tags                = local.tags
-  logging_bucket            = module.s3-logging-bucket
-  production_dev            = local.is-production ? "prod" : "dev"
-  received_files_bucket_id  = module.s3-received-files-bucket.bucket.id
-  security_group_ids        = [aws_security_group.lambda_generic.id]
-  subnet_ids                = data.aws_subnets.shared-public.ids
+  external_account_access_role = local.mdss_supplier_account_mapping[local.environment]
+  local_bucket_prefix          = local.bucket_prefix
+  local_tags                   = local.tags
+  logging_bucket               = module.s3-logging-bucket
+  production_dev               = local.is-production ? "prod" : "dev"
+  received_files_bucket_id     = module.s3-received-files-bucket.bucket.id
+  security_group_ids           = [aws_security_group.lambda_generic.id]
+  subnet_ids                   = data.aws_subnets.shared-public.ids
 
   providers = {
     aws = aws
