@@ -25,22 +25,17 @@ output "alb_dns_name" {
   value       = var.lb_config != null ? aws_lb.mis[0].dns_name : null
 }
 
-output "dfi_url" {
-  description = "Full HTTPS URL for the DFI service"
-  value       = var.lb_config != null && var.dfi_config != null && var.dfi_config.instance_count > 0 ? "https://${local.dfi_fqdn}${local.dfi_health_check_path}" : null
-}
-
-output "dis_url" {
-  description = "Full HTTPS URL for the DIS service"
-  value       = var.lb_config != null && var.dis_config != null && var.dis_config.instance_count > 0 ? "https://${local.dis_fqdn}${local.dis_health_check_path}" : null
-}
-
 output "dfi_fqdn" {
   description = "Fully qualified domain name for DFI service"
-  value       = var.lb_config != null && var.dfi_config != null && var.dfi_config.instance_count > 0 ? local.dfi_fqdn : null
+  value       = local.dfi_enabled ? local.dfi_fqdn : null
 }
 
 output "dis_fqdn" {
   description = "Fully qualified domain name for DIS service"
-  value       = var.lb_config != null && var.dis_config != null && var.dis_config.instance_count > 0 ? local.dis_fqdn : null
+  value       = local.dis_enabled ? local.dis_fqdn : null
+}
+
+output "bws_fqdn" {
+  description = "Fully qualified domain name for BWS service"
+  value       = local.bws_enabled ? local.bws_fqdn : null
 }
