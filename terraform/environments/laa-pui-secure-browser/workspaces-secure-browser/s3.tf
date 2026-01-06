@@ -67,8 +67,9 @@ resource "random_string" "bucket_suffix" {
 
 # Because we can't send notifications to two destinations we need to fan-out via an SNS topic
 resource "aws_s3_bucket_notification" "s3_bucket_workspacesweb_session_logs" {
-  count  = local.create_resources ? 1 : 0
-  bucket = module.s3_bucket_workspacesweb_session_logs[0].s3_bucket_id
+  count       = local.create_resources ? 1 : 0
+  bucket      = module.s3_bucket_workspacesweb_session_logs[0].s3_bucket_id
+  eventbridge = true
   topic {
     events        = ["s3:ObjectCreated:*"]
     filter_prefix = "workspaces-web-logs/"
