@@ -1,10 +1,15 @@
 resource "aws_route53_zone" "cluster_zone" {
   name = trimprefix(terraform.workspace, "cloud-platform-") + ".cloud-platform.service.justice.gov.uk"
   force_destroy = true
+
+  tags = {
+    Environment = terraform.workspace
+    ManagedBy   = "Terraform"
+  }
 }
 
 resource "aws_route53_record" "parent_zone_cluster_ns" {
-  zone_id = data.aws_route53_zone.cloud_platform_justice_gov_uk.zone_id
+  zone_id = data.aws_route53_zone.shared_parent_zone.zone_id
   name    = aws_route53_zone.cluster_zone.name
   type    = "NS"
   ttl     = "30"
