@@ -39,7 +39,7 @@ locals {
   ] : []
   external_account_kms_grant = var.external_account_access_role != null ? {
     external_account_access_role = {
-      grantee_principal = nonsensitive("arn:aws:iam::${var.cross_account_access_role.account_number}:role/${var.cross_account_access_role.role_name}")
+      grantee_principal = nonsensitive("arn:aws:iam::${var.external_account_access_role.account_number}:role/${var.external_account_access_role.role_name}")
       operations = [
         "Encrypt",
         "GenerateDataKey",
