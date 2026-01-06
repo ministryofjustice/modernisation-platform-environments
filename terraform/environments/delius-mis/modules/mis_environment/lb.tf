@@ -12,7 +12,8 @@ locals {
   dis_enabled = var.lb_config != null && var.dis_config != null && var.dis_config.instance_count > 0
   dis_fqdn    = "ndl-dis.${var.env_name}.${var.account_config.dns_suffix}"
 
-  bws_enabled = var.lb_config != null && var.bws_config != null && var.bws_config.instance_count > 0
+  # bws_enabled = var.lb_config != null && var.bws_config != null && var.bws_config.instance_count > 0
+  bws_enabled = false
   bws_fqdn    = "${var.env_name}.${var.account_config.dns_suffix}"
 }
 
