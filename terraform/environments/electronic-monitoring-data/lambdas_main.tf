@@ -496,12 +496,15 @@ module "mdss_daily_failure_digest" {
   role_arn                       = aws_iam_role.mdss_daily_failure_digest[0].arn
   handler                        = "mdss_daily_failure_digest.handler"
   memory_size                    = 512
-  timeout                        = 60
+  timeout                        = 120
   reserved_concurrent_executions = 1
   core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
   production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
-  security_group_ids             = [aws_security_group.lambda_generic.id]
-  subnet_ids                     = data.aws_subnets.shared-public.ids
+
+  # NOTE: This Lambda only calls AWS APIs (CloudWatch + SNS) and does not need VPC access.
+  # Removing VPC config avoids timeouts caused by missing NAT/VPC endpoints. Will remove this if pass.
+  # security_group_ids             = [aws_security_group.lambda_generic.id]
+  # subnet_ids                     = data.aws_subnets.shared-public.ids
 
   environment_variables = {
     SNS_TOPIC_ARN  = aws_sns_topic.emds_alerts.arn
