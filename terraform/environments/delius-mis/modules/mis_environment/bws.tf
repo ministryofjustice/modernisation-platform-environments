@@ -95,7 +95,8 @@ module "bws_instance" {
   availability_zone = "eu-west-2${lookup(local.availability_zone_map, count.index % 3, "a")}"
   subnet_id         = var.account_config.ordered_private_subnet_ids[count.index % 3]
   tags = merge(var.tags, {
-    server-type = "delius-bip-web"
+    instance-scheduling = "skip-scheduling"
+    server-type         = "delius-bip-web"
   })
 
   cloudwatch_metric_alarms = merge(
