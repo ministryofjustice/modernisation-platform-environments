@@ -260,11 +260,6 @@ resource "aws_lb" "mis" {
     enabled = true
   }
 
-  # Explicit dependency to ensure S3 bucket exists first
-  depends_on = [
-    module.s3_lb_logs_bucket
-  ]
-
   tags = merge(
     local.tags,
     {
@@ -416,11 +411,6 @@ resource "aws_lb_listener" "mis_https" {
     type             = "forward"
     target_group_arn = local.dfi_enabled ? try(aws_lb_target_group.dfi[0].arn, null) : try(aws_lb_target_group.dis[0].arn, null)
   }
-
-  # Explicit dependency to ensure certificate is fully validated before listener creation
-  depends_on = [
-    module.acm_certificate
-  ]
 
   tags = local.tags
 }
