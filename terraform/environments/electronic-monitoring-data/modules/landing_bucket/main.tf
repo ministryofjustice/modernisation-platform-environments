@@ -8,6 +8,55 @@ terraform {
   required_version = "~> 1.0"
 }
 
+locals {
+  external_account_bucket_policy = var.external_account_access_role != null ? [
+    {
+      sid    = "ExternalAccountAccess"
+      effect = "Allow"
+      actions = [
+        "s3:PutObject",
+        "s3:PutObjectAcl",
+      ]
+      principals = {
+        identifiers = ["arn:aws:iam::${var.external_account_access_role.account_number}:role/${var.external_account_access_role.role_name}"]
+        type        = "AWS"
+      }
+    }
+  ] : []
+  cross_account_root_account_bucket_policy = var.cross_account_id != null ? [
+    {
+      sid    = "CrossAccountAccess"
+      effect = "Allow"
+      actions = [
+        "s3:PutObject",
+        "s3:PutObjectAcl",
+      ]
+      principals = {
+        identifiers = ["arn:aws:iam::${var.cross_account_id}:root"]
+        type        = "AWS"
+      }
+    }
+  ] : []
+  external_account_kms_grant = var.external_account_access_role != null ? {
+    external_account_access_role = {
+      grantee_principal = nonsensitive("arn:aws:iam::${var.cross_account_access_role.account_number}:role/${var.cross_account_access_role.role_name}")
+      operations = [
+        "Encrypt",
+        "GenerateDataKey",
+      ]
+    }
+  } : {}
+  cross_account_kms_grant = var.cross_account_id != null ? {
+    cross_account_access_role = {
+      grantee_principal = nonsensitive("arn:aws:iam::${var.cross_account_id}:root")
+      operations = [
+        "Encrypt",
+        "GenerateDataKey",
+      ]
+    }
+  } : {}
+}
+
 module "this-bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9f"
 
@@ -59,20 +108,7 @@ module "this-bucket" {
   ]
 
   # Optionally add cross account access to bucket policy.
-  bucket_policy_v2 = var.cross_account_access_role != null ? [
-    {
-      sid    = "CrossAccountAccess"
-      effect = "Allow"
-      actions = [
-        "s3:PutObject",
-        "s3:PutObjectAcl",
-      ]
-      principals = {
-        identifiers = ["arn:aws:iam::${var.cross_account_access_role.account_number}:role/${var.cross_account_access_role.role_name}"]
-        type        = "AWS"
-      }
-    }
-  ] : []
+  bucket_policy_v2 = flatten([local.external_account_bucket_policy, local.cross_account_root_account_bucket_policy])
 
   tags = merge(
     var.local_tags,
@@ -104,15 +140,7 @@ module "kms_key" {
   # Grant external account role specific operations.
   # To view grants, need to use cli:
   # aws kms list-grants --region=eu-west-2 --key-id <key id>
-  grants = var.cross_account_access_role != null ? {
-    cross_account_access_role = {
-      grantee_principal = nonsensitive("arn:aws:iam::${var.cross_account_access_role.account_number}:role/${var.cross_account_access_role.role_name}")
-      operations = [
-        "Encrypt",
-        "GenerateDataKey",
-      ]
-    }
-  } : {}
+  grants = merge(local.cross_account_kms_grant, local.external_account_kms_grant)
 
   tags = merge(
     var.local_tags,

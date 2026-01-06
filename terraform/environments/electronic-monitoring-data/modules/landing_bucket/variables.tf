@@ -3,12 +3,18 @@ variable "core_shared_services_id" {
   type        = string
 }
 
-variable "cross_account_access_role" {
-  description = "An object containing the cross account number and role name."
+variable "external_account_access_role" {
+  description = "An object containing the external account number and role name."
   type = object({
     account_number = string
     role_name      = string
   })
+  default = null
+}
+
+variable "cross_account_id" {
+  description = "Account id to allow access to bucket."
+  type = string
   default = null
 }
 
