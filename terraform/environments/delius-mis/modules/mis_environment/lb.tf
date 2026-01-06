@@ -45,21 +45,6 @@ resource "aws_security_group" "mis_alb_staff" {
   )
 }
 
-# Security group for ALB - End user access
-resource "aws_security_group" "mis_alb_enduser" {
-  count       = var.lb_config != null ? 1 : 0
-  name        = "${local.lb_name}-enduser-sg"
-  description = "Security group for MIS ALB - End user access"
-  vpc_id      = var.account_config.shared_vpc_id
-
-  tags = merge(
-    local.tags,
-    {
-      "Name" = "${local.lb_name}-enduser-sg"
-    },
-  )
-}
-
 # Security group for ALB - MOJO access
 resource "aws_security_group" "mis_alb_mojo" {
   count       = var.lb_config != null ? 1 : 0
