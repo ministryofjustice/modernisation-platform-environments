@@ -92,7 +92,7 @@ resource "aws_security_group" "mis_alb_infrastructure" {
 
 resource "aws_vpc_security_group_egress_rule" "mis_alb_egress" {
   for_each = {
-    http8080-to-bws = { referenced_security_group_id = aws_security_group.bws.id, ip_protocol = "tcp", port = 8080 }
+    http7777-to-bws = { referenced_security_group_id = aws_security_group.bws.id, ip_protocol = "tcp", port = 7777 }
     http8080-to-dis = { referenced_security_group_id = aws_security_group.dis.id, ip_protocol = "tcp", port = 8080 }
     http8080-to-dfi = { referenced_security_group_id = aws_security_group.dfi.id, ip_protocol = "tcp", port = 8080 }
   }
@@ -183,55 +183,6 @@ resource "aws_vpc_security_group_ingress_rule" "mis_alb_https_infrastructure" {
   from_port         = 443
   to_port           = 443
   description       = "Allow HTTPS traffic from infrastructure networks: ${each.value}"
-
-  tags = local.tags
-}
-
-# Allow ALB security groups to communicate with backend instances on port 8080
-resource "aws_vpc_security_group_egress_rule" "mis_alb_backend_staff" {
-  count                        = var.lb_config != null ? 1 : 0
-  security_group_id            = aws_security_group.mis_alb_staff[0].id
-  referenced_security_group_id = aws_security_group.mis_ec2_shared.id
-  ip_protocol                  = "tcp"
-  from_port                    = 8080
-  to_port                      = 8080
-  description                  = "Allow ALB to communicate with MIS instances"
-
-  tags = local.tags
-}
-
-resource "aws_vpc_security_group_egress_rule" "mis_alb_backend_mojo" {
-  count                        = var.lb_config != null ? 1 : 0
-  security_group_id            = aws_security_group.mis_alb_mojo[0].id
-  referenced_security_group_id = aws_security_group.mis_ec2_shared.id
-  ip_protocol                  = "tcp"
-  from_port                    = 8080
-  to_port                      = 8080
-  description                  = "Allow ALB to communicate with MIS instances"
-
-  tags = local.tags
-}
-
-resource "aws_vpc_security_group_egress_rule" "mis_alb_backend_infrastructure" {
-  count                        = var.lb_config != null ? 1 : 0
-  security_group_id            = aws_security_group.mis_alb_infrastructure[0].id
-  referenced_security_group_id = aws_security_group.mis_ec2_shared.id
-  ip_protocol                  = "tcp"
-  from_port                    = 8080
-  to_port                      = 8080
-  description                  = "Allow ALB to communicate with MIS instances"
-
-  tags = local.tags
-}
-
-resource "aws_vpc_security_group_ingress_rule" "ec2_from_alb_infrastructure" {
-  count                        = var.lb_config != null ? 1 : 0
-  security_group_id            = aws_security_group.mis_ec2_shared.id
-  referenced_security_group_id = aws_security_group.mis_alb_infrastructure[0].id
-  ip_protocol                  = "tcp"
-  from_port                    = 8080
-  to_port                      = 8080
-  description                  = "Allow MIS ALB to reach instances on port 8080"
 
   tags = local.tags
 }
@@ -346,7 +297,7 @@ resource "aws_lb_target_group" "dis" {
 resource "aws_lb_target_group" "bws" {
   count    = local.bws_enabled ? 1 : 0
   name     = "${local.lb_name}-bws-tg"
-  port     = 8080
+  port     = 7777
   protocol = "HTTP"
   vpc_id   = var.account_config.shared_vpc_id
 
@@ -536,7 +487,7 @@ resource "aws_lb_target_group_attachment" "bws_attachment" {
   count            = local.bws_enabled ? var.bws_config.instance_count : 0
   target_group_arn = aws_lb_target_group.bws[0].arn
   target_id        = module.bws_instance[count.index].aws_instance.id
-  port             = 8080
+  port             = 7777
 }
 
 # Create route53 entry for DFI - only if DFI is enabled
