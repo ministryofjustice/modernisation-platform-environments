@@ -1,49 +1,19 @@
 locals {
   lb_name = "${var.env_name}-mis-alb"
 
-  # DFI endpoint configuration - uses values from dfi_config if available, otherwise defaults
-  dfi_enabled              = var.lb_config != null && var.dfi_config != null && var.dfi_config.instance_count > 0
-  dfi_endpoint             = local.dfi_enabled && try(var.dfi_config.lb_target_config.endpoint, null) != null ? var.dfi_config.lb_target_config.endpoint : "ndl-dfi"
-  dfi_fqdn                 = "${local.dfi_endpoint}.${var.env_name}.${var.account_config.dns_suffix}"
-  dfi_port                 = local.dfi_enabled && try(var.dfi_config.lb_target_config.port, null) != null ? var.dfi_config.lb_target_config.port : 8080
-  dfi_health_check_path    = local.dfi_enabled && try(var.dfi_config.lb_target_config.health_check_path, null) != null ? var.dfi_config.lb_target_config.health_check_path : "/DataServices/"
-  dfi_health_check_matcher = local.dfi_enabled && try(var.dfi_config.lb_target_config.health_check_matcher, null) != null ? var.dfi_config.lb_target_config.health_check_matcher : "200,302,301"
+  # remember to update cert if changing the DNS zone for the FQDN
+  # Example FQDNs:
+  #   ndl-dis.dev.delius-mis.hmpps-development.modernisation-platform.service.justice.gov.uk [DIS]
+  #   dev.delius-mis.hmpps-development.modernisation-platform.service.justice.gov.uk         [Reporting]
 
-  # DIS endpoint configuration - uses values from dis_config if available, otherwise defaults
-  dis_enabled              = var.lb_config != null && var.dis_config != null && var.dis_config.instance_count > 0
-  dis_endpoint             = local.dis_enabled && try(var.dis_config.lb_target_config.endpoint, null) != null ? var.dis_config.lb_target_config.endpoint : "ndl-dis"
-  dis_fqdn                 = "${local.dis_endpoint}.${var.env_name}.${var.account_config.dns_suffix}"
-  dis_port                 = local.dis_enabled && try(var.dis_config.lb_target_config.port, null) != null ? var.dis_config.lb_target_config.port : 8080
-  dis_health_check_path    = local.dis_enabled && try(var.dis_config.lb_target_config.health_check_path, null) != null ? var.dis_config.lb_target_config.health_check_path : "/BOE/CMC/"
-  dis_health_check_matcher = local.dis_enabled && try(var.dis_config.lb_target_config.health_check_matcher, null) != null ? var.dis_config.lb_target_config.health_check_matcher : "200,302,301"
+  dfi_enabled = var.lb_config != null && var.dfi_config != null && var.dfi_config.instance_count > 0
+  dfi_fqdn    = "ndl-dfi.${var.env_name}.${var.account_config.dns_suffix}"
 
-  # Build certificate SANs dynamically based on what's enabled
-  certificate_sans = compact([
-    local.dfi_enabled ? local.dfi_fqdn : "",
-    local.dis_enabled ? local.dis_fqdn : ""
-  ])
+  dis_enabled = var.lb_config != null && var.dis_config != null && var.dis_config.instance_count > 0
+  dis_fqdn    = "ndl-dis.${var.env_name}.${var.account_config.dns_suffix}"
 
-  # Build certificate validation map dynamically
-  certificate_validation = merge(
-    {
-      "modernisation-platform.service.justice.gov.uk" = {
-        account   = "core-network-services"
-        zone_name = "modernisation-platform.service.justice.gov.uk."
-      }
-    },
-    local.dfi_enabled ? {
-      "${local.dfi_fqdn}" = {
-        account   = "core-vpc"
-        zone_name = var.account_config.route53_external_zone.name
-      }
-    } : {},
-    local.dis_enabled ? {
-      "${local.dis_fqdn}" = {
-        account   = "core-vpc"
-        zone_name = var.account_config.route53_external_zone.name
-      }
-    } : {}
-  )
+  bws_enabled = var.lb_config != null && var.bws_config != null && var.bws_config.instance_count > 0
+  bws_fqdn    = "${var.env_name}.${var.account_config.dns_suffix}"
 }
 
 # Main security group for ALB
@@ -307,7 +277,7 @@ resource "aws_lb" "mis" {
 resource "aws_lb_target_group" "dfi" {
   count    = local.dfi_enabled ? 1 : 0
   name     = "${local.lb_name}-dfi-tg"
-  port     = local.dfi_port
+  port     = 8080
   protocol = "HTTP"
   vpc_id   = var.account_config.shared_vpc_id
 
@@ -320,8 +290,8 @@ resource "aws_lb_target_group" "dfi" {
     unhealthy_threshold = 3
     timeout             = 10
     interval            = 30
-    path                = local.dfi_health_check_path
-    matcher             = local.dfi_health_check_matcher
+    path                = "/DataServices/"
+    matcher             = "200,302,301"
     port                = "traffic-port"
     protocol            = "HTTP"
   }
@@ -344,7 +314,7 @@ resource "aws_lb_target_group" "dfi" {
 resource "aws_lb_target_group" "dis" {
   count    = local.dis_enabled ? 1 : 0
   name     = "${local.lb_name}-dis-tg"
-  port     = local.dis_port
+  port     = 8080
   protocol = "HTTP"
   vpc_id   = var.account_config.shared_vpc_id
 
@@ -357,8 +327,8 @@ resource "aws_lb_target_group" "dis" {
     unhealthy_threshold = 3
     timeout             = 10
     interval            = 30
-    path                = local.dis_health_check_path
-    matcher             = local.dis_health_check_matcher
+    path                = "/BOE/CMC/"
+    matcher             = "200,302,301"
     port                = "traffic-port"
     protocol            = "HTTP"
   }
@@ -373,6 +343,43 @@ resource "aws_lb_target_group" "dis" {
     local.tags,
     {
       "Name" = "${local.lb_name}-dis-tg"
+    },
+  )
+}
+
+# Target Group for BWS instances - only created if BWS instances exist
+resource "aws_lb_target_group" "bws" {
+  count    = local.bws_enabled ? 1 : 0
+  name     = "${local.lb_name}-bws-tg"
+  port     = 8080
+  protocol = "HTTP"
+  vpc_id   = var.account_config.shared_vpc_id
+
+  # Deregistration delay - how long to wait before deregistering targets
+  deregistration_delay = 30
+
+  health_check {
+    enabled             = true
+    healthy_threshold   = 2
+    unhealthy_threshold = 3
+    timeout             = 10
+    interval            = 30
+    path                = "/BOE/CMC/"
+    matcher             = "200,302,301"
+    port                = "traffic-port"
+    protocol            = "HTTP"
+  }
+
+  stickiness {
+    type            = "lb_cookie"
+    enabled         = true
+    cookie_duration = 86400 # 1 day
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      "Name" = "${local.lb_name}-bws-tg"
     },
   )
 }
@@ -468,11 +475,27 @@ module "acm_certificate" {
     aws.core-network-services = aws.core-network-services
   }
 
-  name                    = "${local.lb_name}-cert"
-  domain_name             = "modernisation-platform.service.justice.gov.uk"
-  subject_alternate_names = local.certificate_sans
+  name        = "${local.lb_name}-cert"
+  domain_name = "modernisation-platform.service.justice.gov.uk"
+  subject_alternate_names = [
+    "${var.env_name}.${var.account_config.dns_suffix}",
+    "*.${var.env_name}.${var.account_config.dns_suffix}"
+  ]
 
-  validation = local.certificate_validation
+  validation = {
+    "modernisation-platform.service.justice.gov.uk" = {
+      account   = "core-network-services"
+      zone_name = "modernisation-platform.service.justice.gov.uk."
+    }
+    "${var.env_name}.${var.account_config.dns_suffix}" = {
+      account   = "core-vpc"
+      zone_name = var.account_config.route53_external_zone.name
+    }
+    "*.${var.env_name}.${var.account_config.dns_suffix}" = {
+      account   = "core-vpc"
+      zone_name = var.account_config.route53_external_zone.name
+    }
+  }
 
   tags = local.tags
 }
@@ -482,13 +505,7 @@ resource "aws_lb_target_group_attachment" "dfi_attachment" {
   count            = local.dfi_enabled ? var.dfi_config.instance_count : 0
   target_group_arn = aws_lb_target_group.dfi[0].arn
   target_id        = module.dfi_instance[count.index].aws_instance.id
-  port             = local.dfi_port
-
-  # Explicit dependency to ensure instances and target group exist first
-  depends_on = [
-    aws_lb_target_group.dfi,
-    module.dfi_instance
-  ]
+  port             = 8080
 }
 
 # Attach DIS instances to the target group - only if DIS is enabled
@@ -496,13 +513,15 @@ resource "aws_lb_target_group_attachment" "dis_attachment" {
   count            = local.dis_enabled ? var.dis_config.instance_count : 0
   target_group_arn = aws_lb_target_group.dis[0].arn
   target_id        = module.dis_instance[count.index].aws_instance.id
-  port             = local.dis_port
+  port             = 8080
+}
 
-  # Explicit dependency to ensure instances and target group exist first
-  depends_on = [
-    aws_lb_target_group.dis,
-    module.dis_instance
-  ]
+# Attach BWS instances to the target group - only if BWS is enabled
+resource "aws_lb_target_group_attachment" "bws_attachment" {
+  count            = local.bws_enabled ? var.bws_config.instance_count : 0
+  target_group_arn = aws_lb_target_group.bws[0].arn
+  target_id        = module.bws_instance[count.index].aws_instance.id
+  port             = 8080
 }
 
 # Create route53 entry for DFI - only if DFI is enabled
@@ -528,6 +547,22 @@ resource "aws_route53_record" "dis_entry" {
 
   zone_id = var.account_config.route53_external_zone.zone_id
   name    = local.dis_fqdn
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.mis[0].dns_name
+    zone_id                = aws_lb.mis[0].zone_id
+    evaluate_target_health = false
+  }
+}
+
+# Create route53 entry for BWS - only if BWS is enabled
+resource "aws_route53_record" "bws_entry" {
+  count    = local.bws_enabled ? 1 : 0
+  provider = aws.core-vpc
+
+  zone_id = var.account_config.route53_external_zone.zone_id
+  name    = local.bws_fqdn
   type    = "A"
 
   alias {
