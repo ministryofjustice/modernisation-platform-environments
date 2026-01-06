@@ -1280,7 +1280,7 @@ resource "aws_iam_role_policy_attachment" "glue_db_count_metrics_policy_attachme
 
 
 #-----------------------------------------------------------------------------------
-# Historical Data Cut Back (Prod Role)
+# Data Cut Back
 #-----------------------------------------------------------------------------------
 
 data "aws_iam_policy_document" "data_cutback_iam_role_policy_document" {

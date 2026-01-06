@@ -36,7 +36,7 @@ module "dms_validation_step_function" {
 
 
 # ------------------------------------------
-# Historic Data Cut Back Step Function
+# Data Cut Back Step Function
 # ------------------------------------------
 
 module "data_cutback_step_function" {
