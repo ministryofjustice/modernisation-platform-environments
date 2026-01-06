@@ -140,7 +140,7 @@ module "kms_key" {
   # Grant external account role specific operations.
   # To view grants, need to use cli:
   # aws kms list-grants --region=eu-west-2 --key-id <key id>
-  grants = merge(local.cross_account_kms_grant, local.external_account_kms_grant)
+  grants = nonsensitive(merge(local.cross_account_kms_grant, local.external_account_kms_grant))
 
   tags = merge(
     var.local_tags,
