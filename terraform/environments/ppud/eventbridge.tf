@@ -195,13 +195,13 @@ locals {
       description  = "Trigger Lambda at 07:15 each Monday"
       timezone     = "Europe/London"
     }
+    /*
     check_elb_trt_alarm = {
       environments = ["production"]
       schedule     = "cron(0 * ? * * *)"
       description  = "Trigger Lambda every hour"
       timezone     = "Europe/London"
     }
-    /*
     ppud_elb_daily_connections_graph = {
       environments = ["production"]
       schedule     = "cron(15 20 ? * MON-FRI *)"
@@ -300,7 +300,7 @@ locals {
     #  local.is-preproduction ? aws_lambda_function.lambda_functions["wam_waf_analysis_preproduction"].arn : (
     #    local.is-production ? aws_lambda_function.lambda_functions["wam_waf_analysis_production"].arn : null
     #))
-    check_elb_trt_alarm            = local.is-production ? aws_lambda_function.lambda_functions["check_elb_trt_alarm_production"].arn : null
+    # check_elb_trt_alarm            = local.is-production ? aws_lambda_function.lambda_functions["check_elb_trt_alarm_production"].arn : null
     send_cpu_graph                 = local.is-production ? aws_lambda_function.lambda_functions["send_cpu_graph_production"].arn : null
     disable_cpu_alarms             = local.is-production ? aws_lambda_function.lambda_functions["disable_cpu_alarm_production"].arn : null
     enable_cpu_alarms              = local.is-production ? aws_lambda_function.lambda_functions["enable_cpu_alarm_production"].arn : null
