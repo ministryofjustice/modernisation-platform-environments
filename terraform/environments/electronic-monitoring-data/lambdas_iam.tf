@@ -996,6 +996,14 @@ data "aws_iam_policy_document" "load_fms_lambda_role_policy_document" {
     ]
     resources = [aws_sqs_queue.clean_dlt_load_queue.arn]
   }
+  statement {
+    sid    = "AllowPublishToAlertsTopic"
+    effect = "Allow"
+    actions = [
+      "sns:Publish",
+      ]
+    resources = [aws_sns_topic.emds_alerts.arn]
+  }
 }
 
 resource "aws_iam_role" "load_fms" {

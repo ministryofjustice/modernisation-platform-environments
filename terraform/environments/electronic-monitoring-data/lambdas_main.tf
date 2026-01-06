@@ -399,6 +399,7 @@ module "load_fms_lambda" {
     STAGING_BUCKET      = module.s3-create-a-derived-table-bucket.bucket.id
     ENVIRONMENT_NAME    = local.environment_shorthand
     CLEANUP_QUEUE_URL   = aws_sqs_queue.clean_dlt_load_queue.id
+    SNS_TOPIC_ARN  = aws_sns_topic.emds_alerts.arn
   }
 }
 
