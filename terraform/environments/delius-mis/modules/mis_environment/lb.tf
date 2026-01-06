@@ -379,27 +379,30 @@ resource "aws_lb_target_group" "bws" {
   )
 }
 
-# HTTP Listener (port 80) - default action forwards to DFI (if exists), otherwise DIS
+# HTTP listener - redirect to HTTPS
 resource "aws_lb_listener" "mis_http" {
-  count = (var.lb_config != null && local.dfi_enabled && length(aws_lb_target_group.dfi) > 0) || (
-  !local.dfi_enabled && length(aws_lb_target_group.dis) > 0) ? 1 : 0
+  count = var.lb_config != null ? 1 : 0
 
   load_balancer_arn = aws_lb.mis[0].arn
   port              = "80"
   protocol          = "HTTP"
 
   default_action {
-    type             = "forward"
-    target_group_arn = local.dfi_enabled ? try(aws_lb_target_group.dfi[0].arn, null) : try(aws_lb_target_group.dis[0].arn, null)
+    type = "redirect"
+
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
   }
 
   tags = local.tags
 }
 
-# HTTPS Listener (port 443) - default action forwards to DFI (if exists), otherwise DIS
+# HTTPS Listener (port 443) - default action is HTTP 501 if no rules are matched
 resource "aws_lb_listener" "mis_https" {
-  count = (var.lb_config != null && local.dfi_enabled && length(aws_lb_target_group.dfi) > 0) || (
-  !local.dfi_enabled && length(aws_lb_target_group.dis) > 0) ? 1 : 0
+  count = var.lb_config != null ? 1 : 0
 
   load_balancer_arn = aws_lb.mis[0].arn
   port              = "443"
@@ -408,18 +411,41 @@ resource "aws_lb_listener" "mis_https" {
   certificate_arn   = module.acm_certificate[0].arn
 
   default_action {
-    type             = "forward"
-    target_group_arn = local.dfi_enabled ? try(aws_lb_target_group.dfi[0].arn, null) : try(aws_lb_target_group.dis[0].arn, null)
+    type = "fixed-response"
+
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "Not implemented"
+      status_code  = "501"
+    }
   }
 
   tags = local.tags
 }
 
-# HTTP Listener Rule for DIS - only created if both DFI and DIS exist (otherwise DIS is the default)
-resource "aws_lb_listener_rule" "dis_http" {
-  count        = local.dfi_enabled && local.dis_enabled ? 1 : 0
-  listener_arn = aws_lb_listener.mis_http[0].arn
+resource "aws_lb_listener_rule" "dfi_https" {
+  count        = local.dfi_enabled ? 1 : 0
+  listener_arn = aws_lb_listener.mis_https[0].arn
   priority     = 100
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.dfi[0].arn
+  }
+
+  condition {
+    host_header {
+      values = [local.dfi_fqdn]
+    }
+  }
+
+  tags = local.tags
+}
+
+resource "aws_lb_listener_rule" "dis_https" {
+  count        = local.dis_enabled ? 1 : 0
+  listener_arn = aws_lb_listener.mis_https[0].arn
+  priority     = 200
 
   action {
     type             = "forward"
@@ -435,20 +461,19 @@ resource "aws_lb_listener_rule" "dis_http" {
   tags = local.tags
 }
 
-# HTTPS Listener Rule for DIS - only created if both DFI and DIS exist (otherwise DIS is the default)
-resource "aws_lb_listener_rule" "dis_https" {
-  count        = local.dfi_enabled && local.dis_enabled ? 1 : 0
+resource "aws_lb_listener_rule" "bws_https" {
+  count        = local.bws_enabled ? 1 : 0
   listener_arn = aws_lb_listener.mis_https[0].arn
-  priority     = 100
+  priority     = 300
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.dis[0].arn
+    target_group_arn = aws_lb_target_group.bws[0].arn
   }
 
   condition {
     host_header {
-      values = [local.dis_fqdn]
+      values = [local.bws_fqdn]
     }
   }
 
