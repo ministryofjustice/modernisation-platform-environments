@@ -1277,3 +1277,49 @@ resource "aws_iam_role_policy_attachment" "glue_db_count_metrics_policy_attachme
   role       = aws_iam_role.glue_db_count_metrics.name
   policy_arn = aws_iam_policy.glue_db_count_metrics.arn
 }
+
+#-----------------------------------------------------------------------------------
+# MDSS daily failure digest IAM Role
+#-----------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "mdss_daily_failure_digest_policy_document" {
+  count = local.is-development ? 0 : 1
+
+  statement {
+    sid    = "CloudWatchGetMetricData"
+    effect = "Allow"
+    actions = [
+      "cloudwatch:GetMetricData",
+      "cloudwatch:GetMetricStatistics",
+      "cloudwatch:ListMetrics",
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "AllowPublishToAlertsTopic"
+    effect = "Allow"
+    actions = [
+      "sns:Publish",
+    ]
+    resources = [aws_sns_topic.emds_alerts.arn]
+  }
+}
+
+resource "aws_iam_role" "mdss_daily_failure_digest" {
+  count              = local.is-development ? 0 : 1
+  name               = "mdss_daily_failure_digest_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_policy" "mdss_daily_failure_digest" {
+  count  = local.is-development ? 0 : 1
+  name   = "mdss_daily_failure_digest_lambda_policy"
+  policy = data.aws_iam_policy_document.mdss_daily_failure_digest_policy_document[0].json
+}
+
+resource "aws_iam_role_policy_attachment" "mdss_daily_failure_digest_attach" {
+  count      = local.is-development ? 0 : 1
+  role       = aws_iam_role.mdss_daily_failure_digest[0].name
+  policy_arn = aws_iam_policy.mdss_daily_failure_digest[0].arn
+}

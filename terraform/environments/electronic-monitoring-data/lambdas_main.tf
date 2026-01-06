@@ -482,3 +482,86 @@ resource "aws_lambda_permission" "glue_db_count_metrics_allow_eventbridge" {
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.glue_db_count_metrics_schedule[0].arn
 }
+
+#-----------------------------------------------------------------------------------
+# MDSS daily failure digest Lambda
+#-----------------------------------------------------------------------------------
+
+module "mdss_daily_failure_digest" {
+  count                          = local.is-development ? 0 : 1
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "mdss_daily_failure_digest"
+  role_name                      = aws_iam_role.mdss_daily_failure_digest[0].name
+  role_arn                       = aws_iam_role.mdss_daily_failure_digest[0].arn
+  handler                        = "mdss_daily_failure_digest.handler"
+  memory_size                    = 512
+  timeout                        = 60
+  reserved_concurrent_executions = 1
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+  security_group_ids             = [aws_security_group.lambda_generic.id]
+  subnet_ids                     = data.aws_subnets.shared-public.ids
+
+  environment_variables = {
+    SNS_TOPIC_ARN  = aws_sns_topic.emds_alerts.arn
+    ENVIRONMENT    = local.environment_shorthand
+    NAMESPACE      = "EMDS/MDSS"
+    LOOKBACK_HOURS = "24"
+  }
+}
+
+#-----------------------------------------------------------------------------------
+# MDSS daily failure digest schedule (08:00 Europe/London) - EventBridge Scheduler
+#-----------------------------------------------------------------------------------
+
+resource "aws_iam_role" "mdss_daily_failure_digest_scheduler" {
+  count = local.is-development ? 0 : 1
+  name  = "mdss_daily_failure_digest_scheduler_role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = { Service = "scheduler.amazonaws.com" }
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "mdss_daily_failure_digest_scheduler_invoke" {
+  count = local.is-development ? 0 : 1
+  name  = "mdss_daily_failure_digest_scheduler_invoke_policy"
+  role  = aws_iam_role.mdss_daily_failure_digest_scheduler[0].id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = ["lambda:InvokeFunction"]
+        Resource = [module.mdss_daily_failure_digest[0].lambda_function_arn]
+      }
+    ]
+  })
+}
+
+resource "aws_scheduler_schedule" "mdss_daily_failure_digest" {
+  count       = local.is-development ? 0 : 1
+  name        = "mdss_daily_failure_digest_0800"
+  description = "Runs mdss_daily_failure_digest daily at 08:00 Europe/London"
+
+  flexible_time_window {
+    mode = "OFF"
+  }
+
+  schedule_expression          = "cron(0 8 * * ? *)"
+  schedule_expression_timezone = "Europe/London"
+
+  target {
+    arn      = module.mdss_daily_failure_digest[0].lambda_function_arn
+    role_arn = aws_iam_role.mdss_daily_failure_digest_scheduler[0].arn
+  }
+}
