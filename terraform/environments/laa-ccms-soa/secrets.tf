@@ -86,28 +86,3 @@ resource "aws_secretsmanager_secret_version" "ccms_soa_quiesced_secrets_version"
     ]
   }
 }
-
-##########################################################
-# Slack Webhook Secret for CCMS EBS CW + GuardDuty Alerts
-##########################################################
-resource "aws_secretsmanager_secret" "ebs_cw_alerts_secrets" {
-  name        = "${local.application_name}-${local.environment}-cw-guardduty-alerts"
-  description = "Slack Webhook Secret for CCMS EBS CloudWatch & GuardDuty Lambda Alerts"
-
-  tags = merge(local.tags, {
-    Name = "${local.application_name}-${local.environment}-cw-guardduty-alerts"
-  })
-}
-
-resource "aws_secretsmanager_secret_version" "ebs_cw_alerts_secrets_version" {
-  secret_id = aws_secretsmanager_secret.ebs_cw_alerts_secrets.id
-  secret_string = jsonencode({
-  slack_channel_webhook = ""
-  })
-
-  lifecycle {
-    ignore_changes = [
-      secret_string
-    ]
-  }
-}
