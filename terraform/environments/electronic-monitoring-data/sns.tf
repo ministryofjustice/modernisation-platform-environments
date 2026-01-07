@@ -4,7 +4,7 @@ resource "aws_sns_topic" "emds_alerts" {
 
   http_success_feedback_role_arn = aws_iam_role.sns_delivery_logging.arn
   http_failure_feedback_role_arn = aws_iam_role.sns_delivery_logging.arn
-  http_success_feedback_sample_rate = 0
+  http_success_feedback_sample_rate = 100 # revert to 0 once proved the issue
 }
 
 
