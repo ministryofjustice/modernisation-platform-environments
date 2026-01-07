@@ -6,6 +6,8 @@ locals {
     },
   )
 
+  vpc_name = "${var.account_info.business_unit}-${var.account_info.mp_environment}"
+
   cloudwatch_metric_alarms = {
     ec2 = {
       cpu-utilization-high = {
