@@ -1,3 +1,5 @@
+#### This file can be used to store secrets specific to the member account ####
+
 resource "aws_secretsmanager_secret" "secret_eucs_entra" {
   count       = local.is-development ? 1 : 0
   name        = "eucs-entra-${local.environment}-aws-key"
@@ -26,6 +28,7 @@ resource "aws_secretsmanager_secret" "secret_ses_smtp_credentials" {
   })
 }
 
+# Secret for Payment Load
 resource "aws_secretsmanager_secret" "secret_lambda_s3" {
   name        = "db-${local.environment}-credentials"
   description = "AWS credentials for lambda to connect to the db."
@@ -35,6 +38,7 @@ resource "aws_secretsmanager_secret" "secret_lambda_s3" {
   })
 }
 
+# Slack Channel ID for guardduty Alerts
 resource "aws_secretsmanager_secret" "guardduty_slack_channel_id" {
   name        = "guardduty_slack_channel_id"
   description = "Slack Channel ID for guardduty Alerts"
@@ -44,6 +48,7 @@ data "aws_secretsmanager_secret_version" "guardduty_slack_channel_id" {
   secret_id = aws_secretsmanager_secret.guardduty_slack_channel_id.id
 }
 
+# Slack Channel Webhook Secret for Cloudwatch & GuardDuty Alerts via Lambda
 resource "aws_secretsmanager_secret" "ebs_cw_alerts_secrets" {
   name        = "${local.application_name}-cw-alerts-secrets"
   description = "CCMS CloudWatch & GuardDuty Alerts Secret"
