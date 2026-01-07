@@ -150,7 +150,7 @@ locals {
       }
     }
 
-    prisoner-retail = {
+    prisoner-retail-ps-poc = {
       cloudwatch_metric_alarms = merge(
         local.cloudwatch_metric_alarms.windows,
       )
@@ -195,6 +195,58 @@ locals {
         create_internal_record = false
       }
       tags = {
+        name        = "prison-retail-ps-poc"
+        backup      = "false" # disable mod platform backup since we use our own policies
+        os-type     = "Windows"
+        server-type = "PrisonerRetail"
+      }
+    }
+    prisoner-retail = {
+      cloudwatch_metric_alarms = merge(
+        local.cloudwatch_metric_alarms.windows,
+      )
+      config = {
+        ami_name                      = "Windows_Server-2025-English-Full-SQL_2025_Standard-2025.12.10"
+        availability_zone             = "eu-west-2a"
+        ebs_volumes_copy_all_from_ami = false
+        iam_resource_names_prefix     = "ec2-instance"
+        instance_profile_policies = [
+          "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+          "EC2Default",
+          "EC2S3BucketWriteAndDeleteAccessPolicy",
+          "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
+          "Ec2PrisonerRetailPolicy"
+        ]
+        subnet_name = "private"
+        user_data_raw = base64encode(templatefile(
+          "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
+            branch = "main"
+          }
+        ))
+      }
+      ebs_volumes = {
+        "/dev/sda1" = { type = "gp3", size = 100 }
+      }
+      instance = {
+        disable_api_termination      = false
+        instance_type                = "t3.medium"
+        key_name                     = "ec2-user"
+        metadata_options_http_tokens = "required"
+        tags = {
+          backup-plan = "daily-and-weekly"
+        }
+        vpc_security_group_ids = [
+          "prisoner-retail",
+          "ad-join",
+          "ec2-windows"
+        ]
+      }
+      route53_records = {
+        create_external_record = false
+        create_internal_record = false
+      }
+      tags = {
+        name        = "prison-retail"
         backup      = "false" # disable mod platform backup since we use our own policies
         os-type     = "Windows"
         server-type = "PrisonerRetail"
