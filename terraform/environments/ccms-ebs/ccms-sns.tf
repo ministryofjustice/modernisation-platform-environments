@@ -55,7 +55,7 @@ EOF
 }
 
 data "aws_iam_policy_document" "sns_topic_policy_ec2cw" {
-  # Allow account root full control over the topic
+  # Owner full access
   statement {
     sid     = "AllowOwnerFullAccess"
     effect  = "Allow"
@@ -69,7 +69,7 @@ data "aws_iam_policy_document" "sns_topic_policy_ec2cw" {
     resources = [aws_sns_topic.cw_alerts.arn]
   }
 
-  # Allow CloudWatch (and/or CloudWatch Alarms) to publish to the topic
+  # CloudWatch / CloudWatch Alarms can publish
   statement {
     sid     = "AllowCloudWatchToPublish"
     effect  = "Allow"
@@ -83,7 +83,7 @@ data "aws_iam_policy_document" "sns_topic_policy_ec2cw" {
     resources = [aws_sns_topic.cw_alerts.arn]
   }
 
-  # Allow EventBridge (GuardDuty rule) to publish GuardDuty findings to the topic
+  # EventBridge GuardDuty rule can publish
   statement {
     sid     = "AllowEventBridgeGuardDutyToPublish"
     effect  = "Allow"
