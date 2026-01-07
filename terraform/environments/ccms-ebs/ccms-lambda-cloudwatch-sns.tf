@@ -65,7 +65,6 @@ resource "aws_lambda_layer_version" "lambda_cloudwatch_sns_layer" {
   description              = "Lambda Layer for ${local.application_name} CloudWatch SNS Alarm Integration"
 }
 
-
 data "archive_file" "lambda_zip" {
   type        = "zip"
   source_dir  = "${path.module}/lambda/cloudwatch_alarm_slack_integration"
@@ -104,4 +103,54 @@ resource "aws_lambda_permission" "allow_sns_invoke" {
   function_name = aws_lambda_function.cloudwatch_sns.function_name
   principal     = "sns.amazonaws.com"
   source_arn    = aws_sns_topic.cw_alerts.arn
+}
+
+#############################
+# GuardDuty -> EventBridge -> SNS wiring
+#############################
+
+# EventBridge rule to capture all GuardDuty findings in this account/region
+resource "aws_cloudwatch_event_rule" "guardduty_all_findings" {
+  name        = "${local.application_name}-${local.environment}-guardduty-all-findings"
+  description = "Send all GuardDuty findings to SNS topic ${aws_sns_topic.cw_alerts.name}"
+
+  event_pattern = <<EOF
+{
+  "source": ["aws.guardduty"],
+  "detail-type": ["GuardDuty Finding"]
+}
+EOF
+}
+
+# Allow EventBridge to publish to the cw_alerts SNS topic
+# NOTE: if you already have a topic policy for cw_alerts elsewhere, merge this Statement there instead.
+resource "aws_sns_topic_policy" "cw_alerts_allow_events" {
+  arn = aws_sns_topic.cw_alerts.arn
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid       = "AllowEventBridgeToPublishGuardDutyFindings"
+        Effect    = "Allow"
+        Principal = {
+          Service = "events.amazonaws.com"
+        }
+        Action   = "sns:Publish"
+        Resource = aws_sns_topic.cw_alerts.arn
+        Condition = {
+          ArnEquals = {
+            "aws:SourceArn" = aws_cloudwatch_event_rule.guardduty_all_findings.arn
+          }
+        }
+      }
+    ]
+  })
+}
+
+# EventBridge target: send GuardDuty findings into the same SNS topic
+resource "aws_cloudwatch_event_target" "guardduty_to_sns" {
+  rule      = aws_cloudwatch_event_rule.guardduty_all_findings.name
+  target_id = "send-guardduty-findings-to-sns"
+  arn       = aws_sns_topic.cw_alerts.arn
 }
