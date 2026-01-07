@@ -33,7 +33,7 @@ defaults:
 jobs:
 
   fetch-secrets:
-    uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@0c879ebf9183dd7e47d3fe9c961afa3271843b8b # v3.6.0
+    uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@5c713c93eea694829b1bd3f410d0b235053318ce # v4.0.0
     permissions:
       id-token: write
       contents: read
