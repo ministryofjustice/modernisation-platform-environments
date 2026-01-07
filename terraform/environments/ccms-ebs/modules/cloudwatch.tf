@@ -119,7 +119,7 @@ resource "aws_cloudwatch_metric_alarm" "instance_health_check" {
   metric_name         = "StatusCheckFailed_Instance"
   namespace           = "AWS/EC2"
   period              = "60"
-  statistic           = "Maximum"
+  statistic           = "Average"
   threshold           = "1"
   alarm_description   = "Instance status checks monitor the software and network configuration of your individual instance. When an instance status check fails, you typically must address the problem yourself: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/monitoring-system-instance-status-check.html"
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
