@@ -87,3 +87,34 @@ resource "aws_secretsmanager_secret_version" "ccms_soa_quiesced_secrets_version"
   }
 }
 
+##########################################################
+# Slack Webhook Secret for CCMS EBS CW + GuardDuty Alerts
+##########################################################
+resource "aws_secretsmanager_secret" "ebs_cw_alerts_secrets" {
+  name        = "${local.application_name}-${local.environment}-cw-guardduty-alerts"
+  description = "Slack Webhook Secret for CCMS EBS CloudWatch & GuardDuty Lambda Alerts"
+
+  tags = merge(local.tags, {
+    Name = "${local.application_name}-${local.environment}-cw-guardduty-alerts"
+  })
+}
+
+resource "aws_secretsmanager_secret_version" "ebs_cw_alerts_secrets_version" {
+  secret_id = aws_secretsmanager_secret.ebs_cw_alerts_secrets.id
+
+  # Fill the webhook URL(s) manually in the console or via CI/CD – this is just a shape placeholder.
+  secret_string = jsonencode({
+    # Used by lambda_function.py (mandatory)
+    slack_channel_webhook = ""
+
+    # Optional: you can add more keys later if you extend the Lambda,
+    # e.g. a separate channel just for GuardDuty:
+    # slack_channel_webhook_guardduty = ""
+  })
+
+  lifecycle {
+    ignore_changes = [
+      secret_string
+    ]
+  }
+}
