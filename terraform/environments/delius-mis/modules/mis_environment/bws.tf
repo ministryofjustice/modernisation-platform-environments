@@ -22,11 +22,14 @@ resource "aws_security_group_rule" "bws_ingress" {
 
 resource "aws_security_group_rule" "bws_egress" {
   for_each = {
-    all-to-bcs = { source_security_group_id = aws_security_group.bcs.id }
-    all-to-bps = { source_security_group_id = aws_security_group.bps.id }
+    all-to-bcs   = { source_security_group_id = aws_security_group.bcs.id }
+    all-to-bps   = { source_security_group_id = aws_security_group.bps.id }
+    all-to-http  = { protocol = "TCP", port = "80", cidr_blocks = ["0.0.0.0/0"] }
+    all-to-https = { protocol = "TCP", port = "443", cidr_blocks = ["0.0.0.0/0"] }
   }
 
   description              = each.key
+  cidr_blocks              = lookup(each.value, "cidr_blocks", null)
   protocol                 = lookup(each.value, "protocol", "-1")
   from_port                = lookup(each.value, "port", lookup(each.value, "from_port", 0))
   to_port                  = lookup(each.value, "port", lookup(each.value, "to_port", 0))
@@ -50,16 +53,13 @@ module "bws_instance" {
 
   ami_name  = var.bws_config.ami_name
   ami_owner = var.bws_config.ami_owner
-  instance = merge(
-    var.bws_config.instance_config, {
-      key_name = aws_key_pair.ec2_user_key_pair.key_name
-      vpc_security_group_ids = [
-        aws_security_group.legacy.id,
-        aws_security_group.bws.id,
-        aws_security_group.mis_ec2_shared.id
-      ]
-    }
-  )
+  instance = merge(var.bws_config.instance_config, {
+    key_name = aws_key_pair.ec2_user_key_pair.key_name
+    vpc_security_group_ids = [
+      aws_security_group.legacy.id,
+      aws_security_group.bws.id,
+    ]
+  })
   ebs_kms_key_id                = var.account_config.kms_keys["ebs_shared"]
   ebs_volumes_copy_all_from_ami = false
   ebs_volumes                   = var.bws_config.ebs_volumes
