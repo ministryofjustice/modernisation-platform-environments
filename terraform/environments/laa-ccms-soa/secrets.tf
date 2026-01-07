@@ -101,15 +101,8 @@ resource "aws_secretsmanager_secret" "ebs_cw_alerts_secrets" {
 
 resource "aws_secretsmanager_secret_version" "ebs_cw_alerts_secrets_version" {
   secret_id = aws_secretsmanager_secret.ebs_cw_alerts_secrets.id
-
-  # Fill the webhook URL(s) manually in the console or via CI/CD – this is just a shape placeholder.
   secret_string = jsonencode({
-    # Used by lambda_function.py (mandatory)
-    slack_channel_webhook = ""
-
-    # Optional: you can add more keys later if you extend the Lambda,
-    # e.g. a separate channel just for GuardDuty:
-    # slack_channel_webhook_guardduty = ""
+  slack_channel_webhook = ""
   })
 
   lifecycle {
