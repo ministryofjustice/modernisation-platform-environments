@@ -98,6 +98,23 @@ data "aws_iam_policy_document" "emds_alerts_topic_policy" {
     }
   }
 
+  # Allow mdss_daily_failure_digest Lambda role to publish
+  statement {
+    sid    = "AllowMdssDailyFailureDigestLambdaToPublish"
+    effect = "Allow"
+
+    actions = [
+      "sns:Publish",
+    ]
+
+    resources = [aws_sns_topic.emds_alerts.arn]
+
+    principals {
+      type        = "AWS"
+      identifiers = [aws_iam_role.mdss_daily_failure_digest[0].arn]
+    }
+  }
+
   # Allow AWS Chatbot HTTPS endpoint ingestion
   statement {
     sid    = "AllowChatbotToConsume"
