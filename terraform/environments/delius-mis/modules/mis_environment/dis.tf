@@ -47,10 +47,13 @@ module "dis_instance" {
 
   ami_name  = var.dis_config.ami_name
   ami_owner = "self"
-  instance = merge(
-    var.dis_config.instance_config,
-    { vpc_security_group_ids = [aws_security_group.legacy.id, aws_security_group.dis.id, aws_security_group.mis_ec2_shared.id] }
-  )
+  instance = merge(var.dis_config.instance_config, {
+    vpc_security_group_ids = [
+      aws_security_group.legacy.id,
+      aws_security_group.dis.id,
+      aws_security_group.mis_ad_join.id,
+    ]
+  })
   ebs_kms_key_id                = var.account_config.kms_keys["ebs_shared"]
   ebs_volumes_copy_all_from_ami = false
   ebs_volumes                   = var.dis_config.ebs_volumes
