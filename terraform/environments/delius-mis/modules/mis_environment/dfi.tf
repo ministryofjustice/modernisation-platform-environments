@@ -4,6 +4,15 @@ resource "aws_security_group" "dfi" {
   vpc_id      = var.account_info.vpc_id
 }
 
+resource "aws_vpc_security_group_ingress_rule" "dfi_from_alb" {
+  description                  = "MIS ALB to DIS on port 8080"
+  security_group_id            = aws_security_group.dfi.id
+  referenced_security_group_id = aws_security_group.mis_alb.id
+  ip_protocol                  = "tcp"
+  from_port                    = 8080
+  to_port                      = 8080
+}
+
 resource "aws_vpc_security_group_egress_rule" "dfi_oracle_db" {
   description                  = "Oracle DB connection to DSD database"
   security_group_id            = aws_security_group.dfi.id
@@ -38,10 +47,13 @@ module "dfi_instance" {
 
   ami_name  = var.dfi_config.ami_name
   ami_owner = "self"
-  instance = merge(
-    var.dfi_config.instance_config,
-    { vpc_security_group_ids = [aws_security_group.legacy.id, aws_security_group.dfi.id, aws_security_group.mis_ec2_shared.id] }
-  )
+  instance = merge(var.dfi_config.instance_config, {
+    vpc_security_group_ids = [
+      aws_security_group.legacy.id,
+      aws_security_group.dfi.id,
+      aws_security_group.mis_ad_join.id,
+    ]
+  })
   ebs_kms_key_id                = var.account_config.kms_keys["ebs_shared"]
   ebs_volumes_copy_all_from_ami = false
   ebs_volumes                   = var.dfi_config.ebs_volumes

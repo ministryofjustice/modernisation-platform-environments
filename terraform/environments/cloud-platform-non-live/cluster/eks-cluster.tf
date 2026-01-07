@@ -1,10 +1,10 @@
 module "eks" {
-  count = contains(local.enabled_workspaces, local.environment) ? 1 : 0
+  count = contains(local.enabled_workspaces, local.cluster_environment) ? 1 : 0
 
   source  = "terraform-aws-modules/eks/aws"
   version = "~> 21.0"
 
-  name               = local.environment
+  name               = local.cluster_name
   kubernetes_version = "1.34"
   vpc_id             = data.aws_vpc.selected.id
   subnet_ids         = data.aws_subnets.eks_private.ids
@@ -24,7 +24,7 @@ module "eks" {
       instance_types         = local.environment_configuration.default_ng.instance_types
       block_device_mappings  = local.environment_configuration.default_ng.block_device_mappings
       subnet_ids             = data.aws_subnets.eks_private.ids
-      name                   = "${local.environment}-def-ng"
+      name                   = "${local.cluster_name}-def-ng"
       create_security_group  = true
       create_launch_template = true
       labels                 = local.environment_configuration.default_ng.labels
@@ -37,7 +37,7 @@ module "eks" {
       instance_types         = local.environment_configuration.monitoring_ng.instance_types
       block_device_mappings  = local.environment_configuration.monitoring_ng.block_device_mappings
       subnet_ids             = data.aws_subnets.eks_private.ids
-      name                   = "${local.environment}-mon-ng"
+      name                   = "${local.cluster_name}-mon-ng"
       create_security_group  = true
       create_launch_template = true
       taints                 = local.environment_configuration.monitoring_ng.taints

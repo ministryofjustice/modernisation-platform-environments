@@ -1,5 +1,5 @@
 module "aws_vpc_cni_pod_identity" {
-  count = contains(local.enabled_workspaces, local.environment) ? 1 : 0
+  count = contains(local.enabled_workspaces, local.cluster_environment) ? 1 : 0
 
   source  = "terraform-aws-modules/eks-pod-identity/aws"
   version = "2.5.0"
@@ -21,7 +21,7 @@ module "aws_vpc_cni_pod_identity" {
 }
 
 module "aws_ebs_csi_pod_identity" {
-  count = contains(local.enabled_workspaces, local.environment) ? 1 : 0
+  count = contains(local.enabled_workspaces, local.cluster_environment) ? 1 : 0
 
   source = "terraform-aws-modules/eks-pod-identity/aws"
 
