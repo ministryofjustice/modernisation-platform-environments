@@ -1,16 +1,6 @@
 {
-  "StartAt": "InitializeInput",
+  "StartAt": "DataCutBack",
   "States": {
-    "InitializeInput": {
-      "Type": "Pass",
-      "Result": {
-        "source_bucket": "your-default-source",
-        "target_bucket": "your-default-target",
-        "key_to_migrate": "your-default-key"
-      },
-      "ResultPath": "$", 
-      "Next": "DataCutBack"
-    },
     "DataCutBack": {
       "Type": "Task",
       "Resource": "arn:aws:states:::lambda:invoke",
@@ -19,7 +9,7 @@
         "Payload.$": "$",
         "FunctionName": "${data_cutback}"
       },
-      "End": true
+      "End" : true
     }
   }
 }
