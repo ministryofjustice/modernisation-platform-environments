@@ -5,10 +5,10 @@ resource "aws_secretsmanager_secret" "support_email_account" {
   recovery_window_in_days = local.is-production ? 30 : 0
 }
 
-# Use a default dummy address just for creation. Will require to be populated manually.
 resource "aws_secretsmanager_secret_version" "support_email_account" {
   secret_id     = aws_secretsmanager_secret.support_email_account.id
   secret_string = "default@email.com"
+
   lifecycle {
     ignore_changes = [secret_string]
   }
@@ -26,8 +26,8 @@ resource "aws_secretsmanager_secret_version" "alerts_subscription_email" {
 }
 
 resource "aws_sns_topic" "cw_alerts" {
-  name              = "ccms-ebs-ec2-alerts"
-  delivery_policy   = <<EOF
+  name            = "ccms-ebs-ec2-alerts"
+  delivery_policy = <<EOF
 {
   "http": {
     "defaultHealthyRetryPolicy": {
@@ -46,10 +46,62 @@ resource "aws_sns_topic" "cw_alerts" {
   }
 }
 EOF
+
   kms_master_key_id = aws_kms_key.cloudwatch_sns_alerts_key.id
-  tags = merge(local.tags,
-    { Name = "${local.application_name}-ec2-alerts" }
-  )
+
+  tags = merge(local.tags, {
+    Name = "${local.application_name}-ec2-alerts"
+  })
+}
+
+data "aws_iam_policy_document" "sns_topic_policy_ec2cw" {
+  # Allow account root full control over the topic
+  statement {
+    sid     = "AllowOwnerFullAccess"
+    effect  = "Allow"
+    actions = ["sns:*"]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+    }
+
+    resources = [aws_sns_topic.cw_alerts.arn]
+  }
+
+  # Allow CloudWatch (and/or CloudWatch Alarms) to publish to the topic
+  statement {
+    sid     = "AllowCloudWatchToPublish"
+    effect  = "Allow"
+    actions = ["sns:Publish"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["cloudwatch.amazonaws.com"]
+    }
+
+    resources = [aws_sns_topic.cw_alerts.arn]
+  }
+
+  # Allow EventBridge (GuardDuty rule) to publish GuardDuty findings to the topic
+  statement {
+    sid     = "AllowEventBridgeGuardDutyToPublish"
+    effect  = "Allow"
+    actions = ["sns:Publish"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["events.amazonaws.com"]
+    }
+
+    resources = [aws_sns_topic.cw_alerts.arn]
+
+    condition {
+      test     = "ArnEquals"
+      variable = "aws:SourceArn"
+      values   = [aws_cloudwatch_event_rule.guardduty_all_findings.arn]
+    }
+  }
 }
 
 resource "aws_sns_topic_policy" "sns_policy" {
@@ -57,20 +109,15 @@ resource "aws_sns_topic_policy" "sns_policy" {
   policy = data.aws_iam_policy_document.sns_topic_policy_ec2cw.json
 }
 
-
 resource "aws_sns_topic" "s3_topic" {
   name              = "s3-event-notification-topic"
   policy            = data.aws_iam_policy_document.s3_topic_policy.json
   kms_master_key_id = aws_kms_key.cloudwatch_sns_alerts_key.id
-  tags = merge(local.tags,
-    { Name = "s3-event-notification-topic" }
-  )
-}
 
-# resource "aws_sns_topic_policy" "s3_policy" {
-#   arn    = aws_sns_topic.s3_topic.arn
-#   policy = data.aws_iam_policy_document.sns_topic_policy_s3.json
-# }
+  tags = merge(local.tags, {
+    Name = "s3-event-notification-topic"
+  })
+}
 
 resource "aws_sns_topic_subscription" "s3_subscription" {
   topic_arn = aws_sns_topic.s3_topic.arn
@@ -81,15 +128,11 @@ resource "aws_sns_topic_subscription" "s3_subscription" {
 resource "aws_sns_topic" "ddos_alarm" {
   name              = format("%s_ddos_alarm", local.application_name)
   kms_master_key_id = aws_kms_key.cloudwatch_sns_alerts_key.id
-  tags = merge(local.tags,
-    { Name = format("%s_ddos_alarm", local.application_name) }
-  )
-}
 
-# resource "aws_sns_topic_policy" "ddos_policy" {
-#   arn    = aws_sns_topic.ddos_alarm.arn
-#   policy = data.aws_iam_policy_document.sns_topic_policy_ddos.json
-# }
+  tags = merge(local.tags, {
+    Name = format("%s_ddos_alarm", local.application_name)
+  })
+}
 
 resource "aws_sns_topic_subscription" "ddos_subscription" {
   topic_arn = aws_sns_topic.ddos_alarm.arn
@@ -97,10 +140,9 @@ resource "aws_sns_topic_subscription" "ddos_subscription" {
   endpoint  = aws_secretsmanager_secret_version.alerts_subscription_email.secret_string
 }
 
-#--Altering SNS
 resource "aws_sns_topic" "guardduty_alerts" {
-  name              = "${local.application_name}-guardduty-alerts"
-  delivery_policy   = <<EOF
+  name            = "${local.application_name}-guardduty-alerts"
+  delivery_policy = <<EOF
 {
   "http": {
     "defaultHealthyRetryPolicy": {
@@ -119,8 +161,10 @@ resource "aws_sns_topic" "guardduty_alerts" {
   }
 }
 EOF
+
   kms_master_key_id = aws_kms_key.cloudwatch_sns_alerts_key.id
-  tags = merge(local.tags,
-    { Name = "${local.application_name}-guardduty-alerts" }
-  )
+
+  tags = merge(local.tags, {
+    Name = "${local.application_name}-guardduty-alerts"
+  })
 }
