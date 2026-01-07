@@ -1,7 +1,12 @@
 resource "aws_sns_topic" "emds_alerts" {
   name              = "emds-alerts-${local.environment_shorthand}"
   kms_master_key_id = aws_kms_key.emds_alerts.arn
+
+  http_success_feedback_role_arn = aws_iam_role.sns_delivery_logging.arn
+  http_failure_feedback_role_arn = aws_iam_role.sns_delivery_logging.arn
+  http_success_feedback_sample_rate = 0
 }
+
 
 resource "aws_kms_key" "emds_alerts" {
   description         = "KMS key for EMDS SNS alerts"
@@ -149,4 +154,44 @@ resource "aws_sqs_queue" "emds_alerts_dlq" {
   sqs_managed_sse_enabled    = true
   visibility_timeout_seconds = 60
   message_retention_seconds  = 1209600
+}
+
+# -----------------------------------------------------------------------------------
+# SNS delivery status logging role (for HTTPS / Chatbot)
+# -----------------------------------------------------------------------------------
+
+resource "aws_iam_role" "sns_delivery_logging" {
+  name = "sns-delivery-status-logging-${local.environment_shorthand}"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect    = "Allow"
+        Principal = {
+          Service = "sns.amazonaws.com"
+        }
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "sns_delivery_logging" {
+  role = aws_iam_role.sns_delivery_logging.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
 }
