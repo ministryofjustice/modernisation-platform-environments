@@ -86,3 +86,4 @@ resource "aws_secretsmanager_secret_version" "ccms_soa_quiesced_secrets_version"
     ]
   }
 }
+
