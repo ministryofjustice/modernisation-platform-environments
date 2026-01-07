@@ -89,7 +89,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu_over_threshold" {
   comparison_operator = "GreaterThanThreshold"
 
   dimensions = {
-    DBInstanceIdentifier = "${local.application_name}-${local.environment}-database"
+    DBInstanceIdentifier = aws_db_instance.mariadb.arn
   }
 
   tags = merge(
@@ -115,7 +115,7 @@ resource "aws_cloudwatch_metric_alarm" "ram_over_threshold" {
   comparison_operator = "LessThanThreshold"
 
   dimensions = {
-    DBInstanceIdentifier = "${local.application_name}-${local.environment}-database"
+    DBInstanceIdentifier = aws_db_instance.mariadb.arn
   }
 
   tags = merge(
@@ -141,7 +141,7 @@ resource "aws_cloudwatch_metric_alarm" "read_latency_over_threshold" {
   comparison_operator = "GreaterThanThreshold"
 
   dimensions = {
-    DBInstanceIdentifier = "${local.application_name}-${local.environment}-database"
+    DBInstanceIdentifier = aws_db_instance.mariadb.arn
   }
 
   tags = merge(
@@ -167,7 +167,7 @@ resource "aws_cloudwatch_metric_alarm" "write_latency_over_threshold" {
   comparison_operator = "GreaterThanThreshold"
 
   dimensions = {
-    DBInstanceIdentifier = "${local.application_name}-${local.environment}-database"
+    DBInstanceIdentifier = aws_db_instance.mariadb.arn
   }
 
   tags = merge(
@@ -193,7 +193,7 @@ resource "aws_cloudwatch_metric_alarm" "db_connections_over_threshold" {
   comparison_operator = "GreaterThanThreshold"
 
   dimensions = {
-    DBInstanceIdentifier = "${local.application_name}-${local.environment}-database"
+    DBInstanceIdentifier = aws_db_instance.mariadb.arn
   }
 
   tags = merge(
@@ -219,7 +219,7 @@ resource "aws_cloudwatch_metric_alarm" "db_queue_depth_over_threshold" {
   comparison_operator = "GreaterThanThreshold"
 
   dimensions = {
-    DBInstanceIdentifier = "${local.application_name}-${local.environment}-database"
+    DBInstanceIdentifier = aws_db_instance.mariadb.arn
   }
 
   tags = merge(
