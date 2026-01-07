@@ -79,7 +79,7 @@ resource "aws_vpc_security_group_egress_rule" "mis_alb_egress" {
   for_each = {
     http7777-to-bws = { referenced_security_group_id = aws_security_group.bws.id, ip_protocol = "tcp", port = 7777 }
     http8080-to-dis = { referenced_security_group_id = aws_security_group.dis_ec2.id, ip_protocol = "tcp", port = 8080 }
-    http8080-to-dfi = { referenced_security_group_id = aws_security_group.dfi.id, ip_protocol = "tcp", port = 8080 }
+    http8080-to-dfi = { referenced_security_group_id = aws_security_group.dfi_ec2.id, ip_protocol = "tcp", port = 8080 }
   }
 
   description       = each.key
