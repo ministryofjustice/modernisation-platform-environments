@@ -1,5 +1,5 @@
 resource "aws_lb" "ebsapps_lb" {
-  count              = local.is-development ? 0 : 1
+  count              = local.is-production ? 1 : 0
   name               = lower(format("lb-%s-%s-ebsapp", local.application_name, local.environment))
   internal           = false
   load_balancer_type = "application"

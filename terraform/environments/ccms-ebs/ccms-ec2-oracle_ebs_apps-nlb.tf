@@ -14,7 +14,7 @@ resource "aws_eip" "ebs_eip" {
 
 # NLB for EBS
 resource "aws_lb" "ebsapps_nlb" {
-  count              = local.is-development ? 0 : 1
+  count              = local.is-production ? 1 : 0
   name               = lower(format("nlb-%s-%s-ebs", local.application_name, local.environment))
   internal           = false
   load_balancer_type = "network"
@@ -43,7 +43,7 @@ resource "aws_lb" "ebsapps_nlb" {
 }
 
 resource "aws_lb_listener" "ebsnlb_listener" {
-  count             = local.is-development ? 0 : 1
+  count             = local.is-production ? 0 : 1
   load_balancer_arn = aws_lb.ebsapps_nlb[count.index].arn
   port              = "443"
   protocol          = "TCP"
