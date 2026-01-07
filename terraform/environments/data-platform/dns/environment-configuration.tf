@@ -66,6 +66,12 @@ locals {
             "ns-674.awsdns-20.net."
           ]
         }
+        /* GitHub Pages Challenge */
+        github-pages-challenge = {
+          type = "TXT"
+          name = "_github-pages-challenge-ministryofjustice.user-guide"
+          ttl  = 300
+          records = ["8318341c928cb03ff156af46862430"]
       }
     }
   }
