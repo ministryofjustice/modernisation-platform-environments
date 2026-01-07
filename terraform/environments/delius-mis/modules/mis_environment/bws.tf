@@ -22,11 +22,14 @@ resource "aws_security_group_rule" "bws_ingress" {
 
 resource "aws_security_group_rule" "bws_egress" {
   for_each = {
-    all-to-bcs = { source_security_group_id = aws_security_group.bcs.id }
-    all-to-bps = { source_security_group_id = aws_security_group.bps.id }
+    all-to-bcs   = { source_security_group_id = aws_security_group.bcs.id }
+    all-to-bps   = { source_security_group_id = aws_security_group.bps.id }
+    all-to-http  = { protocol = "TCP", port = "80", cidr_blocks = ["0.0.0.0/0"] }
+    all-to-https = { protocol = "TCP", port = "443", cidr_blocks = ["0.0.0.0/0"] }
   }
 
   description              = each.key
+  cidr_blocks              = lookup(each.value, "cidr_blocks", null)
   protocol                 = lookup(each.value, "protocol", "-1")
   from_port                = lookup(each.value, "port", lookup(each.value, "from_port", 0))
   to_port                  = lookup(each.value, "port", lookup(each.value, "to_port", 0))
