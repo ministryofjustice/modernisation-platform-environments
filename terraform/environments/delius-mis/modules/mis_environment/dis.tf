@@ -46,13 +46,6 @@ resource "aws_vpc_security_group_egress_rule" "dis_ec2" {
   tags = var.tags
 }
 
-#FIXME: remove
-resource "aws_security_group" "dis" {
-  #checkov:skip=CKV2_AWS_5 "ignore"
-  name_prefix = "${var.env_name}-dis"
-  vpc_id      = var.account_info.vpc_id
-}
-
 module "dis_instance" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v4.2.0"
 
