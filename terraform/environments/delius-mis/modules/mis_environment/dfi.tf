@@ -1,36 +1,51 @@
-resource "aws_security_group" "dfi" {
+resource "aws_security_group" "dfi_ec2" {
   #checkov:skip=CKV2_AWS_5 "ignore"
-  name_prefix = "${var.env_name}-dfi"
+  name        = "${var.app_name}-${var.env_name}-dfi-ec2-instance-sg"
+  description = "Security group for DFI EC2"
   vpc_id      = var.account_info.vpc_id
+
+  tags = merge(local.tags, {
+    Name = "${var.app_name}-${var.env_name}-dfi-ec2-instance-sg"
+  })
 }
 
-resource "aws_vpc_security_group_ingress_rule" "dfi_from_alb" {
-  description                  = "MIS ALB to DIS on port 8080"
-  security_group_id            = aws_security_group.dfi.id
-  referenced_security_group_id = aws_security_group.mis_alb.id
-  ip_protocol                  = "tcp"
-  from_port                    = 8080
-  to_port                      = 8080
+resource "aws_vpc_security_group_ingress_rule" "dfi_ec2" {
+  for_each = {
+    http8080-from-alb = { referenced_security_group_id = aws_security_group.mis_alb.id, ip_protocol = "tcp", port = 8080 }
+  }
+
+  description       = each.key
+  security_group_id = resource.aws_security_group.dfi_ec2.id
+
+  cidr_ipv4                    = lookup(each.value, "cidr_ipv4", null)
+  ip_protocol                  = lookup(each.value, "ip_protocol", "-1")
+  from_port                    = lookup(each.value, "port", lookup(each.value, "from_port", null))
+  to_port                      = lookup(each.value, "port", lookup(each.value, "to_port", null))
+  referenced_security_group_id = lookup(each.value, "referenced_security_group_id", null)
+
+  tags = local.tags
 }
 
-resource "aws_vpc_security_group_egress_rule" "dfi_oracle_db" {
-  description                  = "Oracle DB connection to DSD database"
-  security_group_id            = aws_security_group.dfi.id
-  referenced_security_group_id = data.aws_security_group.dsd_db.id
-  ip_protocol                  = "tcp"
-  from_port                    = 1521
-  to_port                      = 1521
-}
+resource "aws_vpc_security_group_egress_rule" "dfi_ec2" {
+  for_each = {
+    smtp-to-internal  = { ip_protocol = "TCP", port = 25, cidr_ipv4 = "10.0.0.0/8" }
+    http-to-all       = { ip_protocol = "TCP", port = 80, cidr_ipv4 = "0.0.0.0/0" }
+    ntp-to-all        = { ip_protocol = "UDP", port = 123, cidr_ipv4 = "0.0.0.0/0" }
+    https-to-all      = { ip_protocol = "TCP", port = 443, cidr_ipv4 = "0.0.0.0/0" }
+    smb-to-fsx        = { ip_protocol = "TCP", port = 445, referenced_security_group_id = aws_security_group.fsx.id }
+    oracle1521-to-vpc = { ip_protocol = "TCP", port = 1521, cidr_ipv4 = module.ip_addresses.mp_cidr[local.vpc_name] }
+  }
 
-resource "aws_vpc_security_group_egress_rule" "dfi_all_outbound" {
-  description       = "Allow all outbound traffic"
-  security_group_id = aws_security_group.dfi.id
-  cidr_ipv4         = "0.0.0.0/0"
-  ip_protocol       = "-1"
-}
+  description       = each.key
+  security_group_id = resource.aws_security_group.dfi_ec2.id
 
-data "aws_security_group" "dsd_db" {
-  name = "delius-mis-${var.env_name}-dsd-db-ec2-instance-sg"
+  cidr_ipv4                    = lookup(each.value, "cidr_ipv4", null)
+  ip_protocol                  = lookup(each.value, "ip_protocol", "-1")
+  from_port                    = lookup(each.value, "port", lookup(each.value, "from_port", null))
+  to_port                      = lookup(each.value, "port", lookup(each.value, "to_port", null))
+  referenced_security_group_id = lookup(each.value, "referenced_security_group_id", null)
+
+  tags = local.tags
 }
 
 module "dfi_instance" {
@@ -50,7 +65,7 @@ module "dfi_instance" {
   instance = merge(var.dfi_config.instance_config, {
     vpc_security_group_ids = [
       aws_security_group.legacy.id,
-      aws_security_group.dfi.id,
+      aws_security_group.dfi_ec2.id,
       aws_security_group.mis_ad_join.id,
     ]
   })
@@ -58,7 +73,7 @@ module "dfi_instance" {
   ebs_volumes_copy_all_from_ami = false
   ebs_volumes                   = var.dfi_config.ebs_volumes
   ebs_volume_config             = var.dfi_config.ebs_volumes_config
-  ebs_volume_tags               = var.tags
+  ebs_volume_tags               = local.tags
   route53_records = {
     create_internal_record = false
     create_external_record = false
@@ -90,7 +105,7 @@ module "dfi_instance" {
   availability_zone = "eu-west-2a"
   subnet_id         = var.account_config.private_subnet_ids[count.index]
   tags = merge(
-    var.tags,
+    local.tags,
     {
       domain-name = var.environment_config.ad_domain_name
       server-type = "MISDis"

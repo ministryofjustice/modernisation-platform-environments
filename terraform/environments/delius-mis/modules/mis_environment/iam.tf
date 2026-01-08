@@ -38,7 +38,7 @@ resource "aws_iam_policy" "secrets_manager" {
   description = "Allow ec2 instance to read secrets"
   policy      = data.aws_iam_policy_document.secrets_manager.json
 
-  tags = var.tags
+  tags = local.tags
 }
 
 data "aws_iam_policy_document" "ec2_automation" {
@@ -61,7 +61,7 @@ resource "aws_iam_policy" "ec2_automation" {
   description = "Allow ec2 instance to run automation"
   policy      = data.aws_iam_policy_document.ec2_automation.json
 
-  tags = var.tags
+  tags = local.tags
 }
 
 # AWS Backup Role

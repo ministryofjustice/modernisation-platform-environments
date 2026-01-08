@@ -1,44 +1,53 @@
-resource "aws_security_group" "bcs" {
+resource "aws_security_group" "bcs_ec2" {
   #checkov:skip=CKV2_AWS_5 "ignore"
-  name_prefix = "${var.env_name}-bcs"
+  name        = "${var.app_name}-${var.env_name}-bcs-ec2-instance-sg"
+  description = "Security group for BCS EC2"
   vpc_id      = var.account_info.vpc_id
+
+  tags = merge(local.tags, {
+    Name = "${var.app_name}-${var.env_name}-bcs-ec2-instance-sg"
+  })
 }
 
-resource "aws_security_group_rule" "bcs_ingress" {
+resource "aws_vpc_security_group_ingress_rule" "bcs_ec2" {
   for_each = {
-    all-from-bps = { source_security_group_id = aws_security_group.bps.id }
-    all-from-bws = { source_security_group_id = aws_security_group.bws.id }
+    all-from-bps = { referenced_security_group_id = aws_security_group.bps_ec2.id }
+    all-from-bws = { referenced_security_group_id = aws_security_group.bws_ec2.id }
   }
 
-  description              = each.key
-  protocol                 = lookup(each.value, "protocol", "-1")
-  from_port                = lookup(each.value, "port", lookup(each.value, "from_port", 0))
-  to_port                  = lookup(each.value, "port", lookup(each.value, "to_port", 0))
-  self                     = lookup(each.value, "self", null)
-  source_security_group_id = lookup(each.value, "source_security_group_id", null)
+  description       = each.key
+  security_group_id = resource.aws_security_group.bcs_ec2.id
 
-  security_group_id = resource.aws_security_group.bcs.id
-  type              = "ingress"
+  cidr_ipv4                    = lookup(each.value, "cidr_ipv4", null)
+  ip_protocol                  = lookup(each.value, "ip_protocol", "-1")
+  from_port                    = lookup(each.value, "port", lookup(each.value, "from_port", null))
+  to_port                      = lookup(each.value, "port", lookup(each.value, "to_port", null))
+  referenced_security_group_id = lookup(each.value, "referenced_security_group_id", null)
+
+  tags = local.tags
 }
 
-resource "aws_security_group_rule" "bcs_egress" {
+resource "aws_vpc_security_group_egress_rule" "bcs_ec2" {
   for_each = {
-    all-to-efs   = { source_security_group_id = aws_security_group.boe_efs.id }
-    all-to-bps   = { source_security_group_id = aws_security_group.bps.id }
-    all-to-http  = { protocol = "TCP", port = "80", cidr_blocks = ["0.0.0.0/0"] }
-    all-to-https = { protocol = "TCP", port = "443", cidr_blocks = ["0.0.0.0/0"] }
+    all-to-bps        = { referenced_security_group_id = aws_security_group.bps_ec2.id }
+    smtp-to-internal  = { ip_protocol = "TCP", port = 25, cidr_ipv4 = "10.0.0.0/8" }
+    http-to-all       = { ip_protocol = "TCP", port = 80, cidr_ipv4 = "0.0.0.0/0" }
+    ntp-to-all        = { ip_protocol = "UDP", port = 123, cidr_ipv4 = "0.0.0.0/0" }
+    https-to-all      = { ip_protocol = "TCP", port = 443, cidr_ipv4 = "0.0.0.0/0" }
+    oracle1521-to-vpc = { ip_protocol = "TCP", port = 1521, cidr_ipv4 = module.ip_addresses.mp_cidr[local.vpc_name] }
+    nfs-to-efs        = { ip_protocol = "TCP", port = 2049, referenced_security_group_id = aws_security_group.efs.id }
   }
 
-  description              = each.key
-  cidr_blocks              = lookup(each.value, "cidr_blocks", null)
-  protocol                 = lookup(each.value, "protocol", "-1")
-  from_port                = lookup(each.value, "port", lookup(each.value, "from_port", 0))
-  to_port                  = lookup(each.value, "port", lookup(each.value, "to_port", 0))
-  self                     = lookup(each.value, "self", null)
-  source_security_group_id = lookup(each.value, "source_security_group_id", null)
+  description       = each.key
+  security_group_id = resource.aws_security_group.bcs_ec2.id
 
-  security_group_id = resource.aws_security_group.bcs.id
-  type              = "egress"
+  cidr_ipv4                    = lookup(each.value, "cidr_ipv4", null)
+  ip_protocol                  = lookup(each.value, "ip_protocol", "-1")
+  from_port                    = lookup(each.value, "port", lookup(each.value, "from_port", null))
+  to_port                      = lookup(each.value, "port", lookup(each.value, "to_port", null))
+  referenced_security_group_id = lookup(each.value, "referenced_security_group_id", null)
+
+  tags = local.tags
 }
 
 module "bcs_instance" {
@@ -58,14 +67,14 @@ module "bcs_instance" {
     key_name = aws_key_pair.ec2_user_key_pair.key_name
     vpc_security_group_ids = [
       aws_security_group.legacy.id,
-      aws_security_group.bcs.id,
+      aws_security_group.bcs_ec2.id,
     ]
   })
   ebs_kms_key_id                = var.account_config.kms_keys["ebs_shared"]
   ebs_volumes_copy_all_from_ami = false
   ebs_volumes                   = var.bcs_config.ebs_volumes
   ebs_volume_config             = var.bcs_config.ebs_volumes_config
-  ebs_volume_tags               = var.tags
+  ebs_volume_tags               = local.tags
   route53_records = {
     create_internal_record = false
     create_external_record = false
@@ -95,7 +104,7 @@ module "bcs_instance" {
   region            = "eu-west-2"
   availability_zone = "eu-west-2${lookup(local.availability_zone_map, count.index % 3, "a")}"
   subnet_id         = var.account_config.ordered_private_subnet_ids[count.index % 3]
-  tags = merge(var.tags, {
+  tags = merge(local.tags, {
     instance-scheduling = "skip-scheduling"
     server-type         = "delius-bip-cms"
   })
