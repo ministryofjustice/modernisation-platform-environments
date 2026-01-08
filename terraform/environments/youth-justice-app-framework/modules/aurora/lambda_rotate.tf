@@ -9,14 +9,15 @@ resource "aws_lambda_function" "rds_secret_rotation" {
   #checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
   #checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
   #checkov:skip=CKV_AWS_363: "fix before deprecation date"
-  function_name = "rds-secrets-rotation"
-  role          = aws_iam_role.rds_secret_rotation.arn
-  runtime       = "python3.12"
-  handler       = "lambda_function.lambda_handler"
-  timeout       = 30
-  memory_size   = 128
-  filename      = "${path.module}/zip/rotation_lambda.zip"
-  kms_key_arn   = var.kms_key_arn
+  function_name     = "rds-secrets-rotation"
+  role              = aws_iam_role.rds_secret_rotation.arn
+  runtime           = "python3.12"
+  handler           = "lambda_function.lambda_handler"
+  timeout           = 30
+  memory_size       = 128
+  filename          = "${path.module}/zip/rotation_lambda.zip"
+  kms_key_arn       = var.kms_key_arn
+  source_code_hash  = filebase64sha256("${path.module}/zip/rotation_lambda.zip")
 
   environment {
     variables = {
