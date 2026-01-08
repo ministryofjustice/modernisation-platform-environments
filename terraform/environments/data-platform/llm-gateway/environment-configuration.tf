@@ -185,6 +185,13 @@ locals {
                 "bedrock-claude-sonnet-4-5"
               ]
             }
+            daniel-a = {
+              max_budget = 500
+              models = [
+                "bedrock-claude-haiku-4-5",
+                "bedrock-claude-sonnet-4-5"
+              ]
+            }
           }
         }
         central-digital = {
