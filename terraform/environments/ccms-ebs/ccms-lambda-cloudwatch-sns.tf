@@ -40,6 +40,14 @@ resource "aws_iam_role_policy" "lambda_cloudwatch_sns_policy" {
           "logs:PutLogEvents"
         ]
         Resource = "arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${aws_lambda_function.cloudwatch_sns.function_name}:*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "kms:GenerateDataKey*",
+          "kms:Decrypt"
+        ]
+        Resource = [aws_kms_key.cloudwatch_sns_alerts_key.arn]
       }
     ]
   })
