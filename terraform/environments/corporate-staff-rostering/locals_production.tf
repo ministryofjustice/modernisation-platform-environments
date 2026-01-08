@@ -527,7 +527,7 @@ locals {
 
       prisoner-retail = local.ec2_instances.prisoner-retail-ps-poc
 
-      prison-retail = local.ec2_instances.prisoner-retail
+      prison-retail = local.ec2_instances.prison-retail
     }
 
     iam_policies = {

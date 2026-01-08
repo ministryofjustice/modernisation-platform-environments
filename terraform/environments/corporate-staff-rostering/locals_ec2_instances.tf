@@ -195,13 +195,12 @@ locals {
         create_internal_record = false
       }
       tags = {
-        name        = "prison-retail-ps-poc"
         backup      = "false" # disable mod platform backup since we use our own policies
         os-type     = "Windows"
         server-type = "PrisonerRetail"
       }
     }
-    prisoner-retail = {
+    prison-retail = {
       cloudwatch_metric_alarms = merge(
         local.cloudwatch_metric_alarms.windows,
       )
@@ -247,7 +246,6 @@ locals {
         create_internal_record = false
       }
       tags = {
-        name        = "prison-retail"
         backup      = "false" # disable mod platform backup since we use our own policies
         os-type     = "Windows"
         server-type = "PrisonerRetail"
