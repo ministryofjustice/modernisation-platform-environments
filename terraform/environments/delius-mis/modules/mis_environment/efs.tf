@@ -16,7 +16,7 @@ resource "aws_vpc_security_group_ingress_rule" "efs" {
   }
 
   description       = each.key
-  security_group_id = resource.aws_security_group.bcs_ec2.id
+  security_group_id = resource.aws_security_group.efs.id
 
   cidr_ipv4                    = lookup(each.value, "cidr_ipv4", null)
   ip_protocol                  = lookup(each.value, "ip_protocol", "-1")
@@ -32,7 +32,7 @@ resource "aws_vpc_security_group_egress_rule" "efs" {
   }
 
   description       = each.key
-  security_group_id = resource.aws_security_group.bcs_ec2.id
+  security_group_id = resource.aws_security_group.efs.id
 
   cidr_ipv4                    = lookup(each.value, "cidr_ipv4", null)
   ip_protocol                  = lookup(each.value, "ip_protocol", "-1")
