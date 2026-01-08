@@ -1132,6 +1132,34 @@ module "s3-dms-target-store-bucket" {
   tags = local.tags
 }
 
+resource "aws_s3_bucket_policy" "allow_cross_env_upload" {
+  # 1. Attach this to the bucket created by your module
+  bucket = module.s3-dms-target-store-bucket.bucket.id
+
+  count = local.is-test ? 1 : 0
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AllowDevLambdaWrite"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::${local.environment_management.account_ids["electronic-monitoring-data-dev"]}:role/data_cutback_iam_role"
+        }
+        Action = [
+          "s3:PutObject",
+          "s3:PutObjectAcl"
+        ]
+        Resource = [
+          "${module.s3-dms-target-store-bucket.bucket.arn}/*"
+        ]
+      }
+    ]
+  })
+}
+
+
 
 module "s3-create-a-derived-table-bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9f"
