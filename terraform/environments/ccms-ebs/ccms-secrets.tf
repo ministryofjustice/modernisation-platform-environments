@@ -59,7 +59,7 @@ resource "aws_secretsmanager_secret_version" "ebs_cw_alerts_secrets" {
   secret_id = aws_secretsmanager_secret.ebs_cw_alerts_secrets.id
 
   secret_string = jsonencode({
-    "slack_channel_webhook"           = ""
+    "slack_channel_webhook"           = "",
     "slack_channel_webhook_guardduty" = ""
   })
 
