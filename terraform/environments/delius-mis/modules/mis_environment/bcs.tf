@@ -4,7 +4,7 @@ resource "aws_security_group" "bcs_ec2" {
   description = "Security group for BCS EC2"
   vpc_id      = var.account_info.vpc_id
 
-  tags = merge(var.tags, {
+  tags = merge(local.tags, {
     Name = "${var.app_name}-${var.env_name}-bcs-ec2-instance-sg"
   })
 }
@@ -24,7 +24,7 @@ resource "aws_vpc_security_group_ingress_rule" "bcs_ec2" {
   to_port                      = lookup(each.value, "port", lookup(each.value, "to_port", null))
   referenced_security_group_id = lookup(each.value, "referenced_security_group_id", null)
 
-  tags = var.tags
+  tags = local.tags
 }
 
 resource "aws_vpc_security_group_egress_rule" "bcs_ec2" {
@@ -47,14 +47,7 @@ resource "aws_vpc_security_group_egress_rule" "bcs_ec2" {
   to_port                      = lookup(each.value, "port", lookup(each.value, "to_port", null))
   referenced_security_group_id = lookup(each.value, "referenced_security_group_id", null)
 
-  tags = var.tags
-}
-
-#FIXME: delete
-resource "aws_security_group" "bcs" {
-  #checkov:skip=CKV2_AWS_5 "ignore"
-  name_prefix = "${var.env_name}-bcs"
-  vpc_id      = var.account_info.vpc_id
+  tags = local.tags
 }
 
 module "bcs_instance" {
@@ -81,7 +74,7 @@ module "bcs_instance" {
   ebs_volumes_copy_all_from_ami = false
   ebs_volumes                   = var.bcs_config.ebs_volumes
   ebs_volume_config             = var.bcs_config.ebs_volumes_config
-  ebs_volume_tags               = var.tags
+  ebs_volume_tags               = local.tags
   route53_records = {
     create_internal_record = false
     create_external_record = false
@@ -111,7 +104,7 @@ module "bcs_instance" {
   region            = "eu-west-2"
   availability_zone = "eu-west-2${lookup(local.availability_zone_map, count.index % 3, "a")}"
   subnet_id         = var.account_config.ordered_private_subnet_ids[count.index % 3]
-  tags = merge(var.tags, {
+  tags = merge(local.tags, {
     instance-scheduling = "skip-scheduling"
     server-type         = "delius-bip-cms"
   })

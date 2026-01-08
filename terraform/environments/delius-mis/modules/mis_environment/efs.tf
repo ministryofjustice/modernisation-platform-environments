@@ -4,7 +4,7 @@ resource "aws_security_group" "efs" {
   description = "Security group for EFS"
   vpc_id      = var.account_info.vpc_id
 
-  tags = merge(var.tags, {
+  tags = merge(local.tags, {
     Name = "${var.app_name}-${var.env_name}-boe-efs-sg"
   })
 }
@@ -24,7 +24,7 @@ resource "aws_vpc_security_group_ingress_rule" "efs" {
   to_port                      = lookup(each.value, "port", lookup(each.value, "to_port", null))
   referenced_security_group_id = lookup(each.value, "referenced_security_group_id", null)
 
-  tags = var.tags
+  tags = local.tags
 }
 
 resource "aws_vpc_security_group_egress_rule" "efs" {
@@ -40,14 +40,7 @@ resource "aws_vpc_security_group_egress_rule" "efs" {
   to_port                      = lookup(each.value, "port", lookup(each.value, "to_port", null))
   referenced_security_group_id = lookup(each.value, "referenced_security_group_id", null)
 
-  tags = var.tags
-}
-
-# FIXME: Delete
-resource "aws_security_group" "boe_efs" {
-  #checkov:skip=CKV2_AWS_5 "ignore"
-  name_prefix = "${var.env_name}-boe-efs"
-  vpc_id      = var.account_info.vpc_id
+  tags = local.tags
 }
 
 module "boe_efs" {
@@ -89,7 +82,7 @@ module "boe_efs" {
     }
   }
 
-  tags = merge(var.tags, {
+  tags = merge(local.tags, {
     backup = "true"
   })
 }
