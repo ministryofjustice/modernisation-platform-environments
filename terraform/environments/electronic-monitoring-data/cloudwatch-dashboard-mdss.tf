@@ -161,7 +161,8 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
             SOURCE '/aws/lambda/load_mdss'
             | filter ispresent(message.event)
             | filter message.event = "MDSS_FILE_FAIL"
-            | stats count() as failures by coalesce(message.table, "UNKNOWN")
+            | parse message.key /\\/mdss\\/(?<tbl>[^\\/]+)\\//
+            | stats count() as failures by coalesce(tbl, message.table, "UNKNOWN")
             | sort failures desc
           EOT
         }
