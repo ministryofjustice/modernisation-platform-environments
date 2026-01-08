@@ -47,10 +47,13 @@ module "dfi_instance" {
 
   ami_name  = var.dfi_config.ami_name
   ami_owner = "self"
-  instance = merge(
-    var.dfi_config.instance_config,
-    { vpc_security_group_ids = [aws_security_group.legacy.id, aws_security_group.dfi.id, aws_security_group.mis_ec2_shared.id] }
-  )
+  instance = merge(var.dfi_config.instance_config, {
+    vpc_security_group_ids = [
+      aws_security_group.legacy.id,
+      aws_security_group.dfi.id,
+      aws_security_group.mis_ad_join.id,
+    ]
+  })
   ebs_kms_key_id                = var.account_config.kms_keys["ebs_shared"]
   ebs_volumes_copy_all_from_ami = false
   ebs_volumes                   = var.dfi_config.ebs_volumes

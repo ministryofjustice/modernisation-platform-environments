@@ -44,8 +44,6 @@ module "environment_dev" {
   lb_config                = local.lb_config_dev
   datasync_config          = local.datasync_config_dev
 
-  domain_join_ports = local.domain_join_ports
-
   pagerduty_integration_key = local.pagerduty_integration_key
 
   create_backup_role = true

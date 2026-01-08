@@ -293,9 +293,9 @@ resource "aws_cloudwatch_metric_alarm" "EC2_CPU_over_Threshold_admin" {
 resource "aws_cloudwatch_metric_alarm" "Status_Check_Failure_admin" {
   alarm_name          = "${local.application_data.accounts[local.environment].app_name}-status-check-failure-alarm-admin"
   alarm_description   = "${local.environment} | ${local.aws_account_id} | A SOA EC2 Admin instance has failed a status check for over 2 minutes. This likely means that the instance has crashed and may need manual intervention."
-  comparison_operator = "GreaterThanThreshold"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
   metric_name         = "StatusCheckFailed"
-  statistic           = "Average"
+  statistic           = "Maximum"
   namespace           = "AWS/EC2"
   period              = "60"
   evaluation_periods  = "2"
@@ -330,9 +330,9 @@ resource "aws_cloudwatch_metric_alarm" "EC2_CPU_over_Threshold_managed" {
 resource "aws_cloudwatch_metric_alarm" "Status_Check_Failure_managed" {
   alarm_name          = "${local.application_data.accounts[local.environment].app_name}-status-check-failure-alarm-managed"
   alarm_description   = "${local.environment} | ${local.aws_account_id} | A SOA EC2 Managed instance has failed a status check for over 2 minutes. This likely means that the instance has crashed and may need manual intervention."
-  comparison_operator = "GreaterThanThreshold"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
   metric_name         = "StatusCheckFailed"
-  statistic           = "Average"
+  statistic           = "Maximum"
   namespace           = "AWS/EC2"
   period              = "60"
   evaluation_periods  = "5"

@@ -16,6 +16,10 @@ resource "aws_db_instance" "mariadb" {
   db_subnet_group_name   = aws_db_subnet_group.mariadb.name
   vpc_security_group_ids = [aws_security_group.mariadb.id]
   skip_final_snapshot    = true
+  storage_encrypted      = true
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 resource "random_id" "db_password" {

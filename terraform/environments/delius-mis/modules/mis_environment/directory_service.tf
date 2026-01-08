@@ -150,3 +150,46 @@ resource "aws_route53_resolver_rule_association" "vpc_r53_fwd_to_ad" {
   resolver_rule_id = aws_route53_resolver_rule.r53_fwd_to_ad.id
   vpc_id           = var.account_config.shared_vpc_id
 }
+
+###
+# AD Join - Provide SG that EC2s can use if they need to join domain
+###
+
+resource "aws_security_group" "mis_ad_join" {
+  #checkov:skip=CKV2_AWS_5 "ignore"
+  name        = "${var.env_name}-mis-ad-join-sg"
+  description = "Security Group allowing Computers to join domain"
+  vpc_id      = var.account_info.vpc_id
+
+  tags = merge(var.tags, {
+    Name = "${var.env_name}-mis-ad-join-sg"
+  })
+}
+
+resource "aws_vpc_security_group_ingress_rule" "mis_ad_join" {
+  for_each = {
+    icmp-from-dc             = { ip_protocol = "ICMP", from_port = 8, to_port = 0 }
+    rpc-from-dc              = { ip_protocol = "TCP", port = 135 }
+    rpc-tcp-dynamic2-from-dc = { ip_protocol = "TCP", from_port = 49152, to_port = 65535 }
+  }
+
+  description       = each.key
+  security_group_id = resource.aws_security_group.mis_ad_join.id
+
+  ip_protocol                  = lookup(each.value, "ip_protocol", "-1")
+  from_port                    = lookup(each.value, "port", lookup(each.value, "from_port", null))
+  to_port                      = lookup(each.value, "port", lookup(each.value, "to_port", null))
+  referenced_security_group_id = aws_directory_service_directory.mis_ad.security_group_id
+
+  tags = var.tags
+}
+
+resource "aws_vpc_security_group_egress_rule" "mis_ad_join" {
+  description       = "Allow all egress to DC"
+  security_group_id = resource.aws_security_group.mis_ad_join.id
+
+  ip_protocol                  = "-1"
+  referenced_security_group_id = aws_directory_service_directory.mis_ad.security_group_id
+
+  tags = var.tags
+}

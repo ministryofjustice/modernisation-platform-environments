@@ -1,36 +1,56 @@
+resource "aws_security_group" "dis_ec2" {
+  #checkov:skip=CKV2_AWS_5 "ignore"
+  name        = "${var.app_name}-${var.env_name}-dis-ec2-instance-sg"
+  description = "Security group for DIS EC2"
+  vpc_id      = var.account_info.vpc_id
+
+  tags = merge(var.tags, {
+    Name = "${var.app_name}-${var.env_name}-dis-ec2-instance-sg"
+  })
+}
+
+resource "aws_vpc_security_group_ingress_rule" "dis_ec2" {
+  for_each = {
+    http8080-from-alb = { referenced_security_group_id = aws_security_group.mis_alb.id, ip_protocol = "tcp", port = 8080 }
+  }
+
+  description       = each.key
+  security_group_id = resource.aws_security_group.dis_ec2.id
+
+  cidr_ipv4                    = lookup(each.value, "cidr_ipv4", null)
+  ip_protocol                  = lookup(each.value, "ip_protocol", "-1")
+  from_port                    = lookup(each.value, "port", lookup(each.value, "from_port", null))
+  to_port                      = lookup(each.value, "port", lookup(each.value, "to_port", null))
+  referenced_security_group_id = lookup(each.value, "referenced_security_group_id", null)
+
+  tags = var.tags
+}
+
+resource "aws_vpc_security_group_egress_rule" "dis_ec2" {
+  for_each = {
+    http1521-to-vpc = { ip_protocol = "TCP", port = "1521", cidr_ipv4 = module.ip_addresses.mp_cidr[local.vpc_name] }
+    smb-to-fsx      = { ip_protocol = "TCP", port = "445", referenced_security_group_id = aws_security_group.fsx.id }
+    all-to-http     = { ip_protocol = "TCP", port = "80", cidr_ipv4 = "0.0.0.0/0" }
+    all-to-https    = { ip_protocol = "TCP", port = "443", cidr_ipv4 = "0.0.0.0/0" }
+  }
+
+  description       = each.key
+  security_group_id = resource.aws_security_group.dis_ec2.id
+
+  cidr_ipv4                    = lookup(each.value, "cidr_ipv4", null)
+  ip_protocol                  = lookup(each.value, "ip_protocol", "-1")
+  from_port                    = lookup(each.value, "port", lookup(each.value, "from_port", null))
+  to_port                      = lookup(each.value, "port", lookup(each.value, "to_port", null))
+  referenced_security_group_id = lookup(each.value, "referenced_security_group_id", null)
+
+  tags = var.tags
+}
+
+#FIXME: remove
 resource "aws_security_group" "dis" {
   #checkov:skip=CKV2_AWS_5 "ignore"
   name_prefix = "${var.env_name}-dis"
   vpc_id      = var.account_info.vpc_id
-}
-
-resource "aws_vpc_security_group_ingress_rule" "dis_from_alb" {
-  description                  = "MIS ALB to DIS on port 8080"
-  security_group_id            = aws_security_group.dis.id
-  referenced_security_group_id = aws_security_group.mis_alb.id
-  ip_protocol                  = "tcp"
-  from_port                    = 8080
-  to_port                      = 8080
-}
-
-resource "aws_vpc_security_group_egress_rule" "mis_oracle_db" {
-  description                  = "Oracle DB connection to MIS database"
-  security_group_id            = aws_security_group.dis.id
-  referenced_security_group_id = data.aws_security_group.mis_db.id
-  ip_protocol                  = "tcp"
-  from_port                    = 1521
-  to_port                      = 1521
-}
-
-resource "aws_vpc_security_group_egress_rule" "dis_all_outbound" {
-  description       = "Allow all outbound traffic"
-  security_group_id = aws_security_group.dis.id
-  cidr_ipv4         = "0.0.0.0/0"
-  ip_protocol       = "-1"
-}
-
-data "aws_security_group" "mis_db" {
-  name = "delius-mis-${var.env_name}-mis-db-ec2-instance-sg"
 }
 
 module "dis_instance" {
@@ -47,10 +67,13 @@ module "dis_instance" {
 
   ami_name  = var.dis_config.ami_name
   ami_owner = "self"
-  instance = merge(
-    var.dis_config.instance_config,
-    { vpc_security_group_ids = [aws_security_group.legacy.id, aws_security_group.dis.id, aws_security_group.mis_ec2_shared.id] }
-  )
+  instance = merge(var.dis_config.instance_config, {
+    vpc_security_group_ids = [
+      aws_security_group.legacy.id,
+      aws_security_group.dis_ec2.id,
+      aws_security_group.mis_ad_join.id,
+    ]
+  })
   ebs_kms_key_id                = var.account_config.kms_keys["ebs_shared"]
   ebs_volumes_copy_all_from_ami = false
   ebs_volumes                   = var.dis_config.ebs_volumes

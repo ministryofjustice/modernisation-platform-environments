@@ -11,7 +11,7 @@ locals {
       airflow_max_workers             = 10
       airflow_min_workers             = 2
       airflow_schedulers              = 2
-      airflow_celery_worker_autoscale = "7,0"
+      airflow_celery_worker_autoscale = "7,1"
     }
     test = {
       /* Route53 */
@@ -24,7 +24,7 @@ locals {
       airflow_max_workers             = 10
       airflow_min_workers             = 2
       airflow_schedulers              = 2
-      airflow_celery_worker_autoscale = "7,0"
+      airflow_celery_worker_autoscale = "7,1"
     }
     production = {
       /* Route53 */
@@ -37,7 +37,7 @@ locals {
       airflow_max_workers             = 10
       airflow_min_workers             = 2
       airflow_schedulers              = 2
-      airflow_celery_worker_autoscale = "7,0"
+      airflow_celery_worker_autoscale = "7,1"
     }
   }
 }
