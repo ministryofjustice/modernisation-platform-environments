@@ -30,9 +30,9 @@ resource "aws_vpc_security_group_egress_rule" "bws_ec2" {
   for_each = {
     all-to-bcs   = { referenced_security_group_id = aws_security_group.bcs_ec2.id }
     all-to-bps   = { referenced_security_group_id = aws_security_group.bps_ec2.id }
-    http-to-all  = { ip_protocol = "TCP", port = "80", cidr_ipv4 = "0.0.0.0/0" }
-    ntp-to-all   = { ip_protocol = "UDP", port = "123", cidr_ipv4 = "0.0.0.0/0" }
-    https-to-all = { ip_protocol = "TCP", port = "443", cidr_ipv4 = "0.0.0.0/0" }
+    http-to-all  = { ip_protocol = "TCP", port = 80, cidr_ipv4 = "0.0.0.0/0" }
+    ntp-to-all   = { ip_protocol = "UDP", port = 123, cidr_ipv4 = "0.0.0.0/0" }
+    https-to-all = { ip_protocol = "TCP", port = 443, cidr_ipv4 = "0.0.0.0/0" }
   }
 
   description       = each.key
