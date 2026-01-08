@@ -6,4 +6,4 @@ pycurl==7.45.7
 python-dateutil==2.9.0.post0
 s3transfer==0.15.0
 six==1.17.0
-urllib3==2.5.0
+urllib3==2.6.3
