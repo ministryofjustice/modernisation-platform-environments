@@ -43,6 +43,15 @@ for folder in "${FOLDERS[@]}"; do
             sed -i.bak "s|cluster_name.*= .*|cluster_name         = \"${CLUSTER_NAME}\"|" "${TMP_DIR}/cluster/locals.tf"
             rm -f "${TMP_DIR}/cluster/locals.tf.bak"
         fi
+
+        # Modify cluster/locals.tf if this is the cluster folder
+        if [ "$folder" = "cluster-core" ] && [ -f "${TMP_DIR}/cluster-core/locals.tf" ]; then
+            echo "Updating cluster-core/locals.tf with cluster-specific values..."
+            sed -i.bak "s/cluster_environment = .*/cluster_environment = \"development_cluster\"/" "${TMP_DIR}/cluster-core/locals.tf"
+            sed -i.bak "s|cp_vpc_name.*= .*|cp_vpc_name         = \"${CLUSTER_NAME}\"|" "${TMP_DIR}/cluster-core/locals.tf"
+            sed -i.bak "s|cluster_name.*= .*|cluster_name         = \"${CLUSTER_NAME}\"|" "${TMP_DIR}/cluster-core/locals.tf"
+            rm -f "${TMP_DIR}/cluster-core/locals.tf.bak"
+        fi
         
         # Modify platform_backend.tf if it exists in the folder
         if [ -f "${TMP_DIR}/${folder}/platform_backend.tf" ]; then
