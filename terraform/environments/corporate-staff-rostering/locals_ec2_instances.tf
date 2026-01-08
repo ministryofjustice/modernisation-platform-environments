@@ -229,7 +229,7 @@ locals {
       }
       instance = {
         disable_api_termination      = false
-        instance_type                = "m5.medium"
+        instance_type                = "m5.large"
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "required"
         tags = {
