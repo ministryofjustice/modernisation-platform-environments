@@ -1,18 +1,18 @@
-# #### Secret for support email address ###
-# resource "aws_secretsmanager_secret" "support_email_account" {
-#   name                    = "support_email_account"
-#   description             = "email address of the support account for cw alerts"
-#   recovery_window_in_days = local.is-production ? 30 : 0
-# }
-#
-# # Use a default dummy address just for creation. Will require to be populated manually.
-# resource "aws_secretsmanager_secret_version" "support_email_account" {
-#   secret_id     = aws_secretsmanager_secret.support_email_account.id
-#   secret_string = "default@email.com"
-#   lifecycle {
-#     ignore_changes = [secret_string]
-#   }
-# }
+#### Secret for support email address ###
+resource "aws_secretsmanager_secret" "support_email_account" {
+  name                    = "support_email_account"
+  description             = "email address of the support account for cw alerts"
+  recovery_window_in_days = local.is-production ? 30 : 0
+}
+
+# Use a default dummy address just for creation. Will require to be populated manually.
+resource "aws_secretsmanager_secret_version" "support_email_account" {
+  secret_id     = aws_secretsmanager_secret.support_email_account.id
+  secret_string = "default@email.com"
+  lifecycle {
+    ignore_changes = [secret_string]
+  }
+}
 
 resource "aws_secretsmanager_secret" "alerts_subscription_email" {
   name                    = "alerts_subscription_email"
