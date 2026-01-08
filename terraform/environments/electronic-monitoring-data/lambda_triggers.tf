@@ -195,6 +195,7 @@ module "load_mdss_event_queue" {
   lambda_function_name = module.load_mdss_lambda[0].lambda_function_name
   bucket_prefix        = local.bucket_prefix
   maximum_concurrency  = 100
+  max_retries          = 6
 }
 
 module "load_fms_event_queue" {

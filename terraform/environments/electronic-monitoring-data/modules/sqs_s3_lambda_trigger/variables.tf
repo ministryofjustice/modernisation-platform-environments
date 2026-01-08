@@ -23,3 +23,9 @@ variable "maximum_concurrency" {
   default     = 10
   nullable    = true
 }
+
+variable "max_retries" {
+  description = "max number of retries before failure"
+  type        = number
+  default     = 3
+}
