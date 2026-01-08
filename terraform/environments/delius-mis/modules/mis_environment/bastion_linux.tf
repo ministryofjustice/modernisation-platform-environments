@@ -36,6 +36,6 @@ module "bastion_linux" {
 
   extra_user_data_content = var.bastion_config.extra_user_data_content
   # Tags
-  tags_common = var.tags
+  tags_common = local.tags
   tags_prefix = terraform.workspace
 }

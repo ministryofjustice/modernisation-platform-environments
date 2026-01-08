@@ -1,6 +1,6 @@
 ## LOADBALANCER
 resource "aws_route53_record" "external" {
-  count    = local.is-development ? 0 : 1
+  count    = local.is-production ? 1 : 0
   provider = aws.core-vpc
 
   zone_id = data.aws_route53_zone.external.zone_id
@@ -44,7 +44,7 @@ resource "aws_route53_record" "prod_ebsapp_lb" {
 }
 
 resource "aws_route53_record" "ebslb_cname" {
-  count    = local.is-development ? 0 : 1
+  count    = local.is-production ? 1 : 0
   provider = aws.core-vpc
 
   zone_id = data.aws_route53_zone.external.zone_id

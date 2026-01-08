@@ -4,7 +4,7 @@ resource "aws_security_group" "dis_ec2" {
   description = "Security group for DIS EC2"
   vpc_id      = var.account_info.vpc_id
 
-  tags = merge(var.tags, {
+  tags = merge(local.tags, {
     Name = "${var.app_name}-${var.env_name}-dis-ec2-instance-sg"
   })
 }
@@ -23,15 +23,17 @@ resource "aws_vpc_security_group_ingress_rule" "dis_ec2" {
   to_port                      = lookup(each.value, "port", lookup(each.value, "to_port", null))
   referenced_security_group_id = lookup(each.value, "referenced_security_group_id", null)
 
-  tags = var.tags
+  tags = local.tags
 }
 
 resource "aws_vpc_security_group_egress_rule" "dis_ec2" {
   for_each = {
-    http1521-to-vpc = { ip_protocol = "TCP", port = "1521", cidr_ipv4 = module.ip_addresses.mp_cidr[local.vpc_name] }
-    smb-to-fsx      = { ip_protocol = "TCP", port = "445", referenced_security_group_id = aws_security_group.fsx.id }
-    all-to-http     = { ip_protocol = "TCP", port = "80", cidr_ipv4 = "0.0.0.0/0" }
-    all-to-https    = { ip_protocol = "TCP", port = "443", cidr_ipv4 = "0.0.0.0/0" }
+    smtp-to-internal  = { ip_protocol = "TCP", port = 25, cidr_ipv4 = "10.0.0.0/8" }
+    http-to-all       = { ip_protocol = "TCP", port = 80, cidr_ipv4 = "0.0.0.0/0" }
+    ntp-to-all        = { ip_protocol = "UDP", port = 123, cidr_ipv4 = "0.0.0.0/0" }
+    https-to-all      = { ip_protocol = "TCP", port = 443, cidr_ipv4 = "0.0.0.0/0" }
+    smb-to-fsx        = { ip_protocol = "TCP", port = 445, referenced_security_group_id = aws_security_group.fsx.id }
+    oracle1521-to-vpc = { ip_protocol = "TCP", port = 1521, cidr_ipv4 = module.ip_addresses.mp_cidr[local.vpc_name] }
   }
 
   description       = each.key
@@ -43,14 +45,7 @@ resource "aws_vpc_security_group_egress_rule" "dis_ec2" {
   to_port                      = lookup(each.value, "port", lookup(each.value, "to_port", null))
   referenced_security_group_id = lookup(each.value, "referenced_security_group_id", null)
 
-  tags = var.tags
-}
-
-#FIXME: remove
-resource "aws_security_group" "dis" {
-  #checkov:skip=CKV2_AWS_5 "ignore"
-  name_prefix = "${var.env_name}-dis"
-  vpc_id      = var.account_info.vpc_id
+  tags = local.tags
 }
 
 module "dis_instance" {
@@ -78,7 +73,7 @@ module "dis_instance" {
   ebs_volumes_copy_all_from_ami = false
   ebs_volumes                   = var.dis_config.ebs_volumes
   ebs_volume_config             = var.dis_config.ebs_volumes_config
-  ebs_volume_tags               = var.tags
+  ebs_volume_tags               = local.tags
   route53_records = {
     create_internal_record = false
     create_external_record = false
@@ -103,7 +98,7 @@ module "dis_instance" {
   availability_zone = "eu-west-2a"
   subnet_id         = var.account_config.private_subnet_ids[count.index]
   tags = merge(
-    var.tags,
+    local.tags,
     {
       computer-name = "${var.dis_config.computer_name}-${count.index + 1}"
       domain-name   = var.environment_config.ad_domain_name

@@ -1,43 +1,50 @@
-resource "aws_security_group" "bws" {
+resource "aws_security_group" "bws_ec2" {
   #checkov:skip=CKV2_AWS_5 "ignore"
-  name_prefix = "${var.env_name}-bws"
+  name        = "${var.app_name}-${var.env_name}-bws-ec2-instance-sg"
+  description = "Security group for BWS EC2"
   vpc_id      = var.account_info.vpc_id
+
+  tags = merge(local.tags, {
+    Name = "${var.app_name}-${var.env_name}-bws-ec2-instance-sg"
+  })
 }
 
-resource "aws_security_group_rule" "bws_ingress" {
+resource "aws_vpc_security_group_ingress_rule" "bws_ec2" {
   for_each = {
-    all-from-alb = { source_security_group_id = aws_security_group.mis_alb.id }
+    http7777-from-alb = { referenced_security_group_id = aws_security_group.mis_alb.id, ip_protocol = "tcp", port = 7777 }
   }
 
-  description              = each.key
-  protocol                 = lookup(each.value, "protocol", "-1")
-  from_port                = lookup(each.value, "port", lookup(each.value, "from_port", 0))
-  to_port                  = lookup(each.value, "port", lookup(each.value, "to_port", 0))
-  self                     = lookup(each.value, "self", null)
-  source_security_group_id = lookup(each.value, "source_security_group_id", null)
+  description       = each.key
+  security_group_id = resource.aws_security_group.bws_ec2.id
 
-  security_group_id = resource.aws_security_group.bws.id
-  type              = "ingress"
+  cidr_ipv4                    = lookup(each.value, "cidr_ipv4", null)
+  ip_protocol                  = lookup(each.value, "ip_protocol", "-1")
+  from_port                    = lookup(each.value, "port", lookup(each.value, "from_port", null))
+  to_port                      = lookup(each.value, "port", lookup(each.value, "to_port", null))
+  referenced_security_group_id = lookup(each.value, "referenced_security_group_id", null)
+
+  tags = local.tags
 }
 
-resource "aws_security_group_rule" "bws_egress" {
+resource "aws_vpc_security_group_egress_rule" "bws_ec2" {
   for_each = {
-    all-to-bcs   = { source_security_group_id = aws_security_group.bcs.id }
-    all-to-bps   = { source_security_group_id = aws_security_group.bps.id }
-    all-to-http  = { protocol = "TCP", port = "80", cidr_blocks = ["0.0.0.0/0"] }
-    all-to-https = { protocol = "TCP", port = "443", cidr_blocks = ["0.0.0.0/0"] }
+    all-to-bcs   = { referenced_security_group_id = aws_security_group.bcs_ec2.id }
+    all-to-bps   = { referenced_security_group_id = aws_security_group.bps_ec2.id }
+    http-to-all  = { ip_protocol = "TCP", port = 80, cidr_ipv4 = "0.0.0.0/0" }
+    ntp-to-all   = { ip_protocol = "UDP", port = 123, cidr_ipv4 = "0.0.0.0/0" }
+    https-to-all = { ip_protocol = "TCP", port = 443, cidr_ipv4 = "0.0.0.0/0" }
   }
 
-  description              = each.key
-  cidr_blocks              = lookup(each.value, "cidr_blocks", null)
-  protocol                 = lookup(each.value, "protocol", "-1")
-  from_port                = lookup(each.value, "port", lookup(each.value, "from_port", 0))
-  to_port                  = lookup(each.value, "port", lookup(each.value, "to_port", 0))
-  self                     = lookup(each.value, "self", null)
-  source_security_group_id = lookup(each.value, "source_security_group_id", null)
+  description       = each.key
+  security_group_id = resource.aws_security_group.bws_ec2.id
 
-  security_group_id = resource.aws_security_group.bws.id
-  type              = "egress"
+  cidr_ipv4                    = lookup(each.value, "cidr_ipv4", null)
+  ip_protocol                  = lookup(each.value, "ip_protocol", "-1")
+  from_port                    = lookup(each.value, "port", lookup(each.value, "from_port", null))
+  to_port                      = lookup(each.value, "port", lookup(each.value, "to_port", null))
+  referenced_security_group_id = lookup(each.value, "referenced_security_group_id", null)
+
+  tags = local.tags
 }
 
 module "bws_instance" {
@@ -57,14 +64,14 @@ module "bws_instance" {
     key_name = aws_key_pair.ec2_user_key_pair.key_name
     vpc_security_group_ids = [
       aws_security_group.legacy.id,
-      aws_security_group.bws.id,
+      aws_security_group.bws_ec2.id,
     ]
   })
   ebs_kms_key_id                = var.account_config.kms_keys["ebs_shared"]
   ebs_volumes_copy_all_from_ami = false
   ebs_volumes                   = var.bws_config.ebs_volumes
   ebs_volume_config             = var.bws_config.ebs_volumes_config
-  ebs_volume_tags               = var.tags
+  ebs_volume_tags               = local.tags
   route53_records = {
     create_internal_record = false
     create_external_record = false
@@ -94,7 +101,7 @@ module "bws_instance" {
   region            = "eu-west-2"
   availability_zone = "eu-west-2${lookup(local.availability_zone_map, count.index % 3, "a")}"
   subnet_id         = var.account_config.ordered_private_subnet_ids[count.index % 3]
-  tags = merge(var.tags, {
+  tags = merge(local.tags, {
     instance-scheduling = "skip-scheduling"
     server-type         = "delius-bip-web"
   })

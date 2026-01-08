@@ -17,7 +17,7 @@ resource "aws_directory_service_directory" "mis_ad" {
     subnet_ids = slice(var.account_config.private_subnet_ids, 0, 2)
   }
 
-  tags = var.tags
+  tags = local.tags
 
   lifecycle {
     ignore_changes = [
@@ -31,7 +31,7 @@ resource "aws_secretsmanager_secret" "ad_admin_password" {
   recovery_window_in_days = 0
 
   tags = merge(
-    var.tags,
+    local.tags,
     {
       Name = "${var.app_name}-${var.env_name}-ad-admin-password"
     }
@@ -161,7 +161,7 @@ resource "aws_security_group" "mis_ad_join" {
   description = "Security Group allowing Computers to join domain"
   vpc_id      = var.account_info.vpc_id
 
-  tags = merge(var.tags, {
+  tags = merge(local.tags, {
     Name = "${var.env_name}-mis-ad-join-sg"
   })
 }
@@ -181,7 +181,7 @@ resource "aws_vpc_security_group_ingress_rule" "mis_ad_join" {
   to_port                      = lookup(each.value, "port", lookup(each.value, "to_port", null))
   referenced_security_group_id = aws_directory_service_directory.mis_ad.security_group_id
 
-  tags = var.tags
+  tags = local.tags
 }
 
 resource "aws_vpc_security_group_egress_rule" "mis_ad_join" {
@@ -191,5 +191,5 @@ resource "aws_vpc_security_group_egress_rule" "mis_ad_join" {
   ip_protocol                  = "-1"
   referenced_security_group_id = aws_directory_service_directory.mis_ad.security_group_id
 
-  tags = var.tags
+  tags = local.tags
 }

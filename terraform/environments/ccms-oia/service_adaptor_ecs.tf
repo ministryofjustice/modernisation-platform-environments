@@ -45,6 +45,11 @@ resource "aws_ecs_service" "ecs_adaptor_service" {
 
   health_check_grace_period_seconds = 300
 
+    lifecycle {
+      ignore_changes = [
+        task_definition
+      ]
+    }
   ordered_placement_strategy {
     field = "attribute:ecs.availability-zone"
     type  = "spread"

@@ -134,9 +134,9 @@ resource "aws_cloudwatch_metric_alarm" "container_adaptor_count" {
 resource "aws_cloudwatch_metric_alarm" "Status_Check_Failure" {
   alarm_name          = "${local.application_name}-${local.environment}-status-check-failure"
   alarm_description   = "A oia cluster EC2 instance has failed a status check, Runbook - https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
-  comparison_operator = "GreaterThanThreshold"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
   metric_name         = "StatusCheckFailed"
-  statistic           = "Average"
+  statistic           = "Maximum"
   namespace           = "AWS/EC2"
   period              = "60"
   evaluation_periods  = "5"
