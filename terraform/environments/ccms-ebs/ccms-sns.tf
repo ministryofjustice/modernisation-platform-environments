@@ -4,7 +4,7 @@
 #   description             = "email address of the support account for cw alerts"
 #   recovery_window_in_days = local.is-production ? 30 : 0
 # }
-
+#
 # # Use a default dummy address just for creation. Will require to be populated manually.
 # resource "aws_secretsmanager_secret_version" "support_email_account" {
 #   secret_id     = aws_secretsmanager_secret.support_email_account.id
@@ -26,8 +26,8 @@ resource "aws_secretsmanager_secret_version" "alerts_subscription_email" {
 }
 
 resource "aws_sns_topic" "cw_alerts" {
-  name              = "ccms-ebs-ec2-alerts"
-  delivery_policy   = <<EOF
+  name            = "ccms-ebs-ec2-alerts"
+  delivery_policy = <<EOF
 {
   "http": {
     "defaultHealthyRetryPolicy": {
@@ -123,14 +123,6 @@ resource "aws_sns_topic_subscription" "s3_subscription" {
   endpoint  = aws_lambda_function.cloudwatch_sns.arn
 }
 
-resource "aws_lambda_permission" "allow_s3_sns_invoke" {
-  statement_id  = "AllowExecutionFromS3SNSTopic"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.cloudwatch_sns.function_name
-  principal     = "sns.amazonaws.com"
-  source_arn    = aws_sns_topic.s3_topic.arn
-}
-
 resource "aws_sns_topic" "ddos_alarm" {
   name              = format("%s_ddos_alarm", local.application_name)
   kms_master_key_id = aws_kms_key.cloudwatch_sns_alerts_key.id
@@ -146,17 +138,9 @@ resource "aws_sns_topic_subscription" "ddos_subscription" {
   endpoint  = aws_lambda_function.cloudwatch_sns.arn
 }
 
-resource "aws_lambda_permission" "allow_ddos_sns_invoke" {
-  statement_id  = "AllowExecutionFromDDoSSNSTopic"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.cloudwatch_sns.function_name
-  principal     = "sns.amazonaws.com"
-  source_arn    = aws_sns_topic.ddos_alarm.arn
-}
-
 resource "aws_sns_topic" "guardduty_alerts" {
-  name              = "${local.application_name}-guardduty-alerts"
-  delivery_policy   = <<EOF
+  name            = "${local.application_name}-guardduty-alerts"
+  delivery_policy = <<EOF
 {
   "http": {
     "defaultHealthyRetryPolicy": {
