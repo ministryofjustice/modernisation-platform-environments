@@ -65,7 +65,6 @@ resource "aws_lambda_layer_version" "lambda_cloudwatch_sns_layer" {
   description              = "Lambda Layer for ${local.application_name} CloudWatch SNS Alarm Integration"
 }
 
-
 data "archive_file" "lambda_zip" {
   type        = "zip"
   source_dir  = "${path.module}/lambda/cloudwatch_alarm_slack_integration"
@@ -106,30 +105,18 @@ resource "aws_lambda_permission" "allow_sns_invoke" {
   source_arn    = aws_sns_topic.cw_alerts.arn
 }
 
-resource "aws_cloudwatch_event_rule" "guardduty_all_findings" {
-  name        = "${local.application_name}-${local.environment}-guardduty-all-findings"
-  description = "Send all GuardDuty findings to SNS topic ${aws_sns_topic.cw_alerts.name}"
-
-  event_pattern = <<EOF
-{
-  "source": ["aws.guardduty"],
-  "detail-type": ["GuardDuty Finding"]
-}
-EOF
-}
-
-resource "aws_cloudwatch_event_target" "guardduty_to_sns" {
-  rule      = aws_cloudwatch_event_rule.guardduty_all_findings.name
-  target_id = "send-guardduty-findings-to-sns"
-  arn       = aws_sns_topic.cw_alerts.arn
-}
-
-# This is technically not required because Events -> SNS -> Lambda,
-# but harmless if you want to keep it.
-resource "aws_lambda_permission" "allow_guardduty_event_invoke" {
-  statement_id  = "AllowExecutionFromGuardDutyEvent"
+resource "aws_lambda_permission" "allow_s3_sns_invoke" {
+  statement_id  = "AllowExecutionFromS3SNSTopic"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.cloudwatch_sns.function_name
-  principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.guardduty_all_findings.arn
+  principal     = "sns.amazonaws.com"
+  source_arn    = aws_sns_topic.s3_topic.arn
+}
+
+resource "aws_lambda_permission" "allow_ddos_sns_invoke" {
+  statement_id  = "AllowExecutionFromDDoSSNSTopic"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.cloudwatch_sns.function_name
+  principal     = "sns.amazonaws.com"
+  source_arn    = aws_sns_topic.ddos_alarm.arn
 }
