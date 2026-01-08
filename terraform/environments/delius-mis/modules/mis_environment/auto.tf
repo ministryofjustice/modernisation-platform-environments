@@ -35,7 +35,7 @@ module "auto_instance" {
   ebs_volumes_copy_all_from_ami = false
   ebs_volumes                   = var.auto_config.ebs_volumes
   ebs_volume_config             = var.auto_config.ebs_volumes_config
-  ebs_volume_tags               = var.tags
+  ebs_volume_tags               = local.tags
   route53_records = {
     create_internal_record = false
     create_external_record = false
@@ -66,7 +66,7 @@ module "auto_instance" {
   region            = "eu-west-2"
   availability_zone = "eu-west-2a"
   subnet_id         = var.account_config.private_subnet_ids[count.index]
-  tags              = var.tags
+  tags              = local.tags
 
   cloudwatch_metric_alarms = {}
 }
