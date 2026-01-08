@@ -30,8 +30,8 @@ resource "aws_vpc_security_group_egress_rule" "dis_ec2" {
   for_each = {
     http1521-to-vpc = { ip_protocol = "TCP", port = "1521", cidr_ipv4 = module.ip_addresses.mp_cidr[local.vpc_name] }
     smb-to-fsx      = { ip_protocol = "TCP", port = "445", referenced_security_group_id = aws_security_group.fsx.id }
-    all-to-http     = { ip_protocol = "TCP", port = "80", cidr_ipv4 = "0.0.0.0/0" }
-    all-to-https    = { ip_protocol = "TCP", port = "443", cidr_ipv4 = "0.0.0.0/0" }
+    http-to-all     = { ip_protocol = "TCP", port = "80", cidr_ipv4 = "0.0.0.0/0" }
+    https-to-all    = { ip_protocol = "TCP", port = "443", cidr_ipv4 = "0.0.0.0/0" }
   }
 
   description       = each.key

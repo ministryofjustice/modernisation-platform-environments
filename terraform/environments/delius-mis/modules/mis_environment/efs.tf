@@ -1,24 +1,53 @@
+resource "aws_security_group" "efs" {
+  #checkov:skip=CKV2_AWS_5 "ignore"
+  name        = "${var.app_name}-${var.env_name}-boe-efs-sg"
+  description = "Security group for EFS"
+  vpc_id      = var.account_info.vpc_id
+
+  tags = merge(var.tags, {
+    Name = "${var.app_name}-${var.env_name}-boe-efs-sg"
+  })
+}
+
+resource "aws_vpc_security_group_ingress_rule" "efs" {
+  for_each = {
+    nfs-from-bcs = { ip_protocol = "TCP", port = 2049, referenced_security_group_id = aws_security_group.bcs_ec2.id }
+    nfs-from-bps = { ip_protocol = "TCP", port = 2049, referenced_security_group_id = aws_security_group.bps_ec2.id }
+  }
+
+  description       = each.key
+  security_group_id = resource.aws_security_group.bcs_ec2.id
+
+  cidr_ipv4                    = lookup(each.value, "cidr_ipv4", null)
+  ip_protocol                  = lookup(each.value, "ip_protocol", "-1")
+  from_port                    = lookup(each.value, "port", lookup(each.value, "from_port", null))
+  to_port                      = lookup(each.value, "port", lookup(each.value, "to_port", null))
+  referenced_security_group_id = lookup(each.value, "referenced_security_group_id", null)
+
+  tags = var.tags
+}
+
+resource "aws_vpc_security_group_egress_rule" "efs" {
+  for_each = {
+  }
+
+  description       = each.key
+  security_group_id = resource.aws_security_group.bcs_ec2.id
+
+  cidr_ipv4                    = lookup(each.value, "cidr_ipv4", null)
+  ip_protocol                  = lookup(each.value, "ip_protocol", "-1")
+  from_port                    = lookup(each.value, "port", lookup(each.value, "from_port", null))
+  to_port                      = lookup(each.value, "port", lookup(each.value, "to_port", null))
+  referenced_security_group_id = lookup(each.value, "referenced_security_group_id", null)
+
+  tags = var.tags
+}
+
+# FIXME: Delete
 resource "aws_security_group" "boe_efs" {
   #checkov:skip=CKV2_AWS_5 "ignore"
   name_prefix = "${var.env_name}-boe-efs"
   vpc_id      = var.account_info.vpc_id
-}
-
-resource "aws_security_group_rule" "boe_efs_ingress" {
-  for_each = {
-    nfs-from-bcs = { protocol = "tcp", port = 2049, source_security_group_id = aws_security_group.bcs.id }
-    nfs-from-bps = { protocol = "tcp", port = 2049, source_security_group_id = aws_security_group.bps.id }
-  }
-
-  description              = each.key
-  protocol                 = lookup(each.value, "protocol", "-1")
-  from_port                = lookup(each.value, "port", lookup(each.value, "from_port", 0))
-  to_port                  = lookup(each.value, "port", lookup(each.value, "to_port", 0))
-  self                     = lookup(each.value, "self", null)
-  source_security_group_id = lookup(each.value, "source_security_group_id", null)
-
-  security_group_id = resource.aws_security_group.boe_efs.id
-  type              = "ingress"
 }
 
 module "boe_efs" {
@@ -56,7 +85,7 @@ module "boe_efs" {
   mount_targets = {
     for key, value in var.boe_efs_config.mount_targets_subnet_ids : key => {
       subnet_id       = value
-      security_groups = [aws_security_group.boe_efs.id]
+      security_groups = [aws_security_group.efs.id]
     }
   }
 
