@@ -55,6 +55,30 @@ resource "aws_security_group_rule" "ingress_ssh_from_workspaces" {
   description       = "SSH from Workspaces"
 }
 
+resource "aws_security_group_rule" "ingress_http_from_mojo" {
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+
+  type              = "ingress"
+  security_group_id = aws_security_group.ec2_sg[0].id
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = ["10.0.0.0/8"]
+  description       = "HTTP from Mojo"
+}
+
+resource "aws_security_group_rule" "ingress_https_from_mojo" {
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+
+  type              = "ingress"
+  security_group_id = aws_security_group.ec2_sg[0].id
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = ["10.0.0.0/8"]
+  description       = "HTTPS from Mojo"
+}
+
 resource "aws_security_group_rule" "ingress_admin_vpc" {
   count = contains(["test", "preproduction"], local.environment) ? 1 : 0
 
