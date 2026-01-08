@@ -16,7 +16,7 @@ resource "aws_security_group" "sg_ebsapps_lb" {
 
 resource "aws_security_group_rule" "ingress_traffic_ebslb_443" {
   count             = local.is-production ? 1 : 0
-  security_group_id = aws_security_group.sg_ebsapps_lb[0].id
+  security_group_id = aws_security_group.sg_ebsapps_lb[count.index].id
   type              = "ingress"
   description       = "HTTPS"
   protocol          = "TCP"

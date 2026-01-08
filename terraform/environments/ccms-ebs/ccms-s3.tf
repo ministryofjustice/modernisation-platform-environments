@@ -188,7 +188,7 @@ data "aws_iam_policy_document" "logging_s3_policy" {
       ]
     }
     actions   = ["s3:PutObject"]
-    resources = "${module.s3-bucket-logging.bucket.arn}/*"
+    resources = ["${module.s3-bucket-logging.bucket.arn}/*"]
     condition {
       test     = "StringEquals"
       variable = "aws:SourceAccount"
