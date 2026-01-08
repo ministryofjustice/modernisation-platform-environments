@@ -82,12 +82,12 @@ module "boe_efs" {
     }
   }
 
-  mount_targets = {
-    for key, value in var.boe_efs_config.mount_targets_subnet_ids : key => {
-      subnet_id       = value
-      security_groups = [aws_security_group.efs.id]
-    }
-  }
+  # mount_targets = {
+  #  for key, value in var.boe_efs_config.mount_targets_subnet_ids : key => {
+  #    subnet_id       = value
+  #    security_groups = [aws_security_group.efs.id]
+  #  }
+  # }
 
   tags = merge(var.tags, {
     backup = "true"
