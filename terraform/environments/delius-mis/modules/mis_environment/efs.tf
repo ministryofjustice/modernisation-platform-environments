@@ -11,8 +11,8 @@ resource "aws_security_group" "efs" {
 
 resource "aws_vpc_security_group_ingress_rule" "efs" {
   for_each = {
-    nfs-from-bcs = { ip_protocol = "TCP", port = 2049, referenced_security_group_id = aws_security_group.bcs_ec2.id }
-    nfs-from-bps = { ip_protocol = "TCP", port = 2049, referenced_security_group_id = aws_security_group.bps_ec2.id }
+    nfs-from-bcs = { ip_protocol = "TCP", port = "2049", referenced_security_group_id = aws_security_group.bcs_ec2.id }
+    nfs-from-bps = { ip_protocol = "TCP", port = "2049", referenced_security_group_id = aws_security_group.bps_ec2.id }
   }
 
   description       = each.key
