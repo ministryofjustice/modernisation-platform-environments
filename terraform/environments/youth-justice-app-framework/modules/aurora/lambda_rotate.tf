@@ -11,7 +11,7 @@ resource "aws_lambda_function" "rds_secret_rotation" {
   #checkov:skip=CKV_AWS_363: "fix before deprecation date"
   function_name = "rds-secrets-rotation"
   role          = aws_iam_role.rds_secret_rotation.arn
-  runtime       = "python3.9"
+  runtime       = "python3.12"
   handler       = "lambda_function.lambda_handler"
   timeout       = 30
   memory_size   = 128
