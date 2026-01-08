@@ -1295,8 +1295,10 @@ data "aws_iam_policy_document" "data_cutback_iam_role_policy_document" {
     ]
 
     resources = [
-      "${module.s3-dms-target-store-bucket.bucket.arn}/*",
-      module.s3-dms-target-store-bucket.bucket.arn,
+      "arn:aws:s3:::emds-dev-dms-rds-to-parquet-*",
+      "arn:aws:s3:::emds-dev-dms-rds-to-parquet-*/*",
+      "arn:aws:s3:::emds-test-dms-rds-to-parquet-*",
+      "arn:aws:s3:::emds-test-dms-rds-to-parquet-*/*"
     ]
   }
 }
