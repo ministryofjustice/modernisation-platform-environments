@@ -11,7 +11,6 @@ resource "aws_iam_role" "lambda_cloudwatch_sns_role" {
       }
     }]
   })
-
   tags = merge(local.tags, {
     Name = "${local.application_name}-${local.environment}-lambda_cloudwatch_sns_role"
   })
@@ -52,7 +51,12 @@ resource "aws_sns_topic_subscription" "lambda_cloudwatch_sns" {
   endpoint  = aws_lambda_function.cloudwatch_sns.arn
 }
 
+# Lambda Layer -> requirements.txt for layer function has been generated following process in the link but it is same as 
+# what has been used for edrms docs exception, also requirements.txt has been added. The zip file for layered function
+# have been added in s3 bucket manually. https://dsdmoj.atlassian.net/wiki/spaces/LDD/pages/5975606239/Build+Layered+Function+for+Lambda
+
 resource "aws_lambda_layer_version" "lambda_cloudwatch_sns_layer" {
+  # filename                 = "lambda/layerV1.zip"
   layer_name               = "${local.application_name}-${local.environment}-cloudwatch-sns-layer"
   s3_key                   = "lambda_delivery/cloudwatch_sns_layer/layerV1.zip"
   s3_bucket                = aws_s3_bucket.ccms_ebs_shared.bucket
@@ -60,6 +64,7 @@ resource "aws_lambda_layer_version" "lambda_cloudwatch_sns_layer" {
   compatible_architectures = ["x86_64"]
   description              = "Lambda Layer for ${local.application_name} CloudWatch SNS Alarm Integration"
 }
+
 
 data "archive_file" "lambda_zip" {
   type        = "zip"
