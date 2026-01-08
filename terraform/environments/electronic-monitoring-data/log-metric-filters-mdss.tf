@@ -50,7 +50,7 @@ resource "aws_cloudwatch_log_metric_filter" "mdss_timeout" {
   }
 }
 
-resource "aws_cloudwatch_log_metric_filter" "mdss_fatal_failures" {
+resource "aws_cloudwatch_log_metric_filter" "mdss_fatal_failures_structured" {
   count          = local.is-development ? 0 : 1
   name           = "mdss-fatal-failures"
   log_group_name = "/aws/lambda/load_mdss"
