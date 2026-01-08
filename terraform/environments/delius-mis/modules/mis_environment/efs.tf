@@ -43,13 +43,6 @@ resource "aws_vpc_security_group_egress_rule" "efs" {
   tags = var.tags
 }
 
-# FIXME: Delete
-resource "aws_security_group" "boe_efs" {
-  #checkov:skip=CKV2_AWS_5 "ignore"
-  name_prefix = "${var.env_name}-boe-efs"
-  vpc_id      = var.account_info.vpc_id
-}
-
 module "boe_efs" {
   source = "../../../../modules/efs"
 

@@ -48,13 +48,6 @@ resource "aws_vpc_security_group_egress_rule" "dfi_ec2" {
   tags = var.tags
 }
 
-#FIXME: delete
-resource "aws_security_group" "dfi" {
-  #checkov:skip=CKV2_AWS_5 "ignore"
-  name_prefix = "${var.env_name}-dfi"
-  vpc_id      = var.account_info.vpc_id
-}
-
 module "dfi_instance" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v4.1.0"
 

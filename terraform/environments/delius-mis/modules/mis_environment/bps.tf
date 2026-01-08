@@ -50,13 +50,6 @@ resource "aws_vpc_security_group_egress_rule" "bps_ec2" {
   tags = var.tags
 }
 
-#FIXME: delete
-resource "aws_security_group" "bps" {
-  #checkov:skip=CKV2_AWS_5 "ignore"
-  name_prefix = "${var.env_name}-bps"
-  vpc_id      = var.account_info.vpc_id
-}
-
 module "bps_instance" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v4.2.0"
 
