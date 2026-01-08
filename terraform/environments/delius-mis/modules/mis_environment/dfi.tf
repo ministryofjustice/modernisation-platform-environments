@@ -28,10 +28,10 @@ resource "aws_vpc_security_group_ingress_rule" "dfi_ec2" {
 
 resource "aws_vpc_security_group_egress_rule" "dfi_ec2" {
   for_each = {
-    http1521-to-vpc = { ip_protocol = "TCP", port = "1521", cidr_ipv4 = module.ip_addresses.mp_cidr[local.vpc_name] }
-    smb-to-fsx      = { ip_protocol = "TCP", port = "445", referenced_security_group_id = aws_security_group.fsx.id }
-    http-to-all     = { ip_protocol = "TCP", port = "80", cidr_ipv4 = "0.0.0.0/0" }
-    https-to-all    = { ip_protocol = "TCP", port = "443", cidr_ipv4 = "0.0.0.0/0" }
+    http-to-all       = { ip_protocol = "TCP", port = "80", cidr_ipv4 = "0.0.0.0/0" }
+    https-to-all      = { ip_protocol = "TCP", port = "443", cidr_ipv4 = "0.0.0.0/0" }
+    smb-to-fsx        = { ip_protocol = "TCP", port = "445", referenced_security_group_id = aws_security_group.fsx.id }
+    oracle1521-to-vpc = { ip_protocol = "TCP", port = "1521", cidr_ipv4 = module.ip_addresses.mp_cidr[local.vpc_name] }
   }
 
   description       = each.key
