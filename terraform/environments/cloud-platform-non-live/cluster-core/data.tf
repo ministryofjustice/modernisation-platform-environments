@@ -45,5 +45,6 @@ data "aws_iam_roles" "platform_engineer_admin_sso_role" {
 }
 
 data "aws_eks_cluster" "cluster" {
-  name = local.cluster_name
+  count = contains(local.enabled_workspaces, local.cluster_environment) ? 1 : 0
+  name  = local.cluster_name
 }
