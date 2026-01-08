@@ -192,6 +192,7 @@ data "aws_route53_zone" "application-zone" {
 
 ## GANDI CERT
 data "aws_acm_certificate" "gandi_cert" {
+  count              = local.is-development ? 0 : 1
   domain   = local.application_data.accounts[local.environment].lz_domain_name
   statuses = ["ISSUED"]
 }
