@@ -14,7 +14,7 @@ resource "aws_instance" "PPUDWEBSERVER2" {
   count                  = local.is-development == true ? 1 : 0
   ami                    = "ami-0852d4d5313264225"
   instance_type          = "m5.large"
-  source_dest_check      = false
+  source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.PPUD-WEB-Portal.id]
   subnet_id              = data.aws_subnet.private_subnets_c.id
@@ -39,7 +39,7 @@ resource "aws_instance" "s609693lo6vw100" {
   count                  = local.is-development == true ? 1 : 0
   ami                    = "ami-0fbad994892c0f0c4"
   instance_type          = "m5.large"
-  source_dest_check      = false
+  source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.PPUD-Database-Server[0].id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
@@ -64,7 +64,7 @@ resource "aws_instance" "s609693lo6vw101" {
   count                  = local.is-development == true ? 1 : 0
   ami                    = "ami-07315ed3a1b524be8"
   instance_type          = "m5.large"
-  source_dest_check      = false
+  source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.PPUD-WEB-Portal.id]
   subnet_id              = data.aws_subnet.private_subnets_b.id
@@ -89,7 +89,7 @@ resource "aws_instance" "s609693lo6vw102" {
   count                  = local.is-development == true ? 1 : 0
   ami                    = "ami-0640473a9b0267bac"
   instance_type          = "m5.large"
-  source_dest_check      = false
+  source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.Live-DOC-Server[0].id]
   subnet_id              = data.aws_subnet.private_subnets_c.id
@@ -114,7 +114,7 @@ resource "aws_instance" "s609693lo6vw103" {
   count                  = local.is-development == true ? 1 : 0
   ami                    = "ami-09bf383e2d58df1c7"
   instance_type          = "m5.large"
-  source_dest_check      = false
+  source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.Archive-DOC-Server[0].id]
   subnet_id              = data.aws_subnet.private_subnets_b.id
@@ -139,7 +139,7 @@ resource "aws_instance" "s609693lo6vw104" {
   count                  = local.is-development == true ? 1 : 0
   ami                    = "ami-0f115a52a37278d93"
   instance_type          = "m5.large"
-  source_dest_check      = false
+  source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.WAM-Data-Access-Server.id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
@@ -164,7 +164,7 @@ resource "aws_instance" "s609693lo6vw105" {
   count                  = local.is-development == true ? 1 : 0
   ami                    = "ami-0edd8d3e58d106f40"
   instance_type          = "m5.large"
-  source_dest_check      = false
+  source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.WAM-Portal.id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
@@ -189,7 +189,7 @@ resource "aws_instance" "s609693lo6vw106" {
   count                  = local.is-development == true ? 1 : 0
   ami                    = "ami-0f9ea6b08039bb33b"
   instance_type          = "m5.large"
-  source_dest_check      = false
+  source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.Dev-Servers-Standard[0].id]
   subnet_id              = data.aws_subnet.private_subnets_b.id
@@ -214,7 +214,7 @@ resource "aws_instance" "s609693lo6vw107" {
   count                  = local.is-development == true ? 1 : 0
   ami                    = "ami-04682227c9aa18702"
   instance_type          = "m5.large"
-  source_dest_check      = false
+  source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.Dev-Servers-Standard[0].id]
   subnet_id              = data.aws_subnet.private_subnets_b.id
@@ -239,7 +239,7 @@ resource "aws_instance" "s609693lo6vw108" {
   count                  = local.is-development == true ? 1 : 0
   ami                    = "ami-0e0b7dbcff71ddd9c"
   instance_type          = "m5.large"
-  source_dest_check      = false
+  source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.Dev-Servers-Standard[0].id]
   subnet_id              = data.aws_subnet.private_subnets_c.id
@@ -265,7 +265,7 @@ resource "aws_instance" "s609693lo6vw109" {
   ami                    = "ami-05d3600bb677c98cd"
   instance_type          = "m5.large"
   vpc_security_group_ids = [aws_security_group.SCR-Team-Foundation-Server[0].id]
-  source_dest_check      = false
+  source_dest_check      = true
   subnet_id              = data.aws_subnet.private_subnets_a.id
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
 
@@ -315,7 +315,7 @@ resource "aws_instance" "s609693lo6vw111" {
   count                  = local.is-development == true ? 1 : 0
   ami                    = "ami-0cbeb839e55dbb65e"
   instance_type          = "m5.large"
-  source_dest_check      = false
+  source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.Archive-DOC-Server[0].id]
   subnet_id              = data.aws_subnet.private_subnets_b.id
@@ -343,10 +343,10 @@ resource "aws_instance" "s609693lo6vw112" {
   count                  = local.is-development == true ? 1 : 0
   ami                    = "ami-0be53fc5198dbd294"
   instance_type          = "m5.large"
-  vpc_security_group_ids = [aws_security_group.Dev-Servers-Standard[0].id]
-  source_dest_check      = false
-  subnet_id              = data.aws_subnet.private_subnets_a.id
+  source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.Dev-Servers-Standard[0].id]
+  subnet_id              = data.aws_subnet.private_subnets_a.id
 
   metadata_options {
     http_tokens   = "required"
@@ -368,7 +368,7 @@ resource "aws_instance" "s609693lo6vw113" {
   count                  = local.is-development == true ? 1 : 0
   ami                    = "ami-04ffd273077ba2a8c"
   instance_type          = "m5.large"
-  source_dest_check      = false
+  source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.Dev-Servers-Standard[0].id]
   subnet_id              = data.aws_subnet.private_subnets_c.id
@@ -393,7 +393,7 @@ resource "aws_instance" "s609693lo6vw114" {
   count                  = local.is-development == true ? 1 : 0
   ami                    = "ami-05ca5ec6d38b0945b"
   instance_type          = "m5.xlarge"
-  source_dest_check      = false
+  source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.Dev-Servers-Standard[0].id]
   subnet_id              = data.aws_subnet.private_subnets_c.id
