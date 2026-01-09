@@ -20,7 +20,8 @@ resource "aws_lambda_function" "rds_secret_rotation" {
   source_code_hash  = filebase64sha256("${path.module}/zip/rotation_lambda.zip")
 
   vpc_config {
-    subnet_ids      = var.database_subnets
+    subnet_ids         = var.database_subnets
+    security_group_ids = [aws_security_group.rds.id]
   }
 
   environment {
