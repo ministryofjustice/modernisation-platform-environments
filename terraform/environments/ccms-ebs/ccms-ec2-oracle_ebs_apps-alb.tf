@@ -60,7 +60,7 @@ resource "aws_lb_target_group" "ebsapp_tg" {
 
 resource "aws_lb_target_group_attachment" "ebsapps" {
   count            = local.is-production ? local.application_data.accounts[local.environment].ebsapps_no_instances : 0
-  target_group_arn = aws_lb_target_group.ebsapp_tg[count.index].arn
+  target_group_arn = aws_lb_target_group.ebsapp_tg[0].arn
   target_id        = element(aws_instance.ec2_ebsapps.*.id, count.index)
   port             = local.application_data.accounts[local.environment].tg_apps_port
 }
