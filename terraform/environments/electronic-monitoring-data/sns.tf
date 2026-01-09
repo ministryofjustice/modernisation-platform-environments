@@ -15,6 +15,7 @@ resource "aws_kms_key" "emds_alerts" {
 }
 
 data "aws_iam_policy_document" "emds_alerts_kms" {
+  count = local.is-development ? 0 : 1
 
   # Root full admin of the key
   statement {
