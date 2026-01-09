@@ -79,21 +79,22 @@ data "aws_iam_policy_document" "bucket_policy" {
   for_each = local.build_s3 ? module.s3_bucket : {}
 
 # Enforce TLS v1.2 or higher
-  Statement = 
+  statement 
       {
-        Sid    = "EnforceTLSv12orHigher",
-        Effect = "Deny",
-        Principal = {
-          AWS = "*"
-        },
-        Action   = "s3:*",
-        Resource = ["${module.s3-bucket-logging.bucket.arn}/*", "${module.s3-bucket-logging.bucket.arn}"],
-        Condition = {
-          NumericLessThan = {
-            "s3:TlsVersion" = "1.2"
+        Sid    = "EnforceTLSv12orHigher"
+        Effect = "Deny"
+        Principals {
+          type = "AWS"
+          identifiers = ["*"]
+        }
+        actions  = ["s3:*"]
+        resources = [each.value.bucket.arn, "${each.value.bucket.arn}/*"]
+        condition {
+          test = "NumericLessThan" 
+          variable = "s3:TlsVersion"
+          values = ["1.2"]
           }
         }
-      }
 
   dynamic "statement" {
     for_each = length(aws_iam_role.ftp_lambda_role) > 0 ? [1] : []
