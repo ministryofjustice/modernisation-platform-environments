@@ -1,5 +1,4 @@
 resource "aws_sns_topic" "emds_alerts" {
-  count = local.is-development ? 0 : 1
   name              = "emds-alerts-${local.environment_shorthand}"
   kms_master_key_id = aws_kms_key.emds_alerts.arn
 
@@ -10,14 +9,12 @@ resource "aws_sns_topic" "emds_alerts" {
 
 
 resource "aws_kms_key" "emds_alerts" {
-  count = local.is-development ? 0 : 1
   description         = "KMS key for EMDS SNS alerts"
   enable_key_rotation = true
   policy              = data.aws_iam_policy_document.emds_alerts_kms.json
 }
 
 data "aws_iam_policy_document" "emds_alerts_kms" {
-  count = local.is-development ? 0 : 1
 
   # Root full admin of the key
   statement {
