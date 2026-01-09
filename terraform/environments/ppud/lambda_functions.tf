@@ -257,6 +257,15 @@ locals {
         source_arn_suffix = "*"
       }]
     }
+    suppress_securityhub_findings = {
+      description  = "Function to suppress security hub findings with a Compliance Status of NOT_AVAILABLE."
+      role_key     = "suppress_securityhub_findings"
+      environments = ["development", "preproduction", "production"]
+      permissions = [{
+        principal         = "securityhub.amazonaws.com"
+        source_arn_suffix = "*"
+      }]
+    }
   }
 
   # Flatten lambda functions with environments
