@@ -3,7 +3,7 @@ module "eks_cluster_logs_kms_access_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "6.2.3"
+  version = "6.3.0"
 
   name        = "eks-cluster-logs-kms-access20240520163412675900000001"
   description = "IAM Policy"
@@ -48,7 +48,7 @@ module "karpenter_sqs_kms_access_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "6.2.3"
+  version = "6.3.0"
 
   name        = "karpenter-sqs-kms-access20240625125618373200000001"
   description = "IAM Policy"
@@ -77,7 +77,7 @@ module "amazon_prometheus_proxy_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "6.2.3"
+  version = "6.3.0"
 
   name        = "amazon-prometheus-proxy20240521075058823800000001"
   description = "IAM Policy"
@@ -107,7 +107,7 @@ module "managed_prometheus_kms_access_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "6.2.3"
+  version = "6.3.0"
 
   name        = "managed-prometheus-kms-access20240521093109516600000001"
   description = "IAM Policy"
