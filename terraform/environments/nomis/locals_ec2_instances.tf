@@ -55,7 +55,6 @@ locals {
 
     db = {
       config = {
-        ami_name                  = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-07T12-48-08.562Z"
         ami_owner                 = "self"
         iam_resource_names_prefix = "ec2-database"
         instance_profile_policies = [
