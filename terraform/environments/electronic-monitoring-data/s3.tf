@@ -1145,7 +1145,7 @@ resource "aws_s3_bucket_policy" "allow_cross_env_upload" {
         Sid    = "AllowDevLambdaWrite"
         Effect = "Allow"
         Principal = {
-          AWS = "arn:aws:iam::${local.environment_management.account_ids["electronic-monitoring-data-dev"]}:role/data_cutback_iam_role"
+          AWS = "arn:aws:iam::${local.environment_management.account_ids["electronic-monitoring-data-development"]}:role/data_cutback_iam_role"
         }
         Action = [
           "s3:PutObject",
