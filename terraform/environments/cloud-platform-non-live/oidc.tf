@@ -8,7 +8,7 @@ module "github_actions_development_cluster_oidc_role" {
   github_repositories = ["ministryofjustice/cloud-platform-github-workflows"]
   role_name           = "github-actions-development-cluster"
   policy_jsons        = [data.aws_iam_policy_document.github_actions_development_cluster_oidc_policy[0].json]
-  subject_claim       = "ref:refs/heads/main"
+  subject_claim       = "ref:refs/heads/*"
   tags                = merge({ "Name" = "GitHub Actions Development Cluster Role" }, local.tags)
 }
 
