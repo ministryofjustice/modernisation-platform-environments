@@ -5,8 +5,7 @@ module "ebs_csi_driver_iam_role" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts"
   version = "6.3.0"
 
-  name            = "ebs-csi-driver20240522102607172700000009"
-  use_name_prefix = false
+  name = "ebs-csi-driver"
 
   attach_ebs_csi_policy = true
 
@@ -27,8 +26,7 @@ module "efs_csi_driver_iam_role" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts"
   version = "6.3.0"
 
-  name            = "efs-csi-driver20240522102607110600000008"
-  use_name_prefix = false
+  name = "efs-csi-driver"
 
   attach_efs_csi_policy = true
 
@@ -49,8 +47,7 @@ module "aws_cloudwatch_network_flow_monitor_iam_role" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts"
   version = "6.3.0"
 
-  name            = "aws-cloudwatch-network-flow-monitor20250620105318927000000001"
-  use_name_prefix = false
+  name = "aws-cloudwatch-network-flow-monitor"
 
   policies = {
     CloudWatchNetworkFlowMonitorAgentPublishPolicy = "arn:aws:iam::aws:policy/CloudWatchNetworkFlowMonitorAgentPublishPolicy"
@@ -73,8 +70,7 @@ module "cluster_autoscaler_iam_role" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts"
   version = "6.3.0"
 
-  name            = "cluster-autoscaler20240523143841962800000002"
-  use_name_prefix = false
+  name = "cluster-autoscaler"
 
   attach_cluster_autoscaler_policy = true
   cluster_autoscaler_cluster_names = [module.eks.cluster_name]
@@ -96,8 +92,7 @@ module "external_dns_iam_role" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts"
   version = "6.3.0"
 
-  name            = "external-dns20240528072355569800000002"
-  use_name_prefix = false
+  name = "external-dns"
 
   attach_external_dns_policy    = true
   external_dns_hosted_zone_arns = [data.aws_route53_zone.route53_zone_zone.arn]
@@ -120,8 +115,7 @@ module "cert_manager_iam_role" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts"
   version = "6.3.0"
 
-  name            = "cert-manager20240530132314388300000002"
-  use_name_prefix = false
+  name = "cert-manager"
 
   attach_cert_manager_policy    = true
   cert_manager_hosted_zone_arns = [data.aws_route53_zone.route53_zone_zone.arn]
@@ -143,8 +137,7 @@ module "external_secrets_iam_role" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts"
   version = "6.3.0"
 
-  name            = "external-secrets20240618140529740000000001"
-  use_name_prefix = false
+  name = "external-secrets"
 
   attach_external_secrets_policy = true
   external_secrets_kms_key_arns  = [module.common_secrets_manager_kms.key_arn]
@@ -166,8 +159,7 @@ module "aws_for_fluent_bit_iam_role" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts"
   version = "6.3.0"
 
-  name            = "aws-for-fluent-bit2024052210261536150000000e"
-  use_name_prefix = false
+  name = "aws-for-fluent-bit"
 
   policies = {
     CloudWatchAgentServerPolicy   = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
@@ -191,8 +183,7 @@ module "amazon_prometheus_proxy_iam_role" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts"
   version = "6.3.0"
 
-  name            = "amazon-prometheus-proxy2024052210261536140000000d"
-  use_name_prefix = false
+  name = "amazon-prometheus-proxy"
 
   policies = {
     AmazonManagedPrometheusProxy = module.amazon_prometheus_proxy_iam_policy.arn
@@ -215,8 +206,7 @@ module "vpc_cni_iam_role" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts"
   version = "6.3.0"
 
-  name            = "vpc-cni2024051512274618540000000f"
-  use_name_prefix = false
+  name = "vpc-cni"
 
   attach_vpc_cni_policy = true
   vpc_cni_enable_ipv4   = true
@@ -238,8 +228,7 @@ module "velero_iam_role" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts"
   version = "6.3.0"
 
-  name            = "velero20250821153855554900000001"
-  use_name_prefix = false
+  name = "velero"
 
   attach_velero_policy  = true
   velero_s3_bucket_arns = [module.velero_s3_bucket.s3_bucket_arn]

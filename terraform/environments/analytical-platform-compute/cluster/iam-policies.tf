@@ -5,7 +5,7 @@ module "eks_cluster_logs_kms_access_iam_policy" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
   version = "6.3.0"
 
-  name        = "eks-cluster-logs-kms-access20240522102606755500000004"
+  name_prefix = "eks-cluster-logs-kms-access"
   description = "IAM Policy"
 
   policy = data.aws_iam_policy_document.eks_cluster_logs_kms_access.json
@@ -50,7 +50,7 @@ module "karpenter_sqs_kms_access_iam_policy" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
   version = "6.3.0"
 
-  name        = "karpenter-sqs-kms-access2024062615572751670000000e"
+  name_prefix = "karpenter-sqs-kms-access"
   description = "IAM Policy"
 
   policy = data.aws_iam_policy_document.karpenter_sqs_kms_access.json
@@ -79,7 +79,7 @@ module "amazon_prometheus_proxy_iam_policy" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
   version = "6.3.0"
 
-  name        = "amazon-prometheus-proxy20240522102759795300000017"
+  name_prefix = "amazon-prometheus-proxy"
   description = "IAM Policy"
 
   policy = data.aws_iam_policy_document.amazon_prometheus_proxy.json
@@ -109,7 +109,7 @@ module "managed_prometheus_kms_access_iam_policy" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
   version = "6.3.0"
 
-  name        = "managed-prometheus-kms-access20240522102621280000000012"
+  name_prefix = "managed-prometheus-kms-access"
   description = "IAM Policy"
 
   policy = data.aws_iam_policy_document.managed_prometheus_kms_access.json
@@ -141,7 +141,7 @@ module "ecr_pull_through_cache_iam_policy" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
   version = "6.3.0"
 
-  name        = "ecr-pull-through-cache20250724174113618600000002"
+  name_prefix = "ecr-pull-through-cache"
   description = "IAM Policy"
 
   policy = data.aws_iam_policy_document.ecr_pull_through_cache.json
@@ -171,7 +171,7 @@ module "velero_kms_iam_policy" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
   version = "6.3.0"
 
-  name        = "velero-kms-access20250821153908350800000003"
+  name_prefix = "velero-kms-access"
   description = "IAM Policy"
 
   policy = data.aws_iam_policy_document.velero_kms_access.json
