@@ -459,6 +459,7 @@ locals {
           local.cloudwatch_metric_alarms.db_backup,
         )
         config = merge(local.ec2_instances.db.config, {
+          ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-07T12-48-08.562Z"
           availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.ec2_instances.db.config.instance_profile_policies, [
             "Ec2T3DatabasePolicy",
