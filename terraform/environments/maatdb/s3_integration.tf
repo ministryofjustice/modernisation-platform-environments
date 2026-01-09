@@ -79,11 +79,10 @@ data "aws_iam_policy_document" "bucket_policy" {
   for_each = local.build_s3 ? module.s3_bucket : {}
 
 # Enforce TLS v1.2 or higher
-  statement 
-      {
+  statement {
         Sid    = "EnforceTLSv12orHigher"
         Effect = "Deny"
-        Principals {
+        principals {
           type = "AWS"
           identifiers = ["*"]
         }
