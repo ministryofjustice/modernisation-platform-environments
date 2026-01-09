@@ -37,7 +37,7 @@ resource "aws_db_parameter_group" "dacp_analyse" {
 
   parameter {
     name  = "log_min_duration_statement"
-    value = "5000" # log queries longer than 5 seconds
+    value = "0" # log queries longer than 5 seconds
   }
 
   parameter {

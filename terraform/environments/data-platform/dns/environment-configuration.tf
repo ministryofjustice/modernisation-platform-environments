@@ -65,6 +65,19 @@ locals {
             "ns-1599.awsdns-07.co.uk.",
             "ns-674.awsdns-20.net."
           ]
+        },
+        /* GitHub Pages */
+        github-pages-challenge-txt = {
+          type    = "TXT"
+          name    = "_github-pages-challenge-ministryofjustice.user-guide"
+          ttl     = 300
+          records = ["8318341c928cb03ff156af46862430"]
+        },
+        github-pages-cname = {
+          type    = "CNAME"
+          name    = "user-guide"
+          ttl     = 300
+          records = ["ministryofjustice.github.io."]
         }
       }
     }

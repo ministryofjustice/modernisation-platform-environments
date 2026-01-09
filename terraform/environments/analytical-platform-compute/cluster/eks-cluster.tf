@@ -6,7 +6,7 @@ module "eks" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/eks/aws"
-  version = "21.0.9"
+  version = "21.10.1"
 
   name               = local.eks_cluster_name
   kubernetes_version = local.environment_configuration.eks_cluster_version
@@ -261,7 +261,7 @@ module "karpenter" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/eks/aws//modules/karpenter"
-  version = "21.0.9"
+  version = "21.10.1"
 
   cluster_name = module.eks.cluster_name
 
@@ -278,6 +278,7 @@ module "karpenter" {
   iam_role_policies = {
     KarpenterSQSKMSAccess = module.karpenter_sqs_kms_access_iam_policy.arn
   }
+  enable_inline_policy = true
 
   node_iam_role_name = "karpenter"
   node_iam_role_additional_policies = {

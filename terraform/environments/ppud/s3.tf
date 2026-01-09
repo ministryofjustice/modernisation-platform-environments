@@ -354,6 +354,10 @@ resource "aws_s3_bucket_replication_configuration" "moj-database-source-prod-rep
   rule {
     id     = "ppud-report-replication-rule-prod"
     status = "Enabled"
+    filter {}
+    delete_marker_replication {
+      status = "Disabled"
+    }
     destination {
       bucket        = "arn:aws:s3:::mojap-data-engineering-production-ppud-prod"
       storage_class = "STANDARD"
@@ -1381,6 +1385,16 @@ resource "aws_s3_bucket_public_access_block" "moj-log-files-dev" {
   block_public_policy     = true
   ignore_public_acls      = true
   restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "moj-log-files-dev" {
+  count  = local.is-development == true ? 1 : 0
+  bucket = aws_s3_bucket.moj-log-files-dev[0].id
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
 }
 
 # S3 bucket notification is turned off as it isn't required. It can be re-enabled in future if required.

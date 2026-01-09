@@ -46,7 +46,7 @@ module "environment_dev" {
 module "environment_poc" {
   # We're in dev account and poc environment, could reference different version
   source = "./modules/delius_environment"
-  count  = local.is-development ? 1 : 0
+  count  = 0
 
   providers = {
     aws                        = aws

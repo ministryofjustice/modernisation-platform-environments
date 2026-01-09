@@ -62,5 +62,12 @@ locals {
         }
       }
     }
+    dso = {
+      secrets = {
+        passwords = {
+          description = "general passwords for digital studio operations team"
+        }
+      }
+    }
   }
 }

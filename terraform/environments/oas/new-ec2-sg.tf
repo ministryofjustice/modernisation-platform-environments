@@ -2,7 +2,7 @@
 ### EC2 SG
 ######################################
 resource "aws_security_group" "ec2_sg" {
-  count = local.environment == "preproduction" ? 1 : 0
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
 
   name        = "${local.application_name}-${local.environment}-ec2-security-group"
   description = "EC2 Security Group"
@@ -19,200 +19,20 @@ resource "aws_security_group" "ec2_sg" {
 ######################################
 ### EC2 INGRESS RULES
 ######################################
-resource "aws_security_group_rule" "ingress_admin_vpc" {
-  count = local.environment == "preproduction" ? 1 : 0
+resource "aws_security_group_rule" "ingress_oas_db_1521" {
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
 
-  type              = "ingress"
-  security_group_id = aws_security_group.ec2_sg[0].id
-  from_port         = 9500
-  to_port           = 9500
-  protocol          = "tcp"
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-  description       = "access to the admin server"
-}
-
-resource "aws_security_group_rule" "ingress_admin_workspace" {
-  count = local.environment == "preproduction" ? 1 : 0
-
-  type              = "ingress"
-  security_group_id = aws_security_group.ec2_sg[0].id
-  from_port         = 9500
-  to_port           = 9500
-  protocol          = "tcp"
-  cidr_blocks       = [local.application_data.accounts[local.environment].managementcidr]
-  description       = "Access to the admin server from workspace"
-}
-
-resource "aws_security_group_rule" "ingress_managed_vpc_9502" {
-  count = local.environment == "preproduction" ? 1 : 0
-
-  type              = "ingress"
-  security_group_id = aws_security_group.ec2_sg[0].id
-  from_port         = 9502
-  to_port           = 9502
-  protocol          = "tcp"
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-  description       = "Access to the managed server"
-}
-
-resource "aws_security_group_rule" "ingress_managed_workspace_9502" {
-  count = local.environment == "preproduction" ? 1 : 0
-
-  type              = "ingress"
-  security_group_id = aws_security_group.ec2_sg[0].id
-  from_port         = 9502
-  to_port           = 9502
-  protocol          = "tcp"
-  cidr_blocks       = [local.application_data.accounts[local.environment].managementcidr]
-  description       = "Access to the managed server from workspace"
-}
-
-resource "aws_security_group_rule" "ingress_managed_lz_9502" {
-  count = local.environment == "preproduction" ? 1 : 0
-
-  type              = "ingress"
-  security_group_id = aws_security_group.ec2_sg[0].id
-  from_port         = 9502
-  to_port           = 9502
-  protocol          = "tcp"
-  cidr_blocks       = [local.application_data.accounts[local.environment].inbound_cidr_lz]
-  description       = "Access to the managed server from laa development"
-}
-
-resource "aws_security_group_rule" "ingress_managed_vpc_9505" {
-  count = local.environment == "preproduction" ? 1 : 0
-
-  type              = "ingress"
-  security_group_id = aws_security_group.ec2_sg[0].id
-  from_port         = 9505
-  to_port           = 9505
-  protocol          = "tcp"
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-  description       = "Access to the managed server"
-}
-
-resource "aws_security_group_rule" "ingress_managed_workspace_9505" {
-  count = local.environment == "preproduction" ? 1 : 0
-
-  type              = "ingress"
-  security_group_id = aws_security_group.ec2_sg[0].id
-  from_port         = 9505
-  to_port           = 9505
-  protocol          = "tcp"
-  cidr_blocks       = [local.application_data.accounts[local.environment].managementcidr]
-  description       = "Access to the managed server from workspace"
-}
-
-resource "aws_security_group_rule" "ingress_managed_lz_9505" {
-  count = local.environment == "preproduction" ? 1 : 0
-
-  type              = "ingress"
-  security_group_id = aws_security_group.ec2_sg[0].id
-  from_port         = 9505
-  to_port           = 9505
-  protocol          = "tcp"
-  cidr_blocks       = [local.application_data.accounts[local.environment].inbound_cidr_lz]
-  description       = "Access to the managed server from laa development"
-}
-
-resource "aws_security_group_rule" "ingress_managed_vpc_9514" {
-  count = local.environment == "preproduction" ? 1 : 0
-
-  type              = "ingress"
-  security_group_id = aws_security_group.ec2_sg[0].id
-  from_port         = 9514
-  to_port           = 9514
-  protocol          = "tcp"
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-  description       = "Access to the managed server"
-}
-
-resource "aws_security_group_rule" "ingress_managed_workspace_9514" {
-  count = local.environment == "preproduction" ? 1 : 0
-
-  type              = "ingress"
-  security_group_id = aws_security_group.ec2_sg[0].id
-  from_port         = 9514
-  to_port           = 9514
-  protocol          = "tcp"
-  cidr_blocks       = [local.application_data.accounts[local.environment].managementcidr]
-  description       = "Access to the managed server from workspace"
-}
-
-resource "aws_security_group_rule" "ingress_ssh_workspace" {
-  count = local.environment == "preproduction" ? 1 : 0
-
-  type              = "ingress"
-  security_group_id = aws_security_group.ec2_sg[0].id
-  from_port         = 22
-  to_port           = 22
-  protocol          = "tcp"
-  cidr_blocks       = [local.application_data.accounts[local.environment].managementcidr]
-  description       = "ssh access to the managed server from workspace"
-}
-
-resource "aws_security_group_rule" "ingress_db_1521" {
-  count = local.environment == "preproduction" ? 1 : 0
-
-  type              = "ingress"
-  security_group_id = aws_security_group.ec2_sg[0].id
-  from_port         = 1521
-  to_port           = 1521
-  protocol          = "tcp"
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-  description       = "Database connections to rds apex edw and mojfin"
-}
-
-resource "aws_security_group_rule" "ingress_ldap_1389_vpc" {
-  count = local.environment == "preproduction" ? 1 : 0
-
-  type              = "ingress"
-  security_group_id = aws_security_group.ec2_sg[0].id
-  from_port         = 1389
-  to_port           = 1389
-  protocol          = "tcp"
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-  description       = "LDAP Server Connection"
-}
-
-resource "aws_security_group_rule" "ingress_http_lz_80" {
-  count = local.environment == "preproduction" ? 1 : 0
-
-  type              = "ingress"
-  security_group_id = aws_security_group.ec2_sg[0].id
-  from_port         = 80
-  to_port           = 80
-  protocol          = "tcp"
-  cidr_blocks       = [local.application_data.accounts[local.environment].inbound_cidr_lz]
-  description       = "http access from LZ to oas-mp to test connectivity"
-}
-
-resource "aws_security_group_rule" "ingress_http_lz_1389" {
-  count = local.environment == "preproduction" ? 1 : 0
-
-  type              = "ingress"
-  security_group_id = aws_security_group.ec2_sg[0].id
-  from_port         = 1389
-  to_port           = 1389
-  protocol          = "tcp"
-  cidr_blocks       = [local.application_data.accounts[local.environment].inbound_cidr_lz]
-  description       = "http access from LZ to oas-mp to test connectivity"
-}
-
-resource "aws_security_group_rule" "ingress_http_lz_3443" {
-  count = local.environment == "preproduction" ? 1 : 0
-
-  type              = "ingress"
-  security_group_id = aws_security_group.ec2_sg[0].id
-  from_port         = 3443
-  to_port           = 3443
-  protocol          = "tcp"
-  cidr_blocks       = [local.application_data.accounts[local.environment].inbound_cidr_lz]
-  description       = "http access from LZ to oas-mp to test connectivity"
+  type                     = "ingress"
+  security_group_id        = aws_security_group.ec2_sg[0].id
+  from_port                = 1521
+  to_port                  = 1521
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.rds_sg[0].id
+  description              = "Database connections to OAS RDS"
 }
 
 resource "aws_security_group_rule" "ingress_ssh_from_bastion" {
-  count = local.environment == "preproduction" ? 1 : 0
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
 
   type                     = "ingress"
   security_group_id        = aws_security_group.ec2_sg[0].id
@@ -223,185 +43,379 @@ resource "aws_security_group_rule" "ingress_ssh_from_bastion" {
   description              = "SSH from the Bastion"
 }
 
+resource "aws_security_group_rule" "ingress_ssh_from_workspaces" {
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+
+  type              = "ingress"
+  security_group_id = aws_security_group.ec2_sg[0].id
+  from_port         = 22
+  to_port           = 22
+  protocol          = "tcp"
+  cidr_blocks       = [local.application_data.accounts[local.environment].managementcidr]
+  description       = "SSH from Workspaces"
+}
+
+resource "aws_security_group_rule" "ingress_http_from_mojo" {
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+
+  type              = "ingress"
+  security_group_id = aws_security_group.ec2_sg[0].id
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = ["10.0.0.0/8"]
+  description       = "HTTP from Mojo"
+}
+
+resource "aws_security_group_rule" "ingress_https_from_mojo" {
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+
+  type              = "ingress"
+  security_group_id = aws_security_group.ec2_sg[0].id
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = ["10.0.0.0/8"]
+  description       = "HTTPS from Mojo"
+}
+
+resource "aws_security_group_rule" "ingress_admin_vpc" {
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+
+  type              = "ingress"
+  security_group_id = aws_security_group.ec2_sg[0].id
+  description       = "access to the admin server"
+  from_port         = 9500
+  to_port           = 9500
+  protocol          = "tcp"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+}
+
+resource "aws_security_group_rule" "ingress_admin_workspace" {
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+
+  type              = "ingress"
+  security_group_id = aws_security_group.ec2_sg[0].id
+  description       = "Access to the admin server from workspace"
+  from_port         = 9500
+  to_port           = 9500
+  protocol          = "tcp"
+  cidr_blocks       = [local.application_data.accounts[local.environment].managementcidr]
+}
+
+resource "aws_security_group_rule" "ingress_admin_9501_vpc" {
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+
+  type              = "ingress"
+  security_group_id = aws_security_group.ec2_sg[0].id
+  description       = "access to the admin server"
+  from_port         = 9501
+  to_port           = 9501
+  protocol          = "tcp"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+}
+
+resource "aws_security_group_rule" "ingress_admin_9501_workspace" {
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+
+  type              = "ingress"
+  security_group_id = aws_security_group.ec2_sg[0].id
+  description       = "Access to the admin server from workspace"
+  from_port         = 9501
+  to_port           = 9501
+  protocol          = "tcp"
+  cidr_blocks       = [local.application_data.accounts[local.environment].managementcidr]
+}
+
+resource "aws_security_group_rule" "ingress_managed_9502_vpc" {
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+
+  type              = "ingress"
+  security_group_id = aws_security_group.ec2_sg[0].id
+  description       = "Access to the managed server"
+  from_port         = 9502
+  to_port           = 9502
+  protocol          = "tcp"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+}
+
+resource "aws_security_group_rule" "ingress_managed_9502_workspace" {
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+
+  type              = "ingress"
+  security_group_id = aws_security_group.ec2_sg[0].id
+  description       = "Access to the managed server from workspace"
+  from_port         = 9502
+  to_port           = 9502
+  protocol          = "tcp"
+  cidr_blocks       = [local.application_data.accounts[local.environment].managementcidr]
+}
+
+resource "aws_security_group_rule" "ingress_managed_9503_vpc" {
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+
+  type              = "ingress"
+  security_group_id = aws_security_group.ec2_sg[0].id
+  description       = "Access to the managed server"
+  from_port         = 9503
+  to_port           = 9503
+  protocol          = "tcp"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+}
+
+resource "aws_security_group_rule" "ingress_managed_9503_workspace" {
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+
+  type              = "ingress"
+  security_group_id = aws_security_group.ec2_sg[0].id
+  description       = "Access to the managed server from workspace"
+  from_port         = 9503
+  to_port           = 9503
+  protocol          = "tcp"
+  cidr_blocks       = [local.application_data.accounts[local.environment].managementcidr]
+}
+
+resource "aws_security_group_rule" "ingress_managed_9505_vpc" {
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+
+  type              = "ingress"
+  security_group_id = aws_security_group.ec2_sg[0].id
+  description       = "Access to the managed server"
+  from_port         = 9505
+  to_port           = 9505
+  protocol          = "tcp"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+}
+
+resource "aws_security_group_rule" "ingress_managed_9505_workspace" {
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+
+  type              = "ingress"
+  security_group_id = aws_security_group.ec2_sg[0].id
+  description       = "Access to the managed server from workspace"
+  from_port         = 9505
+  to_port           = 9505
+  protocol          = "tcp"
+  cidr_blocks       = [local.application_data.accounts[local.environment].managementcidr]
+}
+
+
+resource "aws_security_group_rule" "ingress_managed_9514_vpc" {
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+
+  type              = "ingress"
+  security_group_id = aws_security_group.ec2_sg[0].id
+  description       = "Access to the managed server"
+  from_port         = 9514
+  to_port           = 9514
+  protocol          = "tcp"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+}
+
+resource "aws_security_group_rule" "ingress_managed_9514_workspace" {
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+
+  type              = "ingress"
+  security_group_id = aws_security_group.ec2_sg[0].id
+  description       = "Access to the managed server from workspace"
+  from_port         = 9514
+  to_port           = 9514
+  protocol          = "tcp"
+  cidr_blocks       = [local.application_data.accounts[local.environment].managementcidr]
+}
+
 ######################################
 ### EC2 EGRESS RULES
 ######################################
-resource "aws_security_group_rule" "egress_ssm" {
-  count = local.environment == "preproduction" ? 1 : 0
+resource "aws_security_group_rule" "egress_oas_db_1521" {
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+
+  type                     = "egress"
+  security_group_id        = aws_security_group.ec2_sg[0].id
+  from_port                = 1521
+  to_port                  = 1521
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.rds_sg[0].id
+  description              = "Database connections to OAS RDS"
+}
+
+resource "aws_security_group_rule" "egress_https_s3" {
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
 
   type              = "egress"
   security_group_id = aws_security_group.ec2_sg[0].id
   from_port         = 443
   to_port           = 443
   protocol          = "tcp"
-  cidr_blocks       = [local.application_data.accounts[local.environment].outbound_access_cidr]
-  description       = "Allow AWS SSM Session Manager"
+  prefix_list_ids   = [local.application_data.accounts[local.environment].s3_vpc_endpoint_prefix]
+  description       = "Outbound 443 to LAA VPC Endpoint SG"
 }
 
-resource "aws_security_group_rule" "egress_telnet_mojo" {
-  count = local.environment == "preproduction" ? 1 : 0
-
-  type              = "egress"
-  security_group_id = aws_security_group.ec2_sg[0].id
-  from_port         = 3443
-  to_port           = 3443
-  protocol          = "tcp"
-  cidr_blocks       = [local.application_data.accounts[local.environment].outbound_access_cidr]
-  description       = "Allow telnet to Portal - MoJo"
-}
-
-resource "aws_security_group_rule" "egress_admin_vpc" {
-  count = local.environment == "preproduction" ? 1 : 0
-
-  type              = "egress"
-  security_group_id = aws_security_group.ec2_sg[0].id
-  from_port         = 9500
-  to_port           = 9500
-  protocol          = "tcp"
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-  description       = "access to the admin server"
-}
-
-resource "aws_security_group_rule" "egress_admin_workspace" {
-  count = local.environment == "preproduction" ? 1 : 0
-
-  type              = "egress"
-  security_group_id = aws_security_group.ec2_sg[0].id
-  from_port         = 9500
-  to_port           = 9500
-  protocol          = "tcp"
-  cidr_blocks       = [local.application_data.accounts[local.environment].managementcidr]
-  description       = "Access to the admin server from workspace"
-}
-
-resource "aws_security_group_rule" "egress_managed_vpc_9502" {
-  count = local.environment == "preproduction" ? 1 : 0
-
-  type              = "egress"
-  security_group_id = aws_security_group.ec2_sg[0].id
-  from_port         = 9502
-  to_port           = 9502
-  protocol          = "tcp"
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-  description       = "Access to the managed server"
-}
-
-resource "aws_security_group_rule" "egress_managed_workspace_9502" {
-  count = local.environment == "preproduction" ? 1 : 0
-
-  type              = "egress"
-  security_group_id = aws_security_group.ec2_sg[0].id
-  from_port         = 9502
-  to_port           = 9502
-  protocol          = "tcp"
-  cidr_blocks       = [local.application_data.accounts[local.environment].managementcidr]
-  description       = "Access to the managed server from workspace"
-}
-
-resource "aws_security_group_rule" "egress_managed_vpc_9505" {
-  count = local.environment == "preproduction" ? 1 : 0
-
-  type              = "egress"
-  security_group_id = aws_security_group.ec2_sg[0].id
-  from_port         = 9505
-  to_port           = 9505
-  protocol          = "tcp"
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-  description       = "Access to the managed server"
-}
-
-resource "aws_security_group_rule" "egress_managed_workspace_9505" {
-  count = local.environment == "preproduction" ? 1 : 0
-
-  type              = "egress"
-  security_group_id = aws_security_group.ec2_sg[0].id
-  from_port         = 9505
-  to_port           = 9505
-  protocol          = "tcp"
-  cidr_blocks       = [local.application_data.accounts[local.environment].managementcidr]
-  description       = "Access to the managed server from workspace"
-}
-
-resource "aws_security_group_rule" "egress_managed_vpc_9514" {
-  count = local.environment == "preproduction" ? 1 : 0
-
-  type              = "egress"
-  security_group_id = aws_security_group.ec2_sg[0].id
-  from_port         = 9514
-  to_port           = 9514
-  protocol          = "tcp"
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-  description       = "Access to the managed server"
-}
-
-resource "aws_security_group_rule" "egress_managed_workspace_9514" {
-  count = local.environment == "preproduction" ? 1 : 0
-
-  type              = "egress"
-  security_group_id = aws_security_group.ec2_sg[0].id
-  from_port         = 9514
-  to_port           = 9514
-  protocol          = "tcp"
-  cidr_blocks       = [local.application_data.accounts[local.environment].managementcidr]
-  description       = "Access to the managed server from workspace"
-}
-
-resource "aws_security_group_rule" "egress_db_1521" {
-  count = local.environment == "preproduction" ? 1 : 0
-
-  type              = "egress"
-  security_group_id = aws_security_group.ec2_sg[0].id
-  from_port         = 1521
-  to_port           = 1521
-  protocol          = "tcp"
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-  description       = "Database connections from rds apex edw and mojfin"
-}
-
-resource "aws_security_group_rule" "egress_ldap_1389_vpc" {
-  count = local.environment == "preproduction" ? 1 : 0
-
-  type              = "egress"
-  security_group_id = aws_security_group.ec2_sg[0].id
-  from_port         = 1389
-  to_port           = 1389
-  protocol          = "tcp"
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-  description       = "LDAP Server Connection"
-}
-
-resource "aws_security_group_rule" "egress_http_outbound_80" {
-  count = local.environment == "preproduction" ? 1 : 0
+resource "aws_security_group_rule" "egress_http_internet" {
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
 
   type              = "egress"
   security_group_id = aws_security_group.ec2_sg[0].id
   from_port         = 80
   to_port           = 80
   protocol          = "tcp"
-  cidr_blocks       = [local.application_data.accounts[local.environment].outbound_access_cidr]
-  description       = "Outbound internet access"
+  cidr_blocks       = ["0.0.0.0/0"]
+  description       = "Outbound HTTP for yum repositories"
 }
 
-resource "aws_security_group_rule" "egress_http_lz_1389" {
-  count = local.environment == "preproduction" ? 1 : 0
+resource "aws_security_group_rule" "egress_https_internet" {
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
 
   type              = "egress"
   security_group_id = aws_security_group.ec2_sg[0].id
-  from_port         = 1389
-  to_port           = 1389
+  from_port         = 443
+  to_port           = 443
   protocol          = "tcp"
-  cidr_blocks       = [local.application_data.accounts[local.environment].inbound_cidr_lz]
-  description       = "http access from LZ to oas-mp to test connectivity"
+  cidr_blocks       = ["0.0.0.0/0"]
+  description       = "Outbound HTTPS for yum repositories and SSM"
 }
 
-resource "aws_security_group_rule" "egress_http_lz_1521" {
-  count = local.environment == "preproduction" ? 1 : 0
+resource "aws_security_group_rule" "egress_admin_vpc" {
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
 
   type              = "egress"
   security_group_id = aws_security_group.ec2_sg[0].id
-  from_port         = 1521
-  to_port           = 1521
+  description       = "access to the admin server"
+  from_port         = 9500
+  to_port           = 9500
   protocol          = "tcp"
-  cidr_blocks       = [local.application_data.accounts[local.environment].inbound_cidr_lz]
-  description       = "http access from LZ to oas-mp to test connectivity"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+}
+
+resource "aws_security_group_rule" "egress_admin_workspace" {
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+
+  type              = "egress"
+  security_group_id = aws_security_group.ec2_sg[0].id
+  description       = "Access to the admin server from workspace"
+  from_port         = 9500
+  to_port           = 9500
+  protocol          = "tcp"
+  cidr_blocks       = [local.application_data.accounts[local.environment].managementcidr]
+}
+
+resource "aws_security_group_rule" "egress_admin_9501_vpc" {
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+
+  type              = "egress"
+  security_group_id = aws_security_group.ec2_sg[0].id
+  description       = "access to the admin server"
+  from_port         = 9501
+  to_port           = 9501
+  protocol          = "tcp"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+}
+
+resource "aws_security_group_rule" "egress_admin_9501_workspace" {
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+
+  type              = "egress"
+  security_group_id = aws_security_group.ec2_sg[0].id
+  description       = "Access to the admin server from workspace"
+  from_port         = 9501
+  to_port           = 9501
+  protocol          = "tcp"
+  cidr_blocks       = [local.application_data.accounts[local.environment].managementcidr]
+}
+
+resource "aws_security_group_rule" "egress_managed_9502_vpc" {
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+
+  type              = "egress"
+  security_group_id = aws_security_group.ec2_sg[0].id
+  description       = "Access to the managed server"
+  from_port         = 9502
+  to_port           = 9502
+  protocol          = "tcp"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+}
+
+resource "aws_security_group_rule" "egress_managed_9502_workspace" {
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+
+  type              = "egress"
+  security_group_id = aws_security_group.ec2_sg[0].id
+  description       = "Access to the managed server from workspace"
+  from_port         = 9502
+  to_port           = 9502
+  protocol          = "tcp"
+  cidr_blocks       = [local.application_data.accounts[local.environment].managementcidr]
+}
+
+resource "aws_security_group_rule" "egress_managed_9503_vpc" {
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+
+  type              = "egress"
+  security_group_id = aws_security_group.ec2_sg[0].id
+  description       = "Access to the managed server"
+  from_port         = 9503
+  to_port           = 9503
+  protocol          = "tcp"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+}
+
+resource "aws_security_group_rule" "egress_managed_9503_workspace" {
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+
+  type              = "egress"
+  security_group_id = aws_security_group.ec2_sg[0].id
+  description       = "Access to the managed server from workspace"
+  from_port         = 9503
+  to_port           = 9503
+  protocol          = "tcp"
+  cidr_blocks       = [local.application_data.accounts[local.environment].managementcidr]
+}
+
+resource "aws_security_group_rule" "egress_managed_9505_vpc" {
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+
+  type              = "egress"
+  security_group_id = aws_security_group.ec2_sg[0].id
+  description       = "Access to the managed server"
+  from_port         = 9505
+  to_port           = 9505
+  protocol          = "tcp"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+}
+
+resource "aws_security_group_rule" "egress_managed_9505_workspace" {
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+
+  type              = "egress"
+  security_group_id = aws_security_group.ec2_sg[0].id
+  description       = "Access to the managed server from workspace"
+  from_port         = 9505
+  to_port           = 9505
+  protocol          = "tcp"
+  cidr_blocks       = [local.application_data.accounts[local.environment].managementcidr]
+}
+
+
+resource "aws_security_group_rule" "egress_managed_9514_vpc" {
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+
+  type              = "egress"
+  security_group_id = aws_security_group.ec2_sg[0].id
+  description       = "Access to the managed server"
+  from_port         = 9514
+  to_port           = 9514
+  protocol          = "tcp"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+}
+
+resource "aws_security_group_rule" "egress_managed_9514_workspace" {
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+
+  type              = "egress"
+  security_group_id = aws_security_group.ec2_sg[0].id
+  description       = "Access to the managed server from workspace"
+  from_port         = 9514
+  to_port           = 9514
+  protocol          = "tcp"
+  cidr_blocks       = [local.application_data.accounts[local.environment].managementcidr]
 }

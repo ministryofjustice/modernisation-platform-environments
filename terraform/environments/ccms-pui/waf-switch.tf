@@ -98,7 +98,7 @@ body {
 <body>
 <div class="card">
   <h1>Service Offline</h1>
-  <p><strong>CCMS is available from 07:00 to 21:30 UK time.</strong></p>
+  <p><strong>CCMS is available from 07:00 to 21:30 UK time.It is not available on bank holidays.</strong></p>
 </div>
 </body>
 </html>
@@ -107,7 +107,7 @@ EOT
   }
 }
 
-// EventBridge scheduled rules to trigger Lambda
+// EventBridge scheduled rules Daily Monday-Sunday to trigger Lambda
 resource "aws_cloudwatch_event_rule" "waf_allow_0700_uk" {
   name                = "waf-allow-0700-${local.environment}"
   schedule_expression = "cron(00 07 ? * MON-SUN *)"
@@ -121,6 +121,27 @@ resource "aws_cloudwatch_event_rule" "waf_block_2130_uk" {
   description         = "Set WAF rule to BLOCK at 21:30 UK daily"
 }
 
+# EventBridge rules for BankHolidays of 25th Dec, 26th Dec and 1st Jan
+# Block for 25 Dec 
+resource "aws_cloudwatch_event_rule" "waf_block_dec25" {
+  name                = "waf-block-dec25-${local.environment}"
+  schedule_expression = "cron(01 07 25 12 ? 2025)"
+  description         = "Set WAF rule to BLOCK on 25th Dec Bank Holiday"
+}
+
+# Block for 26 Dec
+resource "aws_cloudwatch_event_rule" "waf_block_dec26" {
+  name                = "waf-block-dec26-${local.environment}"
+  schedule_expression = "cron(01 07 26 12 ? 2025)"
+  description         = "Set WAF rule to BLOCK on 26th Dec Bank Holiday"
+}
+
+# Block for 1 Jan
+resource "aws_cloudwatch_event_rule" "waf_block_jan01" {
+  name                = "waf-block-jan01-${local.environment}"
+  schedule_expression = "cron(01 07 1 1 ? 2026)"
+  description         = "Set WAF rule to BLOCK on Jan 1 (start)"
+}
 
 resource "aws_cloudwatch_event_target" "waf_allow_target" {
   rule      = aws_cloudwatch_event_rule.waf_allow_0700_uk.name
@@ -136,8 +157,29 @@ resource "aws_cloudwatch_event_target" "waf_block_target" {
   input     = jsonencode({ mode = "BLOCK" })
 }
 
+# Added the following targets for Bank Holidays
+resource "aws_cloudwatch_event_target" "waf_block_dec25_target" {
+  rule      = aws_cloudwatch_event_rule.waf_block_dec25.name
+  target_id = "BlockWAFDec25"
+  arn       = aws_lambda_function.waf_toggle.arn
+  input     = jsonencode({ mode = "BLOCK" })
+}
 
-# allow Events to invoke the Lambda
+resource "aws_cloudwatch_event_target" "waf_block_dec26_target" {
+  rule      = aws_cloudwatch_event_rule.waf_block_dec26.name
+  target_id = "BlockWAFDec26"
+  arn       = aws_lambda_function.waf_toggle.arn
+  input     = jsonencode({ mode = "BLOCK" })
+}
+
+resource "aws_cloudwatch_event_target" "waf_block_jan01_target" {
+  rule      = aws_cloudwatch_event_rule.waf_block_jan01.name
+  target_id = "BlockWAFJan01"
+  arn       = aws_lambda_function.waf_toggle.arn
+  input     = jsonencode({ mode = "BLOCK" })
+}
+
+# allow Events to invoke the Lambda for Monday-Sunday schedules
 resource "aws_lambda_permission" "waf_events_allow" {
   statement_id  = "AllowEvents0700-${local.environment}"
   action        = "lambda:InvokeFunction"
@@ -145,7 +187,6 @@ resource "aws_lambda_permission" "waf_events_allow" {
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.waf_allow_0700_uk.arn
 }
-
 
 resource "aws_lambda_permission" "waf_events_block" {
   statement_id  = "BlockEvents2130-${local.environment}"
@@ -155,6 +196,28 @@ resource "aws_lambda_permission" "waf_events_block" {
   source_arn    = aws_cloudwatch_event_rule.waf_block_2130_uk.arn
 }
 
+# Allow events to invoke the Lambda for Bank Holidays
+resource "aws_lambda_permission" "allow_eventbridge_block_dec25" {
+  statement_id  = "AllowEventBridgeBlockDec25-${local.environment}"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.waf_toggle.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.waf_block_dec25.arn
+}
+resource "aws_lambda_permission" "allow_eventbridge_block_dec26" {
+  statement_id  = "AllowEventBridgeBlockDec26-${local.environment}"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.waf_toggle.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.waf_block_dec26.arn
+}
+resource "aws_lambda_permission" "allow_eventbridge_block_jan01" {
+  statement_id  = "AllowEventBridgeBlockJan01-${local.environment}"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.waf_toggle.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.waf_block_jan01.arn
+}
 // Outputs
 output "waf_web_acl_name" {
   description = "WAF Web ACL name"

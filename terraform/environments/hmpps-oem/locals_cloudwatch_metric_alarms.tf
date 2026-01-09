@@ -131,7 +131,6 @@ locals {
   # e.g. src/github-workflow-monitoring/github-workflow-monitor.sh -i 3600 -n 168 -r all | grep -v all | cut -d, -f2,3 | sed 's/^/["/g' | sed 's/,/", "/g' | sed 's/$/", "dso-pipelines-pagerduty"],/g'
   gha_pipeline_alarms = [
     # [repo name, pipeline name, sns topic, optionally overwrite alarm settings]
-    ["dso-certificates", "cert-renewal-devtest", "dso-pipelines-pagerduty", {}],
     ["dso-certificates", "cert-renewal-prod", "dso-pipelines-pagerduty", {}],
     ["dso-certificates", "stale", "dso-pipelines-pagerduty", {}],
     ["dso-infra-azure-ad", "application-management", "dso-pipelines-pagerduty", {}],

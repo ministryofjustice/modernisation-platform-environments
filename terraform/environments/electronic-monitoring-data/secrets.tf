@@ -34,6 +34,11 @@ resource "aws_secretsmanager_secret" "home_office_account_id" {
   tags = merge(
     local.tags
   )
+  lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 
 resource "aws_secretsmanager_secret_version" "home_office_account_id" {

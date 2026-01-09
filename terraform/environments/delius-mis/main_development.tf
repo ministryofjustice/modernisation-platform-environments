@@ -26,6 +26,8 @@ module "environment_dev" {
 
   bastion_config = local.bastion_config_dev
 
+  boe_efs_config = local.boe_efs_config_dev
+
   bcs_config  = local.bcs_config_dev
   bps_config  = local.bps_config_dev
   bws_config  = local.bws_config_dev
@@ -39,10 +41,8 @@ module "environment_dev" {
 
   fsx_config               = local.fsx_config_dev
   dfi_report_bucket_config = local.dfi_report_bucket_config
-  lb_config                = local.lb_config
+  lb_config                = local.lb_config_dev
   datasync_config          = local.datasync_config_dev
-
-  domain_join_ports = local.domain_join_ports
 
   pagerduty_integration_key = local.pagerduty_integration_key
 

@@ -43,7 +43,7 @@ resource "aws_route53_record" "external_validation_prod" {
 #dev NS validation records for all cert domains
 resource "aws_route53_record" "external_validation_dev" {
   # Only create these in non-prod dev; otherwise empty map = no resources
-  for_each        = (!local.is-production && local.environment == "development") ? local.domain_types : {}
+  for_each        = (!local.is-production) ? local.domain_types : {}
   provider        = aws.core-network-services
   allow_overwrite = true
 

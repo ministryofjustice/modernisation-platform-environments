@@ -13,10 +13,7 @@
   "postCreateCommand": "bash .devcontainer/post-create.sh",
   "customizations": {
     "vscode": {
-      "extensions": [
-        "GitHub.copilot",
-        "GitHub.copilot-chat"
-      ]
+      "extensions": ["GitHub.copilot", "GitHub.copilot-chat"]
     }
   }
 }

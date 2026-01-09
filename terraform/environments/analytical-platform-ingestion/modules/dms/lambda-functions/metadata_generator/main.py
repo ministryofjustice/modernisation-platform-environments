@@ -307,7 +307,15 @@ def handler(event, context):  # pylint: disable=unused-argument
         raise ValueError(f"Supported engines: oracle, mssql+pymssql Got: {engine}")
 
     db_string = f"{engine}://{username}:{password}@{dsn}"
-    engine = create_engine(db_string)
+    engine = create_engine(
+        db_string,
+        connect_args={
+            # this becomes USERENV('MODULE') and USERENV('CLIENT_INFO')
+            "program": "repctl",
+            # this becomes USERENV('OS_USER')
+            "osuser": "rdsdb",
+        }
+    )
 
     db_objects = [obj.lower() for obj in json.loads(os.getenv("DB_OBJECTS", "[]"))]
     schema_name = os.getenv("DB_SCHEMA_NAME").lower() # May be empty string if schema specified on per-table basis

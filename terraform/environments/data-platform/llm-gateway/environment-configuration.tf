@@ -3,8 +3,8 @@ locals {
   environment_configurations = {
     development = {
       litellm_versions = {
-        application = "main-v1.80.5-stable"
-        chart       = "0.1.826"
+        application = "main-v1.80.11.rc.1"
+        chart       = "0.1.832"
       }
       litellm_organization_ids = {
         /* These are not currently managed in code */
@@ -68,6 +68,14 @@ locals {
             model_id = "eu.anthropic.claude-haiku-4-5-20251001-v1:0"
             region   = "eu-west-2"
           }
+          claude-opus-4-5 = {
+            model_id = "eu.anthropic.claude-opus-4-5-20251101-v1:0"
+            region   = "eu-west-2"
+          }
+          claude-sonnet-4 = {
+            model_id = "eu.anthropic.claude-sonnet-4-20250514-v1:0"
+            region   = "eu-west-1"
+          }
           claude-sonnet-4-5 = {
             model_id = "eu.anthropic.claude-sonnet-4-5-20250929-v1:0"
             region   = "eu-west-2"
@@ -116,10 +124,7 @@ locals {
         hmcts-claude-code = {
           organisation = "hmcts"
           max_budget   = 10000
-          models = [
-            "bedrock-claude-haiku-4-5",
-            "bedrock-claude-sonnet-4-5"
-          ]
+          models = ["all-proxy-models"]
           keys = {
             chris-o = {
               max_budget = 500
@@ -177,6 +182,13 @@ locals {
                 "bedrock-claude-sonnet-4-5"
               ]
             }
+            daniel-a = {
+              max_budget = 500
+              models = [
+                "bedrock-claude-haiku-4-5",
+                "bedrock-claude-sonnet-4-5"
+              ]
+            }
           }
         }
         central-digital = {
@@ -193,6 +205,15 @@ locals {
                 "bedrock-claude-haiku-4-5",
                 "bedrock-claude-sonnet-4-5"
               ]
+            }
+          }
+        }
+        coat = {
+          organisation = "ministryofjustice"
+          models       = ["bedrock-claude-sonnet-4-5"]
+          keys = {
+            chatbot-poc = {
+              models = ["bedrock-claude-sonnet-4-5"]
             }
           }
         }
@@ -246,6 +267,31 @@ locals {
                 "bedrock-claude-sonnet-4-5",
                 "bedrock-cohere-embed-english-v3",
                 "bedrock-cohere-embed-multilingual-v3"
+              ]
+            }
+          }
+        }
+        digital-prisons-service = {
+          organisation = "ministryofjustice"
+          models       = ["bedrock-claude-sonnet-4"]
+          keys = {
+            ims = {
+              models = ["bedrock-claude-sonnet-4"]
+            }
+          }
+        }
+        hmpps-digital = {
+          organisation = "ministryofjustice"
+          models = [
+            "all-proxy-models"
+          ]
+          keys = {
+            /* For Richard Adams */
+            prisoner-app = {
+              models = [
+                "azure-gpt-5",
+                "bedrock-claude-haiku-4-5",
+                "bedrock-claude-sonnet-4-5"
               ]
             }
           }

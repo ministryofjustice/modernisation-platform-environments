@@ -2,7 +2,7 @@
 # Also includes secrets manager storage for the randomised password that is (TO BE DONE) cycled periodically.
 
 module "rds" {
-  count = local.environment == "development" ? 1 : 0
+  count  = local.environment == "development" ? 1 : 0
   source = "./modules/rds"
 
   application_name            = local.application_name
