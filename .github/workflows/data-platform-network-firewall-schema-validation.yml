@@ -1,0 +1,48 @@
+---
+name: Data Platform Network Firewall Schema Validation
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "terraform/environments/data-platform/network/configuration/network-firewall/rules/**"
+      - "terraform/environments/data-platform/network/configuration/schema/rules/**"
+      - "terraform/environments/data-platform/network/scripts/schema-validation/**"
+
+permissions: {}
+
+jobs:
+  validate-network-firewall-schemas:
+    name: Validate Data Platform Network Firewall Schemas
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        schema:
+          - fqdn
+          - ip
+    defaults:
+      run:
+        working-directory: terraform/environments/data-platform/network
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set Up UV
+        id: setup_uv
+        uses: astral-sh/setup-uv@681c641aba71e4a1c380be3ab5e12ad51f415867 # v7.1.6
+        with:
+          activate-environment: true
+      
+      - name: Run Schema Validation
+        id: validate_schema
+        env:
+          SCHEMA: ${{ matrix.schema }}
+        run: |
+          bash scripts/schema-validation/main.sh "${SCHEMA}"
