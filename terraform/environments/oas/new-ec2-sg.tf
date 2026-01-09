@@ -103,6 +103,18 @@ resource "aws_security_group_rule" "ingress_admin_workspace" {
   cidr_blocks       = [local.application_data.accounts[local.environment].managementcidr]
 }
 
+resource "aws_security_group_rule" "ingress_9500_from_mojo" {
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+
+  type              = "ingress"
+  security_group_id = aws_security_group.ec2_sg[0].id
+  from_port         = 9500
+  to_port           = 9500
+  protocol          = "tcp"
+  cidr_blocks       = ["10.0.0.0/8"]
+  description       = "9500 from Mojo"
+}
+
 resource "aws_security_group_rule" "ingress_admin_9501_vpc" {
   count = contains(["test", "preproduction"], local.environment) ? 1 : 0
 
@@ -149,6 +161,18 @@ resource "aws_security_group_rule" "ingress_managed_9502_workspace" {
   to_port           = 9502
   protocol          = "tcp"
   cidr_blocks       = [local.application_data.accounts[local.environment].managementcidr]
+}
+
+resource "aws_security_group_rule" "ingress_9502_from_mojo" {
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+
+  type              = "ingress"
+  security_group_id = aws_security_group.ec2_sg[0].id
+  from_port         = 9502
+  to_port           = 9502
+  protocol          = "tcp"
+  cidr_blocks       = ["10.0.0.0/8"]
+  description       = "9502 from Mojo"
 }
 
 resource "aws_security_group_rule" "ingress_managed_9503_vpc" {
