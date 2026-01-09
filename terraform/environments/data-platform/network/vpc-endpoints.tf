@@ -4,7 +4,29 @@ module "vpc_endpoints" {
 
   vpc_id = aws_vpc.main.id
 
-  endpoints = merge({ for service in toset(["ssm", "ssmmessages", "ec2messages"]) :
+  endpoints = merge({ for service in toset([
+    "ec2messages",
+    "guardduty-data",
+    "ssm",
+    "ssmmessages",
+    # "sts",
+    # "logs",
+    # "kms",
+    # "ecr.api",
+    # "ecr.dkr",
+    # "eks",
+    # "eks-auth",
+    # "cloudwatch",
+    # "cloudwatchlogs",
+    # "cloudwatchevents",
+    # "rds",
+    # "rds-data",
+    # "secretsmanager",
+    # "sqs",
+    # "sns",
+    # "aps",
+    # "aps-workspaces",
+    ]) :
     replace(service, ".", "_") =>
     {
       service = service
@@ -28,6 +50,18 @@ module "vpc_endpoints" {
         ]
         tags = { Name = "${local.application_name}-${local.environment}-s3-gateway" }
       }
+      s3-eu-west-1 = {
+        service        = "s3"
+        service_name   = "com.amazonaws.eu-west-1.s3"
+        service_region = "eu-west-1"
+        service_type   = "Gateway"
+        route_table_ids = [
+          aws_route_table.main["private-a"].id,
+          aws_route_table.main["private-b"].id,
+          aws_route_table.main["private-c"].id
+        ]
+        tags = { Name = "${local.application_name}-${local.environment}-s3-eu-west-1-gateway" }
+      }
   })
 
   create_security_group      = true
@@ -37,9 +71,9 @@ module "vpc_endpoints" {
     ingress_https = {
       description = "HTTPS from subnets"
       cidr_blocks = [
-        local.all_subnets["private-a"].cidr_block,
-        local.all_subnets["private-b"].cidr_block,
-        local.all_subnets["private-c"].cidr_block
+        local.subnets["private-a"].cidr_block,
+        local.subnets["private-b"].cidr_block,
+        local.subnets["private-c"].cidr_block
       ]
     }
   }
