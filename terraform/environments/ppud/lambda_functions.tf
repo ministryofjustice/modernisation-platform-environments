@@ -259,7 +259,7 @@ locals {
     }
     suppress_securityhub_findings = {
       description  = "Function to suppress security hub findings with a Compliance Status of NOT_AVAILABLE."
-      role_key     = "suppress_securityhub_findings"
+      role_key     = "suppress_sechub_findings"
       environments = ["development", "preproduction", "production"]
       permissions = [{
         principal         = "securityhub.amazonaws.com"

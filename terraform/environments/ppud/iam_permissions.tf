@@ -106,13 +106,13 @@ locals {
         "describe_cloudwatch"
       ]
     }
-    suppress_securityhub_findings = {
+    suppress_sechub_findings = {
       description = "Lambda Function Role for suppressing securityhub findings with a Compliance Status of NOT_AVAILABLE"
       policies = [
         "send_message_to_sqs",
         "send_logs_to_cloudwatch",
         "publish_to_sns",
-        "suppress_securityhub_findings"
+        "suppress_sechub_findings"
       ]
     }
   }
@@ -212,7 +212,7 @@ locals {
           "get_ssm_parameter",
           "update_waf_ipset",
           "describe_cloudwatch",
-          "suppress_securityhub_findings"
+          "suppress_sechub_findings"
           ] : {
           key         = "${policy_name}_${env_key}"
           policy_name = policy_name
@@ -298,7 +298,7 @@ resource "aws_iam_policy" "lambda_policies_v2" {
         Effect   = "Allow"
         Action   = ["cloudwatch:DescribeAlarms"]
         Resource = ["arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"]
-        } : each.value.policy_name == "suppress_securityhub_findings" ? {
+        } : each.value.policy_name == "suppress_sechub_findings" ? {
         Effect   = "Allow"
         Action   = ["securityhub:GetFindings", "securityhub:BatchUpdateFindings"]
         Resource = ["arn:aws:securityhub:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"]
