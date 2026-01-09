@@ -153,20 +153,6 @@ resource "aws_cloudwatch_event_rule" "waf_block_28dec26" {
   description         = "Set WAF rule to BLOCK on 28th Dec Bank Holiday"
 } 
 
-# Block for 25 Dec 
-resource "aws_cloudwatch_event_rule" "waf_block_25dec26" {
-  name                = "waf-block-25dec26-${local.environment}"
-  schedule_expression = "cron(01 07 25 12 ? 2026)"
-  description         = "Set WAF rule to BLOCK on 25th Dec Bank Holiday"
-}
-
-# Block for 28 Dec - Boxing day Substitute day
-resource "aws_cloudwatch_event_rule" "waf_block_28dec26" {
-  name                = "waf-block-28dec26-${local.environment}"
-  schedule_expression = "cron(01 07 28 12 ? 2026)"
-  description         = "Set WAF rule to BLOCK on 28th Dec Bank Holiday"
-}
-
 # Block for 1 Jan
 resource "aws_cloudwatch_event_rule" "waf_block_jan01" {
   name                = "waf-block-jan01-${local.environment}"
@@ -246,7 +232,7 @@ resource "aws_cloudwatch_event_target" "waf_block_jan01_target" {
   input     = jsonencode({ mode = "BLOCK" })
 }
 
-# allow Events to invoke the Lambda
+# allow Events for to invoke the Lambda
 resource "aws_lambda_permission" "waf_events_allow" {
   statement_id  = "AllowEvents0700-${local.environment}"
   action        = "lambda:InvokeFunction"
@@ -264,7 +250,6 @@ resource "aws_lambda_permission" "waf_events_block" {
 }
 
 # Block events to invoke the Lambda for Bank Holidays of year 2026
-# Allow events to invoke the Lambda for Bank Holidays
 resource "aws_lambda_permission" "allow_eventbridge_block_3apr26" {
   statement_id  = "AllowEventBridgeBlock3Apr26-${local.environment}"
   action        = "lambda:InvokeFunction"
