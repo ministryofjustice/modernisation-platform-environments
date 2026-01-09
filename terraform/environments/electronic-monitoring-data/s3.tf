@@ -55,6 +55,8 @@ locals {
     { id = module.s3-raw-formatted-data-bucket.bucket.id, arn = module.s3-raw-formatted-data-bucket.bucket.arn },
     { id = module.s3-lambda-store-bucket.bucket.id, arn = module.s3-lambda-store-bucket.bucket.arn }
   ]
+
+  cross_env_bucket_policy = local.is-preproduction ? [data.aws_iam_policy_document.allow_cross_env_upload.json] : []
 }
 
 
@@ -1065,6 +1067,23 @@ module "s3-glue-job-script-bucket" {
 # DMS target  bucket
 # ------------------------------------------------------------------------
 
+data "aws_iam_policy_document" "allow_cross_env_upload" {
+  count = local.is-preproduction ? 1 : 0
+  statement {
+    sid    = "AllowProdLambdaWrite"
+    effect = "Allow"
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${local.environment_management.account_ids["electronic-monitoring-data-production"]}:role/data_cutback_iam_role"]
+
+    }
+    actions = [
+      "s3:PutObject",
+      "s3:PutObjectAcl"
+    ]
+    resources = ["${module.s3-dms-target-store-bucket.bucket.arn}/*"]
+  }
+}
 
 module "s3-dms-target-store-bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9f"
@@ -1088,6 +1107,7 @@ module "s3-dms-target-store-bucket" {
     aws.bucket-replication = aws
   }
 
+  bucket_policy  = [local.cross_env_bucket_policy]
   lifecycle_rule = [
     {
       id      = "main"
@@ -1131,33 +1151,6 @@ module "s3-dms-target-store-bucket" {
 
   tags = local.tags
 }
-
-resource "aws_s3_bucket_policy" "allow_cross_env_upload" {
-  bucket = module.s3-dms-target-store-bucket.bucket.id
-
-  count = local.is-preproduction ? 1 : 0
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Sid    = "AllowDevLambdaWrite"
-        Effect = "Allow"
-        Principal = {
-          AWS = "arn:aws:iam::${local.environment_management.account_ids["electronic-monitoring-data-production"]}:role/data_cutback_iam_role"
-        }
-        Action = [
-          "s3:PutObject",
-          "s3:PutObjectAcl"
-        ]
-        Resource = [
-          "${module.s3-dms-target-store-bucket.bucket.arn}/*"
-        ]
-      }
-    ]
-  })
-}
-
 
 
 module "s3-create-a-derived-table-bucket" {
