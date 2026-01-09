@@ -65,21 +65,23 @@ data "aws_iam_policy_document" "emds_alerts_kms" {
   }
 
   # Allow mdss_daily_failure_digest Lambda role to publish encrypted messages
-  statement {
-    sid       = "AllowMdssDailyFailureDigestUseOfKey"
-    effect    = "Allow"
-    resources = ["*"]
-    actions = [
-      "kms:Decrypt",
-      "kms:GenerateDataKey"
-    ]
+  dynamic "statement" {
+    for_each = local.is-development ? [] : [1]
+    content {
+      sid       = "AllowMdssDailyFailureDigestUseOfKey"
+      effect    = "Allow"
+      resources = ["*"]
+      actions = [
+        "kms:Decrypt",
+        "kms:GenerateDataKey"
+      ]
 
-    principals {
-      type        = "AWS"
-      identifiers = [aws_iam_role.mdss_daily_failure_digest[0].arn]
+      principals {
+        type        = "AWS"
+        identifiers = [aws_iam_role.mdss_daily_failure_digest[0].arn]
+      }
     }
   }
-}
 
 data "aws_iam_policy_document" "emds_alerts_topic_policy" {
   version = "2012-10-17"
@@ -104,19 +106,22 @@ data "aws_iam_policy_document" "emds_alerts_topic_policy" {
   }
 
   # Allow mdss_daily_failure_digest Lambda role to publish
-  statement {
-    sid    = "AllowMdssDailyFailureDigestLambdaToPublish"
-    effect = "Allow"
+  dynamic "statement" {
+    for_each = local.is-development ? [] : [1]
+    content {
+      sid    = "AllowMdssDailyFailureDigestLambdaToPublish"
+      effect = "Allow"
 
-    actions = [
-      "sns:Publish",
-    ]
+      actions = [
+        "sns:Publish",
+      ]
 
-    resources = [aws_sns_topic.emds_alerts.arn]
+      resources = [aws_sns_topic.emds_alerts.arn]
 
-    principals {
-      type        = "AWS"
-      identifiers = [aws_iam_role.mdss_daily_failure_digest[0].arn]
+      principals {
+        type        = "AWS"
+        identifiers = [aws_iam_role.mdss_daily_failure_digest[0].arn]
+      }
     }
   }
 
