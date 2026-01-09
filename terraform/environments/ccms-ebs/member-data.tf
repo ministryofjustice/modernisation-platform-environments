@@ -4,7 +4,7 @@
 # data "aws_ami" "oracle_base_prereqs" {
 #   most_recent = true
 #   owners      = [local.application_data.accounts[local.environment].ami_owner]
-#
+
 #   filter {
 #     name   = "name"
 #     values = [local.application_data.accounts[local.environment].orace_base_prereqs_ami_name]
@@ -18,7 +18,7 @@
 # data "aws_ami" "oracle_db" {
 #   most_recent = true
 #   owners      = [local.application_data.accounts[local.environment].ami_owner]
-#
+
 #   filter {
 #     name   = "name"
 #     values = [local.application_data.accounts[local.environment].orace_db_ami_name]
@@ -32,7 +32,7 @@
 # data "aws_ami" "webgate" {
 #   most_recent = true
 #   owners      = [local.application_data.accounts[local.environment].ami_owner]
-#
+
 #   filter {
 #     name   = "name"
 #     values = [local.application_data.accounts[local.environment].webgate_ami_name]
@@ -46,7 +46,7 @@
 # data "aws_ami" "accessgate" {
 #   most_recent = true
 #   owners      = [local.application_data.accounts[local.environment].ami_owner]
-#
+
 #   filter {
 #     name   = "name"
 #     values = [local.application_data.accounts[local.environment].accessgate_ami_name]
@@ -59,27 +59,12 @@
 
 ## SNS IAM Policies
 
-# SNS policy used by aws_sns_topic_policy.sns_policy for the cw_alerts topic
+# The policies below are not used. Saved for reference.
+
 data "aws_iam_policy_document" "sns_topic_policy_ec2cw" {
   version = "2012-10-17"
-
-  # Allow account root full access to the topic
   statement {
-    sid    = "AllowOwnerFullAccess"
-    effect = "Allow"
-    actions = ["sns:*"]
-
-    principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
-    }
-
-    resources = [aws_sns_topic.cw_alerts.arn]
-  }
-
-  # Allow CloudWatch / CloudWatch Alarms to publish
-  statement {
-    sid    = "AllowCloudWatchToPublish"
+    sid    = "EventsAllowPublishSnsTopic"
     effect = "Allow"
     actions = [
       "sns:Publish",
@@ -95,32 +80,7 @@ data "aws_iam_policy_document" "sns_topic_policy_ec2cw" {
     }
   }
 
-  # Allow EventBridge (GuardDuty rule) to publish
-  statement {
-    sid    = "AllowEventBridgeGuardDutyToPublish"
-    effect = "Allow"
-    actions = [
-      "sns:Publish",
-    ]
-    resources = [
-      aws_sns_topic.cw_alerts.arn
-    ]
-    principals {
-      type = "Service"
-      identifiers = [
-        "events.amazonaws.com",
-      ]
-    }
-
-    condition {
-      test     = "ArnEquals"
-      variable = "aws:SourceArn"
-      values   = [aws_cloudwatch_event_rule.guardduty.arn]
-    }
-  }
 }
-
-# The policies below are not used. Saved for reference.
 
 # data "aws_iam_policy_document" "sns_topic_policy_s3" {
 #   policy_id = "SnsTopicId"
@@ -244,7 +204,6 @@ data "aws_route53_zone" "prod-network-services" {
   name         = "ccms-ebs.service.justice.gov.uk."
   private_zone = false
 }
-
 data "aws_route53_zone" "application_zone" {
   provider     = aws.core-network-services
   name         = "ccms-ebs.service.justice.gov.uk."

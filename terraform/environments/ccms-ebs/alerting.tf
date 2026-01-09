@@ -15,7 +15,7 @@ resource "aws_sns_topic_policy" "guarduty_default" {
 resource "aws_sns_topic_subscription" "guardduty_alerts" {
   topic_arn = aws_sns_topic.guardduty_alerts.arn
   protocol  = "lambda"
-  endpoint  = "${aws_lambda_function.cloudwatch_sns.arn}"
+  endpoint  = aws_lambda_function.cloudwatch_sns.arn
 }
 
 resource "aws_cloudwatch_event_rule" "guardduty" {
