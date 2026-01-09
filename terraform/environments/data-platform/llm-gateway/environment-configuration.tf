@@ -3,7 +3,7 @@ locals {
   environment_configurations = {
     development = {
       litellm_versions = {
-        application = "main-v1.80.8-stable.1"
+        application = "main-v1.80.11.rc.1"
         chart       = "0.1.832"
       }
       litellm_organization_ids = {
@@ -69,7 +69,7 @@ locals {
             region   = "eu-west-2"
           }
           claude-opus-4-5 = {
-            model_id = "global.anthropic.claude-opus-4-5-20251101-v1:0"
+            model_id = "eu.anthropic.claude-opus-4-5-20251101-v1:0"
             region   = "eu-west-2"
           }
           claude-sonnet-4 = {
@@ -124,10 +124,7 @@ locals {
         hmcts-claude-code = {
           organisation = "hmcts"
           max_budget   = 10000
-          models = [
-            "bedrock-claude-haiku-4-5",
-            "bedrock-claude-sonnet-4-5"
-          ]
+          models = ["all-proxy-models"]
           keys = {
             chris-o = {
               max_budget = 500
