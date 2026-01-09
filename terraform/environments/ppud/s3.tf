@@ -354,6 +354,10 @@ resource "aws_s3_bucket_replication_configuration" "moj-database-source-prod-rep
   rule {
     id     = "ppud-report-replication-rule-prod"
     status = "Enabled"
+    filter {}
+    delete_marker_replication {
+      status = "Disabled"
+    }
     destination {
       bucket        = "arn:aws:s3:::mojap-data-engineering-production-ppud-prod"
       storage_class = "STANDARD"
