@@ -893,7 +893,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-log-files-uat" {
       storage_class = "STANDARD_IA"
     }
     expiration {
-      days = 180
+      days = 120
     }
   }
 }
@@ -1433,7 +1433,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-log-files-dev" {
       storage_class = "STANDARD_IA"
     }
     expiration {
-      days = 180
+      days = 120
     }
   }
 }
