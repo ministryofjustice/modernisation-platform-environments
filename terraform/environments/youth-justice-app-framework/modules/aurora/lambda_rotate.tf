@@ -13,11 +13,15 @@ resource "aws_lambda_function" "rds_secret_rotation" {
   role              = aws_iam_role.rds_secret_rotation.arn
   runtime           = "python3.10"
   handler           = "lambda_function.lambda_handler"
-  timeout           = 30
-  memory_size       = 128
+  timeout           = 120
+  memory_size       = 512
   filename          = "${path.module}/zip/rotation_lambda.zip"
   kms_key_arn       = var.kms_key_arn
   source_code_hash  = filebase64sha256("${path.module}/zip/rotation_lambda.zip")
+
+  vpc_config {
+    subnet_ids      = var.database_subnets
+  }
 
   environment {
     variables = {
