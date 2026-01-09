@@ -201,6 +201,10 @@ resource "aws_db_instance" "appdb1" {
     delete = "2h"
   }
 
+  lifecycle {   
+     ignore_changes = [final_snapshot_identifier] 
+     }
+
 }
 
 # Access from Cloud Platform
