@@ -1284,6 +1284,7 @@ resource "aws_iam_role_policy_attachment" "glue_db_count_metrics_policy_attachme
 #-----------------------------------------------------------------------------------
 
 data "aws_iam_policy_document" "data_cutback_iam_role_policy_document" {
+  count = local.is-production || local.is-development ? 1 : 0
   statement {
     sid    = "S3Permissions"
     effect = "Allow"
@@ -1295,10 +1296,10 @@ data "aws_iam_policy_document" "data_cutback_iam_role_policy_document" {
     ]
 
     resources = [
-      "arn:aws:s3:::emds-dev-dms-rds-to-parquet-*",
-      "arn:aws:s3:::emds-dev-dms-rds-to-parquet-*/*",
-      "arn:aws:s3:::emds-test-dms-rds-to-parquet-*",
-      "arn:aws:s3:::emds-test-dms-rds-to-parquet-*/*"
+      "arn:aws:s3:::emds-preprod-dms-rds-to-parquet-*",
+      "arn:aws:s3:::emds-preprod-dms-rds-to-parquet-*/*",
+      "arn:aws:s3:::emds-prod-dms-rds-to-parquet-*",
+      "arn:aws:s3:::emds-prod-dms-rds-to-parquet-*/*"
     ]
   }
 }
@@ -1312,7 +1313,7 @@ resource "aws_iam_role" "data_cutback_iam_role" {
 resource "aws_iam_policy" "data_cutback_iam_role_policy" {
   count  = local.is-production || local.is-development ? 1 : 0
   name   = "data_cutback_iam_policy"
-  policy = data.aws_iam_policy_document.data_cutback_iam_role_policy_document.json
+  policy = data.aws_iam_policy_document.data_cutback_iam_role_policy_document[0].json
 }
 
 resource "aws_iam_role_policy_attachment" "data_cutback_iam_role_policy_attachment" {
