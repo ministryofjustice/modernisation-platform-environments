@@ -1,6 +1,7 @@
 ---
+# yaml-language-server: $schema=../../schema/rules/fqdn-rules.json
 rules:
-  - name: allow-home-net-api-github-com-https
+  - name: allow-vpc-api-github-com-https
     sid: 1
     revision: 1
     action: pass
