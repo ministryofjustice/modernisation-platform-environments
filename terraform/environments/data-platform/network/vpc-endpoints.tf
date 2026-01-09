@@ -51,7 +51,6 @@ module "vpc_endpoints" {
         tags = { Name = "${local.application_name}-${local.environment}-s3-gateway" }
       }
       s3-eu-west-1 = {
-        service        = "s3"
         service_name   = "com.amazonaws.eu-west-1.s3"
         service_region = "eu-west-1"
         service_type   = "Gateway"
