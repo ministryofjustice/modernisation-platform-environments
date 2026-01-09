@@ -78,6 +78,23 @@ resource "aws_s3_bucket_policy" "ftp_user_and_lambda_access" {
 data "aws_iam_policy_document" "bucket_policy" {
   for_each = local.build_s3 ? module.s3_bucket : {}
 
+# Enforce TLS v1.2 or higher
+  Statement = 
+      {
+        Sid    = "EnforceTLSv12orHigher",
+        Effect = "Deny",
+        Principal = {
+          AWS = "*"
+        },
+        Action   = "s3:*",
+        Resource = ["${module.s3-bucket-logging.bucket.arn}/*", "${module.s3-bucket-logging.bucket.arn}"],
+        Condition = {
+          NumericLessThan = {
+            "s3:TlsVersion" = "1.2"
+          }
+        }
+      }
+
   dynamic "statement" {
     for_each = length(aws_iam_role.ftp_lambda_role) > 0 ? [1] : []
 
