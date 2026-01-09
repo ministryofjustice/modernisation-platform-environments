@@ -3,7 +3,7 @@ module "ebs_csi_driver_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts"
-  version = "6.2.3"
+  version = "6.3.0"
 
   name            = "ebs-csi-driver20240520140611190100000004"
   use_name_prefix = false
@@ -25,7 +25,7 @@ module "efs_csi_driver_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts"
-  version = "6.2.3"
+  version = "6.3.0"
 
   name            = "efs-csi-driver20240520140611186600000003"
   use_name_prefix = false
@@ -47,7 +47,7 @@ module "aws_cloudwatch_network_flow_monitor_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts"
-  version = "6.2.3"
+  version = "6.3.0"
 
   name            = "aws-cloudwatch-network-flow-monitor20250620095157752500000001"
   use_name_prefix = false
@@ -71,7 +71,7 @@ module "cluster_autoscaler_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts"
-  version = "6.2.3"
+  version = "6.3.0"
 
   name            = "cluster-autoscaler20240523131251670100000002"
   use_name_prefix = false
@@ -94,7 +94,7 @@ module "external_dns_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts"
-  version = "6.2.3"
+  version = "6.3.0"
 
   name            = "external-dns20240523161605343400000002"
   use_name_prefix = false
@@ -118,7 +118,7 @@ module "cert_manager_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts"
-  version = "6.2.3"
+  version = "6.3.0"
 
   name            = "cert-manager20240530111145557700000002"
   use_name_prefix = false
@@ -141,7 +141,7 @@ module "external_secrets_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts"
-  version = "6.2.3"
+  version = "6.3.0"
 
   name            = "external-secrets20240617152100265400000001"
   use_name_prefix = false
@@ -164,7 +164,7 @@ module "aws_for_fluent_bit_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts"
-  version = "6.2.3"
+  version = "6.3.0"
 
   name            = "aws-for-fluent-bit20240520192238843200000001"
   use_name_prefix = false
@@ -189,7 +189,7 @@ module "amazon_prometheus_proxy_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts"
-  version = "6.2.3"
+  version = "6.3.0"
 
   name            = "amazon-prometheus-proxy20240521075058834300000002"
   use_name_prefix = false
@@ -213,7 +213,7 @@ module "vpc_cni_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts"
-  version = "6.2.3"
+  version = "6.3.0"
 
   name            = "vpc-cni20240514140203981600000001"
   use_name_prefix = false
@@ -236,7 +236,7 @@ module "velero_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts"
-  version = "6.2.3"
+  version = "6.3.0"
 
   name            = "velero20250821090213811600000002"
   use_name_prefix = false

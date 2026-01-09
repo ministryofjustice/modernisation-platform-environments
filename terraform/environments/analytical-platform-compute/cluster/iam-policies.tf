@@ -139,7 +139,7 @@ module "ecr_pull_through_cache_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "6.2.3"
+  version = "6.3.0"
 
   name        = "ecr-pull-through-cache20250724171726658700000001"
   description = "IAM Policy"
@@ -169,7 +169,7 @@ module "velero_kms_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "6.2.3"
+  version = "6.3.0"
 
   name        = "velero-kms-access20250820143113414500000001"
   description = "IAM Policy"
