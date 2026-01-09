@@ -1133,10 +1133,9 @@ module "s3-dms-target-store-bucket" {
 }
 
 resource "aws_s3_bucket_policy" "allow_cross_env_upload" {
-  # 1. Attach this to the bucket created by your module
   bucket = module.s3-dms-target-store-bucket.bucket.id
 
-  count = local.is-test ? 1 : 0
+  count = local.is-preproduction ? 1 : 0
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -1145,7 +1144,7 @@ resource "aws_s3_bucket_policy" "allow_cross_env_upload" {
         Sid    = "AllowDevLambdaWrite"
         Effect = "Allow"
         Principal = {
-          AWS = "arn:aws:iam::${local.environment_management.account_ids["electronic-monitoring-data-development"]}:role/data_cutback_iam_role"
+          AWS = "arn:aws:iam::${local.environment_management.account_ids["electronic-monitoring-data-production"]}:role/data_cutback_iam_role"
         }
         Action = [
           "s3:PutObject",
