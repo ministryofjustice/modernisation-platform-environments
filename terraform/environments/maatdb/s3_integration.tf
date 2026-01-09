@@ -80,8 +80,8 @@ data "aws_iam_policy_document" "bucket_policy" {
 
 # Enforce TLS v1.2 or higher
   statement {
-        Sid    = "EnforceTLSv12orHigher"
-        Effect = "Deny"
+        sid    = "EnforceTLSv12orHigher"
+        effect = "Deny"
         principals {
           type = "AWS"
           identifiers = ["*"]
