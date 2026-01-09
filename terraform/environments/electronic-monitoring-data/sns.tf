@@ -7,11 +7,15 @@ resource "aws_sns_topic" "emds_alerts" {
   http_success_feedback_sample_rate = 0
 }
 
-
 resource "aws_kms_key" "emds_alerts" {
   description         = "KMS key for EMDS SNS alerts"
   enable_key_rotation = true
   policy              = data.aws_iam_policy_document.emds_alerts_kms.json
+}
+
+locals {
+  # In dev mdss_daily_failure_digest has count = 0
+  mdss_daily_failure_digest_role_arn = try(aws_iam_role.mdss_daily_failure_digest[0].arn, "")
 }
 
 data "aws_iam_policy_document" "emds_alerts_kms" {
@@ -78,10 +82,11 @@ data "aws_iam_policy_document" "emds_alerts_kms" {
 
       principals {
         type        = "AWS"
-        identifiers = [aws_iam_role.mdss_daily_failure_digest[0].arn]
+        identifiers = [local.mdss_daily_failure_digest_role_arn]
       }
     }
   }
+}
 
 data "aws_iam_policy_document" "emds_alerts_topic_policy" {
   version = "2012-10-17"
@@ -120,7 +125,7 @@ data "aws_iam_policy_document" "emds_alerts_topic_policy" {
 
       principals {
         type        = "AWS"
-        identifiers = [aws_iam_role.mdss_daily_failure_digest[0].arn]
+        identifiers = [local.mdss_daily_failure_digest_role_arn]
       }
     }
   }
