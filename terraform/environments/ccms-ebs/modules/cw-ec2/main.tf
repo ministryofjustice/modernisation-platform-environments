@@ -158,7 +158,7 @@ resource "aws_cloudwatch_metric_alarm" "system_health_check" {
   comparison_operator       = "GreaterThanOrEqualToThreshold"
   metric_name               = "StatusCheckFailed_System"
   namespace                 = "AWS/EC2"
-  statistic                 = "Average"
+  statistic                 = "Maximum"
   insufficient_data_actions = [var.topic]
 
   evaluation_periods = var.syshc_eval_periods

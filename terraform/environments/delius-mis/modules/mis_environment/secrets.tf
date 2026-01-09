@@ -5,7 +5,7 @@ resource "aws_secretsmanager_secret" "ad_username" {
   name                    = "${var.env_name}-legacy-ad-username"
   recovery_window_in_days = 0
 
-  tags = var.tags
+  tags = local.tags
 }
 
 #tfsec:ignore:aws-ssm-secret-use-customer-key
@@ -14,7 +14,7 @@ resource "aws_secretsmanager_secret" "ad_password" {
   name                    = "${var.env_name}-legacy-ad-password"
   recovery_window_in_days = 0
 
-  tags = var.tags
+  tags = local.tags
 }
 
 resource "aws_secretsmanager_secret" "boe_config" {
@@ -23,7 +23,7 @@ resource "aws_secretsmanager_secret" "boe_config" {
   description = "Config secrets for SAP BIP reporting system"
   kms_key_id  = var.account_config.kms_keys["general_shared"]
 
-  tags = var.tags
+  tags = local.tags
 }
 
 resource "aws_secretsmanager_secret" "boe_passwords" {
@@ -32,7 +32,7 @@ resource "aws_secretsmanager_secret" "boe_passwords" {
   description = "Passwords for SAP BIP reporting system"
   kms_key_id  = var.account_config.kms_keys["general_shared"]
 
-  tags = var.tags
+  tags = local.tags
 }
 
 resource "aws_secretsmanager_secret" "dis_config" {
@@ -41,7 +41,7 @@ resource "aws_secretsmanager_secret" "dis_config" {
   description = "Config secrets for SAP BODS DIS ETL system"
   kms_key_id  = var.account_config.kms_keys["general_shared"]
 
-  tags = var.tags
+  tags = local.tags
 }
 
 resource "aws_secretsmanager_secret" "dis_passwords" {
@@ -50,5 +50,5 @@ resource "aws_secretsmanager_secret" "dis_passwords" {
   description = "Passwords for SAP BODS DIS ETL system"
   kms_key_id  = var.account_config.kms_keys["general_shared"]
 
-  tags = var.tags
+  tags = local.tags
 }
