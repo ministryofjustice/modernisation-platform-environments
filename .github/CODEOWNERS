@@ -23,7 +23,7 @@
 /terraform/environments/cdpt-ifs @ministryofjustice/azure-aws-sso-cdpt @ministryofjustice/central-digital-product-team @ministryofjustice/modernisation-platform
 /terraform/environments/cica-copilot @ministryofjustice/cica-copilot-llm-maintainers @ministryofjustice/modernisation-platform
 /terraform/environments/cica-data-extraction @ministryofjustice/cica-mp-tariff @ministryofjustice/modernisation-platform
-/terraform/environments/cica-sandbox @ministryofjustice/cica-review-case-documents @ministryofjustice/modernisation-platform
+/terraform/environments/cica-sandbox @ministryofjustice/cica-external-developers @ministryofjustice/cica-review-case-documents @ministryofjustice/modernisation-platform
 /terraform/environments/cica-tariff @ministryofjustice/cica-mp-tariff @ministryofjustice/modernisation-platform
 /terraform/environments/cloud-platform-live @ministryofjustice/cloud-platform-engineers @ministryofjustice/modernisation-platform
 /terraform/environments/cloud-platform-non-live @ministryofjustice/cloud-platform-engineers @ministryofjustice/modernisation-platform
