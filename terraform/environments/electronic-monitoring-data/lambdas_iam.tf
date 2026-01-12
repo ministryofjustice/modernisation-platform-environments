@@ -2,6 +2,7 @@ locals {
   cross_account_map = local.is-test ? "development" : local.is-production ? "preproduction" : null
   cross_account_map_shorthand = local.is-test ? "dev" : local.is-production ? "preprod" : null
   cross_account_bucket = local.is-test || local.is-preproduction ? "arn:aws:s3:::emds-${local.cross_account_map_shorthand}-land-*/*" : ""
+  cross_account_kms = local.is-test || local.is-preproduction ? "arn:aws:kms:${data.aws_region.current.name}:${local.environment_management.account_ids["electronic-monitoring-data-${local.cross_account_map}"]}:key/*"
 }
 
 # ------------------------------------------
@@ -1391,7 +1392,7 @@ data "aws_iam_policy_document" "cross_account_copy" {
       "kms:GenerateDataKey*",
       "kms:DescribeKey"
     ]
-    resources = ["arn:aws:kms:${data.aws_region.current.name}:${local.environment_management.account_ids["electronic-monitoring-data-${local.cross_account_map}"]}:key/*"]
+    resources = [local.cross_account_kms]
   }
   statement {
     sid     = "AccessToInAccountBucket"
