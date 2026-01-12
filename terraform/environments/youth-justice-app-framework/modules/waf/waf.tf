@@ -222,32 +222,50 @@ resource "aws_wafv2_web_acl" "cf" {
   }
 
   dynamic "rule" {
-    for_each = var.waf_geoIP_rules
-    content {
-      name     = rule.value.name
-      priority = rule.value.priority
+  for_each = var.waf_geoIP_rules
+  content {
+    name     = rule.value.name
+    priority = rule.value.priority
 
-      action {
-        block {}
-      }
+    action {
+      block {}
+    }
 
-      statement {
-        not_statement {
-          statement {
-            geo_match_statement {
-              country_codes = rule.value.geo_match_statement.country_codes
+    statement {
+      and_statement {
+
+        
+        statement {
+          not_statement {
+            statement {
+              geo_match_statement {
+                country_codes = rule.value.geo_match_statement.country_codes
+              }
+            }
+          }
+        }
+
+       
+        statement {
+          not_statement {
+            statement {
+              ip_set_reference_statement {
+                arn = aws_wafv2_ip_set.geo_whitelist.arn
+              }
             }
           }
         }
       }
+    }
 
-      visibility_config {
-        cloudwatch_metrics_enabled = true
-        metric_name                = rule.value.name
-        sampled_requests_enabled   = true
-      }
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = rule.value.name
+      sampled_requests_enabled   = true
     }
   }
+}
+
 
   tags = local.tags
 
@@ -269,4 +287,15 @@ resource "aws_wafv2_ip_set" "ipset" {
   addresses          = each.value.ip_addresses
 
   tags = local.tags
+}
+
+
+resource "aws_wafv2_ip_set" "geo_whitelist" {
+  name               = "geo-whitelist"
+  scope              = "REGIONAL"
+  ip_address_version = "IPV4"
+
+  addresses = [
+    "66.103.29.115/32"  # Whitelisted IP (salford.gov.uk office)
+  ]
 }
