@@ -1278,6 +1278,51 @@ resource "aws_iam_role_policy_attachment" "glue_db_count_metrics_policy_attachme
   policy_arn = aws_iam_policy.glue_db_count_metrics.arn
 }
 
+
+#-----------------------------------------------------------------------------------
+# Data Cut Back
+#-----------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "data_cutback_iam_role_policy_document" {
+  count = local.is-production || local.is-development ? 1 : 0
+  statement {
+    sid    = "S3Permissions"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:GetBucketLocation",
+      "s3:ListBucket",
+      "s3:PutObject",
+    ]
+
+    resources = [
+      "arn:aws:s3:::emds-preprod-dms-rds-to-parquet-*",
+      "arn:aws:s3:::emds-preprod-dms-rds-to-parquet-*/*",
+      "arn:aws:s3:::emds-prod-dms-rds-to-parquet-*",
+      "arn:aws:s3:::emds-prod-dms-rds-to-parquet-*/*"
+    ]
+  }
+}
+
+resource "aws_iam_role" "data_cutback_iam_role" {
+  count              = local.is-production || local.is-development ? 1 : 0
+  name               = "data_cutback_iam_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_policy" "data_cutback_iam_role_policy" {
+  count  = local.is-production || local.is-development ? 1 : 0
+  name   = "data_cutback_iam_policy"
+  policy = data.aws_iam_policy_document.data_cutback_iam_role_policy_document[0].json
+}
+
+resource "aws_iam_role_policy_attachment" "data_cutback_iam_role_policy_attachment" {
+  count      = local.is-production || local.is-development ? 1 : 0
+  role       = aws_iam_role.data_cutback_iam_role[0].name
+  policy_arn = aws_iam_policy.data_cutback_iam_role_policy[0].arn
+}
+
+
 #-----------------------------------------------------------------------------------
 # MDSS daily failure digest IAM Role
 #-----------------------------------------------------------------------------------
