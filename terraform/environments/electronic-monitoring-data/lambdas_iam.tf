@@ -1009,6 +1009,7 @@ data "aws_iam_policy_document" "load_fms_lambda_role_policy_document" {
     effect = "Allow"
     actions = [
       "kms:GenerateDataKey",
+      "kms:Decrypt"
       ]
     resources = ["*"]
   }
