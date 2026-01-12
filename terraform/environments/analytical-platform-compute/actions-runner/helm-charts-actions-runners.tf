@@ -425,7 +425,7 @@ resource "helm_release" "actions_runner_mojas_create_a_derived_table_probation_p
   /* https://github.com/ministryofjustice/analytical-platform-actions-runner */
   name = "actions-runner-mojas-cadt-probation-prod"
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
-  version = "2.330.0"
+  version = "2.330.0-2"
   chart = "actions-runner"
   namespace = kubernetes_namespace.actions_runners[0].metadata[0].name
   values = [
