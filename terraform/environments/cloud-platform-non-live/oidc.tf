@@ -151,14 +151,13 @@ data "aws_iam_policy_document" "github_actions_development_cluster_oidc_policy" 
     sid    = "DevelopmentClusterStateBucket"
     effect = "Allow"
     actions = [
-      "s3:ListBucket",
       "s3:GetObject",
       "s3:PutObject",
+      "s3:PutObjectAcl",
       "s3:DeleteObject"
     ]
     resources = [
-      module.development-cluster-state-bucket[0].bucket.arn,
-      "${module.development-cluster-state-bucket[0].bucket.arn}/*"
+      "arn:aws:s3:::modernisation-platform-terraform-state/environments/members/cloud-platform*/*"
     ]
   }
 
