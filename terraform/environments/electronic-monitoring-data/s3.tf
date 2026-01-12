@@ -57,6 +57,7 @@ locals {
   ]
 
   cross_account_recieve_mapping = local.is-development ? "test" : local.is-preproduction ? "production" : null
+  cross_env_bucket_policy = local.is-preproduction ? [data.aws_iam_policy_document.allow_cross_env_upload[0].json] : []
 }
 
 
@@ -1079,6 +1080,23 @@ module "s3-glue-job-script-bucket" {
 # DMS target  bucket
 # ------------------------------------------------------------------------
 
+data "aws_iam_policy_document" "allow_cross_env_upload" {
+  count = local.is-preproduction ? 1 : 0
+  statement {
+    sid    = "AllowProdLambdaWrite"
+    effect = "Allow"
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${local.environment_management.account_ids["electronic-monitoring-data-production"]}:role/data_cutback_iam_role"]
+
+    }
+    actions = [
+      "s3:PutObject",
+      "s3:PutObjectAcl"
+    ]
+    resources = ["${module.s3-dms-target-store-bucket.bucket.arn}/*"]
+  }
+}
 
 module "s3-dms-target-store-bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9f"
@@ -1102,6 +1120,7 @@ module "s3-dms-target-store-bucket" {
     aws.bucket-replication = aws
   }
 
+  bucket_policy  = local.cross_env_bucket_policy
   lifecycle_rule = [
     {
       id      = "main"

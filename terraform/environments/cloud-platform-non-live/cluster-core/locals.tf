@@ -1,9 +1,12 @@
 locals {
-  /* worksapce specific configurations */
-  enabled_workspaces = ["development_cluster"]
-  # below are replaced for dev clusters
-  cp_vpc_name         = "${local.application_name}-${local.environment}" # replaced with "cp-date-time" or custom name
-  cluster_name        = local.environment                                # replaced with "cp-date-time" or custom name
-  cluster_environment = local.environment                                # replaced with "development_cluster"
-  # end replacements
+  mp_environments = [
+    "cloud-platform-non-live-development",
+    "cloud-platform-non-live-test",
+    "cloud-platform-non-live-preproduction",
+    "cloud-platform-non-live-production"
+  ]
+  enabled_workspaces  = ["development_cluster"]
+  cp_vpc_name         = terraform.workspace
+  cluster_name        = contains(local.mp_environments, terraform.workspace) ? local.environment : terraform.workspace
+  cluster_environment = contains(local.mp_environments, terraform.workspace) ? local.environment : "development_cluster"
 }
