@@ -1004,6 +1004,14 @@ data "aws_iam_policy_document" "load_fms_lambda_role_policy_document" {
       ]
     resources = [aws_sns_topic.emds_alerts.arn]
   }
+    statement {
+    sid    = "AllowLambdaToUseKey"
+    effect = "Allow"
+    actions = [
+      "kms:GenerateDataKey",
+      ]
+    resources = ["*"]
+  }
 }
 
 resource "aws_iam_role" "load_fms" {
