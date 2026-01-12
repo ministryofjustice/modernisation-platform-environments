@@ -4,7 +4,6 @@ data "aws_sqs_queue" "load_mdss_dlq" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "load_mdss_dlq_alarm" {
-  count = local.is-development ? 0 : 1
 
   alarm_name          = "load_mdss_dlq_has_messages"
   alarm_description   = "Triggered when Load MDSS DLQ contains messages"
@@ -50,8 +49,6 @@ resource "aws_cloudwatch_metric_alarm" "clean_mdss_dlq_alarm" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "glue_database_count_high" {
-  count = local.is-development ? 0 : 1
-
   alarm_name          = "glue_database_count_high"
   alarm_description   = "Triggered when Glue database count is above 8000 (approaching 10k limit)"
   comparison_operator = "GreaterThanThreshold"
@@ -74,7 +71,6 @@ resource "aws_cloudwatch_metric_alarm" "glue_database_count_high" {
 }
 
 resource "aws_cloudwatch_log_metric_filter" "mdss_fatal_failures" {
-  count          = local.is-development ? 0 : 1
   name           = "mdss-fatal-failures"
   log_group_name = "/aws/lambda/load_mdss"
 

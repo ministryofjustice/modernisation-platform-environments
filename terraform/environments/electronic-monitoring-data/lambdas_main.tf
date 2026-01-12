@@ -188,7 +188,6 @@ module "copy_mdss_data" {
 #-----------------------------------------------------------------------------------
 
 module "clean_after_dlt_load" {
-  count                          = local.is-development ? 0 : 1
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "clean_after_dlt_load"
@@ -347,7 +346,6 @@ module "load_dms_output" {
 #-----------------------------------------------------------------------------------
 
 module "load_mdss_lambda" {
-  count                          = local.is-development ? 0 : 1
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "load_mdss"
@@ -377,7 +375,6 @@ module "load_mdss_lambda" {
 #-----------------------------------------------------------------------------------
 
 module "load_fms_lambda" {
-  count                          = local.is-development ? 0 : 1
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "load_fms"
@@ -435,7 +432,6 @@ module "load_historic_csv" {
 #-----------------------------------------------------------------------------------
 
 module "glue_db_count_metrics" {
-  count                          = local.is-development ? 0 : 1
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "glue_db_count_metrics"
@@ -462,20 +458,17 @@ module "glue_db_count_metrics" {
 #-----------------------------------------------------------------------------------
 
 resource "aws_cloudwatch_event_rule" "glue_db_count_metrics_schedule" {
-  count               = local.is-development ? 0 : 1
   name                = "glue_db_count_metrics_schedule"
   description         = "Runs glue_db_count_metrics on a schedule to publish Glue database count"
   schedule_expression = "rate(5 minutes)"
 }
 
 resource "aws_cloudwatch_event_target" "glue_db_count_metrics_target" {
-  count = local.is-development ? 0 : 1
   rule  = aws_cloudwatch_event_rule.glue_db_count_metrics_schedule[0].name
   arn   = module.glue_db_count_metrics[0].lambda_function_arn
 }
 
 resource "aws_lambda_permission" "glue_db_count_metrics_allow_eventbridge" {
-  count         = local.is-development ? 0 : 1
   statement_id  = "AllowExecutionFromEventBridgeGlueDbCount"
   action        = "lambda:InvokeFunction"
   function_name = module.glue_db_count_metrics[0].lambda_function_name
@@ -511,7 +504,6 @@ module "data_cutback" {
 #-----------------------------------------------------------------------------------
 
 module "mdss_daily_failure_digest" {
-  count                          = local.is-development ? 0 : 1
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "mdss_daily_failure_digest"
@@ -564,7 +556,6 @@ module "cross_account_copy" {
 #-----------------------------------------------------------------------------------
 
 resource "aws_iam_role" "mdss_daily_failure_digest_scheduler" {
-  count = local.is-development ? 0 : 1
   name  = "mdss_daily_failure_digest_scheduler_role"
 
   assume_role_policy = jsonencode({
@@ -580,9 +571,8 @@ resource "aws_iam_role" "mdss_daily_failure_digest_scheduler" {
 }
 
 resource "aws_iam_role_policy" "mdss_daily_failure_digest_scheduler_invoke" {
-  count = local.is-development ? 0 : 1
   name  = "mdss_daily_failure_digest_scheduler_invoke_policy"
-  role  = aws_iam_role.mdss_daily_failure_digest_scheduler[0].id
+  role  = aws_iam_role.mdss_daily_failure_digest_scheduler.id
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -590,14 +580,13 @@ resource "aws_iam_role_policy" "mdss_daily_failure_digest_scheduler_invoke" {
       {
         Effect   = "Allow"
         Action   = ["lambda:InvokeFunction"]
-        Resource = [module.mdss_daily_failure_digest[0].lambda_function_arn]
+        Resource = [module.mdss_daily_failure_digest.lambda_function_arn]
       }
     ]
   })
 }
 
 resource "aws_scheduler_schedule" "mdss_daily_failure_digest" {
-  count       = local.is-development ? 0 : 1
   name        = "mdss_daily_failure_digest_0800"
   description = "Runs mdss_daily_failure_digest daily at 08:00 Europe/London"
 
@@ -609,7 +598,7 @@ resource "aws_scheduler_schedule" "mdss_daily_failure_digest" {
   schedule_expression_timezone = "Europe/London"
 
   target {
-    arn      = module.mdss_daily_failure_digest[0].lambda_function_arn
-    role_arn = aws_iam_role.mdss_daily_failure_digest_scheduler[0].arn
+    arn      = module.mdss_daily_failure_digest.lambda_function_arn
+    role_arn = aws_iam_role.mdss_daily_failure_digest_scheduler.arn
   }
 }
