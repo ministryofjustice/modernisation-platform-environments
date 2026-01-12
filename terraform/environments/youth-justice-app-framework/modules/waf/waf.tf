@@ -271,7 +271,7 @@ resource "aws_wafv2_ip_set" "ipset" {
   tags = local.tags
 }
 
-resource "aws_wafv2_ip_set" "ipset" {
+resource "aws_wafv2_ip_set" "ipset_cf" {
   for_each           = var.waf_IP_rules_cf
   name               = each.value.name
   description        = each.value.description
