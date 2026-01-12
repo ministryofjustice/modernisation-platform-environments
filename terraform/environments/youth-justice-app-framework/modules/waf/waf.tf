@@ -156,7 +156,7 @@ resource "aws_wafv2_web_acl" "cf" {
 
       statement {
         ip_set_reference_statement {
-          arn = aws_wafv2_ip_set.ipset[rule.value.name].arn
+          arn = aws_wafv2_ip_set.ipset_cf[rule.value.name].arn
         }
       }
 
@@ -257,7 +257,7 @@ resource "aws_wafv2_web_acl" "cf" {
     sampled_requests_enabled   = true
   }
 
-  depends_on = [aws_wafv2_ip_set.ipset]
+  depends_on = [aws_wafv2_ip_set.ipset_cf]
 }
 
 resource "aws_wafv2_ip_set" "ipset" {
