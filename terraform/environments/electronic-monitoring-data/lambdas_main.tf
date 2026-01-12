@@ -532,7 +532,7 @@ module "cross_account_copy" {
   subnet_ids                     = data.aws_subnets.shared-public.ids
 
   environment_variables = {
-    SECRET_ID  = module.cross_account_details.secret_id
+    SECRET_ID  = module.cross_account_details[0].secret_id
   }
 }
 
