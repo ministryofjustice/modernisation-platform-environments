@@ -8,6 +8,45 @@ terraform {
   required_version = "~> 1.0"
 }
 
+locals {
+    bucket_policy_v2 = var.cross_account_access_role != null ? [
+    {
+      sid    = "CrossAccountAccess"
+      effect = "Allow"
+      actions = [
+        "s3:PutObject",
+        "s3:PutObjectAcl",
+      ]
+      principals = {
+        identifiers = ["arn:aws:iam::${var.cross_account_access_role.account_number}:role/${var.cross_account_access_role.role_name}"]
+        type        = "AWS"
+      }
+    }
+  ] : []
+  bucket_policy = var.cross_account ? flatten([[data.aws_iam_policy_document.cross_account_bucket_policy.json], local.bucket_policy_v2]) : local.bucket_policy_v2
+  kms_grant_mdss = var.cross_account_access_role != null ? {
+    cross_account_access_role = {
+      grantee_principal = nonsensitive("arn:aws:iam::${var.cross_account_access_role.account_number}:role/${var.cross_account_access_role.role_name}")
+      operations = [
+        "Encrypt",
+        "GenerateDataKey",
+      ]
+    }
+  } : {}
+  kms_grants = var.cross_account ? merge(
+    {
+      cross_account_access = {
+        grantee_principal = nonsensitive("arn:aws:iam::${var.cross_account_id}:role/cross_account_copy_lambda_role")
+        operations = [
+          "Encrypt",
+          "GenerateDataKey",
+        ]
+      }
+    },
+    kms_grant_mdss
+    )
+}
+
 module "this-bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9f"
 
@@ -29,7 +68,6 @@ module "this-bucket" {
     # Leave this provider block in even if you are not using replication
     aws.bucket-replication = aws
   }
-
   lifecycle_rule = [
     {
       id      = "main"
@@ -57,22 +95,7 @@ module "this-bucket" {
       }
     }
   ]
-
-  # Optionally add cross account access to bucket policy.
-  bucket_policy_v2 = var.cross_account_access_role != null ? [
-    {
-      sid    = "CrossAccountAccess"
-      effect = "Allow"
-      actions = [
-        "s3:PutObject",
-        "s3:PutObjectAcl",
-      ]
-      principals = {
-        identifiers = ["arn:aws:iam::${var.cross_account_access_role.account_number}:role/${var.cross_account_access_role.role_name}"]
-        type        = "AWS"
-      }
-    }
-  ] : []
+  bucket_policy_v2 = local.bucket_policy
 
   tags = merge(
     var.local_tags,
@@ -104,15 +127,7 @@ module "kms_key" {
   # Grant external account role specific operations.
   # To view grants, need to use cli:
   # aws kms list-grants --region=eu-west-2 --key-id <key id>
-  grants = var.cross_account_access_role != null ? {
-    cross_account_access_role = {
-      grantee_principal = nonsensitive("arn:aws:iam::${var.cross_account_access_role.account_number}:role/${var.cross_account_access_role.role_name}")
-      operations = [
-        "Encrypt",
-        "GenerateDataKey",
-      ]
-    }
-  } : {}
+  grants = local.kms_grants
 
   tags = merge(
     var.local_tags,
@@ -214,6 +229,8 @@ data "aws_iam_policy_document" "process_landing_bucket_files_s3_policy_document"
   }
 }
 
+
+
 resource "aws_iam_policy" "process_landing_bucket_files_s3" {
   name        = "process_landing_bucket_files_s3_policy_${var.data_feed}_${var.order_type}"
   description = "Policy for Lambda to process files in ${var.data_feed} ${var.order_type} landing bucket"
@@ -233,5 +250,23 @@ data "aws_iam_policy_document" "lambda_assume_role" {
       identifiers = ["lambda.amazonaws.com"]
     }
     actions = ["sts:AssumeRole"]
+  }
+}
+
+
+data "aws_iam_policy_document" "cross_account_bucket_policy" {
+  count = var.cross_account ? 1 : 0
+  statement {
+    sid = "AllowCrossAccountWritesFromLambda"
+    effect = "Allow"
+    principals {
+      type = "AWS"
+      identifiers = ["arn:aws:iam::${var.cross_account_id}:role/cross_account_copy_lambda_role"]
+    }
+    actions = [
+      "s3:PutObject",
+      "s3:PutObjectAcl"
+    ]
+    resources = ["${module.this-bucket.bucket.arn}/*"]
   }
 }

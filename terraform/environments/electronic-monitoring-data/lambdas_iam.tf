@@ -1,3 +1,8 @@
+locals {
+  cross_account_map = local.is-test ? "development" : local.is-production ? "preproduction" : null
+  cross_account_map_shorthand = local.is-test ? "dev" : local.is-production ? "preprod" : null
+}
+
 # ------------------------------------------
 # output_file_structure_as_json_from_zip
 # ------------------------------------------
@@ -1322,4 +1327,62 @@ resource "aws_iam_role_policy_attachment" "mdss_daily_failure_digest_attach" {
   count      = local.is-development ? 0 : 1
   role       = aws_iam_role.mdss_daily_failure_digest[0].name
   policy_arn = aws_iam_policy.mdss_daily_failure_digest[0].arn
+}
+
+#-----------------------------------------------------------------------------------
+# Copy data from test to dev or prod to preprod
+#-----------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "cross_account_copy" {
+  count = local.is-test || local.is-production ? 1 : 0
+  statement {
+    sid     = "AccessToCrossAccountBucket"
+    effect  = "Allow"
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:DescribeKey"
+    ]
+    resources = ["arn:aws:kms:${aws_region.}:${local.environment_management.account_ids["electronic-monitoring-data-${local.cross_account_map}"]}:key/*"]
+  }
+  statement {
+    sid     = "AccessToInAccountBucket"
+    effect  = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:GetObjectTagging"
+    ]
+    resources = ["${module.s3-data-bucket.bucket.arn}/*"]
+  }
+  statement {
+    sid     = "AllowDumpToExternalBuckets"
+    effect  = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:PutObjectAcl"
+    ]
+    resources = [
+      "arn:aws:s3:::emds-${local.cross_account_map_shorthand}-land-*/*",
+    ]
+  }
+}
+
+resource "aws_iam_role" "cross_account_copy" {
+  count = local.is-test || local.is-production ? 1 : 0
+  name               = "cross_account_copy_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_policy" "cross_account_copy" {
+  count = local.is-test || local.is-production ? 1 : 0
+  name   = "cross_account_copy_lambda_policy"
+  policy = data.aws_iam_policy_document.cross_account_copy[0].json
+}
+
+resource "aws_iam_role_policy_attachment" "cross_account_copy" {
+  count = local.is-test || local.is-production ? 1 : 0
+  role       = aws_iam_role.cross_account_copy[0].name
+  policy_arn = aws_iam_policy.cross_account_copy[0].arn
 }

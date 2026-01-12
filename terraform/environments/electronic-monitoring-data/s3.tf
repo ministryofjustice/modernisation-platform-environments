@@ -55,6 +55,8 @@ locals {
     { id = module.s3-raw-formatted-data-bucket.bucket.id, arn = module.s3-raw-formatted-data-bucket.bucket.arn },
     { id = module.s3-lambda-store-bucket.bucket.id, arn = module.s3-lambda-store-bucket.bucket.arn }
   ]
+
+  cross_account_recieve_mapping = local.is-development ? "test" : local.is-preproduction ? "production"
 }
 
 
@@ -594,14 +596,16 @@ module "s3-fms-general-landing-bucket" {
   data_feed  = "fms"
   order_type = "general"
 
-  core_shared_services_id  = local.environment_management.account_ids["core-shared-services-production"]
-  local_bucket_prefix      = local.bucket_prefix
-  local_tags               = local.tags
-  logging_bucket           = module.s3-logging-bucket
-  production_dev           = local.is-production ? "prod" : "dev"
-  received_files_bucket_id = module.s3-received-files-bucket.bucket.id
-  security_group_ids       = [aws_security_group.lambda_generic.id]
-  subnet_ids               = data.aws_subnets.shared-public.ids
+  core_shared_services_id       = local.environment_management.account_ids["core-shared-services-production"]
+  local_bucket_prefix           = local.bucket_prefix
+  local_tags                    = local.tags
+  logging_bucket                = module.s3-logging-bucket
+  production_dev                = local.is-production ? "prod" : "dev"
+  received_files_bucket_id      = module.s3-received-files-bucket.bucket.id
+  security_group_ids            = [aws_security_group.lambda_generic.id]
+  subnet_ids                    = data.aws_subnets.shared-public.ids
+  cross_account                 = local.is-development || local.is-preproduction
+  cross_account_id              = local.is-development || local.is-preproduction ? local.environment_management.account_ids["electronic-monitoring-data-${local.cross_account_recieve_mapping}"] : null
 
   providers = {
     aws = aws
@@ -635,6 +639,8 @@ module "s3-fms-ho-landing-bucket" {
   received_files_bucket_id = module.s3-received-files-bucket.bucket.id
   security_group_ids       = [aws_security_group.lambda_generic.id]
   subnet_ids               = data.aws_subnets.shared-public.ids
+  cross_account                 = local.is-development || local.is-preproduction
+  cross_account_id              = local.is-development || local.is-preproduction ? local.environment_management.account_ids["electronic-monitoring-data-${local.cross_account_recieve_mapping}"] : null
 
   providers = {
     aws = aws
@@ -668,6 +674,8 @@ module "s3-fms-specials-landing-bucket" {
   received_files_bucket_id = module.s3-received-files-bucket.bucket.id
   security_group_ids       = [aws_security_group.lambda_generic.id]
   subnet_ids               = data.aws_subnets.shared-public.ids
+  cross_account                 = local.is-development || local.is-preproduction
+  cross_account_id              = local.is-development || local.is-preproduction ? local.environment_management.account_ids["electronic-monitoring-data-${local.cross_account_recieve_mapping}"] : null
 
   providers = {
     aws = aws
@@ -706,6 +714,8 @@ module "s3-mdss-general-landing-bucket" {
   received_files_bucket_id  = module.s3-received-files-bucket.bucket.id
   subnet_ids                = data.aws_subnets.shared-public.ids
   security_group_ids        = [aws_security_group.lambda_generic.id]
+  cross_account             = local.is-development || local.is-preproduction
+  cross_account_id          = local.is-development || local.is-preproduction ? local.environment_management.account_ids["electronic-monitoring-data-${local.cross_account_recieve_mapping}"] : null
 
   providers = {
     aws = aws
@@ -727,6 +737,8 @@ module "s3-mdss-ho-landing-bucket" {
   received_files_bucket_id  = module.s3-received-files-bucket.bucket.id
   security_group_ids        = [aws_security_group.lambda_generic.id]
   subnet_ids                = data.aws_subnets.shared-public.ids
+  cross_account                 = local.is-development || local.is-preproduction
+  cross_account_id              = local.is-development || local.is-preproduction ? local.environment_management.account_ids["electronic-monitoring-data-${local.cross_account_recieve_mapping}"] : null
 
   providers = {
     aws = aws
@@ -748,6 +760,8 @@ module "s3-mdss-specials-landing-bucket" {
   received_files_bucket_id  = module.s3-received-files-bucket.bucket.id
   security_group_ids        = [aws_security_group.lambda_generic.id]
   subnet_ids                = data.aws_subnets.shared-public.ids
+  cross_account                 = local.is-development || local.is-preproduction
+  cross_account_id              = local.is-development || local.is-preproduction ? local.environment_management.account_ids["electronic-monitoring-data-${local.cross_account_recieve_mapping}"] : null
 
   providers = {
     aws = aws
