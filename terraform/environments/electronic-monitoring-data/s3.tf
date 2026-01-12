@@ -1107,7 +1107,7 @@ module "s3-dms-target-store-bucket" {
     aws.bucket-replication = aws
   }
 
-  bucket_policy  = [local.cross_env_bucket_policy]
+  bucket_policy  = local.cross_env_bucket_policy
   lifecycle_rule = [
     {
       id      = "main"
