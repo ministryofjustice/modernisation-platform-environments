@@ -113,7 +113,7 @@ module "eks" {
   tags = merge(
     local.tags,
     {
-      "Cluster CreatedBy" = var.created_by
+      "cluster-createdby" = var.created_by
     }
   )
 }
