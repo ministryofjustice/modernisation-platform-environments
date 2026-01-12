@@ -6,6 +6,7 @@
       "example_var": "test-data"
     },
     "preproduction": {
+      "edw_environment": "preprod",
       "edw_region": "eu-west-2",
       "edw_ec2_ami_id": "ami-0e820513888f69b25",
       "edw_ec2_instance_type": "m4.xlarge",
