@@ -484,6 +484,29 @@ resource "aws_lambda_permission" "glue_db_count_metrics_allow_eventbridge" {
   source_arn    = aws_cloudwatch_event_rule.glue_db_count_metrics_schedule[0].arn
 }
 
+
+
+#-----------------------------------------------------------------------------------
+# BackFill Data
+#-----------------------------------------------------------------------------------
+module "data_cutback" {
+  count = local.is-development || local.is-production ? 1 : 0
+  source                  = "./modules/lambdas"
+  is_image                = true
+  function_name           = "data_cutback"
+  role_name               = aws_iam_role.data_cutback_iam_role[0].name
+  role_arn                = aws_iam_role.data_cutback_iam_role[0].arn
+  handler                 = "data_cutback.handler"
+  memory_size             = 1024
+  timeout                 = 900
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : "dev"
+
+  environment_variables = {
+    SOURCE_BUCKET = module.s3-dms-target-store-bucket.bucket.id
+  }
+}
+
 #-----------------------------------------------------------------------------------
 # MDSS daily failure digest Lambda
 #-----------------------------------------------------------------------------------
