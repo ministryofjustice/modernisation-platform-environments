@@ -56,7 +56,7 @@ locals {
     { id = module.s3-lambda-store-bucket.bucket.id, arn = module.s3-lambda-store-bucket.bucket.arn }
   ]
 
-  cross_account_recieve_mapping = local.is-development ? "test" : local.is-preproduction ? "production"
+  cross_account_recieve_mapping = local.is-development ? "test" : local.is-preproduction ? "production" : null
 }
 
 

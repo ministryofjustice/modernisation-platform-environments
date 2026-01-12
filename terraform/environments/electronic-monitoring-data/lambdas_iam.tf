@@ -1345,7 +1345,7 @@ data "aws_iam_policy_document" "cross_account_copy" {
       "kms:GenerateDataKey*",
       "kms:DescribeKey"
     ]
-    resources = ["arn:aws:kms:${aws_region.}:${local.environment_management.account_ids["electronic-monitoring-data-${local.cross_account_map}"]}:key/*"]
+    resources = ["arn:aws:kms:${aws_region.current.name}:${local.environment_management.account_ids["electronic-monitoring-data-${local.cross_account_map}"]}:key/*"]
   }
   statement {
     sid     = "AccessToInAccountBucket"
