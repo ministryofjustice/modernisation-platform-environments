@@ -540,7 +540,7 @@ module "cross_account_copy" {
   handler                        = "cross_account_copy.handler"
   memory_size                    = 512
   timeout                        = 60
-  reserved_concurrent_executions = 1
+  reserved_concurrent_executions = 100
   core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
   production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
   security_group_ids             = [aws_security_group.lambda_generic.id]
