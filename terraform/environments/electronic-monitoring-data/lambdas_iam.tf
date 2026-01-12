@@ -876,7 +876,7 @@ module "share_db_with_mdss_lambda_role" {
   dbs_to_grant            = toset(["allied_mdss${local.db_suffix}"])
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
   role_arn                = aws_iam_role.load_mdss.arn
-  db_exists               = true
+  db_exists               = !local.is-development
   de_role_arn             = null
 }
 
@@ -1018,7 +1018,7 @@ module "share_db_with_fms_lambda_role" {
   dbs_to_grant            = toset(["serco_fms${local.db_suffix}"])
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
   role_arn                = aws_iam_role.load_fms.arn
-  db_exists               = true
+  db_exists               = !local.is-development
   de_role_arn             = null
 }
 
