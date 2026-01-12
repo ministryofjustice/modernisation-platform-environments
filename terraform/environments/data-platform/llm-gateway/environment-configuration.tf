@@ -124,7 +124,7 @@ locals {
         hmcts-claude-code = {
           organisation = "hmcts"
           max_budget   = 10000
-          models = ["all-proxy-models"]
+          models       = ["all-proxy-models"]
           keys = {
             chris-o = {
               max_budget = 500
