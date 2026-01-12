@@ -44,7 +44,7 @@ locals {
       }
     },
     kms_grant_mdss
-    )
+    ) : kms_grant_mdss
 }
 
 module "this-bucket" {
