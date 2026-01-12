@@ -271,7 +271,7 @@ module "cross_account_copy_queue" {
 
   source               = "./modules/sqs_s3_lambda_trigger"
   bucket               = module.s3-data-bucket.bucket
-  lambda_function_name = module.ross_account_copy[0].lambda_function_name
+  lambda_function_name = module.cross_account_copy[0].lambda_function_name
   bucket_prefix        = local.bucket_prefix
   maximum_concurrency  = 100
 }
