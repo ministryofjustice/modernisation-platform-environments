@@ -68,7 +68,7 @@ module "cross_account_details" {
       sid = "AllowAccountRead"
       principals = [{
         type        = "AWS"
-        identifiers = [aws_iam_role.cross_account_copy.arn]
+        identifiers = [aws_iam_role.cross_account_copy[0].arn]
       }]
       actions   = ["secretsmanager:GetSecretValue"]
       resources = ["*"]

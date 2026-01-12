@@ -23,7 +23,7 @@ locals {
       }
     }
   ] : []
-  bucket_policy = var.cross_account ? flatten([[data.aws_iam_policy_document.cross_account_bucket_policy.json], local.bucket_policy_v2]) : local.bucket_policy_v2
+  bucket_policy = var.cross_account ? flatten([[data.aws_iam_policy_document.cross_account_bucket_policy[0].json], local.bucket_policy_v2]) : local.bucket_policy_v2
   kms_grant_mdss = var.cross_account_access_role != null ? {
     cross_account_access_role = {
       grantee_principal = nonsensitive("arn:aws:iam::${var.cross_account_access_role.account_number}:role/${var.cross_account_access_role.role_name}")
