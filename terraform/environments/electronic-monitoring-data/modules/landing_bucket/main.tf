@@ -23,7 +23,22 @@ locals {
       }
     }
   ] : []
-  bucket_policy = var.cross_account ? flatten([[data.aws_iam_policy_document.cross_account_bucket_policy[0].json], local.bucket_policy_v2]) : local.bucket_policy_v2
+  cross_account_bucket_policy = var.cross_account ? [
+    {
+      sid = "AllowCrossAccountWritesFromLambda"
+      effect = "Allow"
+      principals = {
+        type = "AWS"
+        identifiers = ["arn:aws:iam::${var.cross_account_id}:role/cross_account_copy_lambda_role"]
+      }
+      actions = [
+        "s3:PutObject",
+        "s3:PutObjectAcl"
+      ]
+      resources = ["${module.this-bucket.bucket.arn}/*"]
+    }
+  ] : []
+  bucket_policy = var.cross_account ? flatten([local.cross_account_bucket_policy, local.bucket_policy_v2]) : local.bucket_policy_v2
   kms_grant_mdss = var.cross_account_access_role != null ? {
     cross_account_access_role = {
       grantee_principal = nonsensitive("arn:aws:iam::${var.cross_account_access_role.account_number}:role/${var.cross_account_access_role.role_name}")
@@ -250,23 +265,5 @@ data "aws_iam_policy_document" "lambda_assume_role" {
       identifiers = ["lambda.amazonaws.com"]
     }
     actions = ["sts:AssumeRole"]
-  }
-}
-
-
-data "aws_iam_policy_document" "cross_account_bucket_policy" {
-  count = var.cross_account ? 1 : 0
-  statement {
-    sid = "AllowCrossAccountWritesFromLambda"
-    effect = "Allow"
-    principals {
-      type = "AWS"
-      identifiers = ["arn:aws:iam::${var.cross_account_id}:role/cross_account_copy_lambda_role"]
-    }
-    actions = [
-      "s3:PutObject",
-      "s3:PutObjectAcl"
-    ]
-    resources = ["${module.this-bucket.bucket.arn}/*"]
   }
 }
