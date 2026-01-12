@@ -877,7 +877,7 @@ module "share_db_with_mdss_lambda_role" {
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
   role_arn                = aws_iam_role.load_mdss.arn
   db_exists               = !local.is-development
-  de_role_arn             = null
+  de_role_arn             = local.is-development ? try(one(data.aws_iam_roles.mod_plat_roles.arns)) : null
 }
 
 resource "aws_lakeformation_permissions" "add_create_db" {
@@ -1019,7 +1019,7 @@ module "share_db_with_fms_lambda_role" {
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
   role_arn                = aws_iam_role.load_fms.arn
   db_exists               = !local.is-development
-  de_role_arn             = null
+  de_role_arn             = local.is-development ? try(one(data.aws_iam_roles.mod_plat_roles.arns)) : null
 }
 
 resource "aws_lakeformation_permissions" "fms_add_create_db" {
