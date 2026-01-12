@@ -56,7 +56,7 @@ locals {
     { id = module.s3-lambda-store-bucket.bucket.id, arn = module.s3-lambda-store-bucket.bucket.arn }
   ]
 
-  cross_env_bucket_policy = local.is-preproduction ? [data.aws_iam_policy_document.allow_cross_env_upload.json] : []
+  cross_env_bucket_policy = local.is-preproduction ? [data.aws_iam_policy_document.allow_cross_env_upload[0].json] : []
 }
 
 
