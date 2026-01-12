@@ -85,7 +85,7 @@
       "ebs_iops_ebsdb_dbf04": 3000,
       "ebs_size_ebsdb_dbf04": 500,
       "ebs_size_ebsdb_dbf_dr": 8000,
-      "ebs_size_ebsdb_redoA": 200,
+      "ebs_size_ebsdb_redoA": 100,
       "ebs_size_ebsdb_redoB": 50,
       "ebs_size_ebsdb_techst": 200,
       "ebs_size_ebsdb_backup": 8000,
