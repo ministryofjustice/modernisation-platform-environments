@@ -311,6 +311,18 @@ resource "aws_security_group_rule" "egress_admin_vpc" {
   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
 }
 
+resource "aws_security_group_rule" "egress_9500_mojo" {
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+
+  type              = "egress"
+  security_group_id = aws_security_group.ec2_sg[0].id
+  from_port         = 9500
+  to_port           = 9500
+  protocol          = "tcp"
+  cidr_blocks       = ["10.0.0.0/8"]
+  description       = "9500 to Mojo"
+}
+
 resource "aws_security_group_rule" "egress_admin_workspace" {
   count = contains(["test", "preproduction"], local.environment) ? 1 : 0
 
@@ -369,6 +381,18 @@ resource "aws_security_group_rule" "egress_managed_9502_workspace" {
   to_port           = 9502
   protocol          = "tcp"
   cidr_blocks       = [local.application_data.accounts[local.environment].managementcidr]
+}
+
+resource "aws_security_group_rule" "egress_9502_mojo" {
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+
+  type              = "egress"
+  security_group_id = aws_security_group.ec2_sg[0].id
+  from_port         = 9502
+  to_port           = 9502
+  protocol          = "tcp"
+  cidr_blocks       = ["10.0.0.0/8"]
+  description       = "9502 to Mojo"
 }
 
 resource "aws_security_group_rule" "egress_managed_9503_vpc" {
