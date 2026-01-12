@@ -191,8 +191,8 @@ module "clean_after_dlt_load" {
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "clean_after_dlt_load"
-  role_name                      = aws_iam_role.clean_after_dlt_load[0].name
-  role_arn                       = aws_iam_role.clean_after_dlt_load[0].arn
+  role_name                      = aws_iam_role.clean_after_dlt_load.name
+  role_arn                       = aws_iam_role.clean_after_dlt_load.arn
   handler                        = "clean_after_dlt_load.handler"
   memory_size                    = 2048
   timeout                        = 900
@@ -205,7 +205,7 @@ module "clean_after_dlt_load" {
 
   environment_variables = {
     CATALOG_ID      = data.aws_caller_identity.current.account_id
-    LAMBDA_ROLE_ARN = aws_iam_role.clean_after_dlt_load[0].arn
+    LAMBDA_ROLE_ARN = aws_iam_role.clean_after_dlt_load.arn
   }
 }
 
@@ -535,8 +535,8 @@ module "cross_account_copy" {
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "cross_account_copy"
-  role_name                      = aws_iam_role.cross_account_copy.name
-  role_arn                       = aws_iam_role.cross_account_copy.arn
+  role_name                      = aws_iam_role.cross_account_copy[0].name
+  role_arn                       = aws_iam_role.cross_account_copy[0].arn
   handler                        = "cross_account_copy.handler"
   memory_size                    = 512
   timeout                        = 60
