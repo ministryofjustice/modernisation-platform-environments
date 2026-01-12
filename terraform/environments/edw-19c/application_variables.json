@@ -17,6 +17,7 @@
       "edw_ArchiveVolumeSize": "200",
       "edw_dns_extension": "aws.dev.legalservices.gov.uk",
       "mp_domain_name": "modernisation-platform.service.justice.gov.uk",
+      "edw_bucket_name": "laa-oracle-software",
       "edw_instance_descriptor": "Database",
       "database_ec2_name": "edw-db-instance",
       "edw_management_cidr": "10.200.0.0/20",
