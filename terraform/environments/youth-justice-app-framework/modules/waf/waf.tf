@@ -145,7 +145,7 @@ resource "aws_wafv2_web_acl" "cf" {
   }
 
   dynamic "rule" {
-    for_each = var.waf_IP_rules
+    for_each = var.waf_IP_rules_cf
     content {
       name     = rule.value.name
       priority = rule.value.priority
