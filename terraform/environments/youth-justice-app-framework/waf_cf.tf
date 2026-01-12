@@ -9,7 +9,7 @@ module "waf-cf" {
     aws.us-east-1 = aws.us-east-1
   }
 
-  waf_IP_rules = {
+  waf_IP_rules_cf = {
     "whitelist-ip-cf" = {
       name         = "whitelist-ip-cf"
       priority     = 2

@@ -272,6 +272,7 @@ resource "aws_wafv2_ip_set" "ipset" {
 }
 
 resource "aws_wafv2_ip_set" "ipset_cf" {
+  provider           = aws.us-east-1
   for_each           = var.waf_IP_rules_cf
   name               = each.value.name
   description        = each.value.description
