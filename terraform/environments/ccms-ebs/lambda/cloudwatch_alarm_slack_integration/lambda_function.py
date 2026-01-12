@@ -7,9 +7,7 @@ import json
 import os
 import logging
 import io
-import time
 import tracemalloc
-import urllib.request
 from dataclasses import dataclass
 from typing import Any, Dict, Optional, Union, cast
 from datetime import datetime
@@ -17,7 +15,6 @@ import boto3
 import pycurl
 from botocore.exceptions import ClientError
 from mypy_boto3_secretsmanager import SecretsManagerClient
-from dateutil import parser
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -164,6 +161,7 @@ class NotificationService:
         curl = pycurl.Curl()
         logger.info("alarmdetailsinside:\n" + json.dumps(alarmdetails, indent=2))
 
+        # ---------------- GuardDuty ----------------
         if type == "GuardDuty":
             severity = alarmdetails.get('detail', {}).get('severity', 'Unknown Severity')
             if isinstance(severity, (int, float)):
@@ -183,7 +181,6 @@ class NotificationService:
                 emoji = ":grey_question:"
                 strseverity = "Unknown"
 
-            color = "danger" if is_error else "good"
             finding_type = alarmdetails.get('detail', {}).get('type', 'Unknown Finding')
             region = alarmdetails.get('detail', {}).get('region', 'Unknown Region')
             account_id = alarmdetails.get('detail', {}).get('accountId', 'Unknown Account')
@@ -255,6 +252,7 @@ class NotificationService:
                 ]
             }
 
+        # ---------------- CloudWatch Alarm ----------------
         elif type == "CloudWatch Alarm":
             alarm_name = alarmdetails.get('AlarmName', 'Unknown Alarm')
             region = alarmdetails.get('Region', '')
@@ -267,7 +265,6 @@ class NotificationService:
 
             dim_text = '\n'.join([f"{d['name']} = {d['value']}" for d in dimensions])
             emoji = ":broken_heart:" if is_error else ":white_check_mark:"
-            color = "danger" if is_error else "good"
             title = f"{emoji} | {title} | {alarm_name} | {region}"
 
             payload = {
@@ -320,33 +317,55 @@ class NotificationService:
                 ]
             }
 
+        # ---------------- S3 Event ----------------
         elif type == "S3 Event":
-            detail = alarmdetails.get("detail", {})
-            region = alarmdetails.get("region", "Unknown Region")
-            account_id = alarmdetails.get("account", "Unknown Account")
-            detail_type = alarmdetails.get("detail-type", "S3 Event")
-            resources = alarmdetails.get("resources") or []
-            source_arn = resources[0] if resources else "Unknown Resource"
+            records = alarmdetails.get("Records", [])
+            record = records[0] if records else {}
 
-            bucket_name = detail.get("bucket", {}).get("name", "Unknown Bucket")
-            object_info = detail.get("object", {})
-            object_key = object_info.get("key", "Unknown Key")
-            object_size = object_info.get("size", "Unknown Size")
+            region = record.get("awsRegion", "Unknown Region")
+            event_name = record.get("eventName", "Unknown Event")
+            event_time_raw = record.get("eventTime")
 
-            header = f":file_cabinet: | S3 Event | {region} | Account: {account_id}"
-            title = f"{detail_type} on bucket {bucket_name}"
+            s3_info = record.get("s3", {})
+            bucket = s3_info.get("bucket", {})
+            obj = s3_info.get("object", {})
+
+            bucket_name = bucket.get("name", "Unknown Bucket")
+            bucket_arn = bucket.get("arn", "")
+            object_key = obj.get("key", "Unknown Key")
+            object_size = obj.get("size", "Unknown Size")
+
+            request_params = record.get("requestParameters", {})
+            user_identity = record.get("userIdentity", {})
+
+            source_ip = request_params.get("sourceIPAddress", "Unknown IP")
+            principal_id = user_identity.get("principalId", "Unknown Principal")
+
+            header = f":inbox_tray: | S3 Object Event | {region} | Bucket: {bucket_name}"
+            title = f"{event_name} on {bucket_name}"
+
+            # Example: similar feel to your GuardDuty Slack text
+            # LAA Alerts
+            # APP 16:40
+            # :inbox_tray: | S3 Object Event | eu-west-2 | Bucket: ccms-ebs-development-logging
+            # Event: ObjectCreated:Put
+            # Object: s3://ccms-ebs-development-logging/test1.log
+            # Size: 606 bytes
+            # Source IP: 81.109.201.161
+            # Principal: AWS:...
+            # Bucket ARN: arn:aws:s3:::...
 
             payload = {
                 "blocks": [
                     {
                         "type": "header",
-                        "text": {"type": "plain_text", "text": title}
+                        "text": {"type": "plain_text", "text": header}
                     },
                     {
                         "type": "section",
                         "text": {
                             "type": "mrkdwn",
-                            "text": f"*{header}*"
+                            "text": f"*{title}*"
                         }
                     },
                     {
@@ -357,20 +376,7 @@ class NotificationService:
                         "fields": [
                             {
                                 "type": "mrkdwn",
-                                "text": f"*Bucket:* {bucket_name}"
-                            },
-                            {
-                                "type": "mrkdwn",
-                                "text": f"*Object key:* `{object_key}`"
-                            }
-                        ]
-                    },
-                    {
-                        "type": "section",
-                        "fields": [
-                            {
-                                "type": "mrkdwn",
-                                "text": f"*Object size (bytes):* {object_size}"
+                                "text": f"*Event:* {event_name}"
                             },
                             {
                                 "type": "mrkdwn",
@@ -380,16 +386,42 @@ class NotificationService:
                     },
                     {
                         "type": "section",
+                        "fields": [
+                            {
+                                "type": "mrkdwn",
+                                "text": f"*Object:* `s3://{bucket_name}/{object_key}`"
+                            },
+                            {
+                                "type": "mrkdwn",
+                                "text": f"*Size (bytes):* {object_size}"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "section",
+                        "fields": [
+                            {
+                                "type": "mrkdwn",
+                                "text": f"*Source IP:* {source_ip}"
+                            },
+                            {
+                                "type": "mrkdwn",
+                                "text": f"*Principal:* {principal_id}"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "section",
                         "text": {
                             "type": "mrkdwn",
-                            "text": f"*Resource ARN:*\n{source_arn}"
+                            "text": f"*Bucket ARN:*\n{bucket_arn}"
                         }
                     }
                 ]
             }
 
+        # ---------------- Fallback ----------------
         else:
-            # Fallback for unknown type
             payload = {
                 "blocks": [
                     {
@@ -444,6 +476,7 @@ def lambda_handler(event, context):
     type = "Unknown"
     is_error = True
 
+    # SNS message comes in event['Records'][0]['Sns']
     sns_message = event['Records'][0]['Sns']
     message_str = sns_message.get('Message', '{}')
 
@@ -451,13 +484,27 @@ def lambda_handler(event, context):
         alarm_details = json.loads(message_str)
         logger.info("alarm_details:" + json.dumps(alarm_details, indent=2))
 
-        source = alarm_details.get('source', 'aws.cloudwatch')
+        # Detect source:
+        # - GuardDuty / CloudWatch / EventBridge-style -> 'source'
+        # - S3 via SNS -> Records[0].eventSource == 'aws:s3'
+        source = alarm_details.get('source')
+        if not source and "Records" in alarm_details:
+            first_record = alarm_details["Records"][0]
+            event_source = first_record.get("eventSource")
+            if event_source == "aws:s3":
+                source = "aws.s3"
+
+        if not source:
+            # Default to CloudWatch if nothing else matches
+            source = "aws.cloudwatch"
+
         logger.info("source:" + str(source))
 
         env_config = {
-            # Mandatory environment variables (currently none)
+            # No mandatory env vars right now
         }
 
+        # Get secret name from environment or event
         secret_name = os.environ.get("SECRET_NAME", event.get("secret_name"))
         if not secret_name:
             raise ValueError("SECRET_NAME not found in environment or event")
@@ -470,6 +517,7 @@ def lambda_handler(event, context):
         secrets_manager = SecretsManager()
         secrets_data = secrets_manager.get_credentials(secret_name)
 
+        # Validate that required credentials are present
         required_secrets = ["slack_channel_webhook", "slack_channel_webhook_guardduty"]
         missing_secrets = [key for key in required_secrets if key not in secrets_data]
         if missing_secrets:
@@ -478,6 +526,7 @@ def lambda_handler(event, context):
         logger.info("Parsing configuration from environment and secrets")
         config = parse_config_from_env_and_secrets(env_config, secrets_data)
 
+        # ---------------- GuardDuty ----------------
         if source == "aws.guardduty":
             logger.info("GuardDuty finding detected in SNS message")
             logger.info("Starting Notification to Slack for GuardDuty Alarm via SNS Topic")
@@ -490,22 +539,30 @@ def lambda_handler(event, context):
             channelconfig = config.slack_channel_webhook_guardduty
             alarmnotifiction = "GuardDuty Finding Notification"
             type = "GuardDuty"
-            is_error = True  # usually findings are "bad"
+            is_error = True  # findings are usually "bad"
 
+        # ---------------- S3 Event ----------------
         elif source == "aws.s3":
             logger.info("S3 event detected in SNS message")
             logger.info("Starting Notification to Slack for S3 Event via SNS Topic")
 
-            timestamp_str = alarm_details.get('time')
+            # S3 time is in the record
+            first_record = alarm_details["Records"][0]
+            timestamp_str = first_record.get("eventTime")
             if timestamp_str:
-                dt = datetime.strptime(timestamp_str, "%Y-%m-%dT%H:%M:%SZ")
+                # Example: 2026-01-12T16:10:07.364Z
+                try:
+                    dt = datetime.strptime(timestamp_str, "%Y-%m-%dT%H:%M:%S.%fZ")
+                except ValueError:
+                    dt = datetime.strptime(timestamp_str, "%Y-%m-%dT%H:%M:%SZ")
                 formatted = dt.strftime("%a, %d %b %Y %H:%M:%S UTC")
 
             channelconfig = config.slack_channel_webhook  # same channel as CloudWatch
-            alarmnotifiction = "S3 Event Notification"
+            alarmnotifiction = "S3 Object Event Notification"
             type = "S3 Event"
-            is_error = False
+            is_error = False   # creation is informational
 
+        # ---------------- CloudWatch Alarm (default) ----------------
         else:
             logger.info("CloudWatch Alarm detected in SNS message")
             logger.info("Starting Notification to Slack for CloudWatch Alarm via SNS Topic")
@@ -523,10 +580,12 @@ def lambda_handler(event, context):
             if new_state == "OK":
                 is_error = False
 
+        # Initialize notification service
         notification_service = NotificationService(
             channelconfig, context.function_name
         )
 
+        # Send to Slack
         notification_service.send_notification(
             alarmnotifiction,
             alarm_details,
