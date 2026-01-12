@@ -349,8 +349,8 @@ module "load_mdss_lambda" {
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "load_mdss"
-  role_name                      = aws_iam_role.load_mdss[0].name
-  role_arn                       = aws_iam_role.load_mdss[0].arn
+  role_name                      = aws_iam_role.load_mdss.name
+  role_arn                       = aws_iam_role.load_mdss.arn
   handler                        = "load_mdss.handler"
   memory_size                    = 10240
   timeout                        = 900
@@ -378,8 +378,8 @@ module "load_fms_lambda" {
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "load_fms"
-  role_name                      = aws_iam_role.load_fms[0].name
-  role_arn                       = aws_iam_role.load_fms[0].arn
+  role_name                      = aws_iam_role.load_fms.name
+  role_arn                       = aws_iam_role.load_fms.arn
   handler                        = "load_fms.handler"
   memory_size                    = 10240
   timeout                        = 900
@@ -464,16 +464,16 @@ resource "aws_cloudwatch_event_rule" "glue_db_count_metrics_schedule" {
 }
 
 resource "aws_cloudwatch_event_target" "glue_db_count_metrics_target" {
-  rule  = aws_cloudwatch_event_rule.glue_db_count_metrics_schedule[0].name
-  arn   = module.glue_db_count_metrics[0].lambda_function_arn
+  rule  = aws_cloudwatch_event_rule.glue_db_count_metrics_schedule.name
+  arn   = module.glue_db_count_metrics.lambda_function_arn
 }
 
 resource "aws_lambda_permission" "glue_db_count_metrics_allow_eventbridge" {
   statement_id  = "AllowExecutionFromEventBridgeGlueDbCount"
   action        = "lambda:InvokeFunction"
-  function_name = module.glue_db_count_metrics[0].lambda_function_name
+  function_name = module.glue_db_count_metrics.lambda_function_name
   principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.glue_db_count_metrics_schedule[0].arn
+  source_arn    = aws_cloudwatch_event_rule.glue_db_count_metrics_schedule.arn
 }
 
 
@@ -507,8 +507,8 @@ module "mdss_daily_failure_digest" {
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "mdss_daily_failure_digest"
-  role_name                      = aws_iam_role.mdss_daily_failure_digest[0].name
-  role_arn                       = aws_iam_role.mdss_daily_failure_digest[0].arn
+  role_name                      = aws_iam_role.mdss_daily_failure_digest.name
+  role_arn                       = aws_iam_role.mdss_daily_failure_digest.arn
   handler                        = "mdss_daily_failure_digest.handler"
   memory_size                    = 512
   timeout                        = 60
@@ -535,8 +535,8 @@ module "cross_account_copy" {
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "cross_account_copy"
-  role_name                      = aws_iam_role.cross_account_copy[0].name
-  role_arn                       = aws_iam_role.cross_account_copy[0].arn
+  role_name                      = aws_iam_role.cross_account_copy.name
+  role_arn                       = aws_iam_role.cross_account_copy.arn
   handler                        = "cross_account_copy.handler"
   memory_size                    = 512
   timeout                        = 60
