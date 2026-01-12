@@ -1,8 +1,8 @@
 locals {
   cross_account_map = local.is-test ? "development" : local.is-production ? "preproduction" : null
   cross_account_map_shorthand = local.is-test ? "dev" : local.is-production ? "preprod" : null
-  cross_account_bucket = local.is-test || local.is-preproduction ? "arn:aws:s3:::emds-${local.cross_account_map_shorthand}-land-*/*" : ""
-  cross_account_kms = local.is-test || local.is-preproduction ? "arn:aws:kms:${data.aws_region.current.name}:${local.environment_management.account_ids["electronic-monitoring-data-${local.cross_account_map}"]}:key/*" : ""
+  cross_account_bucket = local.is-test || local.is-production ? "arn:aws:s3:::emds-${local.cross_account_map_shorthand}-land-*/*" : ""
+  cross_account_kms = local.is-test || local.is-production ? "arn:aws:kms:${data.aws_region.current.name}:${local.environment_management.account_ids["electronic-monitoring-data-${local.cross_account_map}"]}:key/*" : ""
 }
 
 # ------------------------------------------
