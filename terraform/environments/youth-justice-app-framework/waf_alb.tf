@@ -44,8 +44,8 @@ module "waf" {
       description  = "Falanx IP addresses"
       ip_addresses = ["81.178.72.22/32", "154.59.121.128/27", "92.63.139.246/32", "154.59.121.0/24", "154.59.121.64/27", "37.128.189.24/32"]
     },
-    "whitelist-ip-set" = {
-      name         = "whitelist-ip-set"
+    "whitelist-ip" = {
+      name         = "whitelist-ip"
       priority     = 2
       description  = "Whitelisted IP addresses"
       ip_addresses = ["66.103.29.115/32"]

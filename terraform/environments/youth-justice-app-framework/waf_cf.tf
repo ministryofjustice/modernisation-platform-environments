@@ -10,8 +10,8 @@ module "waf-cf" {
   }
 
   waf_IP_rules = {
-    "whitelist-ip-set" = {
-      name         = "whitelist-ip-set"
+    "whitelist-ip-cf" = {
+      name         = "whitelist-ip-cf"
       priority     = 2
       description  = "Whitelisted IP addresses"
       ip_addresses = ["66.103.29.115/32"]
