@@ -185,14 +185,22 @@ locals {
   # Final SANs to apply to cert or distribution. Pull the entry from the above map dependent on environment
   cloudfront_nginx_sans = lookup(local.cloudfront_sans_map, local.environment, [])
 
-  #TODO Check these 3 domains with Tony Bishop. They seem to be delegated to alternate NS or a static ip address
-  pending_cloudfront_nginx_sans = [
-    "courtfines.justice.gov.uk",
-    "obr.co.uk",
-    "sendmoneytoaprisoner.justice.gov.uk",
+  cloudfront_distribution_id = var.lookup_cloudfront_distribution ? data.aws_ssm_parameter.cloudfront_distribution_id[0].value : null
+  cloudfront_distribution_compiled_id = var.lookup_cloudfront_compiled_distribution ? data.aws_ssm_parameter.cloudfront_distribution_compiled_id[0].value : null
+
+  # *********************************************************************************************************
+  # New variables to handle the secondary Cloudfront Distribution for the domains configured
+  # inside the _compiled configuration file of the legacy nginx
+  # *********************************************************************************************************
+  cloudfront_nginx_compiled_sans = [
+    "courts.gov.uk",
+    "dca.gov.uk",
+    "www.familyjusticecouncil.org.uk",
+    "www.magistrates.org.uk",
+    "www.pensionsappealtribunals.gov.uk",
+    "www.tribunals-review.org.uk",
+    "www.xhibit.gov.uk"
   ]
 
-
-  cloudfront_distribution_id = var.lookup_cloudfront_distribution ? data.aws_ssm_parameter.cloudfront_distribution_id[0].value : null
 
 }

@@ -247,6 +247,42 @@ exports.handler = (event, context, callback) => {
                 defaultRedirect: 'https://www.gov.uk/government/publications?departments[]=youth-justice-board-for-england-and-wales',
                 pathRedirects: [],
                 aliases: []
+            },
+            // Sites from _compiled (handled by separate cloudfront distribution
+            'courts.gov.uk' : {
+                defaultRedirect: 'https://www.gov.uk/courts',
+                pathRedirects: [],
+                aliases: []
+            },
+            'dca.gov.uk' : {
+                defaultRedirect: 'https://www.justice.gov.uk/',
+                pathRedirects: [],
+                aliases: []
+            },
+            'www.familyjusticecouncil.org.uk' : {
+                defaultRedirect: 'https://www.judiciary.gov.uk/related-offices-and-bodies/advisory-bodies/fjc/',
+                pathRedirects: [],
+                aliases: []
+            },
+            'www.magistrates.org.uk': {
+                defaultRedirect: 'https://www.gov.uk/become-magistrate/what-magistrates-do',
+                pathRedirects: [],
+                aliases: []
+            },
+            'www.pensionsappealtribunals.gov.uk' : {
+                defaultRedirect: 'https://www.gov.uk/war-pension-armed-forces-compensation-tribunal',
+                pathRedirects: [],
+                aliases: []
+            },
+            'www.tribunals-review.org.uk' : {
+                defaultRedirect: 'https://webarchive.nationalarchives.gov.uk/ukgwa/+/http://www.tribunals-review.org.uk/',
+                pathRedirects: [],
+                aliases: []
+            },
+            'www.xhibit.gov.uk' : {
+                defaultRedirect: 'https://xhibit.justice.gov.uk/court_lists.htm',
+                pathRedirects: [],
+                aliases: []
             }
         };
 

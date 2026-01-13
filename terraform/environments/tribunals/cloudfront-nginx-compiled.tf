@@ -1,24 +1,24 @@
 ###############################
-#  SECOND CLOUDFRONT – HTTP-only to replace nginx server in old DSD AWS account
-#  DNS records managed by
-#  Force redeploy to preprod 14/11/25
-
-
+#  Third CLOUDFRONT deployment–
+#  HTTP-only this serves the remaining entries in the old nginx AWS deployment
+#  which were stored in the _compiled configuration file.0
+#  Creating this to avoid regenrating the Certificate in Production which would involve
+#  re-validating the 40+ SAN certificate records
 ###############################
 
 # -------------------------------------------------
 # 1. ACM Certificate (HTTP-only domains only)
 # -------------------------------------------------
-resource "aws_acm_certificate" "http_cloudfront_nginx" {
+resource "aws_acm_certificate" "http_cloudfront_nginx_compiled" {
   provider          = aws.us-east-1
-  domain_name       = local.is-production ? "ahmlr.gov.uk" : "${local.environment}.ahmlr.gov.uk"
+  domain_name       = local.is-production ? "courts.gov.uk" : "${local.environment}.courts.gov.uk"
   validation_method = "DNS"
 
   # SANS are dynamically calculated in platform_locals dependent on environment
-  subject_alternative_names = local.cloudfront_nginx_sans
+  subject_alternative_names = local.cloudfront_nginx_compiled_sans
 
   tags = {
-    Name        = "tribunals-http-redirect-cert"
+    Name        = "tribunals-http-redirect-cert-compiled"
     Environment = local.environment
   }
 
@@ -37,7 +37,7 @@ They must create **CNAME** records in their Route 53 zone.
 EOF
 
   value = [
-    for dvo in aws_acm_certificate.http_cloudfront_nginx.domain_validation_options : {
+    for dvo in aws_acm_certificate.http_cloudfront_nginx_compiled.domain_validation_options : {
       domain = dvo.domain_name
       name   = dvo.resource_record_name
       type   = dvo.resource_record_type
@@ -50,7 +50,7 @@ EOF
 # 3. CloudFront Distribution – HTTP only
 # -------------------------------------------------
 #tfsec:ignore:AVD-AWS-0012
-resource "aws_cloudfront_distribution" "tribunals_http_redirect" {
+resource "aws_cloudfront_distribution" "tribunals_http_redirect_compiled" {
   #checkov:skip=CKV_AWS_34: This distribution intentionally allows HTTP; Lambda@Edge handles all HTTP→HTTPS redirects for legacy domains.
   #checkov:skip=CKV_AWS_86:"Access logging not required for this distribution"
   #checkov:skip=CKV_AWS_374:"Geo restriction not needed for this public service"
@@ -69,7 +69,7 @@ resource "aws_cloudfront_distribution" "tribunals_http_redirect" {
   }
 
   # Aliases are dynamically calculated in platform_locals dependent on environment
-  aliases = local.cloudfront_nginx_sans
+  aliases = local.cloudfront_nginx_compiled_sans
 
   origin {
     domain_name = "dummy-http-redirect.s3.amazonaws.com"
@@ -108,14 +108,14 @@ resource "aws_cloudfront_distribution" "tribunals_http_redirect" {
 
   enabled         = true
   is_ipv6_enabled = true
-  comment         = "cloudfront-redirect-${local.environment}"
+  comment         = "cloudfront-redirect-compiled-${local.environment}"
   price_class     = "PriceClass_All"
   http_version    = "http2"
 
 
   # Use the **new dedicated certificate**
   viewer_certificate {
-    acm_certificate_arn      = aws_acm_certificate.http_cloudfront_nginx.arn
+    acm_certificate_arn      = aws_acm_certificate.http_cloudfront_nginx_compiled.arn
     ssl_support_method       = "sni-only"
     minimum_protocol_version = "TLSv1.2_2021"
   }
@@ -127,16 +127,16 @@ resource "aws_cloudfront_distribution" "tribunals_http_redirect" {
   }
 
   tags = {
-    Name        = "tribunals-http-redirect"
+    Name        = "tribunals-http-redirect-compiled"
     Environment = local.environment
   }
 
   # Wait for cert to be issued before creating distribution
   depends_on = [
-    aws_acm_certificate.http_cloudfront_nginx,
+    aws_acm_certificate.http_cloudfront_nginx_compiled,
     aws_lambda_function.cloudfront_redirect_lambda,
     aws_s3_bucket.cf_redirect_logs,
-    aws_lambda_permission.allow_http_cloudfront,
+    aws_lambda_permission.allow_http_cloudfront_compiled,
     aws_lambda_permission.allow_replicator
   ]
 }
@@ -144,9 +144,9 @@ resource "aws_cloudfront_distribution" "tribunals_http_redirect" {
 # -------------------------------------------------
 # 4. OUTPUT: CloudFront Domain Name (for final CNAME)
 # -------------------------------------------------
-output "http_redirect_distribution_domain" {
+output "http_redirect_compiled_distribution_domain" {
   description = "CNAME target for HTTP domains (give to external DNS admins)"
-  value       = aws_cloudfront_distribution.tribunals_http_redirect.domain_name
+  value       = aws_cloudfront_distribution.tribunals_http_redirect_compiled.domain_name
 }
 
 # -------------------------------------------------
@@ -216,7 +216,7 @@ resource "aws_s3_bucket_policy" "cf_redirect_policy" {
         Condition = {
           StringEquals = {
             "aws:SourceAccount" = data.aws_caller_identity.current.account_id
-            "aws:SourceArn"     = aws_cloudfront_distribution.tribunals_http_redirect.arn
+            "aws:SourceArn"     = aws_cloudfront_distribution.tribunals_http_redirect_compiled.arn
           }
         }
       },
@@ -263,9 +263,9 @@ resource "aws_s3_bucket_lifecycle_configuration" "cf_redirect_lifecycle" {
   }
 }
 
-resource "aws_ssm_parameter" "cloudfront_distribution_id" {
+resource "aws_ssm_parameter" "cloudfront_distribution_compiled_id" {
   #checkov:skip=CKV2_AWS_34: "AWS SSM Parameter should be Encrypted"
-  name  = "/${local.environment}/cloudfront-distribution-id"
+  name  = "/${local.environment}/cloudfront-distribution-compiled-id"
   type  = "String"
-  value = aws_cloudfront_distribution.tribunals_http_redirect.id
+  value = aws_cloudfront_distribution.tribunals_http_redirect_compiled.id
 }

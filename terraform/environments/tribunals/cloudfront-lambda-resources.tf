@@ -104,6 +104,24 @@ resource "aws_lambda_permission" "allow_http_cloudfront" {
   qualifier = aws_lambda_function.cloudfront_redirect_lambda.version
 }
 
+# Need a second resource to handle the second nginx cloudfront (which manages the _compiled domains)
+resource "aws_lambda_permission" "allow_http_cloudfront_compiled" {
+  provider      = aws.us-east-1
+  statement_id  = "AllowHttpCloudFrontExecution-${aws_lambda_function.cloudfront_redirect_lambda.version}"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.cloudfront_redirect_lambda.function_name
+  principal     = "edgelambda.amazonaws.com"
+  # Only set source_arn if distribution exists
+  source_arn = (
+    local.cloudfront_distribution_compiled_id != null ?
+    "arn:aws:cloudfront::${data.aws_caller_identity.current.account_id}:distribution/${local.cloudfront_distribution_compiled_id}" :
+    null
+  )
+  qualifier = aws_lambda_function.cloudfront_redirect_lambda.version
+}
+
+
+
 #Lambda@Edge replicator permission cannot have source_arn; intentional
 #tfsec:ignore:AVD-AWS-0067
 resource "aws_lambda_permission" "allow_replicator" {
