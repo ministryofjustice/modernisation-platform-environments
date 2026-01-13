@@ -6,7 +6,8 @@ serviceAccount:
 
 kubectl:
   image:
-    tag: "1.33"
+    repository: bitnamilegacy/kubectl
+    tag: "1.33.4"
 
 initContainers:
   - name: velero-plugin-for-aws
