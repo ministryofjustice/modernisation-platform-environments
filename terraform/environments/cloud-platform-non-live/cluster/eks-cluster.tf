@@ -134,11 +134,11 @@ module "eks" {
 module "karpenter" {
   source = "terraform-aws-modules/eks/aws//modules/karpenter"
 
-  cluster_name = module.eks.cluster_name
+  cluster_name = module.eks.cluster_name[0]
 
   # Name needs to match role name passed to the EC2NodeClass
   node_iam_role_use_name_prefix   = false
-  node_iam_role_name              = local.name
+  node_iam_role_name              = local.cluster_name
   create_pod_identity_association = true
 
   # Used to attach additional IAM policies to the Karpenter node IAM role
