@@ -19,7 +19,7 @@ module "s3_bucket" {
   source   = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=474f27a3f9bf542a8826c76fb049cc84b5cf136f"
 
   bucket_prefix       = "${local.application_name}-${local.environment}-ftp-${each.key}"
-  bucket_policy   = data.aws_iam_policy_document.bucket_policy[each.key].json
+  bucket_policy   = [data.aws_iam_policy_document.bucket_policy[each.key].json]
   versioning_enabled  = false
   force_destroy       = false
   replication_enabled = false
