@@ -2,7 +2,7 @@ resource "aws_subnet" "eks_private" {
   count = 3
 
   vpc_id                  = module.vpc.vpc_id
-  cidr_block              = cidrsubnet(lookup(local.cp_vpc_cidr, terraform.workspace), 3, count.index + 4)
+  cidr_block              = cidrsubnet(lookup(local.cp_vpc_cidr, local.cluster_environment), 3, count.index + 4)
   availability_zone       = data.aws_availability_zones.available.names[count.index]
   map_public_ip_on_launch = false
 

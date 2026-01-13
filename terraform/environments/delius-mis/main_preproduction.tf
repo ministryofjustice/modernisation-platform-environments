@@ -40,8 +40,6 @@ module "environment_stage" {
   dfi_report_bucket_config = local.dfi_report_bucket_config_stage
   lb_config                = local.lb_config_stage
 
-  domain_join_ports = local.domain_join_ports
-
   pagerduty_integration_key = local.pagerduty_integration_key
 
   create_backup_role = true
@@ -87,9 +85,6 @@ module "environment_preproduction" {
   fsx_config               = local.fsx_config_preprod
   dfi_report_bucket_config = local.dfi_report_bucket_config_preprod
   lb_config                = local.lb_config_preprod
-
-
-  domain_join_ports = local.domain_join_ports
 
   pagerduty_integration_key = local.pagerduty_integration_key
 

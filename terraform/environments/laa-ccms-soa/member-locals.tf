@@ -19,7 +19,12 @@ locals {
   # Folders created on S3 for Lambda artifacts
   lambda_folder_name = [
     "lambda_delivery",
-    "${local.application_name}-edn-quiesced-layer"
+    "${local.application_name}-edn-quiesced-layer", "cloudwatch_sns_layer"
+  ]
+
+  lambda_source_cloudwatch_sns_hashes = [
+    for f in fileset("./lambda/cloudwatch_alarm_slack_integration", "**") :
+    sha256(file("${path.module}/lambda/cloudwatch_alarm_slack_integration/${f}"))
   ]
 
   # Detect change in Lambda code to force new publish

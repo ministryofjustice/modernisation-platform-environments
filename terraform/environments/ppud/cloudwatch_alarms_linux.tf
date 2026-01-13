@@ -152,7 +152,7 @@ resource "aws_cloudwatch_metric_alarm" "linux_instance_health_check" {
   threshold           = "1"
   treat_missing_data  = "notBreaching"
   alarm_description   = "Instance status checks monitor the software and network configuration of your individual instance. When an instance status check fails, you typically must address the problem yourself: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/monitoring-system-instance-status-check.html"
-  alarm_actions       = [aws_sns_topic.cw_std_and_sms_alerts[0].arn]
+  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
     InstanceId = each.key
   }
@@ -173,7 +173,7 @@ resource "aws_cloudwatch_metric_alarm" "linux_system_health_check" {
   threshold           = "1"
   treat_missing_data  = "notBreaching"
   alarm_description   = "System status checks monitor the AWS systems on which your instance runs. These checks detect underlying problems with your instance that require AWS involvement to repair: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/monitoring-system-instance-status-check.html"
-  alarm_actions       = [aws_sns_topic.cw_std_and_sms_alerts[0].arn]
+  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
     InstanceId = each.key
   }
@@ -194,7 +194,7 @@ resource "aws_cloudwatch_metric_alarm" "service_status_docker_rgsl200" {
   threshold           = "1"
   treat_missing_data  = "notBreaching"
   alarm_description   = "This metric monitors the docker service status. If the metric falls to 0 [not running] then the alarm will trigger."
-  alarm_actions       = [aws_sns_topic.cw_std_and_sms_alerts[0].arn]
+  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
     Instance = "i-0f393d9ed4e53da68"
     Service  = "docker"
@@ -214,7 +214,7 @@ resource "aws_cloudwatch_metric_alarm" "service_status_docker_401_cjsm" {
   threshold           = "1"
   treat_missing_data  = "notBreaching"
   alarm_description   = "This metric monitors the docker service status. If the metric falls to 0 [not running] then the alarm will trigger."
-  alarm_actions       = [aws_sns_topic.cw_std_and_sms_alerts[0].arn]
+  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
     Instance = "i-0e8e2a182917bcf26"
     Service  = "docker"
@@ -234,7 +234,7 @@ resource "aws_cloudwatch_metric_alarm" "service_status_docker_400_non_cjsm" {
   threshold           = "1"
   treat_missing_data  = "notBreaching"
   alarm_description   = "This metric monitors the docker service status. If the metric falls to 0 [not running] then the alarm will trigger."
-  alarm_actions       = [aws_sns_topic.cw_std_and_sms_alerts[0].arn]
+  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
     Instance = "i-01b4cc138ac95a506"
     Service  = "docker"
@@ -256,7 +256,7 @@ resource "aws_cloudwatch_metric_alarm" "port_25_status_check_401_cjsm" {
   threshold           = "1"
   treat_missing_data  = "notBreaching"
   alarm_description   = "This metric monitors the port 25 status check to smtp.cjsm.net . If the metric falls to 0 [unable to connect] then the alarm will trigger."
-  alarm_actions       = [aws_sns_topic.cw_std_and_sms_alerts[0].arn]
+  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
     Instance = "i-0e8e2a182917bcf26"
     Port     = "Port25"

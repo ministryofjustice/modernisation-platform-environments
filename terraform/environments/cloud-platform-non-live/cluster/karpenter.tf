@@ -1,5 +1,5 @@
 # module "karpenter" {
-#   count   = contains(local.enabled_workspaces, terraform.workspace) ? 1 : 0
+#   count   = contains(local.enabled_workspaces, local.cluster_environment) ? 1 : 0
 #   source  = "terraform-aws-modules/eks/aws//modules/karpenter"
 #   version = "~> 21.0"
 

@@ -1,3 +1,10 @@
+locals {
+  cross_account_map = local.is-test ? "development" : local.is-production ? "preproduction" : null
+  cross_account_map_shorthand = local.is-test ? "dev" : local.is-production ? "preprod" : null
+  cross_account_bucket = local.is-test || local.is-production ? "arn:aws:s3:::emds-${local.cross_account_map_shorthand}-land-*/*" : ""
+  cross_account_kms = local.is-test || local.is-production ? "arn:aws:kms:${data.aws_region.current.name}:${local.environment_management.account_ids["electronic-monitoring-data-${local.cross_account_map}"]}:key/*" : ""
+}
+
 # ------------------------------------------
 # output_file_structure_as_json_from_zip
 # ------------------------------------------
@@ -727,12 +734,19 @@ module "share_dbs_with_dms_lambda_role" {
   de_role_arn             = null
 }
 
+resource "aws_lakeformation_permissions" "dms_add_create_db" {
+  count            = local.is-development ? 0 : 1
+  permissions      = ["CREATE_DATABASE", "DROP"]
+  principal        = aws_iam_role.load_dms_output.arn
+  catalog_resource = true
+}
+
+
 #-----------------------------------------------------------------------------------
 # Load MDSS Data IAM Role
 #-----------------------------------------------------------------------------------
 
 data "aws_iam_policy_document" "load_mdss_lambda_role_policy_document" {
-  count = local.is-development ? 0 : 1
   statement {
     sid    = "S3Permissions"
     effect = "Allow"
@@ -828,9 +842,8 @@ data "aws_iam_policy_document" "load_mdss_lambda_role_policy_document" {
     actions   = ["s3:ListAllMyBuckets", "s3:GetBucketLocation"]
     resources = ["*"]
   }
-  # MDSS cleanup queue
   statement {
-    sid    = "AllowMdssCleanupQueueAccess"
+    sid    = "AllowCleanupQueueAccess"
     effect = "Allow"
     actions = [
       "sqs:SendMessage",
@@ -839,42 +852,37 @@ data "aws_iam_policy_document" "load_mdss_lambda_role_policy_document" {
       "sqs:GetQueueAttributes",
       "sqs:GetQueueUrl",
     ]
-    resources = [aws_sqs_queue.clean_mdss_load_queue.arn]
+    resources = [aws_sqs_queue.clean_dlt_load_queue.arn]
   }
 }
 
 resource "aws_iam_role" "load_mdss" {
-  count              = local.is-development ? 0 : 1
   name               = "load_mdss_lambda_role"
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
 }
 
 resource "aws_iam_policy" "load_mdss_lambda_role_policy" {
-  count  = local.is-development ? 0 : 1
   name   = "load_mdss_lambda_policy"
-  policy = data.aws_iam_policy_document.load_mdss_lambda_role_policy_document[0].json
+  policy = data.aws_iam_policy_document.load_mdss_lambda_role_policy_document.json
 }
 
 resource "aws_iam_role_policy_attachment" "load_mdss_output_lambda_policy_attachment" {
-  count      = local.is-development ? 0 : 1
-  role       = aws_iam_role.load_mdss[0].name
-  policy_arn = aws_iam_policy.load_mdss_lambda_role_policy[0].arn
+  role       = aws_iam_role.load_mdss.name
+  policy_arn = aws_iam_policy.load_mdss_lambda_role_policy.arn
 }
 
 module "share_db_with_mdss_lambda_role" {
-  count                   = local.is-development ? 0 : 1
   source                  = "./modules/lakeformation_database_share"
   dbs_to_grant            = toset(["allied_mdss${local.db_suffix}"])
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
-  role_arn                = aws_iam_role.load_mdss[0].arn
-  db_exists               = true
-  de_role_arn             = null
+  role_arn                = aws_iam_role.load_mdss.arn
+  db_exists               = !local.is-development
+  de_role_arn             = local.is-development ? try(one(data.aws_iam_roles.mod_plat_roles.arns)) : null
 }
 
 resource "aws_lakeformation_permissions" "add_create_db" {
-  count            = local.is-development ? 0 : 1
   permissions      = ["CREATE_DATABASE", "DROP"]
-  principal        = aws_iam_role.load_mdss[0].arn
+  principal        = aws_iam_role.load_mdss.arn
   catalog_resource = true
 }
 
@@ -883,7 +891,6 @@ resource "aws_lakeformation_permissions" "add_create_db" {
 #-----------------------------------------------------------------------------------
 
 data "aws_iam_policy_document" "load_fms_lambda_role_policy_document" {
-  count = local.is-development ? 0 : 1
   statement {
     sid    = "S3Permissions"
     effect = "Allow"
@@ -977,40 +984,47 @@ data "aws_iam_policy_document" "load_fms_lambda_role_policy_document" {
     actions   = ["s3:ListAllMyBuckets", "s3:GetBucketLocation"]
     resources = ["*"]
   }
+  statement {
+    sid    = "AllowCleanupQueueAccess"
+    effect = "Allow"
+    actions = [
+      "sqs:SendMessage",
+      "sqs:ReceiveMessage",
+      "sqs:DeleteMessage",
+      "sqs:GetQueueAttributes",
+      "sqs:GetQueueUrl",
+    ]
+    resources = [aws_sqs_queue.clean_dlt_load_queue.arn]
+  }
 }
 
 resource "aws_iam_role" "load_fms" {
-  count              = local.is-development ? 0 : 1
   name               = "load_fms_lambda_role"
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
 }
 
 resource "aws_iam_policy" "load_fms_lambda_role_policy" {
-  count  = local.is-development ? 0 : 1
   name   = "load_fms_lambda_policy"
-  policy = data.aws_iam_policy_document.load_fms_lambda_role_policy_document[0].json
+  policy = data.aws_iam_policy_document.load_fms_lambda_role_policy_document.json
 }
 
 resource "aws_iam_role_policy_attachment" "load_fms_output_lambda_policy_attachment" {
-  count      = local.is-development ? 0 : 1
-  role       = aws_iam_role.load_fms[0].name
-  policy_arn = aws_iam_policy.load_fms_lambda_role_policy[0].arn
+  role       = aws_iam_role.load_fms.name
+  policy_arn = aws_iam_policy.load_fms_lambda_role_policy.arn
 }
 
 module "share_db_with_fms_lambda_role" {
-  count                   = local.is-development ? 0 : 1
   source                  = "./modules/lakeformation_database_share"
   dbs_to_grant            = toset(["serco_fms${local.db_suffix}"])
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
-  role_arn                = aws_iam_role.load_fms[0].arn
-  db_exists               = true
-  de_role_arn             = null
+  role_arn                = aws_iam_role.load_fms.arn
+  db_exists               = !local.is-development
+  de_role_arn             = local.is-development ? try(one(data.aws_iam_roles.mod_plat_roles.arns)) : null
 }
 
 resource "aws_lakeformation_permissions" "fms_add_create_db" {
-  count            = local.is-development ? 0 : 1
   permissions      = ["CREATE_DATABASE", "DROP"]
-  principal        = aws_iam_role.load_fms[0].arn
+  principal        = aws_iam_role.load_fms.arn
   catalog_resource = true
 }
 
@@ -1129,12 +1143,21 @@ resource "aws_iam_role_policy_attachment" "load_historic_csv_output_lambda_polic
   policy_arn = aws_iam_policy.load_historic_csv_lambda_role_policy.arn
 }
 
-module "share_db_with_historic_csv_lambda_role_policy_lambda_role" {
+module "share_lcm_db_with_historic_csv_lambda_role_policy_lambda_role" {
   source                  = "./modules/lakeformation_database_share"
   dbs_to_grant            = toset(["g4s_lcm${local.db_suffix}"])
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
   role_arn                = aws_iam_role.load_historic_csv.arn
   db_exists               = true ? local.is-production : false
+  de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
+}
+
+module "share_scram_db_with_historic_csv_lambda_role_policy_lambda_role" {
+  source                  = "./modules/lakeformation_database_share"
+  dbs_to_grant            = toset(["scram_alcohol_monitoring${local.db_suffix}"])
+  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+  role_arn                = aws_iam_role.load_historic_csv.arn
+  db_exists               = local.is-development ? false : local.is-preproduction ? false : true
   de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
 }
 
@@ -1148,9 +1171,7 @@ resource "aws_lakeformation_permissions" "historic_csv_add_create_db" {
 # Clean after MDSS load IAM Role
 #-----------------------------------------------------------------------------------
 
-data "aws_iam_policy_document" "clean_after_mdss_load_lambda_role_policy_document" {
-  count = local.is-development ? 0 : 1
-
+data "aws_iam_policy_document" "clean_after_dlt_load_lambda_role_policy_document" {
   statement {
     sid    = "GluePermissionsForCleanup"
     effect = "Allow"
@@ -1197,20 +1218,194 @@ data "aws_iam_policy_document" "clean_after_mdss_load_lambda_role_policy_documen
   }
 }
 
-resource "aws_iam_role" "clean_after_mdss_load" {
-  count              = local.is-development ? 0 : 1
-  name               = "clean_after_mdss_load_lambda_role"
+resource "aws_iam_role" "clean_after_dlt_load" {
+  name               = "clean_after_dlt_load_lambda_role"
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
 }
 
-resource "aws_iam_policy" "clean_after_mdss_load_lambda_role_policy" {
-  count  = local.is-development ? 0 : 1
-  name   = "clean_after_mdss_load_lambda_policy"
-  policy = data.aws_iam_policy_document.clean_after_mdss_load_lambda_role_policy_document[0].json
+resource "aws_iam_policy" "clean_after_dlt_load_lambda_role_policy" {
+  name   = "clean_after_dlt_load_lambda_policy"
+  policy = data.aws_iam_policy_document.clean_after_dlt_load_lambda_role_policy_document.json
 }
 
-resource "aws_iam_role_policy_attachment" "clean_after_mdss_load_lambda_policy_attachment" {
-  count      = local.is-development ? 0 : 1
-  role       = aws_iam_role.clean_after_mdss_load[0].name
-  policy_arn = aws_iam_policy.clean_after_mdss_load_lambda_role_policy[0].arn
+resource "aws_iam_role_policy_attachment" "clean_after_dlt_load_lambda_policy_attachment" {
+  role       = aws_iam_role.clean_after_dlt_load.name
+  policy_arn = aws_iam_policy.clean_after_dlt_load_lambda_role_policy.arn
+}
+
+#-----------------------------------------------------------------------------------
+# Glue DB Count Metrics IAM Role
+#-----------------------------------------------------------------------------------
+
+resource "aws_iam_role" "glue_db_count_metrics" {
+  name               = "glue_db_count_metrics"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+data "aws_iam_policy_document" "glue_db_count_metrics_policy_document" {
+  statement {
+    sid    = "GlueGetDatabases"
+    effect = "Allow"
+    actions = [
+      "glue:GetDatabases",
+      "glue:GetDatabase",
+    ]
+    resources = [
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:catalog",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:database/*",
+    ]
+  }
+}
+
+resource "aws_iam_policy" "glue_db_count_metrics" {
+  name        = "glue-db-count-metrics-policy"
+  description = "Policy for Lambda to count Glue databases and publish a CloudWatch metric via EMF"
+  policy      = data.aws_iam_policy_document.glue_db_count_metrics_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "glue_db_count_metrics_policy_attachment" {
+  role       = aws_iam_role.glue_db_count_metrics.name
+  policy_arn = aws_iam_policy.glue_db_count_metrics.arn
+}
+
+
+#-----------------------------------------------------------------------------------
+# Data Cut Back
+#-----------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "data_cutback_iam_role_policy_document" {
+  count = local.is-production || local.is-development ? 1 : 0
+  statement {
+    sid    = "S3Permissions"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:GetBucketLocation",
+      "s3:ListBucket",
+      "s3:PutObject",
+    ]
+
+    resources = [
+      "arn:aws:s3:::emds-preprod-dms-rds-to-parquet-*",
+      "arn:aws:s3:::emds-preprod-dms-rds-to-parquet-*/*",
+      "arn:aws:s3:::emds-prod-dms-rds-to-parquet-*",
+      "arn:aws:s3:::emds-prod-dms-rds-to-parquet-*/*"
+    ]
+  }
+}
+
+resource "aws_iam_role" "data_cutback_iam_role" {
+  count              = local.is-production || local.is-development ? 1 : 0
+  name               = "data_cutback_iam_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_policy" "data_cutback_iam_role_policy" {
+  count  = local.is-production || local.is-development ? 1 : 0
+  name   = "data_cutback_iam_policy"
+  policy = data.aws_iam_policy_document.data_cutback_iam_role_policy_document[0].json
+}
+
+resource "aws_iam_role_policy_attachment" "data_cutback_iam_role_policy_attachment" {
+  count      = local.is-production || local.is-development ? 1 : 0
+  role       = aws_iam_role.data_cutback_iam_role[0].name
+  policy_arn = aws_iam_policy.data_cutback_iam_role_policy[0].arn
+}
+
+
+#-----------------------------------------------------------------------------------
+# MDSS daily failure digest IAM Role
+#-----------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "mdss_daily_failure_digest_policy_document" {
+  statement {
+    sid    = "CloudWatchGetMetricData"
+    effect = "Allow"
+    actions = [
+      "cloudwatch:GetMetricData",
+      "cloudwatch:GetMetricStatistics",
+      "cloudwatch:ListMetrics",
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "AllowPublishToAlertsTopic"
+    effect = "Allow"
+    actions = [
+      "sns:Publish",
+    ]
+    resources = [aws_sns_topic.emds_alerts.arn]
+  }
+}
+
+resource "aws_iam_role" "mdss_daily_failure_digest" {
+  name               = "mdss_daily_failure_digest_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_policy" "mdss_daily_failure_digest" {
+  name   = "mdss_daily_failure_digest_lambda_policy"
+  policy = data.aws_iam_policy_document.mdss_daily_failure_digest_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "mdss_daily_failure_digest_attach" {
+  role       = aws_iam_role.mdss_daily_failure_digest.name
+  policy_arn = aws_iam_policy.mdss_daily_failure_digest.arn
+}
+
+#-----------------------------------------------------------------------------------
+# Copy data from test to dev or prod to preprod
+#-----------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "cross_account_copy" {
+  count = local.is-test || local.is-production ? 1 : 0
+  statement {
+    sid     = "AccessToCrossAccountBucket"
+    effect  = "Allow"
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:DescribeKey"
+    ]
+    resources = [local.cross_account_kms]
+  }
+  statement {
+    sid     = "AccessToInAccountBucket"
+    effect  = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:GetObjectTagging"
+    ]
+    resources = ["${module.s3-data-bucket.bucket.arn}/*"]
+  }
+  statement {
+    sid     = "AllowDumpToExternalBuckets"
+    effect  = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:PutObjectAcl"
+    ]
+    resources = [local.cross_account_bucket]
+  }
+}
+
+resource "aws_iam_role" "cross_account_copy" {
+  count = local.is-test || local.is-production ? 1 : 0
+  name               = "cross_account_copy_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_policy" "cross_account_copy" {
+  count = local.is-test || local.is-production ? 1 : 0
+  name   = "cross_account_copy_lambda_policy"
+  policy = data.aws_iam_policy_document.cross_account_copy[0].json
+}
+
+resource "aws_iam_role_policy_attachment" "cross_account_copy" {
+  count = local.is-test || local.is-production ? 1 : 0
+  role       = aws_iam_role.cross_account_copy[0].name
+  policy_arn = aws_iam_policy.cross_account_copy[0].arn
 }
