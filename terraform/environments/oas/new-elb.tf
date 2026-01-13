@@ -31,7 +31,7 @@ locals {
 ### ELB Instance for OAS Application Servers
 ##############################################
 module "lb_access_logs_enabled" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer?ref=6f59e1ce47df66bc63ee9720b7c58993d1ee64ee"
   providers = {
     aws.bucket-replication = aws
   }
