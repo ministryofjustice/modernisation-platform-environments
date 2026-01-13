@@ -28,7 +28,8 @@ data "aws_iam_policy_document" "github_actions_development_cluster_oidc_policy" 
     effect = "Allow"
     actions = [
       "sqs:CreateQueue",
-      "sqs:TagQueue"
+      "sqs:TagQueue",
+      "sqs:SetQueueAttributes"
     ]
     resources = ["*"]
   }
@@ -37,7 +38,8 @@ data "aws_iam_policy_document" "github_actions_development_cluster_oidc_policy" 
     effect = "Allow"
     actions = [
       "events:TagResource",
-      "events:PutRule"
+      "events:PutRule",
+      "events:PutTargets"
     ]
     resources = ["*"]
   }
