@@ -43,6 +43,19 @@ module "eks" {
       taints                 = local.environment_configuration.monitoring_ng.taints
       labels                 = local.environment_configuration.monitoring_ng.labels
     }
+    karpenter = {
+      ami_type       = "BOTTLEROCKET_x86_64"
+      instance_types = ["m5.large"]
+
+      min_size     = 2
+      max_size     = 3
+      desired_size = 2
+
+      labels = {
+        # Used to ensure Karpenter runs on nodes that it does not manage
+        "karpenter.sh/controller" = "true"
+      }
+    }
   }
 
   addons = {
@@ -116,4 +129,28 @@ module "eks" {
       "cluster-createdby" = var.created_by
     }
   )
+}
+
+module "karpenter" {
+  source = "../../modules/karpenter"
+
+  cluster_name = module.eks.cluster_name
+
+  # Name needs to match role name passed to the EC2NodeClass
+  node_iam_role_use_name_prefix   = false
+  node_iam_role_name              = local.name
+  create_pod_identity_association = true
+
+  # Used to attach additional IAM policies to the Karpenter node IAM role
+  node_iam_role_additional_policies = {
+    AmazonSSMManagedInstanceCore = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+  }
+
+  tags = local.tags
+}
+
+module "karpenter_disabled" {
+  source = "../../modules/karpenter"
+
+  create = false
 }
