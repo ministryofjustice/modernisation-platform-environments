@@ -1,0 +1,15 @@
+{
+  "StartAt": "EarsSars",
+  "States": {
+    "EarsSars": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "OutputPath": "$.Payload",
+      "Parameters": {
+        "Payload.$": "$",
+        "FunctionName": "${ears_sars_request}"
+      },
+      "End" : true
+    }
+  }
+}

@@ -62,7 +62,7 @@ module "ears_sars_step_function" {
   count = local.is-development || local.is-production ? 1 : 0
 
   source       = "./modules/step_function"
-  name         = "ears_sars_request"
+  name         = "ears_sars"
   iam_policies = tomap({ "ears_sars_step_function_policy" = aws_iam_policy.ears_sars_step_function_policy[0] })
   variable_dictionary = tomap(
     {
