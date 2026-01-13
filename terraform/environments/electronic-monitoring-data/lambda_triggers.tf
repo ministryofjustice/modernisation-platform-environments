@@ -188,42 +188,37 @@ resource "aws_s3_bucket_notification" "load_dms_output_event" {
 # ----------------------------------------------
 
 module "load_mdss_event_queue" {
-  count = local.is-development ? 0 : 1
-
   source               = "./modules/sqs_s3_lambda_trigger"
   bucket               = module.s3-raw-formatted-data-bucket.bucket
-  lambda_function_name = module.load_mdss_lambda[0].lambda_function_name
+  lambda_function_name = module.load_mdss_lambda.lambda_function_name
   bucket_prefix        = local.bucket_prefix
   maximum_concurrency  = 100
 }
 
 module "load_fms_event_queue" {
-  count = local.is-development ? 0 : 1
-
   source               = "./modules/sqs_s3_lambda_trigger"
   bucket               = module.s3-raw-formatted-data-bucket.bucket
-  lambda_function_name = module.load_fms_lambda[0].lambda_function_name
+  lambda_function_name = module.load_fms_lambda.lambda_function_name
   bucket_prefix        = local.bucket_prefix
   maximum_concurrency  = 100
 }
 
 resource "aws_s3_bucket_notification" "load_mdss_event" {
-  count = local.is-development ? 0 : 1
 
   bucket = module.s3-raw-formatted-data-bucket.bucket.id
 
   queue {
-    queue_arn     = module.load_mdss_event_queue[0].sqs_queue.arn
+    queue_arn     = module.load_mdss_event_queue.sqs_queue.arn
     events        = ["s3:ObjectCreated:*"]
     filter_prefix = "allied/mdss"
   }
   queue {
-    queue_arn     = module.load_fms_event_queue[0].sqs_queue.arn
+    queue_arn     = module.load_fms_event_queue.sqs_queue.arn
     events        = ["s3:ObjectCreated:*"]
     filter_prefix = "serco/fms"
   }
 
-  depends_on = [module.load_mdss_event_queue[0], module.load_fms_event_queue[0]]
+  depends_on = [module.load_mdss_event_queue, module.load_fms_event_queue]
 }
 
 # ----------------------------------------------
@@ -251,13 +246,26 @@ resource "aws_sqs_queue" "clean_dlt_load_queue" {
 # ----------------------------------------------
 
 resource "aws_lambda_event_source_mapping" "mdss_cleanup_sqs_trigger" {
-  count            = local.is-development ? 0 : 1
   event_source_arn = aws_sqs_queue.clean_dlt_load_queue.arn
-  function_name    = module.clean_after_dlt_load[0].lambda_function_name
+  function_name    = module.clean_after_dlt_load.lambda_function_name
 
   batch_size = 10
 
   scaling_config {
     maximum_concurrency = 100
   }
+}
+
+# ----------------------------------------------
+# Load data sqs queue
+# ----------------------------------------------
+
+module "cross_account_copy_queue" {
+  count = local.is-test || local.is-production ? 1 : 0
+
+  source               = "./modules/sqs_s3_lambda_trigger"
+  bucket               = module.s3-data-bucket.bucket
+  lambda_function_name = module.cross_account_copy[0].lambda_function_name
+  bucket_prefix        = local.bucket_prefix
+  maximum_concurrency  = 100
 }
