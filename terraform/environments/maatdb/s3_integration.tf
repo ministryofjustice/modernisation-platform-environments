@@ -26,10 +26,7 @@ module "s3_bucket" {
   ownership_controls  = "BucketOwnerEnforced"
   custom_kms_key      = local.laa_general_kms_arn
   
-  lifecycle {
-  ignore_changes = [ownership_controls]
-  }
-
+  
   providers = {
     aws.bucket-replication = aws
   }
