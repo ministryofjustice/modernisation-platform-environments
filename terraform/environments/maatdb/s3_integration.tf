@@ -23,7 +23,7 @@ module "s3_bucket" {
   force_destroy       = false
   replication_enabled = false
   replication_region  = local.region
-  ownership_controls  = "BucketOwnerEnforced"
+  object_ownership  = "BucketOwnerEnforced"
   custom_kms_key      = local.laa_general_kms_arn
 
   providers = {
@@ -33,7 +33,7 @@ module "s3_bucket" {
   lifecycle_rule = [
     {
       id      = local.is-production ? "main" : "main-nonprod"
-      enabled = "Enabled"
+      enabled = true
       prefix  = ""
 
       tags = {
