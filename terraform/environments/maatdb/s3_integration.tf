@@ -83,7 +83,7 @@ data "aws_iam_policy_document" "bucket_policy" {
           identifiers = ["*"]
         }
         actions  = ["s3:*"]
-        resources = [each.value.bucket.arn, "${each.value.bucket.arn}/*"]
+        resources = ["arn:aws:s3:::${local.application_name}-${local.environment}-ftp-${each.key}", "arn:aws:s3:::${local.application_name}-${local.environment}-ftp-${each.key}/*"]
         condition {
           test = "NumericLessThan" 
           variable = "s3:TlsVersion"
@@ -109,7 +109,7 @@ data "aws_iam_policy_document" "bucket_policy" {
       ]
 
       resources = [
-        "${each.value.bucket.arn}/*"
+        "arn:aws:s3:::${local.application_name}-${local.environment}-ftp-${each.key}/*"
       ]
     }
   }
@@ -131,7 +131,7 @@ data "aws_iam_policy_document" "bucket_policy" {
       ]
 
       resources = [
-        each.value.bucket.arn
+        "arn:aws:s3:::${local.application_name}-${local.environment}-ftp-${each.key}"
       ]
     }
   }
@@ -157,7 +157,7 @@ data "aws_iam_policy_document" "bucket_policy" {
       ]
 
       resources = [
-        "${each.value.bucket.arn}/*"
+        "arn:aws:s3:::${local.application_name}-${local.environment}-ftp-${each.key}/*"
       ]
     }
   }
@@ -180,7 +180,7 @@ data "aws_iam_policy_document" "bucket_policy" {
       ]
 
       resources = [
-        each.value.bucket.arn
+        "arn:aws:s3:::${local.application_name}-${local.environment}-ftp-${each.key}"
       ]
     }
   }
