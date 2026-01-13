@@ -1,8 +1,7 @@
 resource "aws_cloudwatch_log_metric_filter" "mdss_any_error" {
   name           = "mdss-any-error"
   log_group_name = module.load_mdss_lambda.cloudwatch_log_group.name
-  pattern        = "[ERROR]"
-
+  pattern        = "ERROR"
   metric_transformation {
     name      = "MdssAnyErrorCount"
     namespace = "EMDS/MDSS"
