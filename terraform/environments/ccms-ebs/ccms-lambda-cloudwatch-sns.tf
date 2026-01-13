@@ -30,6 +30,7 @@ resource "aws_iam_role_policy" "lambda_cloudwatch_sns_policy" {
           "secretsmanager:DescribeSecret",
           "secretsmanager:ListSecretVersionIds"
         ]
+        # Secret now contains slack_channel_webhook, slack_channel_webhook_guardduty, slack_channel_webhook_s3
         Resource = [aws_secretsmanager_secret.ebs_cw_alerts_secrets.arn]
       },
       {
@@ -70,7 +71,7 @@ resource "aws_lambda_layer_version" "lambda_cloudwatch_sns_layer" {
   s3_bucket                = aws_s3_bucket.ccms_ebs_shared.bucket
   compatible_runtimes      = ["python3.13"]
   compatible_architectures = ["x86_64"]
-  description              = "Lambda Layer for ${local.application_name} CloudWatch SNS Alarm Integration"
+  description              = "Lambda Layer for ${local.application_name} CloudWatch/GuardDuty/S3 SNS Alerts Integration"
 }
 
 data "archive_file" "lambda_zip" {
@@ -92,6 +93,7 @@ resource "aws_lambda_function" "cloudwatch_sns" {
 
   environment {
     variables = {
+      # This secret now contains slack_channel_webhook, slack_channel_webhook_guardduty, slack_channel_webhook_s3
       SECRET_NAME = aws_secretsmanager_secret.ebs_cw_alerts_secrets.name
     }
   }

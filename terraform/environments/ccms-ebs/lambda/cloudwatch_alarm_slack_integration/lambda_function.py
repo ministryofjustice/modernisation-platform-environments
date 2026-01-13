@@ -39,6 +39,7 @@ class ConfigValidator:
         mandatory_fields = {
             "slack_channel_webhook": config_dict.get("slack_channel_webhook"),
             "slack_channel_webhook_guardduty": config_dict.get("slack_channel_webhook_guardduty"),
+            "slack_channel_webhook_s3": config_dict.get("slack_channel_webhook_s3"),
         }
         missing_fields = [name for name, value in mandatory_fields.items() if not value]
         if missing_fields:
@@ -81,12 +82,14 @@ class ValidateConfig:
 
     slack_channel_webhook: str
     slack_channel_webhook_guardduty: str
+    slack_channel_webhook_s3: str
 
     def __post_init__(self):
         """Validate configuration after initialization."""
         config_dict = {
             "slack_channel_webhook": self.slack_channel_webhook,
             "slack_channel_webhook_guardduty": self.slack_channel_webhook_guardduty,
+            "slack_channel_webhook_s3": self.slack_channel_webhook_s3,
         }
 
         ConfigValidator.validate_mandatory_fields(config_dict, "configuration")
@@ -106,6 +109,7 @@ class SecretsManager:
             logger.info(f"Retrieving secret: {secret_name}")
             response = self.client.get_secret_value(SecretId=secret_name)
 
+            # Parse the secret string
             secret_data = json.loads(response["SecretString"])
             logger.info(
                 f"Successfully retrieved credentials with {len(secret_data)} keys"
@@ -129,6 +133,9 @@ def parse_config_from_env_and_secrets(
 ) -> ValidateConfig:
     """
     Parse configuration from both environment variables and secrets data.
+
+    This function combines non-sensitive configuration from environment variables
+    with sensitive credentials from AWS Secrets Manager.
     """
 
     config = ValidateConfig(
@@ -137,6 +144,9 @@ def parse_config_from_env_and_secrets(
         ),
         slack_channel_webhook_guardduty=ConfigValidator.get_mandatory_secret(
             secrets_data, "slack_channel_webhook_guardduty"
+        ),
+        slack_channel_webhook_s3=ConfigValidator.get_mandatory_secret(
+            secrets_data, "slack_channel_webhook_s3"
         ),
     )
 
@@ -318,7 +328,7 @@ class NotificationService:
                 ]
             }
 
-        # ---------------- S3 Event (UPDATED AS REQUESTED) ----------------
+        # ---------------- S3 Event ----------------
         elif type == "S3 Event":
             records = alarmdetails.get("Records", [])
             record = records[0] if records else {}
@@ -410,20 +420,24 @@ class NotificationService:
             }
 
         try:
+            # Convert payload to JSON
             json_payload = json.dumps(payload)
             logger.info(f"Prepared Slack payload: {json_payload}")
-
+            # Configure curl for HTTP POST with JSON
             curl.setopt(pycurl.URL, self.webhook_url)
             curl.setopt(pycurl.POST, 1)
             curl.setopt(pycurl.POSTFIELDS, json_payload)
             curl.setopt(pycurl.HTTPHEADER, ["Content-Type: application/json"])
             curl.setopt(pycurl.TIMEOUT, 10)
 
+            # Buffer for response (though Slack webhook responses are minimal)
             response_buffer = io.BytesIO()
             curl.setopt(pycurl.WRITEDATA, response_buffer)
 
+            # Send the notification
             curl.perform()
 
+            # Check HTTP status code
             http_code = curl.getinfo(pycurl.RESPONSE_CODE)
             if http_code >= 400:
                 raise Exception(f"HTTP error {http_code}")
@@ -440,7 +454,10 @@ class NotificationService:
 
 def lambda_handler(event, context):
     """
-    Main Lambda handler function.
+    Main Lambda handler function. 
+    
+    This function gets triggered by SNS Topic subscriptions to CloudWatch Alarms,
+    GuardDuty findings and S3 events.
     """
 
     tracemalloc.start()
@@ -475,7 +492,7 @@ def lambda_handler(event, context):
         logger.info("source:" + str(source))
 
         env_config = {
-            # No mandatory env vars right now
+            # Mandatory environment variables (currently none)
         }
 
         # Get secret name from environment or event
@@ -492,11 +509,16 @@ def lambda_handler(event, context):
         secrets_data = secrets_manager.get_credentials(secret_name)
 
         # Validate that required credentials are present
-        required_secrets = ["slack_channel_webhook", "slack_channel_webhook_guardduty"]
+        required_secrets = [
+            "slack_channel_webhook",
+            "slack_channel_webhook_guardduty",
+            "slack_channel_webhook_s3",
+        ]
         missing_secrets = [key for key in required_secrets if key not in secrets_data]
         if missing_secrets:
             raise ValueError(f"Missing required secrets: {', '.join(missing_secrets)}")
 
+        # Parse combined configuration
         logger.info("Parsing configuration from environment and secrets")
         config = parse_config_from_env_and_secrets(env_config, secrets_data)
 
@@ -513,7 +535,7 @@ def lambda_handler(event, context):
             channelconfig = config.slack_channel_webhook_guardduty
             alarmnotifiction = "GuardDuty Finding Notification"
             type = "GuardDuty"
-            is_error = True  # findings are usually "bad"
+            is_error = True  # usually "bad" findings
 
         # ---------------- S3 Event ----------------
         elif source == "aws.s3":
@@ -531,10 +553,11 @@ def lambda_handler(event, context):
                     dt = datetime.strptime(timestamp_str, "%Y-%m-%dT%H:%M:%SZ")
                 formatted = dt.strftime("%a, %d %b %Y %H:%M:%S UTC")
 
-            channelconfig = config.slack_channel_webhook  # same channel as CloudWatch
+            # NEW: use dedicated S3 webhook
+            channelconfig = config.slack_channel_webhook_s3
             alarmnotifiction = "S3 Object Event Notification"
             type = "S3 Event"
-            is_error = False   # creation is informational
+            is_error = False   # S3 put is informational
 
         # ---------------- CloudWatch Alarm (default) ----------------
         else:
@@ -554,12 +577,11 @@ def lambda_handler(event, context):
             if new_state == "OK":
                 is_error = False
 
-        # Initialize notification service
+        # Initialize services
         notification_service = NotificationService(
             channelconfig, context.function_name
         )
 
-        # Send to Slack
         notification_service.send_notification(
             alarmnotifiction,
             alarm_details,
@@ -568,6 +590,7 @@ def lambda_handler(event, context):
             is_error
         )
 
+        # Prepare response
         response = {
             "statusCode": 200,
             "body": {
@@ -582,6 +605,7 @@ def lambda_handler(event, context):
         error_msg = f"Lambda execution failed:\n{str(e)}"
         logger.error(error_msg, exc_info=True)
 
+        # Send error notification if notification service is available
         if notification_service is not None:
             try:
                 notification_service.send_notification(
@@ -590,8 +614,8 @@ def lambda_handler(event, context):
             except Exception as notification_error:
                 logger.error(f"Failed to send error notification: {notification_error}")
 
+        # Return error response
         return {"statusCode": 500, "body": {"error": error_msg}}
-
     finally:
         current, peak = tracemalloc.get_traced_memory()
         logger.info(

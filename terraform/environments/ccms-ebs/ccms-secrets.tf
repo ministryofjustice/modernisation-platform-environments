@@ -49,18 +49,19 @@ data "aws_secretsmanager_secret_version" "guardduty_slack_channel_id" {
   secret_id = aws_secretsmanager_secret.guardduty_slack_channel_id.id
 }
 
-# Slack Channel Webhook Secret for Cloudwatch & GuardDuty Alerts via Lambda
+# Slack Channel Webhook Secret for Cloudwatch, GuardDuty & S3 Alerts via Lambda
 resource "aws_secretsmanager_secret" "ebs_cw_alerts_secrets" {
   name        = "${local.application_name}-cw-alerts-secrets"
-  description = "CCMS CloudWatch & GuardDuty Alerts Secret"
+  description = "CCMS CloudWatch, GuardDuty & S3 Alerts Secret"
 }
 
 resource "aws_secretsmanager_secret_version" "ebs_cw_alerts_secrets" {
   secret_id = aws_secretsmanager_secret.ebs_cw_alerts_secrets.id
 
   secret_string = jsonencode({
-    "slack_channel_webhook"           = "",
+    "slack_channel_webhook"           = ""
     "slack_channel_webhook_guardduty" = ""
+    "slack_channel_webhook_s3"        = ""
   })
 
   lifecycle {
