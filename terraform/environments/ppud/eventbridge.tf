@@ -144,7 +144,7 @@ locals {
     send_cpu_graph = {
       environments = ["production"]
       schedule     = "cron(5 17 ? * MON-FRI *)"
-      description  = "Trigger Lambda at 17:00 on weekdays"
+      description  = "Trigger Lambda at 17:05 on weekdays"
       timezone     = "Europe/London"
     }
     ppud_elb_get_trt_data = {
@@ -195,13 +195,19 @@ locals {
       description  = "Trigger Lambda at 07:15 each Monday"
       timezone     = "Europe/London"
     }
+    suppress_securityhub_findings = {
+      environments = ["development", "preproduction", "production"]
+      schedule     = "cron(15 7 ? * MON-FRI *)"
+      description  = "Trigger Lambda at 07:15 on weekdays"
+      timezone     = "Europe/London"
+    }
+    /*
     check_elb_trt_alarm = {
       environments = ["production"]
       schedule     = "cron(0 * ? * * *)"
       description  = "Trigger Lambda every hour"
       timezone     = "Europe/London"
     }
-    /*
     ppud_elb_daily_connections_graph = {
       environments = ["production"]
       schedule     = "cron(15 20 ? * MON-FRI *)"
@@ -289,7 +295,11 @@ locals {
       local.is-preproduction ? aws_lambda_function.lambda_functions["securityhub_report_preproduction"].arn : (
         local.is-production ? aws_lambda_function.lambda_functions["securityhub_report_production"].arn : null
     ))
-    sync_ssm__to_waf = local.is-development ? aws_lambda_function.lambda_functions["sync_ssm_to_waf_development"].arn : (
+    suppress_securityhub_findings = local.is-development ? aws_lambda_function.lambda_functions["suppress_securityhub_findings_development"].arn : (
+      local.is-preproduction ? aws_lambda_function.lambda_functions["suppress_securityhub_findings_preproduction"].arn : (
+        local.is-production ? aws_lambda_function.lambda_functions["suppress_securityhub_findings_production"].arn : null
+    ))
+    sync_ssm_to_waf = local.is-development ? aws_lambda_function.lambda_functions["sync_ssm_to_waf_development"].arn : (
       local.is-preproduction ? aws_lambda_function.lambda_functions["sync_ssm_to_waf_preproduction"].arn : (
         local.is-production ? aws_lambda_function.lambda_functions["sync_ssm_to_waf_production"].arn : null
     ))
@@ -300,7 +310,7 @@ locals {
     #  local.is-preproduction ? aws_lambda_function.lambda_functions["wam_waf_analysis_preproduction"].arn : (
     #    local.is-production ? aws_lambda_function.lambda_functions["wam_waf_analysis_production"].arn : null
     #))
-    check_elb_trt_alarm            = local.is-production ? aws_lambda_function.lambda_functions["check_elb_trt_alarm_production"].arn : null
+    # check_elb_trt_alarm            = local.is-production ? aws_lambda_function.lambda_functions["check_elb_trt_alarm_production"].arn : null
     send_cpu_graph                 = local.is-production ? aws_lambda_function.lambda_functions["send_cpu_graph_production"].arn : null
     disable_cpu_alarms             = local.is-production ? aws_lambda_function.lambda_functions["disable_cpu_alarm_production"].arn : null
     enable_cpu_alarms              = local.is-production ? aws_lambda_function.lambda_functions["enable_cpu_alarm_production"].arn : null
