@@ -65,15 +65,7 @@ module "s3_bucket" {
   tags = merge(local.tags, {
     Name = "${local.application_name}-${local.environment}-ftp-${each.key}"
   })
-}
 
-# Bucket policy
-
-resource "aws_s3_bucket_policy" "ftp_user_and_lambda_access" {
-  for_each = local.build_s3 ? module.s3_bucket : {}
-  bucket   = each.value.bucket.bucket
-  policy   = data.aws_iam_policy_document.bucket_policy[each.key].json
-}
 
 data "aws_iam_policy_document" "bucket_policy" {
   for_each = local.build_s3 ? module.s3_bucket : {}
@@ -189,7 +181,15 @@ data "aws_iam_policy_document" "bucket_policy" {
     }
   }
 }
+}
 
+# Bucket policy
+
+resource "aws_s3_bucket_policy" "ftp_user_and_lambda_access" {
+  for_each = local.build_s3 ? module.s3_bucket : {}
+  bucket   = each.value.bucket.bucket
+  policy   = data.aws_iam_policy_document.bucket_policy[each.key].json
+}
 
 
 # FTP IAM User
