@@ -19,6 +19,7 @@ module "s3_bucket" {
   source   = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=474f27a3f9bf542a8826c76fb049cc84b5cf136f"
 
   bucket_prefix       = "${local.application_name}-${local.environment}-ftp-${each.key}"
+  bucket_policy   = data.aws_iam_policy_document.bucket_policy[each.key].json
   versioning_enabled  = false
   force_destroy       = false
   replication_enabled = false
@@ -26,7 +27,7 @@ module "s3_bucket" {
   ownership_controls  = "BucketOwnerEnforced"
   custom_kms_key      = local.laa_general_kms_arn
   
-  
+
   providers = {
     aws.bucket-replication = aws
   }
@@ -34,7 +35,7 @@ module "s3_bucket" {
   lifecycle_rule = [
     {
       id      = local.is-production ? "main" : "main-nonprod"
-      enabled = true
+      enabled = "Enabled"
       prefix  = ""
 
       tags = {
@@ -73,7 +74,7 @@ module "s3_bucket" {
 resource "aws_s3_bucket_policy" "ftp_user_and_lambda_access" {
   for_each = local.build_s3 ? module.s3_bucket : {}
   bucket   = each.value.bucket.bucket
-  policy   = data.aws_iam_policy_document.bucket_policy[each.key].json
+  
 }
 
 data "aws_iam_policy_document" "bucket_policy" {
