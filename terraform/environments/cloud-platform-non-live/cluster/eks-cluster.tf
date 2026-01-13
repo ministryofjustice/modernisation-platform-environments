@@ -132,7 +132,7 @@ module "eks" {
 }
 
 module "karpenter" {
-  source = "../../modules/karpenter"
+  source = "terraform-aws-modules/eks/aws//modules/karpenter"
 
   cluster_name = module.eks.cluster_name
 
@@ -150,7 +150,7 @@ module "karpenter" {
 }
 
 module "karpenter_disabled" {
-  source = "../../modules/karpenter"
+  source = "terraform-aws-modules/eks/aws//modules/karpenter"
 
   create = false
 }
