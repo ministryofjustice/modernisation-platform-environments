@@ -72,7 +72,7 @@ module "s3_bucket" {
 
 
 data "aws_iam_policy_document" "bucket_policy" {
-  for_each = local.build_s3 ? module.s3_bucket : {}
+  for_each = local.build_s3 ? toset(local.ftp_directions) : toset([])
 
 # Enforce TLS v1.2 or higher
   statement {
