@@ -42,7 +42,7 @@ module "lb_access_logs_enabled" {
   loadbalancer_ingress_rules = local.loadbalancer_ingress_rules
   loadbalancer_egress_rules  = local.loadbalancer_egress_rules
   account_number             = local.environment_management.account_ids[terraform.workspace]
-  region                     = local.app_data.accounts[local.environment].region
+  region                     = "eu-west-2"
   enable_deletion_protection = false
   idle_timeout               = 60
 
