@@ -53,3 +53,63 @@ resource "aws_secretsmanager_secret_version" "home_office_account_id" {
   depends_on = [aws_secretsmanager_secret.home_office_account_id[0]]
 }
 
+module "cross_account_details" {
+  count = local.is-test || local.is-production ? 1 : 0 
+  source = "terraform-aws-modules/secrets-manager/aws"
+
+  name_prefix             = "cross_account_details"
+  description             = "Details for cross account share"
+  recovery_window_in_days = 30
+
+  create_policy       = true
+  block_public_policy = true
+  policy_statements = {
+    read = {
+      sid = "AllowAccountRead"
+      principals = [{
+        type        = "AWS"
+        identifiers = [aws_iam_role.cross_account_copy[0].arn]
+      }]
+      actions   = ["secretsmanager:GetSecretValue"]
+      resources = ["*"]
+    }
+  }
+
+  ignore_secret_changes = true
+  secret_string = jsonencode({
+    account_id = "placeholder"
+    region     = "placeholder"
+    buckets = {
+      mdss = {
+        home_office = {
+          bucket = "placeholder"
+          kms_id = "placeholder"
+        }
+        specials = {
+          bucket = "placeholder"
+          kms_id = "placeholder"
+        }
+        general = {
+          bucket = "placeholder"
+          kms_id = "placeholder"
+        }
+      }
+      fms = {
+        home_office = {
+          bucket = "placeholder"
+          kms_id = "placeholder"
+        }
+        specials = {
+          bucket = "placeholder"
+          kms_id = "placeholder"
+        }
+        general = {
+          bucket = "placeholder"
+          kms_id = "placeholder"
+        }
+      }
+    }
+  })
+
+  tags = local.tags
+}

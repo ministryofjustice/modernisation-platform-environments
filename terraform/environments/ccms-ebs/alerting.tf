@@ -1,11 +1,11 @@
 #--Alerting Chatbot
-module "guardduty_chatbot" {
-  source           = "github.com/ministryofjustice/modernisation-platform-terraform-aws-chatbot?ref=73280f80ce8a4557cec3a76ee56eb913452ca9aa" # v2.0.0"
-  slack_channel_id = data.aws_secretsmanager_secret_version.guardduty_slack_channel_id.secret_string
-  sns_topic_arns   = [aws_sns_topic.guardduty_alerts.arn]
-  tags             = local.tags #--This doesn't seem to pass to anything in the module but is a mandatory var. Consider submitting a PR to the module. AW
-  application_name = local.application_name
-}
+# module "guardduty_chatbot" {
+#   source           = "github.com/ministryofjustice/modernisation-platform-terraform-aws-chatbot?ref=73280f80ce8a4557cec3a76ee56eb913452ca9aa" # v2.0.0"
+#   slack_channel_id = data.aws_secretsmanager_secret_version.guardduty_slack_channel_id.secret_string
+#   sns_topic_arns   = [aws_sns_topic.guardduty_alerts.arn]
+#   tags             = local.tags #--This doesn't seem to pass to anything in the module but is a mandatory var. Consider submitting a PR to the module. AW
+#   application_name = local.application_name
+# }
 
 resource "aws_sns_topic_policy" "guarduty_default" {
   arn    = aws_sns_topic.guardduty_alerts.arn
@@ -14,8 +14,8 @@ resource "aws_sns_topic_policy" "guarduty_default" {
 
 resource "aws_sns_topic_subscription" "guardduty_alerts" {
   topic_arn = aws_sns_topic.guardduty_alerts.arn
-  protocol  = "https"
-  endpoint  = "https://global.sns-api.chatbot.amazonaws.com"
+  protocol  = "lambda"
+  endpoint  = aws_lambda_function.cloudwatch_sns.arn
 }
 
 resource "aws_cloudwatch_event_rule" "guardduty" {
