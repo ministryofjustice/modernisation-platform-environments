@@ -588,3 +588,25 @@ resource "aws_scheduler_schedule" "mdss_daily_failure_digest" {
     role_arn = aws_iam_role.mdss_daily_failure_digest_scheduler[0].arn
   }
 }
+
+
+#-----------------------------------------------------------------------------------
+# Ears and Sars Request
+#-----------------------------------------------------------------------------------
+module "ears_sars_request" {
+  count = local.is-development || local.is-production ? 1 : 0
+  source                  = "./modules/lambdas"
+  is_image                = true
+  function_name           = "ears_sars_request"
+  role_name               = aws_iam_role.ears_sars_iam_role[0].name
+  role_arn                = aws_iam_role.ears_sars_iam_role[0].arn
+  handler                 = "ears_sars_request.handler"
+  memory_size             = 1024
+  timeout                 = 900
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : "dev"
+
+  environment_variables = {
+    SOURCE_BUCKET = module.s3-dms-target-store-bucket.bucket.id
+  }
+}

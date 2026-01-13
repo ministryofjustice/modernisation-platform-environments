@@ -1368,3 +1368,118 @@ resource "aws_iam_role_policy_attachment" "mdss_daily_failure_digest_attach" {
   role       = aws_iam_role.mdss_daily_failure_digest[0].name
   policy_arn = aws_iam_policy.mdss_daily_failure_digest[0].arn
 }
+
+#-----------------------------------------------------------------------------------
+# Data Cut Back
+#-----------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "ears_sars_iam_role_policy_document" {
+  count = local.is-production || local.is-development ? 1 : 0
+  statement {
+    sid    = "S3PermissionsReportBuckets"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:GetBucketLocation",
+      "s3:ListBucket",
+    ]
+    resources = [
+      "${module.s3-create-a-derived-table-bucket.bucket.arn}/data/prod/models/*",
+      module.s3-create-a-derived-table-bucket.bucket.arn
+    ]
+  }
+
+  statement {
+    sid    = "S3PermissionsUnstructured"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:GetBucketLocation",
+      "s3:ListBucket",
+    ]
+    resources = [
+      "${module.s3-data-bucket.bucket.arn}/g4s/atrium_unstructured/*",
+      "${module.s3-data-bucket.bucket.arn}/capita/blob_storage/*",
+      module.s3-data-bucket.bucket.arn
+    ]
+  }
+
+  statement {
+    sid    = "S3PermissionsOutput"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:GetBucketLocation",
+      "s3:ListBucket",
+    ]
+    resources = [
+      "${module.s3-data-bucket.bucket.arn}/g4s/atrium_unstructured/*",
+      "${module.s3-data-bucket.bucket.arn}/capita/blob_storage/*",
+      module.s3-data-bucket.bucket.arn
+    ]
+  }
+  statement {
+    sid    = "AthenaQueryExecution"
+    effect = "Allow"
+    actions = [
+      "athena:StartQueryExecution",
+      "athena:GetQueryExecution",
+      "athena:GetQueryResults",
+      "athena:StopQueryExecution",
+      "athena:GetWorkGroup"
+    ]
+    resources = [
+      aws_athena_workgroup.ears_sars.arn
+    ] 
+  }
+  statement {
+    sid    = "AthenaQueryExecution"
+    effect = "Allow"
+    actions = [
+      "athena:StartQueryExecution",
+      "athena:GetQueryExecution",
+      "athena:GetQueryResults",
+      "athena:StopQueryExecution",
+      "athena:GetWorkGroup"
+    ]
+    resources = [
+      aws_athena_workgroup.ears_sars.arn
+    ]
+  }
+
+  # statement {
+  # sid    = "GlueMetadataRead"
+  # effect = "Allow"
+  # actions = [
+  #   "glue:GetDatabase",
+  #   "glue:GetDatabases",
+  #   "glue:GetTable",
+  #   "glue:GetTables",
+  #   "glue:GetPartition",
+  #   "glue:GetPartitions"
+  # ]
+  # resources = [
+  #   "arn:aws:glue:*:*:catalog",
+  #   "arn:aws:glue:*:*:database/your_database_name",
+  #   "arn:aws:glue:*:*:table/your_database_name/*" 
+  # ]
+  # }
+}
+
+resource "aws_iam_role" "ears_sars_iam_role" {
+  count              = local.is-production || local.is-development ? 1 : 0
+  name               = "ears_sars_iam_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_policy" "ears_sars_iam_role_policy" {
+  count  = local.is-production || local.is-development ? 1 : 0
+  name   = "ears_sars_iam_policy"
+  policy = data.aws_iam_policy_document.ears_sars_iam_role_policy_document[0].json
+}
+
+resource "aws_iam_role_policy_attachment" "ears_sars_iam_role_policy_attachment" {
+  count      = local.is-production || local.is-development ? 1 : 0
+  role       = aws_iam_role.ears_sars_iam_role[0].name
+  policy_arn = aws_iam_policy.ears_sars_iam_role_policy[0].arn
+}

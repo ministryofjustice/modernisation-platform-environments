@@ -25,3 +25,31 @@ module "get_zipped_file_api_api" {
   }
   api_version = "0.1.1"
 }
+
+module "ears_sars_api" {
+  source          = "./modules/api_step_function"
+  api_name        = "ears_sars_api"
+  api_description = "Ears and Sars API"
+  api_path        = "execute"
+  step_function   = module.get_zipped_file_api
+  stages = [
+    {
+      stage_name             = "retrieve requested data",
+      stage_description      = "API Stage for testing",
+      burst_limit            = 20,
+      rate_limit             = 200,
+      throttling_burst_limit = 20,
+      throttling_rate_limit  = 200
+
+    }
+  ]
+  schema = {
+    type = "object"
+    properties = {
+      file_name     = { type = "string" }
+      zip_file_name = { type = "string" }
+    }
+    required = ["file_name", "zip_file_name"]
+  }
+  api_version = "0.1.1"
+}
