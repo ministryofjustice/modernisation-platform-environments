@@ -265,6 +265,7 @@ class NotificationService:
 
             dim_text = '\n'.join([f"{d['name']} = {d['value']}" for d in dimensions])
             emoji = ":broken_heart:" if is_error else ":white_check_mark:"
+            color = "danger" if is_error else "good"
             title = f"{emoji} | {title} | {alarm_name} | {region}"
 
             payload = {
@@ -317,43 +318,27 @@ class NotificationService:
                 ]
             }
 
-        # ---------------- S3 Event ----------------
+        # ---------------- S3 Event (UPDATED AS REQUESTED) ----------------
         elif type == "S3 Event":
             records = alarmdetails.get("Records", [])
             record = records[0] if records else {}
 
             region = record.get("awsRegion", "Unknown Region")
             event_name = record.get("eventName", "Unknown Event")
-            event_time_raw = record.get("eventTime")
 
             s3_info = record.get("s3", {})
             bucket = s3_info.get("bucket", {})
             obj = s3_info.get("object", {})
 
             bucket_name = bucket.get("name", "Unknown Bucket")
-            bucket_arn = bucket.get("arn", "")
             object_key = obj.get("key", "Unknown Key")
             object_size = obj.get("size", "Unknown Size")
 
-            request_params = record.get("requestParameters", {})
             user_identity = record.get("userIdentity", {})
-
-            source_ip = request_params.get("sourceIPAddress", "Unknown IP")
             principal_id = user_identity.get("principalId", "Unknown Principal")
 
             header = f":inbox_tray: | S3 Object Event | {region} | Bucket: {bucket_name}"
             title = f"{event_name} on {bucket_name}"
-
-            # Example: similar feel to your GuardDuty Slack text
-            # LAA Alerts
-            # APP 16:40
-            # :inbox_tray: | S3 Object Event | eu-west-2 | Bucket: ccms-ebs-development-logging
-            # Event: ObjectCreated:Put
-            # Object: s3://ccms-ebs-development-logging/test1.log
-            # Size: 606 bytes
-            # Source IP: 81.109.201.161
-            # Principal: AWS:...
-            # Bucket ARN: arn:aws:s3:::...
 
             payload = {
                 "blocks": [
@@ -402,20 +387,9 @@ class NotificationService:
                         "fields": [
                             {
                                 "type": "mrkdwn",
-                                "text": f"*Source IP:* {source_ip}"
-                            },
-                            {
-                                "type": "mrkdwn",
                                 "text": f"*Principal:* {principal_id}"
                             }
                         ]
-                    },
-                    {
-                        "type": "section",
-                        "text": {
-                            "type": "mrkdwn",
-                            "text": f"*Bucket ARN:*\n{bucket_arn}"
-                        }
                     }
                 ]
             }
