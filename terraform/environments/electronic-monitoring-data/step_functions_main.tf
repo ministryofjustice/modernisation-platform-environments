@@ -66,7 +66,7 @@ module "ears_sars_step_function" {
   iam_policies = tomap({ "ears_sars_step_function_policy" = aws_iam_policy.ears_sars_step_function_policy[0] })
   variable_dictionary = tomap(
     {
-      "ears_sars_request" = module.ears_sars[0].lambda_function_name,
+      "ears_sars_request" = module.ears_sars_request[0].lambda_function_name,
     }
   )
   type = "STANDARD"
