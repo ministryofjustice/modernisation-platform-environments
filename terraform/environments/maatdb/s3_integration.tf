@@ -69,13 +69,7 @@ module "s3_bucket" {
   })
 }
 
-# Bucket policy
 
-resource "aws_s3_bucket_policy" "ftp_user_and_lambda_access" {
-  for_each = local.build_s3 ? module.s3_bucket : {}
-  bucket   = each.value.bucket.bucket
-  
-}
 
 data "aws_iam_policy_document" "bucket_policy" {
   for_each = local.build_s3 ? module.s3_bucket : {}
