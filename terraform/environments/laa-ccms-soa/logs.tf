@@ -114,7 +114,78 @@ resource "aws_cloudwatch_log_metric_filter" "soa_custom_checks_error_managed" {
   }
 }
 
+# Spilting out custom checks errors for easier alerting in Slack channel
+resource "aws_cloudwatch_log_metric_filter" "soa_custom_checks_override_defaults" {
+  name           = "SOACustomChecksOverrideDefaults"
+  pattern        = "\"<Local Script Error>\" -\"Override defaults error\""
+  log_group_name = aws_cloudwatch_log_group.log_group_managed.name        
 
+  metric_transformation {
+    name      = "SOACustomChecksOverrideDefaults"
+    namespace = "CCMS-SOA-APP"
+    value     = "1"
+  }
+}
+
+resource "aws_cloudwatch_log_metric_filter" "soa_custom_check_test_paths" {
+  name           = "SOACustomCheckTestPaths"
+  pattern        = "\"<Local Script Error>\" -\"Test path error\""
+  log_group_name = aws_cloudwatch_log_group.log_group_managed.name        
+
+  metric_transformation {
+    name      = "SOACustomCheckTestPaths"
+    namespace = "CCMS-SOA-APP"
+    value     = "1"
+  }
+}
+
+resource "aws_cloudwatch_log_metric_filter" "soa_custom_check_server_health" {
+  name           = "SOACustomChecksCheckServerHealth"
+  pattern        = "\"<Local Script Error>\" -\"Server health error\""
+  log_group_name = aws_cloudwatch_log_group.log_group_managed.name        
+
+  metric_transformation {
+    name      = "SOACustomChecksCheckServerHealth"
+    namespace = "CCMS-SOA-APP"
+    value     = "1"
+  }
+}
+
+resource "aws_cloudwatch_log_metric_filter" "soa_custom_check_percentage_heap_free_memory" {
+  name           = "SOACustomCheckPercentageHeapFreeMemory"
+  pattern        = "\"<Local Script Error>\" -\"heap free memory error\""
+  log_group_name = aws_cloudwatch_log_group.log_group_managed.name        
+
+  metric_transformation {
+    name      = "SOACustomCheckPercentageHeapFreeMemory"
+    namespace = "CCMS-SOA-APP"
+    value     = "1"
+  }
+}
+
+resource "aws_cloudwatch_log_metric_filter" "soa_custom_check_threads" {
+  name           = "SOACustomCheckThreads"
+  pattern        = "\"<Local Script Error>\" -\"check threads error\""
+  log_group_name = aws_cloudwatch_log_group.log_group_managed.name        
+
+  metric_transformation {
+    name      = "SOACustomCheckThreads"
+    namespace = "CCMS-SOA-APP"
+    value     = "1"
+  }
+}
+
+resource "aws_cloudwatch_log_metric_filter" "soa_custom_check_jdbc" {
+  name           = "SOACustomCheckJDBC"
+  pattern        = "\"<Local Script Error>\" -\"check jdbc error\""
+  log_group_name = aws_cloudwatch_log_group.log_group_managed.name        
+
+  metric_transformation {
+    name      = "SOACustomCheckJDBC"
+    namespace = "CCMS-SOA-APP"
+    value     = "1"
+  }
+}
 
 resource "aws_cloudwatch_log_subscription_filter" "ccms_soa_edn_quiesced_filter" {
   name            = "${local.application_name}-${local.environment}-ccms-soa-edn-quiesced-filter"
