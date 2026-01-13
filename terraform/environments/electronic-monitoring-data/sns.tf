@@ -14,8 +14,7 @@ resource "aws_kms_key" "emds_alerts" {
 }
 
 locals {
-  # In dev mdss_daily_failure_digest has count = 0
-  mdss_daily_failure_digest_role_arn = try(aws_iam_role.mdss_daily_failure_digest[0].arn, "")
+  mdss_daily_failure_digest_role_arn = aws_iam_role.mdss_daily_failure_digest.arn
 }
 
 data "aws_iam_policy_document" "emds_alerts_kms" {
@@ -170,38 +169,36 @@ resource "aws_sqs_queue" "emds_alerts_dlq" {
 # SNS delivery status logging role (for HTTPS / Chatbot)
 # -----------------------------------------------------------------------------------
 
-resource "aws_iam_role" "sns_delivery_logging" {
-  name = "sns-delivery-status-logging-${local.environment_shorthand}"
+data "aws_iam_policy_document" "sns_delivery_logging_assume" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
 
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect    = "Allow"
-        Principal = {
-          Service = "sns.amazonaws.com"
-        }
-        Action = "sts:AssumeRole"
-      }
+    principals {
+      type        = "Service"
+      identifiers = ["sns.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role" "sns_delivery_logging" {
+  name               = "sns-delivery-status-logging-${local.environment_shorthand}"
+  assume_role_policy = data.aws_iam_policy_document.sns_delivery_logging_assume.json
+}
+
+data "aws_iam_policy_document" "sns_delivery_logging_policy" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents"
     ]
-  })
+    resources = ["*"]
+  }
 }
 
 resource "aws_iam_role_policy" "sns_delivery_logging" {
-  role = aws_iam_role.sns_delivery_logging.id
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "logs:CreateLogGroup",
-          "logs:CreateLogStream",
-          "logs:PutLogEvents"
-        ]
-        Resource = "*"
-      }
-    ]
-  })
+  role   = aws_iam_role.sns_delivery_logging.id
+  policy = data.aws_iam_policy_document.sns_delivery_logging_policy.json
 }
