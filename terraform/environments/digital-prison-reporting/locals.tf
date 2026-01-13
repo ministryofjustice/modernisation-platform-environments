@@ -24,7 +24,7 @@ locals {
   create_db                = local.application_data.accounts[local.environment].create_database
   glue_job                 = local.application_data.accounts[local.environment].glue_job_name
   create_job               = local.application_data.accounts[local.environment].create_job
-  custom_metrics_namespace = local.application_data.accounts[local.environment].custom_metrics_namespace
+  custom_metric_namespace  = local.application_data.accounts[local.environment].custom_metric_namespace
   create_sec_conf          = local.application_data.accounts[local.environment].create_security_conf
   env                      = local.environment
   s3_kms_arn               = aws_kms_key.s3.arn
