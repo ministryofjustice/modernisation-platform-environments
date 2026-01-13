@@ -1459,34 +1459,20 @@ data "aws_iam_policy_document" "ears_sars_iam_role_policy_document" {
       module.s3-data-bucket.bucket.arn
     ]
   }
-  statement {
-    sid    = "AthenaQueryExecution"
-    effect = "Allow"
-    actions = [
-      "athena:StartQueryExecution",
-      "athena:GetQueryExecution",
-      "athena:GetQueryResults",
-      "athena:StopQueryExecution",
-      "athena:GetWorkGroup"
-    ]
-    resources = [
-      aws_athena_workgroup.ears_sars.arn
-    ] 
-  }
-  statement {
-    sid    = "AthenaQueryExecution"
-    effect = "Allow"
-    actions = [
-      "athena:StartQueryExecution",
-      "athena:GetQueryExecution",
-      "athena:GetQueryResults",
-      "athena:StopQueryExecution",
-      "athena:GetWorkGroup"
-    ]
-    resources = [
-      aws_athena_workgroup.ears_sars.arn
-    ]
-  }
+  # statement {
+  #   sid    = "AthenaQueryExecution"
+  #   effect = "Allow"
+  #   actions = [
+  #     "athena:StartQueryExecution",
+  #     "athena:GetQueryExecution",
+  #     "athena:GetQueryResults",
+  #     "athena:StopQueryExecution",
+  #     "athena:GetWorkGroup"
+  #   ]
+  #   resources = [
+  #     aws_athena_workgroup.ears_sars.arn
+  #   ] 
+  # }
 
   # statement {
   # sid    = "GlueMetadataRead"
