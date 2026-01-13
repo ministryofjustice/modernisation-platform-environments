@@ -43,3 +43,8 @@ data "aws_iam_roles" "platform_engineer_admin_sso_role" {
   name_regex  = "AWSReservedSSO_platform-engineer-admin_.*"
   path_prefix = "/aws-reserved/sso.amazonaws.com/"
 }
+
+# data "aws_route53_zone" "shared_parent_zone" {
+#   name         = "temp.cloud-platform.service.justice.gov.uk"
+#   private_zone = false
+# }

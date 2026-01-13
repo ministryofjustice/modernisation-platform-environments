@@ -451,7 +451,8 @@ data "aws_iam_policy_document" "snowflake_policy_doc" {
       test     = "StringLike"
       variable = "kms:EncryptionContext:aws:s3:arn"
       values = [
-        "arn:aws:s3:::${local.bucket_name}/${local.snowflake_prefix}*"
+        "arn:aws:s3:::${local.bucket_name}/${local.genesys_prefix.role6}/*",
+        "arn:aws:s3:::${local.bucket_name}"
       ]
     }
   }
@@ -462,7 +463,9 @@ data "aws_iam_policy_document" "snowflake_policy_doc" {
       "s3:DeleteObject",
       "s3:GetObject",
       "s3:ListBucket",
-      "s3:PutObject"
+      "s3:PutObject",
+      "s3:GetObjectVersion",
+      "s3:GetBucketLocation"
     ]
     resources = [
       "arn:aws:s3:::${local.bucket_name}/${local.genesys_prefix.role6}/*",
