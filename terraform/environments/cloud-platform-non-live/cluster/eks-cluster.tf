@@ -110,5 +110,10 @@ module "eks" {
     }
   }
 
-  tags = local.tags
+  tags = merge(
+    local.tags,
+    {
+      "cluster-createdby" = var.created_by
+    }
+  )
 }
