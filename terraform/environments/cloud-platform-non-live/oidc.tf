@@ -27,7 +27,8 @@ data "aws_iam_policy_document" "github_actions_development_cluster_oidc_policy" 
     sid   = "AllowSQSCreate"
     effect = "Allow"
     actions = [
-      "sqs:CreateQueue"
+      "sqs:CreateQueue",
+      "sqs:TagQueue"
     ]
     resources = ["*"]
   }
@@ -35,7 +36,8 @@ data "aws_iam_policy_document" "github_actions_development_cluster_oidc_policy" 
     sid   = "AllowEventBridgeTagResource"
     effect = "Allow"
     actions = [
-      "events:TagResource"
+      "events:TagResource",
+      "events:PutRule"
     ]
     resources = ["*"]
   }
