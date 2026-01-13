@@ -39,7 +39,6 @@ module "lb_access_logs_enabled" {
   force_destroy_bucket       = true # enables destruction of logging bucket
   application_name           = local.application_name
   public_subnets             = data.aws_subnets.shared-public.ids
-  private_subnets            = data.aws_subnets.shared-private.ids
   loadbalancer_ingress_rules = local.loadbalancer_ingress_rules
   loadbalancer_egress_rules  = local.loadbalancer_egress_rules
   account_number             = local.environment_management.account_ids[terraform.workspace]
