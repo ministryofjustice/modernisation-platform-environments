@@ -225,17 +225,17 @@ resource "aws_s3_bucket_notification" "load_mdss_event" {
 # Clean up MDSS load queue
 # ----------------------------------------------
 
-resource "aws_sqs_queue" "clean_mdss_load_dlq" {
-  name                    = "clean-mdss-load-dlq"
+resource "aws_sqs_queue" "clean_dlt_load_dlq" {
+  name                    = "clean-dlt-load-dlq"
   sqs_managed_sse_enabled = true
 }
 
 resource "aws_sqs_queue" "clean_dlt_load_queue" {
-  name                       = "clean-mdss-load-queue"
+  name                       = "clean-dlt-load-queue"
   visibility_timeout_seconds = 15 * 60
   message_retention_seconds  = 1209600 # 14 days
   redrive_policy = jsonencode({
-    deadLetterTargetArn = aws_sqs_queue.clean_mdss_load_dlq.arn
+    deadLetterTargetArn = aws_sqs_queue.clean_dlt_load_dlq.arn
     maxReceiveCount     = 5
   })
   sqs_managed_sse_enabled = true
