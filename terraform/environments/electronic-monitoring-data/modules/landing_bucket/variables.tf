@@ -64,3 +64,16 @@ variable "subnet_ids" {
   description = "List of subnet IDs associated with the Lambda function."
   type        = list(string)
 }
+
+variable "cross_account" {
+  description = "boolean on whether to enable cross acount copy"
+  type        = bool
+  default     = false
+}
+
+variable "cross_account_id" {
+  description = "id for cross acount copy"
+  type        = string
+  default     = null
+  nullable    = true
+}
