@@ -1,4 +1,4 @@
-#### This file can be used to store secrets specific to the member account ####
+### This file can be used to store secrets specific to the member account ####
 
 resource "aws_secretsmanager_secret" "secret_eucs_entra" {
   count       = local.is-development ? 1 : 0
