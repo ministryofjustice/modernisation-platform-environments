@@ -23,9 +23,8 @@ resource "aws_lakeformation_data_lake_settings" "settings" {
       data.aws_iam_role.github_actions_role.arn,
       data.aws_iam_session_context.current.issuer_arn,
       [for share in local.analytical_platform_share : aws_iam_role.analytical_platform_share_role[share.target_account_name].arn],
-      local.is-development ? [] : [
-        aws_iam_role.clean_after_dlt_load[0].arn
-      ]
+      aws_iam_role.clean_after_dlt_load.arn
+      
     ]
   )
 
@@ -40,8 +39,6 @@ resource "aws_lakeformation_data_lake_settings" "settings" {
 # --------------------------------------------------------------------------
 
 resource "aws_lakeformation_permissions" "glue_db_count_metrics_catalog_describe" {
-  count = local.is-development ? 0 : 1
-
   principal   = aws_iam_role.glue_db_count_metrics.arn
   permissions = ["DESCRIBE"]
 
