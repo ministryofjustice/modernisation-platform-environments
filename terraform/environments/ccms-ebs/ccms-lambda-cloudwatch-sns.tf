@@ -30,6 +30,7 @@ resource "aws_iam_role_policy" "lambda_cloudwatch_sns_policy" {
           "secretsmanager:DescribeSecret",
           "secretsmanager:ListSecretVersionIds"
         ]
+        # Secret now contains slack_channel_webhook, slack_channel_webhook_guardduty, slack_channel_webhook_s3
         Resource = [aws_secretsmanager_secret.ebs_cw_alerts_secrets.arn]
       },
       {
@@ -40,6 +41,14 @@ resource "aws_iam_role_policy" "lambda_cloudwatch_sns_policy" {
           "logs:PutLogEvents"
         ]
         Resource = "arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${aws_lambda_function.cloudwatch_sns.function_name}:*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "kms:GenerateDataKey*",
+          "kms:Decrypt"
+        ]
+        Resource = [aws_kms_key.cloudwatch_sns_alerts_key.arn]
       }
     ]
   })
@@ -62,9 +71,8 @@ resource "aws_lambda_layer_version" "lambda_cloudwatch_sns_layer" {
   s3_bucket                = aws_s3_bucket.ccms_ebs_shared.bucket
   compatible_runtimes      = ["python3.13"]
   compatible_architectures = ["x86_64"]
-  description              = "Lambda Layer for ${local.application_name} CloudWatch SNS Alarm Integration"
+  description              = "Lambda Layer for ${local.application_name} CloudWatch/GuardDuty/S3 SNS Alerts Integration"
 }
-
 
 data "archive_file" "lambda_zip" {
   type        = "zip"
@@ -85,6 +93,7 @@ resource "aws_lambda_function" "cloudwatch_sns" {
 
   environment {
     variables = {
+      # This secret now contains slack_channel_webhook, slack_channel_webhook_guardduty, slack_channel_webhook_s3
       SECRET_NAME = aws_secretsmanager_secret.ebs_cw_alerts_secrets.name
     }
   }
@@ -104,4 +113,28 @@ resource "aws_lambda_permission" "allow_sns_invoke" {
   function_name = aws_lambda_function.cloudwatch_sns.function_name
   principal     = "sns.amazonaws.com"
   source_arn    = aws_sns_topic.cw_alerts.arn
+}
+
+resource "aws_lambda_permission" "allow_s3_sns_invoke" {
+  statement_id  = "AllowExecutionFromS3SNSTopic"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.cloudwatch_sns.function_name
+  principal     = "sns.amazonaws.com"
+  source_arn    = aws_sns_topic.s3_topic.arn
+}
+
+resource "aws_lambda_permission" "allow_ddos_sns_invoke" {
+  statement_id  = "AllowExecutionFromDDoSSNSTopic"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.cloudwatch_sns.function_name
+  principal     = "sns.amazonaws.com"
+  source_arn    = aws_sns_topic.ddos_alarm.arn
+}
+
+resource "aws_lambda_permission" "allow_sns_invoke_guardduty" {
+  statement_id  = "AllowExecutionFromGuardDutySNS"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.cloudwatch_sns.function_name
+  principal     = "sns.amazonaws.com"
+  source_arn    = aws_sns_topic.guardduty_alerts.arn
 }
