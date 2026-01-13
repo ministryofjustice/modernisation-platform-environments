@@ -175,8 +175,8 @@ resource "helm_release" "karpenter" {
       karpenter.sh/controller: 'true'
     dnsPolicy: Default
     settings:
-      clusterName: ${module.eks.cluster_name}
-      clusterEndpoint: ${module.eks.cluster_endpoint}
+      clusterName: ${module.eks[0].cluster_name}
+      clusterEndpoint: ${module.eks[0].cluster_endpoint}
       interruptionQueue: ${module.karpenter.queue_name}
     webhook:
       enabled: false
