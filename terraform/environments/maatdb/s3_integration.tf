@@ -19,14 +19,12 @@ module "s3_bucket" {
   source   = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=474f27a3f9bf542a8826c76fb049cc84b5cf136f"
 
   bucket_prefix       = "${local.application_name}-${local.environment}-ftp-${each.key}"
-  bucket_policy   = [data.aws_iam_policy_document.bucket_policy[each.key].json]
   versioning_enabled  = false
   force_destroy       = false
   replication_enabled = false
   replication_region  = local.region
   ownership_controls  = "BucketOwnerEnforced"
   custom_kms_key      = local.laa_general_kms_arn
-  
 
   providers = {
     aws.bucket-replication = aws
@@ -69,12 +67,18 @@ module "s3_bucket" {
   })
 }
 
+# Bucket policy
 
+resource "aws_s3_bucket_policy" "ftp_user_and_lambda_access" {
+  for_each = local.build_s3 ? module.s3_bucket : {}
+  bucket   = each.value.bucket.bucket
+  policy   = data.aws_iam_policy_document.bucket_policy[each.key].json
+}
 
 data "aws_iam_policy_document" "bucket_policy" {
-  for_each = local.build_s3 ? toset(local.ftp_directions) : toset([])
+  for_each = local.build_s3 ? module.s3_bucket : {}
 
-# Enforce TLS v1.2 or higher
+  # Enforce TLS v1.2 or higher
   statement {
         sid    = "EnforceTLSv12orHigher"
         effect = "Deny"
@@ -109,7 +113,7 @@ data "aws_iam_policy_document" "bucket_policy" {
       ]
 
       resources = [
-        "arn:aws:s3:::${local.application_name}-${local.environment}-ftp-${each.key}/*"
+        "${each.value.bucket.arn}/*"
       ]
     }
   }
@@ -131,7 +135,7 @@ data "aws_iam_policy_document" "bucket_policy" {
       ]
 
       resources = [
-        "arn:aws:s3:::${local.application_name}-${local.environment}-ftp-${each.key}"
+        each.value.bucket.arn
       ]
     }
   }
@@ -157,7 +161,7 @@ data "aws_iam_policy_document" "bucket_policy" {
       ]
 
       resources = [
-        "arn:aws:s3:::${local.application_name}-${local.environment}-ftp-${each.key}/*"
+        "${each.value.bucket.arn}/*"
       ]
     }
   }
@@ -180,12 +184,11 @@ data "aws_iam_policy_document" "bucket_policy" {
       ]
 
       resources = [
-        "arn:aws:s3:::${local.application_name}-${local.environment}-ftp-${each.key}"
+        each.value.bucket.arn
       ]
     }
   }
 }
-
 
 # FTP IAM User
 
