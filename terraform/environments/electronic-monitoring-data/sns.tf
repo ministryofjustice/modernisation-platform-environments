@@ -13,10 +13,6 @@ resource "aws_kms_key" "emds_alerts" {
   policy              = data.aws_iam_policy_document.emds_alerts_kms.json
 }
 
-locals {
-  mdss_daily_failure_digest_role_arn = aws_iam_role.mdss_daily_failure_digest.arn
-}
-
 data "aws_iam_policy_document" "emds_alerts_kms" {
 
   # Root full admin of the key
@@ -67,22 +63,16 @@ data "aws_iam_policy_document" "emds_alerts_kms" {
     }
   }
 
-  # Allow mdss_daily_failure_digest Lambda role to publish encrypted messages
-  dynamic "statement" {
-    for_each = local.is-development ? [] : [1]
-    content {
-      sid       = "AllowMdssDailyFailureDigestUseOfKey"
-      effect    = "Allow"
-      resources = ["*"]
-      actions = [
-        "kms:Decrypt",
-        "kms:GenerateDataKey"
-      ]
+  # Allow mdss_daily_failure_digest Lambda role to publish encrypted messages (all envs)
+  statement {
+    sid       = "AllowMdssDailyFailureDigestUseOfKey"
+    effect    = "Allow"
+    resources = ["*"]
+    actions   = ["kms:Decrypt", "kms:GenerateDataKey"]
 
-      principals {
-        type        = "AWS"
-        identifiers = [local.mdss_daily_failure_digest_role_arn]
-      }
+    principals {
+      type        = "AWS"
+      identifiers = [aws_iam_role.mdss_daily_failure_digest.arn]
     }
   }
 }
@@ -109,23 +99,20 @@ data "aws_iam_policy_document" "emds_alerts_topic_policy" {
     }
   }
 
-  # Allow mdss_daily_failure_digest Lambda role to publish
-  dynamic "statement" {
-    for_each = local.is-development ? [] : [1]
-    content {
-      sid    = "AllowMdssDailyFailureDigestLambdaToPublish"
-      effect = "Allow"
+  # Allow mdss_daily_failure_digest Lambda role to publish (all envs)
+  statement {
+    sid    = "AllowMdssDailyFailureDigestLambdaToPublish"
+    effect = "Allow"
 
-      actions = [
-        "sns:Publish",
-      ]
+    actions = [
+      "sns:Publish",
+    ]
 
-      resources = [aws_sns_topic.emds_alerts.arn]
+    resources = [aws_sns_topic.emds_alerts.arn]
 
-      principals {
-        type        = "AWS"
-        identifiers = [local.mdss_daily_failure_digest_role_arn]
-      }
+    principals {
+      type        = "AWS"
+      identifiers = [aws_iam_role.mdss_daily_failure_digest.arn]
     }
   }
 
