@@ -593,6 +593,11 @@ locals {
     }
 
     route53_zones = {
+      "nomis.az.justice.gov.uk" = {
+        records = [
+          { name = "c", type = "CNAME", ttl = "1800", records = ["c.nomis.service.justice.gov.uk"] },
+        ]
+      }
 
       "nomis.service.justice.gov.uk" = {
         lb_alias_records = [
