@@ -4,7 +4,7 @@ variable "lookup_cloudfront_distribution" {
   default     = false
 }
 
-variable "lookup_cloudfront_compiled_distribution" {
+variable "lookup_cloudfront_distribution_compiled" {
   type        = bool
   description = "Set to true after the CloudFront _compiled distribution has been created and stored in SSM"
   default     = false
