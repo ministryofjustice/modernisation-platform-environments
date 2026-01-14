@@ -34,7 +34,7 @@ module "ears_sars_api_api" {
   step_function   = module.get_zipped_file_api
   stages = [
     {
-      stage_name             = "retrieve requested data",
+      stage_name             = "request",
       stage_description      = "API Stage for testing",
       burst_limit            = 20,
       rate_limit             = 200,
