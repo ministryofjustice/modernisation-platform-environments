@@ -192,15 +192,38 @@ locals {
   # New variables to handle the secondary Cloudfront Distribution for the domains configured
   # inside the _compiled configuration file of the legacy nginx
   # *********************************************************************************************************
-  cloudfront_nginx_compiled_sans = [
+  cloudfront_nginx_compiled_sans_prod = [
     "courts.gov.uk",
+    "www.courts.gov.uk",
     "dca.gov.uk",
+    "www.dca.gov.uk",
+    "familyjusticecouncil.org.uk",
     "www.familyjusticecouncil.org.uk",
+    "magistrates.org.uk",
     "www.magistrates.org.uk",
+    "pensionsappealtribunals.gov.uk",
     "www.pensionsappealtribunals.gov.uk",
+    "tribunals-review.org.uk",
     "www.tribunals-review.org.uk",
+    "xhibit.gov.uk"
     "www.xhibit.gov.uk"
   ]
 
+  cloudfront_nginx_compiled_sans_preprod = [
+    "preproduction.courts.gov.uk"
+  ]
+
+  cloudfront_nginx_compiled_sans_dev = [
+    "development.courts.gov.uk"
+  ]
+
+  cloudfront_sans_compiled_map = {
+    production    = local.cloudfront_nginx_compiled_sans_prod
+    development   = local.cloudfront_nginx_compiled_sans_dev
+    preproduction = local.cloudfront_nginx_compiled_sans_preprod
+  }
+
+  # Final SANs to apply to cert or distribution. Pull the entry from the above map dependent on environment
+  cloudfront_nginx_sans_compiled = lookup(local.cloudfront_sans_compiled_map, local.environment, [])
 
 }

@@ -15,7 +15,7 @@ resource "aws_acm_certificate" "http_cloudfront_nginx_compiled" {
   validation_method = "DNS"
 
   # SANS are dynamically calculated in platform_locals dependent on environment
-  subject_alternative_names = local.cloudfront_nginx_compiled_sans
+  subject_alternative_names = local.cloudfront_nginx_sans_compiled
 
   tags = {
     Name        = "tribunals-http-redirect-cert-compiled"
@@ -69,7 +69,7 @@ resource "aws_cloudfront_distribution" "tribunals_http_redirect_compiled" {
   }
 
   # Aliases are dynamically calculated in platform_locals dependent on environment
-  aliases = local.cloudfront_nginx_compiled_sans
+  aliases = local.cloudfront_nginx_sans_compiled
 
   origin {
     domain_name = "dummy-http-redirect.s3.amazonaws.com"

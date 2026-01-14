@@ -252,37 +252,37 @@ exports.handler = (event, context, callback) => {
             'courts.gov.uk' : {
                 defaultRedirect: 'https://www.gov.uk/courts',
                 pathRedirects: [],
-                aliases: []
+                aliases: ['www.courts.gov.uk']
             },
             'dca.gov.uk' : {
                 defaultRedirect: 'https://www.justice.gov.uk/',
                 pathRedirects: [],
-                aliases: []
+                aliases: ['www.dca.gov.uk']
             },
-            'www.familyjusticecouncil.org.uk' : {
+            'familyjusticecouncil.org.uk' : {
                 defaultRedirect: 'https://www.judiciary.gov.uk/related-offices-and-bodies/advisory-bodies/fjc/',
                 pathRedirects: [],
-                aliases: []
+                aliases: ['www.familyjusticecouncil.org.uk']
             },
-            'www.magistrates.org.uk': {
+            'magistrates.org.uk': {
                 defaultRedirect: 'https://www.gov.uk/become-magistrate/what-magistrates-do',
                 pathRedirects: [],
-                aliases: []
+                aliases: ['www.magistrates.org.uk']
             },
-            'www.pensionsappealtribunals.gov.uk' : {
+            'pensionsappealtribunals.gov.uk' : {
                 defaultRedirect: 'https://www.gov.uk/war-pension-armed-forces-compensation-tribunal',
                 pathRedirects: [],
-                aliases: []
+                aliases: ['www.pensionsappealtribunals.gov.uk']
             },
-            'www.tribunals-review.org.uk' : {
+            'tribunals-review.org.uk' : {
                 defaultRedirect: 'https://webarchive.nationalarchives.gov.uk/ukgwa/+/http://www.tribunals-review.org.uk/',
                 pathRedirects: [],
-                aliases: []
+                aliases: ['www.tribunals-review.org.uk']
             },
-            'www.xhibit.gov.uk' : {
+            'xhibit.gov.uk' : {
                 defaultRedirect: 'https://xhibit.justice.gov.uk/court_lists.htm',
                 pathRedirects: [],
-                aliases: []
+                aliases: ['www.xhibit.gov.uk']
             }
         };
 
