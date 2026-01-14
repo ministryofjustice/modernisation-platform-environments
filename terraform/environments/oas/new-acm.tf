@@ -52,6 +52,10 @@ resource "aws_route53_record" "external_validation_test" {
   ttl             = 60
   type            = each.value.type
   zone_id         = data.aws_route53_zone.external.zone_id
+
+  lifecycle {
+    ignore_changes = [name, records, type]
+  }
 }
 
 # Preproduction environment - validates in parent zone
@@ -65,6 +69,10 @@ resource "aws_route53_record" "external_validation_preprod" {
   ttl             = 60
   type            = each.value.type
   zone_id         = data.aws_route53_zone.modernisation_platform.zone_id
+
+  lifecycle {
+    ignore_changes = [name, records, type]
+  }
 }
 
 # ACM Certificate Validation
