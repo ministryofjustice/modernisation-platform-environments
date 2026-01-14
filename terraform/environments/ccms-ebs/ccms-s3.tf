@@ -179,13 +179,30 @@ resource "aws_s3_bucket_notification" "logging_bucket_notification" {
 
 data "aws_iam_policy_document" "logging_s3_policy" {
   statement {
+    sid    = "AllowELBLogDeliveryPutObject"
+    effect = "Allow"
     principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::652711504416:root"]
+      type = "Service"
+      identifiers = [
+        "logdelivery.elasticloadbalancing.amazonaws.com"
+      ]
     }
     actions   = ["s3:PutObject"]
     resources = ["${module.s3-bucket-logging.bucket.arn}/*"]
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceAccount"
+      values   = ["${data.aws_caller_identity.current.account_id}"]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "s3:x-amz-acl"
+      values   = ["bucket-owner-full-control"]
+    }
+
   }
+
   statement {
     effect = "Allow"
     principals {

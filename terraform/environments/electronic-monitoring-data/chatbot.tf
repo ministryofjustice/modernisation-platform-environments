@@ -1,5 +1,4 @@
 module "chatbot_alerts" {
-  count  = local.is-development ? 0 : 1
   source = "github.com/ministryofjustice/modernisation-platform-terraform-aws-chatbot?ref=0ec33c7bfde5649af3c23d0834ea85c849edf3ac" # v3.0.0
 
   # Map Slack channel per environment

@@ -171,6 +171,7 @@ locals {
         })
         tags = merge(local.ec2_autoscaling_groups.web12.tags, {
           nomis-environment = "qa11g"
+          oracle-db-name    = "qa11g"
         })
       })
     }
