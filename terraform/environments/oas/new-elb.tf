@@ -16,6 +16,7 @@ locals {
       from_port       = 443
       to_port         = 443
       protocol        = "tcp"
+      cidr_blocks     = []
       prefix_list_ids = [data.aws_ec2_managed_prefix_list.cloudfront.id]
       security_groups = []
     }
