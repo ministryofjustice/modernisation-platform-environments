@@ -454,6 +454,25 @@ resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_Error_Managed" {
   ok_actions          = [aws_sns_topic.alerts.arn]
 }
 
+# THe following alarm is used for testing purposes only and can be removed once we are confident that the custom checks error alarm is working as expected
+resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_test_paths" {
+  alarm_name          = "${local.application_data.accounts[local.environment].app_name}-managed-custom-checks-test-paths"
+  alarm_description   = "${local.environment} | ${local.aws_account_id} | There have been multiple custom check script errors on the SOA managed servers in the last 5 minutes, this likely means please that a composite endpoint is unreachable."
+  comparison_operator = "GreaterThanThreshold"
+  metric_name         = aws_cloudwatch_log_metric_filter.soa_custom_checks_test_paths.id
+  statistic           = "Sum"
+  namespace           = "CCMS-SOA-APP"
+  period              = "100"
+  evaluation_periods  = "5"
+  threshold           = "1"
+  datapoints_to_alarm = "1"
+  treat_missing_data  = "notBreaching"
+  alarm_actions       = [aws_sns_topic.alerts.arn]
+  ok_actions          = [aws_sns_topic.alerts.arn]
+}
+
+
+
 #--The below alerts have been disabled as we do not understand their benefit and if the errors being thrown are actually errors
 #--or just part of the regular operation of the CCMS application
 
