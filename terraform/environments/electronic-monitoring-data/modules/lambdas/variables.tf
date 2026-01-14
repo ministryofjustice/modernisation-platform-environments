@@ -139,3 +139,9 @@ variable "s3_bucket" {
   default     = null
 }
 
+variable "cloudwatch_retention_days" {
+  description = "Number of days to keep cloudwatch logs for."
+  type        = number
+  nullable    = true
+  default     = 400
+}

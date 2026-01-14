@@ -65,7 +65,7 @@
       },
       {
         "name": "XXSOA_DS_URL",
-        "value": "jdbc:oracle:thin:@${xxsoa_ds_host}:${xxsoa_ds_db}"
+        "value": "${xxsoa_ds_url}"
       },
       {
         "name": "XXSOA_DS_USERNAME",
@@ -93,11 +93,11 @@
       },
       {
         "name": "EBS_INITIAL_CAPACITY",
-        "value": "0"
+        "value": "5"
       },
       {
         "name": "XXSOA_INITIAL_CAPACITY",
-        "value": "0"
+        "value": "5"
       },
       {
         "name": "EBSSMS_INITIAL_CAPACITY",

@@ -92,7 +92,7 @@
       "pagerduty_integration_key_name": "laa_oas_nonprod_alarms",
       "s3_vpc_endpoint_prefix": "pl-7ca54015",
       "ec2_private_ip": "10.27.72.27",
-      "managementcidr": "10.200.0.0/20"
+      "managementcidr": "10.200.16.0/20"
     },
     "production": {
       "example_var": "production-data",

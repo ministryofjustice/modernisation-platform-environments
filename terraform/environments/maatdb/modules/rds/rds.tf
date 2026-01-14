@@ -121,7 +121,7 @@ resource "aws_secretsmanager_secret_version" "rds_password_secret_version" {
 }
 
 # From Vincent's PR
-# TODO Rotation of secret which requires Lambda function created and permissions granted to Lambda to rotate. 
+# TODO Rotation of secret which requires Lambda function created and permissions granted to Lambda to rotate.
 #
 # resource "aws_secretsmanager_secret_rotation" "rds_password-rotation" {
 #   secret_id           = aws_secretsmanager_secret.rds_password_secret.id
@@ -261,7 +261,24 @@ resource "aws_security_group" "vpc_sec_group" {
     to_port     = 443
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
+  }
 
+  # Allow traffic from Mojfin.
+  # Added here because of limit of 5 SGs per vpc_security_group_ids.
+  ingress {
+    description     = "Sql Net on 1521"
+    from_port       = 1521
+    to_port         = 1521
+    protocol        = "tcp"
+    security_groups = [var.mojfin_sec_group_id]
+  }
+
+  egress {
+    description     = "Sql Net on 1521"
+    from_port       = 1521
+    to_port         = 1521
+    protocol        = "tcp"
+    security_groups = [var.mojfin_sec_group_id]
   }
 
   tags = {
@@ -422,6 +439,3 @@ resource "aws_db_instance_role_association" "rds_s3_role_association" {
 output "db_instance_id" {
   value = aws_db_instance.appdb1.id
 }
-
-
-

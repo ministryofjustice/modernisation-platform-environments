@@ -1,5 +1,5 @@
 resource "aws_sns_topic" "emds_alerts" {
-  name              = "emds-alerts"
+  name              = "emds-alerts-${local.environment_shorthand}"
   kms_master_key_id = aws_kms_key.emds_alerts.arn
 }
 

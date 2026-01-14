@@ -185,4 +185,10 @@ systemctl enable amazon-ssm-agent
 systemctl stop firewalld
 systemctl disable firewalld
 
+# Configure SSH keepalive to prevent session timeouts
+echo "ClientAliveInterval 60" >> /etc/ssh/sshd_config
+echo "ClientAliveCountMax 120" >> /etc/ssh/sshd_config
+systemctl restart sshd
+echo "SSH keepalive configured: 60s interval, 120 retries = 2 hours max idle"
+
 echo "Userdata script completed at $(date)"
