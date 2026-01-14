@@ -194,18 +194,18 @@ locals {
   # *********************************************************************************************************
   cloudfront_nginx_compiled_sans_prod = [
     "courts.gov.uk",
-    "www.courts.gov.uk",
     "dca.gov.uk",
-    "www.dca.gov.uk",
     "familyjusticecouncil.org.uk",
-    "www.familyjusticecouncil.org.uk",
     "magistrates.org.uk",
-    "www.magistrates.org.uk",
     "pensionsappealtribunals.gov.uk",
-    "www.pensionsappealtribunals.gov.uk",
     "tribunals-review.org.uk",
+    "xhibit.gov.uk",
+    "www.courts.gov.uk",
+    "www.dca.gov.uk",
+    "www.familyjusticecouncil.org.uk",
+    "www.magistrates.org.uk",
+    "www.pensionsappealtribunals.gov.uk",
     "www.tribunals-review.org.uk",
-    "xhibit.gov.uk"
     "www.xhibit.gov.uk"
   ]
 
