@@ -328,7 +328,6 @@ class NotificationService:
                 ]
             }
 
-        # ---------------- S3 Event (updated format, with seconds) ----------------
         elif type == "S3 Event":
             records = alarmdetails.get("Records", [])
             record = records[0] if records else {}
@@ -344,7 +343,7 @@ class NotificationService:
             user_identity = record.get("userIdentity", {})
             principal_id = user_identity.get("principalId", "Unknown Principal")
 
-            header = f":white_tick: S3 Object Uploaded on bucket {bucket_name}."
+            header = f":white_check_mark: S3 Object Uploaded on bucket {bucket_name}."
 
             payload = {
                 "blocks": [
