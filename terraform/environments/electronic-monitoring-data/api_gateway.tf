@@ -26,7 +26,7 @@ module "get_zipped_file_api_api" {
   api_version = "0.1.1"
 }
 
-module "ears_sars_api" {
+module "ears_sars_api_api" {
   source          = "./modules/api_step_function"
   api_name        = "ears_sars_api"
   api_description = "Ears and Sars API"
