@@ -328,7 +328,6 @@ class NotificationService:
                 ]
             }
 
-        # ---------------- S3 Event (updated format, with seconds) ----------------
         elif type == "S3 Event":
             records = alarmdetails.get("Records", [])
             record = records[0] if records else {}
