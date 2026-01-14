@@ -343,7 +343,7 @@ class NotificationService:
             user_identity = record.get("userIdentity", {})
             principal_id = user_identity.get("principalId", "Unknown Principal")
 
-            header = f":white_tick: S3 Object Uploaded on bucket {bucket_name}."
+            header = f":inbox_tray: S3 Object Uploaded on bucket {bucket_name}."
 
             payload = {
                 "blocks": [
