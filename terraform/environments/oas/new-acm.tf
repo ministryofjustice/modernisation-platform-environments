@@ -41,23 +41,36 @@ resource "aws_acm_certificate" "external" {
 }
 
 # Route53 DNS records for certificate validation
-# Test validates in laa-test zone, preproduction validates in parent zone
-resource "aws_route53_record" "external_validation" {
-  for_each = local.domain_types
-  provider = local.environment == "test" ? aws.core-vpc : aws.core-network-services
+# Test environment - validates in laa-test zone
+resource "aws_route53_record" "external_validation_test" {
+  for_each = local.environment == "test" ? local.domain_types : {}
+  provider = aws.core-vpc
 
   allow_overwrite = true
   name            = each.value.name
   records         = [each.value.record]
   ttl             = 60
   type            = each.value.type
-  zone_id         = local.environment == "test" ? data.aws_route53_zone.external.zone_id : data.aws_route53_zone.modernisation_platform.zone_id
+  zone_id         = data.aws_route53_zone.external.zone_id
+}
+
+# Preproduction environment - validates in parent zone
+resource "aws_route53_record" "external_validation_preprod" {
+  for_each = local.environment == "preproduction" ? local.domain_types : {}
+  provider = aws.core-network-services
+
+  allow_overwrite = true
+  name            = each.value.name
+  records         = [each.value.record]
+  ttl             = 60
+  type            = each.value.type
+  zone_id         = data.aws_route53_zone.modernisation_platform.zone_id
 }
 
 # ACM Certificate Validation
 resource "aws_acm_certificate_validation" "external" {
   count = contains(["test", "preproduction"], local.environment) ? 1 : 0
 
-  certificate_arn         = aws_acm_certificate.external[0].arn
-  validation_record_fqdns = values(aws_route53_record.external_validation)[*].fqdn
+  certificate_arn = aws_acm_certificate.external[0].arn
+  validation_record_fqdns = local.environment == "test" ? values(aws_route53_record.external_validation_test)[*].fqdn : values(aws_route53_record.external_validation_preprod)[*].fqdn
 }
