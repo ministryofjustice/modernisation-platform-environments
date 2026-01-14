@@ -12,15 +12,22 @@ locals {
   } : {}
 }
 
+# Data source for parent zone (for certificate validation)
+data "aws_route53_zone" "modernisation_platform" {
+  provider     = aws.core-network-services
+  name         = "modernisation-platform.service.justice.gov.uk"
+  private_zone = false
+}
+
 ##############################################
 ### ACM CERTIFICATE FOR LOAD BALANCER ###
 ##############################################
 # ACM Public Certificate for test and preproduction environments
-# Using wildcard certificate to stay under 64 character limit
+# Using wildcard on parent domain (48 chars) to cover laa-preproduction subdomain
 resource "aws_acm_certificate" "external" {
   count = contains(["test", "preproduction"], local.environment) ? 1 : 0
 
-  domain_name       = "*.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  domain_name       = "*.modernisation-platform.service.justice.gov.uk"
   validation_method = "DNS"
 
   tags = merge(
@@ -36,14 +43,14 @@ resource "aws_acm_certificate" "external" {
 # Route53 DNS records for certificate validation
 resource "aws_route53_record" "external_validation" {
   for_each = local.domain_types
-  provider = aws.core-vpc
+  provider = aws.core-network-services
 
   allow_overwrite = true
   name            = each.value.name
   records         = [each.value.record]
   ttl             = 60
   type            = each.value.type
-  zone_id         = data.aws_route53_zone.external.zone_id
+  zone_id         = data.aws_route53_zone.modernisation_platform.zone_id
 }
 
 # ACM Certificate Validation
