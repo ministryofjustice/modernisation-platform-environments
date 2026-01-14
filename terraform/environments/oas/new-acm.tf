@@ -16,10 +16,11 @@ locals {
 ### ACM CERTIFICATE FOR LOAD BALANCER ###
 ##############################################
 # ACM Public Certificate for test and preproduction environments
+# Using wildcard certificate to stay under 64 character limit
 resource "aws_acm_certificate" "external" {
   count = contains(["test", "preproduction"], local.environment) ? 1 : 0
 
-  domain_name       = "${local.application_name}-lb.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  domain_name       = "*.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   validation_method = "DNS"
 
   tags = merge(
