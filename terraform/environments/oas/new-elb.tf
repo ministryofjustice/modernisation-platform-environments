@@ -15,10 +15,8 @@ locals {
       description     = "Loadbalancer ingress rule from CloudFront"
       from_port       = 443
       to_port         = 443
-      protocol        = "tcp"
-      cidr_blocks     = []
+      protocol        = "HTTPS"
       prefix_list_ids = [data.aws_ec2_managed_prefix_list.cloudfront.id]
-      security_groups = []
     }
   }
 
