@@ -25,15 +25,15 @@ locals {
         aws_cloudwatch_metrics = "0.0.11"
         aws_for_fluent_bit     = "0.1.35"
         cert_manager           = "v1.19.2"
-        cluster_autoscaler     = "9.54.0"
-        external_dns           = "1.19.0"
-        external_secrets       = "1.1.1"
+        cluster_autoscaler     = "9.54.1"
+        external_dns           = "1.20.0"
+        external_secrets       = "1.2.1"
         ingress_nginx          = "4.14.1"
-        karpenter              = "1.8.3"
-        keda                   = "2.18.2"
-        kube_prometheus_stack  = "80.4.2"
-        kyverno                = "3.6.1"
-        velero                 = "11.2.0"
+        karpenter              = "1.8.4"
+        keda                   = "2.18.3"
+        kube_prometheus_stack  = "80.14.2"
+        kyverno                = "3.6.2"
+        velero                 = "11.3.2"
       }
 
       /* Data Engineering Airflow */
