@@ -30,7 +30,7 @@ resource "aws_acm_certificate" "http_cloudfront_nginx_compiled" {
 # -------------------------------------------------
 # 2. OUTPUT: DNS Validation Records
 # -------------------------------------------------
-output "cert_validation_records" {
+output "cert_validation_compiled_records" {
   description = <<EOF
 Give these to the external AWS account admins.
 They must create **CNAME** records in their Route 53 zone.
