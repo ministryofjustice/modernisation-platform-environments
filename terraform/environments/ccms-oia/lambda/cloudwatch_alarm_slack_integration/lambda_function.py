@@ -205,10 +205,6 @@ class NotificationService:
             payload = {
                 "blocks": [
                     {
-                        "type": "header",
-                        "text": {"type": "plain_text", "text": f"{header}"}
-                    },
-                    {
                         "type": "section",
                         "text": {"type": "plain_text", "text": f"Finding type - {finding_type}"}
                     },
