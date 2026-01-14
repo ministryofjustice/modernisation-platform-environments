@@ -328,7 +328,7 @@ class NotificationService:
                 ]
             }
 
-        # ---------------- S3 Event (updated format) ----------------
+        # ---------------- S3 Event (updated format, with seconds) ----------------
         elif type == "S3 Event":
             records = alarmdetails.get("Records", [])
             record = records[0] if records else {}
@@ -344,7 +344,6 @@ class NotificationService:
             user_identity = record.get("userIdentity", {})
             principal_id = user_identity.get("principalId", "Unknown Principal")
 
-            # Header and details in Rajinder's format
             header = f":white_tick: S3 Object Uploaded on bucket {bucket_name}."
 
             payload = {
@@ -516,10 +515,8 @@ def lambda_handler(event, context):
                     dt = datetime.strptime(timestamp_str, "%Y-%m-%dT%H:%M:%S.%fZ")
                 except ValueError:
                     dt = datetime.strptime(timestamp_str, "%Y-%m-%dT%H:%M:%SZ")
-                # Match Rajinder style: "13 Jan 2026 16:09 UTC"
-                formatted = dt.strftime("%d %b %Y %H:%M UTC")
+                formatted = dt.strftime("%d %b %Y %H:%M:%S UTC")
 
-            # NEW: use dedicated S3 webhook
             channelconfig = config.slack_channel_webhook_s3
             alarmnotifiction = "S3 Object Event Notification"
             type = "S3 Event"
