@@ -107,7 +107,7 @@ resource "aws_lambda_permission" "allow_http_cloudfront" {
 # Need a second resource to handle the second nginx cloudfront (which manages the _compiled domains)
 resource "aws_lambda_permission" "allow_http_cloudfront_compiled" {
   provider      = aws.us-east-1
-  statement_id  = "AllowHttpCloudFrontExecution-${aws_lambda_function.cloudfront_redirect_lambda.version}"
+  statement_id  = "AllowHttpCloudFrontExecution-cloudfron-redirect-compiled"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.cloudfront_redirect_lambda.function_name
   principal     = "edgelambda.amazonaws.com"
