@@ -31,7 +31,7 @@ module "ears_sars_api" {
   api_name        = "ears_sars_api"
   api_description = "Ears and Sars API"
   api_path        = "execute"
-  step_function   = module.get_zipped_file_api
+  step_function   = module.ears_sars_step_function
   stages = [
     {
       stage_name             = "request",
