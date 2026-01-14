@@ -4,6 +4,11 @@ serviceAccount:
     annotations:
       eks.amazonaws.com/role-arn: ${eks_role_arn}
 
+kubectl:
+  image:
+    repository: bitnamilegacy/kubectl
+    tag: "1.33.4"
+
 initContainers:
   - name: velero-plugin-for-aws
     image: velero/velero-plugin-for-aws:${velero_aws_plugin_version}

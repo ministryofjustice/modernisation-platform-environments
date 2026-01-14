@@ -188,12 +188,11 @@ module "copy_mdss_data" {
 #-----------------------------------------------------------------------------------
 
 module "clean_after_dlt_load" {
-  count                          = local.is-development ? 0 : 1
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "clean_after_dlt_load"
-  role_name                      = aws_iam_role.clean_after_dlt_load[0].name
-  role_arn                       = aws_iam_role.clean_after_dlt_load[0].arn
+  role_name                      = aws_iam_role.clean_after_dlt_load.name
+  role_arn                       = aws_iam_role.clean_after_dlt_load.arn
   handler                        = "clean_after_dlt_load.handler"
   memory_size                    = 2048
   timeout                        = 900
@@ -206,7 +205,7 @@ module "clean_after_dlt_load" {
 
   environment_variables = {
     CATALOG_ID      = data.aws_caller_identity.current.account_id
-    LAMBDA_ROLE_ARN = aws_iam_role.clean_after_dlt_load[0].arn
+    LAMBDA_ROLE_ARN = aws_iam_role.clean_after_dlt_load.arn
   }
 }
 
@@ -347,12 +346,11 @@ module "load_dms_output" {
 #-----------------------------------------------------------------------------------
 
 module "load_mdss_lambda" {
-  count                          = local.is-development ? 0 : 1
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "load_mdss"
-  role_name                      = aws_iam_role.load_mdss[0].name
-  role_arn                       = aws_iam_role.load_mdss[0].arn
+  role_name                      = aws_iam_role.load_mdss.name
+  role_arn                       = aws_iam_role.load_mdss.arn
   handler                        = "load_mdss.handler"
   memory_size                    = 10240
   timeout                        = 900
@@ -377,12 +375,11 @@ module "load_mdss_lambda" {
 #-----------------------------------------------------------------------------------
 
 module "load_fms_lambda" {
-  count                          = local.is-development ? 0 : 1
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "load_fms"
-  role_name                      = aws_iam_role.load_fms[0].name
-  role_arn                       = aws_iam_role.load_fms[0].arn
+  role_name                      = aws_iam_role.load_fms.name
+  role_arn                       = aws_iam_role.load_fms.arn
   handler                        = "load_fms.handler"
   memory_size                    = 10240
   timeout                        = 900
@@ -435,7 +432,6 @@ module "load_historic_csv" {
 #-----------------------------------------------------------------------------------
 
 module "glue_db_count_metrics" {
-  count                          = local.is-development ? 0 : 1
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "glue_db_count_metrics"
@@ -462,25 +458,45 @@ module "glue_db_count_metrics" {
 #-----------------------------------------------------------------------------------
 
 resource "aws_cloudwatch_event_rule" "glue_db_count_metrics_schedule" {
-  count               = local.is-development ? 0 : 1
   name                = "glue_db_count_metrics_schedule"
   description         = "Runs glue_db_count_metrics on a schedule to publish Glue database count"
   schedule_expression = "rate(5 minutes)"
 }
 
 resource "aws_cloudwatch_event_target" "glue_db_count_metrics_target" {
-  count = local.is-development ? 0 : 1
-  rule  = aws_cloudwatch_event_rule.glue_db_count_metrics_schedule[0].name
-  arn   = module.glue_db_count_metrics[0].lambda_function_arn
+  rule  = aws_cloudwatch_event_rule.glue_db_count_metrics_schedule.name
+  arn   = module.glue_db_count_metrics.lambda_function_arn
 }
 
 resource "aws_lambda_permission" "glue_db_count_metrics_allow_eventbridge" {
-  count         = local.is-development ? 0 : 1
   statement_id  = "AllowExecutionFromEventBridgeGlueDbCount"
   action        = "lambda:InvokeFunction"
-  function_name = module.glue_db_count_metrics[0].lambda_function_name
+  function_name = module.glue_db_count_metrics.lambda_function_name
   principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.glue_db_count_metrics_schedule[0].arn
+  source_arn    = aws_cloudwatch_event_rule.glue_db_count_metrics_schedule.arn
+}
+
+
+
+#-----------------------------------------------------------------------------------
+# BackFill Data
+#-----------------------------------------------------------------------------------
+module "data_cutback" {
+  count = local.is-development || local.is-production ? 1 : 0
+  source                  = "./modules/lambdas"
+  is_image                = true
+  function_name           = "data_cutback"
+  role_name               = aws_iam_role.data_cutback_iam_role[0].name
+  role_arn                = aws_iam_role.data_cutback_iam_role[0].arn
+  handler                 = "data_cutback.handler"
+  memory_size             = 1024
+  timeout                 = 900
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : "dev"
+
+  environment_variables = {
+    SOURCE_BUCKET = module.s3-dms-target-store-bucket.bucket.id
+  }
 }
 
 #-----------------------------------------------------------------------------------
@@ -488,12 +504,11 @@ resource "aws_lambda_permission" "glue_db_count_metrics_allow_eventbridge" {
 #-----------------------------------------------------------------------------------
 
 module "mdss_daily_failure_digest" {
-  count                          = local.is-development ? 0 : 1
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "mdss_daily_failure_digest"
-  role_name                      = aws_iam_role.mdss_daily_failure_digest[0].name
-  role_arn                       = aws_iam_role.mdss_daily_failure_digest[0].arn
+  role_name                      = aws_iam_role.mdss_daily_failure_digest.name
+  role_arn                       = aws_iam_role.mdss_daily_failure_digest.arn
   handler                        = "mdss_daily_failure_digest.handler"
   memory_size                    = 512
   timeout                        = 60
@@ -512,11 +527,35 @@ module "mdss_daily_failure_digest" {
 }
 
 #-----------------------------------------------------------------------------------
+# Copy data from test to dev or prod to preprod
+#-----------------------------------------------------------------------------------
+
+module "cross_account_copy" {
+  count                          = local.is-test || local.is-production ? 1 : 0
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "cross_account_copy"
+  role_name                      = aws_iam_role.cross_account_copy[0].name
+  role_arn                       = aws_iam_role.cross_account_copy[0].arn
+  handler                        = "cross_account_copy.handler"
+  memory_size                    = 512
+  timeout                        = 60
+  reserved_concurrent_executions = 100
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+  security_group_ids             = [aws_security_group.lambda_generic.id]
+  subnet_ids                     = data.aws_subnets.shared-public.ids
+
+  environment_variables = {
+    SECRET_ID  = module.cross_account_details[0].secret_id
+  }
+}
+
+#-----------------------------------------------------------------------------------
 # MDSS daily failure digest schedule (08:00 Europe/London) - EventBridge Scheduler
 #-----------------------------------------------------------------------------------
 
 resource "aws_iam_role" "mdss_daily_failure_digest_scheduler" {
-  count = local.is-development ? 0 : 1
   name  = "mdss_daily_failure_digest_scheduler_role"
 
   assume_role_policy = jsonencode({
@@ -532,9 +571,8 @@ resource "aws_iam_role" "mdss_daily_failure_digest_scheduler" {
 }
 
 resource "aws_iam_role_policy" "mdss_daily_failure_digest_scheduler_invoke" {
-  count = local.is-development ? 0 : 1
   name  = "mdss_daily_failure_digest_scheduler_invoke_policy"
-  role  = aws_iam_role.mdss_daily_failure_digest_scheduler[0].id
+  role  = aws_iam_role.mdss_daily_failure_digest_scheduler.id
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -542,14 +580,13 @@ resource "aws_iam_role_policy" "mdss_daily_failure_digest_scheduler_invoke" {
       {
         Effect   = "Allow"
         Action   = ["lambda:InvokeFunction"]
-        Resource = [module.mdss_daily_failure_digest[0].lambda_function_arn]
+        Resource = [module.mdss_daily_failure_digest.lambda_function_arn]
       }
     ]
   })
 }
 
 resource "aws_scheduler_schedule" "mdss_daily_failure_digest" {
-  count       = local.is-development ? 0 : 1
   name        = "mdss_daily_failure_digest_0800"
   description = "Runs mdss_daily_failure_digest daily at 08:00 Europe/London"
 
@@ -561,7 +598,7 @@ resource "aws_scheduler_schedule" "mdss_daily_failure_digest" {
   schedule_expression_timezone = "Europe/London"
 
   target {
-    arn      = module.mdss_daily_failure_digest[0].lambda_function_arn
-    role_arn = aws_iam_role.mdss_daily_failure_digest_scheduler[0].arn
+    arn      = module.mdss_daily_failure_digest.lambda_function_arn
+    role_arn = aws_iam_role.mdss_daily_failure_digest_scheduler.arn
   }
 }
