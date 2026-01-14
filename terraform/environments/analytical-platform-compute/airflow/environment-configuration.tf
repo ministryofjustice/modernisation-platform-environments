@@ -12,6 +12,7 @@ locals {
       airflow_min_workers             = 2
       airflow_schedulers              = 2
       airflow_celery_worker_autoscale = "10,2"
+      core_parallelism                = 40
     }
     test = {
       /* Route53 */
@@ -25,6 +26,7 @@ locals {
       airflow_min_workers             = 2
       airflow_schedulers              = 2
       airflow_celery_worker_autoscale = "10,2"
+      core_parallelism                = 40
     }
     production = {
       /* Route53 */
@@ -38,6 +40,7 @@ locals {
       airflow_min_workers             = 2
       airflow_schedulers              = 2
       airflow_celery_worker_autoscale = "10,2"
+      core_parallelism                = 40
     }
   }
 }
