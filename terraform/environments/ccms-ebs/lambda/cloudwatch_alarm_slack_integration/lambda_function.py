@@ -328,13 +328,10 @@ class NotificationService:
                 ]
             }
 
-        # ---------------- S3 Event ----------------
+        # ---------------- S3 Event (updated format) ----------------
         elif type == "S3 Event":
             records = alarmdetails.get("Records", [])
             record = records[0] if records else {}
-
-            region = record.get("awsRegion", "Unknown Region")
-            event_name = record.get("eventName", "Unknown Event")
 
             s3_info = record.get("s3", {})
             bucket = s3_info.get("bucket", {})
@@ -347,59 +344,27 @@ class NotificationService:
             user_identity = record.get("userIdentity", {})
             principal_id = user_identity.get("principalId", "Unknown Principal")
 
-            header = f":inbox_tray: | S3 Object Event | {region} | Bucket: {bucket_name}"
-            title = f"{event_name} on {bucket_name}"
+            # Header and details in Rajinder's format
+            header = f":white_tick: S3 Object Uploaded on bucket {bucket_name}."
 
             payload = {
                 "blocks": [
                     {
-                        "type": "header",
-                        "text": {"type": "plain_text", "text": header}
+                        "type": "section",
+                        "text": {"type": "mrkdwn", "text": header}
                     },
                     {
                         "type": "section",
                         "text": {
                             "type": "mrkdwn",
-                            "text": f"*{title}*"
+                            "text": (
+                                "*Details*\n"
+                                f" • *Object:* `s3://{bucket_name}/{object_key}`\n"
+                                f" • *Size (bytes):* {object_size} bytes\n"
+                                f" • *Principal:* {principal_id}\n"
+                                f" • *Timestamp:* {timestamp}"
+                            )
                         }
-                    },
-                    {
-                        "type": "divider"
-                    },
-                    {
-                        "type": "section",
-                        "fields": [
-                            {
-                                "type": "mrkdwn",
-                                "text": f"*Event:* {event_name}"
-                            },
-                            {
-                                "type": "mrkdwn",
-                                "text": f"*Timestamp:* {timestamp}"
-                            }
-                        ]
-                    },
-                    {
-                        "type": "section",
-                        "fields": [
-                            {
-                                "type": "mrkdwn",
-                                "text": f"*Object:* `s3://{bucket_name}/{object_key}`"
-                            },
-                            {
-                                "type": "mrkdwn",
-                                "text": f"*Size (bytes):* {object_size}"
-                            }
-                        ]
-                    },
-                    {
-                        "type": "section",
-                        "fields": [
-                            {
-                                "type": "mrkdwn",
-                                "text": f"*Principal:* {principal_id}"
-                            }
-                        ]
                     }
                 ]
             }
@@ -551,7 +516,8 @@ def lambda_handler(event, context):
                     dt = datetime.strptime(timestamp_str, "%Y-%m-%dT%H:%M:%S.%fZ")
                 except ValueError:
                     dt = datetime.strptime(timestamp_str, "%Y-%m-%dT%H:%M:%SZ")
-                formatted = dt.strftime("%a, %d %b %Y %H:%M:%S UTC")
+                # Match Rajinder style: "13 Jan 2026 16:09 UTC"
+                formatted = dt.strftime("%d %b %Y %H:%M UTC")
 
             # NEW: use dedicated S3 webhook
             channelconfig = config.slack_channel_webhook_s3
