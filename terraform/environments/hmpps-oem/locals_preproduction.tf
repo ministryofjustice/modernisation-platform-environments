@@ -137,7 +137,6 @@ locals {
             search_filter_dimension = {
               name = "type_instance"
               values = [
-                "c-lsast.preproduction.nomis.service.justice.gov.uk",
                 "c.preproduction.nomis.service.justice.gov.uk",
               ]
             }
