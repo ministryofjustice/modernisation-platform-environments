@@ -67,7 +67,7 @@ resource "aws_cloudwatch_metric_alarm" "EDWStatusCheckFailedInstance" {
   threshold           = 1
 
   dimensions = {
-    InstanceId = aws_instance.edw_db_instance.id
+    InstanceId = aws_instance.edw_db_instance[count.index].id
   }
 }
 
@@ -84,7 +84,7 @@ resource "aws_cloudwatch_metric_alarm" "EDWStatusCheckFailed" {
   threshold           = 1
 
   dimensions = {
-    InstanceId = aws_instance.edw_db_instance.id
+    InstanceId = aws_instance.edw_db_instance[count.index].id
   }
 }
 
@@ -102,7 +102,7 @@ resource "aws_cloudwatch_metric_alarm" "EDWEc2CpuUtilisationTooHigh" {
   treat_missing_data  = "breaching"
 
   dimensions = {
-    InstanceId = aws_instance.edw_db_instance.id
+    InstanceId = aws_instance.edw_db_instance[count.index].id
   }
 }
 
@@ -120,9 +120,9 @@ resource "aws_cloudwatch_metric_alarm" "EDWEc2MemoryOverThreshold" {
   treat_missing_data  = "breaching"
 
   dimensions = {
-    ImageId      = aws_instance.edw_db_instance.ami
-    InstanceId   = aws_instance.edw_db_instance.id
-    InstanceType = aws_instance.edw_db_instance.instance_type
+    ImageId      = aws_instance.edw_db_instance[count.index].ami
+    InstanceId   = aws_instance.edw_db_instance[count.index].id
+    InstanceType = aws_instance.edw_db_instance[count.index].instance_type
   }
 }
 
@@ -141,9 +141,9 @@ resource "aws_cloudwatch_metric_alarm" "EDWEbsDiskSpaceUsedOverThreshold" {
 
   dimensions = {
     path         = local.application_data.accounts[local.environment].edw_disk_path
-    InstanceId   = aws_instance.edw_db_instance.id
-    ImageId      = aws_instance.edw_db_instance.ami
-    InstanceType = aws_instance.edw_db_instance.instance_type
+    InstanceId   = aws_instance.edw_db_instance[count.index].id
+    ImageId      = aws_instance.edw_db_instance[count.index].ami
+    InstanceType = aws_instance.edw_db_instance[count.index].instance_type
     device       = local.application_data.accounts[local.environment].edw_disk_device
     fstype       = local.application_data.accounts[local.environment].edw_disk_fs_type
   }
