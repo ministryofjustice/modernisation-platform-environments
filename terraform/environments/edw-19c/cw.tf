@@ -3,6 +3,7 @@
 ##### EC2 Log Group
 
 resource "aws_cloudwatch_log_group" "EC2LogGoup" {
+  count             = local.environment == "preproduction" ? 1 : 0
   name              = "${local.application_name}-EC2"
   retention_in_days = 180
 }
@@ -10,36 +11,43 @@ resource "aws_cloudwatch_log_group" "EC2LogGoup" {
 ##### EC2 Cloudwatch Log Groups
 
 resource "aws_cloudwatch_log_group" "EDWLogGroupCfnInit" {
+  count             = local.environment == "preproduction" ? 1 : 0
   name              = "${local.application_name}-CfnInit"
   retention_in_days = 180
 }
 
 resource "aws_cloudwatch_log_group" "EDWLogGroupOracleAlerts" {
+  count             = local.environment == "preproduction" ? 1 : 0
   name              = "${local.application_name}-OracleAlerts"
   retention_in_days = 180
 }
 
 resource "aws_cloudwatch_log_group" "EDWLogGroupRman" {
+  count             = local.environment == "preproduction" ? 1 : 0
   name              = "${local.application_name}-RMan"
   retention_in_days = 180
 }
 
 resource "aws_cloudwatch_log_group" "EDWLogGroupRmanArch" {
+  count             = local.environment == "preproduction" ? 1 : 0
   name              = "${local.application_name}-RManArch"
   retention_in_days = 180
 }
 
 resource "aws_cloudwatch_log_group" "EDWLogGroupTBSFreespace" {
+  count             = local.environment == "preproduction" ? 1 : 0
   name              = "${local.application_name}-TBSFreespace"
   retention_in_days = 180
 }
 
 resource "aws_cloudwatch_log_group" "EDWLogGroupPMONstatus" {
+  count             = local.environment == "preproduction" ? 1 : 0
   name              = "${local.application_name}-PMONstatus"
   retention_in_days = 180
 }
 
 resource "aws_cloudwatch_log_group" "EDWLogGroupCDCstatus" {
+  count             = local.environment == "preproduction" ? 1 : 0
   name              = "${local.application_name}-CDCstatus"
   retention_in_days = 180
 }
@@ -47,6 +55,7 @@ resource "aws_cloudwatch_log_group" "EDWLogGroupCDCstatus" {
 ############# ALARMS & FILTERS #############
 
 resource "aws_cloudwatch_metric_alarm" "EDWStatusCheckFailedInstance" {
+  count               = local.environment == "preproduction" ? 1 : 0
   alarm_name          = "${local.application_name} | ${local.application_data.accounts[local.environment].edw_instance_descriptor} | StatusCheckFailed-Instance"
   alarm_description   = "Instance Status Check Failed"
   comparison_operator = "GreaterThanOrEqualToThreshold"
@@ -63,6 +72,7 @@ resource "aws_cloudwatch_metric_alarm" "EDWStatusCheckFailedInstance" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "EDWStatusCheckFailed" {
+  count               = local.environment == "preproduction" ? 1 : 0
   alarm_name          = "${local.application_name} | ${local.application_data.accounts[local.environment].edw_instance_descriptor} | StatusCheckFailed"
   alarm_description   = "Status Check Failed"
   comparison_operator = "GreaterThanOrEqualToThreshold"
@@ -79,6 +89,7 @@ resource "aws_cloudwatch_metric_alarm" "EDWStatusCheckFailed" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "EDWEc2CpuUtilisationTooHigh" {
+  count               = local.environment == "preproduction" ? 1 : 0
   alarm_name          = "${local.application_name} | ${local.application_data.accounts[local.environment].edw_environment} | ${local.application_data.accounts[local.environment].edw_instance_descriptor} | EC2-CPU-High-Threshold-Alarm"
   alarm_description   = "The average CPU utilization is too high"
   comparison_operator = "GreaterThanOrEqualToThreshold"
@@ -96,6 +107,7 @@ resource "aws_cloudwatch_metric_alarm" "EDWEc2CpuUtilisationTooHigh" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "EDWEc2MemoryOverThreshold" {
+  count               = local.environment == "preproduction" ? 1 : 0
   alarm_name          = "${local.application_name} | ${local.application_data.accounts[local.environment].edw_environment} | ${local.application_data.accounts[local.environment].edw_instance_descriptor} | EC2-Memory-High-Threshold-Alarm"
   alarm_description   = "Average EC2 memory usage exceeds the predefined threshold"
   comparison_operator = "GreaterThanOrEqualToThreshold"
@@ -115,6 +127,7 @@ resource "aws_cloudwatch_metric_alarm" "EDWEc2MemoryOverThreshold" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "EDWEbsDiskSpaceUsedOverThreshold" {
+  count               = local.environment == "preproduction" ? 1 : 0
   alarm_name          = "${local.application_name} | ${local.application_data.accounts[local.environment].edw_environment} | ${local.application_data.accounts[local.environment].edw_instance_descriptor} | EBS-DiskSpace-Alarm"
   alarm_description   = "EBS Volume - Disk Space is Low"
   comparison_operator = "GreaterThanOrEqualToThreshold"
@@ -142,6 +155,7 @@ resource "aws_cloudwatch_metric_alarm" "EDWEbsDiskSpaceUsedOverThreshold" {
 ############# DASHBOARDS #############
 
 resource "aws_cloudwatch_dashboard" "edw-cloudwatch-dashboard" {
+  count          = local.environment == "preproduction" ? 1 : 0
   dashboard_name = "${local.application_name}-${local.application_data.accounts[local.environment].edw_environment}-${local.application_data.accounts[local.environment].edw_instance_descriptor}-Dashboard"
 
   dashboard_body = <<EOF

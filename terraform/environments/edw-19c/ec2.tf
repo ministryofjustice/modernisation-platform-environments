@@ -20,6 +20,7 @@ EOF
 ####### IAM roles #######
 
 resource "aws_iam_role" "edw_ec2_role" {
+  count = local.environment == "preproduction" ? 1 : 0
   name = "${local.application_name}-ec2-instance-role"
   tags = merge(
     local.tags,
@@ -46,6 +47,7 @@ EOF
 ###### DB Instance Profile ########
 
 resource "aws_iam_instance_profile" "edw_ec2_instance_profile" {
+  count = local.environment == "preproduction" ? 1 : 0
   name = "${local.application_name}-S3-${local.application_data.accounts[local.environment].edw_bucket_name}-edw-RW-ec2-profile"
   role = aws_iam_role.edw_ec2_role.name
   tags = merge(
@@ -59,6 +61,7 @@ resource "aws_iam_instance_profile" "edw_ec2_instance_profile" {
 ####### DB Policy #######
 
 resource "aws_iam_policy" "edw_ec2_role_policy" {
+  count = local.environment == "preproduction" ? 1 : 0
   name = "${local.application_name}-ec2-policy2"
   path = "/"
   tags = merge(
@@ -113,11 +116,13 @@ EOF
 ####### DB Policy attachments ########
 
 resource "aws_iam_role_policy_attachment" "edw_cw_agent_policy_attachment" {
+  count      = local.environment == "preproduction" ? 1 : 0
   role       = aws_iam_role.edw_ec2_role.name
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
 }
 
 resource "aws_iam_role_policy_attachment" "edw_ec2_policy_attachments" {
+  count      = local.environment == "preproduction" ? 1 : 0
   role       = aws_iam_role.edw_ec2_role.name
   policy_arn = aws_iam_policy.edw_ec2_role_policy.arn
 }
@@ -125,11 +130,13 @@ resource "aws_iam_role_policy_attachment" "edw_ec2_policy_attachments" {
 ####### DB Instance #######
 
 resource "aws_key_pair" "edw_ec2_key" {
+  count      = local.environment == "preproduction" ? 1 : 0
   key_name   = "${local.application_name}-ssh-key"
   public_key = local.application_data.accounts[local.environment].edw_ec2_key
 }
 
 resource "aws_instance" "edw_db_instance" {
+  count                       = local.environment == "preproduction" ? 1 : 0
   ami                         = local.application_data.accounts[local.environment].edw_ec2_ami_id
   availability_zone           = "eu-west-2a"
   instance_type               = local.application_data.accounts[local.environment].edw_ec2_instance_type
@@ -168,6 +175,7 @@ resource "aws_instance" "edw_db_instance" {
 ####### DB Volumes #######
 
 resource "aws_ebs_volume" "orahomeVolume" {
+  count             = local.environment == "preproduction" ? 1 : 0
   availability_zone = "${local.application_data.accounts[local.environment].edw_region}a"
   size              = local.application_data.accounts[local.environment].edw_OrahomeVolumeSize
   encrypted         = true
@@ -180,12 +188,14 @@ resource "aws_ebs_volume" "orahomeVolume" {
 }
 
 resource "aws_volume_attachment" "orahomeVolume-attachment" {
+  count       = local.environment == "preproduction" ? 1 : 0
   device_name = "/dev/sdi"
   volume_id   = aws_ebs_volume.orahomeVolume.id
   instance_id = aws_instance.edw_db_instance.id
 }
 
 resource "aws_ebs_volume" "oratempVolume" {
+  count             = local.environment == "preproduction" ? 1 : 0
   availability_zone = "${local.application_data.accounts[local.environment].edw_region}a"
   size              = local.application_data.accounts[local.environment].edw_OratempVolumeSize
   encrypted         = true
@@ -198,12 +208,14 @@ resource "aws_ebs_volume" "oratempVolume" {
 }
 
 resource "aws_volume_attachment" "oratempVolume-attachment" {
+  count       = local.environment == "preproduction" ? 1 : 0
   device_name = "/dev/sdj"
   volume_id   = aws_ebs_volume.oratempVolume.id
   instance_id = aws_instance.edw_db_instance.id
 }
 
 resource "aws_ebs_volume" "oradataVolume" {
+  count             = local.environment == "preproduction" ? 1 : 0
   availability_zone = "${local.application_data.accounts[local.environment].edw_region}a"
   size              = local.application_data.accounts[local.environment].edw_OradataVolumeSize
   encrypted         = true
@@ -216,12 +228,14 @@ resource "aws_ebs_volume" "oradataVolume" {
 }
 
 resource "aws_volume_attachment" "oradataVolume-attachment" {
+  count       = local.environment == "preproduction" ? 1 : 0
   device_name = "/dev/sdf"
   volume_id   = aws_ebs_volume.oradataVolume.id
   instance_id = aws_instance.edw_db_instance.id
 }
 
 resource "aws_ebs_volume" "softwareVolume" {
+  count             = local.environment == "preproduction" ? 1 : 0
   availability_zone = "${local.application_data.accounts[local.environment].edw_region}a"
   size              = local.application_data.accounts[local.environment].edw_SoftwareVolumeSize
   encrypted         = true
@@ -234,12 +248,14 @@ resource "aws_ebs_volume" "softwareVolume" {
 }
 
 resource "aws_volume_attachment" "softwareVolume-attachment" {
+  count       = local.environment == "preproduction" ? 1 : 0
   device_name = "/dev/sdg"
   volume_id   = aws_ebs_volume.softwareVolume.id
   instance_id = aws_instance.edw_db_instance.id
 }
 
 resource "aws_ebs_volume" "ArchiveVolume" {
+  count             = local.environment == "preproduction" ? 1 : 0
   availability_zone = "${local.application_data.accounts[local.environment].edw_region}a"
   size              = local.application_data.accounts[local.environment].edw_ArchiveVolumeSize
   encrypted         = true
@@ -254,6 +270,7 @@ resource "aws_ebs_volume" "ArchiveVolume" {
 }
 
 resource "aws_volume_attachment" "ArchiveVolume-attachment" {
+  count       = local.environment == "preproduction" ? 1 : 0
   device_name = "/dev/sdh"
   volume_id   = aws_ebs_volume.ArchiveVolume.id
   instance_id = aws_instance.edw_db_instance.id
@@ -262,6 +279,7 @@ resource "aws_volume_attachment" "ArchiveVolume-attachment" {
 ######## DB Security Groups #######
 
 resource "aws_security_group" "edw_db_security_group" {
+  count       = local.environment == "preproduction" ? 1 : 0
   name        = "${local.application_name}-Security Group"
   description = "Security Group for DB EC2 instance"
   vpc_id      = data.aws_vpc.shared.id
@@ -273,6 +291,7 @@ resource "aws_security_group" "edw_db_security_group" {
 
 # SSH from Bastion
 resource "aws_vpc_security_group_ingress_rule" "db_bastion_ssh" {
+  count                        = local.environment == "preproduction" ? 1 : 0
   security_group_id            = aws_security_group.edw_db_security_group.id
   description                  = "SSH from the Bastion"
   referenced_security_group_id = module.bastion_linux.bastion_security_group
