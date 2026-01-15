@@ -1,7 +1,7 @@
 resource "aws_iam_role" "rds_scheduler" {
-  name = "rds-scheduler-role"
-
-  assume_role_policy = jsonencode({
+  count               = var.create_sheduler ? 1 : 0
+  name                = "rds-scheduler-role"
+  assume_role_policy  = jsonencode({
     Version = "2012-10-17"
     Statement = [{
       Effect = "Allow"
@@ -14,9 +14,9 @@ resource "aws_iam_role" "rds_scheduler" {
 }
 
 resource "aws_iam_role_policy" "rds_scheduler" {
-  role = aws_iam_role.rds_scheduler.id
-
-  policy = jsonencode({
+  count     = var.create_sheduler ? 1 : 0
+  role      = aws_iam_role.rds_scheduler.id
+  policy    = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
@@ -34,9 +34,10 @@ resource "aws_iam_role_policy" "rds_scheduler" {
 
 
 resource "aws_scheduler_schedule" "rds_start" {
+  count                        = var.create_sheduler ? 1 : 0
   name                         = "rds-start-weekdays"
   schedule_expression_timezone = "Europe/London"
-  schedule_expression          = "cron(0 7 ? * MON-FRI *)" # 07:00 UTC Mon–Fri
+  schedule_expression          = "cron(0 7 ? * MON-FRI *)"
 
   flexible_time_window {
     mode = "OFF"
@@ -54,9 +55,10 @@ resource "aws_scheduler_schedule" "rds_start" {
 
 
 resource "aws_scheduler_schedule" "rds_stop" {
+  count                        = var.create_sheduler ? 1 : 0
   name                         = "rds-stop-weekdays"
   schedule_expression_timezone = "Europe/London"
-  schedule_expression          = "cron(0 20 ? * MON-FRI *)" # 20:00 UTC Mon–Fri
+  schedule_expression          = "cron(0 20 ? * MON-FRI *)"
 
   flexible_time_window {
     mode = "OFF"
