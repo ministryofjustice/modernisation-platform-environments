@@ -103,6 +103,18 @@ resource "aws_security_group_rule" "ingress_from_lb_9500" {
   source_security_group_id = module.lb_access_logs_enabled.security_group.id
 }
 
+resource "aws_security_group_rule" "ingress_from_lb_9502" {
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+
+  type                     = "ingress"
+  security_group_id        = aws_security_group.ec2_sg[0].id
+  description              = "Allow traffic from load balancer to EC2 on port 9502"
+  from_port                = 9502
+  to_port                  = 9502
+  protocol                 = "tcp"
+  source_security_group_id = module.lb_access_logs_enabled.security_group.id
+}
+
 resource "aws_security_group_rule" "ingress_admin_workspace" {
   count = contains(["test", "preproduction"], local.environment) ? 1 : 0
 
