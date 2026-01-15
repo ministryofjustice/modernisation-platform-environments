@@ -228,7 +228,7 @@ class NotificationService:
                     },
                     {
                         "type": "section",
-                        "text": {"type": "mrkdwn", "text": f"*{title}*"}
+                        "text": {"type": "plain_text", "text": f"*Details - {title}*"}
                     },
                     {
                         "type": "divider"
