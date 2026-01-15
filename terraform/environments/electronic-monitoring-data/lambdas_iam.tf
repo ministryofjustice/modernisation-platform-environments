@@ -1342,6 +1342,7 @@ data "aws_iam_policy_document" "mdss_daily_failure_digest_policy_document" {
     sid    = "AllowUseOfAlertsKmsKey"
     effect = "Allow"
     actions = [
+      "kms:GenerateDataKey*",
       "kms:GenerateDataKey",
       "kms:Decrypt",
     ]
