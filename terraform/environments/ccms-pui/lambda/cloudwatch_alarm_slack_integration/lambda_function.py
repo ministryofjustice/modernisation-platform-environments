@@ -190,7 +190,7 @@ class NotificationService:
             region = alarmdetails.get('detail', {}).get('region', 'Unknown Region')
             account_id = alarmdetails.get('detail', {}).get('accountId', 'Unknown Account')
             header = f"{emoji} | GuardDuty Finding | {region} | Account: {account_id}"
-            title = alarmdetails.get('detail', {}).get('title', 'No Title Provided')
+            title = alarmdetails.get('detail', {}).get('description', 'No Title Provided')
             threatcount = alarmdetails.get('detail', {}).get('service', {}).get('count', 'N/A')
             firstseennofmt = alarmdetails.get('detail', {}).get('service', {}).get('eventFirstSeen', 'N/A')
             lastseennofmt = alarmdetails.get('detail', {}).get('service', {}).get('eventLastSeen', 'N/A')
