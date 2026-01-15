@@ -144,6 +144,23 @@ resource "aws_lb_target_group_attachment" "oas_analytics_attachment" {
 
 
 
+resource "aws_lb_listener" "http_listener" {
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+
+  load_balancer_arn = module.lb_access_logs_enabled.load_balancer.arn
+  port              = 80
+  protocol          = "HTTP"
+
+  default_action {
+    type = "redirect"
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
+  }
+}
+
 resource "aws_lb_listener" "https_listener" {
   #checkov:skip=CKV_AWS_103
   count = contains(["test", "preproduction"], local.environment) ? 1 : 0
