@@ -462,7 +462,7 @@ resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_test_paths" {
   metric_name         = aws_cloudwatch_log_metric_filter.soa_custom_check_test_paths.id
   statistic           = "Sum"
   namespace           = "CCMS-SOA-APP"
-  period              = "30"
+  period              = "300"
   evaluation_periods  = "5"
   threshold           = "1"
   datapoints_to_alarm = "1"
@@ -478,7 +478,7 @@ resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_server_health" {
   metric_name         = aws_cloudwatch_log_metric_filter.soa_custom_check_server_health.id
   statistic           = "Sum"
   namespace           = "CCMS-SOA-APP"
-  period              = "30"
+  period              = "300"
   evaluation_periods  = "5"
   threshold           = "1"
   datapoints_to_alarm = "1"
@@ -494,7 +494,7 @@ resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_percentage_heap_free_m
   metric_name         = aws_cloudwatch_log_metric_filter.soa_custom_check_percentage_heap_free_memory.id
   statistic           = "Sum"
   namespace           = "CCMS-SOA-APP"
-  period              = "30"
+  period              = "300"
   evaluation_periods  = "5"
   threshold           = "1"
   datapoints_to_alarm = "1"
@@ -510,7 +510,7 @@ resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_stuck_threads" {
   metric_name         = aws_cloudwatch_log_metric_filter.soa_custom_check_stuck_threads.id
   statistic           = "Sum"
   namespace           = "CCMS-SOA-APP"
-  period              = "30"
+  period              = "300"
   evaluation_periods  = "5"
   threshold           = "1"
   datapoints_to_alarm = "1"
@@ -526,7 +526,7 @@ resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_hogging_threads" {
   metric_name         = aws_cloudwatch_log_metric_filter.soa_custom_check_hogging_threads.id
   statistic           = "Sum"
   namespace           = "CCMS-SOA-APP"
-  period              = "30"
+  period              = "300"
   evaluation_periods  = "5"
   threshold           = "1"
   datapoints_to_alarm = "1"
@@ -534,8 +534,6 @@ resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_hogging_threads" {
   alarm_actions       = [aws_sns_topic.alerts.arn]
   ok_actions          = [aws_sns_topic.alerts.arn]
 }
-
-
 
 #--The below alerts have been disabled as we do not understand their benefit and if the errors being thrown are actually errors
 #--or just part of the regular operation of the CCMS application
