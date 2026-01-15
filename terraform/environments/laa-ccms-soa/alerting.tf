@@ -462,7 +462,7 @@ resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_test_paths" {
   metric_name         = aws_cloudwatch_log_metric_filter.soa_custom_check_test_paths.id
   statistic           = "Sum"
   namespace           = "CCMS-SOA-APP"
-  period              = "100"
+  period              = "30"
   evaluation_periods  = "5"
   threshold           = "1"
   datapoints_to_alarm = "1"
