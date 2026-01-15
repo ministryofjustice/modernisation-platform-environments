@@ -248,6 +248,7 @@ resource "aws_secretsmanager_secret" "redshift" {
       dpr-resource-type = "Secrets"
       dpr-jira          = "DPR-XXXX"
       dpr-service       = "redshift"
+      Redshift          = "True" # Required for Redshift Query Editor
     }
   )
 }
@@ -475,7 +476,7 @@ resource "aws_secretsmanager_secret" "dbt_secrets" {
 
   lifecycle {
     ignore_changes = [tags]
-  }  
+  }
 }
 
 # AWS Secrets Manager for Operational DB Credentials

@@ -20,9 +20,9 @@ locals {
       ]
 
       /* Image Versions */
-      scan_image_version     = "0.2.1"
-      transfer_image_version = "0.0.23"
-      notify_image_version   = "0.0.24"
+      scan_image_version     = "0.2.2"
+      transfer_image_version = "0.0.24"
+      notify_image_version   = "0.0.25"
 
       /* Target Buckets */
       target_buckets = [
@@ -56,7 +56,7 @@ locals {
       transfer_server_sftp_users_with_egress = {
         "essex-police" = {
           ssh_key               = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCpNyYzfbqmy4QkViLRyASRqxrEK7G34o3Bc6Jdp8vK555/oBuAUXUxfavtenZnxuxdxsrBYBSCBFcU4+igeXN/nN2kVfaUlt1xBZBCRUaajinhmt+3CLbr8bWmHR/5vL/DhxHH+j/+gDH5A244XN/ybZQvCGX/ilgKiae8s0tiOZD2hmX0fhRTCohQFG/DIu06gqKIyxUQoHBoBJxjzaDvjqioJgqmD9893DN+Gx1KozmaQWHM+0f7iK1UFp8BkdeFBVkj8TOfx60o/EmAjWQ/U+WSHblaXo0nI+LQKZYkW52uTEnfSkbkyvs/vj8E8+vagwYi0noyTVmb5qReSuk1kyuqEP2ycKIaWKt+Z4LnwxHm7KO51SMMeBgpiFHaUTQWXZHYuU2aXVfFIgJkCtHdEjG7Qe2P8K5XU5rG+CrQ/Y9PxPrKQHk+2nox9dLfCWo2Eho1N85z9/rA7A0oNwsHkjWAl3k87lWdpg7y3VNLzqsMNF4M4HjpQV60MH73dUU= essex-police@kpvmshift04app.netr.ecis.police.uk"
-          cidr_blocks           = ["194.74.29.178/32"]
+          cidr_blocks           = ["194.74.29.178/32", "151.186.181.132/32", "151.186.181.195/32"]
           egress_bucket         = module.bold_egress_bucket.s3_bucket_id
           egress_bucket_kms_key = module.s3_bold_egress_kms.key_arn
         }
@@ -84,9 +84,9 @@ locals {
       ]
 
       /* Image Versions */
-      scan_image_version     = "0.2.1"
-      transfer_image_version = "0.0.23"
-      notify_image_version   = "0.0.24"
+      scan_image_version     = "0.2.2"
+      transfer_image_version = "0.0.24"
+      notify_image_version   = "0.0.25"
 
       /* Target Buckets */
       target_buckets = [
@@ -131,7 +131,7 @@ locals {
           cidr_blocks = ["51.140.183.67/32"]
         }
         "sscl-epm" = {
-          ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAgEAwR+f0bWWgM4c14HUgk5gFhy8vu2Jv3y7sOiUa0trgEt4ZVOqs2yueRoEtOj3aQF9dHzYkGmZ6ElaUZtg5z/6p7yzNfjZ/eYcDo7Wkz8rclhvUu/Qz2rR9z2KzYVsCW2eeY6EwS4GbddXc+5bb76ETCCRWuXIKbsEcMGEFuixdo70JDuvxm4jEaqNIC6pswTTOzcP1a8mZp89z7ahZGS1p71owjUsUUOxl+bu4mZ5PdAOc27Hlqiaguc8ytKIiQAWImRxg1OSKs3Ux3CA2ze74K2PWCTiEubT29fZIwkF7tSckhQsnItV+ix9+rcv4Nt8gnWSknNYubxoxi9eT2Somq6LbwaY+MShliHlm9XMnxerqqCruSHk0AZZPhE8QCO8lboMIFOBxlEuG6tgZV4Uob2BAMaEhHFDrFG4MAAKR5vO3dPVR4ANjRsJzb96cOZVb+oLprTfY6JkjyJM3PhdAgZtUVbshdTDizHTbyNqu0LU4DTcY5JtPn1wm5LR2PoLudKwxxb2CUNAaZS1TklOcy7RinPuVg49Rg2HQS+7wyIK9KrFrkNNwARPW4y5FgQv5dov+KAiAm7+xwcga5Fksp25khDuzStMSrE2J3ZOyN0c7TzXiQb7sFleGN10vVmOuzLWIWjUvkRGthBRwLiOC54AHcXXm6SP92GX0XYQTb8="
+          ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAgEAxpUtdJvUtfsqGm0+haTq9Jjx8TSaEtESUXaefwBRXrAx6o53ZgbMM7Eq083ziBGriVh0lBsCjvU9XJg4HP68MLm0dOgZd1jooEL3jufn8AijIIUKF9pftdkMBd2fq2r7TO+XWsrYvs6SFryDj/h9jViWapUhTUk36GALYlk1JOMI4Kh/bkC/cj4cNjFZG5+F4+WgI67J4I3/ItOjNDAsTfVHBhK86w3rcy3n3CynGqfLzCEt0aGdBuDk+gntHBoLpMkTjKmG/nMwNqpeR7WlFUu/GyWhSc6Q1yljBVjNSVt7ktfd2fFZz/FWvAMJ/uIJhZaP0ARS+Wk0dbXYpgIxEjtIUxSJLjlkNfTbETgjzcJS27GPAc8DDHkFpNS/uYQ7PEYJjakbtgzHflS7eeUvWfQjCL/Ie2EHlAi853iKOeb74scdJhm6gl1YM6Q1a+ZhSF+7bSeScnxhwoqrJrvOI0LuvDA/zrlWFUUI0Wudip1mEyECCt7KCUz6pUT1W3sgJ1wBi84VxZM+emhU7MR7hd8avslrRdsUDQgVBjfpb0NToSnAbbtY6Y/8wI6r8/1nmXZ1YuNzmgumk3+0nF9YAiSXvjMK5ioxv+BHsuoFU40LaH0xL0sNe01U5scoK8vYsI0KhjnscsRMV9pUScgVxh3WMm8DKbjytl0lPqyO1dk="
           cidr_blocks = ["51.140.104.41/32"]
         }
         "property-concept" = {
@@ -142,7 +142,7 @@ locals {
       transfer_server_sftp_users_with_egress = {
         "essex-police" = {
           ssh_key               = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCpNyYzfbqmy4QkViLRyASRqxrEK7G34o3Bc6Jdp8vK555/oBuAUXUxfavtenZnxuxdxsrBYBSCBFcU4+igeXN/nN2kVfaUlt1xBZBCRUaajinhmt+3CLbr8bWmHR/5vL/DhxHH+j/+gDH5A244XN/ybZQvCGX/ilgKiae8s0tiOZD2hmX0fhRTCohQFG/DIu06gqKIyxUQoHBoBJxjzaDvjqioJgqmD9893DN+Gx1KozmaQWHM+0f7iK1UFp8BkdeFBVkj8TOfx60o/EmAjWQ/U+WSHblaXo0nI+LQKZYkW52uTEnfSkbkyvs/vj8E8+vagwYi0noyTVmb5qReSuk1kyuqEP2ycKIaWKt+Z4LnwxHm7KO51SMMeBgpiFHaUTQWXZHYuU2aXVfFIgJkCtHdEjG7Qe2P8K5XU5rG+CrQ/Y9PxPrKQHk+2nox9dLfCWo2Eho1N85z9/rA7A0oNwsHkjWAl3k87lWdpg7y3VNLzqsMNF4M4HjpQV60MH73dUU= essex-police@kpvmshift04app.netr.ecis.police.uk"
-          cidr_blocks           = ["194.74.29.178/32"]
+          cidr_blocks           = ["194.74.29.178/32", "151.186.181.132/32", "151.186.181.195/32"]
           egress_bucket         = module.bold_egress_bucket.s3_bucket_id
           egress_bucket_kms_key = module.s3_bold_egress_kms.key_arn
         }

@@ -17,7 +17,7 @@ resource "aws_security_group_rule" "ing_ssh_workspaces" {
   count             = local.is_development ? 1 : 0
   type              = "ingress"
   description       = "SSH from WorkSpaces subnets"
-  security_group_id = aws_security_group.ssogen_sg[0].id
+  security_group_id = aws_security_group.ssogen_sg[count.index].id
   protocol          = "tcp"
   from_port         = 22
   to_port           = 22
@@ -104,21 +104,21 @@ resource "aws_security_group_rule" "ing_7777_workspaces_nat" {
 ############################################
 # INGRESS — OHS 4443
 ############################################
-resource "aws_security_group_rule" "ing_4443_workspaces_private" {
-  count             = local.is_development ? 1 : 0
-  type              = "ingress"
-  description       = "OHS 4443 from WorkSpaces subnets (private)"
-  security_group_id = aws_security_group.ssogen_sg[0].id
-  protocol          = "tcp"
-  from_port         = 4443
-  to_port           = 4443
-  cidr_blocks = [
-    data.aws_vpc.shared.cidr_block,
-    local.application_data.accounts[local.environment].lz_aws_subnet_env,
-    local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_subnet_env,
-    local.application_data.accounts[local.environment].lz_aws_workspace_prod_subnet_env,
-  ]
-}
+# resource "aws_security_group_rule" "ing_4443_workspaces_private" {
+#   count             = local.is_development ? 1 : 0
+#   type              = "ingress"
+#   description       = "OHS 4443 from WorkSpaces subnets (private)"
+#   security_group_id = aws_security_group.ssogen_sg[0].id
+#   protocol          = "tcp"
+#   from_port         = 4443
+#   to_port           = 4443
+#   cidr_blocks = [
+#     data.aws_vpc.shared.cidr_block,
+#     local.application_data.accounts[local.environment].lz_aws_subnet_env,
+#     local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_subnet_env,
+#     local.application_data.accounts[local.environment].lz_aws_workspace_prod_subnet_env,
+#   ]
+# }
 
 resource "aws_security_group_rule" "ing_4443_workspaces_nat" {
   count             = local.is_development ? 1 : 0
@@ -259,4 +259,18 @@ resource "aws_security_group_rule" "eg_icmp_vpc_workspaces" {
     local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_subnet_env,
     local.application_data.accounts[local.environment].lz_aws_workspace_prod_subnet_env,
   ]
+}
+
+#########################################
+# SSOGEN Security Group — Allow inbound 4443 from ALB
+#########################################
+
+resource "aws_vpc_security_group_ingress_rule" "ing_4443_from_alb" {
+  count                        = local.is_development ? 1 : 0
+  security_group_id            = aws_security_group.ssogen_sg[0].id
+  description                  = "Allow inbound HTTPS (4443) from SSOGEN internal ALB"
+  from_port                    = 4443
+  to_port                      = 4443
+  ip_protocol                  = "tcp"
+  referenced_security_group_id = aws_security_group.sg_ssogen_internal_alb[count.index].id
 }

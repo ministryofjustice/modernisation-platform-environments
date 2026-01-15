@@ -155,6 +155,22 @@ resource "aws_security_group" "internal_sg" {
   }
 
   ingress {
+    from_port   = 9114
+    to_port     = 9114
+    protocol    = "tcp"
+    cidr_blocks = ["10.27.144.0/24"]
+    description = "Pre-Prod YJSM to CUG Junipers port 9114"
+  }
+
+  ingress {
+    from_port   = 9114
+    to_port     = 9114
+    protocol    = "tcp"
+    cidr_blocks = ["10.27.152.0/24"]
+    description = "Prod YJSM to CUG Junipers port 9114"
+  }
+
+  ingress {
     from_port   = 8080
     to_port     = 8090
     protocol    = "tcp"

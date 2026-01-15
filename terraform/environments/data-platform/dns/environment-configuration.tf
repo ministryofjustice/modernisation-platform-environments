@@ -3,8 +3,8 @@ locals {
   environment_configurations = {
     development = {
       route53_zone_name = "development.data-platform.service.justice.gov.uk"
-      route53_records = [
-        {
+      route53_records = {
+        llm-gateway-ns = {
           /* 
             Delegate llm-gateway to Cloud Platform 
             https://github.com/ministryofjustice/cloud-platform-environments/blob/main/namespaces/live.cloud-platform.service.justice.gov.uk/data-platform-llm-gateway-development/resources/route53.tf
@@ -19,21 +19,21 @@ locals {
             "ns-885.awsdns-46.net."
           ]
         }
-      ]
+      }
     }
     test = {
       route53_zone_name = "test.data-platform.service.justice.gov.uk"
-      route53_records   = []
+      route53_records   = {}
     }
     preproduction = {
       route53_zone_name = "preproduction.data-platform.service.justice.gov.uk"
-      route53_records   = []
+      route53_records   = {}
     }
     production = {
       route53_zone_name = "data-platform.service.justice.gov.uk"
-      route53_records = [
+      route53_records = {
         /* Zone Delegation */
-        {
+        development-ns = {
           type = "NS"
           name = "development"
           ttl  = 86400
@@ -44,7 +44,7 @@ locals {
             "ns-1012.awsdns-62.net."
           ]
         },
-        {
+        preproduction-ns = {
           type = "NS"
           name = "preproduction"
           ttl  = 86400
@@ -55,7 +55,7 @@ locals {
             "ns-182.awsdns-22.com."
           ]
         },
-        {
+        test-ns = {
           type = "NS"
           name = "test"
           ttl  = 86400
@@ -65,8 +65,21 @@ locals {
             "ns-1599.awsdns-07.co.uk.",
             "ns-674.awsdns-20.net."
           ]
+        },
+        /* GitHub Pages */
+        github-pages-challenge-txt = {
+          type    = "TXT"
+          name    = "_github-pages-challenge-ministryofjustice.user-guide"
+          ttl     = 300
+          records = ["8318341c928cb03ff156af46862430"]
+        },
+        github-pages-cname = {
+          type    = "CNAME"
+          name    = "user-guide"
+          ttl     = 300
+          records = ["ministryofjustice.github.io."]
         }
-      ]
+      }
     }
   }
 }

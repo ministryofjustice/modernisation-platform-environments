@@ -1,8 +1,6 @@
-#-----------------------------------------------------------------------------
-# Database
-#-----------------------------------------------------------------------------
-
+# trivy:ignore:AVD-AWS-0080
 resource "aws_db_instance" "database" {
+  # checkov:skip=CKV_AWS_16: SQL Server engine/version here does not support storage encryption
   allocated_storage         = local.application_data.accounts[local.environment].db_allocated_storage
   storage_type              = "gp2"
   engine                    = "sqlserver-web"

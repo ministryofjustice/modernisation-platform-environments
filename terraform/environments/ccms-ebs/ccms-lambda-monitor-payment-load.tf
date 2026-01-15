@@ -28,43 +28,56 @@ resource "aws_iam_role_policy" "lambda_payment_load_monitor_policy" {
       {
         Effect   = "Allow"
         Action   = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"]
-        Resource = "arn:aws:logs:*:*:*"
+        Resource = "arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${aws_lambda_function.lambda_payment_load_monitor.function_name}:*"
+
       },
       {
-        Effect   = "Allow"
-        Action   = ["sns:Publish"]
-        Resource = [aws_sns_topic.payment_load_notifications.arn]
+        Action : [
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:DescribeSecret",
+          "secretsmanager:ListSecretVersionIds"
+        ],
+        Effect   = "Allow",
+        Resource = [aws_secretsmanager_secret.ebs_cw_alerts_secrets.arn]
       }
     ]
   })
 }
 
-resource "aws_sns_topic" "payment_load_notifications" {
-  name = "${local.application_name}-${local.environment}-payment-load-notifications"
-  tags = merge(local.tags, {
-    Name = "${local.application_name}-${local.environment}-payment-load-notifications"
-  })
+# Lambda Layer -> requirements.txt for layer function has been generated following process in the link but it is same as 
+# what has been used for edrms docs exception, also requirements.txt has been added. The zip file for layered function
+# have been added in s3 bucket manually. https://dsdmoj.atlassian.net/wiki/spaces/LDD/pages/5975606239/Build+Layered+Function+for+Lambda
+
+resource "aws_lambda_layer_version" "payment_load_monitor_layer" {
+  layer_name               = "${local.application_name}-${local.environment}-payment-load-monitor-layer"
+  s3_key                   = "lambda_delivery/payment_load_monitor_layer/layerV1.zip"
+  s3_bucket                = aws_s3_bucket.ccms_ebs_shared.bucket
+  compatible_runtimes      = ["python3.13"]
+  compatible_architectures = ["x86_64"]
+  description              = "Lambda Layer for ${local.application_name} payment load monitor"
 }
 
-resource "aws_sns_topic_subscription" "payment_load_notofications_email" {
-  topic_arn = aws_sns_topic.payment_load_notifications.arn
-  protocol  = "email"
-  endpoint  = local.application_data.accounts[local.environment].payment_load_monitor_email
+
+data "archive_file" "lambda_payment_zip" {
+  type        = "zip"
+  source_dir  = "${path.module}/lambda/payment_load_monitor"
+  output_path = "${path.module}/lambda/payment_load_monitor.zip"
 }
 
 resource "aws_lambda_function" "lambda_payment_load_monitor" {
-  filename         = "./lambda/payment_load_monitor.zip"
-  source_code_hash = filebase64sha256("./lambda/payment_load_monitor.zip")
+  filename         = data.archive_file.lambda_payment_zip.output_path
+  source_code_hash = base64sha256(join("", local.lambda_payment_source_hashes))
   function_name    = "${local.application_name}-${local.environment}-payment-load-monitor"
   role             = aws_iam_role.lambda_payment_load_monitor_role.arn
   handler          = "lambda_function.lambda_handler"
+  layers           = [aws_lambda_layer_version.payment_load_monitor_layer.arn]
   runtime          = "python3.13"
   timeout          = 30
   publish          = true
 
   environment {
     variables = {
-      SNS_TOPIC_ARN = aws_sns_topic.payment_load_notifications.arn
+      SECRET_NAME = aws_secretsmanager_secret.ebs_cw_alerts_secrets.name
     }
   }
 
@@ -91,14 +104,4 @@ resource "aws_lambda_permission" "allow_cloudwatch_logs_invoke" {
   function_name = aws_lambda_function.lambda_payment_load_monitor.function_name
   principal     = "logs.amazonaws.com"
   source_arn    = "arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${local.application_name}-${local.environment}-payment-load:*"
-}
-
-output "sns_topic_arn_payment_load_monitor" {
-  description = "ARN of the SNS topic for Payment Load monitor"
-  value       = aws_sns_topic.payment_load_notifications.arn
-}
-
-output "lambda_function_arn_lambda_payment_load_monitor" {
-  description = "ARN of the Payment Load monitor Lambda function"
-  value       = aws_lambda_function.lambda_payment_load_monitor.arn
 }

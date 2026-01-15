@@ -35,15 +35,21 @@ variable "bws_config" {
   type = any
 }
 
+variable "boe_efs_config" {
+  type    = any
+  default = null
+}
+
 variable "dis_config" {
   description = "Configuration for DIS instances"
   type = object({
     instance_count           = number
     ami_name                 = string
+    computer_name            = string
     ebs_volumes              = any
     ebs_volumes_config       = any
     instance_config          = any
-    branch                   = optional(string, "main")
+    powershell_branch        = optional(string, "main")
     cloudwatch_metric_alarms = optional(any, null)
   })
   default = null
@@ -114,11 +120,6 @@ variable "pagerduty_integration_key" {
   description = "PagerDuty integration key"
   type        = string
   default     = null
-}
-
-variable "domain_join_ports" {
-  description = "Ports required for domain join"
-  type        = any
 }
 
 variable "lb_config" {

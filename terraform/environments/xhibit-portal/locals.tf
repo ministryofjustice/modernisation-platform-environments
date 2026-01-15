@@ -41,4 +41,7 @@ locals {
   }
   only_in_production = local.only_in_production_mapping[local.environment]
 
+  # Environment-specific CIDRs from application_variables.json
+  environment_cidrs = local.application_data != null ? local.application_data.accounts[local.environment].cidr_blocks : []
+
 }

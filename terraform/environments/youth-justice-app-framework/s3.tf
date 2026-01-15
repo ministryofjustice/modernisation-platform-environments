@@ -35,6 +35,7 @@ module "s3" {
   transfer_bucket_name = ["bands", "bedunlock", "cmm", "cms", "incident", "mis", "reporting", "yjsm-artefact", "yjsm", "transfer",
   "historical-infrastructure", "historical-apps"]
 
+
   allow_replication = local.application_data.accounts[local.environment].allow_s3_replication
   s3_source_account = local.application_data.accounts[local.environment].source_account
 
@@ -143,3 +144,13 @@ module "s3-certs" {
 }
 
 
+resource "aws_s3_bucket_cors_configuration" "cms" {
+  bucket = module.s3.aws_s3_bucket_id["cms"].id # only cms
+
+  cors_rule {
+    allowed_headers = ["*"]
+    allowed_methods = ["GET"]
+    allowed_origins = ["https://yjaf.yjbservices.yjb.gov.uk"]
+    expose_headers  = []
+  }
+}

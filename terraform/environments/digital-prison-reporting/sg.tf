@@ -19,12 +19,12 @@ resource "aws_security_group" "lambda_generic" {
   tags = merge(
     local.all_tags,
     {
-      dpr-resource-type = "sg_group"
-      dpr-name          = "${local.generic_lambda}-sg"
-      dpr-is-service-bundle  = true
-      dpr-domain          = "Common"
-      dpr-domain-category = "Common"
-      dpr-jira          = "DPR2-XXXX"
+      dpr-resource-type     = "sg_group"
+      dpr-name              = "${local.generic_lambda}-sg"
+      dpr-is-service-bundle = true
+      dpr-domain            = "Common"
+      dpr-domain-category   = "Common"
+      dpr-jira              = "DPR2-XXXX"
     }
   )
 }

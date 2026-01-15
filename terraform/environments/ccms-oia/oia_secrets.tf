@@ -10,8 +10,10 @@ resource "aws_secretsmanager_secret" "oia_secrets" {
 resource "aws_secretsmanager_secret_version" "oia_secrets" {
   secret_id = aws_secretsmanager_secret.oia_secrets.id
   secret_string = jsonencode({
-    "guardduty_slack_channel_id"  = "",
-    "cloudwatch_slack_channel_id" = ""
+    "guardduty_slack_channel_id"      = "",
+    "cloudwatch_slack_channel_id"     = "",
+    "slack_channel_webhook"           = "",
+    "slack_channel_webhook_guardduty" = ""
   })
 
   lifecycle {
@@ -24,3 +26,13 @@ resource "aws_secretsmanager_secret_version" "oia_secrets" {
 data "aws_secretsmanager_secret_version" "oia_secrets" {
   secret_id = aws_secretsmanager_secret.oia_secrets.id
 }
+
+# # IP Secrets
+# resource "aws_secretsmanager_secret" "ip_secrets" {
+#   name        = "${local.application_name}-ip-secrets"
+#   description = "IP Address List Secrets"
+# }
+
+# data "aws_secretsmanager_secret_version" "ip_secrets" {
+#   secret_id = aws_secretsmanager_secret.ip_secrets.id
+# }

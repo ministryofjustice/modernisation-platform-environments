@@ -123,9 +123,12 @@ resource "grafana_data_source" "github" {
   name = "ministryofjustice-github"
   url  = module.managed_prometheus.workspace_prometheus_endpoint
   json_data_encoded = jsonencode({
-    owner = "ministryofjustice"
+    owner            = "ministryofjustice"
+    selectedAuthType = "github-app"
+    appId            = data.aws_secretsmanager_secret_version.github_app_id.secret_string
+    installationId   = data.aws_secretsmanager_secret_version.github_app_installation_id.secret_string
   })
   secure_json_data_encoded = jsonencode({
-    accessToken = data.aws_secretsmanager_secret_version.github_token.secret_string
+    privateKey = data.aws_secretsmanager_secret_version.github_app_private_key.secret_string
   })
 }

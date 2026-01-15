@@ -56,7 +56,7 @@ module "s3-dfi-report-bucket" { #tfsec:ignore:aws-s3-enable-versioning
 }
 
 data "aws_iam_policy_document" "dfi_report_bucket_policy" {
-  count = var.dfi_report_bucket_config != null && var.dfi_report_bucket_config.bucket_policy_enabled ? 1 : 0
+  count = var.dfi_report_bucket_config == null ? 0 : var.dfi_report_bucket_config.bucket_policy_enabled ? 1 : 0
 
   statement {
     effect = "Allow"
@@ -134,11 +134,11 @@ module "s3_lb_logs_bucket" {
 
 # Get ELB service account for current region
 data "aws_elb_service_account" "main" {
-  count = var.lb_config != null && var.lb_config.bucket_policy_enabled ? 1 : 0
+  count = var.lb_config == null ? 0 : var.lb_config.bucket_policy_enabled ? 1 : 0
 }
 
 data "aws_iam_policy_document" "s3_lb_logs_bucket_policy" {
-  count = var.lb_config != null && var.lb_config.bucket_policy_enabled ? 1 : 0
+  count = var.lb_config == null ? 0 : var.lb_config.bucket_policy_enabled ? 1 : 0
 
   # Allow ALB service account to write access logs
   statement {

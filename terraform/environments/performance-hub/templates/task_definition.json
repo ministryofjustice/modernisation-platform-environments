@@ -88,6 +88,10 @@
       {
         "name": "AP_EXPORT_SECRET_ACCESS_KEY",
         "valueFrom": "${ap_export_secret_access_key}"
+      },
+      {
+        "name": "TEAMS_WEBHOOK_PRISON",
+        "valueFrom": "${teams_webhook_prison}"
       }
     ],
     "essential": true

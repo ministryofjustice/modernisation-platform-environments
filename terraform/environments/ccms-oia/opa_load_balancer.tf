@@ -5,9 +5,9 @@
 resource "aws_lb" "opahub" {
   name               = "${local.opa_app_name}-lb"
   load_balancer_type = "application"
-  internal           = false
+  internal           = true
 
-  subnets = data.aws_subnets.shared-public.ids
+  subnets = data.aws_subnets.shared-private.ids
 
   security_groups = [aws_security_group.opahub_load_balancer.id]
   access_logs {
@@ -68,14 +68,15 @@ resource "aws_lb_listener" "opahub_listener" {
   }
 }
 
-# # Temp only required on first install
-# resource "aws_lb_listener" "opahub_listener_7001" {
-#   load_balancer_arn = aws_lb.opahub.id
-#   port              = "7001"
-#   protocol          = "HTTP"
+# Temp only for DEV OIA
+resource "aws_lb_listener" "opahub_listener_7001" {
+  count             = local.is-development ? 1 : 0
+  load_balancer_arn = aws_lb.opahub.id
+  port              = "7001"
+  protocol          = "HTTP"
 
-#   default_action {
-#     target_group_arn = aws_lb_target_group.opahub_target_group.id
-#     type             = "forward"
-#   }
-# }
+  default_action {
+    target_group_arn = aws_lb_target_group.opahub_target_group.id
+    type             = "forward"
+  }
+}

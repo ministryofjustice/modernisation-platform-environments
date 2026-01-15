@@ -51,8 +51,8 @@ data "aws_subnet" "data_subnets_a" {
 data "aws_subnet" "data_subnets_b" {
   vpc_id = data.aws_vpc.shared.id
   filter {
-    name  = "tag:Name"
-    values =["${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-data-${data.aws_region.current.region}b"]
+    name   = "tag:Name"
+    values = ["${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-data-${data.aws_region.current.region}b"]
   }
 }
 

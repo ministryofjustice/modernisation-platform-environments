@@ -1,0 +1,2 @@
+# Ignore SQS encryption check because queue does not handle sensitive data
+AVD-AWS-0096

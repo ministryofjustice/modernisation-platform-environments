@@ -28,3 +28,15 @@ resource "aws_cloudwatch_log_group" "rds_listener" {
   name              = "/aws/rds/instance/oracle-db/listener"
   retention_in_days = local.application_data.accounts[local.environment].db_log_retention_days
 }
+# Log filter for edrms exception
+# resource "aws_cloudwatch_log_metric_filter" "edrms_exception_thread" {
+#   name           = "EDRMSExceptionThread"
+#   pattern        = "\"EdrmsDocumentException\""
+#   log_group_name = aws_cloudwatch_log_group.log_group_edrms.name
+
+#   metric_transformation {
+#     name      = "EDRMSExceptionThread"
+#     namespace = "CCMS-EDRMS-APP"
+#     value     = "1"
+#   }
+# }

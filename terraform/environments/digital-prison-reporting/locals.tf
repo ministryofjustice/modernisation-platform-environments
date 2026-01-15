@@ -15,38 +15,38 @@ locals {
 
   other_log_retention_in_days = local.application_data.accounts[local.environment].other_log_retention_in_days
 
-  # Kinesis Agent
-  kinesis_agent_autoscale = local.application_data.accounts[local.environment].kinesis_agent_autoscale
+  # Bastion Host
+  bastion_host_autoscale = local.application_data.accounts[local.environment].bastion_host_autoscale
 
   # glue_db                       = local.application_data.accounts[local.environment].glue_db_name
   # glue_db_data_domain           = local.application_data.accounts[local.environment].glue_db_data_domain
-  description            = local.application_data.accounts[local.environment].db_description
-  create_db              = local.application_data.accounts[local.environment].create_database
-  glue_job               = local.application_data.accounts[local.environment].glue_job_name
-  create_job             = local.application_data.accounts[local.environment].create_job
-  create_sec_conf        = local.application_data.accounts[local.environment].create_security_conf
-  env                    = local.environment
-  s3_kms_arn             = aws_kms_key.s3.arn
-  operational_db_kms_arn = aws_kms_key.operational_db.arn
-  operational_db_kms_id  = aws_kms_key.operational_db.key_id
-  kinesis_kms_id         = data.aws_kms_key.kinesis_kms_key.key_id
-  create_bucket          = local.application_data.accounts[local.environment].setup_buckets
-  account_id             = data.aws_caller_identity.current.account_id
-  account_region         = data.aws_region.current.name
-  enable_glue_registry   = local.application_data.accounts[local.environment].create_glue_registries
-  setup_buckets          = local.application_data.accounts[local.environment].setup_s3_buckets
-  create_glue_connection = local.application_data.accounts[local.environment].create_glue_connections
-  image_id               = local.application_data.accounts[local.environment].ami_image_id
-  instance_type          = local.application_data.accounts[local.environment].ec2_instance_type
-  create_datamart        = local.application_data.accounts[local.environment].setup_redshift
-  redshift_cluster_name  = "${local.application_data.accounts[local.environment].project_short_id}-redshift-${local.environment}"
+  description              = local.application_data.accounts[local.environment].db_description
+  create_db                = local.application_data.accounts[local.environment].create_database
+  glue_job                 = local.application_data.accounts[local.environment].glue_job_name
+  create_job               = local.application_data.accounts[local.environment].create_job
+  custom_metric_namespace  = local.application_data.accounts[local.environment].custom_metric_namespace
+  create_sec_conf          = local.application_data.accounts[local.environment].create_security_conf
+  env                      = local.environment
+  s3_kms_arn               = aws_kms_key.s3.arn
+  operational_db_kms_arn   = aws_kms_key.operational_db.arn
+  operational_db_kms_id    = aws_kms_key.operational_db.key_id
+  create_bucket            = local.application_data.accounts[local.environment].setup_buckets
+  account_id               = data.aws_caller_identity.current.account_id
+  account_region           = data.aws_region.current.name
+  enable_glue_registry     = local.application_data.accounts[local.environment].create_glue_registries
+  setup_buckets            = local.application_data.accounts[local.environment].setup_s3_buckets
+  create_glue_connection   = local.application_data.accounts[local.environment].create_glue_connections
+  image_id                 = local.application_data.accounts[local.environment].ami_image_id
+  instance_type            = local.application_data.accounts[local.environment].ec2_instance_type
+  create_datamart          = local.application_data.accounts[local.environment].setup_redshift
+  redshift_cluster_name    = "${local.application_data.accounts[local.environment].project_short_id}-redshift-${local.environment}"
 
   glue_job_common_log_level = local.application_data.accounts[local.environment].glue_job_common_log_level
+  glue_job_version          = local.application_data.accounts[local.environment].glue_job_version
 
   # Flag for whether jobs that access the operational datastore have this feature turned on or not
   enable_operational_datastore_job_access = local.application_data.accounts[local.environment].enable_operational_datastore_job_access
 
-  kinesis_endpoint      = "https://kinesis.eu-west-2.amazonaws.com"
   cloud_platform_cidr   = "172.20.0.0/16"
   enable_dpr_cloudtrail = local.application_data.accounts[local.environment].enable_cloud_trail
   generic_lambda        = "${local.project}-generic-lambda"
@@ -386,7 +386,7 @@ locals {
     # We need to duplicate the username with 'user' and 'username' keys
     user     = "placeholder"
     username = "placeholder"
-    endpoint = "0.0.0.0" # In dev this is always manually set to the static_private_ip of the ec2_kinesis_agent acting as a tunnel to NOMIS
+    endpoint = "0.0.0.0" # In dev this is always manually set to the static_private_ip of the ec2_bastion_host acting as a tunnel to NOMIS
     port     = "1521"
   }
 
@@ -396,7 +396,7 @@ locals {
     password = "placeholder"
     user     = "placeholder"
     username = "placeholder"
-    endpoint = "0.0.0.0" # In dev this is always manually set to the static_private_ip of the ec2_kinesis_agent acting as a tunnel to NOMIS
+    endpoint = "0.0.0.0" # In dev this is always manually set to the static_private_ip of the ec2_bastion_host acting as a tunnel to NOMIS
     port     = "1522"
   }
 
@@ -538,8 +538,8 @@ locals {
   all_tags = merge(
     local.tags,
     {
-      dpr-name          = local.application_name
-      dpr-jira          = "DPR-108"
+      dpr-name       = local.application_name
+      dpr-jira       = "DPR-108"
       dpr-is-backend = true
     }
   )

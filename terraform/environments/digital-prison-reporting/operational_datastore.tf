@@ -19,7 +19,7 @@ locals {
       dpr-resource-group = "Operational-DB"
       dpr-resource-type  = "RDS"
       dpr-jira           = "DPR2-892"
-      project        = local.project
+      project            = local.project
       dpr-name           = "operational-db"
     }
   )

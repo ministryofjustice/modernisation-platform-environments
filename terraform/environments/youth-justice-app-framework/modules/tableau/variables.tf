@@ -43,7 +43,7 @@ variable "instance_type" {
 variable "instance_volume_size" {
   description = "The size of the volumne to be allocated to the Tableau instance."
   type        = number
-  default     = 500
+  default     = 600
 }
 
 variable "instance_key_name" {

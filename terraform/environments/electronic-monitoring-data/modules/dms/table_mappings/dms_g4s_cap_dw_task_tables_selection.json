@@ -6,22 +6,12 @@
       "rule-name": "all",
       "object-locator": {
         "schema-name": "%",
-        "table-name": "%"
+        "table-name": "D_Comments"
       },
       "rule-action": "include",
       "filters": [],
       "parallel-load": null,
       "isAutoSegmentationChecked": false
-    },
-    {
-      "rule-type": "selection",
-      "rule-id": "02",
-      "rule-name": "02_exclude",
-      "object-locator": {
-        "schema-name": "dbo",
-        "table-name": "D_Comments"
-      },
-      "rule-action": "exclude"
     }
   ]
 }

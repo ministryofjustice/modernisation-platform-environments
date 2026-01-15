@@ -1,3 +1,14 @@
+data "archive_file" "lambda" {
+  type        = "zip"
+  source_file = "../lambda/log_shipper/log_shipper.py"
+  output_path = "${path.module}/.build/log_shipper.zip"
+}
+
+# Look up availability zones to map zone IDs to names
+data "aws_availability_zones" "available" {
+  state = "available"
+}
+
 # Look up the new VPC in production (created by networking component)
 data "aws_vpc" "secure_browser" {
   count = local.environment == "production" ? 1 : 0
@@ -7,25 +18,21 @@ data "aws_vpc" "secure_browser" {
 }
 
 # Look up subnets in the new VPC for production
-data "aws_subnets" "secure_browser_private_a" {
-  count = local.environment == "production" ? 1 : 0
-  filter {
-    name   = "vpc-id"
-    values = [data.aws_vpc.secure_browser[0].id]
-  }
-  tags = {
-    "Name" = "${var.networking[0].business-unit}-${local.environment}-secure-browser-private-${data.aws_region.current.name}a"
-  }
-}
+data "aws_subnets" "secure_browser_private" {
+  for_each = local.environment == "production" ? toset(local.wssb_supported_az_names) : toset([])
 
-data "aws_subnets" "secure_browser_private_b" {
-  count = local.environment == "production" ? 1 : 0
   filter {
     name   = "vpc-id"
     values = [data.aws_vpc.secure_browser[0].id]
   }
+
+  filter {
+    name   = "availability-zone"
+    values = [each.value]
+  }
+
   tags = {
-    "Name" = "${var.networking[0].business-unit}-${local.environment}-secure-browser-private-${data.aws_region.current.name}b"
+    Name = "${var.networking[0].business-unit}-${local.environment}-secure-browser-private-*"
   }
 }
 

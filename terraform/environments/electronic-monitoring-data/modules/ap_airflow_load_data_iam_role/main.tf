@@ -117,7 +117,8 @@ data "aws_iam_policy_document" "load_data" {
       "glue:DeleteDatabase",
       "glue:UpdateTable",
       "glue:GetPartition",
-      "glue:GetPartitions"
+      "glue:GetPartitions",
+      "glue:GetCatalog"
     ]
     resources = [
       "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:catalog",

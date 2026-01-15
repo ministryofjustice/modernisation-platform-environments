@@ -100,8 +100,8 @@ locals {
         ebs_volumes = {
           "/dev/sdb" = { label = "app", size = 200 }  # /u01
           "/dev/sdc" = { label = "app", size = 1000 } # /u02
-          "/dev/sde" = { label = "data", size = 2000 }
-          "/dev/sdf" = { label = "data", size = 2000 }
+          "/dev/sde" = { label = "data", size = 2000, iops = 3000, throughput = 250 }
+          "/dev/sdf" = { label = "data", size = 2000, iops = 3000, throughput = 250 }
           "/dev/sdj" = { label = "flash", size = 1000 }
           "/dev/sds" = { label = "swap", size = 2 }
         }
@@ -117,7 +117,7 @@ locals {
         })
       })
 
-      pp-onr-db-a = merge(local.ec2_instances.db11g, {
+      pp-onr-db-a = merge(local.ec2_instances.db11g, { # need to do the user_data/aws provider fix later
         config = merge(local.ec2_instances.db11g.config, {
           availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.ec2_instances.db11g.config.instance_profile_policies, [
@@ -131,8 +131,8 @@ locals {
         ebs_volumes = {
           "/dev/sdb" = { label = "app", size = 100 } # /u01
           "/dev/sdc" = { label = "app", size = 500 } # /u02
-          "/dev/sde" = { label = "data", size = 2000 }
-          "/dev/sdj" = { label = "flash", size = 600 }
+          "/dev/sde" = { label = "data", size = 2000, iops = 3000, throughput = 750 }
+          "/dev/sdj" = { label = "flash", size = 600, iops = 3000, throughput = 125 }
           "/dev/sds" = { label = "swap", size = 2 }
         }
         user_data_cloud_init = merge(local.ec2_instances.db11g.user_data_cloud_init, {

@@ -1,5 +1,5 @@
 locals {
-  rekog_s3_bucket_name = "${terraform.workspace}-rekognition-uploads"
+  rekog_s3_bucket_name      = "${terraform.workspace}-rekognition-uploads"
   rekog_logs_s3_bucket_name = "${local.rekog_s3_bucket_name}-logs"
 
   # prefix for all log objects in the access logs bucket

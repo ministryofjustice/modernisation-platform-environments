@@ -33,3 +33,22 @@ module "dms_validation_step_function" {
   )
   type = "STANDARD"
 }
+
+
+# ------------------------------------------
+# Data Cut Back Step Function
+# ------------------------------------------
+
+module "data_cutback_step_function" {
+  count = local.is-development || local.is-production ? 1 : 0
+
+  source       = "./modules/step_function"
+  name         = "data_cutback"
+  iam_policies = tomap({ "data_cutback_step_function_policy" = aws_iam_policy.data_cutback_step_function_policy[0] })
+  variable_dictionary = tomap(
+    {
+      "data_cutback" = module.data_cutback[0].lambda_function_name,
+    }
+  )
+  type = "STANDARD"
+}

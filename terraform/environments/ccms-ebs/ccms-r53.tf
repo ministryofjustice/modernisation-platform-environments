@@ -1,6 +1,6 @@
 ## LOADBALANCER
 resource "aws_route53_record" "external" {
-  count    = local.is-development ? 0 : 1
+  count    = local.is-production ? 1 : 0
   provider = aws.core-vpc
 
   zone_id = data.aws_route53_zone.external.zone_id
@@ -44,7 +44,7 @@ resource "aws_route53_record" "prod_ebsapp_lb" {
 }
 
 resource "aws_route53_record" "ebslb_cname" {
-  count    = local.is-development ? 0 : 1
+  count    = local.is-production ? 1 : 0
   provider = aws.core-vpc
 
   zone_id = data.aws_route53_zone.external.zone_id
@@ -284,4 +284,15 @@ resource "aws_route53_record" "ftp" {
   type     = "A"
   ttl      = 300
   records  = [aws_instance.ec2_ftp.private_ip]
+}
+
+# Route53 record for SMTP4Dev EC2 instance
+resource "aws_route53_record" "route53_record_smtp4dev" {
+  count    = local.is-production ? 0 : 1
+  provider = aws.core-vpc
+  zone_id  = data.aws_route53_zone.external.zone_id
+  name     = "smtp4dev.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type     = "A"
+  ttl      = 300
+  records  = [aws_instance.smtp4dev_mock_server[count.index].private_ip]
 }

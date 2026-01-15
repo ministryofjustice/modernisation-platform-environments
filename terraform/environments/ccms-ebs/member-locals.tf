@@ -8,6 +8,20 @@ locals {
   lb_log_prefix_wgate_public     = "wgate-lb-public"
   lb_log_prefix_ebsapp_internal  = "ebsapps-internal-lb"
   lb_log_prefix_webgate_internal = "webgate-internal-lb"
+  lb_log_prefix_ssogen_internal  = "ssogen-internal-lb"
+
+
+  lambda_folder_name = ["lambda_delivery", "ftp_lambda_layer", "payment_lambda_layer", "cloudwatch_sns_layer", "payment_load_monitor_layer"]
+
+  lambda_source_hashes = [
+    for f in fileset("./lambda/cloudwatch_alarm_slack_integration", "**") :
+    sha256(file("${path.module}/lambda/cloudwatch_alarm_slack_integration/${f}"))
+  ]
+
+  lambda_payment_source_hashes = [
+    for f in fileset("./lambda/payment_load_monitor", "**") :
+    sha256(file("${path.module}/lambda/payment_load_monitor/${f}"))
+  ]
 
   data_subnets = [
     data.aws_subnet.data_subnets_a.id,
@@ -37,12 +51,14 @@ locals {
   # Subject Alternative Names based on environment
   nonprod_sans = [
     format("ccmsebs.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment),
+    format("ccmsebs-sso.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment),
     format("ccms-ebs-db-nlb.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment)
   ]
 
   prod_sans = [
     format("ccmsebs.%s", local.prod_domain),
-    format("ccms-ebs-db-nlb.%s", local.prod_domain)
+    format("ccms-ebs-db-nlb.%s", local.prod_domain),
+    format("ccmsebs-sso.%s", local.prod_domain),
   ]
 
   subject_alternative_names = local.is-production ? local.prod_sans : local.nonprod_sans

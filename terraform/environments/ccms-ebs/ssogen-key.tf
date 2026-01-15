@@ -58,6 +58,11 @@ resource "aws_key_pair" "ssogen" {
   key_name   = "ssogen_key_name"
   public_key = tls_private_key.ssogen[0].public_key_openssh
   tags       = { Name = "ssogen-key", Environment = local.environment }
+
+  lifecycle {
+    ignore_changes = [public_key]
+  }
+
 }
 
 resource "aws_secretsmanager_secret" "ssogen_privkey" {
@@ -66,6 +71,7 @@ resource "aws_secretsmanager_secret" "ssogen_privkey" {
   kms_key_id              = aws_kms_key.ssogen_kms[0].arn
   recovery_window_in_days = 7
   tags                    = { Environment = local.environment, Purpose = "ec2-ssh" }
+
 }
 
 resource "aws_secretsmanager_secret_version" "ssogen_privkey_v1" {
@@ -81,4 +87,8 @@ resource "aws_secretsmanager_secret_version" "ssogen_privkey_v1" {
     region          = data.aws_region.current.name
     created_at_utc  = timestamp()
   })
+
+  lifecycle {
+    ignore_changes = [secret_string]
+  }
 }

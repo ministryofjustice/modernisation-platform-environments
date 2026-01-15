@@ -27,7 +27,10 @@ resource "aws_secretsmanager_secret_version" "pui_secrets" {
     ccms_soa_soapHeaderUserPassword  = "",
     ccms_soa_soapHeaderUserName      = "",
     opa_security_password            = "",
-    guardduty_slack_channel_id       = ""
+    guardduty_slack_channel_id       = "",
+    cloudwatch_slack_channel_id      = "",
+    slack_channel_webhook            = "",
+    slack_channel_webhook_guardduty  = ""
   })
 
   lifecycle {
@@ -41,6 +44,15 @@ data "aws_secretsmanager_secret_version" "pui_secrets" {
   secret_id = aws_secretsmanager_secret.pui_secrets.id
 }
 
+# # IP Secrets
+# resource "aws_secretsmanager_secret" "ip_secrets" {
+#   name        = "${local.application_name}-ip-secrets"
+#   description = "IP Address List Secrets"
+# }
+
+# data "aws_secretsmanager_secret_version" "ip_secrets" {
+#   secret_id = aws_secretsmanager_secret.ip_secrets.id
+# }
 # # CCMS EBS Database Password
 # resource "aws_secretsmanager_secret" "spring_datasource_password" {
 #   name        = "spring_datasource_password"

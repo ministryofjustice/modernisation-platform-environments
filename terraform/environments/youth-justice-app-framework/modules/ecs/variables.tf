@@ -317,3 +317,8 @@ variable "list_of_target_group_arns" {
   type        = map(string)
   default     = {}
 }
+
+variable "aws_account_id" {
+  description = "The AWS account ID"
+  type        = string
+}

@@ -1,8 +1,9 @@
 locals {
   lambda_path = "lambdas"
-  env_name    = local.is-production ? "prod" : "dev"
+  env_name    = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
   db_name     = local.is-production ? "g4s_cap_dw" : "test"
 }
+
 
 #-----------------------------------------------------------------------------------
 # S3 lambda function to perform zip file structure extraction into json for Athena
@@ -183,6 +184,32 @@ module "copy_mdss_data" {
 }
 
 #-----------------------------------------------------------------------------------
+# Clean after MDSS load
+#-----------------------------------------------------------------------------------
+
+module "clean_after_dlt_load" {
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "clean_after_dlt_load"
+  role_name                      = aws_iam_role.clean_after_dlt_load.name
+  role_arn                       = aws_iam_role.clean_after_dlt_load.arn
+  handler                        = "clean_after_dlt_load.handler"
+  memory_size                    = 2048
+  timeout                        = 900
+  reserved_concurrent_executions = 100
+  ephemeral_storage_size         = 10240
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+  security_group_ids             = [aws_security_group.lambda_generic.id]
+  subnet_ids                     = data.aws_subnets.shared-public.ids
+
+  environment_variables = {
+    CATALOG_ID      = data.aws_caller_identity.current.account_id
+    LAMBDA_ROLE_ARN = aws_iam_role.clean_after_dlt_load.arn
+  }
+}
+
+#-----------------------------------------------------------------------------------
 # Calculate checksum
 #-----------------------------------------------------------------------------------
 
@@ -284,5 +311,294 @@ module "process_fms_metadata" {
     SQS_QUEUE_URL                = aws_sqs_queue.format_fms_json_event_queue.id
     POWERTOOLS_METRICS_NAMESPACE = "FMSLiveFeed"
     POWERTOOLS_SERVICE_NAME      = "process-fms-metadata-lambda"
+  }
+}
+
+#-----------------------------------------------------------------------------------
+# dlt load dms output
+#-----------------------------------------------------------------------------------
+
+module "load_dms_output" {
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "load_dms_output"
+  role_name                      = aws_iam_role.load_dms_output.name
+  role_arn                       = aws_iam_role.load_dms_output.arn
+  handler                        = "load_dms_output.handler"
+  memory_size                    = 10240
+  timeout                        = 900
+  reserved_concurrent_executions = 100
+  ephemeral_storage_size         = 10240
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev                 = local.is-production ? "prod" : "dev"
+  security_group_ids             = [aws_security_group.lambda_generic.id]
+  subnet_ids                     = data.aws_subnets.shared-public.ids
+  environment_variables = {
+    ATHENA_QUERY_BUCKET = module.s3-athena-bucket.bucket.id
+    ACCOUNT_NUMBER      = data.aws_caller_identity.current.account_id
+    STAGING_BUCKET      = module.s3-create-a-derived-table-bucket.bucket.id
+  }
+}
+
+
+#-----------------------------------------------------------------------------------
+# dlt load mdss
+#-----------------------------------------------------------------------------------
+
+module "load_mdss_lambda" {
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "load_mdss"
+  role_name                      = aws_iam_role.load_mdss.name
+  role_arn                       = aws_iam_role.load_mdss.arn
+  handler                        = "load_mdss.handler"
+  memory_size                    = 10240
+  timeout                        = 900
+  reserved_concurrent_executions = 500
+  ephemeral_storage_size         = 10240
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+  security_group_ids             = [aws_security_group.lambda_generic.id]
+  subnet_ids                     = data.aws_subnets.shared-public.ids
+  cloudwatch_retention_days      = 7
+  environment_variables = {
+    ATHENA_QUERY_BUCKET = module.s3-athena-bucket.bucket.id
+    ACCOUNT_NUMBER      = data.aws_caller_identity.current.account_id
+    STAGING_BUCKET      = module.s3-create-a-derived-table-bucket.bucket.id
+    ENVIRONMENT_NAME    = local.environment_shorthand
+    CLEANUP_QUEUE_URL   = aws_sqs_queue.clean_dlt_load_queue.id
+  }
+}
+
+#-----------------------------------------------------------------------------------
+# dlt load fms
+#-----------------------------------------------------------------------------------
+
+module "load_fms_lambda" {
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "load_fms"
+  role_name                      = aws_iam_role.load_fms.name
+  role_arn                       = aws_iam_role.load_fms.arn
+  handler                        = "load_fms.handler"
+  memory_size                    = 10240
+  timeout                        = 900
+  reserved_concurrent_executions = 500
+  ephemeral_storage_size         = 10240
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+  security_group_ids             = [aws_security_group.lambda_generic.id]
+  subnet_ids                     = data.aws_subnets.shared-public.ids
+  cloudwatch_retention_days      = 7
+  environment_variables = {
+    ATHENA_QUERY_BUCKET = module.s3-athena-bucket.bucket.id
+    ACCOUNT_NUMBER      = data.aws_caller_identity.current.account_id
+    STAGING_BUCKET      = module.s3-create-a-derived-table-bucket.bucket.id
+    ENVIRONMENT_NAME    = local.environment_shorthand
+    CLEANUP_QUEUE_URL   = aws_sqs_queue.clean_dlt_load_queue.id
+  }
+}
+
+#-----------------------------------------------------------------------------------
+# dlt load csv
+#-----------------------------------------------------------------------------------
+
+module "load_historic_csv" {
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "load_historic_csv"
+  role_name                      = aws_iam_role.load_historic_csv.name
+  role_arn                       = aws_iam_role.load_historic_csv.arn
+  handler                        = "load_historic_csv.handler"
+  memory_size                    = 10240
+  timeout                        = 900
+  reserved_concurrent_executions = 500
+  ephemeral_storage_size         = 10240
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+  security_group_ids             = [aws_security_group.lambda_generic.id]
+  subnet_ids                     = data.aws_subnets.shared-public.ids
+  environment_variables = {
+    ATHENA_QUERY_BUCKET = module.s3-athena-bucket.bucket.id
+    ACCOUNT_NUMBER      = data.aws_caller_identity.current.account_id
+    STAGING_BUCKET      = module.s3-create-a-derived-table-bucket.bucket.id
+    ENVIRONMENT_NAME    = local.environment_shorthand
+    DB_SUFFIX           = local.db_suffix
+  }
+}
+
+#-----------------------------------------------------------------------------------
+# Glue DB count metrics Lambda (publishes CloudWatch metric)
+#-----------------------------------------------------------------------------------
+
+module "glue_db_count_metrics" {
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "glue_db_count_metrics"
+  role_name                      = aws_iam_role.glue_db_count_metrics.name
+  role_arn                       = aws_iam_role.glue_db_count_metrics.arn
+  handler                        = "glue_db_count_metrics.handler"
+  memory_size                    = 1024
+  timeout                        = 300
+  reserved_concurrent_executions = 1
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev                 = local.env_name
+  security_group_ids             = [aws_security_group.lambda_generic.id]
+  subnet_ids                     = data.aws_subnets.shared-public.ids
+
+  environment_variables = {
+    METRIC_NAMESPACE = "EMDS/Glue"
+    METRIC_NAME      = "GlueDatabaseCount"
+    ENVIRONMENT      = local.environment_shorthand
+  }
+}
+
+#-----------------------------------------------------------------------------------
+# Schedule Glue DB count metrics Lambda
+#-----------------------------------------------------------------------------------
+
+resource "aws_cloudwatch_event_rule" "glue_db_count_metrics_schedule" {
+  name                = "glue_db_count_metrics_schedule"
+  description         = "Runs glue_db_count_metrics on a schedule to publish Glue database count"
+  schedule_expression = "rate(5 minutes)"
+}
+
+resource "aws_cloudwatch_event_target" "glue_db_count_metrics_target" {
+  rule  = aws_cloudwatch_event_rule.glue_db_count_metrics_schedule.name
+  arn   = module.glue_db_count_metrics.lambda_function_arn
+}
+
+resource "aws_lambda_permission" "glue_db_count_metrics_allow_eventbridge" {
+  statement_id  = "AllowExecutionFromEventBridgeGlueDbCount"
+  action        = "lambda:InvokeFunction"
+  function_name = module.glue_db_count_metrics.lambda_function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.glue_db_count_metrics_schedule.arn
+}
+
+
+
+#-----------------------------------------------------------------------------------
+# BackFill Data
+#-----------------------------------------------------------------------------------
+module "data_cutback" {
+  count = local.is-development || local.is-production ? 1 : 0
+  source                  = "./modules/lambdas"
+  is_image                = true
+  function_name           = "data_cutback"
+  role_name               = aws_iam_role.data_cutback_iam_role[0].name
+  role_arn                = aws_iam_role.data_cutback_iam_role[0].arn
+  handler                 = "data_cutback.handler"
+  memory_size             = 1024
+  timeout                 = 900
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : "dev"
+
+  environment_variables = {
+    SOURCE_BUCKET = module.s3-dms-target-store-bucket.bucket.id
+  }
+}
+
+#-----------------------------------------------------------------------------------
+# MDSS daily failure digest Lambda
+#-----------------------------------------------------------------------------------
+
+module "mdss_daily_failure_digest" {
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "mdss_daily_failure_digest"
+  role_name                      = aws_iam_role.mdss_daily_failure_digest.name
+  role_arn                       = aws_iam_role.mdss_daily_failure_digest.arn
+  handler                        = "mdss_daily_failure_digest.handler"
+  memory_size                    = 512
+  timeout                        = 60
+  reserved_concurrent_executions = 1
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+  security_group_ids             = [aws_security_group.lambda_generic.id]
+  subnet_ids                     = data.aws_subnets.shared-public.ids
+
+  environment_variables = {
+    SNS_TOPIC_ARN  = aws_sns_topic.emds_alerts.arn
+    ENVIRONMENT    = local.environment_shorthand
+    NAMESPACE      = "EMDS/MDSS"
+    LOOKBACK_HOURS = "24"
+  }
+}
+
+#-----------------------------------------------------------------------------------
+# Copy data from test to dev or prod to preprod
+#-----------------------------------------------------------------------------------
+
+module "cross_account_copy" {
+  count                          = local.is-test || local.is-production ? 1 : 0
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "cross_account_copy"
+  role_name                      = aws_iam_role.cross_account_copy[0].name
+  role_arn                       = aws_iam_role.cross_account_copy[0].arn
+  handler                        = "cross_account_copy.handler"
+  memory_size                    = 512
+  timeout                        = 60
+  reserved_concurrent_executions = 100
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+  security_group_ids             = [aws_security_group.lambda_generic.id]
+  subnet_ids                     = data.aws_subnets.shared-public.ids
+
+  environment_variables = {
+    SECRET_ID  = module.cross_account_details[0].secret_id
+  }
+}
+
+#-----------------------------------------------------------------------------------
+# MDSS daily failure digest schedule (08:00 Europe/London) - EventBridge Scheduler
+#-----------------------------------------------------------------------------------
+
+resource "aws_iam_role" "mdss_daily_failure_digest_scheduler" {
+  name  = "mdss_daily_failure_digest_scheduler_role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect    = "Allow"
+        Principal = { Service = "scheduler.amazonaws.com" }
+        Action    = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "mdss_daily_failure_digest_scheduler_invoke" {
+  name  = "mdss_daily_failure_digest_scheduler_invoke_policy"
+  role  = aws_iam_role.mdss_daily_failure_digest_scheduler.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = ["lambda:InvokeFunction"]
+        Resource = [module.mdss_daily_failure_digest.lambda_function_arn]
+      }
+    ]
+  })
+}
+
+resource "aws_scheduler_schedule" "mdss_daily_failure_digest" {
+  name        = "mdss_daily_failure_digest_0800"
+  description = "Runs mdss_daily_failure_digest daily at 08:00 Europe/London"
+
+  flexible_time_window {
+    mode = "OFF"
+  }
+
+  schedule_expression          = "cron(0 8 * * ? *)"
+  schedule_expression_timezone = "Europe/London"
+
+  target {
+    arn      = module.mdss_daily_failure_digest.lambda_function_arn
+    role_arn = aws_iam_role.mdss_daily_failure_digest_scheduler.arn
   }
 }

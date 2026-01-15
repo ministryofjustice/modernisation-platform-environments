@@ -10,10 +10,29 @@ locals {
     ]
   ]
 
+  # combine aws_instance.root_block_device and aws_ebs_volume into one map
+  widget_groups_ebs_all = {
+    for ec2_key, ec2_value in var.ec2_instances : ec2_key => merge({
+      for ebs in ec2_value.aws_instance.root_block_device : ebs.device_name => {
+        id         = ebs.volume_id
+        iops       = ebs.iops
+        name       = ebs.tags.Name
+        throughput = ebs.throughput
+      }
+      }, {
+      for ebs_key, ebs_value in ec2_value.aws_ebs_volume : ebs_key => {
+        id         = ebs_value.id
+        iops       = ebs_value.iops
+        name       = ebs_value.tags.Name
+        throughput = ebs_value.throughput
+      }
+    })
+  }
+
   widget_groups_ebs_iops = [
     for i in range(length(var.widget_groups)) : distinct(flatten([
       for ec2_key in local.widget_groups_ec2_keys[i] : [
-        for ebs_key, ebs_value in var.ec2_instances[ec2_key].aws_ebs_volume : ebs_value.iops if try(var.widget_groups[i].add_ebs_widgets.iops, false)
+        for ebs_key, ebs_value in local.widget_groups_ebs_all[ec2_key] : ebs_value.iops if try(var.widget_groups[i].add_ebs_widgets.iops, false)
       ]
     ]))
   ]
@@ -21,7 +40,7 @@ locals {
   widget_groups_ebs_throughput = [
     for i in range(length(var.widget_groups)) : distinct(flatten([
       for ec2_key in local.widget_groups_ec2_keys[i] : [
-        for ebs_key, ebs_value in var.ec2_instances[ec2_key].aws_ebs_volume : ebs_value.throughput if try(var.widget_groups[i].add_ebs_widgets.throughput, false)
+        for ebs_key, ebs_value in local.widget_groups_ebs_all[ec2_key] : ebs_value.throughput if try(var.widget_groups[i].add_ebs_widgets.throughput, false)
       ]
     ]))
   ]
@@ -29,7 +48,7 @@ locals {
   widget_groups_ebs_volumes = [
     for i in range(length(var.widget_groups)) : distinct(flatten([
       for ec2_key in local.widget_groups_ec2_keys[i] : [
-        for ebs_key, ebs_value in var.ec2_instances[ec2_key].aws_ebs_volume : merge(ebs_value, {
+        for ebs_key, ebs_value in local.widget_groups_ebs_all[ec2_key] : merge(ebs_value, {
           metric_id   = join("_", ["vol", split("-", ebs_value.id)[1]])
           metric_id_r = join("_", ["vol", split("-", ebs_value.id)[1], "r"])
           metric_id_w = join("_", ["vol", split("-", ebs_value.id)[1], "w"])
@@ -54,7 +73,7 @@ locals {
               [{
                 expression = "${ebs_value.metric_id_r}/PERIOD(${ebs_value.metric_id_r})+${ebs_value.metric_id_w}/PERIOD(${ebs_value.metric_id_w})"
                 id         = ebs_value.metric_id
-                label      = "${ebs_value.id} ${ebs_value.tags.Name}"
+                label      = "${ebs_value.id} ${ebs_value.name}"
                 region     = "eu-west-2"
               }],
               ["AWS/EBS", "VolumeReadOps", "VolumeId", ebs_value.id, {
@@ -100,7 +119,7 @@ locals {
               [{
                 expression = "(${ebs_value.metric_id_r}/PERIOD(${ebs_value.metric_id_r})+${ebs_value.metric_id_w}/PERIOD(${ebs_value.metric_id_r}))/1048576"
                 id         = ebs_value.metric_id
-                label      = "${ebs_value.id} ${ebs_value.tags.Name}"
+                label      = "${ebs_value.id} ${ebs_value.name}"
                 region     = "eu-west-2"
               }],
               ["AWS/EBS", "VolumeReadBytes", "VolumeId", ebs_value.id, {

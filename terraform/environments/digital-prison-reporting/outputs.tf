@@ -114,7 +114,7 @@ output "cluster_nodes" {
 ## EC2 Private key
 output "ec2_private_key" {
   description = "Ec2 Private Key"
-  value       = module.ec2_kinesis_agent.private_key
+  value       = module.ec2_bastion_host.private_key
   sensitive   = true
 }
 

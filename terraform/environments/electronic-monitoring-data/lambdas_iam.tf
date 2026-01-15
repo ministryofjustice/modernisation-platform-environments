@@ -1,3 +1,10 @@
+locals {
+  cross_account_map = local.is-test ? "development" : local.is-production ? "preproduction" : null
+  cross_account_map_shorthand = local.is-test ? "dev" : local.is-production ? "preprod" : null
+  cross_account_bucket = local.is-test || local.is-production ? "arn:aws:s3:::emds-${local.cross_account_map_shorthand}-land-*/*" : ""
+  cross_account_kms = local.is-test || local.is-production ? "arn:aws:kms:${data.aws_region.current.name}:${local.environment_management.account_ids["electronic-monitoring-data-${local.cross_account_map}"]}:key/*" : ""
+}
+
 # ------------------------------------------
 # output_file_structure_as_json_from_zip
 # ------------------------------------------
@@ -96,7 +103,7 @@ data "aws_iam_policy_document" "load_json_table_s3_policy_document" {
       "athena:StopQueryExecution"
     ]
     resources = [
-      "arn:aws:athena:${data.aws_region.current.name}:${local.env_account_id}:*/*"
+      "arn:aws:athena:${data.aws_region.current.region}:${local.env_account_id}:*/*"
     ]
   }
   statement {
@@ -113,10 +120,10 @@ data "aws_iam_policy_document" "load_json_table_s3_policy_document" {
       "glue:UpdateTable"
     ]
     resources = [
-      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:catalog",
-      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:schema/*",
-      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/*/*",
-      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/*"
+      "arn:aws:glue:${data.aws_region.current.region}:${local.env_account_id}:catalog",
+      "arn:aws:glue:${data.aws_region.current.region}:${local.env_account_id}:schema/*",
+      "arn:aws:glue:${data.aws_region.current.region}:${local.env_account_id}:table/*/*",
+      "arn:aws:glue:${data.aws_region.current.region}:${local.env_account_id}:database/*"
     ]
   }
   statement {
@@ -267,7 +274,7 @@ resource "aws_iam_role_policy_attachment" "unzipped_presigned_url_s3_policy_poli
 }
 
 #-----------------------------------------------------------------------------------
-# Rotate IAM keys
+# Rotate IAM keys
 #-----------------------------------------------------------------------------------
 
 resource "aws_iam_role" "rotate_iam_keys" {
@@ -600,4 +607,805 @@ resource "aws_iam_policy" "process_fms_metadata_lambda_role_policy" {
 resource "aws_iam_role_policy_attachment" "process_fms_metadata_lambda_policy_attachment" {
   role       = aws_iam_role.process_fms_metadata.name
   policy_arn = aws_iam_policy.process_fms_metadata_lambda_role_policy.arn
+}
+
+
+
+#-----------------------------------------------------------------------------------
+# Load DMS Data IAM Role
+#-----------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "load_dms_output_lambda_role_policy_document" {
+  statement {
+    sid    = "S3Permissions"
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:GetObjectAttributes",
+      "s3:GetObject",
+      "s3:DeleteObject",
+    ]
+    resources = [
+      "${module.s3-create-a-derived-table-bucket.bucket.arn}/staging/*",
+      "${module.s3-athena-bucket.bucket.arn}/output/*",
+    ]
+  }
+  statement {
+    sid    = "S3GetPermissions"
+    effect = "Allow"
+    actions = [
+      "s3:GetObjectAttributes",
+      "s3:GetObject",
+    ]
+    resources = [
+      "${module.s3-dms-target-store-bucket.bucket.arn}/*"
+    ]
+  }
+  statement {
+    sid    = "S3ListingPermissions"
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket",
+    ]
+    resources = [
+      module.s3-create-a-derived-table-bucket.bucket.arn
+    ]
+  }
+  statement {
+    sid    = "AthenaPermissionsForLoadData"
+    effect = "Allow"
+    actions = [
+      "athena:StartQueryExecution",
+      "athena:GetQueryExecution",
+      "athena:GetQueryResults",
+      "athena:StopQueryExecution"
+    ]
+    resources = [
+      "arn:aws:athena:${data.aws_region.current.region}:${data.aws_caller_identity.current.id}:workgroup/${data.aws_caller_identity.current.id}-default",
+    ]
+  }
+  statement {
+    sid    = "GluePermissionsForLoad"
+    effect = "Allow"
+    actions = [
+      "glue:GetTable",
+      "glue:GetDatabase",
+      "glue:GetDatabases",
+      "glue:CreateTable",
+      "glue:DeleteTable",
+      "glue:CreateDatabase",
+      "glue:DeleteDatabase",
+      "glue:UpdateTable",
+      "glue:GetPartition",
+      "glue:GetPartitions",
+      "glue:GetCatalog"
+    ]
+    resources = [
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:catalog",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:database/*",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/*/*",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:userDefinedFunction/*/*",
+    ]
+  }
+  statement {
+    sid    = "GetDataAccessAndTagsForLakeFormation"
+    effect = "Allow"
+    actions = [
+      "lakeformation:GetDataAccess",
+      "lakeformation:GetResourceLFTags",
+    ]
+    resources = ["*"]
+  }
+  statement {
+    sid       = "ListAccountAlias"
+    effect    = "Allow"
+    actions   = ["iam:ListAccountAliases"]
+    resources = ["*"]
+  }
+  statement {
+    sid       = "ListAllBucket"
+    effect    = "Allow"
+    actions   = ["s3:ListAllMyBuckets", "s3:GetBucketLocation"]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_role" "load_dms_output" {
+  name               = "load_dms_output_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_policy" "load_dms_output_lambda_role_policy" {
+  name   = "load_dms_output_lambda_policy"
+  policy = data.aws_iam_policy_document.load_dms_output_lambda_role_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "load_dms_output_lambda_policy_attachment" {
+  role       = aws_iam_role.load_dms_output.name
+  policy_arn = aws_iam_policy.load_dms_output_lambda_role_policy.arn
+}
+
+module "share_dbs_with_dms_lambda_role" {
+  source                  = "./modules/lakeformation_database_share"
+  dbs_to_grant            = toset(local.historic_source_dbs)
+  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+  role_arn                = aws_iam_role.load_dms_output.arn
+  db_exists               = true
+  de_role_arn             = null
+}
+
+resource "aws_lakeformation_permissions" "dms_add_create_db" {
+  count            = local.is-development ? 0 : 1
+  permissions      = ["CREATE_DATABASE", "DROP"]
+  principal        = aws_iam_role.load_dms_output.arn
+  catalog_resource = true
+}
+
+
+#-----------------------------------------------------------------------------------
+# Load MDSS Data IAM Role
+#-----------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "load_mdss_lambda_role_policy_document" {
+  statement {
+    sid    = "S3Permissions"
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:GetObjectAttributes",
+      "s3:GetObject",
+      "s3:DeleteObject",
+      "s3:DeleteObjects",
+    ]
+    resources = [
+      "${module.s3-create-a-derived-table-bucket.bucket.arn}/staging/allied_mdss${local.db_suffix}_pipeline/*",
+      "${module.s3-athena-bucket.bucket.arn}/output/*",
+      "${module.s3-athena-bucket.bucket.arn}/*",
+    ]
+  }
+  statement {
+    sid    = "S3GetPermissions"
+    effect = "Allow"
+    actions = [
+      "s3:GetObjectAttributes",
+      "s3:GetObject",
+    ]
+    resources = [
+      "${module.s3-raw-formatted-data-bucket.bucket.arn}/allied/mdss/*"
+    ]
+  }
+  statement {
+    sid    = "S3ListingPermissions"
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket",
+    ]
+    resources = [
+      module.s3-create-a-derived-table-bucket.bucket.arn
+    ]
+  }
+  statement {
+    sid    = "AthenaPermissionsForLoadData"
+    effect = "Allow"
+    actions = [
+      "athena:StartQueryExecution",
+      "athena:GetQueryExecution",
+      "athena:GetQueryResults",
+      "athena:StopQueryExecution"
+    ]
+    resources = [
+      "arn:aws:athena:${data.aws_region.current.region}:${data.aws_caller_identity.current.id}:workgroup/${data.aws_caller_identity.current.id}-default",
+    ]
+  }
+  statement {
+    sid    = "GluePermissionsForLoad"
+    effect = "Allow"
+    actions = [
+      "glue:GetTable",
+      "glue:GetTables",
+      "glue:GetDatabase",
+      "glue:GetDatabases",
+      "glue:CreateTable",
+      "glue:DeleteTable",
+      "glue:CreateDatabase",
+      "glue:DeleteDatabase",
+      "glue:UpdateTable",
+      "glue:GetPartition",
+      "glue:GetPartitions",
+      "glue:GetCatalog"
+    ]
+    resources = [
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:catalog",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:database/*",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/*/*",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:userDefinedFunction/*/*",
+    ]
+  }
+  statement {
+    sid    = "GetDataAccessAndTagsForLakeFormation"
+    effect = "Allow"
+    actions = [
+      "lakeformation:GetDataAccess",
+      "lakeformation:GetResourceLFTags",
+    ]
+    resources = ["*"]
+  }
+  statement {
+    sid       = "ListAccountAlias"
+    effect    = "Allow"
+    actions   = ["iam:ListAccountAliases"]
+    resources = ["*"]
+  }
+  statement {
+    sid       = "ListAllBucket"
+    effect    = "Allow"
+    actions   = ["s3:ListAllMyBuckets", "s3:GetBucketLocation"]
+    resources = ["*"]
+  }
+  statement {
+    sid    = "AllowCleanupQueueAccess"
+    effect = "Allow"
+    actions = [
+      "sqs:SendMessage",
+      "sqs:ReceiveMessage",
+      "sqs:DeleteMessage",
+      "sqs:GetQueueAttributes",
+      "sqs:GetQueueUrl",
+    ]
+    resources = [aws_sqs_queue.clean_dlt_load_queue.arn]
+  }
+}
+
+resource "aws_iam_role" "load_mdss" {
+  name               = "load_mdss_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_policy" "load_mdss_lambda_role_policy" {
+  name   = "load_mdss_lambda_policy"
+  policy = data.aws_iam_policy_document.load_mdss_lambda_role_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "load_mdss_output_lambda_policy_attachment" {
+  role       = aws_iam_role.load_mdss.name
+  policy_arn = aws_iam_policy.load_mdss_lambda_role_policy.arn
+}
+
+module "share_db_with_mdss_lambda_role" {
+  source                  = "./modules/lakeformation_database_share"
+  dbs_to_grant            = toset(["allied_mdss${local.db_suffix}"])
+  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+  role_arn                = aws_iam_role.load_mdss.arn
+  db_exists               = !local.is-development
+  de_role_arn             = local.is-development ? try(one(data.aws_iam_roles.mod_plat_roles.arns)) : null
+}
+
+resource "aws_lakeformation_permissions" "add_create_db" {
+  permissions      = ["CREATE_DATABASE", "DROP"]
+  principal        = aws_iam_role.load_mdss.arn
+  catalog_resource = true
+}
+
+#-----------------------------------------------------------------------------------
+# Load FMS Data IAM Role
+#-----------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "load_fms_lambda_role_policy_document" {
+  statement {
+    sid    = "S3Permissions"
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:GetObjectAttributes",
+      "s3:GetObject",
+      "s3:DeleteObject",
+    ]
+    resources = [
+      "${module.s3-create-a-derived-table-bucket.bucket.arn}/staging/serco_fms${local.db_suffix}_pipeline/*",
+      "${module.s3-athena-bucket.bucket.arn}/output/*",
+      "${module.s3-athena-bucket.bucket.arn}/*",
+    ]
+  }
+  statement {
+    sid    = "S3GetPermissions"
+    effect = "Allow"
+    actions = [
+      "s3:GetObjectAttributes",
+      "s3:GetObject",
+    ]
+    resources = [
+      "${module.s3-raw-formatted-data-bucket.bucket.arn}/serco/fms/*"
+    ]
+  }
+  statement {
+    sid    = "S3ListingPermissions"
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket",
+    ]
+    resources = [
+      module.s3-create-a-derived-table-bucket.bucket.arn
+    ]
+  }
+  statement {
+    sid    = "AthenaPermissionsForLoadData"
+    effect = "Allow"
+    actions = [
+      "athena:StartQueryExecution",
+      "athena:GetQueryExecution",
+      "athena:GetQueryResults",
+      "athena:StopQueryExecution"
+    ]
+    resources = [
+      "arn:aws:athena:${data.aws_region.current.region}:${data.aws_caller_identity.current.id}:workgroup/${data.aws_caller_identity.current.id}-default",
+    ]
+  }
+  statement {
+    sid    = "GluePermissionsForLoad"
+    effect = "Allow"
+    actions = [
+      "glue:GetTable",
+      "glue:GetDatabase",
+      "glue:GetDatabases",
+      "glue:CreateTable",
+      "glue:DeleteTable",
+      "glue:CreateDatabase",
+      "glue:DeleteDatabase",
+      "glue:UpdateTable",
+      "glue:GetPartition",
+      "glue:GetPartitions",
+      "glue:GetCatalog"
+    ]
+    resources = [
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:catalog",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:database/*",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/*/*",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:userDefinedFunction/*/*",
+    ]
+  }
+  statement {
+    sid    = "GetDataAccessAndTagsForLakeFormation"
+    effect = "Allow"
+    actions = [
+      "lakeformation:GetDataAccess",
+      "lakeformation:GetResourceLFTags",
+    ]
+    resources = ["*"]
+  }
+  statement {
+    sid       = "ListAccountAlias"
+    effect    = "Allow"
+    actions   = ["iam:ListAccountAliases"]
+    resources = ["*"]
+  }
+  statement {
+    sid       = "ListAllBucket"
+    effect    = "Allow"
+    actions   = ["s3:ListAllMyBuckets", "s3:GetBucketLocation"]
+    resources = ["*"]
+  }
+  statement {
+    sid    = "AllowCleanupQueueAccess"
+    effect = "Allow"
+    actions = [
+      "sqs:SendMessage",
+      "sqs:ReceiveMessage",
+      "sqs:DeleteMessage",
+      "sqs:GetQueueAttributes",
+      "sqs:GetQueueUrl",
+    ]
+    resources = [aws_sqs_queue.clean_dlt_load_queue.arn]
+  }
+}
+
+resource "aws_iam_role" "load_fms" {
+  name               = "load_fms_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_policy" "load_fms_lambda_role_policy" {
+  name   = "load_fms_lambda_policy"
+  policy = data.aws_iam_policy_document.load_fms_lambda_role_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "load_fms_output_lambda_policy_attachment" {
+  role       = aws_iam_role.load_fms.name
+  policy_arn = aws_iam_policy.load_fms_lambda_role_policy.arn
+}
+
+module "share_db_with_fms_lambda_role" {
+  source                  = "./modules/lakeformation_database_share"
+  dbs_to_grant            = toset(["serco_fms${local.db_suffix}"])
+  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+  role_arn                = aws_iam_role.load_fms.arn
+  db_exists               = !local.is-development
+  de_role_arn             = local.is-development ? try(one(data.aws_iam_roles.mod_plat_roles.arns)) : null
+}
+
+resource "aws_lakeformation_permissions" "fms_add_create_db" {
+  permissions      = ["CREATE_DATABASE", "DROP"]
+  principal        = aws_iam_role.load_fms.arn
+  catalog_resource = true
+}
+
+#-----------------------------------------------------------------------------------
+# Load csv Data IAM Role
+#-----------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "load_historic_csv_lambda_role_policy_document" {
+  statement {
+    sid    = "S3Permissions"
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:GetObjectAttributes",
+      "s3:GetObject",
+      "s3:DeleteObject",
+    ]
+    resources = [
+      "${module.s3-create-a-derived-table-bucket.bucket.arn}/staging/*",
+      "${module.s3-athena-bucket.bucket.arn}/output/*",
+      "${module.s3-athena-bucket.bucket.arn}/*",
+    ]
+  }
+  statement {
+    sid    = "S3GetPermissions"
+    effect = "Allow"
+    actions = [
+      "s3:GetObjectAttributes",
+      "s3:GetObject",
+    ]
+    resources = [
+      "${module.s3-data-bucket.bucket.arn}/*"
+    ]
+  }
+  statement {
+    sid    = "S3ListingPermissions"
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket",
+    ]
+    resources = [
+      module.s3-create-a-derived-table-bucket.bucket.arn
+    ]
+  }
+  statement {
+    sid    = "AthenaPermissionsForLoadData"
+    effect = "Allow"
+    actions = [
+      "athena:StartQueryExecution",
+      "athena:GetQueryExecution",
+      "athena:GetQueryResults",
+      "athena:StopQueryExecution"
+    ]
+    resources = [
+      "arn:aws:athena:${data.aws_region.current.region}:${data.aws_caller_identity.current.id}:workgroup/${data.aws_caller_identity.current.id}-default",
+    ]
+  }
+  statement {
+    sid    = "GluePermissionsForLoad"
+    effect = "Allow"
+    actions = [
+      "glue:GetTable",
+      "glue:GetDatabase",
+      "glue:GetDatabases",
+      "glue:CreateTable",
+      "glue:DeleteTable",
+      "glue:CreateDatabase",
+      "glue:DeleteDatabase",
+      "glue:UpdateTable",
+      "glue:GetPartition",
+      "glue:GetPartitions",
+      "glue:GetCatalog"
+    ]
+    resources = [
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:catalog",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:database/*",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/*/*",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:userDefinedFunction/*/*",
+    ]
+  }
+  statement {
+    sid    = "GetDataAccessAndTagsForLakeFormation"
+    effect = "Allow"
+    actions = [
+      "lakeformation:GetDataAccess",
+      "lakeformation:GetResourceLFTags",
+    ]
+    resources = ["*"]
+  }
+  statement {
+    sid       = "ListAccountAlias"
+    effect    = "Allow"
+    actions   = ["iam:ListAccountAliases"]
+    resources = ["*"]
+  }
+  statement {
+    sid       = "ListAllBucket"
+    effect    = "Allow"
+    actions   = ["s3:ListAllMyBuckets", "s3:GetBucketLocation"]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_role" "load_historic_csv" {
+  name               = "load_historic_csv_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_policy" "load_historic_csv_lambda_role_policy" {
+  name   = "load_historic_csv_lambda_policy"
+  policy = data.aws_iam_policy_document.load_historic_csv_lambda_role_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "load_historic_csv_output_lambda_policy_attachment" {
+  role       = aws_iam_role.load_historic_csv.name
+  policy_arn = aws_iam_policy.load_historic_csv_lambda_role_policy.arn
+}
+
+module "share_lcm_db_with_historic_csv_lambda_role_policy_lambda_role" {
+  source                  = "./modules/lakeformation_database_share"
+  dbs_to_grant            = toset(["g4s_lcm${local.db_suffix}"])
+  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+  role_arn                = aws_iam_role.load_historic_csv.arn
+  db_exists               = true ? local.is-production : false
+  de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
+}
+
+module "share_scram_db_with_historic_csv_lambda_role_policy_lambda_role" {
+  source                  = "./modules/lakeformation_database_share"
+  dbs_to_grant            = toset(["scram_alcohol_monitoring${local.db_suffix}"])
+  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+  role_arn                = aws_iam_role.load_historic_csv.arn
+  db_exists               = local.is-development ? false : local.is-preproduction ? false : true
+  de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
+}
+
+resource "aws_lakeformation_permissions" "historic_csv_add_create_db" {
+  permissions      = ["CREATE_DATABASE", "DROP"]
+  principal        = aws_iam_role.load_historic_csv.arn
+  catalog_resource = true
+}
+
+#-----------------------------------------------------------------------------------
+# Clean after MDSS load IAM Role
+#-----------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "clean_after_dlt_load_lambda_role_policy_document" {
+  statement {
+    sid    = "GluePermissionsForCleanup"
+    effect = "Allow"
+    actions = [
+      "glue:GetTables",
+      "glue:GetTable",
+      "glue:GetDatabase",
+      "glue:DeleteTable",
+      "glue:DeleteDatabase",
+    ]
+    resources = [
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:catalog",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:database/*",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/*/*",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:userDefinedFunction/*/*",
+    ]
+  }
+
+  statement {
+    sid    = "S3PermissionsForCleanup"
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket",
+      "s3:DeleteObject",
+      "s3:DeleteObjectVersion",
+      "s3:GetBucketLocation",
+    ]
+    resources = [
+      module.s3-create-a-derived-table-bucket.bucket.arn,
+      "${module.s3-create-a-derived-table-bucket.bucket.arn}/*",
+    ]
+  }
+
+  statement {
+    sid    = "LakeFormationGrantRevoke"
+    effect = "Allow"
+    actions = [
+      "lakeformation:GrantPermissions",
+      "lakeformation:RevokePermissions",
+      "lakeformation:ListPermissions",
+      "lakeformation:GetDataAccess",
+    ]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_role" "clean_after_dlt_load" {
+  name               = "clean_after_dlt_load_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_policy" "clean_after_dlt_load_lambda_role_policy" {
+  name   = "clean_after_dlt_load_lambda_policy"
+  policy = data.aws_iam_policy_document.clean_after_dlt_load_lambda_role_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "clean_after_dlt_load_lambda_policy_attachment" {
+  role       = aws_iam_role.clean_after_dlt_load.name
+  policy_arn = aws_iam_policy.clean_after_dlt_load_lambda_role_policy.arn
+}
+
+#-----------------------------------------------------------------------------------
+# Glue DB Count Metrics IAM Role
+#-----------------------------------------------------------------------------------
+
+resource "aws_iam_role" "glue_db_count_metrics" {
+  name               = "glue_db_count_metrics"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+data "aws_iam_policy_document" "glue_db_count_metrics_policy_document" {
+  statement {
+    sid    = "GlueGetDatabases"
+    effect = "Allow"
+    actions = [
+      "glue:GetDatabases",
+      "glue:GetDatabase",
+    ]
+    resources = [
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:catalog",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:database/*",
+    ]
+  }
+}
+
+resource "aws_iam_policy" "glue_db_count_metrics" {
+  name        = "glue-db-count-metrics-policy"
+  description = "Policy for Lambda to count Glue databases and publish a CloudWatch metric via EMF"
+  policy      = data.aws_iam_policy_document.glue_db_count_metrics_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "glue_db_count_metrics_policy_attachment" {
+  role       = aws_iam_role.glue_db_count_metrics.name
+  policy_arn = aws_iam_policy.glue_db_count_metrics.arn
+}
+
+
+#-----------------------------------------------------------------------------------
+# Data Cut Back
+#-----------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "data_cutback_iam_role_policy_document" {
+  count = local.is-production || local.is-development ? 1 : 0
+  statement {
+    sid    = "S3Permissions"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:GetBucketLocation",
+      "s3:ListBucket",
+      "s3:PutObject",
+    ]
+
+    resources = [
+      "arn:aws:s3:::emds-preprod-dms-rds-to-parquet-*",
+      "arn:aws:s3:::emds-preprod-dms-rds-to-parquet-*/*",
+      "arn:aws:s3:::emds-prod-dms-rds-to-parquet-*",
+      "arn:aws:s3:::emds-prod-dms-rds-to-parquet-*/*"
+    ]
+  }
+}
+
+resource "aws_iam_role" "data_cutback_iam_role" {
+  count              = local.is-production || local.is-development ? 1 : 0
+  name               = "data_cutback_iam_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_policy" "data_cutback_iam_role_policy" {
+  count  = local.is-production || local.is-development ? 1 : 0
+  name   = "data_cutback_iam_policy"
+  policy = data.aws_iam_policy_document.data_cutback_iam_role_policy_document[0].json
+}
+
+resource "aws_iam_role_policy_attachment" "data_cutback_iam_role_policy_attachment" {
+  count      = local.is-production || local.is-development ? 1 : 0
+  role       = aws_iam_role.data_cutback_iam_role[0].name
+  policy_arn = aws_iam_policy.data_cutback_iam_role_policy[0].arn
+}
+
+
+#-----------------------------------------------------------------------------------
+# MDSS daily failure digest IAM Role
+#-----------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "mdss_daily_failure_digest_policy_document" {
+  statement {
+    sid    = "CloudWatchGetMetricData"
+    effect = "Allow"
+    actions = [
+      "cloudwatch:GetMetricData",
+      "cloudwatch:GetMetricStatistics",
+      "cloudwatch:ListMetrics",
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "AllowPublishToAlertsTopic"
+    effect = "Allow"
+    actions = [
+      "sns:Publish",
+    ]
+    resources = [aws_sns_topic.emds_alerts.arn]
+  }
+}
+
+resource "aws_iam_role" "mdss_daily_failure_digest" {
+  name               = "mdss_daily_failure_digest_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_policy" "mdss_daily_failure_digest" {
+  name   = "mdss_daily_failure_digest_lambda_policy"
+  policy = data.aws_iam_policy_document.mdss_daily_failure_digest_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "mdss_daily_failure_digest_attach" {
+  role       = aws_iam_role.mdss_daily_failure_digest.name
+  policy_arn = aws_iam_policy.mdss_daily_failure_digest.arn
+}
+
+#-----------------------------------------------------------------------------------
+# Copy data from test to dev or prod to preprod
+#-----------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "cross_account_copy" {
+  count = local.is-test || local.is-production ? 1 : 0
+  statement {
+    sid     = "AccessToCrossAccountBucket"
+    effect  = "Allow"
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:DescribeKey"
+    ]
+    resources = [local.cross_account_kms]
+  }
+  statement {
+    sid     = "AccessToInAccountBucket"
+    effect  = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:GetObjectTagging"
+    ]
+    resources = ["${module.s3-data-bucket.bucket.arn}/*"]
+  }
+  statement {
+    sid     = "AllowDumpToExternalBuckets"
+    effect  = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:PutObjectAcl"
+    ]
+    resources = [local.cross_account_bucket]
+  }
+}
+
+resource "aws_iam_role" "cross_account_copy" {
+  count = local.is-test || local.is-production ? 1 : 0
+  name               = "cross_account_copy_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_policy" "cross_account_copy" {
+  count = local.is-test || local.is-production ? 1 : 0
+  name   = "cross_account_copy_lambda_policy"
+  policy = data.aws_iam_policy_document.cross_account_copy[0].json
+}
+
+resource "aws_iam_role_policy_attachment" "cross_account_copy" {
+  count = local.is-test || local.is-production ? 1 : 0
+  role       = aws_iam_role.cross_account_copy[0].name
+  policy_arn = aws_iam_policy.cross_account_copy[0].arn
 }

@@ -22,6 +22,8 @@ resource "aws_mwaa_environment" "main" {
   webserver_access_mode = "PRIVATE_ONLY"
 
   airflow_configuration_options = {
+    "celery.worker_autoscale"            = local.environment_configuration.airflow_celery_worker_autoscale
+    "core.parallelism"                   = local.environment_configuration.core_parallelism
     "secrets.backend"                    = "airflow.providers.amazon.aws.secrets.secrets_manager.SecretsManagerBackend"
     "secrets.backend_kwargs"             = "{\"connections_prefix\": \"airflow/connections\", \"variables_prefix\": \"airflow/variables\"}"
     "smtp.smtp_host"                     = "email-smtp.${data.aws_region.current.region}.amazonaws.com"
@@ -33,7 +35,6 @@ resource "aws_mwaa_environment" "main" {
     "webserver.warn_deployment_exposure" = 0
     "webserver.base_url"                 = "airflow.${local.environment_configuration.route53_zone}"
     "webserver.instance_name"            = local.environment_configuration.airflow_webserver_instance_name
-    "celery.worker_autoscale"            = local.environment_configuration.airflow_celery_worker_autoscale
   }
 
   network_configuration {

@@ -25,7 +25,30 @@ resource "aws_db_instance" "dacp_db" {
   ca_cert_identifier              = "rds-ca-rsa2048-g1"
   apply_immediately               = true
   copy_tags_to_snapshot           = true
+  parameter_group_name            = local.is-production ? "default.postgres14" : aws_db_parameter_group.dacp_analyse.name
   enabled_cloudwatch_logs_exports = ["postgresql", "upgrade"]
+}
+
+# 1. Create a custom parameter group
+resource "aws_db_parameter_group" "dacp_analyse" {
+  name        = "custom-postgres-parameters"
+  family      = "postgres14" # match your RDS engine version
+  description = "Custom parameter group for slow query logging"
+
+  parameter {
+    name  = "log_min_duration_statement"
+    value = "0" # log queries longer than 5 seconds
+  }
+
+  parameter {
+    name  = "log_statement"
+    value = "none"
+  }
+
+  parameter {
+    name  = "log_destination"
+    value = "stderr"
+  }
 }
 
 resource "aws_db_subnet_group" "dbsubnetgroup" {

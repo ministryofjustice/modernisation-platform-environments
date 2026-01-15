@@ -53,50 +53,6 @@ resource "aws_kms_alias" "kms-alias" {
   target_key_id = aws_kms_key.s3.arn
 }
 
-### KINESIS KMS
-resource "aws_kms_key" "kinesis-kms-key" {
-  #checkov:skip=CKV_AWS_33
-  #checkov:skip=CKV_AWS_227
-  #checkov:skip=CKV_AWS_7
-
-  description         = "Encryption key for kinesis data stream"
-  enable_key_rotation = true
-  key_usage           = "ENCRYPT_DECRYPT"
-  policy              = data.aws_iam_policy_document.kinesis-kms.json
-  is_enabled          = true
-
-
-  tags = merge(
-    local.all_tags,
-    {
-      dpr-name          = "${local.application_name}-kinesis-kms"
-      dpr-resource-type = "KMS Key"
-      dpr-jira          = "DPR2-XXXX"
-    }
-  )
-}
-
-data "aws_iam_policy_document" "kinesis-kms" {
-  statement {
-    #checkov:skip=CKV_AWS_111
-    #checkov:skip=CKV_AWS_109
-    #checkov:skip=CKV_AWS_356: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
-    effect    = "Allow"
-    actions   = ["kms:*"]
-    resources = ["*"]
-
-    principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
-    }
-  }
-}
-
-resource "aws_kms_alias" "kinesis-kms-alias" {
-  name          = "alias/${local.project}-kinesis-kms"
-  target_key_id = aws_kms_key.kinesis-kms-key.arn
-}
-
 ### Redshift KMS
 resource "aws_kms_key" "redshift-kms-key" {
   #checkov:skip=CKV_AWS_33

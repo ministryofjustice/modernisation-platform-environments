@@ -3,7 +3,7 @@ module "ecr_github_pull_through_cache_secret" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/secrets-manager/aws"
-  version = "2.0.0"
+  version = "2.0.1"
 
   name        = "ecr-pullthroughcache/github"
   description = "GitHub credentials for ECR pull-through cache"

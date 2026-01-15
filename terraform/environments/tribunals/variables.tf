@@ -1,3 +1,9 @@
+variable "lookup_cloudfront_distribution" {
+  type        = bool
+  description = "Set to true after the CloudFront distribution has been created and stored in SSM"
+  default     = false
+}
+
 variable "services" {
   type = map(object({
     name_prefix = string
