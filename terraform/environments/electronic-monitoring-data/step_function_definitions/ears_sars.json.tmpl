@@ -6,10 +6,18 @@
       "Resource": "arn:aws:states:::lambda:invoke",
       "OutputPath": "$.Payload",
       "Parameters": {
-        "Payload.$": "$",
         "FunctionName": "${ears_sars_request}"
+        "Payload": {
+          "path": "/request/",
+          "httpMethod": "POST",
+          "headers": {
+            "Content-Type": "application/json"
+          },
+          "isBase64Encoded": false,
+          "body.$": "States.JsonToString($)"
+        }
       },
-      "End" : true
+      "End": true
     }
   }
 }
