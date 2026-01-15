@@ -8,10 +8,21 @@
       "Parameters": {
         "FunctionName": "${ears_sars_request}",
         "Payload": {
+          "resource": "/request/",
           "path": "/request/",
           "httpMethod": "POST",
           "headers": {
             "Content-Type": "application/json"
+          },
+          "multiValueHeaders": {},
+          "queryStringParameters": null,
+          "requestContext": {
+            "resourcePath": "/request/",
+            "httpMethod": "POST",
+            "path": "/request/",
+            "identity": {
+              "sourceIp": "127.0.0.1"
+            }
           },
           "isBase64Encoded": false,
           "body.$": "States.JsonToString($)"
