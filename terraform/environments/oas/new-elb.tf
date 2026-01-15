@@ -96,6 +96,51 @@ resource "aws_lb_target_group_attachment" "oas_ec2_attachment" {
   port             = 9500
 }
 
+# Target Group for Analytics (port 9502)
+resource "aws_lb_target_group" "oas_analytics_target_group" {
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+
+  name_prefix          = "oas-an"
+  port                 = 9502
+  protocol             = "HTTP"
+  vpc_id               = data.aws_vpc.shared.id
+  target_type          = "instance"
+  deregistration_delay = 30
+
+  stickiness {
+    type            = "lb_cookie"
+    cookie_duration = 86400
+  }
+
+  health_check {
+    path                = "/"
+    port                = "9502"
+    healthy_threshold   = 3
+    interval            = 30
+    protocol            = "HTTP"
+    unhealthy_threshold = 3
+    matcher             = "200-399"
+    timeout             = 5
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-analytics-target-group" }
+  )
+}
+
+resource "aws_lb_target_group_attachment" "oas_analytics_attachment" {
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+
+  target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
+  target_id        = aws_instance.oas_app_instance_new[0].id
+  port             = 9502
+}
+
 
 
 
@@ -110,7 +155,49 @@ resource "aws_lb_listener" "https_listener" {
   certificate_arn   = aws_acm_certificate.external[0].arn
 
   default_action {
-    target_group_arn = aws_lb_target_group.oas_ec2_target_group[0].arn
+    type = "fixed-response"
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "Not Found"
+      status_code  = "404"
+    }
+  }
+}
+
+# Listener rule for /console/em -> port 9500
+resource "aws_lb_listener_rule" "console_em_rule" {
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+
+  listener_arn = aws_lb_listener.https_listener[0].arn
+  priority     = 100
+
+  action {
     type             = "forward"
+    target_group_arn = aws_lb_target_group.oas_ec2_target_group[0].arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/console/em*"]
+    }
+  }
+}
+
+# Listener rule for /analytics -> port 9502
+resource "aws_lb_listener_rule" "analytics_rule" {
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+
+  listener_arn = aws_lb_listener.https_listener[0].arn
+  priority     = 200
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/analytics*"]
+    }
   }
 }
