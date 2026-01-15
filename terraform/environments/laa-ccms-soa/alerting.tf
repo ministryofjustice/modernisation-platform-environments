@@ -519,21 +519,6 @@ resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_stuck_threads" {
   ok_actions          = [aws_sns_topic.alerts.arn]
 }
 
-resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_hogging_threads" {
-  alarm_name          = "${local.application_data.accounts[local.environment].app_name}-managed-custom-checks-hogging-threads"
-  alarm_description   = "${local.environment} | ${local.aws_account_id} | There are hogging threads on the SOA managed servers."
-  comparison_operator = "GreaterThanThreshold"
-  metric_name         = aws_cloudwatch_log_metric_filter.soa_custom_check_hogging_threads.id
-  statistic           = "Sum"
-  namespace           = "CCMS-SOA-APP"
-  period              = "300"
-  evaluation_periods  = "5"
-  threshold           = "7"
-  datapoints_to_alarm = "1"
-  treat_missing_data  = "notBreaching"
-  alarm_actions       = [aws_sns_topic.alerts.arn]
-  ok_actions          = [aws_sns_topic.alerts.arn]
-}
 
 #--The below alerts have been disabled as we do not understand their benefit and if the errors being thrown are actually errors
 #--or just part of the regular operation of the CCMS application
