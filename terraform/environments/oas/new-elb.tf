@@ -68,7 +68,7 @@ resource "aws_lb_target_group" "oas_ec2_target_group" {
   }
 
   health_check {
-    path                = "/"
+    path                = "/console/em"
     port                = "9500"
     healthy_threshold   = 3
     interval            = 30
@@ -113,7 +113,7 @@ resource "aws_lb_target_group" "oas_analytics_target_group" {
   }
 
   health_check {
-    path                = "/"
+    path                = "/analytics"
     port                = "9502"
     healthy_threshold   = 3
     interval            = 30
