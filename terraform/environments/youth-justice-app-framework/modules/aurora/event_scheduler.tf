@@ -15,7 +15,7 @@ resource "aws_iam_role" "rds_scheduler" {
 
 resource "aws_iam_role_policy" "rds_scheduler" {
   count     = var.create_sheduler ? 1 : 0
-  role      = aws_iam_role.rds_scheduler.id
+  role      = aws_iam_role.rds_scheduler[0].id
   policy    = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -45,7 +45,7 @@ resource "aws_scheduler_schedule" "rds_start" {
 
   target {
     arn      = "arn:aws:scheduler:::aws-sdk:rds:startDBCluster"
-    role_arn = aws_iam_role.rds_scheduler.arn
+    role_arn = aws_iam_role.rds_scheduler[0].arn
 
     input = jsonencode({
       DbClusterIdentifier = var.name
@@ -66,7 +66,7 @@ resource "aws_scheduler_schedule" "rds_stop" {
 
   target {
     arn      = "arn:aws:scheduler:::aws-sdk:rds:stopDBCluster"
-    role_arn = aws_iam_role.rds_scheduler.arn
+    role_arn = aws_iam_role.rds_scheduler[0].arn
 
     input = jsonencode({
       DbClusterIdentifier = var.name
