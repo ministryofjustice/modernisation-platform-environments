@@ -75,7 +75,7 @@
       "tg_db_port": 1521,
       "ebs_size_ebsdb_exhome": 100,
       "ebs_size_ebsdb_u01": 300,
-      "ebs_size_ebsdb_arch": 200,
+      "ebs_size_ebsdb_arch": 500,
       "ebs_iops_ebsdb_dbf01": 24000,
       "ebs_size_ebsdb_dbf01": 4000,
       "ebs_iops_ebsdb_dbf02": 9000,
