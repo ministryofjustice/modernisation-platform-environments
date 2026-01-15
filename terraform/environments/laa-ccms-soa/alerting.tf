@@ -454,12 +454,76 @@ resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_Error_Managed" {
   ok_actions          = [aws_sns_topic.alerts.arn]
 }
 
-# THe following alarm is used for testing purposes only and can be removed once we are confident that the custom checks error alarm is working as expected
+# THe following alarms are new alarms to monitor specific custom check erros
 resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_test_paths" {
   alarm_name          = "${local.application_data.accounts[local.environment].app_name}-managed-custom-checks-test-paths"
   alarm_description   = "${local.environment} | ${local.aws_account_id} | There have been multiple custom check script errors on the SOA managed servers in the last 5 minutes, this likely means please that a composite endpoint is unreachable."
   comparison_operator = "GreaterThanThreshold"
   metric_name         = aws_cloudwatch_log_metric_filter.soa_custom_check_test_paths.id
+  statistic           = "Sum"
+  namespace           = "CCMS-SOA-APP"
+  period              = "30"
+  evaluation_periods  = "5"
+  threshold           = "1"
+  datapoints_to_alarm = "1"
+  treat_missing_data  = "notBreaching"
+  alarm_actions       = [aws_sns_topic.alerts.arn]
+  ok_actions          = [aws_sns_topic.alerts.arn]
+}
+
+resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_server_health" {
+  alarm_name          = "${local.application_data.accounts[local.environment].app_name}-managed-custom-checks-server-health"
+  alarm_description   = "${local.environment} | ${local.aws_account_id} | There have been multiple custom check script errors on the SOA managed servers in the last 5 minutes, this likely means please that a composite endpoint is unreachable."
+  comparison_operator = "GreaterThanThreshold"
+  metric_name         = aws_cloudwatch_log_metric_filter.soa_custom_check_server_health.id
+  statistic           = "Sum"
+  namespace           = "CCMS-SOA-APP"
+  period              = "30"
+  evaluation_periods  = "5"
+  threshold           = "1"
+  datapoints_to_alarm = "1"
+  treat_missing_data  = "notBreaching"
+  alarm_actions       = [aws_sns_topic.alerts.arn]
+  ok_actions          = [aws_sns_topic.alerts.arn]
+}
+
+resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_percentage_heap_free_memory" {
+  alarm_name          = "${local.application_data.accounts[local.environment].app_name}-managed-custom-checks-percentage-heap-free-memory"
+  alarm_description   = "${local.environment} | ${local.aws_account_id} | There have been multiple custom check script errors on the SOA managed servers in the last 5 minutes, this likely means please that a composite endpoint is unreachable."
+  comparison_operator = "GreaterThanThreshold"
+  metric_name         = aws_cloudwatch_log_metric_filter.soa_custom_check_percentage_heap_free_memory.id
+  statistic           = "Sum"
+  namespace           = "CCMS-SOA-APP"
+  period              = "30"
+  evaluation_periods  = "5"
+  threshold           = "1"
+  datapoints_to_alarm = "1"
+  treat_missing_data  = "notBreaching"
+  alarm_actions       = [aws_sns_topic.alerts.arn]
+  ok_actions          = [aws_sns_topic.alerts.arn]
+}
+
+resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_stuck_threads" {
+  alarm_name          = "${local.application_data.accounts[local.environment].app_name}-managed-custom-checks-stuck-threads"
+  alarm_description   = "${local.environment} | ${local.aws_account_id} | There have been multiple custom check script errors on the SOA managed servers in the last 5 minutes, this likely means please that a composite endpoint is unreachable."
+  comparison_operator = "GreaterThanThreshold"
+  metric_name         = aws_cloudwatch_log_metric_filter.soa_custom_check_stuck_threads.id
+  statistic           = "Sum"
+  namespace           = "CCMS-SOA-APP"
+  period              = "30"
+  evaluation_periods  = "5"
+  threshold           = "1"
+  datapoints_to_alarm = "1"
+  treat_missing_data  = "notBreaching"
+  alarm_actions       = [aws_sns_topic.alerts.arn]
+  ok_actions          = [aws_sns_topic.alerts.arn]
+}
+
+resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_hogging_threads" {
+  alarm_name          = "${local.application_data.accounts[local.environment].app_name}-managed-custom-checks-hogging-threads"
+  alarm_description   = "${local.environment} | ${local.aws_account_id} | There have been multiple custom check script errors on the SOA managed servers in the last 5 minutes, this likely means please that a composite endpoint is unreachable."
+  comparison_operator = "GreaterThanThreshold"
+  metric_name         = aws_cloudwatch_log_metric_filter.soa_custom_check_hogging_threads.id
   statistic           = "Sum"
   namespace           = "CCMS-SOA-APP"
   period              = "30"
