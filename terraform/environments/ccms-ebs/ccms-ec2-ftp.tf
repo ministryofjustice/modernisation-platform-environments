@@ -60,6 +60,18 @@ resource "aws_instance" "ec2_ftp" {
     )
   }
 
+  ebs_block_device {
+    device_name = "/dev/sdc"
+    volume_type = "gp3"
+    volume_size = 5
+    encrypted   = true
+    kms_key_id  = data.aws_kms_key.ebs_shared.key_id
+    tags = merge(local.tags,
+      { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ftp, "test")) },
+      { device-name = "/dev/sdc" }
+    )
+  }
+
   tags = merge(local.tags,
     { Name = lower(format("ec2-%s-%s-FTP", local.application_name, local.environment)) },
     { instance-role = local.application_data.accounts[local.environment].instance_role_ftp },
