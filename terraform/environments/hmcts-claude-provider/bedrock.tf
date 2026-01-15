@@ -16,6 +16,7 @@ resource "aws_iam_policy" "bedrock_claude_policy" {
           "bedrock:List*"
         ],
         Resource = [
+          # Regional foundation models
           "arn:aws:bedrock:*::foundation-model/anthropic.claude-opus-4-5-20251101-v1:0",
           "arn:aws:bedrock:eu-*::foundation-model/anthropic.claude-sonnet-4-5-20250929-v1:0",
           "arn:aws:bedrock:eu-*::foundation-model/anthropic.claude-sonnet-4-20250514-v1:0",
@@ -23,8 +24,23 @@ resource "aws_iam_policy" "bedrock_claude_policy" {
           "arn:aws:bedrock:us-*::foundation-model/anthropic.claude-3-5-haiku-20241022-v1:0",
           "arn:aws:bedrock:eu-*::foundation-model/anthropic.claude-3-5-haiku-20241022-v1:0",
           "arn:aws:bedrock:eu-*::foundation-model/anthropic.claude-3-haiku-20240307-v1:0",
+          # Global foundation model ARN (required for global cross-region inference)
+          "arn:aws:bedrock:::foundation-model/anthropic.claude-opus-4-5-20251101-v1:0",
+          # Inference profiles (regional and account-specific)
           "arn:aws:bedrock:*::inference-profile/*",
           "arn:aws:bedrock:*:313941174580:inference-profile/*"
+        ]
+      },
+      {
+        Sid    = "BedrockGlobalInferenceProfile",
+        Effect = "Allow",
+        Action = [
+          "bedrock:InvokeModel",
+          "bedrock:InvokeModelWithResponseStream"
+        ],
+        Resource = [
+          # Global inference profile for Opus 4.5 (from eu-west-1)
+          "arn:aws:bedrock:eu-west-1:313941174580:inference-profile/global.anthropic.claude-opus-4-5-20251101-v1:0"
         ]
       },
       {
