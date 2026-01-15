@@ -4,6 +4,7 @@
 #  which were stored in the _compiled configuration file.0
 #  Creating this to avoid regenrating the Certificate in Production which would involve
 #  re-validating the 40+ SAN certificate records
+#  Force redeployment to preprod
 ###############################
 
 # -------------------------------------------------
