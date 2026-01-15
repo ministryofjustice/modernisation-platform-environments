@@ -6,7 +6,7 @@
       "Resource": "arn:aws:states:::lambda:invoke",
       "OutputPath": "$.Payload",
       "Parameters": {
-        "FunctionName": "${ears_sars_request}"
+        "FunctionName": "${ears_sars_request}",
         "Payload": {
           "path": "/request/",
           "httpMethod": "POST",
