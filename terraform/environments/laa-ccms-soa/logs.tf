@@ -102,34 +102,22 @@ resource "aws_cloudwatch_log_metric_filter" "soa_benefit_checker_rollback_error_
   }
 }
 
-resource "aws_cloudwatch_log_metric_filter" "soa_custom_checks_error_managed" {
-  name           = "SOACustomChecksManaged"
-  pattern        = "\"<Local Script Error>\""
-  log_group_name = aws_cloudwatch_log_group.log_group_managed.name
+# resource "aws_cloudwatch_log_metric_filter" "soa_custom_checks_error_managed" {
+#   name           = "SOACustomChecksManaged"
+#   pattern        = "\"<Local Script Error>\""
+#   log_group_name = aws_cloudwatch_log_group.log_group_managed.name
 
-  metric_transformation {
-    name      = "SOACustomChecksManaged"
-    namespace = "CCMS-SOA-APP"
-    value     = "1"
-  }
-}
+#   metric_transformation {
+#     name      = "SOACustomChecksManaged"
+#     namespace = "CCMS-SOA-APP"
+#     value     = "1"
+#   }
+# }
 
 # Spilting out custom checks errors for easier alerting in Slack channel
-resource "aws_cloudwatch_log_metric_filter" "soa_custom_checks_override_defaults" {
-  name           = "SOACustomChecksOverrideDefaults"
-  pattern        = "\"<Local Script Error>\" -\"custom_config_location\""
-  log_group_name = aws_cloudwatch_log_group.log_group_managed.name        
-
-  metric_transformation {
-    name      = "SOACustomChecksOverrideDefaults"
-    namespace = "CCMS-SOA-APP"
-    value     = "1"
-  }
-}
-
 resource "aws_cloudwatch_log_metric_filter" "soa_custom_check_test_paths" {
   name           = "SOACustomCheckTestPaths"
-  pattern        = "\"<Local Script Error>\" -\"$path failed to respond\""
+  pattern        = "\"<Local Script Error>\" -\"failed to respond\""
   log_group_name = aws_cloudwatch_log_group.log_group_managed.name        
 
   metric_transformation {
@@ -141,7 +129,7 @@ resource "aws_cloudwatch_log_metric_filter" "soa_custom_check_test_paths" {
 
 resource "aws_cloudwatch_log_metric_filter" "soa_custom_check_server_health" {
   name           = "SOACustomChecksCheckServerHealth"
-  pattern        = "\"<Local Script Error>\" -\"Managed server health status is $server_health\""
+  pattern        = "\"<Local Script Error>\" -\"Managed server health status\""
   log_group_name = aws_cloudwatch_log_group.log_group_managed.name        
 
   metric_transformation {
@@ -153,7 +141,7 @@ resource "aws_cloudwatch_log_metric_filter" "soa_custom_check_server_health" {
 
 resource "aws_cloudwatch_log_metric_filter" "soa_custom_check_percentage_heap_free_memory" {
   name           = "SOACustomCheckPercentageHeapFreeMemory"
-  pattern        = "\"<Local Script Error>\" -\"Managed server has only $heap_free_percent% heap free mememory\""
+  pattern        = "\"<Local Script Error>\" -\"Managed server has only heap free mememory\""
   log_group_name = aws_cloudwatch_log_group.log_group_managed.name        
 
   metric_transformation {
@@ -165,7 +153,7 @@ resource "aws_cloudwatch_log_metric_filter" "soa_custom_check_percentage_heap_fr
 
 resource "aws_cloudwatch_log_metric_filter" "soa_custom_check_stuck_threads" {
   name           = "SOACustomCheckStuckThreads"
-  pattern        = "\"<Local Script Error>\" -\"Managed server has $stuck_threads hogging threads\""
+  pattern        = "\"<Local Script Error>\" -\"Managed server has stuck and hogging threads\""
   log_group_name = aws_cloudwatch_log_group.log_group_managed.name        
 
   metric_transformation {
@@ -175,21 +163,9 @@ resource "aws_cloudwatch_log_metric_filter" "soa_custom_check_stuck_threads" {
   }
 }
 
-resource "aws_cloudwatch_log_metric_filter" "soa_custom_check_hogging_threads" {
-  name           = "SOACustomCheckHoggingThreads"
-  pattern        = "\"<Local Script Error>\" -\"Managed server has $hogging_threads hogging threads\""
-  log_group_name = aws_cloudwatch_log_group.log_group_managed.name        
-
-  metric_transformation {
-    name      = "SOACustomCheckThreads"
-    namespace = "CCMS-SOA-APP"
-    value     = "1"
-  }
-}
-
 resource "aws_cloudwatch_log_metric_filter" "soa_custom_check_jdbc_ebssms_state" {
   name           = "SOACustomCheckJDBCebssmsState"
-  pattern        = "\"<Local Script Error>\" -\"Managed server EBSSMS JDBC datasource state is $ebssms_state\""
+  pattern        = "\"<Local Script Error>\" -\"Managed server EBSSMS JDBC datasource state.\""
   log_group_name = aws_cloudwatch_log_group.log_group_managed.name        
 
   metric_transformation {
@@ -201,7 +177,7 @@ resource "aws_cloudwatch_log_metric_filter" "soa_custom_check_jdbc_ebssms_state"
 
 resource "aws_cloudwatch_log_metric_filter" "soa_custom_check_jdbc_ebs_state" {
   name           = "SOACustomCheckJDBCebsState"
-  pattern        = "\"<Local Script Error>\" -\"Managed server EBS JDBC datasource state is $ebs_state\""
+  pattern        = "\"<Local Script Error>\" -\"Managed server EBS JDBC datasource state.\""
   log_group_name = aws_cloudwatch_log_group.log_group_managed.name        
 
   metric_transformation {
