@@ -143,7 +143,7 @@ resource "aws_cloudwatch_event_rule" "rds_events" {
     "source" : ["aws.rds"],
     "detail" : {
       "eventSource" : ["db-instance"],
-      "resources" : [aws_db_instance.dacp_db[0].arn]
+      "resources" : [aws_db_instance.dacp_db.arn]
     }
   })
 }
@@ -171,6 +171,6 @@ resource "aws_cloudwatch_metric_alarm" "rds_connections_alarm" {
   alarm_actions       = [aws_sns_topic.dacp_utilisation_alarm.arn]
 
   dimensions = {
-    DBInstanceIdentifier = aws_db_instance.dacp_db[0].identifier
+    DBInstanceIdentifier = aws_db_instance.dacp_db.identifier
   }
 }

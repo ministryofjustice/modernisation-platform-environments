@@ -105,7 +105,7 @@ resource "aws_ecs_service" "dacp_ecs_service" {
   ]
   name                              = "${var.networking[0].application}-win2022"
   cluster                           = aws_ecs_cluster.dacp_cluster.id
-  task_definition                   = aws_ecs_task_definition.dacp_task_definition[0].arn
+  task_definition                   = aws_ecs_task_definition.dacp_task_definition.arn
   launch_type                       = "FARGATE"
   enable_execute_command            = true
   desired_count                     = 2
