@@ -1337,6 +1337,17 @@ data "aws_iam_policy_document" "mdss_daily_failure_digest_policy_document" {
     ]
     resources = [aws_sns_topic.emds_alerts.arn]
   }
+
+  statement {
+    sid    = "AllowUseOfAlertsKmsKey"
+    effect = "Allow"
+    actions = [
+      "kms:GenerateDataKey*",
+      "kms:GenerateDataKey",
+      "kms:Decrypt",
+    ]
+    resources = [aws_kms_key.emds_alerts.arn]
+  }
 }
 
 resource "aws_iam_role" "mdss_daily_failure_digest" {
