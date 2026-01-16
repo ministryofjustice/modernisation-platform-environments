@@ -29,11 +29,6 @@ data "aws_route53_zone" "modernisation_platform" {
   name         = "modernisation-platform.service.justice.gov.uk"
   private_zone = false
 }
-data "aws_route53_zone" "modernisation_platform" {
-  provider     = aws.core-network-services
-  name         = "modernisation-platform.service.justice.gov.uk"
-  private_zone = false
-}
 
 ##############################################
 ### ACM CERTIFICATE FOR LOAD BALANCER ###
