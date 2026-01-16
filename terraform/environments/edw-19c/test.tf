@@ -6,7 +6,8 @@ resource "aws_instance" "london_ec2" {
   availability_zone           = "eu-west-2a"
   
   subnet_id                   = data.aws_subnet.private_subnets_a.id
-  vpc_security_group_ids      = aws_security_group.ec2_sg.id
+  vpc_security_group_ids = [aws_security_group.ec2_sg.id]
+
   
   
   tags = {
