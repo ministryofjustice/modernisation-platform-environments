@@ -3,6 +3,14 @@
 ##############################################
 locals {
   loadbalancer_ingress_rules = {
+    "lb_ingress_80" = {
+      description     = "Loadbalancer ingress rule for HTTP (redirects to HTTPS)"
+      from_port       = 80
+      to_port         = 80
+      protocol        = "tcp"
+      cidr_blocks     = ["51.149.251.0/24", "51.149.250.0/24", "35.176.254.38/32", "52.56.212.11/32", "35.177.173.197/32"]
+      security_groups = []
+    }
     "lb_ingress_443" = {
       description     = "Loadbalancer ingress rule for HTTPS from MOJO devices and LZ Shared-Service Workspaces"
       from_port       = 443
@@ -84,7 +92,7 @@ resource "aws_lb_target_group" "oas_ec2_target_group" {
   }
 
   health_check {
-    path                = "/console/em"
+    path                = "/console"
     port                = "9500"
     healthy_threshold   = 3
     interval            = 30
