@@ -26,8 +26,9 @@ resource "aws_route53_record" "oas-rds-new" {
 }
 
 ######################################
-### Load Balancer Route53 Record
+### Load Balancer Route53 Records
 ######################################
+# oas-lb.* (Subject Alternative Name - 71 chars)
 resource "aws_route53_record" "oas-lb" {
   count = contains(["test", "preproduction"], local.environment) ? 1 : 0
 

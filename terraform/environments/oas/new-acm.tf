@@ -27,10 +27,10 @@ data "aws_route53_zone" "modernisation_platform" {
 resource "aws_acm_certificate" "external" {
   count = contains(["test", "preproduction"], local.environment) ? 1 : 0
 
-  domain_name = local.environment == "test" ? "*.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk" : "${local.application_name}-lb.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  domain_name = local.environment == "test" ? "*.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk" : "${local.application_name}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   
   subject_alternative_names = local.environment == "preproduction" ? [
-    "${local.application_name}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk",
+    "${local.application_name}-lb.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk",
   ] : []
 
   validation_method = "DNS"
