@@ -217,50 +217,73 @@ class NotificationService:
                 pass
 
             payload = {
-                "blocks": [
-                    {
-                        "type": "header",
-                        "text": {"type": "plain_text", "text": f"{header}"}
-                    },
-                    {
-                        "type": "section",
-                        "text": {"type": "plain_text", "text": f"Finding type - {finding_type}"}
-                    },
-                    {
-                        "type": "section",
-                        "text": {"type": "plain_text", "text": f"*Details - {title}*"}
-                    },
-                    {
-                        "type": "divider"
-                    },
-                    {
-                        "type": "section",
-                        "fields": [
-                            {
-                                "type": "mrkdwn",
-                                "text": f"*FirstSeen:* {firstseen}"
-                            },
-                            {
-                                "type": "mrkdwn",
-                                "text": f"*LastSeen:* {lastseen}"
-                            }
-                        ]
-                    },
-                    {
-                        "type": "section",
-                        "fields": [
-                            {
-                                "type": "mrkdwn",
-                                "text": f"*Severity:* {strseverity}"
-                            },
-                            {
-                                "type": "mrkdwn",
-                                "text": f"*Threat Count:* {threatcount}"
-                            }
-                        ]
+            "blocks": [
+                {
+                    "type": "header",
+                    "text": {
+                        "type": "plain_text",
+                        "text": f"{header}"
                     }
-                ]
-            }
+                },
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "plain_text",
+                        "text": f"Finding type - {finding_type}"
+                    }
+                },
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": "*Details*"
+                    }
+                },
+                {
+                    "type": "rich_text",
+                    "elements": [
+                        {
+                            "type": "rich_text_preformatted",
+                            "elements": [
+                                {
+                                    "type": "text",
+                                    "text": f"{title}"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "divider"
+                },
+                {
+                    "type": "section",
+                    "fields": [
+                        {
+                            "type": "mrkdwn",
+                            "text": f"*FirstSeen:* {firstseen}"
+                        },
+                        {
+                            "type": "mrkdwn",
+                            "text": f"*LastSeen:* {lastseen}"
+                        }
+                    ]
+                },
+                {
+                    "type": "section",
+                    "fields": [
+                        {
+                            "type": "mrkdwn",
+                            "text": "f*Severity:* {strseverity}"
+                        },
+                        {
+                            "type": "mrkdwn",
+                            "text": f"*Threat Count:* {threatcount}"
+                        }
+                    ]
+                }
+            ]
+        }
 
         # ---------------- CloudWatch Alarm ----------------
         elif type == "CloudWatch Alarm":
@@ -584,3 +607,4 @@ def lambda_handler(event, context):
             f"Current memory usage: {current / 1024 / 1024:.2f} MB; Peak: {peak / 1024 / 1024:.2f} MB"
         )
         tracemalloc.stop()
+
