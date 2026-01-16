@@ -180,7 +180,8 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
           region = "eu-west-2"
           view   = "table"
           query  = <<-EOT
-            filter ispresent(message.event)
+            SOURCE '/aws/lambda/load_mdss'
+            | filter ispresent(message.event)
             | filter message.event in ["MDSS_FILE_START","MDSS_FILE_OK","MDSS_FILE_FAIL"]
             | fields @timestamp, message.table as table, message.s3path as s3path, message.attempt as attempt
             | stats
