@@ -10,9 +10,25 @@ locals {
       type   = dvo.resource_record_type
     }
   } : {}
+  
+  # Split domains: parent (modernisation-platform) vs environment-specific (laa-test/laa-preproduction)
+  parent_domain_validation = contains(["test", "preproduction"], local.environment) ? {
+    for k, v in local.domain_types : k => v 
+    if k == "modernisation-platform.service.justice.gov.uk"
+  } : {}
+  
+  env_domain_validation = contains(["test", "preproduction"], local.environment) ? {
+    for k, v in local.domain_types : k => v 
+    if k != "modernisation-platform.service.justice.gov.uk"
+  } : {}
 }
 
 # Data source for parent zone (for certificate validation)
+data "aws_route53_zone" "modernisation_platform" {
+  provider     = aws.core-network-services
+  name         = "modernisation-platform.service.justice.gov.uk"
+  private_zone = false
+}
 data "aws_route53_zone" "modernisation_platform" {
   provider     = aws.core-network-services
   name         = "modernisation-platform.service.justice.gov.uk"
@@ -23,15 +39,15 @@ data "aws_route53_zone" "modernisation_platform" {
 ### ACM CERTIFICATE FOR LOAD BALANCER ###
 ##############################################
 # ACM Public Certificate for test and preproduction environments
-# Using specific domain names to avoid 64-character limit for preproduction
+# Using parent domain as primary (48 chars) with environment-specific SANs
 resource "aws_acm_certificate" "external" {
   count = contains(["test", "preproduction"], local.environment) ? 1 : 0
 
-  domain_name = local.environment == "test" ? "*.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk" : "${local.application_name}-lb.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  domain_name = "modernisation-platform.service.justice.gov.uk"
   
-  subject_alternative_names = local.environment == "preproduction" ? [
-    "${local.application_name}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk",
-  ] : []
+  subject_alternative_names = [
+    "*.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  ]
 
   validation_method = "DNS"
 
@@ -46,9 +62,22 @@ resource "aws_acm_certificate" "external" {
 }
 
 # Route53 DNS records for certificate validation
-# Both environments validate in their respective environment zones
-resource "aws_route53_record" "external_validation" {
-  for_each = local.domain_types
+# Parent domain validates in parent zone
+resource "aws_route53_record" "external_validation_parent" {
+  for_each = local.parent_domain_validation
+  provider = aws.core-network-services
+
+  allow_overwrite = true
+  name            = each.value.name
+  records         = [each.value.record]
+  ttl             = 60
+  type            = each.value.type
+  zone_id         = data.aws_route53_zone.modernisation_platform.zone_id
+}
+
+# Environment-specific domains validate in environment zone
+resource "aws_route53_record" "external_validation_env" {
+  for_each = local.env_domain_validation
   provider = aws.core-vpc
 
   allow_overwrite = true
@@ -64,5 +93,8 @@ resource "aws_acm_certificate_validation" "external" {
   count = contains(["test", "preproduction"], local.environment) ? 1 : 0
 
   certificate_arn = aws_acm_certificate.external[0].arn
-  validation_record_fqdns = values(aws_route53_record.external_validation)[*].fqdn
+  validation_record_fqdns = concat(
+    values(aws_route53_record.external_validation_parent)[*].fqdn,
+    values(aws_route53_record.external_validation_env)[*].fqdn
+  )
 }
