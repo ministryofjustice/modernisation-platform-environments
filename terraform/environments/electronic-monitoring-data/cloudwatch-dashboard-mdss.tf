@@ -168,11 +168,45 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
         }
       },
 
-      # Failing files
+      # Per-file load duration by table (seconds)
       {
         type   = "log",
         x      = 0,
         y      = 32,
+        width  = 24,
+        height = 6,
+        properties = {
+          title  = "Per-file load duration by table (seconds)"
+          region = "eu-west-2"
+          view   = "table"
+          query  = <<-EOT
+            filter ispresent(message.event)
+            | filter message.event in ["MDSS_FILE_START","MDSS_FILE_OK","MDSS_FILE_FAIL"]
+            | fields @timestamp, message.table as table, message.s3path as s3path, message.attempt as attempt
+            | stats
+                count() as n_events,
+                min(@timestamp) as start,
+                max(@timestamp) as finish,
+                (max(@timestamp) - min(@timestamp)) as duration_ms
+              by table, s3path, attempt
+            | filter n_events >= 2
+            | stats
+                count() as files,
+                round(avg(duration_ms)/1000, 1) as avg_sec,
+                round(pct(duration_ms, 95)/1000, 1) as p95_sec,
+                round(max(duration_ms)/1000, 1) as max_sec
+              by table
+            | sort p95_sec desc
+            | limit 50
+          EOT
+        }
+      },
+
+      # Failing files
+      {
+        type   = "log",
+        x      = 0,
+        y      = 38,
         width  = 24,
         height = 6,
         properties = {
