@@ -12,7 +12,7 @@ resource "aws_instance" "ec2_ftp" {
   # Due to a bug in terraform wanting to rebuild the ec2 if more than 1 ebs block is attached, we need the lifecycle clause below.
   lifecycle {
     ignore_changes = [
-      # ebs_block_device,  # Temporarily commented to add new volume
+      ebs_block_device,
       root_block_device,
       ebs_optimized,
       # user_data,
@@ -59,19 +59,7 @@ resource "aws_instance" "ec2_ftp" {
       { device-name = "/dev/sda1" }
     )
   }
-
-  ebs_block_device {
-    device_name = "/dev/sdc"
-    volume_type = "gp3"
-    volume_size = 5
-    encrypted   = true
-    kms_key_id  = data.aws_kms_key.ebs_shared.key_id
-    tags = merge(local.tags,
-      { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ftp, "test")) },
-      { device-name = "/dev/sdc" }
-    )
-  }
-
+  
   tags = merge(local.tags,
     { Name = lower(format("ec2-%s-%s-FTP", local.application_name, local.environment)) },
     { instance-role = local.application_data.accounts[local.environment].instance_role_ftp },
