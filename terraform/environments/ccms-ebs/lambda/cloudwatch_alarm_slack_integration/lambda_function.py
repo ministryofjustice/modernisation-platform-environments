@@ -228,8 +228,8 @@ class NotificationService:
                 {
                     "type": "section",
                     "text": {
-                        "type": "plain_text",
-                        "text": f"*Finding type* - {finding_type}"
+                        "type": "mrkdwn",
+                        "text": f"*Finding Type* - {finding_type}"
                     }
                 },
                 {
