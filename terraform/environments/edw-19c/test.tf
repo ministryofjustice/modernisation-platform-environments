@@ -4,10 +4,11 @@ resource "aws_instance" "london_ec2" {
   instance_type = "t2.micro"
   vpc_id=data.aws_vpc.shared.id
   availability_zone           = "eu-west-2a"
-
-    subnet_id                   = data.aws_subnet.private_subnets_a.id
-    vpc_security_group_ids      = aws_security_group.ec2_sg.id
-
+  
+  subnet_id                   = data.aws_subnet.private_subnets_a.id
+  vpc_security_group_ids      = aws_security_group.ec2_sg.id
+  
+  
   tags = {
     Name = "london-ec2"
   }
