@@ -23,11 +23,16 @@ data "aws_route53_zone" "modernisation_platform" {
 ### ACM CERTIFICATE FOR LOAD BALANCER ###
 ##############################################
 # ACM Public Certificate for test and preproduction environments
-# Test uses zone-specific wildcard (57 chars) - preproduction uses parent wildcard (48 chars)
+# Using specific domain names to avoid 64-character limit for preproduction
 resource "aws_acm_certificate" "external" {
   count = contains(["test", "preproduction"], local.environment) ? 1 : 0
 
-  domain_name       = local.environment == "test" ? "*.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk" : "*.modernisation-platform.service.justice.gov.uk"
+  domain_name = local.environment == "test" ? "*.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk" : "${local.application_name}-lb.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  
+  subject_alternative_names = local.environment == "preproduction" ? [
+    "${local.application_name}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk",
+  ] : []
+
   validation_method = "DNS"
 
   tags = merge(
@@ -41,9 +46,9 @@ resource "aws_acm_certificate" "external" {
 }
 
 # Route53 DNS records for certificate validation
-# Test environment - validates in laa-test zone
-resource "aws_route53_record" "external_validation_test" {
-  for_each = local.environment == "test" ? local.domain_types : {}
+# Both environments validate in their respective environment zones
+resource "aws_route53_record" "external_validation" {
+  for_each = local.domain_types
   provider = aws.core-vpc
 
   allow_overwrite = true
@@ -52,27 +57,6 @@ resource "aws_route53_record" "external_validation_test" {
   ttl             = 60
   type            = each.value.type
   zone_id         = data.aws_route53_zone.external.zone_id
-
-  lifecycle {
-    ignore_changes = [name, records, type]
-  }
-}
-
-# Preproduction environment - validates in parent zone
-resource "aws_route53_record" "external_validation_preprod" {
-  for_each = local.environment == "preproduction" ? local.domain_types : {}
-  provider = aws.core-network-services
-
-  allow_overwrite = true
-  name            = each.value.name
-  records         = [each.value.record]
-  ttl             = 60
-  type            = each.value.type
-  zone_id         = data.aws_route53_zone.modernisation_platform.zone_id
-
-  lifecycle {
-    ignore_changes = [name, records, type]
-  }
 }
 
 # ACM Certificate Validation
@@ -80,5 +64,5 @@ resource "aws_acm_certificate_validation" "external" {
   count = contains(["test", "preproduction"], local.environment) ? 1 : 0
 
   certificate_arn = aws_acm_certificate.external[0].arn
-  validation_record_fqdns = local.environment == "test" ? values(aws_route53_record.external_validation_test)[*].fqdn : values(aws_route53_record.external_validation_preprod)[*].fqdn
+  validation_record_fqdns = values(aws_route53_record.external_validation)[*].fqdn
 }

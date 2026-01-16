@@ -1,5 +1,5 @@
 # resource "aws_route53_zone" "cluster_zone" {
-#   name = trimprefix(terraform.workspace, "cloud-platform-") + ".temp.cloud-platform.service.justice.gov.uk"
+#   name = "cluster" + trimprefix(terraform.workspace, "cloud-platform-") + ".temp.cloud-platform.service.justice.gov.uk"
 #   force_destroy = true
 
 #   tags = {
