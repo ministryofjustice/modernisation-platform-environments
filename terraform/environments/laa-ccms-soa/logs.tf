@@ -141,7 +141,7 @@ resource "aws_cloudwatch_log_metric_filter" "soa_custom_check_server_health" {
 
 resource "aws_cloudwatch_log_metric_filter" "soa_custom_check_percentage_heap_free_memory" {
   name           = "SOACustomCheckPercentageHeapFreeMemory"
-  pattern        = "\"<Local Script Error>\" \"heap free mememory\""
+  pattern        = "\"<Local Script Error>\" \"heap free memory\""
   log_group_name = aws_cloudwatch_log_group.log_group_managed.name        
 
   metric_transformation {
@@ -165,7 +165,7 @@ resource "aws_cloudwatch_log_metric_filter" "soa_custom_check_stuck_threads" {
 
 resource "aws_cloudwatch_log_metric_filter" "soa_custom_check_jdbc_ebssms_state" {
   name           = "SOACustomCheckJDBCebssmsState"
-  pattern        = "\"<Local Script Error>\" \"JDBC datasource state.\""
+  pattern        = "\"<Local Script Error>\" -\"JDBC datasource state.\""
   log_group_name = aws_cloudwatch_log_group.log_group_managed.name        
 
   metric_transformation {
@@ -177,7 +177,7 @@ resource "aws_cloudwatch_log_metric_filter" "soa_custom_check_jdbc_ebssms_state"
 
 resource "aws_cloudwatch_log_metric_filter" "soa_custom_check_jdbc_failed_reserve_request_count" {
   name           = "SOACustomCheckJDBCebsState"
-  pattern        = "\"<Local Script Error>\" \"JDBC datasource failedReserveRequestCount.\""
+  pattern        = "\"<Local Script Error>\" -\"JDBC datasource failedReserveRequestCount.\""
   log_group_name = aws_cloudwatch_log_group.log_group_managed.name        
 
   metric_transformation {
