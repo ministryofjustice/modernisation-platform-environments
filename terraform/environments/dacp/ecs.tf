@@ -19,7 +19,6 @@ resource "aws_cloudwatch_log_group" "ecs_logs" {
 }
 
 resource "aws_ecs_task_definition" "dacp_task_definition" {
-  count                    = local.is-development ? 0 : 1
   family                   = "dacpFamily"
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
@@ -53,7 +52,7 @@ resource "aws_ecs_task_definition" "dacp_task_definition" {
       environment = [
         {
           name  = "RDS_HOSTNAME"
-          value = aws_db_instance.dacp_db[0].address
+          value = aws_db_instance.dacp_db.address
         },
         {
           name  = "RDS_PORT"
@@ -61,98 +60,15 @@ resource "aws_ecs_task_definition" "dacp_task_definition" {
         },
         {
           name  = "RDS_USERNAME"
-          value = aws_db_instance.dacp_db[0].username
+          value = aws_db_instance.dacp_db.username
         },
         {
           name  = "RDS_PASSWORD"
-          value = aws_db_instance.dacp_db[0].password
+          value = aws_db_instance.dacp_db.password
         },
         {
           name  = "DB_NAME"
-          value = aws_db_instance.dacp_db[0].db_name
-        },
-        {
-          name  = "supportEmail"
-          value = local.application_data.accounts[local.environment].support_email
-        },
-        {
-          name  = "supportTeam"
-          value = local.application_data.accounts[local.environment].support_team
-        },
-        {
-          name  = "ida:ClientId"
-          value = local.application_data.accounts[local.environment].client_id
-        },
-        {
-          name  = "BURY_COURT_ID"
-          value = local.application_data.accounts[local.environment].bury_court_id
-        },
-        {
-          name  = "BURY_POST_2015_SEND_CODE"
-          value = local.application_data.accounts[local.environment].bury_post_2015_send_code
-        }
-      ]
-    }
-  ])
-  runtime_platform {
-    operating_system_family = "WINDOWS_SERVER_2022_CORE"
-    cpu_architecture        = "X86_64"
-  }
-}
-
-//ECS task definition for the development environment:
-resource "aws_ecs_task_definition" "dacp_task_definition_dev" {
-  count                    = local.is-development ? 1 : 0
-  family                   = "dacpFamily"
-  requires_compatibilities = ["FARGATE"]
-  network_mode             = "awsvpc"
-  execution_role_arn       = aws_iam_role.app_execution.arn
-  task_role_arn            = aws_iam_role.app_task.arn
-  cpu                      = local.application_data.accounts[local.environment].ecs_cpu
-  memory                   = local.application_data.accounts[local.environment].ecs_memory
-  container_definitions = jsonencode([
-    {
-      name                   = "dacp-container"
-      image                  = "${aws_ecr_repository.dacp_ecr_repo.repository_url}:latest"
-      cpu                    = local.application_data.accounts[local.environment].ecs_cpu
-      memory                 = local.application_data.accounts[local.environment].ecs_memory
-      essential              = true
-      ReadonlyRootFilesystem = true
-      logConfiguration = {
-        logDriver = "awslogs",
-        options = {
-          "awslogs-group"         = aws_cloudwatch_log_group.ecs_logs.name,
-          "awslogs-region"        = "eu-west-2",
-          "awslogs-stream-prefix" = "dacp-app"
-        }
-      },
-      portMappings = [
-        {
-          containerPort = 80
-          protocol      = "tcp"
-          hostPort      = 80
-        }
-      ]
-      environment = [
-        {
-          name  = "RDS_HOSTNAME"
-          value = aws_db_instance.dacp_db_dev[0].address
-        },
-        {
-          name  = "RDS_PORT"
-          value = local.application_data.accounts[local.environment].rds_port
-        },
-        {
-          name  = "RDS_USERNAME"
-          value = aws_db_instance.dacp_db_dev[0].username
-        },
-        {
-          name  = "RDS_PASSWORD"
-          value = aws_db_instance.dacp_db_dev[0].password
-        },
-        {
-          name  = "DB_NAME"
-          value = aws_db_instance.dacp_db_dev[0].db_name
+          value = aws_db_instance.dacp_db.db_name
         },
         {
           name  = "supportEmail"
@@ -185,50 +101,17 @@ resource "aws_ecs_task_definition" "dacp_task_definition_dev" {
 
 resource "aws_ecs_service" "dacp_ecs_service" {
   depends_on = [
-    aws_lb_listener.dacp_lb
+    aws_lb_listener.dacp_lb,
+    aws_security_group.ecs_service
   ]
-  count                             = local.is-development ? 0 : 1
   name                              = "${var.networking[0].application}-win2022"
   cluster                           = aws_ecs_cluster.dacp_cluster.id
-  task_definition                   = aws_ecs_task_definition.dacp_task_definition[0].arn
+  task_definition                   = aws_ecs_task_definition.dacp_task_definition.arn
   launch_type                       = "FARGATE"
   enable_execute_command            = true
   desired_count                     = 2
   health_check_grace_period_seconds = 180
-
-  network_configuration {
-    subnets          = data.aws_subnets.shared-private.ids
-    security_groups  = [aws_security_group.ecs_service.id]
-    assign_public_ip = false
-  }
-
-  load_balancer {
-    target_group_arn = aws_lb_target_group.dacp_target_group.arn
-    container_name   = "dacp-container"
-    container_port   = 80
-  }
-
-  deployment_controller {
-    type = "ECS"
-  }
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
-resource "aws_ecs_service" "dacp_ecs_service_dev" {
-  depends_on = [
-    aws_lb_listener.dacp_lb
-  ]
-  count                             = local.is-development ? 1 : 0
-  name                              = "${var.networking[0].application}-win2022"
-  cluster                           = aws_ecs_cluster.dacp_cluster.id
-  task_definition                   = aws_ecs_task_definition.dacp_task_definition_dev[0].arn
-  launch_type                       = "FARGATE"
-  enable_execute_command            = true
-  desired_count                     = 2
-  health_check_grace_period_seconds = 180
+  force_new_deployment = true
 
   network_configuration {
     subnets          = data.aws_subnets.shared-private.ids
