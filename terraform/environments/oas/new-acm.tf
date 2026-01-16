@@ -23,11 +23,16 @@ data "aws_route53_zone" "modernisation_platform" {
 ### ACM CERTIFICATE FOR LOAD BALANCER ###
 ##############################################
 # ACM Public Certificate for test and preproduction environments
-# Test uses zone-specific wildcard (57 chars) - preproduction uses parent wildcard (48 chars)
+# Using specific domain names to avoid 64-character limit for preproduction
 resource "aws_acm_certificate" "external" {
   count = contains(["test", "preproduction"], local.environment) ? 1 : 0
 
-  domain_name       = "*.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  domain_name = local.environment == "test" ? "*.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk" : "${local.application_name}-lb.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  
+  subject_alternative_names = local.environment == "preproduction" ? [
+    "${local.application_name}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk",
+  ] : []
+
   validation_method = "DNS"
 
   tags = merge(
@@ -52,10 +57,6 @@ resource "aws_route53_record" "external_validation" {
   ttl             = 60
   type            = each.value.type
   zone_id         = data.aws_route53_zone.external.zone_id
-
-  lifecycle {
-    ignore_changes = [name, records, type]
-  }
 }
 
 # ACM Certificate Validation
