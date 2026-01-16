@@ -203,7 +203,7 @@ class NotificationService:
                 lastseen = dt_last.strftime("%a, %d %b %Y %H:%M:%S UTC")
 
              # Prepare the Slack message with formatting
-            payload = {
+                payload = {
                 "blocks": [
                     {
                         "type": "header",
@@ -224,12 +224,12 @@ class NotificationService:
                         "type": "section",
                         "fields": [
                             {
-                            "type": "mrkdwn",
-                            "text": f"*FirstSeen:* {firstseen}"
+                                "type": "mrkdwn",
+                                "text": f"*FirstSeen:* {firstseen}"
                             },
                             {
-                            "type": "mrkdwn",
-                            "text": f"*LastSeen:* {lastseen}"
+                                "type": "mrkdwn",
+                                "text": f"*LastSeen:* {lastseen}"
                             }
                         ]
                     },
@@ -237,12 +237,12 @@ class NotificationService:
                         "type": "section",
                         "fields": [
                             {
-                            "type": "mrkdwn",
-                            "text": f"*Severity:* {strseverity}"
+                                "type": "mrkdwn",
+                                "text": f"*Severity:* {strseverity}"
                             },
                             {
-                            "type": "mrkdwn",
-                            "text": f"*Threat Count:* {threatcount}"
+                                "type": "mrkdwn",
+                                "text": f"*Threat Count:* {threatcount}"
                             }
                         ]
                     }
