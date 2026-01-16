@@ -422,7 +422,7 @@ resource "aws_instance" "s618358rgvw023" {
   count                  = local.is-preproduction == true ? 1 : 0
   ami                    = "ami-0f073b401ba3f1cff"
   instance_type          = "c5.large"
-  source_dest_check      = false
+  source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.PPUD-WEB-Portal.id]
   subnet_id              = data.aws_subnet.private_subnets_b.id
@@ -448,7 +448,7 @@ resource "aws_instance" "s618358rgvw024" {
   count                  = local.is-preproduction == true ? 1 : 0
   ami                    = "ami-06bc4f0d8d949ba24"
   instance_type          = "m6i.2xlarge"
-  source_dest_check      = false
+  source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.UAT-Document-Service[0].id]
   subnet_id              = data.aws_subnet.data_subnets_a.id
@@ -475,7 +475,7 @@ resource "aws_instance" "s618358rgsw025" {
   count                  = local.is-preproduction == true ? 1 : 0
   ami                    = "ami-0ad4be40d57ecc994"
   instance_type          = "c5.4xlarge"
-  source_dest_check      = false
+  source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.WAM-Data-Access-Server.id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
@@ -500,7 +500,7 @@ resource "aws_instance" "s618358rgvw028" {
   count                  = local.is-preproduction == true ? 1 : 0
   ami                    = "ami-0cbeb839e55dbb65e"
   instance_type          = "m5.xlarge"
-  source_dest_check      = false
+  source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.UAT-Document-Servers[0].id]
   subnet_id              = data.aws_subnet.data_subnets_b.id
@@ -525,7 +525,7 @@ resource "aws_instance" "s618358rgvw201" {
   count                  = local.is-preproduction == true ? 1 : 0
   ami                    = "ami-0d1cb68fb6c1f131b"
   instance_type          = "c5.large"
-  source_dest_check      = false
+  source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.WAM-Portal.id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
@@ -550,7 +550,7 @@ resource "aws_instance" "S618358RGVW202" {
   count                  = local.is-preproduction == true ? 1 : 0
   ami                    = "ami-0df4dcc477ff0fa3f"
   instance_type          = "m5.large"
-  source_dest_check      = false
+  source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.Bridge-Server[0].id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
