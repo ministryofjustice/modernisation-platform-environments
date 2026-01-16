@@ -464,7 +464,7 @@ locals {
           instance_type           = "r6i.4xlarge"
         })
         tags = merge(local.ec2_instances.db.tags, {
-          connectivity-tests = "10.40.0.133:53 10.40.129.79:22"
+          connectivity-tests = "10.40.128.196:53 10.40.10.132:22"
           description        = "Disaster-Recovery/High-Availability production databases for AUDIT/MIS"
           misload-dbname     = "DRMIS"
           nomis-environment  = "prod"
@@ -593,6 +593,11 @@ locals {
     }
 
     route53_zones = {
+      "nomis.az.justice.gov.uk" = {
+        records = [
+          { name = "c", type = "CNAME", ttl = "1800", records = ["c.nomis.service.justice.gov.uk"] },
+        ]
+      }
 
       "nomis.service.justice.gov.uk" = {
         lb_alias_records = [

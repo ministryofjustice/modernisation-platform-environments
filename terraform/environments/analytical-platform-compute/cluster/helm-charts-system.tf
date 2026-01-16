@@ -54,7 +54,7 @@ resource "helm_release" "aws_for_fluent_bit" {
         aws_region                = data.aws_region.current.region
         cluster_name              = module.eks.cluster_name
         cloudwatch_log_group_name = module.eks_log_group.cloudwatch_log_group_name
-        eks_role_arn              = module.aws_for_fluent_bit_iam_role.iam_role_arn
+        eks_role_arn              = module.aws_for_fluent_bit_iam_role.arn
       }
     )
   ]
@@ -78,7 +78,7 @@ resource "helm_release" "amazon_prometheus_proxy" {
       "${path.module}/src/helm/values/amazon-prometheus-proxy/values.yml.tftpl",
       {
         aws_region       = data.aws_region.current.region
-        eks_role_arn     = module.amazon_prometheus_proxy_iam_role.iam_role_arn
+        eks_role_arn     = module.amazon_prometheus_proxy_iam_role.arn
         amp_workspace_id = module.managed_prometheus.workspace_id
       }
     )
@@ -105,7 +105,7 @@ resource "helm_release" "cluster_autoscaler" {
       {
         aws_region                = data.aws_region.current.region
         cluster_name              = module.eks.cluster_name
-        eks_role_arn              = module.cluster_autoscaler_iam_role.iam_role_arn
+        eks_role_arn              = module.cluster_autoscaler_iam_role.arn
         service_monitor_namespace = kubernetes_namespace.cluster_autoscaler.metadata[0].name
       }
     )
@@ -195,7 +195,7 @@ resource "helm_release" "external_dns" {
       "${path.module}/src/helm/values/external-dns/values.yml.tftpl",
       {
         domain_filter = local.environment_configuration.route53_zone
-        eks_role_arn  = module.external_dns_iam_role.iam_role_arn
+        eks_role_arn  = module.external_dns_iam_role.arn
         txt_owner_id  = module.eks.cluster_name
       }
     )
@@ -215,7 +215,7 @@ resource "helm_release" "cert_manager" {
     templatefile(
       "${path.module}/src/helm/values/cert-manager/values.yml.tftpl",
       {
-        eks_role_arn = module.cert_manager_iam_role.iam_role_arn
+        eks_role_arn = module.cert_manager_iam_role.arn
       }
     )
   ]
@@ -289,7 +289,7 @@ resource "helm_release" "external_secrets" {
     templatefile(
       "${path.module}/src/helm/values/external-secrets/values.yml.tftpl",
       {
-        eks_role_arn = module.external_secrets_iam_role.iam_role_arn
+        eks_role_arn = module.external_secrets_iam_role.arn
       }
     )
   ]
@@ -332,7 +332,7 @@ resource "helm_release" "velero" {
     templatefile(
       "${path.module}/src/helm/values/velero/values.yml.tftpl",
       {
-        eks_role_arn              = module.velero_iam_role.iam_role_arn
+        eks_role_arn              = module.velero_iam_role.arn
         velero_aws_plugin_version = "v1.12.2"
         velero_bucket             = module.velero_s3_bucket.s3_bucket_id
         velero_prefix             = module.eks.cluster_name
