@@ -274,7 +274,7 @@ class NotificationService:
                     "fields": [
                         {
                             "type": "mrkdwn",
-                            "text": "f*Severity:* {strseverity}"
+                            "text": f"*Severity:* {strseverity}"
                         },
                         {
                             "type": "mrkdwn",
