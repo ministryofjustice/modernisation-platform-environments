@@ -463,8 +463,8 @@ resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_test_paths" {
   statistic           = "Sum"
   namespace           = "CCMS-SOA-APP"
   period              = "300"
-  evaluation_periods  = "5"
-  threshold           = "1"
+  evaluation_periods  = "1"
+  threshold           = "5"
   datapoints_to_alarm = "1"
   treat_missing_data  = "notBreaching"
   alarm_actions       = [aws_sns_topic.alerts.arn]
@@ -479,8 +479,8 @@ resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_server_health" {
   statistic           = "Sum"
   namespace           = "CCMS-SOA-APP"
   period              = "300"
-  evaluation_periods  = "5"
-  threshold           = "0"
+  evaluation_periods  = "1"
+  threshold           = "5"
   datapoints_to_alarm = "1"
   treat_missing_data  = "notBreaching"
   alarm_actions       = [aws_sns_topic.alerts.arn]
@@ -495,8 +495,8 @@ resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_percentage_heap_free_m
   statistic           = "Sum"
   namespace           = "CCMS-SOA-APP"
   period              = "300"
-  evaluation_periods  = "5"
-  threshold           = "60"
+  evaluation_periods  = "1"
+  threshold           = "5"
   datapoints_to_alarm = "1"
   treat_missing_data  = "notBreaching"
   alarm_actions       = [aws_sns_topic.alerts.arn]
@@ -511,8 +511,40 @@ resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_stuck_threads" {
   statistic           = "Sum"
   namespace           = "CCMS-SOA-APP"
   period              = "300"
-  evaluation_periods  = "5"
-  threshold           = "7"
+  evaluation_periods  = "1"
+  threshold           = "5"
+  datapoints_to_alarm = "1"
+  treat_missing_data  = "notBreaching"
+  alarm_actions       = [aws_sns_topic.alerts.arn]
+  ok_actions          = [aws_sns_topic.alerts.arn]
+}
+
+resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_jdbc_ebs_state" {
+  alarm_name          = "${local.application_data.accounts[local.environment].app_name}-managed-custom-checks-jdbc-ebs-state"
+  alarm_description   = "${local.environment} | ${local.aws_account_id} | There is a JDBC EBS state error on the SOA managed servers."
+  comparison_operator = "GreaterThanThreshold"
+  metric_name         = aws_cloudwatch_log_metric_filter.soa_custom_check_jdbc_ebssms_state.id
+  statistic           = "Sum"
+  namespace           = "CCMS-SOA-APP"
+  period              = "300"
+  evaluation_periods  = "1"
+  threshold           = "5"
+  datapoints_to_alarm = "1"
+  treat_missing_data  = "notBreaching"
+  alarm_actions       = [aws_sns_topic.alerts.arn]
+  ok_actions          = [aws_sns_topic.alerts.arn]
+}
+
+resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_jdbc_failed_reserve_request_count" {
+  alarm_name          = "${local.application_data.accounts[local.environment].app_name}-managed-custom-checks-jdbc-failed-reserve-request-count"
+  alarm_description   = "${local.environment} | ${local.aws_account_id} | There is a JDBC failed reserve request count error on the SOA managed servers."
+  comparison_operator = "GreaterThanThreshold"
+  metric_name         = aws_cloudwatch_log_metric_filter.soa_custom_check_jdbc_failed_reserve_request_count.id
+  statistic           = "Sum"
+  namespace           = "CCMS-SOA-APP"
+  period              = "300"
+  evaluation_periods  = "1"
+  threshold           = "5"
   datapoints_to_alarm = "1"
   treat_missing_data  = "notBreaching"
   alarm_actions       = [aws_sns_topic.alerts.arn]
