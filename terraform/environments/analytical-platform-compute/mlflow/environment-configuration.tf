@@ -6,12 +6,8 @@ locals {
 
     }
     test = {
-      mlflow_s3_bucket_name = "alpha-analytical-platform-mlflow-test"
-      route53_zone          = "compute.test.analytical-platform.service.justice.gov.uk"
-    }
+    }    
     production = {
-      mlflow_s3_bucket_name = "alpha-analytical-platform-mlflow"
-      route53_zone          = "compute.analytical-platform.service.justice.gov.uk"
     }
   }
 }
