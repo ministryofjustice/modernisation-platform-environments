@@ -229,7 +229,7 @@ class NotificationService:
                     "type": "section",
                     "text": {
                         "type": "plain_text",
-                        "text": f"Finding type - {finding_type}"
+                        "text": f"*Finding type* - {finding_type}"
                     }
                 },
                 {
