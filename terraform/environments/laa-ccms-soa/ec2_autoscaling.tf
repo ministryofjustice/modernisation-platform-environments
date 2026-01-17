@@ -5,8 +5,8 @@ resource "aws_autoscaling_group" "cluster-scaling-group-managed" {
   name                = "${local.application_data.accounts[local.environment].app_name}-auto-scaling-group-managed"
   vpc_zone_identifier = data.aws_subnets.shared-private.ids
   desired_capacity    = local.application_data.accounts[local.environment].managed_ec2_desired_capacity
-  max_size            = local.is-production ? 7 : 4
-  min_size            = 1
+  max_size            = local.is-production ? 7 : 0
+  min_size            = 0
 
   launch_template {
     id      = aws_launch_template.ec2-launch-template-managed.id
