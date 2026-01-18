@@ -308,7 +308,8 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 112 }
         }
         instance = merge(local.ec2_instances.app.instance, {
-          instance_type = "m5.4xlarge"
+          # instance_type = "m5.4xlarge" # TM-1672
+          instance_type = "r7i.2xlarge"
         })
         tags = merge(local.ec2_instances.app.tags, {
           ami           = "pd-csr-a-8-b"
@@ -329,7 +330,8 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 128 }
         }
         instance = merge(local.ec2_instances.app.instance, {
-          instance_type = "m5.4xlarge"
+          # instance_type = "m5.4xlarge" # TM-1672
+          instance_type = "r7i.2xlarge"
         })
         tags = merge(local.ec2_instances.app.tags, {
           ami           = "pd-csr-a-9-a"
@@ -350,7 +352,8 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 112 }
         }
         instance = merge(local.ec2_instances.app.instance, {
-          instance_type = "m5.4xlarge"
+          # instance_type = "m5.4xlarge" # TM-1672
+          instance_type = "r7i.2xlarge"
         })
         tags = merge(local.ec2_instances.app.tags, {
           ami           = "pd-csr-a-10-b"
@@ -371,7 +374,8 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 128 }
         }
         instance = merge(local.ec2_instances.app.instance, {
-          instance_type = "m5.4xlarge"
+          # instance_type = "m5.4xlarge" # TM-1672
+          instance_type = "r7i.2xlarge"
         })
         tags = merge(local.ec2_instances.app.tags, {
           ami           = "pd-csr-a-11-a"
@@ -391,7 +395,8 @@ locals {
           "/dev/sdc"  = { type = "gp3", size = 112 }
         }
         instance = merge(local.ec2_instances.app.instance, {
-          instance_type = "m5.4xlarge"
+          # instance_type = "m5.4xlarge" # TM-1672
+          instance_type = "r7i.2xlarge"
         })
         tags = merge(local.ec2_instances.app.tags, {
           ami           = "pd-csr-a-12-b"
@@ -456,7 +461,8 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 128 }
         }
         instance = merge(local.ec2_instances.web.instance, {
-          instance_type = "m5.4xlarge"
+          # instance_type = "m5.4xlarge" # TM-1672
+          instance_type = "r7i.xlarge"
         })
         tags = merge(local.ec2_instances.web.tags, {
           ami           = "pd-csr-w-3-a"
@@ -477,7 +483,8 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 128 }
         }
         instance = merge(local.ec2_instances.web.instance, {
-          instance_type = "m5.4xlarge"
+          # instance_type = "m5.4xlarge" # TM-1672
+          instance_type = "r7i.xlarge"
         })
         tags = merge(local.ec2_instances.web.tags, {
           ami           = "pd-csr-w-4-b"
@@ -498,7 +505,8 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 128 }
         }
         instance = merge(local.ec2_instances.web.instance, {
-          instance_type = "m5.4xlarge"
+          # instance_type = "m5.4xlarge" # TM-1672
+          instance_type = "r7i.xlarge"
         })
         tags = merge(local.ec2_instances.web.tags, {
           ami           = "pd-csr-w-5-a"
@@ -519,7 +527,8 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 112 }
         }
         instance = merge(local.ec2_instances.web.instance, {
-          instance_type = "m5.4xlarge"
+          # instance_type = "m5.4xlarge" # TM-1672
+          instance_type = "r7i.xlarge"
         })
         tags = merge(local.ec2_instances.web.tags, {
           ami           = "pd-csr-w-6-b"
