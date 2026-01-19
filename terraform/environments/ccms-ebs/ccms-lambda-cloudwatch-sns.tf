@@ -149,7 +149,7 @@ resource "aws_sns_topic_subscription" "sns_to_lambda" {
 }
 
 resource "aws_lambda_permission" "allow_s3_sns_plain_invoke" {
-  statement_id  = "AllowExecutionFromS3SNSTopic"
+  statement_id  = "AllowExecutionFromS3SNSTopicPlain"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.cloudwatch_sns.function_name
   principal     = "sns.amazonaws.com"
