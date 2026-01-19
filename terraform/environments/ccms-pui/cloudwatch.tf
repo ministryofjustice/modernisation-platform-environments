@@ -3,7 +3,7 @@
 #######################################
 # Alarm for ALB 5xx Errors
 resource "aws_cloudwatch_metric_alarm" "alb_pui_5xx" {
-  alarm_name          = "${local.application_name}-${local.environment}-pui-5xx-errors"
+  alarm_name          = "${local.application_name}-${local.environment}-pui-5xx-errors-test"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 3
   metric_name         = "HTTPCode_ELB_5XX_Count"
