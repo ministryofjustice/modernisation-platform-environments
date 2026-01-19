@@ -591,6 +591,11 @@ module "s3-data-bucket" {
 # Landing buckets FMS
 # ------------------------------------------------------------------------
 
+data "aws_secretsmanager_secret_version" "account_details" {
+  count     = local.is-test || local.is-production
+  secret_id = module.cross_account_details.secret_id.id
+}
+
 module "s3-fms-general-landing-bucket" {
   source = "./modules/landing_bucket/"
 
@@ -601,12 +606,13 @@ module "s3-fms-general-landing-bucket" {
   local_bucket_prefix      = local.bucket_prefix
   local_tags               = local.tags
   logging_bucket           = module.s3-logging-bucket
-  production_dev           = local.is-production ? "prod" : "dev"
+  production_dev           = local.environment_shorthand
   received_files_bucket_id = module.s3-received-files-bucket.bucket.id
   security_group_ids       = [aws_security_group.lambda_generic.id]
   subnet_ids               = data.aws_subnets.shared-public.ids
   cross_account            = local.is-development || local.is-preproduction
   cross_account_id         = local.is-development || local.is-preproduction ? local.environment_management.account_ids["electronic-monitoring-data-${local.cross_account_recieve_mapping}"] : null
+  replication_details      = local.is-test || local.is-production ? jsondecode(data.aws_secretsmanager_secret_version.account_details.secret_string) : null
 
   providers = {
     aws = aws
@@ -642,6 +648,7 @@ module "s3-fms-ho-landing-bucket" {
   subnet_ids               = data.aws_subnets.shared-public.ids
   cross_account            = local.is-development || local.is-preproduction
   cross_account_id         = local.is-development || local.is-preproduction ? local.environment_management.account_ids["electronic-monitoring-data-${local.cross_account_recieve_mapping}"] : null
+  replication_details      = local.is-test || local.is-production ? jsondecode(data.aws_secretsmanager_secret_version.account_details.secret_string) : null
 
   providers = {
     aws = aws
@@ -677,6 +684,7 @@ module "s3-fms-specials-landing-bucket" {
   subnet_ids               = data.aws_subnets.shared-public.ids
   cross_account            = local.is-development || local.is-preproduction
   cross_account_id         = local.is-development || local.is-preproduction ? local.environment_management.account_ids["electronic-monitoring-data-${local.cross_account_recieve_mapping}"] : null
+  replication_details      = local.is-test || local.is-production ? jsondecode(data.aws_secretsmanager_secret_version.account_details.secret_string) : null
 
   providers = {
     aws = aws
@@ -717,6 +725,7 @@ module "s3-mdss-general-landing-bucket" {
   security_group_ids        = [aws_security_group.lambda_generic.id]
   cross_account             = local.is-development || local.is-preproduction
   cross_account_id          = local.is-development || local.is-preproduction ? local.environment_management.account_ids["electronic-monitoring-data-${local.cross_account_recieve_mapping}"] : null
+  replication_details      = local.is-test || local.is-production ? jsondecode(data.aws_secretsmanager_secret_version.account_details.secret_string) : null
 
   providers = {
     aws = aws
@@ -740,6 +749,7 @@ module "s3-mdss-ho-landing-bucket" {
   subnet_ids                = data.aws_subnets.shared-public.ids
   cross_account             = local.is-development || local.is-preproduction
   cross_account_id          = local.is-development || local.is-preproduction ? local.environment_management.account_ids["electronic-monitoring-data-${local.cross_account_recieve_mapping}"] : null
+  replication_details      = local.is-test || local.is-production ? jsondecode(data.aws_secretsmanager_secret_version.account_details.secret_string) : null
 
   providers = {
     aws = aws
@@ -763,6 +773,7 @@ module "s3-mdss-specials-landing-bucket" {
   subnet_ids                = data.aws_subnets.shared-public.ids
   cross_account             = local.is-development || local.is-preproduction
   cross_account_id          = local.is-development || local.is-preproduction ? local.environment_management.account_ids["electronic-monitoring-data-${local.cross_account_recieve_mapping}"] : null
+  replication_details      = local.is-test || local.is-production ? jsondecode(data.aws_secretsmanager_secret_version.account_details.secret_string) : null
 
   providers = {
     aws = aws
