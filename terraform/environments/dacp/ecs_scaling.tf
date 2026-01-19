@@ -1,6 +1,6 @@
 resource "aws_appautoscaling_target" "ecs_service" {
   service_namespace  = "ecs"
-  resource_id = "service/${aws_ecs_cluster.dacp_cluster.name}/${aws_ecs_service.dacp_ecs_service.name}"
+  resource_id        = "service/${aws_ecs_cluster.dacp_cluster.name}/${aws_ecs_service.dacp_ecs_service.name}"
   scalable_dimension = "ecs:service:DesiredCount"
   min_capacity       = 2
   max_capacity       = 4
