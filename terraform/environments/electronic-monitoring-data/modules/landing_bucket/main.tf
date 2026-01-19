@@ -29,7 +29,7 @@ locals {
       effect = "Allow"
       principals = {
         type        = "AWS"
-        identifiers = ["arn:aws:iam::${var.cross_account_id}:role/cross_account_copy_lambda_role"]
+        identifiers = ["arn:aws:iam::${var.cross_account_id}:role/AWSS3BucketReplication"]
       }
       actions = [
         "s3:PutObject",
@@ -51,7 +51,7 @@ locals {
   kms_grants = var.cross_account ? merge(
     {
       cross_account_access = {
-        grantee_principal = nonsensitive("arn:aws:iam::${var.cross_account_id}:role/cross_account_copy_lambda_role")
+        grantee_principal = nonsensitive("arn:aws:iam::${var.cross_account_id}:role/AWSS3BucketReplication")
         operations = [
           "Encrypt",
           "GenerateDataKey",

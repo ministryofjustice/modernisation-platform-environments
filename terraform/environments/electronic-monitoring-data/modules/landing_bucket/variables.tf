@@ -77,3 +77,13 @@ variable "cross_account_id" {
   default     = null
   nullable    = true
 }
+
+variable "replication_details" {
+  description = "kms key and name of bucket to replicate data to"
+  type        = object({
+    bucket  = string
+    kms_key = string
+  })
+  default     = null
+  nullable    = true
+}
