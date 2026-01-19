@@ -519,6 +519,23 @@ resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_stuck_threads" {
   ok_actions          = [aws_sns_topic.alerts.arn]
 }
 
+resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_hogging_threads" {
+  alarm_name          = "${local.application_data.accounts[local.environment].app_name}-managed-custom-checks-hogging-threads"
+  alarm_description   = "${local.environment} | ${local.aws_account_id} | There are hogging threads on the SOA managed servers."
+  comparison_operator = "GreaterThanThreshold"
+  metric_name         = aws_cloudwatch_log_metric_filter.soa_custom_check_hogging_threads.id
+  statistic           = "Sum"
+  namespace           = "CCMS-SOA-APP"
+  period              = "300"
+  evaluation_periods  = "1"
+  threshold           = "5"
+  datapoints_to_alarm = "1"
+  treat_missing_data  = "notBreaching"
+  alarm_actions       = [aws_sns_topic.alerts.arn]
+  ok_actions          = [aws_sns_topic.alerts.arn]
+}
+
+
 resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_jdbc_ebs_state" {
   alarm_name          = "${local.application_data.accounts[local.environment].app_name}-managed-custom-checks-jdbc-ebs-state"
   alarm_description   = "${local.environment} | ${local.aws_account_id} | Either EBSSM or JDBC EBS state is not running on the SOA managed servers."
@@ -537,7 +554,7 @@ resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_jdbc_ebs_state" {
 
 resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_jdbc_failed_reserve_request_count" {
   alarm_name          = "${local.application_data.accounts[local.environment].app_name}-managed-custom-checks-jdbc-failed-reserve-request-count"
-  alarm_description   = "${local.environment} | ${local.aws_account_id} | There is a JDBC failed reserve request count error on the SOA managed servers."
+  alarm_description   = "${local.environment} | ${local.aws_account_id} | There is a EBSSM or JDBC failed reserve request count error on the SOA managed servers."
   comparison_operator = "GreaterThanThreshold"
   metric_name         = aws_cloudwatch_log_metric_filter.soa_custom_check_jdbc_failed_reserve_request_count.id
   statistic           = "Sum"
