@@ -63,18 +63,7 @@ module "cross_account_details" {
 
   create_policy       = true
   block_public_policy = true
-  policy_statements = {
-    read = {
-      sid = "AllowAccountRead"
-      principals = [{
-        type        = "AWS"
-        identifiers = [aws_iam_role.cross_account_copy[0].arn]
-      }]
-      actions   = ["secretsmanager:GetSecretValue"]
-      resources = ["*"]
-    }
-  }
-
+  
   ignore_secret_changes = true
   secret_string = jsonencode({
     fms_general_bucket   = ""
