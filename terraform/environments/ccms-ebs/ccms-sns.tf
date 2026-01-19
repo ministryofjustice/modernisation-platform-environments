@@ -133,7 +133,7 @@ data "aws_iam_policy_document" "s3_topic_policy_plain" {
     }
 
     actions   = ["sns:Publish"]
-    resources = [aws_sns_topic.s3_topic_plain.arn]
+    resources = ["arn:aws:sns:*:*:s3-event-notification-topic-plain"]
 
     condition {
       test     = "ArnLike"
