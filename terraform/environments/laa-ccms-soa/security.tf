@@ -374,6 +374,7 @@ resource "aws_vpc_security_group_egress_rule" "efs-security-group-egress" {
 # OEM Connectivity for SOA RDS (added)
 ###########################################
 
+# OEM OMS → SOA RDS (Port 1521)
 resource "aws_vpc_security_group_ingress_rule" "soa_db_oem_oms_ingress_1521" {
   security_group_id = aws_security_group.soa_db.id
   description       = "OEM OMS to SOA RDS on 1521"
@@ -383,6 +384,7 @@ resource "aws_vpc_security_group_ingress_rule" "soa_db_oem_oms_ingress_1521" {
   cidr_ipv4         = "10.26.60.231/32"
 }
 
+# OEM OMS → SOA RDS (Port 3872)
 resource "aws_vpc_security_group_ingress_rule" "soa_db_oem_oms_ingress_3872" {
   security_group_id = aws_security_group.soa_db.id
   description       = "OEM OMS to SOA RDS on 3872"
@@ -392,6 +394,7 @@ resource "aws_vpc_security_group_ingress_rule" "soa_db_oem_oms_ingress_3872" {
   cidr_ipv4         = "10.26.60.231/32"
 }
 
+# OEM OMS → SOA RDS (Port 4903)
 resource "aws_vpc_security_group_ingress_rule" "soa_db_oem_oms_ingress_4903" {
   security_group_id = aws_security_group.soa_db.id
   description       = "OEM OMS to SOA RDS on 4903"
@@ -401,6 +404,7 @@ resource "aws_vpc_security_group_ingress_rule" "soa_db_oem_oms_ingress_4903" {
   cidr_ipv4         = "10.26.60.231/32"
 }
 
+# OEM DB → SOA RDS (Port 1521)
 resource "aws_vpc_security_group_ingress_rule" "soa_db_oem_db_ingress_1521" {
   security_group_id = aws_security_group.soa_db.id
   description       = "OEM DB to SOA RDS on 1521"
@@ -408,13 +412,4 @@ resource "aws_vpc_security_group_ingress_rule" "soa_db_oem_db_ingress_1521" {
   from_port         = 1521
   to_port           = 1521
   cidr_ipv4         = "10.26.60.169/32"
-}
-
-resource "aws_vpc_security_group_ingress_rule" "soa_db_oem_agent_3872_from_oms_sg" {
-  security_group_id            = aws_security_group.soa_db.id
-  description                  = "OEM OMS to RDS agent port 3872"
-  ip_protocol                  = "tcp"
-  from_port                    = 3872
-  to_port                      = 3872
-  referenced_security_group_id = aws_security_group.<oem_oms_sg>.id
 }
