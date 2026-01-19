@@ -214,9 +214,9 @@ resource "aws_s3_bucket_policy" "cf_redirect_policy" {
         Condition = {
           StringEquals = {
             "aws:SourceAccount" = data.aws_caller_identity.current.account_id
-            "aws:SourceArn"     = [
-                aws_cloudfront_distribution.tribunals_http_redirect.arn,
-                aws_cloudfront_distribution.tribunals_http_redirect_compiled.arn
+            "aws:SourceArn" = [
+              aws_cloudfront_distribution.tribunals_http_redirect.arn,
+              aws_cloudfront_distribution.tribunals_http_redirect_compiled.arn
             ]
           }
         }
