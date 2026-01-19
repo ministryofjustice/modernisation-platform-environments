@@ -2,8 +2,8 @@
   "accounts": {
     "vcms-development": {
       "container_port": 80,
-      "container_cpu": "256",
-      "task_memory": "512",
+      "container_cpu": "512",
+      "task_memory": "1024",
       "desired_count": 1,
       "deployment_maximum_percent": 100,
       "deployment_minimum_healthy_percent": 0,
