@@ -1,6 +1,10 @@
 locals {
   environment_configurations = {
     development_cluster = {
+
+      /* Route53 */
+      route53_zone = "${terraform.workspace}.non-live-development.temp.cloud-platform.service.justice.gov.uk"
+
       /* EKS */
       eks_cluster_version = "1.34"
 
@@ -80,6 +84,10 @@ locals {
       }
     }
     development = {
+
+      /* Route53 */
+      route53_zone = "non-live-development.temp.cloud-platform.service.justice.gov.uk"
+
       /* EKS */
       eks_cluster_version = "1.34"
 
@@ -159,6 +167,10 @@ locals {
       }
     }
     test = {
+
+      /* Route53 */
+      route53_zone = "non-live-test.temp.cloud-platform.service.justice.gov.uk"
+
       /* EKS */
       eks_cluster_version = "1.34"
 
@@ -238,6 +250,10 @@ locals {
       }
     }
     preproduction = {
+
+      /* Route53 */
+      route53_zone = "non-live-preproduction.temp.cloud-platform.service.justice.gov.uk"
+      
       /* EKS */
       eks_cluster_version = "1.34"
 
@@ -317,6 +333,10 @@ locals {
       }
     }
     production = {
+
+      /* Route53 */
+      route53_zone = "non-live-production.temp.cloud-platform.service.justice.gov.uk"
+
       /* EKS */
       eks_cluster_version = "1.34"
 
