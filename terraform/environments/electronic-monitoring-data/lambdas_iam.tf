@@ -1,8 +1,8 @@
 locals {
-  cross_account_map = local.is-test ? "development" : local.is-production ? "preproduction" : null
+  cross_account_map           = local.is-test ? "development" : local.is-production ? "preproduction" : null
   cross_account_map_shorthand = local.is-test ? "dev" : local.is-production ? "preprod" : null
-  cross_account_bucket = local.is-test || local.is-production ? "arn:aws:s3:::emds-${local.cross_account_map_shorthand}-land-*/*" : ""
-  cross_account_kms = local.is-test || local.is-production ? "arn:aws:kms:${data.aws_region.current.name}:${local.environment_management.account_ids["electronic-monitoring-data-${local.cross_account_map}"]}:key/*" : ""
+  cross_account_bucket        = local.is-test || local.is-production ? "arn:aws:s3:::emds-${local.cross_account_map_shorthand}-land-*/*" : ""
+  cross_account_kms           = local.is-test || local.is-production ? "arn:aws:kms:${data.aws_region.current.name}:${local.environment_management.account_ids["electronic-monitoring-data-${local.cross_account_map}"]}:key/*" : ""
 }
 
 # ------------------------------------------
@@ -1372,8 +1372,8 @@ resource "aws_iam_role_policy_attachment" "mdss_daily_failure_digest_attach" {
 data "aws_iam_policy_document" "cross_account_copy" {
   count = local.is-test || local.is-production ? 1 : 0
   statement {
-    sid     = "AccessToCrossAccountBucket"
-    effect  = "Allow"
+    sid    = "AccessToCrossAccountBucket"
+    effect = "Allow"
     actions = [
       "kms:Encrypt",
       "kms:Decrypt",
@@ -1384,8 +1384,8 @@ data "aws_iam_policy_document" "cross_account_copy" {
     resources = [local.cross_account_kms]
   }
   statement {
-    sid     = "AccessToInAccountBucket"
-    effect  = "Allow"
+    sid    = "AccessToInAccountBucket"
+    effect = "Allow"
     actions = [
       "s3:GetObject",
       "s3:GetObjectTagging"
@@ -1393,8 +1393,8 @@ data "aws_iam_policy_document" "cross_account_copy" {
     resources = ["${module.s3-data-bucket.bucket.arn}/*"]
   }
   statement {
-    sid     = "AllowDumpToExternalBuckets"
-    effect  = "Allow"
+    sid    = "AllowDumpToExternalBuckets"
+    effect = "Allow"
     actions = [
       "s3:PutObject",
       "s3:PutObjectAcl"
@@ -1404,19 +1404,19 @@ data "aws_iam_policy_document" "cross_account_copy" {
 }
 
 resource "aws_iam_role" "cross_account_copy" {
-  count = local.is-test || local.is-production ? 1 : 0
+  count              = local.is-test || local.is-production ? 1 : 0
   name               = "cross_account_copy_lambda_role"
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
 }
 
 resource "aws_iam_policy" "cross_account_copy" {
-  count = local.is-test || local.is-production ? 1 : 0
+  count  = local.is-test || local.is-production ? 1 : 0
   name   = "cross_account_copy_lambda_policy"
   policy = data.aws_iam_policy_document.cross_account_copy[0].json
 }
 
 resource "aws_iam_role_policy_attachment" "cross_account_copy" {
-  count = local.is-test || local.is-production ? 1 : 0
+  count      = local.is-test || local.is-production ? 1 : 0
   role       = aws_iam_role.cross_account_copy[0].name
   policy_arn = aws_iam_policy.cross_account_copy[0].arn
 }
