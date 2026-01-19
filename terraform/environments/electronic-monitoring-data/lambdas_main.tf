@@ -464,8 +464,8 @@ resource "aws_cloudwatch_event_rule" "glue_db_count_metrics_schedule" {
 }
 
 resource "aws_cloudwatch_event_target" "glue_db_count_metrics_target" {
-  rule  = aws_cloudwatch_event_rule.glue_db_count_metrics_schedule.name
-  arn   = module.glue_db_count_metrics.lambda_function_arn
+  rule = aws_cloudwatch_event_rule.glue_db_count_metrics_schedule.name
+  arn  = module.glue_db_count_metrics.lambda_function_arn
 }
 
 resource "aws_lambda_permission" "glue_db_count_metrics_allow_eventbridge" {
@@ -482,7 +482,7 @@ resource "aws_lambda_permission" "glue_db_count_metrics_allow_eventbridge" {
 # BackFill Data
 #-----------------------------------------------------------------------------------
 module "data_cutback" {
-  count = local.is-development || local.is-production ? 1 : 0
+  count                   = local.is-development || local.is-production ? 1 : 0
   source                  = "./modules/lambdas"
   is_image                = true
   function_name           = "data_cutback"
@@ -516,8 +516,8 @@ module "mdss_daily_failure_digest" {
   core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
   production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
 
-  security_group_ids             = [aws_security_group.lambda_generic.id]
-  subnet_ids                     = data.aws_subnets.shared-public.ids
+  security_group_ids = [aws_security_group.lambda_generic.id]
+  subnet_ids         = data.aws_subnets.shared-public.ids
 
   environment_variables = {
     SNS_TOPIC_ARN  = aws_sns_topic.emds_alerts.arn
@@ -548,7 +548,7 @@ module "cross_account_copy" {
   subnet_ids                     = data.aws_subnets.shared-public.ids
 
   environment_variables = {
-    SECRET_ID  = module.cross_account_details[0].secret_id
+    SECRET_ID = module.cross_account_details[0].secret_id
   }
 }
 
@@ -557,7 +557,7 @@ module "cross_account_copy" {
 #-----------------------------------------------------------------------------------
 
 resource "aws_iam_role" "mdss_daily_failure_digest_scheduler" {
-  name  = "mdss_daily_failure_digest_scheduler_role"
+  name = "mdss_daily_failure_digest_scheduler_role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -572,8 +572,8 @@ resource "aws_iam_role" "mdss_daily_failure_digest_scheduler" {
 }
 
 resource "aws_iam_role_policy" "mdss_daily_failure_digest_scheduler_invoke" {
-  name  = "mdss_daily_failure_digest_scheduler_invoke_policy"
-  role  = aws_iam_role.mdss_daily_failure_digest_scheduler.id
+  name = "mdss_daily_failure_digest_scheduler_invoke_policy"
+  role = aws_iam_role.mdss_daily_failure_digest_scheduler.id
 
   policy = jsonencode({
     Version = "2012-10-17"

@@ -201,9 +201,9 @@ resource "aws_db_instance" "appdb1" {
     delete = "2h"
   }
 
-  lifecycle {   
-     ignore_changes = [final_snapshot_identifier] 
-     }
+  lifecycle {
+    ignore_changes = [final_snapshot_identifier]
+  }
 
 }
 
@@ -290,9 +290,9 @@ resource "aws_security_group" "vpc_sec_group" {
   }
 
 
-lifecycle {
-  ignore_changes = [ingress, egress]
-}
+  lifecycle {
+    ignore_changes = [ingress, egress]
+  }
 
 }
 

@@ -185,7 +185,7 @@ locals {
   # Final SANs to apply to cert or distribution. Pull the entry from the above map dependent on environment
   cloudfront_nginx_sans = lookup(local.cloudfront_sans_map, local.environment, [])
 
-  cloudfront_distribution_id = var.lookup_cloudfront_distribution ? data.aws_ssm_parameter.cloudfront_distribution_id[0].value : null
+  cloudfront_distribution_id          = var.lookup_cloudfront_distribution ? data.aws_ssm_parameter.cloudfront_distribution_id[0].value : null
   cloudfront_distribution_compiled_id = var.lookup_cloudfront_distribution_compiled ? data.aws_ssm_parameter.cloudfront_distribution_compiled_id[0].value : null
 
   # *********************************************************************************************************

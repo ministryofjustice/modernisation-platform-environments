@@ -10,15 +10,15 @@ locals {
       type   = dvo.resource_record_type
     }
   } : {}
-  
+
   # Split domains: parent (modernisation-platform) vs environment-specific (laa-test/laa-preproduction)
   parent_domain_validation = contains(["test", "preproduction"], local.environment) ? {
-    for k, v in local.domain_types : k => v 
+    for k, v in local.domain_types : k => v
     if k == "modernisation-platform.service.justice.gov.uk"
   } : {}
-  
+
   env_domain_validation = contains(["test", "preproduction"], local.environment) ? {
-    for k, v in local.domain_types : k => v 
+    for k, v in local.domain_types : k => v
     if k != "modernisation-platform.service.justice.gov.uk"
   } : {}
 }
@@ -39,7 +39,7 @@ resource "aws_acm_certificate" "external" {
   count = contains(["test", "preproduction"], local.environment) ? 1 : 0
 
   domain_name = "modernisation-platform.service.justice.gov.uk"
-  
+
   subject_alternative_names = [
     "*.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   ]
