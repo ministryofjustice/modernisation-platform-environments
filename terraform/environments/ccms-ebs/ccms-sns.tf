@@ -138,7 +138,7 @@ data "aws_iam_policy_document" "s3_topic_policy_plain" {
     condition {
       test     = "ArnLike"
       variable = "aws:SourceArn"
-      values   = [for name in var.notification_bucket_names : "arn:aws:s3:::${name}"]
+      values   = [for _, b in aws_s3_bucket.buckets : b.arn]
     }
   }
 }
