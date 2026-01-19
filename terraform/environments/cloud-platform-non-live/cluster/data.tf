@@ -45,6 +45,6 @@ data "aws_iam_roles" "platform_engineer_admin_sso_role" {
 }
 
 data "aws_route53_zone" "account_hosted_zone" {
-  name         = trimprefix(terraform.workspace, "cloud-platform-") + ".temp.cloud-platform.service.justice.gov.uk"
+  name         = "${trimprefix(terraform.workspace, "cloud-platform-")}.temp.cloud-platform.service.justice.gov.uk"
   private_zone = false
 }
