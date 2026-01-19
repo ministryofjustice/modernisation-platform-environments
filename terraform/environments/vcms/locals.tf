@@ -79,8 +79,6 @@ locals {
   app_url                       = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.${local.domain}"
   acm_subject_alternative_names = [local.app_url]
 
-  db_snapshot_identifier = "rds-vcmsdev-db-backup-2025-09-26-14-04-mpcp"
-
 }
 
 module "ip_addresses" {
