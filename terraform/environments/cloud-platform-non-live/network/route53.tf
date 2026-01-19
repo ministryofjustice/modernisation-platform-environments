@@ -4,11 +4,12 @@ resource "aws_route53_zone" "temp_cloud_platform_justice_gov_uk" {
 }
 
 resource "aws_route53_zone" "account_zone" {
-  name = "${trimprefix(terraform.workspace, "cloud-platform-")}.temp.cloud-platform.service.justice.gov.uk"
+  count = can(regex("^cp-", terraform.workspace)) ? 0 : 1
+  name  = "${trimprefix(terraform.workspace, "cloud-platform-")}.temp.cloud-platform.service.justice.gov.uk"
 }
 
 resource "aws_route53_record" "account_delegation" {
-  for_each = terraform.workspace == "cloud-platform-non-live-production" ? local.environment_configurations : {}
+  for_each = terraform.workspace == "cloud-platform-non-live-production" && !can(regex("^cp-", terraform.workspace)) ? local.environment_configurations : {}
   zone_id  = aws_route53_zone.temp_cloud_platform_justice_gov_uk[0].zone_id
   name     = each.value.account_subdomain_name
   type     = "NS"
