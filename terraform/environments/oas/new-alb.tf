@@ -2,13 +2,24 @@
 ### Locals for ELB Module
 ##############################################
 locals {
+  # Define CIDR blocks once to avoid repetition
+  moj_cidr_blocks = [
+    "51.149.251.0/24",     # MOJO
+    "51.149.250.0/24",     # MOJO
+    "35.176.254.38/32",    # Workspace
+    "52.56.212.11/32",     # Workspace
+    "35.177.173.197/32",   # Workspace
+    "10.200.0.0/16",       # Internal network
+    "10.200.16.0/20"       # LZ Prod Shared-Service Workspaces
+  ]
+
   loadbalancer_ingress_rules = {
     "lb_ingress_80" = {
       description     = "Loadbalancer ingress rule for HTTP (redirects to HTTPS)"
       from_port       = 80
       to_port         = 80
       protocol        = "tcp"
-      cidr_blocks     = ["51.149.251.0/24", "51.149.250.0/24", "35.176.254.38/32", "52.56.212.11/32", "35.177.173.197/32"]
+      cidr_blocks     = local.moj_cidr_blocks
       security_groups = []
     }
     "lb_ingress_443" = {
@@ -16,7 +27,7 @@ locals {
       from_port       = 443
       to_port         = 443
       protocol        = "tcp"
-      cidr_blocks     = ["51.149.251.0/24", "51.149.250.0/24", "35.176.254.38/32", "52.56.212.11/32", "35.177.173.197/32"]
+      cidr_blocks     = local.moj_cidr_blocks
       security_groups = []
     }
     "lb_ingress_9500" = {
@@ -24,7 +35,7 @@ locals {
       from_port       = 9500
       to_port         = 9500
       protocol        = "tcp"
-      cidr_blocks     = ["51.149.251.0/24", "51.149.250.0/24", "35.176.254.38/32", "52.56.212.11/32", "35.177.173.197/32"]
+      cidr_blocks     = local.moj_cidr_blocks
       security_groups = []
     }
     "lb_ingress_9502" = {
@@ -32,7 +43,7 @@ locals {
       from_port       = 9502
       to_port         = 9502
       protocol        = "tcp"
-      cidr_blocks     = ["51.149.251.0/24", "51.149.250.0/24", "35.176.254.38/32", "52.56.212.11/32", "35.177.173.197/32"]
+      cidr_blocks     = local.moj_cidr_blocks
       security_groups = []
     }
   }
