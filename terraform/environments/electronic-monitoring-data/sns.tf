@@ -2,8 +2,8 @@ resource "aws_sns_topic" "emds_alerts" {
   name              = "emds-alerts-${local.environment_shorthand}"
   kms_master_key_id = aws_kms_key.emds_alerts.arn
 
-  http_success_feedback_role_arn = aws_iam_role.sns_delivery_logging.arn
-  http_failure_feedback_role_arn = aws_iam_role.sns_delivery_logging.arn
+  http_success_feedback_role_arn    = aws_iam_role.sns_delivery_logging.arn
+  http_failure_feedback_role_arn    = aws_iam_role.sns_delivery_logging.arn
   http_success_feedback_sample_rate = 0
 }
 
