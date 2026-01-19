@@ -93,7 +93,7 @@
       "ebs_iops_ebsdb_swap2": 3000,
       "ebs_size_ebsdb_swap2": 64,
       "ebs_default_iops_test": 9000,
-      "ftp_test_size": 15,
+      "ftp_test_size": 30,
       "ftp_test2_size": 25,
       "dbf_device": "nvme5n1",
       "dbf_path": "/CCMS/EBS/dbf",
