@@ -73,9 +73,9 @@ module "ecs_service" {
 module "container_definition" {
   source                   = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//container?ref=v6.0.0"
   name                     = "vcms"
-  image                    = local.image_uri
-  memory                   = 512
-  cpu                      = 256
+  image                    = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/vcms:${local.app_config.image_tag}"
+  memory                   = 512 # CHANGE
+  cpu                      = 256 # CHANGE
   essential                = true
   readonly_root_filesystem = false
 
@@ -148,7 +148,7 @@ module "container_definition" {
 
 resource "aws_cloudwatch_log_group" "vcms" {
   name              = "/ecs/vcms"
-  retention_in_days = 14
+  retention_in_days = 14 # CHANGE
   tags              = local.tags
 }
 
