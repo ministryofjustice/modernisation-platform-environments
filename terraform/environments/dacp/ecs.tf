@@ -111,7 +111,7 @@ resource "aws_ecs_service" "dacp_ecs_service" {
   enable_execute_command            = true
   desired_count                     = 2
   health_check_grace_period_seconds = 180
-  force_new_deployment = true
+  force_new_deployment              = true
 
   network_configuration {
     subnets          = data.aws_subnets.shared-private.ids

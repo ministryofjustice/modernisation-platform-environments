@@ -9,7 +9,7 @@ terraform {
 }
 
 locals {
-    bucket_policy_v2 = var.cross_account_access_role != null ? [
+  bucket_policy_v2 = var.cross_account_access_role != null ? [
     {
       sid    = "CrossAccountAccess"
       effect = "Allow"
@@ -25,10 +25,10 @@ locals {
   ] : []
   cross_account_bucket_policy = var.cross_account ? [
     {
-      sid = "AllowCrossAccountWritesFromLambda"
+      sid    = "AllowCrossAccountWritesFromLambda"
       effect = "Allow"
       principals = {
-        type = "AWS"
+        type        = "AWS"
         identifiers = ["arn:aws:iam::${var.cross_account_id}:role/cross_account_copy_lambda_role"]
       }
       actions = [
@@ -59,7 +59,7 @@ locals {
       }
     },
     local.kms_grant_mdss
-    ) : local.kms_grant_mdss
+  ) : local.kms_grant_mdss
 }
 
 module "this-bucket" {
