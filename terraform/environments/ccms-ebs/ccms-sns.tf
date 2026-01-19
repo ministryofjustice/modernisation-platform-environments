@@ -115,3 +115,30 @@ EOF
     { Name = "${local.application_name}-guardduty-alerts" }
   )
 }
+
+resource "aws_sns_topic" "s3_topic_plain" {
+  name   = "s3-event-notification-topic-plain"
+  policy = data.aws_iam_policy_document.s3_topic_policy_plain.json
+  tags   = merge(local.tags, { Name = "s3-event-notification-topic-plain" })
+}
+
+data "aws_iam_policy_document" "s3_topic_policy_plain" {
+  statement {
+    sid     = "AllowS3PublishFromBuckets"
+    effect  = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["s3.amazonaws.com"]
+    }
+
+    actions   = ["sns:Publish"]
+    resources = [aws_sns_topic.s3_topic_plain.arn]
+
+    condition {
+      test     = "ArnLike"
+      variable = "aws:SourceArn"
+      values   = [for name in var.notification_bucket_names : "arn:aws:s3:::${name}"]
+    }
+  }
+}

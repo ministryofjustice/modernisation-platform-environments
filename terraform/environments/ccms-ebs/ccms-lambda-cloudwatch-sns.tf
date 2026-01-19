@@ -138,3 +138,20 @@ resource "aws_lambda_permission" "allow_sns_invoke_guardduty" {
   principal     = "sns.amazonaws.com"
   source_arn    = aws_sns_topic.guardduty_alerts.arn
 }
+
+resource "aws_sns_topic_subscription" "sns_to_lambda" {
+  topic_arn = aws_sns_topic.s3_topic_plain.arn
+  protocol  = "lambda"
+  endpoint  = aws_lambda_function.cloudwatch_sns.arn
+  depends_on = [
+   aws_sns_topic.s3_topic_plain
+  ]
+}
+
+resource "aws_lambda_permission" "allow_s3_sns_invoke" {
+  statement_id  = "AllowExecutionFromS3SNSTopic"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.cloudwatch_sns.function_name
+  principal     = "sns.amazonaws.com"
+  source_arn    = aws_sns_topic.s3_topic_plain.arn
+}
