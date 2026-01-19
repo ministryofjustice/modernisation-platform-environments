@@ -3,7 +3,7 @@
 resource "aws_route53_zone" "development_cluster_zone" {
   count = contains(local.mp_environments, terraform.workspace) ? 0 : 1
   
-  name = terraform.workspace + ".temp.cloud-platform.service.justice.gov.uk"
+  name = "${terraform.workspace}.temp.cloud-platform.service.justice.gov.uk"
   force_destroy = true
 
   tags = {
