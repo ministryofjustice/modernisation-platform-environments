@@ -48,8 +48,8 @@ resource "aws_iam_policy" "dms_validation_step_function_policy" {
 data "aws_iam_policy_document" "data_cutback_policy_document" {
   count = local.is-development || local.is-production ? 1 : 0
   statement {
-    effect  = "Allow"
-    actions = ["lambda:InvokeFunction"]
+    effect    = "Allow"
+    actions   = ["lambda:InvokeFunction"]
     resources = [module.data_cutback[0].lambda_function_arn]
   }
 }
