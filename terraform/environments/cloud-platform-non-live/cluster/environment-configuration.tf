@@ -10,6 +10,7 @@ locals {
         vpc_cni                = "v1.20.1-eksbuild.1"
         coredns                = "v1.12.2-eksbuild.4"
         eks_pod_identity_agent = "v1.3.8-eksbuild.2"
+        external_dns           = "v0.20.0-eksbuild.2"
       }
 
       /* Nodes */
@@ -20,7 +21,7 @@ locals {
         desired_capacity = 3
         max_size         = 10
 
-        instance_types = ["r6i.large"]
+        instance_types = ["r8i.large"]
 
         block_device_mappings = {
           xvda = {

@@ -40,3 +40,23 @@ module "aws_ebs_csi_pod_identity" {
 
   tags = local.tags
 }
+
+module "external_dns_pod_identity" {
+  count = contains(local.enabled_workspaces, local.cluster_environment) ? 1 : 0
+
+  source = "terraform-aws-modules/eks-pod-identity/aws"
+
+  name = "external-dns"
+
+  attach_external_dns_policy = true
+
+  associations = {
+    this = {
+      cluster_name    = module.eks[0].cluster_name
+      namespace       = "kube-system"
+      service_account = "external-dns"
+    }
+  }
+
+  tags = local.tags
+}
