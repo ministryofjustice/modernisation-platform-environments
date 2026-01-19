@@ -153,11 +153,23 @@ resource "aws_cloudwatch_log_metric_filter" "soa_custom_check_percentage_heap_fr
 
 resource "aws_cloudwatch_log_metric_filter" "soa_custom_check_stuck_threads" {
   name           = "SOACustomCheckStuckThreads"
-  pattern        = "\"<Local Script Error>\" \"hogging threads\""
+  pattern        = "\"<Local Script Error>\" \"stuck threads\""
   log_group_name = aws_cloudwatch_log_group.log_group_managed.name        
 
   metric_transformation {
     name      = "SOACustomCheckStuckThreads"
+    namespace = "CCMS-SOA-APP"
+    value     = "1"
+  }
+}
+
+resource "aws_cloudwatch_log_metric_filter" "soa_custom_check_hogging_threads" {
+  name           = "SOACustomCheckHoggingThreads"
+  pattern        = "\"<Local Script Error>\" \"hogging threads\""
+  log_group_name = aws_cloudwatch_log_group.log_group_managed.name        
+
+  metric_transformation {
+    name      = "SOACustomCheckHoggingThreads"
     namespace = "CCMS-SOA-APP"
     value     = "1"
   }
