@@ -457,7 +457,7 @@ resource "aws_cloudwatch_metric_alarm" "SOA_Benefit_Checker_Admin" {
 # THe following alarms are new alarms to monitor specific custom check erros
 resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_test_paths" {
   alarm_name          = "${local.application_data.accounts[local.environment].app_name}-managed-custom-checks-test-paths"
-  alarm_description   = "${local.environment} | ${local.aws_account_id} | This means composite is failed to respond."
+  alarm_description   = "${local.environment} | ${local.aws_account_id} | One of the composite failed to respond on SOA managed servers."
   comparison_operator = "GreaterThanThreshold"
   metric_name         = aws_cloudwatch_log_metric_filter.soa_custom_check_test_paths.id
   statistic           = "Sum"
@@ -473,7 +473,7 @@ resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_test_paths" {
 
 resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_server_health" {
   alarm_name          = "${local.application_data.accounts[local.environment].app_name}-managed-custom-checks-server-health"
-  alarm_description   = "${local.environment} | ${local.aws_account_id} | Server health check failed."
+  alarm_description   = "${local.environment} | ${local.aws_account_id} | Server health check failed. One of the SOA managed servers is not in running state"
   comparison_operator = "GreaterThanThreshold"
   metric_name         = aws_cloudwatch_log_metric_filter.soa_custom_check_server_health.id
   statistic           = "Sum"
@@ -521,7 +521,7 @@ resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_stuck_threads" {
 
 resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_jdbc_ebs_state" {
   alarm_name          = "${local.application_data.accounts[local.environment].app_name}-managed-custom-checks-jdbc-ebs-state"
-  alarm_description   = "${local.environment} | ${local.aws_account_id} | There is a JDBC EBS state error on the SOA managed servers."
+  alarm_description   = "${local.environment} | ${local.aws_account_id} | Either EBSSM or JDBC EBS state is not running on the SOA managed servers."
   comparison_operator = "GreaterThanThreshold"
   metric_name         = aws_cloudwatch_log_metric_filter.soa_custom_check_jdbc_ebssms_state.id
   statistic           = "Sum"
