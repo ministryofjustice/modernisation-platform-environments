@@ -7,7 +7,7 @@ resource "aws_ebs_volume" "ftp_test" {
     ]
   }
   availability_zone = "eu-west-2a"
-  size              = 5
+  size              = local.application_data.accounts[local.environment].ftp_test_size
   type              = "gp3"
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
@@ -32,7 +32,7 @@ resource "aws_ebs_volume" "ftp_test2" {
     ]
   }
   availability_zone = "eu-west-2a"
-  size              = 20
+  size              = local.application_data.accounts[local.environment].ftp_test2_size
   type              = "gp3"
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
