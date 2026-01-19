@@ -3,11 +3,11 @@ module "gatekeeper" {
 
   # boolean expression for applying opa valid hostname for test clusters only.
   dryrun_map = {
-    service_type                       = true,
-    warn_service_account_secret_delete = true,
-    user_ns_requires_psa_label         = true,
-    lock_priv_capabilities             = true,
-    warn_kubectl_create_sa             = true,
+    service_type                       = false,
+    warn_service_account_secret_delete = false,
+    user_ns_requires_psa_label         = false,
+    lock_priv_capabilities             = false,
+    warn_kubectl_create_sa             = false,
   }
 
   constraint_violations_max_to_display = 25
