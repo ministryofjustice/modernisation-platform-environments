@@ -592,8 +592,8 @@ module "s3-data-bucket" {
 # ------------------------------------------------------------------------
 
 data "aws_secretsmanager_secret_version" "account_details" {
-  count     = local.is-test || local.is-production
-  secret_id = module.cross_account_details.secret_id.id
+  count     = local.is-test || local.is-production ? 1 : 0
+  secret_id = module.cross_account_details.secret_id[0].id
 }
 
 module "s3-fms-general-landing-bucket" {
