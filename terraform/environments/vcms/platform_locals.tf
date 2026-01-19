@@ -33,5 +33,5 @@ locals {
 
   # environment specfic variables
   all_env_app_config = fileexists("./application_variables.json") ? jsondecode(file("./application_variables.json")) : null
-  app_config = lookup(local.all_env_app_config, terraform.workspace) # only use current env
+  app_config = lookup(local.all_env_app_config["accounts"], terraform.workspace) # only use current env
 }
