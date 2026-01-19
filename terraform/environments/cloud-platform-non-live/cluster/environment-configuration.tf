@@ -3,7 +3,7 @@ locals {
     development_cluster = {
 
       /* Route53 */
-      route53_zone = "${terraform.workspace}.non-live-development.temp.cloud-platform.service.justice.gov.uk"
+      route53_zone = "non-live-development.temp.cloud-platform.service.justice.gov.uk"
 
       /* EKS */
       eks_cluster_version = "1.34"
