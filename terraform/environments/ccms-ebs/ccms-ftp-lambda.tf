@@ -511,7 +511,10 @@ module "LAA-ftp-1stlocate-ccms-inbound" {
 } 
 
 resource "aws_s3_bucket_notification" "ftp_bucket_notification_sns" {
-  for_each = aws_s3_bucket.buckets
+  for_each = {
+  for name, b in aws_s3_bucket.buckets :  
+  name => b if name == "laa-ccms-inbound-${local.environment}-mp"
+  }
   bucket   = each.value.id
   eventbridge = true
   topic {
