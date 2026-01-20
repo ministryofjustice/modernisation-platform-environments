@@ -97,7 +97,7 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
             | filter ispresent(message.event)
             | filter message.event = "MDSS_FILE_FAIL"
             | filter message.error_type = "fatal"
-            | fields @timestamp, message.dataset, message.pipeline, message.table, message.s3path, message.exception_class, @message
+            | fields @timestamp, message.dataset, message.pipeline, message.table, message.s3path, message.exception_class, message.reason, message.exception_chain, @message
             | sort @timestamp desc
             | limit 200
           EOT
@@ -218,7 +218,7 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
             SOURCE '${module.load_mdss_lambda.cloudwatch_log_group.name}'
             | filter ispresent(message.event)
             | filter message.event = "MDSS_FILE_FAIL"
-            | fields @timestamp, message.error_type, message.dataset, message.pipeline, message.table, message.bucket, message.key, message.s3path, message.exception_class
+            | fields @timestamp, message.error_type, message.dataset, message.pipeline, message.table, message.bucket, message.key, message.s3path, message.exception_class, message.reason, message.exception_chain
             | sort @timestamp desc
             | limit 200
           EOT
