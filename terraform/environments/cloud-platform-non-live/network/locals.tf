@@ -5,7 +5,6 @@ locals {
     "cloud-platform-non-live-preproduction",
     "cloud-platform-non-live-production"
   ]
-  environment_configuration = try(local.environment_configurations[local.cluster_environment], { account_subdomain_name = "", ns_records = [] })
   cluster_environment       = contains(local.mp_environments, terraform.workspace) ? local.environment : "development_cluster"
   cp_vpc_name               = terraform.workspace
   cp_vpc_cidr = {
