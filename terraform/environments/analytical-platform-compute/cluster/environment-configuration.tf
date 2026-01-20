@@ -24,8 +24,8 @@ locals {
       helm_chart_version = {
         aws_cloudwatch_metrics = "0.0.11"
         aws_for_fluent_bit     = "0.1.35"
-        cert_manager           = "v1.18.1"
-        cluster_autoscaler     = "9.46.6"
+        cert_manager           = "v1.19.2"
+        cluster_autoscaler     = "9.54.1"
         external_dns           = "1.17.0"
         external_secrets       = "0.18.0"
         ingress_nginx          = "4.12.3"
@@ -64,8 +64,8 @@ locals {
       helm_chart_version = {
         aws_cloudwatch_metrics = "0.0.11"
         aws_for_fluent_bit     = "0.1.35"
-        cert_manager           = "v1.18.1"
-        cluster_autoscaler     = "9.46.6"
+        cert_manager           = "v1.19.2"
+        cluster_autoscaler     = "9.54.1"
         external_dns           = "1.17.0"
         external_secrets       = "0.18.0"
         ingress_nginx          = "4.12.3"
@@ -104,8 +104,8 @@ locals {
       helm_chart_version = {
         aws_cloudwatch_metrics = "0.0.11"
         aws_for_fluent_bit     = "0.1.35"
-        cert_manager           = "v1.18.1"
-        cluster_autoscaler     = "9.46.6"
+        cert_manager           = "v1.19.2"
+        cluster_autoscaler     = "9.54.1"
         external_dns           = "1.17.0"
         external_secrets       = "0.18.0"
         ingress_nginx          = "4.12.3"
