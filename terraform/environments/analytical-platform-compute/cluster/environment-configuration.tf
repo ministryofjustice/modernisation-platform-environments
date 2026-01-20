@@ -29,11 +29,11 @@ locals {
         external_dns           = "1.20.0"
         external_secrets       = "1.2.1"
         ingress_nginx          = "4.14.1"
-        karpenter              = "1.8.2"
-        keda                   = "2.17.2"
-        kube_prometheus_stack  = "75.3.5"
-        kyverno                = "3.4.3"
-        velero                 = "10.0.10"
+        karpenter              = "1.8.4"
+        keda                   = "2.18.3"
+        kube_prometheus_stack  = "81.1.0"
+        kyverno                = "3.6.2"
+        velero                 = "11.3.2"
       }
 
       /* Data Engineering Airflow */
@@ -69,11 +69,11 @@ locals {
         external_dns           = "1.20.0"
         external_secrets       = "1.2.1"
         ingress_nginx          = "4.14.1"
-        karpenter              = "1.8.2"
-        keda                   = "2.17.2"
+        karpenter              = "1.8.4"
+        keda                   = "2.18.3"
         kube_prometheus_stack  = "81.1.0"
-        kyverno                = "3.4.3"
-        velero                 = "10.0.10"
+        kyverno                = "3.6.2"
+        velero                 = "11.3.2"
       }
 
       /* Data Engineering Airflow */
@@ -109,11 +109,11 @@ locals {
         external_dns           = "1.20.0"
         external_secrets       = "1.2.1"
         ingress_nginx          = "4.14.1"
-        karpenter              = "1.8.2"
-        keda                   = "2.17.2"
+        karpenter              = "1.8.4"
+        keda                   = "2.18.3"
         kube_prometheus_stack  = "81.1.0"
-        kyverno                = "3.4.3"
-        velero                 = "10.0.10"
+        kyverno                = "3.6.2"
+        velero                 = "11.3.2"
       }
 
       /* Data Engineering Airflow */
