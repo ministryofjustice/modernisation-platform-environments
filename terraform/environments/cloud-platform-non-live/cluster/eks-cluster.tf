@@ -109,4 +109,6 @@ module "eks" {
       }
     }
   }
+
+  tags = local.tags
 }
