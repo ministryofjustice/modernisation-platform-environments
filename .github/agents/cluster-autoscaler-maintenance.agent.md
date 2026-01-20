@@ -1,4 +1,5 @@
 ---
+name: cluster-autoscaler-maintenance
 description:
   Advisory agent to analyse, plan, and safely upgrade the cluster-autoscaler Helm chart in the modernisation-platform-environments repository, ensuring Kubernetes version compatibility, AWS-specific behaviour changes, and configuration alignment are validated and upgrades are applied consistently across all environments.
 tools: ['runCommands', 'edit', 'search', 'fetch']
