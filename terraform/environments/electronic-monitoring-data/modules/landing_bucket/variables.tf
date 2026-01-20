@@ -81,20 +81,34 @@ variable "cross_account_id" {
 variable "replication_details" {
   description = "kms key and name of bucket to replicate data to"
   type        = object({
-    fms_general_bucket = string
-    fms_general_kms_id = string
-    fms_ho_bucket = string
-    fms_ho_kms_id = string
-    fms_specials_bucket = string
-    fms_specials_kms_id = string
-    mdss_general_bucket = string
-    mdss_general_kms_id = string
+    fms_general_bucket   = string
+    fms_general_kms_id   = string
+    fms_ho_bucket        = string
+    fms_ho_kms_id        = string
+    fms_specials_bucket  = string
+    fms_specials_kms_id  = string
+    mdss_general_bucket  = string
+    mdss_general_kms_id  = string
     mdss_specials_bucket = string
     mdss_specials_kms_id = string
-    mdss_ho_bucket = string
-    mdss_ho_kms_id = string
-    account_id = string
+    mdss_ho_bucket       = string
+    mdss_ho_kms_id       = string
+    account_id           = string
   })
-  default     = null
+  default     = {
+    fms_general_bucket   = null
+    fms_general_kms_id   = null
+    fms_ho_bucket        = null
+    fms_ho_kms_id        = null
+    fms_specials_bucket  = null
+    fms_specials_kms_id  = null
+    mdss_general_bucket  = null
+    mdss_general_kms_id  = null
+    mdss_specials_bucket = null
+    mdss_specials_kms_id = null
+    mdss_ho_bucket       = null
+    mdss_ho_kms_id       = null
+    account_id           = null
+  }
   nullable    = true
 }
