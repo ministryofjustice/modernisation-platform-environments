@@ -45,7 +45,8 @@ data "aws_iam_policy_document" "github_actions_development_cluster_oidc_policy" 
       "iam:TagOpenIDConnectProvider",
       "iam:PassRole",
       "iam:TagRole",
-      "iam:TagPolicy"
+      "iam:TagPolicy",
+      "iam:UntagRole"
     ]
     resources = ["*"]
   }
