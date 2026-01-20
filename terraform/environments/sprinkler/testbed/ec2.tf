@@ -3,7 +3,7 @@
 locals {
 
   # SSH public key for EC2 access
-  ssh_public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPnOaomLFBo83Qnx6+zLvpXSfKdoI5gemGJP22NTUPhh mikereid"
+  ssh_public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJtvL2Ix7o3+frJ9MXbdUJBKjEKnfqvokaEYK1IKPGrI mreid"
 
 }
 
