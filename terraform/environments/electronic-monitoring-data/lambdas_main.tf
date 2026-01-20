@@ -524,6 +524,9 @@ module "mdss_daily_failure_digest" {
     ENVIRONMENT    = local.environment_shorthand
     NAMESPACE      = "EMDS/MDSS"
     LOOKBACK_HOURS = "24"
+
+    LOAD_MDSS_DLQ_NAME = module.load_mdss_event_queue.sqs_dlq.name
+    CLEAN_DLT_DLQ_NAME = aws_sqs_queue.clean_dlt_load_dlq.name
   }
 }
 
