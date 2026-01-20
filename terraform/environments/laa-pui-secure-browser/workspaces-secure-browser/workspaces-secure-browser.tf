@@ -291,6 +291,12 @@ resource "aws_workspacesweb_browser_settings" "main" {
       "SafeBrowsingProtectionLevel" = {
         "value" = 1
       }
+      "AudioCaptureAllowed" = {
+        "value" = false
+      }
+      "VideoCaptureAllowed" = {
+        "value" = false
+      }
     }
   })
 
