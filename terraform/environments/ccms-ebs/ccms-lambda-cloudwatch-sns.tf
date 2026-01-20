@@ -138,5 +138,3 @@ resource "aws_lambda_permission" "allow_sns_invoke_guardduty" {
   principal     = "sns.amazonaws.com"
   source_arn    = aws_sns_topic.guardduty_alerts.arn
 }
-
-
