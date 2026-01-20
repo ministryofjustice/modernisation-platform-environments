@@ -71,7 +71,7 @@ locals {
         ingress_nginx          = "4.12.3"
         karpenter              = "1.8.2"
         keda                   = "2.17.2"
-        kube_prometheus_stack  = "75.3.5"
+        kube_prometheus_stack  = "81.1.0"
         kyverno                = "3.4.3"
         velero                 = "10.0.10"
       }
@@ -111,7 +111,7 @@ locals {
         ingress_nginx          = "4.12.3"
         karpenter              = "1.8.2"
         keda                   = "2.17.2"
-        kube_prometheus_stack  = "75.3.5"
+        kube_prometheus_stack  = "81.1.0"
         kyverno                = "3.4.3"
         velero                 = "10.0.10"
       }
