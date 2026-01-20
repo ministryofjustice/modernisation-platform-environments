@@ -1,4 +1,10 @@
-# :copilot: GitHub Copilot Agent: Upgrade kube-prometheus-stack Helm Chart (EKS)
+---
+description:
+  Advisory agent to analyse, plan, and safely upgrade the kube-prometheus-stack Helm chart in the modernisation-platform-environments repository, ensuring application-level breaking changes are identified, configuration compatibility is validated, and upgrades are applied consistently across all environments.
+tools: ['runCommands', 'edit', 'search', 'fetch']
+---
+
+# kube-prometheus-stack Helm Chart Upgrade Agent
 
 ## Purpose
 
