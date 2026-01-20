@@ -66,7 +66,7 @@ data "aws_iam_policy_document" "replication-policy" {
       "s3:ObjectOwnerOverrideToBucketOwner"
     ]
 
-    resources = [local.replication_enabled ? "${var.replication_details["${var.data_feed}_${var.order_type}_bucket"]}/*" : ""]
+    resources = [local.replication_enabled ? "arn:aws:s3:::${var.replication_details["${var.data_feed}_${var.order_type}_bucket"]}/*" : ""]
 
 
 
