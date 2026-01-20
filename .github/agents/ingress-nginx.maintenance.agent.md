@@ -4,7 +4,7 @@ description:
 tools: ['runCommands', 'edit', 'search', 'fetch']
 ---
 
-# Upgrade ingress-nginx Helm Chart Upgrade Agent
+# Upgrade ingress-nginx Helm Chart Agent
 
 ## Purpose
 

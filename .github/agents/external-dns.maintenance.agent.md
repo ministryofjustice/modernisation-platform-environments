@@ -4,7 +4,7 @@ description:
 tools: ['runCommands', 'edit', 'search', 'fetch']
 ---
 
-# Upgrade external-dns Helm Chart Upgrade Agent
+# Upgrade external-dns Helm Chart Agent
 
 ## Purpose
 

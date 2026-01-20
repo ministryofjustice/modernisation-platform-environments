@@ -4,7 +4,7 @@ description:
 tools: ['runCommands', 'edit', 'search', 'fetch']
 ---
 
-# :copilot: GitHub Copilot Agent: Upgrade velero Helm Chart (EKS)
+# Upgrade velero Helm Chart Agent
 
 ## Purpose
 

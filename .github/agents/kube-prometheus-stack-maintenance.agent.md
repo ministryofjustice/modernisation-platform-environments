@@ -4,7 +4,7 @@ description:
 tools: ['runCommands', 'edit', 'search', 'fetch']
 ---
 
-# kube-prometheus-stack Helm Chart Upgrade Agent
+# kube-prometheus-stack Helm Chart Agent
 
 ## Purpose
 

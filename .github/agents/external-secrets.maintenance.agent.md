@@ -4,7 +4,7 @@ description:
 tools: ['runCommands', 'edit', 'search', 'fetch']
 ---
 
-# Upgrade external-secrets Helm Chart Upgrade Agent
+# Upgrade external-secrets Helm Chart Agent
 
 ## Purpose
 

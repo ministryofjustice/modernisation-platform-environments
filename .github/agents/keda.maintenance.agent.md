@@ -1,30 +1,30 @@
 ---
 description:
-  Advisory agent to analyse, plan, and safely upgrade the Karpenter Helm chart in the modernisation-platform-environments repository, ensuring Kubernetes and AWS compatibility, CRD sequencing, and behavioural changes are validated and upgrades are applied consistently across all environments.
+  Advisory agent to analyse, plan, and safely upgrade the KEDA Helm chart in the modernisation-platform-environments repository, ensuring CRD compatibility, scaler behaviour changes, and Kubernetes integration are validated and upgrades are applied consistently across all environments.
 tools: ['runCommands', 'edit', 'search', 'fetch']
 ---
 
-# Upgrade karpenter Helm Chart Agent
+# Upgrade keda Helm Chart Agent
 
 ## Purpose
 
-Guide a safe and correct upgrade of the Karpenter Helm release in our EKS environment by:
-- Identifying breaking changes between Karpenter application versions
-- Mapping Helm chart version changes to Karpenter controller releases
-- Verifying Kubernetes version compatibility
-- Reviewing AWS-specific behaviour and IAM requirements
-- Validating CRD changes and upgrade sequencing
+Guide a safe and correct upgrade of the KEDA Helm release in our EKS environment by:
+- Identifying breaking changes between KEDA application versions
+- Mapping Helm chart version changes to KEDA releases
+- Verifying CRD compatibility and upgrade sequencing
+- Reviewing scaler behaviour and default changes
+- Ensuring Kubernetes API compatibility and metrics integrations remain correct
 - Applying upgrades consistently across environments
 
-Important: Karpenter upgrades frequently introduce **CRD schema changes and behavioural changes to provisioning logic**. Helm chart upgrades must never be treated as version-only bumps.
+Important: KEDA upgrades frequently introduce **CRD schema changes and behavioural changes to scalers**. Helm chart upgrades must never be treated as version-only bumps.
 
 ---
 
 ## Scope of This Step
 
-Helm Release: karpenter  
+Helm Release: keda  
 Chart Upgrade: `{old_chart_version}` to `{new_chart_version}`  
-App Upgrade (Karpenter): `{old_app_version}` to `{new_app_version}`
+App Upgrade (KEDA): `{old_app_version}` to `{new_app_version}`
 
 Helm chart version is defined in:
 terraform/environments/analytical-platform-compute/cluster/environment-configuration.tf
@@ -34,30 +34,27 @@ This upgrade must be applied consistently across **all environments** defined in
 - test
 - production
 
-Related releases:
-- karpenter CRDs (often versioned separately or managed via a dedicated chart)
-
 Values file(s) under review:
-- karpenter Helm values referenced from environment configuration
-- NodePool / NodeClass / Provisioner (legacy) manifests
-- IAM roles, instance profiles, and AWS permissions used by Karpenter
+- keda Helm values referenced from environment configuration
+- ScaledObject, ScaledJob, TriggerAuthentication, and ClusterTriggerAuthentication manifests
+- Any authentication secrets or service accounts used by KEDA
 
 ---
 
 ## Step 1: Understand the Documentation Model (MANDATORY)
 
-There is no single Karpenter Helm-only upgrade guide.
+There is no single KEDA Helm-only upgrade guide.
 
 Upgrade information is distributed across:
-1. Karpenter upgrade and migration documentation
-2. Karpenter GitHub release notes
+1. KEDA upgrade and migration documentation
+2. KEDA GitHub release notes
 3. Helm chart changelog and values schema
-4. AWS and Kubernetes compatibility documentation
+4. Scaler-specific documentation (e.g. AWS, Prometheus, Kafka, etc.)
 
-Karpenter owns:
-- CRDs (NodePool, NodeClass, and legacy Provisioner APIs)
-- Node lifecycle and provisioning behaviour
-- AWS infrastructure integration (EC2, Spot, AMIs, instance metadata)
+KEDA owns:
+- CRDs (ScaledObject, ScaledJob, TriggerAuthentication, etc.)
+- Scaling and polling behaviour
+- Metrics and external scaler integrations
 
 All sources below must be combined.
 
@@ -65,10 +62,10 @@ All sources below must be combined.
 
 ## Step 2: Identify Chart to App Version Mapping
 
-Retrieve the Karpenter chart metadata from ArtifactHub and confirm:
-- Controller image version
-- CRD versions managed by the chart
-- Default feature gates and controller arguments
+Retrieve the KEDA chart metadata from ArtifactHub and confirm:
+- KEDA controller and metrics adapter versions
+- Managed CRDs and their versions
+- Default flags, feature gates, and controller arguments
 
 Compare between the old and new chart versions and document what changed.
 
@@ -78,11 +75,11 @@ Compare between the old and new chart versions and document what changed.
 
 Determine:
 - The Kubernetes versions currently running in development, test, and production
-- Whether `{new_app_version}` of Karpenter supports those versions
+- Whether `{new_app_version}` of KEDA supports those versions
 
 Verify:
 - Supported Kubernetes minor versions
-- Deprecated API usage (e.g. PodSecurityPolicy, legacy scheduling APIs)
+- Deprecated API usage (e.g. HPA behaviour changes)
 
 If the Kubernetes version is unsupported, do not proceed.
 
@@ -90,30 +87,30 @@ If the Kubernetes version is unsupported, do not proceed.
 
 ## Step 4: Locate and Review Upgrade Notes (REQUIRED)
 
-### Karpenter Upgrade and Migration Documentation (Primary Source)
+### KEDA Upgrade and Migration Documentation (Primary Source)
 
-Review Karpenter upgrade and migration guides covering all versions between `{old_app_version}` and `{new_app_version}`.
+Review KEDA upgrade and migration guides covering all versions between `{old_app_version}` and `{new_app_version}`.
 
 For each intermediate version, identify:
-- CRD changes (especially NodePool / NodeClass evolution)
-- Behavioural changes to scheduling, consolidation, or drift detection
-- Feature gate changes or defaults becoming enabled
-- Removal of legacy APIs (e.g. Provisioner deprecations)
+- CRD schema changes and removals
+- Behavioural changes to scalers and polling intervals
+- Default configuration changes
+- Feature gates that changed default values or became GA
 
 ---
 
-### Karpenter GitHub Releases (Version by Version)
+### KEDA GitHub Releases (Version by Version)
 
-Review all Karpenter releases between the old and new versions.
+Review all KEDA releases between the old and new versions.
 
 Process:
 - Start at `{old_app_version}` (exclusive)
 - Read every minor release up to `{new_app_version}` (inclusive)
 - Focus on:
   - breaking changes
-  - CRD migrations
-  - AWS behaviour changes
-  - default configuration changes
+  - CRD updates
+  - scaler behaviour changes
+  - metrics adapter changes
 
 Patch releases may be skipped unless explicitly marked as breaking.
 
@@ -121,11 +118,11 @@ Patch releases may be skipped unless explicitly marked as breaking.
 
 ### Helm Chart Changelog (Chart Specific Only)
 
-Review the Karpenter Helm chart changelog to identify:
+Review the KEDA Helm chart changelog to identify:
 - Helm value renames or removals
 - CRD installation toggles
 - RBAC / ServiceAccount changes
-- Controller deployment changes
+- Metrics adapter deployment changes
 
 This must not be treated as a substitute for application upgrade notes.
 
@@ -134,27 +131,25 @@ This must not be treated as a substitute for application upgrade notes.
 ## Step 5: CRD Strategy Check (CRITICAL)
 
 Determine:
-- Whether CRDs are installed via Helm, Terraform, or a separate CRD chart
+- Whether CRDs are installed via Helm, Terraform, or another mechanism
 - Whether CRDs must be upgraded before the controller
 - Whether a staged rollout is required
 
 For CRD changes:
-- Identify schema changes and storage versions
-- Identify removed or deprecated fields
+- Identify schema changes and deprecated fields
+- Identify conversion or validation behaviour changes
 - Document apply order and rollback considerations
-
-Do not upgrade the controller before compatible CRDs are in place.
 
 ---
 
 ## Step 6: Extract Breaking and Behavioural Changes
 
 From all sources, identify changes affecting:
-- NodePool / NodeClass configuration
-- Instance type selection and filtering
-- Consolidation, expiration, and drift detection behaviour
-- Spot vs On-Demand handling
-- Defaults that may change scheduling outcomes
+- ScaledObject / ScaledJob definitions
+- Trigger metadata and authentication references
+- Default polling intervals and cooldown behaviour
+- Metrics adapter integration and HPA behaviour
+- Deprecated scaler types or trigger parameters
 
 Create a checklist distinguishing:
 - Mandatory changes
@@ -163,15 +158,19 @@ Create a checklist distinguishing:
 
 ---
 
-## Step 7: AWS and IAM Review
+## Step 7: Values and Resource Compatibility Review
 
-Verify:
-- IAM permissions required by the new Karpenter version
-- EC2, Pricing, and SSM API usage
-- Instance profile and role configuration
-- Any new required tags or discovery mechanisms
+Review existing configuration for:
+- Helm values (controller args, metrics adapter, admission webhooks)
+- ScaledObject and ScaledJob resources
+- TriggerAuthentication and ClusterTriggerAuthentication resources
 
-Document any required IAM or AWS configuration updates.
+Flag any resources requiring updates due to:
+- Deprecated fields
+- Behavioural changes that could affect scaling
+- Authentication or secret reference changes
+
+If unclear, mark as requires human review and do not guess.
 
 ---
 
@@ -179,7 +178,7 @@ Document any required IAM or AWS configuration updates.
 
 Apply required changes in the following locations:
 
-1. Update the Karpenter Helm chart version in:
+1. Update the KEDA Helm chart version in:
    terraform/environments/analytical-platform-compute/cluster/environment-configuration.tf
 
    This change must be applied to **all environment blocks**:
@@ -189,7 +188,7 @@ Apply required changes in the following locations:
 
 2. Update Helm values as required to match `{new_app_version}` and chart schema.
 
-3. Update NodePool / NodeClass (or legacy Provisioner) manifests if required by CRD or behaviour changes.
+3. Update ScaledObject / ScaledJob / TriggerAuthentication manifests if required by CRD or behaviour changes.
 
 ---
 
@@ -213,7 +212,7 @@ Do not reuse or amend existing branches.
 
 Create a pull request with the following requirements:
 
-- Title: :copilot: chore(helm chart): update karpenter chart version in `{environment}`
+- Title: :copilot: chore(helm chart): update keda chart version in `{environment}`
 - Labels: Add the `copilot` label
 - Body: Use the structured format below. Do not include risk assessment, post-upgrade validation, or file change listings.
 
@@ -226,8 +225,8 @@ Create a pull request with the following requirements:
 | Helm Chart (development) | `{old_chart_version}` | `{new_chart_version}` |
 | Helm Chart (test) | `{old_chart_version}` | `{new_chart_version}` |
 | Helm Chart (production) | `{old_chart_version}` | `{new_chart_version}` |
-| Karpenter | `{old_app_version}` | `{new_app_version}` |
-| Karpenter CRDs | `{old_crd_version}` | `{new_crd_version}` |
+| KEDA | `{old_app_version}` | `{new_app_version}` |
+| KEDA CRDs | `{old_crd_version}` | `{new_crd_version}` |
 
 Include an environment-specific note if applicable.
 
@@ -247,8 +246,8 @@ Summarise the breaking and behavioural changes identified across the upgrade ran
 
 Summarise the compatibility review of:
 - Helm values
-- NodePool / NodeClass (or Provisioner) resources
-- AWS/IAM integration
+- ScaledObject / ScaledJob resources
+- TriggerAuthentication resources
 
 | Area | Status |
 |------|--------|
@@ -272,11 +271,10 @@ Provide a concise narrative summary that aligns exactly with the pull request bo
 
 ## Constraints and Rules
 
-- Do not assume Karpenter upgrades are safe
+- Do not assume KEDA upgrades are safe
 - Do not skip intermediate application versions
-- Kubernetes compatibility must be validated first
 - CRD sequencing must be explicitly reviewed
-- AWS behaviour changes must be reviewed
+- Scaler behaviour changes must be reviewed
 - Do not include risk assessments or post-upgrade validation sections
 - If documentation is unclear, mark the item as requires human review
 

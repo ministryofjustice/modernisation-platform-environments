@@ -4,7 +4,7 @@ description:
 tools: ['runCommands', 'edit', 'search', 'fetch']
 ---
 
-# :copilot: GitHub Copilot Agent: Upgrade kyverno Helm Chart (EKS)
+# Upgrade kyverno Helm Chart Agent
 
 ## Purpose
 

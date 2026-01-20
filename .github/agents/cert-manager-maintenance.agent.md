@@ -4,7 +4,7 @@ description:
 tools: ['runCommands', 'edit', 'search', 'fetch']
 ---
 
-# Upgrade cert-manager Helm Chart Upgrade Agent
+# Upgrade cert-manager Helm Chart Agent
 
 ## Purpose
 

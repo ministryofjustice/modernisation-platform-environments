@@ -5,7 +5,7 @@ description:
 tools: ['runCommands', 'edit', 'search', 'fetch']
 ---
 
-# Upgrade cluster-autoscaler Helm Chart Upgrade Agent
+# Upgrade cluster-autoscaler Helm Chart Agent
 
 ## Purpose
 
