@@ -333,7 +333,7 @@ resource "helm_release" "velero" {
       "${path.module}/src/helm/values/velero/values.yml.tftpl",
       {
         eks_role_arn              = module.velero_iam_role.arn
-        velero_aws_plugin_version = "v1.13.2"
+        velero_aws_plugin_version = "v1.12.2"
         velero_bucket             = module.velero_s3_bucket.s3_bucket_id
         velero_prefix             = module.eks.cluster_name
         aws_region                = data.aws_region.current.region
