@@ -97,6 +97,7 @@ resource "aws_s3_bucket_replication_configuration" "default" {
     priority = 0
 
     destination {
+      account       = var.replication_details["account_id"]
       bucket        = local.replication_enabled ? "arn:aws:s3:::${var.replication_details["${var.data_feed}_${var.order_type}_bucket"]}" : ""
       storage_class = "STANDARD"
       encryption_configuration {
