@@ -212,17 +212,6 @@ resource "aws_s3_bucket_notification" "load_mdss_event" {
     filter_prefix = "allied/mdss/"
   }
 
-  # Test-only prefix for repeatable MDSS failure testing
-  # IMPORTANT: must NOT overlap with "allied/mdss/" to satisfy S3 notification rules.
-  dynamic "queue" {
-    for_each = local.is-test ? [1] : []
-    content {
-      queue_arn     = module.load_mdss_event_queue.sqs_queue.arn
-      events        = ["s3:ObjectCreated:*"]
-      filter_prefix = "allied/mdss-test/"
-    }
-  }
-
   queue {
     queue_arn     = module.load_fms_event_queue.sqs_queue.arn
     events        = ["s3:ObjectCreated:*"]
