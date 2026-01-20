@@ -115,5 +115,3 @@ EOF
     { Name = "${local.application_name}-guardduty-alerts" }
   )
 }
-
-
