@@ -89,7 +89,7 @@ resource "aws_iam_role_policy_attachment" "replication" {
 
 resource "aws_s3_bucket_replication_configuration" "default" {
   for_each = local.replication_enabled ? toset(["run"]) : []
-  bucket   = aws_s3_bucket.default.id
+  bucket   = module.this-bucket.bucket.id
   role     = aws_iam_role.replication_role[0].arn
   rule {
     id       = "SourceToDestinationReplication"
