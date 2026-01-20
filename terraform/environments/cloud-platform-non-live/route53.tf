@@ -1,12 +1,11 @@
-# resource "aws_route53_zone" "temp_cloud_platform_justice_gov_uk" {
-#   count = terraform.workspace == "cloud-platform-non-live-production" ? 1 : 0
-#   name  = "temp.cloud-platform.service.justice.gov.uk."
-# }
+resource "aws_route53_zone" "temp_cloud_platform_justice_gov_uk" {
+  count = terraform.workspace == "cloud-platform-non-live-production" ? 1 : 0
+  name  = "temp.cloud-platform.service.justice.gov.uk."
+}
 
-# resource "aws_route53_zone" "account_zone" {
-#   count = can(regex("^cp-", terraform.workspace)) ? 0 : 1
-#   name  = "${trimprefix(terraform.workspace, "cloud-platform-")}.temp.cloud-platform.service.justice.gov.uk"
-# }
+resource "aws_route53_zone" "account_zone" {
+  name  = "${trimprefix(terraform.workspace, "cloud-platform-")}.temp.cloud-platform.service.justice.gov.uk"
+}
 
 # resource "aws_route53_record" "account_delegation" {
 #   for_each = terraform.workspace == "cloud-platform-non-live-production" ? local.environment_configurations : {}
