@@ -212,6 +212,17 @@ resource "aws_s3_bucket_notification" "load_mdss_event" {
     events        = ["s3:ObjectCreated:*"]
     filter_prefix = "allied/mdss"
   }
+
+  # Test env only prefix for repeatable MDSS failure testing
+  dynamic "queue" {
+    for_each = local.is-test ? [1] : []
+    content {
+      queue_arn     = module.load_mdss_event_queue.sqs_queue.arn
+      events        = ["s3:ObjectCreated:*"]
+      filter_prefix = "allied/mdss_test"
+    }
+  }
+
   queue {
     queue_arn     = module.load_fms_event_queue.sqs_queue.arn
     events        = ["s3:ObjectCreated:*"]
