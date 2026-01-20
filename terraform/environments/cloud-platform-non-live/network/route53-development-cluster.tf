@@ -12,7 +12,7 @@ resource "aws_route53_zone" "development_cluster_zone" {
   }
 }
 
-resource "aws_route53_record" "development_hosted_zone_ns" {
+resource "aws_route53_record" "development_cluster_hosted_zone_ns" {
   count = contains(local.mp_environments, terraform.workspace) ? 0 : 1
   
   zone_id = data.aws_route53_zone.account_hosted_zone.zone_id
