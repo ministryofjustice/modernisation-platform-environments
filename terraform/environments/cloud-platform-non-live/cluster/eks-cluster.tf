@@ -110,5 +110,5 @@ module "eks" {
     }
   }
 
-  tags = local.tags
+  # tags = local.tags
 }
