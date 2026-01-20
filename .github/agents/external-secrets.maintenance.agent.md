@@ -4,7 +4,7 @@ description:
 tools: ['runCommands', 'edit', 'search', 'fetch']
 ---
 
-# :copilot: GitHub Copilot Agent: Upgrade external-secrets Helm Chart (EKS)
+# Upgrade external-secrets Helm Chart Upgrade Agent
 
 ## Purpose
 

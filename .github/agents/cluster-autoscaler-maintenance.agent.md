@@ -4,7 +4,7 @@ description:
 tools: ['runCommands', 'edit', 'search', 'fetch']
 ---
 
-# :copilot: GitHub Copilot Agent: Upgrade cluster-autoscaler Helm Chart (EKS)
+# Upgrade cluster-autoscaler Helm Chart Upgrade Agent
 
 ## Purpose
 
