@@ -30,10 +30,10 @@ locals {
     production = {
       account_subdomain_name = length(aws_route53_zone.account_zone) > 0 ? aws_route53_zone.account_zone[0].name : "production.temp.cloud-platform.service.justice.gov.uk"
       ns_records = length(aws_route53_zone.account_zone) > 0 ? [
-        aws_route53_zone.account_zone[0].name_servers[0],
-        aws_route53_zone.account_zone[0].name_servers[1],
-        aws_route53_zone.account_zone[0].name_servers[2],
-        aws_route53_zone.account_zone[0].name_servers[3],
+        aws_route53_zone.account_zone.name_servers[0],
+        aws_route53_zone.account_zone.name_servers[1],
+        aws_route53_zone.account_zone.name_servers[2],
+        aws_route53_zone.account_zone.name_servers[3],
       ] : []
     }
   }
