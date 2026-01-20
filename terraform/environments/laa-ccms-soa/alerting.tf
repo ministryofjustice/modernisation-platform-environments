@@ -438,11 +438,28 @@ resource "aws_cloudwatch_metric_alarm" "SOA_Benefit_Checker_Admin" {
   ok_actions          = [aws_sns_topic.alerts.arn]
 }
 
-resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_Error_Managed" {
-  alarm_name          = "${local.application_data.accounts[local.environment].app_name}-managed-custom-checks-errors"
-  alarm_description   = "${local.environment} | ${local.aws_account_id} | There have been multiple custom check script errors on the SOA managed servers in the last 5 minutes, this likely means please that a composite endpoint is unreachable."
+# resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_Error_Managed" {
+#   alarm_name          = "${local.application_data.accounts[local.environment].app_name}-managed-custom-checks-errors"
+#   alarm_description   = "${local.environment} | ${local.aws_account_id} | There have been multiple custom check script errors on the SOA managed servers in the last 5 minutes, this likely means please that a composite endpoint is unreachable."
+#   comparison_operator = "GreaterThanThreshold"
+#   metric_name         = aws_cloudwatch_log_metric_filter.soa_custom_checks_error_managed.id
+#   statistic           = "Sum"
+#   namespace           = "CCMS-SOA-APP"
+#   period              = "300"
+#   evaluation_periods  = "1"
+#   threshold           = "5"
+#   datapoints_to_alarm = "1"
+#   treat_missing_data  = "notBreaching"
+#   alarm_actions       = [aws_sns_topic.alerts.arn]
+#   ok_actions          = [aws_sns_topic.alerts.arn]
+# }
+
+# THe following alarms are new alarms to monitor specific custom check erros
+resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_test_paths" {
+  alarm_name          = "${local.application_data.accounts[local.environment].app_name}-managed-custom-checks-test-paths"
+  alarm_description   = "${local.environment} | ${local.aws_account_id} | One of the composite failed to respond on SOA managed servers."
   comparison_operator = "GreaterThanThreshold"
-  metric_name         = aws_cloudwatch_log_metric_filter.soa_custom_checks_error_managed.id
+  metric_name         = aws_cloudwatch_log_metric_filter.soa_custom_check_test_paths.id
   statistic           = "Sum"
   namespace           = "CCMS-SOA-APP"
   period              = "300"
@@ -453,6 +470,104 @@ resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_Error_Managed" {
   alarm_actions       = [aws_sns_topic.alerts.arn]
   ok_actions          = [aws_sns_topic.alerts.arn]
 }
+
+resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_server_health" {
+  alarm_name          = "${local.application_data.accounts[local.environment].app_name}-managed-custom-checks-server-health"
+  alarm_description   = "${local.environment} | ${local.aws_account_id} | Server health check failed. One of the SOA managed servers is not in running state"
+  comparison_operator = "GreaterThanThreshold"
+  metric_name         = aws_cloudwatch_log_metric_filter.soa_custom_check_server_health.id
+  statistic           = "Sum"
+  namespace           = "CCMS-SOA-APP"
+  period              = "300"
+  evaluation_periods  = "1"
+  threshold           = "5"
+  datapoints_to_alarm = "1"
+  treat_missing_data  = "notBreaching"
+  alarm_actions       = [aws_sns_topic.alerts.arn]
+  ok_actions          = [aws_sns_topic.alerts.arn]
+}
+
+resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_percentage_heap_free_memory" {
+  alarm_name          = "${local.application_data.accounts[local.environment].app_name}-managed-custom-checks-percentage-heap-free-memory"
+  alarm_description   = "${local.environment} | ${local.aws_account_id} | There is low heap free memory on the SOA managed servers."
+  comparison_operator = "GreaterThanThreshold"
+  metric_name         = aws_cloudwatch_log_metric_filter.soa_custom_check_percentage_heap_free_memory.id
+  statistic           = "Sum"
+  namespace           = "CCMS-SOA-APP"
+  period              = "300"
+  evaluation_periods  = "1"
+  threshold           = "5"
+  datapoints_to_alarm = "1"
+  treat_missing_data  = "notBreaching"
+  alarm_actions       = [aws_sns_topic.alerts.arn]
+  ok_actions          = [aws_sns_topic.alerts.arn]
+}
+
+resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_stuck_threads" {
+  alarm_name          = "${local.application_data.accounts[local.environment].app_name}-managed-custom-checks-stuck-threads"
+  alarm_description   = "${local.environment} | ${local.aws_account_id} | There are stuck threads on the SOA managed servers."
+  comparison_operator = "GreaterThanThreshold"
+  metric_name         = aws_cloudwatch_log_metric_filter.soa_custom_check_stuck_threads.id
+  statistic           = "Sum"
+  namespace           = "CCMS-SOA-APP"
+  period              = "300"
+  evaluation_periods  = "1"
+  threshold           = "5"
+  datapoints_to_alarm = "1"
+  treat_missing_data  = "notBreaching"
+  alarm_actions       = [aws_sns_topic.alerts.arn]
+  ok_actions          = [aws_sns_topic.alerts.arn]
+}
+
+resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_hogging_threads" {
+  alarm_name          = "${local.application_data.accounts[local.environment].app_name}-managed-custom-checks-hogging-threads"
+  alarm_description   = "${local.environment} | ${local.aws_account_id} | There are hogging threads on the SOA managed servers."
+  comparison_operator = "GreaterThanThreshold"
+  metric_name         = aws_cloudwatch_log_metric_filter.soa_custom_check_hogging_threads.id
+  statistic           = "Sum"
+  namespace           = "CCMS-SOA-APP"
+  period              = "300"
+  evaluation_periods  = "1"
+  threshold           = "5"
+  datapoints_to_alarm = "1"
+  treat_missing_data  = "notBreaching"
+  alarm_actions       = [aws_sns_topic.alerts.arn]
+  ok_actions          = [aws_sns_topic.alerts.arn]
+}
+
+
+resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_jdbc_ebs_state" {
+  alarm_name          = "${local.application_data.accounts[local.environment].app_name}-managed-custom-checks-jdbc-ebs-state"
+  alarm_description   = "${local.environment} | ${local.aws_account_id} | Either EBSSM or JDBC EBS state is not running on the SOA managed servers."
+  comparison_operator = "GreaterThanThreshold"
+  metric_name         = aws_cloudwatch_log_metric_filter.soa_custom_check_jdbc_ebssms_state.id
+  statistic           = "Sum"
+  namespace           = "CCMS-SOA-APP"
+  period              = "300"
+  evaluation_periods  = "1"
+  threshold           = "5"
+  datapoints_to_alarm = "1"
+  treat_missing_data  = "notBreaching"
+  alarm_actions       = [aws_sns_topic.alerts.arn]
+  ok_actions          = [aws_sns_topic.alerts.arn]
+}
+
+resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_jdbc_failed_reserve_request_count" {
+  alarm_name          = "${local.application_data.accounts[local.environment].app_name}-managed-custom-checks-jdbc-failed-reserve-request-count"
+  alarm_description   = "${local.environment} | ${local.aws_account_id} | There is a EBSSM or JDBC failed reserve request count error on the SOA managed servers."
+  comparison_operator = "GreaterThanThreshold"
+  metric_name         = aws_cloudwatch_log_metric_filter.soa_custom_check_jdbc_failed_reserve_request_count.id
+  statistic           = "Sum"
+  namespace           = "CCMS-SOA-APP"
+  period              = "300"
+  evaluation_periods  = "1"
+  threshold           = "5"
+  datapoints_to_alarm = "1"
+  treat_missing_data  = "notBreaching"
+  alarm_actions       = [aws_sns_topic.alerts.arn]
+  ok_actions          = [aws_sns_topic.alerts.arn]
+}
+
 
 #--The below alerts have been disabled as we do not understand their benefit and if the errors being thrown are actually errors
 #--or just part of the regular operation of the CCMS application

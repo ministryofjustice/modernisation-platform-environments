@@ -87,3 +87,16 @@ resource "aws_secretsmanager_secret_version" "ccms_soa_quiesced_secrets_version"
   }
 }
 
+##########################################################
+# OEM Agent Credentials Secret (added)
+##########################################################
+
+data "aws_secretsmanager_secret" "oem_agent_credentials" {
+  name = "ccms/soa/oem_agent_credentials"
+}
+
+data "aws_secretsmanager_secret_version" "oem_agent_credentials" {
+  secret_id = data.aws_secretsmanager_secret.oem_agent_credentials.id
+}
+
+
