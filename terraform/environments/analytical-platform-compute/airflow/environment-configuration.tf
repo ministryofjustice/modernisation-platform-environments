@@ -32,12 +32,12 @@ locals {
 
       /* MWAA */
       airflow_version                 = "2.10.3"
-      airflow_environment_class       = "mw1.large"
+      airflow_environment_class       = "mw1.xlarge"
       airflow_webserver_instance_name = "Production"
       airflow_max_workers             = 20
       airflow_min_workers             = 2
       airflow_schedulers              = 2
-      airflow_celery_worker_autoscale = "5,1"
+      airflow_celery_worker_autoscale = "7,1"
     }
   }
 }
