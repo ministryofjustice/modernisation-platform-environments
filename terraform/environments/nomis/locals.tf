@@ -51,5 +51,18 @@ locals {
     }
 
     security_groups = local.security_groups
+
+    patch_manager = {
+      patch_schedules = {
+        windows = "cron(10 06 ? * WED *)" # 06:10 for nomis windows clients we work around the overnight shutdown  
+      }
+      patch_tag_key               = "os-type"
+      maintenance_window_duration = 4
+      maintenance_window_cutoff   = 2
+      patch_classifications = {
+        # REDHAT_ENTERPRISE_LINUX = ["Security", "Bugfix"] # Linux Options=(Security,Bugfix,Enhancement,Recommended,Newpackage)
+        WINDOWS = ["SecurityUpdates", "CriticalUpdates", "UpdateRollups"] # Windows Options=CriticalUpdates,SecurityUpdates,DefinitionUpdates,Drivers,FeaturePacks,ServicePacks,Tools,UpdateRollups,Updates,Upgrades
+      }
+    }
   }
 }
