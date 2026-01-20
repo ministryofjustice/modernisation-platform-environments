@@ -116,29 +116,4 @@ EOF
   )
 }
 
-resource "aws_sns_topic" "s3_topic_plain" {
-  name   = "s3-event-notification-topic-plain"
-  policy = data.aws_iam_policy_document.s3_topic_policy_plain.json
-  tags   = merge(local.tags, { Name = "s3-event-notification-topic-plain" })
-}
 
-data "aws_iam_policy_document" "s3_topic_policy_plain" {
-  statement {
-    sid     = "AllowS3PublishFromBuckets"
-    effect  = "Allow"
-
-    principals {
-      type        = "Service"
-      identifiers = ["s3.amazonaws.com"]
-    }
-
-    actions   = ["sns:Publish"]
-    resources = ["arn:aws:sns:*:*:s3-event-notification-topic-plain"]
-
-    condition {
-      test     = "ArnLike"
-      variable = "aws:SourceArn"
-      values   = [for _, b in aws_s3_bucket.buckets : b.arn]
-    }
-  }
-}
