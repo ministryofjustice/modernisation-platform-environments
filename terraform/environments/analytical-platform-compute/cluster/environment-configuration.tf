@@ -32,8 +32,8 @@ locals {
         karpenter              = "1.8.5"
         keda                   = "2.18.3"
         kube_prometheus_stack  = "81.1.0"
-        kyverno                = "3.4.3"
-        velero                 = "10.0.10"
+        kyverno                = "3.6.2"
+        velero                 = "11.3.2"
       }
 
       /* Data Engineering Airflow */
@@ -72,8 +72,8 @@ locals {
         karpenter              = "1.8.5"
         keda                   = "2.18.3"
         kube_prometheus_stack  = "81.1.0"
-        kyverno                = "3.4.3"
-        velero                 = "10.0.10"
+        kyverno                = "3.6.2"
+        velero                 = "11.3.2"
       }
 
       /* Data Engineering Airflow */
@@ -112,8 +112,8 @@ locals {
         karpenter              = "1.8.5"
         keda                   = "2.18.3"
         kube_prometheus_stack  = "81.1.0"
-        kyverno                = "3.4.3"
-        velero                 = "10.0.10"
+        kyverno                = "3.6.2"
+        velero                 = "11.3.2"
       }
 
       /* Data Engineering Airflow */
