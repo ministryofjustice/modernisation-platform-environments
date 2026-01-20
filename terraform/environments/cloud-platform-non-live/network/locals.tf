@@ -18,4 +18,6 @@ locals {
   vpc_flow_log_cloudwatch_log_group_name_suffix       = local.cp_vpc_name
   vpc_flow_log_cloudwatch_log_group_retention_in_days = 400
   vpc_flow_log_max_aggregation_interval               = 60
+
+  environment_configuration = local.environment_configurations[local.cluster_environment]
 }
