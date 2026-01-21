@@ -45,7 +45,8 @@ data "aws_iam_policy_document" "github_actions_development_cluster_oidc_policy" 
       "iam:TagOpenIDConnectProvider",
       "iam:PassRole",
       "iam:TagRole",
-      "iam:TagPolicy"
+      "iam:TagPolicy",
+      "iam:UntagRole"
     ]
     resources = ["*"]
   }
@@ -169,6 +170,20 @@ data "aws_iam_policy_document" "github_actions_development_cluster_oidc_policy" 
     ]
     resources = ["*"]
   }
+  
+  statement {
+    sid    = "DevelopmentRoute53HostedZone"
+    effect = "Allow"
+    actions = [
+      "route53:CreateHostedZone",
+      "route53:DeleteHostedZone",
+      "route53:ChangeResourceRecordSets",
+      "route53:ChangeTagsForResource",
+      "route53:UpdateHostedZoneComment",
+    ]
+    resources = ["*"]
+  }
+
   statement {
     sid    = "AllowOIDCToAssumeRoles"
     effect = "Allow"
