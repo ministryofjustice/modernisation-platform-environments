@@ -82,13 +82,13 @@ locals {
         /* PagerDuty Status Page */
         pagerduty-dkim1-cname = {
           type    = "CNAME"
-          name    = "pdt._domainkey"
+          name    = "pdt._domainkey.status"
           ttl     = 300
-          records = ["updt.domainkey.u31181182.wl183.sendgrid.net."]
+          records = ["pdt.domainkey.u31181182.wl183.sendgrid.net."]
         },
         pagerduty-dkim2-cname = {
           type    = "CNAME"
-          name    = "pdt2._domainkey"
+          name    = "pdt2._domainkey.status"
           ttl     = 300
           records = ["pdt2.domainkey.u31181182.wl183.sendgrid.net."]
         },
@@ -106,7 +106,7 @@ locals {
         },
         pagerduty-tls-certificate-cname = {
           type    = "CNAME"
-          name    = "_701f6977b827d5ad23c4f98802a51bc3"
+          name    = "_701f6977b827d5ad23c4f98802a51bc3.status"
           ttl     = 300
           records = ["_56473aa9b1f7b9aec52ac3d3ea416721.yygwskclfy.acm-validations.aws."]
         }
