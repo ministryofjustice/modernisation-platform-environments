@@ -32,8 +32,9 @@ locals {
         identifiers = ["arn:aws:iam::${var.cross_account_id}:role/AWSS3BucketReplication"]
       }
       actions = [
-        "s3:PutObject",
-        "s3:PutObjectAcl"
+        "s3:ReplicateObject",
+        "s3:ReplicateTags",
+        "s3:ObjectOwnerOverrideToBucketOwner"
       ]
       resources = ["${module.this-bucket.bucket.arn}/*"]
     }
