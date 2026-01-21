@@ -7,12 +7,8 @@ resource "aws_route53_record" "oas-app_new" {
   zone_id  = data.aws_route53_zone.external.zone_id
   name     = "${local.application_name}.${data.aws_route53_zone.external.name}"
   type     = "A"
-
-  alias {
-    name                   = module.lb_access_logs_enabled.load_balancer.dns_name
-    zone_id                = module.lb_access_logs_enabled.load_balancer.zone_id
-    evaluate_target_health = true
-  }
+  ttl      = 900
+  records  = [aws_instance.oas_app_instance_new[0].private_ip]
 }
 
 ######################################
@@ -30,8 +26,9 @@ resource "aws_route53_record" "oas-rds-new" {
 }
 
 ######################################
-### Load Balancer Route53 Record
+### Load Balancer Route53 Records
 ######################################
+# oas-lb.* (Subject Alternative Name - 71 chars)
 resource "aws_route53_record" "oas-lb" {
   count = contains(["test", "preproduction"], local.environment) ? 1 : 0
 

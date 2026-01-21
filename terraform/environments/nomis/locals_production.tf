@@ -465,10 +465,11 @@ locals {
         })
         tags = merge(local.ec2_instances.db.tags, {
           connectivity-tests = "10.40.0.133:53 10.40.129.79:22"
-          description        = "Disaster-Recovery/High-Availability production databases for AUDIT/MIS"
-          misload-dbname     = "DRMIS"
-          nomis-environment  = "prod"
-          oracle-sids        = "DRMIS DRCNMAUD"
+          # connectivity-tests = "10.40.128.196:53 10.40.10.132:22" # cannot correct due to provider bug, see TM-1715
+          description       = "Disaster-Recovery/High-Availability production databases for AUDIT/MIS"
+          misload-dbname    = "DRMIS"
+          nomis-environment = "prod"
+          oracle-sids       = "DRMIS DRCNMAUD"
         })
       })
     }

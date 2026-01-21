@@ -1,16 +1,13 @@
 """
 AWS Lambda function to pull CloudWatch Alarm from SNS Topic and
-publish into Slack. This will also publish guardduty findings into another slack channel.
+publish into Slack. This will also publish GuardDuty findings and S3 events into Slack.
 """
-
 
 import json
 import os
 import logging
 import io
-import time
 import tracemalloc
-import urllib.request
 from dataclasses import dataclass
 from typing import Any, Dict, Optional, Union, cast
 from datetime import datetime
@@ -18,14 +15,14 @@ import boto3
 import pycurl
 from botocore.exceptions import ClientError
 from mypy_boto3_secretsmanager import SecretsManagerClient
-from dateutil import parser
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
+
 @dataclass
 class Config:
-    """Configuration settings for the Lambda function."""    
+    """Configuration settings for the Lambda function."""
 
     @classmethod
     def from_env(cls) -> "Config":
@@ -39,16 +36,17 @@ class ConfigValidator:
     @staticmethod
     def validate_mandatory_fields(config_dict: Dict[str, Any], field_name: str) -> None:
         """Validate that all mandatory fields are present and non-empty."""
-        # Always mandatory fields
         mandatory_fields = {
             "slack_channel_webhook": config_dict.get("slack_channel_webhook"),
-            "slack_channel_webhook_guardduty": config_dict.get("slack_channel_webhook_guardduty")
+            "slack_channel_webhook_guardduty": config_dict.get("slack_channel_webhook_guardduty"),
+            "slack_channel_webhook_s3": config_dict.get("slack_channel_webhook_s3"),
         }
         missing_fields = [name for name, value in mandatory_fields.items() if not value]
         if missing_fields:
             raise ValueError(
                 f"Missing required {field_name} fields: {', '.join(missing_fields)}"
             )
+
     @staticmethod
     def get_mandatory_secret(secrets_data: Dict, key: str) -> str:
         """Extract and validate a mandatory field from secrets."""
@@ -69,7 +67,6 @@ class ConfigValidator:
             )
         return value if value else None
 
-
     @staticmethod
     def get_mandatory_env(env_data: Dict, key: str) -> str:
         """Extract and validate a mandatory field from environment."""
@@ -78,25 +75,26 @@ class ConfigValidator:
             raise ValueError(f"{key} environment variable is required")
         return value
 
+
 @dataclass
 class ValidateConfig:
     """Configuration with validation."""
 
-    # Mandatory fields (no default values)
     slack_channel_webhook: str
     slack_channel_webhook_guardduty: str
+    slack_channel_webhook_s3: str
 
     def __post_init__(self):
         """Validate configuration after initialization."""
-        # Validate using the ConfigValidator
         config_dict = {
             "slack_channel_webhook": self.slack_channel_webhook,
             "slack_channel_webhook_guardduty": self.slack_channel_webhook_guardduty,
+            "slack_channel_webhook_s3": self.slack_channel_webhook_s3,
         }
 
         ConfigValidator.validate_mandatory_fields(config_dict, "configuration")
+        logger.info("Configuration validated")
 
-        logger.info(f"Configuration validated")
 
 class SecretsManager:
     """Manager for retrieving configuration from AWS Secrets Manager."""
@@ -135,17 +133,21 @@ def parse_config_from_env_and_secrets(
 ) -> ValidateConfig:
     """
     Parse configuration from both environment variables and secrets data.
+
     This function combines non-sensitive configuration from environment variables
     with sensitive credentials from AWS Secrets Manager.
     """
 
-
-    # Create config object with properly separated concerns
     config = ValidateConfig(
-        # Connection settings from mixed sources
-        slack_channel_webhook=ConfigValidator.get_mandatory_secret(secrets_data, "slack_channel_webhook"),
-        slack_channel_webhook_guardduty=ConfigValidator.get_mandatory_secret(secrets_data, "slack_channel_webhook_guardduty"),
-
+        slack_channel_webhook=ConfigValidator.get_mandatory_secret(
+            secrets_data, "slack_channel_webhook"
+        ),
+        slack_channel_webhook_guardduty=ConfigValidator.get_mandatory_secret(
+            secrets_data, "slack_channel_webhook_guardduty"
+        ),
+        slack_channel_webhook_s3=ConfigValidator.get_mandatory_secret(
+            secrets_data, "slack_channel_webhook_s3"
+        ),
     )
 
     return config
@@ -168,97 +170,133 @@ class NotificationService:
         """Send a notification to Slack using the webhook."""
         curl = pycurl.Curl()
         logger.info("alarmdetailsinside:\n" + json.dumps(alarmdetails, indent=2))
-        # alarmdetails = json.loads(jsonalarmdetails)
+
+        # ---------------- GuardDuty ----------------
         if type == "GuardDuty":
             severity = alarmdetails.get('detail', {}).get('severity', 'Unknown Severity')
-            if severity < 4.0:
-                emoji = ":large_blue_circle:" 
-                strseverity = "Low"
-            elif severity < 7.0:
-                emoji = ":large_orange_circle:"  
-                strseverity = "Medium"
-            elif severity < 9.0:
-                emoji = ":small_red_triangle:"  
-                strseverity = "High"
+            if isinstance(severity, (int, float)):
+                if severity < 4.0:
+                    emoji = ":large_blue_circle:"
+                    strseverity = "Low"
+                elif severity < 7.0:
+                    emoji = ":large_orange_circle:"
+                    strseverity = "Medium"
+                elif severity < 9.0:
+                    emoji = ":small_red_triangle:"
+                    strseverity = "High"
+                else:
+                    emoji = ":broken_heart:"
+                    strseverity = "Critical"
             else:
-                emoji = ":broken_heart:"  
-                strseverity = "Critical"
+                emoji = ":grey_question:"
+                strseverity = "Unknown"
 
-            color = "danger" if is_error else "good"
             finding_type = alarmdetails.get('detail', {}).get('type', 'Unknown Finding')
             region = alarmdetails.get('detail', {}).get('region', 'Unknown Region')
             account_id = alarmdetails.get('detail', {}).get('accountId', 'Unknown Account')
             header = f"{emoji} | GuardDuty Finding | {region} | Account: {account_id}"
-            title = alarmdetails.get('detail', {}).get('title', 'No Title Provided')
+            title = alarmdetails.get('detail', {}).get('description', 'No Title Provided')
             threatcount = alarmdetails.get('detail', {}).get('service', {}).get('count', 'N/A')
             firstseennofmt = alarmdetails.get('detail', {}).get('service', {}).get('eventFirstSeen', 'N/A')
             lastseennofmt = alarmdetails.get('detail', {}).get('service', {}).get('eventLastSeen', 'N/A')
 
-            if firstseennofmt != 'N/A':
-                dt_first = datetime.strptime(firstseennofmt, "%Y-%m-%dT%H:%M:%S.%fZ")
-                firstseen = dt_first.strftime("%a, %d %b %Y %H:%M:%S UTC")
-            if lastseennofmt != 'N/A':
-                dt_last = datetime.strptime(lastseennofmt, "%Y-%m-%dT%H:%M:%S.%fZ")
-                lastseen = dt_last.strftime("%a, %d %b %Y %H:%M:%S UTC")
+            firstseen = firstseennofmt
+            lastseen = lastseennofmt
+            try:
+                if firstseennofmt != 'N/A':
+                    dt_first = datetime.strptime(firstseennofmt, "%Y-%m-%dT%H:%M:%S.%fZ")
+                    firstseen = dt_first.strftime("%a, %d %b %Y %H:%M:%S UTC")
+            except Exception:
+                pass
 
-             # Prepare the Slack message with formatting
+            try:
+                if lastseennofmt != 'N/A':
+                    dt_last = datetime.strptime(lastseennofmt, "%Y-%m-%dT%H:%M:%S.%fZ")
+                    lastseen = dt_last.strftime("%a, %d %b %Y %H:%M:%S UTC")
+            except Exception:
+                pass
+
             payload = {
-                "blocks": [
-                    {
-                        "type": "header",
-                        "text": {"type": "plain_text", "text": f"{header}"}
-                    },
-                    {
-                        "type": "section",
-                        "text": {"type": "plain_text", "text": f"Finding type - {finding_type}"}
-                    },
-                    {
-                        "type": "section",
-                        "text": {"type": "mrkdwn", "text": f"*{title}*"}
-                    },
-                    {
-                        "type": "divider"
-                    },
-                    {
-                        "type": "section",
-                        "fields": [
-                            {
+            "blocks": [
+                {
+                    "type": "header",
+                    "text": {
+                        "type": "plain_text",
+                        "text": f"{header}"
+                    }
+                },
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": f"*Finding Type* - {finding_type}"
+                    }
+                },
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": "*Details*"
+                    }
+                },
+                {
+                    "type": "rich_text",
+                    "elements": [
+                        {
+                            "type": "rich_text_preformatted",
+                            "elements": [
+                                {
+                                    "type": "text",
+                                    "text": f"{title}"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "divider"
+                },
+                {
+                    "type": "section",
+                    "fields": [
+                        {
                             "type": "mrkdwn",
                             "text": f"*FirstSeen:* {firstseen}"
-                            },
-                            {
+                        },
+                        {
                             "type": "mrkdwn",
                             "text": f"*LastSeen:* {lastseen}"
-                            }
-                        ]
-                    },
-                    {
-                        "type": "section",
-                        "fields": [
-                            {
+                        }
+                    ]
+                },
+                {
+                    "type": "section",
+                    "fields": [
+                        {
                             "type": "mrkdwn",
                             "text": f"*Severity:* {strseverity}"
-                            },
-                            {
+                        },
+                        {
                             "type": "mrkdwn",
                             "text": f"*Threat Count:* {threatcount}"
-                            }
-                        ]
-                    }
-                ]
-            }
+                        }
+                    ]
+                }
+            ]
+        }
+
+        # ---------------- CloudWatch Alarm ----------------
         elif type == "CloudWatch Alarm":
             alarm_name = alarmdetails.get('AlarmName', 'Unknown Alarm')
             region = alarmdetails.get('Region', '')
-            alarm_state = alarmdetails.get('NewStateValue','')
+            alarm_state = alarmdetails.get('NewStateValue', '')
             reason = alarmdetails.get('NewStateReason', '')
             namespace = alarmdetails.get('Trigger', {}).get('Namespace', '')
             metric_name = alarmdetails.get('Trigger', {}).get('MetricName', '')
             dimensions = alarmdetails.get('Trigger', {}).get('Dimensions', [])
-            alarmdescription = alarmdetails.get('AlarmDescription','Alarm Description')
-            # Format dimensions nicely
+            alarmdescription = alarmdetails.get('AlarmDescription', 'Alarm Description')
+
             dim_text = '\n'.join([f"{d['name']} = {d['value']}" for d in dimensions])
-             # Prepare the Slack message with formatting
             emoji = ":broken_heart:" if is_error else ":white_check_mark:"
             color = "danger" if is_error else "good"
             title = f"{emoji} | {title} | {alarm_name} | {region}"
@@ -272,7 +310,6 @@ class NotificationService:
                     {
                         "type": "section",
                         "text": {"type": "mrkdwn", "text": f"*{title}*"}
-
                     },
                     {
                         "type": "divider"
@@ -285,12 +322,12 @@ class NotificationService:
                         "type": "section",
                         "fields": [
                             {
-                            "type": "mrkdwn",
-                            "text": f"*Namespace:* {namespace}"
+                                "type": "mrkdwn",
+                                "text": f"*Namespace:* {namespace}"
                             },
                             {
-                            "type": "mrkdwn",
-                            "text": f"*Metric:* {metric_name}"
+                                "type": "mrkdwn",
+                                "text": f"*Metric:* {metric_name}"
                             }
                         ]
                     },
@@ -298,25 +335,77 @@ class NotificationService:
                         "type": "section",
                         "fields": [
                             {
-                            "type": "mrkdwn",
-                            "text": f"*Timestamp:* {timestamp}"
+                                "type": "mrkdwn",
+                                "text": f"*Timestamp:* {timestamp}"
                             },
                             {
-                            "type": "mrkdwn",
-                            "text": f"*Alarm Description:* {alarmdescription}"
+                                "type": "mrkdwn",
+                                "text": f"*Alarm Description:* {alarmdescription}"
                             }
                         ]
                     },
                     {
-                       "type": "section",
-                       "text": {"type": "mrkdwn", "text": f"*Resource Details:*\n {dim_text}"}  
-                    }     
+                        "type": "section",
+                        "text": {"type": "mrkdwn", "text": f"*Resource Details:*\n {dim_text}"}
+                    }
+                ]
+            }
+
+        elif type == "S3 Event":
+            records = alarmdetails.get("Records", [])
+            record = records[0] if records else {}
+
+            s3_info = record.get("s3", {})
+            bucket = s3_info.get("bucket", {})
+            obj = s3_info.get("object", {})
+
+            bucket_name = bucket.get("name", "Unknown Bucket")
+            object_key = obj.get("key", "Unknown Key")
+            object_size = obj.get("size", "Unknown Size")
+
+            user_identity = record.get("userIdentity", {})
+            principal_id = user_identity.get("principalId", "Unknown Principal")
+
+            header = f":white_check_mark: S3 Object Uploaded on bucket {bucket_name}."
+
+            payload = {
+                "blocks": [
+                    {
+                        "type": "section",
+                        "text": {"type": "mrkdwn", "text": header}
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": (
+                                "*Details*\n"
+                                f" • *Object:* `s3://{bucket_name}/{object_key}`\n"
+                                f" • *Size (bytes):* {object_size} bytes\n"
+                                f" • *Principal:* {principal_id}\n"
+                                f" • *Timestamp:* {timestamp}"
+                            )
+                        }
+                    }
+                ]
+            }
+
+        # ---------------- Fallback ----------------
+        else:
+            payload = {
+                "blocks": [
+                    {
+                        "type": "section",
+                        "text": {"type": "mrkdwn", "text": f"*{title}*"}
+                    },
+                    {
+                        "type": "section",
+                        "text": {"type": "mrkdwn", "text": f"```{json.dumps(alarmdetails, indent=2)}```"}
+                    }
                 ]
             }
 
         try:
-
-
             # Convert payload to JSON
             json_payload = json.dumps(payload)
             logger.info(f"Prepared Slack payload: {json_payload}")
@@ -348,25 +437,22 @@ class NotificationService:
         finally:
             curl.close()
 
+
 def lambda_handler(event, context):
     """
     Main Lambda handler function. 
     
-    This function gets triggered by SNS Topic subscriptions to CloudWatch Alarms.
-    It performs the following steps:
-    1. Loading slack webhook from AWS Secrets Manager
-    2. Pull the message from the SNS event
-    3. Format the CloudWatch Alarm details
-    4. Sending notifications about the results
-    Args:
-        event: Lambda event data (can override SECRET_NAME via 'secret_name' key)
-        context: Lambda context object
-    Returns:
-        Response dictionary with status and results
+    This function gets triggered by SNS Topic subscriptions to CloudWatch Alarms,
+    GuardDuty findings and S3 events.
     """
+
     tracemalloc.start()
 
     notification_service = None
+    formatted = datetime.utcnow().strftime("%a, %d %b %Y %H:%M:%S UTC")
+    type = "Unknown"
+    is_error = True
+
     # SNS message comes in event['Records'][0]['Sns']
     sns_message = event['Records'][0]['Sns']
     message_str = sns_message.get('Message', '{}')
@@ -374,11 +460,27 @@ def lambda_handler(event, context):
     try:
         alarm_details = json.loads(message_str)
         logger.info("alarm_details:" + json.dumps(alarm_details, indent=2))
-        source = alarm_details.get('source', 'aws.cloudwatch')
+
+        # Detect source:
+        # - GuardDuty / CloudWatch / EventBridge-style -> 'source'
+        # - S3 via SNS -> Records[0].eventSource == 'aws:s3'
+        source = alarm_details.get('source')
+        if not source and "Records" in alarm_details:
+            first_record = alarm_details["Records"][0]
+            event_source = first_record.get("eventSource")
+            if event_source == "aws:s3":
+                source = "aws.s3"
+
+        if not source:
+            # Default to CloudWatch if nothing else matches
+            source = "aws.cloudwatch"
+
         logger.info("source:" + str(source))
+
         env_config = {
-            # Mandatory environment variables
+            # Mandatory environment variables (currently none)
         }
+
         # Get secret name from environment or event
         secret_name = os.environ.get("SECRET_NAME", event.get("secret_name"))
         if not secret_name:
@@ -387,75 +489,103 @@ def lambda_handler(event, context):
             raise ValueError(
                 f"SECRET_NAME must be a string, got: {type(secret_name).__name__}"
             )
-                # Retrieve sensitive credentials from Secrets Manager
+
         logger.info("Retrieving credentials from AWS Secrets Manager")
         secrets_manager = SecretsManager()
         secrets_data = secrets_manager.get_credentials(secret_name)
 
         # Validate that required credentials are present
-        # Always require SLACK_WEBHOOK for CloudWatch and GuardDuty
-        required_secrets = ["slack_channel_webhook", "slack_channel_webhook_guardduty"]
+        required_secrets = [
+            "slack_channel_webhook",
+            "slack_channel_webhook_guardduty",
+            "slack_channel_webhook_s3",
+        ]
         missing_secrets = [key for key in required_secrets if key not in secrets_data]
         if missing_secrets:
             raise ValueError(f"Missing required secrets: {', '.join(missing_secrets)}")
+
         # Parse combined configuration
         logger.info("Parsing configuration from environment and secrets")
         config = parse_config_from_env_and_secrets(env_config, secrets_data)
 
-        is_error=True
+        # ---------------- GuardDuty ----------------
         if source == "aws.guardduty":
             logger.info("GuardDuty finding detected in SNS message")
             logger.info("Starting Notification to Slack for GuardDuty Alarm via SNS Topic")
-            # slack_channel_webhook_guardduty: str
+
             timestamp_str = alarm_details.get('time')
             if timestamp_str:
                 dt = datetime.strptime(timestamp_str, "%Y-%m-%dT%H:%M:%SZ")
                 formatted = dt.strftime("%a, %d %b %Y %H:%M:%S UTC")
 
-            channelconfig=config.slack_channel_webhook_guardduty
-            alarmnotifiction="GuardDuty Finding Notification"
-            type="GuardDuty"
+            channelconfig = config.slack_channel_webhook_guardduty
+            alarmnotifiction = "GuardDuty Finding Notification"
+            type = "GuardDuty"
+            is_error = True  # usually "bad" findings
+
+        # ---------------- S3 Event ----------------
+        elif source == "aws.s3":
+            logger.info("S3 event detected in SNS message")
+            logger.info("Starting Notification to Slack for S3 Event via SNS Topic")
+
+            # S3 time is in the record
+            first_record = alarm_details["Records"][0]
+            timestamp_str = first_record.get("eventTime")
+            if timestamp_str:
+                # Example: 2026-01-12T16:10:07.364Z
+                try:
+                    dt = datetime.strptime(timestamp_str, "%Y-%m-%dT%H:%M:%S.%fZ")
+                except ValueError:
+                    dt = datetime.strptime(timestamp_str, "%Y-%m-%dT%H:%M:%SZ")
+                formatted = dt.strftime("%d %b %Y %H:%M:%S UTC")
+
+            channelconfig = config.slack_channel_webhook_s3
+            alarmnotifiction = "S3 Object Event Notification"
+            type = "S3 Event"
+            is_error = False   # S3 put is informational
+
+        # ---------------- CloudWatch Alarm (default) ----------------
         else:
             logger.info("CloudWatch Alarm detected in SNS message")
             logger.info("Starting Notification to Slack for CloudWatch Alarm via SNS Topic")
-            # slack_channel_webhook: str
+
             timestamp_str = sns_message.get('Timestamp')
             if timestamp_str:
                 dt = datetime.strptime(timestamp_str, "%Y-%m-%dT%H:%M:%S.%fZ")
                 formatted = dt.strftime("%a, %d %b %Y %H:%M:%S UTC")
-            channelconfig=config.slack_channel_webhook
-            alarmnotifiction="CloudWatch Alarm Notification"
-            type="CloudWatch Alarm"
 
+            channelconfig = config.slack_channel_webhook
+            alarmnotifiction = "CloudWatch Alarm Notification"
+            type = "CloudWatch Alarm"
 
-            # Extract useful fields
-
-            new_state = alarm_details.get('NewStateValue','')
-
-
+            new_state = alarm_details.get('NewStateValue', '')
             if new_state == "OK":
-                is_error=False
+                is_error = False
 
         # Initialize services
         notification_service = NotificationService(
             channelconfig, context.function_name
         )
-        # result = f"{slack_message}\n"
+
         notification_service.send_notification(
-                    alarmnotifiction, 
-                    alarm_details,
-                    formatted, type, is_error
-                )
+            alarmnotifiction,
+            alarm_details,
+            formatted,
+            type,
+            is_error
+        )
+
         # Prepare response
         response = {
             "statusCode": 200,
             "body": {
-                "message": f"Successfully completed publishing notifications for CloudWatch Alarm"
+                "message": "Successfully completed publishing notifications"
             },
         }
 
         logger.info(f"Lambda execution completed successfully: {response}")
         return response
+
     except Exception as e:
         error_msg = f"Lambda execution failed:\n{str(e)}"
         logger.error(error_msg, exc_info=True)
@@ -464,7 +594,7 @@ def lambda_handler(event, context):
         if notification_service is not None:
             try:
                 notification_service.send_notification(
-                    "Lambda Execution Failed", error_msg, formatted, type, is_error=True
+                    "Lambda Execution Failed", {"error": error_msg}, formatted, type, is_error=True
                 )
             except Exception as notification_error:
                 logger.error(f"Failed to send error notification: {notification_error}")
@@ -473,5 +603,7 @@ def lambda_handler(event, context):
         return {"statusCode": 500, "body": {"error": error_msg}}
     finally:
         current, peak = tracemalloc.get_traced_memory()
-        logger.info(f"Current memory usage: {current / 1024 / 1024:.2f} MB; Peak: {peak / 1024 / 1024:.2f} MB")
+        logger.info(
+            f"Current memory usage: {current / 1024 / 1024:.2f} MB; Peak: {peak / 1024 / 1024:.2f} MB"
+        )
         tracemalloc.stop()
