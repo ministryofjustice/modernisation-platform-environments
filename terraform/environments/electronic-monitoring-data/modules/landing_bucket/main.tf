@@ -61,6 +61,10 @@ locals {
     },
     local.kms_grant_mdss
   ) : local.kms_grant_mdss
+  kms_key_users = local.replication_enabled ? [
+    aws_iam_role.process_landing_bucket_files.arn,
+    aws_iam_role.replication_role[0].arn
+  ] : [aws_iam_role.process_landing_bucket_files.arn]
 }
 
 data "aws_caller_identity" "current" {}
@@ -138,10 +142,7 @@ module "kms_key" {
 
   # Give full access to key for root account, and lambda role ability to use.
   enable_default_policy = true
-  key_users             = [
-    aws_iam_role.process_landing_bucket_files.arn,
-    aws_iam_role.replication_role[0].arn
-  ]
+  key_users             = local.kms_key_users
 
   deletion_window_in_days = 7
 
