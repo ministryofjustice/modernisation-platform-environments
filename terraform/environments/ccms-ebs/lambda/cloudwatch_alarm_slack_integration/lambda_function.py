@@ -366,7 +366,7 @@ class NotificationService:
             user_identity = record.get("userIdentity", {})
             principal_id = user_identity.get("principalId", "Unknown Principal")
 
-            header = f":white_check_mark: S3 Object Uploaded on bucket {bucket_name}."
+            header = f":white_check_mark: *S3 Object Uploaded on bucket {bucket_name}.*"
 
             payload = {
                 "blocks": [

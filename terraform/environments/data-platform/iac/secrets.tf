@@ -42,6 +42,22 @@ module "github_app_secret" {
   )
 }
 
+module "pagerduty_api_key_secret" {
+  count = terraform.workspace == "data-platform-development" ? 1 : 0
+
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=82029345dea22bc49989a6f46c5d8d8e555b84c9" # v2.0.1
+
+  name = "pagerduty/api-key"
+
+  secret_string         = "CHANGEME"
+  ignore_secret_changes = true
+
+  tags = merge(
+    local.tags,
+    { "credential-expiration" = "none" }
+  )
+}
+
 module "slack_token_secret" {
   count = terraform.workspace == "data-platform-development" ? 1 : 0
 
@@ -79,23 +95,8 @@ module "octo_entra_secret" {
     local.tags,
     { "credential-expiration" = "2026-10-22" }
   )
-}
 
-module "octo_slack_token_secret" {
-  count = terraform.workspace == "data-platform-development" ? 1 : 0
 
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=82029345dea22bc49989a6f46c5d8d8e555b84c9" # v2.0.1
-
-  name        = "slack/octo-access-token"
-  description = "https://api.slack.com/apps/A09N2LW1F44"
-
-  secret_string         = "CHANGEME"
-  ignore_secret_changes = true
-
-  tags = merge(
-    local.tags,
-    { "credential-expiration" = "none" }
-  )
 }
 
 module "octo_github_app_secret" {
@@ -112,6 +113,23 @@ module "octo_github_app_secret" {
     installation_id = "CHANGEME"
     private_key     = "CHANGEME"
   })
+  ignore_secret_changes = true
+
+  tags = merge(
+    local.tags,
+    { "credential-expiration" = "none" }
+  )
+}
+
+module "octo_slack_token_secret" {
+  count = terraform.workspace == "data-platform-development" ? 1 : 0
+
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=82029345dea22bc49989a6f46c5d8d8e555b84c9" # v2.0.1
+
+  name        = "slack/octo-access-token"
+  description = "https://api.slack.com/apps/A09N2LW1F44"
+
+  secret_string         = "CHANGEME"
   ignore_secret_changes = true
 
   tags = merge(

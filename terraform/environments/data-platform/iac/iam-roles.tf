@@ -46,6 +46,7 @@ module "data_platform_access_iam_role" {
       resources = [
         module.entra_secret[0].secret_arn,
         module.github_app_secret[0].secret_arn,
+        module.pagerduty_api_key_secret[0].secret_arn,
         module.slack_token_secret[0].secret_arn
       ]
     }

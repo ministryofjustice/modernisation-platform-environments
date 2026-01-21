@@ -4,7 +4,7 @@ resource "aws_route53_zone" "temp_cloud_platform_justice_gov_uk" {
 }
 
 resource "aws_route53_zone" "account_zone" {
-  name = "${trimprefix(terraform.workspace, "cloud-platform-")}.temp.cloud-platform.service.justice.gov.uk"
+  name  = "${trimprefix(terraform.workspace, "cloud-platform-")}.temp.cloud-platform.service.justice.gov.uk"
 }
 
 resource "aws_route53_record" "account_delegation" {

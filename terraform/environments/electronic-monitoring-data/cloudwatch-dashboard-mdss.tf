@@ -18,8 +18,8 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
           stat   = "Sum"
           period = 60
           metrics = [
-            ["AWS/SQS", "ApproximateNumberOfMessagesVisible", "QueueName", "load_mdss"],
-            [".", "ApproximateNumberOfMessagesNotVisible", ".", "load_mdss"]
+            ["AWS/SQS", "ApproximateNumberOfMessagesVisible", "QueueName", module.load_mdss_event_queue.sqs_queue.name],
+            [".", "ApproximateNumberOfMessagesNotVisible", ".", module.load_mdss_event_queue.sqs_queue.name]
           ]
         }
       },
@@ -35,7 +35,7 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
           stat   = "Sum"
           period = 60
           metrics = [
-            ["AWS/SQS", "ApproximateNumberOfMessagesVisible", "QueueName", "load_mdss-dlq"]
+            ["AWS/SQS", "ApproximateNumberOfMessagesVisible", "QueueName", module.load_mdss_event_queue.sqs_dlq.name]
           ]
         }
       },
@@ -55,8 +55,8 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
           stat   = "Sum"
           period = 60
           metrics = [
-            ["AWS/Lambda", "Errors", "FunctionName", "load_mdss"],
-            [".", "Throttles", ".", "load_mdss"]
+            ["AWS/Lambda", "Errors", "FunctionName", module.load_mdss_lambda.lambda_function_name],
+            [".", "Throttles", ".", module.load_mdss_lambda.lambda_function_name]
           ]
         }
       },
@@ -71,8 +71,8 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
           region = "eu-west-2"
           period = 60
           metrics = [
-            ["AWS/Lambda", "Duration", "FunctionName", "load_mdss", { stat = "p95" }],
-            [".", "Invocations", ".", "load_mdss", { stat = "Sum" }]
+            ["AWS/Lambda", "Duration", "FunctionName", module.load_mdss_lambda.lambda_function_name, { stat = "p95" }],
+            [".", "Invocations", ".", module.load_mdss_lambda.lambda_function_name, { stat = "Sum" }]
           ]
         }
       },
@@ -93,11 +93,11 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
           region = "eu-west-2"
           view   = "table"
           query  = <<-EOT
-            SOURCE '/aws/lambda/load_mdss'
+            SOURCE '${module.load_mdss_lambda.cloudwatch_log_group.name}'
             | filter ispresent(message.event)
             | filter message.event = "MDSS_FILE_FAIL"
             | filter message.error_type = "fatal"
-            | fields @timestamp, message.dataset, message.pipeline, message.table, message.s3path, message.exception_class, @message
+            | fields @timestamp, message.dataset, message.pipeline, message.table, message.s3path, message.exception_class, message.reason, message.exception_chain, @message
             | sort @timestamp desc
             | limit 200
           EOT
@@ -116,7 +116,7 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
           region = "eu-west-2"
           view   = "table"
           query  = <<-EOT
-            SOURCE '/aws/lambda/load_mdss'
+            SOURCE '${module.load_mdss_lambda.cloudwatch_log_group.name}'
             | filter level = "WARNING" or @message like /\\[WARNING\\]/
             | fields @timestamp, @message
             | sort @timestamp desc
@@ -137,7 +137,7 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
           region = "eu-west-2"
           view   = "table"
           query  = <<-EOT
-            SOURCE '/aws/lambda/load_mdss'
+            SOURCE '${module.load_mdss_lambda.cloudwatch_log_group.name}'
             | filter ispresent(message.event)
             | filter message.event = "MDSS_FILE_FAIL"
             | stats count() as n by coalesce(message.error_type, "UNKNOWN")
@@ -158,7 +158,7 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
           region = "eu-west-2"
           view   = "table"
           query  = <<-EOT
-            SOURCE '/aws/lambda/load_mdss'
+            SOURCE '${module.load_mdss_lambda.cloudwatch_log_group.name}'
             | filter ispresent(message.event)
             | filter message.event = "MDSS_FILE_FAIL"
             | parse message.key /mdss\/(?<tbl>[^\/]+)\//
@@ -180,7 +180,7 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
           region = "eu-west-2"
           view   = "table"
           query  = <<-EOT
-            SOURCE '/aws/lambda/load_mdss'
+            SOURCE '${module.load_mdss_lambda.cloudwatch_log_group.name}'
             | filter ispresent(message.event)
             | filter message.event in ["MDSS_FILE_START","MDSS_FILE_OK","MDSS_FILE_FAIL"]
             | fields @timestamp, message.table as table, message.s3path as s3path, message.attempt as attempt
@@ -215,10 +215,10 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
           region = "eu-west-2"
           view   = "table"
           query  = <<-EOT
-            SOURCE '/aws/lambda/load_mdss'
+            SOURCE '${module.load_mdss_lambda.cloudwatch_log_group.name}'
             | filter ispresent(message.event)
             | filter message.event = "MDSS_FILE_FAIL"
-            | fields @timestamp, message.error_type, message.dataset, message.pipeline, message.table, message.bucket, message.key, message.s3path, message.exception_class
+            | fields @timestamp, message.error_type, message.dataset, message.pipeline, message.table, message.bucket, message.key, message.s3path, message.exception_class, message.reason, message.exception_chain
             | sort @timestamp desc
             | limit 200
           EOT

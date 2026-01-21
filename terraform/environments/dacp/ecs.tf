@@ -111,7 +111,7 @@ resource "aws_ecs_service" "dacp_ecs_service" {
   enable_execute_command            = true
   desired_count                     = 2
   health_check_grace_period_seconds = 180
-  force_new_deployment = true
+  force_new_deployment              = true
 
   network_configuration {
     subnets          = data.aws_subnets.shared-private.ids
@@ -210,6 +210,7 @@ EOF
   )
 }
 
+
 resource "aws_iam_role_policy" "app_task" {
   name = "task-${var.networking[0].application}"
   role = aws_iam_role.app_task.id
@@ -219,13 +220,24 @@ resource "aws_iam_role_policy" "app_task" {
    "Version": "2012-10-17",
    "Statement": [
      {
-       "Effect": "Allow",
         "Action": [
-          "logs:*",
-          "ecr:*",
-          "iam:*",
-          "ec2:*"
+            "logs:CreateLogGroup",
+            "logs:CreateLogStream",
+            "logs:PutLogEvents",
+            "logs:DescribeLogStreams",
+            "logs:DescribeLogGroups"
         ],
+        "Resource": "arn:aws:logs:*:${local.environment_management.account_ids[terraform.workspace]}:*",
+        "Effect": "Allow"
+     },
+     {
+       "Effect": "Allow",
+       "Action": [
+         "ssmmessages:CreateControlChannel",
+         "ssmmessages:CreateDataChannel",
+         "ssmmessages:OpenControlChannel",
+         "ssmmessages:OpenDataChannel"
+       ],
        "Resource": "*"
      }
    ]

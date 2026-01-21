@@ -121,7 +121,7 @@ locals {
       maintenance_window_duration = 4
       maintenance_window_cutoff   = 2
       patch_classifications = {
-        WINDOWS = ["SecurityUpdates", "CriticalUpdates"]
+        WINDOWS = ["SecurityUpdates", "CriticalUpdates", "UpdateRollups"] # Windows Options=CriticalUpdates,SecurityUpdates,DefinitionUpdates,Drivers,FeaturePacks,ServicePacks,Tools,UpdateRollups,Updates,Upgrades
       }
     }
 

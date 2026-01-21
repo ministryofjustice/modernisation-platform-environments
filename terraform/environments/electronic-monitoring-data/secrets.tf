@@ -54,7 +54,7 @@ resource "aws_secretsmanager_secret_version" "home_office_account_id" {
 }
 
 module "cross_account_details" {
-  count = local.is-test || local.is-production ? 1 : 0 
+  count  = local.is-test || local.is-production ? 1 : 0
   source = "terraform-aws-modules/secrets-manager/aws"
 
   name_prefix             = "cross_account_details"
