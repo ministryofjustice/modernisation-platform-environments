@@ -62,7 +62,12 @@ data "aws_iam_policy_document" "replication-policy" {
       "s3:GetObjectVersionForReplication",
       "s3:GetObjectLegalHold",
       "s3:GetObjectRetention",
-      "s3:GetObjectVersionTagging"
+      "s3:GetObjectVersionTagging",
+      "s3:ReplicateObject",
+      "s3:ReplicateDelete",
+      "s3:ReplicateTags",
+      "s3:GetObjectVersionTagging",
+      "s3:ObjectOwnerOverrideToBucketOwner"
     ]
     resources = ["${module.this-bucket.bucket.arn}/*"]
   }
