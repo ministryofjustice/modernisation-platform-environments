@@ -369,3 +369,38 @@ resource "aws_vpc_security_group_egress_rule" "efs-security-group-egress" {
   ip_protocol       = "-1"
   cidr_ipv4         = "0.0.0.0/0"
 }
+
+# OEM OMS → SOA RDS (1521)
+resource "aws_vpc_security_group_ingress_rule" "soa_db_oem_oms_ingress_1521" {
+  security_group_id = aws_security_group.soa_db.id
+  ip_protocol       = "TCP"
+  from_port         = 1521
+  to_port           = 1521
+  cidr_ipv4         = "10.26.60.231/32"
+}
+
+# OEM OMS → SOA RDS (3872)
+resource "aws_vpc_security_group_ingress_rule" "soa_db_oem_oms_ingress_3872" {
+  security_group_id = aws_security_group.soa_db.id
+  ip_protocol       = "TCP"
+  from_port         = 3872
+  to_port           = 3872
+  cidr_ipv4         = "10.26.60.231/32"
+}
+
+# OEM OMS → SOA RDS (4903)
+resource "aws_vpc_security_group_ingress_rule" "soa_db_oem_oms_ingress_4903" {
+  security_group_id = aws_security_group.soa_db.id
+  ip_protocol       = "TCP"
+  from_port         = 4903
+  to_port           = 4903
+  cidr_ipv4         = "10.26.60.231/32"
+}
+
+resource "aws_vpc_security_group_ingress_rule" "soa_db_oem_db_ingress_1521" {
+  security_group_id = aws_security_group.soa_db.id
+  ip_protocol       = "TCP"
+  from_port         = 1521
+  to_port           = 1521
+  cidr_ipv4         = "10.26.60.169/32"
+}
