@@ -20,7 +20,7 @@ data "aws_iam_policy_document" "cross_account_hosted_zones_policy" {
       "route53:ListHostedZones",
       "route53:ListResourceRecordSets"
     ]
-    resources = ["non-live-${local.environment}.${local.base_domain}."]
+    resources = ["non-live-${local.environment}.${local.base_domain}/*"]
   }
 }
 
