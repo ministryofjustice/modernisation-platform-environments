@@ -201,6 +201,10 @@ resource "aws_db_instance" "appdb1" {
     delete = "2h"
   }
 
+  lifecycle {
+    ignore_changes = [final_snapshot_identifier]
+  }
+
 }
 
 # Access from Cloud Platform
@@ -284,6 +288,12 @@ resource "aws_security_group" "vpc_sec_group" {
   tags = {
     Name = "${var.application_name}-${var.environment}-vpc-sec-group"
   }
+
+
+  lifecycle {
+    ignore_changes = [ingress, egress]
+  }
+
 }
 
 resource "aws_security_group" "mlra_ecs_sec_group" {

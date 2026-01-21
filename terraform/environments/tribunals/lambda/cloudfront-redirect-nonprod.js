@@ -66,7 +66,16 @@ exports.handler = (event, context, callback) => {
                 ],
                 aliases: []
             },
-
+            'development.courts.gov.uk' : {
+                defaultRedirect: 'https://www.gov.uk/courts',
+                pathRedirects: [],
+                aliases: []
+            },
+            'preproduction.courts.gov.uk' : {
+                defaultRedirect: 'https://www.gov.uk/courts',
+                pathRedirects: [],
+                aliases: []
+            },
         };
 
         // Find matching config, checking aliases

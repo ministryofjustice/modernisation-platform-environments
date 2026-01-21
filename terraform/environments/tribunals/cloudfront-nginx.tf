@@ -1,7 +1,7 @@
 ###############################
 #  SECOND CLOUDFRONT – HTTP-only to replace nginx server in old DSD AWS account
 #  DNS records managed by
-#  Force redeploy to preprod 14/11/25
+#  Force redeploy to development 15/1/26
 ###############################
 
 # -------------------------------------------------
@@ -70,8 +70,10 @@ resource "aws_cloudfront_distribution" "tribunals_http_redirect" {
   aliases = local.cloudfront_nginx_sans
 
   origin {
-    domain_name = "dummy-http-redirect.s3.amazonaws.com"
-    origin_id   = "dummy-http-origin"
+    domain_name              = "dummy-http-redirect.s3.amazonaws.com"
+    origin_id                = "dummy-http-origin"
+    connection_attempts      = 3
+    connection_timeout       = 10
 
     s3_origin_config {
       origin_access_identity = ""
@@ -214,7 +216,10 @@ resource "aws_s3_bucket_policy" "cf_redirect_policy" {
         Condition = {
           StringEquals = {
             "aws:SourceAccount" = data.aws_caller_identity.current.account_id
-            "aws:SourceArn"     = aws_cloudfront_distribution.tribunals_http_redirect.arn
+            "aws:SourceArn" = [
+              aws_cloudfront_distribution.tribunals_http_redirect.arn,
+              aws_cloudfront_distribution.tribunals_http_redirect_compiled.arn
+            ]
           }
         }
       },

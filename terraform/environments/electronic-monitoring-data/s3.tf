@@ -55,6 +55,9 @@ locals {
     { id = module.s3-raw-formatted-data-bucket.bucket.id, arn = module.s3-raw-formatted-data-bucket.bucket.arn },
     { id = module.s3-lambda-store-bucket.bucket.id, arn = module.s3-lambda-store-bucket.bucket.arn }
   ]
+
+  cross_account_recieve_mapping = local.is-development ? "test" : local.is-preproduction ? "production" : null
+  cross_env_bucket_policy       = local.is-preproduction ? [data.aws_iam_policy_document.allow_cross_env_upload[0].json] : []
 }
 
 
@@ -602,6 +605,8 @@ module "s3-fms-general-landing-bucket" {
   received_files_bucket_id = module.s3-received-files-bucket.bucket.id
   security_group_ids       = [aws_security_group.lambda_generic.id]
   subnet_ids               = data.aws_subnets.shared-public.ids
+  cross_account            = local.is-development || local.is-preproduction
+  cross_account_id         = local.is-development || local.is-preproduction ? local.environment_management.account_ids["electronic-monitoring-data-${local.cross_account_recieve_mapping}"] : null
 
   providers = {
     aws = aws
@@ -635,6 +640,8 @@ module "s3-fms-ho-landing-bucket" {
   received_files_bucket_id = module.s3-received-files-bucket.bucket.id
   security_group_ids       = [aws_security_group.lambda_generic.id]
   subnet_ids               = data.aws_subnets.shared-public.ids
+  cross_account            = local.is-development || local.is-preproduction
+  cross_account_id         = local.is-development || local.is-preproduction ? local.environment_management.account_ids["electronic-monitoring-data-${local.cross_account_recieve_mapping}"] : null
 
   providers = {
     aws = aws
@@ -668,6 +675,8 @@ module "s3-fms-specials-landing-bucket" {
   received_files_bucket_id = module.s3-received-files-bucket.bucket.id
   security_group_ids       = [aws_security_group.lambda_generic.id]
   subnet_ids               = data.aws_subnets.shared-public.ids
+  cross_account            = local.is-development || local.is-preproduction
+  cross_account_id         = local.is-development || local.is-preproduction ? local.environment_management.account_ids["electronic-monitoring-data-${local.cross_account_recieve_mapping}"] : null
 
   providers = {
     aws = aws
@@ -706,6 +715,8 @@ module "s3-mdss-general-landing-bucket" {
   received_files_bucket_id  = module.s3-received-files-bucket.bucket.id
   subnet_ids                = data.aws_subnets.shared-public.ids
   security_group_ids        = [aws_security_group.lambda_generic.id]
+  cross_account             = local.is-development || local.is-preproduction
+  cross_account_id          = local.is-development || local.is-preproduction ? local.environment_management.account_ids["electronic-monitoring-data-${local.cross_account_recieve_mapping}"] : null
 
   providers = {
     aws = aws
@@ -727,6 +738,8 @@ module "s3-mdss-ho-landing-bucket" {
   received_files_bucket_id  = module.s3-received-files-bucket.bucket.id
   security_group_ids        = [aws_security_group.lambda_generic.id]
   subnet_ids                = data.aws_subnets.shared-public.ids
+  cross_account             = local.is-development || local.is-preproduction
+  cross_account_id          = local.is-development || local.is-preproduction ? local.environment_management.account_ids["electronic-monitoring-data-${local.cross_account_recieve_mapping}"] : null
 
   providers = {
     aws = aws
@@ -748,6 +761,8 @@ module "s3-mdss-specials-landing-bucket" {
   received_files_bucket_id  = module.s3-received-files-bucket.bucket.id
   security_group_ids        = [aws_security_group.lambda_generic.id]
   subnet_ids                = data.aws_subnets.shared-public.ids
+  cross_account             = local.is-development || local.is-preproduction
+  cross_account_id          = local.is-development || local.is-preproduction ? local.environment_management.account_ids["electronic-monitoring-data-${local.cross_account_recieve_mapping}"] : null
 
   providers = {
     aws = aws
@@ -1065,6 +1080,23 @@ module "s3-glue-job-script-bucket" {
 # DMS target  bucket
 # ------------------------------------------------------------------------
 
+data "aws_iam_policy_document" "allow_cross_env_upload" {
+  count = local.is-preproduction ? 1 : 0
+  statement {
+    sid    = "AllowProdLambdaWrite"
+    effect = "Allow"
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${local.environment_management.account_ids["electronic-monitoring-data-production"]}:role/data_cutback_iam_role"]
+
+    }
+    actions = [
+      "s3:PutObject",
+      "s3:PutObjectAcl"
+    ]
+    resources = ["${module.s3-dms-target-store-bucket.bucket.arn}/*"]
+  }
+}
 
 module "s3-dms-target-store-bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9f"
@@ -1088,6 +1120,7 @@ module "s3-dms-target-store-bucket" {
     aws.bucket-replication = aws
   }
 
+  bucket_policy = local.cross_env_bucket_policy
   lifecycle_rule = [
     {
       id      = "main"

@@ -45,7 +45,8 @@ data "aws_iam_policy_document" "github_actions_development_cluster_oidc_policy" 
       "iam:TagOpenIDConnectProvider",
       "iam:PassRole",
       "iam:TagRole",
-      "iam:TagPolicy"
+      "iam:TagPolicy",
+      "iam:UntagRole"
     ]
     resources = ["*"]
   }
@@ -151,14 +152,13 @@ data "aws_iam_policy_document" "github_actions_development_cluster_oidc_policy" 
     sid    = "DevelopmentClusterStateBucket"
     effect = "Allow"
     actions = [
-      "s3:ListBucket",
       "s3:GetObject",
       "s3:PutObject",
+      "s3:PutObjectAcl",
       "s3:DeleteObject"
     ]
     resources = [
-      module.development-cluster-state-bucket[0].bucket.arn,
-      "${module.development-cluster-state-bucket[0].bucket.arn}/*"
+      "arn:aws:s3:::modernisation-platform-terraform-state/environments/members/cloud-platform*/*"
     ]
   }
 
@@ -170,6 +170,20 @@ data "aws_iam_policy_document" "github_actions_development_cluster_oidc_policy" 
     ]
     resources = ["*"]
   }
+  
+  statement {
+    sid    = "DevelopmentRoute53HostedZone"
+    effect = "Allow"
+    actions = [
+      "route53:CreateHostedZone",
+      "route53:DeleteHostedZone",
+      "route53:ChangeResourceRecordSets",
+      "route53:ChangeTagsForResource",
+      "route53:UpdateHostedZoneComment",
+    ]
+    resources = ["*"]
+  }
+
   statement {
     sid    = "AllowOIDCToAssumeRoles"
     effect = "Allow"

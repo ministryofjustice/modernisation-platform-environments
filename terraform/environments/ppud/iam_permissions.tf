@@ -112,6 +112,7 @@ locals {
         "send_message_to_sqs",
         "send_logs_to_cloudwatch",
         "publish_to_sns",
+        "put_data_s3",
         "suppress_sechub_findings"
       ]
     }
