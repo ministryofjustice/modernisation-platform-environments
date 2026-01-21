@@ -143,37 +143,37 @@ module "kms_key" {
   # Give full access to key for root account, and lambda role ability to use.
   enable_default_policy = true
   key_users             = local.kms_key_users
-  key_statements        = [
-      {
-    sid    = "AllowS3ReplicationFromDevAndTest"
-    effect = "Allow"
+  key_statements        = var.cross_account ? [
+    {
+      sid    = "AllowS3ReplicationFromDevAndTest"
+      effect = "Allow"
 
-    principals = [
-      {
-        type        = "AWS"
-        identifiers = [
-          "arn:aws:iam::${var.cross_account_id}:role/<TEST_REPLICATION_ROLE>"
-        ]
-      }
-    ]
+      principals = [
+        {
+          type        = "AWS"
+          identifiers = [
+            "arn:aws:iam::${var.cross_account_id}:role/AWSS3BucketReplication"
+          ]
+        }
+      ]
 
-    actions = [
-      "kms:Encrypt",
-      "kms:ReEncrypt*",
-      "kms:GenerateDataKey*"
-    ]
+      actions = [
+        "kms:Encrypt",
+        "kms:ReEncrypt*",
+        "kms:GenerateDataKey*"
+      ]
 
-    resources = ["*"]
+      resources = ["*"]
 
-    conditions = [
-      {
-        test     = "StringEquals"
-        variable = "kms:ViaService"
-        values   = ["s3.eu-west-2.amazonaws.com"]
-      }
-    ]
-  }
-  ]
+      conditions = [
+        {
+          test     = "StringEquals"
+          variable = "kms:ViaService"
+          values   = ["s3.eu-west-2.amazonaws.com"]
+        }
+      ]
+    }
+  ] : null
 
   deletion_window_in_days = 7
 
