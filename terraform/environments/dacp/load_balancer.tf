@@ -261,14 +261,18 @@ resource "aws_lb_target_group" "dacp_target_group" {
   }
 
   health_check {
-    healthy_threshold   = "3"
-    interval            = "30"
-    protocol            = "HTTP"
-    port                = "80"
-    unhealthy_threshold = "5"
-    matcher             = "200-302"
-    timeout             = "10"
+    healthy_threshold   = 3
+    unhealthy_threshold = 5
+    interval            = 30
+    timeout             = 10
+
+    protocol = "HTTP"
+    port     = "80"
+    path     = "/health.txt"
+
+    matcher = "200"
   }
+
 
 }
 
