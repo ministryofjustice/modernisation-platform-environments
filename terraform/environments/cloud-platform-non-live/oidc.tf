@@ -22,6 +22,27 @@ data "aws_iam_policy_document" "github_actions_development_cluster_oidc_policy" 
     ]
     resources = ["*"]
   }
+  
+  statement {
+    sid   = "AllowSQSCreate"
+    effect = "Allow"
+    actions = [
+      "sqs:CreateQueue",
+      "sqs:TagQueue",
+      "sqs:SetQueueAttributes"
+    ]
+    resources = ["*"]
+  }
+  statement {
+    sid   = "AllowEventBridgeTagResource"
+    effect = "Allow"
+    actions = [
+      "events:TagResource",
+      "events:PutRule",
+      "events:PutTargets"
+    ]
+    resources = ["*"]
+  }
 
   statement {
     sid    = "IAMForEKSAndIRSA"
