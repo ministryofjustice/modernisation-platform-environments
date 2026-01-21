@@ -79,6 +79,37 @@ locals {
           ttl     = 300
           records = ["ministryofjustice.github.io."]
         }
+        /* PagerDuty Status Page */
+        pagerduty-dkim1-cname = {
+          type    = "CNAME"
+          name    = "pdt._domainkey.status"
+          ttl     = 300
+          records = ["pdt.domainkey.u31181182.wl183.sendgrid.net."]
+        },
+        pagerduty-dkim2-cname = {
+          type    = "CNAME"
+          name    = "pdt2._domainkey.status"
+          ttl     = 300
+          records = ["pdt2.domainkey.u31181182.wl183.sendgrid.net."]
+        },
+        pagerduty-http-trafic-cname = {
+          type    = "CNAME"
+          name    = "status"
+          ttl     = 300
+          records = ["cd-4a9d4d61b9ba517b444f76f11a406278.hosted-status.pagerduty.com."]
+        },
+        pagerduty-mail-cname = {
+          type    = "CNAME"
+          name    = "em714.status"
+          ttl     = 300
+          records = ["u31181182.wl183.sendgrid.net."]
+        },
+        pagerduty-tls-certificate-cname = {
+          type    = "CNAME"
+          name    = "_701f6977b827d5ad23c4f98802a51bc3.status"
+          ttl     = 300
+          records = ["_56473aa9b1f7b9aec52ac3d3ea416721.yygwskclfy.acm-validations.aws."]
+        }
       }
     }
   }
