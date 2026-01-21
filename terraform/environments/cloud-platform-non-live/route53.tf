@@ -14,4 +14,6 @@ resource "aws_route53_record" "account_delegation" {
   type     = "NS"
   ttl      = 300
   records  = each.value.ns_records
+
+  depends_on = [ aws_iam_policy.github_actions_assume_hosted_zones_role ]
 }
