@@ -102,6 +102,9 @@ resource "aws_s3_bucket_replication_configuration" "default" {
       encryption_configuration {
         replica_kms_key_id = local.replication_enabled != "" ? "arn:aws:kms:eu-west-2:${var.replication_details["account_id"]}:key/${var.replication_details["${var.data_feed}_${var.order_type}_kms_id"]}" : ""
       }
+      access_control_translation {
+        owner = "Destination"
+      }
     }
 
     delete_marker_replication {
