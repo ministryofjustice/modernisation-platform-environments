@@ -39,7 +39,7 @@ locals {
       resources = ["${module.this-bucket.bucket.arn}/*"]
     }
   ] : []
-  bucket_policy = var.cross_account ? flatten([local.cross_account_bucket_policy, local.bucket_policy_v2]) : local.bucket_policy_v2
+  bucket_policy = flatten([local.cross_account_bucket_policy, local.bucket_policy_v2])
   kms_grant_mdss = var.cross_account_access_role != null ? {
     cross_account_access_role = {
       grantee_principal = nonsensitive("arn:aws:iam::${var.cross_account_access_role.account_number}:role/${var.cross_account_access_role.role_name}")
