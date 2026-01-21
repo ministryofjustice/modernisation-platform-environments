@@ -32,7 +32,8 @@ resource "aws_iam_role" "cross_account_hosted_zones_read" {
 }
 
 resource "aws_iam_role_policy" "cross_account_hosted_zones_read" {
+  count  = terraform.workspace != "cloud-platform-non-live-production" ? 1 : 0
   name   = "hosted-zones-read-policy"
-  role   = aws_iam_role.cross_account_hosted_zones_read.id
+  role   = aws_iam_role.cross_account_hosted_zones_read[0].id
   policy = data.aws_iam_policy_document.cross_account_hosted_zones_policy.json
 }
