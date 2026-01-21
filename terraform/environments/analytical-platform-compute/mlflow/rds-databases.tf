@@ -54,7 +54,7 @@ module "mlflow_auth_rds" {
   maintenance_window      = "Mon:00:00-Mon:03:00"
   backup_window           = "03:00-06:00"
   backup_retention_period = 7
-  deletion_protection     = false
+  deletion_protection     = true
 
   performance_insights_enabled = true
 
