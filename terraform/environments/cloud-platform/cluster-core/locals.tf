@@ -1,9 +1,9 @@
 locals {
   mp_environments = [
     "cloud-platform-development",
-    "cloud-platform-test",
     "cloud-platform-preproduction",
-    "cloud-platform-production"
+    "cloud-platform-nonlive",
+    "cloud-platform-live",
   ]
   enabled_workspaces  = ["development_cluster"]
   cp_vpc_name         = terraform.workspace
