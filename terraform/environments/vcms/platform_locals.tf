@@ -32,6 +32,7 @@ locals {
   provider_name = "core-vpc-${local.environment}"
 
   # environment specfic variables
-  all_env_app_config = fileexists("./application_variables.json") ? jsondecode(file("./application_variables.json")) : null
-  app_config = lookup(local.all_env_app_config["accounts"], terraform.workspace) # only use current env
+  # example usage:
+  # example_data = local.application_data.accounts[local.environment].example_var
+  application_data = fileexists("./application_variables.json") ? jsondecode(file("./application_variables.json")) : null
 }

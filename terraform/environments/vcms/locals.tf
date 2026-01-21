@@ -30,6 +30,8 @@ locals {
     internal_dns_suffix = "${local.application_name}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.internal"
   }
 
+  app_config = lookup(local.application_data["accounts"], terraform.workspace) # only use current env
+
   bastion_config = {}
   app_port       = 80
   internal_security_group_cidrs = distinct(flatten([
