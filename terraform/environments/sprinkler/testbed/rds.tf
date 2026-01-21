@@ -18,14 +18,14 @@ resource "aws_security_group" "rds" {
   )
 }
 
-# Allow PostgreSQL from EC2
-resource "aws_vpc_security_group_ingress_rule" "rds_from_ec2" {
-  security_group_id            = aws_security_group.rds.id
-  description                  = "Allow PostgreSQL from EC2"
-  cidr_ipv4                    = data.aws_subnet.private_subnets_a.cidr_block
-  ip_protocol                  = "tcp"
-  from_port                    = 54320
-  to_port                      = 54320
+# Allow PostgreSQL from VPC
+resource "aws_vpc_security_group_ingress_rule" "rds_from_vpc" {
+  security_group_id = aws_security_group.rds.id
+  description       = "Allow PostgreSQL from VPC"
+  cidr_ipv4         = data.aws_vpc.shared.cidr_block
+  ip_protocol       = "tcp"
+  from_port         = 5432
+  to_port           = 5432
 }
 
 # DB subnet group
