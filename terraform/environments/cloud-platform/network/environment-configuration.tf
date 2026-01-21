@@ -9,8 +9,8 @@ locals {
         "ns-899.awsdns-48.net."
       ]
     }
-    test = {
-      account_subdomain_name = "non-live-test.temp.cloud-platform.service.justice.gov.uk"
+    preproduction = {
+      account_subdomain_name = "non-live-preproduction.temp.cloud-platform.service.justice.gov.uk"
       ns_records = [
         "ns-792.awsdns-35.net.",
         "ns-110.awsdns-13.com.",
@@ -18,8 +18,8 @@ locals {
         "ns-1245.awsdns-27.org."
       ]
     }
-    preproduction = {
-      account_subdomain_name = "non-live-preproduction.temp.cloud-platform.service.justice.gov.uk"
+    nonlive = {
+      account_subdomain_name = "non-live-nonlive.temp.cloud-platform.service.justice.gov.uk"
       ns_records = [
         "ns-1801.awsdns-33.co.uk.",
         "ns-728.awsdns-27.net.",
@@ -27,7 +27,7 @@ locals {
         "ns-454.awsdns-56.com."
       ]
     }
-    production = {
+    live = {
       account_subdomain_name = aws_route53_zone.account_zone.name
       ns_records = [
         aws_route53_zone.account_zone.name_servers[0],
