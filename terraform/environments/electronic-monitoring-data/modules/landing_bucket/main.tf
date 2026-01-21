@@ -64,10 +64,6 @@ locals {
   kms_key_users = local.replication_enabled ? [
     aws_iam_role.process_landing_bucket_files.arn,
     aws_iam_role.replication_role[0].arn
-  ] : var.cross_account ? [
-    aws_iam_role.process_landing_bucket_files.arn,
-     "arn:aws:iam::${var.cross_account_id}:root",
-    "arn:aws:iam::${var.cross_account_id}:role/AWSS3BucketReplication"
   ] : [aws_iam_role.process_landing_bucket_files.arn]
 }
 
@@ -147,6 +143,37 @@ module "kms_key" {
   # Give full access to key for root account, and lambda role ability to use.
   enable_default_policy = true
   key_users             = local.kms_key_users
+  key_statements        = [
+      {
+    sid    = "AllowS3ReplicationFromDevAndTest"
+    effect = "Allow"
+
+    principals = [
+      {
+        type        = "AWS"
+        identifiers = [
+          "arn:aws:iam::${var.cross_account_id}:role/<TEST_REPLICATION_ROLE>"
+        ]
+      }
+    ]
+
+    actions = [
+      "kms:Encrypt",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*"
+    ]
+
+    resources = ["*"]
+
+    conditions = [
+      {
+        test     = "StringEquals"
+        variable = "kms:ViaService"
+        values   = ["s3.eu-west-2.amazonaws.com"]
+      }
+    ]
+  }
+  ]
 
   deletion_window_in_days = 7
 
