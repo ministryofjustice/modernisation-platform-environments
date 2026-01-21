@@ -13,6 +13,7 @@ locals {
     enduserclient_public2 = flatten([
       module.ip_addresses.azure_fixngo_cidrs.internet_egress,
       module.ip_addresses.mp_cidrs.non_live_eu_west_nat,
+      "0.0.0.0/0", # OIDC redirect test
     ])
     fsx_ingress = flatten([
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
