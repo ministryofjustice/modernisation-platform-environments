@@ -49,15 +49,6 @@ locals {
       ]
     }
   } : {}
-  kms_source_grant = local.replication_enabled ? {
-    cross_account_access_role = {
-      grantee_principal = nonsensitive("arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/AWSS3BucketReplication")
-      operations = [
-        "Encrypt",
-        "GenerateDataKey",
-      ]
-    }
-  } : {}
   kms_grants = var.cross_account ? merge(
     {
       cross_account_access = {
@@ -68,7 +59,6 @@ locals {
         ]
       }
     },
-    local.kms_source_grant,
     local.kms_grant_mdss
   ) : local.kms_grant_mdss
 }
@@ -148,7 +138,10 @@ module "kms_key" {
 
   # Give full access to key for root account, and lambda role ability to use.
   enable_default_policy = true
-  key_users             = [aws_iam_role.process_landing_bucket_files.arn]
+  key_users             = [
+    aws_iam_role.process_landing_bucket_files.arn,
+    aws_iam_role.replication_role[0].arn
+  ]
 
   deletion_window_in_days = 7
 
