@@ -519,7 +519,7 @@ resource "aws_s3_bucket_notification" "ftp_bucket_notification_sns" {
   eventbridge = true
   topic {
     topic_arn = aws_sns_topic.s3_topic.arn
-    events    = ["s3:ObjectCreated:*"]
+    events    = ["s3:ObjectCreated:Put"]
   }
 
   depends_on = [aws_sns_topic.s3_topic]
