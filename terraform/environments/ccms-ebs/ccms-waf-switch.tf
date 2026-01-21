@@ -69,7 +69,7 @@ resource "aws_lambda_function" "maintenance" {
   filename         = data.archive_file.maintenance_zip.output_path
   source_code_hash = data.archive_file.maintenance_zip.output_base64sha256
   handler          = "lambda_function.lambda_handler"
-  runtime          = "python3.14"
+  runtime          = "python3.13"
   timeout          = 30
   environment {
     variables = {
