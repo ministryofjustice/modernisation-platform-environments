@@ -145,9 +145,8 @@ module "kms_key" {
   key_users             = local.kms_key_users
   key_statements        = var.cross_account ? [
     {
-      sid    = "AllowS3ReplicationFromDevAndTest"
+      sid    = "AllowS3ReplicationFromOtherAccount"
       effect = "Allow"
-
       principals = [
         {
           type        = "AWS"
@@ -156,22 +155,12 @@ module "kms_key" {
           ]
         }
       ]
-
       actions = [
         "kms:Encrypt",
         "kms:ReEncrypt*",
         "kms:GenerateDataKey*"
       ]
-
       resources = ["*"]
-
-      conditions = [
-        {
-          test     = "StringEquals"
-          variable = "kms:ViaService"
-          values   = ["s3.eu-west-2.amazonaws.com"]
-        }
-      ]
     }
   ] : null
 
