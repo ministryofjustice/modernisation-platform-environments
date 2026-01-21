@@ -162,7 +162,7 @@ module "kms_key" {
       ]
       resources = ["*"]
     }
-  ] : null
+  ] : []
 
   deletion_window_in_days = 7
 
