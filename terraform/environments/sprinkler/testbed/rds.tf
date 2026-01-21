@@ -24,8 +24,8 @@ resource "aws_vpc_security_group_ingress_rule" "rds_from_ec2" {
   description                  = "Allow PostgreSQL from EC2"
   cidr_ipv4                    = data.aws_subnet.private_subnets_a.cidr_block
   ip_protocol                  = "tcp"
-  from_port                    = 5432
-  to_port                      = 5432
+  from_port                    = 54320
+  to_port                      = 54320
 }
 
 # DB subnet group
