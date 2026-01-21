@@ -8,7 +8,7 @@ locals {
         data.aws_route53_zone.development_account_zone[0].name_servers[1],
         data.aws_route53_zone.development_account_zone[0].name_servers[2],
         data.aws_route53_zone.development_account_zone[0].name_servers[3],
-        ] : []
+      ] : []
     }
     test = {
       account_subdomain_name = "non-live-test.${local.base_domain}"
@@ -18,7 +18,7 @@ locals {
         data.aws_route53_zone.test_account_zone[0].name_servers[1],
         data.aws_route53_zone.test_account_zone[0].name_servers[2],
         data.aws_route53_zone.test_account_zone[0].name_servers[3],
-        ] : []
+      ] : []
     }
     preproduction = {
       account_subdomain_name = "non-live-preproduction.${local.base_domain}"
@@ -28,7 +28,7 @@ locals {
         data.aws_route53_zone.preproduction_account_zone[0].name_servers[1],
         data.aws_route53_zone.preproduction_account_zone[0].name_servers[2],
         data.aws_route53_zone.preproduction_account_zone[0].name_servers[3],
-        ] : []
+      ] : []
     }
     production = {
       account_subdomain_name = aws_route53_zone.account_zone.name

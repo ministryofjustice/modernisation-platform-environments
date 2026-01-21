@@ -20,11 +20,12 @@ data "aws_iam_policy_document" "cross_account_hosted_zones_policy" {
       "route53:ListHostedZones",
       "route53:ListResourceRecordSets"
     ]
-    resources = ["${local.environment}.${local.base_domain}."]
+    resources = ["non-live-${local.environment}.${local.base_domain}."]
   }
 }
 
 resource "aws_iam_role" "cross_account_hosted_zones_read" {
+  count              = terraform.workspace != "cloud-platform-non-live-production" ? 1 : 0
   name               = "cross-account-hosted-zones-read"
   description        = "Allows production account to read hosted zones for account delegation NS records"
   assume_role_policy = data.aws_iam_policy_document.cross_account_hosted_zones_assume_role.json
