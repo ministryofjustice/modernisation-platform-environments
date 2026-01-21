@@ -4,7 +4,7 @@ resource "aws_route53_zone" "temp_cloud_platform_justice_gov_uk" {
 }
 
 resource "aws_route53_zone" "account_zone" {
-  name  = "${trimprefix(terraform.workspace, "cloud-platform-")}.${local.base_domain}"
+  name = "${trimprefix(terraform.workspace, "cloud-platform-")}.${local.base_domain}"
 }
 
 resource "aws_route53_record" "account_delegation" {
@@ -14,9 +14,4 @@ resource "aws_route53_record" "account_delegation" {
   type     = "NS"
   ttl      = 300
   records  = each.value.ns_records
-
-  depends_on =  [
-    aws_iam_role.cross_account_hosted_zones_read,
-    aws_route53_zone.account_zone
-    ]
 }
