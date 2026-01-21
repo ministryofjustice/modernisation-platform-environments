@@ -66,6 +66,7 @@ locals {
     aws_iam_role.replication_role[0].arn
   ] : var.cross_account ? [
     aws_iam_role.process_landing_bucket_files.arn,
+     "arn:aws:iam::${var.cross_account_id}:root",
     "arn:aws:iam::${var.cross_account_id}:role/AWSS3BucketReplication"
   ] : [aws_iam_role.process_landing_bucket_files.arn]
 }
