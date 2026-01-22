@@ -395,6 +395,8 @@ data "aws_iam_policy_document" "format_json_fms_data_policy_document" {
     sid    = "S3PermissionsForPutFormattedJSONFiles"
     effect = "Allow"
     actions = [
+      "s3:GetObject",
+      "s3:GetObjectTagging",
       "s3:PutObject",
       "s3:PutObjectTagging",
     ]
