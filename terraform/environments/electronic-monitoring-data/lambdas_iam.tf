@@ -1420,3 +1420,56 @@ resource "aws_iam_role_policy_attachment" "cross_account_copy" {
   role       = aws_iam_role.cross_account_copy[0].name
   policy_arn = aws_iam_policy.cross_account_copy[0].arn
 }
+
+
+#-----------------------------------------------------------------------------------
+# Iceberg table maint
+#-----------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "iceberg_table_maintenance" {
+  count = local.is-development || local.is-preproduction ? 1 : 0
+  statement {
+    sid    = "AthenaQueryPermissions"
+    effect = "Allow"
+    actions = [
+      "athena:StartQueryExecution",
+      "athena:GetQueryExecution",
+      "athena:GetQueryResults",
+      "athena:GetDataCatalog"
+    ]
+    resources = [
+      "arn:aws:athena:${data.aws_region.current.region}:${local.env_account_id}:*/*"
+    ]
+  }
+
+  statement {
+    sid    = "GlueMetadataUpdate"
+    effect = "Allow"
+    actions = [
+      "glue:GetDatabase",
+      "glue:GetTable",
+      "glue:UpdateTable",
+      "glue:GetPartitions"
+    ]
+    resources = [
+      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:catalog",
+      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:database/intermediate_tasking",
+      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/intermediate_tasking/tbl_answers"
+    ]
+  }
+
+  statement {
+    sid    = "S3DataMaintenance"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:DeleteObject",
+      "s3:ListBucket"
+    ]
+    resources = [
+      "arn:aws:s3:::emds-prod-cadt",
+      "arn:aws:s3:::emds-prod-cadt/prod/data/prod/models/domain_name=historic/database_name=intermediate_tasking/table_name=tbl_answers/*",
+    ]
+  }
+}

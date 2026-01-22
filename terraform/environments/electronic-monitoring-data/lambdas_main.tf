@@ -606,3 +606,23 @@ resource "aws_scheduler_schedule" "mdss_daily_failure_digest" {
     role_arn = aws_iam_role.mdss_daily_failure_digest_scheduler.arn
   }
 }
+
+#-----------------------------------------------------------------------------------
+# Iceberg Table Maint
+#-----------------------------------------------------------------------------------
+
+module "iceberg-table-maintenance" {
+  count                   = local.is-development || local.is-preproduction ? 1 : 0
+  source                  = "./modules/lambdas"
+  is_image                = true
+  function_name           = "iceberg_table_maintenance"
+  role_name               = aws_iam_role.data_cutback_iam_role[0].name
+  role_arn                = aws_iam_role.data_cutback_iam_role[0].arn
+  handler                 = "iceberg_table_maintenance.handler"
+  memory_size             = 1024
+  timeout                 = 900
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+
+}
+
