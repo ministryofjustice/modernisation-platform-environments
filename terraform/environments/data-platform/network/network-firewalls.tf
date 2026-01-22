@@ -93,7 +93,7 @@ resource "aws_networkfirewall_rule_group" "strict_ip" {
       ip_sets {
         key = "VPC"
         ip_set {
-          definition = [aws_vpc.main.cidr_block]
+          definition = [local.network_configuration.vpc.cidr_block]
         }
       }
       ip_sets {
