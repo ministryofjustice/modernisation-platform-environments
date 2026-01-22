@@ -54,7 +54,7 @@ locals {
 
     patch_manager = {
       patch_schedules = {
-        windows = "cron(10 06 ? * WED *)" # 06:10 for nomis windows clients we work around the overnight shutdown  
+        Windows = "cron(10 06 ? * WED *)" # 06:10 for nomis windows clients we work around the overnight shutdown  
       }
       patch_tag_key               = "os-type"
       maintenance_window_duration = 4
