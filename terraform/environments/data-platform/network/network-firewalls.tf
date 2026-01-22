@@ -122,9 +122,9 @@ resource "aws_networkfirewall_rule_group" "strict_fqdn" {
   rule_group {
     rule_variables {
       ip_sets {
-        key = "HOME_NET"
+        key = "VPC"
         ip_set {
-          definition = [aws_vpc.main.cidr_block]
+          definition = [local.network_configuration.vpc.cidr_block]
         }
       }
     }

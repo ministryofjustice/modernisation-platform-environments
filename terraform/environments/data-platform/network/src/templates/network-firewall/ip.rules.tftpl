@@ -4,4 +4,4 @@ ${rule.action} ${rule.protocol} ${rule.source_ip} ${rule.source_port} ${rule.dir
 %{ endfor ~}
 
 ### Static ###
-reject tcp $HOME_NET any -> any 22 (msg:"REJECT outbound SSH not allowlisted"; flow:to_server; sid:1100001; rev:1;)
+reject tcp $VPC any -> any 22 (msg:"REJECT outbound SSH not allowlisted"; flow:to_server; sid:1100001; rev:1;)
