@@ -11,6 +11,12 @@ variable "rule_name" {
   default = "ebs-trusted-rule-ip-set"
 }
 
+data "archive_file" "maintenance_zip" {
+  type        = "zip"
+  source_file = "${path.module}/lambda/maintenance_announcements/lambda_function.py"
+  output_path = "${path.module}/lambda/maintenance_announcements/maintenance_lambda_function.zip"
+}
+
 data "archive_file" "waf_toggle_zip" {
   type        = "zip"
   source_file = "${path.module}/lambda/waf_lambda_function.py"
@@ -57,6 +63,27 @@ resource "aws_iam_role_policy" "waf_lambda_policy" {
   })
 }
 
+resource "aws_lambda_function" "maintenance" {
+  function_name    = "waf-toggle-${local.environment}"
+  role             = aws_iam_role.waf_lambda_role.arn
+  filename         = data.archive_file.maintenance_zip.output_path
+  source_code_hash = data.archive_file.maintenance_zip.output_base64sha256
+  handler          = "lambda_function.lambda_handler"
+  runtime          = "python3.13"
+  timeout          = 30
+  environment {
+    variables = {
+      SCOPE            = var.scope
+      WEB_ACL_NAME     = data.aws_wafv2_web_acl.waf_web_acl.name
+      WEB_ACL_ID       = data.aws_wafv2_web_acl.waf_web_acl.id
+      RULE_NAME        = var.rule_name
+      CUSTOM_BODY_NAME = "maintenance_html"
+      TIME_FROM        = "21:30"  # Optional - these are the defaults
+      TIME_TO          = "07:00"  # Optional - these are the defaults
+    }
+  }
+}
+
 resource "aws_lambda_function" "waf_toggle" {
   function_name    = "waf-toggle-${local.environment}"
   role             = aws_iam_role.waf_lambda_role.arn
@@ -87,7 +114,6 @@ EOT
     }
   }
 }
-
 
 // EventBridge scheduled rules to trigger Lambda
 resource "aws_cloudwatch_event_rule" "waf_allow_0700_uk" {
