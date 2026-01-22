@@ -44,30 +44,30 @@ resource "aws_iam_role_policy" "cross_account_hosted_zones_read" {
   policy = data.aws_iam_policy_document.cross_account_hosted_zones_policy.json
 }
 
-
+# commented out as we dont currently have permission to attach policies to the github-actions role
 # Policy to allow github-actions role in production to assume cross-account hosted zones read roles
-data "aws_iam_policy_document" "github_actions_assume_hosted_zones_role" {
-  count = terraform.workspace == "cloud-platform-non-live-production" ? 1 : 0
-  statement {
-    sid     = "AssumeHostedZonesReadRoles"
-    effect  = "Allow"
-    actions = ["sts:AssumeRole"]
-    resources = [
-      "arn:aws:iam::${local.environment_management.account_ids["cloud-platform-non-live-development"]}:role/cross-account-hosted-zones-read",
-      "arn:aws:iam::${local.environment_management.account_ids["cloud-platform-non-live-test"]}:role/cross-account-hosted-zones-read",
-      "arn:aws:iam::${local.environment_management.account_ids["cloud-platform-non-live-preproduction"]}:role/cross-account-hosted-zones-read"
-    ]
-  }
-}
+# data "aws_iam_policy_document" "github_actions_assume_hosted_zones_role" {
+#   count = terraform.workspace == "cloud-platform-non-live-production" ? 1 : 0
+#   statement {
+#     sid     = "AssumeHostedZonesReadRoles"
+#     effect  = "Allow"
+#     actions = ["sts:AssumeRole"]
+#     resources = [
+#       "arn:aws:iam::${local.environment_management.account_ids["cloud-platform-non-live-development"]}:role/cross-account-hosted-zones-read",
+#       "arn:aws:iam::${local.environment_management.account_ids["cloud-platform-non-live-test"]}:role/cross-account-hosted-zones-read",
+#       "arn:aws:iam::${local.environment_management.account_ids["cloud-platform-non-live-preproduction"]}:role/cross-account-hosted-zones-read"
+#     ]
+#   }
+# }
 
-resource "aws_iam_policy" "github_actions_assume_hosted_zones_role" {
-  count  = terraform.workspace == "cloud-platform-non-live-production" ? 1 : 0
-  name   = "github-actions-assume-hosted-zones-read"
-  policy = data.aws_iam_policy_document.github_actions_assume_hosted_zones_role[0].json
-}
+# resource "aws_iam_policy" "github_actions_assume_hosted_zones_role" {
+#   count  = terraform.workspace == "cloud-platform-non-live-production" ? 1 : 0
+#   name   = "github-actions-assume-hosted-zones-read"
+#   policy = data.aws_iam_policy_document.github_actions_assume_hosted_zones_role[0].json
+# }
 
-resource "aws_iam_role_policy_attachment" "github_actions_assume_hosted_zones_role" {
-  count      = terraform.workspace == "cloud-platform-non-live-production" ? 1 : 0
-  role       = "github-actions"
-  policy_arn = aws_iam_policy.github_actions_assume_hosted_zones_role[0].arn
-}
+# resource "aws_iam_role_policy_attachment" "github_actions_assume_hosted_zones_role" {
+#   count      = terraform.workspace == "cloud-platform-non-live-production" ? 1 : 0
+#   role       = "github-actions"
+#   policy_arn = aws_iam_policy.github_actions_assume_hosted_zones_role[0].arn
+# }
