@@ -9,6 +9,7 @@ module "vpc_endpoints" {
     "guardduty-data",
     "ssm",
     "ssmmessages",
+    "bedrock",
     # "sts",
     # "logs",
     # "kms",
@@ -49,19 +50,18 @@ module "vpc_endpoints" {
           aws_route_table.main["private-c"].id
         ]
         tags = { Name = "${local.application_name}-${local.environment}-s3-gateway" }
+      },
+      s3-eu-west-1 = {
+        service_name   = "com.amazonaws.eu-west-1.s3"
+        service_region = "eu-west-1"
+        service_type   = "Interface"
+        route_table_ids = [
+          aws_route_table.main["private-a"].id,
+          aws_route_table.main["private-b"].id,
+          aws_route_table.main["private-c"].id
+        ]
+        tags = { Name = "${local.application_name}-${local.environment}-s3-eu-west-1-interface" }
       }
-      # Revisit this
-      # s3-eu-west-1 = {
-      #   service_name   = "com.amazonaws.eu-west-1.s3"
-      #   service_region = "eu-west-1"
-      #   service_type   = "Gateway"
-      #   route_table_ids = [
-      #     aws_route_table.main["private-a"].id,
-      #     aws_route_table.main["private-b"].id,
-      #     aws_route_table.main["private-c"].id
-      #   ]
-      #   tags = { Name = "${local.application_name}-${local.environment}-s3-eu-west-1-gateway" }
-      # }
   })
 
   create_security_group      = true

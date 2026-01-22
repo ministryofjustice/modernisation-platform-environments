@@ -3,6 +3,10 @@ resource "aws_networkfirewall_firewall" "main" {
   firewall_policy_arn = aws_networkfirewall_firewall_policy.strict.arn
   vpc_id              = aws_vpc.main.id
 
+  delete_protection                 = true
+  firewall_policy_change_protection = true
+  subnet_change_protection          = true
+
   encryption_configuration {
     type   = "CUSTOMER_KMS"
     key_id = module.network_firewall_kms_key.key_arn
