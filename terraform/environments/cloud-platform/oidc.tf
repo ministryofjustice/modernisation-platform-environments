@@ -174,10 +174,9 @@ data "aws_iam_policy_document" "github_actions_development_cluster_oidc_policy" 
     effect = "Allow"
     resources = [
       format("arn:aws:iam::%s:role/modify-dns-records", local.environment_management.account_ids["core-network-services-production"]),
+      format("arn:aws:iam::%s:role/read-log-records", local.environment_management.account_ids["core-network-services-production"]),
       format("arn:aws:iam::%s:role/modernisation-account-limited-read-member-access", local.environment_management.modernisation_platform_account_id),
-      format("arn:aws:iam::%s:role/ModernisationPlatformSSOReadOnly", local.environment_management.aws_organizations_root_account_id),
-      # the following are required as cooker have development accounts but are in the sandbox vpc
-      local.application_name == "cooker" ? format("arn:aws:iam::%s:role/member-delegation-house-sandbox", local.environment_management.account_ids["core-vpc-sandbox"]) : format("arn:aws:iam::%s:role/modernisation-account-limited-read-member-access", local.environment_management.modernisation_platform_account_id)
+      format("arn:aws:iam::%s:role/ModernisationPlatformSSOReadOnly", local.environment_management.aws_organizations_root_account_id)
     ]
     condition {
       test     = "StringEquals"
