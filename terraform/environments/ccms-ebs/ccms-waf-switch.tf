@@ -1,4 +1,4 @@
-#Environment variable come from Platform local file
+# Environment variable come from Platform local file
 locals {
   env = "data-${local.environment}"
 }
@@ -29,8 +29,7 @@ data "aws_wafv2_web_acl" "waf_web_acl" {
   scope = "REGIONAL"
 }
 
-
-#Create IAM Role and Policy for Lambda
+# Create IAM Role and Policy for Lambda
 resource "aws_iam_role" "waf_lambda_role" {
   name = "waf-toggle-role-${local.environment}"
   assume_role_policy = jsonencode({
@@ -121,7 +120,6 @@ resource "aws_cloudwatch_event_rule" "waf_allow_0700_uk" {
   schedule_expression = "cron(00 07 ? * MON-SUN *)"
   description         = "Set WAF rule to ALLOW at 07:00 UK daily"
 }
-
 
 resource "aws_cloudwatch_event_rule" "waf_block_2130_uk" {
   name                = "waf-block-2130-${local.environment}"
