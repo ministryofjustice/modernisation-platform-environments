@@ -32,11 +32,6 @@ resource "aws_db_option_group" "soa_oracle_19" {
   ]
 
   option_settings {
-    name  = "TLS_CIPHER_SUITE"
-    value = "-"
-  }
-
-  option_settings {
     name  = "MINIMUM_TLS_VERSION"
     value = "TLSv1"
   }
