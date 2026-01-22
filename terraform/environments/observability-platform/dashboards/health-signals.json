@@ -1,6 +1,6 @@
 {
   "id": null,
-  "uid": "${platform_health_dashboard_uid}",
+  "uid": "platform-health-signals",
   "title": "Platform Health Signals - ${team_name} (${environment})",
   "tags": ["platform-health", "health-signals", "status"],
   "schemaVersion": 39,
