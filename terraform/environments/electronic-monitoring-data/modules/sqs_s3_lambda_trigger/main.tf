@@ -13,7 +13,7 @@ resource "aws_sqs_queue" "s3_event_queue" {
   visibility_timeout_seconds = (15 * 60) + 1 # lambda execution time plus 1
   redrive_policy = jsonencode({
     deadLetterTargetArn = aws_sqs_queue.s3_event_dlq.arn
-    maxReceiveCount     = 2
+    maxReceiveCount     = var.max_retries - 1
   })
   sqs_managed_sse_enabled = true
 }
