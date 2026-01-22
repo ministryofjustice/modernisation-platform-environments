@@ -25,7 +25,7 @@ resource "aws_db_option_group" "soa_oracle_19" {
 #   option_name = "OEM_AGENT"
 
 #   port    = 3872
-#   version = "13.5.0.0.v2"
+#   version = "13.5.0.0.v1"
 
 #   vpc_security_group_memberships = [
 #     aws_security_group.soa_db.id
@@ -41,7 +41,7 @@ resource "aws_db_option_group" "soa_oracle_19" {
 #     value = "TLSv1"
 #   }
 
-#   option_settings {
+#   option_settings { 
 #     name  = "AGENT_REGISTRATION_PASSWORD"
 #     value = jsondecode(
 #       data.aws_secretsmanager_secret_version.oem_agent_credentials.secret_string
@@ -50,7 +50,7 @@ resource "aws_db_option_group" "soa_oracle_19" {
 
 #   option_settings {
 #     name  = "OMS_HOST"
-#     value = "laa-oem-app.laa-development.modernisation-platform.service.justice.gov.uk"
+#     value = "10.26.60.231"
 #   }
 
 #   option_settings {
