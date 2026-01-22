@@ -8,3 +8,8 @@ resource "aws_vpc" "main" {
     Name = "${local.application_name}-${local.environment}"
   }
 }
+
+resource "aws_vpc_encryption_control" "main" {
+  vpc_id = aws_vpc.main.id
+  mode   = "monitor"
+}

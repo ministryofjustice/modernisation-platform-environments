@@ -7,6 +7,8 @@ resource "aws_networkfirewall_firewall" "main" {
   firewall_policy_change_protection = true
   subnet_change_protection          = true
 
+  enabled_analysis_types = ["HTTP_HOST", "TLS_SNI"]
+
   encryption_configuration {
     type   = "CUSTOMER_KMS"
     key_id = module.network_firewall_kms_key.key_arn
@@ -25,29 +27,35 @@ resource "aws_networkfirewall_firewall" "main" {
   }
 }
 
-# resource "aws_networkfirewall_logging_configuration" "cloudwatch" {
-#   firewall_arn = aws_networkfirewall_firewall.main.arn
+resource "aws_networkfirewall_logging_configuration" "cloudwatch" {
+  firewall_arn                = aws_networkfirewall_firewall.main.arn
+  enable_monitoring_dashboard = true
 
-#   logging_configuration {
-#     log_destination_config {
-#       log_destination = {
-#         logGroup = module.network_firewall_flow_logs_log_group.cloudwatch_log_group_name
-#       }
-#       log_destination_type = "CloudWatchLogs"
-#       log_type             = "FLOW"
-#     }
-#     log_destination_config {
-#       log_destination = {
-#         logGroup = module.network_firewall_alert_logs_log_group.cloudwatch_log_group_name
-#       }
-#       log_destination_type = "CloudWatchLogs"
-#       log_type             = "ALERT"
-#     }
-#   }
-# }
+  logging_configuration {
+    log_destination_config {
+      log_destination = {
+        logGroup = module.network_firewall_flow_log_group.cloudwatch_log_group_name
+      }
+      log_destination_type = "CloudWatchLogs"
+      log_type             = "FLOW"
+    }
+    log_destination_config {
+      log_destination = {
+        logGroup = module.network_firewall_alerts_log_group.cloudwatch_log_group_name
+      }
+      log_destination_type = "CloudWatchLogs"
+      log_type             = "ALERT"
+    }
+  }
+}
 
 resource "aws_networkfirewall_firewall_policy" "strict" {
   name = "strict"
+
+  encryption_configuration {
+    type   = "CUSTOMER_KMS"
+    key_id = module.network_firewall_kms_key.key_arn
+  }
 
   firewall_policy {
     stateless_default_actions          = ["aws:forward_to_sfe"]
@@ -97,6 +105,11 @@ resource "aws_networkfirewall_rule_group" "strict_ip" {
   type     = "STATEFUL"
   capacity = 10000
 
+  encryption_configuration {
+    type   = "CUSTOMER_KMS"
+    key_id = module.network_firewall_kms_key.key_arn
+  }
+
   rule_group {
     rule_variables {
       ip_sets {
@@ -127,6 +140,11 @@ resource "aws_networkfirewall_rule_group" "strict_fqdn" {
   name     = "strict-fqdn"
   type     = "STATEFUL"
   capacity = 3000
+
+  encryption_configuration {
+    type   = "CUSTOMER_KMS"
+    key_id = module.network_firewall_kms_key.key_arn
+  }
 
   rule_group {
     rule_variables {

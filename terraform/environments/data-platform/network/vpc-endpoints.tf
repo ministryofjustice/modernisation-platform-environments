@@ -60,7 +60,8 @@ module "vpc_endpoints" {
           aws_route_table.main["private-b"].id,
           aws_route_table.main["private-c"].id
         ]
-        tags = { Name = "${local.application_name}-${local.environment}-s3-eu-west-1-interface" }
+        private_dns_enabled = true
+        tags                = { Name = "${local.application_name}-${local.environment}-s3-eu-west-1-interface" }
       }
   })
 
