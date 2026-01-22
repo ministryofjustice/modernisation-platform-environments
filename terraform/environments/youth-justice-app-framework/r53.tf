@@ -69,7 +69,7 @@ resource "aws_route53_record" "connectivity" {
   name    = "connectivity"
   type    = "A"
   ttl     = 300
-  records = [cidrhost(var.vpc_cidr, 250)]
+  records = [cidrhost(data.aws_vpc.shared.cidr_block, 250)]
 }
 
 
