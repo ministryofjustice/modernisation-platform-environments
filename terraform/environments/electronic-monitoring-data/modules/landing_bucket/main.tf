@@ -34,9 +34,11 @@ locals {
       actions = [
         "s3:ReplicateObject",
         "s3:ReplicateTags",
+        "s3:GetBucketVersioning",
+        "s3:PutBucketVersioning",
         "s3:ObjectOwnerOverrideToBucketOwner"
       ]
-      resources = ["${module.this-bucket.bucket.arn}/*"]
+      resources = ["${module.this-bucket.bucket.arn}/*", module.this-bucket.bucket.arn]
     }
   ] : []
   bucket_policy = flatten([local.cross_account_bucket_policy, local.bucket_policy_v2])
