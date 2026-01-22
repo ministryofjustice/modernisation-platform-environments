@@ -1,6 +1,6 @@
 # CloudWatch Alarm for EDRMS Container Count
 resource "aws_cloudwatch_metric_alarm" "container_count" {
-  alarm_name                = "${local.application_name}-ecs-task-count"
+  alarm_name                = "${local.application_name}-ecs-task-count-number"
   alarm_description         = "The number of EDRMS ECS tasks is less than ${local.application_data.accounts[local.environment].app_count}, Runbook - https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
   comparison_operator       = "LessThanThreshold"
   metric_name               = "DesiredTaskCount"
