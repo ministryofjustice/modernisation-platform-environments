@@ -68,7 +68,7 @@ module "cross_account_details" {
       sid = "AllowAccountRead"
       principals = [{
         type        = "AWS"
-        identifiers = [aws_iam_role.cross_account_copy[0].arn]
+        identifiers = ["arn:aws:iam::${local.env_account_id}:root"]
       }]
       actions   = ["secretsmanager:GetSecretValue"]
       resources = ["*"]
@@ -77,38 +77,19 @@ module "cross_account_details" {
 
   ignore_secret_changes = true
   secret_string = jsonencode({
-    account_id = "placeholder"
-    region     = "placeholder"
-    buckets = {
-      mdss = {
-        home_office = {
-          bucket = "placeholder"
-          kms_id = "placeholder"
-        }
-        specials = {
-          bucket = "placeholder"
-          kms_id = "placeholder"
-        }
-        general = {
-          bucket = "placeholder"
-          kms_id = "placeholder"
-        }
-      }
-      fms = {
-        home_office = {
-          bucket = "placeholder"
-          kms_id = "placeholder"
-        }
-        specials = {
-          bucket = "placeholder"
-          kms_id = "placeholder"
-        }
-        general = {
-          bucket = "placeholder"
-          kms_id = "placeholder"
-        }
-      }
-    }
+    fms_general_bucket   = ""
+    fms_general_kms_id   = ""
+    fms_ho_bucket        = ""
+    fms_ho_kms_id        = ""
+    fms_specials_bucket  = ""
+    fms_specials_kms_id  = ""
+    mdss_general_bucket  = ""
+    mdss_general_kms_id  = ""
+    mdss_specials_bucket = ""
+    mdss_specials_kms_id = ""
+    mdss_ho_bucket       = ""
+    mdss_ho_kms_id       = ""
+    account_id           = ""
   })
 
   tags = local.tags
