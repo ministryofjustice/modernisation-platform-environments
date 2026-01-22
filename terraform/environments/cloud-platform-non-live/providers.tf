@@ -1,6 +1,6 @@
+# commented out as we dont currently have permission to attach policies to the github-actions role
 # Providers to assume cross-account role in each environment account
 # These are only used when running from production workspace
-
 # provider "aws" {
 #   alias  = "cloud-platform-non-live-development"
 #   region = "eu-west-2"
