@@ -44,7 +44,6 @@ locals {
     assets       = [module.yjsm.yjsm_instance_private_ip]
     mule         = [module.esb.esb_instance_private_ip]
     ldap         = module.ds.dns_ip_addresses
-    connectivity = [cidrhost(data.aws_vpc.this.cidr_block, 250)]
   }
 }
 
@@ -61,6 +60,20 @@ resource "aws_route53_record" "type_a" {
   ttl     = 300
   records = each.value
 }
+
+
+resource "aws_route53_record" "connectivity" {
+  provider = aws.core-network-services
+
+  zone_id = data.aws_route53_zone.yjaf-inner.id
+  name    = "connectivity"
+  type    = "A"
+  ttl     = 300
+  records = [cidrhost(var.vpc_cidr, 250)]
+}
+
+
+
 
 /*
 resource "aws_route53_record" "assets" {
