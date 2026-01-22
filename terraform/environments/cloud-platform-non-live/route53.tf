@@ -1,10 +1,10 @@
 resource "aws_route53_zone" "temp_cloud_platform_justice_gov_uk" {
   count = terraform.workspace == "cloud-platform-non-live-production" ? 1 : 0
-  name  = "temp.cloud-platform.service.justice.gov.uk."
+  name  = "${local.base_domain}."
 }
 
 resource "aws_route53_zone" "account_zone" {
-  name  = "${trimprefix(terraform.workspace, "cloud-platform-")}.temp.cloud-platform.service.justice.gov.uk"
+  name = "${trimprefix(terraform.workspace, "cloud-platform-")}.${local.base_domain}"
 }
 
 resource "aws_route53_record" "account_delegation" {
