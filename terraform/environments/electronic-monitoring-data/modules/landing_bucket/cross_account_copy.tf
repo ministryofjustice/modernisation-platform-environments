@@ -66,7 +66,6 @@ data "aws_iam_policy_document" "replication-policy" {
       "s3:ReplicateObject",
       "s3:ReplicateDelete",
       "s3:ReplicateTags",
-      "s3:GetObjectVersionTagging",
       "s3:ObjectOwnerOverrideToBucketOwner"
     ]
     resources = ["${module.this-bucket.bucket.arn}/*"]
@@ -84,16 +83,6 @@ data "aws_iam_policy_document" "replication-policy" {
 
     resources = [local.replication_enabled ? "arn:aws:s3:::${var.replication_details["${var.data_feed}_${var.order_type}_bucket"]}/*" : ""]
 
-
-
-    condition {
-      test     = "StringLikeIfExists"
-      variable = "s3:x-amz-server-side-encryption"
-      values = [
-        "aws:kms",
-        "AES256"
-      ]
-    }
   }
 }
 
