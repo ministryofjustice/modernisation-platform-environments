@@ -744,6 +744,60 @@ locals {
             }
           })
         })
+        cloudwatch_metric_alarms = {
+          high-requests = {
+            comparison_operator = "GreaterThanOrEqualToThreshold"
+            evaluation_periods  = "3"
+            datapoints_to_alarm = "3"
+            metric_name         = "RequestCount"
+            namespace           = "AWS/ApplicationELB"
+            period              = "300"
+            statistic           = "Sum"
+            threshold           = 30000
+            alarm_description   = "Triggers if request count exceeds threshold per 5 minutes for 15 minutes."
+            alarm_actions       = [] # ["pagerduty"]
+            ok_actions          = [] # ["pagerduty"]
+          }
+          high-4xx = {
+            comparison_operator = "GreaterThanOrEqualToThreshold"
+            evaluation_periods  = "3"
+            datapoints_to_alarm = "3"
+            metric_name         = "HTTPCode_Target_4XX_Count"
+            namespace           = "AWS/ApplicationELB"
+            period              = "300"
+            statistic           = "Sum"
+            threshold           = 100
+            alarm_description   = "Triggers if target 4xx errors exceed threshold per 5 minutes for 15 minutes."
+            alarm_actions       = [] # ["pagerduty"]
+            ok_actions          = [] # ["pagerduty"]
+          }
+          high-5xx = {
+            comparison_operator = "GreaterThanOrEqualToThreshold"
+            evaluation_periods  = "3"
+            datapoints_to_alarm = "3"
+            metric_name         = "HTTPCode_Target_5XX_Count"
+            namespace           = "AWS/ApplicationELB"
+            period              = "300"
+            statistic           = "Sum"
+            threshold           = 50
+            alarm_description   = "Triggers if target 5xx errors exceed threshold per 5 minutes for 15 minutes."
+            alarm_actions       = [] # ["pagerduty"]
+            ok_actions          = [] # ["pagerduty"]
+          }
+          high-latency = {
+            comparison_operator = "GreaterThanOrEqualToThreshold"
+            evaluation_periods  = "3"
+            datapoints_to_alarm = "3"
+            metric_name         = "TargetResponseTime"
+            namespace           = "AWS/ApplicationELB"
+            period              = "60"
+            statistic           = "Average" # p95 would be nice but not available
+            threshold           = 3
+            alarm_description   = "Triggers if average target response time exceeds threshold for 3 minutes."
+            alarm_actions       = [] # ["pagerduty"]
+            ok_actions          = [] # ["pagerduty"]
+          }
+        }
       })
     }
 

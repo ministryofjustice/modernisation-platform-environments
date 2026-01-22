@@ -143,6 +143,17 @@ module "lb" {
     for sg in each.value.security_groups : lookup(aws_security_group.this, sg, null) != null ? aws_security_group.this[sg].id : sg
   ]
 
+  cloudwatch_metric_alarms = {
+    for key, value in each.value.cloudwatch_metric_alarms : key => merge(value, {
+      alarm_actions = [
+        for item in value.alarm_actions : try(aws_sns_topic.this[item].arn, item)
+      ]
+      ok_actions = [
+        for item in value.ok_actions : try(aws_sns_topic.this[item].arn, item)
+      ]
+    })
+  }
+
   subnets = each.value.subnets
   region  = var.environment.region
   vpc_all = var.environment.vpc_name
@@ -195,3 +206,5 @@ module "lb_listener" {
   ]
   tags = merge(local.tags, each.value.tags)
 }
+
+
