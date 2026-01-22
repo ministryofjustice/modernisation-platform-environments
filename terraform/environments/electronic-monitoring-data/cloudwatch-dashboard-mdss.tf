@@ -182,7 +182,7 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
           query  = <<-EOT
             SOURCE '${module.load_mdss_lambda.cloudwatch_log_group.name}'
             | filter ispresent(message.event)
-            | filter message.event in ["MDSS_FILE_START","MDSS_FILE_OK","MDSS_FILE_FAIL"]
+            | filter message.event in ["MDSS_FILE_START","MDSS_FILE_OK","MDSS_FILE_OK_AFTER_RETRY","MDSS_FILE_FAIL"]
             | fields @timestamp, message.table as table, message.s3path as s3path, message.attempt as attempt
             | stats
                 count() as n_events,
@@ -221,6 +221,78 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
             | fields @timestamp, message.error_type, message.dataset, message.pipeline, message.table, message.bucket, message.key, message.s3path, message.exception_class, message.reason, message.exception_chain
             | sort @timestamp desc
             | limit 200
+          EOT
+        }
+      },
+
+      # Retries (transient)
+      {
+        type   = "log",
+        x      = 0,
+        y      = 44,
+        width  = 24,
+        height = 6,
+        properties = {
+          title  = "Retries: load_mdss (transient failures)"
+          region = "eu-west-2"
+          view   = "table"
+          query  = <<-EOT
+            SOURCE '${module.load_mdss_lambda.cloudwatch_log_group.name}'
+            | filter ispresent(message.event)
+            | filter message.event = "MDSS_FILE_RETRY"
+            | fields @timestamp, message.error_type, message.table, message.s3path, message.attempt, message.max_receive_count, message.exception_class, message.reason
+            | sort @timestamp desc
+            | limit 200
+          EOT
+        }
+      },
+
+      # OK after retry (recovered)
+      {
+        type   = "log",
+        x      = 0,
+        y      = 50,
+        width  = 24,
+        height = 6,
+        properties = {
+          title  = "Recovered: OK after retry"
+          region = "eu-west-2"
+          view   = "table"
+          query  = <<-EOT
+            SOURCE '${module.load_mdss_lambda.cloudwatch_log_group.name}'
+            | filter ispresent(message.event)
+            | filter message.event = "MDSS_FILE_OK_AFTER_RETRY"
+            | fields @timestamp, message.table, message.s3path, message.attempt, message.max_receive_count
+            | sort @timestamp desc
+            | limit 200
+          EOT
+        }
+      },
+
+      # Outcome summary by table
+      {
+        type   = "log",
+        x      = 0,
+        y      = 56,
+        width  = 24,
+        height = 6,
+        properties = {
+          title  = "Outcome summary by table (final fails vs recovered)"
+          region = "eu-west-2"
+          view   = "table"
+          query  = <<-EOT
+            SOURCE '${module.load_mdss_lambda.cloudwatch_log_group.name}'
+            | filter ispresent(message.event)
+            | filter message.event in ["MDSS_FILE_OK","MDSS_FILE_OK_AFTER_RETRY","MDSS_FILE_FAIL"]
+            | stats
+                count_distinct(if(message.event="MDSS_FILE_FAIL", message.s3path, null)) as failed_final,
+                count_distinct(if(message.event="MDSS_FILE_OK_AFTER_RETRY", message.s3path, null)) as ok_after_retry,
+                count_distinct(if(message.event="MDSS_FILE_OK", message.s3path, null)) as ok_first_try,
+                round(avg(if(message.event in ["MDSS_FILE_OK","MDSS_FILE_OK_AFTER_RETRY"], message.attempt, null)), 2) as avg_attempt_success,
+                max(message.attempt) as max_attempt_seen
+              by message.table
+            | sort failed_final desc, ok_after_retry desc, avg_attempt_success desc
+            | limit 50
           EOT
         }
       }

@@ -193,6 +193,7 @@ module "load_mdss_event_queue" {
   lambda_function_name = module.load_mdss_lambda.lambda_function_name
   bucket_prefix        = local.bucket_prefix
   maximum_concurrency  = 100
+  max_receive_count    = local.load_sqs_max_receive_count
 }
 
 module "load_fms_event_queue" {
@@ -201,6 +202,7 @@ module "load_fms_event_queue" {
   lambda_function_name = module.load_fms_lambda.lambda_function_name
   bucket_prefix        = local.bucket_prefix
   maximum_concurrency  = 100
+  max_receive_count    = local.load_sqs_max_receive_count
 }
 
 resource "aws_s3_bucket_notification" "load_mdss_event" {
