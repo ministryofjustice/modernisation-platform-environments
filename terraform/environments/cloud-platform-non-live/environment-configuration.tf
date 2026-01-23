@@ -39,7 +39,7 @@ locals {
   }
 }
 
-
+# commented out as we dont currently have permission to attach policies to the github-actions role
 # locals {
 #   environment_configurations = {
 #     development = {

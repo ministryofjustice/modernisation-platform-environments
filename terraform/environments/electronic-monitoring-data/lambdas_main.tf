@@ -532,31 +532,6 @@ module "mdss_daily_failure_digest" {
 }
 
 #-----------------------------------------------------------------------------------
-# Copy data from test to dev or prod to preprod
-#-----------------------------------------------------------------------------------
-
-module "cross_account_copy" {
-  count                          = local.is-test || local.is-production ? 1 : 0
-  source                         = "./modules/lambdas"
-  is_image                       = true
-  function_name                  = "cross_account_copy"
-  role_name                      = aws_iam_role.cross_account_copy[0].name
-  role_arn                       = aws_iam_role.cross_account_copy[0].arn
-  handler                        = "cross_account_copy.handler"
-  memory_size                    = 512
-  timeout                        = 60
-  reserved_concurrent_executions = 100
-  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
-  production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
-  security_group_ids             = [aws_security_group.lambda_generic.id]
-  subnet_ids                     = data.aws_subnets.shared-public.ids
-
-  environment_variables = {
-    SECRET_ID = module.cross_account_details[0].secret_id
-  }
-}
-
-#-----------------------------------------------------------------------------------
 # MDSS daily failure digest schedule (08:00 Europe/London) - EventBridge Scheduler
 #-----------------------------------------------------------------------------------
 
