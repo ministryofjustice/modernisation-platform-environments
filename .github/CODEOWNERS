@@ -15,7 +15,7 @@
 /terraform/environments/ccms-ebs @ministryofjustice/laa-ccms-developers @ministryofjustice/laa-ccms-instance-access @ministryofjustice/laa-ccms-migration-team @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform-security @ministryofjustice/panda-cyber-team @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-ebs/workspaces-secure-browser @ministryofjustice/aws-root-account-admin-team @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-edrms @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
-/terraform/environments/ccms-oia @ministryofjustice/laa-ccms-developers @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
+/terraform/environments/ccms-oia @ministryofjustice/laa-ccms-developers @ministryofjustice/laa-dba @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-pui-internal @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-pui-internal/workspaces-secure-browser @ministryofjustice/aws-root-account-admin-team @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-pui @ministryofjustice/laa-ccms-developers @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
