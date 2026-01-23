@@ -1426,7 +1426,7 @@ resource "aws_iam_role_policy_attachment" "cross_account_copy" {
 # Iceberg table maint
 #-----------------------------------------------------------------------------------
 
-data "aws_iam_policy_document" "iceberg_table_maintenance" {
+data "aws_iam_policy_document" "iceberg_table_maintenance_iam_role_policy_document" {
   count = local.is-development || local.is-preproduction ? 1 : 0
   statement {
     sid    = "AthenaQueryPermissions"
@@ -1475,19 +1475,19 @@ data "aws_iam_policy_document" "iceberg_table_maintenance" {
 }
 
 resource "aws_iam_role" "iceberg_table_maintenance_iam_role" {
-  count              = local.is-production || local.is-development ? 1 : 0
+  count              = local.is-development || local.is-preproduction ? 1 : 0
   name               = "iceberg_table_maintenance_iam_role"
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
 }
 
 resource "aws_iam_policy" "iceberg_table_maintenance_iam_role_policy" {
-  count  = local.is-production || local.is-development ? 1 : 0
+  count  = local.is-development || local.is-preproduction ? 1 : 0
   name   = "iceberg_table_maintenance_iam_policy"
   policy = data.aws_iam_policy_document.iceberg_table_maintenance_iam_role_policy_document[0].json
 }
 
 resource "aws_iam_role_policy_attachment" "iceberg_table_maintenance_iam_role_policy_attachment" {
-  count      = local.is-production || local.is-development ? 1 : 0
+  count      = local.is-development || local.is-preproduction ? 1 : 0
   role       = aws_iam_role.iceberg_table_maintenance_iam_role[0].name
   policy_arn = aws_iam_policy.iceberg_table_maintenance_iam_role_policy[0].arn
 }
