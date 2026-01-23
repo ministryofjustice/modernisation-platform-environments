@@ -92,7 +92,7 @@ locals {
     }
 
     ec2_instances = {
-      dev-jump2022-1 = merge(local.ec2_instances.jumpserver, {
+      dev-jump2022-2 = merge(local.ec2_instances.jumpserver, {
         cloudwatch_metric_alarms = {}
         config = merge(local.ec2_instances.jumpserver.config, {
           ami_name          = "hmpps_windows_server_2022_release_2025-01-02T00-00-40.487Z"
