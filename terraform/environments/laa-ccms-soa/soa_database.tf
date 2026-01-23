@@ -7,57 +7,57 @@ resource "aws_db_subnet_group" "soa" {
   }
 }
 
-resource "aws_db_option_group" "soa_oracle_19" {
-  name_prefix          = "soa-db-option-group"
-  engine_name          = "oracle-ee"
-  major_engine_version = "19"
+# resource "aws_db_option_group" "soa_oracle_19" {
+#   name_prefix          = "soa-db-option-group"
+#   engine_name          = "oracle-ee"
+#   major_engine_version = "19"
 
-  option {
-    option_name = "JVM"
-  }
+#   option {
+#     option_name = "JVM"
+#   }
 
-  option {
-    option_name = "S3_INTEGRATION"
-    port        = 0
-    version     = "1.0"
-  }
-  option {
-  option_name = "OEM_AGENT"
+#   option {
+#     option_name = "S3_INTEGRATION"
+#     port        = 0
+#     version     = "1.0"
+#   }
+#   option {
+#   option_name = "OEM_AGENT"
 
-  port    = 3872
-  version = "13.5.0.0.v1"
+#   port    = 3872
+#   version = "13.5.0.0.v1"
 
-  vpc_security_group_memberships = [
-    aws_security_group.soa_db.id
-  ]
+#   vpc_security_group_memberships = [
+#     aws_security_group.soa_db.id
+#   ]
 
-  option_settings {
-    name  = "MINIMUM_TLS_VERSION"
-    value = "TLSv1"
-  }
+#   option_settings {
+#     name  = "MINIMUM_TLS_VERSION"
+#     value = "TLSv1"
+#   }
 
-  option_settings { 
-    name  = "AGENT_REGISTRATION_PASSWORD"
-    value = jsondecode(
-      data.aws_secretsmanager_secret_version.oem_agent_credentials.secret_string
-    ).password
-  }
+#   option_settings { 
+#     name  = "AGENT_REGISTRATION_PASSWORD"
+#     value = jsondecode(
+#       data.aws_secretsmanager_secret_version.oem_agent_credentials.secret_string
+#     ).password
+#   }
 
-  option_settings {
-    name  = "OMS_HOST"
-    value = "10.26.60.231"
-  }
+#   option_settings {
+#     name  = "OMS_HOST"
+#     value = "10.26.60.231"
+#   }
 
-  option_settings {
-    name  = "OMS_PORT"
-    value = "4903"
-  }
- }
+#   option_settings {
+#     name  = "OMS_PORT"
+#     value = "4903"
+#   }
+#  }
 
-  lifecycle {
-    create_before_destroy = true
-  }
-}
+#   lifecycle {
+#     create_before_destroy = true
+#   }
+# }
 
 
 resource "aws_db_instance" "soa_db" {
