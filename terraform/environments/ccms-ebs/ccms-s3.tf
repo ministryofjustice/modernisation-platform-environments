@@ -296,7 +296,7 @@ resource "aws_s3_bucket_notification" "dbbackup_bucket_notification" {
   eventbridge = true
   topic {
     topic_arn     = aws_sns_topic.s3_topic.arn
-    events        = ["s3:ObjectCreated:Put"]
+    events        = ["s3:ObjectCreated:*"]
     filter_suffix = ".log"
   }
 }
