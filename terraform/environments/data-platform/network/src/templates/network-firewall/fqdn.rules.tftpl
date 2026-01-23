@@ -4,5 +4,5 @@ ${rule.action} ${rule.protocol} ${rule.source_ip} ${rule.source_port} ${rule.dir
 %{ endfor ~}
 
 ### Static ###
-drop tcp $HOME_NET any -> any 80 (msg:"DROP outbound HTTP not allowlisted"; flow:to_server,established; sid:2099998; rev:1;)
-drop tcp $HOME_NET any -> any 443 (msg:"DROP outbound HTTPS not allowlisted"; flow:to_server,established; sid:2099999; rev:1;)
+drop tcp $HOME_NET any -> any 80 (msg:"DROP outbound HTTP not allowlisted"; flow:to_server,established; sid:2100000; rev:1;)
+drop tcp $HOME_NET any -> any 443 (msg:"DROP outbound HTTPS not allowlisted"; flow:to_server,established; sid:2100001; rev:1;)
