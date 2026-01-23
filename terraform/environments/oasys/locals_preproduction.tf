@@ -18,20 +18,6 @@ locals {
     # If your DNS records are in Fix 'n' Go, setup will be a 2 step process, see the acm_certificate module readme
     # if making changes, comment out the listeners that use the cert, edit the cert, recreate the listeners
     acm_certificates = {
-      pp_oasys_cert = {
-        cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
-        domain_name                         = "pp.oasys.service.justice.gov.uk"
-        external_validation_records_created = true
-        subject_alternate_names = [
-          "pp-int.oasys.service.justice.gov.uk",
-          "bridge-pp-oasys.az.justice.gov.uk",
-          "pp-oasys.az.justice.gov.uk",
-          "*.pp-oasys.az.justice.gov.uk",
-        ]
-        tags = {
-          description = "cert for oasys preproduction domains"
-        }
-      }
       pp_oasys_cert_v2 = {
         cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
         domain_name                         = "pp.oasys.service.justice.gov.uk"
@@ -242,7 +228,7 @@ locals {
 
         listeners = merge(local.lbs.public.listeners, {
           https = merge(local.lbs.public.listeners.https, {
-            certificate_names_or_arns = ["pp_oasys_cert"]
+            certificate_names_or_arns = ["pp_oasys_cert_v2"]
 
             rules = {
               pp-web-http-8080 = {
@@ -257,7 +243,6 @@ locals {
                       values = [
                         "pp.oasys.service.justice.gov.uk",
                         "pp-a.oasys.service.justice.gov.uk",
-                        "bridge-pp-oasys.az.justice.gov.uk"
                       ]
                     }
                   }
@@ -279,7 +264,7 @@ locals {
 
         listeners = merge(local.lbs.private.listeners, {
           https = merge(local.lbs.private.listeners.https, {
-            certificate_names_or_arns = ["pp_oasys_cert"]
+            certificate_names_or_arns = ["pp_oasys_cert_v2"]
 
             default_action = {
               type = "redirect"
@@ -305,7 +290,6 @@ locals {
                         "pp-int.oasys.service.justice.gov.uk",
                         "pp-a-int.oasys.service.justice.gov.uk",
                         "pp-oasys.az.justice.gov.uk",
-                        "oasys-ukwest.pp-oasys.az.justice.gov.uk",
                       ]
                     }
                   }
