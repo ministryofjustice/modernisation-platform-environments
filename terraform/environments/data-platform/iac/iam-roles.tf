@@ -54,7 +54,7 @@ module "data_platform_access_iam_role" {
       effect  = "Allow"
       actions = [
         "secretsmanager:CreateSecret",
-        "secretsmanager:DeleteSecret,
+        "secretsmanager:DeleteSecret",
         "secretsmanager:DescribeSecret",
         "secretsmanager:GetSecretValue",
         "secretsmanager:PutSecretValue",
