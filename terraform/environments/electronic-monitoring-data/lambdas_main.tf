@@ -590,8 +590,8 @@ module "create_fms_general_batch_replication_job" {
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "create_batch_replication_job"
-  role_name                      = aws_iam_role.create_batch_replication_job.name
-  role_arn                       = aws_iam_role.create_batch_replication_job.arn
+  role_name                      = aws_iam_role.bucket_replication.name
+  role_arn                       = aws_iam_role.bucket_replication.arn
   handler                        = "create_batch_replication_job.handler"
   memory_size                    = 512
   timeout                        = 120
