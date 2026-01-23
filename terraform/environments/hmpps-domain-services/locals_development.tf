@@ -91,6 +91,32 @@ locals {
       })
     }
 
+    ec2_instances = {
+      dev-jump2022-1 = merge(local.ec2_instances.jumpserver, {
+        config = merge(local.ec2_instances.jumpserver.config, {
+          ami_name          = "hmpps_windows_server_2022_release_2025-01-02T00-00-40.487Z"
+          availability_zone = "eu-west-2a"
+
+          user_data_raw = base64encode(templatefile(
+            "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
+              branch = "TM-1849/sap-bip-client-install"
+            }
+          ))
+        })
+        instance = merge(local.ec2_instances.jumpserver.instance, {
+          instance_type = "t3.large"
+          tags = {
+            patch-manager = "group1"
+          }
+        })
+        tags = merge(local.ec2_instances.jumpserver.tags, {
+          domain-name              = "azure.noms.root"
+          gha-jumpserver-startstop = "test"
+          instance-scheduling      = "skip-scheduling"
+        })
+      })
+    }
+
     lbs = {
       public = merge(local.lbs.public, {
         instance_target_groups = {
