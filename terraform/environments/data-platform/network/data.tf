@@ -20,9 +20,4 @@ data "aws_vpc_endpoint" "network_firewall" {
   }
 }
 
-data "http" "github_meta" {
-  request_headers = {
-    Accept = "application/json"
-  }
-  url = "https://api.github.com/meta"
-}
+data "github_ip_ranges" "main" {}

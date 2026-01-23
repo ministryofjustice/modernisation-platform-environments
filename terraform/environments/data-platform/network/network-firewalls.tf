@@ -121,7 +121,7 @@ resource "aws_networkfirewall_rule_group" "strict_ip" {
       ip_sets {
         key = "GITHUB_GIT"
         ip_set {
-          definition = jsondecode(data.http.github_meta.response_body)["git"]
+          definition = data.github_ip_ranges.main.git_ipv4
         }
       }
     }
