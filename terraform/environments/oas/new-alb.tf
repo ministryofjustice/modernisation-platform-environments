@@ -399,8 +399,8 @@ resource "aws_lb_listener_rule" "dv_https_rule" {
   }
 }
 
-# Listener rule for //bi-security-login on HTTPS
-resource "aws_lb_listener_rule" "/bi_security_login_https_rule" {
+# Listener rule for /bi-security-login on HTTPS
+resource "aws_lb_listener_rule" "bi_security_login_https_rule" {
   count = contains(["test", "preproduction"], local.environment) ? 1 : 0
 
   listener_arn = aws_lb_listener.https_listener[0].arn
@@ -412,7 +412,7 @@ resource "aws_lb_listener_rule" "/bi_security_login_https_rule" {
   }
 
   condition {
-    path_pattern {
+    path_pattern {g
       values = ["/bi-security-login*"]
     }
   }
