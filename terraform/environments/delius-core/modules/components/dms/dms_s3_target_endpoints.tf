@@ -16,6 +16,7 @@ resource "aws_dms_s3_endpoint" "dms_audit_target_endpoint_s3" {
   preserve_transactions   = true
   timestamp_column_name   = "TIMESTAMP"
   canned_acl_for_objects  = "bucket-owner-full-control"
+  expected_bucket_owner   = var.env_name_to_dms_config_map[var.dms_config.audit_target_endpoint.write_environment].account_id
 }
 
 # In repository environments we must loop through all client environments which write to it, as we
@@ -32,4 +33,5 @@ resource "aws_dms_s3_endpoint" "dms_user_target_endpoint_s3" {
   preserve_transactions   = true
   timestamp_column_name   = "TIMESTAMP"
   canned_acl_for_objects  = "bucket-owner-full-control"
+  expected_bucket_owner   = var.env_name_to_dms_config_map[each.key].account_id
 }
