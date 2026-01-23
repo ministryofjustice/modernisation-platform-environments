@@ -1395,6 +1395,14 @@ data "aws_iam_policy_document" "bucket_replication_policy" {
       module.s3-mdss-specials-landing-bucket.replication_role_arn,
     ]
   }
+  statement {
+    sid     = "SecretAccountDetails"
+    effect  = "Allow"
+    actions = [
+      "secretsmanager:GetSecretValue"
+    ]
+    resources = [module.cross_account_details.secret_arn]
+  }
 }
 
 resource "aws_iam_role" "bucket_replication" {
