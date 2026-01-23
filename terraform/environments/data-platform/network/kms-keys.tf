@@ -22,13 +22,13 @@ module "vpc_flow_logs_kms_key" {
           identifiers = ["logs.${data.aws_region.current.region}.amazonaws.com"]
         }
       ]
-      # conditions = [
-      #   {
-      #     test     = "ArnEquals"
-      #     variable = "kms:EncryptionContext:aws:logs:arn"
-      #     values   = ["arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:${local.vpc_flow_log_cloudwatch_log_group_name_prefix}*"]
-      #   }
-      # ]
+      condition = [
+        {
+          test     = "ArnEquals"
+          variable = "kms:EncryptionContext:aws:logs:arn"
+          values   = ["arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:${local.vpc_flow_logs_log_group_name}*"]
+        }
+      ]
     }
   ]
 
@@ -40,34 +40,6 @@ module "network_firewall_kms_key" {
 
   aliases               = ["network-firewall/${local.application_name}-${local.environment}"]
   enable_default_policy = true
-
-  key_statements = [
-    {
-      sid = "AllowCloudWatchLogs"
-      actions = [
-        "kms:Encrypt*",
-        "kms:Decrypt*",
-        "kms:ReEncrypt*",
-        "kms:GenerateDataKey*",
-        "kms:Describe*"
-      ]
-      resources = ["*"]
-      effect    = "Allow"
-      principals = [
-        {
-          type        = "Service"
-          identifiers = ["logs.${data.aws_region.current.region}.amazonaws.com"]
-        }
-      ]
-      # conditions = [
-      #   {
-      #     test     = "ArnEquals"
-      #     variable = "kms:EncryptionContext:aws:logs:arn"
-      #     values   = ["arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:${local.vpc_flow_log_cloudwatch_log_group_name_prefix}*"]
-      #   }
-      # ]
-    }
-  ]
 
   deletion_window_in_days = 7
 }
@@ -96,13 +68,16 @@ module "network_firewall_logs_kms_key" {
           identifiers = ["logs.${data.aws_region.current.region}.amazonaws.com"]
         }
       ]
-      # conditions = [
-      #   {
-      #     test     = "ArnEquals"
-      #     variable = "kms:EncryptionContext:aws:logs:arn"
-      #     values   = ["arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:${local.vpc_flow_log_cloudwatch_log_group_name_prefix}*"]
-      #   }
-      # ]
+      condition = [
+        {
+          test     = "ArnEquals"
+          variable = "kms:EncryptionContext:aws:logs:arn"
+          values = [
+            "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:${local.network_firewall_flow_log_group_name}*",
+            "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:${local.network_firewall_alerts_log_group_name}*",
+          ]
+        }
+      ]
     }
   ]
 
@@ -133,13 +108,13 @@ module "route53_resolver_logs_kms_key" {
           identifiers = ["logs.${data.aws_region.current.region}.amazonaws.com"]
         }
       ]
-      # conditions = [
-      #   {
-      #     test     = "ArnEquals"
-      #     variable = "kms:EncryptionContext:aws:logs:arn"
-      #     values   = ["arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:${local.vpc_flow_log_cloudwatch_log_group_name_prefix}*"]
-      #   }
-      # ]
+      condition = [
+        {
+          test     = "ArnEquals"
+          variable = "kms:EncryptionContext:aws:logs:arn"
+          values   = ["arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:${local.route53_resolver_log_group_name}*"]
+        }
+      ]
     }
   ]
 

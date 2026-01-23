@@ -9,10 +9,6 @@ resource "aws_route" "public_internet_gateway" {
   gateway_id             = aws_internet_gateway.main.id
 }
 
-# Public subnets should only house network load balancers and NAT gateways,
-# so they only need direct internet access via the Internet Gateway.
-# Hairpin routing through the firewall back to private/firewall subnets is unnecessary.
-
 resource "aws_route" "public_to_firewall_subnets" {
   for_each = {
     for key, value in local.subnets : value.az => value

@@ -3,6 +3,14 @@ locals {
   environment_configuration = local.environment_configurations[local.environment]
   network_configuration     = yamldecode(file("${path.module}/configuration/network.yml"))["environment"][local.environment]
 
+  /* CloudWatch Log Groups
+    - These are stored as locals so we can reference them in their KMS key modules
+  */
+  vpc_flow_logs_log_group_name           = "/aws/vpc/${local.application_name}-${local.environment}-flow"
+  network_firewall_flow_log_group_name   = "/aws/network-firewall/${local.application_name}-${local.environment}-flow"
+  network_firewall_alerts_log_group_name = "/aws/network-firewall/${local.application_name}-${local.environment}-alerts"
+  route53_resolver_log_group_name        = "/aws/route53-resolver/${local.application_name}-${local.environment}"
+
   /* Subnets
     - Build a map of subnets from the network configuration excluding unallocated AZs
       which results in:
