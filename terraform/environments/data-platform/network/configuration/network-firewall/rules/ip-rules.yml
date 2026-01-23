@@ -1,7 +1,7 @@
 ---
 # yaml-language-server: $schema=../../schema/rules/ip-rules.json
 rules:
-  - name: allow-vpc-github-ssh
+  - name: allow-home-net-github-ssh
     sid: 1
     revision: 1
     action: pass
