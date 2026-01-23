@@ -53,12 +53,7 @@ module "data_platform_access_iam_role" {
     SecretsManagerWriteAccess = {
       effect  = "Allow"
       actions = [
-        "secretsmanager:CreateSecret",
-        "secretsmanager:DeleteSecret",
-        "secretsmanager:DescribeSecret",
-        "secretsmanager:GetSecretValue",
-        "secretsmanager:PutSecretValue",
-        "secretsmanager:UpdateSecret"
+        "secretsmanager:*",
       ]
       resources = [
         /* Secrets Managed by Data Platform Access */
