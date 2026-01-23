@@ -257,17 +257,3 @@ resource "aws_lambda_event_source_mapping" "mdss_cleanup_sqs_trigger" {
     maximum_concurrency = 100
   }
 }
-
-# ----------------------------------------------
-# Load data sqs queue
-# ----------------------------------------------
-
-module "cross_account_copy_queue" {
-  count = local.is-test || local.is-production ? 1 : 0
-
-  source               = "./modules/sqs_s3_lambda_trigger"
-  bucket               = module.s3-data-bucket.bucket
-  lambda_function_name = module.cross_account_copy[0].lambda_function_name
-  bucket_prefix        = local.bucket_prefix
-  maximum_concurrency  = 100
-}
