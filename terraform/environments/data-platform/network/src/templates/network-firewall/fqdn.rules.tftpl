@@ -2,3 +2,7 @@
 %{ for rule in rules ~}
 ${rule.action} ${rule.protocol} ${rule.source_ip} ${rule.source_port} ${rule.direction} ${rule.destination_ip} ${rule.destination_port} (msg:"${rule.description}"; flow:to_server,established; ${rule.type}; content:"${rule.content}"; nocase; startswith; endswith; sid:${2000000 + rule.sid}; rev:${rule.revision};)
 %{ endfor ~}
+
+### Static ###
+drop tcp $HOME_NET any -> any 80 (msg:"DROP outbound HTTP not allowlisted"; flow:to_server,established; sid:2099998; rev:1;)
+drop tcp $HOME_NET any -> any 443 (msg:"DROP outbound HTTPS not allowlisted"; flow:to_server,established; sid:2099999; rev:1;)
