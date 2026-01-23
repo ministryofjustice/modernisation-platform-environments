@@ -219,56 +219,56 @@ resource "aws_lb_listener" "https_listener" {
 }
 
 # HTTP Listener on port 9500 for WebLogic Console and Enterprise Manager
-# resource "aws_lb_listener" "http_9500_listener" {
-#   count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+resource "aws_lb_listener" "http_9500_listener" {
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
 
-#   load_balancer_arn = module.lb_access_logs_enabled.load_balancer.arn
-#   port              = 9500
-#   protocol          = "HTTP"
+  load_balancer_arn = module.lb_access_logs_enabled.load_balancer.arn
+  port              = 9500
+  protocol          = "HTTP"
 
-#   default_action {
-#     type             = "forward"
-#     target_group_arn = aws_lb_target_group.oas_ec2_target_group[0].arn
-#   }
-# }
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.oas_ec2_target_group[0].arn
+  }
+}
 
 # Listener rule for /console on port 9500
-# resource "aws_lb_listener_rule" "console_9500_rule" {
-#   count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+resource "aws_lb_listener_rule" "console_9500_rule" {
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
 
-#   listener_arn = aws_lb_listener.http_9500_listener[0].arn
-#   priority     = 100
+  listener_arn = aws_lb_listener.http_9500_listener[0].arn
+  priority     = 100
 
-#   action {
-#     type             = "forward"
-#     target_group_arn = aws_lb_target_group.oas_ec2_target_group[0].arn
-#   }
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.oas_ec2_target_group[0].arn
+  }
 
-#   condition {
-#     path_pattern {
-#       values = ["/console*"]
-#     }
-#   }
-# }
+  condition {
+    path_pattern {
+      values = ["/console*"]
+    }
+  }
+}
 
 # Listener rule for /em on port 9500
-# resource "aws_lb_listener_rule" "em_9500_rule" {
-#   count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+resource "aws_lb_listener_rule" "em_9500_rule" {
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
 
-#   listener_arn = aws_lb_listener.http_9500_listener[0].arn
-#   priority     = 101
+  listener_arn = aws_lb_listener.http_9500_listener[0].arn
+  priority     = 101
 
-#   action {
-#     type             = "forward"
-#     target_group_arn = aws_lb_target_group.oas_ec2_target_group[0].arn
-#   }
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.oas_ec2_target_group[0].arn
+  }
 
-#   condition {
-#     path_pattern {
-#       values = ["/em*"]
-#     }
-#   }
-# }
+  condition {
+    path_pattern {
+      values = ["/em*"]
+    }
+  }
+}
 
 # HTTP Listener on port 9502 for Analytics and Data Visualization
 # resource "aws_lb_listener" "http_9502_listener" {
