@@ -52,9 +52,7 @@ module "data_platform_access_iam_role" {
     }
     SecretsManagerWriteAccess = {
       effect  = "Allow"
-      actions = [
-        "secretsmanager:*",
-      ]
+      actions = ["secretsmanager:*"] # TODO: Tighten this permission down once initial setup is complete
       resources = [
         /* Secrets Managed by Data Platform Access */
         "arn:aws:secretsmanager:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:secret:pagerduty/*" # PagerDuty
