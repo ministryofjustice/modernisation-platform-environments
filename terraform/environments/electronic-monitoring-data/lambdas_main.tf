@@ -581,3 +581,31 @@ resource "aws_scheduler_schedule" "mdss_daily_failure_digest" {
     role_arn = aws_iam_role.mdss_daily_failure_digest_scheduler.arn
   }
 }
+
+#-----------------------------------------------------------------------------------
+# Bucket replication
+#-----------------------------------------------------------------------------------
+
+module "create_batch_replication_job" {
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "create_batch_replication_job"
+  role_name                      = aws_iam_role.create_batch_replication_job.name
+  role_arn                       = aws_iam_role.create_batch_replication_job.arn
+  handler                        = "create_batch_replication_job.handler"
+  memory_size                    = 512
+  timeout                        = 120
+  reserved_concurrent_executions = 1
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+
+  security_group_ids = [aws_security_group.lambda_generic.id]
+  subnet_ids         = data.aws_subnets.shared-public.ids
+
+  environment_variables = {
+    ACCOUNT_ID = data.aws_caller_identity.current.account_id
+    BATCH_COPY_ROLE = module.s3-fms-general-landing-bucket.replication_role_arn
+    DESTINATION_ACCOUNT_SECRET_ARN = module.cross_account_details.secret_arn
+    METADATA_BUCKET_ARN = module.s3-metadata-bucket.bucket.arn
+  }
+}

@@ -5,3 +5,7 @@ output "bucket_id" {
 output "bucket_arn" {
   value = module.this-bucket.bucket.arn
 }
+
+output "replication_role_arn" {
+  value = aws_iam_role.replication_role.arn
+}
