@@ -81,7 +81,7 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
       # Logs Insights widgets
       # --------------------------
 
-      # Fatal failures only
+      # Fatal failures (retry + final)
       {
         type   = "log",
         x      = 0,
@@ -89,15 +89,15 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
         width  = 24,
         height = 8,
         properties = {
-          title  = "FATAL: load_mdss failures (per-file fatal only)"
+          title  = "FATAL: load_mdss failures (retry + final)"
           region = "eu-west-2"
           view   = "table"
           query  = <<-EOT
             SOURCE '${module.load_mdss_lambda.cloudwatch_log_group.name}'
             | filter ispresent(message.event)
-            | filter message.event = "MDSS_FILE_FAIL"
+            | filter message.event in ["MDSS_FILE_RETRY","MDSS_FILE_FAIL"]
             | filter message.error_type = "fatal"
-            | fields @timestamp, message.dataset, message.pipeline, message.table, message.s3path, message.exception_class, message.reason, message.exception_chain, @message
+            | fields @timestamp, message.event, message.dataset, message.pipeline, message.table, message.s3path, message.attempt, message.max_receive_count, message.exception_class, message.reason, message.exception_chain, @message
             | sort @timestamp desc
             | limit 200
           EOT
@@ -125,7 +125,7 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
         }
       },
 
-      #Errors by type (last 6h)
+      # Errors by type (retry vs final)
       {
         type   = "log",
         x      = 0,
@@ -133,20 +133,24 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
         width  = 12,
         height = 6,
         properties = {
-          title  = "Errors by type (last 6h)"
+          title  = "Errors by type (retry vs final)"
           region = "eu-west-2"
           view   = "table"
           query  = <<-EOT
             SOURCE '${module.load_mdss_lambda.cloudwatch_log_group.name}'
             | filter ispresent(message.event)
-            | filter message.event = "MDSS_FILE_FAIL"
-            | stats count() as n by coalesce(message.error_type, "UNKNOWN")
-            | sort n desc
+            | filter message.event in ["MDSS_FILE_RETRY","MDSS_FILE_FAIL"]
+            | stats
+                count_if(message.event="MDSS_FILE_RETRY") as retries,
+                count_if(message.event="MDSS_FILE_FAIL") as final_fails
+              by coalesce(message.error_type, "UNKNOWN")
+            | sort final_fails desc, retries desc
+            | limit 50
           EOT
         }
       },
 
-      #Errors by table
+      # Errors by table (retry vs final)
       {
         type   = "log",
         x      = 12,
@@ -154,16 +158,19 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
         width  = 12,
         height = 6,
         properties = {
-          title  = "Errors by table"
+          title  = "Errors by table (retry vs final)"
           region = "eu-west-2"
           view   = "table"
           query  = <<-EOT
             SOURCE '${module.load_mdss_lambda.cloudwatch_log_group.name}'
             | filter ispresent(message.event)
-            | filter message.event = "MDSS_FILE_FAIL"
-            | parse message.key /mdss\/(?<tbl>[^\/]+)\//
-            | stats count() as failures by coalesce(tbl, message.table, "UNKNOWN")
-            | sort failures desc
+            | filter message.event in ["MDSS_FILE_RETRY","MDSS_FILE_FAIL"]
+            | stats
+                count_if(message.event="MDSS_FILE_RETRY") as retries,
+                count_if(message.event="MDSS_FILE_FAIL") as final_fails
+              by coalesce(message.table, "UNKNOWN")
+            | sort final_fails desc, retries desc
+            | limit 50
           EOT
         }
       },
@@ -203,7 +210,7 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
         }
       },
 
-      # Failing files
+      # Failing files (final only)
       {
         type   = "log",
         x      = 0,
@@ -211,14 +218,14 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
         width  = 24,
         height = 6,
         properties = {
-          title  = "Failing files (per-file failures only)"
+          title  = "Failing files (final only)"
           region = "eu-west-2"
           view   = "table"
           query  = <<-EOT
             SOURCE '${module.load_mdss_lambda.cloudwatch_log_group.name}'
             | filter ispresent(message.event)
             | filter message.event = "MDSS_FILE_FAIL"
-            | fields @timestamp, message.error_type, message.dataset, message.pipeline, message.table, message.bucket, message.key, message.s3path, message.exception_class, message.reason, message.exception_chain
+            | fields @timestamp, message.error_type, message.dataset, message.pipeline, message.table, message.bucket, message.key, message.s3path, message.attempt, message.max_receive_count, message.exception_class, message.reason, message.exception_chain
             | sort @timestamp desc
             | limit 200
           EOT
