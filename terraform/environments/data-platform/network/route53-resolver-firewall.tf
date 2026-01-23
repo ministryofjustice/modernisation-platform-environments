@@ -9,7 +9,7 @@ locals {
 
 resource "aws_route53_resolver_firewall_config" "main" {
   resource_id        = aws_vpc.main.id
-  firewall_fail_open = "ENABLED"
+  firewall_fail_open = "DISABLED"
 }
 
 resource "aws_route53_resolver_firewall_rule_group" "aws_managed_domains" {
