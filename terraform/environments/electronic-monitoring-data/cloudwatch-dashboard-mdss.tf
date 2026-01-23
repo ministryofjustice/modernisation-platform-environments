@@ -81,7 +81,7 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
       # Logs Insights widgets
       # --------------------------
 
-      # Fatal failures (retry + final)
+      # Fatal failures (retry + final) - DEDUPED by file (s3path)
       {
         type   = "log",
         x      = 0,
@@ -89,7 +89,7 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
         width  = 24,
         height = 8,
         properties = {
-          title  = "FATAL: load_mdss failures (retry + final)"
+          title  = "FATAL: load_mdss failures (retry + final, deduped)"
           region = "eu-west-2"
           view   = "table"
           query  = <<-EOT
@@ -97,8 +97,15 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
             | filter ispresent(message.event)
             | filter message.event in ["MDSS_FILE_RETRY","MDSS_FILE_FAIL"]
             | filter message.error_type = "fatal"
-            | fields @timestamp, message.event, message.dataset, message.pipeline, message.table, message.s3path, message.attempt, message.max_receive_count, message.exception_class, message.reason, message.exception_chain, @message
-            | sort @timestamp desc
+            | stats
+                latest(@timestamp) as ts,
+                latest(message.event) as last_event,
+                max(message.attempt) as max_attempt,
+                latest(message.max_receive_count) as max_receive_count,
+                latest(message.exception_class) as exception_class,
+                latest(message.reason) as reason
+              by message.s3path, message.dataset, message.pipeline, message.table
+            | sort ts desc
             | limit 200
           EOT
         }
@@ -125,7 +132,7 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
         }
       },
 
-      # Errors by type (retry vs final)
+      # Errors by type (retry vs final) - FIXED (no count_if)
       {
         type   = "log",
         x      = 0,
@@ -141,8 +148,8 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
             | filter ispresent(message.event)
             | filter message.event in ["MDSS_FILE_RETRY","MDSS_FILE_FAIL"]
             | stats
-                count_if(message.event="MDSS_FILE_RETRY") as retries,
-                count_if(message.event="MDSS_FILE_FAIL") as final_fails
+                sum(if(message.event="MDSS_FILE_RETRY", 1, 0)) as retries,
+                sum(if(message.event="MDSS_FILE_FAIL", 1, 0)) as final_fails
               by coalesce(message.error_type, "UNKNOWN")
             | sort final_fails desc, retries desc
             | limit 50
@@ -150,7 +157,7 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
         }
       },
 
-      # Errors by table (retry vs final)
+      # Errors by table (retry vs final) - FIXED (no count_if)
       {
         type   = "log",
         x      = 12,
@@ -166,8 +173,8 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
             | filter ispresent(message.event)
             | filter message.event in ["MDSS_FILE_RETRY","MDSS_FILE_FAIL"]
             | stats
-                count_if(message.event="MDSS_FILE_RETRY") as retries,
-                count_if(message.event="MDSS_FILE_FAIL") as final_fails
+                sum(if(message.event="MDSS_FILE_RETRY", 1, 0)) as retries,
+                sum(if(message.event="MDSS_FILE_FAIL", 1, 0)) as final_fails
               by coalesce(message.table, "UNKNOWN")
             | sort final_fails desc, retries desc
             | limit 50
@@ -210,7 +217,7 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
         }
       },
 
-      # Failing files (final only)
+      # Failing files (final only) - DEDUPED by file (s3path)
       {
         type   = "log",
         x      = 0,
@@ -218,21 +225,31 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
         width  = 24,
         height = 6,
         properties = {
-          title  = "Failing files (final only)"
+          title  = "Failing files (final only, deduped)"
           region = "eu-west-2"
           view   = "table"
           query  = <<-EOT
             SOURCE '${module.load_mdss_lambda.cloudwatch_log_group.name}'
             | filter ispresent(message.event)
             | filter message.event = "MDSS_FILE_FAIL"
-            | fields @timestamp, message.error_type, message.dataset, message.pipeline, message.table, message.bucket, message.key, message.s3path, message.attempt, message.max_receive_count, message.exception_class, message.reason, message.exception_chain
-            | sort @timestamp desc
+            | stats
+                latest(@timestamp) as ts,
+                max(message.attempt) as attempt,
+                latest(message.max_receive_count) as max_receive_count,
+                latest(message.error_type) as error_type,
+                latest(message.exception_class) as exception_class,
+                latest(message.reason) as reason,
+                latest(message.exception_chain) as exception_chain,
+                latest(message.bucket) as bucket,
+                latest(message.key) as key
+              by message.s3path, message.dataset, message.pipeline, message.table
+            | sort ts desc
             | limit 200
           EOT
         }
       },
 
-      # Retries (transient)
+      # Retries (transient) - DEDUPED by file (s3path)
       {
         type   = "log",
         x      = 0,
@@ -240,15 +257,22 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
         width  = 24,
         height = 6,
         properties = {
-          title  = "Retries: load_mdss (transient failures)"
+          title  = "Retries: load_mdss (transient, deduped)"
           region = "eu-west-2"
           view   = "table"
           query  = <<-EOT
             SOURCE '${module.load_mdss_lambda.cloudwatch_log_group.name}'
             | filter ispresent(message.event)
             | filter message.event = "MDSS_FILE_RETRY"
-            | fields @timestamp, message.error_type, message.table, message.s3path, message.attempt, message.max_receive_count, message.exception_class, message.reason
-            | sort @timestamp desc
+            | stats
+                latest(@timestamp) as ts,
+                max(message.attempt) as attempt,
+                latest(message.max_receive_count) as max_receive_count,
+                latest(message.error_type) as error_type,
+                latest(message.exception_class) as exception_class,
+                latest(message.reason) as reason
+              by message.s3path, message.table
+            | sort ts desc
             | limit 200
           EOT
         }
