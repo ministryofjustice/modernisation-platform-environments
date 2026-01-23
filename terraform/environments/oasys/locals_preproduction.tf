@@ -32,6 +32,19 @@ locals {
           description = "cert for oasys preproduction domains"
         }
       }
+      pp_oasys_cert_v2 = {
+        cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
+        domain_name                         = "pp.oasys.service.justice.gov.uk"
+        external_validation_records_created = true
+        subject_alternate_names = [
+          "pp-int.oasys.service.justice.gov.uk",
+          "pp-oasys.az.justice.gov.uk",
+          "*.pp-oasys.az.justice.gov.uk",
+        ]
+        tags = {
+          description = "cert for oasys preproduction domains"
+        }
+      }      
     }
 
     cloudwatch_dashboards = {
@@ -318,6 +331,14 @@ locals {
         records = [
           { name = "db.pp.oasys", type = "CNAME", ttl = "3600", records = ["pp-oasys-db-a.oasys.hmpps-preproduction.modernisation-platform.internal"] },
           { name = "db.pp.onr", type = "CNAME", ttl = "3600", records = ["pp-onr-db-a.oasys.hmpps-preproduction.modernisation-platform.internal"] },
+        ]
+      }
+      "pp-oasys.az.justice.gov.uk" = {
+        records = [
+          { name = "onr", type = "A", ttl = "3600", records = ["10.40.40.210"] }
+        ]
+        lb_alias_records = [
+          { name = "", type = "A", lbs_map_key = "private" }
         ]
       }
     }
