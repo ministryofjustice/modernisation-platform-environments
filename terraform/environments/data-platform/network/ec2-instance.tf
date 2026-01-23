@@ -9,20 +9,8 @@ module "debug_instance" {
   instance_type = "t4g.micro"
 
   security_group_egress_rules = {
-    vpc-endpoints = {
-      description = "Allow outbound traffic to VPC endpoints"
-      cidr_ipv4   = aws_vpc.main.cidr_block
-      from_port   = 443
-    }
-    internet-https = {
-      description = "Allow outbound HTTPS traffic to the internet"
-      cidr_ipv4   = "0.0.0.0/0"
-      from_port   = 443
-      to_port     = 443
-      ip_protocol = "tcp"
-    }
     internet-all = {
-      description = "Allow all outbound traffic to the internet"
+      description = "Allow EVERYTHING"
       cidr_ipv4   = "0.0.0.0/0"
       from_port   = 0
       to_port     = 65535
