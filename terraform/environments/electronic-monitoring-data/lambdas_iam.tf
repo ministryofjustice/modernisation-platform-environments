@@ -1401,7 +1401,7 @@ data "aws_iam_policy_document" "bucket_replication_policy" {
     actions = [
       "secretsmanager:GetSecretValue"
     ]
-    resources = [module.cross_account_details.secret_arn]
+    resources = [module.cross_account_details[0].secret_arn]
   }
 }
 

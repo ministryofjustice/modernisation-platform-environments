@@ -605,7 +605,7 @@ module "create_fms_general_batch_replication_job" {
   environment_variables = {
     ACCOUNT_ID = data.aws_caller_identity.current.account_id
     BATCH_COPY_ROLE = module.s3-fms-general-landing-bucket.replication_role_arn
-    DESTINATION_ACCOUNT_SECRET_ARN = module.cross_account_details.secret_arn
+    DESTINATION_ACCOUNT_SECRET_ARN = module.cross_account_details[0].secret_arn
     METADATA_BUCKET_ARN = module.s3-metadata-bucket.bucket.arn
   }
 }
