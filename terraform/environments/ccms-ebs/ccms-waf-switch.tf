@@ -17,7 +17,7 @@ data "archive_file" "waf_toggle_zip" {
   output_path = "${path.module}/lambda/waf_lambda_function.zip"
 }
 
-data "archive_file" "maintenance_zip" {
+data "archive_file" "waf_maintenance_zip" {
   type        = "zip"
   source_file = "${path.module}/lambda/waf_maintenance/lambda_function.py"
   output_path = "${path.module}/lambda/waf_maintenance/maintenance_lambda_function.zip"
@@ -93,11 +93,11 @@ EOT
   }
 }
 
-resource "aws_lambda_function" "maintenance" {
-  function_name    = "waf-toggle-${local.environment}"
+resource "aws_lambda_function" "waf_maintenance" {
+  function_name    = "waf-maintenance-${local.environment}"
   role             = aws_iam_role.waf_lambda_role.arn
-  filename         = data.archive_file.maintenance_zip.output_path
-  source_code_hash = data.archive_file.maintenance_zip.output_base64sha256
+  filename         = data.archive_file.waf_maintenance_zip.output_path
+  source_code_hash = data.archive_file.waf_maintenance_zip.output_base64sha256
   handler          = "lambda_function.lambda_handler"
   runtime          = "python3.13"
   timeout          = 30
