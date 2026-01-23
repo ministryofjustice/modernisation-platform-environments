@@ -25,7 +25,17 @@ locals {
     }
   ]...)
 
-  /* Firewall rules */
+  /* Firewall rules
+    - To debug these rules, you need to:
+      1. cd terraform/environments/data-platform/network
+      2. aws-sso login
+      3. aws-sso exec --profile data-platform-${STAGE:-"development"}:platform-engineer-admin
+      4. terraform init
+      5. terraform workspace select ${AWS_SSO_PROFILE%%:*}
+      6. terraform console
+      7. templatefile("src/templates/network-firewall/ip.rules.tftpl", { rules = local.network_firewall_rules.ip.rules })
+      8. templatefile("src/templates/network-firewall/fqdn.rules.tftpl", { rules = local.network_firewall_rules.fqdn.rules })
+  */
   network_firewall_rules = {
     fqdn = yamldecode(file("${path.module}/configuration/network-firewall/rules/fqdn-rules.yml"))
     ip   = yamldecode(file("${path.module}/configuration/network-firewall/rules/ip-rules.yml"))

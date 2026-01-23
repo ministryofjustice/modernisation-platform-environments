@@ -55,7 +55,7 @@
             "type": "string",
             "minLength": 1,
             "description": "Source IP selector",
-            "examples": ["$VPC", "any"]
+            "examples": ["$HOME_NET", "any"]
           },
           "source_port": {
             "description": "Source port. Use 'any' or a single port number (0-65535)",

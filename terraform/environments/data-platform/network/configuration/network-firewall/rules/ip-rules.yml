@@ -6,7 +6,7 @@ rules:
     revision: 1
     action: pass
     protocol: tcp
-    source_ip: $VPC
+    source_ip: $HOME_NET
     source_port: any
     direction: ->
     destination_ip: $GITHUB_GIT

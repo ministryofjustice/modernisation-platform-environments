@@ -113,7 +113,7 @@ resource "aws_networkfirewall_rule_group" "strict_ip" {
   rule_group {
     rule_variables {
       ip_sets {
-        key = "VPC"
+        key = "HOME_NET"
         ip_set {
           definition = [local.network_configuration.vpc.cidr_block]
         }
@@ -149,7 +149,7 @@ resource "aws_networkfirewall_rule_group" "strict_fqdn" {
   rule_group {
     rule_variables {
       ip_sets {
-        key = "VPC"
+        key = "HOME_NET"
         ip_set {
           definition = [local.network_configuration.vpc.cidr_block]
         }

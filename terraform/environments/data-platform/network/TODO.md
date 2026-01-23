@@ -7,3 +7,5 @@
 - [ ] Replace module refernces with pinned git tags
 - [ ] Review logging KMS keys conditions
 - [ ] Flow monitoring
+- [ ] Fix permissions for R53 resolver logging association
+- [ ] Review routes public_to_firewall_subnets public_to_private_subnets

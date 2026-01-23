@@ -1,3 +1,10 @@
+data "aws_route53_resolver_query_log_config" "core_logging_s3" {
+  filter {
+    name   = "Name"
+    values = ["core-logging-rlq-s3"]
+  }
+}
+
 data "aws_vpc_endpoint" "network_firewall" {
   for_each = {
     for key, value in local.subnets : value.az => value

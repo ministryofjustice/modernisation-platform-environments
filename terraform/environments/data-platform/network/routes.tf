@@ -13,31 +13,31 @@ resource "aws_route" "public_internet_gateway" {
 # so they only need direct internet access via the Internet Gateway.
 # Hairpin routing through the firewall back to private/firewall subnets is unnecessary.
 
-# resource "aws_route" "public_to_firewall_subnets" {
-#   for_each = {
-#     for key, value in local.subnets : value.az => value
-#     if value.type == "public"
-#   }
-#
-#   route_table_id         = aws_route_table.main["public-${each.key}"].id
-#   destination_cidr_block = aws_subnet.main["firewall-${each.key}"].cidr_block
-#   vpc_endpoint_id        = data.aws_vpc_endpoint.network_firewall[each.key].id
-#
-#   depends_on = [aws_networkfirewall_firewall.main]
-# }
+resource "aws_route" "public_to_firewall_subnets" {
+  for_each = {
+    for key, value in local.subnets : value.az => value
+    if value.type == "public"
+  }
 
-# resource "aws_route" "public_to_private_subnets" {
-#   for_each = {
-#     for key, value in local.subnets : value.az => value
-#     if value.type == "public"
-#   }
-#
-#   route_table_id         = aws_route_table.main["public-${each.key}"].id
-#   destination_cidr_block = aws_subnet.main["private-${each.key}"].cidr_block
-#   vpc_endpoint_id        = data.aws_vpc_endpoint.network_firewall[each.key].id
-#
-#   depends_on = [aws_networkfirewall_firewall.main]
-# }
+  route_table_id         = aws_route_table.main["public-${each.key}"].id
+  destination_cidr_block = aws_subnet.main["firewall-${each.key}"].cidr_block
+  vpc_endpoint_id        = data.aws_vpc_endpoint.network_firewall[each.key].id
+
+  depends_on = [aws_networkfirewall_firewall.main]
+}
+
+resource "aws_route" "public_to_private_subnets" {
+  for_each = {
+    for key, value in local.subnets : value.az => value
+    if value.type == "public"
+  }
+
+  route_table_id         = aws_route_table.main["public-${each.key}"].id
+  destination_cidr_block = aws_subnet.main["private-${each.key}"].cidr_block
+  vpc_endpoint_id        = data.aws_vpc_endpoint.network_firewall[each.key].id
+
+  depends_on = [aws_networkfirewall_firewall.main]
+}
 
 resource "aws_route" "firewall_nat_gateway" {
   for_each = {
