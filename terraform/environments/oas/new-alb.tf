@@ -412,7 +412,7 @@ resource "aws_lb_listener_rule" "bi_security_login_https_rule" {
   }
 
   condition {
-    path_pattern {g
+    path_pattern {
       values = ["/bi-security-login*"]
     }
   }
