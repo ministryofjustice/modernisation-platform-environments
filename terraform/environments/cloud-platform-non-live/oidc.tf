@@ -188,7 +188,7 @@ data "aws_iam_policy_document" "github_actions_development_cluster_oidc_policy" 
     sid    = "EventBridgeAccess"
     effect = "Allow"
     actions = [
-      "events:*",
+      "events:*"
     ]
     resources = ["*"]
   }
