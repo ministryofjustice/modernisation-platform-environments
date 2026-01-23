@@ -912,6 +912,8 @@ data "aws_iam_policy_document" "load_fms_lambda_role_policy_document" {
     actions = [
       "s3:GetObjectAttributes",
       "s3:GetObject",
+      "s3:GetObjectTagging",
+      "s3:PutObject",
     ]
     resources = [
       "${module.s3-raw-formatted-data-bucket.bucket.arn}/serco/fms/*"
