@@ -347,7 +347,7 @@ resource "aws_lb_listener_rule" "em_https_rule" {
   count = contains(["test", "preproduction"], local.environment) ? 1 : 0
 
   listener_arn = aws_lb_listener.https_listener[0].arn
-  priority     = 101
+  priority     = 110
 
   action {
     type             = "forward"
@@ -385,7 +385,7 @@ resource "aws_lb_listener_rule" "dv_https_rule" {
   count = contains(["test", "preproduction"], local.environment) ? 1 : 0
 
   listener_arn = aws_lb_listener.https_listener[0].arn
-  priority     = 201
+  priority     = 210
 
   action {
     type             = "forward"
@@ -395,6 +395,25 @@ resource "aws_lb_listener_rule" "dv_https_rule" {
   condition {
     path_pattern {
       values = ["/dv*"]
+    }
+  }
+}
+
+# Listener rule for //bi-security-login on HTTPS
+resource "aws_lb_listener_rule" "/bi_security_login_https_rule" {
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+
+  listener_arn = aws_lb_listener.https_listener[0].arn
+  priority     = 220
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/bi-security-login*"]
     }
   }
 }
