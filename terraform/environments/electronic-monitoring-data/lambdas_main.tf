@@ -2,7 +2,7 @@ locals {
   lambda_path                 = "lambdas"
   env_name                    = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
   db_name                     = local.is-production ? "g4s_cap_dw" : "test"
-  load_sqs_max_receive_count  = 5
+  load_sqs_max_receive_count  = 2
 }
 
 
