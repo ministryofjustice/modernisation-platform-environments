@@ -32,15 +32,15 @@ resource "aws_iam_policy" "bedrock_claude_policy" {
         ]
       },
       {
-        Sid    = "BedrockGlobalInferenceProfile",
+        Sid    = "BedrockEUInferenceProfile",
         Effect = "Allow",
         Action = [
           "bedrock:InvokeModel",
           "bedrock:InvokeModelWithResponseStream"
         ],
         Resource = [
-          # Global inference profile for Opus 4.5 (from eu-west-1)
-          "arn:aws:bedrock:eu-west-1:313941174580:inference-profile/global.anthropic.claude-opus-4-5-20251101-v1:0"
+          # EU inference profile for Opus 4.5 (routes only within EU regions)
+          "arn:aws:bedrock:eu-west-1:313941174580:inference-profile/eu.anthropic.claude-opus-4-5-20251101-v1:0"
         ]
       },
       {
