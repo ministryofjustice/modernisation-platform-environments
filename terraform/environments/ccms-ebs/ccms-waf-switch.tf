@@ -19,8 +19,8 @@ data "archive_file" "waf_toggle_zip" {
 
 data "archive_file" "maintenance_zip" {
   type        = "zip"
-  source_file = "${path.module}/lambda/maintenance_announcements/lambda_function.py"
-  output_path = "${path.module}/lambda/maintenance_announcements/maintenance_lambda_function.zip"
+  source_file = "${path.module}/lambda/waf_maintenance/lambda_function.py"
+  output_path = "${path.module}/lambda/waf_maintenance/maintenance_lambda_function.zip"
 }
 
 # Pull an existing WAF Rule Group and rules using a dynamic name.
