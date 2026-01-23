@@ -473,7 +473,12 @@ def lambda_handler(event, context):
 
         if not source:
             # Default to CloudWatch if nothing else matches
-            source = "aws.cloudwatch"
+            # source = "aws.cloudwatch"
+            logger.warning(
+                    "Source not detected and payload does not look like a CloudWatch Alarm; skipping notification."
+                )
+            return {"statusCode": 200, "body": {"message": "No valid source detected; skipping notification."}
+            }
 
         logger.info("source:" + str(source))
 
