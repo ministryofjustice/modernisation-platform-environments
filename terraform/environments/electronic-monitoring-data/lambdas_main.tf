@@ -586,7 +586,7 @@ resource "aws_scheduler_schedule" "mdss_daily_failure_digest" {
 # Bucket replication
 #-----------------------------------------------------------------------------------
 
-module "create_batch_replication_job" {
+module "create_fms_general_batch_replication_job" {
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "create_batch_replication_job"
