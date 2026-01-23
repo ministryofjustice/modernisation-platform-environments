@@ -1,7 +1,6 @@
 // EC2 Instance for debugging purposes
 module "debug_instance" {
-  source  = "terraform-aws-modules/ec2-instance/aws"
-  version = "6.2.0"
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance.git?ref=5e1825205b85a4fb9d10d90225e5d4d28428f49f" # v6.2.0
 
   name = "debug-instance"
 

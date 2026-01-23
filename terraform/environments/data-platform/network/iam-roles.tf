@@ -1,6 +1,5 @@
 module "vpc_flow_logs_iam_role" {
-  source  = "terraform-aws-modules/iam/aws//modules/iam-role"
-  version = "6.3.0"
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role?ref=581bec52db8ad843eeb8e6ae1103aaeec9787c41" # v6.3.0
 
   name            = "${local.application_name}-${local.environment}-vpc-flow-logs"
   use_name_prefix = false
