@@ -1427,7 +1427,7 @@ data "aws_iam_policy_document" "bucket_replication_policy" {
       "s3:GetObject",
       "s3:PutObject"
     ]
-    resources = [module.s3-metadata-bucket.bucjet,]
+    resources = [module.s3-metadata-bucket.bucket.arn]
   }
 }
 
