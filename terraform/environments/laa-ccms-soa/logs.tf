@@ -188,12 +188,12 @@ resource "aws_cloudwatch_log_metric_filter" "soa_custom_check_jdbc_ebssms_state"
 }
 
 resource "aws_cloudwatch_log_metric_filter" "soa_custom_check_jdbc_failed_reserve_request_count" {
-  name           = "SOACustomCheckJDBCebsState"
+  name           = "SOACustomCheckJDBCFailedReserveRequestCount"
   pattern        = "\"<Local Script Error>\" \"JDBC datasource failedReserveRequestCount\""
   log_group_name = aws_cloudwatch_log_group.log_group_managed.name
 
   metric_transformation {
-    name      = "SOACustomCheckJDBCebsState"
+    name      = "SOACustomCheckJDBCFailedReserveRequestCount"
     namespace = "CCMS-SOA-APP"
     value     = "1"
   }
