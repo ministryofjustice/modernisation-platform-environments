@@ -1364,3 +1364,87 @@ resource "aws_iam_role_policy_attachment" "mdss_daily_failure_digest_attach" {
   role       = aws_iam_role.mdss_daily_failure_digest.name
   policy_arn = aws_iam_policy.mdss_daily_failure_digest.arn
 }
+
+
+
+#-----------------------------------------------------------------------------------
+# Bucket replication
+#-----------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "bucket_replication_policy" {
+  count = local.is-development || local.is-preproduction ? 0 : 1
+  statement {
+    sid    = "S3BucketReplication"
+    effect = "Allow"
+    actions = [
+      "s3:CreateJob",
+    ]
+    resources = ["*"]
+  }
+  statement {
+    sid = "GetInventoryConfig"
+    effect = "Allow"
+    actions = [
+      "s3:GetInventoryConfiguration"
+    ]
+    resources = [
+      module.s3-fms-general-landing-bucket.bucket_arn,
+      module.s3-fms-ho-landing-bucket.bucket_arn,
+      module.s3-fms-specials-landing-bucket.bucket_arn,
+      module.s3-mdss-general-landing-bucket.bucket_arn,
+      module.s3-mdss-ho-landing-bucket.bucket_arn,
+      module.s3-mdss-specials-landing-bucket.bucket_arn,
+    ]
+  }
+
+  statement {
+    sid    = "AllowRolePass"
+    effect = "Allow"
+    actions = [
+      "iam:PassRole",
+    ]
+    resources = [
+      module.s3-fms-general-landing-bucket.replication_role_arn,
+      module.s3-fms-ho-landing-bucket.replication_role_arn,
+      module.s3-fms-specials-landing-bucket.replication_role_arn,
+      module.s3-mdss-general-landing-bucket.replication_role_arn,
+      module.s3-mdss-ho-landing-bucket.replication_role_arn,
+      module.s3-mdss-specials-landing-bucket.replication_role_arn,
+    ]
+  }
+  statement {
+    sid     = "SecretAccountDetails"
+    effect  = "Allow"
+    actions = [
+      "secretsmanager:GetSecretValue"
+    ]
+    resources = [module.cross_account_details[0].secret_arn]
+  }
+  statement {
+    sid = "MetadataBucket"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject"
+    ]
+    resources = [module.s3-metadata-bucket.bucket.arn]
+  }
+}
+
+resource "aws_iam_role" "bucket_replication" {
+  count = local.is-development || local.is-preproduction ? 0 : 1
+  name               = "bucket_replication_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_policy" "bucket_replication" {
+  count = local.is-development || local.is-preproduction ? 0 : 1
+  name   = "bucket_replication_lambda_role_policy"
+  policy = data.aws_iam_policy_document.bucket_replication_policy[0].json
+}
+
+resource "aws_iam_role_policy_attachment" "bucket_replication_attach" {
+  count = local.is-development || local.is-preproduction ? 0 : 1
+  role       = aws_iam_role.bucket_replication[0].name
+  policy_arn = aws_iam_policy.bucket_replication[0].arn
+}

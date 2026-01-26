@@ -29,7 +29,7 @@ locals {
       effect = "Allow"
       principals = {
         type        = "AWS"
-        identifiers = ["arn:aws:iam::${var.cross_account_id}:role/AWSS3BucketReplication"]
+        identifiers = ["arn:aws:iam::${var.cross_account_id}:role/AWSS3BucketReplication${var.data_feed}${var.order_type}"]
       }
       actions = [
         "s3:ReplicateObject",
@@ -54,7 +54,7 @@ locals {
   kms_grants = var.cross_account ? merge(
     {
       cross_account_access = {
-        grantee_principal = nonsensitive("arn:aws:iam::${var.cross_account_id}:role/AWSS3BucketReplication")
+        grantee_principal = nonsensitive("arn:aws:iam::${var.cross_account_id}:role/AWSS3BucketReplication${var.data_feed}${var.order_type}")
         operations = [
           "Encrypt",
           "GenerateDataKey",
@@ -153,7 +153,7 @@ module "kms_key" {
         {
           type = "AWS"
           identifiers = [
-            "arn:aws:iam::${var.cross_account_id}:role/AWSS3BucketReplication"
+            "arn:aws:iam::${var.cross_account_id}:role/AWSS3BucketReplication${var.data_feed}${var.order_type}"
           ]
         }
       ]
