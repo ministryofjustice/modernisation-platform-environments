@@ -177,11 +177,11 @@ data "aws_iam_policy_document" "s3_topic_policy" {
         module.s3-bucket.bucket.arn,
         module.s3-bucket-logging.bucket.arn,
         module.s3-bucket-dbbackup.bucket.arn,
-      ],
-      [  
-        for name, b in aws_s3_bucket.buckets :  
-        b.arn if name == "laa-ccms-inbound-${local.environment}-mp"
-        ])
+        ],
+        [
+          for name, b in aws_s3_bucket.buckets :
+          b.arn if name == "laa-ccms-inbound-${local.environment}-mp"
+      ])
     }
   }
 }

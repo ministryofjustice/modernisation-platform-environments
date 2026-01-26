@@ -80,7 +80,7 @@ variable "cross_account_id" {
 
 variable "replication_details" {
   description = "kms key and name of bucket to replicate data to"
-  type        = object({
+  type = object({
     fms_general_bucket   = optional(string)
     fms_general_kms_id   = optional(string)
     fms_ho_bucket        = optional(string)
@@ -95,6 +95,6 @@ variable "replication_details" {
     mdss_ho_kms_id       = optional(string)
     account_id           = optional(string)
   })
-  default     = null
-  nullable    = true
+  default  = null
+  nullable = true
 }
