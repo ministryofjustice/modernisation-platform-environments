@@ -1453,8 +1453,8 @@ data "aws_iam_policy_document" "iceberg_table_maintenance_iam_role_policy_docume
     ]
     resources = [
       "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:catalog",
-      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:database/intermediate_tasking",
-      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/intermediate_tasking/tbl_answers"
+      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:database/g4s_tasking",
+      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/g4s_tasking/tbl_answers"
     ]
   }
 
@@ -1468,11 +1468,12 @@ data "aws_iam_policy_document" "iceberg_table_maintenance_iam_role_policy_docume
       "s3:ListBucket"
     ]
     resources = [
-      "arn:aws:s3:::emds-prod-cadt",
-      "arn:aws:s3:::emds-prod-cadt/prod/data/prod/models/domain_name=historic/database_name=intermediate_tasking/table_name=tbl_answers/*",
+      "arn:aws:s3:::emds-preprod-cadt",
+      "arn:aws:s3:::emds-preprod-cadt/staging/g4s_tasking_pipeline/g4s_tasking/tbl_answers/*",
     ]
   }
 }
+
 
 resource "aws_iam_role" "iceberg_table_maintenance_iam_role" {
   count              = local.is-development || local.is-preproduction ? 1 : 0
