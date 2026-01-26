@@ -1,4 +1,16 @@
 locals {
+  /*  To debug these, you need to:
+      1. cd terraform/environments/data-platform/network
+      2. aws-sso login
+      3. aws-sso exec --profile data-platform-${STAGE:-"development"}:platform-engineer-admin
+      4. terraform init
+      5. terraform workspace select ${AWS_SSO_PROFILE%%:*}
+      6. terraform console
+      7. Type the local you want to debug, e.g. local.subnets
+
+      If you make changes, you need to exit the console and re-run from step 6
+  */
+
   /* Configurations */
   environment_configuration = local.environment_configurations[local.environment]
   network_configuration     = yamldecode(file("${path.module}/configuration/network.yml"))["environment"][local.environment]
@@ -33,17 +45,32 @@ locals {
     }
   ]...)
 
-  /* Firewall rules
-    - To debug these rules, you need to:
-      1. cd terraform/environments/data-platform/network
-      2. aws-sso login
-      3. aws-sso exec --profile data-platform-${STAGE:-"development"}:platform-engineer-admin
-      4. terraform init
-      5. terraform workspace select ${AWS_SSO_PROFILE%%:*}
-      6. terraform console
-      7. templatefile("src/templates/network-firewall/ip.rules.tftpl", { rules = local.network_firewall_rules.ip.rules })
-      8. templatefile("src/templates/network-firewall/fqdn.rules.tftpl", { rules = local.network_firewall_rules.fqdn.rules })
+  /* Additional CIDR Subnets
+    - Similar to above but for any additional CIDR blocks defined in the VPC
+      which results in:
+        {
+          "transit_gateway-attachments-a" = {
+            "az"         = "a"
+            block_name  = "transit-gateway"
+            "cidr_block" = "192.168.255.0/28"
+            "type"       = "attachments"
+        }
   */
+  additional_cidr_subnets = merge([
+    for block_name, block_config in try(local.network_configuration.vpc.additional_cidr_blocks, {}) : merge([
+      for subnet_type, azs in block_config.subnets : {
+        for az, cidr in azs :
+        "${block_name}-${subnet_type}-${az}" => {
+          cidr_block = cidr
+          type       = subnet_type
+          az         = trimprefix(az, "az")
+          block_name = replace(block_name, "_", "-")
+        }
+      }
+    ]...)
+  ]...)
+
+  /* Network Firewall Rules */
   network_firewall_rules = {
     fqdn = yamldecode(file("${path.module}/configuration/network-firewall/rules/fqdn-rules.yml"))
     ip   = yamldecode(file("${path.module}/configuration/network-firewall/rules/ip-rules.yml"))

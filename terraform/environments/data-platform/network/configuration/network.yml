@@ -11,6 +11,15 @@ environment:
   development:
     vpc:
       cidr_block: 10.199.128.0/19 # 10.199.128.0 - 10.199.159.255 (8190)
+      additional_cidr_blocks:
+        transit_gateway:
+            cidr_block: 100.64.255.0/24
+            subnets:
+              attachments:
+                a: 100.64.255.0/28
+                b: 100.64.255.16/28
+                c: 100.64.255.32/28
+                # unallocated: 100.64.255.48/28
       subnets:
         data: # 10.199.128.0/23 | 10.199.128.0 - 10.199.129.255 (510)
           a: 10.199.128.0/25 # 10.199.128.0  - 10.199.128.127 (126)

@@ -21,3 +21,15 @@ data "aws_vpc_endpoint" "network_firewall" {
 }
 
 data "github_ip_ranges" "main" {}
+
+data "aws_ec2_transit_gateway" "moj_tgw" {
+  filter {
+    name = "owner-id"
+    values = ["037161842252"]
+  }
+
+  filter {
+    name   = "state"
+    values = ["available"]
+  }
+}

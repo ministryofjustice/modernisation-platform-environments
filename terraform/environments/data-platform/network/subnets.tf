@@ -9,3 +9,15 @@ resource "aws_subnet" "main" {
     Name = "${local.application_name}-${local.environment}-${each.value.type}-${each.value.az}"
   }
 }
+
+resource "aws_subnet" "additional" {
+  for_each = local.additional_cidr_subnets
+
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = each.value.cidr_block
+  availability_zone = "${data.aws_region.current.region}${each.value.az}"
+
+  tags = {
+    Name = "${local.application_name}-${local.environment}-${each.value.block_name}-${each.value.type}-${each.value.az}"
+  }
+}
