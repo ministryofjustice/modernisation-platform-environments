@@ -587,11 +587,13 @@ resource "aws_scheduler_schedule" "mdss_daily_failure_digest" {
 #-----------------------------------------------------------------------------------
 
 module "create_fms_general_batch_replication_job" {
+  count = local.is-development || local.is-preproduction ? 0 : 1
+
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "create_batch_replication_job"
-  role_name                      = aws_iam_role.bucket_replication.name
-  role_arn                       = aws_iam_role.bucket_replication.arn
+  role_name                      = aws_iam_role.bucket_replication[0].name
+  role_arn                       = aws_iam_role.bucket_replication[0].arn
   handler                        = "create_batch_replication_job.handler"
   memory_size                    = 512
   timeout                        = 120

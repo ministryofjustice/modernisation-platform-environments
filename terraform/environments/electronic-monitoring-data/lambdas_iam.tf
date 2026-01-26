@@ -1372,6 +1372,7 @@ resource "aws_iam_role_policy_attachment" "mdss_daily_failure_digest_attach" {
 #-----------------------------------------------------------------------------------
 
 data "aws_iam_policy_document" "bucket_replication_policy" {
+  count = local.is-development || local.is-preproduction ? 0 : 1
   statement {
     sid    = "S3BucketReplication"
     effect = "Allow"
@@ -1406,16 +1407,19 @@ data "aws_iam_policy_document" "bucket_replication_policy" {
 }
 
 resource "aws_iam_role" "bucket_replication" {
+  count = local.is-development ? 0 : 1
   name               = "bucket_replication_lambda_role"
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
 }
 
 resource "aws_iam_policy" "bucket_replication" {
+  count = local.is-development ? 0 : 1
   name   = "bucket_replication_lambda_role_policy"
-  policy = data.aws_iam_policy_document.bucket_replication_policy.json
+  policy = data.aws_iam_policy_document.bucket_replication_policy[0].json
 }
 
 resource "aws_iam_role_policy_attachment" "bucket_replication_attach" {
-  role       = aws_iam_role.bucket_replication.name
-  policy_arn = aws_iam_policy.bucket_replication.arn
+  count = local.is-development ? 0 : 1
+  role       = aws_iam_role.bucket_replication[0].name
+  policy_arn = aws_iam_policy.bucket_replication[0].arn
 }
