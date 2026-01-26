@@ -1388,12 +1388,12 @@ data "aws_iam_policy_document" "bucket_replication_policy" {
       "s3:GetInventoryConfiguration"
     ]
     resources = [
-      module.s3-fms-general-landing-bucket.bucket.arn,
-      module.s3-fms-ho-landing-bucket.bucket.arn,
-      module.s3-fms-specials-landing-bucket.bucket.arn,
-      module.s3-mdss-general-landing-bucket.bucket.arn,
-      module.s3-mdss-ho-landing-bucket.bucket.arn,
-      module.s3-mdss-specials-landing-bucket.bucket.arn,
+      module.s3-fms-general-landing-bucket.bucket_arn,
+      module.s3-fms-ho-landing-bucket.bucket_arn,
+      module.s3-fms-specials-landing-bucket.bucket_arn,
+      module.s3-mdss-general-landing-bucket.bucket_arn,
+      module.s3-mdss-ho-landing-bucket.bucket_arn,
+      module.s3-mdss-specials-landing-bucket.bucket_arn,
     ]
   }
 
