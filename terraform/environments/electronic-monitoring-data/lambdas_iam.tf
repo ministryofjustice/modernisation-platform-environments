@@ -1389,6 +1389,7 @@ data "aws_iam_policy_document" "bucket_replication_policy" {
       "iam:PassRole",
     ]
     resources = [
+      module.s3-fms-general-landing-bucket.replication_role_arn,
       module.s3-fms-ho-landing-bucket.replication_role_arn,
       module.s3-fms-specials-landing-bucket.replication_role_arn,
       module.s3-mdss-general-landing-bucket.replication_role_arn,
