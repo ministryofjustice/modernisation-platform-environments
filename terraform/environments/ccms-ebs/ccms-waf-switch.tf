@@ -108,8 +108,8 @@ resource "aws_lambda_function" "waf_maintenance" {
       WEB_ACL_ID       = data.aws_wafv2_web_acl.waf_web_acl.id
       RULE_NAME        = var.rule_name
       CUSTOM_BODY_NAME = "maintenance_html"
-      TIME_FROM        = "21:30"  # Optional - these are the defaults
-      TIME_TO          = "07:00"  # Optional - these are the defaults
+      TIME_FROM        = "17:15"  # Optional - these are the defaults
+      TIME_TO          = "23:45"  # Optional - these are the defaults
     }
   }
 }
