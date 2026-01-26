@@ -725,7 +725,7 @@ module "s3-mdss-general-landing-bucket" {
   security_group_ids        = [aws_security_group.lambda_generic.id]
   cross_account             = local.is-development || local.is-preproduction
   cross_account_id          = local.is-development || local.is-preproduction ? local.environment_management.account_ids["electronic-monitoring-data-${local.cross_account_recieve_mapping}"] : null
-  replication_details      = local.is-test || local.is-production ? jsondecode(data.aws_secretsmanager_secret_version.account_details[0].secret_string) : null
+  replication_details       = local.is-test || local.is-production ? jsondecode(data.aws_secretsmanager_secret_version.account_details[0].secret_string) : null
 
   providers = {
     aws = aws
@@ -749,7 +749,7 @@ module "s3-mdss-ho-landing-bucket" {
   subnet_ids                = data.aws_subnets.shared-public.ids
   cross_account             = local.is-development || local.is-preproduction
   cross_account_id          = local.is-development || local.is-preproduction ? local.environment_management.account_ids["electronic-monitoring-data-${local.cross_account_recieve_mapping}"] : null
-  replication_details      = local.is-test || local.is-production ? jsondecode(data.aws_secretsmanager_secret_version.account_details[0].secret_string) : null
+  replication_details       = local.is-test || local.is-production ? jsondecode(data.aws_secretsmanager_secret_version.account_details[0].secret_string) : null
 
   providers = {
     aws = aws
@@ -773,7 +773,7 @@ module "s3-mdss-specials-landing-bucket" {
   subnet_ids                = data.aws_subnets.shared-public.ids
   cross_account             = local.is-development || local.is-preproduction
   cross_account_id          = local.is-development || local.is-preproduction ? local.environment_management.account_ids["electronic-monitoring-data-${local.cross_account_recieve_mapping}"] : null
-  replication_details      = local.is-test || local.is-production ? jsondecode(data.aws_secretsmanager_secret_version.account_details[0].secret_string) : null
+  replication_details       = local.is-test || local.is-production ? jsondecode(data.aws_secretsmanager_secret_version.account_details[0].secret_string) : null
 
   providers = {
     aws = aws

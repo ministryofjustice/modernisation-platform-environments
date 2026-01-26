@@ -145,13 +145,13 @@ module "kms_key" {
   # Give full access to key for root account, and lambda role ability to use.
   enable_default_policy = true
   key_users             = local.kms_key_users
-  key_statements        = var.cross_account ? [
+  key_statements = var.cross_account ? [
     {
       sid    = "AllowS3ReplicationFromOtherAccount"
       effect = "Allow"
       principals = [
         {
-          type        = "AWS"
+          type = "AWS"
           identifiers = [
             "arn:aws:iam::${var.cross_account_id}:role/AWSS3BucketReplication${var.data_feed}${var.order_type}"
           ]
