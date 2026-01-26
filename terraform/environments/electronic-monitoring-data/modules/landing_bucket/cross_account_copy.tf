@@ -4,7 +4,7 @@ locals {
 
 resource "aws_iam_role" "replication_role" {
   count              = local.replication_enabled ? 1 : 0
-  name               = "AWSS3BucketReplication"
+  name               = "AWSS3BucketReplication${var.data_feed}${var.order_type}"
   assume_role_policy = data.aws_iam_policy_document.s3-assume-role-policy.json
   tags               = var.local_tags
 }
@@ -25,7 +25,7 @@ data "aws_iam_policy_document" "s3-assume-role-policy" {
 }
 resource "aws_iam_policy" "replication_policy" {
   count    = local.replication_enabled ? 1 : 0
-  name     = "AWSS3BucketReplication${var.production_dev}"
+  name     = "AWSS3BucketReplication${var.data_feed}${var.order_type}"
   policy   = data.aws_iam_policy_document.replication-policy.json
 }
 
@@ -103,8 +103,8 @@ resource "aws_s3_bucket_replication_configuration" "default" {
     priority = 0
 
     destination {
-      account       = var.replication_details["account_id"]
-      bucket        = local.replication_enabled ? "arn:aws:s3:::${var.replication_details["${var.data_feed}_${var.order_type}_bucket"]}" : ""
+      account = var.replication_details["account_id"]
+      bucket  = local.replication_enabled ? "arn:aws:s3:::${var.replication_details["${var.data_feed}_${var.order_type}_bucket"]}" : ""
       encryption_configuration {
         replica_kms_key_id = local.replication_enabled != "" ? "arn:aws:kms:eu-west-2:${var.replication_details["account_id"]}:key/${var.replication_details["${var.data_feed}_${var.order_type}_kms_id"]}" : ""
       }
@@ -125,6 +125,26 @@ resource "aws_s3_bucket_replication_configuration" "default" {
       sse_kms_encrypted_objects {
         status = (local.replication_enabled != false) ? "Enabled" : "Disabled"
       }
+    }
+  }
+}
+
+resource "aws_s3_bucket_inventory" "this" {
+  count  = local.replication_enabled ? 1 : 0
+  bucket = module.this-bucket.bucket.id
+  name   = "daily-inventory"
+
+  included_object_versions = "All"
+
+  schedule {
+    frequency = "Daily"
+  }
+
+  destination {
+    bucket {
+      bucket_arn = var.metadata_bucket
+      format     = "CSV"
+      prefix     = "${var.data_feed}/${var.order_type}"
     }
   }
 }
