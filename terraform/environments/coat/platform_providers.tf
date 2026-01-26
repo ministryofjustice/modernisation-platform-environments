@@ -3,6 +3,7 @@ provider "aws" {
   alias  = "original-session"
   region = "eu-west-2"
   default_tags { tags = local.tags }
+  tag_policy_compliance = "warning"
 }
 
 # AWS provider for the workspace you're working in (every resource will default to using this, unless otherwise specified)
