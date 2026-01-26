@@ -142,7 +142,7 @@ resource "aws_s3_bucket_inventory" "this" {
 
   destination {
     bucket {
-      bucket_arn = var.metadata_bucket_arn
+      bucket_arn = var.metadata_bucket
       format     = "CSV"
       prefix     = "${var.data_feed}/${var.order_type}"
     }
