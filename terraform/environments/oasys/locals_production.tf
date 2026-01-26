@@ -756,6 +756,34 @@ locals {
           { name = "db.onr", type = "CNAME", ttl = "3600", records = ["pd-onr-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
         ]
       }
+      "oasys.az.justice.gov.uk" = {
+        records = [
+          { name = "onr", type = "A", ttl = "300", records = ["10.40.6.210"] }
+        ]
+        lb_alias_records = [
+          { name = "", type = "A", lbs_map_key = "private" },
+          { name = "training", type = "A", lbs_map_key = "private" },
+          { name = "practice", type = "A", lbs_map_key = "private" }
+        ]
+      }
+      "p-oasys.az.justice.gov.uk" = {
+        records = [
+        ]
+        lb_alias_records = [
+          { name = "", type = "A", lbs_map_key = "private" },
+          { name = "training", type = "A", lbs_map_key = "private" },
+          { name = "practice", type = "A", lbs_map_key = "private" }
+        ]
+      }
+      "bridge-oasys.az.justice.gov.uk" = {
+        records = [
+        ]
+        lb_alias_records = [
+          { name = "", type = "A", lbs_map_key = "private" },
+          { name = "training", type = "A", lbs_map_key = "private" },
+          { name = "practice", type = "A", lbs_map_key = "private" }
+        ]
+      }
       "oasys.service.justice.gov.uk" = {
         lb_alias_records = [
           { name = "", type = "A", lbs_map_key = "public" },

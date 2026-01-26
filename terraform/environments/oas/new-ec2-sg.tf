@@ -2,7 +2,7 @@
 ### EC2 SG
 ######################################
 resource "aws_security_group" "ec2_sg" {
-  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+  count = contains(["test", "preproduction", "production"], local.environment) ? 1 : 0
 
   name        = "${local.application_name}-${local.environment}-ec2-security-group"
   description = "EC2 Security Group"
@@ -20,7 +20,7 @@ resource "aws_security_group" "ec2_sg" {
 ### EC2 INGRESS RULES
 ######################################
 resource "aws_security_group_rule" "ingress_oas_db_1521" {
-  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+  count = contains(["test", "preproduction", "production"], local.environment) ? 1 : 0
 
   type                     = "ingress"
   security_group_id        = aws_security_group.ec2_sg[0].id
@@ -32,7 +32,7 @@ resource "aws_security_group_rule" "ingress_oas_db_1521" {
 }
 
 resource "aws_security_group_rule" "ingress_ssh_from_bastion" {
-  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+  count = contains(["test", "preproduction", "production"], local.environment) ? 1 : 0
 
   type                     = "ingress"
   security_group_id        = aws_security_group.ec2_sg[0].id
@@ -44,7 +44,7 @@ resource "aws_security_group_rule" "ingress_ssh_from_bastion" {
 }
 
 resource "aws_security_group_rule" "ingress_ssh_from_workspaces" {
-  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+  count = contains(["test", "preproduction", "production"], local.environment) ? 1 : 0
 
   type              = "ingress"
   security_group_id = aws_security_group.ec2_sg[0].id
@@ -56,7 +56,7 @@ resource "aws_security_group_rule" "ingress_ssh_from_workspaces" {
 }
 
 resource "aws_security_group_rule" "ingress_http_from_mojo" {
-  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+  count = contains(["test", "preproduction", "production"], local.environment) ? 1 : 0
 
   type              = "ingress"
   security_group_id = aws_security_group.ec2_sg[0].id
@@ -68,7 +68,7 @@ resource "aws_security_group_rule" "ingress_http_from_mojo" {
 }
 
 resource "aws_security_group_rule" "ingress_https_from_mojo" {
-  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+  count = contains(["test", "preproduction", "production"], local.environment) ? 1 : 0
 
   type              = "ingress"
   security_group_id = aws_security_group.ec2_sg[0].id
@@ -80,7 +80,7 @@ resource "aws_security_group_rule" "ingress_https_from_mojo" {
 }
 
 resource "aws_security_group_rule" "ingress_admin_vpc" {
-  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+  count = contains(["test", "preproduction", "production"], local.environment) ? 1 : 0
 
   type              = "ingress"
   security_group_id = aws_security_group.ec2_sg[0].id
@@ -92,7 +92,7 @@ resource "aws_security_group_rule" "ingress_admin_vpc" {
 }
 
 resource "aws_security_group_rule" "ingress_from_lb_9500" {
-  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+  count = contains(["test", "preproduction", "production"], local.environment) ? 1 : 0
 
   type                     = "ingress"
   security_group_id        = aws_security_group.ec2_sg[0].id
@@ -104,7 +104,7 @@ resource "aws_security_group_rule" "ingress_from_lb_9500" {
 }
 
 resource "aws_security_group_rule" "ingress_from_lb_9502" {
-  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+  count = contains(["test", "preproduction", "production"], local.environment) ? 1 : 0
 
   type                     = "ingress"
   security_group_id        = aws_security_group.ec2_sg[0].id
@@ -116,7 +116,7 @@ resource "aws_security_group_rule" "ingress_from_lb_9502" {
 }
 
 resource "aws_security_group_rule" "ingress_admin_workspace" {
-  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+  count = contains(["test", "preproduction", "production"], local.environment) ? 1 : 0
 
   type              = "ingress"
   security_group_id = aws_security_group.ec2_sg[0].id
@@ -128,7 +128,7 @@ resource "aws_security_group_rule" "ingress_admin_workspace" {
 }
 
 resource "aws_security_group_rule" "ingress_9500_from_mojo" {
-  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+  count = contains(["test", "preproduction", "production"], local.environment) ? 1 : 0
 
   type              = "ingress"
   security_group_id = aws_security_group.ec2_sg[0].id
@@ -140,7 +140,7 @@ resource "aws_security_group_rule" "ingress_9500_from_mojo" {
 }
 
 resource "aws_security_group_rule" "ingress_admin_9501_vpc" {
-  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+  count = contains(["test", "preproduction", "production"], local.environment) ? 1 : 0
 
   type              = "ingress"
   security_group_id = aws_security_group.ec2_sg[0].id
@@ -152,7 +152,7 @@ resource "aws_security_group_rule" "ingress_admin_9501_vpc" {
 }
 
 resource "aws_security_group_rule" "ingress_admin_9501_workspace" {
-  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+  count = contains(["test", "preproduction", "production"], local.environment) ? 1 : 0
 
   type              = "ingress"
   security_group_id = aws_security_group.ec2_sg[0].id
@@ -164,7 +164,7 @@ resource "aws_security_group_rule" "ingress_admin_9501_workspace" {
 }
 
 resource "aws_security_group_rule" "ingress_managed_9502_vpc" {
-  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+  count = contains(["test", "preproduction", "production"], local.environment) ? 1 : 0
 
   type              = "ingress"
   security_group_id = aws_security_group.ec2_sg[0].id
@@ -176,7 +176,7 @@ resource "aws_security_group_rule" "ingress_managed_9502_vpc" {
 }
 
 resource "aws_security_group_rule" "ingress_managed_9502_workspace" {
-  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+  count = contains(["test", "preproduction", "production"], local.environment) ? 1 : 0
 
   type              = "ingress"
   security_group_id = aws_security_group.ec2_sg[0].id
@@ -188,7 +188,7 @@ resource "aws_security_group_rule" "ingress_managed_9502_workspace" {
 }
 
 resource "aws_security_group_rule" "ingress_9502_from_mojo" {
-  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+  count = contains(["test", "preproduction", "production"], local.environment) ? 1 : 0
 
   type              = "ingress"
   security_group_id = aws_security_group.ec2_sg[0].id
@@ -200,7 +200,7 @@ resource "aws_security_group_rule" "ingress_9502_from_mojo" {
 }
 
 resource "aws_security_group_rule" "ingress_managed_9503_vpc" {
-  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+  count = contains(["test", "preproduction", "production"], local.environment) ? 1 : 0
 
   type              = "ingress"
   security_group_id = aws_security_group.ec2_sg[0].id
@@ -212,7 +212,7 @@ resource "aws_security_group_rule" "ingress_managed_9503_vpc" {
 }
 
 resource "aws_security_group_rule" "ingress_managed_9503_workspace" {
-  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+  count = contains(["test", "preproduction", "production"], local.environment) ? 1 : 0
 
   type              = "ingress"
   security_group_id = aws_security_group.ec2_sg[0].id
@@ -224,7 +224,7 @@ resource "aws_security_group_rule" "ingress_managed_9503_workspace" {
 }
 
 resource "aws_security_group_rule" "ingress_managed_9505_vpc" {
-  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+  count = contains(["test", "preproduction", "production"], local.environment) ? 1 : 0
 
   type              = "ingress"
   security_group_id = aws_security_group.ec2_sg[0].id
@@ -236,7 +236,7 @@ resource "aws_security_group_rule" "ingress_managed_9505_vpc" {
 }
 
 resource "aws_security_group_rule" "ingress_managed_9505_workspace" {
-  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+  count = contains(["test", "preproduction", "production"], local.environment) ? 1 : 0
 
   type              = "ingress"
   security_group_id = aws_security_group.ec2_sg[0].id
@@ -249,7 +249,7 @@ resource "aws_security_group_rule" "ingress_managed_9505_workspace" {
 
 
 resource "aws_security_group_rule" "ingress_managed_9514_vpc" {
-  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+  count = contains(["test", "preproduction", "production"], local.environment) ? 1 : 0
 
   type              = "ingress"
   security_group_id = aws_security_group.ec2_sg[0].id
@@ -261,7 +261,7 @@ resource "aws_security_group_rule" "ingress_managed_9514_vpc" {
 }
 
 resource "aws_security_group_rule" "ingress_managed_9514_workspace" {
-  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+  count = contains(["test", "preproduction", "production"], local.environment) ? 1 : 0
 
   type              = "ingress"
   security_group_id = aws_security_group.ec2_sg[0].id
@@ -276,7 +276,7 @@ resource "aws_security_group_rule" "ingress_managed_9514_workspace" {
 ### EC2 EGRESS RULES
 ######################################
 resource "aws_security_group_rule" "egress_oas_db_1521" {
-  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+  count = contains(["test", "preproduction", "production"], local.environment) ? 1 : 0
 
   type                     = "egress"
   security_group_id        = aws_security_group.ec2_sg[0].id
@@ -288,7 +288,7 @@ resource "aws_security_group_rule" "egress_oas_db_1521" {
 }
 
 resource "aws_security_group_rule" "egress_https_s3" {
-  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+  count = contains(["test", "preproduction", "production"], local.environment) ? 1 : 0
 
   type              = "egress"
   security_group_id = aws_security_group.ec2_sg[0].id
@@ -300,7 +300,7 @@ resource "aws_security_group_rule" "egress_https_s3" {
 }
 
 resource "aws_security_group_rule" "egress_http_internet" {
-  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+  count = contains(["test", "preproduction", "production"], local.environment) ? 1 : 0
 
   type              = "egress"
   security_group_id = aws_security_group.ec2_sg[0].id
@@ -312,7 +312,7 @@ resource "aws_security_group_rule" "egress_http_internet" {
 }
 
 resource "aws_security_group_rule" "egress_https_internet" {
-  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+  count = contains(["test", "preproduction", "production"], local.environment) ? 1 : 0
 
   type              = "egress"
   security_group_id = aws_security_group.ec2_sg[0].id
@@ -324,7 +324,7 @@ resource "aws_security_group_rule" "egress_https_internet" {
 }
 
 resource "aws_security_group_rule" "egress_admin_vpc" {
-  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+  count = contains(["test", "preproduction", "production"], local.environment) ? 1 : 0
 
   type              = "egress"
   security_group_id = aws_security_group.ec2_sg[0].id
@@ -336,7 +336,7 @@ resource "aws_security_group_rule" "egress_admin_vpc" {
 }
 
 resource "aws_security_group_rule" "egress_9500_mojo" {
-  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+  count = contains(["test", "preproduction", "production"], local.environment) ? 1 : 0
 
   type              = "egress"
   security_group_id = aws_security_group.ec2_sg[0].id
@@ -348,7 +348,7 @@ resource "aws_security_group_rule" "egress_9500_mojo" {
 }
 
 resource "aws_security_group_rule" "egress_admin_workspace" {
-  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+  count = contains(["test", "preproduction", "production"], local.environment) ? 1 : 0
 
   type              = "egress"
   security_group_id = aws_security_group.ec2_sg[0].id
@@ -360,7 +360,7 @@ resource "aws_security_group_rule" "egress_admin_workspace" {
 }
 
 resource "aws_security_group_rule" "egress_admin_9501_vpc" {
-  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+  count = contains(["test", "preproduction", "production"], local.environment) ? 1 : 0
 
   type              = "egress"
   security_group_id = aws_security_group.ec2_sg[0].id
@@ -372,7 +372,7 @@ resource "aws_security_group_rule" "egress_admin_9501_vpc" {
 }
 
 resource "aws_security_group_rule" "egress_admin_9501_workspace" {
-  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+  count = contains(["test", "preproduction", "production"], local.environment) ? 1 : 0
 
   type              = "egress"
   security_group_id = aws_security_group.ec2_sg[0].id
@@ -384,7 +384,7 @@ resource "aws_security_group_rule" "egress_admin_9501_workspace" {
 }
 
 resource "aws_security_group_rule" "egress_managed_9502_vpc" {
-  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+  count = contains(["test", "preproduction", "production"], local.environment) ? 1 : 0
 
   type              = "egress"
   security_group_id = aws_security_group.ec2_sg[0].id
@@ -396,7 +396,7 @@ resource "aws_security_group_rule" "egress_managed_9502_vpc" {
 }
 
 resource "aws_security_group_rule" "egress_managed_9502_workspace" {
-  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+  count = contains(["test", "preproduction", "production"], local.environment) ? 1 : 0
 
   type              = "egress"
   security_group_id = aws_security_group.ec2_sg[0].id
@@ -408,7 +408,7 @@ resource "aws_security_group_rule" "egress_managed_9502_workspace" {
 }
 
 resource "aws_security_group_rule" "egress_9502_mojo" {
-  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+  count = contains(["test", "preproduction", "production"], local.environment) ? 1 : 0
 
   type              = "egress"
   security_group_id = aws_security_group.ec2_sg[0].id
@@ -420,7 +420,7 @@ resource "aws_security_group_rule" "egress_9502_mojo" {
 }
 
 resource "aws_security_group_rule" "egress_managed_9503_vpc" {
-  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+  count = contains(["test", "preproduction", "production"], local.environment) ? 1 : 0
 
   type              = "egress"
   security_group_id = aws_security_group.ec2_sg[0].id
@@ -432,7 +432,7 @@ resource "aws_security_group_rule" "egress_managed_9503_vpc" {
 }
 
 resource "aws_security_group_rule" "egress_managed_9503_workspace" {
-  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+  count = contains(["test", "preproduction", "production"], local.environment) ? 1 : 0
 
   type              = "egress"
   security_group_id = aws_security_group.ec2_sg[0].id
@@ -444,7 +444,7 @@ resource "aws_security_group_rule" "egress_managed_9503_workspace" {
 }
 
 resource "aws_security_group_rule" "egress_managed_9505_vpc" {
-  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+  count = contains(["test", "preproduction", "production"], local.environment) ? 1 : 0
 
   type              = "egress"
   security_group_id = aws_security_group.ec2_sg[0].id
@@ -456,7 +456,7 @@ resource "aws_security_group_rule" "egress_managed_9505_vpc" {
 }
 
 resource "aws_security_group_rule" "egress_managed_9505_workspace" {
-  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+  count = contains(["test", "preproduction", "production"], local.environment) ? 1 : 0
 
   type              = "egress"
   security_group_id = aws_security_group.ec2_sg[0].id
@@ -469,7 +469,7 @@ resource "aws_security_group_rule" "egress_managed_9505_workspace" {
 
 
 resource "aws_security_group_rule" "egress_managed_9514_vpc" {
-  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+  count = contains(["test", "preproduction", "production"], local.environment) ? 1 : 0
 
   type              = "egress"
   security_group_id = aws_security_group.ec2_sg[0].id
@@ -481,7 +481,7 @@ resource "aws_security_group_rule" "egress_managed_9514_vpc" {
 }
 
 resource "aws_security_group_rule" "egress_managed_9514_workspace" {
-  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+  count = contains(["test", "preproduction", "production"], local.environment) ? 1 : 0
 
   type              = "egress"
   security_group_id = aws_security_group.ec2_sg[0].id
