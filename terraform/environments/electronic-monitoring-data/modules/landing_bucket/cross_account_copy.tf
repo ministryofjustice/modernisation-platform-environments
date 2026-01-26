@@ -131,7 +131,7 @@ resource "aws_s3_bucket_replication_configuration" "default" {
 
 resource "aws_s3_bucket_inventory" "this" {
   count  = local.replication_enabled ? 1 : 0
-  bucket = module.this-bucket.id
+  bucket = module.this-bucket.bucket.id
   name   = "daily-inventory"
 
   included_object_versions = "All"
