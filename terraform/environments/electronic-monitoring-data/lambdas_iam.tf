@@ -1381,6 +1381,21 @@ data "aws_iam_policy_document" "bucket_replication_policy" {
     ]
     resources = ["*"]
   }
+  statement {
+    sid = "GetInventoryConfig"
+    effect = "Allow"
+    actions = [
+      "s3:GetInventoryConfiguration"
+    ]
+    resources = [
+      module.s3-fms-general-landing-bucket.bucket.arn,
+      module.s3-fms-ho-landing-bucket.bucket.arn,
+      module.s3-fms-specials-landing-bucket.bucket.arn,
+      module.s3-mdss-general-landing-bucket.bucket.arn,
+      module.s3-mdss-ho-landing-bucket.bucket.arn,
+      module.s3-mdss-specials-landing-bucket.bucket.arn,
+    ]
+  }
 
   statement {
     sid    = "AllowRolePass"
@@ -1404,6 +1419,15 @@ data "aws_iam_policy_document" "bucket_replication_policy" {
       "secretsmanager:GetSecretValue"
     ]
     resources = [module.cross_account_details[0].secret_arn]
+  }
+  statement {
+    sid = "MetadataBucket"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject"
+    ]
+    resources = [module.s3-metadata-bucket.bucket.arn]
   }
 }
 

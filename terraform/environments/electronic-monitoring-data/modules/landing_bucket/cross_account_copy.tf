@@ -128,3 +128,23 @@ resource "aws_s3_bucket_replication_configuration" "default" {
     }
   }
 }
+
+resource "aws_s3_bucket_inventory" "this" {
+  count  = local.replication_enabled ? 1 : 0
+  bucket = module.this-bucket.id
+  name   = "daily-inventory"
+
+  included_object_versions = "All"
+
+  schedule {
+    frequency = "Daily"
+  }
+
+  destination {
+    bucket {
+      bucket_arn = var.metadata_bucket
+      format     = "CSV"
+      prefix     = "${var.data_feed}/${var.order_type}"
+    }
+  }
+}
