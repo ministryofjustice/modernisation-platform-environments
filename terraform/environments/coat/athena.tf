@@ -148,7 +148,7 @@ aws athena start-query-execution \
   --work-group ${aws_athena_workgroup.coat_cur_report.name} \
   --result-configuration OutputLocation=s3://coat-${local.environment}-cur-v2-hourly/ctas/fct-daily-cost/ \
   --query-execution-context Database=${aws_glue_catalog_database.cur_v2_database.name} \
-  --region ${data.aws_region.current.name}
+  --region ${data.aws_region.current.region}
 EOF
   }
 
