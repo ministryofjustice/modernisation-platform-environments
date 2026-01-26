@@ -103,8 +103,8 @@ resource "aws_s3_bucket_replication_configuration" "default" {
     priority = 0
 
     destination {
-      account       = var.replication_details["account_id"]
-      bucket        = local.replication_enabled ? "arn:aws:s3:::${var.replication_details["${var.data_feed}_${var.order_type}_bucket"]}" : ""
+      account = var.replication_details["account_id"]
+      bucket  = local.replication_enabled ? "arn:aws:s3:::${var.replication_details["${var.data_feed}_${var.order_type}_bucket"]}" : ""
       encryption_configuration {
         replica_kms_key_id = local.replication_enabled != "" ? "arn:aws:kms:eu-west-2:${var.replication_details["account_id"]}:key/${var.replication_details["${var.data_feed}_${var.order_type}_kms_id"]}" : ""
       }

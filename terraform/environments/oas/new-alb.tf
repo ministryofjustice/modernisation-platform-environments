@@ -4,14 +4,14 @@
 locals {
   # Define CIDR blocks once to avoid repetition
   moj_cidr_blocks = [
-    "51.149.251.0/24",     # MOJO
-    "51.149.250.0/24",     # MOJO
-    "10.184.0.0/14",       # MOJO device IP taken from CCMS
-    "35.176.254.38/32",    # Workspace
-    "52.56.212.11/32",     # Workspace
-    "35.177.173.197/32",   # Workspace
-    "10.200.0.0/16",       # Internal network
-    "10.200.16.0/20"       # LZ Prod Shared-Service Workspaces
+    "51.149.251.0/24",   # MOJO
+    "51.149.250.0/24",   # MOJO
+    "10.184.0.0/14",     # MOJO device IP taken from CCMS
+    "35.176.254.38/32",  # Workspace
+    "52.56.212.11/32",   # Workspace
+    "35.177.173.197/32", # Workspace
+    "10.200.0.0/16",     # Internal network
+    "10.200.16.0/20"     # LZ Prod Shared-Service Workspaces
   ]
 
   loadbalancer_ingress_rules = {
@@ -219,56 +219,56 @@ resource "aws_lb_listener" "https_listener" {
 }
 
 # HTTP Listener on port 9500 for WebLogic Console and Enterprise Manager
-# resource "aws_lb_listener" "http_9500_listener" {
-#   count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+resource "aws_lb_listener" "http_9500_listener" {
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
 
-#   load_balancer_arn = module.lb_access_logs_enabled.load_balancer.arn
-#   port              = 9500
-#   protocol          = "HTTP"
+  load_balancer_arn = module.lb_access_logs_enabled.load_balancer.arn
+  port              = 9500
+  protocol          = "HTTP"
 
-#   default_action {
-#     type             = "forward"
-#     target_group_arn = aws_lb_target_group.oas_ec2_target_group[0].arn
-#   }
-# }
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.oas_ec2_target_group[0].arn
+  }
+}
 
 # Listener rule for /console on port 9500
-# resource "aws_lb_listener_rule" "console_9500_rule" {
-#   count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+resource "aws_lb_listener_rule" "console_9500_rule" {
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
 
-#   listener_arn = aws_lb_listener.http_9500_listener[0].arn
-#   priority     = 100
+  listener_arn = aws_lb_listener.http_9500_listener[0].arn
+  priority     = 100
 
-#   action {
-#     type             = "forward"
-#     target_group_arn = aws_lb_target_group.oas_ec2_target_group[0].arn
-#   }
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.oas_ec2_target_group[0].arn
+  }
 
-#   condition {
-#     path_pattern {
-#       values = ["/console*"]
-#     }
-#   }
-# }
+  condition {
+    path_pattern {
+      values = ["/console*"]
+    }
+  }
+}
 
 # Listener rule for /em on port 9500
-# resource "aws_lb_listener_rule" "em_9500_rule" {
-#   count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+resource "aws_lb_listener_rule" "em_9500_rule" {
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
 
-#   listener_arn = aws_lb_listener.http_9500_listener[0].arn
-#   priority     = 101
+  listener_arn = aws_lb_listener.http_9500_listener[0].arn
+  priority     = 101
 
-#   action {
-#     type             = "forward"
-#     target_group_arn = aws_lb_target_group.oas_ec2_target_group[0].arn
-#   }
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.oas_ec2_target_group[0].arn
+  }
 
-#   condition {
-#     path_pattern {
-#       values = ["/em*"]
-#     }
-#   }
-# }
+  condition {
+    path_pattern {
+      values = ["/em*"]
+    }
+  }
+}
 
 # HTTP Listener on port 9502 for Analytics and Data Visualization
 # resource "aws_lb_listener" "http_9502_listener" {
