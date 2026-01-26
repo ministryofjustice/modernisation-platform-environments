@@ -20,4 +20,6 @@ resource "aws_subnet" "additional" {
   tags = {
     Name = "${local.application_name}-${local.environment}-${each.value.block_name}-${each.value.type}-${each.value.az}"
   }
+
+  depends_on = [aws_vpc_ipv4_cidr_block_association.additional]
 }
