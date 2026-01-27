@@ -780,9 +780,9 @@ locals {
         records = [
         ]
         lb_alias_records = [
-          { name = "", type = "A", lbs_map_key = "private" },
-          { name = "training", type = "A", lbs_map_key = "private" },
-          { name = "practice", type = "A", lbs_map_key = "private" }
+          { name = "", type = "A", lbs_map_key = "public" },
+          { name = "training", type = "A", lbs_map_key = "public" },
+          { name = "practice", type = "A", lbs_map_key = "public" }
         ]
       }
       "oasys.service.justice.gov.uk" = {
