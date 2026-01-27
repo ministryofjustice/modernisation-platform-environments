@@ -79,7 +79,7 @@ resource "aws_route" "transit_gateway_to_network_firewall" {
   } : {}
 
   route_table_id         = aws_route_table.additional[each.key].id
-  destination_cidr_block = aws_vpc.main.cidr_block
+  destination_cidr_block = "0.0.0.0/0"
   vpc_endpoint_id        = data.aws_vpc_endpoint.network_firewall[each.value.az].id
 
   depends_on = [aws_networkfirewall_firewall.main]
