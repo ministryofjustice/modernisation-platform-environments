@@ -7,7 +7,7 @@ module "datasync_instance" {
   name = "${local.application_name}-${local.environment}-datasync"
   # ami                    = data.aws_ssm_parameter.datasync_ami.value
   ami                    = "ami-037ee8c0ba1cbd1f6" # TODO: Remove hardcoded AMI
-  instance_type          = "m5.2xlarge"
+  instance_type          = "m6i.xlarge"
   subnet_id              = element(module.connected_vpc.private_subnets, 0)
   vpc_security_group_ids = [module.datasync_instance_security_group.security_group_id]
   create_security_group  = false
