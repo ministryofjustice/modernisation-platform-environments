@@ -78,18 +78,20 @@ module "push_lambda_event_queue" {
 #------------------------------------------------------------------------------
 
 module "push_lambda" {
-  source                  = "../lambdas"
-  function_name           = "push_data_export_to_${var.export_destination}"
-  image_name              = "push_data_export"
-  is_image                = true
-  role_name               = aws_iam_role.push_lambda.name
-  role_arn                = aws_iam_role.push_lambda.arn
-  memory_size             = 1024
-  timeout                 = 900
-  core_shared_services_id = var.core_shared_services_id
-  production_dev          = var.environment_shorthand
-  security_group_ids      = var.security_group_ids
-  subnet_ids              = var.subnet_ids
+  source                        = "../lambdas"
+  function_name                 = "push_data_export_to_${var.export_destination}"
+  image_name                    = "push_data_export"
+  is_image                      = true
+  role_name                     = aws_iam_role.push_lambda.name
+  role_arn                      = aws_iam_role.push_lambda.arn
+  memory_size                   = 1024
+  timeout                       = 900
+  core_shared_services_id       = var.core_shared_services_id
+  production_dev                = var.environment_shorthand
+  security_group_ids            = var.security_group_ids
+  subnet_ids                    = var.subnet_ids
+  reserved_concurrent_executions = 0
+
   environment_variables = {
     DESTINATION_BUCKET = var.destination_bucket_id
   }
