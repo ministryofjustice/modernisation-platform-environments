@@ -340,13 +340,7 @@ resource "aws_lb_listener_rule" "console_https_rule" {
       values = ["/console*"]
     }
   }
-
-  condition {
-    http_header {
-      http_header_name = "WL-Proxy-SSL"
-      values = ["true"]
-    }
-  }
+  
 }
 
 # Listener rule for /em on HTTPS
