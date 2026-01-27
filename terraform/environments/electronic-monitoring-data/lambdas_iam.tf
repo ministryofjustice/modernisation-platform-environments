@@ -1468,8 +1468,8 @@ data "aws_iam_policy_document" "iceberg_table_maintenance_iam_role_policy_docume
       "s3:ListBucket"
     ]
     resources = [
-      "arn:aws:s3:::emds-preprod-cadt",
-      "arn:aws:s3:::emds-preprod-cadt/staging/g4s_tasking_pipeline/g4s_tasking/tbl_answers/*",
+      module.s3-create-a-derived-table-bucket.bucket.arn,
+      "${module.s3-create-a-derived-table-bucket.bucket.arn}/staging/g4s_tasking_pipeline/g4s_tasking/tbl_answers/*"
     ]
   }
 }
