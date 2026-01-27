@@ -49,7 +49,7 @@ module "kms_metadata_key" {
   description = "Metadata bucket KMS key"
 
   enable_default_policy = true
-  key_policy = data.aws_iam_policy_document.metadata_kms_key.json
+  policy = data.aws_iam_policy_document.metadata_kms_key.json
 
   deletion_window_in_days = 7
 
