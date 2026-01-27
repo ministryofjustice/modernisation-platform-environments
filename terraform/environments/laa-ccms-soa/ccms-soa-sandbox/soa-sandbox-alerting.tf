@@ -1,6 +1,6 @@
 #--Altering SNS
 resource "aws_sns_topic" "alerts" {
-  name              = "${local.application_data.accounts[local.environment].local.application_data.accounts[local.component_name].app_name}-alerts"
+  name              = "${local.application_data.accounts[local.environment].app_name}-alerts"
   delivery_policy   = <<EOF
 {
   "http": {
@@ -22,7 +22,7 @@ resource "aws_sns_topic" "alerts" {
 EOF
   kms_master_key_id = aws_kms_key.cloudwatch_sns_alerts_key.id
   tags = merge(local.tags,
-    { Name = "${local.application_data.accounts[local.environment].local.application_data.accounts[local.component_name].app_name}-alerts" }
+    { Name = "${local.application_data.accounts[local.environment].app_name}-alerts" }
   )
 }
 
@@ -32,7 +32,7 @@ resource "aws_sns_topic_policy" "default" {
 }
 
 resource "aws_sns_topic" "guardduty_alerts" {
-  name              = "${local.application_data.accounts[local.environment].local.application_data.accounts[local.component_name].app_name}-guardduty-alerts"
+  name              = "${local.application_data.accounts[local.environment].app_name}-guardduty-alerts"
   delivery_policy   = <<EOF
 {
   "http": {
@@ -54,7 +54,7 @@ resource "aws_sns_topic" "guardduty_alerts" {
 EOF
   kms_master_key_id = aws_kms_key.cloudwatch_sns_alerts_key.id
   tags = merge(local.tags,
-    { Name = "${local.application_data.accounts[local.environment].local.application_data.accounts[local.component_name].app_name}-guardduty-alerts" }
+    { Name = "${local.application_data.accounts[local.environment].app_name}-guardduty-alerts" }
   )
 }
 
@@ -65,7 +65,7 @@ resource "aws_sns_topic_policy" "guarduty_default" {
 
 #--Alerts RDS
 resource "aws_db_event_subscription" "rds_events" {
-  name        = "${local.application_data.accounts[local.environment].local.application_data.accounts[local.component_name].app_name}-rds-event-sub"
+  name        = "${local.application_data.accounts[local.environment].app_name}-rds-event-sub"
   sns_topic   = aws_sns_topic.alerts.arn
   source_type = "db-instance"
   source_ids  = [aws_db_instance.soa_db.identifier]
@@ -86,7 +86,7 @@ resource "aws_db_event_subscription" "rds_events" {
 resource "aws_cloudwatch_metric_alarm" "RDS_CPU_over_threshold" {
   # alarm_name          = "${local.application_data.accounts[local.environment].app_name}-RDS-CPU-high-threshold-alarm"
   # alarm_description   = "${local.aws_account_id} | RDS CPU is above 75% for over 15 minutes"
-  alarm_name          = "${local.environment.app_name}-${local.component_name}-RDS-CPU-high-threshold-alarm"
+  alarm_name          = "${local.environment.app_name}-RDS-CPU-high-threshold-alarm"
   alarm_description   = "${local.environment} | RDS CPU is above 75% for over 15 minutes"
   comparison_operator = "GreaterThanThreshold"
   metric_name         = "CPUUtilization"
@@ -107,7 +107,7 @@ resource "aws_cloudwatch_metric_alarm" "RDS_CPU_over_threshold" {
 resource "aws_cloudwatch_metric_alarm" "RDS_Disk_Queue_Depth_Over_Threshold" {
   # alarm_name          = "${local.application_data.accounts[local.environment].app_name}-RDS-DiskQueue-high-threshold-alarm"
   # alarm_description   = "${local.environment} | ${local.aws_account_id} | RDS disk queue is above 4 for over 15 minutes"
-  alarm_name          = "${local.environment.app_name}-${local.component_name}-RDS-DiskQueue-high-threshold-alarm"
+  alarm_name          = "${local.environment.app_name}-RDS-DiskQueue-high-threshold-alarm"
   alarm_description   = "${local.environment} | RDS disk queue is above 4 for over 15 minutes"
   comparison_operator = "GreaterThanThreshold"
   metric_name         = "DiskQueueDepth"
@@ -127,7 +127,7 @@ resource "aws_cloudwatch_metric_alarm" "RDS_Disk_Queue_Depth_Over_Threshold" {
 resource "aws_cloudwatch_metric_alarm" "RDS_Free_Storage_Space_Over_Threshold" {
   # alarm_name          = "${local.application_data.accounts[local.environment].app_name}-RDS-FreeStorageSpace-low-threshold-alarm"
   # alarm_description   = "${local.environment} | ${local.aws_account_id} | RDS Free storage space is below 35% for over 3 minutes"
-  alarm_name          = "${local.environment.app_name}-${local.component_name}-RDS-FreeStorageSpace-low-threshold-alarm"
+  alarm_name          = "${local.environment.app_name}-RDS-FreeStorageSpace-low-threshold-alarm"
   alarm_description   = "${local.environment} | RDS Free storage space is below 35% for over 3 minutes"
   comparison_operator = "LessThanThreshold"
   metric_name         = "FreeStorageSpace"
@@ -148,7 +148,7 @@ resource "aws_cloudwatch_metric_alarm" "RDS_Free_Storage_Space_Over_Threshold" {
 resource "aws_cloudwatch_metric_alarm" "RDS_Burst_Balance_Threshold" {
   # alarm_name          = "${local.application_data.accounts[local.environment].app_name}-RDS-BurstBalance-low-threshold-alarm"
   # alarm_description   = "${local.environment} | ${local.aws_account_id} | RDS Burst balance is below 10% for over 15 minutes"
-  alarm_name          = "${local.environment.app_name}-${local.component_name}-RDS-BurstBalance-low-threshold-alarm"
+  alarm_name          = "${local.environment.app_name}-RDS-BurstBalance-low-threshold-alarm"
   alarm_description   = "${local.environment} | RDS Burst balance is below 10% for over 15 minutes"
   comparison_operator = "LessThanOrEqualToThreshold"
   metric_name         = "BurstBalance"
@@ -167,8 +167,8 @@ resource "aws_cloudwatch_metric_alarm" "RDS_Burst_Balance_Threshold" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "RDS_Write_IOPS_Threshold" {
-  alarm_name          = "${local.application_data.accounts[local.environment].app_name}-${local.component_name}-RDS-WriteIOPS-high-threshold-alarm"
-  alarm_description   = "${local.environment} | RDS Write IOPS is above ${local.application_data.accounts[local.environment].logging_cloudwatch_rds_write_iops_threshold} for over 15 minutes"
+  alarm_name          = "${local.application_data.accounts[local.environment].app_name}-RDS-WriteIOPS-high-threshold-alarm"
+  alarm_description   = "${local.environment} | ${local.aws_account_id} | RDS Write IOPS is above ${local.application_data.accounts[local.environment].logging_cloudwatch_rds_write_iops_threshold} for over 15 minutes"
   comparison_operator = "GreaterThanThreshold"
   metric_name         = "WriteIOPS"
   statistic           = "Average"
@@ -186,8 +186,8 @@ resource "aws_cloudwatch_metric_alarm" "RDS_Write_IOPS_Threshold" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "RDS_Read_IOPS_Threshold" {
-  alarm_name          = "${local.application_data.accounts[local.environment].app_name}-${local.component_name}-RDS-ReadIOPS-high-threshold-alarm"
-  alarm_description   = "${local.environment} | RDS Read IOPS is above ${local.application_data.accounts[local.environment].logging_cloudwatch_rds_read_iops_threshold} for over 15 minutes"
+  alarm_name          = "${local.application_data.accounts[local.environment].app_name}-RDS-ReadIOPS-high-threshold-alarm"
+  alarm_description   = "${local.environment} | ${local.aws_account_id} | RDS Read IOPS is above ${local.application_data.accounts[local.environment].logging_cloudwatch_rds_read_iops_threshold} for over 15 minutes"
   comparison_operator = "GreaterThanThreshold"
   metric_name         = "ReadIOPS"
   statistic           = "Average"
