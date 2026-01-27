@@ -84,10 +84,10 @@ resource "aws_db_event_subscription" "rds_events" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "RDS_CPU_over_threshold" {
-  # alarm_name          = "${local.application_data.accounts[local.environment].app_name}-RDS-CPU-high-threshold-alarm"
-  # alarm_description   = "${local.aws_account_id} | RDS CPU is above 75% for over 15 minutes"
-  alarm_name          = "${local.environment.app_name}-RDS-CPU-high-threshold-alarm"
-  alarm_description   = "${local.environment} | RDS CPU is above 75% for over 15 minutes"
+  alarm_name          = "${local.application_data.accounts[local.environment].app_name}-RDS-CPU-high-threshold-alarm"
+  alarm_description   = "${local.aws_account_id} | RDS CPU is above 75% for over 15 minutes"
+  # alarm_name          = "${local.environment.app_name}-RDS-CPU-high-threshold-alarm"
+  # alarm_description   = "${local.environment} | RDS CPU is above 75% for over 15 minutes"
   comparison_operator = "GreaterThanThreshold"
   metric_name         = "CPUUtilization"
   statistic           = "Average"
@@ -105,10 +105,10 @@ resource "aws_cloudwatch_metric_alarm" "RDS_CPU_over_threshold" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "RDS_Disk_Queue_Depth_Over_Threshold" {
-  # alarm_name          = "${local.application_data.accounts[local.environment].app_name}-RDS-DiskQueue-high-threshold-alarm"
-  # alarm_description   = "${local.environment} | ${local.aws_account_id} | RDS disk queue is above 4 for over 15 minutes"
-  alarm_name          = "${local.environment.app_name}-RDS-DiskQueue-high-threshold-alarm"
-  alarm_description   = "${local.environment} | RDS disk queue is above 4 for over 15 minutes"
+  alarm_name          = "${local.application_data.accounts[local.environment].app_name}-RDS-DiskQueue-high-threshold-alarm"
+  alarm_description   = "${local.environment} | ${local.aws_account_id} | RDS disk queue is above 4 for over 15 minutes"
+  # alarm_name          = "${local.environment.app_name}-RDS-DiskQueue-high-threshold-alarm"
+  # alarm_description   = "${local.environment} | RDS disk queue is above 4 for over 15 minutes"
   comparison_operator = "GreaterThanThreshold"
   metric_name         = "DiskQueueDepth"
   statistic           = "Average"
@@ -125,10 +125,10 @@ resource "aws_cloudwatch_metric_alarm" "RDS_Disk_Queue_Depth_Over_Threshold" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "RDS_Free_Storage_Space_Over_Threshold" {
-  # alarm_name          = "${local.application_data.accounts[local.environment].app_name}-RDS-FreeStorageSpace-low-threshold-alarm"
-  # alarm_description   = "${local.environment} | ${local.aws_account_id} | RDS Free storage space is below 35% for over 3 minutes"
-  alarm_name          = "${local.environment.app_name}-RDS-FreeStorageSpace-low-threshold-alarm"
-  alarm_description   = "${local.environment} | RDS Free storage space is below 35% for over 3 minutes"
+  alarm_name          = "${local.application_data.accounts[local.environment].app_name}-RDS-FreeStorageSpace-low-threshold-alarm"
+  alarm_description   = "${local.environment} | ${local.aws_account_id} | RDS Free storage space is below 35% for over 3 minutes"
+  # alarm_name          = "${local.environment.app_name}-RDS-FreeStorageSpace-low-threshold-alarm"
+  # alarm_description   = "${local.environment} | RDS Free storage space is below 35% for over 3 minutes"
   comparison_operator = "LessThanThreshold"
   metric_name         = "FreeStorageSpace"
   statistic           = "Average"
@@ -146,10 +146,10 @@ resource "aws_cloudwatch_metric_alarm" "RDS_Free_Storage_Space_Over_Threshold" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "RDS_Burst_Balance_Threshold" {
-  # alarm_name          = "${local.application_data.accounts[local.environment].app_name}-RDS-BurstBalance-low-threshold-alarm"
-  # alarm_description   = "${local.environment} | ${local.aws_account_id} | RDS Burst balance is below 10% for over 15 minutes"
-  alarm_name          = "${local.environment.app_name}-RDS-BurstBalance-low-threshold-alarm"
-  alarm_description   = "${local.environment} | RDS Burst balance is below 10% for over 15 minutes"
+  alarm_name          = "${local.application_data.accounts[local.environment].app_name}-RDS-BurstBalance-low-threshold-alarm"
+  alarm_description   = "${local.environment} | ${local.aws_account_id} | RDS Burst balance is below 10% for over 15 minutes"
+  # alarm_name          = "${local.environment.app_name}-RDS-BurstBalance-low-threshold-alarm"
+  # alarm_description   = "${local.environment} | RDS Burst balance is below 10% for over 15 minutes"
   comparison_operator = "LessThanOrEqualToThreshold"
   metric_name         = "BurstBalance"
   statistic           = "Sum"
