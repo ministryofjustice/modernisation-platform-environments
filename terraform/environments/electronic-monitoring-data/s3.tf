@@ -800,7 +800,7 @@ module "s3-p1-export-bucket" {
   local_bucket_prefix     = local.bucket_prefix
   local_tags              = local.tags
   logging_bucket          = module.s3-logging-bucket
-  production_dev          = local.is-production ? "prod" : "dev"
+  environment_shorthand   = local.environment_shorthand
   security_group_ids      = [aws_security_group.lambda_generic.id]
   subnet_ids              = data.aws_subnets.shared-public.ids
 
