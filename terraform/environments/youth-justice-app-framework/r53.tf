@@ -62,14 +62,14 @@ resource "aws_route53_record" "type_a" {
 }
 
 
-resource "aws_route53_record" "connectivity" {
+resource "aws_route53_record" "connectivity_alb" {
   provider = aws.core-network-services
 
   zone_id = data.aws_route53_zone.yjaf-inner.id
-  name    = "connectivity"
-  type    = "A"
+  name    = "connectivity-lb"
+  type    = "CNAME"
   ttl     = 300
-  records = [cidrhost(data.aws_vpc.shared.cidr_block, 250)]
+  records = [module.connectivity_alb.dns_name]
 }
 
 
