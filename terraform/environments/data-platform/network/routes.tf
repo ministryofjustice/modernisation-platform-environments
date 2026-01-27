@@ -73,10 +73,10 @@ module "firewall_transit_gateway_routes" {
 }
 
 resource "aws_route" "transit_gateway_to_network_firewall" {
-  for_each = {
+  for_each = try(local.environment_configuration.transit_gateway_routes, null) != null ? {
     for key, value in local.additional_cidr_subnets : key => value
     if value.type == "attachments"
-  }
+  } : {}
 
   route_table_id         = aws_route_table.additional[each.key].id
   destination_cidr_block = aws_vpc.main.cidr_block
