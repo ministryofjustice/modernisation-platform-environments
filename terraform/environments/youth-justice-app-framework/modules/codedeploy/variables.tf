@@ -34,6 +34,12 @@ variable "internal_listener_port" {
   default     = 8080
 }
 
+variable "connectivity_listener_port" {
+  description = "The port of the connectivity ALB listener"
+  type        = number
+  default     = 8080
+}
+
 variable "external_listener_port" {
   description = "The port of the external ALB listener"
   type        = number

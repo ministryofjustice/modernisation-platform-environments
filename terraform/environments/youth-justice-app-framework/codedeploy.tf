@@ -13,7 +13,7 @@ module "codedeploy" {
     { "bu" = "internal" },
     { "case" = "internal" },
     { "cmm" = "internal" },
-    { "connectivity" = "internal" },
+    { "connectivity" = "connectivity" },
     { "conversions" = "internal" },
     { "dal" = "internal" },
     { "documents" = "internal" },
@@ -34,9 +34,11 @@ module "codedeploy" {
 
   internal_alb_name = "yjaf-int-internal"
   external_alb_name = "yjaf-ext-external"
+  connectivity_alb_name = "yjaf-connectivity"
   depends_on = [
     module.internal_alb,
     module.external_alb,
+    module.connectivity_alb,
     module.ecs,
     module.yjsm
   ]
