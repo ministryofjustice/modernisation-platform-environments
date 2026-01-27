@@ -217,6 +217,7 @@ module "s3-metadata-bucket" {
     # Leave this provider block in even if you are not using replication
     aws.bucket-replication = aws
   }
+  custom_kms_key = module.kms_metadata_key.key_arn
 
   lifecycle_rule = [
     {
