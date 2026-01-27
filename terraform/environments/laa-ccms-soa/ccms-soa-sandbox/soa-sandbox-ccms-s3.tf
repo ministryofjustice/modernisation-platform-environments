@@ -6,7 +6,7 @@ module "s3-bucket-shared" {
 
   bucket_name        = "${local.component_name}-${local.environment}-shared"
   versioning_enabled = true
-  bucket_policy      = [aws_s3_bucket_policy.shared_bucket_policy.policy]
+  bucket_policy      = [aws_s3_bucket_policy.soa-sandbox-shared_bucket_policy.policy]
   sse_algorithm      = "AES256"
   custom_kms_key     = ""
 
