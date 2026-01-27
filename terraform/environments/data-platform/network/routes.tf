@@ -58,3 +58,16 @@ resource "aws_route" "private_network_firewall" {
 
   depends_on = [aws_networkfirewall_firewall.main]
 }
+
+module "transit_gateway_routes" {
+  for_each = try(local.environment_configuration.transit_gateway_routes, null) != null ? {
+    for key, value in local.subnets : value.az => value
+    if value.type == "private"
+  } : {}
+
+  source = "./modules/aws/transit-gateway/routes"
+
+  route_table_id          = aws_route_table.main["private-${each.key}"].id
+  destination_cidr_blocks = values(local.environment_configuration.transit_gateway_routes)
+  transit_gateway_id      = data.aws_ec2_transit_gateway.moj_tgw.id
+}

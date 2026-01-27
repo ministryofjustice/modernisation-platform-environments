@@ -9,4 +9,8 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "moj_tgw" {
   ]
   security_group_referencing_support = "enable"
   appliance_mode_support             = "enable"
+
+  tags = {
+    Name = "moj-tgw"
+  }
 }
