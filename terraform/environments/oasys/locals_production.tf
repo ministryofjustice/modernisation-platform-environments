@@ -791,9 +791,22 @@ locals {
             metric_name         = "TargetResponseTime"
             namespace           = "AWS/ApplicationELB"
             period              = "60"
-            statistic           = "Average" # p95 would be nice but not available
-            threshold           = 3
+            statistic           = "Average"
+            threshold           = 5
             alarm_description   = "Triggers if average target response time exceeds threshold for 3 minutes."
+            alarm_actions       = [] # ["pagerduty"]
+            ok_actions          = [] # ["pagerduty"]
+          }
+          high-new-connections = {
+            comparison_operator = "GreaterThanOrEqualToThreshold"
+            evaluation_periods  = "3"
+            datapoints_to_alarm = "3"
+            metric_name         = "NewConnectionCount"
+            namespace           = "AWS/ApplicationELB"
+            period              = "300"
+            statistic           = "Sum"
+            threshold           = 4000
+            alarm_description   = "Triggers if average target response time exceeds threshold."
             alarm_actions       = [] # ["pagerduty"]
             ok_actions          = [] # ["pagerduty"]
           }
