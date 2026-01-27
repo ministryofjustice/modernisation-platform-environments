@@ -68,7 +68,15 @@
       "workspace_cidr_nonprod": "10.200.0.0/20",
       "northgate_proxy": "10.120.0.147/32",
       "aws_workspace_cidr": "10.200.0.0/20",
-      "cloud_platform_cidr": "172.20.0.0/16"
+      "cloud_platform_cidr": "172.20.0.0/16",
+      "oem": {
+        "agent_port": "3872",
+        "oms_host": "10.26.60.231",
+        "oms_port": "4903",
+        "oem_db_host": "10.26.60.169",
+        "oem_db_port": "1521",
+        "oem_db_name": "OEMDB"
+      }
     },
     "test": {
       "app_name": "ccms-soa",
@@ -137,7 +145,15 @@
       "outbound_s3_bucket_name": "laa-ccms-outbound-test-mp",
       "aws_workspace_cidr": "10.200.0.0/20",
       "northgate_proxy": "10.120.0.147/32",
-      "cloud_platform_cidr": "172.20.0.0/16"
+      "cloud_platform_cidr": "172.20.0.0/16",
+      "oem": {
+        "agent_port": "3872",
+        "oms_host": "10.26.100.179",
+        "oms_port": "4903",
+        "oem_db_host": "10.26.100.249",
+        "oem_db_port": "1521",
+        "oem_db_name": "OEMDB"
+      }
     },
     "preproduction": {
       "app_name": "ccms-soa",
@@ -201,7 +217,15 @@
       "outbound_s3_bucket_name": "laa-ccms-outbound-preproduction-mp",
       "aws_workspace_cidr": "10.200.0.0/19",
       "northgate_proxy": "10.120.0.0/24",
-      "cloud_platform_cidr": "172.20.0.0/16"
+      "cloud_platform_cidr": "172.20.0.0/16",
+      "oem": {
+        "agent_port": "3872",
+        "oms_host": "10.27.76.143",
+        "oms_port": "4903",
+        "oem_db_host": "10.27.76.170",
+        "oem_db_port": "1521",
+        "oem_db_name": "OEMDB"
+      }
     },
     "production": {
       "app_name": "ccms-soa",
@@ -266,7 +290,15 @@
       "cortex_deps_bucket_name": "ccms-shared",
       "aws_workspace_cidr": "10.200.0.0/19",
       "northgate_proxy": "10.110.0.0/24",
-      "cloud_platform_cidr": "172.20.0.0/16"
+      "cloud_platform_cidr": "172.20.0.0/16",
+      "oem": {
+        "agent_port": "3872",
+        "oms_host": "10.27.68.241",
+        "oms_port": "4903",
+        "oem_db_host": "10.27.68.190",
+        "oem_db_port": "1521",
+        "oem_db_name": "OEMDB"
+      }
     }
   }
 }
