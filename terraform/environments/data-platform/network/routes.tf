@@ -35,7 +35,7 @@ resource "aws_route" "public_to_private_subnets" {
   depends_on = [aws_networkfirewall_firewall.main]
 }
 
-resource "aws_route" "firewall_nat_gateway" {
+resource "aws_route" "firewall_to_nat_gateway" {
   for_each = {
     for key, value in local.subnets : value.az => value
     if value.type == "public"
@@ -46,7 +46,7 @@ resource "aws_route" "firewall_nat_gateway" {
   nat_gateway_id         = aws_nat_gateway.main[each.key].id
 }
 
-resource "aws_route" "private_network_firewall" {
+resource "aws_route" "private_to_network_firewall" {
   for_each = {
     for key, value in local.subnets : value.az => value
     if value.type == "private"
@@ -59,15 +59,28 @@ resource "aws_route" "private_network_firewall" {
   depends_on = [aws_networkfirewall_firewall.main]
 }
 
-module "transit_gateway_routes" {
+module "firewall_transit_gateway_routes" {
   for_each = try(local.environment_configuration.transit_gateway_routes, null) != null ? {
     for key, value in local.subnets : value.az => value
-    if value.type == "private"
+    if value.type == "firewall"
   } : {}
 
   source = "./modules/aws/transit-gateway/routes"
 
-  route_table_id          = aws_route_table.main["private-${each.key}"].id
+  route_table_id          = aws_route_table.main["firewall-${each.key}"].id
   destination_cidr_blocks = values(local.environment_configuration.transit_gateway_routes)
   transit_gateway_id      = data.aws_ec2_transit_gateway.moj_tgw.id
+}
+
+resource "aws_route" "transit_gateway_to_network_firewall" {
+  for_each = {
+    for key, value in local.additional_cidr_subnets : key => value
+    if value.type == "attachments"
+  }
+
+  route_table_id         = aws_route_table.additional[each.key].id
+  destination_cidr_block = aws_vpc.main.cidr_block
+  vpc_endpoint_id        = data.aws_vpc_endpoint.network_firewall[each.value.az].id
+
+  depends_on = [aws_networkfirewall_firewall.main]
 }
