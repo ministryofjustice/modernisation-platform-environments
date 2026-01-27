@@ -354,6 +354,10 @@ resource "aws_s3_bucket_replication_configuration" "moj-database-source-prod-rep
   rule {
     id     = "ppud-report-replication-rule-prod"
     status = "Enabled"
+    filter {}
+    delete_marker_replication {
+      status = "Disabled"
+    }
     destination {
       bucket        = "arn:aws:s3:::mojap-data-engineering-production-ppud-prod"
       storage_class = "STANDARD"
@@ -889,7 +893,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-log-files-uat" {
       storage_class = "STANDARD_IA"
     }
     expiration {
-      days = 180
+      days = 120
     }
   }
 }
@@ -1429,7 +1433,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-log-files-dev" {
       storage_class = "STANDARD_IA"
     }
     expiration {
-      days = 180
+      days = 120
     }
   }
 }

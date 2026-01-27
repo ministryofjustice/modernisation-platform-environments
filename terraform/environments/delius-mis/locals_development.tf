@@ -350,7 +350,7 @@ locals {
     throughtput_capacity = 16
   }
 
-  lb_config = {
+  lb_config_dev = {
     bucket_policy_enabled = true
   }
 

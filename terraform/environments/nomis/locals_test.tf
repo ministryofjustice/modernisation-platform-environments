@@ -262,7 +262,7 @@ locals {
           "/dev/sdc" = { label = "app", size = 100 }
         })
         ebs_volume_config = merge(local.ec2_instances.db.ebs_volume_config, {
-          data  = { total_size = 700 }
+          data  = { total_size = 1000 }
           flash = { total_size = 50 }
         })
         instance = merge(local.ec2_instances.db.instance, {
@@ -289,7 +289,7 @@ locals {
           "/dev/sdc" = { label = "app", size = 100 }
         })
         ebs_volume_config = merge(local.ec2_instances.db19c.ebs_volume_config, {
-          data  = { total_size = 500 }
+          data  = { total_size = 1000 }
           flash = { total_size = 150 }
         })
         instance = merge(local.ec2_instances.db19c.instance, {
@@ -321,7 +321,7 @@ locals {
           "/dev/sdc" = { label = "app", size = 100 }
         })
         ebs_volume_config = merge(local.ec2_instances.db19c.ebs_volume_config, {
-          data  = { total_size = 500 }
+          data  = { total_size = 1000 }
           flash = { total_size = 150 }
         })
         instance = merge(local.ec2_instances.db19c.instance, {
@@ -459,6 +459,7 @@ locals {
           local.cloudwatch_metric_alarms.db_backup,
         )
         config = merge(local.ec2_instances.db.config, {
+          ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-07T12-48-08.562Z"
           availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.ec2_instances.db.config.instance_profile_policies, [
             "Ec2T3DatabasePolicy",

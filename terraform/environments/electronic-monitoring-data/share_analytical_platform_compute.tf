@@ -17,8 +17,6 @@ locals {
     "serco_fms",
     "serco_fms_curated",
     "serco_fms_deduped",
-    "serco_servicenow_curated",
-    "serco_servicenow_deduped",
     "staged_fms",
     "staged_mdss",
     "staging_fms",
@@ -28,7 +26,6 @@ locals {
   live_feeds_dbs = [
     "allied_mdss",
     "serco_fms",
-    "serco_servicenow",
   ]
   historic_source_dbs = local.is-production ? [
     "buddi_buddi",
@@ -51,6 +48,7 @@ locals {
   prod_dbs_to_grant = local.is-production ? [
     "am_stg",
     "buddi_stg",
+    "buddi_buddi",
     "cap_dw_stg",
     "curated_emsys_mvp",
     "curated_emsys_tpims",
@@ -214,7 +212,7 @@ data "aws_iam_policy_document" "dataapi_cross_assume" {
     }
     condition {
       test     = "StringEquals"
-      values   = ["system:serviceaccount:mwaa:electronic-monitoring-data-store-cadet"]
+      values   = ["system:serviceaccount:mwaa:emds-cadet", "system:serviceaccount:mwaa:emds-historic-dev"]
       variable = "oidc.eks.eu-west-2.amazonaws.com/id/${jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]}:sub"
     }
     condition {

@@ -25,14 +25,13 @@ locals {
   baseline_production = {
 
     acm_certificates = {
-      nomis_wildcard_cert_v3 = {
+      nomis_wildcard_cert_v4 = {
         cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
         domain_name                         = "*.nomis.service.justice.gov.uk"
         external_validation_records_created = true
         subject_alternate_names = [
           "*.nomis.az.justice.gov.uk",
           "*.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk",
-          "*.production.nomis.az.justice.gov.uk",
           "*.production.nomis.service.justice.gov.uk",
         ]
         tags = {
@@ -465,10 +464,11 @@ locals {
         })
         tags = merge(local.ec2_instances.db.tags, {
           connectivity-tests = "10.40.0.133:53 10.40.129.79:22"
-          description        = "Disaster-Recovery/High-Availability production databases for AUDIT/MIS"
-          misload-dbname     = "DRMIS"
-          nomis-environment  = "prod"
-          oracle-sids        = "DRMIS DRCNMAUD"
+          # connectivity-tests = "10.40.128.196:53 10.40.10.132:22" # cannot correct due to provider bug, see TM-1715
+          description       = "Disaster-Recovery/High-Availability production databases for AUDIT/MIS"
+          misload-dbname    = "DRMIS"
+          nomis-environment = "prod"
+          oracle-sids       = "DRMIS DRCNMAUD"
         })
       })
     }
@@ -522,7 +522,7 @@ locals {
 
         listeners = merge(local.lbs.private.listeners, {
           https = merge(local.lbs.private.listeners.https, {
-            certificate_names_or_arns = ["nomis_wildcard_cert_v3"]
+            certificate_names_or_arns = ["nomis_wildcard_cert_v4"]
 
             alarm_target_group_names = [
               # "prod-nomis-web-a-http-7777",
@@ -542,7 +542,6 @@ locals {
                   host_header = {
                     values = [
                       "prod-nomis-web-a.production.nomis.service.justice.gov.uk",
-                      "c.production.nomis.az.justice.gov.uk"
                     ]
                   }
                 }]
@@ -593,6 +592,11 @@ locals {
     }
 
     route53_zones = {
+      "nomis.az.justice.gov.uk" = {
+        records = [
+          { name = "c", type = "CNAME", ttl = "1800", records = ["c.nomis.service.justice.gov.uk"] },
+        ]
+      }
 
       "nomis.service.justice.gov.uk" = {
         lb_alias_records = [
@@ -608,13 +612,6 @@ locals {
           { name = "preproduction", type = "NS", ttl = "86400", records = ["ns-1200.awsdns-22.org", "ns-1958.awsdns-52.co.uk", "ns-44.awsdns-05.com", "ns-759.awsdns-30.net"] },
           { name = "reporting", type = "NS", ttl = "86400", records = ["ns-1122.awsdns-12.org", "ns-1844.awsdns-38.co.uk", "ns-388.awsdns-48.com", "ns-887.awsdns-46.net"] },
           { name = "ndh", type = "NS", ttl = "86400", records = ["ns-1106.awsdns-10.org", "ns-1904.awsdns-46.co.uk", "ns-44.awsdns-05.com", "ns-799.awsdns-35.net"] },
-        ]
-      }
-
-      # use this zone for testing as it's in the IE compatibility enterprise site list
-      "production.nomis.az.justice.gov.uk" = {
-        lb_alias_records = [
-          { name = "c", type = "A", lbs_map_key = "private" },
         ]
       }
 

@@ -1,16 +1,52 @@
 {
   "accounts": {
-    "development": {
-      "example_var": "dev-data"
+    "vcms-development": {
+      "container_port": 80,
+      "container_cpu": "512",
+      "task_memory": "1024",
+      "desired_count": 1,
+      "deployment_maximum_percent": 100,
+      "deployment_minimum_healthy_percent": 0,
+      "health_check_grace_period_seconds": 60,
+      "image_tag": "tm-1408-composer-19577361514-1",
+      "db_snapshot_identifier": "rds-vcmsdev-db-backup-2025-09-26-14-04-mpcp",
+      "log_retention_in_days": 14
     },
-    "test": {
-      "example_var": "test-data"
+    "vcms-test": {
+      "container_port": 80,
+      "container_cpu": "512",
+      "task_memory": "1024",
+      "desired_count": 1,
+      "deployment_maximum_percent": 100,
+      "deployment_minimum_healthy_percent": 0,
+      "health_check_grace_period_seconds": 60,
+      "image_tag": "tm-1408-composer-19577361514-1",
+      "db_snapshot_identifier": "",
+      "log_retention_in_days": 14
     },
-    "preproduction": {
-      "example_var": "preproduction-data"
+    "vcms-preproduction": {
+      "container_port": 80,
+      "container_cpu": "512",
+      "task_memory": "1024",
+      "desired_count": 1,
+      "deployment_maximum_percent": 100,
+      "deployment_minimum_healthy_percent": 0,
+      "health_check_grace_period_seconds": 60,
+      "image_tag": "tm-1408-composer-19577361514-1",
+      "db_snapshot_identifier": "",
+      "log_retention_in_days": 90
     },
-    "production": {
-      "example_var": "production-data"
+    "vcms-production": {
+      "container_port": 80,
+      "container_cpu": "512",
+      "task_memory": "1024",
+      "desired_count": 1,
+      "deployment_maximum_percent": 100,
+      "deployment_minimum_healthy_percent": 0,
+      "health_check_grace_period_seconds": 60,
+      "image_tag": "tm-1408-composer-19577361514-1",
+      "db_snapshot_identifier": "",
+      "log_retention_in_days": 90
     }
   }
 }

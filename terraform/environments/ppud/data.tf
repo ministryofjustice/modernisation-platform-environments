@@ -41,7 +41,7 @@ data "aws_acm_certificate" "PPUD_Training_ALB" {
 # ACM certificate for PPUD PROD ALB
 data "aws_acm_certificate" "PPUD_PROD_ALB" {
   count       = local.is-production == true ? 1 : 0
-  domain      = "www.ppud.justice.gov.uk"
+  domain      = "ppud.justice.gov.uk"
   most_recent = true
   statuses    = ["ISSUED"]
 }

@@ -10,9 +10,9 @@ resource "aws_secretsmanager_secret" "oia_secrets" {
 resource "aws_secretsmanager_secret_version" "oia_secrets" {
   secret_id = aws_secretsmanager_secret.oia_secrets.id
   secret_string = jsonencode({
-    "guardduty_slack_channel_id"  = "",
-    "cloudwatch_slack_channel_id" = "",
-    "slack_channel_webhook" = "",
+    "guardduty_slack_channel_id"      = "",
+    "cloudwatch_slack_channel_id"     = "",
+    "slack_channel_webhook"           = "",
     "slack_channel_webhook_guardduty" = ""
   })
 

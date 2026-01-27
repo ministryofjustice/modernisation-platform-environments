@@ -2,7 +2,7 @@ data "aws_vpc" "selected" {
 
   filter {
     name   = "tag:Name"
-    values = ["${local.application_name}-${local.environment}"]
+    values = [local.cp_vpc_name]
   }
 }
 
