@@ -2,8 +2,8 @@
 
 resource "aws_route53_zone" "development_cluster_zone" {
   count = contains(local.mp_environments, terraform.workspace) ? 0 : 1
-  
-  name = "${terraform.workspace}.non-live-development.temp.cloud-platform.service.justice.gov.uk"
+
+  name          = "${terraform.workspace}.non-live-development.temp.cloud-platform.service.justice.gov.uk"
   force_destroy = true
 
   tags = {
@@ -14,7 +14,7 @@ resource "aws_route53_zone" "development_cluster_zone" {
 
 resource "aws_route53_record" "development_cluster_hosted_zone_ns" {
   count = contains(local.mp_environments, terraform.workspace) ? 0 : 1
-  
+
   zone_id = data.aws_route53_zone.account_hosted_zone.zone_id
   name    = aws_route53_zone.development_cluster_zone[0].name
   type    = "NS"
