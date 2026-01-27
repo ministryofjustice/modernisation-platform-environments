@@ -69,7 +69,8 @@ module "push_lambda_event_queue" {
   bucket               = module.this-bucket.bucket
   lambda_function_name = module.push_lambda.lambda_function_name
   bucket_prefix        = "emds-${var.environment_shorthand}"
-  maximum_concurrency  = 0
+  maximum_concurrency  = 100
+  enabled              = false
 }
 
 
@@ -90,7 +91,7 @@ module "push_lambda" {
   production_dev                = var.environment_shorthand
   security_group_ids            = var.security_group_ids
   subnet_ids                    = var.subnet_ids
-  reserved_concurrent_executions = 0
+  reserved_concurrent_executions = 100
 
   environment_variables = {
     DESTINATION_BUCKET = var.destination_bucket_id
