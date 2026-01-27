@@ -59,14 +59,12 @@ resource "aws_s3_bucket_notification" "bucket_notification" {
   bucket = module.this-bucket.bucket.id
 
   queue {
-    queue_arn = module.push_queue.sqs_queue.arn
+    queue_arn = module.push_lambda_event_queue.sqs_queue.arn
     events    = ["s3:ObjectCreated:*"]
   }
-
-  depends_on = [aws_lambda_permission.allow_bucket]
 }
 
-module "load_fms_event_queue" {
+module "push_lambda_event_queue" {
   source               = "../sqs_s3_lambda_trigger"
   bucket               = module.this-bucket.bucket
   lambda_function_name = module.push_lambda.lambda_function_name
