@@ -30,7 +30,7 @@ locals {
         tags = {
           description = "cert for oasys preproduction domains"
         }
-      }      
+      }
     }
 
     cloudwatch_dashboards = {
