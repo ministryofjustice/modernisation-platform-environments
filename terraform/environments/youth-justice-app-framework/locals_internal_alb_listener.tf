@@ -162,20 +162,6 @@ locals {
             }
           }]
         },
-        connectivity = {
-          priority = 12
-          actions = [
-            {
-              type             = "forward"
-              target_group_key = "connectivity-target-group-1"
-            }
-          ]
-          conditions = [{
-            path_pattern = {
-              values = ["/api/v1/connectivity*", "/cjse/*"]
-            }
-          }]
-        },
         gateway-internal = {
           priority = 22
           actions = [
@@ -613,21 +599,6 @@ locals {
             http_header = {
               http_header_name = "service-health"
               values           = ["assets"]
-            }
-          }]
-        },
-        connectivity_health = {
-          priority = 43
-          actions = [
-            {
-              type             = "forward"
-              target_group_key = "connectivity-target-group-1"
-            }
-          ]
-          conditions = [{ #header condition for connectivity
-            http_header = {
-              http_header_name = "service-health"
-              values           = ["connectivity"]
             }
           }]
         }
