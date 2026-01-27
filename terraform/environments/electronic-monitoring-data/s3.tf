@@ -18,9 +18,9 @@ locals {
   }
 
   p1_export_bucket_destination_mapping = {
-    "production"    = "tct-339712706964-prearrivals"
+    "production"    = null
     "preproduction" = null
-    "test"          = "tct-339712706964-prearrivals-dev"
+    "test"          = null
     "development"   = null
   }
 
