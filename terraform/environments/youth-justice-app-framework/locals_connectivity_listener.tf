@@ -1,9 +1,8 @@
 locals {
-  # Helper to resolve the target group ARN, whether local or existing
   connectivity_tg_arn = lookup(
     var.existing_target_groups,
     "connectivity-target-group-1",
-    aws_lb_target_group.this["connectivity-target-group-1"].arn
+    null
   )
 
   connectivity_listeners = {
@@ -12,7 +11,7 @@ locals {
       protocol                             = "HTTP"
       routing_http_response_server_enabled = true
 
-      # Default forward uses helper
+      # Default forward uses the existing target group ARN
       forward = {
         target_group_arn = local.connectivity_tg_arn
       }
@@ -36,7 +35,7 @@ locals {
         },
 
         connectivity_health = {
-          priority = 2
+          priority = 23
           actions = [
             {
               type             = "forward"
