@@ -168,11 +168,11 @@ resource "aws_launch_template" "ec2-launch-template-admin" {
 data "template_file" "launch-template-managed" {
   template = file("${path.module}/templates/user-data.sh")
   vars = {
-    cluster_name       = "${local.application_data.accounts[local.environment][local.component_name].app_name}-cluster"
+    cluster_name       = "soasandbox-${local.application_data.accounts[local.environment].app_name}-cluster"
     efs_id             = aws_efs_file_system.storage.id
     server             = "managed"
-    inbound_bucket     = local.application_data.accounts[local.environment][local.component_name].inbound_s3_bucket_name
-    outbound_bucket    = local.application_data.accounts[local.environment][local.component_name].outbound_s3_bucket_name
+    inbound_bucket     = local.application_data.accounts[local.environment].inbound_s3_bucket_name
+    outbound_bucket    = local.application_data.accounts[local.environment].outbound_s3_bucket_name
     deploy_environment = local.environment
   }
 }
@@ -180,11 +180,11 @@ data "template_file" "launch-template-managed" {
 data "template_file" "launch-template-admin" {
   template = file("${path.module}/templates/user-data.sh")
   vars = {
-    cluster_name       = "${local.application_data.accounts[local.environment][local.component_name].app_name}-cluster"
+    cluster_name       = "soasandbox-${local.application_data.accounts[local.environment].app_name}-cluster"
     efs_id             = aws_efs_file_system.storage.id
     server             = "admin"
-    inbound_bucket     = local.application_data.accounts[local.environment][local.component_name].inbound_s3_bucket_name
-    outbound_bucket    = local.application_data.accounts[local.environment][local.component_name].outbound_s3_bucket_name
+    inbound_bucket     = local.application_data.accounts[local.environment].inbound_s3_bucket_name
+    outbound_bucket    = local.application_data.accounts[local.environment].outbound_s3_bucket_name
     deploy_environment = local.environment
   }
 }
