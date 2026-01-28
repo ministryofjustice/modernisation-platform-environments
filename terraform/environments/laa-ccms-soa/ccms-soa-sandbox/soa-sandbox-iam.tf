@@ -18,7 +18,7 @@ data "aws_iam_policy_document" "ecs_task_execution_role" {
 }
 
 resource "aws_iam_role" "ecs_task_execution_role" {
-  name               = "${local.application_data.accounts[local.environment][local.component_name].app_name}-WorldTaskExecutionRole"
+  name               = "soa-${local.component_name}.${local.application_data.accounts[local.environment].app_name}-WorldTaskExecutionRole"
   assume_role_policy = data.aws_iam_policy_document.ecs_task_execution_role.json
   tags               = local.tags
 }
@@ -29,7 +29,7 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_role" {
 }
 
 resource "aws_iam_policy" "ecs_secrets_policy" {
-  name   = "${local.application_data.accounts[local.environment][local.component_name].app_name}-ecs_secrets_policy"
+  name   = "soa-${local.component_name}.${local.application_data.accounts[local.environment].app_name}-ecs_secrets_policy"
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -51,8 +51,8 @@ resource "aws_iam_role_policy_attachment" "ecs_secrets_policy_attachment" {
 }
 
 resource "aws_iam_policy" "soa_s3_policy" {
-  name        = "${local.application_data.accounts[local.environment][local.component_name].app_name}-s3-policy"
-  description = "${local.application_data.accounts[local.environment][local.component_name].app_name} s3-policy"
+  name        = "soa-${local.component_name}.${local.application_data.accounts[local.environment].app_name}-s3-policy"
+  description = "soa-${local.component_name}.${local.application_data.accounts[local.environment].app_name} s3-policy"
 
   policy = <<EOF
 {
@@ -68,10 +68,10 @@ resource "aws_iam_policy" "soa_s3_policy" {
                 "s3:RestoreObject"
             ],
             "Resource": [
-                "arn:aws:s3:::${local.application_data.accounts[local.environment][local.component_name].inbound_s3_bucket_name}/*",
-                "arn:aws:s3:::${local.application_data.accounts[local.environment][local.component_name].inbound_s3_bucket_name}",
-                "arn:aws:s3:::${local.application_data.accounts[local.environment][local.component_name].outbound_s3_bucket_name}/*",
-                "arn:aws:s3:::${local.application_data.accounts[local.environment][local.component_name].outbound_s3_bucket_name}"
+                "arn:aws:s3:::${local.application_data.accounts[local.environment].inbound_s3_bucket_name}/*",
+                "arn:aws:s3:::${local.application_data.accounts[local.environment].inbound_s3_bucket_name}",
+                "arn:aws:s3:::${local.application_data.accounts[local.environment].outbound_s3_bucket_name}/*",
+                "arn:aws:s3:::${local.application_data.accounts[local.environment].outbound_s3_bucket_name}"
             ]
         }
     ]
@@ -81,8 +81,8 @@ EOF
 
 resource "aws_iam_policy" "soa_s3_policy_cortex_deps" {
   # count       = local.is-production ? 1 : 0
-  name        = "${local.application_data.accounts[local.environment][local.component_name].app_name}-s3-policy-cortex-deps"
-  description = "${local.application_data.accounts[local.environment][local.component_name].app_name} s3-policy-cortex-deps"
+  name        = "soa-${local.component_name}.${local.application_data.accounts[local.environment].app_name}-s3-policy-cortex-deps"
+  description = "soa-${local.component_name}.${local.application_data.accounts[local.environment].app_name} s3-policy-cortex-deps"
 
   policy = <<EOF
 {
@@ -95,8 +95,8 @@ resource "aws_iam_policy" "soa_s3_policy_cortex_deps" {
                 "s3:GetObject"
             ],
             "Resource": [
-               "arn:aws:s3:::${local.application_data.accounts[local.environment][local.component_name].cortex_deps_bucket_name}/*",
-                "arn:aws:s3:::${local.application_data.accounts[local.environment][local.component_name].cortex_deps_bucket_name}"
+               "arn:aws:s3:::${local.application_data.accounts[local.environment].cortex_deps_bucket_name}/*",
+                "arn:aws:s3:::${local.application_data.accounts[local.environment].cortex_deps_bucket_name}"
             ]
         }
     ]
@@ -106,12 +106,12 @@ EOF
 
 #--EC2
 resource "aws_iam_instance_profile" "ec2_instance_profile" {
-  name = "${local.application_data.accounts[local.environment][local.component_name].app_name}-ec2-instance-profile"
+  name = "soa-${local.component_name}.${local.application_data.accounts[local.environment].app_name}-ec2-instance-profile"
   role = aws_iam_role.ec2_instance_role.name
 }
 
 resource "aws_iam_role" "ec2_instance_role" {
-  name = "${local.application_data.accounts[local.environment][local.component_name].app_name}-ec2-instance-role"
+  name = "soa-${local.component_name}.${local.application_data.accounts[local.environment].app_name}-ec2-instance-role"
 
   assume_role_policy = <<EOF
 {
@@ -131,7 +131,7 @@ EOF
 }
 
 resource "aws_iam_policy" "ec2_instance_policy" {
-  name = "${local.application_data.accounts[local.environment][local.component_name].app_name}-ec2-instance-policy"
+  name = "soa-${local.component_name}.${local.application_data.accounts[local.environment].app_name}-ec2-instance-policy"
 
   policy = <<EOF
 {
