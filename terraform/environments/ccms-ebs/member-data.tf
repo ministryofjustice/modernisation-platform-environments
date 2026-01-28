@@ -174,7 +174,7 @@ data "aws_iam_policy_document" "s3_topic_policy" {
       test     = "ArnLike"
       variable = "aws:SourceArn"
       values = concat([
-        module.s3-bucket.bucket.arn,
+        # module.s3-bucket.bucket.arn, # DISABLED (artefacts bucket removed)
         module.s3-bucket-logging.bucket.arn,
         module.s3-bucket-dbbackup.bucket.arn,
         ],
