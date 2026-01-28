@@ -1435,7 +1435,8 @@ data "aws_iam_policy_document" "iceberg_table_maintenance_iam_role_policy_docume
       "athena:StartQueryExecution",
       "athena:GetQueryExecution",
       "athena:GetQueryResults",
-      "athena:GetDataCatalog"
+      "athena:GetDataCatalog",
+      "athena:GetWorkGroup"
     ]
     resources = [
       "arn:aws:athena:${data.aws_region.current.region}:${local.env_account_id}:*/*"
