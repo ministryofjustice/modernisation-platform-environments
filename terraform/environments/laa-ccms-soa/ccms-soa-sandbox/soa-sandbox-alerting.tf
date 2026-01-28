@@ -65,7 +65,7 @@ resource "aws_sns_topic_policy" "guarduty_default" {
 
 #--Alerts RDS
 resource "aws_db_event_subscription" "rds_events" {
-  name        = "${local.application_data.accounts[local.environment][local.component_name].app_name}-rds-event-sub"
+  name        = "soasandbox-${local.component_name}.${local.application_data.accounts[local.environment].app_name}-rds-event-sub"
   sns_topic   = aws_sns_topic.alerts.arn
   source_type = "db-instance"
   source_ids  = [aws_db_instance.soa_db.identifier]
