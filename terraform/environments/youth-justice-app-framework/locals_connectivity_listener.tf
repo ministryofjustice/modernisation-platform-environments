@@ -5,8 +5,11 @@ locals {
       port                                 = 8080
       protocol                             = "HTTP"
       routing_http_response_server_enabled = true
-      # remove default forward
-
+      fixed_response = {
+        status_code  = 403
+        message_body = "Access Denied"
+        content_type = "text/plain"
+      }
       rules = {
         connectivity = {
           priority = 1
