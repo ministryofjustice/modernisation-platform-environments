@@ -73,10 +73,10 @@ resource "aws_cloudfront_distribution" "tribunals_http_redirect_compiled" {
   aliases = local.cloudfront_nginx_sans_compiled
 
   origin {
-    domain_name = "dummy-http-redirect.s3.amazonaws.com"
-    origin_id   = "dummy-http-origin"
-    connection_attempts      = 3
-    connection_timeout       = 10
+    domain_name         = "dummy-http-redirect.s3.amazonaws.com"
+    origin_id           = "dummy-http-origin"
+    connection_attempts = 3
+    connection_timeout  = 10
 
     s3_origin_config {
       origin_access_identity = ""

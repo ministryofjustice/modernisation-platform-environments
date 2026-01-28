@@ -456,6 +456,12 @@ def lambda_handler(event, context):
     # SNS message comes in event['Records'][0]['Sns']
     sns_message = event['Records'][0]['Sns']
     message_str = sns_message.get('Message', '{}')
+     
+    # Check for SNS control message types and ignore them
+    sns_type = sns_message.get('Type', '')
+    if sns_type in ("SubscriptionConfirmation", "UnsubscribeConfirmation"):
+        logger.info(f"Ignoring SNS control message Type={sns_type}")
+        return
 
     try:
         alarm_details = json.loads(message_str)
@@ -471,10 +477,24 @@ def lambda_handler(event, context):
             if event_source == "aws:s3":
                 source = "aws.s3"
 
-        if not source:
-            # Default to CloudWatch if nothing else matches
-            source = "aws.cloudwatch"
+        # helper to detect CloudWatch Alarm payloads (SNS -> CloudWatch Alarms often have no 'source')
+        def looks_like_cloudwatch_alarm(d: dict) -> bool:  
+            if not isinstance(d, dict):                     
+                return False                                
+            required = ("AlarmName", "NewStateValue")   
+            return all(k in d for k in required)
 
+        if not source:
+        #     # Default to CloudWatch if nothing else matches
+        #     # source = "aws.cloudwatch"
+            if looks_like_cloudwatch_alarm(alarm_details):
+                source = "aws.cloudwatch"                    
+            else:
+                logger.warning(
+                    "Source not detected and payload does not look like a CloudWatch Alarm; skipping notification."
+                )
+                return
+          
         logger.info("source:" + str(source))
 
         env_config = {
