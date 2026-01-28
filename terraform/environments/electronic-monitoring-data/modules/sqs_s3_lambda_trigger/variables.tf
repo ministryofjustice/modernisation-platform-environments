@@ -28,3 +28,9 @@ variable "max_receive_count" {
   type        = number
   default     = 2
 }
+
+variable "enabled" {
+  description = "whether to enable the sqs queue"
+  type        = bool
+  default     = true
+}

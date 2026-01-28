@@ -1365,6 +1365,134 @@ resource "aws_iam_role_policy_attachment" "mdss_daily_failure_digest_attach" {
   policy_arn = aws_iam_policy.mdss_daily_failure_digest.arn
 }
 
+#-----------------------------------------------------------------------------------
+# Copy data from test to dev or prod to preprod
+#-----------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "cross_account_copy" {
+  count = local.is-test || local.is-production ? 1 : 0
+  statement {
+    sid    = "AccessToCrossAccountBucket"
+    effect = "Allow"
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:DescribeKey"
+    ]
+    resources = [local.cross_account_kms]
+  }
+  statement {
+    sid    = "AccessToInAccountBucket"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:GetObjectTagging"
+    ]
+    resources = ["${module.s3-data-bucket.bucket.arn}/*"]
+  }
+  statement {
+    sid    = "AllowDumpToExternalBuckets"
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:PutObjectAcl"
+    ]
+    resources = [local.cross_account_bucket]
+  }
+}
+
+resource "aws_iam_role" "cross_account_copy" {
+  count              = local.is-test || local.is-production ? 1 : 0
+  name               = "cross_account_copy_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_policy" "cross_account_copy" {
+  count  = local.is-test || local.is-production ? 1 : 0
+  name   = "cross_account_copy_lambda_policy"
+  policy = data.aws_iam_policy_document.cross_account_copy[0].json
+}
+
+resource "aws_iam_role_policy_attachment" "cross_account_copy" {
+  count      = local.is-test || local.is-production ? 1 : 0
+  role       = aws_iam_role.cross_account_copy[0].name
+  policy_arn = aws_iam_policy.cross_account_copy[0].arn
+}
+
+
+#-----------------------------------------------------------------------------------
+# Iceberg table maint
+#-----------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "iceberg_table_maintenance_iam_role_policy_document" {
+  count = local.is-development || local.is-preproduction ? 1 : 0
+  statement {
+    sid    = "AthenaQueryPermissions"
+    effect = "Allow"
+    actions = [
+      "athena:StartQueryExecution",
+      "athena:GetQueryExecution",
+      "athena:GetQueryResults",
+      "athena:GetDataCatalog"
+    ]
+    resources = [
+      "arn:aws:athena:${data.aws_region.current.region}:${local.env_account_id}:*/*"
+    ]
+  }
+
+  statement {
+    sid    = "GlueMetadataUpdate"
+    effect = "Allow"
+    actions = [
+      "glue:GetDatabase",
+      "glue:GetTable",
+      "glue:UpdateTable",
+      "glue:GetPartitions"
+    ]
+    resources = [
+      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:catalog",
+      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:database/g4s_tasking",
+      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/g4s_tasking/tbl_answers"
+    ]
+  }
+
+  statement {
+    sid    = "S3DataMaintenance"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:DeleteObject",
+      "s3:ListBucket"
+    ]
+    resources = [
+      module.s3-create-a-derived-table-bucket.bucket.arn,
+      "${module.s3-create-a-derived-table-bucket.bucket.arn}/staging/g4s_tasking_pipeline/g4s_tasking/tbl_answers/*"
+    ]
+  }
+}
+
+
+resource "aws_iam_role" "iceberg_table_maintenance_iam_role" {
+  count              = local.is-development || local.is-preproduction ? 1 : 0
+  name               = "iceberg_table_maintenance_iam_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_policy" "iceberg_table_maintenance_iam_role_policy" {
+  count  = local.is-development || local.is-preproduction ? 1 : 0
+  name   = "iceberg_table_maintenance_iam_policy"
+  policy = data.aws_iam_policy_document.iceberg_table_maintenance_iam_role_policy_document[0].json
+}
+
+resource "aws_iam_role_policy_attachment" "iceberg_table_maintenance_iam_role_policy_attachment" {
+  count      = local.is-development || local.is-preproduction ? 1 : 0
+  role       = aws_iam_role.iceberg_table_maintenance_iam_role[0].name
+  policy_arn = aws_iam_policy.iceberg_table_maintenance_iam_role_policy[0].arn
+}
+
 
 
 #-----------------------------------------------------------------------------------
