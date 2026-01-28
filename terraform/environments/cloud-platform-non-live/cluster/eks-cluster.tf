@@ -123,12 +123,7 @@ module "eks" {
     }
   }
 
-  tags = merge(
-    local.tags,
-    {
-      "cluster-createdby" = var.created_by
-    }
-  )
+  tags = local.tags
 }
 
 module "karpenter" {

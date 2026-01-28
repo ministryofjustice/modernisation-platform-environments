@@ -23,3 +23,9 @@ variable "maximum_concurrency" {
   default     = 10
   nullable    = true
 }
+
+variable "enabled" {
+  description = "whether to enable the sqs queue"
+  type        = bool
+  default     = true
+}

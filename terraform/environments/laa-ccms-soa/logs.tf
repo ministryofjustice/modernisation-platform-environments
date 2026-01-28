@@ -102,19 +102,102 @@ resource "aws_cloudwatch_log_metric_filter" "soa_benefit_checker_rollback_error_
   }
 }
 
-resource "aws_cloudwatch_log_metric_filter" "soa_custom_checks_error_managed" {
-  name           = "SOACustomChecksManaged"
-  pattern        = "\"<Local Script Error>\""
+# resource "aws_cloudwatch_log_metric_filter" "soa_custom_checks_error_managed" {
+#   name           = "SOACustomChecksManaged"
+#   pattern        = "\"<Local Script Error>\""
+#   log_group_name = aws_cloudwatch_log_group.log_group_managed.name
+
+#   metric_transformation {
+#     name      = "SOACustomChecksManaged"
+#     namespace = "CCMS-SOA-APP"
+#     value     = "1"
+#   }
+# }
+
+# Spilting out custom checks errors for easier alerting in Slack channel
+resource "aws_cloudwatch_log_metric_filter" "soa_custom_check_test_paths" {
+  name           = "SOACustomCheckTestPaths"
+  pattern        = "\"<Local Script Error>\" \"failed to respond\""
   log_group_name = aws_cloudwatch_log_group.log_group_managed.name
 
   metric_transformation {
-    name      = "SOACustomChecksManaged"
+    name      = "SOACustomCheckTestPaths"
     namespace = "CCMS-SOA-APP"
     value     = "1"
   }
 }
 
+resource "aws_cloudwatch_log_metric_filter" "soa_custom_check_server_health" {
+  name           = "SOACustomChecksCheckServerHealth"
+  pattern        = "\"<Local Script Error>\" \"health status\""
+  log_group_name = aws_cloudwatch_log_group.log_group_managed.name
 
+  metric_transformation {
+    name      = "SOACustomChecksCheckServerHealth"
+    namespace = "CCMS-SOA-APP"
+    value     = "1"
+  }
+}
+
+resource "aws_cloudwatch_log_metric_filter" "soa_custom_check_percentage_heap_free_memory" {
+  name           = "SOACustomCheckPercentageHeapFreeMemory"
+  pattern        = "\"<Local Script Error>\" \"heap free memory\""
+  log_group_name = aws_cloudwatch_log_group.log_group_managed.name
+
+  metric_transformation {
+    name      = "SOACustomCheckPercentageHeapFreeMemory"
+    namespace = "CCMS-SOA-APP"
+    value     = "1"
+  }
+}
+
+resource "aws_cloudwatch_log_metric_filter" "soa_custom_check_stuck_threads" {
+  name           = "SOACustomCheckStuckThreads"
+  pattern        = "\"<Local Script Error>\" \"stuck threads\""
+  log_group_name = aws_cloudwatch_log_group.log_group_managed.name
+
+  metric_transformation {
+    name      = "SOACustomCheckStuckThreads"
+    namespace = "CCMS-SOA-APP"
+    value     = "1"
+  }
+}
+
+resource "aws_cloudwatch_log_metric_filter" "soa_custom_check_hogging_threads" {
+  name           = "SOACustomCheckHoggingThreads"
+  pattern        = "\"<Local Script Error>\" \"hogging threads\""
+  log_group_name = aws_cloudwatch_log_group.log_group_managed.name
+
+  metric_transformation {
+    name      = "SOACustomCheckHoggingThreads"
+    namespace = "CCMS-SOA-APP"
+    value     = "1"
+  }
+}
+
+resource "aws_cloudwatch_log_metric_filter" "soa_custom_check_jdbc_ebssms_state" {
+  name           = "SOACustomCheckJDBCebssmsState"
+  pattern        = "\"<Local Script Error>\" \"JDBC datasource state\""
+  log_group_name = aws_cloudwatch_log_group.log_group_managed.name
+
+  metric_transformation {
+    name      = "SOACustomCheckJDBCebssmsState"
+    namespace = "CCMS-SOA-APP"
+    value     = "1"
+  }
+}
+
+resource "aws_cloudwatch_log_metric_filter" "soa_custom_check_jdbc_failed_reserve_request_count" {
+  name           = "SOACustomCheckJDBCFailedReserveRequestCount"
+  pattern        = "\"<Local Script Error>\" \"JDBC datasource failedReserveRequestCount\""
+  log_group_name = aws_cloudwatch_log_group.log_group_managed.name
+
+  metric_transformation {
+    name      = "SOACustomCheckJDBCFailedReserveRequestCount"
+    namespace = "CCMS-SOA-APP"
+    value     = "1"
+  }
+}
 
 resource "aws_cloudwatch_log_subscription_filter" "ccms_soa_edn_quiesced_filter" {
   name            = "${local.application_name}-${local.environment}-ccms-soa-edn-quiesced-filter"

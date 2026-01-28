@@ -20,9 +20,9 @@ resource "aws_cloudwatch_metric_alarm" "load_mdss_dlq_alarm" {
   ]
 }
 
-resource "aws_cloudwatch_metric_alarm" "clean_mdss_dlq_alarm" {
-  alarm_name          = "clean_mdss_dlq_has_messages"
-  alarm_description   = "Triggered when cleanup MDSS DLQ receives failures"
+resource "aws_cloudwatch_metric_alarm" "clean_dlt_dlq_alarm" {
+  alarm_name          = "clean_dlt_dlq_has_messages"
+  alarm_description   = "Triggered when cleanup dlt DLQ receives failures"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
   threshold           = 0
@@ -34,7 +34,7 @@ resource "aws_cloudwatch_metric_alarm" "clean_mdss_dlq_alarm" {
   statistic   = "Sum"
 
   dimensions = {
-    QueueName = module.load_mdss_event_queue.sqs_dlq.name
+    QueueName = aws_sqs_queue.clean_dlt_load_dlq.name
   }
 
   alarm_actions = [
@@ -65,8 +65,8 @@ resource "aws_cloudwatch_metric_alarm" "glue_database_count_high" {
 }
 
 resource "aws_cloudwatch_log_metric_filter" "mdss_fatal_failures" {
-  name           = "mdss-fatal-failures"
-  log_group_name = "/aws/lambda/load_mdss"
+  name           = "mdss-fatal-failures-unstructured"
+  log_group_name = module.load_mdss_lambda.cloudwatch_log_group.name
 
   pattern = "{ ($.level = \"ERROR\") || ($.message = \"*Pipeline execution failed*\") || ($.message = \"*LoadClientJobFailed*\") || ($.message = \"*DatabaseTerminalException*\") || ($.message = \"*Terminal exception*\") }"
 

@@ -464,8 +464,8 @@ resource "aws_cloudwatch_event_rule" "glue_db_count_metrics_schedule" {
 }
 
 resource "aws_cloudwatch_event_target" "glue_db_count_metrics_target" {
-  rule  = aws_cloudwatch_event_rule.glue_db_count_metrics_schedule.name
-  arn   = module.glue_db_count_metrics.lambda_function_arn
+  rule = aws_cloudwatch_event_rule.glue_db_count_metrics_schedule.name
+  arn  = module.glue_db_count_metrics.lambda_function_arn
 }
 
 resource "aws_lambda_permission" "glue_db_count_metrics_allow_eventbridge" {
@@ -482,7 +482,7 @@ resource "aws_lambda_permission" "glue_db_count_metrics_allow_eventbridge" {
 # BackFill Data
 #-----------------------------------------------------------------------------------
 module "data_cutback" {
-  count = local.is-development || local.is-production ? 1 : 0
+  count                   = local.is-development || local.is-production ? 1 : 0
   source                  = "./modules/lambdas"
   is_image                = true
   function_name           = "data_cutback"
@@ -511,43 +511,22 @@ module "mdss_daily_failure_digest" {
   role_arn                       = aws_iam_role.mdss_daily_failure_digest.arn
   handler                        = "mdss_daily_failure_digest.handler"
   memory_size                    = 512
-  timeout                        = 60
+  timeout                        = 120
   reserved_concurrent_executions = 1
   core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
   production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
-  security_group_ids             = [aws_security_group.lambda_generic.id]
-  subnet_ids                     = data.aws_subnets.shared-public.ids
+
+  security_group_ids = [aws_security_group.lambda_generic.id]
+  subnet_ids         = data.aws_subnets.shared-public.ids
 
   environment_variables = {
     SNS_TOPIC_ARN  = aws_sns_topic.emds_alerts.arn
     ENVIRONMENT    = local.environment_shorthand
     NAMESPACE      = "EMDS/MDSS"
     LOOKBACK_HOURS = "24"
-  }
-}
 
-#-----------------------------------------------------------------------------------
-# Copy data from test to dev or prod to preprod
-#-----------------------------------------------------------------------------------
-
-module "cross_account_copy" {
-  count                          = local.is-test || local.is-production ? 1 : 0
-  source                         = "./modules/lambdas"
-  is_image                       = true
-  function_name                  = "cross_account_copy"
-  role_name                      = aws_iam_role.cross_account_copy[0].name
-  role_arn                       = aws_iam_role.cross_account_copy[0].arn
-  handler                        = "cross_account_copy.handler"
-  memory_size                    = 512
-  timeout                        = 60
-  reserved_concurrent_executions = 100
-  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
-  production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
-  security_group_ids             = [aws_security_group.lambda_generic.id]
-  subnet_ids                     = data.aws_subnets.shared-public.ids
-
-  environment_variables = {
-    SECRET_ID  = module.cross_account_details[0].secret_id
+    LOAD_MDSS_DLQ_NAME = module.load_mdss_event_queue.sqs_dlq.name
+    CLEAN_DLT_DLQ_NAME = aws_sqs_queue.clean_dlt_load_dlq.name
   }
 }
 
@@ -556,7 +535,7 @@ module "cross_account_copy" {
 #-----------------------------------------------------------------------------------
 
 resource "aws_iam_role" "mdss_daily_failure_digest_scheduler" {
-  name  = "mdss_daily_failure_digest_scheduler_role"
+  name = "mdss_daily_failure_digest_scheduler_role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -571,8 +550,8 @@ resource "aws_iam_role" "mdss_daily_failure_digest_scheduler" {
 }
 
 resource "aws_iam_role_policy" "mdss_daily_failure_digest_scheduler_invoke" {
-  name  = "mdss_daily_failure_digest_scheduler_invoke_policy"
-  role  = aws_iam_role.mdss_daily_failure_digest_scheduler.id
+  name = "mdss_daily_failure_digest_scheduler_invoke_policy"
+  role = aws_iam_role.mdss_daily_failure_digest_scheduler.id
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -600,5 +579,54 @@ resource "aws_scheduler_schedule" "mdss_daily_failure_digest" {
   target {
     arn      = module.mdss_daily_failure_digest.lambda_function_arn
     role_arn = aws_iam_role.mdss_daily_failure_digest_scheduler.arn
+  }
+}
+
+#-----------------------------------------------------------------------------------
+# Iceberg Table Maint
+#-----------------------------------------------------------------------------------
+
+module "iceberg-table-maintenance" {
+  count                   = local.is-development || local.is-preproduction ? 1 : 0
+  source                  = "./modules/lambdas"
+  is_image                = true
+  function_name           = "iceberg_table_maintenance"
+  role_name               = aws_iam_role.iceberg_table_maintenance_iam_role[0].name
+  role_arn                = aws_iam_role.iceberg_table_maintenance_iam_role[0].arn
+  handler                 = "iceberg_table_maintenance.handler"
+  memory_size             = 1024
+  timeout                 = 900
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+}
+
+
+#-----------------------------------------------------------------------------------
+# Bucket replication
+#-----------------------------------------------------------------------------------
+
+module "create_fms_general_batch_replication_job" {
+  count = local.is-development || local.is-preproduction ? 0 : 1
+
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "create_batch_replication_job"
+  role_name                      = aws_iam_role.bucket_replication[0].name
+  role_arn                       = aws_iam_role.bucket_replication[0].arn
+  handler                        = "create_batch_replication_job.handler"
+  memory_size                    = 512
+  timeout                        = 120
+  reserved_concurrent_executions = 1
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+
+  security_group_ids = [aws_security_group.lambda_generic.id]
+  subnet_ids         = data.aws_subnets.shared-public.ids
+
+  environment_variables = {
+    ACCOUNT_ID = data.aws_caller_identity.current.account_id
+    BATCH_COPY_ROLE = module.s3-fms-general-landing-bucket.replication_role_arn
+    DESTINATION_ACCOUNT_SECRET_ARN = module.cross_account_details[0].secret_arn
+    METADATA_BUCKET_ARN = module.s3-metadata-bucket.bucket.arn
   }
 }

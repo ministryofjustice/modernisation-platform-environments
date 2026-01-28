@@ -204,14 +204,14 @@ module "load_fms_event_queue" {
 }
 
 resource "aws_s3_bucket_notification" "load_mdss_event" {
-
   bucket = module.s3-raw-formatted-data-bucket.bucket.id
 
   queue {
     queue_arn     = module.load_mdss_event_queue.sqs_queue.arn
     events        = ["s3:ObjectCreated:*"]
-    filter_prefix = "allied/mdss"
+    filter_prefix = "allied/mdss/"
   }
+
   queue {
     queue_arn     = module.load_fms_event_queue.sqs_queue.arn
     events        = ["s3:ObjectCreated:*"]
@@ -225,17 +225,17 @@ resource "aws_s3_bucket_notification" "load_mdss_event" {
 # Clean up MDSS load queue
 # ----------------------------------------------
 
-resource "aws_sqs_queue" "clean_mdss_load_dlq" {
-  name                    = "clean-mdss-load-dlq"
+resource "aws_sqs_queue" "clean_dlt_load_dlq" {
+  name                    = "clean-dlt-load-dlq"
   sqs_managed_sse_enabled = true
 }
 
 resource "aws_sqs_queue" "clean_dlt_load_queue" {
-  name                       = "clean-mdss-load-queue"
+  name                       = "clean-dlt-load-queue"
   visibility_timeout_seconds = 15 * 60
   message_retention_seconds  = 1209600 # 14 days
   redrive_policy = jsonencode({
-    deadLetterTargetArn = aws_sqs_queue.clean_mdss_load_dlq.arn
+    deadLetterTargetArn = aws_sqs_queue.clean_dlt_load_dlq.arn
     maxReceiveCount     = 5
   })
   sqs_managed_sse_enabled = true
@@ -254,18 +254,4 @@ resource "aws_lambda_event_source_mapping" "mdss_cleanup_sqs_trigger" {
   scaling_config {
     maximum_concurrency = 100
   }
-}
-
-# ----------------------------------------------
-# Load data sqs queue
-# ----------------------------------------------
-
-module "cross_account_copy_queue" {
-  count = local.is-test || local.is-production ? 1 : 0
-
-  source               = "./modules/sqs_s3_lambda_trigger"
-  bucket               = module.s3-data-bucket.bucket
-  lambda_function_name = module.cross_account_copy[0].lambda_function_name
-  bucket_prefix        = local.bucket_prefix
-  maximum_concurrency  = 100
 }
