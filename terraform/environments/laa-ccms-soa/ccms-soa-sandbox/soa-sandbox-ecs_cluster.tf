@@ -1,13 +1,13 @@
 #--Capacity Providers (Tells the cluster to use the EC2 autoscaling group)
 resource "aws_ecs_capacity_provider" "managed" {
-  name = "managed-${local.component_name}.${local.application_data.accounts[local.environment].app_name}-capacity-provider-managed"
+  name = "managed_${local.component_name}.${local.application_data.accounts[local.environment].app_name}_capacity_provider_managed"
   auto_scaling_group_provider {
     auto_scaling_group_arn = aws_autoscaling_group.cluster-scaling-group-managed.arn
   }
 }
 
 resource "aws_ecs_capacity_provider" "admin" {
-  name = "admin-${local.component_name}.${local.application_data.accounts[local.environment].app_name}-capacity-provider-admin"
+  name = "admin_${local.component_name}.${local.application_data.accounts[local.environment].app_name}_capacity_provider_admin"
   auto_scaling_group_provider {
     auto_scaling_group_arn = aws_autoscaling_group.cluster-scaling-group-admin.arn
   }
@@ -15,7 +15,7 @@ resource "aws_ecs_capacity_provider" "admin" {
 
 #--Cluster
 resource "aws_ecs_cluster" "main" {
-  name = "main-${local.component_name}.${local.application_data.accounts[local.environment].app_name}-cluster"
+  name = "main_${local.component_name}.${local.application_data.accounts[local.environment].app_name}_cluster"
   setting {
     name  = "containerInsights"
     value = "enabled"
