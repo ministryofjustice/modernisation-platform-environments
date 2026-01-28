@@ -91,7 +91,7 @@ resource "aws_ecs_service" "admin" {
   name                               = "soasandbox-${local.application_data.accounts[local.environment].app_name}-admin"
   cluster                            = aws_ecs_cluster.main.id
   task_definition                    = aws_ecs_task_definition.admin.arn
-  desired_count                      = local.application_data.accounts[local.environment][local.component_name].admin_app_count
+  desired_count                      = local.application_data.accounts[local.environment].admin_app_count
   deployment_maximum_percent         = 100
   deployment_minimum_healthy_percent = 0
   launch_type                        = "EC2"
@@ -120,8 +120,8 @@ resource "aws_ecs_service" "admin" {
 
   load_balancer {
     target_group_arn = aws_lb_target_group.admin.id
-    container_name   = "${local.application_data.accounts[local.environment][local.component_name].app_name}-admin"
-    container_port   = local.application_data.accounts[local.environment][local.component_name].admin_server_port
+    container_name   = "soasandbox-${local.application_data.accounts[local.environment].app_name}-admin"
+    container_port   = local.application_data.accounts[local.environment].admin_server_port
   }
 
   depends_on = [
