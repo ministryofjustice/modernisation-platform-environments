@@ -121,12 +121,7 @@ resource "aws_glue_crawler" "cur_v2_crawler" {
 resource "aws_athena_named_query" "fct_daily_cost" {
   name     = "fct-daily-cost"
   database = aws_glue_catalog_database.cur_v2_database.name
-  query = templatefile(
-    "${path.module}/queries/fct_daily_cost.sql",
-    {
-      bucket = "coat-${local.environment}-cur-v2-hourly"
-    }
-  )
+  query = "SELECT * FROM table;"
 }
 
 resource "null_resource" "execute_create_table_query" {
