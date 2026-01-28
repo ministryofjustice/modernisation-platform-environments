@@ -546,7 +546,15 @@ locals {
 
     lbs = {
       public = merge(local.lbs.public, {
+
         access_logs_lifecycle_rule = [module.baseline_presets.s3_lifecycle_rules.general_purpose_one_year]
+
+        s3_notification_queues = {
+          "cortex-xsiam-s3-public-alb-log-collection" = {
+            events    = ["s3:ObjectCreated:*"]
+            queue_arn = "cortex-xsiam-s3-alb-log-collection"
+          }
+        }
 
         listeners = merge(local.lbs.public.listeners, {
           https = merge(local.lbs.public.listeners.https, {
@@ -645,6 +653,16 @@ locals {
       })
 
       private = merge(local.lbs.private, {
+
+        access_logs_lifecycle_rule = [module.baseline_presets.s3_lifecycle_rules.general_purpose_one_year]
+
+        s3_notification_queues = {
+          "cortex-xsiam-s3-private-alb-log-collection" = {
+            events    = ["s3:ObjectCreated:*"]
+            queue_arn = "cortex-xsiam-s3-alb-log-collection"
+          }
+        }
+
         listeners = merge(local.lbs.private.listeners, {
           https = merge(local.lbs.private.listeners.https, {
             certificate_names_or_arns = ["pd_oasys_cert"]
@@ -821,6 +839,35 @@ locals {
           { name = "db.trn.oasys", type = "CNAME", ttl = "3600", records = ["ptctrn-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
           { name = "db.ptc.oasys", type = "CNAME", ttl = "3600", records = ["ptctrn-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
           { name = "db.onr", type = "CNAME", ttl = "3600", records = ["pd-onr-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
+        ]
+      }
+      "oasys.az.justice.gov.uk" = {
+        records = [
+          { name = "_f3741832781b53d3c8d6ebd0c2f785dd.onr", type = "CNAME", ttl = 86400, records = ["_5021c8da699c0e8c8841f906c7ced90e.sdgjtdhdhz.acm-validations.aws"] },
+          { name = "onr", type = "A", ttl = "300", records = ["10.40.6.210"] }
+        ]
+        lb_alias_records = [
+          { name = "", type = "A", lbs_map_key = "private" },
+          { name = "training", type = "A", lbs_map_key = "private" },
+          { name = "practice", type = "A", lbs_map_key = "private" }
+        ]
+      }
+      "p-oasys.az.justice.gov.uk" = {
+        records = [
+        ]
+        lb_alias_records = [
+          { name = "", type = "A", lbs_map_key = "private" },
+          { name = "training", type = "A", lbs_map_key = "private" },
+          { name = "practice", type = "A", lbs_map_key = "private" }
+        ]
+      }
+      "bridge-oasys.az.justice.gov.uk" = {
+        records = [
+        ]
+        lb_alias_records = [
+          { name = "", type = "A", lbs_map_key = "public" },
+          { name = "training", type = "A", lbs_map_key = "public" },
+          { name = "practice", type = "A", lbs_map_key = "public" }
         ]
       }
       "oasys.service.justice.gov.uk" = {
