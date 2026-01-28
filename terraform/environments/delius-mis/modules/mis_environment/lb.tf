@@ -315,7 +315,7 @@ resource "aws_lb_target_group" "bws" {
   )
 }
 
-# HTTP listener - redirect to HTTPS
+# HTTP listener - redirect to HTTPS
 resource "aws_lb_listener" "mis_http" {
   count = var.lb_config != null ? 1 : 0
 

@@ -508,4 +508,19 @@ module "LAA-ftp-1stlocate-ccms-inbound" {
   s3_object_ftp_client     = aws_s3_object.ftp_client.key
   #ftp_cron                     = "cron(0 10 * * ? *)"
   enabled_cron_in_environments = local.enable_cron_in_environments
-} 
+}
+
+resource "aws_s3_bucket_notification" "ftp_bucket_notification_sns" {
+  for_each = {
+    for name, b in aws_s3_bucket.buckets :
+    name => b if name == "laa-ccms-inbound-${local.environment}-mp"
+  }
+  bucket      = each.value.id
+  eventbridge = true
+  topic {
+    topic_arn = aws_sns_topic.s3_topic.arn
+    events    = ["s3:ObjectCreated:*"]
+  }
+
+  depends_on = [aws_sns_topic.s3_topic]
+}

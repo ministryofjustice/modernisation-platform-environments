@@ -52,11 +52,11 @@ EOF
   )
 }
 
+
 resource "aws_sns_topic_policy" "sns_policy" {
   arn    = aws_sns_topic.cw_alerts.arn
   policy = data.aws_iam_policy_document.sns_topic_policy_ec2cw.json
 }
-
 
 resource "aws_sns_topic" "s3_topic" {
   name              = "s3-event-notification-topic"
@@ -67,15 +67,11 @@ resource "aws_sns_topic" "s3_topic" {
   )
 }
 
-# resource "aws_sns_topic_policy" "s3_policy" {
-#   arn    = aws_sns_topic.s3_topic.arn
-#   policy = data.aws_iam_policy_document.sns_topic_policy_s3.json
-# }
-
+# S3 SNS -> Lambda (Slack) instead of email
 resource "aws_sns_topic_subscription" "s3_subscription" {
   topic_arn = aws_sns_topic.s3_topic.arn
-  protocol  = "email"
-  endpoint  = aws_secretsmanager_secret_version.alerts_subscription_email.secret_string
+  protocol  = "lambda"
+  endpoint  = aws_lambda_function.cloudwatch_sns.arn
 }
 
 resource "aws_sns_topic" "ddos_alarm" {
@@ -86,18 +82,13 @@ resource "aws_sns_topic" "ddos_alarm" {
   )
 }
 
-# resource "aws_sns_topic_policy" "ddos_policy" {
-#   arn    = aws_sns_topic.ddos_alarm.arn
-#   policy = data.aws_iam_policy_document.sns_topic_policy_ddos.json
-# }
-
+# DDoS SNS -> Lambda (Slack) instead of email
 resource "aws_sns_topic_subscription" "ddos_subscription" {
   topic_arn = aws_sns_topic.ddos_alarm.arn
-  protocol  = "email"
-  endpoint  = aws_secretsmanager_secret_version.alerts_subscription_email.secret_string
+  protocol  = "lambda"
+  endpoint  = aws_lambda_function.cloudwatch_sns.arn
 }
 
-#--Altering SNS
 resource "aws_sns_topic" "guardduty_alerts" {
   name              = "${local.application_name}-guardduty-alerts"
   delivery_policy   = <<EOF

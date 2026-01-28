@@ -120,6 +120,7 @@ resource "aws_iam_role_policy_attachment" "maintenance_window_task_policy_attach
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMFullAccess"
 }
 
+/*
 ####################################################
 # IAM User, Policy for MGN
 ####################################################
@@ -138,6 +139,7 @@ resource "aws_iam_user_policy_attachment" "mgn_attach_policy" {
   user       = aws_iam_user.mgn_user.name
   policy_arn = "arn:aws:iam::aws:policy/AWSApplicationMigrationFullAccess"
 }
+*/
 
 ####################################################
 # IAM User, Policy, Access Key for email
