@@ -56,31 +56,31 @@ resource "aws_ecs_task_definition" "admin" {
   container_definitions = templatefile(
     "${path.module}/templates/task_definition_admin.json.tpl",
     {
-      app_name             = local.application_data.accounts[local.environment][local.component_name].app_name
-      app_image            = local.application_data.accounts[local.environment][local.component_name].admin_app_image
-      admin_server_port    = local.application_data.accounts[local.environment][local.component_name].admin_server_port
-      aws_region           = local.application_data.accounts[local.environment][local.component_name].aws_region
-      container_version    = local.application_data.accounts[local.environment][local.component_name].admin_container_version
+      app_name             = local.application_data.accounts[local.environment].app_name
+      app_image            = local.application_data.accounts[local.environment].admin_app_image
+      admin_server_port    = local.application_data.accounts[local.environment].admin_server_port
+      aws_region           = local.application_data.accounts[local.environment].aws_region
+      container_version    = local.application_data.accounts[local.environment].admin_container_version
       soa_password         = aws_secretsmanager_secret.soa_password.arn
-      db_user              = local.application_data.accounts[local.environment][local.component_name].soa_db_user
-      db_role              = local.application_data.accounts[local.environment][local.component_name].soa_db_role
+      db_user              = local.application_data.accounts[local.environment].soa_db_user
+      db_role              = local.application_data.accounts[local.environment].soa_db_role
       db_instance_endpoint = aws_db_instance.soa_db.endpoint
       as_hostname          = aws_route53_record.admin.fqdn
-      wl_admin_mem_args    = local.application_data.accounts[local.environment][local.component_name].admin_wl_mem_args
-      xxsoa_ds_host        = local.application_data.accounts[local.environment][local.component_name].tds_db_endpoint
-      xxsoa_ds_db          = local.application_data.accounts[local.environment][local.component_name].tds_ds_db
-      xxsoa_ds_username    = local.application_data.accounts[local.environment][local.component_name].admin_xxsoa_ds_username
-      xxsoa_ds_url         = local.application_data.accounts[local.environment][local.component_name].xxsoa_ds_url
+      wl_admin_mem_args    = local.application_data.accounts[local.environment].admin_wl_mem_args
+      xxsoa_ds_host        = local.application_data.accounts[local.environment].tds_db_endpoint
+      xxsoa_ds_db          = local.application_data.accounts[local.environment].tds_ds_db
+      xxsoa_ds_username    = local.application_data.accounts[local.environment].admin_xxsoa_ds_username
+      xxsoa_ds_url         = local.application_data.accounts[local.environment].xxsoa_ds_url
       xxsoa_ds_password    = aws_secretsmanager_secret.xxsoa_ds_password.arn
-      ebs_ds_url           = local.application_data.accounts[local.environment][local.component_name].admin_ebs_ds_url
-      ebs_ds_username      = local.application_data.accounts[local.environment][local.component_name].admin_ebs_ds_username
+      ebs_ds_url           = local.application_data.accounts[local.environment].admin_ebs_ds_url
+      ebs_ds_username      = local.application_data.accounts[local.environment].admin_ebs_ds_username
       ebs_ds_password      = aws_secretsmanager_secret.ebs_ds_password.arn
       trust_store_password = aws_secretsmanager_secret.trust_store_password.arn
-      ebssms_ds_url        = local.application_data.accounts[local.environment][local.component_name].admin_ebssms_ds_url
-      ebssms_ds_username   = local.application_data.accounts[local.environment][local.component_name].admin_ebs_ds_username
+      ebssms_ds_url        = local.application_data.accounts[local.environment].admin_ebssms_ds_url
+      ebssms_ds_username   = local.application_data.accounts[local.environment].admin_ebs_ds_username
       ebssms_ds_password   = aws_secretsmanager_secret.ebssms_ds_password.arn
       pui_user_password    = aws_secretsmanager_secret.pui_user_password.arn
-      ebs_user_username    = local.application_data.accounts[local.environment][local.component_name].admin_ebs_user_username
+      ebs_user_username    = local.application_data.accounts[local.environment].admin_ebs_user_username
       ebs_user_password    = aws_secretsmanager_secret.ebs_user_password.arn
       run_rcu              = local.application_data.accounts[local.environment][local.component_name].admin_run_rcu_bootstrap
     }
@@ -88,7 +88,7 @@ resource "aws_ecs_task_definition" "admin" {
 }
 
 resource "aws_ecs_service" "admin" {
-  name                               = "${local.application_data.accounts[local.environment][local.component_name].app_name}-admin"
+  name                               = "soasandbox-${local.application_data.accounts[local.environment].app_name}-admin"
   cluster                            = aws_ecs_cluster.main.id
   task_definition                    = aws_ecs_task_definition.admin.arn
   desired_count                      = local.application_data.accounts[local.environment][local.component_name].admin_app_count
@@ -137,7 +137,7 @@ resource "aws_ecs_service" "admin" {
 
 #--Managed
 resource "aws_ecs_task_definition" "managed" {
-  family             = "${local.application_data.accounts[local.environment][local.component_name].app_name}-managed-task"
+  family             = "soasandbox-${local.application_data.accounts[local.environment].app_name}-managed-task"
   execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
   network_mode       = "awsvpc"
   requires_compatibilities = [
@@ -163,26 +163,26 @@ resource "aws_ecs_task_definition" "managed" {
   container_definitions = templatefile(
     "${path.module}/templates/task_definition_managed.json.tpl",
     {
-      app_name             = local.application_data.accounts[local.environment][local.component_name].app_name
-      app_image            = local.application_data.accounts[local.environment][local.component_name].managed_app_image
-      managed_server_port  = local.application_data.accounts[local.environment][local.component_name].managed_server_port
-      admin_server_port    = local.application_data.accounts[local.environment][local.component_name].admin_server_port
-      aws_region           = local.application_data.accounts[local.environment][local.component_name].aws_region
-      container_version    = local.application_data.accounts[local.environment][local.component_name].managed_container_version
+      app_name             = local.application_data.accounts[local.environment].app_name
+      app_image            = local.application_data.accounts[local.environment].managed_app_image
+      managed_server_port  = local.application_data.accounts[local.environment].managed_server_port
+      admin_server_port    = local.application_data.accounts[local.environment].admin_server_port
+      aws_region           = local.application_data.accounts[local.environment].aws_region
+      container_version    = local.application_data.accounts[local.environment].managed_container_version
       admin_host           = aws_route53_record.admin.fqdn
       soa_password         = aws_secretsmanager_secret.soa_password.arn
       trust_store_password = aws_secretsmanager_secret.trust_store_password.arn
       ms_hostname          = aws_route53_record.managed.fqdn
-      wl_mem_args          = local.application_data.accounts[local.environment][local.component_name].managed_wl_mem_args
+      wl_mem_args          = local.application_data.accounts[local.environment].managed_wl_mem_args
     }
   )
 }
 
 resource "aws_ecs_service" "managed" {
-  name                               = "${local.application_data.accounts[local.environment][local.component_name].app_name}-managed"
+  name                               = "soasandbox-${local.application_data.accounts[local.environment].app_name}-managed"
   cluster                            = aws_ecs_cluster.main.id
   task_definition                    = aws_ecs_task_definition.managed.arn
-  desired_count                      = local.application_data.accounts[local.environment][local.component_name].managed_app_count
+  desired_count                      = local.application_data.accounts[local.environment].managed_app_count
   deployment_maximum_percent         = 100
   deployment_minimum_healthy_percent = 50
   launch_type                        = "EC2"
@@ -211,8 +211,8 @@ resource "aws_ecs_service" "managed" {
 
   load_balancer {
     target_group_arn = aws_lb_target_group.managed.id
-    container_name   = "${local.application_data.accounts[local.environment][local.component_name].app_name}-managed"
-    container_port   = local.application_data.accounts[local.environment][local.component_name].managed_server_port
+    container_name   = "soasandbox-${local.application_data.accounts[local.environment].app_name}-managed"
+    container_port   = local.application_data.accounts[local.environment].managed_server_port
   }
 
   depends_on = [
