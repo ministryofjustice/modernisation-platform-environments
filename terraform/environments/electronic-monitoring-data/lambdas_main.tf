@@ -603,7 +603,7 @@ module "iceberg-table-maintenance" {
   production_dev          = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
 
   environment_variables = {
-    ATHENA_QUERY_RESULTS_BUCKET = module.s3-athena-bucket.bucket
+    ATHENA_QUERY_RESULTS_BUCKET = module.s3-athena-bucket.bucket.id
   }
 }
 
