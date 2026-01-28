@@ -1,6 +1,6 @@
 #--ALB Admin
 resource "aws_security_group" "alb_admin" {
-  name        = "${local.application_data.accounts[local.environment].local.application_data.accounts[local.component_name].app_name}_alb_admin"
+  name        = "${local.application_data.accounts[local.environment][local.component_name].app_name}_alb_admin"
   description = "Controls Traffic for SOA Admin Application"
   vpc_id      = data.aws_vpc.shared.id
 }
@@ -77,7 +77,7 @@ resource "aws_security_group_rule" "alb_admin_egress_all" {
 
 #--Managed
 resource "aws_security_group" "alb_managed" {
-  name        = "${local.application_data.accounts[local.environment].local.application_data.accounts[local.component_name].app_name}_alb_managed"
+  name        = "${local.application_data.accounts[local.environment][local.component_name].app_name}_alb_managed"
   description = "Controls Traffic for SOA Managed Application"
   vpc_id      = data.aws_vpc.shared.id
 }
