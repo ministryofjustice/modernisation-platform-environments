@@ -210,7 +210,7 @@ data "aws_iam_policy_document" "allow_inventory_access" {
 
     resources = [
       module.s3-metadata-bucket.bucket.arn,
-      "${module.s3-metadata-bucket.bucket.arn,}/*",
+      "${module.s3-metadata-bucket.bucket.arn}/*",
     ]
 
     condition {
