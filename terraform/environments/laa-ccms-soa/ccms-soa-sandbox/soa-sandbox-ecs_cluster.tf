@@ -1,13 +1,13 @@
 #--Capacity Providers (Tells the cluster to use the EC2 autoscaling group)
 resource "aws_ecs_capacity_provider" "managed" {
-  name = "managed_${local.component_name}.${local.application_data.accounts[local.environment].app_name}_capacity_provider_managed"
+  name = "soasandbox-managed-${local.application_data.accounts[local.environment].app_name}-capacity-provider-managed"
   auto_scaling_group_provider {
     auto_scaling_group_arn = aws_autoscaling_group.cluster-scaling-group-managed.arn
   }
 }
 
 resource "aws_ecs_capacity_provider" "admin" {
-  name = "admin_${local.component_name}.${local.application_data.accounts[local.environment].app_name}_capacity_provider_admin"
+  name = "soasandbox-admin-${local.application_data.accounts[local.environment].app_name}-capacity-provider-admin"
   auto_scaling_group_provider {
     auto_scaling_group_arn = aws_autoscaling_group.cluster-scaling-group-admin.arn
   }
@@ -15,7 +15,7 @@ resource "aws_ecs_capacity_provider" "admin" {
 
 #--Cluster
 resource "aws_ecs_cluster" "main" {
-  name = "main_${local.component_name}.${local.application_data.accounts[local.environment].app_name}_cluster"
+  name = "soasandbox-main-${local.application_data.accounts[local.environment].app_name}-cluster"
   setting {
     name  = "containerInsights"
     value = "enabled"
@@ -29,7 +29,7 @@ resource "aws_ecs_cluster_capacity_providers" "main" {
 
 #--Admin
 resource "aws_ecs_task_definition" "admin" {
-  family             = "admin-${local.component_name}.${local.application_data.accounts[local.environment].app_name}-admin-task"
+  family             = "soasandbox-admin-${local.component_name}.${local.application_data.accounts[local.environment].app_name}-admin-task"
   execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
   network_mode       = "awsvpc"
   requires_compatibilities = [
