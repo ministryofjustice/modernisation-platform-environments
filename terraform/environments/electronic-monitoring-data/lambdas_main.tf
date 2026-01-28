@@ -601,6 +601,10 @@ module "iceberg-table-maintenance" {
   timeout                 = 900
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev          = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+
+  environment_variables = {
+    ATHENA_QUERY_RESULTS_BUCKET = module.s3-athena-bucket.bucket.id
+  }
 }
 
 
