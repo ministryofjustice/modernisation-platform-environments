@@ -42,6 +42,14 @@ environment:
           b: 10.199.148.0/22 # 10.199.148.0 - 10.199.151.255 (1022)
           c: 10.199.152.0/22 # 10.199.152.0 - 10.199.155.255 (1022)
           # unallocated: 10.199.156.0/22 # 10.199.156.0 - 10.199.159.255 (1022)
+    transit_gateway:
+      routes:
+        - name: internal
+          cidr: 10.0.0.0/8
+          description: MoJ internal network
+        - name: cloud-platform
+          cidr: 172.20.0.0/16
+          description: Cloud Platform
   test:
     vpc:
       cidr_block: 10.200.128.0/19 # 10.200.128.0 - 10.200.159.255 (8190)

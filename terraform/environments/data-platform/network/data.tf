@@ -24,7 +24,7 @@ data "github_ip_ranges" "main" {}
 
 data "aws_ec2_transit_gateway" "moj_tgw" {
   filter {
-    name = "owner-id"
+    name   = "owner-id"
     values = ["037161842252"]
   }
 

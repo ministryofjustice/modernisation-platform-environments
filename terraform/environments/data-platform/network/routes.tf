@@ -9,19 +9,9 @@ resource "aws_route" "public_internet_gateway" {
   gateway_id             = aws_internet_gateway.main.id
 }
 
-resource "aws_route" "public_to_firewall_subnets" {
-  for_each = {
-    for key, value in local.subnets : value.az => value
-    if value.type == "public"
-  }
-
-  route_table_id         = aws_route_table.main["public-${each.key}"].id
-  destination_cidr_block = aws_subnet.main["firewall-${each.key}"].cidr_block
-  vpc_endpoint_id        = data.aws_vpc_endpoint.network_firewall[each.key].id
-
-  depends_on = [aws_networkfirewall_firewall.main]
-}
-
+# Public to private subnet route forces ingress traffic (e.g., NLB → backend)
+# through Network Firewall for inspection. Without this, traffic would use
+# the implicit local route and bypass the firewall entirely.
 resource "aws_route" "public_to_private_subnets" {
   for_each = {
     for key, value in local.subnets : value.az => value
@@ -60,7 +50,7 @@ resource "aws_route" "private_to_network_firewall" {
 }
 
 module "firewall_transit_gateway_routes" {
-  for_each = try(local.environment_configuration.transit_gateway_routes, null) != null ? {
+  for_each = length(local.transit_gateway_routes) > 0 ? {
     for key, value in local.subnets : value.az => value
     if value.type == "firewall"
   } : {}
@@ -68,12 +58,12 @@ module "firewall_transit_gateway_routes" {
   source = "./modules/aws/transit-gateway/routes"
 
   route_table_id          = aws_route_table.main["firewall-${each.key}"].id
-  destination_cidr_blocks = values(local.environment_configuration.transit_gateway_routes)
+  destination_cidr_blocks = values(local.transit_gateway_routes)
   transit_gateway_id      = data.aws_ec2_transit_gateway.moj_tgw.id
 }
 
 resource "aws_route" "transit_gateway_to_network_firewall" {
-  for_each = try(local.environment_configuration.transit_gateway_routes, null) != null ? {
+  for_each = length(local.transit_gateway_routes) > 0 ? {
     for key, value in local.additional_cidr_subnets : key => value
     if value.type == "attachments"
   } : {}

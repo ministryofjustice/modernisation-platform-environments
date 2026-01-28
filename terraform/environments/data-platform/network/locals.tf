@@ -75,4 +75,13 @@ locals {
     fqdn = yamldecode(file("${path.module}/configuration/network-firewall/rules/fqdn-rules.yml"))
     ip   = yamldecode(file("${path.module}/configuration/network-firewall/rules/ip-rules.yml"))
   }
+
+  /* Transit Gateway Routes
+    - Parse from YAML configuration if present
+    - Convert list of routes to map for easy lookup
+  */
+  transit_gateway_routes = try(
+    { for route in local.network_configuration.transit_gateway.routes : route.name => route.cidr },
+    {}
+  )
 }
