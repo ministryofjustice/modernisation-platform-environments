@@ -2,7 +2,7 @@
 # IAM Role for CCMS-SOA Quiesced Monitor Lambda
 ##########################################################
 resource "aws_iam_role" "lambda_ccms_soa_quiesced_role" {
-  name = "${local.application_name}-${local.environment}-quiesced-role"
+  name = "${local.application_name}-${local.environment}-${local.component_name}-quiesced-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -16,12 +16,12 @@ resource "aws_iam_role" "lambda_ccms_soa_quiesced_role" {
   })
 
   tags = merge(local.tags, {
-    Name = "${local.application_name}-${local.environment}-quiesced-role"
+    Name = "${local.application_name}-${local.environment}-${local.component_name}-quiesced-role"
   })
 }
 
 resource "aws_iam_role_policy" "lambda_ccms_soa_quiesced_policy" {
-  name = "${local.application_name}-${local.environment}-quiesced-policy"
+  name = "${local.application_name}-${local.environment}-${local.component_name}-quiesced-policy"
   role = aws_iam_role.lambda_ccms_soa_quiesced_role.id
 
   policy = jsonencode({
@@ -75,8 +75,8 @@ resource "aws_iam_role_policy" "lambda_ccms_soa_quiesced_policy" {
 # Otherwise Terraform will error: "S3 Error Code: NoSuchKey"
 ##########################################################
 resource "aws_lambda_layer_version" "lambda_layer_ccms_soa_edn_quiesced" {
-  layer_name               = "${local.application_name}-edn-quiesced-layer"
-  s3_key                   = "lambda_delivery/${local.application_name}-edn-quiesced-layer/layerV1.zip"
+  layer_name               = "${local.application_name}-${local.component_name}-edn-quiesced-layer"
+  s3_key                   = "lambda_delivery/${local.application_name}-${local.component_name}-edn-quiesced-layer/layerV1.zip"
   s3_bucket                = module.s3-bucket-shared.bucket.id
   compatible_runtimes      = ["python3.13"]
   compatible_architectures = ["x86_64"]
@@ -98,7 +98,7 @@ data "archive_file" "ccms_soa_quiesced_zip" {
 resource "aws_lambda_function" "ccms_soa_edn_quiesced_monitor" {
   filename         = data.archive_file.ccms_soa_quiesced_zip.output_path
   source_code_hash = filebase64sha256(data.archive_file.ccms_soa_quiesced_zip.output_path)
-  function_name    = "${local.application_name}-${local.environment}-edn-quiesced-monitor"
+  function_name    = "${local.application_name}-${local.environment}-${local.component_name}-edn-quiesced-monitor"
   role             = aws_iam_role.lambda_ccms_soa_quiesced_role.arn
   handler          = "lambda_function.lambda_handler"
   runtime          = "python3.13"
@@ -118,7 +118,7 @@ resource "aws_lambda_function" "ccms_soa_edn_quiesced_monitor" {
   }
 
   tags = merge(local.tags, {
-    Name = "${local.application_name}-${local.environment}-edn-quiesced-monitor"
+    Name = "${local.application_name}-${local.environment}-${local.component_name}-edn-quiesced-monitor"
   })
 }
 
