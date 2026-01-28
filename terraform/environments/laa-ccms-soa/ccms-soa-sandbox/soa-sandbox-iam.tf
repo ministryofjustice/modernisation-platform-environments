@@ -79,30 +79,30 @@ resource "aws_iam_policy" "soa_s3_policy" {
 EOF
 }
 
-resource "aws_iam_policy" "soa_s3_policy_cortex_deps" {
-  # count       = local.is-production ? 1 : 0
-  name        = "soa-${local.component_name}.${local.application_data.accounts[local.environment].app_name}-s3-policy-cortex-deps"
-  description = "soa-${local.component_name}.${local.application_data.accounts[local.environment].app_name} s3-policy-cortex-deps"
+# resource "aws_iam_policy" "soa_s3_policy_cortex_deps" {
+#   # count       = local.is-production ? 1 : 0
+#   name        = "soa-${local.component_name}.${local.application_data.accounts[local.environment].app_name}-s3-policy-cortex-deps"
+#   description = "soa-${local.component_name}.${local.application_data.accounts[local.environment].app_name} s3-policy-cortex-deps"
 
-  policy = <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [
-                "s3:ListBucket",
-                "s3:GetObject"
-            ],
-            "Resource": [
-               "arn:aws:s3:::${local.application_data.accounts[local.environment].cortex_deps_bucket_name}/*",
-                "arn:aws:s3:::${local.application_data.accounts[local.environment].cortex_deps_bucket_name}"
-            ]
-        }
-    ]
-}
-EOF
-}
+#   policy = <<EOF
+# {
+#     "Version": "2012-10-17",
+#     "Statement": [
+#         {
+#             "Effect": "Allow",
+#             "Action": [
+#                 "s3:ListBucket",
+#                 "s3:GetObject"
+#             ],
+#             "Resource": [
+#                "arn:aws:s3:::${local.application_data.accounts[local.environment].cortex_deps_bucket_name}/*",
+#                 "arn:aws:s3:::${local.application_data.accounts[local.environment].cortex_deps_bucket_name}"
+#             ]
+#         }
+#     ]
+# }
+# EOF
+# }
 
 #--EC2
 resource "aws_iam_instance_profile" "ec2_instance_profile" {

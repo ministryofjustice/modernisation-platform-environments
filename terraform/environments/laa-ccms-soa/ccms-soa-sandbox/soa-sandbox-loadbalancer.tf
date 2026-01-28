@@ -24,7 +24,7 @@ resource "aws_lb" "admin" {
 
 resource "aws_lb_target_group" "admin" {
   name                 = "${local.component_name}-admin-tg"
-  port                 = local.application_data.accounts[local.environment][local.component_name].admin_server_port
+  port                 = local.application_data.accounts[local.environment].admin_server_port
   protocol             = "TCP"
   vpc_id               = data.aws_vpc.shared.id
   target_type          = "ip"
@@ -35,7 +35,7 @@ resource "aws_lb_target_group" "admin" {
     enabled             = true
     interval            = 30
     path                = "/weblogic/ready"
-    port                = local.application_data.accounts[local.environment][local.component_name].admin_server_port
+    port                = local.application_data.accounts[local.environment].admin_server_port
     protocol            = "HTTP"
     timeout             = 5
     healthy_threshold   = 3
@@ -69,7 +69,7 @@ resource "aws_lb_listener" "admin443" {
 
 resource "aws_lb_listener" "admin_server_port" {
   load_balancer_arn = aws_lb.admin.id
-  port              = local.application_data.accounts[local.environment][local.component_name].admin_server_port
+  port              = local.application_data.accounts[local.environment].admin_server_port
   protocol          = "TCP"
 
   default_action {
@@ -102,7 +102,7 @@ resource "aws_lb" "managed" {
 
 resource "aws_lb_target_group" "managed" {
   name        = "${local.component_name}-managed-tg"
-  port        = local.application_data.accounts[local.environment][local.component_name].managed_server_port
+  port        = local.application_data.accounts[local.environment].managed_server_port
   protocol    = "TCP"
   vpc_id      = data.aws_vpc.shared.id
   target_type = "ip"
@@ -140,7 +140,7 @@ resource "aws_lb_listener" "managed443" {
 
 resource "aws_lb_listener" "managed_server_port" {
   load_balancer_arn = aws_lb.managed.id
-  port              = local.application_data.accounts[local.environment][local.component_name].managed_server_port
+  port              = local.application_data.accounts[local.environment].managed_server_port
   protocol          = "TCP"
 
   default_action {
