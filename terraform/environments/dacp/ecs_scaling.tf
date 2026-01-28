@@ -1,17 +1,21 @@
 resource "aws_appautoscaling_target" "ecs_service" {
   service_namespace  = "ecs"
-  resource_id        = "service/dacp_cluster/dacp-win2022"
+  resource_id        = "service/${aws_ecs_cluster.dacp_cluster.name}/${aws_ecs_service.dacp_ecs_service.name}"
   scalable_dimension = "ecs:service:DesiredCount"
   min_capacity       = 2
   max_capacity       = 4
 
-  # Suspend scaling during deployment
   suspended_state {
     dynamic_scaling_in_suspended  = true
     dynamic_scaling_out_suspended = true
     scheduled_scaling_suspended   = true
   }
+
+  depends_on = [
+    aws_ecs_service.dacp_ecs_service
+  ]
 }
+
 
 resource "aws_appautoscaling_policy" "scale_up_amber" {
   name               = "scale-up-amber"

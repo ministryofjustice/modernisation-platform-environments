@@ -3,9 +3,10 @@ module "eks_cluster_logs_kms_access_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.60.0"
+  version = "6.3.0"
 
   name_prefix = "eks-cluster-logs-kms-access"
+  description = "IAM Policy"
 
   policy = data.aws_iam_policy_document.eks_cluster_logs_kms_access.json
 
@@ -47,9 +48,10 @@ module "karpenter_sqs_kms_access_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.60.0"
+  version = "6.3.0"
 
   name_prefix = "karpenter-sqs-kms-access"
+  description = "IAM Policy"
 
   policy = data.aws_iam_policy_document.karpenter_sqs_kms_access.json
 
@@ -75,9 +77,10 @@ module "amazon_prometheus_proxy_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.60.0"
+  version = "6.3.0"
 
   name_prefix = "amazon-prometheus-proxy"
+  description = "IAM Policy"
 
   policy = data.aws_iam_policy_document.amazon_prometheus_proxy.json
 
@@ -104,9 +107,10 @@ module "managed_prometheus_kms_access_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.60.0"
+  version = "6.3.0"
 
   name_prefix = "managed-prometheus-kms-access"
+  description = "IAM Policy"
 
   policy = data.aws_iam_policy_document.managed_prometheus_kms_access.json
 
@@ -135,9 +139,10 @@ module "ecr_pull_through_cache_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.60.0"
+  version = "6.3.0"
 
   name_prefix = "ecr-pull-through-cache"
+  description = "IAM Policy"
 
   policy = data.aws_iam_policy_document.ecr_pull_through_cache.json
 
@@ -164,9 +169,10 @@ module "velero_kms_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.60.0"
+  version = "6.3.0"
 
   name_prefix = "velero-kms-access"
+  description = "IAM Policy"
 
   policy = data.aws_iam_policy_document.velero_kms_access.json
 

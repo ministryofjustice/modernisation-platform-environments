@@ -262,7 +262,7 @@ locals {
           "/dev/sdc" = { label = "app", size = 100 }
         })
         ebs_volume_config = merge(local.ec2_instances.db.ebs_volume_config, {
-          data  = { total_size = 700 }
+          data  = { total_size = 1000 }
           flash = { total_size = 50 }
         })
         instance = merge(local.ec2_instances.db.instance, {
@@ -289,7 +289,7 @@ locals {
           "/dev/sdc" = { label = "app", size = 100 }
         })
         ebs_volume_config = merge(local.ec2_instances.db19c.ebs_volume_config, {
-          data  = { total_size = 500 }
+          data  = { total_size = 1000 }
           flash = { total_size = 150 }
         })
         instance = merge(local.ec2_instances.db19c.instance, {
@@ -321,7 +321,7 @@ locals {
           "/dev/sdc" = { label = "app", size = 100 }
         })
         ebs_volume_config = merge(local.ec2_instances.db19c.ebs_volume_config, {
-          data  = { total_size = 500 }
+          data  = { total_size = 1000 }
           flash = { total_size = 150 }
         })
         instance = merge(local.ec2_instances.db19c.instance, {

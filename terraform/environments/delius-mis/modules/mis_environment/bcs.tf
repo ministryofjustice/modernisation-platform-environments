@@ -13,6 +13,7 @@ resource "aws_vpc_security_group_ingress_rule" "bcs_ec2" {
   for_each = {
     all-from-bps = { referenced_security_group_id = aws_security_group.bps_ec2.id }
     all-from-bws = { referenced_security_group_id = aws_security_group.bws_ec2.id }
+    all-from-dfi = { referenced_security_group_id = aws_security_group.dfi_ec2.id } # client tools temporarily installed on DFI
   }
 
   description       = each.key

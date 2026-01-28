@@ -21,6 +21,7 @@ resource "aws_db_instance" "rdsdb" {
 
   auto_minor_version_upgrade = true
   skip_final_snapshot        = true
+  maintenance_window         = local.is-production ? null : "tue:20:20-tue:20:50"
 
   license_model       = "license-included"
   publicly_accessible = false
