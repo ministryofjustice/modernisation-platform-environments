@@ -2,7 +2,7 @@
 resource "aws_route53_record" "admin" {
   provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.external.zone_id
-  name     = "admin-${local.component_name}.${local.application_data.accounts[local.environment].admin_domain}"
+  name     = local.application_data.accounts[local.component_name].admin_domain
   type     = "A"
   alias {
     name                   = aws_lb.admin.dns_name
@@ -15,7 +15,7 @@ resource "aws_route53_record" "admin" {
 resource "aws_route53_record" "managed" {
   provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.external.zone_id
-  name     = "managed-${local.component_name}.${local.application_data.accounts[local.environment].managed_domain}"
+  name     = local.application_data.accounts[local.component_name].managed_domain
   type     = "A"
   alias {
     name                   = aws_lb.managed.dns_name
