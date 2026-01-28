@@ -28,6 +28,7 @@ terraform {
       version = "~> 3.0"
       source  = "hashicorp/null"
     }
+    
     cloudinit = {
       version = "~> 2.0"
       source  = "hashicorp/cloudinit"
