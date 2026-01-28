@@ -11,12 +11,6 @@ variable "rule_name" {
   default = "ebs-trusted-rule-ip-set"
 }
 
-data "archive_file" "waf_toggle_zip" {
-  type        = "zip"
-  source_file = "${path.module}/lambda/waf_lambda_function.py"
-  output_path = "${path.module}/lambda/waf_lambda_function.zip"
-}
-
 data "archive_file" "waf_maintenance_zip" {
   type        = "zip"
   source_file = "${path.module}/lambda/waf_maintenance/lambda_function.py"
@@ -31,7 +25,7 @@ data "aws_wafv2_web_acl" "waf_web_acl" {
 
 # Create IAM Role and Policy for Lambda
 resource "aws_iam_role" "waf_lambda_role" {
-  name = "waf-toggle-role-${local.environment}"
+  name = "waf-maintenance-role-${local.environment}"
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
     Statement = [{
@@ -44,7 +38,7 @@ resource "aws_iam_role" "waf_lambda_role" {
 
 # Create IAM Role Policy for Lambda
 resource "aws_iam_role_policy" "waf_lambda_policy" {
-  name = "waf-toggle-policy-${local.environment}"
+  name = "waf-maintenance-policy-${local.environment}"
   role = aws_iam_role.waf_lambda_role.id
   policy = jsonencode({
     Version = "2012-10-17",
@@ -60,37 +54,6 @@ resource "aws_iam_role_policy" "waf_lambda_policy" {
       Resource = "*" }
     ]
   })
-}
-
-resource "aws_lambda_function" "waf_toggle" {
-  function_name    = "waf-toggle-${local.environment}"
-  role             = aws_iam_role.waf_lambda_role.arn
-  filename         = data.archive_file.waf_toggle_zip.output_path
-  source_code_hash = data.archive_file.waf_toggle_zip.output_base64sha256
-  handler          = "waf_lambda_function.lambda_handler"
-  runtime          = "python3.11"
-  timeout          = 30
-  environment {
-    variables = {
-      SCOPE        = var.scope
-      WEB_ACL_NAME = data.aws_wafv2_web_acl.waf_web_acl.name
-      WEB_ACL_ID   = data.aws_wafv2_web_acl.waf_web_acl.id
-      RULE_NAME    = var.rule_name
-
-      # New variables for custom body injection
-      CUSTOM_BODY_NAME = "maintenance_html"
-      CUSTOM_BODY_HTML = <<EOT
-<!doctype html><html lang="en"><head>
-<meta charset="utf-8"><title>Maintenance</title>
-<style>body{font-family:sans-serif;background:#0b1a2b;color:#fff;text-align:center;padding:4rem;}
-.card{max-width:600px;margin:auto;background:#12243a;padding:2rem;border-radius:10px;}
-</style></head><body><div class="card">
-<h1>Scheduled Maintenance</h1>
-<p>The service is unavailable from 21:30 to 07:00 UK time. It is not available on bank holidays.</p>
-</div></body></html>
-EOT
-    }
-  }
 }
 
 resource "aws_lambda_function" "waf_maintenance" {
@@ -130,14 +93,14 @@ resource "aws_cloudwatch_event_rule" "waf_block_2130_uk" {
 resource "aws_cloudwatch_event_target" "waf_allow_target" {
   rule      = aws_cloudwatch_event_rule.waf_allow_0700_uk.name
   target_id = "AllowWAF"
-  arn       = aws_lambda_function.waf_toggle.arn
+  arn       = aws_lambda_function.waf_maintenance.arn
   input     = jsonencode({ mode = "ALLOW" })
 }
 
 resource "aws_cloudwatch_event_target" "waf_block_target" {
   rule      = aws_cloudwatch_event_rule.waf_block_2130_uk.name
   target_id = "BlockWAF"
-  arn       = aws_lambda_function.waf_toggle.arn
+  arn       = aws_lambda_function.waf_maintenance.arn
   input     = jsonencode({ mode = "BLOCK" })
 }
 
@@ -145,7 +108,7 @@ resource "aws_cloudwatch_event_target" "waf_block_target" {
 resource "aws_lambda_permission" "waf_events_allow" {
   statement_id  = "AllowEvents0700-${local.environment}"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.waf_toggle.arn
+  function_name = aws_lambda_function.waf_maintenance.arn
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.waf_allow_0700_uk.arn
 }
@@ -153,7 +116,7 @@ resource "aws_lambda_permission" "waf_events_allow" {
 resource "aws_lambda_permission" "waf_events_block" {
   statement_id  = "BlockEvents2130-${local.environment}"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.waf_toggle.arn
+  function_name = aws_lambda_function.waf_maintenance.arn
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.waf_block_2130_uk.arn
 }
@@ -186,12 +149,12 @@ output "waf_lambda_role_policy_id" {
 
 output "waf_lambda_function_arn" {
   description = "Lambda function ARN"
-  value       = aws_lambda_function.waf_toggle.arn
+  value       = aws_lambda_function.waf_maintenance.arn
 }
 
 output "waf_lambda_function_name" {
   description = "Lambda function name"
-  value       = aws_lambda_function.waf_toggle.function_name
+  value       = aws_lambda_function.waf_maintenance.function_name
 }
 
 output "waf_allow_rule_arn" {
