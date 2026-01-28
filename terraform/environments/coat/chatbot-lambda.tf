@@ -12,9 +12,3 @@ resource "null_resource" "build_lambda_zip" {
     EOT
   }
 }
-
-data "archive_file" "rag_lambda" {
-  type        = "zip"
-  source_dir  = "${path.module}/lambdas/rag-lambda/"
-  output_path = "${path.module}/lambdas/rag-lambda.zip"
-}
