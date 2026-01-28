@@ -1,16 +1,16 @@
 #--Admin
 resource "aws_cloudwatch_log_group" "log_group_admin" {
-  name              = "${local.application_data.accounts[local.environment].app_name}-admin-ecs"
+  name              = "${local.application_data.accounts[local.environment][local.component_name].app_name}-admin-ecs"
   retention_in_days = local.application_data.accounts[local.environment].admin_log_retention_days
 }
 
 resource "aws_cloudwatch_log_stream" "log_stream_admin" {
-  name           = "${local.application_data.accounts[local.environment].app_name}-admin-log-stream"
+  name           = "${local.application_data.accounts[local.environment][local.component_name].app_name}-admin-log-stream"
   log_group_name = aws_cloudwatch_log_group.log_group_admin.name
 }
 
 resource "aws_cloudwatch_log_stream" "log_stream_admin_ecs" {
-  name           = "${local.application_data.accounts[local.environment].app_name}-admin-ecs"
+  name           = "${local.application_data.accounts[local.environment][local.component_name].app_name}-admin-ecs"
   log_group_name = aws_cloudwatch_log_group.log_group_admin.name
 }
 
