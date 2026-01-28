@@ -126,7 +126,7 @@ module "emdi_trail_maps_role" {
 
   trusted_role_arns = flatten([
     data.aws_iam_roles.mod_plat_roles.arns,
-    cloud-platform-emdi-iam-dev,
+    var.cloud-platform-emdi-iam-dev,
   ])
 
   create_role       = true
