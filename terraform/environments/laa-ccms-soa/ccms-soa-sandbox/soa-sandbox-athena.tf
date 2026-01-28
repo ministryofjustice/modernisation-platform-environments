@@ -56,7 +56,7 @@ resource "aws_athena_named_query" "tls_requests_admin" {
 }
 
 resource "aws_athena_named_query" "main_table_managed" {
-  name      = lower(format("%s-managed-%s-create-table", "${local.application_data.accounts[local.environment][local.component_name].app_name}", local.environment))
+  name      = lower(format("%s-managed-%s-create-table", "${local.application_data.accounts[local.environment].app_name}", local.environment))
   workgroup = aws_athena_workgroup.lb-access-logs.id
   database  = aws_athena_database.lb-access-logs.name
   query = templatefile(
@@ -71,7 +71,7 @@ resource "aws_athena_named_query" "main_table_managed" {
 }
 
 resource "aws_athena_named_query" "tls_requests_managed" {
-  name      = lower(format("%s-managed-%s-tls-version-get-requests", "${local.application_data.accounts[local.environment][local.component_name].app_name}", local.environment))
+  name      = lower(format("%s-managed-%s-tls-version-get-requests", "${local.application_data.accounts[local.environment].app_name}", local.environment))
   workgroup = aws_athena_workgroup.lb-access-logs.id
   database  = aws_athena_database.lb-access-logs.name
   query = templatefile(
