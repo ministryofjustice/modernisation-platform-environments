@@ -1,16 +1,16 @@
 #--Admin
 resource "aws_cloudwatch_log_group" "log_group_admin" {
-  name              = "${local.application_data.accounts[local.environment][local.component_name].app_name}-admin-ecs"
+  name              = "soasandbox-${local.component_name}.${local.application_data.accounts[local.environment].app_name}-admin-ecs"
   retention_in_days = local.application_data.accounts[local.environment].admin_log_retention_days
 }
 
 resource "aws_cloudwatch_log_stream" "log_stream_admin" {
-  name           = "${local.application_data.accounts[local.environment][local.component_name].app_name}-admin-log-stream"
+  name           = "soasandbox-${local.component_name}.${local.application_data.accounts[local.environment].app_name}-admin-log-stream"
   log_group_name = aws_cloudwatch_log_group.log_group_admin.name
 }
 
 resource "aws_cloudwatch_log_stream" "log_stream_admin_ecs" {
-  name           = "${local.application_data.accounts[local.environment][local.component_name].app_name}-admin-ecs"
+  name           = "soasandbox-${local.component_name}.${local.application_data.accounts[local.environment].app_name}-admin-ecs"
   log_group_name = aws_cloudwatch_log_group.log_group_admin.name
 }
 
@@ -52,17 +52,17 @@ resource "aws_cloudwatch_log_metric_filter" "soa_benefit_checker_rollback_error_
 
 #--Managed
 resource "aws_cloudwatch_log_group" "log_group_managed" {
-  name              = "${local.application_data.accounts[local.environment][local.component_name].app_name}-managed-ecs"
+  name              = "soasandbox-${local.component_name}.${local.application_data.accounts[local.environment].app_name}-managed-ecs"
   retention_in_days = local.application_data.accounts[local.environment].managed_log_retention_days
 }
 
 resource "aws_cloudwatch_log_stream" "log_stream_managed" {
-  name           = "${local.application_data.accounts[local.environment][local.component_name].app_name}-managed-log-stream"
+  name           = "soasandbox-${local.component_name}.${local.application_data.accounts[local.environment].app_name}-managed-log-stream"
   log_group_name = aws_cloudwatch_log_group.log_group_managed.name
 }
 
 resource "aws_cloudwatch_log_stream" "log_stream_managed_ecs" {
-  name           = "${local.application_data.accounts[local.environment][local.component_name].app_name}-managed-ecs"
+  name           = "soasandbox-${local.component_name}.${local.application_data.accounts[local.environment].app_name}-managed-ecs"
   log_group_name = aws_cloudwatch_log_group.log_group_managed.name
 }
 

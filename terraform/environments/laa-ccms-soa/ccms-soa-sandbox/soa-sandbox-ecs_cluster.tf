@@ -15,7 +15,7 @@ resource "aws_ecs_capacity_provider" "admin" {
 
 #--Cluster
 resource "aws_ecs_cluster" "main" {
-  name = "main_${local.component_name}.${local.application_data.accounts[local.environment].app_name}-cluster"
+  name = "main-${local.component_name}.${local.application_data.accounts[local.environment].app_name}-cluster"
   setting {
     name  = "containerInsights"
     value = "enabled"
