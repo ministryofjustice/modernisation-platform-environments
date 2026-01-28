@@ -18,16 +18,26 @@ resource "aws_security_group" "sg_ssogen_internal_alb" {
 #########################################
 
 # Allow HTTPS from AWS Workspaces
-resource "aws_vpc_security_group_ingress_rule" "ingress_ssogen_internal_4443_workspaces" {
+resource "aws_vpc_security_group_ingress_rule" "ingress_ssogen_internal_443_workspaces" {
   count             = local.is_development ? 1 : 0
   security_group_id = aws_security_group.sg_ssogen_internal_alb[count.index].id
-  description       = "Allow HTTPS (4443) from AWS Workspaces CIDR"
+  description       = "Allow HTTPS (443) from AWS Workspaces CIDR"
   from_port         = 443
   to_port           = 443
   ip_protocol       = "tcp"
   cidr_ipv4         = local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_prod
 }
 
+# Allow HTTPS from AWS Workspaces
+resource "aws_vpc_security_group_ingress_rule" "ingress_ssogen_internal_7001_workspaces" {
+  count             = local.is_development ? 1 : 0
+  security_group_id = aws_security_group.sg_ssogen_internal_alb[count.index].id
+  description       = "Allow HTTPS (7001) from AWS Workspaces CIDR"
+  from_port         = 7001
+  to_port           = 7001
+  ip_protocol       = "tcp"
+  cidr_ipv4         = local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_prod
+}
 #########################################
 # EGRESS RULES
 #########################################
@@ -43,4 +53,13 @@ resource "aws_vpc_security_group_egress_rule" "egress_ssogen_internal_4443_backe
   referenced_security_group_id = aws_security_group.ssogen_sg[0].id
 }
 
-
+# Allow outbound HTTPS (7001) only to backend SSOGEN EC2s
+resource "aws_vpc_security_group_egress_rule" "egress_ssogen_internal_7001_backend" {
+  count                        = local.is_development ? 1 : 0
+  security_group_id            = aws_security_group.sg_ssogen_internal_alb[count.index].id
+  description                  = "Allow HTTPS (7001) to backend SSOGEN EC2s"
+  from_port                    = 7001
+  to_port                      = 7001
+  ip_protocol                  = "tcp"
+  referenced_security_group_id = aws_security_group.ssogen_sg[0].id
+}
