@@ -25,7 +25,7 @@ data "aws_lb" "external" {
 
 data "aws_lb_listener" "external" {
   load_balancer_arn = data.aws_lb.external.arn
-  port              = var.connectivity_listener_port
+  port              = var.external_listener_port
 }
 
 data "aws_lb" "connectivity" {
