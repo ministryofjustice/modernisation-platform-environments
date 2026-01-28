@@ -1,38 +1,28 @@
 locals {
   environment_configurations = {
     development_cluster = {
-
-      /* Route53 */
-      route53_zone = "development.temp.cloud-platform.service.justice.gov.uk"
-
+      account_hosted_zone = "development-temp.cloud-platform.service.justice.gov.uk"
+      route53_prefix      = terraform.workspace
     }
 
     development = {
-
-      /* Route53 */
-      route53_zone = "development.temp.cloud-platform.service.justice.gov.uk"
-
+      account_hosted_zone = "development-temp.cloud-platform.service.justice.gov.uk"
+      route53_prefix      = "eks"
     }
 
     preproduction = {
-
-      /* Route53 */
-      route53_zone = "preproduction.temp.cloud-platform.service.justice.gov.uk"
-
+      account_hosted_zone = "preproduction-temp.cloud-platform.service.justice.gov.uk"
+      route53_prefix      = "eks"
     }
 
     nonlive = {
-
-      /* Route53 */
-      route53_zone = "nonlive.temp.cloud-platform.service.justice.gov.uk"
-
+      account_hosted_zone = "nonlive-temp.cloud-platform.service.justice.gov.uk"
+      route53_prefix      = "eks"
     }
 
     live = {
-
-      /* Route53 */
-      route53_zone = "live.temp.cloud-platform.service.justice.gov.uk"
-
+      account_hosted_zone = "live-temp.cloud-platform.service.justice.gov.uk"
+      route53_prefix      = "eks"
     }
   }
 }
