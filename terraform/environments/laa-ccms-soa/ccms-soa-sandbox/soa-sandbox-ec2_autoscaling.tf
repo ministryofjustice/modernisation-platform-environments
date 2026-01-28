@@ -2,7 +2,7 @@
 
 #--Managed
 resource "aws_autoscaling_group" "cluster-scaling-group-managed" {
-  name                = "${local.application_data.accounts[local.environment][local.component_name].app_name}-auto-scaling-group-managed"
+  name                = "soasandbox-${local.application_data.accounts[local.environment].app_name}-auto-scaling-group-managed"
   vpc_zone_identifier = data.aws_subnets.shared-private.ids
   desired_capacity    = local.application_data.accounts[local.environment].managed_ec2_desired_capacity
   max_size            = 4
@@ -25,7 +25,7 @@ resource "aws_autoscaling_group" "cluster-scaling-group-managed" {
 
 #--Admin
 resource "aws_autoscaling_group" "cluster-scaling-group-admin" {
-  name                = "${local.application_data.accounts[local.environment][local.component_name].app_name}-auto-scaling-group-admin"
+  name                = "soasandbox-${local.application_data.accounts[local.environment].app_name}-auto-scaling-group-admin"
   vpc_zone_identifier = data.aws_subnets.shared-private.ids
   desired_capacity    = local.application_data.accounts[local.environment].admin_ec2_desired_capacity
   max_size            = 1
