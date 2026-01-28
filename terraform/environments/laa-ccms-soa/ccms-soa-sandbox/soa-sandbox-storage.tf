@@ -1,8 +1,8 @@
 resource "aws_efs_file_system" "storage" {
   encrypted        = true
-  performance_mode = local.application_data.accounts[local.environment].local.application_data.accounts[local.component_name].efs_performance_mode
+  performance_mode = local.application_data.accounts[local.environment].efs_performance_mode
   tags = merge(local.tags,
-    { Name = lower(format("%s-%s-efs", local.application_name, local.environment)) }
+    { Name = lower(format("%s-%s-%s-efs", local.application_name, local.environment, local.component_name)) }
   )
 }
 
