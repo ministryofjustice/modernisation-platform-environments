@@ -51,9 +51,9 @@ resource "aws_autoscaling_group" "cluster-scaling-group-admin" {
 # so that the autoscaling group creates new ones using the new launch template
 
 resource "aws_launch_template" "ec2-launch-template-managed" {
-  name          = "${local.application_data.accounts[local.environment][local.component_name].app_name}-launch-template-managed"
-  image_id      = local.application_data.accounts[local.environment][local.component_name].managed_ami_image_id
-  instance_type = local.application_data.accounts[local.environment][local.component_name].managed_ec2_instance_type
+  name          = "soasandbox-${local.application_data.accounts[local.environment].app_name}-launch-template-managed"
+  image_id      = local.application_data.accounts[local.environment].managed_ami_image_id
+  instance_type = local.application_data.accounts[local.environment].managed_ec2_instance_type
   ebs_optimized = true
 
   monitoring {
@@ -88,7 +88,7 @@ resource "aws_launch_template" "ec2-launch-template-managed" {
     resource_type = "instance"
     tags = merge(
       local.tags,
-      { "Name" = "${local.application_data.accounts[local.environment][local.component_name].app_name}-ecs-cluster-managed" },
+      { "Name" = "soasandbox-${local.application_data.accounts[local.environment].app_name}-ecs-cluster-managed" },
     )
   }
 
@@ -96,21 +96,21 @@ resource "aws_launch_template" "ec2-launch-template-managed" {
     resource_type = "volume"
     tags = merge(
       local.tags,
-      { "Name" = "${local.application_data.accounts[local.environment][local.component_name].app_name}-ecs-cluster-managed" },
+      { "Name" = "soasandbox-${local.application_data.accounts[local.environment].app_name}-ecs-cluster-managed" },
     )
   }
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_data.accounts[local.environment][local.component_name].app_name}-ecs-cluster-template-managed" },
+    { "Name" = "soasandbox-${local.application_data.accounts[local.environment].app_name}-ecs-cluster-template-managed" },
   )
 }
 
 # Admin server launch template
 resource "aws_launch_template" "ec2-launch-template-admin" {
-  name          = "${local.application_data.accounts[local.environment][local.component_name].app_name}-launch-template-admin"
-  image_id      = local.application_data.accounts[local.environment][local.component_name].admin_ami_image_id
-  instance_type = local.application_data.accounts[local.environment][local.component_name].admin_ec2_instance_type
+  name          = "soasandbox-${local.application_data.accounts[local.environment].app_name}-launch-template-admin"
+  image_id      = local.application_data.accounts[local.environment].admin_ami_image_id
+  instance_type = local.application_data.accounts[local.environment].admin_ec2_instance_type
   #key_name      = local.application_data.accounts[local.environment].admin_ec2_key_name
   ebs_optimized = true
 
@@ -146,7 +146,7 @@ resource "aws_launch_template" "ec2-launch-template-admin" {
     resource_type = "instance"
     tags = merge(
       local.tags,
-      { "Name" = "${local.application_data.accounts[local.environment][local.component_name].app_name}-ecs-cluster-admin" },
+      { "Name" = "soasandbox-${local.application_data.accounts[local.environment].app_name}-ecs-cluster-admin" },
     )
   }
 
@@ -154,13 +154,13 @@ resource "aws_launch_template" "ec2-launch-template-admin" {
     resource_type = "volume"
     tags = merge(
       local.tags,
-      { "Name" = "${local.application_data.accounts[local.environment][local.component_name].app_name}-ecs-cluster-admin" },
+      { "Name" = "soasandbox-${local.application_data.accounts[local.environment].app_name}-ecs-cluster-admin" },
     )
   }
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_data.accounts[local.environment][local.component_name].app_name}-ecs-cluster-template-admin" },
+    { "Name" = "soasandbox-${local.application_data.accounts[local.environment].app_name}-ecs-cluster-template-admin" },
   )
 }
 
