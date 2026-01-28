@@ -1,0 +1,7 @@
+### Generated ###
+%{ for rule in rules ~}
+${rule.action} ${rule.protocol} ${rule.source_ip} ${rule.source_port} ${rule.direction} ${rule.destination_ip} ${rule.destination_port} (msg:"${rule.description}"; sid:${1000000 + rule.sid}; rev:${rule.revision};)
+%{ endfor ~}
+
+### Static ###
+reject tcp $HOME_NET any -> any 22 (msg:"REJECT outbound SSH not allowlisted"; flow:to_server; sid:1100001; rev:1;)
