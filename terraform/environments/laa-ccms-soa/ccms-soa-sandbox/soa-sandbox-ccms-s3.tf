@@ -38,7 +38,7 @@ module "s3-bucket-shared" {
   ]
 
   tags = merge(local.tags,
-    { Name = "${local.application_name}-${local.environment}-shared" }
+    { Name = "${local.application_name}-${local.environment}-${local.component_name}-shared" }
   )
 }
 
