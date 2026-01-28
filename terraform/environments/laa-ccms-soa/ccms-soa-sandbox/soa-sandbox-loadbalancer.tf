@@ -23,7 +23,7 @@ resource "aws_lb" "admin" {
 }
 
 resource "aws_lb_target_group" "admin" {
-  name                 = "${local.component_name}-admin-target-group"
+  name                 = "${local.component_name}-admin-tg"
   port                 = local.application_data.accounts[local.environment][local.component_name].admin_server_port
   protocol             = "TCP"
   vpc_id               = data.aws_vpc.shared.id
@@ -101,7 +101,7 @@ resource "aws_lb" "managed" {
 }
 
 resource "aws_lb_target_group" "managed" {
-  name        = "${local.component_name}-managed-target-group"
+  name        = "${local.component_name}-managed-tg"
   port        = local.application_data.accounts[local.environment][local.component_name].managed_server_port
   protocol    = "TCP"
   vpc_id      = data.aws_vpc.shared.id
