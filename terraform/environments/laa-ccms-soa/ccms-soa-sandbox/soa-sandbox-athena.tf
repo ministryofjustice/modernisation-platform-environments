@@ -1,5 +1,5 @@
 resource "aws_athena_database" "lb-access-logs" {
-  name   = "loadbalancer_access_logs"
+  name   = "soa-sandbox-lb-access-logs"
   bucket = module.s3-bucket-logging.bucket.id
   encryption_configuration {
     encryption_option = "SSE_S3"
@@ -7,7 +7,7 @@ resource "aws_athena_database" "lb-access-logs" {
 }
 
 resource "aws_athena_workgroup" "lb-access-logs" {
-  name = lower(format("%s-%s-lb-access-logs", "${local.application_data.accounts[local.environment].app_name}", local.environment))
+  name = lower(format("%s-%s-lb-access-logs", "${local.application_data.accounts[local.environment][local.component_name].app_name}", local.environment))
 
   configuration {
     enforce_workgroup_configuration    = true
@@ -25,7 +25,7 @@ resource "aws_athena_workgroup" "lb-access-logs" {
 
 # SQL query to creates the table in the athena db
 resource "aws_athena_named_query" "main_table_admin" {
-  name      = lower(format("%s-admin-%s-create-table", "${local.application_data.accounts[local.environment].app_name}", local.environment))
+  name      = lower(format("%s-admin-%s-create-table", "${local.application_data.accounts[local.environment][local.component_name].app_name}", local.environment))
   workgroup = aws_athena_workgroup.lb-access-logs.id
   database  = aws_athena_database.lb-access-logs.name
   query = templatefile(
@@ -41,7 +41,7 @@ resource "aws_athena_named_query" "main_table_admin" {
 
 # SQL query to count the number of HTTP GET requests to the loadbalancer grouped by IP, these queries needs to be executed manually after creation
 resource "aws_athena_named_query" "tls_requests_admin" {
-  name      = lower(format("%s-admin-%s-tls-version-get-requests", "${local.application_data.accounts[local.environment].app_name}", local.environment))
+  name      = lower(format("%s-admin-%s-tls-version-get-requests", "${local.application_data.accounts[local.environment][local.component_name].app_name}", local.environment))
   workgroup = aws_athena_workgroup.lb-access-logs.id
   database  = aws_athena_database.lb-access-logs.name
   query = templatefile(
@@ -56,7 +56,7 @@ resource "aws_athena_named_query" "tls_requests_admin" {
 }
 
 resource "aws_athena_named_query" "main_table_managed" {
-  name      = lower(format("%s-managed-%s-create-table", "${local.application_data.accounts[local.environment].app_name}", local.environment))
+  name      = lower(format("%s-managed-%s-create-table", "${local.application_data.accounts[local.environment][local.component_name].app_name}", local.environment))
   workgroup = aws_athena_workgroup.lb-access-logs.id
   database  = aws_athena_database.lb-access-logs.name
   query = templatefile(
@@ -71,7 +71,7 @@ resource "aws_athena_named_query" "main_table_managed" {
 }
 
 resource "aws_athena_named_query" "tls_requests_managed" {
-  name      = lower(format("%s-managed-%s-tls-version-get-requests", "${local.application_data.accounts[local.environment].app_name}", local.environment))
+  name      = lower(format("%s-managed-%s-tls-version-get-requests", "${local.application_data.accounts[local.environment][local.component_name].app_name}", local.environment))
   workgroup = aws_athena_workgroup.lb-access-logs.id
   database  = aws_athena_database.lb-access-logs.name
   query = templatefile(

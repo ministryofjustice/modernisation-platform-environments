@@ -14,7 +14,7 @@ resource "aws_guardduty_malware_protection_plan" "s3_scan" {
   }
 
   tags = merge(local.tags,
-    { Name = lower(format("s3-%s-%s-awsgaurdduty-mpp", "${local.application_data.accounts[local.environment].app_name}", local.environment)) }
+    { Name = lower(format("s3-%s-%s-awsgaurdduty-mpp", "${local.application_data.accounts[local.environment][local.component_name].app_name}", local.environment)) }
   )
 
   depends_on = [module.s3-bucket-logging]
@@ -36,7 +36,7 @@ resource "aws_guardduty_malware_protection_plan" "s3_shared_scan" {
   }
 
   tags = merge(local.tags,
-    { Name = lower(format("s3-%s-%s-awsgaurdduty-mpp", "${local.application_data.accounts[local.environment].app_name}", local.environment)) }
+    { Name = lower(format("s3-%s-%s-awsgaurdduty-mpp", "${local.application_data.accounts[local.environment][local.component_name].app_name}", local.environment)) }
   )
 
   depends_on = [module.s3-bucket-shared]

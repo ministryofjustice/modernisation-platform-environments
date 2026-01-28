@@ -1,6 +1,6 @@
 #--Altering SNS
 resource "aws_sns_topic" "alerts" {
-  name              = "${local.application_data.accounts[local.environment].app_name}-alerts"
+  name              = "${local.application_data.accounts[local.environment][local.component_name].app_name}-alerts"
   delivery_policy   = <<EOF
 {
   "http": {
@@ -22,7 +22,7 @@ resource "aws_sns_topic" "alerts" {
 EOF
   kms_master_key_id = aws_kms_key.cloudwatch_sns_alerts_key.id
   tags = merge(local.tags,
-    { Name = "${local.application_data.accounts[local.environment].app_name}-alerts" }
+    { Name = "${local.application_data.accounts[local.environment][local.component_name].app_name}-alerts" }
   )
 }
 
@@ -32,7 +32,7 @@ resource "aws_sns_topic_policy" "default" {
 }
 
 resource "aws_sns_topic" "guardduty_alerts" {
-  name              = "${local.application_data.accounts[local.environment].app_name}-guardduty-alerts"
+  name              = "${local.application_data.accounts[local.environment][local.component_name].app_name}-guardduty-alerts"
   delivery_policy   = <<EOF
 {
   "http": {
@@ -54,7 +54,7 @@ resource "aws_sns_topic" "guardduty_alerts" {
 EOF
   kms_master_key_id = aws_kms_key.cloudwatch_sns_alerts_key.id
   tags = merge(local.tags,
-    { Name = "${local.application_data.accounts[local.environment].app_name}-guardduty-alerts" }
+    { Name = "${local.application_data.accounts[local.environment][local.component_name].app_name}-guardduty-alerts" }
   )
 }
 
@@ -65,7 +65,7 @@ resource "aws_sns_topic_policy" "guarduty_default" {
 
 #--Alerts RDS
 resource "aws_db_event_subscription" "rds_events" {
-  name        = "${local.application_data.accounts[local.environment].app_name}-rds-event-sub"
+  name        = "${local.application_data.accounts[local.environment][local.component_name].app_name}-rds-event-sub"
   sns_topic   = aws_sns_topic.alerts.arn
   source_type = "db-instance"
   source_ids  = [aws_db_instance.soa_db.identifier]
