@@ -52,17 +52,17 @@ resource "aws_cloudwatch_log_metric_filter" "soa_benefit_checker_rollback_error_
 
 #--Managed
 resource "aws_cloudwatch_log_group" "log_group_managed" {
-  name              = "${local.application_data.accounts[local.environment].app_name}-managed-ecs"
+  name              = "${local.application_data.accounts[local.environment][local.component_name].app_name}-managed-ecs"
   retention_in_days = local.application_data.accounts[local.environment].managed_log_retention_days
 }
 
 resource "aws_cloudwatch_log_stream" "log_stream_managed" {
-  name           = "${local.application_data.accounts[local.environment].app_name}-managed-log-stream"
+  name           = "${local.application_data.accounts[local.environment][local.component_name].app_name}-managed-log-stream"
   log_group_name = aws_cloudwatch_log_group.log_group_managed.name
 }
 
 resource "aws_cloudwatch_log_stream" "log_stream_managed_ecs" {
-  name           = "${local.application_data.accounts[local.environment].app_name}-managed-ecs"
+  name           = "${local.application_data.accounts[local.environment][local.component_name].app_name}-managed-ecs"
   log_group_name = aws_cloudwatch_log_group.log_group_managed.name
 }
 
@@ -214,21 +214,21 @@ resource "aws_cloudwatch_log_subscription_filter" "ccms_soa_edn_quiesced_filter"
 #--RDS (SOA DB)
 resource "aws_cloudwatch_log_group" "rds_alert" {
   name              = "/aws/rds/instance/oracle-db/alert"
-  retention_in_days = local.application_data.accounts[local.environment].soa_db_log_retention_days
+  retention_in_days = local.application_data.accounts[local.environment][local.component_name].soa_db_log_retention_days
 }
 
 resource "aws_cloudwatch_log_group" "rds_audit" {
   name              = "/aws/rds/instance/oracle-db/audit"
-  retention_in_days = local.application_data.accounts[local.environment].soa_db_log_retention_days
+  retention_in_days = local.application_data.accounts[local.environment][local.component_name].soa_db_log_retention_days
 }
 
 resource "aws_cloudwatch_log_group" "rds_listener" {
   name              = "/aws/rds/instance/oracle-db/listener"
-  retention_in_days = local.application_data.accounts[local.environment].soa_db_log_retention_days
+  retention_in_days = local.application_data.accounts[local.environment][local.component_name].soa_db_log_retention_days
 }
 
 #--Alerting
 resource "aws_cloudwatch_log_group" "log_group_alerting" {
-  name              = "/aws/lambda/${local.application_data.accounts[local.environment].app_name}-soa-alerting"
-  retention_in_days = local.application_data.accounts[local.environment].alerting_log_retention_days
+  name              = "/aws/lambda/${local.application_data.accounts[local.environment][local.component_name].app_name}-soa-alerting"
+  retention_in_days = local.application_data.accounts[local.environment][local.component_name].alerting_log_retention_days
 }
