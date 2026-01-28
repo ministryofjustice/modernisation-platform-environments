@@ -37,7 +37,7 @@ resource "aws_db_instance" "soa_db" {
   engine_version                      = local.application_data.accounts[local.environment].local.application_data.accounts[local.component_name].soa_db_version
   instance_class                      = local.application_data.accounts[local.environment].local.application_data.accounts[local.component_name].soa_db_instance_type
   multi_az                            = local.application_data.accounts[local.environment].local.application_data.accounts[local.component_name].soa_db_deploy_to_multi_azs
-  db_name                             = "SOADB"
+  db_name                             = "SOADB-SANDBOX"
   username                            = local.application_data.accounts[local.environment].local.application_data.accounts[local.component_name].soa_db_user
   password                            = data.aws_secretsmanager_secret_version.soa_password.secret_string
   port                                = "1521"
@@ -54,7 +54,7 @@ resource "aws_db_instance" "soa_db" {
   maintenance_window      = "Mon:00:00-Mon:03:00"
   backup_window           = "03:00-06:00"
   character_set_name      = "AL32UTF8"
-  deletion_protection     = local.application_data.accounts[local.environment].soa_db_deletion_protection
+  deletion_protection     = local.application_data.accounts[local.environment][local.component_name].soa_db_deletion_protection
   db_subnet_group_name    = aws_db_subnet_group.soa.id
   option_group_name       = aws_db_option_group.soa_oracle_19.id
 
