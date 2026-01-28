@@ -1,6 +1,6 @@
 #--ALB Admin
 resource "aws_security_group" "alb_admin" {
-  name        = "${local.application_data.accounts[local.environment][local.component_name].app_name}_alb_admin"
+  name        = "${local.component_name}_alb_admin"
   description = "Controls Traffic for SOA Admin Application"
   vpc_id      = data.aws_vpc.shared.id
 }
@@ -77,7 +77,7 @@ resource "aws_security_group_rule" "alb_admin_egress_all" {
 
 #--Managed
 resource "aws_security_group" "alb_managed" {
-  name        = "${local.application_data.accounts[local.environment][local.component_name].app_name}_alb_managed"
+  name        = "${local.component_name}_alb_managed"
   description = "Controls Traffic for SOA Managed Application"
   vpc_id      = data.aws_vpc.shared.id
 }
@@ -194,7 +194,7 @@ resource "aws_security_group_rule" "alb_managed_egress_all" {
 
 #--ECS Tasks Admin
 resource "aws_security_group" "ecs_tasks_admin" {
-  name_prefix = "${local.application_data.accounts[local.environment].local.application_data.accounts[local.component_name].app_name}_ecs_tasks_admin"
+  name_prefix = "${local.component_name}_ecs_tasks_admin"
   description = "SOA Admin - Controls Traffic Between VPC and ECS Control Plane"
   vpc_id      = data.aws_vpc.shared.id
 }
@@ -221,7 +221,7 @@ resource "aws_security_group_rule" "ecs_tasks_admin_egress_all" {
 
 #--ECS Tasks Managed
 resource "aws_security_group" "ecs_tasks_managed" {
-  name_prefix = "${local.application_data.accounts[local.environment].local.application_data.accounts[local.component_name].app_name}_ecs_tasks_managed"
+  name_prefix = "${local.component_name}_ecs_tasks_managed"
   description = "SOA Managed - Controls Traffic Between VPC and ECS Control Plane"
   vpc_id      = data.aws_vpc.shared.id
 }
@@ -248,7 +248,7 @@ resource "aws_security_group_rule" "ecs_tasks_managed_egress_all" {
 
 #--Cluster EC2 Instances
 resource "aws_security_group" "cluster_ec2" {
-  name        = "${local.application_data.accounts[local.environment].local.application_data.accounts[local.component_name].app_name}-cluster-ec2-security-group"
+  name        = "${local.component_name}-cluster-ec2-security-group"
   description = "controls access to the cluster ec2 instance"
   vpc_id      = data.aws_vpc.shared.id
 }
@@ -348,7 +348,7 @@ resource "aws_security_group_rule" "tds_db_egress_all" {
 
 #--EFS
 resource "aws_security_group" "efs-security-group" {
-  name_prefix = "${local.application_name}-efs-security-group"
+  name_prefix = "${local.component_name}-efs-security-group"
   description = "allow inbound access from container instances"
   vpc_id      = data.aws_vpc.shared.id
 }
