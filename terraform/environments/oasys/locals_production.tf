@@ -546,7 +546,15 @@ locals {
 
     lbs = {
       public = merge(local.lbs.public, {
+
         access_logs_lifecycle_rule = [module.baseline_presets.s3_lifecycle_rules.general_purpose_one_year]
+
+        s3_notification_queues = {
+          "cortex-xsiam-s3-public-alb-log-collection" = {
+            events    = ["s3:ObjectCreated:*"]
+            queue_arn = "cortex-xsiam-s3-alb-log-collection"
+          }
+        }
 
         listeners = merge(local.lbs.public.listeners, {
           https = merge(local.lbs.public.listeners.https, {
@@ -645,6 +653,16 @@ locals {
       })
 
       private = merge(local.lbs.private, {
+
+        access_logs_lifecycle_rule = [module.baseline_presets.s3_lifecycle_rules.general_purpose_one_year]
+
+        s3_notification_queues = {
+          "cortex-xsiam-s3-public-alb-log-collection" = {
+            events    = ["s3:ObjectCreated:*"]
+            queue_arn = "cortex-xsiam-s3-alb-log-collection"
+          }
+        }
+
         listeners = merge(local.lbs.private.listeners, {
           https = merge(local.lbs.private.listeners.https, {
             certificate_names_or_arns = ["pd_oasys_cert"]
