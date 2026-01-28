@@ -29,7 +29,7 @@ resource "aws_ecs_cluster_capacity_providers" "main" {
 
 #--Admin
 resource "aws_ecs_task_definition" "admin" {
-  family             = "soasandbox-admin-${local.component_name}.${local.application_data.accounts[local.environment].app_name}-admin-task"
+  family             = "${local.component_name}.${local.application_data.accounts[local.environment].app_name}-admin-task"
   execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
   network_mode       = "awsvpc"
   requires_compatibilities = [
