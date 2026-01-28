@@ -1,5 +1,5 @@
 resource "aws_athena_database" "lb-access-logs" {
-  name   = "soa-sandbox-lb-access-logs"
+  name   = "soa_sandbox_lb_access_logs"
   bucket = module.s3-bucket-logging.bucket.id
   encryption_configuration {
     encryption_option = "SSE_S3"
