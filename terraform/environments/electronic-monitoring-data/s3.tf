@@ -259,7 +259,7 @@ module "s3-metadata-bucket" {
     # Leave this provider block in even if you are not using replication
     aws.bucket-replication = aws
   }
-  bucket_policy_v2 = [data.aws_iam_policy_document.allow_inventory_access.json]
+  bucket_policy = [data.aws_iam_policy_document.allow_inventory_access.json]
   custom_kms_key = module.kms_metadata_key.key_arn
 
   lifecycle_rule = [
