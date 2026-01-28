@@ -2,7 +2,7 @@
 
 #--Admin
 resource "aws_lb" "admin" {
-  name                       = "${local.application_data.accounts[local.environment].local.application_data.accounts[local.component_name].app_name}-admin-lb"
+  name                       = "${local.component_name}-admin-lb"
   load_balancer_type         = "network"
   internal                   = true
   subnets                    = data.aws_subnets.shared-private.ids
@@ -16,14 +16,14 @@ resource "aws_lb" "admin" {
   }
 
   tags = merge(local.tags,
-    { Name = lower(format("lb-%s-admin", "${local.application_data.accounts[local.environment].app_name}")) }
+    { Name = lower(format("lb-%s-admin", "${local.component_name}")) }
   )
 
   depends_on = [module.s3-bucket-logging]
 }
 
 resource "aws_lb_target_group" "admin" {
-  name                 = "${local.application_data.accounts[local.environment][local.component_name].app_name}-admin-target-group"
+  name                 = "${local.component_name}-admin-target-group"
   port                 = local.application_data.accounts[local.environment][local.component_name].admin_server_port
   protocol             = "TCP"
   vpc_id               = data.aws_vpc.shared.id
@@ -80,7 +80,7 @@ resource "aws_lb_listener" "admin_server_port" {
 
 #--Managed
 resource "aws_lb" "managed" {
-  name                       = "${local.application_data.accounts[local.environment][local.component_name].app_name}-managed-api-lb"
+  name                       = "${local.component_name}-managed-api-lb"
   load_balancer_type         = "network"
   internal                   = true
   subnets                    = data.aws_subnets.shared-private.ids
@@ -94,14 +94,14 @@ resource "aws_lb" "managed" {
   }
 
   tags = merge(local.tags,
-    { Name = lower(format("lb-%s-managed", "${local.application_data.accounts[local.environment][local.component_name].app_name}")) }
+    { Name = lower(format("lb-%s-managed", "${local.component_name}")) }
   )
 
   depends_on = [module.s3-bucket-logging]
 }
 
 resource "aws_lb_target_group" "managed" {
-  name        = "${local.application_data.accounts[local.environment][local.component_name].app_name}-managed-target-group"
+  name        = "${local.component_name}-managed-target-group"
   port        = local.application_data.accounts[local.environment][local.component_name].managed_server_port
   protocol    = "TCP"
   vpc_id      = data.aws_vpc.shared.id
