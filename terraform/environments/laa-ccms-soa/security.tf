@@ -373,7 +373,7 @@ resource "aws_vpc_security_group_egress_rule" "efs-security-group-egress" {
 # OEM OMS → SOA DB (OMS port 4903)
 resource "aws_vpc_security_group_ingress_rule" "soa_db_oem_oms_ingress_4903" {
   security_group_id = aws_security_group.soa_db.id
-  description       = "OEM OMS → SOA DB OMS port"
+  description       = "OEM OMS to SOA DB OMS port"
   ip_protocol       = "TCP"
   from_port         = tonumber(local.application_data.accounts[local.environment].oem.oms_port)
   to_port           = tonumber(local.application_data.accounts[local.environment].oem.oms_port)
@@ -383,7 +383,7 @@ resource "aws_vpc_security_group_ingress_rule" "soa_db_oem_oms_ingress_4903" {
 # OEM OMS → SOA DB (OEM agent 3872)
 resource "aws_vpc_security_group_ingress_rule" "soa_db_oem_oms_ingress_3872" {
   security_group_id = aws_security_group.soa_db.id
-  description       = "OEM OMS → SOA DB agent port"
+  description       = "OEM OMS to SOA DB agent port"
   ip_protocol       = "TCP"
   from_port         = tonumber(local.application_data.accounts[local.environment].oem.agent_port)
   to_port           = tonumber(local.application_data.accounts[local.environment].oem.agent_port)
@@ -393,7 +393,7 @@ resource "aws_vpc_security_group_ingress_rule" "soa_db_oem_oms_ingress_3872" {
 # OEM OMS → SOA DB (Oracle listener 1521)
 resource "aws_vpc_security_group_ingress_rule" "soa_db_oem_oms_ingress_1521" {
   security_group_id = aws_security_group.soa_db.id
-  description       = "OEM OMS → SOA DB listener"
+  description       = "OEM OMS to SOA DB listener"
   ip_protocol       = "TCP"
   from_port         = tonumber(local.application_data.accounts[local.environment].oem.soa_db_port)
   to_port           = tonumber(local.application_data.accounts[local.environment].oem.soa_db_port)
@@ -403,7 +403,7 @@ resource "aws_vpc_security_group_ingress_rule" "soa_db_oem_oms_ingress_1521" {
 # OEM DB → SOA DB (Oracle listener 1521)
 resource "aws_vpc_security_group_ingress_rule" "soa_db_oem_db_ingress_1521" {
   security_group_id = aws_security_group.soa_db.id
-  description       = "OEM DB → SOA DB listener"
+  description       = "OEM DB to SOA DB listener"
   ip_protocol       = "TCP"
   from_port         = tonumber(local.application_data.accounts[local.environment].oem.soa_db_port)
   to_port           = tonumber(local.application_data.accounts[local.environment].oem.soa_db_port)
