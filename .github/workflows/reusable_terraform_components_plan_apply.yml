@@ -162,6 +162,7 @@
               POST_PLAN_TO_PR: "${{ github.event_name == 'pull_request' && inputs.post_plan_to_pr == true }}"
             working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
             run: |
+              run: |
               set -o pipefail
               exitcode=0
 
@@ -182,10 +183,24 @@
 
               terraform show -json tfplan > tfplan.json
 
+              # ---- Surface tag policy warnings explicitly ----
+              if [[ -f tf-warnings.log ]]; then
+                TAG_WARNINGS=$(grep -i "tag policy" tf-warnings.log || true)
+
+                if [[ -n "${TAG_WARNINGS}" ]]; then
+                  echo
+                  echo "⚠️  Tag Policy Warnings"
+                  echo "----------------------------------------"
+                  echo "${TAG_WARNINGS}"
+                fi
+              fi
+              # -----------------------------------------------
+
               echo "exitcode=${exitcode}"
               echo "exitcode=${exitcode}" >> $GITHUB_OUTPUT
 
               (( exitcode == 1 )) && exit 1 || exit 0
+
 
 
           - name: Evaluate Terraform Plan
