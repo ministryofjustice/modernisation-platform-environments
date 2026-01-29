@@ -25,7 +25,7 @@ module "mojap_compute_athena_query_results_bucket_eu_west_2" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "5.2.0"
+  version = "5.8.2"
 
   bucket = "mojap-compute-${local.environment}-athena-query-results-eu-west-2"
 
