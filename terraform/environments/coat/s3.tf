@@ -37,17 +37,6 @@ module "cur_v2_hourly" {
       }
     }
   ]
-
-  tags = merge(
-    { "owner" = "CloudOptimisationAndAccountability@justice.gov.uk" },
-    { "business-unit" = "lalala" },
-    { "application" = "COAT" },
-    { "is-production" = true },
-    { "owner" = "COAT" },
-    { "service-area" = "lalalalala" },
-    { "environment-name" = terraform.workspace },
-    { "source-code" = "https://github.com/ministryofjustice/modernisation-platform-environments" }
-  )
 }
 
 data "aws_iam_policy_document" "coat_cur_v2_hourly_dev_bucket_policy" {
