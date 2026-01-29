@@ -21,16 +21,6 @@ resource "aws_s3_bucket_ownership_controls" "default" {
   }
 }
 
-# Configure bucket ACL
-resource "aws_s3_bucket_acl" "default" {
-  bucket = aws_s3_bucket.default.id
-  acl    = "private"
-  depends_on = [
-    aws_s3_bucket_ownership_controls.default
-  ]
-}
-
-
 
 # Block public access policies for this bucket
 resource "aws_s3_bucket_public_access_block" "default" {
