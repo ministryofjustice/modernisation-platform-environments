@@ -105,30 +105,30 @@
 # }
 
 # #--EC2
-# resource "aws_iam_instance_profile" "ec2_instance_profile" {
-#   name = "soa-${local.component_name}.${local.application_data.accounts[local.environment].app_name}-ec2-instance-profile"
-#   role = aws_iam_role.ec2_instance_role.name
-# }
+resource "aws_iam_instance_profile" "ec2_instance_profile" {
+  name = "${local.component_name}-${local.environment}-ec2-instance-profile"
+  role = aws_iam_role.ec2_instance_role.name
+}
 
-# resource "aws_iam_role" "ec2_instance_role" {
-#   name = "soa-${local.component_name}.${local.application_data.accounts[local.environment].app_name}-ec2-instance-role"
+resource "aws_iam_role" "ec2_instance_role" {
+  name = "${local.component_name}-${local.environment}-ec2-instance-role"
 
-#   assume_role_policy = <<EOF
-# {
-#     "Version": "2012-10-17",
-#     "Statement": [
-#         {
-#             "Action": "sts:AssumeRole",
-#             "Principal": {
-#                "Service": "ec2.amazonaws.com"
-#             },
-#             "Effect": "Allow",
-#             "Sid": ""
-#         }
-#     ]
-# }
-# EOF
-# }
+  assume_role_policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": "sts:AssumeRole",
+            "Principal": {
+               "Service": "ec2.amazonaws.com"
+            },
+            "Effect": "Allow",
+            "Sid": ""
+        }
+    ]
+}
+EOF
+}
 
 # resource "aws_iam_policy" "ec2_instance_policy" {
 #   name = "soa-${local.component_name}.${local.application_data.accounts[local.environment].app_name}-ec2-instance-policy"
