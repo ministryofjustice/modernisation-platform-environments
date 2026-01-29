@@ -167,8 +167,8 @@
               tf_args="-detailed-exitcode ${{ inputs.plan_apply_tfargs }}"
               [[ ${POST_PLAN_TO_PR} == 'true' ]] && tf_args="${tf_args} -no-color"
               [[ ${{ inputs.do_state_refresh_on_plan }} == 'true' ]] && tf_args="${tf_args} -refresh=false"
-              echo "terraform plan ${tf_args} -out=tfplan"
-              terraform plan ${tf_args} -out=tfplan | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh | tee tfplan.txt || exitcode=$?
+              echo "TF_LOG=WARN terraform plan ${tf_args} -out=tfplan"
+              TF_LOG=WARN terraform plan ${tf_args} -out=tfplan | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh | tee tfplan.txt || exitcode=$?
               terraform show -json tfplan > tfplan.json
               echo "exitcode=${exitcode}"
               echo "exitcode=${exitcode}" >> $GITHUB_OUTPUT
