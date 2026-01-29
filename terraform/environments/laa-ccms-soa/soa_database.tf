@@ -40,8 +40,8 @@ resource "aws_db_option_group" "soa_oracle_19" {
     option_settings {
       name  = "AGENT_REGISTRATION_PASSWORD"
       value = jsondecode(
-        data.aws_secretsmanager_secret_version.oem_agent_credentials.secret_string
-      ).password
+        aws_secretsmanager_secret_version.ccms_soa_quiesced_secrets_version.secret_string
+      ).oem.agent_registration_password
     }
 
     option_settings {
