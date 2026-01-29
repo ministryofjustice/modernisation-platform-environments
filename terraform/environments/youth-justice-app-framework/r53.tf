@@ -40,10 +40,10 @@ resource "aws_route53_record" "private_alb" {
 }
 
 locals {
-  dns_a_records = {
-    assets = [module.yjsm.yjsm_instance_private_ip]
-    mule   = [module.esb.esb_instance_private_ip]
-    ldap   = module.ds.dns_ip_addresses
+  dns_a_records  = {
+    assets       = [module.yjsm.yjsm_instance_private_ip]
+    mule         = [module.esb.esb_instance_private_ip]
+    ldap         = module.ds.dns_ip_addresses
   }
 }
 
@@ -60,6 +60,20 @@ resource "aws_route53_record" "type_a" {
   ttl     = 300
   records = each.value
 }
+
+
+resource "aws_route53_record" "connectivity_alb" {
+  provider = aws.core-network-services
+
+  zone_id = data.aws_route53_zone.yjaf-inner.id
+  name    = "connectivity-lb"
+  type    = "CNAME"
+  ttl     = 300
+  records = [module.connectivity_alb.dns_name]
+}
+
+
+
 
 /*
 resource "aws_route53_record" "assets" {
