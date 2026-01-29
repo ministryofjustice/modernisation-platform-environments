@@ -160,17 +160,24 @@ _VALID_EVENT_KEYS = {"mode", "time_from", "time_to"}
 
 
 def lambda_handler(event: Any, context: Any) -> Dict[str, Any]:
-    if isinstance(event, dict):
-        unknown_keys = set(event.keys()) - _VALID_EVENT_KEYS
-        if unknown_keys:
-            logger.error(
-                "Unknown event keys: %s. Valid keys: %s", unknown_keys, _VALID_EVENT_KEYS
-            )
-            return {
-                "ok": False,
-                "updated": False,
-                "error": f"Unknown event keys: {unknown_keys}. Valid keys: {_VALID_EVENT_KEYS}",
-            }
+    if not isinstance(event, dict):
+        logger.error("Event must be a JSON object, got %s.", type(event).__name__)
+        return {
+            "ok": False,
+            "updated": False,
+            "error": f"Event must be a JSON object, got {type(event).__name__}.",
+        }
+
+    unknown_keys = set(event.keys()) - _VALID_EVENT_KEYS
+    if unknown_keys:
+        logger.error(
+            "Unknown event keys: %s. Valid keys: %s", unknown_keys, _VALID_EVENT_KEYS
+        )
+        return {
+            "ok": False,
+            "updated": False,
+            "error": f"Unknown event keys: {unknown_keys}. Valid keys: {_VALID_EVENT_KEYS}",
+        }
 
     mode: WafMode = _parse_mode(event)
     time_from: str = _parse_time_value(event, "time_from", TIME_FROM)
@@ -405,6 +412,20 @@ def main() -> None:
         TIME_TO,
         f"missing time_to uses TIME_TO env var ({TIME_TO})",
     )
+
+    print("\nTesting event type validation (via lambda_handler)...")
+    result = lambda_handler(None, None)
+    assert_eq(result["ok"], False, "None event is rejected")
+    assert_eq("JSON object" in result.get("error", ""), True, "None error mentions JSON object")
+
+    result = lambda_handler("not a dict", None)
+    assert_eq(result["ok"], False, "string event is rejected")
+
+    result = lambda_handler(42, None)
+    assert_eq(result["ok"], False, "int event is rejected")
+
+    result = lambda_handler(["a", "list"], None)
+    assert_eq(result["ok"], False, "list event is rejected")
 
     print("\nTesting event key validation (via lambda_handler)...")
     # Unknown key "mod" (typo for "mode") should be rejected
