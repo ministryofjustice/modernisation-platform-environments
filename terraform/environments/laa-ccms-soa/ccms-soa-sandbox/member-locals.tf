@@ -12,9 +12,9 @@ locals {
   ]
 
   aws_account_id            = data.aws_caller_identity.current.account_id
-  logging_bucket_name       = "${local.application_data.accounts[local.environment].app_name}-${local.environment}-logging"
-  lb_log_prefix_soa_admin   = "${local.application_data.accounts[local.environment].app_name}-admin-lb"
-  lb_log_prefix_soa_managed = "${local.application_data.accounts[local.environment].app_name}-managed-lb"
+  logging_bucket_name       = "${local.component_name}-${local.environment}-logging"
+  lb_log_prefix_soa_admin   = "${local.component_name}-admin-lb"
+  lb_log_prefix_soa_managed = "${local.component_name}-managed-lb"
 
   # Folders created on S3 for Lambda artifacts
   lambda_folder_name = [

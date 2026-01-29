@@ -67,7 +67,7 @@ module "s3-bucket-logging" {
   ]
 
   tags = merge(local.tags,
-    { Name = lower(format("s3-%s-%s-logging", "${local.application_data.accounts[local.environment].app_name}", local.environment)) }
+    { Name = lower(format("s3-%s-%s-logging", "${local.component_name}", local.environment)) }
   )
 }
 
