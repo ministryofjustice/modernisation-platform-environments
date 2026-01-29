@@ -28,7 +28,7 @@ resource "aws_route53_record" "managed-sandbox" {
 resource "aws_route53_record" "validation-sandbox" {
   provider = aws.core-vpc
   for_each = {
-    for dvo in aws_acm_certificate.soa.domain_validation_options : dvo.domain_name => {
+    for dvo in aws_acm_certificate.soa-sandbox.domain_validation_options : dvo.domain_name => {
       name   = dvo.resource_record_name
       record = dvo.resource_record_value
       type   = dvo.resource_record_type
