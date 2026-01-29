@@ -19,7 +19,7 @@ data "aws_iam_policy_document" "s3-assume-role-policy" {
 
     principals {
       type        = "Service"
-      identifiers = ["s3.amazonaws.com"]
+      identifiers = ["s3.amazonaws.com", "batchoperations.s3.amazonaws.com"]
     }
   }
 }
