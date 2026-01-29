@@ -68,7 +68,6 @@ data "aws_secretsmanager_secret_version" "slack_channel_id" {
 #   secret_id = data.aws_secretsmanager_secret.oem_agent_credentials.id
 # }
 
-
 ##########################################################
 # Slack Webhook Secret for CCMS SOA EDN Quiesced Alerts
 ##########################################################
@@ -87,10 +86,8 @@ resource "aws_secretsmanager_secret_version" "ccms_soa_quiesced_secrets_version"
   secret_string = jsonencode({
     slack_channel_webhook           = ""
     slack_channel_webhook_guardduty = ""
+    agent_registration_password     = ""
 
-    oem = {
-      agent_registration_password = ""
-    }
   })
 
   lifecycle {
@@ -100,6 +97,9 @@ resource "aws_secretsmanager_secret_version" "ccms_soa_quiesced_secrets_version"
   }
 }
 
-
+# Read current secret value (used by RDS option group)
+data "aws_secretsmanager_secret_version" "ccms_soa_quiesced_secrets_current" {
+  secret_id = aws_secretsmanager_secret.ccms_soa_quiesced_secrets.id
+}
 
 
