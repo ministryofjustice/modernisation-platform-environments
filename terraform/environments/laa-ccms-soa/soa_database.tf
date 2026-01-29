@@ -39,9 +39,7 @@ resource "aws_db_option_group" "soa_oracle_19" {
 
     option_settings {
       name  = "AGENT_REGISTRATION_PASSWORD"
-      value = lookup(
-        jsondecode(data.aws_secretsmanager_secret_version.ccms_soa_quiesced_secrets_current.secret_string),["agent_registration_password"]
-      )
+      value = jsondecode(data.aws_secretsmanager_secret_version.ccms_soa_quiesced_secrets_current.secret_string),["agent_registration_password"]
     }
 
     option_settings {
