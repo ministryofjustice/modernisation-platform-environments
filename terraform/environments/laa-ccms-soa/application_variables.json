@@ -71,10 +71,12 @@
       "cloud_platform_cidr": "172.20.0.0/16",
       "oem": {
         "agent_port": "3872",
-        "oms_host": "laa-oem-app.laa-development.modernisation-platform.service.justice.gov.uk",
         "oms_port": "4903",
+        "soa_db_port": "1521",
+        "oms_host": "laa-oem-app.laa-development.modernisation-platform.service.justice.gov.uk",
         "oem_db_host": "laa-oem-db.laa-development.modernisation-platform.service.justice.gov.uk",
-        "oem_db_port": "1521",
+        "oms_platform_cidr": "10.26.60.231/32",
+        "oem_db_platform_cidr": "10.26.60.169/32",
         "oem_db_name": "OEMDB"
       }
     },
@@ -148,10 +150,12 @@
       "cloud_platform_cidr": "172.20.0.0/16",
       "oem": {
         "agent_port": "3872",
-        "oms_host": "laa-oem-app.laa-test.modernisation-platform.service.justice.gov.uk",
         "oms_port": "4903",
+        "soa_db_port": "1521",
+        "oms_host": "laa-oem-app.laa-test.modernisation-platform.service.justice.gov.uk",
         "oem_db_host": "laa-oem-db.laa-test.modernisation-platform.service.justice.gov.uk",
-        "oem_db_port": "1521",
+        "oms_platform_cidr": "10.26.100.179/32",
+        "oem_db_platform_cidr": "10.26.100.249/32",
         "oem_db_name": "OEMDB"
       }
     },
@@ -220,10 +224,12 @@
       "cloud_platform_cidr": "172.20.0.0/16",
       "oem": {
         "agent_port": "3872",
-        "oms_host": "laa-oem-app.laa-preproduction.modernisation-platform.service.justice.gov.uk",
         "oms_port": "4903",
+        "soa_db_port": "1521",
+        "oms_host": "laa-oem-app.laa-preproduction.modernisation-platform.service.justice.gov.uk",
         "oem_db_host": "laa-oem-db.laa-preproduction.modernisation-platform.service.justice.gov.uk",
-        "oem_db_port": "1521",
+        "oms_platform_cidr": "10.27.76.143/32",
+        "oem_db_platform_cidr": "10.27.76.170/32",
         "oem_db_name": "OEMDB"
       }
     },
@@ -293,10 +299,12 @@
       "cloud_platform_cidr": "172.20.0.0/16",
       "oem": {
         "agent_port": "3872",
-        "oms_host": "laa-oem-app.laa-production.modernisation-platform.service.justice.gov.uk",
         "oms_port": "4903",
+        "soa_db_port": "1521",
+        "oms_host": "laa-oem-app.laa-production.modernisation-platform.service.justice.gov.uk",
         "oem_db_host": "laa-oem-db.laa-production.modernisation-platform.service.justice.gov.uk",
-        "oem_db_port": "1521",
+        "oms_platform_cidr": "10.27.68.241/32",
+        "oem_db_platform_cidr": "10.27.68.190/32",
         "oem_db_name": "OEMDB"
       }
     }
