@@ -370,7 +370,7 @@ resource "aws_vpc_security_group_egress_rule" "efs-security-group-egress" {
   cidr_ipv4         = "0.0.0.0/0"
 }
 
-# OEM OMS → SOA DB (Oracle listener)
+# OEM OMS → SOA DB (OMS port 4903)
 resource "aws_vpc_security_group_ingress_rule" "soa_db_oem_oms_ingress_4903" {
   security_group_id = aws_security_group.soa_db.id
   description       = "OEM OMS → SOA DB OMS port"
@@ -380,7 +380,7 @@ resource "aws_vpc_security_group_ingress_rule" "soa_db_oem_oms_ingress_4903" {
   cidr_ipv4         = local.application_data.accounts[local.environment].oem.oms_platform_cidr
 }
 
-# OEM OMS → SOA DB (OEM agent)
+# OEM OMS → SOA DB (OEM agent 3872)
 resource "aws_vpc_security_group_ingress_rule" "soa_db_oem_oms_ingress_3872" {
   security_group_id = aws_security_group.soa_db.id
   description       = "OEM OMS → SOA DB agent port"
@@ -390,24 +390,22 @@ resource "aws_vpc_security_group_ingress_rule" "soa_db_oem_oms_ingress_3872" {
   cidr_ipv4         = local.application_data.accounts[local.environment].oem.oms_platform_cidr
 }
 
-# OEM OMS → SOA DB (OMS upload)
+# OEM OMS → SOA DB (Oracle listener 1521)
 resource "aws_vpc_security_group_ingress_rule" "soa_db_oem_oms_ingress_1521" {
   security_group_id = aws_security_group.soa_db.id
   description       = "OEM OMS → SOA DB listener"
   ip_protocol       = "TCP"
-  from_port         = tonumber(local.application_data.accounts[local.environment].oem.oem_db_port)
-  to_port           = tonumber(local.application_data.accounts[local.environment].oem.oem_db_port)
+  from_port         = tonumber(local.application_data.accounts[local.environment].oem.soa_db_port)
+  to_port           = tonumber(local.application_data.accounts[local.environment].oem.soa_db_port)
   cidr_ipv4         = local.application_data.accounts[local.environment].oem.oms_platform_cidr
 }
 
-# OEM DB → SOA DB
+# OEM DB → SOA DB (Oracle listener 1521)
 resource "aws_vpc_security_group_ingress_rule" "soa_db_oem_db_ingress_1521" {
   security_group_id = aws_security_group.soa_db.id
   description       = "OEM DB → SOA DB listener"
   ip_protocol       = "TCP"
-  from_port         = tonumber(local.application_data.accounts[local.environment].oem.oem_db_port)
-  to_port           = tonumber(local.application_data.accounts[local.environment].oem.oem_db_port)
+  from_port         = tonumber(local.application_data.accounts[local.environment].oem.soa_db_port)
+  to_port           = tonumber(local.application_data.accounts[local.environment].oem.soa_db_port)
   cidr_ipv4         = local.application_data.accounts[local.environment].oem.oem_db_platform_cidr
 }
-
-
