@@ -60,19 +60,36 @@ locals {
     }
   ]
 
-  common_datadog_rules = [
+  common_datadog_rules_external = [
     {
       from_port   = 8126
       to_port     = 8126
       protocol    = "tcp"
-      self        = true
+      security_groups = [aws_security_group.common_ecs_service_external.id]
       description = "Datadog from ecs services"
     },
     {
       from_port   = 8125
       to_port     = 8125
       protocol    = "udp"
-      self        = true
+      security_groups = [aws_security_group.common_ecs_service_external.id]
+      description = "Datadog from ecs services"
+    }
+  ]
+
+  common_datadog_rules_internal = [
+    {
+      from_port   = 8126
+      to_port     = 8126
+      protocol    = "tcp"
+      security_groups = [aws_security_group.common_ecs_service_internal.id]
+      description = "Datadog from ecs services"
+    },
+    {
+      from_port   = 8125
+      to_port     = 8125
+      protocol    = "udp"
+      security_groups = [aws_security_group.common_ecs_service_internal.id]
       description = "Datadog from ecs services"
     }
   ]
