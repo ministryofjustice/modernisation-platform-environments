@@ -239,17 +239,22 @@ def lambda_handler(event: Any, context: Any) -> Dict[str, Any]:
                 "Updating Action for rule '%s' to: %s", RULE_NAME, desired_action
             )
 
-            # When BLOCK: ensure the custom response body is present
-            if mode == "BLOCK":
-                custom_response_bodies[CUSTOM_BODY_NAME] = {
-                    "Content": _get_maintenance_html(time_from, time_to),
-                    "ContentType": "TEXT_HTML",
-                }
+        # When BLOCK: ensure the custom response body is present and up to date
+        if mode == "BLOCK":
+            new_body = {
+                "Content": _get_maintenance_html(time_from, time_to),
+                "ContentType": "TEXT_HTML",
+            }
+            if custom_response_bodies.get(CUSTOM_BODY_NAME) != new_body:
+                custom_response_bodies[CUSTOM_BODY_NAME] = new_body
+                changed = True
+                logger.info("Updated custom response body HTML.")
 
-            # When ALLOW: remove custom body to avoid Terraform drift
-            elif mode == "ALLOW":
-                if CUSTOM_BODY_NAME in custom_response_bodies:
-                    del custom_response_bodies[CUSTOM_BODY_NAME]
+        # When ALLOW: remove custom body to avoid Terraform drift
+        elif mode == "ALLOW":
+            if CUSTOM_BODY_NAME in custom_response_bodies:
+                del custom_response_bodies[CUSTOM_BODY_NAME]
+                changed = True
 
         new_rules.append(rr)
 
