@@ -1,4 +1,3 @@
-# nomis-production environment settings
 locals {
 
   baseline_presets_production = {
