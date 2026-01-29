@@ -81,9 +81,14 @@ data "aws_iam_policy_document" "replication-policy" {
       "s3:GetObjectVersionTagging",
       "s3:ObjectOwnerOverrideToBucketOwner"
     ]
-
     resources = [local.replication_enabled ? "arn:aws:s3:::${var.replication_details["${var.data_feed}_${var.order_type}_bucket"]}/*" : ""]
-
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:PutObject"
+    ]
+    resources = ["${var.metadata_bucket}/*"]
   }
 }
 
