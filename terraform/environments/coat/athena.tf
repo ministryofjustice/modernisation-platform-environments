@@ -16,6 +16,32 @@ resource "aws_athena_workgroup" "coat_cur_report" {
   tags = local.tags
 }
 
+resource "aws_athena_workgroup" "test_wg" {
+  name = "test_wg"
+
+  configuration {
+    result_configuration {
+      output_location = "s3://coat-${local.environment}-cur-v2-hourly/athena-results/"
+      encryption_configuration {
+        encryption_option = "SSE_S3"
+      }
+    }
+
+    enforce_workgroup_configuration    = true
+    publish_cloudwatch_metrics_enabled = true
+  }
+
+  tags = merge(
+    { "owner" = "CloudOptimisationAndAccountability@justice.gov.uk" },
+    { "business-unit" = "laslala" },
+    { "application" = "COAT" },
+    { "is-production" = "lalalala" },
+    { "service-area" = "lalalalala" },
+    { "environment-name" = terraform.workspace },
+    { "source-code" = "https://github.com/ministryofjustice/modernisation-platform-environments" }
+  )
+}
+
 resource "aws_glue_catalog_database" "cur_v2_database" {
   name = "cur_v2_database"
 }

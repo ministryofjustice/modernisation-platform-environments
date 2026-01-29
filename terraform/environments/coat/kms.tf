@@ -13,15 +13,7 @@ module "coat_github_repos_s3_kms" {
 
   deletion_window_in_days = 7
 
-  tags = merge(
-    { "owner" = "CloudOptimisationAndAccountability@justice.gov.uk" },
-    { "business-unit" = "laslala" },
-    { "application" = "COAT" },
-    { "is-production" = "lalalala" },
-    { "service-area" = "lalalalala" },
-    { "environment-name" = terraform.workspace },
-    { "source-code" = "https://github.com/ministryofjustice/modernisation-platform-environments" }
-  )
+  tags = local.tags
 }
 
 module "cur_s3_kms" {
