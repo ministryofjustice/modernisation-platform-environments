@@ -145,7 +145,22 @@ def _parse_time_value(event: Any, key: str, fallback: str) -> str:
 # --------------
 
 
+_VALID_EVENT_KEYS = {"mode", "time_from", "time_to"}
+
+
 def lambda_handler(event: Any, context: Any) -> Dict[str, Any]:
+    if isinstance(event, dict):
+        unknown_keys = set(event.keys()) - _VALID_EVENT_KEYS
+        if unknown_keys:
+            logger.error(
+                "Unknown event keys: %s. Valid keys: %s", unknown_keys, _VALID_EVENT_KEYS
+            )
+            return {
+                "ok": False,
+                "updated": False,
+                "error": f"Unknown event keys: {unknown_keys}. Valid keys: {_VALID_EVENT_KEYS}",
+            }
+
     mode: WafMode = _parse_mode(event)
     time_from: str = _parse_time_value(event, "time_from", TIME_FROM)
     time_to: str = _parse_time_value(event, "time_to", TIME_TO)
@@ -368,6 +383,26 @@ def main() -> None:
         TIME_TO,
         f"missing time_to uses TIME_TO env var ({TIME_TO})",
     )
+
+    print("\nTesting event key validation (via lambda_handler)...")
+    # Unknown key "mod" (typo for "mode") should be rejected
+    result = lambda_handler({"mod": "block", "time_from": "19:00", "time_to": "22:00"}, None)
+    assert_eq(result["ok"], False, "typo 'mod' is rejected")
+    assert_eq("Unknown event keys" in result.get("error", ""), True, "error mentions unknown keys")
+    assert_eq("mode" not in result, True, "no 'mode' field in validation error response")
+
+    # Multiple unknown keys
+    result = lambda_handler({"action": "block", "foo": "bar"}, None)
+    assert_eq(result["ok"], False, "multiple unknown keys rejected")
+
+    # Mix of valid and unknown keys
+    result = lambda_handler({"mode": "BLOCK", "typo_key": "value"}, None)
+    assert_eq(result["ok"], False, "mix of valid and unknown keys rejected")
+
+    # Valid keys should not be flagged as unknown
+    assert_eq(set({"mode": "BLOCK", "time_from": "19:00", "time_to": "22:00"}.keys()) - _VALID_EVENT_KEYS, set(), "all valid keys pass validation")
+    assert_eq(set({}.keys()) - _VALID_EVENT_KEYS, set(), "empty event passes validation")
+    assert_eq(set({"mode": "ALLOW"}.keys()) - _VALID_EVENT_KEYS, set(), "single valid key passes validation")
 
     print("\nTesting _get_maintenance_html()...")
     html = _get_maintenance_html("20:00", "08:00")

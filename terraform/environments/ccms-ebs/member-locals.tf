@@ -13,14 +13,19 @@ locals {
 
   lambda_folder_name = ["lambda_delivery", "ftp_lambda_layer", "payment_lambda_layer", "cloudwatch_sns_layer", "payment_load_monitor_layer"]
 
-  lambda_source_hashes = [
+  lambda_source_hashes_cloudwatch_alarm_slack_integration = [
     for f in fileset("./lambda/cloudwatch_alarm_slack_integration", "**") :
     sha256(file("${path.module}/lambda/cloudwatch_alarm_slack_integration/${f}"))
   ]
 
-  lambda_payment_source_hashes = [
+  lambda_source_hashes_payment_load_monitor = [
     for f in fileset("./lambda/payment_load_monitor", "**") :
     sha256(file("${path.module}/lambda/payment_load_monitor/${f}"))
+  ]
+
+  lambda_source_hashes_waf_maintenance = [
+    for f in fileset("./lambda/waf_maintenance", "**") :
+    sha256(file("${path.module}/lambda/waf_maintenance/${f}"))
   ]
 
   data_subnets = [
