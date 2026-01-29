@@ -25,6 +25,17 @@ if not logger.handlers:
 logger.setLevel(logging.INFO)
 
 
+# Validation helpers
+_TIME_RE = re.compile(r"^([01]\d|2[0-3]):[0-5]\d$")
+
+
+def _validate_time(value: str, label: str) -> str | None:
+    """Return an error message if value is not a valid HH:MM time, or None if valid."""
+    if not _TIME_RE.match(value):
+        return f"Invalid time format for '{label}': '{value}'. Expected HH:MM (00:00–23:59)."
+    return None
+
+
 # Env helpers
 def _get_required_env(name: str) -> str:
     value = os.environ.get(name)
@@ -52,6 +63,11 @@ CUSTOM_BODY_HTML: str = os.environ.get("CUSTOM_BODY_HTML", "")
 # Time configuration (with defaults)
 TIME_FROM: str = os.environ.get("TIME_FROM", "21:30")
 TIME_TO: str = os.environ.get("TIME_TO", "07:00")
+
+for _label, _value in [("TIME_FROM", TIME_FROM), ("TIME_TO", TIME_TO)]:
+    _err = _validate_time(_value, _label)
+    if _err:
+        raise ValueError(_err)
 
 # HTML template with placeholders (used when CUSTOM_BODY_HTML is not set)
 MAINTENANCE_HTML_TEMPLATE: str = """<!doctype html>
@@ -129,16 +145,6 @@ def _parse_mode(event: dict[str, Any]) -> WafMode | str:
     if mode_upper not in ("BLOCK", "ALLOW"):
         return f"Invalid value for 'mode': '{raw_mode}'. Must be 'BLOCK' or 'ALLOW'."
     return cast(WafMode, mode_upper)
-
-
-_TIME_RE = re.compile(r"^([01]\d|2[0-3]):[0-5]\d$")
-
-
-def _validate_time(value: str, label: str) -> str | None:
-    """Return an error message if value is not a valid HH:MM time, or None if valid."""
-    if not _TIME_RE.match(value):
-        return f"Invalid time format for '{label}': '{value}'. Expected HH:MM (00:00–23:59)."
-    return None
 
 
 def _parse_time_value(event: Any, key: str, fallback: str) -> str:
