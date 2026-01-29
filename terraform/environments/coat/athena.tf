@@ -15,7 +15,7 @@ resource "aws_athena_workgroup" "coat_cur_report" {
 
   tags = merge(
     { "owner" = "CloudOptimisationAndAccountability@justice.gov.uk" },
-    { "business_unit" = "Platforms" },
+    { "business-unit" = "Platforms" },
     { "owner" = "COAT" },
     { "service-area" = "lalalalala" },
     { "environment-name" = terraform.workspace },

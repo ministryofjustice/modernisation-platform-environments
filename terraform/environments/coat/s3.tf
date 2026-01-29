@@ -40,7 +40,7 @@ module "cur_v2_hourly" {
 
   tags = merge(
     { "owner" = "CloudOptimisationAndAccountability@justice.gov.uk" },
-    { "business_unit" = "lalala" },
+    { "business-unit" = "lalala" },
     { "is-production" = true },
     { "owner" = "COAT" },
     { "service-area" = "lalalalala" },
