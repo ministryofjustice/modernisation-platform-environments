@@ -315,6 +315,19 @@ def lambda_handler(event: Any, context: Any) -> Dict[str, Any]:
         "Rules": new_rules,
     }
 
+    # Forward optional fields from the current WebACL to avoid losing configuration
+    for key in (
+        "CaptchaConfig",
+        "ChallengeConfig",
+        "TokenDomains",
+        "AssociationConfig",
+        "DataProtectionConfig",
+        "OnSourceDDoSProtectionConfig",
+        "ApplicationConfig",
+    ):
+        if key in web_acl:
+            updated_web_acl[key] = web_acl[key]
+
     # Only include CustomResponseBodies if non-empty
     if custom_response_bodies:
         updated_web_acl["CustomResponseBodies"] = custom_response_bodies
