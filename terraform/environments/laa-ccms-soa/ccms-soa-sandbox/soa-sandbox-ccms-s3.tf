@@ -12,7 +12,7 @@ module "s3-bucket-shared" {
 
   # Access logging into the existing logging bucket
   log_bucket = local.logging_bucket_name
-  log_prefix = "s3access/${local.application_name}-${local.environment}-shared"
+  log_prefix = "s3access/${local.component_name}-${local.environment}-shared"
 
   # Replication disabled, same as EDRMS
   replication_enabled = false
@@ -38,7 +38,7 @@ module "s3-bucket-shared" {
   ]
 
   tags = merge(local.tags,
-    { Name = "${local.application_name}-${local.environment}-${local.component_name}-shared" }
+    { Name = "${local.component_name}-${local.environment}-shared" }
   )
 }
 
