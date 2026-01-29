@@ -2,6 +2,7 @@
 # Display a custom HTML response body when blocking requests and remove it for Allow mode.
 
 import os
+import re
 import copy
 import logging
 from typing import Any, Dict, Literal, TYPE_CHECKING, TypeAlias, cast
@@ -131,6 +132,16 @@ def _parse_mode(event: Any) -> WafMode:
     return cast(WafMode, mode_upper)
 
 
+_TIME_RE = re.compile(r"^([01]\d|2[0-3]):[0-5]\d$")
+
+
+def _validate_time(value: str, label: str) -> str | None:
+    """Return an error message if value is not a valid HH:MM time, or None if valid."""
+    if not _TIME_RE.match(value):
+        return f"Invalid time format for '{label}': '{value}'. Expected HH:MM (00:00–23:59)."
+    return None
+
+
 def _parse_time_value(event: Any, key: str, fallback: str) -> str:
     """Parse a time value from event, falling back to provided default."""
     if isinstance(event, dict):
@@ -164,6 +175,12 @@ def lambda_handler(event: Any, context: Any) -> Dict[str, Any]:
     mode: WafMode = _parse_mode(event)
     time_from: str = _parse_time_value(event, "time_from", TIME_FROM)
     time_to: str = _parse_time_value(event, "time_to", TIME_TO)
+
+    for label, value in [("time_from", time_from), ("time_to", time_to)]:
+        err = _validate_time(value, label)
+        if err:
+            logger.error(err)
+            return {"ok": False, "updated": False, "mode": mode, "error": err}
 
     logger.info(
         "Requested mode '%s' for rule '%s' in WebACL '%s' (ID=%s, scope=%s)",
@@ -408,6 +425,17 @@ def main() -> None:
     assert_eq(set({"mode": "BLOCK", "time_from": "19:00", "time_to": "22:00"}.keys()) - _VALID_EVENT_KEYS, set(), "all valid keys pass validation")
     assert_eq(set({}.keys()) - _VALID_EVENT_KEYS, set(), "empty event passes validation")
     assert_eq(set({"mode": "ALLOW"}.keys()) - _VALID_EVENT_KEYS, set(), "single valid key passes validation")
+
+    print("\nTesting _validate_time()...")
+    assert_eq(_validate_time("00:00", "t"), None, "00:00 is valid")
+    assert_eq(_validate_time("23:59", "t"), None, "23:59 is valid")
+    assert_eq(_validate_time("07:30", "t"), None, "07:30 is valid")
+    assert_eq(_validate_time("24:00", "t") is not None, True, "24:00 is invalid")
+    assert_eq(_validate_time("12:60", "t") is not None, True, "12:60 is invalid")
+    assert_eq(_validate_time("banana", "t") is not None, True, "banana is invalid")
+    assert_eq(_validate_time("7:30", "t") is not None, True, "7:30 missing leading zero is invalid")
+    assert_eq(_validate_time("", "t") is not None, True, "empty string is invalid")
+    assert_eq(_validate_time("12:00:00", "t") is not None, True, "HH:MM:SS is invalid")
 
     print("\nTesting _get_maintenance_html()...")
     html = _get_maintenance_html("20:00", "08:00")
