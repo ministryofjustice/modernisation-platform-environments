@@ -5,7 +5,7 @@ module "dashboard_service_app_secrets" {
   count = terraform.workspace == "analytical-platform-compute-test" ? 0 : 1
 
   source  = "terraform-aws-modules/secrets-manager/aws"
-  version = "1.3.1"
+  version = "2.0.1"
 
   name       = "dashboard-service/app-secrets"
   kms_key_id = data.aws_kms_key.common_secrets_manager_kms.arn
