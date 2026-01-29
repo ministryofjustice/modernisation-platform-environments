@@ -50,7 +50,7 @@ variable "alb_security_group_id" {
   type        = string
 }
 
-variable "connectivity_alb_security_group_id" {
+variable "connectivity_alb_sg_id" {
   description = "Security Group ID for connectivity ALB"
   type        = string
 }
