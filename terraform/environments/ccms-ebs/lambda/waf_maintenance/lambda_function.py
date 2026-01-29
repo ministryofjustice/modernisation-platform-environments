@@ -120,15 +120,14 @@ def _desired_action(mode: WafMode) -> RuleActionType:
     raise ValueError(f"Unsupported mode: {mode}")
 
 
-def _parse_mode(event: Any) -> WafMode:
-    if not isinstance(event, dict):
-        return "BLOCK"
+def _parse_mode(event: dict[str, Any]) -> WafMode | str:
+    """Parse mode from event. Returns a WafMode on success, or an error string on failure."""
     raw_mode = event.get("mode", "BLOCK")
     if not isinstance(raw_mode, str):
-        return "BLOCK"
+        return f"Invalid type for 'mode': expected a string, got {type(raw_mode).__name__}."
     mode_upper = raw_mode.upper()
     if mode_upper not in ("BLOCK", "ALLOW"):
-        return "BLOCK"
+        return f"Invalid value for 'mode': '{raw_mode}'. Must be 'BLOCK' or 'ALLOW'."
     return cast(WafMode, mode_upper)
 
 
@@ -179,7 +178,12 @@ def lambda_handler(event: Any, context: Any) -> Dict[str, Any]:
             "error": f"Unknown event keys: {unknown_keys}. Valid keys: {_VALID_EVENT_KEYS}",
         }
 
-    mode: WafMode = _parse_mode(event)
+    mode_or_error = _parse_mode(event)
+    if mode_or_error not in ("BLOCK", "ALLOW"):
+        logger.error(mode_or_error)
+        return {"ok": False, "updated": False, "error": mode_or_error}
+    mode: WafMode = cast(WafMode, mode_or_error)
+
     time_from: str = _parse_time_value(event, "time_from", TIME_FROM)
     time_to: str = _parse_time_value(event, "time_to", TIME_TO)
 
@@ -350,12 +354,24 @@ def main() -> None:
     assert_eq(_parse_mode({"mode": "block"}), "BLOCK", "mode=block (lowercase)")
     assert_eq(_parse_mode({"mode": "ALLOW"}), "ALLOW", "mode=ALLOW")
     assert_eq(_parse_mode({"mode": "allow"}), "ALLOW", "mode=allow (lowercase)")
-    assert_eq(
-        _parse_mode({"mode": "invalid"}), "BLOCK", "mode=invalid defaults to BLOCK"
-    )
     assert_eq(_parse_mode({}), "BLOCK", "empty event defaults to BLOCK")
-    assert_eq(_parse_mode(None), "BLOCK", "None event defaults to BLOCK")
-    assert_eq(_parse_mode("not a dict"), "BLOCK", "non-dict event defaults to BLOCK")
+
+    # Invalid mode values return error strings
+    result = _parse_mode({"mode": "invalid"})
+    assert_eq(isinstance(result, str) and "Invalid value" in result, True, "mode=invalid returns error")
+    result = _parse_mode({"mode": 123})
+    assert_eq(isinstance(result, str) and "Invalid type" in result, True, "mode=123 returns error")
+    result = _parse_mode({"mode": None})
+    assert_eq(isinstance(result, str) and "Invalid type" in result, True, "mode=None returns error")
+
+    # Invalid mode via lambda_handler
+    result = lambda_handler({"mode": "DELETE"}, None)
+    assert_eq(result["ok"], False, "invalid mode rejected by handler")
+    assert_eq("Invalid value" in result.get("error", ""), True, "handler error mentions invalid value")
+
+    result = lambda_handler({"mode": 42}, None)
+    assert_eq(result["ok"], False, "non-string mode rejected by handler")
+    assert_eq("Invalid type" in result.get("error", ""), True, "handler error mentions invalid type")
 
     print("\nTesting _parse_time_value() with event values...")
     assert_eq(
