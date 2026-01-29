@@ -22,7 +22,7 @@ provider "aws" {
   assume_role {
     role_arn = "arn:aws:iam::${local.modernisation_platform_account_id}:role/modernisation-account-limited-read-member-access"
   }
-  default_tags { tags = local.tags }
+  # default_tags { tags = local.tags }
 }
 
 # AWS provider for core-vpc-<environment>, to access resources in the core-vpc accounts
