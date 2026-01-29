@@ -118,7 +118,7 @@ resource "aws_security_group_rule" "allow_connectivity_alb_from_yjsm" {
   from_port                = 8080
   to_port                  = 8080
   protocol                 = "tcp"
-  security_group_id        = var.connectivity_alb_security_group_id
+  security_group_id        = var.connectivity_alb_sg_id
   source_security_group_id = aws_security_group.yjsm_service.id
   description              = "YJSM to YJAF connectivity ALB"
 }
