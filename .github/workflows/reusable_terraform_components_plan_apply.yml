@@ -164,15 +164,29 @@
             run: |
               set -o pipefail
               exitcode=0
+
+              export TF_LOG=WARN
+              export TF_LOG_PATH=tf-warnings.log
+
               tf_args="-detailed-exitcode ${{ inputs.plan_apply_tfargs }}"
               [[ ${POST_PLAN_TO_PR} == 'true' ]] && tf_args="${tf_args} -no-color"
               [[ ${{ inputs.do_state_refresh_on_plan }} == 'true' ]] && tf_args="${tf_args} -refresh=false"
+
               echo "terraform plan ${tf_args} -out=tfplan"
-              terraform plan ${tf_args} -out=tfplan | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh | tee tfplan.txt || exitcode=$?
+
+              terraform plan ${tf_args} -out=tfplan > plan.out || exitcode=$?
+
+              cat plan.out \
+                | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh \
+                | tee tfplan.txt
+
               terraform show -json tfplan > tfplan.json
+
               echo "exitcode=${exitcode}"
               echo "exitcode=${exitcode}" >> $GITHUB_OUTPUT
+
               (( exitcode == 1 )) && exit 1 || exit 0
+
 
           - name: Evaluate Terraform Plan
             if: github.event_name == 'pull_request' && steps.plan.outputs.exitcode == '2' && !contains(fromJSON(env.SKIP_PLAN_EVALUATOR), env.WORKSPACE_NAME)
