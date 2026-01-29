@@ -53,44 +53,46 @@ module "this-bucket" {
   )
 }
 
-resource "aws_lambda_permission" "allow_bucket" {
-  statement_id  = "AllowExecutionFromS3Bucket-${var.export_destination}"
-  action        = "lambda:InvokeFunction"
-  function_name = module.push_lambda.lambda_function_arn
-  principal     = "s3.amazonaws.com"
-  source_arn    = module.this-bucket.bucket.arn
-}
-
 resource "aws_s3_bucket_notification" "bucket_notification" {
   count = var.destination_bucket_id != null ? 1 : 0
 
   bucket = module.this-bucket.bucket.id
 
-  lambda_function {
-    lambda_function_arn = module.push_lambda.lambda_function_arn
-    events              = ["s3:ObjectCreated:*"]
+  queue {
+    queue_arn = module.push_lambda_event_queue.sqs_queue.arn
+    events    = ["s3:ObjectCreated:*"]
   }
-
-  depends_on = [aws_lambda_permission.allow_bucket]
 }
+
+module "push_lambda_event_queue" {
+  source               = "../sqs_s3_lambda_trigger"
+  bucket               = module.this-bucket.bucket
+  lambda_function_name = module.push_lambda.lambda_function_name
+  bucket_prefix        = "emds-${var.environment_shorthand}"
+  maximum_concurrency  = 100
+  enabled              = false
+}
+
 
 #------------------------------------------------------------------------------
 # Push lambda 
 #------------------------------------------------------------------------------
 
 module "push_lambda" {
-  source                  = "../lambdas"
-  function_name           = "push_data_export_to_${var.export_destination}"
-  image_name              = "push_data_export"
-  is_image                = true
-  role_name               = aws_iam_role.push_lambda.name
-  role_arn                = aws_iam_role.push_lambda.arn
-  memory_size             = 1024
-  timeout                 = 900
-  core_shared_services_id = var.core_shared_services_id
-  production_dev          = var.production_dev
-  security_group_ids      = var.security_group_ids
-  subnet_ids              = var.subnet_ids
+  source                        = "../lambdas"
+  function_name                 = "push_data_export_to_${var.export_destination}"
+  image_name                    = "push_data_export"
+  is_image                      = true
+  role_name                     = aws_iam_role.push_lambda.name
+  role_arn                      = aws_iam_role.push_lambda.arn
+  memory_size                   = 1024
+  timeout                       = 900
+  core_shared_services_id       = var.core_shared_services_id
+  production_dev                = var.environment_shorthand
+  security_group_ids            = var.security_group_ids
+  subnet_ids                    = var.subnet_ids
+  reserved_concurrent_executions = 100
+
   environment_variables = {
     DESTINATION_BUCKET = var.destination_bucket_id
   }

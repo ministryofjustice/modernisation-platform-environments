@@ -98,3 +98,10 @@ variable "replication_details" {
   default  = null
   nullable = true
 }
+
+variable "metadata_bucket" {
+  description = "bucket for inventory dumping"
+  type = string
+  default = null
+  nullable = true
+}
