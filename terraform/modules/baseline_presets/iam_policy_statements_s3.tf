@@ -53,7 +53,7 @@ locals {
         principals = {
           type = "AWS"
           identifiers = [
-            var.environment.account_root_arns["${var.environment.application_name}-preproduction"]
+            try(var.environment.account_root_arns["${var.environment.application_name}-preproduction"], "${var.environment.application_name}-not-found")
           ]
         }
       }
