@@ -5,7 +5,7 @@ module "coat_github_repos_s3_kms" {
   count = local.is-production ? 1 : 0
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "3.1.1"
+  version = "4.0.0"
 
   aliases               = ["s3/coat-github-repos"]
   description           = "S3 COAT github repos terraform KMS key"
@@ -13,7 +13,12 @@ module "coat_github_repos_s3_kms" {
 
   deletion_window_in_days = 7
 
-  tags = local.tags
+  tags = merge(
+    jsondecode(data.http.environments_file.response_body).tags,
+    { "is-production" = "lalalalala" },
+    { "environment-name" = terraform.workspace },
+    { "source-code" = "https://github.com/ministryofjustice/modernisation-platform-environments" }
+  )
 }
 
 module "cur_s3_kms" {
@@ -21,7 +26,7 @@ module "cur_s3_kms" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "3.1.1"
+  version = "4.0.0"
 
   aliases                 = ["s3/cur"]
   description             = "S3 CUR KMS key"

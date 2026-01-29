@@ -17,7 +17,7 @@ resource "aws_iam_policy" "coat_gh_actions_policy" {
     {
       environment      = local.environment
       account          = data.aws_caller_identity.current.account_id
-      region           = data.aws_region.current.name
+      region           = data.aws_region.current.region
       athena_workgroup = local.athena_workgroup
       data_catalog     = local.data_catalog
     }
