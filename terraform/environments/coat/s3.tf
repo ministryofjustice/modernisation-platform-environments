@@ -37,14 +37,6 @@ module "cur_v2_hourly" {
       }
     }
   ]
-
-  tags = merge(
-    jsondecode(data.http.environments_file.response_body).tags,
-    { "is-production" = "lalalalala" },
-    { "service-area" = "lalalalala" },
-    { "environment-name" = terraform.workspace },
-    { "source-code" = "https://github.com/ministryofjustice/modernisation-platform-environments" }
-  )
 }
 
 data "aws_iam_policy_document" "coat_cur_v2_hourly_dev_bucket_policy" {

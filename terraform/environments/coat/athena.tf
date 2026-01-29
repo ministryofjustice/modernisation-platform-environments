@@ -13,12 +13,7 @@ resource "aws_athena_workgroup" "coat_cur_report" {
     publish_cloudwatch_metrics_enabled = true
   }
 
-  tags = merge(
-    jsondecode(data.http.environments_file.response_body).tags,
-    { "service-area" = "lalalalala" },
-    { "environment-name" = terraform.workspace },
-    { "source-code" = "https://github.com/ministryofjustice/modernisation-platform-environments" }
-  )
+  tags = local.tags
 }
 
 resource "aws_glue_catalog_database" "cur_v2_database" {
