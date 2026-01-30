@@ -1,0 +1,245 @@
+{
+  "id": null,
+  "uid": "platform-health-signals",
+  "title": "Platform Health Signals - ${team_name} (${environment})",
+  "tags": ["platform-health", "health-signals", "status"],
+  "schemaVersion": 39,
+  "timezone": "browser",
+  "refresh": "1m",
+  "time": { "from": "now-6h", "to": "now" },
+
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+
+  "panels": [
+    {
+      "id": 1000,
+      "type": "row",
+      "title": "Overall Status",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "collapsed": false,
+      "panels": []
+    },
+
+    {
+      "id": 1001,
+      "type": "stat",
+      "title": "Overall Platform Health (TGW domain)",
+      "description": "Worst severity across all Transit Gateways. 0=OK, 2=CRIT.",
+      "datasource": "core-network-services-production-cloudwatch",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 1 },
+      "options": {
+        "textMode": "value",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 0,
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": { "text": "OK", "color": "green" },
+                "2": { "text": "CRIT", "color": "red" }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 2 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "queryMode": "Metrics",
+          "metricQueryType": 0,
+          "metricEditorMode": 0,
+          "region": "eu-west-2",
+          "namespace": "AWS/TransitGateway",
+          "metricName": "BytesIn",
+          "statistic": "Sum",
+          "dimensions": { "TransitGateway": "*" },
+          "label": "{{TransitGateway}}",
+          "matchExact": true
+        },
+        {
+          "refId": "B",
+          "queryMode": "Metrics",
+          "metricQueryType": 0,
+          "metricEditorMode": 0,
+          "region": "eu-west-2",
+          "namespace": "AWS/TransitGateway",
+          "metricName": "BytesOut",
+          "statistic": "Sum",
+          "dimensions": { "TransitGateway": "*" },
+          "label": "{{TransitGateway}}",
+          "matchExact": true
+        },
+        { "refId": "C", "expression": "IF(MIN([A,B])>0, 0, 2)", "label": "{{TransitGateway}} traffic_sev" },
+
+        {
+          "refId": "D",
+          "queryMode": "Metrics",
+          "metricQueryType": 0,
+          "metricEditorMode": 0,
+          "region": "eu-west-2",
+          "namespace": "AWS/TransitGateway",
+          "metricName": "BytesDropCountBlackhole",
+          "statistic": "Sum",
+          "dimensions": { "TransitGateway": "*" },
+          "label": "{{TransitGateway}}",
+          "matchExact": true
+        },
+        {
+          "refId": "E",
+          "queryMode": "Metrics",
+          "metricQueryType": 0,
+          "metricEditorMode": 0,
+          "region": "eu-west-2",
+          "namespace": "AWS/TransitGateway",
+          "metricName": "BytesDropCountNoRoute",
+          "statistic": "Sum",
+          "dimensions": { "TransitGateway": "*" },
+          "label": "{{TransitGateway}}",
+          "matchExact": true
+        },
+        { "refId": "F", "expression": "IF((D+E)>0, 2, 0)", "label": "{{TransitGateway}} drops_sev" },
+
+        { "refId": "G", "expression": "MAX([C,F])", "label": "{{TransitGateway}} overall_sev" }
+      ],
+      "transformations": [
+        {
+          "id": "reduce",
+          "options": {
+            "reducers": ["max"],
+            "includeTimeField": false,
+            "mode": "reduceFields"
+          }
+        }
+      ]
+    },
+
+    {
+      "id": 1010,
+      "type": "row",
+      "title": "Health Signals Detail",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 9 },
+      "collapsed": false,
+      "panels": []
+    },
+
+    {
+      "id": 1011,
+      "type": "table",
+      "title": "Transit Gateways - Health Signals",
+      "description": "Per TGW computed severity (0=OK, 2=CRIT).",
+      "datasource": "core-network-services-production-cloudwatch",
+      "gridPos": { "h": 12, "w": 24, "x": 0, "y": 10 },
+      "options": {
+        "showHeader": true
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": { "text": "OK" },
+                "2": { "text": "CRIT" }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 2 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "queryMode": "Metrics",
+          "metricQueryType": 0,
+          "metricEditorMode": 0,
+          "region": "eu-west-2",
+          "namespace": "AWS/TransitGateway",
+          "metricName": "BytesIn",
+          "statistic": "Sum",
+          "dimensions": { "TransitGateway": "*" },
+          "label": "{{TransitGateway}}",
+          "matchExact": true
+        },
+        {
+          "refId": "B",
+          "queryMode": "Metrics",
+          "metricQueryType": 0,
+          "metricEditorMode": 0,
+          "region": "eu-west-2",
+          "namespace": "AWS/TransitGateway",
+          "metricName": "BytesOut",
+          "statistic": "Sum",
+          "dimensions": { "TransitGateway": "*" },
+          "label": "{{TransitGateway}}",
+          "matchExact": true
+        },
+        { "refId": "C", "expression": "IF(MIN([A,B])>0, 0, 2)", "label": "{{TransitGateway}} traffic_sev" },
+
+        {
+          "refId": "D",
+          "queryMode": "Metrics",
+          "metricQueryType": 0,
+          "metricEditorMode": 0,
+          "region": "eu-west-2",
+          "namespace": "AWS/TransitGateway",
+          "metricName": "BytesDropCountBlackhole",
+          "statistic": "Sum",
+          "dimensions": { "TransitGateway": "*" },
+          "label": "{{TransitGateway}}",
+          "matchExact": true
+        },
+        {
+          "refId": "E",
+          "queryMode": "Metrics",
+          "metricQueryType": 0,
+          "metricEditorMode": 0,
+          "region": "eu-west-2",
+          "namespace": "AWS/TransitGateway",
+          "metricName": "BytesDropCountNoRoute",
+          "statistic": "Sum",
+          "dimensions": { "TransitGateway": "*" },
+          "label": "{{TransitGateway}}",
+          "matchExact": true
+        },
+        { "refId": "F", "expression": "IF((D+E)>0, 2, 0)", "label": "{{TransitGateway}} drops_sev" },
+
+        { "refId": "G", "expression": "MAX([C,F])", "label": "{{TransitGateway}} overall_sev" }
+      ]
+    }
+  ]
+}
