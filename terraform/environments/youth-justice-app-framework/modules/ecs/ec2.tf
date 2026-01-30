@@ -178,25 +178,11 @@ module "autoscaling_sg" {
       source_security_group_id = aws_security_group.common_ecs_service_internal.id
     },
     {
-      from_port                = 8125
-      to_port                  = 8125
-      protocol                 = "UDP"
-      description              = "Datadog from ecs external"
-      source_security_group_id = aws_security_group.common_ecs_service_external.id
-    },
-    {
       from_port                = 8126
       to_port                  = 8126
       protocol                 = "TCP"
       description              = "Datadog from ecs internal"
       source_security_group_id = aws_security_group.common_ecs_service_internal.id
-    },
-    {
-      from_port                = 8126
-      to_port                  = 8126
-      protocol                 = "TCP"
-      description              = "Datadog from ecs external"
-      source_security_group_id = aws_security_group.common_ecs_service_external.id
     }
   ]
 

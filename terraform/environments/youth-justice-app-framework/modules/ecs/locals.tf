@@ -91,13 +91,6 @@ locals {
       protocol        = "tcp"
       description     = "ELB to ECS service communication"
       security_groups = [var.internal_alb_security_group_id]
-    },
-    {
-      from_port       = 8080
-      to_port         = 8080
-      protocol        = "tcp"
-      description     = "EC2 to ECS service communication"
-      security_groups = [module.autoscaling_sg.security_group_id]
     }
   ]
 
