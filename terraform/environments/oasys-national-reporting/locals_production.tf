@@ -343,7 +343,7 @@ locals {
                 }]
               }
               pd-onr-web-http-7777 = {
-                priority = 1200 # change priority to 200 when environment is powered on during day
+                priority = 200
                 actions = [{
                   type              = "forward"
                   target_group_name = "pd-onr-web-http-7777"
@@ -389,8 +389,8 @@ locals {
       maintenance_window_duration = 2 # 4 for prod
       maintenance_window_cutoff   = 1 # 2 for prod
       patch_classifications = {
-        REDHAT_ENTERPRISE_LINUX = ["Security", "Bugfix"] # Linux Options=(Security,Bugfix,Enhancement,Recommended,Newpackage)
-        WINDOWS                 = ["SecurityUpdates", "CriticalUpdates"]
+        REDHAT_ENTERPRISE_LINUX = ["Security", "Bugfix"]                                  # Linux Options=(Security,Bugfix,Enhancement,Recommended,Newpackage)
+        WINDOWS                 = ["SecurityUpdates", "CriticalUpdates", "UpdateRollups"] # Windows Options=CriticalUpdates,SecurityUpdates,DefinitionUpdates,Drivers,FeaturePacks,ServicePacks,Tools,UpdateRollups,Updates,Upgrades
       }
     }
 

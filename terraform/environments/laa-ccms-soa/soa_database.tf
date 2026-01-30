@@ -22,49 +22,35 @@ resource "aws_db_option_group" "soa_oracle_19" {
     version     = "1.0"
   }
 
-  #######################################
-  # OEM Agent Option (Corrected)
-  #######################################
   option {
     option_name = "OEM_AGENT"
 
-    # Required: AGENT_PORT (defaults to 3872 if you like)
-    port    = 3872
+    port    = tonumber(local.application_data.accounts[local.environment].oem.agent_port)
+    version = "13.5.0.0.v1"
 
-    # Required: AGENT_VERSION (pick one supported in your region)
-    # e.g. 13.5.0.0.v2 – check docs / console for allowed values
-    version = "13.5.0.0.v2"
-
-    # Required: security group that OMS can reach
     vpc_security_group_memberships = [
       aws_security_group.soa_db.id
     ]
 
-    # Required: OMS host
     option_settings {
-      name  = "OMS_HOST"
-      value = "laa-oem-app.laa-development.modernisation-platform.service.justice.gov.uk"
+      name  = "MINIMUM_TLS_VERSION"
+      value = "TLSv1"
     }
 
-    # Required: OMS_PORT (HTTPS upload port on OMS, typically 4903)
-    option_settings {
-      name  = "OMS_PORT"
-      value = "4903"
-    }
-
-    # Required: registration password
     option_settings {
       name  = "AGENT_REGISTRATION_PASSWORD"
-      value = jsondecode(
-        data.aws_secretsmanager_secret_version.oem_agent_credentials.secret_string
-      ).password
+      value = jsondecode(data.aws_secretsmanager_secret_version.ccms_soa_quiesced_secrets_current.secret_string)["agent_registration_password"]
     }
 
-    # Optional but recommended in many setups:
-    # option_settings {
-    #   name  = "MINIMUM_TLS_VERSION"
-    #   value = "TLSv1.2"
-    # }
+    option_settings {
+      name  = "OMS_HOST"
+      value = local.application_data.accounts[local.environment].oem.oms_host
+    }
+
+    option_settings {
+      name  = "OMS_PORT"
+      value = local.application_data.accounts[local.environment].oem.oms_port
+    }
   }
 
   lifecycle {
@@ -72,11 +58,10 @@ resource "aws_db_option_group" "soa_oracle_19" {
   }
 }
 
-
 resource "aws_db_instance" "soa_db" {
   identifier                          = "soa-db"
   allocated_storage                   = local.application_data.accounts[local.environment].soa_db_storage_gb
-  auto_minor_version_upgrade          = local.application_data.accounts[local.environment].soa_db_minor_version_upgrade_allowed #--This needs to be set to true if using a JVM in the above option group
+  auto_minor_version_upgrade          = local.application_data.accounts[local.environment].soa_db_minor_version_upgrade_allowed
   storage_type                        = "gp2"
   engine                              = "oracle-ee"
   engine_version                      = local.application_data.accounts[local.environment].soa_db_version

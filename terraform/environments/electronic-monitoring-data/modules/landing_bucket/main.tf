@@ -29,16 +29,19 @@ locals {
       effect = "Allow"
       principals = {
         type        = "AWS"
-        identifiers = ["arn:aws:iam::${var.cross_account_id}:role/cross_account_copy_lambda_role"]
+        identifiers = ["arn:aws:iam::${var.cross_account_id}:role/AWSS3BucketReplication${var.data_feed}${var.order_type}"]
       }
       actions = [
-        "s3:PutObject",
-        "s3:PutObjectAcl"
+        "s3:ReplicateObject",
+        "s3:ReplicateTags",
+        "s3:GetBucketVersioning",
+        "s3:PutBucketVersioning",
+        "s3:ObjectOwnerOverrideToBucketOwner"
       ]
-      resources = ["${module.this-bucket.bucket.arn}/*"]
+      resources = ["${module.this-bucket.bucket.arn}/*", module.this-bucket.bucket.arn]
     }
   ] : []
-  bucket_policy = var.cross_account ? flatten([local.cross_account_bucket_policy, local.bucket_policy_v2]) : local.bucket_policy_v2
+  bucket_policy = flatten([local.cross_account_bucket_policy, local.bucket_policy_v2])
   kms_grant_mdss = var.cross_account_access_role != null ? {
     cross_account_access_role = {
       grantee_principal = nonsensitive("arn:aws:iam::${var.cross_account_access_role.account_number}:role/${var.cross_account_access_role.role_name}")
@@ -51,16 +54,23 @@ locals {
   kms_grants = var.cross_account ? merge(
     {
       cross_account_access = {
-        grantee_principal = nonsensitive("arn:aws:iam::${var.cross_account_id}:role/cross_account_copy_lambda_role")
+        grantee_principal = nonsensitive("arn:aws:iam::${var.cross_account_id}:role/AWSS3BucketReplication${var.data_feed}${var.order_type}")
         operations = [
           "Encrypt",
           "GenerateDataKey",
+          "Decrypt"
         ]
       }
     },
     local.kms_grant_mdss
   ) : local.kms_grant_mdss
+  kms_key_users = local.replication_enabled ? [
+    aws_iam_role.process_landing_bucket_files.arn,
+    aws_iam_role.replication_role[0].arn
+  ] : [aws_iam_role.process_landing_bucket_files.arn]
 }
+
+data "aws_caller_identity" "current" {}
 
 module "this-bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9f"
@@ -135,7 +145,28 @@ module "kms_key" {
 
   # Give full access to key for root account, and lambda role ability to use.
   enable_default_policy = true
-  key_users             = [aws_iam_role.process_landing_bucket_files.arn]
+  key_users             = local.kms_key_users
+  key_statements = var.cross_account ? [
+    {
+      sid    = "AllowS3ReplicationFromOtherAccount"
+      effect = "Allow"
+      principals = [
+        {
+          type = "AWS"
+          identifiers = [
+            "arn:aws:iam::${var.cross_account_id}:role/AWSS3BucketReplication${var.data_feed}${var.order_type}"
+          ]
+        }
+      ]
+      actions = [
+        "kms:Encrypt",
+        "kms:ReEncrypt*",
+        "kms:GenerateDataKey*",
+        "kms:Decrypt",
+      ]
+      resources = ["*"]
+    }
+  ] : []
 
   deletion_window_in_days = 7
 
