@@ -165,7 +165,6 @@
               echo "exitcode=${exitcode}" >> $GITHUB_OUTPUT
               (( exitcode == 1 )) && exit 1 || exit 0
 
-
           - name: Evaluate Terraform Plan
             if: github.event_name == 'pull_request' && steps.plan.outputs.exitcode == '2' && !contains(fromJSON(env.SKIP_PLAN_EVALUATOR), env.WORKSPACE_NAME)
             id: evaluate_terraform_plan
