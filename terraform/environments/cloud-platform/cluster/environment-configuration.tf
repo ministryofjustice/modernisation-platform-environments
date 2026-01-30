@@ -2,7 +2,7 @@ locals {
   environment_configurations = {
     development_cluster = {
       /* EKS */
-      eks_cluster_version = "1.34"
+      eks_cluster_version = "1.35"
 
       /* Addons */
       eks_cluster_addon_versions = {
@@ -81,7 +81,7 @@ locals {
     }
     development = {
       /* EKS */
-      eks_cluster_version = "1.34"
+      eks_cluster_version = "1.35"
 
       /* Addons */
       eks_cluster_addon_versions = {
@@ -160,7 +160,7 @@ locals {
     }
     preproduction = {
       /* EKS */
-      eks_cluster_version = "1.34"
+      eks_cluster_version = "1.35"
 
       /* Addons */
       eks_cluster_addon_versions = {
@@ -239,7 +239,7 @@ locals {
     }
     nonlive = {
       /* EKS */
-      eks_cluster_version = "1.34"
+      eks_cluster_version = "1.35"
 
       /* Addons */
       eks_cluster_addon_versions = {
@@ -318,7 +318,7 @@ locals {
     }
     live = {
       /* EKS */
-      eks_cluster_version = "1.34"
+      eks_cluster_version = "1.35"
 
       /* Addons */
       eks_cluster_addon_versions = {

@@ -5,7 +5,7 @@ module "eks" {
   version = "~> 21.0"
 
   name               = local.cluster_name
-  kubernetes_version = "1.34"
+  kubernetes_version = local.environment_configuration.eks_cluster_version
   vpc_id             = data.aws_vpc.selected.id
   subnet_ids         = data.aws_subnets.eks_private.ids
   enable_irsa        = true
