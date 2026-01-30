@@ -65,62 +65,14 @@ locals {
       from_port   = 8126
       to_port     = 8126
       protocol    = "tcp"
-      security_groups = aws_security_group.common_ecs_service_external.id
+      self        = true
       description = "Datadog from ecs services"
     },
     {
       from_port   = 8125
       to_port     = 8125
       protocol    = "udp"
-      security_groups = aws_security_group.common_ecs_service_external.id
-      description = "Datadog from ecs services"
-    },
-    {
-      from_port   = 8126
-      to_port     = 8126
-      protocol    = "tcp"
-      security_groups = aws_security_group.common_ecs_service_internal.id
-      description = "Datadog from ecs services"
-    },
-    {
-      from_port   = 8125
-      to_port     = 8125
-      protocol    = "udp"
-      security_groups = aws_security_group.common_ecs_service_internal.id
-      description = "Datadog from ecs services"
-    }
-  ]
-
-  common_datadog_rules_external = [
-    {
-      from_port   = 8126
-      to_port     = 8126
-      protocol    = "tcp"
-      security_groups = aws_security_group.common_ecs_service_external.id
-      description = "Datadog from ecs services"
-    },
-    {
-      from_port   = 8125
-      to_port     = 8125
-      protocol    = "udp"
-      security_groups = aws_security_group.common_ecs_service_external.id
-      description = "Datadog from ecs services"
-    }
-  ]
-
-  common_datadog_rules_internal = [
-    {
-      from_port   = 8126
-      to_port     = 8126
-      protocol    = "tcp"
-      security_groups = aws_security_group.common_ecs_service_internal.id
-      description = "Datadog from ecs services"
-    },
-    {
-      from_port   = 8125
-      to_port     = 8125
-      protocol    = "udp"
-      security_groups = aws_security_group.common_ecs_service_internal.id
+      self        = true
       description = "Datadog from ecs services"
     }
   ]
@@ -163,16 +115,14 @@ locals {
   combined_ingress_rules_external = concat(
     local.ecs_common_security_group_ingress,
     local.cloudfront_ingress,
-    local.common_datadog_rules_external,
-    local.common_datadog_rules_internal,
+    local.common_datadog_rules
     var.additional_ecs_common_security_group_ingress
   )
 
   # Concatenate the lists
   combined_ingress_rules_internal = concat(
     local.ecs_common_security_group_ingress,
-    local.common_datadog_rules_internal,
-    local.common_datadog_rules_external,
+    local.common_datadog_rules,
     var.additional_ecs_common_security_group_ingress
   )
 
