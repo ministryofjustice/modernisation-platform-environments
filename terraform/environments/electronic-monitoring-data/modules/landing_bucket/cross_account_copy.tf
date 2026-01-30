@@ -41,8 +41,7 @@ data "aws_iam_policy_document" "replication-policy" {
       "kms:GenerateDataKey"
     ]
     resources = [
-      local.replication_enabled ? "arn:aws:kms:eu-west-2:${var.replication_details["account_id"]}:key/${var.replication_details["${var.data_feed}_${var.order_type}_kms_id"]}" : "",
-      module.kms_key.key_arn
+      "*"
     ]
   }
   statement {
