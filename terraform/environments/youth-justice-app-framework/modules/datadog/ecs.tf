@@ -1,7 +1,7 @@
 module "ecs_service_datadog_agent" {
   #checkov:skip=CKV_TF_1: todo
   source  = "terraform-aws-modules/ecs/aws//modules/service"
-  version = "5.11.2"
+  version = "6.9.0"
 
   name        = "datadog-agent"
   cluster_arn = var.ecs_cluster_arn
