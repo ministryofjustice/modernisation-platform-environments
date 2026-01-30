@@ -51,7 +51,7 @@
     env:
       ACCOUNT_NAME: "${{ inputs.application }}-${{ inputs.environment }}"
       WORKSPACE_NAME: "${{ inputs.application }}-${{ inputs.environment }}"
-      SKIP_PLAN_EVALUATOR: '["cloud-platform-live-development", "cloud-platform-live-test", "cloud-platform-non-live-development", "cloud-platform-non-live-test", "cloud-platform-development"]'
+      SKIP_PLAN_EVALUATOR: '["cloud-platform-live-development", "cloud-platform-live-test", "cloud-platform-non-live-development", "cloud-platform-non-live-test", "cloud-platform-development", "data-platform-development", "data-platform-test", "data-platform-preproduction", "data-platform-production"]'
     concurrency:
       group: ${{ inputs.application }}-${{ inputs.environment }}-${{ inputs.component }}
     jobs:
