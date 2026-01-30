@@ -48,7 +48,7 @@ environment:
       routes:
         - name: internal
           cidr: 10.0.0.0/8
-          description: MoJ internal network
+          description: MOJ internal
         - name: cloud-platform
           cidr: 172.20.0.0/16
           description: Cloud Platform
@@ -57,6 +57,15 @@ environment:
       permissive_mode: true
     vpc:
       cidr_block: 10.200.128.0/19 # 10.200.128.0 - 10.200.159.255 (8190)
+      additional_cidr_blocks:
+        transit_gateway:
+            cidr_block: 100.64.255.0/24
+            subnets:
+              attachments:
+                a: 100.64.255.0/28
+                b: 100.64.255.16/28
+                c: 100.64.255.32/28
+                # unallocated: 100.64.255.48/28
       subnets:
         data: # 10.200.128.0/23 | 10.200.128.0 - 10.200.129.255 (510)
           a: 10.200.128.0/25 # 10.200.128.0  - 10.200.128.127 (126)
@@ -79,6 +88,14 @@ environment:
           b: 10.200.148.0/22 # 10.200.148.0 - 10.200.151.255 (1022)
           c: 10.200.152.0/22 # 10.200.152.0 - 10.200.155.255 (1022)
           # unallocated: 10.200.156.0/22 # 10.200.156.0 - 10.200.159.255 (1022)
+    transit_gateway:
+      routes:
+        - name: internal
+          cidr: 10.0.0.0/8
+          description: MOJ internal
+        - name: cloud-platform
+          cidr: 172.20.0.0/16
+          description: Cloud Platform
   preproduction:
     network_firewall:
       permissive_mode: true
