@@ -145,15 +145,6 @@
               terraform apply -refresh-only -auto-approve ${tf_args} | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
 
           #
-          # Terraform Providers
-          #
-          - name: Terraform Providers
-            working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
-            run: |
-              echo "terraform providers"
-              terraform providers
-
-          #
           # Terraform Plan
           #
           - name: Terraform Plan
