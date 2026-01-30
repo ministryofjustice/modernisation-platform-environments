@@ -3,7 +3,7 @@
 ##############################################
 locals {
   # Extract domain validation options into a structured map
-  domain_types = contains(["test", "preproduction", "production"], local.environment) ? {
+  domain_types = contains(["preproduction", "production"], local.environment) ? {
     for dvo in aws_acm_certificate.external[0].domain_validation_options : dvo.domain_name => {
       name   = dvo.resource_record_name
       record = dvo.resource_record_value
@@ -12,12 +12,12 @@ locals {
   } : {}
 
   # Split domains: parent (modernisation-platform) vs environment-specific (laa-test/laa-preproduction)
-  parent_domain_validation = contains(["test", "preproduction", "production"], local.environment) ? {
+  parent_domain_validation = contains(["preproduction", "production"], local.environment) ? {
     for k, v in local.domain_types : k => v
     if k == "modernisation-platform.service.justice.gov.uk"
   } : {}
 
-  env_domain_validation = contains(["test", "preproduction", "production"], local.environment) ? {
+  env_domain_validation = contains(["preproduction", "production"], local.environment) ? {
     for k, v in local.domain_types : k => v
     if k != "modernisation-platform.service.justice.gov.uk"
   } : {}
@@ -36,7 +36,7 @@ data "aws_route53_zone" "modernisation_platform" {
 # ACM Public Certificate for test, preproduction and production environments
 # Using parent domain as primary (48 chars) with environment-specific SANs
 resource "aws_acm_certificate" "external" {
-  count = contains(["test", "preproduction", "production"], local.environment) ? 1 : 0
+  count = contains(["preproduction", "production"], local.environment) ? 1 : 0
 
   domain_name = "modernisation-platform.service.justice.gov.uk"
 
@@ -85,7 +85,7 @@ resource "aws_route53_record" "external_validation_env" {
 
 # ACM Certificate Validation
 resource "aws_acm_certificate_validation" "external" {
-  count = contains(["test", "preproduction", "production"], local.environment) ? 1 : 0
+  count = contains(["preproduction", "production"], local.environment) ? 1 : 0
 
   certificate_arn = aws_acm_certificate.external[0].arn
   validation_record_fqdns = concat(
