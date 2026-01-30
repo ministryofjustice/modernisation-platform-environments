@@ -66,7 +66,7 @@ data "archive_file" "lambda_payment_zip" {
 
 resource "aws_lambda_function" "lambda_payment_load_monitor" {
   filename         = data.archive_file.lambda_payment_zip.output_path
-  source_code_hash = base64sha256(join("", local.lambda_payment_source_hashes))
+  source_code_hash = base64sha256(join("", local.lambda_source_hashes_payment_load_monitor))
   function_name    = "${local.application_name}-${local.environment}-payment-load-monitor"
   role             = aws_iam_role.lambda_payment_load_monitor_role.arn
   handler          = "lambda_function.lambda_handler"
