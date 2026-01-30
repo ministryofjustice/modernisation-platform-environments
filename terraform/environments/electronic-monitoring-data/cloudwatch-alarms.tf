@@ -6,6 +6,10 @@ resource "aws_cloudwatch_metric_alarm" "load_mdss_dlq_alarm" {
   threshold           = 0
   treat_missing_data  = "notBreaching"
 
+  # We use EventBridge -> cloudwatch_alarm_threader -> SNS custom notifications.
+  # Disable default alarm actions to avoid duplicate Slack messages.
+  actions_enabled = false
+
   metric_name = "ApproximateNumberOfMessagesVisible"
   namespace   = "AWS/SQS"
   period      = 60
@@ -28,6 +32,8 @@ resource "aws_cloudwatch_metric_alarm" "clean_dlt_dlq_alarm" {
   threshold           = 0
   treat_missing_data  = "notBreaching"
 
+  actions_enabled = false
+
   metric_name = "ApproximateNumberOfMessagesVisible"
   namespace   = "AWS/SQS"
   period      = 60
@@ -49,6 +55,8 @@ resource "aws_cloudwatch_metric_alarm" "glue_database_count_high" {
   evaluation_periods  = 1
   threshold           = 8000
   treat_missing_data  = "notBreaching"
+
+  actions_enabled = false
 
   metric_name = "GlueDatabaseCount"
   namespace   = "EMDS/Glue"
