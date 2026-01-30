@@ -127,7 +127,10 @@ resource "aws_networkfirewall_rule_group" "strict_ip" {
     }
 
     rules_source {
-      rules_string = templatefile("src/templates/network-firewall/ip.rules.tftpl", { rules = local.network_firewall_rules.ip.rules })
+      rules_string = templatefile("src/templates/network-firewall/ip.rules.tftpl", {
+        rules           = local.network_firewall_rules.ip.rules
+        permissive_mode = try(local.network_configuration.network_firewall.permissive_mode, false)
+      })
     }
 
     stateful_rule_options {
@@ -157,7 +160,10 @@ resource "aws_networkfirewall_rule_group" "strict_fqdn" {
     }
 
     rules_source {
-      rules_string = templatefile("src/templates/network-firewall/fqdn.rules.tftpl", { rules = local.network_firewall_rules.fqdn.rules })
+      rules_string = templatefile("src/templates/network-firewall/fqdn.rules.tftpl", {
+        rules           = local.network_firewall_rules.fqdn.rules
+        permissive_mode = try(local.network_configuration.network_firewall.permissive_mode, false)
+      })
     }
 
     stateful_rule_options {

@@ -9,6 +9,8 @@
 
 environment:
   development:
+    network_firewall:
+      permissive_mode: true
     vpc:
       cidr_block: 10.199.128.0/19 # 10.199.128.0 - 10.199.159.255 (8190)
       additional_cidr_blocks:
@@ -51,6 +53,8 @@ environment:
           cidr: 172.20.0.0/16
           description: Cloud Platform
   test:
+    network_firewall:
+      permissive_mode: true
     vpc:
       cidr_block: 10.200.128.0/19 # 10.200.128.0 - 10.200.159.255 (8190)
       subnets:
@@ -76,6 +80,8 @@ environment:
           c: 10.200.152.0/22 # 10.200.152.0 - 10.200.155.255 (1022)
           # unallocated: 10.200.156.0/22 # 10.200.156.0 - 10.200.159.255 (1022)
   preproduction:
+    network_firewall:
+      permissive_mode: true
     vpc:
       cidr_block: 10.200.160.0/19 # 10.200.160.0 - 10.200.191.255 (8190)
       subnets:
@@ -101,6 +107,8 @@ environment:
           c: 10.200.184.0/22 # 10.200.184.0 - 10.200.187.255 (1022)
           # unallocated: 10.200.188.0/22 # 10.200.188.0 - 10.200.191.255 (1022)
   production:
+    network_firewall:
+      permissive_mode: true
     vpc: 
       cidr_block: 10.200.192.0/18 # 10.200.192.0 - 10.200.255.255 (16382)
       subnets:
