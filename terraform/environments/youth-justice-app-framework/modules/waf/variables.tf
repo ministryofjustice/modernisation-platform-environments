@@ -51,6 +51,17 @@ variable "waf_IP_rules" {
   default = {}
 }
 
+variable "waf_IP_rules_cf" {
+  description = "A map of IP sets to create for cf"
+  type = map(object({
+    name         = string
+    priority     = number
+    description  = string
+    ip_addresses = list(string)
+  }))
+  default = {}
+}
+
 variable "waf_geoIP_rules" {
   description = "A list of GeoIP rules to add to the waf"
   type = list(object({
