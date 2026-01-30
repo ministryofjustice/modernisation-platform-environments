@@ -166,28 +166,19 @@ _VALID_EVENT_KEYS = {"mode", "time_from", "time_to"}
 
 def lambda_handler(event: Any, context: Any) -> Dict[str, Any]:
     if not isinstance(event, dict):
-        logger.error("Event must be a JSON object, got %s.", type(event).__name__)
-        return {
-            "ok": False,
-            "updated": False,
-            "error": f"Event must be a JSON object, got {type(event).__name__}.",
-        }
+        raise ValueError(
+            f"Event must be a JSON object, got {type(event).__name__}."
+        )
 
     unknown_keys = set(event.keys()) - _VALID_EVENT_KEYS
     if unknown_keys:
-        logger.error(
-            "Unknown event keys: %s. Valid keys: %s", unknown_keys, _VALID_EVENT_KEYS
+        raise ValueError(
+            f"Unknown event keys: {unknown_keys}. Valid keys: {_VALID_EVENT_KEYS}"
         )
-        return {
-            "ok": False,
-            "updated": False,
-            "error": f"Unknown event keys: {unknown_keys}. Valid keys: {_VALID_EVENT_KEYS}",
-        }
 
     mode_or_error = _parse_mode(event)
     if mode_or_error not in ("BLOCK", "ALLOW"):
-        logger.error(mode_or_error)
-        return {"ok": False, "updated": False, "error": mode_or_error}
+        raise ValueError(mode_or_error)
     mode: WafMode = cast(WafMode, mode_or_error)
 
     time_from: str = _parse_time_value(event, "time_from", TIME_FROM)
@@ -196,8 +187,7 @@ def lambda_handler(event: Any, context: Any) -> Dict[str, Any]:
     for label, value in [("time_from", time_from), ("time_to", time_to)]:
         err = _validate_time(value, label)
         if err:
-            logger.error(err)
-            return {"ok": False, "updated": False, "mode": mode, "error": err}
+            raise ValueError(err)
 
     logger.info(
         "Requested mode '%s' for rule '%s' in WebACL '%s' (ID=%s, scope=%s)",
@@ -210,30 +200,16 @@ def lambda_handler(event: Any, context: Any) -> Dict[str, Any]:
     logger.info("Maintenance window: %s to %s", time_from, time_to)
 
     # Get current Web ACL
-    try:
-        resp = waf.get_web_acl(Name=WEB_ACL_NAME, Scope=SCOPE, Id=WEB_ACL_ID)
-    except (ClientError, BotoCoreError) as e:
-        logger.exception("Failed to get WebACL: %s", e)
-        return {"ok": False, "updated": False, "mode": mode, "error": str(e)}
+    resp = waf.get_web_acl(Name=WEB_ACL_NAME, Scope=SCOPE, Id=WEB_ACL_ID)
 
     lock_token = resp.get("LockToken")
     web_acl = resp.get("WebACL")
     if not lock_token or not web_acl:
-        return {
-            "ok": False,
-            "updated": False,
-            "mode": mode,
-            "error": "Missing LockToken or WebACL",
-        }
+        raise RuntimeError("Missing LockToken or WebACL in get_web_acl response.")
 
     rules = web_acl.get("Rules", [])
     if not isinstance(rules, list):
-        return {
-            "ok": False,
-            "updated": False,
-            "mode": mode,
-            "error": "Rules is not a list",
-        }
+        raise RuntimeError("Rules is not a list in WebACL response.")
 
     custom_response_bodies = web_acl.get("CustomResponseBodies") or {}
     if not isinstance(custom_response_bodies, dict):
@@ -256,12 +232,7 @@ def lambda_handler(event: Any, context: Any) -> Dict[str, Any]:
         rr = copy.deepcopy(r)
 
         if "Action" not in r:
-            return {
-                "ok": False,
-                "updated": False,
-                "mode": mode,
-                "error": f"Rule '{RULE_NAME}' has no Action",
-            }
+            raise RuntimeError(f"Rule '{RULE_NAME}' has no Action.")
 
         current_action = r.get("Action", {})
         desired_action = _desired_action(mode)
@@ -293,12 +264,7 @@ def lambda_handler(event: Any, context: Any) -> Dict[str, Any]:
         new_rules.append(rr)
 
     if not found:
-        return {
-            "ok": False,
-            "updated": False,
-            "mode": mode,
-            "error": f"Rule '{RULE_NAME}' not found",
-        }
+        raise RuntimeError(f"Rule '{RULE_NAME}' not found in WebACL.")
 
     if not changed:
         logger.info("No changes needed.")
@@ -334,13 +300,9 @@ def lambda_handler(event: Any, context: Any) -> Dict[str, Any]:
     else:
         logger.info("CustomResponseBodies empty — omitting field.")
 
-    try:
-        waf.update_web_acl(**updated_web_acl)
-        logger.info("WebACL updated successfully.")
-        return {"ok": True, "updated": True, "mode": mode}
-    except (ClientError, BotoCoreError) as e:
-        logger.exception("Failed to update WebACL: %s", e)
-        return {"ok": False, "updated": False, "mode": mode, "error": str(e)}
+    waf.update_web_acl(**updated_web_acl)
+    logger.info("WebACL updated successfully.")
+    return {"ok": True, "updated": True, "mode": mode}
 
 
 # ---------------------------------------------------------------------------
@@ -368,6 +330,29 @@ def main() -> None:
             print(f"        Actual:   {actual!r}")
             failed += 1
 
+    def assert_raises(
+        exc_type: type, substr: str, fn: object, *args: object, test_name: str
+    ) -> None:
+        nonlocal passed, failed
+        try:
+            fn(*args)  # type: ignore[operator]
+            print(f"  FAIL: {test_name}")
+            print(f"        Expected {exc_type.__name__} but no exception was raised")
+            failed += 1
+        except exc_type as e:
+            if substr in str(e):
+                print(f"  PASS: {test_name}")
+                passed += 1
+            else:
+                print(f"  FAIL: {test_name}")
+                print(f"        Expected substring: {substr!r}")
+                print(f"        Actual message:     {e!r}")
+                failed += 1
+        except Exception as e:
+            print(f"  FAIL: {test_name}")
+            print(f"        Expected {exc_type.__name__} but got {type(e).__name__}: {e}")
+            failed += 1
+
     print("Testing _parse_mode()...")
     assert_eq(_parse_mode({"mode": "BLOCK"}), "BLOCK", "mode=BLOCK")
     assert_eq(_parse_mode({"mode": "block"}), "BLOCK", "mode=block (lowercase)")
@@ -383,14 +368,15 @@ def main() -> None:
     result = _parse_mode({"mode": None})
     assert_eq(isinstance(result, str) and "Invalid type" in result, True, "mode=None returns error")
 
-    # Invalid mode via lambda_handler
-    result = lambda_handler({"mode": "DELETE"}, None)
-    assert_eq(result["ok"], False, "invalid mode rejected by handler")
-    assert_eq("Invalid value" in result.get("error", ""), True, "handler error mentions invalid value")
-
-    result = lambda_handler({"mode": 42}, None)
-    assert_eq(result["ok"], False, "non-string mode rejected by handler")
-    assert_eq("Invalid type" in result.get("error", ""), True, "handler error mentions invalid type")
+    # Invalid mode via lambda_handler raises ValueError
+    assert_raises(
+        ValueError, "Invalid value", lambda_handler, {"mode": "DELETE"}, None,
+        test_name="invalid mode raises ValueError",
+    )
+    assert_raises(
+        ValueError, "Invalid type", lambda_handler, {"mode": 42}, None,
+        test_name="non-string mode raises ValueError",
+    )
 
     print("\nTesting _parse_time_value() with event values...")
     assert_eq(
@@ -449,33 +435,42 @@ def main() -> None:
     )
 
     print("\nTesting event type validation (via lambda_handler)...")
-    result = lambda_handler(None, None)
-    assert_eq(result["ok"], False, "None event is rejected")
-    assert_eq("JSON object" in result.get("error", ""), True, "None error mentions JSON object")
-
-    result = lambda_handler("not a dict", None)
-    assert_eq(result["ok"], False, "string event is rejected")
-
-    result = lambda_handler(42, None)
-    assert_eq(result["ok"], False, "int event is rejected")
-
-    result = lambda_handler(["a", "list"], None)
-    assert_eq(result["ok"], False, "list event is rejected")
+    assert_raises(
+        ValueError, "JSON object", lambda_handler, None, None,
+        test_name="None event raises ValueError",
+    )
+    assert_raises(
+        ValueError, "JSON object", lambda_handler, "not a dict", None,
+        test_name="string event raises ValueError",
+    )
+    assert_raises(
+        ValueError, "JSON object", lambda_handler, 42, None,
+        test_name="int event raises ValueError",
+    )
+    assert_raises(
+        ValueError, "JSON object", lambda_handler, ["a", "list"], None,
+        test_name="list event raises ValueError",
+    )
 
     print("\nTesting event key validation (via lambda_handler)...")
     # Unknown key "mod" (typo for "mode") should be rejected
-    result = lambda_handler({"mod": "block", "time_from": "19:00", "time_to": "22:00"}, None)
-    assert_eq(result["ok"], False, "typo 'mod' is rejected")
-    assert_eq("Unknown event keys" in result.get("error", ""), True, "error mentions unknown keys")
-    assert_eq("mode" not in result, True, "no 'mode' field in validation error response")
-
+    assert_raises(
+        ValueError, "Unknown event keys", lambda_handler,
+        {"mod": "block", "time_from": "19:00", "time_to": "22:00"}, None,
+        test_name="typo 'mod' raises ValueError",
+    )
     # Multiple unknown keys
-    result = lambda_handler({"action": "block", "foo": "bar"}, None)
-    assert_eq(result["ok"], False, "multiple unknown keys rejected")
-
+    assert_raises(
+        ValueError, "Unknown event keys", lambda_handler,
+        {"action": "block", "foo": "bar"}, None,
+        test_name="multiple unknown keys raises ValueError",
+    )
     # Mix of valid and unknown keys
-    result = lambda_handler({"mode": "BLOCK", "typo_key": "value"}, None)
-    assert_eq(result["ok"], False, "mix of valid and unknown keys rejected")
+    assert_raises(
+        ValueError, "Unknown event keys", lambda_handler,
+        {"mode": "BLOCK", "typo_key": "value"}, None,
+        test_name="mix of valid and unknown keys raises ValueError",
+    )
 
     # Valid keys should not be flagged as unknown
     assert_eq(set({"mode": "BLOCK", "time_from": "19:00", "time_to": "22:00"}.keys()) - _VALID_EVENT_KEYS, set(), "all valid keys pass validation")
