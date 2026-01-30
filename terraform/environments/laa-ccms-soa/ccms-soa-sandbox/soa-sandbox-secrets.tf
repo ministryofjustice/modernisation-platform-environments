@@ -3,18 +3,18 @@
 #   description = "SOA Weblogic EM Console for user weblogic and RDS Database Password for SOAPDB admin" #--The same password shared between the SOA DB
 # }                                                                                                      #  and weblogic. Don't like that. Revisit. AW
 
-data "aws_secretsmanager_secret_version" "soa_password" {
-  secret_id = aws_secretsmanager_secret.soa_sandbox_password.id
-}
+# data "aws_secretsmanager_secret_version" "soa_password" {
+#   secret_id = aws_secretsmanager_secret.soa_sandbox_password.id
+# }
 
 # resource "aws_secretsmanager_secret" "xxsoa_sandbox_ds_password" {
 #   name        = "ccms/soasandbox/xxsoa/ds/password"
 #   description = "EDRMS TDS XXSOA Data Source Password User XXEDRMS - Comes from different account EDRMS"
 # }
 
-data "aws_secretsmanager_secret_version" "xxsoa_ds_password" {
-  secret_id = aws_secretsmanager_secret.xxsoa_sandbox_ds_password.id
-}
+# data "aws_secretsmanager_secret_version" "xxsoa_ds_password" {
+#   secret_id = aws_secretsmanager_secret.xxsoa_sandbox_ds_password.id
+# }
 
 # resource "aws_secretsmanager_secret" "ebs_sandbox_ds_password" {
 #   name        = "ccms/soasandbox/ebs/ds/password"
@@ -46,9 +46,9 @@ data "aws_secretsmanager_secret_version" "xxsoa_ds_password" {
 #   description = "Password for the Java Trust Store used by SOA"
 # }
 
-data "aws_secretsmanager_secret_version" "trust_store_password" {
-  secret_id = aws_secretsmanager_secret.trust_store_password.id
-}
+# data "aws_secretsmanager_secret_version" "trust_store_password" {
+#   secret_id = aws_secretsmanager_secret.trust_store_password.id
+# }
 
 # Slack Channel ID for Alerts
 # resource "aws_secretsmanager_secret" "slack_channel_id" {
