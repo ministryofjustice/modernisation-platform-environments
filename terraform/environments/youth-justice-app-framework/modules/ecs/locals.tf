@@ -108,14 +108,14 @@ locals {
   combined_ingress_rules_external = concat(
     local.ecs_common_security_group_ingress,
     local.cloudfront_ingress,
-    local.common_datadog_rules,
+ #   local.common_datadog_rules,
     var.additional_ecs_common_security_group_ingress
   )
 
   # Concatenate the lists
   combined_ingress_rules_internal = concat(
     local.ecs_common_security_group_ingress,
-    local.common_datadog_rules,
+#    local.common_datadog_rules,
     var.additional_ecs_common_security_group_ingress
   )
 
