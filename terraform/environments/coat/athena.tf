@@ -116,4 +116,3 @@ resource "aws_glue_crawler" "cur_v2_crawler" {
 
   schedule = "cron(0 7 * * ? *)"
 }
-
