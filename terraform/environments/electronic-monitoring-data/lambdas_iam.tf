@@ -1463,6 +1463,7 @@ data "aws_iam_policy_document" "iceberg_table_maintenance_iam_role_policy_docume
     sid    = "S3DataMaintenance"
     effect = "Allow"
     actions = [
+      "s3:GetBucketLocation",
       "s3:GetObject",
       "s3:PutObject",
       "s3:DeleteObject",
@@ -1470,7 +1471,9 @@ data "aws_iam_policy_document" "iceberg_table_maintenance_iam_role_policy_docume
     ]
     resources = [
       module.s3-create-a-derived-table-bucket.bucket.arn,
-      "${module.s3-create-a-derived-table-bucket.bucket.arn}/staging/g4s_tasking_pipeline/g4s_tasking/tbl_answers/*"
+      "${module.s3-create-a-derived-table-bucket.bucket.arn}/staging/g4s_tasking_pipeline/g4s_tasking/tbl_answers/*",
+      module.s3-athena-bucket.bucket.arn,
+      "${module.s3-create-a-derived-table-bucket.bucket.arn}/*"
     ]
   }
 }
