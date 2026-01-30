@@ -3,9 +3,9 @@
 #   description = "SOA Weblogic EM Console for user weblogic and RDS Database Password for SOAPDB admin" #--The same password shared between the SOA DB
 # }                                                                                                      #  and weblogic. Don't like that. Revisit. AW
 
-# data "aws_secretsmanager_secret_version" "soa_password" {
-#   secret_id = aws_secretsmanager_secret.soa_sandbox_password.id
-# }
+data "aws_secretsmanager_secret_version" "soa_password" {
+  secret_id = aws_secretsmanager_secret.soa_sandbox_password.id
+}
 
 # resource "aws_secretsmanager_secret" "xxsoa_sandbox_ds_password" {
 #   name        = "ccms/soasandbox/xxsoa/ds/password"
@@ -73,7 +73,7 @@
 # }
 
 resource "aws_secretsmanager_secret_version" "sandbox_ccms_soa_quiesced_secrets_version" {
-  secret_id = aws_secretsmanager_secret.ccms_soa_quiesced_secrets.id
+  secret_id = aws_secretsmanager_secret.sandbox_ccms_soa_quiesced_secrets.id
 
   secret_string = jsonencode({
     slack_channel_webhook           = "",
