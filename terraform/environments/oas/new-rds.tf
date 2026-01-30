@@ -110,6 +110,7 @@ resource "aws_db_option_group" "appdboptiongroup19_new" {
   option_group_description = "${local.application_name}-${local.environment}-optiongroup"
   engine_name              = local.application_data.accounts[local.environment].engine
   major_engine_version     = "19"
+  skip_destroy             = true
 
   option {
     option_name = "STATSPACK"
