@@ -360,7 +360,7 @@ module "load_mdss_lambda" {
   core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
   production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
   security_group_ids             = [aws_security_group.lambda_generic.id]
-  subnet_ids                     = data.aws_subnets.shared-public.ids
+  subnet_ids                     = data.aws_subnets.shared-private.ids
   cloudwatch_retention_days      = 7
   environment_variables = {
     ATHENA_QUERY_BUCKET = module.s3-athena-bucket.bucket.id
