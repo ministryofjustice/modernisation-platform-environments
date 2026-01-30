@@ -23,11 +23,6 @@ locals {
     sha256(file("${path.module}/lambda/payment_load_monitor/${f}"))
   ]
 
-  lambda_source_hashes_waf_maintenance = [
-    for f in fileset("./lambda/waf_maintenance", "**") :
-    sha256(file("${path.module}/lambda/waf_maintenance/${f}"))
-  ]
-
   data_subnets = [
     data.aws_subnet.data_subnets_a.id,
     data.aws_subnet.data_subnets_b.id,

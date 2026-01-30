@@ -58,7 +58,7 @@ resource "aws_iam_role_policy" "waf_lambda_policy" {
 
 resource "aws_lambda_function" "waf_maintenance" {
   function_name    = "waf-maintenance-${local.environment}"
-  source_code_hash = base64sha256(join("", local.lambda_source_hashes_payment_load_monitor))
+  source_code_hash = data.archive_file.waf_maintenance_zip.output_base64sha256
   role             = aws_iam_role.waf_lambda_role.arn
   filename         = data.archive_file.waf_maintenance_zip.output_path
   handler          = "lambda_function.lambda_handler"
