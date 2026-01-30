@@ -5,9 +5,9 @@ ${rule.action} ${rule.protocol} ${rule.source_ip} ${rule.source_port} ${rule.dir
 
 ### Static ###
 %{ if permissive_mode ~}
-# BREAKGLASS MODE ACTIVE - Allow all traffic not matched by explicit rules above
+# Permissive mode active - Allow all traffic not matched by explicit rules above
 # This overrides the stateful_default_actions drop behaviour
-pass ip any any -> any any (msg:"BREAKGLASS: Allow all traffic"; sid:1999999; rev:1;)
+pass ip any any -> any any (msg:"Permissive: Allow all traffic"; sid:1999999; rev:1;)
 %{ else ~}
 reject tcp $HOME_NET any -> any 22 (msg:"REJECT outbound SSH not allowlisted"; flow:to_server; sid:1100001; rev:1;)
 %{ endif ~}

@@ -5,7 +5,7 @@ ${rule.action} ${rule.protocol} ${rule.source_ip} ${rule.source_port} ${rule.dir
 
 ### Static ###
 %{ if permissive_mode ~}
-# BREAKGLASS MODE ACTIVE - Static HTTP/HTTPS drop rules disabled to allow all outbound traffic
+# Permissive mode active - Static HTTP/HTTPS drop rules disabled to allow all outbound traffic
 # Generated rules above are still evaluated first, maintaining explicit pass rules for auditing
 %{ else ~}
 drop tcp $HOME_NET any -> any 80 (msg:"DROP outbound HTTP not allowlisted"; flow:to_server,established; sid:2100000; rev:1;)
