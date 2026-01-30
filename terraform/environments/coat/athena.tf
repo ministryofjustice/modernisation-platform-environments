@@ -13,15 +13,7 @@ resource "aws_athena_workgroup" "coat_cur_report" {
     publish_cloudwatch_metrics_enabled = true
   }
 
-  tags = merge(
-    { "owner" = "CloudOptimisationAndAccountability@justice.gov.uk" },
-    { "business-unit" = "laslala" },
-    { "application" = "COAT" },
-    { "is-production" = "lalalala" },
-    { "service-area" = "lalalalala" },
-    { "environment-name" = terraform.workspace },
-    { "source-code" = "https://github.com/ministryofjustice/modernisation-platform-environments" }
-  )
+  tags = local.tags
 }
 
 resource "aws_glue_catalog_database" "cur_v2_database" {
