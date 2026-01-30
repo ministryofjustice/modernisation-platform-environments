@@ -65,28 +65,14 @@ locals {
       from_port   = 8126
       to_port     = 8126
       protocol    = "tcp"
-      security_groups = [aws_security_group.common_ecs_service_external.id]
+      self        = true
       description = "Datadog from ecs services"
     },
     {
       from_port   = 8125
       to_port     = 8125
       protocol    = "udp"
-      security_groups = [aws_security_group.common_ecs_service_external.id]
-      description = "Datadog from ecs services"
-    },
-    {
-      from_port   = 8126
-      to_port     = 8126
-      protocol    = "tcp"
-      security_groups = [aws_security_group.common_ecs_service_internal.id]
-      description = "Datadog from ecs services"
-    },
-    {
-      from_port   = 8125
-      to_port     = 8125
-      protocol    = "udp"
-      security_groups = [aws_security_group.common_ecs_service_internal.id]
+      self        = true
       description = "Datadog from ecs services"
     }
   ]
