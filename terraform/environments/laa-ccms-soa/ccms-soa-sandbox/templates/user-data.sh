@@ -39,7 +39,7 @@ EOF
 chown ec2-user $EC2_USER_HOME_FOLDER/.ssh/config
 chgrp ec2-user $EC2_USER_HOME_FOLDER/.ssh/config
 chmod 600 $EC2_USER_HOME_FOLDER/.ssh/config
-su ec2-user bash -c "git clone ssh://git@ssh.github.com:443/ministryofjustice/laa-ccms-app-soa.git $EFS_MOUNT_POINT/laa-ccms-app-soa/ccms-soa-sandbox || git -C $EFS_MOUNT_POINT/laa-ccms-app-soa/ccms-soa-sandbox pull"
+su ec2-user bash -c "git clone ssh://git@ssh.github.com:443/ministryofjustice/laa-ccms-app-soa.git $EFS_MOUNT_POINT/laa-ccms-app-soa || git -C $EFS_MOUNT_POINT/laa-ccms-app-soa pull"
 
 #--Populate custom monitoring files
 su ec2-user bash -c "cp $EFS_MOUNT_POINT/laa-ccms-app-soa/monitoring/* $EFS_MOUNT_POINT/"
@@ -63,31 +63,31 @@ echo s3fs#${inbound_bucket} $EC2_USER_HOME_FOLDER/inbound fuse iam_role=auto,url
 echo s3fs#${outbound_bucket} $EC2_USER_HOME_FOLDER/outbound fuse iam_role=auto,url="https://s3-eu-west-2.amazonaws.com",endpoint=eu-west-2,allow_other,multireq_max=5,use_cache=/tmp,uid=1000,gid=1000 0 0 >> /etc/fstab
 
 #--Create essential subdirs in S3 Bucket
-mkdir -p \
-  $INBOUND_S3_MOUNT_POINT/archive \
-  $INBOUND_S3_MOUNT_POINT/CCMS_PRD_Allpay \
-  $INBOUND_S3_MOUNT_POINT/CCMS_PRD_Allpay/Inbound \
-  $INBOUND_S3_MOUNT_POINT/CCMS_PRD_Barclaycard \
-  $INBOUND_S3_MOUNT_POINT/CCMS_PRD_Barclaycard/Inbound \
-  $INBOUND_S3_MOUNT_POINT/CCMS_PRD_CCR \
-  $INBOUND_S3_MOUNT_POINT/CCMS_PRD_CCR/Inbound \
-  $INBOUND_S3_MOUNT_POINT/CCMS_PRD_Eckoh \
-  $INBOUND_S3_MOUNT_POINT/CCMS_PRD_Eckoh/Inbound \
-  $INBOUND_S3_MOUNT_POINT/CCMS_PRD_Lloyds \
-  $INBOUND_S3_MOUNT_POINT/CCMS_PRD_Lloyds/Inbound \
-  $INBOUND_S3_MOUNT_POINT/CCMS_PRD_RBS \
-  $INBOUND_S3_MOUNT_POINT/CCMS_PRD_RBS/Inbound \
-  $INBOUND_S3_MOUNT_POINT/CCMS_PRD_RBS/Inbound/BACKUP \
-  $INBOUND_S3_MOUNT_POINT/CCMS_PRD_Rossendales \
-  $INBOUND_S3_MOUNT_POINT/CCMS_PRD_Rossendales/Inbound \
-  $INBOUND_S3_MOUNT_POINT/CCMS_PRD_Rossendales/archive \
-  $INBOUND_S3_MOUNT_POINT/CCMS_PRD_TDX \
-  $INBOUND_S3_MOUNT_POINT/CCMS_PRD_TDX/Inbound \
-  $INBOUND_S3_MOUNT_POINT/CCMS_PRD_TDX_DECRYPTED \
-  $INBOUND_S3_MOUNT_POINT/CCMS_PRD_TDX_DECRYPTED/Inbound \
-  $INBOUND_S3_MOUNT_POINT/error \
-  $INBOUND_S3_MOUNT_POINT/inprocess \
-  $INBOUND_S3_MOUNT_POINT/rejected
+# mkdir -p \
+#   $INBOUND_S3_MOUNT_POINT/archive \
+#   $INBOUND_S3_MOUNT_POINT/CCMS_PRD_Allpay \
+#   $INBOUND_S3_MOUNT_POINT/CCMS_PRD_Allpay/Inbound \
+#   $INBOUND_S3_MOUNT_POINT/CCMS_PRD_Barclaycard \
+#   $INBOUND_S3_MOUNT_POINT/CCMS_PRD_Barclaycard/Inbound \
+#   $INBOUND_S3_MOUNT_POINT/CCMS_PRD_CCR \
+#   $INBOUND_S3_MOUNT_POINT/CCMS_PRD_CCR/Inbound \
+#   $INBOUND_S3_MOUNT_POINT/CCMS_PRD_Eckoh \
+#   $INBOUND_S3_MOUNT_POINT/CCMS_PRD_Eckoh/Inbound \
+#   $INBOUND_S3_MOUNT_POINT/CCMS_PRD_Lloyds \
+#   $INBOUND_S3_MOUNT_POINT/CCMS_PRD_Lloyds/Inbound \
+#   $INBOUND_S3_MOUNT_POINT/CCMS_PRD_RBS \
+#   $INBOUND_S3_MOUNT_POINT/CCMS_PRD_RBS/Inbound \
+#   $INBOUND_S3_MOUNT_POINT/CCMS_PRD_RBS/Inbound/BACKUP \
+#   $INBOUND_S3_MOUNT_POINT/CCMS_PRD_Rossendales \
+#   $INBOUND_S3_MOUNT_POINT/CCMS_PRD_Rossendales/Inbound \
+#   $INBOUND_S3_MOUNT_POINT/CCMS_PRD_Rossendales/archive \
+#   $INBOUND_S3_MOUNT_POINT/CCMS_PRD_TDX \
+#   $INBOUND_S3_MOUNT_POINT/CCMS_PRD_TDX/Inbound \
+#   $INBOUND_S3_MOUNT_POINT/CCMS_PRD_TDX_DECRYPTED \
+#   $INBOUND_S3_MOUNT_POINT/CCMS_PRD_TDX_DECRYPTED/Inbound \
+#   $INBOUND_S3_MOUNT_POINT/error \
+#   $INBOUND_S3_MOUNT_POINT/inprocess \
+#   $INBOUND_S3_MOUNT_POINT/rejected
 
 #--Clears all admin files and entries from config.xml on admin host only
 reset_admin() {
@@ -123,24 +123,24 @@ ensure_https() {
 }
 
 #--Deploy Cortex Agent (Also known as XDR Agent). SOC Monitoring
-deploy_cortex() {
-  CORTEX_DIR=/tmp/CortexAgent
-  CORTEX_VERSION=linux_8_8_0_133595_rpm
+# deploy_cortex() {
+#   CORTEX_DIR=/tmp/CortexAgent
+#   CORTEX_VERSION=linux_8_8_0_133595_rpm
 
-  #--Prep
-  mkdir -p $CORTEX_DIR/linux_8_8_0_133595_rpm
-  mkdir /etc/panw
-  aws s3 sync s3://ccms-shared/CortexAgent/ $CORTEX_DIR #--ccms-shared is in the EBS dev account 767123802783. Bucket is shared at the ORG LEVEL.
-  tar zxf $CORTEX_DIR/$CORTEX_VERSION.tar.gz -C $CORTEX_DIR/$CORTEX_VERSION
-  cp $CORTEX_DIR/$CORTEX_VERSION/cortex.conf /etc/panw/cortex.conf
-  sed -i -e '$a\' /etc/panw/cortex.conf && echo "--endpoint-tags ccms,soa" >> /etc/panw/cortex.conf
+#   #--Prep
+#   mkdir -p $CORTEX_DIR/linux_8_8_0_133595_rpm
+#   mkdir /etc/panw
+#   aws s3 sync s3://ccms-shared/CortexAgent/ $CORTEX_DIR #--ccms-shared is in the EBS dev account 767123802783. Bucket is shared at the ORG LEVEL.
+#   tar zxf $CORTEX_DIR/$CORTEX_VERSION.tar.gz -C $CORTEX_DIR/$CORTEX_VERSION
+#   cp $CORTEX_DIR/$CORTEX_VERSION/cortex.conf /etc/panw/cortex.conf
+#   sed -i -e '$a\' /etc/panw/cortex.conf && echo "--endpoint-tags ccms,soa" >> /etc/panw/cortex.conf
 
-  #--Installs
-  yum install -y selinux-policy-devel
-  rpm -Uvh $CORTEX_DIR/$CORTEX_VERSION/cortex-*.rpm
-  systemctl status traps_pmd
-  echo "Cortex Install Routine Complete. Installation Is NOT GUARANTEED -- Check Logs For Success"
-}
+#   #--Installs
+#   yum install -y selinux-policy-devel
+#   rpm -Uvh $CORTEX_DIR/$CORTEX_VERSION/cortex-*.rpm
+#   systemctl status traps_pmd
+#   echo "Cortex Install Routine Complete. Installation Is NOT GUARANTEED -- Check Logs For Success"
+# }
 
 if [[ "${server}" = "admin" ]]; then
   yum install -y xmlstarlet
@@ -148,6 +148,6 @@ if [[ "${server}" = "admin" ]]; then
   reset_admin
 fi
 
-if [[ "${deploy_environment}" = "production" ]]; then
-  deploy_cortex
-fi
+# if [[ "${deploy_environment}" = "production" ]]; then
+#   deploy_cortex
+# fi
