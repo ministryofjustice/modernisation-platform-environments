@@ -343,7 +343,7 @@ locals {
                 }]
               }
               pd-onr-web-http-7777 = {
-                priority = 1200 # change priority to 200 when environment is powered on during day
+                priority = 200
                 actions = [{
                   type              = "forward"
                   target_group_name = "pd-onr-web-http-7777"
