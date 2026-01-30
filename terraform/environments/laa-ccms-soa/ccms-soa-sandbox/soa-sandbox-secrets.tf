@@ -72,12 +72,14 @@ data "aws_secretsmanager_secret_version" "trust_store_password" {
 #   })
 # }
 
-# resource "aws_secretsmanager_secret_version" "ccms_soa_quiesced_secrets_version" {
+# resource "aws_secretsmanager_secret_version" "sandbox_ccms_soa_quiesced_secrets_version" {
 #   secret_id = aws_secretsmanager_secret.ccms_soa_quiesced_secrets.id
 
 #   secret_string = jsonencode({
 #     slack_channel_webhook           = "",
 #     slack_channel_webhook_guardduty = ""
+
+    
 #   })
 
 #   lifecycle {
