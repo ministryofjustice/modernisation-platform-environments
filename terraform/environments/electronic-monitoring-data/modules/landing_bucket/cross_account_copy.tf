@@ -92,7 +92,15 @@ data "aws_iam_policy_document" "replication-policy" {
     ]
     resources = ["${var.metadata_bucket}/*"]
   }
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket",
+    ]
+    resources = [var.metadata_bucket]
+  }
 }
+
 
 resource "aws_iam_role_policy_attachment" "replication" {
   count      = local.replication_enabled ? 1 : 0
