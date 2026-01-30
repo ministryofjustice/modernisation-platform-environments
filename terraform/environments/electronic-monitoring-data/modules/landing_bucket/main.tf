@@ -58,6 +58,7 @@ locals {
         operations = [
           "Encrypt",
           "GenerateDataKey",
+          "Decrypt"
         ]
       }
     },
@@ -160,7 +161,8 @@ module "kms_key" {
       actions = [
         "kms:Encrypt",
         "kms:ReEncrypt*",
-        "kms:GenerateDataKey*"
+        "kms:GenerateDataKey*",
+        "kms:Decrypt",
       ]
       resources = ["*"]
     }

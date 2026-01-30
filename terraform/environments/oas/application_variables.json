@@ -42,9 +42,9 @@
     },
     "preproduction": {
       "ec2amiid": "ami-0a2128d7b4dd8a56c",
-      "orahomesize": "200",
+      "orahomesize": "300",
       "orahome_snapshot": "snap-0685fb3a76969ad0b",
-      "stageesize": "150",
+      "stageesize": "200",
       "stage_snapshot": "snap-0859b31fc100812e0",
       "allocated_storage": "50",
       "engine": "oracle-ee",
