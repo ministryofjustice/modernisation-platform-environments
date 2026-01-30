@@ -26,7 +26,7 @@ variable "maximum_concurrency" {
 variable "max_receive_count" {
   description = "Number of receives before messages are moved to the DLQ"
   type        = number
-  default     = 5
+  default     = 2
 }
 
 variable "enabled" {

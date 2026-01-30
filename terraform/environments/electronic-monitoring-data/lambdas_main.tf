@@ -2,7 +2,6 @@ locals {
   lambda_path                 = "lambdas"
   env_name                    = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
   db_name                     = local.is-production ? "g4s_cap_dw" : "test"
-  load_sqs_max_receive_count  = 5
 }
 
 
@@ -368,7 +367,7 @@ module "load_mdss_lambda" {
     STAGING_BUCKET      = module.s3-create-a-derived-table-bucket.bucket.id
     ENVIRONMENT_NAME    = local.environment_shorthand
     CLEANUP_QUEUE_URL   = aws_sqs_queue.clean_dlt_load_queue.id
-    MAX_RECEIVE_COUNT   = tostring(local.load_sqs_max_receive_count)
+    MAX_RECEIVE_COUNT   = "5"
   }
 }
 
@@ -399,7 +398,7 @@ module "load_fms_lambda" {
     ENVIRONMENT_NAME    = local.environment_shorthand
     CLEANUP_QUEUE_URL   = aws_sqs_queue.clean_dlt_load_queue.id
     SNS_TOPIC_ARN  = aws_sns_topic.emds_alerts.arn
-    MAX_RECEIVE_COUNT   = tostring(local.load_sqs_max_receive_count)
+    MAX_RECEIVE_COUNT   = "2"
   }
 }
 
