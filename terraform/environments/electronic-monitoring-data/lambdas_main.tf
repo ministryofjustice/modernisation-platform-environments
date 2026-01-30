@@ -398,6 +398,7 @@ module "load_fms_lambda" {
     STAGING_BUCKET      = module.s3-create-a-derived-table-bucket.bucket.id
     ENVIRONMENT_NAME    = local.environment_shorthand
     CLEANUP_QUEUE_URL   = aws_sqs_queue.clean_dlt_load_queue.id
+    SNS_TOPIC_ARN  = aws_sns_topic.emds_alerts.arn
     MAX_RECEIVE_COUNT   = tostring(local.load_sqs_max_receive_count)
   }
 }
@@ -603,7 +604,7 @@ module "iceberg-table-maintenance" {
   production_dev          = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
 
   environment_variables = {
-    ATHENA_QUERY_RESULTS_BUCKET = module.s3-athena-bucket.bucket
+    ATHENA_QUERY_RESULTS_BUCKET = module.s3-athena-bucket.bucket.id
   }
 }
 

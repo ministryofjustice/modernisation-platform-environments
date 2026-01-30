@@ -912,6 +912,9 @@ data "aws_iam_policy_document" "load_fms_lambda_role_policy_document" {
     actions = [
       "s3:GetObjectAttributes",
       "s3:GetObject",
+      "s3:GetObjectTagging",
+      "s3:PutObject",
+      "s3:PutObjectTagging",
     ]
     resources = [
       "${module.s3-raw-formatted-data-bucket.bucket.arn}/serco/fms/*"
@@ -995,6 +998,23 @@ data "aws_iam_policy_document" "load_fms_lambda_role_policy_document" {
       "sqs:GetQueueUrl",
     ]
     resources = [aws_sqs_queue.clean_dlt_load_queue.arn]
+  }
+  statement {
+    sid    = "AllowPublishToAlertsTopic"
+    effect = "Allow"
+    actions = [
+      "sns:Publish",
+      ]
+    resources = [aws_sns_topic.emds_alerts.arn]
+  }
+    statement {
+    sid    = "AllowLambdaToUseKey"
+    effect = "Allow"
+    actions = [
+      "kms:GenerateDataKey",
+      "kms:Decrypt"
+      ]
+    resources = ["*"]
   }
 }
 
