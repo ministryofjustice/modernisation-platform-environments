@@ -642,11 +642,5 @@ module "create_fms_general_batch_replication_job" {
     MDSS_GENERAL_BUCKET = module.s3-mdss-general-landing-bucket.bucket_id
     MDSS_HO_BUCKET = module.s3-mdss-ho-landing-bucket.bucket_id
     MDSS_SPECIALS_BUCKET = module.s3-mdss-specials-landing-bucket.bucket_id
-    MANIFEST_FMS_GENERAL_BUCKET = module.s3-fms-general-landing-bucket.manifest_bucket.arn
-    MANIFEST_FMS_HO_BUCKET = module.s3-fms-ho-landing-bucket.manifest_bucket.arn
-    MANIFEST_FMS_SPECIALS_BUCKET = module.s3-fms-specials-landing-bucket.manifest_bucket.arn
-    MANIFEST_MDSS_GENERAL_BUCKET = module.s3-mdss-general-landing-bucket.manifest_bucket.arn
-    MANIFEST_MDSS_HO_BUCKET = module.s3-mdss-ho-landing-bucket.manifest_bucket.arn
-    MANIFEST_MDSS_SPECIALS_BUCKET = module.s3-mdss-specials-landing-bucket.manifest_bucket.arn
-  }
+    }
 }
