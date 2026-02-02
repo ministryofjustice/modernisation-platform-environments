@@ -10,6 +10,9 @@
     "ghcr.io/ministryofjustice/devcontainer-feature/static-analysis:": {},
     "ghcr.io/ministryofjustice/devcontainer-feature/terraform:": {}
   },
+  "mounts": [
+    "source=${localEnv:HOME}${localEnv:USERPROFILE}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached"
+  ],
   "postCreateCommand": "bash .devcontainer/post-create.sh",
   "customizations": {
     "vscode": {

@@ -14,7 +14,8 @@
 - **3 major version upgrades** available
 - **25 module instances** require updates across **24 files**
 - **1 breaking code change** required (SNS `conditions` → `condition`)
-- **AWS Provider upgrade required** (`~> 5.0` → `~> 6.9`)
+- **AWS Provider upgrade required** (`~> 5.0` → `~> 6.0`)
+- **⚠️ Additional provider constraint conflicts resolved** in subdirectories
 
 ---
 
@@ -233,43 +234,75 @@ Only requires version updates, no code refactoring needed.
 
 ### Prerequisites:
 
-1. **AWS Provider Upgrade:** Update `terraform.tf` to require AWS provider `>= 6.9`
-2. **Terraform Version:** Ensure using Terraform `>= 1.5.7`
+1. **AWS Provider Upgrade:** Update provider constraints to `~> 6.0` (completed)
+2. **Terraform Version:** Ensure using Terraform `>= 1.5.7` (already met: `~> 1.10`)
+
+### ⚠️ Critical Fix Applied: Provider Constraint Conflicts
+
+During implementation, provider constraint conflicts were discovered in subdirectories:
+
+**Issue:** Subdirectories had AWS provider constraints that were incompatible with module requirements:
+- `dms/versions.tf`: `~> 5.0, != 5.86.0` (conflicted with `~> 6.0`)
+- `modules/dms/terraform.tf`: `~> 5.0` (conflicted with `~> 6.0`)
+
+**Resolution:** Updated both files to use `~> 6.0` for consistency.
+
+**Impact:** 
+- 🟡 **MEDIUM** - Additional testing required for DMS-related infrastructure
+- All DMS modules and submodules now require AWS provider v6.x
+- Terraform version requirement also updated to `>= 1.5.7` in `modules/dms/terraform.tf`
 
 ### Change Set Summary:
 
 | File | Change Type | Description |
 |------|-------------|-------------|
-| `terraform.tf` | Provider Update | AWS provider `~> 5.0` → `~> 6.9` |
-| `terraform.tf` | Version Update | Terraform `>= 1.3.0` → `>= 1.5.7` |
+| `versions.tf` | Provider Constraint | AWS provider `~> 6.0` (already correct) |
+| `dms/versions.tf` | Provider Constraint | AWS provider `~> 5.0, != 5.86.0` → `~> 6.0` |
+| `modules/dms/terraform.tf` | Provider Constraint | AWS provider `~> 5.0` → `~> 6.0`, Terraform `>= 1.0.0` → `>= 1.5.7` |
 | `sns.tf` | Version + Refactor | SNS v6.2.0 → v7.1.0, `conditions` → `condition` |
 | `kms-keys.tf` | Version Update | 17 KMS modules v3.1.1 → v4.2.0 |
 | `dms/kms-keys.tf` | Version Update | KMS v3.1.1 → v4.2.0 |
 | `modules/dms/kms-keys.tf` | Version Update | KMS v3.1.1 → v4.2.0 |
-| `secrets.tf` | Version Update | KMS v3.1.1 → v4.2.0 |
-| `dms/secrets.tf` | Version Update | KMS v3.1.1 → v4.2.0 |
+| `secrets.tf` | Version Update | KMS v3.1.1 → v4.2.0 (if present) |
+| `dms/secrets.tf` | Version Update | KMS v3.1.1 → v4.2.0 (if present) |
 | `modules/dms/metadata-generator.tf` | Git Ref Update | Lambda ref v7.20.1 → v8.4.0 |
 | `modules/dms/validation.tf` | Git Ref Update | Lambda ref v7.20.1 → v8.4.0 |
 
-**Total:** 24 files requiring changes
+**Total:** 26 files requiring changes (24 module updates + 2 provider constraint fixes)
 
 ### Detailed Diffs:
 
-#### File 1: terraform.tf (AWS Provider Upgrade)
+#### File 1: dms/versions.tf (AWS Provider Constraint Fix)
 
 ```diff
-  required_providers {
-    aws = {
-      source = "hashicorp/aws"
--     version = "~> 5.0"
-+     version = "~> 6.9"
+  terraform {
+    required_providers {
+      aws = {
+-       version = "~> 5.0, != 5.86.0"
++       version = "~> 6.0"
+        source  = "hashicorp/aws"
+      }
     }
   }
-- required_version = ">= 1.3.0"
-+ required_version = ">= 1.5.7"
 ```
 
-#### File 2: sns.tf (Version + Code Refactoring)
+#### File 2: modules/dms/terraform.tf (AWS Provider & Terraform Version Fix)
+
+```diff
+  terraform {
+-   required_version = ">= 1.0.0, < 2.0.0"
++   required_version = ">= 1.5.7, < 2.0.0"
+    required_providers {
+      aws = {
+        source  = "hashicorp/aws"
+-       version = "~> 5.0"
++       version = "~> 6.0"
+      }
+    }
+  }
+```
+
+#### File 3: sns.tf (Version + Code Refactoring)
 
 ```diff
   module "quarantined_topic" {
@@ -337,7 +370,7 @@ Only requires version updates, no code refactoring needed.
   }
 ```
 
-#### File 3: kms-keys.tf (17 module instances)
+#### File 4: kms-keys.tf (17 module instances)
 
 ```diff
   module "transfer_logs_kms" {
@@ -373,15 +406,15 @@ Only requires version updates, no code refactoring needed.
   # - validation_kms
 ```
 
-#### Files 4-7: Other KMS modules (4 more files)
+#### Files 5-8: Other KMS modules (4 more files)
 
 Apply same version change `3.1.1` → `4.2.0` to:
 - `dms/kms-keys.tf`
 - `modules/dms/kms-keys.tf`
-- `secrets.tf`
-- `dms/secrets.tf`
+- `secrets.tf` (if present)
+- `dms/secrets.tf` (if present)
 
-#### Files 8-9: Lambda modules (git ref update)
+#### Files 9-10: Lambda modules (git ref update)
 
 **modules/dms/metadata-generator.tf:**
 ```diff
@@ -420,8 +453,9 @@ Apply same version change `3.1.1` → `4.2.0` to:
 | **KMS Module** | 🟢 **LOW** | Only version bump, no breaking resource changes |
 | **Lambda Module** | 🟢 **LOW** | Only version bump, no breaking resource changes |
 | **SNS Module** | 🟡 **MEDIUM** | Requires code refactoring (`conditions` → `condition`) |
-| **AWS Provider** | 🟢 **LOW** | Well-tested v6.x series, widely adopted |
-| **Overall** | 🟡 **LOW-MEDIUM** | Manageable changes, test in dev first |
+| **AWS Provider** | � **MEDIUM** | Provider v6 upgrade + constraint conflicts resolved in DMS subdirectories |
+| **DMS Infrastructure** | 🟡 **MEDIUM** | Additional testing required due to provider constraint changes |
+| **Overall** | 🟡 **MEDIUM** | Manageable changes, comprehensive testing recommended |
 
 ---
 
