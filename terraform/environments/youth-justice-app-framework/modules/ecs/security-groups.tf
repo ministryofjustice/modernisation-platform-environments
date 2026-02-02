@@ -212,3 +212,13 @@ resource "aws_security_group_rule" "ecsint_toecs_ecsext_datadog_rule_udp" {
   source_security_group_id = aws_security_group.common_ecs_service_external.id
   description              = "Datadog from ECS Internal to ECS External"
 }
+
+resource "aws_security_group_rule" "autoscaling_toecs_ecsext" {
+  type                     = "ingress"
+  from_port                = 8080
+  to_port                  = 8080
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.common_ecs_service_external.id
+  source_security_group_id = module.autoscaling_sg.security_group_id
+  description              = "Inbound from Autoscaling to ECS External"
+}
