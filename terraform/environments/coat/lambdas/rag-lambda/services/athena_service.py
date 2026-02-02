@@ -3,12 +3,12 @@ import boto3
 
 
 class AthenaService:
-    def __init__(self, database):
+    def __init__(self, database, environment):
         self.client = boto3.client("athena", region_name="eu-west-2")
 
         self.database = database
         self.workgroup = "primary"
-        self.output_location = "s3://coat-development-athena-output-clickops/Unsaved"
+        self.output_location = "s3://coat-production-cur-v2-hourly/athena-results" if environment == "production" else "s3://coat-development-athena-output-clickops/Unsaved"
 
 
     def start_query(self, query):

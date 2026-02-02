@@ -6,6 +6,8 @@ from lib.response import construct_error, construct_response
 from lib.validators import validate_user_question
 from lib.request import parse_request_body
 
+import os
+
 
 def lambda_handler(event, context): 
     print("Request Payload:")
@@ -13,10 +15,12 @@ def lambda_handler(event, context):
     
     print("Executing Lambda Handler..")
 
+    environment = os.environ.get("ENVIRONMENT")
+
     request_body = parse_request_body(event)
     
     secret_service = SecretService()
-    athena_service = AthenaService("cur_v2_database")
+    athena_service = AthenaService("cur_v2_database", environment)
     prompt_service = PromptService()
 
     user_question = validate_user_question(request_body.get("user_question", "No question was submitted"))

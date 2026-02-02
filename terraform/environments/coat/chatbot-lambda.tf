@@ -47,6 +47,12 @@ resource "aws_lambda_function" "rag_lambda" {
     mode = "PassThrough"
   }
 
+  environment {
+    variables = {
+      ENVIRONMENT = local.environment
+    }
+  }
+
   tags = {
     "service-area" = "Hosting"
   }
