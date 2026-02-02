@@ -25,7 +25,9 @@ resource "aws_athena_workgroup" "coat_cur_report" {
     publish_cloudwatch_metrics_enabled = true
   }
 
-  tags = local.tags
+  tags = {
+    "service-area" = "Hosting"
+  }
 }
 
 resource "aws_athena_workgroup" "ctas_athena_workgroup" {
@@ -42,7 +44,9 @@ resource "aws_athena_workgroup" "ctas_athena_workgroup" {
     publish_cloudwatch_metrics_enabled = true
   }
 
-  tags = local.tags
+  tags = {
+    "service-area" = "Hosting"
+  }
 }
 
 resource "aws_glue_catalog_database" "cur_v2_database" {
