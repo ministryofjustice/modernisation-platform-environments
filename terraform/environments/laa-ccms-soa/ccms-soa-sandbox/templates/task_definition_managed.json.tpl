@@ -70,10 +70,6 @@
       {
         "name": "DOMAIN_ROOT",
         "value": "/u01/oracle/user_projects/domains"
-      },      
-      {
-        "name": "MANAGED_HOST",
-        "value": "${ms_hostname}"
       },
       {
         "name": "MS_PORT",
