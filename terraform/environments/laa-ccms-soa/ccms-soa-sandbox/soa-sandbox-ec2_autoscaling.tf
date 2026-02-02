@@ -171,8 +171,6 @@ data "template_file" "launch-template-managed" {
     cluster_name       = "${local.component_name}-${local.environment}-cluster"
     efs_id             = aws_efs_file_system.storage.id
     server             = "managed"
-    inbound_bucket     = ""
-    outbound_bucket    = ""
     deploy_environment = local.environment
   }
 }
@@ -183,8 +181,6 @@ data "template_file" "launch-template-admin" {
     cluster_name       = "soasandbox-${local.application_data.accounts[local.environment].app_name}-cluster"
     efs_id             = aws_efs_file_system.storage.id
     server             = "admin"
-    inbound_bucket     = ""
-    outbound_bucket    = ""
     deploy_environment = local.environment
   }
 }
