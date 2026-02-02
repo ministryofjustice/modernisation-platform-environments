@@ -169,6 +169,23 @@ data "aws_iam_policy_document" "rag_lambda_function_role" {
           "arn:aws:secretsmanager:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:secret:llm_gateway_key-1biv4G"
         ]
     }
+
+    statement {
+        sid    = "AllowKMS"
+        effect = "Allow"
+
+        actions = [
+          "kms:Encrypt*",
+          "kms:Decrypt*",
+          "kms:ReEncrypt*",
+          "kms:GenerateDataKey*",
+          "kms:Describe*"
+        ]
+
+        resources = [
+          module.cur_s3_kms.key_arn
+        ]
+    }
 }
 
 # Secrets
