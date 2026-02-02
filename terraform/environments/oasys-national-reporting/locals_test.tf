@@ -193,6 +193,12 @@ locals {
         instance = merge(local.ec2_instances.bip_web.instance, {
           instance_type = "r6i.large"
         })
+        secretsmanager_secrets = {
+          web-cert = {
+            description             = "Certificate secrets used for tomcat"
+            recovery_window_in_days = 0 # so instances can be deleted and re-created without issue
+          }
+        }
         user_data_cloud_init = merge(local.ec2_instances.bip_web.user_data_cloud_init, {
           args = merge(local.ec2_instances.bip_web.user_data_cloud_init.args, {
             branch = "TM-1865/onr/web-oidc-v1"
