@@ -48,10 +48,6 @@
     ],
     "environment": [
       {
-        "name": "ADMIN_HOST",
-        "value": "${admin_host}"
-      },
-      {
         "name": "ADMIN_PORT",
         "value": "${admin_server_port}"
       },
