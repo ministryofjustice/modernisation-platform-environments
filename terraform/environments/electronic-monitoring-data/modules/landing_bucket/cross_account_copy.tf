@@ -19,7 +19,7 @@ data "aws_iam_policy_document" "s3-assume-role-policy" {
 
     principals {
       type        = "Service"
-      identifiers = ["s3.amazonaws.com"]
+      identifiers = ["s3.amazonaws.com", "batchoperations.s3.amazonaws.com"]
     }
   }
 }
@@ -41,16 +41,15 @@ data "aws_iam_policy_document" "replication-policy" {
       "kms:GenerateDataKey"
     ]
     resources = [
-      local.replication_enabled ? "arn:aws:kms:eu-west-2:${var.replication_details["account_id"]}:key/${var.replication_details["${var.data_feed}_${var.order_type}_kms_id"]}" : "",
-      module.kms_key.key_arn
+      "*"
     ]
   }
   statement {
     effect = "Allow"
     actions = [
       "s3:GetReplicationConfiguration",
-      "s3:ListBucket"
-
+      "s3:ListBucket",
+      "s3:PutInventoryConfiguration",
     ]
     resources = [module.this-bucket.bucket.arn]
   }
@@ -67,7 +66,8 @@ data "aws_iam_policy_document" "replication-policy" {
       "s3:ReplicateObject",
       "s3:ReplicateDelete",
       "s3:ReplicateTags",
-      "s3:ObjectOwnerOverrideToBucketOwner"
+      "s3:ObjectOwnerOverrideToBucketOwner",
+      "s3:InitiateReplication",
     ]
     resources = ["${module.this-bucket.bucket.arn}/*"]
   }
@@ -81,11 +81,26 @@ data "aws_iam_policy_document" "replication-policy" {
       "s3:GetObjectVersionTagging",
       "s3:ObjectOwnerOverrideToBucketOwner"
     ]
-
     resources = [local.replication_enabled ? "arn:aws:s3:::${var.replication_details["${var.data_feed}_${var.order_type}_bucket"]}/*" : ""]
-
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:GetObject",
+      "s3:GetObjectVersion"
+    ]
+    resources = ["${var.metadata_bucket}/*"]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket",
+    ]
+    resources = [var.metadata_bucket]
   }
 }
+
 
 resource "aws_iam_role_policy_attachment" "replication" {
   count      = local.replication_enabled ? 1 : 0

@@ -1,12 +1,13 @@
 locals {
-  lambda_path = "lambdas"
-  env_name    = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
-  db_name     = local.is-production ? "g4s_cap_dw" : "test"
+  lambda_path                 = "lambdas"
+  env_name                    = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+  db_name                     = local.is-production ? "g4s_cap_dw" : "test"
+  load_sqs_max_receive_count  = 2
 }
 
 
 #-----------------------------------------------------------------------------------
-# S3 lambda function to perform zip file structure extraction into json for Athena
+# S3 lambda function to perform zip file structure extraction into json for Athena
 #-----------------------------------------------------------------------------------
 
 module "output_file_structure_as_json_from_zip" {
@@ -28,7 +29,7 @@ module "output_file_structure_as_json_from_zip" {
 }
 
 #-----------------------------------------------------------------------------------
-# Unzip single file
+# Unzip single file
 #-----------------------------------------------------------------------------------
 
 module "unzip_single_file" {
@@ -50,7 +51,7 @@ module "unzip_single_file" {
 }
 
 #-----------------------------------------------------------------------------------
-# Create pre signed url
+# Create pre signed url
 #-----------------------------------------------------------------------------------
 
 module "unzipped_presigned_url" {
@@ -68,7 +69,7 @@ module "unzipped_presigned_url" {
 }
 
 #-----------------------------------------------------------------------------------
-# Rotate IAM keys
+# Rotate IAM keys
 #-----------------------------------------------------------------------------------
 
 module "rotate_iam_key" {
@@ -143,7 +144,7 @@ module "virus_scan_file" {
 }
 
 #-----------------------------------------------------------------------------------
-# Process live files
+# Process live files
 #-----------------------------------------------------------------------------------
 
 module "format_json_fms_data" {
@@ -184,7 +185,7 @@ module "copy_mdss_data" {
 }
 
 #-----------------------------------------------------------------------------------
-# Clean after MDSS load
+# Clean after MDSS load
 #-----------------------------------------------------------------------------------
 
 module "clean_after_dlt_load" {
@@ -210,7 +211,7 @@ module "clean_after_dlt_load" {
 }
 
 #-----------------------------------------------------------------------------------
-# Calculate checksum
+# Calculate checksum
 #-----------------------------------------------------------------------------------
 
 variable "checksum_algorithm" {
@@ -367,6 +368,7 @@ module "load_mdss_lambda" {
     STAGING_BUCKET      = module.s3-create-a-derived-table-bucket.bucket.id
     ENVIRONMENT_NAME    = local.environment_shorthand
     CLEANUP_QUEUE_URL   = aws_sqs_queue.clean_dlt_load_queue.id
+    MAX_RECEIVE_COUNT   = tostring(local.load_sqs_max_receive_count)
   }
 }
 
@@ -396,6 +398,8 @@ module "load_fms_lambda" {
     STAGING_BUCKET      = module.s3-create-a-derived-table-bucket.bucket.id
     ENVIRONMENT_NAME    = local.environment_shorthand
     CLEANUP_QUEUE_URL   = aws_sqs_queue.clean_dlt_load_queue.id
+    SNS_TOPIC_ARN  = aws_sns_topic.emds_alerts.arn
+    MAX_RECEIVE_COUNT   = tostring(local.load_sqs_max_receive_count)
   }
 }
 
@@ -583,6 +587,29 @@ resource "aws_scheduler_schedule" "mdss_daily_failure_digest" {
 }
 
 #-----------------------------------------------------------------------------------
+# Iceberg Table Maint
+#-----------------------------------------------------------------------------------
+
+module "iceberg-table-maintenance" {
+  count                   = local.is-development || local.is-preproduction ? 1 : 0
+  source                  = "./modules/lambdas"
+  is_image                = true
+  function_name           = "iceberg_table_maintenance"
+  role_name               = aws_iam_role.iceberg_table_maintenance_iam_role[0].name
+  role_arn                = aws_iam_role.iceberg_table_maintenance_iam_role[0].arn
+  handler                 = "iceberg_table_maintenance.handler"
+  memory_size             = 1024
+  timeout                 = 900
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+
+  environment_variables = {
+    ATHENA_QUERY_RESULTS_BUCKET = module.s3-athena-bucket.bucket.id
+  }
+}
+
+
+#-----------------------------------------------------------------------------------
 # Bucket replication
 #-----------------------------------------------------------------------------------
 
@@ -609,5 +636,11 @@ module "create_fms_general_batch_replication_job" {
     BATCH_COPY_ROLE = module.s3-fms-general-landing-bucket.replication_role_arn
     DESTINATION_ACCOUNT_SECRET_ARN = module.cross_account_details[0].secret_arn
     METADATA_BUCKET_ARN = module.s3-metadata-bucket.bucket.arn
-  }
+    FMS_GENERAL_BUCKET = module.s3-fms-general-landing-bucket.bucket_id
+    FMS_HO_BUCKET = module.s3-fms-ho-landing-bucket.bucket_id
+    FMS_SPECIALS_BUCKET = module.s3-fms-specials-landing-bucket.bucket_id
+    MDSS_GENERAL_BUCKET = module.s3-mdss-general-landing-bucket.bucket_id
+    MDSS_HO_BUCKET = module.s3-mdss-ho-landing-bucket.bucket_id
+    MDSS_SPECIALS_BUCKET = module.s3-mdss-specials-landing-bucket.bucket_id
+    }
 }

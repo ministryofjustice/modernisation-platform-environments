@@ -6,9 +6,9 @@ terraform {
       configuration_aliases = [aws.core-vpc, aws.core-network-services, aws.modernisation-platform]
     }
     http = {
-      version = "~> 3.4"
+      version = "~> 3.0"
       source  = "hashicorp/http"
     }
   }
-  required_version = "~> 1.10"
+  required_version = "~> 1.0"
 }
