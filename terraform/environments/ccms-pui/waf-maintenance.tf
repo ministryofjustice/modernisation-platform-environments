@@ -19,7 +19,7 @@ data "archive_file" "waf_maintenance_zip" {
 
 # Pull an existing WAF Rule Group and rules using a dynamic name.
 data "aws_wafv2_web_acl" "waf_web_acl" {
-  name  = "ebs_internal_waf"
+  name  = "ccms-pui-web-acl"
   scope = "REGIONAL"
 }
 
