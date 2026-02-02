@@ -83,7 +83,7 @@ locals {
       container_port           = 8080
       container_memory         = 4096
       container_cpu            = 2048
-      task_definition_revision = 14
+      task_definition_revision = 16
     }
 
     weblogic_params = {
@@ -133,11 +133,11 @@ locals {
     }
 
     weblogic_eis = {
-      image_tag                = "6.3.9-eis"
+      image_tag                = "6.5.15-eis"
       container_port           = 8080
       container_memory         = 4096
       container_cpu            = 2048
-      task_definition_revision = 12
+      task_definition_revision = 14
     }
 
     pwm = {
