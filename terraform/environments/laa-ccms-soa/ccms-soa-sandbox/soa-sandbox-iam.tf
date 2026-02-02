@@ -1,54 +1,54 @@
-# #--ECS
-# data "aws_iam_policy_document" "ecs_task_execution_role" {
-#   version = "2012-10-17"
-#   statement {
-#     sid    = ""
-#     effect = "Allow"
-#     actions = [
-#       "sts:AssumeRole",
-#     ]
+#--ECS
+data "aws_iam_policy_document" "ecs_task_execution_role" {
+  version = "2012-10-17"
+  statement {
+    sid    = ""
+    effect = "Allow"
+    actions = [
+      "sts:AssumeRole",
+    ]
 
-#     principals {
-#       type = "Service"
-#       identifiers = [
-#         "ecs-tasks.amazonaws.com",
-#       ]
-#     }
-#   }
-# }
+    principals {
+      type = "Service"
+      identifiers = [
+        "ecs-tasks.amazonaws.com",
+      ]
+    }
+  }
+}
 
-# resource "aws_iam_role" "ecs_task_execution_role" {
-#   name               = "soa-${local.component_name}.${local.application_data.accounts[local.environment].app_name}-WorldTaskExecutionRole"
-#   assume_role_policy = data.aws_iam_policy_document.ecs_task_execution_role.json
-#   tags               = local.tags
-# }
+resource "aws_iam_role" "ecs_task_execution_role" {
+  name               = "soa-${local.component_name}.${local.application_data.accounts[local.environment].app_name}-WorldTaskExecutionRole"
+  assume_role_policy = data.aws_iam_policy_document.ecs_task_execution_role.json
+  tags               = local.tags
+}
 
-# resource "aws_iam_role_policy_attachment" "ecs_task_execution_role" {
-#   role       = aws_iam_role.ecs_task_execution_role.name
-#   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
-# }
+resource "aws_iam_role_policy_attachment" "ecs_task_execution_role" {
+  role       = aws_iam_role.ecs_task_execution_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+}
 
-# resource "aws_iam_policy" "ecs_secrets_policy" {
-#   name   = "soa-${local.component_name}.${local.application_data.accounts[local.environment].app_name}-ecs_secrets_policy"
-#   policy = <<EOF
-# {
-#   "Version": "2012-10-17",
-#   "Statement": [
-#     {
-#       "Effect": "Allow",
-#       "Action": ["secretsmanager:GetSecretValue"],
-#       "Resource": ["arn:aws:secretsmanager:eu-west-2:*:secret:ccms/soa*"]
-#     }
-#   ]
-# }
-# EOF
-# }
+resource "aws_iam_policy" "ecs_secrets_policy" {
+  name   = "soa-${local.component_name}.${local.application_data.accounts[local.environment].app_name}-ecs_secrets_policy"
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": ["secretsmanager:GetSecretValue"],
+      "Resource": ["arn:aws:secretsmanager:eu-west-2:*:secret:ccms/soa*"]
+    }
+  ]
+}
+EOF
+}
 
 
-# resource "aws_iam_role_policy_attachment" "ecs_secrets_policy_attachment" {
-#   role       = aws_iam_role.ecs_task_execution_role.name
-#   policy_arn = aws_iam_policy.ecs_secrets_policy.arn
-# }
+resource "aws_iam_role_policy_attachment" "ecs_secrets_policy_attachment" {
+  role       = aws_iam_role.ecs_task_execution_role.name
+  policy_arn = aws_iam_policy.ecs_secrets_policy.arn
+}
 
 # resource "aws_iam_policy" "soa_s3_policy" {
 #   name        = "soa-${local.component_name}.${local.application_data.accounts[local.environment].app_name}-s3-policy"
@@ -130,104 +130,104 @@ resource "aws_iam_role" "ec2_instance_role" {
 EOF
 }
 
-# resource "aws_iam_policy" "ec2_instance_policy" {
-#   name = "soa-${local.component_name}.${local.application_data.accounts[local.environment].app_name}-ec2-instance-policy"
+resource "aws_iam_policy" "ec2_instance_policy" {
+  name = "soa-${local.component_name}.${local.application_data.accounts[local.environment].app_name}-ec2-instance-policy"
 
-#   policy = <<EOF
-# {
-#     "Version": "2012-10-17",
-#     "Statement": [
-#         {
-#             "Effect": "Allow",
-#             "Action": [
-#                 "ds:CreateComputer",
-#                 "ds:DescribeDirectories",
-#                 "ec2messages:*",
-#                 "ec2:DescribeTags",
-#                 "ec2:DescribeInstanceStatus",
-#                 "cloudwatch:PutMetricData",
-#                 "ecs:CreateCluster",
-#                 "ecs:DeregisterContainerInstance",
-#                 "ecs:DiscoverPollEndpoint",
-#                 "ecs:Poll",
-#                 "ecs:RegisterContainerInstance",
-#                 "ecs:StartTelemetrySession",
-#                 "ecs:UpdateContainerInstancesState",
-#                 "ecs:Submit*",
-#                 "ecs:SubmitTaskStateChange",
-#                 "ecr:GetAuthorizationToken",
-#                 "ecr:BatchCheckLayerAvailability",
-#                 "ecr:GetDownloadUrlForLayer",
-#                 "ecr:BatchGetImage",
-#                 "logs:CreateLogStream",
-#                 "logs:PutLogEvents"
-#             ],
-#             "Resource": "*"
-#         },
-#         {
-#             "Effect": "Allow",
-#             "Action": "iam:CreateServiceLinkedRole",
-#             "Resource": "arn:aws:iam::*:role/aws-service-role/ssm.amazonaws.com/AWSServiceRoleForAmazonSSM*",
-#             "Condition": {
-#                 "StringLike": {
-#                     "iam:AWSServiceName": "ssm.amazonaws.com"
-#                 }
-#             }
-#         },
-#         {
-#             "Effect": "Allow",
-#             "Action": [
-#                 "iam:DeleteServiceLinkedRole",
-#                 "iam:GetServiceLinkedRoleDeletionStatus"
-#             ],
-#             "Resource": "arn:aws:iam::*:role/aws-service-role/ssm.amazonaws.com/AWSServiceRoleForAmazonSSM*"
-#         },
-#         {
-#             "Effect": "Allow",
-#             "Action": [
-#                 "ssmmessages:CreateControlChannel",
-#                 "ssmmessages:CreateDataChannel",
-#                 "ssmmessages:OpenControlChannel",
-#                 "ssmmessages:OpenDataChannel",
-#                 "ssm:AddTagsToResource",
-#                 "ssm:DescribeDocument",
-#                 "ssm:ExecuteAPI",
-#                 "ssm:GetAccessToken",
-#                 "ssm:GetCalendar",
-#                 "ssm:GetDocument",
-#                 "ssm:GetManifest",
-#                 "ssm:GetParameter",
-#                 "ssm:ListInstanceAssociations",
-#                 "ssm:ListTagsForResource",
-#                 "ssm:PutCalendar",
-#                 "ssm:PutComplianceItems",
-#                 "ssm:PutConfigurePackageResult",
-#                 "ssm:PutInventory",
-#                 "ssm:RemoveTagsFromResource",
-#                 "ssm:StartAccessRequest",
-#                 "ssm:StartExecutionPreview",
-#                 "ssm:UpdateInstance*"
-#             ],
-#             "Resource": "*"
-#         },
-#         {
-#           "Effect": "Allow",
-#           "Action": ["secretsmanager:GetSecretValue"],
-#           "Resource": [
-#             "arn:aws:secretsmanager:eu-west-2:*:secret:ccms/soa/deploy-*",
-#             "arn:aws:secretsmanager:eu-west-2:*:secret:ccms/soa/password",
-#             "arn:aws:secretsmanager:eu-west-2:*:secret:ccms/soa/xxsoa/ds/password"
-#           ]
-#         }
-#     ]
-# }
-# EOF
-# }
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ds:CreateComputer",
+                "ds:DescribeDirectories",
+                "ec2messages:*",
+                "ec2:DescribeTags",
+                "ec2:DescribeInstanceStatus",
+                "cloudwatch:PutMetricData",
+                "ecs:CreateCluster",
+                "ecs:DeregisterContainerInstance",
+                "ecs:DiscoverPollEndpoint",
+                "ecs:Poll",
+                "ecs:RegisterContainerInstance",
+                "ecs:StartTelemetrySession",
+                "ecs:UpdateContainerInstancesState",
+                "ecs:Submit*",
+                "ecs:SubmitTaskStateChange",
+                "ecr:GetAuthorizationToken",
+                "ecr:BatchCheckLayerAvailability",
+                "ecr:GetDownloadUrlForLayer",
+                "ecr:BatchGetImage",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": "iam:CreateServiceLinkedRole",
+            "Resource": "arn:aws:iam::*:role/aws-service-role/ssm.amazonaws.com/AWSServiceRoleForAmazonSSM*",
+            "Condition": {
+                "StringLike": {
+                    "iam:AWSServiceName": "ssm.amazonaws.com"
+                }
+            }
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "iam:DeleteServiceLinkedRole",
+                "iam:GetServiceLinkedRoleDeletionStatus"
+            ],
+            "Resource": "arn:aws:iam::*:role/aws-service-role/ssm.amazonaws.com/AWSServiceRoleForAmazonSSM*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ssmmessages:CreateControlChannel",
+                "ssmmessages:CreateDataChannel",
+                "ssmmessages:OpenControlChannel",
+                "ssmmessages:OpenDataChannel",
+                "ssm:AddTagsToResource",
+                "ssm:DescribeDocument",
+                "ssm:ExecuteAPI",
+                "ssm:GetAccessToken",
+                "ssm:GetCalendar",
+                "ssm:GetDocument",
+                "ssm:GetManifest",
+                "ssm:GetParameter",
+                "ssm:ListInstanceAssociations",
+                "ssm:ListTagsForResource",
+                "ssm:PutCalendar",
+                "ssm:PutComplianceItems",
+                "ssm:PutConfigurePackageResult",
+                "ssm:PutInventory",
+                "ssm:RemoveTagsFromResource",
+                "ssm:StartAccessRequest",
+                "ssm:StartExecutionPreview",
+                "ssm:UpdateInstance*"
+            ],
+            "Resource": "*"
+        },
+        {
+          "Effect": "Allow",
+          "Action": ["secretsmanager:GetSecretValue"],
+          "Resource": [
+            "arn:aws:secretsmanager:eu-west-2:*:secret:ccms/soa/deploy-*",
+            "arn:aws:secretsmanager:eu-west-2:*:secret:ccms/soa/password",
+            "arn:aws:secretsmanager:eu-west-2:*:secret:ccms/soa/xxsoa/ds/password"
+          ]
+        }
+    ]
+}
+EOF
+}
 
-# resource "aws_iam_role_policy_attachment" "attach_ec2_policy" {
-#   role       = aws_iam_role.ec2_instance_role.name
-#   policy_arn = aws_iam_policy.ec2_instance_policy.arn
-# }
+resource "aws_iam_role_policy_attachment" "attach_ec2_policy" {
+  role       = aws_iam_role.ec2_instance_role.name
+  policy_arn = aws_iam_policy.ec2_instance_policy.arn
+}
 
 # resource "aws_iam_role_policy_attachment" "attach_s3_policy" {
 #   role       = aws_iam_role.ec2_instance_role.name
