@@ -48,8 +48,8 @@ data "aws_iam_policy_document" "replication-policy" {
     effect = "Allow"
     actions = [
       "s3:GetReplicationConfiguration",
-      "s3:ListBucket"
-
+      "s3:ListBucket",
+      "s3:PutInventoryConfiguration",
     ]
     resources = [module.this-bucket.bucket.arn]
   }
