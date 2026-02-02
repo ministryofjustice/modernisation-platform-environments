@@ -56,10 +56,6 @@
         "value": "soa_server1"
       },
       {
-        "name": "adminhostname",
-        "value": "${admin_host}"
-      },
-      {
         "name": "adminport",
         "value": "${admin_server_port}"
       },      
