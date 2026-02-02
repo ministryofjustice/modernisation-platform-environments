@@ -182,6 +182,28 @@ locals {
           oasys-national-reporting-environment = "t2"
         })
       })
+
+      t2-onr-weboidc-1 = merge(local.ec2_instances.bip_web, {
+        config = merge(local.ec2_instances.bip_web.config, {
+          availability_zone = "eu-west-2b"
+          instance_profile_policies = concat(local.ec2_instances.bip_web.config.instance_profile_policies, [
+            "Ec2T2ReportingPolicy",
+          ])
+        })
+        instance = merge(local.ec2_instances.bip_web.instance, {
+          instance_type = "r6i.large"
+        })
+        user_data_cloud_init = merge(local.ec2_instances.bip_web.user_data_cloud_init, {
+          args = merge(local.ec2_instances.bip_web.user_data_cloud_init.args, {
+            branch = "TM-1865/onr/web-oidc-v1"
+          })
+        })
+        tags = merge(local.ec2_instances.bip_web.tags, {
+          instance-scheduling                  = "skip-scheduling"
+          oasys-national-reporting-environment = "t2"
+          server-type                          = "onr-weboidc"
+        })
+      })
     }
 
     fsx_windows = {
