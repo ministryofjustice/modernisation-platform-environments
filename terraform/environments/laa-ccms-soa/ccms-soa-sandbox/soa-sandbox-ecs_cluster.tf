@@ -216,7 +216,7 @@ resource "aws_ecs_service" "soasandbox-managed" {
 #   }
 
   depends_on = [
-    aws_lb_listener.managed80,
+    # aws_lb_listener.managed80,
     aws_iam_role_policy_attachment.ecs_task_execution_role,
     aws_ecs_service.admin,
   ]
