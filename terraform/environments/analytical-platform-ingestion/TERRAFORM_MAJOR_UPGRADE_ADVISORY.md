@@ -578,7 +578,24 @@ Apply same version change `3.1.1` → `4.2.0` to:
 ### Implementation Summary
 - ✅ **Branch Created:** `terraform-maintenance-major/analytical-platform-ingestion/20260202-121803`
 - ✅ **Changes Committed:** All module upgrades and refactoring applied
+- ✅ **Provider Conflicts Fixed:** AWS provider constraints aligned to `~> 6.0` (commit fc93a89b4)
+- ✅ **KMS Grants Fixed:** Applied `nonsensitive()` wrapper to resolve for_each sensitivity (commit d111e4ac7)
 - ✅ **Pull Request Created:** [PR #15300](https://github.com/ministryofjustice/modernisation-platform-environments/pull/15300) (Draft)
+
+### Post-Implementation Fixes
+
+Two critical issues were discovered and resolved during terraform validation:
+
+1. **AWS Provider Constraint Conflicts** (commit fc93a89b4)
+   - **Issue:** Subdirectories had incompatible provider versions (`~> 5.0` vs `~> 6.0`)
+   - **Files Fixed:** `dms/versions.tf`, `modules/dms/terraform.tf`
+   - **Solution:** Updated all provider constraints to `~> 6.0`
+
+2. **KMS Grant Sensitivity Issues** (commit d111e4ac7)
+   - **Issue:** KMS v4 module rejects sensitive values in `for_each` arguments
+   - **Files Fixed:** `dms/kms-keys.tf`, `modules/dms/kms-keys.tf`
+   - **Solution:** Wrapped role ARNs with `nonsensitive()` function
+   - **Rationale:** IAM role ARNs are resource identifiers, not secrets
 
 ### Testing & Deployment
 
@@ -593,6 +610,11 @@ Apply same version change `3.1.1` → `4.2.0` to:
    terraform init -upgrade
    terraform plan
    ```
+   
+   **Note:** Full terraform plan validation requires AWS credentials. Testing should be performed in:
+   - CI/CD pipeline with appropriate AWS access
+   - Local environment with configured AWS credentials
+   - Development workspace with proper authentication
 
 3. **Development Environment:**
    - Apply changes to development environment first
