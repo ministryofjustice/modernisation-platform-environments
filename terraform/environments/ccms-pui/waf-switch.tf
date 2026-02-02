@@ -2,28 +2,27 @@
 # locals {
 #   env = "data-${local.environment}"
 # }
-# 
+#
 # variable "scope" {
 #   default = "REGIONAL"
 # }
-# 
+#
 # variable "rule_name" {
 #   default = "ccms-pui-waf-ip-set"
 # }
-
-data "archive_file" "waf_toggle_zip" {
-  type        = "zip"
-  source_file = "${path.module}/lambda/waf_lambda_function.py"
-  output_path = "${path.module}/lambda/waf_lambda_function.zip"
-}
-
+#
+# data "archive_file" "waf_toggle_zip" {
+#   type        = "zip"
+#   source_file = "${path.module}/lambda/waf_lambda_function.py"
+#   output_path = "${path.module}/lambda/waf_lambda_function.zip"
+# }
+#
 # # Pull an existing WAF Rule Group and rules using a dynamic name.
 # data "aws_wafv2_web_acl" "waf_web_acl" {
 #   name  = "ccms-pui-web-acl"
 #   scope = "REGIONAL"
 # }
-# 
-# 
+#
 # #Create IAM Role and Policy for Lambda
 # resource "aws_iam_role" "waf_lambda_role" {
 #   name = "waf-toggle-role-${local.environment}"
@@ -36,7 +35,7 @@ data "archive_file" "waf_toggle_zip" {
 #     }]
 #   })
 # }
-# 
+#
 # # Create IAM Role Policy for Lambda
 # resource "aws_iam_role_policy" "waf_lambda_policy" {
 #   name = "waf-toggle-policy-${local.environment}"
@@ -57,55 +56,55 @@ data "archive_file" "waf_toggle_zip" {
 #   })
 # }
 
-resource "aws_lambda_function" "waf_toggle" {
-  function_name    = "waf-toggle-${local.environment}"
-  role             = aws_iam_role.waf_lambda_role.arn
-  filename         = data.archive_file.waf_toggle_zip.output_path
-  source_code_hash = data.archive_file.waf_toggle_zip.output_base64sha256
-  handler          = "waf_lambda_function.lambda_handler"
-  runtime          = "python3.13"
-  timeout          = 30
-  environment {
-    variables = {
-      SCOPE            = var.scope
-      WEB_ACL_NAME     = data.aws_wafv2_web_acl.waf_web_acl.name
-      WEB_ACL_ID       = data.aws_wafv2_web_acl.waf_web_acl.id
-      RULE_NAME        = var.rule_name
-      CUSTOM_BODY_NAME = "maintenance_html"
-      CUSTOM_BODY_HTML = <<EOT
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<title>Maintenance</title>
-<style>
-body {
-  font-family: sans-serif;
-  background: #0b1a2b;
-  color: #fff;
-  text-align: center;
-  padding: 4rem;
-}
-.card {
-  max-width: 600px;
-  margin: auto;
-  background: #12243a;
-  padding: 2rem;
-  border-radius: 10px;
-}
-</style>
-</head>
-<body>
-<div class="card">
-  <h1>Service Offline</h1>
-  <p><strong>CCMS is available from 07:00 to 21:30 UK time.It is not available on bank holidays.</strong></p>
-</div>
-</body>
-</html>
-EOT
-    }
-  }
-}
+# resource "aws_lambda_function" "waf_toggle" {
+#   function_name    = "waf-toggle-${local.environment}"
+#   role             = aws_iam_role.waf_lambda_role.arn
+#   filename         = data.archive_file.waf_toggle_zip.output_path
+#   source_code_hash = data.archive_file.waf_toggle_zip.output_base64sha256
+#   handler          = "waf_lambda_function.lambda_handler"
+#   runtime          = "python3.13"
+#   timeout          = 30
+#   environment {
+#     variables = {
+#       SCOPE            = var.scope
+#       WEB_ACL_NAME     = data.aws_wafv2_web_acl.waf_web_acl.name
+#       WEB_ACL_ID       = data.aws_wafv2_web_acl.waf_web_acl.id
+#       RULE_NAME        = var.rule_name
+#       CUSTOM_BODY_NAME = "maintenance_html"
+#       CUSTOM_BODY_HTML = <<EOT
+# <!doctype html>
+# <html lang="en">
+# <head>
+# <meta charset="utf-8">
+# <title>Maintenance</title>
+# <style>
+# body {
+#   font-family: sans-serif;
+#   background: #0b1a2b;
+#   color: #fff;
+#   text-align: center;
+#   padding: 4rem;
+# }
+# .card {
+#   max-width: 600px;
+#   margin: auto;
+#   background: #12243a;
+#   padding: 2rem;
+#   border-radius: 10px;
+# }
+# </style>
+# </head>
+# <body>
+# <div class="card">
+#   <h1>Service Offline</h1>
+#   <p><strong>CCMS is available from 07:00 to 21:30 UK time.It is not available on bank holidays.</strong></p>
+# </div>
+# </body>
+# </html>
+# EOT
+#     }
+#   }
+# }
 
 # EventBridge scheduled rules Daily Monday-Sunday to trigger Lambda
 # resource "aws_cloudwatch_event_rule" "waf_allow_0700_uk" {
