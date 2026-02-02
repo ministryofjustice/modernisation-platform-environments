@@ -108,14 +108,67 @@ data "aws_iam_policy_document" "coat_cur_v2_hourly_dev_bucket_policy" {
     effect = "Allow"
     actions = [
       "s3:GetObject",
+      "s3:PutObject",
+      "s3:ListBucket",
+      "s3:GetBucketLocation",
+      "s3:ListBucketMultipartUploads",
+      "s3:ListMultipartUploadParts",
+      "s3:AbortMultipartUpload"
+    ]
+    resources = [
+      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/ctas/fct-daily-cost/*",
+      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly",
+      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/*"
+    ]
+    principals {
+      type = "Service"
+      identifiers = [
+        "athena.amazonaws.com",
+        "glue.amazonaws.com"
+      ]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceAccount"
+      values   = [data.aws_caller_identity.current.account_id]
+    }
+  }
+  statement {
+    sid    = "S3SyncCOATProdDev"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:ListBucket",
       "s3:PutObject"
     ]
     resources = [
       "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/athena-results/*"
+      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/*",
+      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly"
     ]
     principals {
       type        = "Service"
       identifiers = ["athena.amazonaws.com"]
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::279191903737:root"]
+    }
+  }
+  statement {
+    sid    = "RAGLambdaAccess"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:ListBucket",
+      "s3:GetBucketLocation"
+    ]
+    resources = [
+      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly",
+      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/*"
+    ]
+    principals {
+      type        = "AWS"
+      identifiers = [aws_iam_role.rag_lambda_role.arn]
     }
   }
 }
@@ -201,7 +254,8 @@ data "aws_iam_policy_document" "coat_cur_v2_hourly_prod_bucket_policy" {
       "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/athena-results/*",
       "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/moj-cost-and-usage-reports/*",
       "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly",
-      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/*"
+      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/*",
+      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/ctas/fct-daily-cost/*"
     ]
     principals {
       type = "Service"
@@ -214,6 +268,24 @@ data "aws_iam_policy_document" "coat_cur_v2_hourly_prod_bucket_policy" {
       test     = "StringEquals"
       variable = "aws:SourceAccount"
       values   = [data.aws_caller_identity.current.account_id]
+    }
+  }
+  statement {
+    sid    = "RAGLambdaAccess"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:ListBucket",
+      "s3:GetBucketLocation"
+    ]
+    resources = [
+      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly",
+      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/*"
+    ]
+    principals {
+      type        = "AWS"
+      identifiers = [aws_iam_role.rag_lambda_role.arn]
     }
   }
 }
