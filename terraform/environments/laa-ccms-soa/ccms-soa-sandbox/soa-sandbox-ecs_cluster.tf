@@ -61,7 +61,7 @@ resource "aws_ecs_task_definition" "soasandbox-admin" {
       admin_server_port    = local.application_data.accounts[local.environment].admin_server_port
       aws_region           = local.application_data.accounts[local.environment].aws_region
       container_version    = local.application_data.accounts[local.environment].admin_container_version
-      soa_password         = "${aws_secretsmanager_secret.soasandbox-password.arn}:ccms/soasandbox/password::"
+      soa_password         = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:ccms/soasandbox/password::"
       db_user              = local.application_data.accounts[local.environment].soa_db_user
       db_role              = local.application_data.accounts[local.environment].soa_db_role
       db_instance_endpoint = aws_db_instance.soa_db.endpoint
@@ -71,17 +71,17 @@ resource "aws_ecs_task_definition" "soasandbox-admin" {
       xxsoa_ds_db          = local.application_data.accounts[local.environment].tds_ds_db
       xxsoa_ds_username    = local.application_data.accounts[local.environment].admin_xxsoa_ds_username
       xxsoa_ds_url         = local.application_data.accounts[local.environment].xxsoa_ds_url
-      xxsoa_ds_password    = "${aws_secretsmanager_secret.soasandbox-password.arn}:ccms/soasandbox/xxsoa/ds/password::"
+      xxsoa_ds_password    = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:ccms/soasandbox/xxsoa/ds/password::"
       ebs_ds_url           = local.application_data.accounts[local.environment].admin_ebs_ds_url
       ebs_ds_username      = local.application_data.accounts[local.environment].admin_ebs_ds_username
-      ebs_ds_password      = "${aws_secretsmanager_secret.soasandbox-password.arn}:ccms/soasandbox/ebs/ds/password::"
+      ebs_ds_password      = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:ccms/soasandbox/ebs/ds/password::"
       trust_store_password = aws_secretsmanager_secret.trust_store_password.arn
       ebssms_ds_url        = local.application_data.accounts[local.environment].admin_ebssms_ds_url
       ebssms_ds_username   = local.application_data.accounts[local.environment].admin_ebs_ds_username
-      ebssms_ds_password   = "${aws_secretsmanager_secret.soasandbox-password.arn}:ccms/soasandbox/ebs/sms/ds/password::"
-      pui_user_password    = "${aws_secretsmanager_secret.soasandbox-password.arn}:ccms/soasandbox/pui/user/password::"
+      ebssms_ds_password   = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:ccms/soasandbox/ebs/sms/ds/password::"
+      pui_user_password    = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:ccms/soasandbox/pui/user/password::"
       ebs_user_username    = local.application_data.accounts[local.environment].admin_ebs_user_username
-      ebs_user_password    = "${aws_secretsmanager_secret.soasandbox-password.arn}:ccms/soasandbox/ebs/user/password::"
+      ebs_user_password    = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:ccms/soasandbox/ebs/user/password::"
       run_rcu              = local.application_data.accounts[local.environment].admin_run_rcu_bootstrap
     }
   )
@@ -170,8 +170,8 @@ resource "aws_ecs_task_definition" "soasandbox-managed" {
       aws_region           = local.application_data.accounts[local.environment].aws_region
       container_version    = local.application_data.accounts[local.environment].managed_container_version
       admin_host           = aws_route53_record.admin.fqdn
-      soa_password         = "${aws_secretsmanager_secret.soasandbox-password.arn}:ccms/soasandbox/password::"
-      trust_store_password = "${aws_secretsmanager_secret.soasandbox-password.arn}:ccms/soasandbox/java/trust-store/password::"
+      soa_password         = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:ccms/soasandbox/password::"
+      trust_store_password = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:ccms/soasandbox/java/trust-store/password::"
       ms_hostname          = aws_route53_record.managed.fqdn
       wl_mem_args          = local.application_data.accounts[local.environment].managed_wl_mem_args
     }
