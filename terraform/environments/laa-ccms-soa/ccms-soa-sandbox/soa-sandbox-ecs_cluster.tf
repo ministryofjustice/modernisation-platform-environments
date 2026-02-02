@@ -75,7 +75,7 @@ resource "aws_ecs_task_definition" "soasandbox-admin" {
       ebs_ds_url           = local.application_data.accounts[local.environment].admin_ebs_ds_url
       ebs_ds_username      = local.application_data.accounts[local.environment].admin_ebs_ds_username
       ebs_ds_password      = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:ccms/soasandbox/ebs/ds/password::"
-      trust_store_password = aws_secretsmanager_secret.trust_store_password.arn
+      trust_store_password = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:ccms/soasandbox/java/trust-store/password::"
       ebssms_ds_url        = local.application_data.accounts[local.environment].admin_ebssms_ds_url
       ebssms_ds_username   = local.application_data.accounts[local.environment].admin_ebs_ds_username
       ebssms_ds_password   = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:ccms/soasandbox/ebs/sms/ds/password::"
@@ -169,10 +169,10 @@ resource "aws_ecs_task_definition" "soasandbox-managed" {
       admin_server_port    = local.application_data.accounts[local.environment].admin_server_port
       aws_region           = local.application_data.accounts[local.environment].aws_region
       container_version    = local.application_data.accounts[local.environment].managed_container_version
-      admin_host           = aws_route53_record.admin.fqdn
+    #   admin_host           = aws_route53_record.admin.fqdn
       soa_password         = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:ccms/soasandbox/password::"
       trust_store_password = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:ccms/soasandbox/java/trust-store/password::"
-      ms_hostname          = aws_route53_record.managed.fqdn
+    #   ms_hostname          = aws_route53_record.managed.fqdn
       wl_mem_args          = local.application_data.accounts[local.environment].managed_wl_mem_args
     }
   )
