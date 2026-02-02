@@ -52,10 +52,6 @@
         "value": "soa"
       },
       {
-        "name": "ADMIN_HOST",
-        "value": "${as_hostname}"
-      },
-      {
         "name": "CONFIG_JVM_ARGS",
         "value": " -Djava.security.egd=file:/tmp/big.random.file"
       },
