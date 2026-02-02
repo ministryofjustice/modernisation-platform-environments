@@ -107,7 +107,7 @@ variable "cloud-platform-crime-matching-algorithm-iam-dev" {
 variable "cloud-platform-emdi-iam-dev" {
   type        = string
   description = "IAM role that the EDMI API in Cloud Platform will use to connect to this role."
-  default     = ""
+  default     = "arn:aws:iam::754256621582:role/cloud-platform-irsa-18caab25332f152c-live"
 }
 
 
