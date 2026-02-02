@@ -10,13 +10,13 @@
 # variable "rule_name" {
 #   default = "ccms-pui-waf-ip-set"
 # }
-# 
-# data "archive_file" "waf_toggle_zip" {
-#   type        = "zip"
-#   source_file = "${path.module}/lambda/waf_lambda_function.py"
-#   output_path = "${path.module}/lambda/waf_lambda_function.zip"
-# }
-# 
+
+data "archive_file" "waf_toggle_zip" {
+  type        = "zip"
+  source_file = "${path.module}/lambda/waf_lambda_function.py"
+  output_path = "${path.module}/lambda/waf_lambda_function.zip"
+}
+
 # # Pull an existing WAF Rule Group and rules using a dynamic name.
 # data "aws_wafv2_web_acl" "waf_web_acl" {
 #   name  = "ccms-pui-web-acl"
