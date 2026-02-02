@@ -39,7 +39,7 @@ resource "aws_db_instance" "soa_db" {
   multi_az                            = local.application_data.accounts[local.environment].soa_db_deploy_to_multi_azs
   db_name                             = "SOADB"
   username                            = local.application_data.accounts[local.environment].soa_db_user
-  password                            = data.aws_secretsmanager_secret_version.soa_password.secret_string
+  password                            = jsondecode(data.aws_secretsmanager_secret_version.soa_password.secret_string)["ccms/soasandbox/password"]
   port                                = "1521"
   kms_key_id                          = data.aws_kms_key.rds_shared.arn
   storage_encrypted                   = true
