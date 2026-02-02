@@ -68,6 +68,24 @@ module "weblogic_eis" {
 
   bastion_sg_id = module.bastion_linux.bastion_security_group
 
+  ecs_service_egress_security_group_ids = [
+    {
+      ip_protocol = "tcp"
+      port        = 389
+      cidr_ipv4   = var.account_config.shared_vpc_cidr
+    },
+    {
+      ip_protocol = "udp"
+      port        = 389
+      cidr_ipv4   = var.account_config.shared_vpc_cidr
+    },
+    {
+      ip_protocol = "tcp"
+      port        = 1521
+      cidr_ipv4   = var.account_config.shared_vpc_cidr
+    }
+  ]
+
   log_error_pattern       = ""
   sns_topic_arn           = aws_sns_topic.delius_core_alarms.arn
   frontend_lb_arn_suffix  = aws_lb.delius_core_frontend.arn_suffix
