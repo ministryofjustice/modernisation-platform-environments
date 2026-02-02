@@ -1,6 +1,29 @@
 resource "aws_secretsmanager_secret" "soa_sandbox_secrets" {
-  name        = "ccms/soasandbox/password"
+  name        = "soasandbox-password"
   description = "SOA Weblogic,EM Console for user weblogic, RDS Database Password for SOAPDB admin, PUI and other passwords in Key values"
+}
+
+resource "aws_secretsmanager_secret_version" "sandbox_ccms_soa_secrets_version" {
+  secret_id = aws_secretsmanager_secret.soa_sandbox_secrets.id
+
+  secret_string = jsonencode({
+    slack_channel_webhook           = "",
+    slack_channel_webhook_guardduty = "",
+    "ccms/soasandbox/password"         = "",
+    "ccms/soasandbox/xxsoa/ds/password" = "",
+    "ccms/soasandbox/ebs/ds/password"  = "",
+    "ccms/soasandbox/ebs/sms/ds/password" = "",
+    "ccms/soasandbox/pui/user/password" = "",
+    "ccms/soasandbox/ebs/user/password" = "",
+    "ccms/soasandbox/deploy-github-ssh-key" = "",
+    "ccms/soasandbox/java/trust-store/password" = ""
+  })
+
+  # lifecycle {
+  #   ignore_changes = [
+  #     secret_string
+  #   ]
+  # }
 }
 
 data "aws_secretsmanager_secret_version" "soa_password" {
@@ -72,26 +95,5 @@ data "aws_secretsmanager_secret_version" "soa_password" {
 #   })
 # }
 
-resource "aws_secretsmanager_secret_version" "sandbox_ccms_soa_quiesced_secrets_version" {
-  secret_id = aws_secretsmanager_secret.soa_sandbox_secrets.id
 
-  secret_string = jsonencode({
-    slack_channel_webhook           = "",
-    slack_channel_webhook_guardduty = "",
-    "ccms/soasandbox/password"         = "",
-    "ccms/soasandbox/xxsoa/ds/password" = "",
-    "ccms/soasandbox/ebs/ds/password"  = "",
-    "ccms/soasandbox/ebs/sms/ds/password" = "",
-    "ccms/soasandbox/pui/user/password" = "",
-    "ccms/soasandbox/ebs/user/password" = "",
-    "ccms/soasandbox/deploy-github-ssh-key" = "",
-    "ccms/soasandbox/java/trust-store/password" = ""
-  })
-
-  # lifecycle {
-  #   ignore_changes = [
-  #     secret_string
-  #   ]
-  # }
-}
 
