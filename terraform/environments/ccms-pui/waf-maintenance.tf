@@ -8,7 +8,7 @@ variable "scope" {
 }
 
 variable "rule_name" {
-  default = "ebs-trusted-rule-ip-set"
+  default = "ccms-pui-waf-ip-set"
 }
 
 data "archive_file" "waf_maintenance_zip" {
