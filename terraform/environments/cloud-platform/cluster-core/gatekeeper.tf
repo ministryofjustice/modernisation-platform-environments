@@ -1,5 +1,5 @@
 module "gatekeeper" {
-  count  = contains(local.enabled_workspaces, local.cluster_environment) ? 1 : 0
+  count  = contains(["development_cluster"], local.cluster_environment) ? 1 : 0
   source = "github.com/ministryofjustice/cloud-platform-terraform-gatekeeper?ref=cp30-baseline"
 
   # boolean expression for applying opa valid hostname for test clusters only.
