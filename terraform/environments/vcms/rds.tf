@@ -18,7 +18,7 @@ resource "aws_db_instance" "mariadb" {
   skip_final_snapshot    = true
   storage_encrypted      = true
   lifecycle {
-    prevent_destroy = false
+    prevent_destroy = true
   }
 }
 
