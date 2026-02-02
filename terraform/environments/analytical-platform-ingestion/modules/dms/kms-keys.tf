@@ -17,11 +17,11 @@ module "bucket_kms" {
       operations        = ["Encrypt", "Decrypt", "GenerateDataKey"]
     }
     metadata_generator = {
-      grantee_principal = module.metadata_generator.lambda_role_arn
+      grantee_principal = nonsensitive(module.metadata_generator.lambda_role_arn)
       operations        = ["Encrypt", "Decrypt", "GenerateDataKey"]
     }
     validation = {
-      grantee_principal = module.validation_lambda_function.lambda_role_arn
+      grantee_principal = nonsensitive(module.validation_lambda_function.lambda_role_arn)
       operations        = ["Encrypt", "Decrypt", "GenerateDataKey"]
     }
   }

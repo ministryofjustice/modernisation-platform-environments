@@ -252,6 +252,32 @@ During implementation, provider constraint conflicts were discovered in subdirec
 - All DMS modules and submodules now require AWS provider v6.x
 - Terraform version requirement also updated to `>= 1.5.7` in `modules/dms/terraform.tf`
 
+### ⚠️ Critical Fix #2: KMS Grant Sensitivity Issue
+
+During terraform plan, a second issue was discovered related to the KMS v4 upgrade:
+
+**Issue:** KMS v4 module now enforces stricter validation on `for_each` arguments:
+```
+Error: Invalid for_each argument
+Sensitive values, or values derived from sensitive values, cannot be used
+as for_each arguments.
+```
+
+**Root Cause:**
+- IAM role ARNs from DMS and Lambda modules are marked as sensitive outputs
+- KMS module v4 uses `for_each` over the `grants` map
+- Terraform now rejects sensitive values in `for_each` to prevent key exposure
+
+**Resolution:** Wrapped sensitive role ARNs with `nonsensitive()` function in grants configuration:
+- `dms/kms-keys.tf`: Updated `cica_dms_credentials_kms` and `cica_dms_eventscheduler_kms` modules
+- `modules/dms/kms-keys.tf`: Updated `bucket_kms` module
+
+**Rationale:** IAM role ARNs are AWS resource identifiers (not secrets), safe to expose as resource keys.
+
+**Files Modified:**
+- `dms/kms-keys.tf` (2 KMS modules with grants)
+- `modules/dms/kms-keys.tf` (1 KMS module with grants)
+
 ### Change Set Summary:
 
 | File | Change Type | Description |
@@ -259,16 +285,18 @@ During implementation, provider constraint conflicts were discovered in subdirec
 | `versions.tf` | Provider Constraint | AWS provider `~> 6.0` (already correct) |
 | `dms/versions.tf` | Provider Constraint | AWS provider `~> 5.0, != 5.86.0` → `~> 6.0` |
 | `modules/dms/terraform.tf` | Provider Constraint | AWS provider `~> 5.0` → `~> 6.0`, Terraform `>= 1.0.0` → `>= 1.5.7` |
+| `dms/kms-keys.tf` | Sensitivity Fix | Wrap role ARNs with `nonsensitive()` in 2 KMS modules |
+| `modules/dms/kms-keys.tf` | Sensitivity Fix | Wrap role ARNs with `nonsensitive()` in 1 KMS module |
 | `sns.tf` | Version + Refactor | SNS v6.2.0 → v7.1.0, `conditions` → `condition` |
 | `kms-keys.tf` | Version Update | 17 KMS modules v3.1.1 → v4.2.0 |
-| `dms/kms-keys.tf` | Version Update | KMS v3.1.1 → v4.2.0 |
+| `dms/kms-keys.tf` | Version Update | KMS v3.1.1 → v4.2.0 (2 modules) |
 | `modules/dms/kms-keys.tf` | Version Update | KMS v3.1.1 → v4.2.0 |
 | `secrets.tf` | Version Update | KMS v3.1.1 → v4.2.0 (if present) |
 | `dms/secrets.tf` | Version Update | KMS v3.1.1 → v4.2.0 (if present) |
 | `modules/dms/metadata-generator.tf` | Git Ref Update | Lambda ref v7.20.1 → v8.4.0 |
 | `modules/dms/validation.tf` | Git Ref Update | Lambda ref v7.20.1 → v8.4.0 |
 
-**Total:** 26 files requiring changes (24 module updates + 2 provider constraint fixes)
+**Total:** 28 changes across 10 files (24 module updates + 2 provider fixes + 3 sensitivity fixes)
 
 ### Detailed Diffs:
 
@@ -302,7 +330,61 @@ During implementation, provider constraint conflicts were discovered in subdirec
   }
 ```
 
-#### File 3: sns.tf (Version + Code Refactoring)
+#### File 3: dms/kms-keys.tf (KMS Grant Sensitivity Fixes)
+
+```diff
+  module "cica_dms_credentials_kms" {
+    grants = {
+      tariff_dms_source = {
+-       grantee_principal = module.cica_dms_tariff_dms_implementation.dms_source_role_arn
++       grantee_principal = nonsensitive(module.cica_dms_tariff_dms_implementation.dms_source_role_arn)
+        operations        = ["Encrypt", "Decrypt", "GenerateDataKey"]
+      }
+      tempus_dms_casework_source = {
+-       grantee_principal = module.cica_dms_tempus_dms_implementation["CaseWork"].dms_source_role_arn
++       grantee_principal = nonsensitive(module.cica_dms_tempus_dms_implementation["CaseWork"].dms_source_role_arn)
+        operations        = ["Encrypt", "Decrypt", "GenerateDataKey"]
+      }
+      # ... similar changes for other grants
+    }
+  }
+  
+  module "cica_dms_eventscheduler_kms" {
+    grants = {
+      tariff_dms_source = {
+-       grantee_principal = module.tariff_eventbridge_dms_full_load_task_role.iam_role_arn
++       grantee_principal = nonsensitive(module.tariff_eventbridge_dms_full_load_task_role.iam_role_arn)
+        operations        = ["Encrypt", "Decrypt", "GenerateDataKey"]
+      }
+      # ... similar changes for other grants
+    }
+  }
+```
+
+#### File 4: modules/dms/kms-keys.tf (KMS Grant Sensitivity Fixes)
+
+```diff
+  module "bucket_kms" {
+    grants = {
+      dms_task = {
+        grantee_principal = aws_iam_role.dms.arn
+        operations        = ["Encrypt", "Decrypt", "GenerateDataKey"]
+      }
+      metadata_generator = {
+-       grantee_principal = module.metadata_generator.lambda_role_arn
++       grantee_principal = nonsensitive(module.metadata_generator.lambda_role_arn)
+        operations        = ["Encrypt", "Decrypt", "GenerateDataKey"]
+      }
+      validation = {
+-       grantee_principal = module.validation_lambda_function.lambda_role_arn
++       grantee_principal = nonsensitive(module.validation_lambda_function.lambda_role_arn)
+        operations        = ["Encrypt", "Decrypt", "GenerateDataKey"]
+      }
+    }
+  }
+```
+
+#### File 5: sns.tf (Version + Code Refactoring)
 
 ```diff
   module "quarantined_topic" {
