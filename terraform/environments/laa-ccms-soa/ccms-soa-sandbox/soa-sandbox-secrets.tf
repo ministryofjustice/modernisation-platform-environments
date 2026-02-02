@@ -1,10 +1,10 @@
-resource "aws_secretsmanager_secret" "soa_sandbox_password" {
+resource "aws_secretsmanager_secret" "soa_sandbox_secrets" {
   name        = "ccms/soasandbox/password"
-  description = "SOA Weblogic EM Console for user weblogic and RDS Database Password for SOAPDB admin" #--The same password shared between the SOA DB
-}                                                                                                      #  and weblogic. Don't like that. Revisit. AW
+  description = "SOA Weblogic,EM Console for user weblogic, RDS Database Password for SOAPDB admin, PUI and other password in Key values"
+}
 
 data "aws_secretsmanager_secret_version" "soa_password" {
-  secret_id = aws_secretsmanager_secret.soa_sandbox_password.id
+  secret_id = aws_secretsmanager_secret.soa_sandbox_secrets.id
 }
 
 # resource "aws_secretsmanager_secret" "xxsoa_sandbox_ds_password" {
@@ -73,7 +73,7 @@ data "aws_secretsmanager_secret_version" "soa_password" {
 # }
 
 resource "aws_secretsmanager_secret_version" "sandbox_ccms_soa_quiesced_secrets_version" {
-  secret_id = aws_secretsmanager_secret.soa_sandbox_password.id
+  secret_id = aws_secretsmanager_secret.soa_sandbox_secrets.id
 
   secret_string = jsonencode({
     slack_channel_webhook           = "",
@@ -88,10 +88,10 @@ resource "aws_secretsmanager_secret_version" "sandbox_ccms_soa_quiesced_secrets_
     "ccms/soasandbox/java/trust-store/password" = ""
   })
 
-  lifecycle {
-    ignore_changes = [
-      secret_string
-    ]
-  }
+  # lifecycle {
+  #   ignore_changes = [
+  #     secret_string
+  #   ]
+  # }
 }
 
