@@ -213,6 +213,8 @@ resource "aws_security_group_rule" "ecsint_toecs_ecsext_datadog_rule_udp" {
   description              = "Datadog from ECS Internal to ECS External"
 }
 
+###Additional rules for ECS services can be added below as needed
+
 resource "aws_security_group_rule" "autoscaling_toecs_ecsext" {
   type                     = "ingress"
   from_port                = 8080
@@ -221,4 +223,34 @@ resource "aws_security_group_rule" "autoscaling_toecs_ecsext" {
   security_group_id        = aws_security_group.common_ecs_service_external.id
   source_security_group_id = module.autoscaling_sg.security_group_id
   description              = "Inbound from Autoscaling to ECS External"
+}
+
+resource "aws_security_group_rule" "ecsint_toecs_autoscaling_datadog_rule_udp" {
+  type                     = "ingress"
+  from_port                = 8125
+  to_port                  = 8125
+  protocol                 = "udp"
+  security_group_id        = module.autoscaling_sg.security_group_id
+  source_security_group_id = aws_security_group.common_ecs_service_internal.id
+  description              = "Datadog from ECS Internal to ECS External"
+}
+
+resource "aws_security_group_rule" "ecsext_toecs_autoscaling_datadog_rule" {
+  type                     = "ingress"
+  from_port                = 8126
+  to_port                  = 8126
+  protocol                 = "tcp"
+  security_group_id        = module.autoscaling_sg.security_group_id
+  source_security_group_id = aws_security_group.common_ecs_service_external.id
+  description              = "Datadog from ECS External to Autoscaling"
+}
+
+resource "aws_security_group_rule" "ecsint_toecs_autoscaling_datadog_rule" {
+  type                     = "ingress"
+  from_port                = 8126
+  to_port                  = 8126
+  protocol                 = "tcp"
+  security_group_id        = module.autoscaling_sg.security_group_id
+  source_security_group_id = aws_security_group.common_ecs_service_internal.id
+  description              = "Datadog from ECS Internal to Autoscaling"
 }
