@@ -147,8 +147,6 @@ data "aws_iam_policy_document" "coat_cur_v2_hourly_dev_bucket_policy" {
       "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly"
     ]
     principals {
-      type        = "Service"
-      identifiers = ["athena.amazonaws.com"]
       type        = "AWS"
       identifiers = ["arn:aws:iam::279191903737:root"]
     }
