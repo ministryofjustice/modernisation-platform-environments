@@ -120,7 +120,7 @@ resource "aws_ecs_service" "soasandbox-admin" {
 
   load_balancer {
     target_group_arn = aws_lb_target_group.admin.id
-    container_name   = "${local.component_name}-${local.environment}-admin"
+    container_name   = "${local.application_data.accounts[local.environment].app_name}-admin"
     container_port   = local.application_data.accounts[local.environment].admin_server_port
   }
 
@@ -211,7 +211,7 @@ resource "aws_ecs_service" "soasandbox-managed" {
 
   load_balancer {
     target_group_arn = aws_lb_target_group.managed.id
-    container_name   = "${local.component_name}-${local.environment}-managed"
+    container_name   = "${local.application_data.accounts[local.environment].app_name}-managed"
     container_port   = local.application_data.accounts[local.environment].managed_server_port
   }
 
