@@ -18,6 +18,11 @@ variable "external_alb_name" {
   type        = string
 }
 
+variable "connectivity_alb_name" {
+  description = "The name of the connectivity ALB"
+  type        = string
+}
+
 variable "tags" {
   description = "A map of tags to add to all resources"
   type        = map(string)
@@ -30,6 +35,12 @@ variable "project_name" {
 
 variable "internal_listener_port" {
   description = "The port of the internal ALB listener"
+  type        = number
+  default     = 8080
+}
+
+variable "connectivity_listener_port" {
+  description = "The port of the connectivity ALB listener"
   type        = number
   default     = 8080
 }
