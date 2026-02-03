@@ -638,3 +638,34 @@ module "create_fms_general_batch_replication_job" {
     METADATA_BUCKET_ARN = module.s3-metadata-bucket.bucket.arn
   }
 }
+
+# ------------------------------------------------------------------------------
+# Lambda: cloudwatch_alarm_threader
+# ------------------------------------------------------------------------------
+
+module "cloudwatch_alarm_threader" {
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "cloudwatch_alarm_threader"
+  role_name                      = aws_iam_role.cloudwatch_alarm_threader.name
+  role_arn                       = aws_iam_role.cloudwatch_alarm_threader.arn
+  handler                        = "cloudwatch_alarm_threader.handler"
+  memory_size                    = 512
+  timeout                        = 60
+  reserved_concurrent_executions = 1
+
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+
+  security_group_ids = [aws_security_group.lambda_generic.id]
+  subnet_ids         = data.aws_subnets.shared-public.ids
+
+  environment_variables = {
+    SNS_TOPIC_ARN         = aws_sns_topic.emds_alerts.arn
+    STATE_BUCKET          = local.alarm_thread_state_bucket
+    STATE_PREFIX          = local.alarm_thread_state_prefix
+    ENVIRONMENT           = local.environment_shorthand
+    INCLUDE_REASON        = "true"
+    ENABLE_CUSTOM_ACTIONS = "false"
+  }
+}

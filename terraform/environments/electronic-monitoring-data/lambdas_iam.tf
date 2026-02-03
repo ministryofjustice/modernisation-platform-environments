@@ -1597,3 +1597,58 @@ resource "aws_iam_role_policy_attachment" "bucket_replication_attach" {
   role       = aws_iam_role.bucket_replication[0].name
   policy_arn = aws_iam_policy.bucket_replication[0].arn
 }
+
+# ------------------------------------------------------------------------------
+# IAM role + policy for the alarm threader lambda
+# ------------------------------------------------------------------------------
+
+resource "aws_iam_role" "cloudwatch_alarm_threader" {
+  name               = "cloudwatch_alarm_threader_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+data "aws_iam_policy_document" "cloudwatch_alarm_threader_policy_document" {
+  statement {
+    sid    = "S3StateAccess"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:DeleteObject",
+    ]
+    resources = [
+      "arn:aws:s3:::${local.alarm_thread_state_bucket}/${local.alarm_thread_state_prefix}/${local.environment_shorthand}/*"
+    ]
+  }
+
+  statement {
+    sid    = "AllowPublishToAlertsTopic"
+    effect = "Allow"
+    actions = [
+      "sns:Publish",
+    ]
+    resources = [aws_sns_topic.emds_alerts.arn]
+  }
+
+  # Topic is KMS-encrypted; to match the pattern used by mdss_daily_failure_digest
+  statement {
+    sid    = "AllowUseOfAlertsKmsKey"
+    effect = "Allow"
+    actions = [
+      "kms:GenerateDataKey",
+      "kms:GenerateDataKey*",
+      "kms:Decrypt",
+    ]
+    resources = [aws_kms_key.emds_alerts.arn]
+  }
+}
+
+resource "aws_iam_policy" "cloudwatch_alarm_threader" {
+  name   = "cloudwatch_alarm_threader_lambda_policy"
+  policy = data.aws_iam_policy_document.cloudwatch_alarm_threader_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "cloudwatch_alarm_threader_attach" {
+  role       = aws_iam_role.cloudwatch_alarm_threader.name
+  policy_arn = aws_iam_policy.cloudwatch_alarm_threader.arn
+}
