@@ -48,12 +48,20 @@
     ],
     "environment": [
       {
+        "name": "ADMIN_HOST",
+        "value": "${admin_host}"
+      },
+      {
         "name": "ADMIN_PORT",
         "value": "${admin_server_port}"
       },
       {
         "name": "MANAGED_SERVER",
         "value": "soa_server1"
+      },
+      {
+        "name": "adminhostname",
+        "value": "${admin_host}"
       },
       {
         "name": "adminport",
@@ -70,6 +78,10 @@
       {
         "name": "DOMAIN_ROOT",
         "value": "/u01/oracle/user_projects/domains"
+      },
+      {
+        "name": "MANAGED_HOST",
+        "value": "${ms_hostname}"
       },
       {
         "name": "MS_PORT",
