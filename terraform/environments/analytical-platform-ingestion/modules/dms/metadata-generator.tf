@@ -1,4 +1,5 @@
 #S3 bucket to store source metadata
+# Note: SQLAlchemy downgraded to 1.4.54 for pymssql compatibility (Feb 2026)
 #trivy:ignore:AVD-AWS-0089: No logging required
 resource "aws_s3_bucket" "validation_metadata" {
   #checkov:skip=CKV_AWS_18:Logging not needed
