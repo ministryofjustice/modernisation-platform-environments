@@ -4,11 +4,12 @@ module "transfer_server_iam_role" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
   version = "6.4.0"
 
-  name_prefix = "transfer-server"
+  name            = "transfer-server"
+  use_name_prefix = true
 
   trust_policy_permissions = {
     TransferServiceToAssume = {
-      actions   = ["sts:AssumeRole"]
+      actions = ["sts:AssumeRole"]
       principals = [{
         type        = "Service"
         identifiers = ["transfer.amazonaws.com"]
@@ -17,7 +18,7 @@ module "transfer_server_iam_role" {
   }
 
   policies = {
-    TransferServerPolicy      = module.transfer_server_iam_policy.arn
+    TransferServerPolicy     = module.transfer_server_iam_policy.arn
     AWSTransferLoggingAccess = "arn:aws:iam::aws:policy/service-role/AWSTransferLoggingAccess"
   }
 }
@@ -28,11 +29,12 @@ module "datasync_iam_role" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
   version = "6.4.0"
 
-  name_prefix = "datasync"
+  name            = "datasync"
+  use_name_prefix = true
 
   trust_policy_permissions = {
     DatasyncServiceToAssume = {
-      actions   = ["sts:AssumeRole"]
+      actions = ["sts:AssumeRole"]
       principals = [{
         type        = "Service"
         identifiers = ["datasync.amazonaws.com"]
@@ -55,7 +57,7 @@ module "datasync_replication_iam_role" {
 
   trust_policy_permissions = {
     S3ServiceToAssume = {
-      actions   = ["sts:AssumeRole"]
+      actions = ["sts:AssumeRole"]
       principals = [{
         type        = "Service"
         identifiers = ["s3.amazonaws.com"]
@@ -78,7 +80,7 @@ module "datasync_opg_replication_iam_role" {
 
   trust_policy_permissions = {
     S3ServiceToAssume = {
-      actions   = ["sts:AssumeRole"]
+      actions = ["sts:AssumeRole"]
       principals = [{
         type        = "Service"
         identifiers = ["s3.amazonaws.com"]
@@ -103,7 +105,7 @@ module "guard_duty_malware_s3_scan_iam_role" {
 
   trust_policy_permissions = {
     GuardDutyServiceToAssume = {
-      actions   = ["sts:AssumeRole"]
+      actions = ["sts:AssumeRole"]
       principals = [{
         type        = "Service"
         identifiers = ["malware-protection-plan.guardduty.amazonaws.com"]
@@ -127,7 +129,7 @@ module "datasync_laa_data_analysis_iam_role" {
 
   trust_policy_permissions = {
     DatasyncServiceToAssume = {
-      actions   = ["sts:AssumeRole"]
+      actions = ["sts:AssumeRole"]
       principals = [{
         type        = "Service"
         identifiers = ["datasync.amazonaws.com"]
@@ -151,7 +153,7 @@ module "laa_data_analysis_replication_iam_role" {
 
   trust_policy_permissions = {
     S3ServiceToAssume = {
-      actions   = ["sts:AssumeRole"]
+      actions = ["sts:AssumeRole"]
       principals = [{
         type        = "Service"
         identifiers = ["s3.amazonaws.com", "batchoperations.s3.amazonaws.com"]

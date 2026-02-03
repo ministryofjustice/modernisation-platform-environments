@@ -10,7 +10,7 @@ module "production_replication_cica_dms_iam_role" {
 
   trust_policy_permissions = {
     S3ServiceToAssume = {
-      actions   = ["sts:AssumeRole"]
+      actions = ["sts:AssumeRole"]
       principals = [{
         type        = "Service"
         identifiers = ["s3.amazonaws.com"]
@@ -34,9 +34,9 @@ module "tariff_eventbridge_dms_full_load_task_role" {
 
   trust_policy_permissions = {
     SchedulerServiceToAssume = {
-      actions   = ["sts:AssumeRole"]
+      actions = ["sts:AssumeRole"]
       principals = [{
-        type        = "Service"
+        type = "Service"
         identifiers = [
           "scheduler.amazonaws.com",
           "apidestinations.events.amazonaws.com"
@@ -76,9 +76,9 @@ module "tempus_eventbridge_dms_full_load_task_role" {
 
   trust_policy_permissions = {
     SchedulerServiceToAssume = {
-      actions   = ["sts:AssumeRole"]
+      actions = ["sts:AssumeRole"]
       principals = [{
-        type        = "Service"
+        type = "Service"
         identifiers = [
           "scheduler.amazonaws.com",
           "apidestinations.events.amazonaws.com"

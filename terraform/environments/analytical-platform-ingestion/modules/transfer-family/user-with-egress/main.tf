@@ -68,7 +68,7 @@ module "role" {
 
   trust_policy_permissions = {
     TransferServiceToAssume = {
-      actions   = ["sts:AssumeRole"]
+      actions = ["sts:AssumeRole"]
       principals = [{
         type        = "Service"
         identifiers = ["transfer.amazonaws.com"]
