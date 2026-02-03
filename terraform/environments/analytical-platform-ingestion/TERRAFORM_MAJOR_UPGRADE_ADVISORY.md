@@ -412,6 +412,34 @@ An argument named "name_prefix" is not expected here.
 
 **Commit:** 1db48da08
 
+### ⚠️ Critical Fix #4: IAM Role Name Length Limits with use_name_prefix Default
+
+During terraform plan, additional errors were discovered related to the IAM v6 `use_name_prefix` default behaviour:
+
+**Issue:** IAM v6 module defaults `use_name_prefix = true`, causing name length validation errors:
+```
+Error: expected length of name_prefix to be in the range (1 - 38), got datasync-opg-ingress-production-replication-
+Error: expected length of name_prefix to be in the range (1 - 38), got tariff-dms-eventbridge-full-load-task-role-
+```
+
+**Root Cause:**
+- IAM module v6 defaults `use_name_prefix = true` (was opt-in via `role_name_prefix` in v5)
+- When enabled, module appends `-` to the name, turning it into a prefix
+- Role names designed as exact names (not prefixes) now exceed AWS's 38-character limit for `name_prefix`
+- Examples:
+  - `datasync-opg-ingress-production-replication` (45 chars) + `-` = 46 chars (exceeds limit)
+  - `tariff-dms-eventbridge-full-load-task-role` (47 chars) + `-` = 48 chars (exceeds limit)
+
+**Resolution:** Explicitly set `use_name_prefix = false` for roles requiring exact names:
+- **Pattern:** `name = "exact-role-name"` + `use_name_prefix = false`
+- This tells the module to use the name exactly as specified without appending `-`
+
+**Files Modified:**
+- `dms/iam-roles.tf`: 3 roles (`production_replication_cica_dms_iam_role`, `tariff_eventbridge_dms_full_load_task_role`, `tempus_eventbridge_dms_full_load_task_role`)
+- `iam-roles.tf`: 2 roles (`datasync_opg_replication_iam_role`, `laa_data_analysis_replication_iam_role`)
+
+**Commits:** d7da252a8 (DMS roles), 6dbb186ec (replication roles)
+
 ### Change Set Summary:
 
 | File | Change Type | Description |
@@ -729,12 +757,13 @@ Apply same version change `3.1.1` → `4.2.0` to:
 - ✅ **Changes Committed:** All module upgrades and refactoring applied
 - ✅ **Provider Conflicts Fixed:** AWS provider constraints aligned to `~> 6.0` (commit fc93a89b4)
 - ✅ **KMS Grants Fixed:** Applied `nonsensitive()` wrapper to resolve for_each sensitivity (commit d111e4ac7)
-- ✅ **IAM name_prefix Fixed:** Updated to v6 pattern `use_name_prefix = true` (commit 1db48da08)
+- ✅ **IAM name_prefix Pattern Fixed:** Updated to v6 pattern with `use_name_prefix` (commits 1db48da08, d7da252a8, 6dbb186ec)
+- ✅ **Terraform Plan Validated:** Development environment plan completed successfully (3 Feb 2026)
 - ✅ **Pull Request Created:** [PR #15300](https://github.com/ministryofjustice/modernisation-platform-environments/pull/15300) (Draft)
 
 ### Post-Implementation Fixes
 
-Three critical issues were discovered and resolved during terraform validation:
+Four critical issues were discovered and resolved during iterative terraform validation:
 
 1. **AWS Provider Constraint Conflicts** (commit fc93a89b4)
    - **Issue:** Subdirectories had incompatible provider versions (`~> 5.0` vs `~> 6.0`)
@@ -747,11 +776,41 @@ Three critical issues were discovered and resolved during terraform validation:
    - **Solution:** Wrapped role ARNs with `nonsensitive()` function
    - **Rationale:** IAM role ARNs are resource identifiers, not secrets
 
-3. **IAM Role name_prefix Variable** (commit 1db48da08)
-   - **Issue:** IAM v6 changed `name_prefix` to `use_name_prefix` boolean pattern
-   - **Files Fixed:** `iam-roles.tf` (2 role modules)
-   - **Solution:** Changed to `name + use_name_prefix = true` pattern
+3. **IAM Role name_prefix Variable Pattern** (commit 1db48da08)
+   - **Issue:** IAM v6 changed `name_prefix` direct variable to `use_name_prefix` boolean pattern
+   - **Files Fixed:** `iam-roles.tf` (2 role modules with prefixes)
+   - **Solution:** Changed to `name + use_name_prefix = true` pattern for prefix-based names
    - **Note:** IAM policy modules still use `name_prefix` directly
+
+4. **IAM Role Name Length with Default use_name_prefix** (commits d7da252a8, 6dbb186ec)
+   - **Issue:** IAM v6 defaults `use_name_prefix = true`, causing exact role names to exceed AWS 38-char limit
+   - **Files Fixed:** `dms/iam-roles.tf` (3 roles), `iam-roles.tf` (2 replication roles)
+   - **Solution:** Explicitly set `use_name_prefix = false` for exact role names
+   - **Root Cause:** Module behaviour change - v5 required explicit prefix opt-in, v6 requires explicit exact-name opt-out
+
+### Terraform Plan Validation
+
+**Status:** ✅ **SUCCESSFUL** (3 February 2026)
+
+**Command:** `bash /workspaces/modernisation-platform-environments/scripts/member-local-plan.sh -r platform-engineer-admin -s development`
+
+**Result:** Plan completed with no errors
+- **Resources:** 35 to add, 13 to change, 35 to destroy
+- **Primary Changes:** IAM role/policy replacements due to module internal structure changes
+- **Expected Behaviour:** Resource replacements are normal when module internals change; actual AWS resources will be replaced with equivalent configurations
+
+**Key Changes in Plan:**
+- IAM roles/policies being replaced with equivalent v6 module resources
+- Trust policy updates (adding `Sid` fields, removing `sts:TagSession`)
+- Policy attachment method changes (`custom` → `this` naming pattern)
+- Lambda version updates (image URI changes)
+- Minor operational updates (security group IPs, KMS policies)
+
+**Validation Notes:**
+- All 4 critical fixes successfully resolved terraform validation errors
+- No syntax or configuration errors remaining
+- Plan output confirms all changes are tracked and expected
+- Ready for application in development environment
 
 ### Testing & Deployment
 
