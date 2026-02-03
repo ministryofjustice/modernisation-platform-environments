@@ -55,6 +55,7 @@ locals {
     "curated_emsys_mvp",
     "curated_emsys_tpims",
     "curated_fep",
+    "curated_scram_alcohol_monitoring",
     "emd_historic_int",
     "emsys_mvp_stg",
     "emsys_tpims_stg",
