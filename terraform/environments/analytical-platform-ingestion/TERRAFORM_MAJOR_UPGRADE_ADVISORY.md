@@ -386,6 +386,32 @@ as for_each arguments.
 - `dms/kms-keys.tf` (2 KMS modules with grants)
 - `modules/dms/kms-keys.tf` (1 KMS module with grants)
 
+### ⚠️ Critical Fix #3: IAM Role name_prefix Variable Change
+
+During terraform plan, a third issue was discovered related to the IAM v6 upgrade:
+
+**Issue:** IAM role modules rejected `name_prefix` as unsupported argument:
+```
+Error: Unsupported argument
+  on iam-roles.tf line 31, in module "datasync_iam_role":
+  31:   name_prefix = "datasync"
+An argument named "name_prefix" is not expected here.
+```
+
+**Root Cause:**
+- IAM module v6 changed how name prefixes work for roles
+- `name_prefix` (direct variable) was replaced with `use_name_prefix` (boolean) + `name`
+- Only affects iam-role module; iam-policy still uses `name_prefix` directly
+
+**Resolution:** Updated role modules to use the new v6 pattern:
+- **Old:** `name_prefix = "datasync"`
+- **New:** `name = "datasync"` + `use_name_prefix = true`
+
+**Files Modified:**
+- `iam-roles.tf`: Updated `transfer_server_iam_role` and `datasync_iam_role`
+
+**Commit:** 1db48da08
+
 ### Change Set Summary:
 
 | File | Change Type | Description |
@@ -703,11 +729,12 @@ Apply same version change `3.1.1` → `4.2.0` to:
 - ✅ **Changes Committed:** All module upgrades and refactoring applied
 - ✅ **Provider Conflicts Fixed:** AWS provider constraints aligned to `~> 6.0` (commit fc93a89b4)
 - ✅ **KMS Grants Fixed:** Applied `nonsensitive()` wrapper to resolve for_each sensitivity (commit d111e4ac7)
+- ✅ **IAM name_prefix Fixed:** Updated to v6 pattern `use_name_prefix = true` (commit 1db48da08)
 - ✅ **Pull Request Created:** [PR #15300](https://github.com/ministryofjustice/modernisation-platform-environments/pull/15300) (Draft)
 
 ### Post-Implementation Fixes
 
-Two critical issues were discovered and resolved during terraform validation:
+Three critical issues were discovered and resolved during terraform validation:
 
 1. **AWS Provider Constraint Conflicts** (commit fc93a89b4)
    - **Issue:** Subdirectories had incompatible provider versions (`~> 5.0` vs `~> 6.0`)
@@ -719,6 +746,12 @@ Two critical issues were discovered and resolved during terraform validation:
    - **Files Fixed:** `dms/kms-keys.tf`, `modules/dms/kms-keys.tf`
    - **Solution:** Wrapped role ARNs with `nonsensitive()` function
    - **Rationale:** IAM role ARNs are resource identifiers, not secrets
+
+3. **IAM Role name_prefix Variable** (commit 1db48da08)
+   - **Issue:** IAM v6 changed `name_prefix` to `use_name_prefix` boolean pattern
+   - **Files Fixed:** `iam-roles.tf` (2 role modules)
+   - **Solution:** Changed to `name + use_name_prefix = true` pattern
+   - **Note:** IAM policy modules still use `name_prefix` directly
 
 ### Testing & Deployment
 
