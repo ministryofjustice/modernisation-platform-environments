@@ -267,7 +267,7 @@ module "datasync_opg_bucket" {
   }
 
   replication_configuration = {
-    role = module.datasync_opg_replication_iam_role.iam_role_arn
+    role = module.datasync_opg_replication_iam_role.arn
     rules = [
       {
         id                        = "datasync-opg-replication"
@@ -350,7 +350,7 @@ module "laa_data_analysis_bucket" {
   }
 
   replication_configuration = {
-    role = module.laa_data_analysis_replication_iam_role[0].iam_role_arn
+    role = module.laa_data_analysis_replication_iam_role[0].arn
     rules = [
       {
         id     = "laa-data-analysis-replication"

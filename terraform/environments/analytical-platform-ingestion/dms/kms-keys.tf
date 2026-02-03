@@ -64,11 +64,11 @@ module "cica_dms_eventscheduler_kms" {
   # Grants
   grants = {
     tariff_dms_source = {
-      grantee_principal = nonsensitive(module.tariff_eventbridge_dms_full_load_task_role.iam_role_arn)
+      grantee_principal = nonsensitive(module.tariff_eventbridge_dms_full_load_task_role.arn)
       operations        = ["Encrypt", "Decrypt", "GenerateDataKey"]
     }
     tempus_dms_source = {
-      grantee_principal = nonsensitive(module.tempus_eventbridge_dms_full_load_task_role.iam_role_arn)
+      grantee_principal = nonsensitive(module.tempus_eventbridge_dms_full_load_task_role.arn)
       operations        = ["Encrypt", "Decrypt", "GenerateDataKey"]
     }
   }

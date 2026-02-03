@@ -27,7 +27,7 @@ module "cica_dms_ingress_bucket" {
 
 resource "aws_s3_bucket_replication_configuration" "cica_dms_ingress_bucket_replication" {
   count  = local.environment == "production" ? 1 : 0
-  role   = module.production_replication_cica_dms_iam_role[0].iam_role_arn
+  role   = module.production_replication_cica_dms_iam_role[0].arn
   bucket = module.cica_dms_ingress_bucket.s3_bucket_id
   rule {
     id     = "mojap-ingestion-cica-dms-ingress"

@@ -51,7 +51,7 @@ module "policy" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.58.0"
+  version = "6.4.0"
 
   name_prefix = "transfer-user-${var.name}"
 
@@ -61,23 +61,30 @@ module "policy" {
 module "role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
-  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.58.0"
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role"
+  version = "6.4.0"
 
-  create_role = true
+  name = "transfer-user-egress-${var.name}"
 
-  role_name         = "transfer-user-${var.name}"
-  role_requires_mfa = false
+  trust_policy_permissions = {
+    TransferServiceToAssume = {
+      actions   = ["sts:AssumeRole"]
+      principals = [{
+        type        = "Service"
+        identifiers = ["transfer.amazonaws.com"]
+      }]
+    }
+  }
 
-  trusted_role_services = ["transfer.amazonaws.com"]
-
-  custom_role_policy_arns = [module.policy.arn]
+  policies = {
+    TransferUserPolicy = module.policy.arn
+  }
 }
 
 resource "aws_transfer_user" "this" {
   server_id = var.transfer_server
   user_name = var.name
-  role      = module.role.iam_role_arn
+  role      = module.role.arn
 
   home_directory_type = "LOGICAL"
   home_directory_mappings {

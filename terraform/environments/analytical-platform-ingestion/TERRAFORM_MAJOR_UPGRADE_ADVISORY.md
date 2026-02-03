@@ -11,11 +11,14 @@
 
 ## Executive Summary
 
-- **3 major version upgrades** available
-- **25 module instances** require updates across **24 files**
-- **1 breaking code change** required (SNS `conditions` → `condition`)
+- **4 major version upgrades** available
+- **40 module instances** require updates across **34 files**
+- **2 breaking code changes** required:
+  - SNS `conditions` → `condition`
+  - IAM `iam-assumable-role` → `iam-role` (module path + variable renames)
 - **AWS Provider upgrade required** (`~> 5.0` → `~> 6.0`)
 - **⚠️ Additional provider constraint conflicts resolved** in subdirectories
+- **⚠️ KMS grant sensitivity issues resolved** with nonsensitive() wrapper
 
 ---
 
@@ -26,13 +29,13 @@
 | **terraform-aws-modules/kms/aws** | v3.1.1 | **v4.2.0** | 🔴 **MAJOR** | 21 files |
 | **terraform-aws-modules/sns/aws** | v6.2.0 | **v7.1.0** | 🔴 **MAJOR** | 2 files |
 | **terraform-aws-modules/lambda/aws** (git ref) | v7.20.1 | **v8.4.0** | 🔴 **MAJOR** | 2 files |
+| **terraform-aws-modules/iam/aws** | v5.x | **v6.4.0** | 🔴 **MAJOR** | 26 files |
 | terraform-aws-modules/lambda/aws (registry) | v8.0.1 | v8.4.0 | 🟡 Minor | 5 files |
 | terraform-aws-modules/vpc/aws | v6.6.0 | v6.6.0 | ✅ Up-to-date | 2 files |
 | terraform-aws-modules/s3-bucket/aws | v5.10.0 | v5.10.0 | ✅ Up-to-date | 9 files |
 | terraform-aws-modules/ec2-instance/aws | v6.2.0 | v6.2.0 | ✅ Up-to-date | 1 file |
 | terraform-aws-modules/cloudwatch/aws | v5.6.0 | v5.7.2 | 🟡 Minor | 4 files |
 | ministryofjustice/observability-platform-tenant/aws | v2.0.0 | v2.0.0 | ✅ Up-to-date | 1 file |
-| terraform-aws-modules/iam/aws | v6.x | v6.4.0 | 🟡 Minor | 25 files |
 | terraform-aws-modules/route53/aws | Unknown | v6.4.0 | ℹ️ Review | 2 files |
 | terraform-aws-modules/secrets-manager/aws | Unknown | v2.1.0 | ℹ️ Review | 7 files |
 | terraform-aws-modules/security-group/aws | Unknown | v5.3.1 | ℹ️ Review | 8 files |
@@ -230,6 +233,111 @@ Only requires version updates, no code refactoring needed.
 
 ---
 
+### 4. terraform-aws-modules/iam/aws (v5.52.2-5.58.0 → v6.4.0)
+
+#### 📍 Affected Files (26 instances):
+
+**IAM Policy Modules (14 instances):**
+- `iam-policies.tf` (7 instances) - v5.58.0
+- `dms/iam-policies.tf` (3 instances) - v5.54.1
+- `modules/transfer-family/user/main.tf` (2 instances) - v5.58.0
+- `modules/transfer-family/user-with-egress/main.tf` (2 instances) - v5.58.0
+
+**IAM Role Modules (12 instances):**
+- `iam-roles.tf` (7 instances) - v5.58.0
+- `dms/iam-roles.tf` (3 instances) - v5.52.2
+- `modules/transfer-family/user/main.tf` (1 instance) - v5.58.0
+- `modules/transfer-family/user-with-egress/main.tf` (1 instance) - v5.58.0
+
+#### Current Usage:
+
+```hcl
+# iam-policy (NO breaking changes - version bump only)
+source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
+version = "5.58.0"
+
+# iam-assumable-role (BREAKING - requires migration)
+source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
+version = "5.58.0"
+```
+
+#### ⚠️ Breaking Changes:
+
+**1. Module Path Changes:**
+- `iam-assumable-role` → `iam-role`
+- `iam-policy` → **NO CHANGE**
+
+**2. Variable Renames (iam-role only):**
+- `create_role` → `create` (default now `true`, can be omitted)
+- `role_name` → `name`
+- `role_requires_mfa` → **REMOVED**
+- `trusted_role_services` → **REPLACED** by `trust_policy_permissions`
+- `custom_role_policy_arns` → `policies` (array → map format)
+
+**3. Output Changes:**
+- `iam_role_arn` → `arn`
+- `iam_role_name` → `name`
+
+#### ✅ Migration Pattern:
+
+**Before (v5.x):**
+```hcl
+module \"example_role\" {
+  source  = \"terraform-aws-modules/iam/aws//modules/iam-assumable-role\"
+  version = \"5.58.0\"
+  
+  create_role       = true
+  role_name         = \"my-role\"
+  role_requires_mfa = false
+  
+  trusted_role_services = [\"datasync.amazonaws.com\"]
+  
+  custom_role_policy_arns = [
+    module.my_policy.arn,
+    \"arn:aws:iam::aws:policy/ReadOnlyAccess\"
+  ]
+}
+
+resource \"some_resource\" \"example\" {
+  role_arn = module.example_role.iam_role_arn
+}
+```
+
+**After (v6.4.0):**
+```hcl
+module \"example_role\" {
+  source  = \"terraform-aws-modules/iam/aws//modules/iam-role\"
+  version = \"6.4.0\"
+  
+  name = \"my-role\"
+  
+  trust_policy_permissions = {
+    ServiceToAssume = {
+      actions   = [\"sts:AssumeRole\"]
+      principals = [{
+        type        = \"Service\"
+        identifiers = [\"datasync.amazonaws.com\"]
+      }]
+    }
+  }
+  
+  policies = {
+    CustomPolicy   = module.my_policy.arn
+    ReadOnlyAccess = \"arn:aws:iam::aws:policy/ReadOnlyAccess\"
+  }
+}
+
+resource \"some_resource\" \"example\" {
+  role_arn = module.example_role.arn
+}
+```
+
+#### 💡 Impact: **MEDIUM**
+
+Requires module path changes and variable refactoring for 12 assumable-role modules. All output references updated across 14 consuming resources.
+
+---
+
 ## 📋 Step 5: Proposed Code Changes
 
 ### Prerequisites:
@@ -295,8 +403,23 @@ as for_each arguments.
 | `dms/secrets.tf` | Version Update | KMS v3.1.1 → v4.2.0 (if present) |
 | `modules/dms/metadata-generator.tf` | Git Ref Update | Lambda ref v7.20.1 → v8.4.0 |
 | `modules/dms/validation.tf` | Git Ref Update | Lambda ref v7.20.1 → v8.4.0 |
+| `iam-policies.tf` | Version Update | 7 IAM policy modules v5.58.0 → v6.4.0 |
+| `iam-roles.tf` | Module Migration | 7 IAM assumable-role → iam-role v6.4.0 + variable refactoring |
+| `dms/iam-policies.tf` | Version Update | 3 IAM policy modules v5.54.1 → v6.4.0 |
+| `dms/iam-roles.tf` | Module Migration | 3 IAM assumable-role → iam-role v6.4.0 + variable refactoring |
+| `modules/transfer-family/user/main.tf` | Module Migration | IAM modules v5.58.0 → v6.4.0 (policy + role) |
+| `modules/transfer-family/user-with-egress/main.tf` | Module Migration | IAM modules v5.58.0 → v6.4.0 (policy + role) |
+| `transfer-servers.tf` | Output Reference | `iam_role_arn` → `arn` |
+| `datasync-laa-tasks.tf` | Output Reference | `iam_role_arn` → `arn` (3 instances) |
+| `datasync-locations.tf` | Output Reference | `iam_role_arn` → `arn` |
+| `datasync-tasks.tf` | Output Reference | `iam_role_arn` → `arn` |
+| `dms/eventbridge-scheduler.tf` | Output Reference | `iam_role_arn` → `arn` (2 instances) |
+| `dms/s3.tf` | Output Reference | `iam_role_arn` → `arn` |
+| `dms/kms-keys.tf` | Output Reference | `iam_role_arn` → `arn` (2 instances) |
+| `s3-malware-protection-plan.tf` | Output Reference | `iam_role_arn` → `arn` (2 instances) |
+| `s3.tf` | Output Reference | `iam_role_arn` → `arn` (2 instances) |
 
-**Total:** 28 changes across 10 files (24 module updates + 2 provider fixes + 3 sensitivity fixes)
+**Total:** 56 changes across 22 files (24 module updates + 2 provider fixes + 3 sensitivity fixes + 27 output reference updates)
 
 ### Detailed Diffs:
 
