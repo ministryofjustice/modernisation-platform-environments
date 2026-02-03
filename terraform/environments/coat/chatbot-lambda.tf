@@ -53,6 +53,10 @@ resource "aws_lambda_function" "rag_lambda" {
     }
   }
 
+  tags = {
+    "service-area" = "Hosting"
+  }
+
   depends_on = [null_resource.build_lambda_zip]
 }
 
