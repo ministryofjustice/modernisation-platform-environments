@@ -65,7 +65,7 @@ resource "aws_ecs_task_definition" "soasandbox-admin" {
       db_user              = local.application_data.accounts[local.environment].soa_db_user
       db_role              = local.application_data.accounts[local.environment].soa_db_role
       db_instance_endpoint = aws_db_instance.soa_db.endpoint
-      as_hostname          = aws_route53_record.admin.fqdn
+      as_hostname          = aws_route53_record.admin-sandbox.fqdn
       wl_admin_mem_args    = local.application_data.accounts[local.environment].admin_wl_mem_args
       xxsoa_ds_host        = local.application_data.accounts[local.environment].tds_db_endpoint
       xxsoa_ds_db          = local.application_data.accounts[local.environment].tds_ds_db
@@ -169,10 +169,10 @@ resource "aws_ecs_task_definition" "soasandbox-managed" {
       admin_server_port    = local.application_data.accounts[local.environment].admin_server_port
       aws_region           = local.application_data.accounts[local.environment].aws_region
       container_version    = local.application_data.accounts[local.environment].managed_container_version
-      admin_host           = aws_route53_record.admin.fqdn
+      admin_host           = aws_route53_record.admin-sandbox.fqdn
       soa_password         = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:ccms/soasandbox/password::"
       trust_store_password = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:ccms/soasandbox/java/trust-store/password::"
-      ms_hostname          = aws_route53_record.managed.fqdn
+      ms_hostname          = aws_route53_record.managed-sandbox.fqdn
       wl_mem_args          = local.application_data.accounts[local.environment].managed_wl_mem_args
     }
   )
