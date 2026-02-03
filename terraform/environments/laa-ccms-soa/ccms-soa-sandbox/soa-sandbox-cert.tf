@@ -1,7 +1,7 @@
 # #-- ACM Certificate for SOASANDBOX Load Balancers --#
 resource "aws_acm_certificate" "soa-sandbox" {
   domain_name               = trim(data.aws_route53_zone.external.name, ".")
-  subject_alternative_names = [aws_route53_record.admin-sandbox.fqdn, aws_route53_record.managed-sandbox.fqdn]
+  subject_alternative_names = toset([aws_route53_record.admin-sandbox.fqdn, aws_route53_record.managed-sandbox.fqdn])
   validation_method         = "DNS"
   lifecycle {
     create_before_destroy = true
