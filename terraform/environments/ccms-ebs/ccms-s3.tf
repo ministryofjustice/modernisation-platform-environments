@@ -145,6 +145,9 @@ module "s3-bucket-dbbackup" {
   replication_region = "eu-west-2"
   # replication_role_arn                     = module.s3-bucket-replication-role.role.arn
   providers = {
+    # Here we use the default provider Region for replication. Destination buckets can be within the same Region as the
+    # source bucket. On the other hand, if you need to enable cross-region replication, please contact the Modernisation
+    # Platform team to add a new provider for the additional Region.
     aws.bucket-replication = aws
   }
 
