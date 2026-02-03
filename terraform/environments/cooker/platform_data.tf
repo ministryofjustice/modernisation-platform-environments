@@ -16,7 +16,7 @@ data "aws_subnets" "shared-data" {
     values = [data.aws_vpc.shared.id]
   }
   tags = {
-    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-data*"
+    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-data-${data.aws_region.current.name}*"
   }
 }
 
@@ -26,7 +26,7 @@ data "aws_subnets" "shared-private" {
     values = [data.aws_vpc.shared.id]
   }
   tags = {
-    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private*"
+    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private-${data.aws_region.current.name}*"
   }
 }
 
@@ -36,7 +36,37 @@ data "aws_subnets" "shared-public" {
     values = [data.aws_vpc.shared.id]
   }
   tags = {
-    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public*"
+    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public-${data.aws_region.current.name}*"
+  }
+}
+
+data "aws_subnets" "shared-data-secondary" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.shared.id]
+  }
+  tags = {
+    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-data-secondary-${data.aws_region.current.name}*"
+  }
+}
+
+data "aws_subnets" "shared-private-secondary" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.shared.id]
+  }
+  tags = {
+    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private-secondary-${data.aws_region.current.name}*"
+  }
+}
+
+data "aws_subnets" "shared-public-secondary" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.shared.id]
+  }
+  tags = {
+    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public-secondary-${data.aws_region.current.name}*"
   }
 }
 
@@ -61,6 +91,33 @@ data "aws_subnet" "data_subnets_c" {
   }
 }
 
+data "aws_subnet" "data_secondary_subnets_a" {
+  count = length(data.aws_subnets.shared-data-secondary.ids) != 0 ? 1 : 0
+
+  vpc_id = data.aws_vpc.shared.id
+  tags = {
+    "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-data-secondary-${data.aws_region.current.name}a"
+  }
+}
+
+data "aws_subnet" "data_secondary_subnets_b" {
+  count = length(data.aws_subnets.shared-data-secondary.ids) != 0 ? 1 : 0
+
+  vpc_id = data.aws_vpc.shared.id
+  tags = {
+    "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-data-secondary-${data.aws_region.current.name}b"
+  }
+}
+
+data "aws_subnet" "data_secondary_subnets_c" {
+  count = length(data.aws_subnets.shared-data-secondary.ids) != 0 ? 1 : 0
+
+  vpc_id = data.aws_vpc.shared.id
+  tags = {
+    "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-data-secondary-${data.aws_region.current.name}c"
+  }
+}
+
 data "aws_subnet" "private_subnets_a" {
   vpc_id = data.aws_vpc.shared.id
   tags = {
@@ -82,6 +139,33 @@ data "aws_subnet" "private_subnets_c" {
   }
 }
 
+data "aws_subnet" "private_secondary_subnets_a" {
+  count = length(data.aws_subnets.shared-private-secondary.ids) != 0 ? 1 : 0
+
+  vpc_id = data.aws_vpc.shared.id
+  tags = {
+    "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private-secondary-${data.aws_region.current.name}a"
+  }
+}
+
+data "aws_subnet" "private_secondary_subnets_b" {
+  count = length(data.aws_subnets.shared-private-secondary.ids) != 0 ? 1 : 0
+
+  vpc_id = data.aws_vpc.shared.id
+  tags = {
+    "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private-secondary-${data.aws_region.current.name}b"
+  }
+}
+
+data "aws_subnet" "private_secondary_subnets_c" {
+  count = length(data.aws_subnets.shared-private-secondary.ids) != 0 ? 1 : 0
+
+  vpc_id = data.aws_vpc.shared.id
+  tags = {
+    "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private-secondary-${data.aws_region.current.name}c"
+  }
+}
+
 data "aws_subnet" "public_subnets_a" {
   vpc_id = data.aws_vpc.shared.id
   tags = {
@@ -100,6 +184,33 @@ data "aws_subnet" "public_subnets_c" {
   vpc_id = data.aws_vpc.shared.id
   tags = {
     Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public-${data.aws_region.current.name}c"
+  }
+}
+
+data "aws_subnet" "public_secondary_subnets_a" {
+  count = length(data.aws_subnets.shared-public-secondary.ids) != 0 ? 1 : 0
+
+  vpc_id = data.aws_vpc.shared.id
+  tags = {
+    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public-secondary-${data.aws_region.current.name}a"
+  }
+}
+
+data "aws_subnet" "public_secondary_subnets_b" {
+  count = length(data.aws_subnets.shared-public-secondary.ids) != 0 ? 1 : 0
+
+  vpc_id = data.aws_vpc.shared.id
+  tags = {
+    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public-secondary-${data.aws_region.current.name}b"
+  }
+}
+
+data "aws_subnet" "public_secondary_subnets_c" {
+  count = length(data.aws_subnets.shared-public-secondary.ids) != 0 ? 1 : 0
+
+  vpc_id = data.aws_vpc.shared.id
+  tags = {
+    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public-secondary-${data.aws_region.current.name}c"
   }
 }
 
@@ -126,17 +237,17 @@ data "aws_route53_zone" "network-services" {
 }
 
 # Shared KMS keys (per business unit)
-# data "aws_kms_key" "general_shared" {
-#   key_id = "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["core-shared-services-production"]}:alias/general-${var.networking[0].business-unit}"
-# }
+data "aws_kms_key" "general_shared" {
+  key_id = "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["core-shared-services-production"]}:alias/general-${var.networking[0].business-unit}"
+}
 
-# data "aws_kms_key" "ebs_shared" {
-#   key_id = "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["core-shared-services-production"]}:alias/ebs-${var.networking[0].business-unit}"
-# }
+data "aws_kms_key" "ebs_shared" {
+  key_id = "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["core-shared-services-production"]}:alias/ebs-${var.networking[0].business-unit}"
+}
 
-# data "aws_kms_key" "rds_shared" {
-#   key_id = "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["core-shared-services-production"]}:alias/rds-${var.networking[0].business-unit}"
-# }
+data "aws_kms_key" "rds_shared" {
+  key_id = "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["core-shared-services-production"]}:alias/rds-${var.networking[0].business-unit}"
+}
 
 # State for core-network-services resource information
 data "terraform_remote_state" "core_network_services" {
