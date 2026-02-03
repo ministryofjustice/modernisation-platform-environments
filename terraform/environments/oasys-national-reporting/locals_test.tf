@@ -189,6 +189,7 @@ locals {
           instance_profile_policies = concat(local.ec2_instances.bip_web.config.instance_profile_policies, [
             "Ec2T2ReportingPolicy",
           ])
+          secretsmanager_secrets_prefix = "ec2/"
         })
         instance = merge(local.ec2_instances.bip_web.instance, {
           instance_type = "r6i.large"
