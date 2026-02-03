@@ -50,6 +50,8 @@ locals {
     "buddi_stg",
     "buddi_buddi",
     "cap_dw_stg",
+    "curated_alcohol_monitoring",
+    "curated_cap_dw",
     "curated_emsys_mvp",
     "curated_emsys_tpims",
     "curated_fep",
