@@ -183,7 +183,7 @@ data "aws_iam_policy_document" "rag_lambda_function_role" {
         ]
 
         resources = [
-          module.cur_s3_kms.key_arn
+          "arn:aws:kms:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:key/ef7e1dc9-dc2b-4733-9278-46885b7040c7"
         ]
     }
 }
