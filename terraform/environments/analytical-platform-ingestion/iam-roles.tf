@@ -76,7 +76,8 @@ module "datasync_opg_replication_iam_role" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
   version = "6.4.0"
 
-  name = "datasync-opg-ingress-${local.environment}-replication"
+  name            = "datasync-opg-ingress-${local.environment}-replication"
+  use_name_prefix = false
 
   trust_policy_permissions = {
     S3ServiceToAssume = {
@@ -149,7 +150,8 @@ module "laa_data_analysis_replication_iam_role" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
   version = "6.4.0"
 
-  name = "laa-data-analysis-${local.environment}-replication"
+  name            = "laa-data-analysis-${local.environment}-replication"
+  use_name_prefix = false
 
   trust_policy_permissions = {
     S3ServiceToAssume = {
