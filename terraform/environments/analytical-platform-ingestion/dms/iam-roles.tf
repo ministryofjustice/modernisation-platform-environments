@@ -6,7 +6,8 @@ module "production_replication_cica_dms_iam_role" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
   version = "6.4.0"
 
-  name = "cica-dms-ingress-production-replication"
+  name            = "cica-dms-ingress-production-replication"
+  use_name_prefix = false
 
   trust_policy_permissions = {
     S3ServiceToAssume = {
@@ -30,7 +31,8 @@ module "tariff_eventbridge_dms_full_load_task_role" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
   version = "6.4.0"
 
-  name = "tariff-dms-eventbridge-full-load-task-role"
+  name            = "tariff-dms-eventbridge-full-load-task-role"
+  use_name_prefix = false
 
   trust_policy_permissions = {
     SchedulerServiceToAssume = {
@@ -72,7 +74,8 @@ module "tempus_eventbridge_dms_full_load_task_role" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
   version = "6.4.0"
 
-  name = "tempus-dms-eventbridge-full-load-task-role"
+  name            = "tempus-dms-eventbridge-full-load-task-role"
+  use_name_prefix = false
 
   trust_policy_permissions = {
     SchedulerServiceToAssume = {
