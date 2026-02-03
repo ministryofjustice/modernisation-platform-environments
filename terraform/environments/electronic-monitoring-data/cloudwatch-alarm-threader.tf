@@ -7,13 +7,9 @@
 # ------------------------------------------------------------------------------
 
 locals {
-  # State bucket per environment (logs buckets)
-  alarm_thread_state_bucket = {
-    dev     = "emds-dev-bucket-logs-20240917140510319000000006"
-    test    = "emds-test-bucket-logs-2024092309592738660000000b"
-    preprod = "emds-preprod-bucket-logs-2024110511092940930000000a"
-    prod    = "emds-prod-bucket-logs-20240918073115961600000004"
-  }[local.environment_shorthand]
+  # State bucket for incident-threading state
+  # Use the environment's logging bucket created by this stack
+  alarm_thread_state_bucket = module.s3-logging-bucket.bucket.id
 
   alarm_thread_state_prefix = "alarm-threading/current"
 }
