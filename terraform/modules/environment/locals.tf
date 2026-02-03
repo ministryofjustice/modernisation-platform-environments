@@ -31,9 +31,31 @@ locals {
     ]
   ])
 
-  subnet_names = {
-    general = ["data", "private", "public"]
+  subnets_type_by_vpc = {
+    "hmpps-production" : "with_secondary"
   }
+  subnets_type = lookup(local.subnets_type_by_vpc, local.vpc_name, "default")
+  subnet_names_by_type = {
+    default = {
+      general = [
+        "data",
+        "private",
+        "public",
+      ]
+    }
+    with_secondary = {
+      general = [
+        "data",
+        "data-secondary",
+        "private",
+        "private-secondary",
+        "public",
+        "public-secondary",
+      ]
+    }
+  }
+
+  subnet_names = local.subnet_names_by_type[local.subnets_type][var.subnet_set]
 
   domains = {
     public = {
@@ -86,7 +108,7 @@ locals {
   })
 
   subnet_name_availability_zone = [
-    for subnet_name in local.subnet_names[var.subnet_set] : [
+    for subnet_name in local.subnet_names : [
       for zone_name in data.aws_availability_zones.this.names : "${subnet_name}-${zone_name}"
     ]
   ]

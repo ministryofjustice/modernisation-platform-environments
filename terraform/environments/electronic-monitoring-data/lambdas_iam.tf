@@ -1448,6 +1448,7 @@ resource "aws_iam_role_policy_attachment" "cross_account_copy" {
 
 data "aws_iam_policy_document" "iceberg_table_maintenance_iam_role_policy_document" {
   count = local.is-development || local.is-preproduction ? 1 : 0
+
   statement {
     sid    = "AthenaQueryPermissions"
     effect = "Allow"
@@ -1459,7 +1460,8 @@ data "aws_iam_policy_document" "iceberg_table_maintenance_iam_role_policy_docume
       "athena:GetWorkGroup"
     ]
     resources = [
-      "arn:aws:athena:${data.aws_region.current.region}:${local.env_account_id}:*/*"
+      "arn:aws:athena:${data.aws_region.current.name}:${local.env_account_id}:workgroup/*",
+      "arn:aws:athena:${data.aws_region.current.name}:${local.env_account_id}:datacatalog/*"
     ]
   }
 
@@ -1480,17 +1482,26 @@ data "aws_iam_policy_document" "iceberg_table_maintenance_iam_role_policy_docume
   }
 
   statement {
-    sid    = "S3DataMaintenance"
+    sid    = "S3DataAndResultsAccess"
     effect = "Allow"
     actions = [
+      "s3:GetBucketLocation",
       "s3:GetObject",
       "s3:PutObject",
       "s3:DeleteObject",
-      "s3:ListBucket"
+      "s3:ListBucket",
+      "s3:ListBucketMultipartUploads",
+      "s3:AbortMultipartUpload", 
+      "s3:ListMultipartUploadParts" 
     ]
     resources = [
+      # The Data Bucket
       module.s3-create-a-derived-table-bucket.bucket.arn,
-      "${module.s3-create-a-derived-table-bucket.bucket.arn}/staging/g4s_tasking_pipeline/g4s_tasking/tbl_answers/*"
+      "${module.s3-create-a-derived-table-bucket.bucket.arn}/*",
+      
+      # The Query Results Bucket
+      module.s3-athena-bucket.bucket.arn,
+      "${module.s3-athena-bucket.bucket.arn}/*"
     ]
   }
 }
