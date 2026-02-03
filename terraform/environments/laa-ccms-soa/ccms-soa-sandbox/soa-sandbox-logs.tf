@@ -212,18 +212,18 @@ resource "aws_cloudwatch_log_metric_filter" "soa_stuck_thread_managed" {
 
 
 # #--RDS (SOA DB)
-resource "aws_cloudwatch_log_group" "rds_alert" {
-  name              = "/aws/rds/instance/oracle-db/alert"
+resource "aws_cloudwatch_log_group" "soa_sandbox_rds_alert" {
+  name              = "soa-sandbox/aws/rds/instance/oracle-db/alert"
   retention_in_days = local.application_data.accounts[local.environment].soa_db_log_retention_days
 }
 
-resource "aws_cloudwatch_log_group" "rds_audit" {
-  name              = "/aws/rds/instance/oracle-db/audit"
+resource "aws_cloudwatch_log_group" "soa_sandbox_rds_audit" {
+  name              = "soa-sandbox/aws/rds/instance/oracle-db/audit"
   retention_in_days = local.application_data.accounts[local.environment].soa_db_log_retention_days
 }
 
-resource "aws_cloudwatch_log_group" "rds_listener" {
-  name              = "/aws/rds/instance/oracle-db/listener"
+resource "aws_cloudwatch_log_group" "soa_sandbox_rds_listener" {
+  name              = "soa-sandbox/aws/rds/instance/oracle-db/listener"
   retention_in_days = local.application_data.accounts[local.environment].soa_db_log_retention_days
 }
 
