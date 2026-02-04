@@ -49,21 +49,6 @@ resource "aws_athena_workgroup" "ctas_athena_workgroup" {
   }
 }
 
-resource "aws_athena_workgroup" "test_workgroup" {
-  name = "test_workgroup"
-
-  configuration {
-    result_configuration {
-      encryption_configuration {
-        encryption_option = "SSE_S3"
-      }
-    }
-
-    enforce_workgroup_configuration    = true
-    publish_cloudwatch_metrics_enabled = true
-  }
-}
-
 resource "aws_glue_catalog_database" "cur_v2_database" {
   name = "cur_v2_database"
 }

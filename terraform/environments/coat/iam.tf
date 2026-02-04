@@ -252,3 +252,20 @@ module "cur_v2_hourly_enriched_replication_policy" {
 
   policy = data.aws_iam_policy_document.cur_v2_hourly_enriched_replication[0].json
 }
+
+resource "aws_iam_role" "test_iam_role" {
+  name = "TestIAMRole"
+  assume_role_policy = templatefile("${path.module}/templates/coat-gh-actions-assume-role-policy.json",
+    {
+      gh_actions_oidc_provider     = "token.actions.githubusercontent.com"
+      gh_actions_oidc_provider_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/token.actions.githubusercontent.com"
+    }
+  )
+
+  tags = merge(
+    jsondecode(data.http.environments_file.response_body).tags,
+    { "service-area" = "Hosting" },
+    { "environment-name" = terraform.workspace },
+    { "source-code" = "https://github.com/ministryofjustice/modernisation-platform-environments" }
+  )
+}
