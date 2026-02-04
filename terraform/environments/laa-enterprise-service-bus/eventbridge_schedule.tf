@@ -25,7 +25,7 @@ resource "aws_scheduler_schedule" "ccms_load_schedule" {
     mode = "OFF"
   }
 
-  schedule_expression = local.environment == "production" ? "cron(45 7 * * ? *)" : "cron(0 7-19 ? * * *)"
+  schedule_expression = local.environment == "production" ? "cron(0 8 * * ? *)" : "cron(0 7-19 ? * * *)"
 
   target {
     arn      = aws_lambda_function.ccms_provider_load.arn
@@ -42,7 +42,7 @@ resource "aws_scheduler_schedule" "maat_load_schedule" {
     mode = "OFF"
   }
 
-  schedule_expression = local.environment == "production" ? "cron(45 10 * * ? *)" : "cron(0 7-19 ? * * *)"
+  schedule_expression = local.environment == "production" ? "cron(0 11 * * ? *)" : "cron(0 7-19 ? * * *)"
 
   target {
     arn      = aws_lambda_function.maat_provider_load.arn
