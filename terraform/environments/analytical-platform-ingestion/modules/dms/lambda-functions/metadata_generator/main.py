@@ -365,9 +365,9 @@ def handler(event, context):  # pylint: disable=unused-argument
     glue_table_definitions = []
     for table in db_metadata:
         if destination_prefix != "":
-            table_location = f"s3://{destination_bucket}/{destination_prefix}/{table.database_name}/{table.name}"
+            table_location = f"s3://{destination_bucket}/{destination_prefix.lower()}/{table.database_name.lower()}/{table.name.lower()}"
         else:
-            table_location = f"s3://{destination_bucket}/{table.database_name}/{table.name}"
+            table_location = f"s3://{destination_bucket}/{table.database_name.lower()}/{table.name.lower()}"
 
         logger.info("Generating glue metadata for %s.%s located at %s", table.database_name, table.name, table_location)
         glue_table_definition = gc.generate_from_meta(
