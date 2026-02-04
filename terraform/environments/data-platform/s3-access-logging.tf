@@ -35,8 +35,10 @@ module "s3_access_logs_s3_bucket" {
 
   server_side_encryption_configuration = {
     rule = {
+      bucket_key_enabled = true
       apply_server_side_encryption_by_default = {
-        sse_algorithm = "AES256"
+        kms_master_key_id = module.s3_access_logs_kms_key.key_arn
+        sse_algorithm     = "aws:kms"
       }
     }
   }
