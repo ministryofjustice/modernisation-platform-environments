@@ -187,6 +187,25 @@ locals {
         }
       }
     }
+    prisoner-retail = {
+      description = "Security group for prisoner retail"
+      ingress = {
+        all-from-self = {
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
+        }
+        TCP_3389 = {
+          description = "Allow RDP ingress 3389"
+          from_port   = 3389
+          to_port     = 3389
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.enduserclient
+        }
+      }
+    }
     database = {
       description = "New security group for database servers"
       ingress = {
