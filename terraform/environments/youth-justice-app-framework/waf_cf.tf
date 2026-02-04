@@ -9,6 +9,15 @@ module "waf-cf" {
     aws.us-east-1 = aws.us-east-1
   }
 
+  waf_IP_rules_cf = {
+    "whitelist-ip-cf" = {
+      name         = "whitelist-ip-cf"
+      priority     = 2
+      description  = "Whitelisted IP addresses"
+      ip_addresses = ["66.103.29.115/32"]
+    }
+  }
+
   project_name = local.project_name
   tags         = local.tags
   waf_name     = "yjaf-cf"
