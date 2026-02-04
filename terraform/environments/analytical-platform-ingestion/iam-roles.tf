@@ -1,68 +1,106 @@
 module "transfer_server_iam_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
-  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.58.0"
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role"
+  version = "6.4.0"
 
-  create_role = true
+  create = true
 
-  role_name_prefix  = "transfer-server"
-  role_requires_mfa = false
+  name = "transfer-server"
 
-  trusted_role_services = ["transfer.amazonaws.com"]
+  trust_policy_permissions = {
+    AllowTransferService = {
+      effect  = "Allow"
+      actions = ["sts:AssumeRole"]
+      principals = [{
+        type        = "Service"
+        identifiers = ["transfer.amazonaws.com"]
+      }]
+    }
+  }
 
-  custom_role_policy_arns = [
-    module.transfer_server_iam_policy.arn,
-    "arn:aws:iam::aws:policy/service-role/AWSTransferLoggingAccess"
-  ]
+  policies = {
+    transfer_server_policy = module.transfer_server_iam_policy.arn
+    aws_transfer_logging   = "arn:aws:iam::aws:policy/service-role/AWSTransferLoggingAccess"
+  }
 }
 
 module "datasync_iam_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
-  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.58.0"
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role"
+  version = "6.4.0"
 
-  create_role = true
+  create = true
 
-  role_name_prefix  = "datasync"
-  role_requires_mfa = false
+  name = "datasync"
 
-  trusted_role_services = ["datasync.amazonaws.com"]
+  trust_policy_permissions = {
+    AllowDataSyncService = {
+      effect  = "Allow"
+      actions = ["sts:AssumeRole"]
+      principals = [{
+        type        = "Service"
+        identifiers = ["datasync.amazonaws.com"]
+      }]
+    }
+  }
 
-  custom_role_policy_arns = [module.datasync_iam_policy.arn]
+  policies = {
+    datasync_policy = module.datasync_iam_policy.arn
+  }
 }
 
 module "datasync_replication_iam_role" {
   #checkov:skip=CKV_TF_1:Module is from Terraform registry
 
-  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.58.0"
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role"
+  version = "6.4.0"
 
-  create_role = true
+  create = true
 
-  role_name         = "datasync-replication"
-  role_requires_mfa = false
+  name = "datasync-replication"
 
-  trusted_role_services = ["s3.amazonaws.com"]
+  trust_policy_permissions = {
+    AllowS3Service = {
+      effect  = "Allow"
+      actions = ["sts:AssumeRole"]
+      principals = [{
+        type        = "Service"
+        identifiers = ["s3.amazonaws.com"]
+      }]
+    }
+  }
 
-  custom_role_policy_arns = [module.datasync_replication_iam_policy.arn]
+  policies = {
+    datasync_replication_policy = module.datasync_replication_iam_policy.arn
+  }
 }
 
 module "datasync_opg_replication_iam_role" {
   #checkov:skip=CKV_TF_1:Module is from Terraform registry
 
-  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.58.0"
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role"
+  version = "6.4.0"
 
-  create_role = true
+  create = true
 
-  role_name         = "datasync-opg-ingress-${local.environment}-replication"
-  role_requires_mfa = false
+  name = "datasync-opg-${local.environment}-replication"
 
-  trusted_role_services = ["s3.amazonaws.com"]
+  trust_policy_permissions = {
+    AllowS3Service = {
+      effect  = "Allow"
+      actions = ["sts:AssumeRole"]
+      principals = [{
+        type        = "Service"
+        identifiers = ["s3.amazonaws.com"]
+      }]
+    }
+  }
 
-  custom_role_policy_arns = [module.datasync_opg_replication_iam_policy.arn]
+  policies = {
+    datasync_opg_replication_policy = module.datasync_opg_replication_iam_policy.arn
+  }
 }
 
 # Guard Duty Malware Role
@@ -70,49 +108,79 @@ module "datasync_opg_replication_iam_role" {
 module "guard_duty_malware_s3_scan_iam_role" {
   #checkov:skip=CKV_TF_1:Module is from Terraform registry
 
-  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.58.0"
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role"
+  version = "6.4.0"
 
-  create_role = true
+  create = true
 
-  role_name         = "guard-duty-malware-${local.environment}-scan"
-  role_requires_mfa = false
+  name = "guard-duty-malware-${local.environment}-scan"
 
-  trusted_role_services = ["malware-protection-plan.guardduty.amazonaws.com"]
+  trust_policy_permissions = {
+    AllowGuardDutyService = {
+      effect  = "Allow"
+      actions = ["sts:AssumeRole"]
+      principals = [{
+        type        = "Service"
+        identifiers = ["malware-protection-plan.guardduty.amazonaws.com"]
+      }]
+    }
+  }
 
-  custom_role_policy_arns = [module.guard_duty_s3_malware_protection_iam_policy.arn]
+  policies = {
+    guard_duty_malware_protection_policy = module.guard_duty_s3_malware_protection_iam_policy.arn
+  }
 }
 
 module "datasync_laa_data_analysis_iam_role" {
   #checkov:skip=CKV_TF_1:Module is from Terraform registry
   count = local.environment == "production" ? 1 : 0
 
-  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.58.0"
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role"
+  version = "6.4.0"
 
-  create_role = true
+  create = true
 
-  role_name         = "datasync-laa-data-analysis"
-  role_requires_mfa = false
+  name = "datasync-laa-data-analysis"
 
-  trusted_role_services = ["datasync.amazonaws.com"]
+  trust_policy_permissions = {
+    AllowDataSyncService = {
+      effect  = "Allow"
+      actions = ["sts:AssumeRole"]
+      principals = [{
+        type        = "Service"
+        identifiers = ["datasync.amazonaws.com"]
+      }]
+    }
+  }
 
-  custom_role_policy_arns = [module.laa_data_analysis_iam_policy[0].arn]
+  policies = {
+    laa_data_analysis_policy = module.laa_data_analysis_iam_policy[0].arn
+  }
 }
 
 module "laa_data_analysis_replication_iam_role" {
   #checkov:skip=CKV_TF_1:Module is from Terraform registry
   count = local.environment == "production" ? 1 : 0
 
-  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.58.0"
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role"
+  version = "6.4.0"
 
-  create_role = true
+  create = true
 
-  role_name         = "laa-data-analysis-${local.environment}-replication"
-  role_requires_mfa = false
+  name = "laa-analysis-${local.environment}-repl"
 
-  trusted_role_services = ["s3.amazonaws.com", "batchoperations.s3.amazonaws.com"] # I want to replicate after scanning only, so need to do it as a batch job
+  trust_policy_permissions = {
+    AllowS3Services = {
+      effect  = "Allow"
+      actions = ["sts:AssumeRole"]
+      principals = [{
+        type        = "Service"
+        identifiers = ["s3.amazonaws.com", "batchoperations.s3.amazonaws.com"]
+      }]
+    }
+  }
 
-  custom_role_policy_arns = [module.laa_data_analysis_replication_iam_policy[0].arn]
+  policies = {
+    laa_data_analysis_replication_policy = module.laa_data_analysis_replication_iam_policy[0].arn
+  }
 }

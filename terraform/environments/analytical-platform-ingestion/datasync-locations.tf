@@ -3,7 +3,7 @@ resource "aws_datasync_location_s3" "opg" {
   subdirectory  = "/"
 
   s3_config {
-    bucket_access_role_arn = module.datasync_iam_role.iam_role_arn
+    bucket_access_role_arn = module.datasync_iam_role.arn
   }
 
   tags = local.tags
