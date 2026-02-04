@@ -30,7 +30,7 @@ module "cur_s3_kms" {
 
   key_statements = [
     {
-      sid = "AllowReplicationRole"
+      sid = "AllowReplicationRoleAndSync"
       actions = [
         "kms:Encrypt*",
         "kms:Decrypt*",
@@ -46,7 +46,8 @@ module "cur_s3_kms" {
           identifiers = [
             "arn:aws:iam::${local.environment_management.aws_organizations_root_account_id}:role/moj-cur-reports-v2-hourly-replication-role",
             "arn:aws:iam::${local.coat_prod_account_id}:role/moj-coat-${local.prod_environment}-cur-reports-cross-role",
-            "arn:aws:iam::593291632749:root"
+            "arn:aws:iam::593291632749:root",
+            "arn:aws:iam::279191903737:root"
           ]
         }
       ]
@@ -68,7 +69,25 @@ module "cur_s3_kms" {
           identifiers = ["glue.amazonaws.com"]
         }
       ]
-    }
+    },
+    {
+    sid    = "RAGLambdaAccess"
+    effect = "Allow"
+    actions = [
+        "kms:Encrypt*",
+        "kms:Decrypt*",
+        "kms:ReEncrypt*",
+        "kms:GenerateDataKey*",
+        "kms:Describe*"
+      ]
+    resources = ["*"]
+    principals = [
+      {
+        type        = "AWS"
+        identifiers = [aws_iam_role.rag_lambda_role.arn]
+      }
+    ]
+   }
   ]
 
   tags = local.tags
