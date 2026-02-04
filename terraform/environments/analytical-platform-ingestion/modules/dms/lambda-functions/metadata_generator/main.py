@@ -233,7 +233,7 @@ class MetadataExtractor:
         logger.info("Primary key of %s.%s is %s", schema, table, table_meta.primary_key)
         if self.dialect == "oracle":
             table_meta = self._manage_blob_columns(table_meta)
-        table_meta = self._convert_int_columns(table_meta)
+            table_meta = self._convert_int_columns(table_meta)
         table_meta = self._rename_materialised_view(table_meta)
         table_meta = self._add_reference_columns(table_meta)
         table_meta = self._process_exclusions(table_meta, schema, table)
