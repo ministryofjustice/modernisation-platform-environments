@@ -26,8 +26,8 @@ resource "aws_scheduler_schedule" "ccms_load_schedule" {
   }
 
   schedule_expression = local.environment == "production" ? "rate(15 minutes)" : "cron(0 7-19 ? * * *)"
-  start_date          = local.environment == "production" ? "2026-02-04T07:30:00Z" : null
-  end_date            = local.environment == "production" ? "2026-02-04T09:00:00Z" : null
+  start_date          = local.environment == "production" ? "2026-02-05T07:30:00Z" : null
+  end_date            = local.environment == "production" ? "2026-02-05T09:00:00Z" : null
   target {
     arn      = aws_lambda_function.ccms_provider_load.arn
     role_arn = aws_iam_role.scheduler_invoke_lambda_role.arn
