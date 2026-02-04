@@ -2,7 +2,7 @@ module "bucket_kms" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "3.1.1"
+  version = "4.2.0"
 
   aliases               = ["dms/${var.db}/bucket-kms"]
   description           = "Used to encrypt internal buckets for ${var.db} DMS module"
@@ -17,11 +17,11 @@ module "bucket_kms" {
       operations        = ["Encrypt", "Decrypt", "GenerateDataKey"]
     }
     metadata_generator = {
-      grantee_principal = module.metadata_generator.lambda_role_arn
+      grantee_principal = nonsensitive(module.metadata_generator.lambda_role_arn)
       operations        = ["Encrypt", "Decrypt", "GenerateDataKey"]
     }
     validation = {
-      grantee_principal = module.validation_lambda_function.lambda_role_arn
+      grantee_principal = nonsensitive(module.validation_lambda_function.lambda_role_arn)
       operations        = ["Encrypt", "Decrypt", "GenerateDataKey"]
     }
   }

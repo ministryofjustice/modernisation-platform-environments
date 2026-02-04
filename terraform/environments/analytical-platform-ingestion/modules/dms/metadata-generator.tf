@@ -175,7 +175,7 @@ resource "aws_s3_object" "dms_mapping_rules" {
 
 module "metadata_generator" {
   # Commit hash for v7.20.1
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-lambda?ref=84dfbfddf9483bc56afa0aff516177c03652f0c7"
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-lambda?ref=v8.4.0"
   # Force rebuild when requirements.txt changes
   hash_extra = filemd5("${path.module}/lambda-functions/metadata_generator/requirements.txt")
 

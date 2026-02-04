@@ -33,7 +33,7 @@ resource "aws_datasync_task" "opg" {
     s3_object_versioning = "INCLUDE"
 
     s3_destination {
-      bucket_access_role_arn = module.datasync_iam_role.iam_role_arn
+      bucket_access_role_arn = module.datasync_iam_role.arn
       s3_bucket_arn          = module.datasync_opg_bucket.s3_bucket_arn
     }
   }
