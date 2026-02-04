@@ -27,21 +27,27 @@ locals {
     - Build a map of subnets from the network configuration excluding unallocated AZs
       which results in:
         {
-          "data-aza" = {
+          "data-a" = {
             "az"         = "a"
             "cidr_block" = "10.199.128.0/25"
             "type"       = "data"
+            "tags"       = {}
           }
         }
+    - Tags are extracted from the subnet type configuration and template variables are interpolated
   */
   subnets = merge([
-    for subnet_type, azs in local.network_configuration.vpc.subnets : {
-      for az, cidr in azs :
+    for subnet_type, config in local.network_configuration.vpc.subnets : {
+      for az, cidr in config :
       "${subnet_type}-${az}" => {
         cidr_block = cidr
         type       = subnet_type
         az         = trimprefix(az, "az")
-      }
+        tags = try(
+          { for k, v in config.tags : k => replace(v, "$${environment}", "${local.application_name}-${local.environment}") },
+          {}
+        )
+      } if can(regex("^[a-z]$", az)) # Only include single letter AZ keys, excluding 'tags'
     }
   ]...)
 
