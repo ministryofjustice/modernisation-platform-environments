@@ -301,20 +301,25 @@ def handler(event, context):  # pylint: disable=unused-argument
     port = db_secret["port"]
     if engine == "oracle":
         dsn = f"{host}:{port}/?service_name={db_name}"
+        connect_args = {
+            # this becomes USERENV('MODULE') and USERENV('CLIENT_INFO')
+            "program": "repctl",
+            # this becomes USERENV('OS_USER')
+            "osuser": "rdsdb",
+        }
     elif engine == "mssql+pymssql":
         dsn = f"{host}:{port}/{db_name}?charset=utf8"
+        connect_args = {
+            # pymssql uses 'appname' instead of 'program'
+            "appname": "repctl",
+        }
     else:
         raise ValueError(f"Supported engines: oracle, mssql+pymssql Got: {engine}")
 
     db_string = f"{engine}://{username}:{password}@{dsn}"
     engine = create_engine(
         db_string,
-        connect_args={
-            # this becomes USERENV('MODULE') and USERENV('CLIENT_INFO')
-            "program": "repctl",
-            # this becomes USERENV('OS_USER')
-            "osuser": "rdsdb",
-        }
+        connect_args=connect_args,
     )
 
     db_objects = [obj.lower() for obj in json.loads(os.getenv("DB_OBJECTS", "[]"))]

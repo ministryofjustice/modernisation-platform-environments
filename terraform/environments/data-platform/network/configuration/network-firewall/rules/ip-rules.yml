@@ -1,0 +1,14 @@
+---
+# yaml-language-server: $schema=../../schema/rules/ip-rules.json
+rules:
+  - name: allow-home-net-github-ssh
+    sid: 1
+    revision: 1
+    action: pass
+    protocol: tcp
+    source_ip: $HOME_NET
+    source_port: any
+    direction: ->
+    destination_ip: $GITHUB_GIT
+    destination_port: 22
+    description: Allow SSH to github.com
