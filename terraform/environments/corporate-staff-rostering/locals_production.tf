@@ -536,10 +536,6 @@ locals {
           pre-migration = "PDCWW00006"
         })
       })
-
-      prisoner-retail = local.ec2_instances.prisoner-retail-ps-poc
-
-      prison-retail = local.ec2_instances.prison-retail
     }
 
     iam_policies = {
@@ -555,21 +551,6 @@ locals {
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*P/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/P*/*",
-            ]
-          }
-        ]
-      }
-      Ec2PrisonerRetailPolicy = {
-        description = "Permissions required for prisoner retail"
-        statements = [
-          {
-            effect = "Allow"
-            actions = [
-              "secretsmanager:GetSecretValue",
-              "secretsmanager:PutSecretValue",
-            ]
-            resources = [
-              "arn:aws:secretsmanager:*:*:secret:/prisoner-retail/*",
             ]
           }
         ]
@@ -824,11 +805,6 @@ locals {
       "/oracle/database/DIWFM" = {
         secrets = {
           passwords = { description = "database passwords" }
-        }
-      }
-      "/prisoner-retail" = {
-        secrets = {
-          notify_emails = { description = "email list to notify about prisoner retail job outputs. Format: 'from':'some.name@domain','to':'\"<some.name@domain>\", \"<another.name@domain>\" " }
         }
       }
     }
