@@ -202,7 +202,10 @@ resource "aws_db_instance" "appdb1" {
   }
 
   lifecycle {
-    ignore_changes = [final_snapshot_identifier]
+    ignore_changes = concat(
+      ["final_snapshot_identifier"],
+      local.is-production ? [] : ["auto_minor_version_upgrade"]
+    )
   }
 
 }
