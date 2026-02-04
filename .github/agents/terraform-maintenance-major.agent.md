@@ -319,4 +319,3 @@ Include:
   - Discoverability of major upgrades
   - Clear explanation of breaking changes
   - Helping engineers refactor safely with proposed diffs and draft PRs.
-  
