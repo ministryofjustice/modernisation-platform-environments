@@ -266,6 +266,7 @@ resource "aws_iam_role" "test_iam_role" {
     jsondecode(data.http.environments_file.response_body).tags,
     { "service-area" = "Hosting" },
     { "environment-name" = terraform.workspace },
-    { "source-code" = "https://github.com/ministryofjustice/modernisation-platform-environments" }
+    { "source-code" = "https://github.com/ministryofjustice/modernisation-platform-environments" },
+    { "is-production" = local.is-production }
   )
 }
