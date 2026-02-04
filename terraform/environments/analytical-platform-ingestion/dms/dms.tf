@@ -1,4 +1,4 @@
-# DMS configuration for CICA data pipelines (tariff and tempus)
+# DMS configuration for CICA data pipelines (tariff & tempus)
 locals {
   tariff = {
     short_resource_name = "tariff-${local.environment}"
