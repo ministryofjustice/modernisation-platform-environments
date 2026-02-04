@@ -12,6 +12,10 @@ terraform {
       version = "~> 2.0"
       source  = "hashicorp/external"
     }
+    github = {
+      version = "~> 6.0"
+      source  = "integrations/github"
+    }
     http = {
       version = "~> 3.0"
       source  = "hashicorp/http"
