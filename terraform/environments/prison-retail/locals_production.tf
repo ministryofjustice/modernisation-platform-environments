@@ -54,7 +54,7 @@ locals {
       #       backup-plan = "daily-and-weekly"
       #     }
       #     vpc_security_group_ids = [
-      #       "prisoner-retail",
+      #       "prison-retail",
       #       "ad-join",
       #       "ec2-windows"
       #     ]
