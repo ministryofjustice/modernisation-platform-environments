@@ -46,7 +46,7 @@ module "yjsm" {
       development   = "ami-020f796d0dec4ed4c"
       test          = "ami-00e714c8277811e57"
       preproduction = "ami-0d79a6afc87dfa388"
-      production    = "ami-08e24cb718917177b"
+      production    = "ami-0be9396f2bf4f21c1"
       # Add more environments when AMIs are known
     },
     local.environment,
