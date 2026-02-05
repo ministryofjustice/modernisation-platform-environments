@@ -4,7 +4,7 @@ module "cica_dms_ingress_bucket" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "5.10.0"
+  version = "4.3.0"
 
   bucket = "mojap-ingestion-${local.environment}-cica-dms-ingress"
 
@@ -27,7 +27,7 @@ module "cica_dms_ingress_bucket" {
 
 resource "aws_s3_bucket_replication_configuration" "cica_dms_ingress_bucket_replication" {
   count  = local.environment == "production" ? 1 : 0
-  role   = module.production_replication_cica_dms_iam_role[0].arn
+  role   = module.production_replication_cica_dms_iam_role[0].iam_role_arn
   bucket = module.cica_dms_ingress_bucket.s3_bucket_id
   rule {
     id     = "mojap-ingestion-cica-dms-ingress"

@@ -11,7 +11,7 @@ resource "aws_scheduler_schedule" "tariff_dms_nightly_full_load" {
 
   target {
     arn      = "arn:aws:scheduler:::aws-sdk:databasemigration:startReplicationTask"
-    role_arn = module.tariff_eventbridge_dms_full_load_task_role.arn
+    role_arn = module.tariff_eventbridge_dms_full_load_task_role.iam_role_arn
 
     input = jsonencode({
       ReplicationTaskArn       = module.cica_dms_tariff_dms_implementation.dms_full_load_task_arn
@@ -39,7 +39,7 @@ resource "aws_scheduler_schedule" "tempus_dms_nightly_full_load" {
 
   target {
     arn      = "arn:aws:scheduler:::aws-sdk:databasemigration:startReplicationTask"
-    role_arn = module.tempus_eventbridge_dms_full_load_task_role.arn
+    role_arn = module.tempus_eventbridge_dms_full_load_task_role.iam_role_arn
 
     input = jsonencode({
       ReplicationTaskArn       = each.value.dms_full_load_task_arn

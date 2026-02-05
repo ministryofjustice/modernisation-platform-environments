@@ -2,7 +2,7 @@ module "bucket_kms" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "4.2.0"
+  version = "3.1.1"
 
   aliases               = ["dms/${var.db}/bucket-kms"]
   description           = "Used to encrypt internal buckets for ${var.db} DMS module"
