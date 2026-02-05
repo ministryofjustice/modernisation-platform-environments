@@ -68,7 +68,17 @@
       "workspace_cidr_nonprod": "10.200.0.0/20",
       "northgate_proxy": "10.120.0.147/32",
       "aws_workspace_cidr": "10.200.0.0/20",
-      "cloud_platform_cidr": "172.20.0.0/16"
+      "cloud_platform_cidr": "172.20.0.0/16",
+      "oem": {
+        "agent_port": "3872",
+        "oms_port": "4903",
+        "soa_db_port": "1521",
+        "oms_host": "laa-oem-app.laa-development.modernisation-platform.service.justice.gov.uk",
+        "oem_db_host": "laa-oem-db.laa-development.modernisation-platform.service.justice.gov.uk",
+        "oms_platform_cidr": "10.26.60.231/32",
+        "oem_db_platform_cidr": "10.26.60.169/32",
+        "oem_db_name": "OEMDB"
+      }
     },
     "test": {
       "app_name": "ccms-soa",
@@ -137,7 +147,17 @@
       "outbound_s3_bucket_name": "laa-ccms-outbound-test-mp",
       "aws_workspace_cidr": "10.200.0.0/20",
       "northgate_proxy": "10.120.0.147/32",
-      "cloud_platform_cidr": "172.20.0.0/16"
+      "cloud_platform_cidr": "172.20.0.0/16",
+      "oem": {
+        "agent_port": "3872",
+        "oms_port": "4903",
+        "soa_db_port": "1521",
+        "oms_host": "laa-oem-app.laa-test.modernisation-platform.service.justice.gov.uk",
+        "oem_db_host": "laa-oem-db.laa-test.modernisation-platform.service.justice.gov.uk",
+        "oms_platform_cidr": "10.26.100.179/32",
+        "oem_db_platform_cidr": "10.26.100.249/32",
+        "oem_db_name": "OEMDB"
+      }
     },
     "preproduction": {
       "app_name": "ccms-soa",
@@ -145,7 +165,7 @@
       "admin_log_retention_days": "30",
       "admin_app_image": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/soa-admin",
       "admin_server_port": "7001",
-      "admin_container_version": "ba8b730c7751de92c9f55dca38277192336dd84a",
+      "admin_container_version": "0.0.15",
       "admin_ami_image_id": "ami-0d6d764bbe794b8ca",
       "admin_ec2_instance_type": "m5.xlarge",
       "admin_ec2_desired_capacity": "1",
@@ -175,7 +195,7 @@
       "managed_app_image": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/soa-managed",
       "managed_server_port": "8001",
       "managed_app_count": "4",
-      "managed_container_version": "40a3e9a71937b8acd08fa3d886135268918c461b",
+      "managed_container_version": "0.0.15",
       "managed_wl_mem_args": "-Xms8192m -Xmx12288m -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:InitiatingHeapOccupancyPercent=35 -XX:G1HeapRegionSize=16M -XX:MinMetaspaceFreeRatio=50 -XX:MaxMetaspaceFreeRatio=80 -XX:+AlwaysPreTouch",
       "managed_hostname": "ccms-soa-managed",
       "efs_performance_mode": "generalPurpose",
@@ -201,7 +221,17 @@
       "outbound_s3_bucket_name": "laa-ccms-outbound-preproduction-mp",
       "aws_workspace_cidr": "10.200.0.0/19",
       "northgate_proxy": "10.120.0.0/24",
-      "cloud_platform_cidr": "172.20.0.0/16"
+      "cloud_platform_cidr": "172.20.0.0/16",
+      "oem": {
+        "agent_port": "3872",
+        "oms_port": "4903",
+        "soa_db_port": "1521",
+        "oms_host": "laa-oem-app.laa-preproduction.modernisation-platform.service.justice.gov.uk",
+        "oem_db_host": "laa-oem-db.laa-preproduction.modernisation-platform.service.justice.gov.uk",
+        "oms_platform_cidr": "10.27.76.143/32",
+        "oem_db_platform_cidr": "10.27.76.170/32",
+        "oem_db_name": "OEMDB"
+      }
     },
     "production": {
       "app_name": "ccms-soa",
@@ -266,7 +296,17 @@
       "cortex_deps_bucket_name": "ccms-shared",
       "aws_workspace_cidr": "10.200.0.0/19",
       "northgate_proxy": "10.110.0.0/24",
-      "cloud_platform_cidr": "172.20.0.0/16"
+      "cloud_platform_cidr": "172.20.0.0/16",
+      "oem": {
+        "agent_port": "3872",
+        "oms_port": "4903",
+        "soa_db_port": "1521",
+        "oms_host": "laa-oem-app.laa-production.modernisation-platform.service.justice.gov.uk",
+        "oem_db_host": "laa-oem-db.laa-production.modernisation-platform.service.justice.gov.uk",
+        "oms_platform_cidr": "10.27.68.241/32",
+        "oem_db_platform_cidr": "10.27.68.190/32",
+        "oem_db_name": "OEMDB"
+      }
     }
   }
 }

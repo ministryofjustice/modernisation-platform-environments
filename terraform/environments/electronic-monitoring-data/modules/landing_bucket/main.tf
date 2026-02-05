@@ -58,6 +58,7 @@ locals {
         operations = [
           "Encrypt",
           "GenerateDataKey",
+          "Decrypt"
         ]
       }
     },
@@ -160,7 +161,8 @@ module "kms_key" {
       actions = [
         "kms:Encrypt",
         "kms:ReEncrypt*",
-        "kms:GenerateDataKey*"
+        "kms:GenerateDataKey*",
+        "kms:Decrypt",
       ]
       resources = ["*"]
     }
@@ -247,6 +249,14 @@ data "aws_iam_policy_document" "process_landing_bucket_files_s3_policy_document"
     resources = [
       "${module.this-bucket.bucket.arn}/*",
     ]
+  }
+
+  statement {
+    sid = "ListBucketPermissions"
+    actions = [
+      "s3:ListBucket",
+    ]
+    resources = [module.this-bucket.bucket.arn]
   }
 
   statement {

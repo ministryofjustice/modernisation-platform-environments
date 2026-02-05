@@ -912,6 +912,9 @@ data "aws_iam_policy_document" "load_fms_lambda_role_policy_document" {
     actions = [
       "s3:GetObjectAttributes",
       "s3:GetObject",
+      "s3:GetObjectTagging",
+      "s3:PutObject",
+      "s3:PutObjectTagging",
     ]
     resources = [
       "${module.s3-raw-formatted-data-bucket.bucket.arn}/serco/fms/*"
@@ -995,6 +998,23 @@ data "aws_iam_policy_document" "load_fms_lambda_role_policy_document" {
       "sqs:GetQueueUrl",
     ]
     resources = [aws_sqs_queue.clean_dlt_load_queue.arn]
+  }
+  statement {
+    sid    = "AllowPublishToAlertsTopic"
+    effect = "Allow"
+    actions = [
+      "sns:Publish",
+      ]
+    resources = [aws_sns_topic.emds_alerts.arn]
+  }
+    statement {
+    sid    = "AllowLambdaToUseKey"
+    effect = "Allow"
+    actions = [
+      "kms:GenerateDataKey",
+      "kms:Decrypt"
+      ]
+    resources = ["*"]
   }
 }
 
@@ -1365,6 +1385,146 @@ resource "aws_iam_role_policy_attachment" "mdss_daily_failure_digest_attach" {
   policy_arn = aws_iam_policy.mdss_daily_failure_digest.arn
 }
 
+#-----------------------------------------------------------------------------------
+# Copy data from test to dev or prod to preprod
+#-----------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "cross_account_copy" {
+  count = local.is-test || local.is-production ? 1 : 0
+  statement {
+    sid    = "AccessToCrossAccountBucket"
+    effect = "Allow"
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:DescribeKey"
+    ]
+    resources = [local.cross_account_kms]
+  }
+  statement {
+    sid    = "AccessToInAccountBucket"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:GetObjectTagging"
+    ]
+    resources = ["${module.s3-data-bucket.bucket.arn}/*"]
+  }
+  statement {
+    sid    = "AllowDumpToExternalBuckets"
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:PutObjectAcl"
+    ]
+    resources = [local.cross_account_bucket]
+  }
+}
+
+resource "aws_iam_role" "cross_account_copy" {
+  count              = local.is-test || local.is-production ? 1 : 0
+  name               = "cross_account_copy_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_policy" "cross_account_copy" {
+  count  = local.is-test || local.is-production ? 1 : 0
+  name   = "cross_account_copy_lambda_policy"
+  policy = data.aws_iam_policy_document.cross_account_copy[0].json
+}
+
+resource "aws_iam_role_policy_attachment" "cross_account_copy" {
+  count      = local.is-test || local.is-production ? 1 : 0
+  role       = aws_iam_role.cross_account_copy[0].name
+  policy_arn = aws_iam_policy.cross_account_copy[0].arn
+}
+
+
+#-----------------------------------------------------------------------------------
+# Iceberg table maint
+#-----------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "iceberg_table_maintenance_iam_role_policy_document" {
+  count = local.is-development || local.is-preproduction ? 1 : 0
+
+  statement {
+    sid    = "AthenaQueryPermissions"
+    effect = "Allow"
+    actions = [
+      "athena:StartQueryExecution",
+      "athena:GetQueryExecution",
+      "athena:GetQueryResults",
+      "athena:GetDataCatalog",
+      "athena:GetWorkGroup"
+    ]
+    resources = [
+      "arn:aws:athena:${data.aws_region.current.name}:${local.env_account_id}:workgroup/*",
+      "arn:aws:athena:${data.aws_region.current.name}:${local.env_account_id}:datacatalog/*"
+    ]
+  }
+
+  statement {
+    sid    = "GlueMetadataUpdate"
+    effect = "Allow"
+    actions = [
+      "glue:GetDatabase",
+      "glue:GetTable",
+      "glue:UpdateTable",
+      "glue:GetPartitions"
+    ]
+    resources = [
+      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:catalog",
+      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:database/g4s_tasking",
+      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/g4s_tasking/tbl_answers"
+    ]
+  }
+
+  statement {
+    sid    = "S3DataAndResultsAccess"
+    effect = "Allow"
+    actions = [
+      "s3:GetBucketLocation",
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:DeleteObject",
+      "s3:ListBucket",
+      "s3:ListBucketMultipartUploads",
+      "s3:AbortMultipartUpload", 
+      "s3:ListMultipartUploadParts" 
+    ]
+    resources = [
+      # The Data Bucket
+      module.s3-create-a-derived-table-bucket.bucket.arn,
+      "${module.s3-create-a-derived-table-bucket.bucket.arn}/*",
+      
+      # The Query Results Bucket
+      module.s3-athena-bucket.bucket.arn,
+      "${module.s3-athena-bucket.bucket.arn}/*"
+    ]
+  }
+}
+
+
+resource "aws_iam_role" "iceberg_table_maintenance_iam_role" {
+  count              = local.is-development || local.is-preproduction ? 1 : 0
+  name               = "iceberg_table_maintenance_iam_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_policy" "iceberg_table_maintenance_iam_role_policy" {
+  count  = local.is-development || local.is-preproduction ? 1 : 0
+  name   = "iceberg_table_maintenance_iam_policy"
+  policy = data.aws_iam_policy_document.iceberg_table_maintenance_iam_role_policy_document[0].json
+}
+
+resource "aws_iam_role_policy_attachment" "iceberg_table_maintenance_iam_role_policy_attachment" {
+  count      = local.is-development || local.is-preproduction ? 1 : 0
+  role       = aws_iam_role.iceberg_table_maintenance_iam_role[0].name
+  policy_arn = aws_iam_policy.iceberg_table_maintenance_iam_role_policy[0].arn
+}
+
 
 
 #-----------------------------------------------------------------------------------
@@ -1447,4 +1607,59 @@ resource "aws_iam_role_policy_attachment" "bucket_replication_attach" {
   count = local.is-development || local.is-preproduction ? 0 : 1
   role       = aws_iam_role.bucket_replication[0].name
   policy_arn = aws_iam_policy.bucket_replication[0].arn
+}
+
+# ------------------------------------------------------------------------------
+# IAM role + policy for the alarm threader lambda
+# ------------------------------------------------------------------------------
+
+resource "aws_iam_role" "cloudwatch_alarm_threader" {
+  name               = "cloudwatch_alarm_threader_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+data "aws_iam_policy_document" "cloudwatch_alarm_threader_policy_document" {
+  statement {
+    sid    = "S3StateAccess"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:DeleteObject",
+    ]
+    resources = [
+      "arn:aws:s3:::${local.alarm_thread_state_bucket}/${local.alarm_thread_state_prefix}/${local.environment_shorthand}/*"
+    ]
+  }
+
+  statement {
+    sid    = "AllowPublishToAlertsTopic"
+    effect = "Allow"
+    actions = [
+      "sns:Publish",
+    ]
+    resources = [aws_sns_topic.emds_alerts.arn]
+  }
+
+  # Topic is KMS-encrypted; to match the pattern used by mdss_daily_failure_digest
+  statement {
+    sid    = "AllowUseOfAlertsKmsKey"
+    effect = "Allow"
+    actions = [
+      "kms:GenerateDataKey",
+      "kms:GenerateDataKey*",
+      "kms:Decrypt",
+    ]
+    resources = [aws_kms_key.emds_alerts.arn]
+  }
+}
+
+resource "aws_iam_policy" "cloudwatch_alarm_threader" {
+  name   = "cloudwatch_alarm_threader_lambda_policy"
+  policy = data.aws_iam_policy_document.cloudwatch_alarm_threader_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "cloudwatch_alarm_threader_attach" {
+  role       = aws_iam_role.cloudwatch_alarm_threader.name
+  policy_arn = aws_iam_policy.cloudwatch_alarm_threader.arn
 }
