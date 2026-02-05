@@ -3,7 +3,8 @@ module "production_replication_cica_dms_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
   count = local.environment == "production" ? 1 : 0
 
-  source  = "terraform-aws-modules/iam/aws//modules/iam-role"
+  source = "terraform-aws-modules/iam/aws//modules/iam-role"
+  # version = "6.4.0"
   version = "6.4.0"
 
   create = true
@@ -42,7 +43,7 @@ module "tariff_eventbridge_dms_full_load_task_role" {
       effect  = "Allow"
       actions = ["sts:AssumeRole"]
       principals = [{
-        type        = "Service"
+        type = "Service"
         identifiers = [
           "scheduler.amazonaws.com",
           "apidestinations.events.amazonaws.com"
@@ -86,7 +87,7 @@ module "tempus_eventbridge_dms_full_load_task_role" {
       effect  = "Allow"
       actions = ["sts:AssumeRole"]
       principals = [{
-        type        = "Service"
+        type = "Service"
         identifiers = [
           "scheduler.amazonaws.com",
           "apidestinations.events.amazonaws.com"
