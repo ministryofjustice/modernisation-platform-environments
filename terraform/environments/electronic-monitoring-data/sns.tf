@@ -1,6 +1,10 @@
 resource "aws_sns_topic" "emds_alerts" {
   name              = "emds-alerts-${local.environment_shorthand}"
   kms_master_key_id = aws_kms_key.emds_alerts.arn
+
+  http_success_feedback_role_arn    = aws_iam_role.sns_delivery_logging.arn
+  http_failure_feedback_role_arn    = aws_iam_role.sns_delivery_logging.arn
+  http_success_feedback_sample_rate = 0
 }
 
 resource "aws_kms_key" "emds_alerts" {
@@ -58,6 +62,32 @@ data "aws_iam_policy_document" "emds_alerts_kms" {
       identifiers = ["cloudwatch.amazonaws.com"]
     }
   }
+
+  # Allow mdss_daily_failure_digest Lambda role to publish encrypted messages (all envs)
+  statement {
+    sid       = "AllowMdssDailyFailureDigestUseOfKey"
+    effect    = "Allow"
+    resources = ["*"]
+    actions   = ["kms:Decrypt", "kms:GenerateDataKey"]
+
+    principals {
+      type        = "AWS"
+      identifiers = [aws_iam_role.mdss_daily_failure_digest.arn]
+    }
+  }
+
+  # Allow cloudwatch_alarm_threader Lambda role to publish encrypted messages (all envs)
+  statement {
+    sid       = "AllowCloudwatchAlarmThreaderUseOfKey"
+    effect    = "Allow"
+    resources = ["*"]
+    actions   = ["kms:Decrypt", "kms:GenerateDataKey"]
+
+    principals {
+      type        = "AWS"
+      identifiers = [aws_iam_role.cloudwatch_alarm_threader.arn]
+    }
+  }
 }
 
 data "aws_iam_policy_document" "emds_alerts_topic_policy" {
@@ -79,6 +109,40 @@ data "aws_iam_policy_document" "emds_alerts_topic_policy" {
       identifiers = [
         "cloudwatch.amazonaws.com"
       ]
+    }
+  }
+
+  # Allow mdss_daily_failure_digest Lambda role to publish (all envs)
+  statement {
+    sid    = "AllowMdssDailyFailureDigestLambdaToPublish"
+    effect = "Allow"
+
+    actions = [
+      "sns:Publish",
+    ]
+
+    resources = [aws_sns_topic.emds_alerts.arn]
+
+    principals {
+      type        = "AWS"
+      identifiers = [aws_iam_role.mdss_daily_failure_digest.arn]
+    }
+  }
+
+  # Allow cloudwatch_alarm_threader Lambda role to publish (all envs)
+  statement {
+    sid    = "AllowCloudwatchAlarmThreaderLambdaToPublish"
+    effect = "Allow"
+
+    actions = [
+      "sns:Publish",
+    ]
+
+    resources = [aws_sns_topic.emds_alerts.arn]
+
+    principals {
+      type        = "AWS"
+      identifiers = [aws_iam_role.cloudwatch_alarm_threader.arn]
     }
   }
 
@@ -116,4 +180,42 @@ resource "aws_sqs_queue" "emds_alerts_dlq" {
   sqs_managed_sse_enabled    = true
   visibility_timeout_seconds = 60
   message_retention_seconds  = 1209600
+}
+
+# -----------------------------------------------------------------------------------
+# SNS delivery status logging role (for HTTPS / Chatbot)
+# -----------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "sns_delivery_logging_assume" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["sns.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role" "sns_delivery_logging" {
+  name               = "sns-delivery-status-logging-${local.environment_shorthand}"
+  assume_role_policy = data.aws_iam_policy_document.sns_delivery_logging_assume.json
+}
+
+data "aws_iam_policy_document" "sns_delivery_logging_policy" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents"
+    ]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_role_policy" "sns_delivery_logging" {
+  role   = aws_iam_role.sns_delivery_logging.id
+  policy = data.aws_iam_policy_document.sns_delivery_logging_policy.json
 }

@@ -2,12 +2,12 @@
 ### SSH KEY PAIR GENERATION
 ######################################
 resource "tls_private_key" "ec2_ssh_key" {
-  count     = contains(["test", "preproduction"], local.environment) ? 1 : 0
+  count     = contains(["preproduction", "production"], local.environment) ? 1 : 0
   algorithm = "ED25519"
 }
 
 resource "aws_key_pair" "ec2_key_pair" {
-  count      = contains(["test", "preproduction"], local.environment) ? 1 : 0
+  count      = contains(["preproduction", "production"], local.environment) ? 1 : 0
   key_name   = "${local.application_name}-${local.environment}-key"
   public_key = tls_private_key.ec2_ssh_key[0].public_key_openssh
 
@@ -18,7 +18,7 @@ resource "aws_key_pair" "ec2_key_pair" {
 }
 
 resource "aws_secretsmanager_secret" "ec2_ssh_private_key" {
-  count       = contains(["test", "preproduction"], local.environment) ? 1 : 0
+  count       = contains(["preproduction", "production"], local.environment) ? 1 : 0
   name        = "${local.application_name}-${local.environment}/ec2-ssh-private-key"
   description = "Private SSH key for ${local.application_name} EC2 instance"
 
@@ -29,7 +29,7 @@ resource "aws_secretsmanager_secret" "ec2_ssh_private_key" {
 }
 
 resource "aws_secretsmanager_secret_version" "ec2_ssh_private_key_version" {
-  count     = contains(["test", "preproduction"], local.environment) ? 1 : 0
+  count     = contains(["preproduction", "production"], local.environment) ? 1 : 0
   secret_id = aws_secretsmanager_secret.ec2_ssh_private_key[0].id
   secret_string = jsonencode({
     private_key = tls_private_key.ec2_ssh_key[0].private_key_openssh
@@ -52,9 +52,9 @@ locals {
 ### EC2 Network Interface (ENI)
 ######################################
 resource "aws_network_interface" "oas_eni_new" {
-  count           = contains(["test", "preproduction"], local.environment) ? 1 : 0
+  count           = contains(["preproduction", "production"], local.environment) ? 1 : 0
   subnet_id       = data.aws_subnet.private_subnets_a.id
-  private_ips     = [local.application_data.accounts[local.environment].ec2_private_ip]
+  private_ips     = try(local.application_data.accounts[local.environment].ec2_private_ip, null) != null ? [local.application_data.accounts[local.environment].ec2_private_ip] : null
   security_groups = [aws_security_group.ec2_sg[0].id]
 
   tags = merge(
@@ -67,7 +67,7 @@ resource "aws_network_interface" "oas_eni_new" {
 ### EC2 INSTANCE
 ######################################
 resource "aws_instance" "oas_app_instance_new" {
-  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+  count = contains(["preproduction", "production"], local.environment) ? 1 : 0
 
   ami                         = local.application_data.accounts[local.environment].ec2amiid
   availability_zone           = "eu-west-2a"
