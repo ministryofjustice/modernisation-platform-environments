@@ -202,7 +202,7 @@ resource "aws_db_instance" "appdb1" {
   }
 
   lifecycle {
-    ignore_changes = [final_snapshot_identifier, auto_minor_version_upgrade] # Remove the auto minor version upgrade for PROD as that is handled via Terraform and then add it back in.
+    ignore_changes = [final_snapshot_identifier, engine_version] # Remove the engine version for PROD as that is handled via Terraform and then add it back in.
   }
 
 }
