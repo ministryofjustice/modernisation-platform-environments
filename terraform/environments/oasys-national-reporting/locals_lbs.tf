@@ -102,6 +102,26 @@ locals {
           }
           target_type = "instance"
         }
+        https-8443 = {
+          port     = 8443
+          protocol = "HTTPS"
+          health_check = {
+            enabled             = true
+            interval            = 10
+            healthy_threshold   = 3
+            matcher             = "200-399"
+            path                = "/"
+            port                = 8443
+            protocol            = "HTTPS"
+            timeout             = 5
+            unhealthy_threshold = 2
+          }
+          stickiness = {
+            enabled = true
+            type    = "lb_cookie"
+          }
+          target_type = "instance"
+        }
       }
     }
   }
