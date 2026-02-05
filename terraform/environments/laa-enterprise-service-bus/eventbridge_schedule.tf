@@ -44,7 +44,7 @@ resource "aws_scheduler_schedule" "maat_load_schedule" {
   }
 
   schedule_expression = local.environment == "production" ? "cron(45 10 * * ? *)" : "cron(0 7-19 ? * * *)"
-
+  state               = local.environment == "test" ? "DISABLED" : "ENABLED"
   target {
     arn      = aws_lambda_function.maat_provider_load.arn
     role_arn = aws_iam_role.scheduler_invoke_lambda_role.arn
