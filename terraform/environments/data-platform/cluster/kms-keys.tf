@@ -41,7 +41,7 @@ module "eks_logs_kms_key" {
 module "eks_ebs_kms_key" {
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-kms.git?ref=407e3db34a65b384c20ef718f55d9ceacb97a846" # v4.2.0
 
-  aliases               = ["eks/ebs"]
+  aliases               = ["ebs/eks/${local.eks_cluster_name}"]
   enable_default_policy = true
 
   key_service_roles_for_autoscaling = [
