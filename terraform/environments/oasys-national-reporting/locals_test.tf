@@ -310,6 +310,11 @@ locals {
               { ec2_instance_name = "t2-onr-web-1" },
             ]
           })
+          t2-onr-weboidc-https-8443 = merge(local.lbs.public.instance_target_groups.https-8443, {
+            attachments = [
+              { ec2_instance_name = "t2-onr-weboidc-1" },
+            ]
+          })
         }
         listeners = merge(local.lbs.public.listeners, {
           https = merge(local.lbs.public.listeners.https, {
@@ -330,10 +335,24 @@ locals {
                 }]
               }
               t2-onr-web-http-7777 = {
-                priority = 1200 # change priority to 200 if the environment is powered on during day
+                priority = 200 # change priority to 1200 once testing is finished
                 actions = [{
                   type              = "forward"
                   target_group_name = "t2-onr-web-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t2-without-sso.test.reporting.oasys.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              t2-onr-weboidc-https-8443 = {
+                priority = 300 # change priority to 200 if the environment is powered on during day
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t2-onr-weboidc-https-8443"
                 }]
                 conditions = [{
                   host_header = {
@@ -386,6 +405,7 @@ locals {
       "test.reporting.oasys.service.justice.gov.uk" = {
         lb_alias_records = [
           { name = "t2", type = "A", lbs_map_key = "public" },
+          { name = "t2-without-sso", type = "A", lbs_map_key = "public" },
           { name = "t2-bods", type = "A", lbs_map_key = "public" },
         ],
       }
