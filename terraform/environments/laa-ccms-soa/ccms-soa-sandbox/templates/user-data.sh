@@ -4,7 +4,10 @@ EFS_MOUNT_POINT=$EC2_USER_HOME_FOLDER/efs
 
 echo "ECS_CLUSTER=${cluster_name}" >> /etc/ecs/ecs.config
 echo 'ECS_VOLUME_PLUGIN_CAPABILITIES=["efsAuth"]' >> /etc/ecs/ecs.config
-echo 'ECS_INSTANCE_ATTRIBUTES={"server": "${server}","latest": "true"}' >> /etc/ecs/ecs.config
+# echo 'ECS_INSTANCE_ATTRIBUTES={"server": "${server}","latest": "true"}' >> /etc/ecs/ecs.config
+# The following lines are added to test on 5th Feb 2026
+echo "ECS_INSTANCE_ATTRIBUTES={\"server\": \"${server}\",\"latest\": \"true\"}" >> /etc/ecs/ecs.config
+systemctl restart ecs || true
 
 #--Configure EFS
 yum install -y amazon-efs-utils
