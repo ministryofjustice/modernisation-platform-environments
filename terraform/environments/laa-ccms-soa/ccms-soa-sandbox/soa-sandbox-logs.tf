@@ -6,18 +6,18 @@ resource "aws_cloudwatch_log_group" "soa_sandbox_log_group_admin" {
 
 resource "aws_cloudwatch_log_stream" "soa_sandbox_log_stream_admin" {
   name           = "${local.component_name}-admin-log-stream"
-  log_group_name = aws_cloudwatch_log_group.log_group_admin.name
+  log_group_name = aws_cloudwatch_log_group.soa_sandbox_log_group_admin.name
 }
 
 resource "aws_cloudwatch_log_stream" "soa_sandbox_log_stream_admin_ecs" {
   name           = "${local.component_name}-admin-ecs"
-  log_group_name = aws_cloudwatch_log_group.log_group_admin.name
+  log_group_name = aws_cloudwatch_log_group.soa_sandbox_log_group_admin.name
 }
 
 resource "aws_cloudwatch_log_metric_filter" "soa_sandbox_soa_stuck_thread_admin" {
-  name           = "SOASANDBOC_SOAStuckThreadAdmin"
+  name           = "SOASANDBOX_SOAStuckThreadAdmin"
   pattern        = "\"STUCK\" -\"Self tuning\""
-  log_group_name = aws_cloudwatch_log_group.log_group_admin.name
+  log_group_name = aws_cloudwatch_log_group.soa_sandbox_log_group_admin.name
 
   metric_transformation {
     name      = "SOAStuckThreadAdmin"
