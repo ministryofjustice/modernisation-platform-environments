@@ -48,9 +48,8 @@ module "eks" {
 
   authentication_mode = "API"
 
-  #   cloudwatch_log_group_kms_key_id        = module.eks_logs_kms_key.key_arn
-  #   cloudwatch_log_group_retention_in_days = 365
-  enabled_log_types = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
+  create_cloudwatch_log_group = false
+  enabled_log_types           = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
 
   kms_key_aliases = ["eks/${local.eks_cluster_name}"]
 
