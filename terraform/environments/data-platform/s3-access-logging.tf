@@ -22,7 +22,7 @@ data "aws_iam_policy_document" "s3_access_logs_bucket_policy" {
 
 #trivy:ignore:AVD-AWS-0132: S3 Server Access Logging bucket cannot use SSE-KMS (https://docs.aws.amazon.com/AmazonS3/latest/userguide/enable-server-access-logging.html)
 module "s3_access_logs_s3_bucket" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-s3-bucket.git?ref=0662a7bdfceac73daed7c08df2b421707de341df" # v5.9.0
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-s3-bucket.git?ref=b040965a526e22a78784840c2f2ae384f2a8e4ef" # v5.10.0
 
   bucket = local.s3_access_logs_bucket_name
 
