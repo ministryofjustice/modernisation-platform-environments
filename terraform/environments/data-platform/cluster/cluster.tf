@@ -51,8 +51,6 @@ module "eks" {
   create_cloudwatch_log_group = false
   enabled_log_types           = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
 
-  kms_key_aliases = ["eks/${local.eks_cluster_name}"]
-
   encryption_config = {
     resources = ["secrets"]
   }
