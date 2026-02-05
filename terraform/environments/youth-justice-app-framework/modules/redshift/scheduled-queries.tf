@@ -18,7 +18,7 @@ resource "aws_lambda_function" "redshift_scheduler" {
     variables = {
       REDSHIFT_WORKGROUP = aws_redshiftserverless_workgroup.default.workgroup_name
       SECRET_ARN         = aws_secretsmanager_secret.yjb_schedular.arn
-      SQL_QUERY_1        = "CALL yjb_ianda_team.refresh_materialized_views();"
+      SQL_QUERY_1        = "yjb_case_reporting.refresh_materialized_views();"
       SQL_QUERY_2_FILE   = "/var/task/scripts/qs2-fte_redshift.sql"
       DATABASE_NAME      = "yjb_returns"
     }

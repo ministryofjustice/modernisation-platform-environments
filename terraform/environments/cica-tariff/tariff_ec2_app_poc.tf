@@ -14,8 +14,8 @@ resource "aws_instance" "tariff_app_dev_poc_clone" {
   key_name             = aws_key_pair.key_pair_app.key_name
   monitoring           = true
   subnet_id            = data.aws_subnet.private_subnets_a.id
-  #vpc_security_group_ids = [module.tariff_app_security_group[0].security_group_id]
-  vpc_security_group_ids = [aws_security_group.temp_dev_ssm_only[0].id] # TEMPORARY ASSIGNMENT
+  vpc_security_group_ids = [module.tariff_app_security_group[0].security_group_id]
+  #vpc_security_group_ids = [aws_security_group.temp_dev_ssm_only[0].id] # TEMPORARY ASSIGNMENT
 
   tags = merge(tomap({
     "Name"     = lower(format("ec2-%s-%s-app-clone", local.application_name, local.environment)),
@@ -23,7 +23,7 @@ resource "aws_instance" "tariff_app_dev_poc_clone" {
     }), local.tags, local.environment != "development" ? tomap({ "backup" = "true" }) : tomap({})
   )
 }
-
+/*
 # Temporary SG to restrict access to/from Clone above during configuration phase
 resource "aws_security_group" "temp_dev_ssm_only" {
   count       = local.environment == "development" ? 1 : 0
@@ -49,3 +49,4 @@ resource "aws_security_group_rule" "temp_dev_ssm_only_egress" {
   protocol                 = "TCP"
   source_security_group_id = data.aws_security_group.core_vpc_protected.id
 }
+*/

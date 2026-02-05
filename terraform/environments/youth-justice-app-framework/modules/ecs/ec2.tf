@@ -169,36 +169,22 @@ module "autoscaling_sg" {
   description = "Autoscaling group security group"
   vpc_id      = var.vpc_id
 
-  ingress_with_source_security_group_id = [
-    {
-      from_port                = 8125
-      to_port                  = 8125
-      protocol                 = "UDP"
-      description              = "Datadog from ecs internal"
-      source_security_group_id = aws_security_group.common_ecs_service_internal.id
-    },
-    {
-      from_port                = 8125
-      to_port                  = 8125
-      protocol                 = "UDP"
-      description              = "Datadog from ecs external"
-      source_security_group_id = aws_security_group.common_ecs_service_external.id
-    },
-    {
-      from_port                = 8126
-      to_port                  = 8126
-      protocol                 = "TCP"
-      description              = "Datadog from ecs internal"
-      source_security_group_id = aws_security_group.common_ecs_service_internal.id
-    },
-    {
-      from_port                = 8126
-      to_port                  = 8126
-      protocol                 = "TCP"
-      description              = "Datadog from ecs external"
-      source_security_group_id = aws_security_group.common_ecs_service_external.id
-    }
-  ]
+   ingress_with_source_security_group_id = [
+  #   {
+  #     from_port                = 8125
+  #     to_port                  = 8125
+  #     protocol                 = "UDP"
+  #     description              = "Datadog from ecs internal"
+  #     source_security_group_id = aws_security_group.common_ecs_service_internal.id
+  #   },
+  #   {
+  #     from_port                = 8126
+  #     to_port                  = 8126
+  #     protocol                 = "TCP"
+  #     description              = "Datadog from ecs internal"
+  #     source_security_group_id = aws_security_group.common_ecs_service_internal.id
+  #   }
+   ]
 
   ingress_with_self = [
     {
@@ -209,6 +195,8 @@ module "autoscaling_sg" {
   computed_ingress_with_source_security_group_id = concat(var.ec2_ingress_with_source_security_group_id_rules, local.common_datadog_rules)
 
   number_of_computed_ingress_with_source_security_group_id = length(var.ec2_ingress_with_source_security_group_id_rules)
+
+
 
   egress_rules = ["all-all"]
 

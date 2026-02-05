@@ -54,6 +54,12 @@ locals {
     cmm-target-group-2 = {
       name = "cmm-target-group-2"
     },
+    connectivity-target-group-1 = {
+      name = "connectivity-target-group-1"
+    },
+    connectivity-target-group-2 = {
+      name = "connectivity-target-group-2"
+    },
     conversions-target-group-1 = {
       name = "conversions-target-group-1"
     },
