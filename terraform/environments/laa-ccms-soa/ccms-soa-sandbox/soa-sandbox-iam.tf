@@ -17,6 +17,11 @@ data "aws_iam_policy_document" "ecs_task_execution_role" {
   }
 }
 
+#--Secrets access policy for ECS tasks
+data "aws_secretsmanager_secret" "pull_soasandbox_password" {
+  name = "soasandbox-password"
+}
+
 resource "aws_iam_role" "ecs_task_execution_role" {
   name               = "soa-${local.component_name}.${local.application_data.accounts[local.environment].app_name}-WorldTaskExecutionRole"
   assume_role_policy = data.aws_iam_policy_document.ecs_task_execution_role.json
@@ -48,6 +53,26 @@ EOF
 resource "aws_iam_role_policy_attachment" "ecs_secrets_policy_attachment" {
   role       = aws_iam_role.ecs_task_execution_role.name
   policy_arn = aws_iam_policy.ecs_secrets_policy.arn
+}
+
+# resource to allow ECS tasks to access specific secrets
+resource "aws_iam_role_policy" "ecs_execution_secret_access" {
+  name = "ecs-exec-secret-access"
+  role = aws_iam_role.ecs_task_execution_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:DescribeSecret"
+        ]
+        Resource = data.aws_secretsmanager_secret.pull_soasandbox_password.arn
+      }
+    ]
+  })
 }
 
 # resource "aws_iam_policy" "soa_s3_policy" {
@@ -214,9 +239,14 @@ resource "aws_iam_policy" "ec2_instance_policy" {
           "Effect": "Allow",
           "Action": ["secretsmanager:GetSecretValue"],
           "Resource": [
-            "arn:aws:secretsmanager:eu-west-2:*:secret:ccms/soa/deploy-*",
-            "arn:aws:secretsmanager:eu-west-2:*:secret:ccms/soa/password",
-            "arn:aws:secretsmanager:eu-west-2:*:secret:ccms/soa/xxsoa/ds/password"
+            "arn:aws:secretsmanager:eu-west-2:*:secret:ccms/soasandbox/deploy-*",
+            "arn:aws:secretsmanager:eu-west-2:*:secret:ccms/soasandbox/password",
+            "arn:aws:secretsmanager:eu-west-2:*:secret:ccms/soasandbox/xxsoa/ds/password",
+            "arn:aws:secretsmanager:eu-west-2:*:secret:ccms/soasandbox/ebs/sms/ds/password",
+            "arn:aws:secretsmanager:eu-west-2:*:secret:ccms/soasandbox/ebs/user/password",
+            "arn:aws:secretsmanager:eu-west-2:*:secret:ccms/soasandbox/ebs/ds/password",
+            "arn:aws:secretsmanager:eu-west-2:*:secret:ccms/soasandbox/pui/user/password",
+            "arn:aws:secretsmanager:eu-west-2:*:secret:ccms/soasandbox/java/trust-store/password"
           ]
         }
     ]
