@@ -22,6 +22,9 @@ locals {
     "staging_fms",
     "staging_mdss",
     "test_results",
+    "validation",
+    "metrics",
+    "check",
   ]
   live_feeds_dbs = [
     "allied_mdss",
@@ -50,9 +53,12 @@ locals {
     "buddi_stg",
     "buddi_buddi",
     "cap_dw_stg",
+    "curated_alcohol_monitoring",
+    "curated_cap_dw",
     "curated_emsys_mvp",
     "curated_emsys_tpims",
     "curated_fep",
+    "curated_scram_alcohol_monitoring",
     "emd_historic_int",
     "emsys_mvp_stg",
     "emsys_tpims_stg",

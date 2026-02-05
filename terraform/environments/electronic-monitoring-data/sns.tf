@@ -75,6 +75,19 @@ data "aws_iam_policy_document" "emds_alerts_kms" {
       identifiers = [aws_iam_role.mdss_daily_failure_digest.arn]
     }
   }
+
+  # Allow cloudwatch_alarm_threader Lambda role to publish encrypted messages (all envs)
+  statement {
+    sid       = "AllowCloudwatchAlarmThreaderUseOfKey"
+    effect    = "Allow"
+    resources = ["*"]
+    actions   = ["kms:Decrypt", "kms:GenerateDataKey"]
+
+    principals {
+      type        = "AWS"
+      identifiers = [aws_iam_role.cloudwatch_alarm_threader.arn]
+    }
+  }
 }
 
 data "aws_iam_policy_document" "emds_alerts_topic_policy" {
@@ -113,6 +126,23 @@ data "aws_iam_policy_document" "emds_alerts_topic_policy" {
     principals {
       type        = "AWS"
       identifiers = [aws_iam_role.mdss_daily_failure_digest.arn]
+    }
+  }
+
+  # Allow cloudwatch_alarm_threader Lambda role to publish (all envs)
+  statement {
+    sid    = "AllowCloudwatchAlarmThreaderLambdaToPublish"
+    effect = "Allow"
+
+    actions = [
+      "sns:Publish",
+    ]
+
+    resources = [aws_sns_topic.emds_alerts.arn]
+
+    principals {
+      type        = "AWS"
+      identifiers = [aws_iam_role.cloudwatch_alarm_threader.arn]
     }
   }
 

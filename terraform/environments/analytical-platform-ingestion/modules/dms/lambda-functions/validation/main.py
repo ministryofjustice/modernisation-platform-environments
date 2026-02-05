@@ -26,6 +26,7 @@ http = PoolManager()
 
 type_lookup = {
     "string": "character",
+    "bool": "boolean",
     "boolean": "boolean",
     "timestamp": "datetime",
     "decimal": "decimal",

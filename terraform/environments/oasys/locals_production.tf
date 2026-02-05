@@ -546,7 +546,15 @@ locals {
 
     lbs = {
       public = merge(local.lbs.public, {
+
         access_logs_lifecycle_rule = [module.baseline_presets.s3_lifecycle_rules.general_purpose_one_year]
+
+        s3_notification_queues = {
+          "cortex-xsiam-s3-public-alb-log-collection" = {
+            events    = ["s3:ObjectCreated:*"]
+            queue_arn = "cortex-xsiam-s3-alb-log-collection"
+          }
+        }
 
         listeners = merge(local.lbs.public.listeners, {
           https = merge(local.lbs.public.listeners.https, {
@@ -645,6 +653,16 @@ locals {
       })
 
       private = merge(local.lbs.private, {
+
+        access_logs_lifecycle_rule = [module.baseline_presets.s3_lifecycle_rules.general_purpose_one_year]
+
+        s3_notification_queues = {
+          "cortex-xsiam-s3-private-alb-log-collection" = {
+            events    = ["s3:ObjectCreated:*"]
+            queue_arn = "cortex-xsiam-s3-alb-log-collection"
+          }
+        }
+
         listeners = merge(local.lbs.private.listeners, {
           https = merge(local.lbs.private.listeners.https, {
             certificate_names_or_arns = ["pd_oasys_cert"]
@@ -744,6 +762,73 @@ locals {
             }
           })
         })
+        cloudwatch_metric_alarms = {
+          high-requests = {
+            comparison_operator = "GreaterThanOrEqualToThreshold"
+            evaluation_periods  = "3"
+            datapoints_to_alarm = "3"
+            metric_name         = "RequestCount"
+            namespace           = "AWS/ApplicationELB"
+            period              = "300"
+            statistic           = "Sum"
+            threshold           = 30000
+            alarm_description   = "Triggers if request count exceeds threshold per 5 minutes for 15 minutes."
+            alarm_actions       = [] # ["pagerduty"]
+            ok_actions          = [] # ["pagerduty"]
+          }
+          high-4xx = {
+            comparison_operator = "GreaterThanOrEqualToThreshold"
+            evaluation_periods  = "3"
+            datapoints_to_alarm = "3"
+            metric_name         = "HTTPCode_Target_4XX_Count"
+            namespace           = "AWS/ApplicationELB"
+            period              = "300"
+            statistic           = "Sum"
+            threshold           = 100
+            alarm_description   = "Triggers if target 4xx errors exceed threshold per 5 minutes for 15 minutes."
+            alarm_actions       = [] # ["pagerduty"]
+            ok_actions          = [] # ["pagerduty"]
+          }
+          high-5xx = {
+            comparison_operator = "GreaterThanOrEqualToThreshold"
+            evaluation_periods  = "3"
+            datapoints_to_alarm = "3"
+            metric_name         = "HTTPCode_Target_5XX_Count"
+            namespace           = "AWS/ApplicationELB"
+            period              = "300"
+            statistic           = "Sum"
+            threshold           = 50
+            alarm_description   = "Triggers if target 5xx errors exceed threshold per 5 minutes for 15 minutes."
+            alarm_actions       = [] # ["pagerduty"]
+            ok_actions          = [] # ["pagerduty"]
+          }
+          high-latency = {
+            comparison_operator = "GreaterThanOrEqualToThreshold"
+            evaluation_periods  = "3"
+            datapoints_to_alarm = "3"
+            metric_name         = "TargetResponseTime"
+            namespace           = "AWS/ApplicationELB"
+            period              = "60"
+            statistic           = "Average"
+            threshold           = 5
+            alarm_description   = "Triggers if average target response time exceeds threshold for 3 minutes."
+            alarm_actions       = [] # ["pagerduty"]
+            ok_actions          = [] # ["pagerduty"]
+          }
+          high-new-connections = {
+            comparison_operator = "GreaterThanOrEqualToThreshold"
+            evaluation_periods  = "3"
+            datapoints_to_alarm = "3"
+            metric_name         = "NewConnectionCount"
+            namespace           = "AWS/ApplicationELB"
+            period              = "300"
+            statistic           = "Sum"
+            threshold           = 4000
+            alarm_description   = "Triggers if average target response time exceeds threshold."
+            alarm_actions       = [] # ["pagerduty"]
+            ok_actions          = [] # ["pagerduty"]
+          }
+        }
       })
     }
 
