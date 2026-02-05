@@ -178,7 +178,7 @@ data "template_file" "launch-template-managed" {
 data "template_file" "launch-template-admin" {
   template = file("${path.module}/templates/user-data.sh")
   vars = {
-    cluster_name       = "soasandbox-${local.application_data.accounts[local.environment].app_name}-cluster"
+    cluster_name       = "${local.component_name}-${local.environment}-cluster"
     efs_id             = aws_efs_file_system.storage.id
     server             = "admin"
     deploy_environment = local.environment
