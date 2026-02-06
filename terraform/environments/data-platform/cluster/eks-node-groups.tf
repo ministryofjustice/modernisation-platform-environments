@@ -3,8 +3,7 @@
 # AFTER Cilium CNI is installed and ready
 
 module "eks_managed_node_group_system" {
-  source  = "terraform-aws-modules/eks/aws//modules/eks-managed-node-group"
-  version = "21.15.1"
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-eks.git//modules/eks-managed-node-group?ref=42693d40bceb3ad80d49b0574cc3046455c2def6" # v21.15.1
 
   name         = "system"
   cluster_name = module.eks.cluster_name
@@ -22,10 +21,10 @@ module "eks_managed_node_group_system" {
   min_size       = 3
   max_size       = 10
   desired_size   = 3
-  instance_types = ["m7a.large"]
+  instance_types = ["m8g.large"]
 
   # Bottlerocket configuration
-  ami_type                       = "BOTTLEROCKET_x86_64"
+  ami_type                       = "BOTTLEROCKET_ARM_64"
   use_latest_ami_release_version = false
   ami_release_version            = "1.54.0-5043decc"
 
@@ -47,9 +46,6 @@ module "eks_managed_node_group_system" {
     }
   }
 
-  tags = {
-    Name = "${local.eks_cluster_name}-system"
-  }
 
   # EBS volume configuration
   block_device_mappings = {
@@ -69,9 +65,8 @@ module "eks_managed_node_group_system" {
 
   # IAM policies for node functionality
   iam_role_additional_policies = {
-    AmazonEC2ContainerRegistryReadOnly = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
-    AmazonSSMManagedInstanceCore       = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-    CloudWatchAgentServerPolicy        = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+    AmazonSSMManagedInstanceCore = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+    CloudWatchAgentServerPolicy  = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
   }
 
   # Enable automatic node repair
