@@ -39,6 +39,7 @@ module "environment_stage" {
   fsx_config               = local.fsx_config_stage
   dfi_report_bucket_config = local.dfi_report_bucket_config_stage
   lb_config                = local.lb_config_stage
+  datasync_config          = local.datasync_config_stage
 
   pagerduty_integration_key = local.pagerduty_integration_key
 
