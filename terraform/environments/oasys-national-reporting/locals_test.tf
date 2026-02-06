@@ -387,24 +387,24 @@ locals {
         })
       })
 
-      # onr-test-nlb = merge(local.lbs.nlb, {
-      #   instance_target_groups = {
-      #     t2-onr-weboidc-https-8443 = merge(local.lbs.nlb.instance_target_groups.https-8443, {
-      #       # attachments = [
-      #       #   { ec2_instance_name = "t2-onr-weboidc-1" },
-      #       # ]
-      #     })
-      #   }
+      onr-test-nlb = merge(local.lbs.nlb, {
+        instance_target_groups = {
+          t2-onr-weboidc-https-8443 = merge(local.lbs.nlb.instance_target_groups.https-8443, {
+            attachments = [
+              { ec2_instance_name = "t2-onr-weboidc-1" },
+            ]
+          })
+        }
 
-      #   listeners = {
-      #     https = merge(local.lbs.nlb.listeners.https, {
-      #       # default_action = {
-      #       #   type      #       #   = "forward"
-      #       #   target_group_name = "t2-onr-weboidc-https-8443"
-      #       # }
-      #     })
-      #   }
-      # })
+        listeners = {
+          https = merge(local.lbs.nlb.listeners.https, {
+            default_action = {
+              type              = "forward"
+              target_group_name = "t2-onr-weboidc-https-8443"
+            }
+          })
+        }
+      })
     }
 
     patch_manager = {
