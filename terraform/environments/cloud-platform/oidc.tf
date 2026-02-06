@@ -213,6 +213,7 @@ data "aws_iam_policy_document" "github_actions_development_cluster_oidc_policy" 
     effect = "Allow"
     actions = [
       "sqs:CreateQueue",
+      "sqs:DeleteQueue",
       "sqs:TagQueue",
       "sqs:SetQueueAttributes"
     ]
