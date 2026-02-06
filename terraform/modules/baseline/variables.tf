@@ -670,6 +670,7 @@ variable "lbs" {
     instance_target_groups = optional(map(object({
       port                 = optional(number)
       protocol             = optional(string)
+      preserve_client_ip   = optional(bool)
       deregistration_delay = optional(number)
       health_check = optional(object({
         enabled             = optional(bool)

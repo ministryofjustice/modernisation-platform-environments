@@ -192,8 +192,7 @@ locals {
           secretsmanager_secrets_prefix = "ec2/"
         })
         instance = merge(local.ec2_instances.bip_web.instance, {
-          instance_type          = "r6i.large"
-          vpc_security_group_ids = ["bip-web", "ec2-linux", "public-lb", "public-lb-2"] # include when connected to public LB
+          instance_type = "r6i.large"
         })
         secretsmanager_secrets = {
           web-cert = {
