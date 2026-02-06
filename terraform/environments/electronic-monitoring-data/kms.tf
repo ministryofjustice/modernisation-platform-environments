@@ -11,38 +11,38 @@ module "kms_metadata_key" {
   enable_default_policy = true
   key_statements = [
     {
-        sid = "CustomKMSForS3"
-        actions = [
-            "kms:Encrypt",
-            "kms:ReEncrypt*",
-            "kms:GenerateDataKey*"
-        ]
-        principals = [
-            {
-                type = "Service"
-                identifiers = ["s3.amazonaws.com"]
-            }
-        ]
-        condition = [
-            {
-                test     = "StringEquals"
-                variable = "aws:SourceAccount"
-                values   = [data.aws_caller_identity.current.account_id]
-            },
-            {
-                test     = "ArnLike"
-                variable = "aws:SourceArn"
-                values   = [
-                    module.s3-fms-general-landing-bucket.bucket_arn,
-                    module.s3-fms-ho-landing-bucket.bucket_arn,
-                    module.s3-fms-specials-landing-bucket.bucket_arn,
-                    module.s3-mdss-general-landing-bucket.bucket_arn,
-                    module.s3-mdss-ho-landing-bucket.bucket_arn,
-                    module.s3-mdss-specials-landing-bucket.bucket_arn,
-                ]
-            }
-        ]
-        resources = ["*"]
+      sid = "CustomKMSForS3"
+      actions = [
+        "kms:Encrypt",
+        "kms:ReEncrypt*",
+        "kms:GenerateDataKey*"
+      ]
+      principals = [
+        {
+          type        = "Service"
+          identifiers = ["s3.amazonaws.com"]
+        }
+      ]
+      condition = [
+        {
+          test     = "StringEquals"
+          variable = "aws:SourceAccount"
+          values   = [data.aws_caller_identity.current.account_id]
+        },
+        {
+          test     = "ArnLike"
+          variable = "aws:SourceArn"
+          values = [
+            module.s3-fms-general-landing-bucket.bucket_arn,
+            module.s3-fms-ho-landing-bucket.bucket_arn,
+            module.s3-fms-specials-landing-bucket.bucket_arn,
+            module.s3-mdss-general-landing-bucket.bucket_arn,
+            module.s3-mdss-ho-landing-bucket.bucket_arn,
+            module.s3-mdss-specials-landing-bucket.bucket_arn,
+          ]
+        }
+      ]
+      resources = ["*"]
     }
   ]
 

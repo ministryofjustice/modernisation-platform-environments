@@ -1,8 +1,8 @@
 locals {
-  lambda_path                 = "lambdas"
-  env_name                    = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
-  db_name                     = local.is-production ? "g4s_cap_dw" : "test"
-  load_sqs_max_receive_count  = 2
+  lambda_path                = "lambdas"
+  env_name                   = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+  db_name                    = local.is-production ? "g4s_cap_dw" : "test"
+  load_sqs_max_receive_count = 2
 }
 
 
@@ -398,7 +398,7 @@ module "load_fms_lambda" {
     STAGING_BUCKET      = module.s3-create-a-derived-table-bucket.bucket.id
     ENVIRONMENT_NAME    = local.environment_shorthand
     CLEANUP_QUEUE_URL   = aws_sqs_queue.clean_dlt_load_queue.id
-    SNS_TOPIC_ARN  = aws_sns_topic.emds_alerts.arn
+    SNS_TOPIC_ARN       = aws_sns_topic.emds_alerts.arn
     MAX_RECEIVE_COUNT   = tostring(local.load_sqs_max_receive_count)
   }
 }
@@ -632,17 +632,17 @@ module "create_fms_general_batch_replication_job" {
   subnet_ids         = data.aws_subnets.shared-public.ids
 
   environment_variables = {
-    ACCOUNT_ID = data.aws_caller_identity.current.account_id
-    BATCH_COPY_ROLE = module.s3-fms-general-landing-bucket.replication_role_arn
+    ACCOUNT_ID                     = data.aws_caller_identity.current.account_id
+    BATCH_COPY_ROLE                = module.s3-fms-general-landing-bucket.replication_role_arn
     DESTINATION_ACCOUNT_SECRET_ARN = module.cross_account_details[0].secret_arn
-    METADATA_BUCKET_ARN = module.s3-metadata-bucket.bucket.arn
-    FMS_GENERAL_BUCKET = module.s3-fms-general-landing-bucket.bucket_id
-    FMS_HO_BUCKET = module.s3-fms-ho-landing-bucket.bucket_id
-    FMS_SPECIALS_BUCKET = module.s3-fms-specials-landing-bucket.bucket_id
-    MDSS_GENERAL_BUCKET = module.s3-mdss-general-landing-bucket.bucket_id
-    MDSS_HO_BUCKET = module.s3-mdss-ho-landing-bucket.bucket_id
-    MDSS_SPECIALS_BUCKET = module.s3-mdss-specials-landing-bucket.bucket_id
-    }
+    METADATA_BUCKET_ARN            = module.s3-metadata-bucket.bucket.arn
+    FMS_GENERAL_BUCKET             = module.s3-fms-general-landing-bucket.bucket_id
+    FMS_HO_BUCKET                  = module.s3-fms-ho-landing-bucket.bucket_id
+    FMS_SPECIALS_BUCKET            = module.s3-fms-specials-landing-bucket.bucket_id
+    MDSS_GENERAL_BUCKET            = module.s3-mdss-general-landing-bucket.bucket_id
+    MDSS_HO_BUCKET                 = module.s3-mdss-ho-landing-bucket.bucket_id
+    MDSS_SPECIALS_BUCKET           = module.s3-mdss-specials-landing-bucket.bucket_id
+  }
 }
 
 # ------------------------------------------------------------------------------

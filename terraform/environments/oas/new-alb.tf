@@ -340,7 +340,7 @@ resource "aws_lb_listener_rule" "console_https_rule" {
       values = ["/console*"]
     }
   }
-  
+
 }
 
 # Listener rule for /em on HTTPS
