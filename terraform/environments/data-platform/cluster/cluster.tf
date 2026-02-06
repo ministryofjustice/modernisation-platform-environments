@@ -56,44 +56,26 @@ module "eks" {
   }
 
   addons = {
-    /* Core Networking */
-    # coredns = {
-    #   addon_version = local.environment_configuration.eks_cluster_addon_versions.coredns
-    # }
-    # kube-proxy = {
-    #   addon_version = local.environment_configuration.eks_cluster_addon_versions.kube_proxy
-    # }
-    # /* AWS */
-    # aws-ebs-csi-driver = {
-    #   addon_version            = local.environment_configuration.eks_cluster_addon_versions.aws_ebs_csi_driver
-    #   service_account_role_arn = module.ebs_csi_driver_iam_role.arn
-    # }
-    # aws-efs-csi-driver = {
-    #   addon_version            = local.environment_configuration.eks_cluster_addon_versions.aws_efs_csi_driver
-    #   service_account_role_arn = module.efs_csi_driver_iam_role.arn
-    # }
-    # aws-guardduty-agent = {
-    #   addon_version = local.environment_configuration.eks_cluster_addon_versions.aws_guardduty_agent
-    # }
-    # aws-network-flow-monitoring-agent = {
-    #   addon_version            = local.environment_configuration.eks_cluster_addon_versions.aws_network_flow_monitoring_agent
-    #   service_account_role_arn = module.aws_cloudwatch_network_flow_monitor_iam_role.arn
-    # }
-    # eks-pod-identity-agent = {
-    #   addon_version = local.environment_configuration.eks_cluster_addon_versions.eks_pod_identity_agent
-    # }
-    # eks-node-monitoring-agent = {
-    #   addon_version = local.environment_configuration.eks_cluster_addon_versions.eks_node_monitoring_agent
-    # }
-    # vpc-cni = {
-    #   addon_version            = local.environment_configuration.eks_cluster_addon_versions.vpc_cni
-    #   service_account_role_arn = module.vpc_cni_iam_role.arn
-    #   configuration_values = jsonencode({
-    #     env = {
-    #       ENABLE_BANDWIDTH_PLUGIN = "true"
-    #     }
-    #   })
-    # }
+    coredns = {
+      addon_version = "v1.13.2-eksbuild.1" # local.environment_configuration.eks_cluster_addon_versions.coredns
+      configuration_values = jsonencode({
+        tolerations = [
+          {
+            key      = "CriticalAddonsOnly"
+            operator = "Exists"
+          },
+          {
+            key    = "node-role.kubernetes.io/control-plane"
+            effect = "NoSchedule"
+          },
+          {
+            key      = "node.cilium.io/agent-not-ready"
+            operator = "Exists"
+            effect   = "NoSchedule"
+          }
+        ]
+      })
+    }
   }
 
   node_security_group_tags = {
