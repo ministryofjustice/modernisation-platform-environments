@@ -22,6 +22,9 @@ locals {
     "staging_fms",
     "staging_mdss",
     "test_results",
+    "validation",
+    "metrics",
+    "check",
   ]
   live_feeds_dbs = [
     "allied_mdss",

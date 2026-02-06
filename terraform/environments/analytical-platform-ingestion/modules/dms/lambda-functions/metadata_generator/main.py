@@ -233,7 +233,7 @@ class MetadataExtractor:
         logger.info("Primary key of %s.%s is %s", schema, table, table_meta.primary_key)
         if self.dialect == "oracle":
             table_meta = self._manage_blob_columns(table_meta)
-        table_meta = self._convert_int_columns(table_meta)
+            table_meta = self._convert_int_columns(table_meta)
         table_meta = self._rename_materialised_view(table_meta)
         table_meta = self._add_reference_columns(table_meta)
         table_meta = self._process_exclusions(table_meta, schema, table)
@@ -301,20 +301,25 @@ def handler(event, context):  # pylint: disable=unused-argument
     port = db_secret["port"]
     if engine == "oracle":
         dsn = f"{host}:{port}/?service_name={db_name}"
+        connect_args = {
+            # this becomes USERENV('MODULE') and USERENV('CLIENT_INFO')
+            "program": "repctl",
+            # this becomes USERENV('OS_USER')
+            "osuser": "rdsdb",
+        }
     elif engine == "mssql+pymssql":
         dsn = f"{host}:{port}/{db_name}?charset=utf8"
+        connect_args = {
+            # pymssql uses 'appname' instead of 'program'
+            "appname": "repctl",
+        }
     else:
         raise ValueError(f"Supported engines: oracle, mssql+pymssql Got: {engine}")
 
     db_string = f"{engine}://{username}:{password}@{dsn}"
     engine = create_engine(
         db_string,
-        connect_args={
-            # this becomes USERENV('MODULE') and USERENV('CLIENT_INFO')
-            "program": "repctl",
-            # this becomes USERENV('OS_USER')
-            "osuser": "rdsdb",
-        }
+        connect_args=connect_args,
     )
 
     db_objects = [obj.lower() for obj in json.loads(os.getenv("DB_OBJECTS", "[]"))]
@@ -360,9 +365,9 @@ def handler(event, context):  # pylint: disable=unused-argument
     glue_table_definitions = []
     for table in db_metadata:
         if destination_prefix != "":
-            table_location = f"s3://{destination_bucket}/{destination_prefix}/{table.database_name}/{table.name}"
+            table_location = f"s3://{destination_bucket}/{destination_prefix.lower()}/{table.database_name.lower()}/{table.name.lower()}"
         else:
-            table_location = f"s3://{destination_bucket}/{table.database_name}/{table.name}"
+            table_location = f"s3://{destination_bucket}/{table.database_name.lower()}/{table.name.lower()}"
 
         logger.info("Generating glue metadata for %s.%s located at %s", table.database_name, table.name, table_location)
         glue_table_definition = gc.generate_from_meta(

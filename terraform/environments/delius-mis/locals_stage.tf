@@ -455,9 +455,15 @@ locals {
     throughtput_capacity = 16
   }
 
-  dfi_report_bucket_config_stage = null
+  dfi_report_bucket_config_stage = {
+    bucket_policy_enabled = true
+  }
 
   lb_config_stage = {
     bucket_policy_enabled = true
+  }
+
+  datasync_config_stage = {
+    source_s3_bucket_arn = "arn:aws:s3:::eu-west-2-delius-stage-dfi-extracts"
   }
 }
