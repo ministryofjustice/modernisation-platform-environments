@@ -36,9 +36,11 @@ egressMasqueradeInterfaces: eth0
 operator:
   replicas: 2
 
-# Disable Hubble observability
 hubble:
-  enabled: false
+  relay:
+    enabled: true
+  ui:
+    enabled: true
 
 # Enable local redirect policy (new format)
 localRedirectPolicies:

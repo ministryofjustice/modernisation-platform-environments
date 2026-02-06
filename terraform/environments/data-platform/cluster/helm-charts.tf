@@ -24,12 +24,6 @@ resource "helm_release" "cilium" {
   depends_on = [module.eks]
 }
 
-# Give Cilium manifests a moment to be applied before nodes start joining
-resource "time_sleep" "wait_for_cilium_manifests" {
-  depends_on      = [helm_release.cilium]
-  create_duration = "30s"
-}
-
 resource "helm_release" "coredns" {
   /* https://artifacthub.io/packages/helm/coredns/coredns */
 
@@ -47,6 +41,4 @@ resource "helm_release" "coredns" {
       {}
     )
   ]
-
-  depends_on = [module.eks_managed_node_group_system]
 }
