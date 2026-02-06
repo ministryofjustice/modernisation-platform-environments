@@ -343,8 +343,8 @@ locals {
                 conditions = [{
                   host_header = {
                     values = [
-                      "t2.test.reporting.oasys.service.justice.gov.uk",
-                      #"t2-without-sso.test.reporting.oasys.service.justice.gov.uk",
+                      #"t2.test.reporting.oasys.service.justice.gov.uk",
+                      "t2-without-sso.test.reporting.oasys.service.justice.gov.uk",
                     ]
                   }
                 }]
@@ -424,8 +424,8 @@ locals {
     route53_zones = {
       "test.reporting.oasys.service.justice.gov.uk" = {
         lb_alias_records = [
-          { name = "t2", type = "A", lbs_map_key = "public" },
-          #{ name = "t2-without-sso", type = "A", lbs_map_key = "public" },
+          { name = "t2", type = "A", lbs_map_key = "onr-test-nlb" },
+          { name = "t2-without-sso", type = "A", lbs_map_key = "public" },
           { name = "t2-bods", type = "A", lbs_map_key = "public" },
         ],
       }
