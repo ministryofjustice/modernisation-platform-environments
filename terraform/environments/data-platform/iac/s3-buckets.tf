@@ -118,7 +118,7 @@ data "aws_iam_policy_document" "s3_bucket_policy" {
 module "s3_bucket" {
   count = terraform.workspace == "data-platform-development" ? 1 : 0
 
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-s3-bucket.git?ref=0662a7bdfceac73daed7c08df2b421707de341df" # v5.9.0
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-s3-bucket.git?ref=b040965a526e22a78784840c2f2ae384f2a8e4ef" # v5.10.0
 
   bucket = "mojdp-${local.environment}-${local.component_name}"
 
@@ -262,7 +262,7 @@ data "aws_iam_policy_document" "octo_s3_bucket_policy" {
 module "octo_s3_bucket" {
   count = terraform.workspace == "data-platform-development" ? 1 : 0
 
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-s3-bucket.git?ref=0662a7bdfceac73daed7c08df2b421707de341df" # v5.9.0
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-s3-bucket.git?ref=b040965a526e22a78784840c2f2ae384f2a8e4ef" # v5.10.0
 
   bucket = "mojdp-${local.environment}-${local.component_name}-octo"
 
