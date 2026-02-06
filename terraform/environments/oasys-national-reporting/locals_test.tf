@@ -310,11 +310,11 @@ locals {
               { ec2_instance_name = "t2-onr-web-1" },
             ]
           })
-          t2-onr-weboidc-https-8443 = merge(local.lbs.public.instance_target_groups.https-8443, {
-            attachments = [
-              { ec2_instance_name = "t2-onr-weboidc-1" },
-            ]
-          })
+          #t2-onr-weboidc-https-8443 = merge(local.lbs.public.instance_target_groups.https-8443, {
+          #  attachments = [
+          #    { ec2_instance_name = "t2-onr-weboidc-1" },
+          #  ]
+          #})
         }
         listeners = merge(local.lbs.public.listeners, {
           https = merge(local.lbs.public.listeners.https, {
@@ -343,25 +343,26 @@ locals {
                 conditions = [{
                   host_header = {
                     values = [
-                      "t2-without-sso.test.reporting.oasys.service.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
-              t2-onr-weboidc-https-8443 = {
-                priority = 300 # change priority to 200 if the environment is powered on during day
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "t2-onr-weboidc-https-8443"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
                       "t2.test.reporting.oasys.service.justice.gov.uk",
+                      #"t2-without-sso.test.reporting.oasys.service.justice.gov.uk",
                     ]
                   }
                 }]
               }
+              #t2-onr-weboidc-https-8443 = {
+              #  priority = 300 # change priority to 200 if the environment is powered on during day
+              #  actions = [{
+              #    type              = "forward"
+              #    target_group_name = "t2-onr-weboidc-https-8443"
+              #  }]
+              #  conditions = [{
+              #    host_header = {
+              #      values = [
+              #        "t2.test.reporting.oasys.service.justice.gov.uk",
+              #      ]
+              #    }
+              #  }]
+              #}
               maintenance = {
                 priority = 999
                 actions = [{
@@ -385,6 +386,25 @@ locals {
           })
         })
       })
+
+      # onr-test-nlb = merge(local.lbs.nlb, {
+      #   instance_target_groups = {
+      #     t2-onr-weboidc-https-8443 = merge(local.lbs.nlb.instance_target_groups.https-8443, {
+      #       # attachments = [
+      #       #   { ec2_instance_name = "t2-onr-weboidc-1" },
+      #       # ]
+      #     })
+      #   }
+
+      #   listeners = {
+      #     https = merge(local.lbs.nlb.listeners.https, {
+      #       # default_action = {
+      #       #   type      #       #   = "forward"
+      #       #   target_group_name = "t2-onr-weboidc-https-8443"
+      #       # }
+      #     })
+      #   }
+      # })
     }
 
     patch_manager = {
@@ -405,7 +425,7 @@ locals {
       "test.reporting.oasys.service.justice.gov.uk" = {
         lb_alias_records = [
           { name = "t2", type = "A", lbs_map_key = "public" },
-          { name = "t2-without-sso", type = "A", lbs_map_key = "public" },
+          #{ name = "t2-without-sso", type = "A", lbs_map_key = "public" },
           { name = "t2-bods", type = "A", lbs_map_key = "public" },
         ],
       }
