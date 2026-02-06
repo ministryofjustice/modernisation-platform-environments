@@ -1,0 +1,67 @@
+---
+# Cilium Configuration for EKS with VXLAN Overlay
+# Preserves VPC IPs by using internal pod CIDR (100.64.0.0/16)
+
+# Kubernetes API Server Access
+k8sServiceHost: ${k8sServiceHost}
+k8sServicePort: "443"
+
+# Networking Mode - VXLAN Overlay
+tunnelProtocol: vxlan
+
+# Disable ENI mode - use overlay only
+eni:
+  enabled: false
+
+# Replace kube-proxy
+kubeProxyReplacement: true
+
+# Cluster Configuration
+cluster:
+  name: ${cluster_name}
+  id: 1
+
+# IP Address Management - Cilium operator manages pod IPs
+ipam:
+  mode: cluster-pool
+  operator:
+    clusterPoolIPv4PodCIDRList:
+      - 100.64.0.0/16  # Internal pod CIDR - does not consume VPC IPs
+    clusterPoolIPv4MaskSize: 25  # 128 IPs per node, supports 512 nodes max
+
+# Egress Masquerade
+egressMasqueradeInterfaces: eth0
+
+# Operator Configuration
+operator:
+  replicas: 2
+
+# Disable Hubble observability
+hubble:
+  enabled: false
+
+# Enable local redirect policy (new format)
+localRedirectPolicies:
+  enabled: true
+
+# Resources
+resources:
+  limits:
+    cpu: 4000m
+    memory: 4Gi
+  requests:
+    cpu: 100m
+    memory: 512Mi
+
+# Enable EndpointRoutes for better performance
+enableEndpointRoutes: true
+
+# Enable native routing CIDR
+routingMode: native
+ipv4NativeRoutingCIDR: 100.64.0.0/16
+
+# Monitoring CRDs - allow longer wait time for large clusters
+crdWaitTimeout: 15m
+
+# Roll out pods automatically on ConfigMap change
+rollOutCiliumPods: true

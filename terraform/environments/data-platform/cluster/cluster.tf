@@ -51,84 +51,44 @@ module "eks" {
   create_cloudwatch_log_group = false
   enabled_log_types           = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
 
+  kms_key_administrators = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/MemberInfrastructureAccess"]
+
   encryption_config = {
     resources = ["secrets"]
   }
 
   addons = {
-    coredns = {
-      addon_version = "v1.13.2-eksbuild.1" # local.environment_configuration.eks_cluster_addon_versions.coredns
-      configuration_values = jsonencode({
-        tolerations = [
-          {
-            key      = "CriticalAddonsOnly"
-            operator = "Exists"
-          },
-          {
-            key    = "node-role.kubernetes.io/control-plane"
-            effect = "NoSchedule"
-          },
-          {
-            key      = "node.cilium.io/agent-not-ready"
-            operator = "Exists"
-            effect   = "NoSchedule"
-          }
-        ]
-      })
-    }
+    # coredns = {
+    #   addon_version               = "v1.13.2-eksbuild.1" # local.environment_configuration.eks_cluster_addon_versions.coredns
+    #   preserve                    = true
+    #   resolve_conflicts_on_create = "OVERWRITE"
+    #   resolve_conflicts_on_update = "PRESERVE"
+    #   configuration_values = jsonencode({
+    #     tolerations = [
+    #       {
+    #         key      = "CriticalAddonsOnly"
+    #         operator = "Exists"
+    #       },
+    #       {
+    #         key    = "node-role.kubernetes.io/control-plane"
+    #         effect = "NoSchedule"
+    #       },
+    #       {
+    #         key      = "node.cilium.io/agent-not-ready"
+    #         operator = "Exists"
+    #         effect   = "NoSchedule"
+    #       }
+    #     ]
+    #   })
+    # }
   }
 
   node_security_group_tags = {
     "karpenter.sh/discovery" = local.eks_cluster_name
   }
 
-  #   eks_managed_node_groups = {
-  #     system = {
-  #       min_size       = 1
-  #       max_size       = 10
-  #       desired_size   = 3
-  #       instance_types = ["m7a.large"]
-
-  #       use_latest_ami_release_version = false
-  #       ami_release_version            = "1.54.0-5043decc" # local.environment_configuration.eks_node_version
-  #       ami_type                       = "BOTTLEROCKET_x86_64"
-  #       platform                       = "bottlerocket"
-  #       enable_monitoring              = true
-  #       metadata_options = {
-  #         http_endpoint               = "enabled"
-  #         http_put_response_hop_limit = 1
-  #         http_tokens                 = "required"
-  #         instance_metadata_tags      = "enabled"
-  #       }
-
-  #       block_device_mappings = {
-  #         xvdb = {
-  #           device_name = "/dev/xvdb"
-  #           ebs = {
-  #             volume_size           = 100
-  #             volume_type           = "gp3"
-  #             iops                  = 3000
-  #             throughput            = 150
-  #             encrypted             = true
-  #             kms_key_id            = module.eks_ebs_kms_key.key_arn
-  #             delete_on_termination = true
-  #           }
-  #         }
-  #       }
-
-  #       iam_role_additional_policies = {
-  #         AmazonEC2ContainerRegistryReadOnly = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
-  #         AmazonSSMManagedInstanceCore       = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-  #         CloudWatchAgentServerPolicy        = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
-  #         # ECRPullThroughCachePolicy          = module.ecr_pull_through_cache_iam_policy.arn
-  #         # EKSClusterLogsKMSAccessPolicy      = module.eks_cluster_logs_kms_access_iam_policy.arn
-  #       }
-
-  #       node_repair_config = {
-  #         enabled = true
-  #       }
-  #     }
-  #   }
+  # Node groups moved to separate module with dependency on Cilium
+  # See eks-node-groups.tf
 
   access_entries = {
     MemberInfrastructureAccess = {
@@ -155,3 +115,38 @@ module "eks" {
     }
   }
 }
+
+# module "eks_system_node_group" {
+#   source = "terraform-aws-modules/eks/aws//modules/eks-managed-node-group"
+
+#   name         = "system"
+#   cluster_name = module.eks.cluster_name
+
+#   subnet_ids = data.aws_subnets.private.ids
+
+#   // The following variables are necessary if you decide to use the module outside of the parent EKS module context.
+#   // Without it, the security groups of the nodes are empty and thus won't join the cluster.
+#   cluster_primary_security_group_id = module.eks.cluster_primary_security_group_id
+#   vpc_security_group_ids            = [module.eks.node_security_group_id]
+
+#   cluster_service_cidr = data.aws_eks_cluster.eks.kubernetes_network_config[0].service_ipv4_cidr
+
+#   // Note: `disk_size`, and `remote_access` can only be set when using the EKS managed node group default launch template
+#   // This module defaults to providing a custom launch template to allow for custom security groups, tag propagation, etc.
+#   // use_custom_launch_template = false
+#   // disk_size = 50
+#   //
+#   //  # Remote access cannot be specified with a launch template
+#   //  remote_access = {
+#   //    ec2_ssh_key               = module.key_pair.key_pair_name
+#   //    source_security_group_ids = [aws_security_group.remote_access.id]
+#   //  }
+
+#   min_size     = 1
+#   max_size     = 10
+#   desired_size = 1
+
+#   instance_types = ["t3.large"]
+
+
+# }
