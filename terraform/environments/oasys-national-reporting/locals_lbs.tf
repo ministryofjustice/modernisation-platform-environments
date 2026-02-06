@@ -136,8 +136,9 @@ locals {
       subnets                          = module.environment.subnets["public"].ids
       instance_target_groups = {
         https-8443 = {
-          port     = 8443
-          protocol = "TCP"
+          port               = 8443
+          preserve_client_ip = false
+          protocol           = "TCP"
           health_check = {
             enabled             = true
             interval            = 5
