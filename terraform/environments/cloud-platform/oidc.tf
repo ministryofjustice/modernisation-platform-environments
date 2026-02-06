@@ -22,6 +22,14 @@ data "aws_iam_policy_document" "github_actions_development_cluster_oidc_policy" 
     ]
     resources = ["*"]
   }
+  statement {
+    sid   = "EventsFullAccess"
+    effect = "Allow"
+    actions = [
+      "events:*"
+    ]
+    resources = ["*"]
+  }
 
   statement {
     sid    = "IAMForEKSAndIRSA"
@@ -200,4 +208,16 @@ data "aws_iam_policy_document" "github_actions_development_cluster_oidc_policy" 
     }
     actions = ["sts:AssumeRole"]
   }
+  statement {
+    sid   = "AllowSQSCreate"
+    effect = "Allow"
+    actions = [
+      "sqs:CreateQueue",
+      "sqs:DeleteQueue",
+      "sqs:TagQueue",
+      "sqs:SetQueueAttributes"
+    ]
+    resources = ["*"]
+  }
+
 }
