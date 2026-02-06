@@ -16,7 +16,7 @@ resource "helm_release" "cilium" {
       "${path.module}/configuration/helm/cilium/values.yml.tftpl",
       {
         cluster_name   = local.eks_cluster_name
-        k8sServiceHost = trimprefix(data.aws_eks_cluster.eks.endpoint, "https://") # set sensitive long term
+        k8sServiceHost = trimprefix(module.eks.cluster_endpoint, "https://")
       }
     )
   ]
@@ -40,6 +40,13 @@ resource "helm_release" "coredns" {
   namespace  = "kube-system"
 
   wait = false
+
+  values = [
+    templatefile(
+      "${path.module}/configuration/helm/coredns/values.yml.tftpl",
+      {}
+    )
+  ]
 
   depends_on = [module.eks_managed_node_group_system]
 }

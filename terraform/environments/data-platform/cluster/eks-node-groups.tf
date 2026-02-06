@@ -16,7 +16,7 @@ module "eks_managed_node_group_system" {
   vpc_security_group_ids            = [module.eks.node_security_group_id]
 
   # Service CIDR required for Bottlerocket user data (EKS default)
-  cluster_service_cidr = data.aws_eks_cluster.eks.kubernetes_network_config[0].service_ipv4_cidr
+  cluster_service_cidr = "172.20.0.0/16"
 
   # Instance configuration
   min_size       = 3

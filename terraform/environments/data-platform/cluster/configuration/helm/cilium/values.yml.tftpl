@@ -56,9 +56,8 @@ resources:
 # Enable EndpointRoutes for better performance
 enableEndpointRoutes: true
 
-# Enable native routing CIDR
-routingMode: native
-ipv4NativeRoutingCIDR: 100.64.0.0/16
+# Routing mode for VXLAN overlay
+routingMode: tunnel
 
 # Monitoring CRDs - allow longer wait time for large clusters
 crdWaitTimeout: 15m
