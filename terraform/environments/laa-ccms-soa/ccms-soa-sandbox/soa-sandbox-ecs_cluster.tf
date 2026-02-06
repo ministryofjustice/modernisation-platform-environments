@@ -103,10 +103,10 @@ resource "aws_ecs_service" "soasandbox-admin" {
     type  = "spread"
   }
 
-  placement_constraints {
-    type       = "memberOf"
-    expression = "attribute:latest == true"
-  }
+  # placement_constraints {
+  #   type       = "memberOf"
+  #   expression = "attribute:latest == true"
+  # }
 
   placement_constraints {
     type       = "memberOf"
@@ -194,10 +194,10 @@ resource "aws_ecs_service" "soasandbox-managed" {
     type  = "spread"
   }
 
-  placement_constraints {
-    type       = "memberOf"
-    expression = "attribute:latest == true"
-  }
+  # placement_constraints {
+  #   type       = "memberOf"
+  #   expression = "attribute:latest == true"
+  # }
 
   placement_constraints {
     type       = "memberOf"
