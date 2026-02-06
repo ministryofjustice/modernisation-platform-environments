@@ -341,7 +341,7 @@ locals {
     }
   })
 
-  dfi_report_bucket_config = {
+  dfi_report_bucket_config_dev = {
     bucket_policy_enabled = true
   }
 

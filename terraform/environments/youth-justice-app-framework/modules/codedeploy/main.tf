@@ -28,6 +28,15 @@ data "aws_lb_listener" "external" {
   port              = var.external_listener_port
 }
 
+data "aws_lb" "connectivity" {
+  name = var.connectivity_alb_name
+}
+
+data "aws_lb_listener" "connectivity" {
+  load_balancer_arn = data.aws_lb.connectivity.arn
+  port              = var.connectivity_listener_port
+}
+
 
 data "aws_lb_target_group" "one" {
   for_each = { for pair in var.services : join("", keys(pair)) => pair }
@@ -125,8 +134,16 @@ resource "aws_codedeploy_deployment_group" "this" {
   load_balancer_info {
     target_group_pair_info {
       prod_traffic_route {
-        listener_arns = each.value[join("", keys(each.value))] == "external" ? [data.aws_lb_listener.external.arn] : [data.aws_lb_listener.internal.arn]
-      }
+        listener_arns = [ lookup(
+          {
+            "internal"     = data.aws_lb_listener.internal.arn
+            "external"     = data.aws_lb_listener.external.arn
+            "connectivity" = data.aws_lb_listener.connectivity.arn
+          },
+          each.value[join("", keys(each.value))],
+          data.aws_lb_listener.internal.arn
+        ) ]
+      } 
 
       target_group {
         name = data.aws_lb_target_group.one[each.key].name

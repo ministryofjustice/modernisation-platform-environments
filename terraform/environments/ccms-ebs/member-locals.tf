@@ -1,6 +1,5 @@
 #### This file can be used to store locals specific to the member account ####
 locals {
-  artefact_bucket_name           = "${local.application_name}-${local.environment}-artefacts"
   logging_bucket_name            = "${local.application_name}-${local.environment}-logging"
   rsync_bucket_name              = "${local.application_name}-${local.environment}-dbbackup"
   lb_log_prefix_ebsapp           = "ebsapps-lb"
@@ -13,12 +12,12 @@ locals {
 
   lambda_folder_name = ["lambda_delivery", "ftp_lambda_layer", "payment_lambda_layer", "cloudwatch_sns_layer", "payment_load_monitor_layer"]
 
-  lambda_source_hashes = [
+  lambda_source_hashes_cloudwatch_alarm_slack_integration = [
     for f in fileset("./lambda/cloudwatch_alarm_slack_integration", "**") :
     sha256(file("${path.module}/lambda/cloudwatch_alarm_slack_integration/${f}"))
   ]
 
-  lambda_payment_source_hashes = [
+  lambda_source_hashes_payment_load_monitor = [
     for f in fileset("./lambda/payment_load_monitor", "**") :
     sha256(file("${path.module}/lambda/payment_load_monitor/${f}"))
   ]

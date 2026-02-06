@@ -27,6 +27,7 @@ locals {
       enable_hmpps_domain                        = true
       enable_image_builder                       = true
       enable_ssm_command_monitoring              = true
+      s3_iam_policies                            = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
     }
   }
 
@@ -34,5 +35,6 @@ locals {
     options = {
       enable_resource_explorer = true
     }
+    security_groups = local.security_groups
   }
 }
