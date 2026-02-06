@@ -1,3 +1,4 @@
+/*
 locals {
   tariff_app_xvde = {
     development = "vol-0e4cf68a8692776d4"
@@ -90,3 +91,34 @@ import {
   to       = aws_volume_attachment.tariff_app2_storage_attachment[each.key]
   id       = "${each.key}:${each.value}:${aws_instance.tariff_app_2[0].id}"
 }
+*/
+/*
+# Production only CDI-305 remap Cloned App > App
+locals {
+  tariff_cloneapp_storage = {
+    "xvde" = "vol-0bd784f7c5a5cf9ed"
+    "xvdf" = "vol-06f077e410a43e557"
+    "xvdg" = "vol-0a298bae20abca596"
+    "xvdh" = "vol-02fae4bc96068dc11"
+    "xvdi" = "vol-071ef337d5ccf24ba"
+  }
+}
+
+import {
+  for_each = local.environment == "production" ? 1 : 0
+  to = aws_instance.tariff_app
+  id = "i-09e042424e8f558bc"
+}
+
+import {
+  for_each = local.environment == "production" ? local.tariff_cloneapp_storage : {}
+  to       = aws_ebs_volume.tariff_cloneapp_storage[each.key]
+  id       = each.value
+}
+
+import {
+  for_each = local.environment == "production" ? local.tariff_cloneapp_storage : {}
+  to       = aws_volume_attachment.tariff_cloneapp_storage_attachment[each.key]
+  id       = "${each.key}:${each.value}:${aws_instance.tariff_app[0].id}"
+}
+*/
