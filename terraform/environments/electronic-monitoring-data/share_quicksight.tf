@@ -6,7 +6,7 @@ locals {
         for db in local.quicksight_dbs :
         "${user}.${db}" => {
             email    = user
-            database = "${db}${local.db_suffix}"
+            database = "${db}${local.dbt_suffix}"
         }
         }
     ]...)
