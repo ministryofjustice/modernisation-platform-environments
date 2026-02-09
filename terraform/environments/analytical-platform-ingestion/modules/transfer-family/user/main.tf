@@ -53,7 +53,8 @@ module "role" {
 
   create = true
 
-  name = "transfer-user-${var.name}"
+  name            = "transfer-user-${var.name}"
+  use_name_prefix = false
 
   trust_policy_permissions = {
     AllowTransferService = {

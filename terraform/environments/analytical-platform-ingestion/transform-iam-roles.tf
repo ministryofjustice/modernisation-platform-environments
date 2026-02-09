@@ -6,7 +6,8 @@ module "transfer_family_service_role" {
 
   create = true
 
-  name = "transfer-family-service-role"
+  name            = "transfer-family-service-role"
+  use_name_prefix = false
 
   trust_policy_permissions = {
     AllowTransferService = {

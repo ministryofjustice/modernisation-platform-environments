@@ -6,7 +6,8 @@ module "transfer_server_iam_role" {
 
   create = true
 
-  name = "transfer-server"
+  name            = "transfer-server"
+  use_name_prefix = false
 
   trust_policy_permissions = {
     AllowTransferService = {
@@ -33,7 +34,8 @@ module "datasync_iam_role" {
 
   create = true
 
-  name = "datasync"
+  name            = "datasync"
+  use_name_prefix = false
 
   trust_policy_permissions = {
     AllowDataSyncService = {
@@ -59,7 +61,8 @@ module "datasync_replication_iam_role" {
 
   create = true
 
-  name = "datasync-replication"
+  name            = "datasync-replication"
+  use_name_prefix = false
 
   trust_policy_permissions = {
     AllowS3Service = {
@@ -85,7 +88,8 @@ module "datasync_opg_replication_iam_role" {
 
   create = true
 
-  name = "datasync-opg-${local.environment}-replication"
+  name            = "datasync-opg-${local.environment}-replication"
+  use_name_prefix = false
 
   trust_policy_permissions = {
     AllowS3Service = {
@@ -113,7 +117,8 @@ module "guard_duty_malware_s3_scan_iam_role" {
 
   create = true
 
-  name = "guard-duty-malware-${local.environment}-scan"
+  name            = "guard-duty-malware-${local.environment}-scan"
+  use_name_prefix = false
 
   trust_policy_permissions = {
     AllowGuardDutyService = {
@@ -140,7 +145,8 @@ module "datasync_laa_data_analysis_iam_role" {
 
   create = true
 
-  name = "datasync-laa-data-analysis"
+  name            = "datasync-laa-data-analysis"
+  use_name_prefix = false
 
   trust_policy_permissions = {
     AllowDataSyncService = {
@@ -167,7 +173,8 @@ module "laa_data_analysis_replication_iam_role" {
 
   create = true
 
-  name = "laa-analysis-${local.environment}-repl"
+  name            = "laa-analysis-${local.environment}-repl"
+  use_name_prefix = false
 
   trust_policy_permissions = {
     AllowS3Services = {

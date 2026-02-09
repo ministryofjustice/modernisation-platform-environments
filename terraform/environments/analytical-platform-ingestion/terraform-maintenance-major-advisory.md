@@ -711,6 +711,39 @@ When ready to apply changes, explicitly instruct:
 
 ## History Log
 
+### 2026-02-09 - Phase 4: IAM Role Name Preservation Fix
+
+- **Branch**: copilot-major-upgrade/analytical-platform-ingestion-1770207173
+- **Issue Identified**: Multiple IAM roles were being destroyed and recreated in production plan due to missing `use_name_prefix = false` parameter
+- **Root Cause**: 
+  - IAM module v6 defaults `use_name_prefix = true`, which appends random suffixes to role names
+  - During Phase 3 upgrade (commit e3fbb72f7), only long role names received `use_name_prefix = false` to avoid AWS 64-character limit errors
+  - Most roles were left with default behaviour, causing Terraform to want to replace `role-name` → `role-name-<random-suffix>`
+  - Advisory document incorrectly stated "`name_prefix` not supported in v6" (referring to the old v5 parameter), which caused confusion
+- **Affected Resources**: 10 IAM role modules across 4 files:
+  - iam-roles.tf: 7 modules
+  - transform-iam-roles.tf: 1 module
+  - modules/transfer-family/user/main.tf: 1 module
+  - modules/transfer-family/user-with-egress/main.tf: 1 module
+- **Fix Applied**: Added `use_name_prefix = false` to all IAM role modules (excluding /dms directory) to preserve exact existing role names
+- **Files Modified**:
+  - iam-roles.tf (transfer_server_iam_role, datasync_iam_role, datasync_replication_iam_role, datasync_opg_replication_iam_role, guard_duty_malware_s3_scan_iam_role, datasync_laa_data_analysis_iam_role, laa_data_analysis_replication_iam_role)
+  - transform-iam-roles.tf (transfer_family_service_role)
+  - modules/transfer-family/user/main.tf (role module)
+  - modules/transfer-family/user-with-egress/main.tf (role module)
+- **Validation**: ✅ Terraform Plan Reviewed
+  - **Before Fix**: 126+ adds, 18 changes, 126+ destroys (production) - many IAM roles being replaced
+  - **After Fix**: 41 adds, 20 changes, 41 destroys (production)
+  - **8 IAM roles preserved** that would have been destroyed
+  - Only 2 IAM roles still being replaced (acceptable):
+    1. `transfer_server_iam_role`: Was created with random suffix `transfer-server20240327121853746100000001`, now getting clean name `transfer-server` (one-time cleanup, desirable)
+    2. `laa_data_analysis_replication_iam_role`: Intentional name change from `laa-data-analysis-production-replication` → `laa-analysis-production-repl` (documented in Phase 3 as character limit fix)
+  - Remaining adds/destroys are IAM policy attachments being recreated (expected behaviour from v5→v6 module restructuring)
+  - All SFTP user roles preserved (cgi-cps, maat-xhibit, meganexususer, opg-restore-ocr, property-concept, sscl-chris-j, sscl-epm, cgi-ssct-sop, essex-police)
+- **Key Learning**: IAM module v6's `use_name_prefix` parameter is a boolean flag controlling whether to append random suffixes, not to be confused with the removed v5 parameter `role_name_prefix`
+- **Impact**: Significantly reduced blast radius for production deployment - eliminated unnecessary IAM role replacements and associated DataSync/S3/Transfer resource recreations
+- **Status**: Fix validated, ready for commit and apply
+
 ### 2026-02-04 - Phase 3 Complete: IAM v6.4.0 Upgrade
 
 - **Branch**: copilot-major-upgrade/analytical-platform-ingestion-1770207173
@@ -736,11 +769,13 @@ When ready to apply changes, explicitly instruct:
   - Output rename: `iam_role_arn` → `arn`
   - Removed: `role_requires_mfa`, `name_prefix` support
 - **Configuration Fixes**:
-  - Removed `name_prefix` usage (not supported in v6)
+  - Removed v5 `role_name_prefix` parameter usage (replaced with `name` + `use_name_prefix` boolean in v6)
+  - Added `use_name_prefix = false` to roles with long names exceeding AWS 64-char limit when suffixed
   - Shortened role names to fit AWS 64-char limit:
     - `datasync-opg-ingress-{env}-replication` → `datasync-opg-{env}-replication`
     - `laa-data-analysis-{env}-replication` → `laa-analysis-{env}-repl`
   - Updated 17 references from `.iam_role_arn` to `.arn` across codebase
+  - **Note**: Additional roles required `use_name_prefix = false` fix in Phase 4 (2026-02-09)
 - **Validation**: ✅ Passed
   - Development: 32 adds, 11 changes, 32 destroys
   - Production: 126 adds, 18 changes, 126 destroys
