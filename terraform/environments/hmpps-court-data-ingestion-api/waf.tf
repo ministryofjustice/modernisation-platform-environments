@@ -134,6 +134,6 @@ resource "aws_wafv2_ip_set" "allowed_ips" {
   description        = "Allowed IPs for ${local.application_name}"
   scope              = "REGIONAL"
   ip_address_version = "IPV4"
-  addresses          = [] # Add allowed CIDRs here, e.g., ["1.2.3.4/32"]
+  addresses          = ["150.228.103.80/32"] #for testing, replace with actual IPs or CIDR blocks as needed
   tags               = local.tags
 }
