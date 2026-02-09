@@ -153,9 +153,9 @@ locals {
 
     web12 = {
       autoscaling_group = {
-        desired_capacity          = 1
+        desired_capacity          = 2
         force_delete              = true
-        max_size                  = 1
+        max_size                  = 2
         termination_policies      = ["NewestInstance"]
         vpc_zone_identifier       = module.environment.subnets["private"].ids
         wait_for_capacity_timeout = 0
@@ -224,13 +224,13 @@ locals {
         ]
       }
       tags = {
-        # ami       = "base_ol_8_5" # commented out to ensure harden role does not re-run
-        backup           = "false"
-        component        = "web"
-        description      = "For testing nomis weblogic 12 image"
-        os-type          = "Linux"
-        server-type      = "nomis-web12"
-        update-ssm-agent = "patchgroup1"
+        # ami                 = "base_ol_8_5" # commented out to ensure harden role does not re-run
+        backup                = "false"
+        component             = "web"
+        description           = "For testing nomis weblogic 12 image"
+        os-type               = "Linux"
+        server-type           = "nomis-web12"
+        update-ssm-agent      = "patchgroup1"
       }
     }
 
