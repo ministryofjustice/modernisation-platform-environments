@@ -12,7 +12,7 @@ resource "aws_api_gateway_resource" "ingest" {
 resource "aws_api_gateway_authorizer" "hmac" {
   name            = "hmac-authorizer"
   rest_api_id     = aws_api_gateway_rest_api.ingestion_api.id
-  authorizer_uri  = aws_lambda_function.authorizer.invoke_arn
+  authorizer_uri  = module.authorizer_lambda.lambda_function_invoke_arn
   type            = "TOKEN"
   identity_source = "method.request.header.X-Signature"
 }
@@ -38,7 +38,7 @@ resource "aws_api_gateway_integration" "sqs" {
   http_method             = aws_api_gateway_method.post.http_method
   type                    = "AWS"
   integration_http_method = "POST"
-  credentials             = aws_iam_role.apigw_sqs_role.arn
+  credentials             = module.apigw_sqs_role.iam_role_arn
 
   # SQS Path Integration: arn:aws:apigateway:{region}:sqs:path/{account_id}/{queue_name}
   # Account ID is retrieved from Secrets Manager (must be populated manually)
@@ -49,6 +49,19 @@ resource "aws_api_gateway_integration" "sqs" {
 Action=SendMessage&MessageBody=$util.urlEncode($input.body)
 EOF
   }
+}
+
+resource "aws_iam_role_policy" "apigw_sqs_policy" {
+  role = module.apigw_sqs_role.iam_role_name
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect   = "Allow"
+      Action   = "sqs:SendMessage"
+      Resource = "arn:aws:sqs:eu-west-2:${data.aws_secretsmanager_secret_version.cloud_platform_account_id.secret_string}:${local.environment_configuration[local.environment].cloud_platform_sqs_queue_name}"
+    }]
+  })
 }
 
 resource "aws_api_gateway_integration_response" "response_200" {
@@ -114,30 +127,15 @@ resource "aws_cloudwatch_log_group" "api_gateway_access_logs" {
 }
 
 # IAM Role for API Gateway to push to SQS
-resource "aws_iam_role" "apigw_sqs_role" {
-  name = "apigw-sqs-role-mp"
+module "apigw_sqs_role" {
+  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
+  version = "5.58.0"
 
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Effect = "Allow"
-      Principal = {
-        Service = "apigateway.amazonaws.com"
-      }
-      Action = "sts:AssumeRole"
-    }]
-  })
-}
+  create_role = true
 
-resource "aws_iam_role_policy" "apigw_sqs_policy" {
-  role = aws_iam_role.apigw_sqs_role.id
+  role_name = "apigw-sqs-role-mp"
 
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Effect   = "Allow"
-      Action   = "sqs:SendMessage"
-      Resource = "arn:aws:sqs:eu-west-2:${data.aws_secretsmanager_secret_version.cloud_platform_account_id.secret_string}:${local.environment_configuration[local.environment].cloud_platform_sqs_queue_name}"
-    }]
-  })
+  trusted_role_services = [
+    "apigateway.amazonaws.com"
+  ]
 }

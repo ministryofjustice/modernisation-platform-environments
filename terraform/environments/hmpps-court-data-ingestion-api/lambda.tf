@@ -1,44 +1,45 @@
-resource "aws_lambda_function" "authorizer" {
-  function_name    = "hmac-authorizer"
-  runtime          = "nodejs18.x"
-  handler          = "authorizer.handler"
-  role             = aws_iam_role.lambda_role.arn
-  filename         = data.archive_file.authorizer.output_path
-  source_code_hash = data.archive_file.authorizer.output_base64sha256
+module "authorizer_lambda" {
+  source  = "terraform-aws-modules/lambda/aws"
+  version = "8.5.0"
 
-  environment {
-    variables = {
-      HMAC_SECRET = data.aws_secretsmanager_secret_version.auth_token.secret_string
+  function_name = "hmac-authorizer"
+  description   = "Custom TOKEN authorizer for API Gateway"
+  handler       = "authorizer.handler"
+  runtime       = "nodejs18.x"
+
+  create_package         = false
+  local_existing_package = data.archive_file.authorizer.output_path
+
+  environment_variables = {
+    SECRET_ID = module.secret_ingestion_api_auth_token.secret_arn
+  }
+
+  attach_policy_statements = true
+  policy_statements = {
+    secrets = {
+      effect    = "Allow"
+      actions   = ["secretsmanager:GetSecretValue"]
+      resources = [module.secret_ingestion_api_auth_token.secret_arn]
+    }
+    kms = {
+      effect    = "Allow"
+      actions   = ["kms:Decrypt"]
+      resources = [module.secrets_kms.key_arn]
+    }
+  }
+
+  # IAM Roles & Policies
+  create_role = true
+  role_name   = "authorizer-role-mp"
+
+  allowed_triggers = {
+    APIGateway = {
+      service    = "apigateway"
+      source_arn = "${aws_api_gateway_rest_api.ingestion_api.execution_arn}/*/*"
     }
   }
 
   tags = local.tags
 }
 
-resource "aws_iam_role" "lambda_role" {
-  name = "authorizer-role-mp"
 
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Effect    = "Allow"
-      Principal = { Service = "lambda.amazonaws.com" }
-      Action    = "sts:AssumeRole"
-    }]
-  })
-
-  tags = local.tags
-}
-
-resource "aws_iam_role_policy_attachment" "lambda_logs" {
-  role       = aws_iam_role.lambda_role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-}
-
-resource "aws_lambda_permission" "authorizer" {
-  statement_id  = "AllowApiGatewayInvoke"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.authorizer.function_name
-  principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_api_gateway_rest_api.ingestion_api.execution_arn}/*/*"
-}
