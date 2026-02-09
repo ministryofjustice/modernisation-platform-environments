@@ -26,6 +26,8 @@ module "environment_stage" {
 
   bastion_config = local.bastion_config_stage
 
+  boe_efs_config = local.boe_efs_config_stage
+
   bcs_config = local.bcs_config_stage
   bps_config = local.bps_config_stage
   bws_config = local.bws_config_stage
