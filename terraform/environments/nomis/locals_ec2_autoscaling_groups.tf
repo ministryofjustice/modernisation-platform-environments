@@ -68,10 +68,6 @@ locals {
         #   }
         # }        
       }
-      autoscaling_schedules = {
-        "scale_up"   = { recurrence = "0 6 * * Mon-Fri" }
-        "scale_down" = { desired_capacity = 0, recurrence = "0 19 * * Mon-Fri" }
-      }
       config = {
         ami_name                      = "hmpps_windows_server_2022_release_2024-*"
         ebs_volumes_copy_all_from_ami = false # ami has unwanted ephemeral devices
