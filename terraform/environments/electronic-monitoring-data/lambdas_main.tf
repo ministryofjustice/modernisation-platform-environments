@@ -684,6 +684,7 @@ module "ears_sars_request" {
   count = local.is-development || local.is-production ? 1 : 0
   source                  = "./modules/lambdas"
   is_image                = true
+  ecr_repo_name           = "electronic-monitoring-ear-sars"
   function_name           = "ears_sars_request"
   role_name               = aws_iam_role.ears_sars_iam_role[0].name
   role_arn                = aws_iam_role.ears_sars_iam_role[0].arn
