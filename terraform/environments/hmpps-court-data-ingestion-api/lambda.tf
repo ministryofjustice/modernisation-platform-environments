@@ -3,8 +3,8 @@ resource "aws_lambda_function" "authorizer" {
   runtime          = "nodejs18.x"
   handler          = "authorizer.handler"
   role             = aws_iam_role.lambda_role.arn
-  filename         = data.archive_file.dummy.output_path
-  source_code_hash = data.archive_file.dummy.output_base64sha256
+  filename         = data.archive_file.authorizer.output_path
+  source_code_hash = data.archive_file.authorizer.output_base64sha256
 
   environment {
     variables = {

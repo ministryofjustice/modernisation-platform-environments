@@ -7,6 +7,32 @@ resource "aws_wafv2_web_acl" "main" {
     allow {}
   }
 
+  # Rule 0: IP Allowlist
+  rule {
+    name     = "IPAllowlist"
+    priority = 1
+
+    action {
+      block {}
+    }
+
+    statement {
+      not_statement {
+        statement {
+          ip_set_reference_statement {
+            arn = aws_wafv2_ip_set.allowed_ips.arn
+          }
+        }
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "${local.application_name}-ip-allowlist"
+      sampled_requests_enabled   = true
+    }
+  }
+
   # Rule 1: AWS Common Rule Set (Generic exploits, OWASP Top 10)
   rule {
     name     = "AWS-AWSManagedRulesCommonRuleSet"
@@ -101,4 +127,13 @@ resource "aws_cloudwatch_log_group" "waf" {
 resource "aws_wafv2_web_acl_logging_configuration" "main" {
   log_destination_configs = [aws_cloudwatch_log_group.waf.arn]
   resource_arn            = aws_wafv2_web_acl.main.arn
+}
+
+resource "aws_wafv2_ip_set" "allowed_ips" {
+  name               = "${local.application_name}-allowed-ips"
+  description        = "Allowed IPs for ${local.application_name}"
+  scope              = "REGIONAL"
+  ip_address_version = "IPV4"
+  addresses          = [] # Add allowed CIDRs here, e.g., ["1.2.3.4/32"]
+  tags               = local.tags
 }
