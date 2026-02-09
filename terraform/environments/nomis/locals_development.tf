@@ -134,6 +134,10 @@ locals {
       })
 
       dev-nomis-client-a = merge(local.ec2_autoscaling_groups.client, {
+        autoscaling_schedules = {
+          "scale_up"   = { recurrence = "0 6 * * Mon-Fri" }
+          "scale_down" = { desired_capacity = 0, recurrence = "0 19 * * Mon-Fri" }
+        }
         tags = merge(local.ec2_autoscaling_groups.client.tags, {
           domain-name = "azure.noms.root"
         })
