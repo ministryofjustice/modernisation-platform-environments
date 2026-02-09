@@ -32,14 +32,15 @@ module "authorizer_lambda" {
   create_role = true
   role_name   = "authorizer-role-mp"
 
-  allowed_triggers = {
-    APIGateway = {
-      service    = "apigateway"
-      source_arn = "${aws_api_gateway_rest_api.ingestion_api.execution_arn}/*/*/*"
-    }
-  }
-
   tags = local.tags
+}
+
+resource "aws_lambda_permission" "apigw" {
+  statement_id  = "AllowAPIGatewayInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = module.authorizer_lambda.lambda_function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.ingestion_api.execution_arn}/*/*/*"
 }
 
 

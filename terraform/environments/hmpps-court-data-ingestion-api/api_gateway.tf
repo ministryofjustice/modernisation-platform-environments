@@ -98,28 +98,50 @@ resource "aws_api_gateway_stage" "main" {
   rest_api_id   = aws_api_gateway_rest_api.ingestion_api.id
   stage_name    = local.environment
 
-  access_log_settings {
-    destination_arn = aws_cloudwatch_log_group.api_gateway_access_logs.arn
-    format = jsonencode({
-      extendedRequestId  = "$context.extendedRequestId"
-      ip                 = "$context.identity.sourceIp"
-      client             = "$context.identity.clientCert.subjectDN"
-      issuerDN           = "$context.identity.clientCert.issuerDN"
-      requestTime        = "$context.requestTime"
-      httpMethod         = "$context.httpMethod"
-      resourcePath       = "$context.resourcePath"
-      status             = "$context.status"
-      responseLength     = "$context.responseLength"
-      error              = "$context.error.message"
-      authenticateStatus = "$context.authenticate.status"
-      authenticateError  = "$context.authenticate.error"
-      integrationStatus  = "$context.integration.status"
-      integrationError   = "$context.integration.error"
-      apiKeyId           = "$context.identity.apiKeyId"
-    })
-  }
+  # access_log_settings {
+  #   destination_arn = aws_cloudwatch_log_group.api_gateway_access_logs.arn
+  #   format = jsonencode({
+  #     extendedRequestId  = "$context.extendedRequestId"
+  #     ip                 = "$context.identity.sourceIp"
+  #     client             = "$context.identity.clientCert.subjectDN"
+  #     issuerDN           = "$context.identity.clientCert.issuerDN"
+  #     requestTime        = "$context.requestTime"
+  #     httpMethod         = "$context.httpMethod"
+  #     resourcePath       = "$context.resourcePath"
+  #     status             = "$context.status"
+  #     responseLength     = "$context.responseLength"
+  #     error              = "$context.error.message"
+  #     authenticateStatus = "$context.authenticate.status"
+  #     authenticateError  = "$context.authenticate.error"
+  #     integrationStatus  = "$context.integration.status"
+  #     integrationError   = "$context.integration.error"
+  #     apiKeyId           = "$context.identity.apiKeyId"
+  #   })
+  # }
 
   tags = local.tags
+}
+
+# Account-level Logging Role
+module "apigw_cloudwatch_role" {
+  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
+  version = "5.58.0"
+
+  create_role = true
+
+  role_name = "apigateway-cloudwatch-logs-role-${local.environment}"
+
+  trusted_role_services = [
+    "apigateway.amazonaws.com"
+  ]
+
+  custom_role_policy_arns = [
+    "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
+  ]
+}
+
+resource "aws_api_gateway_account" "main" {
+  cloudwatch_role_arn = module.apigw_cloudwatch_role.iam_role_arn
 }
 
 resource "aws_cloudwatch_log_group" "api_gateway_access_logs" {
