@@ -148,3 +148,11 @@ variable "web_acl_arn" {
 #variable "s3_access_logging_bucket" {
 #  description = "The bucket to store the access logs"
 #}
+
+
+## Scheduler
+variable "create_svc_pilot" {
+  description = "Create infrastructure for the hub-svc pilot, including ALB and associated resources"
+  type        = bool
+  default     = true
+}

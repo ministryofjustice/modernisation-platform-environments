@@ -37,6 +37,15 @@ data "aws_lb_listener" "connectivity" {
   port              = var.connectivity_listener_port
 }
 
+data "aws_lb" "yjsm_hub_svc" {
+  name = var.yjsm_hub_svc_alb_name
+}
+
+data "aws_lb_listener" "yjsm_hub_svc" {
+  load_balancer_arn = data.aws_lb.yjsm_hub_svc.arn
+  port              = var.yjsm_hub_svc_listener_port
+}
+
 
 data "aws_lb_target_group" "one" {
   for_each = { for pair in var.services : join("", keys(pair)) => pair }

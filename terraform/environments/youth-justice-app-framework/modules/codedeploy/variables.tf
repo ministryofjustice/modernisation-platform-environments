@@ -23,6 +23,11 @@ variable "connectivity_alb_name" {
   type        = string
 }
 
+variable "yjsm_hub_svc_alb_name" {
+  description = "The name of the yjsm hub svc service ALB"
+  type        = string
+}
+
 variable "tags" {
   description = "A map of tags to add to all resources"
   type        = map(string)
