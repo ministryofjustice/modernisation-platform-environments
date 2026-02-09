@@ -54,6 +54,7 @@ module "policy" {
   version = "6.4.0"
 
   name_prefix = "transfer-user-${var.name}"
+  description = "IAM Policy"
 
   policy = data.aws_iam_policy_document.this.json
 }

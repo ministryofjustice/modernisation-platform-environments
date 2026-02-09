@@ -20,6 +20,7 @@ module "transfer_server_iam_policy" {
   version = "6.4.0"
 
   name_prefix = "transfer-server"
+  description = "IAM Policy"
 
   policy = data.aws_iam_policy_document.transfer_server.json
 }
@@ -72,6 +73,7 @@ module "datasync_iam_policy" {
   version = "6.4.0"
 
   name_prefix = "datasync"
+  description = "IAM Policy"
 
   policy = data.aws_iam_policy_document.datasync.json
 }
@@ -138,6 +140,7 @@ module "datasync_replication_iam_policy" {
   version = "6.4.0"
 
   name_prefix = "datasync-replication"
+  description = "IAM Policy"
 
   policy = data.aws_iam_policy_document.datasync_replication.json
 }
@@ -204,6 +207,7 @@ module "datasync_opg_replication_iam_policy" {
   version = "6.4.0"
 
   name_prefix = "datasync-opg-ingress-${local.environment}-replication"
+  description = "IAM Policy"
 
   policy = data.aws_iam_policy_document.datasync_opg_replication.json
 }
@@ -351,6 +355,7 @@ module "guard_duty_s3_malware_protection_iam_policy" {
   version = "6.4.0"
 
   name_prefix = "guard-duty-s3-malware-protection-${local.environment}-scan"
+  description = "IAM Policy"
 
   policy = data.aws_iam_policy_document.guard_duty_malware_protection_iam_policy.json
 }
@@ -449,6 +454,7 @@ module "laa_data_analysis_iam_policy" {
   version = "6.4.0"
 
   name_prefix = "laa-data-analysis"
+  description = "IAM Policy"
 
   policy = data.aws_iam_policy_document.laa_data_analysis[0].json
 }
@@ -534,6 +540,7 @@ module "laa_data_analysis_replication_iam_policy" {
   version = "6.4.0"
 
   name_prefix = "laa-data-analysis-${local.environment}-replication"
+  description = "IAM Policy"
 
   policy = data.aws_iam_policy_document.laa_data_analysis_replication[0].json
 }

@@ -714,35 +714,57 @@ When ready to apply changes, explicitly instruct:
 ### 2026-02-09 - Phase 4: IAM Role Name Preservation Fix
 
 - **Branch**: copilot-major-upgrade/analytical-platform-ingestion-1770207173
-- **Issue Identified**: Multiple IAM roles were being destroyed and recreated in production plan due to missing `use_name_prefix = false` parameter
+- **Issues Identified**: 
+  1. Multiple IAM roles being destroyed and recreated due to missing `use_name_prefix = false` parameter
+  2. Multiple IAM policies being replaced due to missing `description = "IAM Policy"` parameter
 - **Root Cause**: 
-  - IAM module v6 defaults `use_name_prefix = true`, which appends random suffixes to role names
-  - During Phase 3 upgrade (commit e3fbb72f7), only long role names received `use_name_prefix = false` to avoid AWS 64-character limit errors
-  - Most roles were left with default behaviour, causing Terraform to want to replace `role-name` → `role-name-<random-suffix>`
-  - Advisory document incorrectly stated "`name_prefix` not supported in v6" (referring to the old v5 parameter), which caused confusion
-- **Affected Resources**: 10 IAM role modules across 4 files:
-  - iam-roles.tf: 7 modules
-  - transform-iam-roles.tf: 1 module
-  - modules/transfer-family/user/main.tf: 1 module
-  - modules/transfer-family/user-with-egress/main.tf: 1 module
-- **Fix Applied**: Added `use_name_prefix = false` to all IAM role modules (excluding /dms directory) to preserve exact existing role names
+  - **IAM Roles**: IAM module v6 defaults `use_name_prefix = true`, which appends random suffixes to role names
+    - During Phase 3 upgrade (commit e3fbb72f7), only long role names received `use_name_prefix = false` to avoid AWS 64-character limit errors
+    - Most roles were left with default behaviour, causing Terraform to want to replace `role-name` → `role-name-<random-suffix>`
+    - Advisory document incorrectly stated "`name_prefix` not supported in v6" (referring to the old v5 parameter), which caused confusion
+  - **IAM Policies**: IAM module v6 `description` parameter changed from `null` default, causing force-replacement
+    - All policy modules using `name_prefix` (generates random policy names) but missing explicit `description` parameter
+    - Terraform detected description change from `"IAM Policy"` (existing in AWS) to `null` (module default), forcing replacement
+- **Affected Resources**: 
+  - **10 IAM role modules** across 4 files:
+    - iam-roles.tf: 7 modules
+    - transform-iam-roles.tf: 1 module
+    - modules/transfer-family/user/main.tf: 1 module
+    - modules/transfer-family/user-with-egress/main.tf: 1 module
+  - **9 IAM policy modules** across 3 files:
+    - iam-policies.tf: 7 modules
+    - modules/transfer-family/user/main.tf: 1 module
+    - modules/transfer-family/user-with-egress/main.tf: 1 module
+- **Fixes Applied**: 
+  1. Added `use_name_prefix = false` to all IAM role modules (excluding /dms directory) to preserve exact existing role names
+  2. Added `description = "IAM Policy"` to all IAM policy modules to preserve existing policy descriptions
 - **Files Modified**:
-  - iam-roles.tf (transfer_server_iam_role, datasync_iam_role, datasync_replication_iam_role, datasync_opg_replication_iam_role, guard_duty_malware_s3_scan_iam_role, datasync_laa_data_analysis_iam_role, laa_data_analysis_replication_iam_role)
-  - transform-iam-roles.tf (transfer_family_service_role)
-  - modules/transfer-family/user/main.tf (role module)
-  - modules/transfer-family/user-with-egress/main.tf (role module)
+  - **iam-roles.tf**: Added `use_name_prefix = false` to 7 role modules (transfer_server_iam_role, datasync_iam_role, datasync_replication_iam_role, datasync_opg_replication_iam_role, guard_duty_malware_s3_scan_iam_role, datasync_laa_data_analysis_iam_role, laa_data_analysis_replication_iam_role)
+  - **iam-policies.tf**: Added `description = "IAM Policy"` to 7 policy modules
+  - **transform-iam-roles.tf**: Added `use_name_prefix = false` to transfer_family_service_role
+  - **modules/transfer-family/user/main.tf**: Added `use_name_prefix = false` to role module, `description = "IAM Policy"` to policy module
+  - **modules/transfer-family/user-with-egress/main.tf**: Added `use_name_prefix = false` to role module, `description = "IAM Policy"` to policy module
 - **Validation**: ✅ Terraform Plan Reviewed
-  - **Before Fix**: 126+ adds, 18 changes, 126+ destroys (production) - many IAM roles being replaced
-  - **After Fix**: 41 adds, 20 changes, 41 destroys (production)
-  - **8 IAM roles preserved** that would have been destroyed
-  - Only 2 IAM roles still being replaced (acceptable):
-    1. `transfer_server_iam_role`: Was created with random suffix `transfer-server20240327121853746100000001`, now getting clean name `transfer-server` (one-time cleanup, desirable)
-    2. `laa_data_analysis_replication_iam_role`: Intentional name change from `laa-data-analysis-production-replication` → `laa-analysis-production-repl` (documented in Phase 3 as character limit fix)
-  - Remaining adds/destroys are IAM policy attachments being recreated (expected behaviour from v5→v6 module restructuring)
+  - **Before Fix 1**: 126+ adds, 18 changes, 126+ destroys (production) - many IAM roles being replaced
+  - **After Fix 1**: 41 adds, 20 changes, 41 destroys (production) - roles preserved, policies still being replaced
+  - **After Fix 2**: 25 adds, 20 changes, 25 destroys (production) - roles and policies preserved
+  - **Resources Preserved**:
+    - **8 IAM roles** that would have been destroyed
+    - **16 IAM policy attachments** that would have been recreated (policies themselves now preserved)
+  - **Remaining Changes** (expected and acceptable):
+    - 2 IAM roles still being replaced:
+      1. `transfer_server_iam_role`: Cleaning up random suffix `transfer-server20240327121853746100000001` → `transfer-server` (desirable)
+      2. `laa_data_analysis_replication_iam_role`: Intentional rename from `laa-data-analysis-production-replication` → `laa-analysis-production-repl` (Phase 3 character limit fix)
+    - 25 policy attachments recreated due to v5→v6 resource address changes (expected per upgrade guide)
   - All SFTP user roles preserved (cgi-cps, maat-xhibit, meganexususer, opg-restore-ocr, property-concept, sscl-chris-j, sscl-epm, cgi-ssct-sop, essex-police)
-- **Key Learning**: IAM module v6's `use_name_prefix` parameter is a boolean flag controlling whether to append random suffixes, not to be confused with the removed v5 parameter `role_name_prefix`
-- **Impact**: Significantly reduced blast radius for production deployment - eliminated unnecessary IAM role replacements and associated DataSync/S3/Transfer resource recreations
-- **Status**: Fix validated, ready for commit and apply
+- **Key Learnings**: 
+  1. IAM module v6's `use_name_prefix` parameter is a boolean flag controlling whether to append random suffixes, not to be confused with the removed v5 parameter `role_name_prefix`
+  2. IAM policy `description` changes force replacement even when policy document is identical - always preserve existing descriptions
+- **Impact**: Significantly reduced blast radius for production deployment
+  - Eliminated 8 unnecessary IAM role replacements and associated downstream resource recreations
+  - Eliminated 16 IAM policy replacements (only attachment resources now recreated)
+  - Final plan shows minimal expected changes from v5→v6 restructuring
+- **Status**: Both fixes validated, ready for commit and apply
 
 ### 2026-02-04 - Phase 3 Complete: IAM v6.4.0 Upgrade
 
