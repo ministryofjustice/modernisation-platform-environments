@@ -90,7 +90,7 @@ resource "aws_ecs_task_definition" "wardship_task_definition" {
     }
   ])
   runtime_platform {
-    operating_system_family = "WINDOWS_SERVER_2019_CORE"
+    operating_system_family = "WINDOWS_SERVER_2022_CORE"
     cpu_architecture        = "X86_64"
   }
 }
@@ -262,7 +262,18 @@ resource "aws_iam_role_policy" "app_task" {
         ],
         "Resource": "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:*",
         "Effect": "Allow"
+     },
+     {
+       "Effect": "Allow",
+       "Action": [
+         "ssmmessages:CreateControlChannel",
+         "ssmmessages:CreateDataChannel",
+         "ssmmessages:OpenControlChannel",
+         "ssmmessages:OpenDataChannel"
+       ],
+       "Resource": "*"
      }
+
    ]
 }
 EOF
