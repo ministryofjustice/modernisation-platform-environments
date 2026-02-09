@@ -35,7 +35,7 @@ module "authorizer_lambda" {
   allowed_triggers = {
     APIGateway = {
       service    = "apigateway"
-      source_arn = "${aws_api_gateway_rest_api.ingestion_api.execution_arn}/*/*"
+      source_arn = "${aws_api_gateway_rest_api.ingestion_api.execution_arn}/*/*/*"
     }
   }
 

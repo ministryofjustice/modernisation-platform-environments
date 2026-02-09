@@ -69,6 +69,8 @@ resource "aws_api_gateway_integration_response" "response_200" {
   resource_id = aws_api_gateway_resource.ingest.id
   http_method = aws_api_gateway_method.post.http_method
   status_code = "200"
+
+  depends_on = [aws_api_gateway_integration.sqs]
 }
 
 resource "aws_api_gateway_deployment" "main" {

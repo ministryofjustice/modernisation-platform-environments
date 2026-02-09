@@ -27,13 +27,3 @@ module "secret_ingestion_api_auth_token" {
 
   tags = local.tags
 }
-
-import {
-  to = module.secret_cloud_platform_account_id.aws_secretsmanager_secret.this[0]
-  id = "arn:aws:secretsmanager:eu-west-2:${data.aws_caller_identity.current.account_id}:secret:cloud-platform-account-id"
-}
-
-import {
-  to = module.secret_ingestion_api_auth_token.aws_secretsmanager_secret.this[0]
-  id = "arn:aws:secretsmanager:eu-west-2:${data.aws_caller_identity.current.account_id}:secret:ingestion-api-auth-token"
-}
