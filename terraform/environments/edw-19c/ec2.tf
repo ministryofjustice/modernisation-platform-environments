@@ -21,7 +21,7 @@ EOF
 
 resource "aws_iam_role" "edw_ec2_role" {
   count = local.environment == "preproduction" ? 1 : 0
-  name = "${local.application_name}-ec2-instance-role"
+  name  = "${local.application_name}-ec2-instance-role"
   tags = merge(
     local.tags,
     {
@@ -48,8 +48,8 @@ EOF
 
 resource "aws_iam_instance_profile" "edw_ec2_instance_profile" {
   count = local.environment == "preproduction" ? 1 : 0
-  name = "${local.application_name}-S3-${local.application_data.accounts[local.environment].edw_bucket_name}-edw-RW-ec2-profile"
-  role = aws_iam_role.edw_ec2_role[count.index].name
+  name  = "${local.application_name}-S3-${local.application_data.accounts[local.environment].edw_bucket_name}-edw-RW-ec2-profile"
+  role  = aws_iam_role.edw_ec2_role[count.index].name
   tags = merge(
     local.tags,
     {
@@ -62,8 +62,8 @@ resource "aws_iam_instance_profile" "edw_ec2_instance_profile" {
 
 resource "aws_iam_policy" "edw_ec2_role_policy" {
   count = local.environment == "preproduction" ? 1 : 0
-  name = "${local.application_name}-ec2-policy2"
-  path = "/"
+  name  = "${local.application_name}-ec2-policy2"
+  path  = "/"
   tags = merge(
     local.tags,
     {
