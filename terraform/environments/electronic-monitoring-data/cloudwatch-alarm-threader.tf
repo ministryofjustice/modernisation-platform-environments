@@ -23,10 +23,10 @@ resource "aws_cloudwatch_event_rule" "alarm_state_change_threader" {
   description = "Routes CloudWatch ALARM/OK state changes to cloudwatch_alarm_threader for incident-threaded Slack notifications"
 
   event_pattern = jsonencode({
-    "source": ["aws.cloudwatch"],
-    "detail-type": ["CloudWatch Alarm State Change"],
-    "detail": {
-      "alarmName": [
+    "source" : ["aws.cloudwatch"],
+    "detail-type" : ["CloudWatch Alarm State Change"],
+    "detail" : {
+      "alarmName" : [
         aws_cloudwatch_metric_alarm.load_mdss_dlq_alarm.alarm_name,
         aws_cloudwatch_metric_alarm.clean_dlt_dlq_alarm.alarm_name,
         aws_cloudwatch_metric_alarm.glue_database_count_high.alarm_name

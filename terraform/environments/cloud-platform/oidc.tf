@@ -23,7 +23,7 @@ data "aws_iam_policy_document" "github_actions_development_cluster_oidc_policy" 
     resources = ["*"]
   }
   statement {
-    sid   = "EventsFullAccess"
+    sid    = "EventsFullAccess"
     effect = "Allow"
     actions = [
       "events:*"
@@ -209,10 +209,11 @@ data "aws_iam_policy_document" "github_actions_development_cluster_oidc_policy" 
     actions = ["sts:AssumeRole"]
   }
   statement {
-    sid   = "AllowSQSCreate"
+    sid    = "AllowSQSCreate"
     effect = "Allow"
     actions = [
       "sqs:CreateQueue",
+      "sqs:DeleteQueue",
       "sqs:TagQueue",
       "sqs:SetQueueAttributes"
     ]
