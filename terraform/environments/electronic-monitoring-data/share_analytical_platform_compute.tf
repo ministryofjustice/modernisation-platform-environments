@@ -641,6 +641,7 @@ resource "aws_iam_role_policy_attachment" "analytical_platform_share_policy_atta
 }
 
 module "share_dbs_with_roles" {
+  count                   = local.is-development ? 0 : 1
   source                  = "./modules/lakeformation_database_share"
   dbs_to_grant            = local.dbs_to_grant
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
@@ -649,6 +650,7 @@ module "share_dbs_with_roles" {
 }
 
 module "share_existing_dbs_with_roles" {
+  count                   = local.is-development ? 0 : 1
   source                  = "./modules/lakeformation_database_share"
   dbs_to_grant            = local.existing_dbs_to_grant
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
