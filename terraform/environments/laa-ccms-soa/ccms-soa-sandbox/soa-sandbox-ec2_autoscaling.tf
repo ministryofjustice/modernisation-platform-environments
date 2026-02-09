@@ -76,7 +76,7 @@ resource "aws_launch_template" "ec2-launch-template-managed" {
       delete_on_termination = true
       encrypted             = true
       kms_key_id            = data.aws_kms_alias.ebs.target_key_arn #--Instances would not book with a CMK and time to debug was not available.
-      volume_size           = 30                                    #  Ideally this needs to be debugged and migrated on to a CMK! - AW
+      volume_size           = 60                              #  Ideally this needs to be debugged and migrated on to a CMK! - AW
       volume_type           = "gp2"
       iops                  = 0
     }
@@ -134,7 +134,7 @@ resource "aws_launch_template" "ec2-launch-template-admin" {
       delete_on_termination = true
       encrypted             = true
       kms_key_id            = data.aws_kms_alias.ebs.target_key_arn #--TEMPORARY. SHOULD USE A CMK. AW
-      volume_size           = 30
+      volume_size           = 60
       volume_type           = "gp2"
       iops                  = 0
     }
