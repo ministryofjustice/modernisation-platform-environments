@@ -56,10 +56,6 @@
         "value": "${admin_server_port}"
       },
       {
-        "name": "CONNECTION_STRING",
-        "value": "${db_instance_endpoint}/SOADB"
-      },
-      {
         "name": "MANAGED_SERVER",
         "value": "soa_server1"
       },

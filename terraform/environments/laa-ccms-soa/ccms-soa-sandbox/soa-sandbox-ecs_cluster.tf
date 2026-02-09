@@ -165,7 +165,6 @@ resource "aws_ecs_task_definition" "soasandbox-managed" {
     {
       app_name             = local.application_data.accounts[local.environment].app_name
       app_image            = local.application_data.accounts[local.environment].managed_app_image
-      db_instance_endpoint = aws_db_instance.soa_db.endpoint
       managed_server_port  = local.application_data.accounts[local.environment].managed_server_port
       admin_server_port    = local.application_data.accounts[local.environment].admin_server_port
       aws_region           = local.application_data.accounts[local.environment].aws_region

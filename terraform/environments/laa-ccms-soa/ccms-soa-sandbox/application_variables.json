@@ -32,7 +32,7 @@
       "managed_app_image": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/soa-managed",
       "managed_server_port": "8001",
       "managed_app_count": "1",
-      "managed_container_version": "28eb19b13b394f047ddf1c43e6ef01b29e665579",
+      "managed_container_version": "b996415b76265296e010280bec1dd9bf4f50c353",
       "managed_wl_mem_args": "-Xms8192m -Xmx12288m -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:InitiatingHeapOccupancyPercent=35 -XX:G1HeapRegionSize=16M -XX:MinMetaspaceFreeRatio=50 -XX:MaxMetaspaceFreeRatio=80 -XX:+AlwaysPreTouch",
       "managed_hostname": "ccms-soa-sandbox-managed",
       "efs_performance_mode": "generalPurpose",
