@@ -796,6 +796,17 @@ locals {
     }
 
     route53_zones = {
+      "csr.az.justice.gov.uk" = {
+        records = [
+          { name = "r1", type = "CNAME", ttl = "1800", records = ["r1.csr.service.justice.gov.uk"] },
+          { name = "r2", type = "CNAME", ttl = "1800", records = ["r2.csr.service.justice.gov.uk"] },
+          { name = "r3", type = "CNAME", ttl = "1800", records = ["r3.csr.service.justice.gov.uk"] },
+          { name = "r4", type = "CNAME", ttl = "1800", records = ["r4.csr.service.justice.gov.uk"] },
+          { name = "r5", type = "CNAME", ttl = "1800", records = ["r5.csr.service.justice.gov.uk"] },
+          { name = "r6", type = "CNAME", ttl = "1800", records = ["r6.csr.service.justice.gov.uk"] },
+        ]
+      }
+
       "csr.service.justice.gov.uk" = {
         records = [
           { name = "test", type = "NS", ttl = "86400", records = ["ns-1332.awsdns-38.org", "ns-2038.awsdns-62.co.uk", "ns-62.awsdns-07.com", "ns-689.awsdns-22.net"] },
