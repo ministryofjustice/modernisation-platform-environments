@@ -15,7 +15,7 @@ locals {
 resource "aws_lakeformation_permissions" "quicksight_s3_share" {
   for_each    = toset(local.quicksight_users)
 
-  principal   = "arn:aws:quicksight:eu-west-2:${local.environment_management.account_ids["analytical-platform-compute-production"]}:user/default/${each.value.email}"
+  principal   = "arn:aws:quicksight:eu-west-2:${local.environment_management.account_ids["analytical-platform-compute-production"]}:user/default/${each.value}"
   permissions = ["DATA_LOCATION_ACCESS"]
 
   data_location {
