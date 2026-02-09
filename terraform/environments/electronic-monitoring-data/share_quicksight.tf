@@ -12,9 +12,20 @@ locals {
     ]...)
 }
 
+resource "aws_lakeformation_permissions" "quicksight_s3_share" {
+  for_each    = local.quicksight_users
+
+  principal   = "arn:aws:quicksight:eu-west-2:${local.environment_management.account_ids["analytical-platform-compute-production"]}:user/default/${each.value.email}"
+  permissions = ["DATA_LOCATION_ACCESS"]
+
+  data_location {
+    arn = aws_lakeformation_resource.data_bucket.arn
+  }
+}
+
 resource "aws_lakeformation_permissions" "quicksight_db_share" {
   for_each = local.quicksight_user_db_map
-  principal = "arn:aws:quicksight:eu-west-2:${local.environment_management.account_ids["analytical-platform-compute-production"]}:user/default/${each.value.email}@justice.gov.uk"
+  principal = "arn:aws:quicksight:eu-west-2:${local.environment_management.account_ids["analytical-platform-compute-production"]}:user/default/${each.value.email}"
   permissions = ["DESCRIBE"]
   database {
     name = each.value.database
@@ -23,7 +34,7 @@ resource "aws_lakeformation_permissions" "quicksight_db_share" {
 
 resource "aws_lakeformation_permissions" "quicksight_table_share" {
   for_each = local.quicksight_user_db_map
-  principal = "arn:aws:quicksight:eu-west-2:${local.environment_management.account_ids["analytical-platform-compute-production"]}:user/default/${each.value.email}@justice.gov.uk"
+  principal = "arn:aws:quicksight:eu-west-2:${local.environment_management.account_ids["analytical-platform-compute-production"]}:user/default/${each.value.email}"
   permissions = ["DESCRIBE", "SELECT"]
 
   table {
