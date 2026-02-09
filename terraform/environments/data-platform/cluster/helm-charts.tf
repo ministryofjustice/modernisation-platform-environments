@@ -21,7 +21,10 @@ resource "helm_release" "cilium" {
     )
   ]
 
-  depends_on = [module.eks]
+  depends_on = [
+    module.eks,
+    kubernetes_manifest.gateway_api_crd
+  ]
 }
 
 resource "helm_release" "coredns" {
