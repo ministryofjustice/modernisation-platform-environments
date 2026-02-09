@@ -150,7 +150,7 @@ variable "web_acl_arn" {
 #}
 
 
-## Scheduler
+## YJSM Hub Svc Pilot
 variable "create_svc_pilot" {
   description = "Create infrastructure for the hub-svc pilot, including ALB and associated resources"
   type        = bool
