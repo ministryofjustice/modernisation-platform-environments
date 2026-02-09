@@ -43,9 +43,9 @@ locals {
             }
           ))
         }
-        # ebs_volumes = {
-        #   "/dev/sda1" = { type = "gp3", size = 100 }
-        # }
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 100 }
+        }
         instance = {
           disable_api_termination      = false
           instance_type                = "m7i.large"
