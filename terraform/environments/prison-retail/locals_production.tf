@@ -27,12 +27,12 @@ locals {
           ami_name                      = "Windows_Server-2019-English-Full-SQL_2019_Standard-2026.01.14"
           ami_owner                     = "801119661308"
           availability_zone             = "eu-west-2b"
-          ebs_volumes_copy_all_from_ami = false
+          ebs_volumes_copy_all_from_ami = true
           iam_resource_names_prefix     = "ec2-instance"
           instance_profile_policies = [
             "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
             "EC2Default",
-            # "EC2S3BucketWriteAndDeleteAccessPolicy",
+            "EC2S3BucketWriteAndDeleteAccessPolicy",
             # "Ec2PrisonerRetailPolicy", # just for email list secret
             "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"
           ]
@@ -43,9 +43,9 @@ locals {
             }
           ))
         }
-        ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 100 }
-        }
+        # ebs_volumes = {
+        #   "/dev/sda1" = { type = "gp3", size = 100 }
+        # }
         instance = {
           disable_api_termination      = false
           instance_type                = "m7i.large"
