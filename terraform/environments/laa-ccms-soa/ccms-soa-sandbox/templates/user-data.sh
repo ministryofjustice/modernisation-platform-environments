@@ -9,9 +9,17 @@ echo 'ECS_INSTANCE_ATTRIBUTES={"server": "${server}","latest": "true"}' >> /etc/
 
 #--Configure EFS
 yum install -y amazon-efs-utils
-mkdir $EFS_MOUNT_POINT
+mkdir -p $EFS_MOUNT_POINT
 mount -t efs -o tls ${efs_id}:/ $EFS_MOUNT_POINT
-chmod go+rw $EFS_MOUNT_POINT
+
+# verify EFS is mounted successfully or not
+mountpoint -q $EFS_MOUNT_POINT || (echo "EFS mount failed" && exit 1)
+
+#--Set permissions for EFS mount point
+chown ec2-user:ec2-user $EFS_MOUNT_POINT
+chmod 755 $EFS_MOUNT_POINT
+# chmod go+rw $EFS_MOUNT_POINT
+
 # create large file for better EFS performance 
 # https://docs.aws.amazon.com/efs/latest/ug/performance.html
 dd if=/dev/urandom of=$EFS_MOUNT_POINT/large_file_for_efs_performance bs=1024k count=10000
