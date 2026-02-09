@@ -1,7 +1,7 @@
 ## Only create Route53 zone in development clusters
 
 resource "aws_route53_zone" "cluster_zone" {
-  count = contains(local.enabled_workspaces, local.cluster_environment) ? 1 : 0
+  count         = contains(local.enabled_workspaces, local.cluster_environment) ? 1 : 0
   name          = "${local.environment_configuration.route53_prefix}.${local.environment_configuration.account_hosted_zone}"
   force_destroy = true
 

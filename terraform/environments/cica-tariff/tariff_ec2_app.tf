@@ -9,7 +9,7 @@ resource "aws_key_pair" "key_pair_app" {
 
 
 resource "aws_instance" "tariff_app" {
-  count = local.environment != "production" ? 1 : 0
+  count                       = local.environment != "production" ? 1 : 0
   ami                         = data.aws_ami.shared_ami.id
   associate_public_ip_address = false
   ebs_optimized               = true

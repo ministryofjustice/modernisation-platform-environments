@@ -169,22 +169,22 @@ module "autoscaling_sg" {
   description = "Autoscaling group security group"
   vpc_id      = var.vpc_id
 
-   ingress_with_source_security_group_id = [
-  #   {
-  #     from_port                = 8125
-  #     to_port                  = 8125
-  #     protocol                 = "UDP"
-  #     description              = "Datadog from ecs internal"
-  #     source_security_group_id = aws_security_group.common_ecs_service_internal.id
-  #   },
-  #   {
-  #     from_port                = 8126
-  #     to_port                  = 8126
-  #     protocol                 = "TCP"
-  #     description              = "Datadog from ecs internal"
-  #     source_security_group_id = aws_security_group.common_ecs_service_internal.id
-  #   }
-   ]
+  ingress_with_source_security_group_id = [
+    #   {
+    #     from_port                = 8125
+    #     to_port                  = 8125
+    #     protocol                 = "UDP"
+    #     description              = "Datadog from ecs internal"
+    #     source_security_group_id = aws_security_group.common_ecs_service_internal.id
+    #   },
+    #   {
+    #     from_port                = 8126
+    #     to_port                  = 8126
+    #     protocol                 = "TCP"
+    #     description              = "Datadog from ecs internal"
+    #     source_security_group_id = aws_security_group.common_ecs_service_internal.id
+    #   }
+  ]
 
   ingress_with_self = [
     {
