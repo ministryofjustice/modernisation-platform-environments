@@ -32,8 +32,8 @@ module "codedeploy" {
     { "yp" = "internal" },
   ]
 
-  internal_alb_name = "yjaf-int-internal"
-  external_alb_name = "yjaf-ext-external"
+  internal_alb_name     = "yjaf-int-internal"
+  external_alb_name     = "yjaf-ext-external"
   connectivity_alb_name = "yjaf-connectivity-internal"
   depends_on = [
     module.internal_alb,

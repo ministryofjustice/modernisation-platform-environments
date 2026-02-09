@@ -457,11 +457,6 @@ locals {
           { name = "", type = "A", lbs_map_key = "cafmwebx2" },
         ]
       }
-      "cafmtx.az.justice.gov.uk" = {
-        records = [
-          { name = "", type = "CNAME", ttl = 3600, records = ["cafmtx.planetfm.service.justice.gov.uk"] },
-        ]
-      }
       "planetfm.service.justice.gov.uk" = {
         records = [
           { name = "_a6a2b9e651b91ed3f1e906b4f1c3c317", type = "CNAME", ttl = 86400, records = ["_c4257165635a7b495df6c4fbd986c09f.mhbtsbpdnt.acm-validations.aws"] },

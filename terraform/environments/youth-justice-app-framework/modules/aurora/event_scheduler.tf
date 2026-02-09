@@ -1,7 +1,7 @@
 resource "aws_iam_role" "rds_scheduler" {
-  count               = var.create_sheduler ? 1 : 0
-  name                = "rds-scheduler-role"
-  assume_role_policy  = jsonencode({
+  count = var.create_sheduler ? 1 : 0
+  name  = "rds-scheduler-role"
+  assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
       Effect = "Allow"
@@ -14,9 +14,9 @@ resource "aws_iam_role" "rds_scheduler" {
 }
 
 resource "aws_iam_role_policy" "rds_scheduler" {
-  count     = var.create_sheduler ? 1 : 0
-  role      = aws_iam_role.rds_scheduler[0].id
-  policy    = jsonencode({
+  count = var.create_sheduler ? 1 : 0
+  role  = aws_iam_role.rds_scheduler[0].id
+  policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
