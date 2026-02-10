@@ -312,6 +312,8 @@ module "process_fms_metadata" {
     SQS_QUEUE_URL                = aws_sqs_queue.format_fms_json_event_queue.id
     POWERTOOLS_METRICS_NAMESPACE = "FMSLiveFeed"
     POWERTOOLS_SERVICE_NAME      = "process-fms-metadata-lambda"
+    SNS_TOPIC_ARN  = aws_sns_topic.emds_alerts.arn
+    ENVIRONMENT_NAME    = local.environment_shorthand
   }
 }
 
@@ -360,7 +362,7 @@ module "load_mdss_lambda" {
   core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
   production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
   security_group_ids             = [aws_security_group.lambda_generic.id]
-  subnet_ids                     = data.aws_subnets.shared-public.ids
+  subnet_ids                     = data.aws_subnets.shared-private.ids
   cloudwatch_retention_days      = 7
   environment_variables = {
     ATHENA_QUERY_BUCKET = module.s3-athena-bucket.bucket.id

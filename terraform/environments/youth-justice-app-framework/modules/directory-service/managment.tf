@@ -316,7 +316,7 @@ resource "aws_instance" "ad_instance" {
   }
   root_block_device {
     encrypted   = true
-    volume_size = 50
+    volume_size = 100
     tags = merge(local.all_tags,
       { Name = "root-device-mgmt-ad-instance" },
       { device-name = "/dev/sda1" }
