@@ -241,8 +241,11 @@ resource "aws_iam_role_policy" "app_task" {
    "Statement": [
      {
         "Action": [
-          "logs:CreateLogStream",
-          "logs:PutLogEvents"
+            "logs:CreateLogGroup",
+            "logs:CreateLogStream",
+            "logs:PutLogEvents",
+            "logs:DescribeLogStreams",
+            "logs:DescribeLogGroups"
         ],
         "Resource": "arn:aws:logs:*:${local.environment_management.account_ids[terraform.workspace]}:*",
         "Effect": "Allow"
