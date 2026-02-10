@@ -35,6 +35,7 @@ jobs:
       
   terraform:
     needs: strategy
+    if: join(fromJson(needs.strategy.outputs.matrix).include) != ''
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.strategy.outputs.matrix) }}
