@@ -6,6 +6,11 @@ exec > /var/log/user-data.log 2>&1
 EC2_USER_HOME_FOLDER=/home/ec2-user
 EFS_MOUNT_POINT=$EC2_USER_HOME_FOLDER/efs
 
+#--Variables for AWS Secrets Manager
+SECRET_NAME="soasandbox-password"
+SECRET_KEY="ccms/soasandbox/deploy-github-ssh-key"
+REGION="eu-west-2"
+
 echo "ECS_CLUSTER=${cluster_name}" >> /etc/ecs/ecs.config
 echo 'ECS_VOLUME_PLUGIN_CAPABILITIES=["efsAuth"]' >> /etc/ecs/ecs.config
 echo 'ECS_INSTANCE_ATTRIBUTES={"server": "${server}","latest": "true"}' >> /etc/ecs/ecs.config
@@ -31,8 +36,9 @@ dd if=/dev/urandom of=$EFS_MOUNT_POINT/large_file_for_efs_performance bs=1024k c
 #--Add EPEL Repo
 amazon-linux-extras install epel -y
 
-#--Install AWSCLI
+#--Install AWSCLI & jq for JSON parsing in bash
 yum install -y awscli
+yum install -y jq
 
 # Configure SSH and pull git repo
 mkdir -p /home/ec2-user/.ssh
@@ -40,7 +46,7 @@ chown ec2-user:ec2-user /home/ec2-user/.ssh
 chmod 700 /home/ec2-user/.ssh
 
 yum install git -y
-su ec2-user bash -c "aws secretsmanager get-secret-value --secret-id ccms/soasandbox/deploy-github-ssh-key --query SecretString --output text --region eu-west-2 | base64 -d > /home/ec2-user/.ssh/id_rsa"
+su ec2-user bash -c "aws secretsmanager get-secret-value --secret-id ${SECRET_NAME} --region ${REGION} --query SecretString --output text | jq -r --arg key \"${SECRET_KEY}\" '.[$key]' > /home/ec2-user/.ssh/id_rsa"
 chown ec2-user $EC2_USER_HOME_FOLDER/.ssh/id_rsa
 chgrp ec2-user $EC2_USER_HOME_FOLDER/.ssh/id_rsa
 chmod 400 $EC2_USER_HOME_FOLDER/.ssh/id_rsa
