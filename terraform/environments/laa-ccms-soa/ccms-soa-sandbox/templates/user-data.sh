@@ -1,4 +1,8 @@
 #!/bin/bash
+
+set -euxo pipefail
+exec > /var/log/user-data.log 2>&1
+
 EC2_USER_HOME_FOLDER=/home/ec2-user
 EFS_MOUNT_POINT=$EC2_USER_HOME_FOLDER/efs
 
@@ -31,6 +35,10 @@ amazon-linux-extras install epel -y
 yum install -y awscli
 
 # Configure SSH and pull git repo
+mkdir -p /home/ec2-user/.ssh
+chown ec2-user:ec2-user /home/ec2-user/.ssh
+chmod 700 /home/ec2-user/.ssh
+
 yum install git -y
 su ec2-user bash -c "aws secretsmanager get-secret-value --secret-id ccms/soa/deploy-github-ssh-key --query SecretString --output text --region eu-west-2 | base64 -d > /home/ec2-user/.ssh/id_rsa"
 chown ec2-user $EC2_USER_HOME_FOLDER/.ssh/id_rsa
@@ -41,7 +49,7 @@ host ssh.github.com
   HostName ssh.github.com
   Port 443
   User git
-StrictHostKeyChecking no
+  StrictHostKeyChecking no
 EOF
 chown ec2-user $EC2_USER_HOME_FOLDER/.ssh/config
 chgrp ec2-user $EC2_USER_HOME_FOLDER/.ssh/config
