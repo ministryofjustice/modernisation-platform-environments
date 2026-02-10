@@ -92,7 +92,7 @@ import {
   id       = "${each.key}:${each.value}:${aws_instance.tariff_app_2[0].id}"
 }
 */
-/*
+
 # Production only CDI-305 remap Cloned App > App
 locals {
   tariff_cloneapp_storage = {
@@ -105,20 +105,19 @@ locals {
 }
 
 import {
-  for_each = local.environment == "production" ? 1 : 0
-  to = aws_instance.tariff_app
-  id = "i-09e042424e8f558bc"
-}
-
-import {
-  for_each = local.environment == "production" ? local.tariff_cloneapp_storage : {}
-  to       = aws_ebs_volume.tariff_cloneapp_storage[each.key]
+  for_each = local.environment == "production" ? { "AppClone" = "i-09e042424e8f558bc" } : {}
+  to       = aws_instance.tariff_app
   id       = each.value
 }
 
 import {
   for_each = local.environment == "production" ? local.tariff_cloneapp_storage : {}
-  to       = aws_volume_attachment.tariff_cloneapp_storage_attachment[each.key]
-  id       = "${each.key}:${each.value}:${aws_instance.tariff_app[0].id}"
+  to       = aws_ebs_volume.tariff_app_storage[each.key]
+  id       = each.value
 }
-*/
+
+import {
+  for_each = local.environment == "production" ? local.tariff_cloneapp_storage : {}
+  to       = aws_volume_attachment.tariff_app_storage_attachment[each.key]
+  id       = "${each.key}:${each.value}:${aws_instance.tariff_app.id}"
+}
