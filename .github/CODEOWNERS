@@ -68,7 +68,7 @@
 /terraform/environments/maat @ministryofjustice/laa-aws-infrastructure @ministryofjustice/laa-crime-apps-team @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
 /terraform/environments/maatdb @ministryofjustice/laa-aws-infrastructure @ministryofjustice/laa-crime-apps-team @ministryofjustice/laa-dba @ministryofjustice/laa-maat-migrations @ministryofjustice/modernisation-platform
 /terraform/environments/mlra @ministryofjustice/laa-aws-infrastructure @ministryofjustice/laa-crime-apps-team @ministryofjustice/modernisation-platform
-/terraform/environments/mojfin @ministryofjustice/azure-aws-sso-mojfin-ssm @ministryofjustice/laa-aws-infrastructure @ministryofjustice/laa-mojfin-database-access @ministryofjustice/laa-mojfin-developers @ministryofjustice/laa-mojfin-security @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
+/terraform/environments/mojfin @ministryofjustice/azure-aws-sso-mojfin-security @ministryofjustice/azure-aws-sso-mojfin-ssm @ministryofjustice/laa-aws-infrastructure @ministryofjustice/laa-mojfin-database-access @ministryofjustice/laa-mojfin-developers @ministryofjustice/laa-mojfin-security @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
 /terraform/environments/ncas @ministryofjustice/dts-legacy @ministryofjustice/modernisation-platform
 /terraform/environments/nomis-combined-reporting @ministryofjustice/hosting-migrations @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
 /terraform/environments/nomis-data-hub @ministryofjustice/hosting-migrations @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
@@ -77,7 +77,6 @@
 /terraform/environments/oasys-national-reporting @ministryofjustice/hosting-migrations @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
 /terraform/environments/oasys @ministryofjustice/hosting-migrations @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
 /terraform/environments/observability-platform @ministryofjustice/observability-platform @ministryofjustice/modernisation-platform
-/terraform/environments/operations-engineering @ministryofjustice/github-audit-log-viewer @ministryofjustice/operations-engineering @ministryofjustice/modernisation-platform
 /terraform/environments/panda-cyber-appsec-lab @ministryofjustice/panda-cyber-team @ministryofjustice/modernisation-platform
 /terraform/environments/performance-hub @ministryofjustice/azure-aws-sso-performancehub @ministryofjustice/performance-hub-developers @ministryofjustice/modernisation-platform
 /terraform/environments/planetfm @ministryofjustice/azure-aws-sso-digital-studio-operations @ministryofjustice/csr-application-support @ministryofjustice/hosting-migrations @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
