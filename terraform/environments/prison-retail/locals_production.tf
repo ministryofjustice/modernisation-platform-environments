@@ -14,7 +14,7 @@ locals {
   # please keep resources in alphabetical order
   baseline_production = {
     cloudwatch_dashboards = {}
-    
+
     ec2_instances = {
       pd-pr-retail-b = { # 15 char limit on name as domain joined
         # TODO: enable alarms when commissioned
@@ -33,10 +33,10 @@ locals {
             "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
             "EC2Default",
             # "EC2S3BucketWriteAndDeleteAccessPolicy",
-          # "Ec2PrisonerRetailPolicy", # just for email list secret
+            # "Ec2PrisonerRetailPolicy", # just for email list secret
             "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"
           ]
-          subnet_name = "private-secondary" # running out of IPs, using secondary subnets
+          subnet_name = "private" # running out of IPs, use secondary subnets private-secondary when possible
           user_data_raw = base64encode(templatefile(
             "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
               branch = "main"
@@ -54,14 +54,14 @@ locals {
             backup-plan = "daily-and-weekly"
           }
           vpc_security_group_ids = [
-            "prisoner-retail",
+            "prison-retail",
             "ad-join",
             "ec2-windows"
           ]
         }
         route53_records = {
           create_external_record = false
-          create_internal_record = true
+          create_internal_record = false
         }
         tags = {
           backup      = "false" # disable mod platform backup since we use our own policies
@@ -88,7 +88,7 @@ locals {
       #   ]
       # }
     }
-    lbs = {}
+    lbs           = {}
     route53_zones = {}
     secretsmanager_secrets = {
       # "/prisoner-retail" = {

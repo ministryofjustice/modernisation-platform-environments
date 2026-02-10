@@ -24,9 +24,9 @@ data "aws_iam_policy_document" "s3-assume-role-policy" {
   }
 }
 resource "aws_iam_policy" "replication_policy" {
-  count    = local.replication_enabled ? 1 : 0
-  name     = "AWSS3BucketReplication${var.data_feed}${var.order_type}"
-  policy   = data.aws_iam_policy_document.replication-policy.json
+  count  = local.replication_enabled ? 1 : 0
+  name   = "AWSS3BucketReplication${var.data_feed}${var.order_type}"
+  policy = data.aws_iam_policy_document.replication-policy.json
 }
 
 # S3 bucket replication: role policy

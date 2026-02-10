@@ -133,7 +133,6 @@ variable "datasync_config" {
   type = object({
     source_s3_bucket_arn       = string
     source_s3_subdirectory     = optional(string, "/dfinterventions/dfi/csv/reports/")
-    fsx_domain                 = optional(string, "delius-mis-dev.internal")
     bandwidth_throttle         = optional(number)
     schedule_expression        = optional(string, "cron(15 4 * * ? *)") # Default: DataSync at 04:15 UTC
     lambda_schedule_expression = optional(string, "cron(0 4 * * ? *)")  # Default: Lambda at 04:00 UTC
