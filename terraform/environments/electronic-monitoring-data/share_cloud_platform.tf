@@ -158,7 +158,7 @@ resource "aws_lakeformation_permissions" "emdi_fms_tables" {
 }
 
 resource "aws_lakeformation_permissions" "emdi_mdss_db" {
-  count       = local.is-development ? 1 : 0
+  count       = local.is-development || local.is-test ? 1 : 0
   principal   = module.emdi_trail_maps_role[0].iam_role_arn
   permissions = ["DESCRIBE"]
   database {
@@ -167,7 +167,7 @@ resource "aws_lakeformation_permissions" "emdi_mdss_db" {
 }
 
 resource "aws_lakeformation_permissions" "emdi_mdss_tables" {
-  count       = local.is-development ? 1 : 0
+  count       = local.is-development || local.is-test ? 1 : 0
   principal   = module.emdi_trail_maps_role[0].iam_role_arn
   permissions = ["SELECT", "DESCRIBE"]
   table {
