@@ -5,7 +5,7 @@ module "coat_github_repos_s3_kms" {
   count = local.is-production ? 1 : 0
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "3.1.1"
+  version = "4.0.0"
 
   aliases               = ["s3/coat-github-repos"]
   description           = "S3 COAT github repos terraform KMS key"
@@ -21,7 +21,7 @@ module "cur_s3_kms" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "3.1.1"
+  version = "4.0.0"
 
   aliases                 = ["s3/cur"]
   description             = "S3 CUR KMS key"
@@ -30,7 +30,7 @@ module "cur_s3_kms" {
 
   key_statements = [
     {
-      sid = "AllowReplicationRole"
+      sid = "AllowReplicationRoleAndSync"
       actions = [
         "kms:Encrypt*",
         "kms:Decrypt*",
@@ -46,7 +46,8 @@ module "cur_s3_kms" {
           identifiers = [
             "arn:aws:iam::${local.environment_management.aws_organizations_root_account_id}:role/moj-cur-reports-v2-hourly-replication-role",
             "arn:aws:iam::${local.coat_prod_account_id}:role/moj-coat-${local.prod_environment}-cur-reports-cross-role",
-            "arn:aws:iam::593291632749:root"
+            "arn:aws:iam::593291632749:root",
+            "arn:aws:iam::279191903737:root"
           ]
         }
       ]
@@ -66,6 +67,24 @@ module "cur_s3_kms" {
         {
           type        = "Service"
           identifiers = ["glue.amazonaws.com"]
+        }
+      ]
+    },
+    {
+      sid    = "RAGLambdaAccess"
+      effect = "Allow"
+      actions = [
+        "kms:Encrypt*",
+        "kms:Decrypt*",
+        "kms:ReEncrypt*",
+        "kms:GenerateDataKey*",
+        "kms:Describe*"
+      ]
+      resources = ["*"]
+      principals = [
+        {
+          type        = "AWS"
+          identifiers = [aws_iam_role.rag_lambda_role.arn]
         }
       ]
     }

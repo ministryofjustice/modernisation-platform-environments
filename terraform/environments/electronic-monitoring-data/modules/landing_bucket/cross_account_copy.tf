@@ -24,9 +24,9 @@ data "aws_iam_policy_document" "s3-assume-role-policy" {
   }
 }
 resource "aws_iam_policy" "replication_policy" {
-  count    = local.replication_enabled ? 1 : 0
-  name     = "AWSS3BucketReplication${var.data_feed}${var.order_type}"
-  policy   = data.aws_iam_policy_document.replication-policy.json
+  count  = local.replication_enabled ? 1 : 0
+  name   = "AWSS3BucketReplication${var.data_feed}${var.order_type}"
+  policy = data.aws_iam_policy_document.replication-policy.json
 }
 
 # S3 bucket replication: role policy
@@ -48,8 +48,8 @@ data "aws_iam_policy_document" "replication-policy" {
     effect = "Allow"
     actions = [
       "s3:GetReplicationConfiguration",
-      "s3:ListBucket"
-
+      "s3:ListBucket",
+      "s3:PutInventoryConfiguration",
     ]
     resources = [module.this-bucket.bucket.arn]
   }
@@ -66,7 +66,8 @@ data "aws_iam_policy_document" "replication-policy" {
       "s3:ReplicateObject",
       "s3:ReplicateDelete",
       "s3:ReplicateTags",
-      "s3:ObjectOwnerOverrideToBucketOwner"
+      "s3:ObjectOwnerOverrideToBucketOwner",
+      "s3:InitiateReplication",
     ]
     resources = ["${module.this-bucket.bucket.arn}/*"]
   }
