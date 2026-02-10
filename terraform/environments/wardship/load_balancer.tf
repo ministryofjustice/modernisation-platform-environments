@@ -261,29 +261,26 @@ resource "aws_lb_target_group" "wardship_target_group" {
     type = "lb_cookie"
   }
 
-  #health_check {
-  #  healthy_threshold   = "3"
-  #  interval            = "300"
-  #  protocol            = "HTTP"
-  #  port                = "80"
-  # unhealthy_threshold = "10"
-  #  matcher             = "200-302"
-  #  timeout             = "120"
-  #}
-
   health_check {
+    healthy_threshold   = "3"
+    interval            = "300"
     protocol            = "HTTP"
     port                = "80"
-    path                = "/health.txt"
-
-    healthy_threshold   = 2
-    unhealthy_threshold = 10
-
-    timeout             = 10
-    interval            = 30
-
-    matcher             = "200"
+   unhealthy_threshold = "10"
+    matcher             = "200-302"
+    timeout             = "120"
   }
+
+  #health_check {
+  #  protocol            = "HTTP"
+  #  port                = "80"
+  #  path                = "/health.txt"
+  #  healthy_threshold   = 2
+  #  unhealthy_threshold = 10
+  #  timeout             = 10
+  #  interval            = 30
+  #  matcher             = "200"
+  #}
 
 
 }
