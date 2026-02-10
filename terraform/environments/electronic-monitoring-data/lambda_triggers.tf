@@ -205,6 +205,15 @@ module "load_fms_event_queue" {
   max_receive_count    = local.load_sqs_max_receive_count
 }
 
+module "fms_fan_out_event_queue" {
+  source               = "./modules/sqs_s3_lambda_trigger"
+  bucket               = module.s3-raw-formatted-data-bucket.bucket
+  lambda_function_name = module.fan_out_tags.lambda_function_name
+  bucket_prefix        = local.bucket_prefix
+  maximum_concurrency  = 100
+  max_receive_count    = local.load_sqs_max_receive_count
+}
+
 resource "aws_s3_bucket_notification" "load_mdss_event" {
   bucket = module.s3-raw-formatted-data-bucket.bucket.id
 
@@ -218,6 +227,12 @@ resource "aws_s3_bucket_notification" "load_mdss_event" {
   queue {
     queue_arn     = module.load_fms_event_queue.sqs_queue.arn
     events        = ["s3:ObjectCreated:*"]
+    filter_prefix = "serco/fms"
+  }
+
+  queue {
+    queue_arn     = module.fms_fan_out_event_queue.sqs_queue.arn
+    events        = ["s3:ObjectTagging:Put"]
     filter_prefix = "serco/fms"
   }
 
