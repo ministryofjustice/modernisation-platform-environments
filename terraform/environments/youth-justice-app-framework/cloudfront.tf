@@ -20,7 +20,7 @@ module "cloudfront_yjaf" {
 
 
 module "yjsm_hub_svc_cloudfront" {
-  count = local.pilot_enabled ? 1 : 0
+  count = var.create_svc_pilot ? 1 : 0
   source = "./modules/cloudfront"
 
   providers = {
@@ -38,4 +38,11 @@ module "yjsm_hub_svc_cloudfront" {
   project_name                   = local.project_name
   tags                           = local.tags
   cloudfront_distribution_id     = module.cloudfront_yjaf.cloudfront_distribution_id
+}
+
+## YJSM Hub Svc Pilot
+variable "create_svc_pilot" {
+  description = "Create infrastructure for the hub-svc pilot, including ALB and associated resources"
+  type        = bool
+  default     = true
 }
