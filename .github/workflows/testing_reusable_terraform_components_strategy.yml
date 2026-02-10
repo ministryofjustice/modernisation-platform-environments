@@ -244,9 +244,9 @@ jobs:
           #    On feature branch, ensure all dev/test components are included with plan_apply,
           #    and prod/preprod components are included with plan.
           # ---------------------------------------------------------------------------------------------------------------
-          # Ensure this block always runs for manual runs
-          if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
-            echo "Workflow was manually triggered"
+          # Ensure this block always runs for manual runs and for push-based test runs
+          if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" || "${GITHUB_EVENT_NAME}" == "push" ]]; then
+            echo "Workflow was manually triggered or push event"
             while IFS= read -r envobj; do
               for comp in $COMPONENTS; do
                 target=$(echo "$envobj" | jq -r '.target')
