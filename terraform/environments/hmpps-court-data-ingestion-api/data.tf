@@ -15,54 +15,80 @@ const { SecretsManagerClient, GetSecretValueCommand } = require("@aws-sdk/client
 const client = new SecretsManagerClient();
 let cachedSecret;
 
+function preview(str) {
+  if (!str) return "∅";
+  const s = String(str);
+  if (s.length <= 12) return s.slice(0, 6) + "…";
+  return s.slice(0, 6) + "…" + s.slice(-6);
+}
+
 exports.handler = async (event) => {
-    console.log('Received event:', JSON.stringify(event, null, 2));
+  console.log("[auth] start");
+  console.log("[auth] Received event:", JSON.stringify(event, null, 2));
 
-    const token = event.authorizationToken;
-    const methodArn = event.methodArn;
+  const token = event && event.authorizationToken;
+  const methodArn = event && event.methodArn;
 
-    if (!token) {
-        return generatePolicy('user', 'Deny', methodArn);
+  console.log(\`[auth] token present=$${Boolean(token)} len=$${token ? String(token).length : 0} preview=$${preview(token)}\`);
+  console.log(\`[auth] methodArn present=$${Boolean(methodArn)} value=$${methodArn || "∅"}\`);
+
+  if (!methodArn) {
+    console.log("[auth] deny: missing methodArn");
+    return generatePolicy("user", "Deny", "*");
+  }
+
+  if (!token) {
+    console.log("[auth] deny: missing token");
+    return generatePolicy("user", "Deny", methodArn);
+  }
+
+  try {
+    if (!cachedSecret) {
+      console.log("[auth] fetching secret from Secrets Manager", "SECRET_ID=", process.env.SECRET_ID);
+      const command = new GetSecretValueCommand({ SecretId: process.env.SECRET_ID });
+      const response = await client.send(command);
+      cachedSecret = response.SecretString;
+      console.log(\`[auth] secret fetched len=$${cachedSecret ? String(cachedSecret).length : 0} preview=$${preview(cachedSecret)}\`);
+    } else {
+      console.log(\`[auth] using cached secret len=$${cachedSecret ? String(cachedSecret).length : 0} preview=$${preview(cachedSecret)}\`);
     }
 
-    try {
-        if (!cachedSecret) {
-            console.log('Fetching secret from Secrets Manager');
-            const command = new GetSecretValueCommand({ SecretId: process.env.SECRET_ID });
-            const response = await client.send(command);
-            cachedSecret = response.SecretString;
-        }
-
-        if (token === cachedSecret) {
-             return generatePolicy('user', 'Allow', methodArn);
-        }
-        console.log('Token mismatch');
-        return generatePolicy('user', 'Deny', methodArn);
-
-    } catch (error) {
-        console.log('Error verifying token:', error);
-        return generatePolicy('user', 'Deny', methodArn);
+    if (String(token) === String(cachedSecret)) {
+      console.log("[auth] allow: token matched");
+      return generatePolicy("user", "Allow", methodArn);
     }
+
+    console.log("[auth] deny: token mismatch", "tokenPreview=", preview(token), "secretPreview=", preview(cachedSecret));
+    return generatePolicy("user", "Deny", methodArn);
+
+  } catch (error) {
+    console.log("[auth] deny: error verifying token:", error);
+    return generatePolicy("user", "Deny", methodArn);
+  } finally {
+    console.log("[auth] end");
+  }
 };
 
 const generatePolicy = (principalId, effect, resource) => {
-    const authResponse = {};
-    authResponse.principalId = principalId;
-    if (effect && resource) {
-        const policyDocument = {};
-        policyDocument.Version = '2012-10-17';
-        policyDocument.Statement = [];
-        const statementOne = {};
-        statementOne.Action = 'execute-api:Invoke';
-        statementOne.Effect = effect;
-        statementOne.Resource = resource;
-        policyDocument.Statement[0] = statementOne;
-        authResponse.policyDocument = policyDocument;
-    }
-    return authResponse;
+  const authResponse = {};
+  authResponse.principalId = principalId;
+  if (effect && resource) {
+    const policyDocument = {};
+    policyDocument.Version = "2012-10-17";
+    policyDocument.Statement = [];
+    const statementOne = {};
+    statementOne.Action = "execute-api:Invoke";
+    statementOne.Effect = effect;
+    statementOne.Resource = resource;
+    policyDocument.Statement[0] = statementOne;
+    authResponse.policyDocument = policyDocument;
+  }
+  return authResponse;
 };
 EOF
     filename = "authorizer.js"
   }
 }
+
+
 

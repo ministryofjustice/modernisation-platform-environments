@@ -10,6 +10,8 @@ module "authorizer_lambda" {
   create_package         = false
   local_existing_package = data.archive_file.authorizer.output_path
 
+  publish = true
+
   environment_variables = {
     SECRET_ID = module.secret_ingestion_api_auth_token.secret_arn
   }

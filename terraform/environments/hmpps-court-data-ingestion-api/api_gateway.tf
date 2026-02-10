@@ -23,6 +23,9 @@ resource "aws_api_gateway_method" "post" {
   http_method   = "POST"
   authorization = "CUSTOM"
   authorizer_id = aws_api_gateway_authorizer.hmac.id
+  request_parameters = {
+    "method.request.header.X-Signature" = true
+  }
 }
 
 resource "aws_api_gateway_method_response" "response_200" {
@@ -78,6 +81,7 @@ resource "aws_api_gateway_deployment" "main" {
 
   triggers = {
     redeployment = sha1(jsonencode([
+      aws_api_gateway_authorizer.hmac.id,
       aws_api_gateway_method.post.id,
       aws_api_gateway_integration.sqs.id,
     ]))
@@ -116,6 +120,8 @@ resource "aws_api_gateway_stage" "main" {
       integrationStatus  = "$context.integration.status"
       integrationError   = "$context.integration.error"
       apiKeyId           = "$context.identity.apiKeyId"
+      authDecision       = "$context.authorizer.auth"
+      authReason         = "$context.authorizer.reason"
     })
   }
 
