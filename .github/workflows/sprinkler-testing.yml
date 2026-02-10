@@ -32,7 +32,7 @@ jobs:
     uses: ./.github/workflows/testing_reusable_terraform_components_strategy.yml
     if: inputs.action != 'destroy'
     with:
-      application: "${{ github.workflow }}"
+      application: "sprinkler"
       
   terraform:
     needs: strategy
@@ -42,7 +42,7 @@ jobs:
       matrix: ${{ fromJson(needs.strategy.outputs.matrix) }}
     uses: ./.github/workflows/testing_reusable_terraform_components_plan_apply.yml
     with:
-      application: "${{ github.workflow }}"
+      application: "sprinkler"
       environment: "${{ matrix.target }}"
       action: "${{ matrix.action }}"
       component: "${{ matrix.component }}"
@@ -54,7 +54,7 @@ jobs:
     if: inputs.action == 'destroy'
     uses: ./.github/workflows/testing_reusable_terraform_components_plan_apply.yml
     with:
-      application: "${{ github.workflow }}"
+      application: "sprinkler"
       environment: "development"
       action: "plan_apply"
       plan_apply_tfargs: "-destroy"
