@@ -33,8 +33,8 @@ module "codedeploy" {
     { "yjsm-hub-svc" = "yjsm-hub-svc" }
   ]
 
-  internal_alb_name = "yjaf-int-internal"
-  external_alb_name = "yjaf-ext-external"
+  internal_alb_name     = "yjaf-int-internal"
+  external_alb_name     = "yjaf-ext-external"
   connectivity_alb_name = "yjaf-connectivity-internal"
   yjsm_hub_svc_alb_name = "yjsm-hub-svc-ext"
   depends_on = [
