@@ -233,7 +233,7 @@ resource "aws_s3_bucket_notification" "load_mdss_event" {
   queue {
     queue_arn     = module.fms_fan_out_event_queue.sqs_queue.arn
     events        = ["s3:ObjectTagging:Put"]
-    filter_prefix = "serco/fms"
+    filter_prefix = "serco/fms/validation_rejected"
   }
 
   depends_on = [module.load_mdss_event_queue, module.load_fms_event_queue]
