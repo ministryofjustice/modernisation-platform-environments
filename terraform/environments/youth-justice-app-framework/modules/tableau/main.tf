@@ -56,7 +56,66 @@ module "tableau-alb" {
       protocol    = "HTTPS"
       port        = 443
       target_type = "instance"
-      target_id   = aws_instance.tableau.id
+      target_id   = var.tableau_blue_live ? aws_instance.tableau.id : aws_instance.tableau-green.id
+    }
+  }
+}
+#trivy:ignore:AVD-AWS-0052 - needs testing in non-prod first
+#trivy:ignore:AVD-AWS-0053
+module "tableau-test-alb" {
+  # checkov:skip=CKV_TF_1
+
+  source  = "terraform-aws-modules/alb/aws"
+  version = "9.13.0"
+  
+  count = var.tableau_test_active ? 1 : 0
+
+  name    = "${var.alb_name}-test"
+  vpc_id  = var.vpc_id
+  subnets = var.alb_subnet_ids
+
+  security_groups       = [module.alb_sg.security_group_id]
+  create_security_group = false
+
+  enable_deletion_protection = local.enable_deletion_protection
+
+  # LB Attributes
+  idle_timeout               = 360
+  drop_invalid_header_fields = false
+
+  access_logs = {
+    bucket = module.log_bucket.s3_bucket_id
+  }
+
+  listeners = {
+    ex-http-https-redirect = {
+      port     = 80
+      proticol = "HTTP"
+      redirect = {
+        port        = 443
+        protocol    = "HTTPS"
+        status_code = "HTTP_301"
+      }
+    }
+
+    ex-https = {
+      port            = 443
+      protocol        = "HTTPS"
+      certificate_arn = var.test_certificate_arn
+
+      forward = {
+        target_group_key = "tableau-test-instance"
+      }
+    }
+
+  }
+
+  target_groups = {
+    tableau-test-instance = {
+      protocol    = "HTTPS"
+      port        = 443
+      target_type = "instance"
+      target_id   = var.tableau_blue_live ? aws_instance.tableau-green.id : aws_instance.tableau.id
     }
   }
 }

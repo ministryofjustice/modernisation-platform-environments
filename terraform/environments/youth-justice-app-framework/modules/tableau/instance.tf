@@ -50,7 +50,7 @@ resource "aws_instance" "tableau" {
 }
 
 
-resource "aws_instance" "tableau2" {
+resource "aws_instance" "tableau-green" {
   ami                     = data.aws_ami.app_ami.id
   instance_type           = var.instance_type
   subnet_id               = var.tableau_subnet_id
