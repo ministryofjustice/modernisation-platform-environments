@@ -592,7 +592,25 @@ data "aws_iam_policy_document" "process_fms_metadata_lambda_role_policy_document
       aws_sqs_queue.format_fms_json_event_queue.arn
     ]
   }
+  statement {
+    sid    = "AllowPublishToAlertsTopic"
+    effect = "Allow"
+    actions = [
+      "sns:Publish",
+      ]
+    resources = [aws_sns_topic.emds_alerts.arn]
+  }
+    statement {
+    sid    = "AllowLambdaToUseKey"
+    effect = "Allow"
+    actions = [
+      "kms:GenerateDataKey",
+      "kms:Decrypt"
+      ]
+    resources = ["*"]
+  }
 }
+
 
 resource "aws_iam_role" "process_fms_metadata" {
   name               = "process_fms_metadata_lambda_role"
@@ -1004,16 +1022,16 @@ data "aws_iam_policy_document" "load_fms_lambda_role_policy_document" {
     effect = "Allow"
     actions = [
       "sns:Publish",
-      ]
+    ]
     resources = [aws_sns_topic.emds_alerts.arn]
   }
-    statement {
+  statement {
     sid    = "AllowLambdaToUseKey"
     effect = "Allow"
     actions = [
       "kms:GenerateDataKey",
       "kms:Decrypt"
-      ]
+    ]
     resources = ["*"]
   }
 }
@@ -1491,14 +1509,14 @@ data "aws_iam_policy_document" "iceberg_table_maintenance_iam_role_policy_docume
       "s3:DeleteObject",
       "s3:ListBucket",
       "s3:ListBucketMultipartUploads",
-      "s3:AbortMultipartUpload", 
-      "s3:ListMultipartUploadParts" 
+      "s3:AbortMultipartUpload",
+      "s3:ListMultipartUploadParts"
     ]
     resources = [
       # The Data Bucket
       module.s3-create-a-derived-table-bucket.bucket.arn,
       "${module.s3-create-a-derived-table-bucket.bucket.arn}/*",
-      
+
       # The Query Results Bucket
       module.s3-athena-bucket.bucket.arn,
       "${module.s3-athena-bucket.bucket.arn}/*"
@@ -1542,7 +1560,7 @@ data "aws_iam_policy_document" "bucket_replication_policy" {
     resources = ["*"]
   }
   statement {
-    sid = "GetInventoryConfig"
+    sid    = "GetInventoryConfig"
     effect = "Allow"
     actions = [
       "s3:GetInventoryConfiguration"
@@ -1573,15 +1591,15 @@ data "aws_iam_policy_document" "bucket_replication_policy" {
     ]
   }
   statement {
-    sid     = "SecretAccountDetails"
-    effect  = "Allow"
+    sid    = "SecretAccountDetails"
+    effect = "Allow"
     actions = [
       "secretsmanager:GetSecretValue"
     ]
     resources = [module.cross_account_details[0].secret_arn]
   }
   statement {
-    sid = "MetadataBucket"
+    sid    = "MetadataBucket"
     effect = "Allow"
     actions = [
       "s3:GetObject",
@@ -1592,19 +1610,19 @@ data "aws_iam_policy_document" "bucket_replication_policy" {
 }
 
 resource "aws_iam_role" "bucket_replication" {
-  count = local.is-development || local.is-preproduction ? 0 : 1
+  count              = local.is-development || local.is-preproduction ? 0 : 1
   name               = "bucket_replication_lambda_role"
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
 }
 
 resource "aws_iam_policy" "bucket_replication" {
-  count = local.is-development || local.is-preproduction ? 0 : 1
+  count  = local.is-development || local.is-preproduction ? 0 : 1
   name   = "bucket_replication_lambda_role_policy"
   policy = data.aws_iam_policy_document.bucket_replication_policy[0].json
 }
 
 resource "aws_iam_role_policy_attachment" "bucket_replication_attach" {
-  count = local.is-development || local.is-preproduction ? 0 : 1
+  count      = local.is-development || local.is-preproduction ? 0 : 1
   role       = aws_iam_role.bucket_replication[0].name
   policy_arn = aws_iam_policy.bucket_replication[0].arn
 }

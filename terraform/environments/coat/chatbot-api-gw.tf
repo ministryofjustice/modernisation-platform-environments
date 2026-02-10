@@ -20,20 +20,20 @@ resource "aws_api_gateway_method" "send_request_post" {
   #checkov:skip=CKV2_AWS_53: “Ignoring AWS API gateway request validatation"
   #checkov:skip=CKV_AWS_59: "Ensure there is no open access to back-end resources through API"
 
-  authorization = "NONE"
-  http_method   = "POST"
-  resource_id   = aws_api_gateway_resource.send_request.id
-  rest_api_id   = aws_api_gateway_rest_api.chatbot_api.id
+  authorization    = "NONE"
+  http_method      = "POST"
+  resource_id      = aws_api_gateway_resource.send_request.id
+  rest_api_id      = aws_api_gateway_rest_api.chatbot_api.id
   api_key_required = true
 }
 
 resource "aws_api_gateway_integration" "send_request_post_integration" {
-  http_method = aws_api_gateway_method.send_request_post.http_method
-  resource_id = aws_api_gateway_resource.send_request.id
-  rest_api_id = aws_api_gateway_rest_api.chatbot_api.id
-  type = "AWS_PROXY"
-  uri = aws_lambda_function.rag_lambda.invoke_arn
-  integration_http_method  = "POST"
+  http_method             = aws_api_gateway_method.send_request_post.http_method
+  resource_id             = aws_api_gateway_resource.send_request.id
+  rest_api_id             = aws_api_gateway_rest_api.chatbot_api.id
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.rag_lambda.invoke_arn
+  integration_http_method = "POST"
 }
 
 # OPTIONS method for CORS
@@ -56,7 +56,7 @@ resource "aws_api_gateway_integration" "send_request_options_integration" {
   type                    = "MOCK"
   integration_http_method = "OPTIONS"
 
-  request_templates       = {
+  request_templates = {
     "application/json" = "{\"statusCode\": 200}"
   }
 }
@@ -104,9 +104,9 @@ resource "aws_api_gateway_deployment" "chatbot_api_deployment" {
 
   triggers = {
     redeployment = sha1(jsonencode([
-        aws_api_gateway_resource.send_request.id,
-        aws_api_gateway_method.send_request_post.id,
-        aws_api_gateway_integration.send_request_post_integration.id
+      aws_api_gateway_resource.send_request.id,
+      aws_api_gateway_method.send_request_post.id,
+      aws_api_gateway_integration.send_request_post_integration.id
     ]))
   }
 
@@ -164,7 +164,7 @@ resource "aws_api_gateway_usage_plan" "chatbot_api_usage_plan" {
   }
 
   throttle_settings {
-    rate_limit = 5
+    rate_limit  = 5
     burst_limit = 5
   }
 }
