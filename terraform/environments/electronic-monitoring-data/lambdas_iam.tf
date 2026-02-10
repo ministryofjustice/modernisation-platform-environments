@@ -592,7 +592,25 @@ data "aws_iam_policy_document" "process_fms_metadata_lambda_role_policy_document
       aws_sqs_queue.format_fms_json_event_queue.arn
     ]
   }
+  statement {
+    sid    = "AllowPublishToAlertsTopic"
+    effect = "Allow"
+    actions = [
+      "sns:Publish",
+      ]
+    resources = [aws_sns_topic.emds_alerts.arn]
+  }
+    statement {
+    sid    = "AllowLambdaToUseKey"
+    effect = "Allow"
+    actions = [
+      "kms:GenerateDataKey",
+      "kms:Decrypt"
+      ]
+    resources = ["*"]
+  }
 }
+
 
 resource "aws_iam_role" "process_fms_metadata" {
   name               = "process_fms_metadata_lambda_role"
