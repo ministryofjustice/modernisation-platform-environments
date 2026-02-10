@@ -13,8 +13,8 @@ resource "aws_api_gateway_authorizer" "hmac" {
   name            = "hmac-authorizer"
   rest_api_id     = aws_api_gateway_rest_api.ingestion_api.id
   authorizer_uri  = "arn:aws:apigateway:${data.aws_region.current.name}:lambda:path/2015-03-31/functions/${module.authorizer_lambda.lambda_function_arn}/invocations"
-  type            = "TOKEN"
-  identity_source = "method.request.header.X-Signature"
+  type            = "REQUEST"
+  identity_source = "method.request.header.X-Signature, method.request.header.Date"
 }
 
 resource "aws_api_gateway_method" "post" {
@@ -25,6 +25,7 @@ resource "aws_api_gateway_method" "post" {
   authorizer_id = aws_api_gateway_authorizer.hmac.id
   request_parameters = {
     "method.request.header.X-Signature" = true
+    "method.request.header.Date"        = true
   }
 }
 
@@ -49,7 +50,7 @@ resource "aws_api_gateway_integration" "sqs" {
 
   request_templates = {
     "application/json" = <<EOF
-Action=SendMessage&MessageBody=$util.urlEncode($input.body)
+Action=SendMessage&MessageBody=$util.urlEncode($input.body)&MessageAttribute.1.Name=X-Signature&MessageAttribute.1.Value.StringValue=$util.escapeJavaScript($input.params('X-Signature'))&MessageAttribute.1.Value.DataType=String&MessageAttribute.2.Name=Date&MessageAttribute.2.Value.StringValue=$util.escapeJavaScript($input.params('Date'))&MessageAttribute.2.Value.DataType=String
 EOF
   }
 }
