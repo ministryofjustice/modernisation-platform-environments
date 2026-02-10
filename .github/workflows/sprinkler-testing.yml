@@ -30,13 +30,11 @@ permissions:
 jobs:
   strategy:
     uses: ./.github/workflows/testing_reusable_terraform_components_strategy.yml
-    if: inputs.action != 'destroy'
     with:
       application: "sprinkler"
       
   terraform:
     needs: strategy
-    if: inputs.action != 'destroy' && join(fromJson(needs.strategy.outputs.matrix).include) != ''
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.strategy.outputs.matrix) }}
@@ -50,14 +48,4 @@ jobs:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
 
-  destroy-development:
-    if: inputs.action == 'destroy'
-    uses: ./.github/workflows/testing_reusable_terraform_components_plan_apply.yml
-    with:
-      application: "sprinkler"
-      environment: "development"
-      action: "plan_apply"
-      plan_apply_tfargs: "-destroy"
-    secrets:
-      MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
-      PASSPHRASE: ${{ secrets.PASSPHRASE }}
+
