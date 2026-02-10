@@ -155,7 +155,8 @@ module "apigw_sqs_role" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
   version = "5.58.0"
 
-  create_role = true
+  create_role       = true
+  role_requires_mfa = false
 
   role_name = "apigw-sqs-role-mp"
 
