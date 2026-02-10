@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - issue/9293-workflow-changes
-    paths:
-      - 'terraform/environments/sprinkler/**'
-      - '.github/workflows/sprinkler-testing.yml'
 
   pull_request:
     branches:
@@ -32,7 +29,7 @@ permissions:
 
 jobs:
   strategy:
-    uses: ./.github/workflows/testing_reusable_terraform_components_strategy.yml
+    uses: ./.github/workflows/testing_reusable_terraform_git components_strategy.yml
     if: inputs.action != 'destroy'
     with:
       application: "${{ github.workflow }}"
