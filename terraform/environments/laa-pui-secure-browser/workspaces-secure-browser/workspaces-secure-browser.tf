@@ -243,6 +243,7 @@ resource "aws_workspacesweb_browser_settings" "main" {
           "passwordreset.microsoftonline.com",
           "portal.manage.microsoft.com",
           "provisioningapi.microsoftonline.com",
+          "sso.ashfords.co.uk",
           "sso.godaddy.com",
           "sso.secureserver.net",
           "www.gov.uk",
