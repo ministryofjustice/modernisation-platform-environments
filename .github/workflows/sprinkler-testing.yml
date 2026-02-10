@@ -29,7 +29,7 @@ permissions:
 
 jobs:
   strategy:
-    uses: ./.github/workflows/testing_reusable_terraform_git components_strategy.yml
+    uses: ./.github/workflows/testing_reusable_terraform_components_strategy.yml
     if: inputs.action != 'destroy'
     with:
       application: "${{ github.workflow }}"
