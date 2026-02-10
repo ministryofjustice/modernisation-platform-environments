@@ -22,10 +22,10 @@ resource "aws_ecs_cluster" "soasandbox-main" {
   }
 }
 
-resource "aws_ecs_cluster_capacity_providers" "soasandbox-main" {
-  cluster_name       = aws_ecs_cluster.soasandbox-main.name
-  capacity_providers = [aws_ecs_capacity_provider.soasandbox-managed.name, aws_ecs_capacity_provider.soasandbox-admin.name]
-}
+# resource "aws_ecs_cluster_capacity_providers" "soasandbox-main" {
+#   cluster_name       = aws_ecs_cluster.soasandbox-main.name
+#   capacity_providers = [aws_ecs_capacity_provider.soasandbox-managed.name, aws_ecs_capacity_provider.soasandbox-admin.name]
+# }
 
 #--Admin
 resource "aws_ecs_task_definition" "soasandbox-admin" {
