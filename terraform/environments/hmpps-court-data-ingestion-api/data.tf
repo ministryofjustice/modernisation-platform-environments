@@ -16,10 +16,10 @@ const client = new SecretsManagerClient();
 let cachedSecret;
 
 function preview(str) {
-  if (!str) return "∅";
+  if (!str) return "(none)";
   const s = String(str);
-  if (s.length <= 12) return s.slice(0, 6) + "…";
-  return s.slice(0, 6) + "…" + s.slice(-6);
+  if (s.length <= 12) return s.slice(0, 6) + "...";
+  return s.slice(0, 6) + "..." + s.slice(-6);
 }
 
 exports.handler = async (event) => {
@@ -29,8 +29,8 @@ exports.handler = async (event) => {
   const token = event && event.authorizationToken;
   const methodArn = event && event.methodArn;
 
-  console.log(\`[auth] token present=$${Boolean(token)} len=$${token ? String(token).length : 0} preview=$${preview(token)}\`);
-  console.log(\`[auth] methodArn present=$${Boolean(methodArn)} value=$${methodArn || "∅"}\`);
+  console.log(`[auth] token present=$${Boolean(token)} len=$${token ? String(token).length : 0} preview=$${preview(token)}`);
+  console.log(`[auth] methodArn present=$${Boolean(methodArn)} value=$${methodArn || "(none)"}`);
 
   if (!methodArn) {
     console.log("[auth] deny: missing methodArn");
@@ -48,9 +48,10 @@ exports.handler = async (event) => {
       const command = new GetSecretValueCommand({ SecretId: process.env.SECRET_ID });
       const response = await client.send(command);
       cachedSecret = response.SecretString;
-      console.log(\`[auth] secret fetched len=$${cachedSecret ? String(cachedSecret).length : 0} preview=$${preview(cachedSecret)}\`);
+
+      console.log(`[auth] secret fetched len=$${cachedSecret ? String(cachedSecret).length : 0} preview=$${preview(cachedSecret)}`);
     } else {
-      console.log(\`[auth] using cached secret len=$${cachedSecret ? String(cachedSecret).length : 0} preview=$${preview(cachedSecret)}\`);
+      console.log(`[auth] using cached secret len=$${cachedSecret ? String(cachedSecret).length : 0} preview=$${preview(cachedSecret)}`);
     }
 
     if (String(token) === String(cachedSecret)) {
@@ -89,6 +90,7 @@ EOF
     filename = "authorizer.js"
   }
 }
+
 
 
 
