@@ -12,7 +12,7 @@ resource "aws_api_gateway_resource" "ingest" {
 resource "aws_api_gateway_authorizer" "hmac" {
   name            = "hmac-authorizer"
   rest_api_id     = aws_api_gateway_rest_api.ingestion_api.id
-  authorizer_uri  = module.authorizer_lambda.lambda_function_invoke_arn
+  authorizer_uri  = "arn:aws:apigateway:${data.aws_region.current.name}:lambda:path/2015-03-31/functions/${module.authorizer_lambda.lambda_function_arn}/invocations"
   type            = "TOKEN"
   identity_source = "method.request.header.X-Signature"
 }

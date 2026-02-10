@@ -35,12 +35,13 @@ module "authorizer_lambda" {
   tags = local.tags
 }
 
-resource "aws_lambda_permission" "apigw" {
-  statement_id  = "AllowAPIGatewayInvoke"
+resource "aws_lambda_permission" "apigw_authorizer" {
+  statement_id  = "AllowAPIGatewayInvokeAuthorizer"
   action        = "lambda:InvokeFunction"
   function_name = module.authorizer_lambda.lambda_function_name
   principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_api_gateway_rest_api.ingestion_api.execution_arn}/*/*/*"
+  source_arn    = "${aws_api_gateway_rest_api.ingestion_api.execution_arn}/authorizers/*"
 }
+
 
 
