@@ -29,7 +29,7 @@ module "yjsm_hub_svc_cloudfront" {
   }
 
   cloudfront_alias               = "gateway.${local.application_data.accounts[local.environment].domain_name}"
-  alb_dns                        = module.yjsm_hub_svc_alb[0].dns_name
+  alb_dns                        = module.yjsm_hub_svc_alb.dns_name
   waf_web_acl_arn                = module.waf-cf.waf_arn
   r53_zone_id                    = module.public_dns_zone.aws_route53_zone_id
   cloudfront_route53_record_name = "yjsm-hub-svc"
