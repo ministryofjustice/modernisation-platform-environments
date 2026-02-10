@@ -1,8 +1,8 @@
 locals {
-  lambda_path                 = "lambdas"
-  env_name                    = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
-  db_name                     = local.is-production ? "g4s_cap_dw" : "test"
-  load_sqs_max_receive_count  = 2
+  lambda_path                = "lambdas"
+  env_name                   = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+  db_name                    = local.is-production ? "g4s_cap_dw" : "test"
+  load_sqs_max_receive_count = 2
 }
 
 
@@ -360,7 +360,7 @@ module "load_mdss_lambda" {
   core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
   production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
   security_group_ids             = [aws_security_group.lambda_generic.id]
-  subnet_ids                     = data.aws_subnets.shared-public.ids
+  subnet_ids                     = data.aws_subnets.shared-private.ids
   cloudwatch_retention_days      = 7
   environment_variables = {
     ATHENA_QUERY_BUCKET = module.s3-athena-bucket.bucket.id
@@ -398,7 +398,7 @@ module "load_fms_lambda" {
     STAGING_BUCKET      = module.s3-create-a-derived-table-bucket.bucket.id
     ENVIRONMENT_NAME    = local.environment_shorthand
     CLEANUP_QUEUE_URL   = aws_sqs_queue.clean_dlt_load_queue.id
-    SNS_TOPIC_ARN  = aws_sns_topic.emds_alerts.arn
+    SNS_TOPIC_ARN       = aws_sns_topic.emds_alerts.arn
     MAX_RECEIVE_COUNT   = tostring(local.load_sqs_max_receive_count)
   }
 }
@@ -632,9 +632,46 @@ module "create_fms_general_batch_replication_job" {
   subnet_ids         = data.aws_subnets.shared-public.ids
 
   environment_variables = {
-    ACCOUNT_ID = data.aws_caller_identity.current.account_id
-    BATCH_COPY_ROLE = module.s3-fms-general-landing-bucket.replication_role_arn
+    ACCOUNT_ID                     = data.aws_caller_identity.current.account_id
+    BATCH_COPY_ROLE                = module.s3-fms-general-landing-bucket.replication_role_arn
     DESTINATION_ACCOUNT_SECRET_ARN = module.cross_account_details[0].secret_arn
-    METADATA_BUCKET_ARN = module.s3-metadata-bucket.bucket.arn
+    METADATA_BUCKET_ARN            = module.s3-metadata-bucket.bucket.arn
+    FMS_GENERAL_BUCKET             = module.s3-fms-general-landing-bucket.bucket_id
+    FMS_HO_BUCKET                  = module.s3-fms-ho-landing-bucket.bucket_id
+    FMS_SPECIALS_BUCKET            = module.s3-fms-specials-landing-bucket.bucket_id
+    MDSS_GENERAL_BUCKET            = module.s3-mdss-general-landing-bucket.bucket_id
+    MDSS_HO_BUCKET                 = module.s3-mdss-ho-landing-bucket.bucket_id
+    MDSS_SPECIALS_BUCKET           = module.s3-mdss-specials-landing-bucket.bucket_id
+  }
+}
+
+# ------------------------------------------------------------------------------
+# Lambda: cloudwatch_alarm_threader
+# ------------------------------------------------------------------------------
+
+module "cloudwatch_alarm_threader" {
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "cloudwatch_alarm_threader"
+  role_name                      = aws_iam_role.cloudwatch_alarm_threader.name
+  role_arn                       = aws_iam_role.cloudwatch_alarm_threader.arn
+  handler                        = "cloudwatch_alarm_threader.handler"
+  memory_size                    = 512
+  timeout                        = 60
+  reserved_concurrent_executions = 1
+
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+
+  security_group_ids = [aws_security_group.lambda_generic.id]
+  subnet_ids         = data.aws_subnets.shared-public.ids
+
+  environment_variables = {
+    SNS_TOPIC_ARN         = aws_sns_topic.emds_alerts.arn
+    STATE_BUCKET          = local.alarm_thread_state_bucket
+    STATE_PREFIX          = local.alarm_thread_state_prefix
+    ENVIRONMENT           = local.environment_shorthand
+    INCLUDE_REASON        = "true"
+    ENABLE_CUSTOM_ACTIONS = "false"
   }
 }
