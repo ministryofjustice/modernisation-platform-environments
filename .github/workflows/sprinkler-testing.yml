@@ -1,6 +1,6 @@
 ---
 
-## to force a run
+## to force a run ##
 
 name: sprinkler-testing
 on:
