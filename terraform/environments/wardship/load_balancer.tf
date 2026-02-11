@@ -263,7 +263,7 @@ resource "aws_lb_target_group" "wardship_target_group" {
 
   health_check {
     healthy_threshold   = "3"
-    interval            = "100"
+    interval            = "150"
     protocol            = "HTTP"
     port                = "80"
     unhealthy_threshold = "10"
