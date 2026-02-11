@@ -1,4 +1,7 @@
 ---
+
+## to force a run
+
 name: sprinkler-testing
 on:
   push:
