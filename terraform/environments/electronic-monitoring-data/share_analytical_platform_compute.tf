@@ -732,7 +732,7 @@ resource "aws_lakeformation_permissions" "cadt_runner_quicksight_check_db" {
   principal   = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/create-a-derived-table"
   permissions = ["DESCRIBE"]
   database {
-    name = "check${local.db_suffix}"
+    name = "check${local.dbt_suffix}"
   }
 }
 
@@ -742,7 +742,7 @@ resource "aws_lakeformation_permissions" "cadt_runner_quicksight_check_tables" {
   principal   = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/create-a-derived-table"
   permissions = ["DESCRIBE", "SELECT"]
   table {
-    database_name = "check${local.db_suffix}"
+    database_name = "check${local.dbt_suffix}"
     wildcard      = true
   }
 }
@@ -753,7 +753,7 @@ resource "aws_lakeformation_permissions" "cadt_runner_quicksight_validation_db" 
   principal   = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/create-a-derived-table"
   permissions = ["DESCRIBE"]
   database {
-    name = "validation${local.db_suffix}"
+    name = "validation${local.dbt_suffix}"
   }
 }
 
@@ -763,7 +763,7 @@ resource "aws_lakeformation_permissions" "cadt_runner_quicksight_validation_tabl
   principal   = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/create-a-derived-table"
   permissions = ["DESCRIBE", "SELECT"]
   table {
-    database_name = "validation${local.db_suffix}"
+    database_name = "validation${local.dbt_suffix}"
     wildcard      = true
   }
 }
