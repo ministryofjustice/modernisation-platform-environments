@@ -85,7 +85,7 @@ resource "aws_lb_listener" "ssogen_internal_listener" {
     target_group_arn = aws_lb_target_group.ssogen_internal_tg1[count.index].arn
   }
 
-  depends_on = [aws_acm_certificate_validation.external_nonprod, aws_lb.ssogen_alb[count.index]]
+  depends_on = [aws_acm_certificate_validation.external_nonprod]
 }
 
 
