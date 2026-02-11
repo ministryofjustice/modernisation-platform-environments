@@ -23,7 +23,7 @@ resource "aws_cloudwatch_metric_alarm" "alb_ssogen_5xx" {
 }
 
 # Underlying EC2 Instance Status Check Failure
-resource "aws_cloudwatch_metric_alarm" "Status_Check_Failure" {
+resource "aws_cloudwatch_metric_alarm" "Status_Check_Failure1" {
   alarm_name          = "${local.application_name}-${local.environment}-ssogen-ec2-status-check-failure"
   alarm_description   = "A ssogen EC2 instance has failed a status check, Runbook - https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
   comparison_operator = "GreaterThanOrEqualToThreshold"
@@ -35,7 +35,28 @@ resource "aws_cloudwatch_metric_alarm" "Status_Check_Failure" {
   threshold           = "1"
   treat_missing_data  = "notBreaching"
   dimensions = {
-    AutoScalingGroupName = aws_autoscaling_group.cluster-scaling-group.name
+    AutoScalingGroupName = aws_autoscaling_group.cluster-scaling-group1.name
+  }
+  alarm_actions       = [aws_sns_topic.cw_alerts.arn]
+  ok_actions          = [aws_sns_topic.cw_alerts.arn]
+
+  tags = local.tags
+}
+
+# Underlying EC2 Instance Status Check Failure
+resource "aws_cloudwatch_metric_alarm" "Status_Check_Failure2" {
+  alarm_name          = "${local.application_name}-${local.environment}-ssogen-ec2-status-check-failure"
+  alarm_description   = "A ssogen EC2 instance has failed a status check, Runbook - https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  metric_name         = "StatusCheckFailed"
+  statistic           = "Maximum"
+  namespace           = "AWS/EC2"
+  period              = "60"
+  evaluation_periods  = "5"
+  threshold           = "1"
+  treat_missing_data  = "notBreaching"
+  dimensions = {
+    AutoScalingGroupName = aws_autoscaling_group.cluster-scaling-group2.name
   }
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
   ok_actions          = [aws_sns_topic.cw_alerts.arn]
