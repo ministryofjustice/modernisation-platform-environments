@@ -153,8 +153,7 @@ EOF
   )
 }
 
-# This is the role ECS uses to manage the task
-# needed by the ECS agent / Fargate to Pull container images from ECR, Write logs, fetch secrets
+
 resource "aws_iam_role_policy" "app_execution" {
   name = "execution-${var.networking[0].application}"
   role = aws_iam_role.app_execution.id
@@ -165,39 +164,12 @@ resource "aws_iam_role_policy" "app_execution" {
     "Statement": [
       {
            "Action": [
-               "logs:CreateLogStream",
-               "logs:PutLogEvents"
+              "ecr:*",
+              "logs:*",
+              "secretsmanager:GetSecretValue"
            ],
-           "Resource": [
-               "${aws_cloudwatch_log_group.deployment_logs.arn}",
-               "${aws_cloudwatch_log_group.deployment_logs.arn}:*",
-               "${aws_cloudwatch_log_group.ecs_logs.arn}",
-                "${aws_cloudwatch_log_group.ecs_logs.arn}:*"
-           ],
+           "Resource": "*",
            "Effect": "Allow"
-      },
-      {
-            "Action": [
-              "ecr:GetAuthorizationToken"
-            ],
-            "Resource": "*",
-            "Effect": "Allow"
-      },
-      {
-            "Action": [
-              "ecr:BatchCheckLayerAvailability",
-              "ecr:GetDownloadUrlForLayer",
-              "ecr:BatchGetImage"
-            ],
-            "Resource": "arn:aws:ecr:eu-west-2:${local.environment_management.account_ids[terraform.workspace]}:repository/${aws_ecr_repository.pra_ecr_repo.name}",
-            "Effect": "Allow"
-      },
-      {
-          "Action": [
-               "secretsmanager:GetSecretValue"
-           ],
-          "Resource": "arn:aws:secretsmanager:*:${local.environment_management.account_ids[terraform.workspace]}:secret:${aws_secretsmanager_secret.rds_db_credentials.arn}",
-          "Effect": "Allow"
       }
     ]
   }
