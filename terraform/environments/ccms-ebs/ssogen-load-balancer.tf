@@ -49,8 +49,8 @@ resource "aws_lb_target_group" "ssogen_internal_tg1" {
 resource "aws_lb_target_group" "ssogen_internal_tg2" {
   count       = local.is-development || local.is-test ? 1 : 0
   name        = lower(format("tg-%s-ssogen", local.application_name))
-  port        = local.application_data.accounts[local.environment].tg_ssogen_apps_port
-  protocol    = "HTTPS"
+  port        = local.application_data.accounts[local.environment].tg_ssogen_admin_port
+  protocol    = "TCP"
   vpc_id      = data.aws_vpc.shared.id
   target_type = "instance"
   # deregistration_delay = 60

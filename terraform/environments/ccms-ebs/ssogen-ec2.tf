@@ -78,6 +78,7 @@ resource "aws_autoscaling_group" "cluster-scaling-group" {
   min_size            = local.application_data.accounts[local.environment].ssogen_min_capacity
 
   target_group_arns = [
+    aws_lb_target_group.ssogen_internal_tg1.arn,
     aws_lb_target_group.ssogen_internal_tg2.arn
   ]
 
