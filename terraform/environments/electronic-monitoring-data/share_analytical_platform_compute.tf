@@ -715,3 +715,55 @@ resource "aws_secretsmanager_secret" "airflow_ssh_secret" {
     local.tags
   )
 }
+
+resource "aws_lakeformation_permissions" "cadt_runner_quicksight_s3" {
+  count = local.is-development ? 0 : 1
+
+  principal   = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/create-a-derived-table"
+  permissions = ["DATA_LOCATION_ACCESS"]
+  data_location {
+    arn = aws_lakeformation_resource.data_bucket.arn
+  }
+}
+
+resource "aws_lakeformation_permissions" "cadt_runner_quicksight_check_db" {
+  count = local.is-development ? 0 : 1
+
+  principal   = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/create-a-derived-table"
+  permissions = ["DESCRIBE"]
+  database {
+    name = "check${local.db_suffix}"
+  }
+}
+
+resource "aws_lakeformation_permissions" "cadt_runner_quicksight_check_db" {
+  count = local.is-development ? 0 : 1
+
+  principal   = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/create-a-derived-table"
+  permissions = ["DESCRIBE", "SELECT"]
+  table {
+    database_name = "check${local.db_suffix}"
+    wildcard      = true
+  }
+}
+
+resource "aws_lakeformation_permissions" "cadt_runner_quicksight_check_db" {
+  count = local.is-development ? 0 : 1
+
+  principal   = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/create-a-derived-table"
+  permissions = ["DESCRIBE"]
+  database {
+    name = "validation${local.db_suffix}"
+  }
+}
+
+resource "aws_lakeformation_permissions" "cadt_runner_quicksight_check_db" {
+  count = local.is-development ? 0 : 1
+
+  principal   = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/create-a-derived-table"
+  permissions = ["DESCRIBE", "SELECT"]
+  table {
+    database_name = "validation${local.db_suffix}"
+    wildcard      = true
+  }
+}
