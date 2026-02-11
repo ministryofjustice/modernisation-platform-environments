@@ -797,7 +797,7 @@ resource "aws_lakeformation_permissions" "apde_runner_quicksight_check_tables" {
   permissions = ["DESCRIBE", "SELECT"]
   table {
     database_name = "check${local.dbt_suffix}"
-    wildcard      = true
+    name          = "unique_device_wearer_id"
   }
 }
 
@@ -818,6 +818,6 @@ resource "aws_lakeformation_permissions" "apdes_runner_quicksight_validation_tab
   permissions = ["DESCRIBE", "SELECT"]
   table {
     database_name = "validation${local.dbt_suffix}"
-    wildcard      = true
+    name          = "delius_id"
   }
 }
