@@ -736,7 +736,7 @@ resource "aws_lakeformation_permissions" "cadt_runner_quicksight_check_db" {
   }
 }
 
-resource "aws_lakeformation_permissions" "cadt_runner_quicksight_check_db" {
+resource "aws_lakeformation_permissions" "cadt_runner_quicksight_check_tables" {
   count = local.is-development ? 0 : 1
 
   principal   = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/create-a-derived-table"
@@ -747,7 +747,7 @@ resource "aws_lakeformation_permissions" "cadt_runner_quicksight_check_db" {
   }
 }
 
-resource "aws_lakeformation_permissions" "cadt_runner_quicksight_check_db" {
+resource "aws_lakeformation_permissions" "cadt_runner_quicksight_validation_db" {
   count = local.is-development ? 0 : 1
 
   principal   = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/create-a-derived-table"
@@ -757,7 +757,7 @@ resource "aws_lakeformation_permissions" "cadt_runner_quicksight_check_db" {
   }
 }
 
-resource "aws_lakeformation_permissions" "cadt_runner_quicksight_check_db" {
+resource "aws_lakeformation_permissions" "cadt_runner_quicksight_validation_tables" {
   count = local.is-development ? 0 : 1
 
   principal   = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/create-a-derived-table"
