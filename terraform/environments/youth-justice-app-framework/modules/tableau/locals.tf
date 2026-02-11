@@ -11,4 +11,5 @@ locals {
   alb_access_logs_bucket_name_suffix = "tableau-alb-logs"
 
   tableau-backups-bucket-name = "tableau-backups"
+
 }
