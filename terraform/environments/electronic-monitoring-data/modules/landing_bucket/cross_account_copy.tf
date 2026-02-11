@@ -1,5 +1,5 @@
 locals {
-  replication_enabled = var.production_dev == "prod" || var.production_dev == "test"
+  replication_enabled = var.production_dev == "prod" || (var.production_dev == "test" && var.data_feed == "mdss")
 }
 
 resource "aws_iam_role" "replication_role" {
