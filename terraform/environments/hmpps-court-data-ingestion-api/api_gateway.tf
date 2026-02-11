@@ -83,6 +83,7 @@ resource "aws_api_gateway_deployment" "main" {
   triggers = {
     redeployment = sha1(jsonencode([
       aws_api_gateway_authorizer.hmac.id,
+      aws_api_gateway_authorizer.hmac.type,
       aws_api_gateway_method.post.id,
       aws_api_gateway_integration.sqs.id,
     ]))

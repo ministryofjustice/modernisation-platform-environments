@@ -29,7 +29,13 @@ exports.handler = async (event) => {
   // REQUEST authorizer passes headers in event.headers
   // Headers are not always lowercased by APIGW, so we check strictly or loosely
   const headers = event.headers || {};
-  const token = headers["X-Signature"] || headers["x-signature"];
+  let token = headers["X-Signature"] || headers["x-signature"];
+
+  // Fallback for TOKEN authorizer events (where token is in authorizationToken)
+  if (!token && event.authorizationToken) {
+    token = event.authorizationToken;
+  }
+
   const methodArn = event && event.methodArn;
 
   console.log(`[auth] token present=$${Boolean(token)} len=$${token ? String(token).length : 0} preview=$${preview(token)}`);
