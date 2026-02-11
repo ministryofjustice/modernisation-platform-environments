@@ -98,13 +98,32 @@ resource "aws_cloudwatch_metric_alarm" "ssogen_alb_healthyhosts" {
   period              = 240
   statistic           = "Average"
   threshold           = local.application_data.accounts[local.environment].ssogen_no_instances
-  alarm_description   = "Number of healthy nodes in Target Group"
+  alarm_description   = "Number of healthy hosts in SSOGEN Target Group"
   actions_enabled     = true
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
   ok_actions          = [aws_sns_topic.cw_alerts.arn]
   dimensions = {
-    TargetGroup  = aws_lb_target_group.ssogen_internal_tg.arn_suffix
-    LoadBalancer = aws_lb.ssogen_lb.arn_suffix
+    TargetGroup  = aws_lb_target_group.ssogen_internal_tg1[count.index].arn_suffix
+    LoadBalancer = aws_lb.ssogen_alb[count.index].arn_suffix
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "ssogen_alb_healthyhosts_admin" {
+  alarm_name          = "${local.application_name}-${local.environment}-ssogen-alb-targets-group"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = 1
+  metric_name         = "HealthyHostCount"
+  namespace           = "AWS/ApplicationELB"
+  period              = 240
+  statistic           = "Average"
+  threshold           = local.application_data.accounts[local.environment].ssogen_no_instances
+  alarm_description   = "Number of healthy hosts in Admin Target Group"
+  actions_enabled     = true
+  alarm_actions       = [aws_sns_topic.cw_alerts.arn]
+  ok_actions          = [aws_sns_topic.cw_alerts.arn]
+  dimensions = {
+    TargetGroup  = aws_lb_target_group.ssogen_internal_tg_admin[count.index].arn_suffix
+    LoadBalancer = aws_lb.ssogen_alb[count.index].arn_suffix
   }
 }
 
@@ -126,10 +145,8 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ssogen_temp" {
   ok_actions          = [aws_sns_topic.cw_alerts.arn]
 
   dimensions = {
-    ImageId      = aws_instance.ec2_ssogen[count.index].ami
+    AutoScalingGroupName = aws_autoscaling_group.cluster-scaling-group.name
     path         = "/temp"
-    InstanceType = aws_instance.ec2_ssogen[count.index].instance_type
-    InstanceId   = aws_instance.ec2_ssogen[count.index].id
     fstype       = "ext4"
   }
 }
@@ -152,10 +169,8 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ssogen_home" {
   ok_actions          = [aws_sns_topic.cw_alerts.arn]
 
   dimensions = {
-    ImageId      = aws_instance.ec2_ssogen[count.index].ami
+    AutoScalingGroupName = aws_autoscaling_group.cluster-scaling-group.name
     path         = "/home"
-    InstanceType = aws_instance.ec2_ssogen[count.index].instance_type
-    InstanceId   = aws_instance.ec2_ssogen[count.index].id
     fstype       = "ext4"
   }
 }
@@ -204,10 +219,8 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ssogen_u01" {
   ok_actions          = [aws_sns_topic.cw_alerts.arn]
 
   dimensions = {
-    ImageId      = aws_instance.ec2_ssogen[count.index].ami
+    AutoScalingGroupName = aws_autoscaling_group.cluster-scaling-group.name
     path         = "/u01"
-    InstanceType = aws_instance.ec2_ssogen[count.index].instance_type
-    InstanceId   = aws_instance.ec2_ssogen[count.index].id
     fstype       = "ext4"
   }
 }
@@ -229,10 +242,8 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ssogen_u03" {
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
   ok_actions          = [aws_sns_topic.cw_alerts.arn]
   dimensions = {
-    ImageId      = aws_instance.ec2_ssogen[count.index].ami
+    AutoScalingGroupName = aws_autoscaling_group.cluster-scaling-group.name
     path         = "/u03"
-    InstanceType = aws_instance.ec2_ssogen[count.index].instance_type
-    InstanceId   = aws_instance.ec2_ssogen[count.index].id
     fstype       = "ext4"
   }
 }
@@ -254,10 +265,8 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ssogen_stage" {
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
   ok_actions          = [aws_sns_topic.cw_alerts.arn]
   dimensions = {
-    ImageId      = aws_instance.ec2_ssogen[count.index].ami
+    AutoScalingGroupName = aws_autoscaling_group.cluster-scaling-group.name
     path         = "/stage"
-    InstanceType = aws_instance.ec2_ssogen[count.index].instance_type
-    InstanceId   = aws_instance.ec2_ssogen[count.index].id
     fstype       = "ext4"
   }
 }
