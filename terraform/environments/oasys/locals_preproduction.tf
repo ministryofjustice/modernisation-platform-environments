@@ -288,8 +288,6 @@ locals {
                     host_header = {
                       values = [
                         "pp-int.oasys.service.justice.gov.uk",
-                        "pp-a-int.oasys.service.justice.gov.uk",
-                        "pp-oasys.az.justice.gov.uk",
                       ]
                     }
                   }

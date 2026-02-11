@@ -13,9 +13,9 @@ locals {
   auto_minor_version_upgrade = false
   backup_retention_period    = "35"
   character_set_name         = "WE8MSWIN1252"
-  instance_class             = "db.m5.large"
+  instance_class             = "db.m5.xlarge"
   engine                     = "oracle-se2"
-  engine_version             = "19.0.0.0.ru-2025-04.rur-2025-04.r1"
+  engine_version             = "19.0.0.0.ru-2025-10.rur-2025-10.r1"
   username                   = "sysdba"
   backup_window              = "22:00-01:00"
   maintenance_window         = "Mon:01:15-Mon:06:00"
