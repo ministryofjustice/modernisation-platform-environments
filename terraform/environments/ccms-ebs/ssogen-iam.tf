@@ -18,7 +18,7 @@ resource "aws_iam_role" "ssogen_ec2" {
 
 # Instance Profile to attach to EC2
 resource "aws_iam_instance_profile" "ssogen_instance_profile" {
-  count = local.is_development ? 1 : 0
+  count = local.is-development || local.is-test ? 1 : 0
 
   name = "ssogen-instance-profile-${local.environment}"
   role = aws_iam_role.ssogen_ec2[0].name
