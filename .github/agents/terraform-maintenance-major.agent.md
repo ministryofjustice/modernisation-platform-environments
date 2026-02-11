@@ -89,8 +89,9 @@ Numbered checkpoint confirmations: Require explicit confirmation after each phas
 
 When invoked with a target environment path:
 
-1. Search all .tf files within the specified directory for module blocks.
-2. For each module block, extract:
+a. Search all .tf files within the specified directory for module blocks.
+
+b. For each module block, extract:
    - Module name
    - Module source (Terraform Registry or GitHub)
    - Current version (tag, ref, or version constraint)
@@ -106,9 +107,11 @@ For each extracted module:
 
 #### Terraform Registry Modules
 
-1. Identify the namespace, module name, and provider from the source.
-2. Query the registry (conceptually, for example using the Terraform Registry API) to obtain available versions.
-3. Determine:
+a. Identify the namespace, module name, and provider from the source.
+
+b. Query the registry (conceptually, for example using the Terraform Registry API) to obtain available versions.
+
+c. Determine:
    - Current version and major version (for example 3.7.0 → 3)
    - Latest available version and major version (for example 4.3.2 → 4)
    - Whether there is a newer major version (latest_major > current_major)
@@ -117,9 +120,11 @@ For each extracted module:
 
 For modules with source referencing a GitHub repository:
 
-1. Identify owner and repo from the source.
-2. Fetch tags that follow semantic versioning (vX.Y.Z) using the GitHub API.
-3. Determine:
+a. Identify owner and repo from the source.
+
+b. Fetch tags that follow semantic versioning (vX.Y.Z) using the GitHub API.
+
+c. Determine:
    - Current version and major version
    - Latest available version and major version
    - Whether a newer major version exists
@@ -134,9 +139,11 @@ For each module where a newer major version is available:
 
 #### Terraform Registry Modules (via GitHub)
 
-1. Determine the associated GitHub repository for the module.
-2. Fetch recent releases (for example, last 5 releases) using the GitHub API.
-3. Extract:
+a. Determine the associated GitHub repository for the module.
+
+b. Fetch recent releases (for example, last 5 releases) using the GitHub API.
+
+c. Extract:
    - Release notes mentioning BREAKING, breaking change, upgrade, deprecated, or migration
    - Links to upgrade guides (for example UPGRADE-*.md, docs/upgrade, MIGRATING-*.md)
    - Notes about:
@@ -147,8 +154,9 @@ For each module where a newer major version is available:
 
 #### GitHub Modules
 
-1. Fetch the latest release via the GitHub API.
-2. Extract similar information:
+a. Fetch the latest release via the GitHub API.
+
+b. Extract similar information:
    - Breaking changes
    - Migration instructions
    - Upgrade documentation links
@@ -216,13 +224,13 @@ Before proceeding to apply changes, perform comprehensive validation checks:
 
 #### Workspace Consistency Scan
 
-1. Scan the entire environment directory (including subdirectories) for all Terraform configuration files:
+a. Scan the entire environment directory (including subdirectories) for all Terraform configuration files:
    - Find all `.tf`, `terraform.tf`, and `versions.tf` files
    - Check provider version constraints in each file
    - Identify any constraints that might conflict with module requirements
    - Report all locations where provider versions are defined
 
-2. Flag potential issues:
+b. Flag potential issues:
    - Subdirectories with incompatible provider versions
    - Inconsistent provider version pinning across the workspace
    - Any constraints that conflict with upgraded module requirements
@@ -231,14 +239,14 @@ Before proceeding to apply changes, perform comprehensive validation checks:
 
 For each module being upgraded where breaking changes are identified:
 
-1. Compare variable schemas between current and target versions:
+a. Compare variable schemas between current and target versions:
    - Identify removed variables (breaking)
    - Identify renamed variables (breaking)
    - Identify variables with changed defaults (potentially breaking behavior)
    - Identify new required variables (breaking)
    - Identify type changes (breaking)
 
-2. Document findings:
+b. Document findings:
    - List all variable-level changes that require code updates
    - Highlight default behavior changes that may affect infrastructure
    - Note any variables where explicit values should be set to maintain current behavior
@@ -263,13 +271,13 @@ After completing the advisory analysis, create or update a summary file in the t
 
 **Content Structure**:
 
-1. **Metadata Section**:
+a. **Metadata Section**:
    - Date of analysis
    - Agent version/run identifier
    - Target environment path
    - Analysis status (Advisory Complete / Refactor In Progress / Refactor Complete)
 
-2. **Modules Analyzed**:
+b. **Modules Analyzed**:
    - Table listing all modules found with:
      - Module name
      - Current version
@@ -277,20 +285,20 @@ After completing the advisory analysis, create or update a summary file in the t
      - Major upgrade available (Yes/No)
      - Status (Pending / In Progress / Complete)
 
-3. **Detailed Migration Plans** (for each module with major upgrades available):
+c. **Detailed Migration Plans** (for each module with major upgrades available):
    - Module identification and version summary
    - Breaking changes summary
    - Refactoring requirements
    - Impact considerations
    - Proposed code changes (diff snippets)
 
-4. **Pre-Flight Validation Findings**:
+d. **Pre-Flight Validation Findings**:
    - Workspace consistency scan results
    - Provider constraint conflicts
    - Module schema comparison results
    - Validation requirements
 
-5. **History Log**:
+e. **History Log**:
    - Append each run's findings with timestamp
    - Track progression through advisory → refactor phases
    - Record validation results and fixes applied
@@ -317,9 +325,11 @@ When applying changes:
 
 #### Safety Checks
 
-1. Confirm that a migration plan and proposed diffs were already generated for the requested module or modules.
-2. Ensure only .tf files within the specified environment directory are modified.
-3. Confirm that none of the Out of Scope Files are included in the changes.
+a. Confirm that a migration plan and proposed diffs were already generated for the requested module or modules.
+
+b. Ensure only .tf files within the specified environment directory are modified.
+
+c. Confirm that none of the Out of Scope Files are included in the changes.
 
 #### Applying Edits (Incremental Approach)
 
@@ -327,28 +337,37 @@ Apply changes in logical groups with validation after each group:
 
 **Group 1: Provider Constraints**
 
-1. Update all provider version constraints throughout the workspace (root and subdirectories)
-2. Ensure consistency across all `versions.tf` and `terraform.tf` files
-3. Run validation check (syntax only, no credentials required)
+a. Update all provider version constraints throughout the workspace (root and subdirectories)
+
+b. Ensure consistency across all `versions.tf` and `terraform.tf` files
+
+c. Run validation check (syntax only, no credentials required)
 
 **Group 2: Module Version Updates**
 
-1. Update module source references to target versions
-2. Apply only version changes, no argument modifications yet
-3. Run validation check
+a. Update module source references to target versions
+
+b. Apply only version changes, no argument modifications yet
+
+c. Run validation check
 
 **Group 3: Variable and Argument Refactoring**
 
-1. Remove deprecated or removed arguments
-2. Rename arguments and blocks according to upgrade guides
-3. Introduce new required arguments with clear comments if values are assumptions or placeholders
-4. Run validation check
+a. Remove deprecated or removed arguments
+
+b. Rename arguments and blocks according to upgrade guides
+
+c. Introduce new required arguments with clear comments if values are assumptions or placeholders
+
+d. Run validation check
 
 **Group 4: Output Reference Updates**
 
-1. Update any references to renamed module outputs
-2. Maintain Terraform formatting and style (consistent indentation and alignment)
-3. Run validation check
+a. Update any references to renamed module outputs
+
+b. Maintain Terraform formatting and style (consistent indentation and alignment)
+
+c. Run validation check
 
 After each group, if validation fails:
 - Stop the process
@@ -359,9 +378,11 @@ After each group, if validation fails:
 
 Before creating commits or PRs, perform comprehensive validation:
 
-1. **Terraform Init**: Run `terraform init -upgrade` to refresh module cache
-2. **Terraform Validate**: Run `terraform validate` to check syntax and configuration
-3. **Terraform Plan** (if credentials available): Run `terraform plan` to identify resource changes
+a. **Terraform Init**: Run `terraform init -upgrade` to refresh module cache
+
+b. **Terraform Validate**: Run `terraform validate` to check syntax and configuration
+
+c. **Terraform Plan** (if credentials available): Run `terraform plan` to identify resource changes
 
 **If any validation step fails:**
 - Do not proceed to commit/PR creation
@@ -376,11 +397,11 @@ Before creating commits or PRs, perform comprehensive validation:
 
 #### Branch and Commit
 
-1. Create and switch to a new branch, for example:
+a. Create and switch to a new branch, for example:
 
    - Branch name pattern: copilot-major-upgrade/{module-name}-to-v{major}-{timestamp}
 
-2. Stage and commit the changes with a clear message, for example:
+b. Stage and commit the changes with a clear message, for example:
 
    - :copilot: refactor(terraform): major upgrade of <module> to <target-version>
 
@@ -414,11 +435,6 @@ Create a draft PR (not ready-for-merge) with:
     - Arguments removed or renamed
     - New arguments added
     - Structural changes made
-  - Validation Results:
-    - terraform init status (✅/❌)
-    - terraform validate status (✅/❌)
-    - terraform plan status (✅/❌/⏭️ skipped)
-    - Summary of expected resource changes from plan
   - Post-Implementation Fixes (if any):
     - Document any issues discovered during validation
     - List fixes applied with commit references
@@ -438,22 +454,22 @@ The PR should clearly communicate that it requires careful review before merge.
 
 If validation fails at any stage after initial implementation:
 
-1. **Analyze Error**:
+a. **Analyze Error**:
    - Examine the error message carefully
    - Identify the root cause (syntax, configuration, dependency, constraint conflict)
    - Determine affected files and resources
 
-2. **Apply Fix**:
+b. **Apply Fix**:
    - Make targeted changes to resolve the specific error
    - Keep changes minimal and focused on the issue
    - Document what was changed and why
 
-3. **Re-Validate**:
+c. **Re-Validate**:
    - Run the same validation checks again
    - Confirm the fix resolved the issue
    - Check for new errors introduced by the fix
 
-4. **Document Fix**:
+d. **Document Fix**:
    - Add entry to the advisory document or PR description
    - Include:
      - Issue description
@@ -463,12 +479,12 @@ If validation fails at any stage after initial implementation:
      - Commit reference
    - Label as "Critical Fix #N" or "Post-Implementation Fix #N"
 
-5. **Commit Fix**:
+e. **Commit Fix**:
    - Create separate commit for each fix with clear message
    - Follow conventional commit format
    - Reference the specific issue being fixed
 
-6. **Repeat**: Continue the fix-validate-document-commit loop until all validation passes
+f. **Repeat**: Continue the fix-validate-document-commit loop until all validation passes
 
 **Key Principle**: Don't batch multiple unrelated fixes. Fix one issue at a time, validate, document, commit, then proceed to the next issue.
 
@@ -522,15 +538,15 @@ Include:
 
 ### General Validation Principles
 
-1. **Validate Early, Validate Often**: Run validation checks after each logical group of changes, not just at the end
+a. **Validate Early, Validate Often**: Run validation checks after each logical group of changes, not just at the end
 
-2. **Incremental Changes**: Apply changes in small batches to identify exactly what breaks if validation fails
+b. **Incremental Changes**: Apply changes in small batches to identify exactly what breaks if validation fails
 
-3. **Scan Beyond Root**: Always check subdirectories and nested modules for configuration conflicts
+c. **Scan Beyond Root**: Always check subdirectories and nested modules for configuration conflicts
 
-4. **Schema Comparison**: Compare full module schemas between versions, not just release note highlights
+d. **Schema Comparison**: Compare full module schemas between versions, not just release note highlights
 
-5. **Blocking Validation**: Never proceed to commit/PR without passing `terraform validate` at minimum
+e. **Blocking Validation**: Never proceed to commit/PR without passing `terraform validate` at minimum
 
 ### Expected Validation Flow
 
