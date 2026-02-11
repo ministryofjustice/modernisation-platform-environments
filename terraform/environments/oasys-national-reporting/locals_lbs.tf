@@ -102,6 +102,63 @@ locals {
           }
           target_type = "instance"
         }
+        https-8443 = {
+          port     = 8443
+          protocol = "HTTPS"
+          health_check = {
+            enabled             = true
+            interval            = 10
+            healthy_threshold   = 3
+            matcher             = "200-399"
+            path                = "/"
+            port                = 8443
+            protocol            = "HTTPS"
+            timeout             = 5
+            unhealthy_threshold = 2
+          }
+          stickiness = {
+            enabled = true
+            type    = "lb_cookie"
+          }
+          target_type = "instance"
+        }
+      }
+    }
+
+    nlb = {
+      access_logs                      = false
+      enable_cross_zone_load_balancing = true
+      enable_delete_protection         = true
+      force_destroy_bucket             = true
+      internal_lb                      = false
+      load_balancer_type               = "network"
+      security_groups                  = ["public-lb", "public-lb-2"]
+      subnets                          = module.environment.subnets["public"].ids
+      instance_target_groups = {
+        https-8443 = {
+          port               = 8443
+          preserve_client_ip = false
+          protocol           = "TCP"
+          health_check = {
+            enabled             = true
+            interval            = 5
+            healthy_threshold   = 3
+            port                = 8443
+            protocol            = "TCP"
+            timeout             = 4
+            unhealthy_threshold = 2
+          }
+          stickiness = {
+            enabled = true
+            type    = "source_ip"
+          }
+        }
+      }
+      listeners = {
+        https = {
+          port     = 443
+          protocol = "TCP"
+        }
       }
     }
   }

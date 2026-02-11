@@ -182,6 +182,35 @@ locals {
           oasys-national-reporting-environment = "t2"
         })
       })
+
+      t2-onr-weboidc-1 = merge(local.ec2_instances.bip_web, {
+        config = merge(local.ec2_instances.bip_web.config, {
+          availability_zone = "eu-west-2b"
+          instance_profile_policies = concat(local.ec2_instances.bip_web.config.instance_profile_policies, [
+            "Ec2T2ReportingPolicy",
+          ])
+          secretsmanager_secrets_prefix = "ec2/"
+        })
+        instance = merge(local.ec2_instances.bip_web.instance, {
+          instance_type = "r6i.large"
+        })
+        secretsmanager_secrets = {
+          web-cert = {
+            description             = "Certificate secrets used for tomcat"
+            recovery_window_in_days = 0 # so instances can be deleted and re-created without issue
+          }
+        }
+        user_data_cloud_init = merge(local.ec2_instances.bip_web.user_data_cloud_init, {
+          args = merge(local.ec2_instances.bip_web.user_data_cloud_init.args, {
+            branch = "TM-1865/onr/web-oidc-v1"
+          })
+        })
+        tags = merge(local.ec2_instances.bip_web.tags, {
+          instance-scheduling                  = "skip-scheduling"
+          oasys-national-reporting-environment = "t2"
+          server-type                          = "onr-weboidc"
+        })
+      })
     }
 
     fsx_windows = {
@@ -281,6 +310,11 @@ locals {
               { ec2_instance_name = "t2-onr-web-1" },
             ]
           })
+          #t2-onr-weboidc-https-8443 = merge(local.lbs.public.instance_target_groups.https-8443, {
+          #  attachments = [
+          #    { ec2_instance_name = "t2-onr-weboidc-1" },
+          #  ]
+          #})
         }
         listeners = merge(local.lbs.public.listeners, {
           https = merge(local.lbs.public.listeners.https, {
@@ -301,7 +335,7 @@ locals {
                 }]
               }
               t2-onr-web-http-7777 = {
-                priority = 1200 # change priority to 200 if the environment is powered on during day
+                priority = 200 # change priority to 1200 once testing is finished
                 actions = [{
                   type              = "forward"
                   target_group_name = "t2-onr-web-http-7777"
@@ -309,11 +343,26 @@ locals {
                 conditions = [{
                   host_header = {
                     values = [
-                      "t2.test.reporting.oasys.service.justice.gov.uk",
+                      #"t2.test.reporting.oasys.service.justice.gov.uk",
+                      "t2-without-sso.test.reporting.oasys.service.justice.gov.uk",
                     ]
                   }
                 }]
               }
+              #t2-onr-weboidc-https-8443 = {
+              #  priority = 300 # change priority to 200 if the environment is powered on during day
+              #  actions = [{
+              #    type              = "forward"
+              #    target_group_name = "t2-onr-weboidc-https-8443"
+              #  }]
+              #  conditions = [{
+              #    host_header = {
+              #      values = [
+              #        "t2.test.reporting.oasys.service.justice.gov.uk",
+              #      ]
+              #    }
+              #  }]
+              #}
               maintenance = {
                 priority = 999
                 actions = [{
@@ -337,6 +386,25 @@ locals {
           })
         })
       })
+
+      onr-test-nlb = merge(local.lbs.nlb, {
+        instance_target_groups = {
+          t2-onr-weboidc-https-8443 = merge(local.lbs.nlb.instance_target_groups.https-8443, {
+            attachments = [
+              { ec2_instance_name = "t2-onr-weboidc-1" },
+            ]
+          })
+        }
+
+        listeners = {
+          https = merge(local.lbs.nlb.listeners.https, {
+            default_action = {
+              type              = "forward"
+              target_group_name = "t2-onr-weboidc-https-8443"
+            }
+          })
+        }
+      })
     }
 
     patch_manager = {
@@ -356,7 +424,8 @@ locals {
     route53_zones = {
       "test.reporting.oasys.service.justice.gov.uk" = {
         lb_alias_records = [
-          { name = "t2", type = "A", lbs_map_key = "public" },
+          { name = "t2", type = "A", lbs_map_key = "onr-test-nlb" },
+          { name = "t2-without-sso", type = "A", lbs_map_key = "public" },
           { name = "t2-bods", type = "A", lbs_map_key = "public" },
         ],
       }
