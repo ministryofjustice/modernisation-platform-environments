@@ -274,7 +274,7 @@
       "managed_hostname": "ccms-soa-managed",
       "efs_performance_mode": "maxIO",
       "logging_cloudwatch_rds_write_iops_threshold": "1200",
-      "logging_cloudwatch_rds_read_iops_threshold": "1200",
+      "logging_cloudwatch_rds_read_iops_threshold": "1800",
       "s3_lifecycle_days_abort_incomplete_multipart_upload_days": 6,
       "s3_lifecycle_days_expiration_current": 730,
       "s3_lifecycle_days_expiration_noncurrent": 730,
