@@ -1,7 +1,7 @@
 module "data_platform_access_iam_role" {
   count = terraform.workspace == "data-platform-development" ? 1 : 0
 
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role?ref=7279fc444aed7e36c60438b46972e1611e48984c" # v6.2.3
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role?ref=277e8947b1267290988e47882d8dc116850929be" # v6.4.0
 
   path            = "/github-actions/"
   name            = "data-platform-access"
@@ -64,7 +64,7 @@ module "data_platform_access_iam_role" {
 module "octo_access_iam_role" {
   count = terraform.workspace == "data-platform-development" ? 1 : 0
 
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role?ref=7279fc444aed7e36c60438b46972e1611e48984c" # v6.2.3
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role?ref=277e8947b1267290988e47882d8dc116850929be" # v6.4.0
 
   path            = "/github-actions/"
   name            = "octo-access"
