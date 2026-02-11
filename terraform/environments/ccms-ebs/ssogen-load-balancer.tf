@@ -46,7 +46,7 @@ resource "aws_lb_target_group" "ssogen_internal_tg1" {
   }
 }
 
-resource "aws_lb_target_group" "ssogen_internal_tg2" {
+resource "aws_lb_target_group" "ssogen_internal_tg_admin" {
   count       = local.is-development || local.is-test ? 1 : 0
   name        = lower(format("tg-%s-ssogen", local.application_name))
   port        = local.application_data.accounts[local.environment].tg_ssogen_admin_port
