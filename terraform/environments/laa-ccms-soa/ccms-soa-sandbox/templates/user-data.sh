@@ -6,10 +6,6 @@ exec > /var/log/user-data.log 2>&1
 EC2_USER_HOME_FOLDER=/home/ec2-user
 EFS_MOUNT_POINT=$EC2_USER_HOME_FOLDER/efs
 
-# #--Variables for AWS Secrets Manager
-# SECRET_NAME="soasandbox-password"
-# SECRET_KEY="ccms/soasandbox/deploy-github-ssh-key"
-# REGION="eu-west-2"
 
 echo "ECS_CLUSTER=${cluster_name}" >> /etc/ecs/ecs.config
 echo 'ECS_VOLUME_PLUGIN_CAPABILITIES=["efsAuth"]' >> /etc/ecs/ecs.config
