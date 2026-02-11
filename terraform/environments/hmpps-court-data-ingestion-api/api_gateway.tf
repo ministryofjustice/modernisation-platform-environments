@@ -48,6 +48,10 @@ resource "aws_api_gateway_integration" "sqs" {
   # Account ID is retrieved from Secrets Manager (must be populated manually)
   uri = "arn:aws:apigateway:eu-west-2:sqs:path/${data.aws_secretsmanager_secret_version.cloud_platform_account_id.secret_string}/${local.environment_configuration[local.environment].cloud_platform_sqs_queue_name}"
 
+  request_parameters = {
+    "integration.request.header.Content-Type" = "'application/x-www-form-urlencoded'"
+  }
+
   request_templates = {
     "application/json" = <<EOF
 Action=SendMessage&MessageBody=$util.urlEncode($input.body)&MessageAttribute.1.Name=X-Signature&MessageAttribute.1.Value.StringValue=$util.escapeJavaScript($input.params('X-Signature'))&MessageAttribute.1.Value.DataType=String&MessageAttribute.2.Name=Date&MessageAttribute.2.Value.StringValue=$util.escapeJavaScript($input.params('Date'))&MessageAttribute.2.Value.DataType=String
@@ -60,11 +64,21 @@ resource "aws_iam_role_policy" "apigw_sqs_policy" {
 
   policy = jsonencode({
     Version = "2012-10-17"
-    Statement = [{
-      Effect   = "Allow"
-      Action   = "sqs:SendMessage"
-      Resource = "arn:aws:sqs:eu-west-2:${data.aws_secretsmanager_secret_version.cloud_platform_account_id.secret_string}:${local.environment_configuration[local.environment].cloud_platform_sqs_queue_name}"
-    }]
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = "sqs:SendMessage"
+        Resource = "arn:aws:sqs:eu-west-2:${data.aws_secretsmanager_secret_version.cloud_platform_account_id.secret_string}:${local.environment_configuration[local.environment].cloud_platform_sqs_queue_name}"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "kms:GenerateDataKey",
+          "kms:Decrypt"
+        ]
+        Resource = "*"
+      }
+    ]
   })
 }
 

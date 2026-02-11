@@ -1,16 +1,13 @@
 locals {
   environment_configuration = {
     development = {
-      cloud_platform_sqs_queue_name = "hmpps-court-data-ingestion-queue-dev"
-    }
-    test = {
-      cloud_platform_sqs_queue_name = "hmpps-court-data-ingestion-queue-test"
+      cloud_platform_sqs_queue_name = "calculate-release-dates-team-dev-hmpps_court_data_ingestion_queuev"
     }
     preproduction = {
-      cloud_platform_sqs_queue_name = "hmpps-court-data-ingestion-queue-preprod"
+      cloud_platform_sqs_queue_name = "calculate-release-dates-team-preprod-hmpps_court_data_ingestion_queue"
     }
     production = {
-      cloud_platform_sqs_queue_name = "hmpps-court-data-ingestion-queue-prod"
+      cloud_platform_sqs_queue_name = "calculate-release-dates-team-prod-hmpps_court_data_ingestion_queue"
     }
   }
 }
