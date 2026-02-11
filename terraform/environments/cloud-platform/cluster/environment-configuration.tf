@@ -20,7 +20,7 @@ locals {
         desired_capacity = 3
         max_size         = 10
 
-        instance_types = ["r6i.large"]
+        instance_types = ["r8i.large"]
 
         block_device_mappings = {
           xvda = {
@@ -48,7 +48,7 @@ locals {
         desired_capacity = 2
         max_size         = 5
 
-        instance_types = ["r6i.large"]
+        instance_types = ["r8i.large"]
 
         block_device_mappings = {
           xvda = {
@@ -99,7 +99,7 @@ locals {
         desired_capacity = 3
         max_size         = 10
 
-        instance_types = ["r6i.large"]
+        instance_types = ["r8i.large"]
 
         block_device_mappings = {
           xvda = {
@@ -127,7 +127,7 @@ locals {
         desired_capacity = 2
         max_size         = 5
 
-        instance_types = ["r6i.large"]
+        instance_types = ["r8i.large"]
 
         block_device_mappings = {
           xvda = {
@@ -178,7 +178,7 @@ locals {
         desired_capacity = 3
         max_size         = 10
 
-        instance_types = ["r6i.large"]
+        instance_types = ["r8i.large"]
 
         block_device_mappings = {
           xvda = {
@@ -206,7 +206,7 @@ locals {
         desired_capacity = 2
         max_size         = 5
 
-        instance_types = ["r6i.large"]
+        instance_types = ["r8i.large"]
 
         block_device_mappings = {
           xvda = {
@@ -257,7 +257,7 @@ locals {
         desired_capacity = 3
         max_size         = 10
 
-        instance_types = ["r6i.large"]
+        instance_types = ["r8i.large"]
 
         block_device_mappings = {
           xvda = {
@@ -285,7 +285,7 @@ locals {
         desired_capacity = 2
         max_size         = 5
 
-        instance_types = ["r6i.large"]
+        instance_types = ["r8i.large"]
 
         block_device_mappings = {
           xvda = {
@@ -336,7 +336,7 @@ locals {
         desired_capacity = 3
         max_size         = 10
 
-        instance_types = ["r6i.large"]
+        instance_types = ["r8i.large"]
 
         block_device_mappings = {
           xvda = {
@@ -364,7 +364,7 @@ locals {
         desired_capacity = 2
         max_size         = 5
 
-        instance_types = ["r6i.large"]
+        instance_types = ["r8i.large"]
 
         block_device_mappings = {
           xvda = {
