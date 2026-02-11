@@ -12,7 +12,7 @@ data "template_file" "launch-template" {
 
 resource "aws_launch_template" "ssogen-ec2-launch-template" {
   name_prefix   = local.application_name
-  image_id      = local.application_data.accounts[local.environment].ami_image_id
+  image_id      = local.application_data.accounts[local.environment].ssogen_ami_id-1
   instance_type = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ssogen
   # key_name      = var.key_name
   ebs_optimized = true
@@ -46,7 +46,7 @@ resource "aws_launch_template" "ssogen-ec2-launch-template" {
   tag_specifications {
     resource_type = "instance"
     tags = merge(local.tags,
-      { Name = lower(format("%s-%s-ecs-cluster", local.application_name, local.environment)) }
+      { Name = lower(format("%s-%s-launch-template-primary", local.application_name, local.environment)) }
     )
   }
 
@@ -60,12 +60,12 @@ resource "aws_launch_template" "ssogen-ec2-launch-template" {
   tag_specifications {
     resource_type = "volume"
     tags = merge(local.tags,
-      { Name = lower(format("%s-%s-ecs-cluster", local.application_name, local.environment)) }
+      { Name = lower(format("%s-%s-launch-template-primary", local.application_name, local.environment)) }
     )
   }
 
   tags = merge(local.tags,
-    { Name = lower(format("%s-%s-ecs-cluster-template", local.application_name, local.environment)) }
+    { Name = lower(format("%s-%s-launch-template-primary", local.application_name, local.environment)) }
   )
 
 }
@@ -77,8 +77,15 @@ resource "aws_autoscaling_group" "cluster-scaling-group" {
   max_size            = local.application_data.accounts[local.environment].ssogen_max_capacity
   min_size            = local.application_data.accounts[local.environment].ssogen_min_capacity
 
-  launch_template {
-    id      = aws_launch_template.ec2-launch-template.id
+  target_group_arns = [
+    aws_lb_target_group.ssogen_internal_tg2.arn
+  ]
+
+   health_check_type         = "EC2"
+   health_check_grace_period = 300
+
+   launch_template {
+    id      = aws_launch_template.ssogen-ec2-launch-template.id
     version = "$Latest"
   }
 
