@@ -14,54 +14,6 @@ resource "helm_release" "kyverno" {
   ]
 }
 
-/* AWS Observability */
-/*
-  There is an ongoing issue with aws-cloudwatch-metrics as it doesn't properly support IMDSv2 (https://github.com/aws/amazon-cloudwatch-agent/issues/1101)
-  Therefore for this to work properly, I've set hostNetwork to true in src/helm/values/amazon-cloudwatch-metrics/values.yml.tftpl
-  The DaemonSet uses the node role to which has arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy attached
-  The Helm chart also doesn't have support for IRSA, so a EKS Pod Identity has been been made ready to use module.aws_cloudwatch_metrics_pod_identity
-*/
-resource "helm_release" "aws_cloudwatch_metrics" {
-  /* https://artifacthub.io/packages/helm/aws/aws-cloudwatch-metrics */
-  name       = "aws-cloudwatch-metrics"
-  repository = "https://aws.github.io/eks-charts"
-  chart      = "aws-cloudwatch-metrics"
-  version    = local.environment_configuration.helm_chart_version.aws_cloudwatch_metrics
-  namespace  = kubernetes_namespace.aws_observability.metadata[0].name
-  values = [
-    templatefile(
-      "${path.module}/src/helm/values/aws-cloudwatch-metrics/values.yml.tftpl",
-      {
-        cluster_name = module.eks.cluster_name
-      }
-    )
-  ]
-
-  depends_on = [module.aws_cloudwatch_metrics_pod_identity]
-}
-
-resource "helm_release" "aws_for_fluent_bit" {
-  /* https://artifacthub.io/packages/helm/aws/aws-for-fluent-bit */
-  name       = "aws-for-fluent-bit"
-  repository = "https://aws.github.io/eks-charts"
-  chart      = "aws-for-fluent-bit"
-  version    = local.environment_configuration.helm_chart_version.aws_for_fluent_bit
-  namespace  = kubernetes_namespace.aws_observability.metadata[0].name
-  values = [
-    templatefile(
-      "${path.module}/src/helm/values/aws-for-fluent-bit/values.yml.tftpl",
-      {
-        aws_region                = data.aws_region.current.region
-        cluster_name              = module.eks.cluster_name
-        cloudwatch_log_group_name = module.eks_log_group.cloudwatch_log_group_name
-        eks_role_arn              = module.aws_for_fluent_bit_iam_role.arn
-      }
-    )
-  ]
-
-  depends_on = [module.aws_for_fluent_bit_iam_role]
-}
-
 resource "helm_release" "amazon_prometheus_proxy" {
   /* https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack */
   /* 
