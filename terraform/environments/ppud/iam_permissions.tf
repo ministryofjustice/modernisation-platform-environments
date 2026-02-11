@@ -59,6 +59,14 @@ locals {
         "get_securityhub_data"
       ]
     }
+    invoke_ses = {
+      description = "Lambda Function Role for sending emails via SES"
+      policies = [
+        "send_message_to_sqs",
+        "send_logs_to_cloudwatch",
+        "invoke_ses"
+      ]
+    }
     get_ses_logging = {
       description = "Lambda Function Role for SES logging"
       policies = [
