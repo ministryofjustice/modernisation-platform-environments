@@ -159,9 +159,9 @@ resource "aws_autoscaling_group" "ssogen-scaling-group-secondary" {
   count               = local.is-development || local.is-test ? 1 : 0
   name                = "${local.application_name}-ssogen-auto-scaling-group-secondary"
   vpc_zone_identifier = data.aws_subnets.shared-private.ids
-  desired_capacity    = local.application_data.accounts[local.environment].ssogen_desired_capacity_secondary
-  max_size            = local.application_data.accounts[local.environment].ssogen_max_capacity_secondary
-  min_size            = local.application_data.accounts[local.environment].ssogen_min_capacity_secondary
+  desired_capacity    = local.application_data.accounts[local.environment].ssogen_desired_capacity
+  max_size            = local.application_data.accounts[local.environment].ssogen_max_capacity
+  min_size            = local.application_data.accounts[local.environment].ssogen_min_capacity
 
   target_group_arns = [
     aws_lb_target_group.ssogen_internal_tg_ssogen_app[count.index].arn,
