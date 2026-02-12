@@ -97,7 +97,7 @@ locals {
         aws_guardduty_agent               = "v1.12.1-eksbuild.2"
         aws_ebs_csi_driver                = "v1.53.0-eksbuild.1"
         vpc_cni                           = "v1.20.5-eksbuild.1"
-        amazon_cloudwatch_observability   = "v3.3.1-eksbuild.1"
+        amazon_cloudwatch_observability   = "v4.10.0-eksbuild.1"
       }
 
       helm_chart_version = {
