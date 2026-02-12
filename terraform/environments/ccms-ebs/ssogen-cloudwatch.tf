@@ -83,7 +83,7 @@ resource "aws_cloudwatch_metric_alarm" "ssogen_waf_high_blocked_requests" {
   treat_missing_data  = "notBreaching"
 
   dimensions = {
-    WebACL = aws_wafv2_web_acl.ssogen_web_acl.name
+    WebACL = aws_wafv2_web_acl.ssogen_web_acl[count.index].name
     Scope  = "REGIONAL"
   }
 
