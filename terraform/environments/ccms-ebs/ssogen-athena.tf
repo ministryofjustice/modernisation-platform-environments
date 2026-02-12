@@ -1,4 +1,5 @@
 resource "aws_athena_database" "ssogen_lb-access-logs" {
+  count  = local.is-development || local.is-test ? 1 : 0
   name   = "ssogen_loadbalancer_access_logs"
   bucket = module.s3-bucket-logging.bucket.id
   encryption_configuration {
@@ -7,7 +8,8 @@ resource "aws_athena_database" "ssogen_lb-access-logs" {
 }
 
 resource "aws_athena_workgroup" "ssogen_lb-access-logs" {
-  name = lower(format("%s-%s-ssogen-lb-access-logs", local.application_name, local.environment))
+  count = local.is-development || local.is-test ? 1 : 0
+  name  = lower(format("%s-%s-ssogen-lb-access-logs", local.application_name, local.environment))
 
   configuration {
     enforce_workgroup_configuration    = true
@@ -24,9 +26,10 @@ resource "aws_athena_workgroup" "ssogen_lb-access-logs" {
 
 # SQL query to creates the table in the athena db, these queries needs to be executed manually after creation
 resource "aws_athena_named_query" "main_table_ssogen" {
+  count     = local.is-development || local.is-test ? 1 : 0
   name      = lower(format("%s-%s-ssogen-create-table", local.application_name, local.environment))
-  workgroup = aws_athena_workgroup.ssogen_lb-access-logs.id
-  database  = aws_athena_database.ssogen_lb-access-logs.name
+  workgroup = aws_athena_workgroup.ssogen_lb-access-logs[count.index].id
+  database  = aws_athena_database.ssogen_lb-access-logs[count.index].name
   query = templatefile(
     "./templates/create_internal_ssogen_table.sql",
     {
@@ -40,9 +43,10 @@ resource "aws_athena_named_query" "main_table_ssogen" {
 
 # SQL query to count the number of HTTP GET requests to the loadbalancer grouped by IP, these queries needs to be executed manually after creation
 resource "aws_athena_named_query" "http_requests_ssogen" {
+  count     = local.is-development || local.is-test ? 1 : 0
   name      = lower(format("%s-%s-ssogen-http-get-requests-ssogen", local.application_name, local.environment))
-  workgroup = aws_athena_workgroup.ssogen_lb-access-logs.id
-  database  = aws_athena_database.ssogen_lb-access-logs.name
+  workgroup = aws_athena_workgroup.ssogen_lb-access-logs[count.index].id
+  database  = aws_athena_database.ssogen_lb-access-logs[count.index].name
   query = templatefile(
     "./templates/lb_internal_ssogen_http_gets.sql",
     {
