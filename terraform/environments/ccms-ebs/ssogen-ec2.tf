@@ -141,8 +141,8 @@ resource "aws_autoscaling_group" "ssogen-scaling-group-primary" {
   min_size            = local.application_data.accounts[local.environment].ssogen_min_capacity
 
   target_group_arns = [
-    aws_lb_target_group.ssogen_internal_tg_ssogen_app.arn,
-    aws_lb_target_group.ssogen_internal_tg_ssogen_admin.arn
+    aws_lb_target_group.ssogen_internal_tg_ssogen_app[count.index].arn,
+    aws_lb_target_group.ssogen_internal_tg_ssogen_admin[count.index].arn
   ]
 
    health_check_type         = "EC2"
