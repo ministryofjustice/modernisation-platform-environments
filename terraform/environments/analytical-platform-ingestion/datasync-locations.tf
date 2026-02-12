@@ -5,8 +5,7 @@ resource "time_sleep" "wait_for_policy_propagation" {
     module.datasync_opg_bucket,
     module.datasync_iam_role,
     module.datasync_iam_policy,
-    module.s3_datasync_opg_kms,
-    aws_s3_object.datasync_test
+    module.s3_datasync_opg_kms
   ]
 }
 
