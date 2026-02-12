@@ -1,6 +1,7 @@
 # WAF FOR SSOGEN APP
 
 resource "aws_wafv2_ip_set" "ssogen_waf_ip_set" {
+  count              = local.is-development || local.is-test ? 1 : 0
   name               = "${local.application_name}-ssogen-waf-ip-set"
   scope              = "REGIONAL"
   ip_address_version = "IPV4"
@@ -22,6 +23,7 @@ resource "aws_wafv2_ip_set" "ssogen_waf_ip_set" {
 
 
 resource "aws_wafv2_web_acl" "ssogen_web_acl" {
+  count       = local.is-development || local.is-test ? 1 : 0
   name        = "${local.application_name}-ssogen-web-acl"
   scope       = "REGIONAL"
   description = "AWS WAF Web ACL for SSOGEN Application Load Balancer"
@@ -91,7 +93,8 @@ resource "aws_wafv2_web_acl" "ssogen_web_acl" {
 
   # Restrict access to trusted IPs only - Non-Prod environments only
   dynamic "rule" {
-    for_each = !local.is-production ? [1] : [1] # Temprorarily enable for Prod as well - to be removed when Geo Match is live
+    # for_each = !local.is-production ? [1] : [1] # Temprorarily enable for Prod as well - to be removed when Geo Match is live
+    for_each = local.is-development || local.is-test ? [1] : [0] # Temprorarily enable for Prod as well - to be removed when Geo Match is live
     content {
       name     = "${local.application_name}-ssogen-waf-ip-set"
       priority = 2
@@ -102,7 +105,7 @@ resource "aws_wafv2_web_acl" "ssogen_web_acl" {
 
       statement {
         ip_set_reference_statement {
-          arn = aws_wafv2_ip_set.ssogen_waf_ip_set.arn
+          arn = aws_wafv2_ip_set.ssogen_waf_ip_set[count.index].arn
         }
       }
 
