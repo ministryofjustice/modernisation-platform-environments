@@ -234,6 +234,33 @@ module "bold_egress_bucket" {
 
 data "aws_iam_policy_document" "datasync_opg_policy" {
   statement {
+    sid    = "AllowDataSyncRole"
+    effect = "Allow"
+    principals {
+      type        = "AWS"
+      identifiers = [module.datasync_iam_role.arn]
+    }
+    actions = [
+      "s3:GetBucketLocation",
+      "s3:ListBucket",
+      "s3:ListBucketMultipartUploads",
+      "s3:AbortMultipartUpload",
+      "s3:DeleteObject",
+      "s3:GetObject",
+      "s3:GetObjectTagging",
+      "s3:GetObjectVersion",
+      "s3:GetObjectVersionTagging",
+      "s3:ListMultipartUploadParts",
+      "s3:PutObject",
+      "s3:PutObjectTagging"
+    ]
+    resources = [
+      "arn:aws:s3:::mojap-ingestion-${local.environment}-datasync-opg/*",
+      "arn:aws:s3:::mojap-ingestion-${local.environment}-datasync-opg"
+    ]
+  }
+
+  statement {
     sid    = "DenyS3AccessSandbox"
     effect = "Deny"
     principals {
