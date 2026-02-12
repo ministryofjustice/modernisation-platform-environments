@@ -8,7 +8,8 @@ resource "aws_datasync_location_s3" "opg" {
 
   depends_on = [
     module.datasync_opg_bucket,
-    module.datasync_iam_role
+    module.datasync_iam_role,
+    module.s3_datasync_opg_kms
   ]
 
   tags = local.tags
