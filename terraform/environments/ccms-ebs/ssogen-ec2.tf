@@ -23,7 +23,7 @@ resource "aws_launch_template" "ssogen-ec2-launch-template-primary" {
   }
 
   iam_instance_profile {
-    name = aws_iam_instance_profile.ec2_instance_profile.name
+    name = aws_iam_instance_profile.ssogen_instance_profile[count.index].name
   }
 
   network_interfaces {
@@ -84,7 +84,7 @@ resource "aws_launch_template" "ssogen-ec2-launch-template-secondary" {
   }
 
   iam_instance_profile {
-    name = aws_iam_instance_profile.ec2_instance_profile.name
+    name = aws_iam_instance_profile.ssogen_instance_profile[count.index].name
   }
 
   network_interfaces {
@@ -178,7 +178,7 @@ resource "aws_autoscaling_group" "ssogen-scaling-group-secondary" {
 
 }
 # resource "aws_instance" "ec2_ssogen" {
-#   count = local.is_development ? local.application_data.accounts[local.environment].ssogen_no_instances : 0
+#   count = local.is-development ? local.application_data.accounts[local.environment].ssogen_no_instances : 0
 
 #   instance_type          = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ssogen
 #   ami                    = local.application_data.accounts[local.environment]["ssogen_ami_id-${count.index + 1}"]
