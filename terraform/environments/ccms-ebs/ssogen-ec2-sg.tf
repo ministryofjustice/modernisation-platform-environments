@@ -2,7 +2,7 @@
 # Security Group (no inline rules) — dev only
 ############################################
 resource "aws_security_group" "ssogen_sg" {
-  count       = local.is_development ? 1 : 0
+  count       = local.is-development || local.is-test ? 1 : 0
   name        = "ssogen-sg-${local.environment}"
   description = "Security group for SSOGEN EC2 (WebLogic + OHS)"
   vpc_id      = data.aws_vpc.shared.id
@@ -16,7 +16,7 @@ resource "aws_security_group" "ssogen_sg" {
 # # INGRESS — SSH (22) from WorkSpaces subnets (private)
 # ############################################
 resource "aws_vpc_security_group_ingress_rule" "ing_ssh_workspaces" {
-  count             = local.is_development ? 1 : 0
+  count             = local.is-development || local.is-test ? 1 : 0
   ip_protocol       = "tcp"
   description       = "SSH from WorkSpaces subnets"
   security_group_id = aws_security_group.ssogen_sg[count.index].id
@@ -36,7 +36,7 @@ resource "aws_vpc_security_group_ingress_rule" "ing_ssh_workspaces" {
 # #########################################
 
 resource "aws_vpc_security_group_egress_rule" "from_ec2_to_rds" {
-  count                        = local.is_development ? 1 : 0
+  count                        = local.is-development || local.is-test ? 1 : 0
   security_group_id            = aws_security_group.ssogen_sg[count.index].id
   description                  = "Allow outbound to RDS"
   from_port                    = 1521
