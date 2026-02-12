@@ -101,6 +101,7 @@ module "eks" {
                 }
                 kubernetes = {
                   enhanced_container_insights = false
+                  accelerated_compute_metrics = true
                 }
               }
             }
