@@ -1,3 +1,15 @@
+resource "time_sleep" "wait_for_policy_propagation" {
+  create_duration = "30s"
+
+  depends_on = [
+    module.datasync_opg_bucket,
+    module.datasync_iam_role,
+    module.datasync_iam_policy,
+    module.s3_datasync_opg_kms,
+    aws_s3_object.datasync_test
+  ]
+}
+
 resource "aws_datasync_location_s3" "opg" {
   s3_bucket_arn = module.datasync_opg_bucket.s3_bucket_arn
   subdirectory  = "/"
@@ -7,9 +19,7 @@ resource "aws_datasync_location_s3" "opg" {
   }
 
   depends_on = [
-    module.datasync_opg_bucket,
-    module.datasync_iam_role,
-    module.s3_datasync_opg_kms
+    time_sleep.wait_for_policy_propagation
   ]
 
   tags = local.tags
