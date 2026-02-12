@@ -35,6 +35,8 @@ resource "aws_vpc_security_group_egress_rule" "bcs_ec2" {
     smtp-to-internal  = { ip_protocol = "TCP", port = 25, cidr_ipv4 = "10.0.0.0/8" }
     http-to-all       = { ip_protocol = "TCP", port = 80, cidr_ipv4 = "0.0.0.0/0" }
     ntp-to-all        = { ip_protocol = "UDP", port = 123, cidr_ipv4 = "0.0.0.0/0" }
+    ldap-tcp-to-vpc   = { ip_protocol = "TCP", port = 389, cidr_ipv4 = module.ip_addresses.mp_cidr[local.vpc_name] }
+    ldap-udp-to-vpc   = { ip_protocol = "UDP", port = 389, cidr_ipv4 = module.ip_addresses.mp_cidr[local.vpc_name] }
     https-to-all      = { ip_protocol = "TCP", port = 443, cidr_ipv4 = "0.0.0.0/0" }
     oracle1521-to-vpc = { ip_protocol = "TCP", port = 1521, cidr_ipv4 = module.ip_addresses.mp_cidr[local.vpc_name] }
     nfs-to-efs        = { ip_protocol = "TCP", port = 2049, referenced_security_group_id = aws_security_group.efs.id }
