@@ -104,6 +104,13 @@ module "eks" {
                 }
               }
             }
+            traces = {
+              traces_collected = {
+                xray = {
+                  enabled = false
+                }
+              }
+            }
           }
         }
       })
