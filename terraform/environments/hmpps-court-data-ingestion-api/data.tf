@@ -11,6 +11,7 @@ data "archive_file" "authorizer" {
 
   source {
     content  = <<EOF
+const crypto = require('crypto');
 const { SecretsManagerClient, GetSecretValueCommand } = require("@aws-sdk/client-secrets-manager");
 const client = new SecretsManagerClient();
 let cachedSecret;
@@ -29,16 +30,15 @@ exports.handler = async (event) => {
   // REQUEST authorizer passes headers in event.headers
   // Headers are not always lowercased by APIGW, so we check strictly or loosely
   const headers = event.headers || {};
-  let token = headers["X-Signature"] || headers["x-signature"];
+  let signatureHeader = headers["X-Signature"] || headers["x-signature"];
 
-  // Fallback for TOKEN authorizer events (where token is in authorizationToken)
-  if (!token && event.authorizationToken) {
-    token = event.authorizationToken;
+  // Fallback for TOKEN authorizer events (where signatureHeader is in authorizationToken)
+  if (!signatureHeader && event.authorizationToken) {
+    signatureHeader = event.authorizationToken;
   }
-
   const methodArn = event && event.methodArn;
 
-  console.log(`[auth] token present=$${Boolean(token)} len=$${token ? String(token).length : 0} preview=$${preview(token)}`);
+  console.log(`[auth] signiture header present=$${Boolean(signatureHeader)} len=$${signatureHeader ? String(signatureHeader).length : 0} preview=$${preview(signatureHeader)}`);
   console.log(`[auth] methodArn present=$${Boolean(methodArn)} value=$${methodArn || "(none)"}`);
 
   if (!methodArn) {
@@ -46,8 +46,8 @@ exports.handler = async (event) => {
     return generatePolicy("user", "Deny", "*");
   }
 
-  if (!token) {
-    console.log("[auth] deny: missing token");
+  if (!signatureHeader) {
+    console.log("[auth] deny: missing signatureHeader");
     return generatePolicy("user", "Deny", methodArn);
   }
 
@@ -63,12 +63,36 @@ exports.handler = async (event) => {
       console.log(`[auth] using cached secret len=$${cachedSecret ? String(cachedSecret).length : 0} preview=$${preview(cachedSecret)}`);
     }
 
-    if (String(token) === String(cachedSecret)) {
+
+    // Extract actual signature (assuming format: sha256=abcdef123...)
+    const receivedSignature = signatureHeader.replace('sha256=', '');
+
+    // IMPORTANT: Use raw body (API Gateway must pass it unmodified)
+    const rawBody = event.body;
+
+    // If body is base64 encoded (when using certain API Gateway configs)
+    const bodyBuffer = event.isBase64Encoded
+        ? Buffer.from(rawBody, 'base64')
+        : Buffer.from(rawBody, 'utf8');
+
+    // Compute HMAC
+    const computedSignature = crypto
+        .createHmac('sha256', cachedSecret)
+        .update(bodyBuffer)
+        .digest('hex');
+        
+    // Timing-safe comparison
+    const isValid = crypto.timingSafeEqual(
+        Buffer.from(receivedSignature, 'hex'),
+        Buffer.from(computedSignature, 'hex')
+    );
+
+    if (isValid) {
       console.log("[auth] allow: token matched");
       return generatePolicy("user", "Allow", methodArn);
     }
 
-    console.log("[auth] deny: token mismatch", "tokenPreview=", preview(token), "secretPreview=", preview(cachedSecret));
+    console.log("[auth] deny: token mismatch", "tokenPreview=", preview(receivedSignature), "secretPreview=", preview(computedSignature));
     return generatePolicy("user", "Deny", methodArn);
 
   } catch (error) {
