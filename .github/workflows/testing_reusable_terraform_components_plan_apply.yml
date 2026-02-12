@@ -104,7 +104,7 @@
           - name: Configure AWS Credentials
             uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708  # v5.1.1
             with:
-              role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions-dev-test"
+              role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions-testing-nonprod"
               role-session-name: githubactionsrolesession
               aws-region: "eu-west-2"
 
