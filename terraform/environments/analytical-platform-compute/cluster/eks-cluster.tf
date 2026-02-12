@@ -96,6 +96,9 @@ module "eks" {
           config = {
             logs = {
               metrics_collected = {
+                application_signals = {
+                  enabled = false
+                }
                 kubernetes = {
                   enhanced_container_insights = false
                 }
