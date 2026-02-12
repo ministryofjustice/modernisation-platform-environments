@@ -2,7 +2,7 @@
 ### EC2 SG
 ######################################
 resource "aws_security_group" "ec2_sg" {
-  count = contains(["preproduction", "production"], local.environment) ? 1 : 0
+  count = local.environment == "preproduction" ? 1 : 0
 
   name        = "${local.application_name}-${local.environment}-ec2-security-group"
   description = "EC2 Security Group"
@@ -20,7 +20,7 @@ resource "aws_security_group" "ec2_sg" {
 ### EC2 INGRESS RULES
 ######################################
 resource "aws_security_group_rule" "ingress_oas_db_1521" {
-  count = contains(["preproduction", "production"], local.environment) ? 1 : 0
+  count = local.environment == "preproduction" ? 1 : 0
 
   type                     = "ingress"
   security_group_id        = aws_security_group.ec2_sg[0].id
@@ -32,7 +32,7 @@ resource "aws_security_group_rule" "ingress_oas_db_1521" {
 }
 
 resource "aws_security_group_rule" "ingress_ssh_from_bastion" {
-  count = contains(["preproduction", "production"], local.environment) ? 1 : 0
+  count = local.environment == "preproduction" ? 1 : 0
 
   type                     = "ingress"
   security_group_id        = aws_security_group.ec2_sg[0].id
@@ -44,7 +44,7 @@ resource "aws_security_group_rule" "ingress_ssh_from_bastion" {
 }
 
 resource "aws_security_group_rule" "ingress_ssh_from_workspaces" {
-  count = contains(["preproduction", "production"], local.environment) ? 1 : 0
+  count = local.environment == "preproduction" ? 1 : 0
 
   type              = "ingress"
   security_group_id = aws_security_group.ec2_sg[0].id
@@ -56,7 +56,7 @@ resource "aws_security_group_rule" "ingress_ssh_from_workspaces" {
 }
 
 resource "aws_security_group_rule" "ingress_http_from_mojo" {
-  count = contains(["preproduction", "production"], local.environment) ? 1 : 0
+  count = local.environment == "preproduction" ? 1 : 0
 
   type              = "ingress"
   security_group_id = aws_security_group.ec2_sg[0].id
@@ -68,7 +68,7 @@ resource "aws_security_group_rule" "ingress_http_from_mojo" {
 }
 
 resource "aws_security_group_rule" "ingress_https_from_mojo" {
-  count = contains(["preproduction", "production"], local.environment) ? 1 : 0
+  count = local.environment == "preproduction" ? 1 : 0
 
   type              = "ingress"
   security_group_id = aws_security_group.ec2_sg[0].id
@@ -80,7 +80,7 @@ resource "aws_security_group_rule" "ingress_https_from_mojo" {
 }
 
 resource "aws_security_group_rule" "ingress_admin_vpc" {
-  count = contains(["preproduction", "production"], local.environment) ? 1 : 0
+  count = local.environment == "preproduction" ? 1 : 0
 
   type              = "ingress"
   security_group_id = aws_security_group.ec2_sg[0].id
@@ -92,7 +92,7 @@ resource "aws_security_group_rule" "ingress_admin_vpc" {
 }
 
 resource "aws_security_group_rule" "ingress_from_lb_9500" {
-  count = contains(["preproduction", "production"], local.environment) ? 1 : 0
+  count = local.environment == "preproduction" ? 1 : 0
 
   type                     = "ingress"
   security_group_id        = aws_security_group.ec2_sg[0].id
@@ -104,7 +104,7 @@ resource "aws_security_group_rule" "ingress_from_lb_9500" {
 }
 
 resource "aws_security_group_rule" "ingress_from_lb_9502" {
-  count = contains(["preproduction", "production"], local.environment) ? 1 : 0
+  count = local.environment == "preproduction" ? 1 : 0
 
   type                     = "ingress"
   security_group_id        = aws_security_group.ec2_sg[0].id
