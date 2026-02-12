@@ -106,14 +106,14 @@ resource "aws_lb_listener" "ssogen_internal_console_listener" {
 }
 
 # resource "aws_lb_target_group_attachment" "ssogen_internal" {
-#   count            = local.is_development ? local.application_data.accounts[local.environment].ssogen_no_instances : 0
+#   count            = local.is-development ? local.application_data.accounts[local.environment].ssogen_no_instances : 0
 #   target_group_arn = aws_lb_target_group.ssogen_internal_tg1.arn
 #   target_id        = element(aws_instance.ec2_ssogen.*.id, count.index)
 #   port             = local.application_data.accounts[local.environment].tg_ssogen_apps_port
 # }
 
 # resource "aws_lb_target_group_attachment" "ssogen_internal_console" {
-#   count            = local.is_development ? local.application_data.accounts[local.environment].ssogen_no_instances : 0
+#   count            = local.is-development ? local.application_data.accounts[local.environment].ssogen_no_instances : 0
 #   target_group_arn = aws_lb_target_group.ssogen_internal_tg2.arn
 #   target_id        = element(aws_instance.ec2_ssogen.*.id, count.index)
 #   port             = local.application_data.accounts[local.environment].tg_ssogen_apps_port

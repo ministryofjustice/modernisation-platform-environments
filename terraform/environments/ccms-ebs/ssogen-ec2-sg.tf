@@ -49,7 +49,7 @@ resource "aws_vpc_security_group_egress_rule" "from_ec2_to_rds" {
 # # INGRESS — WebLogic Admin (7001)
 # ############################################
 # resource "aws_security_group_rule" "ing_7001_workspaces_private" {
-#   count             = local.is_development ? 1 : 0
+#   count             = local.is-development ? 1 : 0
 #   type              = "ingress"
 #   description       = "WebLogic 7001 from WorkSpaces subnets (private)"
 #   security_group_id = aws_security_group.ssogen_sg[0].id
@@ -65,7 +65,7 @@ resource "aws_vpc_security_group_egress_rule" "from_ec2_to_rds" {
 # }
 
 # resource "aws_security_group_rule" "ing_7001_workspaces_nat" {
-#   count             = local.is_development ? 1 : 0
+#   count             = local.is-development ? 1 : 0
 #   type              = "ingress"
 #   description       = "WebLogic 7001 from WorkSpaces NAT IPs (public)"
 #   security_group_id = aws_security_group.ssogen_sg[0].id
@@ -85,7 +85,7 @@ resource "aws_vpc_security_group_egress_rule" "from_ec2_to_rds" {
 # # INGRESS — OHS 7777
 # ############################################
 # resource "aws_security_group_rule" "ing_7777_workspaces_private" {
-#   count             = local.is_development ? 1 : 0
+#   count             = local.is-development ? 1 : 0
 #   type              = "ingress"
 #   description       = "OHS 7777 from WorkSpaces subnets (private)"
 #   security_group_id = aws_security_group.ssogen_sg[0].id
@@ -101,7 +101,7 @@ resource "aws_vpc_security_group_egress_rule" "from_ec2_to_rds" {
 # }
 
 # resource "aws_security_group_rule" "ing_7777_workspaces_nat" {
-#   count             = local.is_development ? 1 : 0
+#   count             = local.is-development ? 1 : 0
 #   type              = "ingress"
 #   description       = "OHS 7777 from WorkSpaces NAT IPs (public)"
 #   security_group_id = aws_security_group.ssogen_sg[0].id
@@ -121,7 +121,7 @@ resource "aws_vpc_security_group_egress_rule" "from_ec2_to_rds" {
 # # INGRESS — OHS 4443
 # ############################################
 # # resource "aws_security_group_rule" "ing_4443_workspaces_private" {
-# #   count             = local.is_development ? 1 : 0
+# #   count             = local.is-development ? 1 : 0
 # #   type              = "ingress"
 # #   description       = "OHS 4443 from WorkSpaces subnets (private)"
 # #   security_group_id = aws_security_group.ssogen_sg[0].id
@@ -137,7 +137,7 @@ resource "aws_vpc_security_group_egress_rule" "from_ec2_to_rds" {
 # # }
 
 # resource "aws_security_group_rule" "ing_4443_workspaces_nat" {
-#   count             = local.is_development ? 1 : 0
+#   count             = local.is-development ? 1 : 0
 #   type              = "ingress"
 #   description       = "OHS 4443 from WorkSpaces NAT IPs (public)"
 #   security_group_id = aws_security_group.ssogen_sg[0].id
@@ -157,7 +157,7 @@ resource "aws_vpc_security_group_egress_rule" "from_ec2_to_rds" {
 # # INGRESS — WebLogic managed servers (8000–8005) from EBS App SG
 # ############################################
 # resource "aws_security_group_rule" "ing_8000_8005_from_ebsapps" {
-#   count                    = local.is_development ? 1 : 0
+#   count                    = local.is-development ? 1 : 0
 #   type                     = "ingress"
 #   description              = "WebLogic managed servers from EBS App servers"
 #   security_group_id        = aws_security_group.ssogen_sg[0].id
@@ -171,7 +171,7 @@ resource "aws_vpc_security_group_egress_rule" "from_ec2_to_rds" {
 # # INGRESS — Node Manager (5556) intra-cluster (self)
 # ############################################
 # resource "aws_security_group_rule" "ing_5556_self" {
-#   count                    = local.is_development ? 1 : 0
+#   count                    = local.is-development ? 1 : 0
 #   type                     = "ingress"
 #   description              = "WL Node Manager intra-SG"
 #   security_group_id        = aws_security_group.ssogen_sg[0].id
@@ -185,7 +185,7 @@ resource "aws_vpc_security_group_egress_rule" "from_ec2_to_rds" {
 # # TEMP INGRESS — ICMP Echo (self + WorkSpaces)
 # ############################################
 # resource "aws_security_group_rule" "ing_icmp_self" {
-#   count                    = local.is_development ? 1 : 0
+#   count                    = local.is-development ? 1 : 0
 #   type                     = "ingress"
 #   description              = "TEMP: ICMP Echo from SSOGEN (self)"
 #   security_group_id        = aws_security_group.ssogen_sg[0].id
@@ -196,7 +196,7 @@ resource "aws_vpc_security_group_egress_rule" "from_ec2_to_rds" {
 # }
 
 # resource "aws_security_group_rule" "ing_icmp_workspaces" {
-#   count             = local.is_development ? 1 : 0
+#   count             = local.is-development ? 1 : 0
 #   type              = "ingress"
 #   description       = "TEMP: ICMP Echo from WorkSpaces subnets"
 #   security_group_id = aws_security_group.ssogen_sg[0].id
@@ -213,7 +213,7 @@ resource "aws_vpc_security_group_egress_rule" "from_ec2_to_rds" {
 # # EGRESS — Oracle LDAP (non-SSL + SSL)
 # ############################################
 # resource "aws_security_group_rule" "eg_ldap_1389" {
-#   count             = local.is_development ? 1 : 0
+#   count             = local.is-development ? 1 : 0
 #   type              = "egress"
 #   description       = "Oracle LDAP"
 #   security_group_id = aws_security_group.ssogen_sg[0].id
@@ -224,7 +224,7 @@ resource "aws_vpc_security_group_egress_rule" "from_ec2_to_rds" {
 # }
 
 # resource "aws_security_group_rule" "eg_ldap_1636_ssl" {
-#   count             = local.is_development ? 1 : 0
+#   count             = local.is-development ? 1 : 0
 #   type              = "egress"
 #   description       = "Oracle LDAP SSL"
 #   security_group_id = aws_security_group.ssogen_sg[0].id
@@ -238,7 +238,7 @@ resource "aws_vpc_security_group_egress_rule" "from_ec2_to_rds" {
 # # EGRESS — 80/443
 # ############################################
 # resource "aws_security_group_rule" "eg_http_80" {
-#   count             = local.is_development ? 1 : 0
+#   count             = local.is-development ? 1 : 0
 #   type              = "egress"
 #   description       = "Allow outbound HTTP"
 #   security_group_id = aws_security_group.ssogen_sg[0].id
@@ -249,7 +249,7 @@ resource "aws_vpc_security_group_egress_rule" "from_ec2_to_rds" {
 # }
 
 # resource "aws_security_group_rule" "eg_https_443" {
-#   count             = local.is_development ? 1 : 0
+#   count             = local.is-development ? 1 : 0
 #   type              = "egress"
 #   description       = "Allow outbound HTTPS"
 #   security_group_id = aws_security_group.ssogen_sg[0].id
@@ -263,7 +263,7 @@ resource "aws_vpc_security_group_egress_rule" "from_ec2_to_rds" {
 # # TEMP EGRESS — ICMP Echo to VPC + WorkSpaces
 # ############################################
 # resource "aws_security_group_rule" "eg_icmp_vpc_workspaces" {
-#   count             = local.is_development ? 1 : 0
+#   count             = local.is-development ? 1 : 0
 #   type              = "egress"
 #   description       = "TEMP: ICMP Echo egress to VPC + WorkSpaces"
 #   security_group_id = aws_security_group.ssogen_sg[0].id
@@ -283,7 +283,7 @@ resource "aws_vpc_security_group_egress_rule" "from_ec2_to_rds" {
 # #########################################
 
 resource "aws_vpc_security_group_ingress_rule" "ing_4443_from_alb" {
-  count                        = local.is_development ? 1 : 0
+  count                        = local.is-development ? 1 : 0
   security_group_id            = aws_security_group.ssogen_sg[0].id
   description                  = "Allow inbound HTTPS (4443) from SSOGEN internal ALB"
   from_port                    = 4443
@@ -297,7 +297,7 @@ resource "aws_vpc_security_group_ingress_rule" "ing_4443_from_alb" {
 # #########################################
 
 resource "aws_vpc_security_group_ingress_rule" "ing_7001_from_alb" {
-  count                        = local.is_development ? 1 : 0
+  count                        = local.is-development ? 1 : 0
   security_group_id            = aws_security_group.ssogen_sg[0].id
   description                  = "Allow inbound HTTPS (7001) from SSOGEN internal ALB"
   from_port                    = 7001
