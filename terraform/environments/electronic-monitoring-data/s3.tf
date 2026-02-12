@@ -636,7 +636,7 @@ module "s3-data-bucket" {
 # ------------------------------------------------------------------------
 
 data "aws_secretsmanager_secret_version" "account_details" {
-  count     = local.is-test || local.is-production ? 1 : 0
+  count     = local.is-test || local.is-preproduction || local.is-production ? 1 : 0
   secret_id = module.cross_account_details[0].secret_id
 }
 
