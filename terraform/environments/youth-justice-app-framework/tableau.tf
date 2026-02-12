@@ -3,24 +3,38 @@ module "tableau_cert" {
 
   project_name = local.project_name
 
+  r53_zone_id      = module.public_dns_zone.aws_route53_zone_id
+  domain_name      = "${local.application_data.accounts[local.environment].tableau_website_name}.${local.application_data.accounts[local.environment].domain_name}"
+  validate_certs   = local.application_data.accounts[local.environment].validate_certs
+
+  tags = local.tags
+}
+
+module "tableau_test_cert" {
+  source = "./modules/dns/certs"
+
+  count = local.application_data.accounts[local.environment].tableau_test_active ? 1 : 0
+
+  project_name = local.project_name
+
   r53_zone_id    = module.public_dns_zone.aws_route53_zone_id
-  domain_name    = "${local.application_data.accounts[local.environment].tableau_website_name}.${local.application_data.accounts[local.environment].domain_name}"
+  domain_name    ="${local.application_data.accounts[local.environment].tableau_test_website_name}.${local.application_data.accounts[local.environment].domain_name}"
   validate_certs = local.application_data.accounts[local.environment].validate_certs
 
   tags = local.tags
 }
 
-
 module "tableau" {
   source = "./modules/tableau"
-
-  # count = 0
 
   project_name = local.project_name
   # tags         = merge(local.tags, { Name = "AD Management Server" })
 
   environment = local.environment
   test_mode   = local.test_mode
+
+  tableau_blue_live = local.application_data.accounts[local.environment].tableau_blue_live
+  tableau_test_active = local.application_data.accounts[local.environment].tableau_test_active
 
   #Network details
   vpc_id            = data.aws_vpc.shared.id
@@ -34,8 +48,10 @@ module "tableau" {
 
   # ALB Details
   certificate_arn      = module.tableau_cert.domain_cert_arn
+  test_certificate_arn = local.application_data.accounts[local.environment].tableau_test_active ? module.tableau_test_cert[0].domain_cert_arn : null
   r53_zone_id          = module.public_dns_zone.aws_route53_zone_id
   tableau_website_name = local.application_data.accounts[local.environment].tableau_website_name
+  tableau_test_website_name = local.application_data.accounts[local.environment].tableau_test_website_name
 
 
   # Security Group IDs
