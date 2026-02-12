@@ -30,11 +30,12 @@ data "aws_iam_policy_document" "datasync" {
     sid    = "AllowKMS"
     effect = "Allow"
     actions = [
-      "kms:ReEncrypt*",
-      "kms:GenerateDataKey*",
-      "kms:Encrypt",
-      "kms:DescribeKey",
+      "kms:CreateGrant",
       "kms:Decrypt",
+      "kms:DescribeKey",
+      "kms:Encrypt",
+      "kms:GenerateDataKey*",
+      "kms:ReEncrypt*"
     ]
     resources = [module.s3_datasync_opg_kms.key_arn]
   }
@@ -60,6 +61,7 @@ data "aws_iam_policy_document" "datasync" {
       "s3:GetObjectVersionTagging",
       "s3:ListMultipartUploadParts",
       "s3:PutObject",
+      "s3:PutObjectAcl",
       "s3:PutObjectTagging"
     ]
     resources = ["${module.datasync_opg_bucket.s3_bucket_arn}/*"]

@@ -237,9 +237,29 @@ module "s3_datasync_opg_kms" {
   description           = "DataSync OPG S3 KMS Key"
   enable_default_policy = true
 
-  key_users = [
-    module.datasync_iam_role.arn,
-    module.datasync_opg_replication_iam_role.arn
+  key_statements = [
+    {
+      sid = "AllowDataSyncRole"
+      actions = [
+        "kms:CreateGrant",
+        "kms:Decrypt",
+        "kms:DescribeKey",
+        "kms:Encrypt",
+        "kms:GenerateDataKey*",
+        "kms:ReEncrypt*"
+      ]
+      resources = ["*"]
+      effect    = "Allow"
+      principals = [
+        {
+          type = "AWS"
+          identifiers = [
+            module.datasync_iam_role.arn,
+            module.datasync_opg_replication_iam_role.arn
+          ]
+        }
+      ]
+    }
   ]
 
   deletion_window_in_days = 7

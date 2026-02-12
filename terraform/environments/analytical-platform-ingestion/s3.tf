@@ -266,6 +266,7 @@ data "aws_iam_policy_document" "datasync_opg_policy" {
       "s3:GetObjectVersionTagging",
       "s3:ListMultipartUploadParts",
       "s3:PutObject",
+      "s3:PutObjectAcl",
       "s3:PutObjectTagging"
     ]
     resources = [
