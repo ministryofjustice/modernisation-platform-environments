@@ -151,7 +151,7 @@ resource "aws_cloudwatch_metric_alarm" "ssogen_alb_healthyhosts_admin" {
 #   }
 # }
 
-resource "aws_cloudwatch_metric_alarm" "disk_free_ssogen_home" {
+resource "aws_cloudwatch_metric_alarm" "disk_free_ssogen_home_primary" {
   count                     = local.application_data.accounts[local.environment].ssogen_no_instances
   alarm_name                = "${local.application_data.accounts[local.environment].short_env}-ssogen${count.index + 1}-disk_free-home"
   alarm_description         = "This metric monitors the amount of free disk space on /home mount. If the amount of free disk space on root falls below 20% for 2 minutes, the alarm will trigger"
@@ -160,6 +160,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ssogen_home" {
   namespace                 = "CWAgent"
   statistic                 = "Average"
   insufficient_data_actions = [aws_sns_topic.cw_alerts.arn]
+  treat_missing_data        = "notBreaching"
 
   evaluation_periods  = local.application_data.cloudwatch_ec2.disk.eval_periods
   datapoints_to_alarm = local.application_data.cloudwatch_ec2.disk.eval_periods
@@ -175,7 +176,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ssogen_home" {
   }
 }
 
-resource "aws_cloudwatch_metric_alarm" "disk_free_ssogen_home" {
+resource "aws_cloudwatch_metric_alarm" "disk_free_ssogen_home_secondary" {
   count                     = local.application_data.accounts[local.environment].ssogen_no_instances
   alarm_name                = "${local.application_data.accounts[local.environment].short_env}-ssogen${count.index + 1}-disk_free-home"
   alarm_description         = "This metric monitors the amount of free disk space on /home mount. If the amount of free disk space on root falls below 20% for 2 minutes, the alarm will trigger"
@@ -184,6 +185,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ssogen_home" {
   namespace                 = "CWAgent"
   statistic                 = "Average"
   insufficient_data_actions = [aws_sns_topic.cw_alerts.arn]
+  treat_missing_data        = "notBreaching"
 
   evaluation_periods  = local.application_data.cloudwatch_ec2.disk.eval_periods
   datapoints_to_alarm = local.application_data.cloudwatch_ec2.disk.eval_periods
