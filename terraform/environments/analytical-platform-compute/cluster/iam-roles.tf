@@ -162,8 +162,9 @@ module "cloudwatch_observability_iam_role" {
   name = "cloudwatch-observability"
 
   policies = {
-    CloudWatchAgentServerPolicy = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
-    AWSXrayWriteOnlyAccess      = "arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess"
+    CloudWatchAgentServerPolicy   = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+    AWSXrayWriteOnlyAccess        = "arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess"
+    EKSClusterLogsKMSAccessPolicy = module.eks_cluster_logs_kms_access_iam_policy.arn
   }
 
   oidc_providers = {

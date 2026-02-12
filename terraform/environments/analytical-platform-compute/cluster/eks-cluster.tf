@@ -76,6 +76,23 @@ module "eks" {
     amazon-cloudwatch-observability = {
       addon_version            = local.environment_configuration.eks_cluster_addon_versions.amazon_cloudwatch_observability
       service_account_role_arn = module.cloudwatch_observability_iam_role.arn
+      configuration_values = jsonencode({
+        containerLogs = {
+          fluentBit = {
+            config = {
+              outputs = <<-EOT
+                [OUTPUT]
+                    Name cloudwatch_logs
+                    Match *
+                    region ${data.aws_region.current.name}
+                    log_group_name ${local.eks_cloudwatch_log_group_name}
+                    log_stream_prefix fluentbit-
+                    auto_create_group false
+              EOT
+            }
+          }
+        }
+      })
     }
     vpc-cni = {
       addon_version            = local.environment_configuration.eks_cluster_addon_versions.vpc_cni
