@@ -92,6 +92,17 @@ module "eks" {
             }
           }
         }
+        agent = {
+          config = {
+            logs = {
+              metrics_collected = {
+                kubernetes = {
+                  enhanced_container_insights = false
+                }
+              }
+            }
+          }
+        }
       })
     }
     vpc-cni = {
