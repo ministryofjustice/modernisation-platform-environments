@@ -32,7 +32,7 @@ module "yjsm_hub_svc_cloudfront" {
   alb_dns                        = module.yjsm_hub_svc_alb.dns_name
   waf_web_acl_arn                = module.waf-cf.waf_arn
   r53_zone_id                    = module.public_dns_zone.aws_route53_zone_id
-  cloudfront_route53_record_name = "yjsm-hub-svc"
+  cloudfront_route53_record_name = "gateway"
   kms_key_arn                    = module.kms.key_arn
   environment                    = local.environment
   project_name                   = local.project_name
