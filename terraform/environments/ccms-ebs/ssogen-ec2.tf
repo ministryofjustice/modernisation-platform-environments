@@ -5,7 +5,7 @@
 data "template_file" "launch-template" {
   template = file("${path.module}/templates/ec2_user_data_ssogen.sh")
   vars = {
-    hostname.          = "${local.application_name}-ssogen"
+    hostname           = "${local.application_name}-ssogen"
     deploy_environment = local.environment
   }
 }
