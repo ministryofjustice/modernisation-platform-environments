@@ -1,6 +1,6 @@
 # IAM Role for SSOGEN EC2
 resource "aws_iam_role" "ssogen_ec2" {
-  count = local.is_development ? 1 : 0
+  count = local.is-development || local.is-test ? 1 : 0
 
   name = "ssogen-ec2-role-${local.environment}"
   assume_role_policy = jsonencode({
@@ -29,7 +29,7 @@ resource "aws_iam_instance_profile" "ssogen_instance_profile" {
 
 # Attach SSM permissions (Session Manager, logging, patching, etc.)
 resource "aws_iam_role_policy_attachment" "ssogen_ssm" {
-  count = local.is_development ? 1 : 0
+  count = local.is-development ? 1 : 0
 
   role       = aws_iam_role.ssogen_ec2[0].name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
@@ -37,7 +37,7 @@ resource "aws_iam_role_policy_attachment" "ssogen_ssm" {
 
 # Secrets Manager read-only  (kept exactly as in your file)
 resource "aws_iam_role_policy_attachment" "ssogen_secrets_read" {
-  count = local.is_development ? 1 : 0
+  count = local.is-development ? 1 : 0
 
   role       = aws_iam_role.ssogen_ec2[0].name
   policy_arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
