@@ -20,7 +20,7 @@ resource "aws_lb" "ssogen_alb" {
   )
 }
 
-resource "aws_lb_target_group" "ssogen_internal_tg1" {
+resource "aws_lb_target_group" "ssogen_internal_tg_ssogen_app" {
   count       = local.is-development || local.is-test ? 1 : 0
   name        = lower(format("tg-%s-ssogen", local.application_name))
   port        = local.application_data.accounts[local.environment].tg_ssogen_apps_port
@@ -46,7 +46,7 @@ resource "aws_lb_target_group" "ssogen_internal_tg1" {
   }
 }
 
-resource "aws_lb_target_group" "ssogen_internal_tg_admin" {
+resource "aws_lb_target_group" "ssogen_internal_tg_ssogen_admin" { 
   count       = local.is-development || local.is-test ? 1 : 0
   name        = lower(format("tg-%s-ssogen", local.application_name))
   port        = local.application_data.accounts[local.environment].tg_ssogen_admin_port
@@ -82,7 +82,7 @@ resource "aws_lb_listener" "ssogen_internal_listener" {
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.ssogen_internal_tg1[count.index].arn
+    target_group_arn = aws_lb_target_group.ssogen_internal_tg_ssogen_app[count.index].arn
   }
 
   depends_on = [aws_acm_certificate_validation.external_nonprod]
@@ -99,7 +99,7 @@ resource "aws_lb_listener" "ssogen_internal_console_listener" {
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.ssogen_internal_tg2[count.index].arn
+    target_group_arn = aws_lb_target_group.ssogen_internal_tg_ssogen_admin[count.index].arn
   }
 
   depends_on = [aws_acm_certificate_validation.external_nonprod]
