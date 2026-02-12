@@ -7,7 +7,7 @@ resource "aws_wafv2_ip_set" "ssogen_waf_ip_set" {
   description        = "List of trusted IP Addresses allowing access via WAF"
 
   addresses = [
-    local.application_data.accounts[local.environment].aws_workspace,
+    local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_prod,
     data.aws_subnet.private_subnets_a.cidr_block,
     data.aws_subnet.private_subnets_b.cidr_block,
     data.aws_subnet.private_subnets_c.cidr_block
