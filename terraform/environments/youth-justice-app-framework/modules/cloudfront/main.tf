@@ -116,7 +116,7 @@ resource "aws_s3_bucket" "cloudfront" {
   #checkov:skip=CKV_AWS_21:  "Bucket versioning is not required"
   #checkov:skip=CKV2_AWS_61:  "lift and shift" todo fix later  
   #checkov:skip=CKV2_AWS_62:  "lift and shift"
-  bucket = "${var.project_name}-${var.environment}-cloudfront-logs"
+  bucket = "${var.cloudfront_route53_record_name}-${var.environment}-cloudfront-logs"
   tags   = var.tags
 }
 
@@ -144,7 +144,7 @@ resource "aws_s3_bucket_public_access_block" "cloudfront" {
 }
 
 resource "aws_cloudfront_origin_request_policy" "headers_policy" {
-  name    = "cloudfront-yjaf-headers-policy"
+  name    = "cloudfront-${var.cloudfront_route53_record_name}-headers-policy"
   comment = "Policy to include all viewer headers, all query strings, and no cookies."
 
   headers_config {
@@ -175,7 +175,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "cloudfront" {
 
 resource "aws_cloudfront_response_headers_policy" "strict_transport_security" {
   #checkov:skip=CKV_AWS_259:Todo fix this later
-  name    = "Strict-Transport-Security"
+  name    = "${var.cloudfront_route53_record_name}-Strict-Transport-Security"
   comment = "Policy to enforce Strict-Transport-Security header."
 
   security_headers_config {
