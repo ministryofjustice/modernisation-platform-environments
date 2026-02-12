@@ -143,7 +143,7 @@ resource "aws_codedeploy_deployment_group" "this" {
   load_balancer_info {
     target_group_pair_info {
       prod_traffic_route {
-        listener_arns = [ lookup(
+        listener_arns = [lookup(
           {
             "internal"     = data.aws_lb_listener.internal.arn
             "external"     = data.aws_lb_listener.external.arn
@@ -151,8 +151,8 @@ resource "aws_codedeploy_deployment_group" "this" {
           },
           each.value[join("", keys(each.value))],
           data.aws_lb_listener.internal.arn
-        ) ]
-      } 
+        )]
+      }
 
       target_group {
         name = data.aws_lb_target_group.one[each.key].name

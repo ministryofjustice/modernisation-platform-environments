@@ -91,7 +91,8 @@
         "dps-applications",
         "dps-manage-pom",
         "dps-san",
-        "dps-cvl"
+        "dps-cvl",
+        "dps-adjudications"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -326,7 +327,8 @@
         "dps-applications",
         "dps-manage-pom",
         "dps-san",
-        "dps-cvl"
+        "dps-cvl",
+        "dps-adjudications"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -540,7 +542,8 @@
         "dps-applications",
         "dps-manage-pom",
         "dps-san",
-        "dps-cvl"
+        "dps-cvl",
+        "dps-adjudications"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -771,7 +774,8 @@
         "dps-applications",
         "dps-manage-pom",
         "dps-san",
-        "dps-cvl"
+        "dps-cvl",
+        "dps-adjudications"
       ],
       "alarms": {
         "setup_cw_alarms": true,

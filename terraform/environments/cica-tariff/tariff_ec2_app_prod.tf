@@ -59,6 +59,7 @@ resource "aws_volume_attachment" "tariff_app2_storage_attachment" {
   instance_id = aws_instance.tariff_app_2[0].id
 }
 
+/*
 #Clone of Production App server - first instance
 resource "aws_instance" "tariff_app_prod_clone" {
   count = local.environment == "production" ? 1 : 0
@@ -84,7 +85,7 @@ resource "aws_instance" "tariff_app_prod_clone" {
     }), local.tags, local.environment != "production" ? tomap({ "backup" = "true" }) : tomap({})
   )
 }
-/*
+
 #Temporary SG to restrict access to/from Clone above during configuration phase
 resource "aws_security_group" "temp_ssm_only" {
   count       = local.environment == "production" ? 1 : 0
