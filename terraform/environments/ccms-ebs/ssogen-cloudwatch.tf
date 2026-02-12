@@ -13,7 +13,7 @@ resource "aws_cloudwatch_metric_alarm" "alb_ssogen_5xx" {
   threshold           = 10
   alarm_description   = "Alarm when the number of 5xx errors from the ssogen ALB exceeds 10 in a 3 minute period"
   dimensions = {
-    LoadBalancer = aws_lb.ssogen.name
+    LoadBalancer = aws_lb.ssogen_alb[count.index].name
   }
   treat_missing_data = "notBreaching"
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
@@ -22,7 +22,7 @@ resource "aws_cloudwatch_metric_alarm" "alb_ssogen_5xx" {
   tags = local.tags
 }
 
-# Underlying EC2 Instance Status Check Failure
+# Underlying EC2 Instance Status Check Failure for Primary ASG
 resource "aws_cloudwatch_metric_alarm" "Status_Check_Failure1" {
   alarm_name          = "${local.application_name}-${local.environment}-ssogen-ec2-status-check-failure"
   alarm_description   = "A ssogen EC2 instance has failed a status check, Runbook - https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
@@ -35,7 +35,7 @@ resource "aws_cloudwatch_metric_alarm" "Status_Check_Failure1" {
   threshold           = "1"
   treat_missing_data  = "notBreaching"
   dimensions = {
-    AutoScalingGroupName = aws_autoscaling_group.cluster-scaling-group1.name
+    AutoScalingGroupName = aws_autoscaling_group.ssogen-scaling-group-primary[count.index].name
   }
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
   ok_actions          = [aws_sns_topic.cw_alerts.arn]
@@ -56,7 +56,7 @@ resource "aws_cloudwatch_metric_alarm" "Status_Check_Failure2" {
   threshold           = "1"
   treat_missing_data  = "notBreaching"
   dimensions = {
-    AutoScalingGroupName = aws_autoscaling_group.cluster-scaling-group2.name
+    AutoScalingGroupName = aws_autoscaling_group.ssogen-scaling-group-secondary[count.index].name
   }
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
   ok_actions          = [aws_sns_topic.cw_alerts.arn]
@@ -89,7 +89,7 @@ resource "aws_cloudwatch_metric_alarm" "ssogen_waf_high_blocked_requests" {
   tags = local.tags
 }
 
-resource "aws_cloudwatch_metric_alarm" "ssogen_alb_healthyhosts" {
+resource "aws_cloudwatch_metric_alarm" "ssogen_alb_healthyhosts_app" {
   alarm_name          = "${local.application_name}-${local.environment}-ssogen-alb-targets-group"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = 1
@@ -98,12 +98,12 @@ resource "aws_cloudwatch_metric_alarm" "ssogen_alb_healthyhosts" {
   period              = 240
   statistic           = "Average"
   threshold           = local.application_data.accounts[local.environment].ssogen_no_instances
-  alarm_description   = "Number of healthy hosts in SSOGEN Target Group"
+  alarm_description   = "Number of healthy hosts in SSOGEN App Target Group"
   actions_enabled     = true
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
   ok_actions          = [aws_sns_topic.cw_alerts.arn]
   dimensions = {
-    TargetGroup  = aws_lb_target_group.ssogen_internal_tg1[count.index].arn_suffix
+    TargetGroup  = aws_lb_target_group.ssogen_internal_tg_ssogen_app[count.index].arn_suffix
     LoadBalancer = aws_lb.ssogen_alb[count.index].arn_suffix
   }
 }
@@ -117,7 +117,7 @@ resource "aws_cloudwatch_metric_alarm" "ssogen_alb_healthyhosts_admin" {
   period              = 240
   statistic           = "Average"
   threshold           = local.application_data.accounts[local.environment].ssogen_no_instances
-  alarm_description   = "Number of healthy hosts in Admin Target Group"
+  alarm_description   = "Number of healthy hosts in SSOGEN Admin Target Group"
   actions_enabled     = true
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
   ok_actions          = [aws_sns_topic.cw_alerts.arn]
@@ -127,10 +127,34 @@ resource "aws_cloudwatch_metric_alarm" "ssogen_alb_healthyhosts_admin" {
   }
 }
 
-resource "aws_cloudwatch_metric_alarm" "disk_free_ssogen_temp" {
+# resource "aws_cloudwatch_metric_alarm" "disk_free_ssogen_temp" {
+#   count                     = local.application_data.accounts[local.environment].ssogen_no_instances
+#   alarm_name                = "${local.application_data.accounts[local.environment].short_env}-ssogen${count.index + 1}-disk_free-temp"
+#   alarm_description         = "This metric monitors the amount of free disk space on /temp mount. If the amount of free disk space on root falls below 20% for 2 minutes, the alarm will trigger"
+#   comparison_operator       = "GreaterThanOrEqualToThreshold"
+#   metric_name               = "disk_used_percent"
+#   namespace                 = "CWAgent"
+#   statistic                 = "Average"
+#   insufficient_data_actions = [aws_sns_topic.cw_alerts.arn]
+
+#   evaluation_periods  = local.application_data.cloudwatch_ec2.disk.eval_periods
+#   datapoints_to_alarm = local.application_data.cloudwatch_ec2.disk.eval_periods
+#   period              = local.application_data.cloudwatch_ec2.disk.period
+#   threshold           = local.application_data.cloudwatch_ec2.disk.threshold
+#   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
+#   ok_actions          = [aws_sns_topic.cw_alerts.arn]
+
+#   dimensions = {
+#     AutoScalingGroupName = aws_autoscaling_group.cluster-scaling-group.name
+#     path         = "/temp"
+#     fstype       = "ext4"
+#   }
+# }
+
+resource "aws_cloudwatch_metric_alarm" "disk_free_ssogen_home" {
   count                     = local.application_data.accounts[local.environment].ssogen_no_instances
-  alarm_name                = "${local.application_data.accounts[local.environment].short_env}-ssogen${count.index + 1}-disk_free-temp"
-  alarm_description         = "This metric monitors the amount of free disk space on /temp mount. If the amount of free disk space on root falls below 20% for 2 minutes, the alarm will trigger"
+  alarm_name                = "${local.application_data.accounts[local.environment].short_env}-ssogen${count.index + 1}-disk_free-home"
+  alarm_description         = "This metric monitors the amount of free disk space on /home mount. If the amount of free disk space on root falls below 20% for 2 minutes, the alarm will trigger"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
   metric_name               = "disk_used_percent"
   namespace                 = "CWAgent"
@@ -145,8 +169,8 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ssogen_temp" {
   ok_actions          = [aws_sns_topic.cw_alerts.arn]
 
   dimensions = {
-    AutoScalingGroupName = aws_autoscaling_group.cluster-scaling-group.name
-    path         = "/temp"
+    AutoScalingGroupName = aws_autoscaling_group.ssogen-scaling-group-primary[count.index].name
+    path         = "/home"
     fstype       = "ext4"
   }
 }
@@ -169,7 +193,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ssogen_home" {
   ok_actions          = [aws_sns_topic.cw_alerts.arn]
 
   dimensions = {
-    AutoScalingGroupName = aws_autoscaling_group.cluster-scaling-group.name
+    AutoScalingGroupName = aws_autoscaling_group.ssogen-scaling-group-secondary[count.index].name
     path         = "/home"
     fstype       = "ext4"
   }
@@ -201,75 +225,75 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ssogen_home" {
 #   }
 # }
 
-resource "aws_cloudwatch_metric_alarm" "disk_free_ssogen_u01" {
-  count                     = local.application_data.accounts[local.environment].ebsapps_no_instances
-  alarm_name                = "${local.application_data.accounts[local.environment].short_env}-ssogen${count.index + 1}-disk_free-u01"
-  alarm_description         = "This metric monitors the amount of free disk space on /u01 mount. If the amount of free disk space on root falls below 20% for 2 minutes, the alarm will trigger"
-  comparison_operator       = "GreaterThanOrEqualToThreshold"
-  metric_name               = "disk_used_percent"
-  namespace                 = "CWAgent"
-  statistic                 = "Average"
-  insufficient_data_actions = [aws_sns_topic.cw_alerts.arn]
+# resource "aws_cloudwatch_metric_alarm" "disk_free_ssogen_u01" {
+#   count                     = local.application_data.accounts[local.environment].ebsapps_no_instances
+#   alarm_name                = "${local.application_data.accounts[local.environment].short_env}-ssogen${count.index + 1}-disk_free-u01"
+#   alarm_description         = "This metric monitors the amount of free disk space on /u01 mount. If the amount of free disk space on root falls below 20% for 2 minutes, the alarm will trigger"
+#   comparison_operator       = "GreaterThanOrEqualToThreshold"
+#   metric_name               = "disk_used_percent"
+#   namespace                 = "CWAgent"
+#   statistic                 = "Average"
+#   insufficient_data_actions = [aws_sns_topic.cw_alerts.arn]
 
-  evaluation_periods  = local.application_data.cloudwatch_ec2.disk.eval_periods
-  datapoints_to_alarm = local.application_data.cloudwatch_ec2.disk.eval_periods
-  period              = local.application_data.cloudwatch_ec2.disk.period
-  threshold           = local.application_data.cloudwatch_ec2.disk.threshold
-  alarm_actions       = [aws_sns_topic.cw_alerts.arn]
-  ok_actions          = [aws_sns_topic.cw_alerts.arn]
+#   evaluation_periods  = local.application_data.cloudwatch_ec2.disk.eval_periods
+#   datapoints_to_alarm = local.application_data.cloudwatch_ec2.disk.eval_periods
+#   period              = local.application_data.cloudwatch_ec2.disk.period
+#   threshold           = local.application_data.cloudwatch_ec2.disk.threshold
+#   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
+#   ok_actions          = [aws_sns_topic.cw_alerts.arn]
 
-  dimensions = {
-    AutoScalingGroupName = aws_autoscaling_group.cluster-scaling-group.name
-    path         = "/u01"
-    fstype       = "ext4"
-  }
-}
+#   dimensions = {
+#     AutoScalingGroupName = aws_autoscaling_group.cluster-scaling-group.name
+#     path         = "/u01"
+#     fstype       = "ext4"
+#   }
+# }
 
-resource "aws_cloudwatch_metric_alarm" "disk_free_ssogen_u03" {
-  count                     = local.application_data.accounts[local.environment].ssogen_no_instances
-  alarm_name                = "${local.application_data.accounts[local.environment].short_env}-ssogen${count.index + 1}-disk_free-u03"
-  alarm_description         = "This metric monitors the amount of free disk space on /u03 mount. If the amount of free disk space on root falls below 20% for 2 minutes, the alarm will trigger"
-  comparison_operator       = "GreaterThanOrEqualToThreshold"
-  metric_name               = "disk_used_percent"
-  namespace                 = "CWAgent"
-  statistic                 = "Average"
-  insufficient_data_actions = [aws_sns_topic.cw_alerts.arn]
+# resource "aws_cloudwatch_metric_alarm" "disk_free_ssogen_u03" {
+#   count                     = local.application_data.accounts[local.environment].ssogen_no_instances
+#   alarm_name                = "${local.application_data.accounts[local.environment].short_env}-ssogen${count.index + 1}-disk_free-u03"
+#   alarm_description         = "This metric monitors the amount of free disk space on /u03 mount. If the amount of free disk space on root falls below 20% for 2 minutes, the alarm will trigger"
+#   comparison_operator       = "GreaterThanOrEqualToThreshold"
+#   metric_name               = "disk_used_percent"
+#   namespace                 = "CWAgent"
+#   statistic                 = "Average"
+#   insufficient_data_actions = [aws_sns_topic.cw_alerts.arn]
 
-  evaluation_periods  = local.application_data.cloudwatch_ec2.disk.eval_periods
-  datapoints_to_alarm = local.application_data.cloudwatch_ec2.disk.eval_periods
-  period              = local.application_data.cloudwatch_ec2.disk.period
-  threshold           = local.application_data.cloudwatch_ec2.disk.threshold
-  alarm_actions       = [aws_sns_topic.cw_alerts.arn]
-  ok_actions          = [aws_sns_topic.cw_alerts.arn]
-  dimensions = {
-    AutoScalingGroupName = aws_autoscaling_group.cluster-scaling-group.name
-    path         = "/u03"
-    fstype       = "ext4"
-  }
-}
+#   evaluation_periods  = local.application_data.cloudwatch_ec2.disk.eval_periods
+#   datapoints_to_alarm = local.application_data.cloudwatch_ec2.disk.eval_periods
+#   period              = local.application_data.cloudwatch_ec2.disk.period
+#   threshold           = local.application_data.cloudwatch_ec2.disk.threshold
+#   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
+#   ok_actions          = [aws_sns_topic.cw_alerts.arn]
+#   dimensions = {
+#     AutoScalingGroupName = aws_autoscaling_group.cluster-scaling-group.name
+#     path         = "/u03"
+#     fstype       = "ext4"
+#   }
+# }
 
-resource "aws_cloudwatch_metric_alarm" "disk_free_ssogen_stage" {
-  count                     = local.application_data.accounts[local.environment].ssogen_no_instances
-  alarm_name                = "${local.application_data.accounts[local.environment].short_env}-ssogen${count.index + 1}-disk_free-stage"
-  alarm_description         = "This metric monitors the amount of free disk space on /stage mount. If the amount of free disk space on root falls below 20% for 2 minutes, the alarm will trigger"
-  comparison_operator       = "GreaterThanOrEqualToThreshold"
-  metric_name               = "disk_used_percent"
-  namespace                 = "CWAgent"
-  statistic                 = "Average"
-  insufficient_data_actions = [aws_sns_topic.cw_alerts.arn]
+# resource "aws_cloudwatch_metric_alarm" "disk_free_ssogen_stage" {
+#   count                     = local.application_data.accounts[local.environment].ssogen_no_instances
+#   alarm_name                = "${local.application_data.accounts[local.environment].short_env}-ssogen${count.index + 1}-disk_free-stage"
+#   alarm_description         = "This metric monitors the amount of free disk space on /stage mount. If the amount of free disk space on root falls below 20% for 2 minutes, the alarm will trigger"
+#   comparison_operator       = "GreaterThanOrEqualToThreshold"
+#   metric_name               = "disk_used_percent"
+#   namespace                 = "CWAgent"
+#   statistic                 = "Average"
+#   insufficient_data_actions = [aws_sns_topic.cw_alerts.arn]
 
-  evaluation_periods  = local.application_data.cloudwatch_ec2.disk.eval_periods
-  datapoints_to_alarm = local.application_data.cloudwatch_ec2.disk.eval_periods
-  period              = local.application_data.cloudwatch_ec2.disk.period
-  threshold           = local.application_data.cloudwatch_ec2.disk.threshold
-  alarm_actions       = [aws_sns_topic.cw_alerts.arn]
-  ok_actions          = [aws_sns_topic.cw_alerts.arn]
-  dimensions = {
-    AutoScalingGroupName = aws_autoscaling_group.cluster-scaling-group.name
-    path         = "/stage"
-    fstype       = "ext4"
-  }
-}
+#   evaluation_periods  = local.application_data.cloudwatch_ec2.disk.eval_periods
+#   datapoints_to_alarm = local.application_data.cloudwatch_ec2.disk.eval_periods
+#   period              = local.application_data.cloudwatch_ec2.disk.period
+#   threshold           = local.application_data.cloudwatch_ec2.disk.threshold
+#   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
+#   ok_actions          = [aws_sns_topic.cw_alerts.arn]
+#   dimensions = {
+#     AutoScalingGroupName = aws_autoscaling_group.cluster-scaling-group.name
+#     path         = "/stage"
+#     fstype       = "ext4"
+#   }
+# }
 
 # resource "aws_cloudwatch_metric_alarm" "disk_free_ebsapps_backup_prod" {
 #   count                     = local.application_data.accounts[local.environment].ebsapps_no_instances

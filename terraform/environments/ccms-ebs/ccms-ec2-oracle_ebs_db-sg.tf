@@ -378,6 +378,7 @@ resource "aws_security_group_rule" "egress_traffic_ebsdb_2525" {
 
 #Ingress from ssogn ec2 instance security group to ebs db security group
 resource "aws_vpc_security_group_ingress_rule" "ingress_ssogen_to_ebsdb" {
+  count       = local.is-development || local.is-test ? 1 : 0
   security_group_id        = aws_security_group.ec2_sg_ebsdb.id
   description              = "Allow ssogen ec2 instances to access ebs db"
   from_port                = 1521
