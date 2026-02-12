@@ -6,6 +6,11 @@ resource "aws_datasync_location_s3" "opg" {
     bucket_access_role_arn = module.datasync_iam_role.arn
   }
 
+  depends_on = [
+    module.datasync_opg_bucket,
+    module.datasync_iam_role
+  ]
+
   tags = local.tags
 }
 

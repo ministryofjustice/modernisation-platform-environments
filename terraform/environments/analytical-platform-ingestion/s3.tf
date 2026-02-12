@@ -234,7 +234,7 @@ module "bold_egress_bucket" {
 
 data "aws_iam_policy_document" "datasync_opg_policy" {
   statement {
-    sid    = "AllowDataSyncRole"
+    sid    = "AllowDataSyncRoleBucketActions"
     effect = "Allow"
     principals {
       type        = "AWS"
@@ -243,7 +243,21 @@ data "aws_iam_policy_document" "datasync_opg_policy" {
     actions = [
       "s3:GetBucketLocation",
       "s3:ListBucket",
-      "s3:ListBucketMultipartUploads",
+      "s3:ListBucketMultipartUploads"
+    ]
+    resources = [
+      "arn:aws:s3:::mojap-ingestion-${local.environment}-datasync-opg"
+    ]
+  }
+
+  statement {
+    sid    = "AllowDataSyncRoleObjectActions"
+    effect = "Allow"
+    principals {
+      type        = "AWS"
+      identifiers = [module.datasync_iam_role.arn]
+    }
+    actions = [
       "s3:AbortMultipartUpload",
       "s3:DeleteObject",
       "s3:GetObject",
@@ -255,8 +269,7 @@ data "aws_iam_policy_document" "datasync_opg_policy" {
       "s3:PutObjectTagging"
     ]
     resources = [
-      "arn:aws:s3:::mojap-ingestion-${local.environment}-datasync-opg/*",
-      "arn:aws:s3:::mojap-ingestion-${local.environment}-datasync-opg"
+      "arn:aws:s3:::mojap-ingestion-${local.environment}-datasync-opg/*"
     ]
   }
 
