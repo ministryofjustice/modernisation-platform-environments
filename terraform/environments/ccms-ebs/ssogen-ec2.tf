@@ -10,127 +10,127 @@ data "template_file" "launch-template" {
   }
 }
 
-resource "aws_launch_template" "ssogen-ec2-launch-template-primary" {
-  count       = local.is-development || local.is-test ? 1 : 0
-  name_prefix   = local.application_name
-  image_id      = local.application_data.accounts[local.environment].ssogen_ami_id-1
-  instance_type = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ssogen
-  # key_name      = var.key_name
-  ebs_optimized = true
+# resource "aws_launch_template" "ssogen-ec2-launch-template-primary" {
+#   count       = local.is-development || local.is-test ? 1 : 0
+#   name_prefix   = local.application_name
+#   image_id      = local.application_data.accounts[local.environment].ssogen_ami_id-1
+#   instance_type = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ssogen
+#   # key_name      = var.key_name
+#   ebs_optimized = true
 
-  monitoring {
-    enabled = true
-  }
+#   monitoring {
+#     enabled = true
+#   }
 
-  iam_instance_profile {
-    name = aws_iam_instance_profile.ssogen_instance_profile[count.index].name
-  }
+#   iam_instance_profile {
+#     name = aws_iam_instance_profile.ssogen_instance_profile[count.index].name
+#   }
 
-  network_interfaces {
-    associate_public_ip_address = false
-    security_groups             = [aws_security_group.ssogen_sg[count.index].id]
-  }
+#   network_interfaces {
+#     associate_public_ip_address = false
+#     security_groups             = [aws_security_group.ssogen_sg[count.index].id]
+#   }
 
-  block_device_mappings {
-    device_name = "/dev/sda1"
-    ebs {
-      delete_on_termination = true
-      encrypted             = false
-      volume_size           = 30
-      volume_type           = "gp2"
-      iops                  = 0
-    }
-  }
+#   block_device_mappings {
+#     device_name = "/dev/sda1"
+#     ebs {
+#       delete_on_termination = true
+#       encrypted             = false
+#       volume_size           = 60
+#       volume_type           = "gp2"
+#       iops                  = 0
+#     }
+#   }
 
-  user_data = base64encode(data.template_file.launch-template.rendered)
+#   user_data = base64encode(data.template_file.launch-template.rendered)
 
-  tag_specifications {
-    resource_type = "instance"
-    tags = merge(local.tags,
-      { Name = lower(format("%s-%s-launch-template-primary", local.application_name, local.environment)) }
-    )
-  }
+#   tag_specifications {
+#     resource_type = "instance"
+#     tags = merge(local.tags,
+#       { Name = lower(format("%s-%s-launch-template-primary", local.application_name, local.environment)) }
+#     )
+#   }
 
-  tag_specifications {
-    resource_type = "instance"
-    tags = merge(local.tags,
-      { instance-scheduling = "skip-scheduling" }
-    )
-  }
+#   tag_specifications {
+#     resource_type = "instance"
+#     tags = merge(local.tags,
+#       { instance-scheduling = "skip-scheduling" }
+#     )
+#   }
 
-  tag_specifications {
-    resource_type = "volume"
-    tags = merge(local.tags,
-      { Name = lower(format("%s-%s-launch-template-primary", local.application_name, local.environment)) }
-    )
-  }
+#   tag_specifications {
+#     resource_type = "volume"
+#     tags = merge(local.tags,
+#       { Name = lower(format("%s-%s-launch-template-primary", local.application_name, local.environment)) }
+#     )
+#   }
 
-  tags = merge(local.tags,
-    { Name = lower(format("%s-%s-launch-template-primary", local.application_name, local.environment)) }
-  )
+#   tags = merge(local.tags,
+#     { Name = lower(format("%s-%s-launch-template-primary", local.application_name, local.environment)) }
+#   )
 
-}
+# }
 
-resource "aws_launch_template" "ssogen-ec2-launch-template-secondary" {
-  count         = local.is-development || local.is-test ? 1 : 0
-  name_prefix   = local.application_name
-  image_id      = local.application_data.accounts[local.environment].ssogen_ami_id-2
-  instance_type = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ssogen
-  # key_name      = var.key_name
-  ebs_optimized = true
+# resource "aws_launch_template" "ssogen-ec2-launch-template-secondary" {
+#   count         = local.is-development || local.is-test ? 1 : 0
+#   name_prefix   = local.application_name
+#   image_id      = local.application_data.accounts[local.environment].ssogen_ami_id-2
+#   instance_type = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ssogen
+#   # key_name      = var.key_name
+#   ebs_optimized = true
 
-  monitoring {
-    enabled = true
-  }
+#   monitoring {
+#     enabled = true
+#   }
 
-  iam_instance_profile {
-    name = aws_iam_instance_profile.ssogen_instance_profile[count.index].name
-  }
+#   iam_instance_profile {
+#     name = aws_iam_instance_profile.ssogen_instance_profile[count.index].name
+#   }
 
-  network_interfaces {
-    associate_public_ip_address = false
-    security_groups             = [aws_security_group.ssogen_sg[count.index].id]
-  }
+#   network_interfaces {
+#     associate_public_ip_address = false
+#     security_groups             = [aws_security_group.ssogen_sg[count.index].id]
+#   }
 
-  block_device_mappings {
-    device_name = "/dev/sda1"
-    ebs {
-      delete_on_termination = true
-      encrypted             = false
-      volume_size           = 30
-      volume_type           = "gp2"
-      iops                  = 0
-    }
-  }
+#   block_device_mappings {
+#     device_name = "/dev/sda1"
+#     ebs {
+#       delete_on_termination = true
+#       encrypted             = false
+#       volume_size           = 60
+#       volume_type           = "gp2"
+#       iops                  = 0
+#     }
+#   }
 
-  user_data = base64encode(data.template_file.launch-template.rendered)
+#   user_data = base64encode(data.template_file.launch-template.rendered)
 
-  tag_specifications {
-    resource_type = "instance"
-    tags = merge(local.tags,
-      { Name = lower(format("%s-%s-launch-template-secondary", local.application_name, local.environment)) }
-    )
-  }
+#   tag_specifications {
+#     resource_type = "instance"
+#     tags = merge(local.tags,
+#       { Name = lower(format("%s-%s-launch-template-secondary", local.application_name, local.environment)) }
+#     )
+#   }
 
-  tag_specifications {
-    resource_type = "instance"
-    tags = merge(local.tags,
-      { instance-scheduling = "skip-scheduling" }
-    )
-  }
+#   tag_specifications {
+#     resource_type = "instance"
+#     tags = merge(local.tags,
+#       { instance-scheduling = "skip-scheduling" }
+#     )
+#   }
 
-  tag_specifications {
-    resource_type = "volume"
-    tags = merge(local.tags,
-      { Name = lower(format("%s-%s-launch-template-secondary", local.application_name, local.environment)) }
-    )
-  }
+#   tag_specifications {
+#     resource_type = "volume"
+#     tags = merge(local.tags,
+#       { Name = lower(format("%s-%s-launch-template-secondary", local.application_name, local.environment)) }
+#     )
+#   }
 
-  tags = merge(local.tags,
-    { Name = lower(format("%s-%s-launch-template-secondary", local.application_name, local.environment)) }
-  )
+#   tags = merge(local.tags,
+#     { Name = lower(format("%s-%s-launch-template-secondary", local.application_name, local.environment)) }
+#   )
 
-}
+# }
 
 resource "aws_autoscaling_group" "ssogen-scaling-group-primary" {
   count               = local.is-development || local.is-test ? 1 : 0
