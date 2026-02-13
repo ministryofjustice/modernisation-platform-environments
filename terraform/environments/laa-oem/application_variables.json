@@ -15,8 +15,8 @@
       "key_name": "oem-ec2-key-development"
     },
     "test": {
-      "ec2_oem_ami_id_app": "ami-00a433d5bdf0bd23b",
-      "ec2_oem_ami_id_db": "ami-0383b69679d229ff9",
+      "ec2_oem_ami_id_app": "ami-076a3ec996e3e63e0",
+      "ec2_oem_ami_id_db": "ami-0048220e126b83bf3",
       "ec2_oem_ami_id_wl": "",
       "ec2_oem_instance_type_app": "m5.xlarge",
       "ec2_oem_instance_type_db": "c5.2xlarge",
