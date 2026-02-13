@@ -153,10 +153,10 @@ locals {
 
     web12 = {
       autoscaling_group = {
-        desired_capacity          = 2
+        desired_capacity          = 1
         force_delete              = true
-        max_size                  = 2
-        termination_policies      = ["NewestInstance"]
+        max_size                  = 1
+        termination_policies      = ["OldestInstance"]
         vpc_zone_identifier       = module.environment.subnets["private"].ids
         wait_for_capacity_timeout = 0
         warm_pool = {
