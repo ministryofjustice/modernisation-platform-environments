@@ -35,7 +35,7 @@ resource "aws_iam_role_policy_attachment" "ssogen_ssm" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
-
+# Need to tighten this policy to remove all resources
 resource "aws_iam_policy" "ssogen_ec2_instance_policy" {
   name = "${local.application_name}-ec2-instance-policy"
 
@@ -93,6 +93,11 @@ resource "aws_iam_policy" "ssogen_ec2_instance_policy" {
       "Effect": "Allow",
       "Action": ["secretsmanager:GetSecretValue"],
       "Resource": ["arn:aws:secretsmanager:eu-west-2:*:secret:*"]
+    },
+    {
+      "Effect": "Allow",
+      "Action": ["kms:GenerateDataKey*", "kms:Decrypt"],
+      "Resource": "*"
     }
   ]
 }
