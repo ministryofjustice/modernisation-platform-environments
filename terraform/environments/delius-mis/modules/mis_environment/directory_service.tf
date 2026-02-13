@@ -230,3 +230,31 @@ resource "aws_vpc_security_group_ingress_rule" "mis_ad_sg_udp_53" {
 
   tags = local.tags
 }
+
+resource "aws_vpc_security_group_ingress_rule" "mis_ad_sg_tcp_389" {
+  for_each = toset(local.forest_trust_domain_controllers_by_vpc[local.vpc_name])
+
+  description       = "Allow inbound tcp/389 from DC ${each.value}"
+  security_group_id = aws_directory_service_directory.mis_ad.security_group_id
+
+  cidr_ipv4   = each.value
+  ip_protocol = "TCP"
+  from_port   = 389
+  to_port     = 389
+
+  tags = local.tags
+}
+
+resource "aws_vpc_security_group_ingress_rule" "mis_ad_sg_udp_389" {
+  for_each = toset(local.forest_trust_domain_controllers_by_vpc[local.vpc_name])
+
+  description       = "Allow inbound udp/389 from DC ${each.value}"
+  security_group_id = aws_directory_service_directory.mis_ad.security_group_id
+
+  cidr_ipv4   = each.value
+  ip_protocol = "UDP"
+  from_port   = 389
+  to_port     = 389
+
+  tags = local.tags
+}
