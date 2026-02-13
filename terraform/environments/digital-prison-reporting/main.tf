@@ -853,7 +853,7 @@ module "ec2_bastion_host" {
   description                 = "EC2 bastion instance for accessing the private network"
   vpc                         = data.aws_vpc.shared.id
   cidr                        = [data.aws_vpc.shared.cidr_block]
-  subnet_ids                  = data.aws_subnet.private_subnets_a.id
+  subnet_ids                  = data.aws_subnet.private_subnets_b.id
   ec2_instance_type           = local.instance_type
   ami_image_id                = local.image_id
   aws_region                  = local.account_region
