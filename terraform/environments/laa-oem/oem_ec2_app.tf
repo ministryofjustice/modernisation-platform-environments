@@ -8,6 +8,9 @@ resource "aws_key_pair" "key_pair_app" {
 }
 
 resource "aws_instance" "oem_app" {
+  # AMI ID must match the value in application_variables.json
+  # Reverted from new AMI back to old AMI due to environment-specific configurations
+  # Do not update the AMI without testing, as changes to the AMI will cause Terraform to replace the instance
   ami                         = local.application_data.accounts[local.environment].ec2_oem_ami_id_app
   associate_public_ip_address = false
   availability_zone           = local.application_data.accounts[local.environment].ec2_zone
