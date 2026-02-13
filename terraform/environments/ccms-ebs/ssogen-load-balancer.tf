@@ -1,24 +1,24 @@
-# resource "aws_lb" "ssogen_alb" {
-#   count              = local.is-development || local.is-test ? 1 : 0
-#   name               = lower(format("lb-%s-ssogen-internal", local.application_name))
-#   internal           = true
-#   load_balancer_type = "application"
-#   security_groups    = [aws_security_group.sg_ssogen_internal_alb[count.index].id]
-#   subnets            = data.aws_subnets.shared-private.ids
+resource "aws_lb" "ssogen_alb" {
+  count              = local.is-development || local.is-test ? 1 : 0
+  name               = lower(format("lb-%s-ssogen-internal", local.application_name))
+  internal           = true
+  load_balancer_type = "application"
+  security_groups    = [aws_security_group.sg_ssogen_internal_alb[count.index].id]
+  subnets            = data.aws_subnets.shared-private.ids
 
-#   drop_invalid_header_fields = true
-#   enable_deletion_protection = true
+  drop_invalid_header_fields = true
+  enable_deletion_protection = true
 
-#   access_logs {
-#     bucket  = module.s3-bucket-logging.bucket.id
-#     prefix  = local.lb_log_prefix_ssogen_internal
-#     enabled = true
-#   }
+  access_logs {
+    bucket  = module.s3-bucket-logging.bucket.id
+    prefix  = local.lb_log_prefix_ssogen_internal
+    enabled = true
+  }
 
-#   tags = merge(local.tags,
-#     { Name = lower(format("lb-%s-ssogen-internal", local.application_name)) }
-#   )
-# }
+  tags = merge(local.tags,
+    { Name = lower(format("lb-%s-ssogen-internal", local.application_name)) }
+  )
+}
 
 resource "aws_lb_target_group" "ssogen_internal_tg_ssogen_app" {
   count       = local.is-development || local.is-test ? 1 : 0
