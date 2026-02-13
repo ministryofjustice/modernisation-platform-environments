@@ -193,3 +193,40 @@ resource "aws_vpc_security_group_egress_rule" "mis_ad_join" {
 
   tags = local.tags
 }
+
+locals {
+  forest_trust_domain_controllers_by_vpc = {
+    hmpps-development   = module.ip_addresses.active_directory_cidrs.azure.domain_controllers
+    hmpps-test          = module.ip_addresses.active_directory_cidrs.azure.domain_controllers
+    hmpps-preproduction = module.ip_addresses.active_directory_cidrs.hmpp.domain_controllers
+    hmpps-production    = module.ip_addresses.active_directory_cidrs.hmpp.domain_controllers
+  }
+}
+
+resource "aws_vpc_security_group_ingress_rule" "mis_ad_sg_tcp_53" {
+  for_each = toset(local.forest_trust_domain_controllers_by_vpc[local.vpc_name])
+
+  description       = "Allow inbound tcp/53 from DC ${each.value}"
+  security_group_id = aws_directory_service_directory.mis_ad.security_group_id
+
+  cidr_ipv4   = each.value
+  ip_protocol = "TCP"
+  from_port   = 53
+  to_port     = 53
+
+  tags = local.tags
+}
+
+resource "aws_vpc_security_group_ingress_rule" "mis_ad_sg_udp_53" {
+  for_each = toset(local.forest_trust_domain_controllers_by_vpc[local.vpc_name])
+
+  description       = "Allow inbound udp/53 from DC ${each.value}"
+  security_group_id = aws_directory_service_directory.mis_ad.security_group_id
+
+  cidr_ipv4   = each.value
+  ip_protocol = "UDP"
+  from_port   = 53
+  to_port     = 53
+
+  tags = local.tags
+}
