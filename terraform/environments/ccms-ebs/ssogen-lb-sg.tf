@@ -28,6 +28,17 @@ resource "aws_vpc_security_group_ingress_rule" "ingress_ssogen_internal_443_work
   cidr_ipv4         = local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_prod
 }
 
+# Allow 5443from AWS Workspaces
+resource "aws_vpc_security_group_ingress_rule" "ingress_ssogen_internal_443_workspaces" {
+  count             = local.is-development || local.is-test ? 1 : 0
+  security_group_id = aws_security_group.sg_ssogen_internal_alb[count.index].id
+  description       = "Allow HTTPS (5443) from AWS Workspaces CIDR"
+  from_port         = 5443
+  to_port           = 5443
+  ip_protocol       = "tcp"
+  cidr_ipv4         = local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_prod
+}
+
 # Allow HTTPS from AWS Workspaces
 resource "aws_vpc_security_group_ingress_rule" "ingress_ssogen_internal_7001_workspaces" {
   count             = local.is-development || local.is-test ? 1 : 0
