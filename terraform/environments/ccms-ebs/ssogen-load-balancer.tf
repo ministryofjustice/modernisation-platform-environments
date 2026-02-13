@@ -86,7 +86,7 @@ resource "aws_lb_listener" "ssogen_internal_listener" {
 resource "aws_lb_listener" "ssogen_internal_console_listener" {
   count             = local.is-development || local.is-test ? 1 : 0
   load_balancer_arn = aws_lb.ssogen_alb[count.index].arn
-  port              = "7001"
+  port              = "5443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
   certificate_arn   = aws_acm_certificate.external.arn
