@@ -11,7 +11,7 @@ locals {
         content_type = "text/plain"
       }
       rules = {
-        gateway-external = {
+        yjsm-hub-svc = {
           priority = 2
           actions = [
             {

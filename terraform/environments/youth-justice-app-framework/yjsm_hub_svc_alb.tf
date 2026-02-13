@@ -22,7 +22,7 @@ module "yjsm_hub_svc_alb" {
   
   #alb_route53_record_zone_id = module.private_dns_zone.aws_route53_zone_id #data.aws_route53_zone_id.inner.id
 
-  listeners              = local.external_listeners
+  listeners              = local.yjsm_hub_svc_listeners
   existing_target_groups = module.internal_alb.target_group_arns
 
   alb_ingress_with_cidr_blocks_rules = [
