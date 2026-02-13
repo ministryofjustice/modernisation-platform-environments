@@ -201,19 +201,20 @@ locals {
     hmpps-preproduction = module.ip_addresses.active_directory_cidrs.hmpp.domain_controllers
     hmpps-production    = module.ip_addresses.active_directory_cidrs.hmpp.domain_controllers
   }
+  # DNS is always needed; the other ports I think only required when trust is initially configured
   active_directory_sg_rules = [
     # ip_protocol, from_port, to_port
-    # ["TCP", 53, 53],
-    # ["UDP", 53, 53],
-    # ["TCP", 88, 88],
-    # ["UDP", 88, 88],
-    # ["UDP", 123, 123],
-    # ["TCP", 135, 135],
-    # ["TCP", 389, 389],
-    # ["UDP", 389, 389],
-    # ["TCP", 445, 445],
-    # ["UDP", 445, 445],
-    # ["TCP", 49152, 65535],
+    ["TCP", 53, 53],
+    ["UDP", 53, 53],
+    ["TCP", 88, 88],
+    ["UDP", 88, 88],
+    ["UDP", 123, 123],
+    ["TCP", 135, 135],
+    ["TCP", 389, 389],
+    ["UDP", 389, 389],
+    ["TCP", 445, 445],
+    ["UDP", 445, 445],
+    ["TCP", 49152, 65535],
   ]
   domain_controllers_and_active_directory_sg_rules = flatten([
     for dc_cidr in local.forest_trust_domain_controllers_by_vpc[local.vpc_name] : [
