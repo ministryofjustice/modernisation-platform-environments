@@ -172,7 +172,7 @@ resource "aws_autoscaling_group" "ssogen-scaling-group-secondary" {
    health_check_grace_period = 300
 
    launch_template {
-    id      = aws_launch_template.ssogen-ec2-launch-template-primary[count.index].id
+    id      = aws_launch_template.ssogen-ec2-launch-template-secondary[count.index].id
     version = "$Latest"
   }
 
