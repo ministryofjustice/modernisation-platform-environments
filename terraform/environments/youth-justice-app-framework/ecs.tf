@@ -43,12 +43,15 @@ module "ecs" {
   external_alb_security_group_id     = module.external_alb.alb_security_group_id
   internal_alb_security_group_id     = module.internal_alb.alb_security_group_id
   connectivity_alb_security_group_id = module.connectivity_alb.alb_security_group_id
+  yjsm_hub_svc_alb_security_group_id = module.yjsm_hub_svc_alb.alb_security_group_id
   external_alb_arn                   = module.external_alb.alb_arn
   internal_alb_arn                   = module.internal_alb.alb_arn
   connectivity_alb_arn               = module.connectivity_alb.alb_arn
+  yjsm_hub_svc_alb_arn               = module.yjsm_hub_svc_alb.alb_arn
   external_alb_name                  = module.external_alb.alb_name
   internal_alb_name                  = module.internal_alb.alb_name
   connectivity_alb_name              = module.connectivity_alb.alb_name
+  yjsm_hub_svc_alb_name              = module.yjsm_hub_svc_alb.alb_name
   #ECS details
   cluster_name                = "yjaf-cluster"
   ec2_instance_type           = "c6a.4xlarge"

@@ -23,6 +23,7 @@ variable "connectivity_alb_name" {
   type        = string
 }
 
+
 variable "yjsm_hub_svc_alb_name" {
   description = "The name of the yjsm hub svc service ALB"
   type        = string
