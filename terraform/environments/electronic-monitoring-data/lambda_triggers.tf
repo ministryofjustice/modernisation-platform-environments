@@ -231,7 +231,7 @@ resource "aws_s3_bucket_notification" "load_mdss_event" {
     filter_prefix = "serco/fms"
   }
   dynamic "queue" {
-    count = local.is-development ? 1 : 0 
+    for_each = local.is-development ? [1] : [] 
     content {
       queue_arn     = module.fms_fan_out_event_queue[0].sqs_queue.arn
       events        = ["s3:ObjectTagging:Put"]
