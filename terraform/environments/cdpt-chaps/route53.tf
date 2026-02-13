@@ -58,8 +58,8 @@ resource "aws_route53_record" "external_validation_dev" {
 }
 
 # Delegated env zone 
-data "aws_route53_zone" "external" {
-  provider     = aws.core.vpc
+data "aws_route53_zone" "external_env" {
+  provider     = aws.core-vpc
   name         = "hq-${local.environment}.modernisation-platform.service.justice.gov.uk"
   private_zone = false
 }
@@ -68,7 +68,7 @@ data "aws_route53_zone" "external" {
 resource "aws_route53_record" "external_nonprod" {
   count           = local.is-production ? 0 : 1
   provider        = aws.core-vpc
-  zone_id         = data.aws_route53_zone.external.zone_id
+  zone_id         = data.aws_route53_zone.external_env.zone_id
   name            = "${var.networking[0].application}.hq-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type            = "A"
   allow_overwrite = true
