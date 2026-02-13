@@ -85,7 +85,7 @@ resource "aws_ebs_volume" "oem_app_volume_opt_oem_app" {
   encrypted         = true
   iops              = 3000
   kms_key_id        = data.aws_kms_key.ebs_shared.arn
-  size              = 100
+  size              = local.is-test ? 100 : 50
   snapshot_id       = data.aws_ebs_snapshot.oem_app_volume_opt_oem_app.id
   type              = "gp3"
   depends_on        = [resource.aws_instance.oem_app]
