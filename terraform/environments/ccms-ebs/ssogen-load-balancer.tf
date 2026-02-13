@@ -46,9 +46,9 @@ resource "aws_lb_target_group" "ssogen_internal_tg_ssogen_app" {
   }
 }
 
-resource "aws_lb_target_group" "ssogen_internal_tg_ssogen_admin" { 
+resource "aws_lb_target_group" "ssogen_internal_tg_ssogen_console" { 
   count       = local.is-development || local.is-test ? 1 : 0
-  name        = lower(format("tg-%s-ssogen-admin", local.application_name))
+  name        = lower(format("tg-%s-ssogen-console", local.application_name))
   port        = local.application_data.accounts[local.environment].tg_ssogen_admin_port
   protocol    = "HTTP"
   vpc_id      = data.aws_vpc.shared.id
@@ -93,7 +93,7 @@ resource "aws_lb_listener" "ssogen_internal_console_listener" {
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.ssogen_internal_tg_ssogen_admin[count.index].arn
+    target_group_arn = aws_lb_target_group.ssogen_internal_tg_ssogen_console[count.index].arn
   }
 
   depends_on = [aws_acm_certificate_validation.external_nonprod]
