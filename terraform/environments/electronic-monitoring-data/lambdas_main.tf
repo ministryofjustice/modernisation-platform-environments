@@ -647,6 +647,7 @@ module "cloudwatch_alarm_threader" {
 # ------------------------------------------------------------------------------
 
 module "fan_out_tags" {
+  count = local.is-development ? 1 : 0
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "fan_out_tags"
