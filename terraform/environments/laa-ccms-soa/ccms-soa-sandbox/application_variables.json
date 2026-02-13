@@ -15,7 +15,7 @@
       "admin_app_count": "1",
       "admin_wl_mem_args": "-Xms8192m -Xmx12288m",
       "admin_xxsoa_ds_username": "XXSOA",
-      "admin_ebs_ds_url": "jdbc:oracle:thin:@ccms-ebs-db-upgrade.laa-test.modernisation-platform.service.justice.gov.uk:1521:EBSPATCH",
+      "admin_ebs_ds_url": "jdbc:oracle:thin:@//soa-db-sandbox.czg08kyeauqh.eu-west-2.rds.amazonaws.com:1521/SOADB",
       "admin_ebs_ds_username": "apps",
       "admin_ebssms_ds_url": "jdbc:oracle:thin:@cwa-db.aws.dev.sandbox.legalservices.gov.uk:1571:CWA",
       "xxsoa_ds_url": "jdbc:oracle:thin:@//ccms-edrms-tds-db.sandbox.c1oi2sogk1w3.eu-west-2.rds.amazonaws.com:1521/EDRMSTDS",
