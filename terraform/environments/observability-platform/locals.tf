@@ -24,4 +24,17 @@ locals {
     local.environment_management.account_ids,
     local.nonmp_account_ids
   )
+
+  securityhub_event_bus_name = "securityhub-central"
+
+  securityhub_source_account_ids = sort(distinct([
+    for account_name, account_id in local.environment_management.account_ids : account_id
+    if can(regex("^core-", account_name))
+  ]))
+
+  securityhub_account_name_map = {
+    for account_name, account_id in local.all_account_ids :
+    account_id => account_name if contains(local.securityhub_source_account_ids, account_id)
+  }
+
 }
