@@ -208,7 +208,7 @@ module "load_fms_event_queue" {
 module "fms_fan_out_event_queue" {
   source               = "./modules/sqs_s3_lambda_trigger"
   bucket               = module.s3-raw-formatted-data-bucket.bucket
-  lambda_function_name = module.fan_out_tags.lambda_function_name
+  lambda_function_name = module.fan_out_tags[0].lambda_function_name
   bucket_prefix        = local.bucket_prefix
   maximum_concurrency  = 100
   max_receive_count    = local.load_sqs_max_receive_count
