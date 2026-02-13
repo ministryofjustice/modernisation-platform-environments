@@ -1597,3 +1597,46 @@ resource "aws_iam_role_policy_attachment" "cloudwatch_alarm_threader_attach" {
   role       = aws_iam_role.cloudwatch_alarm_threader.name
   policy_arn = aws_iam_policy.cloudwatch_alarm_threader.arn
 }
+
+
+# ------------------------------------------------------------------------------
+# Fan Out Tags
+# ------------------------------------------------------------------------------
+
+resource "aws_iam_role" "fan_out_tags" {
+  name               = "fan_out_tags_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+data "aws_iam_policy_document" "fan_out_tags_policy_document" {
+  statement {
+    sid    = "S3Access"
+    effect = "Allow"
+    actions = [
+      "s3:GetObjectTagging",
+    ]
+    resources = [
+      "${module.s3-raw-formatted-data-bucket.bucket.arn}/*"
+    ]
+  }
+
+  statement {
+    sid    = "AllowSendMessagesToQueue"
+    effect = "Allow"
+    actions = [
+      "sqs:SendMessage",
+    ]
+    resources = [module.load_fms_event_queue.sqs_queue.arn]
+  }
+}
+
+resource "aws_iam_policy" "fan_out_tags" {
+  name   = "fan_out_tags_lambda_policy"
+  policy = data.aws_iam_policy_document.fan_out_tags_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "fan_out_tags_attach" {
+  role       = aws_iam_role.fan_out_tags.name
+  policy_arn = aws_iam_policy.fan_out_tags.arn
+}
+
