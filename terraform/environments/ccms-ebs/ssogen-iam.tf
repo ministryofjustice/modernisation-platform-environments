@@ -46,11 +46,10 @@ resource "aws_iam_policy" "ssogen_ec2_instance_policy" {
     {
       "Effect": "Allow",
       "Action": [
-        "ec2:DescribeTags",
         "logs:CreateLogStream",
         "logs:PutLogEvents"
       ],
-      "Resource": "*"
+      "Resource": "arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:/aws/*"
     },
     {
       "Effect": "Allow",
@@ -59,6 +58,7 @@ resource "aws_iam_policy" "ssogen_ec2_instance_policy" {
         "ds:CreateComputer",
         "ds:DescribeDirectories",
         "ec2:DescribeInstanceStatus",
+        "ec2:DescribeTags",
         "logs:*",
         "ssm:*",
         "ec2messages:*"
@@ -68,7 +68,7 @@ resource "aws_iam_policy" "ssogen_ec2_instance_policy" {
     {
       "Effect": "Allow",
       "Action": "iam:CreateServiceLinkedRole",
-      "Resource": "arn:aws:iam::*:role/aws-service-role/ssm.amazonaws.com/AWSServiceRoleForAmazonSSM*",
+      "Resource": "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-service-role/ssm.amazonaws.com/AWSServiceRoleForAmazonSSM*",
       "Condition": { "StringLike": { "iam:AWSServiceName": "ssm.amazonaws.com" } }
     },
     {
@@ -77,7 +77,7 @@ resource "aws_iam_policy" "ssogen_ec2_instance_policy" {
         "iam:DeleteServiceLinkedRole",
         "iam:GetServiceLinkedRoleDeletionStatus"
       ],
-      "Resource": "arn:aws:iam::*:role/aws-service-role/ssm.amazonaws.com/AWSServiceRoleForAmazonSSM*"
+      "Resource": "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-service-role/ssm.amazonaws.com/AWSServiceRoleForAmazonSSM*"
     },
     {
       "Effect": "Allow",
@@ -92,7 +92,7 @@ resource "aws_iam_policy" "ssogen_ec2_instance_policy" {
     {
       "Effect": "Allow",
       "Action": ["secretsmanager:GetSecretValue"],
-      "Resource": ["arn:aws:secretsmanager:eu-west-2:*:secret:*"]
+      "Resource": ["arn:aws:secretsmanager:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:secret:*"]
     },
     {
       "Effect": "Allow",
