@@ -229,7 +229,7 @@ resource "aws_lb_target_group_attachment" "oem_app_7803_internal" {
 }
 
 resource "aws_security_group" "load_balancer_internal" {
-  name_prefix = "${local.application_name}-lb-sg"
+  name_prefix = "${local.application_name}-lb-sg-"
   description = "Access to the EBS App server"
   vpc_id      = data.aws_vpc.shared.id
 
