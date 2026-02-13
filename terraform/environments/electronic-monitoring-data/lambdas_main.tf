@@ -656,7 +656,7 @@ module "fan_out_tags" {
   handler                        = "fan_out_tags.handler"
   memory_size                    = 512
   timeout                        = 60
-  reserved_concurrent_executions = 1
+  reserved_concurrent_executions = 100
 
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev          = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
