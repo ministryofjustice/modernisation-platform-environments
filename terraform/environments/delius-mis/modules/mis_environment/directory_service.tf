@@ -201,60 +201,43 @@ locals {
     hmpps-preproduction = module.ip_addresses.active_directory_cidrs.hmpp.domain_controllers
     hmpps-production    = module.ip_addresses.active_directory_cidrs.hmpp.domain_controllers
   }
+  active_directory_sg_rules = [
+    # ip_protocol, from_port, to_port
+    # ["TCP", 53, 53],
+    # ["UDP", 53, 53],
+    # ["TCP", 88, 88],
+    # ["UDP", 88, 88],
+    # ["UDP", 123, 123],
+    # ["TCP", 135, 135],
+    # ["TCP", 389, 389],
+    # ["UDP", 389, 389],
+    # ["TCP", 445, 445],
+    # ["UDP", 445, 445],
+    # ["TCP", 49152, 65535],
+  ]
+  domain_controllers_and_active_directory_sg_rules = flatten([
+    for dc_cidr in local.forest_trust_domain_controllers_by_vpc[local.vpc_name] : [
+      for sg_rule in local.active_directory_sg_rules : {
+        key = "${dc_cidr} ${sg_rule[0]} ${sg_rule[1]} ${sg_rule[2]}"
+        value = {
+          cidr_ipv4   = dc_cidr
+          ip_protocol = sg_rule[0]
+          from_port   = sg_rule[1]
+          to_port     = sg_rule[2]
+        }
+      }
+    ]
+  ])
 }
 
-resource "aws_vpc_security_group_ingress_rule" "mis_ad_sg_tcp_53" {
-  for_each = toset(local.forest_trust_domain_controllers_by_vpc[local.vpc_name])
+resource "aws_vpc_security_group_ingress_rule" "mis_ad_sg_inbound" {
+  for_each = { for item in local.domain_controllers_and_active_directory_sg_rules : item.key => item.value }
 
-  description       = "Allow inbound tcp/53 from DC ${each.value}"
   security_group_id = aws_directory_service_directory.mis_ad.security_group_id
-
-  cidr_ipv4   = each.value
-  ip_protocol = "TCP"
-  from_port   = 53
-  to_port     = 53
-
-  tags = local.tags
-}
-
-resource "aws_vpc_security_group_ingress_rule" "mis_ad_sg_udp_53" {
-  for_each = toset(local.forest_trust_domain_controllers_by_vpc[local.vpc_name])
-
-  description       = "Allow inbound udp/53 from DC ${each.value}"
-  security_group_id = aws_directory_service_directory.mis_ad.security_group_id
-
-  cidr_ipv4   = each.value
-  ip_protocol = "UDP"
-  from_port   = 53
-  to_port     = 53
-
-  tags = local.tags
-}
-
-resource "aws_vpc_security_group_ingress_rule" "mis_ad_sg_tcp_389" {
-  for_each = toset(local.forest_trust_domain_controllers_by_vpc[local.vpc_name])
-
-  description       = "Allow inbound tcp/389 from DC ${each.value}"
-  security_group_id = aws_directory_service_directory.mis_ad.security_group_id
-
-  cidr_ipv4   = each.value
-  ip_protocol = "TCP"
-  from_port   = 389
-  to_port     = 389
-
-  tags = local.tags
-}
-
-resource "aws_vpc_security_group_ingress_rule" "mis_ad_sg_udp_389" {
-  for_each = toset(local.forest_trust_domain_controllers_by_vpc[local.vpc_name])
-
-  description       = "Allow inbound udp/389 from DC ${each.value}"
-  security_group_id = aws_directory_service_directory.mis_ad.security_group_id
-
-  cidr_ipv4   = each.value
-  ip_protocol = "UDP"
-  from_port   = 389
-  to_port     = 389
+  cidr_ipv4         = each.value.cidr_ipv4
+  ip_protocol       = each.value.ip_protocol
+  from_port         = each.value.from_port
+  to_port           = each.value.to_port
 
   tags = local.tags
 }
