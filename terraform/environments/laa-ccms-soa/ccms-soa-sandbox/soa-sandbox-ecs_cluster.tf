@@ -221,3 +221,8 @@ resource "aws_ecs_service" "soasandbox-managed" {
     aws_ecs_service.soasandbox-admin,
   ]
 }
+
+# OUTPUT for SOA DB Password Check - Remove this once we confirm the ECS tasks can retrieve the password from secrets manager successfully
+output "soa_db_password_check" {
+  value = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:ccms/soasandbox/password::"
+}
