@@ -22,7 +22,7 @@ resource "aws_lb" "ssogen_alb" {
 
 resource "aws_lb_target_group" "ssogen_internal_tg_ssogen_app" {
   count       = local.is-development || local.is-test ? 1 : 0
-  name        = lower(format("tg-%s-ssogen", local.application_name))
+  name        = lower(format("tg-%s-ssogen-app", local.application_name))
   port        = local.application_data.accounts[local.environment].tg_ssogen_apps_port
   protocol    = "HTTPS"
   vpc_id      = data.aws_vpc.shared.id
@@ -48,7 +48,7 @@ resource "aws_lb_target_group" "ssogen_internal_tg_ssogen_app" {
 
 resource "aws_lb_target_group" "ssogen_internal_tg_ssogen_admin" { 
   count       = local.is-development || local.is-test ? 1 : 0
-  name        = lower(format("tg-%s-ssogen", local.application_name))
+  name        = lower(format("tg-%s-ssogen-admin", local.application_name))
   port        = local.application_data.accounts[local.environment].tg_ssogen_admin_port
   protocol    = "TCP"
   vpc_id      = data.aws_vpc.shared.id
