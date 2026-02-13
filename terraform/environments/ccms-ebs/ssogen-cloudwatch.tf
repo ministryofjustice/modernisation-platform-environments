@@ -93,45 +93,45 @@ resource "aws_cloudwatch_metric_alarm" "ssogen_waf_high_blocked_requests" {
   tags = local.tags
 }
 
-resource "aws_cloudwatch_metric_alarm" "ssogen_alb_healthyhosts_app" {
-  count           = local.is-development || local.is-test ? 1 : 0
-  alarm_name          = "${local.application_name}-${local.environment}-ssogen-alb-targets-group"
-  comparison_operator = "LessThanThreshold"
-  evaluation_periods  = 1
-  metric_name         = "HealthyHostCount"
-  namespace           = "AWS/ApplicationELB"
-  period              = 240
-  statistic           = "Average"
-  threshold           = local.application_data.accounts[local.environment].ssogen_no_instances
-  alarm_description   = "Number of healthy hosts in SSOGEN App Target Group"
-  actions_enabled     = true
-  alarm_actions       = [aws_sns_topic.cw_alerts.arn]
-  ok_actions          = [aws_sns_topic.cw_alerts.arn]
-  dimensions = {
-    TargetGroup  = aws_lb_target_group.ssogen_internal_tg_ssogen_app[count.index].arn_suffix
-    LoadBalancer = aws_lb.ssogen_alb[count.index].arn_suffix
-  }
-}
+# resource "aws_cloudwatch_metric_alarm" "ssogen_alb_healthyhosts_app" {
+#   count           = local.is-development || local.is-test ? 1 : 0
+#   alarm_name          = "${local.application_name}-${local.environment}-ssogen-alb-targets-group"
+#   comparison_operator = "LessThanThreshold"
+#   evaluation_periods  = 1
+#   metric_name         = "HealthyHostCount"
+#   namespace           = "AWS/ApplicationELB"
+#   period              = 240
+#   statistic           = "Average"
+#   threshold           = local.application_data.accounts[local.environment].ssogen_no_instances
+#   alarm_description   = "Number of healthy hosts in SSOGEN App Target Group"
+#   actions_enabled     = true
+#   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
+#   ok_actions          = [aws_sns_topic.cw_alerts.arn]
+#   dimensions = {
+#     TargetGroup  = aws_lb_target_group.ssogen_internal_tg_ssogen_app[count.index].arn_suffix
+#     LoadBalancer = aws_lb.ssogen_alb[count.index].arn_suffix
+#   }
+# }
 
-resource "aws_cloudwatch_metric_alarm" "ssogen_alb_healthyhosts_admin" {
-  count        = local.is-development || local.is-test ? 1 : 0
-  alarm_name          = "${local.application_name}-${local.environment}-ssogen-alb-targets-group"
-  comparison_operator = "LessThanThreshold"
-  evaluation_periods  = 1
-  metric_name         = "HealthyHostCount"
-  namespace           = "AWS/ApplicationELB"
-  period              = 240
-  statistic           = "Average"
-  threshold           = local.application_data.accounts[local.environment].ssogen_no_instances
-  alarm_description   = "Number of healthy hosts in SSOGEN Admin Target Group"
-  actions_enabled     = true
-  alarm_actions       = [aws_sns_topic.cw_alerts.arn]
-  ok_actions          = [aws_sns_topic.cw_alerts.arn]
-  dimensions = {
-    TargetGroup  = aws_lb_target_group.ssogen_internal_tg_ssogen_admin[count.index].arn_suffix
-    LoadBalancer = aws_lb.ssogen_alb[count.index].arn_suffix
-  }
-}
+# resource "aws_cloudwatch_metric_alarm" "ssogen_alb_healthyhosts_admin" {
+#   count        = local.is-development || local.is-test ? 1 : 0
+#   alarm_name          = "${local.application_name}-${local.environment}-ssogen-alb-targets-group"
+#   comparison_operator = "LessThanThreshold"
+#   evaluation_periods  = 1
+#   metric_name         = "HealthyHostCount"
+#   namespace           = "AWS/ApplicationELB"
+#   period              = 240
+#   statistic           = "Average"
+#   threshold           = local.application_data.accounts[local.environment].ssogen_no_instances
+#   alarm_description   = "Number of healthy hosts in SSOGEN Admin Target Group"
+#   actions_enabled     = true
+#   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
+#   ok_actions          = [aws_sns_topic.cw_alerts.arn]
+#   dimensions = {
+#     TargetGroup  = aws_lb_target_group.ssogen_internal_tg_ssogen_admin[count.index].arn_suffix
+#     LoadBalancer = aws_lb.ssogen_alb[count.index].arn_suffix
+#   }
+# }
 
 # resource "aws_cloudwatch_metric_alarm" "disk_free_ssogen_temp" {
 #   count                     = local.application_data.accounts[local.environment].ssogen_no_instances
