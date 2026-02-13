@@ -142,7 +142,7 @@ resource "aws_autoscaling_group" "ssogen-scaling-group-primary" {
 
   target_group_arns = [
     aws_lb_target_group.ssogen_internal_tg_ssogen_app[count.index].arn,
-    aws_lb_target_group.ssogen_internal_tg_ssogen_admin[count.index].arn
+    aws_lb_target_group.ssogen_internal_tg_ssogen_console[count.index].arn
   ]
 
    health_check_type         = "EC2"
@@ -165,7 +165,7 @@ resource "aws_autoscaling_group" "ssogen-scaling-group-secondary" {
 
   target_group_arns = [
     aws_lb_target_group.ssogen_internal_tg_ssogen_app[count.index].arn,
-    aws_lb_target_group.ssogen_internal_tg_ssogen_admin[count.index].arn
+    aws_lb_target_group.ssogen_internal_tg_ssogen_console[count.index].arn
   ]
 
    health_check_type         = "EC2"
