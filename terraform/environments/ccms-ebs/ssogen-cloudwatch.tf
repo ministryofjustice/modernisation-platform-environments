@@ -2,96 +2,96 @@
 # CloudWatch Alarms for SSOGEN
 #######################################
 # Alarm for ALB 5xx Errors
-resource "aws_cloudwatch_metric_alarm" "alb_ssogen_5xx" {
-  count               = local.is-development || local.is-test ? 1 : 0
-  alarm_name          = "${local.application_name}-${local.environment}-ssogen-5xx-errors"
-  comparison_operator = "GreaterThanThreshold"
-  evaluation_periods  = 3
-  metric_name         = "HTTPCode_ELB_5XX_Count"
-  namespace           = "AWS/ApplicationELB"
-  period              = 60
-  statistic           = "Sum"
-  threshold           = 10
-  alarm_description   = "Alarm when the number of 5xx errors from the ssogen ALB exceeds 10 in a 3 minute period"
-  dimensions = {
-    LoadBalancer = aws_lb.ssogen_alb[count.index].name
-  }
-  treat_missing_data = "notBreaching"
-  alarm_actions       = [aws_sns_topic.cw_alerts.arn]
-  ok_actions          = [aws_sns_topic.cw_alerts.arn]
+# resource "aws_cloudwatch_metric_alarm" "alb_ssogen_5xx" {
+#   count               = local.is-development || local.is-test ? 1 : 0
+#   alarm_name          = "${local.application_name}-${local.environment}-ssogen-5xx-errors"
+#   comparison_operator = "GreaterThanThreshold"
+#   evaluation_periods  = 3
+#   metric_name         = "HTTPCode_ELB_5XX_Count"
+#   namespace           = "AWS/ApplicationELB"
+#   period              = 60
+#   statistic           = "Sum"
+#   threshold           = 10
+#   alarm_description   = "Alarm when the number of 5xx errors from the ssogen ALB exceeds 10 in a 3 minute period"
+#   dimensions = {
+#     LoadBalancer = aws_lb.ssogen_alb[count.index].name
+#   }
+#   treat_missing_data = "notBreaching"
+#   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
+#   ok_actions          = [aws_sns_topic.cw_alerts.arn]
 
-  tags = local.tags
-}
+#   tags = local.tags
+# }
 
-# Underlying EC2 Instance Status Check Failure for Primary ASG
-resource "aws_cloudwatch_metric_alarm" "Status_Check_Failure1" {
-  count             = local.is-development || local.is-test ? 1 : 0
-  alarm_name          = "${local.application_name}-${local.environment}-ssogen-ec2-status-check-failure"
-  alarm_description   = "A ssogen EC2 instance has failed a status check, Runbook - https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
-  comparison_operator = "GreaterThanOrEqualToThreshold"
-  metric_name         = "StatusCheckFailed"
-  statistic           = "Maximum"
-  namespace           = "AWS/EC2"
-  period              = "60"
-  evaluation_periods  = "5"
-  threshold           = "1"
-  treat_missing_data  = "notBreaching"
-  dimensions = {
-    AutoScalingGroupName = aws_autoscaling_group.ssogen-scaling-group-primary[count.index].name
-  }
-  alarm_actions       = [aws_sns_topic.cw_alerts.arn]
-  ok_actions          = [aws_sns_topic.cw_alerts.arn]
+# # Underlying EC2 Instance Status Check Failure for Primary ASG
+# resource "aws_cloudwatch_metric_alarm" "Status_Check_Failure1" {
+#   count             = local.is-development || local.is-test ? 1 : 0
+#   alarm_name          = "${local.application_name}-${local.environment}-ssogen-ec2-status-check-failure"
+#   alarm_description   = "A ssogen EC2 instance has failed a status check, Runbook - https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
+#   comparison_operator = "GreaterThanOrEqualToThreshold"
+#   metric_name         = "StatusCheckFailed"
+#   statistic           = "Maximum"
+#   namespace           = "AWS/EC2"
+#   period              = "60"
+#   evaluation_periods  = "5"
+#   threshold           = "1"
+#   treat_missing_data  = "notBreaching"
+#   dimensions = {
+#     AutoScalingGroupName = aws_autoscaling_group.ssogen-scaling-group-primary[count.index].name
+#   }
+#   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
+#   ok_actions          = [aws_sns_topic.cw_alerts.arn]
 
-  tags = local.tags
-}
+#   tags = local.tags
+# }
 
-# Underlying EC2 Instance Status Check Failure
-resource "aws_cloudwatch_metric_alarm" "Status_Check_Failure2" {
-  count               = local.is-development || local.is-test ? 1 : 0
-  alarm_name          = "${local.application_name}-${local.environment}-ssogen-ec2-status-check-failure"
-  alarm_description   = "A ssogen EC2 instance has failed a status check, Runbook - https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
-  comparison_operator = "GreaterThanOrEqualToThreshold"
-  metric_name         = "StatusCheckFailed"
-  statistic           = "Maximum"
-  namespace           = "AWS/EC2"
-  period              = "60"
-  evaluation_periods  = "5"
-  threshold           = "1"
-  treat_missing_data  = "notBreaching"
-  dimensions = {
-    AutoScalingGroupName = aws_autoscaling_group.ssogen-scaling-group-secondary[count.index].name
-  }
-  alarm_actions       = [aws_sns_topic.cw_alerts.arn]
-  ok_actions          = [aws_sns_topic.cw_alerts.arn]
+# # Underlying EC2 Instance Status Check Failure
+# resource "aws_cloudwatch_metric_alarm" "Status_Check_Failure2" {
+#   count               = local.is-development || local.is-test ? 1 : 0
+#   alarm_name          = "${local.application_name}-${local.environment}-ssogen-ec2-status-check-failure"
+#   alarm_description   = "A ssogen EC2 instance has failed a status check, Runbook - https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
+#   comparison_operator = "GreaterThanOrEqualToThreshold"
+#   metric_name         = "StatusCheckFailed"
+#   statistic           = "Maximum"
+#   namespace           = "AWS/EC2"
+#   period              = "60"
+#   evaluation_periods  = "5"
+#   threshold           = "1"
+#   treat_missing_data  = "notBreaching"
+#   dimensions = {
+#     AutoScalingGroupName = aws_autoscaling_group.ssogen-scaling-group-secondary[count.index].name
+#   }
+#   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
+#   ok_actions          = [aws_sns_topic.cw_alerts.arn]
 
-  tags = local.tags
-}
+#   tags = local.tags
+# }
 
-# Underlying waf Instance Status Check Failure
-resource "aws_cloudwatch_metric_alarm" "ssogen_waf_high_blocked_requests" {
-  count               = local.is-development || local.is-test ? 1 : 0
-  alarm_name          = "${local.application_name}-${local.environment}-ssogen-waf-high-blocked-requests"
-  alarm_description   = "High number of requests blocked by WAF. Potential attack."
+# # Underlying waf Instance Status Check Failure
+# resource "aws_cloudwatch_metric_alarm" "ssogen_waf_high_blocked_requests" {
+#   count               = local.is-development || local.is-test ? 1 : 0
+#   alarm_name          = "${local.application_name}-${local.environment}-ssogen-waf-high-blocked-requests"
+#   alarm_description   = "High number of requests blocked by WAF. Potential attack."
 
-  comparison_operator = "GreaterThanThreshold"
-  metric_name         = "BlockedRequests"
-  namespace           = "AWS/WAFV2"
-  statistic           = "Sum"
-  period              = 60
-  evaluation_periods  = 5
-  threshold           = 50 # tune for your workload
-  treat_missing_data  = "notBreaching"
+#   comparison_operator = "GreaterThanThreshold"
+#   metric_name         = "BlockedRequests"
+#   namespace           = "AWS/WAFV2"
+#   statistic           = "Sum"
+#   period              = 60
+#   evaluation_periods  = 5
+#   threshold           = 50 # tune for your workload
+#   treat_missing_data  = "notBreaching"
 
-  dimensions = {
-    WebACL = aws_wafv2_web_acl.ssogen_web_acl[count.index].name
-    Scope  = "REGIONAL"
-  }
+#   dimensions = {
+#     WebACL = aws_wafv2_web_acl.ssogen_web_acl[count.index].name
+#     Scope  = "REGIONAL"
+#   }
 
-  alarm_actions       = [aws_sns_topic.cw_alerts.arn]
-  ok_actions          = [aws_sns_topic.cw_alerts.arn]
+#   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
+#   ok_actions          = [aws_sns_topic.cw_alerts.arn]
 
-  tags = local.tags
-}
+#   tags = local.tags
+# }
 
 # resource "aws_cloudwatch_metric_alarm" "ssogen_alb_healthyhosts_app" {
 #   count           = local.is-development || local.is-test ? 1 : 0
@@ -157,57 +157,57 @@ resource "aws_cloudwatch_metric_alarm" "ssogen_waf_high_blocked_requests" {
 #   }
 # }
 
-resource "aws_cloudwatch_metric_alarm" "disk_free_ssogen_home_primary" {
-  count                     = local.is-development || local.is-test ? 1 : 0
-  # count                     = local.application_data.accounts[local.environment].ssogen_no_instances
-  alarm_name                = "${local.application_data.accounts[local.environment].short_env}-ssogen${count.index + 1}-disk_free-home"
-  alarm_description         = "This metric monitors the amount of free disk space on /home mount. If the amount of free disk space on root falls below 20% for 2 minutes, the alarm will trigger"
-  comparison_operator       = "GreaterThanOrEqualToThreshold"
-  metric_name               = "disk_used_percent"
-  namespace                 = "CWAgent"
-  statistic                 = "Average"
-  insufficient_data_actions = [aws_sns_topic.cw_alerts.arn]
-  treat_missing_data        = "notBreaching"
+# resource "aws_cloudwatch_metric_alarm" "disk_free_ssogen_home_primary" {
+#   count                     = local.is-development || local.is-test ? 1 : 0
+#   # count                     = local.application_data.accounts[local.environment].ssogen_no_instances
+#   alarm_name                = "${local.application_data.accounts[local.environment].short_env}-ssogen${count.index + 1}-disk_free-home"
+#   alarm_description         = "This metric monitors the amount of free disk space on /home mount. If the amount of free disk space on root falls below 20% for 2 minutes, the alarm will trigger"
+#   comparison_operator       = "GreaterThanOrEqualToThreshold"
+#   metric_name               = "disk_used_percent"
+#   namespace                 = "CWAgent"
+#   statistic                 = "Average"
+#   insufficient_data_actions = [aws_sns_topic.cw_alerts.arn]
+#   treat_missing_data        = "notBreaching"
 
-  evaluation_periods  = local.application_data.cloudwatch_ec2.disk.eval_periods
-  datapoints_to_alarm = local.application_data.cloudwatch_ec2.disk.eval_periods
-  period              = local.application_data.cloudwatch_ec2.disk.period
-  threshold           = local.application_data.cloudwatch_ec2.disk.threshold
-  alarm_actions       = [aws_sns_topic.cw_alerts.arn]
-  ok_actions          = [aws_sns_topic.cw_alerts.arn]
+#   evaluation_periods  = local.application_data.cloudwatch_ec2.disk.eval_periods
+#   datapoints_to_alarm = local.application_data.cloudwatch_ec2.disk.eval_periods
+#   period              = local.application_data.cloudwatch_ec2.disk.period
+#   threshold           = local.application_data.cloudwatch_ec2.disk.threshold
+#   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
+#   ok_actions          = [aws_sns_topic.cw_alerts.arn]
 
-  dimensions = {
-    AutoScalingGroupName = aws_autoscaling_group.ssogen-scaling-group-primary[count.index].name
-    path         = "/home"
-    fstype       = "ext4"
-  }
-}
+#   dimensions = {
+#     AutoScalingGroupName = aws_autoscaling_group.ssogen-scaling-group-primary[count.index].name
+#     path         = "/home"
+#     fstype       = "ext4"
+#   }
+# }
 
-resource "aws_cloudwatch_metric_alarm" "disk_free_ssogen_home_secondary" {
-  count                = local.is-development || local.is-test ? 1 : 0
-  # count                     = local.application_data.accounts[local.environment].ssogen_no_instances
-  alarm_name                = "${local.application_data.accounts[local.environment].short_env}-ssogen${count.index + 1}-disk_free-home"
-  alarm_description         = "This metric monitors the amount of free disk space on /home mount. If the amount of free disk space on root falls below 20% for 2 minutes, the alarm will trigger"
-  comparison_operator       = "GreaterThanOrEqualToThreshold"
-  metric_name               = "disk_used_percent"
-  namespace                 = "CWAgent"
-  statistic                 = "Average"
-  insufficient_data_actions = [aws_sns_topic.cw_alerts.arn]
-  treat_missing_data        = "notBreaching"
+# resource "aws_cloudwatch_metric_alarm" "disk_free_ssogen_home_secondary" {
+#   count                = local.is-development || local.is-test ? 1 : 0
+#   # count                     = local.application_data.accounts[local.environment].ssogen_no_instances
+#   alarm_name                = "${local.application_data.accounts[local.environment].short_env}-ssogen${count.index + 1}-disk_free-home"
+#   alarm_description         = "This metric monitors the amount of free disk space on /home mount. If the amount of free disk space on root falls below 20% for 2 minutes, the alarm will trigger"
+#   comparison_operator       = "GreaterThanOrEqualToThreshold"
+#   metric_name               = "disk_used_percent"
+#   namespace                 = "CWAgent"
+#   statistic                 = "Average"
+#   insufficient_data_actions = [aws_sns_topic.cw_alerts.arn]
+#   treat_missing_data        = "notBreaching"
 
-  evaluation_periods  = local.application_data.cloudwatch_ec2.disk.eval_periods
-  datapoints_to_alarm = local.application_data.cloudwatch_ec2.disk.eval_periods
-  period              = local.application_data.cloudwatch_ec2.disk.period
-  threshold           = local.application_data.cloudwatch_ec2.disk.threshold
-  alarm_actions       = [aws_sns_topic.cw_alerts.arn]
-  ok_actions          = [aws_sns_topic.cw_alerts.arn]
+#   evaluation_periods  = local.application_data.cloudwatch_ec2.disk.eval_periods
+#   datapoints_to_alarm = local.application_data.cloudwatch_ec2.disk.eval_periods
+#   period              = local.application_data.cloudwatch_ec2.disk.period
+#   threshold           = local.application_data.cloudwatch_ec2.disk.threshold
+#   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
+#   ok_actions          = [aws_sns_topic.cw_alerts.arn]
 
-  dimensions = {
-    AutoScalingGroupName = aws_autoscaling_group.ssogen-scaling-group-secondary[count.index].name
-    path         = "/home"
-    fstype       = "ext4"
-  }
-}
+#   dimensions = {
+#     AutoScalingGroupName = aws_autoscaling_group.ssogen-scaling-group-secondary[count.index].name
+#     path         = "/home"
+#     fstype       = "ext4"
+#   }
+# }
 
 # resource "aws_cloudwatch_metric_alarm" "disk_free_ebsapps_export_home" {
 #   count                     = local.application_data.accounts[local.environment].ebsapps_no_instances
