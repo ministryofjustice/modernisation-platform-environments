@@ -148,6 +148,7 @@ resource "aws_codedeploy_deployment_group" "this" {
             "internal"     = data.aws_lb_listener.internal.arn
             "external"     = data.aws_lb_listener.external.arn
             "connectivity" = data.aws_lb_listener.connectivity.arn
+            "yjsm-hub-svc" = data.aws_lb_listener.yjsm_hub_svc.arn
           },
           each.value[join("", keys(each.value))],
           data.aws_lb_listener.internal.arn
