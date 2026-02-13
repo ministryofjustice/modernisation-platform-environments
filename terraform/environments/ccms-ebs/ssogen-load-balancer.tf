@@ -66,7 +66,7 @@ resource "aws_lb_target_group" "ssogen_internal_tg_ssogen_admin" {
   }
 }
 
-resource "aws_lb_listener" "ssogen_internal_listener" {
+resource "aws_lb_listener" "ssogen_internal_app_listener" {
   count             = local.is-development || local.is-test ? 1 : 0
   load_balancer_arn = aws_lb.ssogen_alb[count.index].arn
   port              = "443"
