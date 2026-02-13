@@ -35,11 +35,72 @@ resource "aws_iam_role_policy_attachment" "ssogen_ssm" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
-# Secrets Manager read-only  (kept exactly as in your file)
-resource "aws_iam_role_policy_attachment" "ssogen_secrets_read" {
-  count = local.is-development ? 1 : 0
 
-  role       = aws_iam_role.ssogen_ec2[0].name
-  policy_arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
+resource "aws_iam_policy" "ssogen_ec2_instance_policy" {
+  name = "${local.application_name}-ec2-instance-policy"
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ec2:DescribeTags",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "cloudwatch:PutMetricData",
+        "ds:CreateComputer",
+        "ds:DescribeDirectories",
+        "ec2:DescribeInstanceStatus",
+        "logs:*",
+        "ssm:*",
+        "ec2messages:*"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": "iam:CreateServiceLinkedRole",
+      "Resource": "arn:aws:iam::*:role/aws-service-role/ssm.amazonaws.com/AWSServiceRoleForAmazonSSM*",
+      "Condition": { "StringLike": { "iam:AWSServiceName": "ssm.amazonaws.com" } }
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "iam:DeleteServiceLinkedRole",
+        "iam:GetServiceLinkedRoleDeletionStatus"
+      ],
+      "Resource": "arn:aws:iam::*:role/aws-service-role/ssm.amazonaws.com/AWSServiceRoleForAmazonSSM*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ssmmessages:CreateControlChannel",
+        "ssmmessages:CreateDataChannel",
+        "ssmmessages:OpenControlChannel",
+        "ssmmessages:OpenDataChannel"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": ["secretsmanager:GetSecretValue"],
+      "Resource": ["arn:aws:secretsmanager:eu-west-2:*:secret:*"]
+    }
+  ]
+}
+EOF
 }
 
+resource "aws_iam_role_policy_attachment" "ssogen_ec2_policy" {
+  count      = local.is-development || local.is-test ? 1 : 0
+  role       = aws_iam_role.ssogen_ec2[count.index].name
+  policy_arn = aws_iam_policy.ssogen_ec2_instance_policy.arn
+}
