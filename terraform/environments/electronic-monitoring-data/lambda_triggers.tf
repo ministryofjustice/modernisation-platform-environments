@@ -206,6 +206,7 @@ module "load_fms_event_queue" {
 }
 
 module "fms_fan_out_event_queue" {
+  count = local.is-development ? 1 : 0
   source               = "./modules/sqs_s3_lambda_trigger"
   bucket               = module.s3-raw-formatted-data-bucket.bucket
   lambda_function_name = module.fan_out_tags[0].lambda_function_name
@@ -229,11 +230,13 @@ resource "aws_s3_bucket_notification" "load_mdss_event" {
     events        = ["s3:ObjectCreated:*"]
     filter_prefix = "serco/fms"
   }
-
-  queue {
-    queue_arn     = module.fms_fan_out_event_queue.sqs_queue.arn
-    events        = ["s3:ObjectTagging:Put"]
-    filter_prefix = "serco/fms/validation_rejected"
+  dynamic "queue" {
+    count = local.is-development ? 1 : 0 
+    content {
+      queue_arn     = module.fms_fan_out_event_queue[0].sqs_queue.arn
+      events        = ["s3:ObjectTagging:Put"]
+      filter_prefix = "serco/fms/validation_rejected"
+    }
   }
 
   depends_on = [module.load_mdss_event_queue, module.load_fms_event_queue]
