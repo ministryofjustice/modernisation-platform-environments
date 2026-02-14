@@ -152,14 +152,14 @@ module "external_secrets_iam_role" {
   tags = local.tags
 }
 
-module "aws_for_fluent_bit_iam_role" {
+module "cloudwatch_observability_iam_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts"
   version = "6.3.0"
 
-  name = "aws-for-fluent-bit"
+  name = "cloudwatch-observability"
 
   policies = {
     CloudWatchAgentServerPolicy   = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
@@ -169,7 +169,7 @@ module "aws_for_fluent_bit_iam_role" {
   oidc_providers = {
     main = {
       provider_arn               = module.eks.oidc_provider_arn
-      namespace_service_accounts = ["${kubernetes_namespace.aws_observability.metadata[0].name}:aws-for-fluent-bit"]
+      namespace_service_accounts = ["amazon-cloudwatch:cloudwatch-agent"]
     }
   }
 

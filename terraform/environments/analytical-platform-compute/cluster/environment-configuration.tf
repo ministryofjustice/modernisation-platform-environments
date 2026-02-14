@@ -19,21 +19,20 @@ locals {
         aws_guardduty_agent               = "v1.12.1-eksbuild.2"
         aws_ebs_csi_driver                = "v1.53.0-eksbuild.1"
         vpc_cni                           = "v1.20.5-eksbuild.1"
+        amazon_cloudwatch_observability   = "v4.10.0-eksbuild.1"
       }
 
       helm_chart_version = {
-        aws_cloudwatch_metrics = "0.0.11"
-        aws_for_fluent_bit     = "0.1.35"
-        cert_manager           = "v1.19.2"
-        cluster_autoscaler     = "9.54.1"
-        external_dns           = "1.20.0"
-        external_secrets       = "1.2.1"
-        ingress_nginx          = "4.14.1"
-        karpenter              = "1.8.5"
-        keda                   = "2.18.3"
-        kube_prometheus_stack  = "81.1.0"
-        kyverno                = "3.6.2"
-        velero                 = "11.3.2"
+        cert_manager          = "v1.19.2"
+        cluster_autoscaler    = "9.54.1"
+        external_dns          = "1.20.0"
+        external_secrets      = "1.2.1"
+        ingress_nginx         = "4.14.1"
+        karpenter             = "1.8.5"
+        keda                  = "2.18.3"
+        kube_prometheus_stack = "81.1.0"
+        kyverno               = "3.6.2"
+        velero                = "11.3.2"
       }
 
       /* Data Engineering Airflow */
@@ -59,21 +58,20 @@ locals {
         aws_guardduty_agent               = "v1.12.1-eksbuild.2"
         aws_ebs_csi_driver                = "v1.53.0-eksbuild.1"
         vpc_cni                           = "v1.20.5-eksbuild.1"
+        amazon_cloudwatch_observability   = "v4.10.0-eksbuild.1"
       }
 
       helm_chart_version = {
-        aws_cloudwatch_metrics = "0.0.11"
-        aws_for_fluent_bit     = "0.1.35"
-        cert_manager           = "v1.19.2"
-        cluster_autoscaler     = "9.54.1"
-        external_dns           = "1.20.0"
-        external_secrets       = "1.2.1"
-        ingress_nginx          = "4.14.1"
-        karpenter              = "1.8.5"
-        keda                   = "2.18.3"
-        kube_prometheus_stack  = "81.1.0"
-        kyverno                = "3.6.2"
-        velero                 = "11.3.2"
+        cert_manager          = "v1.19.2"
+        cluster_autoscaler    = "9.54.1"
+        external_dns          = "1.20.0"
+        external_secrets      = "1.2.1"
+        ingress_nginx         = "4.14.1"
+        karpenter             = "1.8.5"
+        keda                  = "2.18.3"
+        kube_prometheus_stack = "81.1.0"
+        kyverno               = "3.6.2"
+        velero                = "11.3.2"
       }
 
       /* Data Engineering Airflow */
@@ -99,21 +97,20 @@ locals {
         aws_guardduty_agent               = "v1.12.1-eksbuild.2"
         aws_ebs_csi_driver                = "v1.53.0-eksbuild.1"
         vpc_cni                           = "v1.20.5-eksbuild.1"
+        amazon_cloudwatch_observability   = "v4.10.0-eksbuild.1"
       }
 
       helm_chart_version = {
-        aws_cloudwatch_metrics = "0.0.11"
-        aws_for_fluent_bit     = "0.1.35"
-        cert_manager           = "v1.19.2"
-        cluster_autoscaler     = "9.54.1"
-        external_dns           = "1.20.0"
-        external_secrets       = "1.2.1"
-        ingress_nginx          = "4.14.1"
-        karpenter              = "1.8.5"
-        keda                   = "2.18.3"
-        kube_prometheus_stack  = "81.1.0"
-        kyverno                = "3.6.2"
-        velero                 = "11.3.2"
+        cert_manager          = "v1.19.2"
+        cluster_autoscaler    = "9.54.1"
+        external_dns          = "1.20.0"
+        external_secrets      = "1.2.1"
+        ingress_nginx         = "4.14.1"
+        karpenter             = "1.8.5"
+        keda                  = "2.18.3"
+        kube_prometheus_stack = "81.1.0"
+        kyverno               = "3.6.2"
+        velero                = "11.3.2"
       }
 
       /* Data Engineering Airflow */
