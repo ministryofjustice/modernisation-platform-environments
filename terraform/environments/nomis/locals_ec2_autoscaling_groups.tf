@@ -225,12 +225,12 @@ locals {
       }
       tags = {
         # ami                 = "base_ol_8_5" # commented out to ensure harden role does not re-run
-        backup                = "false"
-        component             = "web"
-        description           = "For testing nomis weblogic 12 image"
-        os-type               = "Linux"
-        server-type           = "nomis-web12"
-        update-ssm-agent      = "patchgroup1"
+        backup           = "false"
+        component        = "web"
+        description      = "For testing nomis weblogic 12 image"
+        os-type          = "Linux"
+        server-type      = "nomis-web12"
+        update-ssm-agent = "patchgroup1"
       }
     }
 

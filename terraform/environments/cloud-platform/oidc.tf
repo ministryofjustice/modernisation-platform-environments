@@ -221,3 +221,27 @@ data "aws_iam_policy_document" "github_actions_development_cluster_oidc_policy" 
   }
 
 }
+
+
+# OIDC Role for GitHub Actions - Cluster Reminder Workflow
+module "github_actions_cluster_reminder_oidc_role" {
+  count               = local.environment == "development" ? 1 : 0
+  source              = "github.com/ministryofjustice/modernisation-platform-github-oidc-role?ref=b40748ec162b446f8f8d282f767a85b6501fd192" # v4.0.0
+  github_repositories = ["ministryofjustice/cloud-platform-github-workflows"]
+  role_name           = "github-actions-cluster-reminder"
+  policy_jsons        = [data.aws_iam_policy_document.github_actions_cluster_reminder_oidc_policy.json]
+  subject_claim       = "ref:refs/heads/*"
+  tags                = merge({ "Name" = "GitHub Actions Cluster Reminder Role" }, local.tags)
+}
+
+data "aws_iam_policy_document" "github_actions_cluster_reminder_oidc_policy" {
+  statement {
+    sid = "ListEKSClustersAndAccountAlias"
+    effect = "Allow"
+    actions = [
+      "eks:ListClusters",
+      "iam:ListAccountAliases"
+    ]
+    resources = ["*"]
+  }
+}
