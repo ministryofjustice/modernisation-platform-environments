@@ -9,7 +9,7 @@ resource "aws_athena_database" "ssogen_lb-access-logs" {
 
 resource "aws_athena_workgroup" "ssogen_lb-access-logs" {
   count = local.is-development || local.is-test ? 1 : 0
-  name  = lower(format("%s-%s-ssogen-lb-access-logs", local.application_name, local.environment))
+  name  = lower(format("%s-lb-access-logs", local.application_name_ssogen, local.environment))
 
   configuration {
     enforce_workgroup_configuration    = true
@@ -27,7 +27,7 @@ resource "aws_athena_workgroup" "ssogen_lb-access-logs" {
 # SQL query to creates the table in the athena db, these queries needs to be executed manually after creation
 resource "aws_athena_named_query" "main_table_ssogen" {
   count     = local.is-development || local.is-test ? 1 : 0
-  name      = lower(format("%s-%s-ssogen-create-table", local.application_name, local.environment))
+  name      = lower(format("%s-%s-create-table", local.application_name_ssogen, local.environment))
   workgroup = aws_athena_workgroup.ssogen_lb-access-logs[count.index].id
   database  = aws_athena_database.ssogen_lb-access-logs[count.index].name
   query = templatefile(
@@ -44,7 +44,7 @@ resource "aws_athena_named_query" "main_table_ssogen" {
 # SQL query to count the number of HTTP GET requests to the loadbalancer grouped by IP, these queries needs to be executed manually after creation
 resource "aws_athena_named_query" "http_requests_ssogen" {
   count     = local.is-development || local.is-test ? 1 : 0
-  name      = lower(format("%s-%s-ssogen-http-get-requests-ssogen", local.application_name, local.environment))
+  name      = lower(format("%s-%s-http-get-requests", local.application_name_ssogen, local.environment))
   workgroup = aws_athena_workgroup.ssogen_lb-access-logs[count.index].id
   database  = aws_athena_database.ssogen_lb-access-logs[count.index].name
   query = templatefile(

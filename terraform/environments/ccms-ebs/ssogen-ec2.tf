@@ -5,7 +5,7 @@
 data "template_file" "launch-template" {
   template = file("${path.module}/templates/ec2_user_data_ssogen.sh")
   vars = {
-    hostname           = "${local.application_name}-ssogen"
+    hostname           = "${local.application_name_ssogen}"
     deploy_environment = local.environment
   }
 }
@@ -73,7 +73,7 @@ resource "aws_launch_template" "ssogen-ec2-launch-template-primary" {
 
 resource "aws_launch_template" "ssogen-ec2-launch-template-secondary" {
   count         = local.is-development || local.is-test ? 1 : 0
-  name_prefix   = local.application_name
+  name_prefix   = local.application_name_ssogen
   image_id      = local.application_data.accounts[local.environment].ssogen_ami_id-2
   instance_type = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ssogen
   # key_name      = var.key_name
@@ -134,7 +134,7 @@ resource "aws_launch_template" "ssogen-ec2-launch-template-secondary" {
 
 resource "aws_autoscaling_group" "ssogen-scaling-group-primary" {
   count               = local.is-development || local.is-test ? 1 : 0
-  name                = "${local.application_name}-ssogen-primary"
+  name                = "${local.application_name_ssogen}-primary"
   vpc_zone_identifier = data.aws_subnets.shared-private.ids
   desired_capacity    = local.application_data.accounts[local.environment].ssogen_desired_capacity
   max_size            = local.application_data.accounts[local.environment].ssogen_max_capacity
@@ -157,7 +157,7 @@ resource "aws_autoscaling_group" "ssogen-scaling-group-primary" {
 
 resource "aws_autoscaling_group" "ssogen-scaling-group-secondary" {
   count               = local.is-development || local.is-test ? 1 : 0
-  name                = "${local.application_name}-ssogen-secondary"
+  name                = "${local.application_name_ssogen}-secondary"
   vpc_zone_identifier = data.aws_subnets.shared-private.ids
   desired_capacity    = local.application_data.accounts[local.environment].ssogen_desired_capacity
   max_size            = local.application_data.accounts[local.environment].ssogen_max_capacity
