@@ -1,5 +1,6 @@
 module "codedeploy" {
   source           = "./modules/codedeploy"
+  create_svc_pilot = local.application_data.accounts[local.environment].create_svc_pilot  # Added to conditionally create resources for the service pilot
   project_name     = local.project_name
   tags             = local.tags
   cluster_name     = "yjaf-cluster"

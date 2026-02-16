@@ -38,11 +38,13 @@ data "aws_lb_listener" "connectivity" {
 }
 
 data "aws_lb" "yjsm_hub_svc" {
-  name = var.yjsm_hub_svc_alb_name
+  count = var.create_svc_pilot ? 1 : 0
+  name  = var.yjsm_hub_svc_alb_name
 }
 
 data "aws_lb_listener" "yjsm_hub_svc" {
-  load_balancer_arn = data.aws_lb.yjsm_hub_svc.arn
+  count             = var.create_svc_pilot ? 1 : 0
+  load_balancer_arn = data.aws_lb.yjsm_hub_svc[0].arn
   port              = var.yjsm_hub_svc_listener_port
 }
 
@@ -148,7 +150,7 @@ resource "aws_codedeploy_deployment_group" "this" {
             "internal"     = data.aws_lb_listener.internal.arn
             "external"     = data.aws_lb_listener.external.arn
             "connectivity" = data.aws_lb_listener.connectivity.arn
-            "yjsm-hub-svc" = data.aws_lb_listener.yjsm_hub_svc.arn
+            "yjsm-hub-svc" = data.aws_lb_listener.yjsm_hub_svc[0].arn
           },
           each.value[join("", keys(each.value))],
           data.aws_lb_listener.internal.arn
