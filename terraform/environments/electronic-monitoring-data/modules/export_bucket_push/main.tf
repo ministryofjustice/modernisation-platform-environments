@@ -64,14 +64,14 @@ resource "aws_s3_bucket_notification" "bucket_notification" {
   }
 }
 
-module "push_lambda_event_queue" {
-  source               = "../sqs_s3_lambda_trigger"
-  bucket               = module.this-bucket.bucket
-  lambda_function_name = module.push_lambda.lambda_function_name
-  bucket_prefix        = "emds-${var.environment_shorthand}"
-  maximum_concurrency  = 0
-  enabled              = false
-}
+# module "push_lambda_event_queue" {
+#   source               = "../sqs_s3_lambda_trigger"
+#   bucket               = module.this-bucket.bucket
+#   lambda_function_name = module.push_lambda.lambda_function_name
+#   bucket_prefix        = "emds-${var.environment_shorthand}"
+#   maximum_concurrency  = 0
+#   enabled              = false
+# }
 
 
 #------------------------------------------------------------------------------
