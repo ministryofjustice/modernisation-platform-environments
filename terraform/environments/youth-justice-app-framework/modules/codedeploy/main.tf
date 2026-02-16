@@ -110,7 +110,10 @@ resource "aws_iam_role_policy_attachment" "codedeploy_ec2_service_role_policy" {
 
 
 resource "aws_codedeploy_deployment_group" "this" {
-  for_each               = { for pair in var.services : join("", keys(pair)) => pair }
+  for_each               = { 
+    for pair in var.services : join("", keys(pair)) => pair 
+    if join("", keys(pair)) != "yjsm-hub-svc" || var.create_svc_pilot
+  }
   deployment_group_name  = var.environment
   app_name               = aws_codedeploy_app.this[each.key].name
   deployment_config_name = "CodeDeployDefault.ECSAllAtOnce"
