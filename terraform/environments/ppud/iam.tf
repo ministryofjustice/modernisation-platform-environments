@@ -102,6 +102,14 @@ resource "aws_iam_policy" "production-s3-access" {
 # IAM Policy & Locals statement for EC2 to send email vis SES [Development & Preproduction]
 ###########################################################################################
 
+locals {
+  allowed_from_address = (
+    local.is-development     ? "noreply@internaltest.ppud.justice.gov.uk" :
+    local.is-preproduction   ? "noreply@uat.ppud.justice.gov.uk" :
+    null
+  )
+}
+
 resource "aws_iam_policy" "ses-send-email" {
   count       = local.is-production == false ? 1 : 0
   name        = "ses-send-email"
@@ -129,13 +137,6 @@ resource "aws_iam_policy" "ses-send-email" {
   })
 }
 
-locals {
-  allowed_from_address = (
-    local.is-development ? "noreply@internaltest.ppud.justice.gov.uk" :
-    local.is-preproduction ? "noreply@uat.ppud.justice.gov.uk" :
-    null
-  )
-}
 
 #################################
 # IAM Role for SSM Patch Manager
