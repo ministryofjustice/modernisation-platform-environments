@@ -7,7 +7,7 @@ resource "aws_lb" "ssogen_alb" {
   subnets            = data.aws_subnets.shared-private.ids
 
   drop_invalid_header_fields = true
-  enable_deletion_protection = true
+  enable_deletion_protection = false
 
   access_logs {
     bucket  = module.s3-bucket-logging.bucket.id
