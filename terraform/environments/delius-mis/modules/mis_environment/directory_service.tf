@@ -238,18 +238,22 @@ resource "aws_vpc_security_group_ingress_rule" "mis_ad_sg_inbound" {
   tags = local.tags
 }
 
-#resource "aws_secretsmanager_secret" "ad_hmpp_trust_password" {
-#  description             = "Directory service to hmpp AD trust password"
-#  name                    = "${var.app_name}-${var.env_name}-ad-hmpp-trust-password"
-#  recovery_window_in_days = 0
+resource "aws_secretsmanager_secret" "ad_hmpp_trust_password" {
+  description             = "Directory service to hmpp AD trust password"
+  name                    = "${var.app_name}-${var.env_name}-ad-hmpp-trust-password"
+  recovery_window_in_days = 0
 
-#  tags = merge(
-#    local.tags,
-#    {
-#      Name = "${var.app_name}-${var.env_name}-ad-hmpp-trust-password"
-#    }
-#  )
-#}
+  tags = merge(
+    local.tags,
+    {
+      Name = "${var.app_name}-${var.env_name}-ad-hmpp-trust-password"
+    }
+  )
+}
+
+data "aws_secretsmanager_secret_version" "ad_hmpp_trust_password" {
+  secret_id = aws_secretsmanager_secret.ad_hmpp_trust_password.id
+}
 
 #resource "aws_secretsmanager_secret_version" "ad_hmpp_trust_password" {
 #  secret_id     = aws_secretsmanager_secret.ad_hmpp_trust_password.id
