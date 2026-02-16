@@ -13,7 +13,8 @@ locals {
       }
 
       /* Nodes */
-      ami_type = "AL2023_x86_64_STANDARD"
+      ami_type     = "AL2023_x86_64_STANDARD"
+      ami_type_arm = "BOTTLEROCKET_ARM_64"
 
       default_ng = {
         min_size         = 2
@@ -21,6 +22,34 @@ locals {
         max_size         = 10
 
         instance_types = ["r8i.large"]
+
+        block_device_mappings = {
+          xvda = {
+            device_name = "/dev/xvda"
+            ebs = {
+              volume_size           = 200
+              volume_type           = "gp3"
+              iops                  = 0
+              encrypted             = false
+              kms_key_id            = ""
+              delete_on_termination = true
+            }
+          }
+        }
+
+        labels = {
+          Terraform                                  = "true"
+          "cloud-platform.justice.gov.uk/default-ng" = "true"
+          Cluster                                    = local.environment
+        }
+      }
+
+      default_ng_arm = {
+        min_size         = 2
+        desired_capacity = 3
+        max_size         = 10
+
+        instance_types = ["m8g.large"]
 
         block_device_mappings = {
           xvda = {
