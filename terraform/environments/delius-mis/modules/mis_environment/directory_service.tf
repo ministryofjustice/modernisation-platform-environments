@@ -238,36 +238,36 @@ resource "aws_vpc_security_group_ingress_rule" "mis_ad_sg_inbound" {
   tags = local.tags
 }
 
-resource "aws_secretsmanager_secret" "ad_hmpp_trust_password" {
-  description             = "Directory service to hmpp AD trust password"
-  name                    = "${var.app_name}-${var.env_name}-ad-hmpp-trust-password"
-  recovery_window_in_days = 0
+#resource "aws_secretsmanager_secret" "ad_hmpp_trust_password" {
+#  description             = "Directory service to hmpp AD trust password"
+#  name                    = "${var.app_name}-${var.env_name}-ad-hmpp-trust-password"
+#  recovery_window_in_days = 0
 
-  tags = merge(
-    local.tags,
-    {
-      Name = "${var.app_name}-${var.env_name}-ad-hmpp-trust-password"
-    }
-  )
-}
+#  tags = merge(
+#    local.tags,
+#    {
+#      Name = "${var.app_name}-${var.env_name}-ad-hmpp-trust-password"
+#    }
+#  )
+#}
 
-resource "aws_secretsmanager_secret_version" "ad_hmpp_trust_password" {
-  secret_id     = aws_secretsmanager_secret.ad_hmpp_trust_password.id
-  secret_string = "change me"
+#resource "aws_secretsmanager_secret_version" "ad_hmpp_trust_password" {
+#  secret_id     = aws_secretsmanager_secret.ad_hmpp_trust_password.id
+#  secret_string = "change me"
+#
+#  lifecycle {
+#    ignore_changes = [secret_string]
+#  }
+#}
 
-  lifecycle {
-    ignore_changes = [secret_string]
-  }
-}
+#resource "aws_directory_service_trust" "ad_hmpp_trust" {
+#  count = aws_secretsmanager_secret_version.ad_hmpp_trust_password.secret_string != "change me" ? 1 : 0
+#
+#  directory_id = aws_directory_service_directory.mis_ad.id
 
-resource "aws_directory_service_trust" "ad_hmpp_trust" {
-  count = aws_secretsmanager_secret_version.ad_hmpp_trust_password.secret_string != "change me" ? 1 : 0
+#  remote_domain_name = var.environment_config.ad_trust_domain_name
+#  trust_direction    = "One-Way: Outgoing"
+#  trust_password     = aws_secretsmanager_secret_version.ad_hmpp_trust_password.secret_string
 
-  directory_id = aws_directory_service_directory.mis_ad.id
-
-  remote_domain_name = var.environment_config.ad_trust_domain_name
-  trust_direction    = "One-Way: Outgoing"
-  trust_password     = aws_secretsmanager_secret_version.ad_hmpp_trust_password.secret_string
-
-  conditional_forwarder_ip_addrs = var.environment_config.ad_trust_dns_ip_addrs
-}
+#  conditional_forwarder_ip_addrs = var.environment_config.ad_trust_dns_ip_addrs
+#}
