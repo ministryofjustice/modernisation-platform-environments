@@ -128,7 +128,10 @@ resource "aws_iam_policy" "ses-send-email" {
           "ses:SendRawEmail"
         ]
         Effect   = "Allow"
-        Resource = local.ses_identity_arn
+        Resource = [
+          local.ses_identity_arn,
+          "arn:aws:ses:eu-west-2:${local.environment_management.account_ids[local.is-development ? "ppud-development" : "ppud-preproduction"]}:configuration-set/*"
+        ]
         Condition = {
           StringLike = {
             "ses:FromAddress" = local.allowed_from_address
@@ -144,6 +147,7 @@ resource "aws_iam_policy" "ses-send-email" {
     ]
   })
 }
+
 
 #################################
 # IAM Role for SSM Patch Manager
