@@ -1,6 +1,5 @@
 locals {
-  replication_enabled = var.production_dev == "prod" || (var.production_dev == "test" && var.data_feed == "mdss") ||  (var.production_dev == "preprod" && var.data_feed == "fms")
-}
+  replication_enabled = var.production_dev == "prod" || (var.production_dev == "test" && var.data_feed == "mdss")
 
 resource "aws_iam_role" "replication_role" {
   count              = local.replication_enabled ? 1 : 0
