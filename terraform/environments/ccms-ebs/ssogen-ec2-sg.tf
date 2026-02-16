@@ -54,7 +54,7 @@ resource "aws_vpc_security_group_egress_rule" "from_ec2_to_ssm" {
   from_port                    = 443
   to_port                      = 443
   ip_protocol                  = "tcp"
-  cidr_ipv4                    = ["0.0.0.0/0"]
+  cidr_ipv4                    = "0.0.0.0/0"
 }
 # ############################################
 # # INGRESS — WebLogic Admin (7001)
