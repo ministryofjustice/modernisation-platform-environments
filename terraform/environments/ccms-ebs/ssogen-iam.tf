@@ -37,7 +37,7 @@ resource "aws_iam_role_policy_attachment" "ssogen_ssm" {
 
 # Need to tighten this policy to remove all resources
 resource "aws_iam_policy" "ssogen_ec2_instance_policy" {
-  name = "${local.application_name}-ec2-instance-policy"
+  name = "${local.application_name}-ssogen-instance-policy"
 
   policy = <<EOF
 {
