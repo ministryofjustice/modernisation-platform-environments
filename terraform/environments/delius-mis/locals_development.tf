@@ -2,10 +2,10 @@
 
 locals {
   environment_config_dev = {
-    legacy_engineering_vpc_cidr            = "10.161.98.0/25"
-    legacy_counterpart_vpc_cidr            = "10.162.32.0/20"
-    ad_domain_name                         = "delius-mis-dev.internal"
-    ad_trust_domain_name                   = "azure.noms.root"
+    legacy_engineering_vpc_cidr = "10.161.98.0/25"
+    legacy_counterpart_vpc_cidr = "10.162.32.0/20"
+    ad_domain_name              = "delius-mis-dev.internal"
+    #ad_trust_domain_name                   = "azure.noms.root"
     ad_trust_dc_cidrs                      = module.ip_addresses.active_directory_cidrs.azure.domain_controllers
     ad_trust_dns_ip_addrs                  = module.ip_addresses.mp_ips.ad_fixngo_azure_domain_controllers
     ec2_user_ssh_key                       = file("${path.module}/files/.ssh/${terraform.workspace}/ec2-user.pub")

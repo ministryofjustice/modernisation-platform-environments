@@ -252,26 +252,18 @@ resource "aws_secretsmanager_secret" "ad_hmpp_trust_password" {
 }
 
 data "aws_secretsmanager_secret_version" "ad_hmpp_trust_password" {
+  count     = lookup(var.environment_config, "ad_trust_domain_name", null) != null ? 1 : 0
   secret_id = aws_secretsmanager_secret.ad_hmpp_trust_password.id
 }
 
-#resource "aws_secretsmanager_secret_version" "ad_hmpp_trust_password" {
-#  secret_id     = aws_secretsmanager_secret.ad_hmpp_trust_password.id
-#  secret_string = "change me"
-#
-#  lifecycle {
-#    ignore_changes = [secret_string]
-#  }
-#}
+resource "aws_directory_service_trust" "ad_hmpp_trust" {
+  count = lookup(var.environment_config, "ad_trust_domain_name", null) != null ? 1 : 0
 
-#resource "aws_directory_service_trust" "ad_hmpp_trust" {
-#  count = aws_secretsmanager_secret_version.ad_hmpp_trust_password.secret_string != "change me" ? 1 : 0
-#
-#  directory_id = aws_directory_service_directory.mis_ad.id
+  directory_id = aws_directory_service_directory.mis_ad.id
 
-#  remote_domain_name = var.environment_config.ad_trust_domain_name
-#  trust_direction    = "One-Way: Outgoing"
-#  trust_password     = aws_secretsmanager_secret_version.ad_hmpp_trust_password.secret_string
+  remote_domain_name = var.environment_config.ad_trust_domain_name
+  trust_direction    = "One-Way: Outgoing"
+  trust_password     = data.aws_secretsmanager_secret_version.ad_hmpp_trust_password[0].secret_string
 
-#  conditional_forwarder_ip_addrs = var.environment_config.ad_trust_dns_ip_addrs
-#}
+  conditional_forwarder_ip_addrs = var.environment_config.ad_trust_dns_ip_addrs
+}
