@@ -39,6 +39,7 @@ resource "aws_launch_template" "ssogen-ec2-launch-template-primary" {
       volume_size           = 60
       volume_type           = "gp2"
       iops                  = 0
+      kms_key_id            = data.aws_kms_key.ssogen_kms_key[count.index].arn
     }
   }
 
@@ -100,6 +101,7 @@ resource "aws_launch_template" "ssogen-ec2-launch-template-secondary" {
       volume_size           = 60
       volume_type           = "gp2"
       iops                  = 0
+      kms_key_id             = data.aws_kms_key.ssogen_kms_key[count.index].arn
     }
   }
 
