@@ -149,16 +149,18 @@ resource "aws_codedeploy_deployment_group" "this" {
     target_group_pair_info {
       prod_traffic_route {
         listener_arns = [lookup(
+          merge(
           {
             "internal"     = data.aws_lb_listener.internal.arn
             "external"     = data.aws_lb_listener.external.arn
             "connectivity" = data.aws_lb_listener.connectivity.arn
-            "yjsm-hub-svc" = data.aws_lb_listener.yjsm_hub_svc[0].arn
           },
-          each.value[join("", keys(each.value))],
-          data.aws_lb_listener.internal.arn
-        )]
-      }
+          var.create_svc_pilot ? { "yjsm-hub-svc" = data.aws_lb_listener.yjsm_hub_svc[0].arn } : {}
+        ),
+        each.value[join("", keys(each.value))],
+        data.aws_lb_listener.internal.arn
+      )]
+    }
 
       target_group {
         name = data.aws_lb_target_group.one[each.key].name
