@@ -113,6 +113,11 @@ locals {
     local.is-preproduction ? "arn:aws:ses:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:identity/uat.ppud.justice.gov.uk" :
     null
   )
+  ses_config_set_arn = (
+    local.is-development   ? "arn:aws:ses:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:configuration-set/*" :
+    local.is-preproduction ? "arn:aws:ses:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:configuration-set/*" :
+    null
+  )
 }
 
 resource "aws_iam_policy" "ses-send-email" {
@@ -130,7 +135,7 @@ resource "aws_iam_policy" "ses-send-email" {
         Effect   = "Allow"
         Resource = [
           local.ses_identity_arn,
-          "arn:aws:ses:eu-west-2:${local.environment_management.account_ids[local.is-development ? "ppud-development" : "ppud-preproduction"]}:configuration-set/*"
+          local.ses_config_set_arn
         ]
         Condition = {
           StringLike = {
