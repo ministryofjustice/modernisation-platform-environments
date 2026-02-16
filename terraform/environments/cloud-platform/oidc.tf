@@ -229,7 +229,7 @@ module "github_actions_cluster_reminder_oidc_role" {
   source              = "github.com/ministryofjustice/modernisation-platform-github-oidc-role?ref=b40748ec162b446f8f8d282f767a85b6501fd192" # v4.0.0
   github_repositories = ["ministryofjustice/cloud-platform-github-workflows"]
   role_name           = "github-actions-cluster-reminder"
-  policy_jsons        = [data.aws_iam_policy_document.github_actions_cluster_reminder_oidc_policy[0].json]
+  policy_jsons        = [data.aws_iam_policy_document.github_actions_cluster_reminder_oidc_policy.json]
   subject_claim       = "ref:refs/heads/*"
   tags                = merge({ "Name" = "GitHub Actions Cluster Reminder Role" }, local.tags)
 }
