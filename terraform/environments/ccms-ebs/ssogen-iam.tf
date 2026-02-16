@@ -36,7 +36,7 @@ resource "aws_iam_role_policy_attachment" "ssogen_ssm" {
 }
 
 data "aws_kms_key" "ssogen_kms_key" {
-  key_id = "arn:aws:kms:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:key/*"
+  key_id = "alias/ec2_oracle_key"
 }
 
 # Need to tighten this policy to remove all resources
