@@ -13,7 +13,7 @@ locals {
       }
 
       /* Nodes */
-      ami_type = "AL2023_x86_64_STANDARD"
+      ami_type     = "AL2023_x86_64_STANDARD"
       ami_type_arm = "BOTTLEROCKET_ARM_64"
 
       default_ng = {

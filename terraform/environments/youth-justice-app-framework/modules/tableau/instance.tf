@@ -51,9 +51,9 @@ resource "aws_instance" "tableau" {
 
 
 resource "aws_instance" "tableau-green" {
-  ami                     = data.aws_ami.app_ami.id
-  instance_type           = var.instance_type
-  subnet_id               = var.tableau_subnet_id
+  ami           = data.aws_ami.app_ami.id
+  instance_type = var.instance_type
+  subnet_id     = var.tableau_subnet_id
   #private_ip              = var.private_ip
   vpc_security_group_ids  = [module.tableau_sg.security_group_id]
   disable_api_termination = local.disable_api_termination
