@@ -195,13 +195,7 @@ resource "aws_vpc_security_group_egress_rule" "mis_ad_join" {
 }
 
 locals {
-  forest_trust_domain_controllers_by_vpc = {
-    hmpps-development   = module.ip_addresses.active_directory_cidrs.azure.domain_controllers
-    hmpps-test          = module.ip_addresses.active_directory_cidrs.azure.domain_controllers
-    hmpps-preproduction = module.ip_addresses.active_directory_cidrs.hmpp.domain_controllers
-    hmpps-production    = module.ip_addresses.active_directory_cidrs.hmpp.domain_controllers
-  }
-  # DNS is always needed; the other ports I think only required when trust is initially configured
+  # SG rules for domain trust. DNS is always needed; other ports I think only required when trust is initially configured
   active_directory_sg_rules = [
     # ip_protocol, from_port, to_port
     ["TCP", 53, 53],
@@ -216,8 +210,8 @@ locals {
     ["UDP", 445, 445],
     ["TCP", 49152, 65535],
   ]
-  domain_controllers_and_active_directory_sg_rules = flatten([
-    for dc_cidr in local.forest_trust_domain_controllers_by_vpc[local.vpc_name] : [
+  active_directory_sg_rules_from_dcs = flatten([
+    for dc_cidr in var.environment_config.ad_trust_dc_cidrs : [
       for sg_rule in local.active_directory_sg_rules : {
         key = "${dc_cidr} ${sg_rule[0]} ${sg_rule[1]} ${sg_rule[2]}"
         value = {
@@ -232,7 +226,7 @@ locals {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "mis_ad_sg_inbound" {
-  for_each = { for item in local.domain_controllers_and_active_directory_sg_rules : item.key => item.value }
+  for_each = { for item in local.active_directory_sg_rules_from_dcs : item.key => item.value }
 
   security_group_id = aws_directory_service_directory.mis_ad.security_group_id
   cidr_ipv4         = each.value.cidr_ipv4
@@ -242,3 +236,31 @@ resource "aws_vpc_security_group_ingress_rule" "mis_ad_sg_inbound" {
 
   tags = local.tags
 }
+
+#resource "aws_secretsmanager_secret" "ad_hmpp_trust_password" {
+#  name                    = "${var.app_name}-${var.env_name}-ad-hmpp-trust-password"
+#  recovery_window_in_days = 0
+#
+#  tags = merge(
+#    local.tags,
+#    {
+#      Name = "${var.app_name}-${var.env_name}-ad-hmpp-trust-password"
+#    }
+#  )
+#}
+
+#data "aws_secretsmanager_secret_version" "ad_hmpp_trust_password" {
+#  secret_id = aws_secretsmanager_secret.ad_hmpp_trust_password.id
+#}
+
+#resource "aws_directory_service_trust" "ad_hmpp_trust" {
+#  count = var.hmpp_trust != null ? 1 : 0
+#
+#  directory_id = aws_directory_service_directory.mis_ad.id
+#
+#  remote_domain_name = var.hmpp_trust.remote_domain_name
+#  trust_direction    = "One-Way: Outgoing"
+#  trust_password     = data.aws_secretsmanager_secret_version.ad_admin_password.secret_string
+#
+#  conditional_forwarder_ip_addrs = var.hmpp.trust.conditional_forwarder_ip_addrs
+#}

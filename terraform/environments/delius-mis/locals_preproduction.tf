@@ -5,6 +5,8 @@ locals {
     legacy_engineering_vpc_cidr            = "10.160.98.0/25"
     legacy_counterpart_vpc_cidr            = "10.160.0.0/20"
     ad_domain_name                         = "delius-mis-preprod.internal"
+    ad_trust_domain_name                   = "azure.hmpp.root"
+    ad_trust_dc_cidrs                      = module.ip_addresses.active_directory_cidrs.hmpp.domain_controllers
     ec2_user_ssh_key                       = file("${path.module}/files/.ssh/${terraform.workspace}/ec2-user.pub")
     migration_environment_full_name        = "del-pre-prod"
     migration_environment_abbreviated_name = "del"

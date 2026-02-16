@@ -36,7 +36,7 @@ resource "aws_vpc_security_group_egress_rule" "dfi_ec2" {
     all-to-bcs        = { referenced_security_group_id = aws_security_group.bcs_ec2.id } # client tools temporarily installed on DFI
     all-to-bps        = { referenced_security_group_id = aws_security_group.bps_ec2.id } # client tools temporarily installed on DFI
     all-to-bws        = { referenced_security_group_id = aws_security_group.bws_ec2.id } # client tools temporarily installed on DFI
-    oracle1521-to-vpc = { ip_protocol = "TCP", port = 1521, cidr_ipv4 = module.ip_addresses.mp_cidr[local.vpc_name] }
+    oracle1521-to-vpc = { ip_protocol = "TCP", port = 1521, cidr_ipv4 = var.account_config.shared_vpc_cidr }
   }
 
   description       = each.key
