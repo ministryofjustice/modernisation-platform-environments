@@ -9,7 +9,7 @@ resource "aws_athena_database" "ssogen_lb-access-logs" {
 
 resource "aws_athena_workgroup" "ssogen_lb-access-logs" {
   count = local.is-development || local.is-test ? 1 : 0
-  name  = lower(format("%s-lb-access-logs", local.application_name_ssogen, local.environment))
+  name  = lower(format("%s-%s-lb-access-logs", local.application_name_ssogen, local.environment))
 
   configuration {
     enforce_workgroup_configuration    = true
