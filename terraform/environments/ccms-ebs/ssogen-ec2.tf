@@ -35,7 +35,7 @@ resource "aws_launch_template" "ssogen-ec2-launch-template-primary" {
     device_name = "/dev/sda1"
     ebs {
       delete_on_termination = true
-      encrypted             = false
+      encrypted             = true
       volume_size           = 60
       volume_type           = "gp2"
       iops                  = 0
@@ -97,7 +97,7 @@ resource "aws_launch_template" "ssogen-ec2-launch-template-secondary" {
     device_name = "/dev/sda1"
     ebs {
       delete_on_termination = true
-      encrypted             = false
+      encrypted             = true
       volume_size           = 60
       volume_type           = "gp2"
       iops                  = 0
