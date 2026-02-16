@@ -32,30 +32,6 @@ resource "aws_wafv2_web_acl" "ssogen_web_acl" {
     block {}
   }
 
-  # default_action {
-  #   block {
-  #     custom_response {
-  #       custom_response_body_key = "maintenance-response"
-  #       response_code            = 503
-  #     }
-  #   }
-  # }
-
-  #   custom_response_body {
-  #     key          = "maintenance-response"
-  #     content      = <<EOT
-  # <!doctype html><html lang="en"><head>
-  # <meta charset="utf-8"><title>Maintenance</title>
-  # <style>body{font-family:sans-serif;background:#0b1a2b;color:#fff;text-align:center;padding:4rem;}
-  # .card{max-width:600px;margin:auto;background:#12243a;padding:2rem;border-radius:10px;}
-  # </style></head><body><div class="card">
-  # <h1>Scheduled Maintenance</h1>
-  # <p>The service is unavailable from 19:00 to 07:00 UK time. Apologies for any inconvenience caused.</p>
-  # </div></body></html>
-  # EOT
-  #     content_type = "TEXT_HTML"
-  #   }
-
   rule {
     name     = "AWS-AWSManagedRulesCommonRuleSet"
     priority = 1
@@ -68,19 +44,6 @@ resource "aws_wafv2_web_acl" "ssogen_web_acl" {
       managed_rule_group_statement {
         name        = "AWSManagedRulesCommonRuleSet"
         vendor_name = "AWS"
-
-        rule_action_override {
-          name = "SizeRestrictions_BODY"
-          action_to_use {
-            count {}
-          }
-        }
-        rule_action_override {
-          name = "CrossSiteScripting_BODY"
-          action_to_use {
-            count {}
-          }
-        }
       }
     }
 
@@ -115,40 +78,12 @@ resource "aws_wafv2_web_acl" "ssogen_web_acl" {
         sampled_requests_enabled   = true
       }
     }
+
   }
 
 
-  #### WHEN READY TO GO LIVE, SWITCH TO GEO MATCH INSTEAD OF IP SET ####
-
-  # # Rule 2: Allow UK traffic only (Prod only)
-  # dynamic "rule" {
-  #   for_each = local.is-production ? [1] : []
-  #   content {
-  #     name     = "${local.application_name}-waf-geo-uk-only"
-  #     priority = 2
-
-  #     action {
-  #       allow {}
-  #     }
-
-  #     statement {
-  #       geo_match_statement {
-  #         country_codes = ["GB"]
-  #       }
-  #     }
-
-  #     visibility_config {
-  #       cloudwatch_metrics_enabled = true
-  #       metric_name                = "${local.application_name}-waf-geo-uk-only"
-  #       sampled_requests_enabled   = true
-  #     }
-  #   }
-  # }
-
-
-
   tags = merge(local.tags,
-    { Name = lower(format("%s-%s-ssogen-web-acl", local.application_name, local.environment)) }
+    { Name = lower(format("lb-%s-%s-ssogen-web-acl", local.application_name, local.environment)) }
   )
 
   visibility_config {
@@ -156,4 +91,19 @@ resource "aws_wafv2_web_acl" "ssogen_web_acl" {
     metric_name                = "${local.application_name}-ssogen-waf-metrics"
     sampled_requests_enabled   = true
   }
+
+}
+
+resource "aws_cloudwatch_log_group" "ssogen_waf_logs" {
+  name              = "aws-waf-logs-ssogen/ssogen-waf-logs"
+  retention_in_days = 30
+
+  tags = merge(local.tags,
+    { Name = lower(format("lb-%s-%s-ssogen-waf-logs", local.application_name, local.environment)) }
+  )
+}
+
+resource "aws_wafv2_web_acl_logging_configuration" "ssogen_waf_logging" {
+  log_destination_configs = [aws_cloudwatch_log_group.ssogen_waf_logs.arn]
+  resource_arn            = aws_wafv2_web_acl.ssogen_web_acl.arn
 }

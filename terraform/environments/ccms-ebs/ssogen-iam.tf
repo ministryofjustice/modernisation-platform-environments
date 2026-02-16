@@ -35,6 +35,10 @@ resource "aws_iam_role_policy_attachment" "ssogen_ssm" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
+data "aws_kms_key" "ssogen_kms_key" {
+  key_id = "aws/ebs"
+}
+
 # Need to tighten this policy to remove all resources
 resource "aws_iam_policy" "ssogen_ec2_instance_policy" {
   name = "${local.application_name}-ssogen-instance-policy"
@@ -97,7 +101,7 @@ resource "aws_iam_policy" "ssogen_ec2_instance_policy" {
     {
       "Effect": "Allow",
       "Action": ["kms:GenerateDataKey*", "kms:Decrypt"],
-      "Resource": "*"
+      "Resource": [data.aws_kms_key.ssogen_kms_key.arn]
     }
   ]
 }
