@@ -108,16 +108,6 @@ locals {
     local.is-preproduction   ? "noreply@uat.ppud.justice.gov.uk" :
     null
   )
-  ses_identity_arn = (
-    local.is-development   ? "arn:aws:ses:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:identity/internaltest.ppud.justice.gov.uk" :
-    local.is-preproduction ? "arn:aws:ses:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:identity/uat.ppud.justice.gov.uk" :
-    null
-  )
-  ses_config_set_arn = (
-    local.is-development   ? "arn:aws:ses:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:configuration-set/*" :
-    local.is-preproduction ? "arn:aws:ses:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:configuration-set/*" :
-    null
-  )
 }
 
 resource "aws_iam_policy" "ses-send-email" {
@@ -133,10 +123,7 @@ resource "aws_iam_policy" "ses-send-email" {
           "ses:SendRawEmail"
         ]
         Effect   = "Allow"
-        Resource = [
-          local.ses_identity_arn,
-          local.ses_config_set_arn
-        ]
+        Resource = [ "*" ]
         Condition = {
           StringLike = {
             "ses:FromAddress" = local.allowed_from_address
