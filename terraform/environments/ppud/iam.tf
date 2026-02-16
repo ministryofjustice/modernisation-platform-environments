@@ -102,6 +102,19 @@ resource "aws_iam_policy" "production-s3-access" {
 # IAM Policy & Locals statement for EC2 to send email vis SES [Development & Preproduction]
 ###########################################################################################
 
+locals {
+  allowed_from_address = (
+    local.is-development     ? "noreply@internaltest.ppud.justice.gov.uk" :
+    local.is-preproduction   ? "noreply@uat.ppud.justice.gov.uk" :
+    null
+  )
+  ses_identity_arn = (
+    local.is-development   ? "arn:aws:ses:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:identity/internaltest.ppud.justice.gov.uk" :
+    local.is-preproduction ? "arn:aws:ses:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:identity/uat.ppud.justice.gov.uk" :
+    null
+  )
+}
+
 resource "aws_iam_policy" "ses-send-email" {
   count       = local.is-production == false ? 1 : 0
   name        = "ses-send-email"
@@ -115,7 +128,7 @@ resource "aws_iam_policy" "ses-send-email" {
           "ses:SendRawEmail"
         ]
         Effect   = "Allow"
-        Resource = "*"
+        Resource = local.ses_identity_arn
         Condition = {
           StringLike = {
             "ses:FromAddress" = local.allowed_from_address
@@ -123,18 +136,13 @@ resource "aws_iam_policy" "ses-send-email" {
           StringEquals = {
             "aws:RequestedRegion" = "eu-west-2"
           }
+          Bool = {
+          "ses:RequireTLS" = "true"
+          }
         }
       }
     ]
   })
-}
-
-locals {
-  allowed_from_address = (
-    local.is-development     ? "noreply@internaltest.ppud.justice.gov.uk" :
-    local.is-preproduction   ? "noreply@uat.ppud.justice.gov.uk" :
-    null
-  )
 }
 
 #################################
