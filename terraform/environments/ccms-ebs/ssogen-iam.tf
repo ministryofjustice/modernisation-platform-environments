@@ -29,19 +29,21 @@ resource "aws_iam_instance_profile" "ssogen_instance_profile" {
 
 # Attach SSM permissions (Session Manager, logging, patching, etc.)
 resource "aws_iam_role_policy_attachment" "ssogen_ssm" {
-  count = local.is-development ? 1 : 0
+  count = local.is-development || local.is-test ? 1 : 0
 
   role       = aws_iam_role.ssogen_ec2[0].name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
 data "aws_kms_key" "ssogen_kms_key" {
+  count  = local.is-development || local.is-test ? 1 : 0
   key_id = "alias/ec2_oracle_key"
 }
 
 # Need to tighten this policy to remove all resources
 resource "aws_iam_policy" "ssogen_ec2_instance_policy" {
-  name = "${local.application_name}-ssogen-instance-policy"
+  count = local.is-development || local.is-test ? 1 : 0
+  name = "${local.application_name_ssogen}-instance-policy"
 
   policy = <<EOF
 {
@@ -101,7 +103,7 @@ resource "aws_iam_policy" "ssogen_ec2_instance_policy" {
     {
       "Effect": "Allow",
       "Action": ["kms:GenerateDataKey*", "kms:Decrypt"],
-      "Resource": [data.aws_kms_key.ssogen_kms_key.arn]
+      "Resource": [data.aws_kms_key.ssogen_kms_key[count.index].arn]
     }
   ]
 }
@@ -111,5 +113,5 @@ EOF
 resource "aws_iam_role_policy_attachment" "ssogen_ec2_policy" {
   count      = local.is-development || local.is-test ? 1 : 0
   role       = aws_iam_role.ssogen_ec2[count.index].name
-  policy_arn = aws_iam_policy.ssogen_ec2_instance_policy.arn
+  policy_arn = aws_iam_policy.ssogen_ec2_instance_policy[count.index].arn
 }
