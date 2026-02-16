@@ -562,7 +562,7 @@ locals {
   create_postgres_load_generator_job = local.application_data.accounts[local.environment].create_postgres_load_generator_job
 
   # Probation Discovery
-  probation_discovery_windows_ami_id = "ami-03c8cd9ad2f2d6256"
+  probation_discovery_windows_ami_id = data.aws_ami.windows_server_2022.id
   enable_probation_discovery_node    = local.application_data.accounts[local.environment].enable_probation_discovery_node
 
   dpr_windows_rdp_credentials_placeholder = {

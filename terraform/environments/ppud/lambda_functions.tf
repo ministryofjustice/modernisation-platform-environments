@@ -215,6 +215,16 @@ locals {
         source_arn_suffix = "*"
       }]
     }
+    ssm_patch_notification = {
+      description  = "Function to send email notification when SSM patching completes."
+      role_key     = "invoke_ses"
+      environments = ["development", "preproduction", "production"]
+      runtime      = "python3.13"
+      permissions = [{
+        principal         = "events.amazonaws.com"
+        source_arn_suffix = "*"
+      }]
+    }
     disk_info_report = {
       description  = "Function to retrieve, format and email a report on the disk utilisation of all Windows EC2 instances."
       role_key     = "get_cloudwatch"
