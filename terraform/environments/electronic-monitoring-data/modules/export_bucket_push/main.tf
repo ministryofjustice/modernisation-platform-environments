@@ -53,16 +53,16 @@ module "this-bucket" {
   )
 }
 
-resource "aws_s3_bucket_notification" "bucket_notification" {
-  count = var.destination_bucket_id != null ? 1 : 0
+# resource "aws_s3_bucket_notification" "bucket_notification" {
+#   count = var.destination_bucket_id != null ? 1 : 0
 
-  bucket = module.this-bucket.bucket.id
+#   bucket = module.this-bucket.bucket.id
 
-  queue {
-    queue_arn = module.push_lambda_event_queue.sqs_queue.arn
-    events    = ["s3:ObjectCreated:*"]
-  }
-}
+#   queue {
+#     queue_arn = module.push_lambda_event_queue.sqs_queue.arn
+#     events    = ["s3:ObjectCreated:*"]
+#   }
+# }
 
 # module "push_lambda_event_queue" {
 #   source               = "../sqs_s3_lambda_trigger"
