@@ -135,12 +135,12 @@ resource "aws_iam_policy" "ses-send-email" {
         Effect   = "Allow"
         Resource = [
           local.ses_identity_arn,
-          local.ses_config_set_arn
+#         local.ses_config_set_arn
         ]
         Condition = {
-          StringLike = {
-            "ses:FromAddress" = local.allowed_from_address
-          }
+#          StringLike = {
+#            "ses:FromAddress" = local.allowed_from_address
+#          }
           StringEquals = {
             "aws:RequestedRegion" = "eu-west-2"
           }
