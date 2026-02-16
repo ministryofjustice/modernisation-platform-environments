@@ -117,9 +117,9 @@ locals {
 }
 
 resource "aws_cloudwatch_event_rule" "ssm_patch_completion" {
-  for_each    = local.ssm_patch_notification_envs
-  name        = "SSM-Patch-Completion-${each.value.env}"
-  description = "Triggers when SSM patch maintenance window completes"
+  for_each      = local.ssm_patch_notification_envs
+  name          = "SSM-Patch-Completion-${each.value.env}"
+  description   = "Triggers when SSM patch maintenance window completes"
   event_pattern = <<EOF
 {
   "source": ["aws.ssm"],
