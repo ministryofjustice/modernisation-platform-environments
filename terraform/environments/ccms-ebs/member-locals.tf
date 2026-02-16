@@ -8,6 +8,7 @@ locals {
   lb_log_prefix_ebsapp_internal  = "ebsapps-internal-lb"
   lb_log_prefix_webgate_internal = "webgate-internal-lb"
   lb_log_prefix_ssogen_internal  = "ssogen-internal-lb"
+  application_name_ssogen        = "ssogen"
 
   volume_prefix = local.environment == "production" ? "/CCMS/EBSPROD" : "/CCMS/EBS"
 
