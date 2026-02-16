@@ -44,6 +44,14 @@ resource "aws_iam_policy_attachment" "ec2_attach2" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM"
 }
 
+resource "aws_iam_policy_attachment" "ses-send-email" {
+  count      = local.is-production == false ? 1 : 0
+  depends_on = [aws_iam_policy.ses-send-email]
+  name       = "ses-send-email-attachment"
+  roles      = [aws_iam_role.ec2_iam_role.id]
+  policy_arn = aws_iam_policy.ses-send-email[0].arn
+}
+
 resource "aws_iam_policy_attachment" "production-s3-access" {
   count      = local.is-production == false ? 1 : 0
   depends_on = [aws_iam_policy.production-s3-access]
@@ -88,6 +96,45 @@ resource "aws_iam_policy" "production-s3-access" {
       ]
     }]
   })
+}
+
+###########################################################################################
+# IAM Policy & Locals statement for EC2 to send email vis SES [Development & Preproduction]
+###########################################################################################
+
+resource "aws_iam_policy" "ses-send-email" {
+  count       = local.is-production == false ? 1 : 0
+  name        = "ses-send-email"
+  description = "Policy to allow EC2 to send email via SES"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "ses:SendEmail",
+          "ses:SendRawEmail"
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+        Condition = {
+          StringLike = {
+            "ses:FromAddress" = local.allowed_from_address
+          }
+          StringEquals = {
+            "aws:RequestedRegion" = "eu-west-2"
+          }
+        }
+      }
+    ]
+  })
+}
+
+locals {
+  allowed_from_address = (
+    local.is-development ? "noreply@internaltest.ppud.justice.gov.uk" :
+    local.is-preproduction ? "noreply@uat.ppud.justice.gov.uk" :
+    null
+  )
 }
 
 #################################
