@@ -2,6 +2,7 @@
 #tfsec:ignore:AVD-AWS-0053
 module "yjsm_hub_svc_alb" {
   #checkov:skip=CKV_AWS_2:false alert
+  count  = local.application_data.accounts[local.environment].create_svc_pilot ? 1 : 0
   source = "./modules/alb"
   #pass in provider for creating records on central route53
   providers = {
@@ -15,10 +16,6 @@ module "yjsm_hub_svc_alb" {
 
   alb_name = "yjsm-hub-svc-ext"
   internal = false
-
-
-  #hub-svc-pilot toggle to control whether the ALB and associated resources are created.
-  create_svc_pilot  = local.application_data.accounts[local.environment].create_svc_pilot
   
   #alb_route53_record_zone_id = module.private_dns_zone.aws_route53_zone_id #data.aws_route53_zone_id.inner.id
 
