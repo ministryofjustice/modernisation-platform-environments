@@ -123,16 +123,13 @@ resource "aws_iam_policy" "ses-send-email" {
           "ses:SendRawEmail"
         ]
         Effect   = "Allow"
-        Resource = [ "*" ]
+        Resource = "*"
         Condition = {
           StringLike = {
             "ses:FromAddress" = local.allowed_from_address
           }
           StringEquals = {
             "aws:RequestedRegion" = "eu-west-2"
-          }
-          Bool = {
-          "ses:RequireTLS" = "true"
           }
         }
       }
