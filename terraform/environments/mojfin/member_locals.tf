@@ -19,15 +19,15 @@ locals {
   username                   = "sysdba"
   backup_window              = "22:00-01:00"
   maintenance_window = (
-    local.environment == "development"   ? "wed:02:00-wed:05:00" :
+    local.environment == "development" ? "wed:02:00-wed:05:00" :
     local.environment == "preproduction" ? "thu:02:00-thu:05:00" :
-    local.environment == "production"    ? "fri:02:00-fri:05:00" :
+    local.environment == "production" ? "fri:02:00-fri:05:00" :
     "sun:02:00-sun:05:00" # fallback default
   )
-  storage_type               = "gp2"
-  rds_snapshot_name          = "laws3169-mojfin-migration-v1"
-  deletion_production        = local.application_data.accounts[local.environment].deletion_protection
-  ca_cert_identifier         = "rds-ca-rsa4096-g1"
+  storage_type        = "gp2"
+  rds_snapshot_name   = "laws3169-mojfin-migration-v1"
+  deletion_production = local.application_data.accounts[local.environment].deletion_protection
+  ca_cert_identifier  = "rds-ca-rsa4096-g1"
 
 
   # CloudWatch Alarms

@@ -597,16 +597,16 @@ data "aws_iam_policy_document" "process_fms_metadata_lambda_role_policy_document
     effect = "Allow"
     actions = [
       "sns:Publish",
-      ]
+    ]
     resources = [aws_sns_topic.emds_alerts.arn]
   }
-    statement {
+  statement {
     sid    = "AllowLambdaToUseKey"
     effect = "Allow"
     actions = [
       "kms:GenerateDataKey",
       "kms:Decrypt"
-      ]
+    ]
     resources = ["*"]
   }
 }

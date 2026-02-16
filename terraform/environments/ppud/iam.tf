@@ -131,8 +131,8 @@ resource "aws_iam_policy" "ses-send-email" {
 
 locals {
   allowed_from_address = (
-    local.is-development     ? "noreply@internaltest.ppud.justice.gov.uk" :
-    local.is-preproduction   ? "noreply@uat.ppud.justice.gov.uk" :
+    local.is-development ? "noreply@internaltest.ppud.justice.gov.uk" :
+    local.is-preproduction ? "noreply@uat.ppud.justice.gov.uk" :
     null
   )
 }
