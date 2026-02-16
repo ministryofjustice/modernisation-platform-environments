@@ -27,6 +27,7 @@ resource "aws_directory_service_directory" "mis_ad" {
 }
 
 resource "aws_secretsmanager_secret" "ad_admin_password" {
+  description             = "Directory service admin password"
   name                    = "${var.app_name}-${var.env_name}-ad-admin-password"
   recovery_window_in_days = 0
 
@@ -238,6 +239,7 @@ resource "aws_vpc_security_group_ingress_rule" "mis_ad_sg_inbound" {
 }
 
 resource "aws_secretsmanager_secret" "ad_hmpp_trust_password" {
+  description             = "Directory service to hmpp AD trust password"
   name                    = "${var.app_name}-${var.env_name}-ad-hmpp-trust-password"
   recovery_window_in_days = 0
 
