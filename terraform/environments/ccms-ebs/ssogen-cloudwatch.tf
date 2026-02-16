@@ -4,7 +4,7 @@
 # Alarm for ALB 5xx Errors
 # resource "aws_cloudwatch_metric_alarm" "alb_ssogen_5xx" {
 #   count               = local.is-development || local.is-test ? 1 : 0
-#   alarm_name          = "${local.application_name}-${local.environment}-ssogen-5xx-errors"
+#   alarm_name          = "${local.application_name_ssogen}-${local.environment}-5xx-errors"
 #   comparison_operator = "GreaterThanThreshold"
 #   evaluation_periods  = 3
 #   metric_name         = "HTTPCode_ELB_5XX_Count"
@@ -26,7 +26,7 @@
 # # Underlying EC2 Instance Status Check Failure for Primary ASG
 # resource "aws_cloudwatch_metric_alarm" "Status_Check_Failure1" {
 #   count             = local.is-development || local.is-test ? 1 : 0
-#   alarm_name          = "${local.application_name}-${local.environment}-ssogen-ec2-status-check-failure"
+#   alarm_name          = "${local.application_name_ssogen}-${local.environment}-ec2-status-check-failure"
 #   alarm_description   = "A ssogen EC2 instance has failed a status check, Runbook - https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
 #   comparison_operator = "GreaterThanOrEqualToThreshold"
 #   metric_name         = "StatusCheckFailed"
@@ -48,7 +48,7 @@
 # # Underlying EC2 Instance Status Check Failure
 # resource "aws_cloudwatch_metric_alarm" "Status_Check_Failure2" {
 #   count               = local.is-development || local.is-test ? 1 : 0
-#   alarm_name          = "${local.application_name}-${local.environment}-ssogen-ec2-status-check-failure"
+#   alarm_name          = "${local.application_name_ssogen}-${local.environment}-ec2-status-check-failure"
 #   alarm_description   = "A ssogen EC2 instance has failed a status check, Runbook - https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
 #   comparison_operator = "GreaterThanOrEqualToThreshold"
 #   metric_name         = "StatusCheckFailed"
@@ -70,7 +70,7 @@
 # # Underlying waf Instance Status Check Failure
 # resource "aws_cloudwatch_metric_alarm" "ssogen_waf_high_blocked_requests" {
 #   count               = local.is-development || local.is-test ? 1 : 0
-#   alarm_name          = "${local.application_name}-${local.environment}-ssogen-waf-high-blocked-requests"
+#   alarm_name          = "${local.application_name_ssogen}-${local.environment}-waf-high-blocked-requests"
 #   alarm_description   = "High number of requests blocked by WAF. Potential attack."
 
 #   comparison_operator = "GreaterThanThreshold"
@@ -95,7 +95,7 @@
 
 # resource "aws_cloudwatch_metric_alarm" "ssogen_alb_healthyhosts_app" {
 #   count           = local.is-development || local.is-test ? 1 : 0
-#   alarm_name          = "${local.application_name}-${local.environment}-ssogen-alb-targets-group"
+#   alarm_name          = "${local.application_name_ssogen}-${local.environment}-alb-targets-group"
 #   comparison_operator = "LessThanThreshold"
 #   evaluation_periods  = 1
 #   metric_name         = "HealthyHostCount"
@@ -115,7 +115,7 @@
 
 # resource "aws_cloudwatch_metric_alarm" "ssogen_alb_healthyhosts_admin" {
 #   count        = local.is-development || local.is-test ? 1 : 0
-#   alarm_name          = "${local.application_name}-${local.environment}-ssogen-alb-targets-group"
+#   alarm_name          = "${local.application_name_ssogen}-${local.environment}-alb-targets-group"
 #   comparison_operator = "LessThanThreshold"
 #   evaluation_periods  = 1
 #   metric_name         = "HealthyHostCount"

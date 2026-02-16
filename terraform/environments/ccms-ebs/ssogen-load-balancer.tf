@@ -1,6 +1,6 @@
 resource "aws_lb" "ssogen_alb" {
   count              = local.is-development || local.is-test ? 1 : 0
-  name               = lower(format("lb-%s-ssogen-internal", local.application_name))
+  name               = lower(format("lb-%s-internal", local.application_name_ssogen))
   internal           = true
   load_balancer_type = "application"
   security_groups    = [aws_security_group.sg_ssogen_internal_alb[count.index].id]
@@ -16,13 +16,13 @@ resource "aws_lb" "ssogen_alb" {
   }
 
   tags = merge(local.tags,
-    { Name = lower(format("lb-%s-ssogen-internal", local.application_name)) }
+    { Name = lower(format("lb-%s-internal", local.application_name_ssogen)) }
   )
 }
 
 resource "aws_lb_target_group" "ssogen_internal_tg_ssogen_app" {
   count       = local.is-development || local.is-test ? 1 : 0
-  name        = lower(format("tg-%s-ssogen-app", local.application_name))
+  name        = lower(format("tg-%s-app", local.application_name_ssogen))
   port        = local.application_data.accounts[local.environment].tg_ssogen_apps_port
   protocol    = "HTTP"
   vpc_id      = data.aws_vpc.shared.id
@@ -48,7 +48,7 @@ resource "aws_lb_target_group" "ssogen_internal_tg_ssogen_app" {
 
 resource "aws_lb_target_group" "ssogen_internal_tg_ssogen_console" { 
   count       = local.is-development || local.is-test ? 1 : 0
-  name        = lower(format("tg-%s-ssogen-console", local.application_name))
+  name        = lower(format("tg-%s-console", local.application_name_ssogen))
   port        = local.application_data.accounts[local.environment].tg_ssogen_admin_port
   protocol    = "HTTP"
   vpc_id      = data.aws_vpc.shared.id
