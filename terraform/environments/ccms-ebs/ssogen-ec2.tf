@@ -135,7 +135,7 @@ resource "aws_launch_template" "ssogen-ec2-launch-template-secondary" {
 }
 
 resource "aws_autoscaling_group" "ssogen-scaling-group-primary" {
-  count               = local.is-development || local.is-test ? 0 : 0
+  count               = local.is-development || local.is-test ? 1 : 0
   name                = "${local.application_name_ssogen}-asg-primary"
   vpc_zone_identifier = data.aws_subnets.shared-private.ids
   desired_capacity    = local.application_data.accounts[local.environment].ssogen_desired_capacity
@@ -158,7 +158,7 @@ resource "aws_autoscaling_group" "ssogen-scaling-group-primary" {
 }
 
 resource "aws_autoscaling_group" "ssogen-scaling-group-secondary" {
-  count               = local.is-development || local.is-test ? 0 : 0
+  count               = local.is-development || local.is-test ? 1 : 0
   name                = "${local.application_name_ssogen}-asg-secondary"
   vpc_zone_identifier = data.aws_subnets.shared-private.ids
   desired_capacity    = local.application_data.accounts[local.environment].ssogen_desired_capacity
