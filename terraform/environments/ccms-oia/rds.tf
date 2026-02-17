@@ -36,8 +36,6 @@ resource "aws_db_instance" "opahub_db" {
   snapshot_identifier       = local.is-development ? local.application_data.accounts[local.environment].db_snapshot_identifier : null
   maintenance_window        = "Mon:00:00-Mon:03:00"
   backup_window             = "03:00-06:00"
-  # final_snapshot_identifier = local.is-development ? "${local.opa_app_name}-final-snapshot" : null
-  # skip_final_snapshot       = local.is-development ? true : null
 
   tags = merge(local.tags, {
     Name = "${local.opa_app_name}-db"
