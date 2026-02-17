@@ -1472,6 +1472,7 @@ data "aws_iam_policy_document" "ears_sars_iam_role_policy_document" {
       "s3:GetObject",
       "s3:GetBucketLocation",
       "s3:ListBucket",
+      "s3:ListAllMyBuckets",
     ]
     resources = [
       "${module.s3-create-a-derived-table-bucket.bucket.arn}/data/prod/models/*",
@@ -1486,6 +1487,7 @@ data "aws_iam_policy_document" "ears_sars_iam_role_policy_document" {
       "s3:GetObject",
       "s3:GetBucketLocation",
       "s3:ListBucket",
+      "s3:ListAllMyBuckets",
     ]
     resources = [
       "${module.s3-data-bucket.bucket.arn}/g4s/atrium_unstructured/*",
@@ -1493,52 +1495,39 @@ data "aws_iam_policy_document" "ears_sars_iam_role_policy_document" {
       module.s3-data-bucket.bucket.arn
     ]
   }
+
 
   statement {
-    sid    = "S3PermissionsOutput"
+    sid    = "AthenaQueryExecution"
     effect = "Allow"
     actions = [
-      "s3:GetObject",
-      "s3:GetBucketLocation",
-      "s3:ListBucket",
+      "athena:StartQueryExecution",
+      "athena:GetQueryExecution",
+      "athena:GetQueryResults",
+      "athena:StopQueryExecution",
+      "athena:GetWorkGroup"
     ]
     resources = [
-      "${module.s3-data-bucket.bucket.arn}/g4s/atrium_unstructured/*",
-      "${module.s3-data-bucket.bucket.arn}/capita/blob_storage/*",
-      module.s3-data-bucket.bucket.arn
-    ]
+      aws_athena_workgroup.ears_sars.arn
+    ] 
   }
-  # statement {
-  #   sid    = "AthenaQueryExecution"
-  #   effect = "Allow"
-  #   actions = [
-  #     "athena:StartQueryExecution",
-  #     "athena:GetQueryExecution",
-  #     "athena:GetQueryResults",
-  #     "athena:StopQueryExecution",
-  #     "athena:GetWorkGroup"
-  #   ]
-  #   resources = [
-  #     aws_athena_workgroup.ears_sars.arn
-  #   ] 
-  # }
 
   # statement {
-  # sid    = "GlueMetadataRead"
-  # effect = "Allow"
-  # actions = [
-  #   "glue:GetDatabase",
-  #   "glue:GetDatabases",
-  #   "glue:GetTable",
-  #   "glue:GetTables",
-  #   "glue:GetPartition",
-  #   "glue:GetPartitions"
-  # ]
-  # resources = [
-  #   "arn:aws:glue:*:*:catalog",
-  #   "arn:aws:glue:*:*:database/your_database_name",
-  #   "arn:aws:glue:*:*:table/your_database_name/*" 
-  # ]
+  #   sid    = "GlueMetadataRead"
+  #   effect = "Allow"
+  #   actions = [
+  #     "glue:GetDatabase",
+  #     "glue:GetDatabases",
+  #     "glue:GetTable",
+  #     "glue:GetTables",
+  #     "glue:GetPartition",
+  #     "glue:GetPartitions"
+  #   ]
+  #   resources = [
+  #     "arn:aws:glue:*:*:catalog",
+  #     "arn:aws:glue:*:*:database/*",
+  #     "arn:aws:glue:*:*:table/*" 
+  #   ]
   # }
 }
 
