@@ -134,51 +134,51 @@ resource "aws_launch_template" "ssogen-ec2-launch-template-secondary" {
 
 }
 
-# resource "aws_autoscaling_group" "ssogen-scaling-group-primary" {
-#   count               = local.is-development || local.is-test ? 1 : 0
-#   name                = "${local.application_name_ssogen}-asg-primary"
-#   vpc_zone_identifier = data.aws_subnets.shared-private.ids
-#   desired_capacity    = local.application_data.accounts[local.environment].ssogen_desired_capacity
-#   max_size            = local.application_data.accounts[local.environment].ssogen_max_capacity
-#   min_size            = local.application_data.accounts[local.environment].ssogen_min_capacity
+resource "aws_autoscaling_group" "ssogen-scaling-group-primary" {
+  count               = local.is-development || local.is-test ? 0 : 0
+  name                = "${local.application_name_ssogen}-asg-primary"
+  vpc_zone_identifier = data.aws_subnets.shared-private.ids
+  desired_capacity    = local.application_data.accounts[local.environment].ssogen_desired_capacity
+  max_size            = local.application_data.accounts[local.environment].ssogen_max_capacity
+  min_size            = local.application_data.accounts[local.environment].ssogen_min_capacity
 
-#   target_group_arns = [
-#     aws_lb_target_group.ssogen_internal_tg_ssogen_app[count.index].arn,
-#     aws_lb_target_group.ssogen_internal_tg_ssogen_console[count.index].arn
-#   ]
+  target_group_arns = [
+    aws_lb_target_group.ssogen_internal_tg_ssogen_app[count.index].arn,
+    aws_lb_target_group.ssogen_internal_tg_ssogen_console[count.index].arn
+  ]
 
-#    health_check_type         = "EC2"
-#    health_check_grace_period = 300
+   health_check_type         = "EC2"
+   health_check_grace_period = 300
 
-#    launch_template {
-#     id      = aws_launch_template.ssogen-ec2-launch-template-primary[count.index].id
-#     version = "$Latest"
-#   }
+   launch_template {
+    id      = aws_launch_template.ssogen-ec2-launch-template-primary[count.index].id
+    version = "$Latest"
+  }
 
-# }
+}
 
-# resource "aws_autoscaling_group" "ssogen-scaling-group-secondary" {
-#   count               = local.is-development || local.is-test ? 1 : 0
-#   name                = "${local.application_name_ssogen}-asg-secondary"
-#   vpc_zone_identifier = data.aws_subnets.shared-private.ids
-#   desired_capacity    = local.application_data.accounts[local.environment].ssogen_desired_capacity
-#   max_size            = local.application_data.accounts[local.environment].ssogen_max_capacity
-#   min_size            = local.application_data.accounts[local.environment].ssogen_min_capacity
+resource "aws_autoscaling_group" "ssogen-scaling-group-secondary" {
+  count               = local.is-development || local.is-test ? 0 : 0
+  name                = "${local.application_name_ssogen}-asg-secondary"
+  vpc_zone_identifier = data.aws_subnets.shared-private.ids
+  desired_capacity    = local.application_data.accounts[local.environment].ssogen_desired_capacity
+  max_size            = local.application_data.accounts[local.environment].ssogen_max_capacity
+  min_size            = local.application_data.accounts[local.environment].ssogen_min_capacity
 
-#   target_group_arns = [
-#     aws_lb_target_group.ssogen_internal_tg_ssogen_app[count.index].arn,
-#     aws_lb_target_group.ssogen_internal_tg_ssogen_console[count.index].arn
-#   ]
+  target_group_arns = [
+    aws_lb_target_group.ssogen_internal_tg_ssogen_app[count.index].arn,
+    aws_lb_target_group.ssogen_internal_tg_ssogen_console[count.index].arn
+  ]
 
-#    health_check_type         = "EC2"
-#    health_check_grace_period = 300
+   health_check_type         = "EC2"
+   health_check_grace_period = 300
 
-#    launch_template {
-#     id      = aws_launch_template.ssogen-ec2-launch-template-secondary[count.index].id
-#     version = "$Latest"
-#   }
+   launch_template {
+    id      = aws_launch_template.ssogen-ec2-launch-template-secondary[count.index].id
+    version = "$Latest"
+  }
 
-# }
+}
 # resource "aws_instance" "ec2_ssogen" {
 #   count = local.is-development ? local.application_data.accounts[local.environment].ssogen_no_instances : 0
 
