@@ -24,6 +24,10 @@ terraform {
       source  = "hashicorp/tls"
       version = ">= 4.1.0"
     }
+    template = {
+      version = "~> 2.2"
+      source  = "hashicorp/template"
+    }
   }
   required_version = "~> 1.10"
 }
