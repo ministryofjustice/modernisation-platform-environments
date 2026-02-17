@@ -21,7 +21,7 @@
       "opa_container_cpu": "2048",
       "opa_container_memory": "6144",
       "db_instance_version": "8.0.42",
-      "db_snapshot_identifier": "opa23-hub-db-20260217",
+      "db_snapshot_identifier": "opa23-hub-db-20260217-encrypted",
       "db_instance_type": "db.t3.large",
       "db_storage_gb": "100",
       "db_deletion_protection": "false",
