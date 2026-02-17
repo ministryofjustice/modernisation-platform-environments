@@ -23,10 +23,10 @@ resource "aws_vpc_security_group_ingress_rule" "ing_ssh_workspaces" {
   from_port         = 22
   to_port           = 22
   cidr_ipv4         = local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_prod
-#     data.aws_vpc.shared.cidr_block,
-#     local.application_data.accounts[local.environment].lz_aws_subnet_env,
-#     local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_subnet_env,
-#     local.application_data.accounts[local.environment].lz_aws_workspace_prod_subnet_env,
+  #     data.aws_vpc.shared.cidr_block,
+  #     local.application_data.accounts[local.environment].lz_aws_subnet_env,
+  #     local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_subnet_env,
+  #     local.application_data.accounts[local.environment].lz_aws_workspace_prod_subnet_env,
 }
 
 # #########################################
@@ -48,13 +48,13 @@ resource "aws_vpc_security_group_egress_rule" "from_ec2_to_rds" {
 # #########################################
 
 resource "aws_vpc_security_group_egress_rule" "from_ec2_to_ssm" {
-  count                        = local.is-development || local.is-test ? 1 : 0
-  security_group_id            = aws_security_group.ssogen_sg[count.index].id
-  description                  = "Allow outbound to SSM"
-  from_port                    = 443
-  to_port                      = 443
-  ip_protocol                  = "tcp"
-  cidr_ipv4                    = "0.0.0.0/0"
+  count             = local.is-development || local.is-test ? 1 : 0
+  security_group_id = aws_security_group.ssogen_sg[count.index].id
+  description       = "Allow outbound to SSM"
+  from_port         = 443
+  to_port           = 443
+  ip_protocol       = "tcp"
+  cidr_ipv4         = "0.0.0.0/0"
 }
 # ############################################
 # # INGRESS — WebLogic Admin (7001)
