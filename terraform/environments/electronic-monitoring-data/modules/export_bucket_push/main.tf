@@ -70,7 +70,6 @@ module "push_lambda_event_queue" {
   lambda_function_name = module.push_lambda.lambda_function_name
   bucket_prefix        = "emds-${var.environment_shorthand}"
   maximum_concurrency  = 100
-  enabled              = false
 }
 
 
