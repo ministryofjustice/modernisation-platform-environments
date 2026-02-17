@@ -35,15 +35,15 @@ resource "aws_iam_role_policy_attachment" "ssogen_ssm" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
-data "aws_kms_key" "ssogen_kms_key" {
-  count  = local.is-development || local.is-test ? 1 : 0
-  key_id = "alias/ec2_oracle_key"
+resource "aws_kms_alias" "a" {
+  count       = local.is-development || local.is-test ? 1 : 0
+  name          = "alias/ssogen-key-alias"
+  target_key_id = aws_kms_key.ssogen_kms_key[0].key_id
 }
 
 resource "aws_kms_key" "ssogen_kms_key" {
   count       = local.is-development || local.is-test ? 1 : 0
-  key_id      = "alias/ec2_oracle_key"
-  description = "key-default-1"
+  description = "kms key for ssogen ami"
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -159,7 +159,7 @@ resource "aws_iam_policy" "ssogen_ec2_instance_policy" {
     {
       "Effect": "Allow",
       "Action": ["kms:CreateGrant", "kms:DescribeKey", "kms:ReEncrypt", "kms:GenerateDataKeyWithoutPlainText", "kms:Decrypt"],
-      "Resource": "${data.aws_kms_key.ssogen_kms_key[count.index].arn}"
+      "Resource": "${aws_kms_key.ssogen_kms_key[count.index].arn}"
     }
   ]
 }
