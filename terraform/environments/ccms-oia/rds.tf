@@ -34,8 +34,8 @@ resource "aws_db_instance" "opahub_db" {
   option_group_name       = "default:mysql-8-0"
   backup_retention_period = 30
   snapshot_identifier     = local.is-development ? local.application_data.accounts[local.environment].db_snapshot_identifier : null
-  maintenance_window = "Mon:00:00-Mon:03:00"
-  backup_window      = "03:00-06:00"
+  maintenance_window      = "Mon:00:00-Mon:03:00"
+  backup_window           = "03:00-06:00"
 
   tags = merge(local.tags, {
     Name = "${local.opa_app_name}-db"
