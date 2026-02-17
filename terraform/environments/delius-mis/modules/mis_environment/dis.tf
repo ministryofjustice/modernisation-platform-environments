@@ -48,6 +48,18 @@ resource "aws_vpc_security_group_egress_rule" "dis_ec2" {
   tags = local.tags
 }
 
+resource "aws_vpc_security_group_egress_rule" "dis_ec2_to_dc" {
+  for_each = toset(var.environment_config.ad_trust_dc_cidrs)
+
+  description       = "all-to-dc ${each.key}"
+  security_group_id = resource.aws_security_group.dis_ec2.id
+
+  cidr_ipv4   = each.value
+  ip_protocol = "-1"
+
+  tags = local.tags
+}
+
 module "dis_instance" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v4.2.0"
 
