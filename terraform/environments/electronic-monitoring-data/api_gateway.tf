@@ -27,7 +27,7 @@ module "get_zipped_file_api_api" {
 }
 
 module "ears_sars_api" {
-  count           = local.is-development || local.is-production ? 1 : 0
+  count           = local.is-development || local.is-preproduction ? 1 : 0
   source          = "./modules/api_step_function"
   api_name        = "ears_sars_api"
   api_description = "Ears and Sars API"

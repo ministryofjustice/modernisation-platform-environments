@@ -646,7 +646,7 @@ module "cloudwatch_alarm_threader" {
 # Ears and Sars Request
 #-----------------------------------------------------------------------------------
 module "ears_sars_request" {
-  count = local.is-development || local.is-production ? 1 : 0
+  count                   = local.is-development || local.is-preproduction ? 1 : 0
   source                  = "./modules/lambdas"
   is_image                = true
   ecr_repo_name           = "electronic-monitoring-ear-sars"
