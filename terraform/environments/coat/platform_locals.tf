@@ -18,6 +18,7 @@ locals {
   tags = merge(
     jsondecode(data.http.environments_file.response_body).tags,
     { "is-production" = local.is-production },
+    { "service-area" = "Hosting" },
     { "environment-name" = terraform.workspace },
     { "source-code" = "https://github.com/ministryofjustice/modernisation-platform-environments" }
   )
