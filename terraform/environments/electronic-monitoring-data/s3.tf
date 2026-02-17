@@ -834,7 +834,6 @@ module "s3-mdss-specials-landing-bucket" {
 # Export buckets
 # ------------------------------------------------------------------------
 
-# TO DO: turn back on export
 module "s3-p1-export-bucket" {
   source = "./modules/export_bucket_push/"
 
