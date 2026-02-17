@@ -1,6 +1,6 @@
 resource "aws_lb" "ssogen_alb" {
   count              = local.is-development || local.is-test ? 1 : 0
-  name               = lower(format("lb-%s-internal", local.application_name_ssogen))
+  name               = lower(format("lb-%s-ssogen-internal", local.application_name))
   internal           = true
   load_balancer_type = "application"
   security_groups    = [aws_security_group.sg_ssogen_internal_alb[count.index].id]
