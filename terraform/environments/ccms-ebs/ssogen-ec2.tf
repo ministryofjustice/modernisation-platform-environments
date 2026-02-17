@@ -62,12 +62,12 @@ resource "aws_launch_template" "ssogen-ec2-launch-template-primary" {
   tag_specifications {
     resource_type = "volume"
     tags = merge(local.tags,
-      { Name = lower(format("%s-%s-primary", local.application_name, local.environment)) }
+      { Name = lower(format("%s-%s-primary", local.application_name_ssogen, local.environment)) }
     )
   }
 
   tags = merge(local.tags,
-    { Name = lower(format("%s-%s-launch-template-primary", local.application_name, local.environment)) }
+    { Name = lower(format("%s-%s-launch-template-primary", local.application_name_ssogen, local.environment)) }
   )
 
 }
@@ -110,7 +110,7 @@ resource "aws_launch_template" "ssogen-ec2-launch-template-secondary" {
   tag_specifications {
     resource_type = "instance"
     tags = merge(local.tags,
-      { Name = lower(format("%s-%s-secondary", local.application_name, local.environment)) }
+      { Name = lower(format("%s-%s-secondary", local.application_name_ssogen, local.environment)) }
     )
   }
 
@@ -124,12 +124,12 @@ resource "aws_launch_template" "ssogen-ec2-launch-template-secondary" {
   tag_specifications {
     resource_type = "volume"
     tags = merge(local.tags,
-      { Name = lower(format("%s-%s-secondary", local.application_name, local.environment)) }
+      { Name = lower(format("%s-%s-secondary", local.application_name_ssogen, local.environment)) }
     )
   }
 
   tags = merge(local.tags,
-    { Name = lower(format("%s-%s-launch-template-secondary", local.application_name, local.environment)) }
+    { Name = lower(format("%s-%s-launch-template-secondary", local.application_name_ssogen, local.environment)) }
   )
 
 }
