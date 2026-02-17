@@ -1465,6 +1465,14 @@ resource "aws_iam_role_policy_attachment" "cross_account_copy" {
 
 data "aws_iam_policy_document" "ears_sars_iam_role_policy_document" {
   count = local.is-production || local.is-development ? 1 : 0
+
+  statement {
+    sid       = "S3BucketPerms"
+    effect    = "Allow"
+    actions   = ["s3:ListAllMyBuckets", "s3:GetBucketLocation"]
+    resources = ["*"]
+  }
+
   statement {
     sid    = "S3PermissionsReportBuckets"
     effect = "Allow"
@@ -1472,7 +1480,6 @@ data "aws_iam_policy_document" "ears_sars_iam_role_policy_document" {
       "s3:GetObject",
       "s3:GetBucketLocation",
       "s3:ListBucket",
-      "s3:ListAllMyBuckets",
     ]
     resources = [
       "${module.s3-create-a-derived-table-bucket.bucket.arn}/data/prod/models/*",
@@ -1487,7 +1494,6 @@ data "aws_iam_policy_document" "ears_sars_iam_role_policy_document" {
       "s3:GetObject",
       "s3:GetBucketLocation",
       "s3:ListBucket",
-      "s3:ListAllMyBuckets",
     ]
     resources = [
       "${module.s3-data-bucket.bucket.arn}/g4s/atrium_unstructured/*",
