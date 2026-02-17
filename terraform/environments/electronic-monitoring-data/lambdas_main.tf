@@ -312,8 +312,8 @@ module "process_fms_metadata" {
     SQS_QUEUE_URL                = aws_sqs_queue.format_fms_json_event_queue.id
     POWERTOOLS_METRICS_NAMESPACE = "FMSLiveFeed"
     POWERTOOLS_SERVICE_NAME      = "process-fms-metadata-lambda"
-    SNS_TOPIC_ARN  = aws_sns_topic.emds_alerts.arn
-    ENVIRONMENT_NAME    = local.environment_shorthand
+    SNS_TOPIC_ARN                = aws_sns_topic.emds_alerts.arn
+    ENVIRONMENT_NAME             = local.environment_shorthand
   }
 }
 
