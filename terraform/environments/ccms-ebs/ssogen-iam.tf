@@ -40,10 +40,66 @@ data "aws_kms_key" "ssogen_kms_key" {
   key_id = "alias/ec2_oracle_key"
 }
 
+resource "aws_kms_key" "ssogen_kms_key" {
+  count       = local.is-development || local.is-test ? 1 : 0
+  key_id      = "alias/ec2_oracle_key"
+  description = "key-default-1"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        "Sid" : "Enable IAM User Permissions",
+        "Effect" : "Allow",
+        "Principal" : {
+          "AWS" : "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+        },
+        "Action" : "kms:*",
+        "Resource" : "*"
+      },
+      {
+        "Sid" : "Allow service-linked role use of the customer managed key",
+        "Effect" : "Allow",
+        "Principal" : {
+          "AWS" : [
+            "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
+          ]
+        },
+        "Action" : [
+          "kms:Encrypt",
+          "kms:Decrypt",
+          "kms:ReEncrypt*",
+          "kms:GenerateDataKey*",
+          "kms:DescribeKey"
+        ],
+        "Resource" : "*"
+      },
+      {
+        "Sid" : "Allow attachment of persistent resources",
+        "Effect" : "Allow",
+        "Principal" : {
+          "AWS" : [
+            "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
+          ]
+        },
+        "Action" : [
+          "kms:CreateGrant"
+        ],
+        "Resource" : "*",
+        "Condition" : {
+          "Bool" : {
+            "kms:GrantIsForAWSResource" : true
+          }
+        }
+      }
+    ]
+  })
+}
+
 # Need to tighten this policy to remove all resources
 resource "aws_iam_policy" "ssogen_ec2_instance_policy" {
   count = local.is-development || local.is-test ? 1 : 0
-  name = "${local.application_name_ssogen}-instance-policy"
+  name  = "${local.application_name_ssogen}-instance-policy"
 
   policy = <<EOF
 {

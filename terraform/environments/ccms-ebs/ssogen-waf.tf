@@ -56,24 +56,24 @@ resource "aws_wafv2_web_acl" "ssogen_web_acl" {
 
   # Restrict access to trusted IPs only - Non-Prod environments only
   rule {
-      name     = "${local.application_name_ssogen}-ssogen-waf-ip-set"
-      priority = 2
+    name     = "${local.application_name_ssogen}-ssogen-waf-ip-set"
+    priority = 2
 
-      action {
-        allow {}
-      }
+    action {
+      allow {}
+    }
 
-      statement {
-        ip_set_reference_statement {
-          arn = aws_wafv2_ip_set.ssogen_waf_ip_set[count.index].arn
-        }
+    statement {
+      ip_set_reference_statement {
+        arn = aws_wafv2_ip_set.ssogen_waf_ip_set[count.index].arn
       }
+    }
 
-      visibility_config {
-        cloudwatch_metrics_enabled = true
-        metric_name                = "${local.application_name}-waf-ip-set"
-        sampled_requests_enabled   = true
-      }
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "${local.application_name}-waf-ip-set"
+      sampled_requests_enabled   = true
+    }
   }
 
   tags = merge(local.tags,
