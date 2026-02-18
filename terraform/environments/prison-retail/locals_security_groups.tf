@@ -36,6 +36,13 @@ locals {
           protocol    = "TCP"
           cidr_blocks = local.security_group_cidrs.enduserclient
         }
+        TCP_445 = {
+          description = "Allow SMB ingress 445"
+          from_port   = 445
+          to_port     = 445
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.enduserclient
+        }
       }
     }
   }

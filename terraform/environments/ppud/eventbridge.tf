@@ -104,6 +104,53 @@ resource "aws_lambda_permission" "allow_cloudwatch_sync_ssm_to_waf" {
   source_arn    = aws_cloudwatch_event_rule.sync_ssm_to_waf[each.key].arn
 }
 
+######################################################
+# Eventbridge Rule for SSM Patch Completion
+######################################################
+
+locals {
+  ssm_patch_notification_envs = {
+    for k, v in local.lambda_instances_map :
+    k => v
+    if startswith(k, "ssm_patch_notification")
+  }
+}
+
+resource "aws_cloudwatch_event_rule" "ssm_patch_completion" {
+  for_each      = local.ssm_patch_notification_envs
+  name          = "SSM-Patch-Completion-${each.value.env}"
+  description   = "Triggers when SSM patch maintenance window completes"
+  event_pattern = <<EOF
+{
+  "source": ["aws.ssm"],
+  "detail-type": ["Maintenance Window Execution State-change Notification"],
+  "detail": {
+    "status": ["SUCCESS", "FAILED", "TIMED_OUT"]
+  }
+}
+EOF
+  tags = {
+    Function    = each.value.func_name
+    Environment = each.value.env
+  }
+}
+
+resource "aws_cloudwatch_event_target" "trigger_lambda_ssm_patch_completion" {
+  for_each  = local.ssm_patch_notification_envs
+  rule      = aws_cloudwatch_event_rule.ssm_patch_completion[each.key].name
+  target_id = "ssm_patch_completion_${each.value.env}"
+  arn       = aws_lambda_function.lambda_functions[each.key].arn
+}
+
+resource "aws_lambda_permission" "allow_eventbridge_ssm_patch_completion" {
+  for_each      = local.ssm_patch_notification_envs
+  statement_id  = "AllowExecutionFromEventBridge-${each.value.env}"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.lambda_functions[each.key].function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.ssm_patch_completion[each.key].arn
+}
+
 #################################
 # EventBridge Scheduler Schedules 
 #################################
@@ -302,6 +349,10 @@ locals {
     sync_ssm_to_waf = local.is-development ? aws_lambda_function.lambda_functions["sync_ssm_to_waf_development"].arn : (
       local.is-preproduction ? aws_lambda_function.lambda_functions["sync_ssm_to_waf_preproduction"].arn : (
         local.is-production ? aws_lambda_function.lambda_functions["sync_ssm_to_waf_production"].arn : null
+    ))
+    ssm_patch_notification = local.is-development ? aws_lambda_function.lambda_functions["ssm_patch_notification_development"].arn : (
+      local.is-preproduction ? aws_lambda_function.lambda_functions["ssm_patch_notification_preproduction"].arn : (
+        local.is-production ? aws_lambda_function.lambda_functions["ssm_patch_notification_production"].arn : null
     ))
     wam_waf_analysis = local.is-development ? aws_lambda_function.lambda_functions["wam_waf_analysis_development"].arn : (
       local.is-preproduction ? aws_lambda_function.lambda_functions["wam_waf_analysis_preproduction"].arn : null

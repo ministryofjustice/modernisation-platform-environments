@@ -1,19 +1,19 @@
 ---
-name: operations-engineering
+name: data-factory-moj
 on:
   push:
     branches:
       - main
     paths:
-      - 'terraform/environments/operations-engineering/**'
-      - '.github/workflows/operations-engineering.yml'
+      - 'terraform/environments/data-factory-moj/**'
+      - '.github/workflows/data-factory-moj.yml'
 
   pull_request:
     branches:
       - main
     paths:
-      - 'terraform/environments/operations-engineering/**'
-      - '.github/workflows/operations-engineering.yml'
+      - 'terraform/environments/data-factory-moj/**'
+      - '.github/workflows/data-factory-moj.yml'
 
   workflow_dispatch:
     inputs:
@@ -25,6 +25,11 @@ on:
         options:
           - deploy
           - destroy
+      component:
+        description: "Optional: Target a specific component for destroy. Defaults to 'root' to destroy the root or <application> folder."
+        required: false
+        default: "root"
+        type: string
 
 permissions:
   id-token: write  # This is required for requesting the JWT
@@ -48,6 +53,7 @@ jobs:
       application: "${{ github.workflow }}"
       environment: "${{ matrix.target }}"
       action: "${{ matrix.action }}"
+      component: "${{ matrix.component }}"     # If your strategy workflow also outputs "matrix.component"
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
@@ -60,6 +66,7 @@ jobs:
       environment: "development"
       action: "plan_apply"
       plan_apply_tfargs: "-destroy"
+      component: "${{ inputs.component }}"  # Targets a specific component for the destroy operation; defaults to 'root' if not specified.
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}

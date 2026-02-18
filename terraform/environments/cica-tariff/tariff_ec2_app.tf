@@ -9,7 +9,6 @@ resource "aws_key_pair" "key_pair_app" {
 
 
 resource "aws_instance" "tariff_app" {
-  count                       = local.environment != "production" ? 1 : 0
   ami                         = data.aws_ami.shared_ami.id
   associate_public_ip_address = false
   ebs_optimized               = true
@@ -50,7 +49,7 @@ resource "aws_instance" "tariff_app" {
 }
 
 resource "aws_ebs_volume" "tariff_app_storage" {
-  for_each          = local.environment == "production" ? {} : { for v in local.tariffapp_volume_layout : v.device_name => v }
+  for_each          = { for v in local.tariffapp_volume_layout : v.device_name => v }
   availability_zone = data.aws_subnet.private_subnets_a.availability_zone
   size              = each.value.size
   type              = "gp3"
@@ -62,8 +61,8 @@ resource "aws_ebs_volume" "tariff_app_storage" {
 }
 
 resource "aws_volume_attachment" "tariff_app_storage_attachment" {
-  for_each    = local.environment == "production" ? {} : { for v in local.tariffapp_volume_layout : v.device_name => v }
+  for_each    = { for v in local.tariffapp_volume_layout : v.device_name => v }
   device_name = each.key
   volume_id   = aws_ebs_volume.tariff_app_storage[each.key].id
-  instance_id = aws_instance.tariff_app[0].id
+  instance_id = aws_instance.tariff_app.id
 }

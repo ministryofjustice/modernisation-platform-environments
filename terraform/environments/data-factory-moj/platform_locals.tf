@@ -1,6 +1,6 @@
 locals {
 
-  application_name = "operations-engineering"
+  application_name = "data-factory-moj"
 
   environment_management = jsondecode(data.aws_secretsmanager_secret_version.environment_management.secret_string)
 

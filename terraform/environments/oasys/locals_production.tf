@@ -586,8 +586,6 @@ locals {
                     host_header = {
                       values = [ # max of 5
                         "oasys.service.justice.gov.uk",
-                        "bridge-oasys.az.justice.gov.uk",
-                        "www.oasys.service.justice.gov.uk",
                       ]
                     }
                   }
@@ -619,10 +617,7 @@ locals {
                   {
                     host_header = {
                       values = [ # max of 5
-                        "practice.bridge-oasys.az.justice.gov.uk",
                         "practice.oasys.service.justice.gov.uk",
-                        "practice.a.oasys.service.justice.gov.uk",
-                        "practice.b.oasys.service.justice.gov.uk",
                       ]
                     }
                   }
@@ -638,10 +633,7 @@ locals {
                   {
                     host_header = {
                       values = [ # max of 5
-                        "training.bridge-oasys.az.justice.gov.uk",
                         "training.oasys.service.justice.gov.uk",
-                        "training.a.oasys.service.justice.gov.uk",
-                        "training.b.oasys.service.justice.gov.uk",
                       ]
                     }
                   }
@@ -693,9 +685,6 @@ locals {
                     host_header = {
                       values = [ # max of 5
                         "int.oasys.service.justice.gov.uk",
-                        "oasys-ukwest.oasys.az.justice.gov.uk",
-                        # "oasys.az.justice.gov.uk",
-                        "p-oasys.az.justice.gov.uk",
                       ]
                     }
                   }
@@ -728,11 +717,6 @@ locals {
                     host_header = {
                       values = [ # max of 5
                         "practice.int.oasys.service.justice.gov.uk",
-                        "practice.oasys.az.justice.gov.uk",
-                        "practice.p-oasys.az.justice.gov.uk",
-                        # "practice-ukwest.oasys.az.justice.gov.uk",
-                        "practice.a-int.oasys.service.justice.gov.uk",
-                        "practice.b-int.oasys.service.justice.gov.uk",
                       ]
                     }
                   }
@@ -749,11 +733,6 @@ locals {
                     host_header = {
                       values = [ # max of 5
                         "training.int.oasys.service.justice.gov.uk",
-                        "training.oasys.az.justice.gov.uk",
-                        "training.p-oasys.az.justice.gov.uk",
-                        # "training-ukwest.oasys.az.justice.gov.uk",
-                        "training.a-int.oasys.service.justice.gov.uk",
-                        "training.b-int.oasys.service.justice.gov.uk",
                       ]
                     }
                   }
