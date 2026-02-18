@@ -663,3 +663,31 @@ module "ears_sars_request" {
     SOURCE_BUCKET = module.s3-dms-target-store-bucket.bucket.id
   }
 }
+
+
+# ------------------------------------------------------------------------------
+# Fan out fms tags
+# ------------------------------------------------------------------------------
+
+module "fan_out_tags" {
+  count = local.is-development || local.is-test ? 1 : 0
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "fan_out_tags"
+  role_name                      = aws_iam_role.fan_out_tags.name
+  role_arn                       = aws_iam_role.fan_out_tags.arn
+  handler                        = "fan_out_tags.handler"
+  memory_size                    = 512
+  timeout                        = 60
+  reserved_concurrent_executions = 100
+
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+
+  security_group_ids = [aws_security_group.lambda_generic.id]
+  subnet_ids         = data.aws_subnets.shared-private.ids
+
+  environment_variables = {
+    SQS_QUEUE_ARN         = module.load_fms_event_queue.sqs_queue.url
+  }
+}
