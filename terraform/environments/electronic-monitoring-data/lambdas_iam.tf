@@ -1550,13 +1550,13 @@ resource "aws_iam_policy" "ears_sars_iam_role_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "ears_sars_iam_role_policy_attachment" {
-  count      = local.is-preproduction ? 1 : 0
+  count      = local.is-development || local.is-preproduction ? 1 : 0
   role       = aws_iam_role.ears_sars_iam_role[0].name
   policy_arn = aws_iam_policy.ears_sars_iam_role_policy[0].arn
 }
 
 resource "aws_lakeformation_permissions" "ears_sars_table_permissions" {
-  count     = local.is-development || local.is-preproduction ? 1 : 0
+  count     = local.is-preproduction ? 1 : 0
   principal = aws_iam_role.ears_sars_iam_role[0].arn
 
   table {
