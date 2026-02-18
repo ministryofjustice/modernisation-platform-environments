@@ -26,7 +26,7 @@ resource "aws_route53_record" "app1" {
   records  = [aws_instance.app1.private_ip]
 }
 
-# # Note that this app2 referes to Application Server 2, not CM
+# Note that this app2 referes to Application Server 2, not CM
 # resource "aws_route53_record" "app2" {
 #   count    = contains(["development", "testing"], local.environment) ? 0 : 1
 #   provider = aws.core-vpc
@@ -37,16 +37,19 @@ resource "aws_route53_record" "app1" {
 #   records  = [aws_instance.app2[0].private_ip]
 # }
 
-# Domain A record for ALB
+####################################
+# Internal ALB DNS Record
+####################################
+
 resource "aws_route53_record" "external" {
   provider = aws.core-vpc
   zone_id  = var.route53_zone_external_id
-  name     = "${local.application_name_short}.${var.route53_zone_external}" # cwa.dev.legalservices.gov.uk
+  name     = "${local.application_name_short}.${var.route53_zone_external}"
   type     = "A"
 
   alias {
-    name                   = aws_lb.external.dns_name
-    zone_id                = aws_lb.external.zone_id
+    name                   = aws_lb.internal.dns_name
+    zone_id                = aws_lb.internal.zone_id
     evaluate_target_health = true
   }
 }

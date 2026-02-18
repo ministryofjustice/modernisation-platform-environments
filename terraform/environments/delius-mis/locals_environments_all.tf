@@ -27,7 +27,15 @@ locals {
       general_shared = data.aws_kms_key.general_shared.arn
       rds_shared     = data.aws_kms_key.rds_shared.arn
     }
-    dns_suffix = "${local.application_name}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+    dns_suffix                 = "${local.application_name}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+    security_group_cidrs_staff = module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public
+    security_group_cidrs_mojo  = module.ip_addresses.moj_cidrs.trusted_mojo_public
+    security_group_cidrs_infrastructure = distinct(flatten([
+      module.ip_addresses.moj_cidr.ark_dc_external_internet,
+      module.ip_addresses.moj_cidr.vodafone_dia_networks,
+      module.ip_addresses.moj_cidr.palo_alto_prisma_access_corporate,
+      module.ip_addresses.moj_cidr.mojo_azure_landing_zone_egress,
+    ]))
   }
 
   platform_vars = {
@@ -37,32 +45,4 @@ locals {
   pagerduty_integration_keys = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys.secret_string)
   integration_key_lookup     = local.is-production ? "delius_mis_prod_alarms" : "delius_mis_nonprod_alarms"
   pagerduty_integration_key  = local.pagerduty_integration_keys[local.integration_key_lookup]
-
-  domain_join_ports = [
-    { protocol = "tcp", from_port = 25, to_port = 25 },
-    { protocol = "tcp", from_port = 53, to_port = 53 }, # DNS
-    { protocol = "udp", from_port = 53, to_port = 53 },
-    { protocol = "udp", from_port = 67, to_port = 67 },
-    { protocol = "tcp", from_port = 88, to_port = 88 }, # Kerberos
-    { protocol = "udp", from_port = 88, to_port = 88 },
-    { protocol = "udp", from_port = 123, to_port = 123 }, # NTP
-    { protocol = "tcp", from_port = 135, to_port = 135 }, # RPC
-    { protocol = "udp", from_port = 137, to_port = 138 }, # NetBIOS
-    { protocol = "tcp", from_port = 139, to_port = 139 }, # NetBIOS
-    { protocol = "tcp", from_port = 389, to_port = 389 }, # LDAP
-    { protocol = "udp", from_port = 389, to_port = 389 },
-    { protocol = "tcp", from_port = 445, to_port = 445 }, # SMB
-    { protocol = "udp", from_port = 445, to_port = 445 },
-    { protocol = "tcp", from_port = 464, to_port = 464 }, # Kerberos password change
-    { protocol = "udp", from_port = 464, to_port = 464 },
-    { protocol = "tcp", from_port = 636, to_port = 636 }, # LDAPS
-    { protocol = "tcp", from_port = 1025, to_port = 5000 },
-    { protocol = "udp", from_port = 2535, to_port = 2535 },
-    { protocol = "tcp", from_port = 3268, to_port = 3269 },
-    { protocol = "tcp", from_port = 5722, to_port = 5722 },
-    { protocol = "tcp", from_port = 9389, to_port = 9389 },
-    { protocol = "tcp", from_port = 49152, to_port = 65535 },
-    { protocol = "icmp", from_port = -1, to_port = -1 } # ICMP
-  ]
-
 }

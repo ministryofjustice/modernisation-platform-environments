@@ -1,4 +1,6 @@
 data "aws_iam_policy_document" "mlflow" {
+  count = terraform.workspace == "analytical-platform-compute-development" ? 1 : 0
+
   statement {
     sid    = "AllowKMS"
     effect = "Allow"
@@ -9,14 +11,14 @@ data "aws_iam_policy_document" "mlflow" {
       "kms:GenerateDataKey*",
       "kms:Describe*"
     ]
-    resources = [module.mlflow_s3_kms.key_arn]
+    resources = [module.mlflow_s3_kms[0].key_arn]
   }
   statement {
     sid     = "AllowS3List"
     effect  = "Allow"
     actions = ["s3:ListBucket"]
     resources = [
-      module.mlflow_bucket.s3_bucket_arn,
+      module.mlflow_bucket[0].s3_bucket_arn,
       "arn:aws:s3:::${local.environment_configuration.mlflow_s3_bucket_name}"
     ]
   }
@@ -29,13 +31,15 @@ data "aws_iam_policy_document" "mlflow" {
       "s3:DeleteObject"
     ]
     resources = [
-      "${module.mlflow_bucket.s3_bucket_arn}/*",
+      "${module.mlflow_bucket[0].s3_bucket_arn}/*",
       "arn:aws:s3:::${local.environment_configuration.mlflow_s3_bucket_name}/*"
     ]
   }
 }
 
 module "mlflow_iam_policy" {
+  count = terraform.workspace == "analytical-platform-compute-development" ? 1 : 0
+
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
@@ -44,7 +48,7 @@ module "mlflow_iam_policy" {
 
   name_prefix = "mlflow"
 
-  policy = data.aws_iam_policy_document.mlflow.json
+  policy = data.aws_iam_policy_document.mlflow[0].json
 
   tags = local.tags
 }

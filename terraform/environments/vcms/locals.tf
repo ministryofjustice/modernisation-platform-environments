@@ -30,19 +30,9 @@ locals {
     internal_dns_suffix = "${local.application_name}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.internal"
   }
 
-  app_config = {
-    container_port                     = 80
-    container_cpu                      = "512"
-    task_memory                        = "1024"
-    desired_count                      = 1
-    deployment_maximum_percent         = 100
-    deployment_minimum_healthy_percent = 0
-    health_check_grace_period_seconds  = 60
-  }
+  app_config = lookup(local.application_data["accounts"], terraform.workspace) # only use current env
 
   bastion_config = {}
-  image_tag      = "initial-16447252449-1"
-  image_uri      = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/vcms:${local.image_tag}"
   app_port       = 80
   internal_security_group_cidrs = distinct(flatten([
     module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public,
@@ -62,6 +52,12 @@ locals {
       "54.228.16.0/26",    # eu-west-1 Region
       "107.23.255.0/26",   # us-east-1 Region
       "54.243.31.192/26"   # us-east-1 Region
+    ],
+    [
+      # Civica secure development environment
+      "4.234.27.250/32",
+      "213.143.143.69/32",
+      "213.143.146.149/32"
     ]
   ]))
   ipv6_cidr_blocks = []

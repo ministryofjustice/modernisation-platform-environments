@@ -13,7 +13,7 @@ resource "aws_sqs_queue" "s3_event_queue" {
   visibility_timeout_seconds = (15 * 60) + 1 # lambda execution time plus 1
   redrive_policy = jsonencode({
     deadLetterTargetArn = aws_sqs_queue.s3_event_dlq.arn
-    maxReceiveCount     = 2
+    maxReceiveCount     = var.max_receive_count
   })
   sqs_managed_sse_enabled = true
 }
@@ -54,12 +54,14 @@ resource "aws_lambda_event_source_mapping" "sqs_trigger" {
   event_source_arn = aws_sqs_queue.s3_event_queue.arn
   function_name    = var.lambda_function_name
   batch_size       = 1
+  enabled          = var.enabled
   scaling_config {
-    maximum_concurrency = 10
+    maximum_concurrency = var.maximum_concurrency
   }
 }
 
 resource "aws_sqs_queue" "s3_event_dlq" {
-  name                    = "${local.queue_base_name}-dlq"
-  sqs_managed_sse_enabled = true
+  name                      = "${local.queue_base_name}-dlq"
+  sqs_managed_sse_enabled   = true
+  message_retention_seconds = 1209600
 }

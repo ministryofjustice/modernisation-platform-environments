@@ -2,7 +2,7 @@ locals {
 
   lb_maintenance_message_preproduction = {
     maintenance_title   = "Prison-NOMIS Environment Not Started"
-    maintenance_message = "Lsast weblogic is rarely used so is started on demand. Preprod is available during working hours 7am-7pm. Please contact <a href=\"https://moj.enterprise.slack.com/archives/C6D94J81E\">#ask-digital-studio-ops</a> slack channel if environment is unexpecedly down. See <a href=\"https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4978343956\">confluence</a> for more details"
+    maintenance_message = "Preprod is available during working hours 7am-7pm. Please contact <a href=\"https://moj.enterprise.slack.com/archives/C6D94J81E\">#ask-digital-studio-ops</a> slack channel if environment is unexpectedly down. See <a href=\"https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4978343956\">confluence</a> for more details"
   }
 
   baseline_presets_preproduction = {
@@ -24,14 +24,13 @@ locals {
   baseline_preproduction = {
 
     acm_certificates = {
-      nomis_wildcard_cert_v2 = {
+      nomis_wildcard_cert_v3 = {
         cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
         domain_name                         = "*.preproduction.nomis.service.justice.gov.uk"
         external_validation_records_created = true
         subject_alternate_names = [
           "*.nomis.hmpps-preproduction.modernisation-platform.service.justice.gov.uk",
           "*.pp-nomis.az.justice.gov.uk",
-          "*.lsast-nomis.az.justice.gov.uk",
         ]
         tags = {
           description = "wildcard cert for nomis preproduction domains"
@@ -54,30 +53,30 @@ locals {
     }
 
     ec2_autoscaling_groups = {
-      # ACTIVE (blue deployment)
-      lsast-nomis-web-a = merge(local.ec2_autoscaling_groups.web, {
-        autoscaling_group = merge(local.ec2_autoscaling_groups.web.autoscaling_group, {
-          desired_capacity = 0 # started on demand
-        })
-        # cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.web
-        config = merge(local.ec2_autoscaling_groups.web.config, {
-          ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
-          instance_profile_policies = concat(local.ec2_autoscaling_groups.web.config.instance_profile_policies, [
-            "Ec2LsastWeblogicPolicy",
-          ])
-        })
-        user_data_cloud_init = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init, {
-          args = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init.args, {
-            branch = "main"
-          })
-        })
-        tags = merge(local.ec2_autoscaling_groups.web.tags, {
-          nomis-environment    = "lsast"
-          oracle-db-hostname-a = "lsnomis-a.preproduction.nomis.service.justice.gov.uk"
-          oracle-db-hostname-b = "lsnomis-b.preproduction.nomis.service.justice.gov.uk"
-          oracle-db-name       = "LSCNOM"
-        })
-      })
+      # # ACTIVE (blue deployment)
+      # lsast-nomis-web-a = merge(local.ec2_autoscaling_groups.web, {
+      #   autoscaling_group = merge(local.ec2_autoscaling_groups.web.autoscaling_group, {
+      #     desired_capacity = 0 # started on demand
+      #   })
+      #   # cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.web
+      #   config = merge(local.ec2_autoscaling_groups.web.config, {
+      #     ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
+      #     instance_profile_policies = concat(local.ec2_autoscaling_groups.web.config.instance_profile_policies, [
+      #       "Ec2LsastWeblogicPolicy",
+      #     ])
+      #   })
+      #   user_data_cloud_init = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init, {
+      #     args = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init.args, {
+      #       branch = "main"
+      #     })
+      #   })
+      #   tags = merge(local.ec2_autoscaling_groups.web.tags, {
+      #     nomis-environment    = "lsast"
+      #     oracle-db-hostname-a = "lsnomis-a.preproduction.nomis.service.justice.gov.uk"
+      #     oracle-db-hostname-b = "lsnomis-b.preproduction.nomis.service.justice.gov.uk"
+      #     oracle-db-name       = "LSCNOM"
+      #   })
+      # })
 
       # ACTIVE (blue deployment)
       preprod-nomis-web-a = merge(local.ec2_autoscaling_groups.web, {
@@ -413,28 +412,28 @@ locals {
         listeners = merge(local.lbs.private.listeners, {
           https = merge(local.lbs.private.listeners.https, {
             alarm_target_group_names  = [] # don't enable as environments are powered up/down frequently
-            certificate_names_or_arns = ["nomis_wildcard_cert_v2"]
+            certificate_names_or_arns = ["nomis_wildcard_cert_v3"]
             cloudwatch_metric_alarms  = module.baseline_presets.cloudwatch_metric_alarms.lb
 
             # /home/oracle/admin/scripts/lb_maintenance_mode.sh script on
             # weblogic servers can alter priorities to enable maintenance message
             rules = {
-              lsast-nomis-web-a-http-7777 = {
-                priority = 1150 # reduce by 1000 to make active
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "lsast-nomis-web-a-http-7777"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "lsast-nomis-web-a.preproduction.nomis.service.justice.gov.uk",
-                      "c-lsast.preproduction.nomis.service.justice.gov.uk",
-                      "c.lsast-nomis.az.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
+              # lsast-nomis-web-a-http-7777 = {
+              #   priority = 1150 # reduce by 1000 to make active
+              #   actions = [{
+              #     type              = "forward"
+              #     target_group_name = "lsast-nomis-web-a-http-7777"
+              #   }]
+              #   conditions = [{
+              #     host_header = {
+              #       values = [
+              #         "lsast-nomis-web-a.preproduction.nomis.service.justice.gov.uk",
+              #         "c-lsast.preproduction.nomis.service.justice.gov.uk",
+              #         "c.lsast-nomis.az.justice.gov.uk",
+              #       ]
+              #     }
+              #   }]
+              # }
               preprod-nomis-web-a-http-7777 = {
                 priority = 200
                 actions = [{
@@ -480,9 +479,9 @@ locals {
                     values = [
                       "maintenance.preproduction.nomis.service.justice.gov.uk",
                       "c.pp-nomis.az.justice.gov.uk",
-                      "c.lsast-nomis.az.justice.gov.uk",
+                      # "c.lsast-nomis.az.justice.gov.uk",
                       "c.preproduction.nomis.service.justice.gov.uk",
-                      "c-lsast.preproduction.nomis.service.justice.gov.uk",
+                      # "c-lsast.preproduction.nomis.service.justice.gov.uk",
                     ]
                   }
                 }]
@@ -531,7 +530,12 @@ locals {
           { name = "preprod-nomis-web-a", type = "A", lbs_map_key = "private" },
           { name = "preprod-nomis-web-b", type = "A", lbs_map_key = "private" },
           { name = "c", type = "A", lbs_map_key = "private" },
-          { name = "c-lsast", type = "A", lbs_map_key = "private" },
+          # { name = "c-lsast", type = "A", lbs_map_key = "private" },
+        ]
+      }
+      "pp-nomis.az.justice.gov.uk" = {
+        records = [
+          { name = "c", type = "CNAME", ttl = "1800", records = ["c.preproduction.nomis.service.justice.gov.uk"] },
         ]
       }
     }

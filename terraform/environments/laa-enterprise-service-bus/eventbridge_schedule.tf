@@ -18,7 +18,6 @@ resource "aws_scheduler_schedule" "cwa_extract_schedule" {
 
 # CCMS Load Schedule
 resource "aws_scheduler_schedule" "ccms_load_schedule" {
-  count      = local.environment == "development" ? 1 : 0
   name       = "ccms-load-schedule"
   group_name = "default"
 
@@ -26,8 +25,9 @@ resource "aws_scheduler_schedule" "ccms_load_schedule" {
     mode = "OFF"
   }
 
-  schedule_expression = "cron(0 7-19 ? * * *)"
-
+  schedule_expression = local.environment == "production" ? "rate(15 minutes)" : "cron(0 7-19 ? * * *)"
+  start_date          = local.environment == "production" ? "2026-02-05T07:30:00Z" : null
+  end_date            = local.environment == "production" ? "2026-02-05T09:00:00Z" : null
   target {
     arn      = aws_lambda_function.ccms_provider_load.arn
     role_arn = aws_iam_role.scheduler_invoke_lambda_role.arn
@@ -43,7 +43,7 @@ resource "aws_scheduler_schedule" "maat_load_schedule" {
     mode = "OFF"
   }
 
-  schedule_expression = local.environment == "production" ? "cron(0/15 7-19 ? * * *)" : "cron(0 7-19 ? * * *)"
+  schedule_expression = local.environment == "production" ? "cron(45 10 * * ? *)" : "cron(0 7-19 ? * * *)"
 
   target {
     arn      = aws_lambda_function.maat_provider_load.arn
@@ -60,7 +60,8 @@ resource "aws_scheduler_schedule" "ccr_load_schedule" {
     mode = "OFF"
   }
 
-  schedule_expression = local.environment == "production" ? "cron(0/15 7-19 ? * * *)" : "cron(0 7-19 ? * * *)"
+  schedule_expression = local.environment == "production" ? "cron(45 10 * * ? *)" : "cron(0 7-19 ? * * *)"
+  state               = "DISABLED"
 
   target {
     arn      = aws_lambda_function.ccr_provider_load.arn
@@ -77,7 +78,8 @@ resource "aws_scheduler_schedule" "cclf_load_schedule" {
     mode = "OFF"
   }
 
-  schedule_expression = local.environment == "production" ? "cron(0/15 7-19 ? * * *)" : "cron(0 7-19 ? * * *)"
+  schedule_expression = local.environment == "production" ? "cron(45 10 * * ? *)" : "cron(0 7-19 ? * * *)"
+  state               = "DISABLED"
 
   target {
     arn      = aws_lambda_function.cclf_provider_load.arn

@@ -1,3 +1,4 @@
+# DMS configuration for CICA data pipelines (tariff and tempus)
 locals {
   tariff = {
     short_resource_name = "tariff-${local.environment}"
@@ -26,7 +27,7 @@ locals {
 }
 
 module "cica_dms_tariff_dms_implementation" {
-
+  # Oracle DMS source
   source      = "../modules/dms"
   vpc_id      = data.aws_vpc.connected_vpc.id
   environment = local.environment

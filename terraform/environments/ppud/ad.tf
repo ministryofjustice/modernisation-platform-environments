@@ -1,3 +1,7 @@
+#############################################
+# Active Directory Documents and Associations
+#############################################
+
 resource "aws_directory_service_directory" "UKGOV" {
   name     = local.application_data.accounts[local.environment].directory_service_name
   password = aws_secretsmanager_secret_version.sversion.secret_string

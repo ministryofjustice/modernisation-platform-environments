@@ -35,15 +35,21 @@ variable "bws_config" {
   type = any
 }
 
+variable "boe_efs_config" {
+  type    = any
+  default = null
+}
+
 variable "dis_config" {
   description = "Configuration for DIS instances"
   type = object({
     instance_count           = number
     ami_name                 = string
+    computer_name            = string
     ebs_volumes              = any
     ebs_volumes_config       = any
     instance_config          = any
-    branch                   = optional(string, "main")
+    powershell_branch        = optional(string, "main")
     cloudwatch_metric_alarms = optional(any, null)
   })
   default = null
@@ -116,11 +122,6 @@ variable "pagerduty_integration_key" {
   default     = null
 }
 
-variable "domain_join_ports" {
-  description = "Ports required for domain join"
-  type        = any
-}
-
 variable "lb_config" {
   description = "params for Classic Load Balancer"
   type        = any
@@ -132,7 +133,6 @@ variable "datasync_config" {
   type = object({
     source_s3_bucket_arn       = string
     source_s3_subdirectory     = optional(string, "/dfinterventions/dfi/csv/reports/")
-    fsx_domain                 = optional(string, "delius-mis-dev.internal")
     bandwidth_throttle         = optional(number)
     schedule_expression        = optional(string, "cron(15 4 * * ? *)") # Default: DataSync at 04:15 UTC
     lambda_schedule_expression = optional(string, "cron(0 4 * * ? *)")  # Default: Lambda at 04:00 UTC

@@ -112,6 +112,17 @@ resource "aws_security_group_rule" "allow_alb_from_yjsm" {
   description              = "YJSM to YJAF Internal ALB"
 }
 
+# YJSM to ALB
+resource "aws_security_group_rule" "allow_connectivity_alb_from_yjsm" {
+  type                     = "ingress"
+  from_port                = 8080
+  to_port                  = 8080
+  protocol                 = "tcp"
+  security_group_id        = var.connectivity_alb_sg_id
+  source_security_group_id = aws_security_group.yjsm_service.id
+  description              = "YJSM to YJAF connectivity ALB"
+}
+
 
 #YJSM to ECS
 resource "aws_security_group_rule" "yjsm_to_ecsint_rule" {

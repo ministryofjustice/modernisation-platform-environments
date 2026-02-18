@@ -9,6 +9,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu" {
   threshold           = "80"
   alarm_description   = "Monitors ec2 cpu utilisation"
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
+  ok_actions          = [aws_sns_topic.cw_alerts.arn]
   dimensions = {
     instanceId = aws_instance.ec2_oracle_ebs.id
   }
@@ -30,6 +31,7 @@ resource "aws_cloudwatch_metric_alarm" "low_available_memory" {
   threshold           = "10"
   alarm_description   = "This metric monitors the amount of available memory. If the amount of available memory is less than 10% for 2 minutes, the alarm will trigger."
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
+  ok_actions          = [aws_sns_topic.cw_alerts.arn]
   dimensions = {
     instanceId = aws_instance.ec2_oracle_ebs.id
   }
@@ -52,6 +54,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu_usage_iowait" {
   threshold           = "90"
   alarm_description   = "This metric monitors the amount of CPU time spent waiting for I/O to complete. If the average CPU time spent waiting for I/O to complete is greater than 90% for 30 minutes, the alarm will trigger."
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
+  ok_actions          = [aws_sns_topic.cw_alerts.arn]
   dimensions = {
     instanceId = aws_instance.ec2_oracle_ebs.id
   }
@@ -73,6 +76,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free" {
   threshold           = "15"
   alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 15% for 2 minutes, the alarm will trigger"
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
+  ok_actions          = [aws_sns_topic.cw_alerts.arn]
   dimensions = {
     instanceId = aws_instance.ec2_oracle_ebs.id
   }
@@ -94,6 +98,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu_utilization" {
   threshold           = "95"                            # threshold for the alarm - see comparison_operator for usage
   alarm_description   = "Triggers if the average cpu remains at 95% utilization or above for 15 minutes"
   alarm_actions       = [aws_sns_topic.cw_alerts.arn] # SNS topic to send the alarm to
+  ok_actions          = [aws_sns_topic.cw_alerts.arn] # SNS topic to send the OK notification to
   dimensions = {
     instanceId = aws_instance.ec2_oracle_ebs.id
   }
@@ -118,6 +123,7 @@ resource "aws_cloudwatch_metric_alarm" "instance_health_check" {
   threshold           = "1"
   alarm_description   = "Instance status checks monitor the software and network configuration of your individual instance. When an instance status check fails, you typically must address the problem yourself: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/monitoring-system-instance-status-check.html"
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
+  ok_actions          = [aws_sns_topic.cw_alerts.arn]
   dimensions = {
     instanceId = aws_instance.ec2_oracle_ebs.id
   }
@@ -138,6 +144,7 @@ resource "aws_cloudwatch_metric_alarm" "system_health_check" {
   threshold           = "1"
   alarm_description   = "System status checks monitor the AWS systems on which your instance runs. These checks detect underlying problems with your instance that require AWS involvement to repair: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/monitoring-system-instance-status-check.html"
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
+  ok_actions          = [aws_sns_topic.cw_alerts.arn]
   dimensions = {
     instanceId = aws_instance.ec2_oracle_ebs.id
   }
@@ -161,6 +168,7 @@ resource "aws_cloudwatch_metric_alarm" "load_balancer_unhealthy_state_routing" {
   threshold           = "1"
   alarm_description   = "This metric monitors the number of unhealthy hosts in the routing table for the load balancer. If the number of unhealthy hosts is greater than 0 for 3 minutes."
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
+  ok_actions          = [aws_sns_topic.cw_alerts.arn]
   dimensions = {
     TargetGroup  = aws_lb_target_group.ebsapp_tg.arn_suffix
     LoadBalancer = aws_lb.ebsapps_lb.arn_suffix
@@ -181,6 +189,7 @@ resource "aws_cloudwatch_metric_alarm" "load_balancer_unhealthy_state_dns" {
   threshold           = "1"
   alarm_description   = "This metric monitors the number of unhealthy hosts in the DNS table for the load balancer. If the number of unhealthy hosts is greater than 0 for 3 minutes."
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
+  ok_actions          = [aws_sns_topic.cw_alerts.arn]
   dimensions = {
     TargetGroup  = aws_lb_target_group.ebsapp_tg.arn_suffix
     LoadBalancer = aws_lb.ebsapps_lb.arn_suffix
@@ -207,6 +216,7 @@ resource "aws_cloudwatch_metric_alarm" "oracle_db_disconnected" {
   threshold           = "1"
   alarm_description   = "Oracle db connection to a particular SID is not working"
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
+  ok_actions          = [aws_sns_topic.cw_alerts.arn]
   tags = {
     Name = "oracle_db_disconnected"
   }
@@ -225,6 +235,7 @@ resource "aws_cloudwatch_metric_alarm" "oracle_batch_error" {
   threshold           = "1"
   alarm_description   = "Oracle db is either in long-running batch or failed batch status"
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
+  ok_actions          = [aws_sns_topic.cw_alerts.arn]
   tags = {
     Name = "oracle_batch_error"
   }
@@ -243,6 +254,7 @@ resource "aws_cloudwatch_metric_alarm" "load_balancer_unhealthy_state_target" {
   threshold           = "1"
   alarm_description   = "This metric monitors the number of unhealthy hosts in the target table for the load balancer. If the number of unhealthy hosts is greater than 0 for 3 minutes."
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
+  ok_actions          = [aws_sns_topic.cw_alerts.arn]
   tags = {
     Name = "load_balancer_unhealthy_state_target"
   }
@@ -264,6 +276,7 @@ resource "aws_cloudwatch_metric_alarm" "cert_expires_in_30_days" {
   threshold           = "30"
   alarm_description   = "This metric monitors the number of days until the certificate expires. If the number of days is less than 30."
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
+  ok_actions          = [aws_sns_topic.cw_alerts.arn]
   tags = {
     Name = "cert_expires_in_30_days"
   }
@@ -280,6 +293,7 @@ resource "aws_cloudwatch_metric_alarm" "cert_expires_in_2_days" {
   threshold           = "2"
   alarm_description   = "This metric monitors the number of days until the certificate expires. If the number of days is less than 2."
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
+  ok_actions          = [aws_sns_topic.cw_alerts.arn]
   tags = {
     Name = "cert_expires_in_2_days"
   }

@@ -76,7 +76,7 @@ locals {
     wam_waf_analysis = {
       description  = "Function to analyse WAM WAF ACL traffic and email a report."
       role_key     = "get_cloudwatch"
-      environments = ["development"]
+      environments = ["development", "preproduction", "production"]
       layers       = ["numpy", "pillow", "requests", "matplotlib"]
       permissions = [{
         principal         = "cloudwatch.amazonaws.com"
@@ -215,6 +215,16 @@ locals {
         source_arn_suffix = "*"
       }]
     }
+    ssm_patch_notification = {
+      description  = "Function to send email notification when SSM patching completes."
+      role_key     = "invoke_ses"
+      environments = ["development", "preproduction", "production"]
+      runtime      = "python3.13"
+      permissions = [{
+        principal         = "events.amazonaws.com"
+        source_arn_suffix = "*"
+      }]
+    }
     disk_info_report = {
       description  = "Function to retrieve, format and email a report on the disk utilisation of all Windows EC2 instances."
       role_key     = "get_cloudwatch"
@@ -236,6 +246,33 @@ locals {
       vpc_config   = { production = true }
       permissions = [{
         principal         = "cloudwatch.amazonaws.com"
+        source_arn_suffix = "*"
+      }]
+    }
+    sync_ssm_to_waf = {
+      description  = "Function to synchronize ssm parameter store with WAF ip sets."
+      role_key     = "sync_ssm_to_waf"
+      environments = ["development", "preproduction", "production"]
+      permissions = [{
+        principal         = "events.amazonaws.com"
+        source_arn_suffix = "*"
+      }]
+    }
+    check_elb_trt_alarm = {
+      description  = "Function to check alarm state of High-Target-Response-Time-WAM-ELB alarm and generate subsequent alerts."
+      role_key     = "check_elb_trt_alarm"
+      environments = ["production"]
+      permissions = [{
+        principal         = "cloudwatch.amazonaws.com"
+        source_arn_suffix = "*"
+      }]
+    }
+    suppress_securityhub_findings = {
+      description  = "Function to suppress security hub findings with a Compliance Status of NOT_AVAILABLE."
+      role_key     = "suppress_sechub_findings"
+      environments = ["development", "preproduction", "production"]
+      permissions = [{
+        principal         = "securityhub.amazonaws.com"
         source_arn_suffix = "*"
       }]
     }

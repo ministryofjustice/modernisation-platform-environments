@@ -9,13 +9,15 @@ resource "random_password" "password" {
 
 // Secrets for the ncas database on the modernisation platform
 resource "aws_secretsmanager_secret" "rds_db_credentials" {
+  #checkov:skip=CKV2_AWS_57:Automatic rotation is not required for this secret
+  #checkov:skip=CKV_AWS_149: "Ensure that Secrets Manager secret is encrypted using KMS CMK"
   name                    = "rds-password"
   recovery_window_in_days = 0
 }
 
 resource "aws_secretsmanager_secret_version" "rds_credentials" {
   secret_id     = aws_secretsmanager_secret.rds_db_credentials.id
-  secret_string = jsonencode({ "NCAS_DB_PASSWORD" : "${random_password.password.result}" })
+  secret_string = jsonencode({ "NCAS_DB_PASSWORD" : random_password.password.result })
 }
 
 data "aws_secretsmanager_secret" "get_ncas_db_secrets" {

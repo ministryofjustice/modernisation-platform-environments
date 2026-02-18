@@ -134,9 +134,9 @@ resource "aws_cloudwatch_metric_alarm" "container_adaptor_count" {
 resource "aws_cloudwatch_metric_alarm" "Status_Check_Failure" {
   alarm_name          = "${local.application_name}-${local.environment}-status-check-failure"
   alarm_description   = "A oia cluster EC2 instance has failed a status check, Runbook - https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
-  comparison_operator = "GreaterThanThreshold"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
   metric_name         = "StatusCheckFailed"
-  statistic           = "Average"
+  statistic           = "Maximum"
   namespace           = "AWS/EC2"
   period              = "60"
   evaluation_periods  = "5"
@@ -237,4 +237,61 @@ resource "aws_cloudwatch_metric_alarm" "oia_rds_burst_balance_low" {
   ok_actions         = [aws_sns_topic.cloudwatch_alerts.arn]
 
   tags = local.tags
+}
+
+resource "aws_cloudwatch_metric_alarm" "connector_alb_healthyhosts" {
+  alarm_name          = "${local.application_name}-${local.environment}-connector-alb-targets-group"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = 1
+  metric_name         = "HealthyHostCount"
+  namespace           = "AWS/ApplicationELB"
+  period              = 240
+  statistic           = "Average"
+  threshold           = local.application_data.accounts[local.environment].connector_app_count
+  alarm_description   = "Number of healthy nodes in Target Group"
+  actions_enabled     = true
+  alarm_actions       = [aws_sns_topic.cloudwatch_alerts.arn]
+  ok_actions          = [aws_sns_topic.cloudwatch_alerts.arn]
+  dimensions = {
+    TargetGroup  = aws_lb_target_group.connector_target_group.arn_suffix
+    LoadBalancer = aws_lb.connector.arn_suffix
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "opa_alb_healthyhosts" {
+  alarm_name          = "${local.application_name}-${local.environment}-opa-alb-targets-group"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = 1
+  metric_name         = "HealthyHostCount"
+  namespace           = "AWS/ApplicationELB"
+  period              = 240
+  statistic           = "Average"
+  threshold           = local.application_data.accounts[local.environment].opa_app_count
+  alarm_description   = "Number of healthy nodes in Target Group"
+  actions_enabled     = true
+  alarm_actions       = [aws_sns_topic.cloudwatch_alerts.arn]
+  ok_actions          = [aws_sns_topic.cloudwatch_alerts.arn]
+  dimensions = {
+    TargetGroup  = aws_lb_target_group.opahub_target_group.arn_suffix
+    LoadBalancer = aws_lb.opahub.arn_suffix
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "adaptor_alb_healthyhosts" {
+  alarm_name          = "${local.application_name}-${local.environment}-adaptor-alb-targets-group"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = 1
+  metric_name         = "HealthyHostCount"
+  namespace           = "AWS/ApplicationELB"
+  period              = 240
+  statistic           = "Average"
+  threshold           = local.application_data.accounts[local.environment].adaptor_app_count
+  alarm_description   = "Number of healthy nodes in Target Group"
+  actions_enabled     = true
+  alarm_actions       = [aws_sns_topic.cloudwatch_alerts.arn]
+  ok_actions          = [aws_sns_topic.cloudwatch_alerts.arn]
+  dimensions = {
+    TargetGroup  = aws_lb_target_group.adaptor_target_group.arn_suffix
+    LoadBalancer = aws_lb.adaptor.arn_suffix
+  }
 }

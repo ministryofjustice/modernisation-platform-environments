@@ -4,7 +4,7 @@ resource "helm_release" "kyverno" {
   name       = "kyverno"
   repository = "https://kyverno.github.io/kyverno"
   chart      = "kyverno"
-  version    = "3.4.3"
+  version    = local.environment_configuration.helm_chart_version.kyverno
   namespace  = kubernetes_namespace.kyverno.metadata[0].name
   values = [
     templatefile(
@@ -26,7 +26,7 @@ resource "helm_release" "aws_cloudwatch_metrics" {
   name       = "aws-cloudwatch-metrics"
   repository = "https://aws.github.io/eks-charts"
   chart      = "aws-cloudwatch-metrics"
-  version    = "0.0.11"
+  version    = local.environment_configuration.helm_chart_version.aws_cloudwatch_metrics
   namespace  = kubernetes_namespace.aws_observability.metadata[0].name
   values = [
     templatefile(
@@ -45,7 +45,7 @@ resource "helm_release" "aws_for_fluent_bit" {
   name       = "aws-for-fluent-bit"
   repository = "https://aws.github.io/eks-charts"
   chart      = "aws-for-fluent-bit"
-  version    = "0.1.35"
+  version    = local.environment_configuration.helm_chart_version.aws_for_fluent_bit
   namespace  = kubernetes_namespace.aws_observability.metadata[0].name
   values = [
     templatefile(
@@ -54,7 +54,7 @@ resource "helm_release" "aws_for_fluent_bit" {
         aws_region                = data.aws_region.current.region
         cluster_name              = module.eks.cluster_name
         cloudwatch_log_group_name = module.eks_log_group.cloudwatch_log_group_name
-        eks_role_arn              = module.aws_for_fluent_bit_iam_role.iam_role_arn
+        eks_role_arn              = module.aws_for_fluent_bit_iam_role.arn
       }
     )
   ]
@@ -71,14 +71,14 @@ resource "helm_release" "amazon_prometheus_proxy" {
   name       = "amazon-prometheus-proxy"
   repository = "https://prometheus-community.github.io/helm-charts"
   chart      = "kube-prometheus-stack"
-  version    = "75.3.5"
+  version    = local.environment_configuration.helm_chart_version.kube_prometheus_stack
   namespace  = kubernetes_namespace.aws_observability.metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/values/amazon-prometheus-proxy/values.yml.tftpl",
       {
         aws_region       = data.aws_region.current.region
-        eks_role_arn     = module.amazon_prometheus_proxy_iam_role.iam_role_arn
+        eks_role_arn     = module.amazon_prometheus_proxy_iam_role.arn
         amp_workspace_id = module.managed_prometheus.workspace_id
       }
     )
@@ -96,7 +96,7 @@ resource "helm_release" "cluster_autoscaler" {
   name       = "cluster-autoscaler"
   repository = "https://kubernetes.github.io/autoscaler"
   chart      = "cluster-autoscaler"
-  version    = "9.46.6"
+  version    = local.environment_configuration.helm_chart_version.cluster_autoscaler
   namespace  = kubernetes_namespace.cluster_autoscaler.metadata[0].name
 
   values = [
@@ -105,7 +105,7 @@ resource "helm_release" "cluster_autoscaler" {
       {
         aws_region                = data.aws_region.current.region
         cluster_name              = module.eks.cluster_name
-        eks_role_arn              = module.cluster_autoscaler_iam_role.iam_role_arn
+        eks_role_arn              = module.cluster_autoscaler_iam_role.arn
         service_monitor_namespace = kubernetes_namespace.cluster_autoscaler.metadata[0].name
       }
     )
@@ -119,7 +119,7 @@ resource "helm_release" "karpenter_crd" {
   name       = "karpenter-crd"
   repository = "oci://public.ecr.aws/karpenter"
   chart      = "karpenter-crd"
-  version    = "1.5.0"
+  version    = local.environment_configuration.helm_chart_version.karpenter
   namespace  = kubernetes_namespace.karpenter.metadata[0].name
 
   values = [
@@ -141,7 +141,7 @@ resource "helm_release" "karpenter" {
   name       = "karpenter"
   repository = "oci://public.ecr.aws/karpenter"
   chart      = "karpenter"
-  version    = "1.5.0"
+  version    = local.environment_configuration.helm_chart_version.karpenter
   namespace  = kubernetes_namespace.karpenter.metadata[0].name
 
   values = [
@@ -188,14 +188,14 @@ resource "helm_release" "external_dns" {
   name       = "external-dns"
   repository = "https://kubernetes-sigs.github.io/external-dns"
   chart      = "external-dns"
-  version    = "1.17.0"
+  version    = local.environment_configuration.helm_chart_version.external_dns
   namespace  = kubernetes_namespace.external_dns.metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/values/external-dns/values.yml.tftpl",
       {
         domain_filter = local.environment_configuration.route53_zone
-        eks_role_arn  = module.external_dns_iam_role.iam_role_arn
+        eks_role_arn  = module.external_dns_iam_role.arn
         txt_owner_id  = module.eks.cluster_name
       }
     )
@@ -209,13 +209,13 @@ resource "helm_release" "cert_manager" {
   name       = "cert-manager"
   repository = "https://charts.jetstack.io"
   chart      = "cert-manager"
-  version    = "v1.18.1"
+  version    = local.environment_configuration.helm_chart_version.cert_manager
   namespace  = kubernetes_namespace.cert_manager.metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/values/cert-manager/values.yml.tftpl",
       {
-        eks_role_arn = module.cert_manager_iam_role.iam_role_arn
+        eks_role_arn = module.cert_manager_iam_role.arn
       }
     )
   ]
@@ -262,7 +262,7 @@ resource "helm_release" "ingress_nginx" {
   name       = "ingress-nginx"
   repository = "https://kubernetes.github.io/ingress-nginx"
   chart      = "ingress-nginx"
-  version    = "4.12.3"
+  version    = local.environment_configuration.helm_chart_version.ingress_nginx
   namespace  = kubernetes_namespace.ingress_nginx.metadata[0].name
   values = [
     templatefile(
@@ -283,13 +283,13 @@ resource "helm_release" "external_secrets" {
   name       = "external-secrets"
   repository = "https://charts.external-secrets.io"
   chart      = "external-secrets"
-  version    = "0.18.0"
+  version    = local.environment_configuration.helm_chart_version.external_secrets
   namespace  = kubernetes_namespace.external_secrets.metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/values/external-secrets/values.yml.tftpl",
       {
-        eks_role_arn = module.external_secrets_iam_role.iam_role_arn
+        eks_role_arn = module.external_secrets_iam_role.arn
       }
     )
   ]
@@ -310,7 +310,7 @@ resource "helm_release" "keda" {
   name       = "keda"
   repository = "https://kedacore.github.io/charts"
   chart      = "keda"
-  version    = "2.17.2"
+  version    = local.environment_configuration.helm_chart_version.keda
   namespace  = kubernetes_namespace.keda.metadata[0].name
   values = [
     templatefile(
@@ -322,17 +322,18 @@ resource "helm_release" "keda" {
 
 /* Velero */
 resource "helm_release" "velero" {
+  /* https://artifacthub.io/packages/helm/vmware-tanzu/velero */
   name       = "velero"
   repository = "https://vmware-tanzu.github.io/helm-charts"
   chart      = "velero"
-  version    = "10.0.10"
+  version    = local.environment_configuration.helm_chart_version.velero
   namespace  = kubernetes_namespace.velero.metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/values/velero/values.yml.tftpl",
       {
-        eks_role_arn              = module.velero_iam_role.iam_role_arn
-        velero_aws_plugin_version = "v1.12.2"
+        eks_role_arn              = module.velero_iam_role.arn
+        velero_aws_plugin_version = "v1.13.2"
         velero_bucket             = module.velero_s3_bucket.s3_bucket_id
         velero_prefix             = module.eks.cluster_name
         aws_region                = data.aws_region.current.region

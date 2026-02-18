@@ -18,9 +18,9 @@ locals {
   }
 
   p1_export_bucket_destination_mapping = {
-    "production"    = "tct-339712706964-prearrivals"
+    "production"    = "tct-339712706964-prearrivals-dev"
     "preproduction" = null
-    "test"          = "tct-339712706964-prearrivals-dev"
+    "test"          = null
     "development"   = null
   }
 
@@ -55,6 +55,9 @@ locals {
     { id = module.s3-raw-formatted-data-bucket.bucket.id, arn = module.s3-raw-formatted-data-bucket.bucket.arn },
     { id = module.s3-lambda-store-bucket.bucket.id, arn = module.s3-lambda-store-bucket.bucket.arn }
   ]
+
+  cross_account_recieve_mapping = local.is-development ? "test" : local.is-preproduction ? "production" : null
+  cross_env_bucket_policy       = local.is-preproduction ? [data.aws_iam_policy_document.allow_cross_env_upload[0].json] : []
 }
 
 
@@ -79,7 +82,7 @@ data "aws_secretsmanager_secret_version" "allied_account_id" {
 # ------------------------------------------------------------------------
 
 module "s3-logging-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9f"
 
   bucket_prefix      = "${local.bucket_prefix}-bucket-logs-"
   versioning_enabled = true
@@ -193,8 +196,50 @@ resource "aws_s3_bucket_logging" "s3_buckets_logging" {
 # Metadata Store Bucket
 # ------------------------------------------------------------------------
 
+
+data "aws_iam_policy_document" "allow_inventory_access" {
+  statement {
+    principals {
+      type        = "Service"
+      identifiers = ["s3.amazonaws.com"]
+    }
+
+    actions = [
+      "s3:PutObject",
+    ]
+
+    resources = [
+      module.s3-metadata-bucket.bucket.arn,
+      "${module.s3-metadata-bucket.bucket.arn}/*",
+    ]
+
+    condition {
+      test     = "StringEquals"
+      variable = "s3:x-amz-acl"
+      values   = ["bucket-owner-full-control"]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceAccount"
+      values   = [data.aws_caller_identity.current.account_id]
+    }
+    condition {
+      test     = "ArnLike"
+      variable = "aws:SourceArn"
+      values = [
+        module.s3-fms-general-landing-bucket.bucket_arn,
+        module.s3-fms-ho-landing-bucket.bucket_arn,
+        module.s3-fms-specials-landing-bucket.bucket_arn,
+        module.s3-mdss-general-landing-bucket.bucket_arn,
+        module.s3-mdss-ho-landing-bucket.bucket_arn,
+        module.s3-mdss-specials-landing-bucket.bucket_arn,
+      ]
+    }
+  }
+}
+
 module "s3-metadata-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9f"
 
   bucket_prefix      = "${local.bucket_prefix}-metadata-"
   versioning_enabled = true
@@ -214,6 +259,8 @@ module "s3-metadata-bucket" {
     # Leave this provider block in even if you are not using replication
     aws.bucket-replication = aws
   }
+  bucket_policy  = [data.aws_iam_policy_document.allow_inventory_access.json]
+  custom_kms_key = module.kms_metadata_key.key_arn
 
   lifecycle_rule = [
     {
@@ -264,7 +311,7 @@ module "s3-metadata-bucket" {
 # ----------------------------------
 
 module "s3-athena-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9f"
 
   bucket_prefix      = "${local.bucket_prefix}-athena-query-results-"
   versioning_enabled = true
@@ -334,7 +381,7 @@ module "s3-athena-bucket" {
 # ----------------------------------
 
 module "s3-unzipped-files-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9f"
 
   bucket_prefix      = "${local.bucket_prefix}-unzipped-files-"
   versioning_enabled = true
@@ -380,7 +427,7 @@ module "s3-unzipped-files-bucket" {
 # ------------------------------------------------------------------------
 
 module "s3-dms-premigrate-assess-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9f"
 
   bucket_prefix      = "${local.bucket_prefix}-dms-premigrate-assess-"
   versioning_enabled = true
@@ -450,7 +497,7 @@ module "s3-dms-premigrate-assess-bucket" {
 # ------------------------------------------------------------------------
 
 module "s3-json-directory-structure-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9f"
 
   bucket_prefix      = local.is-preproduction ? "emds-p-prod-json-directory-structure-" : "${local.bucket_prefix}-json-directory-structure-"
   versioning_enabled = true
@@ -520,7 +567,7 @@ module "s3-json-directory-structure-bucket" {
 # ------------------------------------------------------------------------
 
 module "s3-data-bucket" {
-  source             = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
+  source             = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9f"
   bucket_prefix      = "${local.bucket_prefix}-data-"
   versioning_enabled = true
 
@@ -588,6 +635,11 @@ module "s3-data-bucket" {
 # Landing buckets FMS
 # ------------------------------------------------------------------------
 
+data "aws_secretsmanager_secret_version" "account_details" {
+  count     = local.is-test || local.is-preproduction || local.is-production ? 1 : 0
+  secret_id = module.cross_account_details[0].secret_id
+}
+
 module "s3-fms-general-landing-bucket" {
   source = "./modules/landing_bucket/"
 
@@ -598,10 +650,14 @@ module "s3-fms-general-landing-bucket" {
   local_bucket_prefix      = local.bucket_prefix
   local_tags               = local.tags
   logging_bucket           = module.s3-logging-bucket
-  production_dev           = local.is-production ? "prod" : "dev"
+  production_dev           = local.environment_shorthand
   received_files_bucket_id = module.s3-received-files-bucket.bucket.id
   security_group_ids       = [aws_security_group.lambda_generic.id]
   subnet_ids               = data.aws_subnets.shared-public.ids
+  cross_account            = local.is-preproduction
+  cross_account_id         = local.is-preproduction ? local.environment_management.account_ids["electronic-monitoring-data-${local.cross_account_recieve_mapping}"] : null
+  replication_details      = local.is-production ? jsondecode(data.aws_secretsmanager_secret_version.account_details[0].secret_string) : null
+  metadata_bucket          = module.s3-metadata-bucket.bucket.arn
 
   providers = {
     aws = aws
@@ -631,10 +687,14 @@ module "s3-fms-ho-landing-bucket" {
   local_bucket_prefix      = local.bucket_prefix
   local_tags               = local.tags
   logging_bucket           = module.s3-logging-bucket
-  production_dev           = local.is-production ? "prod" : "dev"
+  production_dev           = local.environment_shorthand
   received_files_bucket_id = module.s3-received-files-bucket.bucket.id
   security_group_ids       = [aws_security_group.lambda_generic.id]
   subnet_ids               = data.aws_subnets.shared-public.ids
+  cross_account            = local.is-preproduction
+  cross_account_id         = local.is-preproduction ? local.environment_management.account_ids["electronic-monitoring-data-${local.cross_account_recieve_mapping}"] : null
+  replication_details      = local.is-production ? jsondecode(data.aws_secretsmanager_secret_version.account_details[0].secret_string) : null
+  metadata_bucket          = module.s3-metadata-bucket.bucket.arn
 
   providers = {
     aws = aws
@@ -664,10 +724,14 @@ module "s3-fms-specials-landing-bucket" {
   local_bucket_prefix      = local.bucket_prefix
   local_tags               = local.tags
   logging_bucket           = module.s3-logging-bucket
-  production_dev           = local.is-production ? "prod" : "dev"
+  production_dev           = local.environment_shorthand
   received_files_bucket_id = module.s3-received-files-bucket.bucket.id
   security_group_ids       = [aws_security_group.lambda_generic.id]
   subnet_ids               = data.aws_subnets.shared-public.ids
+  cross_account            = local.is-preproduction
+  cross_account_id         = local.is-preproduction ? local.environment_management.account_ids["electronic-monitoring-data-${local.cross_account_recieve_mapping}"] : null
+  replication_details      = local.is-production ? jsondecode(data.aws_secretsmanager_secret_version.account_details[0].secret_string) : null
+  metadata_bucket          = module.s3-metadata-bucket.bucket.arn
 
   providers = {
     aws = aws
@@ -702,10 +766,14 @@ module "s3-mdss-general-landing-bucket" {
   local_bucket_prefix       = local.bucket_prefix
   local_tags                = local.tags
   logging_bucket            = module.s3-logging-bucket
-  production_dev            = local.is-production ? "prod" : "dev"
+  production_dev            = local.environment_shorthand
   received_files_bucket_id  = module.s3-received-files-bucket.bucket.id
   subnet_ids                = data.aws_subnets.shared-public.ids
   security_group_ids        = [aws_security_group.lambda_generic.id]
+  cross_account             = local.is-development || local.is-preproduction
+  cross_account_id          = local.is-development || local.is-preproduction ? local.environment_management.account_ids["electronic-monitoring-data-${local.cross_account_recieve_mapping}"] : null
+  replication_details       = local.is-test || local.is-production ? jsondecode(data.aws_secretsmanager_secret_version.account_details[0].secret_string) : null
+  metadata_bucket           = module.s3-metadata-bucket.bucket.arn
 
   providers = {
     aws = aws
@@ -723,10 +791,14 @@ module "s3-mdss-ho-landing-bucket" {
   local_bucket_prefix       = local.bucket_prefix
   local_tags                = local.tags
   logging_bucket            = module.s3-logging-bucket
-  production_dev            = local.is-production ? "prod" : "dev"
+  production_dev            = local.environment_shorthand
   received_files_bucket_id  = module.s3-received-files-bucket.bucket.id
   security_group_ids        = [aws_security_group.lambda_generic.id]
   subnet_ids                = data.aws_subnets.shared-public.ids
+  cross_account             = local.is-development || local.is-preproduction
+  cross_account_id          = local.is-development || local.is-preproduction ? local.environment_management.account_ids["electronic-monitoring-data-${local.cross_account_recieve_mapping}"] : null
+  replication_details       = local.is-test || local.is-production ? jsondecode(data.aws_secretsmanager_secret_version.account_details[0].secret_string) : null
+  metadata_bucket           = module.s3-metadata-bucket.bucket.arn
 
   providers = {
     aws = aws
@@ -744,10 +816,14 @@ module "s3-mdss-specials-landing-bucket" {
   local_bucket_prefix       = local.bucket_prefix
   local_tags                = local.tags
   logging_bucket            = module.s3-logging-bucket
-  production_dev            = local.is-production ? "prod" : "dev"
+  production_dev            = local.environment_shorthand
   received_files_bucket_id  = module.s3-received-files-bucket.bucket.id
   security_group_ids        = [aws_security_group.lambda_generic.id]
   subnet_ids                = data.aws_subnets.shared-public.ids
+  cross_account             = local.is-development || local.is-preproduction
+  cross_account_id          = local.is-development || local.is-preproduction ? local.environment_management.account_ids["electronic-monitoring-data-${local.cross_account_recieve_mapping}"] : null
+  replication_details       = local.is-test || local.is-production ? jsondecode(data.aws_secretsmanager_secret_version.account_details[0].secret_string) : null
+  metadata_bucket           = module.s3-metadata-bucket.bucket.arn
 
   providers = {
     aws = aws
@@ -767,7 +843,7 @@ module "s3-p1-export-bucket" {
   local_bucket_prefix     = local.bucket_prefix
   local_tags              = local.tags
   logging_bucket          = module.s3-logging-bucket
-  production_dev          = local.is-production ? "prod" : "dev"
+  environment_shorthand   = local.environment_shorthand
   security_group_ids      = [aws_security_group.lambda_generic.id]
   subnet_ids              = data.aws_subnets.shared-public.ids
 
@@ -796,7 +872,7 @@ module "s3-serco-export-bucket" {
 # ----------------------------------
 
 module "s3-received-files-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9f"
 
   bucket_prefix      = "${local.bucket_prefix}-received-files-"
   versioning_enabled = true
@@ -839,7 +915,7 @@ module "s3-received-files-bucket" {
 
 
 module "s3-quarantine-files-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9f"
 
   bucket_prefix      = "${local.bucket_prefix}-quarantined-files-"
   versioning_enabled = true
@@ -881,7 +957,7 @@ module "s3-quarantine-files-bucket" {
 }
 
 module "s3-clamav-definitions-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9f"
 
   bucket_prefix      = "${local.bucket_prefix}-clamav-definitions-"
   versioning_enabled = true
@@ -926,7 +1002,7 @@ module "s3-clamav-definitions-bucket" {
 # DMS data validation bucket
 # ------------------------------------------------------------------------
 module "s3-dms-data-validation-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9f"
 
   bucket_prefix      = "${local.bucket_prefix}-dms-data-validation-"
   versioning_enabled = true
@@ -996,7 +1072,7 @@ module "s3-dms-data-validation-bucket" {
 # ------------------------------------------------------------------------
 
 module "s3-glue-job-script-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9f"
 
   bucket_prefix      = "${local.bucket_prefix}-glue-job-store-"
   versioning_enabled = true
@@ -1065,9 +1141,26 @@ module "s3-glue-job-script-bucket" {
 # DMS target  bucket
 # ------------------------------------------------------------------------
 
+data "aws_iam_policy_document" "allow_cross_env_upload" {
+  count = local.is-preproduction ? 1 : 0
+  statement {
+    sid    = "AllowProdLambdaWrite"
+    effect = "Allow"
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${local.environment_management.account_ids["electronic-monitoring-data-production"]}:role/data_cutback_iam_role"]
+
+    }
+    actions = [
+      "s3:PutObject",
+      "s3:PutObjectAcl"
+    ]
+    resources = ["${module.s3-dms-target-store-bucket.bucket.arn}/*"]
+  }
+}
 
 module "s3-dms-target-store-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9f"
 
   bucket_prefix      = "${local.bucket_prefix}-dms-rds-to-parquet-"
   versioning_enabled = true
@@ -1088,6 +1181,7 @@ module "s3-dms-target-store-bucket" {
     aws.bucket-replication = aws
   }
 
+  bucket_policy = local.cross_env_bucket_policy
   lifecycle_rule = [
     {
       id      = "main"
@@ -1134,7 +1228,7 @@ module "s3-dms-target-store-bucket" {
 
 
 module "s3-create-a-derived-table-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9f"
 
   bucket_name        = "${local.bucket_prefix}-cadt"
   versioning_enabled = true
@@ -1204,7 +1298,7 @@ module "s3-create-a-derived-table-bucket" {
 # ------------------------------------------------------------------------
 
 module "s3-raw-formatted-data-bucket" {
-  source             = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
+  source             = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9f"
   bucket_prefix      = "${local.bucket_prefix}-raw-formatted-data-"
   versioning_enabled = true
 
@@ -1274,7 +1368,7 @@ module "s3-raw-formatted-data-bucket" {
 # -----------------------------
 
 module "s3-lambda-store-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9f"
 
   bucket_prefix      = "${local.bucket_prefix}-lambda-store-"
   versioning_enabled = true
@@ -1345,7 +1439,7 @@ module "s3-lambda-store-bucket" {
 # -----------------------------
 
 module "s3-export-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9f"
 
   bucket_prefix      = "${local.bucket_prefix}-export-"
   versioning_enabled = true

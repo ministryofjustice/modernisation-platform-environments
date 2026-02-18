@@ -18,13 +18,12 @@ locals {
     # If your DNS records are in Fix 'n' Go, setup will be a 2 step process, see the acm_certificate module readme
     # if making changes, comment out the listeners that use the cert, edit the cert, recreate the listeners
     acm_certificates = {
-      pp_oasys_cert = {
+      pp_oasys_cert_v2 = {
         cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
         domain_name                         = "pp.oasys.service.justice.gov.uk"
         external_validation_records_created = true
         subject_alternate_names = [
           "pp-int.oasys.service.justice.gov.uk",
-          "bridge-pp-oasys.az.justice.gov.uk",
           "pp-oasys.az.justice.gov.uk",
           "*.pp-oasys.az.justice.gov.uk",
         ]
@@ -100,8 +99,8 @@ locals {
         ebs_volumes = {
           "/dev/sdb" = { label = "app", size = 200 }  # /u01
           "/dev/sdc" = { label = "app", size = 1000 } # /u02
-          "/dev/sde" = { label = "data", size = 2000 }
-          "/dev/sdf" = { label = "data", size = 2000 }
+          "/dev/sde" = { label = "data", size = 2000, iops = 3000, throughput = 250 }
+          "/dev/sdf" = { label = "data", size = 2000, iops = 3000, throughput = 250 }
           "/dev/sdj" = { label = "flash", size = 1000 }
           "/dev/sds" = { label = "swap", size = 2 }
         }
@@ -117,7 +116,7 @@ locals {
         })
       })
 
-      pp-onr-db-a = merge(local.ec2_instances.db11g, {
+      pp-onr-db-a = merge(local.ec2_instances.db11g, { # need to do the user_data/aws provider fix later
         config = merge(local.ec2_instances.db11g.config, {
           availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.ec2_instances.db11g.config.instance_profile_policies, [
@@ -131,8 +130,8 @@ locals {
         ebs_volumes = {
           "/dev/sdb" = { label = "app", size = 100 } # /u01
           "/dev/sdc" = { label = "app", size = 500 } # /u02
-          "/dev/sde" = { label = "data", size = 2000 }
-          "/dev/sdj" = { label = "flash", size = 600 }
+          "/dev/sde" = { label = "data", size = 2000, iops = 3000, throughput = 750 }
+          "/dev/sdj" = { label = "flash", size = 600, iops = 3000, throughput = 125 }
           "/dev/sds" = { label = "swap", size = 2 }
         }
         user_data_cloud_init = merge(local.ec2_instances.db11g.user_data_cloud_init, {
@@ -229,7 +228,7 @@ locals {
 
         listeners = merge(local.lbs.public.listeners, {
           https = merge(local.lbs.public.listeners.https, {
-            certificate_names_or_arns = ["pp_oasys_cert"]
+            certificate_names_or_arns = ["pp_oasys_cert_v2"]
 
             rules = {
               pp-web-http-8080 = {
@@ -244,7 +243,6 @@ locals {
                       values = [
                         "pp.oasys.service.justice.gov.uk",
                         "pp-a.oasys.service.justice.gov.uk",
-                        "bridge-pp-oasys.az.justice.gov.uk"
                       ]
                     }
                   }
@@ -266,7 +264,7 @@ locals {
 
         listeners = merge(local.lbs.private.listeners, {
           https = merge(local.lbs.private.listeners.https, {
-            certificate_names_or_arns = ["pp_oasys_cert"]
+            certificate_names_or_arns = ["pp_oasys_cert_v2"]
 
             default_action = {
               type = "redirect"
@@ -290,9 +288,6 @@ locals {
                     host_header = {
                       values = [
                         "pp-int.oasys.service.justice.gov.uk",
-                        "pp-a-int.oasys.service.justice.gov.uk",
-                        "pp-oasys.az.justice.gov.uk",
-                        "oasys-ukwest.pp-oasys.az.justice.gov.uk",
                       ]
                     }
                   }
@@ -318,6 +313,14 @@ locals {
         records = [
           { name = "db.pp.oasys", type = "CNAME", ttl = "3600", records = ["pp-oasys-db-a.oasys.hmpps-preproduction.modernisation-platform.internal"] },
           { name = "db.pp.onr", type = "CNAME", ttl = "3600", records = ["pp-onr-db-a.oasys.hmpps-preproduction.modernisation-platform.internal"] },
+        ]
+      }
+      "pp-oasys.az.justice.gov.uk" = {
+        records = [
+          { name = "onr", type = "A", ttl = "3600", records = ["10.40.40.210"] }
+        ]
+        lb_alias_records = [
+          { name = "", type = "A", lbs_map_key = "private" }
         ]
       }
     }

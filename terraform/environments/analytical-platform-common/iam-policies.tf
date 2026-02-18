@@ -72,7 +72,7 @@ module "ecr_access_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.59.0"
+  version = "5.60.0"
 
   name_prefix = "ecr-access"
 
@@ -115,7 +115,7 @@ module "analytical_platform_terraform_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.59.0"
+  version = "5.60.0"
 
   name_prefix = "analytical-platform-terraform"
 
@@ -176,7 +176,7 @@ module "analytical_platform_github_actions_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.59.0"
+  version = "5.60.0"
 
   name_prefix = "analytical-platform-github-actions"
 
@@ -200,6 +200,9 @@ data "aws_iam_policy_document" "data_engineering_datalake_access_github_actions"
       "arn:aws:iam::${local.environment_management.account_ids["digital-prison-reporting-test"]}:role/analytical-platform-data-production-share-role",
       "arn:aws:iam::${local.environment_management.account_ids["digital-prison-reporting-preproduction"]}:role/analytical-platform-data-production-share-role",
       "arn:aws:iam::${local.environment_management.account_ids["digital-prison-reporting-production"]}:role/analytical-platform-data-production-share-role",
+      "arn:aws:iam::${local.environment_management.account_ids["property-cafm-data-migration-development"]}:role/lakeformation-share-role",
+      "arn:aws:iam::${local.environment_management.account_ids["property-cafm-data-migration-preproduction"]}:role/lakeformation-share-role",
+      "arn:aws:iam::${local.environment_management.account_ids["property-cafm-data-migration-production"]}:role/lakeformation-share-role",
     ]
   }
 }
@@ -209,7 +212,7 @@ module "data_engineering_datalake_access_github_actions_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.59.0"
+  version = "5.60.0"
 
   name_prefix = "data-engineering-datalake-access-github-actions"
 
@@ -252,7 +255,7 @@ module "data_engineering_datalake_access_terraform_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.59.0"
+  version = "5.60.0"
 
   name_prefix = "data-engineering-datalake-access-terraform"
 

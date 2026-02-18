@@ -5,6 +5,7 @@
       "create_database": true,
       "db_description": "DPR Data Catalog",
       "create_job": true,
+      "custom_metric_namespace": "DPRAgentCustomMetrics",
       "glue_log_retention_in_days": 3,
       "lambda_log_retention_in_days": 3,
       "dms_log_retention_in_days": 3,
@@ -89,7 +90,9 @@
         "dps-allocations",
         "dps-applications",
         "dps-manage-pom",
-        "dps-san"
+        "dps-san",
+        "dps-cvl",
+        "dps-adjudications"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -208,7 +211,7 @@
         "enable": true,
         "create_replica": true,
         "engine": "postgres",
-        "engine_version": "17.5",
+        "engine_version": "18.1",
         "init_size": "158",
         "max_size": "1000",
         "name": "testdatabase",
@@ -216,8 +219,8 @@
         "inst_class": "db.t4g.large",
         "user": "postgres",
         "store_type": "gp3",
-        "parameter_group_family": "postgres17",
-        "parameter_group_name": "pg17-with-pglogical"
+        "parameter_group_family": "postgres18",
+        "parameter_group_name": "pg18-with-pglogical"
       },
       "missing_report_submissions_rds": {
         "enable": true,
@@ -240,6 +243,7 @@
       "create_database": true,
       "db_description": "DPR Data Catalog",
       "create_job": true,
+      "custom_metric_namespace": "DPRAgentCustomMetrics",
       "glue_log_retention_in_days": 3,
       "lambda_log_retention_in_days": 3,
       "dms_log_retention_in_days": 3,
@@ -322,7 +326,9 @@
         "dps-allocations",
         "dps-applications",
         "dps-manage-pom",
-        "dps-san"
+        "dps-san",
+        "dps-cvl",
+        "dps-adjudications"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -450,6 +456,7 @@
       "create_database": true,
       "db_description": "DPR Data Catalog",
       "create_job": true,
+      "custom_metric_namespace": "DPRAgentCustomMetrics",
       "glue_log_retention_in_days": 7,
       "lambda_log_retention_in_days": 7,
       "dms_log_retention_in_days": 14,
@@ -534,7 +541,9 @@
         "dps-allocations",
         "dps-applications",
         "dps-manage-pom",
-        "dps-san"
+        "dps-san",
+        "dps-cvl",
+        "dps-adjudications"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -681,6 +690,7 @@
       "create_database": true,
       "db_description": "DPR Data Catalog",
       "create_job": true,
+      "custom_metric_namespace": "DPRAgentCustomMetrics",
       "glue_log_retention_in_days": 7,
       "lambda_log_retention_in_days": 7,
       "dms_log_retention_in_days": 14,
@@ -763,7 +773,9 @@
         "dps-allocations",
         "dps-applications",
         "dps-manage-pom",
-        "dps-san"
+        "dps-san",
+        "dps-cvl",
+        "dps-adjudications"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -869,6 +881,10 @@
             },
             {
               "glue_database": "prison_derived",
+              "glue_tables": ["*"]
+            },
+            {
+              "glue_database": "prison_datamarts",
               "glue_tables": ["*"]
             }
           ]

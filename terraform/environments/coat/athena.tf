@@ -1,3 +1,15 @@
+locals {
+  glue_s3_targets = {
+    development = [
+      "s3://coat-${local.environment}-cur-v2-hourly/moj-cost-and-usage-reports/MOJ-CUR-V2-HOURLY/data/"
+    ]
+    production = [
+      "s3://coat-${local.environment}-cur-v2-hourly/moj-cost-and-usage-reports/MOJ-CUR-V2-HOURLY/data/",
+      "s3://coat-${local.environment}-cur-v2-hourly-enriched/"
+    ]
+  }
+}
+
 resource "aws_athena_workgroup" "coat_cur_report" {
   name = "coat_cur_report"
 
@@ -13,7 +25,28 @@ resource "aws_athena_workgroup" "coat_cur_report" {
     publish_cloudwatch_metrics_enabled = true
   }
 
-  tags = local.tags
+  tags = {
+    "service-area" = "Hosting"
+  }
+}
+
+resource "aws_athena_workgroup" "ctas_athena_workgroup" {
+  name = "ctas_athena_workgroup"
+
+  configuration {
+    result_configuration {
+      encryption_configuration {
+        encryption_option = "SSE_S3"
+      }
+    }
+
+    enforce_workgroup_configuration    = true
+    publish_cloudwatch_metrics_enabled = true
+  }
+
+  tags = {
+    "service-area" = "Hosting"
+  }
 }
 
 resource "aws_glue_catalog_database" "cur_v2_database" {
@@ -90,16 +123,16 @@ resource "aws_iam_role_policy_attachment" "glue_service_role_attachment" {
 
 resource "aws_glue_crawler" "cur_v2_crawler" {
   #checkov:skip=CKV_AWS_195: "Ensure Glue component has a security configuration associated"
+
   name          = "cur_v2_crawler"
   database_name = aws_glue_catalog_database.cur_v2_database.name
   role          = aws_iam_role.glue_cur_role.arn
 
-  s3_target {
-    path = "s3://coat-${local.environment}-cur-v2-hourly/moj-cost-and-usage-reports/MOJ-CUR-V2-HOURLY/data/"
-  }
-
-  s3_target {
-    path = "s3://coat-${local.environment}-cur-v2-hourly-enriched/"
+  dynamic "s3_target" {
+    for_each = local.glue_s3_targets[local.environment]
+    content {
+      path = s3_target.value
+    }
   }
 
   configuration = jsonencode({
@@ -112,4 +145,40 @@ resource "aws_glue_crawler" "cur_v2_crawler" {
   })
 
   schedule = "cron(0 7 * * ? *)"
+}
+
+# Create derived table for ChatBot PoC
+resource "aws_athena_named_query" "fct_daily_cost" {
+  name     = "fct-daily-cost"
+  database = aws_glue_catalog_database.cur_v2_database.name
+  query = templatefile(
+    "${path.module}/queries/fct_daily_cost.sql",
+    {
+      bucket = "coat-${local.environment}-cur-v2-hourly"
+    }
+  )
+}
+
+resource "null_resource" "execute_create_table_query" {
+  triggers = {
+    query_ids   = aws_athena_named_query.fct_daily_cost.id
+    script_hash = filesha256("${path.module}/queries/fct_daily_cost.sql")
+  }
+
+  provisioner "local-exec" {
+    command = <<EOF
+CREDS=$(aws sts assume-role --role-arn arn:aws:iam::${data.aws_caller_identity.current.id}:role/MemberInfrastructureAccess --role-session-name github-actions-session)
+export AWS_ACCESS_KEY_ID=$(echo $CREDS | jq -r '.Credentials.AccessKeyId')
+export AWS_SECRET_ACCESS_KEY=$(echo $CREDS | jq -r '.Credentials.SecretAccessKey')
+export AWS_SESSION_TOKEN=$(echo $CREDS | jq -r '.Credentials.SessionToken')
+aws athena start-query-execution \
+  --query-string "$(aws athena get-named-query --named-query-id ${aws_athena_named_query.fct_daily_cost.id} --query 'NamedQuery.QueryString' --output text)" \
+  --work-group ${aws_athena_workgroup.ctas_athena_workgroup.name} \
+  --result-configuration OutputLocation=s3://coat-${local.environment}-cur-v2-hourly/ctas/fct-daily-cost/ \
+  --query-execution-context Database=${aws_glue_catalog_database.cur_v2_database.name} \
+  --region ${data.aws_region.current.name}
+EOF
+  }
+
+  depends_on = [aws_athena_named_query.fct_daily_cost]
 }

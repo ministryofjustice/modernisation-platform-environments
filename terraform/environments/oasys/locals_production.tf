@@ -195,6 +195,10 @@ locals {
             "Ec2PtcWebPolicy",
           ])
         })
+        instance = merge(local.ec2_autoscaling_groups.web.instance, {
+          instance_type = "t3.medium"
+          #instance_type           = "t3.small"
+        })
         tags = merge(local.ec2_autoscaling_groups.web.tags, {
           description        = "${local.environment} practice oasys web"
           oasys-environment  = "ptc"
@@ -209,6 +213,10 @@ locals {
           instance_profile_policies = concat(local.ec2_autoscaling_groups.web.config.instance_profile_policies, [
             "Ec2TrnWebPolicy",
           ])
+        })
+        instance = merge(local.ec2_autoscaling_groups.web.instance, {
+          instance_type = "t3.medium"
+          #instance_type           = "t3.small"
         })
         tags = merge(local.ec2_autoscaling_groups.web.tags, {
           description        = "${local.environment} training oasys web"
@@ -228,7 +236,8 @@ locals {
           ])
         })
         instance = merge(local.ec2_instances.bip.instance, {
-          ami = "ami-0d206b8546ea2b68a" # to prevent instances being re-created due to recreated AMI
+          ami           = "ami-0d206b8546ea2b68a" # to prevent instances being re-created due to recreated AMI
+          instance_type = "t3.xlarge"             # OVERSIZED
         })
         tags = merge(local.ec2_instances.bip.tags, {
           bip-db-name       = "PDBIPINF"
@@ -367,9 +376,9 @@ locals {
           ])
         })
         instance = merge(local.ec2_instances.bip.instance, {
-          ami                          = "ami-0d206b8546ea2b68a" # to prevent instances being re-created due to recreated AMI
-          instance_type                = "r6i.4xlarge"           # this is massively over provisioned FIXME
-          metadata_options_http_tokens = "optional"              # accidentally set, remove this line when resizing
+          disable_api_termination = true
+          instance_type           = "m7i.large"
+          ami                     = "ami-0d206b8546ea2b68a" # to prevent instances being re-created due to recreated AMI
         })
         tags = merge(local.ec2_instances.bip.tags, {
           bip-db-hostname   = "ptctrn-oasys-db-a"
@@ -537,7 +546,15 @@ locals {
 
     lbs = {
       public = merge(local.lbs.public, {
+
         access_logs_lifecycle_rule = [module.baseline_presets.s3_lifecycle_rules.general_purpose_one_year]
+
+        s3_notification_queues = {
+          "cortex-xsiam-s3-public-alb-log-collection" = {
+            events    = ["s3:ObjectCreated:*"]
+            queue_arn = "cortex-xsiam-s3-alb-log-collection"
+          }
+        }
 
         listeners = merge(local.lbs.public.listeners, {
           https = merge(local.lbs.public.listeners.https, {
@@ -569,8 +586,6 @@ locals {
                     host_header = {
                       values = [ # max of 5
                         "oasys.service.justice.gov.uk",
-                        "bridge-oasys.az.justice.gov.uk",
-                        "www.oasys.service.justice.gov.uk",
                       ]
                     }
                   }
@@ -602,10 +617,7 @@ locals {
                   {
                     host_header = {
                       values = [ # max of 5
-                        "practice.bridge-oasys.az.justice.gov.uk",
                         "practice.oasys.service.justice.gov.uk",
-                        "practice.a.oasys.service.justice.gov.uk",
-                        "practice.b.oasys.service.justice.gov.uk",
                       ]
                     }
                   }
@@ -621,10 +633,7 @@ locals {
                   {
                     host_header = {
                       values = [ # max of 5
-                        "training.bridge-oasys.az.justice.gov.uk",
                         "training.oasys.service.justice.gov.uk",
-                        "training.a.oasys.service.justice.gov.uk",
-                        "training.b.oasys.service.justice.gov.uk",
                       ]
                     }
                   }
@@ -636,6 +645,16 @@ locals {
       })
 
       private = merge(local.lbs.private, {
+
+        access_logs_lifecycle_rule = [module.baseline_presets.s3_lifecycle_rules.general_purpose_one_year]
+
+        s3_notification_queues = {
+          "cortex-xsiam-s3-private-alb-log-collection" = {
+            events    = ["s3:ObjectCreated:*"]
+            queue_arn = "cortex-xsiam-s3-alb-log-collection"
+          }
+        }
+
         listeners = merge(local.lbs.private.listeners, {
           https = merge(local.lbs.private.listeners.https, {
             certificate_names_or_arns = ["pd_oasys_cert"]
@@ -666,9 +685,6 @@ locals {
                     host_header = {
                       values = [ # max of 5
                         "int.oasys.service.justice.gov.uk",
-                        "oasys-ukwest.oasys.az.justice.gov.uk",
-                        # "oasys.az.justice.gov.uk",
-                        "p-oasys.az.justice.gov.uk",
                       ]
                     }
                   }
@@ -701,11 +717,6 @@ locals {
                     host_header = {
                       values = [ # max of 5
                         "practice.int.oasys.service.justice.gov.uk",
-                        "practice.oasys.az.justice.gov.uk",
-                        "practice.p-oasys.az.justice.gov.uk",
-                        # "practice-ukwest.oasys.az.justice.gov.uk",
-                        "practice.a-int.oasys.service.justice.gov.uk",
-                        "practice.b-int.oasys.service.justice.gov.uk",
                       ]
                     }
                   }
@@ -722,11 +733,6 @@ locals {
                     host_header = {
                       values = [ # max of 5
                         "training.int.oasys.service.justice.gov.uk",
-                        "training.oasys.az.justice.gov.uk",
-                        "training.p-oasys.az.justice.gov.uk",
-                        # "training-ukwest.oasys.az.justice.gov.uk",
-                        "training.a-int.oasys.service.justice.gov.uk",
-                        "training.b-int.oasys.service.justice.gov.uk",
                       ]
                     }
                   }
@@ -735,6 +741,73 @@ locals {
             }
           })
         })
+        cloudwatch_metric_alarms = {
+          high-requests = {
+            comparison_operator = "GreaterThanOrEqualToThreshold"
+            evaluation_periods  = "3"
+            datapoints_to_alarm = "3"
+            metric_name         = "RequestCount"
+            namespace           = "AWS/ApplicationELB"
+            period              = "300"
+            statistic           = "Sum"
+            threshold           = 30000
+            alarm_description   = "Triggers if request count exceeds threshold per 5 minutes for 15 minutes."
+            alarm_actions       = [] # ["pagerduty"]
+            ok_actions          = [] # ["pagerduty"]
+          }
+          high-4xx = {
+            comparison_operator = "GreaterThanOrEqualToThreshold"
+            evaluation_periods  = "3"
+            datapoints_to_alarm = "3"
+            metric_name         = "HTTPCode_Target_4XX_Count"
+            namespace           = "AWS/ApplicationELB"
+            period              = "300"
+            statistic           = "Sum"
+            threshold           = 100
+            alarm_description   = "Triggers if target 4xx errors exceed threshold per 5 minutes for 15 minutes."
+            alarm_actions       = [] # ["pagerduty"]
+            ok_actions          = [] # ["pagerduty"]
+          }
+          high-5xx = {
+            comparison_operator = "GreaterThanOrEqualToThreshold"
+            evaluation_periods  = "3"
+            datapoints_to_alarm = "3"
+            metric_name         = "HTTPCode_Target_5XX_Count"
+            namespace           = "AWS/ApplicationELB"
+            period              = "300"
+            statistic           = "Sum"
+            threshold           = 50
+            alarm_description   = "Triggers if target 5xx errors exceed threshold per 5 minutes for 15 minutes."
+            alarm_actions       = [] # ["pagerduty"]
+            ok_actions          = [] # ["pagerduty"]
+          }
+          high-latency = {
+            comparison_operator = "GreaterThanOrEqualToThreshold"
+            evaluation_periods  = "3"
+            datapoints_to_alarm = "3"
+            metric_name         = "TargetResponseTime"
+            namespace           = "AWS/ApplicationELB"
+            period              = "60"
+            statistic           = "Average"
+            threshold           = 5
+            alarm_description   = "Triggers if average target response time exceeds threshold for 3 minutes."
+            alarm_actions       = [] # ["pagerduty"]
+            ok_actions          = [] # ["pagerduty"]
+          }
+          high-new-connections = {
+            comparison_operator = "GreaterThanOrEqualToThreshold"
+            evaluation_periods  = "3"
+            datapoints_to_alarm = "3"
+            metric_name         = "NewConnectionCount"
+            namespace           = "AWS/ApplicationELB"
+            period              = "300"
+            statistic           = "Sum"
+            threshold           = 4000
+            alarm_description   = "Triggers if average target response time exceeds threshold."
+            alarm_actions       = [] # ["pagerduty"]
+            ok_actions          = [] # ["pagerduty"]
+          }
+        }
       })
     }
 
@@ -745,6 +818,35 @@ locals {
           { name = "db.trn.oasys", type = "CNAME", ttl = "3600", records = ["ptctrn-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
           { name = "db.ptc.oasys", type = "CNAME", ttl = "3600", records = ["ptctrn-oasys-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
           { name = "db.onr", type = "CNAME", ttl = "3600", records = ["pd-onr-db-a.oasys.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
+        ]
+      }
+      "oasys.az.justice.gov.uk" = {
+        records = [
+          { name = "_f3741832781b53d3c8d6ebd0c2f785dd.onr", type = "CNAME", ttl = 86400, records = ["_5021c8da699c0e8c8841f906c7ced90e.sdgjtdhdhz.acm-validations.aws"] },
+          { name = "onr", type = "A", ttl = "300", records = ["10.40.6.210"] }
+        ]
+        lb_alias_records = [
+          { name = "", type = "A", lbs_map_key = "private" },
+          { name = "training", type = "A", lbs_map_key = "private" },
+          { name = "practice", type = "A", lbs_map_key = "private" }
+        ]
+      }
+      "p-oasys.az.justice.gov.uk" = {
+        records = [
+        ]
+        lb_alias_records = [
+          { name = "", type = "A", lbs_map_key = "private" },
+          { name = "training", type = "A", lbs_map_key = "private" },
+          { name = "practice", type = "A", lbs_map_key = "private" }
+        ]
+      }
+      "bridge-oasys.az.justice.gov.uk" = {
+        records = [
+        ]
+        lb_alias_records = [
+          { name = "", type = "A", lbs_map_key = "public" },
+          { name = "training", type = "A", lbs_map_key = "public" },
+          { name = "practice", type = "A", lbs_map_key = "public" }
         ]
       }
       "oasys.service.justice.gov.uk" = {

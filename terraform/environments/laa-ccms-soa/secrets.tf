@@ -49,6 +49,7 @@ resource "aws_secretsmanager_secret" "trust_store_password" {
 data "aws_secretsmanager_secret_version" "trust_store_password" {
   secret_id = aws_secretsmanager_secret.trust_store_password.id
 }
+
 # Slack Channel ID for Alerts
 resource "aws_secretsmanager_secret" "slack_channel_id" {
   name        = "guardduty_slack_channel_id"
@@ -58,3 +59,48 @@ resource "aws_secretsmanager_secret" "slack_channel_id" {
 data "aws_secretsmanager_secret_version" "slack_channel_id" {
   secret_id = aws_secretsmanager_secret.slack_channel_id.id
 }
+
+# data "aws_secretsmanager_secret" "oem_agent_credentials" {
+#   name = "ccms/soa/oem_agent_credentials"
+# }
+
+# data "aws_secretsmanager_secret_version" "oem_agent_credentials" {
+#   secret_id = data.aws_secretsmanager_secret.oem_agent_credentials.id
+# }
+
+
+##########################################################
+# Slack Webhook Secret for CCMS SOA EDN Quiesced Alerts
+##########################################################
+resource "aws_secretsmanager_secret" "ccms_soa_quiesced_secrets" {
+  name        = "${local.application_name}-edn-quiesced-alerts"
+  description = "Slack Webhook Secret for CCMS SOA EDN Quiesced Lambda Alerts"
+
+  tags = merge(local.tags, {
+    Name = "${local.application_name}-edn-quiesced-alerts"
+  })
+}
+
+resource "aws_secretsmanager_secret_version" "ccms_soa_quiesced_secrets_version" {
+  secret_id = aws_secretsmanager_secret.ccms_soa_quiesced_secrets.id
+
+  secret_string = jsonencode({
+    slack_channel_webhook           = "",
+    slack_channel_webhook_guardduty = "",
+    agent_registration_password     = ""
+
+  })
+
+  lifecycle {
+    ignore_changes = [
+      secret_string
+    ]
+  }
+}
+
+# Read current secret value (used by RDS option group)
+data "aws_secretsmanager_secret_version" "ccms_soa_quiesced_secrets_current" {
+  secret_id = aws_secretsmanager_secret.ccms_soa_quiesced_secrets.id
+}
+
+

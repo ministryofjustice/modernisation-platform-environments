@@ -22,19 +22,7 @@ output "aws_sns_topic_cw_alerts_arn" {
   value       = aws_sns_topic.cw_alerts.arn
 }
 
-#
 
-output "aws_sns_topic_subscription_cw_subscription_arn" {
-  description = "aws_sns_topic_subscription cw_subscription arn"
-  value       = aws_sns_topic_subscription.cw_subscription.arn
-}
-
-output "aws_sns_topic_subscription_cw_subscription_owner_id" {
-  description = "aws_sns_topic_subscription cw_subscription owner_id"
-  value       = aws_sns_topic_subscription.cw_subscription.owner_id
-}
-
-#
 
 output "aws_sns_topic_s3_topic_arn" {
   description = "aws_sns_topic s3_topic"

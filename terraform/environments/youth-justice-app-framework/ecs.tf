@@ -40,13 +40,15 @@ module "ecs" {
   ecs_subnet_ids = local.private_subnet_list[*].id
 
   #ALB details 
-  external_alb_security_group_id = module.external_alb.alb_security_group_id
-  internal_alb_security_group_id = module.internal_alb.alb_security_group_id
-  external_alb_arn               = module.external_alb.alb_arn
-  internal_alb_arn               = module.internal_alb.alb_arn
-  external_alb_name              = module.external_alb.alb_name
-  internal_alb_name              = module.internal_alb.alb_name
-
+  external_alb_security_group_id     = module.external_alb.alb_security_group_id
+  internal_alb_security_group_id     = module.internal_alb.alb_security_group_id
+  connectivity_alb_security_group_id = module.connectivity_alb.alb_security_group_id
+  external_alb_arn                   = module.external_alb.alb_arn
+  internal_alb_arn                   = module.internal_alb.alb_arn
+  connectivity_alb_arn               = module.connectivity_alb.alb_arn
+  external_alb_name                  = module.external_alb.alb_name
+  internal_alb_name                  = module.internal_alb.alb_name
+  connectivity_alb_name              = module.connectivity_alb.alb_name
   #ECS details
   cluster_name                = "yjaf-cluster"
   ec2_instance_type           = "c6a.4xlarge"
@@ -76,9 +78,10 @@ module "ecs" {
   ecs_allowed_secret_arns         = [module.aurora.app_rotated_postgres_secret_arn, aws_secretsmanager_secret.LDAP_administration_secret.arn]
   ecs_services                    = local.ecs_services
 
-  project_name = local.project_name
-  environment  = local.environment
-  tags         = local.tags
+  aws_account_id = data.aws_caller_identity.current.account_id
+  project_name   = local.project_name
+  environment    = local.environment
+  tags           = local.tags
 
   #RDS and Redshift Details
   rds_postgresql_sg_id = module.aurora.rds_cluster_security_group_id
@@ -97,6 +100,7 @@ module "ecs" {
     aws_secretsmanager_secret.google_api.arn,
     aws_secretsmanager_secret.ordnance_survey_api.arn,
     aws_secretsmanager_secret.yjaf_credentials.arn,
+    aws_secretsmanager_secret.jwt_secret.arn,
     module.redshift.returns_secret_arn,
     module.datadog.datadog_api_key_secret_arn,
     module.datadog.datadog_api_key_plain_secret_arn

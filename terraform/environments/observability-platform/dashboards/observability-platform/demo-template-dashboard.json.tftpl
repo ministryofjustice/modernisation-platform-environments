@@ -1,0 +1,20 @@
+{
+  "uid": "${dashboard_uid}",
+  "title": "Demo Template Dashboard - ${team_name} (${environment})",
+  "tags": ["demo", "template", "team:${team_name}", "env:${environment}"],
+  "timezone": "browser",
+  "schemaVersion": 36,
+  "version": 1,
+  "refresh": "30s",
+  "panels": [
+    {
+      "type": "text",
+      "title": "Template Demo",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 0 },
+      "options": {
+        "mode": "html",
+        "content": "<h2>This dashboard was created using a <strong>Terraform template file</strong>.</h2><p>Team: <strong>${team_name}</strong><br>Environment: <strong>${environment}</strong></p><p>This demonstrates how environment-aware dashboards can be generated dynamically.</p>"
+      }
+    }
+  ]
+}

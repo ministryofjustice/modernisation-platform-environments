@@ -10,6 +10,18 @@ variable "environment" {
   type = string
 }
 
+variable "tableau_blue_live" {
+  type        = bool
+  description = "Shows if the blue or green tableau server is currently live."
+  default     = true
+}
+
+variable "tableau_test_active" {
+  type        = bool
+  description = "Set to true to publish the Tableau test server externally via ALB."
+  default     = false
+}
+
 variable "test_mode" {
   type        = bool
   description = "(Optional) When test mode is true the destroy command can be used to remove all items."
@@ -43,7 +55,7 @@ variable "instance_type" {
 variable "instance_volume_size" {
   description = "The size of the volumne to be allocated to the Tableau instance."
   type        = number
-  default     = 500
+  default     = 600
 }
 
 variable "instance_key_name" {
@@ -86,6 +98,11 @@ variable "certificate_arn" {
   description = "The arn of the SSL cetificate to use for external access to Tableau."
 }
 
+variable "test_certificate_arn" {
+  type        = string
+  description = "The arn of the SSL cetificate to use for external access to the Tableau instance under test."
+}
+
 variable "r53_zone_id" {
   type        = string
   description = "The Route 53 Zone where thhe public DNS record is to be created."
@@ -94,6 +111,11 @@ variable "r53_zone_id" {
 variable "tableau_website_name" {
   type        = string
   description = "The name of the tableau website."
+}
+
+variable "tableau_test_website_name" {
+  type        = string
+  description = "The name of the tableau test website used for testing upgrades."
 }
 
 #Tableau security gropup inputs

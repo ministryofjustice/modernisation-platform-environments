@@ -1,6 +1,5 @@
 locals {
   db_port            = 1521
-  db_tcps_port       = 1522
   dms_audit_username = "delius_audit_dms_pool"
 
   # Although it is recommended to use bucket_prefix rather than bucket_name when creating an S3 bucket

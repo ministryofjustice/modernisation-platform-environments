@@ -1,3 +1,9 @@
+data "archive_file" "lambda" {
+  type        = "zip"
+  source_file = "../lambda/log_shipper/log_shipper.py"
+  output_path = "${path.module}/.build/log_shipper.zip"
+}
+
 # Look up availability zones to map zone IDs to names
 data "aws_availability_zones" "available" {
   state = "available"

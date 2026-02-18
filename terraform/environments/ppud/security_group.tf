@@ -303,8 +303,6 @@ resource "aws_security_group" "Dev-Servers-Standard" {
   tags = {
     Name = "${var.networking[0].business-unit}-${local.environment}"
   }
-
-  ingress = []
 }
 
 resource "aws_security_group_rule" "Dev-Servers-Ingress" {
@@ -1056,8 +1054,6 @@ resource "aws_security_group" "docker-build-server" {
   tags = {
     Name = "${var.networking[0].business-unit}-${local.environment}"
   }
-
-  ingress = []
 }
 
 resource "aws_security_group_rule" "docker-build-server-Ingress" {

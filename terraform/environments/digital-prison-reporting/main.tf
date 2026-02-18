@@ -40,6 +40,7 @@ module "glue_hive_table_creation_job" {
   project_id      = local.project
   aws_kms_key     = local.s3_kms_arn
 
+  custom_metric_namespace     = local.custom_metric_namespace
   execution_class             = "STANDARD"
   worker_type                 = "G.1X"
   number_of_workers           = 2
@@ -106,6 +107,7 @@ module "glue_s3_file_transfer_job" {
   project_id      = local.project
   aws_kms_key     = local.s3_kms_arn
 
+  custom_metric_namespace     = local.custom_metric_namespace
   execution_class             = "STANDARD"
   worker_type                 = "G.1X"
   number_of_workers           = 2
@@ -165,6 +167,7 @@ module "glue_switch_prisons_hive_data_location_job" {
   project_id      = local.project
   aws_kms_key     = local.s3_kms_arn
 
+  custom_metric_namespace     = local.custom_metric_namespace
   execution_class             = "STANDARD"
   worker_type                 = "G.1X"
   number_of_workers           = 2
@@ -225,6 +228,7 @@ module "glue_s3_data_deletion_job" {
   project_id      = local.project
   aws_kms_key     = local.s3_kms_arn
 
+  custom_metric_namespace     = local.custom_metric_namespace
   execution_class             = "STANDARD"
   worker_type                 = "G.1X"
   number_of_workers           = 2
@@ -279,6 +283,7 @@ module "glue_stop_glue_instance_job" {
   project_id      = local.project
   aws_kms_key     = local.s3_kms_arn
 
+  custom_metric_namespace     = local.custom_metric_namespace
   execution_class             = "STANDARD"
   worker_type                 = "G.1X"
   number_of_workers           = 2
@@ -323,6 +328,7 @@ module "stop_dms_task_job" {
   project_id      = local.project
   aws_kms_key     = local.s3_kms_arn
 
+  custom_metric_namespace     = local.custom_metric_namespace
   execution_class             = "STANDARD"
   worker_type                 = "G.1X"
   number_of_workers           = 2
@@ -367,6 +373,7 @@ module "set_cdc_dms_start_time_job" {
   project_id      = local.project
   aws_kms_key     = local.s3_kms_arn
 
+  custom_metric_namespace     = local.custom_metric_namespace
   execution_class             = "STANDARD"
   worker_type                 = "G.1X"
   number_of_workers           = 2
@@ -410,6 +417,7 @@ module "activate_glue_trigger_job" {
   project_id      = local.project
   aws_kms_key     = local.s3_kms_arn
 
+  custom_metric_namespace     = local.custom_metric_namespace
   execution_class             = "STANDARD"
   worker_type                 = "G.1X"
   number_of_workers           = 2
@@ -845,7 +853,7 @@ module "ec2_bastion_host" {
   description                 = "EC2 bastion instance for accessing the private network"
   vpc                         = data.aws_vpc.shared.id
   cidr                        = [data.aws_vpc.shared.cidr_block]
-  subnet_ids                  = data.aws_subnet.private_subnets_a.id
+  subnet_ids                  = data.aws_subnet.private_subnets_b.id
   ec2_instance_type           = local.instance_type
   ami_image_id                = local.image_id
   aws_region                  = local.account_region
@@ -1128,6 +1136,7 @@ module "generate_test_postgres_data" {
   aws_kms_key     = local.s3_kms_arn
   connections     = ["${local.project}-dps-test-db-connection"]
 
+  custom_metric_namespace     = local.custom_metric_namespace
   execution_class             = "STANDARD"
   worker_type                 = "G.1X"
   number_of_workers           = 2

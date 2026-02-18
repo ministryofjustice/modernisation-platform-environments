@@ -39,6 +39,9 @@ echo "assumeyes=1" >> /etc/yum.conf
 # Update all packages
 sudo yum -y update
 
+# Setup YUM install Kinesis Agent
+sudo yum -y install wget unzip jq
+
 # Setup Oracle Client Tools
 sudo yum install https://yum.oracle.com/repo/OracleLinux/OL7/oracle/instantclient21/x86_64/getPackage/oracle-instantclient-basic-21.8.0.0.0-1.x86_64.rpm
 sudo yum install https://yum.oracle.com/repo/OracleLinux/OL7/oracle/instantclient21/x86_64/getPackage/oracle-instantclient-tools-21.8.0.0.0-1.x86_64.rpm

@@ -24,5 +24,7 @@ module "cwa-poc2-environment" {
   public_subnet_c_id               = data.aws_subnet.public_subnets_c.id
   data_subnet_a_id                 = data.aws_subnet.data_subnets_a.id
   private_subnet_a_id              = data.aws_subnet.private_subnets_a.id
+  private_subnet_b_id              = data.aws_subnet.private_subnets_b.id
+  private_subnet_c_id              = data.aws_subnet.private_subnets_c.id
   management_aws_account           = local.environment_management.account_ids[terraform.workspace]
 }
