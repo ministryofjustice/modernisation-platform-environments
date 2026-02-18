@@ -127,6 +127,7 @@
       "ssogen_max_capacity": "1",
       "ssogen_min_capacity": "1",   
       "ec2_oracle_instance_threads_ssogen": 1,
+      "ec2_disk_size_ssogen": 70,
       "instance_role_ssogen": "ssogen",
       "red_button_lambda_boom": false,
       "red_button_lambda_debug": true
@@ -255,6 +256,7 @@
       "ssogen_min_capacity": "1",
       "ssogen_efs_performance_mode": "generalPurpose",
       "ec2_oracle_instance_threads_ssogen": 1,
+      "ec2_disk_size_ssogen": 70,
       "instance_role_ssogen": "ssogen",
       "red_button_lambda_boom": false,
       "red_button_lambda_debug": true
