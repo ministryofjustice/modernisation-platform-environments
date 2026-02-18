@@ -9,10 +9,10 @@ resource "aws_efs_file_system" "storage" {
 
 resource "aws_efs_mount_target" "mount" {
   count          = local.is-development || local.is-test ? 1 : 0
-  file_system_id = aws_efs_file_system.storage.id
+  file_system_id = aws_efs_file_system.storage[count.index].id
   subnet_id      = data.aws_subnet.data_subnets_a.id
   security_groups = [
-    aws_security_group.efs-security-group.id
+    aws_security_group.efs-security-group[count.index].id
   ]
 }
 
