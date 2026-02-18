@@ -3,7 +3,7 @@ locals {
     yjsm_hub_svc_listener = {
       port                                 = 443
       protocol                             = "HTTPS"
-      certificate_arn                      = module.gateway_certs[0].domain_cert_arn
+      certificate_arn                      = local.application_data.accounts[local.environment].create_svc_pilot ? module.gateway_certs[0].domain_cert_arn : module.certs.domain_cert_arn
       routing_http_response_server_enabled = true
       fixed_response = {
         status_code  = 403
