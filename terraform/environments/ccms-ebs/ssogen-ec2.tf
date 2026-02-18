@@ -3,6 +3,7 @@
 # }
 
 data "template_file" "launch-template" {
+  count    = local.is-development || local.is-test ? 1 : 0
   template = file("${path.module}/templates/ec2_user_data_ssogen.sh")
   vars = {
     hostname           = "${local.application_name_ssogen}"
@@ -44,7 +45,7 @@ resource "aws_launch_template" "ssogen-ec2-launch-template-primary" {
     }
   }
 
-  user_data = base64encode(data.template_file.launch-template.rendered)
+  user_data = base64encode(data.template_file.launch-template[count.index].rendered)
 
   tag_specifications {
     resource_type = "instance"
@@ -106,7 +107,7 @@ resource "aws_launch_template" "ssogen-ec2-launch-template-secondary" {
     }
   }
 
-  user_data = base64encode(data.template_file.launch-template.rendered)
+  user_data = base64encode(data.template_file.launch-template[count.index].rendered)
 
   tag_specifications {
     resource_type = "instance"
