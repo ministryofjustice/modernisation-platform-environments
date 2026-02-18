@@ -10,7 +10,7 @@ resource "aws_vpc_security_group_ingress_rule" "efs-security-group-ingress" {
 
   count             = local.is-development || local.is-test ? length(local.private_subnets_cidr_blocks) : 0
   description       = "Allow inbound access from ec2 instances"
-  security_group_id = aws_security_group.efs-security-group[count.index].id
+  security_group_id = [aws_security_group.efs-security-group[0].id]
   ip_protocol       = "tcp"
   from_port         = 2049
   to_port           = 2049
