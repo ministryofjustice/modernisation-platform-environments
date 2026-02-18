@@ -1,20 +1,9 @@
 #!/bin/bash
 set -euo pipefail
 
-mkdir -p /SSOGEN
-EFS_MOUNT_POINT=/SSOGEN
 # === Set hostname ===
 hostnamectl set-hostname "${hostname}"
 echo "127.0.0.1   ${hostname}" >> /etc/hosts
-
-#--Configure EFS
-yum install -y amazon-efs-utils
-mkdir $EFS_MOUNT_POINT
-mount -t efs -o tls ${efs_id}:/ $EFS_MOUNT_POINT
-chmod go+rw $EFS_MOUNT_POINT
-# create large file for better EFS performance 
-# https://docs.aws.amazon.com/efs/latest/ug/performance.html
-dd if=/dev/urandom of=$EFS_MOUNT_POINT/large_file_for_efs_performance bs=1024k count=10000
 
 # === Base updates and packages ===
 yum update -y
@@ -46,6 +35,14 @@ chown -R oracle:dba /oracle
 chmod 775 /oracle
 
 # 
-
+#--Configure EFS
+EFS_MOUNT_POINT=/SSOGEN
+yum install -y amazon-efs-utils
+mkdir $EFS_MOUNT_POINT
+mount -t efs -o tls ${efs_id}:/ $EFS_MOUNT_POINT
+chmod go+rw $EFS_MOUNT_POINT
+# create large file for better EFS performance 
+# https://docs.aws.amazon.com/efs/latest/ug/performance.html
+dd if=/dev/urandom of=$EFS_MOUNT_POINT/large_file_for_efs_performance bs=1024k count=10000
 # === Final logs ===
 echo "SSOGEN instance bootstrap completed for ${hostname}" >> /var/log/user-data.log
