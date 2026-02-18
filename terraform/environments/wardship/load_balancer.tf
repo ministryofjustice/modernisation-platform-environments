@@ -270,19 +270,6 @@ resource "aws_lb_target_group" "wardship_target_group" {
     matcher             = "200-302"
     timeout             = "10"
   }
-
-  #health_check {
-  #  protocol            = "HTTP"
-  #  port                = "80"
-  #  path                = "/health.txt"
-  #  healthy_threshold   = 2
-  #  unhealthy_threshold = 10
-  #  timeout             = 10
-  #  interval            = 30
-  #  matcher             = "200"
-  #}
-
-
 }
 
 resource "aws_lb_listener" "wardship_lb" {
