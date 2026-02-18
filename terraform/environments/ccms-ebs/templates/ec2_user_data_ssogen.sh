@@ -1,7 +1,8 @@
 #!/bin/bash
 set -euo pipefail
-EC2_USER_HOME_FOLDER=/home/ec2-user
-EFS_MOUNT_POINT=$EC2_USER_HOME_FOLDER/SSOGEN
+
+mkdir -p /SSOGEN
+EFS_MOUNT_POINT=/SSOGEN
 # === Set hostname ===
 hostnamectl set-hostname "${hostname}"
 echo "127.0.0.1   ${hostname}" >> /etc/hosts
