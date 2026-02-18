@@ -81,13 +81,28 @@ module "lb_access_logs_enabled" {
   region                     = "eu-west-2"
   enable_deletion_protection = false
   idle_timeout               = 60
-  enable_http2               = false
 
   tags = merge(
     local.tags,
     { "Name" = "${local.application_name} lb_module" }
   )
 
+}
+
+# Disable HTTP/2 on the load balancer by modifying its attributes
+resource "terraform_data" "disable_http2" {
+  count = local.environment == "preproduction" ? 1 : 0
+
+  provisioner "local-exec" {
+    command = <<-EOT
+      aws elbv2 modify-load-balancer-attributes \
+        --load-balancer-arn ${module.lb_access_logs_enabled.load_balancer.arn} \
+        --attributes Key=routing.http2.enabled,Value=false \
+        --region eu-west-2
+    EOT
+  }
+
+  depends_on = [module.lb_access_logs_enabled]
 }
 
 resource "aws_lb_target_group" "oas_ec2_target_group" {
