@@ -308,7 +308,7 @@ resource "aws_vpc_security_group_ingress_rule" "ing_4443_from_alb" {
 # #########################################
 
 resource "aws_vpc_security_group_ingress_rule" "ing_7001_from_alb" {
-  count                        = local.is-development || local.is-test? 1 : 0
+  count                        = local.is-development || local.is-test ? 1 : 0
   security_group_id            = aws_security_group.ssogen_sg[0].id
   description                  = "Allow inbound HTTPS (7001) from SSOGEN internal ALB"
   from_port                    = 7001
