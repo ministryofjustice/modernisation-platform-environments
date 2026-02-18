@@ -86,7 +86,7 @@ resource "aws_ebs_volume" "oem_db_volume_opt_oem_app" {
   encrypted         = true
   iops              = 3000
   kms_key_id        = data.aws_kms_key.ebs_shared.arn
-  size              = 50
+  size              = local.application_data.accounts[local.environment].ebs_size_db_app
   type              = "gp3"
   depends_on        = [resource.aws_instance.oem_db]
 
@@ -117,7 +117,7 @@ resource "aws_ebs_volume" "oem_db_volume_opt_oem_inst" {
   encrypted         = true
   iops              = 3000
   kms_key_id        = data.aws_kms_key.ebs_shared.arn
-  size              = 50
+  size              = local.application_data.accounts[local.environment].ebs_size_db_inst
   type              = "gp3"
   depends_on        = [resource.aws_instance.oem_db]
 
@@ -148,7 +148,7 @@ resource "aws_ebs_volume" "oem_db_volume_opt_oem_dbf" {
   encrypted         = true
   iops              = 3000
   kms_key_id        = data.aws_kms_key.ebs_shared.arn
-  size              = 200
+  size              = local.application_data.accounts[local.environment].ebs_size_db_dbf
   type              = "io2"
   depends_on        = [resource.aws_instance.oem_db]
 
@@ -179,7 +179,7 @@ resource "aws_ebs_volume" "oem_db_volume_opt_oem_redo" {
   encrypted         = true
   iops              = 3000
   kms_key_id        = data.aws_kms_key.ebs_shared.arn
-  size              = 20
+  size              = local.application_data.accounts[local.environment].ebs_size_db_redo
   type              = "io2"
   depends_on        = [resource.aws_instance.oem_db]
 
@@ -210,7 +210,7 @@ resource "aws_ebs_volume" "oem_db_volume_opt_oem_arch" {
   encrypted         = true
   iops              = 3000
   kms_key_id        = data.aws_kms_key.ebs_shared.arn
-  size              = 200
+  size              = local.application_data.accounts[local.environment].ebs_size_db_arch
   type              = "io2"
   depends_on        = [resource.aws_instance.oem_db]
 

@@ -1,6 +1,13 @@
 {
   "accounts": {
     "development": {
+      "ebs_size_app_app": 100,
+      "ebs_size_app_inst": 50,
+      "ebs_size_db_app": 50,
+      "ebs_size_db_arch": 200,
+      "ebs_size_db_dbf": 200,
+      "ebs_size_db_inst": 50,
+      "ebs_size_db_redo": 20,
       "ec2_oem_ami_id_app": "ami-061d717bf569e59fc",
       "ec2_oem_ami_id_db": "ami-07d6d3f7f5579a302",
       "ec2_oem_ami_id_wl": "",
@@ -22,6 +29,13 @@
       "snapshot_id_db_opt_oem_arch": "snap-0e41eb82143d24103"
     },
     "test": {
+      "ebs_size_app_app": 100,
+      "ebs_size_app_inst": 50,
+      "ebs_size_db_app": 50,
+      "ebs_size_db_arch": 200,
+      "ebs_size_db_dbf": 200,
+      "ebs_size_db_inst": 50,
+      "ebs_size_db_redo": 20,
       "ec2_oem_ami_id_app": "ami-076a3ec996e3e63e0",
       "ec2_oem_ami_id_db": "ami-0048220e126b83bf3",
       "ec2_oem_ami_id_wl": "",
@@ -43,6 +57,13 @@
       "snapshot_id_db_opt_oem_arch": "snap-0b5065f16978b9833"
     },
     "preproduction": {
+      "ebs_size_app_app": 100,
+      "ebs_size_app_inst": 50,
+      "ebs_size_db_app": 50,
+      "ebs_size_db_arch": 200,
+      "ebs_size_db_dbf": 200,
+      "ebs_size_db_inst": 50,
+      "ebs_size_db_redo": 20,
       "ec2_oem_ami_id_app": "ami-0dc9e412061b87365",
       "ec2_oem_ami_id_db": "ami-00ee36632a2a3e413",
       "ec2_oem_ami_id_wl": "",
@@ -64,6 +85,13 @@
       "snapshot_id_db_opt_oem_arch": ""
     },
     "production": {
+      "ebs_size_app_app": 100,
+      "ebs_size_app_inst": 50,
+      "ebs_size_db_app": 50,
+      "ebs_size_db_arch": 200,
+      "ebs_size_db_dbf": 200,
+      "ebs_size_db_inst": 50,
+      "ebs_size_db_redo": 20,
       "ec2_oem_ami_id_app": "ami-0dc9e412061b87365",
       "ec2_oem_ami_id_db": "ami-00ee36632a2a3e413",
       "ec2_oem_ami_id_wl": "",
