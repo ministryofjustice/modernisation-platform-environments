@@ -1555,13 +1555,6 @@ resource "aws_iam_role_policy_attachment" "ears_sars_iam_role_policy_attachment"
   policy_arn = aws_iam_policy.ears_sars_iam_role_policy[0].arn
 }
 
-resource "aws_lakeformation_permissions" "ears_sars_lf_permisions" {
-  count            = local.is-development || local.is-preproduction ? 1 : 0
-  permissions      = ["SELECT", "DATA_LOCATION_ACCESS"]
-  principal        = aws_iam_role.ears_sars_iam_role[0].arn
-  catalog_resource = true
-}
-
 resource "aws_lakeformation_permissions" "ears_sars_table_permissions" {
   count     = local.is-development || local.is-preproduction ? 1 : 0
   principal = aws_iam_role.ears_sars_iam_role[0].arn
@@ -1571,7 +1564,7 @@ resource "aws_lakeformation_permissions" "ears_sars_table_permissions" {
     wildcard      = true
   }
 
-  permissions = ["SELECT", "DESCRIBE"]
+  permissions = ["SELECT"]
 }
 
 resource "aws_lakeformation_permissions" "ears_sars_datalake_location" {
