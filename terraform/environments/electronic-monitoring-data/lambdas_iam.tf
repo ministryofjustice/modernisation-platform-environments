@@ -1555,29 +1555,28 @@ resource "aws_iam_role_policy_attachment" "ears_sars_iam_role_policy_attachment"
   policy_arn = aws_iam_policy.ears_sars_iam_role_policy[0].arn
 }
 
-resource "aws_lakeformation_permissions" "ears_sars_table_permissions" {
+resource "aws_lakeformation_permissions" "ears_sars_db_permissions" {
   count     = local.is-preproduction ? 1 : 0
   principal = aws_iam_role.ears_sars_iam_role[0].arn
 
-  table {
-    database_name = "sar_ear_reports_mart"
-    wildcard      = true
+  database {
+    name = "sar_ear_reports_mart${local.db_suffix}"
   }
 
   permissions = ["SELECT", "DESCRIBE"]
 }
+
 
 resource "aws_lakeformation_permissions" "ears_sars_datalake_location" {
   count     = local.is-development || local.is-preproduction ? 1 : 0
   principal = aws_iam_role.ears_sars_iam_role[0].arn
 
   data_location {
-    arn = module.s3-data-bucket.bucket.arn # The ARN of the bucket
+    arn = module.s3-data-bucket.bucket.arn
   }
 
   permissions = ["DATA_LOCATION_ACCESS"]
 }
-
 
 #-----------------------------------------------------------------------------------
 # Iceberg table maint
