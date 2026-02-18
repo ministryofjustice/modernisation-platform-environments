@@ -1,13 +1,12 @@
 #!/bin/bash
 set -e
 
-# Script to create a Bedrock API key by assuming the BedrockAPIKeyCreator role
+# Script to create Bedrock API keys by assuming the BedrockAPIKeyCreator role
 # This bypasses the common_policy deny on IAM user creation
 
 ROLE_ARN="arn:aws:iam::313941174580:role/BedrockAPIKeyCreator"
 REGION="eu-west-1"
-TIMESTAMP=$(date +%Y%m%d-%H%M%S)
-USER_NAME="BedrockAPIKey-hmcts-claude-${TIMESTAMP}"
+NUM_KEYS=${1:-20}  # Default to 20 keys, or pass as first argument
 
 echo "Assuming BedrockAPIKeyCreator role..."
 CREDENTIALS=$(aws sts assume-role \
@@ -28,70 +27,111 @@ export AWS_SECRET_ACCESS_KEY=$(echo "$CREDENTIALS" | awk '{print $2}')
 export AWS_SESSION_TOKEN=$(echo "$CREDENTIALS" | awk '{print $3}')
 
 echo "Successfully assumed role"
+echo ""
+echo "Creating $NUM_KEYS Bedrock API keys..."
+echo ""
 
-# Create IAM user with timestamp
-echo "Creating IAM user: $USER_NAME"
-aws iam create-user --user-name "$USER_NAME"
-
-# Attach the Bedrock access policy to the user
-echo "Attaching Bedrock policy to user..."
 POLICY_ARN="arn:aws:iam::313941174580:policy/HMCTSClaudeBedrockPolicy"
-aws iam attach-user-policy \
-  --user-name "$USER_NAME" \
-  --policy-arn "$POLICY_ARN"
 
-# Create service-specific credential for Bedrock
-echo "Creating Bedrock API key (service-specific credential with 90-day expiry)..."
-RESULT=$(aws iam create-service-specific-credential \
-  --user-name "$USER_NAME" \
-  --service-name bedrock.amazonaws.com \
-  --credential-age-days 90 2>&1)
+# Arrays to store results
+declare -a TOKENS
+declare -a USERNAMES
+FAILED=0
 
-# Check if the command succeeded
-if [ $? -ne 0 ]; then
-  echo ""
-  echo "ERROR: Failed to create service-specific credential"
-  echo "$RESULT"
-  exit 1
-fi
+for i in $(seq 1 $NUM_KEYS); do
+  TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+  USER_NAME="BedrockAPIKey-hmcts-claude-${TIMESTAMP}-${i}"
 
-# Extract and display the credentials
-SERVICE_USER_NAME=$(echo "$RESULT" | jq -r '.ServiceSpecificCredential.ServiceUserName')
-SERVICE_PASSWORD=$(echo "$RESULT" | jq -r '.ServiceSpecificCredential.ServiceCredentialSecret')
+  echo "[$i/$NUM_KEYS] Creating user: $USER_NAME"
 
-# Verify we got valid credentials
-if [ "$SERVICE_PASSWORD" = "null" ] || [ -z "$SERVICE_PASSWORD" ]; then
-  echo ""
-  echo "ERROR: Failed to extract credentials from response"
-  echo "Raw response:"
-  echo "$RESULT"
-  exit 1
-fi
+  # Create IAM user
+  if ! aws iam create-user --user-name "$USER_NAME" > /dev/null 2>&1; then
+    echo "  ERROR: Failed to create user $USER_NAME"
+    ((FAILED++))
+    continue
+  fi
+
+  # Attach policy
+  if ! aws iam attach-user-policy --user-name "$USER_NAME" --policy-arn "$POLICY_ARN" 2>/dev/null; then
+    echo "  ERROR: Failed to attach policy to $USER_NAME"
+    ((FAILED++))
+    continue
+  fi
+
+  # Create service-specific credential
+  RESULT=$(aws iam create-service-specific-credential \
+    --user-name "$USER_NAME" \
+    --service-name bedrock.amazonaws.com \
+    --credential-age-days 90 2>&1)
+
+  if [ $? -ne 0 ]; then
+    echo "  ERROR: Failed to create credential for $USER_NAME"
+    ((FAILED++))
+    continue
+  fi
+
+  SERVICE_PASSWORD=$(echo "$RESULT" | jq -r '.ServiceSpecificCredential.ServiceCredentialSecret')
+  SERVICE_USER_NAME=$(echo "$RESULT" | jq -r '.ServiceSpecificCredential.ServiceUserName')
+
+  if [ "$SERVICE_PASSWORD" = "null" ] || [ -z "$SERVICE_PASSWORD" ]; then
+    echo "  ERROR: Failed to extract credential for $USER_NAME"
+    ((FAILED++))
+    continue
+  fi
+
+  TOKENS+=("$SERVICE_PASSWORD")
+  USERNAMES+=("$SERVICE_USER_NAME")
+  echo "  SUCCESS"
+
+  # Small delay to ensure unique timestamps
+  sleep 1
+done
 
 echo ""
 echo "=========================================="
-echo "Bedrock API Key Created Successfully!"
+echo "Bedrock API Keys Created"
+echo "=========================================="
+echo "Successfully created: ${#TOKENS[@]} keys"
+echo "Failed: $FAILED"
+echo ""
+echo "=========================================="
+echo "Bearer Tokens"
 echo "=========================================="
 echo ""
-echo "Bearer Token: $SERVICE_PASSWORD"
-echo "Service User Name: $SERVICE_USER_NAME"
+
+for i in "${!TOKENS[@]}"; do
+  echo "Key $((i+1)): ${TOKENS[$i]}"
+done
+
 echo ""
 echo "=========================================="
-echo "Claude Code Configuration"
+echo "CSV Format (for easy import)"
 echo "=========================================="
 echo ""
-echo "Add the following to your ~/.bashrc or ~/.zshrc:"
+echo "username,bearer_token"
+for i in "${!TOKENS[@]}"; do
+  echo "${USERNAMES[$i]},${TOKENS[$i]}"
+done
+
 echo ""
-echo "# Claude Code Bedrock Configuration"
-echo "export CLAUDE_CODE_MAX_OUTPUT_TOKENS=4096"
-echo "export MAX_THINKING_TOKENS=1024"
+echo "=========================================="
+echo "Claude Code Configuration (use any token)"
+echo "=========================================="
+echo ""
+echo "# IMPORTANT: AWS_REGION must be set - Claude Code doesn't read ~/.aws/config"
+echo "export AWS_REGION=eu-west-1"
+echo ""
+echo "# Option 1: Claude Sonnet 4.5 (EU inference - recommended)"
 echo "export ANTHROPIC_MODEL='eu.anthropic.claude-sonnet-4-5-20250929-v1:0'"
-echo "export ANTHROPIC_SMALL_FAST_MODEL='eu.anthropic.claude-3-haiku-20240307-v1:0'"
+echo ""
+echo "# Option 2: Claude Opus 4.5 (global inference - may be blocked by SCP)"
+echo "# export ANTHROPIC_MODEL='global.anthropic.claude-opus-4-5-20251101-v1:0'"
+echo ""
+echo "# Common settings"
 echo "export CLAUDE_CODE_USE_BEDROCK=1"
-echo "export AWS_BEARER_TOKEN_BEDROCK='$SERVICE_PASSWORD'"
+echo "export ANTHROPIC_SMALL_FAST_MODEL='eu.anthropic.claude-haiku-4-5-20251001-v1:0'"
+echo "export AWS_BEARER_TOKEN_BEDROCK='<paste-one-of-the-tokens-above>'"
 echo ""
-echo "Then run: source ~/.bashrc (or source ~/.zshrc)"
-echo ""
-echo "IMPORTANT: Save this bearer token securely!"
-echo "You will not be able to retrieve it again."
+echo "IMPORTANT: Save these bearer tokens securely!"
+echo "You will not be able to retrieve them again."
 echo "=========================================="

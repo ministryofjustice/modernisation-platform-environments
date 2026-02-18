@@ -12,8 +12,12 @@ First, request access to Claude models in the AWS Bedrock console:
 
 1. Go to the [Bedrock Model Access page](https://eu-west-1.console.aws.amazon.com/bedrock/home?region=eu-west-1#/modelaccess)
 2. Request access to:
+   - Claude Opus 4.5 (uses global inference profile)
    - Claude Sonnet 4.5
+   - Claude Haiku 4.5
    - Claude Sonnet 4 (optional - requires marketplace subscription)
+
+**Note:** Claude Opus 4.5 uses a global inference profile which routes requests across all supported AWS regions worldwide. There is no EU-only profile available for Opus 4.5.
 
 ### 2. Create Bedrock API Key
 
@@ -37,10 +41,11 @@ Add the environment variables from the script output to your `~/.bashrc` or `~/.
 
 ```bash
 # Claude Code Bedrock Configuration
-export CLAUDE_CODE_MAX_OUTPUT_TOKENS=4096
-export MAX_THINKING_TOKENS=1024
-export ANTHROPIC_MODEL='eu.anthropic.claude-sonnet-4-5-20250929-v1:0'
+# IMPORTANT: AWS_REGION must be set - Claude Code doesn't read ~/.aws/config
+export AWS_REGION=eu-west-1
 export CLAUDE_CODE_USE_BEDROCK=1
+export ANTHROPIC_MODEL='eu.anthropic.claude-sonnet-4-5-20250929-v1:0'
+export ANTHROPIC_SMALL_FAST_MODEL='eu.anthropic.claude-haiku-4-5-20251001-v1:0'
 export AWS_BEARER_TOKEN_BEDROCK='<your-bearer-token>'
 ```
 
@@ -52,14 +57,20 @@ source ~/.bashrc  # or source ~/.zshrc
 
 ## Available Models
 
-Use the system-defined EU inference profiles for cross-region load balancing:
+### Global Inference Profile (cross-region worldwide)
 
-- **Claude Opus 4.5**: `global.anthropic.claude-opus-4-5-20251101-v1:0` (global only - no EU profile available)
-- **Claude Sonnet 4.5**: `eu.anthropic.claude-sonnet-4-5-20250929-v1:0` (recommended)
+- **Claude Opus 4.5**: `global.anthropic.claude-opus-4-5-20251101-v1:0`
+  - Routes requests globally across all supported AWS regions
+  - Best for complex, long-running workflows and agentic tasks
+  - No EU-only profile available
+
+### EU Inference Profiles (cross-region within EU)
+
+- **Claude Sonnet 4.5**: `eu.anthropic.claude-sonnet-4-5-20250929-v1:0` (recommended for most use cases)
 - **Claude Sonnet 4**: `eu.anthropic.claude-sonnet-4-20250514-v1:0`
-- **Claude Haiku 4.5**: `eu.anthropic.claude-haiku-4-5-20251001-v1:0`
+- **Claude Haiku 4.5**: `eu.anthropic.claude-haiku-4-5-20251001-v1:0` (fast, cost-effective)
 
-These inference profiles route requests across multiple EU regions (eu-west-1, eu-central-1, eu-north-1, eu-west-3, etc.) for optimal availability.
+These EU inference profiles route requests across multiple EU regions (eu-west-1, eu-central-1, eu-north-1, eu-west-3, etc.) for optimal availability while keeping data within the EU.
 
 ## Troubleshooting
 
