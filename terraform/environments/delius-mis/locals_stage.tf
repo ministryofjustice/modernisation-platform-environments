@@ -2,12 +2,10 @@
 
 locals {
   environment_config_stage = {
-    # comment in below after trust secret set
-    #ad_trust_domain_name                   = "azure.hmpp.root"
-
     legacy_engineering_vpc_cidr            = "10.160.98.0/25"
     legacy_counterpart_vpc_cidr            = "10.160.32.0/20"
     ad_domain_name                         = "delius-mis-stage.internal"
+    ad_trust_domain_name                   = "azure.hmpp.root"
     ad_trust_dc_cidrs                      = module.ip_addresses.active_directory_cidrs.hmpp.domain_controllers
     ad_trust_dns_ip_addrs                  = module.ip_addresses.mp_ips.ad_fixngo_hmpp_domain_controllers
     ec2_user_ssh_key                       = file("${path.module}/files/.ssh/${terraform.workspace}/ec2-user.pub")
