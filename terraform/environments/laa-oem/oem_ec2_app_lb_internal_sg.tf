@@ -106,7 +106,7 @@ resource "aws_vpc_security_group_ingress_rule" "lb_int_ingress_tcp_3872_3872_cid
   ip_protocol       = "tcp"
   from_port         = 3872
   to_port           = 3872
-  cidr_ipv4         = data.aws_vpc.shared.cidr_block
+  cidr_ipv4         = local.cidr_lz_workspaces_all
 
   tags = {
     Name = "Oracle EM Console HTTP from anywhere"
@@ -159,7 +159,7 @@ resource "aws_vpc_security_group_ingress_rule" "lb_int_ingress_tcp_4903_4903_cid
   ip_protocol       = "tcp"
   from_port         = 4903
   to_port           = 4903
-  cidr_ipv4         = data.aws_vpc.shared.cidr_block
+  cidr_ipv4         = local.cidr_lz_workspaces_all
 
   tags = {
     Name = "Oracle EM Console HTTPS from anywhere"
@@ -252,7 +252,7 @@ resource "aws_vpc_security_group_ingress_rule" "lb_int_ingress_tcp_7803_7803_cid
   ip_protocol       = "tcp"
   from_port         = 7803
   to_port           = 7803
-  cidr_ipv4         = data.aws_vpc.shared.cidr_block
+  cidr_ipv4         = local.cidr_lz_workspaces_all
 
   tags = {
     Name = "Oracle EM port 7803 from anywhere"
