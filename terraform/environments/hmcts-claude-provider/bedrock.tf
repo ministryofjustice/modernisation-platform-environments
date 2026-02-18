@@ -17,6 +17,8 @@ resource "aws_iam_policy" "bedrock_claude_policy" {
         ],
         Resource = [
           # Regional foundation models
+          "arn:aws:bedrock:eu-*::foundation-model/anthropic.claude-opus-4-6-v1",
+          "arn:aws:bedrock:eu-*::foundation-model/anthropic.claude-sonnet-4-6",
           "arn:aws:bedrock:*::foundation-model/anthropic.claude-opus-4-5-20251101-v1:0",
           "arn:aws:bedrock:eu-*::foundation-model/anthropic.claude-sonnet-4-5-20250929-v1:0",
           "arn:aws:bedrock:eu-*::foundation-model/anthropic.claude-sonnet-4-20250514-v1:0",
@@ -39,7 +41,9 @@ resource "aws_iam_policy" "bedrock_claude_policy" {
           "bedrock:InvokeModelWithResponseStream"
         ],
         Resource = [
-          # EU inference profile for Opus 4.5 (routes only within EU regions)
+          # EU inference profiles (routes only within EU regions)
+          "arn:aws:bedrock:eu-west-1:313941174580:inference-profile/eu.anthropic.claude-opus-4-6-v1",
+          "arn:aws:bedrock:eu-west-1:313941174580:inference-profile/eu.anthropic.claude-sonnet-4-6",
           "arn:aws:bedrock:eu-west-1:313941174580:inference-profile/eu.anthropic.claude-opus-4-5-20251101-v1:0"
         ]
       },
