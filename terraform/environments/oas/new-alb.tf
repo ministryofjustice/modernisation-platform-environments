@@ -81,6 +81,7 @@ module "lb_access_logs_enabled" {
   region                     = "eu-west-2"
   enable_deletion_protection = false
   idle_timeout               = 60
+  enable_http2               = false
 
   tags = merge(
     local.tags,
