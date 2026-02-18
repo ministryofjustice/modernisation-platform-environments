@@ -36,7 +36,7 @@ resource "aws_iam_role_policy_attachment" "ssogen_ssm" {
 }
 
 resource "aws_kms_alias" "a" {
-  count       = local.is-development || local.is-test ? 1 : 0
+  count         = local.is-development || local.is-test ? 1 : 0
   name          = "alias/ssogen-key-alias"
   target_key_id = aws_kms_key.ssogen_kms_key[0].key_id
 }

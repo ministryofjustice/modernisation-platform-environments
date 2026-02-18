@@ -26,7 +26,7 @@ resource "aws_efs_mount_target" "mount_B" {
 }
 
 resource "aws_efs_mount_target" "mount_C" {
-   count         = local.is-development || local.is-test ? 1 : 0
+  count          = local.is-development || local.is-test ? 1 : 0
   file_system_id = aws_efs_file_system.storage[count.index].id
   subnet_id      = data.aws_subnet.data_subnets_c.id
   security_groups = [
