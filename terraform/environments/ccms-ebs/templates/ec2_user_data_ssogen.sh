@@ -1,9 +1,19 @@
 #!/bin/bash
-set -euxo pipefail
-
+set -euo pipefail
+EC2_USER_HOME_FOLDER=/home/ec2-user
+EFS_MOUNT_POINT=$EC2_USER_HOME_FOLDER/SSOGEN
 # === Set hostname ===
 hostnamectl set-hostname "${hostname}"
 echo "127.0.0.1   ${hostname}" >> /etc/hosts
+
+#--Configure EFS
+yum install -y amazon-efs-utils
+mkdir $EFS_MOUNT_POINT
+mount -t efs -o tls ${efs_id}:/ $EFS_MOUNT_POINT
+chmod go+rw $EFS_MOUNT_POINT
+# create large file for better EFS performance 
+# https://docs.aws.amazon.com/efs/latest/ug/performance.html
+dd if=/dev/urandom of=$EFS_MOUNT_POINT/large_file_for_efs_performance bs=1024k count=10000
 
 # === Base updates and packages ===
 yum update -y
