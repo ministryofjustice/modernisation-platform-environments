@@ -38,7 +38,7 @@ resource "aws_launch_template" "ssogen-ec2-launch-template-primary" {
     ebs {
       delete_on_termination = true
       encrypted             = true
-      volume_size           = 60
+      volume_size           = local.application_data.accounts[local.environment].ec2_disk_size_ssogen
       volume_type           = "gp2"
       iops                  = 0
       kms_key_id            = aws_kms_key.ssogen_kms_key[count.index].arn
@@ -100,7 +100,7 @@ resource "aws_launch_template" "ssogen-ec2-launch-template-secondary" {
     ebs {
       delete_on_termination = true
       encrypted             = true
-      volume_size           = 60
+      volume_size           = local.application_data.accounts[local.environment].ec2_disk_size_ssogen
       volume_type           = "gp2"
       iops                  = 0
       kms_key_id            = aws_kms_key.ssogen_kms_key[count.index].arn
