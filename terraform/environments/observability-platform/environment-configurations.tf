@@ -339,6 +339,25 @@ locals {
             }
           }
         },
+        "dacp" = {
+          "identity_centre_team" = "dacp",
+          "aws_accounts" = {
+            "dacp-preproduction" = {
+              cloudwatch_enabled              = true
+              prometheus_push_enabled         = false
+              amazon_prometheus_query_enabled = false
+              xray_enabled                    = false
+              athena_enabled                  = false
+            },
+            "dacp-production" = {
+              cloudwatch_enabled              = true
+              prometheus_push_enabled         = false
+              amazon_prometheus_query_enabled = false
+              xray_enabled                    = false
+              athena_enabled                  = false
+            }
+          }
+        },
         "data-engineering" = {
           "identity_centre_team" = "data-engineering",
           "aws_accounts" = {
