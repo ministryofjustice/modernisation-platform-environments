@@ -1459,6 +1459,134 @@ resource "aws_iam_role_policy_attachment" "cross_account_copy" {
   policy_arn = aws_iam_policy.cross_account_copy[0].arn
 }
 
+#-----------------------------------------------------------------------------------
+# EARS SARS
+#-----------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "ears_sars_iam_role_policy_document" {
+  count = local.is-development || local.is-preproduction ? 1 : 0
+
+  statement {
+    sid       = "S3BucketPerms"
+    effect    = "Allow"
+    actions   = ["s3:ListAllMyBuckets", "s3:GetBucketLocation"]
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "S3PermissionsReportBuckets"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:GetBucketLocation",
+      "s3:ListBucket",
+    ]
+    resources = [
+      "${module.s3-create-a-derived-table-bucket.bucket.arn}/data/prod/models/*",
+      module.s3-create-a-derived-table-bucket.bucket.arn
+    ]
+  }
+
+  statement {
+    sid    = "S3PermissionsUnstructured"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:GetBucketLocation",
+      "s3:ListBucket",
+    ]
+    resources = [
+      "${module.s3-data-bucket.bucket.arn}/g4s/atrium_unstructured/*",
+      "${module.s3-data-bucket.bucket.arn}/capita/blob_storage/*",
+      module.s3-data-bucket.bucket.arn
+    ]
+  }
+
+
+  statement {
+    sid    = "AthenaQueryExecution"
+    effect = "Allow"
+    actions = [
+      "athena:StartQueryExecution",
+      "athena:GetQueryExecution",
+      "athena:GetQueryResults",
+      "athena:StopQueryExecution",
+      "athena:GetWorkGroup"
+    ]
+    resources = [
+      aws_athena_workgroup.ears_sars.arn
+    ] 
+  }
+
+  statement {
+    sid    = "GlueMetadataRead"
+    effect = "Allow"
+    actions = [
+      "glue:GetDatabase",
+      "glue:GetDatabases",
+      "glue:GetTable",
+      "glue:GetTables",
+      "glue:GetPartition",
+      "glue:GetPartitions"
+    ]
+    resources = [
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:catalog",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:database/*",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/*" 
+    ]
+  }
+}
+
+resource "aws_iam_role" "ears_sars_iam_role" {
+  count              = local.is-development || local.is-preproduction ? 1 : 0
+  name               = "ears_sars_iam_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_policy" "ears_sars_iam_role_policy" {
+  count  = local.is-development || local.is-preproduction ? 1 : 0
+  name   = "ears_sars_iam_policy"
+  policy = data.aws_iam_policy_document.ears_sars_iam_role_policy_document[0].json
+}
+
+resource "aws_iam_role_policy_attachment" "ears_sars_iam_role_policy_attachment" {
+  count      = local.is-development || local.is-preproduction ? 1 : 0
+  role       = aws_iam_role.ears_sars_iam_role[0].name
+  policy_arn = aws_iam_policy.ears_sars_iam_role_policy[0].arn
+}
+
+resource "aws_lakeformation_permissions" "ears_sars_db_permissions" {
+  count     = local.is-preproduction ? 1 : 0
+  principal = aws_iam_role.ears_sars_iam_role[0].arn
+
+  database {
+    name = "sar_ear_reports_mart${local.db_suffix}"
+  }
+
+  permissions = ["SELECT", "DESCRIBE"]
+}
+resource "aws_lakeformation_permissions" "ears_sars_table_permissions" {
+  count     = local.is-preproduction ? 1 : 0
+  principal = aws_iam_role.ears_sars_iam_role[0].arn
+
+  table {
+    database_name = "sar_ear_reports_mart${local.db_suffix}"
+    wildcard              = true
+  }
+
+  permissions = ["SELECT", "DESCRIBE"]
+}
+
+resource "aws_lakeformation_permissions" "ears_sars_datalake_location" {
+  count     = local.is-development || local.is-preproduction ? 1 : 0
+  principal = aws_iam_role.ears_sars_iam_role[0].arn
+
+  data_location {
+    arn = module.s3-data-bucket.bucket.arn
+  }
+
+  permissions = ["DATA_LOCATION_ACCESS"]
+}
 
 #-----------------------------------------------------------------------------------
 # Iceberg table maint
