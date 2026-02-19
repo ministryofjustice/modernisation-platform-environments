@@ -100,7 +100,7 @@ resource "aws_security_group_rule" "ingress_from_lb_9500" {
   from_port                = 9500
   to_port                  = 9500
   protocol                 = "tcp"
-  source_security_group_id = module.lb_access_logs_enabled.security_group.id
+  source_security_group_id = aws_security_group.lb_security_group[0].id
 }
 
 resource "aws_security_group_rule" "ingress_from_lb_9502" {
@@ -112,7 +112,7 @@ resource "aws_security_group_rule" "ingress_from_lb_9502" {
   from_port                = 9502
   to_port                  = 9502
   protocol                 = "tcp"
-  source_security_group_id = module.lb_access_logs_enabled.security_group.id
+  source_security_group_id = aws_security_group.lb_security_group[0].id
 }
 
 resource "aws_security_group_rule" "ingress_admin_workspace" {
