@@ -84,7 +84,7 @@ locals {
     "staged_emsys_mvp",
     "staged_emsys_tpims",
     "staged_scram_alcohol_monitoring",
-  ] : []
+  ] : local.is-preproduction ? ["sar_ear_reports_mart_preprod_dbt"] : []
 
   dev_dbs_to_grant       = local.is-production ? [for db in local.prod_dbs_to_grant : "${db}_historic_dev_dbt"] : []
   dbt_dbs_to_grant       = [for db in local.dbt_dbs : "${db}${local.dbt_suffix}"]
