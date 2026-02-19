@@ -1,5 +1,6 @@
 resource "aws_s3_bucket" "bucket" {
   bucket_prefix = "mike-reid-testing-abc123"
+  force_destroy = true
   tags = {
     Name        = "mike-reid-testing-abc123"
     Environment = "development"
