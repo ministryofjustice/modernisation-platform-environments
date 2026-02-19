@@ -56,6 +56,20 @@ resource "aws_vpc_security_group_egress_rule" "from_ec2_to_ssm" {
   ip_protocol       = "tcp"
   cidr_ipv4         = "0.0.0.0/0"
 }
+
+# #########################################
+# # SSOGEN Security Group — Allow inbound 7001 from ALB
+# #########################################
+
+resource "aws_vpc_security_group_egress_rule" "from_ec2_to_efs" {
+  count                        = local.is-development || local.is-test ? 1 : 0
+  security_group_id            = aws_security_group.ssogen_sg[count.index].id
+  description                  = "Allow outbound to EFS"
+  from_port                    = 2049
+  to_port                      = 2049
+  ip_protocol                  = "tcp"
+  referenced_security_group_id = aws_security_group.efs-security-group[0].id
+}
 # ############################################
 # # INGRESS — WebLogic Admin (7001)
 # ############################################
