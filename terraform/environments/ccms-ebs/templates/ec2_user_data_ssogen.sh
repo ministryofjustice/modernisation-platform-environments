@@ -38,7 +38,8 @@ chmod 775 /oracle
 #--Configure EFS
 EFS_MOUNT_POINT=/SSOGEN
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-# . "/root/.cargo/env"
+export HOME=/root
+. "$HOME/.cargo/env"
 yum -y install git rpm-build make rust cargo openssl-devel gcc gcc-c++ cmake wget perl
 wget https://go.dev/dl/go1.22.0.linux-amd64.tar.gz
 tar -C /usr/local -xzf go1.22.0.linux-amd64.tar.gz
