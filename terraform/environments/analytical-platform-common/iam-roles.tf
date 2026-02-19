@@ -56,7 +56,7 @@ module "analytical_platform_terraform_iam_role" {
   name = "analytical-platform-terraform"
 
   trust_policy_permissions = {
-    github-actions-assume = {
+    githubActionsAssume = {
       actions = [
         "sts:AssumeRole",
         "sts:TagSession"
@@ -109,7 +109,7 @@ module "data_engineering_datalake_access_terraform_iam_role" {
   name = "data-engineering-datalake-access-terraform"
 
   trust_policy_permissions = {
-    data-engineering-github-actions-assume = {
+    dataEngineeringGithubActionsAssume = {
       actions = [
         "sts:AssumeRole",
         "sts:TagSession"
