@@ -1,5 +1,5 @@
 #!/bin/bash
-set -euo pipefail
+set -exuo pipefail
 
 # === Set hostname ===
 hostnamectl set-hostname "${hostname}"
@@ -37,7 +37,28 @@ chmod 775 /oracle
 # 
 #--Configure EFS
 EFS_MOUNT_POINT=/SSOGEN
-yum install -y amazon-efs-utils
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+. "$HOME/.cargo/env"
+yum -y install git rpm-build make rust cargo openssl-devel gcc gcc-c++ cmake wget perl
+wget https://go.dev/dl/go1.22.0.linux-amd64.tar.gz
+tar -C /usr/local -xzf go1.22.0.linux-amd64.tar.gz
+echo "export PATH=\$PATH:/usr/local/go/bin" >> ~/.bashrc
+rm go1.22.0.linux-amd64.tar.gz
+cmake --version
+wget https://cmake.org/files/v3.20/cmake-3.20.0.tar.gz
+echo "get cmake tar"
+tar -xzf cmake-3.20.0.tar.gz
+cd ~/cmake-3.20.0
+./bootstrap && make && make install
+cmake --version
+~/.cargo/bin/rustc --version
+~/.cargo/bin/cargo --version
+cd ~
+git clone https://github.com/aws/efs-utils
+cd ~/efs-utils
+sed -i 's/--with system_rust --noclean/--without system_rust --noclean/g' ~/efs-utils/Makefile
+make rpm
+sudo yum -y install build/amazon-efs-utils*rpm
 mkdir $EFS_MOUNT_POINT
 mount -t efs -o tls ${efs_id}:/ $EFS_MOUNT_POINT
 chmod go+rw $EFS_MOUNT_POINT
