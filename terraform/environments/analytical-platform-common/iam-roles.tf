@@ -50,7 +50,7 @@ module "analytical_platform_terraform_iam_role" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
   version = "6.4.0"
 
-  create = true
+  create          = true
   use_name_prefix = false
 
   name = "analytical-platform-terraform"
@@ -64,6 +64,16 @@ module "analytical_platform_terraform_iam_role" {
       principals = [{
         type        = "AWS"
         identifiers = [module.analytical_platform_github_actions_iam_role.arn]
+      }]
+    }
+    platformEngineerAdminAssume = {
+      actions = [
+        "sts:AssumeRole",
+        "sts:TagSession"
+      ]
+      principals = [{
+        type        = "AWS"
+        identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_platform-engineer-admin_9b8c6791c5ec375b"]
       }]
     }
   }
@@ -103,7 +113,7 @@ module "data_engineering_datalake_access_terraform_iam_role" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
   version = "6.4.0"
 
-  create = true
+  create          = true
   use_name_prefix = false
 
   name = "data-engineering-datalake-access-terraform"
