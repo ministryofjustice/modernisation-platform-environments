@@ -11,6 +11,7 @@ resource "aws_security_group" "dis_ec2" {
 
 resource "aws_vpc_security_group_ingress_rule" "dis_ec2" {
   for_each = {
+    rdp-from-vpc      = { ip_protocol = "TCP", port = 3389, cidr_ipv4 = var.account_config.shared_vpc_cidr }
     http8080-from-alb = { referenced_security_group_id = aws_security_group.mis_alb.id, ip_protocol = "tcp", port = 8080 }
   }
 
