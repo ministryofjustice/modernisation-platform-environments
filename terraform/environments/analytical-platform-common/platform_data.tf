@@ -172,6 +172,7 @@ data "http" "environments_file" {
   url = "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/${local.application_name}.json"
 }
 
-data "aws_iam_role" "platform_engineer_admin" {
-  name = "AWSReservedSSO_platform-engineer-admin_9b8c6791c5ec375b"
+data "aws_iam_roles" "platform_engineer_admin_sso_role" {
+  name_regex  = "AWSReservedSSO_platform-engineer-admin_.*"
+  path_prefix = "/aws-reserved/sso.amazonaws.com/"
 }
