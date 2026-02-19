@@ -35,6 +35,7 @@ resource "aws_vpc_security_group_egress_rule" "bws_ec2" {
     http-to-all  = { ip_protocol = "TCP", port = 80, cidr_ipv4 = "0.0.0.0/0" }
     ntp-to-all   = { ip_protocol = "UDP", port = 123, cidr_ipv4 = "0.0.0.0/0" }
     https-to-all = { ip_protocol = "TCP", port = 443, cidr_ipv4 = "0.0.0.0/0" }
+    smb-to-vpc   = { ip_protocol = "TCP", port = 445, cidr_ipv4 = var.account_config.shared_vpc_cidr }
   }
 
   description       = each.key
