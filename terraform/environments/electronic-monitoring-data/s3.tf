@@ -18,7 +18,7 @@ locals {
   }
 
   p1_export_bucket_destination_mapping = {
-    "production"    = null
+    "production"    = "tct-339712706964-prearrivals-dev"
     "preproduction" = null
     "test"          = null
     "development"   = null
@@ -834,7 +834,6 @@ module "s3-mdss-specials-landing-bucket" {
 # Export buckets
 # ------------------------------------------------------------------------
 
-# TO DO: turn back on export
 module "s3-p1-export-bucket" {
   source = "./modules/export_bucket_push/"
 

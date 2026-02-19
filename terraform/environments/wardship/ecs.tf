@@ -90,7 +90,7 @@ resource "aws_ecs_task_definition" "wardship_task_definition" {
     }
   ])
   runtime_platform {
-    operating_system_family = "WINDOWS_SERVER_2019_CORE"
+    operating_system_family = "WINDOWS_SERVER_2022_CORE"
     cpu_architecture        = "X86_64"
   }
 }
@@ -100,13 +100,14 @@ resource "aws_ecs_service" "wardship_ecs_service" {
     aws_lb_listener.wardship_lb
   ]
 
-  name                              = var.networking[0].application
+  name                              = "${var.networking[0].application}-win2022"
   cluster                           = aws_ecs_cluster.wardship_cluster.id
   task_definition                   = aws_ecs_task_definition.wardship_task_definition.arn
   launch_type                       = "FARGATE"
   enable_execute_command            = true
   desired_count                     = 2
   health_check_grace_period_seconds = 180
+  force_new_deployment              = true
 
   network_configuration {
     subnets          = data.aws_subnets.shared-private.ids
@@ -122,6 +123,10 @@ resource "aws_ecs_service" "wardship_ecs_service" {
 
   deployment_controller {
     type = "ECS"
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 }
 
@@ -236,8 +241,11 @@ resource "aws_iam_role_policy" "app_task" {
    "Statement": [
      {
         "Action": [
-          "logs:CreateLogStream",
-          "logs:PutLogEvents"
+            "logs:CreateLogGroup",
+            "logs:CreateLogStream",
+            "logs:PutLogEvents",
+            "logs:DescribeLogStreams",
+            "logs:DescribeLogGroups"
         ],
         "Resource": "arn:aws:logs:*:${local.environment_management.account_ids[terraform.workspace]}:*",
         "Effect": "Allow"
@@ -262,7 +270,18 @@ resource "aws_iam_role_policy" "app_task" {
         ],
         "Resource": "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:*",
         "Effect": "Allow"
+     },
+     {
+       "Effect": "Allow",
+       "Action": [
+         "ssmmessages:CreateControlChannel",
+         "ssmmessages:CreateDataChannel",
+         "ssmmessages:OpenControlChannel",
+         "ssmmessages:OpenDataChannel"
+       ],
+       "Resource": "*"
      }
+
    ]
 }
 EOF

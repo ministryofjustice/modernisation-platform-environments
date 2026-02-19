@@ -33,7 +33,8 @@ resource "aws_vpc_security_group_egress_rule" "dis_ec2" {
     ntp-to-all        = { ip_protocol = "UDP", port = 123, cidr_ipv4 = "0.0.0.0/0" }
     https-to-all      = { ip_protocol = "TCP", port = 443, cidr_ipv4 = "0.0.0.0/0" }
     smb-to-fsx        = { ip_protocol = "TCP", port = 445, referenced_security_group_id = aws_security_group.fsx.id }
-    oracle1521-to-vpc = { ip_protocol = "TCP", port = 1521, cidr_ipv4 = module.ip_addresses.mp_cidr[local.vpc_name] }
+    smb-to-core-vpc   = { ip_protocol = "TCP", port = 445, cidr_ipv4 = var.environment_config.core_shared_services_vpc_cidr }
+    oracle1521-to-vpc = { ip_protocol = "TCP", port = 1521, cidr_ipv4 = var.account_config.shared_vpc_cidr }
   }
 
   description       = each.key
@@ -44,6 +45,18 @@ resource "aws_vpc_security_group_egress_rule" "dis_ec2" {
   from_port                    = lookup(each.value, "port", lookup(each.value, "from_port", null))
   to_port                      = lookup(each.value, "port", lookup(each.value, "to_port", null))
   referenced_security_group_id = lookup(each.value, "referenced_security_group_id", null)
+
+  tags = local.tags
+}
+
+resource "aws_vpc_security_group_egress_rule" "dis_ec2_to_dc" {
+  for_each = toset(var.environment_config.ad_trust_dc_cidrs)
+
+  description       = "all-to-dc ${each.key}"
+  security_group_id = resource.aws_security_group.dis_ec2.id
+
+  cidr_ipv4   = each.value
+  ip_protocol = "-1"
 
   tags = local.tags
 }

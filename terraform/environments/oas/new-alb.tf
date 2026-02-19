@@ -63,30 +63,221 @@ locals {
 
 
 ##############################################
-### ELB Instance for OAS Application Servers
+### Security Group for Load Balancer
 ##############################################
-module "lb_access_logs_enabled" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer?ref=6f59e1ce47df66bc63ee9720b7c58993d1ee64ee"
-  providers = {
-    aws.bucket-replication = aws
-  }
-  vpc_all                    = "${local.vpc_name}-${local.environment}"
-  force_destroy_bucket       = true # enables destruction of logging bucket
-  application_name           = local.application_name
-  internal_lb                = true
-  subnets                    = data.aws_subnets.shared-private.ids
-  loadbalancer_ingress_rules = local.loadbalancer_ingress_rules
-  loadbalancer_egress_rules  = local.loadbalancer_egress_rules
-  account_number             = local.environment_management.account_ids[terraform.workspace]
-  region                     = "eu-west-2"
-  enable_deletion_protection = false
-  idle_timeout               = 60
+resource "aws_security_group" "lb_security_group" {
+  count       = local.environment == "preproduction" ? 1 : 0
+  name_prefix = "${local.application_name}-lb-sg"
+  description = "Security group for ${local.application_name} load balancer"
+  vpc_id      = data.aws_vpc.shared.id
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name} lb_module" }
+    { "Name" = "${local.application_name}-lb-sg" }
   )
+}
 
+resource "aws_security_group_rule" "lb_ingress_rules" {
+  for_each = local.environment == "preproduction" ? local.loadbalancer_ingress_rules : {}
+
+  security_group_id = aws_security_group.lb_security_group[0].id
+  type              = "ingress"
+  description       = each.value.description
+  from_port         = each.value.from_port
+  to_port           = each.value.to_port
+  protocol          = each.value.protocol
+  cidr_blocks       = each.value.cidr_blocks
+}
+
+resource "aws_security_group_rule" "lb_egress_rules" {
+  for_each = local.environment == "preproduction" ? local.loadbalancer_egress_rules : {}
+
+  security_group_id = aws_security_group.lb_security_group[0].id
+  type              = "egress"
+  description       = each.value.description
+  from_port         = each.value.from_port
+  to_port           = each.value.to_port
+  protocol          = each.value.protocol
+  cidr_blocks       = each.value.cidr_blocks
+}
+
+##############################################
+### S3 Bucket for Load Balancer Access Logs
+##############################################
+resource "aws_s3_bucket" "lb_access_logs" {
+  count         = local.environment == "preproduction" ? 1 : 0
+  bucket_prefix = "${local.application_name}-lb-access-logs-"
+  force_destroy = true
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-lb-access-logs" }
+  )
+}
+
+resource "aws_s3_bucket_versioning" "lb_access_logs" {
+  count  = local.environment == "preproduction" ? 1 : 0
+  bucket = aws_s3_bucket.lb_access_logs[0].id
+
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "lb_access_logs" {
+  count  = local.environment == "preproduction" ? 1 : 0
+  bucket = aws_s3_bucket.lb_access_logs[0].id
+
+  rule {
+    id     = "main"
+    status = "Enabled"
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+    }
+
+    transition {
+      days          = 90
+      storage_class = "STANDARD_IA"
+    }
+
+    transition {
+      days          = 365
+      storage_class = "GLACIER"
+    }
+
+    expiration {
+      days = 730
+    }
+
+    noncurrent_version_transition {
+      noncurrent_days = 90
+      storage_class   = "STANDARD_IA"
+    }
+
+    noncurrent_version_transition {
+      noncurrent_days = 365
+      storage_class   = "GLACIER"
+    }
+
+    noncurrent_version_expiration {
+      noncurrent_days = 730
+    }
+  }
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "lb_access_logs" {
+  count  = local.environment == "preproduction" ? 1 : 0
+  bucket = aws_s3_bucket.lb_access_logs[0].id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "aws:kms"
+    }
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "lb_access_logs" {
+  count  = local.environment == "preproduction" ? 1 : 0
+  bucket = aws_s3_bucket.lb_access_logs[0].id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+data "aws_elb_service_account" "default" {}
+
+resource "aws_s3_bucket_policy" "lb_access_logs" {
+  count  = local.environment == "preproduction" ? 1 : 0
+  bucket = aws_s3_bucket.lb_access_logs[0].id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Deny"
+        Principal = {
+          AWS = "*"
+        }
+        Action = "s3:*"
+        Resource = [
+          aws_s3_bucket.lb_access_logs[0].arn,
+          "${aws_s3_bucket.lb_access_logs[0].arn}/*"
+        ]
+        Condition = {
+          Bool = {
+            "aws:SecureTransport" = "false"
+          }
+        }
+      },
+      {
+        Effect = "Allow"
+        Principal = {
+          AWS = data.aws_elb_service_account.default.arn
+        }
+        Action = "s3:PutObject"
+        Resource = [
+          "${aws_s3_bucket.lb_access_logs[0].arn}/${local.application_name}/AWSLogs/${local.environment_management.account_ids[terraform.workspace]}/*",
+          "${aws_s3_bucket.lb_access_logs[0].arn}/AWSLogs/${local.environment_management.account_ids[terraform.workspace]}/*"
+        ]
+      },
+      {
+        Sid = "AWSLogDeliveryWrite"
+        Effect = "Allow"
+        Principal = {
+          Service = "delivery.logs.amazonaws.com"
+        }
+        Action = "s3:PutObject"
+        Resource = [
+          "${aws_s3_bucket.lb_access_logs[0].arn}/${local.application_name}/AWSLogs/${local.environment_management.account_ids[terraform.workspace]}/*",
+          "${aws_s3_bucket.lb_access_logs[0].arn}/AWSLogs/${local.environment_management.account_ids[terraform.workspace]}/*"
+        ]
+        Condition = {
+          StringEquals = {
+            "s3:x-amz-acl" = "bucket-owner-full-control"
+          }
+        }
+      },
+      {
+        Sid = "AWSLogDeliveryAclCheck"
+        Effect = "Allow"
+        Principal = {
+          Service = "delivery.logs.amazonaws.com"
+        }
+        Action = "s3:GetBucketAcl"
+        Resource = aws_s3_bucket.lb_access_logs[0].arn
+      }
+    ]
+  })
+}
+
+##############################################
+### Application Load Balancer
+##############################################
+resource "aws_lb" "oas_lb" {
+  count                      = local.environment == "preproduction" ? 1 : 0
+  name                       = "${local.application_name}-lb"
+  internal                   = true
+  load_balancer_type         = "application"
+  security_groups            = [aws_security_group.lb_security_group[0].id]
+  subnets                    = data.aws_subnets.shared-private.ids
+  enable_deletion_protection = false
+  idle_timeout               = 60
+  enable_http2               = false
+  drop_invalid_header_fields = true
+
+  access_logs {
+    bucket  = aws_s3_bucket.lb_access_logs[0].id
+    prefix  = local.application_name
+    enabled = true
+  }
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-lb" }
+  )
 }
 
 resource "aws_lb_target_group" "oas_ec2_target_group" {
@@ -184,7 +375,7 @@ resource "aws_lb_target_group_attachment" "oas_analytics_attachment" {
 resource "aws_lb_listener" "http_listener" {
   count = local.environment == "preproduction" ? 1 : 0
 
-  load_balancer_arn = module.lb_access_logs_enabled.load_balancer.arn
+  load_balancer_arn = aws_lb.oas_lb[0].arn
   port              = 80
   protocol          = "HTTP"
 
@@ -203,7 +394,7 @@ resource "aws_lb_listener" "https_listener" {
   count = local.environment == "preproduction" ? 1 : 0
 
   depends_on        = [aws_acm_certificate_validation.external]
-  load_balancer_arn = module.lb_access_logs_enabled.load_balancer.arn
+  load_balancer_arn = aws_lb.oas_lb[0].arn
   port              = 443
   protocol          = "HTTPS"
   certificate_arn   = aws_acm_certificate.external[0].arn
@@ -222,7 +413,7 @@ resource "aws_lb_listener" "https_listener" {
 resource "aws_lb_listener" "http_9500_listener" {
   count = local.environment == "preproduction" ? 1 : 0
 
-  load_balancer_arn = module.lb_access_logs_enabled.load_balancer.arn
+  load_balancer_arn = aws_lb.oas_lb[0].arn
   port              = 9500
   protocol          = "HTTP"
 
