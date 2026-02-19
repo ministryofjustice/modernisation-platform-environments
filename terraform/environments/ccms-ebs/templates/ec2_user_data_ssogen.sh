@@ -48,7 +48,7 @@ cmake --version
 wget https://cmake.org/files/v3.20/cmake-3.20.0.tar.gz
 echo "get cmake tar"
 tar -xzf cmake-3.20.0.tar.gz
-cd /root/cmake-3.20.0
+cd cmake-3.20.0
 ./bootstrap && make && make install
 cmake --version
 /root/.cargo/bin/rustc --version
@@ -65,5 +65,7 @@ chmod go+rw $EFS_MOUNT_POINT
 # create large file for better EFS performance 
 # https://docs.aws.amazon.com/efs/latest/ug/performance.html
 dd if=/dev/urandom of=$EFS_MOUNT_POINT/large_file_for_efs_performance bs=1024k count=10000
+rm -fr /cmake-3.20.0
+rm -fr /root/efs-utils
 # === Final logs ===
 echo "SSOGEN instance bootstrap completed for ${hostname}" >> /var/log/user-data.log
