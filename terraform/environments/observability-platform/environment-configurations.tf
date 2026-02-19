@@ -340,7 +340,7 @@ locals {
           }
         },
         "dacp" = {
-          "identity_centre_team" = "dacp",
+          "identity_centre_team" = "dts-legacy",
           "aws_accounts" = {
             "dacp-preproduction" = {
               cloudwatch_enabled              = true
