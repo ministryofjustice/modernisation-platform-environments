@@ -4,7 +4,7 @@ resource "helm_release" "cilium" {
   name       = "cilium"
   repository = "oci://quay.io/cilium/charts"
   chart      = "cilium"
-  version    = "1.19.0"
+  version    = "1.19.1"
   namespace  = "kube-system"
 
   # Don't wait for pods - they need nodes to run on

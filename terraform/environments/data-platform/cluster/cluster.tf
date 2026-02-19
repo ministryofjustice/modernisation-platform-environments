@@ -11,40 +11,7 @@ module "eks" {
   control_plane_subnet_ids = data.aws_subnets.private.ids
   subnet_ids               = data.aws_subnets.private.ids
 
-  security_group_additional_rules = {
-    vpc = {
-      description = "Allow traffic from the VPC"
-      from_port   = 0
-      to_port     = 65535
-      protocol    = "tcp"
-      type        = "ingress"
-      cidr_blocks = [data.aws_vpc.main.cidr_block]
-    }
-    cilium_vxlan = {
-      description = "Cilium VXLAN overlay network"
-      from_port   = 8472
-      to_port     = 8472
-      protocol    = "udp"
-      type        = "ingress"
-      self        = true
-    }
-    cilium_health = {
-      description = "Cilium health checks"
-      from_port   = 4240
-      to_port     = 4240
-      protocol    = "tcp"
-      type        = "ingress"
-      self        = true
-    }
-    cilium_hubble = {
-      description = "Cilium Hubble observability"
-      from_port   = 4244
-      to_port     = 4244
-      protocol    = "tcp"
-      type        = "ingress"
-      self        = true
-    }
-  }
+  create_node_security_group = false
 
   authentication_mode = "API"
 
@@ -83,10 +50,6 @@ module "eks" {
     # }
   }
 
-  node_security_group_tags = {
-    "karpenter.sh/discovery" = local.eks_cluster_name
-  }
-
   access_entries = {
     MemberInfrastructureAccess = {
       principal_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/MemberInfrastructureAccess"
@@ -123,7 +86,7 @@ module "eks_managed_node_group_system" {
 
   # Security groups required for nodes to join cluster
   cluster_primary_security_group_id = module.eks.cluster_primary_security_group_id
-  vpc_security_group_ids            = [module.eks.node_security_group_id]
+  vpc_security_group_ids            = [module.node_security_group.security_group_id]
 
   # Service CIDR required for Bottlerocket user data (EKS default)
   cluster_service_cidr = "172.20.0.0/16"
@@ -137,7 +100,7 @@ module "eks_managed_node_group_system" {
   # Bottlerocket configuration
   ami_type                       = "BOTTLEROCKET_ARM_64"
   use_latest_ami_release_version = false
-  ami_release_version            = "1.54.0-5043decc"
+  ami_release_version            = "1.55.0-d93bb1b1"
 
   enable_monitoring = true
 
