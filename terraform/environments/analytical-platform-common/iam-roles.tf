@@ -73,7 +73,7 @@ module "analytical_platform_terraform_iam_role" {
       ]
       principals = [{
         type        = "AWS"
-        identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_platform-engineer-admin_9b8c6791c5ec375b"]
+        identifiers = [data.aws_iam_role.platform_engineer_admin.arn]
       }]
     }
   }
