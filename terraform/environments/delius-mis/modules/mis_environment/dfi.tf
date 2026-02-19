@@ -33,6 +33,7 @@ resource "aws_vpc_security_group_egress_rule" "dfi_ec2" {
     ntp-to-all        = { ip_protocol = "UDP", port = 123, cidr_ipv4 = "0.0.0.0/0" }
     https-to-all      = { ip_protocol = "TCP", port = 443, cidr_ipv4 = "0.0.0.0/0" }
     smb-to-fsx        = { ip_protocol = "TCP", port = 445, referenced_security_group_id = aws_security_group.fsx.id }
+    smb-to-core-vpc   = { ip_protocol = "TCP", port = 445, cidr_ipv4 = var.account_config.shared_vpc_cidr }
     all-to-bcs        = { referenced_security_group_id = aws_security_group.bcs_ec2.id } # client tools temporarily installed on DFI
     all-to-bps        = { referenced_security_group_id = aws_security_group.bps_ec2.id } # client tools temporarily installed on DFI
     all-to-bws        = { referenced_security_group_id = aws_security_group.bws_ec2.id } # client tools temporarily installed on DFI
