@@ -57,7 +57,10 @@ module "analytical_platform_terraform_iam_role" {
 
   trust_policy_permissions = {
     github-actions-assume = {
-      actions = ["sts:AssumeRole"]
+      actions = [
+        "sts:AssumeRole",
+        "sts:TagSession"
+      ]
       principals = [{
         type        = "AWS"
         identifiers = [module.analytical_platform_github_actions_iam_role.arn]
@@ -107,7 +110,10 @@ module "data_engineering_datalake_access_terraform_iam_role" {
 
   trust_policy_permissions = {
     data-engineering-github-actions-assume = {
-      actions = ["sts:AssumeRole"]
+      actions = [
+        "sts:AssumeRole",
+        "sts:TagSession"
+      ]
       principals = [{
         type        = "AWS"
         identifiers = [module.data_engineering_datalake_access_github_actions_iam_role.arn]
