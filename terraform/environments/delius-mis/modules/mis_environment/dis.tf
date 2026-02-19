@@ -32,7 +32,7 @@ resource "aws_vpc_security_group_egress_rule" "dis_ec2" {
     http-to-all       = { ip_protocol = "TCP", port = 80, cidr_ipv4 = "0.0.0.0/0" }
     ntp-to-all        = { ip_protocol = "UDP", port = 123, cidr_ipv4 = "0.0.0.0/0" }
     https-to-all      = { ip_protocol = "TCP", port = 443, cidr_ipv4 = "0.0.0.0/0" }
-    smb-to-vpc        = { ip_protocol = "TCP", port = 445, cidr_ipv4 = var.account_config.shared_vpc_cidr }
+    smb-to-core-vpc   = { ip_protocol = "TCP", port = 445, cidr_ipv4 = var.environment_config.core_shared_services_vpc_cidr }
     oracle1521-to-vpc = { ip_protocol = "TCP", port = 1521, cidr_ipv4 = var.account_config.shared_vpc_cidr }
   }
 
