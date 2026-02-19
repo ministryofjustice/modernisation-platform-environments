@@ -1,8 +1,9 @@
 resource "aws_s3_bucket" "bucket" {
-  bucket_prefix = "mike-reid-testing-abc123"
+  provider = aws.us_east_1
+  bucket_prefix = "mike-reid-testing-abc123789"
   force_destroy = true
   tags = {
-    Name        = "mike-reid-testing-abc123"
+    Name        = "mike-reid-testing-abc123789"
     Environment = "development"
   }
 }
