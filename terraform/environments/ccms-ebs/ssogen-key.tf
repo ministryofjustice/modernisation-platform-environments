@@ -40,7 +40,7 @@ data "aws_iam_policy_document" "ssogen_kms_policy" {
 
 resource "aws_kms_alias" "apk" {
   count         = local.is-development || local.is-test ? 1 : 0
-  name          = "alias/ssogen--private-key-alias"
+  name          = "alias/ssogen-private-key-alias"
   target_key_id = aws_kms_key.ssogen_kms[0].key_id
 }
 
