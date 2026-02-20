@@ -103,3 +103,10 @@ resource "aws_wafv2_web_acl_logging_configuration" "ssogen_waf_logging" {
   log_destination_configs = [aws_cloudwatch_log_group.ssogen_waf_logs[count.index].arn]
   resource_arn            = aws_wafv2_web_acl.ssogen_web_acl[count.index].arn
 }
+
+# Associate WAF with Internal ALB for SSOGEN WAF
+resource "aws_wafv2_web_acl_association" "ssogen_internal_waf_association" {
+  count        = local.is-development || local.is-test ? 1 : 0
+  resource_arn = aws_lb.ssogen_alb.arn
+  web_acl_arn  = aws_wafv2_web_acl.ssogen_web_acl[count.index].arn
+}
