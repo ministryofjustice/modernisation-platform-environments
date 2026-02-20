@@ -38,8 +38,8 @@ chmod 775 /oracle
 #--Configure EFS
 EFS_MOUNT_POINT=/SSOGEN
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-export HOME=/root
-. "$HOME/.cargo/env"
+HOME=/root
+source"$HOME/.cargo/env"
 yum -y install git rpm-build make rust cargo openssl-devel gcc gcc-c++ cmake wget perl
 wget https://go.dev/dl/go1.22.0.linux-amd64.tar.gz
 tar -C /usr/local -xzf go1.22.0.linux-amd64.tar.gz
@@ -50,13 +50,12 @@ wget https://cmake.org/files/v3.20/cmake-3.20.0.tar.gz
 echo "get cmake tar"
 tar -xzf cmake-3.20.0.tar.gz
 cd cmake-3.20.0
-./bootstrap && make && make install
+./bootstrap && make -j$(nproc) && make install
 cmake --version
 /root/.cargo/bin/rustc --version
 /root/.cargo/bin/cargo --version
-cd /root
 git clone https://github.com/aws/efs-utils
-cd /root/efs-utils
+cd efs-utils
 sed -i 's/--with system_rust --noclean/--without system_rust --noclean/g' /root/efs-utils/Makefile
 make rpm
 sudo yum -y install build/amazon-efs-utils*rpm
@@ -66,7 +65,5 @@ chmod go+rw $EFS_MOUNT_POINT
 # create large file for better EFS performance 
 # https://docs.aws.amazon.com/efs/latest/ug/performance.html
 dd if=/dev/urandom of=$EFS_MOUNT_POINT/large_file_for_efs_performance bs=1024k count=10000
-rm -fr /cmake-3.20.0
-rm -fr /root/efs-utils
 # === Final logs ===
 echo "SSOGEN instance bootstrap completed for ${hostname}" >> /var/log/user-data.log
