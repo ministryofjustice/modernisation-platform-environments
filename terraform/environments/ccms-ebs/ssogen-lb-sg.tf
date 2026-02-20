@@ -28,7 +28,7 @@ resource "aws_vpc_security_group_ingress_rule" "ingress_ssogen_internal_app_work
   cidr_ipv4         = local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_prod
 }
 
-# Allow 5443from AWS Workspaces
+# Allow 5443 from AWS Workspaces
 resource "aws_vpc_security_group_ingress_rule" "ingress_ssogen_internal_admin_workspaces" {
   count             = local.is-development || local.is-test ? 1 : 0
   security_group_id = aws_security_group.sg_ssogen_internal_alb[count.index].id
@@ -37,6 +37,36 @@ resource "aws_vpc_security_group_ingress_rule" "ingress_ssogen_internal_admin_wo
   to_port           = 5443
   ip_protocol       = "tcp"
   cidr_ipv4         = local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_prod
+}
+
+resource "aws_security_group_rule" "ingress_traffic_ssogenalb_internal_443_mojo_devices" {
+  security_group_id = aws_security_group.sg_ssogen_internal_alb[count.index].id
+  type              = "ingress"
+  description       = "HTTPS from Mojo Devices"
+  protocol          = "TCP"
+  from_port         = 443
+  to_port           = 443
+  cidr_blocks       = [local.application_data.accounts[local.environment].mojo_devices]
+}
+
+resource "aws_security_group_rule" "ingress_traffic_ssogenalb_internal_443_moj_wifi" {
+  security_group_id = aws_security_group.sg_ssogen_internal_alb[count.index].id
+  type              = "ingress"
+  description       = "HTTPS from MoJ WiFi"
+  protocol          = "TCP"
+  from_port         = 443
+  to_port           = 443
+  cidr_blocks       = [local.application_data.accounts[local.environment].moj_wifi]
+}
+
+resource "aws_security_group_rule" "ingress_traffic_ssogenalb_internal_443_dom1_devices" {
+  security_group_id = aws_security_group.sg_ssogen_internal_alb[count.index].id
+  type              = "ingress"
+  description       = "HTTPS from Dom1 Devices"
+  protocol          = "TCP"
+  from_port         = 443
+  to_port           = 443
+  cidr_blocks       = [local.application_data.accounts[local.environment].dom1_devices]
 }
 
 # Allow HTTPS from AWS Workspaces
