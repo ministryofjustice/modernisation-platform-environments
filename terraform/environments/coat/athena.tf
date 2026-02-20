@@ -161,7 +161,7 @@ resource "aws_athena_named_query" "fct_daily_cost" {
 
 resource "null_resource" "execute_create_table_query" {
   triggers = {
-    query_ids = aws_athena_named_query.fct_daily_cost.id
+    query_ids   = aws_athena_named_query.fct_daily_cost.id
     script_hash = filesha256("${path.module}/queries/fct_daily_cost.sql")
   }
 

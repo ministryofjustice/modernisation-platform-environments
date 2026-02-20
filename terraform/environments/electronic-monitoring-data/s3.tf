@@ -18,7 +18,7 @@ locals {
   }
 
   p1_export_bucket_destination_mapping = {
-    "production"    = null
+    "production"    = "tct-339712706964-prearrivals-dev"
     "preproduction" = null
     "test"          = null
     "development"   = null
@@ -56,7 +56,7 @@ locals {
     { id = module.s3-lambda-store-bucket.bucket.id, arn = module.s3-lambda-store-bucket.bucket.arn }
   ]
 
-  cross_account_recieve_mapping = local.is-development ? "test" : local.is-preproduction ? "production" : null
+  cross_account_recieve_mapping = local.is-development ? "test" : local.is-preproduction ? "production" : local.is-test ? "preproduction" : null 
   cross_env_bucket_policy       = local.is-preproduction ? [data.aws_iam_policy_document.allow_cross_env_upload[0].json] : []
 }
 
@@ -226,7 +226,7 @@ data "aws_iam_policy_document" "allow_inventory_access" {
     condition {
       test     = "ArnLike"
       variable = "aws:SourceArn"
-      values   = [
+      values = [
         module.s3-fms-general-landing-bucket.bucket_arn,
         module.s3-fms-ho-landing-bucket.bucket_arn,
         module.s3-fms-specials-landing-bucket.bucket_arn,
@@ -259,7 +259,7 @@ module "s3-metadata-bucket" {
     # Leave this provider block in even if you are not using replication
     aws.bucket-replication = aws
   }
-  bucket_policy = [data.aws_iam_policy_document.allow_inventory_access.json]
+  bucket_policy  = [data.aws_iam_policy_document.allow_inventory_access.json]
   custom_kms_key = module.kms_metadata_key.key_arn
 
   lifecycle_rule = [
@@ -636,7 +636,7 @@ module "s3-data-bucket" {
 # ------------------------------------------------------------------------
 
 data "aws_secretsmanager_secret_version" "account_details" {
-  count     = local.is-test || local.is-production ? 1 : 0
+  count     = local.is-test || local.is-preproduction || local.is-production ? 1 : 0
   secret_id = module.cross_account_details[0].secret_id
 }
 
@@ -654,9 +654,9 @@ module "s3-fms-general-landing-bucket" {
   received_files_bucket_id = module.s3-received-files-bucket.bucket.id
   security_group_ids       = [aws_security_group.lambda_generic.id]
   subnet_ids               = data.aws_subnets.shared-public.ids
-  cross_account            = local.is-development || local.is-preproduction
-  cross_account_id         = local.is-development || local.is-preproduction ? local.environment_management.account_ids["electronic-monitoring-data-${local.cross_account_recieve_mapping}"] : null
-  replication_details      = local.is-test || local.is-production ? jsondecode(data.aws_secretsmanager_secret_version.account_details[0].secret_string) : null
+  cross_account            = local.is-preproduction || local.is-test
+  cross_account_id         = local.is-preproduction || local.is-test ? local.environment_management.account_ids["electronic-monitoring-data-${local.cross_account_recieve_mapping}"] : null
+  replication_details      = local.is-production || local.is-preproduction ? jsondecode(data.aws_secretsmanager_secret_version.account_details[0].secret_string) : null
   metadata_bucket          = module.s3-metadata-bucket.bucket.arn
 
   providers = {
@@ -691,9 +691,9 @@ module "s3-fms-ho-landing-bucket" {
   received_files_bucket_id = module.s3-received-files-bucket.bucket.id
   security_group_ids       = [aws_security_group.lambda_generic.id]
   subnet_ids               = data.aws_subnets.shared-public.ids
-  cross_account            = local.is-development || local.is-preproduction
-  cross_account_id         = local.is-development || local.is-preproduction ? local.environment_management.account_ids["electronic-monitoring-data-${local.cross_account_recieve_mapping}"] : null
-  replication_details      = local.is-test || local.is-production ? jsondecode(data.aws_secretsmanager_secret_version.account_details[0].secret_string) : null
+  cross_account            = local.is-preproduction || local.is-test
+  cross_account_id         = local.is-preproduction || local.is-test ? local.environment_management.account_ids["electronic-monitoring-data-${local.cross_account_recieve_mapping}"] : null
+  replication_details      = local.is-production || local.is-preproduction ? jsondecode(data.aws_secretsmanager_secret_version.account_details[0].secret_string) : null
   metadata_bucket          = module.s3-metadata-bucket.bucket.arn
 
   providers = {
@@ -728,9 +728,9 @@ module "s3-fms-specials-landing-bucket" {
   received_files_bucket_id = module.s3-received-files-bucket.bucket.id
   security_group_ids       = [aws_security_group.lambda_generic.id]
   subnet_ids               = data.aws_subnets.shared-public.ids
-  cross_account            = local.is-development || local.is-preproduction
-  cross_account_id         = local.is-development || local.is-preproduction ? local.environment_management.account_ids["electronic-monitoring-data-${local.cross_account_recieve_mapping}"] : null
-  replication_details      = local.is-test || local.is-production ? jsondecode(data.aws_secretsmanager_secret_version.account_details[0].secret_string) : null
+  cross_account            = local.is-preproduction || local.is-test
+  cross_account_id         = local.is-preproduction || local.is-test ? local.environment_management.account_ids["electronic-monitoring-data-${local.cross_account_recieve_mapping}"] : null
+  replication_details      = local.is-production || local.is-preproduction ? jsondecode(data.aws_secretsmanager_secret_version.account_details[0].secret_string) : null
   metadata_bucket          = module.s3-metadata-bucket.bucket.arn
 
   providers = {
@@ -773,7 +773,7 @@ module "s3-mdss-general-landing-bucket" {
   cross_account             = local.is-development || local.is-preproduction
   cross_account_id          = local.is-development || local.is-preproduction ? local.environment_management.account_ids["electronic-monitoring-data-${local.cross_account_recieve_mapping}"] : null
   replication_details       = local.is-test || local.is-production ? jsondecode(data.aws_secretsmanager_secret_version.account_details[0].secret_string) : null
-  metadata_bucket          = module.s3-metadata-bucket.bucket.arn
+  metadata_bucket           = module.s3-metadata-bucket.bucket.arn
 
   providers = {
     aws = aws
@@ -798,7 +798,7 @@ module "s3-mdss-ho-landing-bucket" {
   cross_account             = local.is-development || local.is-preproduction
   cross_account_id          = local.is-development || local.is-preproduction ? local.environment_management.account_ids["electronic-monitoring-data-${local.cross_account_recieve_mapping}"] : null
   replication_details       = local.is-test || local.is-production ? jsondecode(data.aws_secretsmanager_secret_version.account_details[0].secret_string) : null
-  metadata_bucket          = module.s3-metadata-bucket.bucket.arn
+  metadata_bucket           = module.s3-metadata-bucket.bucket.arn
 
   providers = {
     aws = aws
@@ -823,7 +823,7 @@ module "s3-mdss-specials-landing-bucket" {
   cross_account             = local.is-development || local.is-preproduction
   cross_account_id          = local.is-development || local.is-preproduction ? local.environment_management.account_ids["electronic-monitoring-data-${local.cross_account_recieve_mapping}"] : null
   replication_details       = local.is-test || local.is-production ? jsondecode(data.aws_secretsmanager_secret_version.account_details[0].secret_string) : null
-  metadata_bucket          = module.s3-metadata-bucket.bucket.arn
+  metadata_bucket           = module.s3-metadata-bucket.bucket.arn
 
   providers = {
     aws = aws

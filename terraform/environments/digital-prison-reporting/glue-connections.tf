@@ -35,9 +35,9 @@ resource "aws_glue_connection" "glue_operational_datastore_connection" {
   }
 
   physical_connection_requirements {
-    availability_zone      = data.aws_subnet.private_subnets_a.availability_zone
+    availability_zone      = data.aws_subnet.private_subnets_b.availability_zone
     security_group_id_list = [aws_security_group.glue_job_connection_sg.id]
-    subnet_id              = data.aws_subnet.private_subnets_a.id
+    subnet_id              = data.aws_subnet.private_subnets_b.id
   }
 }
 
@@ -54,9 +54,9 @@ resource "aws_glue_connection" "glue_nomis_connection" {
   }
 
   physical_connection_requirements {
-    availability_zone      = data.aws_subnet.private_subnets_a.availability_zone
+    availability_zone      = data.aws_subnet.private_subnets_c.availability_zone
     security_group_id_list = [aws_security_group.glue_job_connection_sg.id]
-    subnet_id              = data.aws_subnet.private_subnets_a.id
+    subnet_id              = data.aws_subnet.private_subnets_c.id
   }
 }
 
@@ -73,9 +73,9 @@ resource "aws_glue_connection" "glue_dps_connection" {
   }
 
   physical_connection_requirements {
-    availability_zone      = data.aws_subnet.private_subnets_a.availability_zone
+    availability_zone      = data.aws_subnet.private_subnets_b.availability_zone
     security_group_id_list = [aws_security_group.glue_job_connection_sg.id]
-    subnet_id              = data.aws_subnet.private_subnets_a.id
+    subnet_id              = data.aws_subnet.private_subnets_b.id
   }
 }
 
@@ -91,9 +91,9 @@ resource "aws_glue_connection" "glue_dpr_test_connection" {
   }
 
   physical_connection_requirements {
-    availability_zone      = data.aws_subnet.private_subnets_a.availability_zone
+    availability_zone      = data.aws_subnet.private_subnets_c.availability_zone
     security_group_id_list = [aws_security_group.glue_job_connection_sg.id]
-    subnet_id              = data.aws_subnet.private_subnets_a.id
+    subnet_id              = data.aws_subnet.private_subnets_c.id
   }
 }
 

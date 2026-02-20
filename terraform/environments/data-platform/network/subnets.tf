@@ -5,9 +5,12 @@ resource "aws_subnet" "main" {
   cidr_block        = each.value.cidr_block
   availability_zone = "${data.aws_region.current.region}${each.value.az}"
 
-  tags = {
-    Name = "${local.application_name}-${local.environment}-${each.value.type}-${each.value.az}"
-  }
+  tags = merge(
+    {
+      Name = "${local.application_name}-${local.environment}-${each.value.type}-${each.value.az}"
+    },
+    each.value.tags
+  )
 }
 
 resource "aws_subnet" "additional" {

@@ -5,6 +5,10 @@ locals {
     legacy_engineering_vpc_cidr            = "10.161.98.0/25"
     legacy_counterpart_vpc_cidr            = "10.162.32.0/20"
     ad_domain_name                         = "delius-mis-dev.internal"
+    ad_trust_domain_name                   = "azure.noms.root"
+    ad_trust_dc_cidrs                      = module.ip_addresses.active_directory_cidrs.azure.domain_controllers
+    ad_trust_dns_ip_addrs                  = module.ip_addresses.mp_ips.ad_fixngo_azure_domain_controllers
+    core_shared_services_vpc_cidr          = module.ip_addresses.mp_cidr["core-shared-services-non-live-data"]
     ec2_user_ssh_key                       = file("${path.module}/files/.ssh/${terraform.workspace}/ec2-user.pub")
     migration_environment_full_name        = "dmd-mis-dev"
     migration_environment_abbreviated_name = "dmd"
@@ -341,7 +345,7 @@ locals {
     }
   })
 
-  dfi_report_bucket_config = {
+  dfi_report_bucket_config_dev = {
     bucket_policy_enabled = true
   }
 
@@ -354,14 +358,7 @@ locals {
     bucket_policy_enabled = true
   }
 
-  # DataSync configuration for syncing S3 bucket to FSX share
-  # Default schedule: Lambda at 04:00 UTC, DataSync at 04:15 UTC
-  # To override schedules, add schedule_expression and/or lambda_schedule_expression parameters:
-  # Note: Always ensure Lambda runs 15+ minutes before DataSync for credential refresh
   datasync_config_dev = {
     source_s3_bucket_arn = "arn:aws:s3:::eu-west-2-delius-mis-dev-dfi-extracts" # differs per environment
-    # schedule_expression = "cron(30 9 * * ? *)"        # Uncomment to run DataSync at 09:30 UTC (10:30 BST)
-    # lambda_schedule_expression = "cron(15 9 * * ? *)"  # Uncomment to run Lambda at 09:15 UTC (10:15 BST)
-    # fsx_domain = "delius-mis-dev.internal"            # Override FSX domain if needed
   }
 }

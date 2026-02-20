@@ -65,7 +65,7 @@ resource "aws_sesv2_configuration_set" "ses_events_configuration_set" {
   configuration_set_name = "ses-events-configuration-set-${each.key}"
 
   delivery_options {
-    tls_policy = "OPTIONAL"
+    tls_policy = "REQUIRE" #OPTIONAL option also available
   }
 
   tags = {

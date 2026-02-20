@@ -546,8 +546,17 @@ Include:
 Include:
 - Modules upgraded
 - Branch name
-- Draft PR reference
-- Validation summary (init/validate/plan with status)
-- Plan results (add/change/destroy) if available
-- Fix commits applied
-- Next steps for human review/testing
+- PR reference
+- Brief summary of key changes and review considerations
+
+---
+
+## Notes
+
+- This agent must not automatically perform major upgrades without explicit user instruction.
+- It always starts in advisory mode, where no files are modified.
+- It is intended to complement the existing Terraform Maintenance Agent, which handles minor and patch version updates and deliberately avoids major version changes.
+- This agent focuses on:
+  - Discoverability of major upgrades
+  - Clear explanation of breaking changes
+  - Helping engineers refactor safely with proposed diffs and draft PRs.

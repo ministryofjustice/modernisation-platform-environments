@@ -24,23 +24,29 @@ locals {
   route53_resolver_log_group_name        = "/aws/route53-resolver/${local.application_name}-${local.environment}"
 
   /* Subnets
-    - Build a map of subnets from the network configuration excluding unallocated AZs
+    - Build a map of subnets from the network configuration's availability_zones
       which results in:
         {
-          "data-aza" = {
+          "data-a" = {
             "az"         = "a"
             "cidr_block" = "10.199.128.0/25"
             "type"       = "data"
+            "tags"       = {}
           }
         }
+    - Tags are extracted from the subnet type configuration and template variables are interpolated
   */
   subnets = merge([
-    for subnet_type, azs in local.network_configuration.vpc.subnets : {
-      for az, cidr in azs :
+    for subnet_type, config in local.network_configuration.vpc.subnets : {
+      for az, cidr in config.availability_zones :
       "${subnet_type}-${az}" => {
         cidr_block = cidr
         type       = subnet_type
         az         = trimprefix(az, "az")
+        tags = try(
+          { for k, v in config.tags : k => replace(v, "$${environment}", "${local.application_name}-${local.environment}") },
+          {}
+        )
       }
     }
   ]...)
@@ -58,8 +64,8 @@ locals {
   */
   additional_cidr_subnets = merge([
     for block_name, block_config in try(local.network_configuration.vpc.additional_cidr_blocks, {}) : merge([
-      for subnet_type, azs in block_config.subnets : {
-        for az, cidr in azs :
+      for subnet_type, config in block_config.subnets : {
+        for az, cidr in config.availability_zones :
         "${block_name}-${subnet_type}-${az}" => {
           cidr_block = cidr
           type       = subnet_type
