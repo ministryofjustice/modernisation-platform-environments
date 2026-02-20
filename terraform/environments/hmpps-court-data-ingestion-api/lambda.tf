@@ -20,7 +20,7 @@ module "authorizer_lambda" {
   handler          = "authorizer.handler"
 
   create_package         = false
-  local_existing_package = data.archive_file.authorizer.output_path
+  local_existing_package = data.archive_file.lambda_zip.output_path
 
   publish = true
 
