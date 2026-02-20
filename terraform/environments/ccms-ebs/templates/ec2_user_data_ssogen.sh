@@ -51,6 +51,7 @@ echo "get cmake tar"
 tar -xzf cmake-3.20.0.tar.gz
 cd cmake-3.20.0
 ./bootstrap && make -j$(nproc) && make install
+sleep 5
 cmake --version
 /root/.cargo/bin/rustc --version
 /root/.cargo/bin/cargo --version
