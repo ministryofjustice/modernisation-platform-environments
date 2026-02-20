@@ -45,18 +45,18 @@ yum -y install git rpm-build make rust cargo openssl-devel gcc gcc-c++ cmake wge
 wget https://go.dev/dl/go1.22.0.linux-amd64.tar.gz
 tar -C /usr/local -xzf go1.22.0.linux-amd64.tar.gz
 echo "export PATH=\$PATH:/usr/local/go/bin" >> /root/.bashrc
-export PS1=[\u@\h \W]\$
+export PS1="[\u@\h \W]\$"
 source /root/.bashrc
 rm go1.22.0.linux-amd64.tar.gz
 cd /root
 cmake --version
+export PATH=/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/bin:/sbin:/root/.cargo/bin
 wget https://cmake.org/files/v3.20/cmake-3.20.0.tar.gz
 echo "get cmake tar"
 tar -xzf cmake-3.20.0.tar.gz
 cd cmake-3.20.0
 env
 ./bootstrap && make -j$(nproc) && make install
-sleep 120
 cmake --version
 # VERSION=3.27.9
 # curl -LO https://cmake.org/files/v3.27/cmake-$VERSION.tar.gz
