@@ -98,11 +98,6 @@ resource "aws_db_parameter_group" "appdbparametergroup19_new" {
   }
 
   parameter {
-    name  = "sqlnetora.crypto_checksum_server"
-    value = "REQUIRED"
-  }
-
-  parameter {
     name  = "sqlnetora.encryption_types_server"
     value = "AES256,AES192,AES128"
   }
