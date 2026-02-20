@@ -50,7 +50,7 @@ echo "export PATH=\$PATH:/usr/local/go/bin" >> /root/.bashrc
 rm go1.22.0.linux-amd64.tar.gz
 cd /root
 cmake --version
-export PATH=/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/bin:/sbin:/root/.cargo/bin:/usr/local/go/bin:/root/bin
+export PATH=/usr/local/bin:/usr/bin:/usr/sbin:/usr/local/sbin:/bin:/sbin:/root/.cargo/bin:/usr/local/go/bin:/root/bin
 wget https://cmake.org/files/v3.20/cmake-3.20.0.tar.gz
 echo "get cmake tar"
 tar -xzf cmake-3.20.0.tar.gz
