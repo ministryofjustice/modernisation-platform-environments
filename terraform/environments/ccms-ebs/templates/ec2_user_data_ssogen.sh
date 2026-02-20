@@ -63,9 +63,10 @@ cmake --version
 # cmake --version
 /root/.cargo/bin/rustc --version
 /root/.cargo/bin/cargo --version
+cd /root
 git clone https://github.com/aws/efs-utils
 cd efs-utils
-sed -i 's/--with system_rust --noclean/--without system_rust --noclean/g' /efs-utils/Makefile
+sed -i 's/--with system_rust --noclean/--without system_rust --noclean/g' /root/efs-utils/Makefile
 make rpm
 sudo yum -y install build/amazon-efs-utils*rpm
 mkdir $EFS_MOUNT_POINT
@@ -74,6 +75,6 @@ chmod go+rw $EFS_MOUNT_POINT
 # create large file for better EFS performance 
 # https://docs.aws.amazon.com/efs/latest/ug/performance.html
 dd if=/dev/urandom of=$EFS_MOUNT_POINT/large_file_for_efs_performance bs=1024k count=10000
-rm -fr /efs-utils
+rm -fr /root/efs-utils
 # === Final logs ===
 echo "SSOGEN instance bootstrap completed for ${hostname}" >> /var/log/user-data.log
