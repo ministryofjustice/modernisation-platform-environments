@@ -170,14 +170,14 @@ locals {
         })
         user_data_cloud_init = merge(local.ec2_autoscaling_groups.web12.user_data_cloud_init, {
           args = merge(local.ec2_autoscaling_groups.web12.user_data_cloud_init.args, {
-            branch = "main"
+            branch = "TM-1883"
           })
         })
         tags = merge(local.ec2_autoscaling_groups.web12.tags, {
-          nomis-environment     = "qa11g"
-          oracle-db-name        = "qa11g"
-          oracle-db-hostname-a  = "dev-nomis-db19c-1-a"
-          oracle-db-hostname-b  = "none"
+          nomis-environment    = "qa11g"
+          oracle-db-name       = "qa11g"
+          oracle-db-hostname-a = "dev-nomis-db19c-1-a"
+          oracle-db-hostname-b = "none"
         })
       })
     }
