@@ -40,6 +40,7 @@ resource "aws_vpc_security_group_ingress_rule" "ingress_ssogen_internal_admin_wo
 }
 
 resource "aws_security_group_rule" "ingress_traffic_ssogenalb_internal_443_mojo_devices" {
+  count             = local.is-development || local.is-test ? 1 : 0
   security_group_id = aws_security_group.sg_ssogen_internal_alb[count.index].id
   type              = "ingress"
   description       = "HTTPS from Mojo Devices"
@@ -50,6 +51,7 @@ resource "aws_security_group_rule" "ingress_traffic_ssogenalb_internal_443_mojo_
 }
 
 resource "aws_security_group_rule" "ingress_traffic_ssogenalb_internal_443_moj_wifi" {
+  count             = local.is-development || local.is-test ? 1 : 0
   security_group_id = aws_security_group.sg_ssogen_internal_alb[count.index].id
   type              = "ingress"
   description       = "HTTPS from MoJ WiFi"
@@ -60,6 +62,7 @@ resource "aws_security_group_rule" "ingress_traffic_ssogenalb_internal_443_moj_w
 }
 
 resource "aws_security_group_rule" "ingress_traffic_ssogenalb_internal_443_dom1_devices" {
+  count             = local.is-development || local.is-test ? 1 : 0
   security_group_id = aws_security_group.sg_ssogen_internal_alb[count.index].id
   type              = "ingress"
   description       = "HTTPS from Dom1 Devices"
