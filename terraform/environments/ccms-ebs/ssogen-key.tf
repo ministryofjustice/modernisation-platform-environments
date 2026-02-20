@@ -1,56 +1,56 @@
 # checkov:skip=CKV_AWS_356: KMS key policies require Resource="*"; constrained via principals/conditions
 # checkov:skip=CKV_AWS_109: Root admin stanza retained; functional use is tightly scoped
-data "aws_iam_policy_document" "ssogen_kms_policy" {
-  statement {
-    sid = "AllowRootAccountAdmin"
-    principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
-    }
-    actions   = ["kms:*"]
-    resources = ["*"]
-  }
-  statement {
-    sid = "AllowUseForSecretsManagerInThisAccount"
-    principals {
-      type        = "AWS"
-      identifiers = ["*"]
-    }
-    actions = [
-      "kms:Encrypt",
-      "kms:Decrypt",
-      "kms:ReEncrypt*",
-      "kms:GenerateDataKey*"
-      , "kms:DescribeKey"
-    ]
-    resources = ["*"]
+# data "aws_iam_policy_document" "ssogen_kms_policy" {
+#   statement {
+#     sid = "AllowRootAccountAdmin"
+#     principals {
+#       type        = "AWS"
+#       identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+#     }
+#     actions   = ["kms:*"]
+#     resources = ["*"]
+#   }
+#   statement {
+#     sid = "AllowUseForSecretsManagerInThisAccount"
+#     principals {
+#       type        = "AWS"
+#       identifiers = ["*"]
+#     }
+#     actions = [
+#       "kms:Encrypt",
+#       "kms:Decrypt",
+#       "kms:ReEncrypt*",
+#       "kms:GenerateDataKey*"
+#       , "kms:DescribeKey"
+#     ]
+#     resources = ["*"]
 
-    condition {
-      test     = "StringEquals"
-      variable = "kms:CallerAccount"
-      values   = [data.aws_caller_identity.current.account_id]
-    }
-    condition {
-      test     = "StringEquals"
-      variable = "kms:ViaService"
-      values   = ["secretsmanager.${data.aws_region.current.name}.amazonaws.com"]
-    }
-  }
-}
+#     condition {
+#       test     = "StringEquals"
+#       variable = "kms:CallerAccount"
+#       values   = [data.aws_caller_identity.current.account_id]
+#     }
+#     condition {
+#       test     = "StringEquals"
+#       variable = "kms:ViaService"
+#       values   = ["secretsmanager.${data.aws_region.current.name}.amazonaws.com"]
+#     }
+#   }
+# }
 
-resource "aws_kms_alias" "apk" {
-  count         = local.is-development || local.is-test ? 1 : 0
-  name          = "alias/ssogen--private-key-alias"
-  target_key_id = aws_kms_key.ssogen_kms[0].key_id
-}
+# resource "aws_kms_alias" "apk" {
+#   count         = local.is-development || local.is-test ? 1 : 0
+#   name          = "alias/ssogen--private-key-alias"
+#   target_key_id = aws_kms_key.ssogen_kms[0].key_id
+# }
 
-resource "aws_kms_key" "ssogen_kms" {
-  count               = local.is-development || local.is-test ? 1 : 0
-  description         = "KMS for SSH private keys in Secrets Manager"
-  enable_key_rotation = true
-  policy              = data.aws_iam_policy_document.ssogen_kms_policy.json
-  tags                = { Environment = local.environment }
-}
+# resource "aws_kms_key" "ssogen_kms" {
+#   count               = local.is-development || local.is-test ? 1 : 0
+#   description         = "KMS for SSH private keys in Secrets Manager"
+#   enable_key_rotation = true
+#   policy              = data.aws_iam_policy_document.ssogen_kms_policy.json
+#   tags                = { Environment = local.environment }
+# }
 
 # Generate SSH key pair
 resource "tls_private_key" "ssogen" {
@@ -74,13 +74,13 @@ resource "aws_key_pair" "ssogen" {
 resource "aws_secretsmanager_secret" "ssogen_privkey" {
   count                   = local.is-development || local.is-test ? 1 : 0
   name                    = "ssh/${local.environment}/ssogen/private-key"
-  kms_key_id              = aws_kms_key.ssogen_kms[count.index].arn
+  kms_key_id              = aws_kms_key.ssogen_kms_key[count.index].arn
   recovery_window_in_days = 7
   tags                    = { Environment = local.environment, Purpose = "ec2-ssh" }
 
 }
 
-resource "aws_secretsmanager_secret_version" "ssogen_privkey_v1" {
+resource "aws_secretsmanager_secret_version" "ssogen_privkey_version" {
   count     = local.is-development || local.is-test ? 1 : 0
   secret_id = aws_secretsmanager_secret.ssogen_privkey[count.index].id
   secret_string = jsonencode({
