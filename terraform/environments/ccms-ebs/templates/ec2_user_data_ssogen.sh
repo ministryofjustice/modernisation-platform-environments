@@ -50,7 +50,7 @@ echo "export PATH=\$PATH:/usr/local/go/bin" >> /root/.bashrc
 rm go1.22.0.linux-amd64.tar.gz
 cd /root
 cmake --version
-export PATH=/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/bin:/sbin:/root/.cargo/bin:/usr/local/go/bin
+export PATH=/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/bin:/sbin:/root/.cargo/bin:/usr/local/go/bin:/root/bin
 wget https://cmake.org/files/v3.20/cmake-3.20.0.tar.gz
 echo "get cmake tar"
 tar -xzf cmake-3.20.0.tar.gz
@@ -68,6 +68,7 @@ cmake --version
 # cmake --version
 /root/.cargo/bin/rustc --version
 /root/.cargo/bin/cargo --version
+cd /root
 git clone https://github.com/aws/efs-utils
 cd efs-utils
 sed -i 's/--with system_rust --noclean/--without system_rust --noclean/g' /root/efs-utils/Makefile
