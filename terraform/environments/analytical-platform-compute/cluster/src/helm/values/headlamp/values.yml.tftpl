@@ -1,0 +1,30 @@
+---
+config:
+  inCluster: true
+  pluginsDir: "/headlamp/plugins"
+
+clusterRoleBinding:
+  create: true
+  clusterRoleName: cluster-admin
+
+pluginsManager:
+  enabled: true
+  configContent: |
+    plugins:
+      - name: "@headlamp-k8s/karpenter"
+        source: https://github.com/headlamp-k8s/plugins/releases/download/karpenter-0.2.0/headlamp-k8s-karpenter-0.2.0.tar.gz
+
+ingress:
+  enabled: true
+  ingressClassName: "default"
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-production-http01
+  hosts:
+    - host: ${headlamp_hostname}
+      paths:
+        - path: /
+          type: ImplementationSpecific
+  tls:
+    - secretName: headlamp-tls
+      hosts:
+        - ${headlamp_hostname}
