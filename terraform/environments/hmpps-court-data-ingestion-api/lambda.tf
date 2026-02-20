@@ -18,6 +18,7 @@ module "authorizer_lambda" {
   description      = "Custom TOKEN authorizer for API Gateway"
   source_path      = data.archive_file.lambda_zip.output_path
   handler          = "authorizer.handler"
+  runtime          = "nodejs20.x"
 
   create_package         = false
   local_existing_package = data.archive_file.lambda_zip.output_path
