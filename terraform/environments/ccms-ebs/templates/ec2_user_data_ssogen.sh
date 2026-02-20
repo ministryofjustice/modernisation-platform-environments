@@ -53,14 +53,14 @@ cmake --version
 # ./bootstrap && make -j$(nproc) && make install
 # sleep 5
 # cmake --version
-VERSION=3.27.9
-curl -LO https://cmake.org/files/v3.27/cmake-$VERSION.tar.gz
-tar xf cmake-$VERSION.tar.gz
-cd cmake-$VERSION
-./bootstrap --prefix=/usr/local
-make -j"$(nproc)"
-sudo make install
-cmake --version
+# VERSION=3.27.9
+# curl -LO https://cmake.org/files/v3.27/cmake-$VERSION.tar.gz
+# tar xf cmake-$VERSION.tar.gz
+# cd cmake-$VERSION
+# ./bootstrap --prefix=/usr/local
+# make -j"$(nproc)"
+# sudo make install
+# cmake --version
 /root/.cargo/bin/rustc --version
 /root/.cargo/bin/cargo --version
 git clone https://github.com/aws/efs-utils
