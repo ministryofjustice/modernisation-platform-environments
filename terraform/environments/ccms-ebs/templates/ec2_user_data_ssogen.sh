@@ -46,12 +46,20 @@ tar -C /usr/local -xzf go1.22.0.linux-amd64.tar.gz
 echo "export PATH=\$PATH:/usr/local/go/bin" >> /root/.bashrc
 rm go1.22.0.linux-amd64.tar.gz
 cmake --version
-wget https://cmake.org/files/v3.20/cmake-3.20.0.tar.gz
-echo "get cmake tar"
-tar -xzf cmake-3.20.0.tar.gz
-cd cmake-3.20.0
-./bootstrap && make -j$(nproc) && make install
-sleep 5
+# wget https://cmake.org/files/v3.20/cmake-3.20.0.tar.gz
+# echo "get cmake tar"
+# tar -xzf cmake-3.20.0.tar.gz
+# cd cmake-3.20.0
+# ./bootstrap && make -j$(nproc) && make install
+# sleep 5
+# cmake --version
+VERSION=3.27.9
+curl -LO https://cmake.org/files/v3.27/cmake-$VERSION.tar.gz
+tar xf cmake-$VERSION.tar.gz
+cd cmake-$VERSION
+./bootstrap --prefix=/usr/local
+make -j"$(nproc)"
+sudo make install
 cmake --version
 /root/.cargo/bin/rustc --version
 /root/.cargo/bin/cargo --version
