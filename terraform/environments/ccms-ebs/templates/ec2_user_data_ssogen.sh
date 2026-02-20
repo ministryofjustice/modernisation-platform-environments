@@ -45,15 +45,18 @@ yum -y install git rpm-build make rust cargo openssl-devel gcc gcc-c++ cmake wge
 wget https://go.dev/dl/go1.22.0.linux-amd64.tar.gz
 tar -C /usr/local -xzf go1.22.0.linux-amd64.tar.gz
 echo "export PATH=\$PATH:/usr/local/go/bin" >> /root/.bashrc
+source /root/.bashrc
 rm go1.22.0.linux-amd64.tar.gz
+cd /root
 cmake --version
-# wget https://cmake.org/files/v3.20/cmake-3.20.0.tar.gz
-# echo "get cmake tar"
-# tar -xzf cmake-3.20.0.tar.gz
-# cd cmake-3.20.0
-# ./bootstrap && make -j$(nproc) && make install
-# sleep 5
-# cmake --version
+wget https://cmake.org/files/v3.20/cmake-3.20.0.tar.gz
+echo "get cmake tar"
+tar -xzf cmake-3.20.0.tar.gz
+cd cmake-3.20.0
+env
+./bootstrap && make -j$(nproc) && make install
+sleep 120
+cmake --version
 # VERSION=3.27.9
 # curl -LO https://cmake.org/files/v3.27/cmake-$VERSION.tar.gz
 # tar xf cmake-$VERSION.tar.gz
@@ -64,7 +67,6 @@ cmake --version
 # cmake --version
 /root/.cargo/bin/rustc --version
 /root/.cargo/bin/cargo --version
-cd /root
 git clone https://github.com/aws/efs-utils
 cd efs-utils
 sed -i 's/--with system_rust --noclean/--without system_rust --noclean/g' /root/efs-utils/Makefile
