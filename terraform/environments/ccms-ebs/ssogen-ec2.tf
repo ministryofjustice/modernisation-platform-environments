@@ -17,7 +17,7 @@ resource "aws_launch_template" "ssogen-ec2-launch-template-primary" {
   name_prefix   = local.application_name_ssogen
   image_id      = local.application_data.accounts[local.environment].ssogen_ami_id-1
   instance_type = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ssogen
-  # key_name      = var.key_name
+  key_name      = aws_key_pair.ssogen[count.index].key_name
   ebs_optimized          = true
   update_default_version = true
 
@@ -80,7 +80,7 @@ resource "aws_launch_template" "ssogen-ec2-launch-template-secondary" {
   name_prefix   = local.application_name_ssogen
   image_id      = local.application_data.accounts[local.environment].ssogen_ami_id-2
   instance_type = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ssogen
-  # key_name      = var.key_name
+  key_name      = aws_key_pair.ssogen[count.index].key_name
   ebs_optimized          = true
   update_default_version = true
 
