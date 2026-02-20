@@ -94,7 +94,7 @@ resource "aws_secretsmanager_secret_version" "ssogen_privkey_v1" {
     created_at_utc  = timestamp()
   })
 
-  # lifecycle {
-  #   ignore_changes = [secret_string]
-  # }
+  lifecycle {
+    ignore_changes = [secret_string]
+  }
 }
