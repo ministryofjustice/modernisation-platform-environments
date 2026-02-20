@@ -65,7 +65,7 @@ resource "aws_api_gateway_deployment" "main" {
 
   depends_on = [
     aws_api_gateway_method.post,
-    aws_api_gateway_integration.sqs
+    aws_api_gateway_authorizer.hmac
   ]
 
   lifecycle {
