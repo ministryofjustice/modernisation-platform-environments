@@ -91,22 +91,6 @@ resource "aws_db_parameter_group" "appdbparametergroup19_new" {
     value = "10"
   }
 
-  # Enforce SSL/TLS for all connections
-  parameter {
-    name  = "sqlnetora.encryption_server"
-    value = "REQUIRED"
-  }
-
-  parameter {
-    name  = "sqlnetora.encryption_types_server"
-    value = "AES256,AES192,AES128"
-  }
-
-  parameter {
-    name  = "sqlnetora.crypto_checksum_types_server"
-    value = "SHA256,SHA384,SHA512"
-  }
-
   tags = merge(
     local.tags,
     {
