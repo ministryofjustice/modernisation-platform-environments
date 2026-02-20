@@ -158,10 +158,16 @@ resource "aws_lambda_permission" "allow_eventbridge_ssm_patch_completion" {
 locals {
   # EventBridge Scheduler configurations
   lambda_schedules = {
-    securityhub_report = {
+    securityhub_critical_report = {
       environments = ["development", "preproduction", "production"]
       schedule     = "cron(0 7 ? * MON-FRI *)"
       description  = "Trigger Lambda at 07:00 each Monday through Friday"
+      timezone     = "Europe/London"
+    }
+    securityhub_monthly_report = {
+      environments = ["development", "preproduction", "production"]
+      schedule     = "cron(0 1 1 * ? *)"
+      description  = "Trigger Lambda at 01:00 on the 1st day of every month"
       timezone     = "Europe/London"
     }
     disable_cpu_alarms = {
@@ -338,9 +344,13 @@ resource "aws_scheduler_schedule" "lambda_schedules" {
 # Lambda function ARN mapping
 locals {
   lambda_function_arns = {
-    securityhub_report = local.is-development ? aws_lambda_function.lambda_functions["securityhub_report_development"].arn : (
-      local.is-preproduction ? aws_lambda_function.lambda_functions["securityhub_report_preproduction"].arn : (
-        local.is-production ? aws_lambda_function.lambda_functions["securityhub_report_production"].arn : null
+    securityhub_critical_report = local.is-development ? aws_lambda_function.lambda_functions["securityhub_critical_report_development"].arn : (
+      local.is-preproduction ? aws_lambda_function.lambda_functions["securityhub_critical_report_preproduction"].arn : (
+        local.is-production ? aws_lambda_function.lambda_functions["securityhub_critical_report_production"].arn : null
+    ))
+    securityhub_monthly_report = local.is-development ? aws_lambda_function.lambda_functions["securityhub_monthly_report_development"].arn : (
+      local.is-preproduction ? aws_lambda_function.lambda_functions["securityhub_monthly_report_preproduction"].arn : (
+        local.is-production ? aws_lambda_function.lambda_functions["securityhub_monthly_report_production"].arn : null
     ))
     suppress_securityhub_findings = local.is-development ? aws_lambda_function.lambda_functions["suppress_securityhub_findings_development"].arn : (
       local.is-preproduction ? aws_lambda_function.lambda_functions["suppress_securityhub_findings_preproduction"].arn : (
