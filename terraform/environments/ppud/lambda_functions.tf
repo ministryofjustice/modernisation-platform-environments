@@ -217,7 +217,7 @@ locals {
     }
     ssm_patch_notification = {
       description  = "Function to send email notification when SSM patching completes."
-      role_key     = "invoke_ses"
+      role_key     = "ssm_patch_notification"
       environments = ["development", "preproduction", "production"]
       runtime      = "python3.13"
       permissions = [{

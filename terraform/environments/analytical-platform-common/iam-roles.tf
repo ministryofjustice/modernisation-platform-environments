@@ -2,12 +2,15 @@ module "ecr_access_iam_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
-  source  = "terraform-aws-modules/iam/aws//modules/iam-github-oidc-role"
-  version = "5.60.0"
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role"
+  version = "6.4.0"
+
+  enable_github_oidc = true
+  use_name_prefix    = false
 
   name = "ecr-access"
 
-  subjects = [
+  oidc_wildcard_subjects = [
     "ministryofjustice/*",
     "moj-analytical-services/*"
   ]
@@ -23,12 +26,15 @@ module "analytical_platform_github_actions_iam_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
-  source  = "terraform-aws-modules/iam/aws//modules/iam-github-oidc-role"
-  version = "5.60.0"
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role"
+  version = "6.4.0"
+
+  enable_github_oidc = true
+  use_name_prefix    = false
 
   name = "analytical-platform-github-actions"
 
-  subjects = ["ministryofjustice/analytical-platform-airflow:*"]
+  oidc_wildcard_subjects = ["ministryofjustice/analytical-platform-airflow:*"]
 
   policies = {
     analytical_platform_github_actions = module.analytical_platform_github_actions_iam_policy.arn
@@ -41,17 +47,40 @@ module "analytical_platform_terraform_iam_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
-  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.60.0"
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role"
+  version = "6.4.0"
 
-  create_role = true
+  create          = true
+  use_name_prefix = false
 
-  role_name         = "analytical-platform-terraform"
-  role_requires_mfa = false
+  name = "analytical-platform-terraform"
 
-  trusted_role_arns = [module.analytical_platform_github_actions_iam_role.arn]
+  trust_policy_permissions = {
+    githubActionsAssume = {
+      actions = [
+        "sts:AssumeRole",
+        "sts:TagSession"
+      ]
+      principals = [{
+        type        = "AWS"
+        identifiers = [module.analytical_platform_github_actions_iam_role.arn]
+      }]
+    }
+    platformEngineerAdminAssume = {
+      actions = [
+        "sts:AssumeRole",
+        "sts:TagSession"
+      ]
+      principals = [{
+        type        = "AWS"
+        identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/${data.aws_region.current.region}/${one(data.aws_iam_roles.platform_engineer_admin_sso_role.names)}"]
+      }]
+    }
+  }
 
-  custom_role_policy_arns = [module.analytical_platform_terraform_iam_policy.arn]
+  policies = {
+    analytical-platform-terraform = module.analytical_platform_terraform_iam_policy.arn
+  }
 
   tags = local.tags
 }
@@ -60,12 +89,15 @@ module "data_engineering_datalake_access_github_actions_iam_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
-  source  = "terraform-aws-modules/iam/aws//modules/iam-github-oidc-role"
-  version = "5.60.0"
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role"
+  version = "6.4.0"
+
+  enable_github_oidc = true
+  use_name_prefix    = false
 
   name = "data-engineering-datalake-access-github-actions"
 
-  subjects = ["moj-analytical-services/data-engineering-datalake-access:*"]
+  oidc_wildcard_subjects = ["moj-analytical-services/data-engineering-datalake-access:*"]
 
   policies = {
     data_engineering_github_actions = module.data_engineering_datalake_access_github_actions_iam_policy.arn
@@ -78,17 +110,30 @@ module "data_engineering_datalake_access_terraform_iam_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
-  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.60.0"
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role"
+  version = "6.4.0"
 
-  create_role = true
+  create          = true
+  use_name_prefix = false
 
-  role_name         = "data-engineering-datalake-access-terraform"
-  role_requires_mfa = false
+  name = "data-engineering-datalake-access-terraform"
 
-  trusted_role_arns = [module.data_engineering_datalake_access_github_actions_iam_role.arn]
+  trust_policy_permissions = {
+    dataEngineeringGithubActionsAssume = {
+      actions = [
+        "sts:AssumeRole",
+        "sts:TagSession"
+      ]
+      principals = [{
+        type        = "AWS"
+        identifiers = [module.data_engineering_datalake_access_github_actions_iam_role.arn]
+      }]
+    }
+  }
 
-  custom_role_policy_arns = [module.data_engineering_datalake_access_terraform_iam_policy.arn]
+  policies = {
+    data-engineering-datalake-access-terraform = module.data_engineering_datalake_access_terraform_iam_policy.arn
+  }
 
   tags = local.tags
 }

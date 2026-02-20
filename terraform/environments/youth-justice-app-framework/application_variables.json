@@ -123,7 +123,7 @@
       "tableau_blue_live": true,
       "tableau_test_active": true,
       "database_instance_class": "db.r5.2xlarge",
-      "rds_engine_version": "17.5",
+      "rds_engine_version": "17.7",
       "enable_datadog_agent_apm": true,
       "create_rds_sheduler": false,
       "create_svc_pilot": false,

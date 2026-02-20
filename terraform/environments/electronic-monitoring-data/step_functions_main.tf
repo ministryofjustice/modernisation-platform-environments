@@ -52,3 +52,22 @@ module "data_cutback_step_function" {
   )
   type = "STANDARD"
 }
+
+
+# ------------------------------------------
+# Ears and Sars Step funtion
+# ------------------------------------------
+
+module "ears_sars_step_function" {
+  count        = local.is-development || local.is-preproduction ? 1 : 0
+
+  source       = "./modules/step_function"
+  name         = "ears_sars"
+  iam_policies = tomap({ "ears_sars_step_function_policy" = aws_iam_policy.ears_sars_step_function_policy[0] })
+  variable_dictionary = tomap(
+    {
+      "ears_sars_request" = module.ears_sars_request[0].lambda_function_name,
+    }
+  )
+  type = "STANDARD"
+}
