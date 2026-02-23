@@ -366,7 +366,7 @@ class NotificationService:
             user_identity = record.get("userIdentity", {})
             principal_id = user_identity.get("principalId", "Unknown Principal")
             if "rejected" in object_key.lower():
-                emoji = ":small_red_triangle:"
+                emoji = ":broken_heart:"
             else:             
                 emoji = ":white_check_mark:"
 
