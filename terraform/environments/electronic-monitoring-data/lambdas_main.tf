@@ -670,7 +670,7 @@ module "ears_sars_request" {
 # ------------------------------------------------------------------------------
 
 module "fan_out_tags" {
-  count = local.is-development || local.is-test ? 1 : 0
+  count                          = local.is-development || local.is-test ? 1 : 0
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "fan_out_tags"
@@ -688,6 +688,6 @@ module "fan_out_tags" {
   subnet_ids         = data.aws_subnets.shared-private.ids
 
   environment_variables = {
-    SQS_QUEUE_ARN         = module.load_fms_event_queue.sqs_queue.url
+    SQS_QUEUE_ARN = module.load_fms_event_queue.sqs_queue.url
   }
 }

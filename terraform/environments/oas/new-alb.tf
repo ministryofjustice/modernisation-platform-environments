@@ -224,7 +224,7 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
         ]
       },
       {
-        Sid = "AWSLogDeliveryWrite"
+        Sid    = "AWSLogDeliveryWrite"
         Effect = "Allow"
         Principal = {
           Service = "delivery.logs.amazonaws.com"
@@ -241,12 +241,12 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
         }
       },
       {
-        Sid = "AWSLogDeliveryAclCheck"
+        Sid    = "AWSLogDeliveryAclCheck"
         Effect = "Allow"
         Principal = {
           Service = "delivery.logs.amazonaws.com"
         }
-        Action = "s3:GetBucketAcl"
+        Action   = "s3:GetBucketAcl"
         Resource = aws_s3_bucket.lb_access_logs[0].arn
       }
     ]
