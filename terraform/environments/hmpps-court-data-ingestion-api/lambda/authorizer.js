@@ -1,6 +1,7 @@
 
 const crypto = require('crypto');
 const { SecretsManagerClient, GetSecretValueCommand } = require("@aws-sdk/client-secrets-manager");
+const { SQSClient, SendMessageCommand } = require("@aws-sdk/client-sqs");
 const client = new SecretsManagerClient();
 let cachedSecret;
 
@@ -73,14 +74,15 @@ exports.handler = async (event) => {
     const isValid = true
     if (isValid) {
       console.log("[auth] allow: token matched");
-        const SQS_URL = process.env.SQS_URL;
-        await sqs
-            .sendMessage({
-                QueueUrl: SQS_URL,
-                MessageBody: rawBody,
-            })
-            .promise();
-
+      const SQS_URL = process.env.SQS_URL;
+      const config = {}; // type is SQSClientConfig
+      const client = new SQSClient(config);
+      const input = { // SendMessageRequest
+        QueueUrl: SQS_URL, // required
+        MessageBody: rawBody, // required
+      }
+      const command = new SendMessageCommand(input);
+      const response = await client.send(command);
       return generatePolicy("user", "Allow", methodArn);
     }
 
