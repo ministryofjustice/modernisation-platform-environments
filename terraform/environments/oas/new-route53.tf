@@ -38,8 +38,8 @@ resource "aws_route53_record" "oas-lb" {
   type     = "A"
 
   alias {
-    name                   = module.lb_access_logs_enabled.load_balancer.dns_name
-    zone_id                = module.lb_access_logs_enabled.load_balancer.zone_id
+    name                   = aws_lb.oas_lb[0].dns_name
+    zone_id                = aws_lb.oas_lb[0].zone_id
     evaluate_target_health = true
   }
 }

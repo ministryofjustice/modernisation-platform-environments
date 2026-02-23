@@ -67,6 +67,15 @@ locals {
         "invoke_ses"
       ]
     }
+    ssm_patch_notification = {
+      description = "Lambda Function Role for sending SSM patch notifications via SES"
+      policies = [
+        "send_message_to_sqs",
+        "send_logs_to_cloudwatch",
+        "invoke_ses",
+        "ssm_patch_notification"
+      ]
+    }
     get_ses_logging = {
       description = "Lambda Function Role for SES logging"
       policies = [
@@ -208,6 +217,7 @@ locals {
           "send_logs_to_cloudwatch",
           "get_cloudwatch_metrics",
           "invoke_ses",
+          "ssm_patch_notification",
           "publish_to_sns",
           "invoke_ssm_powershell",
           "invoke_ssm_ec2_instances",
@@ -259,6 +269,10 @@ resource "aws_iam_policy" "lambda_policies_v2" {
         Effect   = "Allow"
         Action   = ["ses:*"]
         Resource = ["arn:aws:ses:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"]
+        } : each.value.policy_name == "ssm_patch_notification" ? {
+        Effect   = "Allow"
+        Action   = ["ssm:DescribeMaintenanceWindows"]
+        Resource = ["arn:aws:ssm:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"]
         } : each.value.policy_name == "publish_to_sns" ? {
         Effect   = "Allow"
         Action   = ["sns:Publish"]
