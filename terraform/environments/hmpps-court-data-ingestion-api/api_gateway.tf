@@ -41,7 +41,7 @@ resource "aws_api_gateway_integration" "lambda_integration" {
   http_method             = aws_api_gateway_method.post.http_method
   integration_http_method = "POST"
   type                    = "AWS_PROXY"  
-  uri                     = "arn:aws:apigateway:${data.aws_region.current.name}:lambda:path/2015-03-31/functions/${module.authorizer_lambda.lambda_function_arn}/invocations"
+  uri                     = module.authorizer_lambda.lambda_function_invoke_arn
 }
 
 resource "aws_api_gateway_integration_response" "response_200" {
