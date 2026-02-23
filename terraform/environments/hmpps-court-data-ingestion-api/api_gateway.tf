@@ -49,6 +49,8 @@ resource "aws_api_gateway_integration_response" "response_200" {
   resource_id = aws_api_gateway_resource.ingest.id
   http_method = aws_api_gateway_method.post.http_method
   status_code = "200"
+
+  depends_on = [aws_api_gateway_integration.lambda_integration]
 }
 
 resource "aws_api_gateway_deployment" "main" {
@@ -58,13 +60,14 @@ resource "aws_api_gateway_deployment" "main" {
     redeployment = sha1(jsonencode([
       aws_api_gateway_authorizer.hmac.id,
       aws_api_gateway_authorizer.hmac.type,
-      aws_api_gateway_method.post.id
+      aws_api_gateway_method.post.id,
+      aws_api_gateway_integration.lambda_integration.id
     ]))
   }
 
   depends_on = [
     aws_api_gateway_method.post,
-    aws_api_gateway_authorizer.hmac
+    aws_api_gateway_integration.lambda_integration
   ]
 
   lifecycle {
