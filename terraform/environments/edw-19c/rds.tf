@@ -133,12 +133,12 @@ resource "aws_db_instance" "edw_rds_instance" {
   count = local.environment == "preproduction" ? 1 : 0
 
   # Instance identification
-  identifier            = "${local.application_name}-${local.environment}"
-  db_name               = local.application_name
-  engine                = local.application_data.accounts[local.environment].engine
-  engine_version        = local.application_data.accounts[local.environment].engine_version
-  instance_class        = local.application_data.accounts[local.environment].instance_class
-  license_model         = local.application_data.accounts[local.environment].license_model
+  identifier     = "${local.application_name}-${local.environment}"
+  db_name        = local.application_name
+  engine         = local.application_data.accounts[local.environment].engine
+  engine_version = local.application_data.accounts[local.environment].engine_version
+  instance_class = local.application_data.accounts[local.environment].instance_class
+  license_model  = local.application_data.accounts[local.environment].license_model
 
   # Storage configuration
   allocated_storage     = local.application_data.accounts[local.environment].allocated_storage
@@ -150,9 +150,9 @@ resource "aws_db_instance" "edw_rds_instance" {
   kms_key_id            = data.aws_kms_key.rds_shared.arn
 
   # Database configuration
-  character_set_name    = local.application_data.accounts[local.environment].character_set_name
-  username              = local.application_data.accounts[local.environment].username
-  password              = random_password.rds_password_new[0].result
+  character_set_name = local.application_data.accounts[local.environment].character_set_name
+  username           = local.application_data.accounts[local.environment].username
+  password           = random_password.rds_password_new[0].result
 
   # Network configuration
   db_subnet_group_name   = aws_db_subnet_group.appdbsubnetgroup_new[0].name
@@ -174,8 +174,8 @@ resource "aws_db_instance" "edw_rds_instance" {
   apply_immediately           = true
 
   # Parameter and option groups
-  parameter_group_name    = aws_db_parameter_group.appdbparametergroup19_new[0].name
-  option_group_name       = aws_db_option_group.appdboptiongroup19_new[0].name
+  parameter_group_name = aws_db_parameter_group.appdbparametergroup19_new[0].name
+  option_group_name    = aws_db_option_group.appdboptiongroup19_new[0].name
 
   # Performance Insights
   performance_insights_enabled          = local.application_data.accounts[local.environment].performance_insights_enabled
@@ -186,7 +186,7 @@ resource "aws_db_instance" "edw_rds_instance" {
   enabled_cloudwatch_logs_exports = local.application_data.accounts[local.environment].enabled_cloudwatch_logs_exports
 
   # Security configuration
-  deletion_protection     = local.application_data.accounts[local.environment].deletion_protection
+  deletion_protection = local.application_data.accounts[local.environment].deletion_protection
 
   tags = merge(
     local.tags,
