@@ -247,6 +247,16 @@ resource "aws_iam_role_policy" "app_task" {
         ],
         "Resource": "arn:aws:logs:*:${local.environment_management.account_ids[terraform.workspace]}:*",
         "Effect": "Allow"
+     },
+     {
+       "Effect": "Allow",
+       "Action": [
+         "ssmmessages:CreateControlChannel",
+         "ssmmessages:CreateDataChannel",
+         "ssmmessages:OpenControlChannel",
+         "ssmmessages:OpenDataChannel"
+       ],
+       "Resource": "*"
      }
    ]
   }

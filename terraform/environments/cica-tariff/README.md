@@ -3,7 +3,7 @@
 <!-- This is a template that should be populated by the development team when moving to the modernisation platform, but also reviewed and kept up to date.
 To ensure that people looking at your runbook can get the information they need quickly, your runbook should be short but clear. Throughout, only use acronyms if you’re confident that someone who has just been woken up at 3am would understand them. -->
 
-_If you have any questions surrounding this page please email Alan.terry@cica.gov.uk
+_If you have any questions surrounding this page please email <Alan.terry@cica.gov.uk>
 
 
 ## Mandatory Information
@@ -19,7 +19,7 @@ Tariff Service – CICA’s primary data store
 
 ### **Service URLs:**
 
-https://ip-10-27-80-154.eu-west-2.compute.internal:8001/forms/java/ 
+<https://ip-10-27-80-154.eu-west-2.compute.internal:8001/forms/java/>
 
 
 ### **Incident response hours:**
@@ -28,14 +28,14 @@ https://ip-10-27-80-154.eu-west-2.compute.internal:8001/forms/java/
 
 ### **Incident contact details:**
 
-CICA’s internal servicedesk 
+CICA’s internal servicedesk
 
-Infrastructure@cica.gov.uk if it is an incident for that team. 
+<Infrastructure@cica.gov.uk> if it is an incident for that team.
 Priority slack channel: cica-tech-team-p1
 
 ### **Service team contact:**
 
-Alan.terry@cica.gov.uk
+<Alan.terry@cica.gov.uk>
 
 ### **Hosting environment:**
 
