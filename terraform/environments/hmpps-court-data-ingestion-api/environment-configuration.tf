@@ -1,7 +1,7 @@
 locals {
   environment_configuration = {
     development = {
-      cloud_platform_sqs_queue_name = "calculate-release-dates-team-dev-hmpps_court_data_ingestion_queuev"
+      cloud_platform_sqs_queue_name = "calculate-release-dates-team-dev-hmpps_court_data_ingestion_queue"
     }
     preproduction = {
       cloud_platform_sqs_queue_name = "calculate-release-dates-team-preprod-hmpps_court_data_ingestion_queue"

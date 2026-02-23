@@ -27,6 +27,7 @@ module "authorizer_lambda" {
 
   environment_variables = {
     SECRET_ID = module.secret_ingestion_api_auth_token.secret_arn
+    SQS_URL = "arn:aws:sqs:eu-west-2:${data.aws_secretsmanager_secret_version.cloud_platform_account_id.secret_string}:${local.environment_configuration[local.environment].cloud_platform_sqs_queue_name}"
   }
 
   attach_policy_statements = true
