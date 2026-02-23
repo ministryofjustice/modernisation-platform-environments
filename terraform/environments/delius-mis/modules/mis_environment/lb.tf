@@ -96,7 +96,7 @@ resource "aws_vpc_security_group_egress_rule" "mis_alb_egress" {
 
 # HTTP rules for staff access
 resource "aws_vpc_security_group_ingress_rule" "mis_alb_http_staff" {
-  for_each          = var.lb_config != null && length(local.internal_security_group_cidrs_staff) > 0 ? toset(local.internal_security_group_cidrs_staff) : []
+  for_each          = var.lb_config != null ? toset(var.account_config.security_group_cidrs_staff) : []
   security_group_id = aws_security_group.mis_alb_staff[0].id
   cidr_ipv4         = each.value
   ip_protocol       = "tcp"
@@ -109,7 +109,7 @@ resource "aws_vpc_security_group_ingress_rule" "mis_alb_http_staff" {
 
 # HTTPS rules for staff access
 resource "aws_vpc_security_group_ingress_rule" "mis_alb_https_staff" {
-  for_each          = var.lb_config != null && length(local.internal_security_group_cidrs_staff) > 0 ? toset(local.internal_security_group_cidrs_staff) : []
+  for_each          = var.lb_config != null ? toset(var.account_config.security_group_cidrs_staff) : []
   security_group_id = aws_security_group.mis_alb_staff[0].id
   cidr_ipv4         = each.value
   ip_protocol       = "tcp"
@@ -122,7 +122,7 @@ resource "aws_vpc_security_group_ingress_rule" "mis_alb_https_staff" {
 
 # HTTP rules for MOJO access
 resource "aws_vpc_security_group_ingress_rule" "mis_alb_http_mojo" {
-  for_each          = var.lb_config != null && length(local.internal_security_group_cidrs_mojo) > 0 ? toset(local.internal_security_group_cidrs_mojo) : []
+  for_each          = var.lb_config != null ? toset(var.account_config.security_group_cidrs_mojo) : []
   security_group_id = aws_security_group.mis_alb_mojo[0].id
   cidr_ipv4         = each.value
   ip_protocol       = "tcp"
@@ -135,7 +135,7 @@ resource "aws_vpc_security_group_ingress_rule" "mis_alb_http_mojo" {
 
 # HTTPS rules for MOJO access
 resource "aws_vpc_security_group_ingress_rule" "mis_alb_https_mojo" {
-  for_each          = var.lb_config != null && length(local.internal_security_group_cidrs_mojo) > 0 ? toset(local.internal_security_group_cidrs_mojo) : []
+  for_each          = var.lb_config != null ? toset(var.account_config.security_group_cidrs_mojo) : []
   security_group_id = aws_security_group.mis_alb_mojo[0].id
   cidr_ipv4         = each.value
   ip_protocol       = "tcp"
@@ -148,7 +148,7 @@ resource "aws_vpc_security_group_ingress_rule" "mis_alb_https_mojo" {
 
 # HTTP rules for infrastructure access
 resource "aws_vpc_security_group_ingress_rule" "mis_alb_http_infrastructure" {
-  for_each          = var.lb_config != null && length(local.internal_security_group_cidrs_infrastructure) > 0 ? toset(local.internal_security_group_cidrs_infrastructure) : []
+  for_each          = var.lb_config != null ? toset(var.account_config.security_group_cidrs_infrastructure) : []
   security_group_id = aws_security_group.mis_alb_infrastructure[0].id
   cidr_ipv4         = each.value
   ip_protocol       = "tcp"
@@ -161,7 +161,7 @@ resource "aws_vpc_security_group_ingress_rule" "mis_alb_http_infrastructure" {
 
 # HTTPS rules for infrastructure access
 resource "aws_vpc_security_group_ingress_rule" "mis_alb_https_infrastructure" {
-  for_each          = var.lb_config != null && length(local.internal_security_group_cidrs_infrastructure) > 0 ? toset(local.internal_security_group_cidrs_infrastructure) : []
+  for_each          = var.lb_config != null ? toset(var.account_config.security_group_cidrs_infrastructure) : []
   security_group_id = aws_security_group.mis_alb_infrastructure[0].id
   cidr_ipv4         = each.value
   ip_protocol       = "tcp"
