@@ -1515,7 +1515,7 @@ data "aws_iam_policy_document" "ears_sars_iam_role_policy_document" {
     ]
     resources = [
       aws_athena_workgroup.ears_sars.arn
-    ] 
+    ]
   }
 
   statement {
@@ -1532,7 +1532,7 @@ data "aws_iam_policy_document" "ears_sars_iam_role_policy_document" {
     resources = [
       "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:catalog",
       "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:database/*",
-      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/*" 
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/*"
     ]
   }
 }
@@ -1571,7 +1571,7 @@ resource "aws_lakeformation_permissions" "ears_sars_table_permissions" {
 
   table {
     database_name = "sar_ear_reports_mart${local.db_suffix}"
-    wildcard              = true
+    wildcard      = true
   }
 
   permissions = ["SELECT", "DESCRIBE"]

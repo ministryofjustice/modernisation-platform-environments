@@ -224,7 +224,7 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
         ]
       },
       {
-        Sid = "AWSLogDeliveryWrite"
+        Sid    = "AWSLogDeliveryWrite"
         Effect = "Allow"
         Principal = {
           Service = "delivery.logs.amazonaws.com"
@@ -241,12 +241,12 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
         }
       },
       {
-        Sid = "AWSLogDeliveryAclCheck"
+        Sid    = "AWSLogDeliveryAclCheck"
         Effect = "Allow"
         Principal = {
           Service = "delivery.logs.amazonaws.com"
         }
-        Action = "s3:GetBucketAcl"
+        Action   = "s3:GetBucketAcl"
         Resource = aws_s3_bucket.lb_access_logs[0].arn
       }
     ]
@@ -265,8 +265,9 @@ resource "aws_lb" "oas_lb" {
   subnets                    = data.aws_subnets.shared-private.ids
   enable_deletion_protection = false
   idle_timeout               = 60
-  enable_http2               = false
+  enable_http2               = true
   drop_invalid_header_fields = true
+  preserve_host_header       = true
 
   access_logs {
     bucket  = aws_s3_bucket.lb_access_logs[0].id
