@@ -1563,7 +1563,7 @@ resource "aws_lakeformation_permissions" "ears_sars_db_permissions" {
     name = "sar_ear_reports_mart${local.dbt_suffix}"
   }
 
-  permissions = ["SELECT", "DESCRIBE"]
+  permissions = ["DESCRIBE"]
 }
 resource "aws_lakeformation_permissions" "ears_sars_table_permissions" {
   count     = local.is-preproduction ? 1 : 0
