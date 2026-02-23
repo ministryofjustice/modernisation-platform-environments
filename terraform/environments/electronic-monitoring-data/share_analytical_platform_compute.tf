@@ -30,7 +30,7 @@ locals {
     "allied_mdss",
     "serco_fms",
   ]
-  historic_source_dbs = local.is-production ? [
+  historic_source_dbs = local.is-production || local.is-preproduction ? [
     "buddi_buddi",
     "capita_alcohol_monitoring",
     "capita_blob_storage",
@@ -48,7 +48,7 @@ locals {
     "scram_alcohol_monitoring",
   ] : local.is-development ? ["test"] : []
 
-  prod_dbs_to_grant = local.is-production ? [
+  prod_dbs_to_grant = local.is-production || local.is-preproduction ? [
     "am_stg",
     "buddi_stg",
     "buddi_buddi",
