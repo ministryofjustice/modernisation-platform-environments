@@ -1560,7 +1560,7 @@ resource "aws_lakeformation_permissions" "ears_sars_db_permissions" {
   principal = aws_iam_role.ears_sars_iam_role[0].arn
 
   database {
-    name = "sar_ear_reports_mart${local.db_suffix}"
+    name = "sar_ear_reports_mart${local.dbt_suffix}"
   }
 
   permissions = ["SELECT", "DESCRIBE"]
@@ -1570,7 +1570,7 @@ resource "aws_lakeformation_permissions" "ears_sars_table_permissions" {
   principal = aws_iam_role.ears_sars_iam_role[0].arn
 
   table {
-    database_name = "sar_ear_reports_mart${local.db_suffix}"
+    database_name = "sar_ear_reports_mart${local.dbt_suffix}"
     wildcard      = true
   }
 
