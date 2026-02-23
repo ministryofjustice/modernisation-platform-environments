@@ -267,7 +267,7 @@ resource "aws_lb" "oas_lb" {
   idle_timeout               = 60
   enable_http2               = true
   drop_invalid_header_fields = true
-  preserve_host_header       = true
+  preserve_host_header       = false
 
   access_logs {
     bucket  = aws_s3_bucket.lb_access_logs[0].id
