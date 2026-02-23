@@ -34,7 +34,29 @@ useradd -g dba -m oracle || true
 chown -R oracle:dba /oracle
 chmod 775 /oracle
 
-# 
+deploy_cortex() {
+  CORTEX_DIR=/tmp/CortexAgent
+  CORTEX_VERSION=linux_8_8_0_133595_rpm
+
+  #--Prep
+  mkdir -p $CORTEX_DIR/linux_8_8_0_133595_rpm
+  mkdir /etc/panw
+  aws s3 sync s3://ccms-shared/CortexAgent/ $CORTEX_DIR #--ccms-shared is in the EBS dev account 767123802783. Bucket is shared at the ORG LEVEL.
+  tar zxf $CORTEX_DIR/$CORTEX_VERSION.tar.gz -C $CORTEX_DIR/$CORTEX_VERSION
+  cp $CORTEX_DIR/$CORTEX_VERSION/cortex.conf /etc/panw/cortex.conf
+  sed -i -e '$a\' /etc/panw/cortex.conf && echo "--endpoint-tags ccms,ssogen" >> /etc/panw/cortex.conf
+
+  #--Installs
+  yum install -y selinux-policy-devel
+  rpm -Uvh $CORTEX_DIR/$CORTEX_VERSION/cortex-*.rpm
+  systemctl status traps_pmd
+  echo "Cortex Install Routine Complete. Installation Is NOT GUARANTEED -- Check Logs For Success"
+}
+
+if [[ "${deploy_environment}" = "production" ]]; then
+  deploy_cortex
+fi
+
 #--Configure EFS
 EFS_MOUNT_POINT=/SSOGEN
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
@@ -58,14 +80,6 @@ cd cmake-3.20.0
 env
 ./bootstrap && make -j$(nproc) && make install
 cmake --version
-# VERSION=3.27.9
-# curl -LO https://cmake.org/files/v3.27/cmake-$VERSION.tar.gz
-# tar xf cmake-$VERSION.tar.gz
-# cd cmake-$VERSION
-# ./bootstrap --prefix=/usr/local
-# make -j"$(nproc)"
-# sudo make install
-# cmake --version
 /root/.cargo/bin/rustc --version
 /root/.cargo/bin/cargo --version
 cd /root
@@ -82,5 +96,19 @@ chmod go+rw $EFS_MOUNT_POINT
 # https://docs.aws.amazon.com/efs/latest/ug/performance.html
 dd if=/dev/urandom of=$EFS_MOUNT_POINT/large_file_for_efs_performance bs=1024k count=10000
 rm -fr /root/efs-utils
+
+#--Hardening to level 1 standard
+# git clone https://github.com/srikanththummala0470/RHEL7-CIS.git
+# cd RHEL7-CIS
+# git checkout feature/my-feature
+pip3 install --upgrade pip setuptools wheel
+pip3 install setuptools-rust
+pip3 install cryptography
+python3 -m pip install ansible-core==2.11.12
+# export PATH=/usr/local/bin:$PATH
+ansible --version
+# ansible-galaxy collection install -r collections/requirements.yml
+# ansible-playbook -i inventory.ini site.yml --tags level1-server
+
 # === Final logs ===
 echo "SSOGEN instance bootstrap completed for ${hostname}" >> /var/log/user-data.log
