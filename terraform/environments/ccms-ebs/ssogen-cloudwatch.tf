@@ -17,15 +17,15 @@ resource "aws_cloudwatch_metric_alarm" "alb_ssogen_5xx" {
     LoadBalancer = aws_lb.ssogen_alb[count.index].name
   }
   treat_missing_data = "notBreaching"
-  alarm_actions       = [aws_sns_topic.cw_alerts.arn]
-  ok_actions          = [aws_sns_topic.cw_alerts.arn]
+  alarm_actions      = [aws_sns_topic.cw_alerts.arn]
+  ok_actions         = [aws_sns_topic.cw_alerts.arn]
 
   tags = local.tags
 }
 
 # Underlying EC2 Instance Status Check Failure for Primary ASG
 resource "aws_cloudwatch_metric_alarm" "Primary_Status_Check_Failure" {
-  count             = local.is-development || local.is-test ? 1 : 0
+  count               = local.is-development || local.is-test ? 1 : 0
   alarm_name          = "${local.application_name_ssogen}-${local.environment}-ec2-primary-status-check-failure"
   alarm_description   = "A ssogen EC2 instance has failed a status check, Runbook - https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
   comparison_operator = "GreaterThanOrEqualToThreshold"
@@ -39,8 +39,8 @@ resource "aws_cloudwatch_metric_alarm" "Primary_Status_Check_Failure" {
   dimensions = {
     AutoScalingGroupName = aws_autoscaling_group.ssogen-scaling-group-primary[count.index].name
   }
-  alarm_actions       = [aws_sns_topic.cw_alerts.arn]
-  ok_actions          = [aws_sns_topic.cw_alerts.arn]
+  alarm_actions = [aws_sns_topic.cw_alerts.arn]
+  ok_actions    = [aws_sns_topic.cw_alerts.arn]
 
   tags = local.tags
 }
@@ -61,17 +61,17 @@ resource "aws_cloudwatch_metric_alarm" "Secondary_Status_Check_Failure" {
   dimensions = {
     AutoScalingGroupName = aws_autoscaling_group.ssogen-scaling-group-secondary[count.index].name
   }
-  alarm_actions       = [aws_sns_topic.cw_alerts.arn]
-  ok_actions          = [aws_sns_topic.cw_alerts.arn]
+  alarm_actions = [aws_sns_topic.cw_alerts.arn]
+  ok_actions    = [aws_sns_topic.cw_alerts.arn]
 
   tags = local.tags
 }
 
 # Underlying waf Instance Status Check Failure
 resource "aws_cloudwatch_metric_alarm" "ssogen_waf_high_blocked_requests" {
-  count               = local.is-development || local.is-test ? 1 : 0
-  alarm_name          = "${local.application_name_ssogen}-${local.environment}-waf-high-blocked-requests"
-  alarm_description   = "High number of requests blocked by WAF. Potential attack."
+  count             = local.is-development || local.is-test ? 1 : 0
+  alarm_name        = "${local.application_name_ssogen}-${local.environment}-waf-high-blocked-requests"
+  alarm_description = "High number of requests blocked by WAF. Potential attack."
 
   comparison_operator = "GreaterThanThreshold"
   metric_name         = "BlockedRequests"
@@ -87,14 +87,14 @@ resource "aws_cloudwatch_metric_alarm" "ssogen_waf_high_blocked_requests" {
     Scope  = "REGIONAL"
   }
 
-  alarm_actions       = [aws_sns_topic.cw_alerts.arn]
-  ok_actions          = [aws_sns_topic.cw_alerts.arn]
+  alarm_actions = [aws_sns_topic.cw_alerts.arn]
+  ok_actions    = [aws_sns_topic.cw_alerts.arn]
 
   tags = local.tags
 }
 
 resource "aws_cloudwatch_metric_alarm" "ssogen_alb_healthyhosts_app" {
-  count           = local.is-development || local.is-test ? 1 : 0
+  count               = local.is-development || local.is-test ? 1 : 0
   alarm_name          = "${local.application_name_ssogen}-${local.environment}-app-alb-targets-group"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = 1
@@ -114,7 +114,7 @@ resource "aws_cloudwatch_metric_alarm" "ssogen_alb_healthyhosts_app" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "ssogen_alb_healthyhosts_admin" {
-  count        = local.is-development || local.is-test ? 1 : 0
+  count               = local.is-development || local.is-test ? 1 : 0
   alarm_name          = "${local.application_name_ssogen}-${local.environment}-admin-alb-targets-group"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = 1
