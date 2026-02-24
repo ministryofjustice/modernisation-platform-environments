@@ -85,7 +85,17 @@ resource "aws_iam_policy" "delius_oasys" {
           "sqs:ChangeMessageVisibility"
         ]
         Resource = aws_sqs_queue.delius_oasys[each.key].arn
-      }
+      },
+      {
+        Effect   = "Deny"
+        Action   = "*"
+        Resource = "*"
+        Condition = {
+          NotIpAddress = {
+            "aws:SourceIp" = each.value.ip_allow_list
+          }
+        }
+      },
     ]
   })
 }
