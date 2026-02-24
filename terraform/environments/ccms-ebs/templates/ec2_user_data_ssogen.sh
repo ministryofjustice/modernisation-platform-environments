@@ -34,6 +34,48 @@ useradd -g dba -m oracle || true
 chown -R oracle:dba /oracle
 chmod 775 /oracle
 
+# nvme1n1 = first attached volume goes to root
+# nvme2n1 = second attached volume, etc.
+DISKSARRAY=(
+  "/dev/nvme2n1:/u01/product/fmw"
+  "/dev/nvme3n1:/u01/product/runtime/Domain/mserver"
+  "/dev/nvme4n1:/tmp"
+)
+
+# Wait for disks to appear
+sleep 5
+
+for entry in "${DISKSARRAY[@]}"; do
+  IFS=":" read -r disk mount <<< "$entry"
+  echo "Processing $disk -> $mount"
+  # Ensure directory exists
+  mkdir -p "$mount"
+
+  # Check if disk already has a filesystem
+  if ! file -s "$disk" | grep -q "data"; then
+    echo "Creating filesystem on $disk"
+    mkfs.xfs "$disk"
+  else
+    echo "Filesystem already exists on $disk"
+  fi
+
+  # Mount disk
+  echo "Mounting $disk to $mount"
+  mount "$disk" "$mount"
+
+  # Get UUID for persistent mount
+  uuid=$(blkid -s UUID -o value "${disk}p1")
+  
+  # Add to fstab if not already present
+  if ! grep -q "$uuid" /etc/fstab; then
+    echo "Adding to /etc/fstab"
+    echo "UUID=$uuid $mount xfs defaults,nofail 0 2" >> /etc/fstab
+  else
+    echo "Entry already exists in /etc/fstab"
+  fi
+
+done
+
 deploy_cortex() {
   CORTEX_DIR=/tmp/CortexAgent
   CORTEX_VERSION=linux_8_8_0_133595_rpm
@@ -58,7 +100,7 @@ if [[ "${deploy_environment}" = "production" ]]; then
 fi
 
 #--Configure EFS
-EFS_MOUNT_POINT=/SSOGEN
+EFS_MOUNT_POINT_ARRAY=("/stage" "/u01/shared/product/fmw" "/u01/shared/product/runtime/Domain/aserver" "/u01/shared/product/runtime/Domain/config")
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 export HOME=/root
 . "$HOME/.cargo/env"
@@ -89,12 +131,15 @@ sed -i 's/--with system_rust --noclean/--without system_rust --noclean/g' /root/
 env
 make rpm
 sudo yum -y install build/amazon-efs-utils*rpm
-mkdir $EFS_MOUNT_POINT
-mount -t efs -o tls ${efs_id}:/ $EFS_MOUNT_POINT
-chmod go+rw $EFS_MOUNT_POINT
+for var in "${EFS_MOUNT_POINT_ARRAY[@]}"; do
+mkdir $var
+mount -t efs -o tls ${efs_id}:/ $var
+chmod go+rw $var
 # create large file for better EFS performance 
 # https://docs.aws.amazon.com/efs/latest/ug/performance.html
-dd if=/dev/urandom of=$EFS_MOUNT_POINT/large_file_for_efs_performance bs=1024k count=10000
+dd if=/dev/urandom of=$var/large_file_for_efs_performance bs=1024k count=10000
+done
+
 rm -fr /root/efs-utils
 
 #--Hardening to level 1 standard
