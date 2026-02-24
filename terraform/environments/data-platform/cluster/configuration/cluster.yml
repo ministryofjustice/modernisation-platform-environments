@@ -1,0 +1,33 @@
+environment:
+  development:
+    kubernetes_version: "1.35"
+    bottlerocket_version: "1.55.0-d93bb1b1"
+    gateway_api_version: "v1.4.1" # https://docs.cilium.io/en/v1.19/network/servicemesh/gateway-api/gateway-api/#cilium-gateway-api-support
+    helm_chart_versions:
+      cilium: "1.19.1"
+      coredns: "1.45.2"
+      kyverno: "3.7.1"
+  test:
+    kubernetes_version: "1.35"
+    bottlerocket_version: "1.55.0-d93bb1b1"
+    gateway_api_version: "v1.4.1" # https://docs.cilium.io/en/v1.19/network/servicemesh/gateway-api/gateway-api/#cilium-gateway-api-support
+    helm_chart_versions:
+      cilium: "1.19.1"
+      coredns: "1.45.2"
+      kyverno: "3.7.1"
+  preproduction:
+    kubernetes_version: "1.35"
+    bottlerocket_version: "1.55.0-d93bb1b1"
+    gateway_api_version: "v1.4.1" # https://docs.cilium.io/en/v1.19/network/servicemesh/gateway-api/gateway-api/#cilium-gateway-api-support
+    helm_chart_versions:
+      cilium: "1.19.1"
+      coredns: "1.45.2"
+      kyverno: "3.7.1"
+  production:
+    kubernetes_version: "1.35"
+    bottlerocket_version: "1.55.0-d93bb1b1"
+    gateway_api_version: "v1.4.1" # https://docs.cilium.io/en/v1.19/network/servicemesh/gateway-api/gateway-api/#cilium-gateway-api-support
+    helm_chart_versions:
+      cilium: "1.19.1"
+      coredns: "1.45.2"
+      kyverno: "3.7.1"

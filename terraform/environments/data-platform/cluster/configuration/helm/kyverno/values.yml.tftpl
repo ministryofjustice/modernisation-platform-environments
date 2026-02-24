@@ -1,0 +1,46 @@
+---
+admissionController:
+  replicas: 3
+  serviceMonitor:
+    enabled: false
+  nodeSelector:
+    compute.data-platform.service.justice.gov.uk/node: system
+  tolerations:
+    - key: compute.data-platform.service.justice.gov.uk/node
+      operator: Exists
+      effect: NoSchedule
+backgroundController:
+  replicas: 2
+  serviceMonitor:
+    enabled: false
+  nodeSelector:
+    compute.data-platform.service.justice.gov.uk/node: system
+  tolerations:
+    - key: compute.data-platform.service.justice.gov.uk/node
+      operator: Exists
+      effect: NoSchedule
+cleanupController:
+  replicas: 2
+  serviceMonitor:
+    enabled: false
+  nodeSelector:
+    compute.data-platform.service.justice.gov.uk/node: system
+  tolerations:
+    - key: compute.data-platform.service.justice.gov.uk/node
+      operator: Exists
+      effect: NoSchedule
+reportsController:
+  replicas: 2
+  serviceMonitor:
+    enabled: false
+  nodeSelector:
+    compute.data-platform.service.justice.gov.uk/node: system
+  tolerations:
+    - key: compute.data-platform.service.justice.gov.uk/node
+      operator: Exists
+      effect: NoSchedule
+
+config:
+  resourceFiltersExcludeNamespaces:
+    - kube-system
+    - cilium-secrets

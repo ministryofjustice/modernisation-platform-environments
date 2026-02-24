@@ -1,6 +1,4 @@
 locals {
-  gateway_api_version = "v1.4.1" # https://docs.cilium.io/en/v1.19/network/servicemesh/gateway-api/gateway-api/#cilium-gateway-api-support
-
   gateway_api_crds = [
     "gatewayclasses",
     "gateways",
@@ -23,7 +21,7 @@ locals {
 data "http" "gateway_api_crd" {
   for_each = toset(local.gateway_api_crds)
 
-  url = "https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/${local.gateway_api_version}/config/crd/standard/gateway.networking.k8s.io_${each.key}.yaml"
+  url = "https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/${local.cluster_configuration.gateway_api_version}/config/crd/standard/gateway.networking.k8s.io_${each.key}.yaml"
 }
 
 resource "kubernetes_manifest" "gateway_api_crd" {

@@ -6,3 +6,8 @@ service:
 
 nodeSelector:
   compute.data-platform.service.justice.gov.uk/node: system
+
+tolerations:
+  - key: compute.data-platform.service.justice.gov.uk/node
+    operator: Exists
+    effect: NoSchedule

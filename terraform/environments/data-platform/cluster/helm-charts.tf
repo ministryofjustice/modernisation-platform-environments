@@ -4,11 +4,9 @@ resource "helm_release" "cilium" {
   name       = "cilium"
   repository = "oci://quay.io/cilium/charts"
   chart      = "cilium"
-  version    = "1.19.1"
+  version    = local.cluster_configuration.helm_chart_versions.cilium
   namespace  = "kube-system"
 
-  # Don't wait for pods - they need nodes to run on
-  # Just install the manifests and move on
   wait = false
 
   values = [
@@ -33,7 +31,7 @@ resource "helm_release" "coredns" {
   name       = "coredns"
   repository = "oci://ghcr.io/coredns/charts"
   chart      = "coredns"
-  version    = "1.45.2"
+  version    = local.cluster_configuration.helm_chart_versions.coredns
   namespace  = "kube-system"
 
   wait = false
@@ -43,5 +41,26 @@ resource "helm_release" "coredns" {
       "${path.module}/configuration/helm/coredns/values.yml.tftpl",
       {}
     )
+  ]
+}
+
+resource "helm_release" "kyverno" {
+  /* https://artifacthub.io/packages/helm/kyverno/kyverno */
+  name       = "kyverno"
+  repository = "https://kyverno.github.io/kyverno"
+  chart      = "kyverno"
+  version    = local.cluster_configuration.helm_chart_versions.kyverno
+  namespace  = module.kyverno_namespace.name
+
+  values = [
+    templatefile(
+      "${path.module}/configuration/helm/kyverno/values.yml.tftpl",
+      {}
+    )
+  ]
+
+  depends_on = [
+    helm_release.cilium,
+    helm_release.coredns
   ]
 }

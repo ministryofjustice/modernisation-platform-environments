@@ -35,16 +35,67 @@ egressMasqueradeInterfaces: eth0
 # Operator Configuration
 operator:
   replicas: 2
+  nodeSelector:
+    compute.data-platform.service.justice.gov.uk/node: system
+  tolerations:
+    - key: compute.data-platform.service.justice.gov.uk/node
+      operator: Exists
+      effect: NoSchedule
 
 hubble:
   relay:
     enabled: true
+    nodeSelector:
+      compute.data-platform.service.justice.gov.uk/node: system
+    tolerations:
+      - key: compute.data-platform.service.justice.gov.uk/node
+        operator: Exists
+        effect: NoSchedule
   ui:
     enabled: true
+    frontend:
+      nodeSelector:
+        compute.data-platform.service.justice.gov.uk/node: system
+      tolerations:
+        - key: compute.data-platform.service.justice.gov.uk/node
+          operator: Exists
+          effect: NoSchedule
+    backend:
+      nodeSelector:
+        compute.data-platform.service.justice.gov.uk/node: system
+      tolerations:
+        - key: compute.data-platform.service.justice.gov.uk/node
+          operator: Exists
+          effect: NoSchedule
+  # Commenting out for later
+  # export:
+  #   static:
+  #     enabled: true
+  #     filePath: /var/run/cilium/hubble/events.log
+  #     fieldMask: []  # export all fields; restrict if PII is a concern
+  #     allowList: []  # empty = all flows; add filters to reduce volume
+  #     denyList: []
 
 # Enable local redirect policy (new format)
 localRedirectPolicies:
   enabled: true
+
+# Tolerations for the Cilium DaemonSet - must run on all nodes including system
+# operator: Exists ensures it also tolerates any future Karpenter node taints
+tolerations:
+  - operator: Exists
+    effect: NoSchedule
+  - operator: Exists
+    effect: NoExecute
+
+# Envoy DaemonSet tolerations
+envoy:
+  enabled: true
+  tolerations:
+    - operator: Exists
+      effect: NoSchedule
+    - operator: Exists
+      effect: NoExecute
 
 # Resources
 resources:
@@ -67,10 +118,7 @@ crdWaitTimeout: 15m
 # Roll out pods automatically on ConfigMap change
 rollOutCiliumPods: true
 
-# Envoy configuration (required for Gateway API)
-envoy:
-  enabled: true
+# Envoy configuration (required for Gateway API) - tolerations defined above with resources
 
 gatewayAPI:
   enabled: true
-
