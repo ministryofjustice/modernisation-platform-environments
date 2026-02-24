@@ -131,7 +131,7 @@ sed -i 's/--with system_rust --noclean/--without system_rust --noclean/g' /root/
 env
 make rpm
 sudo yum -y install build/amazon-efs-utils*rpm
-%{ for entry in EFS_MOUNT_POINT_ARRAY ~}
+%{ for var in EFS_MOUNT_POINT_ARRAY ~}
 # for var in "\${EFS_MOUNT_POINT_ARRAY[@]}"; 
 mkdir $var
 mount -t efs -o tls ${efs_id}:/ $var
