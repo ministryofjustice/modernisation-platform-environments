@@ -414,7 +414,7 @@ locals {
             ]
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/qa11g/*",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/qa11g/weblogic-*"
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/qa11g/weblogic-*",
             ]
           }
         ])
