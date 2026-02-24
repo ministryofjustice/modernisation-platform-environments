@@ -36,16 +36,18 @@ chmod 775 /oracle
 
 # nvme1n1 = first attached volume goes to root
 # nvme2n1 = second attached volume, etc.
-DISKSARRAY=(
-  "/dev/nvme2n1:/u01/product/fmw"
-  "/dev/nvme3n1:/u01/product/runtime/Domain/mserver"
-  "/dev/nvme4n1:/tmp"
-)
+# DISKSARRAY=(
+#   "/dev/nvme2n1:/u01/product/fmw"
+#   "/dev/nvme3n1:/u01/product/runtime/Domain/mserver"
+#   "/dev/nvme4n1:/tmp"
+# )
 
 # Wait for disks to appear
 sleep 25
 
-for entry in "\${DISKSARRAY[@]}"; do
+%{ for entry in DISKSARRAY ~}
+do
+# for entry in "${disks[@]}"; do
   IFS=":" read -r disk mount <<< "$entry"
   echo "Processing $disk -> $mount"
   # Ensure directory exists
@@ -75,6 +77,7 @@ for entry in "\${DISKSARRAY[@]}"; do
   fi
 
 done
+%{ endfor ~}
 
 deploy_cortex() {
   CORTEX_DIR=/tmp/CortexAgent
@@ -100,7 +103,7 @@ if [[ "${deploy_environment}" = "production" ]]; then
 fi
 
 #--Configure EFS
-EFS_MOUNT_POINT_ARRAY=("/stage" "/u01/shared/product/fmw" "/u01/shared/product/runtime/Domain/aserver" "/u01/shared/product/runtime/Domain/config")
+# EFS_MOUNT_POINT_ARRAY=("/stage" "/u01/shared/product/fmw" "/u01/shared/product/runtime/Domain/aserver" "/u01/shared/product/runtime/Domain/config")
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 export HOME=/root
 . "$HOME/.cargo/env"
@@ -131,7 +134,9 @@ sed -i 's/--with system_rust --noclean/--without system_rust --noclean/g' /root/
 env
 make rpm
 sudo yum -y install build/amazon-efs-utils*rpm
-for var in "\${EFS_MOUNT_POINT_ARRAY[@]}"; do
+%{ for entry in EFS_MOUNT_POINT_ARRAY ~}
+# for var in "\${EFS_MOUNT_POINT_ARRAY[@]}"; 
+do
 mkdir $var
 mount -t efs -o tls ${efs_id}:/ $var
 chmod go+rw $var
@@ -139,6 +144,7 @@ chmod go+rw $var
 # https://docs.aws.amazon.com/efs/latest/ug/performance.html
 dd if=/dev/urandom of=$var/large_file_for_efs_performance bs=1024k count=10000
 done
+%{ endfor ~}
 
 rm -fr /root/efs-utils
 

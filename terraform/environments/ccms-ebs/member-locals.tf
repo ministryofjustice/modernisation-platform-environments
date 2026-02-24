@@ -10,6 +10,19 @@ locals {
   lb_log_prefix_ssogen_internal  = "ssogen-internal-lb"
   application_name_ssogen        = "ssogen"
 
+
+  disksmount = [
+    "/dev/nvme2n1:/u01/product/fmw",
+    "/dev/nvme3n1:/u01/product/runtime/Domain/mserver",
+    "/dev/nvme4n1:/tmp"
+  ]
+
+  efs_mount_points = [
+    "/stage",
+    "/u01/shared/product/fmw",
+    "/u01/shared/product/runtime/Domain/aserver",
+    "/u01/shared/product/runtime/Domain/config"
+  ]
   volume_prefix = local.environment == "production" ? "/CCMS/EBSPROD" : "/CCMS/EBS"
 
   sftp_enabled       = contains(["development", "test"], local.environment)
