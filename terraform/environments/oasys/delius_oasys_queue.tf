@@ -18,7 +18,7 @@ resource "aws_sqs_queue" "delius_oasys" {
   })
 }
 
-resource "aws_sqs_queue_policy" "delius_oasys_allow_sns" {
+resource "aws_sqs_queue_policy" "delius_oasys" {
   for_each = local.delius_oasys_queues
 
   queue_url = aws_sqs_queue.delius_oasys[each.key].id
@@ -51,7 +51,7 @@ resource "aws_sns_topic_subscription" "delius_oasys" {
   endpoint  = aws_sqs_queue.delius_oasys[each.key].arn
 }
 
-resource "aws_iam_user" "delius_oasys_queue_user" {
+resource "aws_iam_user" "delius_oasys" {
   for_each = local.delius_oasys_queues
 
   name = "${each.key}-delius-oasys-queue-user"
@@ -61,13 +61,13 @@ resource "aws_iam_user" "delius_oasys_queue_user" {
   })
 }
 
-resource "aws_iam_access_key" "delius_oasys_queue_access_key" {
+resource "aws_iam_access_key" "delius_oasys" {
   for_each = local.delius_oasys_queues
 
-  user = aws_iam_user.delius_oasys_queue_user[each.key].name
+  user = aws_iam_user.delius_oasys[each.key].name
 }
 
-resource "aws_iam_policy" "delius_oasys_sqs_poll_policy" {
+resource "aws_iam_policy" "delius_oasys" {
   for_each = local.delius_oasys_queues
 
   name = "${each.key}-delius-oasys-sqs-poll-policy"
@@ -90,11 +90,11 @@ resource "aws_iam_policy" "delius_oasys_sqs_poll_policy" {
   })
 }
 
-resource "aws_iam_user_policy_attachment" "attach_policy" {
+resource "aws_iam_user_policy_attachment" "delius_oasys" {
   for_each = local.delius_oasys_queues
 
-  user       = aws_iam_user.delius_oasys_queue_user[each.key].name
-  policy_arn = aws_iam_policy.delius_oasys_sqs_poll_policy[each.key].arn
+  user       = aws_iam_user.delius_oasys[each.key].name
+  policy_arn = aws_iam_policy.delius_oasys[each.key].arn
 }
 
 resource "aws_secretsmanager_secret" "delius_oasys" {
@@ -119,7 +119,7 @@ resource "aws_secretsmanager_secret_version" "delius_oasys" {
   secret_string = jsonencode({
     topic_arn     = aws_sns_topic.delius_oasys[each.key].arn
     queue_url     = aws_sqs_queue.delius_oasys[each.key].id
-    client_id     = aws_iam_access_key.delius_oasys_queue_access_key[each.key].id
-    client_secret = aws_iam_access_key.delius_oasys_queue_access_key[each.key].secret
+    client_id     = aws_iam_access_key.delius_oasys[each.key].id
+    client_secret = aws_iam_access_key.delius_oasys[each.key].secret
   })
 }
