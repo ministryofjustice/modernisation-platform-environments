@@ -24,31 +24,7 @@ module "eks" {
     resources = ["secrets"]
   }
 
-  addons = {
-    # coredns = {
-    #   addon_version               = "v1.13.2-eksbuild.1" # local.environment_configuration.eks_cluster_addon_versions.coredns
-    #   preserve                    = true
-    #   resolve_conflicts_on_create = "OVERWRITE"
-    #   resolve_conflicts_on_update = "PRESERVE"
-    #   configuration_values = jsonencode({
-    #     tolerations = [
-    #       {
-    #         key      = "CriticalAddonsOnly"
-    #         operator = "Exists"
-    #       },
-    #       {
-    #         key    = "node-role.kubernetes.io/control-plane"
-    #         effect = "NoSchedule"
-    #       },
-    #       {
-    #         key      = "node.cilium.io/agent-not-ready"
-    #         operator = "Exists"
-    #         effect   = "NoSchedule"
-    #       }
-    #     ]
-    #   })
-    # }
-  }
+  addons = {}
 
   access_entries = {
     MemberInfrastructureAccess = {
@@ -111,8 +87,16 @@ module "eks_managed_node_group_system" {
     instance_metadata_tags      = "enabled"
   }
 
-  # Taint to prevent scheduling until Cilium is ready
+  labels = {
+    "compute.data-platform.service.justice.gov.uk/node" = "system"
+  }
+
   taints = {
+    # node-group = {
+    #   key    = "compute.data-platform.service.justice.gov.uk/node"
+    #   value  = "system"
+    #   effect = "NO_SCHEDULE"
+    # }
     cilium = {
       key    = "node.cilium.io/agent-not-ready"
       value  = "true"
