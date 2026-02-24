@@ -595,6 +595,8 @@ locals {
       "/oracle/database/qa11g" = local.secretsmanager_secrets.db_cnom
       "/oracle/weblogic/qa11r" = local.secretsmanager_secrets.web
       "/oracle/database/qa11r" = local.secretsmanager_secrets.db_cnom
+      "/oracle/weblogic/qa19c" = local.secretsmanager_secrets.web
+      "/oracle/database/qa19c" = local.secretsmanager_secrets.db_cnom
     }
   }
 }
