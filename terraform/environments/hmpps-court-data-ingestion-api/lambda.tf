@@ -39,8 +39,8 @@ module "authorizer_lambda" {
     }
     kms = {
       effect    = "Allow"
-      actions   = ["kms:Decrypt"]
-      resources = [module.secrets_kms.key_arn]
+      actions   = ["kms:Decrypt", "kms:GenerateDataKey"]
+      resources = ["*"]
     }
     sqs = {
       effect    = "Allow"
