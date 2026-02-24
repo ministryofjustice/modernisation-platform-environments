@@ -45,7 +45,7 @@ DISKSARRAY=(
 # Wait for disks to appear
 sleep 25
 
-for entry in "${DISKSARRAY[@]}"; do
+for entry in "\${DISKSARRAY[@]}"; do
   IFS=":" read -r disk mount <<< "$entry"
   echo "Processing $disk -> $mount"
   # Ensure directory exists
@@ -131,7 +131,7 @@ sed -i 's/--with system_rust --noclean/--without system_rust --noclean/g' /root/
 env
 make rpm
 sudo yum -y install build/amazon-efs-utils*rpm
-for var in "${EFS_MOUNT_POINT_ARRAY[@]}"; do
+for var in "\${EFS_MOUNT_POINT_ARRAY[@]}"; do
 mkdir $var
 mount -t efs -o tls ${efs_id}:/ $var
 chmod go+rw $var
