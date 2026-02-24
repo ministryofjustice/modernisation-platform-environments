@@ -45,7 +45,9 @@ chmod 775 /oracle
 # Wait for disks to appear
 sleep 25
 
-%{ for entry in DISKSARRAY ~}
+IFS=',' read -r -a DISKS_ARRAY <<< "${DISKSARRAY}"
+
+for entry in "\${DISKS_ARRAY[@]}"; do
   IFS=":" read -r disk mount <<< "$entry"
   echo "Processing $disk -> $mount"
   # Ensure directory exists
@@ -73,7 +75,7 @@ sleep 25
   else
     echo "Entry already exists in /etc/fstab"
   fi
-%{ endfor ~}
+done
 
 deploy_cortex() {
   CORTEX_DIR=/tmp/CortexAgent
@@ -127,14 +129,15 @@ sed -i 's/--with system_rust --noclean/--without system_rust --noclean/g' /root/
 env
 make rpm
 sudo yum -y install build/amazon-efs-utils*rpm
-%{ for var in EFS_MOUNT_POINT_ARRAY ~}
+IFS=',' read -r -a EFS_MP_ARRAY <<< "${EFS_MOUNT_POINT_ARRAY}"
+for var in "\${EFS_MP_ARRAY[@]}"; do
   mkdir $var
   mount -t efs -o tls ${efs_id}:/ $var
   chmod go+rw $var
   # create large file for better EFS performance 
   # https://docs.aws.amazon.com/efs/latest/ug/performance.html
   dd if=/dev/urandom of=$var/large_file_for_efs_performance bs=1024k count=10000
-%{ endfor ~}
+done
 
 rm -fr /root/efs-utils
 
