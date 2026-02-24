@@ -134,7 +134,7 @@ resource "aws_db_instance" "edw_rds_instance" {
 
   # Instance identification
   identifier     = "${local.application_name}-${local.environment}"
-  db_name        = local.application_name
+  db_name        = "edw19c"
   engine         = local.application_data.accounts[local.environment].engine
   engine_version = local.application_data.accounts[local.environment].engine_version
   instance_class = local.application_data.accounts[local.environment].instance_class
