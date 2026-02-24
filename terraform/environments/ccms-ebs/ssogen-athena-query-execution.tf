@@ -1,6 +1,6 @@
 # Execute the create table queries automatically after creation
 resource "null_resource" "execute_create_ssogen_table_queries" {
-  count    = local.is-development || local.is-test ? 1 : 0
+  count = local.is-development || local.is-test ? 1 : 0
   triggers = {
     query_ids = "${aws_athena_named_query.main_table_ssogen[count.index].id}"
   }
