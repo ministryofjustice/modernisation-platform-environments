@@ -27,7 +27,6 @@ module "authorizer_lambda" {
 
   environment_variables = {
     SECRET_ID = module.secret_ingestion_api_auth_token.secret_arn
-    # SQS_URL = "https://sqs.eu-west-2.amazonaws.com/754256621582/calculate-release-dates-team-dev-hmpps_court_data_ingestion_queue"
     SQS_URL = "https://sqs.eu-west-2.amazonaws.com/${data.aws_secretsmanager_secret_version.cloud_platform_account_id.secret_string}/${local.environment_configuration[local.environment].cloud_platform_sqs_queue_name}"
   }
 
@@ -43,11 +42,17 @@ module "authorizer_lambda" {
       actions   = ["kms:Decrypt"]
       resources = [module.secrets_kms.key_arn]
     }
+    sqs = {
+      effect    = "Allow"
+      actions   = ["sqs:sendmessage"]
+      resources = ["arn:aws:sqs:eu-west-2:${data.aws_secretsmanager_secret_version.cloud_platform_account_id.secret_string}:${local.environment_configuration[local.environment].cloud_platform_sqs_queue_name}"]
+    }
   }
 
   # IAM Roles & Policies
   create_role = true
   role_name   = "authorizer-role-mp"
+  
 
   tags = local.tags
 }
@@ -59,44 +64,4 @@ resource "aws_lambda_permission" "apigw_authorizer" {
   function_name = module.authorizer_lambda.lambda_function_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_api_gateway_rest_api.ingestion_api.execution_arn}/authorizers/*"
-}
-
-
-# IAM Role for API Gateway to push to SQS
-module "lamdba_role" {
-  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.58.0"
-
-  create_role       = true
-  role_requires_mfa = false
-
-  role_name = "lambda-sqs-role-mp"
-
-  trusted_role_services = [
-    "apigateway.amazonaws.com"
-  ]
-}
-
-
-resource "aws_iam_role_policy" "lambda_policy" {
-  role = module.lamdba_role.iam_role_name
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect   = "Allow"
-        Action   = "sqs:SendMessage"
-        Resource = "arn:aws:sqs:eu-west-2:${data.aws_secretsmanager_secret_version.cloud_platform_account_id.secret_string}:${local.environment_configuration[local.environment].cloud_platform_sqs_queue_name}"
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "kms:GenerateDataKey",
-          "kms:Decrypt"
-        ]
-        Resource = "*"
-      }
-    ]
-  })
 }
