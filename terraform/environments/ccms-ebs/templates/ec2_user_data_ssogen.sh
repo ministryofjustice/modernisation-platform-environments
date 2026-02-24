@@ -46,7 +46,6 @@ chmod 775 /oracle
 sleep 25
 
 %{ for entry in DISKSARRAY ~}
-# for entry in "${disks[@]}"; do
   IFS=":" read -r disk mount <<< "$entry"
   echo "Processing $disk -> $mount"
   # Ensure directory exists
@@ -100,7 +99,6 @@ if [[ "${deploy_environment}" = "production" ]]; then
 fi
 
 #--Configure EFS
-# EFS_MOUNT_POINT_ARRAY=("/stage" "/u01/shared/product/fmw" "/u01/shared/product/runtime/Domain/aserver" "/u01/shared/product/runtime/Domain/config")
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 export HOME=/root
 . "$HOME/.cargo/env"
@@ -109,8 +107,6 @@ yum -y install git rpm-build make rust cargo openssl-devel gcc gcc-c++ cmake wge
 wget https://go.dev/dl/go1.22.0.linux-amd64.tar.gz
 tar -C /usr/local -xzf go1.22.0.linux-amd64.tar.gz
 echo "export PATH=\$PATH:/usr/local/go/bin" >> /root/.bashrc
-# export PS1="[\u@\h \W]\$"
-# source /root/.bashrc
 rm go1.22.0.linux-amd64.tar.gz
 cd /root
 cmake --version
@@ -132,13 +128,12 @@ env
 make rpm
 sudo yum -y install build/amazon-efs-utils*rpm
 %{ for var in EFS_MOUNT_POINT_ARRAY ~}
-# for var in "\${EFS_MOUNT_POINT_ARRAY[@]}"; 
-mkdir $var
-mount -t efs -o tls ${efs_id}:/ $var
-chmod go+rw $var
-# create large file for better EFS performance 
-# https://docs.aws.amazon.com/efs/latest/ug/performance.html
-dd if=/dev/urandom of=$var/large_file_for_efs_performance bs=1024k count=10000
+  mkdir $var
+  mount -t efs -o tls ${efs_id}:/ $var
+  chmod go+rw $var
+  # create large file for better EFS performance 
+  # https://docs.aws.amazon.com/efs/latest/ug/performance.html
+  dd if=/dev/urandom of=$var/large_file_for_efs_performance bs=1024k count=10000
 %{ endfor ~}
 
 rm -fr /root/efs-utils
