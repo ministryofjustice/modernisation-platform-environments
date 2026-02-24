@@ -13,6 +13,20 @@ locals {
   volume_prefix = local.environment == "production" ? "/CCMS/EBSPROD" : "/CCMS/EBS"
 
   sftp_enabled       = contains(["development", "test"], local.environment)
+
+  disksmount = [
+    "/dev/nvme2n1:/u01/product/fmw",
+    "/dev/nvme3n1:/u01/product/runtime/Domain/mserver",
+    "/dev/nvme4n1:/tmp"
+  ]
+
+  efs_mount_points = [
+    "/stage",
+    "/u01/shared/product/fmw",
+    "/u01/shared/product/runtime/Domain/aserver",
+    "/u01/shared/product/runtime/Domain/config"
+  ]
+  sftp_enabled       = contains(["development","test"], local.environment)
   lambda_folder_name = ["lambda_delivery", "ftp_lambda_layer", "payment_lambda_layer", "cloudwatch_sns_layer", "payment_load_monitor_layer"]
 
   lambda_source_hashes_cloudwatch_alarm_slack_integration = [
