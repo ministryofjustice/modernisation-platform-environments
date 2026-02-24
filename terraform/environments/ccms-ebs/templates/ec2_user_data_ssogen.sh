@@ -43,7 +43,7 @@ DISKSARRAY=(
 )
 
 # Wait for disks to appear
-sleep 5
+sleep 25
 
 for entry in "${DISKSARRAY[@]}"; do
   IFS=":" read -r disk mount <<< "$entry"
