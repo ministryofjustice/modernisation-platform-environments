@@ -6,18 +6,20 @@ data "template_file" "launch-template" {
   count    = local.is-development || local.is-test ? 1 : 0
   template = file("${path.module}/templates/ec2_user_data_ssogen.sh")
   vars = {
-    hostname           = "${local.application_name_ssogen}"
-    deploy_environment = local.environment
-    efs_id             = aws_efs_file_system.storage[count.index].id
+    hostname              = local.application_name_ssogen
+    deploy_environment    = local.environment
+    DISKSARRAY            = local.disksmount
+    EFS_MOUNT_POINT_ARRAY = local.efs_mount_points
+    efs_id                = aws_efs_file_system.storage[count.index].id
   }
 }
 
 resource "aws_launch_template" "ssogen-ec2-launch-template-primary" {
-  count         = local.is-development || local.is-test ? 1 : 0
-  name_prefix   = local.application_name_ssogen
-  image_id      = local.application_data.accounts[local.environment].ssogen_ami_id-1
-  instance_type = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ssogen
-  key_name      = aws_key_pair.ssogen[count.index].key_name
+  count                  = local.is-development || local.is-test ? 1 : 0
+  name_prefix            = local.application_name_ssogen
+  image_id               = local.application_data.accounts[local.environment].ssogen_ami_id-1
+  instance_type          = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ssogen
+  key_name               = aws_key_pair.ssogen[count.index].key_name
   ebs_optimized          = true
   update_default_version = true
 
@@ -111,11 +113,11 @@ resource "aws_launch_template" "ssogen-ec2-launch-template-primary" {
 }
 
 resource "aws_launch_template" "ssogen-ec2-launch-template-secondary" {
-  count         = local.is-development || local.is-test ? 1 : 0
-  name_prefix   = local.application_name_ssogen
-  image_id      = local.application_data.accounts[local.environment].ssogen_ami_id-2
-  instance_type = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ssogen
-  key_name      = aws_key_pair.ssogen[count.index].key_name
+  count                  = local.is-development || local.is-test ? 1 : 0
+  name_prefix            = local.application_name_ssogen
+  image_id               = local.application_data.accounts[local.environment].ssogen_ami_id-2
+  instance_type          = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ssogen
+  key_name               = aws_key_pair.ssogen[count.index].key_name
   ebs_optimized          = true
   update_default_version = true
 
