@@ -1,5 +1,9 @@
 locals {
 
+  delius_oasys_queues_development = {
+    "dev" = {}
+  }
+
   baseline_presets_development = {
     options = {
       # disabling some features in development as the environment gets nuked
