@@ -166,6 +166,7 @@ locals {
         config = merge(local.ec2_autoscaling_groups.web12.config, {
           instance_profile_policies = concat(local.ec2_instances.db.config.instance_profile_policies, [
             "Ec2Qa11GWeblogicPolicy",
+            "Ec2Qa19CWeblogicPolicy",
           ])
         })
         user_data_cloud_init = merge(local.ec2_autoscaling_groups.web12.user_data_cloud_init, {
@@ -381,6 +382,7 @@ locals {
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/dev/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/qa11g/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/qa11r/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/qa19c/*",
             ]
           }
         ]
@@ -429,6 +431,22 @@ locals {
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/qa11r/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/qa11r/weblogic-*",
+            ]
+          }
+        ])
+      }
+      Ec2Qa19CWeblogicPolicy = {
+        description = "Permissions required for QA19C Weblogic EC2s"
+        statements = concat(local.iam_policy_statements_ec2.web, [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/qa19c/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/qa19c/weblogic-*"
             ]
           }
         ])
