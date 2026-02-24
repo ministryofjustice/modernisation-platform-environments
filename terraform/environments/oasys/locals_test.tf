@@ -1,5 +1,7 @@
 locals {
 
+  delius_oasys_queues_test = {}
+
   baseline_presets_test = {
     options = {
 
