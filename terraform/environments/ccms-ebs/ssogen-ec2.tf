@@ -8,8 +8,8 @@ data "template_file" "launch-template" {
   vars = {
     hostname              = local.application_name_ssogen
     deploy_environment    = local.environment
-    DISKSARRAY            = local.disksmount
-    EFS_MOUNT_POINT_ARRAY = local.efs_mount_points
+    DISKSARRAY            = local.disksmount_joined
+    EFS_MOUNT_POINT_ARRAY = local.efs_mount_points_joined
     efs_id                = aws_efs_file_system.storage[count.index].id
   }
 }
