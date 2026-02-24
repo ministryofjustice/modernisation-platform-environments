@@ -25,13 +25,14 @@ exports.handler = async (event) => {
   if (!signatureHeader && event.authorizationToken) {
     signatureHeader = event.authorizationToken;
   }
-  const methodArn = event && event.methodArn;
-
   console.log(`[auth] signiture header present=$${Boolean(signatureHeader)} len=$${signatureHeader ? String(signatureHeader).length : 0} preview=$${preview(signatureHeader)}`);
 
   if (!signatureHeader) {
     console.log("[auth] deny: missing signatureHeader");
-    return generatePolicy("user", "Deny", methodArn);
+    return {
+      statusCode: 403,
+      body: JSON.stringify({ message: "missing signatureHeader" })
+    };
   }
 
   try {
@@ -83,33 +84,24 @@ exports.handler = async (event) => {
       }
       const command = new SendMessageCommand(input);
       const response = await client.send(command);
-      return generatePolicy("user", "Allow", methodArn);
+      return {
+        statusCode: 200
+      };
     }
 
     console.log("[auth] deny: token mismatch", "tokenPreview=", preview(receivedSignature), "secretPreview=", preview(computedSignature));
-    return generatePolicy("user", "Deny", methodArn);
+    return {
+      statusCode: 403,
+      body: JSON.stringify({ message: "Token did not match" })
+    };
 
   } catch (error) {
     console.log("[auth] deny: error verifying token:", error);
-    return generatePolicy("user", "Deny", methodArn);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ message: "error" })
+    };
   } finally {
     console.log("[auth] end");
   }
-};
-
-const generatePolicy = (principalId, effect, resource) => {
-  const authResponse = {};
-  authResponse.principalId = principalId;
-  if (effect && resource) {
-    const policyDocument = {};
-    policyDocument.Version = "2012-10-17";
-    policyDocument.Statement = [];
-    const statementOne = {};
-    statementOne.Action = "execute-api:Invoke";
-    statementOne.Effect = effect;
-    statementOne.Resource = resource;
-    policyDocument.Statement[0] = statementOne;
-    authResponse.policyDocument = policyDocument;
-  }
-  return authResponse;
 };
