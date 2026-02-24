@@ -17,12 +17,16 @@ locals {
     "/dev/nvme4n1:/tmp"
   ]
 
+  disksmount_joined = join(",", local.disksmount)
+
   efs_mount_points = [
     "/stage",
     "/u01/shared/product/fmw",
     "/u01/shared/product/runtime/Domain/aserver",
     "/u01/shared/product/runtime/Domain/config"
   ]
+
+  efs_mount_points_joined = join(",", local.efs_mount_points) 
   sftp_enabled       = contains(["development"], local.environment)
   lambda_folder_name = ["lambda_delivery", "ftp_lambda_layer", "payment_lambda_layer", "cloudwatch_sns_layer", "payment_load_monitor_layer"]
 
