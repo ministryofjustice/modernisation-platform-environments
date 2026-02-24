@@ -47,7 +47,7 @@ sleep 25
 
 IFS=',' read -r -a DISKS_ARRAY <<< "${DISKSARRAY}"
 
-for entry in "\${DISKS_ARRAY[@]}"; do
+for entry in "$${DISKS_ARRAY[@]}"; do
   IFS=":" read -r disk mount <<< "$entry"
   echo "Processing $disk -> $mount"
   # Ensure directory exists
@@ -130,7 +130,7 @@ env
 make rpm
 sudo yum -y install build/amazon-efs-utils*rpm
 IFS=',' read -r -a EFS_MP_ARRAY <<< "${EFS_MOUNT_POINT_ARRAY}"
-for var in "\${EFS_MP_ARRAY[@]}"; do
+for var in "$${EFS_MP_ARRAY[@]}"; do
   mkdir $var
   mount -t efs -o tls ${efs_id}:/ $var
   chmod go+rw $var
