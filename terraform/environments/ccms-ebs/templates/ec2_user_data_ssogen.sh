@@ -1,6 +1,9 @@
 #!/bin/bash
 set -exuo pipefail
 
+# === Set hostname ===
+hostnamectl set-hostname "${hostname}"
+
 # === Base updates and packages ===
 yum update -y
 yum install -y unzip wget curl git lsof tree java-1.8.0-openjdk
