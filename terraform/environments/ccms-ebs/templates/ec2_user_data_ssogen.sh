@@ -1,10 +1,6 @@
 #!/bin/bash
 set -exuo pipefail
 
-# === Set hostname ===
-hostnamectl set-hostname "${hostname}"
-echo "127.0.0.1   ${hostname}" >> /etc/hosts
-
 # === Base updates and packages ===
 yum update -y
 yum install -y unzip wget curl git lsof tree java-1.8.0-openjdk
