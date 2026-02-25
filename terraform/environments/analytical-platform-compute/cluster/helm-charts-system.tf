@@ -270,7 +270,6 @@ resource "helm_release" "ingress_nginx" {
       {
         default_ssl_certificate   = "${kubernetes_namespace.ingress_nginx.metadata[0].name}/default-certificate"
         ingress_hostname          = "ingress.${local.environment_configuration.route53_zone}"
-        ingress_nginx_image_tag   = local.environment_configuration.helm_chart_version.ingress_nginx
         service_monitor_namespace = kubernetes_namespace.ingress_nginx.metadata[0].name
       }
     )
