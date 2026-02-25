@@ -100,7 +100,7 @@ resource "aws_launch_template" "ssogen-ec2-launch-template-primary" {
   tag_specifications {
     resource_type = "instance"
     tags = merge(local.tags,
-      { Name = lower(format("ccms-%s-%s-as1", local.application_name_ssogen, local.environment)) }
+      { Name = lower(format("ec2-ccms-%s-%s-as1", local.application_name_ssogen, local.environment)) }
     )
   }
 
@@ -199,7 +199,7 @@ resource "aws_launch_template" "ssogen-ec2-launch-template-secondary" {
   tag_specifications {
     resource_type = "instance"
     tags = merge(local.tags,
-      { Name = lower(format("ccms-%s-%s-as2", local.application_name_ssogen, local.environment)) }
+      { Name = lower(format("ec2-ccms-%s-%s-as2", local.application_name_ssogen, local.environment)) }
     )
   }
 
