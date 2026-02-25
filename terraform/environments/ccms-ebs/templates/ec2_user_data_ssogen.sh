@@ -66,7 +66,7 @@ for entry in "$${DISKS_ARRAY[@]}"; do
   mount "$disk" "$mount"
 
   # Get UUID for persistent mount
-  uuid=$(blkid -s UUID -o value "$${disk}p1")
+  uuid=$(blkid -s UUID -o value "$${disk}")
   
   # Add to fstab if not already present
   if ! grep -q "$uuid" /etc/fstab; then
