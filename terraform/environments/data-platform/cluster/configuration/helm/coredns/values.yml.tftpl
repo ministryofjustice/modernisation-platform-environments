@@ -9,5 +9,6 @@ nodeSelector:
 
 tolerations:
   - key: compute.data-platform.service.justice.gov.uk/node
-    operator: Exists
+    operator: Equal
+    value: system
     effect: NoSchedule

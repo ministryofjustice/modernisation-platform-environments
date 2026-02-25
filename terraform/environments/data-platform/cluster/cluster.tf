@@ -24,7 +24,78 @@ module "eks" {
     resources = ["secrets"]
   }
 
-  addons = {}
+  addons = {
+    /* Monitoring */
+    aws-guardduty-agent = {
+      addon_version = local.cluster_configuration.addon_versions.aws_guardduty_agent
+    }
+    aws-network-flow-monitoring-agent = {
+      addon_version            = local.cluster_configuration.addon_versions.aws_network_flow_monitoring_agent
+      service_account_role_arn = module.aws_network_flow_monitor_iam_role.arn
+    }
+    eks-node-monitoring-agent = {
+      addon_version = local.cluster_configuration.addon_versions.eks_node_monitoring_agent
+    }
+    /* Identity */
+    eks-pod-identity-agent = {
+      addon_version = local.cluster_configuration.addon_versions.eks_pod_identity_agent
+    }
+    /* Storage */
+    aws-ebs-csi-driver = {
+      addon_version            = local.cluster_configuration.addon_versions.aws_ebs_csi_driver
+      service_account_role_arn = module.ebs_csi_driver_iam_role.arn
+      configuration_values = jsonencode({
+        controller = {
+          nodeSelector = {
+            "compute.data-platform.service.justice.gov.uk/node" = "system"
+          }
+          tolerations = [
+            {
+              key      = "compute.data-platform.service.justice.gov.uk/node"
+              operator = "Equal"
+              value    = "system"
+              effect   = "NoSchedule"
+            }
+          ]
+        }
+        node = {
+          tolerations = [
+            {
+              key      = ""
+              operator = "Exists"
+            }
+          ]
+        }
+      })
+    }
+    aws-efs-csi-driver = {
+      addon_version            = local.cluster_configuration.addon_versions.aws_efs_csi_driver
+      service_account_role_arn = module.efs_csi_driver_iam_role.arn
+      configuration_values = jsonencode({
+        controller = {
+          nodeSelector = {
+            "compute.data-platform.service.justice.gov.uk/node" = "system"
+          }
+          tolerations = [
+            {
+              key      = "compute.data-platform.service.justice.gov.uk/node"
+              operator = "Equal"
+              value    = "system"
+              effect   = "NoSchedule"
+            }
+          ]
+        }
+        node = {
+          tolerations = [
+            {
+              key      = ""
+              operator = "Exists"
+            }
+          ]
+        }
+      })
+    }
+  }
 
   access_entries = {
     MemberInfrastructureAccess = {
@@ -38,7 +109,7 @@ module "eks" {
         }
       }
     }
-    PlatformEngineerAdmin = {
+    PlatformEngineerAAdmin = {
       principal_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/${data.aws_region.current.region}/${one(data.aws_iam_roles.platform_engineer_admin_sso_role.names)}"
       policy_associations = {
         eks-admin = {
@@ -213,3 +284,33 @@ module "eks_managed_node_group_general" {
     enabled = true
   }
 }
+
+# module "karpenter" {
+#   source = "git::https://github.com/terraform-aws-modules/terraform-aws-eks.git//modules/karpenter?ref=42693d40bceb3ad80d49b0574cc3046455c2def6" # v21.15.1
+
+#   cluster_name = module.eks.cluster_name
+
+#   create_pod_identity_association = true
+
+#   namespace = kubernetes_namespace.karpenter.metadata[0].name
+
+#   queue_name                = "${module.eks.cluster_name}-karpenter"
+#   queue_kms_master_key_id   = module.karpenter_sqs_kms.key_arn
+#   queue_managed_sse_enabled = false
+
+#   iam_policy_name = "karpenter"
+#   iam_role_name   = "karpenter"
+#   iam_role_policies = {
+#     KarpenterSQSKMSAccess = module.karpenter_sqs_kms_access_iam_policy.arn
+#   }
+#   enable_inline_policy = true
+
+#   node_iam_role_name = "karpenter"
+#   node_iam_role_additional_policies = {
+#     AmazonSSMManagedInstanceCore  = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+#     CloudWatchAgentServerPolicy   = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+#     EKSClusterLogsKMSAccessPolicy = module.eks_cluster_logs_kms_access_iam_policy.arn
+#   }
+
+#   tags = local.tags
+# }

@@ -87,3 +87,108 @@ module "eks_ebs_kms_key" {
 
   depends_on = [aws_iam_service_linked_role.autoscaling]
 }
+
+module "karpenter_sqs_kms_key" {
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-kms.git?ref=407e3db34a65b384c20ef718f55d9ceacb97a846" # v4.2.0
+
+  aliases               = ["sqs/karpenter"]
+  enable_default_policy = true
+
+  key_statements = [
+    {
+      sid = "AllowAmazonEventBridge"
+      actions = [
+        "kms:GenerateDataKey",
+        "kms:Decrypt"
+      ]
+      resources = ["*"]
+      effect    = "Allow"
+      principals = [
+        {
+          type        = "Service"
+          identifiers = ["events.amazonaws.com"]
+        }
+      ]
+    }
+  ]
+
+  deletion_window_in_days = 7
+}
+
+module "prometheus_kms_key" {
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-kms.git?ref=407e3db34a65b384c20ef718f55d9ceacb97a846" # v4.2.0
+
+  aliases               = ["aps/${local.eks_cluster_name}"]
+  enable_default_policy = true
+
+  key_statements = [
+    {
+      sid = "AllowAmazonManagedPrometheus"
+      actions = [
+        "kms:DescribeKey",
+        "kms:CreateGrant",
+        "kms:GenerateDataKey",
+        "kms:Decrypt"
+      ]
+      resources = ["*"]
+      effect    = "Allow"
+      principals = [
+        {
+          type        = "AWS"
+          identifiers = ["*"]
+        }
+      ]
+      condition = [
+        {
+          test     = "StringEquals"
+          variable = "kms:ViaService"
+          values   = ["aps.${data.aws_region.current.region}.amazonaws.com"]
+        },
+        {
+          test     = "StringEquals"
+          variable = "kms:CallerAccount"
+          values   = [data.aws_caller_identity.current.account_id]
+        }
+      ]
+    }
+  ]
+
+  deletion_window_in_days = 7
+}
+
+module "prometheus_logs_kms_key" {
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-kms.git?ref=407e3db34a65b384c20ef718f55d9ceacb97a846" # v4.2.0
+
+  aliases               = ["logs/aps/${local.eks_cluster_name}"]
+  enable_default_policy = true
+
+  key_statements = [
+    {
+      sid = "AllowCloudWatchLogs"
+      actions = [
+        "kms:Encrypt*",
+        "kms:Decrypt*",
+        "kms:ReEncrypt*",
+        "kms:GenerateDataKey*",
+        "kms:Describe*"
+      ]
+      resources = ["*"]
+      effect    = "Allow"
+      principals = [
+        {
+          type        = "Service"
+          identifiers = ["logs.${data.aws_region.current.region}.amazonaws.com"]
+        }
+      ]
+      condition = [
+        {
+          test     = "ArnEquals"
+          variable = "kms:EncryptionContext:aws:logs:arn"
+          values   = ["arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:${local.aps_log_group_name}*"]
+        }
+      ]
+    }
+  ]
+
+  deletion_window_in_days = 7
+}

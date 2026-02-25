@@ -39,7 +39,8 @@ operator:
     compute.data-platform.service.justice.gov.uk/node: system
   tolerations:
     - key: compute.data-platform.service.justice.gov.uk/node
-      operator: Exists
+      operator: Equal
+      value: system
       effect: NoSchedule
 
 hubble:
@@ -49,7 +50,8 @@ hubble:
       compute.data-platform.service.justice.gov.uk/node: system
     tolerations:
       - key: compute.data-platform.service.justice.gov.uk/node
-        operator: Exists
+        operator: Equal
+        value: system
         effect: NoSchedule
   ui:
     enabled: true
@@ -58,14 +60,16 @@ hubble:
         compute.data-platform.service.justice.gov.uk/node: system
       tolerations:
         - key: compute.data-platform.service.justice.gov.uk/node
-          operator: Exists
+          operator: Equal
+          value: system
           effect: NoSchedule
     backend:
       nodeSelector:
         compute.data-platform.service.justice.gov.uk/node: system
       tolerations:
         - key: compute.data-platform.service.justice.gov.uk/node
-          operator: Exists
+          operator: Equal
+          value: system
           effect: NoSchedule
   # Commenting out for later
   # export:

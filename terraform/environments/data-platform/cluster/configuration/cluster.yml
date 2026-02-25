@@ -2,6 +2,13 @@ environment:
   development:
     kubernetes_version: "1.35"
     bottlerocket_version: "1.55.0-d93bb1b1"
+    addon_versions:
+      aws_ebs_csi_driver: "v1.56.0-eksbuild.1"
+      aws_efs_csi_driver: "v2.3.0-eksbuild.1"
+      aws_guardduty_agent: "v1.12.1-eksbuild.2"
+      aws_network_flow_monitoring_agent: "v1.1.3-eksbuild.1"
+      eks_node_monitoring_agent: "v1.5.1-eksbuild.1"
+      eks_pod_identity_agent: "v1.3.10-eksbuild.2"
     gateway_api_version: "v1.4.1" # https://docs.cilium.io/en/v1.19/network/servicemesh/gateway-api/gateway-api/#cilium-gateway-api-support
     helm_chart_versions:
       cilium: "1.19.1"

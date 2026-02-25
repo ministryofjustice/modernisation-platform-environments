@@ -7,7 +7,8 @@ admissionController:
     compute.data-platform.service.justice.gov.uk/node: system
   tolerations:
     - key: compute.data-platform.service.justice.gov.uk/node
-      operator: Exists
+      operator: Equal
+      value: system
       effect: NoSchedule
 backgroundController:
   replicas: 2
@@ -17,7 +18,8 @@ backgroundController:
     compute.data-platform.service.justice.gov.uk/node: system
   tolerations:
     - key: compute.data-platform.service.justice.gov.uk/node
-      operator: Exists
+      operator: Equal
+      value: system
       effect: NoSchedule
 cleanupController:
   replicas: 2
@@ -27,7 +29,8 @@ cleanupController:
     compute.data-platform.service.justice.gov.uk/node: system
   tolerations:
     - key: compute.data-platform.service.justice.gov.uk/node
-      operator: Exists
+      operator: Equal
+      value: system
       effect: NoSchedule
 reportsController:
   replicas: 2
@@ -37,10 +40,17 @@ reportsController:
     compute.data-platform.service.justice.gov.uk/node: system
   tolerations:
     - key: compute.data-platform.service.justice.gov.uk/node
-      operator: Exists
+      operator: Equal
+      value: system
       effect: NoSchedule
 
 config:
   resourceFiltersExcludeNamespaces:
+    # Default
     - kube-system
+    # Cilium
     - cilium-secrets
+    # AWS GuardDuty EKS addon
+    - amazon-guardduty
+    # AWS Network Flow Monitor EKS addon
+    - amazon-network-flow-monitor
