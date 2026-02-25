@@ -38,7 +38,7 @@ module "eks" {
         }
       }
     }
-    PlatformEngineerAAdmin = {
+    PlatformEngineerAdmin = {
       principal_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/${data.aws_region.current.region}/${one(data.aws_iam_roles.platform_engineer_admin_sso_role.names)}"
       policy_associations = {
         eks-admin = {
