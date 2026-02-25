@@ -27,7 +27,7 @@ data "aws_instance" "ssogen_primary_details" {
   }
   filter {
     name   = "tag:Name"
-    values = [lower(format("ec2-ccms-%s-%s-as1", local.application_name_ssogen, local.environment))]
+    values = [lower(format("ccms-%s-%s-as1", local.application_name_ssogen, local.environment))]
   }
   filter {
     name   = "instance-state-name"
@@ -44,7 +44,7 @@ data "aws_instance" "ssogen_secondary_details" {
   }
   filter {
     name   = "tag:Name"
-    values = [lower(format("ec2-ccms-%s-%s-as2", local.application_name_ssogen, local.environment))]
+    values = [lower(format("ccms-%s-%s-as2", local.application_name_ssogen, local.environment))]
   }
   filter {
     name   = "instance-state-name"
