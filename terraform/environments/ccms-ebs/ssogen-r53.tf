@@ -25,6 +25,8 @@ data "aws_instance" "ssogen_primary_details" {
     name   = "tag:aws:autoscaling:groupName"
     values = [aws_autoscaling_group.ssogen-scaling-group-primary[count.index].name]
   }
+
+  instance_state = "running"
 }
 
 data "aws_instance" "ssogen_secondary_details" {
@@ -34,6 +36,7 @@ data "aws_instance" "ssogen_secondary_details" {
     name   = "tag:aws:autoscaling:groupName"
     values = [aws_autoscaling_group.ssogen-scaling-group-secondary[count.index].name]
   }
+  instance_state = "running"
 }
 
 resource "aws_route53_record" "ssogen_primary" {
