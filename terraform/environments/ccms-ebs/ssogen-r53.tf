@@ -43,6 +43,10 @@ data "aws_instance" "ssogen_secondary_details" {
     name   = "tag:Name"
     values = [lower(format("ccms-%s-%s-as2", local.application_name_ssogen, local.environment))]
   }
+  filter {
+    name   = "instance-state-name"
+    values = ["running"]
+  }
 }
 
 resource "aws_route53_record" "ssogen_primary" {
