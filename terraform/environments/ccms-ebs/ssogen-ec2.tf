@@ -6,7 +6,7 @@ data "template_file" "launch-template1" {
   count    = local.is-development || local.is-test ? 1 : 0
   template = file("${path.module}/templates/ec2_user_data_ssogen.sh")
   vars = {
-    hostname              = lower(format("ccms-%s-%s-as1", local.application_name_ssogen, local.environment))
+    hostname              = lower(format("ccms-%s-as1", local.application_name_ssogen))
     deploy_environment    = local.environment
     DISKSARRAY            = local.disksmount_joined
     EFS_MOUNT_POINT_ARRAY = local.efs_mount_points_joined
@@ -18,7 +18,7 @@ data "template_file" "launch-template2" {
   count    = local.is-development || local.is-test ? 1 : 0
   template = file("${path.module}/templates/ec2_user_data_ssogen.sh")
   vars = {
-    hostname              = lower(format("ccms-%s-%s-as2", local.application_name_ssogen, local.environment))
+    hostname              = lower(format("ccms-%s-as2", local.application_name_ssogen))
     deploy_environment    = local.environment
     DISKSARRAY            = local.disksmount_joined
     EFS_MOUNT_POINT_ARRAY = local.efs_mount_points_joined
