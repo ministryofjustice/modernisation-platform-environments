@@ -151,4 +151,4 @@ ansible --version
 # ansible-playbook -i inventory.ini site.yml --tags level1-server
 
 # === Final logs ===
-echo "SSOGEN instance bootstrap completed for ${hostname}" >> /var/log/user-data.log
+echo "SSOGEN instance bootstrap completed" >> /var/log/user-data.log
