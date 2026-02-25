@@ -127,7 +127,7 @@ make rpm
 sudo yum -y install build/amazon-efs-utils*rpm
 IFS=',' read -r -a EFS_MP_ARRAY <<< "${EFS_MOUNT_POINT_ARRAY}"
 for var in "$${EFS_MP_ARRAY[@]}"; do
-  mkdir $var
+  mkdir -p $var
   mount -t efs -o tls ${efs_id}:/ $var
   chmod go+rw $var
   # create large file for better EFS performance 
