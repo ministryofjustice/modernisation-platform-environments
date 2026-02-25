@@ -141,3 +141,29 @@ module "maatdb_pagerduty_core_alerts" {
   sns_topics                = [aws_sns_topic.maatdb_alerting_topic.name]
   pagerduty_integration_key = local.maatdb_pagerduty_integration_keys[local.maatdb_pagerduty_integration_key_name]
 }
+# create RDS maintenance notification 
+resource "aws_db_event_subscription" "rds_maintenance_notifications" {
+  name       = "${local.application_name}-${local.environment}-rds-maintenance"
+  sns_topic  = aws_sns_topic.maatdb_alerting_topic.arn
+
+  # DB instance only
+  source_type = "db-instance"
+  source_ids  = [module.rds.db_instance_id]
+
+  # This category includes:
+  # - minor version upgrade available
+  # - maintenance scheduled
+  # - maintenance started / completed
+  event_categories = ["maintenance"]
+
+  enabled = true
+
+  tags = merge(local.tags, {
+    Name = "${local.application_name}-${local.environment}-rds-maintenance"
+  })
+
+  depends_on = [
+    module.rds,
+    aws_sns_topic.maatdb_alerting_topic
+  ]
+}
