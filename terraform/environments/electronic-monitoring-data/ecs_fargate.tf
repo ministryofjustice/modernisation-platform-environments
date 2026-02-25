@@ -33,3 +33,16 @@ resource "aws_iam_role_policy_attachment" "ecs_execution_role_policy_attach" {
   role       = aws_iam_role.ecs_execution_role.name
   policy_arn = aws_iam_policy.ecs_execution_policy.arn
 }
+
+resource "aws_iam_role" "ecs_gdpr_execution_role" {
+  name               = "emds-gdpr-execution-role"
+  assume_role_policy = data.aws_iam_policy_document.ecs_assume_policy.json
+}
+resource "aws_iam_policy" "ecs_gdpr_execution_policy" {
+  name   = "emds-gdpr-ecs-execution-role-policy"
+  policy = data.aws_iam_policy_document.ecs_execution_policy.json
+}
+resource "aws_iam_role_policy_attachment" "ecs_gdpr_execution_role_policy_attach" {
+  role       = aws_iam_role.ecs_execution_role.name
+  policy_arn = aws_iam_policy.ecs_gdpr_execution_policy.arn
+}
