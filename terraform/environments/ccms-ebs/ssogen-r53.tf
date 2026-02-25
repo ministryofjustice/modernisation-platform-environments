@@ -23,7 +23,7 @@ data "aws_instance" "ssogen_primary_details" {
 
   filter {
     name   = "tag:aws:autoscaling:groupName"
-    values = [aws_autoscaling_group.ssogen-calling-group-primary[count.index].name]
+    values = [aws_autoscaling_group.ssogen-scaling-group-primary[count.index].name]
   }
 }
 
@@ -32,7 +32,7 @@ data "aws_instance" "ssogen_secondary_details" {
 
   filter {
     name   = "tag:aws:autoscaling:groupName"
-    values = [aws_autoscaling_group.ssogen-calling-group-secondary[count.index].name]
+    values = [aws_autoscaling_group.ssogen-scaling-group-secondary[count.index].name]
   }
 }
 
