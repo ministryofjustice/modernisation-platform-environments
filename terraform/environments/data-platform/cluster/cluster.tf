@@ -89,7 +89,6 @@ module "eks_managed_node_group_system" {
 
   labels = {
     "compute.data-platform.service.justice.gov.uk/node" = "system"
-    "node-role.kubernetes.io/system"                    = "true"
   }
 
   taints = {
@@ -171,7 +170,6 @@ module "eks_managed_node_group_general" {
 
   labels = {
     "compute.data-platform.service.justice.gov.uk/node" = "general"
-    "node-role.kubernetes.io/general"                   = "true"
   }
 
   taints = {
