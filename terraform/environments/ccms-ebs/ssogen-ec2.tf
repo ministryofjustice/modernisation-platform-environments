@@ -49,7 +49,7 @@ resource "aws_launch_template" "ssogen-ec2-launch-template-primary" {
   }
 
   block_device_mappings {
-    device_name = "/dev/sdb1"
+    device_name = "/dev/sdb"
     ebs {
       delete_on_termination = true
       encrypted             = true
@@ -61,7 +61,7 @@ resource "aws_launch_template" "ssogen-ec2-launch-template-primary" {
   }
 
   block_device_mappings {
-    device_name = "/dev/sdc1"
+    device_name = "/dev/sdc"
     ebs {
       delete_on_termination = true
       encrypted             = true
@@ -73,7 +73,7 @@ resource "aws_launch_template" "ssogen-ec2-launch-template-primary" {
   }
 
   block_device_mappings {
-    device_name = "/dev/sdd1"
+    device_name = "/dev/sdd"
     ebs {
       delete_on_termination = true
       encrypted             = true
@@ -147,7 +147,7 @@ resource "aws_launch_template" "ssogen-ec2-launch-template-secondary" {
   }
 
   block_device_mappings {
-    device_name = "/dev/sdb1"
+    device_name = "/dev/sdb"
     ebs {
       delete_on_termination = true
       encrypted             = true
@@ -159,7 +159,7 @@ resource "aws_launch_template" "ssogen-ec2-launch-template-secondary" {
   }
 
   block_device_mappings {
-    device_name = "/dev/sdc1"
+    device_name = "/dev/sdc"
     ebs {
       delete_on_termination = true
       encrypted             = true
@@ -171,7 +171,7 @@ resource "aws_launch_template" "ssogen-ec2-launch-template-secondary" {
   }
 
   block_device_mappings {
-    device_name = "/dev/sdd1"
+    device_name = "/dev/sdd"
     ebs {
       delete_on_termination = true
       encrypted             = true
