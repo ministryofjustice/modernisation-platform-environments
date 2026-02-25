@@ -26,7 +26,10 @@ data "aws_instance" "ssogen_primary_details" {
     values = [aws_autoscaling_group.ssogen-scaling-group-primary[count.index].name]
   }
 
-  instance_state = "running"
+  filter {
+    name   = "tag:Name"
+    values = [lower(format("ccms-%s-%s-as1", local.application_name_ssogen, local.environment))]
+  }
 }
 
 data "aws_instance" "ssogen_secondary_details" {
@@ -36,7 +39,10 @@ data "aws_instance" "ssogen_secondary_details" {
     name   = "tag:aws:autoscaling:groupName"
     values = [aws_autoscaling_group.ssogen-scaling-group-secondary[count.index].name]
   }
-  instance_state = "running"
+  filter {
+    name   = "tag:Name"
+    values = [lower(format("ccms-%s-%s-as2", local.application_name_ssogen, local.environment))]
+  }
 }
 
 resource "aws_route53_record" "ssogen_primary" {
