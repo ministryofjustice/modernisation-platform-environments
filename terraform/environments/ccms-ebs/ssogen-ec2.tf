@@ -82,7 +82,7 @@ resource "aws_launch_template" "ssogen-ec2-launch-template-primary" {
       kms_key_id            = aws_kms_key.ssogen_kms_key[count.index].arn
     }
   }
-  user_data = base64encode(data.template_file.launch-template[count.index].rendered)
+  user_data = base64encode(data.template_file.launch-template[count.index].rendered, {hostname = lower(format("ccms-%s-%s-as1", local.application_name_ssogen, local.environment))})
 
   tag_specifications {
     resource_type = "instance"
@@ -181,7 +181,7 @@ resource "aws_launch_template" "ssogen-ec2-launch-template-secondary" {
     }
   }
 
-  user_data = base64encode(data.template_file.launch-template[count.index].rendered)
+  user_data = base64encode(data.template_file.launch-template[count.index].rendered, {hostname = lower(format("ccms-%s-%s-as2", local.application_name_ssogen, local.environment))})
 
   tag_specifications {
     resource_type = "instance"
