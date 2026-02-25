@@ -2,10 +2,23 @@
 #   is_development = local.environment == "development"
 # }
 
-data "template_file" "launch-template" {
+data "template_file" "launch-template1" {
   count    = local.is-development || local.is-test ? 1 : 0
   template = file("${path.module}/templates/ec2_user_data_ssogen.sh")
   vars = {
+    hostname              = lower(format("ccms-%s-%s-as1", local.application_name_ssogen, local.environment))
+    deploy_environment    = local.environment
+    DISKSARRAY            = local.disksmount_joined
+    EFS_MOUNT_POINT_ARRAY = local.efs_mount_points_joined
+    efs_id                = aws_efs_file_system.storage[count.index].id
+  }
+}
+
+data "template_file" "launch-template2" {
+  count    = local.is-development || local.is-test ? 1 : 0
+  template = file("${path.module}/templates/ec2_user_data_ssogen.sh")
+  vars = {
+    hostname              = lower(format("ccms-%s-%s-as2", local.application_name_ssogen, local.environment))
     deploy_environment    = local.environment
     DISKSARRAY            = local.disksmount_joined
     EFS_MOUNT_POINT_ARRAY = local.efs_mount_points_joined
@@ -82,12 +95,12 @@ resource "aws_launch_template" "ssogen-ec2-launch-template-primary" {
       kms_key_id            = aws_kms_key.ssogen_kms_key[count.index].arn
     }
   }
-  user_data = base64encode(data.template_file.launch-template[count.index].rendered, {hostname = lower(format("ccms-%s-%s-as1", local.application_name_ssogen, local.environment))})
+  user_data = base64encode(data.template_file.launch-template1[count.index].rendered)
 
   tag_specifications {
     resource_type = "instance"
     tags = merge(local.tags,
-      { Name = lower(format("ec2-ccms-%s-%s-as1", local.application_name_ssogen, local.environment)) }
+      { Name = lower(format("ccms-%s-%s-as1", local.application_name_ssogen, local.environment)) }
     )
   }
 
@@ -181,12 +194,12 @@ resource "aws_launch_template" "ssogen-ec2-launch-template-secondary" {
     }
   }
 
-  user_data = base64encode(data.template_file.launch-template[count.index].rendered, {hostname = lower(format("ccms-%s-%s-as2", local.application_name_ssogen, local.environment))})
+  user_data = base64encode(data.template_file.launch-template2[count.index].rendered)
 
   tag_specifications {
     resource_type = "instance"
     tags = merge(local.tags,
-      { Name = lower(format("ec2-ccms-%s-%s-as2", local.application_name_ssogen, local.environment)) }
+      { Name = lower(format("ccms-%s-%s-as2", local.application_name_ssogen, local.environment)) }
     )
   }
 
