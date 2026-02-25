@@ -12,9 +12,9 @@ locals {
 
 
   disksmount = [
-    "/dev/nvme2n1:/u01/product/fmw",
-    "/dev/nvme3n1:/u01/product/runtime/Domain/mserver",
-    "/dev/nvme4n1:/tmp"
+    "/dev/nvme1n1:/u01/product/fmw",
+    "/dev/nvme2n1:/u01/product/runtime/Domain/mserver",
+    "/dev/nvme3n1:/tmp"
   ]
 
   disksmount_joined = join(",", local.disksmount)
