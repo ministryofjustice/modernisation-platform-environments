@@ -44,3 +44,9 @@ data "aws_subnet" "firewall_subnet_details" {
 
   id = each.value
 }
+
+data "aws_route53_zone" "route53_zones" {
+  for_each = toset(local.cluster_configuration.route53_zones)
+
+  name = each.value
+}
