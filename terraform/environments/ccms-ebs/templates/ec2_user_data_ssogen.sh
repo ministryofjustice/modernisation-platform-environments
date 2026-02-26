@@ -128,16 +128,24 @@ sed -i 's/--with system_rust --noclean/--without system_rust --noclean/g' /root/
 env
 make rpm
 sudo yum -y install build/amazon-efs-utils*rpm
+mkdir -p /mnt/efs
+mount -t efs -o tls ${efs_id}:/ /mnt/nfs
 IFS=',' read -r -a EFS_MP_ARRAY <<< "${EFS_MOUNT_POINT_ARRAY}"
+
 for var in "$${EFS_MP_ARRAY[@]}"; do
-  mkdir -p $var
-  mount -t efs -o tls ${efs_id}:$var $var
-  chmod go+rw $var
+  IFS=":" read -r efsmount localmount <<< "$var"
+  mkdir -p /mnt/efs/$efsmount
+  mkdir -p $localmount
+  mount -t efs -o tls ${efs_id}:/$efsmount $localmount
+  chmod go+rw $localmount
   # create large file for better EFS performance 
   # https://docs.aws.amazon.com/efs/latest/ug/performance.html
-  dd if=/dev/urandom of=$var/large_file_for_efs_performance bs=1024k count=10000
+  dd if=/dev/urandom of=$localmount/large_file_for_efs_performance bs=1024k count=10000
+  echo "Adding to /etc/fstab"
+  echo "${efs_id}:/$efsmount $localmount efs _netdev,tls,nofail 0 0" >> /etc/fstab
 done
 
+umount /mnt/efs
 rm -fr /root/efs-utils
 
 #--Hardening to level 1 standard
