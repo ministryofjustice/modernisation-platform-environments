@@ -462,57 +462,23 @@ resource "aws_lb_listener_rule" "em_9500_rule" {
   }
 }
 
-# HTTP Listener on port 9502 for Analytics and Data Visualization
-# resource "aws_lb_listener" "http_9502_listener" {
-#   count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+# HTTP Listener on port 9502 for Analytics and Data Visualization (redirects to HTTPS)
+resource "aws_lb_listener" "http_9502_listener" {
+  count = local.environment == "preproduction" ? 1 : 0
 
-#   load_balancer_arn = module.lb_access_logs_enabled.load_balancer.arn
-#   port              = 9502
-#   protocol          = "HTTP"
+  load_balancer_arn = aws_lb.oas_lb[0].arn
+  port              = 9502
+  protocol          = "HTTP"
 
-#   default_action {
-#     type             = "forward"
-#     target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
-#   }
-# }
-
-# Listener rule for /analytics on port 9502
-# resource "aws_lb_listener_rule" "analytics_9502_rule" {
-#   count = contains(["test", "preproduction"], local.environment) ? 1 : 0
-
-#   listener_arn = aws_lb_listener.http_9502_listener[0].arn
-#   priority     = 100
-
-#   action {
-#     type             = "forward"
-#     target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
-#   }
-
-#   condition {
-#     path_pattern {
-#       values = ["/analytics*"]
-#     }
-#   }
-# }
-
-# Listener rule for /dv on port 9502
-# resource "aws_lb_listener_rule" "dv_9502_rule" {
-#   count = contains(["test", "preproduction"], local.environment) ? 1 : 0
-
-#   listener_arn = aws_lb_listener.http_9502_listener[0].arn
-#   priority     = 101
-
-#   action {
-#     type             = "forward"
-#     target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
-#   }
-
-#   condition {
-#     path_pattern {
-#       values = ["/dv*"]
-#     }
-#   }
-# }
+  default_action {
+    type = "redirect"
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
+  }
+}
 
 # HTTPS Listener rules (keeping for SSL access)
 # Listener rule for /console on HTTPS
