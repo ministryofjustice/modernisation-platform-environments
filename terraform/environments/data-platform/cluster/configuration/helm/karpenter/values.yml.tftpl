@@ -1,0 +1,20 @@
+---
+serviceAccount:
+  name: ${service_account_name}
+
+serviceMonitor:
+  enabled: false
+
+settings:
+  clusterName: ${cluster_name}
+  clusterEndpoint: ${cluster_endpoint}
+  interruptionQueue: ${interruption_queue}
+
+nodeSelector:
+  compute.data-platform.service.justice.gov.uk/node: system
+
+tolerations:
+  - key: compute.data-platform.service.justice.gov.uk/node
+    operator: Equal
+    value: system
+    effect: NoSchedule

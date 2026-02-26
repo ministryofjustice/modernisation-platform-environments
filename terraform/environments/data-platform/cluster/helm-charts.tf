@@ -87,6 +87,79 @@ resource "helm_release" "cluster_autoscaler" {
   depends_on = [module.cluster_autoscaler_iam_role]
 }
 
+resource "helm_release" "karpenter_crd" {
+  /* https://github.com/aws/karpenter-provider-aws/releases */
+  name       = "karpenter-crd"
+  repository = "oci://public.ecr.aws/karpenter"
+  chart      = "karpenter-crd"
+  version    = local.cluster_configuration.helm_chart_versions.karpenter_crd
+  namespace  = module.karpenter_namespace.name
+
+  values = [
+    templatefile(
+      "${path.module}/configuration/helm/karpenter-crd/values.yml.tftpl",
+      {
+        service_namespace = module.karpenter_namespace.name
+      }
+    )
+  ]
+  depends_on = [
+    aws_iam_service_linked_role.spot,
+    module.karpenter
+  ]
+}
+
+resource "helm_release" "karpenter" {
+  /* https://github.com/aws/karpenter-provider-aws/releases */
+  name       = "karpenter"
+  repository = "oci://public.ecr.aws/karpenter"
+  chart      = "karpenter"
+  version    = local.cluster_configuration.helm_chart_versions.karpenter
+  namespace  = module.karpenter_namespace.name
+
+  values = [
+    templatefile(
+      "${path.module}/configuration/helm/karpenter/values.yml.tftpl",
+      {
+        service_account_name = module.karpenter.service_account
+        cluster_name         = module.eks.cluster_name
+        cluster_endpoint     = module.eks.cluster_endpoint
+        interruption_queue   = module.karpenter.queue_name
+      }
+    )
+  ]
+  depends_on = [
+    aws_iam_service_linked_role.spot,
+    module.karpenter,
+    helm_release.karpenter_crd
+  ]
+}
+
+resource "helm_release" "karpenter_configuration" {
+  name      = "karpenter-configuration"
+  chart     = "./src/helm/charts/karpenter-configuration"
+  namespace = module.karpenter_namespace.name
+
+  values = [
+    templatefile(
+      "${path.module}/configuration/helm/karpenter-configuration/values.yml.tftpl",
+      {
+        cluster_name    = module.eks.cluster_name
+        cluster_version = module.eks.cluster_version
+        ebs_kms_key_id  = module.eks_ebs_kms_key.key_id
+        node_role       = module.karpenter.node_iam_role_name
+        node_version    = local.cluster_configuration.bottlerocket_version
+        subnet_ids      = data.aws_subnets.private.ids
+        security_group_ids = [
+          module.eks.cluster_primary_security_group_id,
+          module.node_security_group.security_group_id,
+        ]
+      }
+    )
+  ]
+  depends_on = [helm_release.karpenter]
+}
+
 resource "helm_release" "prometheus" {
   /* https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack */
   name       = "prometheus"

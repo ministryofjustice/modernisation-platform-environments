@@ -28,6 +28,13 @@ module "cert_manager_namespace" {
   name = "cert-manager"
 }
 
+module "karpenter_namespace" {
+  source = "./modules/kubernetes/namespace"
+
+  name = "karpenter"
+}
+
+
 module "external_dns_namespace" {
   source = "./modules/kubernetes/namespace"
 

@@ -204,113 +204,31 @@ module "eks_managed_node_group_system" {
   }
 }
 
-module "eks_managed_node_group_general" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-eks.git//modules/eks-managed-node-group?ref=42693d40bceb3ad80d49b0574cc3046455c2def6" # v21.15.1
+module "karpenter" {
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-eks.git//modules/karpenter?ref=42693d40bceb3ad80d49b0574cc3046455c2def6" # v21.15.1
 
-  name         = "general"
   cluster_name = module.eks.cluster_name
 
-  subnet_ids = data.aws_subnets.private.ids
+  create_pod_identity_association = true
 
-  # Security groups required for nodes to join cluster
-  cluster_primary_security_group_id = module.eks.cluster_primary_security_group_id
-  vpc_security_group_ids            = [module.node_security_group.security_group_id]
+  namespace = module.karpenter_namespace.name
 
-  # Service CIDR required for Bottlerocket user data (EKS default)
-  cluster_service_cidr = "172.20.0.0/16"
+  queue_name                = "${module.eks.cluster_name}-karpenter"
+  queue_kms_master_key_id   = module.karpenter_sqs_kms_key.key_arn
+  queue_managed_sse_enabled = false
 
-  # Instance configuration
-  min_size       = 3
-  max_size       = 10
-  desired_size   = 3
-  instance_types = ["m8g.large"]
+  iam_policy_name = "karpenter"
 
-  # Bottlerocket configuration
-  ami_type                       = "BOTTLEROCKET_ARM_64"
-  use_latest_ami_release_version = false
-  ami_release_version            = local.cluster_configuration.bottlerocket_version
-
-  enable_monitoring = true
-
-  metadata_options = {
-    http_endpoint               = "enabled"
-    http_put_response_hop_limit = 2
-    http_tokens                 = "required"
-    instance_metadata_tags      = "enabled"
+  iam_role_name = "karpenter"
+  iam_role_policies = {
+    KarpenterSQSKMSAccess = module.karpenter_sqs_kms_iam_policy.arn
   }
 
-  labels = {
-    "compute.data-platform.service.justice.gov.uk/node" = "general"
-  }
+  enable_inline_policy = true
 
-  taints = {
-    # node-group = {
-    #   key    = "compute.data-platform.service.justice.gov.uk/node"
-    #   value  = "general"
-    #   effect = "NO_SCHEDULE"
-    # }
-    cilium = {
-      key    = "node.cilium.io/agent-not-ready"
-      value  = "true"
-      effect = "NO_EXECUTE"
-    }
-  }
-
-
-  # EBS volume configuration
-  block_device_mappings = {
-    xvdb = {
-      device_name = "/dev/xvdb"
-      ebs = {
-        volume_size           = 100
-        volume_type           = "gp3"
-        iops                  = 3000
-        throughput            = 150
-        encrypted             = true
-        kms_key_id            = module.eks_ebs_kms_key.key_arn
-        delete_on_termination = true
-      }
-    }
-  }
-
-  # IAM policies for node functionality
-  iam_role_additional_policies = {
+  node_iam_role_name = "karpenter"
+  node_iam_role_additional_policies = {
     AmazonSSMManagedInstanceCore = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
     CloudWatchAgentServerPolicy  = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
   }
-
-  # Enable automatic node repair
-  node_repair_config = {
-    enabled = true
-  }
 }
-
-# module "karpenter" {
-#   source = "git::https://github.com/terraform-aws-modules/terraform-aws-eks.git//modules/karpenter?ref=42693d40bceb3ad80d49b0574cc3046455c2def6" # v21.15.1
-
-#   cluster_name = module.eks.cluster_name
-
-#   create_pod_identity_association = true
-
-#   namespace = kubernetes_namespace.karpenter.metadata[0].name
-
-#   queue_name                = "${module.eks.cluster_name}-karpenter"
-#   queue_kms_master_key_id   = module.karpenter_sqs_kms.key_arn
-#   queue_managed_sse_enabled = false
-
-#   iam_policy_name = "karpenter"
-#   iam_role_name   = "karpenter"
-#   iam_role_policies = {
-#     KarpenterSQSKMSAccess = module.karpenter_sqs_kms_access_iam_policy.arn
-#   }
-#   enable_inline_policy = true
-
-#   node_iam_role_name = "karpenter"
-#   node_iam_role_additional_policies = {
-#     AmazonSSMManagedInstanceCore  = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-#     CloudWatchAgentServerPolicy   = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
-#     EKSClusterLogsKMSAccessPolicy = module.eks_cluster_logs_kms_access_iam_policy.arn
-#   }
-
-#   tags = local.tags
-# }

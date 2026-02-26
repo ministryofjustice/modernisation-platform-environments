@@ -1,0 +1,11 @@
+---
+clusterName:
+clusterVersion:
+
+ebsKmsKeyId:
+
+nodeRole:
+nodeVersion:
+
+subnetSelectorTerms: []
+securityGroupSelectorTerms: []

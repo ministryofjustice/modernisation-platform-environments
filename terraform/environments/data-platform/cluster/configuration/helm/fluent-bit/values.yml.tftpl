@@ -7,6 +7,10 @@ cloudWatchLogs:
   region: ${aws_region}
   logGroupName: ${cloudwatch_log_group_name}
 
+input:
+  extraInputs: |
+    Read_from_Head On
+
 serviceAccount:
   create: true
   name: fluent-bit
