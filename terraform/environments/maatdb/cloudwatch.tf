@@ -141,6 +141,10 @@ module "maatdb_pagerduty_core_alerts" {
   sns_topics                = [aws_sns_topic.maatdb_alerting_topic.name]
   pagerduty_integration_key = local.maatdb_pagerduty_integration_keys[local.maatdb_pagerduty_integration_key_name]
 }
+
+data "aws_db_instance" "this" {
+   db_instance_identifier = "${local.application_name}-${local.environment}"
+  }
 # create RDS maintenance notification 
 resource "aws_db_event_subscription" "rds_maintenance_notifications" {
   name       = "${local.application_name}-${local.environment}-rds-maintenance"
@@ -148,7 +152,7 @@ resource "aws_db_event_subscription" "rds_maintenance_notifications" {
 
   # DB instance only
   source_type = "db-instance"
-  source_ids  = [module.rds.db_instance_identifier]
+  source_ids  = [data.aws_db_instance.this.db_instance_identifier]
 
   # This category includes:
   # - minor version upgrade available
