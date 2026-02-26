@@ -5,7 +5,7 @@ module "chainguard_pull_credentials" {
   source  = "terraform-aws-modules/secrets-manager/aws"
   version = "2.0.1"
 
-  name        = "analytical-platform/compute/chainguard/pull-credentials"
+  name        = "compute/chainguard/pull-credentials"
   description = "Chainguard dockerconfigjson pull credentials for cgr.dev/justice.gov.uk"
 
   secret_string         = jsonencode({ username = "CHANGEME", password = "CHANGEME" })
