@@ -148,7 +148,7 @@ resource "aws_db_event_subscription" "rds_maintenance_notifications" {
 
   # DB instance only
   source_type = "db-instance"
-  source_ids  = [module.rds.db_instance_id]
+  source_ids  = [module.rds.db_instance_identifier]
 
   # This category includes:
   # - minor version upgrade available
