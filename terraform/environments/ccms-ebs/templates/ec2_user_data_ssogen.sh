@@ -27,12 +27,8 @@ wget https://s3.amazonaws.com/amazoncloudwatch-agent/oracle_linux/amd64/latest/a
 rpm -U ./amazon-cloudwatch-agent.rpm
 /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c ssm:cloud-watch-config
 
-# === Optional: Create oracle user & dirs ===
-mkdir -p /oracle
-useradd -g dba -m oracle || true
-chown -R oracle:dba /oracle
-chmod 775 /oracle
-
+# === Optional: Add oracle user to oinstall group ===
+usermod -g oinstall oracle
 # nvme1n1 = first attached volume goes to root
 # nvme2n1 = second attached volume, etc.
 # DISKSARRAY=(
