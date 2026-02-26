@@ -2,7 +2,7 @@
 const crypto = require('crypto');
 const { SecretsManagerClient, GetSecretValueCommand } = require("@aws-sdk/client-secrets-manager");
 const { SQSClient, SendMessageCommand } = require("@aws-sdk/client-sqs");
-const client = new SecretsManagerClient();
+const secretsClient = new SecretsManagerClient();
 let cachedSecret;
 
 function preview(str) {
@@ -25,7 +25,7 @@ exports.handler = async (event) => {
   if (!signatureHeader && event.authorizationToken) {
     signatureHeader = event.authorizationToken;
   }
-  console.log(`[auth] signiture header present=$${Boolean(signatureHeader)} len=$${signatureHeader ? String(signatureHeader).length : 0} preview=$${preview(signatureHeader)}`);
+  console.log(`[auth] signature header present=$${Boolean(signatureHeader)} len=$${signatureHeader ? String(signatureHeader).length : 0} preview=$${preview(signatureHeader)}`);
 
   if (!signatureHeader) {
     console.log("[auth] deny: missing signatureHeader");
@@ -39,7 +39,7 @@ exports.handler = async (event) => {
     if (!cachedSecret) {
       console.log("[auth] fetching secret from Secrets Manager", "SECRET_ID=", process.env.SECRET_ID);
       const command = new GetSecretValueCommand({ SecretId: process.env.SECRET_ID });
-      const response = await client.send(command);
+      const response = await secretsClient.send(command);
       cachedSecret = response.SecretString;
 
       console.log(`[auth] secret fetched len=$${cachedSecret ? String(cachedSecret).length : 0} preview=$${preview(cachedSecret)}`);
@@ -70,18 +70,18 @@ exports.handler = async (event) => {
         Buffer.from(receivedSignature, 'hex'),
         Buffer.from(computedSignature, 'hex')
     );
-    
+
     if (isValid) {
       console.log("[auth] allow: token matched");
       const SQS_URL = process.env.SQS_URL;
       const config = {}; // type is SQSClientConfig
-      const client = new SQSClient(config);
+      const sqsClient = new SQSClient(config);
       const input = { // SendMessageRequest
         QueueUrl: SQS_URL, // required
         MessageBody: rawBody, // required
-      }
+      };
       const command = new SendMessageCommand(input);
-      const response = await client.send(command);
+      const response = await sqsClient.send(command);
       return {
         statusCode: 200
       };

@@ -1,22 +1,16 @@
 
-
-# -------------------------------------------------
-# 3. ZIP Archives (prod / non-prod)
-# -------------------------------------------------
 data "archive_file" "lambda_zip" {
   type        = "zip"
   source_file = "lambda/authorizer.js"
   output_path = "lambda/authorizer.zip"
 }
 
-
 module "authorizer_lambda" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "8.5.0"
 
   function_name    = "hmac-authorizer"
-  description      = "Custom TOKEN authorizer for API Gateway"
-  source_path      = data.archive_file.lambda_zip.output_path
+  description      = "Custom HMAC authorizer and method handler for API Gateway"
   handler          = "authorizer.handler"
   runtime          = "nodejs20.x"
 
@@ -63,5 +57,5 @@ resource "aws_lambda_permission" "apigw_authorizer" {
   action        = "lambda:InvokeFunction"
   function_name = module.authorizer_lambda.lambda_function_name
   principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_api_gateway_rest_api.ingestion_api.execution_arn}/authorizers/*"
+  source_arn    = "${aws_api_gateway_rest_api.ingestion_api.execution_arn}/${aws_api_gateway_method.post.http_method}${aws_api_gateway_resource.ingest.path}"
 }
