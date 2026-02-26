@@ -143,6 +143,7 @@ module "maatdb_pagerduty_core_alerts" {
 }
 
 data "aws_db_instance" "this" {
+   provider = aws.modernisation-platform  
    db_instance_identifier = "${local.application_name}-${local.environment}"
   }
 # create RDS maintenance notification 
