@@ -52,6 +52,8 @@ resource "aws_lb_listener" "this" {
           status_code = redirect.value.status_code
           port        = redirect.value.port
           protocol    = redirect.value.protocol
+          path        = redirect.value.path
+          query       = redirect.value.query
         }
       }
     }
@@ -110,6 +112,8 @@ resource "aws_lb_listener_rule" "this" {
           status_code = redirect.value.status_code
           port        = redirect.value.port
           protocol    = redirect.value.protocol
+          path        = redirect.value.path
+          query       = redirect.value.query
         }
       }
     }

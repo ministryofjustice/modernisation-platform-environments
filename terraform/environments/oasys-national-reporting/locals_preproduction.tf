@@ -361,6 +361,27 @@ locals {
                   }
                 }]
               }
+              legacy-redirect = {
+                priority = 300
+                actions = [{
+                  type = "redirect"
+                  redirect = {
+                    host        = "preproduction.reporting.oasys.service.justice.gov.uk"
+                    path        = "/BOE/BI"
+                    port        = "443"
+                    protocol    = "HTTPS"
+                    query       = ""
+                    status_code = "HTTP_302"
+                  }
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "onr.pp-oasys.az.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
               maintenance = {
                 priority = 999
                 actions = [{
@@ -387,7 +408,7 @@ locals {
 
     patch_manager = {
       patch_schedules = {
-        weds1500  = "cron(00 15 ? * WED *)" # 3pm wed 
+        weds1500  = "cron(00 15 ? * WED *)" # 3pm wed
         thurs1500 = "cron(00 15 ? * THU *)" # 3pm thu
         manual    = "cron(00 21 31 2 ? *)"  # 9pm 31 feb e.g. impossible date to allow for manual patching of otherwise enrolled instances
       }
