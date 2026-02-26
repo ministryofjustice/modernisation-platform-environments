@@ -129,7 +129,7 @@ env
 make rpm
 sudo yum -y install build/amazon-efs-utils*rpm
 mkdir -p /mnt/efs
-mount -t efs -o tls ${efs_id}:/ /mnt/nfs
+mount -t efs -o tls ${efs_id}:/ /mnt/efs
 IFS=',' read -r -a EFS_MP_ARRAY <<< "${EFS_MOUNT_POINT_ARRAY}"
 
 for var in "$${EFS_MP_ARRAY[@]}"; do
