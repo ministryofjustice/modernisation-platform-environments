@@ -193,7 +193,7 @@ module "load_mdss_event_queue" {
   lambda_function_name = module.load_mdss_lambda.lambda_function_name
   bucket_prefix        = local.bucket_prefix
   maximum_concurrency  = 100
-  max_receive_count    = local.load_sqs_max_receive_count
+  max_receive_count    = local.load_mdss_sqs_max_receive_count
 }
 
 module "load_fms_event_queue" {
@@ -206,7 +206,7 @@ module "load_fms_event_queue" {
 }
 
 module "fms_fan_out_event_queue" {
-  count = local.is-development || local.is-test ? 1 : 0
+  count                = local.is-development || local.is-test ? 1 : 0
   source               = "./modules/sqs_s3_lambda_trigger"
   bucket               = module.s3-raw-formatted-data-bucket.bucket
   lambda_function_name = module.fan_out_tags[0].lambda_function_name
@@ -231,7 +231,7 @@ resource "aws_s3_bucket_notification" "load_mdss_event" {
     filter_prefix = "serco/fms"
   }
   dynamic "queue" {
-    for_each = local.is-development || local.is-test ? [1] : [] 
+    for_each = local.is-development || local.is-test ? [1] : []
     content {
       queue_arn     = module.fms_fan_out_event_queue[0].sqs_queue.arn
       events        = ["s3:ObjectTagging:Put"]

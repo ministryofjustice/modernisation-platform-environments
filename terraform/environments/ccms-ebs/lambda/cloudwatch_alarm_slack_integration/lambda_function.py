@@ -365,8 +365,12 @@ class NotificationService:
 
             user_identity = record.get("userIdentity", {})
             principal_id = user_identity.get("principalId", "Unknown Principal")
+            if "rejected" in object_key.lower():
+                emoji = ":broken_heart:"
+            else:             
+                emoji = ":white_check_mark:"
 
-            header = f":white_check_mark: *S3 Object Uploaded on bucket {bucket_name}.*"
+            header = f"{emoji} *S3 Object Uploaded on bucket {bucket_name}.*"
 
             payload = {
                 "blocks": [

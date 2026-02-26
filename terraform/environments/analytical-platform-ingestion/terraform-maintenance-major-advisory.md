@@ -714,10 +714,10 @@ When ready to apply changes, explicitly instruct:
 ### 2026-02-09 - Phase 4: IAM Role Name Preservation Fix
 
 - **Branch**: copilot-major-upgrade/analytical-platform-ingestion-1770207173
-- **Issues Identified**: 
+- **Issues Identified**:
   1. Multiple IAM roles being destroyed and recreated due to missing `use_name_prefix = false` parameter
   2. Multiple IAM policies being replaced due to missing `description = "IAM Policy"` parameter
-- **Root Cause**: 
+- **Root Cause**:
   - **IAM Roles**: IAM module v6 defaults `use_name_prefix = true`, which appends random suffixes to role names
     - During Phase 3 upgrade (commit e3fbb72f7), only long role names received `use_name_prefix = false` to avoid AWS 64-character limit errors
     - Most roles were left with default behaviour, causing Terraform to want to replace `role-name` → `role-name-<random-suffix>`
@@ -725,7 +725,7 @@ When ready to apply changes, explicitly instruct:
   - **IAM Policies**: IAM module v6 `description` parameter changed from `null` default, causing force-replacement
     - All policy modules using `name_prefix` (generates random policy names) but missing explicit `description` parameter
     - Terraform detected description change from `"IAM Policy"` (existing in AWS) to `null` (module default), forcing replacement
-- **Affected Resources**: 
+- **Affected Resources**:
   - **10 IAM role modules** across 4 files:
     - iam-roles.tf: 7 modules
     - transform-iam-roles.tf: 1 module
@@ -735,7 +735,7 @@ When ready to apply changes, explicitly instruct:
     - iam-policies.tf: 7 modules
     - modules/transfer-family/user/main.tf: 1 module
     - modules/transfer-family/user-with-egress/main.tf: 1 module
-- **Fixes Applied**: 
+- **Fixes Applied**:
   1. Added `use_name_prefix = false` to all IAM role modules (excluding /dms directory) to preserve exact existing role names
   2. Added `description = "IAM Policy"` to all IAM policy modules to preserve existing policy descriptions
 - **Files Modified**:
@@ -757,7 +757,7 @@ When ready to apply changes, explicitly instruct:
       2. `laa_data_analysis_replication_iam_role`: Intentional rename from `laa-data-analysis-production-replication` → `laa-analysis-production-repl` (Phase 3 character limit fix)
     - 25 policy attachments recreated due to v5→v6 resource address changes (expected per upgrade guide)
   - All SFTP user roles preserved (cgi-cps, maat-xhibit, meganexususer, opg-restore-ocr, property-concept, sscl-chris-j, sscl-epm, cgi-ssct-sop, essex-police)
-- **Key Learnings**: 
+- **Key Learnings**:
   1. IAM module v6's `use_name_prefix` parameter is a boolean flag controlling whether to append random suffixes, not to be confused with the removed v5 parameter `role_name_prefix`
   2. IAM policy `description` changes force replacement even when policy document is identical - always preserve existing descriptions
 - **Impact**: Significantly reduced blast radius for production deployment
@@ -770,11 +770,11 @@ When ready to apply changes, explicitly instruct:
 
 - **Branch**: copilot-major-upgrade/analytical-platform-ingestion-1770207173
 - **Commit**: e3fbb72f7
-- **Modules Upgraded**: 
+- **Modules Upgraded**:
   - IAM: 24 instances total (v5.58.0/v5.52.2 → v6.4.0)
     - iam-role (formerly iam-assumable-role): 14 instances
     - iam-policy: 10 instances
-- **Files Modified**: 
+- **Files Modified**:
   - iam-roles.tf (7 role modules)
   - iam-policies.tf (7 policy modules)
   - dms/iam-roles.tf (3 role modules)
@@ -810,10 +810,10 @@ When ready to apply changes, explicitly instruct:
 
 - **Branch**: copilot-major-upgrade/analytical-platform-ingestion-1770207173
 - **Commit**: e91d4022e
-- **Modules Upgraded**: 
+- **Modules Upgraded**:
   - SNS: 2 instances (v6.2.0 → v7.1.0)
   - ALB: 1 instance (v9.17.0 → v10.5.0)
-- **Files Modified**: 
+- **Files Modified**:
   - sns.tf (2 modules, updated conditions → condition)
   - network-load-balancers.tf (1 module)
 - **Validation**: ✅ Passed
@@ -826,7 +826,7 @@ When ready to apply changes, explicitly instruct:
 - **Branch**: copilot-major-upgrade/analytical-platform-ingestion-1770207173
 - **Commit**: a6f7608bf
 - **Modules Upgraded**: 19 KMS module instances (v3.1.1 → v4.2.0)
-- **Files Modified**: 
+- **Files Modified**:
   - kms-keys.tf (16 modules)
   - dms/kms-keys.tf (3 modules)
   - modules/dms/kms-keys.tf (1 module - already at v4.2.0)

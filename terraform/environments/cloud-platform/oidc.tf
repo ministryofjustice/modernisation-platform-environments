@@ -236,7 +236,7 @@ module "github_actions_cluster_reminder_oidc_role" {
 
 data "aws_iam_policy_document" "github_actions_cluster_reminder_oidc_policy" {
   statement {
-    sid = "ListEKSClustersAndAccountAlias"
+    sid    = "ListEKSClustersAndAccountAlias"
     effect = "Allow"
     actions = [
       "eks:ListClusters",

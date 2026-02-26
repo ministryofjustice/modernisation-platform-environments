@@ -65,8 +65,8 @@ proxy_config:
     - model_name: azure-${key}
       litellm_params:
         model: azure/${profile.model_id}
-        api_base: os.environ/JUSTICEAI_AZURE_OPENAI_API_BASE
-        api_key: os.environ/JUSTICEAI_AZURE_OPENAI_API_KEY
+        api_base: os.environ/AZURE_OPENAI_API_BASE
+        api_key: os.environ/AZURE_OPENAI_API_KEY
         api_version: ${profile.api_version}
 %{ endfor ~}
 %{ for key, profile in bedrockModels ~}

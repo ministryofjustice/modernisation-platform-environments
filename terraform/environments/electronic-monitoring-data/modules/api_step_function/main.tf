@@ -109,7 +109,7 @@ resource "aws_api_gateway_integration" "step_function_integration" {
   http_method             = aws_api_gateway_method.method.http_method
   integration_http_method = "POST"
   type                    = "AWS"
-  uri                     = "arn:aws:apigateway:${data.aws_region.current.name}:states:action/Start${local.synced}Execution"
+  uri                     = "arn:aws:apigateway:${data.aws_region.current.name}:states:action/Start${var.api_name}${local.synced}Execution"
 
   credentials = aws_iam_role.api_gateway_role.arn
 
