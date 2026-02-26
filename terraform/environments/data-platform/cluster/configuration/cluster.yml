@@ -32,7 +32,7 @@ environment:
     bottlerocket_version: "1.55.0-d93bb1b1"
     addon_versions:
       aws_ebs_csi_driver: "v1.56.0-eksbuild.1"
-      aws_efs_csi_driver: "v2.3.0-eksbuild.1"
+      aws_efs_csi_driver: "v2.3.0-eksbuild.2"
       aws_guardduty_agent: "v1.12.1-eksbuild.2"
       aws_network_flow_monitoring_agent: "v1.1.3-eksbuild.1"
       eks_node_monitoring_agent: "v1.5.2-eksbuild.1"
@@ -49,6 +49,8 @@ environment:
       fluent_bit: "0.2.0"
       cert_manager: "1.19.4"
       external_dns: "1.20.0"
+      karpenter_crd: "1.9.0"
+      karpenter: "1.9.0"
     route53_zones:
       - "test.data-platform.service.justice.gov.uk"
       - "test.ai-gateway.justice.gov.uk"
@@ -58,7 +60,7 @@ environment:
     bottlerocket_version: "1.55.0-d93bb1b1"
     addon_versions:
       aws_ebs_csi_driver: "v1.56.0-eksbuild.1"
-      aws_efs_csi_driver: "v2.3.0-eksbuild.1"
+      aws_efs_csi_driver: "v2.3.0-eksbuild.2"
       aws_guardduty_agent: "v1.12.1-eksbuild.2"
       aws_network_flow_monitoring_agent: "v1.1.3-eksbuild.1"
       eks_node_monitoring_agent: "v1.5.2-eksbuild.1"
@@ -75,6 +77,8 @@ environment:
       fluent_bit: "0.2.0"
       cert_manager: "1.19.4"
       external_dns: "1.20.0"
+      karpenter_crd: "1.9.0"
+      karpenter: "1.9.0"
     route53_zones:
       - "preproduction.data-platform.service.justice.gov.uk"
       - "preproduction.ai-gateway.justice.gov.uk"
@@ -84,7 +88,7 @@ environment:
     bottlerocket_version: "1.55.0-d93bb1b1"
     addon_versions:
       aws_ebs_csi_driver: "v1.56.0-eksbuild.1"
-      aws_efs_csi_driver: "v2.3.0-eksbuild.1"
+      aws_efs_csi_driver: "v2.3.0-eksbuild.2"
       aws_guardduty_agent: "v1.12.1-eksbuild.2"
       aws_network_flow_monitoring_agent: "v1.1.3-eksbuild.1"
       eks_node_monitoring_agent: "v1.5.2-eksbuild.1"
@@ -101,6 +105,8 @@ environment:
       fluent_bit: "0.2.0"
       cert_manager: "1.19.4"
       external_dns: "1.20.0"
+      karpenter_crd: "1.9.0"
+      karpenter: "1.9.0"
     route53_zones:
       - "data-platform.service.justice.gov.uk"
       - "ai-gateway.justice.gov.uk"
