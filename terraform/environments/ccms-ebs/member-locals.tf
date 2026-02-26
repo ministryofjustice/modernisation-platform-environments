@@ -20,10 +20,10 @@ locals {
   disksmount_joined = join(",", local.disksmount)
 
   efs_mount_points = [
-    "/stage",
-    "/u01/shared/product/fmw",
-    "/u01/shared/product/runtime/Domain/aserver",
-    "/u01/shared/product/runtime/Domain/config"
+    "stage:/stage",
+    "fmw:/u01/shared/product/fmw",
+    "aserver:/u01/shared/product/runtime/Domain/aserver",
+    "config:/u01/shared/product/runtime/Domain/config"
   ]
 
   efs_mount_points_joined = join(",", local.efs_mount_points) 
