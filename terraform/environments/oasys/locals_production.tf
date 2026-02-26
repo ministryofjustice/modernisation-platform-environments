@@ -2,6 +2,8 @@ locals {
 
   web_live_side = "b"
 
+  delius_oasys_queues_production = {}
+
   baseline_presets_production = {
     options = {
       db_backup_lifecycle_rule            = "rman_backup_one_month"

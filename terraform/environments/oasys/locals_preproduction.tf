@@ -1,5 +1,7 @@
 locals {
 
+  delius_oasys_queues_preproduction = {}
+
   baseline_presets_preproduction = {
     options = {
       enable_xsiam_cloudwatch_integration = true

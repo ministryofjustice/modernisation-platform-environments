@@ -101,20 +101,10 @@ jobs:
           echo "::add-mask::$BACKEND_NUMBER"
           echo "BACKEND_NUMBER=${BACKEND_NUMBER}" >> $GITHUB_ENV
 
-      - name: Select AWS role based on environment
-        run: |
-          if [[ "${{ inputs.environment }}" == "development" || \
-                "${{ inputs.environment }}" == "test" ]]; then
-            echo "OIDC_ROLE_NAME=github-actions-terraform-dev-test" >> $GITHUB_ENV
-          else
-            echo "OIDC_ROLE_NAME=github-actions" >> $GITHUB_ENV
-          fi
-          echo "Role to be used: ${{ env.OIDC_ROLE_NAME }}"
-
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708  # v5.1.1
+        uses: aws-actions/configure-aws-credentials@8df5847569e6427dd6c4fb1cf565c83acfa8afa7  # v6.0.0
         with:
-          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/${{ env.OIDC_ROLE_NAME }}"
+          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions-environments-read-only"
           role-session-name: githubactionsrolesession
           aws-region: "eu-west-2"
 
@@ -315,16 +305,16 @@ jobs:
 
       - name: Select AWS role based on environment
         run: |
-          if [[ "${{ inputs.environment }}" == "development" || \
-                "${{ inputs.environment }}" == "test" ]]; then
-            echo "OIDC_ROLE_NAME=github-actions-terraform-dev-test" >> $GITHUB_ENV
-          else
+          # Use github-actions role on main branch, dev-test role otherwise
+          if [[ "${GITHUB_REF_NAME}" == "main" ]]; then
             echo "OIDC_ROLE_NAME=github-actions" >> $GITHUB_ENV
+          else
+            echo "OIDC_ROLE_NAME=github-actions-environments-dev-test" >> $GITHUB_ENV
           fi
           echo "Role to be used: ${{ env.OIDC_ROLE_NAME }}"
 
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708  # v5.1.1
+        uses: aws-actions/configure-aws-credentials@8df5847569e6427dd6c4fb1cf565c83acfa8afa7  # v6.0.0
         with:
           role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/${{ env.OIDC_ROLE_NAME }}"
           role-session-name: githubactionsrolesession

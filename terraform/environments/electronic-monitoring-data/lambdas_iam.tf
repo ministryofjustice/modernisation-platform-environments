@@ -922,6 +922,8 @@ data "aws_iam_policy_document" "load_fms_lambda_role_policy_document" {
       "${module.s3-create-a-derived-table-bucket.bucket.arn}/staging/serco_fms${local.db_suffix}_pipeline/*",
       "${module.s3-athena-bucket.bucket.arn}/output/*",
       "${module.s3-athena-bucket.bucket.arn}/*",
+      "${module.s3-raw-formatted-data-bucket.bucket.arn}/serco/fms/validation_rejected/*",
+
     ]
   }
   statement {
@@ -1515,7 +1517,7 @@ data "aws_iam_policy_document" "ears_sars_iam_role_policy_document" {
     ]
     resources = [
       aws_athena_workgroup.ears_sars.arn
-    ] 
+    ]
   }
 
   statement {
@@ -1532,7 +1534,7 @@ data "aws_iam_policy_document" "ears_sars_iam_role_policy_document" {
     resources = [
       "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:catalog",
       "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:database/*",
-      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/*" 
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/*"
     ]
   }
 }
@@ -1560,18 +1562,18 @@ resource "aws_lakeformation_permissions" "ears_sars_db_permissions" {
   principal = aws_iam_role.ears_sars_iam_role[0].arn
 
   database {
-    name = "sar_ear_reports_mart${local.db_suffix}"
+    name = "sar_ear_reports_mart${local.dbt_suffix}"
   }
 
-  permissions = ["SELECT", "DESCRIBE"]
+  permissions = ["DESCRIBE"]
 }
 resource "aws_lakeformation_permissions" "ears_sars_table_permissions" {
   count     = local.is-preproduction ? 1 : 0
   principal = aws_iam_role.ears_sars_iam_role[0].arn
 
   table {
-    database_name = "sar_ear_reports_mart${local.db_suffix}"
-    wildcard              = true
+    database_name = "sar_ear_reports_mart${local.dbt_suffix}"
+    wildcard      = true
   }
 
   permissions = ["SELECT", "DESCRIBE"]

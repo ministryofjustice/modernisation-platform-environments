@@ -6,6 +6,7 @@ locals {
   # RDS
   appstream_cidr             = "10.200.32.0/19"
   cidr_ire_workspace         = "10.200.96.0/19"
+  mojo_vpc_cidr              = "10.184.0.0/14"
   workspaces_cidr            = local.application_data.accounts[local.environment].london_workspace_cidr
   cp_vpc_cidr                = local.application_data.accounts[local.environment].cp_vpc_cidr
   analytic_platform_cidr     = local.application_data.accounts[local.environment].analytic_platform_cidr
