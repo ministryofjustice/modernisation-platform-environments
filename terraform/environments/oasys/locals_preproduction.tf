@@ -319,8 +319,7 @@ locals {
       }
       "pp-oasys.az.justice.gov.uk" = {
         records = [
-          # { name = "onr", type = "A", ttl = "300", records = ["10.40.40.210"] }
-          { name = "onr", type = "A", ttl = "300", records = ["13.43.251.60"] }
+          { name = "onr", type = "A", ttl = "300", records = ["10.40.40.210"] }
         ]
         lb_alias_records = [
           { name = "", type = "A", lbs_map_key = "private" }
