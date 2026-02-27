@@ -56,7 +56,7 @@ resource "aws_lb_target_group" "ssogen_internal_tg_ssogen_console" {
   # deregistration_delay = 60
   health_check {
     enabled             = true
-    path                = "/weblogic/ready"
+    path                = "/"
     protocol            = "HTTP"
     matcher             = "200"
     interval            = 30
