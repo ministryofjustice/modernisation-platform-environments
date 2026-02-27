@@ -1,5 +1,5 @@
 ---
-name: cloud-platform-non-live-hijacked
+name: cloud-platform-non-live
 on:
   push:
     branches:
