@@ -357,6 +357,27 @@ locals {
                   }
                 }]
               }
+              legacy-redirect = {
+                priority = 300
+                actions = [{
+                  type = "redirect"
+                  redirect = {
+                    host        = "reporting.oasys.service.justice.gov.uk"
+                    path        = "/BOE/BI"
+                    port        = "443"
+                    protocol    = "HTTPS"
+                    query       = ""
+                    status_code = "HTTP_302"
+                  }
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "onr.oasys.az.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
               maintenance = {
                 priority = 999
                 actions = [{
