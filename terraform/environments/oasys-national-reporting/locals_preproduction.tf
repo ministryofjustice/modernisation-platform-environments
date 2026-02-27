@@ -357,6 +357,7 @@ locals {
                   host_header = {
                     values = [
                       "preproduction.reporting.oasys.service.justice.gov.uk",
+                      "admin.preproduction.reporting.oasys.service.justice.gov.uk",
                     ]
                   }
                 }]
@@ -424,6 +425,7 @@ locals {
       "preproduction.reporting.oasys.service.justice.gov.uk" = {
         lb_alias_records = [
           { name = "", type = "A", lbs_map_key = "public" },
+          { name = "admin", type = "A", lbs_map_key = "public" },
           { name = "pp-bods", type = "A", lbs_map_key = "public" }
         ],
       }
