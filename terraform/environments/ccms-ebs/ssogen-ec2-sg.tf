@@ -15,7 +15,7 @@ resource "aws_security_group" "ssogen_sg" {
 # ############################################
 # # INGRESS — SSH (22) from WorkSpaces subnets (private)
 # ############################################
-resource "aws_vpc_security_group_ingress_rule" "ing_ssh_workspaces" {
+resource "aws_vpc_security_group_ingress_rule" "ing_console_workspaces" {
   count             = local.is-development || local.is-test ? 1 : 0
   ip_protocol       = "tcp"
   description       = "SSH from WorkSpaces subnets"
