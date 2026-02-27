@@ -26,8 +26,8 @@ locals {
     "config:/u01/shared/product/runtime/Domain/config"
   ]
 
-  efs_mount_points_joined = join(",", local.efs_mount_points) 
-  
+  efs_mount_points_joined = join(",", local.efs_mount_points)
+
   lambda_folder_name = ["lambda_delivery", "ftp_lambda_layer", "payment_lambda_layer", "cloudwatch_sns_layer", "payment_load_monitor_layer"]
 
   lambda_source_hashes_cloudwatch_alarm_slack_integration = [
