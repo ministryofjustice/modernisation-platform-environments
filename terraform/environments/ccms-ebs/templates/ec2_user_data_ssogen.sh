@@ -4,6 +4,11 @@ set -exuo pipefail
 # === Set hostname ===
 hostnamectl set-hostname "${hostname}"
 
+# === Configure resolv.conf ===
+nmcli con modify "System eth0" ipv4.ignore-auto-dns no
+nmcli con modify "System eth0" ipv4.dns-search "${mp_fqdn} eu-west-2.compute.internal"
+nmcli con up "System eth0"
+
 # === Base updates and packages ===
 yum update -y
 yum install -y unzip wget curl git lsof tree java-1.8.0-openjdk
@@ -148,6 +153,7 @@ rm -fr /root/efs-utils
 # git clone https://github.com/srikanththummala0470/RHEL7-CIS.git
 # cd RHEL7-CIS
 # git checkout feature/my-feature
+cd /root
 pip3 install --upgrade pip setuptools wheel
 pip3 install setuptools-rust
 pip3 install cryptography
