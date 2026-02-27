@@ -8,7 +8,6 @@ on:
       - 'terraform/environments/cloud-platform-non-live/**'
       - '.github/workflows/cloud-platform-non-live-hijacked.yml'
       - '.github/reusable_terraform_components_plan_apply_hijacked.yml'
-
   workflow_dispatch:
     inputs:
       action:
