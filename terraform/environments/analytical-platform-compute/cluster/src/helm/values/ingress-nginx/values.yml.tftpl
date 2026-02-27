@@ -1,5 +1,10 @@
 ---
 controller:
+  image:
+    registry: cgr.dev
+    image: justice.gov.uk/ingress-nginx-controller
+    tag: 1.14.3
+    digest: sha256:003c27183b7664b2cfe62ca85508b09005943d404c71702732a71b49f7d244ac
   replicaCount: 3
   ingressClassResource:
     name: default
@@ -26,3 +31,5 @@ controller:
     serviceMonitor:
       enabled: true
       namespace: ${service_monitor_namespace}
+imagePullSecrets:
+    - name: chainguard-pull-secret
