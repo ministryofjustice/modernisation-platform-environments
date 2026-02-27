@@ -20,6 +20,7 @@ data "template_file" "launch-template2" {
   template = file("${path.module}/templates/ec2_user_data_ssogen.sh")
   vars = {
     hostname              = lower(format("ccms-%s-as2", local.application_name_ssogen))
+    mp_fqdn               = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
     deploy_environment    = local.environment
     DISKSARRAY            = local.disksmount_joined
     EFS_MOUNT_POINT_ARRAY = local.efs_mount_points_joined
