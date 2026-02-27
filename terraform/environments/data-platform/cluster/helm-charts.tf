@@ -298,3 +298,19 @@ resource "helm_release" "shared_services_gateway" {
     helm_release.external_dns
   ]
 }
+
+resource "helm_release" "keda" {
+  /* https://artifacthub.io/packages/helm/kedacore/keda */
+
+  name       = "keda"
+  repository = "https://kedacore.github.io/charts"
+  chart      = "keda"
+  version    = "2.19.0"
+  namespace  = module.keda_namespace.name
+  values = [
+    templatefile(
+      "${path.module}/configuration/helm/keda/values.yml.tftpl",
+      {}
+    )
+  ]
+}

@@ -24,6 +24,7 @@ environment:
       external_dns: "1.20.0"
       karpenter_crd: "1.9.0"
       karpenter: "1.9.0"
+      keda: "2.19.0"
     route53_zones:
       - "development.data-platform.service.justice.gov.uk"
       - "development.ai-gateway.justice.gov.uk"
@@ -53,6 +54,7 @@ environment:
       external_dns: "1.20.0"
       karpenter_crd: "1.9.0"
       karpenter: "1.9.0"
+      keda: "2.19.0"
     route53_zones:
       - "test.data-platform.service.justice.gov.uk"
       - "test.ai-gateway.justice.gov.uk"
@@ -82,6 +84,7 @@ environment:
       external_dns: "1.20.0"
       karpenter_crd: "1.9.0"
       karpenter: "1.9.0"
+      keda: "2.19.0"
     route53_zones:
       - "preproduction.data-platform.service.justice.gov.uk"
       - "preproduction.ai-gateway.justice.gov.uk"
@@ -112,6 +115,7 @@ environment:
       external_dns: "1.20.0"
       karpenter_crd: "1.9.0"
       karpenter: "1.9.0"
+      keda: "2.19.0"
     route53_zones:
       - "data-platform.service.justice.gov.uk"
       - "ai-gateway.justice.gov.uk"
