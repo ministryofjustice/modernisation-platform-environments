@@ -165,49 +165,6 @@
               echo "exitcode=${exitcode}" >> $GITHUB_OUTPUT
               (( exitcode == 1 )) && exit 1 || exit 0
 
-          - name: Create Plan PR message (Optional)
-            if: github.event_name == 'pull_request' && steps.plan.outputs.exitcode == '2' && inputs.post_plan_to_pr == true
-            working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
-            run: |
-              comment() {
-                url="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-                len=$(cat tfplan.txt | wc -c)
-                echo '**`${{ env.WORKSPACE_NAME }}`** terraform plan on `${{ github.event_name }}` event [#${{ github.run_number }}]('${url}')'
-                echo
-                echo '```'
-                head -c 65476 tfplan.txt | sed -n '/Terraform will perform/,$p'
-                echo
-                echo '```'
-                if [[ $len -gt 65476 ]]; then
-                  echo "** Truncated output.  See $url for the rest **"
-                fi
-              }
-              echo 'TF_PLAN_OUT<<EOF' >> $GITHUB_ENV
-              comment >> $GITHUB_ENV
-              echo 'EOF' >> $GITHUB_ENV
-
-          - name: Hide Previous PR comment (Optional)
-            if: ${{ github.event_name == 'pull_request' }}
-            working-directory: "scripts/minimise-comments"
-            env:
-              COMMENT_BODY_CONTAINS: "**`${{ env.WORKSPACE_NAME }}`**"
-              PR_NUMBER: "${{ github.event.pull_request.number }}"
-            run: |
-              go build
-              ./minimise-comments
-
-          - name: Post Plan to PR (Optional)
-            if: github.event_name == 'pull_request' && steps.plan.outputs.exitcode == '2' && inputs.post_plan_to_pr == true
-            env:
-              message: "${{ env.TF_PLAN_OUT }}"
-            run: |
-              escaped_message=$(echo "$message" | jq -Rsa .)
-              curl -sS -X POST \
-                -H "Accept: application/vnd.github+json" \
-                -H "Authorization: Bearer ${{ env.GITHUB_TOKEN }}" \
-                "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" \
-                -d '{"body":'"${escaped_message}"'}'
-
       #
       # The "apply" job (only runs if plan_exitcode == 2 => changes present)
       #
