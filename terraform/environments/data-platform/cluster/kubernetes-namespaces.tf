@@ -1,13 +1,19 @@
 module "kyverno_namespace" {
   source = "./modules/kubernetes/namespace"
 
-  name = "kyverno-system"
+  name = "kyverno"
 }
 
 module "cluster_autoscaler_namespace" {
   source = "./modules/kubernetes/namespace"
 
   name = "cluster-autoscaler"
+}
+
+module "cloudwatch_metrics_namespace" {
+  source = "./modules/kubernetes/namespace"
+
+  name = "cloudwatch-metrics"
 }
 
 module "prometheus_namespace" {

@@ -46,6 +46,7 @@ resource "helm_release" "coredns" {
 
 resource "helm_release" "kyverno" {
   /* https://artifacthub.io/packages/helm/kyverno/kyverno */
+
   name       = "kyverno"
   repository = "https://kyverno.github.io/kyverno"
   chart      = "kyverno"
@@ -67,6 +68,7 @@ resource "helm_release" "kyverno" {
 
 resource "helm_release" "cluster_autoscaler" {
   /* https://artifacthub.io/packages/helm/cluster-autoscaler/cluster-autoscaler */
+
   name       = "cluster-autoscaler"
   repository = "https://kubernetes.github.io/autoscaler"
   chart      = "cluster-autoscaler"
@@ -89,6 +91,7 @@ resource "helm_release" "cluster_autoscaler" {
 
 resource "helm_release" "karpenter_crd" {
   /* https://github.com/aws/karpenter-provider-aws/releases */
+
   name       = "karpenter-crd"
   repository = "oci://public.ecr.aws/karpenter"
   chart      = "karpenter-crd"
@@ -111,6 +114,7 @@ resource "helm_release" "karpenter_crd" {
 
 resource "helm_release" "karpenter" {
   /* https://github.com/aws/karpenter-provider-aws/releases */
+
   name       = "karpenter"
   repository = "oci://public.ecr.aws/karpenter"
   chart      = "karpenter"
@@ -160,8 +164,27 @@ resource "helm_release" "karpenter_configuration" {
   depends_on = [helm_release.karpenter]
 }
 
+resource "helm_release" "cloudwatch_metrics" {
+  /* https://artifacthub.io/packages/helm/aws/aws-cloudwatch-metrics */
+
+  name       = "cloudwatch-metrics"
+  repository = "https://aws.github.io/eks-charts"
+  chart      = "aws-cloudwatch-metrics"
+  version    = local.cluster_configuration.helm_chart_versions.cloudwatch_metrics
+  namespace  = module.cloudwatch_metrics_namespace.name
+  values = [
+    templatefile(
+      "${path.module}/configuration/helm/cloudwatch-metrics/values.yml.tftpl",
+      {
+        cluster_name = module.eks.cluster_name
+      }
+    )
+  ]
+}
+
 resource "helm_release" "prometheus" {
   /* https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack */
+
   name       = "prometheus"
   repository = "https://prometheus-community.github.io/helm-charts"
   chart      = "kube-prometheus-stack"
@@ -183,6 +206,7 @@ resource "helm_release" "prometheus" {
 
 resource "helm_release" "fluent_bit" {
   /* https://artifacthub.io/packages/helm/aws/aws-for-fluent-bit */
+
   name       = "fluent-bit"
   repository = "https://aws.github.io/eks-charts"
   chart      = "aws-for-fluent-bit"
@@ -203,6 +227,7 @@ resource "helm_release" "fluent_bit" {
 
 resource "helm_release" "cert_manager" {
   /* https://artifacthub.io/packages/helm/cert-manager/cert-manager */
+
   name       = "cert-manager"
   repository = "https://charts.jetstack.io"
   chart      = "cert-manager"
@@ -237,6 +262,7 @@ resource "helm_release" "cert_manager_issuers" {
 
 resource "helm_release" "external_dns" {
   /* https://artifacthub.io/packages/helm/external-dns/external-dns */
+
   name       = "external-dns"
   repository = "https://kubernetes-sigs.github.io/external-dns"
   chart      = "external-dns"

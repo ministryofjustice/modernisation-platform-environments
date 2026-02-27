@@ -50,3 +50,7 @@ data "aws_route53_zone" "route53_zones" {
 
   name = each.value
 }
+
+data "aws_ssm_parameter" "network_monitor_scope_arn" {
+  name = "/cloudwatch/network-monitor/scope-arn"
+}

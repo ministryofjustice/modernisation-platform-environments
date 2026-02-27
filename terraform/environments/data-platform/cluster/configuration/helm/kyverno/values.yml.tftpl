@@ -44,6 +44,15 @@ reportsController:
       value: system
       effect: NoSchedule
 
+webhooksCleanup:
+  nodeSelector:
+    compute.data-platform.service.justice.gov.uk/node: system
+  tolerations:
+    - key: compute.data-platform.service.justice.gov.uk/node
+      operator: Equal
+      value: system
+      effect: NoSchedule
+
 config:
   resourceFiltersExcludeNamespaces:
     # Default
