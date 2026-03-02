@@ -1,10 +1,8 @@
 locals {
 
   lb_maintenance_message_production = {
-    maintenance_title   = "OASys National Reporting Environment Not Started"
-    maintenance_message = "OASys National Reporting Production environment is powered down until we are ready for final configuration. Please contact <a href=\"https://moj.enterprise.slack.com/archives/C6D94J81E\">#ask-digital-studio-ops</a> slack channel if you need the environment starting."
-    # maintenance_title   = "OASys National Reporting Maintenance Window"
-    # maintenance_message = "OASys National Reporting is currently unavailable due to planned maintenance. Please try again later."
+    maintenance_title   = "OASys National Reporting Maintenance Window"
+    maintenance_message = "OASys National Reporting is currently unavailable due to planned maintenance. Please try again later."
   }
 
   baseline_presets_production = {
