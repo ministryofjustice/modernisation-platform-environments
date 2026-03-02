@@ -86,13 +86,13 @@ resource "aws_security_group_rule" "ingress_traffic_ssogenalb_internal_443_dom1_
 # EGRESS RULES
 #########################################
 
-# Allow outbound HTTPS (4443) only to backend SSOGEN EC2s
+# Allow outbound HTTPS (7777) only to backend SSOGEN EC2s
 resource "aws_vpc_security_group_egress_rule" "egress_ssogen_internal_app_backend" {
   count                        = local.is-development || local.is-test ? 1 : 0
   security_group_id            = aws_security_group.sg_ssogen_internal_alb[count.index].id
-  description                  = "Allow HTTPS (4443) to backend SSOGEN EC2s"
-  from_port                    = 4443
-  to_port                      = 4443
+  description                  = "Allow HTTPS (7777) to backend SSOGEN EC2s"
+  from_port                    = 7777
+  to_port                      = 7777
   ip_protocol                  = "tcp"
   referenced_security_group_id = aws_security_group.ssogen_sg[0].id
 }
