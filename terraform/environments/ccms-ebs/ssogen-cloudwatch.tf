@@ -122,7 +122,7 @@ resource "aws_cloudwatch_metric_alarm" "ssogen_alb_healthyhosts_admin" {
   namespace           = "AWS/ApplicationELB"
   period              = 240
   statistic           = "Average"
-  threshold           = local.application_data.accounts[local.environment].ssogen_no_instances
+  threshold           = 1
   alarm_description   = "Number of healthy hosts in SSOGEN Admin Target Group"
   actions_enabled     = true
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
