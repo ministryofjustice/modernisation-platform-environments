@@ -53,6 +53,7 @@
         # Pass along the "application" and "environment" from the matrix
         application: "${{ github.workflow }}"
         environment: "${{ matrix.target }}"
+        account_environment_override: "${{ matrix.target == 'internal-development' && 'development' || '' }}"  # If the target environment is internal-development, use development for AWS account lookup, otherwise use the target environment
         action: "${{ matrix.action }}"
         component: "${{ matrix.component }}"      # If your strategy workflow also outputs "matrix.component"
       secrets:

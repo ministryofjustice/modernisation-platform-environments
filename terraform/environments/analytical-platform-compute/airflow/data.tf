@@ -9,7 +9,7 @@ data "dns_a_record_set" "mwaa_webserver_vpc_endpoint" {
 # APC VPC
 data "aws_vpc" "apc_vpc" {
   tags = {
-    "Name" = "${var.networking[0].application}-${local.environment}"
+    "Name" = "${var.networking[0].application}-${local.mapped_environment}"
   }
 }
 
@@ -19,7 +19,7 @@ data "aws_subnets" "apc_public_subnets" {
     values = [data.aws_vpc.apc_vpc.id]
   }
   tags = {
-    Name = "${var.networking[0].application}-${local.environment}-public*"
+    Name = "${var.networking[0].application}-${local.mapped_environment}-public*"
   }
 }
 
@@ -29,7 +29,7 @@ data "aws_subnet" "apc_private_subnet_a" {
     values = [data.aws_vpc.apc_vpc.id]
   }
   tags = {
-    Name = "${var.networking[0].application}-${local.environment}-private-${data.aws_region.current.region}a"
+    Name = "${var.networking[0].application}-${local.mapped_environment}-private-${data.aws_region.current.region}a"
   }
 }
 
@@ -39,7 +39,7 @@ data "aws_subnet" "apc_private_subnet_b" {
     values = [data.aws_vpc.apc_vpc.id]
   }
   tags = {
-    Name = "${var.networking[0].application}-${local.environment}-private-${data.aws_region.current.region}b"
+    Name = "${var.networking[0].application}-${local.mapped_environment}-private-${data.aws_region.current.region}b"
   }
 }
 
