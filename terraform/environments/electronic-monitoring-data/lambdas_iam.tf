@@ -922,6 +922,8 @@ data "aws_iam_policy_document" "load_fms_lambda_role_policy_document" {
       "${module.s3-create-a-derived-table-bucket.bucket.arn}/staging/serco_fms${local.db_suffix}_pipeline/*",
       "${module.s3-athena-bucket.bucket.arn}/output/*",
       "${module.s3-athena-bucket.bucket.arn}/*",
+      "${module.s3-raw-formatted-data-bucket.bucket.arn}/serco/fms/validation_rejected/*",
+
     ]
   }
   statement {

@@ -267,7 +267,7 @@ resource "aws_lb" "oas_lb" {
   idle_timeout               = 60
   enable_http2               = true
   drop_invalid_header_fields = true
-  preserve_host_header       = false
+  preserve_host_header       = true
 
   access_logs {
     bucket  = aws_s3_bucket.lb_access_logs[0].id
@@ -463,56 +463,94 @@ resource "aws_lb_listener_rule" "em_9500_rule" {
 }
 
 # HTTP Listener on port 9502 for Analytics and Data Visualization
-# resource "aws_lb_listener" "http_9502_listener" {
-#   count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+resource "aws_lb_listener" "http_9502_listener" {
+  count = local.environment == "preproduction" ? 1 : 0
 
-#   load_balancer_arn = module.lb_access_logs_enabled.load_balancer.arn
-#   port              = 9502
-#   protocol          = "HTTP"
+  load_balancer_arn = aws_lb.oas_lb[0].arn
+  port              = 9502
+  protocol          = "HTTP"
 
-#   default_action {
-#     type             = "forward"
-#     target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
-#   }
-# }
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
+  }
+}
 
 # Listener rule for /analytics on port 9502
-# resource "aws_lb_listener_rule" "analytics_9502_rule" {
-#   count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+resource "aws_lb_listener_rule" "analytics_9502_rule" {
+  count = local.environment == "preproduction" ? 1 : 0
 
-#   listener_arn = aws_lb_listener.http_9502_listener[0].arn
-#   priority     = 100
+  listener_arn = aws_lb_listener.http_9502_listener[0].arn
+  priority     = 200
 
-#   action {
-#     type             = "forward"
-#     target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
-#   }
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
+  }
 
-#   condition {
-#     path_pattern {
-#       values = ["/analytics*"]
-#     }
-#   }
-# }
+  condition {
+    path_pattern {
+      values = ["/analytics*"]
+    }
+  }
+}
 
 # Listener rule for /dv on port 9502
-# resource "aws_lb_listener_rule" "dv_9502_rule" {
-#   count = contains(["test", "preproduction"], local.environment) ? 1 : 0
+resource "aws_lb_listener_rule" "dv_9502_rule" {
+  count = local.environment == "preproduction" ? 1 : 0
 
-#   listener_arn = aws_lb_listener.http_9502_listener[0].arn
-#   priority     = 101
+  listener_arn = aws_lb_listener.http_9502_listener[0].arn
+  priority     = 210
 
-#   action {
-#     type             = "forward"
-#     target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
-#   }
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
+  }
 
-#   condition {
-#     path_pattern {
-#       values = ["/dv*"]
-#     }
-#   }
-# }
+  condition {
+    path_pattern {
+      values = ["/dv*"]
+    }
+  }
+}
+
+# Listener rule for /bi-security-login on port 9502
+resource "aws_lb_listener_rule" "bi_security_login_9502_rule" {
+  count = local.environment == "preproduction" ? 1 : 0
+
+  listener_arn = aws_lb_listener.http_9502_listener[0].arn
+  priority     = 220
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/bi-security-login*"]
+    }
+  }
+}
+
+# Listener rule for /static on port 9502
+resource "aws_lb_listener_rule" "static_9502_rule" {
+  count = local.environment == "preproduction" ? 1 : 0
+
+  listener_arn = aws_lb_listener.http_9502_listener[0].arn
+  priority     = 230
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/static*"]
+    }
+  }
+}
 
 # HTTPS Listener rules (keeping for SSL access)
 # Listener rule for /console on HTTPS

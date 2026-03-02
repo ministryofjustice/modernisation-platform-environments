@@ -50,6 +50,17 @@ resource "aws_security_group" "mojfin" {
   }
 
   dynamic "ingress" {
+    for_each = local.environment != "production" ? [] : [local.mojo_vpc_cidr] # only applying this rule in production
+    content {
+      description = "MoJ Official Device Traffic inbound"
+      from_port   = 1521
+      to_port     = 1521
+      protocol    = "tcp"
+      cidr_blocks = [ingress.value]
+    }
+  }
+
+  dynamic "ingress" {
     for_each = local.environment == "preproduction" ? [] : [local.analytic_platform_cidr]
     content {
       description = "Connectivity Analytic Platform (Airflow) use of Transit Gateway to MoJFin"

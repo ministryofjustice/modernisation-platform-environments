@@ -748,6 +748,8 @@ variable "lbs" {
           status_code = string
           port        = optional(number)
           protocol    = optional(string)
+          path        = optional(string)
+          query       = optional(string)
         }))
       })
       rules = optional(map(object({
@@ -777,6 +779,8 @@ variable "lbs" {
             status_code = string
             port        = optional(number)
             protocol    = optional(string)
+            path        = optional(string)
+            query       = optional(string)
           }))
         }))
         conditions = list(object({
