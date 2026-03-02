@@ -73,34 +73,6 @@ resource "aws_s3_bucket_policy" "default" {
       "Resource": [
         "arn:aws:s3:::${local.yjb_bucket_id}/${local.yjb_s3_folder_landing}/*"
       ]
-    },
-    {
-      "Sid": "",
-      "Effect": "Allow",
-      "Principal": {
-          "AWS": "${var.lambda_arn}"
-      },
-      "Action": [
-        "s3:RestoreObject",
-        "s3:PutObjectTagging",
-        "s3:PutObjectAcl",
-        "s3:PutObject",
-        "s3:GetObjectVersion",
-        "s3:GetObjectAcl",
-        "s3:GetObject",
-        "s3:DeleteObjectVersion",
-        "s3:DeleteObject"
-    ],
-    "Resource": "arn:aws:s3:::${local.yjb_bucket_id}/*"
-    },
-    {
-      "Sid": "",
-      "Effect": "Allow",
-      "Principal": {
-          "AWS": "${var.lambda_arn}"
-    },
-    "Action": "s3:ListBucket",
-    "Resource": "arn:aws:s3:::${local.yjb_bucket_id}/*"
     }
  	]
 }
