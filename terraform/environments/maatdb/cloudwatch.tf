@@ -210,3 +210,13 @@ resource "aws_sns_topic_subscription" "rds_to_slack_lambda" {
   protocol  = "lambda"
   endpoint  = aws_lambda_function.slack_notifier.arn
 }
+
+# Create Lambda Permission 
+
+resource "aws_lambda_permission" "allow_sns_invoke" {
+  statement_id  = "AllowExecutionFromSNS"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.slack_notifier.function_name
+  principal     = "sns.amazonaws.com"
+  source_arn    = aws_sns_topic.maatdb_maintenance_topic.arn
+}
