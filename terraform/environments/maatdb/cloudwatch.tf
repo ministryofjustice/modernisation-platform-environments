@@ -169,3 +169,44 @@ resource "aws_db_event_subscription" "rds_maintenance_notifications" {
     aws_sns_topic.maatdb_alerting_topic
   ]
 }
+
+# Create SNS topic for RDS maintenance event 
+resource "aws_sns_topic" "maatdb_maintenance_topic" {
+  name = "${local.application_name}-${local.environment}-maintenance-topic"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-${local.environment}-maintenance-topic"
+    }
+  )
+}
+
+# RDS to SNS publish policy (not mandatory but safe to have)
+
+data "aws_iam_policy_document" "rds_publish_to_sns" {
+  statement {
+    sid    = "AllowRDSPublish"
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["rds.amazonaws.com"]
+    }
+
+    actions   = ["sns:Publish"]
+    resources = [aws_sns_topic.maatdb_maintenance_topic.arn]
+  }
+}
+
+resource "aws_sns_topic_policy" "rds_publish_policy" {
+  arn    = aws_sns_topic.maatdb_maintenance_topic.arn
+  policy = data.aws_iam_policy_document.rds_publish_to_sns.json
+}
+
+# Create Topic subscription 
+
+resource "aws_sns_topic_subscription" "rds_to_slack_lambda" {
+  topic_arn = aws_sns_topic.maatdb_maintenance_topic.arn
+  protocol  = "lambda"
+  endpoint  = aws_lambda_function.slack_notifier.arn
+}
