@@ -137,7 +137,7 @@ resource "aws_security_group" "mojfin" {
       from_port       = 1521
       to_port         = 1521
       protocol        = "tcp"
-      prefix_list_ids = [aws_ec2_managed_prefix_list.mojfin_allowed_ips.id]
+      prefix_list_ids = [aws_ec2_managed_prefix_list.mojfin_allowed_ips[0].id]
     }
   }
 
