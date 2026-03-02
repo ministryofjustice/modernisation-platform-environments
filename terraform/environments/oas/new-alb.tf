@@ -495,6 +495,25 @@ resource "aws_lb_listener_rule" "analytics_9502_rule" {
   }
 }
 
+# Listener rule for /analytics-ws on port 9502
+resource "aws_lb_listener_rule" "analytics_ws_9502_rule" {
+  count = local.environment == "preproduction" ? 1 : 0
+
+  listener_arn = aws_lb_listener.http_9502_listener[0].arn
+  priority     = 205
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/analytics-ws*"]
+    }
+  }
+}
+
 # Listener rule for /dv on port 9502
 resource "aws_lb_listener_rule" "dv_9502_rule" {
   count = local.environment == "preproduction" ? 1 : 0
@@ -607,6 +626,25 @@ resource "aws_lb_listener_rule" "analytics_https_rule" {
   condition {
     path_pattern {
       values = ["/analytics*"]
+    }
+  }
+}
+
+# Listener rule for /analytics-ws on HTTPS
+resource "aws_lb_listener_rule" "analytics_ws_https_rule" {
+  count = local.environment == "preproduction" ? 1 : 0
+
+  listener_arn = aws_lb_listener.https_listener[0].arn
+  priority     = 205
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/analytics-ws*"]
     }
   }
 }
