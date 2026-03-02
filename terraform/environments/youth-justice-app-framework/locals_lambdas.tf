@@ -84,6 +84,7 @@ locals {
     iam_policy_path   = "lambda_policies/s3-cross-account-replication-role-policy.json"
     policy_template_vars = {
       account_number = local.environment_management.account_ids[terraform.workspace]
+      environment    = local.environment
     }
   }
 
