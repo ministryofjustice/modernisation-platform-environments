@@ -24,14 +24,14 @@ resource "aws_lb_target_group" "ssogen_internal_tg_ssogen_app" {
   count       = local.is-development || local.is-test ? 1 : 0
   name        = lower(format("tg-%s-app", local.application_name_ssogen))
   port        = local.application_data.accounts[local.environment].tg_ssogen_apps_port
-  protocol    = "HTTP"
+  protocol    = "HTTPS"
   vpc_id      = data.aws_vpc.shared.id
   target_type = "instance"
   # deregistration_delay = 60
   health_check {
     enabled             = true
     path                = "/"
-    protocol            = "HTTP"
+    protocol            = "HTTPS"
     matcher             = "200"
     interval            = 30
     timeout             = 5
