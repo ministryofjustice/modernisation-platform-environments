@@ -1,5 +1,5 @@
 ---
-name: cloud-platform-non-live
+name: cloud-platform-non-live-hijacked
 on:
   push:
     branches:
@@ -33,7 +33,7 @@ jobs:
     uses: ./.github/workflows/reusable_terraform_components_strategy.yml
     if: inputs.action != 'destroy'
     with:
-      application: "${{ github.workflow }}"
+      application: "cloud-platform-non-live"
 
   terraform:
     needs: strategy
