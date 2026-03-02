@@ -13,6 +13,12 @@ module "eks" {
   endpoint_private_access = true
   endpoint_public_access  = true
 
+  endpoint_public_access_cidrs = [
+    "51.149.250.0/24",
+    "51.149.251.0/24",
+    "35.176.93.186/32",
+  ]
+
   cloudwatch_log_group_retention_in_days = 30
 
   eks_managed_node_groups = {
