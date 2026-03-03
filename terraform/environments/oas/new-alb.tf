@@ -281,6 +281,7 @@ resource "aws_lb" "oas_lb" {
   enable_http2               = false
   drop_invalid_header_fields = false
   preserve_host_header       = false
+  xff_header_processing_mode = "remove"
 
   access_logs {
     bucket  = aws_s3_bucket.lb_access_logs[0].id
