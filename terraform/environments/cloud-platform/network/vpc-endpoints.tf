@@ -16,7 +16,7 @@ module "vpc_endpoints_security_group" {
 
 module "vpc_vpc-endpoints" {
   source   = "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
-  version  = "6.5.1"
+  version  = "6.6.0"
   for_each = toset(local.vpc_interface_endpoint_service_names)
 
   vpc_id             = module.vpc.vpc_id
