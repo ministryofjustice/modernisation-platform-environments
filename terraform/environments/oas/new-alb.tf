@@ -690,7 +690,7 @@ resource "aws_lb_listener_rule" "bi_security_login_https_rule" {
 }
 
 # Listener rule for /biinfer on HTTPS
-resource "aws_lb_listener_rule" "/biinfer_login_https_rule" {
+resource "aws_lb_listener_rule" "biinfer_login_https_rule" {
   count = local.environment == "preproduction" ? 1 : 0
 
   listener_arn = aws_lb_listener.https_listener[0].arn
