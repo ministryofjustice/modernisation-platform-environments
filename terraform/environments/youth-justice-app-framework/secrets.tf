@@ -175,6 +175,22 @@ resource "aws_secretsmanager_secret_version" "Root_CA_secret" {
   }
 }
 
+resource "aws_secretsmanager_secret" "document_gateway" {
+  #checkov:skip=CKV2_AWS_57:doesn't need rotation
+  name        = "${local.project_name}_document_gateway"
+  description = "Used for document gateway"
+  kms_key_id  = module.kms.key_id
+  tags        = local.tags
+}
+
+resource "aws_secretsmanager_secret_version" "document_gateway" {
+  secret_id     = aws_secretsmanager_secret.document_gateway.id
+  secret_string = "dummy" # InvalidRequestException: You must provide either SecretString or SecretBinary.
+  lifecycle {
+    ignore_changes = [secret_string]
+  }
+}
+
 
 ### Tableau Secrets ###
 ## Secret to hold Tableau administration details
