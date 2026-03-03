@@ -1,5 +1,6 @@
 #trivy:ignore:AVD-AWS-0345: required as per documentation
 data "aws_iam_policy_document" "mwaa_execution_policy" {
+  count = local.create_internal_airflow ? 1 : 0
   statement {
     effect  = "Deny"
     actions = ["s3:ListAllMyBuckets"]
@@ -118,12 +119,13 @@ module "mwaa_execution_iam_policy" {
   version = "5.59.0"
 
   name   = "mwaa-execution"
-  policy = data.aws_iam_policy_document.mwaa_execution_policy.json
+  policy = data.aws_iam_policy_document.mwaa_execution_policy[0].json
 
   tags = local.tags
 }
 
 data "aws_iam_policy_document" "mwaa_ses" {
+  count = local.create_internal_airflow ? 1 : 0
   statement {
     sid    = "AllowSESSendRawEmail"
     effect = "Allow"
@@ -149,12 +151,13 @@ module "mwaa_ses_policy" {
   version = "5.59.0"
 
   name   = "mwaa-ses"
-  policy = data.aws_iam_policy_document.mwaa_ses.json
+  policy = data.aws_iam_policy_document.mwaa_ses[0].json
 
   tags = local.tags
 }
 
 data "aws_iam_policy_document" "gha_moj_ap_airflow" {
+  count = local.create_internal_airflow ? 1 : 0
   statement {
     sid    = "MWAAKMSAccess"
     effect = "Allow"
@@ -204,12 +207,13 @@ module "gha_moj_ap_airflow_iam_policy" {
 
   name = "github-actions-ministryofjustice-analytical-platform-airflow"
 
-  policy = data.aws_iam_policy_document.gha_moj_ap_airflow.json
+  policy = data.aws_iam_policy_document.gha_moj_ap_airflow[0].json
 
   tags = local.tags
 }
 
 data "aws_iam_policy_document" "gha_mojas_airflow" {
+  count = local.create_internal_airflow ? 1 : 0
   statement {
     sid       = "EKSAccess"
     effect    = "Allow"
@@ -228,12 +232,13 @@ module "gha_mojas_airflow_iam_policy" {
 
   name_prefix = "github-actions-mojas-airflow"
 
-  policy = data.aws_iam_policy_document.gha_mojas_airflow.json
+  policy = data.aws_iam_policy_document.gha_mojas_airflow[0].json
 
   tags = local.tags
 }
 
 data "aws_iam_policy_document" "create_airflow_token" {
+  count = local.create_internal_airflow ? 1 : 0
   statement {
     sid       = "CreateAirflowToken"
     effect    = "Allow"
@@ -252,7 +257,7 @@ module "create_airflow_token_iam_policy" {
 
   name_prefix = "create-airflow-token-"
 
-  policy = data.aws_iam_policy_document.create_airflow_token.json
+  policy = data.aws_iam_policy_document.create_airflow_token[0].json
 
   tags = local.tags
 }
