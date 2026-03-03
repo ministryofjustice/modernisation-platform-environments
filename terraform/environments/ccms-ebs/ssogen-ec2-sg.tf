@@ -30,6 +30,18 @@ resource "aws_vpc_security_group_ingress_rule" "ing_console_workspaces" {
 }
 
 # ############################################
+# # INGRESS — 7001 within ec2 instances
+# ############################################
+resource "aws_vpc_security_group_ingress_rule" "ing_console_ec2" {
+  count                        = local.is-development || local.is-test ? 1 : 0
+  ip_protocol                  = "tcp"
+  description                  = "7001 from EC2 instances"
+  security_group_id            = aws_security_group.ssogen_sg[count.index].id
+  from_port                    = 7001
+  to_port                      = 7001
+  referenced_security_group_id = aws_security_group.ssogen_sg[count.index].id
+}
+# ############################################
 # # INGRESS — SSH (22) from WorkSpaces subnets (private)
 # ############################################
 resource "aws_vpc_security_group_ingress_rule" "ing_ssh_workspaces" {
