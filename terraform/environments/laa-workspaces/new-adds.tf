@@ -5,10 +5,10 @@
 resource "aws_directory_service_directory" "workspaces_ad" {
   count = local.environment == "development" ? 1 : 0
 
-  name       = local.workspace_config.ad_directory_name
-  short_name = local.workspace_config.ad_short_name
+  name       = local.application_data.accounts[local.environment].ad_directory_name
+  short_name = local.application_data.accounts[local.environment].ad_short_name
   password   = random_password.ad_admin_password[0].result
-  edition    = local.workspace_config.ad_edition
+  edition    = local.application_data.accounts[local.environment].ad_edition
   type       = "MicrosoftAD"
 
   vpc_settings {

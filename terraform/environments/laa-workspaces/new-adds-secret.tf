@@ -8,7 +8,7 @@ resource "random_password" "ad_admin_password" {
   special = false
 
   keepers = {
-    directory_name = local.workspace_config.ad_directory_name
+    directory_name = local.application_data.accounts[local.environment].ad_directory_name
   }
 
   lifecycle {

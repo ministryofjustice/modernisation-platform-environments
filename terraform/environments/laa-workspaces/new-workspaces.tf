@@ -31,7 +31,7 @@ resource "aws_workspaces_directory" "workspaces" {
     enable_internet_access              = false
     enable_maintenance_mode             = true
     user_enabled_as_local_administrator = false
-    default_ou                          = "OU=Computers,OU=${local.workspace_config.ad_short_name},DC=${replace(local.workspace_config.ad_directory_name, ".", ",DC=")}"
+    default_ou                          = "OU=Computers,OU=${local.application_data.accounts[local.environment].ad_short_name},DC=${replace(local.application_data.accounts[local.environment].ad_directory_name, ".", ",DC=")}"
   }
 
   ip_group_ids = [aws_workspaces_ip_group.workspaces[0].id]
@@ -79,7 +79,7 @@ resource "aws_workspaces_ip_group" "workspaces" {
 #   for_each = local.environment == "development" ? local.workspace_users : {}
 #
 #   directory_id = aws_workspaces_directory.workspaces[0].id
-#   bundle_id    = local.workspace_config.workspace_bundle_id
+#   bundle_id    = local.application_data.accounts[local.environment].workspace_bundle_id
 #   user_name    = each.key
 #
 #   root_volume_encryption_enabled = true
