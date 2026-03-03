@@ -24,12 +24,12 @@ locals {
       security_groups = []
     }
     "lb_ingress_443" = {
-      description     = "Loadbalancer ingress rule for HTTPS from MOJO devices and LZ Shared-Service Workspaces"
+      description     = "Loadbalancer ingress rule for HTTPS from MOJO devices, LZ Shared-Service Workspaces and OAS EC2 Instance"
       from_port       = 443
       to_port         = 443
       protocol        = "tcp"
       cidr_blocks     = local.moj_cidr_blocks
-      security_groups = []
+      security_groups = [aws_security_group.ec2_sg]
     }
     "lb_ingress_9500" = {
       description     = "Loadbalancer ingress rule for HTTP 9500 (Console/EM)"
