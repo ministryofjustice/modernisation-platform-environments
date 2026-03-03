@@ -59,6 +59,20 @@ resource "aws_vpc_security_group_ingress_rule" "ing_ssh_workspaces" {
 }
 
 # #########################################
+# # SSOGEN Security Group — Allow outbound 7001 from EC2 to EC2 (self)
+# #########################################
+
+resource "aws_vpc_security_group_egress_rule" "from_ec2_to_ec2" {
+  count                        = local.is-development || local.is-test ? 1 : 0
+  security_group_id            = aws_security_group.ssogen_sg[count.index].id
+  description                  = "Allow outbound to RDS"
+  from_port                    = 1521
+  to_port                      = 1521
+  ip_protocol                  = "tcp"
+  referenced_security_group_id = aws_security_group.ssogen_sg[count.index].id
+}
+
+# #########################################
 # # SSOGEN Security Group — Allow inbound 7001 from ALB
 # #########################################
 
