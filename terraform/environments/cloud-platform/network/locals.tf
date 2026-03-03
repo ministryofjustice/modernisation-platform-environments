@@ -36,6 +36,7 @@ locals {
     "ecr.api",           # ECR (API)
     "ecr.dkr",           # ECR (Docker)
     "eks",               # EKS
+    "eks-auth",          # EKS Auth
     "elasticache",       # ElastiCache
     "email-smtp",        # SES
     "events",            # CloudWatch Events
@@ -48,6 +49,7 @@ locals {
     "logs",              # CloudWatch Logs
     "macie2",            # AWS Macie
     "rds",               # RDS
+    "rds-data",          # RDS Data
     "secretsmanager",    # Secrets Manager
     "securityhub",       # Security Hub
     "sns",               # SNS
