@@ -68,7 +68,7 @@ data "aws_iam_policy_document" "mwaa_execution_policy" {
       "kms:GenerateDataKey*",
       "kms:Encrypt"
     ]
-    resources = [module.mwaa_kms.key_arn]
+    resources = [module.mwaa_kms[0].key_arn]
     condition {
       test     = "StringLike"
       variable = "kms:ViaService"
@@ -110,6 +110,7 @@ data "aws_iam_policy_document" "mwaa_execution_policy" {
 }
 
 module "mwaa_execution_iam_policy" {
+  count = local.create_internal_airflow ? 1 : 0
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
@@ -140,6 +141,7 @@ data "aws_iam_policy_document" "mwaa_ses" {
 }
 
 module "mwaa_ses_policy" {
+  count = local.create_internal_airflow ? 1 : 0
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
@@ -163,7 +165,7 @@ data "aws_iam_policy_document" "gha_moj_ap_airflow" {
       "kms:GenerateDataKey*",
       "kms:Describe*"
     ]
-    resources = [module.mwaa_kms.key_arn]
+    resources = [module.mwaa_kms[0].key_arn]
   }
   statement {
     sid    = "MWAABucketAccess"
@@ -172,7 +174,7 @@ data "aws_iam_policy_document" "gha_moj_ap_airflow" {
       "s3:ListBucket",
       "s3:GetBucketLocation"
     ]
-    resources = [module.mwaa_bucket.s3_bucket_arn]
+    resources = [module.mwaa_bucket[0].s3_bucket_arn]
   }
   statement {
     sid    = "MWAAS3WriteAccess"
@@ -182,7 +184,7 @@ data "aws_iam_policy_document" "gha_moj_ap_airflow" {
       "s3:GetObject",
       "s3:DeleteObject"
     ]
-    resources = ["${module.mwaa_bucket.s3_bucket_arn}/*"]
+    resources = ["${module.mwaa_bucket[0].s3_bucket_arn}/*"]
   }
   statement {
     sid       = "EKSAccess"
@@ -193,6 +195,7 @@ data "aws_iam_policy_document" "gha_moj_ap_airflow" {
 }
 
 module "gha_moj_ap_airflow_iam_policy" {
+  count = local.create_internal_airflow ? 1 : 0
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
@@ -216,6 +219,7 @@ data "aws_iam_policy_document" "gha_mojas_airflow" {
 }
 
 module "gha_mojas_airflow_iam_policy" {
+  count = local.create_internal_airflow ? 1 : 0
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
@@ -234,11 +238,12 @@ data "aws_iam_policy_document" "create_airflow_token" {
     sid       = "CreateAirflowToken"
     effect    = "Allow"
     actions   = ["airflow:CreateCliToken"]
-    resources = [aws_mwaa_environment.main.arn]
+    resources = [aws_mwaa_environment.main[0].arn]
   }
 }
 
 module "create_airflow_token_iam_policy" {
+  count = local.create_internal_airflow ? 1 : 0
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 

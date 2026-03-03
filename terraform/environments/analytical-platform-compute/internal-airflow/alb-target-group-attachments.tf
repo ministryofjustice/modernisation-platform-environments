@@ -1,4 +1,5 @@
 resource "aws_lb_target_group" "internal_airflow_mwaa" {
+  count = local.create_internal_airflow ? 1 : 0
   name_prefix = "iaf-"
   port        = 443
   protocol    = "HTTPS"
@@ -17,11 +18,12 @@ resource "aws_lb_target_group" "internal_airflow_mwaa" {
 }
 
 resource "aws_lb_listener_rule" "internal_airflow_host" {
+  count        = local.create_internal_airflow ? 1 : 0
   listener_arn = data.aws_lb_listener.mwaa_https.arn
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.internal_airflow_mwaa.arn
+    target_group_arn = aws_lb_target_group.internal_airflow_mwaa[0].arn
   }
 
   condition {
@@ -32,9 +34,9 @@ resource "aws_lb_listener_rule" "internal_airflow_host" {
 }
 
 resource "aws_lb_target_group_attachment" "internal_airflow_mwaa_webserver" {
-  for_each = toset(data.dns_a_record_set.mwaa_webserver_vpc_endpoint.addrs)
+  count = local.create_internal_airflow ? length(local.mwaa_private_subnet_ids) : 0
 
-  target_group_arn = aws_lb_target_group.internal_airflow_mwaa.arn
-  target_id        = each.value
+  target_group_arn = aws_lb_target_group.internal_airflow_mwaa[0].arn
+  target_id        = data.dns_a_record_set.mwaa_webserver_vpc_endpoint[0].addrs[count.index]
   port             = 443
 }

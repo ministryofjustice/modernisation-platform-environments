@@ -1,9 +1,11 @@
 data "aws_vpc_endpoint" "mwaa_webserver" {
-  service_name = aws_mwaa_environment.main.webserver_vpc_endpoint_service
+  count        = local.create_internal_airflow ? 1 : 0
+  service_name = aws_mwaa_environment.main[0].webserver_vpc_endpoint_service
 }
 
 data "dns_a_record_set" "mwaa_webserver_vpc_endpoint" {
-  host = data.aws_vpc_endpoint.mwaa_webserver.dns_entry[0].dns_name
+  count = local.create_internal_airflow ? 1 : 0
+  host  = data.aws_vpc_endpoint.mwaa_webserver[0].dns_entry[0].dns_name
 }
 
 data "aws_lb" "mwaa" {

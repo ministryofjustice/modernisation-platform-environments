@@ -1,11 +1,12 @@
 module "airflow_requirements_object" {
+  count = local.create_internal_airflow ? 1 : 0
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws//modules/object"
   version = "5.2.0"
 
-  bucket        = module.mwaa_bucket.s3_bucket_id
+  bucket        = module.mwaa_bucket[0].s3_bucket_id
   key           = "requirements.txt"
   file_source   = "src/airflow/requirements.txt"
   source_hash   = filemd5("src/airflow/requirements.txt")
@@ -15,13 +16,14 @@ module "airflow_requirements_object" {
 }
 
 module "airflow_kube_config_object" {
+  count = local.create_internal_airflow ? 1 : 0
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws//modules/object"
   version = "5.2.0"
 
-  bucket = module.mwaa_bucket.s3_bucket_id
+  bucket = module.mwaa_bucket[0].s3_bucket_id
   key    = "dags/.kube/config"
   content = templatefile("${path.module}/src/airflow/kube_config", {
     cluster_name                       = data.aws_eks_cluster.apc_cluster.name
@@ -34,13 +36,14 @@ module "airflow_kube_config_object" {
 }
 
 module "airflow_plugins_object" {
+  count = local.create_internal_airflow ? 1 : 0
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws//modules/object"
   version = "5.2.0"
 
-  bucket        = module.mwaa_bucket.s3_bucket_id
+  bucket        = module.mwaa_bucket[0].s3_bucket_id
   key           = "plugins.zip"
   file_source   = "plugins.zip"
   source_hash   = data.archive_file.airflow_plugins.output_md5

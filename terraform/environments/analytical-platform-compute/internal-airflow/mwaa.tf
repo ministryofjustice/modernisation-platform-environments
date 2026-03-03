@@ -1,19 +1,20 @@
 resource "aws_mwaa_environment" "main" {
+  count                           = local.create_internal_airflow ? 1 : 0
   name                            = "internal-${local.environment}"
   airflow_version                 = local.environment_configuration.airflow_version
   environment_class               = local.environment_configuration.airflow_environment_class
   weekly_maintenance_window_start = "SAT:01:00"
 
-  execution_role_arn = module.mwaa_execution_iam_role.iam_role_arn
+  execution_role_arn = module.mwaa_execution_iam_role[0].iam_role_arn
 
-  kms_key = module.mwaa_kms.key_arn
+  kms_key = module.mwaa_kms[0].key_arn
 
-  source_bucket_arn              = module.mwaa_bucket.s3_bucket_arn
+  source_bucket_arn              = module.mwaa_bucket[0].s3_bucket_arn
   dag_s3_path                    = "dags/"
   requirements_s3_path           = "requirements.txt"
-  requirements_s3_object_version = module.airflow_requirements_object.s3_object_version_id
+  requirements_s3_object_version = module.airflow_requirements_object[0].s3_object_version_id
   plugins_s3_path                = "plugins.zip"
-  plugins_s3_object_version      = module.airflow_plugins_object.s3_object_version_id
+  plugins_s3_object_version      = module.airflow_plugins_object[0].s3_object_version_id
 
   max_workers = local.environment_configuration.airflow_max_workers
   min_workers = local.environment_configuration.airflow_min_workers
@@ -28,8 +29,8 @@ resource "aws_mwaa_environment" "main" {
     "smtp.smtp_host"                     = "email-smtp.${data.aws_region.current.region}.amazonaws.com"
     "smtp.smtp_port"                     = 587
     "smtp.smtp_starttls"                 = 1
-    "smtp.smtp_user"                     = module.mwaa_ses_iam_user.iam_access_key_id
-    "smtp.smtp_password"                 = module.mwaa_ses_iam_user.iam_access_key_ses_smtp_password_v4
+    "smtp.smtp_user"                     = module.mwaa_ses_iam_user[0].iam_access_key_id
+    "smtp.smtp_password"                 = module.mwaa_ses_iam_user[0].iam_access_key_ses_smtp_password_v4
     "smtp.smtp_mail_from"                = "noreply@${local.environment_configuration.route53_zone}"
     "webserver.warn_deployment_exposure" = 0
     "webserver.base_url"                 = "internal-airflow.${local.environment_configuration.route53_zone}"
@@ -37,7 +38,7 @@ resource "aws_mwaa_environment" "main" {
   }
 
   network_configuration {
-    security_group_ids = [module.mwaa_security_group.security_group_id]
+    security_group_ids = [module.mwaa_security_group[0].security_group_id]
     subnet_ids = [
       data.aws_subnet.apc_private_subnet_a.id,
       data.aws_subnet.apc_private_subnet_b.id
