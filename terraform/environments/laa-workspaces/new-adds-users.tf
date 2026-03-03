@@ -13,7 +13,7 @@ resource "terraform_data" "ad_users" {
     first_name   = each.value.first_name
     last_name    = each.value.last_name
     email        = each.value.email
-    region       = data.aws_region.current.name
+    region       = local.application_data.accounts[local.environment].region
   }
 
   provisioner "local-exec" {
