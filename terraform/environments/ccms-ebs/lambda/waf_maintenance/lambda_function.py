@@ -1,6 +1,7 @@
 # This AWS Lambda function toggles a WAF rule between BLOCK and ALLOW modes,
 # Display a custom HTML response body when blocking requests and remove it for Allow mode.
 
+import json
 import os
 import re
 import copy
@@ -45,24 +46,34 @@ def _get_required_env(name: str) -> str:
 
 
 # Configuration
-WEB_ACL_NAME: str = _get_required_env("WEB_ACL_NAME")
-WEB_ACL_ID: str = _get_required_env("WEB_ACL_ID")
-RULE_NAME: str = _get_required_env("RULE_NAME")
+WAFS =json.loads(os.environ.get("WAF_CONFIG", "[]"))
 
 ScopeLiteral = Literal["REGIONAL", "CLOUDFRONT"]
-_raw_scope = os.environ.get("SCOPE", "REGIONAL").upper()
-if _raw_scope not in ("REGIONAL", "CLOUDFRONT"):
-    raise ValueError(
-        f"Unsupported SCOPE '{_raw_scope}'. Must be 'REGIONAL' or 'CLOUDFRONT'."
-    )
-SCOPE: ScopeLiteral = cast(ScopeLiteral, _raw_scope)
+for item_name, item_cfg in WAFS.items():
+    if item_name not in ("ebs", "ssogen"):
+        raise ValueError(f"Invalid WAF_CONFIG key: '{item_name}'. Expected 'ebs' or 'ssogen'.")
+    if item_name == "ebs":
+        EBS_WEB_ACL_NAME: str = item_cfg["WEB_ACL_NAME"]
+        EBS_WEB_ACL_ID: str = item_cfg["WEB_ACL_ID"]
+        EBS_RULE_NAME: str = item_cfg["RULE_NAME"]
+    elif item_name == "ssogen":
+        SSOGEN_WEB_ACL_NAME: str = item_cfg["WEB_ACL_NAME"]
+        SSOGEN_WEB_ACL_ID: str = item_cfg["WEB_ACL_ID"]
+        SSOGEN_RULE_NAME: str = item_cfg["RULE_NAME"]
 
-CUSTOM_BODY_NAME: str = os.environ.get("CUSTOM_BODY_NAME", "maintenance_html")
-CUSTOM_BODY_HTML: str = os.environ.get("CUSTOM_BODY_HTML", "")
+    _raw_scope = item_cfg["SCOPE"].upper()
+    if _raw_scope not in ("REGIONAL", "CLOUDFRONT"):
+        raise ValueError(
+            f"Unsupported SCOPE '{_raw_scope}'. Must be 'REGIONAL' or 'CLOUDFRONT'."
+        )
+    SCOPE: ScopeLiteral = cast(ScopeLiteral, _raw_scope)
 
-# Time configuration (with defaults)
-TIME_FROM: str = os.environ.get("TIME_FROM", "21:30")
-TIME_TO: str = os.environ.get("TIME_TO", "07:00")
+    CUSTOM_BODY_NAME: str = item_cfg["CUSTOM_BODY_NAME"]
+    CUSTOM_BODY_HTML: str = item_cfg.get("CUSTOM_BODY_HTML", "")
+
+    # Time configuration (with defaults)
+    TIME_FROM: str = item_cfg.get("TIME_FROM", "21:30")
+    TIME_TO: str = item_cfg.get("TIME_TO", "07:00")
 
 for _label, _value in [("TIME_FROM", TIME_FROM), ("TIME_TO", TIME_TO)]:
     _err = _validate_time(_value, _label)
@@ -189,119 +200,130 @@ def lambda_handler(event: Any, context: Any) -> Dict[str, Any]:
         if err:
             raise ValueError(err)
 
-    logger.info(
-        "Requested mode '%s' for rule '%s' in WebACL '%s' (ID=%s, scope=%s)",
-        mode,
-        RULE_NAME,
-        WEB_ACL_NAME,
-        WEB_ACL_ID,
-        SCOPE,
-    )
-    logger.info("Maintenance window: %s to %s", time_from, time_to)
+    for item_name, item_cfg in WAFS.items():
+        if item_name == "ebs":
+            WEB_ACL_NAME = item_cfg["WEB_ACL_NAME"]
+            WEB_ACL_ID = item_cfg["WEB_ACL_ID"]
+            RULE_NAME = item_cfg["RULE_NAME"]
+        elif item_name == "ssogen":
+            WEB_ACL_NAME = item_cfg["WEB_ACL_NAME"]
+            WEB_ACL_ID = item_cfg["WEB_ACL_ID"]
+            RULE_NAME = item_cfg["RULE_NAME"]
 
-    # Get current Web ACL
-    resp = waf.get_web_acl(Name=WEB_ACL_NAME, Scope=SCOPE, Id=WEB_ACL_ID)
+        logger.info(
+            "Requested mode '%s' for rule '%s' in WebACL '%s' (ID=%s, scope=%s)",
+            mode,
+            RULE_NAME,
+            WEB_ACL_NAME,
+            WEB_ACL_ID,
+            SCOPE,
+        )
+        logger.info("Maintenance window: %s to %s", time_from, time_to)
 
-    lock_token = resp.get("LockToken")
-    web_acl = resp.get("WebACL")
-    if not lock_token or not web_acl:
-        raise RuntimeError("Missing LockToken or WebACL in get_web_acl response.")
+        # Get current Web ACL
+        resp = waf.get_web_acl(Name=WEB_ACL_NAME, Scope=SCOPE, Id=WEB_ACL_ID)
 
-    rules = web_acl.get("Rules", [])
-    if not isinstance(rules, list):
-        raise RuntimeError("Rules is not a list in WebACL response.")
+        lock_token = resp.get("LockToken")
+        web_acl = resp.get("WebACL")
+        if not lock_token or not web_acl:
+            raise RuntimeError("Missing LockToken or WebACL in get_web_acl response.")
 
-    custom_response_bodies = web_acl.get("CustomResponseBodies") or {}
-    if not isinstance(custom_response_bodies, dict):
-        custom_response_bodies = {}
+        rules = web_acl.get("Rules", [])
+        if not isinstance(rules, list):
+            raise RuntimeError("Rules is not a list in WebACL response.")
 
-    found = False
-    changed = False
-    new_rules = []
+        custom_response_bodies = web_acl.get("CustomResponseBodies") or {}
+        if not isinstance(custom_response_bodies, dict):
+            custom_response_bodies = {}
 
-    for r in rules:
-        if not isinstance(r, dict) or "Name" not in r:
-            new_rules.append(r)
-            continue
+        found = False
+        changed = False
+        new_rules = []
 
-        if r["Name"] != RULE_NAME:
-            new_rules.append(r)
-            continue
+        for r in rules:
+            if not isinstance(r, dict) or "Name" not in r:
+                new_rules.append(r)
+                continue
 
-        found = True
-        rr = copy.deepcopy(r)
+            if r["Name"] != RULE_NAME:
+                new_rules.append(r)
+                continue
 
-        if "Action" not in r:
-            raise RuntimeError(f"Rule '{RULE_NAME}' has no Action.")
+            found = True
+            rr = copy.deepcopy(r)
 
-        current_action = r.get("Action", {})
-        desired_action = _desired_action(mode)
+            if "Action" not in r:
+                raise RuntimeError(f"Rule '{RULE_NAME}' has no Action.")
 
-        if current_action != desired_action:
-            rr["Action"] = desired_action
-            changed = True
-            logger.info(
-                "Updating Action for rule '%s' to: %s", RULE_NAME, desired_action
-            )
+            current_action = r.get("Action", {})
+            desired_action = _desired_action(mode)
 
-        # When BLOCK: ensure the custom response body is present and up to date
-        if mode == "BLOCK":
-            new_body = {
-                "Content": _get_maintenance_html(time_from, time_to),
-                "ContentType": "TEXT_HTML",
-            }
-            if custom_response_bodies.get(CUSTOM_BODY_NAME) != new_body:
-                custom_response_bodies[CUSTOM_BODY_NAME] = new_body
+            if current_action != desired_action:
+                rr["Action"] = desired_action
                 changed = True
-                logger.info("Updated custom response body HTML.")
+                logger.info(
+                    "Updating Action for rule '%s' to: %s", RULE_NAME, desired_action
+                )
 
-        # When ALLOW: remove custom body to avoid Terraform drift
-        elif mode == "ALLOW":
-            if CUSTOM_BODY_NAME in custom_response_bodies:
-                del custom_response_bodies[CUSTOM_BODY_NAME]
-                changed = True
+            # When BLOCK: ensure the custom response body is present and up to date
+            if mode == "BLOCK":
+                new_body = {
+                    "Content": _get_maintenance_html(time_from, time_to),
+                    "ContentType": "TEXT_HTML",
+                }
+                if custom_response_bodies.get(CUSTOM_BODY_NAME) != new_body:
+                    custom_response_bodies[CUSTOM_BODY_NAME] = new_body
+                    changed = True
+                    logger.info("Updated custom response body HTML.")
 
-        new_rules.append(rr)
+            # When ALLOW: remove custom body to avoid Terraform drift
+            elif mode == "ALLOW":
+                if CUSTOM_BODY_NAME in custom_response_bodies:
+                    del custom_response_bodies[CUSTOM_BODY_NAME]
+                    changed = True
 
-    if not found:
-        raise RuntimeError(f"Rule '{RULE_NAME}' not found in WebACL.")
+            new_rules.append(rr)
 
-    if not changed:
-        logger.info("No changes needed.")
-        return {"ok": True, "updated": False, "mode": mode}
+        if not found:
+            raise RuntimeError(f"Rule '{RULE_NAME}' not found in WebACL.")
 
-    updated_web_acl: Dict[str, Any] = {
-        "Name": WEB_ACL_NAME,
-        "Scope": SCOPE,
-        "Id": WEB_ACL_ID,
-        "LockToken": lock_token,
-        "DefaultAction": web_acl.get("DefaultAction", {}),
-        "Description": web_acl.get("Description", ""),
-        "VisibilityConfig": web_acl.get("VisibilityConfig", {}),
-        "Rules": new_rules,
-    }
+        if not changed:
+            logger.info("No changes needed.")
+            return {"ok": True, "updated": False, "mode": mode}
 
-    # Forward optional fields from the current WebACL to avoid losing configuration
-    for key in (
-        "CaptchaConfig",
-        "ChallengeConfig",
-        "TokenDomains",
-        "AssociationConfig",
-        "DataProtectionConfig",
-        "OnSourceDDoSProtectionConfig",
-        "ApplicationConfig",
-    ):
-        if key in web_acl:
-            updated_web_acl[key] = web_acl[key]
+        updated_web_acl: Dict[str, Any] = {
+            "Name": WEB_ACL_NAME,
+            "Scope": SCOPE,
+            "Id": WEB_ACL_ID,
+            "LockToken": lock_token,
+            "DefaultAction": web_acl.get("DefaultAction", {}),
+            "Description": web_acl.get("Description", ""),
+            "VisibilityConfig": web_acl.get("VisibilityConfig", {}),
+            "Rules": new_rules,
+        }
 
-    # Only include CustomResponseBodies if non-empty
-    if custom_response_bodies:
-        updated_web_acl["CustomResponseBodies"] = custom_response_bodies
-    else:
-        logger.info("CustomResponseBodies empty — omitting field.")
+        # Forward optional fields from the current WebACL to avoid losing configuration
+        for key in (
+            "CaptchaConfig",
+            "ChallengeConfig",
+            "TokenDomains",
+            "AssociationConfig",
+            "DataProtectionConfig",
+            "OnSourceDDoSProtectionConfig",
+            "ApplicationConfig",
+        ):
+            if key in web_acl:
+                updated_web_acl[key] = web_acl[key]
 
-    waf.update_web_acl(**updated_web_acl)
-    logger.info("WebACL updated successfully.")
+        # Only include CustomResponseBodies if non-empty
+        if custom_response_bodies:
+            updated_web_acl["CustomResponseBodies"] = custom_response_bodies
+        else:
+            logger.info("CustomResponseBodies empty — omitting field.")
+
+        waf.update_web_acl(**updated_web_acl)
+        logger.info("WebACL updated successfully.")
+    
     return {"ok": True, "updated": True, "mode": mode}
 
 
