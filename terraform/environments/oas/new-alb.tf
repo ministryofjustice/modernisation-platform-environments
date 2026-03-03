@@ -29,7 +29,7 @@ locals {
       to_port         = 443
       protocol        = "tcp"
       cidr_blocks     = local.moj_cidr_blocks
-      security_groups = [aws_security_group.ec2_sg]
+      security_groups = [aws_security_group.ec2_sg[0].id]
     }
     "lb_ingress_9500" = {
       description     = "Loadbalancer ingress rule for HTTP 9500 (Console/EM)"
@@ -87,6 +87,19 @@ resource "aws_security_group_rule" "lb_ingress_rules" {
   to_port           = each.value.to_port
   protocol          = each.value.protocol
   cidr_blocks       = each.value.cidr_blocks
+}
+
+# Additional ingress rules for when a source security group is specified in the local
+resource "aws_security_group_rule" "lb_ingress_sg_rules" {
+  for_each = local.environment == "preproduction" ? { for k, v in local.loadbalancer_ingress_rules : k => v if length(v.security_groups) > 0 } : {}
+
+  security_group_id        = aws_security_group.lb_security_group[0].id
+  type                     = "ingress"
+  description              = each.value.description
+  from_port                = each.value.from_port
+  to_port                  = each.value.to_port
+  protocol                 = each.value.protocol
+  source_security_group_id = try(each.value.security_groups[0])
 }
 
 resource "aws_security_group_rule" "lb_egress_rules" {
@@ -265,9 +278,9 @@ resource "aws_lb" "oas_lb" {
   subnets                    = data.aws_subnets.shared-private.ids
   enable_deletion_protection = false
   idle_timeout               = 60
-  enable_http2               = true
-  drop_invalid_header_fields = true
-  preserve_host_header       = true
+  enable_http2               = false
+  drop_invalid_header_fields = false
+  preserve_host_header       = false
 
   access_logs {
     bucket  = aws_s3_bucket.lb_access_logs[0].id
