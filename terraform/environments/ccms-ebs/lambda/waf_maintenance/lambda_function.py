@@ -71,51 +71,51 @@ for item_name, item_cfg in WAFS.items():
     TIME_FROM: str = item_cfg.get("TIME_FROM", "21:30")
     TIME_TO: str = item_cfg.get("TIME_TO", "07:00")
 
-for _label, _value in [("TIME_FROM", TIME_FROM), ("TIME_TO", TIME_TO)]:
-    _err = _validate_time(_value, _label)
-    if _err:
-        raise ValueError(_err)
+    for _label, _value in [("TIME_FROM", TIME_FROM), ("TIME_TO", TIME_TO)]:
+        _err = _validate_time(_value, _label)
+        if _err:
+            raise ValueError(_err)
 
-# HTML template with placeholders (used when CUSTOM_BODY_HTML is not set)
-MAINTENANCE_HTML_TEMPLATE: str = """<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<title>Maintenance</title>
-<style>
-body{{font-family:sans-serif;background:#0b1a2b;color:#fff;text-align:center;padding:4rem;}}
-.card{{max-width:600px;margin:auto;background:#12243a;padding:2rem;border-radius:10px;}}
-</style>
-</head>
-<body>
-<div class="card">
-<h1>Scheduled Maintenance</h1>
-<p>The service is unavailable from {time_from} to {time_to} UK time.<br>
-It is not available on bank holidays.</p>
-</div>
-</body>
-</html>"""
-
-
-def _get_maintenance_html(time_from: str, time_to: str) -> str:
-    """Return maintenance HTML: CUSTOM_BODY_HTML if set, otherwise rendered template."""
-    if CUSTOM_BODY_HTML.strip():
-        return CUSTOM_BODY_HTML
-    return MAINTENANCE_HTML_TEMPLATE.format(time_from=time_from, time_to=time_to)
+    # HTML template with placeholders (used when CUSTOM_BODY_HTML is not set)
+    MAINTENANCE_HTML_TEMPLATE: str = """<!doctype html>
+    <html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <title>Maintenance</title>
+    <style>
+    body{{font-family:sans-serif;background:#0b1a2b;color:#fff;text-align:center;padding:4rem;}}
+    .card{{max-width:600px;margin:auto;background:#12243a;padding:2rem;border-radius:10px;}}
+    </style>
+    </head>
+    <body>
+    <div class="card">
+    <h1>Scheduled Maintenance</h1>
+    <p>The service is unavailable from {time_from} to {time_to} UK time.<br>
+    It is not available on bank holidays.</p>
+    </div>
+    </body>
+    </html>"""
 
 
-# Set region (CloudFront uses us-east-1)
-if SCOPE == "CLOUDFRONT":
-    region: str = "us-east-1"
-else:
-    region_env = os.environ.get("AWS_REGION")
-    if region_env is None:
-        raise ValueError(
-            "AWS_REGION environment variable is required for REGIONAL scope."
-        )
-    region = region_env
+    def _get_maintenance_html(time_from: str, time_to: str) -> str:
+        """Return maintenance HTML: CUSTOM_BODY_HTML if set, otherwise rendered template."""
+        if CUSTOM_BODY_HTML.strip():
+            return CUSTOM_BODY_HTML
+        return MAINTENANCE_HTML_TEMPLATE.format(time_from=time_from, time_to=time_to)
 
-waf = boto3.client("wafv2", region_name=region)
+
+    # Set region (CloudFront uses us-east-1)
+    if SCOPE == "CLOUDFRONT":
+        region: str = "us-east-1"
+    else:
+        region_env = os.environ.get("AWS_REGION")
+        if region_env is None:
+            raise ValueError(
+                "AWS_REGION environment variable is required for REGIONAL scope."
+            )
+        region = region_env
+
+    waf = boto3.client("wafv2", region_name=region)
 
 WafMode = Literal["BLOCK", "ALLOW"]
 
@@ -197,14 +197,9 @@ def lambda_handler(event: Any, context: Any) -> Dict[str, Any]:
             raise ValueError(err)
     results = []
     for item_name, item_cfg in WAFS.items():
-        if item_name == "ebs":
-            WEB_ACL_NAME = item_cfg["WEB_ACL_NAME"]
-            WEB_ACL_ID = item_cfg["WEB_ACL_ID"]
-            RULE_NAME = item_cfg["RULE_NAME"]
-        elif item_name == "ssogen":
-            WEB_ACL_NAME = item_cfg["WEB_ACL_NAME"]
-            WEB_ACL_ID = item_cfg["WEB_ACL_ID"]
-            RULE_NAME = item_cfg["RULE_NAME"]
+        WEB_ACL_NAME = item_cfg["WEB_ACL_NAME"]
+        WEB_ACL_ID = item_cfg["WEB_ACL_ID"]
+        RULE_NAME = item_cfg["RULE_NAME"]
 
         logger.info(
             "Requested mode '%s' for rule '%s' in WebACL '%s' (ID=%s, scope=%s)",
