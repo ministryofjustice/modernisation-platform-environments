@@ -22,6 +22,38 @@ locals {
   vpc_flow_log_max_aggregation_interval               = 60
 
   vpc_interface_endpoint_service_names = [
-    "guardduty-data",
+    "apigateway",        # API Gateway
+    "athena",            # Athena
+    "backup",            # AWS Backup
+    "cloudtrail",        # CloudTrail
+    "comprehend",        # AWS Comprehend
+    "config",            # AWS Config
+    "detective",         # AWS Detective
+    "dms",               # AWS Database Migration Service
+    "ec2",               # EC2
+    "ecr.api",           # ECR (API)
+    "ecr.dkr",           # ECR (Docker)
+    "eks",               # EKS
+    "elasticache",       # ElastiCache
+    "email-smtp",        # SES
+    "events",            # CloudWatch Events
+    "glue",              # AWS Glue
+    "guardduty-data",    # GuardDuty
+    "inspector2",        # Inspector
+    "kinesis-firehose",  # Kinesis Firehose
+    "kms",               # KMS
+    "lambda",            # Lambda
+    "logs",              # CloudWatch Logs
+    "macie2",            # AWS Macie
+    "rds",               # RDS
+    "secretsmanager",    # Secrets Manager
+    "securityhub",       # Security Hub
+    "sns",               # SNS
+    "sqs",               # SQS
+    "ssm",               # AWS Systems Manager
+    "sts",               # STS
+    "transcribe",        # AWS Transcribe
+    "translate",         # AWS Translate
+    "wafv2"              # WAF
   ]
 }
