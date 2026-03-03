@@ -1,6 +1,27 @@
 # Environment variable come from Platform local file
 locals {
   env = "data-${local.environment}"
+
+  wafs = {
+    ebs = {
+      SCOPE = var.scope
+      WEB_ACL_NAME = data.aws_wafv2_web_acl.waf_web_acl.name
+      WEB_ACL_ID = data.aws_wafv2_web_acl.waf_web_acl.id
+      RULE_NAME = var.rule_name
+      CUSTOM_BODY_NAME = "maintenance_html"
+      TIME_FROM = "21:30"
+      TIME_TO = "07:00"
+    } 
+    ssogen = {
+      SCOPE = var.scope
+      WEB_ACL_NAME = data.aws_wafv2_web_acl.ssogen_waf_web_acl[count.index].name
+      WEB_ACL_ID = data.aws_wafv2_web_acl.ssogen_waf_web_acl[count.index].id
+      RULE_NAME = var.ssogen_rule_name
+      CUSTOM_BODY_NAME = "maintenance_html"
+      TIME_FROM = "21:30"
+      TIME_TO = "07:00"
+    }
+  }
 }
 
 variable "scope" {
@@ -9,6 +30,10 @@ variable "scope" {
 
 variable "rule_name" {
   default = "ebs-trusted-rule-ip-set"
+}
+
+variable "ssogen_rule_name" {
+  default = "${local.application_name_ssogen}-waf-ip-set"
 }
 
 data "archive_file" "waf_maintenance_zip" {
@@ -20,6 +45,13 @@ data "archive_file" "waf_maintenance_zip" {
 # Pull an existing WAF Rule Group and rules using a dynamic name.
 data "aws_wafv2_web_acl" "waf_web_acl" {
   name  = "ebs_internal_waf"
+  scope = "REGIONAL"
+}
+
+# Pull an existing SSOGEN WAF Rule Group and rules using a dynamic name.
+data "aws_wafv2_web_acl" "ssogen_waf_web_acl" {
+  count = local.is-development || local.is-test ? 1 : 0
+  name  = "${local.application_name_ssogen}-web-acl"
   scope = "REGIONAL"
 }
 
@@ -66,13 +98,7 @@ resource "aws_lambda_function" "waf_maintenance" {
   timeout          = 30
   environment {
     variables = {
-      SCOPE            = var.scope
-      WEB_ACL_NAME     = data.aws_wafv2_web_acl.waf_web_acl.name
-      WEB_ACL_ID       = data.aws_wafv2_web_acl.waf_web_acl.id
-      RULE_NAME        = var.rule_name
-      CUSTOM_BODY_NAME = "maintenance_html"
-      TIME_FROM        = "21:30" # Optional - these are the defaults
-      TIME_TO          = "07:00" # Optional - these are the defaults
+      WAF_CONFIG = jsonencode(local.wafs)
     }
   }
 }
