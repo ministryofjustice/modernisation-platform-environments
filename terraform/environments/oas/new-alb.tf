@@ -24,12 +24,12 @@ locals {
       security_groups = []
     }
     "lb_ingress_443" = {
-      description     = "Loadbalancer ingress rule for HTTPS from MOJO devices and LZ Shared-Service Workspaces"
+      description     = "Loadbalancer ingress rule for HTTPS from MOJO devices, LZ Shared-Service Workspaces and OAS EC2 Instance"
       from_port       = 443
       to_port         = 443
       protocol        = "tcp"
       cidr_blocks     = local.moj_cidr_blocks
-      security_groups = []
+      security_groups = [aws_security_group.ec2_sg]
     }
     "lb_ingress_9500" = {
       description     = "Loadbalancer ingress rule for HTTP 9500 (Console/EM)"
@@ -689,12 +689,31 @@ resource "aws_lb_listener_rule" "bi_security_login_https_rule" {
   }
 }
 
+# Listener rule for /biinfer on HTTPS
+resource "aws_lb_listener_rule" "biinfer_login_https_rule" {
+  count = local.environment == "preproduction" ? 1 : 0
+
+  listener_arn = aws_lb_listener.https_listener[0].arn
+  priority     = 250
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/biinfer*"]
+    }
+  }
+}
+
 # Listener rule for /static on HTTPS
 resource "aws_lb_listener_rule" "static_https_rule" {
   count = local.environment == "preproduction" ? 1 : 0
 
   listener_arn = aws_lb_listener.https_listener[0].arn
-  priority     = 230
+  priority     = 240
 
   action {
     type             = "forward"
