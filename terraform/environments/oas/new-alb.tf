@@ -400,6 +400,8 @@ resource "aws_lb_listener" "https_listener" {
   protocol          = "HTTPS"
   certificate_arn   = aws_acm_certificate.external[0].arn
 
+  routing_http_response_content_security_policy_header_value = "upgrade-insecure-requests"
+
   default_action {
     type = "fixed-response"
     fixed_response {
