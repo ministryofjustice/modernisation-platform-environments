@@ -50,16 +50,12 @@ WAFS =json.loads(os.environ.get("WAF_CONFIG", "[]"))
 
 ScopeLiteral = Literal["REGIONAL", "CLOUDFRONT"]
 for item_name, item_cfg in WAFS.items():
+    if not isinstance(item_cfg, dict):
+        raise ValueError(f"Invalid configuration for '{item_name}': expected a JSON object.")
+    if "WEB_ACL_NAME" not in item_cfg or "WEB_ACL_ID" not in item_cfg or "RULE_NAME" not in item_cfg or "SCOPE" not in item_cfg:
+        raise ValueError(f"Missing required keys in configuration for '{item_name}'. Required: WEB_ACL_NAME, WEB_ACL_ID, RULE_NAME, SCOPE.")
     if item_name not in ("ebs", "ssogen"):
         raise ValueError(f"Invalid WAF_CONFIG key: '{item_name}'. Expected 'ebs' or 'ssogen'.")
-    if item_name == "ebs":
-        EBS_WEB_ACL_NAME: str = item_cfg["WEB_ACL_NAME"]
-        EBS_WEB_ACL_ID: str = item_cfg["WEB_ACL_ID"]
-        EBS_RULE_NAME: str = item_cfg["RULE_NAME"]
-    elif item_name == "ssogen":
-        SSOGEN_WEB_ACL_NAME: str = item_cfg["WEB_ACL_NAME"]
-        SSOGEN_WEB_ACL_ID: str = item_cfg["WEB_ACL_ID"]
-        SSOGEN_RULE_NAME: str = item_cfg["RULE_NAME"]
 
     _raw_scope = item_cfg["SCOPE"].upper()
     if _raw_scope not in ("REGIONAL", "CLOUDFRONT"):
@@ -199,7 +195,7 @@ def lambda_handler(event: Any, context: Any) -> Dict[str, Any]:
         err = _validate_time(value, label)
         if err:
             raise ValueError(err)
-
+    results = []
     for item_name, item_cfg in WAFS.items():
         if item_name == "ebs":
             WEB_ACL_NAME = item_cfg["WEB_ACL_NAME"]
@@ -323,8 +319,11 @@ def lambda_handler(event: Any, context: Any) -> Dict[str, Any]:
 
         waf.update_web_acl(**updated_web_acl)
         logger.info("WebACL updated successfully.")
-    
-    return {"ok": True, "updated": True, "mode": mode}
+        logger.info("Updated WebACL: %s", json.dumps(updated_web_acl, indent=2, default=str))
+        results.append({"webacl": WEB_ACL_NAME, "ok": True, "updated": True, "mode": mode})
+    overall_ok = all(r["ok"] for r in results)
+    return {"ok": overall_ok, "results": results}
+
 
 
 # ---------------------------------------------------------------------------
