@@ -2,7 +2,7 @@
 
 resource "aws_wafv2_ip_set" "ssogen_waf_ip_set" {
   count              = local.is-development || local.is-test ? 1 : 0
-  name               = "${local.application_name}-ssogen-waf-ip-set"
+  name               = "${local.application_name_ssogen}-waf-ip-set"
   scope              = "REGIONAL"
   ip_address_version = "IPV4"
   description        = "List of trusted IP Addresses allowing access via WAF"
@@ -11,8 +11,7 @@ resource "aws_wafv2_ip_set" "ssogen_waf_ip_set" {
     data.aws_vpc.shared.cidr_block,
     local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_prod,
     local.application_data.accounts[local.environment].mojo_devices,
-    local.application_data.accounts[local.environment].dom1_devices,
-    local.application_data.accounts[local.environment].moj_wifi
+    local.application_data.accounts[local.environment].dom1_devices
     # local.application_data.accounts[local.environment].sb_vpc
   ]
 
@@ -57,7 +56,7 @@ resource "aws_wafv2_web_acl" "ssogen_web_acl" {
 
   # Restrict access to trusted IPs only - Non-Prod environments only
   rule {
-    name     = "${local.application_name_ssogen}-ssogen-waf-ip-set"
+    name     = "${local.application_name_ssogen}-waf-ip-set"
     priority = 2
 
     action {
@@ -72,7 +71,7 @@ resource "aws_wafv2_web_acl" "ssogen_web_acl" {
 
     visibility_config {
       cloudwatch_metrics_enabled = true
-      metric_name                = "${local.application_name}-waf-ip-set"
+      metric_name                = "${local.application_name_ssogen}-waf-ip-set"
       sampled_requests_enabled   = true
     }
   }
@@ -95,7 +94,7 @@ resource "aws_cloudwatch_log_group" "ssogen_waf_logs" {
   retention_in_days = 30
 
   tags = merge(local.tags,
-    { Name = lower(format("lb-%s-%s-ssogen-waf-logs", local.application_name_ssogen, local.environment)) }
+    { Name = lower(format("lb-%s-%s-waf-logs", local.application_name_ssogen, local.environment)) }
   )
 }
 
