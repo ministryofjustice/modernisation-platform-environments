@@ -1,16 +1,16 @@
 {
   "accounts": {
     "development": {
-      "example_var": "dev-data"
+      "ad_directory_name": "laa-workspaces.local",
+      "ad_short_name": "LAAWS",
+      "ad_edition": "Standard",
+      "workspace_bundle_id": "wsb-clj85qzj1"
     },
     "test": {
-      "example_var": "test-data"
     },
     "preproduction": {
-      "example_var": "preproduction-data"
     },
     "production": {
-      "example_var": "production-data"
     }
   }
 }
