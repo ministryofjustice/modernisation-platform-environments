@@ -55,10 +55,10 @@ data "aws_subnet" "apc_private_subnet_b" {
 }
 
 # ACM
-data "aws_acm_certificate" "certificate" {
-  domain   = local.environment_configuration.route53_zone
-  statuses = ["ISSUED"]
-}
+#data "aws_acm_certificate" "certificate" {
+#  domain   = local.environment_configuration.route53_zone
+#  statuses = ["ISSUED"]
+#}
 
 # EKS
 data "aws_eks_cluster" "apc_cluster" {
