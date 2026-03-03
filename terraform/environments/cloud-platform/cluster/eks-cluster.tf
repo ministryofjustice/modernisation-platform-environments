@@ -152,7 +152,7 @@ module "karpenter" {
 resource "helm_release" "karpenter" {
  namespace           = "kube-system"
  name                = "karpenter"
- repository          = "oci://public.ecr.aws/karpenter/karpenter"
+ repository          = "oci://public.ecr.aws/karpenter"
 #  repository_username = data.aws_ecrpublic_authorization_token.token.user_name
 #  repository_password = data.aws_ecrpublic_authorization_token.token.password
  chart               = "karpenter"
