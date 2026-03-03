@@ -694,7 +694,7 @@ resource "aws_lb_listener_rule" "biinfer_login_https_rule" {
   count = local.environment == "preproduction" ? 1 : 0
 
   listener_arn = aws_lb_listener.https_listener[0].arn
-  priority     = 230
+  priority     = 250
 
   action {
     type             = "forward"
