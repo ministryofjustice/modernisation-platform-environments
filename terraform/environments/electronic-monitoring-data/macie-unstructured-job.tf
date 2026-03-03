@@ -5,7 +5,7 @@ resource "aws_macie2_account" "macie_unstructured_spike" {
 
 # Uses the default checks
 resource "aws_macie2_classification_job" "unstructured_data_spike" {
-  depends_on = [aws_macie2_account.example]
+  depends_on = [aws_macie2_account.macie_unstructured_spike]
 
   name        = "spike-unstructured-data"
   description = "Spike to scan unstructured data"
@@ -24,7 +24,7 @@ resource "aws_macie2_classification_job" "unstructured_data_spike" {
     scoping {
       includes {
         and {
-          # Only scan objects in the "raw-logs/" prefix
+          # Only scan objects in this prefix
           simple_scope_term {
             comparator = "STARTS_WITH"
             key        = "OBJECT_KEY"
