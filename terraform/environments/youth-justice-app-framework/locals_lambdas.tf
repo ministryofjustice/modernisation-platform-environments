@@ -1,6 +1,6 @@
 locals {
   split-ds-managed-ad-ips             = tolist(module.ds.dns_ip_addresses)
-  s3-cross-account-replication-s3-arn = "arn:aws:s3:::redshift-serverless-yjb-${local.environment}-reporting"
+  s3-cross-account-replication-s3-arn = "arn:aws:s3:::yjaf-${local.environment}-redshift-yjb-reporting"
   update-dc-names = {
     function_zip_file = "lambda_code/update-dc-names.zip"
     function_name     = "update-dc-names"
@@ -84,6 +84,7 @@ locals {
     iam_policy_path   = "lambda_policies/s3-cross-account-replication-role-policy.json"
     policy_template_vars = {
       account_number = local.environment_management.account_ids[terraform.workspace]
+      environment    = local.environment
     }
   }
 
