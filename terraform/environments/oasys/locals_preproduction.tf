@@ -1,5 +1,7 @@
 locals {
 
+  delius_oasys_queues_preproduction = {}
+
   baseline_presets_preproduction = {
     options = {
       enable_xsiam_cloudwatch_integration = true
@@ -317,7 +319,7 @@ locals {
       }
       "pp-oasys.az.justice.gov.uk" = {
         records = [
-          { name = "onr", type = "A", ttl = "3600", records = ["10.40.40.210"] }
+          { name = "onr", type = "A", ttl = "300", records = ["10.40.40.210"] }
         ]
         lb_alias_records = [
           { name = "", type = "A", lbs_map_key = "private" }

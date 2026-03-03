@@ -3,8 +3,8 @@ locals {
   environment_configurations = {
     development = {
       litellm_versions = {
-        application = "main-v1.81.3.rc.3"
-        chart       = "0.1.837"
+        application = "main-v1.81.12-stable"
+        chart       = "1.81.12-stable"
       }
       litellm_organization_ids = {
         /* These are not currently managed in code */
@@ -47,16 +47,24 @@ locals {
       llm_gateway_models = {
         azure = {
           gpt-4o = {
-            model_id    = "gpt-4o"
+            model_id    = "gpt-4o-mojdp"
+            api_version = "2024-12-01-preview"
+          }
+          gpt-4-1 = {
+            model_id    = "gpt-4.1-mojdp"
             api_version = "2024-12-01-preview"
           }
           gpt-5 = {
-            model_id    = "gpt-5"
+            model_id    = "gpt-5-mojdp"
             api_version = "2024-12-01-preview"
           }
-          gpt-5-codex = {
-            model_id    = "gpt-5-codex"
-            api_version = "2025-03-01-preview"
+          gpt-5-1 = {
+            model_id    = "gpt-5.1-mojdp"
+            api_version = "2024-12-01-preview"
+          }
+          gpt-5-2 = {
+            model_id    = "gpt-5.2-mojdp"
+            api_version = "2024-12-01-preview"
           }
         }
         bedrock = {
@@ -72,12 +80,20 @@ locals {
             model_id = "eu.anthropic.claude-opus-4-5-20251101-v1:0"
             region   = "eu-west-2"
           }
+          claude-opus-4-6 = {
+            model_id = "eu.anthropic.claude-opus-4-6-v1"
+            region   = "eu-west-2"
+          }
           claude-sonnet-4 = {
             model_id = "eu.anthropic.claude-sonnet-4-20250514-v1:0"
             region   = "eu-west-1"
           }
           claude-sonnet-4-5 = {
             model_id = "eu.anthropic.claude-sonnet-4-5-20250929-v1:0"
+            region   = "eu-west-2"
+          }
+          claude-sonnet-4-6 = {
+            model_id = "eu.anthropic.claude-sonnet-4-6"
             region   = "eu-west-2"
           }
           cohere-embed-english-v3 = {
