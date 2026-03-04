@@ -406,7 +406,7 @@ module "LAA-ftp-xerox-ccms-outbound" {
   s3_bucket_layer_ftp      = aws_s3_bucket.ccms_ebs_shared.bucket
   s3_object_ftp_clientlibs = "lambda_delivery/ftp_lambda_layer/ftp_lambda_layer.zip"
   s3_object_ftp_client     = aws_s3_object.ftp_client.key
-  ftp_cron                     = "cron(0 5 * * ? *)"
+  ftp_cron                     = "cron(5 5 * * ? *)"
   enabled_cron_in_environments = local.enable_xerox_outbound_cron_in_environments
 }
 
