@@ -72,6 +72,30 @@ locals {
         })
       })
 
+      t1-oasys-web-b = merge(local.ec2_autoscaling_groups.web, {
+        autoscaling_schedules = {
+          scale_up   = { recurrence = "0 5 * * Mon-Fri" }
+          scale_down = { recurrence = "0 19 * * Mon-Fri", desired_capacity = 0 }
+        }
+        config = merge(local.ec2_autoscaling_groups.web.config, {
+          ami_name                  = "oasys_webserver_release_*"
+          availability_zone         = "eu-west-2b"
+          iam_resource_names_prefix = "ec2-web-t1"
+          instance_profile_policies = concat(local.ec2_autoscaling_groups.web.config.instance_profile_policies, [
+            "Ec2T1WebPolicy",
+          ])
+        })
+        instance = merge(local.ec2_autoscaling_groups.web.instance, {
+          instance_type = "t3.small"
+        })
+        tags = merge(local.ec2_autoscaling_groups.web.tags, {
+          description        = "t1 oasys web"
+          oasys-environment  = "t1"
+          oracle-db-hostname = "db.t1.oasys.hmpps-test.modernisation-platform.internal"
+          oracle-db-sid      = "T1OASYS" # for each env using azure DB will need to be OASPROD
+        })
+      })
+
       t2-oasys-web-a = merge(local.ec2_autoscaling_groups.web, {
         autoscaling_schedules = {
           scale_up   = { recurrence = "0 5 * * Mon-Fri" }
