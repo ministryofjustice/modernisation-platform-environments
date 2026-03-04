@@ -567,6 +567,7 @@ locals {
     },
     yjsm-hub-svc = {
       name                              = "yjsm-hub-svc"
+      internal_only                     = false
       image                             = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/youth-justice-app-framework:yjsm-hub-svc-preprod"
       task_cpu                          = 1024
       task_memory                       = 3584

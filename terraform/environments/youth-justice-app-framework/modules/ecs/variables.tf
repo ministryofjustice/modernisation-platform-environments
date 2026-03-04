@@ -352,3 +352,10 @@ variable "aws_account_id" {
   description = "The AWS account ID"
   type        = string
 }
+
+## YJSM Hub Svc Pilot
+variable "create_svc_pilot" {
+  description = "Create infrastructure for the hub-svc pilot, including ALB and associated resources"
+  type        = bool
+  default     = true
+}
