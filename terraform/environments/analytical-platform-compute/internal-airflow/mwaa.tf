@@ -1,12 +1,12 @@
 resource "aws_mwaa_environment" "main" {
   count                           = local.create_internal_airflow ? 1 : 0
-  
+
   name                            = "internal-${local.environment}"
   airflow_version                 = local.environment_configuration.airflow_version
   environment_class               = local.environment_configuration.airflow_environment_class
   weekly_maintenance_window_start = "SAT:01:00"
 
-  execution_role_arn = module.mwaa_execution_iam_role[0].iam_role_arn
+  execution_role_arn = module.mwaa_execution_iam_role.iam_role_arn
 
   kms_key = module.mwaa_kms[0].key_arn
 
