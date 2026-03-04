@@ -39,6 +39,7 @@ resource "aws_workspaces_directory" "workspaces" {
   depends_on = [
     aws_iam_role_policy_attachment.workspaces_default_service_access,
     aws_iam_role_policy_attachment.workspaces_default_self_service_access,
+    aws_iam_role_policy.workspaces_ds_access,
   ]
 
   tags = merge(

@@ -38,3 +38,31 @@ resource "aws_iam_role_policy_attachment" "workspaces_default_self_service_acces
   role       = aws_iam_role.workspaces_default[0].name
   policy_arn = "arn:aws:iam::aws:policy/AmazonWorkSpacesSelfServiceAccess"
 }
+
+resource "aws_iam_role_policy" "workspaces_ds_access" {
+  count = local.environment == "development" ? 1 : 0
+
+  name = "workspaces-directory-service-access"
+  role = aws_iam_role.workspaces_default[0].id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "ds:AuthorizeApplication",
+          "ds:UnauthorizeApplication",
+          "ds:DescribeDirectories",
+          "ds:CheckAlias",
+          "ds:CreateAlias",
+          "ds:DescribeTrusts",
+          "ds:DeleteDirectory",
+          "ds:CreateIdentityPoolDirectory",
+          "ds:ListAuthorizedApplications"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
