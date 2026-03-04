@@ -119,3 +119,27 @@ jobs:
             role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
             role-session-name: githubactionsrolesession
             aws-region: "eu-west-2"
+
+        - name: Setup Terraform
+          uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd  # v3.1.2
+          with:
+            terraform_version: "${{ inputs.terraform_version }}"
+            terraform_wrapper: false
+
+        #
+        # Terraform Init
+        #
+        - name: Terraform Init
+          run: |
+            pwd
+            ls -la
+            terraform --version
+            echo "terraform init"
+            terraform init
+
+        #
+        # Terraform Workspace Select
+        #
+        - name: Terraform Workspace Select
+          run: |
+            terraform workspace select "${ACCOUNT_NAME}"
