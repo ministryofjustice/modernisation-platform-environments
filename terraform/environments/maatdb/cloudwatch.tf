@@ -146,7 +146,7 @@ module "maatdb_pagerduty_core_alerts" {
 # create RDS maintenance notification 
 resource "aws_db_event_subscription" "rds_maintenance_notifications" {
   name       = "${local.application_name}-${local.environment}-rds-maintenance"
-  sns_topic  = aws_sns_topic.maatdb_alerting_topic.arn
+  sns_topic  = aws_sns_topic.maatdb_maintenance_topic.arn
 
   # DB instance only
   source_type = "db-instance"
@@ -166,7 +166,7 @@ resource "aws_db_event_subscription" "rds_maintenance_notifications" {
 
   depends_on = [
     module.rds,
-    aws_sns_topic.maatdb_alerting_topic
+    aws_sns_topic.maatdb_maintenance_topic
   ]
 }
 
@@ -190,7 +190,7 @@ data "aws_iam_policy_document" "rds_publish_to_sns" {
 
     principals {
       type        = "Service"
-      identifiers = ["rds.amazonaws.com"]
+      identifiers = ["events.rds.amazonaws.com"]
     }
 
     actions   = ["sns:Publish"]
@@ -208,15 +208,8 @@ resource "aws_sns_topic_policy" "rds_publish_policy" {
 resource "aws_sns_topic_subscription" "rds_to_slack_lambda" {
   topic_arn = aws_sns_topic.maatdb_maintenance_topic.arn
   protocol  = "lambda"
-  endpoint  = aws_lambda_function.slack_notifier.arn
+  endpoint  = aws_lambda_function.dbmaintenance_sns_to_slack.arn
+  
+  depends_on = [aws_lambda_permission.allow_rds_sns_invoke]
 }
 
-# Create Lambda Permission 
-
-resource "aws_lambda_permission" "allow_sns_invoke" {
-  statement_id  = "AllowExecutionFromSNS"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.slack_notifier.function_name
-  principal     = "sns.amazonaws.com"
-  source_arn    = aws_sns_topic.maatdb_maintenance_topic.arn
-}
