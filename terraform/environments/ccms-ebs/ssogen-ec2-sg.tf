@@ -41,6 +41,19 @@ resource "aws_vpc_security_group_ingress_rule" "ing_console_ec2" {
   to_port                      = 7001
   referenced_security_group_id = aws_security_group.ssogen_sg[count.index].id
 }
+
+# ############################################
+# # INGRESS — 7003 within ec2 instances
+# ############################################
+resource "aws_vpc_security_group_ingress_rule" "ing_console_ec2" {
+  count                        = local.is-development || local.is-test ? 1 : 0
+  ip_protocol                  = "tcp"
+  description                  = "7003 from EC2 instances"
+  security_group_id            = aws_security_group.ssogen_sg[count.index].id
+  from_port                    = 7003
+  to_port                      = 7003
+  referenced_security_group_id = aws_security_group.ssogen_sg[count.index].id
+}
 # ############################################
 # # INGRESS — SSH (22) from WorkSpaces subnets (private)
 # ############################################
@@ -65,9 +78,23 @@ resource "aws_vpc_security_group_ingress_rule" "ing_ssh_workspaces" {
 resource "aws_vpc_security_group_egress_rule" "from_ec2_to_ec2" {
   count                        = local.is-development || local.is-test ? 1 : 0
   security_group_id            = aws_security_group.ssogen_sg[count.index].id
-  description                  = "Allow outbound to RDS"
+  description                  = "Allow outbound to EC2 (self)"
   from_port                    = 7001
   to_port                      = 7001
+  ip_protocol                  = "tcp"
+  referenced_security_group_id = aws_security_group.ssogen_sg[count.index].id
+}
+
+# #########################################
+# # SSOGEN Security Group — Allow outbound 7003 from EC2 to EC2 (self)
+# #########################################
+
+resource "aws_vpc_security_group_egress_rule" "from_ec2_to_ec2" {
+  count                        = local.is-development || local.is-test ? 1 : 0
+  security_group_id            = aws_security_group.ssogen_sg[count.index].id
+  description                  = "Allow outbound to EC2 (self)"
+  from_port                    = 7003
+  to_port                      = 7003
   ip_protocol                  = "tcp"
   referenced_security_group_id = aws_security_group.ssogen_sg[count.index].id
 }
