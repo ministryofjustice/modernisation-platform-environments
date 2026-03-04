@@ -21,9 +21,7 @@ locals {
 
   efs_mount_points = [
     "stage:/stage",
-    "fmw:/u01/shared/product/fmw",
-    "aserver:/u01/shared/product/runtime/Domain/aserver",
-    "config:/u01/shared/product/runtime/Domain/config"
+    "aserver:/u01/shared/product/runtime/Domain/aserver"
   ]
 
   efs_mount_points_joined = join(",", local.efs_mount_points)
