@@ -24,12 +24,12 @@ locals {
       security_groups = []
     }
     "lb_ingress_443" = {
-      description     = "Loadbalancer ingress rule for HTTPS from MOJO devices and LZ Shared-Service Workspaces"
+      description     = "Loadbalancer ingress rule for HTTPS from MOJO devices, LZ Shared-Service Workspaces and OAS EC2 Instance"
       from_port       = 443
       to_port         = 443
       protocol        = "tcp"
       cidr_blocks     = local.moj_cidr_blocks
-      security_groups = []
+      security_groups = [aws_security_group.ec2_sg[0].id]
     }
     "lb_ingress_9500" = {
       description     = "Loadbalancer ingress rule for HTTP 9500 (Console/EM)"
@@ -87,6 +87,19 @@ resource "aws_security_group_rule" "lb_ingress_rules" {
   to_port           = each.value.to_port
   protocol          = each.value.protocol
   cidr_blocks       = each.value.cidr_blocks
+}
+
+# Additional ingress rules for when a source security group is specified in the local
+resource "aws_security_group_rule" "lb_ingress_sg_rules" {
+  for_each = local.environment == "preproduction" ? { for k, v in local.loadbalancer_ingress_rules : k => v if length(v.security_groups) > 0 } : {}
+
+  security_group_id        = aws_security_group.lb_security_group[0].id
+  type                     = "ingress"
+  description              = each.value.description
+  from_port                = each.value.from_port
+  to_port                  = each.value.to_port
+  protocol                 = each.value.protocol
+  source_security_group_id = try(each.value.security_groups[0])
 }
 
 resource "aws_security_group_rule" "lb_egress_rules" {
@@ -266,8 +279,8 @@ resource "aws_lb" "oas_lb" {
   enable_deletion_protection = false
   idle_timeout               = 60
   enable_http2               = true
-  drop_invalid_header_fields = true
-  preserve_host_header       = true
+  drop_invalid_header_fields = false
+  preserve_host_header       = false
 
   access_logs {
     bucket  = aws_s3_bucket.lb_access_logs[0].id
@@ -399,6 +412,8 @@ resource "aws_lb_listener" "https_listener" {
   port              = 443
   protocol          = "HTTPS"
   certificate_arn   = aws_acm_certificate.external[0].arn
+
+  routing_http_response_content_security_policy_header_value = "upgrade-insecure-requests"
 
   default_action {
     type = "fixed-response"
@@ -687,12 +702,31 @@ resource "aws_lb_listener_rule" "bi_security_login_https_rule" {
   }
 }
 
+# Listener rule for /biinfer on HTTPS
+resource "aws_lb_listener_rule" "biinfer_login_https_rule" {
+  count = local.environment == "preproduction" ? 1 : 0
+
+  listener_arn = aws_lb_listener.https_listener[0].arn
+  priority     = 250
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/biinfer*"]
+    }
+  }
+}
+
 # Listener rule for /static on HTTPS
 resource "aws_lb_listener_rule" "static_https_rule" {
   count = local.environment == "preproduction" ? 1 : 0
 
   listener_arn = aws_lb_listener.https_listener[0].arn
-  priority     = 230
+  priority     = 240
 
   action {
     type             = "forward"
