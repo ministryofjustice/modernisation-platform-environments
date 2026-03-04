@@ -21,12 +21,20 @@ resource "aws_api_gateway_method" "post" {
   rest_api_id   = aws_api_gateway_rest_api.ingestion_api.id
   resource_id   = aws_api_gateway_resource.ingest.id
   http_method   = "POST"
-  authorization = "CUSTOM"
-  authorizer_id = aws_api_gateway_authorizer.hmac.id
+  authorization = "NONE"
   request_parameters = {
     "method.request.header.X-Signature" = true
     "method.request.header.Date"        = true
   }
+}
+
+resource "aws_api_gateway_integration" "lambda_integration" {
+  rest_api_id             = aws_api_gateway_rest_api.ingestion_api.id
+  resource_id             = aws_api_gateway_resource.ingest.id
+  http_method             = aws_api_gateway_method.post.http_method
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = module.authorizer_lambda.lambda_function_invoke_arn
 }
 
 resource "aws_api_gateway_method_response" "response_200" {
@@ -36,59 +44,13 @@ resource "aws_api_gateway_method_response" "response_200" {
   status_code = "200"
 }
 
-resource "aws_api_gateway_integration" "sqs" {
-  rest_api_id             = aws_api_gateway_rest_api.ingestion_api.id
-  resource_id             = aws_api_gateway_resource.ingest.id
-  http_method             = aws_api_gateway_method.post.http_method
-  type                    = "AWS"
-  integration_http_method = "POST"
-  credentials             = module.apigw_sqs_role.iam_role_arn
-
-  # SQS Path Integration: arn:aws:apigateway:{region}:sqs:path/{account_id}/{queue_name}
-  # Account ID is retrieved from Secrets Manager (must be populated manually)
-  uri = "arn:aws:apigateway:eu-west-2:sqs:path/${data.aws_secretsmanager_secret_version.cloud_platform_account_id.secret_string}/${local.environment_configuration[local.environment].cloud_platform_sqs_queue_name}"
-
-  request_parameters = {
-    "integration.request.header.Content-Type" = "'application/x-www-form-urlencoded'"
-  }
-
-  request_templates = {
-    "application/json" = <<EOF
-Action=SendMessage&MessageBody=$util.urlEncode($input.body)&MessageAttribute.1.Name=X-Signature&MessageAttribute.1.Value.StringValue=$util.escapeJavaScript($input.params('X-Signature'))&MessageAttribute.1.Value.DataType=String&MessageAttribute.2.Name=Date&MessageAttribute.2.Value.StringValue=$util.escapeJavaScript($input.params('Date'))&MessageAttribute.2.Value.DataType=String
-EOF
-  }
-}
-
-resource "aws_iam_role_policy" "apigw_sqs_policy" {
-  role = module.apigw_sqs_role.iam_role_name
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect   = "Allow"
-        Action   = "sqs:SendMessage"
-        Resource = "arn:aws:sqs:eu-west-2:${data.aws_secretsmanager_secret_version.cloud_platform_account_id.secret_string}:${local.environment_configuration[local.environment].cloud_platform_sqs_queue_name}"
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "kms:GenerateDataKey",
-          "kms:Decrypt"
-        ]
-        Resource = "*"
-      }
-    ]
-  })
-}
-
 resource "aws_api_gateway_integration_response" "response_200" {
   rest_api_id = aws_api_gateway_rest_api.ingestion_api.id
   resource_id = aws_api_gateway_resource.ingest.id
   http_method = aws_api_gateway_method.post.http_method
   status_code = "200"
 
-  depends_on = [aws_api_gateway_integration.sqs]
+  depends_on = [aws_api_gateway_integration.lambda_integration]
 }
 
 resource "aws_api_gateway_deployment" "main" {
@@ -99,13 +61,13 @@ resource "aws_api_gateway_deployment" "main" {
       aws_api_gateway_authorizer.hmac.id,
       aws_api_gateway_authorizer.hmac.type,
       aws_api_gateway_method.post.id,
-      aws_api_gateway_integration.sqs.id,
+      aws_api_gateway_integration.lambda_integration.id
     ]))
   }
 
   depends_on = [
     aws_api_gateway_method.post,
-    aws_api_gateway_integration.sqs
+    aws_api_gateway_integration.lambda_integration
   ]
 
   lifecycle {
@@ -172,17 +134,3 @@ resource "aws_cloudwatch_log_group" "api_gateway_access_logs" {
   tags              = local.tags
 }
 
-# IAM Role for API Gateway to push to SQS
-module "apigw_sqs_role" {
-  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.58.0"
-
-  create_role       = true
-  role_requires_mfa = false
-
-  role_name = "apigw-sqs-role-mp"
-
-  trusted_role_services = [
-    "apigateway.amazonaws.com"
-  ]
-}
