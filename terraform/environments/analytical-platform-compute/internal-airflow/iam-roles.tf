@@ -1,9 +1,3 @@
-locals {
-  datahub_environments_share = [
-    "electronic-monitoring-data-${local.environment}"
-  ]
-}
-
 module "mwaa_execution_iam_role" {
   count = local.create_internal_airflow ? 1 : 0
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions

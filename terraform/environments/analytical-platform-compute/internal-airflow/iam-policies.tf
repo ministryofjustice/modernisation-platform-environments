@@ -1,6 +1,7 @@
 #trivy:ignore:AVD-AWS-0345: required as per documentation
 data "aws_iam_policy_document" "mwaa_execution_policy" {
   count = local.create_internal_airflow ? 1 : 0
+  
   statement {
     effect  = "Deny"
     actions = ["s3:ListAllMyBuckets"]
@@ -126,6 +127,7 @@ module "mwaa_execution_iam_policy" {
 
 data "aws_iam_policy_document" "mwaa_ses" {
   count = local.create_internal_airflow ? 1 : 0
+
   statement {
     sid    = "AllowSESSendRawEmail"
     effect = "Allow"
@@ -158,6 +160,7 @@ module "mwaa_ses_policy" {
 
 data "aws_iam_policy_document" "gha_moj_ap_airflow" {
   count = local.create_internal_airflow ? 1 : 0
+
   statement {
     sid    = "MWAAKMSAccess"
     effect = "Allow"
@@ -214,6 +217,7 @@ module "gha_moj_ap_airflow_iam_policy" {
 
 data "aws_iam_policy_document" "gha_mojas_airflow" {
   count = local.create_internal_airflow ? 1 : 0
+
   statement {
     sid       = "EKSAccess"
     effect    = "Allow"
