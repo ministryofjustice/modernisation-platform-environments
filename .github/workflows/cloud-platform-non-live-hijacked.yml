@@ -29,6 +29,7 @@ permissions:
   contents: read  # This is required for actions/checkout
 
 env:
+  APPLICATION: "cloud-platform-non-live"
   ACCOUNT_NAME: "cloud-platform-non-live-development"
 
 jobs:
@@ -130,7 +131,7 @@ jobs:
         # Terraform Init
         #
         - name: Terraform Init
-          working-directory: "terraform/environments/${{ env.ACCOUNT_NAME }}/"
+          working-directory: "terraform/environments/${{ env.APPLICATION }}/"
           run: |
             pwd
             ls -la
@@ -142,6 +143,6 @@ jobs:
         # Terraform Workspace Select
         #
         - name: Terraform Workspace Select
-          working-directory: "terraform/environments/${{ env.ACCOUNT_NAME }}/"
+          working-directory: "terraform/environments/${{ env.APPLICATION }}/"
           run: |
             terraform workspace select "${ACCOUNT_NAME}"
