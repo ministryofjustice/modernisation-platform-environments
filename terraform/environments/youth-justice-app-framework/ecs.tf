@@ -52,6 +52,7 @@ module "ecs" {
   internal_alb_name                  = module.internal_alb.alb_name
   connectivity_alb_name              = module.connectivity_alb.alb_name
   yjsm_hub_svc_alb_name              = local.application_data.accounts[local.environment].create_svc_pilot ? module.yjsm_hub_svc_alb[0].alb_name : null
+  create_svc_pilot                   = local.application_data.accounts[local.environment].create_svc_pilot  # Added to conditionally create resources for the service pilot
   #ECS details
   cluster_name                = "yjaf-cluster"
   ec2_instance_type           = "c6a.4xlarge"
