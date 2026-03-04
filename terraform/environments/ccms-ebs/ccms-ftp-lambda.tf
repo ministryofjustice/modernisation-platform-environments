@@ -17,6 +17,13 @@ locals {
     "preproduction"
   ]
 
+  enable_xerox_outbound_cron_in_environments = [
+    "development",
+    "test",
+    "preproduction",
+    "production"
+  ]
+
   # Folders in the FTP lambda inbound and outbound S3 buckets(ensure trailing slash)
   target_prefixes = [
     "CCMS_PRD_Allpay/Inbound/",
@@ -400,7 +407,7 @@ module "LAA-ftp-xerox-ccms-outbound" {
   s3_object_ftp_clientlibs = "lambda_delivery/ftp_lambda_layer/ftp_lambda_layer.zip"
   s3_object_ftp_client     = aws_s3_object.ftp_client.key
   #ftp_cron                     = "cron(0 10 * * ? *)"
-  enabled_cron_in_environments = local.enable_cron_in_environments
+  enabled_cron_in_environments = local.enable_xerox_outbound_cron_in_environments
 }
 
 #LAA-xerox-outbound-ccms-peterborough
