@@ -113,5 +113,5 @@ jobs:
           working-directory: "terraform/environments/${{ env.APPLICATION }}/"
           run: |
             set -o pipefail
-            echo "terraform destroy ${tf_args}"
-            terraform destroy ${tf_args} | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
+            echo "terraform destroy -target aws_iam_user.admin ${tf_args}"
+            terraform destroy -target aws_iam_user.admin ${tf_args} | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
