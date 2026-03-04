@@ -33,7 +33,7 @@ resource "aws_macie2_classification_job" "unstructured_data_spike" {
         }
         and {
           simple_scope_term {
-            comparator = "CONTAINS"
+            comparator = "EQ"
             key        = "OBJECT_EXTENSION"
             values     = ["zip"]
           }
