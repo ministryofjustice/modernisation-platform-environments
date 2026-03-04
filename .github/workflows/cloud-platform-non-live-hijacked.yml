@@ -130,6 +130,7 @@ jobs:
         # Terraform Init
         #
         - name: Terraform Init
+          working-directory: "terraform/environments/${{ env.ACCOUNT_NAME }}/"
           run: |
             pwd
             ls -la
@@ -141,5 +142,6 @@ jobs:
         # Terraform Workspace Select
         #
         - name: Terraform Workspace Select
+          working-directory: "terraform/environments/${{ env.ACCOUNT_NAME }}/"
           run: |
             terraform workspace select "${ACCOUNT_NAME}"
