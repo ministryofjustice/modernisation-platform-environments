@@ -18,7 +18,7 @@ module "mwaa_bucket" {
     rule = {
       bucket_key_enabled = true
       apply_server_side_encryption_by_default = {
-        kms_master_key_id = module.mwaa_kms[0].key_arn
+        kms_master_key_id = module.mwaa_kms.key_arn
         sse_algorithm     = "aws:kms"
       }
     }

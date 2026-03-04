@@ -8,7 +8,7 @@ resource "aws_mwaa_environment" "main" {
 
   execution_role_arn = module.mwaa_execution_iam_role.iam_role_arn
 
-  kms_key = module.mwaa_kms[0].key_arn
+  kms_key = module.mwaa_kms.key_arn
 
   source_bucket_arn              = module.mwaa_bucket[0].s3_bucket_arn
   dag_s3_path                    = "dags/"

@@ -69,7 +69,7 @@ data "aws_iam_policy_document" "mwaa_execution_policy" {
       "kms:GenerateDataKey*",
       "kms:Encrypt"
     ]
-    resources = [module.mwaa_kms[0].key_arn]
+    resources = [module.mwaa_kms.key_arn]
     condition {
       test     = "StringLike"
       variable = "kms:ViaService"
@@ -169,7 +169,7 @@ data "aws_iam_policy_document" "gha_moj_ap_airflow" {
       "kms:GenerateDataKey*",
       "kms:Describe*"
     ]
-    resources = [module.mwaa_kms[0].key_arn]
+    resources = [module.mwaa_kms.key_arn]
   }
   statement {
     sid    = "MWAABucketAccess"
