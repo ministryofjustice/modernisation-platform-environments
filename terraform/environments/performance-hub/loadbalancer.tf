@@ -73,6 +73,7 @@ resource "aws_lb_target_group" "target_group" {
   )
 }
 
+/*
 #tfsec:ignore:AWS004
 resource "aws_lb_listener" "listener" {
   #checkov:skip=CKV_AWS_2
@@ -86,7 +87,10 @@ resource "aws_lb_listener" "listener" {
     type             = "forward"
   }
 }
+*/
 
+## remove this
+/*
 resource "aws_lb_listener" "https_listener" {
   #checkov:skip=CKV_AWS_103
   depends_on = [aws_acm_certificate_validation.external]
@@ -102,6 +106,22 @@ resource "aws_lb_listener" "https_listener" {
     type             = "forward"
   }
 }
+*/
+
+# add this
+resource "aws_lb_listener" "https_listener" {
+  #checkov:skip=CKV_AWS_103
+  depends_on        = [aws_acm_certificate_validation.external]
+  load_balancer_arn = module.lb_access_logs_enabled.load_balancer.arn
+  port              = 443
+  protocol          = "HTTPS"
+  certificate_arn   = aws_acm_certificate.external.arn
+
+  default_action {
+    target_group_arn = aws_lb_target_group.target_group.id
+    type             = "forward"
+  }
+}
 
 resource "aws_security_group" "load_balancer_security_group" {
   name_prefix = "${local.application_name}-loadbalancer-security-group"
@@ -110,7 +130,7 @@ resource "aws_security_group" "load_balancer_security_group" {
 
   ingress {
     protocol    = "tcp"
-    description = "Open the server port"
+    description = "Allow traffic from load balancer to application container"
     from_port   = local.app_data.accounts[local.environment].server_port
     to_port     = local.app_data.accounts[local.environment].server_port
     #tfsec:ignore:AWS008

@@ -1,0 +1,65 @@
+
+
+# Preprod (staging) certificate
+
+locals {
+  preprod_domains = local.is-preproduction ? {
+    "default"   = "staging.hmpps-performance-hub.service.justice.gov.uk"
+  } : {}
+}
+
+resource "aws_acm_certificate" "preprod_certificates" {
+  for_each                  = local.is-preproduction ? local.preprod_domains : {}
+  domain_name               = each.value
+  validation_method         = "DNS"
+  subject_alternative_names = ["www.${each.value}"]
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  tags = {
+    Name = "${each.value} certificate"
+  }
+}
+
+resource "aws_acm_certificate_validation" "preprod_certificate_validation" {
+  for_each        = local.is-preproduction ? aws_acm_certificate.preprod_certificates : {}
+  certificate_arn = each.value.arn
+
+  validation_record_fqdns = [
+    for option in each.value.domain_validation_options : option.resource_record_name
+  ]
+}
+
+# Prod certificate
+
+locals {
+  prod_domains = local.is-production ? {
+    "default" = "hmpps-performance-hub.service.justice.gov.uk"
+  } : {}
+}
+
+resource "aws_acm_certificate" "prod_certificates" {
+  for_each                  = local.is-production ? local.prod_domains : {}
+  domain_name               = each.value
+  validation_method         = "DNS"
+  subject_alternative_names = ["www.${each.value}"]
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  tags = {
+    Name = "${each.value} certificate"
+  }
+}
+
+resource "aws_acm_certificate_validation" "prod_certificate_validation" {
+  for_each        = local.is-production ? aws_acm_certificate.prod_certificates : {}
+  certificate_arn = each.value.arn
+
+  validation_record_fqdns = [
+    for option in each.value.domain_validation_options : option.resource_record_name
+  ]
+}
