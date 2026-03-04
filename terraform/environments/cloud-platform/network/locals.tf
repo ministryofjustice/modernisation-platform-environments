@@ -38,7 +38,8 @@ locals {
     "eks",               # EKS
     "eks-auth",          # EKS Auth
     "elasticache",       # ElastiCache
-    "email-smtp",        # SES
+    "email",             # SES (API)
+    # "email-smtp",        # SES (SMTP) (Disabled until we have a confirmed use case for it, as it requires additional secuirty group configuration as it uses SMTP ports instead of HTTPS 443)
     "events",            # CloudWatch Events
     "glue",              # AWS Glue
     "guardduty-data",    # GuardDuty
