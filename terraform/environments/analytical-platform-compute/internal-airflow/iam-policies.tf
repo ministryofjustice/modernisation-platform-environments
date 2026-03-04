@@ -1,6 +1,5 @@
 #trivy:ignore:AVD-AWS-0345: required as per documentation
 data "aws_iam_policy_document" "mwaa_execution_policy" {
-  count = local.create_internal_airflow ? 1 : 0
 
   statement {
     effect  = "Deny"
@@ -112,7 +111,6 @@ data "aws_iam_policy_document" "mwaa_execution_policy" {
 }
 
 module "mwaa_execution_iam_policy" {
-  count = local.create_internal_airflow ? 1 : 0
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
@@ -120,7 +118,7 @@ module "mwaa_execution_iam_policy" {
   version = "5.59.0"
 
   name   = "mwaa-execution"
-  policy = data.aws_iam_policy_document.mwaa_execution_policy[0].json
+  policy = data.aws_iam_policy_document.mwaa_execution_policy.json
 
   tags = local.tags
 }

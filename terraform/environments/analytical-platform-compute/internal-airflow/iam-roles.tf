@@ -16,7 +16,7 @@ module "mwaa_execution_iam_role" {
     "airflow-env.amazonaws.com"
   ]
 
-  custom_role_policy_arns = [module.mwaa_execution_iam_policy[0].arn]
+  custom_role_policy_arns = [module.mwaa_execution_iam_policy.arn]
 
   tags = local.tags
 }
