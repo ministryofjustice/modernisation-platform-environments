@@ -82,3 +82,4 @@ resource "aws_security_group_rule" "workspaces_rdp_ingress" {
   protocol          = "tcp"
   cidr_blocks       = [aws_vpc.workspaces[0].cidr_block]
 }
+
