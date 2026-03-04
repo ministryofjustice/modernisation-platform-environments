@@ -68,30 +68,30 @@ resource "aws_cloudwatch_metric_alarm" "Secondary_Status_Check_Failure" {
 }
 
 # Underlying waf Instance Status Check Failure
-resource "aws_cloudwatch_metric_alarm" "ssogen_waf_high_blocked_requests" {
-  count             = local.is-development || local.is-test ? 1 : 0
-  alarm_name        = "${local.application_name_ssogen}-${local.environment}-waf-high-blocked-requests"
-  alarm_description = "High number of requests blocked by WAF. Potential attack."
+# resource "aws_cloudwatch_metric_alarm" "ssogen_waf_high_blocked_requests" {
+#   count             = local.is-development || local.is-test ? 1 : 0
+#   alarm_name        = "${local.application_name_ssogen}-${local.environment}-waf-high-blocked-requests"
+#   alarm_description = "High number of requests blocked by WAF. Potential attack."
 
-  comparison_operator = "GreaterThanThreshold"
-  metric_name         = "BlockedRequests"
-  namespace           = "AWS/WAFV2"
-  statistic           = "Sum"
-  period              = 60
-  evaluation_periods  = 5
-  threshold           = 50 # tune for your workload
-  treat_missing_data  = "notBreaching"
+#   comparison_operator = "GreaterThanThreshold"
+#   metric_name         = "BlockedRequests"
+#   namespace           = "AWS/WAFV2"
+#   statistic           = "Sum"
+#   period              = 60
+#   evaluation_periods  = 5
+#   threshold           = 50 # tune for your workload
+#   treat_missing_data  = "notBreaching"
 
-  dimensions = {
-    WebACL = aws_wafv2_web_acl.ssogen_web_acl[count.index].name
-    Scope  = "REGIONAL"
-  }
+#   dimensions = {
+#     WebACL = aws_wafv2_web_acl.ssogen_web_acl[count.index].name
+#     Scope  = "REGIONAL"
+#   }
 
-  alarm_actions = [aws_sns_topic.cw_alerts.arn]
-  ok_actions    = [aws_sns_topic.cw_alerts.arn]
+#   alarm_actions = [aws_sns_topic.cw_alerts.arn]
+#   ok_actions    = [aws_sns_topic.cw_alerts.arn]
 
-  tags = local.tags
-}
+#   tags = local.tags
+# }
 
 resource "aws_cloudwatch_metric_alarm" "ssogen_alb_healthyhosts_app" {
   count               = local.is-development || local.is-test ? 1 : 0
