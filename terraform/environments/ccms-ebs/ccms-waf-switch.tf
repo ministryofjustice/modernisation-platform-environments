@@ -12,7 +12,7 @@ variable "rule_name" {
 }
 
 variable "ssogen_rule_name" {
-  default = "${local.application_name_ssogen}-waf-ip-set"
+  default = "ssogen-waf-ip-set"
 }
 
 # Pull an existing SSOGEN WAF Rule Group and rules using a dynamic name.

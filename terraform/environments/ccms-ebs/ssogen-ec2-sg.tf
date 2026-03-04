@@ -45,7 +45,7 @@ resource "aws_vpc_security_group_ingress_rule" "ing_console_ec2" {
 # ############################################
 # # INGRESS — 7003 within ec2 instances
 # ############################################
-resource "aws_vpc_security_group_ingress_rule" "ing_console_ec2" {
+resource "aws_vpc_security_group_ingress_rule" "ing_console_ec2_7003" {
   count                        = local.is-development || local.is-test ? 1 : 0
   ip_protocol                  = "tcp"
   description                  = "7003 from EC2 instances"
@@ -89,7 +89,7 @@ resource "aws_vpc_security_group_egress_rule" "from_ec2_to_ec2" {
 # # SSOGEN Security Group — Allow outbound 7003 from EC2 to EC2 (self)
 # #########################################
 
-resource "aws_vpc_security_group_egress_rule" "from_ec2_to_ec2" {
+resource "aws_vpc_security_group_egress_rule" "from_ec2_to_ec2_7003" {
   count                        = local.is-development || local.is-test ? 1 : 0
   security_group_id            = aws_security_group.ssogen_sg[count.index].id
   description                  = "Allow outbound to EC2 (self)"
