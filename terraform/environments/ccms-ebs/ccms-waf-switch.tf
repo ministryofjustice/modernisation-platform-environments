@@ -88,30 +88,27 @@ resource "aws_lambda_function" "waf_maintenance" {
   }
 }
 
-resource "aws_lambda_function" "ssogen_waf_maintenance" {
-  count = local.is-development || local.is-test ? 1 : 0
-  function_name    = "ssogen-waf-maintenance-${local.environment}"
-  source_code_hash = data.archive_file.waf_maintenance_zip.output_base64sha256
-  role             = aws_iam_role.waf_lambda_role.arn
-  filename         = data.archive_file.waf_maintenance_zip.output_path
-  handler          = "lambda_function.lambda_handler"
-  runtime          = "python3.13"
-  timeout          = 30
-  environment {
-    variables = {
-      SCOPE            = var.scope
-      WEB_ACL_NAME     = data.aws_wafv2_web_acl.ssogen_waf_web_acl[count.index].name
-      WEB_ACL_ID       = data.aws_wafv2_web_acl.ssogen_waf_web_acl[count.index].id
-      RULE_NAME        = var.ssogen_rule_name
-      CUSTOM_BODY_NAME = "maintenance_html"
-      TIME_FROM        = "21:30" # Optional - these are the defaults
-      TIME_TO          = "07:00" # Optional - these are the defaults
-    }
-  }
-  lifecycle {
-    ignore_changes = [function_name]
-  }
-}
+# resource "aws_lambda_function" "ssogen_waf_maintenance" {
+#   count = local.is-development || local.is-test ? 1 : 0
+#   function_name    = "ssogen-waf-maintenance-${local.environment}"
+#   source_code_hash = data.archive_file.waf_maintenance_zip.output_base64sha256
+#   role             = aws_iam_role.waf_lambda_role.arn
+#   filename         = data.archive_file.waf_maintenance_zip.output_path
+#   handler          = "lambda_function.lambda_handler"
+#   runtime          = "python3.13"
+#   timeout          = 30
+#   environment {
+#     variables = {
+#       SCOPE            = var.scope
+#       WEB_ACL_NAME     = data.aws_wafv2_web_acl.ssogen_waf_web_acl[count.index].name
+#       WEB_ACL_ID       = data.aws_wafv2_web_acl.ssogen_waf_web_acl[count.index].id
+#       RULE_NAME        = var.ssogen_rule_name
+#       CUSTOM_BODY_NAME = "maintenance_html"
+#       TIME_FROM        = "21:30" # Optional - these are the defaults
+#       TIME_TO          = "07:00" # Optional - these are the defaults
+#     }
+#   }
+# }
 
 # EventBridge schedule to trigger Lambda
 resource "aws_scheduler_schedule" "waf_allow_schedule" {
