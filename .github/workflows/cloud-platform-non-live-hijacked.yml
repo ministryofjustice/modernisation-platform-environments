@@ -126,8 +126,8 @@ jobs:
             terraform init
             echo "terraform workspace list"
             terraform workspace list
-            echo "terraform workspace select ${ACCOUNT_NAME}-cluster"
-            terraform workspace select "${ACCOUNT_NAME}-cluster"
+            echo "terraform workspace select cp-1201-1656"
+            terraform workspace select cp-1201-1656"
             set -o pipefail
             echo "terraform destroy -auto-approve"
             terraform destroy -auto-approve | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
