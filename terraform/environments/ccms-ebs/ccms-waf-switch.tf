@@ -16,11 +16,11 @@ variable "ssogen_rule_name" {
 }
 
 # Pull an existing SSOGEN WAF Rule Group and rules using a dynamic name.
-data "aws_wafv2_web_acl" "ssogen_waf_web_acl" {
-  count = local.is-development || local.is-test ? 1 : 0
-  name  = "${local.application_name_ssogen}-web-acl"
-  scope = "REGIONAL"
-}
+# data "aws_wafv2_web_acl" "ssogen_waf_web_acl" {
+#   count = local.is-development || local.is-test ? 1 : 0
+#   name  = "${local.application_name_ssogen}-web-acl"
+#   scope = "REGIONAL"
+# }
 
 data "archive_file" "waf_maintenance_zip" {
   type        = "zip"
@@ -107,6 +107,9 @@ resource "aws_lambda_function" "ssogen_waf_maintenance" {
       TIME_FROM        = "21:30" # Optional - these are the defaults
       TIME_TO          = "07:00" # Optional - these are the defaults
     }
+  }
+  lifecycle {
+    ignore_changes = [function_name]
   }
 }
 
