@@ -1,7 +1,7 @@
 #trivy:ignore:AVD-AWS-0345: required as per documentation
 data "aws_iam_policy_document" "mwaa_execution_policy" {
   count = local.create_internal_airflow ? 1 : 0
-  
+
   statement {
     effect  = "Deny"
     actions = ["s3:ListAllMyBuckets"]
