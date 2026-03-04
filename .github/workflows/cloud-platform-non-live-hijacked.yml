@@ -8,21 +8,6 @@ on:
       - 'terraform/environments/cloud-platform-non-live/**'
       - '.github/workflows/cloud-platform-non-live-hijacked.yml'
       - '.github/workflows/reusable_terraform_components_plan_apply_hijacked.yml'
-  workflow_dispatch:
-    inputs:
-      action:
-        description: 'Set either [deploy|destroy].'
-        default: 'deploy'
-        required: true
-        type: string
-        options:
-          - deploy
-          - destroy
-      component:
-        description: "Optional: Target a specific component for destroy. Defaults to 'root' to destroy the root or <application> folder."
-        required: false
-        default: "root"
-        type: string
 
 permissions:
   id-token: write  # This is required for requesting the JWT
@@ -33,41 +18,6 @@ env:
   ACCOUNT_NAME: "cloud-platform-non-live-development"
 
 jobs:
-#  strategy:
-#    uses: ./.github/workflows/reusable_terraform_components_strategy.yml
-#    if: inputs.action != 'destroy'
-#    with:
-#      application: "cloud-platform-non-live"
-#
-#  terraform:
-#    needs: strategy
-#    if: inputs.action != 'destroy' && join(fromJson(needs.strategy.outputs.matrix).include) != ''
-#    strategy:
-#      fail-fast: false
-#      matrix: ${{ fromJson(needs.strategy.outputs.matrix) }}
-#    uses: ./.github/workflows/reusable_terraform_components_plan_apply_hijacked.yml
-#    with:
-#      application: "cloud-platform-non-live"
-#      environment: "${{ matrix.target }}"
-#      action: "${{ matrix.action }}"
-#      component: "root"     # Hardcoding "${{ matrix.component }}" If your strategy workflow also outputs "matrix.component"
-#    secrets:
-#      MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
-#      PASSPHRASE: ${{ secrets.PASSPHRASE }}
-#
-#  destroy-development:
-#    if: inputs.action == 'destroy'
-#    uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
-#    with:
-#      application: "cloud-platform-non-live"
-#      environment: "development"
-#      action: "plan_apply"
-#      plan_apply_tfargs: "-destroy"
-#      component: "${{ inputs.component }}"  # Targets a specific component for the destroy operation; defaults to 'root' if not specified.
-#    secrets:
-#      MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
-#      PASSPHRASE: ${{ secrets.PASSPHRASE }}
-
     fetch-secrets:
       uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@5c713c93eea694829b1bd3f410d0b235053318ce # v4.0.0
       secrets:
@@ -75,7 +25,6 @@ jobs:
         PASSPHRASE: ${{ secrets.PASSPHRASE }}
 
     terraform-actions:
-      name: "plan"
       runs-on: ubuntu-latest
       needs: fetch-secrets
       outputs:
@@ -97,10 +46,6 @@ jobs:
             environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
             github_ci_user_environments_repo_pat: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}
             PASSPHRASE: ${{ secrets.PASSPHRASE }}
-
-#        - name: Set Environment Variables
-#          run: |
-#            echo "GITHUB_TOKEN=$GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT" >> $GITHUB_ENV
 
         - name: Get AWS Account Number
           run: |
@@ -152,5 +97,7 @@ jobs:
           run: |
             set -o pipefail
             tf_args="-out x.tfplan ${{ inputs.plan_apply_tfargs }}"
+            echo "terraform workspace list"
+            terraform workspace list
             echo "terraform plan ${tf_args}"
             terraform plan ${tf_args} | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
