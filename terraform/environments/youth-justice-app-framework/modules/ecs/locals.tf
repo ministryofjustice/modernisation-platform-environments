@@ -104,6 +104,16 @@ locals {
     }
   ]
 
+  doc_gateway_ingress = [
+    {
+      from_port       = 8080
+      to_port         = 8080
+      protocol        = "tcp"
+      security_groups = [var.yjsm_hub_svc_alb_security_group_id]
+      description     = "External doc-gateway alb to ECS service communication"
+    }
+  ]
+
   # Concatenate the lists here because I can't do it in the resource block
   combined_ingress_rules_external = concat(
     local.ecs_common_security_group_ingress,
