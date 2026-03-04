@@ -66,3 +66,16 @@ resource "aws_iam_role_policy" "workspaces_ds_access" {
     ]
   })
 }
+
+##############################################
+### WorkSpaces Service-Linked Role
+### Required for WorkSpaces to authorize with
+### Directory Service during registration
+##############################################
+
+resource "aws_iam_service_linked_role" "workspaces" {
+  count = local.environment == "development" ? 1 : 0
+
+  aws_service_name = "workspaces.amazonaws.com"
+  description      = "Service-linked role for Amazon WorkSpaces"
+}

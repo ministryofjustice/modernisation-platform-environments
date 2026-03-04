@@ -40,6 +40,7 @@ resource "aws_workspaces_directory" "workspaces" {
     aws_iam_role_policy_attachment.workspaces_default_service_access,
     aws_iam_role_policy_attachment.workspaces_default_self_service_access,
     aws_iam_role_policy.workspaces_ds_access,
+    aws_iam_service_linked_role.workspaces,
   ]
 
   tags = merge(
