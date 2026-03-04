@@ -24,11 +24,11 @@ resource "aws_subnet" "private_a" {
 
   vpc_id            = aws_vpc.workspaces[0].id
   cidr_block        = local.application_data.accounts[local.environment].private_subnet_a_cidr
-  availability_zone = "${data.aws_region.current.name}a"
+  availability_zone = "eu-west-2a"
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}-${local.environment}-private-${data.aws_region.current.name}a" }
+    { "Name" = "${local.application_name}-${local.environment}-private-eu-west-2a" }
   )
 }
 
@@ -37,11 +37,11 @@ resource "aws_subnet" "private_b" {
 
   vpc_id            = aws_vpc.workspaces[0].id
   cidr_block        = local.application_data.accounts[local.environment].private_subnet_b_cidr
-  availability_zone = "${data.aws_region.current.name}b"
+  availability_zone = "eu-west-2b"
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}-${local.environment}-private-${data.aws_region.current.name}b" }
+    { "Name" = "${local.application_name}-${local.environment}-private-eu-west-2b" }
   )
 }
 
