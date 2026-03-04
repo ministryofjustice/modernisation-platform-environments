@@ -113,5 +113,5 @@ jobs:
           working-directory: "terraform/environments/${{ env.APPLICATION }}/"
           run: |
             set -o pipefail
-            echo "terraform destroy -target aws_iam_user.admin ${tf_args}"
-            terraform destroy -target aws_iam_user.admin ${tf_args} | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
+            echo "terraform destroy terraform destroy -target aws_iam_access_key.admin -target aws_iam_user_policy_attachment.admin -target aws_iam_user.admin"
+            terraform destroy -target aws_iam_access_key.admin -target aws_iam_user_policy_attachment.admin -target aws_iam_user.admin | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
