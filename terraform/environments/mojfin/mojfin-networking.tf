@@ -131,7 +131,7 @@ resource "aws_security_group" "mojfin" {
   }
 
   dynamic "ingress" {
-    for_each = local.environment == "production" ? 1 : 0
+    for_each = local.environment == "production" ? [1] : []
     content {
       description = "Custom allowed CIDRs for MOJO devices - only applied in production"
       from_port   = 1521
