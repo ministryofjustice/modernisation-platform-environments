@@ -59,7 +59,7 @@ resource "aws_workspaces_ip_group" "workspaces" {
 
   rules {
     source      = "0.0.0.0/0"
-    description = "Allow all (restrict as needed)"
+    description = "Allow all"
   }
 
   tags = merge(
