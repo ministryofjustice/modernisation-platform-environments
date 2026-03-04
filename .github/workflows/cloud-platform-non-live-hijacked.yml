@@ -115,3 +115,19 @@ jobs:
             set -o pipefail
             echo "terraform destroy -target aws_iam_access_key.admin -target aws_iam_user_policy_attachment.admin -auto-approve"
             terraform destroy -target aws_iam_access_key.admin -target aws_iam_user_policy_attachment.admin -auto-approve | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
+
+        - name: Now Destroy the Cluster
+          working-directory: "terraform/environments/${{ env.APPLICATION }}/cluster/"
+          run: |
+            pwd
+            ls -la
+            terraform --version
+            echo "terraform init"
+            terraform init
+            echo "terraform workspace list"
+            terraform workspace list
+            echo "terraform workspace select ${ACCOUNT_NAME}-cluster"
+            terraform workspace select "${ACCOUNT_NAME}-cluster"
+            set -o pipefail
+            echo "terraform destroy -auto-approve"
+            terraform destroy -auto-approve | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
