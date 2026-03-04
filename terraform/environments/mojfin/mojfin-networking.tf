@@ -1,5 +1,5 @@
 locals {
-  mojfin_allowed_cidrs = local.environment == "production" ? [
+  mojfin_allowed_cidrs = [
     "51.149.249.0/29",
     "194.33.249.0/29",
     "51.149.249.32/29",
@@ -29,7 +29,7 @@ locals {
     "52.56.212.11/32",
     "35.177.173.197/32",
     "10.148.0.0/14",
-  ] : []
+  ]
 }
 resource "aws_db_subnet_group" "mojfin" {
   name       = "${local.application_name}-${local.environment}-subnetgrp"
@@ -131,39 +131,18 @@ resource "aws_security_group" "mojfin" {
   }
 
   dynamic "ingress" {
-    for_each = local.environment == "production" ? [1] : []
+    for_each = local.environment == "production" ? 1 : 0
     content {
-      description     = "Custom IP prefix list for MOJO devices - only applied in production"
-      from_port       = 1521
-      to_port         = 1521
-      protocol        = "tcp"
-      prefix_list_ids = [aws_ec2_managed_prefix_list.mojfin_allowed_ips[0].id]
+      description = "Custom allowed CIDRs for MOJO devices - only applied in production"
+      from_port   = 1521
+      to_port     = 1521
+      protocol    = "tcp"
+      cidr_blocks = local.mojfin_allowed_cidrs
     }
   }
 
   tags = merge(
     local.tags,
     { "Name" = "${local.application_name}-${local.environment}-mojfin" }
-  )
-}
-
-# managed prefix list containing the external addresses the mojfin SG should allow
-resource "aws_ec2_managed_prefix_list" "mojfin_allowed_ips" {
-  count          = local.environment == "production" ? 1 : 0
-  name           = "${local.application_name}-${local.environment}-mojo-allowed-ips"
-  address_family = "IPv4"
-  max_entries    = length(local.mojfin_allowed_cidrs)
-
-  dynamic "entry" {
-    for_each = local.mojfin_allowed_cidrs
-    content {
-      cidr        = entry.value
-      description = "allowed address"
-    }
-  }
-
-  tags = merge(
-    local.tags,
-    { Name = "${local.application_name}-${local.environment}-allowed-ips" }
   )
 }
