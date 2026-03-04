@@ -9,3 +9,5 @@ nodeVersion:
 
 subnetSelectorTerms: []
 securityGroupSelectorTerms: []
+
+ec2NodeClassTags: {}

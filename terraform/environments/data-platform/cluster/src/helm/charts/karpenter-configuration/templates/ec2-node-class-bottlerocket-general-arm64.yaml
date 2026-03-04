@@ -27,3 +27,5 @@ spec:
         deleteOnTermination: true
         throughput: 250
   detailedMonitoring: true
+  tags:
+{{- toYaml .Values.ec2NodeClassTags | nindent 4 }}

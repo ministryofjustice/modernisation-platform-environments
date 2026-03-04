@@ -130,3 +130,41 @@ module "external_dns_iam_role" {
     }
   }
 }
+
+module "external_secrets_iam_role" {
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role-for-service-accounts?ref=581bec52db8ad843eeb8e6ae1103aaeec9787c41" # v6.3.0
+
+  name = "external-secrets"
+
+  attach_external_secrets_policy = true
+  external_secrets_kms_key_arns  = [module.secrets_manager_common_kms_key.key_arn]
+
+  oidc_providers = {
+    main = {
+      provider_arn               = module.eks.oidc_provider_arn
+      namespace_service_accounts = ["${module.external_secrets_namespace.name}:external-secrets"]
+    }
+  }
+
+  tags = local.tags
+}
+
+module "velero_iam_role" {
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role-for-service-accounts?ref=581bec52db8ad843eeb8e6ae1103aaeec9787c41" # v6.3.0
+
+  name = "velero"
+
+  attach_velero_policy  = true
+  velero_s3_bucket_arns = [module.velero_s3_bucket.s3_bucket_arn]
+
+  policies = {
+    VeleroKMSAccessPolicy = module.velero_kms_iam_policy.arn
+  }
+
+  oidc_providers = {
+    main = {
+      provider_arn               = module.eks.oidc_provider_arn
+      namespace_service_accounts = ["${module.velero_namespace.name}:velero-server"]
+    }
+  }
+}

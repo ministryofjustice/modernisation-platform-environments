@@ -55,6 +55,13 @@ module "external_dns_namespace" {
   workload = "system"
 }
 
+module "external_secrets_namespace" {
+  source = "./modules/kubernetes/namespace"
+
+  name     = "external-secrets"
+  workload = "system"
+}
+
 module "shared_services_namespace" {
   source = "./modules/kubernetes/namespace"
 
@@ -66,5 +73,12 @@ module "keda_namespace" {
   source = "./modules/kubernetes/namespace"
 
   name     = "keda"
+  workload = "system"
+}
+
+module "velero_namespace" {
+  source = "./modules/kubernetes/namespace"
+
+  name     = "velero"
   workload = "system"
 }

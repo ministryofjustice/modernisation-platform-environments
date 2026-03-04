@@ -22,9 +22,14 @@ environment:
       fluent_bit: "0.2.0"
       cert_manager: "1.19.4"
       external_dns: "1.20.0"
+      external_secrets: "2.0.1"
       karpenter_crd: "1.9.0"
       karpenter: "1.9.0"
       keda: "2.19.0"
+      velero: "11.4.0"
+    extra_versions:
+      velero_plugin_aws: "v1.13.2"
+      velero_kubectl: "1.35.2"
     route53_zones:
       - "development.data-platform.service.justice.gov.uk"
       - "development.ai-gateway.justice.gov.uk"
@@ -52,9 +57,14 @@ environment:
       fluent_bit: "0.2.0"
       cert_manager: "1.19.4"
       external_dns: "1.20.0"
+      external_secrets: "2.0.1"
       karpenter_crd: "1.9.0"
       karpenter: "1.9.0"
       keda: "2.19.0"
+      velero: "11.4.0"
+    extra_versions:
+      velero_plugin_aws: "v1.13.2"
+      velero_kubectl: "1.35.2"
     route53_zones:
       - "test.data-platform.service.justice.gov.uk"
       - "test.ai-gateway.justice.gov.uk"
@@ -82,15 +92,19 @@ environment:
       fluent_bit: "0.2.0"
       cert_manager: "1.19.4"
       external_dns: "1.20.0"
+      external_secrets: "2.0.1"
       karpenter_crd: "1.9.0"
       karpenter: "1.9.0"
       keda: "2.19.0"
+      velero: "11.4.0"
+    extra_versions:
+      velero_plugin_aws: "v1.13.2"
+      velero_kubectl: "1.35.2"
     route53_zones:
       - "preproduction.data-platform.service.justice.gov.uk"
       - "preproduction.ai-gateway.justice.gov.uk"
     shared_services_gateway_hostname: "*.preproduction.data-platform.service.justice.gov.uk"
   production:
-    kubernetes_version: "1.35"
     kubernetes_version: "1.35"
     bottlerocket_version: "1.55.0-d93bb1b1"
     addon_versions:
@@ -113,9 +127,14 @@ environment:
       fluent_bit: "0.2.0"
       cert_manager: "1.19.4"
       external_dns: "1.20.0"
+      external_secrets: "2.0.1"
       karpenter_crd: "1.9.0"
       karpenter: "1.9.0"
       keda: "2.19.0"
+      velero: "11.4.0"
+    extra_versions:
+      velero_plugin_aws: "v1.13.2"
+      velero_kubectl: "1.35.2"
     route53_zones:
       - "data-platform.service.justice.gov.uk"
       - "ai-gateway.justice.gov.uk"

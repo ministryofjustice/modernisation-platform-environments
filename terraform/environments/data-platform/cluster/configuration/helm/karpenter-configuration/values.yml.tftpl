@@ -16,3 +16,6 @@ securityGroupSelectorTerms:
 %{ for security_group_id in security_group_ids ~}
   - id: ${security_group_id}
 %{ endfor ~}
+
+ec2NodeClassTags:
+  ${replace(yamlencode(ec2_node_class_tags), "\n", "\n  ")}

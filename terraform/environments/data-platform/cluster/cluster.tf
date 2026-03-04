@@ -160,6 +160,7 @@ module "eks_managed_node_group_system" {
 
   labels = {
     "compute.data-platform.service.justice.gov.uk/node" = "system"
+    "compute.data-platform.service.justice.gov.uk/type" = "mng"
   }
 
   taints = {
@@ -175,6 +176,13 @@ module "eks_managed_node_group_system" {
     }
   }
 
+  launch_template_tags = merge(
+    {
+      "compute.data-platform.service.justice.gov.uk/node" = "system"
+      "compute.data-platform.service.justice.gov.uk/type" = "mng"
+    },
+    local.tags
+  )
 
   # EBS volume configuration
   block_device_mappings = {

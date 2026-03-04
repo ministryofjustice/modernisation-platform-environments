@@ -192,3 +192,21 @@ module "prometheus_logs_kms_key" {
 
   deletion_window_in_days = 7
 }
+
+module "secrets_manager_common_kms_key" {
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-kms.git?ref=407e3db34a65b384c20ef718f55d9ceacb97a846" # v4.2.0
+
+  aliases               = ["secretsmanager/${local.eks_cluster_name}/common"]
+  enable_default_policy = true
+
+  deletion_window_in_days = 7
+}
+
+module "velero_kms_key" {
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-kms.git?ref=407e3db34a65b384c20ef718f55d9ceacb97a846" # v4.2.0
+
+  aliases               = ["s3/velero/${local.eks_cluster_name}"]
+  enable_default_policy = true
+
+  deletion_window_in_days = 7
+}

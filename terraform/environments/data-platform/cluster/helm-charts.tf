@@ -158,6 +158,17 @@ resource "helm_release" "karpenter_configuration" {
           module.eks.cluster_primary_security_group_id,
           module.node_security_group.security_group_id,
         ]
+        ec2_node_class_tags = {
+          # This enhanced logic ensures that boolean values in local.tags are converted to strings, which is necessary for Helm chart compatibility.
+          # for example. local.tags.is-production = true will be converted to "is-production" = "true"
+          for key, value in merge(
+            {
+              "compute.data-platform.service.justice.gov.uk/node" = "application"
+              "compute.data-platform.service.justice.gov.uk/type" = "karpenter"
+            },
+            local.tags
+          ) : key => tostring(value)
+        }
       }
     )
   ]
@@ -280,6 +291,25 @@ resource "helm_release" "external_dns" {
   ]
 }
 
+resource "helm_release" "external_secrets" {
+  /* https://artifacthub.io/packages/helm/external-secrets-operator/external-secrets */
+
+  name       = "external-secrets"
+  repository = "https://charts.external-secrets.io"
+  chart      = "external-secrets"
+  version    = local.cluster_configuration.helm_chart_versions.external_secrets
+  namespace  = module.external_secrets_namespace.name
+  values = [
+    templatefile(
+      "${path.module}/configuration/helm/external-secrets/values.yml.tftpl",
+      {
+        eks_role_arn = module.external_secrets_iam_role.arn
+      }
+    )
+  ]
+}
+
+
 resource "helm_release" "shared_services_gateway" {
   name      = "shared-services-gateway"
   chart     = "./src/helm/charts/shared-services-gateway"
@@ -305,7 +335,7 @@ resource "helm_release" "keda" {
   name       = "keda"
   repository = "https://kedacore.github.io/charts"
   chart      = "keda"
-  version    = "2.19.0"
+  version    = local.cluster_configuration.helm_chart_versions.keda
   namespace  = module.keda_namespace.name
   values = [
     templatefile(
@@ -314,3 +344,28 @@ resource "helm_release" "keda" {
     )
   ]
 }
+
+# Velero CRD installation is failing due to changes with Bitnami's kubectl image https://github.com/vmware-tanzu/helm-charts/issues/698
+# TODO: Look at https://aws.amazon.com/about-aws/whats-new/2025/11/aws-backup-supports-amazon-eks/
+# resource "helm_release" "velero" {
+#   /* https://artifacthub.io/packages/helm/vmware-tanzu/velero */
+
+#   name       = "velero"
+#   repository = "https://vmware-tanzu.github.io/helm-charts"
+#   chart      = "velero"
+#   version    = local.cluster_configuration.helm_chart_versions.velero
+#   namespace  = module.velero_namespace.name
+#   values = [
+#     templatefile(
+#       "${path.module}/configuration/helm/velero/values.yml.tftpl",
+#       {
+#         aws_region                = data.aws_region.current.region
+#         eks_role_arn              = module.velero_iam_role.arn
+#         kubectl_version           = local.cluster_configuration.extra_versions.velero_kubectl
+#         velero_aws_plugin_version = local.cluster_configuration.extra_versions.velero_plugin_aws
+#         velero_bucket             = module.velero_s3_bucket.s3_bucket_id
+#         velero_prefix             = module.eks.cluster_name
+#       }
+#     )
+#   ]
+# }
