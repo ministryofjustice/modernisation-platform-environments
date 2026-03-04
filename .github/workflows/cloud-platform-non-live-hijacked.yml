@@ -15,6 +15,7 @@ permissions:
 env:
   APPLICATION: "cloud-platform-non-live"
   ACCOUNT_NAME: "cloud-platform-non-live-development"
+  CLUSTER_WORKSPACE: "cp-1301-1148"
 
 jobs:
     fetch-secrets:
@@ -119,6 +120,7 @@ jobs:
         - name: Now Destroy the Cluster
           working-directory: "terraform/environments/${{ env.APPLICATION }}/cluster/"
           run: |
+            set -o pipefail
             pwd
             ls -la
             terraform --version
@@ -126,8 +128,9 @@ jobs:
             terraform init
             echo "terraform workspace list"
             terraform workspace list
-            echo "terraform workspace select cp-1201-1656"
-            terraform workspace select cp-1201-1656
-            set -o pipefail
+            echo "terraform workspace select ${CLUSTER_WORKSPACE}"
+            terraform workspace select ${CLUSTER_WORKSPACE}
+            echo "terraform apply -auto-approve"
+            terraform apply -auto-approve | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
             echo "terraform destroy -auto-approve"
             terraform destroy -auto-approve | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
