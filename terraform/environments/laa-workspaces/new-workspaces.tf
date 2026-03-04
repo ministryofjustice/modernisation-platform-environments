@@ -84,7 +84,7 @@ resource "aws_workspaces_ip_group" "workspaces" {
 #
 #   root_volume_encryption_enabled = true
 #   user_volume_encryption_enabled = true
-#   volume_encryption_key          = aws_kms_key.workspaces[0].arn
+#   volume_encryption_key          = data.aws_kms_key.ebs_shared.arn
 #
 #   workspace_properties {
 #     compute_type_name                         = local.workspace_types[each.value.instance_type].compute_type_name
