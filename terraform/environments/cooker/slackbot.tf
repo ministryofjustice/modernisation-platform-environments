@@ -5,7 +5,7 @@ module "cert_module" {
     aws.core-network-services = aws.core-network-services
   }
   application_name                          = local.application_name
-  subject_alternative_names                 = ["*.webapp"]
+  subject_alternative_names                 = ["webapp", "*.webapp"]
   is-production                             = local.is-production
   production_service_fqdn                   = ""
   zone_name_core_vpc_public                 = data.aws_route53_zone.external.name
