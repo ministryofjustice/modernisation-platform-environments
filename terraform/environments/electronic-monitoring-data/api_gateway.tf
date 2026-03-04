@@ -33,6 +33,7 @@ module "ears_sars_api" {
   api_description = "Ears and Sars API"
   api_path        = "execute"
   step_function   = module.ears_sars_step_function[0]
+  sync            = false
   stages = [
     {
       stage_name             = "request",
