@@ -46,6 +46,8 @@ locals {
     "g4s_lcm_archive",
     "g4s_tasking",
     "scram_alcohol_monitoring",
+  ] : local.is-preproduction ? [
+    "g4s_cap_dw",
   ] : local.is-development ? ["test"] : []
 
   prod_dbs_to_grant = [
