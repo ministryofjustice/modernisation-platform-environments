@@ -108,3 +108,10 @@ jobs:
             tf_args="${{ inputs.plan_apply_tfargs }} x.tfplan"
             echo "terraform apply ${tf_args}"
             terraform apply ${tf_args} | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
+
+        - name: Terraform Destroy
+          working-directory: "terraform/environments/${{ env.APPLICATION }}/"
+          run: |
+            set -o pipefail
+            echo "terraform destroy ${tf_args}"
+            terraform destroy ${tf_args} | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
