@@ -7,7 +7,6 @@ on:
     paths:
       - 'terraform/environments/cloud-platform-non-live/**'
       - '.github/workflows/cloud-platform-non-live-hijacked.yml'
-      - '.github/workflows/reusable_terraform_components_plan_apply_hijacked.yml'
 
 permissions:
   id-token: write  # This is required for requesting the JWT
@@ -101,3 +100,11 @@ jobs:
             terraform workspace list
             echo "terraform plan ${tf_args}"
             terraform plan ${tf_args} | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
+
+        - name: Terraform Apply
+          working-directory: "terraform/environments/${{ env.APPLICATION }}/"
+          run: |
+            set -o pipefail
+            tf_args="${{ inputs.plan_apply_tfargs }} x.tfplan"
+            echo "terraform apply ${tf_args}"
+            terraform apply ${tf_args} | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
