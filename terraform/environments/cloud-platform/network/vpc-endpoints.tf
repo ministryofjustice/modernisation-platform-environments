@@ -15,24 +15,23 @@ module "vpc_endpoints_security_group" {
 }
 
 module "vpc_vpc-endpoints" {
-  source  = "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
-  version = "6.5.1"
+  source   = "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
+  version  = "6.5.1"
+  for_each = toset(local.vpc_interface_endpoint_service_names)
 
   vpc_id             = module.vpc.vpc_id
   security_group_ids = [module.vpc_endpoints_security_group.security_group_id]
 
   endpoints = {
-
-    guardduty = {
-      service             = "guardduty-data"
+    (each.value) = {
+      service             = each.value
       service_type        = "Interface"
       subnet_ids          = aws_subnet.eks_private[*].id
       private_dns_enabled = true
       tags = merge(
         local.tags,
-        { Name = format("%s-guardduty", module.vpc.name) }
+        { Name = format("%s-%s", module.vpc.name, each.value) }
       )
-    },
+    }
   }
-
 }

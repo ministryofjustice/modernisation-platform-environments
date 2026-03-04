@@ -9,10 +9,10 @@ module "authorizer_lambda" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "8.5.0"
 
-  function_name    = "hmac-authorizer"
-  description      = "Custom HMAC authorizer and method handler for API Gateway"
-  handler          = "authorizer.handler"
-  runtime          = "nodejs20.x"
+  function_name = "hmac-authorizer"
+  description   = "Custom HMAC authorizer and method handler for API Gateway"
+  handler       = "authorizer.handler"
+  runtime       = "nodejs20.x"
 
   create_package         = false
   local_existing_package = data.archive_file.lambda_zip.output_path
@@ -21,7 +21,7 @@ module "authorizer_lambda" {
 
   environment_variables = {
     SECRET_ID = module.secret_ingestion_api_auth_token.secret_arn
-    SQS_URL = "https://sqs.eu-west-2.amazonaws.com/${data.aws_secretsmanager_secret_version.cloud_platform_account_id.secret_string}/${local.environment_configuration[local.environment].cloud_platform_sqs_queue_name}"
+    SQS_URL   = "https://sqs.eu-west-2.amazonaws.com/${data.aws_secretsmanager_secret_version.cloud_platform_account_id.secret_string}/${local.environment_configuration[local.environment].cloud_platform_sqs_queue_name}"
   }
 
   attach_policy_statements = true
@@ -46,7 +46,7 @@ module "authorizer_lambda" {
   # IAM Roles & Policies
   create_role = true
   role_name   = "authorizer-role-mp"
-  
+
 
   tags = local.tags
 }
