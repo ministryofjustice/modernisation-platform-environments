@@ -99,7 +99,7 @@ resource "aws_lb_listener" "ssogen_internal_console_listener" {
   # depends_on = [aws_acm_certificate_validation.external_nonprod]
 }
 
-resource "aws_lb_listener" "ssogen_internal_console_listener" {
+resource "aws_lb_listener" "ssogen_internal_console_listener_encrypted" {
   count             = local.is-development || local.is-test ? 1 : 0
   load_balancer_arn = aws_lb.ssogen_alb[count.index].arn
   port              = "5443"
