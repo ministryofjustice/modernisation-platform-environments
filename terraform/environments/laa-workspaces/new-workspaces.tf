@@ -55,7 +55,7 @@ resource "aws_workspaces_ip_group" "workspaces" {
   count = local.environment == "development" ? 1 : 0
 
   name        = "${local.application_name}-${local.environment}-ip-group"
-  description = "IP access control group for ${local.application_name} WorkSpaces"
+  description = "IP access control group"
 
   rules {
     source      = "0.0.0.0/0"
