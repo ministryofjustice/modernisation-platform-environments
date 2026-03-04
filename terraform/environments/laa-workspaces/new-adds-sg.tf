@@ -7,7 +7,7 @@ resource "aws_security_group" "ad" {
 
   name_prefix = "${local.application_name}-ad-"
   description = "Security group for ${local.application_name} Active Directory"
-  vpc_id      = data.aws_vpc.shared.id
+  vpc_id      = aws_vpc.workspaces[0].id
 
   tags = merge(
     local.tags,
@@ -29,7 +29,7 @@ resource "aws_security_group_rule" "ad_dns_tcp" {
   from_port         = 53
   to_port           = 53
   protocol          = "tcp"
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+  cidr_blocks       = [aws_vpc.workspaces[0].cidr_block]
 }
 
 # AD - Allow DNS (UDP)
@@ -42,7 +42,7 @@ resource "aws_security_group_rule" "ad_dns_udp" {
   from_port         = 53
   to_port           = 53
   protocol          = "udp"
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+  cidr_blocks       = [aws_vpc.workspaces[0].cidr_block]
 }
 
 # AD - Allow LDAP (TCP)
@@ -55,7 +55,7 @@ resource "aws_security_group_rule" "ad_ldap_tcp" {
   from_port         = 389
   to_port           = 389
   protocol          = "tcp"
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+  cidr_blocks       = [aws_vpc.workspaces[0].cidr_block]
 }
 
 # AD - Allow LDAPS
@@ -68,7 +68,7 @@ resource "aws_security_group_rule" "ad_ldaps" {
   from_port         = 636
   to_port           = 636
   protocol          = "tcp"
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+  cidr_blocks       = [aws_vpc.workspaces[0].cidr_block]
 }
 
 # AD - Allow Kerberos (TCP)
@@ -81,7 +81,7 @@ resource "aws_security_group_rule" "ad_kerberos_tcp" {
   from_port         = 88
   to_port           = 88
   protocol          = "tcp"
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+  cidr_blocks       = [aws_vpc.workspaces[0].cidr_block]
 }
 
 # AD - Allow Kerberos (UDP)
@@ -94,7 +94,7 @@ resource "aws_security_group_rule" "ad_kerberos_udp" {
   from_port         = 88
   to_port           = 88
   protocol          = "udp"
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+  cidr_blocks       = [aws_vpc.workspaces[0].cidr_block]
 }
 
 # AD - Allow SMB
@@ -107,7 +107,7 @@ resource "aws_security_group_rule" "ad_smb" {
   from_port         = 445
   to_port           = 445
   protocol          = "tcp"
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+  cidr_blocks       = [aws_vpc.workspaces[0].cidr_block]
 }
 
 # AD - Allow all outbound

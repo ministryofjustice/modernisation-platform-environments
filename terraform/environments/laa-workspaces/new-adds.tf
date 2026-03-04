@@ -12,8 +12,8 @@ resource "aws_directory_service_directory" "workspaces_ad" {
   type       = "MicrosoftAD"
 
   vpc_settings {
-    vpc_id     = data.aws_vpc.shared.id
-    subnet_ids = slice(data.aws_subnets.shared-private.ids, 0, 2)
+    vpc_id     = aws_vpc.workspaces[0].id
+    subnet_ids = [aws_subnet.private_a[0].id, aws_subnet.private_b[0].id]
   }
 
   tags = merge(

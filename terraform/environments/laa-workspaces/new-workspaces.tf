@@ -6,7 +6,7 @@ resource "aws_workspaces_directory" "workspaces" {
   count = local.environment == "development" ? 1 : 0
 
   directory_id = aws_directory_service_directory.workspaces_ad[0].id
-  subnet_ids   = slice(data.aws_subnets.shared-private.ids, 0, 2)
+  subnet_ids   = [aws_subnet.private_a[0].id, aws_subnet.private_b[0].id]
 
   self_service_permissions {
     change_compute_type  = false

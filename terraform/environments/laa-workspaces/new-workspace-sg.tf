@@ -7,7 +7,7 @@ resource "aws_security_group" "workspaces" {
 
   name_prefix = "${local.application_name}-workspaces-"
   description = "Security group for ${local.application_name} WorkSpaces"
-  vpc_id      = data.aws_vpc.shared.id
+  vpc_id      = aws_vpc.workspaces[0].id
 
   tags = merge(
     local.tags,
@@ -42,7 +42,7 @@ resource "aws_security_group_rule" "workspaces_wsp_ingress" {
   from_port         = 4195
   to_port           = 4195
   protocol          = "tcp"
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+  cidr_blocks       = [aws_vpc.workspaces[0].cidr_block]
 }
 
 # Ingress - Allow PCoIP from VPC
@@ -55,7 +55,7 @@ resource "aws_security_group_rule" "workspaces_pcoip_ingress" {
   from_port         = 4172
   to_port           = 4172
   protocol          = "tcp"
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+  cidr_blocks       = [aws_vpc.workspaces[0].cidr_block]
 }
 
 resource "aws_security_group_rule" "workspaces_pcoip_udp_ingress" {
@@ -67,7 +67,7 @@ resource "aws_security_group_rule" "workspaces_pcoip_udp_ingress" {
   from_port         = 4172
   to_port           = 4172
   protocol          = "udp"
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+  cidr_blocks       = [aws_vpc.workspaces[0].cidr_block]
 }
 
 # Ingress - Allow RDP from VPC (for management)
@@ -80,5 +80,5 @@ resource "aws_security_group_rule" "workspaces_rdp_ingress" {
   from_port         = 3389
   to_port           = 3389
   protocol          = "tcp"
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+  cidr_blocks       = [aws_vpc.workspaces[0].cidr_block]
 }
