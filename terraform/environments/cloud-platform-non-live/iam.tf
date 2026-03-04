@@ -2,7 +2,7 @@
 resource "aws_iam_user" "admin" {
   count = local.application_data.accounts[local.environment].admin_iam_user_name == null ? 0 : 1
 
-  name          = var.admin_iam_user_name
+  name          = local.application_data.accounts[local.environment].admin_iam_user_name
   force_destroy = true
 }
 
@@ -21,7 +21,7 @@ resource "aws_iam_access_key" "admin" {
 
 output "admin_iam_user_name" {
   description = "IAM admin username (if created)."
-  value       = var.admin_iam_user_name
+  value       = local.application_data.accounts[local.environment].admin_iam_user_name
 }
 
 output "admin_iam_access_key_id" {
@@ -35,4 +35,3 @@ output "admin_iam_secret_access_key" {
   value       = try(aws_iam_access_key.admin[0].secret, null)
   sensitive   = true
 }
-
