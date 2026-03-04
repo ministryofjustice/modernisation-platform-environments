@@ -76,13 +76,22 @@ locals {
     format("ccms-ebs-db-nlb.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment)
   ]
 
+  nonprod_test_sans = [
+    format("ccmsebs.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment),
+    format("ccmsebs-sso.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment),
+    format("ccms-ebs-db-nlb.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment),
+    format("ccms-ssogen-as1.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment),
+    format("ccms-ssogen-as2.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment),
+    format("ccms-ssogen-admin.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment)
+  ]
+
   prod_sans = [
     format("ccmsebs.%s", local.prod_domain),
     format("ccms-ebs-db-nlb.%s", local.prod_domain),
     format("ccmsebs-sso.%s", local.prod_domain),
   ]
 
-  subject_alternative_names = local.is-production ? local.prod_sans : local.nonprod_sans
+  subject_alternative_names = local.is-test ? local.nonprod_test_sans : (local.is-production ? local.prod_sans : local.nonprod_sans)
 
   # Domain validation options mapping (following the example pattern)
   domain_types = { for dvo in aws_acm_certificate.external.domain_validation_options : dvo.domain_name => {
