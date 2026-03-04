@@ -18,7 +18,7 @@ resource "aws_macie2_classification_job" "unstructured_data_spike" {
   s3_job_definition {
     bucket_definitions {
       account_id = data.aws_caller_identity.current.account_id
-      buckets    = [module.s3-data-bucket.bucket]
+      buckets    = [module.s3-data-bucket.bucket.id]
     }
     
     scoping {
