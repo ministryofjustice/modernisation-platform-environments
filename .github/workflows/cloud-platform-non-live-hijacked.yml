@@ -46,7 +46,7 @@ jobs:
       application: "cloud-platform-non-live"
       environment: "${{ matrix.target }}"
       action: "${{ matrix.action }}"
-      component: "${{ matrix.component }}"     # If your strategy workflow also outputs "matrix.component"
+      component: "root"     # Hardcoding "${{ matrix.component }}" If your strategy workflow also outputs "matrix.component"
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
