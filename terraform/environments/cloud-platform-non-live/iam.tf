@@ -1,27 +1,20 @@
 #### IAM resources for this member account ####
-
-variable "admin_iam_user_name" {
-  description = "Optional: create an IAM user with AdministratorAccess in this member account. Leave null to disable."
-  type        = string
-  default     = null
-}
-
 resource "aws_iam_user" "admin" {
-  count = var.admin_iam_user_name == null ? 0 : 1
+  count = local.application_data.accounts[local.environment].admin_iam_user_name == null ? 0 : 1
 
   name          = var.admin_iam_user_name
   force_destroy = true
 }
 
 resource "aws_iam_user_policy_attachment" "admin" {
-  count = var.admin_iam_user_name == null ? 0 : 1
+  count = local.application_data.accounts[local.environment].admin_iam_user_name == null ? 0 : 1
 
   user       = aws_iam_user.admin[0].name
   policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
 }
 
 resource "aws_iam_access_key" "admin" {
-  count = var.admin_iam_user_name == null ? 0 : 1
+  count = local.application_data.accounts[local.environment].admin_iam_user_name == null ? 0 : 1
 
   user = aws_iam_user.admin[0].name
 }
