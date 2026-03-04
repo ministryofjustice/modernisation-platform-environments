@@ -1,7 +1,6 @@
 # This AWS Lambda function toggles a WAF rule between BLOCK and ALLOW modes,
 # Display a custom HTML response body when blocking requests and remove it for Allow mode.
 
-import json
 import os
 import re
 import copy
@@ -46,76 +45,70 @@ def _get_required_env(name: str) -> str:
 
 
 # Configuration
-WAFS =json.loads(os.environ.get("WAF_CONFIG", "[]"))
+WEB_ACL_NAME: str = _get_required_env("WEB_ACL_NAME")
+WEB_ACL_ID: str = _get_required_env("WEB_ACL_ID")
+RULE_NAME: str = _get_required_env("RULE_NAME")
 
 ScopeLiteral = Literal["REGIONAL", "CLOUDFRONT"]
-for item_name, item_cfg in WAFS.items():
-    if not isinstance(item_cfg, dict):
-        raise ValueError(f"Invalid configuration for '{item_name}': expected a JSON object.")
-    if "WEB_ACL_NAME" not in item_cfg or "WEB_ACL_ID" not in item_cfg or "RULE_NAME" not in item_cfg or "SCOPE" not in item_cfg:
-        raise ValueError(f"Missing required keys in configuration for '{item_name}'. Required: WEB_ACL_NAME, WEB_ACL_ID, RULE_NAME, SCOPE.")
-    if item_name not in ("ebs", "ssogen"):
-        raise ValueError(f"Invalid WAF_CONFIG key: '{item_name}'. Expected 'ebs' or 'ssogen'.")
+_raw_scope = os.environ.get("SCOPE", "REGIONAL").upper()
+if _raw_scope not in ("REGIONAL", "CLOUDFRONT"):
+    raise ValueError(
+        f"Unsupported SCOPE '{_raw_scope}'. Must be 'REGIONAL' or 'CLOUDFRONT'."
+    )
+SCOPE: ScopeLiteral = cast(ScopeLiteral, _raw_scope)
 
-    _raw_scope = item_cfg["SCOPE"].upper()
-    if _raw_scope not in ("REGIONAL", "CLOUDFRONT"):
+CUSTOM_BODY_NAME: str = os.environ.get("CUSTOM_BODY_NAME", "maintenance_html")
+CUSTOM_BODY_HTML: str = os.environ.get("CUSTOM_BODY_HTML", "")
+
+# Time configuration (with defaults)
+TIME_FROM: str = os.environ.get("TIME_FROM", "21:30")
+TIME_TO: str = os.environ.get("TIME_TO", "07:00")
+
+for _label, _value in [("TIME_FROM", TIME_FROM), ("TIME_TO", TIME_TO)]:
+    _err = _validate_time(_value, _label)
+    if _err:
+        raise ValueError(_err)
+
+# HTML template with placeholders (used when CUSTOM_BODY_HTML is not set)
+MAINTENANCE_HTML_TEMPLATE: str = """<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Maintenance</title>
+<style>
+body{{font-family:sans-serif;background:#0b1a2b;color:#fff;text-align:center;padding:4rem;}}
+.card{{max-width:600px;margin:auto;background:#12243a;padding:2rem;border-radius:10px;}}
+</style>
+</head>
+<body>
+<div class="card">
+<h1>Scheduled Maintenance</h1>
+<p>The service is unavailable from {time_from} to {time_to} UK time.<br>
+It is not available on bank holidays.</p>
+</div>
+</body>
+</html>"""
+
+
+def _get_maintenance_html(time_from: str, time_to: str) -> str:
+    """Return maintenance HTML: CUSTOM_BODY_HTML if set, otherwise rendered template."""
+    if CUSTOM_BODY_HTML.strip():
+        return CUSTOM_BODY_HTML
+    return MAINTENANCE_HTML_TEMPLATE.format(time_from=time_from, time_to=time_to)
+
+
+# Set region (CloudFront uses us-east-1)
+if SCOPE == "CLOUDFRONT":
+    region: str = "us-east-1"
+else:
+    region_env = os.environ.get("AWS_REGION")
+    if region_env is None:
         raise ValueError(
-            f"Unsupported SCOPE '{_raw_scope}'. Must be 'REGIONAL' or 'CLOUDFRONT'."
+            "AWS_REGION environment variable is required for REGIONAL scope."
         )
-    SCOPE: ScopeLiteral = cast(ScopeLiteral, _raw_scope)
+    region = region_env
 
-    CUSTOM_BODY_NAME: str = item_cfg["CUSTOM_BODY_NAME"]
-    CUSTOM_BODY_HTML: str = item_cfg.get("CUSTOM_BODY_HTML", "")
-
-    # Time configuration (with defaults)
-    TIME_FROM: str = item_cfg.get("TIME_FROM", "21:30")
-    TIME_TO: str = item_cfg.get("TIME_TO", "07:00")
-
-    for _label, _value in [("TIME_FROM", TIME_FROM), ("TIME_TO", TIME_TO)]:
-        _err = _validate_time(_value, _label)
-        if _err:
-            raise ValueError(_err)
-
-    # HTML template with placeholders (used when CUSTOM_BODY_HTML is not set)
-    MAINTENANCE_HTML_TEMPLATE: str = """<!doctype html>
-    <html lang="en">
-    <head>
-    <meta charset="utf-8">
-    <title>Maintenance</title>
-    <style>
-    body{{font-family:sans-serif;background:#0b1a2b;color:#fff;text-align:center;padding:4rem;}}
-    .card{{max-width:600px;margin:auto;background:#12243a;padding:2rem;border-radius:10px;}}
-    </style>
-    </head>
-    <body>
-    <div class="card">
-    <h1>Scheduled Maintenance</h1>
-    <p>The service is unavailable from {time_from} to {time_to} UK time.<br>
-    It is not available on bank holidays.</p>
-    </div>
-    </body>
-    </html>"""
-
-
-    def _get_maintenance_html(time_from: str, time_to: str) -> str:
-        """Return maintenance HTML: CUSTOM_BODY_HTML if set, otherwise rendered template."""
-        if CUSTOM_BODY_HTML.strip():
-            return CUSTOM_BODY_HTML
-        return MAINTENANCE_HTML_TEMPLATE.format(time_from=time_from, time_to=time_to)
-
-
-    # Set region (CloudFront uses us-east-1)
-    if SCOPE == "CLOUDFRONT":
-        region: str = "us-east-1"
-    else:
-        region_env = os.environ.get("AWS_REGION")
-        if region_env is None:
-            raise ValueError(
-                "AWS_REGION environment variable is required for REGIONAL scope."
-            )
-        region = region_env
-
-    waf = boto3.client("wafv2", region_name=region)
+waf = boto3.client("wafv2", region_name=region)
 
 WafMode = Literal["BLOCK", "ALLOW"]
 
@@ -195,130 +188,121 @@ def lambda_handler(event: Any, context: Any) -> Dict[str, Any]:
         err = _validate_time(value, label)
         if err:
             raise ValueError(err)
-    results = []
-    for item_name, item_cfg in WAFS.items():
-        WEB_ACL_NAME = item_cfg["WEB_ACL_NAME"]
-        WEB_ACL_ID = item_cfg["WEB_ACL_ID"]
-        RULE_NAME = item_cfg["RULE_NAME"]
 
-        logger.info(
-            "Requested mode '%s' for rule '%s' in WebACL '%s' (ID=%s, scope=%s)",
-            mode,
-            RULE_NAME,
-            WEB_ACL_NAME,
-            WEB_ACL_ID,
-            SCOPE,
-        )
-        logger.info("Maintenance window: %s to %s", time_from, time_to)
+    logger.info(
+        "Requested mode '%s' for rule '%s' in WebACL '%s' (ID=%s, scope=%s)",
+        mode,
+        RULE_NAME,
+        WEB_ACL_NAME,
+        WEB_ACL_ID,
+        SCOPE,
+    )
+    logger.info("Maintenance window: %s to %s", time_from, time_to)
 
-        # Get current Web ACL
-        resp = waf.get_web_acl(Name=WEB_ACL_NAME, Scope=SCOPE, Id=WEB_ACL_ID)
+    # Get current Web ACL
+    resp = waf.get_web_acl(Name=WEB_ACL_NAME, Scope=SCOPE, Id=WEB_ACL_ID)
 
-        lock_token = resp.get("LockToken")
-        web_acl = resp.get("WebACL")
-        if not lock_token or not web_acl:
-            raise RuntimeError("Missing LockToken or WebACL in get_web_acl response.")
+    lock_token = resp.get("LockToken")
+    web_acl = resp.get("WebACL")
+    if not lock_token or not web_acl:
+        raise RuntimeError("Missing LockToken or WebACL in get_web_acl response.")
 
-        rules = web_acl.get("Rules", [])
-        if not isinstance(rules, list):
-            raise RuntimeError("Rules is not a list in WebACL response.")
+    rules = web_acl.get("Rules", [])
+    if not isinstance(rules, list):
+        raise RuntimeError("Rules is not a list in WebACL response.")
 
-        custom_response_bodies = web_acl.get("CustomResponseBodies") or {}
-        if not isinstance(custom_response_bodies, dict):
-            custom_response_bodies = {}
+    custom_response_bodies = web_acl.get("CustomResponseBodies") or {}
+    if not isinstance(custom_response_bodies, dict):
+        custom_response_bodies = {}
 
-        found = False
-        changed = False
-        new_rules = []
+    found = False
+    changed = False
+    new_rules = []
 
-        for r in rules:
-            if not isinstance(r, dict) or "Name" not in r:
-                new_rules.append(r)
-                continue
+    for r in rules:
+        if not isinstance(r, dict) or "Name" not in r:
+            new_rules.append(r)
+            continue
 
-            if r["Name"] != RULE_NAME:
-                new_rules.append(r)
-                continue
+        if r["Name"] != RULE_NAME:
+            new_rules.append(r)
+            continue
 
-            found = True
-            rr = copy.deepcopy(r)
+        found = True
+        rr = copy.deepcopy(r)
 
-            if "Action" not in r:
-                raise RuntimeError(f"Rule '{RULE_NAME}' has no Action.")
+        if "Action" not in r:
+            raise RuntimeError(f"Rule '{RULE_NAME}' has no Action.")
 
-            current_action = r.get("Action", {})
-            desired_action = _desired_action(mode)
+        current_action = r.get("Action", {})
+        desired_action = _desired_action(mode)
 
-            if current_action != desired_action:
-                rr["Action"] = desired_action
+        if current_action != desired_action:
+            rr["Action"] = desired_action
+            changed = True
+            logger.info(
+                "Updating Action for rule '%s' to: %s", RULE_NAME, desired_action
+            )
+
+        # When BLOCK: ensure the custom response body is present and up to date
+        if mode == "BLOCK":
+            new_body = {
+                "Content": _get_maintenance_html(time_from, time_to),
+                "ContentType": "TEXT_HTML",
+            }
+            if custom_response_bodies.get(CUSTOM_BODY_NAME) != new_body:
+                custom_response_bodies[CUSTOM_BODY_NAME] = new_body
                 changed = True
-                logger.info(
-                    "Updating Action for rule '%s' to: %s", RULE_NAME, desired_action
-                )
+                logger.info("Updated custom response body HTML.")
 
-            # When BLOCK: ensure the custom response body is present and up to date
-            if mode == "BLOCK":
-                new_body = {
-                    "Content": _get_maintenance_html(time_from, time_to),
-                    "ContentType": "TEXT_HTML",
-                }
-                if custom_response_bodies.get(CUSTOM_BODY_NAME) != new_body:
-                    custom_response_bodies[CUSTOM_BODY_NAME] = new_body
-                    changed = True
-                    logger.info("Updated custom response body HTML.")
+        # When ALLOW: remove custom body to avoid Terraform drift
+        elif mode == "ALLOW":
+            if CUSTOM_BODY_NAME in custom_response_bodies:
+                del custom_response_bodies[CUSTOM_BODY_NAME]
+                changed = True
 
-            # When ALLOW: remove custom body to avoid Terraform drift
-            elif mode == "ALLOW":
-                if CUSTOM_BODY_NAME in custom_response_bodies:
-                    del custom_response_bodies[CUSTOM_BODY_NAME]
-                    changed = True
+        new_rules.append(rr)
 
-            new_rules.append(rr)
+    if not found:
+        raise RuntimeError(f"Rule '{RULE_NAME}' not found in WebACL.")
 
-        if not found:
-            raise RuntimeError(f"Rule '{RULE_NAME}' not found in WebACL.")
+    if not changed:
+        logger.info("No changes needed.")
+        return {"ok": True, "updated": False, "mode": mode}
 
-        if not changed:
-            logger.info("No changes needed.")
-            return {"ok": True, "updated": False, "mode": mode}
+    updated_web_acl: Dict[str, Any] = {
+        "Name": WEB_ACL_NAME,
+        "Scope": SCOPE,
+        "Id": WEB_ACL_ID,
+        "LockToken": lock_token,
+        "DefaultAction": web_acl.get("DefaultAction", {}),
+        "Description": web_acl.get("Description", ""),
+        "VisibilityConfig": web_acl.get("VisibilityConfig", {}),
+        "Rules": new_rules,
+    }
 
-        updated_web_acl: Dict[str, Any] = {
-            "Name": WEB_ACL_NAME,
-            "Scope": SCOPE,
-            "Id": WEB_ACL_ID,
-            "LockToken": lock_token,
-            "DefaultAction": web_acl.get("DefaultAction", {}),
-            "Description": web_acl.get("Description", ""),
-            "VisibilityConfig": web_acl.get("VisibilityConfig", {}),
-            "Rules": new_rules,
-        }
+    # Forward optional fields from the current WebACL to avoid losing configuration
+    for key in (
+        "CaptchaConfig",
+        "ChallengeConfig",
+        "TokenDomains",
+        "AssociationConfig",
+        "DataProtectionConfig",
+        "OnSourceDDoSProtectionConfig",
+        "ApplicationConfig",
+    ):
+        if key in web_acl:
+            updated_web_acl[key] = web_acl[key]
 
-        # Forward optional fields from the current WebACL to avoid losing configuration
-        for key in (
-            "CaptchaConfig",
-            "ChallengeConfig",
-            "TokenDomains",
-            "AssociationConfig",
-            "DataProtectionConfig",
-            "OnSourceDDoSProtectionConfig",
-            "ApplicationConfig",
-        ):
-            if key in web_acl:
-                updated_web_acl[key] = web_acl[key]
+    # Only include CustomResponseBodies if non-empty
+    if custom_response_bodies:
+        updated_web_acl["CustomResponseBodies"] = custom_response_bodies
+    else:
+        logger.info("CustomResponseBodies empty — omitting field.")
 
-        # Only include CustomResponseBodies if non-empty
-        if custom_response_bodies:
-            updated_web_acl["CustomResponseBodies"] = custom_response_bodies
-        else:
-            logger.info("CustomResponseBodies empty — omitting field.")
-
-        waf.update_web_acl(**updated_web_acl)
-        logger.info("WebACL updated successfully.")
-        logger.info("Updated WebACL: %s", json.dumps(updated_web_acl, indent=2, default=str))
-        results.append({"webacl": WEB_ACL_NAME, "ok": True, "updated": True, "mode": mode})
-    overall_ok = all(r["ok"] for r in results)
-    return {"ok": overall_ok, "results": results}
-
+    waf.update_web_acl(**updated_web_acl)
+    logger.info("WebACL updated successfully.")
+    return {"ok": True, "updated": True, "mode": mode}
 
 
 # ---------------------------------------------------------------------------
