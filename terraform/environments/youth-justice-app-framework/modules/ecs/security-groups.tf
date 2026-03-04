@@ -129,6 +129,17 @@ resource "aws_security_group_rule" "connectivity_alb_to_ecs_internal_rule" {
 }
 
 
+#yjsm-hub-svc external to ecs
+resource "aws_security_group_rule" "yjsm_hub_svc_alb_to_ecs_external_rule" {
+  type                     = "ingress"
+  from_port                = 8080
+  to_port                  = 8080
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.common_ecs_service_external.id
+  source_security_group_id = var.yjsm_hub_svc_alb_security_group_id
+  description              = "yjsm-hub-svc ALB to ECS service communication"
+}
+
 
 #allow each ecs sg to talk to eachother
 resource "aws_security_group_rule" "ecsext_to_ecsint_rule" {
