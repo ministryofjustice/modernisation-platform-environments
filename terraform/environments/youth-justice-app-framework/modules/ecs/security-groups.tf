@@ -163,7 +163,7 @@ resource "aws_security_group_rule" "ecsint_to_ecsext_rule" {
   description              = "ECSint to ECSext communication"
 }
 
-# Enable ECS Services access to RDS PostgreSQL
+# Enable ECS internal Services access to RDS PostgreSQL
 resource "aws_security_group_rule" "ecsint_to_rds_rule" {
   type                     = "ingress"
   from_port                = 5432
@@ -172,6 +172,17 @@ resource "aws_security_group_rule" "ecsint_to_rds_rule" {
   security_group_id        = var.rds_postgresql_sg_id
   source_security_group_id = aws_security_group.common_ecs_service_internal.id
   description              = "PostgreSQL from ECS Internal"
+}
+
+# Enable ECS external Services access to RDS PostgreSQL
+resource "aws_security_group_rule" "ecsext_to_rds_rule" {
+  type                     = "ingress"
+  from_port                = 5432
+  to_port                  = 5432
+  protocol                 = "tcp"
+  security_group_id        = var.rds_postgresql_sg_id
+  source_security_group_id = aws_security_group.common_ecs_service_external.id
+  description              = "PostgreSQL from ECS External"
 }
 
 # Enable ECS Services access to Redshift
