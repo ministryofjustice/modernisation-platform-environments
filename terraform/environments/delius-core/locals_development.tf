@@ -84,6 +84,7 @@ locals {
       container_memory         = 4096
       container_cpu            = 2048
       task_definition_revision = 13
+      ec2_instance_type        = "m5.large"
     }
 
     weblogic_eis = {
