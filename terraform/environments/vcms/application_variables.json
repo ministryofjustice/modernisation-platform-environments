@@ -21,7 +21,7 @@
       "deployment_minimum_healthy_percent": 0,
       "health_check_grace_period_seconds": 60,
       "image_tag": "tm-1408-composer-19577361514-1",
-      "db_snapshot_identifier": "",
+      "db_snapshot_identifier": "rds-vcmsdev-db-backup-2025-09-26-14-04-mpcp",
       "log_retention_in_days": 14
     },
     "vcms-preproduction": {
