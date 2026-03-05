@@ -28,7 +28,7 @@ resource "aws_macie2_classification_job" "unstructured_data_spike" {
           simple_scope_term {
             comparator = "STARTS_WITH"
             key        = "OBJECT_KEY"
-            values     = ["g4s/atrium_unstructured/2024-05-31"]
+            values     = ["g4s/atrium_unstructured/2024-05-31/340000-1349999"]
           }
         }
         and {
