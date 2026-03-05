@@ -1,0 +1,91 @@
+{
+  "rules": [
+    {
+      "rule-type": "selection",
+      "rule-id": "10",
+      "rule-name": "SelectCurfewSegment",
+      "object-locator": {
+        "schema-name": "dbo",
+        "table-name": "CurfewSegment"
+      },
+      "rule-action": "include",
+      "filters": [],
+      "parallel-load": null,
+      "isAutoSegmentationChecked": false
+    },
+    {
+      "rule-type": "transformation",
+      "rule-id": "11",
+      "rule-target": "column",
+      "rule-name": "TransformStartTime",
+      "object-locator": {
+        "schema-name": "dbo",
+        "table-name": "CurfewSegment",
+        "column-name": "StartTime"
+      },
+      "rule-action": "change-data-type",
+      "data-type": {
+        "type": "time",
+        "scale": 6
+      }
+    },
+    {
+      "rule-type": "transformation",
+      "rule-id": "12",
+      "rule-target": "column",
+      "rule-name": "TransformEndTime",
+      "object-locator": {
+        "schema-name": "dbo",
+        "table-name": "CurfewSegment",
+        "column-name": "EndTime"
+      },
+      "rule-action": "change-data-type",
+      "data-type": {
+        "type": "time",
+        "scale": 6
+      }
+    },
+    {
+      "rule-type": "selection",
+      "rule-id": "20",
+      "rule-name": "SelectGPSPositionLatest",
+      "object-locator": {
+        "schema-name": "dbo",
+        "table-name": "GPSPositionLatest"
+      },
+      "rule-action": "include",
+      "filters": [],
+      "parallel-load": null,
+      "isAutoSegmentationChecked": false
+    },
+    {
+      "rule-type": "transformation",
+      "rule-id": "21",
+      "rule-name": "RemoveOriginalSpatialPosition",
+      "rule-target": "column",
+      "object-locator": {
+        "schema-name": "dbo",
+        "table-name": "GPSPositionLatest",
+        "column-name": "SpatialPosition"
+      },
+      "rule-action": "remove-column"
+    },
+    {
+      "rule-type": "transformation",
+      "rule-id": "22",
+      "rule-name": "AddTransformedSpatialPosition",
+      "rule-target": "column",
+      "object-locator": {
+        "schema-name": "dbo",
+        "table-name": "GPSPositionLatest"
+      },
+      "rule-action": "add-column",
+      "value": "SpatialPosition",
+      "expression": "STAsText(SpatialPosition)",
+      "data-type": {
+        "type": "string",
+        "length": 1000
+      }
+    }
+  ]
+}
