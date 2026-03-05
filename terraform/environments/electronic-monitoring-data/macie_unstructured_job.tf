@@ -3,7 +3,7 @@ resource "aws_macie2_account" "macie_unstructured_spike" {
 }
 
 # Uses the default checks
-resource "aws_macie2_classification_job" "unstructured_data_spike_updated_prefix" {
+resource "aws_macie2_classification_job" "unstructured_data_spike_atrium" {
   depends_on = [aws_macie2_account.macie_unstructured_spike]
 
   name        = "spike-unstructured-data-atrium"
