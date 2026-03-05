@@ -177,6 +177,7 @@ resource "aws_secretsmanager_secret_version" "Root_CA_secret" {
 
 resource "aws_secretsmanager_secret" "document_gateway" {
   #checkov:skip=CKV2_AWS_57:doesn't need rotation
+  count       = local.application_data.accounts[local.environment].create_svc_pilot ? 1 : 0
   name        = "${local.project_name}_document_gateway"
   description = "Used for document gateway"
   kms_key_id  = module.kms.key_id
@@ -184,7 +185,8 @@ resource "aws_secretsmanager_secret" "document_gateway" {
 }
 
 resource "aws_secretsmanager_secret_version" "document_gateway" {
-  secret_id     = aws_secretsmanager_secret.document_gateway.id
+  count         = local.application_data.accounts[local.environment].create_svc_pilot ? 1 : 0
+  secret_id     = aws_secretsmanager_secret.document_gateway[count.index].id
   secret_string = "dummy" # InvalidRequestException: You must provide either SecretString or SecretBinary.
   lifecycle {
     ignore_changes = [secret_string]
@@ -193,6 +195,7 @@ resource "aws_secretsmanager_secret_version" "document_gateway" {
 
 resource "aws_secretsmanager_secret" "yjsm_hub_doc_gateway_auth" {
   #checkov:skip=CKV2_AWS_57:doesn't need rotation
+  count       = local.application_data.accounts[local.environment].create_svc_pilot ? 1 : 0
   name        = "${local.project_name}_yjsm_hub_doc_gateway_auth"
   description = "Used for document gateway"
   kms_key_id  = module.kms.key_id
@@ -200,7 +203,8 @@ resource "aws_secretsmanager_secret" "yjsm_hub_doc_gateway_auth" {
 }
 
 resource "aws_secretsmanager_secret_version" "yjsm_hub_doc_gateway_auth" {
-  secret_id     = aws_secretsmanager_secret.yjsm_hub_doc_gateway_auth.id
+  count         = local.application_data.accounts[local.environment].create_svc_pilot ? 1 : 0
+  secret_id     = aws_secretsmanager_secret.yjsm_hub_doc_gateway_auth[count.index].id
   secret_string = "dummy" # InvalidRequestException: You must provide either SecretString or SecretBinary.
   lifecycle {
     ignore_changes = [secret_string]

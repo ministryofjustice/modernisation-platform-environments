@@ -176,6 +176,7 @@ resource "aws_security_group_rule" "ecsint_to_rds_rule" {
 
 # Enable ECS external Services access to RDS PostgreSQL
 resource "aws_security_group_rule" "ecsext_to_rds_rule" {
+  count                    = var.create_svc_pilot ? 1 : 0
   type                     = "ingress"
   from_port                = 5432
   to_port                  = 5432
