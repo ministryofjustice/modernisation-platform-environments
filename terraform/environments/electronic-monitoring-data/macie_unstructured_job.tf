@@ -5,7 +5,7 @@ resource "aws_macie2_account" "macie_unstructured_spike" {
 resource "aws_macie2_classification_job" "unstructured_data_spike_atrium" {
   depends_on = [aws_macie2_account.macie_unstructured_spike]
 
-  name        = "spike-unstructured-data-atrium"
+  name_prefix = "spike-unstructured-data-atrium-"
   description = "Spike to scan unstructured data"
   
   # ONE TIME IS CONSIDERED ONCE AND DONE 
