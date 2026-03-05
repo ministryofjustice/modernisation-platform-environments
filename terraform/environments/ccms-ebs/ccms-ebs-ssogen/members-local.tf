@@ -1,0 +1,134 @@
+#### This file can be used to store locals specific to the member account ####
+locals {
+  logging_bucket_name            = "${local.application_name}-${local.environment}-logging"
+  rsync_bucket_name              = "${local.application_name}-${local.environment}-dbbackup"
+  lb_log_prefix_ebsapp           = "ebsapps-lb"
+  lb_log_prefix_wgate            = "wgate-lb"
+  lb_log_prefix_wgate_public     = "wgate-lb-public"
+  lb_log_prefix_ebsapp_internal  = "ebsapps-internal-lb"
+  lb_log_prefix_webgate_internal = "webgate-internal-lb"
+  lb_log_prefix_ssogen_internal  = "ssogen-internal-lb"
+  application_name_ssogen        = "ssogen"
+
+
+  disksmount = [
+    "/dev/nvme1n1:/u01/product/fmw",
+    "/dev/nvme2n1:/u01/product/runtime/Domain/mserver",
+    "/dev/nvme3n1:/tmp"
+  ]
+
+  disksmount_joined = join(",", local.disksmount)
+
+  efs_mount_points = [
+    "stage:/stage",
+    "aserver:/u01/shared/product/runtime/Domain/aserver"
+  ]
+
+  efs_mount_points_joined = join(",", local.efs_mount_points)
+
+  lambda_folder_name = ["lambda_delivery", "ftp_lambda_layer", "payment_lambda_layer", "cloudwatch_sns_layer", "payment_load_monitor_layer"]
+
+  lambda_source_hashes_cloudwatch_alarm_slack_integration = [
+    for f in fileset("./lambda/cloudwatch_alarm_slack_integration", "**") :
+    sha256(file("${path.module}/lambda/cloudwatch_alarm_slack_integration/${f}"))
+  ]
+
+  lambda_source_hashes_payment_load_monitor = [
+    for f in fileset("./lambda/payment_load_monitor", "**") :
+    sha256(file("${path.module}/lambda/payment_load_monitor/${f}"))
+  ]
+
+  private_subnets_cidr_blocks = [
+    data.aws_subnet.private_subnets_a.cidr_block,
+    data.aws_subnet.private_subnets_b.cidr_block,
+    data.aws_subnet.private_subnets_c.cidr_block
+  ]
+
+  data_subnets = [
+    data.aws_subnet.data_subnets_a.id,
+    data.aws_subnet.data_subnets_b.id,
+    data.aws_subnet.data_subnets_c.id
+  ]
+
+  private_subnets = [
+    data.aws_subnet.private_subnets_a.id,
+    data.aws_subnet.private_subnets_b.id,
+    data.aws_subnet.private_subnets_c.id
+  ]
+
+  public_subnets = [
+    data.aws_subnet.public_subnets_a.id,
+    data.aws_subnet.public_subnets_b.id,
+    data.aws_subnet.public_subnets_c.id
+  ]
+
+  # Certificate configuration based on environment
+  nonprod_domain = format("%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment)
+  prod_domain    = "laa.service.justice.gov.uk"
+
+  # Primary domain name based on environment
+  primary_domain = local.is-production ? local.prod_domain : local.nonprod_domain
+
+  # Subject Alternative Names based on environment
+  nonprod_sans = [
+    format("ccmsebs.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment),
+    format("ccmsebs-sso.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment),
+    format("ccms-ebs-db-nlb.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment)
+  ]
+
+  nonprod_dev_sans = [
+    format("ccmsebs-sso.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment),
+    format("ccms-ssogen-as1.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment),
+    format("ccms-ssogen-as2.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment),
+    format("ccms-ssogen-admin.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment)
+  ]
+
+  prod_sans = [
+    format("ccmsebs.%s", local.prod_domain),
+    format("ccms-ebs-db-nlb.%s", local.prod_domain),
+    format("ccmsebs-sso.%s", local.prod_domain),
+  ]
+
+  subject_alternative_names = local.is-development ? local.nonprod_dev_sans : (local.is-production ? local.prod_sans : local.nonprod_sans)
+
+  # Domain validation options mapping (following the example pattern)
+  domain_types = { for dvo in aws_acm_certificate.external.domain_validation_options : dvo.domain_name => {
+    name   = dvo.resource_record_name
+    record = dvo.resource_record_value
+    type   = dvo.resource_record_type
+    }
+  }
+
+  # Split domain validation by domain type
+  modernisation_platform_validations = [for k, v in local.domain_types : v if strcontains(k, "modernisation-platform.service.justice.gov.uk")]
+  laa_validations                    = [for k, v in local.domain_types : v if strcontains(k, "laa.service.justice.gov.uk")]
+
+  #  cert_opts    = local.environment == "production" ? aws_acm_certificate.external-service[0].domain_validation_options : aws_acm_certificate.external[0].domain_validation_options
+  # cert_arn     = aws_acm_certificate.external.arn
+  # cert_zone_id = local.environment == "production" ? data.aws_route53_zone.application-zone.zone_id : data.aws_route53_zone.network-services.zone_id
+
+  # domain_types = { for dvo in aws_acm_certificate.external.domain_validation_options : dvo.domain_name => {
+  #   name   = dvo.resource_record_name
+  #   record = dvo.resource_record_value
+  #   type   = dvo.resource_record_type
+  #   }
+  # }
+
+  # domain_name_main   = [for k, v in local.domain_types : v.name if k == "modernisation-platform.service.justice.gov.uk"]
+  # domain_name_sub    = [for k, v in local.domain_types : v.name if k != "modernisation-platform.service.justice.gov.uk"]
+  # domain_record_main = [for k, v in local.domain_types : v.record if k == "modernisation-platform.service.justice.gov.uk"]
+  # domain_record_sub  = [for k, v in local.domain_types : v.record if k != "modernisation-platform.service.justice.gov.uk"]
+  # domain_type_main   = [for k, v in local.domain_types : v.type if k == "modernisation-platform.service.justice.gov.uk"]
+  # domain_type_sub    = [for k, v in local.domain_types : v.type if k != "modernisation-platform.service.justice.gov.uk"]
+
+  #--Cash office. Transfer family CSR mapping. Production only
+  transfer_family_dvo_map = (local.is-preproduction || local.is-production) && length(aws_acm_certificate.transfer_family) > 0 ? {
+    for dvo in aws_acm_certificate.transfer_family[0].domain_validation_options :
+    dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+    }
+  } : {}
+
+}
