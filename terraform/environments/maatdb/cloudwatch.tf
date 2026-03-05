@@ -173,6 +173,10 @@ resource "aws_db_event_subscription" "rds_maintenance_notifications" {
 # Create SNS topic for RDS maintenance event 
 resource "aws_sns_topic" "maatdb_maintenance_topic" {
   name = "${local.application_name}-${local.environment}-maintenance-topic"
+  kms_master_key_id = aws_kms_key.sns_rds_events.arn
+
+  depends_on = [    aws_kms_key.sns_rds_events  ]
+  
   tags = merge(
     local.tags,
     {
@@ -195,6 +199,14 @@ data "aws_iam_policy_document" "rds_publish_to_sns" {
 
     actions   = ["sns:Publish"]
     resources = [aws_sns_topic.maatdb_maintenance_topic.arn]
+
+   condition {
+   test     = "ArnLike"
+   variable = "aws:SourceArn"
+   values   = [
+    "arn:aws:rds:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:db:${module.rds.db_instance_identifier}"
+    ]
+   } 
   }
 }
 
@@ -203,6 +215,65 @@ resource "aws_sns_topic_policy" "rds_publish_policy" {
   policy = data.aws_iam_policy_document.rds_publish_to_sns.json
 }
 
+# KMS key policy for SNS ans RDS to use the key
+resource "aws_kms_key" "sns_rds_events" {
+  description         = "KMS key for encrypting RDS maintenance events in SNS"
+  enable_key_rotation = true
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      # --- Allow account administrators full control ---
+      {
+        Sid    = "AllowAccountAdmins"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+        }
+        Action   = "kms:*"
+        Resource = "*"
+      },
+
+      # --- REQUIRED: Allow SNS to use the key ---
+      {
+        Sid    = "AllowSNSToUseKey"
+        Effect = "Allow"
+        Principal = {
+          Service = "sns.amazonaws.com"
+        }
+        Action = [
+          "kms:GenerateDataKey*",
+          "kms:Decrypt"
+        ]
+        Resource = "*"
+      },
+
+      # --- REQUIRED: Allow RDS Events to use the key ---
+      {
+        Sid    = "AllowRDSEventsToUseKey"
+        Effect = "Allow"
+        Principal = {
+          Service = "events.rds.amazonaws.com"
+        }
+        Action = [
+          "kms:GenerateDataKey*",
+          "kms:Decrypt"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+
+  tags = merge(local.tags, {
+    Name = "${local.application_name}-${local.environment}-sns-rds-events-kms"
+  })
+}
+
+# KMS alias
+resource "aws_kms_alias" "sns_rds_events" {
+  name          = "alias/${local.application_name}-${local.environment}-sns-rds-events"
+  target_key_id = aws_kms_key.sns_rds_events.key_id
+}
 # Create Topic subscription 
 
 resource "aws_sns_topic_subscription" "rds_to_slack_lambda" {
