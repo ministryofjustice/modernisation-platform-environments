@@ -118,18 +118,11 @@ run_ansible() {
   fi
 
   # install requirements in virtual env
-  # best efforts if ansible galaxy is down. Rely on sufficient requirements baked into the image
   echo "# Installing ansible requirements"
   cd $ansible_dir/modernisation-platform-configuration-management/ansible
-  if ! python -m pip install -r requirements.txt ; then
-    echo "failed command: python -m pip install -r requirements.txt"
-  fi
-  if ! ansible-galaxy role install -r "$requirements_yml" ; then
-    echo "failed command: ansible-galaxy role install -r '$requirements_yml'"
-  fi
-  if ! ansible-galaxy collection install -r "$requirements_yml" ; then
-    echo "failed command: ansible-galaxy collection install -r '$requirements_yml'"
-  fi
+  $python -m pip install -r requirements.txt
+  ansible-galaxy role install -r $requirements_yml
+  ansible-galaxy collection install -r $requirements_yml
 
   # run ansible (comma after localhost deliberate)
   echo "# Execute ansible site.yml ${ansible_args} $ansible_group_vars ..."
