@@ -131,7 +131,7 @@ resource "aws_security_group_rule" "connectivity_alb_to_ecs_internal_rule" {
 
 #yjsm-hub-svc external to ecs
 resource "aws_security_group_rule" "yjsm_hub_svc_alb_to_ecs_external_rule" {
-  count                    = count = var.create_svc_pilot ? 1 : 0
+  count                    = var.create_svc_pilot ? 1 : 0
   type                     = "ingress"
   from_port                = 8080
   to_port                  = 8080
