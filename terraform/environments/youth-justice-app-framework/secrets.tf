@@ -191,6 +191,22 @@ resource "aws_secretsmanager_secret_version" "document_gateway" {
   }
 }
 
+resource "aws_secretsmanager_secret" "yjsm_hub_doc_gateway_auth" {
+  #checkov:skip=CKV2_AWS_57:doesn't need rotation
+  name        = "${local.project_name}_yjsm_hub_doc_gateway_auth"
+  description = "Used for document gateway"
+  kms_key_id  = module.kms.key_id
+  tags        = local.tags
+}
+
+resource "aws_secretsmanager_secret_version" "yjsm_hub_doc_gateway_auth" {
+  secret_id     = aws_secretsmanager_secret.yjsm_hub_doc_gateway_auth.id
+  secret_string = "dummy" # InvalidRequestException: You must provide either SecretString or SecretBinary.
+  lifecycle {
+    ignore_changes = [secret_string]
+  }
+}
+
 
 ### Tableau Secrets ###
 ## Secret to hold Tableau administration details
