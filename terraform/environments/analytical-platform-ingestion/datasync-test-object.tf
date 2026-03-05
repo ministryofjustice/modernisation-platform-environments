@@ -1,5 +1,7 @@
 # Create a test object in the bucket for DataSync to verify access against
 resource "aws_s3_object" "datasync_test" {
+  count = local.environment == "production" ? 1 : 0
+
   bucket  = module.datasync_opg_bucket.s3_bucket_id
   key     = ".datasync-test"
   content = "DataSync access test object"
