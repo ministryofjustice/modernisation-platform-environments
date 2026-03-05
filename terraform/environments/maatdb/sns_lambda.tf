@@ -49,23 +49,13 @@ resource "aws_iam_role_policy" "lambda_dbmaintenance_sns_policy" {
         ]
         Resource = "arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${aws_lambda_function.dbmaintenance_sns_to_slack.function_name}:*"
       }
-
-      # --- OPTIONAL KMS: only if the secret (or env vars) use a customer-managed CMK ---
-      # If you use the default AWS-managed Secrets Manager key, you typically don't need this.
-      # ,
-      # {
-      #   Sid    = "AllowKMSForSecret"
-      #   Effect = "Allow"
-      #   Action = [
-      #     "kms:Decrypt",
-      #     "kms:GenerateDataKey*"
-      #   ]
-      #   Resource = [
-      #     aws_kms_key.<dbmaintenance_secret_key>.arn
-      #   ]
-      # }
     ]
   })
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
+  role       = aws_iam_role.lambda_dbmaintenance_sns_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
 data "archive_file" "lambda_zip" {
