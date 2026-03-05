@@ -42,3 +42,8 @@ module "datasync_instance" {
     }
   )
 }
+
+moved {
+  from = module.datasync_instance
+  to   = module.datasync_instance[0]
+}
