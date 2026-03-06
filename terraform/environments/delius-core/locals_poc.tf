@@ -79,10 +79,11 @@ locals {
 
   delius_microservices_configs_poc = {
     weblogic = {
-      image_tag        = "6.2.0.3"
-      container_port   = 8080
-      container_memory = 4096
-      container_cpu    = 2048
+      image_tag         = "6.2.0.3"
+      container_port    = 8080
+      container_memory  = 4096
+      container_cpu     = 2048
+      ec2_instance_type = "m5.large"
     }
 
     weblogic_params = {
