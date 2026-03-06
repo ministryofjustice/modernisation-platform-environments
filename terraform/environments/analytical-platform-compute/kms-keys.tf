@@ -3,7 +3,7 @@ module "mojap_compute_logs_s3_kms_eu_west_2" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "3.1.1"
+  version = "4.2.0"
 
   aliases               = ["s3/mojap-compute-logs-eu-west-2"]
   description           = "mojap-compute-logs eu-west-2 S3 KMS key"
@@ -47,7 +47,7 @@ module "mojap_compute_logs_s3_kms_eu_west_1" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "3.1.1"
+  version = "4.2.0"
 
   providers = {
     aws = aws.analytical-platform-compute-eu-west-1
