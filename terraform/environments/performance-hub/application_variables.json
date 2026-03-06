@@ -84,7 +84,7 @@
       "memebership_db_name": "Membership_Live",
       "cert_arn": "e0485248-782a-40b6-8f73-e4f641b577bd",
       "hub_wwwroot": "C:/inetpub/wwwroot",
-      "app_dns_name": "staging.hmpps-performance-hub.service.justice.gov.uk"
+      "app_dns_name": "hmpps-performance-hub.service.justice.gov.uk"
     }
   }
 }

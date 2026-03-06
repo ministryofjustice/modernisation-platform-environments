@@ -17,6 +17,8 @@ resource "aws_route53_record" "external" {
   }
 }
 
+# hmpps-performance-hub.service.justice.gov.uk
+# staging.hmpps-performance-hub.service.justice.gov.uk
 resource "aws_acm_certificate" "external" {
   domain_name = local.is-development ? "modernisation-platform.service.justice.gov.uk" : local.app_data.accounts[local.environment].app_dns_name
   validation_method = "DNS"
@@ -30,6 +32,16 @@ resource "aws_acm_certificate" "external" {
     create_before_destroy = true
   }
 }
+
+/*
+1. Create ACM cert as above (resolve error https://github.com/ministryofjustice/modernisation-platform-environments/actions/runs/22754150102/job/65994863067?pr=15852#step:13:37)
+
+2. This will create a cert with a CNAME value a bit like this: _f0f2cb35920a21c336c8a8d4eadcc9f3.jddtvkljgg.acm-validations.aws.
+
+3. Raise a PR in DNS repo to create this record: https://github.com/ministryofjustice/dns/blob/a4e0ebfdd7cd5fa8b85299272b53aa6127383ae4/hostedzones/service.justice.gov.uk.yaml#L24
+
+4. Then can proceed with the cert validation (don't change the code below until then)
+*/
 
 # original
 /*
