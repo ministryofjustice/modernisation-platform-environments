@@ -6,33 +6,33 @@
 
 # Certificate
 
-# resource "aws_acm_certificate" "external" {
-#   validation_method         = "DNS"
-#   domain_name               = local.primary_domain
-#   subject_alternative_names = local.subject_alternative_names
+resource "aws_acm_certificate" "external" {
+  validation_method         = "DNS"
+  domain_name               = local.primary_domain
+  subject_alternative_names = local.subject_alternative_names
 
-#   options {
-#     export = "ENABLED"
-#   }
+  options {
+    export = "ENABLED"
+  }
 
-#   tags = merge(local.tags,
-#     { Environment = local.environment }
-#   )
-# }
+  tags = merge(local.tags,
+    { Environment = local.environment }
+  )
+}
 
 # ## Validation Records
 
-# resource "aws_route53_record" "external_validation_nonprod" {
-#   count    = local.is-production ? 0 : length(local.modernisation_platform_validations)
-#   provider = aws.core-vpc
+resource "aws_route53_record" "external_validation_nonprod" {
+  count    = local.is-production ? 0 : length(local.modernisation_platform_validations)
+  provider = aws.core-vpc
 
-#   allow_overwrite = true
-#   name            = local.modernisation_platform_validations[count.index].name
-#   records         = [local.modernisation_platform_validations[count.index].record]
-#   ttl             = 60
-#   type            = local.modernisation_platform_validations[count.index].type
-#   zone_id         = data.aws_route53_zone.external.zone_id
-# }
+  allow_overwrite = true
+  name            = local.modernisation_platform_validations[count.index].name
+  records         = [local.modernisation_platform_validations[count.index].record]
+  ttl             = 60
+  type            = local.modernisation_platform_validations[count.index].type
+  zone_id         = data.aws_route53_zone.external.zone_id
+}
 
 # resource "aws_route53_record" "external_validation_prod" {
 #   count    = local.is-production ? length(local.laa_validations) : 0
@@ -48,20 +48,20 @@
 
 ## Certificate Validation
 
-# resource "aws_acm_certificate_validation" "external_nonprod" {
-#   count = local.is-production ? 0 : 1
+resource "aws_acm_certificate_validation" "external_nonprod" {
+  count = local.is-production ? 0 : 1
 
-#   depends_on = [
-#     aws_route53_record.external_validation_nonprod
-#   ]
+  depends_on = [
+    aws_route53_record.external_validation_nonprod
+  ]
 
-#   certificate_arn         = aws_acm_certificate.external.arn
-#   validation_record_fqdns = [for record in aws_route53_record.external_validation_nonprod : record.fqdn]
+  certificate_arn         = aws_acm_certificate.external.arn
+  validation_record_fqdns = [for record in aws_route53_record.external_validation_nonprod : record.fqdn]
 
-#   timeouts {
-#     create = "10m"
-#   }
-# }
+  timeouts {
+    create = "10m"
+  }
+}
 
 # resource "aws_acm_certificate_validation" "external_prod" {
 #   count = local.is-production ? 1 : 0
