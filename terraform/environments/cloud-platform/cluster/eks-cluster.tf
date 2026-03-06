@@ -145,16 +145,10 @@ module "karpenter" {
 }
 
 
-# data "aws_ecrpublic_authorization_token" "token" {
-#   region = "eu-west-2"
-# }
-
 resource "helm_release" "karpenter" {
  namespace           = "kube-system"
  name                = "karpenter"
  repository          = "oci://public.ecr.aws/karpenter"
-#  repository_username = data.aws_ecrpublic_authorization_token.token.user_name
-#  repository_password = data.aws_ecrpublic_authorization_token.token.password
  chart               = "karpenter"
  version             = "1.9.0"
  wait                = false
@@ -172,4 +166,25 @@ resource "helm_release" "karpenter" {
      enabled: false
    EOT
  ]
+}
+
+# data "template_file" "karpenter_nodepool" {
+#   template = "${file("${path.module}/templates/karpenter_nodepool.yaml.tpl")}"
+#   vars = {
+#     alias_version = "v20260304"
+#     cluster_name = module.eks[0].cluster_name
+#   }
+# }
+
+data "kubectl_path_documents" "manifests" {
+  pattern = "${path.module}/templates/*.yaml"
+  vars = {
+    alias_version = "v20260304"
+    cluster_name = module.eks[0].cluster_name
+  }
+}
+
+resource "kubectl_manifest" "test" {
+    for_each  = data.kubectl_path_documents.manifests.manifests
+    yaml_body = each.value
 }
