@@ -254,7 +254,7 @@ resource "aws_security_group" "ftp_lambda" {
     from_port   = local.endpoint_details["${local.ftp_job.job_name}.remote-port"]
     to_port     = local.endpoint_details["${local.ftp_job.job_name}.remote-port"]
     protocol    = "tcp"
-    cidr_blocks = ["${local.endpoint_details["${local.ftp_job.job_name}.remote-host"]}/32"]
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {

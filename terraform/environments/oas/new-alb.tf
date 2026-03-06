@@ -278,10 +278,9 @@ resource "aws_lb" "oas_lb" {
   subnets                    = data.aws_subnets.shared-private.ids
   enable_deletion_protection = false
   idle_timeout               = 60
-  enable_http2               = false
+  enable_http2               = true
   drop_invalid_header_fields = false
   preserve_host_header       = false
-  xff_header_processing_mode = "remove"
 
   access_logs {
     bucket  = aws_s3_bucket.lb_access_logs[0].id
