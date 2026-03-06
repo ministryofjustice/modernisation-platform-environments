@@ -89,7 +89,7 @@ locals {
     format("ccmsebs-sso.%s", local.prod_domain),
   ]
 
-  subject_alternative_names = local.is-development ? local.nonprod_test_sans : (local.is-production ? local.prod_sans : local.nonprod_sans)
+  subject_alternative_names = local.is-test ? local.nonprod_test_sans : (local.is-production ? local.prod_sans : local.nonprod_sans)
 
   # Domain validation options mapping (following the example pattern)
   domain_types = { for dvo in aws_acm_certificate.external.domain_validation_options : dvo.domain_name => {
