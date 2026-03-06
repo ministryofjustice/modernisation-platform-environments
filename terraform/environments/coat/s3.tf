@@ -294,7 +294,7 @@ module "focus_s3_kms" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "4.0.0"
+  version = "4.2.0"
 
   aliases               = ["s3/focus"]
   description           = "S3 FOCUS KMS key"
@@ -386,7 +386,7 @@ module "coat_s3_kms" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "4.0.0"
+  version = "4.2.0"
 
   aliases               = ["s3/coat"]
   description           = "S3 COAT KMS key"
