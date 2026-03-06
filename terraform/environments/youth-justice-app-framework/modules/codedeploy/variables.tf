@@ -23,6 +23,12 @@ variable "connectivity_alb_name" {
   type        = string
 }
 
+
+variable "yjsm_hub_svc_alb_name" {
+  description = "The name of the yjsm hub svc service ALB"
+  type        = string
+}
+
 variable "tags" {
   description = "A map of tags to add to all resources"
   type        = map(string)
@@ -51,6 +57,12 @@ variable "external_listener_port" {
   default     = 443
 }
 
+variable "yjsm_hub_svc_listener_port" {
+  description = "The port of the yjsm hub svc ALB listener"
+  type        = number
+  default     = 443
+}
+
 variable "environment" {
   description = "The environment to deploy to"
   type        = string
@@ -66,4 +78,12 @@ variable "ec2_enabled" {
   description = "Enable EC2 deployments"
   type        = bool
   default     = false
+}
+
+
+## YJSM Hub Svc Pilot
+variable "create_svc_pilot" {
+  description = "Create infrastructure for the hub-svc pilot, including ALB and associated resources"
+  type        = bool
+  default     = true
 }

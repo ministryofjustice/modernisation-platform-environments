@@ -6,7 +6,7 @@ resource "aws_s3_bucket" "error_page" {
   #checkov:skip=CKV2_AWS_61:"Dont want to delete any files in this bucket"
   #checkov:skip=CKV_AWS_144:"Do not need to replicate error pages as stored in terraform anyway"
   #checkov:skip=CKV_AWS_18:"Logging not required for error pages"
-  bucket        = "yjaf-${var.environment}-custom-error-pages"
+  bucket        = "${var.cloudfront_route53_record_name}-${var.environment}-custom-error-pages"
   force_destroy = true
 }
 
@@ -16,7 +16,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "error_page" {
   rule {
     apply_server_side_encryption_by_default {
       sse_algorithm     = "aws:kms"
-      kms_master_key_id = aws_kms_key.cloudfront_s3.arn
+      kms_master_key_id = var.kms_key_arn
     }
   }
 }
@@ -71,7 +71,7 @@ resource "aws_s3_bucket_policy" "error_page_policy" {
 }
 
 resource "aws_cloudfront_origin_access_control" "s3_oac" {
-  name                              = "cloudfront-${var.environment}-s3-oac"
+  name                              = "cloudfront-${var.cloudfront_route53_record_name}-${var.environment}-s3-oac"
   description                       = "OAC for CloudFront to access S3 bucket"
   origin_access_control_origin_type = "s3"
   signing_behavior                  = "always"
@@ -80,49 +80,4 @@ resource "aws_cloudfront_origin_access_control" "s3_oac" {
 
 resource "aws_cloudfront_origin_access_identity" "oai" {
   comment = "OAI for private S3 access"
-}
-
-resource "aws_kms_key" "cloudfront_s3" {
-  description             = "KMS key for CloudFront ${var.environment}"
-  deletion_window_in_days = 7
-  enable_key_rotation     = true
-
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Id      = "cloudfront-s3-kms-policy",
-    Statement : [
-      {
-        Sid : "AllowCloudFrontServiceAccess",
-        Effect : "Allow",
-        Principal : {
-          Service : "cloudfront.amazonaws.com"
-        },
-        Action : [
-          "kms:Decrypt",
-          "kms:DescribeKey"
-        ],
-        Resource : "*",
-        Condition : {
-          StringEquals : {
-            "kms:ViaService" : "s3.${data.aws_region.current.name}.amazonaws.com",
-            "kms:CallerAccount" : data.aws_caller_identity.current.account_id
-          }
-        }
-      },
-      {
-        Sid : "AllowRootAccountFullAccess",
-        Effect : "Allow",
-        Principal : {
-          AWS : "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
-        },
-        Action : "kms:*",
-        Resource : "*"
-      }
-    ]
-  })
-}
-
-resource "aws_kms_alias" "cloudfront_s3" {
-  name          = "alias/cloudfront-${var.environment}"
-  target_key_id = aws_kms_key.cloudfront_s3.id
 }
