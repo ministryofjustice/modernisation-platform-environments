@@ -70,7 +70,7 @@
       "setup_redshift_schedule": true,
       "scheduled_dataset_lambda_version": "vLatest",
       "probation_domains": [
-        "prb-sent-plan-temp"
+        "prb-sentence-plan"
       ],
       "dps_domains": [
         "dps-activities",
