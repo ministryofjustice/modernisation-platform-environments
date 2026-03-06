@@ -36,21 +36,21 @@ resource "aws_lb_target_group" "ebsapp_internal_tg" {
   }
 }
 
-# resource "aws_lb_listener" "ebsapps_internal_listener" {
+resource "aws_lb_listener" "ebsapps_internal_listener" {
 
-#   load_balancer_arn = aws_lb.ebsapps_internal_alb.arn
-#   port              = "443"
-#   protocol          = "HTTPS"
-#   ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
-#   certificate_arn   = aws_acm_certificate.external.arn
+  load_balancer_arn = aws_lb.ebsapps_internal_alb.arn
+  port              = "443"
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+  certificate_arn   = aws_acm_certificate.external.arn
 
-#   default_action {
-#     type             = "forward"
-#     target_group_arn = aws_lb_target_group.ebsapp_internal_tg.id
-#   }
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.ebsapp_internal_tg.id
+  }
 
-#   depends_on = [aws_acm_certificate_validation.external_nonprod, aws_acm_certificate_validation.external_prod]
-# }
+  depends_on = [aws_acm_certificate_validation.external_nonprod, aws_acm_certificate_validation.external_prod]
+}
 
 
 resource "aws_lb_target_group_attachment" "ebsapps_internal" {
