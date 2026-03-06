@@ -76,7 +76,7 @@ locals {
     format("ccms-ebs-db-nlb.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment)
   ]
 
-  nonprod_dev_sans = [
+  nonprod_test_sans = [
     format("ccmsebs-sso.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment),
     format("ccms-ssogen-as1.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment),
     format("ccms-ssogen-as2.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment),
@@ -89,7 +89,7 @@ locals {
     format("ccmsebs-sso.%s", local.prod_domain),
   ]
 
-  subject_alternative_names = local.is-development ? local.nonprod_dev_sans : (local.is-production ? local.prod_sans : local.nonprod_sans)
+  subject_alternative_names = local.is-development ? local.nonprod_test_sans : (local.is-production ? local.prod_sans : local.nonprod_sans)
 
   # Domain validation options mapping (following the example pattern)
   domain_types = { for dvo in aws_acm_certificate.external.domain_validation_options : dvo.domain_name => {
