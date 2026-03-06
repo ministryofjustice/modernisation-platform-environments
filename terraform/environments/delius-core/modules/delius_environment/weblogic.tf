@@ -125,11 +125,18 @@ data "aws_ami" "ecs_ami" {
 }
 
 resource "aws_launch_template" "weblogic" {
-  name_prefix   = "weblogic-ecs-"
+  name_prefix   = "weblogic-${var.env_name}-ecs-"
   image_id      = data.aws_ami.ecs_ami.id
   instance_type = var.delius_microservice_configs.weblogic.ec2_instance_type
 
   user_data = base64encode(templatefile("${path.module}/templates/ecs-host-userdata.tpl", {ecs_cluster_name = module.ecs.ecs_cluster_name}))
+
+  network_interfaces {
+    associate_public_ip_address = false
+    security_groups = [
+      aws_security_group.ecs_host_sg.id
+    ]
+  }
 
   iam_instance_profile {
     name = aws_iam_instance_profile.weblogic.name
@@ -163,8 +170,24 @@ resource "aws_iam_instance_profile" "weblogic" {
   role = aws_iam_role.weblogic_host.name
 }
 
+resource "aws_security_group" "ecs_host_sg" {
+  name        = "weblogic-${var.env_name}-ecscluster-private-sg"
+  description = "Shared ECS Cluster Hosts Security Group"
+  vpc_id      = data.terraform_remote_state.vpc.outputs.vpc_id
+
+  # Allow all outbound
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = merge(var.tags, { Name = "weblogic-${var.env_name}-ecscluster-private-sg" })
+}
+
 resource "aws_autoscaling_group" "weblogic" {
-  name                = "weblogic-ecs-asg"
+  name                = "weblogic-${var.env_name}-ecs-asg"
   max_size            = 2
   min_size            = 1
   desired_capacity    = 1
@@ -177,7 +200,7 @@ resource "aws_autoscaling_group" "weblogic" {
 }
 
 resource "aws_ecs_capacity_provider" "weblogic" {
-  name = "weblogic-ec2-cp"
+  name = "weblogic-${var.env_name}-ec2-cp"
 
   auto_scaling_group_provider {
     auto_scaling_group_arn = aws_autoscaling_group.weblogic.arn
