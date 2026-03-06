@@ -1,4 +1,55 @@
 # ######################################
+# SSM Details for SSOGEN
+# ######################################
+resource "aws_cloudwatch_log_group" "ssogen_groups" {
+  for_each          = local.application_data.ssogen_cw_log_groups
+  name              = each.key
+  retention_in_days = each.value.retention_days
+
+  tags = merge(
+    local.tags,
+    {
+      Name = each.key
+    },
+  )
+}
+
+resource "aws_ssm_parameter" "ssogen_cw_agent_config" {
+  count       = local.is-development || local.is-test ? 1 : 0
+  description = "SSOGEN cloud watch agent config"
+  name        = "ssogen-cloud-watch-config"
+  type        = "String"
+  value       = file("./templates/cw_agent_config_ssogen.json")
+
+  tags = merge(local.tags,
+    { Name = "cw-config" }
+  )
+}
+
+resource "aws_ssm_association" "ssogen_update_ssm_agent" {
+  count            = local.is-development || local.is-test ? 1 : 0
+  name             = "AWS-SSOGEN-UpdateSSMAgent"
+  association_name = "ssogen-update-ssm-agent"
+  parameters = {
+    allowDowngrade = "false"
+  }
+  targets {
+    # we could just target all instances, but this would also include the bastion, which gets rebuilt everyday
+    key    = "tag:name"
+    values = [lower(format("ec2-ccms-%s-%s-*", local.application_name_ssogen, local.environment))]
+  }
+  apply_only_at_cron_interval = false
+  schedule_expression         = "cron(30 7 ? * MON *)"
+}
+
+resource "aws_iam_role_policy_attachment" "cloudwatch_datasource_policy_attach" {
+  count      = local.is-development || local.is-test ? 1 : 0
+  policy_arn = aws_iam_policy.cloudwatch_datasource_policy.arn
+  role       = aws_iam_role.ssogen_ec2[count.index].name
+
+}
+
+# ######################################
 # CloudWatch Alarms for SSOGEN
 # ######################################
 # Alarm for ALB 5xx Errors
