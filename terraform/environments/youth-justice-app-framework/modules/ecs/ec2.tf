@@ -163,7 +163,7 @@ module "autoscaling" {
 module "autoscaling_sg" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/security-group/aws"
-  version = "5.1.2"
+  version = "5.3.1"
 
   name        = "${var.cluster_name}-ecs-autoscaling-group"
   description = "Autoscaling group security group"
