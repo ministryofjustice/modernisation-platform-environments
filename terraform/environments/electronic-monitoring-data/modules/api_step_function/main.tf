@@ -1,6 +1,7 @@
 locals {
   camel_case_api_name  = join("", [for word in split("_", var.api_name) : title(word)])
   synced               = var.sync ? "Sync" : ""
+  sfn_name             = trimsuffix(var.api_name, "_api")
   # Return a parsed response dependent on if sfn is standard or express type
   express_response  = <<EOF
 #set ($parsedPayload = $util.parseJson($input.json('$.output')))
@@ -170,7 +171,7 @@ resource "aws_api_gateway_integration" "status_integration" {
   request_templates = {
     "application/json" = <<EOF
 {
-  "executionArn": "arn:aws:states:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:execution:${var.api_name}:$input.params('execution_id')"
+  "executionArn": "arn:aws:states:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:execution:${local.sfn_name}:$input.params('execution_id')"
 }
 EOF
   }
