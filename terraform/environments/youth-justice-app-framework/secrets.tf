@@ -182,6 +182,8 @@ resource "aws_secretsmanager_secret" "document_gateway" {
   description = "Used for document gateway"
   kms_key_id  = module.kms.key_id
   tags        = local.tags
+
+  recovery_window_in_days = 0
 }
 
 resource "aws_secretsmanager_secret_version" "document_gateway" {
@@ -200,6 +202,8 @@ resource "aws_secretsmanager_secret" "yjsm_hub_doc_gateway_auth" {
   description = "Used for document gateway"
   kms_key_id  = module.kms.key_id
   tags        = local.tags
+  
+  recovery_window_in_days = 0
 }
 
 resource "aws_secretsmanager_secret_version" "yjsm_hub_doc_gateway_auth" {
