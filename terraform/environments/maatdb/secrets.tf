@@ -12,7 +12,7 @@ resource "aws_secretsmanager_secret_version" "maatdb_maintenance_slack_secrets_v
   secret_id = aws_secretsmanager_secret.maatdb_maintenance_slack_secrets.id
 
   secret_string = jsonencode({
-    "slack_channel_webhook_crimeapps" = "",
-    "slack_channel_webhook_maatdb_dbas"    = "" 
+    "slack_channel_webhook_crimeapps"   = "",
+    "slack_channel_webhook_maatdb_dbas" = ""
   })
 }

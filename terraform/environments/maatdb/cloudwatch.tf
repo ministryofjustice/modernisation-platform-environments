@@ -145,8 +145,8 @@ module "maatdb_pagerduty_core_alerts" {
 
 # create RDS maintenance notification 
 resource "aws_db_event_subscription" "rds_maintenance_notifications" {
-  name       = "${local.application_name}-${local.environment}-rds-maintenance"
-  sns_topic  = aws_sns_topic.maatdb_maintenance_topic.arn
+  name      = "${local.application_name}-${local.environment}-rds-maintenance"
+  sns_topic = aws_sns_topic.maatdb_maintenance_topic.arn
 
   # DB instance only
   source_type = "db-instance"
@@ -172,11 +172,11 @@ resource "aws_db_event_subscription" "rds_maintenance_notifications" {
 
 # Create SNS topic for RDS maintenance event 
 resource "aws_sns_topic" "maatdb_maintenance_topic" {
-  name = "${local.application_name}-${local.environment}-maintenance-topic"
+  name              = "${local.application_name}-${local.environment}-maintenance-topic"
   kms_master_key_id = aws_kms_key.sns_rds_events.arn
 
-  depends_on = [    aws_kms_key.sns_rds_events  ]
-  
+  depends_on = [aws_kms_key.sns_rds_events]
+
   tags = merge(
     local.tags,
     {
@@ -200,13 +200,13 @@ data "aws_iam_policy_document" "rds_publish_to_sns" {
     actions   = ["sns:Publish"]
     resources = [aws_sns_topic.maatdb_maintenance_topic.arn]
 
-   condition {
-   test     = "ArnLike"
-   variable = "aws:SourceArn"
-   values   = [
-    "arn:aws:rds:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:db:${module.rds.db_instance_identifier}"
-    ]
-   } 
+    condition {
+      test     = "ArnLike"
+      variable = "aws:SourceArn"
+      values = [
+        "arn:aws:rds:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:db:${module.rds.db_instance_identifier}"
+      ]
+    }
   }
 }
 
@@ -280,7 +280,7 @@ resource "aws_sns_topic_subscription" "rds_to_slack_lambda" {
   topic_arn = aws_sns_topic.maatdb_maintenance_topic.arn
   protocol  = "lambda"
   endpoint  = aws_lambda_function.dbmaintenance_sns_to_slack.arn
-  
+
   depends_on = [aws_lambda_permission.allow_rds_sns_invoke]
 }
 
