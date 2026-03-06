@@ -82,7 +82,7 @@ resource "aws_lambda_function" "waf_maintenance" {
 }
 
 resource "aws_lambda_function" "ssogen_waf_maintenance" {
-  count = local.is-development || local.is-test ? 1 : 0
+  count            = local.is-development || local.is-test ? 1 : 0
   function_name    = "ssogen-waf-maintenance-${local.environment}"
   source_code_hash = data.archive_file.waf_maintenance_zip.output_base64sha256
   role             = aws_iam_role.waf_lambda_role.arn
