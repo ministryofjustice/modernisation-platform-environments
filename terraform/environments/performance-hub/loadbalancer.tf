@@ -17,7 +17,7 @@ module "lb_access_logs_enabled" {
   region                     = "eu-west-2"
   enable_deletion_protection = false
   # allow 60*4 seconds before 504 gateway timeout for long-running DB operations
-  idle_timeout               = 240
+  #idle_timeout               = 240
   tags                       = { Name = "lb_module" }
 }
 
@@ -74,7 +74,6 @@ resource "aws_lb_target_group" "target_group" {
   )
 }
 
-# remove this
 #tfsec:ignore:AWS004
 resource "aws_lb_listener" "listener" {
   #checkov:skip=CKV_AWS_2
