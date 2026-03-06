@@ -577,5 +577,16 @@
     "cwagent-var-log-secure": {
       "retention_days": 90
     }
+  },
+  "ssogen_cw_log_groups": {
+    "cwagent-ssogen-admin-server-logs": {
+      "retention_days": 30
+    },
+    "cwagent-ssogen-ohs-server-logs": {
+      "retention_days": 30
+    },
+    "cwagent-ssogen-managed-server-logs": {
+      "retention_days": 30
+    }
   }
 }
