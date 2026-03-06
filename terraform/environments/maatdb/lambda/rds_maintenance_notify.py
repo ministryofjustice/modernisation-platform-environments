@@ -182,22 +182,22 @@ def lambda_handler(event, context):
     secret_json = _get_secret_json(secret_name)
     webhook_urls = _pick_webhooks(secret_json)
 
-   results = []
-   for url in webhook_urls:
+    results = []
+    for url in webhook_urls:
       results.append(_post_to_slack(url, slack_text))
 
-   print(json.dumps(
-    {
+    print(json.dumps(
+     {
         "slack_post_results": results,
         "message_id": info.get("message_id"),
         "timestamp": info.get("timestamp"),
         "parsed": info.get("parsed"),
-    },
+     },
     sort_keys=True 
-  ))
+    ))
 
-  # Fail only if ALL posts failed
-  if not any(r.get("ok") for r in results):
+    # Fail only if ALL posts failed
+    if not any(r.get("ok") for r in results):
       raise RuntimeError(f"Slack post failed for all webhooks: {results}")
 
-   return {"statusCode": 200, "body": "Notification sent to Slack (all configured webhooks)"}
+    return {"statusCode": 200, "body": "Notification sent to Slack (all configured webhooks)"}
