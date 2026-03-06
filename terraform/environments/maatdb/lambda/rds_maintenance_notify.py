@@ -3,7 +3,7 @@ import os
 import urllib.request
 import urllib.error
 import boto3
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, List
 
 
 secrets_client = boto3.client("secretsmanager")
@@ -23,33 +23,51 @@ def _get_secret_json(secret_name: str) -> Dict[str, Any]:
         raise ValueError("SecretString is not valid JSON.") from e
 
 
-def _pick_webhook(secret_json: Dict[str, Any]) -> str:
+    def _pick_webhooks(secret_json: Dict[str, Any]) -> List[str]:
     """
-    Choose which webhook to use. Preference order:
-    1) SLACK_WEBHOOK_KEY env var (optional) -> e.g. 'slack_channel_webhook_appops'
-    2) slack_channel_webhook_appops
-    3) slack_channel_webhook_crimeapps
-    4) slack_webhook (fallback common key)
+    Return ALL webhook URLs found in the secret.
+    - If SLACK_WEBHOOK_KEY is set, only that key is used.
+    - Otherwise, use known keys (appops/crimeapps/fallback) AND any other non-empty string values in the secret.
     """
     preferred_key = os.environ.get("SLACK_WEBHOOK_KEY", "").strip()
-    candidates = []
+
     if preferred_key:
-        candidates.append(preferred_key)
-    candidates += [
+        v = (secret_json.get(preferred_key) or "").strip()
+        if not v:
+            raise ValueError(f"SLACK_WEBHOOK_KEY is set to '{preferred_key}' but the value is empty/missing in the secret.")
+        return [v]
+
+    # First, grab known keys in stable order (so logs are predictable)
+    keys_in_order = [
         "slack_channel_webhook_appops",
         "slack_channel_webhook_crimeapps",
         "slack_webhook",
     ]
 
-    for k in candidates:
-        v = (secret_json.get(k) or "").strip()
-        if v:
-            return v
+    urls: List[str] = []
+    seen = set()
 
-    raise ValueError(
-        "No Slack webhook URL found in secret. "
-        "Set one of: SLACK_WEBHOOK_KEY target, slack_channel_webhook_appops, slack_channel_webhook_crimeapps, slack_webhook."
-    )
+    for k in keys_in_order:
+        v = (secret_json.get(k) or "").strip()
+        if v and v not in seen:
+            urls.append(v)
+            seen.add(v)
+
+    # Then add any other non-empty string values from the secret (optional, future-proof)
+    for v in secret_json.values():
+        if isinstance(v, str):
+            vv = v.strip()
+            if vv and vv not in seen:
+                urls.append(vv)
+                seen.add(vv)
+
+    if not urls:
+        raise ValueError(
+            "No Slack webhook URLs found in secret. "
+            "Expected keys like slack_channel_webhook_appops / slack_channel_webhook_crimeapps."
+        )
+
+    return urls
 
 
 def _extract_sns_message(event: Dict[str, Any]) -> Dict[str, Any]:
@@ -162,23 +180,24 @@ def lambda_handler(event, context):
     slack_text = _build_slack_text(info)
 
     secret_json = _get_secret_json(secret_name)
-    webhook_url = _pick_webhook(secret_json)
+    webhook_urls = _pick_webhooks(secret_json)
 
-    result = _post_to_slack(webhook_url, slack_text)
+   results = []
+   for url in webhook_urls:
+      results.append(_post_to_slack(url, slack_text))
 
-    # Always log outcome; Lambda basic logging is enabled by your IAM policy
-    print(json.dumps(
-        {
-            "slack_post_result": result,
-            "message_id": info.get("message_id"),
-            "timestamp": info.get("timestamp"),
-            "parsed": info.get("parsed"),
-        },
-        sort_keys=True
-    ))
+   print(json.dumps(
+    {
+        "slack_post_results": results,
+        "message_id": info.get("message_id"),
+        "timestamp": info.get("timestamp"),
+        "parsed": info.get("parsed"),
+    },
+    sort_keys=True 
+  ))
 
-    # If Slack fails, raise to let SNS/Lambda retry (note duplicates possible)
-    if not result.get("ok"):
-        raise RuntimeError(f"Slack post failed: {result}")
+  # Fail only if ALL posts failed
+  if not any(r.get("ok") for r in results):
+      raise RuntimeError(f"Slack post failed for all webhooks: {results}")
 
-    return {"statusCode": 200, "body": "Notification sent to Slack"}
+   return {"statusCode": 200, "body": "Notification sent to Slack (all configured webhooks)"}
