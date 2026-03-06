@@ -52,12 +52,11 @@ variable "schema" {
   type        = any
 }
 
-variable "sync" {
-  description = "Boolean value of whether API should return output of step function"
-  type        = bool
-  default     = true
+variable "sfn_type" {
+  description = "If the sfn is standard or express"
+  type        = string
+  default     = "standard"
 }
-
 
 variable "api_version" {
   description = "The version of the API Gateway"

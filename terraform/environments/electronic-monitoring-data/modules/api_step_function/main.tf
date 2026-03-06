@@ -1,6 +1,6 @@
 locals {
   camel_case_api_name  = join("", [for word in split("_", var.api_name) : title(word)])
-  synced               = var.sync ? "Sync" : ""
+  sync                 = var.sfn_type == "express" ? "Sync" : ""
   sfn_name             = trimsuffix(var.api_name, "_api")
   # Return a parsed response dependent on if sfn is standard or express type
   express_response  = <<EOF
@@ -144,7 +144,7 @@ resource "aws_api_gateway_integration" "step_function_integration" {
   http_method             = aws_api_gateway_method.method.http_method
   integration_http_method = "POST"
   type                    = "AWS"
-  uri                     = "arn:aws:apigateway:${data.aws_region.current.name}:states:action/Start${local.synced}Execution"
+  uri                     = "arn:aws:apigateway:${data.aws_region.current.name}:states:action/Start${local.sync}Execution"
 
   credentials = aws_iam_role.api_gateway_role.arn
 
@@ -250,7 +250,7 @@ resource "aws_api_gateway_integration_response" "integration_response_200" {
   status_code = "200"
 
   response_templates = {
-    "application/json" = local.synced ? local.express_response : local.standard_response
+    "application/json" = var.sfn_type == "express" ? local.express_response : local.standard_response
   }
   depends_on = [
     aws_api_gateway_integration.step_function_integration

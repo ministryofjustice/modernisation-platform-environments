@@ -4,6 +4,7 @@ module "get_zipped_file_api_api" {
   api_description = "API to trigger step function that gets a zipped file out of storage"
   api_path        = "execute"
   step_function   = module.get_zipped_file_api
+  sfn_type        = "express"
   stages = [
     {
       stage_name             = "test",
@@ -33,7 +34,7 @@ module "ears_sars_api" {
   api_description = "Ears and Sars API"
   api_path        = "execute"
   step_function   = module.ears_sars_step_function[0]
-  sync            = false
+  sfn_type        = "standard"
   stages = [
     {
       stage_name             = "request",
