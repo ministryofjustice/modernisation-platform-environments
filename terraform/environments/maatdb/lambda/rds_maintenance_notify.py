@@ -23,7 +23,7 @@ def _get_secret_json(secret_name: str) -> Dict[str, Any]:
         raise ValueError("SecretString is not valid JSON.") from e
 
 
-    def _pick_webhooks(secret_json: Dict[str, Any]) -> List[str]:
+def _pick_webhooks(secret_json: Dict[str, Any]) -> List[str]:
     """
     Return ALL webhook URLs found in the secret.
     - If SLACK_WEBHOOK_KEY is set, only that key is used.
