@@ -78,7 +78,7 @@ resource "aws_lambda_function" "dbmaintenance_sns_to_slack" {
 
   environment {
     variables = {
-      # This secret now contains slack_channel_webhook_crimeapps ,slack_channel_webhook_appops
+      # This secret now contains slack_channel_webhook_crimeapps ,slack_channel_webhook_maatdb_dbas
       SECRET_NAME = aws_secretsmanager_secret.maatdb_maintenance_slack_secrets.name
     }
   }
