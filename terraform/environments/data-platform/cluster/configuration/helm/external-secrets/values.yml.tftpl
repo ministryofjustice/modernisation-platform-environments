@@ -1,0 +1,18 @@
+---
+serviceAccount:
+  create: true
+  annotations: 
+    eks.amazonaws.com/role-arn: ${eks_role_arn}
+
+serviceMonitor:
+  enabled: true
+
+global:
+  nodeSelector:
+    compute.data-platform.service.justice.gov.uk/node: system
+
+  tolerations:
+    - key: compute.data-platform.service.justice.gov.uk/node
+      operator: Equal
+      value: system
+      effect: NoSchedule
