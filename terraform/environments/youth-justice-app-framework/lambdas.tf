@@ -42,7 +42,7 @@ resource "aws_iam_role_policy_attachment" "lambda_iam_roles_basic_policy" {
 module "serverlessrepo-lambda-canary-sg" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/security-group/aws"
-  version = "5.1.2"
+  version = "5.3.1"
 
   name        = "serverlessrepo-lambda-canary-sg"
   description = "ALB security group"
