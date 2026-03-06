@@ -27,7 +27,7 @@ def _get_secret_json(secret_name: str) -> Dict[str, Any]:
     """
     Return ALL webhook URLs found in the secret.
     - If SLACK_WEBHOOK_KEY is set, only that key is used.
-    - Otherwise, use known keys (appops/crimeapps/fallback) AND any other non-empty string values in the secret.
+    - Otherwise, use known keys (maatdb_dbas/crimeapps/fallback) AND any other non-empty string values in the secret.
     """
     preferred_key = os.environ.get("SLACK_WEBHOOK_KEY", "").strip()
 
@@ -39,7 +39,7 @@ def _get_secret_json(secret_name: str) -> Dict[str, Any]:
 
     # First, grab known keys in stable order (so logs are predictable)
     keys_in_order = [
-        "slack_channel_webhook_appops",
+        "slack_channel_webhook_maatdb_dbas",
         "slack_channel_webhook_crimeapps",
         "slack_webhook",
     ]
@@ -64,7 +64,7 @@ def _get_secret_json(secret_name: str) -> Dict[str, Any]:
     if not urls:
         raise ValueError(
             "No Slack webhook URLs found in secret. "
-            "Expected keys like slack_channel_webhook_appops / slack_channel_webhook_crimeapps."
+            "Expected keys like slack_channel_webhook_maatdb_dbas / slack_channel_webhook_crimeapps."
         )
 
     return urls
