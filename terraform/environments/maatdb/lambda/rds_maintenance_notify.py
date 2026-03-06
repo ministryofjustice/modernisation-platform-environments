@@ -4,6 +4,10 @@ import urllib.request
 import urllib.error
 import boto3
 from typing import Any, Dict, Optional, List
+import logging
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 
 secrets_client = boto3.client("secretsmanager")
@@ -186,15 +190,15 @@ def lambda_handler(event, context):
     for url in webhook_urls:
       results.append(_post_to_slack(url, slack_text))
 
-    print(json.dumps(
-     {
+    logger.info(
+    "Slack notification results",
+    extra={
         "slack_post_results": results,
         "message_id": info.get("message_id"),
         "timestamp": info.get("timestamp"),
         "parsed": info.get("parsed"),
-     },
-    sort_keys=True 
-    ))
+    },
+ )
 
     # Fail only if ALL posts failed
     if not any(r.get("ok") for r in results):

@@ -60,21 +60,21 @@ resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
 
 data "archive_file" "lambda_zip" {
   type        = "zip"
-  source_file  = "${path.module}/lambda/rds_maintenance_notify.py"
+  source_file = "${path.module}/lambda/rds_maintenance_notify.py"
   output_path = "${path.module}/lambda/rds_maintenance_notify.zip"
 }
 
 resource "aws_lambda_function" "dbmaintenance_sns_to_slack" {
-  filename         = data.archive_file.lambda_zip.output_path
-#  source_code_hash = base64sha256(join("", local.lambda_source_hashes_cloudwatch_alarm_slack_integration))
+  filename = data.archive_file.lambda_zip.output_path
+  #  source_code_hash = base64sha256(join("", local.lambda_source_hashes_cloudwatch_alarm_slack_integration))
   source_code_hash = data.archive_file.lambda_zip.output_base64sha256
   function_name    = "${local.application_name}-${local.environment}-rds_maintenance_notify"
   role             = aws_iam_role.lambda_dbmaintenance_sns_role.arn
   handler          = "rds_maintenance_notify.lambda_handler"
-#  layers           = [aws_lambda_layer_version.lambda_dbmaintenance_sns_layer.arn]
-  runtime          = "python3.13"
-  timeout          = 30
-  publish          = true
+  #  layers           = [aws_lambda_layer_version.lambda_dbmaintenance_sns_layer.arn]
+  runtime = "python3.13"
+  timeout = 30
+  publish = true
 
   environment {
     variables = {
