@@ -2,14 +2,13 @@ resource "aws_macie2_account" "macie_unstructured_spike" {
   status = "ENABLED"
 }
 
-
-# Uses the default checks
-resource "aws_macie2_classification_job" "unstructured_data_spike" {
+resource "aws_macie2_classification_job" "unstructured_data_spike_atrium" {
   depends_on = [aws_macie2_account.macie_unstructured_spike]
 
-  name        = "spike-unstructured-data"
+  name_prefix = "spike-unstructured-data-atrium-"
   description = "Spike to scan unstructured data"
   
+  # ONE TIME IS CONSIDERED ONCE AND DONE 
   job_type    = "ONE_TIME" 
   
   # For custom jobs add the arn values for each custom ident
@@ -28,7 +27,7 @@ resource "aws_macie2_classification_job" "unstructured_data_spike" {
           simple_scope_term {
             comparator = "STARTS_WITH"
             key        = "OBJECT_KEY"
-            values     = ["g4s/atrium_unstructured/2024-05-31/340000-1349999"]
+            values     = ["g4s/atrium_unstructured/2024-05-31"]
           }
         }
         and {
@@ -42,3 +41,4 @@ resource "aws_macie2_classification_job" "unstructured_data_spike" {
     }
   }
 }
+
