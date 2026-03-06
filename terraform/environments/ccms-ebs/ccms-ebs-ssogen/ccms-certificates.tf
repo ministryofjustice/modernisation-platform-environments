@@ -16,7 +16,7 @@ resource "aws_acm_certificate" "external" {
   }
 
   tags = merge(local.tags,
-    { Environment = local.environment }
+    { Name = format("%s-%s", local.application_name_ssogen, local.environment), Environment = local.environment }
   )
 }
 
