@@ -9,7 +9,7 @@ module "redshift_sg" {
   # checkov:skip=CKV_TF_1
 
   source  = "terraform-aws-modules/security-group/aws"
-  version = "4.13.0"
+  version = "5.3.1"
 
   vpc_id      = var.vpc_id
   name        = "Redshift Serverless"
@@ -59,7 +59,7 @@ module "postgres_sg" {
   # checkov:skip=CKV_TF_1
 
   source  = "terraform-aws-modules/security-group/aws"
-  version = "4.13.0"
+  version = "5.3.1"
 
   vpc_id            = var.vpc_id
   security_group_id = var.postgres_security_group_id
@@ -81,7 +81,7 @@ module "mgmt_sg" {
   # checkov:skip=CKV_TF_1
 
   source  = "terraform-aws-modules/security-group/aws"
-  version = "4.13.0"
+  version = "5.3.1"
 
   vpc_id            = var.vpc_id
   security_group_id = var.management_server_sg_id
