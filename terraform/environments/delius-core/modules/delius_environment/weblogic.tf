@@ -173,7 +173,7 @@ resource "aws_iam_instance_profile" "weblogic" {
 resource "aws_security_group" "ecs_host_sg" {
   name        = "weblogic-${var.env_name}-ecscluster-private-sg"
   description = "Shared ECS Cluster Hosts Security Group"
-  vpc_id      = data.terraform_remote_state.vpc.outputs.vpc_id
+  vpc_id      = var.account_info.vpc_id
 
   # Allow all outbound
   egress {
