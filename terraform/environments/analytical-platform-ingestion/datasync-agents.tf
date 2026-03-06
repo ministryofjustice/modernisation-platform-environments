@@ -1,4 +1,6 @@
 resource "aws_datasync_agent" "main" {
+  count = local.environment == "production" ? 1 : 0
+
   name       = "${local.application_name}-${local.environment}-datasync"
   ip_address = data.dns_a_record_set.datasync_activation_nlb.addrs[0]
 

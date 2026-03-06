@@ -156,3 +156,16 @@ resource "aws_lambda_permission" "s3-cross-account-replication-s3" {
   principal     = "s3.amazonaws.com"
   source_arn    = local.s3-cross-account-replication-s3-arn
 }
+
+resource "aws_s3_bucket_notification" "s3_cross_account_replication" {
+  bucket = "yjaf-${local.environment}-redshift-yjb-reporting"
+
+  lambda_function {
+    lambda_function_arn = module.s3-cross-account-replication.lambda_arn
+    events              = ["s3:ObjectCreated:*"]
+  }
+
+  depends_on = [
+    aws_lambda_permission.s3-cross-account-replication-s3
+  ]
+}

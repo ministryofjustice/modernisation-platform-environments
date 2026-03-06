@@ -74,7 +74,7 @@ module "vpc_endpoints" {
   })
 
   create_security_group      = true
-  security_group_name_prefix = "${local.application_name}-${local.environment}-vpc-endpoints-"
+  security_group_name_prefix = "${local.application_name}-${local.environment}-vpc-endpoints"
   security_group_description = "VPC endpoint security group"
   security_group_rules = {
     ingress_https = {
