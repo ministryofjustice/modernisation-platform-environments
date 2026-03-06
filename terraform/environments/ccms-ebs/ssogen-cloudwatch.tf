@@ -42,7 +42,7 @@ resource "aws_ssm_association" "ssogen_update_ssm_agent" {
   schedule_expression         = "cron(30 7 ? * MON *)"
 }
 
-resource "aws_iam_role_policy_attachment" "cloudwatch_datasource_policy_attach" {
+resource "aws_iam_role_policy_attachment" "ssogen_cloudwatch_datasource_policy_attach" {
   count      = local.is-development || local.is-test ? 1 : 0
   policy_arn = aws_iam_policy.cloudwatch_datasource_policy.arn
   role       = aws_iam_role.ssogen_ec2[count.index].name
