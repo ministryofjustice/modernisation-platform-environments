@@ -16,16 +16,16 @@ resource "aws_acm_certificate" "external" {
   )
 }
 
-data "aws_acm_certificate" "external_ssogen" {
-  count             = local.is-development || local.is-test ? 1 : 0
-  domain              = local.primary_domain
-  statuses = ["ISSUED"]
-  most_recent = true
+# data "aws_acm_certificate" "external_ssogen" {
+#   count             = local.is-development || local.is-test ? 1 : 0
+#   domain              = local.primary_domain
+#   statuses = ["ISSUED"]
+#   most_recent = true
 
-  tags = merge(local.tags,
-    { Environment = local.environment }
-  )
-}
+#   tags = merge(local.tags,
+#     { Environment = local.environment }
+#   )
+# }
 ## Validation Records
 
 resource "aws_route53_record" "external_validation_nonprod" {
