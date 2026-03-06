@@ -17,6 +17,7 @@ resource "aws_acm_certificate" "external" {
 }
 
 data "aws_acm_certificate" "external_ssogen" {
+  count             = local.is-development || local.is-test ? 1 : 0
   domain              = local.primary_domain
   statuses = ["ISSUED"]
   most_recent = true
