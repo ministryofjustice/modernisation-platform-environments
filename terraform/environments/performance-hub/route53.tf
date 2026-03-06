@@ -1,4 +1,8 @@
-# Note: The production record is managed by operations engineering and has a CNAME to this record
+# Note: The prod and preprod records are managed by operations engineering's DNS repo and have a CNAME to the 
+# equivalent .modernisation-platform.service.justice.gov.uk record
+# https://github.com/ministryofjustice/dns/blob/a4e0ebfdd7cd5fa8b85299272b53aa6127383ae4/hostedzones/service.justice.gov.uk.yaml#L962
+# https://github.com/ministryofjustice/dns/blob/a4e0ebfdd7cd5fa8b85299272b53aa6127383ae4/hostedzones/service.justice.gov.uk.yaml#L1730
+
 resource "aws_route53_record" "external" {
   provider = aws.core-vpc
 
@@ -13,7 +17,22 @@ resource "aws_route53_record" "external" {
   }
 }
 
-# Note: Production certificate is a Gandi cert which is manually imported
+resource "aws_acm_certificate" "external" {
+  domain_name = local.is-development ? "modernisation-platform.service.justice.gov.uk" : local.app_data.accounts[local.environment].app_dns_name
+  validation_method = "DNS"
+
+  subject_alternative_names = local.is-development ? ["*.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"] : local.app_data.accounts[local.environment].app_dns_name
+  tags = {
+    Environment = local.environment
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+# original
+/*
 resource "aws_acm_certificate" "external" {
   count             = local.is-production ? 0 : 1
   domain_name       = "modernisation-platform.service.justice.gov.uk"
@@ -28,6 +47,7 @@ resource "aws_acm_certificate" "external" {
     create_before_destroy = true
   }
 }
+*/
 
 resource "aws_route53_record" "external_validation" {
   count    = local.is-production ? 0 : 1
@@ -58,3 +78,10 @@ resource "aws_acm_certificate_validation" "external" {
   certificate_arn         = aws_acm_certificate.external[0].arn
   validation_record_fqdns = [local.domain_name_main[0], local.domain_name_sub[0]]
 }
+
+# original
+# resource "aws_acm_certificate_validation" "external" {
+#   count                   = local.is-production ? 0 : 1
+#   certificate_arn         = aws_acm_certificate.external[0].arn
+#   validation_record_fqdns = [local.domain_name_main[0], local.domain_name_sub[0]]
+# }

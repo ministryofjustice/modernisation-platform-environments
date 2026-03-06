@@ -109,6 +109,7 @@ resource "aws_lb_listener" "https_listener" {
 
 
 # add this
+/*
 resource "aws_lb_listener" "https_listener_lb" {
   #checkov:skip=CKV_AWS_103
   depends_on        = [aws_acm_certificate_validation.external]
@@ -122,6 +123,7 @@ resource "aws_lb_listener" "https_listener_lb" {
     type             = "forward"
   }
 }
+*/
 
 resource "aws_security_group" "load_balancer_security_group" {
   name_prefix = "${local.application_name}-loadbalancer-security-group"
