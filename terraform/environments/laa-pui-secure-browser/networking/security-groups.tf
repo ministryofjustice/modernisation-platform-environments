@@ -5,7 +5,7 @@ module "vpc_endpoints_security_group" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/security-group/aws"
-  version = "5.3.0"
+  version = "5.3.1"
 
   name        = "${module.vpc[0].name}-vpc-endpoints"
   description = "VPC endpoints security group"
