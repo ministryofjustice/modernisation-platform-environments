@@ -109,7 +109,7 @@ resource "aws_api_gateway_stage" "main" {
 # Account-level Logging Role
 module "apigw_cloudwatch_role" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.58.0"
+  version = "6.4.0"
 
   create_role = true
 
