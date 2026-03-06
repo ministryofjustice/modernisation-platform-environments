@@ -17,9 +17,9 @@ resource "aws_acm_certificate" "external" {
 }
 
 data "aws_acm_certificate" "external_ssogen" {
-  count             = local.is-development || local.is-test ? 1 : 0
-  domain              = local.primary_domain
-  statuses = ["ISSUED"]
+  count       = local.is-development || local.is-test ? 1 : 0
+  domain      = local.primary_domain
+  statuses    = ["ISSUED"]
   most_recent = true
 
   tags = { Name = format("%s-%s", local.application_name_ssogen, local.environment) }
