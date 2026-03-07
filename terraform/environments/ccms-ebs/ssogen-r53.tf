@@ -19,7 +19,7 @@ resource "aws_route53_record" "ssogen_internal_alb" {
 }
 
 # Non-prod SSOGEN ADMIN ALB record
-resource "aws_route53_record" "ssogen_internal_alb" {
+resource "aws_route53_record" "ssogen_internal_alb_admin" {
   count    = local.is-development || local.is-test ? 1 : 0
   provider = aws.core-vpc
 
