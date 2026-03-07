@@ -26,22 +26,6 @@ resource "aws_ssm_parameter" "ssogen_cw_agent_config" {
   )
 }
 
-resource "aws_ssm_association" "ssogen_update_ssm_agent" {
-  count            = local.is-development || local.is-test ? 1 : 0
-  name             = "AWS-SSOGEN-UpdateSSMAgent"
-  association_name = "ssogen-update-ssm-agent"
-  parameters = {
-    allowDowngrade = "false"
-  }
-  targets {
-    # we could just target all instances, but this would also include the bastion, which gets rebuilt everyday
-    key    = "tag:name"
-    values = [lower(format("ec2-ccms-%s-%s-*", local.application_name_ssogen, local.environment))]
-  }
-  apply_only_at_cron_interval = false
-  schedule_expression         = "cron(30 7 ? * MON *)"
-}
-
 resource "aws_iam_role_policy_attachment" "ssogen_cloudwatch_datasource_policy_attach" {
   count      = local.is-development || local.is-test ? 1 : 0
   policy_arn = aws_iam_policy.cloudwatch_datasource_policy.arn
