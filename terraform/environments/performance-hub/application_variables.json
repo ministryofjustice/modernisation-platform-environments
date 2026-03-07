@@ -54,7 +54,8 @@
       "app_db_name": "NomsPMU_Staging",
       "memebership_db_name": "Membership_Staging",
       "cert_arn": "c4d95275-7b33-44c0-91ce-7ca42883e5cc",
-      "hub_wwwroot": "C:/inetpub/wwwroot"
+      "hub_wwwroot": "C:/inetpub/wwwroot",
+      "app_dns_name": "staging.hmpps-performance-hub.service.justice.gov.uk"
     },
     "production": {
       "region": "eu-west-2",
@@ -82,7 +83,8 @@
       "app_db_name": "NomsPMU_Live",
       "memebership_db_name": "Membership_Live",
       "cert_arn": "e0485248-782a-40b6-8f73-e4f641b577bd",
-      "hub_wwwroot": "C:/inetpub/wwwroot"
+      "hub_wwwroot": "C:/inetpub/wwwroot",
+      "app_dns_name": "hmpps-performance-hub.service.justice.gov.uk"
     }
   }
 }

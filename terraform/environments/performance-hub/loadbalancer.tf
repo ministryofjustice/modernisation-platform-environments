@@ -16,7 +16,8 @@ module "lb_access_logs_enabled" {
   account_number             = local.environment_management.account_ids[terraform.workspace]
   region                     = "eu-west-2"
   enable_deletion_protection = false
-  idle_timeout               = 60
+  # allow 60*4 seconds before 504 gateway timeout for long-running DB operations
+  #idle_timeout               = 240
   tags                       = { Name = "lb_module" }
 }
 
@@ -87,6 +88,8 @@ resource "aws_lb_listener" "listener" {
   }
 }
 
+
+## remove this
 resource "aws_lb_listener" "https_listener" {
   #checkov:skip=CKV_AWS_103
   depends_on = [aws_acm_certificate_validation.external]
@@ -103,6 +106,24 @@ resource "aws_lb_listener" "https_listener" {
   }
 }
 
+
+# add this
+/*
+resource "aws_lb_listener" "https_listener_lb" {
+  #checkov:skip=CKV_AWS_103
+  depends_on        = [aws_acm_certificate_validation.external]
+  load_balancer_arn = module.lb_access_logs_enabled.load_balancer.arn
+  port              = 443
+  protocol          = "HTTPS"
+  certificate_arn   = aws_acm_certificate.external.arn
+
+  default_action {
+    target_group_arn = aws_lb_target_group.target_group.id
+    type             = "forward"
+  }
+}
+*/
+
 resource "aws_security_group" "load_balancer_security_group" {
   name_prefix = "${local.application_name}-loadbalancer-security-group"
   description = "controls access to lb"
@@ -110,7 +131,7 @@ resource "aws_security_group" "load_balancer_security_group" {
 
   ingress {
     protocol    = "tcp"
-    description = "Open the server port"
+    description = "Allow traffic from load balancer to application container"
     from_port   = local.app_data.accounts[local.environment].server_port
     to_port     = local.app_data.accounts[local.environment].server_port
     #tfsec:ignore:AWS008
