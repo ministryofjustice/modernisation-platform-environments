@@ -45,7 +45,9 @@ resource "aws_ssm_association" "update_ssm_agent" {
   targets {
     # we could just target all instances, but this would also include the bastion, which gets rebuilt everyday
     key    = "tag:name"
-    values = [lower(format("ec2-%s-%s-*", local.application_name, local.environment))]
+    values = [
+      lower(format("ec2-%s-%s-*", local.application_name, local.environment)),
+      lower(format("ec2-ccms-%s-%s-*", local.application_name_ssogen, local.environment))]
   }
   apply_only_at_cron_interval = false
   schedule_expression         = "cron(30 7 ? * MON *)"
