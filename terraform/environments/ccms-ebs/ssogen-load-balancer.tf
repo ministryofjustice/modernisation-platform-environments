@@ -72,7 +72,7 @@ resource "aws_lb_listener" "ssogen_internal_app_listener" {
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
-  certificate_arn = data.aws_acm_certificate.external_ssogen[count.index].arn
+  certificate_arn   = data.aws_acm_certificate.external_ssogen[count.index].arn
 
   default_action {
     type             = "forward"
@@ -105,6 +105,8 @@ resource "aws_lb_listener" "ssogen_internal_console_listener_encrypted" {
   port              = "5443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+  certificate_arn   = data.aws_acm_certificate.external_ssogen[count.index].arn
+
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.ssogen_internal_tg_ssogen_console[count.index].arn
