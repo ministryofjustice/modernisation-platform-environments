@@ -66,22 +66,21 @@ resource "aws_lb_target_group" "ssogen_internal_tg_ssogen_console" {
   }
 }
 
-resource "aws_lb_listener" "ssogen_internal_app_listener" {
-  count             = local.is-development || local.is-test ? 1 : 0
-  load_balancer_arn = aws_lb.ssogen_alb[count.index].arn
-  port              = "443"
-  protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
-  # certificate_arn   = "arn:aws:acm:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:certificate/5c3ae0da-7cf1-47ef-b66a-05d83a8e14d6"
-  certificate_arn = data.aws_acm_certificate.external_ssogen[count.index].arn
+# resource "aws_lb_listener" "ssogen_internal_app_listener" {
+#   count             = local.is-development || local.is-test ? 1 : 0
+#   load_balancer_arn = aws_lb.ssogen_alb[count.index].arn
+#   port              = "443"
+#   protocol          = "HTTPS"
+#   ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+#   certificate_arn = data.aws_acm_certificate.external_ssogen[count.index].arn
 
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.ssogen_internal_tg_ssogen_app[count.index].arn
-  }
+#   default_action {
+#     type             = "forward"
+#     target_group_arn = aws_lb_target_group.ssogen_internal_tg_ssogen_app[count.index].arn
+#   }
 
-  depends_on = [aws_acm_certificate_validation.external_nonprod]
-}
+#   depends_on = [aws_acm_certificate_validation.external_nonprod]
+# }
 
 
 resource "aws_lb_listener" "ssogen_internal_console_listener" {
@@ -100,21 +99,19 @@ resource "aws_lb_listener" "ssogen_internal_console_listener" {
   # depends_on = [aws_acm_certificate_validation.external_nonprod]
 }
 
-resource "aws_lb_listener" "ssogen_internal_console_listener_encrypted" {
-  count             = local.is-development || local.is-test ? 1 : 0
-  load_balancer_arn = aws_lb.ssogen_alb[count.index].arn
-  port              = "5443"
-  protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
-  # certificate_arn   = "arn:aws:acm:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:certificate/5c3ae0da-7cf1-47ef-b66a-05d83a8e14d6"
-  certificate_arn = data.aws_acm_certificate.external_ssogen[count.index].arn
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.ssogen_internal_tg_ssogen_console[count.index].arn
-  }
+# resource "aws_lb_listener" "ssogen_internal_console_listener_encrypted" {
+#   count             = local.is-development || local.is-test ? 1 : 0
+#   load_balancer_arn = aws_lb.ssogen_alb[count.index].arn
+#   port              = "5443"
+#   protocol          = "HTTPS"
+#   ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+#   default_action {
+#     type             = "forward"
+#     target_group_arn = aws_lb_target_group.ssogen_internal_tg_ssogen_console[count.index].arn
+#   }
 
-  depends_on = [aws_acm_certificate_validation.external_nonprod]
-}
+#   depends_on = [aws_acm_certificate_validation.external_nonprod]
+# }
 
 # resource "aws_lb_target_group_attachment" "ssogen_internal" {
 #   count            = local.is-development ? local.application_data.accounts[local.environment].ssogen_no_instances : 0
