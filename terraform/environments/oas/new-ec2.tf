@@ -37,6 +37,39 @@ resource "aws_secretsmanager_secret_version" "ec2_ssh_private_key_version" {
   })
 }
 
+
+
+
+#kali ssh keys 
+
+resource "tls_private_key" "kali_ssh_key" {
+  count     = local.environment == "preproduction" ? 1 : 0
+  algorithm = "ED25519"
+}
+
+
+resource "aws_key_pair" "kali_key_pair" {
+  count     = local.environment == "preproduction" ? 1 : 0
+  key_name   = "${local.application_name}-kali-key"
+  public_key = tls_private_key.kali_ssh_key.public_key_openssh
+}
+
+resource "aws_secretsmanager_secret" "kali_ssh_private_key" {
+  count     = local.environment == "preproduction" ? 1 : 0
+  name        = "${local.application_name}/kali-ec2-ssh-private-key"
+  description = "Private SSH key for kali EC2 instance"
+}
+
+resource "aws_secretsmanager_secret_version" "kali_ssh_private_key_version" {
+  count     = local.environment == "preproduction" ? 1 : 0
+  secret_id     = aws_secretsmanager_secret.kali_ssh_private_key.id
+  secret_string = jsonencode({
+    private_key = tls_private_key.kali_ssh_key.private_key_openssh
+    public_key  = tls_private_key.kali_ssh_key.public_key_openssh
+  })
+}
+
+
 ######################################
 ### EC2 INSTANCE Userdata File
 ######################################
@@ -115,7 +148,7 @@ resource "aws_instance" "kali_app_instance_new" {
   subnet_id                   = data.aws_subnet.data_subnets_a.id
 
   instance_type               = "t2.micro"
-  key_name                    = aws_key_pair.ec2_key_pair[0].key_name
+  key_name                    = aws_key_pair.kali_key_pair.key_name
   monitoring                  = true
   iam_instance_profile        = aws_iam_instance_profile.ec2_instance_profile_new[0].id
   user_data_replace_on_change = true
