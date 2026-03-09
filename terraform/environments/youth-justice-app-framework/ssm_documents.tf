@@ -5,3 +5,16 @@ resource "aws_ssm_document" "trend_av_installer" {
 
   content = file("${path.module}/ssm-document.yaml")
 }
+
+
+resource "aws_ssm_association" "run_once_on_launch" {
+  name             = aws_ssm_document.trend_av_installer.name
+  association_name = "Trend_av_installer"
+
+  targets {
+    key    = "tag:install-trend-av"
+    values = ["true"]
+  }
+
+  compliance_severity = "HIGH"
+}
