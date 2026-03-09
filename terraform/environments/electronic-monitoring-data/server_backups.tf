@@ -2,7 +2,7 @@
 # Secret generation for database access.
 #------------------------------------------------------------------------------
 resource "aws_secretsmanager_secret" "db_password" {
-  count = local.is-production || local.is-development ? 1 : 0
+  count = local.is-production || local.is-development || local.is-preproduction ? 1 : 0
   name  = "db_password"
   #checkov:skip=CKV_AWS_149
   #checkov:skip=CKV2_AWS_57
