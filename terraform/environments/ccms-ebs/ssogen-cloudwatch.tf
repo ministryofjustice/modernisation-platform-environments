@@ -240,9 +240,9 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ssogen_mserver" {
   }
 }
 
-resource "aws_cloudwatch_metric_alarm" "disk_free_ssogen_temp" {
+resource "aws_cloudwatch_metric_alarm" "disk_free_ssogen_temp2" {
   count                     = local.is-development || local.is-test ? 1 : 0
-  alarm_name                = "${local.application_data.accounts[local.environment].short_env}-ssogen${count.index + 1}-disk_free-temp"
+  alarm_name                = "${local.application_data.accounts[local.environment].short_env}-ssogen${count.index + 2}-disk_free-temp"
   alarm_description         = "This metric monitors the amount of free disk space on /tmp mount. If the amount of free disk space falls below 20% for 2 minutes, the alarm will trigger"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
   metric_name               = "disk_used_percent"
@@ -264,9 +264,9 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ssogen_temp" {
   }
 }
 
-resource "aws_cloudwatch_metric_alarm" "disk_free_ssogen_fmw" {
+resource "aws_cloudwatch_metric_alarm" "disk_free_ssogen_fmw2" {
   count                     = local.is-development || local.is-test ? 1 : 0
-  alarm_name                = "${local.application_data.accounts[local.environment].short_env}-ssogen${count.index + 1}-disk_free-fmw"
+  alarm_name                = "${local.application_data.accounts[local.environment].short_env}-ssogen${count.index + 2}-disk_free-fmw"
   alarm_description         = "This metric monitors the amount of free disk space on /u01/product/fmw mount. If the amount of free disk space falls below 20% for 2 minutes, the alarm will trigger"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
   metric_name               = "disk_used_percent"
@@ -288,9 +288,9 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ssogen_fmw" {
   }
 }
 
-resource "aws_cloudwatch_metric_alarm" "disk_free_ssogen_mserver" {
+resource "aws_cloudwatch_metric_alarm" "disk_free_ssogen_mserver2" {
   count                     = local.is-development || local.is-test ? 1 : 0
-  alarm_name                = "${local.application_data.accounts[local.environment].short_env}-ssogen${count.index + 1}-disk_free-mserver"
+  alarm_name                = "${local.application_data.accounts[local.environment].short_env}-ssogen${count.index + 2}-disk_free-mserver"
   alarm_description         = "This metric monitors the amount of free disk space on /u01/product/runtime/Domain/mserver mount. If the amount of free disk space falls below 20% for 2 minutes, the alarm will trigger"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
   metric_name               = "disk_used_percent"
