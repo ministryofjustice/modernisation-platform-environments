@@ -40,15 +40,15 @@ resource "aws_vpc_security_group_ingress_rule" "ingress_ssogen_internal_app_work
 # }
 
 # Allow 7001 from AWS Workspaces
-# resource "aws_vpc_security_group_ingress_rule" "ingress_ssogen_internal_admin_workspaces" {
-#   count             = local.is-development || local.is-test ? 1 : 0
-#   security_group_id = aws_security_group.sg_ssogen_internal_alb[count.index].id
-#   description       = "Allow HTTP (7001) from AWS Workspaces CIDR"
-#   from_port         = 7001
-#   to_port           = 7001
-#   ip_protocol       = "tcp"
-#   cidr_ipv4         = local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_prod
-# }
+resource "aws_vpc_security_group_ingress_rule" "ingress_ssogen_internal_admin_workspaces" {
+  count             = local.is-development || local.is-test ? 1 : 0
+  security_group_id = aws_security_group.sg_ssogen_internal_alb[count.index].id
+  description       = "Allow HTTP (7001) from AWS Workspaces CIDR"
+  from_port         = 7001
+  to_port           = 7001
+  ip_protocol       = "tcp"
+  cidr_ipv4         = local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_prod
+}
 
 resource "aws_security_group_rule" "ingress_traffic_ssogenalb_internal_443_mojo_devices" {
   count             = local.is-development || local.is-test ? 1 : 0
