@@ -65,8 +65,6 @@ data "aws_iam_policy_document" "p1_export_airflow" {
       "${module.s3_bucket_rawhist_curated["raw-hist"].bucket.arn}/*",
       module.s3_bucket_rawhist_curated["curated"].bucket.arn,
       "${module.s3_bucket_rawhist_curated["curated"].bucket.arn}/*",
-      module.s3_bucket_rawhist_curated["curated"].bucket.arn,
-      "${module.s3_bucket_rawhist_curated["curated"].bucket.arn}/*"
     ]
   }
   statement {
@@ -90,8 +88,6 @@ data "aws_iam_policy_document" "p1_export_airflow" {
     resources = [
       module.s3_bucket_rawhist_curated["raw-hist"].bucket.arn,
       "${module.s3_bucket_rawhist_curated["raw-hist"].bucket.arn}/*",
-      module.s3_bucket_rawhist_curated["curated"].bucket.arn,
-      "${module.s3_bucket_rawhist_curated["curated"].bucket.arn}/*",
       module.s3_bucket_rawhist_curated["curated"].bucket.arn,
       "${module.s3_bucket_rawhist_curated["curated"].bucket.arn}/*",
     ]
