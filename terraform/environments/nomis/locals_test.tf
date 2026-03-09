@@ -206,6 +206,10 @@ locals {
       })
 
       test-nomis-client-a = merge(local.ec2_autoscaling_groups.client, {
+        autoscaling_schedules = {
+          "scale_up"   = { recurrence = "0 6 * * Mon-Fri" }
+          "scale_down" = { desired_capacity = 0, recurrence = "0 19 * * Mon-Fri" }
+        }
         autoscaling_group = merge(local.ec2_autoscaling_groups.client.autoscaling_group, {
           desired_capacity = 3 # until we get some RD Licences
           max_size         = 3

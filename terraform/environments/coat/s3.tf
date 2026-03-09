@@ -4,7 +4,7 @@ module "cur_v2_hourly" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "4.3.0"
+  version = "5.0.0"
 
   bucket = "coat-${local.environment}-cur-v2-hourly"
 
@@ -108,14 +108,65 @@ data "aws_iam_policy_document" "coat_cur_v2_hourly_dev_bucket_policy" {
     effect = "Allow"
     actions = [
       "s3:GetObject",
+      "s3:PutObject",
+      "s3:ListBucket",
+      "s3:GetBucketLocation",
+      "s3:ListBucketMultipartUploads",
+      "s3:ListMultipartUploadParts",
+      "s3:AbortMultipartUpload"
+    ]
+    resources = [
+      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/ctas/fct-daily-cost/*",
+      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly",
+      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/*"
+    ]
+    principals {
+      type = "Service"
+      identifiers = [
+        "athena.amazonaws.com",
+        "glue.amazonaws.com"
+      ]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceAccount"
+      values   = [data.aws_caller_identity.current.account_id]
+    }
+  }
+  statement {
+    sid    = "S3SyncCOATProdDev"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:ListBucket",
       "s3:PutObject"
     ]
     resources = [
-      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/athena-results/*"
+      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/athena-results/*",
+      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/*",
+      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly"
     ]
     principals {
-      type        = "Service"
-      identifiers = ["athena.amazonaws.com"]
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::279191903737:root"]
+    }
+  }
+  statement {
+    sid    = "RAGLambdaAccess"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:ListBucket",
+      "s3:GetBucketLocation"
+    ]
+    resources = [
+      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly",
+      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/*"
+    ]
+    principals {
+      type        = "AWS"
+      identifiers = [aws_iam_role.rag_lambda_role.arn]
     }
   }
 }
@@ -199,10 +250,10 @@ data "aws_iam_policy_document" "coat_cur_v2_hourly_prod_bucket_policy" {
     ]
     resources = [
       "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/athena-results/*",
-      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/ctas/fct-daily-cost/*",
       "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/moj-cost-and-usage-reports/*",
       "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly",
-      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/*"
+      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/*",
+      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/ctas/fct-daily-cost/*"
     ]
     principals {
       type = "Service"
@@ -217,22 +268,19 @@ data "aws_iam_policy_document" "coat_cur_v2_hourly_prod_bucket_policy" {
       values   = [data.aws_caller_identity.current.account_id]
     }
   }
-
   statement {
     sid    = "RAGLambdaAccess"
     effect = "Allow"
-
     actions = [
       "s3:GetObject",
       "s3:PutObject",
-      "s3:ListBucket"
+      "s3:ListBucket",
+      "s3:GetBucketLocation"
     ]
-
     resources = [
       "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly",
       "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/*"
     ]
-
     principals {
       type        = "AWS"
       identifiers = [aws_iam_role.rag_lambda_role.arn]
@@ -246,7 +294,7 @@ module "focus_s3_kms" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "3.1.1"
+  version = "4.0.0"
 
   aliases               = ["s3/focus"]
   description           = "S3 FOCUS KMS key"
@@ -298,7 +346,7 @@ module "focus_reports" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "4.3.0"
+  version = "5.0.0"
 
   bucket           = "coat-${local.environment}-focus-reports"
   object_ownership = "BucketOwnerEnforced"
@@ -338,7 +386,7 @@ module "coat_s3_kms" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "3.1.1"
+  version = "4.0.0"
 
   aliases               = ["s3/coat"]
   description           = "S3 COAT KMS key"
@@ -371,7 +419,7 @@ module "coat_reports" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "4.3.0"
+  version = "5.0.0"
 
   bucket           = "coat-reports-${local.environment}"
   object_ownership = "BucketOwnerEnforced"
@@ -434,7 +482,7 @@ module "cur_v2_hourly_enriched" {
   count = local.is-development ? 0 : 1
 
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "4.3.0"
+  version = "5.0.0"
 
   bucket = "coat-${local.environment}-cur-v2-hourly-enriched"
 

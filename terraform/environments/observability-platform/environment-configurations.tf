@@ -339,6 +339,25 @@ locals {
             }
           }
         },
+        "dacp" = {
+          "identity_centre_team" = "dts-legacy",
+          "aws_accounts" = {
+            "dacp-preproduction" = {
+              cloudwatch_enabled              = true
+              prometheus_push_enabled         = false
+              amazon_prometheus_query_enabled = false
+              xray_enabled                    = false
+              athena_enabled                  = false
+            },
+            "dacp-production" = {
+              cloudwatch_enabled              = true
+              prometheus_push_enabled         = false
+              amazon_prometheus_query_enabled = false
+              xray_enabled                    = false
+              athena_enabled                  = false
+            }
+          }
+        },
         "data-engineering" = {
           "identity_centre_team" = "data-engineering",
           "aws_accounts" = {
@@ -360,7 +379,7 @@ locals {
         },
         "digital-prison-reporting" = {
           "identity_centre_team" = "hmpps-digital-prison-reporting",
-          "slack_channels"       = ["dpr-alerts-dev", "dpr-alerts-preprod", "dpr-alerts-prod", "dpr-alerts-test"],
+          "slack_channels"       = ["dpr-backend-alerts-dev", "dpr-backend-alerts-preprod", "dpr-backend-alerts-prod", "dpr-backend-alerts-test"],
           "aws_accounts" = {
             "digital-prison-reporting-development" = {
               cloudwatch_enabled              = true

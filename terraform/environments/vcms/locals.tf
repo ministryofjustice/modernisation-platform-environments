@@ -30,19 +30,9 @@ locals {
     internal_dns_suffix = "${local.application_name}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.internal"
   }
 
-  app_config = {
-    container_port                     = 80
-    container_cpu                      = "512"
-    task_memory                        = "1024"
-    desired_count                      = 1
-    deployment_maximum_percent         = 100
-    deployment_minimum_healthy_percent = 0
-    health_check_grace_period_seconds  = 60
-  }
+  app_config = lookup(local.application_data["accounts"], terraform.workspace) # only use current env
 
   bastion_config = {}
-  image_tag      = "tm-1408-composer-19577361514-1"
-  image_uri      = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/vcms:${local.image_tag}"
   app_port       = 80
   internal_security_group_cidrs = distinct(flatten([
     module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public,
@@ -90,8 +80,6 @@ locals {
 
   app_url                       = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.${local.domain}"
   acm_subject_alternative_names = [local.app_url]
-
-  db_snapshot_identifier = "rds-vcmsdev-db-backup-2025-09-26-14-04-mpcp"
 
 }
 

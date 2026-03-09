@@ -15,6 +15,7 @@
       "athena_federated_query_lambda_concurrent_executions": 20,
       "glue_job_name": "glue-job-ingester",
       "glue_job_common_log_level": "INFO",
+      "glue_job_jar_name": "digital-prison-reporting-jobs-vLatest-all.jar",
       "glue_job_version": "5.0",
       "maintenance_job_retry_max_attempts": 10,
       "maintenance_job_retry_min_wait_millis": 1000,
@@ -68,6 +69,9 @@
       "setup_scheduled_action_iam_role": true,
       "setup_redshift_schedule": true,
       "scheduled_dataset_lambda_version": "vLatest",
+      "probation_domains": [
+        "prb-sentence-plan"
+      ],
       "dps_domains": [
         "dps-activities",
         "dps-case-notes",
@@ -91,7 +95,8 @@
         "dps-applications",
         "dps-manage-pom",
         "dps-san",
-        "dps-cvl"
+        "dps-cvl",
+        "dps-adjudications"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -252,6 +257,7 @@
       "athena_federated_query_lambda_concurrent_executions": 20,
       "glue_job_name": "glue-job-ingester",
       "glue_job_common_log_level": "INFO",
+      "glue_job_jar_name": "digital-prison-reporting-jobs-vLatest-all.jar",
       "glue_job_version": "5.0",
       "maintenance_job_retry_max_attempts": 10,
       "maintenance_job_retry_min_wait_millis": 1000,
@@ -305,6 +311,7 @@
       "setup_scheduled_action_iam_role": true,
       "setup_redshift_schedule": true,
       "scheduled_dataset_lambda_version": "vLatest",
+      "probation_domains": [],
       "dps_domains": [
         "dps-activities",
         "dps-case-notes",
@@ -326,7 +333,8 @@
         "dps-applications",
         "dps-manage-pom",
         "dps-san",
-        "dps-cvl"
+        "dps-cvl",
+        "dps-adjudications"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -464,6 +472,7 @@
       "athena_federated_query_lambda_concurrent_executions": 20,
       "glue_job_name": "glue-job-ingester",
       "glue_job_common_log_level": "INFO",
+      "glue_job_jar_name": "digital-prison-reporting-jobs-vLatest-all.jar",
       "glue_job_version": "5.0",
       "maintenance_job_retry_max_attempts": 10,
       "maintenance_job_retry_min_wait_millis": 1000,
@@ -519,6 +528,7 @@
       "setup_redshift_schedule": true,
       "enable_redshift_health_check": true,
       "scheduled_dataset_lambda_version": "vLatest",
+      "probation_domains": [],
       "dps_domains": [
         "dps-activities",
         "dps-case-notes",
@@ -540,7 +550,8 @@
         "dps-applications",
         "dps-manage-pom",
         "dps-san",
-        "dps-cvl"
+        "dps-cvl",
+        "dps-adjudications"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -697,6 +708,7 @@
       "athena_federated_query_lambda_concurrent_executions": 20,
       "glue_job_name": "glue-job-ingester",
       "glue_job_common_log_level": "INFO",
+      "glue_job_jar_name": "digital-prison-reporting-jobs-vLatest-all.jar",
       "glue_job_version": "5.0",
       "maintenance_job_retry_max_attempts": 10,
       "maintenance_job_retry_min_wait_millis": 1000,
@@ -750,6 +762,7 @@
       "setup_scheduled_action_iam_role": false,
       "setup_redshift_schedule": false,
       "scheduled_dataset_lambda_version": "vLatest",
+      "probation_domains": [],
       "dps_domains": [
         "dps-activities",
         "dps-case-notes",
@@ -771,7 +784,8 @@
         "dps-applications",
         "dps-manage-pom",
         "dps-san",
-        "dps-cvl"
+        "dps-cvl",
+        "dps-adjudications"
       ],
       "alarms": {
         "setup_cw_alarms": true,

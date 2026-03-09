@@ -26,6 +26,7 @@ locals {
       "arn:aws:iam::${module.environment.account_ids.nomis-data-hub-production}:role/EC2HmppsDomainSecretsRole",
       "arn:aws:iam::${module.environment.account_ids.oasys-national-reporting-preproduction}:role/EC2HmppsDomainSecretsRole",
       "arn:aws:iam::${module.environment.account_ids.oasys-national-reporting-production}:role/EC2HmppsDomainSecretsRole",
+      "arn:aws:iam::${module.environment.account_ids.prison-retail-production}:role/EC2HmppsDomainSecretsRole",
     ]
   }
 

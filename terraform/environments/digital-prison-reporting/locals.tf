@@ -73,7 +73,8 @@ locals {
 
   # Glue Job parameters
   glue_placeholder_script_location = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/scripts/digital-prison-reporting-jobs-vLatest.scala"
-  glue_jobs_latest_jar_location    = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-vLatest-all.jar"
+  glue_job_jar_name                = local.application_data.accounts[local.environment].glue_job_jar_name
+  glue_jobs_jar_location           = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/jars/${local.glue_job_jar_name}"
   glue_log_retention_in_days       = local.application_data.accounts[local.environment].glue_log_retention_in_days
 
   # Common Maintenance Job settings
@@ -451,6 +452,17 @@ locals {
     heartbeat_endpoint = "0.0.0.0"
   }
 
+  probation_domains_list = local.application_data.accounts[local.environment].probation_domains
+  probation_secrets_placeholder = {
+    db_name            = "dps"
+    password           = "placeholder"
+    user               = "placeholder"
+    username           = "placeholder"
+    endpoint           = "0.0.0.0"
+    port               = "5432"
+    heartbeat_endpoint = "0.0.0.0"
+  }
+
   # Operational DataStore Secrets PlaceHolder
   operational_datastore_secrets_placeholder = {
     username = "placeholder"
@@ -562,7 +574,7 @@ locals {
   create_postgres_load_generator_job = local.application_data.accounts[local.environment].create_postgres_load_generator_job
 
   # Probation Discovery
-  probation_discovery_windows_ami_id = "ami-03c8cd9ad2f2d6256"
+  probation_discovery_windows_ami_id = data.aws_ami.windows_server_2022.id
   enable_probation_discovery_node    = local.application_data.accounts[local.environment].enable_probation_discovery_node
 
   dpr_windows_rdp_credentials_placeholder = {

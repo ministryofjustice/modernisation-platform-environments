@@ -33,4 +33,8 @@ resource "aws_secretsmanager_secret_version" "redshift_connection" {
     port                = "5439"
     dbClusterIdentifier = aws_redshift_cluster.this[0].cluster_identifier
   })
+
+  lifecycle {
+    ignore_changes = [secret_string]
+  }
 }

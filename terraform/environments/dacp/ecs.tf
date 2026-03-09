@@ -210,6 +210,7 @@ EOF
   )
 }
 
+
 resource "aws_iam_role_policy" "app_task" {
   name = "task-${var.networking[0].application}"
   role = aws_iam_role.app_task.id
@@ -219,13 +220,24 @@ resource "aws_iam_role_policy" "app_task" {
    "Version": "2012-10-17",
    "Statement": [
      {
-       "Effect": "Allow",
         "Action": [
-          "logs:*",
-          "ecr:*",
-          "iam:*",
-          "ec2:*"
+            "logs:CreateLogGroup",
+            "logs:CreateLogStream",
+            "logs:PutLogEvents",
+            "logs:DescribeLogStreams",
+            "logs:DescribeLogGroups"
         ],
+        "Resource": "arn:aws:logs:*:${local.environment_management.account_ids[terraform.workspace]}:*",
+        "Effect": "Allow"
+     },
+     {
+       "Effect": "Allow",
+       "Action": [
+         "ssmmessages:CreateControlChannel",
+         "ssmmessages:CreateDataChannel",
+         "ssmmessages:OpenControlChannel",
+         "ssmmessages:OpenDataChannel"
+       ],
        "Resource": "*"
      }
    ]
@@ -332,7 +344,7 @@ module "pagerduty_core_alerts_non_prod" {
   depends_on = [
     aws_sns_topic.dacp_utilisation_alarm
   ]
-  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v3.0.0"
   sns_topics                = [aws_sns_topic.dacp_utilisation_alarm.name]
   pagerduty_integration_key = local.pagerduty_integration_keys["dacp_non_prod_alarms"]
 }
@@ -344,7 +356,7 @@ module "pagerduty_core_alerts_prod" {
   depends_on = [
     aws_sns_topic.dacp_utilisation_alarm
   ]
-  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v3.0.0"
   sns_topics                = [aws_sns_topic.dacp_utilisation_alarm.name]
   pagerduty_integration_key = local.pagerduty_integration_keys["dacp_prod_alarms"]
 }

@@ -1,5 +1,28 @@
 # Lambda
 
+resource "null_resource" "build_lambda_zip" {
+
+  triggers = {
+    always_run = timestamp()
+  }
+
+  provisioner "local-exec" {
+    command = <<-EOT
+      cd ${path.module}/lambdas/rag-lambda
+	    
+	    pip3 install -r requirements.txt -t .
+
+      zip -r rag-lambda.zip .
+    EOT
+  }
+}
+
+data "archive_file" "rag_lambda" {
+  type        = "zip"
+  source_dir  = "${path.module}/lambdas/rag-lambda/"
+  output_path = "${path.module}/lambdas/rag-lambda/rag-lambda.zip"
+}
+
 resource "aws_lambda_function" "rag_lambda" {
   #checkov:skip=CKV_AWS_173:No sensitive information stored in Lambda environment variables
   #checkov:skip=CKV_AWS_117:This Lambda doesn't need VPC
@@ -24,28 +47,17 @@ resource "aws_lambda_function" "rag_lambda" {
     mode = "PassThrough"
   }
 
-  tags = local.tags
-}
-
-resource "null_resource" "build_lambda_zip" {
-
-  triggers = {
-    script_hash = filesha256("${path.module}/lambdas/rag-lambda/rag-lambda.py")
+  environment {
+    variables = {
+      ENVIRONMENT = local.environment
+    }
   }
 
-  provisioner "local-exec" {
-    command = <<-EOT
-      cd ${path.module}/lambdas/rag-lambda
-
-      zip -r rag-lambda.zip .
-    EOT
+  tags = {
+    "service-area" = "Hosting"
   }
-}
 
-data "archive_file" "rag_lambda" {
-  type        = "zip"
-  source_dir  = "${path.module}/lambdas/rag-lambda/"
-  output_path = "${path.module}/lambdas/rag-lambda.zip"
+  depends_on = [null_resource.build_lambda_zip]
 }
 
 # Logs
@@ -68,7 +80,9 @@ resource "aws_iam_role" "rag_lambda_role" {
     policy = data.aws_iam_policy_document.rag_lambda_function_role.json
   }
 
-  tags = local.tags
+  tags = {
+    "service-area" = "Hosting"
+  }
 }
 
 data "aws_iam_policy_document" "rag_lambda_function_assume_role" {
@@ -104,12 +118,13 @@ data "aws_iam_policy_document" "rag_lambda_function_role" {
     actions = [
       "s3:GetObject",
       "s3:PutObject",
-      "s3:ListBucket"
+      "s3:ListBucket",
+      "s3:GetBucketLocation"
     ]
 
     resources = [
       "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/",
-      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/*",
+      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/*"
     ]
   }
 
@@ -144,16 +159,39 @@ data "aws_iam_policy_document" "rag_lambda_function_role" {
   }
 
   statement {
-    sid    = "AllowInvokeBedrockModels"
+    sid    = "AllowSecretsManager"
+    effect = "Allow"
+
+    actions = ["secretsmanager:GetSecretValue"]
+
+    resources = [
+      "arn:aws:secretsmanager:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:secret:llm_gateway_key-HDBjRn",
+      "arn:aws:secretsmanager:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:secret:llm_gateway_key-1biv4G"
+    ]
+  }
+
+  statement {
+    sid    = "AllowKMS"
     effect = "Allow"
 
     actions = [
-      "bedrock:InvokeModel",
-      "bedrock:InvokeModelWithResponseStream"
+      "kms:Encrypt*",
+      "kms:Decrypt*",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:Describe*"
     ]
 
     resources = [
-      "arn:aws:bedrock:*::foundation-model/*"
+      "arn:aws:kms:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:key/ef7e1dc9-dc2b-4733-9278-46885b7040c7"
     ]
   }
+}
+
+# Secrets
+
+resource "aws_secretsmanager_secret" "llm_gateway_key" {
+  count = local.is-development ? 0 : 1
+
+  name = "llm_gateway_key"
 }

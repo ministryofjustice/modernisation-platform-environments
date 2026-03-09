@@ -220,6 +220,11 @@ variable "internal_alb_security_group_id" {
   type        = string
 }
 
+variable "connectivity_alb_security_group_id" {
+  description = "The security group ID for the connectivity ALB"
+  type        = string
+}
+
 variable "external_alb_security_group_id" {
   description = "The security group ID for the external ALB"
   type        = string
@@ -235,8 +240,18 @@ variable "internal_alb_arn" {
   type        = string
 }
 
+variable "connectivity_alb_arn" {
+  description = "The ARN of the connectivity ALB"
+  type        = string
+}
+
 variable "internal_alb_name" {
   description = "The name of the internal ALB"
+  type        = string
+}
+
+variable "connectivity_alb_name" {
+  description = "The name of the connectivity ALB"
   type        = string
 }
 

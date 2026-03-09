@@ -748,6 +748,8 @@ variable "lbs" {
           status_code = string
           port        = optional(number)
           protocol    = optional(string)
+          path        = optional(string)
+          query       = optional(string)
         }))
       })
       rules = optional(map(object({
@@ -777,6 +779,8 @@ variable "lbs" {
             status_code = string
             port        = optional(number)
             protocol    = optional(string)
+            path        = optional(string)
+            query       = optional(string)
           }))
         }))
         conditions = list(object({
@@ -805,6 +809,22 @@ variable "lbs" {
         dimensions          = optional(map(string), {})
       })), {})
       tags = optional(map(string), {})
+    })), {})
+    cloudwatch_metric_alarms = optional(map(object({
+      comparison_operator = string
+      evaluation_periods  = number
+      metric_name         = string
+      namespace           = string
+      period              = number
+      statistic           = string
+      threshold           = number
+      alarm_actions       = optional(list(string), [])
+      ok_actions          = optional(list(string), [])
+      actions_enabled     = optional(bool, false)
+      alarm_description   = optional(string)
+      datapoints_to_alarm = optional(number)
+      treat_missing_data  = optional(string, "missing")
+      dimensions          = optional(map(string), {})
     })), {})
     tags = optional(map(string), {})
   }))

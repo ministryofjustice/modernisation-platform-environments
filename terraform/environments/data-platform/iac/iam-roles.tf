@@ -40,13 +40,22 @@ module "data_platform_access_iam_role" {
       ]
       resources = ["${module.s3_bucket[0].s3_bucket_arn}/data-platform-access/*"]
     }
-    SecretsManagerAccess = {
+    SecretsManagerReadAccess = {
       effect  = "Allow"
       actions = ["secretsmanager:GetSecretValue"]
       resources = [
         module.entra_secret[0].secret_arn,
         module.github_app_secret[0].secret_arn,
+        module.pagerduty_api_key_secret[0].secret_arn,
         module.slack_token_secret[0].secret_arn
+      ]
+    }
+    SecretsManagerWriteAccess = {
+      effect  = "Allow"
+      actions = ["secretsmanager:*"] # TODO: Tighten this permission down once initial setup is complete
+      resources = [
+        /* Secrets Managed by Data Platform Access */
+        "arn:aws:secretsmanager:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:secret:pagerduty/*" # PagerDuty
       ]
     }
   }

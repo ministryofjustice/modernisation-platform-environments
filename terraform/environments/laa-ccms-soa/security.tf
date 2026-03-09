@@ -370,46 +370,42 @@ resource "aws_vpc_security_group_egress_rule" "efs-security-group-egress" {
   cidr_ipv4         = "0.0.0.0/0"
 }
 
-###########################################
-# OEM Connectivity for SOA RDS (added)
-###########################################
-
-# OEM OMS → SOA RDS (Port 1521)
-resource "aws_vpc_security_group_ingress_rule" "soa_db_oem_oms_ingress_1521" {
-  security_group_id = aws_security_group.soa_db.id
-  description       = "OEM OMS to SOA RDS on 1521"
-  ip_protocol       = "TCP"
-  from_port         = 1521
-  to_port           = 1521
-  cidr_ipv4         = "10.26.60.231/32"
-}
-
-# OEM OMS → SOA RDS (Port 3872)
-resource "aws_vpc_security_group_ingress_rule" "soa_db_oem_oms_ingress_3872" {
-  security_group_id = aws_security_group.soa_db.id
-  description       = "OEM OMS to SOA RDS on 3872"
-  ip_protocol       = "TCP"
-  from_port         = 3872
-  to_port           = 3872
-  cidr_ipv4         = "10.26.60.231/32"
-}
-
-# OEM OMS → SOA RDS (Port 4903)
+# OEM OMS → SOA DB (OMS port 4903)
 resource "aws_vpc_security_group_ingress_rule" "soa_db_oem_oms_ingress_4903" {
   security_group_id = aws_security_group.soa_db.id
-  description       = "OEM OMS to SOA RDS on 4903"
+  description       = "OEM OMS to SOA DB OMS port"
   ip_protocol       = "TCP"
-  from_port         = 4903
-  to_port           = 4903
-  cidr_ipv4         = "10.26.60.231/32"
+  from_port         = tonumber(local.application_data.accounts[local.environment].oem.oms_port)
+  to_port           = tonumber(local.application_data.accounts[local.environment].oem.oms_port)
+  cidr_ipv4         = local.application_data.accounts[local.environment].oem.oms_platform_cidr
 }
 
-# OEM DB → SOA RDS (Port 1521)
+# OEM OMS → SOA DB (OEM agent 3872)
+resource "aws_vpc_security_group_ingress_rule" "soa_db_oem_oms_ingress_3872" {
+  security_group_id = aws_security_group.soa_db.id
+  description       = "OEM OMS to SOA DB agent port"
+  ip_protocol       = "TCP"
+  from_port         = tonumber(local.application_data.accounts[local.environment].oem.agent_port)
+  to_port           = tonumber(local.application_data.accounts[local.environment].oem.agent_port)
+  cidr_ipv4         = local.application_data.accounts[local.environment].oem.oms_platform_cidr
+}
+
+# OEM OMS → SOA DB (Oracle listener 1521)
+resource "aws_vpc_security_group_ingress_rule" "soa_db_oem_oms_ingress_1521" {
+  security_group_id = aws_security_group.soa_db.id
+  description       = "OEM OMS to SOA DB listener"
+  ip_protocol       = "TCP"
+  from_port         = tonumber(local.application_data.accounts[local.environment].oem.soa_db_port)
+  to_port           = tonumber(local.application_data.accounts[local.environment].oem.soa_db_port)
+  cidr_ipv4         = local.application_data.accounts[local.environment].oem.oms_platform_cidr
+}
+
+# OEM DB → SOA DB (Oracle listener 1521)
 resource "aws_vpc_security_group_ingress_rule" "soa_db_oem_db_ingress_1521" {
   security_group_id = aws_security_group.soa_db.id
-  description       = "OEM DB to SOA RDS on 1521"
+  description       = "OEM DB to SOA DB listener"
   ip_protocol       = "TCP"
-  from_port         = 1521
-  to_port           = 1521
-  cidr_ipv4         = "10.26.60.169/32"
+  from_port         = tonumber(local.application_data.accounts[local.environment].oem.soa_db_port)
+  to_port           = tonumber(local.application_data.accounts[local.environment].oem.soa_db_port)
+  cidr_ipv4         = local.application_data.accounts[local.environment].oem.oem_db_platform_cidr
 }

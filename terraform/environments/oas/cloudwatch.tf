@@ -3,7 +3,7 @@ locals {
   sns_topic_name                 = "${local.appnameenv}-alerting-topic"
   dashboard_name                 = "${local.appnameenv}-Appication-Dashboard"
   pagerduty_integration_keys     = try(jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys[0].secret_string), {})
-  pagerduty_integration_key_name = local.application_data.accounts[local.environment].pagerduty_integration_key_name
+  pagerduty_integration_key_name = try(local.application_data.accounts[local.environment].pagerduty_integration_key_name, "")
   cloudwatch_metric_alarms = {
     ec2_cpu_utilisation_too_high = {
       alarm_name          = "${local.appnameenv}-EC2-CPU-High-Threshold-Alarm"
@@ -33,7 +33,7 @@ locals {
       threshold           = "90"
       treat_missing_data  = "breaching"
       dimensions = {
-        ImageId      = local.application_data.accounts[local.environment].ec2amiid
+        ImageId      = try(local.application_data.accounts[local.environment].ec2amiid, "")
         InstanceId   = try(aws_instance.oas_app_instance[0].id, "")
         InstanceType = "db.t3.small"
       }
@@ -51,7 +51,7 @@ locals {
       threshold           = "90"
       treat_missing_data  = "breaching"
       dimensions = {
-        ImageId    = local.application_data.accounts[local.environment].ec2amiid
+        ImageId    = try(local.application_data.accounts[local.environment].ec2amiid, "")
         InstanceId = try(aws_instance.oas_app_instance[0].id, "")
         path       = "/oracle/software"
         fstype     = "ext4"
@@ -70,7 +70,7 @@ locals {
       threshold           = "90"
       treat_missing_data  = "breaching"
       dimensions = {
-        ImageId    = local.application_data.accounts[local.environment].ec2amiid
+        ImageId    = try(local.application_data.accounts[local.environment].ec2amiid, "")
         InstanceId = try(aws_instance.oas_app_instance[0].id, "")
         path       = "/"
         fstype     = "xfs"
@@ -99,7 +99,7 @@ module "cwalarm" {
   snsTopicName                    = local.sns_topic_name
   cloudwatch_metric_alarms        = local.cloudwatch_metric_alarms
   dashboard_name                  = local.dashboard_name
-  dashboard_widget_refresh_period = local.application_data.accounts[local.environment].dashboard_widget_period
+  dashboard_widget_refresh_period = try(local.application_data.accounts[local.environment].dashboard_widget_period, 60)
 }
 
 module "pagerduty_core_alerts" {

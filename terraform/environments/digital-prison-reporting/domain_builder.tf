@@ -111,7 +111,7 @@ module "domain_builder_cli_agent" {
   description                 = "Domain Builder CLI Agent"
   vpc                         = data.aws_vpc.shared.id
   cidr                        = [data.aws_vpc.shared.cidr_block]
-  subnet_ids                  = data.aws_subnet.private_subnets_a.id
+  subnet_ids                  = data.aws_subnet.private_subnets_b.id
   ec2_instance_type           = local.instance_type
   ami_image_id                = local.image_id
   aws_region                  = local.account_region

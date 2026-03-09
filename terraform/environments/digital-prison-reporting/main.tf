@@ -59,7 +59,7 @@ module "glue_hive_table_creation_job" {
   )
 
   arguments = {
-    "--extra-jars"                = local.glue_jobs_latest_jar_location
+    "--extra-jars"                = local.glue_jobs_jar_location
     "--extra-files"               = local.shared_log4j_properties_path
     "--class"                     = "uk.gov.justice.digital.job.HiveTableCreationJob"
     "--dpr.aws.region"            = local.account_region
@@ -126,7 +126,7 @@ module "glue_s3_file_transfer_job" {
   )
 
   arguments = {
-    "--extra-jars"                                = local.glue_jobs_latest_jar_location
+    "--extra-jars"                                = local.glue_jobs_jar_location
     "--extra-files"                               = local.shared_log4j_properties_path
     "--class"                                     = "uk.gov.justice.digital.job.S3FileTransferJob"
     "--dpr.aws.region"                            = local.account_region
@@ -186,7 +186,7 @@ module "glue_switch_prisons_hive_data_location_job" {
   )
 
   arguments = {
-    "--extra-jars"                = local.glue_jobs_latest_jar_location
+    "--extra-jars"                = local.glue_jobs_jar_location
     "--extra-files"               = local.shared_log4j_properties_path
     "--class"                     = "uk.gov.justice.digital.job.SwitchHiveTableJob"
     "--dpr.aws.region"            = local.account_region
@@ -247,7 +247,7 @@ module "glue_s3_data_deletion_job" {
   )
 
   arguments = {
-    "--extra-jars"                     = local.glue_jobs_latest_jar_location
+    "--extra-jars"                     = local.glue_jobs_jar_location
     "--extra-files"                    = local.shared_log4j_properties_path
     "--class"                          = "uk.gov.justice.digital.job.S3DataDeletionJob"
     "--dpr.aws.region"                 = local.account_region
@@ -302,7 +302,7 @@ module "glue_stop_glue_instance_job" {
   )
 
   arguments = {
-    "--extra-jars"     = local.glue_jobs_latest_jar_location
+    "--extra-jars"     = local.glue_jobs_jar_location
     "--extra-files"    = local.shared_log4j_properties_path
     "--class"          = "uk.gov.justice.digital.job.StopGlueInstanceJob"
     "--dpr.aws.region" = local.account_region
@@ -347,7 +347,7 @@ module "stop_dms_task_job" {
   )
 
   arguments = {
-    "--extra-jars"     = local.glue_jobs_latest_jar_location
+    "--extra-jars"     = local.glue_jobs_jar_location
     "--extra-files"    = local.shared_log4j_properties_path
     "--class"          = "uk.gov.justice.digital.job.StopDmsTaskJob"
     "--dpr.aws.region" = local.account_region
@@ -392,7 +392,7 @@ module "set_cdc_dms_start_time_job" {
   )
 
   arguments = {
-    "--extra-jars"    = local.glue_jobs_latest_jar_location
+    "--extra-jars"    = local.glue_jobs_jar_location
     "--extra-files"   = local.shared_log4j_properties_path
     "--class"         = "uk.gov.justice.digital.job.UpdateDmsCdcTaskStartTimeJob"
     "--dpr.log.level" = local.glue_job_common_log_level
@@ -436,7 +436,7 @@ module "activate_glue_trigger_job" {
   )
 
   arguments = {
-    "--extra-jars"     = local.glue_jobs_latest_jar_location
+    "--extra-jars"     = local.glue_jobs_jar_location
     "--extra-files"    = local.shared_log4j_properties_path
     "--class"          = "uk.gov.justice.digital.job.GlueTriggerActivationJob"
     "--dpr.aws.region" = local.account_region
@@ -853,7 +853,7 @@ module "ec2_bastion_host" {
   description                 = "EC2 bastion instance for accessing the private network"
   vpc                         = data.aws_vpc.shared.id
   cidr                        = [data.aws_vpc.shared.cidr_block]
-  subnet_ids                  = data.aws_subnet.private_subnets_a.id
+  subnet_ids                  = data.aws_subnet.private_subnets_b.id
   ec2_instance_type           = local.instance_type
   ami_image_id                = local.image_id
   aws_region                  = local.account_region
@@ -1155,7 +1155,7 @@ module "generate_test_postgres_data" {
   )
 
   arguments = {
-    "--extra-jars"                             = local.glue_jobs_latest_jar_location
+    "--extra-jars"                             = local.glue_jobs_jar_location
     "--extra-files"                            = local.shared_log4j_properties_path
     "--class"                                  = "uk.gov.justice.digital.job.generator.PostgresLoadGeneratorJob"
     "--dpr.aws.region"                         = local.account_region

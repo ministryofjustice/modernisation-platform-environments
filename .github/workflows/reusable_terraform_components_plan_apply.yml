@@ -51,7 +51,7 @@
     env:
       ACCOUNT_NAME: "${{ inputs.application }}-${{ inputs.environment }}"
       WORKSPACE_NAME: "${{ inputs.application }}-${{ inputs.environment }}"
-      SKIP_PLAN_EVALUATOR: '["cloud-platform-live-development", "cloud-platform-live-test", "cloud-platform-non-live-development", "cloud-platform-non-live-test"]'
+      SKIP_PLAN_EVALUATOR: '["cloud-platform-development", "cloud-platform-preproduction", "cloud-platform-nonlive", "cloud-platform-live", "data-platform-development", "data-platform-test", "data-platform-preproduction", "data-platform-production"]'
     concurrency:
       group: ${{ inputs.application }}-${{ inputs.environment }}-${{ inputs.component }}
     jobs:
@@ -78,7 +78,7 @@
               echo "component=${{ inputs.component }}"
 
           - name: Checkout Repository
-            uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+            uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
           - name: Decrypt Secrets
             uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@5c713c93eea694829b1bd3f410d0b235053318ce # v4.0.0
             with:
@@ -102,14 +102,14 @@
               echo "BACKEND_NUMBER=${BACKEND_NUMBER}" >> $GITHUB_ENV
 
           - name: Configure AWS Credentials
-            uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708  # v5.1.1
+            uses: aws-actions/configure-aws-credentials@8df5847569e6427dd6c4fb1cf565c83acfa8afa7  # v6.0.0
             with:
               role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
               role-session-name: githubactionsrolesession
               aws-region: "eu-west-2"
 
           - name: Setup Terraform
-            uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd  # v3.1.2
+            uses: hashicorp/setup-terraform@5e8dbf3c6d9deaf4193ca7a8fb23f2ac83bb6c85  # v4.0.0
             with:
               terraform_version: "${{ inputs.terraform_version }}"
               terraform_wrapper: false
@@ -283,7 +283,7 @@
         environment: ${{ inputs.component != 'root' && format('{0}-{1}-{2}', inputs.application, inputs.environment, inputs.component) || format('{0}-{1}', inputs.application, inputs.environment) }}
         steps:
           - name: Checkout Repository
-            uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+            uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
           
           - name: Decrypt Secrets
             uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@5c713c93eea694829b1bd3f410d0b235053318ce # v4.0.0
@@ -304,14 +304,14 @@
               echo "BACKEND_NUMBER=${BACKEND_NUMBER}" >> $GITHUB_ENV
 
           - name: Configure AWS Credentials
-            uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708  # v5.1.1
+            uses: aws-actions/configure-aws-credentials@8df5847569e6427dd6c4fb1cf565c83acfa8afa7  # v6.0.0
             with:
               role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
               role-session-name: githubactionsrolesession
               aws-region: "eu-west-2"
 
           - name: Setup Terraform
-            uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd  # v3.1.2
+            uses: hashicorp/setup-terraform@5e8dbf3c6d9deaf4193ca7a8fb23f2ac83bb6c85  # v4.0.0
             with:
               terraform_version: "${{ inputs.terraform_version }}"
               terraform_wrapper: false

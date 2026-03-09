@@ -6,23 +6,29 @@ locals {
   # RDS
   appstream_cidr             = "10.200.32.0/19"
   cidr_ire_workspace         = "10.200.96.0/19"
+  mojo_vpc_cidr              = "10.184.0.0/14"
   workspaces_cidr            = local.application_data.accounts[local.environment].london_workspace_cidr
   cp_vpc_cidr                = local.application_data.accounts[local.environment].cp_vpc_cidr
   analytic_platform_cidr     = local.application_data.accounts[local.environment].analytic_platform_cidr
   lz_vpc                     = local.application_data.accounts[local.environment].landing_zone_vpc_cidr
-  auto_minor_version_upgrade = false
+  auto_minor_version_upgrade = true
   backup_retention_period    = "35"
   character_set_name         = "WE8MSWIN1252"
-  instance_class             = "db.m5.large"
+  instance_class             = "db.m5.xlarge"
   engine                     = "oracle-se2"
-  engine_version             = "19.0.0.0.ru-2025-04.rur-2025-04.r1"
+  engine_version             = "19.0.0.0.ru-2025-10.rur-2025-10.r1"
   username                   = "sysdba"
   backup_window              = "22:00-01:00"
-  maintenance_window         = "Mon:01:15-Mon:06:00"
-  storage_type               = "gp2"
-  rds_snapshot_name          = "laws3169-mojfin-migration-v1"
-  deletion_production        = local.application_data.accounts[local.environment].deletion_protection
-  ca_cert_identifier         = "rds-ca-rsa4096-g1"
+  maintenance_window = (
+    local.environment == "development" ? "wed:02:00-wed:05:00" :
+    local.environment == "preproduction" ? "thu:02:00-thu:05:00" :
+    local.environment == "production" ? "fri:02:00-fri:05:00" :
+    "sun:02:00-sun:05:00" # fallback default
+  )
+  storage_type        = "gp2"
+  rds_snapshot_name   = "laws3169-mojfin-migration-v1"
+  deletion_production = local.application_data.accounts[local.environment].deletion_protection
+  ca_cert_identifier  = "rds-ca-rsa4096-g1"
 
 
   # CloudWatch Alarms

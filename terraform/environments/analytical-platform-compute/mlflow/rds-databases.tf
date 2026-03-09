@@ -1,4 +1,6 @@
 module "mlflow_auth_rds" {
+  count = terraform.workspace == "analytical-platform-compute-development" ? 1 : 0
+
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
@@ -21,13 +23,13 @@ module "mlflow_auth_rds" {
 
   multi_az               = true
   db_subnet_group_name   = data.aws_db_subnet_group.apc.name
-  vpc_security_group_ids = [module.rds_security_group.security_group_id]
+  vpc_security_group_ids = [module.rds_security_group[0].security_group_id]
 
   username                    = "mlflowauth"
   db_name                     = "mlflowauth"
   manage_master_user_password = false
-  password                    = random_password.mlflow_auth_rds.result
-  kms_key_id                  = module.mlflow_auth_rds_kms.key_arn
+  password                    = random_password.mlflow_auth_rds[0].result
+  kms_key_id                  = module.mlflow_auth_rds_kms[0].key_arn
 
   parameters = [
     {
@@ -69,6 +71,8 @@ module "mlflow_auth_rds" {
 }
 
 module "mlflow_rds" {
+  count = terraform.workspace == "analytical-platform-compute-development" ? 1 : 0
+
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
@@ -91,13 +95,13 @@ module "mlflow_rds" {
 
   multi_az               = true
   db_subnet_group_name   = data.aws_db_subnet_group.apc.name
-  vpc_security_group_ids = [module.rds_security_group.security_group_id]
+  vpc_security_group_ids = [module.rds_security_group[0].security_group_id]
 
   username                    = "mlflow"
   db_name                     = "mlflow"
   manage_master_user_password = false
-  password                    = random_password.mlflow_rds.result
-  kms_key_id                  = module.mlflow_rds_kms.key_arn
+  password                    = random_password.mlflow_rds[0].result
+  kms_key_id                  = module.mlflow_rds_kms[0].key_arn
 
   parameters = [
     {

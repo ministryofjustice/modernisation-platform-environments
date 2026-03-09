@@ -538,7 +538,7 @@ resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_hogging_threads" {
 
 resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_jdbc_ebs_state" {
   alarm_name          = "${local.application_data.accounts[local.environment].app_name}-managed-custom-checks-jdbc-ebs-state"
-  alarm_description   = "${local.environment} | ${local.aws_account_id} | Either EBSSM or JDBC EBS state is not running on the SOA managed servers."
+  alarm_description   = "${local.environment} | ${local.aws_account_id} | EBSSMS/EBS JDBC state is not running on the SOA managed servers."
   comparison_operator = "GreaterThanThreshold"
   metric_name         = aws_cloudwatch_log_metric_filter.soa_custom_check_jdbc_ebssms_state.id
   statistic           = "Sum"
@@ -554,7 +554,7 @@ resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_jdbc_ebs_state" {
 
 resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_jdbc_failed_reserve_request_count" {
   alarm_name          = "${local.application_data.accounts[local.environment].app_name}-managed-custom-checks-jdbc-failed-reserve-request-count"
-  alarm_description   = "${local.environment} | ${local.aws_account_id} | There is a EBSSM or JDBC failed reserve request count error on the SOA managed servers."
+  alarm_description   = "${local.environment} | ${local.aws_account_id} | There is a EBSSMS/EBS JDBC failed reserve request count error on the SOA managed servers."
   comparison_operator = "GreaterThanThreshold"
   metric_name         = aws_cloudwatch_log_metric_filter.soa_custom_check_jdbc_failed_reserve_request_count.id
   statistic           = "Sum"

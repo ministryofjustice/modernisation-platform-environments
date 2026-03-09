@@ -11,7 +11,6 @@ module "windows-new-ecs" {
   app_name                = local.application_name
   container_instance_type = local.app_data.accounts[local.environment].container_instance_type
   environment             = local.environment
-  #ami_image_id            = local.app_data.accounts[local.environment].ami_image_id
   instance_type          = local.app_data.accounts[local.environment].instance_type
   user_data              = base64encode(data.template_file.launch-template.rendered)
   key_name               = local.app_data.accounts[local.environment].key_name
@@ -35,5 +34,4 @@ module "windows-new-ecs" {
 moved {
   from = module.windows-ecs
   to   = module.windows-new-ecs
-
 }

@@ -6,7 +6,7 @@ module "probation_discovery_windows_node" {
   description                 = "Probation Discovery Windows Agent"
   vpc                         = data.aws_vpc.shared.id
   cidr                        = [data.aws_vpc.shared.cidr_block]
-  subnet_ids                  = data.aws_subnet.private_subnets_a.id
+  subnet_ids                  = data.aws_subnet.private_subnets_c.id
   ec2_instance_type           = "t3.large"
   ami_image_id                = local.probation_discovery_windows_ami_id
   aws_region                  = local.account_region

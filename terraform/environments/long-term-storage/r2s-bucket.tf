@@ -451,6 +451,11 @@ data "aws_iam_policy_document" "snowflake_policy_doc" {
       test     = "StringLike"
       variable = "kms:EncryptionContext:aws:s3:arn"
       values = [
+        "arn:aws:s3:::${local.bucket_name}/${local.genesys_prefix.role1}/*",
+        "arn:aws:s3:::${local.bucket_name}/${local.genesys_prefix.role2}/*",
+        "arn:aws:s3:::${local.bucket_name}/${local.genesys_prefix.role3}/*",
+        "arn:aws:s3:::${local.bucket_name}/${local.genesys_prefix.role4}/*",
+        "arn:aws:s3:::${local.bucket_name}/${local.genesys_prefix.role5}/*",
         "arn:aws:s3:::${local.bucket_name}/${local.genesys_prefix.role6}/*",
         "arn:aws:s3:::${local.bucket_name}"
       ]
@@ -468,6 +473,11 @@ data "aws_iam_policy_document" "snowflake_policy_doc" {
       "s3:GetBucketLocation"
     ]
     resources = [
+      "arn:aws:s3:::${local.bucket_name}/${local.genesys_prefix.role1}/*",
+      "arn:aws:s3:::${local.bucket_name}/${local.genesys_prefix.role2}/*",
+      "arn:aws:s3:::${local.bucket_name}/${local.genesys_prefix.role3}/*",
+      "arn:aws:s3:::${local.bucket_name}/${local.genesys_prefix.role4}/*",
+      "arn:aws:s3:::${local.bucket_name}/${local.genesys_prefix.role5}/*",
       "arn:aws:s3:::${local.bucket_name}/${local.genesys_prefix.role6}/*",
       "arn:aws:s3:::${local.bucket_name}"
     ]

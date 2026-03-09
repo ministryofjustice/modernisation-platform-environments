@@ -6,6 +6,10 @@ resource "aws_cloudwatch_metric_alarm" "load_mdss_dlq_alarm" {
   threshold           = 0
   treat_missing_data  = "notBreaching"
 
+  # We use EventBridge -> cloudwatch_alarm_threader -> SNS custom notifications.
+  # Disable default alarm actions to avoid duplicate Slack messages.
+  actions_enabled = false
+
   metric_name = "ApproximateNumberOfMessagesVisible"
   namespace   = "AWS/SQS"
   period      = 60
@@ -27,6 +31,8 @@ resource "aws_cloudwatch_metric_alarm" "clean_dlt_dlq_alarm" {
   evaluation_periods  = 1
   threshold           = 0
   treat_missing_data  = "notBreaching"
+
+  actions_enabled = false
 
   metric_name = "ApproximateNumberOfMessagesVisible"
   namespace   = "AWS/SQS"
@@ -50,6 +56,8 @@ resource "aws_cloudwatch_metric_alarm" "glue_database_count_high" {
   threshold           = 8000
   treat_missing_data  = "notBreaching"
 
+  actions_enabled = false
+
   metric_name = "GlueDatabaseCount"
   namespace   = "EMDS/Glue"
   period      = 300
@@ -65,7 +73,7 @@ resource "aws_cloudwatch_metric_alarm" "glue_database_count_high" {
 }
 
 resource "aws_cloudwatch_log_metric_filter" "mdss_fatal_failures" {
-  name           = "mdss-fatal-failures"
+  name           = "mdss-fatal-failures-unstructured"
   log_group_name = module.load_mdss_lambda.cloudwatch_log_group.name
 
   pattern = "{ ($.level = \"ERROR\") || ($.message = \"*Pipeline execution failed*\") || ($.message = \"*LoadClientJobFailed*\") || ($.message = \"*DatabaseTerminalException*\") || ($.message = \"*Terminal exception*\") }"

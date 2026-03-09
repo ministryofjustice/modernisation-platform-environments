@@ -91,6 +91,29 @@ locals {
       })
     }
 
+    ec2_instances = {
+
+      # To be used for ndmis-development Business Objects
+      dev-jump2022-1 = merge(local.ec2_instances.jumpserver, {
+        cloudwatch_metric_alarms = {}
+        config = merge(local.ec2_instances.jumpserver.config, {
+          ami_name          = "hmpps_windows_server_2022_release_2025-01-02T00-00-40.487Z"
+          availability_zone = "eu-west-2a"
+        })
+        instance = merge(local.ec2_instances.jumpserver.instance, {
+          instance_type = "t3.large"
+          tags = {
+            patch-manager = "group1"
+          }
+        })
+        tags = merge(local.ec2_instances.jumpserver.tags, {
+          domain-name              = "azure.noms.root"
+          gha-jumpserver-startstop = "development"
+          instance-scheduling      = "skip-scheduling"
+        })
+      })
+    }
+
     lbs = {
       public = merge(local.lbs.public, {
         instance_target_groups = {
@@ -121,7 +144,7 @@ locals {
       maintenance_window_cutoff   = 1 # 2 for prod
       patch_classifications = {
         # REDHAT_ENTERPRISE_LINUX = ["Security", "Bugfix"] # Linux Options=(Security,Bugfix,Enhancement,Recommended,Newpackage)
-        WINDOWS = ["SecurityUpdates", "CriticalUpdates", "UpdateRollups"] # Windows Options=CriticalUpdates,SecurityUpdates,DefinitionUpdates,Drivers,FeaturePacks,ServicePacks,Tools,UpdateRollups,Updates,Upgrades
+        WINDOWS = ["SecurityUpdates", "CriticalUpdates", "UpdateRollups", "ServicePacks", "Updates"] # Windows Options=CriticalUpdates,SecurityUpdates,DefinitionUpdates,Drivers,FeaturePacks,ServicePacks,Tools,UpdateRollups,Updates,Upgrades
       }
     }
 

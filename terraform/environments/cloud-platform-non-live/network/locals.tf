@@ -5,9 +5,8 @@ locals {
     "cloud-platform-non-live-preproduction",
     "cloud-platform-non-live-production"
   ]
-  environment_configuration = try(local.environment_configurations[local.cluster_environment], { account_subdomain_name = "", ns_records = [] })
-  cluster_environment       = contains(local.mp_environments, terraform.workspace) ? local.environment : "development_cluster"
-  cp_vpc_name               = terraform.workspace
+  cluster_environment = contains(local.mp_environments, terraform.workspace) ? local.environment : "development_cluster"
+  cp_vpc_name         = terraform.workspace
   cp_vpc_cidr = {
     development_cluster = "10.0.0.0/16"
     test                = "10.1.0.0/16"
@@ -19,4 +18,6 @@ locals {
   vpc_flow_log_cloudwatch_log_group_name_suffix       = local.cp_vpc_name
   vpc_flow_log_cloudwatch_log_group_retention_in_days = 400
   vpc_flow_log_max_aggregation_interval               = 60
+
+  environment_configuration = local.environment_configurations[local.cluster_environment]
 }
