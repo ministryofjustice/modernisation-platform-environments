@@ -1,5 +1,5 @@
 resource "aws_mwaa_environment" "main" {
-  count                           = local.create_internal_airflow ? 1 : 0
+  count = local.create_internal_airflow ? 1 : 0
 
   name                            = "internal-${local.environment}"
   airflow_version                 = local.environment_configuration.airflow_version

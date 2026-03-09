@@ -1,6 +1,6 @@
 resource "aws_lb_target_group" "internal_airflow_mwaa" {
   count = local.create_internal_airflow ? 1 : 0
-  
+
   name_prefix = "iaf-"
   port        = 443
   protocol    = "HTTPS"
@@ -17,7 +17,7 @@ resource "aws_lb_target_group" "internal_airflow_mwaa" {
 }
 
 resource "aws_lb_listener_rule" "internal_airflow_host" {
-  count        = local.create_internal_airflow ? 1 : 0
+  count = local.create_internal_airflow ? 1 : 0
 
   listener_arn = data.aws_lb_listener.mwaa_https.arn
 
