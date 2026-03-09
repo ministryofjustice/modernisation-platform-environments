@@ -1812,10 +1812,11 @@ data "aws_iam_policy_document" "mdss_reconciler_lambda_role_policy_document" {
   }
 
   statement {
-    sid    = "ReadManifestMarkers"
+    sid    = "ReadWriteManifestMarkers"
     effect = "Allow"
     actions = [
       "s3:GetObject",
+      "s3:PutObject",
     ]
     resources = [
       "${module.s3-logging-bucket.bucket.arn}/mdss-manifest/*",
