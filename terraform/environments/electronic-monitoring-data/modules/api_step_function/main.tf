@@ -118,7 +118,7 @@ data "aws_iam_policy_document" "trigger_step_function_policy" {
     effect    = "Allow"
     resources = [
       var.step_function.arn,
-      "${replace(var.step_function.arn, "stateMachine", "execution")}:*"
+      "${replace(var.step_function.arn, "stateMachine", local.status_int_get)}:*"
     ]
   }
 }
