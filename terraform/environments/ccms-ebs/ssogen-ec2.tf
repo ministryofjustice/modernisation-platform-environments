@@ -115,6 +115,8 @@ resource "aws_launch_template" "ssogen-ec2-launch-template-primary" {
   tag_specifications {
     resource_type = "instance"
     tags = merge(local.tags,
+      { instance-role = aws_iam_instance_profile.ssogen_instance_profile[count.index].name },
+      { backup = "true" },
       { instance-scheduling = "skip-scheduling" }
     )
   }
@@ -214,6 +216,8 @@ resource "aws_launch_template" "ssogen-ec2-launch-template-secondary" {
   tag_specifications {
     resource_type = "instance"
     tags = merge(local.tags,
+      { instance-role = aws_iam_instance_profile.ssogen_instance_profile[count.index].name },
+      { backup = "true" },
       { instance-scheduling = "skip-scheduling" }
     )
   }
