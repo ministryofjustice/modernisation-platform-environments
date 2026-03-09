@@ -42,6 +42,7 @@ locals {
       if user.environment == local.environment
     }
   }
+  
   # Staging SFTP users — scoped to a specific directory on the staging bucket, read-only
   sftp_staging_user_list = [
     {
