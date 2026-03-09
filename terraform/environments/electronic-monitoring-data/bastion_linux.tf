@@ -63,7 +63,7 @@ resource "aws_vpc_security_group_egress_rule" "vpc_access" {
 resource "aws_vpc_security_group_ingress_rule" "rds_via_vpc_access" {
   count = local.is-production || local.is-development || local.is-preproduction ? 1 : 0
 
-  security_group_id            = aws_security_group.db[0].id
+  security_group_id            = aws_security_group.db.id
   description                  = "EC2 instance connection to RDS"
   ip_protocol                  = "tcp"
   from_port                    = 1433
@@ -103,6 +103,7 @@ resource "aws_iam_role_policy" "ec2_s3_policy" {
 }
 
 resource "aws_iam_role_policy" "zip_s3_policy" {
+  count = local.is-production || local.is-development ? 1 : 0
 
   name   = "zip_s3_policy"
   role   = module.zip_bastion[0].bastion_iam_role.name
