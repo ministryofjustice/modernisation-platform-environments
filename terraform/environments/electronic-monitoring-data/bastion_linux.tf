@@ -165,6 +165,7 @@ data "aws_iam_policy_document" "zip_s3_policy" {
 
 # tfsec:ignore:aws-s3-enable-bucket-encryption tfsec:ignore:aws-s3-encryption-customer-key tfsec:ignore:aws-s3-enable-bucket-logging tfsec:ignore:aws-s3-enable-versioning
 module "zip_bastion" {
+  count = local.is-production || local.is-development ? 1 : 0
   source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=1eaf3c9"
 
   providers = {
@@ -202,6 +203,8 @@ module "zip_bastion" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "zip_bastion_vpc_access" {
+  count = local.is-production || local.is-development ? 1 : 0
+  
   security_group_id = module.zip_bastion.bastion_security_group
   description       = "Reach vpc endpoints"
   ip_protocol       = "tcp"
