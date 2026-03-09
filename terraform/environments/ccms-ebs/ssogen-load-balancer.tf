@@ -99,20 +99,21 @@ resource "aws_lb_listener" "ssogen_internal_console_listener" {
   # depends_on = [aws_acm_certificate_validation.external_nonprod]
 }
 
-resource "aws_lb_listener" "ssogen_internal_console_listener_encrypted" {
+resource "aws_lb_listener_rule" "ssogen_internal_console_listener_encrypted" {
   count             = local.is-development || local.is-test ? 1 : 0
-  load_balancer_arn = aws_lb.ssogen_alb[count.index].arn
-  port              = "5443"
-  protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
-  certificate_arn   = data.aws_acm_certificate.external_ssogen[count.index].arn
+  listener_arn = aws_lb_listener.ssogen_internal_app_listener[count.index].arn
+  priority          = 10
 
-  default_action {
+  action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.ssogen_internal_tg_ssogen_console[count.index].arn
   }
 
-  depends_on = [aws_acm_certificate_validation.external_nonprod]
+  condition {
+    path_pattern {
+      values = ["/console*"]
+    }
+  }
 }
 
 # resource "aws_lb_target_group_attachment" "ssogen_internal" {
