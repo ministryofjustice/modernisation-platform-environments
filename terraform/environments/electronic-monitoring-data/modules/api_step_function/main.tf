@@ -1,7 +1,8 @@
 locals {
   camel_case_api_name  = join("", [for word in split("_", var.api_name) : title(word)])
-  sync                 = var.sfn_type == "express" ? "Sync" : ""
-  # Return a parsed response dependent on if sfn is standard or express type
+  # Set some vars based on if sfn is standard or express type
+  sync              = lower(var.sfn_type) == "express" ? "Sync" : ""
+  status_int_get    = lower(var.sfn_type) == "express" ? "express" : "execution"
   express_response  = <<EOF
 #set ($parsedPayload = $util.parseJson($input.json('$.output')))
 $parsedPayload
@@ -36,14 +37,16 @@ resource "aws_api_gateway_resource" "resource" {
 }
 
 resource "aws_api_gateway_resource" "status" {
+  count       = var.enable_status_check ? 1 : 0
   rest_api_id = aws_api_gateway_rest_api.api_gateway.id
   parent_id   = aws_api_gateway_resource.resource.id
   path_part   = "status"
 }
 
 resource "aws_api_gateway_resource" "execution_id" {
+  count       = var.enable_status_check ? 1 : 0
   rest_api_id = aws_api_gateway_rest_api.api_gateway.id
-  parent_id   = aws_api_gateway_resource.status.id
+  parent_id   = aws_api_gateway_resource.status[0].id
   path_part   = "{execution_id}"
 }
 
@@ -59,8 +62,9 @@ resource "aws_api_gateway_method" "method" {
 }
 
 resource "aws_api_gateway_method" "get_status" {
+  count       = var.enable_status_check ? 1 : 0
   rest_api_id   = aws_api_gateway_rest_api.api_gateway.id
-  resource_id   = aws_api_gateway_resource.execution_id.id
+  resource_id   = aws_api_gateway_resource.execution_id[0].id
   http_method   = "GET"
   authorization = "AWS_IAM"
 }
@@ -158,9 +162,10 @@ EOF
 }
 
 resource "aws_api_gateway_integration" "status_integration" {
+  count                   = var.enable_status_check ? 1 : 0
   rest_api_id             = aws_api_gateway_rest_api.api_gateway.id
-  resource_id             = aws_api_gateway_resource.execution_id.id
-  http_method             = aws_api_gateway_method.get_status.http_method
+  resource_id             = aws_api_gateway_resource.execution_id[0].id
+  http_method             = aws_api_gateway_method.get_status[0].http_method
   integration_http_method = "POST"
   type                    = "AWS"
   uri                     = "arn:aws:apigateway:${data.aws_region.current.name}:states:action/DescribeExecution"
@@ -170,7 +175,7 @@ resource "aws_api_gateway_integration" "status_integration" {
   request_templates = {
     "application/json" = <<EOF
 {
-  "executionArn": "${replace(var.step_function.arn, "stateMachine", "execution")}:$input.params('execution_id')"
+  "executionArn": "${replace(var.step_function.arn, "stateMachine", local.status_int_get)}:$input.params('execution_id')"
 }
 EOF
   }
@@ -184,15 +189,15 @@ resource "aws_api_gateway_deployment" "deployment" {
   rest_api_id = aws_api_gateway_rest_api.api_gateway.id
 
   triggers = {
-    redeployment = sha1(jsonencode([
+    redeployment = sha1(jsonencode(compact([
       aws_api_gateway_resource.resource.id,
-      aws_api_gateway_resource.execution_id.id,
-      aws_api_gateway_resource.status.id,
+      var.enable_status_check ? aws_api_gateway_resource.execution_id[0].id : null,
+      var.enable_status_check ? aws_api_gateway_resource.status[0].id : null,
       aws_api_gateway_method.method.id,
-      aws_api_gateway_method.get_status.id,
+      var.enable_status_check ? aws_api_gateway_method.get_status[0].id : null,
       aws_api_gateway_integration.step_function_integration.id,
-      aws_api_gateway_integration.status_integration.id,
-    ]))
+      var.enable_status_check ? aws_api_gateway_integration.status_integration[0].id : null,
+    ])))
   }
 
   lifecycle {
@@ -236,16 +241,18 @@ resource "aws_api_gateway_method_response" "response_200" {
 }
 
 resource "aws_api_gateway_method_response" "status_200" {
+  count       = var.enable_status_check ? 1 : 0
   rest_api_id = aws_api_gateway_rest_api.api_gateway.id
-  resource_id = aws_api_gateway_resource.execution_id.id
-  http_method = aws_api_gateway_method.get_status.http_method
+  resource_id = aws_api_gateway_resource.execution_id[0].id
+  http_method = aws_api_gateway_method.get_status[0].http_method
   status_code = "200"
 }
 
 resource "aws_api_gateway_method_response" "status_404" {
+  count       = var.enable_status_check ? 1 : 0
   rest_api_id = aws_api_gateway_rest_api.api_gateway.id
-  resource_id = aws_api_gateway_resource.execution_id.id
-  http_method = aws_api_gateway_method.get_status.http_method
+  resource_id = aws_api_gateway_resource.execution_id[0].id
+  http_method = aws_api_gateway_method.get_status[0].http_method
   status_code = "404"
 }
 
@@ -264,15 +271,16 @@ resource "aws_api_gateway_integration_response" "integration_response_200" {
 }
 
 resource "aws_api_gateway_integration_response" "status_integration_response" {
+  count       = var.enable_status_check ? 1 : 0
   rest_api_id = aws_api_gateway_rest_api.api_gateway.id
-  resource_id = aws_api_gateway_resource.execution_id.id
-  http_method = aws_api_gateway_method.get_status.http_method
+  resource_id = aws_api_gateway_resource.execution_id[0].id
+  http_method = aws_api_gateway_method.get_status[0].http_method
   status_code = "200"
 
   response_templates = {
     "application/json" = <<EOF
 #set($input = $input.path('$'))
-#if($input.get("__type").contains("Execution Does Not Exist"))
+#if($input.get("__type").contains("ExecutionDoesNotExist"))
     #set($context.responseOverride.status = 404)
     {
       "error": "NotFound",
@@ -290,7 +298,7 @@ resource "aws_api_gateway_integration_response" "status_integration_response" {
         "error": "$input.error",
         "cause": "$input.cause"
       #else
-        "output": "Execution is currently $input.status"
+        "output": ""
       #end
     }
 #end

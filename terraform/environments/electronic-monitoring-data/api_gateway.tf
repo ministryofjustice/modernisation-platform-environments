@@ -28,13 +28,14 @@ module "get_zipped_file_api_api" {
 }
 
 module "ears_sars_api" {
-  count           = local.is-development || local.is-preproduction ? 1 : 0
-  source          = "./modules/api_step_function"
-  api_name        = "ears_sars_api"
-  api_description = "Ears and Sars API"
-  api_path        = "execute"
-  step_function   = module.ears_sars_step_function[0]
-  sfn_type        = "standard"
+  count               = local.is-development || local.is-preproduction ? 1 : 0
+  source              = "./modules/api_step_function"
+  api_name            = "ears_sars_api"
+  api_description     = "Ears and Sars API"
+  api_path            = "execute"
+  step_function       = module.ears_sars_step_function[0]
+  sfn_type            = "standard"
+  enable_status_check = true
   stages = [
     {
       stage_name             = "request",

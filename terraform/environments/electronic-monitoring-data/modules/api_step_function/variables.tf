@@ -53,9 +53,15 @@ variable "schema" {
 }
 
 variable "sfn_type" {
-  description = "If the sfn is standard or express"
+  description = "If the step function type is standard or express"
   type        = string
   default     = "standard"
+}
+
+variable "enable_status_check" {
+  type        = bool
+  description = "Boolean to enable the GET /status/{execution_id} endpoint"
+  default     = false
 }
 
 variable "api_version" {
