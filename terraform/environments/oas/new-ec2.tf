@@ -103,3 +103,24 @@ resource "aws_instance" "oas_app_instance_new" {
   )
 }
 
+
+
+
+
+resource "aws_instance" "kali_app_instance_new" {
+  count = local.environment == "preproduction" ? 1 : 0
+
+  ami                         = "ami-002e3567c9c495d68"
+  availability_zone           = "eu-west-2a"
+  subnet_id                   = data.aws_subnet.data_subnets_a.id
+
+  instance_type               = "t2.micro"
+  key_name                    = aws_key_pair.ec2_key_pair[0].key_name
+  monitoring                  = true
+  iam_instance_profile        = aws_iam_instance_profile.ec2_instance_profile_new[0].id
+  user_data_replace_on_change = true
+ 
+
+
+
+}
