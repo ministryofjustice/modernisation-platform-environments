@@ -449,3 +449,7 @@ resource "aws_db_instance_role_association" "rds_s3_role_association" {
 output "db_instance_id" {
   value = aws_db_instance.appdb1.id
 }
+
+output "db_instance_identifier" {
+  value = aws_db_instance.appdb1.identifier
+}
