@@ -148,3 +148,81 @@ resource "aws_glue_catalog_table_optimizer" "standard_orphan_file_deletion" {
 
   type = "orphan_file_deletion"
 }
+
+data "aws_iam_policy_document" "glue_table_optimizer_assume_role_policy" {
+    statement {
+        effect = "Allow"
+        principals {
+            type        = "Service"
+            identifiers = ["glue.amazonaws.com"]
+        }
+    }
+}
+
+resource "aws_iam_role" "glue_table_optimizer" {
+    name               = "glue-table-optimizer-role"
+    assume_role_policy = data.aws_iam_policy_document.glue_table_optimizer_assume_role_policy.json
+}
+
+data "aws_iam_policy_document" "glue_table_optimizer_policy" {
+    statement {
+      effect = "Allow"
+      actions = [
+        "lakeformation:GetDataAccess"
+      ]
+      resources = ["*"]
+    }
+    statement {
+      effect = "Allow"
+      actions = [
+        "glue:UpdateTable",
+        "glue:GetTable"
+      ]
+      resources = [
+        "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/*/*",
+        "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:database/*",
+        "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:catalog"
+      ]
+    }
+    statement {
+      effect = "Allow"
+      actions = [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+      ]
+      resources = [
+        "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws-glue/iceberg-compaction/logs:*",
+        "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws-glue/iceberg-retention/logs:*",
+        "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws-glue/iceberg-orphan-file-deletion/logs:*"
+      ]
+    }
+}
+
+resource "aws_iam_policy" "glue_table_optimizer_policy" {
+    name   = "glue-table-optimizer-policy"
+    policy = data.aws_iam_policy_document.glue_table_optimizer_policy.json
+}
+
+resource "aws_iam_role_policy_attachment" "glue_table_optimizer_policy_attachment" {
+    role       = aws_iam_role.glue_table_optimizer.name
+    policy_arn = aws_iam_policy.glue_table_optimizer_policy.arn
+}
+
+resource "aws_lakeformation_permissions" "glue_table_optimizer_permissions" {
+    principal = aws_iam_role.glue_table_optimizer.arn
+    permissions = ["DATA_LOCATION_ACCESS"]
+    data_location {
+        arn = aws_lakeformation_resource.data_bucket.arn
+    }
+}
+
+resource "aws_lakeformation_permissions" "glue_table_optimizer_database_permissions" {
+    for_each = toset(local.database_to_optimize)
+    principal = aws_iam_role.glue_table_optimizer.arn
+    permissions = ["ALTER", "DESCRIBE", "INSERT", "DELETE"]
+    table {
+        database_name = each.key
+        wildcard      = true
+    }
+}
