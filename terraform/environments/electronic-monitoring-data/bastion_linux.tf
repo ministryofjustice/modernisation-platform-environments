@@ -105,7 +105,7 @@ resource "aws_iam_role_policy" "ec2_s3_policy" {
 resource "aws_iam_role_policy" "zip_s3_policy" {
 
   name   = "zip_s3_policy"
-  role   = module.zip_bastion.bastion_iam_role.name
+  role   = module.zip_bastion[0].bastion_iam_role.name
   policy = data.aws_iam_policy_document.zip_s3_policy.json
 }
 
@@ -204,8 +204,8 @@ module "zip_bastion" {
 
 resource "aws_vpc_security_group_egress_rule" "zip_bastion_vpc_access" {
   count = local.is-production || local.is-development ? 1 : 0
-  
-  security_group_id = module.zip_bastion.bastion_security_group
+
+  security_group_id = module.zip_bastion[0].bastion_security_group
   description       = "Reach vpc endpoints"
   ip_protocol       = "tcp"
   from_port         = 443
